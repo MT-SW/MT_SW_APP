@@ -80,6 +80,12 @@ class CapabilitiesTest {
     }
 
     @Test
+    fun supportsTrafficManagementConfig_requires_V2_8_0() {
+        assertFalse(caps("2.7.21").supportsTrafficManagementConfig)
+        assertTrue(caps("2.8.0").supportsTrafficManagementConfig)
+    }
+
+    @Test
     fun supportsTakConfig_requires_V2_7_19() {
         assertFalse(caps("2.7.18").supportsTakConfig)
         assertTrue(caps("2.7.19").supportsTakConfig)
@@ -102,6 +108,7 @@ class CapabilitiesTest {
         assertFalse(c.supportsQrCodeSharing)
         assertFalse(c.supportsSecondaryChannelLocation)
         assertFalse(c.supportsStatusMessage)
+        assertFalse(c.supportsTrafficManagementConfig)
         assertFalse(c.supportsTakConfig)
         assertFalse(c.supportsEsp32Ota)
     }
@@ -112,6 +119,7 @@ class CapabilitiesTest {
         assertTrue(c.canMuteNode)
         assertTrue(c.canSendVerifiedContacts)
         assertTrue(c.supportsStatusMessage)
+        assertTrue(c.supportsTrafficManagementConfig)
         assertTrue(c.supportsTakConfig)
     }
 }

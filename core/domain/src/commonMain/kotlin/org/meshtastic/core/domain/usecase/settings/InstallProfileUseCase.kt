@@ -107,6 +107,7 @@ open class InstallProfileUseCase constructor(private val radioController: RadioC
         lmc.detection_sensor?.let { setModuleConfig(ModuleConfig(detection_sensor = it)) }
         lmc.paxcounter?.let { setModuleConfig(ModuleConfig(paxcounter = it)) }
         lmc.statusmessage?.let { setModuleConfig(ModuleConfig(statusmessage = it)) }
+        lmc.traffic_management?.let { setModuleConfig(ModuleConfig(traffic_management = it)) }
         lmc.tak?.let { setModuleConfig(ModuleConfig(tak = it)) }
     }
 }

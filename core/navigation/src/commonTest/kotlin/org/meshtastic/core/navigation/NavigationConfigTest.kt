@@ -97,6 +97,7 @@ class NavigationConfigTest {
             SettingsRoute.DetectionSensor,
             SettingsRoute.Paxcounter,
             SettingsRoute.StatusMessage,
+            SettingsRoute.TrafficManagement,
             SettingsRoute.TAK,
             SettingsRoute.CleanNodeDb,
             SettingsRoute.DebugPanel,

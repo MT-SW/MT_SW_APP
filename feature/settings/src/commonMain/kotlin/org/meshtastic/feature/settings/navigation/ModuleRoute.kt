@@ -27,6 +27,7 @@ import org.meshtastic.core.resources.audio
 import org.meshtastic.core.resources.canned_message
 import org.meshtastic.core.resources.detection_sensor
 import org.meshtastic.core.resources.external_notification
+import org.meshtastic.core.resources.ic_alt_route
 import org.meshtastic.core.resources.ic_cloud
 import org.meshtastic.core.resources.ic_data_usage
 import org.meshtastic.core.resources.ic_group
@@ -51,6 +52,7 @@ import org.meshtastic.core.resources.status_message
 import org.meshtastic.core.resources.store_forward
 import org.meshtastic.core.resources.tak
 import org.meshtastic.core.resources.telemetry
+import org.meshtastic.core.resources.traffic_management
 import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.Config
 import org.meshtastic.proto.DeviceMetadata
@@ -146,6 +148,13 @@ enum class ModuleRoute(
         AdminMessage.ModuleConfigType.STATUSMESSAGE_CONFIG.value,
         isSupported = { it.supportsStatusMessage },
     ),
+    TRAFFIC_MANAGEMENT(
+        Res.string.traffic_management,
+        SettingsRoute.TrafficManagement,
+        Res.drawable.ic_alt_route,
+        AdminMessage.ModuleConfigType.TRAFFICMANAGEMENT_CONFIG.value,
+        isSupported = { it.supportsTrafficManagementConfig },
+    ),
     TAK(
         Res.string.tak,
         SettingsRoute.TAK,
@@ -196,6 +205,9 @@ enum class ModuleRoute(
                 PAXCOUNTER -> 0x1000
 
                 STATUS_MESSAGE -> 0x0000
+
+                // Not excludable yet
+                TRAFFIC_MANAGEMENT -> 0x0000
 
                 // Not excludable yet
                 TAK -> 0x0000
