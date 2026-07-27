@@ -80,7 +80,7 @@ Kui värskendus õnnestub:
 - The radio will reboot automatically
 - Sinihamba ühendus taastatakse
 - Verify your settings are intact
-- Kontrolli uut versiooni püsivara värskenduse ekraanil jaotises **Praegu installitud** – see kuvatakse ka sõlme üksikasjade lehel ja ühenduste ekraanil
+- Kontrolli uut versiooni püsivara värskenduse ekraanil jaotises **Praegu paigaldatud** – see kuvatakse ka sõlme üksikasjade lehel ja ühenduste ekraanil
 
 ![Püsivara värskendus õnnestus](/assets/screenshots/firmware_success.png)
 
@@ -120,7 +120,7 @@ The app may show warnings when:
 - [Ühendused](connections) — ühenduse loomine pärast püsivara värskendamist
 - [Püsivara uuendamise juhend](https://meshtastic.org/docs/getting-started/flashing-firmware) — täielik püsivara uuendamise juhend meshtastic.org lehel
 - [Toetatud seadmed](https://meshtastic.org/docs/hardware/devices) — ühilduvate raadiote täielik loetelu on leitav aadressilt meshtastic.org
-- [KKK](https://meshtastic.org/docs/about/faq) — meshtastic.org levinud küsimused
+- [FAQ](https://meshtastic.org/docs/faq/) — common questions on meshtastic.org
 
 ---
 

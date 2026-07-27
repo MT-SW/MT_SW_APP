@@ -80,15 +80,18 @@ class CapabilitiesTest {
     }
 
     @Test
+    @Test
     fun supportsTrafficManagementConfig_requires_V2_8_0() {
         assertFalse(caps("2.7.21").supportsTrafficManagementConfig)
         assertTrue(caps("2.8.0").supportsTrafficManagementConfig)
     }
 
     @Test
-    fun supportsTakConfig_requires_V2_7_19() {
-        assertFalse(caps("2.7.18").supportsTakConfig)
-        assertTrue(caps("2.7.19").supportsTakConfig)
+    fun supportsTakConfig_requires_V2_8_0() {
+        assertFalse(caps("2.7.19").supportsTakConfig)
+        assertFalse(caps("2.7.26").supportsTakConfig)
+        assertTrue(caps("2.8.0").supportsTakConfig)
+    }in/main
     }
 
     @Test

@@ -52,6 +52,12 @@ Internetiühendusega (WiFi või Ethernet) lüüsisõlm jagab võrgusõnumeid MQT
 | TLS              | Secure connection to broker                                                                | Keelatud                                            |
 | Map Reporting    | Report position to public map                                                              | Keelatud                                            |
 
+### MQTT Proxy on This Phone
+
+If your node has no internet access of its own, it can use the connected phone as its MQTT gateway: enable **MQTT** and **Proxy to client enabled** in the module config, and the app relays MQTT traffic between the radio and the broker over your phone's internet connection.
+
+The **MQTT proxy on this phone** toggle at the top of the MQTT settings screen shows whether this relay is currently running and lets you cut it off (or restart it) immediately — without editing and re-saving the device's MQTT configuration.
+
 ### Meshtastic vaikemaakler
 
 Kogukond haldab avaliku vahendajat aadressil `mqtt.meshtastic.org`. This is intended for general use and testing.
@@ -87,11 +93,11 @@ Kui kaardiaruandlus on lubatud, avaldab sõlm oma asukoha Meshtasticu kogukonnak
 
 Konfi iga kanali kohta, millised suunad on aktiivsed, et kontrollida sõnumivoogu ja eetriaega.
 
-## Message Formats
+## Sõnumivormingud
 
 MQTT kasutab protobuf-sõnumivormingut:
 
-| Format       | Kirjeldus                              | Use case                   |
+| Vorming      | Kirjeldus                              | Use case                   |
 | ------------ | -------------------------------------- | -------------------------- |
 | **Protobuf** | Binaarne Meshtastic protobuf kodeering | Node-to-node mesh bridging |
 
@@ -122,7 +128,7 @@ Understanding the layered encryption model:
 - **Kontrolli WiFit** – lüüssõlmel peab olema aktiivne internetiühendus (WiFi või Ethernet). MQTT ei tööta LoRa raadiolingi enda kaudu.
 - **Verify credentials** — incorrect username or password will silently fail on most brokers. Double-check for trailing spaces.
 - **Tulemüür** — port 1883 (MQTT) või 8883 (MQTT+TLS) peab olema avatud. Some networks block non-standard ports.
-- **DNS resolution** — if using a custom broker hostname, verify the node can resolve it. Try the broker's IP address directly.
+- **DNS-i lahendamine** – kui kasutad kohandatud maakleri hostinime, veenduge, et sõlm suudab seda lahendada. Try the broker's IP address directly.
 
 ### Messages Not Bridging
 

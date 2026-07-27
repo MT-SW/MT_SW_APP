@@ -16,9 +16,14 @@
  */
 package org.meshtastic.core.data.repository
 
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.yield
 import kotlinx.serialization.json.Json
 import okio.Buffer
 import okio.Source
@@ -28,8 +33,11 @@ import org.meshtastic.core.database.entity.FirmwareReleaseEntity
 import org.meshtastic.core.database.entity.FirmwareReleaseType
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.EventFirmwareResponse
+import org.meshtastic.core.model.FirmwareReleaseManifest
+import org.meshtastic.core.model.FirmwareTarget
 import org.meshtastic.core.model.NetworkDeviceHardware
 import org.meshtastic.core.model.NetworkDeviceLinksResponse
+import org.meshtastic.core.model.NetworkFirmwareNightly
 import org.meshtastic.core.model.NetworkFirmwareRelease
 import org.meshtastic.core.model.NetworkFirmwareReleases
 import org.meshtastic.core.model.Releases
@@ -44,13 +52,36 @@ import kotlin.test.assertTrue
 
 class FirmwareReleaseRepositoryImplTest {
 
-    /** Only [getFirmwareReleases] is exercised; the other endpoints are never called by this repository. */
+    /** Only the firmware endpoints are exercised; the others are never called by this repository. */
     private class FakeApiService(var response: NetworkFirmwareReleases) : ApiService {
+        var nightly: NetworkFirmwareNightly? = null
+        var nightlyUnreachable = false
+        var manifest: FirmwareReleaseManifest? = null
+        var manifestCalls = 0
+        var firmwareCalls = 0
+
+        /** When set, [getFirmwareReleases] hangs until completed — simulates a slow/unreachable API. */
+        var responseGate: CompletableDeferred<Unit>? = null
+
         override suspend fun getDeviceHardware(): List<NetworkDeviceHardware> = error("unused")
 
         override suspend fun getDeviceLinks(): NetworkDeviceLinksResponse = error("unused")
 
-        override suspend fun getFirmwareReleases(): NetworkFirmwareReleases = response
+        override suspend fun getFirmwareReleases(): NetworkFirmwareReleases {
+            firmwareCalls++
+            responseGate?.await()
+            return response
+        }
+
+        override suspend fun getFirmwareReleaseManifest(manifestUrl: String): FirmwareReleaseManifest {
+            manifestCalls++
+            return checkNotNull(manifest) { "manifest not configured" }
+        }
+
+        override suspend fun getNightlyFirmware(): NetworkFirmwareNightly? {
+            if (nightlyUnreachable) error("nightly index unreachable")
+            return nightly
+        }
 
         override suspend fun getEventFirmware(): EventFirmwareResponse = error("unused")
     }
@@ -128,6 +159,21 @@ class FirmwareReleaseRepositoryImplTest {
             dao.getReleasesByType(FirmwareReleaseType.ALPHA).map { it.id },
             "pulled and reclassified releases are pruned from the alpha rows",
         )
+    }
+
+    @Test
+    fun `manifest board targets are fetched once and cached by release URL`() = runBlocking {
+        val release =
+            org.meshtastic.core.database.entity.FirmwareRelease(id = "v2.8.0", zipUrl = "https://example.com/manifest")
+        api.manifest =
+            FirmwareReleaseManifest(
+                version = "2.8.0",
+                targets = listOf(FirmwareTarget(board = "tbeam-s3-core", platform = "esp32s3")),
+            )
+
+        assertEquals(setOf("tbeam-s3-core"), repository.getManifestTargets(release))
+        assertEquals(setOf("tbeam-s3-core"), repository.getManifestTargets(release))
+        assertEquals(1, api.manifestCalls)
     }
 
     @Test
@@ -238,6 +284,98 @@ class FirmwareReleaseRepositoryImplTest {
         // A genuinely newer alpha is still offered.
         dao.insert(FirmwareReleaseEntity(id = "v2.7.27.abc1234", releaseType = FirmwareReleaseType.ALPHA))
         assertEquals("v2.7.27.abc1234", repository.alphaRelease.toList().last()?.id)
+    }
+
+    @Test
+    fun nightlyFlowMapsPublishedIndex() = runBlocking {
+        api.nightly = NetworkFirmwareNightly(version = "2.8.0.f52e2ea", commit = "f52e2ea8efa096a")
+
+        val emissions = repository.nightlyRelease.toList()
+
+        val nightly = emissions.last()
+        assertEquals("v2.8.0.f52e2ea", nightly?.id, "id is derived from the version when absent")
+        assertEquals("Meshtastic Firmware 2.8.0.f52e2ea Nightly", nightly?.title)
+        assertEquals("", nightly?.zipUrl, "nightly publishes no release zip")
+        assertEquals(FirmwareReleaseType.NIGHTLY, nightly?.releaseType)
+    }
+
+    @Test
+    fun unpublishedNightlyClearsStaleRow() = runBlocking {
+        // A nightly was cached, then unpublished upstream (index.json now 404s).
+        dao.insert(staleRow("v2.8.0.f52e2ea", FirmwareReleaseType.NIGHTLY))
+        api.nightly = null
+
+        val emissions = repository.nightlyRelease.toList()
+
+        assertEquals("v2.8.0.f52e2ea", emissions.first()?.id, "stale cache is emitted before the refresh")
+        assertEquals(null, emissions.last(), "404 clears the cached nightly row")
+        assertTrue(dao.getReleasesByType(FirmwareReleaseType.NIGHTLY).isEmpty())
+    }
+
+    @Test
+    fun unreachableNightlyIndexLeavesCacheUntouched() = runBlocking {
+        dao.insert(staleRow("v2.8.0.f52e2ea", FirmwareReleaseType.NIGHTLY))
+        api.nightlyUnreachable = true
+
+        val emissions = repository.nightlyRelease.toList()
+
+        assertEquals("v2.8.0.f52e2ea", emissions.last()?.id, "transport errors keep the cached nightly")
+    }
+
+    @Test
+    fun nightlyIsExemptFromBelowStableGuard() = runBlocking {
+        // Unlike alpha, an explicitly selected nightly is offered even when stable is ahead of it.
+        dao.insert(FirmwareReleaseEntity(id = "v2.9.0.abc1234", releaseType = FirmwareReleaseType.STABLE))
+        dao.insert(FirmwareReleaseEntity(id = "v2.8.0.f52e2ea", releaseType = FirmwareReleaseType.NIGHTLY))
+
+        assertEquals("v2.8.0.f52e2ea", repository.nightlyRelease.toList().first()?.id)
+    }
+
+    @Test
+    fun cachedEmissionIsNotBlockedByAnotherFlowsInFlightRefresh() = runBlocking {
+        // Regression for the api.meshtastic.org outage of 2026-07: the stable flow's refresh held a lock for the
+        // full request+retry window (minutes), wedging the alpha flow's *cached* emission behind it — and with it
+        // the node detail screen, which combines both flows into its first UI state.
+        dao.insert(staleRow("v2.7.26.54e0d8d", FirmwareReleaseType.STABLE))
+        dao.insert(staleRow("v2.7.27.abc1234", FirmwareReleaseType.ALPHA))
+        val gate = CompletableDeferred<Unit>()
+        api.responseGate = gate
+        api.response = NetworkFirmwareReleases()
+
+        val stableCollector = launch { repository.stableRelease.collect {} }
+        withTimeout(2_000) { while (api.firmwareCalls == 0) yield() } // stable's refresh is now hanging on the API
+
+        val alphaCached = withTimeout(2_000) { repository.alphaRelease.first() }
+        assertEquals("v2.7.27.abc1234", alphaCached?.id, "alpha cache emits while the stable refresh is in flight")
+
+        gate.complete(Unit)
+        stableCollector.join()
+    }
+
+    @Test
+    fun concurrentCollectorsShareOneNetworkRefresh() = runBlocking {
+        dao.insert(staleRow("v2.7.26.54e0d8d", FirmwareReleaseType.STABLE))
+        dao.insert(staleRow("v2.7.27.abc1234", FirmwareReleaseType.ALPHA))
+        val gate = CompletableDeferred<Unit>()
+        api.responseGate = gate
+        // The response refreshes BOTH channels, so whichever collector reaches its fetch decision second either
+        // joins the in-flight refresh (refresh still hanging on [gate]) or finds its rows already fresh (refresh
+        // completed) — one network call in both interleavings.
+        api.response =
+            NetworkFirmwareReleases(
+                releases =
+                Releases(stable = listOf(release("v2.7.28.def5678")), alpha = listOf(release("v2.7.29.fedcba9"))),
+            )
+
+        val stableCollector = launch { repository.stableRelease.collect {} }
+        val alphaCollector = launch { repository.alphaRelease.collect {} }
+        withTimeout(2_000) { while (api.firmwareCalls == 0) yield() }
+
+        gate.complete(Unit)
+        stableCollector.join()
+        alphaCollector.join()
+
+        assertEquals(1, api.firmwareCalls, "stable and alpha collectors share one refresh")
     }
 
     @Test

@@ -28,9 +28,16 @@ permissions:
   id-token: write
   attestations: write
 
+# Never allow two release pipelines to run at once — they race on tags,
+# release objects, and Play track state. Later dispatches queue.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
   determine-tags:
     runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
     outputs:
       tag_to_process: ${{ steps.calculate_tags.outputs.tag_to_process }}
       release_name: ${{ steps.calculate_tags.outputs.release_name }}
@@ -38,7 +45,7 @@ jobs:
       from_channel: ${{ steps.calculate_tags.outputs.from_channel }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
           token: ${{ secrets.CROWDIN_GITHUB_TOKEN }}
@@ -132,6 +139,18 @@ jobs:
   call-promote-workflow:
     if: ${{ !inputs.dry_run && inputs.channel != 'internal' }}
     needs: determine-tags
+    # promote.yml's token is capped by this job's grants, and a called
+    # workflow requesting more than its caller grants fails at startup —
+    # so this must cover promote.yml's declared workflow-level set, plus
+    # actions: write for its publish-workflow dispatch. Scoped to this job
+    # so call-release-workflow doesn't carry it.
+    permissions:
+      contents: write
+      pull-requests: write
+      statuses: write
+      id-token: write
+      attestations: write
+      actions: write
     uses: ./.github/workflows/promote.yml
     with:
       tag_name: ${{ needs.determine-tags.outputs.tag_to_process }}
@@ -146,9 +165,10 @@ jobs:
     needs: [determine-tags, call-release-workflow]
     if: ${{ (failure() || cancelled()) && !inputs.dry_run && inputs.channel == 'internal' }}
     runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
       - name: Delete Failed or Cancelled Tag

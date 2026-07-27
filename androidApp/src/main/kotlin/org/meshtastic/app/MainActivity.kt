@@ -44,11 +44,8 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import co.touchlab.kermit.Logger
-import coil3.ImageLoader
-import coil3.compose.setSingletonImageLoaderFactory
 import com.eygraber.uri.toKmpUri
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.compose.koinInject
@@ -115,9 +112,6 @@ class MainActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
 
-        // ponytail: debug-only test affordance so CI/agent tooling can skip onboarding on a fresh
-        // install: `adb shell am start -n <pkg>/.MainActivity --ez skip_onboarding true`. Pair with
-        // `adb shell pm grant <pkg> <permission>` to pre-grant runtime permissions (native, no app code).
         if (BuildConfig.DEBUG && intent.getBooleanExtra(EXTRA_SKIP_ONBOARDING, false)) {
             model.onAppIntroCompleted()
         }
@@ -136,10 +130,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContent {
-            // Bridge Koin-provided ImageLoader (with flavor-specific HttpClient, SVG, debug logger)
-            // to Coil's singleton so all AsyncImage composables use the custom configuration.
-            setSingletonImageLoaderFactory { get<ImageLoader>() }
-
             val theme by model.theme.collectAsStateWithLifecycle()
             val dynamic = theme == MODE_DYNAMIC
             val dark =

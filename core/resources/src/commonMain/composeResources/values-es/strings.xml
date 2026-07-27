@@ -65,6 +65,8 @@
     <string name="app_too_old">Es necesario actualizar la aplicación</string>
     <string name="app_version">Versión</string>
     <string name="apply">Aplique</string>
+    <!-- AQI -->
+    <string name="aqi_good">Bien</string>
     <string name="are_you_sure">¿Estás seguro?</string>
     <string name="are_you_sure_change_default">¿Estás seguro de que quieres cambiar al canal por defecto?</string>
     <string name="audio">Audio</string>
@@ -218,6 +220,7 @@
     <string name="delivery_confirmed">Envío confirmado</string>
     <string name="desc_node_filter_clear">quitar filtro de nodo</string>
     <string name="description">Descripción</string>
+    <!-- DESKTOP -->
     <string name="desktop_notification_title">Meshtastic</string>
     <string name="details">Detalles</string>
     <string name="detection_sensor">Sensor de Presencia</string>
@@ -335,6 +338,7 @@
     <string name="fixed_position">Posición Fijada</string>
     <string name="flip_screen">Girar la pantalla 180º</string>
     <string name="for_more_information_see_our_privacy_policy">Para más información, consulte nuestra política de privacidad.</string>
+    <!-- FORMAT -->
     <string name="free_memory">Memoria disponible</string>
     <string name="freq">Frecuencia</string>
     <string name="frequency_slot">Slot de frecuencia</string>
@@ -387,6 +391,7 @@ Rango de Valores 0 - 500.</string>
     <string name="ignore_incoming">Ignorar entrante</string>
     <string name="ignore_mqtt">Ignorar Paquetes MQTT</string>
     <string name="ignore_remove">¿Eliminar '%1$s' para ignorar la lista? Tu radio se reiniciará después de hacer este cambio.</string>
+    <!-- IMPORT -->
     <string name="import_configuration">Importar una configuración</string>
     <string name="import_known_shared_contact_text">Advertencia: Este contacto ya es conocido, importar sobrescribirá la información anterior del contacto.</string>
     <string name="import_label">Importar</string>
@@ -444,7 +449,7 @@ Rango de Valores 0 - 500.</string>
     <string name="low_battery_title">Batería baja: %1$s</string>
     <string name="lux">Lux</string>
     <string name="manage_map_layers">Administrar capas de mapa</string>
-    <string name="managed_mode">Modo \"ya terminado de configurar\"</string>
+    <string name="managed_mode">Modo "ya terminado de configurar"</string>
     <string name="manual_position_request">Requerir solicitud manual de posición</string>
     <!-- MAP -->
     <string name="map">Mapa Mesh</string>
@@ -606,6 +611,7 @@ Estos datos de ubicación pueden ser utilizados para fines como aparecer en un m
     <string name="override_duty_cycle">Sobreescribir el Tiempo de Trabajo</string>
     <string name="override_frequency_mhz">Sobreescribir frecuencia</string>
     <string name="pa_fan_disabled">Ventilador del Amplificador apagado</string>
+    <!-- PACKET -->
     <string name="pairing_mode">Modo de emparejamiento</string>
     <string name="password">Contraseña</string>
     <!-- PAX -->
@@ -613,7 +619,7 @@ Estos datos de ubicación pueden ser utilizados para fines como aparecer en un m
     <string name="paxcounter_config">Configuración del Contador de Paquetes</string>
     <string name="paxcounter_enabled">Activar el Contador de Paquetes</string>
     <string name="periodic_position_broadcast">Transmisión periódica de posición</string>
-    <string name="permission_missing_31">Meshtastic necesita activar los permisos \"Dispositivos cercanos\" para encontrar y conectarse a dispositivos mediante Bluetooth. Puede desactivar cuando no esté en uso.</string>
+    <string name="permission_missing_31">Meshtastic necesita activar los permisos "Dispositivos cercanos" para encontrar y conectarse a dispositivos mediante Bluetooth. Puede desactivar cuando no esté en uso.</string>
     <string name="phone_location">Ubicación del teléfono</string>
     <string name="phone_location_description">Meshtastic utiliza la ubicación de tu teléfono para habilitar varias características. Puedes actualizar los permisos de ubicación en cualquier momento desde la configuración.</string>
     <plurals name="plurals_hours">
@@ -749,6 +755,7 @@ Estos datos de ubicación pueden ser utilizados para fines como aparecer en un m
     <string name="rssi_definition">Indicador de Fuerza de Señal Recibida (RSSI en inglés), una medida utilizada para determinar el nivel de potencia que está siendo recibido por la antena. Un valor de RSSI más alto generalmente indica una conexión más fuerte y estable.</string>
     <string name="rsyslog_server">Servidor rsyslog</string>
     <string name="sats">Satélites</string>
+    <!-- SAVE -->
     <string name="save">Guardar</string>
     <string name="save_changes">Guardar</string>
     <string name="save_csv_in_storage_esp32_only">Guardar el .CSV en el almacenamiento (Esp32)</string>
@@ -794,7 +801,6 @@ Estos datos de ubicación pueden ser utilizados para fines como aparecer en un m
     <string name="share">Compartir</string>
     <string name="share_contact">Compartir contacto</string>
     <string name="share_location">Compartir ubicación</string>
-    <string name="share_location_description">Utilice el GPS del teléfono para enviar ubicaciones a su nodo en lugar de usar el hardware GPS de su nodo.</string>
     <string name="share_to">Compartir con…</string>
     <string name="share_your_location_in_real_time">Comparte tu ubicación en tiempo real y mantén tu grupo coordinado con las características integradas del GPS.</string>
     <string name="short_name">Nombre Corto</string>
@@ -823,6 +829,7 @@ Estos datos de ubicación pueden ser utilizados para fines como aparecer en un m
     <string name="ssid">SSID (Nombre la Red)</string>
     <string name="state_broadcast_seconds">Periodo entre transmisión de estado (segundos)</string>
     <string name="stay_connected_anywhere">Manténgase conectado en cualquier lugar</string>
+    <string name="subnet">Subred</string>
     <string name="super_deep_sleep_duration_seconds">Duración del sueño súper profundo</string>
     <string name="supported">Soportado nativamente</string>
     <string name="supported_by_community">Apoyado por la comunidad Meshtastic</string>
@@ -930,5 +937,6 @@ Estos datos de ubicación pueden ser utilizados para fines como aparecer en un m
     <string name="wifi_rssi_threshold_defaults_to_80">Umbral mínimo de RSSI de WiFi (por defecto es -80)</string>
     <!-- WIND -->
     <string name="wind">Viento</string>
+    <!-- WRITE -->
     <string name="you">Usted</string>
 </resources>

@@ -153,57 +153,87 @@ open class MeshLogRepositoryImpl(
         .mapLatest { list -> list.map { it.asExternalModel() }.firstOrNull { it.myNodeInfo != null }?.myNodeInfo }
         .flowOn(dispatchers.io)
 
+    // Writes go through withDb so they register with the cross-transport merge drain barrier (see DatabaseProvider).
+
     /** Persists a new log entry to the database if logging is enabled in preferences. */
     override suspend fun insert(log: MeshLog) = withContext(dispatchers.io) {
         if (!meshLogPrefs.loggingEnabled.value) return@withContext
-        dbManager.currentDb.value.meshLogDao().insert(log.asEntity())
+        dbManager.withDb { it.meshLogDao().insert(log.asEntity()) }
+        Unit
     }
 
     /** Clears all logs from the database. */
-    override suspend fun deleteAll() =
-        withContext(dispatchers.io) { dbManager.currentDb.value.meshLogDao().deleteAll() }
+    override suspend fun deleteAll() {
+        withContext(dispatchers.io) { dbManager.withDb { it.meshLogDao().deleteAll() } }
+    }
 
     /** Deletes a specific log entry by its [uuid]. */
-    override suspend fun deleteLog(uuid: String) =
-        withContext(dispatchers.io) { dbManager.currentDb.value.meshLogDao().deleteLog(uuid) }
+    override suspend fun deleteLog(uuid: String) {
+        withContext(dispatchers.io) { dbManager.withDb { it.meshLogDao().deleteLog(uuid) } }
+    }
 
     /** Deletes all logs associated with a specific [nodeNum] and [portNum]. */
     override suspend fun deleteLogs(nodeNum: Int, portNum: Int) = withContext(dispatchers.io) {
         val myNodeNum = nodeInfoReadDataSource.myNodeInfoFlow().firstOrNull()?.myNodeNum
         val logId = if (nodeNum == myNodeNum) MeshLog.NODE_NUM_LOCAL else nodeNum
-        dbManager.currentDb.value.meshLogDao().deleteLogs(logId, portNum)
+        dbManager.withDb { it.meshLogDao().deleteLogs(logId, portNum) }
+        Unit
     }
 
-    /** Deletes only local stats telemetry logs for [nodeNum], preserving other telemetry types. */
+    /**
+     * Deletes only local stats telemetry logs for [nodeNum], preserving other telemetry types. The bounded keyset scan
+     * and atomic deletion remain under one manager-tracked database lease, while protobuf parsing runs on the compute
+     * dispatcher.
+     */
     override suspend fun deleteLocalStatsLogs(nodeNum: Int) = withContext(dispatchers.io) {
         val myNodeNum = nodeInfoReadDataSource.myNodeInfoFlow().firstOrNull()?.myNodeNum
         val logId = if (nodeNum == myNodeNum) MeshLog.NODE_NUM_LOCAL else nodeNum
-        val dao = dbManager.currentDb.value.meshLogDao()
-        val localStatsLogs =
-            dao.getLogsFrom(logId, PortNum.TELEMETRY_APP.value, Int.MAX_VALUE)
-                .firstOrNull()
-                .orEmpty()
-                .map { it.asExternalModel() }
-                .filter { parseTelemetryLog(it)?.local_stats != null }
+        dbManager.withDb { selectedDb ->
+            val dao = selectedDb.meshLogDao()
+            val uuidsToDelete = mutableListOf<String>()
+            var beforeReceivedDate: Long? = null
+            var beforeUuid: String? = null
+            do {
+                val page =
+                    dao.getLogsSnapshotPage(
+                        fromNum = logId,
+                        portNum = PortNum.TELEMETRY_APP.value,
+                        beforeReceivedDate = beforeReceivedDate,
+                        beforeUuid = beforeUuid,
+                        pageSize = TELEMETRY_SNAPSHOT_PAGE_SIZE,
+                    )
+                uuidsToDelete +=
+                    withContext(dispatchers.default) {
+                        page
+                            .asSequence()
+                            .map { it.asExternalModel() }
+                            .filter { parseTelemetryLog(it)?.local_stats != null }
+                            .map { it.uuid }
+                            .toList()
+                    }
+                page.lastOrNull()?.let { last ->
+                    beforeReceivedDate = last.received_date
+                    beforeUuid = last.uuid
+                }
+            } while (page.size == TELEMETRY_SNAPSHOT_PAGE_SIZE)
 
-        val localStatsLogIds = localStatsLogs.map { it.uuid }
-        // Chunk to stay under SQLite's bind-variable limit; re-fetch DAO per chunk if the active DB switches.
-        for (chunk in localStatsLogIds.chunked(DELETE_CHUNK_SIZE)) {
-            dbManager.currentDb.value.meshLogDao().deleteLogsByUuid(chunk)
+            if (uuidsToDelete.isNotEmpty()) {
+                dao.deleteLogsByUuidAtomic(uuidsToDelete)
+            }
         }
+        Unit
     }
 
     /** Prunes the log database based on the configured [retentionDays]. */
     @Suppress("MagicNumber")
     override suspend fun deleteLogsOlderThan(retentionDays: Int) = withContext(dispatchers.io) {
         val cutoffTime = nowMillis - (retentionDays.toLong() * 24 * 60 * 60 * 1000)
-        dbManager.currentDb.value.meshLogDao().deleteOlderThan(cutoffTime)
+        dbManager.withDb { it.meshLogDao().deleteOlderThan(cutoffTime) }
+        Unit
     }
 
     companion object {
         private const val MILLIS_PER_SEC = 1000L
-
-        /** Max UUIDs per DELETE IN-clause; keeps us under SQLite's bind-variable limit. */
-        private const val DELETE_CHUNK_SIZE = 500
+        private const val TELEMETRY_SNAPSHOT_PAGE_SIZE = 512
     }
 }

@@ -88,6 +88,25 @@ Tuloksista saatavilla olevat lisätoiminnot:
 
 ---
 
+## Verkkokutsu
+
+Mesh Beacon antaa radioille mahdollisuuden kutsua muita liittymään mesh-verkkoon. Majakkatilassa oleva radio lähettää määräajoin kutsun, jossa voidaan ilmoittaa kanava, alue ja modeemiasetus. Näin lähistöllä olevat laitteet voivat havaita verkon jo ennen kuin niillä on yhteinen määritys.
+
+Määritä se kohdassa **Asetukset → Moduuliasetukset → Mesh Beacon**:
+
+- **Kuuntele majakoita** – vastaanota muiden radioiden lähettämiä liittymiskutsuja.
+- **Lähetä majakka** – lähetä oma liittymiskutsusi määritetyin väliajoin. Voit liittää mukaan viestin ja tarjotun kanavan.
+
+Vastaanotetut kutsut näkyvät **Mesh-kutsut** -korteissa haku-näytössä. Jokainen kortti näyttää lähettäjän viestin sekä tarjotun kanavan, alueen, esiasetuksen ja signaalin laadun. Käytettävissä ovat seuraavat toiminnot:
+
+- **Liity** – vaihda tarjottuun kanavaan ja esiasetukseen (radio palautetaan alkutilaan ja käynnistyy uudelleen). Jos tarjous vastaa nykyistä taajuuspaikkaasi, **Lisää kanava** lisää sen ilman uudelleenkäynnistystä.
+- **Tutki** – aloita Haku tarjotulla esiasetuksella, jotta voit tutkia mesh-verkkoa ennen liittymistä (näkyy vain, jos majakka tarjoaa esiasetuksen).
+- **Hylkää** – ohita kutsu.
+
+Majakoiden ilmoittamat kanavat näkyvät myös Haku-toiminnon asetuksissa kohdassa **Majakkakanavat**. Valitse kanava lisätäksesi sen hakukohteeksi.
+
+---
+
 ## Manuaalinen haku
 
 Alla olevat työkalut ovat käytettävissä milloin tahansa radiolistasta ja radion tietonäkymistä. Käytä niitä yksittäisten reittien tutkimiseen ja topologian muodostamiseen, joko osana skannausta tai sen sijaan.
@@ -169,7 +188,7 @@ Radiolista on itsessään tehokas hakutyökalu, kun käytät sen suodatus- ja la
 
 ### Infrastruktuurin tarkistus
 
-- Poista käytöstä **Ohita infrastruktuurilaitteet** nähdäksesi Router-, Repeater-, Router Late- ja Client Base -radiot.
+- Poista **Jätä infrastruktuuri pois** käytöstä, jos haluat nähdä Router-, Router Late- ja Client Base -radiot.
 - Tarkista niiden signaalin laatu ja viimeksi kuultu -ajat varmistaaksesi, että infrastruktuuriradiot ovat kunnossa.
 
 Katso [Radiot](nodes) saadaksesi lisätietoa suodatus- ja lajitteluasetuksista.

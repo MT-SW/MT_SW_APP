@@ -43,11 +43,8 @@ class TracerouteSnapshotRepositoryImpl(
         .flowOn(dispatchers.io)
         .conflate()
 
-    override suspend fun upsertSnapshotPositions(logUuid: String, requestId: Int, positions: Map<Int, Position>) =
+    override suspend fun upsertSnapshotPositions(logUuid: String, requestId: Int, positions: Map<Int, Position>) {
         withContext(dispatchers.io) {
-            val dao = dbManager.currentDb.value.tracerouteNodePositionDao()
-            dao.deleteByLogUuid(logUuid)
-            if (positions.isEmpty()) return@withContext
             val entities =
                 positions.map { (nodeNum, position) ->
                     TracerouteNodePositionEntity(
@@ -57,6 +54,9 @@ class TracerouteSnapshotRepositoryImpl(
                         position = position,
                     )
                 }
-            dao.insertAll(entities)
+            // Single transactional DAO call — delete + insert is atomic. An authoritative empty result deliberately
+            // deletes the previous snapshot instead of retaining stale positions.
+            dbManager.withDb { it.tracerouteNodePositionDao().replaceByLogUuid(logUuid, entities) }
         }
+    }
 }

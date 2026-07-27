@@ -1,8 +1,8 @@
 # ============================================================================
 # Meshtastic Android — ProGuard / R8 rules for release minification
 # ============================================================================
-# Open-source project: obfuscation and optimization are disabled. We rely on
-# tree-shaking (unused code removal) for APK size reduction.
+# Open-source project: obfuscation is disabled (readable stack traces). We rely
+# on R8 optimization + tree-shaking (unused code removal) for APK size reduction.
 #
 # Cross-platform library rules (Koin, kotlinx-serialization, Wire, Room,
 # Ktor, Coil, Kable, Kermit, Okio, DataStore, Paging, Lifecycle, Navigation 3,
@@ -17,18 +17,23 @@
 # Open-source — no need to obfuscate
 -dontobfuscate
 
-# Disable R8 optimization passes. Tree-shaking (unused code removal) still
-# runs — only method-body rewrites and call-site transformations are suppressed.
+# R8 optimization is ENABLED. Obfuscation stays off (-dontobfuscate above), so
+# stack traces remain readable; tree-shaking plus the full optimization pass
+# (method inlining, class merging, Composer/ComposerImpl devirtualization,
+# unused-argument removal) all run.
 #
-# Why: CMP 1.11 ships consumer rules with -assumenosideeffects on
-# Composer.<clinit>() and ComposerImpl.<clinit>(), plus -assumevalues on
-# ComposeRuntimeFlags and ComposeStackTraceMode. These optimization directives
-# let R8 rewrite *call sites* (class-init triggers, flag reads) even when the
-# target classes are preserved by -keep rules. The result is that the Compose
-# recomposer/frame-clock/animation state machines silently freeze on their
-# first frame in release builds. -dontoptimize is the only directive that
-# disables processing of -assumenosideeffects/-assumevalues. See #5146.
--dontoptimize
+# History: optimization used to be disabled here via -dontoptimize (#5146).
+# androidx.compose's consumer rules ship -assumenosideeffects on
+# Composer/ComposerImpl/ComposerKt.sourceInformation* and -assumevalues on
+# ComposeRuntimeFlags/ComposeStackTraceMode; -dontoptimize is the only directive
+# that stops R8 from acting on those, and on an older R8×CMP combination acting
+# on them froze the Compose recomposer/frame-clock on the first release frame.
+# Re-verified on AGP 9.3 / CMP 1.11.1 (2026-07) by driving a minified release
+# APK on-device: first-frame render, Navigation-3 transitions, animated tab
+# switching and recomposition all work, so -dontoptimize was removed. The R8
+# config analyzer confirms OPTIMIZATION coverage jumps from 0% to ~96%.
+# If Compose animations/recomposition ever freeze in a release build after a
+# CMP/AGP/R8 bump, re-add `-dontoptimize` and re-open #5146.
 
 # Dump the full merged R8 configuration (app rules + all library consumer rules)
 # for auditing. Inspect this file after a release build to see what libraries inject.
@@ -39,14 +44,6 @@
 -dontwarn org.conscrypt.**
 -dontwarn org.bouncycastle.**
 -dontwarn org.openjsse.**
-
-# ---- BLE (Kable) -------------------------------------------------------------
-# Kable annotates ScanResultAndroidAdvertisement with @Parcelize but doesn't
-# ship the parcelize runtime in its POM; the app doesn't apply the parcelize
-# plugin (no @Parcelize usage of our own), so the annotation class is absent.
-# Annotation classes aren't needed at runtime — Kable's generated CREATOR
-# works without it.
--dontwarn kotlinx.parcelize.Parcelize
 
 # ---- AppSearch / AppFunctions generated document factories ------------------
 # AppSearch's DocumentClassFactoryRegistry loads the generated

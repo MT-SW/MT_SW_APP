@@ -50,8 +50,6 @@ if (keystorePropertiesFile.exists()) {
 // submissions are auto-rejected (https://developer.android.com/training/cars/communication/templated-messaging).
 // Default builds therefore ship *notification-only* car messaging, which is GA and production-safe.
 // Build a Closed-track templated AAB with: -PenableCarTemplates=true
-// ponytail: gated by a gradle property + res override, not a full build flavor — templated is
-// parked until it leaves Google's beta. Promote to a flavor dimension only if CI must ship both.
 val enableCarTemplates = providers.gradleProperty("enableCarTemplates").map { it.toBoolean() }.getOrElse(false)
 
 configure<ApplicationExtension> {
@@ -131,10 +129,6 @@ configure<ApplicationExtension> {
             )
         }
         ndk { abiFilters += listOf("armeabi-v7a", "arm64-v8a") }
-
-        // Activates the (google-only) CarAppService. Off by default so production builds ship
-        // notification-only car messaging; flipped on by -PenableCarTemplates=true for Closed tracks.
-        manifestPlaceholders["carTemplatesEnabled"] = enableCarTemplates.toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

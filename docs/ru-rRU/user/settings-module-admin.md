@@ -18,13 +18,13 @@ aliases:
 
 Настройки модулей используют макет на основе карточек с переключателями, выпадающими списками, текстовыми полями и ползунками:
 
-![Toggle switch](../../assets/screenshots/settings_switch.png)
+![Переключатель](../../assets/screenshots/settings_switch.png)
 
-![Dropdown selector](../../assets/screenshots/settings_dropdown.png)
+![Выпадающий список](../../assets/screenshots/settings_dropdown.png)
 
-![Text field](../../assets/screenshots/settings_text_field.png)
+![Текстовое поле](../../assets/screenshots/settings_text_field.png)
 
-![Settings card layout](../../assets/screenshots/settings_titled_card.png)
+![Настройки расположения карточек](../../assets/screenshots/settings_titled_card.png)
 
 ## Конфигурация модуля
 
@@ -32,49 +32,49 @@ aliases:
 
 Мосты передают сообщения туда и обратно от брокера MQTT для подключения к интернету. Ты так расширишь сеть за пределы радиуса действия или интегрируешь её с системами домашней автоматизации.
 
-| Настройка        | Описание                                                                 |
-| ---------------- | ------------------------------------------------------------------------ |
-| Включено         | Toggle MQTT bridge                                                       |
-| Сервер           | MQTT broker address                                                      |
-| Имя пользователя | Имя пользователя для аутентификации                                      |
-| Пароль           | Пароль аутентификации                                                    |
-| Шифрование       | Encrypt MQTT payloads                                                    |
-| ~~JSON Output~~  | ⚠️ **Deprecated** — JSON support removed from firmware; field is ignored |
-| TLS              | Use secure connection                                                    |
-| Корневая тема    | Base MQTT topic path                                                     |
-| Отчет карты      | Publish position for public map                                          |
+| Настройка        | Описание                                                                |
+| ---------------- | ----------------------------------------------------------------------- |
+| Включено         | Переключить MQTT мост                                                   |
+| Сервер           | Адрес MQTT брокера                                                      |
+| Имя пользователя | Имя пользователя для аутентификации                                     |
+| Пароль           | Пароль аутентификации                                                   |
+| Шифрование       | Зашифровать MQTT-пейлоады                                               |
+| ~~Вывод JSON~~   | ⚠️ **Устарело** — поддержка JSON удалена из прошивки; поле игнорируется |
+| TLS              | Использовать защищённое соединение                                      |
+| Корневая тема    | Базовый путь темы MQTT                                                  |
+| Отчет карты      | Опубликовать позицию на публичной карте                                 |
 
-See [MQTT](mqtt) for a detailed usage guide including encryption, privacy, and broker setup.
+См. [MQTT](mqtt) для подробного руководства по использованию, включая шифрование, конфиденциальность и настройку брокера.
 
-### Serial Module
+### Последовательный модуль
 
-Enables serial port communication for external device integrations (GPS modules, sensors, or custom hardware). When enabled, the node's serial port can send and receive protobuf or text data, allowing external microcontrollers or computers to interact with the mesh.
+Позволяет общаться через последовательный порт с внешними устройствами (GPS-модулями, датчиками или собственной техникой). Когда включено, последовательный порт ноды может отправлять и получать данные в формате protobuf или текст, что позволяет внешним микроконтроллерам или компьютерам взаимодействовать с сетью.
 
-| Настройка                                  | Описание                        |
-| ------------------------------------------ | ------------------------------- |
-| Включено                                   | Activate serial communication   |
-| Эхо                                        | Echo received serial data back  |
-| Режим обмена                               | Text, Protobuf, or NMEA output  |
-| RX/TX Pins                                 | GPIO pins for serial connection |
-| Скорость передачи (бод) | Serial communication speed      |
+| Настройка                                  | Описание                                     |
+| ------------------------------------------ | -------------------------------------------- |
+| Включено                                   | Включить последовательное соединение         |
+| Эхо                                        | Echo получил обратно последовательные данные |
+| Режим обмена                               | Вывод в формате текста, Protobuf или NMEA    |
+| Пины RX/TX                                 | GPIO-пины для последовательного соединения   |
+| Скорость передачи (бод) | Скорость последовательного соединения        |
 
-### External Notification Module
+### Модуль внешних уведомлений
 
-Controls buzzer, LED, or vibration alerts on your radio hardware. Useful for devices that need to physically signal when a message arrives — particularly helpful for unattended or outdoor installations.
+Управляет зуммером, светодиодом или вибрацией на вашем радиооборудовании. Полезно для устройств, которым нужно физически сигнализировать о приходе сообщения — особенно удобно для неоснащенных персоналом или уличных установок.
 
-| Настройка                                 | Описание                    |
-| ----------------------------------------- | --------------------------- |
-| Включено                                  | Activate notifications      |
-| Включить уведомление о входящем сообщении | Notify on incoming messages |
-| Зуммер при уведомлении                    | Use buzzer for messages     |
-| Alert Message Vibra                       | Use vibration for messages  |
-| Уведомлять при 🔔                         | Notify on bell character    |
-| Output (GPIO)          | Pin for notification output |
-| Активный выход                            | High or Low active          |
-| Duration (ms)          | Notification length         |
-| Use I2S as Buzzer                         | Use I2S audio output        |
+| Настройка                                 | Описание                            |
+| ----------------------------------------- | ----------------------------------- |
+| Включено                                  | Включить уведомления                |
+| Включить уведомление о входящем сообщении | Уведомлять о входящих сообщениях    |
+| Зуммер при уведомлении                    | Использовать буззер для сообщений   |
+| Alert Message Vibra                       | Использовать вибрацию для сообщений |
+| Уведомлять при 🔔                         | Notify on bell character            |
+| Вывод (GPIO)           | Пин для вывода уведомления          |
+| Активный выход                            | High or Low active                  |
+| Длительность (мс)      | Длительность уведомления            |
+| Использовать I2S как буззер               | Использовать аудиовывод I2S         |
 
-### Store & Forward Module
+### Модуль Store & Forward
 
 Buffers messages for nodes that were temporarily offline, then replays them when those nodes reconnect. Essential for meshes where nodes go in and out of range regularly — ensures messages aren't lost during brief disconnections.
 
@@ -241,7 +241,7 @@ Opens the **Packets** and **App logs** tabs for viewing, filtering, and exportin
 
 - [Settings — Radio & User](settings-radio-user) — core radio and user profile settings
 - [Module configuration reference](https://meshtastic.org/docs/configuration/module) — detailed module docs on meshtastic.org
-- [FAQ](https://meshtastic.org/docs/about/faq) — common questions on meshtastic.org
+- [FAQ](https://meshtastic.org/docs/faq/) — common questions on meshtastic.org
 
 ---
 

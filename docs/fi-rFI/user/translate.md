@@ -97,6 +97,6 @@ Sovellus valitsee automaattisesti oikean kielialueen laitteen **Kieli & alue** -
 
 ## Kysyttävää?
 
-Jos sinulla on kysyttävää tietyn merkkijonon kontekstista tai tarvitset apua alkuun pääsemisessä, avaa keskustelu Meshtastic GitHub Discussions -sivulla (https://github.com/meshtastic/Meshtastic-Android/discussions).
+Jos sinulla on kysyttävää tietyn merkkijonon asiayhteydestä tai tarvitset apua alkuun pääsemisessä, avaa keskustelu [Meshtastic GitHub Discussions](https://github.com/orgs/meshtastic/discussions) -sivulla.
 
 Kiitos, että autat laajentamaan Meshtasticin tavoittavuutta!

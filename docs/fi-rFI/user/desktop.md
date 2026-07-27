@@ -84,17 +84,17 @@ Työpöytäsovellus käyttää samaa Compose Multiplatform -käyttöliittymää,
 
 ### Pikanäppäimet
 
-Kaikissa pikanäppäimissä käytetään **Meta**-näppäintä — se on ⌘ (komento) macOS:ssa sekä Super-/Windows-näppäin Linuxissa ja Windowsissa. (`Ctrl`-näppäintä ei ole määritetty.)
+Pikanäppäimissä käytetään macOS:ssä **⌘**-näppäintä (Command) ja Windowsissa sekä Linuxissa **Ctrl**-näppäintä. (Super-/Windows-näppäimelle ei ole määritetty toimintoa.)
 
-| Pikanäppäin | Toiminto                    |
-| ----------- | --------------------------- |
-| **Meta+Q**  | Sulje sovellus              |
-| **Meta+,**  | Avaa asetukset              |
-| **Meta+1**  | Vaihda Viestit-välilehdelle |
-| **Meta+2**  | Vaihda Radiot-välilehdelle  |
-| **Meta+3**  | Vaihda Kartta-välilehdelle  |
-| **Meta+4**  | Vaihda Yhdistä-välilehdelle |
-| **Meta+/**  | Avaa tietoja                |
+| Pikanäppäin  | Toiminto                    |
+| ------------ | --------------------------- |
+| **⌘/Ctrl+Q** | Sulje sovellus              |
+| **⌘/Ctrl+,** | Avaa asetukset              |
+| **⌘/Ctrl+1** | Vaihda Viestit-välilehdelle |
+| **⌘/Ctrl+2** | Vaihda Radiot-välilehdelle  |
+| **⌘/Ctrl+3** | Vaihda Kartta-välilehdelle  |
+| **⌘/Ctrl+4** | Vaihda Yhdistä-välilehdelle |
+| **⌘/Ctrl+/** | Avaa tietoja                |
 
 ### Ikkuna ja järjestelmätarjotin
 

@@ -115,6 +115,11 @@ compose.desktop {
         // unresolved java.* references. Pin packaging to the JBR SDK toolchain (jmods
         // included) so ProGuard sees the platform classes and the bundled runtime is
         // deterministically JBR 25 on every machine.
+        //
+        // This assignment must stay EAGER here on the extension. Deferring it to lazy
+        // `tasks.withType<AbstractProguardTask>().configureEach { javaHome.set(provider) }` (PR #6401)
+        // does not reach `proguardReleaseJars` — the extension value still wins, ProGuard relaunches
+        // under the Gradle JVM, and every Build Desktop leg goes red with the jmods-less signature.
         javaHome =
             javaToolchains
                 .launcherFor {

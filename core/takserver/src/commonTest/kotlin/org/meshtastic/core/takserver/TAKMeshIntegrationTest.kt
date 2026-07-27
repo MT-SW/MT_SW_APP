@@ -40,6 +40,7 @@ import org.meshtastic.core.model.service.TracerouteResponse
 import org.meshtastic.core.repository.CommandSender
 import org.meshtastic.core.repository.MeshConfigHandler
 import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.repository.RadioSessionContext
 import org.meshtastic.core.repository.ServiceRepository
 import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.Channel
@@ -224,15 +225,15 @@ class TAKMeshIntegrationTest {
         override val localConfig: StateFlow<LocalConfig> = MutableStateFlow(LocalConfig())
         override val moduleConfig: StateFlow<LocalModuleConfig> = MutableStateFlow(LocalModuleConfig())
 
-        override fun handleDeviceConfig(config: Config) {}
+        override fun handleDeviceConfig(config: Config, session: RadioSessionContext): Boolean = true
 
-        override fun handleModuleConfig(config: ModuleConfig) {}
+        override fun handleModuleConfig(config: ModuleConfig, session: RadioSessionContext): Boolean = true
 
-        override fun handleChannel(channel: Channel) {}
+        override fun handleChannel(channel: Channel, session: RadioSessionContext): Boolean = true
 
-        override fun handleDeviceUIConfig(config: DeviceUIConfig) {}
+        override fun handleDeviceUIConfig(config: DeviceUIConfig, session: RadioSessionContext): Boolean = true
 
-        override fun handleRegionPresets(map: LoRaRegionPresetMap) {}
+        override fun handleRegionPresets(map: LoRaRegionPresetMap, session: RadioSessionContext): Boolean = true
     }
 
     private class FakeNodeRepository(firmwareVersion: String? = "2.8.0.0") : NodeRepository {
@@ -285,6 +286,9 @@ class TAKMeshIntegrationTest {
         override val myId: StateFlow<String?> = MutableStateFlow(null)
         override val localStats: StateFlow<LocalStats> = MutableStateFlow(LocalStats())
         override val nodeDBbyNum: StateFlow<Map<Int, Node>> = MutableStateFlow(emptyMap())
+
+        override suspend fun getNodeDbSnapshot(): Map<Int, Node> = nodeDBbyNum.value
+
         override val onlineNodeCount: Flow<Int> = MutableStateFlow(0)
         override val totalNodeCount: Flow<Int> = MutableStateFlow(0)
 
@@ -322,7 +326,7 @@ class TAKMeshIntegrationTest {
 
         override suspend fun upsert(node: Node) {}
 
-        override suspend fun installConfig(mi: MyNodeInfo, nodes: List<Node>) {}
+        override suspend fun installConfig(mi: MyNodeInfo, nodes: List<Node>): List<Int> = emptyList()
 
         override suspend fun insertMetadata(nodeNum: Int, metadata: DeviceMetadata) {}
 

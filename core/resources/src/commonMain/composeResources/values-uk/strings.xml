@@ -87,6 +87,9 @@
     <string name="app_too_old">Потрібне оновлення програми</string>
     <string name="app_version">Версія</string>
     <string name="apply">Застосувати</string>
+    <!-- AQI -->
+    <string name="aqi">AQI</string>
+    <string name="aqi_good">Хороший</string>
     <string name="are_you_sure">Ви впевнені?</string>
     <string name="are_you_sure_change_default">Ви впевнені, що хочете змінити канал за умовчанням?</string>
     <string name="audio">Аудіо</string>
@@ -165,6 +168,8 @@
     <string name="close">Закрити</string>
     <string name="close_selection">Закрити вибір</string>
     <string name="co2">CO₂</string>
+    <string name="co2_humidity">CO₂ Волог</string>
+    <string name="co2_temperature">CO₂ Темп</string>
     <string name="codec_2_enabled">CODEC 2 увімкнено</string>
     <string name="codec2_sample_rate">Частота дискретизації CODEC2</string>
     <string name="coding_rate">Швидкість кодування</string>
@@ -259,6 +264,7 @@
     <string name="debug_search_prev">Попередій збіг</string>
     <string name="debug_store_logs_summary">Вимкнути запис логів мережі на диск</string>
     <string name="debug_store_logs_title">Сховище для логування</string>
+    <string name="debug_tab_app_logs">Журнали програми</string>
     <string name="debug_tab_packets">Пакетів</string>
     <string name="default_">За замовчуванням</string>
     <!-- DELETE -->
@@ -278,8 +284,10 @@
     <string name="demo_mode">Демо режим</string>
     <string name="desc_node_filter_clear">очистити фільтр вузлів</string>
     <string name="description">Опис</string>
+    <!-- DESKTOP -->
     <string name="desktop_notification_title">Meshtastic</string>
     <string name="desktop_tray_quit">Вийти</string>
+    <string name="desktop_tray_show">Показати Meshtastic</string>
     <string name="details">Подробиці</string>
     <string name="detection_sensor">Датчик виявлення</string>
     <string name="detection_sensor_config">Налаштування датчика виявлення</string>
@@ -436,7 +444,7 @@
     <string name="firmware_update_connecting_attempt">Підключення до пристрою (спроба %1$d/%2$d)...</string>
     <string name="firmware_update_currently_installed">Наразі встановлено: %1$s</string>
     <string name="firmware_update_device">Пристрій: %1$s</string>
-    <string name="firmware_update_disclaimer_chirpy_says">Chirpy каже: \"Тримайся напоготові!\"</string>
+    <string name="firmware_update_disclaimer_chirpy_says">Chirpy каже: "Тримайся напоготові!"</string>
     <string name="firmware_update_disclaimer_text">Ви збираєтеся встановити нову прошивку на свій пристрій. Цей процес несе ризики.\n\n• Переконайтеся, що ваш пристрій заряджений.\n• Тримайте пристрій поруч із телефоном.\n• Не закривайте програму під час оновлення.\n\nПереконайтеся, що ви вибрали правильну прошивку для вашого обладнання.</string>
     <string name="firmware_update_disclaimer_title">Попередження про оновлення</string>
     <string name="firmware_update_disconnect_warning">Примітка: це тимчасово від'єднає ваш пристрій на час оновлення.</string>
@@ -478,7 +486,7 @@
     <string name="firmware_update_unknown_release">Невідомий віддалений реліз</string>
     <string name="firmware_update_uploading">Завантаження прошивки...</string>
     <string name="firmware_update_usb_bootloader_warning">%1$s зазвичай постачається із завантажувачем, який не підтримує оновлення OTA. Вам може знадобитися завантажувач з можливістю оновлень OTA через USB перед прошиванням OTA.</string>
-    <string name="firmware_update_usb_instruction_text">Ваш пристрій перезавантажився в режим DFU і повинен з'явитися як USB накопичувач (наприклад, RAK4631).\n\nУ вікні \"Зберегти як\", виберіть кореневу теку цього диску, щоб зберегти файл прошивки.</string>
+    <string name="firmware_update_usb_instruction_text">Ваш пристрій перезавантажився в режим DFU і повинен з'явитися як USB накопичувач (наприклад, RAK4631).\n\nУ вікні "Зберегти як", виберіть кореневу теку цього диску, щоб зберегти файл прошивки.</string>
     <string name="firmware_update_usb_instruction_title">Оберіть USB DFU накопичувач</string>
     <string name="firmware_update_validating">Перевірка прошивки...</string>
     <string name="firmware_update_verification_failed">Час очікування підтвердження минув. Пристрій не під'єднався вчасно.</string>
@@ -489,6 +497,7 @@
     <string name="fixed_position">Фіксована позиція</string>
     <string name="flip_screen">Перевернути екран</string>
     <string name="for_more_information_see_our_privacy_policy">Для додаткової інформації, перегляньте нашу політику конфіденційності.</string>
+    <!-- FORMAT -->
     <string name="free_memory">Вільна пам'ять</string>
     <string name="free_memory_description">Доступно системної пам'яті в байтах</string>
     <string name="freq">Част</string>
@@ -547,6 +556,7 @@
     <string name="ignore_incoming">Ігнорувати вхідні</string>
     <string name="ignore_mqtt">Ігнорувати MQTT</string>
     <string name="ignore_remove">Видалити '%1$s' з чорного списку? Після цієї зміни ваш пристрій перезавантажиться.</string>
+    <!-- IMPORT -->
     <string name="import_configuration">Імпортувати налаштування</string>
     <string name="import_known_shared_contact_text">Увага: Цей контакт уже існує. Імпортування призведе до перезапису попередньої інформації про контакт.</string>
     <string name="import_label">Імпортувати</string>
@@ -872,6 +882,7 @@
     <string name="override_duty_cycle">Ігнорувати обмеження завантаженості каналу</string>
     <string name="override_frequency_mhz">Перевизначити частоту</string>
     <string name="pa_fan_disabled">Вентилятор вимкнений</string>
+    <!-- PACKET -->
     <string name="pairing_mode">Режим створення пари</string>
     <string name="password">Пароль</string>
     <!-- PAX -->
@@ -1066,6 +1077,7 @@
     <string name="rssi_definition">Показник рівня потужності сигналу — вимірювання, що використовується для визначення рівня потужності, що приймається антеною. Вище значення RSSI зазвичай вказує на міцніше та стабільніше з'єднання.</string>
     <string name="rsyslog_server">rsyslog-сервер</string>
     <string name="sats">Супутники</string>
+    <!-- SAVE -->
     <string name="save">Зберегти</string>
     <string name="save_changes">Зберегти</string>
     <string name="save_csv_in_storage_esp32_only">Зберегти .CSV у сховищі (лише ESP32)</string>
@@ -1126,7 +1138,6 @@
     <string name="share">Поділіться</string>
     <string name="share_contact">Поділитися контактом</string>
     <string name="share_location">Поділитися місцезнаходженням</string>
-    <string name="share_location_description">Використовувати GPS телефона для передачі координат на вузол замість вбудованого GPS-модуля.</string>
     <string name="share_to">Поділитися з…</string>
     <string name="share_your_location_in_real_time">Діліться своїм місцезнаходженням у реальному часі та координуйте групу завдяки вбудованим функціям GPS.</string>
     <string name="short_name">Коротка назва</string>
@@ -1160,7 +1171,7 @@
     <string name="status_message">Статус повідомлення</string>
     <string name="status_message_config">Конфігурація статусу повідомлення</string>
     <string name="stay_connected_anywhere">Залишайтесь на зв'язку будь-де</string>
-    <string name="subnet">Підрегіон</string>
+    <string name="subnet">Підмережа</string>
     <string name="super_deep_sleep_duration_seconds">Тривалість глибокого сну</string>
     <string name="supported">Підтримується</string>
     <string name="supported_by_community">Підтримується спільнотою Meshtastic</string>
@@ -1334,5 +1345,6 @@
     <string name="wind_gust">Порив вітру</string>
     <string name="wind_lull">Затишшя вітру</string>
     <string name="wind_speed">Швидкість вітру</string>
+    <!-- WRITE -->
     <string name="you">Ви</string>
 </resources>

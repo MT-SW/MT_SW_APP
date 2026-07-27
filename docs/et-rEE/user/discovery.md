@@ -84,7 +84,26 @@ Additional features available from the results:
 - **Avastuskaart** – skanni käigus leitud sõlmede kaart.
 - **Aruande eksport** – ekspordi aruanne PDF-failina Androidis või tekstina muudel platvormidel.
 
-> 💡 **Vihje:** Androidis saab Discovery genereerida tulemustest seadmesisese tehisintellekti kokkuvõtte (Gemini Nano). If the on-device model isn't available, an algorithmic summary is used instead — so you always get a readable interpretation of the scan.
+> 💡 **Vihje:** Androidis saab Discovery genereerida tulemustest seadmesisese TI kokkuvõtte (Gemini Nano). If the on-device model isn't available, an algorithmic summary is used instead — so you always get a readable interpretation of the scan.
+
+---
+
+## Kärgvõrgu majakas
+
+Mesh Beacon lets nodes invite others to join their mesh. A beaconing node periodically broadcasts an invitation — optionally advertising a channel, region, and modem preset — that nearby devices can hear even before they share a configuration.
+
+Configure it under **Settings → Module Config → Mesh Beacon**:
+
+- **Listen for beacons** — receive invitations broadcast by other nodes.
+- **Broadcast beacon** — send your own invitation at a set interval, with an optional message and an offered channel.
+
+Received invitations appear as **Mesh invitations** cards on the Discovery screen. Each card shows the sender's message plus the offered channel, region, preset, and signal quality, with these actions:
+
+- **Join** — switch to the offered channel and preset (retunes the radio and reboots). When the offer matches your current frequency slot, an **Add channel** action adds it without a reboot.
+- **Discover** — seed a Discovery scan with the offered preset so you can survey that mesh before joining (shown only when the beacon offers a preset).
+- **Dismiss** — ignore the invitation.
+
+Channels advertised by beacons also show up in the scan setup as **Beacon channels** — select one to include it as a scan target.
 
 ---
 
@@ -116,8 +135,8 @@ Iga hüpe näitab vahendussõlme, mis sõnumi edastas. The SNR and RSSI values a
 | What to look for                                                                  | What it means                                                               |
 | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
 | All hops show Good SNR (≥ −7 dB, green)                        | Healthy path — messages flow reliably                                       |
-| One hop shows Bad SNR (< −15 dB, red) | Weak link — this relay segment is fragile                                   |
-| Mitu hüppet (4+)                                               | Long path — consider repositioning a node to shorten it                     |
+| One hop shows Bad SNR (< −15 dB, red) | Kehv ühendus – see releesegment on habras                                   |
+| Mitu hüppet (4+)                                               | Pikk tee – kaalu sõlme ümberpaigutamist selle lühendamiseks                 |
 | Different path on retry                                                           | Mesh is adapting — multiple routes exist (this is good!) |
 
 > 💡 **Vihje:** Käivita traceroute'i mitu korda mõne minuti tagant. If the path changes, your mesh has redundant routes — a sign of a well-connected network.
@@ -169,7 +188,7 @@ Sõlmede loend ise on võimas avastusvahend, kui kasutada selle filtreerimis- ja
 
 ### Infrastructure Audit
 
-- Disable **Exclude infrastructure** to see Router, Repeater, Router Late, and Client Base nodes.
+- Disable **Exclude infrastructure** to see Router, Router Late, and Client Base nodes.
 - Check their signal quality and last-heard times to verify your infrastructure nodes are healthy.
 
 See [Nodes](nodes) for full details on filtering and sorting options.
@@ -179,8 +198,8 @@ See [Nodes](nodes) for full details on filtering and sorting options.
 ## Tips for Mesh Exploration
 
 - **Start with traceroute** — it gives you immediate, actionable information about a specific path.
-- **Enable Neighbor Info on key nodes** — especially routers and repeaters, to build a picture of the backbone.
-- **Check the map** — node positions on the [Map](map-and-waypoints) combined with signal data help you understand why some links are strong and others are weak.
+- **Luba naabriinfo funktsioon võtmesõlmedes** – eriti ruuterites ja repiiterites, et saada ülevaade magistraalvõrgust.
+- **Kontrolli kaarti** — sõlmede asukohad [Kaart] (map-and-waypoints) koos signaaliandmetega aitavad sul mõista, miks mõned ühendused on tugevad ja teised nõrgad.
 - **Compare signal over time** — use the [Signal Meter](signal-meter) guide to interpret SNR and RSSI values correctly.
 
 ---

@@ -52,6 +52,8 @@
     <!-- APP -->
     <string name="app_too_old">Uygulama güncellemesi gerekli</string>
     <string name="apply">Uygula</string>
+    <!-- AQI -->
+    <string name="aqi_good">İyi</string>
     <string name="are_you_sure">Emin misiniz?</string>
     <string name="are_you_sure_change_default">Varsayılan kanala geçmek istediğinizden emin misiniz?</string>
     <string name="audio">Ses</string>
@@ -141,6 +143,7 @@
     <string name="delivery_confirmed">Teslim Edildi</string>
     <string name="desc_node_filter_clear">düğüm filtresini kaldır</string>
     <string name="description">Açıklaması</string>
+    <!-- DESKTOP -->
     <string name="desktop_notification_title">Meshtastic</string>
     <string name="details">Detaylar</string>
     <string name="detection_sensor">Algılama Sensörü</string>
@@ -214,6 +217,7 @@
     <string name="firmware_update_failed">Güncelleme başarısız</string>
     <string name="fixed_pin">Sabit PIN</string>
     <string name="flip_screen">Ekranı Çevir</string>
+    <!-- FORMAT -->
     <string name="free_memory">Boş Hafıza</string>
     <string name="freq">Frekans</string>
     <string name="friendly_name">Arkadaşça isim</string>
@@ -256,6 +260,7 @@
     <string name="ignore_incoming">Gelenleri Yoksay</string>
     <string name="ignore_mqtt">MQTT'yi Yoksay</string>
     <string name="ignore_remove">Yoksay listesinden '%1$s' çıkarılsın mı? Değişiklikten sonra cihazınız yeniden başlar.</string>
+    <!-- IMPORT -->
     <string name="import_configuration">Ayarları içe aktar</string>
     <string name="import_known_shared_contact_text">Uyarı: Bu kişi biliniyor, içe aktarma işlemi önceki kişi bilgilerini üzerine yazacaktır.</string>
     <string name="import_label">İçeri aktar</string>
@@ -404,6 +409,7 @@
     <string name="override_console_serial_port">Konsol seri portunu geçersiz kıl</string>
     <string name="override_duty_cycle">Görev Döngüsünü Geçersiz Kıl</string>
     <string name="pa_fan_disabled">PA fanı devre dışı</string>
+    <!-- PACKET -->
     <string name="pairing_mode">Eşleştirme Modu</string>
     <string name="password">Şifre</string>
     <!-- PAX -->
@@ -508,6 +514,7 @@
     <string name="rssi_definition">Alınan Sinyal Gücü Göstergesi, anten tarafından alınan güç seviyesini belirlemek için kullanılan bir ölçüdür. Daha yüksek bir RSSI değeri genellikle daha güçlü ve daha istikrarlı bir bağlantıya işaret eder.</string>
     <string name="rsyslog_server">rsyslog sunucusu</string>
     <string name="sats">Uydular</string>
+    <!-- SAVE -->
     <string name="save">Kaydet</string>
     <string name="save_changes">Kaydet</string>
     <string name="save_csv_in_storage_esp32_only">.CSV'yi depolamada kaydet (sadece ESP32)</string>
@@ -553,6 +560,7 @@
     <string name="snr_definition">Sinyal-Gürültü Oranı, iletişimde istenen bir sinyalin seviyesini arka plan gürültüsü seviyesine mukayese ölçmek için kullanılan bir ölçüdür. Meshtastic ve diğer kablosuz sistemlerde, daha yüksek bir SNR, veri iletiminin güvenilirliğini ve kalitesini artırabilecek daha net bir sinyale işaret eder.</string>
     <string name="ssid">SSID</string>
     <string name="state_broadcast_seconds">Durum yayını (saniye)</string>
+    <string name="subnet">Alt ağ</string>
     <string name="supported">Desteklenen</string>
     <!-- TAK -->
     <string name="tak_server_section">Sunucu</string>
@@ -633,5 +641,6 @@
     <string name="wifi_rssi_threshold_defaults_to_80">WiFi RSSI eşiği (varsayılan -80)</string>
     <!-- WIND -->
     <string name="wind">Rüzgar</string>
+    <!-- WRITE -->
     <string name="you">Siz</string>
 </resources>

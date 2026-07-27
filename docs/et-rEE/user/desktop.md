@@ -16,7 +16,7 @@ aliases:
 
 Meshtastic arvuti rakendus jagab oma põhikoodibaasi Androidiga Kotlin Multiplatformi kaudu. Most features work identically on Linux, macOS, and Windows.
 
-## Installation
+## Paigaldus
 
 ### Linux
 
@@ -30,7 +30,7 @@ Meshtastic arvuti rakendus jagab oma põhikoodibaasi Androidiga Kotlin Multiplat
 
 ### Windows
 
-- Lae väljalaske lehelt `.msi` installifail
+- Lae väljalaske lehelt `.msi` paigaldus fail
 - Or build from source
 
 ## Connecting Your Radio
@@ -82,19 +82,19 @@ Sinihamba madal voolutarve on lauaarvutites toetatud [Kable](https://github.com/
 
 The Desktop app uses the same Compose Multiplatform UI with adaptations for larger screens and desktop interaction.
 
-### Keyboard Shortcuts
+### Kiirklahvid
 
-All shortcuts use the **Meta** key — that's ⌘ (Command) on macOS and the Super / Windows key on Linux and Windows. (`Ctrl` is not bound.)
+Otseteed kasutavad macOS-is **⌘** (Command) ja Windowsis ning Linuxis **Ctrl**. (Super/Windowsi võti pole seotud.)
 
-| Shortcut   | Action                 |
-| ---------- | ---------------------- |
-| **Meta+Q** | Quit the application   |
-| **Meta+,** | Ava sätted             |
-| **Meta+1** | Switch to Messages tab |
-| **Meta+2** | Switch to Nodes tab    |
-| **Meta+3** | Switch to Map tab      |
-| **Meta+4** | Switch to Connect tab  |
-| **Meta+/** | Open About             |
+| Otsetee      | Action                 |
+| ------------ | ---------------------- |
+| **⌘/Ctrl+Q** | Quit the application   |
+| **⌘/Ctrl+,** | Ava sätted             |
+| **⌘/Ctrl+1** | Switch to Messages tab |
+| **⌘/Ctrl+2** | Switch to Nodes tab    |
+| **⌘/Ctrl+3** | Switch to Map tab      |
+| **⌘/Ctrl+4** | Switch to Connect tab  |
+| **⌘/Ctrl+/** | Open About             |
 
 ### Window & System Tray
 

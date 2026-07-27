@@ -147,15 +147,19 @@ Modeemiesiasetus määrittää tärkeimmän kompromissin **kantaman** ja **tiedo
 
 ### Turvallisuusasetukset
 
-| Asetus                      | Kuvaus                                                                          |
-| --------------------------- | ------------------------------------------------------------------------------- |
-| Julkinen avain              | Radiosi julkinen avain (vain luku)                           |
-| Ylläpitäjän avain           | Avain etähallintaa varten                                                       |
-| Yksityinen avain            | Radiosi yksityinen avain (käsittele turvallisesti)           |
-| ~~Ylläpitokanava käytössä~~ | ⚠️ Poistettu — määritetään nyt automaattisesti, kun ylläpitoavain asetetaan     |
-| Virheenkorjausloki          | Tulosta reaaliaikainen virheenkorjausloki sarjaportin tai bluetoothin kautta    |
-| Sarjaportti käytössä        | Ota sarjakonsoliyhteys käyttöön (siirretty laiteasetuksista) |
-| Hallintatila                | Rajoita muutokset muihin kuin ylläpitokanaviin                                  |
+| Asetus                      | Kuvaus                                                                                                                                                                                                                                        |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Julkinen avain              | Radiosi julkinen avain (vain luku)                                                                                                                                                                                         |
+| Ylläpitäjän avain           | Avain etähallintaa varten                                                                                                                                                                                                                     |
+| Yksityinen avain            | Radiosi yksityinen avain (käsittele turvallisesti)                                                                                                                                                                         |
+| ~~Ylläpitokanava käytössä~~ | ⚠️ Poistettu — määritetään nyt automaattisesti, kun ylläpitoavain asetetaan                                                                                                                                                                   |
+| Virheenkorjausloki          | Tulosta reaaliaikainen virheenkorjausloki sarjaportin tai bluetoothin kautta                                                                                                                                                                  |
+| Sarjaportti käytössä        | Ota sarjakonsoliyhteys käyttöön (siirretty laiteasetuksista)                                                                                                                                                               |
+| Hallintatila                | Rajoita muutokset muihin kuin ylläpitokanaviin                                                                                                                                                                                                |
+| Varmuuskopioi avaimet       | Tallenna radion avaimista salattu varmuuskopio tälle laitteelle (vain Android)                                                                                                                                             |
+| Palauta avaimet             | Kirjoita varmuuskopioidut avaimet takaisin radioon (käytettävissä, kun varmuuskopio on olemassa)                                                                                                                           |
+| Poista avaimen varmuuskopio | Poista tälle laitteelle tallennettu avainten varmuuskopio                                                                                                                                                                                     |
+| Suojaustaso                 | Pakettien aitous – miten allekirjoittamattomia tai välitettyjä paketteja käsitellään: **Tiukka**, **Tasapainoinen** tai **Yhteensopiva** (edellyttää tuettua laiteohjelmistoa; Tiukka pyytää vahvistuksen) |
 
 ![Salasanakenttä](../../assets/screenshots/settings_password_field.png)
 

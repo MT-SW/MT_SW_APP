@@ -198,7 +198,7 @@ class NodeRepositoryImpl(
         withContext(dispatchers.io) { nodeInfoWriteDataSource.upsert(node.toEntity()) }
 
     /** Installs initial configuration data (local info and remote nodes) into the database. */
-    override suspend fun installConfig(mi: MyNodeInfo, nodes: List<Node>) = withContext(dispatchers.io) {
+    override suspend fun installConfig(mi: MyNodeInfo, nodes: List<Node>): List<Int> = withContext(dispatchers.io) {
         nodeInfoWriteDataSource.installConfig(mi.toEntity(), nodes.map { it.toEntity() })
     }
 
@@ -226,6 +226,9 @@ class NodeRepositoryImpl(
 
     override suspend fun getUnknownNodes(): List<Node> =
         withContext(dispatchers.io) { nodeInfoReadDataSource.getUnknownNodes().map { it.toModel() } }
+
+    override suspend fun getNodeDbSnapshot(): Map<Int, Node> =
+        withContext(dispatchers.io) { nodeInfoReadDataSource.getNodeDbSnapshot().mapValues { (_, it) -> it.toModel() } }
 
     /** Persists hardware metadata for a node. */
     override suspend fun insertMetadata(nodeNum: Int, metadata: DeviceMetadata) =

@@ -112,7 +112,9 @@
     <string name="app_too_old">アプリを更新して下さい。</string>
     <string name="app_version">バージョン</string>
     <string name="apply">適用</string>
+    <!-- AQI -->
     <string name="aqi">AQI</string>
+    <string name="aqi_good">良</string>
     <string name="are_you_sure">よろしいですか？</string>
     <string name="are_you_sure_change_default">デフォルトチャンネルに変更しますか？</string>
     <string name="audio">オーディオ</string>
@@ -347,6 +349,7 @@
     <string name="demo_mode_replay">デモモード（リプレイ）</string>
     <string name="desc_node_filter_clear">ノードフィルターをクリアします</string>
     <string name="description">説明</string>
+    <!-- DESKTOP -->
     <string name="desktop_notification_title">Meshtastic</string>
     <string name="desktop_tray_quit">終了</string>
     <string name="desktop_tray_show">Meshtastic を表示</string>
@@ -675,6 +678,7 @@
     <string name="fixed_position">固定位置</string>
     <string name="flip_screen">画面反転</string>
     <string name="for_more_information_see_our_privacy_policy">詳細については、プライバシーポリシーをご覧ください。</string>
+    <!-- FORMAT -->
     <string name="free_memory">空きメモリ</string>
     <string name="free_memory_description">利用可能なシステムメモリ（バイト単位）</string>
     <string name="freq">周波数</string>
@@ -753,6 +757,7 @@
     <string name="ignore_incoming">無視リスト (ノード番号を登録)</string>
     <string name="ignore_mqtt">MQTT を無視</string>
     <string name="ignore_remove">'%1$s'を無視リストから削除しますか？</string>
+    <!-- IMPORT -->
     <string name="import_configuration">設定をインポート</string>
     <string name="import_known_shared_contact_text">警告: この連絡先は登録済です。インポートすると以前の連絡先情報が上書きされます。</string>
     <string name="import_label">インポート</string>
@@ -1188,6 +1193,7 @@
     <string name="override_duty_cycle">デューティサイクルを上書き</string>
     <string name="override_frequency_mhz">周波数の上書き</string>
     <string name="pa_fan_disabled">PAファン無効</string>
+    <!-- PACKET -->
     <string name="pairing_mode">ペアリングモード</string>
     <string name="password">パスワード</string>
     <!-- PAX -->
@@ -1358,7 +1364,7 @@
     <string name="role_tracker_desc">GPSの位置情報パケットを優先してブロードキャストします。</string>
     <string name="root_topic">ルート トピック</string>
     <string name="rotary_encoder_1_enabled">ロータリーエンコーダ #1 を有効化</string>
-    <string name="router_role_confirmation_text">&lt;a href=\"https://meshtastic.org/docs/configuration/radio/device/#roles\"&gt;デバイスの役割に関するドキュメント&lt;/a&gt;と、&lt;a href=\"http://meshtastic.org/blog/choosing-the-right-device-role\"&gt;適切なデバイスの役割の選び方&lt;/a&gt;に関するブログ記事を読みました。</string>
+    <string name="router_role_confirmation_text">&lt;a href="https://meshtastic.org/docs/configuration/radio/device/#roles"&gt;デバイスの役割に関するドキュメント&lt;/a&gt;と、&lt;a href="http://meshtastic.org/blog/choosing-the-right-device-role"&gt;適切なデバイスの役割の選び方&lt;/a&gt;に関するブログ記事を読みました。</string>
     <!-- ROUTING -->
     <string name="routing_error_admin_bad_session_key">セッション鍵が不正です</string>
     <string name="routing_error_admin_public_key_unauthorized">許可されていない公開鍵</string>
@@ -1382,6 +1388,7 @@
     <string name="rssi_definition">受信信号強度インジケーター（RSSI）は、アンテナで受信している電力レベルを測定するための指標です。一般的にRSSI値が高いほど、より強力で安定した接続を示します。</string>
     <string name="rsyslog_server">rsyslogサーバー</string>
     <string name="sats">GPS衛星</string>
+    <!-- SAVE -->
     <string name="save">保存</string>
     <string name="save_changes">保存</string>
     <string name="save_csv_in_storage_esp32_only">ストレージにCSVファイルを保存(ESP32のみ)</string>
@@ -1457,7 +1464,6 @@
     <string name="share_connected_node">接続中のノードを共有</string>
     <string name="share_contact">連絡先を共有</string>
     <string name="share_location">位置情報を共有</string>
-    <string name="share_location_description">ノードのハードウェア GPS を使用する代わりに、スマートフォンの GPS を使ってノードに位置情報を送信します。</string>
     <string name="share_to">共有…</string>
     <string name="share_your_location_in_real_time">統合された GPS 機能で位置情報をリアルタイムに共有し、グループの連携を保ちます。</string>
     <string name="short_name">短縮名</string>
@@ -1756,6 +1762,7 @@
     <string name="wind_gust">突風</string>
     <string name="wind_lull">風の弱まり</string>
     <string name="wind_speed">風速</string>
+    <!-- WRITE -->
     <string name="write_nfc">NFC タグに書き込む</string>
     <string name="write_nfc_failed">タグに書き込めませんでした。書き込み可能な空の NFC タグを使い、動かさずに近づけてください。</string>
     <string name="write_nfc_success">タグに書き込みました</string>

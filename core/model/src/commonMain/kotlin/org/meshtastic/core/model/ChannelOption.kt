@@ -209,13 +209,6 @@ enum class RegionInfo(
     UA_433(RegionCode.UA_433, "Ukraine 433MHz", 433.0f, 434.7f),
 
     /**
-     * Ukraine 868MHz 868,0-868,6 Mhz 25 mW
-     *
-     * @see [NKZRZI](https://nkrzi.gov.ua/images/upload/256/5810/PDF_UUZ_19_01_2016.pdf)
-     */
-    UA_868(RegionCode.UA_868, "Ukraine 868MHz", 868.0f, 868.6f),
-
-    /**
      * Malaysia 433MHz 433 - 435 MHz at 100mW, no restrictions.
      *
      * @see [MCMC](https://www.mcmc.gov.my/skmmgovmy/media/General/pdf/Short-Range-Devices-Specification.pdf)
@@ -320,6 +313,7 @@ enum class ChannelOption(val modemPreset: ModemPreset, val bandwidth: Float, val
     LONG_SLOW(ModemPreset.LONG_SLOW, 0.125f, snrLimit = -20f), // SF12
     MEDIUM_FAST(ModemPreset.MEDIUM_FAST, 0.250f, snrLimit = -12.5f), // SF9
     MEDIUM_SLOW(ModemPreset.MEDIUM_SLOW, 0.250f, snrLimit = -15f), // SF10
+    MEDIUM_TURBO(ModemPreset.MEDIUM_TURBO, 0.500f, snrLimit = -12.5f), // SF9
     SHORT_FAST(ModemPreset.SHORT_FAST, 0.250f, snrLimit = -7.5f), // SF7
     SHORT_SLOW(ModemPreset.SHORT_SLOW, 0.250f, snrLimit = -10f), // SF8
     SHORT_TURBO(ModemPreset.SHORT_TURBO, 0.500f, snrLimit = -7.5f), // SF7

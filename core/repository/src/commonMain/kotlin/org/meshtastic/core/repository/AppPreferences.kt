@@ -146,6 +146,12 @@ interface UiPrefs {
 
     fun setSelectedConnectionTransport(type: DeviceType)
 
+    /** Keys for firmware-update notifications already scheduled on this device. */
+    val firmwareUpdateNotificationKeys: StateFlow<Set<String>>
+
+    /** Records a notification key after the platform notification has been scheduled successfully. */
+    fun recordFirmwareUpdateNotificationKey(key: String)
+
     fun shouldProvideNodeLocation(nodeNum: Int): StateFlow<Boolean>
 
     fun setShouldProvideNodeLocation(nodeNum: Int, provide: Boolean)
@@ -222,6 +228,7 @@ interface NotificationPrefs {
 }
 
 /** Reactive interface for general map preferences. */
+@Suppress("TooManyFunctions")
 interface MapPrefs {
     val mapStyle: StateFlow<Int>
 
@@ -264,7 +271,15 @@ interface MapPrefs {
 
     /** Persisted [networkMapLayers]; suspends for the first disk load to avoid a cold-start empty default. */
     suspend fun awaitNetworkMapLayers(): Set<String>
+
+    /** Persist the F-Droid map camera as one atomic preference update. */
+    fun setCameraPosition(position: MapCameraPosition)
+
+    /** Load the complete persisted camera, or null before the map has ever been positioned. */
+    suspend fun awaitCameraPosition(): MapCameraPosition?
 }
+
+data class MapCameraPosition(val latitude: Double, val longitude: Double, val zoom: Double)
 
 /** Reactive interface for map consent. */
 interface MapConsentPrefs {

@@ -6,7 +6,13 @@ on:
       run_lint:
         type: boolean
         default: true
+      run_screenshot_tests:
+        type: boolean
+        default: true
       run_unit_tests:
+        type: boolean
+        default: true
+      run_android_build:
         type: boolean
         default: true
       run_coverage:
@@ -47,47 +53,27 @@ env:
   GRADLE_CACHE_URL: ${{ secrets.GRADLE_CACHE_URL }}
   GRADLE_CACHE_USERNAME: ${{ secrets.GRADLE_CACHE_USERNAME }}
   GRADLE_CACHE_PASSWORD: ${{ secrets.GRADLE_CACHE_PASSWORD }}
-  # Fallback VERSION_CODE for jobs that don't consume the setup output.
-  VERSION_CODE: ${{ github.run_number }}
+  # Merge-queue and main-branch runs write to the Gradle caches; every other
+  # context (PRs, release tags) is a read-only consumer.
+  GRADLE_CACHE_READ_ONLY: ${{ (github.ref == 'refs/heads/main' || github.event_name == 'merge_group') && 'false' || 'true' }}
 
 jobs:
-  # ── Fast Setup (version code + cache config) ────────────────────────
-  # Lightweight job that unblocks lint, tests, and builds in parallel.
-  setup:
-    runs-on: ubuntu-24.04-arm
-    permissions:
-      contents: read
-    timeout-minutes: 5
-    outputs:
-      cache_read_only: ${{ steps.cache_config.outputs.cache_read_only }}
-      version_code: ${{ steps.version_code.outputs.version_code }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v7.0.0
-        with:
-          fetch-depth: 0
-          filter: 'blob:none'
-          submodules: false
-
-      - name: Determine cache read-only setting
-        id: cache_config
-        shell: bash
-        run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]] || [[ "${{ github.event_name }}" == "merge_group" ]] || [[ "${{ github.ref }}" == gh-readonly-queue/* ]]; then
-            echo "cache_read_only=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "cache_read_only=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Calculate version code from git commit count
-        id: version_code
-        shell: bash
-        run: |
-          COMMIT_COUNT=$(git rev-list --count HEAD)
-          OFFSET=$(grep '^VERSION_CODE_OFFSET=' config.properties | cut -d'=' -f2 || echo 0)
-          VERSION_CODE=$((COMMIT_COUNT + OFFSET))
-          echo "version_code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
+  # There is deliberately no fan-in "setup" job here. Every heavy job used to
+  # `needs:` one, which serialized TWO runner-queue waits per run — under pool
+  # congestion the setup job alone sat queued for ~10 minutes before the real
+  # jobs could even enter the queue. Its two outputs are now sourced without a
+  # job: cache writability is the pure expression above, and the versionCode
+  # comes from one of two places:
+  #   - Jobs whose artifacts ship (android-check, build-desktop,
+  #     build-flatpak-src) check out full — blob-less — history so the build's
+  #     GitVersionValueSource derives the real commit-count versionCode.
+  #   - Validation-only jobs (lint, screenshot, test shards) pin VERSION_CODE
+  #     to a constant instead: their outputs are never shipped, and the real
+  #     value changes on every commit, which poisons the versionCode-dependent
+  #     task chain (BuildConfig -> compile -> test/lint) in the build cache.
+  #     A stable value keeps those cache keys identical across commits so
+  #     unchanged modules resolve FROM-CACHE on every run. Keep the pinned
+  #     value (30000000) identical across the three jobs for the same reason.
 
   # ── Lint & Static Analysis ──────────────────────────────────────────
   lint-check:
@@ -95,15 +81,15 @@ jobs:
     permissions:
       contents: read
     timeout-minutes: 30
-    needs: setup
     if: inputs.run_lint == true
     env:
-      VERSION_CODE: ${{ needs.setup.outputs.version_code }}
+      VERSION_CODE: 30000000 # pinned for cache stability -- see comment above
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
+          # Full history: spotless ratchetFrom("origin/main") diffs against main.
           fetch-depth: 0
           filter: 'blob:none'
           submodules: true
@@ -112,7 +98,7 @@ jobs:
         uses: ./.github/actions/gradle-setup
         with:
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          cache_read_only: ${{ needs.setup.outputs.cache_read_only }}
+          cache_read_only: ${{ env.GRADLE_CACHE_READ_ONLY }}
           install_jetbrains_jdk: 'true'
 
       - name: Lint, Analysis & KMP Smoke Compile
@@ -124,14 +110,13 @@ jobs:
     permissions:
       contents: read
     timeout-minutes: 20
-    needs: setup
-    if: inputs.run_lint == true
+    if: inputs.run_lint == true && inputs.run_screenshot_tests == true
     env:
-      VERSION_CODE: ${{ needs.setup.outputs.version_code }}
+      VERSION_CODE: 30000000 # pinned for cache stability -- see comment above
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 1
           submodules: true
@@ -140,7 +125,7 @@ jobs:
         uses: ./.github/actions/gradle-setup
         with:
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          cache_read_only: ${{ needs.setup.outputs.cache_read_only }}
+          cache_read_only: ${{ env.GRADLE_CACHE_READ_ONLY }}
 
       - name: Screenshot Test Validation
         run: ./gradlew :screenshot-tests:validateDebugScreenshotTest -Pci=true
@@ -166,7 +151,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 1
           submodules: true
@@ -334,19 +319,28 @@ jobs:
           echo "🎉 All RB checks passed"
 
   # ── Sharded Unit Tests ──────────────────────────────────────────────
-  # Tests are split into 3 shards that run in parallel:
-  #   shard-core:    core:* KMP module tests (allTests)
-  #   shard-feature: feature:* KMP module tests (allTests)
-  #   shard-app:     Pure-Android/JVM tests (androidApp, desktopApp, core:barcode, etc.)
+  # Tests are split into 3 shards that run in parallel. Module assignment is
+  # balance-driven (measured test-execution time), not purely semantic: the
+  # three heaviest core modules (:core:database ~135s, :core:service ~119s,
+  # :core:network ~66s) are placed in the lighter shards so all three finish
+  # in roughly the same wall time. shard-app already compiles the full
+  # dependency graph (androidApp depends on everything), so hosting extra
+  # core-module tests there costs only their execution time.
+  # These lists are hand-maintained; pull-request.yml's check-changes job
+  # guards them against drift (every module in settings.gradle.kts with test
+  # sources must appear here or be explicitly exempted).
+  #   shard-core:    remaining core:* KMP module tests (allTests)
+  #   shard-feature: feature:* KMP module tests + :core:service
+  #   shard-app:     Pure-Android/JVM tests (androidApp, desktopApp,
+  #                  core:barcode) + :core:database + :core:network
   test-shards:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
     timeout-minutes: 45
-    needs: setup
     if: inputs.run_unit_tests == true
     env:
-      VERSION_CODE: ${{ needs.setup.outputs.version_code }}
+      VERSION_CODE: 30000000 # pinned for cache stability -- see comment above
     strategy:
       fail-fast: false
       matrix:
@@ -356,14 +350,13 @@ jobs:
               :core:ble:allTests
               :core:common:allTests
               :core:data:allTests
-              :core:database:allTests
+              :core:datastore:allTests
               :core:domain:allTests
+              :core:konsist:allTests
               :core:model:allTests
               :core:navigation:allTests
-              :core:network:allTests
               :core:prefs:allTests
               :core:repository:allTests
-              :core:service:allTests
               :core:takserver:allTests
               :core:testing:allTests
               :core:ui:allTests
@@ -371,34 +364,41 @@ jobs:
               :core:ble:koverXmlReport
               :core:common:koverXmlReport
               :core:data:koverXmlReport
-              :core:database:koverXmlReport
+              :core:datastore:koverXmlReport
               :core:domain:koverXmlReport
+              :core:konsist:koverXmlReport
               :core:model:koverXmlReport
               :core:navigation:koverXmlReport
-              :core:network:koverXmlReport
               :core:prefs:koverXmlReport
               :core:repository:koverXmlReport
-              :core:service:koverXmlReport
               :core:takserver:koverXmlReport
               :core:testing:koverXmlReport
               :core:ui:koverXmlReport
           - name: shard-feature
             tasks: >-
+              :core:service:allTests
               :feature:connections:allTests
+              :feature:discovery:allTests
+              :feature:docs:allTests
               :feature:firmware:allTests
               :feature:intro:allTests
               :feature:map:allTests
               :feature:messaging:allTests
               :feature:node:allTests
               :feature:settings:allTests
+              :feature:wifi-provision:allTests
             kover: >-
+              :core:service:koverXmlReport
               :feature:connections:koverXmlReport
+              :feature:discovery:koverXmlReport
+              :feature:docs:koverXmlReport
               :feature:firmware:koverXmlReport
               :feature:intro:koverXmlReport
               :feature:map:koverXmlReport
               :feature:messaging:koverXmlReport
               :feature:node:koverXmlReport
               :feature:settings:koverXmlReport
+              :feature:wifi-provision:koverXmlReport
           - name: shard-app
             tasks: >-
               :androidApp:testFdroidDebugUnitTest
@@ -406,16 +406,24 @@ jobs:
               :desktopApp:test
               :core:barcode:testFdroidDebugUnitTest
               :core:barcode:testGoogleDebugUnitTest
+              :core:database:allTests
+              :core:network:allTests
+              :feature:car:testFdroidDebugUnitTest
+              :feature:car:testGoogleDebugUnitTest
             kover: >-
               :androidApp:koverXmlReportFdroidDebug
               :androidApp:koverXmlReportGoogleDebug
               :core:barcode:koverXmlReportFdroidDebug
               :core:barcode:koverXmlReportGoogleDebug
               :desktopApp:koverXmlReport
+              :core:database:koverXmlReport
+              :core:network:koverXmlReport
+              :feature:car:koverXmlReportFdroidDebug
+              :feature:car:koverXmlReportGoogleDebug
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 1
           submodules: true
@@ -424,7 +432,7 @@ jobs:
         uses: ./.github/actions/gradle-setup
         with:
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          cache_read_only: ${{ needs.setup.outputs.cache_read_only }}
+          cache_read_only: ${{ env.GRADLE_CACHE_READ_ONLY }}
 
       - name: Run Tests & Coverage (${{ matrix.shard.name }})
         run: |
@@ -471,25 +479,22 @@ jobs:
     permissions:
       contents: read
     timeout-minutes: 60
-    needs: setup
-    env:
-      VERSION_CODE: ${{ needs.setup.outputs.version_code }}
+    if: inputs.run_android_build == true
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
-          fetch-depth: 1
+          fetch-depth: 0
+          filter: 'blob:none'
           submodules: true
 
       - name: Gradle Setup
         uses: ./.github/actions/gradle-setup
         with:
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          cache_read_only: ${{ needs.setup.outputs.cache_read_only }}
+          cache_read_only: ${{ env.GRADLE_CACHE_READ_ONLY }}
 
-      # ponytail: -SNAPSHOT only on main pushes, so PR/merge-queue debug builds keep the plain
-      # base version. Publishing the resulting APKs is main-check.yml's job, not this one.
       - name: Tag main-branch builds as -SNAPSHOT
         if: github.event_name == 'push'
         run: |
@@ -523,26 +528,24 @@ jobs:
     permissions:
       contents: read
     timeout-minutes: 60
-    needs: setup
     strategy:
       fail-fast: false
       matrix:
         os: [macos-latest, windows-latest, ubuntu-24.04, ubuntu-24.04-arm]
-    env:
-      VERSION_CODE: ${{ needs.setup.outputs.version_code }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
-          fetch-depth: 1
+          fetch-depth: 0
+          filter: 'blob:none'
           submodules: true
 
       - name: Gradle Setup
         uses: ./.github/actions/gradle-setup
         with:
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          cache_read_only: ${{ needs.setup.outputs.cache_read_only }}
+          cache_read_only: ${{ env.GRADLE_CACHE_READ_ONLY }}
           install_jetbrains_jdk: 'true'
 
       - name: Build Desktop
@@ -567,19 +570,17 @@ jobs:
     permissions:
       contents: read
     timeout-minutes: 60
-    needs: setup
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04, ubuntu-24.04-arm]
-    env:
-      VERSION_CODE: ${{ needs.setup.outputs.version_code }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
-          fetch-depth: 1
+          fetch-depth: 0
+          filter: 'blob:none'
           submodules: true
 
       - name: Gradle Setup

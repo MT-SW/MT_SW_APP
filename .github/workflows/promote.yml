@@ -52,6 +52,8 @@ on:
         required: true
       DISCORD_WEBHOOK_ANDROID:
         required: false
+      HOMEBREW_TAP_TOKEN:
+        required: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ inputs.tag_name }}
@@ -67,12 +69,13 @@ permissions:
 jobs:
   prepare-build-info:
     runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
     outputs:
       APP_VERSION_NAME: ${{ steps.prep_version.outputs.APP_VERSION_NAME }}
       APP_VERSION_CODE: ${{ steps.calculate_version_code.outputs.versionCode }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
           ref: ${{ inputs.commit_sha || inputs.tag_name }}
           fetch-depth: 0
@@ -104,6 +107,7 @@ jobs:
 
   promote-release:
     runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
     needs: [ prepare-build-info ]
     env:
       FROM_TRACK: ${{ inputs.from_channel == 'closed' && 'NewAlpha' || (inputs.from_channel == 'open' && 'beta' || 'internal') }}
@@ -111,14 +115,14 @@ jobs:
       USER_FRACTION: ${{ (inputs.channel == 'production' && '0.1') || (inputs.channel == 'open' && '0.5') || '1.0' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
           ref: ${{ inputs.commit_sha || inputs.tag_name }}
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '4.0.4'
+          ruby-version: '4.0.6'
           bundler-cache: true
 
       - name: Decode Play Store credentials
@@ -142,10 +146,20 @@ jobs:
 
   update-github-release:
     runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
     needs: [ prepare-build-info, promote-release ]
+    # actions: write is scoped here — only this job's publish-workflow
+    # dispatch needs it, and the other jobs must not get it. Job-level
+    # permissions replace the workflow-level block, so the full set this
+    # job uses is listed.
+    permissions:
+      contents: write
+      pull-requests: write
+      statuses: write
+      actions: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
           ref: ${{ inputs.commit_sha || inputs.tag_name }}
           fetch-depth: 0
@@ -166,6 +180,28 @@ jobs:
             --title "${{ inputs.release_name }} (${{ needs.prepare-build-info.outputs.APP_VERSION_CODE }})" \
             --draft=false \
             --prerelease=${{ inputs.channel != 'production' }}
+
+      # The edit above is made with GITHUB_TOKEN, and GITHUB_TOKEN-caused
+      # events never start workflow runs — winget-publish.yml's `released`
+      # trigger will not fire from it. workflow_dispatch is exempt from that
+      # suppression, so dispatch it explicitly. Soft-fail: a winget hiccup
+      # must not block the changelog stamp or Discord notification.
+      - name: Dispatch winget publish
+        if: ${{ inputs.channel == 'production' }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.final_tag }}
+        run: gh workflow run winget-publish.yml --ref main -f "tag=$TAG"
+
+      # Same GITHUB_TOKEN-suppression story as the winget dispatch above.
+      - name: Dispatch Microsoft Store publish
+        if: ${{ inputs.channel == 'production' }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.final_tag }}
+        run: gh workflow run msstore-publish.yml --ref main -f "tag=$TAG"
 
       - name: Stamp CHANGELOG.md for release
         if: ${{ inputs.channel == 'production' }}
@@ -305,3 +341,65 @@ jobs:
           )
 
           curl -H "Content-Type: application/json" -d "$PAYLOAD" "$DISCORD_WEBHOOK"
+
+  # Runs in-workflow rather than on `release: published` because the undraft above
+  # uses github.token, whose events never trigger other workflows. Once the cask is
+  # promoted to homebrew/cask, replace the tap PR with `brew bump-cask-pr`.
+  update-homebrew-cask:
+    if: ${{ inputs.channel == 'production' }}
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    needs: [ update-github-release ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ inputs.commit_sha || inputs.tag_name }}
+
+      - name: Render cask and open PR against meshtastic/homebrew-tap
+        env:
+          TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          TAG: ${{ inputs.final_tag }}
+        run: |
+          if [[ -z "$TAP_TOKEN" ]]; then
+            echo "HOMEBREW_TAP_TOKEN not set; skipping Homebrew cask update."
+            exit 0
+          fi
+          # Tags cut before the template landed check out without it — skip, don't fail.
+          if [[ ! -f .github/homebrew/meshtastic-desktop.rb ]]; then
+            echo "Cask template not present at this tag; skipping Homebrew cask update."
+            exit 0
+          fi
+
+          VERSION=${TAG#v}
+          # GitHub rewrites spaces in asset names to dots:
+          # "Meshtastic Desktop-X.dmg" is served as "Meshtastic.Desktop-X.dmg".
+          # --retry-all-errors covers the brief 404 window while the undraft propagates.
+          curl -fsSL --retry 5 --retry-delay 30 --retry-all-errors -o /tmp/app.dmg \
+            "https://github.com/${{ github.repository }}/releases/download/${TAG}/Meshtastic.Desktop-${VERSION}.dmg"
+          SHA256=$(sha256sum /tmp/app.dmg | cut -d' ' -f1)
+
+          sed -e "s/{{VERSION}}/${VERSION}/" -e "s/{{SHA256}}/${SHA256}/" \
+            .github/homebrew/meshtastic-desktop.rb > /tmp/meshtastic-desktop.rb
+
+          # PR (not a direct push to main) so the tap's brew test-bot CI validates the bump.
+          git clone "https://x-access-token:${TAP_TOKEN}@github.com/meshtastic/homebrew-tap.git" /tmp/tap
+          cd /tmp/tap
+          BRANCH="meshtastic-desktop-${VERSION}"
+          git checkout -b "$BRANCH"
+          mkdir -p Casks
+          cp /tmp/meshtastic-desktop.rb Casks/meshtastic-desktop.rb
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Casks/meshtastic-desktop.rb
+          if git diff --cached --quiet; then
+            echo "Cask already up to date."
+            exit 0
+          fi
+          git commit -m "meshtastic-desktop ${VERSION}"
+          git push -fu origin "$BRANCH"
+          GH_TOKEN="$TAP_TOKEN" gh pr create --repo meshtastic/homebrew-tap \
+            --head "$BRANCH" --base main \
+            --title "meshtastic-desktop ${VERSION}" \
+            --body "Automated cask bump for the ${TAG} production release of [Meshtastic-Android](https://github.com/${{ github.repository }}/releases/tag/${TAG})." \
+            || echo "PR already exists for $BRANCH; branch updated."

@@ -2,7 +2,7 @@
 title: Messages & Channels
 parent: User Guide
 nav_order: 3
-last_updated: 2026-07-08
+last_updated: 2026-07-11
 description: Send and receive messages, manage channels, configure encryption, search conversations, and use quick chat, reactions, and message actions.
 aliases:
   - channels
@@ -124,6 +124,22 @@ You can search the full history of any conversation directly from the chat scree
 
 Messages appear as chat bubbles — sent messages on the right, received messages on the left. Each bubble shows the sender, timestamp, and delivery status. Messages with replies include a quoted preview of the original message above the response.
 
+### Text Formatting
+
+Messages support lightweight inline **Markdown**. Received messages render the styling with the syntax characters removed:
+
+| Тып           | Syntax                         | Renders as           |
+| ------------- | ------------------------------ | -------------------- |
+| Bold          | `**bold**`                     | **bold**             |
+| Italic        | `*italic*`                     | _italic_             |
+| Strikethrough | `~~strike~~`                   | ~~strike~~           |
+| Inline code   | `` `code` ``                   | monospace `code`     |
+| Link          | `[label](https://example.com)` | a tappable **label** |
+
+When composing, focus the message field and type at least three characters to reveal a **formatting toolbar** below the input. Select text and tap a style to wrap it (tap again to remove it); with no selection, a style inserts an empty pair with the cursor between the markers. The link button opens a dialog to enter a URL. As you type, the draft styles live in the field while the underlying text keeps its Markdown characters.
+
+> 💡 **Tip:** Formatting is carried as literal characters on the mesh — the same bytes iOS sends. Clients that don't support Markdown (older apps, plain firmware clients) will show the raw `**`/`~~` characters. URLs, email addresses, and phone numbers are still auto-linked whether or not you use Markdown.
+
 ### Mentions
 
 Type `@` while composing to mention a node — a picker suggests matching contacts as you type. In a received message, a mention appears as a highlighted chip showing the node's name; tap it to jump straight to that node's detail page.
@@ -163,6 +179,7 @@ Messages are queued and transmitted based on priority:
 ### Message Limits
 
 - **Maximum length:** 200 bytes (approximately 200 characters for ASCII text)
+- The 200-byte cap applies to the in-app composer — the mesh payload limit itself is ~233 bytes, so messages from other senders (e.g., App Functions or Android Auto) may arrive slightly longer
 - **Rate limiting:** The mesh enforces airtime fairness; heavy message volume may be throttled
 - **Delivery:** Messages are retried automatically if no acknowledgment is received
 

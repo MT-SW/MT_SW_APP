@@ -53,6 +53,8 @@ Reittipisteet ovat jaettuja maantieteellisiä kiinnostavia kohteita, jotka kaikk
 3. Valitse reittipisteelle kuvake tai emoji.
 4. Napauta **Lähetä** jakaaksesi sen verkkoon.
 
+Reittipisteet osoitetaan kuten viestit: oletuksena ne lähetetään yleislähetyksenä ensisijaisella kanavalla, mutta reittipiste voidaan lähettää myös tietyllä kanavalla tai suoraviestinä yhdelle radiolle.
+
 ### Reittipisteen ominaisuudet
 
 | Ominaisuus      | Kuvaus                                                                  |
@@ -116,9 +118,8 @@ Määritä sijaintikäyttäytyminen kohdassa **Asetukset → Sijainti**.
 
 ## Karttalähteet
 
-Sovellus tukee useita karttatiililähteitä:
+Kartan pohja riippuu sovellusversiosta: **Google Play** -versio käyttää Google Mapsia, kun taas **F-Droid**- ja työpöytäversiot käyttävät OpenStreetMapia. Pohjakartan lisäksi käytettävissä on muita karttatasoja peitekerroksina tai vaihtoehtoisina karttoina:
 
-- OpenStreetMap (oletus)
 - Satelliittikuvat (jos saatavilla)
 - Offline-kartat (lataa alueet offline-käyttöä varten)
 

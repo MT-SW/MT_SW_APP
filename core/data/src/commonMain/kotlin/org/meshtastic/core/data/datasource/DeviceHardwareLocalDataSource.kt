@@ -28,21 +28,21 @@ class DeviceHardwareLocalDataSource(private val dbManager: DatabaseProvider) {
         dbManager.withDb { it.deviceHardwareDao().insertAll(deviceHardware.map { hw -> hw.asEntity() }) }
     }
 
-    suspend fun deleteAllDeviceHardware() {
-        dbManager.withDb { it.deviceHardwareDao().deleteAll() }
+    suspend fun replaceAllDeviceHardware(deviceHardware: List<NetworkDeviceHardware>) {
+        dbManager.withDb { it.deviceHardwareDao().replaceAll(deviceHardware.map { hw -> hw.asEntity() }) }
     }
 
     suspend fun getByHwModel(hwModel: Int): List<DeviceHardwareEntity> =
-        dbManager.withDb { it.deviceHardwareDao().getByHwModel(hwModel) }.orEmpty()
+        dbManager.withReadDb { it.deviceHardwareDao().getByHwModel(hwModel) }
 
     suspend fun getByTarget(target: String): DeviceHardwareEntity? =
-        dbManager.withDb { it.deviceHardwareDao().getByTarget(target) }
+        dbManager.withReadDb { it.deviceHardwareDao().getByTarget(target) }
 
     suspend fun getByModelAndTarget(hwModel: Int, target: String): DeviceHardwareEntity? =
-        dbManager.withDb { it.deviceHardwareDao().getByModelAndTarget(hwModel, target) }
+        dbManager.withReadDb { it.deviceHardwareDao().getByModelAndTarget(hwModel, target) }
 
-    suspend fun hasAnyEntries(): Boolean = dbManager.withDb { it.deviceHardwareDao().count() > 0 } ?: false
+    suspend fun hasAnyEntries(): Boolean = dbManager.withReadDb { it.deviceHardwareDao().count() > 0 }
 
     /** All known `platformioTarget` values — used to determine which msh.to links are vendor links. */
-    suspend fun getAllTargets(): List<String> = dbManager.withDb { it.deviceHardwareDao().getAllTargets() }.orEmpty()
+    suspend fun getAllTargets(): List<String> = dbManager.withReadDb { it.deviceHardwareDao().getAllTargets() }
 }

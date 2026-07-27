@@ -97,6 +97,6 @@ docs/
 
 ## Вопросы?
 
-Если у вас есть вопросы о контексте конкретной строки или вам нужна помощь с началом работы, откройте обсуждение на странице [Meshtastic GitHub Discussions](https://github.com/meshtastic/Meshtastic-Android/discussions).
+Если у тебя есть вопросы о контексте конкретной строки или нужна помощь для начала работы, создайте обсуждение на странице [Meshtastic GitHub Discussions](https://github.com/orgs/meshtastic/discussions).
 
 Спасибо за помощь в расширении охвата Meshtastic!

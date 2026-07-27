@@ -57,11 +57,19 @@ https://meshtastic.org/{path}       # App Link, android:autoVerify — also open
 `adb shell am start -a android.intent.action.VIEW -d "meshtastic://meshtastic/{path}"` is the fastest way to
 trigger any route below from a shell or automation script without touching the UI.
 
-**Source of truth:** the always-current list of segments lives in the `when` block in
-[`DeepLinkRouter.route()`](../../../core/navigation/src/commonMain/kotlin/org/meshtastic/core/navigation/DeepLinkRouter.kt)
-(the class-level KDoc above it is illustrative, not exhaustive)
-and as executable spec in
-[`DeepLinkRouterTest.kt`](../../../core/navigation/src/commonTest/kotlin/org/meshtastic/core/navigation/DeepLinkRouterTest.kt).
+For the `https` form to open in-app, each top-level path segment must also be declared as an
+`android:pathPrefix` in the `android:autoVerify` intent-filter in `androidApp/src/main/AndroidManifest.xml` —
+otherwise the link opens in the browser. Adding a new top-level route therefore takes three steps: add the
+segment to `DeepLinkRouter.topLevelPathSegments` (the router refuses to dispatch segments outside that set),
+add its `when` branch in `DeepLinkRouter.route()`, and add the matching `pathPrefix` to the manifest.
+`DeepLinkManifestConsistencyTest` (androidApp unit tests) checks the manifest against the set, so a missing
+manifest entry fails CI.
+
+**Source of truth:** the always-current list of top-level segments is `topLevelPathSegments` in
+[`DeepLinkRouter`](https://github.com/meshtastic/Meshtastic-Android/blob/main/core/navigation/src/commonMain/kotlin/org/meshtastic/core/navigation/DeepLinkRouter.kt)
+— sub-paths live in the `route()` `when` block plus its helper maps (`settingsSubRoutes`, `nodeDetailSubRoutes`);
+the class-level KDoc is illustrative, not exhaustive. It also exists as executable spec in
+[`DeepLinkRouterTest.kt`](https://github.com/meshtastic/Meshtastic-Android/blob/main/core/navigation/src/commonTest/kotlin/org/meshtastic/core/navigation/DeepLinkRouterTest.kt).
 The table below is a snapshot for quick reference — check those two files if it looks out of date.
 
 ### Supported Deep Links

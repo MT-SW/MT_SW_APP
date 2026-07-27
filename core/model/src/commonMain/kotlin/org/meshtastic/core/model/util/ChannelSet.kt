@@ -57,12 +57,15 @@ fun CommonUri.toChannelSet(): ChannelSet {
     val fragmentBytes =
         fragmentBase64.decodeBase64() ?: throw MalformedMeshtasticUrlException("Invalid Base64 in URL fragment")
     val url = ChannelSet.ADAPTER.decode(fragmentBytes)
-    val shouldAdd =
-        fragment?.substringAfter('?', "")?.takeUnless { it.isBlank() }?.equals("add=true")
-            ?: getBooleanQueryParameter("add", false)
+    val shouldAdd = fragment?.substringAfter('?', "")?.addParameter() ?: getBooleanQueryParameter("add", false)
 
     return if (shouldAdd) url.copy(lora_config = null) else url
 }
+
+private fun String.addParameter(): Boolean? = split('&')
+    .firstOrNull { it.substringBefore('=').equals("add", ignoreCase = true) }
+    ?.substringAfter('=', missingDelimiterValue = "true")
+    ?.equals("true", ignoreCase = true)
 
 /** @return A list of globally unique channel IDs usable with MQTT subscribe() */
 val ChannelSet.subscribeList: List<String>
@@ -181,7 +184,7 @@ private fun ChannelSettings.withoutPositionSharing(): ChannelSettings =
  * @param upperCasePrefix portions of the URL can be upper case to make for more efficient QR codes
  */
 fun ChannelSet.getChannelUrl(upperCasePrefix: Boolean = false, shouldAdd: Boolean = false): CommonUri {
-    val channelBytes = ChannelSet.ADAPTER.encode(this)
+    val channelBytes = ChannelSet.ADAPTER.encode(if (shouldAdd) copy(lora_config = null) else this)
     val enc = channelBytes.toByteString().base64Url().replace("=", "")
     val p = if (upperCasePrefix) CHANNEL_URL_PREFIX.uppercase() else CHANNEL_URL_PREFIX
     val query = if (shouldAdd) "?add=true" else ""

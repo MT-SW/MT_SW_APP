@@ -25,6 +25,7 @@ import org.meshtastic.core.repository.AppPreferences
 import org.meshtastic.core.repository.CustomEmojiPrefs
 import org.meshtastic.core.repository.FilterPrefs
 import org.meshtastic.core.repository.HomoglyphPrefs
+import org.meshtastic.core.repository.MapCameraPosition
 import org.meshtastic.core.repository.MapConsentPrefs
 import org.meshtastic.core.repository.MapPrefs
 import org.meshtastic.core.repository.MapTileProviderPrefs
@@ -175,6 +176,12 @@ class FakeUiPrefs : UiPrefs {
         selectedConnectionTransport.value = type
     }
 
+    override val firmwareUpdateNotificationKeys = MutableStateFlow<Set<String>>(emptySet())
+
+    override fun recordFirmwareUpdateNotificationKey(key: String) {
+        firmwareUpdateNotificationKeys.value += key
+    }
+
     private val nodeLocationEnabled = mutableMapOf<Int, MutableStateFlow<Boolean>>()
 
     override fun shouldProvideNodeLocation(nodeNum: Int): StateFlow<Boolean> =
@@ -245,7 +252,10 @@ class FakeUiPrefs : UiPrefs {
     }
 }
 
+@Suppress("TooManyFunctions")
 class FakeMapPrefs : MapPrefs {
+    private var cameraPosition: MapCameraPosition? = null
+
     override val mapStyle = MutableStateFlow(0)
 
     override fun setMapStyle(style: Int) {
@@ -297,6 +307,12 @@ class FakeMapPrefs : MapPrefs {
     }
 
     override suspend fun awaitNetworkMapLayers(): Set<String> = networkMapLayers.value
+
+    override fun setCameraPosition(position: MapCameraPosition) {
+        cameraPosition = position
+    }
+
+    override suspend fun awaitCameraPosition(): MapCameraPosition? = cameraPosition
 }
 
 class FakeMapConsentPrefs : MapConsentPrefs {

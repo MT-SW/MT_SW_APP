@@ -98,6 +98,10 @@ import org.meshtastic.core.model.DataPacket
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.geofence.toGeofence
+import org.meshtastic.core.model.isLocked
+import org.meshtastic.core.model.isModifiableBy
+import org.meshtastic.core.model.util.toCodePointString
+import org.meshtastic.core.model.util.waypointIconOrDefault
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.calculating
 import org.meshtastic.core.resources.cancel
@@ -158,6 +162,7 @@ import org.meshtastic.feature.map.component.WaypointInfoDialog
 import org.meshtastic.proto.Waypoint
 import org.osmdroid.bonuspack.utils.BonusPackHelper.getBitmapFromVectorDrawable
 import org.osmdroid.config.Configuration
+import org.osmdroid.events.DelayedMapListener
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
@@ -186,6 +191,13 @@ import org.meshtastic.proto.BoundingBox as ProtoBoundingBox
  * !is GeofenceOverlayPolygon }`) so persistent waypoint geofences are not wiped.
  */
 private class GeofenceOverlayPolygon : Polygon()
+
+private const val INITIAL_MAP_ZOOM = 1.5
+
+private fun MapView.saveCameraPosition(viewModel: MapViewModel) {
+    val center = mapCenter
+    viewModel.saveCameraPosition(center.latitude, center.longitude, zoomLevelDouble)
+}
 
 private fun MapView.updateMarkers(
     nodeMarkers: List<MarkerWithLabel>,
@@ -298,13 +310,33 @@ fun MapView(
         }
     }
 
+    val nodes by mapViewModel.nodes.collectAsStateWithLifecycle()
+    val initialCameraState by mapViewModel.initialCameraState.collectAsStateWithLifecycle()
+    if (initialCameraState is InitialCameraState.Loading) return
+    val initialCameraPosition = (initialCameraState as InitialCameraState.Ready).position
     val map =
         rememberMapViewWithLifecycle(
-            applicationId = mapViewModel.applicationId,
-            zoomLevel = DEFAULT_MAP_ZOOM,
-            mapCenter = DEFAULT_MAP_CENTER,
+            zoomLevel = initialCameraPosition?.zoom ?: INITIAL_MAP_ZOOM,
+            mapCenter = initialCameraPosition?.let { GeoPoint(it.latitude, it.longitude) } ?: GeoPoint(0.0, 0.0),
             tileSource = loadOnlineTileSourceBase(),
         )
+    var hasAppliedInitialNodeBounds by remember { mutableStateOf(initialCameraPosition != null) }
+
+    LaunchedEffect(nodes, hasAppliedInitialNodeBounds) {
+        val nodePoints = nodes.filter { it.validPosition != null }.map { GeoPoint(it.latitude, it.longitude) }
+        if (!hasAppliedInitialNodeBounds && nodePoints.isNotEmpty()) {
+            map.post {
+                if (nodePoints.size == 1) {
+                    map.controller.setCenter(nodePoints.first())
+                    map.controller.setZoom(WAYPOINT_ZOOM)
+                } else {
+                    map.zoomToBoundingBox(BoundingBox.fromGeoPoints(nodePoints), false)
+                }
+                map.saveCameraPosition(mapViewModel)
+            }
+            hasAppliedInitialNodeBounds = true
+        }
+    }
 
     val nodeClusterer = remember { RadiusMarkerClusterer(context) }
 
@@ -397,7 +429,6 @@ fun MapView(
         }
     }
 
-    val nodes by mapViewModel.nodes.collectAsStateWithLifecycle()
     val waypoints by mapViewModel.waypoints.collectAsStateWithLifecycle(emptyMap())
     val selectedWaypointId by mapViewModel.selectedWaypointId.collectAsStateWithLifecycle()
     val myId by mapViewModel.myId.collectAsStateWithLifecycle()
@@ -492,9 +523,8 @@ fun MapView(
             // Foreign geofences: read-only view hosting the receiver-local crossing-alert opt-in.
             waypoint.toGeofence() != null && !mapViewModel.isMyWaypoint(id) -> showGeofenceInfoDialog = waypoint
 
-            // edit only when unlocked or lockedTo myNodeNum
-            waypoint.locked_to in setOf(0, mapViewModel.myNodeNum ?: 0) && isConnected ->
-                showEditWaypointDialog = waypoint
+            // edit only when unlocked or locked to us
+            waypoint.isModifiableBy(mapViewModel.myNodeNum) && isConnected -> showEditWaypointDialog = waypoint
 
             else -> showDeleteWaypointDialog = waypoint
         }
@@ -511,10 +541,11 @@ fun MapView(
         return waypoints.mapNotNull { waypoint ->
             val pt = waypoint.waypoint ?: return@mapNotNull null
             if (!mapFilterState.showWaypoints) return@mapNotNull null // Use collected mapFilterState
-            val lock = if (pt.locked_to != 0) "\uD83D\uDD12" else ""
+            val lock = if (pt.isLocked) "\uD83D\uDD12" else ""
             val time = DateFormatter.formatDateTime(waypoint.time)
             val label = pt.name + " " + formatAgo((waypoint.time / 1000).toInt(), unknownText, nowText)
-            val emoji = String(Character.toChars(if (pt.icon == 0) 128205 else pt.icon))
+            // pt.icon is untrusted input; toCodePointString substitutes a fallback rather than throwing.
+            val emoji = pt.icon.waypointIconOrDefault().toCodePointString()
             val now = nowMillis
             val expireTimeMillis = pt.expire * 1000L
             val expireTimeStr =
@@ -655,9 +686,27 @@ fun MapView(
         invalidate()
     }
 
+    val cameraSaveListener =
+        remember(mapViewModel) {
+            DelayedMapListener(
+                object : MapListener {
+                    override fun onScroll(event: ScrollEvent): Boolean {
+                        event.source.saveCameraPosition(mapViewModel)
+                        return true
+                    }
+
+                    override fun onZoom(event: ZoomEvent): Boolean {
+                        event.source.saveCameraPosition(mapViewModel)
+                        return true
+                    }
+                },
+            )
+        }
+
     val boxOverlayListener =
         object : MapListener {
             override fun onScroll(event: ScrollEvent): Boolean {
+                cameraSaveListener.onScroll(event)
                 when {
                     downloadRegionBoundingBox != null -> event.source.generateBoxOverlay()
                     geofenceBoxDraft != null -> event.source.generateGeofenceBoxOverlay()
@@ -665,7 +714,10 @@ fun MapView(
                 return true
             }
 
-            override fun onZoom(event: ZoomEvent): Boolean = false
+            override fun onZoom(event: ZoomEvent): Boolean {
+                cameraSaveListener.onZoom(event)
+                return false
+            }
         }
 
     fun startDownload() {
@@ -907,6 +959,7 @@ fun MapView(
         EditWaypointDialog(
             waypoint = showEditWaypointDialog ?: return, // Safe call
             displayUnits = displayUnits,
+            myNodeNum = mapViewModel.myNodeNum,
             onSend = { waypoint ->
                 Logger.d { "User clicked send waypoint ${waypoint.id}" }
                 showEditWaypointDialog = null
@@ -914,18 +967,10 @@ fun MapView(
                 val newId = if (waypoint.id == 0) mapViewModel.generatePacketId() else waypoint.id
                 val newName = if (waypoint.name.isNullOrEmpty()) "Dropped Pin" else waypoint.name
                 val newExpire = if (waypoint.expire == 0) Int.MAX_VALUE else waypoint.expire
-                val newLockedTo = if (waypoint.locked_to != 0) mapViewModel.myNodeNum ?: 0 else 0
-                val newIcon = if (waypoint.icon == 0) 128205 else waypoint.icon
+                val newIcon = waypoint.icon.waypointIconOrDefault()
 
-                mapViewModel.sendWaypoint(
-                    waypoint.copy(
-                        id = newId,
-                        name = newName,
-                        expire = newExpire,
-                        locked_to = newLockedTo,
-                        icon = newIcon,
-                    ),
-                )
+                // locked_to is already resolved by the editor (our node number when locked, 0 when not).
+                mapViewModel.sendWaypoint(waypoint.copy(id = newId, name = newName, expire = newExpire, icon = newIcon))
             },
             onDelete = { waypoint ->
                 Logger.d { "User clicked delete waypoint ${waypoint.id}" }
@@ -956,7 +1001,7 @@ fun MapView(
             // Unlocked foreign geofences can still be edited/re-broadcast (only while connected, since editing means
             // re-sending); locked ones stay read-only.
             onEdit =
-            if (waypoint.locked_to == 0 && isConnected) {
+            if (!waypoint.isLocked && isConnected) {
                 {
                     showGeofenceInfoDialog = null
                     showEditWaypointDialog = waypoint
@@ -969,7 +1014,7 @@ fun MapView(
 
     if (showDeleteWaypointDialog != null) {
         val waypoint = showDeleteWaypointDialog ?: return
-        val canDeleteForEveryone = waypoint.locked_to in setOf(0, mapViewModel.myNodeNum ?: 0) && isConnected
+        val canDeleteForEveryone = waypoint.isModifiableBy(mapViewModel.myNodeNum) && isConnected
         androidx.compose.material3.AlertDialog(
             onDismissRequest = {
                 Logger.d { "User canceled marker delete dialog" }

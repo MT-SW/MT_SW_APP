@@ -28,6 +28,8 @@
     <!-- APP -->
     <string name="app_too_old">مطلوب تحديث التطبيق</string>
     <string name="apply">تفعيل</string>
+    <!-- AQI -->
+    <string name="aqi_good">جيد</string>
     <string name="are_you_sure">هل أنت متيقِّن؟</string>
     <string name="audio">إعدادات الصوت</string>
     <string name="bad">سيئ</string>
@@ -64,6 +66,7 @@
     <!-- DELETE -->
     <string name="desc_node_filter_clear">عربي</string>
     <string name="description">الوصف</string>
+    <!-- DESKTOP -->
     <!-- DEVICE -->
     <string name="device">الجهاز</string>
     <string name="device_sleeping">الجهاز في وضعية السكون</string>
@@ -95,6 +98,7 @@
     <!-- FIRMWARE -->
     <string name="firmware_too_old">يجب عليك التحديث.</string>
     <string name="firmware_update_failed">التحديث فشل</string>
+    <!-- FORMAT -->
     <!-- GEOFENCE -->
     <string name="good">جيد</string>
     <!-- GPIO -->
@@ -103,6 +107,7 @@
     <!-- IGNORE -->
     <string name="ignore">تجاهل</string>
     <string name="ignore_add">أضف '%1$s' إلى قائمة التجاهل؟</string>
+    <!-- IMPORT -->
     <string name="info">معلومات</string>
     <string name="interval_unset">إلغاء تعيين</string>
     <string name="ip_address">عنوان الـ IP:</string>
@@ -169,6 +174,7 @@
     <string name="one_week">أسبوع</string>
     <!-- OPEN -->
     <!-- OUTPUT -->
+    <!-- PACKET -->
     <!-- PAX -->
     <!-- POSITION -->
     <!-- POWER -->
@@ -207,6 +213,7 @@
     <string name="routing_error_timeout">استغرق وقت طويل</string>
     <string name="routing_error_too_large">رسالة كبيره</string>
     <string name="rssi">مؤشر القوة النسبية</string>
+    <!-- SAVE -->
     <string name="save">حفظ</string>
     <string name="save_changes">حفظ</string>
     <!-- SCAN -->
@@ -250,5 +257,6 @@
     <!-- WIFI -->
     <string name="wifi_provision_success_ip_address">عنوان الـ IP</string>
     <!-- WIND -->
+    <!-- WRITE -->
     <string name="you">أنت</string>
 </resources>
