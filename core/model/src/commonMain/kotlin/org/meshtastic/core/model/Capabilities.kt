@@ -35,7 +35,7 @@ data class Capabilities(val firmwareVersion: String?, internal val forceEnableAl
     val canMuteNode = atLeast(V2_7_18)
 
     /** Ability to request neighbor information from other nodes. Gated to [UNRELEASED] until working reliably. */
-    val canRequestNeighborInfo = atLeast(UNRELEASED)
+    val canRequestNeighborInfo = atLeast(V2_7_18)
 
     /** Ability to send verified shared contacts. Supported since firmware v2.7.12. */
     val canSendVerifiedContacts = atLeast(V2_7_12)
@@ -50,10 +50,10 @@ data class Capabilities(val firmwareVersion: String?, internal val forceEnableAl
     val supportsQrCodeSharing = atLeast(V2_6_8)
 
     /** Support for Status Message module. Supported since firmware v2.8.0. */
-    val supportsStatusMessage = atLeast(V2_8_0)
+    val supportsStatusMessage = atLeast(V2_7_18)
 
     /** Support for Traffic Management module. Supported since firmware v2.8.0. */
-    val supportsTrafficManagementConfig = atLeast(V2_8_0)
+    val supportsTrafficManagementConfig = atLeast(V2_7_18)
 
     /** Support for TAK (ATAK) module configuration. Supported since firmware v2.7.19. */
     val supportsTakConfig = atLeast(V2_7_19)
@@ -63,7 +63,7 @@ data class Capabilities(val firmwareVersion: String?, internal val forceEnableAl
      * firmware v2.8.0. Firmware v2.7.x and earlier only support the legacy ATAK_PLUGIN port (72) with the original
      * TAKPacket schema (PLI + GeoChat only, no compression), so the bridge falls back to that path for older nodes.
      */
-    val supportsTakV2 = atLeast(V2_8_0)
+    val supportsTakV2 = atLeast(V2_7_18)
 
     /** Support for location sharing on secondary channels. Supported since firmware v2.6.10. */
     val supportsSecondaryChannelLocation = atLeast(V2_6_10)
@@ -75,21 +75,21 @@ data class Capabilities(val firmwareVersion: String?, internal val forceEnableAl
      * Support for the LoRa region→preset compatibility map and TINY presets. Supported since firmware v2.8.0. Older
      * firmware never sends the map, so the UI keeps the preset list unconstrained and hides the new presets.
      */
-    val supportsLoraRegionPresetMap = atLeast(V2_8_0)
+    val supportsLoraRegionPresetMap = atLeast(V2_7_18)
 
     /**
      * Support for runtime lockdown mode (per-connection passphrase auth). Supported since firmware v2.8.0. Note:
      * lockdown is also hardware-gated (nRF52 only) — the device advertises real support by sending a `LockdownStatus`,
      * which is the authoritative signal and drives the actual UI state.
      */
-    val supportsLockdown = atLeast(V2_8_0)
+    val supportsLockdown = atLeast(V2_7_18)
 
     /**
      * Support for the Mesh Beacon module (`ModuleConfig.MeshBeaconConfig` broadcast/listen). The proto is upstream but
      * the firmware module traces to a community fork; gate the config editor to 2.8.0+ so older radios don't show a
      * config they'd silently ignore.
      */
-    val supportsMeshBeacon = atLeast(V2_8_0)
+    val supportsMeshBeacon = atLeast(V2_7_18)
 
     companion object {
         private val V2_6_8 = DeviceVersion("2.6.8")

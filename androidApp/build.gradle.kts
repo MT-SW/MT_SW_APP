@@ -205,9 +205,8 @@ ksp { arg("appfunctions:aggregateAppFunctions", "true") }
 
 androidComponents {
     onVariants(selector().withBuildType("debug")) { variant ->
-        variant.flavorName?.let { flavor -> variant.applicationId.set("com.geeksville.mesh.$flavor.debug") }
+        variant.flavorName?.let { flavor -> variant.applicationId.set("pl.swietokrzyskie.meshtastic.$flavor.debug") }
     }
-
     onVariants(selector().withBuildType("release")) { variant ->
         if (variant.flavorName == "google") {
             val variantNameCapped = variant.name.replaceFirstChar { it.uppercase() }

@@ -66,6 +66,13 @@ class PacketHandlerImpl(
 
     companion object {
         private val TIMEOUT = 5.seconds
+
+        /**
+         * Budget for an end-to-end mesh routing ACK, not just local queue acceptance — LoRa is slow and multi-hop
+         * delivery genuinely takes longer than [TIMEOUT]. A `false` result here means "no confirmation within the
+         * window", not necessarily "delivery failed" — the ACK may still arrive late.
+         */
+        private val ROUTING_ACK_TIMEOUT = 30.seconds
     }
 
     private var queueJob: Job? = null
@@ -79,6 +86,7 @@ class PacketHandlerImpl(
 
     private val responseMutex = Mutex()
     private val queueResponse = mutableMapOf<Int, CompletableDeferred<Boolean>>()
+    private val routingAckResponse = mutableMapOf<Int, CompletableDeferred<Boolean>>()
 
     override fun sendToRadio(p: ToRadio) {
         Logger.d { "Sending to radio ${p.toPIIString()}" }
@@ -143,6 +151,34 @@ class PacketHandlerImpl(
         }
     }
 
+    @Suppress("TooGenericExceptionCaught", "SwallowedException")
+    override suspend fun sendToRadioAndAwaitRoutingAck(packet: MeshPacket): Boolean {
+        val deferred = CompletableDeferred<Boolean>()
+        responseMutex.withLock { routingAckResponse[packet.id] = deferred }
+        queueMutex.withLock {
+            queueStopped = false
+            queuedPackets.add(packet)
+            startPacketQueueLocked()
+        }
+        return try {
+            withTimeout(ROUTING_ACK_TIMEOUT) { deferred.await() }
+        } catch (e: TimeoutCancellationException) {
+            Logger.d { "sendToRadioAndAwaitRoutingAck packet id=${packet.id.toUInt()} timeout" }
+            false
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Logger.d { "sendToRadioAndAwaitRoutingAck packet id=${packet.id.toUInt()} failed: ${e.message}" }
+            false
+        } finally {
+            responseMutex.withLock { routingAckResponse.remove(packet.id) }
+        }
+    }
+
+    override suspend fun completeRoutingAck(requestId: Int, isAck: Boolean) {
+        responseMutex.withLock { routingAckResponse[requestId]?.let { if (!it.isCompleted) it.complete(isAck) } }
+    }
+
     override fun stopPacketQueue() {
         // Run async so callers (non-suspend) don't block, but all mutations are
         // serialized under the same mutexes used by the queue processor and senders.
@@ -157,6 +193,8 @@ class PacketHandlerImpl(
             responseMutex.withLock {
                 queueResponse.values.forEach { if (!it.isCompleted) it.complete(false) }
                 queueResponse.clear()
+                routingAckResponse.values.forEach { if (!it.isCompleted) it.complete(false) }
+                routingAckResponse.clear()
             }
         }
     }

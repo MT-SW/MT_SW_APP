@@ -194,7 +194,9 @@ enum class ModuleRoute(
 
                 AUDIO -> 0x0080
 
-                REMOTE_HARDWARE -> 0x0100
+                REMOTE_HARDWARE -> 0x0000
+
+                // Not excludable yet
 
                 NEIGHBOR_INFO -> 0x0200
 

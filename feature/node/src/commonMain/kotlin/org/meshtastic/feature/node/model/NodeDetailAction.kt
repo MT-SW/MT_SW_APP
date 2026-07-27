@@ -32,6 +32,18 @@ sealed interface NodeDetailAction {
     /** Force-refresh device metadata (firmware version, edition, role) for the given node. */
     data class RefreshMetadata(val nodeNum: Int) : NodeDetailAction
 
+    /**
+     * Sets favorite status for [targetNodeNum] on the remote radio [destNum] over an active admin session — not the
+     * locally-connected radio. [targetNodeNum] need not be in the local node DB.
+     */
+    data class SetRemoteFavorite(val destNum: Int, val targetNodeNum: Int, val favorite: Boolean) : NodeDetailAction
+
+    /**
+     * Sets ignore status for [targetNodeNum] on the remote radio [destNum] over an active admin session — not the
+     * locally-connected radio. [targetNodeNum] need not be in the local node DB.
+     */
+    data class SetRemoteIgnored(val destNum: Int, val targetNodeNum: Int, val ignored: Boolean) : NodeDetailAction
+
     data object ShareContact : NodeDetailAction
 
     // Opens the compass sheet scoped to a target node and the user’s preferred units.

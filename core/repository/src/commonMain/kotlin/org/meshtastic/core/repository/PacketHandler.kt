@@ -39,6 +39,20 @@ interface PacketHandler {
      */
     suspend fun sendToRadioAndAwait(packet: MeshPacket): Boolean
 
+    /**
+     * Adds [packet] to the queue and suspends until a mesh routing ACK/NAK referencing its ID arrives — true end-to-end
+     * delivery confirmation, unlike [sendToRadioAndAwait] which only confirms local queue acceptance.
+     *
+     * @return `true` only for an explicit ACK (`Routing.Error.NONE`); `false` for a NAK or timeout.
+     */
+    suspend fun sendToRadioAndAwaitRoutingAck(packet: MeshPacket): Boolean
+
+    /**
+     * Completes a pending [sendToRadioAndAwaitRoutingAck] wait for [requestId]. Called when a Routing ACK/NAK packet is
+     * processed.
+     */
+    suspend fun completeRoutingAck(requestId: Int, isAck: Boolean)
+
     /** Processes queue status updates from the radio. */
     fun handleQueueStatus(queueStatus: QueueStatus)
 

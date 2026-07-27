@@ -194,6 +194,12 @@ class CommandSenderImpl(
         return packetHandler.sendToRadioAndAwait(packet)
     }
 
+    override suspend fun sendAdminAndAwaitDelivery(destNum: Int, requestId: Int, initFn: () -> AdminMessage): Boolean {
+        val adminMsg = initFn().copy(session_passkey = sessionManager.getPasskey(destNum))
+        val packet = buildAdminPacket(to = destNum, id = requestId, wantResponse = false, adminMessage = adminMsg)
+        return packetHandler.sendToRadioAndAwaitRoutingAck(packet)
+    }
+
     override suspend fun sendPosition(pos: ProtoPosition, destNum: Int?, wantResponse: Boolean) {
         val myNum = nodeManager.myNodeNum.value ?: return
         val idNum = destNum ?: myNum

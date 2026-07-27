@@ -21,18 +21,35 @@ package org.meshtastic.feature.node.component
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldLabelPosition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -43,16 +60,21 @@ import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.SessionStatus
 import org.meshtastic.core.repository.EventFirmwareRepository
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.add
 import org.meshtastic.core.resources.administration
 import org.meshtastic.core.resources.connect_radio_for_remote_admin
 import org.meshtastic.core.resources.establishing_session
+import org.meshtastic.core.resources.favorite
 import org.meshtastic.core.resources.firmware
 import org.meshtastic.core.resources.firmware_edition
+import org.meshtastic.core.resources.ignore
 import org.meshtastic.core.resources.installed_firmware_version
 import org.meshtastic.core.resources.latest_alpha_firmware
 import org.meshtastic.core.resources.latest_stable_firmware
+import org.meshtastic.core.resources.node_id
 import org.meshtastic.core.resources.refresh_metadata
 import org.meshtastic.core.resources.remote_admin
+import org.meshtastic.core.resources.remove
 import org.meshtastic.core.resources.session_active
 import org.meshtastic.core.resources.session_refresh_required
 import org.meshtastic.core.ui.component.BasicListItem
@@ -97,6 +119,15 @@ fun AdministrationSection(
                         isEnsuringSession = isEnsuringSession,
                         onAction = onAction,
                     )
+
+                    if (sessionStatus is SessionStatus.Active) {
+                        SectionDivider()
+                        RemoteNodeManagementCard(
+                            destNum = node.num,
+                            isEnsuringSession = isEnsuringSession,
+                            onAction = onAction,
+                        )
+                    }
 
                     SectionDivider()
 
@@ -181,6 +212,86 @@ private fun RemoteAdminListItem(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp),
                 )
+            }
+        }
+    }
+}
+
+/**
+ * Lets the user, while an admin session with [destNum] is active, tell that remote radio to favorite or ignore a node
+ * by its numeric ID — the target node need not be in the local node DB, since this command is administered entirely on
+ * the remote radio's own node database over the mesh.
+ */
+private enum class RemoteNodeListType {
+    FAVORITE,
+    IGNORE,
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun RemoteNodeManagementCard(destNum: Int, isEnsuringSession: Boolean, onAction: (NodeDetailAction) -> Unit) {
+    val targetIdState = rememberTextFieldState("")
+    val targetNodeNum = targetIdState.text.toString().toIntOrNull()
+    // Which list on the remote radio we're operating on. Chosen explicitly, then Add/Remove performs the action
+    // against it — there's no way to read the remote radio's current state first (the admin protocol only exposes
+    // set/unset — no getter), so the app can't offer a toggle reflecting the real current state.
+    var listType by remember { mutableStateOf(RemoteNodeListType.FAVORITE) }
+
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        OutlinedTextField(
+            state = targetIdState,
+            labelPosition = TextFieldLabelPosition.Above(),
+            lineLimits = TextFieldLineLimits.SingleLine,
+            label = { Text(stringResource(Res.string.node_id)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+            enabled = !isEnsuringSession,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+            SegmentedButton(
+                shape = SegmentedButtonDefaults.itemShape(0, 2),
+                onClick = { listType = RemoteNodeListType.FAVORITE },
+                selected = listType == RemoteNodeListType.FAVORITE,
+                enabled = !isEnsuringSession,
+                label = { Text(stringResource(Res.string.favorite)) },
+            )
+            SegmentedButton(
+                shape = SegmentedButtonDefaults.itemShape(1, 2),
+                onClick = { listType = RemoteNodeListType.IGNORE },
+                selected = listType == RemoteNodeListType.IGNORE,
+                enabled = !isEnsuringSession,
+                label = { Text(stringResource(Res.string.ignore)) },
+            )
+        }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        ) {
+            Button(
+                modifier = Modifier.weight(1f),
+                enabled = !isEnsuringSession && targetNodeNum != null,
+                onClick = {
+                    val id = targetNodeNum ?: return@Button
+                    when (listType) {
+                        RemoteNodeListType.FAVORITE -> onAction(NodeDetailAction.SetRemoteFavorite(destNum, id, true))
+                        RemoteNodeListType.IGNORE -> onAction(NodeDetailAction.SetRemoteIgnored(destNum, id, true))
+                    }
+                },
+            ) {
+                Text(stringResource(Res.string.add))
+            }
+            Button(
+                modifier = Modifier.weight(1f),
+                enabled = !isEnsuringSession && targetNodeNum != null,
+                onClick = {
+                    val id = targetNodeNum ?: return@Button
+                    when (listType) {
+                        RemoteNodeListType.FAVORITE -> onAction(NodeDetailAction.SetRemoteFavorite(destNum, id, false))
+                        RemoteNodeListType.IGNORE -> onAction(NodeDetailAction.SetRemoteIgnored(destNum, id, false))
+                    }
+                },
+            ) {
+                Text(stringResource(Res.string.remove))
             }
         }
     }

@@ -42,6 +42,8 @@ fun InlineMap(node: Node, modifier: Modifier = Modifier) {
             setMultiTouchControls(false)
 
             controller.setZoom(15.0)
+            // Wycentruj od razu na węźle, żeby uniknąć startu na (0,0) / środku oceanu
+            controller.setCenter(GeoPoint(node.latitude, node.longitude))
         }
     }
 
@@ -57,7 +59,7 @@ fun InlineMap(node: Node, modifier: Modifier = Modifier) {
             }
         map.overlays.add(marker)
 
-        map.controller.animateTo(point)
+        map.controller.setCenter(point)
     }
 
     AndroidView(factory = { map }, modifier = modifier)

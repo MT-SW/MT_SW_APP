@@ -324,6 +324,9 @@ class MeshDataHandlerImpl(
     private fun handleAckNak(requestId: Int, fromId: String, routingError: Int, relayNode: Int?) {
         scope.handledLaunch {
             val isAck = routingError == Routing.Error.NONE.value
+            // Wake up any generic sendAdminAndAwaitDelivery() waiter for this requestId (e.g. remote favorite/ignore
+            // commands), independent of whether this ACK/NAK also corresponds to a stored message/reaction below.
+            packetHandler.completeRoutingAck(requestId, isAck)
             val p = packetRepository.value.getPacketByPacketId(requestId)
             val reaction = packetRepository.value.getReactionByPacketId(requestId)
 

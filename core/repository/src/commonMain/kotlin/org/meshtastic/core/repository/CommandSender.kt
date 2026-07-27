@@ -63,6 +63,17 @@ interface CommandSender {
         initFn: () -> AdminMessage,
     ): Boolean
 
+    /**
+     * Sends an admin message to [destNum] and suspends until a mesh routing ACK/NAK confirms delivery — true end-to-end
+     * confirmation (see [org.meshtastic.core.repository.PacketHandler.sendToRadioAndAwaitRoutingAck]), unlike
+     * [sendAdminAwait] which only confirms the local radio accepted the packet into its TX queue.
+     */
+    suspend fun sendAdminAndAwaitDelivery(
+        destNum: Int,
+        requestId: Int = generatePacketId(),
+        initFn: () -> AdminMessage,
+    ): Boolean
+
     /** Sends our current position to the mesh. */
     suspend fun sendPosition(pos: org.meshtastic.proto.Position, destNum: Int? = null, wantResponse: Boolean = false)
 

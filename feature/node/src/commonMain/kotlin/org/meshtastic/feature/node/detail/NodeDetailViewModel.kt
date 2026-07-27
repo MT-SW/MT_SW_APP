@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.domain.usecase.session.EnsureRemoteAdminSessionUseCase
 import org.meshtastic.core.domain.usecase.session.EnsureSessionResult
@@ -43,7 +44,9 @@ import org.meshtastic.core.repository.QueryController
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.UiText
 import org.meshtastic.core.resources.connect_radio_for_remote_admin
+import org.meshtastic.core.resources.delivery_confirmed
 import org.meshtastic.core.resources.remote_admin_unreachable
+import org.meshtastic.core.resources.remote_command_no_response
 import org.meshtastic.core.ui.util.SnackbarManager
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
 import org.meshtastic.feature.node.component.NodeMenuAction
@@ -128,6 +131,35 @@ class NodeDetailViewModel(
         if (manualNodeId.value != nodeId) {
             manualNodeId.value = nodeId
         }
+    }
+
+    /**
+     * Sets favorite status for [targetNodeNum] on the remote radio [destNum] over the admin session already established
+     * for this screen — not the locally-connected radio, and regardless of whether [targetNodeNum] is in the local node
+     * DB.
+     */
+    fun setRemoteFavorite(destNum: Int, targetNodeNum: Int, favorite: Boolean) {
+        viewModelScope.launch {
+            val delivered = nodeManagementActions.setFavorite(targetNodeNum, favorite, destNum)
+            showRemoteCommandResult(delivered)
+        }
+    }
+
+    /**
+     * Sets ignore status for [targetNodeNum] on the remote radio [destNum] over the admin session already established
+     * for this screen — not the locally-connected radio.
+     */
+    fun setRemoteIgnored(destNum: Int, targetNodeNum: Int, ignored: Boolean) {
+        viewModelScope.launch {
+            val delivered = nodeManagementActions.setIgnored(targetNodeNum, ignored, destNum)
+            showRemoteCommandResult(delivered)
+        }
+    }
+
+    /** Shows a snackbar confirming (or not) mesh delivery for a remote favorite/ignore command. */
+    private suspend fun showRemoteCommandResult(delivered: Boolean) {
+        val messageRes = if (delivered) Res.string.delivery_confirmed else Res.string.remote_command_no_response
+        snackbarManager.showSnackbar(getString(messageRes))
     }
 
     /** Dispatches high-level node management actions like removal, muting, or favoriting. */

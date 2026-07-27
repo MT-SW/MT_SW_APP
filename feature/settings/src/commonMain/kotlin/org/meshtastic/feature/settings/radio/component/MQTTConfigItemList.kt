@@ -272,7 +272,7 @@ fun MQTTConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
     }
 }
 
-private const val MIN_INTERVAL_SECS = 3600
+private const val MIN_INTERVAL_SECS = 600
 
 private val AmberColor = Color(0xFFFFA000)
 private val GreenColor = Color(0xFF4CAF50)

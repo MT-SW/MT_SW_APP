@@ -16,5 +16,5 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 <resources>
-    <string name="widget_local_stats_label">Meshtastic</string>
+    <string name="widget_local_stats_label">Meshtastic_S+</string>
 </resources>

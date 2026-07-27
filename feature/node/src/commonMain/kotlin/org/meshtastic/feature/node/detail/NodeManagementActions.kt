@@ -77,9 +77,8 @@ constructor(
         }
     }
 
-    open suspend fun setIgnored(nodeNum: Int, ignored: Boolean) {
-        radioController.setIgnored(nodeNum, ignored)
-    }
+    open suspend fun setIgnored(nodeNum: Int, ignored: Boolean, destNum: Int? = null): Boolean =
+        radioController.setIgnored(nodeNum, ignored, destNum)
 
     open fun requestMuteNode(scope: CoroutineScope, node: Node) {
         scope.launch {
@@ -112,9 +111,8 @@ constructor(
         }
     }
 
-    open suspend fun setFavorite(nodeNum: Int, favorite: Boolean) {
-        radioController.setFavorite(nodeNum, favorite)
-    }
+    open suspend fun setFavorite(nodeNum: Int, favorite: Boolean, destNum: Int? = null): Boolean =
+        radioController.setFavorite(nodeNum, favorite, destNum)
 
     open suspend fun setNodeNotes(nodeNum: Int, notes: String) {
         try {

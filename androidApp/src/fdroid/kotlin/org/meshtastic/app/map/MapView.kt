@@ -67,6 +67,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -297,16 +298,11 @@ fun MapView(
         }
     }
 
-    val initialCameraView = remember {
-        val nodes = mapViewModel.nodes.value
-        val nodesWithPosition = nodes.filter { it.validPosition != null }
-        val geoPoints = nodesWithPosition.map { GeoPoint(it.latitude, it.longitude) }
-        BoundingBox.fromGeoPoints(geoPoints)
-    }
     val map =
         rememberMapViewWithLifecycle(
             applicationId = mapViewModel.applicationId,
-            box = initialCameraView,
+            zoomLevel = DEFAULT_MAP_ZOOM,
+            mapCenter = DEFAULT_MAP_CENTER,
             tileSource = loadOnlineTileSourceBase(),
         )
 
@@ -406,6 +402,23 @@ fun MapView(
     val selectedWaypointId by mapViewModel.selectedWaypointId.collectAsStateWithLifecycle()
     val myId by mapViewModel.myId.collectAsStateWithLifecycle()
     val displayUnits by mapViewModel.displayUnits.collectAsStateWithLifecycle()
+
+    // Jednorazowe wycentrowanie mapy na węzłach, gdy dane się załadują (start zawsze od DEFAULT_MAP_CENTER)
+    var hasCenteredOnNodes by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(nodes) {
+        if (hasCenteredOnNodes) return@LaunchedEffect
+        val geoPoints = nodes.filter { it.validPosition != null }.map { GeoPoint(it.latitude, it.longitude) }
+        if (geoPoints.isEmpty()) return@LaunchedEffect
+        val box = BoundingBox.fromGeoPoints(geoPoints)
+        val zoom =
+            box.requiredZoomLevel()
+                .takeIf { it.isFinite() }
+                ?.let { it.coerceAtLeast(FALLBACK_MIN_ZOOM) } // usunięte "- 0.5"
+                ?: DEFAULT_MAP_ZOOM
+        map.controller.setCenter(GeoPoint(box.centerLatitude, box.centerLongitude))
+        map.controller.setZoom(zoom)
+        hasCenteredOnNodes = true
+    }
 
     LaunchedEffect(selectedWaypointId, waypoints) {
         if (selectedWaypointId != null && waypoints.containsKey(selectedWaypointId)) {
@@ -1251,7 +1264,12 @@ private fun MapsDialog(
     }
 }
 
-private const val WAYPOINT_ZOOM = 15.0
+private const val WAYPOINT_ZOOM = 25.0
+
+// Domyślny punkt startowy mapy, gdy brak węzłów z pozycją (Kielce / region świętokrzyski)
+private val DEFAULT_MAP_CENTER = GeoPoint(50.8661, 20.6286)
+private const val DEFAULT_MAP_ZOOM = 20.0
+private const val FALLBACK_MIN_ZOOM = 1.5
 
 // Geofence / authoring rectangle styling (orange) for the imperative OSMDroid Polygon paints (android.graphics ints).
 private const val GEOFENCE_OVERLAY_COLOR = 0xFFFF9800.toInt()

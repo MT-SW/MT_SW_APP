@@ -184,11 +184,11 @@ open class ScannerViewModel(
     // ── Device lists for UI ──────────────────────────────────────────────────────────────────
 
     /**
-     * BLE devices for the UI — restricted to those currently visible via an active scan.
+     * BLE devices for the UI — all system-bonded (paired) devices, plus any unbonded devices currently visible via an
+     * active scan.
      *
-     * Previously bonded / system-paired peripherals that aren't advertising right now are intentionally excluded so the
-     * list reflects what's actually nearby. The currently-selected device is the one exception: it's always kept so the
-     * active connection stays visible (a connected radio stops advertising and would otherwise drop out).
+     * Bonded / system-paired peripherals are always shown, regardless of whether they're currently advertising —
+     * matches classic behavior where the "Paired devices" list is always visible, not just while scanning.
      *
      * Sorted for stability to prevent "shifting" as advertisements arrive: bonded devices appear first (sorted by
      * name), followed by unbonded scanned devices in the order they were first discovered. RSSI updates are reflected
@@ -200,13 +200,10 @@ open class ScannerViewModel(
             scannedBleDevices,
             discoveryOrder,
             radioInterfaceService.currentDeviceAddressFlow,
-        ) { discovered, scannedMap, order, selectedAddress ->
-            // Surface a bonded device only when it's currently visible via scan (advertising) or it's the selected
-            // device — this hides stale system-bonded peripherals that aren't nearby.
-            val bonded =
-                discovered.bleDevices.filterIsInstance<DeviceListEntry.Ble>().filter {
-                    it.address in scannedMap || it.fullAddress == selectedAddress
-                }
+        ) { discovered, scannedMap, order, _ ->
+            // Always surface every system-bonded (paired) device, regardless of scan state —
+            // restores classic behavior where the "Paired devices" list is always visible.
+            val bonded = discovered.bleDevices.filterIsInstance<DeviceListEntry.Ble>()
             val bondedAddresses = bonded.mapTo(mutableSetOf()) { it.address }
 
             // Scanned-but-not-bonded devices are explicitly flagged unbonded so the UI routes through

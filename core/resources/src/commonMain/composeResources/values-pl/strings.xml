@@ -462,7 +462,7 @@
     <!-- MESHTASTIC -->
     <string name="meshtastic">Meshtastic</string>
     <string name="meshtastic_alerts_notifications">Powiadomienia alertowe</string>
-    <string name="meshtastic_app_name">Meshtastic</string>
+    <string name="meshtastic_app_name">Meshtastic_S+</string>
     <string name="meshtastic_broadcast_notifications">Powiadomienia o wiadomościach rozgłoszeniowych</string>
     <string name="meshtastic_low_battery_notifications">Powiadomienia o niskim poziomie baterii</string>
     <string name="meshtastic_low_battery_temporary_remote_notifications">Powiadomienia o niskim poziomie baterii (ulubione węzły)</string>
@@ -501,7 +501,7 @@
     <string name="mute_status_unmuted">Nie wyciszony</string>
     <string name="name">Nazwa</string>
     <string name="navigate_back">Przejdź wstecz</string>
-    <string name="neighbor_info">Informacje o sąsiadze</string>
+    <string name="neighbor_info">Informacje o sąsiadach</string>
     <string name="neighbor_info_config">Konfiguracja Info o sąsiedzie</string>
     <string name="neighbor_info_enabled">Włącz informacje o sąsiedzie</string>
     <string name="network">Sieć</string>

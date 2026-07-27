@@ -33,8 +33,8 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.meshtastic.core.common.util.nowMillis
 
-internal const val COOL_DOWN_TIME_MS = 30000L
-internal const val REQUEST_NEIGHBORS_COOL_DOWN_TIME_MS = 180000L // 3 minutes
+internal const val COOL_DOWN_TIME_MS = 10000L
+internal const val REQUEST_NEIGHBORS_COOL_DOWN_TIME_MS = 10000L //  10 seconds
 
 @Composable
 fun CooldownIconButton(

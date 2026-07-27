@@ -55,7 +55,7 @@ import org.meshtastic.feature.settings.util.toDisplayString
 import kotlin.math.roundToInt
 
 private const val POSITION_PRECISION_MIN = 12
-private const val POSITION_PRECISION_MAX = 15
+private const val POSITION_PRECISION_MAX = 32
 
 @Suppress("LongMethod")
 @Composable
@@ -66,7 +66,7 @@ fun MapReportingPreference(
     onShouldReportLocationChanged: (Boolean) -> Unit = {},
     positionPrecision: Int = 14,
     onPositionPrecisionChanged: (Int) -> Unit = {},
-    publishIntervalSecs: Int = 3600,
+    publishIntervalSecs: Int = 300,
     onPublishIntervalSecsChanged: (Int) -> Unit = {},
     enabled: Boolean,
 ) {
@@ -149,7 +149,7 @@ fun MapReportingPreview() {
         onMapReportingEnabledChanged = {},
         shouldReportLocation = true,
         onShouldReportLocationChanged = {},
-        positionPrecision = 5,
+        positionPrecision = 32,
         onPositionPrecisionChanged = {},
         enabled = true,
     )

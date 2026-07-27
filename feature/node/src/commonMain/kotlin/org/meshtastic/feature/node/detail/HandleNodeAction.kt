@@ -41,6 +41,12 @@ internal fun handleNodeAction(
 
         is NodeDetailAction.RefreshMetadata -> viewModel.refreshMetadata(action.nodeNum)
 
+        is NodeDetailAction.SetRemoteFavorite ->
+            viewModel.setRemoteFavorite(action.destNum, action.targetNodeNum, action.favorite)
+
+        is NodeDetailAction.SetRemoteIgnored ->
+            viewModel.setRemoteIgnored(action.destNum, action.targetNodeNum, action.ignored)
+
         is NodeDetailAction.HandleNodeMenuAction -> {
             when (val menuAction = action.action) {
                 is NodeMenuAction.DirectMessage -> {

@@ -43,7 +43,7 @@ private const val POSITION_ENABLED = 32
 private const val POSITION_DISABLED = 0
 
 private const val POSITION_PRECISION_MIN = 10
-private const val POSITION_PRECISION_MAX = 19
+private const val POSITION_PRECISION_MAX = 32
 private const val POSITION_PRECISION_DEFAULT = 13
 
 @Suppress("MagicNumber")
