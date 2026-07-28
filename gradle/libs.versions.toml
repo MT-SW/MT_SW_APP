@@ -87,12 +87,12 @@ dokka = "2.2.0"
 devtools-ksp = "2.3.10"
 firebase-crashlytics-gradle = "3.0.7"
 google-services-gradle = "4.5.0"
-markdown = "0.7.7"
+markdown = "0.7.8"
 markdownRenderer = "0.43.0"
 okio = "3.18.0"
 uri-kmp = "0.0.21"
 osmdroid-android = "6.1.20"
-spotless = "8.8.0"
+spotless = "8.9.0"
 vico = "3.3.0-next.1"
 kable = "0.44.3"
 mqttastic = "0.7.0"
@@ -133,8 +133,10 @@ androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "d
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
 androidx-glance-appwidget-preview = { module = "androidx.glance:glance-appwidget-preview", version.ref = "glance" }
+androidx-glance-appwidget-testing = { module = "androidx.glance:glance-appwidget-testing", version.ref = "glance" }
 androidx-glance-preview = { module = "androidx.glance:glance-preview", version.ref = "glance" }
 androidx-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glance" }
+androidx-glance-testing = { module = "androidx.glance:glance-testing", version.ref = "glance" }
 # Android-only lifecycle — no KMP equivalent (use only in androidMain / androidHostTest)
 # lifecycle-runtime-ktx dropped: KTX extensions merged into lifecycle-runtime since 2.8.0;
 # use jetbrains-lifecycle-runtime (JB KMP fork) instead.

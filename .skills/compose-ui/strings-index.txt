@@ -131,6 +131,7 @@ bluetooth_feature_config_description
 bluetooth_feature_discovery
 bluetooth_feature_discovery_description
 bluetooth_permission
+bluetooth_scan_location_services_disabled
 bluetooth_scan_missing_permission
 bluetooth_scan_start_failed
 bluetooth_scan_too_frequent
@@ -267,6 +268,7 @@ config_security_is_managed
 config_security_private_key
 config_security_public_key
 config_security_serial_enabled
+configuration
 configure_bluetooth_permissions
 configure_critical_alerts
 configure_location_permissions
