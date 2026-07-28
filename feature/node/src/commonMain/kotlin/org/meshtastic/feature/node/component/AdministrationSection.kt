@@ -217,21 +217,24 @@ private fun RemoteAdminListItem(
     }
 }
 
-/**
- * Lets the user, while an admin session with [destNum] is active, tell that remote radio to favorite or ignore a node
- * by its numeric ID — the target node need not be in the local node DB, since this command is administered entirely on
- * the remote radio's own node database over the mesh.
- */
 private enum class RemoteNodeListType {
     FAVORITE,
     IGNORE,
 }
 
+/**
+ * Lets the user, while an admin session with [destNum] is active, tell that remote radio to favorite or ignore a node
+ * by its numeric ID — the target node need not be in the local node DB, since this command is administered entirely on
+ * the remote radio's own node database over the mesh.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RemoteNodeManagementCard(destNum: Int, isEnsuringSession: Boolean, onAction: (NodeDetailAction) -> Unit) {
     val targetIdState = rememberTextFieldState("")
-    val targetNodeNum = targetIdState.text.toString().toIntOrNull()
+    // Node numbers are unsigned 32-bit (up to 4294967295) — toIntOrNull() alone rejects anything above
+    // Int.MAX_VALUE (2147483647), which silently disabled the buttons for a large chunk of real node IDs. Parse as
+    // UInt first, then reinterpret the same bit pattern as Int (matches the convention used in EditTextPreference.kt).
+    val targetNodeNum = targetIdState.text.toString().toUIntOrNull()?.toInt()
     // Which list on the remote radio we're operating on. Chosen explicitly, then Add/Remove performs the action
     // against it — there's no way to read the remote radio's current state first (the admin protocol only exposes
     // set/unset — no getter), so the app can't offer a toggle reflecting the real current state.

@@ -68,11 +68,10 @@ class PacketHandlerImpl(
         private val TIMEOUT = 5.seconds
 
         /**
-        /**
          * Budget for an end-to-end mesh routing ACK, not just local queue acceptance — LoRa is slow and multi-hop
          * delivery genuinely takes longer than [TIMEOUT]. A `false` result here means "no confirmation within the
          * window", not necessarily "delivery failed" — the ACK may still arrive late.
-        */
+         */
         private val ROUTING_ACK_TIMEOUT = 30.seconds
 
         /**
@@ -81,9 +80,9 @@ class PacketHandlerImpl(
          * delivered through the synchronous local loopback instead of the TX queue — a success. Note it numerically
          * collides with `Routing.Error.PKI_UNKNOWN_PUBKEY` (35); `QueueStatus.res` carries ErrorCode semantics, not
          * Routing.Error.
-        */
+         */
         private const val ERRNO_SHOULD_RELEASE = 35
-        }
+    }
 
     private var queueJob: Job? = null
 
