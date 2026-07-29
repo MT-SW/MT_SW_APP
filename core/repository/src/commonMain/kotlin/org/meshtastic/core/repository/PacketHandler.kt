@@ -53,6 +53,21 @@ interface PacketHandler {
      */
     suspend fun completeRoutingAck(requestId: Int, isAck: Boolean)
 
+    /**
+     * Suspends until a Remote Hardware READ_GPIOS_REPLY from [fromNum] arrives, or times out. There's no request ID in
+     * [org.meshtastic.proto.HardwareMessage] to correlate by, so this keys purely on the sender — only one pending GPIO
+     * read per remote node is supported at a time.
+     *
+     * @return the reported gpio_value bitmask, or `null` on timeout/no response.
+     */
+    suspend fun awaitGpioReply(fromNum: Int): Long?
+
+    /**
+     * Completes a pending [awaitGpioReply] wait for [fromNum] with [gpioValue]. Called when a READ_GPIOS_REPLY is
+     * processed.
+     */
+    suspend fun completeGpioReply(fromNum: Int, gpioValue: Long)
+
     /** Processes queue status updates from the radio. */
     fun handleQueueStatus(queueStatus: QueueStatus)
 

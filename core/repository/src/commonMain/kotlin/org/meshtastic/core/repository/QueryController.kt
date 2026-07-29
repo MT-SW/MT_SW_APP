@@ -45,4 +45,17 @@ interface QueryController {
 
     /** Requests neighbor information (detected nodes) from a remote node. */
     suspend fun requestNeighborInfo(requestId: Int, destNum: Int)
+
+    /**
+     * Sets the GPIO pins selected in [gpioMask] on [destNum] to the corresponding bits in [gpioValue], via the Remote
+     * Hardware module. See https://meshtastic.org/docs/configuration/module/remote-hardware/.
+     */
+    suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long)
+
+    /**
+     * Reads the GPIO pins selected in [gpioMask] on [destNum] via the Remote Hardware module.
+     *
+     * @return the reported gpio_value bitmask, or `null` on timeout/no response.
+     */
+    suspend fun readGpio(destNum: Int, gpioMask: Long): Long?
 }

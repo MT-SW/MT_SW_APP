@@ -33,12 +33,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.add
+import org.meshtastic.core.resources.add_contact
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.import_export_label
 import org.meshtastic.core.resources.import_label
 import org.meshtastic.core.resources.input_channel_url
 import org.meshtastic.core.resources.input_shared_contact_url
+import org.meshtastic.core.resources.long_name
+import org.meshtastic.core.resources.node_id
 import org.meshtastic.core.resources.okay
 import org.meshtastic.core.resources.scan_channels_nfc
 import org.meshtastic.core.resources.scan_channels_qr
@@ -48,11 +53,13 @@ import org.meshtastic.core.resources.scan_shared_contact_nfc
 import org.meshtastic.core.resources.scan_shared_contact_qr
 import org.meshtastic.core.resources.share_channels_qr
 import org.meshtastic.core.resources.share_connected_node
+import org.meshtastic.core.resources.short_name
 import org.meshtastic.core.resources.url
 import org.meshtastic.core.ui.icon.LinkIcon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Nfc
 import org.meshtastic.core.ui.icon.Person
+import org.meshtastic.core.ui.icon.PersonAdd
 import org.meshtastic.core.ui.icon.QrCode2
 import org.meshtastic.core.ui.icon.QrCodeScanner
 import org.meshtastic.core.ui.theme.AppTheme
@@ -85,6 +92,7 @@ fun MeshtasticImportFAB(
     onDismissSharedContact: () -> Unit = {},
     onShareChannels: (() -> Unit)? = null,
     onShareContact: (() -> Unit)? = null,
+    onAddManualContact: ((nodeNum: Int, longName: String, shortName: String) -> Unit)? = null,
     isContactContext: Boolean = true,
     testTag: String? = null,
     importDialog: @Composable (SharedContact, () -> Unit) -> Unit = { contact, dismiss ->
@@ -95,6 +103,7 @@ fun MeshtasticImportFAB(
 
     var expanded by rememberSaveable { mutableStateOf(false) }
     var showUrlDialog by rememberSaveable { mutableStateOf(false) }
+    var showAddManualContactDialog by rememberSaveable { mutableStateOf(false) }
     var isNfcScanning by rememberSaveable { mutableStateOf(false) }
     var showNfcDisabledDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -134,6 +143,16 @@ fun MeshtasticImportFAB(
                     onImport(it)
                     showUrlDialog = false
                 }
+            },
+        )
+    }
+
+    if (showAddManualContactDialog) {
+        AddManualContactDialog(
+            onDismiss = { showAddManualContactDialog = false },
+            onConfirm = { nodeNum, longName, shortName ->
+                onAddManualContact?.invoke(nodeNum, longName, shortName)
+                showAddManualContactDialog = false
             },
         )
     }
@@ -202,6 +221,17 @@ fun MeshtasticImportFAB(
         )
     }
 
+    onAddManualContact?.let {
+        items.add(
+            MenuFABItem(
+                label = stringResource(Res.string.add_contact),
+                icon = MeshtasticIcons.PersonAdd,
+                onClick = { showAddManualContactDialog = true },
+                testTag = "add_manual_contact",
+            ),
+        )
+    }
+
     MenuFAB(
         expanded = expanded,
         onExpandedChange = { expanded = it },
@@ -244,6 +274,52 @@ private fun InputUrlDialog(title: String, onDismiss: () -> Unit, onConfirm: (Str
         },
         onConfirm = { onConfirm(urlText) },
         confirmTextRes = Res.string.okay,
+        dismissTextRes = Res.string.cancel,
+    )
+}
+
+/**
+ * Manually adds a contact by node number (standard "!a1b2c3d4" hex format) and name — the "type an ID" counterpart to
+ * scanning a shared-contact QR/NFC/URL above.
+ */
+@Composable
+private fun AddManualContactDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (nodeNum: Int, longName: String, shortName: String) -> Unit,
+) {
+    var idText by remember { mutableStateOf("") }
+    var longNameText by remember { mutableStateOf("") }
+    var shortNameText by remember { mutableStateOf("") }
+    val nodeNum = NodeAddress.idToNum(idText)
+
+    MeshtasticDialog(
+        onDismiss = onDismiss,
+        titleRes = Res.string.add_contact,
+        text = {
+            androidx.compose.foundation.layout.Column {
+                OutlinedTextField(
+                    value = idText,
+                    onValueChange = { idText = it },
+                    label = { Text(stringResource(Res.string.node_id)) },
+                    placeholder = { Text("!a1b2c3d4") },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = longNameText,
+                    onValueChange = { longNameText = it },
+                    label = { Text(stringResource(Res.string.long_name)) },
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                )
+                OutlinedTextField(
+                    value = shortNameText,
+                    onValueChange = { shortNameText = it },
+                    label = { Text(stringResource(Res.string.short_name)) },
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                )
+            }
+        },
+        onConfirm = { nodeNum?.let { onConfirm(it, longNameText, shortNameText) } },
+        confirmTextRes = Res.string.add,
         dismissTextRes = Res.string.cancel,
     )
 }

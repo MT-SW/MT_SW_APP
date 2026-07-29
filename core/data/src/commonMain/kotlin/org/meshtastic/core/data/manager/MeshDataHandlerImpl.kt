@@ -74,6 +74,7 @@ import org.meshtastic.core.resources.mesh_beacon_notification_body
 import org.meshtastic.core.resources.mesh_beacon_notification_title
 import org.meshtastic.core.resources.unknown_username
 import org.meshtastic.core.resources.waypoint_received
+import org.meshtastic.proto.HardwareMessage
 import org.meshtastic.proto.MeshBeacon
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.Paxcount
@@ -192,7 +193,7 @@ class MeshDataHandlerImpl(
             }
 
             PortNum.PAXCOUNTER_APP -> {
-                handlePaxCounter(packet, session)
+                handlePaxCounter(packet)
             }
 
             PortNum.STORE_FORWARD_APP -> {
@@ -209,6 +210,10 @@ class MeshDataHandlerImpl(
 
             PortNum.NEIGHBORINFO_APP -> {
                 neighborInfoHandler.handleNeighborInfo(packet)
+            }
+
+            PortNum.REMOTE_HARDWARE_APP -> {
+                handleRemoteHardware(packet, session)
             }
 
             PortNum.ATAK_PLUGIN,
@@ -266,10 +271,25 @@ class MeshDataHandlerImpl(
         }
     }
 
-    private fun handlePaxCounter(packet: MeshPacket, session: RadioSessionContext) {
+    private fun handlePaxCounter(packet: MeshPacket) {
         val payload = packet.decoded?.payload ?: return
         val p = Paxcount.ADAPTER.decodeOrNull(payload, Logger) ?: return
-        nodeManager.handleReceivedPaxcounter(packet.from, p, session)
+        nodeManager.handleReceivedPaxcounter(packet.from, p)
+    }
+
+    /**
+     * Handles incoming Remote Hardware messages. Only [HardwareMessage.Type.READ_GPIOS_REPLY] is actioned today — it
+     * wakes up a pending [PacketHandler.awaitGpioReply] caller. GPIOS_CHANGED notifications (unsolicited state changes
+     * from a watched pin) aren't surfaced anywhere yet.
+     */
+    private fun handleRemoteHardware(packet: MeshPacket, session: RadioSessionContext) {
+        val payload = packet.decoded?.payload ?: return
+        val hw = HardwareMessage.ADAPTER.decodeOrNull(payload, Logger) ?: return
+        if (hw.type == HardwareMessage.Type.READ_GPIOS_REPLY) {
+            radioInterfaceService.launchSessionWork(scope, session) {
+                packetHandler.completeGpioReply(packet.from, hw.gpio_value)
+            }
+        }
     }
 
     private fun handlePosition(

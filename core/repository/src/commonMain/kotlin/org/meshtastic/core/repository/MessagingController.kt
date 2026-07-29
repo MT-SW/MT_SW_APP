@@ -45,4 +45,16 @@ interface MessagingController {
      * @return `true` if the radio accepted the contact, `false` on timeout or failure.
      */
     suspend fun sendSharedContact(nodeNum: Int): Boolean
+
+    /**
+     * Manually adds a contact by node number and name — the "type an ID" counterpart to [importContact], which takes a
+     * full [SharedContact] from a scanned QR code. The added contact is unverified (no public key) since it wasn't
+     * exchanged cryptographically.
+     *
+     * @param destNum Optional remote radio to administer over the mesh (via an established admin session) instead of
+     *   the locally-connected radio. `null` (default) targets the local radio.
+     * @return `true` when added to the local radio (always), or for a remote [destNum], `true` only if the remote
+     *   radio's mesh routing ACK confirmed delivery within the timeout.
+     */
+    suspend fun addManualContact(nodeNum: Int, longName: String, shortName: String, destNum: Int? = null): Boolean
 }

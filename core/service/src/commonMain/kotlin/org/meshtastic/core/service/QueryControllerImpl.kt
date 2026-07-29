@@ -66,6 +66,12 @@ internal class QueryControllerImpl(
         commandSender.requestTraceroute(requestId, destNum)
     }
 
+    override suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long) {
+        commandSender.writeGpio(destNum, gpioMask, gpioValue)
+    }
+
+    override suspend fun readGpio(destNum: Int, gpioMask: Long): Long? = commandSender.readGpio(destNum, gpioMask)
+
     override suspend fun requestTelemetry(requestId: Int, destNum: Int, typeValue: Int) {
         commandSender.requestTelemetry(requestId, destNum, typeValue)
     }

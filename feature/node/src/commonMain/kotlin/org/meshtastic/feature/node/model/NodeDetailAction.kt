@@ -44,6 +44,19 @@ sealed interface NodeDetailAction {
      */
     data class SetRemoteIgnored(val destNum: Int, val targetNodeNum: Int, val ignored: Boolean) : NodeDetailAction
 
+    /**
+     * Manually adds a contact ([targetNodeNum] with [longName]/[shortName]) to the remote radio [destNum]'s node DB
+     * over an active admin session — not the locally-connected radio.
+     */
+    data class AddRemoteContact(val destNum: Int, val targetNodeNum: Int, val longName: String, val shortName: String) :
+        NodeDetailAction
+
+    /** Sets the GPIO pins in [gpioMask] on [destNum] to [gpioValue], via the Remote Hardware module. */
+    data class WriteGpio(val destNum: Int, val gpioMask: Long, val gpioValue: Long) : NodeDetailAction
+
+    /** Reads the GPIO pins in [gpioMask] on [destNum], via the Remote Hardware module. */
+    data class ReadGpio(val destNum: Int, val gpioMask: Long) : NodeDetailAction
+
     data object ShareContact : NodeDetailAction
 
     // Opens the compass sheet scoped to a target node and the user’s preferred units.

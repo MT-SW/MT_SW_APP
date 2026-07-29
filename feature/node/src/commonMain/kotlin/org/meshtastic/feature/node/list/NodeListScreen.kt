@@ -205,6 +205,9 @@ fun NodeListScreen(
                     parseDeepLinkOrInvalid(uriString, onHandleDeepLink, onInvalid)
                 },
                 onShareContact = { showShareContact = true },
+                onAddManualContact = { nodeNum, longName, shortName ->
+                    viewModel.addManualContact(nodeNum, longName, shortName)
+                },
                 isContactContext = true,
             )
         },

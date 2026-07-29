@@ -47,6 +47,13 @@ internal fun handleNodeAction(
         is NodeDetailAction.SetRemoteIgnored ->
             viewModel.setRemoteIgnored(action.destNum, action.targetNodeNum, action.ignored)
 
+        is NodeDetailAction.AddRemoteContact ->
+            viewModel.addRemoteContact(action.destNum, action.targetNodeNum, action.longName, action.shortName)
+
+        is NodeDetailAction.WriteGpio -> viewModel.writeGpio(action.destNum, action.gpioMask, action.gpioValue)
+
+        is NodeDetailAction.ReadGpio -> viewModel.readGpio(action.destNum, action.gpioMask)
+
         is NodeDetailAction.HandleNodeMenuAction -> {
             when (val menuAction = action.action) {
                 is NodeMenuAction.DirectMessage -> {

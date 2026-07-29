@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
@@ -57,26 +58,36 @@ import org.meshtastic.core.database.entity.FirmwareRelease
 import org.meshtastic.core.database.entity.asDeviceVersion
 import org.meshtastic.core.model.DeviceVersion
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.SessionStatus
 import org.meshtastic.core.repository.EventFirmwareRepository
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.add
+import org.meshtastic.core.resources.add_contact
 import org.meshtastic.core.resources.administration
 import org.meshtastic.core.resources.connect_radio_for_remote_admin
 import org.meshtastic.core.resources.establishing_session
 import org.meshtastic.core.resources.favorite
 import org.meshtastic.core.resources.firmware
 import org.meshtastic.core.resources.firmware_edition
+import org.meshtastic.core.resources.gpio
+import org.meshtastic.core.resources.gpio_mask_display
+import org.meshtastic.core.resources.gpio_off
+import org.meshtastic.core.resources.gpio_on
+import org.meshtastic.core.resources.gpio_pin
+import org.meshtastic.core.resources.gpio_read
 import org.meshtastic.core.resources.ignore
 import org.meshtastic.core.resources.installed_firmware_version
 import org.meshtastic.core.resources.latest_alpha_firmware
 import org.meshtastic.core.resources.latest_stable_firmware
+import org.meshtastic.core.resources.long_name
 import org.meshtastic.core.resources.node_id
 import org.meshtastic.core.resources.refresh_metadata
 import org.meshtastic.core.resources.remote_admin
 import org.meshtastic.core.resources.remove
 import org.meshtastic.core.resources.session_active
 import org.meshtastic.core.resources.session_refresh_required
+import org.meshtastic.core.resources.short_name
 import org.meshtastic.core.ui.component.BasicListItem
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.icon.ForkLeft
@@ -141,6 +152,8 @@ fun AdministrationSection(
                 }
             }
         }
+
+        SectionCard(title = Res.string.gpio) { RemoteHardwareCard(destNum = node.num, onAction = onAction) }
 
         val firmwareVersion = node.metadata?.firmware_version
         val firmwareEdition = metricsState.firmwareEdition
@@ -231,10 +244,11 @@ private enum class RemoteNodeListType {
 @Composable
 private fun RemoteNodeManagementCard(destNum: Int, isEnsuringSession: Boolean, onAction: (NodeDetailAction) -> Unit) {
     val targetIdState = rememberTextFieldState("")
-    // Node numbers are unsigned 32-bit (up to 4294967295) — toIntOrNull() alone rejects anything above
-    // Int.MAX_VALUE (2147483647), which silently disabled the buttons for a large chunk of real node IDs. Parse as
-    // UInt first, then reinterpret the same bit pattern as Int (matches the convention used in EditTextPreference.kt).
-    val targetNodeNum = targetIdState.text.toString().toUIntOrNull()?.toInt()
+    val longNameState = rememberTextFieldState("")
+    val shortNameState = rememberTextFieldState("")
+    // Accept the app's standard hex node ID format ("!a1b2c3d4", with or without the "!") — matches how IDs are
+    // displayed everywhere else in the app, rather than a raw decimal number the user would have to convert by hand.
+    val targetNodeNum = NodeAddress.idToNum(targetIdState.text.toString())
     // Which list on the remote radio we're operating on. Chosen explicitly, then Add/Remove performs the action
     // against it — there's no way to read the remote radio's current state first (the admin protocol only exposes
     // set/unset — no getter), so the app can't offer a toggle reflecting the real current state.
@@ -246,7 +260,8 @@ private fun RemoteNodeManagementCard(destNum: Int, isEnsuringSession: Boolean, o
             labelPosition = TextFieldLabelPosition.Above(),
             lineLimits = TextFieldLineLimits.SingleLine,
             label = { Text(stringResource(Res.string.node_id)) },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+            placeholder = { Text("!a1b2c3d4") },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             enabled = !isEnsuringSession,
             modifier = Modifier.fillMaxWidth(),
         )
@@ -295,6 +310,97 @@ private fun RemoteNodeManagementCard(destNum: Int, isEnsuringSession: Boolean, o
                 },
             ) {
                 Text(stringResource(Res.string.remove))
+            }
+        }
+
+        // Manual contact add is a separate action from Favorite/Ignore above — the admin protocol has no
+        // "remove contact" counterpart, so it doesn't fit the Add/Remove button pair and gets its own row.
+        SectionDivider()
+        OutlinedTextField(
+            state = longNameState,
+            labelPosition = TextFieldLabelPosition.Above(),
+            lineLimits = TextFieldLineLimits.SingleLine,
+            label = { Text(stringResource(Res.string.long_name)) },
+            enabled = !isEnsuringSession,
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        )
+        OutlinedTextField(
+            state = shortNameState,
+            labelPosition = TextFieldLabelPosition.Above(),
+            lineLimits = TextFieldLineLimits.SingleLine,
+            label = { Text(stringResource(Res.string.short_name)) },
+            enabled = !isEnsuringSession,
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        )
+        Button(
+            enabled = !isEnsuringSession && targetNodeNum != null && longNameState.text.isNotBlank(),
+            onClick = {
+                val id = targetNodeNum ?: return@Button
+                onAction(
+                    NodeDetailAction.AddRemoteContact(
+                        destNum,
+                        id,
+                        longNameState.text.toString(),
+                        shortNameState.text.toString(),
+                    ),
+                )
+            },
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        ) {
+            Text(stringResource(Res.string.add_contact))
+        }
+    }
+}
+
+/**
+ * Remote Hardware module control: type a GPIO pin number, the app computes the bit mask (`1 shl pin`, matching
+ * https://meshtastic.org/docs/configuration/module/remote-hardware/#masks), and On/Off/Read send the corresponding
+ * WRITE_GPIOS/READ_GPIOS command to [destNum]. Requires the Remote Hardware module enabled and a shared channel on both
+ * ends — the app can't verify that from here, so a failed command surfaces only as "no response" on Read.
+ */
+@Composable
+private fun RemoteHardwareCard(destNum: Int, onAction: (NodeDetailAction) -> Unit) {
+    val pinState: TextFieldState = rememberTextFieldState("")
+    val pinNumber = pinState.text.toString().toIntOrNull()
+    val gpioMask = pinNumber?.takeIf { it in 0..62 }?.let { 1L shl it }
+
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        OutlinedTextField(
+            state = pinState,
+            labelPosition = TextFieldLabelPosition.Above(),
+            lineLimits = TextFieldLineLimits.SingleLine,
+            label = { Text(stringResource(Res.string.gpio_pin)) },
+            supportingText =
+            gpioMask?.let { mask ->
+                { Text(stringResource(Res.string.gpio_mask_display, "0x" + mask.toString(16))) }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        ) {
+            Button(
+                modifier = Modifier.weight(1f),
+                enabled = gpioMask != null,
+                onClick = { gpioMask?.let { onAction(NodeDetailAction.WriteGpio(destNum, it, it)) } },
+            ) {
+                Text(stringResource(Res.string.gpio_on))
+            }
+            Button(
+                modifier = Modifier.weight(1f),
+                enabled = gpioMask != null,
+                onClick = { gpioMask?.let { onAction(NodeDetailAction.WriteGpio(destNum, it, 0L)) } },
+            ) {
+                Text(stringResource(Res.string.gpio_off))
+            }
+            Button(
+                modifier = Modifier.weight(1f),
+                enabled = gpioMask != null,
+                onClick = { gpioMask?.let { onAction(NodeDetailAction.ReadGpio(destNum, it)) } },
+            ) {
+                Text(stringResource(Res.string.gpio_read))
             }
         }
     }

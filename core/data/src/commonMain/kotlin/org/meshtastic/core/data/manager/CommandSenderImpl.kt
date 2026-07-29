@@ -47,6 +47,7 @@ import org.meshtastic.proto.Constants
 import org.meshtastic.proto.Data
 import org.meshtastic.proto.DeviceMetrics
 import org.meshtastic.proto.EnvironmentMetrics
+import org.meshtastic.proto.HardwareMessage
 import org.meshtastic.proto.HostMetrics
 import org.meshtastic.proto.LocalConfig
 import org.meshtastic.proto.LocalStats
@@ -294,6 +295,40 @@ class CommandSenderImpl(
         )
     }
 
+    override suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long) {
+        val hw = HardwareMessage(type = HardwareMessage.Type.WRITE_GPIOS, gpio_mask = gpioMask, gpio_value = gpioValue)
+        packetHandler.sendToRadio(
+            buildMeshPacket(
+                to = destNum,
+                wantAck = true,
+                // Remote Hardware commands must go out on the dedicated "gpio" channel, not the node's default
+                // channel — per https://meshtastic.org/docs/configuration/module/remote-hardware/#setup, the app and
+                // the target radio share a channel created specifically for this. Simplification: assume it's always
+                // channel 1 (the one right after the primary channel 0), matching the documented setup flow.
+                channel = GPIO_CHANNEL_INDEX,
+                decoded = Data(portnum = PortNum.REMOTE_HARDWARE_APP, payload = hw.encode().toByteString()),
+            ),
+        )
+    }
+
+    override suspend fun readGpio(destNum: Int, gpioMask: Long): Long? {
+        val hw = HardwareMessage(type = HardwareMessage.Type.READ_GPIOS, gpio_mask = gpioMask)
+        packetHandler.sendToRadio(
+            buildMeshPacket(
+                to = destNum,
+                wantAck = true,
+                channel = GPIO_CHANNEL_INDEX,
+                decoded =
+                Data(
+                    portnum = PortNum.REMOTE_HARDWARE_APP,
+                    payload = hw.encode().toByteString(),
+                    want_response = true,
+                ),
+            ),
+        )
+        return packetHandler.awaitGpioReply(destNum)
+    }
+
     override suspend fun requestTelemetry(requestId: Int, destNum: Int, typeValue: Int) {
         val type = TelemetryType.entries.getOrNull(typeValue) ?: TelemetryType.DEVICE
 
@@ -511,5 +546,10 @@ class CommandSenderImpl(
 
         private const val MILLIS_PER_SECOND = 1000L
         private const val SECONDS_PER_HOUR = 3600
+
+        /**
+         * Index of the dedicated "gpio" channel, per Remote Hardware setup convention — always right after channel 0.
+         */
+        private const val GPIO_CHANNEL_INDEX = 1
     }
 }

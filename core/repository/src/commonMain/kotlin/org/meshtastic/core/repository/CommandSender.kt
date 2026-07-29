@@ -96,6 +96,21 @@ interface CommandSender {
     suspend fun requestNeighborInfo(requestId: Int, destNum: Int)
 
     /**
+     * Sends a Remote Hardware WRITE_GPIOS command to [destNum], setting the pins selected in [gpioMask] to the
+     * corresponding bits in [gpioValue]. Requires the target to have the Remote Hardware module enabled and share the
+     * channel this is sent on (see the app's node-channel resolution) — see
+     * https://meshtastic.org/docs/configuration/module/remote-hardware/.
+     */
+    suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long)
+
+    /**
+     * Sends a Remote Hardware READ_GPIOS command to [destNum] and awaits its READ_GPIOS_REPLY.
+     *
+     * @return the reported gpio_value bitmask, or `null` on timeout/no response.
+     */
+    suspend fun readGpio(destNum: Int, gpioMask: Long): Long?
+
+    /**
      * Sends a lockdown passphrase to authenticate with a locked device.
      *
      * @param disable when `true`, instructs the device to decrypt storage back to plaintext and leave lockdown (the off

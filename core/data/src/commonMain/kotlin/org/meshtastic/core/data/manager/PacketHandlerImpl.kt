@@ -74,6 +74,9 @@ class PacketHandlerImpl(
          */
         private val ROUTING_ACK_TIMEOUT = 30.seconds
 
+        /** Budget for a Remote Hardware READ_GPIOS_REPLY — a plain mesh data packet round trip, not a routed ACK. */
+        private val GPIO_REPLY_TIMEOUT = 15.seconds
+
         /**
          * Firmware-internal `ErrorCode` (MeshTypes.h `ERRNO_SHOULD_RELEASE`) leaked into `QueueStatus.res`: "no error,
          * but the packet should still be released". Firmware 2.8+ returns it for self-addressed packets, which are
@@ -96,6 +99,7 @@ class PacketHandlerImpl(
     private val responseMutex = Mutex()
     private val queueResponse = mutableMapOf<Int, CompletableDeferred<Boolean>>()
     private val routingAckResponse = mutableMapOf<Int, CompletableDeferred<Boolean>>()
+    private val gpioReplyResponse = mutableMapOf<Int, CompletableDeferred<Long?>>()
 
     override fun sendToRadio(p: ToRadio) {
         Logger.d { "Sending to radio ${p.toPIIString()}" }
@@ -188,6 +192,27 @@ class PacketHandlerImpl(
         responseMutex.withLock { routingAckResponse[requestId]?.let { if (!it.isCompleted) it.complete(isAck) } }
     }
 
+    @Suppress("TooGenericExceptionCaught", "SwallowedException")
+    override suspend fun awaitGpioReply(fromNum: Int): Long? {
+        val deferred = CompletableDeferred<Long?>()
+        responseMutex.withLock { gpioReplyResponse[fromNum] = deferred }
+        return try {
+            withTimeout(GPIO_REPLY_TIMEOUT) { deferred.await() }
+        } catch (e: TimeoutCancellationException) {
+            null
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            null
+        } finally {
+            responseMutex.withLock { gpioReplyResponse.remove(fromNum) }
+        }
+    }
+
+    override suspend fun completeGpioReply(fromNum: Int, gpioValue: Long) {
+        responseMutex.withLock { gpioReplyResponse[fromNum]?.let { if (!it.isCompleted) it.complete(gpioValue) } }
+    }
+
     override fun stopPacketQueue() {
         // Run async so callers (non-suspend) don't block, but all mutations are
         // serialized under the same mutexes used by the queue processor and senders.
@@ -204,6 +229,8 @@ class PacketHandlerImpl(
                 queueResponse.clear()
                 routingAckResponse.values.forEach { if (!it.isCompleted) it.complete(false) }
                 routingAckResponse.clear()
+                gpioReplyResponse.values.forEach { if (!it.isCompleted) it.complete(null) }
+                gpioReplyResponse.clear()
             }
         }
     }

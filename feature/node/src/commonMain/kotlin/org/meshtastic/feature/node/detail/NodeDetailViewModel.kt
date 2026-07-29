@@ -41,10 +41,14 @@ import org.meshtastic.core.model.SessionStatus
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.repository.QueryController
+import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.UiText
 import org.meshtastic.core.resources.connect_radio_for_remote_admin
 import org.meshtastic.core.resources.delivery_confirmed
+import org.meshtastic.core.resources.gpio_off
+import org.meshtastic.core.resources.gpio_on
+import org.meshtastic.core.resources.gpio_read_result
 import org.meshtastic.core.resources.remote_admin_unreachable
 import org.meshtastic.core.resources.remote_command_no_response
 import org.meshtastic.core.ui.util.SnackbarManager
@@ -85,6 +89,7 @@ class NodeDetailViewModel(
     private val nodeManagementActions: NodeManagementActions,
     private val nodeRequestActions: NodeRequestActions,
     private val queryController: QueryController,
+    private val radioController: RadioController,
     private val getNodeDetailsUseCase: GetNodeDetailsUseCase,
     private val ensureRemoteAdminSession: EnsureRemoteAdminSessionUseCase,
     private val observeRemoteAdminSessionStatus: ObserveRemoteAdminSessionStatusUseCase,
@@ -153,6 +158,36 @@ class NodeDetailViewModel(
         viewModelScope.launch {
             val delivered = nodeManagementActions.setIgnored(targetNodeNum, ignored, destNum)
             showRemoteCommandResult(delivered)
+        }
+    }
+
+    /**
+     * Manually adds a contact ([targetNodeNum] with [longName]/[shortName]) to the remote radio [destNum]'s node DB
+     * over the admin session already established for this screen — not the locally-connected radio.
+     */
+    fun addRemoteContact(destNum: Int, targetNodeNum: Int, longName: String, shortName: String) {
+        viewModelScope.launch {
+            val delivered = radioController.addManualContact(targetNodeNum, longName, shortName, destNum)
+            showRemoteCommandResult(delivered)
+        }
+    }
+
+    /** Sets the GPIO pins in [gpioMask] on [destNum] to [gpioValue] via the Remote Hardware module. */
+    fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long) {
+        viewModelScope.launch { radioController.writeGpio(destNum, gpioMask, gpioValue) }
+    }
+
+    /** Reads the GPIO pins in [gpioMask] on [destNum] via the Remote Hardware module and shows the result. */
+    fun readGpio(destNum: Int, gpioMask: Long) {
+        viewModelScope.launch {
+            val value = radioController.readGpio(destNum, gpioMask)
+            val resultText =
+                when {
+                    value == null -> getString(Res.string.remote_command_no_response)
+                    (value and gpioMask) == gpioMask -> getString(Res.string.gpio_on)
+                    else -> getString(Res.string.gpio_off)
+                }
+            snackbarManager.showSnackbar(getString(Res.string.gpio_read_result, resultText))
         }
     }
 

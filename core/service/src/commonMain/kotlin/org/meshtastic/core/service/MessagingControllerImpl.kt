@@ -122,6 +122,20 @@ internal class MessagingControllerImpl(
         nodeManager.handleReceivedUser(contact.node_num, user, manuallyVerified = contact.manually_verified)
     }
 
+    override suspend fun addManualContact(nodeNum: Int, longName: String, shortName: String, destNum: Int?): Boolean {
+        val myNum = nodeManager.myNodeNum.value ?: return false
+        val target = destNum ?: myNum
+        val user = User(id = NodeAddress.numToDefaultId(nodeNum), long_name = longName, short_name = shortName)
+        val contact = SharedContact(node_num = nodeNum, user = user)
+        return if (target == myNum) {
+            commandSender.sendAdmin(myNum) { AdminMessage(add_contact = contact) }
+            nodeManager.handleReceivedUser(nodeNum, user, manuallyVerified = false)
+            true
+        } else {
+            commandSender.sendAdminAndAwaitDelivery(target) { AdminMessage(add_contact = contact) }
+        }
+    }
+
     private companion object {
         private const val EMOJI_INDICATOR = 1
     }

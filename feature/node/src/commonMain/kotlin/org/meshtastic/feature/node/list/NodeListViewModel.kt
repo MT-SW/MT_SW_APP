@@ -39,6 +39,7 @@ import org.meshtastic.core.model.util.DistanceUnit
 import org.meshtastic.core.repository.AdminController
 import org.meshtastic.core.repository.ConnectionStateProvider
 import org.meshtastic.core.repository.DeviceHardwareRepository
+import org.meshtastic.core.repository.MessagingController
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.RadioInterfaceService
@@ -57,6 +58,7 @@ class NodeListViewModel(
     private val radioConfigRepository: RadioConfigRepository,
     private val connectionStateProvider: ConnectionStateProvider,
     private val adminController: AdminController,
+    private val messagingController: MessagingController,
     private val radioInterfaceService: RadioInterfaceService,
     private val deviceHardwareRepository: DeviceHardwareRepository,
     val nodeManagementActions: NodeManagementActions,
@@ -202,6 +204,11 @@ class NodeListViewModel(
     fun muteNode(node: Node) = nodeManagementActions.requestMuteNode(viewModelScope, node)
 
     fun removeNode(node: Node) = nodeManagementActions.requestRemoveNode(viewModelScope, node)
+
+    /** Manually adds a contact by node number and name to the locally-connected radio's node DB. */
+    fun addManualContact(nodeNum: Int, longName: String, shortName: String) {
+        viewModelScope.launch { messagingController.addManualContact(nodeNum, longName, shortName) }
+    }
 
     /** Returns the contact key for navigating to a direct message conversation with this node. */
     fun getDirectMessageRoute(node: Node): String {
