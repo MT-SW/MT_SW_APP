@@ -343,6 +343,7 @@ class MeshConfigFlowManagerImpl(
                 // this newer session. The async clear also rechecks transport authority before touching persistence.
                 clearGeneration = handshakeGeneration.incrementAndGet()
                 connectionManager.value.onHandshakeProgress()
+                connectionManager.value.onMyNodeInfoReceived(myInfo.my_node_num)
             }
         if (!admitted) {
             Logger.d { "[DeviceAssociation] discard stale MyNodeInfo gen=${session.generation}" }
@@ -493,18 +494,10 @@ class MeshConfigFlowManagerImpl(
         null
     }
 
+    // Whether to silence new-node notifications is a read-decide-write over two preferences, so it lives behind one
+    // atomic prefs operation rather than being assembled from setter calls here.
     private fun applyEventFirmwareNotificationDefaults(edition: FirmwareEdition) {
-        if (edition != FirmwareEdition.VANILLA) {
-            if (!notificationPrefs.nodeEventsAutoDisabledForEvent.value) {
-                notificationPrefs.setNodeEventsEnabled(false)
-                notificationPrefs.setNodeEventsAutoDisabledForEvent(true)
-            }
-        } else {
-            if (notificationPrefs.nodeEventsAutoDisabledForEvent.value) {
-                notificationPrefs.setNodeEventsEnabled(true)
-                notificationPrefs.setNodeEventsAutoDisabledForEvent(false)
-            }
-        }
+        notificationPrefs.applyEventFirmwareNodeEventDefault(isEventFirmware = edition != FirmwareEdition.VANILLA)
     }
 }
 

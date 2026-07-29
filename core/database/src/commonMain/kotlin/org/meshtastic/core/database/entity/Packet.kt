@@ -55,7 +55,15 @@ data class PacketEntity(
             status = data.status,
             routingError = routingError,
             packetId = packetId,
-            emojis = reactions.filter { it.myNodeNum == myNodeNum || it.myNodeNum == 0 }.toReaction(getNode),
+            emojis =
+            reactions
+                .filter { it.myNodeNum == myNodeNum || it.myNodeNum == 0 }
+                // myNodeNum is part of the reactions primary key, so the legacy 0 bucket can hold the same
+                // (user, emoji) as this node's. The UI keys reaction rows on that pair, so keep one — the
+                // current node's, which carries the live delivery status.
+                .sortedBy { it.myNodeNum == 0 }
+                .distinctBy { it.userId to it.emoji }
+                .toReaction(getNode),
             replyId = data.replyId,
             viaMqtt = data.viaMqtt,
             relayNode = data.relayNode,
@@ -95,7 +103,8 @@ data class Packet(
     @ColumnInfo(name = "packet_id", defaultValue = "0") val packetId: Int = 0,
     @ColumnInfo(name = "routing_error", defaultValue = "-1") var routingError: Int = -1,
     @ColumnInfo(name = "snr", defaultValue = "0") val snr: Float = 0f,
-    @ColumnInfo(name = "rssi", defaultValue = "0") val rssi: Int = 0,
+    /** Null when the radio reported no rssi. Rows written before schema 51 store 0 for both absent and 0 dBm. */
+    @ColumnInfo(name = "rssi") val rssi: Int? = null,
     @ColumnInfo(name = "hopsAway", defaultValue = "-1") val hopsAway: Int = -1,
     @ColumnInfo(name = "sfpp_hash") val sfpp_hash: ByteString? = null,
     @ColumnInfo(name = "filtered", defaultValue = "0") val filtered: Boolean = false,
@@ -154,7 +163,8 @@ data class ReactionEntity(
     val emoji: String,
     val timestamp: Long,
     @ColumnInfo(name = "snr", defaultValue = "0") val snr: Float = 0f,
-    @ColumnInfo(name = "rssi", defaultValue = "0") val rssi: Int = 0,
+    /** Null when the radio reported no rssi. Rows written before schema 51 store 0 for both absent and 0 dBm. */
+    @ColumnInfo(name = "rssi") val rssi: Int? = null,
     @ColumnInfo(name = "hopsAway", defaultValue = "-1") val hopsAway: Int = -1,
     @ColumnInfo(name = "packet_id", defaultValue = "0") val packetId: Int = 0,
     @ColumnInfo(name = "status", defaultValue = "0") val status: MessageStatus = MessageStatus.UNKNOWN,
