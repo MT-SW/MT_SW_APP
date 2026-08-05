@@ -68,6 +68,7 @@ data class PacketEntity(
             viaMqtt = data.viaMqtt,
             relayNode = data.relayNode,
             relays = data.relays,
+            relayNodes = data.relayNodes,
             filtered = filtered,
             transportMechanism = data.transportMechanism,
             xeddsaSigned = data.xeddsaSigned,

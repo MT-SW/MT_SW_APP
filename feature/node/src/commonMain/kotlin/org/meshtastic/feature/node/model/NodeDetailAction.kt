@@ -55,7 +55,17 @@ sealed interface NodeDetailAction {
     data class WriteGpio(val destNum: Int, val gpioMask: Long, val gpioValue: Long) : NodeDetailAction
 
     /** Reads the GPIO pins in [gpioMask] on [destNum], via the Remote Hardware module. */
+
+    /** Reads the GPIO pins in [gpioMask] on [destNum], via the Remote Hardware module. */
     data class ReadGpio(val destNum: Int, val gpioMask: Long) : NodeDetailAction
+
+    /**
+     * Sends a preset quick command (e.g. "/ping") as a private message to [node] — independent of the normal messaging
+     * entry point, so it works even for nodes whose role makes them otherwise unmessageable. The caller is expected to
+     * gate this on [org.meshtastic.core.model.Node.hasPKC] (and !mismatchKey) so it only fires once keys have been
+     * exchanged.
+     */
+    data class SendQuickMessage(val node: Node, val text: String) : NodeDetailAction
 
     data object ShareContact : NodeDetailAction
 

@@ -168,6 +168,7 @@ data class Message(
     val viaMqtt: Boolean = false,
     val relayNode: Int? = null,
     val relays: Int = 0,
+    val relayNodes: List<Int> = emptyList(),
     val filtered: Boolean = false,
     /** The transport mechanism this packet arrived over (see [MeshPacket.TransportMechanism]). */
     val transportMechanism: Int = 0,

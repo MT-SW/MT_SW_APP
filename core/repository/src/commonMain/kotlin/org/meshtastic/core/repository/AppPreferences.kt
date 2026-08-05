@@ -116,6 +116,14 @@ interface UiPrefs {
 
     fun setExcludeMqtt(value: Boolean)
 
+    /**
+     * Whether image URLs found in chat messages are automatically loaded as inline previews. Off by default — fetching
+     * an external image reveals your IP address and the moment you read the message to whoever hosts it.
+     */
+    val autoLoadChatImages: StateFlow<Boolean>
+
+    fun setAutoLoadChatImages(value: Boolean)
+
     val hasShownNotPairedWarning: StateFlow<Boolean>
 
     fun setHasShownNotPairedWarning(shown: Boolean)
@@ -198,6 +206,33 @@ interface UiPrefs {
     val shouldShowTelemetry: StateFlow<Boolean>
 
     fun setShouldShowTelemetry(value: Boolean)
+
+    /**
+     * Epoch millis of the last time the narrow-band (>200 kHz) LoRa channel warning was shown from a foreground
+     * app-open/resume check. Used to throttle that check to a couple of times per day; does not affect the unthrottled
+     * warning shown every time remote admin is opened.
+     */
+    val lastNarrowBandWarningShownMillis: StateFlow<Long>
+
+    fun setLastNarrowBandWarningShownMillis(millis: Long)
+
+    /**
+     * Whether the phone's own location was inside the Świętokrzyskie region geofence as of the last foreground check.
+     * Used only to detect the edge (was outside, now inside) that triggers an immediate, unthrottled warning — separate
+     * from [lastRegionWarningShownMillis], which throttles the repeat reminder while still inside.
+     */
+    val wasInsideSwietokrzyskieRegion: StateFlow<Boolean>
+
+    fun setWasInsideSwietokrzyskieRegion(inside: Boolean)
+
+    /**
+     * Epoch millis of the last time the Świętokrzyskie region warning was shown from a foreground app-open/resume
+     * check, whether triggered by a border crossing or by the periodic reminder. Used to throttle the periodic reminder
+     * to a couple of times per day.
+     */
+    val lastRegionWarningShownMillis: StateFlow<Long>
+
+    fun setLastRegionWarningShownMillis(millis: Long)
 }
 
 /** Reactive interface for notification preferences. */

@@ -38,11 +38,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.DateFormatter
+import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.getNeighborInfoResponse
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.neighbor_info
 import org.meshtastic.core.resources.routing_error_no_response
-import org.meshtastic.core.resources.success
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.icon.Groups
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -53,6 +53,29 @@ import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 import org.meshtastic.core.ui.util.annotateNeighborInfo
 import org.meshtastic.feature.node.component.CooldownIconButton
+import org.meshtastic.proto.MeshPacket
+
+/**
+ * A row in the Neighbor Info log — either a response to a request we sent, or a NeighborInfo packet overheard on the
+ * mesh without any matching outgoing request from this device.
+ */
+private sealed interface NeighborInfoLogItem {
+    val uuid: String
+    val receivedDate: Long
+    val packet: MeshPacket?
+
+    data class Requested(val requestLog: MeshLog, val result: MeshLog?) : NeighborInfoLogItem {
+        override val uuid: String = requestLog.uuid
+        override val receivedDate: Long = requestLog.received_date
+        override val packet: MeshPacket? = result?.fromRadio?.packet
+    }
+
+    data class Overheard(val resultLog: MeshLog) : NeighborInfoLogItem {
+        override val uuid: String = resultLog.uuid
+        override val receivedDate: Long = resultLog.received_date
+        override val packet: MeshPacket? = resultLog.fromRadio.packet
+    }
+}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Suppress("LongMethod", "CyclomaticComplexMethod")
@@ -65,6 +88,27 @@ fun NeighborInfoLogScreen(modifier: Modifier = Modifier, viewModel: MetricsViewM
     val statusGreen = MaterialTheme.colorScheme.StatusGreen
     val statusYellow = MaterialTheme.colorScheme.StatusYellow
     val statusOrange = MaterialTheme.colorScheme.StatusOrange
+
+    // Combine our own requests (matched to a result, or "no response") with any NeighborInfo packets overheard on
+    // the mesh that don't correspond to a request we sent — sorted newest-first.
+    val logItems =
+        remember(state.neighborInfoRequests, state.neighborInfoResults) {
+            val requested =
+                state.neighborInfoRequests.map { req ->
+                    val result =
+                        state.neighborInfoResults.find {
+                            it.fromRadio.packet?.decoded?.request_id == req.fromRadio.packet?.id
+                        }
+                    NeighborInfoLogItem.Requested(req, result)
+                }
+            val matchedResultUuids = requested.mapNotNull { it.result?.uuid }.toSet()
+            val requestedUuids = requested.map { it.uuid }.toSet()
+            val overheard =
+                state.neighborInfoResults
+                    .filter { it.uuid !in matchedResultUuids && it.uuid !in requestedUuids }
+                    .map { NeighborInfoLogItem.Overheard(it) }
+            (requested + overheard).distinctBy { it.uuid }.sortedByDescending { it.receivedDate }
+        }
 
     Scaffold(
         topBar = {
@@ -94,51 +138,49 @@ fun NeighborInfoLogScreen(modifier: Modifier = Modifier, viewModel: MetricsViewM
             modifier = modifier.fillMaxSize().padding(innerPadding),
             contentPadding = PaddingValues(horizontal = 16.dp),
         ) {
-            items(state.neighborInfoRequests, key = { it.uuid }) { log ->
-                val result =
-                    remember(state.neighborInfoResults, log.fromRadio.packet?.id) {
-                        state.neighborInfoResults.find {
-                            it.fromRadio.packet?.decoded?.request_id == log.fromRadio.packet?.id
-                        }
+            items(logItems, key = { it.uuid }) { item ->
+                val time = DateFormatter.formatDateTime(item.receivedDate)
+                val header = stringResource(Res.string.neighbor_info)
+
+                val (icon, text) =
+                    when (item) {
+                        is NeighborInfoLogItem.Requested ->
+                            if (item.result != null) {
+                                MeshtasticIcons.Groups to "$time - Poproszono ręcznie"
+                            } else {
+                                MeshtasticIcons.PersonOff to
+                                    "$time - Poproszono ręcznie - ${stringResource(
+                                        Res.string.routing_error_no_response,
+                                    )}"
+                            }
+
+                        is NeighborInfoLogItem.Overheard -> MeshtasticIcons.Groups to "$time - Odebrano automatycznie"
                     }
 
-                val time = DateFormatter.formatDateTime(log.received_date)
-                val text =
-                    if (result != null) {
-                        stringResource(Res.string.success)
-                    } else {
-                        stringResource(Res.string.routing_error_no_response)
-                    }
-                val icon = if (result != null) MeshtasticIcons.Groups else MeshtasticIcons.PersonOff
-                val header = stringResource(Res.string.neighbor_info)
                 var expanded by remember { mutableStateOf(false) }
 
                 Box {
                     MetricLogItem(
                         icon = icon,
-                        text = "$time - $text",
+                        text = text,
                         contentDescription = stringResource(Res.string.neighbor_info),
                         modifier =
                         Modifier.combinedClickable(onLongClick = { expanded = true }) {
-                            result
-                                ?.fromRadio
-                                ?.packet
-                                ?.getNeighborInfoResponse(::getUsername, header = header)
-                                ?.let {
-                                    val message =
-                                        annotateNeighborInfo(
-                                            it,
-                                            statusGreen = statusGreen,
-                                            statusYellow = statusYellow,
-                                            statusOrange = statusOrange,
-                                        )
-                                    viewModel.showLogDetail(Res.string.neighbor_info, message)
-                                }
+                            item.packet?.getNeighborInfoResponse(::getUsername, header = header)?.let {
+                                val message =
+                                    annotateNeighborInfo(
+                                        it,
+                                        statusGreen = statusGreen,
+                                        statusYellow = statusYellow,
+                                        statusOrange = statusOrange,
+                                    )
+                                viewModel.showLogDetail(Res.string.neighbor_info, message)
+                            }
                         },
                     )
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                         DeleteItem {
-                            viewModel.deleteLog(log.uuid)
+                            viewModel.deleteLog(item.uuid)
                             expanded = false
                         }
                     }

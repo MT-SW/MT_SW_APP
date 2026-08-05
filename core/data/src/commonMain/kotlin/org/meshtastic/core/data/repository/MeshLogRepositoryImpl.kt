@@ -71,6 +71,30 @@ open class MeshLogRepositoryImpl(
     /** Retrieves all [MeshLog]s in the database without any limit. */
     override fun getAllLogsUnbounded(): Flow<List<MeshLog>> = getAllLogs(Int.MAX_VALUE)
 
+    /** Retrieves all [MeshLog]s for a given [portNum], across every sender. */
+    override fun getLogsByPortNum(portNum: Int, maxItem: Int): Flow<List<MeshLog>> = dbManager.currentDb
+        .flatMapLatest { it.meshLogDao().getLogsByPortNum(portNum, maxItem) }
+        .map { list -> list.map { it.asExternalModel() } }
+        .flowOn(dispatchers.io)
+
+    /** Retrieves all [MeshLog]s for a given [portNum] since [sinceTimestamp], across every sender, uncapped. */
+    override fun getLogsByPortNumSince(portNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>> = dbManager.currentDb
+        .flatMapLatest { it.meshLogDao().getLogsByPortNumSince(portNum, sinceTimestamp) }
+        .map { list -> list.map { it.asExternalModel() } }
+        .flowOn(dispatchers.io)
+
+    /** Retrieves all [MeshLog]s from a single [nodeNum] since [sinceTimestamp], across every port. */
+    override fun getLogsFromNodeSince(nodeNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>> = dbManager.currentDb
+        .flatMapLatest { it.meshLogDao().getLogsFromNodeSince(nodeNum, sinceTimestamp) }
+        .map { list -> list.map { it.asExternalModel() } }
+        .flowOn(dispatchers.io)
+
+    /** Retrieves all [MeshLog]s across every sender and port since [sinceTimestamp]. */
+    override fun getAllLogsSince(sinceTimestamp: Long): Flow<List<MeshLog>> = dbManager.currentDb
+        .flatMapLatest { it.meshLogDao().getAllLogsSince(sinceTimestamp) }
+        .map { list -> list.map { it.asExternalModel() } }
+        .flowOn(dispatchers.io)
+
     /** Retrieves all [MeshLog]s associated with a specific [nodeNum] and [portNum]. */
     override fun getLogsFrom(nodeNum: Int, portNum: Int): Flow<List<MeshLog>> = dbManager.currentDb
         .flatMapLatest { it.meshLogDao().getLogsFrom(nodeNum, portNum, DEFAULT_MAX_LOGS) }

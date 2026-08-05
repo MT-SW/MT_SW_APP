@@ -669,6 +669,7 @@ fun MessageStatusDialog(
     onResend: () -> Unit,
     onDismiss: () -> Unit,
     isDirectMessage: Boolean = false,
+    relayNodeNames: List<String> = emptyList(),
 ) {
     val (title, text) = message.getStatusStringRes(isDirectMessage)
     DeliveryInfo(
@@ -676,6 +677,7 @@ fun MessageStatusDialog(
         resendOption = resendOption,
         text = text,
         relays = message.relays,
+        relayNodeNames = relayNodeNames,
         onConfirm = onResend,
         onDismiss = onDismiss,
     )

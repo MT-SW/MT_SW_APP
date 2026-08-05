@@ -23,6 +23,7 @@ import org.meshtastic.core.resources.bottom_nav_settings
 import org.meshtastic.core.resources.connect
 import org.meshtastic.core.resources.map
 import org.meshtastic.core.resources.messages
+import org.meshtastic.core.resources.network_health
 import org.meshtastic.core.resources.nodes
 
 /**
@@ -34,6 +35,7 @@ import org.meshtastic.core.resources.nodes
 enum class TopLevelDestination(val label: StringResource, val route: Route) {
     Messages(Res.string.messages, ContactsRoute.Contacts),
     Nodes(Res.string.nodes, NodesRoute.Nodes),
+    NetworkHealth(Res.string.network_health, NetworkHealthRoute.NetworkHealth),
     Map(Res.string.map, MapRoute.Map()),
     Settings(Res.string.bottom_nav_settings, SettingsRoute.Settings()),
     Connect(Res.string.connect, ConnectionsRoute.Connections()),

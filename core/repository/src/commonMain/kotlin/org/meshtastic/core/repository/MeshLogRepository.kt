@@ -42,6 +42,18 @@ interface MeshLogRepository {
     /** Retrieves all [MeshLog]s in the database without any limit. */
     fun getAllLogsUnbounded(): Flow<List<MeshLog>>
 
+    /** Retrieves all [MeshLog]s for a given [portNum], across every sender — used for cross-node summaries. */
+    fun getLogsByPortNum(portNum: Int, maxItem: Int = DEFAULT_MAX_LOGS): Flow<List<MeshLog>>
+
+    /** Retrieves all [MeshLog]s for a given [portNum] since [sinceTimestamp], across every sender, uncapped. */
+    fun getLogsByPortNumSince(portNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>>
+
+    /** Retrieves all [MeshLog]s from a single [nodeNum] since [sinceTimestamp], across every port. */
+    fun getLogsFromNodeSince(nodeNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>>
+
+    /** Retrieves all [MeshLog]s across every sender and port since [sinceTimestamp]. */
+    fun getAllLogsSince(sinceTimestamp: Long): Flow<List<MeshLog>>
+
     /** Retrieves all [MeshLog]s associated with a specific [nodeNum] and [portNum]. */
     fun getLogsFrom(nodeNum: Int, portNum: Int): Flow<List<MeshLog>>
 

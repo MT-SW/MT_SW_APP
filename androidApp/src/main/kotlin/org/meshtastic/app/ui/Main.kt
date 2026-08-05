@@ -52,6 +52,7 @@ import org.meshtastic.feature.docs.navigation.docsEntries
 import org.meshtastic.feature.firmware.navigation.firmwareGraph
 import org.meshtastic.feature.map.navigation.mapGraph
 import org.meshtastic.feature.messaging.navigation.contactsGraph
+import org.meshtastic.feature.node.navigation.networkHealthGraph
 import org.meshtastic.feature.node.navigation.nodesGraph
 import org.meshtastic.feature.settings.lockdown.LockdownDialog
 import org.meshtastic.feature.settings.navigation.rememberSettingsRadioConfigViewModelProvider
@@ -105,6 +106,7 @@ fun MainScreen() {
                             multiBackstack.navigateTopLevel(TopLevelDestination.Connect.route)
                         },
                     )
+                    networkHealthGraph(backStack)
                     mapGraph(backStack)
                     channelsGraph(backStack)
                     connectionsGraph(backStack)

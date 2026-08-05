@@ -64,7 +64,7 @@ data class MetricsState(
 
     fun hasTracerouteLogs() = tracerouteRequests.isNotEmpty()
 
-    fun hasNeighborInfoLogs() = neighborInfoRequests.isNotEmpty()
+    fun hasNeighborInfoLogs() = neighborInfoRequests.isNotEmpty() || neighborInfoResults.isNotEmpty()
 
     fun hasPositionLogs() = positionLogs.isNotEmpty()
 

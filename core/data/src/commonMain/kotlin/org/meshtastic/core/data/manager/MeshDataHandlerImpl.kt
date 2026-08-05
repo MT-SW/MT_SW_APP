@@ -439,8 +439,19 @@ class MeshDataHandlerImpl(
                     else -> MessageStatus.ERROR
                 }
             if (p != null && p.status != MessageStatus.RECEIVED) {
+                val updatedRelayNodes =
+                    if (isAck && relayNode != null && relayNode != 0 && relayNode !in p.relayNodes) {
+                        p.relayNodes + relayNode
+                    } else {
+                        p.relayNodes
+                    }
                 val updatedPacket =
-                    p.copy(status = m, relays = if (isAck) p.relays + 1 else p.relays, relayNode = relayNode)
+                    p.copy(
+                        status = m,
+                        relays = if (isAck) p.relays + 1 else p.relays,
+                        relayNode = relayNode,
+                        relayNodes = updatedRelayNodes,
+                    )
                 packetRepository.value.update(updatedPacket, routingError = routingError)
             }
 

@@ -16,5 +16,8 @@
  */
 package org.meshtastic.core.repository
 
-/** JVM placeholder location type for repository smoke compilation. */
-actual class Location
+/**
+ * Desktop/JVM location object. Desktop has no OS-level location API, so [JvmLocationService] always returns null — this
+ * class exists only so the `expect class Location` contract compiles; its fields are never populated in practice.
+ */
+actual class Location(val latitude: Double = 0.0, val longitude: Double = 0.0)

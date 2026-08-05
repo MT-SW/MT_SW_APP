@@ -56,6 +56,7 @@ import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.isUnmessageableRole
+import org.meshtastic.core.model.util.formatUptime
 import org.meshtastic.core.model.util.toDistanceString
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.distance
@@ -321,6 +322,21 @@ private fun CompactHealthRow(
                 },
             )
         }
+
+        // Uptime — how long the device has been running since its last boot
+        thatNode.deviceMetrics.uptime_seconds
+            ?.takeIf { it > 0 }
+            ?.let { uptime ->
+                add(
+                    @Composable {
+                        Text(
+                            text = formatUptime(uptime),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = contentColor,
+                        )
+                    },
+                )
+            }
 
         // Distance
         if (showLocation && distance != null && !isThisNode) {

@@ -255,6 +255,8 @@ fun SettingsScreen(
                         onToggleHomoglyph = { viewModel.toggleHomoglyphCharactersEncodingEnabled() },
                         startProvideLocation = { settingsViewModel.startProvidingLocation() },
                         stopProvideLocation = { settingsViewModel.stopProvidingLocation() },
+                        autoLoadChatImages = settingsViewModel.autoLoadChatImages.collectAsStateWithLifecycle().value,
+                        onToggleAutoLoadChatImages = { settingsViewModel.setAutoLoadChatImages(it) },
                     )
                     AppearanceSettingsContent(
                         onShowLanguagePicker = { showLanguagePickerDialog = true },

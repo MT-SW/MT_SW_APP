@@ -87,6 +87,11 @@ class TelemetryPacketHandlerImpl(
         }
         nodeManager.updateNodeForSession(fromNum, session, transform = transform)
 
+        // Network Health's history charts now read directly from MeshLog (already logs every telemetry packet,
+        // unthrottled, matching what the standard per-node metrics screens show) instead of a separate insert
+        // here — see NetworkHealthViewModel.toHistoryEntry(). SNR/RSSI history is still recorded, but from a
+        // separate per-packet recorder in MeshDataHandlerImpl.handleReceivedData(), not here.
+
         val metrics = telemetry.device_metrics ?: return
         val updatedNode = nodeManager.nodeDBbyNodeNum[fromNum] ?: return
         if (fromNum != myNodeNum && !updatedNode.isFavorite) return

@@ -32,6 +32,29 @@ data class GeofenceBox(val south: Double, val west: Double, val north: Double, v
 }
 
 /**
+ * An arbitrary simple polygon in decimal degrees, given as an ordered list of (lat, lon) vertices. The polygon is
+ * treated as implicitly closed (the last vertex connects back to the first). Containment uses a standard ray-casting
+ * algorithm: a point is inside if a ray cast from it crosses the polygon boundary an odd number of times.
+ */
+data class GeofencePolygon(val vertices: List<Pair<Double, Double>>) {
+    @Suppress("MagicNumber")
+    fun contains(lat: Double, lon: Double): Boolean {
+        var inside = false
+        var j = vertices.size - 1
+        for (i in vertices.indices) {
+            val (latI, lonI) = vertices[i]
+            val (latJ, lonJ) = vertices[j]
+            val crossesRay = (lonI > lon) != (lonJ > lon)
+            if (crossesRay && lat < (latJ - latI) * (lon - lonI) / (lonJ - lonI) + latI) {
+                inside = !inside
+            }
+            j = i
+        }
+        return inside
+    }
+}
+
+/**
  * A waypoint's geofence region: a [circle] and/or a [box]. A point is inside if it is in EITHER shape (OR semantics) —
  * both may be set, either may be null.
  */

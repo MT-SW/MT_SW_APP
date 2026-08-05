@@ -22,10 +22,12 @@ import androidx.compose.runtime.LaunchedEffect
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.analytics_okay
+import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.location_disabled
 import org.meshtastic.core.resources.provide_location_to_mesh
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.BugReport
+import org.meshtastic.core.ui.icon.LinkIcon
 import org.meshtastic.core.ui.icon.LocationOn
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.isGpsDisabled
@@ -44,6 +46,8 @@ internal fun ColumnScope.PrivacySettingsContent(
     onToggleHomoglyph: () -> Unit,
     startProvideLocation: () -> Unit,
     stopProvideLocation: () -> Unit,
+    autoLoadChatImages: Boolean,
+    onToggleAutoLoadChatImages: (Boolean) -> Unit,
 ) {
     val showToast = rememberShowToastResource()
     val locationPermission = rememberLocationPermissionState()
@@ -85,4 +89,11 @@ internal fun ColumnScope.PrivacySettingsContent(
     )
 
     HomoglyphSetting(homoglyphEncodingEnabled = homoglyphEnabled, onToggle = onToggleHomoglyph)
+
+    SwitchListItem(
+        text = stringResource(Res.string.auto_load_chat_images),
+        leadingIcon = MeshtasticIcons.LinkIcon,
+        checked = autoLoadChatImages,
+        onClick = { onToggleAutoLoadChatImages(!autoLoadChatImages) },
+    )
 }

@@ -156,6 +156,12 @@ class SettingsViewModel(
         uiPrefs.setLocale(languageTag)
     }
 
+    val autoLoadChatImages = uiPrefs.autoLoadChatImages
+
+    fun setAutoLoadChatImages(value: Boolean) {
+        uiPrefs.setAutoLoadChatImages(value)
+    }
+
     fun showAppIntro() {
         uiPrefs.setAppIntroCompleted(false)
     }

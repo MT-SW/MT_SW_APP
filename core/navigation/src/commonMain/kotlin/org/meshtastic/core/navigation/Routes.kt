@@ -65,6 +65,15 @@ sealed interface NodesRoute : Route {
 }
 
 @Serializable
+sealed interface NetworkHealthRoute : Route {
+    @Serializable data object NetworkHealth : NetworkHealthRoute, Graph
+
+    @Serializable data class NodeMetricDetail(val destNum: Int, val metricName: String) : NetworkHealthRoute
+
+    @Serializable data object Summary : NetworkHealthRoute
+}
+
+@Serializable
 sealed interface NodeDetailRoute : Route {
     @Serializable data class DeviceMetrics(val destNum: Int) : NodeDetailRoute
 

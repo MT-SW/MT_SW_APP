@@ -30,6 +30,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.meshtastic.core.navigation.ContactsRoute
+import org.meshtastic.core.navigation.NetworkHealthRoute
 import org.meshtastic.core.navigation.NodeDetailRoute
 import org.meshtastic.core.navigation.NodesRoute
 import org.meshtastic.core.navigation.Route
@@ -89,6 +90,40 @@ fun EntryProviderScope<NavKey>.nodesGraph(
     }
 
     nodeDetailGraph(backStack)
+}
+
+fun EntryProviderScope<NavKey>.networkHealthGraph(backStack: NavBackStack<NavKey>) {
+    entry<NetworkHealthRoute.NetworkHealth> {
+        val viewModel: org.meshtastic.feature.node.health.NetworkHealthViewModel = koinViewModel()
+        org.meshtastic.feature.node.health.NetworkHealthScreen(
+            viewModel = viewModel,
+            onNodeClick = { num, metric ->
+                backStack.add(NetworkHealthRoute.NodeMetricDetail(destNum = num, metricName = metric.name))
+            },
+            onNeighborInfoNodeClick = { num -> backStack.add(NodeDetailRoute.NeighborInfoLog(num)) },
+            onSummaryClick = { backStack.add(NetworkHealthRoute.Summary) },
+        )
+    }
+
+    entry<NetworkHealthRoute.NodeMetricDetail> { args ->
+        val metric = org.meshtastic.feature.node.health.NetworkHealthMetric.valueOf(args.metricName)
+        val viewModel =
+            koinViewModel<org.meshtastic.feature.node.health.NodeMetricDetailViewModel> {
+                parametersOf(args.destNum, metric)
+            }
+        org.meshtastic.feature.node.health.NodeMetricDetailScreen(
+            viewModel = viewModel,
+            onNavigateUp = dropUnlessResumed { backStack.removeLastOrNull() },
+        )
+    }
+
+    entry<NetworkHealthRoute.Summary> {
+        val viewModel: org.meshtastic.feature.node.health.NetworkSummaryViewModel = koinViewModel()
+        org.meshtastic.feature.node.health.NetworkSummaryScreen(
+            viewModel = viewModel,
+            onNavigateUp = dropUnlessResumed { backStack.removeLastOrNull() },
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)

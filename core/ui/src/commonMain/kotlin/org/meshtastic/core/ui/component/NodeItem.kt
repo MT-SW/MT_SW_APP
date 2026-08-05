@@ -57,6 +57,7 @@ import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.isUnmessageableRole
+import org.meshtastic.core.model.util.formatUptime
 import org.meshtastic.core.model.util.toDistanceString
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.air_utilization
@@ -536,6 +537,15 @@ private fun NodeItemHeader(
                     online = !isThisNode && thatNode.isOnline,
                     contentColor = contentColor,
                 )
+                thatNode.deviceMetrics.uptime_seconds
+                    ?.takeIf { it > 0 }
+                    ?.let { uptime ->
+                        Text(
+                            text = formatUptime(uptime),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = contentColor,
+                        )
+                    }
             }
         }
 

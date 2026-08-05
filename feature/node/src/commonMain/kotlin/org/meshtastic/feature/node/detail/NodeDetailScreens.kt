@@ -40,6 +40,7 @@ import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.details
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.NarrowBandWarningDialog
 import org.meshtastic.core.ui.component.SharedContactDialog
 import org.meshtastic.feature.node.compass.CompassUiState
 import org.meshtastic.feature.node.compass.CompassViewModel
@@ -145,6 +146,10 @@ private fun NodeDetailScaffold(
 
     NodeDetailOverlays(activeOverlay, node, compassUiState, actualCompassViewModel, { activeOverlay = null }) {
         viewModel.handleNodeMenuAction(NodeMenuAction.RequestPosition(it))
+    }
+
+    if (uiState.showNarrowBandWarning) {
+        NarrowBandWarningDialog(onClose = { viewModel.dismissNarrowBandWarning() })
     }
 }
 

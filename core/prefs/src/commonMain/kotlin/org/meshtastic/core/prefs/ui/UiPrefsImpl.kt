@@ -21,6 +21,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.atomicfu.atomic
 import kotlinx.collections.immutable.persistentMapOf
@@ -117,6 +118,13 @@ class UiPrefsImpl(
 
     override fun setExcludeMqtt(value: Boolean) {
         scope.launch { dataStore.edit { it[KEY_EXCLUDE_MQTT] = value } }
+    }
+
+    override val autoLoadChatImages: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_AUTO_LOAD_CHAT_IMAGES] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
+
+    override fun setAutoLoadChatImages(value: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_AUTO_LOAD_CHAT_IMAGES] = value } }
     }
 
     override val hasShownNotPairedWarning: StateFlow<Boolean> =
@@ -296,6 +304,29 @@ class UiPrefsImpl(
         scope.launch { dataStore.edit { it[NodeListLayoutPreferences.KEY_SHOW_TELEMETRY] = value } }
     }
 
+    override val lastNarrowBandWarningShownMillis: StateFlow<Long> =
+        dataStore.data.map { it[KEY_LAST_NARROW_BAND_WARNING_SHOWN] ?: 0L }.stateIn(scope, SharingStarted.Eagerly, 0L)
+
+    override fun setLastNarrowBandWarningShownMillis(millis: Long) {
+        scope.launch { dataStore.edit { it[KEY_LAST_NARROW_BAND_WARNING_SHOWN] = millis } }
+    }
+
+    override val wasInsideSwietokrzyskieRegion: StateFlow<Boolean> =
+        dataStore.data
+            .map { it[KEY_WAS_INSIDE_SWIETOKRZYSKIE_REGION] ?: false }
+            .stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setWasInsideSwietokrzyskieRegion(inside: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_WAS_INSIDE_SWIETOKRZYSKIE_REGION] = inside } }
+    }
+
+    override val lastRegionWarningShownMillis: StateFlow<Long> =
+        dataStore.data.map { it[KEY_LAST_REGION_WARNING_SHOWN] ?: 0L }.stateIn(scope, SharingStarted.Eagerly, 0L)
+
+    override fun setLastRegionWarningShownMillis(millis: Long) {
+        scope.launch { dataStore.edit { it[KEY_LAST_REGION_WARNING_SHOWN] = millis } }
+    }
+
     companion object {
         val KEY_HAS_SHOWN_NOT_PAIRED_WARNING_PREF = booleanPreferencesKey("has_shown_not_paired_warning")
         val KEY_SHOW_QUICK_CHAT_PREF = booleanPreferencesKey("show-quick-chat")
@@ -311,10 +342,14 @@ class UiPrefsImpl(
         val KEY_ONLY_DIRECT = booleanPreferencesKey("only-direct")
         val KEY_SHOW_IGNORED = booleanPreferencesKey("show-ignored")
         val KEY_EXCLUDE_MQTT = booleanPreferencesKey("exclude-mqtt")
+        val KEY_AUTO_LOAD_CHAT_IMAGES = booleanPreferencesKey("auto-load-chat-images")
         val KEY_BLE_AUTO_SCAN = booleanPreferencesKey("ble-auto-scan")
         val KEY_NETWORK_AUTO_SCAN = booleanPreferencesKey("network-auto-scan")
         val KEY_SELECTED_CONNECTION_TRANSPORT = stringPreferencesKey("selected-connection-transport")
         val KEY_FIRMWARE_UPDATE_NOTIFICATION_KEYS = stringPreferencesKey("firmware-update-notification-keys")
+        val KEY_LAST_NARROW_BAND_WARNING_SHOWN = longPreferencesKey("last-narrow-band-warning-shown")
+        val KEY_WAS_INSIDE_SWIETOKRZYSKIE_REGION = booleanPreferencesKey("was-inside-swietokrzyskie-region")
+        val KEY_LAST_REGION_WARNING_SHOWN = longPreferencesKey("last-region-warning-shown")
         val KEY_SHOW_BLE_TRANSPORT = booleanPreferencesKey("show-ble-transport")
         val KEY_SHOW_NETWORK_TRANSPORT = booleanPreferencesKey("show-network-transport")
         val KEY_SHOW_USB_TRANSPORT = booleanPreferencesKey("show-usb-transport")

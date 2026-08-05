@@ -42,6 +42,43 @@ interface MeshLogDao {
     @Query("SELECT * FROM log ORDER BY received_date DESC LIMIT :maxItem")
     fun getAllLogs(maxItem: Int): Flow<List<MeshLog>>
 
+    /**
+     * All logs for a given port across every sender, newest first — used for cross-node summaries (e.g. Neighbor Info).
+     */
+    @Query("SELECT * FROM log WHERE port_num = :portNum ORDER BY received_date DESC LIMIT :maxItem")
+    fun getLogsByPortNum(portNum: Int, maxItem: Int): Flow<List<MeshLog>>
+
+    /**
+     * All logs for a given port across every sender since [sinceTimestamp] — unlike [getLogsByPortNum], this has no
+     * count cap, so a busy mesh's frequent packets from one node can never crowd out a rarer variant from another.
+     */
+
+    /**
+     * All logs for a given port across every sender since [sinceTimestamp] — unlike [getLogsByPortNum], this has no
+     * count cap, so a busy mesh's frequent packets from one node can never crowd out a rarer variant from another.
+     */
+    @Query(
+        "SELECT * FROM log WHERE port_num = :portNum AND received_date >= :sinceTimestamp ORDER BY received_date DESC",
+    )
+    fun getLogsByPortNumSince(portNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>>
+
+    /**
+     * All logs from a single node since [sinceTimestamp], across every port — hop count lives in every packet's header,
+     * not just telemetry, so this is used as a fallback source when a metric like SNR/RSSI has no direct-signal data
+     * for a node that's only ever heard via relay.
+     */
+    @Query(
+        "SELECT * FROM log WHERE from_num = :nodeNum AND received_date >= :sinceTimestamp ORDER BY received_date ASC",
+    )
+    fun getLogsFromNodeSince(nodeNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>>
+
+    /**
+     * All logs across every sender and every port since [sinceTimestamp] — used to derive SNR/RSSI history, since that
+     * data lives in every packet's header, not just telemetry packets.
+     */
+    @Query("SELECT * FROM log WHERE received_date >= :sinceTimestamp ORDER BY received_date ASC")
+    fun getAllLogsSince(sinceTimestamp: Long): Flow<List<MeshLog>>
+
     @Query("SELECT * FROM log ORDER BY received_date ASC LIMIT :maxItem")
     fun getAllLogsInReceiveOrder(maxItem: Int): Flow<List<MeshLog>>
 

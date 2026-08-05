@@ -40,6 +40,7 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -47,6 +48,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -60,6 +62,10 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isShiftPressed
@@ -82,6 +88,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
+import co.touchlab.kermit.Logger
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toPersistentMap
@@ -136,6 +143,35 @@ private const val FORMATTING_TOOLBAR_MIN_CHARS = 3
  * @param navigateToFilterSettings Callback to navigate to the message filter settings screen.
  * @param onNavigateBack Callback to navigate back from this screen.
  */
+@Composable
+private fun rememberAddIcon(): ImageVector = remember {
+    ImageVector.Builder(
+        name = "Add",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f,
+    )
+        .apply {
+            path(fill = SolidColor(Color.Black)) {
+                moveTo(19f, 13f)
+                lineTo(13f, 13f)
+                lineTo(13f, 19f)
+                lineTo(11f, 19f)
+                lineTo(11f, 13f)
+                lineTo(5f, 13f)
+                lineTo(5f, 11f)
+                lineTo(11f, 11f)
+                lineTo(11f, 5f)
+                lineTo(13f, 5f)
+                lineTo(13f, 11f)
+                lineTo(19f, 11f)
+                close()
+            }
+        }
+        .build()
+}
+
 @Suppress("LongMethod", "CyclomaticComplexMethod")
 @Composable
 fun MessageScreen(
@@ -768,6 +804,46 @@ private fun MessageInput(
     }
 
     var isFocused by remember { mutableStateOf(false) }
+    val addIcon = rememberAddIcon()
+    val uploadScope = rememberCoroutineScope()
+    var pendingImageBytes by remember { mutableStateOf<ByteArray?>(null) }
+    var pendingImageMimeType by remember { mutableStateOf("image/jpeg") }
+    val launchImagePicker = rememberImagePickerLauncher { bytes, mimeType ->
+        pendingImageBytes = bytes
+        pendingImageMimeType = mimeType
+    }
+
+    pendingImageBytes?.let { bytesToSend ->
+        AlertDialog(
+            onDismissRequest = { pendingImageBytes = null },
+            title = { Text("Wysłać zdjęcie?") },
+            text = {
+                Text(
+                    "Zdjęcie zostanie wysłane na publiczny serwer catbox.moe i będzie dostępne dla każdego, kto zna link. Upewnij się, że nie zawiera niczego prywatnego.",
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        pendingImageBytes = null
+                        val mime = pendingImageMimeType
+                        uploadScope.launch {
+                            try {
+                                val url = uploadToCatbox(bytesToSend, mime)
+                                textFieldState.setTextAndPlaceCursorAtEnd(url)
+                                onSendMessage()
+                            } catch (e: Exception) {
+                                Logger.e { "ImagePicker: catbox upload failed: ${e.message}" }
+                            }
+                        }
+                    },
+                ) {
+                    Text("Wyślij")
+                }
+            },
+            dismissButton = { TextButton(onClick = { pendingImageBytes = null }) { Text("Anuluj") } },
+        )
+    }
 
     Column(modifier = modifier.fillMaxWidth()) {
         if (mentionActive) {
@@ -818,6 +894,11 @@ private fun MessageInput(
             // The current approach (show error, disable send) is generally preferred for UX.
             // If strict real-time byte trimming is required, it needs careful handling of
             // cursor position and multi-byte characters, likely outside simple inputTransformation.
+            leadingIcon = {
+                IconButton(onClick = launchImagePicker, enabled = isEnabled) {
+                    Icon(imageVector = addIcon, contentDescription = "Wyślij zdjęcie")
+                }
+            },
             trailingIcon = {
                 IconButton(onClick = onSendAction, enabled = canSend || mentionActive) {
                     Icon(imageVector = MeshtasticIcons.Send, contentDescription = stringResource(Res.string.send))

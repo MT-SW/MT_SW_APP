@@ -153,7 +153,13 @@ fun AdministrationSection(
             }
         }
 
-        SectionCard(title = Res.string.gpio) { RemoteHardwareCard(destNum = node.num, onAction = onAction) }
+        SectionCard(title = Res.string.gpio) {
+            Column {
+                RemoteHardwareCard(destNum = node.num, onAction = onAction)
+                SectionDivider()
+                QuickCommandsCard(node = node, onAction = onAction)
+            }
+        }
 
         val firmwareVersion = node.metadata?.firmware_version
         val firmwareEdition = metricsState.firmwareEdition
@@ -406,6 +412,37 @@ private fun RemoteHardwareCard(destNum: Int, onAction: (NodeDetailAction) -> Uni
     }
 }
 
+/**
+ * Quick preset text commands sent as a private message to [node] — independent of the normal chat entry point, so these
+ * work even for nodes whose role would otherwise hide "Message" from their menu (see [isUnmessageableRole]). Enabled
+ * only once we've exchanged a valid public key with [node] ([Node.hasPKC] && ![Node.mismatchKey]), so the command
+ * actually goes out PKI-encrypted rather than silently falling back to weaker channel encryption.
+ */
+@Composable
+private fun QuickCommandsCard(node: Node, onAction: (NodeDetailAction) -> Unit) {
+    val canSend = node.hasPKC && !node.mismatchKey
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+    ) {
+        listOf("/ping", "/hello", "/test").forEach { command ->
+            Button(
+                modifier = Modifier.weight(1f),
+                enabled = canSend,
+                onClick = { onAction(NodeDetailAction.SendQuickMessage(node, command)) },
+            ) {
+                Text(command)
+            }
+        }
+    }
+}
+
+/** Substring the Świętokrzyskie firmware build appends to its version string (e.g. "2.7.11.abc12345-MTSW"). */
+private const val MT_SW_VERSION_MARKER = "MTSW"
+
+/** Name shown in the UI for a build carrying [MT_SW_VERSION_MARKER]. */
+private const val MT_SW_DISPLAY_NAME = "FW_MT_SW"
+
 @Composable
 private fun FirmwareSection(
     metricsState: MetricsState,
@@ -413,20 +450,33 @@ private fun FirmwareSection(
     firmwareVersion: String?,
     onFirmwareSelect: (FirmwareRelease) -> Unit,
 ) {
+    // `firmwareEdition` comes from MyNodeInfo, which only ever describes the locally connected radio — showing it on
+    // a remote node's screen would label that node with our own firmware. The version-string marker travels in
+    // DeviceMetadata, so it *is* per-node and stays valid for remote nodes.
+    val isMtSwBuild = firmwareVersion?.contains(MT_SW_VERSION_MARKER, ignoreCase = true) == true
+    val edition = firmwareEdition?.takeIf { metricsState.isLocal }
+    val showEdition = edition != null || isMtSwBuild
+
     SectionCard(title = Res.string.firmware) {
         Column {
-            firmwareEdition?.let { edition ->
+            if (showEdition) {
+                val eventFirmwareRepository = koinInject<EventFirmwareRepository>()
                 val icon =
-                    when (edition) {
-                        FirmwareEdition.VANILLA -> MeshtasticIcons.Icecream
+                    when {
+                        isMtSwBuild -> MeshtasticIcons.ForkLeft
+                        edition == FirmwareEdition.VANILLA -> MeshtasticIcons.Icecream
                         else -> MeshtasticIcons.ForkLeft
                     }
-                val eventFirmwareRepository = koinInject<EventFirmwareRepository>()
                 val displayName by
-                    produceState(edition.name, edition) {
-                        value = eventFirmwareRepository.getEdition(edition.name)?.displayName ?: edition.name
+                    produceState(edition?.name ?: MT_SW_DISPLAY_NAME, edition, isMtSwBuild) {
+                        value =
+                            when {
+                                isMtSwBuild || edition == FirmwareEdition.DIY_EDITION -> MT_SW_DISPLAY_NAME
+                                edition == null -> MT_SW_DISPLAY_NAME
+                                edition == FirmwareEdition.VANILLA -> edition.name
+                                else -> eventFirmwareRepository.getEdition(edition.name)?.displayName ?: edition.name
+                            }
                     }
-
                 ListItem(
                     text = stringResource(Res.string.firmware_edition),
                     leadingIcon = icon,
@@ -437,7 +487,7 @@ private fun FirmwareSection(
             }
 
             firmwareVersion?.let { version ->
-                FirmwareVersionItems(metricsState, version, firmwareEdition != null, onFirmwareSelect)
+                FirmwareVersionItems(metricsState, version, showEdition, onFirmwareSelect)
             }
         }
     }

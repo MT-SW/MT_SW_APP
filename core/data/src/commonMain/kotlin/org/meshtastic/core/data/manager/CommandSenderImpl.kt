@@ -28,12 +28,14 @@ import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.DataPacket
+import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.MessageStatus
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.Position
 import org.meshtastic.core.model.TelemetryType
 import org.meshtastic.core.model.util.isWithinSizeLimit
 import org.meshtastic.core.repository.CommandSender
+import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NeighborInfoHandler
 import org.meshtastic.core.repository.NodeManager
 import org.meshtastic.core.repository.PacketHandler
@@ -47,6 +49,7 @@ import org.meshtastic.proto.Constants
 import org.meshtastic.proto.Data
 import org.meshtastic.proto.DeviceMetrics
 import org.meshtastic.proto.EnvironmentMetrics
+import org.meshtastic.proto.FromRadio
 import org.meshtastic.proto.HardwareMessage
 import org.meshtastic.proto.HostMetrics
 import org.meshtastic.proto.LocalConfig
@@ -63,6 +66,7 @@ import org.meshtastic.proto.ToRadio
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.hours
+import kotlin.uuid.Uuid
 import org.meshtastic.proto.Position as ProtoPosition
 
 @Suppress("TooManyFunctions", "CyclomaticComplexMethod", "LongParameterList")
@@ -74,6 +78,7 @@ class CommandSenderImpl(
     private val tracerouteHandler: TracerouteHandler,
     private val neighborInfoHandler: NeighborInfoHandler,
     private val sessionManager: SessionManager,
+    private val meshLogRepository: MeshLogRepository,
     @Named("ServiceScope") private val scope: CoroutineScope,
 ) : CommandSender {
     private val currentPacketId = atomic(Random(nowMillis).nextLong().absoluteValue)
@@ -394,21 +399,55 @@ class CommandSenderImpl(
                         )
                     }
 
-            // Send the neighbor info from our connected radio to ourselves (simulated)
-            packetHandler.sendToRadio(
-                buildMeshPacket(
+            // Requesting NeighborInfo from ourself never gets a real over-the-air round trip — the locally
+            // connected radio doesn't answer its own protocol requests back through the interface. So instead of
+            // sending anything to the radio, synthesize both the outgoing "request" and its "response" directly as
+            // MeshLog entries, with the response's request_id pointing back at the request — exactly the shape a
+            // real remote request/response pair takes. This lets NeighborInfoLogScreen's existing matching logic
+            // (looking up a result by request_id) pick it up correctly, instead of showing an unanswered request.
+            val requestPacket =
+                MeshPacket(
+                    from = myNum,
                     to = destNum,
-                    wantAck = true,
                     id = requestId,
-                    channel = getChannelIndex(destNum),
+                    decoded = Data(portnum = PortNum.NEIGHBORINFO_APP, want_response = true, dest = destNum),
+                )
+            val responsePacket =
+                MeshPacket(
+                    from = myNum,
+                    to = destNum,
+                    id = generatePacketId(),
                     decoded =
                     Data(
                         portnum = PortNum.NEIGHBORINFO_APP,
+                        request_id = requestId,
                         payload = neighborInfoToSend.encode().toByteString(),
-                        want_response = true,
                     ),
+                )
+
+            meshLogRepository.insert(
+                MeshLog(
+                    uuid = Uuid.random().toString(),
+                    message_type = "Packet",
+                    received_date = nowMillis,
+                    raw_message = requestPacket.toString(),
+                    fromNum = MeshLog.NODE_NUM_LOCAL,
+                    portNum = PortNum.NEIGHBORINFO_APP.value,
+                    fromRadio = FromRadio(packet = requestPacket),
                 ),
             )
+            meshLogRepository.insert(
+                MeshLog(
+                    uuid = Uuid.random().toString(),
+                    message_type = "Packet",
+                    received_date = nowMillis,
+                    raw_message = responsePacket.toString(),
+                    fromNum = MeshLog.NODE_NUM_LOCAL,
+                    portNum = PortNum.NEIGHBORINFO_APP.value,
+                    fromRadio = FromRadio(packet = responsePacket),
+                ),
+            )
+            neighborInfoHandler.handleNeighborInfo(responsePacket)
         } else {
             // Send request to remote
             packetHandler.sendToRadio(

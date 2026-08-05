@@ -67,6 +67,8 @@ import org.meshtastic.core.resources.channel_invalid
 import org.meshtastic.core.service.MeshService
 import org.meshtastic.core.service.ServiceStartTrigger
 import org.meshtastic.core.service.startService
+import org.meshtastic.core.ui.component.NarrowBandWarningDialog
+import org.meshtastic.core.ui.component.RegionWarningDialog
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.EventFontResolver
 import org.meshtastic.core.ui.theme.EventTheme
@@ -160,6 +162,16 @@ class MainActivity : AppCompatActivity() {
 
                     if (appIntroCompleted) {
                         MainScreen()
+
+                        val showNarrowBandWarning by model.showNarrowBandWarning.collectAsStateWithLifecycle()
+                        if (showNarrowBandWarning) {
+                            NarrowBandWarningDialog(onClose = { model.dismissNarrowBandWarning() })
+                        }
+
+                        val showRegionWarning by model.showRegionWarning.collectAsStateWithLifecycle()
+                        if (showRegionWarning) {
+                            RegionWarningDialog(onClose = { model.dismissRegionWarning() })
+                        }
                     } else {
                         val introViewModel = koinViewModel<IntroViewModel>()
                         AppIntroductionScreen(onDone = { model.onAppIntroCompleted() }, viewModel = introViewModel)
@@ -187,6 +199,18 @@ class MainActivity : AppCompatActivity() {
         // before UsbRepository was constructed. Re-poll deviceList here so the UI reflects
         // reality without requiring the user to physically replug.
         usbRepository.refreshState()
+        // Foreground-only, throttled check for a wide (>200 kHz) LoRa channel — see UIViewModel.
+        model.checkNarrowBandWarningThrottled()
+        // Foreground-only check for entering the Świętokrzyskie region on a wide LoRa channel — see UIViewModel.
+        model.checkRegionWarningThrottled()
+        // Keeps re-checking the region every few minutes while in the foreground, in case the app is left open
+        // across an actual border crossing without ever triggering another onResume.
+        model.startPeriodicRegionCheck()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        model.stopPeriodicRegionCheck()
     }
 
     @Suppress("LongMethod")

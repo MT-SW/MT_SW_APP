@@ -21,10 +21,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation3.runtime.NavKey
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -38,24 +41,33 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.CommonUri
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.database.entity.asDeviceVersion
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.EventFirmwareEdition
 import org.meshtastic.core.model.MeshActivity
 import org.meshtastic.core.model.MyNodeInfo
+import org.meshtastic.core.model.RegionInfo
 import org.meshtastic.core.model.TracerouteMapAvailability
+import org.meshtastic.core.model.effectiveBandwidthKHz
 import org.meshtastic.core.model.evaluateTracerouteMapAvailability
+import org.meshtastic.core.model.geofence.GeofencePolygon
 import org.meshtastic.core.model.service.TracerouteResponse
 import org.meshtastic.core.model.util.dispatchMeshtasticUri
 import org.meshtastic.core.model.util.isOtaStatusNotification
+import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.navigation.DeepLinkRouter
 import org.meshtastic.core.repository.EventFirmwareRepository
 import org.meshtastic.core.repository.FirmwareReleaseRepository
 import org.meshtastic.core.repository.FirmwareUpdateStatusRepository
+import org.meshtastic.core.repository.LocationService
 import org.meshtastic.core.repository.LockdownCoordinator
 import org.meshtastic.core.repository.LockdownPassphraseStore
 import org.meshtastic.core.repository.MeshLogRepository
@@ -63,6 +75,7 @@ import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.NodeRestartTracker
 import org.meshtastic.core.repository.NotificationManager
 import org.meshtastic.core.repository.PacketRepository
+import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.ServiceRepository
@@ -76,6 +89,7 @@ import org.meshtastic.core.ui.util.ComposableContent
 import org.meshtastic.core.ui.util.SnackbarManager
 import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.ClientNotification
+import org.meshtastic.proto.LocalConfig
 import org.meshtastic.proto.SharedContact
 
 /**
@@ -99,6 +113,8 @@ class UIViewModel(
     private val firmwareUpdateStatusRepository: FirmwareUpdateStatusRepository,
     private val uiPrefs: UiPrefs,
     private val notificationManager: NotificationManager,
+    private val radioConfigRepository: RadioConfigRepository,
+    private val locationService: LocationService,
     packetRepository: PacketRepository,
     val alertManager: AlertManager,
     val snackbarManager: SnackbarManager,
@@ -355,8 +371,191 @@ class UIViewModel(
         uiPrefs.setAppIntroCompleted(true)
     }
 
+    /**
+     * Snapshot of the locally-connected radio's config, used to check its LoRa channel bandwidth. Started eagerly (not
+     * `stateInWhileSubscribed`) since [checkNarrowBandWarningThrottled] only ever reads [StateFlow.value] directly and
+     * never collects it — a lazily-started, subscriber-gated flow would never actually receive an update.
+     */
+    private val localConfig: StateFlow<LocalConfig> =
+        radioConfigRepository.localConfigFlow.stateIn(viewModelScope, SharingStarted.Eagerly, LocalConfig())
+
+    private val narrowBandWarningFlow = MutableStateFlow(false)
+
+    /** True when the narrow-band LoRa channel warning dialog should be shown. */
+    val showNarrowBandWarning: StateFlow<Boolean> = narrowBandWarningFlow.asStateFlow()
+
+    /**
+     * Checks the locally-connected radio's LoRa channel bandwidth on a foreground app-open/resume, throttled to at most
+     * once per [NARROW_BAND_WARNING_THROTTLE_MILLIS] so it surfaces roughly twice a day. Foreground-only by design — no
+     * background/WorkManager check. Unrelated to the unthrottled check shown every time remote admin is opened from
+     * Node Details.
+     */
+    fun checkNarrowBandWarningThrottled() {
+        val lora = localConfig.value.lora ?: return
+        val regionInfo = RegionInfo.fromRegionCode(lora.region)
+        if (lora.effectiveBandwidthKHz(regionInfo) <= NARROW_BAND_WARNING_THRESHOLD_KHZ) return
+
+        val now = nowMillis
+        if (now - uiPrefs.lastNarrowBandWarningShownMillis.value < NARROW_BAND_WARNING_THROTTLE_MILLIS) return
+
+        uiPrefs.setLastNarrowBandWarningShownMillis(now)
+        narrowBandWarningFlow.value = true
+    }
+
+    /** Dismisses the narrow-band warning dialog after its close button becomes enabled. */
+    fun dismissNarrowBandWarning() {
+        narrowBandWarningFlow.value = false
+    }
+
+    private val regionWarningFlow = MutableStateFlow(false)
+
+    /** True when the Świętokrzyskie region warning dialog should be shown. */
+    val showRegionWarning: StateFlow<Boolean> = regionWarningFlow.asStateFlow()
+
+    /**
+     * Checks (on a foreground app-open/resume) whether the phone is physically within the Świętokrzyskie region while
+     * the locally-connected radio's LoRa channel is wide (>200 kHz). Fires immediately, unthrottled, the moment a
+     * border crossing is detected (was outside, now inside); otherwise repeats at most ~2x/day, offset by
+     * [REGION_WARNING_OFFSET_FROM_NARROW_BAND_MILLIS] from the NarrowFast dialog's own throttle so the two don't show
+     * back-to-back. On trigger, navigates to the LoRa settings screen first so the preset picker is already on screen
+     * when the dialog appears.
+     */
+    fun checkRegionWarningThrottled() {
+        viewModelScope.launch { performRegionCheck() }
+    }
+
+    private suspend fun performRegionCheck() {
+        val lora = localConfig.value.lora ?: return
+        val regionInfo = RegionInfo.fromRegionCode(lora.region)
+        if (lora.effectiveBandwidthKHz(regionInfo) <= NARROW_BAND_WARNING_THRESHOLD_KHZ) return
+
+        val location = locationService.getCurrentLocation() ?: return
+        val isInside = SWIETOKRZYSKIE_REGION.contains(location.latitude, location.longitude)
+        val wasInside = uiPrefs.wasInsideSwietokrzyskieRegion.value
+        if (isInside != wasInside) uiPrefs.setWasInsideSwietokrzyskieRegion(isInside)
+        if (!isInside) return
+
+        val now = nowMillis
+        val justCrossed = !wasInside
+        val periodicDue = now - uiPrefs.lastRegionWarningShownMillis.value >= REGION_WARNING_THROTTLE_MILLIS
+        val clearOfNarrowBand =
+            now - uiPrefs.lastNarrowBandWarningShownMillis.value >= REGION_WARNING_OFFSET_FROM_NARROW_BAND_MILLIS
+
+        if (justCrossed || (periodicDue && clearOfNarrowBand)) {
+            uiPrefs.setLastRegionWarningShownMillis(now)
+            handleDeepLink(CommonUri.parse("$DEEP_LINK_BASE_URI/lora"))
+            regionWarningFlow.value = true
+        }
+    }
+
+    /** Dismisses the region warning dialog after its close button becomes enabled. */
+    fun dismissRegionWarning() {
+        regionWarningFlow.value = false
+    }
+
+    private var periodicRegionCheckJob: Job? = null
+
+    /**
+     * Starts re-checking the region every [REGION_CHECK_INTERVAL_MILLIS] while the app is in the foreground, so a
+     * border crossing is caught even if the user never leaves/reopens the app (i.e. no `onResume` ever fires again on
+     * its own). Call from `onResume`/`onStart`; pair with [stopPeriodicRegionCheck] on pause/stop so this never runs
+     * while backgrounded.
+     */
+    fun startPeriodicRegionCheck() {
+        if (periodicRegionCheckJob?.isActive == true) return
+        periodicRegionCheckJob =
+            viewModelScope.launch {
+                while (isActive) {
+                    performRegionCheck()
+                    delay(REGION_CHECK_INTERVAL_MILLIS)
+                }
+            }
+    }
+
+    /** Stops the periodic foreground re-check; call when the app leaves the foreground. */
+    fun stopPeriodicRegionCheck() {
+        periodicRegionCheckJob?.cancel()
+        periodicRegionCheckJob = null
+    }
+
     companion object {
         private const val DEFAULT_BOOT_TTL = LockdownPassphraseStore.DEFAULT_BOOTS
+        private const val NARROW_BAND_WARNING_THRESHOLD_KHZ = 200f
+
+        /** ~12h throttle → the foreground check can fire at most twice in a 24h period. */
+        private const val NARROW_BAND_WARNING_THROTTLE_MILLIS = 12 * 60 * 60 * 1000L
+
+        /**
+         * Simplified border polygon for Świętokrzyskie voivodeship (52 vertices, Douglas-Peucker simplified from the
+         * ppatrzyk/polska-geojson dataset) — (lat, lon) pairs, connects back to the first vertex.
+         */
+        @Suppress("MagicNumber")
+        private val SWIETOKRZYSKIE_REGION =
+            GeofencePolygon(
+                listOf(
+                    50.8660 to 19.7471,
+                    50.9357 to 19.8488,
+                    51.0469 to 19.8752,
+                    50.9726 to 20.0356,
+                    51.0577 to 20.0562,
+                    51.0731 to 19.9818,
+                    51.1647 to 20.0258,
+                    51.1840 to 19.9941,
+                    51.2013 to 20.2324,
+                    51.2588 to 20.2605,
+                    51.2366 to 20.3711,
+                    51.3105 to 20.3644,
+                    51.3394 to 20.4328,
+                    51.3314 to 20.5072,
+                    51.2304 to 20.5460,
+                    51.1960 to 20.7003,
+                    51.1490 to 20.6974,
+                    51.1544 to 20.8798,
+                    51.1953 to 20.9207,
+                    51.1445 to 20.9985,
+                    51.1571 to 21.0566,
+                    51.2114 to 21.0700,
+                    51.1887 to 21.1199,
+                    51.1551 to 21.0912,
+                    51.0803 to 21.1528,
+                    51.0853 to 21.3555,
+                    51.0131 to 21.4636,
+                    51.0590 to 21.5291,
+                    51.0780 to 21.6763,
+                    51.0374 to 21.7521,
+                    51.0721 to 21.8030,
+                    50.8136 to 21.8690,
+                    50.6451 to 21.7801,
+                    50.6454 to 21.7226,
+                    50.5212 to 21.6040,
+                    50.4941 to 21.4541,
+                    50.3298 to 21.1766,
+                    50.2896 to 20.7899,
+                    50.1866 to 20.5724,
+                    50.2160 to 20.3746,
+                    50.2415 to 20.3975,
+                    50.3280 to 20.2925,
+                    50.3623 to 20.3372,
+                    50.4894 to 20.2205,
+                    50.5545 to 19.7887,
+                    50.6394 to 19.9222,
+                    50.6514 to 19.8352,
+                    50.6930 to 19.8717,
+                    50.7254 to 19.8108,
+                    50.7292 to 19.7129,
+                    50.8250 to 19.8257,
+                    50.8660 to 19.7471,
+                ),
+            )
+
+        /** ~12h throttle → the periodic region reminder can also fire at most twice in a 24h period. */
+        private const val REGION_WARNING_THROTTLE_MILLIS = 12 * 60 * 60 * 1000L
+
+        /** Minimum gap kept between the NarrowFast dialog and the periodic region reminder (not the crossing one). */
+        private const val REGION_WARNING_OFFSET_FROM_NARROW_BAND_MILLIS = 90 * 60 * 1000L // 1.5h
+
+        /** How often the region is re-checked while the app stays in the foreground without a resume/pause cycle. */
+        private const val REGION_CHECK_INTERVAL_MILLIS = 5 * 60 * 1000L // 5 minutes
     }
 }
 

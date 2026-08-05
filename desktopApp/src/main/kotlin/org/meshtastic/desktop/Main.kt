@@ -363,7 +363,7 @@ private fun ApplicationScope.MeshtasticWindow(
 
     Window(
         onCloseRequest = onCloseRequest,
-        title = "Meshtastic Desktop",
+        title = "Meshtastic_S+",
         icon = appIcon,
         state = windowState,
         visible = visible,

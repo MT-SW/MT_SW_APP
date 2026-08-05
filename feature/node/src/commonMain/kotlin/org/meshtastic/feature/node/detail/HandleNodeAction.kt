@@ -54,6 +54,8 @@ internal fun handleNodeAction(
 
         is NodeDetailAction.ReadGpio -> viewModel.readGpio(action.destNum, action.gpioMask)
 
+        is NodeDetailAction.SendQuickMessage -> viewModel.sendQuickMessage(action.node, action.text)
+
         is NodeDetailAction.HandleNodeMenuAction -> {
             when (val menuAction = action.action) {
                 is NodeMenuAction.DirectMessage -> {

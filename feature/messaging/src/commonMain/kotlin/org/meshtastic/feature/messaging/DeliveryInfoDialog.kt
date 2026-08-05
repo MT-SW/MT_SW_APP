@@ -41,6 +41,7 @@ fun DeliveryInfo(
     resendOption: Boolean,
     text: StringResource? = null,
     relays: Int = 0,
+    relayNodeNames: List<String> = emptyList(),
     onConfirm: (() -> Unit) = {},
     onDismiss: () -> Unit = {},
 ) = MeshtasticDialog(
@@ -65,6 +66,15 @@ fun DeliveryInfo(
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyMedium,
                 )
+                if (relayNodeNames.isNotEmpty()) {
+                    Text(
+                        text = relayNodeNames.joinToString(", "),
+                        modifier = Modifier.padding(top = 2.dp),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
     },

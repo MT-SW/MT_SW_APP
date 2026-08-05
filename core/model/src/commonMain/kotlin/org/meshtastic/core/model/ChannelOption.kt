@@ -66,6 +66,16 @@ private fun LoRaConfig.bandwidth(regionInfo: RegionInfo?) = if (use_preset) {
     }
 }
 
+/**
+ * Effective RF channel bandwidth in kHz for this LoRa configuration, honoring [LoRaConfig.use_preset] vs a custom
+ * [LoRaConfig.bandwidth] value and the region's wide-LoRa scaling factor.
+ *
+ * Used to warn users running a wide channel (> 200 kHz, e.g. the 250 kHz Long/Medium/Short presets) that a Narrow
+ * preset (62.5 kHz) would be more resilient to interference and reflections, and allows 4 independent networks on the
+ * band instead of 1.
+ */
+fun LoRaConfig.effectiveBandwidthKHz(regionInfo: RegionInfo?): Float = bandwidth(regionInfo) * 1000f
+
 val LoRaConfig.numChannels: Int
     get() {
         val regionInfo = RegionInfo.fromRegionCode(region)

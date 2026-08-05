@@ -16,22 +16,30 @@
  */
 package org.meshtastic.feature.messaging.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
@@ -45,8 +53,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
@@ -57,12 +69,20 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
+import coil3.compose.LocalPlatformContext
+import coil3.request.ImageRequest
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.meshtastic.core.model.Message
 import org.meshtastic.core.model.MessageStatus
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.Reaction
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.a11y_message_from
 import org.meshtastic.core.resources.action_show_message_status
@@ -82,6 +102,7 @@ import org.meshtastic.core.ui.component.TransportIcon
 import org.meshtastic.core.ui.component.nodeBorderStroke
 import org.meshtastic.core.ui.component.nodeTintedContainer
 import org.meshtastic.core.ui.emoji.EmojiPickerDialog
+import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.FormatQuote
 import org.meshtastic.core.ui.icon.HopCount
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -91,6 +112,19 @@ import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
 import org.meshtastic.core.ui.util.createClipEntry
 
 internal const val MESSAGE_STATUS_LABEL_TEST_TAG = "message_status_label"
+
+/**
+ * Matches the first URL in a message. Many image hosts (CDN proxies/resizers) don't put a literal file extension at the
+ * end of the URL, so this deliberately does NOT filter by extension — instead every link is speculatively tried as an
+ * image and the preview is hidden on load failure (see the `onError` callback below).
+ */
+private val FIRST_URL_REGEX =
+    Regex(
+        """(?:https?://|www\.)[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&//=]*)""",
+        RegexOption.IGNORE_CASE,
+    )
+
+private fun firstUrl(text: String): String? = FIRST_URL_REGEX.find(text)?.value
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("LongMethod", "CyclomaticComplexMethod")
@@ -115,6 +149,7 @@ fun MessageItem(
     onDelete: () -> Unit = {},
     onClickChip: (Node) -> Unit = {},
     resolveMention: (String) -> Node? = { null },
+    relayNodeName: String? = null,
     onNavigateToOriginalMessage: (Int) -> Unit = {},
     onStatusClick: () -> Unit = {},
     hasSamePrev: Boolean = false,
@@ -139,6 +174,7 @@ fun MessageItem(
         ),
 ) {
     var activeSheet by remember { mutableStateOf<ActiveSheet?>(null) }
+    var fullScreenImageUrl by remember { mutableStateOf<String?>(null) }
     val clipboardManager = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -214,6 +250,10 @@ fun MessageItem(
                 null -> {}
             }
         }
+    }
+
+    fullScreenImageUrl?.let { url ->
+        FullScreenImageViewer(imageUrl = url, onDismiss = { fullScreenImageUrl = null })
     }
 
     val containsBel = message.text.contains('\u0007')
@@ -340,6 +380,22 @@ fun MessageItem(
                     )
                 }
 
+                val linkUrl = remember(message.text) { firstUrl(message.text) }
+                val autoLoadChatImages by koinInject<UiPrefs>().autoLoadChatImages.collectAsStateWithLifecycle()
+                var linkImageFailed by remember(linkUrl) { mutableStateOf(false) }
+                if (linkUrl != null && autoLoadChatImages && !linkImageFailed) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalPlatformContext.current).data(linkUrl).build(),
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                        onError = { linkImageFailed = true },
+                        modifier =
+                        Modifier.padding(top = 8.dp).fillMaxWidth().heightIn(max = 240.dp).clickable {
+                            fullScreenImageUrl = linkUrl
+                        },
+                    )
+                }
+
                 Row(
                     modifier = Modifier.padding(top = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -378,6 +434,13 @@ fun MessageItem(
                                     style = metadataStyle,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
+                                if (relayNodeName != null) {
+                                    Text(
+                                        text = "via $relayNodeName",
+                                        style = metadataStyle,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
                             }
                         }
                     }
@@ -541,6 +604,52 @@ private fun OriginalMessageSnippet(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
+            }
+        }
+    }
+}
+
+/** Full-screen, dark-backdrop viewer for a chat image — tap the image, the close button, or outside to dismiss. */
+@Composable
+private fun FullScreenImageViewer(imageUrl: String, onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        var scale by remember(imageUrl) { mutableStateOf(1f) }
+        var offset by remember(imageUrl) { mutableStateOf(Offset.Zero) }
+        Box(
+            modifier =
+            Modifier.fillMaxSize()
+                .background(Color.Black)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onDismiss,
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalPlatformContext.current).data(imageUrl).build(),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier =
+                Modifier.fillMaxSize()
+                    .graphicsLayer(scaleX = scale, scaleY = scale, translationX = offset.x, translationY = offset.y)
+                    .pointerInput(imageUrl) {
+                        detectTransformGestures { _, pan, zoom, _ ->
+                            scale = (scale * zoom).coerceIn(1f, 5f)
+                            offset = if (scale > 1f) offset + pan else Offset.Zero
+                        }
+                    }
+                    .pointerInput(imageUrl) {
+                        detectTapGestures(
+                            onDoubleTap = {
+                                scale = 1f
+                                offset = Offset.Zero
+                            },
+                        )
+                    },
+            )
+            IconButton(onClick = onDismiss, modifier = Modifier.align(Alignment.TopEnd).padding(16.dp)) {
+                Icon(imageVector = MeshtasticIcons.Close, contentDescription = "Zamknij", tint = Color.White)
             }
         }
     }

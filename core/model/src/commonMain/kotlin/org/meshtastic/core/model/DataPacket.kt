@@ -57,6 +57,7 @@ data class DataPacket(
     var replyId: Int? = null, // If this is a reply to a previous message, this is the ID of that message
     var relayNode: Int? = null,
     var relays: Int = 0,
+    var relayNodes: List<Int> = emptyList(),
     var viaMqtt: Boolean = false, // True if this packet passed via MQTT somewhere along its path
     var emoji: Int = 0,
     @Serializable(with = ByteStringSerializer::class) var sfppHash: ByteString? = null,

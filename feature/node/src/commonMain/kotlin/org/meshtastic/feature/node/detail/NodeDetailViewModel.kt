@@ -23,24 +23,30 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.domain.usecase.session.EnsureRemoteAdminSessionUseCase
 import org.meshtastic.core.domain.usecase.session.EnsureSessionResult
 import org.meshtastic.core.domain.usecase.session.ObserveRemoteAdminSessionStatusUseCase
+import org.meshtastic.core.model.DataPacket
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
+import org.meshtastic.core.model.RegionInfo
 import org.meshtastic.core.model.SessionStatus
+import org.meshtastic.core.model.effectiveBandwidthKHz
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.repository.QueryController
+import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.UiText
@@ -58,6 +64,7 @@ import org.meshtastic.feature.node.domain.usecase.GetNodeDetailsUseCase
 import org.meshtastic.feature.node.metrics.EnvironmentMetricsState
 import org.meshtastic.feature.node.model.LogsType
 import org.meshtastic.feature.node.model.MetricsState
+import org.meshtastic.proto.LocalConfig
 
 /** UI state for the Node Details screen. */
 @androidx.compose.runtime.Stable
@@ -72,6 +79,7 @@ data class NodeDetailUiState(
     val lastRequestNeighborsTime: Long? = null,
     val sessionStatus: SessionStatus = SessionStatus.NoSession,
     val isEnsuringSession: Boolean = false,
+    val showNarrowBandWarning: Boolean = false,
 )
 
 internal object NodeDetailUiTextResolver {
@@ -94,6 +102,7 @@ class NodeDetailViewModel(
     private val ensureRemoteAdminSession: EnsureRemoteAdminSessionUseCase,
     private val observeRemoteAdminSessionStatus: ObserveRemoteAdminSessionStatusUseCase,
     private val snackbarManager: SnackbarManager,
+    private val radioConfigRepository: RadioConfigRepository,
 ) : ViewModel() {
 
     private val nodeIdFromRoute: Int? = savedStateHandle.get<Int>("destNum")
@@ -104,6 +113,16 @@ class NodeDetailViewModel(
             .distinctUntilChanged()
 
     private val isEnsuringSession = MutableStateFlow(false)
+
+    /**
+     * Snapshot of the locally-connected radio's config, used to check its LoRa channel bandwidth. Started eagerly (not
+     * `stateInWhileSubscribed`) since [checkNarrowBandWarning] only ever reads [StateFlow.value] directly and never
+     * collects it — a lazily-started, subscriber-gated flow would never actually receive an update.
+     */
+    private val localConfig: StateFlow<LocalConfig> =
+        radioConfigRepository.localConfigFlow.stateIn(viewModelScope, SharingStarted.Eagerly, LocalConfig())
+
+    private val narrowBandWarningFlow = MutableStateFlow(false)
 
     private val sessionStatusFlow =
         activeNodeId.flatMapLatest { nodeId ->
@@ -121,12 +140,17 @@ class NodeDetailViewModel(
                 if (nodeId == null) {
                     flowOf(NodeDetailUiState())
                 } else {
-                    combine(getNodeDetailsUseCase(nodeId), sessionStatusFlow, isEnsuringSession) {
-                            base,
-                            sessionStatus,
-                            ensuring,
-                        ->
-                        base.copy(sessionStatus = sessionStatus, isEnsuringSession = ensuring)
+                    combine(
+                        getNodeDetailsUseCase(nodeId),
+                        sessionStatusFlow,
+                        isEnsuringSession,
+                        narrowBandWarningFlow,
+                    ) { base, sessionStatus, ensuring, showNarrowBandWarning ->
+                        base.copy(
+                            sessionStatus = sessionStatus,
+                            isEnsuringSession = ensuring,
+                            showNarrowBandWarning = showNarrowBandWarning,
+                        )
                     }
                 }
             }
@@ -191,6 +215,18 @@ class NodeDetailViewModel(
         }
     }
 
+    /**
+     * Sends a preset quick command (e.g. "/ping") as a private message to [node]. Prefers the PKI-encrypted channel
+     * when we've exchanged a valid public key with [node] ([Node.hasPKC] && ![Node.mismatchKey]); otherwise falls back
+     * to [node]'s regular channel.
+     */
+    fun sendQuickMessage(node: Node, text: String) {
+        viewModelScope.launch {
+            val channel = if (node.hasPKC && !node.mismatchKey) NodeAddress.PKC_CHANNEL_INDEX else node.channel
+            radioController.sendMessage(DataPacket(to = node.user.id, channel = channel, text = text))
+        }
+    }
+
     /** Shows a snackbar confirming (or not) mesh delivery for a remote favorite/ignore command. */
     private suspend fun showRemoteCommandResult(delivered: Boolean) {
         val messageRes = if (delivered) Res.string.delivery_confirmed else Res.string.remote_command_no_response
@@ -248,6 +284,7 @@ class NodeDetailViewModel(
      * snackbar with the appropriate guidance on [EnsureSessionResult.Disconnected] or [EnsureSessionResult.Timeout].
      */
     fun openRemoteAdmin(destNum: Int) {
+        checkNarrowBandWarning()
         // Atomic check-and-flip prevents a double-tap from queuing two passkey exchanges + two navigation events.
         if (!isEnsuringSession.compareAndSet(expect = false, update = true)) return
         viewModelScope.launch {
@@ -273,6 +310,23 @@ class NodeDetailViewModel(
         }
     }
 
+    /**
+     * Shows [NodeDetailUiState.showNarrowBandWarning] if the locally-connected radio's current LoRa channel bandwidth
+     * exceeds [NARROW_BAND_WARNING_THRESHOLD_KHZ] — unthrottled, shown every time remote admin is opened.
+     */
+    private fun checkNarrowBandWarning() {
+        val lora = localConfig.value.lora ?: return
+        val regionInfo = RegionInfo.fromRegionCode(lora.region)
+        if (lora.effectiveBandwidthKHz(regionInfo) > NARROW_BAND_WARNING_THRESHOLD_KHZ) {
+            narrowBandWarningFlow.value = true
+        }
+    }
+
+    /** Dismisses the narrow-band warning dialog after its close button becomes enabled. */
+    fun dismissNarrowBandWarning() {
+        narrowBandWarningFlow.value = false
+    }
+
     fun setNodeNotes(nodeNum: Int, notes: String) {
         viewModelScope.launch { nodeManagementActions.setNodeNotes(nodeNum, notes) }
     }
@@ -282,5 +336,10 @@ class NodeDetailViewModel(
         val hasPKC = ourNode?.hasPKC == true && node.hasPKC
         val channel = if (hasPKC) NodeAddress.PKC_CHANNEL_INDEX else node.channel
         return "${channel}${node.user.id}"
+    }
+
+    private companion object {
+        /** LoRa channel bandwidths above this are considered "wide" (the 250 kHz Long/Medium/Short presets). */
+        const val NARROW_BAND_WARNING_THRESHOLD_KHZ = 200f
     }
 }

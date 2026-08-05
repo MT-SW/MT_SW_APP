@@ -65,6 +65,38 @@ import org.meshtastic.feature.messaging.component.UnreadMessagesDivider
 import kotlin.math.abs
 
 private const val HEX_RADIX = 16
+private const val RELAY_NODE_SUFFIX_MASK = 0xFF
+
+/**
+ * relay_node on the wire is only the last byte of the relaying node's id — match candidates by that suffix and, if more
+ * than one node shares it, prefer the one fewest hops away. Mirrors Packet.getRelayNode (core/database), reimplemented
+ * here since this module doesn't depend on that one. Returns the short name, or null if unresolved.
+ */
+private fun resolveRelayNodeName(message: Message, nodeMap: Map<Int, Node>, ourNode: Node?): String? {
+    val relayId = message.relayNode
+    if (relayId == null || relayId == 0) return null
+    val suffix = relayId and RELAY_NODE_SUFFIX_MASK
+    return nodeMap.values
+        .filter { it.num != ourNode?.num && it.lastHeard != 0 && (it.num and RELAY_NODE_SUFFIX_MASK) == suffix }
+        .minByOrNull { it.hopsAway }
+        ?.user
+        ?.short_name
+}
+
+/**
+ * Same suffix-matching logic as [resolveRelayNodeName], applied to every id in [Message.relayNodes] instead of the
+ * single legacy [Message.relayNode]. Returns short names for every relay we could resolve; ids we couldn't match
+ * (unknown node) are silently dropped from the list.
+ */
+private fun resolveRelayNodeNames(message: Message, nodeMap: Map<Int, Node>, ourNode: Node?): List<String> =
+    message.relayNodes.mapNotNull { relayId ->
+        val suffix = relayId and RELAY_NODE_SUFFIX_MASK
+        nodeMap.values
+            .filter { it.num != ourNode?.num && it.lastHeard != 0 && (it.num and RELAY_NODE_SUFFIX_MASK) == suffix }
+            .minByOrNull { it.hopsAway }
+            ?.user
+            ?.short_name
+    }
 
 /**
  * Messages merge into one visual group only when they are from the same sender AND close in time. The group header
@@ -131,10 +163,13 @@ internal fun MessageListPaged(
 
     var showStatusDialog by remember { mutableStateOf<Message?>(null) }
     showStatusDialog?.let { message ->
+        val relayNodeNames =
+            remember(nodeMap, message.relayNodes) { resolveRelayNodeNames(message, nodeMap, state.ourNode) }
         MessageStatusDialog(
             message = message,
             isDirectMessage = isDirectMessageConversation,
             resendOption = message.isStatusRetryable(isDirectMessageConversation),
+            relayNodeNames = relayNodeNames,
             onResend = {
                 handlers.onDeleteMessages(listOf(message.uuid))
                 handlers.onSendMessage(message.text, state.contactKey)
@@ -340,6 +375,9 @@ private fun RenderPagedChatMessageRow(
     val resolveMention: (String) -> Node? =
         remember(nodeMap) { { id -> id.removePrefix("!").toLongOrNull(HEX_RADIX)?.toInt()?.let { nodeMap[it] } } }
 
+    val relayNodeName: String? =
+        remember(nodeMap, message.relayNode) { resolveRelayNodeName(message, nodeMap, ourNode) }
+
     MessageItem(
         modifier = modifier,
         node = node,
@@ -358,6 +396,7 @@ private fun RenderPagedChatMessageRow(
         onDelete = { handlers.onDeleteMessages(listOf(message.uuid)) },
         onClickChip = handlers.onClickChip,
         resolveMention = resolveMention,
+        relayNodeName = relayNodeName,
         onStatusClick = { onShowStatusDialog(message) },
         onReply = { handlers.onReply(message) },
         emojis = message.emojis,

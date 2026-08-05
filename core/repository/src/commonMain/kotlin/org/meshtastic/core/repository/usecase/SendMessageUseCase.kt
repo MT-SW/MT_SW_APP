@@ -19,18 +19,15 @@ package org.meshtastic.core.repository.usecase
 import co.touchlab.kermit.Logger
 import org.meshtastic.core.common.util.HomoglyphCharacterStringTransformer
 import org.meshtastic.core.common.util.nowMillis
-import org.meshtastic.core.model.Capabilities
 import org.meshtastic.core.model.ContactKey
 import org.meshtastic.core.model.DataPacket
 import org.meshtastic.core.model.MessageStatus
-import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.repository.HomoglyphPrefs
 import org.meshtastic.core.repository.MessageQueue
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioController
-import org.meshtastic.proto.Config
 import kotlin.random.Random
 
 /**
@@ -78,29 +75,7 @@ class SendMessageUseCaseImpl(
         val ourNode = nodeRepository.ourNodeInfo.value
         val fromId = ourNode?.user?.id ?: NodeAddress.ID_LOCAL
 
-        // Direct message side-effects: share the contact's public key (PKI) or
-        // favorite the node (legacy) before sending the first message.  PKI DMs use
-        // channel == PKC_CHANNEL_INDEX (8); legacy DMs have no channel prefix
-        // (channel == null).  Both formats target a specific node.
-        val isDirectMessage = channel == null || channel == NodeAddress.PKC_CHANNEL_INDEX
-        if (isDirectMessage) {
-            val destNode = nodeRepository.getNode(dest)
-            val fwVersion = ourNode?.metadata?.firmware_version
-            val isClientBase = ourNode?.user?.role == Config.DeviceConfig.Role.CLIENT_BASE
-            val capabilities = Capabilities(fwVersion)
-
-            if (capabilities.canSendVerifiedContacts) {
-                // Best-effort: inform firmware of the destination's public key
-                // for its NodeDB cache.  The MeshPacket itself carries the key
-                // directly, so the message can be encrypted regardless.
-                sendSharedContact(destNode)
-            } else if (channel == null) {
-                // Legacy favoriting only applies to old-style DMs without PKI
-                if (!destNode.isFavorite && !isClientBase) {
-                    favoriteNode(destNode)
-                }
-            }
-        }
+        // Auto-share-contact / auto-favorite on DM celowo wyłączone (fork MT-SW)
 
         // Apply homoglyph encoding
         val finalMessageText =
@@ -136,24 +111,5 @@ class SendMessageUseCaseImpl(
         }
 
         return packetId
-    }
-
-    private suspend fun favoriteNode(node: Node) {
-        try {
-            radioController.setFavorite(node.num, favorite = true)
-        } catch (ex: Exception) {
-            Logger.e(ex) { "Favorite node error" }
-        }
-    }
-
-    private suspend fun sendSharedContact(node: Node) {
-        try {
-            val accepted = radioController.sendSharedContact(node.num)
-            if (!accepted) {
-                Logger.w { "Shared contact for node ${node.num} was not acknowledged by the radio" }
-            }
-        } catch (ex: Exception) {
-            Logger.e(ex) { "Send shared contact error" }
-        }
     }
 }
