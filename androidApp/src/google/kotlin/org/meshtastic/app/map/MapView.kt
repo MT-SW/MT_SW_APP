@@ -988,6 +988,9 @@ fun MapView(
     LaunchedEffect(sitePlannerRequest) {
         sitePlannerRequest?.let { node ->
             sitePlannerInitial = node.toSitePlannerParams(channelSet)
+            if (node.validPosition != null) {
+                cameraPositionState.animate(CameraUpdateFactory.newLatLng(LatLng(node.latitude, node.longitude)))
+            }
             mapViewModel.consumeSitePlannerRequest()
         }
     }
@@ -1438,7 +1441,9 @@ private fun parseMapLayer(layerType: LayerType, stream: InputStream): DataLayer?
         kml.toLayer()
     }
 
-    LayerType.GEOJSON -> GeoJsonParser().parse(stream)?.toLayer()?.applySimpleStyleSpec()
+    LayerType.GEOJSON,
+    LayerType.COVERAGE,
+    -> GeoJsonParser().parse(stream)?.toLayer()?.applySimpleStyleSpec()
 }
 
 /**

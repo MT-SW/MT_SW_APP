@@ -26,7 +26,7 @@ On Android, your measurement preferences are determined by your system **Languag
 
 Temperature values from environment sensors are transmitted as **°C** and displayed based on your device's temperature unit preference.
 
-![Environment metrics with temperature](../../assets/screenshots/nodes_environment_metrics.png)
+![Keskkonna mõõdikud koos temperatuuriga](../../assets/screenshots/nodes_environment_metrics.png)
 
 | Sinu sätted | Teadmiseks |
 | ----------- | ---------- |
@@ -37,9 +37,9 @@ This affects all temperature displays throughout the app: node environment telem
 
 ## Distance & Altitude
 
-Distances between nodes and GPS altitudes are transmitted as **meters** and automatically scaled and converted.
+Sõlmede vahelised kaugused ja GPS kõrgused edastatakse **meetrites** ning skaleeritakse ja teisendatakse automaatselt.
 
-![Distance info display](../../assets/screenshots/nodes_distance_info.png)
+![Vahemaa info kuvamine](../../assets/screenshots/nodes_distance_info.png)
 
 | Sinu sätted                      | Small Distance | Large Distance         | Kõrgus   |
 | -------------------------------- | -------------- | ---------------------- | -------- |
@@ -93,7 +93,7 @@ Mõned ühikud on rahvusvahelised standardid ja neid kuvatakse ühtemoodi olenem
 | Baromeetrii rõhk            | hPa                            | International meteorological standard |
 | Heading / bearing           | ° (degrees) | Universal navigation convention       |
 | Radiatsioon                 | μR/hr                          | Standard dosimetry unit               |
-| GPS coordinates             | decimal degrees                | Universal geographic standard         |
+| GPS koordinaadid            | decimal degrees                | Universal geographic standard         |
 | Niiskus, aku, mulla niiskus | %                              | Universal                             |
 
 ## Date & Time

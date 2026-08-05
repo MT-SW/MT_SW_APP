@@ -848,6 +848,12 @@ last_position_update
 latest_alpha_firmware
 latest_stable_firmware
 latitude
+### LAYER ###
+layer_subtitle
+layer_type_coverage
+layer_type_geojson
+layer_type_kml
+layer_type_network
 learn_more
 led_heartbeat
 led_state
@@ -1609,6 +1615,8 @@ tak_server_enabled
 tak_server_enabled_desc
 tak_server_export_data_package_desc
 tak_server_loading
+tak_server_mesh_to_cot
+tak_server_mesh_to_cot_desc
 tak_server_section
 tak_server_test_card_title
 tak_server_test_idle

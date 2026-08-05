@@ -52,7 +52,6 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.discovery_interrupted_scan_restored
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.service.worker.MeshLogCleanupWorker
-import org.meshtastic.core.service.worker.NodeMetricsHistoryCleanupWorker
 import org.meshtastic.feature.discovery.DiscoveryScanEngine
 import org.meshtastic.feature.widget.LocalStatsWidgetReceiver
 import kotlin.time.Duration.Companion.hours
@@ -86,9 +85,6 @@ open class MeshUtilApplication :
 
         // Schedule periodic MeshLog cleanup
         scheduleMeshLogCleanup()
-
-        // Schedule periodic NodeMetricsHistory cleanup
-        scheduleNodeMetricsHistoryCleanup()
 
         // Generate and publish widget preview for Android 15+ widget picker
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
@@ -167,19 +163,6 @@ open class MeshUtilApplication :
         WorkManager.getInstance(this)
             .enqueueUniquePeriodicWork(
                 MeshLogCleanupWorker.WORK_NAME,
-                ExistingPeriodicWorkPolicy.UPDATE,
-                cleanupRequest,
-            )
-    }
-
-    private fun scheduleNodeMetricsHistoryCleanup() {
-        val cleanupRequest =
-            PeriodicWorkRequestBuilder<NodeMetricsHistoryCleanupWorker>(repeatInterval = 24.hours.toJavaDuration())
-                .build()
-
-        WorkManager.getInstance(this)
-            .enqueueUniquePeriodicWork(
-                NodeMetricsHistoryCleanupWorker.WORK_NAME,
                 ExistingPeriodicWorkPolicy.UPDATE,
                 cleanupRequest,
             )

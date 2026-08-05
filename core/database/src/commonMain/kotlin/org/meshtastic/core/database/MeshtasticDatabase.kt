@@ -34,7 +34,6 @@ import org.meshtastic.core.database.dao.FirmwareReleaseDao
 import org.meshtastic.core.database.dao.MergeMarkerDao
 import org.meshtastic.core.database.dao.MeshLogDao
 import org.meshtastic.core.database.dao.NodeInfoDao
-import org.meshtastic.core.database.dao.NodeMetricsHistoryDao
 import org.meshtastic.core.database.dao.PacketDao
 import org.meshtastic.core.database.dao.QuickChatActionDao
 import org.meshtastic.core.database.dao.TracerouteNodePositionDao
@@ -52,7 +51,6 @@ import org.meshtastic.core.database.entity.MeshLog
 import org.meshtastic.core.database.entity.MetadataEntity
 import org.meshtastic.core.database.entity.MyNodeEntity
 import org.meshtastic.core.database.entity.NodeEntity
-import org.meshtastic.core.database.entity.NodeMetricsHistoryEntity
 import org.meshtastic.core.database.entity.Packet
 import org.meshtastic.core.database.entity.PacketFts
 import org.meshtastic.core.database.entity.QuickChatAction
@@ -81,7 +79,6 @@ import org.meshtastic.core.database.entity.TracerouteNodePositionEntity
         EventFirmwareEditionEntity::class,
         MergeMarkerEntity::class,
         ChannelSetEntity::class,
-        NodeMetricsHistoryEntity::class,
     ],
     autoMigrations =
     [
@@ -134,13 +131,8 @@ import org.meshtastic.core.database.entity.TracerouteNodePositionEntity
         AutoMigration(from = 49, to = 50),
         AutoMigration(from = 50, to = 51),
         AutoMigration(from = 51, to = 52),
-        AutoMigration(from = 52, to = 53),
-        AutoMigration(from = 53, to = 54),
-        AutoMigration(from = 54, to = 55),
-        AutoMigration(from = 55, to = 56),
-        AutoMigration(from = 56, to = 57),
     ],
-    version = 57,
+    version = 52,
     exportSchema = true,
 )
 @androidx.room3.ConstructedBy(MeshtasticDatabaseConstructor::class)
@@ -171,8 +163,6 @@ abstract class MeshtasticDatabase : RoomDatabase() {
     abstract fun mergeMarkerDao(): MergeMarkerDao
 
     abstract fun channelSetDao(): ChannelSetDao
-
-    abstract fun nodeMetricsHistoryDao(): NodeMetricsHistoryDao
 
     companion object {
         /**

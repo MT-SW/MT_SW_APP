@@ -23,6 +23,7 @@ import dev.mokkery.answering.throws
 import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
+import dev.mokkery.matcher.matches
 import dev.mokkery.mock
 import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode
@@ -37,6 +38,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import okio.ByteString
 import okio.ByteString.Companion.toByteString
+import org.meshtastic.core.common.di.asServiceScope
 import org.meshtastic.core.repository.FromRadioPacketHandler
 import org.meshtastic.core.repository.MeshDataHandler
 import org.meshtastic.core.repository.MeshLogRepository
@@ -141,7 +143,7 @@ class MeshMessageProcessorImplTest {
         dataHandler = lazy { dataHandler },
         fromRadioDispatcher = fromRadioDispatcher,
         radioInterfaceService = radioInterfaceService,
-        scope = scope,
+        scope = scope.asServiceScope(),
     )
 
     private fun frame(bytes: ByteArray, frameSession: RadioSessionContext = session) =
@@ -560,6 +562,27 @@ class MeshMessageProcessorImplTest {
         advanceUntilIdle()
 
         verifySuspend { serviceRepository.emitMeshPacket(any()) }
+    }
+
+    @Test
+    fun `packets with absent rx_time get current time`() = runTest(testDispatcher) {
+        processor = createProcessor(backgroundScope)
+        isNodeDbReady.value = true
+
+        val packet =
+            MeshPacket(
+                id = 3,
+                from = myNodeNum,
+                decoded = Data(portnum = PortNum.TEXT_MESSAGE_APP, payload = ByteString.EMPTY),
+                rx_time = null, // radio had no clock at reception
+            )
+
+        processor.handleReceivedMeshPacket(packet, myNodeNum)
+        advanceUntilIdle()
+
+        verifySuspend {
+            serviceRepository.emitMeshPacket(matches<MeshPacket> { emitted -> (emitted.rx_time ?: 0) > 0 })
+        }
     }
 
     // ---------- handleReceivedMeshPacket: node updates ----------

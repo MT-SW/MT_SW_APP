@@ -1085,6 +1085,10 @@
     <string name="mqtt">MQTT</string>
     <string name="mqtt_config">MQTT asetukset</string>
     <string name="mqtt_enabled">MQTT käytössä</string>
+    <string name="mqtt_error_connection_lost">MQTT: yhteys katkesi</string>
+    <string name="mqtt_error_credentials_rejected">MQTT: yhteys hylättiin (tarkista tunnistetiedot)</string>
+    <string name="mqtt_error_proxy_failed">MQTT-välityspalvelin epäonnistui: %1$s</string>
+    <string name="mqtt_error_rejected">MQTT: yhteys hylätty: %1$s</string>
     <string name="mqtt_probe_dns_failure">Palvelinta ei löytynyt</string>
     <string name="mqtt_probe_other_failure">Yhdistäminen epäonnistui</string>
     <string name="mqtt_probe_rejected">Välityspalvelin ei hyväksynyt: %1$s</string>
@@ -1571,7 +1575,6 @@
     <string name="signal">Signaali </string>
     <string name="signal_quality">Signaalin laatu</string>
     <!-- SITE -->
-    <string name="site_planner">Site Planner</string>
     <string name="site_planner_antenna_gain_dbi">Antennin vahvistus (dBi)</string>
     <string name="site_planner_antenna_height_meters">Antennin korkeus (m)</string>
     <string name="site_planner_color_scale">Väripaletti</string>
@@ -1641,6 +1644,8 @@
     <string name="tak_server_enabled_desc">Avaa paikallisen salatun TLS-palvelinyhteyden porttiin 8089, jotta ATAK/iTAK voi yhdistää siihen</string>
     <string name="tak_server_export_data_package_desc">Luo .zip-asetustiedosto ATAK/iTAK-sovellukselle, jotta se voi yhdistää tähän palvelimeen</string>
     <string name="tak_server_loading">…</string>
+    <string name="tak_server_mesh_to_cot">Mesh to CoT -muunnin</string>
+    <string name="tak_server_mesh_to_cot_desc">Näytä Meshtastic radiot ATAK/iTAK -kartalla kontakteina</string>
     <string name="tak_server_section">Palvelin</string>
     <string name="tak_server_test_card_title">TAK Mesh -testitila (debug)</string>
     <string name="tak_server_test_idle">Lähetä kaikki %1$d testisanomat mesh-verkkoon</string>

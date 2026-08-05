@@ -876,6 +876,12 @@
     <string name="latest_alpha_firmware">Latest alpha</string>
     <string name="latest_stable_firmware">Latest stable</string>
     <string name="latitude">Latitude</string>
+    <!-- LAYER -->
+    <string name="layer_subtitle">%1$s • %2$s</string>
+    <string name="layer_type_coverage">Coverage estimate</string>
+    <string name="layer_type_geojson" translatable="false">GeoJSON</string>
+    <string name="layer_type_kml" translatable="false">KML</string>
+    <string name="layer_type_network">Network layer</string>
     <string name="learn_more">Learn more</string>
     <string name="led_heartbeat">LED Heartbeat</string>
     <string name="led_state">LED state</string>
@@ -1663,6 +1669,8 @@
     <string name="tak_server_enabled_desc">Starts a local TLS server on port 8089 for ATAK/iTAK connections</string>
     <string name="tak_server_export_data_package_desc">Generate .zip for ATAK/iTAK to connect to this server</string>
     <string name="tak_server_loading">…</string>
+    <string name="tak_server_mesh_to_cot">Mesh to CoT Converter</string>
+    <string name="tak_server_mesh_to_cot_desc">Show Meshtastic nodes on the ATAK/iTAK map as contacts</string>
     <string name="tak_server_section">Server</string>
     <string name="tak_server_test_card_title">TAK Mesh Test (Debug)</string>
     <string name="tak_server_test_idle">Send all %1$d test fixtures to mesh</string>

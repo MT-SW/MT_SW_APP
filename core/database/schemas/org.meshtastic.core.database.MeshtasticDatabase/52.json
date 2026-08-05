@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 52,
-    "identityHash": "db0055dce2514e7f6aa1c8d4036a46ab",
+    "identityHash": "4045629645b02d263f278d1140cdec4e",
     "entities": [
       {
         "tableName": "my_node",
@@ -336,7 +336,7 @@
       },
       {
         "tableName": "packet",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `myNodeNum` INTEGER NOT NULL DEFAULT 0, `port_num` INTEGER NOT NULL, `contact_key` TEXT NOT NULL, `received_time` INTEGER NOT NULL, `read` INTEGER NOT NULL DEFAULT 1, `data` TEXT NOT NULL, `packet_id` INTEGER NOT NULL DEFAULT 0, `routing_error` INTEGER NOT NULL DEFAULT -1, `snr` REAL NOT NULL DEFAULT 0, `rssi` INTEGER, `hopsAway` INTEGER NOT NULL DEFAULT -1, `sfpp_hash` BLOB, `filtered` INTEGER NOT NULL DEFAULT 0, `message_text` TEXT NOT NULL DEFAULT '', `translated_text` TEXT, `show_translated` INTEGER NOT NULL DEFAULT 0)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uuid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `myNodeNum` INTEGER NOT NULL DEFAULT 0, `port_num` INTEGER NOT NULL, `contact_key` TEXT NOT NULL, `received_time` INTEGER NOT NULL, `read` INTEGER NOT NULL DEFAULT 1, `data` TEXT NOT NULL, `packet_id` INTEGER NOT NULL DEFAULT 0, `routing_error` INTEGER NOT NULL DEFAULT -1, `snr` REAL, `rssi` INTEGER, `hopsAway` INTEGER NOT NULL DEFAULT -1, `sfpp_hash` BLOB, `filtered` INTEGER NOT NULL DEFAULT 0, `message_text` TEXT NOT NULL DEFAULT '', `translated_text` TEXT, `show_translated` INTEGER NOT NULL DEFAULT 0)",
         "fields": [
           {
             "fieldPath": "uuid",
@@ -399,9 +399,7 @@
           {
             "fieldPath": "snr",
             "columnName": "snr",
-            "affinity": "REAL",
-            "notNull": true,
-            "defaultValue": "0"
+            "affinity": "REAL"
           },
           {
             "fieldPath": "rssi",
@@ -728,7 +726,7 @@
       },
       {
         "tableName": "reactions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`myNodeNum` INTEGER NOT NULL DEFAULT 0, `reply_id` INTEGER NOT NULL, `user_id` TEXT NOT NULL, `emoji` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `snr` REAL NOT NULL DEFAULT 0, `rssi` INTEGER, `hopsAway` INTEGER NOT NULL DEFAULT -1, `packet_id` INTEGER NOT NULL DEFAULT 0, `status` INTEGER NOT NULL DEFAULT 0, `routing_error` INTEGER NOT NULL DEFAULT 0, `relays` INTEGER NOT NULL DEFAULT 0, `relay_node` INTEGER, `to` TEXT, `channel` INTEGER NOT NULL DEFAULT 0, `sfpp_hash` BLOB, PRIMARY KEY(`myNodeNum`, `reply_id`, `user_id`, `emoji`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`myNodeNum` INTEGER NOT NULL DEFAULT 0, `reply_id` INTEGER NOT NULL, `user_id` TEXT NOT NULL, `emoji` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `snr` REAL, `rssi` INTEGER, `hopsAway` INTEGER NOT NULL DEFAULT -1, `packet_id` INTEGER NOT NULL DEFAULT 0, `status` INTEGER NOT NULL DEFAULT 0, `routing_error` INTEGER NOT NULL DEFAULT 0, `relays` INTEGER NOT NULL DEFAULT 0, `relay_node` INTEGER, `to` TEXT, `channel` INTEGER NOT NULL DEFAULT 0, `sfpp_hash` BLOB, PRIMARY KEY(`myNodeNum`, `reply_id`, `user_id`, `emoji`))",
         "fields": [
           {
             "fieldPath": "myNodeNum",
@@ -764,9 +762,7 @@
           {
             "fieldPath": "snr",
             "columnName": "snr",
-            "affinity": "REAL",
-            "notNull": true,
-            "defaultValue": "0"
+            "affinity": "REAL"
           },
           {
             "fieldPath": "rssi",
@@ -1740,83 +1736,11 @@
             "id"
           ]
         }
-      },
-      {
-        "tableName": "node_metrics_history",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `num` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `battery_level` INTEGER, `voltage` REAL, `snr` REAL, `rssi` INTEGER, `channel_utilization` REAL, `air_util_tx` REAL)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "num",
-            "columnName": "num",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "timestamp",
-            "columnName": "timestamp",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "batteryLevel",
-            "columnName": "battery_level",
-            "affinity": "INTEGER"
-          },
-          {
-            "fieldPath": "voltage",
-            "columnName": "voltage",
-            "affinity": "REAL"
-          },
-          {
-            "fieldPath": "snr",
-            "columnName": "snr",
-            "affinity": "REAL"
-          },
-          {
-            "fieldPath": "rssi",
-            "columnName": "rssi",
-            "affinity": "INTEGER"
-          },
-          {
-            "fieldPath": "channelUtilization",
-            "columnName": "channel_utilization",
-            "affinity": "REAL"
-          },
-          {
-            "fieldPath": "airUtilTx",
-            "columnName": "air_util_tx",
-            "affinity": "REAL"
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": true,
-          "columnNames": [
-            "id"
-          ]
-        },
-        "indices": [
-          {
-            "name": "index_node_metrics_history_num_timestamp",
-            "unique": false,
-            "columnNames": [
-              "num",
-              "timestamp"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_node_metrics_history_num_timestamp` ON `${TABLE_NAME}` (`num`, `timestamp`)"
-          }
-        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'db0055dce2514e7f6aa1c8d4036a46ab')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4045629645b02d263f278d1140cdec4e')"
     ]
   }
 }

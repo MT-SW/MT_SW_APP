@@ -151,7 +151,8 @@ data class Message(
     val time: String,
     /**
      * Mesh time in epoch millis (the packet's `rx_time`) — the instant [time] renders. 0 when the radio never stamped
-     * one; read [displayTime] instead of this field so that case falls back to [receivedTime].
+     * one (the packet carried no arrival time, or an old-firmware 0); read [displayTime] instead of this field so that
+     * case falls back to [receivedTime].
      */
     val meshTime: Long = 0L,
     val read: Boolean,
@@ -159,7 +160,8 @@ data class Message(
     val routingError: Int,
     val packetId: Int,
     val emojis: List<Reaction>,
-    val snr: Float,
+    /** Signal-to-noise ratio in dB, or null when the packet carried no measurement. 0 dB is a valid reading. */
+    val snr: Float?,
     /** Received signal strength, or null when the radio did not report one. 0 dBm is a valid reading. */
     val rssi: Int?,
     val hopsAway: Int,

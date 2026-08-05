@@ -23,14 +23,13 @@ import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.persistentSetOf
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import okio.ByteString
-import org.koin.core.annotation.Named
 import org.koin.core.annotation.Single
+import org.meshtastic.core.common.di.ServiceScope
 import org.meshtastic.core.common.util.clampTimestampToNow
 import org.meshtastic.core.common.util.crc32
 import org.meshtastic.core.common.util.handledLaunch
@@ -87,7 +86,7 @@ class NodeManagerImpl(
     private val nodeRepository: NodeRepository,
     private val notificationManager: NotificationManager,
     private val radioInterfaceService: RadioInterfaceService,
-    @Named("ServiceScope") private val scope: CoroutineScope,
+    private val scope: ServiceScope,
 ) : NodeManager {
 
     // Fixed stripes bound mutex lifetime while preserving same-node persistence ordering. Hash collisions only reduce
@@ -627,7 +626,11 @@ class NodeManagerImpl(
         manuallyVerified: Boolean,
         session: RadioSessionContext?,
     ) {
-        while (true) {
+        // Pin admission and session ownership to packet arrival. A packet that loses a node-state CAS must not become a
+        // live discovery after initial sync, and a packet from a cleared session must never retry into the new one.
+        val allowNotificationAtArrival = isNodeDbReady.value
+        val arrivalSessionGeneration = sessionGeneration.value
+        while (sessionGeneration.value == arrivalSessionGeneration) {
             val before = nodeState.value
             val transition =
                 reduceReceivedUser(
@@ -638,9 +641,11 @@ class NodeManagerImpl(
                     manuallyVerified,
                     before.localNodeNum,
                     before.isRetiredAbsent(fromNum),
+                    allowNotificationAtArrival = allowNotificationAtArrival,
                     retiredKeyHint = before.retiredKeyHints[fromNum],
                 )
             receivedUserReductionHook?.invoke()
+            if (sessionGeneration.value != arrivalSessionGeneration) break
             val after =
                 before
                     .copy(
@@ -667,6 +672,7 @@ class NodeManagerImpl(
                 return
             }
         }
+        Logger.d { "[NodeIdentity] user from=$fromNum discarded after session reset" }
     }
 
     override fun handleReceivedPosition(
@@ -850,6 +856,7 @@ class NodeManagerImpl(
         manuallyVerified: Boolean,
         myNum: Int?,
         retiredAbsent: Boolean,
+        allowNotificationAtArrival: Boolean,
         retiredKeyHint: ByteString? = null,
     ): ReceivedUserTransition {
         val resolvedKey = resolveValidatedPublicKeyHint(p.public_key)
@@ -905,7 +912,7 @@ class NodeManagerImpl(
                 channel = channel,
                 manuallyVerified = manuallyVerified,
                 persist = true,
-                allowNotification = true,
+                allowNotification = allowNotificationAtArrival,
                 unretireNodeNum = fromNum,
             )
                 .copy(decision = ReceivedUserDecision.RETIRED_DIFFERENT_KEY_REACTIVATED)
@@ -1032,7 +1039,7 @@ class NodeManagerImpl(
             channel,
             manuallyVerified,
             persist = true,
-            allowNotification = true,
+            allowNotification = allowNotificationAtArrival,
         )
     }
 
@@ -1174,7 +1181,7 @@ class NodeManagerImpl(
         getStringSuspend(Res.string.new_node_seen, shortName)
     }
 
-    /** Test seam invoked after reduction but before CAS to deterministically race a local-node-number update. */
+    /** Test seam invoked after reduction but before CAS to deterministically race a concurrent node-state update. */
     internal var receivedUserReductionHook: (() -> Unit)? = null
 
     override fun toNodeID(nodeNum: Int): String = if (nodeNum == NodeAddress.NODENUM_BROADCAST) {
