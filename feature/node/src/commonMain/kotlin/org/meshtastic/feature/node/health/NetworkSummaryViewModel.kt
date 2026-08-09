@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import org.koin.core.annotation.KoinViewModel
+import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
@@ -276,7 +277,7 @@ class NetworkSummaryViewModel(
                     add(AttentionItem(nameByNum[it.num] ?: "?", "Bateria ${it.deviceMetrics.battery_level}%"))
                 }
                 weakSignalNodes.forEach {
-                    add(AttentionItem(nameByNum[it.num] ?: "?", "Słaby sygnał: ${"%.1f".format(it.snr)} dB"))
+                    add(AttentionItem(nameByNum[it.num] ?: "?", "Słaby sygnał: ${MetricFormatter.snr(it.snr)}"))
                 }
                 latestPerNode.entries
                     .filter { (it.value?.channelUtilization ?: 0f) > HIGH_CHANNEL_UTIL_THRESHOLD }
@@ -284,7 +285,9 @@ class NetworkSummaryViewModel(
                         add(
                             AttentionItem(
                                 nameByNum[num] ?: "?",
-                                "Wysokie zajęcie kanału: ${"%.1f".format(entry?.channelUtilization)}%",
+                                "Wysokie zajęcie kanału: ${MetricFormatter.percent(
+                                    entry?.channelUtilization ?: 0f,
+                                )}",
                             ),
                         )
                     }

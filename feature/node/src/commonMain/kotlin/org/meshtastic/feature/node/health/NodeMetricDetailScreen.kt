@@ -42,6 +42,8 @@ import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.compose.cartesian.data.lineModel
 import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
+import org.meshtastic.core.common.util.MetricFormatter
+import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.ui.theme.GraphColors.Blue
 import org.meshtastic.core.ui.theme.GraphColors.Gold
 import org.meshtastic.core.ui.theme.GraphColors.Green
@@ -102,11 +104,10 @@ fun NodeMetricDetailScreen(
             groups.forEachIndexed { groupIndex, groupSeries ->
                 groupSeries.forEach { s ->
                     val color = colorFor(groups, groupIndex, s.label)
-                    val format = formatFor(s.label)
                     Row(horizontalArrangement = Arrangement.spacedBy(24.dp), modifier = Modifier.fillMaxWidth()) {
-                        StatLabel(label = "${s.label} — min", value = s.minValue, format = format, color = color)
-                        StatLabel(label = "max", value = s.maxValue, format = format, color = color)
-                        StatLabel(label = "ostatnia", value = s.latestValue, format = format, color = color)
+                        StatLabel(label = "${s.label} — min", value = s.minValue, seriesLabel = s.label, color = color)
+                        StatLabel(label = "max", value = s.maxValue, seriesLabel = s.label, color = color)
+                        StatLabel(label = "ostatnia", value = s.latestValue, seriesLabel = s.label, color = color)
                     }
                 }
             }
@@ -195,7 +196,7 @@ private const val MILLIS_PER_SEC = 1000L
 private fun StatLabel(
     label: String,
     value: Float?,
-    format: String = "%.1f",
+    seriesLabel: String,
     color: Color = MaterialTheme.colorScheme.onSurfaceVariant,
 ) {
     Column {
@@ -205,20 +206,44 @@ private fun StatLabel(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
-            text = value?.let { format.format(it) } ?: "—",
+            text = value?.let { formatSeriesValue(seriesLabel, it) } ?: "—",
             style = MaterialTheme.typography.titleMedium,
             color = color,
         )
     }
 }
 
-/** Voltage/current and channel/air utilization need finer precision than the default 1 decimal place. */
-private fun formatFor(seriesLabel: String): String = when (seriesLabel) {
-    "Napięcie",
-    "Prąd",
+/** Formats one series' stat value with the unit appropriate to that metric, via the shared [MetricFormatter]. */
+private fun formatSeriesValue(seriesLabel: String, value: Float): String = when (seriesLabel) {
+    "Bateria" -> MetricFormatter.percent(value, decimalPlaces = 1)
+
+    "Napięcie" -> MetricFormatter.voltage(value, decimalPlaces = 2)
+
+    "Prąd" -> MetricFormatter.current(value, decimalPlaces = 2)
+
+    "SNR" -> MetricFormatter.snr(value)
+
+    "RSSI" -> MetricFormatter.rssi(value.toInt())
+
+    "Noise Floor" -> "${NumberFormatter.format(value, 1)} dB"
+
     "Ch. Util",
     "Air Util",
-    -> "%.2f"
+    -> MetricFormatter.percent(value, decimalPlaces = 2)
 
-    else -> "%.1f"
+    "Temperatura" -> MetricFormatter.temperature(value, isFahrenheit = false)
+
+    "Wilgotność" -> MetricFormatter.percent(value, decimalPlaces = 1)
+
+    "Ciśnienie" -> MetricFormatter.pressure(value, decimalPlaces = 1)
+
+    "TX",
+    "RX",
+    "Duplikaty",
+    "Przekazane",
+    "Uszkodzone",
+    "Przeskoki",
+    -> "${value.toInt()}"
+
+    else -> NumberFormatter.format(value, 1)
 }

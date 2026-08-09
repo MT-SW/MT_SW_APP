@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -36,12 +35,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.meshtastic.core.common.util.MetricFormatter
 
 @Composable
 fun NetworkHealthScreen(
@@ -112,60 +111,6 @@ fun NetworkHealthScreen(
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
                     )
                 }
-            }
-        }
-    }
-}
-
-private val FAVORITES_CHART_COLORS =
-    listOf(
-        org.meshtastic.core.ui.theme.GraphColors.Green,
-        org.meshtastic.core.ui.theme.GraphColors.Blue,
-        org.meshtastic.core.ui.theme.GraphColors.Gold,
-        org.meshtastic.core.ui.theme.GraphColors.Orange,
-        org.meshtastic.core.ui.theme.GraphColors.Red,
-    )
-
-/** Overlay chart showing every favorite node's history for the active metric, one colored line per node. */
-@Composable
-private fun FavoritesChart(lines: List<FavoriteChartLine>, modifier: Modifier = Modifier) {
-    Column(modifier = modifier) {
-        Canvas(modifier = Modifier.fillMaxWidth().weight(1f)) {
-            val allValues = lines.flatMap { line -> line.points.map { it.second } }
-            if (allValues.isEmpty()) return@Canvas
-            val minV = allValues.min()
-            val maxV = allValues.max()
-            val range = (maxV - minV).takeIf { it > 0f } ?: 1f
-            val allTimestamps = lines.flatMap { line -> line.points.map { it.first } }
-            val minT = allTimestamps.min()
-            val maxT = allTimestamps.max()
-            val timeRange = (maxT - minT).takeIf { it > 0L } ?: 1L
-
-            lines.forEachIndexed { index, line ->
-                if (line.points.size < 2) return@forEachIndexed
-                val color =
-                    FAVORITES_CHART_COLORS.getOrElse(index % FAVORITES_CHART_COLORS.size) {
-                        androidx.compose.ui.graphics.Color.Gray
-                    }
-                val path = Path()
-                line.points.forEachIndexed { pointIndex, (timestamp, value) ->
-                    val x = ((timestamp - minT).toFloat() / timeRange) * size.width
-                    val y = size.height - ((value - minV) / range) * size.height
-                    if (pointIndex == 0) path.moveTo(x, y) else path.lineTo(x, y)
-                }
-                drawPath(path = path, color = color, style = Stroke(width = 4f))
-            }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            lines.forEachIndexed { index, line ->
-                val color =
-                    FAVORITES_CHART_COLORS.getOrElse(index % FAVORITES_CHART_COLORS.size) {
-                        androidx.compose.ui.graphics.Color.Gray
-                    }
-                Text(text = line.name, style = MaterialTheme.typography.bodySmall, color = color)
             }
         }
     }
@@ -276,10 +221,10 @@ private fun NodeHealthRow(
 private fun formatMetricValue(metric: NetworkHealthMetric, value: Float?): String {
     if (value == null) return "—"
     return when (metric) {
-        NetworkHealthMetric.POWER -> "${value.toInt()}%"
-        NetworkHealthMetric.SIGNAL -> "%.1f dB".format(value)
-        NetworkHealthMetric.ETHER -> "%.2f%%".format(value)
-        NetworkHealthMetric.ENVIRONMENT -> "%.1f°C".format(value)
+        NetworkHealthMetric.POWER -> MetricFormatter.percent(value.toInt())
+        NetworkHealthMetric.SIGNAL -> MetricFormatter.snr(value)
+        NetworkHealthMetric.ETHER -> MetricFormatter.percent(value, decimalPlaces = 2)
+        NetworkHealthMetric.ENVIRONMENT -> MetricFormatter.temperature(value, isFahrenheit = false)
         NetworkHealthMetric.TRAFFIC -> "${value.toInt()}"
         NetworkHealthMetric.NEIGHBORS -> "${value.toInt()}"
     }

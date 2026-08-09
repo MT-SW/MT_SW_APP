@@ -68,9 +68,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalFocusManager
@@ -79,7 +79,6 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -743,7 +742,7 @@ private fun mentionOutputTransformation(candidatesById: Map<String, MentionCandi
  *   changes — telemetry-only updates leave this map structurally identical, preventing recomposition churn.
  * @param modifier The modifier for this composable.
  * @param maxByteSize The maximum allowed size of the message in bytes.
- * @param onSendMessage Callback invoked when the send button is pressed or send IME action is triggered.
+ * @param onSendMessage Callback invoked when the send button is pressed, or Ctrl+Enter is pressed on desktop.
  */
 @Suppress("LongMethod", "CyclomaticComplexMethod") // Due to multiple parts of the OutlinedTextField
 @Composable
@@ -854,11 +853,11 @@ private fun MessageInput(
             Modifier.fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 4.dp)
                 .onFocusChanged { isFocused = it.isFocused }
-                .onKeyEvent { keyEvent ->
-                    val isEnterNoShift = keyEvent.key == Key.Enter && !keyEvent.isShiftPressed
-                    if (isEnterNoShift) {
+                .onPreviewKeyEvent { keyEvent ->
+                    val isCtrlEnter = keyEvent.key == Key.Enter && keyEvent.isCtrlPressed
+                    if (isCtrlEnter) {
                         if (keyEvent.type == KeyEventType.KeyUp) onSendAction()
-                        true // consume both KeyDown and KeyUp to prevent newline insertion
+                        true // consume both KeyDown and KeyUp so Ctrl+Enter doesn't also add a newline
                     } else {
                         false
                     }
@@ -871,9 +870,7 @@ private fun MessageInput(
             shape = RoundedCornerShape(ROUNDED_CORNER_PERCENT.toFloat()),
             isError = isOverLimit,
             placeholder = { Text(stringResource(Res.string.type_a_message)) },
-            keyboardOptions =
-            KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Send),
-            onKeyboardAction = { onSendAction() },
+            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
             supportingText = {
                 if (isEnabled) { // Only show supporting text if input is enabled
                     Text(

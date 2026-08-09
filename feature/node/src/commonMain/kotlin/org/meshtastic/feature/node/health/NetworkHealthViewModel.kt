@@ -95,9 +95,6 @@ data class NodeHealthInfo(
     }
 }
 
-/** One favorite node's line in the shared favorites chart: display name + its history points for the active metric. */
-data class FavoriteChartLine(val name: String, val points: List<Pair<Long, Float>>)
-
 data class NetworkHealthUiState(
     val nodes: List<NodeHealthInfo> = emptyList(),
     val activeMetric: NetworkHealthMetric = NetworkHealthMetric.POWER,
@@ -106,7 +103,6 @@ data class NetworkHealthUiState(
     val favoritesFirst: Boolean = true,
     val hideWithoutData: Boolean = false,
     val searchText: String = "",
-    val favoritesChart: List<FavoriteChartLine> = emptyList(),
 )
 
 @KoinViewModel
@@ -226,22 +222,6 @@ class NetworkHealthViewModel(
             val directed = if (sortAscending) baseSorted else baseSorted.reversed()
             val sorted = if (favoritesFirst) directed.sortedByDescending { it.isFavorite } else directed
 
-            val favoritesChart =
-                healthInfos
-                    .filter { it.isFavorite }
-                    .mapNotNull { info ->
-                        val points =
-                            historyByNode[info.num]
-                                .orEmpty()
-                                .sortedBy { it.timestamp }
-                                .mapNotNull { entry -> metric.historyValue(entry)?.let { entry.timestamp to it } }
-                        if (points.size < 2) {
-                            null
-                        } else {
-                            FavoriteChartLine(info.longName.ifBlank { info.shortName }, points)
-                        }
-                    }
-
             NetworkHealthUiState(
                 nodes = sorted,
                 activeMetric = metric,
@@ -250,7 +230,6 @@ class NetworkHealthViewModel(
                 favoritesFirst = favoritesFirst,
                 hideWithoutData = hideWithoutData,
                 searchText = searchText,
-                favoritesChart = favoritesChart,
             )
         }
             .stateInWhileSubscribed(initialValue = NetworkHealthUiState())

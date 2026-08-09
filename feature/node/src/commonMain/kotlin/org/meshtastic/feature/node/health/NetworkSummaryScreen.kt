@@ -32,6 +32,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.meshtastic.core.common.util.MetricFormatter
+import org.meshtastic.core.common.util.NumberFormatter
 
 @Composable
 fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () -> Unit, modifier: Modifier = Modifier) {
@@ -103,7 +105,7 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
                         Text(text = "Najlepszy sygnał:", style = MaterialTheme.typography.bodyMedium)
                         uiState.topSignalNodes.forEachIndexed { index, leader ->
                             Text(
-                                text = "${index + 1}. ${leader.nodeName} — %.1f dB".format(leader.snr),
+                                text = "${index + 1}. ${leader.nodeName} — ${MetricFormatter.snr(leader.snr)}",
                                 style = MaterialTheme.typography.bodyMedium,
                             )
                         }
@@ -121,17 +123,22 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
                     Text(
                         text =
                         "Śr. zajęcie kanału: ${uiState.averageChannelUtilization?.let {
-                            "%.1f%%".format(it)
+                            MetricFormatter.percent(it)
                         } ?: "—"}",
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
                         text =
-                        "Max zajęcie kanału: ${uiState.maxChannelUtilization?.let { "%.1f%%".format(it) } ?: "—"}",
+                        "Max zajęcie kanału: ${uiState.maxChannelUtilization?.let {
+                            MetricFormatter.percent(it)
+                        } ?: "—"}",
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
-                        text = "Śr. air util TX: ${uiState.averageAirUtilTx?.let { "%.1f%%".format(it) } ?: "—"}",
+                        text =
+                        "Śr. air util TX: ${uiState.averageAirUtilTx?.let {
+                            MetricFormatter.percent(it)
+                        } ?: "—"}",
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
@@ -161,7 +168,10 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
-                        text = "Śr. liczba sąsiadów: ${uiState.averageNeighborCount?.let { "%.1f".format(it) } ?: "—"}",
+                        text =
+                        "Śr. liczba sąsiadów: ${uiState.averageNeighborCount?.let {
+                            NumberFormatter.format(it, 1)
+                        } ?: "—"}",
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
@@ -199,7 +209,7 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
                         uiState.closestNodes.forEachIndexed { index, node ->
                             val distanceText =
                                 if (node.distanceMeters >= METERS_PER_KM) {
-                                    "%.1f km".format(node.distanceMeters / METERS_PER_KM.toFloat())
+                                    "${NumberFormatter.format(node.distanceMeters / METERS_PER_KM.toFloat(), 1)} km"
                                 } else {
                                     "${node.distanceMeters} m"
                                 }
