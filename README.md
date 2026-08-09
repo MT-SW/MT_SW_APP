@@ -1,189 +1,112 @@
-<p align="center">
-  <img src=".github/meshtastic_logo.png" alt="Meshtastic Logo" width="200"/>
-</p>
-<h1 align="center">Meshtastic-Android</h1>
+# Meshtastic_S+ — osobisty fork Meshtastic-Android
 
-![GitHub all releases](https://img.shields.io/github/downloads/meshtastic/meshtastic-android/total)
-[![Android CI](https://github.com/meshtastic/Meshtastic-Android/actions/workflows/pull-request.yml/badge.svg?branch=main)](https://github.com/meshtastic/Meshtastic-Android/actions/workflows/pull-request.yml)
-[![codecov](https://codecov.io/gh/meshtastic/Meshtastic-Android/graph/badge.svg)](https://codecov.io/gh/meshtastic/Meshtastic-Android)
-[![Crowdin](https://badges.crowdin.net/e/f440f1a5e094a5858dd86deb1adfe83d/localized.svg)](https://crowdin.meshtastic.org/android)
-[![CLA assistant](https://cla-assistant.io/readme/badge/meshtastic/Meshtastic-Android)](https://cla-assistant.io/meshtastic/Meshtastic-Android)
-[![Fiscal Contributors](https://opencollective.com/meshtastic/tiers/badge.svg?label=Fiscal%20Contributors&color=deeppink)](https://opencollective.com/meshtastic/)
-[![Vercel](https://img.shields.io/static/v1?label=Powered%20by&message=Vercel&style=flat&logo=vercel&color=000000)](https://vercel.com?utm_source=meshtastic&utm_campaign=oss)
-[![Revved up by Develocity](https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?logo=Gradle&labelColor=02303A)](https://community.develocity.cloud/scans?search.rootProjectNames=MeshtasticAndroid)
+Fork oficjalnej aplikacji [Meshtastic-Android](https://github.com/meshtastic/Meshtastic-Android) rozwijany na potrzeby sieci mesh radiowej **Świętokrzyskie** (meshtastic-swietokrzyskie.pl). Bazuje na architekturze KMP/Compose Multiplatform oryginału (warianty `fdroid`/`google`, moduł desktopowy) i dokłada zestaw lokalnych funkcji, poprawek i personalizacji, których nie ma w wersji upstream.
 
-This is a tool for using Android (and Compose Desktop) with open-source mesh radios. For more information see our webpage: [meshtastic.org](https://www.meshtastic.org). If you are looking for the device side code, see [here](https://github.com/meshtastic/firmware).
+Stan roboczy — repo służy głównie do własnego użytku i testów z niewielką grupą osób, niekoniecznie buduje się na bieżąco.
 
-If you have questions or feedback please [Join our discussion forum](https://github.com/orgs/meshtastic/discussions) or the [Discord Group](https://discord.gg/meshtastic). We would love to hear from you!
+## Zarządzanie węzłami i siecią mesh
 
-## Features
+- **Zdalne sterowanie GPIO** — na ekranie szczegółów węzła (moduł Remote Hardware) można wpisać numer pinu, appka sama liczy maskę bitową i wysyła `WRITE_GPIOS`/`READ_GPIOS` do zdalnego węzła. Przyciski aktywne tylko gdy klucze PKC z węzłem zostały wymienione.
+- **Zdalne ulubione/ignorowanie węzłów** przez sieć LoRa (nie tylko lokalnie) — z prawdziwym potwierdzeniem doręczenia opartym o routing ACK z mesh, zamiast tylko zmiany po stronie telefonu.
+- **Ręczne dodawanie kontaktu przez ID węzła** — zarówno lokalnie, jak i zdalnie, z ujednoliconym formatem `!a1b2c3d4` (hex) wszędzie w appce.
+- **Pasywne zbieranie NeighborInfo** — log sąsiadów pokazuje teraz też podsłuchane rozgłoszenia innych węzłów, nie tylko odpowiedzi na własne zapytania; naprawiony też przypadek żądania Neighbor Info dla własnego, lokalnie podłączonego urządzenia (wcześniej nic nie zwracał).
+- **Przyciski szybkich komend** (`/ping`, `/hello`, `/test`) na ekranie węzła — wysyłają wiadomość prywatną nawet do węzłów, których rola normalnie blokuje ręczne wiadomości; przydatne do szybkiego testowania nowych buildów firmware na urządzeniach w terenie.
+- **Lista węzłów pośredniczących (relay) w dostarczeniu wiadomości** — dialog "Status doręczenia" pokazuje pełną listę nazw wszystkich węzłów biorących udział w retransmisji (nie tylko licznik ani jedną nazwę jak w oryginale), łącznie z poprawkami po stronie firmware, żeby te dane w ogóle docierały do appki.
+- Przywrócony ekran konfiguracji **Traffic Management** (w pewnym momencie usunięty w upstreamie).
 
-Highlights from the 2.8.0 release:
+## Ekran "Zdrowie sieci"
 
-- **Mesh network discovery** to surface nodes and channels around you, with **Mesh Beacon** invitations for joining nearby meshes.
-- **Waypoint geofences** — draw zones on the map and get alerts when nodes cross them.
-- **Secure key backup** — encrypted backup, restore, and delete for your device security keys.
-- **NFC sharing** — write shared contacts and channels to NFC tags.
-- **XEdDSA packet signing** indicators in the node and messaging UI.
-- **Air-quality telemetry** — PM1.0, PM2.5, PM10, and CO₂ readings from supported sensors.
-- **App Functions / system-AI integration** so on-device assistants can trigger common workflows.
+Nowa, szósta zakładka w dolnej nawigacji (między Węzłami a Mapą), której nie ma w oryginalnej appce:
 
-## Get Meshtastic
+- **6 kategorii metryk** per węzeł: zasilanie (bateria/napięcie/prąd), sygnał (SNR/RSSI/poziom szumu, z fallbackiem na liczbę przeskoków gdy brak bezpośrednich odczytów), sieć (kanał/eter), środowisko (temperatura/wilgotność/ciśnienie), ruch (TX/RX/duplikaty/przekazane/uszkodzone) i sąsiedzi.
+- Lista węzłów z sortowaniem, przypinaniem ulubionych na górze, ukrywaniem pustych wpisów i wyszukiwarką; szczegóły każdej metryki jako wykres w oknie 24h/7d/30d.
+- **Ekran "Podsumowanie"** — karty z rankingami top-3: najcichsze węzły, najlepszy sygnał, najwięcej wysłanych pozycji, fizycznie najbliższe węzły, najwięcej danych telemetrii, najwięcej wiadomości (tydzień/dziś) i inne — wszystkie poprawnie wykluczają lokalnie podłączone urządzenie z rankingów, żeby nie zaburzało wyników.
+- Architektura danych: wszystko dekodowane na żywo z istniejącego logu zdarzeń mesh przy każdym odczycie ekranu — żadne dane nie są duplikowane w osobnej tabeli, więc statystyki są zawsze aktualne i nie zajmują dodatkowego miejsca w bazie.
 
-The easiest and fastest way to get the latest releases is to use our [GitHub releases](https://github.com/meshtastic/Meshtastic-Android/releases). It is recommended to use these with [Obtainium](https://github.com/ImranR98/Obtainium) to get the latest updates automatically.
+## Komunikator
 
-With Obtainium installed, tap a link below on your phone to set it up with everything pre-configured. The `google` flavor adds Google Crashlytics and Google Maps; `fdroid` has no Google dependencies.
+- **Zdjęcia w czacie przez link** — appka nie wysyła surowych bajtów zdjęcia przez LoRa (za mała przepustowość), tylko uploaduje je anonimowo na zewnętrzny serwer i wysyła sam link jako wiadomość tekstową; odbiorca widzi automatyczny podgląd. Przed wysyłką pojawia się dialog ostrzegający, że serwer hostingu jest publiczny.
+- **Podgląd obrazków wklejonych jako link** — sterowany osobnym przełącznikiem w Ustawienia → Prywatność (domyślnie wyłączone), dostępny zarówno na Androidzie, jak i w wersji desktopowej.
+- **Desktop: Enter = nowa linijka, Ctrl+Enter = wyślij** — zamiast wymuszonego wysyłania samym Enterem, zachowanie typowe dla komunikatorów na komputerze; na telefonie wysyłanie zostaje osobnym przyciskiem obok pola tekstowego.
 
-<!-- BEGIN GENERATED LINKS: obtainium/generate-links.py -->
+## Mapa
 
-| Channel | `google` flavor | `fdroid` flavor |
-|---|---|---|
-| **Latest release** | [Add](https://apps.obtainium.imranr.dev/redirect.html?r=obtainium://app/%7B%22id%22%3A%22com.geeksville.mesh%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fmeshtastic%2FMeshtastic-Android%22%2C%22author%22%3A%22meshtastic%22%2C%22name%22%3A%22Meshtastic%22%2C%22additionalSettings%22%3A%22%7B%5C%22apkFilterRegEx%5C%22%3A%5C%22google-release%5C%5C%5C%5C.apk%24%5C%22%2C%5C%22appName%5C%22%3A%5C%22Meshtastic%5C%22%7D%22%7D) | [Add](https://apps.obtainium.imranr.dev/redirect.html?r=obtainium://app/%7B%22id%22%3A%22com.geeksville.mesh%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fmeshtastic%2FMeshtastic-Android%22%2C%22author%22%3A%22meshtastic%22%2C%22name%22%3A%22Meshtastic%22%2C%22additionalSettings%22%3A%22%7B%5C%22apkFilterRegEx%5C%22%3A%5C%22fdroid-.%2A-release%5C%5C%5C%5C.apk%24%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%2C%5C%22appName%5C%22%3A%5C%22Meshtastic%5C%22%7D%22%7D) |
-| **Open beta** | [Add](https://apps.obtainium.imranr.dev/redirect.html?r=obtainium://app/%7B%22id%22%3A%22com.geeksville.mesh%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fmeshtastic%2FMeshtastic-Android%22%2C%22author%22%3A%22meshtastic%22%2C%22name%22%3A%22Meshtastic%20Beta%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22filterReleaseTitlesByRegEx%5C%22%3A%5C%22-open%5C%22%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22google-release%5C%5C%5C%5C.apk%24%5C%22%2C%5C%22appName%5C%22%3A%5C%22Meshtastic%20Beta%5C%22%7D%22%7D) | [Add](https://apps.obtainium.imranr.dev/redirect.html?r=obtainium://app/%7B%22id%22%3A%22com.geeksville.mesh%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fmeshtastic%2FMeshtastic-Android%22%2C%22author%22%3A%22meshtastic%22%2C%22name%22%3A%22Meshtastic%20Beta%22%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Atrue%2C%5C%22filterReleaseTitlesByRegEx%5C%22%3A%5C%22-open%5C%22%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22fdroid-.%2A-release%5C%5C%5C%5C.apk%24%5C%22%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%2C%5C%22appName%5C%22%3A%5C%22Meshtastic%20Beta%5C%22%7D%22%7D) |
+- Domyślne centrum i przybliżenie mapy ustawione tak, żeby przy pierwszym uruchomieniu (zanim appka zdąży pobrać pozycje węzłów) nie pokazywała pustego oceanu, tylko sensowny punkt startowy; po załadowaniu węzłów mapa i tak wycentrowuje się na realnym obszarze sieci.
+- Naprawiony efekt "przelotu przez ocean" (chwilowe pokazanie punktu 0,0 przed wyśrodkowaniem na właściwej pozycji) na głównym ekranie mapy.
 
-<!-- END GENERATED LINKS -->
+## Branding i personalizacja
 
-What those two channels point at right now:
+- Własny `applicationId`, dzięki czemu appka instaluje się obok oryginalnej appki Meshtastic bez konfliktu (osobne dane, można mieć obie naraz).
+- Zmieniona nazwa i ikona głównego (trwałego) powiadomienia appki oraz ikona samej aplikacji.
+- Wersja desktopowa przemianowana z "Meshtastic Desktop" na tę samą nazwę co appka mobilna, z uzupełnioną sekcją Prywatności w ustawieniach (wcześniej niedostępną na desktopie mimo że logika już istniała).
+- Rozpoznawanie niestandardowej edycji firmware używanej w sieci Świętokrzyskiej — appka pokazuje czytelną nazwę zamiast surowej wartości technicznej.
+- Wygenerowany plik tłumaczeń PL uzupełniający ok. 1000 wcześniej brakujących stringów (appka była przetłumaczona na polski w ok. 43%).
 
-<!-- BEGIN GENERATED STATUS: obtainium/generate-links.py --refresh -->
+## Status i zastrzeżenia
 
-| Channel | Currently | Released |
-|---|---|---|
-| **Latest release** | `v2.8.0` | 2026-07-29 |
-| **Open beta** | *none published right now* | — |
+- To osobisty, roboczy fork — część zmian jest zweryfikowana buildem i przetestowana na urządzeniu, część czeka na potwierdzenie w terenie.
+- Brak oficjalnych release'ów/tagów — zmiany trzymane na bieżąco na gałęzi `main`.
+- Fork korzysta z tej samej licencji GPL-3.0 co projekt macierzysty.
 
-<!-- END GENERATED STATUS -->
+---
+*Bazuje na [meshtastic/Meshtastic-Android](https://github.com/meshtastic/Meshtastic-Android). Nieoficjalny, niezwiązany z Meshtastic LLC.*
 
-Closed-beta and per-commit snapshot channels, importable config files, and the setup details are in [Test Builds & Obtainium](docs/en/developer/test-builds.md). These links, files and the table above are generated — see [`obtainium/`](obtainium/).
 
-Alternatively, these other providers are also available, but may be slower to update. 
 
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-alt="Get it on F-Droid"
-width="24%">](https://f-droid.org/packages/com.geeksville.mesh/)
-[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png"
-alt="Get it on IzzyOnDroid"
-width="24%">](https://apt.izzysoft.de/fdroid/index/apk/com.geeksville.mesh)
-[<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png"
-alt="Get it on GitHub"
-width="24%">](https://github.com/meshtastic/Meshtastic-Android/releases)
-[<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
-alt="Download at https://play.google.com/store/apps/details?id=com.geeksville.mesh]"
-width="24%">](https://play.google.com/store/apps/details?id=com.geeksville.mesh&referrer=utm_source%3Dgithub-android-readme)
+____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
 
-The play store is the last to update of these options, but if you want to join the Play Store testing program go to [this URL](https://play.google.com/apps/testing/com.geeksville.mesh) and opt-in to become a tester.
-If you encounter any problems or have questions, [ask us on the discord](https://discord.gg/meshtastic), [create an issue](https://github.com/meshtastic/Meshtastic-Android/issues), or [post in the forum](https://github.com/orgs/meshtastic/discussions) and we'll help as we can.
 
-### Desktop
 
-**Meshtastic Desktop** installers (macOS DMG, Windows MSI/EXE, Linux DEB/RPM/AppImage) are available from [GitHub Releases](https://github.com/meshtastic/Meshtastic-Android/releases). A Flatpak is available on [Flathub](https://flathub.org/apps/org.meshtastic.MeshtasticDesktop) (packaging repo: [flathub/org.meshtastic.MeshtasticDesktop](https://github.com/flathub/org.meshtastic.MeshtasticDesktop)).
+# Meshtastic_S+ — personal Meshtastic-Android fork
 
-## Documentation
+A fork of the official [Meshtastic-Android](https://github.com/meshtastic/Meshtastic-Android) app, developed for the **Świętokrzyskie** mesh radio network (meshtastic-swietokrzyskie.pl). Builds on the upstream KMP/Compose Multiplatform architecture (`fdroid`/`google` flavors, desktop module) and adds a set of local features, fixes, and customizations not found in the upstream version.
 
-Both sites are deployed to GitHub Pages automatically on every push to `main`.
+Work in progress — this repo is mainly for personal use and testing with a small group of people; it doesn't necessarily build cleanly at all times.
 
-| Site | URL | Contents |
-|---|---|---|
-| **User & Developer Docs** | [meshtastic.github.io/Meshtastic-Android](https://meshtastic.github.io/Meshtastic-Android/) | Jekyll site — user guide, developer guide, in-app doc content |
-| **API Reference** | [meshtastic.github.io/Meshtastic-Android/api](https://meshtastic.github.io/Meshtastic-Android/api/) | Dokka-generated KDoc for all public APIs |
+## Node and mesh network management
 
-### Generating Locally
+- **Remote GPIO control** — on the node detail screen (Remote Hardware module) you can enter a pin number; the app computes the bitmask itself and sends `WRITE_GPIOS`/`READ_GPIOS` to the remote node. Buttons are only enabled once PKC keys have been exchanged with that node.
+- **Remote favorite/ignore over the LoRa mesh** (not just locally) — with real delivery confirmation based on mesh routing ACKs, instead of only a local, phone-side change.
+- **Manual contact add by node ID** — both locally and remotely, with a unified `!a1b2c3d4` (hex) format used everywhere in the app.
+- **Passive NeighborInfo collection** — the neighbor log now also shows overheard broadcasts from other nodes, not just responses to your own requests; also fixes requesting Neighbor Info for your own, locally connected device (previously returned nothing).
+- **Quick command buttons** (`/ping`, `/hello`, `/test`) on the node screen — send a private message even to nodes whose role normally hides the manual message option; useful for quickly testing new firmware builds on devices in the field.
+- **Full list of relay nodes for message delivery** — the "Delivery status" dialog shows the full list of node names involved in relaying a message (not just a count or a single name like upstream), including firmware-side fixes so that data actually reaches the app.
+- Restored the **Traffic Management** configuration screen (removed from upstream at one point).
 
-**User & Developer Docs (Jekyll):**
-```bash
-./gradlew generateDocsBundle publishDocsSite
-BUNDLE_GEMFILE=docs/Gemfile bundle exec jekyll serve \
-  --source build/_site --baseurl ""
-```
+## "Network Health" screen
 
-**API Reference (Dokka):**
-```bash
-./gradlew dokkaGeneratePublicationHtml
-# Output: build/dokka/html/index.html
-```
+A new, sixth tab in the bottom navigation (between Nodes and Map) that doesn't exist in the original app:
 
-## Architecture
+- **6 metric categories** per node: power (battery/voltage/current), signal (SNR/RSSI/noise floor, with a hop-count fallback when there are no direct readings), network (channel/air utilization), environment (temperature/humidity/pressure), traffic (TX/RX/duplicates/relayed/corrupted), and neighbors.
+- Node list with sorting, pinning favorites to the top, hiding empty entries, and search; each metric's detail view is a chart over a 24h/7d/30d window.
+- **"Summary" screen** — cards with top-3 rankings: quietest nodes, best signal, most positions sent, physically closest nodes, most telemetry data, most messages (week/today), and more — all correctly exclude the locally connected device from the rankings so it doesn't skew results.
+- Data architecture: everything is decoded live from the existing mesh event log every time the screen is read — nothing is duplicated into a separate table, so the stats are always current and take no extra database space.
 
-### Modern Android Development (MAD)
-The app follows modern Android development practices, built on top of a shared Kotlin Multiplatform (KMP) Core:
-- **KMP Modules:** Business logic (`core:domain`), data sources (`core:data`, `core:database`, `core:datastore`), and communications (`core:network`, `core:ble`) are entirely platform-agnostic, targeting Android and Compose Desktop.
-- **UI:** JetBrains Compose Multiplatform (Material 3) using Compose Multiplatform resources.
-- **State Management:** Unidirectional Data Flow (UDF) with ViewModels, Coroutines, and Flow.
-- **Dependency Injection:** Koin with Koin Annotations (K2 Compiler Plugin).
-- **Navigation:** JetBrains Navigation 3 (Multiplatform routing with RESTful deep linking).
-- **Data Layer:** Repository pattern with Room KMP (local DB), DataStore (prefs), and Protobuf (device comms). Protobuf models are consumed from the upstream `org.meshtastic:protobufs` Maven artifact, pinned in `gradle/libs.versions.toml`.
+## Messaging
 
-### Bluetooth Low Energy (BLE)
-The BLE stack uses a multiplatform interface-driven architecture. Platform-agnostic interfaces live in `commonMain`, utilizing the **Kable** multiplatform BLE library to handle device communication across all supported targets (Android, Desktop). This provides a robust, Coroutine-based architecture for reliable device communication while remaining fully KMP compatible. See [core/ble/README.md](core/ble/README.md) for details.
+- **Photos in chat via link** — the app doesn't send raw photo bytes over LoRa (not enough bandwidth); instead it anonymously uploads the photo to an external server and sends just the link as a text message, with the recipient seeing an automatic preview. A confirmation dialog appears before sending, warning that the hosting server is public.
+- **Preview for images pasted as links** — controlled by a separate toggle in Settings → Privacy (off by default), available on both Android and the desktop version.
+- **Desktop: Enter = new line, Ctrl+Enter = send** — instead of forcing a send on plain Enter, matching the behavior people expect from desktop chat apps; on the phone, sending stays a separate button next to the text field.
 
-### Module Documentation
+## Map
 
-Each module has its own README with details on its responsibilities, API surface, and internal design.
+- Default map center and zoom set so that on first launch (before the app has fetched node positions) it doesn't show an empty ocean, just a sensible starting point; once nodes load, the map still re-centers on the actual network area.
+- Fixed the "flying through the ocean" effect (briefly showing point 0,0 before centering on the real position) on the main map screen.
 
-| Module | Description |
-|---|---|
-| [core/domain](core/domain/README.md) | Business-logic use cases (radio config, sessions, exports) |
-| [core/repository](core/repository/README.md) | Data & infrastructure contracts (RadioTransport, NodeRepository, ServiceRepository) |
-| [core/takserver](core/takserver/README.md) | Meshtastic ↔ TAK (ATAK/iTAK) bridge — CoT server & conversion |
-| [core/ble](core/ble/README.md) | Multiplatform BLE transport (Kable) |
-| [core/network](core/network/README.md) | Internet comms: firmware metadata, map tiles, radio transports |
-| [core/data](core/data/README.md) | Repository layer — orchestrates DB, network, and service data |
-| [core/database](core/database/README.md) | Room KMP local persistence |
-| [core/datastore](core/datastore/README.md) | DataStore preferences |
-| [core/service](core/service/README.md) | Meshtastic Android service abstractions |
-| [core/navigation](core/navigation/README.md) | Type-safe Navigation 3 route model |
-| [core/resources](core/resources/README.md) | Centralised CMP string & drawable resources |
-| [core/model](core/model/README.md) | Shared domain models |
-| [core/ui](core/ui/README.md) | Shared UI components |
-| [core/common](core/common/README.md) | Common utilities |
-| [core/di](core/di/README.md) | Koin DI modules |
-| [core/testing](core/testing/README.md) | Shared test fakes & utilities |
-| [core/konsist](core/konsist/README.md) | Konsist architecture-rule tests (KMP boundary guards) |
-| [core/nfc](core/nfc/README.md) | NFC support |
-| [core/prefs](core/prefs/README.md) | Legacy preference helpers |
-| [core/barcode](core/barcode/README.md) | Barcode / QR scanning |
-| [feature/messaging](feature/messaging/README.md) | Messaging UI feature |
-| [feature/map](feature/map/README.md) | Map UI feature |
-| [feature/node](feature/node/README.md) | Node detail UI feature |
-| [feature/settings](feature/settings/README.md) | Settings UI feature |
-| [feature/firmware](feature/firmware/README.md) | Firmware update UI feature |
-| [feature/intro](feature/intro/README.md) | Onboarding / intro UI feature |
-| [feature/wifi-provision](feature/wifi-provision/README.md) | Wi-Fi provisioning UI feature |
-| [feature/connections](feature/connections/README.md) | Device discovery & connection management (BLE / USB / TCP) |
-| [feature/discovery](feature/discovery/README.md) | Mesh network discovery (scanner, AI summaries, Mesh Beacon) |
-| [feature/docs](feature/docs/README.md) | In-app documentation browser with Chirpy AI assistant |
-| [feature/widget](feature/widget/README.md) | Android home-screen Glance widget (live mesh stats) |
-| [feature/car](feature/car/README.md) | Android Auto integration (Car App Library, `google` flavor) |
-| [baselineprofile](baselineprofile/README.md) | Macrobenchmark Baseline Profile generation for `:androidApp` |
+## Branding and customization
 
-## Translations
+- A custom `applicationId`, so the app installs side by side with the original Meshtastic app without conflicting (separate data, both can be installed at once).
+- Changed name and icon for the app's main (persistent) notification, plus a custom app icon.
+- The desktop build renamed from "Meshtastic Desktop" to match the mobile app's name, with a Privacy section added to its settings (previously missing on desktop even though the underlying logic already existed).
+- Detection of the custom firmware edition used on the Świętokrzyskie network — the app shows a readable name instead of the raw technical value.
+- A generated PL translation file filling in roughly 1,000 previously untranslated strings (the app was only about 43% translated into Polish).
 
-You can help translate the app into your native language using [Crowdin](https://crowdin.meshtastic.org/android).
+## Status and caveats
 
-## Integration
+- This is a personal, work-in-progress fork — some changes are build-verified and tested on-device, others are still awaiting confirmation in the field.
+- No official releases/tags — changes are kept up to date directly on the `main` branch.
+- The fork uses the same GPL-3.0 license as the upstream project.
 
-The app includes a built-in **Local TAK Server** feature that can be enabled in settings. This runs a loopback-only TLS (mTLS) server on port 8089 so ATAK on the same device can connect directly and route its traffic over the mesh.
+---
+*Based on [meshtastic/Meshtastic-Android](https://github.com/meshtastic/Meshtastic-Android). Unofficial, not affiliated with Meshtastic LLC.*
 
-## Building the Android App
-> [!WARNING]
-> Debug and release builds can be installed concurrently. This is solely to enable smoother development, and you should avoid running both apps simultaneously. To ensure proper function, force quit the app not in use.
-
-https://meshtastic.org/docs/development/android/
-
-Note: when building the `google` flavor locally you will need to supply your own [Google Maps Android SDK api key](https://developers.google.com/maps/documentation/android-sdk/get-api-key) as `MAPS_API_KEY` in `secrets.properties` (repo root — create the file if it doesn't exist) in order to use Google Maps. Without it, `secrets.defaults.properties` supplies a placeholder so the build still succeeds, but map tiles will not load.
-e.g.
-```properties
-# secrets.properties
-MAPS_API_KEY=your_google_maps_api_key_here
-```
-
-## Contributing guidelines
-
-For detailed instructions on how to contribute, please see our [CONTRIBUTING.md](CONTRIBUTING.md) file.
-For details on our release process, see the [RELEASE_PROCESS.md](RELEASE_PROCESS.md) file.
-
-## Repository Statistics
-
-![Alt](https://repobeats.axiom.co/api/embed/1d75239069a6d671fe0b8f80b2e1bf590a98f0eb.svg "Repobeats analytics image")
-
-Copyright 2025-2026, Meshtastic LLC. GPL-3.0 license
