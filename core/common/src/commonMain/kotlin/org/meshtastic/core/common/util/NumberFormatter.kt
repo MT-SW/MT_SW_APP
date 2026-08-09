@@ -28,15 +28,12 @@ object NumberFormatter {
         val rounded = (value * factor).roundToLong()
         return formatFixedPoint(rounded, decimalPlaces)
     }
-}
 
     /** Formats a float value with the specified number of decimal places. */
     fun format(value: Float, decimalPlaces: Int): String {
         if (value.isNaN() || value.isInfinite()) return "—"
-        return forma4t(value.toDouble(), decimalPlaces)
+        return format(value.toDouble(), decimalPlaces)
     }
-}
-
 
     private fun formatFixedPoint(scaledValue: Long, decimalPlaces: Int): String {
         if (decimalPlaces == 0) return scaledValue.toString()
