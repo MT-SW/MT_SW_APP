@@ -33,8 +33,8 @@
     <string name="acknowledgements">Potwierdzenia</string>
     <!-- ACTION -->
     <string name="action_copy_message">Kopiuj wiadomość</string>
-    <string name="action_delete_message">Usunąć wiadomość</string>
-    <string name="action_react_with_emoji">Reaguj emoji</string>
+    <string name="action_delete_message">Usuń wiadomość</string>
+    <string name="action_react_with_emoji">Wstaw emoji</string>
     <string name="action_select_device">Wybierz urządzenie</string>
     <string name="action_select_message">Wybierz wiadomość</string>
     <string name="action_select_network">Wybierz sieć</string>
@@ -71,7 +71,7 @@
     <string name="air_quality_metrics_module_enabled">Włącz moduł metryk jakości powietrza</string>
     <string name="air_quality_metrics_update_interval_seconds">Czas aktualizacji metryk jakości powietrza</string>
     <string name="air_util_definition">Procent czasu  wykorzystanego do transmisji w ciągu ostatniej godziny.</string>
-    <string name="air_utilization">Wykorzystanie eteru</string>
+    <string name="air_utilization">AirUtil</string>
     <!-- ALERT -->
     <string name="alert_bell_buzzer">Brzęczyk dzwonka alarmowego</string>
     <string name="alert_bell_led">Dioda dzwonka alarmowego</string>
@@ -84,8 +84,8 @@
     <string name="allow_input_source">Zezwól na źródło wejściowe</string>
     <string name="allow_undefined_pin_access">Zezwól na dostęp do niezdefiniowanych pinów</string>
     <string name="alt">Alt</string>
-    <string name="altitude">Wysokość</string>
-    <string name="always_point_north">Zawsze wskazywać na północ</string>
+    <string name="altitude">Wys.</string>
+    <string name="always_point_north">Zawsze wskazuj północ</string>
     <string name="ambient_lighting">Oświetlenie otoczenia</string>
     <string name="ambient_lighting_config">Konfiguracja oświetlenia otoczenia</string>
     <string name="analytics_notice">Zbierane są dane analityczne, które pomagają nam ulepszać aplikację na Androida (dziękujemy) - otrzymujemy zanonimizowane informacje o zachowaniu użytkownika. Obejmuje to raporty awarii, ekrany używane w aplikacji itd.</string>
@@ -129,14 +129,14 @@
     <string name="audio_config">Konfiguracja dźwięku</string>
     <string name="available_pins">Dostępne piny</string>
     <string name="back">Wstecz</string>
-    <string name="backup_keys">Klucze zapasowe</string>
+    <string name="backup_keys">Kopia kluczy</string>
     <string name="backup_keys_confirmation">Zapisuje klucz publiczny i prywatny w bezpiecznej, zaszyfrowanej pamięci tego urządzenia.</string>
     <string name="backup_restore">Kopia zapasowa i przywracanie</string>
     <string name="bad">słaby</string>
     <string name="bandwidth">Pasmo</string>
     <string name="baro_pressure">Baro</string>
     <string name="battery">Bateria</string>
-    <string name="battery_ina_2xx_i2c_address">Adres I2C baterii INA_2XX</string>
+    <string name="battery_ina_2xx_i2c_address">Adres I2C  dla wartości baterii INA_2XX</string>
     <string name="ble_devices">Urządzenia Bluetooth</string>
     <string name="ble_rssi_threshold_defaults_to_80">Próg RSSI BLE (domyślnie -80)</string>
     <string name="blue">Niebieski</string>
@@ -171,17 +171,17 @@
     <string name="calculating">Obliczanie…</string>
     <string name="call_sign">Znak wywoławczy</string>
     <string name="call_sign_summary">Twój znak wywoławczy radioamatorski, do 8 znaków</string>
-    <string name="camera_permission">Pozwolenie na użycie kamery</string>
+    <string name="camera_permission">Pozwolenie na dostęp do kamery</string>
     <string name="camera_permission_rationale">Zezwól na dostęp do aparatu, aby skanować kody QR.</string>
     <string name="camera_unavailable">Nie udało się uruchomić aparatu. Spróbuj ponownie lub zamknij i otwórz skaner ponownie.</string>
     <string name="cancel">Anuluj</string>
     <string name="cancel_reply">Anuluj odpowiedź</string>
-    <string name="canned_message">Wiadomości gotowe</string>
-    <string name="canned_message_config">Konfiguracja gotowych wiadomości</string>
-    <string name="canned_message_enabled">Wiadomości gotowe włączone</string>
+    <string name="canned_message">Wiadomości predefiniowane</string>
+    <string name="canned_message_config">Konfiguracja predefiniowanych wiadomości</string>
+    <string name="canned_message_enabled">Wiadomości predefiniowane włączone</string>
     <string name="cant_change_no_radio">Nie można zmienić kanału, ponieważ urządzenie nie jest jeszcze podłączone. Proszę, spróbuj ponownie.</string>
     <string name="cant_shutdown">Wyłączenie nie jest obsługiwane w tym urządzeniu</string>
-    <string name="carousel_interval">Interwał karuzeli</string>
+    <string name="carousel_interval">Interwał "karuzeli"</string>
     <string name="ch_util_definition">Wykorzystanie dla bieżącego kanału, w tym prawidłowego TX/RX oraz zniekształconego RX (czyli szumu).</string>
     <!-- CHANNEL -->
     <string name="channel">Kan.</string>
@@ -198,7 +198,7 @@
     <string name="channel_label">Kanał</string>
     <string name="channel_name">Nazwa Kanału</string>
     <string name="channel_url">URL kanału</string>
-    <string name="channel_utilization">WykKan</string>
+    <string name="channel_utilization">ChUtil</string>
     <string name="channels">Kanały</string>
     <!-- CHIRPY -->
     <string name="chirpy">Chirpy</string>
@@ -244,8 +244,8 @@
     <string name="communicate_off_the_grid">Komunikuj się z przyjaciółmi i społecznością bez zasięgu sieci komórkowej.</string>
     <!-- COMPASS -->
     <string name="compass_bearing">Kurs: %1$s</string>
-    <string name="compass_bearing_na">Kurs: N/A</string>
-    <string name="compass_distance">Odległość: %1$s</string>
+    <string name="compass_bearing_na">Kurs: B/D</string>
+    <string name="compass_distance">Dystans: %1$s</string>
     <string name="compass_location_disabled">Lokalizacja jest wyłączona. Włącz usługi lokalizacji.</string>
     <string name="compass_no_location_fix">Oczekiwanie na poprawkę GPS, aby obliczyć odległość i kurs.</string>
     <string name="compass_no_location_permission">Aby pokazać odległość i kurs, wymagane jest uprawnienie do lokalizacji.</string>
@@ -255,11 +255,11 @@
     <string name="compass_title">Kompas</string>
     <string name="compass_uncertainty">Szacowany obszar: \u00b1%1$s (\u00b1%2$s)</string>
     <string name="compass_uncertainty_unknown">Szacowany obszar: nieznana dokładność</string>
-    <string name="compromised_keys">Wykryto skompromitowane klucze, wybierz OK, aby je wygenerować ponownie.</string>
+    <string name="compromised_keys">Wykryto powielone klucze, wybierz OK, aby je wygenerować ponownie.</string>
     <!-- CONFIG -->
     <string name="config_device_doubleTapAsButtonPress_summary">Traktuj podwójne dotknięcie na obsługiwanych akcelerometrach jako naciśnięcie przycisku użytkownika.</string>
     <string name="config_device_ledHeartbeatEnabled_summary">Kontroluje miganie LED na urządzeniu. Dla większości urządzeń będzie to sterować jednym z maksymalnie 4 diod LED, ładowarka i diody GPS nie są sterowane.</string>
-    <string name="config_device_transmitOverLora_summary">Czy oprócz wysyłania do MQTT i PhoneAPI, NeighborInfo powinny być przesłane przez LoRa? Niedostępny na kanale z domyślnym kluczem i nazwą.</string>
+    <string name="config_device_transmitOverLora_summary">Czy oprócz wysyłania do MQTT i PhoneAPI, NeighborInfo powinny być przesłane przez LoRa? Niedostępny na kanale z domyślnym kluczem i nazwą (z wyjątkiem FW_MT_SW).</string>
     <string name="config_device_tripleClickAsAdHocPing_summary">Wyślij lokalizację na kanale głównym, gdy przycisk użytkownika jest trzykrotnie kliknięty.</string>
     <string name="config_device_tzdef_summary">Strefa czasowa dla dat na ekranie urządzenia i dzienniku.</string>
     <string name="config_device_use_phone_tz">Użyj strefy czasowej telefonu</string>
@@ -287,11 +287,11 @@
     <string name="config_position_gps_update_interval_summary">Jak często powinniśmy próbować uzyskać pozycję GPS (&lt;10 sekund utrzymuje GPS włączony).</string>
     <string name="config_power_is_power_saving_summary">Uśpij wszystko na tak długo, jak to możliwe, w przypadku funkcji trackera i czujnika obejmie to również radio lora. Nie używaj tego ustawienia, jeśli chcesz korzystać z urządzenia z aplikacjami na telefon lub używasz urządzenia bez przycisków.</string>
     <string name="config_saved_restarting">Węzeł restartuje się i będzie chwilowo niedostępny.</string>
-    <string name="config_security_admin_key">Klucz publiczny uprawniony do wysyłania wiadomości administracyjnych do tego węzła.</string>
+    <string name="config_security_admin_key">Klucz publiczny uprawniony do wysyłania poleceń administracyjnych do tego węzła.</string>
     <string name="config_security_debug_log_api_enabled">Pokaż na żywo logi debugowania przez połączenie szeregowe, podejrzyj i eksportuj logi węzła (bez informacji lokalizacyjnych) przez Bluetooth.</string>
     <string name="config_security_is_managed">Urządzenie jest zarządzane przez administratora sieci mesh, użytkownik nie ma dostępu do żadnych ustawień urządzenia.</string>
-    <string name="config_security_private_key">Używane do tworzenia klucza współdzielonego ze zdalnym urządzeniem.</string>
-    <string name="config_security_public_key">Wygenerowany z Twojego klucza prywatnego i wysyłany do innych węzłów w sieci mesh, aby mogły obliczyć wspólny klucz tajny.</string>
+    <string name="config_security_private_key">Klucz prywatny, na podstawie którego generujemy ID (fw 2.8) oraz klucz publiczny.</string>
+    <string name="config_security_public_key">Wygenerowany z Twojego klucza prywatnego i wysyłany do innych węzłów w sieci mesh.</string>
     <string name="config_security_serial_enabled">Konsola szeregowa przez Stream API.</string>
     <string name="configuration">Konfiguracja</string>
     <string name="configure_bluetooth_permissions">Skonfiguruj uprawnienia Bluetooth</string>
@@ -316,7 +316,7 @@
     <string name="critical_alert">Krytyczny alert!</string>
     <string name="critical_alerts">Alerty krytyczne</string>
     <string name="critical_alerts_dnd_request_text">Aby zapewnić otrzymywanie krytycznych alertów, takich jak wiadomości SOS, nawet gdy urządzenie jest w trybie "Nie przeszkadzać", musisz przyznać specjalne uprawnienie. Włącz to w ustawieniach powiadomień.</string>
-    <string name="current">Natężenie</string>
+    <string name="current">Prąd</string>
     <string name="currently">Obecnie:</string>
     <string name="datadog_link" translatable="false">Datadog: https://www.datadoghq.com/</string>
     <string name="date">Data</string>
@@ -358,7 +358,7 @@
     <string name="default_mqtt_address" translatable="false">mqtt.meshtastic.org</string>
     <!-- DELETE -->
     <string name="delete">Usuń</string>
-    <string name="delete_custom_tile_source">Usuń sieciowe źródło kafelków</string>
+    <string name="delete_custom_tile_source">Usuń własne źródło kafelków mapy</string>
     <string name="delete_for_everyone">Usuń dla wszystkich</string>
     <string name="delete_for_me">Usuń u mnie</string>
     <string name="delete_key_backup">Usuń kopię zapasową kluczy</string>
@@ -394,7 +394,7 @@
     <string name="device">Urządzenie</string>
     <string name="device_configuration">Konfiguracja urządzenia</string>
     <string name="device_db_cache_limit">Limit pamięci podręcznej urządzenia</string>
-    <string name="device_db_cache_limit_summary">Maksymalna ilość danych urządzenia do utrzymania na tym telefonie</string>
+    <string name="device_db_cache_limit_summary">Maksymalna ilość danych urządzenia do utrzymania w tej aplikacji</string>
     <string name="device_gps">Ustawienia GPS</string>
     <string name="device_links">Linki urządzenia</string>
     <string name="device_links_i_want_one">Chcę taki</string>
@@ -433,7 +433,7 @@
     <string name="discovery_history">Historia odkrywania</string>
     <string name="discovery_interrupted_scan_restored">Przywrócono konfigurację domową radia (%1$s) po przerwanym skanowaniu odkrywania</string>
     <string name="discovery_keep_screen_awake">Nie wygaszaj ekranu</string>
-    <string name="discovery_keep_screen_awake_description">Zapobiega odrzucaniu pakietów radiowych przez tryb Doze Androida podczas długich skanów. Zalecane.</string>
+    <string name="discovery_keep_screen_awake_description">Zapobiega odrzucaniu pakietów radiowych przez tryb uśpienia Androida podczas długich skanów. Zalecane.</string>
     <string name="discovery_local_mesh">Odkrywanie lokalnej sieci mesh</string>
     <string name="discovery_lora_presets">Presety LoRa</string>
     <string name="discovery_lora_presets_description">Wybierz jeden lub więcej presetów do przeskanowania</string>
@@ -501,11 +501,11 @@
     <string name="display_time_in_12h_format">Gdy włączone, urządzenie będzie wyświetlać czas na ekranie w formacie 12-godzinnym.</string>
     <string name="display_units">Wyświetlana jednostka</string>
     <!-- DISTANCE -->
-    <string name="distance">Odległość</string>
+    <string name="distance">Dystans</string>
     <string name="distance_filters">Filtry odległości</string>
-    <string name="distance_filters_description">Filtruj listę węzłów i mapę sieci mesh na podstawie odległości od telefonu.</string>
+    <string name="distance_filters_description">Filtruj listę węzłów i mapę sieci mesh na podstawie odległości od Twojego urządzenia.</string>
     <string name="distance_measurements">Pomiary odległości</string>
-    <string name="distance_measurements_description">Wyświetlaj odległość między telefonem a innymi węzłami Meshtastic_S+ z ustaloną pozycją.</string>
+    <string name="distance_measurements_description">Wyświetlaj odległość między Twoim urządzeniem a innymi węzłami Meshtastic_S+ z ustaloną pozycją.</string>
     <string name="dns">DNS</string>
     <!-- DOC -->
     <string name="doc_clear_search">Wyczyść wyszukiwanie</string>
@@ -569,7 +569,7 @@
     <string name="easily_set_up_private_mesh_networks">Łatwo skonfiguruj prywatne sieci mesh do bezpiecznej i niezawodnej komunikacji na odległych obszarach.</string>
     <string name="echo_enabled">Włącz echo</string>
     <string name="edit">Edytuj</string>
-    <string name="edit_custom_tile_source">Edytuj sieciowe źródło kafelków</string>
+    <string name="edit_custom_tile_source">Edytuj własne źródło kafelków mapy</string>
     <string name="eight_hours">8 Godzin</string>
     <string name="elevation_suffix" translatable="false">MSL</string>
     <string name="enable_power_saving_mode">Włącz tryb oszczędzania energii</string>
@@ -842,7 +842,7 @@
     <string name="interval_always_on">Zawsze włączone</string>
     <string name="interval_unset">Nieustawiony</string>
     <string name="intro_show">Wprowadzenie</string>
-    <string name="intro_welcome">Witaj w</string>
+    <string name="intro_welcome">Witaj</string>
     <string name="ip">IP</string>
     <string name="ip_address">Adres IP:</string>
     <string name="ip_port">Port:</string>
@@ -903,7 +903,7 @@
     <string name="local_stats_battery">Bateria: %1$d%</string>
     <string name="local_stats_diagnostics_prefix">Diagnostyka: %1$s</string>
     <string name="local_stats_dropped">Odrzucone %1$d</string>
-    <string name="local_stats_heap">Sterta</string>
+    <string name="local_stats_heap">Heap</string>
     <string name="local_stats_heap_value">%1$d / %2$d</string>
     <string name="local_stats_nodes">Węzły: %1$d online / %2$d łącznie</string>
     <string name="local_stats_noise">Szum %1$d dBm</string>
@@ -911,7 +911,7 @@
     <string name="local_stats_traffic">Ruch: TX %1$d / RX %2$d (D: %3$d)</string>
     <string name="local_stats_updated_at">%1$s</string>
     <string name="local_stats_uptime">Czas pracy: %1$s</string>
-    <string name="local_stats_utilization">WykKan: %1$s% | AirTX: %2$s%</string>
+    <string name="local_stats_utilization">ChUtil: %1$s% | AirTX: %2$s%</string>
     <string name="location_disabled">Brak dostępu do lokalizacji, nie można udostępnić pozycji w sieci mesh.</string>
     <string name="location_sharing">Udostępnianie lokalizacji</string>
     <!-- LOCKDOWN -->
@@ -946,7 +946,7 @@
     <string name="lockdown_submit">Prześlij</string>
     <string name="locked">Zablokowany</string>
     <!-- LOG -->
-    <string name="log_retention_days">Okres przechowywania MeshLog</string>
+    <string name="log_retention_days">Okres przechowywania logów</string>
     <plurals name="log_retention_days_quantity">
         <item quantity="one">%1$d dni</item>
         <item quantity="few">%1$d dni</item>
@@ -1012,16 +1012,16 @@
     <string name="match_any">Dopasuj Dowolne | Wszystkie</string>
     <string name="max">Maks.</string>
     <!-- MESH -->
-    <string name="mesh_beacon">Latarnia sieci mesh</string>
-    <string name="mesh_beacon_broadcast">Nadawaj latarnię</string>
+    <string name="mesh_beacon">Meshbeacon</string>
+    <string name="mesh_beacon_broadcast">Nadawaj pakiety meshbeacon</string>
     <string name="mesh_beacon_broadcast_summary">Okresowo ogłaszaj tę sieć mesh pobliskim węzłom</string>
-    <string name="mesh_beacon_channels_title">Kanały latarni</string>
+    <string name="mesh_beacon_channels_title">Kanały meshbeacon</string>
     <string name="mesh_beacon_interval">Interwał nadawania (sekundy)</string>
     <string name="mesh_beacon_interval_error">Minimum %1$d sekund</string>
     <string name="mesh_beacon_invitations_title">Zaproszenia do sieci mesh</string>
-    <string name="mesh_beacon_listen">Nasłuchuj latarni</string>
+    <string name="mesh_beacon_listen">Nasłuchuj pakietów meshbeacon</string>
     <string name="mesh_beacon_listen_summary">Wychwytuj zaproszenia ogłaszane przez pobliskie sieci mesh</string>
-    <string name="mesh_beacon_message">Wiadomość latarni</string>
+    <string name="mesh_beacon_message">Wiadomość meshbeacon</string>
     <string name="mesh_beacon_message_error">Maksymalnie %1$d bajtów</string>
     <string name="mesh_beacon_notification_body">Pobliska sieć mesh zaprosiła Cię do dołączenia</string>
     <string name="mesh_beacon_notification_title">Zaproszenie do sieci mesh</string>
@@ -1215,13 +1215,13 @@
     <string name="node_sort_alpha">Nazwa</string>
     <string name="node_sort_button">Opcje sortowania węzłów</string>
     <string name="node_sort_channel">Kanał</string>
-    <string name="node_sort_distance">Odległość</string>
+    <string name="node_sort_distance">Dystans</string>
     <string name="node_sort_hops_away">Liczba skoków</string>
     <string name="node_sort_last_heard">Aktywność</string>
     <string name="node_sort_title">Sortuj według</string>
     <string name="node_sort_via_favorite">Przez ulubione</string>
     <string name="node_sort_via_mqtt">Przez MQTT</string>
-    <string name="node_status_summary">Rzeczywisty ciąg statusu</string>
+    <string name="node_status_summary">Treść statusu</string>
     <string name="nodedb_reset">Zresetuj NodeDB</string>
     <string name="nodeinfo_broadcast_interval">Interwał transmisji informacji o węźle</string>
     <!-- NODES -->
@@ -1256,9 +1256,9 @@
     <!-- ONE -->
     <string name="one_day">24 Godzin</string>
     <string name="one_hour">1 godzina</string>
-    <string name="one_hour_short">1G</string>
+    <string name="one_hour_short">1g</string>
     <string name="one_month">1M</string>
-    <string name="one_week">1W</string>
+    <string name="one_week">1t</string>
     <string name="one_wire_temperature">Temp. 1-Wire</string>
     <string name="only_favorites">Tylko ulubione</string>
     <!-- OPEN -->
@@ -1278,8 +1278,8 @@
     <string name="output_vibra_gpio">Wyjście silnika wibracyjnego (GPIO)</string>
     <string name="overflow_menu">Menu dodatkowe</string>
     <string name="override_console_serial_port">Nadpisz port szeregowy konsoli</string>
-    <string name="override_duty_cycle">Nadpisz cykl pracy</string>
-    <string name="override_frequency_mhz">Nadpisanie częstotliwości</string>
+    <string name="override_duty_cycle">Pomiń limit czasu nadawania</string>
+    <string name="override_frequency_mhz">Wymuszenie częstotliwości</string>
     <string name="pa_fan_disabled">Wentylator PA wyłączony</string>
     <!-- PACKET -->
     <string name="packet_authenticity">Autentyczność pakietów</string>
@@ -1485,7 +1485,7 @@
     <string name="routing_error_admin_public_key_unauthorized">Nieautoryzowany klucz publiczny</string>
     <string name="routing_error_bad_request">Błędne żądanie</string>
     <string name="routing_error_duty_cycle_limit">Osiągnięto okresowy limit nadawania dla tego regionu</string>
-    <string name="routing_error_got_nak">Otrzymano negatywne potwierdzenie</string>
+    <string name="routing_error_got_nak">Otrzymano NAK</string>
     <string name="routing_error_max_retransmit">Przekroczono czas lub liczbę retransmisji</string>
     <string name="routing_error_no_channel">Brak kanału</string>
     <string name="routing_error_no_interface">Brak interfejsu</string>
@@ -1560,7 +1560,7 @@
     <string name="send_bell_with_alert_message">Wyślij dzwonek z wiadomością alarmową</string>
     <string name="sender_message_interval_seconds">Interwał wiadomości nadawcy (sekundy)</string>
     <!-- SERIAL -->
-    <string name="serial">Seryjny</string>
+    <string name="serial">Port szeregowy</string>
     <string name="serial_baud_rate">Prędkość transmisji</string>
     <string name="serial_config">Konfiguracja seryjna</string>
     <string name="serial_console">Konsola szeregowa</string>
@@ -1652,7 +1652,7 @@
     <string name="success">Sukces</string>
     <string name="super_deep_sleep_duration_seconds">Czas trwania głębokiego uśpienia</string>
     <string name="supported">Obsługiwane</string>
-    <string name="supported_by_community">Wspierane przez społeczność Meshtastic_S+</string>
+    <string name="supported_by_community">Wspierane przez społeczność Meshtastic</string>
     <string name="sx126x_rx_boosted_gain">Wzmocniony zysk RX</string>
     <string name="system_settings">Ustawienia systemowe</string>
     <!-- TAK -->
@@ -1699,7 +1699,7 @@
     <string name="tak_team_yellow">Żółty</string>
     <string name="telemetry">Telemetria</string>
     <string name="telemetry_config">Konfiguracja telemetrii</string>
-    <string name="temperature">Temp.</string>
+    <string name="temperature">Temp.°</string>
     <string name="theme">Motyw</string>
     <string name="theme_dark">Ciemny</string>
     <string name="theme_light">Jasny</string>
@@ -1725,12 +1725,12 @@
         <item quantity="other">%d skoków</item>
     </plurals>
     <string name="traceroute_log">Pokaż trasę</string>
-    <string name="traceroute_map_no_data">Ten traceroute nie ma jeszcze węzłów możliwych do naniesienia na mapę.</string>
+    <string name="traceroute_map_no_data">Ta trasa nie ma jeszcze węzłów możliwych do naniesienia na mapę.</string>
     <string name="traceroute_no_response">Brak odpowiedzi</string>
     <string name="traceroute_outgoing_route">Wychodząca trasa</string>
     <string name="traceroute_return_hops">Skoki powrotne</string>
     <string name="traceroute_return_route">Trasa zwrotna</string>
-    <string name="traceroute_round_trip">Podróż w obie strony</string>
+    <string name="traceroute_round_trip">Trasa w obie strony</string>
     <string name="traceroute_route_back_to_us">Trasa do nas:\n\n</string>
     <string name="traceroute_route_towards_dest">Trasa do miejsca docelowego:\n\n</string>
     <string name="traceroute_showing_nodes">Pokazywanie %1$d/%2$d węzłów</string>
@@ -1771,7 +1771,7 @@
     <string name="transport_tcp">TCP</string>
     <string name="transport_udp">UDP</string>
     <string name="transport_usb">USB</string>
-    <string name="triple_click_adhoc_ping">Potrójne kliknięcie: Ping doraźny</string>
+    <string name="triple_click_adhoc_ping">Potrójne kliknięcie: Ping adhoc</string>
     <string name="twenty_four_hours">24H</string>
     <string name="two_days">48 Godzin</string>
     <string name="two_weeks">2W</string>
@@ -1829,7 +1829,7 @@
     <string name="via_udp">przez UDP</string>
     <string name="view_on_map">Pokaż na mapie</string>
     <string name="view_release">Zobacz wydanie</string>
-    <string name="voltage">Napięcie</string>
+    <string name="voltage">Nap.</string>
     <string name="wait_for_bluetooth_duration_seconds">Czas oczekiwania na Bluetooth</string>
     <string name="wake_on_tap_or_motion">Wybudź przy dotknięciu lub ruchu</string>
     <string name="warning">Uwaga</string>
@@ -1888,11 +1888,11 @@
     <string name="wind_lull">Cisza wiatru</string>
     <string name="wind_speed">Prędkość wiatru</string>
     <!-- WRITE -->
-    <string name="write_nfc">Zapisz na znaczniku NFC</string>
-    <string name="write_nfc_failed">Nie udało się zapisać na znaczniku. Użyj zapisywalnego, pustego znacznika NFC i trzymaj go nieruchomo.</string>
-    <string name="write_nfc_subtext">Zapis zapisuje ten link udostępniania na fizycznym znaczniku NFC. Każdy może dotknąć znacznika telefonem, aby go otworzyć.</string>
-    <string name="write_nfc_success">Zapisano na znaczniku</string>
-    <string name="write_nfc_text">Przyłóż zapisywalny znacznik NFC do tyłu telefonu.</string>
+    <string name="write_nfc">Zapisz na tagu NFC</string>
+    <string name="write_nfc_failed">Nie udało się zapisać na tagu. Użyj zapisywalnego, pustego tagu NFC i trzymaj go nieruchomo.</string>
+    <string name="write_nfc_subtext">Zapis zapisuje ten link udostępniania na fizycznym tagu NFC. Każdy może dotknąć tagu telefonem, aby go otworzyć.</string>
+    <string name="write_nfc_success">Zapisano na tagu</string>
+    <string name="write_nfc_text">Przyłóż zapisywalny tag NFC do tyłu telefonu.</string>
     <string name="you">Ty</string>
     <string name="zh_CN" translatable="false">简体中文</string>
     <string name="zh_TW" translatable="false">繁體中文</string>
