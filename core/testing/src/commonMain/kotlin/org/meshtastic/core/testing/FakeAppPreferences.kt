@@ -152,6 +152,12 @@ class FakeUiPrefs : UiPrefs {
         showQuickChat.value = show
     }
 
+    override val showFullMessageTimestamps = MutableStateFlow(false)
+
+    override fun setShowFullMessageTimestamps(show: Boolean) {
+        showFullMessageTimestamps.value = show
+    }
+
     override val eventThemeEnabled = MutableStateFlow(true)
 
     override fun setEventThemeEnabled(enabled: Boolean) {
@@ -328,9 +334,18 @@ class FakeMapConsentPrefs : MapConsentPrefs {
 
 class FakeMapTileProviderPrefs : MapTileProviderPrefs {
     override val customTileProviders = MutableStateFlow<String?>(null)
+    override val selectedCustomTileProviderId = MutableStateFlow<String?>(null)
 
-    override fun setCustomTileProviders(providers: String?) {
+    override suspend fun awaitCustomTileProviders(): String? = customTileProviders.value
+
+    override suspend fun awaitSelectedCustomTileProviderId(): String? = selectedCustomTileProviderId.value
+
+    override suspend fun setCustomTileProviders(providers: String?) {
         customTileProviders.value = providers
+    }
+
+    override suspend fun setSelectedCustomTileProviderId(providerId: String?) {
+        selectedCustomTileProviderId.value = providerId
     }
 }
 
@@ -353,6 +368,8 @@ class FakeMeshPrefs : MeshPrefs {
     override fun setDeviceAddress(address: String?) {
         deviceAddress.value = address
     }
+
+    override suspend fun awaitDeviceAddress(): String? = deviceAddress.value
 
     private val lastRequest = mutableMapOf<String?, MutableStateFlow<Int>>()
 

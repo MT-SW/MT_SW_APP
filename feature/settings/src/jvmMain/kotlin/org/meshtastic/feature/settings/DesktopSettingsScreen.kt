@@ -46,7 +46,6 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.acknowledgements
 import org.meshtastic.core.resources.app_settings
 import org.meshtastic.core.resources.app_version
-import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.bottom_nav_settings
 import org.meshtastic.core.resources.device_db_cache_limit
 import org.meshtastic.core.resources.device_db_cache_limit_summary
@@ -65,14 +64,12 @@ import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticDialog
-import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.ChevronRight
 import org.meshtastic.core.ui.icon.Device
 import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.HelpOutline
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Language
-import org.meshtastic.core.ui.icon.LinkIcon
 import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.Memory
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -110,7 +107,6 @@ fun DesktopSettingsScreen(
     val hiddenFeaturesUnlocked by settingsViewModel.hiddenFeaturesUnlocked.collectAsStateWithLifecycle()
     val cacheLimit by settingsViewModel.dbCacheLimit.collectAsStateWithLifecycle()
     val isOtaCapable by settingsViewModel.isOtaCapable.collectAsStateWithLifecycle()
-    val autoLoadChatImages by settingsViewModel.autoLoadChatImages.collectAsStateWithLifecycle()
 
     var showThemePickerDialog by remember { mutableStateOf(false) }
     var showLanguagePickerDialog by remember { mutableStateOf(false) }
@@ -196,13 +192,6 @@ fun DesktopSettingsScreen(
                     HomoglyphSetting(
                         homoglyphEncodingEnabled = homoglyphEnabled,
                         onToggle = { radioConfigViewModel.toggleHomoglyphCharactersEncodingEnabled() },
-                    )
-
-                    SwitchListItem(
-                        text = stringResource(Res.string.auto_load_chat_images),
-                        leadingIcon = MeshtasticIcons.LinkIcon,
-                        checked = autoLoadChatImages,
-                        onClick = { settingsViewModel.setAutoLoadChatImages(!autoLoadChatImages) },
                     )
 
                     val cacheItems = remember {

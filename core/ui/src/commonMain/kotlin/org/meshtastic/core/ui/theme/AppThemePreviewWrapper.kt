@@ -14,18 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package org.meshtastic.app.map.model
+package org.meshtastic.core.ui.theme
 
-import kotlinx.serialization.Serializable
-import kotlin.uuid.Uuid
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.PreviewWrapperProvider
 
-@Serializable
-data class CustomTileProviderConfig(
-    val id: String = Uuid.random().toString(),
-    val name: String,
-    val urlTemplate: String,
-    val localUri: String? = null,
-) {
-    val isLocal: Boolean
-        get() = localUri != null
+/**
+ * Supplies [AppTheme] to previews annotated with `@PreviewWrapper(AppThemePreviewWrapper::class)`, replacing a manual
+ * `AppTheme { }` in the preview body. Only the renderer of the annotated function applies this — a preview invoked as a
+ * plain function call from another composable does not inherit it.
+ */
+class AppThemePreviewWrapper : PreviewWrapperProvider {
+    @Composable
+    override fun Wrap(content: @Composable () -> Unit) {
+        AppTheme { content() }
+    }
 }

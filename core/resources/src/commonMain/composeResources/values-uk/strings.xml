@@ -99,6 +99,7 @@
     <string name="back">Назад</string>
     <string name="backup_keys">Резервні ключі</string>
     <string name="bad">Поганий</string>
+    <!-- BANDWIDTH -->
     <string name="bandwidth">Ширина смуги пропускання</string>
     <string name="baro_pressure">Бар</string>
     <string name="battery">Батарея</string>
@@ -377,7 +378,6 @@
     <string name="doc_title_nodes">Вузли</string>
     <string name="done">Готово</string>
     <string name="double_tap_as_button_press">Подвійний дотик як натискання кнопки</string>
-    <string name="downlink_enabled">Прийом увімкнений</string>
     <string name="download">Завантажити</string>
     <string name="duplicated_public_key_title">Виявлено дублікат публічного ключа</string>
     <string name="dynamic">Динамічна</string>
@@ -385,6 +385,7 @@
     <string name="echo_enabled">Відлуння активоване</string>
     <string name="edit">Редагувати</string>
     <string name="eight_hours">8 Годин</string>
+    <!-- EMOJI -->
     <string name="enable_power_saving_mode">Увімкнути енергоощадний режим</string>
     <string name="enabled">Увімкнено</string>
     <!-- ENCRYPTION -->
@@ -412,6 +413,7 @@
     <string name="exchange_position">Обмін місцеположенням</string>
     <string name="expand_chart">Розгорнути графік</string>
     <string name="expires">Діє до</string>
+    <!-- EXPORT -->
     <string name="export_configuration">Експортувати налаштування</string>
     <string name="export_data_csv">Експортувати всі пакети</string>
     <string name="export_gpx">Експортувати GPX</string>
@@ -612,11 +614,13 @@
     <string name="latest_alpha_firmware">Остання альфа</string>
     <string name="latest_stable_firmware">Остання стабільна</string>
     <string name="latitude">Широта</string>
+    <!-- LAYER -->
     <string name="learn_more">Докладніше</string>
     <string name="led_heartbeat">Частота мигання світлодіоду</string>
     <string name="led_state">Стан світлодіоду</string>
     <string name="legacy_admin_channel">Застарілий адмін канал</string>
     <string name="library_count">%1$d Бібліотеки</string>
+    <!-- LICENSED -->
     <string name="licensed_amateur_radio">Ліцензований радіоаматор (Ham)</string>
     <string name="licensed_amateur_radio_text">Включення цієї опції вимикає шифрування і не сумісне зі стандартною мережею Meshtastic.</string>
     <!-- LOAD -->
@@ -1074,24 +1078,10 @@
     <string name="rotary_encoder_1_enabled">Енкодер #1 активований</string>
     <string name="router_role_confirmation_text">Я прочитав(-ла) &lt;a href="https://meshtastic.org/docs/configuration/radio/device/#roles"&gt;Device Role Documentation&lt;/a&gt; і допис у блозі про &lt;a href="http://meshtastic.org/blog/choosing-the-right-device-role"&gt;Choosing The Right Device Role&lt;/a&gt;.</string>
     <!-- ROUTING -->
-    <string name="routing_error_admin_bad_session_key">Помилка ключа сеансу</string>
-    <string name="routing_error_admin_public_key_unauthorized">Несанкціонований відкритий ключ</string>
-    <string name="routing_error_bad_request">Невірний запит</string>
-    <string name="routing_error_duty_cycle_limit">Перевищено регіональний ліміт ефіру</string>
     <string name="routing_error_got_nak">Отримано негативне підтвердження</string>
-    <string name="routing_error_max_retransmit">Досягнуто ліміт спроб</string>
-    <string name="routing_error_no_channel">Канал відсутній</string>
-    <string name="routing_error_no_interface">Інтерфейс відсутній</string>
-    <string name="routing_error_no_response">Немає відповіді</string>
     <string name="routing_error_no_route">Маршрут відсутній</string>
     <string name="routing_error_none">Підтверджено</string>
-    <string name="routing_error_not_authorized">Не авторизований</string>
-    <string name="routing_error_pki_failed">Помилка зашифрованої передачі</string>
-    <string name="routing_error_pki_send_fail_public_key">Помилка надсилання PKI, відсутній публічний ключ</string>
-    <string name="routing_error_pki_unknown_pubkey">Невідомий відкритий ключ</string>
-    <string name="routing_error_rate_limit_exceeded">Перевищено ліміт запитів. Будь ласка, спробуйте пізніше.</string>
     <string name="routing_error_timeout">Таймаут</string>
-    <string name="routing_error_too_large">Пакет завеликий</string>
     <string name="rssi">RSSI</string>
     <string name="rssi_definition">Показник рівня потужності сигналу — вимірювання, що використовується для визначення рівня потужності, що приймається антеною. Вище значення RSSI зазвичай вказує на міцніше та стабільніше з'єднання.</string>
     <string name="rsyslog_server">rsyslog-сервер</string>
@@ -1215,6 +1205,7 @@
     <string name="tak_role_unspecified">Невизначений</string>
     <string name="tak_server">Сервер TAK</string>
     <string name="tak_server_section">Сервер</string>
+    <string name="tak_server_status">Статус</string>
     <string name="tak_server_test_result_bytes">%1$dB ✓</string>
     <string name="tak_server_test_result_unknown_error">✗</string>
     <string name="tak_team_blue">Синій</string>
@@ -1305,7 +1296,6 @@
     <string name="update_interval">Інтервал опитування GPS</string>
     <string name="update_interval_seconds">Інтервал оновлення (секунд)</string>
     <string name="updated">Оновлено</string>
-    <string name="uplink_enabled">Передача увімкнена</string>
     <string name="uptime">Час роботи</string>
     <!-- URL -->
     <string name="url">URL</string>

@@ -40,6 +40,7 @@ fun DeliveryInfo(
     title: StringResource,
     resendOption: Boolean,
     text: StringResource? = null,
+    detail: StringResource? = null,
     relays: Int = 0,
     relayNodeNames: List<String> = emptyList(),
     onConfirm: (() -> Unit) = {},
@@ -55,6 +56,14 @@ fun DeliveryInfo(
             text?.let {
                 Text(
                     text = stringResource(it),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+            detail?.let {
+                Text(
+                    text = stringResource(it),
+                    modifier = Modifier.padding(top = 8.dp),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyMedium,
                 )

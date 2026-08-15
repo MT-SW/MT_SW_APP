@@ -150,6 +150,7 @@ fun NodeItem(
                 viaMqtt = thatNode.viaMqtt,
                 strings = a11yStrings,
                 modemPreset = modemPreset,
+                isUnknownUser = thatNode.isUnknownUser,
             )
         }
 
@@ -556,6 +557,7 @@ private fun NodeItemHeader(
             connectionState = connectionState,
             deviceType = deviceType,
             contentColor = contentColor,
+            isUnknownUser = thatNode.isUnknownUser,
         )
     }
 }

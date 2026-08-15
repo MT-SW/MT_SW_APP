@@ -74,7 +74,6 @@ import org.meshtastic.core.resources.mesh_beacon_notification_body
 import org.meshtastic.core.resources.mesh_beacon_notification_title
 import org.meshtastic.core.resources.unknown_username
 import org.meshtastic.core.resources.waypoint_received
-import org.meshtastic.proto.HardwareMessage
 import org.meshtastic.proto.MeshBeacon
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.Paxcount
@@ -193,7 +192,7 @@ class MeshDataHandlerImpl(
             }
 
             PortNum.PAXCOUNTER_APP -> {
-                handlePaxCounter(packet)
+                handlePaxCounter(packet, session)
             }
 
             PortNum.STORE_FORWARD_APP -> {
@@ -210,10 +209,6 @@ class MeshDataHandlerImpl(
 
             PortNum.NEIGHBORINFO_APP -> {
                 neighborInfoHandler.handleNeighborInfo(packet)
-            }
-
-            PortNum.REMOTE_HARDWARE_APP -> {
-                handleRemoteHardware(packet, session)
             }
 
             PortNum.ATAK_PLUGIN,
@@ -277,25 +272,10 @@ class MeshDataHandlerImpl(
         }
     }
 
-    private fun handlePaxCounter(packet: MeshPacket) {
+    private fun handlePaxCounter(packet: MeshPacket, session: RadioSessionContext) {
         val payload = packet.decoded?.payload ?: return
         val p = Paxcount.ADAPTER.decodeOrNull(payload, Logger) ?: return
-        nodeManager.handleReceivedPaxcounter(packet.from, p)
-    }
-
-    /**
-     * Handles incoming Remote Hardware messages. Only [HardwareMessage.Type.READ_GPIOS_REPLY] is actioned today — it
-     * wakes up a pending [PacketHandler.awaitGpioReply] caller. GPIOS_CHANGED notifications (unsolicited state changes
-     * from a watched pin) aren't surfaced anywhere yet.
-     */
-    private fun handleRemoteHardware(packet: MeshPacket, session: RadioSessionContext) {
-        val payload = packet.decoded?.payload ?: return
-        val hw = HardwareMessage.ADAPTER.decodeOrNull(payload, Logger) ?: return
-        if (hw.type == HardwareMessage.Type.READ_GPIOS_REPLY) {
-            radioInterfaceService.launchSessionWork(scope, session) {
-                packetHandler.completeGpioReply(packet.from, hw.gpio_value)
-            }
-        }
+        nodeManager.handleReceivedPaxcounter(packet.from, p, session)
     }
 
     private fun handlePosition(
@@ -425,9 +405,6 @@ class MeshDataHandlerImpl(
     ) {
         radioInterfaceService.launchSessionWork(scope, session) {
             val isAck = routingError == Routing.Error.NONE.value
-            // Wake up any generic sendAdminAndAwaitDelivery() waiter for this requestId (e.g. remote favorite/ignore
-            // commands), independent of whether this ACK/NAK also corresponds to a stored message/reaction below.
-            packetHandler.completeRoutingAck(requestId, isAck)
             val p = packetRepository.value.getPacketByPacketId(requestId)
             val reaction = packetRepository.value.getReactionByPacketId(requestId)
 
@@ -445,19 +422,8 @@ class MeshDataHandlerImpl(
                     else -> MessageStatus.ERROR
                 }
             if (p != null && p.status != MessageStatus.RECEIVED) {
-                val updatedRelayNodes =
-                    if (isAck && relayNode != null && relayNode != 0 && relayNode !in p.relayNodes) {
-                        p.relayNodes + relayNode
-                    } else {
-                        p.relayNodes
-                    }
                 val updatedPacket =
-                    p.copy(
-                        status = m,
-                        relays = if (isAck) p.relays + 1 else p.relays,
-                        relayNode = relayNode,
-                        relayNodes = updatedRelayNodes,
-                    )
+                    p.copy(status = m, relays = if (isAck) p.relays + 1 else p.relays, relayNode = relayNode)
                 packetRepository.value.update(updatedPacket, routingError = routingError)
             }
 

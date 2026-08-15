@@ -36,7 +36,9 @@ plugins {
     // Develocity + CCUD + build cache; shared with build-logic, versions from the catalog.
     id("meshtastic.develocity")
     id("org.gradle.toolchains.foojay-resolver") version "1.0.0"
-    id("org.meshtastic.flatpak.sources.settings") version "0.1.5"
+    // 0.1.7 fixed the Isolated Projects incompatibility (shares state via a BuildService instead of
+    // gradle.extensions) that previously required gating this behind an opt-in property.
+    id("org.meshtastic.flatpak.sources.settings") version "0.1.7"
 }
 
 @Suppress("UnstableApiUsage")

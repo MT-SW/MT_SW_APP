@@ -724,7 +724,11 @@ class SharedRadioInterfaceService(
 
     override fun consumeGattCacheInvalidationRequest(): Boolean = gattCacheInvalidationRequested.getAndSet(false)
 
-    override fun isMockTransport(): Boolean = transportFactory.isMockTransport()
+    override val mockTransportEnabled: StateFlow<Boolean>
+        get() = transportFactory.mockTransportEnabled
+
+    override val isReplayTransportAvailable: Boolean
+        get() = transportFactory.isReplayTransportAvailable
 
     override fun toInterfaceAddress(interfaceId: InterfaceId, rest: String): String =
         transportFactory.toInterfaceAddress(interfaceId, rest)
