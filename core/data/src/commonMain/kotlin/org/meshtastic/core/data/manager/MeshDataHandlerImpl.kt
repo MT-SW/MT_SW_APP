@@ -405,14 +405,21 @@ class MeshDataHandlerImpl(
     ) {
         radioInterfaceService.launchSessionWork(scope, session) {
             val isAck = routingError == Routing.Error.NONE.value
-            val p = packetRepository.value.getPacketByPacketId(requestId)
-            val reaction = packetRepository.value.getReactionByPacketId(requestId)
+            // Wake up any generic sendAdminAndAwaitDelivery() waiter for this requestId (e.g. remote favorite/ignore
+            // commands), independent of whether this ACK/NAK also corresponds to a stored message/reaction below.
+            packetHandler.completeRoutingAck(requestId, isAck)
+            val packets =
+                packetRepository.value.findPacketsWithId(requestId).filter { it.status != MessageStatus.RECEIVED }
+            val reactions =
+                packetRepository.value.findReactionsWithId(requestId).filter { it.status != MessageStatus.RECEIVED }
+            val p = packets.filter { it.to == fromId }.singleOrNull() ?: packets.singleOrNull()
+            val reaction = reactions.filter { it.to == fromId }.singleOrNull() ?: reactions.singleOrNull()
 
             @Suppress("MaxLineLength")
             Logger.d {
                 val statusInfo = "status=${p?.status ?: reaction?.status}"
                 "[ackNak] req=$requestId routeErr=$routingError isAck=$isAck " +
-                    "packetId=${p?.id ?: reaction?.packetId} dataId=${p?.id} $statusInfo"
+                        "packetId=${p?.id ?: reaction?.packetId} dataId=${p?.id} $statusInfo"
             }
 
             val m =
@@ -422,8 +429,19 @@ class MeshDataHandlerImpl(
                     else -> MessageStatus.ERROR
                 }
             if (p != null && p.status != MessageStatus.RECEIVED) {
+                val updatedRelayNodes =
+                    if (isAck && relayNode != null && relayNode != 0 && relayNode !in p.relayNodes) {
+                        p.relayNodes + relayNode
+                    } else {
+                        p.relayNodes
+                    }
                 val updatedPacket =
-                    p.copy(status = m, relays = if (isAck) p.relays + 1 else p.relays, relayNode = relayNode)
+                    p.copy(
+                        status = m,
+                        relays = if (isAck) p.relays + 1 else p.relays,
+                        relayNode = relayNode,
+                        relayNodes = updatedRelayNodes,
+                    )
                 packetRepository.value.update(updatedPacket, routingError = routingError)
             }
 
@@ -436,7 +454,7 @@ class MeshDataHandlerImpl(
                     packetRepository.value.updateReaction(updated)
                 }
             }
-            packetHandler.removeResponse(requestId, complete = true)
+            packetHandler.removeResponse(requestId, complete = isAck)
         }
     }
 

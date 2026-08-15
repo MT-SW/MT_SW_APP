@@ -77,6 +77,7 @@ data class NodeDetailUiState(
     val availableLogs: Set<LogsType> = emptySet(),
     val lastTracerouteTime: Long? = null,
     val lastRequestNeighborsTime: Long? = null,
+    val relayNodeName: String? = null,
     val sessionStatus: SessionStatus = SessionStatus.NoSession,
     val isEnsuringSession: Boolean = false,
     val showNarrowBandWarning: Boolean = false,

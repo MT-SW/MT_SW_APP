@@ -110,6 +110,7 @@ fun NodeDetailsSection(
     modifier: Modifier = Modifier,
     deviceHardware: DeviceHardware? = null,
     reportedTarget: String? = null,
+    relayNodeName: String? = null,
 ) {
     SectionCard(title = Res.string.details, modifier = modifier) {
         Column(modifier = Modifier.animateContentSize()) {
@@ -125,7 +126,7 @@ fun NodeDetailsSection(
                 )
                 SectionDivider()
             }
-            MainNodeDetails(node)
+            MainNodeDetails(node, relayNodeName)
         }
     }
 }
@@ -163,7 +164,7 @@ private fun MismatchKeyWarning(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun MainNodeDetails(node: Node) {
+private fun MainNodeDetails(node: Node, relayNodeName: String? = null) {
     Column {
         NameAndRoleRow(node)
         node.nodeStatus?.let { status ->
@@ -173,7 +174,7 @@ private fun MainNodeDetails(node: Node) {
         SectionDivider()
         NodeIdentificationRow(node)
         SectionDivider()
-        HearsAndHopsRow(node)
+        HearsAndHopsRow(node, relayNodeName)
         SectionDivider()
         UserAndUptimeRow(node)
         if (node.hopsAway == 0 && !node.viaMqtt) {
@@ -243,7 +244,7 @@ private fun NodeIdentificationRow(node: Node) {
 }
 
 @Composable
-private fun HearsAndHopsRow(node: Node) {
+private fun HearsAndHopsRow(node: Node, relayNodeName: String? = null) {
     Row(modifier = Modifier.fillMaxWidth()) {
         InfoItem(
             label = stringResource(Res.string.node_sort_last_heard),
@@ -252,9 +253,11 @@ private fun HearsAndHopsRow(node: Node) {
             modifier = Modifier.weight(1f),
         )
         if (node.hopsAway >= 0) {
+            val hopsValue =
+                if (relayNodeName != null) "${node.hopsAway} (via $relayNodeName)" else node.hopsAway.toString()
             InfoItem(
                 label = stringResource(Res.string.hops_away),
-                value = node.hopsAway.toString(),
+                value = hopsValue,
                 icon = MeshtasticIcons.HopCount,
                 modifier = Modifier.weight(1f),
             )

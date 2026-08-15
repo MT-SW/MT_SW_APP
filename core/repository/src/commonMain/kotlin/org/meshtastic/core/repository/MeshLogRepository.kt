@@ -57,6 +57,12 @@ interface MeshLogRepository {
     /** Retrieves all [MeshLog]s associated with a specific [nodeNum] and [portNum]. */
     fun getLogsFrom(nodeNum: Int, portNum: Int): Flow<List<MeshLog>>
 
+    /**
+     * The single most recent [MeshLog] per distinct sender, across every port — used for live per-node reads (e.g.
+     * relay) without a persisted column.
+     */
+    fun getLatestLogPerNode(): Flow<List<MeshLog>>
+
     /** Retrieves all [MeshLog]s containing [MeshPacket]s for a specific [nodeNum]. */
     fun getMeshPacketsFrom(nodeNum: Int, portNum: Int = -1): Flow<List<MeshPacket>>
 

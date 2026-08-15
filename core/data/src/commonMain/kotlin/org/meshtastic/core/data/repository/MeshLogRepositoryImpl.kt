@@ -110,6 +110,12 @@ open class MeshLogRepositoryImpl(
         .distinctUntilChanged()
         .flowOn(dispatchers.io)
 
+    /** The single most recent [MeshLog] per distinct sender, across every port. */
+    override fun getLatestLogPerNode(): Flow<List<MeshLog>> = dbManager
+        .observeCurrentDb { it.meshLogDao().getLatestLogPerNode() }
+        .map { list -> list.map { it.asExternalModel() } }
+        .flowOn(dispatchers.io)
+
     /** Retrieves all [MeshLog]s containing [MeshPacket]s for a specific [nodeNum]. */
     override fun getMeshPacketsFrom(nodeNum: Int, portNum: Int): Flow<List<MeshPacket>> =
         getLogsFrom(nodeNum, portNum).map { list -> list.mapNotNull { it.fromRadio.packet } }.flowOn(dispatchers.io)

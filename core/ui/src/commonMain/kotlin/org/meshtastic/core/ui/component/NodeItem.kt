@@ -41,6 +41,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -80,6 +83,41 @@ import org.meshtastic.proto.Config
 
 private const val GRID_COLUMNS = 3
 
+/**
+ * Hand-built "refresh" (circular-arrow) icon — this module has no Material Icons Extended dependency, same situation
+ * as [rememberAddIcon] in MessageScreen.kt, so the vector is built directly instead of pulling in the library.
+ */
+@Composable
+internal fun rememberRefreshIcon(): ImageVector = remember {
+    ImageVector.Builder(
+        name = "Refresh",
+        defaultWidth = 24.dp,
+        defaultHeight = 24.dp,
+        viewportWidth = 24f,
+        viewportHeight = 24f,
+    )
+        .apply {
+            path(fill = SolidColor(Color.Black)) {
+                moveTo(17.65f, 6.35f)
+                curveTo(16.2f, 4.9f, 14.21f, 4f, 12f, 4f)
+                curveTo(7.58f, 4f, 4.01f, 7.58f, 4.01f, 12f)
+                curveTo(4.01f, 16.42f, 7.58f, 20f, 12f, 20f)
+                curveTo(15.73f, 20f, 18.84f, 17.45f, 19.73f, 14f)
+                lineTo(17.65f, 14f)
+                curveTo(16.83f, 16.33f, 14.61f, 18f, 12f, 18f)
+                curveTo(8.69f, 18f, 6f, 15.31f, 6f, 12f)
+                curveTo(6f, 8.69f, 8.69f, 6f, 12f, 6f)
+                curveTo(13.66f, 6f, 15.14f, 6.69f, 16.22f, 7.78f)
+                lineTo(13f, 11f)
+                lineTo(20f, 11f)
+                lineTo(20f, 4f)
+                lineTo(17.65f, 6.35f)
+                close()
+            }
+        }
+        .build()
+}
+
 @Composable
 @Suppress("LongMethod", "CyclomaticComplexMethod")
 fun NodeItem(
@@ -95,6 +133,7 @@ fun NodeItem(
     isActive: Boolean = false,
     showTelemetry: Boolean = true,
     deviceImageUrl: String? = null,
+    relayNodeName: String? = null,
 ) {
     val originalLongName = thatNode.user.long_name.ifEmpty { stringResource(Res.string.unknown_username) }
     val isMuted = remember(thatNode) { thatNode.isMuted }
@@ -221,7 +260,12 @@ fun NodeItem(
                 contentColor = contentColor,
             )
 
-            NodeSignalRow(thatNode = thatNode, isThisNode = isThisNode, contentColor = contentColor)
+            NodeSignalRow(
+                thatNode = thatNode,
+                isThisNode = isThisNode,
+                contentColor = contentColor,
+                relayNodeName = relayNodeName,
+            )
 
             if (showTelemetry) {
                 val sensorItems = gatherSensors(thatNode, tempInFahrenheit, contentColor)
@@ -284,7 +328,7 @@ private fun NodeBatteryPositionRow(
 
 @Suppress("CyclomaticComplexMethod", "LongMethod")
 @Composable
-private fun NodeSignalRow(thatNode: Node, isThisNode: Boolean, contentColor: Color) {
+private fun NodeSignalRow(thatNode: Node, isThisNode: Boolean, contentColor: Color, relayNodeName: String? = null) {
     // The signal pill bundles SNR + RSSI + quality into one row. It's wider than a 1/3 grid cell, so it renders on
     // its own line at natural width; the short metrics flow in the grid.
     var signalChip: (@Composable () -> Unit)? = null
@@ -312,6 +356,15 @@ private fun NodeSignalRow(thatNode: Node, isThisNode: Boolean, contentColor: Col
             } else {
                 if (thatNode.hopsAway > 0) {
                     add { HopsInfo(hops = thatNode.hopsAway, contentColor = contentColor) }
+                    relayNodeName?.let { name ->
+                        add {
+                            Text(
+                                text = "via $name",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = contentColor,
+                            )
+                        }
+                    }
                 } else if (thatNode.hopsAway == 0 && !thatNode.viaMqtt) {
                     val snr = thatNode.snrOrNull
                     val rssi = thatNode.rssiOrNull
@@ -531,7 +584,7 @@ private fun NodeItemHeader(
                     modifier = Modifier.size(16.dp),
                 )
             }
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 StatusAwareLastHeard(
                     lastHeard = thatNode.lastHeard,
                     online = !isThisNode && thatNode.isOnline,
@@ -540,11 +593,22 @@ private fun NodeItemHeader(
                 thatNode.deviceMetrics.uptime_seconds
                     ?.takeIf { it > 0 }
                     ?.let { uptime ->
-                        Text(
-                            text = formatUptime(uptime),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = contentColor,
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(2.dp),
+                        ) {
+                            Icon(
+                                imageVector = rememberRefreshIcon(),
+                                contentDescription = null,
+                                modifier = Modifier.size(12.dp),
+                                tint = contentColor,
+                            )
+                            Text(
+                                text = formatUptime(uptime),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = contentColor,
+                            )
+                        }
                     }
             }
         }

@@ -59,6 +59,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.ConnectionState
+import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeListDensity
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.channel_invalid
@@ -117,6 +118,7 @@ fun NodeListScreen(
     val totalNodeCount by viewModel.totalNodeCount.collectAsStateWithLifecycle(0)
     val unfilteredNodes by viewModel.unfilteredNodeList.collectAsStateWithLifecycle()
     val deviceImageUrls by viewModel.deviceImageUrls.collectAsStateWithLifecycle()
+    val relayNodeIds by viewModel.relayNodeIds.collectAsStateWithLifecycle()
     val ignoredNodeCount = unfilteredNodes.count { it.isIgnored }
 
     val listState = rememberLazyListState()
@@ -268,6 +270,12 @@ fun NodeListScreen(
                             }
 
                         val isActive = remember(activeNodeId, node.num) { activeNodeId == node.num }
+                        val relayNodeName =
+                            remember(relayNodeIds[node.num], unfilteredNodes, ourNode) {
+                                relayNodeIds[node.num]?.let { relayId ->
+                                    Node.getRelayNode(relayId, unfilteredNodes, ourNode?.num)?.user?.short_name
+                                }
+                            }
 
                         when (density) {
                             NodeListDensity.COMPLETE ->
@@ -284,6 +292,7 @@ fun NodeListScreen(
                                     isActive = isActive,
                                     showTelemetry = showTelemetry,
                                     deviceImageUrl = deviceImageUrls[node.user.hw_model.value],
+                                    relayNodeName = relayNodeName,
                                 )
 
                             NodeListDensity.COMPACT ->
@@ -306,6 +315,7 @@ fun NodeListScreen(
                                     showTelemetry = showTelemetry,
                                     tempInFahrenheit = state.tempInFahrenheit,
                                     deviceImageUrl = deviceImageUrls[node.user.hw_model.value],
+                                    relayNodeName = relayNodeName,
                                 )
                         }
                         val isThisNode = remember(node) { ourNode?.num == node.num }

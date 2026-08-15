@@ -90,6 +90,22 @@ interface MeshLogDao {
     @Query(LOGS_FROM_QUERY)
     fun getLogsFrom(fromNum: Int, portNum: Int, maxItem: Int): Flow<List<MeshLog>>
 
+    /**
+     * The single most recent [MeshLog] per distinct sender, across every port — used for live per-node reads (e.g.
+     * relay-node display) without a persisted column.
+     */
+    @Query(
+        """
+        SELECT l.* FROM log l
+        INNER JOIN (
+            SELECT from_num, MAX(received_date) AS max_date
+            FROM log
+            GROUP BY from_num
+        ) latest ON l.from_num = latest.from_num AND l.received_date = latest.max_date
+        """,
+    )
+    fun getLatestLogPerNode(): Flow<List<MeshLog>>
+
     @Insert suspend fun insert(log: MeshLog)
 
     /**

@@ -115,6 +115,7 @@ fun NodeItemCompact(
     showTelemetry: Boolean = true,
     tempInFahrenheit: Boolean = false,
     deviceImageUrl: String? = null,
+    relayNodeName: String? = null,
 ) {
     val longName = thatNode.user.long_name.ifEmpty { stringResource(Res.string.unknown_username) }
     val isFavorite = thatNode.isFavorite
@@ -249,6 +250,7 @@ fun NodeItemCompact(
                     showChannel = showChannel,
                     showRole = showRole,
                     deviceImageUrl = deviceImageUrl,
+                    relayNodeName = relayNodeName,
                 )
             }
         }
@@ -339,10 +341,11 @@ private fun CompactHealthRow(
             ?.let { uptime ->
                 add(
                     @Composable {
-                        Text(
+                        IconInfo(
+                            icon = rememberRefreshIcon(),
+                            contentDescription = "Uptime",
+                            contentColor = contentColor,
                             text = formatUptime(uptime),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = contentColor,
                         )
                     },
                 )
@@ -413,6 +416,7 @@ private fun CompactFooterRow(
     showChannel: Boolean,
     showRole: Boolean,
     deviceImageUrl: String?,
+    relayNodeName: String? = null,
 ) {
     val tertiaryColor = MaterialTheme.colorScheme.outline
     val segments =
@@ -442,6 +446,11 @@ private fun CompactFooterRow(
                         contentColor = tertiaryColor,
                         text = thatNode.hopsAway.toString(),
                     )
+                }
+                relayNodeName?.let { name ->
+                    add {
+                        Text(text = "via $name", style = MaterialTheme.typography.labelSmall, color = tertiaryColor)
+                    }
                 }
             }
             if (showChannel && thatNode.channel > 0) {

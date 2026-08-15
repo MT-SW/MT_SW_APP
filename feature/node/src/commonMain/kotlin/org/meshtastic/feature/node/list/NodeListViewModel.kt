@@ -39,6 +39,7 @@ import org.meshtastic.core.model.util.DistanceUnit
 import org.meshtastic.core.repository.AdminController
 import org.meshtastic.core.repository.ConnectionStateProvider
 import org.meshtastic.core.repository.DeviceHardwareRepository
+import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.MessagingController
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioConfigRepository
@@ -61,6 +62,7 @@ class NodeListViewModel(
     private val messagingController: MessagingController,
     private val radioInterfaceService: RadioInterfaceService,
     private val deviceHardwareRepository: DeviceHardwareRepository,
+    private val meshLogRepository: MeshLogRepository,
     val nodeManagementActions: NodeManagementActions,
     private val nodeRequestActions: NodeRequestActions,
     private val getFilteredNodesUseCase: GetFilteredNodesUseCase,
@@ -154,6 +156,21 @@ class NodeListViewModel(
 
     val unfilteredNodeList: StateFlow<List<Node>> =
         nodeRepository.getNodes().stateInWhileSubscribed(initialValue = emptyList())
+
+    /**
+     * Maps each node's number to the raw relay-node ID from its most recent packet, decoded live from MeshLog rather
+     * than a persisted column (matches the Network Health approach). Nodes with no relay on their latest packet (0, or
+     * a non-packet log) are simply absent from the map.
+     */
+    val relayNodeIds: StateFlow<Map<Int, Int>> =
+        meshLogRepository
+            .getLatestLogPerNode()
+            .map { logs ->
+                logs
+                    .mapNotNull { log -> log.fromRadio.packet?.relay_node?.takeIf { it != 0 }?.let { log.fromNum to it } }
+                    .toMap()
+            }
+            .stateInWhileSubscribed(initialValue = emptyMap())
 
     private val _deviceImageUrls = MutableStateFlow<Map<Int, String>>(emptyMap())
 

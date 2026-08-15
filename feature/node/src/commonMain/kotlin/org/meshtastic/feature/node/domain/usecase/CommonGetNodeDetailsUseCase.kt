@@ -172,6 +172,7 @@ constructor(
             metadataFlow,
             requestsFlow,
             hardwareAndLinksFlow,
+            nodeRepository.nodeDBbyNum,
         ) { args: Array<Any?> ->
             @Suppress("UNCHECKED_CAST")
             val node = args[NODE_INDEX] as Node
@@ -185,6 +186,16 @@ constructor(
             @Suppress("UNCHECKED_CAST")
             val hardwareAndLinks = args[HARDWARE_INDEX] as Pair<DeviceHardware?, List<DeviceLink>>
             val (hw, deviceLinks) = hardwareAndLinks
+
+            @Suppress("UNCHECKED_CAST")
+            val nodeDBbyNum = args[NODES_INDEX] as Map<Int, Node>
+            val relayNodeName =
+                logs.packets
+                    .firstOrNull()
+                    ?.relay_node
+                    ?.let { relayId -> Node.getRelayNode(relayId, nodeDBbyNum.values.toList(), identity.ourNode?.num) }
+                    ?.user
+                    ?.short_name
 
             val (trReqs, niReqs) = requests
             val isLocal = node.num == identity.ourNode?.num
@@ -251,6 +262,7 @@ constructor(
                 availableLogs = availableLogs,
                 lastTracerouteTime = metadata.trTime,
                 lastRequestNeighborsTime = metadata.niTime,
+                relayNodeName = relayNodeName,
             )
         }
     }
@@ -283,5 +295,6 @@ constructor(
         const val METADATA_INDEX = 3
         const val REQUESTS_INDEX = 4
         const val HARDWARE_INDEX = 5
+        const val NODES_INDEX = 6
     }
 }
