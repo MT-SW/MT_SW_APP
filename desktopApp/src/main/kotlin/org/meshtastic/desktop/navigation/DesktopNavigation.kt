@@ -20,15 +20,17 @@ import androidx.compose.runtime.Composable
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import org.meshtastic.core.navigation.MapRoute
 import org.meshtastic.core.navigation.MultiBackstack
+import org.meshtastic.core.navigation.NodesRoute
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.navigation.TopLevelDestination
+import org.meshtastic.core.ui.util.LocalMapMainScreenProvider
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.feature.connections.navigation.connectionsGraph
 import org.meshtastic.feature.discovery.navigation.discoveryGraph
 import org.meshtastic.feature.docs.navigation.docsEntries
 import org.meshtastic.feature.firmware.navigation.firmwareGraph
-import org.meshtastic.feature.map.navigation.mapGraph
 import org.meshtastic.feature.messaging.navigation.contactsGraph
 import org.meshtastic.feature.node.navigation.networkHealthGraph
 import org.meshtastic.feature.node.navigation.nodesGraph
@@ -61,7 +63,20 @@ fun EntryProviderScope<NavKey>.desktopNavGraph(
         scrollToTopEvents = uiViewModel.scrollToTopEventFlow,
         onHandleDeepLink = uiViewModel::handleDeepLink,
     )
-    mapGraph(backStack)
+    // Desktop-only override of the shared feature/map `mapGraph`: clicking a node on the map switches to the Nodes
+    // tab and opens its detail there (back returns to the node list), instead of the shared implementation's
+    // behavior of pushing NodeDetail directly onto the Map tab's own backstack.
+    entry<MapRoute.Map> { args ->
+        val mapScreen = LocalMapMainScreenProvider.current
+        val openNodeInNodesTab: (Int) -> Unit = { id ->
+            multiBackstack.navigateTopLevel(TopLevelDestination.Nodes.route)
+            multiBackstack.backStacks[TopLevelDestination.Nodes.route]?.add(NodesRoute.NodeDetail(id))
+        }
+        // ZAŁOŻENIE DO WERYFIKACJI: zakładam że MapRoute.Map ma teraz pole sitePlannerNodeNum
+        // analogiczne do waypointId. Jeśli kompilator powie "unresolved reference", wklej mi
+        // definicję MapRoute.Map, żeby sprawdzić jak faktycznie się nazywa / czy istnieje.
+        mapScreen(openNodeInNodesTab, openNodeInNodesTab, args.waypointId, args.sitePlannerNodeNum)
+    }
     firmwareGraph(backStack)
     settingsGraph(backStack, settingsRadioConfigViewModel)
     docsEntries(backStack)

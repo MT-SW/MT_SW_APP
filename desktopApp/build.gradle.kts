@@ -134,15 +134,29 @@ compose.desktop {
                 .asFile
                 .absolutePath
 
+        val isMacOsHost = providers.systemProperty("os.name").getOrElse("").lowercase().contains("mac")
+
         val desktopJvmArgs =
-            listOf(
-                "-Xmx2G",
+            buildList {
+                add("-Xmx2G")
                 // Let the macOS title bar follow the system light/dark theme (ignored on other OSes).
-                "-Dapple.awt.application.appearance=system",
-                "-Dapple.awt.application.name=Meshtastic Desktop",
-                "-Dcom.apple.mrj.application.apple.menu.about.name=Meshtastic Desktop",
-                "-Dcom.apple.bundle.identifier=org.meshtastic.MeshtasticDesktop",
-            )
+                add("-Dapple.awt.application.appearance=system")
+                add("-Dapple.awt.application.name=Meshtastic Desktop")
+                add("-Dcom.apple.mrj.application.apple.menu.about.name=Meshtastic Desktop")
+                add("-Dcom.apple.bundle.identifier=org.meshtastic.MeshtasticDesktop")
+                // JCEF (Site Planner bridge) on JDK 16+: OSR (off-screen render) mode needs these module exports —
+                // referenced packages exist on every platform, safe to add unconditionally.
+                add("--add-exports=java.base/java.lang=ALL-UNNAMED")
+                add("--add-exports=java.desktop/sun.awt=ALL-UNNAMED")
+                add("--add-exports=java.desktop/sun.java2d=ALL-UNNAMED")
+                // JCEF on macOS additionally needs these — the referenced packages only exist in macOS JDK builds,
+                // so gating by host OS avoids a startup failure on Windows/Linux ("package not in java.desktop").
+                if (isMacOsHost) {
+                    add("--add-opens=java.desktop/sun.awt=ALL-UNNAMED")
+                    add("--add-opens=java.desktop/sun.lwawt=ALL-UNNAMED")
+                    add("--add-opens=java.desktop/sun.lwawt.macosx=ALL-UNNAMED")
+                }
+            }
         jvmArgs(*desktopJvmArgs.toTypedArray())
 
         buildTypes.release.proguard {
@@ -271,6 +285,10 @@ dependencies {
     implementation(libs.coil)
     implementation(libs.coil.network.ktor3)
     implementation(libs.coil.svg)
+
+    // JCEF (Chromium Embedded Framework) — headless browser for the Site Planner coverage-estimate bridge.
+    // Bundles only the Java wrapper + JOGL; native Chromium binaries are downloaded/extracted on first run.
+    implementation(libs.jcefmaven)
 
     // Core KMP modules (JVM variants)
     implementation(projects.core.common)

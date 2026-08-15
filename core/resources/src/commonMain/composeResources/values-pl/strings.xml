@@ -285,7 +285,7 @@
     <string name="config_lora_region_summary">Region, w którym będziesz używać urządzenia.</string>
     <string name="config_network_eth_enabled_summary">Włączenie połączenia Ethernet spowoduje wyłączenie bluetootha. Połączania TCP nie są dostępne na urządzeniach Apple.</string>
     <string name="config_network_udp_enabled_summary">Włącz nadawanie pakietów poprzez UDP w lokalnej sieci.</string>
-    <string name="config_network_wifi_enabled_summary">Włączenie WiFi spowoduje wyłączenie bluetootha.</string>
+    <string name="config_network_wifi_enabled_summary">Włączenie WiFi spowoduje wyłączenie bluetooth.</string>
     <string name="config_position_broadcast_secs_summary">Maksymalny odstęp czasu, jaki może upłynąć bez nadawania lokalizacji przez węzeł.</string>
     <string name="config_position_broadcast_smart_minimum_distance_summary">Minimalna zmiana odległości w metrach, którą należy uwzględnić w przypadku inteligentnego pozycjonowania.</string>
     <string name="config_position_broadcast_smart_minimum_interval_secs_summary">Kiedy najszybciej pozycja zostanie zaktualizowana, jeśli minimalna odległość została osiągnięta.</string>
@@ -297,7 +297,7 @@
     <string name="config_security_debug_log_api_enabled">Pokaż na żywo logi debugowania przez połączenie szeregowe, podejrzyj i eksportuj logi węzła (bez informacji lokalizacyjnych) przez Bluetooth.</string>
     <string name="config_security_is_managed">Urządzenie jest zarządzane przez administratora sieci mesh, użytkownik nie ma dostępu do żadnych ustawień urządzenia.</string>
     <string name="config_security_private_key">Klucz prywatny, na podstawie którego generujemy ID (fw 2.8) oraz klucz publiczny.</string>
-    <string name="config_security_private_key_remote">Urządzenie nie udostępnia swojego klucza prywatnego podczas zdalnego zarządzania. Możesz ustawić nowy klucz, ale nie będzie można go odczytać ponownie.</string>
+    <string name="config_security_private_key_remote">Urządzenie nie udostępnia swojego klucza prywatnego poprzez zdalne zarządzanie. Możesz ustawić nowy klucz, ale nie będzie można go odczytać ponownie.</string>
     <string name="config_security_public_key">Wygenerowany z Twojego klucza prywatnego i wysyłany do innych węzłów w sieci mesh.</string>
     <string name="config_security_serial_enabled">Konsola szeregowa przez Stream API.</string>
     <string name="configuration">Konfiguracja</string>
@@ -617,7 +617,7 @@
     <string name="ethernet_config">Ustawienia Ethernet</string>
     <string name="ethernet_enabled">Ethernet włączony</string>
     <string name="ethernet_ip">Ethernet IP:</string>
-    <string name="event_firmware_running">Uruchomione firmware wydarzenia</string>
+    <string name="event_firmware_running">Uruchomiona wersja firmware wydarzenia</string>
     <string name="event_use_event_theme">Użyj motywu wydarzenia</string>
     <string name="exchange_position">Poproś o pozycję</string>
     <string name="expand_chart">Rozwiń wykres</string>
@@ -800,14 +800,14 @@
     <!-- GPIO -->
     <string name="gpio">GPIO</string>
     <string name="gpio_mask_display">Maska: %1$s</string>
-    <string name="gpio_off">Wyłączony</string>
-    <string name="gpio_on">Włączony</string>
-    <string name="gpio_pin">Pin GPIO</string>
+    <string name="gpio_off">0</string>
+    <string name="gpio_on">1</string>
+    <string name="gpio_pin">Funkcja wymaga kanału "gpio" na 1 pozycji. Podaj GPIO (liczba całkowita)</string>
     <string name="gpio_pin_for_rotary_encoder_a_port">Pin GPIO dla portu A enkodera obrotowego</string>
     <string name="gpio_pin_for_rotary_encoder_b_port">Pin GPIO dla portu B enkodera obrotowego</string>
     <string name="gpio_pin_for_rotary_encoder_press_port">Pin GPIO dla portu Press enkodera obrotowego</string>
     <string name="gpio_pin_to_monitor">Pin GPIO do monitorowania</string>
-    <string name="gpio_read">Odczytaj</string>
+    <string name="gpio_read">Odczyt</string>
     <string name="gpio_read_result">Odczyt GPIO: %1$s</string>
     <string name="gps_en_gpio">GPS EN GPIO</string>
     <string name="gps_mode">Tryb GPS (sprzęt fizyczny)</string>
@@ -829,7 +829,7 @@
     <string name="hop_limit">Liczba skoków</string>
     <string name="hops_away">Skoków</string>
     <string name="host">Host</string>
-    <string name="host_metrics_log">Statystyki hosta</string>
+    <string name="host_metrics_log">Statystyki hosta (Linux)</string>
     <string name="humidity">Wilg.</string>
     <string name="i_agree">Zgadzam się.</string>
     <string name="i_agree_to_share_my_location">Przeczytałem powyższe informacje i rozumiem je. Wyrażam dobrowolną zgodę na niezaszyfrowaną transmisję danych mojego węzła za pośrednictwem protokołu MQTT</string>
@@ -920,7 +920,7 @@
     <string name="licensed_amateur_radio_text">Włączenie tej opcji wyłącza szyfrowanie i jest niezgodne z domyślną siecią Meshtastic_S+.</string>
     <string name="licensed_mode_enable_confirm">Włącz tryb licencjonowany</string>
     <string name="licensed_mode_enable_title">Włączyć tryb licencjonowany (Ham)?</string>
-    <string name="licensed_mode_enable_warning">Tryb licencjonowany usuwa klucze szyfrowania kanałów i wyłącza kanał administracyjny, więc cały ruch jest wysyłany jako czysty tekst, który każdy może odczytać — a to firmware nie może go podpisać, więc inne węzły nie mogą zweryfikować, że pochodzi od Ciebie. Nie jest to zgodne z domyślną siecią Meshtastic_S+, a Ty pozostajesz odpowiedzialny za spełnienie wymagań swojej licencji radioamatorskiej i lokalnych przepisów.</string>
+    <string name="licensed_mode_enable_warning">Tryb licencjonowany usuwa klucze szyfrowania kanałów i wyłącza kanał administracyjny, więc cały ruch jest wysyłany jako czysty tekst, który każdy może odczytać — a to firmware nie może go podpisać, więc inne węzły nie mogą zweryfikować, że pochodzi od Ciebie. Nie jest to zgodne z domyślną siecią Meshtastic, a Ty pozostajesz odpowiedzialny za spełnienie wymagań swojej licencji radioamatorskiej i lokalnych przepisów.</string>
     <string name="licensed_mode_enable_warning_signed">Tryb licencjonowany usuwa klucze szyfrowania kanałów i wyłącza kanał administracyjny, więc cały ruch jest wysyłany jako czysty tekst, który każdy może odczytać — ale jest cyfrowo podpisany, co pozwala innym węzłom zweryfikować, że pochodzi od Ciebie. Numer Twojego węzła może się raz zmienić, aby dopasować się do klucza tożsamości, więc ulubione, historia wiadomości, zdalne zarządzanie i inne węzły mogą początkowo traktować go jako nowy; pozostajesz odpowiedzialny za spełnienie wymagań swojej licencji radioamatorskiej i lokalnych przepisów.</string>
     <!-- LOAD -->
     <string name="load">Wczytaj</string>
@@ -1106,12 +1106,12 @@
     <string name="message_routing_error_admin_bad_session_key">Sesja administratora wygasła</string>
     <string name="message_routing_error_admin_bad_session_key_detail">Klucz sesji administratora jest nieobecny, wygasł lub jest nieprawidłowy. Zażądaj nowej sesji przed ponowną próbą.</string>
     <string name="message_routing_error_admin_public_key_unauthorized">Klucz administratora nieautoryzowany</string>
-    <string name="message_routing_error_admin_public_key_unauthorized_detail">Zdalny węzeł nie autoryzuje Twojego klucza administratora.</string>
+    <string name="message_routing_error_admin_public_key_unauthorized_detail">Zdalny węzeł nie rozpoznaje Twojego klucza administratora.</string>
     <string name="message_routing_error_bad_request">Nieprawidłowe żądanie</string>
     <string name="message_routing_error_bad_request_detail">Cel odrzucił to żądanie jako nieprawidłowe.</string>
     <string name="message_routing_error_duty_cycle_limit">Limit cyklu pracy</string>
     <string name="message_routing_error_duty_cycle_limit_detail">Lokalne limity czasu nadawania tymczasowo blokują wysyłanie. Poczekaj przed ponowną próbą.</string>
-    <string name="message_routing_error_got_nak_detail">Węzeł odrzucił tę wiadomość. Spróbuj ponownie, gdy trasa się zmieni.</string>
+    <string name="message_routing_error_got_nak_detail">Węzeł odrzucił tę wiadomość. Spróbuj ponownie.</string>
     <string name="message_routing_error_max_retransmit">Nie udało się dostarczyć do sieci mesh</string>
     <string name="message_routing_error_max_retransmit_detail">Żaden węzeł nie potwierdził tej wiadomości. Spróbuj ponownie, gdy będziesz mieć lepszy sygnał lub większy zasięg sieci mesh.</string>
     <string name="message_routing_error_no_channel">Nie wybrano kanału</string>
@@ -1124,12 +1124,12 @@
     <string name="message_routing_error_not_authorized">Brak autoryzacji</string>
     <string name="message_routing_error_not_authorized_detail">Cel odrzucił to żądanie, ponieważ nie jest ono autoryzowane.</string>
     <string name="message_routing_error_pki_failed">Nie udało się wysłać zaszyfrowanej wiadomości</string>
-    <string name="message_routing_error_pki_failed_detail">Nie można było użyć ścieżki wysyłania zaszyfrowanego. Poczekaj na synchronizację informacji o węźle lub kluczy, a następnie spróbuj ponownie.</string>
+    <string name="message_routing_error_pki_failed_detail">Nie można było użyć szyfrowania PKI. Poczekaj na synchronizację informacji o węźle lub kluczy, a następnie spróbuj ponownie.</string>
     <string name="message_routing_error_pki_send_fail_public_key">Klucz odbiorcy niedostępny</string>
     <string name="message_routing_error_pki_send_fail_public_key_detail">Twój węzeł nie ma jeszcze klucza publicznego odbiorcy. Poczekaj na synchronizację informacji o węźle, a następnie spróbuj ponownie.</string>
     <string name="message_routing_error_pki_unknown_pubkey">Odbiorca potrzebuje Twojego klucza</string>
     <string name="message_routing_error_pki_unknown_pubkey_detail">Odbiorca nie zna jeszcze Twojego klucza publicznego. Twój węzeł może automatycznie udostępnić swoje informacje; spróbuj ponownie po synchronizacji.</string>
-    <string name="message_routing_error_rate_limit_exceeded">Przekroczono limit szybkości</string>
+    <string name="message_routing_error_rate_limit_exceeded">Przekroczono limit wysyłania</string>
     <string name="message_routing_error_rate_limit_exceeded_detail">Wiadomości są wysyłane zbyt szybko. Poczekaj przed ponowną próbą.</string>
     <string name="message_routing_error_timeout_detail">Nie otrzymano potwierdzenia w wyznaczonym czasie. Spróbuj ponownie, gdy będziesz mieć lepszy sygnał lub większy zasięg sieci mesh.</string>
     <string name="message_routing_error_too_large">Wiadomość jest za duża, aby ją wysłać</string>
@@ -1532,8 +1532,8 @@
     <string name="role_client_hidden_desc">Urządzenie, które nadaje tylko w razie potrzeby, dla ukrycia lub oszczędności energii.</string>
     <string name="role_client_mute_desc">Urządzenie, które nie przekazuje dalej pakietów od innych urządzeń.</string>
     <string name="role_lost_and_found_desc">Nadaje regularnie lokalizację jako wiadomości do głównego kanału, aby pomóc w odzyskaniu urządzenia.</string>
-    <string name="role_repeater_desc">Węzeł infrastruktury do rozszerzenia zasięgu sieci poprzez przekazywanie pakietów z minimalnym narzutem. Niewidoczny na liście węzłów.</string>
-    <string name="role_router_client_desc">Połączenie zarówno trybu ROUTER, jak i CLIENT. Nie dla urządzeń przenośnych.</string>
+    <string name="role_repeater_desc">PORZUCONY: Węzeł infrastruktury do rozszerzenia zasięgu sieci poprzez przekazywanie pakietów z minimalnym narzutem. Niewidoczny na liście węzłów.</string>
+    <string name="role_router_client_desc">PORZUCONY: Połączenie zarówno trybu ROUTER, jak i CLIENT. Nie dla urządzeń przenośnych.</string>
     <string name="role_router_desc">Węzeł infrastruktury do rozszerzenia zasięgu sieci poprzez przekazywanie pakietów. Widoczny na liście węzłów.</string>
     <string name="role_router_late_desc">Węzeł infrastruktury, który zawsze powtarza pakiety raz, ale tylko po wszystkich innych trybach, zapewniając dodatkowe pokrycie lokalnych klastrów. Widoczne na liście węzłów.</string>
     <string name="role_sensor_desc">Nadaje priorytetowo pakiety telemetryczne.</string>
@@ -1652,8 +1652,8 @@
     <string name="should_update_firmware">Zalecana aktualizacja.</string>
     <!-- SHOW -->
     <string name="show_all_key_title">Znaczenie klucza szyfrowania</string>
-    <string name="show_full_message_timestamps">Pokaż pełne znaczniki czasu wiadomości</string>
-    <string name="show_full_message_timestamps_summary">Zawsze pokazuj datę i godzinę w nagłówkach rozmów i akcjach wiadomości</string>
+    <string name="show_full_message_timestamps">Wyświetlaj pełne znaczniki czasu</string>
+    <string name="show_full_message_timestamps_summary">Zawsze wyświetlaj pełną datę i czas w nagłówkach wiadomości</string>
     <string name="show_iaq_legend">Pokaż legendę jakości powietrza</string>
     <string name="show_layer">Pokaż warstwę</string>
     <string name="show_original">Pokaż oryginał</string>
@@ -1739,7 +1739,7 @@
     <string name="tak_server_export_data_package_desc">Generuje plik .zip dla ATAK/iTAK do połączenia z tym serwerem</string>
     <string name="tak_server_loading">…</string>
     <string name="tak_server_mesh_to_cot">Konwerter Mesh na CoT</string>
-    <string name="tak_server_mesh_to_cot_desc">Pokazuj węzły Meshtastic_S+ na mapie ATAK jako kontakty</string>
+    <string name="tak_server_mesh_to_cot_desc">Pokazuj węzły Meshtastic na mapie ATAK jako kontakty</string>
     <string name="tak_server_section">Serwer</string>
     <string name="tak_server_status">Status</string>
     <plurals name="tak_server_status_connected">
@@ -1894,7 +1894,7 @@
     <string name="use_i2s_as_buzzer">Użyj I2S jako buzzer</string>
     <string name="use_input_pullup_mode">Użyj trybu INPUT_PULLUP</string>
     <string name="use_modem_preset">Użyj predefiniowanych ustawień</string>
-    <string name="use_pwm_buzzer">Użyj buzzer PWM</string>
+    <string name="use_pwm_buzzer">Użyj buzzera PWM</string>
     <!-- USER -->
     <string name="user">Użytkownik</string>
     <string name="user_config">Konfiguracja użytkownika</string>

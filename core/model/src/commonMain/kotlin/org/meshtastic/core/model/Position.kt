@@ -30,6 +30,11 @@ data class Position(
     val groundSpeed: Int = 0,
     val groundTrack: Int = 0, // "heading"
     val precisionBits: Int = 0,
+    // True for a manually-configured (fixed) position. Firmware retransmits the same Position struct
+    // periodically for these without refreshing `time` to a new GPS fix, so `time` goes stale even
+    // though the node is actively heard — callers should prefer the containing Node's `lastHeard`
+    // instead of `time` when this is true.
+    val isManual: Boolean = false,
 ) {
 
     @Suppress("MagicNumber")
@@ -57,6 +62,7 @@ data class Position(
         position.ground_speed ?: 0,
         position.ground_track ?: 0,
         position.precision_bits,
+        position.location_source == org.meshtastic.proto.Position.LocSource.LOC_MANUAL,
     )
 
     /** @return distance in meters to some other position */

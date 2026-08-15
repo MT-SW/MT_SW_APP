@@ -36,7 +36,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.database.DatabaseConstants
 import org.meshtastic.core.navigation.DiscoveryRoute
 import org.meshtastic.core.navigation.Route
@@ -46,11 +51,14 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.acknowledgements
 import org.meshtastic.core.resources.app_settings
 import org.meshtastic.core.resources.app_version
+import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.bottom_nav_settings
 import org.meshtastic.core.resources.device_db_cache_limit
 import org.meshtastic.core.resources.device_db_cache_limit_summary
 import org.meshtastic.core.resources.device_links
 import org.meshtastic.core.resources.discovery_local_mesh
+import org.meshtastic.core.resources.export_configuration
+import org.meshtastic.core.resources.import_configuration
 import org.meshtastic.core.resources.help_and_documentation
 import org.meshtastic.core.resources.info
 import org.meshtastic.core.resources.modules_already_unlocked
@@ -64,6 +72,7 @@ import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.ChevronRight
 import org.meshtastic.core.ui.icon.Device
 import org.meshtastic.core.ui.icon.FormatPaint
@@ -75,6 +84,8 @@ import org.meshtastic.core.ui.icon.Memory
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PermScanWifi
 import org.meshtastic.core.ui.icon.Wifi
+import org.meshtastic.core.ui.util.rememberOpenFileLauncher
+import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.core.ui.util.rememberShowToastResource
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.HomoglyphSetting
@@ -84,7 +95,10 @@ import org.meshtastic.feature.settings.navigation.ConfigRoute
 import org.meshtastic.feature.settings.navigation.ModuleRoute
 import org.meshtastic.feature.settings.radio.RadioConfigItemList
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
+import org.meshtastic.feature.settings.radio.component.EditDeviceProfileDialog
+import org.meshtastic.proto.DeviceProfile
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant.Companion.fromEpochMilliseconds
 
 /**
  * Desktop-specific top-level settings screen. Replaces the Android `SettingsScreen` which uses Android-specific APIs
@@ -107,6 +121,7 @@ fun DesktopSettingsScreen(
     val hiddenFeaturesUnlocked by settingsViewModel.hiddenFeaturesUnlocked.collectAsStateWithLifecycle()
     val cacheLimit by settingsViewModel.dbCacheLimit.collectAsStateWithLifecycle()
     val isOtaCapable by settingsViewModel.isOtaCapable.collectAsStateWithLifecycle()
+    val autoLoadChatImages by settingsViewModel.autoLoadChatImages.collectAsStateWithLifecycle()
 
     var showThemePickerDialog by remember { mutableStateOf(false) }
     var showLanguagePickerDialog by remember { mutableStateOf(false) }
@@ -121,6 +136,59 @@ fun DesktopSettingsScreen(
         LanguagePickerDialog(
             onSelectLanguage = { tag -> settingsViewModel.setLocale(tag) },
             onDismiss = { showLanguagePickerDialog = false },
+        )
+    }
+
+    var deviceProfile by remember { mutableStateOf<DeviceProfile?>(null) }
+    var showEditDeviceProfileDialog by remember { mutableStateOf(false) }
+
+    val openConfigLauncher = rememberOpenFileLauncher { uri ->
+        uri?.let {
+            radioConfigViewModel.importProfile(it) { profile ->
+                deviceProfile = profile
+                showEditDeviceProfileDialog = true
+            }
+        }
+    }
+
+    val saveConfigLauncher = rememberSaveFileLauncher { uri ->
+        deviceProfile?.let { radioConfigViewModel.exportProfile(uri, it) }
+    }
+
+    if (showEditDeviceProfileDialog) {
+        EditDeviceProfileDialog(
+            title =
+                if (deviceProfile != null) {
+                    stringResource(Res.string.import_configuration)
+                } else {
+                    stringResource(Res.string.export_configuration)
+                },
+            deviceProfile = deviceProfile ?: radioConfigViewModel.currentDeviceProfile,
+            onConfirm = {
+                showEditDeviceProfileDialog = false
+                if (deviceProfile != null) {
+                    radioConfigViewModel.installProfile(it)
+                } else {
+                    deviceProfile = it
+                    val nodeName = (it.short_name ?: "").ifBlank { "node" }
+                    val dateStr =
+                        fromEpochMilliseconds(nowMillis)
+                            .toLocalDateTime(TimeZone.currentSystemDefault())
+                            .format(
+                                LocalDateTime.Format {
+                                    year()
+                                    monthNumber()
+                                    day()
+                                },
+                            )
+                    val fileName = "Meshtastic_${nodeName}_${dateStr}_nodeConfig.cfg"
+                    saveConfigLauncher(fileName, "application/octet-stream")
+                }
+            },
+            onDismiss = {
+                showEditDeviceProfileDialog = false
+                deviceProfile = null
+            },
         )
     }
 
@@ -163,10 +231,14 @@ fun DesktopSettingsScreen(
                 },
                 onNavigate = onNavigate,
                 onImport = {
-                    // Profile import not yet supported on Desktop
+                    radioConfigViewModel.clearPacketResponse()
+                    deviceProfile = null
+                    openConfigLauncher("application/octet-stream")
                 },
                 onExport = {
-                    // Profile export not yet supported on Desktop
+                    radioConfigViewModel.clearPacketResponse()
+                    deviceProfile = null
+                    showEditDeviceProfileDialog = true
                 },
             )
 
@@ -206,6 +278,12 @@ fun DesktopSettingsScreen(
                         selectedItem = cacheLimit.toLong(),
                         onItemSelected = { selected -> settingsViewModel.setDbCacheLimit(selected.toInt()) },
                         summary = stringResource(Res.string.device_db_cache_limit_summary),
+                    )
+
+                    SwitchListItem(
+                        text = stringResource(Res.string.auto_load_chat_images),
+                        checked = autoLoadChatImages,
+                        onClick = { settingsViewModel.setAutoLoadChatImages(!autoLoadChatImages) },
                     )
                 }
 

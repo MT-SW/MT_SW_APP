@@ -33,6 +33,7 @@ import org.meshtastic.core.common.util.GPSFormat
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.util.metersIn
 import org.meshtastic.core.model.util.toString
+import org.meshtastic.proto.Position as WirePosition
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.copy
 import org.meshtastic.core.resources.elevation_suffix
@@ -57,7 +58,10 @@ fun LinkedCoordinatesItem(
     val coroutineScope = rememberCoroutineScope()
     val openMap = rememberOpenMap()
 
-    val ago = formatAgo(node.position.time)
+    // A manually-set (fixed) position keeps its original `time` forever, even as the node is heard
+    // regularly — show when we last actually heard from the node instead of the frozen GPS-fix time.
+    val isManualPosition = node.position.location_source == WirePosition.LocSource.LOC_MANUAL
+    val ago = formatAgo(if (isManualPosition) node.lastHeard else node.position.time)
     val coordinates = GPSFormat.toDec(node.latitude, node.longitude)
     val elevationText =
         node.validPosition?.altitude?.let { altitude ->

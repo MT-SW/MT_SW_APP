@@ -92,7 +92,9 @@ import org.meshtastic.core.resources.desktop_update_download
 import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.util.LocalEventBranding
+import org.meshtastic.core.ui.util.LocalMapMainScreenProvider
 import org.meshtastic.core.ui.util.rememberOpenUrl
+import org.meshtastic.desktop.map.DesktopMapScreen
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.desktop.data.DesktopPreferencesDataSource
 import org.meshtastic.desktop.di.desktopModule
@@ -390,7 +392,13 @@ private fun ApplicationScope.MeshtasticWindow(
         val eventEdition by uiViewModel.eventEdition.collectAsState()
 
         CoilImageLoaderSetup()
-        CompositionLocalProvider(LocalEventBranding provides eventEdition) {
+        CompositionLocalProvider(
+            LocalEventBranding provides eventEdition,
+            LocalMapMainScreenProvider provides
+                    { onClickNodeChip, navigateToNodeDetails, waypointId, sitePlannerNodeNum ->
+                        DesktopMapScreen(onClickNodeChip, navigateToNodeDetails, waypointId, sitePlannerNodeNum)
+                    },
+        ) {
             AppTheme(darkTheme = isDarkTheme) { DesktopMainScreen(uiViewModel, multiBackstack) }
         }
     }

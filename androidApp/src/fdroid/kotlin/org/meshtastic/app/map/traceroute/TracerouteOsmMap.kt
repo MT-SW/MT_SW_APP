@@ -199,7 +199,19 @@ fun TracerouteOsmMap(
                 val marker =
                     MarkerWithLabel(
                         mapView = map,
-                        label = "${node.user.short_name} ${formatAgo(node.position.time, unknownText, nowText)}",
+                        label =
+                            "${node.user.short_name} " +
+                                    formatAgo(
+                                        if (node.position.location_source ==
+                                            org.meshtastic.proto.Position.LocSource.LOC_MANUAL
+                                        ) {
+                                            node.lastHeard
+                                        } else {
+                                            node.position.time
+                                        },
+                                        unknownText,
+                                        nowText,
+                                    ),
                     )
                         .apply {
                             id = node.user.id
