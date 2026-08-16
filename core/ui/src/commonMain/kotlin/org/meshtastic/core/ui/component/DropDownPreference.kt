@@ -58,10 +58,13 @@ fun <T : Enum<T>> DropDownPreference(
     itemIcon: @Composable ((T) -> ImageVector)? = null,
     itemColor: @Composable ((T) -> Color)? = null,
     itemLabel: @Composable ((T) -> String)? = null,
+    excludedItems: Set<T> = emptySet(),
 ) {
     val enumConstants =
-        remember(selectedItem) {
-            enumEntriesOf(selectedItem).filter { it.name != "UNRECOGNIZED" && !it.isDeprecatedEnumEntry() }
+        remember(selectedItem, excludedItems) {
+            enumEntriesOf(selectedItem).filter {
+                it.name != "UNRECOGNIZED" && !it.isDeprecatedEnumEntry() && it !in excludedItems
+            }
         }
 
     val items =

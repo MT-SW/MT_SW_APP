@@ -198,6 +198,8 @@ fun DeviceConfigScreenCommon(viewModel: RadioConfigViewModel, onBack: () -> Unit
                     summary = stringResource(currentRole.description),
                     itemIcon = { MeshtasticIcons.role(it) },
                     itemLabel = { it.name },
+                    excludedItems =
+                        setOf(Config.DeviceConfig.Role.REPEATER, Config.DeviceConfig.Role.ROUTER_CLIENT),
                 )
 
                 HorizontalDivider()
