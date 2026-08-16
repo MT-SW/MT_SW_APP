@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +45,7 @@ import org.meshtastic.app.map.addPositionMarkers
 import org.meshtastic.app.map.addScaleBarOverlay
 import org.meshtastic.app.map.model.CustomTileSource
 import org.meshtastic.app.map.rememberMapViewWithLifecycle
+import org.meshtastic.app.map.requiredZoomLevel
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.model.util.GeoConstants.DEG_D
 import org.meshtastic.core.resources.Res
@@ -54,6 +56,9 @@ import org.meshtastic.proto.Position
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import kotlin.math.roundToInt
+
+private const val TRACK_SINGLE_POINT_ZOOM = 12.0
+private const val TRACK_MAX_ZOOM = 12.0
 
 /**
  * A focused OSMDroid map composable that renders **only** a node's position track — a dashed polyline with directional
@@ -93,9 +98,30 @@ fun NodeTrackOsmMap(
         remember(filteredPositions) {
             filteredPositions.map { GeoPoint((it.latitude_i ?: 0) * DEG_D, (it.longitude_i ?: 0) * DEG_D) }
         }
-    val cameraView = remember(geoPoints) { BoundingBox.fromGeoPoints(geoPoints) }
+    val initialCameraView =
+        remember(geoPoints) { if (geoPoints.isEmpty()) null else BoundingBox.fromGeoPoints(geoPoints) }
     val mapView =
-        rememberMapViewWithLifecycle(box = cameraView, tileSource = CustomTileSource.getTileSource(mapStyleId))
+        rememberMapViewWithLifecycle(
+            box = initialCameraView ?: BoundingBox(),
+            tileSource = CustomTileSource.getTileSource(mapStyleId),
+        )
+
+    // The box above only seeds the very first composition, which can happen before `positions` has
+    // finished loading (empty geoPoints -> BoundingBox() -> map centers on 0,0, "the ocean"). Re-center
+    // once real track data actually arrives, exactly one time, so it doesn't fight the user's own pan/zoom.
+    var hasCentered by remember { mutableStateOf(false) }
+    LaunchedEffect(geoPoints) {
+        if (hasCentered || geoPoints.isEmpty()) return@LaunchedEffect
+        if (geoPoints.size == 1) {
+            mapView.controller.setCenter(geoPoints.first())
+            mapView.controller.setZoom(TRACK_SINGLE_POINT_ZOOM)
+        } else {
+            val box = BoundingBox.fromGeoPoints(geoPoints)
+            mapView.controller.setZoom(box.requiredZoomLevel().coerceAtMost(TRACK_MAX_ZOOM))
+            mapView.controller.setCenter(GeoPoint(box.centerLatitude, box.centerLongitude))
+        }
+        hasCentered = true
+    }
 
     var filterMenuExpanded by remember { mutableStateOf(false) }
 
