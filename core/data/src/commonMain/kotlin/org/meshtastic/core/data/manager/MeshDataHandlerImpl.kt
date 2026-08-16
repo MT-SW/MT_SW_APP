@@ -118,14 +118,6 @@ class MeshDataHandlerImpl(
     private val scope: ServiceScope,
 ) : MeshDataHandler {
 
-    private val rememberDataType =
-        setOf(
-            PortNum.TEXT_MESSAGE_APP.value,
-            PortNum.ALERT_APP.value,
-            PortNum.WAYPOINT_APP.value,
-            PortNum.NODE_STATUS_APP.value,
-        )
-
     override fun handleReceivedData(
         packet: MeshPacket,
         myNodeNum: Int,
@@ -344,8 +336,8 @@ class MeshDataHandlerImpl(
         session: RadioSessionContext,
     ) {
         val decoded = packet.decoded ?: return
-        if (decoded.reply_id != 0 && decoded.emoji != 0) {
-            rememberReaction(packet, session)
+        if (decoded.isReaction()) {
+            rememberReaction(packet, dataPacket, session)
         } else {
             rememberDataPacket(dataPacket, myNodeNum, session = session)
         }
@@ -454,7 +446,7 @@ class MeshDataHandlerImpl(
                     packetRepository.value.updateReaction(updated)
                 }
             }
-            packetHandler.removeResponse(requestId, complete = isAck)
+            packetHandler.completeDispatchedResponse(requestId, complete = isAck)
         }
     }
 
@@ -464,7 +456,7 @@ class MeshDataHandlerImpl(
         updateNotification: Boolean,
         session: RadioSessionContext?,
     ) {
-        if (dataPacket.dataType !in rememberDataType) return
+        if (dataPacket.dataType !in PERSISTED_DATA_PORT_NUMBERS) return
         radioInterfaceService.launchSessionWork(scope, session) {
             persistDataPacket(dataPacket, myNodeNum, updateNotification)
         }
@@ -473,25 +465,21 @@ class MeshDataHandlerImpl(
     /**
      * Deduplicates, filters, persists, and (when appropriate) notifies for a single [dataPacket]. Runs inside a session
      * lease — callers must launch it via [RadioInterfaceService.launchSessionWork] and must have already confirmed the
-     * packet's [DataPacket.dataType] is one of [rememberDataType]. Split out from [rememberDataPacket] so the waypoint
-     * path can gate persistence on a repository read within the same lease (see [handleWaypoint]).
+     * packet's [DataPacket.dataType] is one of [PERSISTED_DATA_PORT_NUMBERS]. Split out from [rememberDataPacket] so
+     * the waypoint path can gate persistence on a repository read within the same lease (see [handleWaypoint]).
      */
     private suspend fun persistDataPacket(dataPacket: DataPacket, myNodeNum: Int, updateNotification: Boolean) {
         val fromLocal = dataPacket.isFromLocal(myNodeNum)
-        val toBroadcast = dataPacket.isBroadcast
-        val contactId = if (fromLocal || toBroadcast) dataPacket.to else dataPacket.from
-
-        // contactKey: unique contact key filter (channel)+(nodeId)
-        val contactKey = "${dataPacket.channel}$contactId"
+        val contactKey = dataPacket.contactKey(myNodeNum)
 
         packetRepository.value.apply {
             // Check for duplicates before inserting
             val existingPackets = findPacketsWithId(dataPacket.id)
-            if (existingPackets.isNotEmpty()) {
+            if (existingPackets.any { it.hasSameSenderAs(dataPacket, myNodeNum) }) {
                 Logger.d {
                     "Skipping duplicate packet: packetId=${dataPacket.id} from=${dataPacket.from} " +
-                        "to=${dataPacket.to} contactKey=$contactKey" +
-                        " (already have ${existingPackets.size} packet(s))"
+                            "to=${dataPacket.to} contactKey=$contactKey" +
+                            " (already have ${existingPackets.size} packet(s))"
                 }
                 return
             }
@@ -592,81 +580,93 @@ class MeshDataHandlerImpl(
     }
 
     @Suppress("LongMethod", "KotlinConstantConditions")
-    private fun rememberReaction(packet: MeshPacket, session: RadioSessionContext) =
+    private fun rememberReaction(packet: MeshPacket, dataPacket: DataPacket, session: RadioSessionContext) =
         radioInterfaceService.launchSessionWork(scope, session) {
             val decoded = packet.decoded ?: return@launchSessionWork
             val emoji = decoded.payload.toByteArray().decodeToString()
             val fromId = nodeManager.toNodeID(packet.from)
+            val toId = nodeManager.toNodeID(packet.to)
+            val myNodeNum = nodeManager.myNodeNum.value ?: 0
+            val contactKey = dataPacket.contactKey(myNodeNum)
 
             val fromNode = nodeManager.nodeDBbyNodeNum[packet.from] ?: Node(num = packet.from)
-            val toNode = nodeManager.nodeDBbyNodeNum[packet.to] ?: Node(num = packet.to)
+            val fromUser = fromNode.user.copy(id = fromNode.user.id.ifEmpty { fromId })
 
             val reaction =
                 Reaction(
                     replyId = decoded.reply_id,
-                    user = fromNode.user,
+                    user = fromUser,
                     emoji = emoji,
                     timestamp = nowMillis,
                     // [Reaction.snr] is not nullable, so absent narrows to 0f here. See [snrOrNull].
                     snr = packet.snrOrNull() ?: 0f,
                     rssi = packet.rx_rssi,
                     hopsAway =
-                    if (packet.hop_start == 0 || packet.hop_limit > packet.hop_start) {
-                        HOPS_AWAY_UNAVAILABLE
-                    } else {
-                        packet.hop_start - packet.hop_limit
-                    },
+                        if (packet.hop_start == 0 || packet.hop_limit > packet.hop_start) {
+                            HOPS_AWAY_UNAVAILABLE
+                        } else {
+                            packet.hop_start - packet.hop_limit
+                        },
                     packetId = packet.id,
                     status = MessageStatus.RECEIVED,
-                    to = toNode.user.id,
-                    channel = packet.channel,
+                    to = toId,
+                    channel = dataPacket.channel,
                 )
 
             // Check for duplicates before inserting
             val existingReactions = packetRepository.value.findReactionsWithId(packet.id)
-            if (existingReactions.isNotEmpty()) {
+            if (existingReactions.any { it.user.id == fromId }) {
                 Logger.d {
                     "Skipping duplicate reaction: packetId=${packet.id} replyId=${decoded.reply_id} " +
-                        "from=$fromId emoji=$emoji (already have ${existingReactions.size} reaction(s))"
+                            "(already have ${existingReactions.size} reaction(s))"
                 }
                 return@launchSessionWork
             }
 
-            packetRepository.value.insertReaction(reaction, nodeManager.myNodeNum.value ?: 0)
+            packetRepository.value.insertReaction(reaction, myNodeNum)
 
-            // Find the original packet to get the contactKey
-            packetRepository.value.getPacketByPacketId(decoded.reply_id)?.let { originalPacket ->
-                // Skip notification if the original message was filtered
-                val targetId =
-                    if (originalPacket.source is NodeAddress.Local) originalPacket.to else originalPacket.from
-                val contactKey = "${originalPacket.channel}$targetId"
-                val conversationMuted = packetRepository.value.getContactSettings(contactKey).isMuted
-                val nodeMuted = nodeManager.getNodeById(fromId)?.isMuted == true
-                val isSilent = conversationMuted || nodeMuted
+            // A reply ID is sender-scoped, so only use a parent that is unique within this reaction's conversation.
+            packetRepository.value
+                .findPacketsWithId(decoded.reply_id)
+                .filter { it.contactKey(myNodeNum) == contactKey }
+                .singleOrNull()
+                ?.let { originalPacket ->
+                    // Skip notification if the original message was filtered
+                    val conversationMuted = packetRepository.value.getContactSettings(contactKey).isMuted
+                    val nodeMuted = nodeManager.getNodeById(fromId)?.isMuted == true
+                    val isSilent = conversationMuted || nodeMuted
 
-                if (!isSilent) {
-                    val isBroadcast = originalPacket.destination is NodeAddress.Broadcast
-                    val channelName =
-                        if (isBroadcast) {
-                            radioConfigRepository.channelSetFlow
-                                .first()
-                                .settings
-                                .getOrNull(originalPacket.channel)
-                                ?.name
-                        } else {
-                            null
-                        }
-                    serviceNotifications.updateReactionNotification(
-                        contactKey,
-                        getSenderName(dataMapper.toDataPacket(packet)!!),
-                        emoji,
-                        isBroadcast,
-                        channelName,
-                        isSilent,
-                    )
+                    if (!isSilent) {
+                        val isBroadcast = originalPacket.destination is NodeAddress.Broadcast
+                        val channelName =
+                            if (isBroadcast) {
+                                radioConfigRepository.channelSetFlow
+                                    .first()
+                                    .settings
+                                    .getOrNull(originalPacket.channel)
+                                    ?.name
+                            } else {
+                                null
+                            }
+                        serviceNotifications.updateReactionNotification(
+                            contactKey,
+                            getSenderName(dataPacket),
+                            emoji,
+                            isBroadcast,
+                            channelName,
+                            isSilent,
+                        )
+                    }
                 }
-            }
         }
+
+    private fun DataPacket.contactKey(myNodeNum: Int): String {
+        val contactId = if (isFromLocal(myNodeNum) || isBroadcast) to else from
+        return "$channel$contactId"
+    }
+
+    private fun DataPacket.hasSameSenderAs(other: DataPacket, myNodeNum: Int): Boolean =
+        source == other.source || (isFromLocal(myNodeNum) && other.isFromLocal(myNodeNum))
 
     companion object {
         private const val HOPS_AWAY_UNAVAILABLE = -1

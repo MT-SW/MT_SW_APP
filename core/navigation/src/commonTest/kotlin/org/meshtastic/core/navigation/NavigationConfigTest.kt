@@ -102,6 +102,7 @@ class NavigationConfigTest {
             SettingsRoute.CleanNodeDb,
             SettingsRoute.DebugPanel,
             SettingsRoute.About,
+            SettingsRoute.Acknowledgements,
             SettingsRoute.FilterSettings,
             // FirmwareRoute
             FirmwareRoute.FirmwareGraph,

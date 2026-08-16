@@ -44,6 +44,7 @@ import org.meshtastic.core.repository.MessagingController
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.RadioInterfaceService
+import org.meshtastic.core.ui.viewmodel.safeLaunch
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
 import org.meshtastic.feature.node.detail.NodeManagementActions
 import org.meshtastic.feature.node.detail.NodeRequestActions
@@ -208,7 +209,7 @@ class NodeListViewModel(
         nodeFilterPreferences.setNodeSort(sort)
     }
 
-    fun setChannels(channelSet: ChannelSet) = viewModelScope.launch {
+    fun setChannels(channelSet: ChannelSet) = safeLaunch(tag = "setChannels") {
         radioConfigRepository.replaceAllSettings(channelSet.settings)
         val newLoraConfig = channelSet.lora_config
         if (newLoraConfig != null) {
@@ -239,7 +240,7 @@ class NodeListViewModel(
 
     /** Initiates a trace route request to the specified node. */
     fun traceRoute(node: Node) {
-        viewModelScope.launch { nodeRequestActions.requestTraceroute(node.num, node.user.long_name) }
+        safeLaunch(tag = "requestTraceroute") { nodeRequestActions.requestTraceroute(node.num, node.user.long_name) }
     }
 
     companion object {

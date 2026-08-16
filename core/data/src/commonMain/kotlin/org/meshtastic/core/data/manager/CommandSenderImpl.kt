@@ -33,14 +33,19 @@ import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.Position
 import org.meshtastic.core.model.TelemetryType
 import org.meshtastic.core.model.util.isWithinSizeLimit
+import org.meshtastic.core.repository.AwaitedSendResult
 import org.meshtastic.core.repository.CommandSender
+import org.meshtastic.core.repository.LocalNodeUnavailableException
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NeighborInfoHandler
 import org.meshtastic.core.repository.NodeManager
 import org.meshtastic.core.repository.PacketHandler
+import org.meshtastic.core.repository.PacketQueueRejectedException
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.SessionManager
 import org.meshtastic.core.repository.TracerouteHandler
+import org.meshtastic.core.repository.toFixedPositionAdminMessage
+import org.meshtastic.core.repository.toFixedPositionProto
 import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.AirQualityMetrics
 import org.meshtastic.proto.ChannelSet
@@ -95,6 +100,8 @@ class CommandSenderImpl(
     override fun getCachedChannelSet(): ChannelSet = channelSet.value
 
     override fun getCurrentPacketId(): Long = currentPacketId.value
+
+    private fun Int.nonZeroRequestId(): Int = takeUnless { it == 0 } ?: generatePacketId()
 
     override fun generatePacketId(): Int {
         val numPacketIds = ((1L shl PACKET_ID_SHIFT_BITS) - 1)
@@ -157,10 +164,15 @@ class CommandSenderImpl(
             p.status = MessageStatus.QUEUED
         }
 
-        sendNow(p)
+        if (!sendNow(p)) {
+            p.status = MessageStatus.ERROR
+            // Persistence owners treat a normal return as successful admission; throw so they can requeue or fail it.
+            throw PacketQueueRejectedException("Data packet")
+        }
+        p.time = nowMillis
     }
 
-    private suspend fun sendNow(p: DataPacket) {
+    private suspend fun sendNow(p: DataPacket): Boolean {
         val meshPacket =
             buildMeshPacket(
                 to = resolveNodeNum(NodeAddress.fromString(p.to)),
@@ -176,15 +188,47 @@ class CommandSenderImpl(
                     emoji = p.emoji,
                 ),
             )
-        p.time = nowMillis
-        packetHandler.sendToRadio(meshPacket)
+        return packetHandler.sendToRadio(meshPacket)
     }
 
+    private suspend fun enqueueOrThrow(packet: MeshPacket, operation: String, expectedConnectionVersion: Long? = null) {
+        val accepted =
+            if (expectedConnectionVersion == null) {
+                packetHandler.sendToRadio(packet)
+            } else {
+                packetHandler.sendToRadioForConnection(packet, expectedConnectionVersion)
+            }
+        if (!accepted) throw PacketQueueRejectedException(operation)
+    }
+
+    private fun buildAdminMessagePacket(
+        destNum: Int,
+        requestId: Int,
+        wantResponse: Boolean,
+        initFn: () -> AdminMessage,
+    ): MeshPacket = buildAdminPacket(
+        to = destNum,
+        id = requestId.nonZeroRequestId(),
+        wantResponse = wantResponse,
+        adminMessage = initFn().copy(session_passkey = sessionManager.getPasskey(destNum)),
+    )
+
     override suspend fun sendAdmin(destNum: Int, requestId: Int, wantResponse: Boolean, initFn: () -> AdminMessage) {
-        val adminMsg = initFn().copy(session_passkey = sessionManager.getPasskey(destNum))
-        val packet =
-            buildAdminPacket(to = destNum, id = requestId, wantResponse = wantResponse, adminMessage = adminMsg)
-        packetHandler.sendToRadio(packet)
+        enqueueOrThrow(buildAdminMessagePacket(destNum, requestId, wantResponse, initFn), "Admin command")
+    }
+
+    override suspend fun sendAdminForConnection(
+        destNum: Int,
+        expectedConnectionVersion: Long,
+        requestId: Int,
+        wantResponse: Boolean,
+        initFn: () -> AdminMessage,
+    ) {
+        enqueueOrThrow(
+            buildAdminMessagePacket(destNum, requestId, wantResponse, initFn),
+            "Admin command",
+            expectedConnectionVersion,
+        )
     }
 
     override fun sendAdminImmediate(destNum: Int, initFn: () -> AdminMessage) {
@@ -193,17 +237,13 @@ class CommandSenderImpl(
         packetHandler.sendToRadio(ToRadio(packet = packet))
     }
 
-    override suspend fun sendAdminAwait(
+    override suspend fun sendAdminAwaitResult(
         destNum: Int,
         requestId: Int,
         wantResponse: Boolean,
         initFn: () -> AdminMessage,
-    ): Boolean {
-        val adminMsg = initFn().copy(session_passkey = sessionManager.getPasskey(destNum))
-        val packet =
-            buildAdminPacket(to = destNum, id = requestId, wantResponse = wantResponse, adminMessage = adminMsg)
-        return packetHandler.sendToRadioAndAwait(packet)
-    }
+    ): AwaitedSendResult =
+        packetHandler.sendToRadioAndAwaitResult(buildAdminMessagePacket(destNum, requestId, wantResponse, initFn))
 
     override suspend fun sendAdminAndAwaitDelivery(destNum: Int, requestId: Int, initFn: () -> AdminMessage): Boolean {
         val adminMsg = initFn().copy(session_passkey = sessionManager.getPasskey(destNum))
@@ -212,15 +252,11 @@ class CommandSenderImpl(
     }
 
     override suspend fun sendPosition(pos: ProtoPosition, destNum: Int?, wantResponse: Boolean) {
-        val myNum = nodeManager.myNodeNum.value ?: return
+        val myNum = nodeManager.myNodeNum.value ?: throw LocalNodeUnavailableException("Position update")
         val idNum = destNum ?: myNum
-        Logger.d { "Sending our position/time to=$idNum $pos" }
+        Logger.d { "Sending our position/time to=$idNum" }
 
-        if (localConfig.value.position?.fixed_position != true) {
-            nodeManager.handleReceivedPosition(myNum, myNum, pos, nowMillis)
-        }
-
-        packetHandler.sendToRadio(
+        enqueueOrThrow(
             buildMeshPacket(
                 to = idNum,
                 channel = if (destNum == null) 0 else getChannelIndex(destNum),
@@ -232,7 +268,11 @@ class CommandSenderImpl(
                     want_response = wantResponse,
                 ),
             ),
+            "Position update",
         )
+        if (localConfig.value.position?.fixed_position != true) {
+            nodeManager.handleReceivedPosition(myNum, myNum, pos, nowMillis)
+        }
     }
 
     override suspend fun requestPosition(destNum: Int, currentPosition: Position) {
@@ -243,7 +283,7 @@ class CommandSenderImpl(
                 altitude = currentPosition.altitude,
                 time = (nowMillis / 1000L).toInt(),
             )
-        packetHandler.sendToRadio(
+        enqueueOrThrow(
             buildMeshPacket(
                 to = destNum,
                 channel = getChannelIndex(destNum),
@@ -255,30 +295,28 @@ class CommandSenderImpl(
                     want_response = true,
                 ),
             ),
+            "Position request",
         )
     }
 
     override suspend fun setFixedPosition(destNum: Int, pos: Position) {
-        val meshPos =
-            ProtoPosition(
-                latitude_i = Position.degI(pos.latitude),
-                longitude_i = Position.degI(pos.longitude),
-                altitude = pos.altitude,
-            )
-        sendAdmin(destNum) {
-            if (pos != Position(0.0, 0.0, 0)) {
-                AdminMessage(set_fixed_position = meshPos)
+        val removesFixedPosition = pos.isFixedPositionRemoval()
+        val myNodeNum =
+            if (removesFixedPosition) {
+                null
             } else {
-                AdminMessage(remove_fixed_position = true)
+                nodeManager.myNodeNum.value ?: throw LocalNodeUnavailableException("Fixed position")
             }
+        sendAdmin(destNum) { pos.toFixedPositionAdminMessage() }
+        if (myNodeNum != null) {
+            nodeManager.handleReceivedPosition(destNum, myNodeNum, pos.toFixedPositionProto(), nowMillis)
         }
-        nodeManager.handleReceivedPosition(destNum, nodeManager.myNodeNum.value ?: 0, meshPos, nowMillis)
     }
 
     override suspend fun requestUserInfo(destNum: Int) {
-        val myNum = nodeManager.myNodeNum.value ?: return
-        val myNode = nodeManager.nodeDBbyNodeNum[myNum] ?: return
-        packetHandler.sendToRadio(
+        val myNum = nodeManager.myNodeNum.value ?: throw LocalNodeUnavailableException("User-info request")
+        val myNode = nodeManager.nodeDBbyNodeNum[myNum] ?: throw LocalNodeUnavailableException("User-info request")
+        enqueueOrThrow(
             buildMeshPacket(
                 to = destNum,
                 channel = getChannelIndex(destNum),
@@ -289,20 +327,23 @@ class CommandSenderImpl(
                     payload = myNode.user.encode().toByteString(),
                 ),
             ),
+            "User-info request",
         )
     }
 
     override suspend fun requestTraceroute(requestId: Int, destNum: Int) {
-        tracerouteHandler.recordStartTime(requestId)
-        packetHandler.sendToRadio(
+        val effectiveRequestId = requestId.nonZeroRequestId()
+        enqueueOrThrow(
             buildMeshPacket(
                 to = destNum,
                 wantAck = true,
-                id = requestId,
+                id = effectiveRequestId,
                 channel = getChannelIndex(destNum),
                 decoded = Data(portnum = PortNum.TRACEROUTE_APP, want_response = true, dest = destNum),
             ),
+            "Traceroute request",
         )
+        tracerouteHandler.recordStartTime(effectiveRequestId)
     }
 
     override suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long) {
@@ -340,6 +381,25 @@ class CommandSenderImpl(
     }
 
     override suspend fun requestTelemetry(requestId: Int, destNum: Int, typeValue: Int) {
+        enqueueTelemetryOrThrow(requestId, destNum, typeValue)
+    }
+
+    override suspend fun requestTelemetryForConnection(
+        requestId: Int,
+        destNum: Int,
+        typeValue: Int,
+        expectedConnectionVersion: Long,
+    ) {
+        enqueueTelemetryOrThrow(requestId, destNum, typeValue, expectedConnectionVersion)
+    }
+
+    private suspend fun enqueueTelemetryOrThrow(
+        requestId: Int,
+        destNum: Int,
+        typeValue: Int,
+        expectedConnectionVersion: Long? = null,
+    ) {
+        val effectiveRequestId = requestId.nonZeroRequestId()
         val type = TelemetryType.entries.getOrNull(typeValue) ?: TelemetryType.DEVICE
 
         val portNum: PortNum
@@ -363,19 +423,22 @@ class CommandSenderImpl(
                     .toByteString()
         }
 
-        packetHandler.sendToRadio(
+        enqueueOrThrow(
             buildMeshPacket(
                 to = destNum,
-                id = requestId,
+                id = effectiveRequestId,
                 channel = getChannelIndex(destNum),
                 decoded = Data(portnum = portNum, payload = payloadBytes, want_response = true, dest = destNum),
             ),
+            "Telemetry request",
+            expectedConnectionVersion,
         )
     }
 
     override suspend fun requestNeighborInfo(requestId: Int, destNum: Int) {
-        neighborInfoHandler.recordStartTime(requestId)
-        val myNum = nodeManager.myNodeNum.value ?: 0
+        val effectiveRequestId = requestId.nonZeroRequestId()
+        val myNum = nodeManager.myNodeNum.value ?: throw LocalNodeUnavailableException("Neighbor-info request")
+
         if (destNum == myNum) {
             val neighborInfoToSend =
                 neighborInfoHandler.lastNeighborInfo
@@ -387,14 +450,14 @@ class CommandSenderImpl(
                             last_sent_by_id = myNum,
                             node_broadcast_interval_secs = oneHour,
                             neighbors =
-                            listOf(
-                                Neighbor(
-                                    node_id = 0, // Dummy node ID that can be intercepted
-                                    snr = 0f,
-                                    last_rx_time = (nowMillis / 1000L).toInt(),
-                                    node_broadcast_interval_secs = oneHour,
+                                listOf(
+                                    Neighbor(
+                                        node_id = 0, // Dummy node ID that can be intercepted
+                                        snr = 0f,
+                                        last_rx_time = (nowMillis / 1000L).toInt(),
+                                        node_broadcast_interval_secs = oneHour,
+                                    ),
                                 ),
-                            ),
                         )
                     }
 
@@ -417,11 +480,11 @@ class CommandSenderImpl(
                     to = destNum,
                     id = generatePacketId(),
                     decoded =
-                    Data(
-                        portnum = PortNum.NEIGHBORINFO_APP,
-                        request_id = requestId,
-                        payload = neighborInfoToSend.encode().toByteString(),
-                    ),
+                        Data(
+                            portnum = PortNum.NEIGHBORINFO_APP,
+                            request_id = requestId,
+                            payload = neighborInfoToSend.encode().toByteString(),
+                        ),
                 )
 
             meshLogRepository.insert(
@@ -447,18 +510,20 @@ class CommandSenderImpl(
                 ),
             )
             neighborInfoHandler.handleNeighborInfo(responsePacket)
-        } else {
-            // Send request to remote
-            packetHandler.sendToRadio(
-                buildMeshPacket(
-                    to = destNum,
-                    wantAck = true,
-                    id = requestId,
-                    channel = getChannelIndex(destNum),
-                    decoded = Data(portnum = PortNum.NEIGHBORINFO_APP, want_response = true, dest = destNum),
-                ),
-            )
+            return
         }
+
+        // Send request to remote
+        val packet =
+            buildMeshPacket(
+                to = destNum,
+                wantAck = true,
+                id = effectiveRequestId,
+                channel = getChannelIndex(destNum),
+                decoded = Data(portnum = PortNum.NEIGHBORINFO_APP, want_response = true, dest = destNum),
+            )
+        enqueueOrThrow(packet, "Neighbor-info request")
+        neighborInfoHandler.recordStartTime(effectiveRequestId)
     }
 
     override fun sendLockdownPassphrase(
