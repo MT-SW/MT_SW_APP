@@ -12,9 +12,31 @@ Stan roboczy — repo służy głównie do własnego użytku i testów z niewiel
 - **Pasywne zbieranie NeighborInfo** — log sąsiadów pokazuje teraz też podsłuchane rozgłoszenia innych węzłów, nie tylko odpowiedzi na własne zapytania; naprawiony też przypadek żądania Neighbor Info dla własnego, lokalnie podłączonego urządzenia (wcześniej nic nie zwracał).
 - **Przyciski szybkich komend** (`/ping`, `/hello`, `/test`) na ekranie węzła — wysyłają wiadomość prywatną nawet do węzłów, których rola normalnie blokuje ręczne wiadomości; przydatne do szybkiego testowania nowych buildów firmware na urządzeniach w terenie.
 - **Lista węzłów pośredniczących (relay) w dostarczeniu wiadomości** — dialog "Status doręczenia" pokazuje pełną listę nazw wszystkich węzłów biorących udział w retransmisji (nie tylko licznik ani jedną nazwę jak w oryginale), łącznie z poprawkami po stronie firmware, żeby te dane w ogóle docierały do appki.
-- Przywrócony ekran konfiguracji **Traffic Management** (w pewnym momencie usunięty w upstreamie).
 - **Nazwa węzła pośredniczącego (relay) widoczna wprost na liście węzłów i w szczegółach węzła** — nie trzeba już otwierać dialogu "Status doręczenia", żeby zobaczyć przez kogo dany węzeł się łączy.
+- Przywrócony ekran konfiguracji **Traffic Management** (w pewnym momencie usunięty w upstreamie).
+- **Naprawiony nieaktualny czas ostatniej pozycji dla węzłów ze stałą (ręcznie wpisaną) lokalizacją** — firmware nie odświeża czasu przy retransmisji tej samej pozycji, appka pokazuje teraz realny czas ostatniego kontaktu z węzłem zamiast zamrożonej daty sprzed dni.
 - **Ukryte nieaktualne role urządzenia** (REPEATER, ROUTER_CLIENT) na liście wyboru roli w konfiguracji urządzenia — firmware ich już nie wspiera, więc nie da się ich przez pomyłkę wybrać.
+- Poprawiony wygląd czasu działania (uptime) na liście węzłów — dodana ikonka odróżniająca go wizualnie od czasu ostatniego kontaktu.
+
+## Mapa desktopowa
+
+Wersja desktopowa appki wcześniej w ogóle nie miała mapy — zakładka "Mapa" pokazywała pusty placeholder, bo desktop nie miał żadnej biblioteki mapowej. Zbudowana od podstaw, jako własny renderer kafelków OSM na Compose Canvas:
+
+- Przesuwanie, zoom scrollem (w kierunku kursora), klikalne markery węzłów (ikony pinezek z krótką nazwą, nie kropki)
+- Automatyczne dopasowanie widoku do wszystkich węzłów przy starcie
+- Markery waypointów z podglądem/usuwaniem po kliknięciu, oznaczenie zablokowanych waypointów
+- Nakładki geofence dla stref waypointów
+- Filtry: tylko ulubione, pokaż waypointy, okrąg niepewności GPS, filtr czasu ostatniego kontaktu
+- Import warstw GeoJSON i KML (własne parsery napisane od zera pod desktop)
+- Pobieranie kafelków offline dla wybranego regionu i zoomu, z zarządzaniem rozmiarem pamięci podręcznej
+- **Site Planner** (symulacja zasięgu) zintegrowany przez wbudowaną przeglądarkę Chromium (JCEF)
+- Naprawiona mini-mapa w szczegółach węzła, mapa trasy pozycji i pełnoekranowa mapa pojedynczego węzła — wcześniej wszystkie trzy pokazywały czarne pole
+- Kliknięcie węzła na mapie desktopowej otwiera teraz najpierw listę węzłów, potem szczegóły — zgodnie z resztą appki desktopowej
+
+## Ustawienia desktopowe
+
+- **Naprawiony import/eksport konfiguracji urządzenia** — wcześniej przycisk działał, ale nie tworzył żadnego pliku (błąd w parsowaniu ścieżki na Windowsie, cichy błąd bez informacji dla użytkownika).
+- Przywrócony brakujący przełącznik **automatyczne ładowanie obrazków w czacie** (zgubiony przy jednym z merge'y z upstreamem).
 
 ## Ekran "Zdrowie sieci"
 
@@ -74,9 +96,31 @@ Work in progress — this repo is mainly for personal use and testing with a sma
 - **Passive NeighborInfo collection** — the neighbor log now also shows overheard broadcasts from other nodes, not just responses to your own requests; also fixes requesting Neighbor Info for your own, locally connected device (previously returned nothing).
 - **Quick command buttons** (`/ping`, `/hello`, `/test`) on the node screen — send a private message even to nodes whose role normally hides the manual message option; useful for quickly testing new firmware builds on devices in the field.
 - **Full list of relay nodes for message delivery** — the "Delivery status" dialog shows the full list of node names involved in relaying a message (not just a count or a single name like upstream), including firmware-side fixes so that data actually reaches the app.
-- Restored the **Traffic Management** configuration screen (removed from upstream at one point).
 - **Relay node name shown directly in the node list and node detail** — no need to open the "Delivery status" dialog anymore to see which node a given node relays through.
+- Restored the **Traffic Management** configuration screen (removed from upstream at one point).
+- **Fixed a stale last-position timestamp for nodes with a manually configured fixed position** — firmware doesn't refresh the timestamp when retransmitting the same position, so the app now shows the node's actual last-heard time instead of a frozen date from days ago.
 - **Hid outdated device roles** (REPEATER, ROUTER_CLIENT) from the role picker in device configuration — firmware no longer supports them, so they can't be selected by mistake anymore.
+- Cleaned up the uptime display in the node list — added an icon to visually separate it from the last-heard time.
+
+## Desktop map
+
+The desktop build previously had no map at all — the "Map" tab showed an empty placeholder, since desktop had zero map library dependencies. Built from scratch as a custom OSM tile renderer on Compose Canvas:
+
+- Pan, scroll-to-zoom toward cursor, clickable node markers (pin-style icons with short names, not plain dots)
+- Auto-fit view to all known nodes on launch
+- Waypoint markers with tap-to-view/delete, locked-waypoint badge
+- Geofence overlays for waypoint zones
+- Filters: favorites-only, show waypoints, GPS precision-uncertainty circle, last-heard filter
+- GeoJSON and KML layer import (custom parsers written from scratch for desktop)
+- Offline tile download for a chosen region/zoom range, with cache size management
+- **Site Planner** (coverage simulation) integrated via an embedded Chromium browser (JCEF)
+- Fixed the node-detail mini-map, position-track map, and full-screen single-node map — all three previously showed a black box
+- Clicking a node on the desktop map now opens the node list first, then details — matching the rest of the desktop app's navigation
+
+## Desktop settings
+
+- **Fixed device configuration import/export** — the button worked but silently failed to create any file (a URI-parsing bug on Windows, with no error shown to the user).
+- Restored the missing **auto-load chat images** toggle (lost during an upstream merge).
 
 ## "Network Health" screen
 
