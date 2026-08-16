@@ -448,9 +448,7 @@ private fun CompactFooterRow(
                     )
                 }
                 relayNodeName?.let { name ->
-                    add {
-                        Text(text = "via $name", style = MaterialTheme.typography.labelSmall, color = tertiaryColor)
-                    }
+                    add { Text(text = "via $name", style = MaterialTheme.typography.labelSmall, color = tertiaryColor) }
                 }
             }
             if (showChannel && thatNode.channel > 0) {

@@ -31,11 +31,12 @@ private const val TAG = "SitePlannerCoverageRunner"
 
 /**
  * Shims `window.__meshtasticNative.onCoverage(geoJson)` — the bridge API the hosted Site Planner calls once its
- * `run=1&bridge=1` estimate completes — onto JCEF's built-in `window.cefQuery` mechanism. Injected via [onLoadStart]
- * so it exists before the planner's own scripts run (same ordering guarantee Android's transparent-attached-WebView
- * trick relies on, just via a different mechanism).
+ * `run=1&bridge=1` estimate completes — onto JCEF's built-in `window.cefQuery` mechanism. Injected via [onLoadStart] so
+ * it exists before the planner's own scripts run (same ordering guarantee Android's transparent-attached-WebView trick
+ * relies on, just via a different mechanism).
  */
-private const val BRIDGE_SHIM_JS = """
+private const val BRIDGE_SHIM_JS =
+    """
     window.__meshtasticNative = {
         onCoverage: function(geoJson) {
             window.cefQuery({
@@ -48,8 +49,8 @@ private const val BRIDGE_SHIM_JS = """
 """
 
 /**
- * Runs one Site Planner coverage estimate headlessly: creates an off-screen-rendered (OSR — JCEF's default) browser
- * for [url], never attaches it to any visible UI component (so [BRIDGE_SHIM_JS]'s result is the only thing this class
+ * Runs one Site Planner coverage estimate headlessly: creates an off-screen-rendered (OSR — JCEF's default) browser for
+ * [url], never attaches it to any visible UI component (so [BRIDGE_SHIM_JS]'s result is the only thing this class
  * produces — no Compose overlay-hiding tricks needed, unlike Android's WebView), and reports the coverage GeoJSON via
  * [onResult] once the planner's bridge call arrives. A fresh [CefClient] is created per run and disposed after, so
  * router/handler state never accumulates across estimates.
@@ -58,8 +59,10 @@ class SitePlannerCoverageRunner {
     private var client: CefClient? = null
     private var browser: CefBrowser? = null
 
-    /** Starts loading [url] and estimating. [onResult]/[onError] fire at most once each; call [dispose] afterward
-     * (or on user cancellation) to release the browser and client. */
+    /**
+     * Starts loading [url] and estimating. [onResult]/[onError] fire at most once each; call [dispose] afterward (or on
+     * user cancellation) to release the browser and client.
+     */
     fun start(url: String, onResult: (String) -> Unit, onError: (String) -> Unit) {
         val cefApp = JcefRuntime.get()
         val newClient = cefApp.createClient()
@@ -91,7 +94,11 @@ class SitePlannerCoverageRunner {
 
         newClient.addLoadHandler(
             object : CefLoadHandlerAdapter() {
-                override fun onLoadStart(browser: CefBrowser?, frame: CefFrame?, transitionType: CefRequest.TransitionType?) {
+                override fun onLoadStart(
+                    browser: CefBrowser?,
+                    frame: CefFrame?,
+                    transitionType: CefRequest.TransitionType?,
+                ) {
                     if (frame?.isMain == true) {
                         frame.executeJavaScript(BRIDGE_SHIM_JS, frame.url, 0)
                     }

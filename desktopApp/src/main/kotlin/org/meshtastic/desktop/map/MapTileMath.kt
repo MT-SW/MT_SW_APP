@@ -32,9 +32,8 @@ private const val DEGREES_IN_FULL_TURN = 360.0
 
 /**
  * Fractional world-pixel coordinate at [zoom] for a given lat/lon, using the standard Web Mercator (EPSG:3857)
- * projection that OSM/most tile servers use. "World pixels" means the whole map at this zoom is
- * `TILE_SIZE_PX * 2^zoom` pixels wide/tall — tile (x, y) covers world-pixel range
- * `[x*TILE_SIZE_PX, (x+1)*TILE_SIZE_PX)`.
+ * projection that OSM/most tile servers use. "World pixels" means the whole map at this zoom is `TILE_SIZE_PX * 2^zoom`
+ * pixels wide/tall — tile (x, y) covers world-pixel range `[x*TILE_SIZE_PX, (x+1)*TILE_SIZE_PX)`.
  */
 fun lonLatToWorldPixel(lon: Double, lat: Double, zoom: Double): WorldPixel {
     val scale = TILE_SIZE_PX * 2.0.pow(zoom)

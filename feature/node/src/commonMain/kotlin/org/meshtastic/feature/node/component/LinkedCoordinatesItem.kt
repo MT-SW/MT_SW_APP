@@ -33,7 +33,6 @@ import org.meshtastic.core.common.util.GPSFormat
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.util.metersIn
 import org.meshtastic.core.model.util.toString
-import org.meshtastic.proto.Position as WirePosition
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.copy
 import org.meshtastic.core.resources.elevation_suffix
@@ -47,6 +46,7 @@ import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.core.ui.util.formatAgo
 import org.meshtastic.core.ui.util.rememberOpenMap
 import org.meshtastic.proto.Config
+import org.meshtastic.proto.Position as WirePosition
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

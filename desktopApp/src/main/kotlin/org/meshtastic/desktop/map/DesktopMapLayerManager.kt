@@ -36,8 +36,8 @@ private const val LAYERS_DIR = "map_layers"
 
 /**
  * Owner of the imported map-layer list for desktop: persistence (files under [desktopDataDir]/map_layers) and the
- * in-memory layer list. Visibility toggles are in-memory only for now (not persisted across restart) — the Android
- * fork persists this via `MapPrefs`, which has no desktop equivalent yet.
+ * in-memory layer list. Visibility toggles are in-memory only for now (not persisted across restart) — the Android fork
+ * persists this via `MapPrefs`, which has no desktop equivalent yet.
  */
 @Single
 class DesktopMapLayerManager(private val dispatchers: CoroutineDispatchers) {
@@ -86,7 +86,7 @@ class DesktopMapLayerManager(private val dispatchers: CoroutineDispatchers) {
             }
             try {
                 if (!layersDir.exists()) layersDir.mkdirs()
-                val destFile = File(layersDir, "${sourceFile.nameWithoutExtension}_${nowMillis}.${sourceFile.extension}")
+                val destFile = File(layersDir, "${sourceFile.nameWithoutExtension}_$nowMillis.${sourceFile.extension}")
                 sourceFile.copyTo(destFile, overwrite = false)
                 _layers.update {
                     it +
@@ -103,8 +103,10 @@ class DesktopMapLayerManager(private val dispatchers: CoroutineDispatchers) {
         }
     }
 
-    /** Writes a GeoJSON coverage estimate string directly to the layers directory and adds it, visible by default —
-     * the Site Planner import path (no source file to copy, unlike [addLayer]). */
+    /**
+     * Writes a GeoJSON coverage estimate string directly to the layers directory and adds it, visible by default — the
+     * Site Planner import path (no source file to copy, unlike [addLayer]).
+     */
     fun addGeoJsonLayer(name: String, geoJson: String) {
         scope.launch(dispatchers.io) {
             try {

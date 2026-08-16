@@ -419,7 +419,7 @@ class MeshDataHandlerImpl(
             Logger.d {
                 val statusInfo = "status=${p?.status ?: reaction?.status}"
                 "[ackNak] req=$requestId routeErr=$routingError isAck=$isAck " +
-                        "packetId=${p?.id ?: reaction?.packetId} dataId=${p?.id} $statusInfo"
+                    "packetId=${p?.id ?: reaction?.packetId} dataId=${p?.id} $statusInfo"
             }
 
             val m =

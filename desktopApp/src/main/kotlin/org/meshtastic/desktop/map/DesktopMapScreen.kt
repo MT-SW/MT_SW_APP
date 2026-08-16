@@ -42,9 +42,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import java.awt.FileDialog
-import java.io.File
-import kotlin.math.roundToInt
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -65,6 +62,9 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PinDrop
 import org.meshtastic.feature.map.BaseMapViewModel.MapFilterState
 import org.meshtastic.feature.map.LastHeardFilter
+import java.awt.FileDialog
+import java.io.File
+import kotlin.math.roundToInt
 
 private val LAYER_FILE_EXTENSIONS = setOf("geojson", "json", "kml")
 
@@ -105,10 +105,16 @@ fun DesktopMapScreen(
                 onNavigateUp = {},
                 actions = {
                     IconButton(onClick = { showLayersDialog = true }) {
-                        Icon(imageVector = MeshtasticIcons.Layers, contentDescription = stringResource(Res.string.manage_map_layers))
+                        Icon(
+                            imageVector = MeshtasticIcons.Layers,
+                            contentDescription = stringResource(Res.string.manage_map_layers),
+                        )
                     }
                     IconButton(onClick = { filterExpanded = true }) {
-                        Icon(imageVector = MeshtasticIcons.Favorite, contentDescription = stringResource(Res.string.map))
+                        Icon(
+                            imageVector = MeshtasticIcons.Favorite,
+                            contentDescription = stringResource(Res.string.map),
+                        )
                     }
                     DesktopMapFilterDropdown(
                         expanded = filterExpanded,
@@ -175,10 +181,7 @@ private fun MapLayersDialog(
                     Text("No layers imported yet.")
                 } else {
                     layers.forEach { layer ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
+                        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                             Checkbox(checked = layer.isVisible, onCheckedChange = { onToggleVisibility(layer.id) })
                             Text(layer.name, modifier = Modifier.weight(1f))
                             IconButton(onClick = { onRemoveLayer(layer.id) }) {
@@ -191,7 +194,11 @@ private fun MapLayersDialog(
         },
         confirmButton = {
             TextButton(onClick = onAddLayer) {
-                Icon(imageVector = MeshtasticIcons.Add, contentDescription = null, modifier = Modifier.padding(end = 4.dp))
+                Icon(
+                    imageVector = MeshtasticIcons.Add,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 4.dp),
+                )
                 Text("Add Layer")
             }
         },

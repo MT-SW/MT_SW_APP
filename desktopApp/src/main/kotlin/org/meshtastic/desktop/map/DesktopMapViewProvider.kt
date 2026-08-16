@@ -104,10 +104,10 @@ private const val BYTES_PER_MB = 1024 * 1024
 
 /**
  * Desktop implementation of [MapViewProvider] backed by [OsmCanvasMap]. Renders node markers (with optional precision
- * circles), waypoint markers with geofence overlays, imported GeoJSON/KML layers, offline tile-region downloads, and
- * a Site Planner coverage-estimate trigger (via JCEF, see the `siteplanner` package). Node markers use pin-shaped
- * `MeshtasticIcons.LocationOn` icons with a short-name label; clicking one navigates via [navigateToNodeDetails] —
- * on desktop this is wired (in DesktopNavigation.kt) to open the Nodes tab and push detail there, not jump directly.
+ * circles), waypoint markers with geofence overlays, imported GeoJSON/KML layers, offline tile-region downloads, and a
+ * Site Planner coverage-estimate trigger (via JCEF, see the `siteplanner` package). Node markers use pin-shaped
+ * `MeshtasticIcons.LocationOn` icons with a short-name label; clicking one navigates via [navigateToNodeDetails] — on
+ * desktop this is wired (in DesktopNavigation.kt) to open the Nodes tab and push detail there, not jump directly.
  */
 class DesktopMapViewProvider : MapViewProvider {
     @Composable
@@ -145,9 +145,10 @@ class DesktopMapViewProvider : MapViewProvider {
         // interpretation: auto-open the Site Planner dialog, pre-seeded from that node's params if known
         // (falling back to the connected radio's own node otherwise). Verify this matches what Android's own
         // MapViewProvider implementation actually does with this parameter, and adjust if not.
-        val sitePlannerTargetNode = remember(sitePlannerNodeNum, nodesWithPosition, ourNode) {
-            sitePlannerNodeNum?.let { num -> nodesWithPosition.find { it.num == num } ?: ourNode }
-        }
+        val sitePlannerTargetNode =
+            remember(sitePlannerNodeNum, nodesWithPosition, ourNode) {
+                sitePlannerNodeNum?.let { num -> nodesWithPosition.find { it.num == num } ?: ourNode }
+            }
         LaunchedEffect(sitePlannerNodeNum) { if (sitePlannerNodeNum != null) showSitePlanner = true }
 
         // Parses newly-added layer files off the main thread and caches results by layer id (not content), so
@@ -187,9 +188,11 @@ class DesktopMapViewProvider : MapViewProvider {
                     val isOurNode = node.num == ourNode?.num
                     when {
                         mapFilterState.onlyFavorites && !node.isFavorite && !isOurNode -> false
+
                         mapFilterState.lastHeardFilter.seconds != 0L &&
                             (nowSeconds - node.lastHeard) > mapFilterState.lastHeardFilter.seconds &&
                             !isOurNode -> false
+
                         else -> true
                     }
                 }
@@ -256,8 +259,9 @@ class DesktopMapViewProvider : MapViewProvider {
                                 (circle.radiusMeters / metersPerScreenUnit(circle.centerLat, viewport.zoom)).toFloat()
                             GeofenceCircleOverlay(
                                 radius = radiusScreenUnits,
-                                modifier =
-                                Modifier.offset { IntOffset(screenOffset.x.toInt(), screenOffset.y.toInt()) },
+                                modifier = Modifier.offset {
+                                    IntOffset(screenOffset.x.toInt(), screenOffset.y.toInt())
+                                },
                             )
                         }
                         geofence.box?.let { box ->
@@ -333,7 +337,9 @@ class DesktopMapViewProvider : MapViewProvider {
                     onDismiss = { showSitePlanner = false },
                     onImport = { name, geoJson, _, _ -> layerManager.addGeoJsonLayer(name, geoJson) },
                     onUseNodeLocation =
-                    ourNode?.takeIf { it.validPosition != null }?.let { node -> { node.latitude to node.longitude } },
+                    ourNode
+                        ?.takeIf { it.validPosition != null }
+                        ?.let { node -> { node.latitude to node.longitude } },
                 )
             }
         }
@@ -347,8 +353,8 @@ class DesktopMapViewProvider : MapViewProvider {
  * drag-a-rectangle tool. [onStartDownload] downloads sequentially and reports (completed, total) progress; a failed
  * tile is skipped rather than aborting the batch, so a partial download still leaves a usable region.
  *
- * NOTE (recovery script): includes the "Manage Cache" button and nested CacheManagementDialog (tile count + size in
- * MB, "Clear Cache" calling TileCache.clear()) — fully recovered verbatim below, not a gap.
+ * NOTE (recovery script): includes the "Manage Cache" button and nested CacheManagementDialog (tile count + size in MB,
+ * "Clear Cache" calling TileCache.clear()) — fully recovered verbatim below, not a gap.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -476,8 +482,10 @@ private fun NodeMarker(node: Node, modifier: Modifier = Modifier, onClick: () ->
             style = MaterialTheme.typography.labelSmall,
             color = Color.Black,
             modifier =
-            Modifier.background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(2.dp))
-                .padding(horizontal = 2.dp),
+            Modifier.background(
+                Color.White.copy(alpha = 0.8f),
+                RoundedCornerShape(2.dp),
+            ).padding(horizontal = 2.dp),
         )
     }
 }
@@ -573,9 +581,7 @@ private fun WaypointDetailsDialog(
         dismissButton = {
             Row {
                 if (canDeleteForEveryone) {
-                    TextButton(onClick = onDeleteForEveryone) {
-                        Text(stringResource(Res.string.delete_for_everyone))
-                    }
+                    TextButton(onClick = onDeleteForEveryone) { Text(stringResource(Res.string.delete_for_everyone)) }
                 }
                 TextButton(onClick = onDismiss) { Text(stringResource(Res.string.close)) }
             }

@@ -84,8 +84,8 @@ import org.meshtastic.proto.Config
 private const val GRID_COLUMNS = 3
 
 /**
- * Hand-built "refresh" (circular-arrow) icon — this module has no Material Icons Extended dependency, same situation
- * as [rememberAddIcon] in MessageScreen.kt, so the vector is built directly instead of pulling in the library.
+ * Hand-built "refresh" (circular-arrow) icon — this module has no Material Icons Extended dependency, same situation as
+ * [rememberAddIcon] in MessageScreen.kt, so the vector is built directly instead of pulling in the library.
  */
 @Composable
 internal fun rememberRefreshIcon(): ImageVector = remember {
@@ -358,11 +358,7 @@ private fun NodeSignalRow(thatNode: Node, isThisNode: Boolean, contentColor: Col
                     add { HopsInfo(hops = thatNode.hopsAway, contentColor = contentColor) }
                     relayNodeName?.let { name ->
                         add {
-                            Text(
-                                text = "via $name",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = contentColor,
-                            )
+                            Text(text = "via $name", style = MaterialTheme.typography.labelSmall, color = contentColor)
                         }
                     }
                 } else if (thatNode.hopsAway == 0 && !thatNode.viaMqtt) {

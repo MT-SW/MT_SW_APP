@@ -38,9 +38,15 @@ sealed interface ParsedGeometry {
     data class MultiPolygon(val polygons: List<Polygon>) : ParsedGeometry
 }
 
-/** Resolved mapbox-simplestyle properties. ARGB colors packed as [Long] (0xAARRGGBB) so callers can build Compose
- * `Color` directly via `Color(argb.toInt())`. Null fields mean "renderer picks its own default". */
-data class FeatureStyle(val strokeColorArgb: Long? = null, val fillColorArgb: Long? = null, val strokeWidth: Float? = null)
+/**
+ * Resolved mapbox-simplestyle properties. ARGB colors packed as [Long] (0xAARRGGBB) so callers can build Compose
+ * `Color` directly via `Color(argb.toInt())`. Null fields mean "renderer picks its own default".
+ */
+data class FeatureStyle(
+    val strokeColorArgb: Long? = null,
+    val fillColorArgb: Long? = null,
+    val strokeWidth: Float? = null,
+)
 
 data class ParsedFeature(val geometry: ParsedGeometry, val style: FeatureStyle)
 
@@ -48,7 +54,9 @@ private val geoJsonParser = Json { ignoreUnknownKeys = true }
 
 private const val MIN_POINT_COORDS = 2
 
-/** Parses a GeoJSON document — a bare geometry, a single `Feature`, or a `FeatureCollection` — into [ParsedFeature]s. */
+/**
+ * Parses a GeoJSON document — a bare geometry, a single `Feature`, or a `FeatureCollection` — into [ParsedFeature]s.
+ */
 fun parseGeoJson(text: String): List<ParsedFeature> {
     val root = geoJsonParser.parseToJsonElement(text).jsonObject
     return when (root["type"]?.jsonPrimitive?.contentOrNull) {
@@ -67,9 +75,13 @@ private fun parseGeometry(obj: JsonObject): ParsedGeometry? {
     val coords = obj["coordinates"]?.jsonArray ?: return null
     return when (obj["type"]?.jsonPrimitive?.contentOrNull) {
         "Point" -> coords.toLonLat()?.let { ParsedGeometry.Point(it.first, it.second) }
+
         "LineString" -> ParsedGeometry.LineString(coords.toLonLatList())
+
         "Polygon" -> ParsedGeometry.Polygon(coords.toRings())
+
         "MultiPolygon" -> ParsedGeometry.MultiPolygon(coords.map { ParsedGeometry.Polygon(it.jsonArray.toRings()) })
+
         // MultiPoint, MultiLineString, GeometryCollection: not supported in v1.
         else -> null
     }
@@ -88,12 +100,14 @@ private fun JsonArray.toRings(): List<List<Pair<Double, Double>>> = map { it.jso
 
 private fun parseStyle(properties: JsonObject?): FeatureStyle {
     properties ?: return FeatureStyle()
-    val strokeRaw = properties["stroke"]?.jsonPrimitive?.contentOrNull ?: properties["color"]?.jsonPrimitive?.contentOrNull
+    val strokeRaw =
+        properties["stroke"]?.jsonPrimitive?.contentOrNull ?: properties["color"]?.jsonPrimitive?.contentOrNull
     val fillRaw = properties["fill"]?.jsonPrimitive?.contentOrNull ?: properties["color"]?.jsonPrimitive?.contentOrNull
     val fillOpacity = properties["fill-opacity"]?.jsonPrimitive?.floatOrNull
     val strokeWidth = properties["stroke-width"]?.jsonPrimitive?.floatOrNull
     val strokeColor = strokeRaw?.let(::parseCssColorArgb)
-    val fillColor = fillRaw?.let(::parseCssColorArgb)?.let { color -> fillOpacity?.let { color.withAlpha(it) } ?: color }
+    val fillColor =
+        fillRaw?.let(::parseCssColorArgb)?.let { color -> fillOpacity?.let { color.withAlpha(it) } ?: color }
     return FeatureStyle(strokeColorArgb = strokeColor, fillColorArgb = fillColor, strokeWidth = strokeWidth)
 }
 
@@ -114,8 +128,10 @@ private fun Long.withAlpha(opacity: Float): Long {
     return alpha or (this and RGB_MASK)
 }
 
-/** Parses a hex (`#RRGGBB`/`#AARRGGBB`) or `rgb()`/`rgba()` CSS color into a packed 0xAARRGGBB [Long]; null if
- * unparseable or an unsupported form (named colors like `"red"` aren't handled in v1). */
+/**
+ * Parses a hex (`#RRGGBB`/`#AARRGGBB`) or `rgb()`/`rgba()` CSS color into a packed 0xAARRGGBB [Long]; null if
+ * unparseable or an unsupported form (named colors like `"red"` aren't handled in v1).
+ */
 private fun parseCssColorArgb(raw: String): Long? {
     val value = raw.trim()
     return try {
@@ -135,7 +151,12 @@ private fun parseCssColorArgb(raw: String): Long? {
                 val r = parts[0].toLong()
                 val g = parts[1].toLong()
                 val b = parts[2].toLong()
-                val a = if (parts.size >= RGBA_COMPONENT_COUNT) (parts[3].toFloat() * OPAQUE_ALPHA).toLong() else OPAQUE_ALPHA
+                val a =
+                    if (parts.size >= RGBA_COMPONENT_COUNT) {
+                        (parts[3].toFloat() * OPAQUE_ALPHA).toLong()
+                    } else {
+                        OPAQUE_ALPHA
+                    }
                 (a shl ALPHA_SHIFT) or (r shl RED_SHIFT) or (g shl GREEN_SHIFT) or b
             }
 

@@ -34,8 +34,8 @@ private const val POINT_RADIUS_DP = 5f
 /**
  * Draws parsed GeoJSON/KML [features] (polygons, lines, points) as a single [Canvas] overlay, using each feature's
  * resolved [FeatureStyle] where present and sensible defaults otherwise. Mirrors the Android fork's
- * `DEFAULT_GEOJSON_FILL_OPACITY`/`DEFAULT_GEOJSON_STROKE_WIDTH` fallback approach. Polygon holes are not rendered in
- * v1 — only each polygon's outer boundary (first ring).
+ * `DEFAULT_GEOJSON_FILL_OPACITY`/`DEFAULT_GEOJSON_STROKE_WIDTH` fallback approach. Polygon holes are not rendered in v1
+ * — only each polygon's outer boundary (first ring).
  */
 @Composable
 fun MapLayersOverlay(
@@ -60,7 +60,8 @@ fun MapLayersOverlay(
                     drawPath(path, color = strokeColor, style = Stroke(width = strokeWidthPx))
                 }
 
-                is ParsedGeometry.Polygon -> drawPolygonOuterRing(geometry, toScreenOffset, fillColor, strokeColor, strokeWidthPx)
+                is ParsedGeometry.Polygon ->
+                    drawPolygonOuterRing(geometry, toScreenOffset, fillColor, strokeColor, strokeWidthPx)
 
                 is ParsedGeometry.MultiPolygon ->
                     geometry.polygons.forEach { polygon ->

@@ -28,8 +28,8 @@ private const val TAG = "JcefRuntime"
 /**
  * Lazily-initialized singleton owner of the app's one [CefApp] instance — CEF (Chromium Embedded Framework) only
  * supports a single instance per process. Used exclusively by the Site Planner coverage-estimate bridge, so init is
- * deferred to first use rather than paid at app startup; the native Chromium bundle (~100+MB) downloads and extracts
- * on first run if not already present under [installDir].
+ * deferred to first use rather than paid at app startup; the native Chromium bundle (~100+MB) downloads and extracts on
+ * first run if not already present under [installDir].
  *
  * OSR (off-screen rendering) mode is [CefAppBuilder]'s default — we rely on that rather than setting it explicitly,
  * since the Site Planner bridge never displays the browser (see [SitePlannerCoverageRunner]).
@@ -46,7 +46,9 @@ object JcefRuntime {
         builder.build()
     }
 
-    /** Returns the shared [CefApp], initializing it on first call. May block for seconds (or minutes on first-ever
-     * run, while the native bundle downloads) — call from a background dispatcher, never the UI thread. */
+    /**
+     * Returns the shared [CefApp], initializing it on first call. May block for seconds (or minutes on first-ever run,
+     * while the native bundle downloads) — call from a background dispatcher, never the UI thread.
+     */
     fun get(): CefApp = cefApp
 }

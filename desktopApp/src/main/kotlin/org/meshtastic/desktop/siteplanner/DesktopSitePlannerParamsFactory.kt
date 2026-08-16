@@ -25,8 +25,8 @@ import kotlin.math.pow
 
 /**
  * Desktop's copy of Android's `SitePlannerParamsFactory.kt` — a verbatim port, not a reuse, because the original file
- * lives under `androidApp/src/main` (an Android-flavor-only source set) despite having zero actual Android
- * dependencies itself; desktop can't depend on that source set, so this file is a byte-for-byte duplicate under
+ * lives under `androidApp/src/main` (an Android-flavor-only source set) despite having zero actual Android dependencies
+ * itself; desktop can't depend on that source set, so this file is a byte-for-byte duplicate under
  * `org.meshtastic.desktop.siteplanner` instead. If the Android original changes, mirror the change here too.
  *
  * Seed Site Planner params from a node (name + position) and, when a radio is connected, from its actual config:

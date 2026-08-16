@@ -58,8 +58,8 @@ import org.meshtastic.core.resources.device_db_cache_limit_summary
 import org.meshtastic.core.resources.device_links
 import org.meshtastic.core.resources.discovery_local_mesh
 import org.meshtastic.core.resources.export_configuration
-import org.meshtastic.core.resources.import_configuration
 import org.meshtastic.core.resources.help_and_documentation
+import org.meshtastic.core.resources.import_configuration
 import org.meshtastic.core.resources.info
 import org.meshtastic.core.resources.modules_already_unlocked
 import org.meshtastic.core.resources.modules_unlocked
@@ -158,11 +158,11 @@ fun DesktopSettingsScreen(
     if (showEditDeviceProfileDialog) {
         EditDeviceProfileDialog(
             title =
-                if (deviceProfile != null) {
-                    stringResource(Res.string.import_configuration)
-                } else {
-                    stringResource(Res.string.export_configuration)
-                },
+            if (deviceProfile != null) {
+                stringResource(Res.string.import_configuration)
+            } else {
+                stringResource(Res.string.export_configuration)
+            },
             deviceProfile = deviceProfile ?: radioConfigViewModel.currentDeviceProfile,
             onConfirm = {
                 showEditDeviceProfileDialog = false

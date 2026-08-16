@@ -48,9 +48,9 @@ private const val TAG = "DesktopSitePlannerHost"
 /**
  * Desktop equivalent of the Android fork's `SitePlannerHost`: [SitePlannerSheet] (reused verbatim from commonMain)
  * pre-filled with [initialParams], then a JCEF-backed [SitePlannerCoverageRunner] running fully off-screen — no
- * "transparent WebView" trick needed, since OSR mode is never attached to any visible component in the first place.
- * No GPS-based current-location shortcut on desktop (no `onRequestCurrentLocation` equivalent); map-center shortcut
- * also deferred — only [onUseNodeLocation] is wired.
+ * "transparent WebView" trick needed, since OSR mode is never attached to any visible component in the first place. No
+ * GPS-based current-location shortcut on desktop (no `onRequestCurrentLocation` equivalent); map-center shortcut also
+ * deferred — only [onUseNodeLocation] is wired.
  *
  * NOTE (recovery script): this file's `toQueryUrl(SITE_PLANNER_BASE_URL)` call assumes `SitePlannerParams` (in
  * commonMain, feature/map) has a `toQueryUrl(baseUrl: String): String` extension/method already — that's existing

@@ -37,8 +37,13 @@ fun tilesInBounds(minLon: Double, minLat: Double, maxLon: Double, maxLat: Double
 }
 
 /** Tile coordinates covering the lon/lat box across every zoom level in [zoomRange] (inclusive). */
-fun tilesInBounds(minLon: Double, minLat: Double, maxLon: Double, maxLat: Double, zoomRange: IntRange): List<TileCoord> =
-    zoomRange.flatMap { tilesInBounds(minLon, minLat, maxLon, maxLat, it) }
+fun tilesInBounds(
+    minLon: Double,
+    minLat: Double,
+    maxLon: Double,
+    maxLat: Double,
+    zoomRange: IntRange,
+): List<TileCoord> = zoomRange.flatMap { tilesInBounds(minLon, minLat, maxLon, maxLat, it) }
 
 private const val OSM_TILE_URL_TEMPLATE = "https://tile.openstreetmap.org/%d/%d/%d.png"
 
@@ -47,7 +52,11 @@ private const val OSM_TILE_URL_TEMPLATE = "https://tile.openstreetmap.org/%d/%d/
  * (success or failure) with (completed, total). A failed tile is logged-and-skipped rather than aborting the whole
  * batch — a partial region download is still useful, matching the Android fork's tolerant `CacheManagerCallback`.
  */
-suspend fun downloadTiles(httpClient: HttpClient, tiles: List<TileCoord>, onProgress: (completed: Int, total: Int) -> Unit) {
+suspend fun downloadTiles(
+    httpClient: HttpClient,
+    tiles: List<TileCoord>,
+    onProgress: (completed: Int, total: Int) -> Unit,
+) {
     var completed = 0
     for (tile in tiles) {
         if (!TileCache.hasTile(tile.zoom, tile.x, tile.y)) {

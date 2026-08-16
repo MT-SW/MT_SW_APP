@@ -167,7 +167,9 @@ class NodeListViewModel(
             .getLatestLogPerNode()
             .map { logs ->
                 logs
-                    .mapNotNull { log -> log.fromRadio.packet?.relay_node?.takeIf { it != 0 }?.let { log.fromNum to it } }
+                    .mapNotNull { log ->
+                        log.fromRadio.packet?.relay_node?.takeIf { it != 0 }?.let { log.fromNum to it }
+                    }
                     .toMap()
             }
             .stateInWhileSubscribed(initialValue = emptyMap())

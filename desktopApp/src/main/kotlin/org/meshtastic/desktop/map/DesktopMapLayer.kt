@@ -19,9 +19,9 @@ package org.meshtastic.desktop.map
 import kotlin.uuid.Uuid
 
 /**
- * Desktop's own map-layer model — a standalone parallel of the Android fork's `MapLayerItem`/`MapLayersManager`
- * (which are Android-specific: `Context`, `android.net.Uri`), not a reuse of it. `filePath` is an absolute path on the
- * local filesystem rather than a content URI, since desktop has no content-resolver concept.
+ * Desktop's own map-layer model — a standalone parallel of the Android fork's `MapLayerItem`/`MapLayersManager` (which
+ * are Android-specific: `Context`, `android.net.Uri`), not a reuse of it. `filePath` is an absolute path on the local
+ * filesystem rather than a content URI, since desktop has no content-resolver concept.
  */
 enum class DesktopLayerType {
     KML,

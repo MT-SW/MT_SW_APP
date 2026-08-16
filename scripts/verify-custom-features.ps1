@@ -44,9 +44,24 @@ $checks = @(
     @{ File = "core\resources\src\commonMain\composeResources\values\strings.xml"; Pattern = "auto_load_chat_images"; Feature = "String EN: auto_load_chat_images" }
 
     # --- Inne znane autorskie funkcje (dopisz tu kolejne w miarę rozwoju forka) ---
-    @{ File = "androidApp\build.gradle.kts"; Pattern = "pl.swietokrzyskie.meshtastic"; Feature = "applicationId side-by-side z oryginałem" }
-    @{ File = "core\ui\src\commonMain\kotlin\org\meshtastic\core\ui\component\NarrowBandWarningDialog.kt"; Pattern = "NarrowBandWarningDialog"; Feature = "Ostrzeżenie o wąskim paśmie" }
-)
+        @{ File = "androidApp\build.gradle.kts"; Pattern = "pl.swietokrzyskie.meshtastic"; Feature = "applicationId side-by-side z oryginałem" }
+        @{ File = "core\ui\src\commonMain\kotlin\org\meshtastic\core\ui\component\NarrowBandWarningDialog.kt"; Pattern = "NarrowBandWarningDialog"; Feature = "Ostrzeżenie o wąskim paśmie" }
+
+        # --- Czas "ostatnia pozycja" dla fixed position (sesja 08-15) ---
+        @{ File = "feature\node\src\commonMain\kotlin\org\meshtastic\feature\node\component\LinkedCoordinatesItem.kt"; Pattern = "LOC_MANUAL"; Feature = "Poprawka czasu pozycji: szczegóły node'a (LinkedCoordinatesItem)" }
+        @{ File = "androidApp\src\fdroid\kotlin\org\meshtastic\app\map\traceroute\TracerouteOsmMap.kt"; Pattern = "LOC_MANUAL"; Feature = "Poprawka czasu pozycji: mapa Traceroute (fdroid)" }
+        @{ File = "androidApp\src\google\kotlin\org\meshtastic\app\map\MapView.kt"; Pattern = "LOC_MANUAL"; Feature = "Poprawka czasu pozycji: mapa Google" }
+
+        # --- Desktop: import/eksport configu + auto-load obrazków (sesja 08-15) ---
+        @{ File = "feature\settings\src\jvmMain\kotlin\org\meshtastic\feature\settings\DesktopSettingsScreen.kt"; Pattern = "EditDeviceProfileDialog"; Feature = "Desktop: import/eksport configu urządzenia" }
+        @{ File = "feature\settings\src\jvmMain\kotlin\org\meshtastic\feature\settings\DesktopSettingsScreen.kt"; Pattern = "auto_load_chat_images"; Feature = "Desktop: przełącznik auto-load obrazków (UI, nie tylko string)" }
+
+        # --- Desktop: cała mapa, odzyskana po utracie 08-15 (sesje 08-10 do 08-15) ---
+        @{ File = "desktopApp\src\main\kotlin\org\meshtastic\desktop\map\DesktopMapViewProvider.kt"; Pattern = "OsmCanvasMap"; Feature = "Desktop: renderer mapy (DesktopMapViewProvider)" }
+        @{ File = "desktopApp\src\main\kotlin\org\meshtastic\desktop\map\DesktopMapScreen.kt"; Pattern = "DesktopMapFilterDropdown"; Feature = "Desktop: filtr mapy + dialog warstw" }
+        @{ File = "desktopApp\src\main\kotlin\org\meshtastic\desktop\map\DesktopMapLayerManager.kt"; Pattern = "addGeoJsonLayer"; Feature = "Desktop: import warstw GeoJSON/KML" }
+        @{ File = "desktopApp\src\main\kotlin\org\meshtastic\desktop\map\TileCache.kt"; Pattern = "TileCache"; Feature = "Desktop: cache kafelków offline" }
+        @{ File = "desktopApp\src\main\kotlin\org\meshtastic\desktop\siteplanner\JcefRuntime.kt"; Pattern = "CefAppBuilder"; Feature = "Desktop:
 
 Write-Host ""
 Write-Host "=== Weryfikacja autorskich funkcji forka ===" -ForegroundColor Cyan

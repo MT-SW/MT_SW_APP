@@ -92,13 +92,19 @@ import org.meshtastic.core.resources.desktop_update_download
 import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.util.LocalEventBranding
+import org.meshtastic.core.ui.util.LocalInlineMapProvider
 import org.meshtastic.core.ui.util.LocalMapMainScreenProvider
+import org.meshtastic.core.ui.util.LocalNodeMapScreenProvider
+import org.meshtastic.core.ui.util.LocalNodeTrackMapProvider
 import org.meshtastic.core.ui.util.rememberOpenUrl
-import org.meshtastic.desktop.map.DesktopMapScreen
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.desktop.data.DesktopPreferencesDataSource
 import org.meshtastic.desktop.di.desktopModule
 import org.meshtastic.desktop.di.desktopPlatformModule
+import org.meshtastic.desktop.map.DesktopInlineMap
+import org.meshtastic.desktop.map.DesktopMapScreen
+import org.meshtastic.desktop.map.DesktopNodeMapScreen
+import org.meshtastic.desktop.map.DesktopNodeTrackMap
 import org.meshtastic.desktop.notification.DesktopOS
 import org.meshtastic.desktop.ui.DesktopMainScreen
 import java.awt.Desktop
@@ -398,6 +404,13 @@ private fun ApplicationScope.MeshtasticWindow(
                     { onClickNodeChip, navigateToNodeDetails, waypointId, sitePlannerNodeNum ->
                         DesktopMapScreen(onClickNodeChip, navigateToNodeDetails, waypointId, sitePlannerNodeNum)
                     },
+            LocalInlineMapProvider provides { node, inlineModifier -> DesktopInlineMap(node, inlineModifier) },
+            LocalNodeTrackMapProvider provides
+                    { destNum, positions, trackModifier, selectedPositionTime, onPositionSelected ->
+                        DesktopNodeTrackMap(destNum, positions, trackModifier, selectedPositionTime, onPositionSelected)
+                    },
+            LocalNodeMapScreenProvider provides
+                    { destNum, onNavigateUp -> DesktopNodeMapScreen(destNum, onNavigateUp) },
         ) {
             AppTheme(darkTheme = isDarkTheme) { DesktopMainScreen(uiViewModel, multiBackstack) }
         }

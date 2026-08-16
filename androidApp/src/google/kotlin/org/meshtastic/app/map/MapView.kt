@@ -1056,16 +1056,16 @@ internal fun rememberNodeClusterItems(
                 node = node,
                 nodePosition = latLng,
                 nodeTitle =
-                    "${node.user.short_name} " +
-                            formatAgo(
-                                if (node.position.location_source == org.meshtastic.proto.Position.LocSource.LOC_MANUAL) {
-                                    node.lastHeard
-                                } else {
-                                    node.position.time
-                                },
-                                unknownText,
-                                nowText,
-                            ),
+                "${node.user.short_name} " +
+                    formatAgo(
+                        if (node.position.location_source == org.meshtastic.proto.Position.LocSource.LOC_MANUAL) {
+                            node.lastHeard
+                        } else {
+                            node.position.time
+                        },
+                        unknownText,
+                        nowText,
+                    ),
                 nodeSnippet = node.user.long_name,
                 myNodeNum = myNodeNum,
             )

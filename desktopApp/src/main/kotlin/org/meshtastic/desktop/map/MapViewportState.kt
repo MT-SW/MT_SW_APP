@@ -20,8 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import kotlin.math.ln
@@ -40,8 +38,8 @@ data class GeoBounds(val minLon: Double, val minLat: Double, val maxLon: Double,
  * saving camera position, zoom-toward-cursor math).
  *
  * NOTE (recovery script): `fitToBounds()` and `visibleBounds()` below are both fully recovered verbatim from chat
- * history (offline tile-download feature — the "region" to download is just the live viewport re-read on pan/zoom,
- * not a separately drawn rectangle).
+ * history (offline tile-download feature — the "region" to download is just the live viewport re-read on pan/zoom, not
+ * a separately drawn rectangle).
  */
 class MapViewportState(initialLon: Double, initialLat: Double, initialZoom: Double) {
     var zoom by mutableStateOf(initialZoom.coerceIn(MIN_ZOOM, MAX_ZOOM))
@@ -53,7 +51,9 @@ class MapViewportState(initialLon: Double, initialLat: Double, initialZoom: Doub
     val centerLonLat: LonLat
         get() = worldPixelToLonLat(centerWorldPixel, zoom)
 
-    /** Pans the map by a screen-pixel [delta] (e.g. from a drag gesture) — dragging right moves the map's center left. */
+    /**
+     * Pans the map by a screen-pixel [delta] (e.g. from a drag gesture) — dragging right moves the map's center left.
+     */
     fun panBy(delta: Offset) {
         centerWorldPixel = WorldPixel(centerWorldPixel.x - delta.x, centerWorldPixel.y - delta.y)
     }
@@ -63,10 +63,14 @@ class MapViewportState(initialLon: Double, initialLat: Double, initialZoom: Doub
         centerWorldPixel = lonLatToWorldPixel(lon, lat, zoom)
     }
 
-    /** The lon/lat box currently visible for a viewport of [viewportSize] pixels, as (minLon, minLat, maxLon, maxLat). */
+    /**
+     * The lon/lat box currently visible for a viewport of [viewportSize] pixels, as (minLon, minLat, maxLon, maxLat).
+     */
     fun visibleBounds(viewportSize: Offset): GeoBounds {
-        val topLeftWorld = WorldPixel(centerWorldPixel.x - viewportSize.x / 2.0, centerWorldPixel.y - viewportSize.y / 2.0)
-        val bottomRightWorld = WorldPixel(centerWorldPixel.x + viewportSize.x / 2.0, centerWorldPixel.y + viewportSize.y / 2.0)
+        val topLeftWorld =
+            WorldPixel(centerWorldPixel.x - viewportSize.x / 2.0, centerWorldPixel.y - viewportSize.y / 2.0)
+        val bottomRightWorld =
+            WorldPixel(centerWorldPixel.x + viewportSize.x / 2.0, centerWorldPixel.y + viewportSize.y / 2.0)
         val topLeft = worldPixelToLonLat(topLeftWorld, zoom)
         val bottomRight = worldPixelToLonLat(bottomRightWorld, zoom)
         return GeoBounds(minLon = topLeft.lon, minLat = bottomRight.lat, maxLon = bottomRight.lon, maxLat = topLeft.lat)
@@ -113,7 +117,8 @@ class MapViewportState(initialLon: Double, initialLat: Double, initialZoom: Doub
         val newZoom = (zoom + ln(factor) / LOG_2).coerceIn(MIN_ZOOM, MAX_ZOOM)
         if (newZoom == zoom) return
 
-        val topLeftOld = WorldPixel(centerWorldPixel.x - viewportSize.x / 2.0, centerWorldPixel.y - viewportSize.y / 2.0)
+        val topLeftOld =
+            WorldPixel(centerWorldPixel.x - viewportSize.x / 2.0, centerWorldPixel.y - viewportSize.y / 2.0)
         val focalWorldOld = WorldPixel(topLeftOld.x + focalPoint.x, topLeftOld.y + focalPoint.y)
         val focalLonLat = worldPixelToLonLat(focalWorldOld, zoom)
 
@@ -125,7 +130,6 @@ class MapViewportState(initialLon: Double, initialLat: Double, initialZoom: Doub
                 focalWorldNew.y + viewportSize.y / 2.0 - focalPoint.y,
             )
     }
-
 }
 
 /** Remembers a [MapViewportState] seeded from a saved camera position, or a sensible world-view default. */

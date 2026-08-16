@@ -200,18 +200,19 @@ fun TracerouteOsmMap(
                     MarkerWithLabel(
                         mapView = map,
                         label =
-                            "${node.user.short_name} " +
-                                    formatAgo(
-                                        if (node.position.location_source ==
-                                            org.meshtastic.proto.Position.LocSource.LOC_MANUAL
-                                        ) {
-                                            node.lastHeard
-                                        } else {
-                                            node.position.time
-                                        },
-                                        unknownText,
-                                        nowText,
-                                    ),
+                        "${node.user.short_name} " +
+                            formatAgo(
+                                if (
+                                    node.position.location_source ==
+                                    org.meshtastic.proto.Position.LocSource.LOC_MANUAL
+                                ) {
+                                    node.lastHeard
+                                } else {
+                                    node.position.time
+                                },
+                                unknownText,
+                                nowText,
+                            ),
                     )
                         .apply {
                             id = node.user.id
