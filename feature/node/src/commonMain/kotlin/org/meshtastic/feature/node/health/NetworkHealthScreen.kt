@@ -227,6 +227,7 @@ private fun formatMetricValue(metric: NetworkHealthMetric, value: Float?): Strin
         NetworkHealthMetric.ENVIRONMENT -> MetricFormatter.temperature(value, isFahrenheit = false)
         NetworkHealthMetric.TRAFFIC -> "${value.toInt()}"
         NetworkHealthMetric.NEIGHBORS -> "${value.toInt()}"
+        NetworkHealthMetric.RESOURCES -> "${value.toInt()}%"
     }
 }
 

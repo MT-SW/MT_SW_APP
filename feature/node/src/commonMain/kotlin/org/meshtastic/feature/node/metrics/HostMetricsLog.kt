@@ -54,13 +54,20 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.formatString
 import org.meshtastic.core.model.TelemetryType
+import org.meshtastic.core.model.util.LocalStatsExtended
 import org.meshtastic.core.model.util.TimeConstants.MS_PER_SEC
+import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.model.util.formatUptime
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.disk_free_indexed
 import org.meshtastic.core.resources.free_memory
 import org.meshtastic.core.resources.host_metrics_log
 import org.meshtastic.core.resources.load_indexed
+import org.meshtastic.core.resources.local_stats_cpu
+import org.meshtastic.core.resources.local_stats_flash
+import org.meshtastic.core.resources.local_stats_heap
+import org.meshtastic.core.resources.local_stats_heap_value
+import org.meshtastic.core.resources.local_stats_psram
 import org.meshtastic.core.resources.uptime
 import org.meshtastic.core.resources.user_string
 import org.meshtastic.core.ui.theme.GraphColors
@@ -109,12 +116,15 @@ fun HostMetricsLogScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) 
             )
         },
         listPart = { listModifier, selectedX, lazyListState, onCardClick ->
+            // fw+ sends local_stats (heap) and local_stats_extended (CPU/flash/PSRAM) as separate packets in the
+            // same telemetry cycle, sharing the same second-resolution `time` — group them into one card.
+            val groupedData = remember(filteredData) { filteredData.groupBy { it.time }.values.toList() }
             LazyColumn(modifier = listModifier.fillMaxSize(), state = lazyListState) {
-                itemsIndexed(filteredData, key = { index, t -> "${t.time}_$index" }) { _, telemetry ->
+                itemsIndexed(groupedData, key = { index, group -> "${group.first().time}_$index" }) { _, group ->
                     HostMetricsCard(
-                        telemetry = telemetry,
-                        isSelected = telemetry.time.toDouble() == selectedX,
-                        onClick = { onCardClick(telemetry.time.toDouble()) },
+                        telemetryGroup = group,
+                        isSelected = group.first().time.toDouble() == selectedX,
+                        onClick = { onCardClick(group.first().time.toDouble()) },
                     )
                 }
             }
@@ -125,29 +135,39 @@ fun HostMetricsLogScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) 
 /** A selectable card summarising a single host metrics telemetry snapshot. */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun HostMetricsCard(telemetry: Telemetry, isSelected: Boolean, onClick: () -> Unit) {
-    val hostMetrics = telemetry.host_metrics
-    val time = DateFormatter.formatDateTime(telemetry.time.toLong() * MS_PER_SEC)
+private fun HostMetricsCard(telemetryGroup: List<Telemetry>, isSelected: Boolean, onClick: () -> Unit) {
+    val hostMetrics = telemetryGroup.firstNotNullOfOrNull { it.host_metrics }
+    val localStatsExtended = telemetryGroup.firstNotNullOfOrNull { it.unknownFields.decodeLocalStatsExtended() }
+    val localStats = telemetryGroup.firstNotNullOfOrNull { it.local_stats }
+    val heapFreeBytes = localStats?.heap_free_bytes
+    val heapTotalBytes = localStats?.heap_total_bytes
+    val time = DateFormatter.formatDateTime(telemetryGroup.first().time.toLong() * MS_PER_SEC)
     var expanded by remember { mutableStateOf(false) }
 
     Box {
         Card(
             modifier =
-            Modifier.fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 4.dp)
-                .combinedClickable(onClick = onClick, onLongClick = { expanded = true }),
+                Modifier.fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .combinedClickable(onClick = onClick, onLongClick = { expanded = true }),
             border = if (isSelected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
             colors =
-            CardDefaults.cardColors(
-                containerColor =
-                if (isSelected) {
-                    MaterialTheme.colorScheme.primaryContainer
-                } else {
-                    MaterialTheme.colorScheme.surfaceVariant
-                },
-            ),
+                CardDefaults.cardColors(
+                    containerColor =
+                        if (isSelected) {
+                            MaterialTheme.colorScheme.primaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.surfaceVariant
+                        },
+                ),
         ) {
-            HostMetricsCardContent(time = time, hostMetrics = hostMetrics)
+            HostMetricsCardContent(
+                time = time,
+                hostMetrics = hostMetrics,
+                localStatsExtended = localStatsExtended,
+                heapFreeBytes = heapFreeBytes,
+                heapTotalBytes = heapTotalBytes,
+            )
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) { DeleteItem { expanded = false } }
     }
@@ -155,7 +175,13 @@ private fun HostMetricsCard(telemetry: Telemetry, isSelected: Boolean, onClick: 
 
 /** Card body showing timestamp, load averages with progress bars, memory, disk, and uptime. */
 @Composable
-private fun HostMetricsCardContent(time: String, hostMetrics: org.meshtastic.proto.HostMetrics?) {
+private fun HostMetricsCardContent(
+    time: String,
+    hostMetrics: org.meshtastic.proto.HostMetrics?,
+    localStatsExtended: LocalStatsExtended? = null,
+    heapFreeBytes: Int? = null,
+    heapTotalBytes: Int? = null,
+) {
     Column(modifier = Modifier.padding(12.dp)) {
         Text(text = time, style = MaterialTheme.typography.titleMediumEmphasized, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(8.dp))
@@ -187,6 +213,31 @@ private fun HostMetricsCardContent(time: String, hostMetrics: org.meshtastic.pro
         }
         hostMetrics?.load15?.let {
             LoadRow(label = stringResource(Res.string.load_indexed, 15), value = it, color = GraphColors.Orange)
+        }
+
+        if (heapTotalBytes != null && heapTotalBytes > 0) {
+            Spacer(modifier = Modifier.height(4.dp))
+            LogLine(
+                label = stringResource(Res.string.local_stats_heap),
+                value = "${formatBytes((heapFreeBytes ?: 0).toLong())} / ${formatBytes(heapTotalBytes.toLong())}",
+            )
+        }
+
+        localStatsExtended?.let { ext ->
+            Spacer(modifier = Modifier.height(4.dp))
+            LogLine(label = stringResource(Res.string.local_stats_cpu), value = "${ext.cpuUsagePercent}%")
+            if (ext.flashTotalBytes > 0) {
+                LogLine(
+                    label = stringResource(Res.string.local_stats_flash),
+                    value = "${formatBytes(ext.flashUsedBytes.toLong())} / ${formatBytes(ext.flashTotalBytes.toLong())}",
+                )
+            }
+            if (ext.memoryPsramTotal > 0) {
+                LogLine(
+                    label = stringResource(Res.string.local_stats_psram),
+                    value = "${formatBytes(ext.memoryPsramFree.toLong())} / ${formatBytes(ext.memoryPsramTotal.toLong())}",
+                )
+            }
         }
 
         hostMetrics?.user_string?.let {

@@ -31,6 +31,7 @@ import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.util.LocalStatsExtended
 import org.meshtastic.core.model.util.onlineTimeThreshold
 import org.meshtastic.core.repository.ConnectionStateProvider
 import org.meshtastic.core.repository.NodeRepository
@@ -69,6 +70,14 @@ data class LocalStatsWidgetUiState(
     val heapFreeBytes: Int = 0,
     val heapTotalBytes: Int = 0,
 
+    // fw+ Extended Stats (heap/CPU/flash/PSRAM beyond stock firmware)
+    val hasStatsExtended: Boolean = false,
+    val cpuUsagePercent: Int = 0,
+    val flashUsedBytes: Int = 0,
+    val flashTotalBytes: Int = 0,
+    val memoryPsramFree: Int = 0,
+    val memoryPsramTotal: Int = 0,
+
     // Footer
     val totalNodes: Int = 0,
     val onlineNodes: Int = 0,
@@ -92,11 +101,19 @@ class LocalStatsWidgetStateProvider(nodeRepository: NodeRepository, connectionSt
                 .distinctUntilChanged(),
             nodeRepository.localStats,
             nodeRepository.ourNodeInfo,
-        ) { connectionState, (totalNodes, onlineNodes), stats, localNode ->
-            StateInput(connectionState, totalNodes, onlineNodes, stats, localNode)
+            nodeRepository.localStatsExtended,
+        ) { connectionState, (totalNodes, onlineNodes), stats, localNode, statsExtended ->
+            StateInput(connectionState, totalNodes, onlineNodes, stats, localNode, statsExtended)
         }
             .map { input ->
-                mapToUiState(input.connectionState, input.totalNodes, input.onlineNodes, input.stats, input.localNode)
+                mapToUiState(
+                    input.connectionState,
+                    input.totalNodes,
+                    input.onlineNodes,
+                    input.stats,
+                    input.localNode,
+                    input.statsExtended,
+                )
             }
             .stateIn(scope = scope, started = SharingStarted.Eagerly, initialValue = LocalStatsWidgetUiState())
 
@@ -106,6 +123,7 @@ class LocalStatsWidgetStateProvider(nodeRepository: NodeRepository, connectionSt
         val onlineNodes: Int,
         val stats: LocalStats,
         val localNode: Node?,
+        val statsExtended: LocalStatsExtended,
     )
 
     @Suppress("LongMethod", "CyclomaticComplexMethod", "MagicNumber")
@@ -115,6 +133,7 @@ class LocalStatsWidgetStateProvider(nodeRepository: NodeRepository, connectionSt
         onlineNodes: Int,
         stats: LocalStats,
         localNode: Node?,
+        statsExtended: LocalStatsExtended,
     ): LocalStatsWidgetUiState {
         val metrics = localNode?.deviceMetrics
         val batteryLevel = metrics?.battery_level ?: 0
@@ -148,6 +167,12 @@ class LocalStatsWidgetStateProvider(nodeRepository: NodeRepository, connectionSt
             numTxDropped = stats.num_tx_dropped,
             heapFreeBytes = stats.heap_free_bytes,
             heapTotalBytes = stats.heap_total_bytes,
+            hasStatsExtended = statsExtended.memoryTotal != 0,
+            cpuUsagePercent = statsExtended.cpuUsagePercent,
+            flashUsedBytes = statsExtended.flashUsedBytes,
+            flashTotalBytes = statsExtended.flashTotalBytes,
+            memoryPsramFree = statsExtended.memoryPsramFree,
+            memoryPsramTotal = statsExtended.memoryPsramTotal,
             totalNodes = totalNodes,
             onlineNodes = onlineNodes,
             uptimeSecs = uptimeSecs,

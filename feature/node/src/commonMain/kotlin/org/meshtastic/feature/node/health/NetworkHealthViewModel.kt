@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.model.util.isDirectSignal
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
@@ -36,6 +37,7 @@ enum class NetworkHealthMetric(val label: String) {
     SIGNAL("Sygnał"),
     ETHER("Eter"),
     ENVIRONMENT("Środowisko"),
+    RESOURCES("Zasoby"),
     TRAFFIC("Ruch"),
     NEIGHBORS("Sąsiedzi"),
 }
@@ -92,6 +94,10 @@ data class NodeHealthInfo(
         NetworkHealthMetric.TRAFFIC -> null
 
         NetworkHealthMetric.NEIGHBORS -> neighborCount?.toFloat()
+
+        // Resources tab (fw+ local_stats_extended) isn't part of the live Node model — like Traffic, its sparkline
+        // and detail chart are driven entirely by history, not a "current" column value.
+        NetworkHealthMetric.RESOURCES -> null
     }
 }
 
@@ -276,6 +282,9 @@ internal fun org.meshtastic.core.model.MeshLog.toHistoryEntry(): org.meshtastic.
     val telemetry = runCatching { org.meshtastic.proto.Telemetry.ADAPTER.decode(payload) }.getOrNull() ?: return null
     val voltage = telemetry.power_metrics?.ch3_voltage ?: telemetry.environment_metrics?.voltage
     val current = telemetry.power_metrics?.ch3_current ?: telemetry.environment_metrics?.current
+    val localStatsExtended = telemetry.unknownFields.decodeLocalStatsExtended()
+    val heapTotal = telemetry.local_stats?.heap_total_bytes ?: 0
+    val heapFree = telemetry.local_stats?.heap_free_bytes ?: 0
     return org.meshtastic.core.model.NodeMetricsHistoryEntry(
         num = fromNum,
         timestamp = received_date,
@@ -294,8 +303,20 @@ internal fun org.meshtastic.core.model.MeshLog.toHistoryEntry(): org.meshtastic.
         txRelay = telemetry.local_stats?.num_tx_relay,
         packetsRxBad = telemetry.local_stats?.num_packets_rx_bad,
         uptimeSeconds = telemetry.local_stats?.uptime_seconds,
+        cpuUsagePercent = localStatsExtended?.cpuUsagePercent,
+        heapFreePercent = if (heapTotal > 0) heapFree.toFloat() / heapTotal * PERCENT_MULTIPLIER else null,
+        flashUsedPercent =
+            localStatsExtended
+                ?.takeIf { it.flashTotalBytes > 0 }
+                ?.let { it.flashUsedBytes.toFloat() / it.flashTotalBytes * PERCENT_MULTIPLIER },
+        psramFreePercent =
+            localStatsExtended
+                ?.takeIf { it.memoryPsramTotal > 0 }
+                ?.let { it.memoryPsramFree.toFloat() / it.memoryPsramTotal * PERCENT_MULTIPLIER },
     )
 }
+
+private const val PERCENT_MULTIPLIER = 100f
 
 /** Extracts this metric's value from a raw history entry, for sparkline plotting. */
 
@@ -334,6 +355,8 @@ internal fun NetworkHealthMetric.historyValue(entry: org.meshtastic.core.model.N
 
         // Neighbor counts aren't tracked in this table; there's no sparkline/history for this tab.
         NetworkHealthMetric.NEIGHBORS -> null
+
+        NetworkHealthMetric.RESOURCES -> entry.cpuUsagePercent?.toFloat()
     }
 
 /** Sub-series labels for a metric tab's detail chart. Most metrics have one; several tabs have multiple. */
@@ -343,6 +366,7 @@ internal fun NetworkHealthMetric.seriesLabels(): List<String> = when (this) {
     NetworkHealthMetric.ETHER -> listOf("Ch. Util", "Air Util")
     NetworkHealthMetric.ENVIRONMENT -> listOf("Temperatura", "Wilgotność", "Ciśnienie")
     NetworkHealthMetric.TRAFFIC -> listOf("TX", "RX", "Duplikaty", "Przekazane", "Uszkodzone")
+    NetworkHealthMetric.RESOURCES -> listOf("CPU", "Heap", "Flash", "PSRAM")
     else -> listOf(label)
 }
 
@@ -358,6 +382,7 @@ internal fun NetworkHealthMetric.seriesGroups(): List<List<String>> = when (this
     NetworkHealthMetric.ETHER -> listOf(listOf("Ch. Util", "Air Util"))
     NetworkHealthMetric.ENVIRONMENT -> listOf(listOf("Temperatura", "Wilgotność"), listOf("Ciśnienie"))
     NetworkHealthMetric.TRAFFIC -> listOf(listOf("TX", "RX"), listOf("Duplikaty", "Przekazane", "Uszkodzone"))
+    NetworkHealthMetric.RESOURCES -> listOf(listOf("CPU", "Heap"), listOf("Flash", "PSRAM"))
     else -> listOf(listOf(label))
 }
 
@@ -404,6 +429,15 @@ internal fun NetworkHealthMetric.historySeriesValue(
             "Duplikaty" -> entry.rxDupe?.toFloat()
             "Przekazane" -> entry.txRelay?.toFloat()
             "Uszkodzone" -> entry.packetsRxBad?.toFloat()
+            else -> null
+        }
+
+    NetworkHealthMetric.RESOURCES ->
+        when (seriesLabel) {
+            "CPU" -> entry.cpuUsagePercent?.toFloat()
+            "Heap" -> entry.heapFreePercent
+            "Flash" -> entry.flashUsedPercent
+            "PSRAM" -> entry.psramFreePercent
             else -> null
         }
 

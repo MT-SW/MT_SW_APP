@@ -55,6 +55,7 @@ import org.meshtastic.proto.FirmwareEdition
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.Telemetry
+import org.meshtastic.core.model.util.decodeLocalStatsExtended
 
 @Single(binds = [GetNodeDetailsUseCase::class])
 class CommonGetNodeDetailsUseCase
@@ -217,7 +218,12 @@ constructor(
                     localStats = logs.telemetry.filter { it.local_stats != null },
                     powerMetrics = logs.telemetry.filter { it.power_metrics != null },
                     airQualityMetrics = logs.telemetry.filter { it.air_quality_metrics != null },
-                    hostMetrics = logs.telemetry.filter { it.host_metrics != null },
+                    hostMetrics =
+                        logs.telemetry.filter {
+                            it.host_metrics != null ||
+                                    it.local_stats != null ||
+                                    it.unknownFields.decodeLocalStatsExtended() != null
+                        },
                     signalMetrics = logs.packets.filter { it.isDirectSignal() },
                     positionLogs = logs.posPackets.mapNotNull { it.toPosition() },
                     paxMetrics = logs.pax,

@@ -43,12 +43,15 @@ import org.meshtastic.core.database.entity.MetadataEntity
 import org.meshtastic.core.database.entity.MyNodeEntity
 import org.meshtastic.core.database.entity.NodeEntity
 import org.meshtastic.core.datastore.LocalStatsDataSource
+import org.meshtastic.core.datastore.LocalStatsExtendedDataSource
+import org.meshtastic.core.datastore.LocalStatsExtendedPrefs
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.MyNodeInfo
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.NodeSortOption
+import org.meshtastic.core.model.util.LocalStatsExtended
 import org.meshtastic.core.model.util.onlineTimeThreshold
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.proto.DeviceMetadata
@@ -64,6 +67,7 @@ class NodeRepositoryImpl(
     private val nodeInfoWriteDataSource: NodeInfoWriteDataSource,
     private val dispatchers: CoroutineDispatchers,
     private val localStatsDataSource: LocalStatsDataSource,
+    private val localStatsExtendedDataSource: LocalStatsExtendedDataSource,
 ) : NodeRepository {
     /** Hardware info about our local device (can be null if not connected). */
     override val myNodeInfo: StateFlow<MyNodeInfo?> =
@@ -96,6 +100,17 @@ class NodeRepositoryImpl(
     /** Update the cached local stats telemetry. */
     override fun updateLocalStats(stats: LocalStats) {
         processLifecycle.coroutineScope.launch { localStatsDataSource.setLocalStats(stats) }
+    }
+
+    /** The latest fw+ extended local stats telemetry received from the locally connected node, persisted across restarts. */
+    override val localStatsExtended: StateFlow<LocalStatsExtended> =
+        localStatsExtendedDataSource.localStatsExtendedFlow
+            .map { it.toDomain() }
+            .stateIn(processLifecycle.coroutineScope, SharingStarted.Eagerly, LocalStatsExtended())
+
+    /** Update the cached fw+ extended local stats telemetry. */
+    override fun updateLocalStatsExtended(stats: LocalStatsExtended) {
+        processLifecycle.coroutineScope.launch { localStatsExtendedDataSource.setLocalStatsExtended(stats.toPrefs()) }
     }
 
     /**
@@ -300,5 +315,25 @@ class NodeRepositoryImpl(
         nodeStatus = nodeStatus,
         lastTransport = lastTransport,
         signsPackets = signsPackets,
+    )
+
+    private fun LocalStatsExtendedPrefs.toDomain() = LocalStatsExtended(
+        memoryFreeCheap = memoryFreeCheap,
+        memoryTotal = memoryTotal,
+        cpuUsagePercent = cpuUsagePercent,
+        flashUsedBytes = flashUsedBytes,
+        flashTotalBytes = flashTotalBytes,
+        memoryPsramFree = memoryPsramFree,
+        memoryPsramTotal = memoryPsramTotal,
+    )
+
+    private fun LocalStatsExtended.toPrefs() = LocalStatsExtendedPrefs(
+        memoryFreeCheap = memoryFreeCheap,
+        memoryTotal = memoryTotal,
+        cpuUsagePercent = cpuUsagePercent,
+        flashUsedBytes = flashUsedBytes,
+        flashTotalBytes = flashTotalBytes,
+        memoryPsramFree = memoryPsramFree,
+        memoryPsramTotal = memoryPsramTotal,
     )
 }

@@ -40,6 +40,7 @@ import org.meshtastic.core.common.util.safeCatchingAll
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.TelemetryType
+import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.repository.AppWidgetUpdater
 import org.meshtastic.core.repository.CommandSender
 import org.meshtastic.core.repository.DataPair
@@ -734,6 +735,7 @@ class MeshConnectionManagerImpl(
 
     override fun updateTelemetry(t: Telemetry) {
         t.local_stats?.let { nodeRepository.updateLocalStats(it) }
+        t.unknownFields.decodeLocalStatsExtended()?.let { nodeRepository.updateLocalStatsExtended(it) }
         updateStatusNotification(t)
     }
 

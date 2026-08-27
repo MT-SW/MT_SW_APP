@@ -243,7 +243,14 @@ private fun formatSeriesValue(seriesLabel: String, value: Float): String = when 
     "Przekazane",
     "Uszkodzone",
     "Przeskoki",
-    -> "${value.toInt()}"
+        -> "${value.toInt()}"
+
+    "CPU" -> MetricFormatter.percent(value, decimalPlaces = 0)
+
+    "Heap",
+    "Flash",
+    "PSRAM",
+        -> MetricFormatter.percent(value, decimalPlaces = 1)
 
     else -> NumberFormatter.format(value, 1)
 }

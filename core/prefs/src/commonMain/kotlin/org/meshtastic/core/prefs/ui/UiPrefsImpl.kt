@@ -140,6 +140,14 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_SHOW_QUICK_CHAT_PREF] = show } }
     }
 
+    override val quickChatDefaultsSeeded: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_QUICK_CHAT_DEFAULTS_SEEDED_PREF] ?: false }
+            .stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setQuickChatDefaultsSeeded(seeded: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_QUICK_CHAT_DEFAULTS_SEEDED_PREF] = seeded } }
+    }
+
     override val showFullMessageTimestamps: StateFlow<Boolean> =
         dataStore.data
             .map { it[KEY_SHOW_FULL_MESSAGE_TIMESTAMPS] ?: false }
@@ -336,6 +344,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
     companion object {
         val KEY_HAS_SHOWN_NOT_PAIRED_WARNING_PREF = booleanPreferencesKey("has_shown_not_paired_warning")
         val KEY_SHOW_QUICK_CHAT_PREF = booleanPreferencesKey("show-quick-chat")
+        val KEY_QUICK_CHAT_DEFAULTS_SEEDED_PREF = booleanPreferencesKey("quick-chat-defaults-seeded")
         val KEY_SHOW_FULL_MESSAGE_TIMESTAMPS = booleanPreferencesKey("show-full-message-timestamps")
         val KEY_EVENT_THEME_ENABLED = booleanPreferencesKey("event-theme-enabled")
 

@@ -107,6 +107,7 @@ import org.meshtastic.proto.LocalStats
 import org.meshtastic.proto.Telemetry
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration.Companion.minutes
+import org.meshtastic.core.resources.local_stats_heap_value_kb
 
 /**
  * Manages the creation and display of all app notifications.
@@ -130,6 +131,7 @@ class MeshNotificationManagerImpl(
 
     companion object {
         const val MAX_BATTERY_LEVEL = 100
+        private const val BYTES_PER_KB = 1024.0
 
         // Meshtastic brand accent (Green 500, see .skills/design-standards) — used as the notification accent color
         // (small-icon tint) and the notification LED color.
@@ -1082,9 +1084,13 @@ class MeshNotificationManagerImpl(
         if (heap_free_bytes > 0 || heap_total_bytes > 0) {
             parts.add(
                 BULLET +
-                    getStringSuspend(Res.string.local_stats_heap) +
-                    ": " +
-                    getStringSuspend(Res.string.local_stats_heap_value, heap_free_bytes, heap_total_bytes),
+                        getStringSuspend(Res.string.local_stats_heap) +
+                        ": " +
+                        getStringSuspend(
+                            Res.string.local_stats_heap_value_kb,
+                            NumberFormatter.format(heap_free_bytes / BYTES_PER_KB, 2),
+                            NumberFormatter.format(heap_total_bytes / BYTES_PER_KB, 2),
+                        ),
             )
         }
 

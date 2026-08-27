@@ -152,6 +152,12 @@ class FakeUiPrefs : UiPrefs {
         showQuickChat.value = show
     }
 
+    override val quickChatDefaultsSeeded = MutableStateFlow(true)
+
+    override fun setQuickChatDefaultsSeeded(seeded: Boolean) {
+        quickChatDefaultsSeeded.value = seeded
+    }
+
     override val showFullMessageTimestamps = MutableStateFlow(false)
 
     override fun setShowFullMessageTimestamps(show: Boolean) {

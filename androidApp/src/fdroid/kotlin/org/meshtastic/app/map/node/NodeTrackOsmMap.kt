@@ -57,8 +57,8 @@ import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import kotlin.math.roundToInt
 
-private const val TRACK_SINGLE_POINT_ZOOM = 12.0
-private const val TRACK_MAX_ZOOM = 12.0
+private const val TRACK_SINGLE_POINT_ZOOM = 14.0
+private const val TRACK_MAX_ZOOM = 14.0
 
 /**
  * A focused OSMDroid map composable that renders **only** a node's position track — a dashed polyline with directional

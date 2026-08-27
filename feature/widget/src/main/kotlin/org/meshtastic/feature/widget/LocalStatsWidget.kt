@@ -78,11 +78,14 @@ import org.meshtastic.core.resources.device_sleeping
 import org.meshtastic.core.resources.disconnected
 import org.meshtastic.core.resources.getString
 import org.meshtastic.core.resources.local_stats_bad
+import org.meshtastic.core.resources.local_stats_cpu
 import org.meshtastic.core.resources.local_stats_diagnostics_prefix
 import org.meshtastic.core.resources.local_stats_dropped
+import org.meshtastic.core.resources.local_stats_flash
 import org.meshtastic.core.resources.local_stats_heap
 import org.meshtastic.core.resources.local_stats_heap_value
 import org.meshtastic.core.resources.local_stats_noise
+import org.meshtastic.core.resources.local_stats_psram
 import org.meshtastic.core.resources.local_stats_relays
 import org.meshtastic.core.resources.local_stats_traffic
 import org.meshtastic.core.resources.local_stats_updated_at
@@ -285,6 +288,47 @@ class LocalStatsWidget :
                         val heapValue =
                             stringResource(Res.string.local_stats_heap_value, state.heapFreeBytes, state.heapTotalBytes)
                         StatRow(stringResource(Res.string.local_stats_heap), heapValue, heapProgress, isSmall)
+
+                        if (state.hasStatsExtended) {
+                            Row(modifier = GlanceModifier.fillMaxWidth()) {
+                                StatRow(
+                                    label = stringResource(Res.string.local_stats_cpu),
+                                    value = "${state.cpuUsagePercent}%",
+                                    progress = (state.cpuUsagePercent / 100f).coerceIn(0f, 1f),
+                                    isSmall = isSmall,
+                                    modifier = GlanceModifier.defaultWeight().padding(end = 4.dp),
+                                )
+                                if (state.memoryPsramTotal > 0) {
+                                    val psramProgress = state.memoryPsramFree.toFloat() / state.memoryPsramTotal
+                                    StatRow(
+                                        label = stringResource(Res.string.local_stats_psram),
+                                        value =
+                                            stringResource(
+                                                Res.string.local_stats_heap_value,
+                                                state.memoryPsramFree,
+                                                state.memoryPsramTotal,
+                                            ),
+                                        progress = psramProgress,
+                                        isSmall = isSmall,
+                                        modifier = GlanceModifier.defaultWeight().padding(start = 4.dp),
+                                    )
+                                }
+                            }
+                            if (state.flashTotalBytes > 0) {
+                                val flashProgress = state.flashUsedBytes.toFloat() / state.flashTotalBytes
+                                StatRow(
+                                    label = stringResource(Res.string.local_stats_flash),
+                                    value =
+                                        stringResource(
+                                            Res.string.local_stats_heap_value,
+                                            state.flashUsedBytes,
+                                            state.flashTotalBytes,
+                                        ),
+                                    progress = flashProgress,
+                                    isSmall = isSmall,
+                                )
+                            }
+                        }
                     }
                 }
             }

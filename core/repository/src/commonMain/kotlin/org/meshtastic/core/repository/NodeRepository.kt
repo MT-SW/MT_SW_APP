@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import org.meshtastic.core.model.MyNodeInfo
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeSortOption
+import org.meshtastic.core.model.util.LocalStatsExtended
 import org.meshtastic.proto.DeviceMetadata
 import org.meshtastic.proto.LocalStats
 import org.meshtastic.proto.User
@@ -51,6 +52,9 @@ interface NodeRepository {
     /** Reactive flow of the latest local stats telemetry received from the radio. */
     val localStats: StateFlow<LocalStats>
 
+    /** Reactive flow of the latest fw+ `local_stats_extended` telemetry (heap/CPU/flash/PSRAM) from the radio. */
+    val localStatsExtended: StateFlow<LocalStatsExtended>
+
     /** A reactive map of all known nodes in the mesh, keyed by their 32-bit node number. */
     val nodeDBbyNum: StateFlow<Map<Int, Node>>
 
@@ -66,6 +70,13 @@ interface NodeRepository {
      * @param stats The new [LocalStats].
      */
     fun updateLocalStats(stats: LocalStats)
+
+    /**
+     * Updates the cached fw+ extended local stats telemetry.
+     *
+     * @param stats The new [LocalStatsExtended].
+     */
+    fun updateLocalStatsExtended(stats: LocalStatsExtended)
 
     /**
      * Returns the node number used for log queries.

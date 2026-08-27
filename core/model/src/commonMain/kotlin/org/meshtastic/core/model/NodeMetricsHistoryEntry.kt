@@ -42,4 +42,8 @@ data class NodeMetricsHistoryEntry(
     val txRelay: Int? = null,
     val packetsRxBad: Int? = null,
     val uptimeSeconds: Int? = null,
+    val cpuUsagePercent: Int? = null,
+    val heapFreePercent: Float? = null,
+    val flashUsedPercent: Float? = null,
+    val psramFreePercent: Float? = null,
 )

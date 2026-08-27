@@ -140,6 +140,10 @@ interface UiPrefs {
 
     fun setShowQuickChat(show: Boolean)
 
+    val quickChatDefaultsSeeded: StateFlow<Boolean>
+
+    fun setQuickChatDefaultsSeeded(seeded: Boolean)
+
     /** Whether conversation message headers and actions always show both the date and time. */
     val showFullMessageTimestamps: StateFlow<Boolean>
 
