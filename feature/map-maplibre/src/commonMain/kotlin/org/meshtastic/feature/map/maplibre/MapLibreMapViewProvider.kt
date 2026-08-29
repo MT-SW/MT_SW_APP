@@ -68,6 +68,7 @@ import org.meshtastic.feature.map.maplibre.geojson.ClusterMember
 import org.meshtastic.feature.map.maplibre.layers.CustomLayer
 import org.meshtastic.feature.map.maplibre.style.Basemap
 import org.meshtastic.feature.map.maplibre.style.MapOverlay
+import org.meshtastic.feature.map.maplibre.style.MapOverlays
 
 /**
  * MapLibre implementation of [MapViewProvider], shared by the F-Droid flavor and the desktop app.
@@ -203,7 +204,7 @@ private class MapScreenState {
     var infoWaypointId by mutableStateOf<Int?>(null)
     var clusterMembers by mutableStateOf(emptyList<ClusterMember>())
     var plannerOpen by mutableStateOf(false)
-    var overlays by mutableStateOf(emptyList<MapOverlay>())
+    var overlays by mutableStateOf(MapOverlays.all)
 }
 
 /** Holds the screen's open-thing state, and opens whatever the incoming deep link named. */
