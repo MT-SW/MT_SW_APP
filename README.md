@@ -18,20 +18,17 @@ Stan roboczy — repo służy głównie do własnego użytku i testów z niewiel
 - **Ukryte nieaktualne role urządzenia** (REPEATER, ROUTER_CLIENT) na liście wyboru roli w konfiguracji urządzenia — firmware ich już nie wspiera, więc nie da się ich przez pomyłkę wybrać.
 - Poprawiony wygląd czasu działania (uptime) na liście węzłów — dodana ikonka odróżniająca go wizualnie od czasu ostatniego kontaktu.
 
-## Mapa desktopowa
+## Mapa
 
-Wersja desktopowa appki wcześniej w ogóle nie miała mapy — zakładka "Mapa" pokazywała pusty placeholder, bo desktop nie miał żadnej biblioteki mapowej. Zbudowana od podstaw, jako własny renderer kafelków OSM na Compose Canvas:
+Silnik mapy (Android i desktop) korzysta teraz ze współdzielonej, natywnie renderowanej biblioteki **MapLibre** — przyjętej z upstreamu zamiast wcześniejszego, własnoręcznie napisanego renderera (osmdroid na Androidzie, autorski renderer kafelków OSM na Compose Canvas na desktopie). Powody tej zmiany: wydajniejsze natywne renderowanie (GPU) i brak konieczności utrzymywania osobnego silnika mapy przy każdej synchronizacji z upstreamem.
 
-- Przesuwanie, zoom scrollem (w kierunku kursora), klikalne markery węzłów (ikony pinezek z krótką nazwą, nie kropki)
-- Automatyczne dopasowanie widoku do wszystkich węzłów przy starcie
-- Markery waypointów z podglądem/usuwaniem po kliknięciu, oznaczenie zablokowanych waypointów
-- Nakładki geofence dla stref waypointów
-- Filtry: tylko ulubione, pokaż waypointy, okrąg niepewności GPS, filtr czasu ostatniego kontaktu
-- Import warstw GeoJSON i KML (własne parsery napisane od zera pod desktop)
-- Pobieranie kafelków offline dla wybranego regionu i zoomu, z zarządzaniem rozmiarem pamięci podręcznej
-- **Site Planner** (symulacja zasięgu) zintegrowany przez wbudowaną przeglądarkę Chromium (JCEF)
-- Naprawiona mini-mapa w szczegółach węzła, mapa trasy pozycji i pełnoekranowa mapa pojedynczego węzła — wcześniej wszystkie trzy pokazywały czarne pole
-- Kliknięcie węzła na mapie desktopowej otwiera teraz najpierw listę węzłów, potem szczegóły — zgodnie z resztą appki desktopowej
+Co to oznacza w praktyce:
+
+- **Desktop ma teraz mapę "za darmo"** — wcześniej zakładka "Mapa" na desktopie była pustym placeholderem, potem dorobiona jako własny renderer od zera; teraz korzysta z tego samego współdzielonego komponentu co Android, więc funkcje typu import warstw GeoJSON/KML, pobieranie kafelków offline czy filtry mapy pochodzą już ze wspólnego modułu, a nie z osobnej implementacji tylko dla desktopu.
+- **Site Planner** (symulacja zasięgu radiowego) na desktopie działa teraz przez przeglądarkę zamiast wcześniejszej integracji z wbudowaną przeglądarką Chromium (JCEF) pisaną specjalnie pod ten fork.
+- Mini-mapa w szczegółach węzła, mapa trasy pozycji i główny ekran mapy korzystają z tego samego, wspólnego komponentu na obu platformach.
+- Kliknięcie węzła na mapie desktopowej nadal otwiera najpierw listę węzłów, potem szczegóły — to zachowanie przetrwało przejście na nowy silnik mapy.
+- **Domyślnie włączone nakładki terenu i pogody** — nakładka cieniowania rzeźby terenu (hillshade, przydatna do oceny zasięgu LoRa ograniczonego ukształtowaniem terenu) oraz radar pogodowy NOAA są teraz zaznaczone od razu po otwarciu mapy, zamiast wymagać ręcznego włączenia w warstwach.
 
 ## Ustawienia desktopowe
 
@@ -54,12 +51,6 @@ Nowa, szósta zakładka w dolnej nawigacji (między Węzłami a Mapą), której 
 - **Podgląd obrazków wklejonych jako link** — sterowany osobnym przełącznikiem w Ustawienia → Prywatność (domyślnie wyłączone), dostępny zarówno na Androidzie, jak i w wersji desktopowej.
 - **Desktop: Enter = nowa linijka, Ctrl+Enter = wyślij** — zamiast wymuszonego wysyłania samym Enterem, zachowanie typowe dla komunikatorów na komputerze; na telefonie wysyłanie zostaje osobnym przyciskiem obok pola tekstowego.
 - **Domyślne szablony w Szybkim Czacie (Quick Chat)** — appka wcześniej startowała z pustą listą szablonów wiadomości; teraz przy pierwszym uruchomieniu automatycznie wypełnia ją zestawem własnych komend sieciowych (np. `scyzoryk pomoc`, `scyzoryk test`, `scyzoryk range`, `scyzoryk pogoda`, `scyzoryk info`, `scyzoryk aktualnosci`).
-
-## Mapa
-
-- Domyślne centrum i przybliżenie mapy ustawione tak, żeby przy pierwszym uruchomieniu (zanim appka zdąży pobrać pozycje węzłów) nie pokazywała pustego oceanu, tylko sensowny punkt startowy; po załadowaniu węzłów mapa i tak wycentrowuje się na realnym obszarze sieci.
-- Naprawiony efekt "przelotu przez ocean" (chwilowe pokazanie punktu 0,0 przed wyśrodkowaniem na właściwej pozycji) na głównym ekranie mapy.
-- Ten sam fix zastosowany też na mapie trasy pozycji węzła (ekran "Pozycjonowanie") — wcześniej problem dotyczył tylko głównej mapy; dodatkowo dostrojony poziom przybliżenia przy automatycznym centrowaniu.
 
 ## Branding i personalizacja
 
@@ -108,20 +99,17 @@ Work in progress — this repo is mainly for personal use and testing with a sma
 - **Hid outdated device roles** (REPEATER, ROUTER_CLIENT) from the role picker in device configuration — firmware no longer supports them, so they can't be selected by mistake anymore.
 - Cleaned up the uptime display in the node list — added an icon to visually separate it from the last-heard time.
 
-## Desktop map
+## Map
 
-The desktop build previously had no map at all — the "Map" tab showed an empty placeholder, since desktop had zero map library dependencies. Built from scratch as a custom OSM tile renderer on Compose Canvas:
+The map engine (Android and desktop) now uses the shared, natively rendered **MapLibre** library — adopted from upstream in place of the earlier, hand-written renderer (osmdroid on Android, a custom OSM tile renderer on Compose Canvas on desktop). Reasons for the switch: faster native (GPU) rendering, and no longer having to maintain a separate map engine on every sync with upstream.
 
-- Pan, scroll-to-zoom toward cursor, clickable node markers (pin-style icons with short names, not plain dots)
-- Auto-fit view to all known nodes on launch
-- Waypoint markers with tap-to-view/delete, locked-waypoint badge
-- Geofence overlays for waypoint zones
-- Filters: favorites-only, show waypoints, GPS precision-uncertainty circle, last-heard filter
-- GeoJSON and KML layer import (custom parsers written from scratch for desktop)
-- Offline tile download for a chosen region/zoom range, with cache size management
-- **Site Planner** (coverage simulation) integrated via an embedded Chromium browser (JCEF)
-- Fixed the node-detail mini-map, position-track map, and full-screen single-node map — all three previously showed a black box
-- Clicking a node on the desktop map now opens the node list first, then details — matching the rest of the desktop app's navigation
+What this means in practice:
+
+- **Desktop gets a map "for free" now** — the desktop "Map" tab used to be an empty placeholder, then a from-scratch custom renderer; it now uses the same shared component as Android, so features like GeoJSON/KML layer import, offline tile downloads, and map filters come from the shared module rather than a desktop-only implementation.
+- **Site Planner** (coverage simulation) on desktop now runs through the browser instead of the earlier integration with an embedded Chromium browser (JCEF) built specifically for this fork.
+- The node-detail mini-map, the position-track map, and the main map screen all use the same shared component on both platforms.
+- Clicking a node on the desktop map still opens the node list first, then details — that behavior survived the switch to the new map engine.
+- **Terrain and weather overlays enabled by default** — the hillshade overlay (useful for judging LoRa range limited by terrain) and the NOAA weather radar overlay are now checked as soon as the map opens, instead of requiring a manual toggle in the layers menu.
 
 ## Desktop settings
 
@@ -144,12 +132,6 @@ A new, sixth tab in the bottom navigation (between Nodes and Map) that doesn't e
 - **Preview for images pasted as links** — controlled by a separate toggle in Settings → Privacy (off by default), available on both Android and the desktop version.
 - **Desktop: Enter = new line, Ctrl+Enter = send** — instead of forcing a send on plain Enter, matching the behavior people expect from desktop chat apps; on the phone, sending stays a separate button next to the text field.
 - **Default Quick Chat templates** — the app's Quick Chat template list used to start out empty; now on first launch it's automatically seeded with a set of custom network commands (e.g. `scyzoryk pomoc`, `scyzoryk test`, `scyzoryk range`, `scyzoryk pogoda`, `scyzoryk info`, `scyzoryk aktualnosci`).
-
-## Map
-
-- Default map center and zoom set so that on first launch (before the app has fetched node positions) it doesn't show an empty ocean, just a sensible starting point; once nodes load, the map still re-centers on the actual network area.
-- Fixed the "flying through the ocean" effect (briefly showing point 0,0 before centering on the real position) on the main map screen.
-- Applied the same fix to the node position-track map (the "Pozycjonowanie"/position-log screen) — previously this only covered the main map screen; the auto-fit zoom level was also tuned.
 
 ## Branding and customization
 
