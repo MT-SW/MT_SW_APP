@@ -566,13 +566,6 @@ fun MessageItem(
                             }
                         }
                         if (containsBel) {
-                                        style = metadataStyle,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                            }
-                        }
-                        if (containsBel) {
                             Text(text = "\uD83D\uDD14")
                         }
                         if (message.filtered) {
