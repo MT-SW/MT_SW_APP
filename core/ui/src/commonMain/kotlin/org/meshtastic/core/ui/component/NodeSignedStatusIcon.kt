@@ -35,7 +35,7 @@ import org.meshtastic.core.resources.security_signed_node
 import org.meshtastic.core.resources.security_signed_node_help
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.ShieldCheck
-import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
+import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 
 /** The plain-language "signed node" explanation, shared by [NodeSignedStatusIcon] and the node-details signed row. */
 @Composable
@@ -59,7 +59,7 @@ fun NodeSignedStatusIcon(modifier: Modifier = Modifier) {
         Icon(
             imageVector = MeshtasticIcons.ShieldCheck,
             contentDescription = stringResource(Res.string.security_signed_node),
-            tint = MaterialTheme.colorScheme.StatusGreen,
+            tint = MaterialTheme.colorScheme.StatusOnline,
         )
     }
 }

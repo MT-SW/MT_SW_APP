@@ -56,7 +56,7 @@ fun RegionWarningDialog(onClose: () -> Unit) {
                 Text(
                     text =
                     "Na naszym terenie pracujemy na nastawach Custom (62KHz, SF7, CR6) lub preset NarrowFast. " +
-                        "Więcej szczegółów znajdziesz na https://meshtastic-swietokrzyskie.pl",
+                        "Więcej szczegółów znajdziesz na https://mt-sw.pl",
                 )
                 TextButton(
                     onClick = onClose,

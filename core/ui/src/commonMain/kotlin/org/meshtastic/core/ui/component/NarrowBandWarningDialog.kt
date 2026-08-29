@@ -73,7 +73,7 @@ fun NarrowBandWarningDialog(onClose: () -> Unit) {
                         "na 4 osobnych kanałach. Jeśli masz kłopoty z zasięgiem, słabym sygnałem, sprawdź już dziś " +
                         "nowy preset NarrowFast, lub jeśli nie chcesz jeszcze wgrywać nie stabilnego firmware, " +
                         "skorzystaj z ustawień Custom (przykład takiej konfiguracji znajdziesz na stronie " +
-                        "https://meshtastic-swietokrzyskie.pl ) Jeśli w Twojej okolicy pracują opróćz Meshtastica " +
+                        "https://mt-sw.pl ) Jeśli w Twojej okolicy pracują opróćz Meshtastica " +
                         "inne sieci, jak Meshcore czy Reticulum, przetestuj preset NarrowFast, unikniesz wtedy " +
                         "zakłóceń ze strony tych sieci, i zarazem sam nie będziesz ich powodował innym użytkownikom " +
                         "pasma.",

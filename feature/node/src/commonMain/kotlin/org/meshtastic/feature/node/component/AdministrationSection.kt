@@ -441,7 +441,7 @@ private fun QuickCommandsCard(node: Node, onAction: (NodeDetailAction) -> Unit) 
 private const val MT_SW_VERSION_MARKER = "MTSW"
 
 /** Name shown in the UI for a build carrying [MT_SW_VERSION_MARKER]. */
-private const val MT_SW_DISPLAY_NAME = "FW_MT_SW"
+private const val MT_SW_DISPLAY_NAME = "MT_SW_FIRMWARE"
 
 @Composable
 private fun FirmwareSection(

@@ -37,9 +37,9 @@ import org.meshtastic.core.ui.icon.NoDevice
 import org.meshtastic.core.ui.icon.Reconnecting
 import org.meshtastic.core.ui.icon.Usb
 import org.meshtastic.core.ui.icon.Wifi
-import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
-import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
-import org.meshtastic.core.ui.theme.StatusColors.StatusRed
+import org.meshtastic.core.ui.theme.StatusColors.StatusConnecting
+import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
+import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 
 @Composable
@@ -48,8 +48,9 @@ fun ConnectionsNavIcon(
     connectionState: ConnectionState,
     deviceType: DeviceType?,
     contentDescription: String? = null,
+    tintOverride: Color? = null,
 ) {
-    val tint = getTint(connectionState)
+    val tint = tintOverride ?: getTint(connectionState)
 
     val (backgroundIcon, connectionTypeIcon) = getIconPair(deviceType = deviceType, connectionState = connectionState)
 
@@ -74,11 +75,11 @@ fun ConnectionsNavIcon(
 }
 
 @Composable
-private fun getTint(connectionState: ConnectionState): Color = when (connectionState) {
-    ConnectionState.Connecting -> colorScheme.StatusOrange
-    ConnectionState.Disconnected -> colorScheme.StatusRed
+fun getTint(connectionState: ConnectionState): Color = when (connectionState) {
+    ConnectionState.Connecting -> colorScheme.StatusConnecting
+    ConnectionState.Disconnected -> colorScheme.StatusDisconnected
     ConnectionState.DeviceSleep -> colorScheme.StatusYellow
-    else -> colorScheme.StatusGreen
+    else -> colorScheme.StatusOnline
 }
 
 @Composable

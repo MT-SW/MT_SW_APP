@@ -17,6 +17,7 @@
 package org.meshtastic.core.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -166,19 +167,47 @@ object GraphColors {
 }
 
 object StatusColors {
+    private val ColorScheme.isEffectivelyDark: Boolean
+        get() = background.luminance() < 0.5f
+
+    val ColorScheme.StatusConnecting: Color
+        @Composable
+        get() = Color(0xFFFFFFFF) // White — connecting/reconnecting
+
+    val ColorScheme.StatusDisconnected: Color
+        @Composable
+        get() = Color(0xFFF4212E) // Vivid red — disconnected
+
+    val ColorScheme.StatusTransmit: Color
+        @Composable
+        get() = Color(0xFF00C853) // Vivid green — sending
+
+    val ColorScheme.StatusReceive: Color
+        @Composable
+        get() = Color(0xFF2979FF) // Vivid blue — receiving
+
     val ColorScheme.StatusGreen: Color
         @Composable
         get() =
-            if (isSystemInDarkTheme()) {
+            if (isEffectivelyDark) {
                 Color(0xFF3FB86D) // Green 600
             } else {
                 Color(0xFF3FB86D) // Green 600 (Success)
             }
 
+    val ColorScheme.StatusOnline: Color
+        @Composable
+        get() =
+            if (isEffectivelyDark) {
+                Color(0xFFEBB60C) // Gold 600
+            } else {
+                Color(0xFFAA8309) // Gold 700 — matches primary, for consistency across the app
+            }
+
     val ColorScheme.StatusYellow: Color
         @Composable
         get() =
-            if (isSystemInDarkTheme()) {
+            if (isEffectivelyDark) {
                 Color(0xFFE8A33E) // Warning
             } else {
                 Color(0xFFE8A33E) // Warning
@@ -187,7 +216,7 @@ object StatusColors {
     val ColorScheme.StatusOrange: Color
         @Composable
         get() =
-            if (isSystemInDarkTheme()) {
+            if (isEffectivelyDark) {
                 Color(0xFFE07000)
             } else {
                 Color(0xFFFF8800)
@@ -196,7 +225,7 @@ object StatusColors {
     val ColorScheme.StatusRed: Color
         @Composable
         get() =
-            if (isSystemInDarkTheme()) {
+            if (isEffectivelyDark) {
                 Color(0xFFE05252) // Error
             } else {
                 Color(0xFFE05252) // Error
@@ -205,7 +234,7 @@ object StatusColors {
     val ColorScheme.StatusBlue: Color
         @Composable
         get() =
-            if (isSystemInDarkTheme()) {
+            if (isEffectivelyDark) {
                 Color(0xFF5C6BC0) // Info
             } else {
                 Color(0xFF5C6BC0) // Info

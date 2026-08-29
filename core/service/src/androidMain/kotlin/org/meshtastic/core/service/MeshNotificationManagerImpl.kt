@@ -21,7 +21,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.TaskStackBuilder
-import android.content.ContentResolver.SCHEME_ANDROID_RESOURCE
 import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
@@ -58,7 +57,6 @@ import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.SERVICE_NOTIFY_ID
 import org.meshtastic.core.resources.R.drawable
-import org.meshtastic.core.resources.R.raw
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.channel
 import org.meshtastic.core.resources.client_notification
@@ -73,7 +71,6 @@ import org.meshtastic.core.resources.local_stats_battery
 import org.meshtastic.core.resources.local_stats_diagnostics_prefix
 import org.meshtastic.core.resources.local_stats_dropped
 import org.meshtastic.core.resources.local_stats_heap
-import org.meshtastic.core.resources.local_stats_heap_value
 import org.meshtastic.core.resources.local_stats_nodes
 import org.meshtastic.core.resources.local_stats_noise
 import org.meshtastic.core.resources.local_stats_relays
@@ -324,12 +321,10 @@ class MeshNotificationManagerImpl(
                         enableLights(true)
                         enableVibration(true)
                         setBypassDnd(true)
-                        val alertSoundUri =
-                            "${SCHEME_ANDROID_RESOURCE}://${context.packageName}/${raw.meshtastic_alert}".toUri()
                         setSound(
-                            alertSoundUri,
+                            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),
                             AudioAttributes.Builder()
-                                .setUsage(AudioAttributes.USAGE_ALARM) // More appropriate for an alert
+                                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                                 .build(),
                         )

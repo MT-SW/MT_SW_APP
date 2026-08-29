@@ -1,6 +1,6 @@
-# Meshtastic_S+ — osobisty fork Meshtastic-Android
+# MT_SW_APP — osobisty fork Meshtastic-Android
 
-Fork oficjalnej aplikacji [Meshtastic-Android](https://github.com/meshtastic/Meshtastic-Android) rozwijany na potrzeby sieci mesh radiowej **Świętokrzyskie** (meshtastic-swietokrzyskie.pl). Bazuje na architekturze KMP/Compose Multiplatform oryginału (warianty `fdroid`/`google`, moduł desktopowy) i dokłada zestaw lokalnych funkcji, poprawek i personalizacji, których nie ma w wersji upstream.
+Fork oficjalnej aplikacji [Meshtastic-Android](https://github.com/meshtastic/Meshtastic-Android) rozwijany na potrzeby sieci mesh radiowej **Świętokrzyskie** (mt-sw.pl). Bazuje na architekturze KMP/Compose Multiplatform oryginału (warianty `fdroid`/`google`, moduł desktopowy) i dokłada zestaw lokalnych funkcji, poprawek i personalizacji, których nie ma w wersji upstream.
 
 Stan roboczy — repo służy głównie do własnego użytku i testów z niewielką grupą osób, niekoniecznie buduje się na bieżąco.
 
@@ -64,7 +64,11 @@ Nowa, szósta zakładka w dolnej nawigacji (między Węzłami a Mapą), której 
 ## Branding i personalizacja
 
 - Własny `applicationId`, dzięki czemu appka instaluje się obok oryginalnej appki Meshtastic bez konfliktu (osobne dane, można mieć obie naraz).
-- Zmieniona nazwa i ikona głównego (trwałego) powiadomienia appki oraz ikona samej aplikacji.
+- **Pełny rebranding wizualny** — appka i wersja desktopowa mają teraz własną tożsamość: nazwa MT_SW_APP wszędzie w interfejsie i powiadomieniach, autorska ikona (kontur województwa świętokrzyskiego + wordmark "MT_SW", w miejsce wcześniejszego tymczasowego oznaczenia "MS+"), oraz własna paleta kolorów (złoto/granat zamiast domyślnego zielonego brandingu Meshtastic) zastosowana w ikonie połączenia, tarczy podpisanego węzła i czasie ostatniego kontaktu w appce.
+- Osobna ikona w zasobniku systemowym (tray) wersji desktopowej, spójna z resztą brandingu.
+- **Ekran "O aplikacji"** wskazuje na repozytorium tego forka (nie oryginalnego projektu) i pokazuje jawny disclaimer "nieoficjalny fork, niezwiązany z Meshtastic LLC" — zgodnie z licencją GPL-3.0 i polityką znaku towarowego Meshtastic LLC.
+- **Naprawiony zbyt ostry dźwięk powiadomień Alert (SOS)** — kanał alertów miał własny, dedykowany plik dźwiękowy odtwarzany w trybie alarmowym; appka używa teraz domyślnego dźwięku systemowego, tak jak pozostałe kanały powiadomień.
+- **Kolorowa ikona statusu połączenia z urządzeniem** — złoty gdy połączony, biały podczas łączenia/ponownego łączenia, czerwony gdy rozłączony, żółty gdy urządzenie śpi; dodatkowo krótki błysk samej ikony i poświaty na zielono przy nadawaniu danych i na niebiesko przy odbiorze.
 - Wersja desktopowa przemianowana z "Meshtastic Desktop" na tę samą nazwę co appka mobilna, z uzupełnioną sekcją Prywatności w ustawieniach (wcześniej niedostępną na desktopie mimo że logika już istniała).
 - Rozpoznawanie niestandardowej edycji firmware używanej w sieci Świętokrzyskiej — appka pokazuje czytelną nazwę zamiast surowej wartości technicznej.
 - Wygenerowany plik tłumaczeń PL uzupełniający ok. 1000 wcześniej brakujących stringów (appka była przetłumaczona na polski w ok. 43%).
@@ -84,9 +88,9 @@ ________________________________________________________________________________
 
 
 
-# Meshtastic_S+ — personal Meshtastic-Android fork
+# MT_SW_APP — personal Meshtastic-Android fork
 
-A fork of the official [Meshtastic-Android](https://github.com/meshtastic/Meshtastic-Android) app, developed for the **Świętokrzyskie** mesh radio network (meshtastic-swietokrzyskie.pl). Builds on the upstream KMP/Compose Multiplatform architecture (`fdroid`/`google` flavors, desktop module) and adds a set of local features, fixes, and customizations not found in the upstream version.
+A fork of the official [Meshtastic-Android](https://github.com/meshtastic/Meshtastic-Android) app, developed for the **Świętokrzyskie** mesh radio network (mt-sw.pl). Builds on the upstream KMP/Compose Multiplatform architecture (`fdroid`/`google` flavors, desktop module) and adds a set of local features, fixes, and customizations not found in the upstream version.
 
 Work in progress — this repo is mainly for personal use and testing with a small group of people; it doesn't necessarily build cleanly at all times.
 
@@ -129,7 +133,8 @@ The desktop build previously had no map at all — the "Map" tab showed an empty
 A new, sixth tab in the bottom navigation (between Nodes and Map) that doesn't exist in the original app:
 
 - **7 metric categories** per node: power (battery/voltage/current), signal (SNR/RSSI/noise floor, with a hop-count fallback when there are no direct readings), network (channel/air utilization), environment (temperature/humidity/pressure), **resources** (node host CPU/memory/flash/PSRAM — requires custom firmware with extended telemetry), traffic (TX/RX/duplicates/relayed/corrupted), and neighbors.
-- **Android home-screen "Local Stats" widget** — shows live host CPU/Flash/PSRAM, persisted across app restarts.- Node list with sorting, pinning favorites to the top, hiding empty entries, and search; each metric's detail view is a chart over a 24h/7d/30d window.
+- **Android home-screen "Local Stats" widget** — shows live host CPU/Flash/PSRAM, persisted across app restarts.
+- Node list with sorting, pinning favorites to the top, hiding empty entries, and search; each metric's detail view is a chart over a 24h/7d/30d window.
 - **"Summary" screen** — cards with top-3 rankings: quietest nodes, best signal, most positions sent, physically closest nodes, most telemetry data, most messages (week/today), and more — all correctly exclude the locally connected device from the rankings so it doesn't skew results.
 - Data architecture: everything is decoded live from the existing mesh event log every time the screen is read — nothing is duplicated into a separate table, so the stats are always current and take no extra database space.
 
@@ -149,7 +154,11 @@ A new, sixth tab in the bottom navigation (between Nodes and Map) that doesn't e
 ## Branding and customization
 
 - A custom `applicationId`, so the app installs side by side with the original Meshtastic app without conflicting (separate data, both can be installed at once).
-- Changed name and icon for the app's main (persistent) notification, plus a custom app icon.
+- **Full visual rebrand** — the app and desktop build now have their own identity: the name MT_SW_APP everywhere in the UI and notifications, a custom icon (Świętokrzyskie voivodeship outline + "MT_SW" wordmark, replacing the earlier placeholder "MS+" mark), and a custom color palette (gold/navy instead of Meshtastic's default green branding) applied to the connection icon, the signed-node shield, and the last-heard time indicator throughout the app.
+- A dedicated system-tray icon for the desktop build, matching the rest of the branding.
+- The **"About" screen** now points to this fork's own repository (not the upstream project) and shows an explicit "unofficial fork, not affiliated with Meshtastic LLC" disclaimer — in line with the GPL-3.0 license and Meshtastic LLC's trademark policy.
+- **Fixed an overly harsh Alert (SOS) notification sound** — the alert channel had its own dedicated sound file played in alarm mode; the app now uses the default system notification sound, matching every other notification channel.
+- **Color-coded device connection status icon** — gold when connected, white while connecting/reconnecting, red when disconnected, yellow when the device is asleep; plus a brief flash of the icon itself and a matching glow, green when transmitting and blue when receiving data.
 - The desktop build renamed from "Meshtastic Desktop" to match the mobile app's name, with a Privacy section added to its settings (previously missing on desktop even though the underlying logic already existed).
 - Detection of the custom firmware edition used on the Świętokrzyskie network — the app shows a readable name instead of the raw technical value.
 - A generated PL translation file filling in roughly 1,000 previously untranslated strings (the app was only about 43% translated into Polish).

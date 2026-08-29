@@ -156,7 +156,7 @@
     <string name="bluetooth_feature_config">Konfiguracja</string>
     <string name="bluetooth_feature_config_description">Zarządzaj bezprzewodowo ustawieniami i kanałami swojego urządzenia.</string>
     <string name="bluetooth_feature_discovery">Odkrywanie</string>
-    <string name="bluetooth_feature_discovery_description">Znajdź i zidentyfikuj urządzenia Meshtastic_S+ w pobliżu.</string>
+    <string name="bluetooth_feature_discovery_description">Znajdź i zidentyfikuj urządzenia mesh w pobliżu.</string>
     <string name="bluetooth_permission">Bluetooth</string>
     <string name="bluetooth_scan_location_services_disabled">Usługi lokalizacji są wyłączone. Włącz je, aby wyszukać pobliskie urządzenia.</string>
     <string name="bluetooth_scan_missing_permission">Skanowanie Bluetooth wymaga uprawnień. Przyznaj uprawnienie Pobliskie urządzenia (lub Lokalizacja), aby wyszukać urządzenia.</string>
@@ -220,9 +220,9 @@
     <string name="chirpy_error_unknown">Ups! Trafiliśmy na spore straty pakietów albo zakłócenia sygnału! 📡 Spróbujmy wysłać to zapytanie ponownie.</string>
     <string name="chirpy_error_unsupported_flavor">Działam na ograniczonej częstotliwości w tej wersji appki! 🔌 Spróbuj wersji z pełną integracją AI Core.</string>
     <string name="chirpy_error_unsupported_platform">O nie! Moja antena nie potrafi nawiązać połączenia na tej platformie. 📡 Sprawdź zgodność swojego sprzętu!</string>
-    <string name="chirpy_intro">Cześć! 📡 Jestem Chirpy, Twój asystent Meshtastic_S+ działający na urządzeniu! Mogę pomóc z konfiguracją, ustawieniami, rozwiązywaniem problemów i wskazówkami dot. sieci mesh. W czym mogę pomóc?</string>
+    <string name="chirpy_intro">Cześć! 📡 Jestem Chirpy, Twój asystent MT_SW_APP działający na urządzeniu! Mogę pomóc z konfiguracją, ustawieniami, rozwiązywaniem problemów i wskazówkami dot. sieci mesh. W czym mogę pomóc?</string>
     <string name="chirpy_ready">Zapytaj Chirpy</string>
-    <string name="chirpy_search_placeholder">Zapytaj o Meshtastic_S+…</string>
+    <string name="chirpy_search_placeholder">Zapytaj o MT_SW_APP…</string>
     <string name="chirpy_suggested_pages_help">Oto strony dokumentacji, które mogą pomóc:</string>
     <string name="chirpy_thinking">Chirpy szuka drogi przez sieć mesh… 📡</string>
     <string name="choose_contrast">Poziom kontrastu</string>
@@ -266,7 +266,7 @@
     <!-- CONFIG -->
     <string name="config_device_doubleTapAsButtonPress_summary">Traktuj podwójne dotknięcie na obsługiwanych akcelerometrach jako naciśnięcie przycisku użytkownika.</string>
     <string name="config_device_ledHeartbeatEnabled_summary">Kontroluje miganie LED na urządzeniu. Dla większości urządzeń będzie to sterować jednym z maksymalnie 4 diod LED, ładowarka i diody GPS nie są sterowane.</string>
-    <string name="config_device_transmitOverLora_summary">Czy oprócz wysyłania do MQTT i PhoneAPI, NeighborInfo powinny być przesłane przez LoRa? Niedostępny na kanale z domyślnym kluczem i nazwą (z wyjątkiem FW_MT_SW).</string>
+    <string name="config_device_transmitOverLora_summary">Czy oprócz wysyłania do MQTT i PhoneAPI, NeighborInfo powinny być przesłane przez LoRa? Niedostępny na kanale z domyślnym kluczem i nazwą (z wyjątkiem MT_SW_FIRMWARE).</string>
     <string name="config_device_tripleClickAsAdHocPing_summary">Wyślij lokalizację na kanale głównym, gdy przycisk użytkownika jest trzykrotnie kliknięty.</string>
     <string name="config_device_tzdef_summary">Strefa czasowa dla dat na ekranie urządzenia i dzienniku.</string>
     <string name="config_device_use_phone_tz">Użyj strefy czasowej telefonu</string>
@@ -388,11 +388,11 @@
     <string name="desc_node_filter_clear">Wyczyść filtr</string>
     <string name="description">Opis</string>
     <!-- DESKTOP -->
-    <string name="desktop_notification_title">Meshtastic_S+</string>
+    <string name="desktop_notification_title">MT_SW_APP</string>
     <string name="desktop_tray_quit">Zakończ</string>
-    <string name="desktop_tray_show">Pokaż Meshtastic_S+</string>
-    <string name="desktop_tray_tooltip">Meshtastic_S+</string>
-    <string name="desktop_update_available_message">Meshtastic_S+ Desktop %1$s jest gotowy do pobrania.</string>
+    <string name="desktop_tray_show">Pokaż MT_SW_APP</string>
+    <string name="desktop_tray_tooltip">MT_SW_APP</string>
+    <string name="desktop_update_available_message">MT_SW_APP Desktop %1$s jest gotowy do pobrania.</string>
     <string name="desktop_update_available_title">Dostępna aktualizacja aplikacji</string>
     <string name="desktop_update_download">Pobierz aktualizację %1$s</string>
     <string name="details">Szczegóły</string>
@@ -431,7 +431,7 @@
     <!-- DISCOVERY -->
     <string name="discovery_analysing_results">Analizowanie wyników</string>
     <string name="discovery_cancelling_scan">Anulowanie skanowania</string>
-    <string name="discovery_connection_warning">Brak połączenia. Połącz się z urządzeniem Meshtastic_S+, aby rozpocząć skanowanie.</string>
+    <string name="discovery_connection_warning">Brak połączenia. Połącz się z urządzeniem mesh, aby rozpocząć skanowanie.</string>
     <string name="discovery_delete_session">Usuń sesję</string>
     <string name="discovery_delete_session_confirm">Czy na pewno chcesz usunąć tę sesję odkrywania? Tej operacji nie można cofnąć.</string>
     <string name="discovery_dwell_minutes">%1$d min</string>
@@ -449,7 +449,7 @@
     <string name="discovery_lora_presets_description">Wybierz jeden lub więcej presetów do przeskanowania</string>
     <string name="discovery_map">Mapa odkrywania</string>
     <string name="discovery_not_connected">Brak połączenia</string>
-    <string name="discovery_not_connected_description">Połącz się z urządzeniem Meshtastic_S+, aby rozpocząć skanowanie.</string>
+    <string name="discovery_not_connected_description">Połącz się z urządzeniem mesh, aby rozpocząć skanowanie.</string>
     <string name="discovery_paused">Wstrzymano: %1$s</string>
     <string name="discovery_preparing">Przygotowywanie skanu</string>
     <string name="discovery_preset_home_label">%1$s (domowy)</string>
@@ -515,7 +515,7 @@
     <string name="distance_filters">Filtry odległości</string>
     <string name="distance_filters_description">Filtruj listę węzłów i mapę sieci mesh na podstawie odległości od Twojego urządzenia.</string>
     <string name="distance_measurements">Pomiary odległości</string>
-    <string name="distance_measurements_description">Wyświetlaj odległość między Twoim urządzeniem a innymi węzłami Meshtastic_S+ z ustaloną pozycją.</string>
+    <string name="distance_measurements_description">Wyświetlaj odległość między Twoim urządzeniem a innymi węzłami mesh z ustaloną pozycją.</string>
     <string name="dns">DNS</string>
     <!-- DOC -->
     <string name="doc_clear_search">Wyczyść wyszukiwanie</string>
@@ -636,7 +636,7 @@
     <string name="external_notification_enabled">Powiadomienia zewnętrzne włączone</string>
     <string name="factory_reset">Ustawienia fabryczne</string>
     <string name="fair">wystarczający</string>
-    <string name="fallback_node_name">Meshtastic_S+ %1$s</string>
+    <string name="fallback_node_name">MT_SW_APP %1$s</string>
     <string name="favorite">Ulubiony</string>
     <string name="favorite_add">Dodać węzeł '%1$s' do ulubionych?</string>
     <string name="favorite_remove">Usunąć węzeł '%1$s' z ulubionych?</string>
@@ -662,7 +662,7 @@
     <!-- FIRMWARE -->
     <string name="firmware">Oprogramowanie</string>
     <string name="firmware_edition">Edycja firmware</string>
-    <string name="firmware_event_ended_banner">%1$s zakończone. Wróć do standardowego firmware Meshtastic_S+, aby przywrócić normalne funkcje.</string>
+    <string name="firmware_event_ended_banner">%1$s zakończone. Wróć do standardowego firmware MT_SW, aby przywrócić normalne funkcje.</string>
     <string name="firmware_event_ended_button">Zaktualizuj firmware</string>
     <string name="firmware_old">Oprogramowanie układowe radia jest zbyt stare, aby komunikować się z tą aplikacją. Aby uzyskać więcej informacji na ten temat, zobacz <a href="https://meshtastic.org/docs/getting-started/flashing-firmware">nasz przewodnik instalacji oprogramowania układowego</a>.</string>
     <string name="firmware_recovery_banner">Dokończ aktualizację %1$s</string>
@@ -715,9 +715,9 @@
     <string name="firmware_update_node_info_missing">Brak informacji o użytkowniku węzła.</string>
     <string name="firmware_update_not_found_in_release">Nie znaleziono firmware dla %1$s w wydaniu.</string>
     <string name="firmware_update_notification_android">Zainstalowano %1$s. Dostępna stabilna wersja %2$s. Otwórz Aktualizacje firmware, gdy będziesz gotowy.</string>
-    <string name="firmware_update_notification_flasher">Zainstalowano %1$s. Dostępna stabilna wersja %2$s. Otwórz Meshtastic_S+ Flasher, aby zaktualizować ten sprzęt.</string>
+    <string name="firmware_update_notification_flasher">Zainstalowano %1$s. Dostępna stabilna wersja %2$s. Otwórz MT_SW_APP Flasher, aby zaktualizować ten sprzęt.</string>
     <string name="firmware_update_open">Otwórz Aktualizacje firmware</string>
-    <string name="firmware_update_open_flasher">Otwórz Meshtastic_S+ Flasher</string>
+    <string name="firmware_update_open_flasher">Otwórz MT_SW_APP Flasher</string>
     <string name="firmware_update_ota_failed">Aktualizacja OTA nie powiodła się: %1$s</string>
     <string name="firmware_update_ota_unsupported_reason">Loader OTA tego urządzenia odrzucił żądaną metodę aktualizacji: %1$s</string>
     <string name="firmware_update_rak4631_bootloader_hint">Dla RAK WisBlock RAK4631 użyj narzędzia DFU producenta przez port szeregowy (np. adafruit-nrfutil dfu serial z dołączonym plikiem .zip bootloadera). Samo skopiowanie pliku .uf2 nie zaktualizuje bootloadera.</string>
@@ -920,7 +920,7 @@
     <string name="legacy_admin_channel">Stary kanał administracyjny</string>
     <string name="library_count">%1$d bibliotek</string>
     <string name="licensed_amateur_radio">Radioamator licencjonowany (Ham)</string>
-    <string name="licensed_amateur_radio_text">Włączenie tej opcji wyłącza szyfrowanie i jest niezgodne z domyślną siecią Meshtastic_S+.</string>
+    <string name="licensed_amateur_radio_text">Włączenie tej opcji wyłącza szyfrowanie i jest niezgodne z domyślną siecią MT_SW.</string>
     <string name="licensed_mode_enable_confirm">Włącz tryb licencjonowany</string>
     <string name="licensed_mode_enable_title">Włączyć tryb licencjonowany (Ham)?</string>
     <string name="licensed_mode_enable_warning">Tryb licencjonowany usuwa klucze szyfrowania kanałów i wyłącza kanał administracyjny, więc cały ruch jest wysyłany jako czysty tekst, który każdy może odczytać — a to firmware nie może go podpisać, więc inne węzły nie mogą zweryfikować, że pochodzi od Ciebie. Nie jest to zgodne z domyślną siecią Meshtastic, a Ty pozostajesz odpowiedzialny za spełnienie wymagań swojej licencji radioamatorskiej i lokalnych przepisów.</string>
@@ -1097,9 +1097,9 @@
     <string name="mesh_map_location">Lokalizacja na mapie sieci</string>
     <string name="mesh_map_location_description">Włącza niebieską kropkę lokalizacji Twojego telefonu na mapie sieci.</string>
     <!-- MESHTASTIC -->
-    <string name="meshtastic">Meshtastic_S+</string>
+    <string name="meshtastic">MT_SW_APP</string>
     <string name="meshtastic_alerts_notifications">Powiadomienia alertowe</string>
-    <string name="meshtastic_app_name">Meshtastic_S+</string>
+    <string name="meshtastic_app_name">MT_SW_APP</string>
     <string name="meshtastic_broadcast_notifications">Powiadomienia o wiadomościach rozgłoszeniowych</string>
     <string name="meshtastic_low_battery_notifications">Powiadomienia o niskim poziomie baterii</string>
     <string name="meshtastic_low_battery_temporary_remote_notifications">Powiadomienia o niskim poziomie baterii (ulubione węzły)</string>
@@ -1208,6 +1208,7 @@
     <string name="mute_status_muted_for_days">Wyciszono na %1$d dni, %2$s godzin</string>
     <string name="mute_status_muted_for_hours">Wyciszono na %1$s godzin</string>
     <string name="mute_status_unmuted">Nie wyciszony</string>
+    <string name="unofficial_fork_disclaimer">Nieoficjalny fork Meshtastic-Android. Niezwiązany z Meshtastic LLC ani przez nią niewspierany.</string>
     <string name="nag_timeout_seconds">Czas przypomnienia (sekundy)</string>
     <string name="name">Nazwa</string>
     <string name="name_cannot_be_empty">Nazwa nie może być pusta.</string>
@@ -1313,7 +1314,7 @@
     <string name="not_connected">Nie połączono</string>
     <string name="note">Notatka</string>
     <string name="notes">Notatki</string>
-    <string name="notification_permissions_description">Meshtastic_S+ używa powiadomień, aby informować Cię o nowych wiadomościach i innych ważnych zdarzeniach. Możesz zaktualizować uprawnienia powiadomień w każdej chwili w ustawieniach.</string>
+    <string name="notification_permissions_description">MT_SW_APP używa powiadomień, aby informować Cię o nowych wiadomościach i innych ważnych zdarzeniach. Możesz zaktualizować uprawnienia powiadomień w każdej chwili w ustawieniach.</string>
     <!-- NOTIFICATIONS -->
     <string name="notifications_for_channel_and_direct_messages">Powiadomienia o wiadomościach kanałowych i bezpośrednich.</string>
     <string name="notifications_for_low_battery_alerts">Powiadomienia o niskim poziomie baterii połączonego urządzenia.</string>
@@ -1338,7 +1339,7 @@
     <string name="open_bluetooth_settings">Otwórz ustawienia Bluetooth</string>
     <string name="open_compass">Otwórz kompas</string>
     <string name="open_settings">Otwórz ustawienia</string>
-    <string name="open_source_description">Meshtastic_S+ jest zbudowany z użyciem następujących bibliotek open source. Dotknij dowolną bibliotekę, aby zobaczyć jej licencję.</string>
+    <string name="open_source_description">MT_SW_APP jest zbudowany z użyciem następujących bibliotek open source. Dotknij dowolną bibliotekę, aby zobaczyć jej licencję.</string>
     <string name="open_source_libraries">Biblioteki open source</string>
     <string name="open_wifi_settings">Otwórz ustawienia Wi-Fi</string>
     <string name="options">Opcje</string>
@@ -1382,9 +1383,9 @@
     <string name="paxcounter_config">Konfiguracja Paxcounter</string>
     <string name="paxcounter_enabled">Paxcounter włączony</string>
     <string name="periodic_position_broadcast">Okresowe nadawanie pozycji</string>
-    <string name="permission_missing_31">Meshtastic_S+ potrzebuje uprawnienia "Urządzenia w pobliżu" w celu znalezienia i połączenia się z urządzeniem poprzez Bluetooth. Możesz wyłączyć, gdy nie jest używane.</string>
+    <string name="permission_missing_31">MT_SW_APP potrzebuje uprawnienia "Urządzenia w pobliżu" w celu znalezienia i połączenia się z urządzeniem poprzez Bluetooth. Możesz wyłączyć, gdy nie jest używane.</string>
     <string name="phone_location">Lokalizacja telefonu</string>
-    <string name="phone_location_description">Meshtastic_S+ używa lokalizacji Twojego telefonu, aby udostępnić szereg funkcji. Możesz zaktualizować uprawnienia lokalizacji w każdej chwili w ustawieniach.</string>
+    <string name="phone_location_description">MT_SW_APP używa lokalizacji Twojego telefonu, aby udostępnić szereg funkcji. Możesz zaktualizować uprawnienia lokalizacji w każdej chwili w ustawieniach.</string>
     <string name="play">Odtwórz</string>
     <plurals name="plurals_hours">
         <item quantity="one">%1$d godzina</item>
@@ -1707,7 +1708,7 @@
     <string name="slot">Slot</string>
     <string name="smart_position">Inteligentne Pozycjonowanie</string>
     <string name="snr">SNR:</string>
-    <string name="snr_definition">Współczynnik sygnału do szumu (Signal-to-Noise Ratio) - miara stosowana w komunikacji do określania poziomu pożądanego sygnału w stosunku do poziomu szumu tła. W Meshtastic_S+ i innych systemach bezprzewodowych wyższy współczynnik SNR oznacza czystszy sygnał, który może zwiększyć niezawodność i jakość transmisji danych.</string>
+    <string name="snr_definition">Współczynnik sygnału do szumu (Signal-to-Noise Ratio) - miara stosowana w komunikacji do określania poziomu pożądanego sygnału w stosunku do poziomu szumu tła. W MT_SW i innych systemach bezprzewodowych wyższy współczynnik SNR oznacza czystszy sygnał, który może zwiększyć niezawodność i jakość transmisji danych.</string>
     <string name="soil_moisture">Wilg. gleby</string>
     <string name="soil_temperature">Temp. gleby</string>
     <string name="speed">Prędkość</string>
@@ -1762,7 +1763,7 @@
     <string name="tak_server_status_not_running">Serwer TAK nie jest uruchomiony</string>
     <string name="tak_server_status_off">Wyłączony</string>
     <string name="tak_server_status_starting">Uruchamianie serwera TAK</string>
-    <string name="tak_server_status_unavailable">Lokalny serwer TAK jest dostępny w Meshtastic_S+ na Androida</string>
+    <string name="tak_server_status_unavailable">Lokalny serwer TAK jest dostępny w MT_SW_APP na Androida</string>
     <string name="tak_server_status_waiting">Nasłuchiwanie na 127.0.0.1:8089 — oczekiwanie na ATAK</string>
     <string name="tak_server_test_card_title">Test sieci mesh TAK (Debug)</string>
     <string name="tak_server_test_idle">Wyślij wszystkie %1$d fikstury testowe do sieci mesh</string>

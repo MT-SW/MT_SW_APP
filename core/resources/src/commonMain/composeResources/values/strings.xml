@@ -157,7 +157,7 @@
     <string name="bluetooth_feature_config">Configuration</string>
     <string name="bluetooth_feature_config_description">Wirelessly manage your device settings and channels.</string>
     <string name="bluetooth_feature_discovery">Discovery</string>
-    <string name="bluetooth_feature_discovery_description">Find and identify Meshtastic devices near you.</string>
+    <string name="bluetooth_feature_discovery_description">Find and identify mt compatible devices near you.</string>
     <string name="bluetooth_permission">Bluetooth</string>
     <string name="bluetooth_scan_location_services_disabled">Location services are off. Turn them on to scan for nearby devices.</string>
     <string name="bluetooth_scan_missing_permission">Bluetooth scan needs permission. Grant the Nearby devices (or Location) permission to find devices.</string>
@@ -219,9 +219,9 @@
     <string name="chirpy_error_unknown">Oops! We hit some heavy packet loss or signal interference! ­čôí Let's re-transmit that query and see if we can get through.</string>
     <string name="chirpy_error_unsupported_flavor">I'm operating on a limited frequency on this app flavor! ­čöî Try using a version with full AI Core integration.</string>
     <string name="chirpy_error_unsupported_platform">Oh no! My antenna can't seem to establish a connection on this platform. ­čôí Please double-check your hardware compatibility!</string>
-    <string name="chirpy_intro">Hey there! ­čôí I'm Chirpy, your on-device Meshtastic assistant! I can help with setup, configuration, troubleshooting, and mesh networking tips. What can I help you with?</string>
+    <string name="chirpy_intro">Hey there! ­čôí I'm Chirpy, your on-device MT_SW_APP assistant! I can help with setup, configuration, troubleshooting, and mesh networking tips. What can I help you with?</string>
     <string name="chirpy_ready">Ask Chirpy</string>
-    <string name="chirpy_search_placeholder">Ask about MeshtasticÔÇŽ</string>
+    <string name="chirpy_search_placeholder">Ask about MT_SW_APP</string>
     <string name="chirpy_suggested_pages_help">Here are some documentation pages that might help:</string>
     <string name="chirpy_thinking">Chirpy is routing through the meshÔÇŽ ­čôí</string>
     <string name="choose_contrast">Contrast level</string>
@@ -389,11 +389,11 @@
     <string name="desc_node_filter_clear">clear node filter</string>
     <string name="description">Description</string>
     <!-- DESKTOP -->
-    <string name="desktop_notification_title">Meshtastic</string>
+    <string name="desktop_notification_title">MT_SW_APP</string>
     <string name="desktop_tray_quit">Quit</string>
-    <string name="desktop_tray_show">Show Meshtastic</string>
-    <string name="desktop_tray_tooltip">Meshtastic Desktop</string>
-    <string name="desktop_update_available_message">Meshtastic Desktop %1$s is ready to download.</string>
+    <string name="desktop_tray_show">Show MT_SW_APP</string>
+    <string name="desktop_tray_tooltip">MT_SW_APP Desktop</string>
+    <string name="desktop_update_available_message">MT_SW_APP Desktop %1$s is ready to download.</string>
     <string name="desktop_update_available_title">App update available</string>
     <string name="desktop_update_download">Download update %1$s</string>
     <string name="details">Details</string>
@@ -432,7 +432,7 @@
     <!-- DISCOVERY -->
     <string name="discovery_analysing_results">Analyzing results</string>
     <string name="discovery_cancelling_scan">Cancelling scan</string>
-    <string name="discovery_connection_warning">Not connected. Connect to a Meshtastic device to start scanning.</string>
+    <string name="discovery_connection_warning">Not connected. Connect to a mt compatible device to start scanning.</string>
     <string name="discovery_delete_session">Delete Session</string>
     <string name="discovery_delete_session_confirm">Are you sure you want to delete this discovery session? This action cannot be undone.</string>
     <string name="discovery_dwell_minutes">%1$d min</string>
@@ -450,7 +450,7 @@
     <string name="discovery_lora_presets_description">Select one or more presets to scan</string>
     <string name="discovery_map">Discovery Map</string>
     <string name="discovery_not_connected">Not Connected</string>
-    <string name="discovery_not_connected_description">Connect to a Meshtastic device to start scanning.</string>
+    <string name="discovery_not_connected_description">Connect to a mt compatible device to start scanning.</string>
     <string name="discovery_paused">Paused: %1$s</string>
     <string name="discovery_preparing">Preparing scan</string>
     <string name="discovery_preset_home_label">%1$s (Home)</string>
@@ -516,7 +516,7 @@
     <string name="distance_filters">Distance Filters</string>
     <string name="distance_filters_description">Filter the node list and mesh map based on proximity to your phone.</string>
     <string name="distance_measurements">Distance Measurements</string>
-    <string name="distance_measurements_description">Display the distance between your phone and other Meshtastic nodes with positions.</string>
+    <string name="distance_measurements_description">Display the distance between your phone and other mt compatible nodes with positions.</string>
     <string name="dns">DNS</string>
     <!-- DOC -->
     <string name="doc_clear_search">Clear search</string>
@@ -639,7 +639,7 @@
     <string name="external_notification_enabled">External notification enabled</string>
     <string name="factory_reset">Factory reset</string>
     <string name="fair">Fair</string>
-    <string name="fallback_node_name">Meshtastic %1$s</string>
+    <string name="fallback_node_name">MT_SW_APP %1$s</string>
     <string name="favorite">Favorite</string>
     <string name="favorite_add">Add '%1$s' as a favorite node?</string>
     <string name="favorite_remove">Remove '%1$s' as a favorite node?</string>
@@ -665,7 +665,7 @@
     <!-- FIRMWARE -->
     <string name="firmware">Firmware</string>
     <string name="firmware_edition">Firmware Edition</string>
-    <string name="firmware_event_ended_banner">%1$s has ended. Return to standard Meshtastic firmware to restore normal features.</string>
+    <string name="firmware_event_ended_banner">%1$s has ended. Return to standard MT_SW firmware to restore normal features.</string>
     <string name="firmware_event_ended_button">Update firmware</string>
     <string name="firmware_old">The radio firmware is too old to talk to this application. For more information on this see <a href="https://meshtastic.org/docs/getting-started/flashing-firmware">our Firmware Installation guide</a>.</string>
     <string name="firmware_recovery_banner">Finish updating %1$s</string>
@@ -718,9 +718,9 @@
     <string name="firmware_update_node_info_missing">Node user information is missing.</string>
     <string name="firmware_update_not_found_in_release">Could not find firmware for %1$s in release.</string>
     <string name="firmware_update_notification_android">%1$s is installed. Stable %2$s is available. Open Firmware Updates when you're ready.</string>
-    <string name="firmware_update_notification_flasher">%1$s is installed. Stable %2$s is available. Open Meshtastic Flasher to update this hardware.</string>
+    <string name="firmware_update_notification_flasher">%1$s is installed. Stable %2$s is available. Open MT_SW_APP Flasher to update this hardware.</string>
     <string name="firmware_update_open">Open Firmware Updates</string>
-    <string name="firmware_update_open_flasher">Open Meshtastic Flasher</string>
+    <string name="firmware_update_open_flasher">Open MT_SW_APP Flasher</string>
     <string name="firmware_update_ota_failed">OTA update failed: %1$s</string>
     <string name="firmware_update_ota_unsupported_reason">This device's OTA loader rejected the requested update method: %1$s</string>
     <string name="firmware_update_rak4631_bootloader_hint">For RAK WisBlock RAK4631, use the vendor's serial DFU tool (for example, adafruit-nrfutil dfu serial with the provided bootloader .zip file). Copying the .uf2 file alone will not update the bootloader.</string>
@@ -925,7 +925,7 @@
     <string name="library_count">%1$d libraries</string>
     <!-- LICENSED -->
     <string name="licensed_amateur_radio">Licensed amateur radio (Ham)</string>
-    <string name="licensed_amateur_radio_text">Enabling this option disables encryption and is not compatible with the default Meshtastic network.</string>
+    <string name="licensed_amateur_radio_text">Enabling this option disables encryption and is not compatible with the default MT_SW network.</string>
     <string name="licensed_mode_enable_confirm">Enable licensed mode</string>
     <string name="licensed_mode_enable_title">Enable licensed (Ham) mode?</string>
     <string name="licensed_mode_enable_warning">Licensed mode removes channel encryption keys and disables the admin channel, so all traffic is sent as plaintext that anyone can read ÔÇö and this firmware cannot sign it, so other nodes cannot verify it came from you. This is not compatible with the default Meshtastic network, and you remain responsible for meeting your amateur radio license requirements and local regulations.</string>
@@ -1098,9 +1098,9 @@
     <string name="mesh_map_location">Mesh Map Location</string>
     <string name="mesh_map_location_description">Enables the blue location dot for your phone in the mesh map.</string>
     <!-- MESHTASTIC -->
-    <string name="meshtastic">Meshtastic</string>
+    <string name="meshtastic">MT_SW_APP</string>
     <string name="meshtastic_alerts_notifications">Alert notifications</string>
-    <string name="meshtastic_app_name">Meshtastic</string>
+    <string name="meshtastic_app_name">MT_SW_APP</string>
     <string name="meshtastic_broadcast_notifications">Broadcast message notifications</string>
     <string name="meshtastic_low_battery_notifications">Low battery notifications</string>
     <string name="meshtastic_low_battery_temporary_remote_notifications">Low battery notifications (favorite nodes)</string>
@@ -1209,13 +1209,14 @@
     <string name="mute_status_muted_for_days">Muted for %1$d days, %2$s hours</string>
     <string name="mute_status_muted_for_hours">Muted for %1$s hours</string>
     <string name="mute_status_unmuted">Not muted</string>
+    <string name="unofficial_fork_disclaimer">Unofficial fork of Meshtastic-Android. Not affiliated with or endorsed by Meshtastic LLC.</string>
     <string name="nag_timeout_seconds">Nag timeout (seconds)</string>
     <string name="name">Name</string>
     <string name="name_cannot_be_empty">Name cannot be empty.</string>
     <string name="navigate_back">Navigate Back</string>
     <string name="navigate_into_label">Navigate Into</string>
     <string name="need_hardware">Need Hardware?</string>
-    <string name="need_hardware_description">Meshtastic requires a compatible device. Our backers and partners offer ready-to-use hardware. Here are some of the most popular options.</string>
+    <string name="need_hardware_description">MT_SW requires a compatible device. Our backers and partners offer ready-to-use hardware. Here are some of the most popular options.</string>
     <string name="neighbor_info">Neighbor Info</string>
     <string name="neighbor_info_config">Neighbor Info Config</string>
     <string name="neighbor_info_enabled">Neighbor Info enabled</string>
@@ -1317,7 +1318,7 @@
     <string name="not_connected">Not connected</string>
     <string name="note">Note</string>
     <string name="notes">Notes</string>
-    <string name="notification_permissions_description">Meshtastic uses notifications to keep you updated on new messages and other important events. You can update your notification permissions at any time from settings.</string>
+    <string name="notification_permissions_description">MT_SW_APP uses notifications to keep you updated on new messages and other important events. You can update your notification permissions at any time from settings.</string>
     <!-- NOTIFICATIONS -->
     <string name="notifications_for_channel_and_direct_messages">Notifications for channel and direct messages.</string>
     <string name="notifications_for_low_battery_alerts">Notifications for low battery alerts for the connected device.</string>
@@ -1342,7 +1343,7 @@
     <string name="open_bluetooth_settings">Open Bluetooth settings</string>
     <string name="open_compass">Open Compass</string>
     <string name="open_settings">Open settings</string>
-    <string name="open_source_description">Meshtastic is built with the following open source libraries. Tap any library to view its license.</string>
+    <string name="open_source_description">MT_SW_APP is built with the following open source libraries. Tap any library to view its license.</string>
     <string name="open_source_libraries">Open Source Libraries</string>
     <string name="open_wifi_settings">Open Wi-Fi settings</string>
     <string name="options">Options</string>
@@ -1386,9 +1387,9 @@
     <string name="paxcounter_config">Paxcounter Config</string>
     <string name="paxcounter_enabled">Paxcounter enabled</string>
     <string name="periodic_position_broadcast">Periodic position broadcast</string>
-    <string name="permission_missing_31">Meshtastic needs "Nearby devices" permissions enabled to find and connect to devices via Bluetooth. You can disable when not in use.</string>
+    <string name="permission_missing_31">MT_SW_APP needs "Nearby devices" permissions enabled to find and connect to devices via Bluetooth. You can disable when not in use.</string>
     <string name="phone_location">Phone Location</string>
-    <string name="phone_location_description">Meshtastic uses your phone's location to enable a number of features. You can update your location permissions at any time from settings.</string>
+    <string name="phone_location_description">MT_SW_APP uses your phone's location to enable a number of features. You can update your location permissions at any time from settings.</string>
     <string name="play">Play</string>
     <plurals name="plurals_hours">
         <item quantity="one">%1$d hour</item>
@@ -1747,7 +1748,7 @@
     <string name="tak_server_export_data_package_desc">Generate .zip for ATAK to connect to this server</string>
     <string name="tak_server_loading">ÔÇŽ</string>
     <string name="tak_server_mesh_to_cot">Mesh to CoT Converter</string>
-    <string name="tak_server_mesh_to_cot_desc">Show Meshtastic nodes on the ATAK map as contacts</string>
+    <string name="tak_server_mesh_to_cot_desc">Show MT_SW nodes on the ATAK map as contacts</string>
     <string name="tak_server_section">Server</string>
     <string name="tak_server_status">Status</string>
     <plurals name="tak_server_status_connected">
@@ -1758,7 +1759,7 @@
     <string name="tak_server_status_not_running">TAK Server is not running</string>
     <string name="tak_server_status_off">Off</string>
     <string name="tak_server_status_starting">Starting TAK Server</string>
-    <string name="tak_server_status_unavailable">Local TAK Server is available in Meshtastic for Android</string>
+    <string name="tak_server_status_unavailable">Local TAK Server is available in MT_SW_APP for Android</string>
     <string name="tak_server_status_waiting">Listening on 127.0.0.1:8089 ÔÇö waiting for ATAK</string>
     <string name="tak_server_test_card_title">TAK Mesh Test (Debug)</string>
     <string name="tak_server_test_idle">Send all %1$d test fixtures to mesh</string>
@@ -1923,7 +1924,7 @@
     <string name="waypoint_received">Received waypoint: %1$s</string>
     <string name="website">Website</string>
     <string name="weight">Weight</string>
-    <string name="what_is_meshtastic">What is Meshtastic?</string>
+    <string name="what_is_meshtastic">What is MT_SW?</string>
     <string name="what_is_meshtastic_description">An open source, off-grid, decentralized, mesh network that runs on affordable, low-power radios.</string>
     <!-- WIFI -->
     <string name="wifi_config">WiFi Options</string>

@@ -78,6 +78,7 @@ import org.meshtastic.core.ui.icon.MapCompass
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Notes
 import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
+import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.proto.Config
 
@@ -514,7 +515,7 @@ internal fun StatusAwareLastHeard(lastHeard: Int, online: Boolean, contentColor:
         lastHeard = lastHeard,
         showLabel = false,
         relative = relative,
-        contentColor = if (online) MaterialTheme.colorScheme.StatusGreen else contentColor,
+        contentColor = if (online) MaterialTheme.colorScheme.StatusOnline else contentColor,
     )
 }
 
@@ -583,7 +584,7 @@ private fun NodeItemHeader(
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 StatusAwareLastHeard(
                     lastHeard = thatNode.lastHeard,
-                    online = !isThisNode && thatNode.isOnline,
+                    online = thatNode.isOnline,
                     contentColor = contentColor,
                 )
                 thatNode.deviceMetrics.uptime_seconds

@@ -172,7 +172,7 @@ compose.desktop {
         }
 
         nativeDistributions {
-            packageName = "Meshtastic_S+"
+            packageName = "MT_SW_APP"
 
             // Ensure critical JVM modules are included in the custom JRE bundled with the app.
             // jdeps might miss some of these if they are loaded via reflection or JNI.
@@ -240,7 +240,7 @@ compose.desktop {
             }
             windows {
                 iconFile.set(project.file("src/main/resources/icon.ico"))
-                menuGroup = "Meshtastic_S+"
+                menuGroup = "MT_SW_APP"
                 shortcut = true
                 menu = true
                 dirChooser = true
@@ -270,7 +270,7 @@ compose.desktop {
             val sanitizedVersion = Regex("^\\d+\\.\\d+\\.\\d+").find(versionInfo.versionName)?.value ?: "1.0.0"
             packageVersion = sanitizedVersion
 
-            description = "Meshtastic_S+ Desktop Application"
+            description = "MT_SW_APP Desktop"
             vendor = "Meshtastic LLC"
         }
     }

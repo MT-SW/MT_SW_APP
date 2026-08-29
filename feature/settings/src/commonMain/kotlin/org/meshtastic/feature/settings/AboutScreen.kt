@@ -77,6 +77,7 @@ import org.meshtastic.core.ui.icon.Memory
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.feature.settings.component.ExpressiveSection
+import org.meshtastic.core.resources.unofficial_fork_disclaimer
 
 private const val CAROUSEL_INTERVAL_MS = 3000L
 private const val CROSSFADE_DURATION_MS = 500
@@ -84,8 +85,8 @@ private val CAROUSEL_IMAGE_WIDTH = 110.dp
 private val CAROUSEL_IMAGE_HEIGHT = 130.dp
 
 private const val HARDWARE_URL = "https://meshtastic.org/#hardware"
-private const val GITHUB_REPO_URL = "https://github.com/meshtastic/Meshtastic-Android"
-private const val WEBSITE_URL = "https://meshtastic.org"
+private const val GITHUB_REPO_URL = "https://github.com/MT-SW/MT_SW_APP"
+private const val WEBSITE_URL = "https://mt-sw.pl"
 private const val DOCS_URL = "https://meshtastic.org/docs/getting-started"
 
 private data class PopularDevice(val name: String, val svgFileName: String)
@@ -219,13 +220,20 @@ private fun ProjectInformationSection(
 
 @Composable
 private fun CopyrightFooter(modifier: Modifier = Modifier) {
-    Text(
-        text = stringResource(Res.string.copyright_notice),
-        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp),
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        textAlign = TextAlign.Center,
-    )
+    Column(modifier = modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = stringResource(Res.string.unofficial_fork_disclaimer),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text = stringResource(Res.string.copyright_notice),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+    }
 }
 
 @Composable

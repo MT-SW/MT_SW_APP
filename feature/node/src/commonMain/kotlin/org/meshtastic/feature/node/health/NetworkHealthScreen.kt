@@ -32,7 +32,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import org.meshtastic.core.ui.component.MainAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -55,10 +55,15 @@ fun NetworkHealthScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = { Text("Zdrowie sieci") },
+            MainAppBar(
+                title = "Zdrowie sieci",
+                ourNode = null,
+                showNodeChip = false,
+                canNavigateUp = false,
+                onNavigateUp = {},
+                onClickChip = {},
                 actions = {
-                    androidx.compose.material3.IconButton(onClick = onSummaryClick) {
+                    IconButton(onClick = onSummaryClick) {
                         Text("📋", style = MaterialTheme.typography.titleLarge)
                     }
                 },

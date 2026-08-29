@@ -207,7 +207,7 @@ ksp { arg("appfunctions:aggregateAppFunctions", "true") }
 
 androidComponents {
     onVariants(selector().withBuildType("debug")) { variant ->
-        variant.flavorName?.let { flavor -> variant.applicationId.set("pl.swietokrzyskie.meshtastic.$flavor.debug") }
+        variant.flavorName?.let { flavor -> variant.applicationId.set("pl.sw.mt.$flavor.debug") }
     }
     onVariants(selector().withBuildType("release")) { variant ->
         if (variant.flavorName == "google") {

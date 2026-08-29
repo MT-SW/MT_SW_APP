@@ -97,7 +97,7 @@ import org.meshtastic.core.ui.icon.ShieldCheck
 import org.meshtastic.core.ui.icon.Snr
 import org.meshtastic.core.ui.icon.Verified
 import org.meshtastic.core.ui.icon.role
-import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
+import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.core.ui.util.formatAgo
 import org.meshtastic.proto.MeshPacket.TransportMechanism
@@ -365,7 +365,7 @@ private fun SignedNodeItem(modifier: Modifier = Modifier) {
         value = stringResource(Res.string.security_signed_node_desc),
         icon = MeshtasticIcons.ShieldCheck,
         modifier = modifier,
-        iconTint = MaterialTheme.colorScheme.StatusGreen,
+        iconTint = MaterialTheme.colorScheme.StatusOnline,
         iconSize = 20.dp,
         onClick = { showDialog = true },
     )

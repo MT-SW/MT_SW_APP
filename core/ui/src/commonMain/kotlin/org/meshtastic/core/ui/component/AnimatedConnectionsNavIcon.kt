@@ -32,13 +32,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.conflate
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.MeshActivity
-import org.meshtastic.core.ui.theme.StatusColors.StatusBlue
-import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
+import org.meshtastic.core.ui.theme.StatusColors.StatusReceive
+import org.meshtastic.core.ui.theme.StatusColors.StatusTransmit
 
 /**
  * A wrapper around [ConnectionsNavIcon] that adds a blinking glow effect when there is mesh activity (Send/Receive).
@@ -54,8 +55,8 @@ fun AnimatedConnectionsNavIcon(
     var currentGlowColor by remember { mutableStateOf(Color.Transparent) }
     val animatedGlowAlpha = remember { Animatable(0f) }
 
-    val sendColor = colorScheme.StatusGreen
-    val receiveColor = colorScheme.StatusBlue
+    val sendColor = colorScheme.StatusTransmit
+    val receiveColor = colorScheme.StatusReceive
 
     LaunchedEffect(meshActivityFlow, colorScheme) {
         meshActivityFlow.conflate().collect { activity ->
@@ -102,6 +103,9 @@ fun AnimatedConnectionsNavIcon(
             }
         },
     ) {
-        ConnectionsNavIcon(connectionState = connectionState, deviceType = deviceType)
+        val baseTint = getTint(connectionState)
+        val blendedTint = lerp(baseTint, currentGlowColor, animatedGlowAlpha.value)
+
+        ConnectionsNavIcon(connectionState = connectionState, deviceType = deviceType, tintOverride = blendedTint)
     }
 }
