@@ -23,20 +23,23 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
-import org.meshtastic.core.model.util.DistanceUnit
+import org.koin.compose.koinInject
+import org.meshtastic.core.common.util.LocaleUnitsProvider
+import org.meshtastic.core.common.util.MeasurementSystem
+import org.meshtastic.core.model.util.precisionRadiusMetersOrNull
 import org.meshtastic.core.model.util.toDistanceString
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.position_enabled
 import org.meshtastic.core.resources.precise_location
 import org.meshtastic.core.ui.theme.AppTheme
-import kotlin.math.pow
 import kotlin.math.roundToInt
 
 private const val POSITION_ENABLED = 32
@@ -46,9 +49,6 @@ private const val POSITION_PRECISION_MIN = 10
 private const val POSITION_PRECISION_MAX = 32
 private const val POSITION_PRECISION_DEFAULT = 13
 
-@Suppress("MagicNumber")
-fun precisionBitsToMeters(bits: Int): Double = 23905787.925008 * 0.5.pow(bits.toDouble())
-
 @Composable
 fun PositionPrecisionPreference(
     value: Int,
@@ -56,7 +56,13 @@ fun PositionPrecisionPreference(
     onValueChanged: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val unit = remember { DistanceUnit.getFromLocale() }
+    val unit =
+        if (LocalInspectionMode.current) {
+            // Previews and screenshot tests render with no Koin application; the value itself is arbitrary there.
+            MeasurementSystem.METRIC
+        } else {
+            koinInject<LocaleUnitsProvider>().measurementSystem.collectAsStateWithLifecycle().value
+        }
 
     Column(modifier = modifier) {
         SwitchPreference(
@@ -91,9 +97,9 @@ fun PositionPrecisionPreference(
                     steps = POSITION_PRECISION_MAX - POSITION_PRECISION_MIN - 1,
                 )
 
-                val precisionMeters = precisionBitsToMeters(value).toInt()
+                val precisionMeters = precisionRadiusMetersOrNull(value)?.toInt()
                 Text(
-                    text = "± ${precisionMeters.toDistanceString(unit)}",
+                    text = "± ${precisionMeters?.toDistanceString(unit).orEmpty()}",
                     modifier = Modifier.padding(bottom = 16.dp),
                     fontSize = MaterialTheme.typography.bodyLarge.fontSize,
                     overflow = TextOverflow.Ellipsis,

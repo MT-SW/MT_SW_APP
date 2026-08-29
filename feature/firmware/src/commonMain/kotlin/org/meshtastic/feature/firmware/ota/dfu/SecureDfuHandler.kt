@@ -23,6 +23,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.Single
 import org.meshtastic.core.ble.BleConnectionFactory
+import org.meshtastic.core.ble.BleDevice
+import org.meshtastic.core.ble.BleScanStartException
 import org.meshtastic.core.ble.BleScanner
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.common.util.ioDispatcher
@@ -37,6 +39,8 @@ import org.meshtastic.core.resources.firmware_update_downloading_percent
 import org.meshtastic.core.resources.firmware_update_enabling_dfu
 import org.meshtastic.core.resources.firmware_update_not_found_in_release
 import org.meshtastic.core.resources.firmware_update_ota_failed
+import org.meshtastic.core.resources.firmware_update_preparing_flash
+import org.meshtastic.core.resources.firmware_update_retrying_upload
 import org.meshtastic.core.resources.firmware_update_slow_bootloader_hint
 import org.meshtastic.core.resources.firmware_update_starting_dfu
 import org.meshtastic.core.resources.firmware_update_uploading
@@ -251,6 +255,19 @@ private fun DfuProtocolKind.serviceUuid(): Uuid = when (this) {
 }
 
 /**
+ * UI state for a [DfuUploadPhase] reported by the transport during the firmware transfer. PREPARING is a silent wait
+ * the user would otherwise read as a hang, so it is a [FirmwareUpdateState.Processing] with its own copy rather than an
+ * "Uploading 0%" that never moves.
+ */
+internal fun dfuUploadPhaseState(phase: DfuUploadPhase, uploadMsg: UiText, slowHint: UiText?): FirmwareUpdateState =
+    when (phase) {
+        DfuUploadPhase.PREPARING ->
+            FirmwareUpdateState.Processing(ProgressState(UiText.Resource(Res.string.firmware_update_preparing_flash)))
+
+        DfuUploadPhase.STREAMING -> FirmwareUpdateState.Updating(ProgressState(uploadMsg, 0f, hint = slowHint))
+    }
+
+/**
  * Drives the bounded Legacy/Secure DFU upload retry loop. Extracted from [SecureDfuHandler.runDfuUploadWithRetry] so
  * the retry policy can be unit-tested without bringing up the full BLE stack — callers supply a [runUploadSession]
  * lambda that returns the next [DfuUploadResult] and a [resetStaleBootloader] lambda that performs the fresh-connection
@@ -281,6 +298,7 @@ internal suspend fun runDfuRetryLoop(
     runUploadSession: suspend (LegacyDfuStreamProfile) -> DfuUploadResult,
     resetStaleBootloader: suspend () -> Unit,
     interAttemptDelay: suspend () -> Unit,
+    onRetryScheduled: (nextAttempt: Int, totalAttempts: Int) -> Unit = { _, _ -> },
 ): DfuUploadResult {
     var uploadAttempts = 0
     var staleResets = 0
@@ -373,7 +391,10 @@ internal suspend fun runDfuRetryLoop(
                         }
                     }
 
-                    if (uploadAttempts < activeAttempts) interAttemptDelay()
+                    if (uploadAttempts < activeAttempts) {
+                        onRetryScheduled(uploadAttempts + 1, activeAttempts)
+                        interAttemptDelay()
+                    }
                 }
             }
         }
@@ -559,13 +580,9 @@ class SecureDfuHandler(
 
         Logger.i { "DFU: detect — scanning for Legacy DFU service (${LegacyDfuUuids.SERVICE})" }
         val legacyHit =
-            scanForBleDevice(
-                scanner = bleScanner,
+            scanForBleDeviceTolerant(
                 tag = "DFU detect (legacy)",
                 serviceUuid = LegacyDfuUuids.SERVICE,
-                retryCount = 1,
-                retryDelay = 0.seconds,
-                scanTimeout = DETECT_SCAN_TIMEOUT,
                 predicate = { it.address in targetAddresses },
             )
 
@@ -578,19 +595,48 @@ class SecureDfuHandler(
 
         Logger.i { "DFU: detect — scanning for Secure DFU service (${SecureDfuUuids.SERVICE})" }
         val secureHit =
-            scanForBleDevice(
-                scanner = bleScanner,
+            scanForBleDeviceTolerant(
                 tag = "DFU detect (secure)",
                 serviceUuid = SecureDfuUuids.SERVICE,
-                retryCount = 1,
-                retryDelay = 0.seconds,
-                scanTimeout = DETECT_SCAN_TIMEOUT,
                 predicate = { it.address in targetAddresses },
             )
 
         val detection = if (secureHit != null) BootloaderDetection.SecureObserved else BootloaderDetection.Unknown
         Logger.i { "DFU: detect — secureHit=${secureHit != null}, result=$detection" }
         return detection
+    }
+
+    /**
+     * [scanForBleDevice] with `retryCount = 1`, `scanTimeout = DETECT_SCAN_TIMEOUT` — detection's fixed shape — but
+     * tolerant of Android's BLE scan-start quota: with no internal retry budget of its own, a throttled scan here would
+     * otherwise propagate straight out of [detectBootloaderProtocol] and abort the whole DFU attempt before a single
+     * reconnect attempt ran. Waits the reported cooldown (or the same detect timeout, if the failure carried none) and
+     * tries once more; if that also can't start a scan, returns null so detection degrades to
+     * [BootloaderDetection.Unknown] rather than crashing — the fallback coordinator still tries both protocols from
+     * there, now via [retryWithDelay]'s own scan-start-aware backoff.
+     */
+    private suspend fun scanForBleDeviceTolerant(
+        tag: String,
+        serviceUuid: Uuid,
+        predicate: (BleDevice) -> Boolean,
+    ): BleDevice? {
+        repeat(2) { pass ->
+            try {
+                return scanForBleDevice(
+                    scanner = bleScanner,
+                    tag = tag,
+                    serviceUuid = serviceUuid,
+                    retryCount = 1,
+                    retryDelay = 0.seconds,
+                    scanTimeout = DETECT_SCAN_TIMEOUT,
+                    predicate = predicate,
+                )
+            } catch (e: BleScanStartException) {
+                Logger.w(e) { "$tag: scan could not start (${e.reason}), pass ${pass + 1}/2" }
+                if (pass == 0) delay(e.retryAfter ?: DETECT_SCAN_TIMEOUT)
+            }
+        }
+        return null
     }
 
     /**
@@ -611,6 +657,13 @@ class SecureDfuHandler(
         runUploadSession = { profile -> runUploadSession(protocol, target, pkg, profile, updateState) },
         resetStaleBootloader = { resetStaleBootloader(protocol, target) },
         interAttemptDelay = { delay(SESSION_RETRY_DELAY_MS) },
+        onRetryScheduled = { next, total ->
+            updateState(
+                FirmwareUpdateState.Processing(
+                    ProgressState(UiText.Resource(Res.string.firmware_update_retrying_upload, next, total)),
+                ),
+            )
+        },
     )
 
     private fun createTransport(
@@ -687,7 +740,10 @@ class SecureDfuHandler(
             val firmwareSize = pkg.firmware.size
             val throughputTracker = ThroughputTracker()
             transport
-                .transferFirmware(pkg.firmware) { progress ->
+                .transferFirmware(
+                    pkg.firmware,
+                    onPhase = { phase -> updateState(dfuUploadPhaseState(phase, uploadMsg, slowHint)) },
+                ) { progress ->
                     val bytesSent = (progress * firmwareSize).toLong()
                     throughputTracker.record(bytesSent)
                     val details = formatTransferProgress(progress, firmwareSize, throughputTracker.bytesPerSecond())

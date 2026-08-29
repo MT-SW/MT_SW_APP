@@ -30,9 +30,9 @@ import androidx.compose.ui.semantics.semantics
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.GPSFormat
+import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.model.Node
-import org.meshtastic.core.model.util.metersIn
-import org.meshtastic.core.model.util.toString
+import org.meshtastic.core.model.util.toElevationString
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.copy
 import org.meshtastic.core.resources.elevation_suffix
@@ -45,15 +45,11 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.core.ui.util.formatAgo
 import org.meshtastic.core.ui.util.rememberOpenMap
-import org.meshtastic.proto.Config
 import org.meshtastic.proto.Position as WirePosition
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun LinkedCoordinatesItem(
-    node: Node,
-    displayUnits: Config.DisplayConfig.DisplayUnits = Config.DisplayConfig.DisplayUnits.METRIC,
-) {
+fun LinkedCoordinatesItem(node: Node, displayUnits: MeasurementSystem = MeasurementSystem.METRIC) {
     val clipboard: Clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
     val openMap = rememberOpenMap()
@@ -66,7 +62,7 @@ fun LinkedCoordinatesItem(
     val elevationText =
         node.validPosition?.altitude?.let { altitude ->
             val suffix = stringResource(Res.string.elevation_suffix)
-            " • ${altitude.metersIn(displayUnits).toString(displayUnits)} $suffix"
+            " • ${altitude.toElevationString(displayUnits)} $suffix"
         } ?: ""
 
     val copyLabel = stringResource(Res.string.copy)

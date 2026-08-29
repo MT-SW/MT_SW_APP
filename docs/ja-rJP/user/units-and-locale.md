@@ -2,13 +2,19 @@
 title: 単位・計測・ロケール
 parent: User Guide
 nav_order: 16
-last_updated: 2026-07-08
+last_updated: 2026-08-27
 description: アプリが、デバイスのロケールに基づいて温度・距離・速度などの計測値をどう表示するかを説明します。
+aliases:
+  - measurement
+  - units
+  - locale
+  - metric
+  - imperial
 ---
 
 # 単位・計測・ロケール
 
-Meshtastic アプリは、温度・距離・速度・時刻を、デバイスで設定されている単位で自動的に表示します。アプリ内で変更する設定はありません。
+The Meshtastic app automatically displays temperatures, distances, speeds, and times in the units your device is configured to use. If your device's settings can't express the units you want, an in-app **Units** setting overrides them.
 
 ---
 
@@ -18,9 +24,17 @@ Meshtastic の無線機は、常に**メートル法の単位**（メートル�
 
 Android では、計測の設定はシステムの**言語と地域**の設定によって決まります。 デスクトップ（JVM）では、アプリは JVM のデフォルトの `Locale` を使用します。
 
-> 💡 **ヒント：** アプリ内で単位を切り替える必要はまったくありません。 システムの計測設定を変更すると、Meshtastic のすべての画面（ノードの詳細、テレメトリのグラフ、天気、標高など）が自動的に更新されます。
+Units follow your device's **region**, not the display language. Choosing a plain language — like **English** in the app's own Language setting or Android's per-app language — keeps the region your device is set to; only a choice that names a region of its own (like **English (Canada)**) brings that region's units with it. On Android 16+, the system-wide **Measurement system** preference overrides the region entirely.
+
+> 💡 **Tip:** By default there is nothing to configure — change your system measurement preferences and every screen in Meshtastic updates automatically. If your device offers no working region or measurement setting (some manufacturer builds don't), set **Settings → Units** in the app instead.
 
 ---
+
+## The Radio's Own Screen Is Separate
+
+**Device → Display → Units** configures the screen on the radio, not the app. So do **Use 12-Hour Clock** and **Always Point North** — all three apply to the node's display only. Temperature on that screen has its own setting, [**Telemetry → Display Fahrenheit**](https://meshtastic.org/docs/configuration/module/telemetry#display-fahrenheit).
+
+If your node list shows miles while the radio's screen shows kilometres, this is why: the two are set in different places. Changing the device setting will never alter what the app displays. See the [Display Config](https://meshtastic.org/docs/configuration/radio/display) guide on meshtastic.org for the device-side options.
 
 ## 温度
 
@@ -34,6 +48,8 @@ Android では、計測の設定はシステムの**言語と地域**の設定�
 | 華氏     | 72°F |
 
 これは、アプリ全体のすべての温度表示に影響します：ノードの環境テレメトリ、土壌温度、露点、テレメトリグラフの軸。
+
+Temperature follows your locale's **temperature preference**, independent of the distance system. Locales that mix systems work correctly — a UK phone shows miles for distance but **°C** for temperature. On Android 14+, the **Temperature** regional preference (Settings → System → Languages → Regional preferences) overrides the locale default.
 
 ## 距離と標高
 
@@ -66,23 +82,32 @@ GPS の対地速度は、ロケールで優先される速度単位で表示さ�
 
 ## 風力
 
-環境センサーの風速と突風のデータは **m/s** で送信され、表示用に変換されます。
+Wind speed, gust and lull are transmitted by the sensor as **m/s** and converted for display — the app shows the unit weather forecasts use in your region, not the raw sensor unit.
 
-| あなたの設定       | 表示     |
-| ------------ | ------ |
-| メートル法        | 5 m/s  |
-| ヤード・ポンド法（米国） | 11 mph |
+| あなたの設定       | 表示                        |
+| ------------ | ------------------------- |
+| メートル法        | 18.0 km/h |
+| ヤード・ポンド法（米国） | 11.2 mph  |
 
-風の測定値は、「**ノードの詳細**」の環境セクションと「**環境テレメトリ**」のグラフに表示されます。
+All three read in the same unit wherever they appear: the Node Detail environment section, the Environment Telemetry log, and the charts.
+
+## 重さ
+
+Readings from a connected scale are transmitted in **kg** and converted for display.
+
+| あなたの設定       | 表示                      |
+| ------------ | ----------------------- |
+| メートル法        | 1.50 kg |
+| ヤード・ポンド法（米国） | 3.31 lb |
 
 ## 降水量
 
 降水量の測定値（1 時間および 24 時間の合計）は **mm** で送信され、表示用に変換されます。
 
-| あなたの設定       | 表示                     |
-| ------------ | ---------------------- |
-| メートル法        | 12 mm                  |
-| ヤード・ポンド法（米国） | 0.5 in |
+| あなたの設定       | 表示                      |
+| ------------ | ----------------------- |
+| メートル法        | 12.0 mm |
+| ヤード・ポンド法（米国） | 0.47 in |
 
 ## 変わらない単位
 
@@ -92,7 +117,7 @@ GPS の対地速度は、ロケールで優先される速度単位で表示さ�
 | ------------- | ----- | ----------- |
 | 大気圧           | hPa   | 国際的な気象標準    |
 | 方位／進行方向       | °（度）  | 普遍的な航法の慣例   |
-| 放射線           | μR/hr | 標準的な線量測定の単位 |
+| 放射線           | µR/h  | 標準的な線量測定の単位 |
 | GPS 座標        | 十進法の度 | 普遍的な地理標準    |
 | 湿度、バッテリー、土壌水分 | %     | 普遍的         |
 
@@ -107,13 +132,33 @@ GPS の対地速度は、ロケールで優先される速度単位で表示さ�
 
 アプリは、意味がある場面では**相対時間**も使用します。たとえばノードリストの「5 分前」や「2 時間前」で、これらはデバイスの言語に自動的にローカライズされます。
 
-## 計測系を変更する（Android）
+## Changing Your Measurement System
 
-Android では、計測系（メートル法かヤード・ポンド法か）は地域設定に連動しています：
+By default the app follows your device, and your measurement system (metric vs imperial) is tied to your region setting:
 
 1. 「**Android の設定 → システム → 言語と地域**」を開きます
-2. 「**地域**」または「**計測単位**」の設定を変更します
-3. Meshtastic に戻ります。値がすぐに更新されます
+2. Change your **Region**
+3. On Android 16+, **Measurement system** overrides the region for every measurement
+4. On Android 14+, temperature can be overridden on its own under **Regional preferences → Temperature**
+5. Meshtastic に戻ります。値がすぐに更新されます
+
+Not every English region is fully metric. **English (United Kingdom)** uses miles and feet for distance, so the node list shows miles and altitude in feet. For metric distances, set the app's **Units** setting to Metric (below), or choose a fully metric region such as English (Canada), English (Ireland), or English (New Zealand).
+
+Some phones do not offer the **Regional preferences** menu at all and list only English (United States). On those devices, use the app's **Units** setting below.
+
+### Overriding the units in the app
+
+Not every device can express every preference — some manufacturer builds ship no regional preferences at all, some
+offer only one English variant, and UK regions are imperial for distance even if you'd rather read altitude in
+metres. For those cases the app has its own switch:
+
+1. Open **Meshtastic Settings → Units**
+2. Choose **System default**, **Metric**, or **Imperial**
+3. Every screen updates immediately — no restart needed
+
+**System default** follows your device as described above. Forcing **Metric** or **Imperial** applies to
+everything, temperature included (metric → °C, imperial → °F), even where the device's own regional preferences say
+otherwise. The setting exists on Android and Desktop alike.
 
 > 💡 **ヒント：** すべての計測値の書式は一元的に処理され、プラットフォームのロケールに従うため、単位はアプリ全体で一貫しています。
 
@@ -123,6 +168,7 @@ Android では、計測系（メートル法かヤード・ポンド法か）は
 - [テレメトリとセンサー](telemetry-and-sensors)：これらの計測値を生成するセンサー
 - [計測と書式](../developer/measurement)：書式ユーティリティの開発者向けリファレンス
 - [設定：無線機とユーザー](settings-radio-user)：単位の選択を決める地域設定
+- [Display Config](https://meshtastic.org/docs/configuration/radio/display) — units, clock, and compass settings for the radio's own screen, on meshtastic.org
 
 ---
 

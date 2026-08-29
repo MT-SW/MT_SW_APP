@@ -30,6 +30,7 @@ import org.meshtastic.core.common.BuildConfigProvider
 import org.meshtastic.core.common.database.DatabaseManager
 import org.meshtastic.core.common.state.HiddenFeaturesUnlock
 import org.meshtastic.core.common.util.CommonUri
+import org.meshtastic.core.common.util.UnitsOverride
 import org.meshtastic.core.domain.usecase.settings.ExportDataUseCase
 import org.meshtastic.core.domain.usecase.settings.ExportNodeDatabaseUseCase
 import org.meshtastic.core.domain.usecase.settings.IsOtaCapableUseCase
@@ -117,6 +118,10 @@ class SettingsViewModel(
         databaseManager.setCacheLimit(limit)
     }
 
+    /** How many currently-cached device databases would be evicted if the cache limit were lowered to [limit]. */
+    suspend fun cachedDeviceCountExceeding(limit: Int): Int =
+        (databaseManager.cachedDeviceDbCount() - limit).coerceAtLeast(0)
+
     // Notifications
     val messagesEnabled = notificationPrefs.messagesEnabled
     val nodeEventsEnabled = notificationPrefs.nodeEventsEnabled
@@ -151,6 +156,12 @@ class SettingsViewModel(
 
     fun setTheme(theme: Int) {
         uiPrefs.setTheme(theme)
+    }
+
+    val unitsOverride = uiPrefs.unitsOverride
+
+    fun setUnitsOverride(override: UnitsOverride) {
+        uiPrefs.setUnitsOverride(override.value)
     }
 
     val showFullMessageTimestamps = uiPrefs.showFullMessageTimestamps

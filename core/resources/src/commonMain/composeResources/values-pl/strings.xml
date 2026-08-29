@@ -234,6 +234,7 @@
     <string name="clean_nodes_older_than">Wyczyść węzły, które są starsze niż %1$d dni</string>
     <string name="clean_now">Wyczyść teraz</string>
     <string name="clean_unknown_nodes">Wyczyść tylko nieznane węzły</string>
+    <!-- CLEAR -->
     <string name="clear">Czyść</string>
     <string name="clear_selection">Wyczyść zaznaczenie</string>
     <string name="clear_time_zone">Wyczyść strefę czasową</string>
@@ -330,6 +331,8 @@
     <string name="currently">Obecnie:</string>
     <string name="datadog_link" translatable="false">Datadog: https://www.datadoghq.com/</string>
     <string name="date">Data</string>
+    <string name="date_separator_today">Dziś</string>
+    <string name="date_separator_yesterday">Wczoraj</string>
     <string name="dbm_value">%1$d dBm</string>
     <!-- DEBUG -->
     <string name="debug">Debugowanie</string>
@@ -957,6 +960,7 @@
     <string name="local_stats_updated_at">%1$s</string>
     <string name="local_stats_uptime">Czas pracy: %1$s</string>
     <string name="local_stats_utilization">ChUtil: %1$s% | AirTX: %2$s%</string>
+    <!-- LOCATION -->
     <string name="location_disabled">Brak dostępu do lokalizacji, nie można udostępnić pozycji w sieci mesh.</string>
     <string name="location_sharing">Udostępnianie lokalizacji</string>
     <!-- LOCKDOWN -->
@@ -1383,10 +1387,12 @@
     <string name="paxcounter_config">Konfiguracja Paxcounter</string>
     <string name="paxcounter_enabled">Paxcounter włączony</string>
     <string name="periodic_position_broadcast">Okresowe nadawanie pozycji</string>
+    <!-- PERMISSION -->
     <string name="permission_missing_31">MT_SW_APP potrzebuje uprawnienia "Urządzenia w pobliżu" w celu znalezienia i połączenia się z urządzeniem poprzez Bluetooth. Możesz wyłączyć, gdy nie jest używane.</string>
+    <!-- PERMISSIONS -->
     <string name="phone_location">Lokalizacja telefonu</string>
     <string name="phone_location_description">MT_SW_APP używa lokalizacji Twojego telefonu, aby udostępnić szereg funkcji. Możesz zaktualizować uprawnienia lokalizacji w każdej chwili w ustawieniach.</string>
-    <string name="play">Odtwórz</string>
+    <string name="pin_selected">Pin</string>    <string name="play">Odtwórz</string>
     <plurals name="plurals_hours">
         <item quantity="one">%1$d godzina</item>
         <item quantity="few">%1$d godzin</item>
@@ -1729,6 +1735,8 @@
     <string name="super_deep_sleep_duration_seconds">Czas trwania głębokiego uśpienia</string>
     <string name="supported">Obsługiwane</string>
     <string name="supported_by_community">Wspierane przez społeczność Meshtastic</string>
+    <string name="swipe_action_delete">Usuń</string>
+    <string name="swipe_action_mute">Wycisz</string>
     <string name="sx126x_rx_boosted_gain">Wzmocniony zysk RX</string>
     <string name="system_settings">Ustawienia systemowe</string>
     <!-- TAK -->
@@ -1871,6 +1879,8 @@
     <string name="type">Typ</string>
     <string name="type_a_message">Napisz wiadomość</string>
     <string name="udp_enabled">Nadawanie UDP</string>
+    <!-- UNITS -->
+    <string name="units_follow_system">Domyślny systemu</string>
     <!-- UNKNOWN -->
     <string name="unknown">Nieznany</string>
     <string name="unknown_age">Unknown Age</string>

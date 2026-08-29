@@ -46,9 +46,14 @@ actual fun rememberSaveFileLauncher(
 @Composable
 actual fun rememberOpenFileLauncher(onUriReceived: (CommonUri?) -> Unit): (mimeType: String) -> Unit = { _ -> }
 
+@Composable actual fun rememberOpenDocumentTreeLauncher(onTreeUriSelect: (CommonUri?) -> Unit): () -> Unit = {}
+
 @Composable actual fun rememberReadTextFromUri(): suspend (uri: CommonUri, maxChars: Int) -> String? = { _, _ -> null }
 
-@Composable actual fun KeepScreenOn(enabled: Boolean) {}
+@Composable
+actual fun KeepScreenOn(enabled: Boolean) {
+    // No-op iOS stub.
+}
 
 @Composable actual fun rememberOpenLocationSettings(): () -> Unit = {}
 
@@ -56,13 +61,18 @@ actual fun rememberOpenFileLauncher(onUriReceived: (CommonUri?) -> Unit): (mimeT
 
 @Composable actual fun rememberOpenWifiSettings(): () -> Unit = {}
 
+actual val bleScanRequiresLocationServices: Boolean = false
+
 @Composable actual fun isGpsDisabled(): Boolean = false
 
 @Composable actual fun isBluetoothDisabled(): Boolean = false
 
 @Composable actual fun isWifiUnavailable(): Boolean = false
 
-@Composable actual fun SetScreenBrightness(brightness: Float) {}
+@Composable
+actual fun SetScreenBrightness(brightness: Float) {
+    // No-op iOS stub.
+}
 
 @Composable actual fun rememberOpenAppSettings(): () -> Unit = {}
 

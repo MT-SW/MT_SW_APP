@@ -92,6 +92,11 @@ interface UiPrefs {
 
     fun setTheme(value: Int)
 
+    /** The in-app units choice as a [org.meshtastic.core.common.util.UnitsOverride] value; 0 follows the OS locale. */
+    val unitsOverride: StateFlow<Int>
+
+    fun setUnitsOverride(value: Int)
+
     val locale: StateFlow<String>
 
     fun setLocale(languageTag: String)
@@ -416,6 +421,14 @@ interface TakPrefs {
     val isMeshToCotEnabled: StateFlow<Boolean>
 
     fun setMeshToCotEnabled(enabled: Boolean)
+
+    /**
+     * Meshtastic channel index used for outbound TAK traffic (TAK client -> mesh). Parity with iOS's `takServerChannel`
+     * setting and the legacy ATAK plugin's channel option. Defaults to 0 (the primary channel).
+     */
+    val takServerChannel: StateFlow<Int>
+
+    fun setTakServerChannel(index: Int)
 }
 
 /** Reactive interface for App Functions (system AI integration) preferences. */

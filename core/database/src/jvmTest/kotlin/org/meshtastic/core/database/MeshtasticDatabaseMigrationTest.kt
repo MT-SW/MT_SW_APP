@@ -26,6 +26,7 @@ import kotlin.io.path.Path
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * Creates the earliest exported schema (v3) and walks every auto-migration up to the current version, validating the
@@ -63,8 +64,212 @@ class MeshtasticDatabaseMigrationTest {
     @Test
     fun migrateAll() = runTest {
         helper.createDatabase(EARLIEST_SCHEMA_VERSION).close()
-        // No manual migrations: every version bump is an @AutoMigration, so Room derives the full path itself.
-        helper.runMigrationsAndValidate(latestSchemaVersion(), emptyList()).close()
+        // Every bump through 52 is an @AutoMigration; 52→53 is the manual FTS-rebuild migration.
+        helper.runMigrationsAndValidate(latestSchemaVersion(), listOf(MeshtasticDatabase.MIGRATION_52_53)).close()
+    }
+
+    /**
+     * The 50→51 and 51→52 auto-migrations both recreate `packet` (DROP + RENAME) underneath the `packet_fts` FTS5
+     * external-content table. In production (2.8.1, build 29321949) upgraders came out of that chain with the FTS
+     * shadow tables desynced from the content table, and every later packet write failed with SQLITE_CORRUPT_VTAB (267,
+     * "database disk image is malformed") — permanently, since the sync triggers surface the desync on each write
+     * instead of repairing it. [MeshtasticDatabase.MIGRATION_52_53] rebuilds the index; this proves a populated index
+     * comes out of the chain consistent for the exact write shapes that stormed in the field.
+     */
+    @Test
+    fun ftsIndexSurvivesPacketTableRecreations() = runTest {
+        helper.createDatabase(RSSI_NULLABLE_FROM_VERSION).use { connection ->
+            // Simulate a live install: Room's runtime sync triggers exist and the index is populated through them.
+            FTS_SYNC_TRIGGERS.forEach(connection::execSQL)
+            connection.execSQL(
+                "INSERT INTO packet (uuid, myNodeNum, port_num, contact_key, received_time, read, data, snr, rssi, " +
+                    "message_text) VALUES (1, 42, 1, '0^all', 1000, 0, '{}', 5.0, -70, 'hello mesh world')",
+            )
+            connection.execSQL(
+                "INSERT INTO packet (uuid, myNodeNum, port_num, contact_key, received_time, read, data, snr, rssi, " +
+                    "message_text) VALUES (2, 42, 1, '0^all', 2000, 0, '{}', 5.0, -70, 'second message here')",
+            )
+            assertEquals(
+                listOf("1"),
+                queryColumn(connection, "SELECT rowid FROM packet_fts WHERE packet_fts MATCH 'hello'"),
+            )
+        }
+
+        val migrated =
+            helper.runMigrationsAndValidate(FTS_REBUILD_TO_VERSION, listOf(MeshtasticDatabase.MIGRATION_52_53))
+        migrated.use { connection ->
+            // Room recreates the sync triggers on open; the migrations dropped them with the old packet table.
+            FTS_SYNC_TRIGGERS.forEach(connection::execSQL)
+            // rank=1 verifies the index against the external-content table, not just its internal shape.
+            connection.execSQL("INSERT INTO packet_fts(packet_fts, rank) VALUES('integrity-check', 1)")
+            // Both rows and their text survived the two table recreations before anything mutates them.
+            assertEquals(listOf("1", "2"), queryColumn(connection, "SELECT uuid FROM packet ORDER BY uuid"))
+            assertEquals(
+                listOf("hello mesh world", "second message here"),
+                queryColumn(connection, "SELECT message_text FROM packet ORDER BY uuid"),
+            )
+            // The write shapes that stormed with error 267 in the field: clearUnreadCount and message deletion.
+            connection.execSQL("UPDATE packet SET read = 1 WHERE contact_key = '0^all'")
+            connection.execSQL("DELETE FROM packet WHERE uuid = 2")
+            connection.execSQL("INSERT INTO packet_fts(packet_fts, rank) VALUES('integrity-check', 1)")
+            assertEquals(
+                listOf("1"),
+                queryColumn(connection, "SELECT rowid FROM packet_fts WHERE packet_fts MATCH 'hello'"),
+            )
+            assertTrue(
+                queryColumn(connection, "SELECT rowid FROM packet_fts WHERE packet_fts MATCH 'second'").isEmpty(),
+            )
+        }
+    }
+
+    /**
+     * 54→55 adds the `maintenance_uf2_cache` table. [migrateAll] only proves the resulting schema validates from an
+     * empty database; this proves an existing install's rows are untouched by the addition — specifically the
+     * `bootloader_ota_quirks_cache` row added one version earlier, whose `softDeviceVariants` table gates a destructive
+     * flash and must survive the upgrade rather than silently reverting to the bundled seed.
+     */
+    @Test
+    fun maintenanceUf2TableAddedWithoutDisturbingTheQuirksCache() = runTest {
+        helper.createDatabase(MAINTENANCE_UF2_FROM_VERSION).use { connection ->
+            connection.execSQL(
+                "INSERT INTO bootloader_ota_quirks_cache (id, devices_json, soft_device_variants_json) " +
+                    "VALUES (0, '[{\"hwModel\":\"HELTEC_V3\"}]', '[{\"target\":\"rak4631\",\"variant\":\"7.3.0\"}]')",
+            )
+        }
+
+        helper.runMigrationsAndValidate(
+            MAINTENANCE_UF2_TO_VERSION,
+            listOf(MeshtasticDatabase.MIGRATION_52_53),
+        ).use { connection ->
+            assertEquals(
+                listOf("[{\"target\":\"rak4631\",\"variant\":\"7.3.0\"}]"),
+                queryColumn(connection, "SELECT soft_device_variants_json FROM bootloader_ota_quirks_cache"),
+            )
+            assertEquals(
+                listOf("[{\"hwModel\":\"HELTEC_V3\"}]"),
+                queryColumn(connection, "SELECT devices_json FROM bootloader_ota_quirks_cache"),
+            )
+            // The new table exists, is empty, and accepts the single row the repository writes.
+            assertTrue(queryColumn(connection, "SELECT manifest_json FROM maintenance_uf2_cache").isEmpty())
+            connection.execSQL("INSERT INTO maintenance_uf2_cache (id, manifest_json) VALUES (0, '{}')")
+            assertEquals(listOf("{}"), queryColumn(connection, "SELECT manifest_json FROM maintenance_uf2_cache"))
+        }
+    }
+
+    /**
+     * 55→56 adds `contact_settings.draft`. [migrateAll] only proves the resulting schema validates from an empty
+     * database; this proves an existing install's per-conversation state survives the addition — mute, last-read and
+     * filtering are what stop a notification firing for a muted channel or re-announcing a message already read, so
+     * they must not revert to defaults on upgrade. The new column must arrive as an empty string, because the draft UI
+     * treats blank as "nothing in progress" and NULL would surface as a phantom draft row.
+     */
+    @Test
+    fun draftColumnAddedWithoutDisturbingContactSettings() = runTest {
+        helper.createDatabase(DRAFT_COLUMN_FROM_VERSION).use { connection ->
+            connection.execSQL(
+                "INSERT INTO contact_settings (contact_key, muteUntil, last_read_message_uuid, " +
+                    "last_read_message_timestamp, filtering_disabled) VALUES ('0^all', 9999, 7, 5000, 1)",
+            )
+            connection.execSQL("INSERT INTO contact_settings (contact_key, muteUntil) VALUES ('0!abcdef01', 0)")
+        }
+
+        helper.runMigrationsAndValidate(
+            DRAFT_COLUMN_TO_VERSION,
+            listOf(MeshtasticDatabase.MIGRATION_52_53),
+        ).use { connection ->
+            assertEquals(
+                listOf("0!abcdef01", "0^all"),
+                queryColumn(connection, "SELECT contact_key FROM contact_settings ORDER BY contact_key"),
+            )
+            assertEquals(
+                listOf("9999"),
+                queryColumn(connection, "SELECT muteUntil FROM contact_settings " + "WHERE contact_key = '0^all'"),
+            )
+            assertEquals(
+                listOf("7"),
+                queryColumn(
+                    connection,
+                    "SELECT last_read_message_uuid FROM contact_settings " + "WHERE contact_key = '0^all'",
+                ),
+            )
+            assertEquals(
+                listOf("5000"),
+                queryColumn(
+                    connection,
+                    "SELECT last_read_message_timestamp FROM contact_settings " + "WHERE contact_key = '0^all'",
+                ),
+            )
+            assertEquals(
+                listOf("1"),
+                queryColumn(
+                    connection,
+                    "SELECT filtering_disabled FROM contact_settings " + "WHERE contact_key = '0^all'",
+                ),
+            )
+            // Empty, never NULL — blank is what the UI reads as "no draft".
+            assertEquals(
+                listOf("", ""),
+                queryColumn(connection, "SELECT draft FROM contact_settings ORDER BY contact_key"),
+            )
+            connection.execSQL("UPDATE contact_settings SET draft = 'half typed' WHERE contact_key = '0^all'")
+            assertEquals(
+                listOf("half typed"),
+                queryColumn(connection, "SELECT draft FROM contact_settings WHERE contact_key = '0^all'"),
+            )
+        }
+    }
+
+    /**
+     * 56→57 adds `contact_settings.pinned`. [migrateAll] only proves the resulting schema validates from an empty
+     * database; this proves an existing install's per-conversation state survives the addition — mute, last-read,
+     * filtering and the draft added one version earlier all have to come through untouched, and `pinned` must arrive
+     * false so no conversation silently jumps to the top of the list on upgrade.
+     */
+    @Test
+    fun pinnedColumnAddedWithoutDisturbingContactSettings() = runTest {
+        helper.createDatabase(PINNED_COLUMN_FROM_VERSION).use { connection ->
+            connection.execSQL(
+                "INSERT INTO contact_settings (contact_key, muteUntil, last_read_message_uuid, " +
+                    "last_read_message_timestamp, filtering_disabled, draft) " +
+                    "VALUES ('0^all', 9999, 7, 5000, 1, 'half typed')",
+            )
+            connection.execSQL("INSERT INTO contact_settings (contact_key, muteUntil) VALUES ('0!abcdef01', 0)")
+        }
+
+        helper.runMigrationsAndValidate(
+            PINNED_COLUMN_TO_VERSION,
+            listOf(MeshtasticDatabase.MIGRATION_52_53),
+        ).use { connection ->
+            assertEquals(
+                listOf("0!abcdef01", "0^all"),
+                queryColumn(connection, "SELECT contact_key FROM contact_settings ORDER BY contact_key"),
+            )
+            assertEquals(
+                listOf("9999"),
+                queryColumn(connection, "SELECT muteUntil FROM contact_settings WHERE contact_key = '0^all'"),
+            )
+            assertEquals(
+                listOf("5000"),
+                queryColumn(
+                    connection,
+                    "SELECT last_read_message_timestamp FROM contact_settings WHERE contact_key = '0^all'",
+                ),
+            )
+            assertEquals(
+                listOf("half typed"),
+                queryColumn(connection, "SELECT draft FROM contact_settings WHERE contact_key = '0^all'"),
+            )
+            // Nothing is pinned by upgrading; the list order users had is the order they keep.
+            assertEquals(
+                listOf("0", "0"),
+                queryColumn(connection, "SELECT pinned FROM contact_settings ORDER BY contact_key"),
+            )
+            connection.execSQL("UPDATE contact_settings SET pinned = 1 WHERE contact_key = '0^all'")
+            assertEquals(
+                listOf("1"),
+                queryColumn(connection, "SELECT pinned FROM contact_settings WHERE contact_key = '0^all'"),
+            )
+        }
     }
 
     /**
@@ -151,6 +356,28 @@ class MeshtasticDatabaseMigrationTest {
 
     private companion object {
         const val EARLIEST_SCHEMA_VERSION = 3
+        const val FTS_REBUILD_TO_VERSION = 53
+        const val MAINTENANCE_UF2_FROM_VERSION = 54
+        const val MAINTENANCE_UF2_TO_VERSION = 55
+        const val DRAFT_COLUMN_FROM_VERSION = 55
+        const val DRAFT_COLUMN_TO_VERSION = 56
+        const val PINNED_COLUMN_FROM_VERSION = 56
+        const val PINNED_COLUMN_TO_VERSION = 57
+
+        /** Room's runtime FTS content-sync triggers, verbatim from the generated MeshtasticDatabase_Impl. */
+        val FTS_SYNC_TRIGGERS =
+            listOf(
+                "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_packet_fts_BEFORE_UPDATE BEFORE UPDATE ON " +
+                    "`packet` BEGIN DELETE FROM `packet_fts` WHERE `rowid`=OLD.`rowid`; END",
+                "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_packet_fts_BEFORE_DELETE BEFORE DELETE ON " +
+                    "`packet` BEGIN DELETE FROM `packet_fts` WHERE `rowid`=OLD.`rowid`; END",
+                "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_packet_fts_AFTER_UPDATE AFTER UPDATE ON " +
+                    "`packet` BEGIN INSERT INTO `packet_fts`(`rowid`, `message_text`) VALUES (NEW.`rowid`, " +
+                    "NEW.`message_text`); END",
+                "CREATE TRIGGER IF NOT EXISTS room_fts_content_sync_packet_fts_AFTER_INSERT AFTER INSERT ON " +
+                    "`packet` BEGIN INSERT INTO `packet_fts`(`rowid`, `message_text`) VALUES (NEW.`rowid`, " +
+                    "NEW.`message_text`); END",
+            )
         const val RSSI_NULLABLE_FROM_VERSION = 50
         const val RSSI_NULLABLE_TO_VERSION = 51
         const val SNR_NULLABLE_FROM_VERSION = 51

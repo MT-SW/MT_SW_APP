@@ -16,6 +16,7 @@
  */
 package org.meshtastic.feature.messaging
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,9 +42,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -53,11 +58,13 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
+import org.meshtastic.core.common.util.isSameLocalDay
 import org.meshtastic.core.model.ContactKey
 import org.meshtastic.core.model.Message
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.Reaction
+import org.meshtastic.feature.messaging.component.DateSeparator
 import org.meshtastic.feature.messaging.component.MessageItem
 import org.meshtastic.feature.messaging.component.MessageStatusDialog
 import org.meshtastic.feature.messaging.component.ReactionDialog
@@ -254,7 +261,26 @@ private fun MessageListPagedContent(
     // Disable animations during scroll to prevent jank/stutter
     val enableAnimations by remember { derivedStateOf { !listState.isScrollInProgress } }
 
-    Box(modifier = modifier.fillMaxSize()) {
+    // One bar at a time, owned above the rows: a row cannot see a tap that lands on another row or on the space
+    // between them, and two rows owning their own state could both be open at once.
+    var openReactionBarFor by remember { mutableStateOf<Long?>(null) }
+
+    // Back closes it too: it is transient UI, and leaving it open would make Back look unresponsive.
+    val reactionBarBackState = rememberNavigationEventState(NavigationEventInfo.None)
+    NavigationBackHandler(
+        state = reactionBarBackState,
+        isBackEnabled = openReactionBarFor != null,
+        onBackCompleted = { openReactionBarFor = null },
+    )
+
+    Box(
+        modifier =
+        modifier.fillMaxSize().pointerInput(Unit) {
+            // Only taps no row consumed reach here, so this closes on the background without stealing a tap meant
+            // for a bubble or an emoji.
+            detectTapGestures { openReactionBarFor = null }
+        },
+    ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             state = listState,
@@ -279,12 +305,22 @@ private fun MessageListPagedContent(
                 if (message != null) {
                     val isFirstUnread = state.hasUnreadMessages && unreadDividerIndex == index
                     val itemModifier = if (enableAnimations) Modifier.animateItem() else Modifier
+                    // The separator belongs above the first message of each local day. At the top of the loaded
+                    // range there is no older message to compare against, so only label it once paging has
+                    // confirmed there is nothing older — otherwise the label would move as pages arrive.
+                    val startsNewDay =
+                        if (visuallyPrevMessage != null) {
+                            !isSameLocalDay(visuallyPrevMessage.displayTime, message.displayTime)
+                        } else {
+                            state.messages.loadState.append.endOfPaginationReached
+                        }
 
-                    if (isFirstUnread) {
+                    if (isFirstUnread || startsNewDay) {
                         // Wrap in Column to prevent overlapping of divider and message item
                         // Apply animation to the container Column once
                         Column(modifier = itemModifier) {
-                            UnreadMessagesDivider()
+                            if (startsNewDay) DateSeparator(timestampMillis = message.displayTime)
+                            if (isFirstUnread) UnreadMessagesDivider()
                             RenderPagedChatMessageRow(
                                 message = message,
                                 state = state,
@@ -301,6 +337,8 @@ private fun MessageListPagedContent(
                                 hasSamePrev = hasSamePrev,
                                 hasSameNext = hasSameNext,
                                 quickEmojis = quickEmojis,
+                                openReactionBarFor = openReactionBarFor,
+                                onOpenReactionBarChange = { openReactionBarFor = it },
                             )
                         }
                     } else {
@@ -321,6 +359,8 @@ private fun MessageListPagedContent(
                             hasSamePrev = hasSamePrev,
                             hasSameNext = hasSameNext,
                             quickEmojis = quickEmojis,
+                            openReactionBarFor = openReactionBarFor,
+                            onOpenReactionBarChange = { openReactionBarFor = it },
                         )
                     }
                 }
@@ -363,6 +403,8 @@ private fun RenderPagedChatMessageRow(
     showUserName: Boolean,
     hasSamePrev: Boolean,
     hasSameNext: Boolean,
+    openReactionBarFor: Long?,
+    onOpenReactionBarChange: (Long?) -> Unit,
     quickEmojis: List<String>,
 ) {
     val ourNode = state.ourNode ?: return
@@ -386,7 +428,15 @@ private fun RenderPagedChatMessageRow(
         message = message,
         selected = selected,
         inSelectionMode = inSelectionMode,
-        onClick = { if (inSelectionMode) state.selectedIds.toggle(message.uuid) },
+        quickReactionsOpen = openReactionBarFor == message.uuid,
+        onQuickReactionsOpenChange = { open -> onOpenReactionBarChange(if (open) message.uuid else null) },
+        // A tap that closes another row's bar is spent doing just that, the same way the owning row swallows it.
+        onClick = {
+            when {
+                openReactionBarFor != null -> onOpenReactionBarChange(null)
+                inSelectionMode -> state.selectedIds.toggle(message.uuid)
+            }
+        },
         onLongClick = {
             if (inSelectionMode) {
                 state.selectedIds.toggle(message.uuid)

@@ -1,8 +1,8 @@
 ---
 title: Telemeetria & Sensorid
-parent: User Guide
+parent: Kasutusjuhend
 nav_order: 9
-last_updated: 2026-05-13
+last_updated: 2026-08-27
 description: Kärgvõrgu andurite andmed — toetatud keskkonna-, õhukvaliteedi- ja võimsusandurid ning konfiguratsiooni- ja vaatamisjuhendid.
 aliases:
   - sensorid
@@ -47,11 +47,20 @@ Supported environmental sensors:
 
 ### Air Quality
 
-| Andur    | Meetriline                   | Sõnumid                    |
-| -------- | ---------------------------- | -------------------------- |
-| BME680   | Gas Resistance / IAQ         | Volatile organic compounds |
-| PMSA003I | PM1,0, PM2,5, PM10           | Particulate matter         |
-| SEN55    | PM, NOx, VOC, Temp, Humidity | Multi-sensor               |
+| Andur    | Meetriline           | Sõnumid                                                                                                                                   |
+| -------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| BME680   | Gas Resistance / IAQ | Volatile organic compounds                                                                                                                |
+| PMSA003I | PM1,0, PM2,5, PM10   | Particulate matter                                                                                                                        |
+| SEN55    | PM, Temp, Humidity   | Multi-sensor. Its NOx and VOC indices are recorded and included in a CSV export, but are not yet shown as cards or charts |
+
+### Soil
+
+| Meetriline          | Ühik    | Sõnumid                                         |
+| ------------------- | ------- | ----------------------------------------------- |
+| Pinnase temperatuur | °C / °F | Reported alongside soil moisture by soil probes |
+| Pinnase niiskus     | %       | Volumetric water content                        |
+
+Both appear as info cards on the node detail screen, next to the other environment readings.
 
 ### Valgus & UV
 
@@ -65,38 +74,39 @@ Supported environmental sensors:
 
 Nodes with INA-series power sensors can report:
 
-| Meetriline  | Kirjeldus                                 |
-| ----------- | ----------------------------------------- |
-| Bus Voltage | Supply rail voltage                       |
-| Pinge       | Power consumption (mA) |
-| Toide       | Calculated power (mW)  |
+| Meetriline | Kirjeldus                       |
+| ---------- | ------------------------------- |
+| Vool       | Per-channel voltage reading     |
+| Pinge      | Per-channel current draw, in mA |
+
+Up to three channels are reported (ch1–ch3), and each can be given its own label — Solar or Battery, say — from the node detail screen. There is no separate wattage reading; the app charts voltage and current, and does not compute power from them.
 
 Kasulik päikesepaneelide laadimise või aku seisundi jälgimiseks kaugsõlmedes.
 
 ## Configuring Telemetry
 
 1. Mine menüüsse **Seaded → Mooduli konfiguratsioon → Telemeetria**.
-2. Set reporting intervals:
-   - **Seadme mõõdikute intervall** – kui tihti seadme mõõdikuid levitada
-   - **Keskkonnamõõdikute intervall** – kui tihti anduriandmeid levitada
-3. Enable specific sensor types as needed.
+2. Each metric group has its own enable toggle and its own interval:
 
-### Recommended Intervals
+   - **Device Metrics** — battery, channel and airtime utilisation
+   - **Environment Metrics** — temperature, humidity, pressure and the other sensor readings
+   - **Air Quality Metrics** — particulate and CO₂ readings
+   - **Power Metrics** — the per-channel voltage and current readings
 
-| Use Case                                   | Device (s) | Environment (s) |
-| ------------------------------------------ | ----------------------------- | ---------------------------------- |
-| Urban mesh (many nodes) | 3600                          | 3600                               |
-| Rural mesh (few nodes)  | 900                           | 900                                |
-| Weather station                            | 900                           | 300                                |
-| Aku säilitus                               | 7200                          | 7200                               |
+   Environment metrics additionally have an on-screen toggle and a Fahrenheit toggle for the
+   device's own display.
 
-> ⚠️ **Märkus:** Lühemad intervallid suurendavad saate kasutusaega ja aku tühjenemist.
+### Choosing an Interval
+
+> 💡 **Tip:** These are nominal values, not hard schedules. On a congested mesh the firmware
+> automatically backs off to longer intervals based on how many nodes are online, so you do not
+> need to hand-tune them for mesh size. Lengthen them deliberately only to save battery.
 
 ## Air Quality Metrics
 
 Nodes with particulate matter or CO₂ sensors report air quality data:
 
-| Meetriline            | Unit  | Kirjeldus                         |
+| Meetriline            | Ühik  | Kirjeldus                         |
 | --------------------- | ----- | --------------------------------- |
 | PM1.0 | µg/m³ | Ultrafine particulate matter      |
 | PM2.5 | µg/m³ | Fine particulate matter           |
@@ -121,13 +131,13 @@ CO₂ näit on värvikoodiga märgitud vastavalt raskusastmele (Hea → Umbne �
 
 ![Telemeetria toimingud](../../assets/screenshots/node-metrics_telemetric_actions.png)
 
-## Troubleshooting
+## Veaotsing
 
 - **Keskkonnaandmeid ei kuvata?** Kaugühenduse jaoks on vaja ühendada füüsiline andur (nt BME280 I2C-l). Seadme telemeetria (aku, tööaeg) on ​​alati saadaval, kuid keskkonnamõõdikute jaoks on vaja riistvara.
 - **Vananenud näidud?** Kontrolli aruandlusintervalli – väga pikad intervallid (7200+ sekundit) tähendavad harva andmete uuendamist. Samuti veendu, et kaugsõlm on endiselt võrgus.
 - **Sensor conflict on I2C bus?** Some sensors share I2C addresses. Kui samal siinil on mitu andurit, kontrolli raadio jadapordi arendajaväljundis aadresside kokkupõrkeid.
 
-## Related Topics
+## Seotud teemad
 
 - [Node Metrics](node-metrics) — view telemetry data on the node detail screen
 - [Seaded — Moodulid ja administreerimine](settings-module-admin) — telemeetriamooduli konfiguratsioon

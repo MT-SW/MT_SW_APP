@@ -35,6 +35,7 @@
     <!-- ACTION -->
     <string name="action_copy_message">Kopioi viesti</string>
     <string name="action_delete_message">Poista viesti</string>
+    <string name="action_more_message_actions">Lisää viestitoimintoja</string>
     <string name="action_react_with_emoji">Reaktio emojin kanssa</string>
     <string name="action_select_device">Valitse laite</string>
     <string name="action_select_message">Valitse viesti</string>
@@ -145,6 +146,7 @@
     <string name="battery_ina_2xx_i2c_address">INA_2XX-akun valvontapiirin I2C-osoite</string>
     <string name="ble_devices">Bluetooth-laitteet</string>
     <string name="ble_rssi_threshold_defaults_to_80">BLE-signaalin RSSI-kynnysarvo (oletus -80)</string>
+    <string name="ble_scan_needs_location_services">Bluetooth-laitteiden haku edellyttää tässä Android-versiossa myös sijaintipalvelujen käyttöä. Sijaintiasi ei käytetä.</string>
     <string name="blue">Sininen</string>
     <!-- BLUETOOTH -->
     <string name="bluetooth">Bluetooth</string>
@@ -157,6 +159,14 @@
     <string name="bluetooth_feature_discovery">Haku</string>
     <string name="bluetooth_feature_discovery_description">Etsi ja tunnista lähelläsi olevia Meshtastic-laitteita.</string>
     <string name="bluetooth_permission">Bluetooth</string>
+    <string name="bluetooth_permission_blocked_notice">Lähistön laitteet -käyttöoikeus on poistettu käytöstä, eikä Android enää pyydä sitä. Ota se käyttöön sovelluksen asetuksissa, jotta voit muodostaa Bluetooth-yhteyden, tai käytä sen sijaan Wi-Fi- tai USB-yhteyttä.</string>
+    <string name="bluetooth_permission_blocked_notice_pre31">Sijaintikäyttöoikeus on poistettu käytöstä, eikä Android enää pyydä sitä. Ota se käyttöön sovelluksen asetuksissa, jotta voit etsiä Bluetooth-laitteita, tai käytä sen sijaan Wi-Fi- tai USB-yhteyttä.</string>
+    <string name="bluetooth_permission_blocked_rationale">Lähistön laitteet -käyttöoikeus on poistettu käytöstä, eikä Android enää pyydä sitä. Ota se käyttöön sovelluksen asetuksissa, jotta voit etsiä laitteita ja muodostaa Bluetooth-yhteyden.</string>
+    <string name="bluetooth_permission_blocked_rationale_pre31">Sijaintikäyttöoikeus on poistettu käytöstä, eikä Android enää pyydä sitä. Ota se käyttöön sovelluksen asetuksissa, jotta voit etsiä laitteita ja muodostaa Bluetooth-yhteyden.</string>
+    <string name="bluetooth_permission_denied_notice">Ilman Lähistön laitteet -käyttöoikeutta Meshtastic ei voi löytää radiotasi eikä muodostaa siihen Bluetooth-yhteyttä. Voit silti käyttää Wi-Fi- tai USB-yhteyttä.</string>
+    <string name="bluetooth_permission_denied_notice_pre31">Ilman sijaintikäyttöoikeutta Android estää Bluetooth-laitteiden haun, joten Meshtastic ei voi löytää radiotasi. Voit silti käyttää Wi-Fi- tai USB-yhteyttä.</string>
+    <string name="bluetooth_permission_rationale">Meshtastic tarvitsee Lähistön laitteet -käyttöoikeuden löytääkseen radiosi ja muodostaakseen siihen yhteyden. Käyttöoikeutta käytetään vain omien laitteidesi kanssa, eikä sillä selvitetä sijaintiasi. Ilman sitä Bluetooth ei ole käytettävissä, mutta Wi-Fi ja USB toimivat edelleen.</string>
+    <string name="bluetooth_permission_rationale_pre31">Meshtastic tarvitsee sijaintikäyttöoikeuden, koska tässä Android-versiossa Bluetooth-laitteiden haku käsitellään sijaintiominaisuutena. Sijaintiasi ei lueta eikä jaeta tätä varten. Ilman käyttöoikeutta Bluetooth ei ole käytettävissä, mutta Wi-Fi ja USB toimivat edelleen.</string>
     <string name="bluetooth_scan_location_services_disabled">Sijaintipalvelut ovat pois käytöstä. Ota ne käyttöön etsiäksesi lähistöllä olevia laitteita.</string>
     <string name="bluetooth_scan_missing_permission">Bluetooth-laitteiden haku edellyttää käyttöoikeutta. Myönnä lähistön laitteet (tai sijainti) käyttöoikeus, jotta laitteita voidaan etsiä.</string>
     <string name="bluetooth_scan_start_failed">Bluetooth-skannaus ei onnistunut. Yritä uudelleen tai ota bluetooth-yhteys uudelleen käyttöön jos ongelma jatkuu.</string>
@@ -167,14 +177,20 @@
     <string name="bold_heading">Lihavoitu otsikko</string>
     <string name="bonding_failed_permissions">Pariliitos epäonnistui. Myönnä lupa lähellä olevien laitteiden käyttöön ja yritä uudelleen.</string>
     <string name="bonding_failed_retry">Paritus ei onnistunut. Yritä uudelleen.</string>
+    <string name="boot_reconnect_blocked_message">Lähistön laitteet -käyttöoikeus on poistettu käytöstä, joten radioosi ei voida muodostaa Bluetooth-yhteyttä. Napauta ottaaksesi käyttöoikeuden uudelleen käyttöön.</string>
+    <string name="boot_reconnect_blocked_title">Meshtastic ei voi muodostaa yhteyttä uudelleen</string>
     <string name="bottom_nav_settings">Asetukset</string>
     <string name="broadcast_interval">Lähetyksen aikaväli</string>
     <string name="busy_noise_floor">Kanava varattu</string>
     <string name="button_gpio">Painikkeen GPIO-pinni</string>
     <string name="buzzer_gpio">Summerin GPIO-pinni</string>
+    <plurals name="cache_limit_eviction_warning">
+        <item quantity="one">Tämän pienentäminen poistaa pysyvästi tallennetun historian %1$d laitteelta.</item>
+        <item quantity="other">Tämän pienentäminen poistaa pysyvästi tallennetun historian %1$d laitteelta.</item>
+    </plurals>
     <string name="calculating">Lasketaan…</string>
     <string name="call_sign">Kutsutunnus</string>
-    <string name="call_sign_summary">Amatööriradion kutsutunnuksesi, enintään 8 merkkiä</string>
+    <string name="call_sign_summary">Radioamatöörikutsusi, enintään 7 merkkiä</string>
     <string name="camera_permission">Kameran käyttöoikeudet</string>
     <string name="camera_permission_rationale">Salli kameran käyttö QR-koodien skannaamista varten.</string>
     <string name="camera_unavailable">Kameraa ei voitu käynnistää. Yritä uudelleen tai sulje skanneri ja avaa se uudelleen.</string>
@@ -224,6 +240,7 @@
     <string name="chirpy_thinking">Chirpy reitittää viestiä mesh-verkon kautta… 📡</string>
     <string name="choose_contrast">Kontrastin taso</string>
     <string name="choose_theme">Valitse teema</string>
+    <string name="choose_units">Valitse yksiköt</string>
     <!-- CLEAN -->
     <string name="clean_node_database_confirmation">Tämä poistaa %1$d laitetta tietokannasta. Toimintoa ei voi peruuttaa.</string>
     <string name="clean_node_database_description">Varoitus: Tämä poistaa laitteet sovelluksen sekä laitteen tietokannoista.\nValinnat lisätään aiempiin.</string>
@@ -231,7 +248,10 @@
     <string name="clean_nodes_older_than">Poista laitteet, joita ei ole nähty yli %1$d päivään</string>
     <string name="clean_now">Poista nyt</string>
     <string name="clean_unknown_nodes">Poista vain tuntemattomat laitteet</string>
+    <!-- CLEAR -->
     <string name="clear">Tyhjennä</string>
+    <string name="clear_position_track_message">Tämä poistaa pysyvästi radion tallennetun GPS-jäljen. Toimintoa ei voi peruuttaa.</string>
+    <string name="clear_position_track_title">Poistetaanko GPS-jälki?</string>
     <string name="clear_selection">Tyhjennä valinta</string>
     <string name="clear_time_zone">Tyhjennä aikavyöhyke</string>
     <string name="client_notification">Sovellusilmoitukset</string>
@@ -311,6 +331,9 @@
     <string name="connecting">Yhdistetään</string>
     <string name="connection_status">Aktiiviset yhteydet:</string>
     <string name="connections">Yhteys</string>
+    <string name="contact_draft_prefix">Luonnos: %1$s</string>
+    <string name="contact_muted_snackbar">Mykistettty %1$s</string>
+    <string name="contact_pinned">Kiinnitetty</string>
     <string name="contrast">Kontrasti</string>
     <string name="contrast_high">Korkea</string>
     <string name="contrast_medium">Keskitaso</string>
@@ -328,6 +351,8 @@
     <string name="current">Virta</string>
     <string name="currently">Tällä hetkellä:</string>
     <string name="date">Päivä</string>
+    <string name="date_separator_today">Tänään</string>
+    <string name="date_separator_yesterday">Eilen</string>
     <string name="dbm_value">%1$d dBm</string>
     <!-- DEBUG -->
     <string name="debug">Vianetsintä</string>
@@ -514,7 +539,6 @@
     <string name="dns">DNS</string>
     <!-- DOC -->
     <string name="doc_clear_search">Tyhjennä haku</string>
-    <string name="doc_keywords_android_auto">android auto, auto, auton tietokeskus, ajaminen, handsfree, viestintä</string>
     <string name="doc_keywords_app_functions">järjestelmätekoäly, gemini, avustaja, toiminnot, automaatio, ääni</string>
     <string name="doc_keywords_connections">bluetooth, usb, tcp, pariliitos, sarjaportti, wifi</string>
     <string name="doc_keywords_debug_logs">debug, lokitiedot, logcat, vienti, vikaraportti, ongelma, vianmääritys, diagnostiikka</string>
@@ -540,12 +564,11 @@
     <string name="doc_search_placeholder">Hae documentaatiosta…</string>
     <string name="doc_section_developer">Kehittäjän opas</string>
     <string name="doc_section_user">Käyttöopas</string>
-    <string name="doc_title_android_auto">Android Auto</string>
     <string name="doc_title_app_functions">Sovelluksen ominaisuudet</string>
     <string name="doc_title_connections">Yhteydet</string>
     <string name="doc_title_debug_logs">Virheenjäljityslokitiedot</string>
     <string name="doc_title_desktop">Työpöytäsovellus</string>
-    <string name="doc_title_discovery">Haku</string>
+    <string name="doc_title_discovery">Paikallisen mesh-verkon skannaus</string>
     <string name="doc_title_firmware">Laiteohjelmiston päivitykset</string>
     <string name="doc_title_help">Ohjeet &amp; sovelluksen sisäinen dokumentaatio</string>
     <string name="doc_title_map">Kartta &amp; reittipisteet</string>
@@ -659,6 +682,24 @@
     <string name="firmware_edition">Laiteohjelmistoversio</string>
     <string name="firmware_event_ended_banner">%1$s on päättynyt. Palaa tavalliseen Meshtastic-laiteohjelmistoon palauttaaksesi normaalit ominaisuudet.</string>
     <string name="firmware_event_ended_button">Päivitä laiteohjelmisto</string>
+    <string name="firmware_maintenance_cdc_unblock_failed">Poistotiedosto kopioitiin, mutta laite ei aloittanut poistamista. Mitään ei ole vielä muutettu. Irrota laite, paina sen nollauspainiketta kahdesti ja yritä uudelleen.</string>
+    <string name="firmware_maintenance_copy_failed">Tiedostoa ei voitu kopioida laitteen asemalle. Varmista, että asema on edelleen yhdistetty ja yritä uudelleen.</string>
+    <string name="firmware_maintenance_data_unavailable">Laitteen tyhjennystiedostoja ei ole tällä hetkellä saatavilla. Tarkista yhteytesi ja yritä uudelleen tai käytä Web Flasheria osoitteessa flasher.meshtastic.org</string>
+    <string name="firmware_maintenance_erase_action">Tyhjennä ja asenna uudelleen</string>
+    <string name="firmware_maintenance_erase_confirm_button">Tyhjennä laite</string>
+    <string name="firmware_maintenance_erase_confirm_text">Tämä tyhjentää kaiken laitteesta %1$s, mukaan lukien kanavat, avaimet ja kaikki asetukset, ja asentaa sitten laiteohjelmiston uudelleen.\n\nToimintoa ei voi peruuttaa, eikä varmuuskopiota ole. Sinua pyydetään valitsemaan laitteen asema kahdesti: ensin poistotiedostoa ja sitten laiteohjelmistoa varten.</string>
+    <string name="firmware_maintenance_erase_confirm_title">Tyhjennetäänkö tämä laite?</string>
+    <string name="firmware_maintenance_no_release">Valitse ensin laiteohjelmiston versio, jotta laite voidaan asentaa uudelleen tyhjentämisen jälkeen.</string>
+    <string name="firmware_maintenance_not_a_bootloader_volume">Tämä asema ei ole laitteen päivitysasema. Valitse asema, joka näkyy, kun laite on päivitystilassa (se sisältää tiedoston nimeltä INFO_UF2.TXT).</string>
+    <string name="firmware_maintenance_select_drive">Valitse laitteen päivitysasema</string>
+    <string name="firmware_maintenance_softdevice_conflict">Laite ilmoittaa käyttävänsä odotetusta poikkeavaa Bluetooth-pinoa, joten poistaminen ei ole turvallista. Ilmoita tästä yhdessä laitteen mallin kanssa.</string>
+    <string name="firmware_maintenance_unknown_board">Tämän laitteen käynnistyslatainta ei voi päivittää tällä sovelluksella.</string>
+    <string name="firmware_maintenance_unknown_softdevice">Tämä sovellus ei pysty varmistamaan, mitä Bluetooth-pinoa tämä laite käyttää, joten poistaminen ei ole turvallista. Käytä sen sijaan verkkopohjaista Flasheria osoitteessa flasher.meshtastic.org</string>
+    <string name="firmware_maintenance_unsupported_device">Tämä laite ei tue tyhjentämistä sovelluksesta.</string>
+    <string name="firmware_maintenance_upgrade_bootloader_action">Päivitä käynnistyslatain</string>
+    <string name="firmware_maintenance_upgrade_confirm_text">Tämä asentaa päivitetyn käynnistyslataimen laitteeseen %1$s, mikä nopeuttaa tulevia Bluetooth-päivityksiä huomattavasti. \n\nSen jälkeen laiteohjelmisto asennetaan uudelleen. Älä irrota laitetta tämän aikana.</string>
+    <string name="firmware_maintenance_upgrade_confirm_title">Päivitetäänkö käynnistyslatain?</string>
+    <string name="firmware_maintenance_wrong_destination">Valittu sijainti ei ole laitteen päivitysasema, joten laitteelle ei kirjoitettu mitään. Valitse siirrettävä asema, joka tulee näkyviin, kun laite on päivitystilassa.</string>
     <string name="firmware_old">Radion laiteohjelmisto on liian vanha toimiakseen tämän sovelluksen kanssa. Lisätietoja löydät <a href="https://meshtastic.org/docs/getting-started/flashing-firmware">ohjelmiston asennusoppaasta</a>.</string>
     <string name="firmware_recovery_banner">Päivitys valmistuu %1$s kuluttua</string>
     <string name="firmware_recovery_ble_failed">Päivitystä ei voitu viimeistellä Bluetoothin kautta. Tämän laitteen vakiokäynnistyslatain ei pysty luotettavasti jatkamaan keskeytynyttä OTA-päivitystä. Liitä laite tietokoneeseen USB:llä ja kirjoita laiteohjelmisto uudelleen valmistajan sarjamuotoisella DFU-työkalulla (esimerkiksi adafruit-nrfutil), jotta laite voidaan palauttaa toimintakuntoon.</string>
@@ -715,7 +756,8 @@
     <string name="firmware_update_open_flasher">Avaa Meshtastic Flasher</string>
     <string name="firmware_update_ota_failed">OTA-päivitys epäonnistui: %1$s</string>
     <string name="firmware_update_ota_unsupported_reason">Tämän laitteen OTA-käynnistyslatain ei tue pyydettyä päivitystapaa: %1$s</string>
-    <string name="firmware_update_rak4631_bootloader_hint">Käytä RAK WisBlock RAK4631 -laitteelle valmistajan sarjamuotoista DFU-työkalua (esimerkiksi adafruit-nrfutil dfu serial toimitetun bootloader .zip -tiedoston kanssa). Pelkän .uf2-tiedoston kopiointi ei päivitä bootloaderia.</string>
+    <string name="firmware_update_preparing_flash">Valmistellaan laitetta: flash-muistia tyhjennetään. Tämä voi kestää jopa minuutin...</string>
+    <string name="firmware_update_rak4631_bootloader_hint">RAK WisBlock RAK4631 -laitteessa valmistajan käynnistyslatain (.zip) on asennettava sarjaliitäntäisen DFU-työkalun, kuten adafruit-nrfutilin, avulla. Pelkkä .zip-tiedoston kopioiminen laitteen asemalle ei toimi. Vaihtoehtoisesti voit yhdistää laitteen USB:n kautta ja päivittää käynnistyslataimen tällä sovelluksella.</string>
     <string name="firmware_update_rebooting">Käynnistetään DFU-tilaan...</string>
     <string name="firmware_update_release_notes">Julkaisutiedot</string>
     <string name="firmware_update_requires_bin">%1$s edellyttää kohteeseen sopivaa .bin-tiedostoa.</string>
@@ -723,6 +765,7 @@
     <string name="firmware_update_requires_uf2">%1$s edellyttää kohteeseen sopivaa .uf2-tiedostoa.</string>
     <string name="firmware_update_retrieval_failed">Laiteohjelmistotiedostoa ei voitu noutaa.</string>
     <string name="firmware_update_retry">Yritä uudelleen</string>
+    <string name="firmware_update_retrying_upload">Laite ei vastannut. Yritetään lähettää uudelleen (yritys %1$d/%2$d)...</string>
     <string name="firmware_update_save_dfu_file">Tallenna .uf2-tiedosto laitteesi DFU-asemaan.</string>
     <string name="firmware_update_searching_device">Etsitään OTA-laitetta verkosta...</string>
     <string name="firmware_update_select_file">Valitse paikallinen tiedosto</string>
@@ -732,6 +775,7 @@
     <string name="firmware_update_starting_dfu">Käynnistetään DFU...</string>
     <string name="firmware_update_starting_ota">Käynnistetään OTA-päivitys...</string>
     <string name="firmware_update_success">Päivitys onnistui!</string>
+    <string name="firmware_update_success_wiped">Laite palautettiin tehdasasetuksiin ja se on määritettävä (sekä pariliitettävä) uudelleen.</string>
     <string name="firmware_update_taking_a_while">Tämä voi kestää hetken...</string>
     <string name="firmware_update_target">Kohde: %1$s</string>
     <string name="firmware_update_title">Laiteohjelmiston päivitys</string>
@@ -751,6 +795,10 @@
     <string name="firmware_update_verifying">Vahvistetaan päivitystä...</string>
     <string name="firmware_update_waiting_reboot">Odotetaan, että laite käynnistyy uudelleen OTA-tilassa...</string>
     <string name="firmware_update_waiting_reconnect">Odotetaan, että laite muodostaa yhteyden uudelleen...</string>
+    <string name="firmware_update_wipe_ble_detail">Palauttaa laitteen tehdasasetuksiin, kun päivitys on varmistettu. Kaikki asetukset ja Bluetooth-pariliitokset poistetaan.</string>
+    <string name="firmware_update_wipe_confirm_warning">Laite tyhjennetään myös – kaikki asetukset, kanavat ja avaimet menetetään.</string>
+    <string name="firmware_update_wipe_label">Tyhjennä laite päivityksen aikana</string>
+    <string name="firmware_update_wipe_usb_detail">Tyhjentää laitteen flash-muistin kokonaan ja asentaa sen jälkeen valitun laiteohjelmiston alusta alkaen.</string>
     <string name="firmware_version">Firmwaren versio: %1$s</string>
     <string name="fixed_pin">Kiinteä PIN-koodi</string>
     <string name="fixed_position">Kiinteä sijainti</string>
@@ -809,6 +857,7 @@
     <string name="gps_transmit_gpio">GPS lähetyksen GPIO-pinni</string>
     <string name="grant_permission">Myönnä käyttöoikeus</string>
     <string name="green">Vihreä</string>
+    <string name="ham_long_name_summary">Valinnainen. Lisätään kutsumerkkisi perään, esimerkiksi OH2ABC//Tukiasema</string>
     <string name="hardware">Laite</string>
     <string name="hardware_model">Laitteen malli</string>
     <string name="heading">Suunta</string>
@@ -846,6 +895,8 @@
     <string name="import_export_label">Tuonti ja vienti</string>
     <string name="import_known_shared_contact_text">Varoitus: Kontakti on jo olemassa, tuonti ylikirjoittaa aiemmat tiedot.</string>
     <string name="import_label">Tuo</string>
+    <string name="import_pending_channels_connect">Kanavan asetukset vastaanotettu. Yhdistä laitteeseen tuodaksesi ne.</string>
+    <string name="import_pending_contact_connect">Yhteystieto vastaanotettu. Yhdistä laitteeseen tuodaksesi sen.</string>
     <string name="import_shared_contact">Tuo jaettu yhteystieto?</string>
     <string name="incoming_messages">Saapuvat viestit</string>
     <string name="indoor_air_quality_iaq">Sisäilmanlaatu (IAQ)</string>
@@ -867,6 +918,8 @@
     <string name="ip_port">Portti:</string>
     <string name="ipv4_mode">IPv4-tila</string>
     <string name="json_output_enabled">JSON ulostulo käytössä</string>
+    <string name="jump_to_latest_from">%1$s</string>
+    <string name="jump_to_latest_from_and_more">%1$s +%2$d</string>
     <!-- KEY -->
     <string name="key_backup_deleted">Avaimen varmuuskopio poistettu</string>
     <string name="key_backup_not_found">Tälle radiolle ei löytynyt avaimen varmuuskopiota</string>
@@ -927,6 +980,10 @@
     <string name="loading">Ladataan</string>
     <!-- LOCAL -->
     <string name="local_mbtiles_file">Paikallinen MBTiles-karttatiedosto</string>
+    <string name="local_network_permission">Paikallisverkon käyttöoikeus</string>
+    <string name="local_network_permission_blocked_rationale">Paikallisverkon käyttöoikeus on poistettu käytöstä, eikä Android enää pyydä sitä. Wi-Fi-verkossasi olevaa radiota ei voida löytää eikä siihen voida muodostaa yhteyttä, ennen kuin otat käyttöoikeuden käyttöön sovelluksen asetuksissa. Julkisessa verkossa tai VPN:n kautta oleva radio toimii normaalisti.</string>
+    <string name="local_network_permission_denied_hint">Meshtasticin paikallisverkon käyttöoikeus on poistettu käytöstä. Jos tämä radio on paikallisverkossasi, yhteys epäonnistuu, kunnes sallit paikallisverkon käytön järjestelmän asetuksissa.</string>
+    <string name="local_network_permission_rationale">Meshtastic tarvitsee paikallisverkon käyttöoikeuden löytääkseen Wi-Fi-verkossasi olevat radiot. Sovellus etsii vain verkosta, johon olet jo yhdistetty. Ilman käyttöoikeutta voit silti muodostaa yhteyden radioon kirjoittamalla sen osoitteen.</string>
     <string name="local_stats_bad">Huonot %1$d</string>
     <string name="local_stats_battery">Akku: %1$d%</string>
     <string name="local_stats_diagnostics_prefix">Vianmääritys: %1$s</string>
@@ -940,7 +997,13 @@
     <string name="local_stats_updated_at">%1$s</string>
     <string name="local_stats_uptime">Käyttöaika: %1$s</string>
     <string name="local_stats_utilization">Kanavan käyttöaste: %1$s% | Lähetysajan käyttöaste: %2$s%</string>
+    <!-- LOCATION -->
     <string name="location_disabled">Sijainnin käyttöoikeus on poistettu käytöstä, joten emme voi tarjota sijaintia mesh-verkkoon.</string>
+    <string name="location_permission">Sijaintikäyttöoikeus</string>
+    <string name="location_permission_blocked_notice">Sijaintikäyttöoikeus on poistettu käytöstä, eikä Android enää pyydä sitä. Ota se käyttöön sovelluksen asetuksissa aina, kun haluat käyttää karttaa ja sijainnin jakamista.</string>
+    <string name="location_permission_blocked_toast">Sijaintikäyttöoikeus on poistettu käytöstä. Ota se käyttöön sovelluksen asetuksissa, jotta voit jakaa sijaintisi.</string>
+    <string name="location_permission_denied_notice">Ilman sijaintikäyttöoikeutta kartta ei näytä sijaintiasi, eikä Meshtastic voi jakaa sijaintiasi mesh-verkkoon. Kaikki muu toimii edelleen, ja voit ottaa käyttöoikeuden käyttöön myöhemmin.</string>
+    <string name="location_permission_rationale">Meshtastic käyttää sijaintiasi näyttääkseen sijaintisi kartalla, mitatakseen etäisyyden radioihin ja – vain jos otat sen käyttöön – jakaakseen sijaintisi mesh-verkkoon. Jos et myönnä käyttöoikeutta, kaikki muu toimii edelleen.</string>
     <string name="location_sharing">Sijainnin jakaminen</string>
     <!-- LOCKDOWN -->
     <string name="lockdown_backoff">Yritä uudelleen %1$d sekunnin kuluttua.</string>
@@ -1031,6 +1094,7 @@
     <string name="map_type_satellite">Satelliitti</string>
     <string name="map_type_terrain">Maasto</string>
     <string name="mark_as_read">Merkitse luetuksi</string>
+    <string name="mark_unread_selected">Merkitse lukemattomiksi</string>
     <string name="match_all">Täsmää yhteen | kaikkiin</string>
     <string name="match_any">Täsmää yhteen | kaikkiin</string>
     <string name="max">Kaikki</string>
@@ -1066,7 +1130,6 @@
     <string name="mesh_beacon_on_region">Lähetä alue</string>
     <string name="mesh_beacon_preset_indicator">Lähellä olevan verkkokutsun ilmoittama</string>
     <string name="mesh_beacon_preset_none">ei mitään</string>
-    <string name="mesh_beacon_send_as_node">Lähetä radion numerolla (0 = tämä radio)</string>
     <string name="mesh_beacon_target">Kohde %1$d</string>
     <string name="mesh_beacon_target_add">Lisää kohde</string>
     <string name="mesh_beacon_target_channel_index">Kanavan hakemisto</string>
@@ -1190,6 +1253,7 @@
     <string name="name_cannot_be_empty">Nimi ei voi olla tyhjä.</string>
     <string name="navigate_back">Siirry takaisin</string>
     <string name="navigate_into_label">Siirry kohtaan</string>
+    <string name="nearby_devices_permission">Lähistön laitteet -käyttöoikeus</string>
     <string name="need_hardware">Tarvitsetko laitteiston?</string>
     <string name="need_hardware_description">Meshtastic vaatii yhteensopivan laitteen. Tukijamme ja yhteistyökumppanimme tarjoavat käyttövalmiita laitteita. Tässä on muutamia suosituimmista vaihtoehdoista.</string>
     <string name="neighbor_info">Naapuritieto</string>
@@ -1262,6 +1326,7 @@
     <string name="node_list_help_title">Radiolistan ohje</string>
     <string name="node_list_long_click_label">Radion asetukset</string>
     <string name="node_number">Laitteen numero</string>
+    <string name="node_request_send_failed">Pyynnön lähettäminen epäonnistui. Yritä uudelleen.</string>
     <string name="node_restarting">Käynnistetään uudelleen…</string>
     <string name="node_sort_alpha">A-Ö</string>
     <string name="node_sort_button">Lajitteluvaihtoehdot</string>
@@ -1289,8 +1354,12 @@
     <string name="none">Ei mitään (ei käytössä)</string>
     <string name="none_quality">ei mitään</string>
     <string name="not_connected">Ei yhdistetty</string>
+    <string name="not_now">Ei nyt</string>
     <string name="note">Merkintä</string>
     <string name="notes">Viestit</string>
+    <string name="notification_permission_blocked_notice">Ilmoitukset on poistettu käytöstä, eikä Android enää pyydä käyttöoikeutta. Ota se käyttöön sovelluksen asetuksissa, jotta saat tiedon uusista viesteistä ja ilmoituksista.</string>
+    <string name="notification_permission_denied_notice">Ilman ilmoituksia Meshtastic ei voi ilmoittaa uusista viesteistä, uusista radioista tai akun alhaisesta varaustasosta, kun sovellus on taustalla.</string>
+    <string name="notification_permission_rationale">Ilmoitusten avulla Meshtastic voi tavoittaa sinut, kun sovellus ei ole avoinna: uusista viesteistä, uusista löydetyistä radioista ja radion alhaisesta varaustasosta. Jos et myönnä käyttöoikeutta, mikään muu ei muutu.</string>
     <string name="notification_permissions_description">Meshtastic käyttää ilmoituksia tiedottaakseen uusista viesteistä ja muista tärkeistä tapahtumista. Voit muuttaa ilmoitusasetuksia milloin tahansa.</string>
     <!-- NOTIFICATIONS -->
     <string name="notifications_for_channel_and_direct_messages">Kanavailmoitukset ja yksityisviestit.</string>
@@ -1315,6 +1384,7 @@
     <!-- OPEN -->
     <string name="open_bluetooth_settings">Avaa bluetooth-asetukset</string>
     <string name="open_compass">Avaa kompassi</string>
+    <string name="open_location_settings">Avaa sijaintiasetukset</string>
     <string name="open_settings">Avaa asetukset</string>
     <string name="open_source_description">Meshtastic on rakennettu seuraavilla avoimen lähdekoodin kirjastoilla. Napauta mitä tahansa kirjastoa nähdäksesi sen lisenssin.</string>
     <string name="open_source_libraries">Avoimen lähteen kirjastot</string>
@@ -1360,9 +1430,33 @@
     <string name="paxcounter_config">PAX-laskurin asetukset</string>
     <string name="paxcounter_enabled">PAX-laskuri käytössä</string>
     <string name="periodic_position_broadcast">Sijainnin toistuva lähetys</string>
+    <!-- PERMISSION -->
+    <string name="permission_camera_summary">Skannaa kanava- ja yhteystietojen QR-koodit</string>
+    <string name="permission_local_network_summary">Etsi radiot Wi-Fi-verkostasi</string>
+    <string name="permission_location_summary">Näytä sijaintisi kartalla ja jaa se mesh-verkon kanssa</string>
+    <string name="permission_location_summary_pre31">Etsi radiosi Bluetoothin kautta, näytä sijaintisi kartalla ja jaa sijaintisi mesh-verkon kanssa</string>
     <string name="permission_missing_31">Meshtastic tarvitsee "lähistön laitteet" -oikeudet, jotta se voi löytää ja yhdistää laitteisiin Bluetoothin kautta. Voit poistaa oikeuden käytöstä, kun et käytä sovellusta.</string>
+    <string name="permission_missing_pre31">Tässä Android-versiossa yksi sijaintikäyttöoikeus kattaa kaksi asiaa: se mahdollistaa Bluetooth-laitteiden haun ja näyttää sijaintisi mesh-kartalla. Sijainnin jakaminen mesh-verkkoon pysyy pois käytöstä, kunnes otat sen itse käyttöön.</string>
+    <string name="permission_nearby_devices_summary">Etsi radio ja muodosta siihen Bluetooth-yhteys</string>
+    <string name="permission_notifications_summary">Ilmoita viesteistä, uusista radioista ja akun alhaisesta varaustasosta</string>
+    <string name="permission_state_allowed">Sallittu</string>
+    <string name="permission_state_blocked">Estetty - napauta avataksesi järjestelmän asetukset</string>
+    <string name="permission_state_denied">Estetty - napauta salliaksesi</string>
+    <string name="permission_state_not_applicable">Ei vaadita tässä Android-versiossa</string>
+    <string name="permission_state_not_asked">Ei vielä kysytty</string>
+    <!-- PERMISSIONS -->
+    <string name="permissions">Käyttöoikeudet</string>
+    <string name="permissions_all_allowed">Kaikki sallittu</string>
+    <string name="permissions_hide">Piilota käyttöoikeudet</string>
+    <plurals name="permissions_need_attention">
+        <item quantity="one">%1$d vaatii huomiota</item>
+        <item quantity="other">%1$d vaatii huomiota</item>
+    </plurals>
+    <string name="permissions_nothing_needed">Mikään ei vaadi huomiotasi</string>
+    <string name="permissions_show">Näytä käyttöoikeudet</string>
     <string name="phone_location">Puhelimen sijainti</string>
     <string name="phone_location_description">Meshtastic hyödyntää puhelimen sijaintia tarjotakseen erilaisia toimintoja. Voit muuttaa sijaintioikeuksia koska tahansa asetuksista.</string>
+    <string name="pin_selected">PIN</string>
     <string name="play">Aloita</string>
     <plurals name="plurals_hours">
         <item quantity="one">%1$d tunti</item>
@@ -1670,6 +1764,7 @@
     <string name="site_planner_use_current_location">Käytä nykyistä sijaintia</string>
     <string name="site_planner_use_map_center">Käytä kartan keskikohtaa</string>
     <string name="site_planner_use_node_location">Käytä nykyistä radion sijaintia</string>
+    <string name="site_planner_webview_updating">WebView järjestelmä päivittyy. Yritä myöhemmin uudelleen.</string>
     <string name="skip">Ohita</string>
     <string name="slot">Paikka</string>
     <string name="smart_position">Älykäs sijainti</string>
@@ -1695,6 +1790,9 @@
     <string name="super_deep_sleep_duration_seconds">Super-syväunen kesto</string>
     <string name="supported">Tuettu</string>
     <string name="supported_by_community">Meshtastic-yhteisön tukema</string>
+    <string name="swipe_action_delete">Poista</string>
+    <string name="swipe_action_mute">Mykistä</string>
+    <string name="swipe_action_unmute">Poista mykistys</string>
     <string name="sx126x_rx_boosted_gain">RX tehostettu vahvistus</string>
     <string name="system_settings">Järjestelmäasetukset</string>
     <!-- TAK -->
@@ -1711,12 +1809,16 @@
     <string name="tak_role_teammember">Tiimin jäsen</string>
     <string name="tak_role_unspecified">Määrittelemätön</string>
     <string name="tak_server">TAK palvelin</string>
+    <string name="tak_server_channel">TAK-mesh-kanava</string>
+    <string name="tak_server_channel_desc">Lähtevään TAK-liikenteeseen käytettävä Meshtastic-kanava</string>
+    <string name="tak_server_channel_option">%1$d: %2$s</string>
     <string name="tak_server_enabled">Ota paikallinen TAK-palvelin käyttöön</string>
     <string name="tak_server_enabled_desc">Käynnistää paikallisen TLS-palvelimen portissa 8089 ATAK-yhteyksiä varten</string>
     <string name="tak_server_export_data_package_desc">Luo ATAKille .zip-paketti tätä palvelinta varten</string>
     <string name="tak_server_loading">…</string>
     <string name="tak_server_mesh_to_cot">Mesh to CoT -muunnin</string>
     <string name="tak_server_mesh_to_cot_desc">Näytä Meshtastic-radiot ATAK-kartalla yhteystietoina</string>
+    <string name="tak_server_permission_blocked">TAK-palvelin tarvitsee paikallisverkon käyttöoikeuden yhteyksien vastaanottamiseen, eikä Android enää pyydä sitä. Käyttöoikeus on nyt poistettu käytöstä – ota se käyttöön sovelluksen asetuksissa ja ota TAK-palvelin uudelleen käyttöön.</string>
     <string name="tak_server_section">Palvelin</string>
     <string name="tak_server_status">Tila</string>
     <plurals name="tak_server_status_connected">
@@ -1731,11 +1833,15 @@
     <string name="tak_server_status_waiting">Kuunnellaan osoitteessa 127.0.0.1:8089 – odotetaan ATAK-yhteyttä</string>
     <string name="tak_server_test_card_title">TAK Mesh -testitila (debug)</string>
     <string name="tak_server_test_idle">Lähetä kaikki %1$d testisanomat mesh-verkkoon</string>
+    <string name="tak_server_test_protocol_v1_label">V1 (vanha laiteohjelmisto &lt; &lt; 2.8.0 – vain PLI + chat)</string>
+    <string name="tak_server_test_protocol_v2_label">V2 (laiteohjelmisto ≥ 2.8.0)</string>
     <string name="tak_server_test_result_bytes">%1$dB ✓</string>
+    <string name="tak_server_test_result_expected_drop">Ei v1-rakenteessa (odotettu)</string>
     <string name="tak_server_test_result_unknown_error">✗</string>
-    <string name="tak_server_test_results">%1$d onnistui, %2$d epäonnistui yhteensä %3$d/%4$d testistä</string>
+    <string name="tak_server_test_results_v2">%1$d hyväksytty, %2$d odotetusti hylätty, %3$d epäonnistui / %4$d/%5$d</string>
     <string name="tak_server_test_run">Suorita</string>
     <string name="tak_server_test_running">Käynnissä: %1$s</string>
+    <string name="tak_server_v1_fallback_notice">Yhdistetyn radion laiteohjelmisto ei tue täydellistä TAK-integraatiota – vain sijaintitiedot ja chat-viestit välitetään ATAKiin. Merkit ja muut tapahtumatyypit edellyttävät laiteohjelmiston versiota 2.8.0 tai uudempaa.</string>
     <string name="tak_team">Tiimin väri</string>
     <string name="tak_team_blue">Sininen</string>
     <string name="tak_team_brown">Ruskea</string>
@@ -1814,6 +1920,8 @@
     <string name="translation_failed">Viestin kääntäminen epäonnistui</string>
     <string name="translation_model_download_failed">Käännösmallin lataus epäonnistui</string>
     <string name="translation_not_required">Viesti on jo omalla kielelläsi</string>
+    <string name="transmit_disabled">Lähetys on poistettu käytöstä</string>
+    <string name="transmit_disabled_summary">Tämä laite voi vastaanottaa, mutta ei lähetä mitään LoRa-verkon kautta.</string>
     <string name="transmit_over_lora">Lähetä LoRa:n kautta</string>
     <!-- TRANSPORT -->
     <string name="transport">Kuljetus</string>
@@ -1833,6 +1941,13 @@
     <string name="type">Kirjoita</string>
     <string name="type_a_message">Kirjoita viesti</string>
     <string name="udp_enabled">UDP-lähetys</string>
+    <string name="undo">Kumoa</string>
+    <!-- UNITS -->
+    <string name="units">Yksiköt</string>
+    <string name="units_follow_system">Järjestelmän oletus</string>
+    <string name="units_imperial">Tuumajärjestelmä</string>
+    <string name="units_metric">Metrijärjestelmä</string>
+    <string name="units_scope_summary">Määrittää, miten sovellus näyttää etäisyyden, korkeuden, nopeuden ja lämpötilan. Radion oma näyttö käyttää sen sijaan omia näyttöasetuksiaan.</string>
     <!-- UNKNOWN -->
     <string name="unknown">Tuntematon</string>
     <string name="unknown_age">Tuntematon ikä</string>
@@ -1844,6 +1959,7 @@
     <string name="unmonitored_or_infrastructure">Ei seurannassa tai toimii infrastruktuurilaitteena</string>
     <string name="unmute">Poista mykistys</string>
     <string name="unmute_selected">Poista mykistys valitusta</string>
+    <string name="unpin_selected">Poista kiinnitys</string>
     <string name="unrecognized">Tuntematon</string>
     <string name="unset">Ei asetettu – 0</string>
     <string name="up_down_select_input_enabled">Ylös/Alas/Valitse syöte käytössä</string>

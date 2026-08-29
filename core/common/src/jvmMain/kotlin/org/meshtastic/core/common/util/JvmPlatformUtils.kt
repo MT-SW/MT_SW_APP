@@ -76,16 +76,27 @@ actual object DateFormatter {
         shortDateTimeFormatter.format(java.time.Instant.ofEpochMilli(timestampMillis).atZone(zoneId))
 }
 
-@Suppress("MagicNumber")
-actual fun getSystemMeasurementSystem(): MeasurementSystem =
+// No ICU measurement data on the JVM, so the region table in core:common is the source. Desktop
+// keeps the region of the system locale when the language preference carries none (see
+// LocaleResolution.kt), so a region-less preference cannot decide the units the way it once did.
+actual fun getSystemMeasurementSystem(): MeasurementSystem {
+    val locale = Locale.getDefault()
+    return measurementSystemOverride(locale.getUnicodeLocaleType(MEASUREMENT_SYSTEM_EXTENSION))
+        ?: measurementSystemForRegion(locale.country)
+}
+
+// CLDR unitPreferenceData lists these regions as defaulting to Fahrenheit; everywhere else is Celsius.
+actual fun getSystemTemperatureUnit(): TemperatureUnit =
     when (Locale.getDefault().country.uppercase(Locale.getDefault())) {
         "US",
-        "LR",
-        "MM",
-        "GB",
-        -> MeasurementSystem.IMPERIAL
+        "BS",
+        "BZ",
+        "KY",
+        "PR",
+        "PW",
+        -> TemperatureUnit.FAHRENHEIT
 
-        else -> MeasurementSystem.METRIC
+        else -> TemperatureUnit.CELSIUS
     }
 
 actual fun currentLocaleCode(): String = Locale.getDefault().language

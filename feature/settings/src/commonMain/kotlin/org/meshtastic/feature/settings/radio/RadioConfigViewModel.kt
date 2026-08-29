@@ -56,7 +56,9 @@ import org.meshtastic.core.domain.usecase.settings.InstallProfileUseCase
 import org.meshtastic.core.domain.usecase.settings.ProcessRadioResponseUseCase
 import org.meshtastic.core.domain.usecase.settings.RadioConfigUseCase
 import org.meshtastic.core.domain.usecase.settings.RadioResponseResult
+import org.meshtastic.core.model.Capabilities
 import org.meshtastic.core.model.ConnectionState
+import org.meshtastic.core.model.HamName
 import org.meshtastic.core.model.MqttConnectionState
 import org.meshtastic.core.model.MqttProbeStatus
 import org.meshtastic.core.model.MyNodeInfo
@@ -279,6 +281,10 @@ open class RadioConfigViewModel(
 
     private val requestIds = MutableStateFlow(hashSetOf<Int>())
 
+    // USER reads one config on firmware without the status message module and two with it, so whether a
+    // load fanned out is a property of that load, not of the route. Null falls back to the route's flag.
+    private var loadFanOut: Pair<String, Boolean>? = null
+
     // Main-dispatcher confined with the other ViewModel request state below. Keep every access on viewModelScope unless
     // these collections are moved behind explicit synchronization.
     private val requestTimeoutJobs = mutableMapOf<Int, Job>()
@@ -446,12 +452,13 @@ open class RadioConfigViewModel(
     private fun setHamMode(destNum: Int, user: User) {
         safeLaunch(tag = "setHamMode") {
             _radioConfigState.update { it.copy(userConfig = user) }
-            // The form's long-name field carries the callsign while licensed (iOS parity).
-            // When meshtastic/protobufs#941 ships, add long_name here.
+            // While licensed the form's long name is the composed `CALLSIGN//Long name`; firmware rebuilds that same
+            // composition from the two HamParameters fields, so send the halves rather than the whole.
+            val (callSign, longName) = HamName.split(user.long_name)
             expectRestartIfLocal(RebootBehavior.ALWAYS)
             radioConfigUseCase.setHamMode(
                 destNum,
-                HamParameters(call_sign = user.long_name, short_name = user.short_name),
+                HamParameters(call_sign = callSign, short_name = user.short_name, long_name = longName),
                 onRequestId = ::registerWriteRequestId,
             )
         }
@@ -833,12 +840,28 @@ open class RadioConfigViewModel(
         _radioConfigState.update {
             it.copy(route = route.name, responseState = ResponseState.Loading(showOverlay = showOverlay))
         }
+        loadFanOut = null
 
         when (route) {
-            ConfigRoute.USER ->
+            ConfigRoute.USER -> {
                 safeLaunch(tag = "getOwner") {
                     radioConfigUseCase.getOwner(destNum, onRequestId = ::registerReadRequestId)
                 }
+                // The status message is edited on the user screen, so it is read with the owner. Gated on the
+                // capability: firmware without the module never answers the get, leaving the overlay waiting.
+                val readsStatusMessage =
+                    Capabilities(radioConfigState.value.metadata?.firmware_version).supportsStatusMessage
+                loadFanOut = ConfigRoute.USER.name to readsStatusMessage
+                if (readsStatusMessage) {
+                    safeLaunch(tag = "getStatusMessageConfig") {
+                        radioConfigUseCase.getModuleConfig(
+                            destNum,
+                            AdminMessage.ModuleConfigType.STATUSMESSAGE_CONFIG.value,
+                            onRequestId = ::registerReadRequestId,
+                        )
+                    }
+                }
+            }
 
             ConfigRoute.CHANNELS -> {
                 safeLaunch(tag = "getChannel0") {
@@ -1363,7 +1386,8 @@ open class RadioConfigViewModel(
     private fun isSingleResponseRemoteReadRoute(route: String): Boolean {
         if (!isRemoteReadRoute(route)) return false
         val hasReadFanOut =
-            ConfigRoute.entries.firstOrNull { it.name == route }?.hasReadFanOut
+            loadFanOut?.takeIf { it.first == route }?.second
+                ?: ConfigRoute.entries.firstOrNull { it.name == route }?.hasReadFanOut
                 ?: ModuleRoute.entries.firstOrNull { it.name == route }?.hasReadFanOut
         // Unknown routes are never retained.
         return hasReadFanOut == false

@@ -92,6 +92,12 @@ class FakeUiPrefs : UiPrefs {
         theme.value = value
     }
 
+    override val unitsOverride = MutableStateFlow(0)
+
+    override fun setUnitsOverride(value: Int) {
+        unitsOverride.value = value
+    }
+
     override val locale = MutableStateFlow("en")
 
     override fun setLocale(languageTag: String) {
@@ -503,5 +509,11 @@ class FakeTakPrefs : org.meshtastic.core.repository.TakPrefs {
 
     override fun setMeshToCotEnabled(enabled: Boolean) {
         isMeshToCotEnabled.value = enabled
+    }
+
+    override val takServerChannel = MutableStateFlow(0)
+
+    override fun setTakServerChannel(index: Int) {
+        takServerChannel.value = index
     }
 }

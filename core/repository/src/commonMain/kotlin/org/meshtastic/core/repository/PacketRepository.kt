@@ -231,6 +231,17 @@ interface PacketRepository {
     /** Disables or enables message filtering for a specific contact. */
     suspend fun setContactFilteringDisabled(contactKey: String, disabled: Boolean)
 
+    /** Persists unsent composer text for [contactKey] so it survives leaving the screen, and shows in the list. */
+    suspend fun setDraft(contactKey: String, draft: String)
+
+    suspend fun getDraft(contactKey: String): String
+
+    /** Pins or unpins conversations so they sort above their unpinned siblings. */
+    suspend fun setPinned(contactKeys: List<String>, pinned: Boolean)
+
+    /** Returns a conversation to unread: flips its newest message back and rewinds the read watermark past it. */
+    suspend fun markContactUnread(contactKey: String)
+
     /** Clears all packet and message history from the database. */
     suspend fun clearPacketDB()
 

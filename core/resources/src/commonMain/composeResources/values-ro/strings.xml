@@ -141,6 +141,7 @@
     <string name="clean_nodes_older_than">Curăță nodurile văzute ultima dată mai vechi de %1$d zile</string>
     <string name="clean_now">Curăţă acum</string>
     <string name="clean_unknown_nodes">Curăță doar noduri necunoscute</string>
+    <!-- CLEAR -->
     <string name="clear">Șterge</string>
     <string name="clear_selection">Șterge selecția</string>
     <string name="client_notification">Notificare client</string>
@@ -317,7 +318,6 @@
     <string name="dns">DNS</string>
     <!-- DOC -->
     <string name="doc_clear_search">Ștergeți căutarea</string>
-    <string name="doc_title_discovery">Descoperiți</string>
     <string name="doc_title_mqtt">MQTT</string>
     <string name="doc_title_nodes">Noduri</string>
     <string name="done">Gata</string>
@@ -528,6 +528,7 @@
     <string name="ip_port">Port:</string>
     <string name="ipv4_mode">Mod IPv4</string>
     <string name="json_output_enabled">Ieșire JSON activată</string>
+    <string name="jump_to_latest_from">%1$s</string>
     <!-- KEY -->
     <string name="key_verification_final_title">Verificare cheie finalizată</string>
     <string name="key_verification_request_title">Solicitare de verificare cheie</string>
@@ -580,6 +581,7 @@
     <string name="local_stats_updated_at">%1$s</string>
     <string name="local_stats_uptime">Actualizare: %1$s</string>
     <string name="local_stats_utilization">ChUtil: %1$s% | AirTX: %2$s%</string>
+    <!-- LOCATION -->
     <string name="location_disabled">Accesul locației este dezactivat, nu putem furniza locația ta la rețea.</string>
     <string name="location_sharing">Partajarea locației</string>
     <!-- LOCKDOWN -->
@@ -815,7 +817,9 @@
     <string name="paxcounter_config">Configurație Paxcounter</string>
     <string name="paxcounter_enabled">Paxcounter activat</string>
     <string name="periodic_position_broadcast">Pozitie periodica</string>
+    <!-- PERMISSION -->
     <string name="permission_missing_31">Meshtastic necesită permisiunea „Dispozitive din apropiere” pentru a găsi și conecta dispozitive prin Bluetooth. Puteți dezactiva această funcție când nu o utilizați.</string>
+    <!-- PERMISSIONS -->
     <string name="phone_location">Locaţia telefonului</string>
     <string name="phone_location_description">Meshtastic folosește locația telefonului tău pentru a activa o serie de caracteristici. Poți actualiza permisiunile de locație în orice moment din setări.</string>
     <string name="play">Redare</string>
@@ -1056,6 +1060,8 @@
     <string name="super_deep_sleep_duration_seconds">Durată maximă de somn</string>
     <string name="supported">Suportate</string>
     <string name="supported_by_community">Sprijinită de comunitatea Meshtastic</string>
+    <string name="swipe_action_delete">Șterge</string>
+    <string name="swipe_action_unmute">Activare sunet</string>
     <string name="sx126x_rx_boosted_gain">Amplificare RX amplificată</string>
     <string name="system_settings">Setări ale sistemului</string>
     <!-- TAK -->
@@ -1156,6 +1162,8 @@
     <string name="tx_power_dbm">Putere transmisie</string>
     <string name="type">Tip</string>
     <string name="type_a_message">Scrie un mesaj</string>
+    <!-- UNITS -->
+    <string name="units_follow_system">Setarea telefonului</string>
     <!-- UNKNOWN -->
     <string name="unknown">Necunoscut</string>
     <string name="unknown_age">Vârstă necunoscută</string>

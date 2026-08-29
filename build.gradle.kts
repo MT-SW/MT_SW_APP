@@ -20,6 +20,9 @@ plugins {
     alias(libs.plugins.android.kotlin.multiplatform.library) apply false
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.compose.multiplatform) apply false
+    // On the root classpath (never applied here) so AndroidScreenshotConventionPlugin can
+    // reference PreviewScreenshotValidationTask — build-logic's compileOnly is not enough.
+    alias(libs.plugins.compose.screenshot) apply false
     alias(libs.plugins.datadog) apply false
     alias(libs.plugins.devtools.ksp) apply false
     alias(libs.plugins.koin.compiler) apply false
@@ -39,29 +42,44 @@ plugins {
 }
 
 plugins.withId("org.meshtastic.flatpak.sources") {
+    // The version catalog, reached through the API rather than the generated `libs` accessor. The
+    // accessor genuinely does not resolve in this script — it fails with a receiver-type mismatch,
+    // which is why this block used to carry copies of versions the catalog already held: it sat at
+    // compose-multiplatform 1.11.1 long after the catalog moved to 1.12.0-rc01, shipping URLs for a
+    // version nothing in the project used. The catalog itself is right here, so anything we already
+    // own is read rather than duplicated.
+    val catalog = extensions.getByType<org.gradle.api.artifacts.VersionCatalogsExtension>().named("libs")
+    val composeVersion = catalog.findVersion("compose-multiplatform").get().requiredVersion
+
+    fun catalogCoordinate(alias: String): String =
+        catalog.findLibrary(alias).get().get().let {
+            "${it.module.group}:${it.module.name}:${it.versionConstraint.requiredVersion}"
+        }
+
+    val platforms = setOf("linux-x64", "linux-arm64")
+
+    // desktopApp picks exactly one maplibre native runtime, by build-host arch, so an x86_64 generation
+    // host never resolves the arm64 blob and the arm64 offline build had no URL to fetch. These name the
+    // same catalog aliases desktopApp itself uses, so the two cannot disagree, and a target platform
+    // added below with no matching catalog entry fails here at configure time rather than eleven minutes
+    // into an offline build.
+    val maplibreRuntimes = platforms.map { catalogCoordinate("maplibre-compose-runtime-vulkan-$it") }
+
     extensions.configure<org.meshtastic.flatpak.sources.FlatpakSourcesExtension> {
         outputFile.set(layout.buildDirectory.file("flatpak-sources.json"))
         mustRunAfterTasks.set(listOf(":desktopApp:assemble", ":desktopApp:packageUberJarForCurrentOS"))
+        targetPlatforms.set(platforms)
         // Force-resolve platform-specific native artifacts not resolved on the generation host (the
         // manifest is generated on an x86_64 runner, but the offline build also needs to run on arm64).
         //
-        // KEEP desktop-jvm's version IN SYNC with the compose-multiplatform entry in
-        // gradle/libs.versions.toml — that's exactly the maintenance trap that caused this to break once
-        // already: this block was pinned to 1.11.1 and never updated when the catalog moved to
-        // 1.12.0-rc01, so the arm64 offline flatpak build kept resolving (and shipping) URLs for a version
-        // nothing in the project used anymore. (A `libs.versions.composeMultiplatform` reference here
-        // would auto-track it, but that accessor isn't resolvable in this project's script — tried and
-        // confirmed via a direct `./gradlew help` failure — so it has to stay a literal that a human/agent
-        // updates by hand alongside any compose-multiplatform bump.)
-        //
-        // skiko isn't in this catalog at all — its version must track whatever desktop-jvm-<platform>'s
-        // own POM declares for org.jetbrains.skiko:skiko-awt-runtime-<platform> (0.150.1 for
-        // compose-multiplatform 1.12.0-rc01); check that POM again if this version is bumped.
-        targetPlatforms.set(setOf("linux-x64", "linux-arm64"))
-        platformDependencies.set(setOf(
-            "org.jetbrains.skiko:skiko-awt-runtime-{platform}:0.150.1",
-            "org.jetbrains.compose.desktop:desktop-jvm-{platform}:1.12.0-rc01",
-        ))
+        // Since plugin 0.2.0 each coordinate resolves transitively, so only direct dependencies belong
+        // here: desktop-jvm-{platform} brings skiko-awt-runtime-{platform}, and the maplibre runtimes
+        // bring the maplibre-native-ffi and LWJGL natives with them. Those three were spelled out here
+        // until 0.2.0, versions and classifiers copied by hand out of POMs this project does not own —
+        // which went stale silently and cost two arm64 build failures on #6901.
+        platformDependencies.set(
+            maplibreRuntimes + setOf("org.jetbrains.compose.desktop:desktop-jvm-{platform}:$composeVersion"),
+        )
     }
 }
 

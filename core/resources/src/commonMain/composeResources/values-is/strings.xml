@@ -43,6 +43,7 @@
     <!-- CHIRPY -->
     <string name="choose_theme">Veldu þema</string>
     <!-- CLEAN -->
+    <!-- CLEAR -->
     <string name="clear">Hreinsa</string>
     <string name="close">Loka</string>
     <!-- COMPASS -->
@@ -96,6 +97,7 @@
     <!-- LICENSED -->
     <!-- LOAD -->
     <!-- LOCAL -->
+    <!-- LOCATION -->
     <string name="location_disabled">Aðgangur að staðsetningu ekki leyfður, staðsetning ekki send út á mesh.</string>
     <!-- LOCKDOWN -->
     <string name="locked">Læst</string>
@@ -145,6 +147,8 @@
     <!-- OUTPUT -->
     <!-- PACKET -->
     <!-- PAX -->
+    <!-- PERMISSION -->
+    <!-- PERMISSIONS -->
     <!-- POSITION -->
     <!-- POWER -->
     <string name="preferences_language">Tungumál</string>
@@ -185,6 +189,7 @@
     <!-- SHOW -->
     <string name="shutdown">Slökkva</string>
     <!-- SITE -->
+    <string name="swipe_action_delete">Eyða</string>
     <!-- TAK -->
     <string name="theme">Þema</string>
     <string name="theme_dark">Dökkt</string>
@@ -196,6 +201,8 @@
     <!-- TRAFFIC -->
     <!-- TRANSLATION -->
     <!-- TRANSPORT -->
+    <!-- UNITS -->
+    <string name="units_follow_system">Grunnstilling kerfis</string>
     <!-- UNKNOWN -->
     <string name="unknown_username">Óþekkt notendanafn</string>
     <!-- URL -->

@@ -24,6 +24,8 @@ import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
 import dev.mokkery.verify
+import dev.mokkery.verify.VerifyMode
+import dev.mokkery.verifySuspend
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,17 +34,23 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import org.meshtastic.core.common.state.FirmwareMaintenanceLock
 import org.meshtastic.core.common.state.HiddenFeaturesUnlock
 import org.meshtastic.core.database.entity.FirmwareRelease
 import org.meshtastic.core.database.entity.FirmwareReleaseType
 import org.meshtastic.core.datastore.BootloaderWarningDataSource
 import org.meshtastic.core.datastore.FirmwareRecoveryDataSource
 import org.meshtastic.core.datastore.model.PendingFirmwareRecovery
+import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceHardware
+import org.meshtastic.core.model.MaintenanceUf2Manifest
 import org.meshtastic.core.repository.DeviceHardwareRepository
 import org.meshtastic.core.repository.FirmwareReleaseRepository
+import org.meshtastic.core.repository.MaintenanceUf2Repository
+import org.meshtastic.core.repository.NodeRestartTracker
 import org.meshtastic.core.repository.PlatformAnalytics
 import org.meshtastic.core.repository.RadioPrefs
 import org.meshtastic.core.resources.Res
@@ -70,6 +78,7 @@ class FirmwareUpdateViewModelTest {
 
     private val firmwareReleaseRepository: FirmwareReleaseRepository = mock(MockMode.autofill)
     private val deviceHardwareRepository: DeviceHardwareRepository = mock(MockMode.autofill)
+    private val maintenanceUf2Repository: MaintenanceUf2Repository = mock(MockMode.autofill)
     private val nodeRepository = FakeNodeRepository()
     private val radioController = FakeRadioController()
     private val radioPrefs: RadioPrefs = mock(MockMode.autofill)
@@ -78,6 +87,7 @@ class FirmwareUpdateViewModelTest {
     private val firmwareUpdateManager: FirmwareUpdateManager = mock(MockMode.autofill)
     private val usbManager: FirmwareUsbManager = mock(MockMode.autofill)
     private val fileHandler: FirmwareFileHandler = mock(MockMode.autofill)
+    private val firmwareRetriever: FirmwareRetriever = mock(MockMode.autofill)
     private val analytics: PlatformAnalytics = mock(MockMode.autofill)
 
     private lateinit var viewModel: FirmwareUpdateViewModel
@@ -98,6 +108,8 @@ class FirmwareUpdateViewModelTest {
             Result.success(hardware)
 
         everySuspend { bootloaderWarningDataSource.isDismissed(any()) } returns false
+        everySuspend { maintenanceUf2Repository.reconcile() } returns Unit
+        everySuspend { maintenanceUf2Repository.getSnapshot() } returns MaintenanceUf2Manifest()
 
         // No stranded-device recovery record by default; recovery tests override this.
         every { firmwareRecoveryDataSource.pending } returns flowOf(null)
@@ -131,6 +143,7 @@ class FirmwareUpdateViewModelTest {
     private fun createViewModel() = FirmwareUpdateViewModel(
         firmwareReleaseRepository,
         deviceHardwareRepository,
+        maintenanceUf2Repository,
         nodeRepository,
         radioController,
         radioPrefs,
@@ -139,9 +152,12 @@ class FirmwareUpdateViewModelTest {
         firmwareUpdateManager,
         usbManager,
         fileHandler,
+        firmwareRetriever,
+        FirmwareMaintenanceLock(),
         TestApplicationCoroutineScope(testDispatcher),
         hiddenFeaturesUnlock,
         analytics,
+        NodeRestartTracker(TestApplicationCoroutineScope(testDispatcher)),
     )
 
     @Test
@@ -212,7 +228,12 @@ class FirmwareUpdateViewModelTest {
         verify {
             analytics.trackAction(
                 "firmware_update_start",
-                mapOf("update_method" to "ble", "is_recovery" to false, "release_version" to "1"),
+                mapOf(
+                    "update_method" to "ble",
+                    "is_recovery" to false,
+                    "release_version" to "1",
+                    "wipe_device" to false,
+                ),
             )
         }
     }
@@ -241,6 +262,77 @@ class FirmwareUpdateViewModelTest {
                 state is FirmwareUpdateState.VerificationFailed,
             "Final state was $state",
         )
+    }
+
+    @Test
+    fun `startUpdate with wipe factory-resets only after verification succeeds`() = runTest {
+        advanceUntilIdle()
+
+        everySuspend { firmwareUpdateManager.startUpdate(any(), any(), any(), any()) }
+            .calls {
+                @Suppress("UNCHECKED_CAST")
+                val updateState = it.args[3] as (FirmwareUpdateState) -> Unit
+                updateState(FirmwareUpdateState.Success())
+                null
+            }
+        // Start while disconnected: verification blocks on reconnect, and the reset must not have fired yet.
+        viewModel.startUpdate(wipeDevice = true)
+        runCurrent()
+
+        assertIs<FirmwareUpdateState.Verifying>(viewModel.state.value)
+        assertTrue(radioController.factoryResetCalls.isEmpty(), "no reset before the device is back and verified")
+
+        radioController.setConnectionState(ConnectionState.Connected)
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertIs<FirmwareUpdateState.Success>(state)
+        assertTrue(state.deviceWasWiped, "Success must report the wipe it performed")
+        assertEquals(listOf(123), radioController.factoryResetCalls)
+    }
+
+    @Test
+    fun `startUpdate with wipe never factory-resets when verification fails`() = runTest {
+        advanceUntilIdle()
+
+        everySuspend { firmwareUpdateManager.startUpdate(any(), any(), any(), any()) }
+            .calls {
+                @Suppress("UNCHECKED_CAST")
+                val updateState = it.args[3] as (FirmwareUpdateState) -> Unit
+                updateState(FirmwareUpdateState.Success())
+                null
+            }
+        // Never reconnects → verification times out. A device we cannot confirm updated is never wiped.
+
+        viewModel.startUpdate(wipeDevice = true)
+        advanceUntilIdle()
+
+        assertIs<FirmwareUpdateState.VerificationFailed>(viewModel.state.value)
+        assertTrue(radioController.factoryResetCalls.isEmpty(), "no factory reset without a verified update")
+    }
+
+    @Test
+    fun `startUpdate without wipe never factory-resets`() = runTest {
+        advanceUntilIdle()
+
+        everySuspend { firmwareUpdateManager.startUpdate(any(), any(), any(), any()) }
+            .calls {
+                @Suppress("UNCHECKED_CAST")
+                val updateState = it.args[3] as (FirmwareUpdateState) -> Unit
+                updateState(FirmwareUpdateState.Success())
+                null
+            }
+        radioController.setConnectionState(ConnectionState.Connected)
+
+        viewModel.startUpdate()
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertIs<FirmwareUpdateState.Success>(state)
+        assertFalse(state.deviceWasWiped)
+        assertTrue(radioController.factoryResetCalls.isEmpty(), "default update path must not wipe")
+        // The USB permission preflight is serial-only; a BLE verify must not touch the USB stack.
+        verifySuspend(VerifyMode.not) { usbManager.ensureSerialPermission(any()) }
     }
 
     @Test

@@ -47,6 +47,7 @@
     <!-- CHIRPY -->
     <string name="choose_theme">Odaberi temu</string>
     <!-- CLEAN -->
+    <!-- CLEAR -->
     <string name="clear">Očisti</string>
     <string name="close">Zatvori</string>
     <!-- COMPASS -->
@@ -111,6 +112,7 @@
     <!-- LICENSED -->
     <!-- LOAD -->
     <!-- LOCAL -->
+    <!-- LOCATION -->
     <string name="location_disabled">Pristup lokaciji je isključen, Vaš Android ne može pružiti lokaciju mesh mreži.</string>
     <!-- LOCKDOWN -->
     <string name="locked">Zaključano</string>
@@ -176,6 +178,8 @@
     <!-- OUTPUT -->
     <!-- PACKET -->
     <!-- PAX -->
+    <!-- PERMISSION -->
+    <!-- PERMISSIONS -->
     <!-- POSITION -->
     <!-- POWER -->
     <string name="preferences_language">Jezik</string>
@@ -220,6 +224,8 @@
     <!-- SHOW -->
     <string name="shutdown">Isključi</string>
     <!-- SITE -->
+    <string name="swipe_action_delete">Obriši</string>
+    <string name="swipe_action_mute">Utišaj</string>
     <!-- TAK -->
     <string name="tak_team_red">Crveno</string>
     <string name="theme">Tema</string>
@@ -233,6 +239,8 @@
     <!-- TRANSLATION -->
     <!-- TRANSPORT -->
     <string name="two_days">48 Sati</string>
+    <!-- UNITS -->
+    <string name="units_follow_system">Sistemski zadano</string>
     <!-- UNKNOWN -->
     <string name="unknown_username">Nepoznati korisnik</string>
     <!-- URL -->

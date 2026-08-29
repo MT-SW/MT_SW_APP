@@ -52,6 +52,7 @@
     <!-- CHIRPY -->
     <string name="choose_theme">Izberi temo</string>
     <!-- CLEAN -->
+    <!-- CLEAR -->
     <string name="clear">Počisti</string>
     <string name="close">Zapri</string>
     <!-- COMPASS -->
@@ -128,6 +129,7 @@
     <!-- LICENSED -->
     <!-- LOAD -->
     <!-- LOCAL -->
+    <!-- LOCATION -->
     <string name="location_disabled">Dostop do lokacije je onemogočen, mreža ne more prikazati položaja.</string>
     <!-- LOCKDOWN -->
     <string name="locked">Zaklenjeno</string>
@@ -200,6 +202,8 @@
     <!-- OUTPUT -->
     <!-- PACKET -->
     <!-- PAX -->
+    <!-- PERMISSION -->
+    <!-- PERMISSIONS -->
     <!-- POSITION -->
     <!-- POWER -->
     <string name="preferences_language">Jezik</string>
@@ -275,6 +279,8 @@
     <!-- SITE -->
     <string name="snr">SNR</string>
     <string name="snr_definition">Razmerje med signalom in šumom je merilo, ki se uporablja v komunikacijah za količinsko opredelitev ravni želenega signala glede na raven hrupa v ozadju. V Meshtastic in drugih brezžičnih sistemih višji SNR pomeni jasnejši signal, ki lahko poveča zanesljivost in kakovost prenosa podatkov.</string>
+    <string name="swipe_action_delete">Izbriši</string>
+    <string name="swipe_action_mute">Utišaj</string>
     <!-- TAK -->
     <string name="theme">Tema</string>
     <string name="theme_dark">Temna tema</string>
@@ -298,6 +304,8 @@
     <string name="twenty_four_hours">24ur</string>
     <string name="two_days">48 Ur</string>
     <string name="two_weeks">2T</string>
+    <!-- UNITS -->
+    <string name="units_follow_system">Privzeta sistemska</string>
     <!-- UNKNOWN -->
     <string name="unknown_username">Neznano uporabniško ime</string>
     <string name="unrecognized">Neprepoznano</string>

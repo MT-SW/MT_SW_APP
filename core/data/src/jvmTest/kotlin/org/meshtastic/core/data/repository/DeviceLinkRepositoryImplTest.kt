@@ -24,8 +24,10 @@ import okio.Source
 import org.meshtastic.core.data.datasource.BundledAssetReader
 import org.meshtastic.core.data.datasource.DeviceLinkLocalDataSource
 import org.meshtastic.core.di.CoroutineDispatchers
+import org.meshtastic.core.model.BootloaderOtaQuirksResponse
 import org.meshtastic.core.model.EventFirmwareResponse
 import org.meshtastic.core.model.FirmwareReleaseManifest
+import org.meshtastic.core.model.MaintenanceUf2Manifest
 import org.meshtastic.core.model.NetworkDeviceHardware
 import org.meshtastic.core.model.NetworkDeviceLink
 import org.meshtastic.core.model.NetworkDeviceLinksResponse
@@ -55,6 +57,10 @@ class DeviceLinkRepositoryImplTest {
         override suspend fun getNightlyFirmware(): NetworkFirmwareNightly? = error("unused")
 
         override suspend fun getEventFirmware(): EventFirmwareResponse = error("unused")
+
+        override suspend fun getBootloaderOtaQuirks(): BootloaderOtaQuirksResponse = error("unused")
+
+        override suspend fun getMaintenanceUf2Manifest(): MaintenanceUf2Manifest = error("unused")
     }
 
     /** Serves only `device_links.json`, serializing the current [links] so the repo seeds via the real decode path. */

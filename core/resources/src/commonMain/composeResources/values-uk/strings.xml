@@ -165,6 +165,7 @@
     <string name="clean_nodes_older_than">Очистити вузли, які не були онлайн більше %1$d дні(в)</string>
     <string name="clean_now">Очистити зараз</string>
     <string name="clean_unknown_nodes">Очистити лише невідомі вузли</string>
+    <!-- CLEAR -->
     <string name="clear">Очистити</string>
     <string name="clear_selection">Очистити вибір</string>
     <string name="client_notification">Клієнтські повідомлення</string>
@@ -243,6 +244,8 @@
     <string name="current">Поточний</string>
     <string name="currently">Наразі:</string>
     <string name="date">Дата</string>
+    <string name="date_separator_today">Сьогодні</string>
+    <string name="date_separator_yesterday">Вчора</string>
     <string name="dbm_value">%1$d дБм</string>
     <!-- DEBUG -->
     <string name="debug">Відлагодження</string>
@@ -355,7 +358,6 @@
     <string name="dns">DNS</string>
     <!-- DOC -->
     <string name="doc_clear_search">Очистити пошук</string>
-    <string name="doc_keywords_android_auto">android auto,car,head unit,driving,hands free,messaging</string>
     <string name="doc_keywords_app_functions">system ai,gemini,assistant,functions,automation,voice</string>
     <string name="doc_keywords_connections">bluetooth,usb,tcp,pairing,serial,wifi</string>
     <string name="doc_keywords_desktop">desktop,linux,macos,windows,serial</string>
@@ -374,7 +376,6 @@
     <string name="doc_keywords_tak">tak,atak,cursor-on-target,team-awareness</string>
     <string name="doc_section_developer">Посібник для розробників</string>
     <string name="doc_section_user">Посібник користувача</string>
-    <string name="doc_title_android_auto">Android Auto</string>
     <string name="doc_title_mqtt">MQTT</string>
     <string name="doc_title_nodes">Вузли</string>
     <string name="done">Готово</string>
@@ -589,6 +590,7 @@
     <string name="ip_port">Порт:</string>
     <string name="ipv4_mode">Режим IPv4</string>
     <string name="json_output_enabled">Вивід JSON увімкнено</string>
+    <string name="jump_to_latest_from">%1$s</string>
     <!-- KEY -->
     <string name="key_verification_final_title">Перевірку ключа завершено</string>
     <string name="key_verification_request_title">Запит ключа верифікації</string>
@@ -643,6 +645,7 @@
     <string name="local_stats_noise">Шум %1$d dBm</string>
     <string name="local_stats_traffic">Трафік: TX %1$d / RX %2$d (D: %3$d)</string>
     <string name="local_stats_updated_at">%1$s</string>
+    <!-- LOCATION -->
     <string name="location_disabled">Доступ до місцезнаходження вимкнено, неможливо транслювати позицію.</string>
     <!-- LOCKDOWN -->
     <string name="lockdown_enable_ack">Я розумію</string>
@@ -920,9 +923,12 @@
     <string name="paxcounter">Лічильник пристроїв</string>
     <string name="paxcounter_config">Конфігурація лічильника пристроїв</string>
     <string name="paxcounter_enabled">Лічильник пристроїв активований</string>
+    <!-- PERMISSION -->
     <string name="permission_missing_31">Для пошуку та підключення до пристроїв через Bluetooth програмі Meshtastic потрібен дозвіл «Пристрої поблизу». Ви можете вимкнути його, коли не користуєтеся програмою.</string>
+    <!-- PERMISSIONS -->
     <string name="phone_location">Геопозиція телефона</string>
     <string name="phone_location_description">Meshtastic використовує геопозицію вашого телефона для роботи низки функцій. Ви можете змінити дозволи на доступ до місцезнаходження в будь-який час у налаштуваннях.</string>
+    <string name="pin_selected">Контакт</string>
     <string name="play">Відтворити</string>
     <plurals name="plurals_hours">
         <item quantity="one">%1$d година</item>
@@ -1192,6 +1198,9 @@
     <string name="super_deep_sleep_duration_seconds">Тривалість глибокого сну</string>
     <string name="supported">Підтримується</string>
     <string name="supported_by_community">Підтримується спільнотою Meshtastic</string>
+    <string name="swipe_action_delete">Видалити</string>
+    <string name="swipe_action_mute">Вимкнути звук</string>
+    <string name="swipe_action_unmute">Увімкнути звук</string>
     <string name="sx126x_rx_boosted_gain">Підсилення передачі</string>
     <string name="system_settings">Системі налаштування</string>
     <!-- TAK -->
@@ -1281,6 +1290,8 @@
     <string name="tx_power_dbm">Потужність передачі</string>
     <string name="type">Тип</string>
     <string name="type_a_message">Введіть повідомлення</string>
+    <!-- UNITS -->
+    <string name="units_follow_system">Системна</string>
     <!-- UNKNOWN -->
     <string name="unknown">Невідомий</string>
     <string name="unknown_age">Невідомий вік</string>

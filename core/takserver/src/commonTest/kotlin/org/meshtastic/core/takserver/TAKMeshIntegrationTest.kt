@@ -48,6 +48,7 @@ import org.meshtastic.proto.TAKPacket
 import org.meshtastic.proto.User
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
@@ -178,6 +179,7 @@ class TAKMeshIntegrationTest {
                 meshConfigHandler = meshConfigHandler,
                 nodeRepository = nodeRepository,
                 meshToCotBroadcaster = broadcaster,
+                takPrefs = takPrefs,
             )
     }
 
@@ -320,6 +322,44 @@ class TAKMeshIntegrationTest {
         assertEquals(PortNum.ATAK_PLUGIN.value, h.commandSender.sentPackets.single().dataType)
     }
 
+    // ── Outbound channel selection ───────────────────────────────────────────
+
+    @Test
+    fun `default outbound channel is the primary channel`() = runTest(UnconfinedTestDispatcher()) {
+        val h = TestHarness(nodeRepository = FakeNodeRepository(firmwareVersion = "2.8.0.0"))
+        h.integration.start(backgroundScope)
+
+        h.serverManager.emitInbound(createPli("test-default-channel"))
+
+        assertEquals(0, h.commandSender.sentPackets.single().channel)
+    }
+
+    @Test
+    fun `configured takServerChannel is applied to V2 sends`() = runTest(UnconfinedTestDispatcher()) {
+        val h = TestHarness(nodeRepository = FakeNodeRepository(firmwareVersion = "2.8.0.0"))
+        h.takPrefs.setTakServerChannel(3)
+        h.integration.start(backgroundScope)
+
+        h.serverManager.emitInbound(createPli("test-v2-channel"))
+
+        val sent = h.commandSender.sentPackets.single()
+        assertEquals(PortNum.ATAK_PLUGIN_V2.value, sent.dataType)
+        assertEquals(3, sent.channel)
+    }
+
+    @Test
+    fun `configured takServerChannel is applied to V1 sends`() = runTest(UnconfinedTestDispatcher()) {
+        val h = TestHarness(nodeRepository = FakeNodeRepository(firmwareVersion = "2.7.0.0"))
+        h.takPrefs.setTakServerChannel(5)
+        h.integration.start(backgroundScope)
+
+        h.serverManager.emitInbound(createPli("test-v1-channel"))
+
+        val sent = h.commandSender.sentPackets.single()
+        assertEquals(PortNum.ATAK_PLUGIN.value, sent.dataType)
+        assertEquals(5, sent.channel)
+    }
+
     @Test
     fun `legacy firmware drops non-PLI non-GeoChat types`() = runTest(UnconfinedTestDispatcher()) {
         val h = TestHarness(nodeRepository = FakeNodeRepository(firmwareVersion = "2.7.0.0"))
@@ -330,6 +370,42 @@ class TAKMeshIntegrationTest {
 
         assertTrue(h.commandSender.sentPackets.isEmpty())
     }
+
+    // ── Dropped-outcome discrimination (regression: #6583 self-test blind spot) ────────
+
+    @Test
+    fun `v1 drop of an unsupported CoT type is schema-limited`() = runTest(UnconfinedTestDispatcher()) {
+        // a-h-G is a shape/marker type the legacy v1 TAKPacket schema has no field for at all —
+        // this is the "permanent limitation" case, not a size problem.
+        val h = TestHarness(nodeRepository = FakeNodeRepository(firmwareVersion = "2.7.0.0"))
+        val marker = CoTMessage(uid = "marker-1", type = "a-h-G", stale = Clock.System.now() + 5.minutes)
+
+        val outcome = h.integration.sendCoTToMeshForTest(marker, forceV2 = false)
+
+        val dropped = assertNotNull(outcome as? TakSendOutcome.Dropped, "expected a Dropped outcome, got $outcome")
+        assertTrue(dropped.schemaLimited, "an unsupported CoT type must be reported as schema-limited")
+    }
+
+    @Test
+    fun `v1 drop of an oversize but schema-representable PLI is NOT schema-limited`() =
+        runTest(UnconfinedTestDispatcher()) {
+            // a-f-G (PLI) IS representable in the v1 schema — this must be dropped for size, not
+            // mislabeled as an expected schema gap. This is the exact blind spot the self-test's
+            // expectedDrop flag has to avoid: an MTU problem hiding behind "expected" v1 behavior.
+            val h = TestHarness(nodeRepository = FakeNodeRepository(firmwareVersion = "2.7.0.0"))
+            val oversizePli =
+                CoTMessage(
+                    uid = "pli-1",
+                    type = "a-f-G-U-C",
+                    stale = Clock.System.now() + 5.minutes,
+                    contact = CoTContact(callsign = "X".repeat(500)),
+                )
+
+            val outcome = h.integration.sendCoTToMeshForTest(oversizePli, forceV2 = false)
+
+            val dropped = assertNotNull(outcome as? TakSendOutcome.Dropped, "expected a Dropped outcome, got $outcome")
+            assertTrue(!dropped.schemaLimited, "an oversize drop of a representable type must not be schema-limited")
+        }
 
     // ── GeoChat callsign enrichment ──────────────────────────────────────────
 

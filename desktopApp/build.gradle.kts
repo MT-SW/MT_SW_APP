@@ -25,6 +25,13 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.compose.multiplatform)
+    // Adds `:desktopApp:hotRun` — the app relaunched with live recomposition on source edits.
+    // Needs the JetBrains Runtime for enhanced class redefinition, which the jvmToolchain block
+    // below already pins (vendor JETBRAINS, resolved by the foojay resolver in settings.gradle.kts).
+    // Version-less because the Compose Multiplatform plugin already carries hot-reload on the
+    // build classpath; requesting a version fails resolution ("already on the classpath with an
+    // unknown version"), the same reason Mokkery is applied bare below.
+    id("org.jetbrains.compose.hot-reload")
     alias(libs.plugins.meshtastic.detekt)
     alias(libs.plugins.meshtastic.spotless)
     alias(libs.plugins.meshtastic.koin)
@@ -138,6 +145,10 @@ compose.desktop {
 
         val desktopJvmArgs = buildList {
             add("-Xmx2G")
+            // maplibre-compose's desktop renderer reaches native code through the FFM API,
+            // which refuses to load without this. Omitting it fails at first map composition,
+            // not at startup, so the map tab would simply be blank.
+            add("--enable-native-access=ALL-UNNAMED")
             // Let the macOS title bar follow the system light/dark theme (ignored on other OSes).
             add("-Dapple.awt.application.appearance=system")
             add("-Dapple.awt.application.name=Meshtastic Desktop")
@@ -323,6 +334,35 @@ dependencies {
 
     // Compose Desktop
     implementation(compose.desktop.currentOs)
+
+    // The MapLibre map surfaces, shared with the F-Droid Android flavor.
+    implementation(projects.feature.mapMaplibre)
+
+    // Exactly one native runtime — the one matching this build host. Each carries that platform's
+    // maplibre-native blob, so adding them all would bloat every distribution with four unusable
+    // copies. Upstream publishes no macos-x64 artifact, which matches our release matrix.
+    run {
+        val osName = providers.systemProperty("os.name").get().lowercase()
+        val osArch = providers.systemProperty("os.arch").get().lowercase()
+        val isArm = osArch.contains("aarch64") || osArch.contains("arm64")
+        when {
+            osName.contains("mac") -> runtimeOnly(libs.maplibre.compose.runtime.metal.macos.arm64)
+
+            osName.contains("win") ->
+                if (isArm) {
+                    runtimeOnly(libs.maplibre.compose.runtime.vulkan.windows.arm64)
+                } else {
+                    runtimeOnly(libs.maplibre.compose.runtime.vulkan.windows.x64)
+                }
+
+            else ->
+                if (isArm) {
+                    runtimeOnly(libs.maplibre.compose.runtime.vulkan.linux.arm64)
+                } else {
+                    runtimeOnly(libs.maplibre.compose.runtime.vulkan.linux.x64)
+                }
+        }
+    }
     implementation(libs.compose.multiplatform.animation)
     implementation(libs.compose.multiplatform.material3)
     implementation(libs.compose.multiplatform.runtime)

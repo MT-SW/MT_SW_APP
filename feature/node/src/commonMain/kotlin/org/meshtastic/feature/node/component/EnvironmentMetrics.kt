@@ -17,6 +17,7 @@
 package org.meshtastic.feature.node.component
 
 import androidx.compose.runtime.Composable
+import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.model.Node
@@ -26,7 +27,6 @@ import org.meshtastic.core.model.util.UnitConversions.toTempString
 import org.meshtastic.core.model.util.adcVoltage
 import org.meshtastic.core.model.util.oneWireTemperature
 import org.meshtastic.core.model.util.toSmallDistanceString
-import org.meshtastic.core.model.util.toSpeedString
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.adc_voltage
 import org.meshtastic.core.resources.current
@@ -65,7 +65,6 @@ import org.meshtastic.core.ui.icon.Weight
 import org.meshtastic.core.ui.icon.WindDirection
 import org.meshtastic.feature.node.model.DrawableMetricInfo
 import org.meshtastic.feature.node.model.VectorMetricInfo
-import org.meshtastic.proto.Config
 
 /**
  * Displays environmental metrics for a node.
@@ -76,11 +75,7 @@ import org.meshtastic.proto.Config
  */
 @Suppress("CyclomaticComplexMethod", "LongMethod")
 @Composable
-internal fun EnvironmentMetrics(
-    node: Node,
-    displayUnits: Config.DisplayConfig.DisplayUnits,
-    isFahrenheit: Boolean = false,
-) {
+internal fun EnvironmentMetrics(node: Node, displayUnits: MeasurementSystem, isFahrenheit: Boolean = false) {
     val groups: List<MetricGroup> = buildList {
         with(node.environmentMetrics) {
             val temperatureCard =
@@ -196,7 +191,7 @@ internal fun EnvironmentMetrics(
                 add(
                     VectorMetricInfo(
                         label = Res.string.wind,
-                        value = ws.toSpeedString(displayUnits),
+                        value = MetricFormatter.windSpeed(ws, displayUnits == MeasurementSystem.IMPERIAL),
                         icon = MeshtasticIcons.WindDirection,
                         rotateIcon = normalizedBearing.toFloat(),
                     )
@@ -207,8 +202,7 @@ internal fun EnvironmentMetrics(
                 add(
                     VectorMetricInfo(
                         label = Res.string.weight,
-                        value =
-                        MetricFormatter.weight(w, displayUnits == Config.DisplayConfig.DisplayUnits.IMPERIAL),
+                        value = MetricFormatter.weight(w, displayUnits == MeasurementSystem.IMPERIAL),
                         icon = MeshtasticIcons.Weight,
                     )
                         .asGroup(),

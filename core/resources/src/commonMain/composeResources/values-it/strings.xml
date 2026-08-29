@@ -167,7 +167,6 @@
     <string name="buzzer_gpio">GPIO del Buzzer</string>
     <string name="calculating">Calcolo…</string>
     <string name="call_sign">Identificativo di chiamata</string>
-    <string name="call_sign_summary">Il tuo identificativo di chiamata di radioamatore, fino a 8 caratteri</string>
     <string name="camera_permission">Autorizzazione fotocamera</string>
     <string name="camera_permission_rationale">Consenti l'accesso alla fotocamera per scansionare i codici QR.</string>
     <string name="camera_unavailable">Impossibile avviare la fotocamera. Riprovare o chiudere lo scanner e riaprirlo.</string>
@@ -224,6 +223,7 @@
     <string name="clean_nodes_older_than">Elimina i nodi visti per l'ultima volta più di %1$d giorni fa</string>
     <string name="clean_now">Elimina ora</string>
     <string name="clean_unknown_nodes">Elimina solo i nodi sconosciuti</string>
+    <!-- CLEAR -->
     <string name="clear">Svuota</string>
     <string name="clear_selection">Annulla selezione</string>
     <string name="clear_time_zone">Cancella fuso orario</string>
@@ -319,6 +319,8 @@
     <string name="current">Attuale</string>
     <string name="currently">Attualmente:</string>
     <string name="date">Data</string>
+    <string name="date_separator_today">Oggi</string>
+    <string name="date_separator_yesterday">Ieri</string>
     <string name="dbm_value">%1$d dBm</string>
     <!-- DEBUG -->
     <string name="debug">Debug</string>
@@ -505,7 +507,6 @@
     <string name="dns">DNS</string>
     <!-- DOC -->
     <string name="doc_clear_search">Azzera ricerca</string>
-    <string name="doc_keywords_android_auto">android auto,auto,head unit,guida,vivavoce,messaggi</string>
     <string name="doc_keywords_app_functions">system ai,gemini,assistente,funzioni,automazione,voce</string>
     <string name="doc_keywords_connections">bluetooth,usb,tcp,accoppiamento,seriale,wifi,connessione</string>
     <string name="doc_keywords_debug_logs">debug,log,logcat,esportazione,segnalazione bug,problema,risoluzione problemi,diagnostica</string>
@@ -531,12 +532,11 @@
     <string name="doc_search_placeholder">Cerca nella documentazione…</string>
     <string name="doc_section_developer">Guida per sviluppatori</string>
     <string name="doc_section_user">Guida utente</string>
-    <string name="doc_title_android_auto">Android Auto</string>
     <string name="doc_title_app_functions">Funzioni dell'app</string>
     <string name="doc_title_connections">Connessioni</string>
     <string name="doc_title_debug_logs">Log di debug</string>
     <string name="doc_title_desktop">App desktop</string>
-    <string name="doc_title_discovery">Discovery</string>
+    <string name="doc_title_discovery">Discovery della mesh locale</string>
     <string name="doc_title_firmware">Aggiornamenti firmware</string>
     <string name="doc_title_help">Aiuto &amp; Documentazione In-App</string>
     <string name="doc_title_map">Mappa &amp; Waypoint</string>
@@ -690,7 +690,6 @@
     <string name="firmware_update_open_flasher">Apri Meshtastic Flasher</string>
     <string name="firmware_update_ota_failed">Aggiornamento OTA non riuscito: %1$s</string>
     <string name="firmware_update_ota_unsupported_reason">Il loader OTA di questo dispositivo ha rifiutato il metodo di aggiornamento richiesto: %1$s</string>
-    <string name="firmware_update_rak4631_bootloader_hint">Per il RAK WisBlock RAK4631, usa lo strumento DFU seriale del produttore (per esempio adafruit-nrfutil dfu serial con il file .zip del bootloader fornito). Copiare solo il file .uf2 non aggiorna il bootloader.</string>
     <string name="firmware_update_rebooting">Riavvio in DFU...</string>
     <string name="firmware_update_release_notes">Note di rilascio</string>
     <string name="firmware_update_requires_bin">%1$s richiede un file .bin corrispondente al target.</string>
@@ -840,6 +839,7 @@
     <string name="ip_port">Porta:</string>
     <string name="ipv4_mode">Modalità IPv4</string>
     <string name="json_output_enabled">Output JSON abilitato</string>
+    <string name="jump_to_latest_from">%1$s</string>
     <!-- KEY -->
     <string name="key_backup_deleted">Backup delle chiavi eliminato</string>
     <string name="key_backup_not_found">Nessun backup delle chiavi trovato per questo nodo</string>
@@ -906,6 +906,7 @@
     <string name="local_stats_updated_at">%1$s</string>
     <string name="local_stats_uptime">Tempo di attività: %1$s</string>
     <string name="local_stats_utilization">ChUtil: %1$s% | AirTX: %2$s%</string>
+    <!-- LOCATION -->
     <string name="location_disabled">L'accesso alla posizione è disattivato, non è possibile fornire la posizione al mesh.</string>
     <string name="location_sharing">Condivisione della posizione</string>
     <!-- LOCKDOWN -->
@@ -1032,7 +1033,6 @@
     <string name="mesh_beacon_on_region">Regione di trasmissione</string>
     <string name="mesh_beacon_preset_indicator">Annunciato da un beacon vicino</string>
     <string name="mesh_beacon_preset_none">Nessuno</string>
-    <string name="mesh_beacon_send_as_node">Trasmetti come numero di nodo (0 = questo nodo)</string>
     <string name="mesh_beacon_target">Destinazione %1$d</string>
     <string name="mesh_beacon_target_add">Aggiungi destinazione</string>
     <string name="mesh_beacon_target_channel_index">Indice del canale</string>
@@ -1291,9 +1291,12 @@
     <string name="paxcounter_config">Configurazione Paxcounter</string>
     <string name="paxcounter_enabled">Paxcounter abilitato</string>
     <string name="periodic_position_broadcast">Trasmissione periodica della posizione</string>
+    <!-- PERMISSION -->
     <string name="permission_missing_31">Meshtastic ha bisogno dei permessi "Dispositivi nelle vicinanze" abilitati per trovare e connettersi ai dispositivi tramite Bluetooth. È possibile disabilitare quando non è in uso.</string>
+    <!-- PERMISSIONS -->
     <string name="phone_location">Posizione del telefono</string>
     <string name="phone_location_description">Meshtastic utilizza la posizione del telefono per abilitare molte funzionalità. È possibile aggiornare i permessi riguardo la posizione in qualsiasi momento dalle impostazioni.</string>
+    <string name="pin_selected">Pin</string>
     <string name="play">Riproduci</string>
     <plurals name="plurals_hours">
         <item quantity="one">%1$d ora</item>
@@ -1613,6 +1616,9 @@
     <string name="super_deep_sleep_duration_seconds">Durata super deep sleep</string>
     <string name="supported">Supportato</string>
     <string name="supported_by_community">Supportato dalla comunità Meshtastic</string>
+    <string name="swipe_action_delete">Elimina</string>
+    <string name="swipe_action_mute">Silenzia</string>
+    <string name="swipe_action_unmute">Riattiva l'audio</string>
     <string name="sx126x_rx_boosted_gain">Migliora guadagno in Ricezione</string>
     <string name="system_settings">Impostazioni di Sistema</string>
     <!-- TAK -->
@@ -1638,7 +1644,6 @@
     <string name="tak_server_test_idle">Invia alla mesh tutte le %1$d fixture di test</string>
     <string name="tak_server_test_result_bytes">%1$dB ✓</string>
     <string name="tak_server_test_result_unknown_error">✗</string>
-    <string name="tak_server_test_results">%1$d superati, %2$d falliti su %3$d/%4$d</string>
     <string name="tak_server_test_run">Esegui</string>
     <string name="tak_server_test_running">In esecuzione: %1$s</string>
     <string name="tak_team">Colore squadra</string>
@@ -1738,6 +1743,10 @@
     <string name="type">Tipo</string>
     <string name="type_a_message">Inserisci un messaggio</string>
     <string name="udp_enabled">Trasmissione UDP</string>
+    <!-- UNITS -->
+    <string name="units_follow_system">Predefinito di sistema</string>
+    <string name="units_imperial">Imperiale</string>
+    <string name="units_metric">Metrico</string>
     <!-- UNKNOWN -->
     <string name="unknown">Sconosciuto</string>
     <string name="unknown_age">Età sconosciuta</string>

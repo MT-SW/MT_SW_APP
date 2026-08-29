@@ -97,6 +97,7 @@
     <!-- CHIRPY -->
     <string name="choose_theme">Escolher tema</string>
     <!-- CLEAN -->
+    <!-- CLEAR -->
     <string name="clear">Limpar</string>
     <string name="close">Fechar</string>
     <string name="codec_2_enabled">CODEC 2 ativado</string>
@@ -268,6 +269,7 @@
     <string name="licensed_amateur_radio_text">Ativar esta opção desativa a encriptação e não é compatível com a rede Meshtastic normal.</string>
     <!-- LOAD -->
     <!-- LOCAL -->
+    <!-- LOCATION -->
     <string name="location_disabled">Acesso à localização desativado, não é possível fornecer a localização na mesh.</string>
     <!-- LOCKDOWN -->
     <string name="locked">Bloqueado</string>
@@ -396,6 +398,8 @@
     <string name="paxcounter">Contador de pessoas</string>
     <string name="paxcounter_config">Configuração do contador de pessoas</string>
     <string name="paxcounter_enabled">Ativar contador de pessoas</string>
+    <!-- PERMISSION -->
+    <!-- PERMISSIONS -->
     <!-- POSITION -->
     <string name="position">Posição</string>
     <string name="position_enabled">Posição ativada</string>
@@ -526,6 +530,9 @@
     <string name="state_broadcast_seconds">Transmissão de estado (segundos)</string>
     <string name="subnet">Subnet</string>
     <string name="supported">Suportado</string>
+    <string name="swipe_action_delete">Excluir</string>
+    <string name="swipe_action_mute">Silenciar</string>
+    <string name="swipe_action_unmute">Tirar mute</string>
     <!-- TAK -->
     <string name="tak_server_section">Servidor</string>
     <string name="tak_team_blue">Azul</string>
@@ -559,6 +566,8 @@
     <string name="two_days">48 Horas</string>
     <string name="two_weeks">2sem</string>
     <string name="type">Tipo</string>
+    <!-- UNITS -->
+    <string name="units_follow_system">Padrão do sistema</string>
     <!-- UNKNOWN -->
     <string name="unknown_age">Idade desconhecida</string>
     <string name="unknown_username">Nome de utilizador desconhecido</string>

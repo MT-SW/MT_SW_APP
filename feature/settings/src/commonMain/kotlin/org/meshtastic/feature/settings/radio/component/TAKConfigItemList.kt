@@ -47,13 +47,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.BuildConfigProvider
+import org.meshtastic.core.model.Capabilities
+import org.meshtastic.core.model.Channel
 import org.meshtastic.core.model.getColorFrom
 import org.meshtastic.core.model.getStringResFrom
-import org.meshtastic.core.repository.CommandSender
+import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.TakPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.back
@@ -62,6 +66,9 @@ import org.meshtastic.core.resources.tak
 import org.meshtastic.core.resources.tak_config
 import org.meshtastic.core.resources.tak_role
 import org.meshtastic.core.resources.tak_server
+import org.meshtastic.core.resources.tak_server_channel
+import org.meshtastic.core.resources.tak_server_channel_desc
+import org.meshtastic.core.resources.tak_server_channel_option
 import org.meshtastic.core.resources.tak_server_enabled
 import org.meshtastic.core.resources.tak_server_enabled_desc
 import org.meshtastic.core.resources.tak_server_export_data_package_desc
@@ -79,15 +86,21 @@ import org.meshtastic.core.resources.tak_server_status_unavailable
 import org.meshtastic.core.resources.tak_server_status_waiting
 import org.meshtastic.core.resources.tak_server_test_card_title
 import org.meshtastic.core.resources.tak_server_test_idle
+import org.meshtastic.core.resources.tak_server_test_protocol_v1_label
+import org.meshtastic.core.resources.tak_server_test_protocol_v2_label
 import org.meshtastic.core.resources.tak_server_test_result_bytes
+import org.meshtastic.core.resources.tak_server_test_result_expected_drop
 import org.meshtastic.core.resources.tak_server_test_result_unknown_error
-import org.meshtastic.core.resources.tak_server_test_results
+import org.meshtastic.core.resources.tak_server_test_results_v2
 import org.meshtastic.core.resources.tak_server_test_run
 import org.meshtastic.core.resources.tak_server_test_running
+import org.meshtastic.core.resources.tak_server_v1_fallback_notice
 import org.meshtastic.core.resources.tak_team
 import org.meshtastic.core.takserver.TAKDataPackageGenerator
+import org.meshtastic.core.takserver.TAKMeshIntegration
 import org.meshtastic.core.takserver.TAKServerManager
 import org.meshtastic.core.takserver.TakMeshTestRunner
+import org.meshtastic.core.takserver.TakProtocol
 import org.meshtastic.core.takserver.TakTestResult
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.SwitchPreference
@@ -96,11 +109,13 @@ import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PlayArrow
 import org.meshtastic.core.ui.icon.Share
+import org.meshtastic.core.ui.icon.Warning
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 import org.meshtastic.feature.settings.radio.RebootBehavior
 import org.meshtastic.feature.settings.radio.ResponseState
 import org.meshtastic.feature.settings.tak.TakPermissionHandler
 import org.meshtastic.feature.settings.tak.rememberDataPackageExporter
+import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.MemberRole
 import org.meshtastic.proto.ModuleConfig
 import org.meshtastic.proto.Team
@@ -192,12 +207,41 @@ internal fun handleTakPermissionResult(granted: Boolean, isTakServerEnabled: Boo
 fun TakServerScreen(onBack: () -> Unit) {
     val takPrefs: TakPrefs = koinInject()
     val takServerManager: TAKServerManager = koinInject()
+    val nodeRepository: NodeRepository = koinInject()
+    val radioConfigRepository: RadioConfigRepository = koinInject()
     val isTakServerEnabled by takPrefs.isTakServerEnabled.collectAsStateWithLifecycle()
     val isMeshToCotEnabled by takPrefs.isMeshToCotEnabled.collectAsStateWithLifecycle()
+    val takServerChannel by takPrefs.takServerChannel.collectAsStateWithLifecycle()
+    val channelSet by radioConfigRepository.channelSetFlow.collectAsStateWithLifecycle(initialValue = ChannelSet())
+    // Options come from the radio's configured channels; the persisted index is appended as a bare
+    // number when it isn't among them (no radio connected yet, or the channel list shrank) so the
+    // dropdown never renders an empty selection.
+    val channelOptions =
+        channelSet.settings
+            .mapIndexed { index, settings ->
+                val channelName = Channel(settings, channelSet.lora_config ?: Channel.default.loraConfig).name
+                index to stringResource(Res.string.tak_server_channel_option, index, channelName)
+            }
+            .let { options ->
+                if (options.none { it.first == takServerChannel }) {
+                    options + (takServerChannel to takServerChannel.toString())
+                } else {
+                    options
+                }
+            }
     val isTakServerRunning by takServerManager.isRunning.collectAsStateWithLifecycle()
     val isTakServerStarting by takServerManager.isStarting.collectAsStateWithLifecycle()
     val takClientCount by takServerManager.connectionCount.collectAsStateWithLifecycle()
     val hasTakServerStartError by takServerManager.hasStartError.collectAsStateWithLifecycle()
+    val myNodeInfo by nodeRepository.myNodeInfo.collectAsStateWithLifecycle()
+    // The Mesh-to-CoT bridge falls back to a legacy protocol (PLI + basic chat only, no
+    // markers/POIs) when the connected node's firmware predates the v2 TAK port — see
+    // TAKMeshIntegration.useTakV2() for the same check on the actual bridging path.
+    // Defaults to true (assume supported) when firmware is unknown -- no node connected yet,
+    // or myNodeInfo hasn't arrived -- rather than treating "unknown" the same as "confirmed
+    // unsupported": Capabilities(null).supportsTakV2 is false, which would otherwise show the
+    // fallback warning even when there's no connected node to be falling back for.
+    val supportsTakV2 = myNodeInfo?.firmwareVersion?.let { Capabilities(it).supportsTakV2 } ?: true
     val takServerStatus =
         TakServerStatus.resolve(
             isSupported = takServerManager.isSupported,
@@ -245,9 +289,13 @@ fun TakServerScreen(onBack: () -> Unit) {
                 onEnabledChange = { takPrefs.setTakServerEnabled(it) },
                 isMeshToCotEnabled = isMeshToCotEnabled,
                 onMeshToCotChange = { takPrefs.setMeshToCotEnabled(it) },
+                takServerChannel = takServerChannel,
+                channelOptions = channelOptions,
+                onChannelSelected = { takPrefs.setTakServerChannel(it) },
                 status = takServerStatus,
                 clientCount = takClientCount,
                 onExport = { exportLauncher("Meshtastic_TAK_Server.zip") },
+                supportsTakV2 = supportsTakV2,
             )
             TakMeshTestCard()
         }
@@ -261,9 +309,13 @@ internal fun TakServerSection(
     onEnabledChange: (Boolean) -> Unit,
     isMeshToCotEnabled: Boolean,
     onMeshToCotChange: (Boolean) -> Unit,
+    takServerChannel: Int,
+    channelOptions: List<Pair<Int, String>>,
+    onChannelSelected: (Int) -> Unit,
     status: TakServerStatus,
     clientCount: Int,
     onExport: () -> Unit,
+    supportsTakV2: Boolean,
 ) {
     TitledCard(title = stringResource(Res.string.tak_server_section)) {
         SwitchPreference(
@@ -283,6 +335,19 @@ internal fun TakServerSection(
                 checked = isMeshToCotEnabled,
                 enabled = true,
                 onCheckedChange = onMeshToCotChange,
+            )
+            if (isMeshToCotEnabled && !supportsTakV2) {
+                HorizontalDivider()
+                TakV1FallbackNotice()
+            }
+            HorizontalDivider()
+            DropDownPreference(
+                title = stringResource(Res.string.tak_server_channel),
+                summary = stringResource(Res.string.tak_server_channel_desc),
+                enabled = true,
+                items = channelOptions,
+                selectedItem = takServerChannel,
+                onItemSelected = onChannelSelected,
             )
             HorizontalDivider()
             Row(
@@ -309,6 +374,23 @@ internal fun TakServerSection(
                 }
             }
         }
+    }
+}
+
+/** Warns that the connected node's firmware falls back to the legacy TAK bridge (PLI + chat only, no markers/POIs). */
+@Composable
+private fun TakV1FallbackNotice() {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.Top,
+    ) {
+        Icon(imageVector = MeshtasticIcons.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+        Text(
+            text = stringResource(Res.string.tak_server_v1_fallback_notice),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
@@ -392,8 +474,8 @@ private fun TakMeshTestCard() {
     val buildConfig: BuildConfigProvider = koinInject()
     if (!buildConfig.isDebug) return
 
-    val commandSender: CommandSender = koinInject()
-    val testRunner = remember { TakMeshTestRunner(commandSender) }
+    val takMeshIntegration: TAKMeshIntegration = koinInject()
+    val testRunner = remember { TakMeshTestRunner(takMeshIntegration) }
     val results by testRunner.results.collectAsStateWithLifecycle()
     val isRunning by testRunner.isRunning.collectAsStateWithLifecycle()
     val currentFixture by testRunner.currentFixture.collectAsStateWithLifecycle()
@@ -418,8 +500,8 @@ internal fun TakMeshTestCardContent(
     onRunTests: () -> Unit,
 ) {
     val loadingLabel = stringResource(Res.string.tak_server_loading)
-    val passed = results.count { it.passed }
-    val failed = results.count { !it.passed }
+    val v2Results = results.filter { it.protocol == TakProtocol.V2 }
+    val v1Results = results.filter { it.protocol == TakProtocol.V1 }
 
     TitledCard(title = stringResource(Res.string.tak_server_test_card_title)) {
         Row(
@@ -437,25 +519,6 @@ internal fun TakMeshTestCardContent(
                     },
                     style = MaterialTheme.typography.bodyLarge,
                 )
-                if (results.isNotEmpty()) {
-                    Text(
-                        text =
-                        stringResource(
-                            Res.string.tak_server_test_results,
-                            passed,
-                            failed,
-                            results.size,
-                            fixtureCount,
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color =
-                        if (failed > 0) {
-                            MaterialTheme.colorScheme.error
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        },
-                    )
-                }
             }
             if (isRunning) {
                 CircularProgressIndicator()
@@ -467,7 +530,58 @@ internal fun TakMeshTestCardContent(
             }
         }
 
-        // Results list
+        if (v2Results.isNotEmpty()) {
+            TakProtocolResultsSection(
+                titleRes = Res.string.tak_server_test_protocol_v2_label,
+                results = v2Results,
+                fixtureCount = fixtureCount,
+            )
+        }
+        if (v1Results.isNotEmpty()) {
+            TakProtocolResultsSection(
+                titleRes = Res.string.tak_server_test_protocol_v1_label,
+                results = v1Results,
+                fixtureCount = fixtureCount,
+            )
+        }
+    }
+}
+
+/**
+ * One protocol's fixture run within the TAK self-test card: a summary line (passed / expected-limitation drops /
+ * unexpected failures) followed by the per-fixture rows. Expected v1 schema drops are surfaced distinctly from real
+ * failures so a low v1 pass rate reads as intentional legacy-schema behavior, not a self-test regression.
+ */
+@Composable
+private fun TakProtocolResultsSection(titleRes: StringResource, results: List<TakTestResult>, fixtureCount: Int) {
+    val passed = results.count { it.passed }
+    val expectedDrops = results.count { !it.passed && it.expectedDrop }
+    val unexpectedFailed = results.count { !it.passed && !it.expectedDrop }
+
+    Column {
+        HorizontalDivider()
+        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+            Text(text = stringResource(titleRes), style = MaterialTheme.typography.titleSmall)
+            Text(
+                text =
+                stringResource(
+                    Res.string.tak_server_test_results_v2,
+                    passed,
+                    expectedDrops,
+                    unexpectedFailed,
+                    results.size,
+                    fixtureCount,
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color =
+                if (unexpectedFailed > 0) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+            )
+        }
+
         for (result in results) {
             HorizontalDivider()
             Row(
@@ -482,13 +596,21 @@ internal fun TakMeshTestCardContent(
                 )
                 Text(
                     text =
-                    if (result.passed) {
-                        stringResource(Res.string.tak_server_test_result_bytes, result.compressedBytes)
-                    } else {
-                        result.error ?: stringResource(Res.string.tak_server_test_result_unknown_error)
+                    when {
+                        result.passed ->
+                            stringResource(Res.string.tak_server_test_result_bytes, result.compressedBytes)
+
+                        result.expectedDrop -> stringResource(Res.string.tak_server_test_result_expected_drop)
+
+                        else -> result.error ?: stringResource(Res.string.tak_server_test_result_unknown_error)
                     },
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (result.passed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                    color =
+                    when {
+                        result.passed -> MaterialTheme.colorScheme.primary
+                        result.expectedDrop -> MaterialTheme.colorScheme.onSurfaceVariant
+                        else -> MaterialTheme.colorScheme.error
+                    },
                 )
             }
         }

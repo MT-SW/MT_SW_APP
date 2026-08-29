@@ -52,6 +52,7 @@
     <!-- CHIRPY -->
     <string name="choose_theme">Pasirinkite Aplinką</string>
     <!-- CLEAN -->
+    <!-- CLEAR -->
     <string name="clear">Išvalyti</string>
     <string name="close">Uždaryti</string>
     <!-- COMPASS -->
@@ -123,6 +124,7 @@
     <!-- LICENSED -->
     <!-- LOAD -->
     <!-- LOCAL -->
+    <!-- LOCATION -->
     <string name="location_disabled">Vietos prieigos funkcija išjungta, negalima pateikti pozicijos tinklui.</string>
     <!-- LOCKDOWN -->
     <string name="locked">Užrakintas</string>
@@ -196,6 +198,8 @@
     <!-- OUTPUT -->
     <!-- PACKET -->
     <!-- PAX -->
+    <!-- PERMISSION -->
+    <!-- PERMISSIONS -->
     <!-- POSITION -->
     <!-- POWER -->
     <string name="preferences_language">Kalba</string>
@@ -267,6 +271,8 @@
     <string name="signal_quality">Signalo kokybė</string>
     <!-- SITE -->
     <string name="snr">SNR</string>
+    <string name="swipe_action_delete">Ištrinti</string>
+    <string name="swipe_action_mute">Nutildyti</string>
     <!-- TAK -->
     <string name="tak_team_red">Raudona</string>
     <string name="theme">Išvaizda</string>
@@ -291,6 +297,8 @@
     <string name="twenty_four_hours">24 val</string>
     <string name="two_days">48 Valandos</string>
     <string name="two_weeks">2 sav</string>
+    <!-- UNITS -->
+    <string name="units_follow_system">Numatytoji sistema</string>
     <!-- UNKNOWN -->
     <string name="unknown_username">Nežinomas vartotojo vardas</string>
     <string name="unrecognized">Be kategorijos</string>

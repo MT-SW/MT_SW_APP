@@ -56,6 +56,7 @@
     <string name="channels">القنوات</string>
     <!-- CHIRPY -->
     <!-- CLEAN -->
+    <!-- CLEAR -->
     <string name="clear">مسح</string>
     <string name="close">أغلق</string>
     <!-- COMPASS -->
@@ -121,6 +122,7 @@
     <!-- LICENSED -->
     <!-- LOAD -->
     <!-- LOCAL -->
+    <!-- LOCATION -->
     <string name="location_disabled">تم إيقاف الوصول إلى الموقع، لا يمكن تحديد موقع للشبكة.</string>
     <!-- LOCKDOWN -->
     <string name="locked">مقفل</string>
@@ -182,6 +184,8 @@
     <!-- OUTPUT -->
     <!-- PACKET -->
     <!-- PAX -->
+    <!-- PERMISSION -->
+    <!-- PERMISSIONS -->
     <!-- POSITION -->
     <!-- POWER -->
     <string name="preferences_language">اللغات</string>
@@ -226,6 +230,7 @@
     <string name="signal_quality">جودة الإشارة</string>
     <!-- SITE -->
     <string name="site_planner_section_display">إعدادات الشاشة</string>
+    <string name="swipe_action_mute">كتم</string>
     <!-- TAK -->
     <string name="timeout">استغرق وقت طويل</string>
     <!-- TRACEROUTE -->
@@ -238,6 +243,7 @@
     <string name="twenty_four_hours">24 ساعة</string>
     <string name="two_days">48 ساعات</string>
     <string name="two_weeks">أسبوعين</string>
+    <!-- UNITS -->
     <!-- UNKNOWN -->
     <string name="unknown_age">عمر غير معروف</string>
     <string name="unknown_username">اسم المستخدم غير معروف</string>

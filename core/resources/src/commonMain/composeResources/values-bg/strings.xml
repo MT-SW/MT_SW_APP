@@ -64,7 +64,7 @@
     <string name="air_quality_metrics_module_enabled">Модулът за показатели за качеството на въздуха е активиран</string>
     <string name="air_quality_metrics_update_interval_seconds">Интервал на актуализиране на показателите за качеството на въздуха</string>
     <string name="air_util_definition">Процент от ефирното време за предаване, използвано през последния час.</string>
-    <string name="air_utilization">Използ. на ефира</string>
+    <string name="air_utilization">Изпол. на ефира</string>
     <!-- ALERT -->
     <string name="all_time">Всички</string>
     <string name="alt">н.в.</string>
@@ -74,7 +74,12 @@
     <string name="analytics_okay">Разрешаване на анализи и докладване за сривове.</string>
     <string name="analytics_platforms">Аналитични платформи:</string>
     <!-- APP -->
+    <string name="app_functions_get_channel_info">Получаване на информация за канала</string>
+    <string name="app_functions_get_device_status">Получаване на състоянието на устройството</string>
+    <string name="app_functions_get_mesh_status">Получаване на състоянието на mesh</string>
+    <string name="app_functions_get_node_details">Получaване на подробности за възела</string>
     <string name="app_functions_get_node_list">Получаване на списък с възли</string>
+    <string name="app_functions_get_recent_messages">Получаване на последните съобщения</string>
     <string name="app_notifications">Известия от приложението</string>
     <string name="app_settings">Приложение</string>
     <string name="app_too_old">Изисква се актуализация на приложението</string>
@@ -133,7 +138,6 @@
     <string name="buzzer_gpio">GPIO за зумер</string>
     <string name="calculating">Изчисляване…</string>
     <string name="call_sign">Опознавателен знак</string>
-    <string name="call_sign_summary">Вашият радиолюбителски опознавателен знак, до 8 знака</string>
     <string name="camera_permission">Разрешение за камерата</string>
     <string name="camera_permission_rationale">Разрешаване на достъп до камерата за сканиране на QR кодове.</string>
     <string name="cancel">Отказ</string>
@@ -153,7 +157,7 @@
     <string name="channel_invalid">URL адресът на този канал е невалиден и не може да се използва</string>
     <string name="channel_label">Канал</string>
     <string name="channel_name">Име на канал</string>
-    <string name="channel_utilization">Използ. на канала</string>
+    <string name="channel_utilization">Изпол. на канала</string>
     <string name="channels">Канали</string>
     <!-- CHIRPY -->
     <string name="chirpy">Чирпи</string>
@@ -169,6 +173,7 @@
     <string name="clean_nodes_older_than">Почистване на възлите, последно видяни преди повече от %1$d дни</string>
     <string name="clean_now">Почистете сега</string>
     <string name="clean_unknown_nodes">Почистване само на неизвестните възли</string>
+    <!-- CLEAR -->
     <string name="clear">Изчисти</string>
     <string name="clear_selection">Изчистване на избора</string>
     <string name="clear_time_zone">Изчистване на часовата зона</string>
@@ -237,12 +242,15 @@
     <string name="contrast_standard">Стандартен</string>
     <string name="conversations">Разговори</string>
     <string name="copy">Копиране</string>
+    <string name="copyright_notice">Meshtastic® Авторско право Meshtastic LLC</string>
     <string name="create_your_own_networks">Създайте свои собствени мрежи</string>
     <string name="critical_alert">Критичен сигнал!</string>
     <string name="critical_alerts">Критични предупреждения</string>
     <string name="current">Текущ</string>
     <string name="currently">В момента:</string>
     <string name="date">Дата</string>
+    <string name="date_separator_today">Днес</string>
+    <string name="date_separator_yesterday">Вчера</string>
     <string name="dbm_value">%1$d dBm</string>
     <!-- DEBUG -->
     <string name="debug">Отстраняване на грешки</string>
@@ -316,6 +324,7 @@
     <string name="disconnected">Прекъсната връзка</string>
     <string name="discovered_network_devices">Открити мрежови устройства</string>
     <!-- DISCOVERY -->
+    <string name="discovery_connection_warning">Не е свързано. Свържете се с устройство Meshtastic, за да започнете сканирането.</string>
     <string name="discovery_delete_session">Изтриване на сесията</string>
     <string name="discovery_dwell_minutes">%1$d мин</string>
     <string name="discovery_keep_screen_awake">Поддържане на екрана активен</string>
@@ -365,7 +374,6 @@
     <string name="doc_title_connections">Връзки</string>
     <string name="doc_title_debug_logs">Журнали за отстраняване на грешки</string>
     <string name="doc_title_desktop">Настолно приложение</string>
-    <string name="doc_title_discovery">Откриване</string>
     <string name="doc_title_firmware">Актуализации на фърмуера</string>
     <string name="doc_title_map">Карта &amp; Пътни точки</string>
     <string name="doc_title_measurement">Измерване &amp; Форматиране</string>
@@ -595,6 +603,7 @@
     <string name="ip_address">IP адрес:</string>
     <string name="ip_port">Порт:</string>
     <string name="ipv4_mode">Режим на IPv4</string>
+    <string name="jump_to_latest_from">%1$s</string>
     <!-- KEY -->
     <string name="key_verification_final_title">Проверката на ключа е завършена</string>
     <string name="key_verification_request_title">Заявка за проверка на ключ</string>
@@ -635,6 +644,7 @@
     <string name="local_stats_traffic">Трафик: TX %1$d / RX %2$d (D: %3$d)</string>
     <string name="local_stats_updated_at">%1$s</string>
     <string name="local_stats_uptime">Време на работа: %1$s</string>
+    <!-- LOCATION -->
     <string name="location_disabled">Достъпът до местоположението е изключен, не може да предостави позиция на мрежата.</string>
     <string name="location_sharing">Споделяне на местоположение</string>
     <!-- LOCKDOWN -->
@@ -728,6 +738,7 @@
     <string name="message_delivery_status">Състояние на доставка на съобщението</string>
     <string name="message_device_managed">Това радио се управлява и може да бъде променяно само от отдалечен администратор.</string>
     <string name="message_input_label">Съобщение</string>
+    <string name="message_routing_error_max_retransmit">Неуспешно доставяне към mesh</string>
     <string name="message_routing_error_no_interface">Няма радио интерфейс</string>
     <string name="message_routing_error_pki_failed">Не можа да се изпрати криптирано съобщение</string>
     <string name="message_routing_error_pki_send_fail_public_key">Ключът на получателя не е наличен</string>
@@ -907,9 +918,12 @@
     <string name="paxcounter_config">Конфигуриране на Paxcounter</string>
     <string name="paxcounter_enabled">Paxcounter е активиран</string>
     <string name="periodic_position_broadcast">Периодично излъчване на позиция</string>
+    <!-- PERMISSION -->
     <string name="permission_missing_31">Meshtastic се нуждае от активирани разрешения за "Устройства наблизо", за да намира и да се свързва с устройства чрез Bluetooth. Можете да ги дезактивирате, когато не се използват.</string>
+    <!-- PERMISSIONS -->
     <string name="phone_location">Местоположение на телефона</string>
     <string name="phone_location_description">Meshtastic използва местоположението на телефона ви, за да активира редица функции. Можете да актуализирате разрешенията си за местоположение по всяко време от настройките.</string>
+    <string name="pin_selected">ПИН</string>
     <plurals name="plurals_hours">
         <item quantity="one">%1$d час</item>
         <item quantity="other">%1$d часа</item>
@@ -1036,6 +1050,7 @@
     <string name="rotary_encoder_1_enabled">Ротационен енкодер #1 е активиран</string>
     <!-- ROUTING -->
     <string name="routing_error_got_nak">Получено отрицателно потвърждение</string>
+    <string name="routing_error_max_retransmit">Неуспешно доставяне към mesh</string>
     <string name="routing_error_no_interface">Няма радио интерфейс</string>
     <string name="routing_error_no_route">Няма маршрут</string>
     <string name="routing_error_none">Признато</string>
@@ -1152,6 +1167,9 @@
     <string name="super_deep_sleep_duration_seconds">Продължителност на супер дълбок сън</string>
     <string name="supported">Поддържан</string>
     <string name="supported_by_community">Поддържа се от общността Meshtastic</string>
+    <string name="swipe_action_delete">Изтриване</string>
+    <string name="swipe_action_mute">Заглуши</string>
+    <string name="swipe_action_unmute">Включване на звука</string>
     <string name="system_settings">Системни настройки</string>
     <!-- TAK -->
     <string name="tak">TAK (ATAK)</string>
@@ -1169,6 +1187,7 @@
     <string name="tak_server_loading">…</string>
     <string name="tak_server_section">Сървър</string>
     <string name="tak_server_status">Статус</string>
+    <string name="tak_server_status_failed">Не може да се стартира TAK сървъра. Изключете го и го включете, за да опитате отново.</string>
     <string name="tak_server_test_result_bytes">%1$dB ✓</string>
     <string name="tak_server_test_result_unknown_error">✗</string>
     <string name="tak_team">Цвят на екипа</string>
@@ -1220,6 +1239,8 @@
     <string name="traffic_management_nodeinfo_direct_response_max_hops">Максимален брой отскоци за директен отговор</string>
     <string name="translate">Превод</string>
     <!-- TRANSLATION -->
+    <string name="translation_failed">Не може да се преведе съобщението</string>
+    <string name="translation_model_download_failed">Изтеглянето на модела за превод не е успешно</string>
     <string name="transmit_over_lora">Предаване през LoRa</string>
     <!-- TRANSPORT -->
     <string name="transport">Транспорт</string>
@@ -1237,6 +1258,10 @@
     <string name="tx_power_dbm">Мощност на предаване</string>
     <string name="type">Тип</string>
     <string name="type_a_message">Въведете съобщение</string>
+    <!-- UNITS -->
+    <string name="units_follow_system">По подразбиране на системата</string>
+    <string name="units_imperial">Имперски</string>
+    <string name="units_metric">Метрични</string>
     <!-- UNKNOWN -->
     <string name="unknown">Неизвестно</string>
     <string name="unknown_age">Неизвестна възраст</string>

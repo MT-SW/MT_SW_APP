@@ -163,8 +163,6 @@ sealed interface SettingsRoute : Route {
 
     @Serializable data object Paxcounter : SettingsRoute
 
-    @Serializable data object StatusMessage : SettingsRoute
-
     @Serializable data object TrafficManagement : SettingsRoute
 
     @Serializable data object TAK : SettingsRoute

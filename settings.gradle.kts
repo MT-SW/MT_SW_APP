@@ -38,7 +38,8 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver") version "1.0.0"
     // 0.1.7 fixed the Isolated Projects incompatibility (shares state via a BuildService instead of
     // gradle.extensions) that previously required gating this behind an opt-in property.
-    id("org.meshtastic.flatpak.sources.settings") version "0.1.7"
+    // 0.2.0 resolves platformDependencies transitively — see the collapsed list in build.gradle.kts.
+    id("org.meshtastic.flatpak.sources.settings") version "0.2.1"
 }
 
 @Suppress("UnstableApiUsage")
@@ -110,13 +111,13 @@ include(
     ":feature:messaging",
     ":feature:connections",
     ":feature:map",
+    ":feature:map-maplibre",
     ":feature:node",
     ":feature:settings",
     ":feature:discovery",
     ":feature:docs",
     ":feature:firmware",
     ":feature:wifi-provision",
-    ":feature:car",
     ":desktopApp",
     ":androidApp",
     ":core:barcode",

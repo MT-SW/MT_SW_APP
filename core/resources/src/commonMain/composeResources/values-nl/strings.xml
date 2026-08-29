@@ -79,6 +79,7 @@
     <!-- CHIRPY -->
     <string name="choose_theme">Kies thema</string>
     <!-- CLEAN -->
+    <!-- CLEAR -->
     <string name="clear">Wis</string>
     <string name="close">Sluit</string>
     <string name="codec_2_enabled">CODEC 2 ingeschakeld</string>
@@ -216,6 +217,7 @@
     <!-- LICENSED -->
     <!-- LOAD -->
     <!-- LOCAL -->
+    <!-- LOCATION -->
     <string name="location_disabled">Vrijgave positie niet actief, onmogelijk de positie aan het netwerk te geven.</string>
     <!-- LOCKDOWN -->
     <string name="locked">Vergrendeld</string>
@@ -320,6 +322,8 @@
     <string name="paxcounter">Paxcounter</string>
     <string name="paxcounter_config">Paxcounter Configuratie</string>
     <string name="paxcounter_enabled">Paxcounter ingeschakeld</string>
+    <!-- PERMISSION -->
+    <!-- PERMISSIONS -->
     <!-- POSITION -->
     <string name="position">Positie</string>
     <string name="position_enabled">Positie ingeschakeld</string>
@@ -432,6 +436,9 @@
     <string name="ssid">SSID</string>
     <string name="subnet">Subnet</string>
     <string name="supported">Ondersteund</string>
+    <string name="swipe_action_delete">Verwijder</string>
+    <string name="swipe_action_mute">Demp</string>
+    <string name="swipe_action_unmute">Dempen opheffen</string>
     <!-- TAK -->
     <string name="tak_server_section">Server</string>
     <string name="tak_team_blue">Blauw</string>
@@ -465,6 +472,8 @@
     <string name="two_days">48 Uur</string>
     <string name="two_weeks">2W</string>
     <string name="type">Type</string>
+    <!-- UNITS -->
+    <string name="units_follow_system">Systeemstandaard</string>
     <!-- UNKNOWN -->
     <string name="unknown_age">Onbekende Leeftijd</string>
     <string name="unknown_username">Onbekende Gebruikersnaam</string>

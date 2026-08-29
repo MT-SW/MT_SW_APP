@@ -20,6 +20,7 @@ package org.meshtastic.feature.messaging.ui.contact
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,11 +35,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -48,21 +53,29 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
@@ -82,6 +95,7 @@ import org.meshtastic.core.resources.channel_invalid
 import org.meshtastic.core.resources.channels
 import org.meshtastic.core.resources.close_selection
 import org.meshtastic.core.resources.collapsed
+import org.meshtastic.core.resources.contact_muted_snackbar
 import org.meshtastic.core.resources.conversations
 import org.meshtastic.core.resources.currently
 import org.meshtastic.core.resources.delete
@@ -90,6 +104,7 @@ import org.meshtastic.core.resources.delete_selection
 import org.meshtastic.core.resources.direct_messages
 import org.meshtastic.core.resources.expanded
 import org.meshtastic.core.resources.mark_as_read
+import org.meshtastic.core.resources.mark_unread_selected
 import org.meshtastic.core.resources.mute_1_week
 import org.meshtastic.core.resources.mute_8_hours
 import org.meshtastic.core.resources.mute_always
@@ -100,9 +115,15 @@ import org.meshtastic.core.resources.mute_status_muted_for_days
 import org.meshtastic.core.resources.mute_status_muted_for_hours
 import org.meshtastic.core.resources.mute_status_unmuted
 import org.meshtastic.core.resources.okay
+import org.meshtastic.core.resources.pin_selected
 import org.meshtastic.core.resources.select_all
+import org.meshtastic.core.resources.swipe_action_delete
+import org.meshtastic.core.resources.swipe_action_mute
+import org.meshtastic.core.resources.swipe_action_unmute
+import org.meshtastic.core.resources.undo
 import org.meshtastic.core.resources.unmute
 import org.meshtastic.core.resources.unmute_selected
+import org.meshtastic.core.resources.unpin_selected
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.MeshtasticImportFAB
@@ -113,7 +134,9 @@ import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.ExpandLess
 import org.meshtastic.core.ui.icon.ExpandMore
+import org.meshtastic.core.ui.icon.Keep
 import org.meshtastic.core.ui.icon.MarkChatRead
+import org.meshtastic.core.ui.icon.MarkChatUnread
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.SelectAll
 import org.meshtastic.core.ui.icon.VolumeMute
@@ -169,7 +192,19 @@ fun ContactsScreen(
     LaunchedEffect(selectedContactKeys.size, selectedContactKeys.joinToString(",")) {
         selectedCount = viewModel.getTotalMessageCount(selectedContactKeys.toList())
     }
+    var pendingSwipeDelete by remember { mutableStateOf<Contact?>(null) }
+    LaunchedEffect(pendingSwipeDelete) {
+        val contact = pendingSwipeDelete ?: return@LaunchedEffect
+        selectedContactKeys.clear()
+        selectedContactKeys.add(contact.contactKey)
+        selectedCount = viewModel.getTotalMessageCount(listOf(contact.contactKey))
+        showDeleteDialog = true
+        pendingSwipeDelete = null
+    }
+
     val isAllMuted = remember(selectedContacts) { selectedContacts.all { it.isMuted } }
+    val isAllPinned =
+        remember(selectedContacts) { selectedContacts.isNotEmpty() && selectedContacts.all { it.isPinned } }
 
     // Callback functions for item interaction
     val onContactClick: (Contact) -> Unit = { contact ->
@@ -253,16 +288,28 @@ fun ContactsScreen(
                     selectedCount = selectedContactKeys.size,
                     onCloseSelection = { selectedContactKeys.clear() },
                     onMuteSelected = { showMuteDialog = true },
+                    onMarkUnread = {
+                        viewModel.markUnread(selectedContactKeys.toList())
+                        selectedContactKeys.clear()
+                    },
+                    onTogglePin = {
+                        viewModel.setPinned(selectedContactKeys.toList(), !isAllPinned)
+                        selectedContactKeys.clear()
+                    },
                     onDeleteSelected = { showDeleteDialog = true },
                     onSelectAll = {
                         selectedContactKeys.clear()
                         selectedContactKeys.addAll(contacts.map { it.contactKey })
                     },
                     isAllMuted = isAllMuted, // Pass the derived state
+                    isAllPinned = isAllPinned,
                 )
             }
 
             val collapsedSections by viewModel.collapsedSections.collectAsStateWithLifecycle()
+
+            val mutedLabel = stringResource(Res.string.contact_muted_snackbar)
+            val undoLabel = stringResource(Res.string.undo)
 
             ContactListView(
                 contacts = contacts,
@@ -271,6 +318,21 @@ fun ContactsScreen(
                 onClick = onContactClick,
                 onLongClick = onContactLongClick,
                 onNodeChipClick = onNodeChipClick,
+                onSwipeMute = { contact ->
+                    val wasMuted = contact.isMuted
+                    viewModel.setMuteUntil(listOf(contact.contactKey), if (wasMuted) 0L else Long.MAX_VALUE)
+                    if (!wasMuted) {
+                        viewModel.showSnackbar(
+                            message = mutedLabel.replace("%1\$s", contact.longName),
+                            actionLabel = undoLabel,
+                            onAction = { viewModel.setMuteUntil(listOf(contact.contactKey), 0L) },
+                        )
+                    }
+                },
+                // Deleting a conversation drops its packets outright, so a swipe only nominates a target; the
+                // confirmation opens once its message count has been read, so the dialog can never quote a stale
+                // count from the previous selection.
+                onSwipeDelete = { contact -> pendingSwipeDelete = contact },
                 listState = contactsListState,
                 channels = channels,
                 collapsedSections = collapsedSections,
@@ -425,7 +487,10 @@ private fun SelectionToolbar(
     onMuteSelected: () -> Unit,
     onDeleteSelected: () -> Unit,
     onSelectAll: () -> Unit,
+    onMarkUnread: () -> Unit,
+    onTogglePin: () -> Unit,
     isAllMuted: Boolean,
+    isAllPinned: Boolean,
 ) {
     TopAppBar(
         title = { Text(text = "$selectedCount") },
@@ -453,6 +518,25 @@ private fun SelectionToolbar(
                     ),
                 )
             }
+            IconButton(onClick = onTogglePin) {
+                Icon(
+                    imageVector = MeshtasticIcons.Keep,
+                    contentDescription =
+                    stringResource(if (isAllPinned) Res.string.unpin_selected else Res.string.pin_selected),
+                    tint =
+                    if (isAllPinned) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        LocalContentColor.current
+                    },
+                )
+            }
+            IconButton(onClick = onMarkUnread) {
+                Icon(
+                    MeshtasticIcons.MarkChatUnread,
+                    contentDescription = stringResource(Res.string.mark_unread_selected),
+                )
+            }
             IconButton(onClick = onDeleteSelected) {
                 Icon(MeshtasticIcons.Delete, contentDescription = stringResource(Res.string.delete_selection))
             }
@@ -471,6 +555,8 @@ private fun ContactListView(
     onClick: (Contact) -> Unit,
     onLongClick: (Contact) -> Unit,
     onNodeChipClick: (Contact) -> Unit,
+    onSwipeMute: (Contact) -> Unit,
+    onSwipeDelete: (Contact) -> Unit,
     listState: LazyListState,
     collapsedSections: Set<String>,
     onToggleSectionCollapse: (String) -> Unit,
@@ -481,8 +567,12 @@ private fun ContactListView(
     val (channelContacts, dmContacts) =
         remember(contacts) {
             val (channelPart, dmPart) = contacts.partition { it.section() == ContactSection.CHANNELS }
-            // Channels keep a fixed slot order (channel index); DMs stay in the query's recency order.
-            channelPart.sortedBy { ContactKey(it.contactKey).channel } to dmPart
+            // Channels keep a fixed slot order (channel index); DMs stay in the query's recency order. Pinned rows
+            // rise to the top of their own section — Kotlin's sort is stable, so the order below is preserved within
+            // each group. Pinning matters most for DMs, where an active conversation otherwise pushes others down;
+            // channels already have a deterministic order, so pinning one just reorders that.
+            channelPart.sortedBy { ContactKey(it.contactKey).channel }.sortedByDescending { it.isPinned } to
+                dmPart.sortedByDescending { it.isPinned }
         }
     val channelsTitle = stringResource(Res.string.channels)
     val dmTitle = stringResource(Res.string.direct_messages)
@@ -499,6 +589,8 @@ private fun ContactListView(
             onClick = onClick,
             onLongClick = onLongClick,
             onNodeChipClick = onNodeChipClick,
+            onSwipeMute = onSwipeMute,
+            onSwipeDelete = onSwipeDelete,
             channels = channels,
             haptic = haptic,
         )
@@ -514,6 +606,8 @@ private fun ContactListView(
             onClick = onClick,
             onLongClick = onLongClick,
             onNodeChipClick = onNodeChipClick,
+            onSwipeMute = onSwipeMute,
+            onSwipeDelete = onSwipeDelete,
             channels = channels,
             haptic = haptic,
         )
@@ -531,6 +625,8 @@ private fun LazyListScope.contactSection(
     onClick: (Contact) -> Unit,
     onLongClick: (Contact) -> Unit,
     onNodeChipClick: (Contact) -> Unit,
+    onSwipeMute: (Contact) -> Unit,
+    onSwipeDelete: (Contact) -> Unit,
     channels: ChannelSet?,
     haptic: HapticFeedback,
 ) {
@@ -548,19 +644,163 @@ private fun LazyListScope.contactSection(
     if (!collapsed) {
         items(count = sectionContacts.size, key = { index -> sectionContacts[index].contactKey }) { index ->
             val contact = sectionContacts[index]
-            ContactItem(
+            SwipeableContactRow(
                 contact = contact,
-                selected = selectedList.contains(contact.contactKey),
-                isActive = contact.contactKey == activeContactKey,
-                onClick = { onClick(contact) },
-                onLongClick = {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    onLongClick(contact)
+                // Selection mode owns the row's gestures; a swipe there would fight multi-select.
+                enabled = selectedList.isEmpty(),
+                onMute = { onSwipeMute(contact) },
+                onDelete = { onSwipeDelete(contact) },
+            ) {
+                ContactItem(
+                    contact = contact,
+                    selected = selectedList.contains(contact.contactKey),
+                    isActive = contact.contactKey == activeContactKey,
+                    onClick = { onClick(contact) },
+                    onLongClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onLongClick(contact)
+                    },
+                    onNodeChipClick = { onNodeChipClick(contact) },
+                    channels = channels,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * One-handed row actions: swipe toward the reading direction to mute, away from it to delete.
+ *
+ * The action fires from `onDismiss`, which the box raises once per settle. It must not fire from `confirmValueChange`:
+ * that runs from the fling's `calculateSnapOffset`, so it is called once per frame — a single swipe fired mute nine
+ * times, leaving the result decided by frame-count parity and stacking a snackbar per call. It is also deprecated in
+ * `AnchoredDraggable`, which directs callers at the anchor set instead.
+ *
+ * `SwipeToDismissBox` disables its own gestures while the row is settled in a dismissed direction, so animating home is
+ * what re-arms the next swipe rather than mere decoration.
+ *
+ * Mute is instant and undoable from a snackbar; delete is not, because [ContactsViewModel.deleteContacts] hard deletes
+ * the conversation's packets with nothing to restore from, so it routes into the same confirmation dialog the selection
+ * toolbar uses.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun SwipeableContactRow(
+    contact: Contact,
+    enabled: Boolean,
+    onMute: () -> Unit,
+    onDelete: () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    // These outlive a recomposition, so without them the callbacks would stay the ones captured the first time — and
+    // they read the contact's mute state, which is exactly what a swipe changes.
+    val currentOnMute by rememberUpdatedState(onMute)
+    val currentOnDelete by rememberUpdatedState(onDelete)
+    val dismissState = rememberSwipeToDismissBoxState()
+    val haptics = LocalHapticFeedback.current
+    LaunchedEffect(dismissState) {
+        // A tick the moment the swipe becomes eligible, so the row can be committed or dragged back without
+        // watching it. `snapshotFlow` is distinct-until-changed, so re-crossing the threshold ticks again.
+        snapshotFlow { dismissState.targetValue }
+            .collect { target ->
+                if (target != SwipeToDismissBoxValue.Settled) {
+                    haptics.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                }
+            }
+    }
+    // Kept stable on purpose: the box raises `onDismiss` from a `LaunchedEffect` keyed on the lambda, so a fresh one
+    // each recomposition would re-fire the action for a row that is still settled open.
+    val onDismiss = remember {
+        { direction: SwipeToDismissBoxValue ->
+            when (direction) {
+                SwipeToDismissBoxValue.StartToEnd -> currentOnMute()
+                SwipeToDismissBoxValue.EndToStart -> currentOnDelete()
+                SwipeToDismissBoxValue.Settled -> Unit
+            }
+        }
+    }
+    LaunchedEffect(dismissState) {
+        snapshotFlow { dismissState.settledValue }
+            .collect { settled ->
+                if (settled == SwipeToDismissBoxValue.Settled) return@collect
+                // `AnchoredDraggableState` serialises mutations, so the first attempt can lose to the gesture's own
+                // settle still holding the mutex; retrying wins uncontended rather than leaving the row stranded.
+                while (dismissState.currentValue != SwipeToDismissBoxValue.Settled) {
+                    try {
+                        dismissState.reset()
+                    } catch (interrupted: CancellationException) {
+                        // Ours to retry unless the effect itself is going away.
+                        if (!currentCoroutineContext().isActive) throw interrupted
+                    }
+                }
+            }
+    }
+    // The same two actions without the gesture: a swipe is unusable under a screen reader, and Material asks for a
+    // non-swipe route to anything a swipe can reach.
+    val muteLabel =
+        stringResource(if (contact.isMuted) Res.string.swipe_action_unmute else Res.string.swipe_action_mute)
+    val deleteLabel = stringResource(Res.string.swipe_action_delete)
+    val rowActions =
+        remember(muteLabel, deleteLabel) {
+            listOf(
+                CustomAccessibilityAction(muteLabel) {
+                    currentOnMute()
+                    true
                 },
-                onNodeChipClick = { onNodeChipClick(contact) },
-                channels = channels,
+                CustomAccessibilityAction(deleteLabel) {
+                    currentOnDelete()
+                    true
+                },
             )
         }
+    SwipeToDismissBox(
+        state = dismissState,
+        backgroundContent = { SwipeBackground(dismissState.dismissDirection, contact.isMuted) },
+        modifier = Modifier.semantics { customActions = rowActions },
+        gesturesEnabled = enabled,
+        onDismiss = onDismiss,
+        content = { content() },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SwipeBackground(direction: SwipeToDismissBoxValue, isMuted: Boolean) {
+    val muting = direction == SwipeToDismissBoxValue.StartToEnd
+    val color =
+        when (direction) {
+            SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.secondaryContainer
+            SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.errorContainer
+            SwipeToDismissBoxValue.Settled -> Color.Transparent
+        }
+    val contentColor =
+        when (direction) {
+            SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.onSecondaryContainer
+            SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.onErrorContainer
+            SwipeToDismissBoxValue.Settled -> Color.Transparent
+        }
+    val label =
+        when {
+            direction == SwipeToDismissBoxValue.EndToStart -> stringResource(Res.string.swipe_action_delete)
+            isMuted -> stringResource(Res.string.swipe_action_unmute)
+            else -> stringResource(Res.string.swipe_action_mute)
+        }
+    Row(
+        modifier = Modifier.fillMaxSize().background(color).padding(horizontal = 20.dp),
+        horizontalArrangement = if (muting) Arrangement.Start else Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (direction == SwipeToDismissBoxValue.Settled) return@Row
+        Icon(
+            imageVector =
+            when {
+                direction == SwipeToDismissBoxValue.EndToStart -> MeshtasticIcons.Delete
+                isMuted -> MeshtasticIcons.VolumeUp
+                else -> MeshtasticIcons.VolumeMute
+            },
+            contentDescription = label,
+            tint = contentColor,
+        )
     }
 }
 

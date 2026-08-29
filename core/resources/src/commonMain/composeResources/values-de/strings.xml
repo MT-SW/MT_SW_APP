@@ -166,7 +166,6 @@
     <string name="buzzer_gpio">GPIO Summer</string>
     <string name="calculating">Wird berechnet...</string>
     <string name="call_sign">Rufzeichen</string>
-    <string name="call_sign_summary">Dein Amateurfunk Rufzeichen, bis zu 8 Zeichen</string>
     <string name="camera_permission">Kamera-Berechtigungen</string>
     <string name="camera_permission_rationale">Kamera-Zugriff zum Scannen von QR-Codes erlauben.</string>
     <string name="camera_unavailable">Kamera konnte nicht gestartet werden. Versuche es erneut, oder schließe den Scanner und öffne ihn erneut.</string>
@@ -223,6 +222,7 @@
     <string name="clean_nodes_older_than">Knoten älter als %1$d Tage entfernen</string>
     <string name="clean_now">Jetzt leeren</string>
     <string name="clean_unknown_nodes">Nur unbekannte Knoten entfernen</string>
+    <!-- CLEAR -->
     <string name="clear">Leeren</string>
     <string name="clear_selection">Auswahl löschen</string>
     <string name="clear_time_zone">Zeitzone löschen</string>
@@ -315,6 +315,8 @@
     <string name="current">Strom</string>
     <string name="currently">Aktuell:</string>
     <string name="date">Datum</string>
+    <string name="date_separator_today">Heute</string>
+    <string name="date_separator_yesterday">Gestern</string>
     <string name="dbm_value">%1$d dBm</string>
     <!-- DEBUG -->
     <string name="debug">Debug</string>
@@ -501,7 +503,6 @@
     <string name="doc_title_connections">Verbindungen</string>
     <string name="doc_title_debug_logs">Fehlersuchprotokolle</string>
     <string name="doc_title_desktop">Desktop App</string>
-    <string name="doc_title_discovery">Entdecken</string>
     <string name="doc_title_firmware">Firmwareaktualisierungen</string>
     <string name="doc_title_map">Karte &amp; Wegpunkte</string>
     <string name="doc_title_measurement">Messen &amp; Formatierung</string>
@@ -646,7 +647,6 @@
     <string name="firmware_update_open">Öffne Firmware Updates</string>
     <string name="firmware_update_open_flasher">Öffne Meshtastic Flasher</string>
     <string name="firmware_update_ota_failed">OTA Aktualisierung fehlgeschlagen: %1$s</string>
-    <string name="firmware_update_rak4631_bootloader_hint">Für RAK WisBlock RAK4631 verwenden Sie die serielle DFU Software des Herstellers (z. B. adafruit-nrfutil dfu serial mit der mitgelieferten Bootloader-ZIP-Datei). Das alleinige Kopieren der .uf2 Datei aktualisiert den Bootloader nicht.</string>
     <string name="firmware_update_rebooting">Neustart in DFU Modus...</string>
     <string name="firmware_update_release_notes">Versionshinweise</string>
     <string name="firmware_update_retrieval_failed">Konnte Firmware Datei nicht abrufen.</string>
@@ -766,6 +766,7 @@
     <string name="ip_port">Port:</string>
     <string name="ipv4_mode">IPv4 Modus</string>
     <string name="json_output_enabled">JSON-Ausgabe aktiviert</string>
+    <string name="jump_to_latest_from">%1$s</string>
     <!-- KEY -->
     <string name="key_backup_deleted">Schlüssel Backup gelöscht</string>
     <string name="key_backup_not_found">Kein Schlüssel Backup für diesen Knoten gefunden</string>
@@ -827,6 +828,7 @@
     <string name="local_stats_updated_at">%1$s</string>
     <string name="local_stats_uptime">Laufzeit: %1$s</string>
     <string name="local_stats_utilization">Kanalauslastung: %1$s% | Sendezeit: %2$s%</string>
+    <!-- LOCATION -->
     <string name="location_disabled">Standortzugriff ist deaktiviert, es kann kein Standort zum Mesh bereitgestellt werden.</string>
     <string name="location_sharing">Standortfreigabe</string>
     <!-- LOCKDOWN -->
@@ -1184,9 +1186,12 @@
     <string name="paxcounter_config">Einstellung Besucherzähler</string>
     <string name="paxcounter_enabled">Besucherzähler aktiviert</string>
     <string name="periodic_position_broadcast">Regelmäßige Standortübertragung</string>
+    <!-- PERMISSION -->
     <string name="permission_missing_31">Meshtastic benötigt die Berechtigung „Geräte in der Nähe“, um Geräte über Bluetooth zu finden und eine Verbindung zu ihnen herzustellen. Sie können die Funktion deaktivieren, wenn sie nicht verwendet wird.</string>
+    <!-- PERMISSIONS -->
     <string name="phone_location">Telefonstandort</string>
     <string name="phone_location_description">Meshtastic nutzt den Standort Ihres Telefons, um einige Funktionen zu aktivieren. Sie können Ihre Standortberechtigungen jederzeit in den Einstellungen aktualisieren.</string>
+    <string name="pin_selected">PIN Nummer</string>
     <string name="play">Wiedergabe</string>
     <plurals name="plurals_hours">
         <item quantity="one">%1$d Stunde</item>
@@ -1490,6 +1495,9 @@
     <string name="super_deep_sleep_duration_seconds">Dauer Supertiefschlaf</string>
     <string name="supported">Unterstützt</string>
     <string name="supported_by_community">Unterstützt von der Meshtastic Gemeinschaft</string>
+    <string name="swipe_action_delete">Löschen</string>
+    <string name="swipe_action_mute">Stummschalten</string>
+    <string name="swipe_action_unmute">Stummschaltung aufheben</string>
     <string name="sx126x_rx_boosted_gain">Empfangsverstärkung</string>
     <string name="system_settings">Systemeinstellungen</string>
     <!-- TAK -->
@@ -1515,7 +1523,6 @@
     <string name="tak_server_test_idle">Alle %1$d Tests an das Netz senden</string>
     <string name="tak_server_test_result_bytes">%1$dB ✓</string>
     <string name="tak_server_test_result_unknown_error">✗</string>
-    <string name="tak_server_test_results">%1$d bestanden, %2$d fehlgeschlagen von %3$d/%4$d</string>
     <string name="tak_server_test_run">Ausführen</string>
     <string name="tak_server_test_running">Ausführen: %1$s</string>
     <string name="tak_team">Teamfarbe</string>
@@ -1612,6 +1619,10 @@
     <string name="type">Typ</string>
     <string name="type_a_message">Eine Nachricht schreiben</string>
     <string name="udp_enabled">UDP Übertragung</string>
+    <!-- UNITS -->
+    <string name="units_follow_system">System</string>
+    <string name="units_imperial">Angelsächsisch</string>
+    <string name="units_metric">Metrisch</string>
     <!-- UNKNOWN -->
     <string name="unknown">Unbekannt</string>
     <string name="unknown_age">Alter unbekannt</string>

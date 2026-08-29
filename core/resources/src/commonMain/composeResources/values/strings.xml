@@ -35,6 +35,7 @@
     <!-- ACTION -->
     <string name="action_copy_message">Copy message</string>
     <string name="action_delete_message">Delete message</string>
+    <string name="action_more_message_actions">More message actions</string>
     <string name="action_react_with_emoji">React with emoji</string>
     <string name="action_select_device">Select device</string>
     <string name="action_select_message">Select message</string>
@@ -147,6 +148,7 @@
     <string name="battery_ina_2xx_i2c_address">Battery INA_2XX I2C address</string>
     <string name="ble_devices">Bluetooth Devices</string>
     <string name="ble_rssi_threshold_defaults_to_80">BLE RSSI threshold (defaults to -80)</string>
+    <string name="ble_scan_needs_location_services">Bluetooth scanning also needs location services switched on for this version of Android. Your position is not used.</string>
     <string name="blue">Blue</string>
     <!-- BLUETOOTH -->
     <string name="bluetooth">Bluetooth</string>
@@ -159,6 +161,14 @@
     <string name="bluetooth_feature_discovery">Discovery</string>
     <string name="bluetooth_feature_discovery_description">Find and identify mt compatible devices near you.</string>
     <string name="bluetooth_permission">Bluetooth</string>
+    <string name="bluetooth_permission_blocked_notice">Nearby devices access is turned off and Android will not ask again. Turn it on in app settings to connect over Bluetooth, or connect over Wi-Fi or USB instead.</string>
+    <string name="bluetooth_permission_blocked_notice_pre31">Location permission is turned off and Android will not ask again. Turn it on in app settings to scan for Bluetooth devices, or connect over Wi-Fi or USB instead.</string>
+    <string name="bluetooth_permission_blocked_rationale">Nearby devices access is off and Android will not ask again. Turn it on in app settings to scan and connect over Bluetooth.</string>
+    <string name="bluetooth_permission_blocked_rationale_pre31">Location permission is off and Android will not ask again. Turn it on in app settings to scan and connect over Bluetooth.</string>
+    <string name="bluetooth_permission_denied_notice">Without Nearby devices access, Meshtastic cannot find or connect to your radio over Bluetooth. You can still connect over Wi-Fi or USB.</string>
+    <string name="bluetooth_permission_denied_notice_pre31">Without Location permission, Android blocks Bluetooth scanning, so Meshtastic cannot find your radio. You can still connect over Wi-Fi or USB.</string>
+    <string name="bluetooth_permission_rationale">Meshtastic needs Nearby devices access to find your radio and connect to it. It is used only to talk to your own devices, never to work out where you are. Without it, Bluetooth is unavailable — Wi-Fi and USB still work.</string>
+    <string name="bluetooth_permission_rationale_pre31">Meshtastic needs Location permission because this version of Android treats Bluetooth scanning as a location capability. Your position is never read or shared for this. Without it, Bluetooth is unavailable — Wi-Fi and USB still work.</string>
     <string name="bluetooth_scan_location_services_disabled">Location services are off. Turn them on to scan for nearby devices.</string>
     <string name="bluetooth_scan_missing_permission">Bluetooth scan needs permission. Grant the Nearby devices (or Location) permission to find devices.</string>
     <string name="bluetooth_scan_start_failed">Bluetooth scan couldn't start. Try again, or toggle Bluetooth if the problem continues.</string>
@@ -169,14 +179,20 @@
     <string name="bold_heading">Bold Heading</string>
     <string name="bonding_failed_permissions">Pairing failed. Grant nearby device permissions and try again.</string>
     <string name="bonding_failed_retry">Pairing did not complete. Try pairing again.</string>
+    <string name="boot_reconnect_blocked_message">Nearby devices permission is off, so your radio cannot be reached over Bluetooth. Tap to turn it back on.</string>
+    <string name="boot_reconnect_blocked_title">Meshtastic can't reconnect</string>
     <string name="bottom_nav_settings">Settings</string>
     <string name="broadcast_interval">Broadcast Interval</string>
     <string name="busy_noise_floor">Busy floor</string>
     <string name="button_gpio">Button GPIO</string>
     <string name="buzzer_gpio">Buzzer GPIO</string>
-    <string name="calculating">CalculatingÔÇŽ</string>
+    <plurals name="cache_limit_eviction_warning">
+        <item quantity="one">Lowering this will permanently delete the saved history for %1$d device.</item>
+        <item quantity="other">Lowering this will permanently delete the saved history for %1$d devices.</item>
+    </plurals>
+    <string name="calculating">Calculating…</string>
     <string name="call_sign">Call sign</string>
-    <string name="call_sign_summary">Your amateur radio call sign, up to 8 characters</string>
+    <string name="call_sign_summary">Your amateur radio call sign, up to 7 characters</string>
     <string name="camera_permission">Camera permission</string>
     <string name="camera_permission_rationale">Allow camera access to scan QR codes.</string>
     <string name="camera_unavailable">Camera could not start. Try again, or close the scanner and reopen it.</string>
@@ -226,6 +242,7 @@
     <string name="chirpy_thinking">Chirpy is routing through the meshÔÇŽ ­čôí</string>
     <string name="choose_contrast">Contrast level</string>
     <string name="choose_theme">Choose theme</string>
+    <string name="choose_units">Choose units</string>
     <!-- CLEAN -->
     <string name="clean_node_database_confirmation">This will remove %1$d nodes from your database. This action cannot be undone.</string>
     <string name="clean_node_database_description">Caution: This removes nodes from in-app and on-device databases.\nSelections are additive.</string>
@@ -233,7 +250,10 @@
     <string name="clean_nodes_older_than">Clean up nodes last seen older than %1$d days</string>
     <string name="clean_now">Clean Now</string>
     <string name="clean_unknown_nodes">Clean up only unknown nodes</string>
+    <!-- CLEAR -->
     <string name="clear">Clear</string>
+    <string name="clear_position_track_message">This permanently deletes this node's recorded GPS track. This cannot be undone.</string>
+    <string name="clear_position_track_title">Clear position track?</string>
     <string name="clear_selection">Clear selection</string>
     <string name="clear_time_zone">Clear time zone</string>
     <string name="client_notification">Client Notification</string>
@@ -313,6 +333,9 @@
     <string name="connecting">Connecting</string>
     <string name="connection_status">Current connections:</string>
     <string name="connections">Connection</string>
+    <string name="contact_draft_prefix">Draft: %1$s</string>
+    <string name="contact_muted_snackbar">Muted %1$s</string>
+    <string name="contact_pinned">Pinned</string>
     <string name="contrast">Contrast</string>
     <string name="contrast_high">High</string>
     <string name="contrast_medium">Medium</string>
@@ -333,6 +356,8 @@
     <string name="currently">Currently:</string>
     <string name="datadog_link" translatable="false">Datadog: https://www.datadoghq.com/</string>
     <string name="date">Date</string>
+    <string name="date_separator_today">Today</string>
+    <string name="date_separator_yesterday">Yesterday</string>
     <string name="dbm_value">%1$d dBm</string>
     <!-- DEBUG -->
     <string name="debug">Debug</string>
@@ -520,7 +545,6 @@
     <string name="dns">DNS</string>
     <!-- DOC -->
     <string name="doc_clear_search">Clear search</string>
-    <string name="doc_keywords_android_auto">android auto,car,head unit,driving,hands free,messaging</string>
     <string name="doc_keywords_app_functions">system ai,gemini,assistant,functions,automation,voice</string>
     <string name="doc_keywords_connections">bluetooth,usb,tcp,pairing,serial,wifi</string>
     <string name="doc_keywords_debug_logs">debug,logs,logcat,export,bug report,issue,troubleshooting,diagnostics</string>
@@ -546,12 +570,11 @@
     <string name="doc_search_placeholder">Search documentationÔÇŽ</string>
     <string name="doc_section_developer">Developer Guide</string>
     <string name="doc_section_user">User Guide</string>
-    <string name="doc_title_android_auto">Android Auto</string>
     <string name="doc_title_app_functions">App Functions</string>
     <string name="doc_title_connections">Connections</string>
     <string name="doc_title_debug_logs">Debug Logs</string>
     <string name="doc_title_desktop">Desktop App</string>
-    <string name="doc_title_discovery">Discovery</string>
+    <string name="doc_title_discovery">Local Mesh Discovery</string>
     <string name="doc_title_firmware">Firmware Updates</string>
     <string name="doc_title_help">Help &amp; In-App Docs</string>
     <string name="doc_title_map">Map &amp; Waypoints</string>
@@ -576,6 +599,7 @@
     <string name="downlink_enabled">MQTT Downlink Enabled</string>
     <string name="downlink_feature_description">Messages from a public internet gateway are forwarded to the local mesh. Due to the zero-hop policy, traffic from the default MQTT server will not propagate further than this device.</string>
     <string name="download">Download</string>
+    <string name="download_this_area">Download this area</string>
     <string name="duplicated_public_key_title">Duplicate Public Key Detected</string>
     <string name="dynamic">Dynamic</string>
     <string name="easily_set_up_private_mesh_networks">Easily set up private mesh networks for secure and reliable communication in remote areas.</string>
@@ -667,6 +691,24 @@
     <string name="firmware_edition">Firmware Edition</string>
     <string name="firmware_event_ended_banner">%1$s has ended. Return to standard MT_SW firmware to restore normal features.</string>
     <string name="firmware_event_ended_button">Update firmware</string>
+    <string name="firmware_maintenance_cdc_unblock_failed">The erase file was copied but the device didn't start erasing. Nothing has been changed yet. Unplug the device, double-press its reset button, and try again.</string>
+    <string name="firmware_maintenance_copy_failed">Couldn't copy the file to the device's drive. Make sure the drive is still connected and try again.</string>
+    <string name="firmware_maintenance_data_unavailable">The erase image list isn't available right now. Check your connection and try again, or use the web flasher at flasher.meshtastic.org.</string>
+    <string name="firmware_maintenance_erase_action">Erase and reinstall</string>
+    <string name="firmware_maintenance_erase_confirm_button">Erase device</string>
+    <string name="firmware_maintenance_erase_confirm_text">This erases everything on %1$s, including its channels, keys and all settings, then reinstalls the firmware. It cannot be undone and there is no backup.\n\nYou will be asked to select the device's drive twice: once for the erase file, then again for the firmware.</string>
+    <string name="firmware_maintenance_erase_confirm_title">Erase this device?</string>
+    <string name="firmware_maintenance_no_release">Select a firmware version first, so the device can be reinstalled after erasing.</string>
+    <string name="firmware_maintenance_not_a_bootloader_volume">That drive isn't the device's update drive. Select the drive that appears when the device is in update mode (it contains a file named INFO_UF2.TXT).</string>
+    <string name="firmware_maintenance_select_drive">Select the device's update drive</string>
+    <string name="firmware_maintenance_softdevice_conflict">The device reports a different Bluetooth stack than expected, so erasing it isn't safe. Please report this along with your device model.</string>
+    <string name="firmware_maintenance_unknown_board">This device's bootloader isn't one this app has an upgrade for.</string>
+    <string name="firmware_maintenance_unknown_softdevice">This app can't confirm which Bluetooth stack this device uses, so erasing it isn't safe. Use the web flasher at flasher.meshtastic.org instead.</string>
+    <string name="firmware_maintenance_unsupported_device">This device doesn't support erasing from the app.</string>
+    <string name="firmware_maintenance_upgrade_bootloader_action">Upgrade bootloader</string>
+    <string name="firmware_maintenance_upgrade_confirm_text">This installs an upgraded bootloader on %1$s, which makes future Bluetooth updates much faster. The firmware is reinstalled afterwards.\n\nDon't disconnect the device while this runs.</string>
+    <string name="firmware_maintenance_upgrade_confirm_title">Upgrade bootloader?</string>
+    <string name="firmware_maintenance_wrong_destination">That location isn't the device's update drive, so nothing was written to the device. Select the removable drive that appears when the device is in update mode.</string>
     <string name="firmware_old">The radio firmware is too old to talk to this application. For more information on this see <a href="https://meshtastic.org/docs/getting-started/flashing-firmware">our Firmware Installation guide</a>.</string>
     <string name="firmware_recovery_banner">Finish updating %1$s</string>
     <string name="firmware_recovery_ble_failed">Couldn't finish the update over Bluetooth. This device's stock bootloader can't reliably complete an interrupted update over the air. Connect it to a computer with USB and re-flash it using the vendor's serial DFU tool (for example adafruit-nrfutil) to recover the device.</string>
@@ -723,7 +765,8 @@
     <string name="firmware_update_open_flasher">Open MT_SW_APP Flasher</string>
     <string name="firmware_update_ota_failed">OTA update failed: %1$s</string>
     <string name="firmware_update_ota_unsupported_reason">This device's OTA loader rejected the requested update method: %1$s</string>
-    <string name="firmware_update_rak4631_bootloader_hint">For RAK WisBlock RAK4631, use the vendor's serial DFU tool (for example, adafruit-nrfutil dfu serial with the provided bootloader .zip file). Copying the .uf2 file alone will not update the bootloader.</string>
+    <string name="firmware_update_preparing_flash">Preparing device: erasing flash. This can take up to a minute...</string>
+    <string name="firmware_update_rak4631_bootloader_hint">For RAK WisBlock RAK4631, the vendor's bootloader .zip has to be flashed with a serial DFU tool such as adafruit-nrfutil — copying that .zip to the device's drive won't work. Alternatively, connect this device over USB and use the bootloader upgrade in this app.</string>
     <string name="firmware_update_rebooting">Rebooting to DFU...</string>
     <string name="firmware_update_release_notes">Release Notes</string>
     <string name="firmware_update_requires_bin">%1$s requires a target-matching .bin file.</string>
@@ -731,6 +774,7 @@
     <string name="firmware_update_requires_uf2">%1$s requires a target-matching .uf2 file.</string>
     <string name="firmware_update_retrieval_failed">Could not retrieve firmware file.</string>
     <string name="firmware_update_retry">Retry</string>
+    <string name="firmware_update_retrying_upload">Device did not respond. Retrying upload (attempt %1$d/%2$d)...</string>
     <string name="firmware_update_save_dfu_file">Please save the .uf2 file to your device's DFU drive.</string>
     <string name="firmware_update_searching_device">Searching for OTA device on the network...</string>
     <string name="firmware_update_select_file">Select Local File</string>
@@ -740,6 +784,7 @@
     <string name="firmware_update_starting_dfu">Starting DFU...</string>
     <string name="firmware_update_starting_ota">Starting OTA update...</string>
     <string name="firmware_update_success">Update Successful!</string>
+    <string name="firmware_update_success_wiped">The device was reset to factory defaults and needs to be set up (and paired) again.</string>
     <string name="firmware_update_taking_a_while">This might take a minute...</string>
     <string name="firmware_update_target">Target: %1$s</string>
     <string name="firmware_update_title">Firmware Update</string>
@@ -758,6 +803,10 @@
     <string name="firmware_update_verifying">Verifying update...</string>
     <string name="firmware_update_waiting_reboot">Waiting for device to reboot into OTA mode...</string>
     <string name="firmware_update_waiting_reconnect">Waiting for device to reconnect...</string>
+    <string name="firmware_update_wipe_ble_detail">Factory-resets the device once the update is verified. All settings and Bluetooth pairing are removed.</string>
+    <string name="firmware_update_wipe_confirm_warning">The device will also be erased — all settings, channels, and keys will be lost.</string>
+    <string name="firmware_update_wipe_label">Erase device during update</string>
+    <string name="firmware_update_wipe_usb_detail">Wipes the device's flash completely, then installs the selected firmware from scratch.</string>
     <string name="firmware_version">Firmware version: %1$s</string>
     <string name="fixed_pin">Fixed PIN</string>
     <string name="fixed_position">Fixed Position</string>
@@ -822,6 +871,7 @@
     <string name="gps_transmit_gpio">GPS Transmit GPIO</string>
     <string name="grant_permission">Grant permission</string>
     <string name="green">Green</string>
+    <string name="ham_long_name_summary">Optional. Appended to your call sign, e.g. KD2ABC//Attic Heltec</string>
     <string name="hardware">Hardware</string>
     <string name="hardware_model">Hardware model</string>
     <string name="heading">Heading</string>
@@ -859,6 +909,8 @@
     <string name="import_export_label">Import/Export</string>
     <string name="import_known_shared_contact_text">Warning: This contact is known, importing will overwrite the previous contact information.</string>
     <string name="import_label">Import</string>
+    <string name="import_pending_channels_connect">Channel settings received. Connect to a device to import them.</string>
+    <string name="import_pending_contact_connect">Contact received. Connect to a device to import it.</string>
     <string name="import_shared_contact">Import Shared Contact?</string>
     <string name="incoming_messages">Incoming Messages</string>
     <string name="indoor_air_quality_iaq">Indoor Air Quality (IAQ)</string>
@@ -880,6 +932,8 @@
     <string name="ip_port">Port:</string>
     <string name="ipv4_mode">IPv4 mode</string>
     <string name="json_output_enabled">JSON output enabled</string>
+    <string name="jump_to_latest_from">%1$s</string>
+    <string name="jump_to_latest_from_and_more">%1$s +%2$d</string>
     <!-- KEY -->
     <string name="key_backup_deleted">Key backup deleted</string>
     <string name="key_backup_not_found">No key backup found for this node</string>
@@ -942,6 +996,10 @@
     <string name="loading">Loading</string>
     <!-- LOCAL -->
     <string name="local_mbtiles_file">Local MBTiles File</string>
+    <string name="local_network_permission">Local network permission</string>
+    <string name="local_network_permission_blocked_rationale">Local network access is off and Android will not ask again. A radio on your Wi-Fi cannot be found or reached until you turn it on in app settings. A radio on a public address or over a VPN is unaffected.</string>
+    <string name="local_network_permission_denied_hint">Local network access is turned off for Meshtastic. If this radio is on your local network, the connection will fail until you allow local network access in system settings.</string>
+    <string name="local_network_permission_rationale">Meshtastic needs local network access to find radios on your Wi-Fi. It only looks on the network you are already connected to. Without it, you can still reach a radio by typing its address.</string>
     <string name="local_stats_bad">Bad %1$d</string>
     <string name="local_stats_battery">Battery: %1$d%</string>
     <string name="local_stats_cpu">CPU</string>
@@ -962,7 +1020,13 @@
     <string name="local_stats_updated_at">%1$s</string>
     <string name="local_stats_uptime">Uptime: %1$s</string>
     <string name="local_stats_utilization">ChUtil: %1$s% | AirTX: %2$s%</string>
+    <!-- LOCATION -->
     <string name="location_disabled">Location access is turned off, can not provide position to mesh.</string>
+    <string name="location_permission">Location permission</string>
+    <string name="location_permission_blocked_notice">Location access is turned off and Android will not ask again. Turn it on in app settings whenever you want the map and position sharing back.</string>
+    <string name="location_permission_blocked_toast">Location permission is off. Turn it on in app settings to share your position.</string>
+    <string name="location_permission_denied_notice">Without location access, the map will not show where you are and Meshtastic cannot share your position with the mesh. Everything else keeps working, and you can turn it on later.</string>
+    <string name="location_permission_rationale">Meshtastic uses your location to place you on the map, measure distance to nodes, and — only if you turn it on — share your position with the mesh. Declining leaves everything else working.</string>
     <string name="location_sharing">Location Sharing</string>
     <!-- LOCKDOWN -->
     <string name="lockdown_backoff">Try again in %1$d seconds.</string>
@@ -1026,16 +1090,23 @@
     <string name="network_health">Network Health</string>
     <string name="map_cache_info">Cache Capacity: %1$d MB\nCache Usage: %2$d MB</string>
     <string name="map_cache_manager">Cache Manager</string>
+    <string name="map_cache_megabytes">%1$s MB</string>
     <string name="map_cache_size">Current Cache size</string>
     <string name="map_cache_tiles">%1$d tiles</string>
     <string name="map_clear_tiles">Clear Downloaded Tiles</string>
     <string name="map_download_complete">Download complete!</string>
     <string name="map_download_errors">Download complete with %1$d errors</string>
     <string name="map_download_region">Download Region</string>
+    <string name="map_download_status_complete">Complete</string>
+    <string name="map_download_status_downloading">Downloading</string>
+    <string name="map_download_status_paused">Paused</string>
     <string name="map_filter">Map Filter\n</string>
     <string name="map_layer_formats">Map layers support .kml, .kmz, or GeoJSON formats.</string>
     <string name="map_node_popup_details">%1$s&lt;br&gt;Last heard: %2$s&lt;br&gt;Last position: %3$s&lt;br&gt;Battery: %4$s</string>
     <string name="map_offline_manager">Offline Manager</string>
+    <string name="map_overlay_hillshade">Hillshade</string>
+    <string name="map_overlay_precipitation">Precipitation</string>
+    <string name="map_overlay_weather_radar">Weather radar</string>
     <string name="map_purge_fail">SQL Cache purge failed, see logcat for details</string>
     <string name="map_purge_success">SQL Cache purged for %1$s</string>
     <string name="map_reporting">Map reporting</string>
@@ -1048,12 +1119,15 @@
     <string name="map_style_selection">Map style selection</string>
     <string name="map_subDescription">bearing: %1$d┬░ distance: %2$s</string>
     <string name="map_tile_download_estimate">Tile download estimate:</string>
+    <string name="map_tile_limit_reached">Tile limit reached (%1$d)</string>
     <string name="map_tile_source">Tile Source</string>
     <string name="map_type_hybrid">Hybrid</string>
     <string name="map_type_normal">Normal</string>
     <string name="map_type_satellite">Satellite</string>
     <string name="map_type_terrain">Terrain</string>
+    <string name="map_zoom_levels" translatable="false">(z%1$d–%2$d)</string>
     <string name="mark_as_read">Mark as read</string>
+    <string name="mark_unread_selected">Mark unread</string>
     <string name="match_all">Match All | Any</string>
     <string name="match_any">Match Any | All</string>
     <string name="max">Max</string>
@@ -1089,7 +1163,6 @@
     <string name="mesh_beacon_on_region">Transmit region</string>
     <string name="mesh_beacon_preset_indicator">Advertised by a nearby beacon</string>
     <string name="mesh_beacon_preset_none">None</string>
-    <string name="mesh_beacon_send_as_node">Broadcast as node number (0 = this node)</string>
     <string name="mesh_beacon_target">Target %1$d</string>
     <string name="mesh_beacon_target_add">Add target</string>
     <string name="mesh_beacon_target_channel_index">Channel index</string>
@@ -1215,6 +1288,7 @@
     <string name="name_cannot_be_empty">Name cannot be empty.</string>
     <string name="navigate_back">Navigate Back</string>
     <string name="navigate_into_label">Navigate Into</string>
+    <string name="nearby_devices_permission">Nearby devices permission</string>
     <string name="need_hardware">Need Hardware?</string>
     <string name="need_hardware_description">MT_SW requires a compatible device. Our backers and partners offer ready-to-use hardware. Here are some of the most popular options.</string>
     <string name="neighbor_info">Neighbor Info</string>
@@ -1299,7 +1373,6 @@
     <string name="node_sort_title">Sort by</string>
     <string name="node_sort_via_favorite">via Favorite</string>
     <string name="node_sort_via_mqtt">via MQTT</string>
-    <string name="node_status_summary">The actual status string</string>
     <string name="nodedb_reset">NodeDB reset</string>
     <string name="nodeinfo_broadcast_interval">Node Info Broadcast Interval</string>
     <!-- NODES -->
@@ -1316,8 +1389,12 @@
     <string name="none">None (disable)</string>
     <string name="none_quality">None</string>
     <string name="not_connected">Not connected</string>
+    <string name="not_now">Not now</string>
     <string name="note">Note</string>
     <string name="notes">Notes</string>
+    <string name="notification_permission_blocked_notice">Notifications are turned off and Android will not ask again. Turn them on in app settings to hear about new messages and alerts.</string>
+    <string name="notification_permission_denied_notice">Without notifications, MT_SW_APP cannot alert you to new messages, new nodes, or a low battery while the app is in the background.</string>
+    <string name="notification_permission_rationale">Notifications are how MT_SW_APP reaches you when the app is not open: new messages, newly discovered nodes, and a radio running low on battery. Nothing else changes if you decline.</string>
     <string name="notification_permissions_description">MT_SW_APP uses notifications to keep you updated on new messages and other important events. You can update your notification permissions at any time from settings.</string>
     <!-- NOTIFICATIONS -->
     <string name="notifications_for_channel_and_direct_messages">Notifications for channel and direct messages.</string>
@@ -1328,6 +1405,8 @@
     <string name="now">Now</string>
     <string name="ntp_server">NTP server</string>
     <string name="number_of_records">Number of records</string>
+    <string name="offline_maps">Offline maps</string>
+    <string name="offline_maps_empty">No areas downloaded yet</string>
     <string name="ok_to_mqtt">Ok to MQTT</string>
     <string name="okay">OK</string>
     <string name="oled_type">OLED type</string>
@@ -1342,6 +1421,7 @@
     <!-- OPEN -->
     <string name="open_bluetooth_settings">Open Bluetooth settings</string>
     <string name="open_compass">Open Compass</string>
+    <string name="open_location_settings">Open location settings</string>
     <string name="open_settings">Open settings</string>
     <string name="open_source_description">MT_SW_APP is built with the following open source libraries. Tap any library to view its license.</string>
     <string name="open_source_libraries">Open Source Libraries</string>
@@ -1387,9 +1467,33 @@
     <string name="paxcounter_config">Paxcounter Config</string>
     <string name="paxcounter_enabled">Paxcounter enabled</string>
     <string name="periodic_position_broadcast">Periodic position broadcast</string>
+    <!-- PERMISSION -->
+    <string name="permission_camera_summary">Scan channel and contact QR codes</string>
+    <string name="permission_local_network_summary">Find radios on your Wi-Fi network</string>
+    <string name="permission_location_summary">Show your position on the map and share it with the mesh</string>
+    <string name="permission_location_summary_pre31">Find your radio over Bluetooth, place you on the map, and share your position with the mesh</string>
     <string name="permission_missing_31">MT_SW_APP needs "Nearby devices" permissions enabled to find and connect to devices via Bluetooth. You can disable when not in use.</string>
+    <string name="permission_missing_pre31">On this version of Android, one Location permission covers two things: it is what unlocks Bluetooth scanning, and it places you on the mesh map. Sharing your position with the mesh stays off until you turn it on yourself.</string>
+    <string name="permission_nearby_devices_summary">Find and connect to your radio over Bluetooth</string>
+    <string name="permission_notifications_summary">Alert you to messages, new nodes and low battery</string>
+    <string name="permission_state_allowed">Allowed</string>
+    <string name="permission_state_blocked">Blocked — tap to open system settings</string>
+    <string name="permission_state_denied">Denied — tap to allow</string>
+    <string name="permission_state_not_applicable">Not required on this version of Android</string>
+    <string name="permission_state_not_asked">Not asked yet</string>
+    <!-- PERMISSIONS -->
+    <string name="permissions">Permissions</string>
+    <string name="permissions_all_allowed">All allowed</string>
+    <string name="permissions_hide">Hide permissions</string>
+    <plurals name="permissions_need_attention">
+        <item quantity="one">%1$d needs attention</item>
+        <item quantity="other">%1$d need attention</item>
+    </plurals>
+    <string name="permissions_nothing_needed">Nothing needs your attention</string>
+    <string name="permissions_show">Show permissions</string>
     <string name="phone_location">Phone Location</string>
     <string name="phone_location_description">MT_SW_APP uses your phone's location to enable a number of features. You can update your location permissions at any time from settings.</string>
+    <string name="pin_selected">Pin</string>
     <string name="play">Play</string>
     <plurals name="plurals_hours">
         <item quantity="one">%1$d hour</item>
@@ -1680,6 +1784,7 @@
     <string name="site_planner">Site Planner</string>
     <string name="site_planner_antenna_gain_dbi">Antenna gain (dBi)</string>
     <string name="site_planner_antenna_height_meters">Antenna height (m)</string>
+    <string name="site_planner_browser_note">The estimate opens in your browser. To bring it onto this map, click the transmitter pin there, choose Export › GeoJSON, then add the downloaded file under Manage Map Layers › Add Layer. Use the GeoJSON export — the KML one is a ground-overlay image this map cannot draw.</string>
     <string name="site_planner_color_scale">Color palette</string>
     <string name="site_planner_estimate">Estimate coverage</string>
     <string name="site_planner_estimating">Estimating coverageÔÇŽ</string>
@@ -1702,6 +1807,7 @@
     <string name="site_planner_use_current_location">Use current location</string>
     <string name="site_planner_use_map_center">Use map center</string>
     <string name="site_planner_use_node_location">Use current node location</string>
+    <string name="site_planner_webview_updating">The system WebView is updating. Please try again in a moment.</string>
     <string name="skip">Skip</string>
     <string name="slot">Slot</string>
     <string name="smart_position">Smart Position</string>
@@ -1716,7 +1822,7 @@
     <string name="ssid">SSID</string>
     <string name="state_broadcast_seconds">State broadcast (seconds)</string>
     <string name="status_message">Status Message</string>
-    <string name="status_message_config">Status Message Config</string>
+    <string name="status_message_summary">A status message that is broadcast to the mesh. Other nodes will see this status in the node list.</string>
     <string name="stay_connected_anywhere">Stay Connected Anywhere</string>
     <string name="stop_connecting">Stop Connecting</string>
     <string name="store_forward">Store &amp; Forward</string>
@@ -1727,6 +1833,9 @@
     <string name="super_deep_sleep_duration_seconds">Super deep sleep duration</string>
     <string name="supported">Supported</string>
     <string name="supported_by_community">Supported by Meshtastic Community</string>
+    <string name="swipe_action_delete">Delete</string>
+    <string name="swipe_action_mute">Mute</string>
+    <string name="swipe_action_unmute">Unmute</string>
     <string name="sx126x_rx_boosted_gain">RX Boosted Gain</string>
     <string name="system_settings">System Settings</string>
     <!-- TAK -->
@@ -1743,12 +1852,16 @@
     <string name="tak_role_teammember">Team Member</string>
     <string name="tak_role_unspecified">Unspecified</string>
     <string name="tak_server">TAK Server</string>
+    <string name="tak_server_channel">TAK Mesh Channel</string>
+    <string name="tak_server_channel_desc">Meshtastic channel used for outgoing TAK traffic</string>
+    <string name="tak_server_channel_option">%1$d: %2$s</string>
     <string name="tak_server_enabled">Enable Local TAK Server</string>
     <string name="tak_server_enabled_desc">Starts a local TLS server on port 8089 for ATAK connections</string>
     <string name="tak_server_export_data_package_desc">Generate .zip for ATAK to connect to this server</string>
     <string name="tak_server_loading">ÔÇŽ</string>
     <string name="tak_server_mesh_to_cot">Mesh to CoT Converter</string>
     <string name="tak_server_mesh_to_cot_desc">Show MT_SW nodes on the ATAK map as contacts</string>
+    <string name="tak_server_permission_blocked">The TAK server needs local network access to accept connections, and Android will not ask again. It has been turned off for now — turn the permission on in app settings and switch it back on.</string>
     <string name="tak_server_section">Server</string>
     <string name="tak_server_status">Status</string>
     <plurals name="tak_server_status_connected">
@@ -1763,11 +1876,15 @@
     <string name="tak_server_status_waiting">Listening on 127.0.0.1:8089 ÔÇö waiting for ATAK</string>
     <string name="tak_server_test_card_title">TAK Mesh Test (Debug)</string>
     <string name="tak_server_test_idle">Send all %1$d test fixtures to mesh</string>
-    <string name="tak_server_test_result_bytes">%1$dB Ôťô</string>
-    <string name="tak_server_test_result_unknown_error">ÔťŚ</string>
-    <string name="tak_server_test_results">%1$d passed, %2$d failed of %3$d/%4$d</string>
+    <string name="tak_server_test_protocol_v1_label">V1 (legacy firmware &lt; 2.8.0 — PLI + chat only)</string>
+    <string name="tak_server_test_protocol_v2_label">V2 (firmware ≥ 2.8.0)</string>
+    <string name="tak_server_test_result_bytes">%1$dB ✓</string>
+    <string name="tak_server_test_result_expected_drop">Not in v1 schema (expected)</string>
+    <string name="tak_server_test_result_unknown_error">✗</string>
+    <string name="tak_server_test_results_v2">%1$d passed, %2$d expected drop, %3$d failed of %4$d/%5$d</string>
     <string name="tak_server_test_run">Run</string>
     <string name="tak_server_test_running">Running: %1$s</string>
+    <string name="tak_server_v1_fallback_notice">Connected node firmware doesn't support full TAK integration — only location and chat messages will bridge to ATAK. Markers and other event types need firmware 2.8.0 or newer.</string>
     <string name="tak_team">Team Color</string>
     <string name="tak_team_blue">Blue</string>
     <string name="tak_team_brown">Brown</string>
@@ -1846,6 +1963,8 @@
     <string name="translation_failed">Unable to translate message</string>
     <string name="translation_model_download_failed">Translation model download failed</string>
     <string name="translation_not_required">Message is already in your language</string>
+    <string name="transmit_disabled">Transmit is disabled</string>
+    <string name="transmit_disabled_summary">This device can receive but will not send anything over LoRa.</string>
     <string name="transmit_over_lora">Transmit over LoRa</string>
     <!-- TRANSPORT -->
     <string name="transport">Transport</string>
@@ -1865,6 +1984,13 @@
     <string name="type">Type</string>
     <string name="type_a_message">Type a message</string>
     <string name="udp_enabled">UDP broadcasting</string>
+    <string name="undo">Undo</string>
+    <!-- UNITS -->
+    <string name="units">Units</string>
+    <string name="units_follow_system">System default</string>
+    <string name="units_imperial">Imperial</string>
+    <string name="units_metric">Metric</string>
+    <string name="units_scope_summary">How this app displays distance, altitude, speed, and temperature. Your device's own screen follows its Display config instead.</string>
     <!-- UNKNOWN -->
     <string name="unknown">Unknown</string>
     <string name="unknown_age">Unknown Age</string>
@@ -1876,6 +2002,7 @@
     <string name="unmonitored_or_infrastructure">Unmonitored or Infrastructure</string>
     <string name="unmute">Unmute</string>
     <string name="unmute_selected">Unmute selected</string>
+    <string name="unpin_selected">Unpin</string>
     <string name="unrecognized">Unrecognized</string>
     <string name="unset">Unset - 0</string>
     <string name="up_down_select_input_enabled">Up/Down/Select input enabled</string>
@@ -1888,6 +2015,7 @@
     <!-- URL -->
     <string name="url">URL</string>
     <string name="url_cannot_be_empty">URL cannot be empty.</string>
+    <string name="url_must_be_http">URL must start with http:// or https://.</string>
     <string name="url_must_contain_placeholders">URL must contain placeholders.</string>
     <string name="url_template">URL Template</string>
     <string name="url_template_hint" translatable="false">https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png</string>
@@ -1982,7 +2110,9 @@
     <string name="write_nfc_success">Written to tag</string>
     <string name="write_nfc_text">Hold a writable NFC tag against the back of your phone.</string>
     <string name="you">You</string>
-    <string name="zh_CN" translatable="false">š«ÇńŻôńŞşŠľç</string>
-    <string name="zh_TW" translatable="false">š╣üÚźöńŞşŠľç</string>
+    <string name="zh_CN" translatable="false">简体中文</string>
+    <string name="zh_TW" translatable="false">繁體中文</string>
+    <string name="zoom_in">Zoom in</string>
+    <string name="zoom_out">Zoom out</string>
 </resources>
 

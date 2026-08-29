@@ -2,7 +2,7 @@
 title: Telemetria ja anturit
 parent: Käyttöopas
 nav_order: 9
-last_updated: 2026-05-13
+last_updated: 2026-08-27
 description: Anturitiedot verkossa — tuetut ympäristö-, ilmanlaatu- ja virta-anturit sekä määritys- ja katseluohjeet.
 aliases:
   - sensorit
@@ -47,11 +47,20 @@ Tuetut ympäristöanturit:
 
 ### Ilmanlaatu
 
-| Sensor   | Metrijärjestelmä                                   | Viestit                        |
-| -------- | -------------------------------------------------- | ------------------------------ |
-| BME680   | Kaasuvastus ja IAQ                                 | Haihtuvat orgaaniset yhdisteet |
-| PMSA003I | PM1.0, PM2.5, PM10 | Hiukkaset                      |
-| SEN55    | PM, NOx, VOC, lämpötila, kosteus                   | Monianturi                     |
+| Sensor   | Metrijärjestelmä                                   | Viestit                                                                                                                                               |
+| -------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| BME680   | Kaasuvastus ja IAQ                                 | Haihtuvat orgaaniset yhdisteet                                                                                                                        |
+| PMSA003I | PM1.0, PM2.5, PM10 | Hiukkaset                                                                                                                                             |
+| SEN55    | PM, lämpötila, kosteus                             | Monianturi. Sen NOx- ja VOC-indeksit tallennetaan ja sisällytetään CSV-vientiin, mutta niitä ei vielä näytetä kortteina tai kaavioina |
+
+### Maaperä
+
+| Metrijärjestelmä   | Yksikkö | Viestit                                                                     |
+| ------------------ | ------- | --------------------------------------------------------------------------- |
+| Maaperän lämpötila | °C / °F | Näytetään maaperän kosteuslukemien yhteydessä maaperäkosteusanturien kanssa |
+| Maaperän kosteus   | %       | Tilavuusvesipitoisuus                                                       |
+
+Molemmat näkyvät tietokorteissa radion tietonäytössä muiden ympäristömittausten rinnalla.
 
 ### Valo ja UV
 
@@ -65,32 +74,30 @@ Tuetut ympäristöanturit:
 
 INA-sarjan virta-antureilla varustetut radiot voivat raportoida:
 
-| Metrijärjestelmä | Kuvaus                                   |
-| ---------------- | ---------------------------------------- |
-| Väyläjännite     | Syöttöjännitteen                         |
-| Virta            | Virrankulutuksen (mA) |
-| Virta            | Lasketun tehon (mW)   |
+| Metrijärjestelmä | Kuvaus                                        |
+| ---------------- | --------------------------------------------- |
+| Jännite          | Kanavakohtainen jännitemittaus                |
+| Virta            | Kanavakohtainen virta (mA) |
+
+Enintään kolme kanavaa (ch1–ch3) voidaan näyttää, ja jokaiselle voidaan antaa oma nimi, kuten Aurinko tai Akku, radion tietonäytössä. Erillistä tehomittausta ei ole. Sovellus näyttää kaavioissa jännitteen ja virran, mutta ei laske niistä tehoa.
 
 Hyödyllinen aurinkolatauksen tai etäradioiden akun kunnon seurantaan.
 
 ## Telemetrian määrittäminen
 
 1. Siirry kohtaan **Asetukset → Moduuliasetukset → Telemetria**
-2. Määritä raportointivälit:
-   - **Laitemittarien väli** — kuinka usein laitteen mittarit lähetetään verkkoon
-   - **Ympäristömittarien väli** — kuinka usein anturitiedot lähetetään verkkoon
-3. Ota tarvittavat anturityypit käyttöön.
+2. Jokaisella mittausryhmällä on oma käyttöönottokytkin ja oma mittausväli:
 
-### Suositellut raportointivälit
+   - **Laitemittaukset** — akku, kanava ja lähetysajan käyttö
+   - **Ympäristömittaukset** — lämpötila, kosteus, paine ja muut anturimittaukset
+   - **Ilmanlaatumittaukset** — hiukkas- ja CO₂-mittaukset
+   - **Virtamittaukset** — kanavakohtaiset jännite- ja virtamittaukset
 
-| Käyttötarkoitus                                     | Laite (s) | Ympäristö (s) |
-| --------------------------------------------------- | ---------------------------- | -------------------------------- |
-| Kaupunkiverkko (paljon radioita) | 3600                         | 3600                             |
-| Maaseutuverkko (vähän radioita)  | 900                          | 900                              |
-| Sääasema                                            | 900                          | 300                              |
-| Akun säästäminen                                    | 7200                         | 7200                             |
+   Ympäristömittauksille on lisäksi    radion omalle näytölle oma näyttökytkin ja Fahrenheit-kytkin.
 
-> ⚠️ **Huomautus:** Lyhyemmät välit lisäävät käyttöastetta ja akun kulutusta koko verkossa.
+### Mittausvälin valitseminen
+
+> 💡 **Vinkki:** Nämä ovat nimellisiä arvoja, eivät tarkkoja aikatauluja. Ruuhkaisessa mesh-verkossa laiteohjelmisto pidentää mittausvälejä automaattisesti verkossa olevien radioiden määrän mukaan, joten niitä ei tarvitse säätää käsin verkon koon perusteella. Pidennä niitä tarkoituksella vain akun säästämiseksi.
 
 ## Ilmanlaatumittarit
 

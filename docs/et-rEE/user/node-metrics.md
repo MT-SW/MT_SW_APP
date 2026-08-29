@@ -1,19 +1,19 @@
 ---
 title: Sõlme mõõdikud
-parent: User Guide
+parent: Kasutusjuhend
 nav_order: 5
-last_updated: 2026-07-08
-description: Telemetry dashboards for each mesh node — device health, environment sensors, air quality, signal quality, power, traceroute, and position history.
+last_updated: 2026-08-27
+description: Telemeetria armatuurlauad iga võrgusõlme kohta – seadme tervis, keskkonnaandurid, õhu kvaliteet, signaali kvaliteet, võimsus, marsruut ja asukoha ajalugu.
 aliases:
   - meetriline
-  - telemetry
+  - telemeetria
   - sõlme-mõõdikud
-  - signal
+  - signaal
 ---
 
 # Sõlme mõõdikud
 
-The node detail screen provides comprehensive telemetry and metrics for each node on your mesh.
+Sõlme detailvaates on iga kärgvõrgu sõlme kohta põhjalikud telemeetria ja mõõdikud.
 
 ## Seadme mõõdikud
 
@@ -43,7 +43,7 @@ Environmental sensor data (requires compatible hardware):
 | Gaasi surve                          | BME680                |
 | IAQ (Air Quality) | BME680                |
 
-Environment metrics are charted over time for easy trend analysis — temperature, humidity, and pressure each get their own line chart with the measurement unit displayed on the Y axis.
+Keskkonnanäitajaid joonistatakse aja jooksul lihtsaks trendianalüüsiks – temperatuur, niiskus ja rõhk saavad igaüks oma joondiagrammi, mille mõõtühik kuvatakse Y-teljel.
 
 BME680 **IAQ (siseõhu kvaliteet)** indeks on üksik väärtus vahemikus 0–500+, mis on tuletatud gaasitakistusest ja näidatud värvikoodiga skaalal _Suurepärane_ kuni _Ohtlikult saastunud_:
 
@@ -62,24 +62,24 @@ Air Quality is a dedicated metrics view for nodes equipped with a particulate-ma
 | PM10                  | µg/m³      | Particulate matter up to 10 microns                                                                                                                                                                                                                   |
 | AQI                   | EPA indeks | EPA **NowCast** õhukvaliteedi indeks on arvutatud hiljutise PM2.5 ajaloo põhjal ja sellel on värvikoodiga raskusastme silt. Kuvatakse PM2.5 kõrval, kui on kogunenud piisavalt näite. |
 | CO₂                   | ppm        | Süsinikdioksiidi kontsentratsioon                                                                                                                                                                                                                     |
-| CO₂ temperature       | °C / °F    | Temperature reported by the CO₂ sensor itself (e.g. SCD4x)                                                                                                                                         |
-| CO₂ humidity          | %          | Relative humidity reported by the CO₂ sensor                                                                                                                                                                                                          |
+| CO₂ temperatuur       | °C / °F    | Temperature reported by the CO₂ sensor itself (e.g. SCD4x)                                                                                                                                         |
+| CO₂ niiskus           | %          | Relative humidity reported by the CO₂ sensor                                                                                                                                                                                                          |
 
 CO₂ näidud on vastavalt raskusastmele värvikoodiga kodeeritud, et õhukvaliteeti oleks kiirelt loetav:
 
-| Band         | CO₂ Range (ppm) | Värv        |
-| ------------ | ---------------------------------- | ----------- |
-| Hea          | < 1000    | Roheline    |
-| Stuffy       | < 2000    | Merevaik    |
-| Kehv         | < 5000    | Oranž       |
-| Ebaturvaline | < 30000   | Punane      |
-| Evakueeru    | ≥ 30000                            | Tume punane |
+| Band         | CO₂ ulatus (ppm) | Värv        |
+| ------------ | ----------------------------------- | ----------- |
+| Hea          | < 1000     | Roheline    |
+| Stuffy       | < 2000     | Merevaik    |
+| Kehv         | < 5000     | Oranž       |
+| Ebaturvaline | < 30000    | Punane      |
+| Evakueeru    | ≥ 30000                             | Tume punane |
 
 ![Õhukvaliteedi näidud koos värvikoodiga CO₂ sisalduse raskusastme kohta](../../assets/screenshots/node-metrics_air_quality.png)
 
 An air-quality log/metrics button appears on the node detail screen **only when the node has reported air-quality telemetry**. From the Air Quality view you can:
 
-- Select a **time frame** for the charts.
+- Vali diagrammide jaoks **ajaraam**.
 - Filtreeri **mõõdikute kiipide** abil — kuvatakse ainult andmeid sisaldavad mõõdikud.
 - **Refresh / request** the latest air-quality telemetry.
 - **Ekspordi CSV** analüüsimiseks arvutustabeli vaates.
@@ -101,12 +101,12 @@ Radio signal quality information:
 
 Signaali kvaliteeti hinnatakse **SNR-i põhjal, mis on seotud aktiivse LoRa modemi eelseadistuse demodulatsiooni alumise piiriga**, mitte fikseeritud läviväärtuste põhjal – antud SNR tähendab erinevatel eelseadistustel erinevat väärtust (nt −15 dB on LongSlow režiimil hea, kuid ShortFast režiimil mittekasutatav). RSSI on kuvatud, aga see ei ole osa hinnangust. Letting `limit` be the preset's SNR limit:
 
-| Quality  | Criteria                                                         |
-| -------- | ---------------------------------------------------------------- |
-| Hea      | SNR above the preset's limit                                     |
-| Rahuldav | less than 5.5 dB below the limit                 |
-| Halb     | 5.5 dB to 7.5 dB below the limit |
-| Puudub   | more than 7.5 dB below the limit                 |
+| Kvaliteet | Kriteerium                                |
+| --------- | ----------------------------------------- |
+| Hea       | SNR above the preset's limit              |
+| Rahuldav  | vähem kui 5,5 dB piirväärtusest allpool   |
+| Halb      | 5,5 dB kuni 7,5 dB piirväärtusest allpool |
+| Puudub    | üle 7,5 dB piirväärtusest allpool         |
 
 See [Understanding the Signal Meter](signal-meter) for the full explanation.
 
@@ -116,24 +116,26 @@ Kohalik statistika ühendatud raadiost kuvatakse ka signaali kvaliteedi all, kui
 
 Power management telemetry (requires INA sensor or compatible hardware):
 
-| Meetriline  | Kirjeldus               |
-| ----------- | ----------------------- |
-| Bus Voltage | Supply voltage          |
-| Pinge       | Power draw in milliamps |
-| Toide       | Calculated wattage      |
+| Meetriline | Kirjeldus                      |
+| ---------- | ------------------------------ |
+| Vool       | Per-channel voltage reading    |
+| Pinge      | Per-channel draw, in milliamps |
+
+Up to three channels (ch1–ch3) are charted, each with a label you can edit. The app does not
+derive a wattage figure from them.
 
 ## Marsruudi
 
 Traceroute näitab sõnumi teed läbi kärgvõrgu:
 
 1. Sõlme üksikasjade ekraanil puuduta **Traceroute**.
-2. The app sends a traceroute request to the target node.
+2. Rakendus saadab sihtsõlmele traceroute-päringu.
 3. Tulemused näitavad iga hüpet koos SNR/RSSI väärtustega.
 
-### Reading Traceroute Results
+### Traceroute'i tulemuste lugemine
 
 ```
-You → Node A (SNR: 8.5) → Node B (SNR: 5.2) → Target
+Sina → seade A (SNR: 8,5) → seade B (SNR: 5,2) → sihtkoht
 ```
 
 Iga hüpe esindab vahendussõlme, mis sõnumi edastas.
@@ -144,18 +146,18 @@ Asukohta jagavate sõlmede ajaloolised asukohaandmed:
 
 - GPS koordinaadid
 - Kõrgus
-- Speed (if moving)
+- Kiirus (kui liigub)
 - Timestamp for each position report
 
 ## Naabruse teave
 
-Näitab, milliseid sõlmi antud sõlm otse kuuleb, kasulik kärgvõrgus topoloogia mõistmiseks.
+Näitab, milliseid sõlmi antud sõlm otse kuuleb, kasulik kärgvõrgu topoloogia mõistmiseks.
 
 ## Viewing Metrics
 
 1. Mine **Seadmed**.
 2. Puuduta sõlme, mida soovite kontrollida.
-3. Select the metric category from the detail tabs.
+3. Vali detailvaadete vahekaartidelt mõõdiku kategooria.
 
 ![Sõlme detailid — kohalik seade](../../assets/screenshots/nodes_detail_local.png)
 
@@ -163,14 +165,14 @@ Asukoha vahekaart kuvab GPS-i jagavate sõlmede asukohaandmeid:
 
 ![Asukoha tekstisisene sisu](../../assets/screenshots/nodes_position.png)
 
-> ⚠️ **Märkus:** Mõõdikud on saadaval ainult siis, kui need on kaugsõlme poolt esitatud. Mõõdikud värskendatakse iga sõlme telemeetria sätetes seadistatud intervallidega.
+> ℹ️ **Note:** Metrics are only available when they have been reported by the remote node. Mõõdikud värskendatakse iga sõlme telemeetria sätetes seadistatud intervallidega.
 
-## Related Topics
+## Seotud teemad
 
 - [Nodes](nodes) — node list, filtering, and sorting
 - [Telemeetria & Sensorid](telemetry-and-sensors) — toetatud andurid ja seadistus
 - [Signal Meter](signal-meter) — how signal quality is calculated from SNR and RSSI
-- [Avasta](Discovery) — traceroute'i üksikasjad ja naabri teave
+- [Local Mesh Discovery](discovery) — traceroute details and neighbor info
 - [Ühikud ja lokaat](units-and-locale) — temperatuuri, kauguse ja kiiruse kuvamise ühikud
 
 ---

@@ -17,6 +17,7 @@ acknowledgements
 ### ACTION ###
 action_copy_message
 action_delete_message
+action_more_message_actions
 action_react_with_emoji
 action_select_device
 action_select_message
@@ -127,6 +128,7 @@ battery
 battery_ina_2xx_i2c_address
 ble_devices
 ble_rssi_threshold_defaults_to_80
+ble_scan_needs_location_services
 blue
 ### BLUETOOTH ###
 bluetooth
@@ -139,6 +141,14 @@ bluetooth_feature_config_description
 bluetooth_feature_discovery
 bluetooth_feature_discovery_description
 bluetooth_permission
+bluetooth_permission_blocked_notice
+bluetooth_permission_blocked_notice_pre31
+bluetooth_permission_blocked_rationale
+bluetooth_permission_blocked_rationale_pre31
+bluetooth_permission_denied_notice
+bluetooth_permission_denied_notice_pre31
+bluetooth_permission_rationale
+bluetooth_permission_rationale_pre31
 bluetooth_scan_location_services_disabled
 bluetooth_scan_missing_permission
 bluetooth_scan_start_failed
@@ -146,11 +156,14 @@ bluetooth_scan_too_frequent
 bold_heading
 bonding_failed_permissions
 bonding_failed_retry
+boot_reconnect_blocked_message
+boot_reconnect_blocked_title
 bottom_nav_settings
 broadcast_interval
 busy_noise_floor
 button_gpio
 buzzer_gpio
+cache_limit_eviction_warning
 calculating
 call_sign
 call_sign_summary
@@ -203,6 +216,7 @@ chirpy_suggested_pages_help
 chirpy_thinking
 choose_contrast
 choose_theme
+choose_units
 ### CLEAN ###
 clean_node_database_confirmation
 clean_node_database_description
@@ -210,7 +224,10 @@ clean_node_database_title
 clean_nodes_older_than
 clean_now
 clean_unknown_nodes
+### CLEAR ###
 clear
+clear_position_track_message
+clear_position_track_title
 clear_selection
 clear_time_zone
 client_notification
@@ -290,6 +307,9 @@ connected_sleeping
 connecting
 connection_status
 connections
+contact_draft_prefix
+contact_muted_snackbar
+contact_pinned
 contrast
 contrast_high
 contrast_medium
@@ -305,6 +325,8 @@ current
 currently
 datadog_link
 date
+date_separator_today
+date_separator_yesterday
 dbm_value
 ### DEBUG ###
 debug
@@ -489,7 +511,6 @@ distance_measurements_description
 dns
 ### DOC ###
 doc_clear_search
-doc_keywords_android_auto
 doc_keywords_app_functions
 doc_keywords_connections
 doc_keywords_debug_logs
@@ -515,7 +536,6 @@ doc_keywords_widget
 doc_search_placeholder
 doc_section_developer
 doc_section_user
-doc_title_android_auto
 doc_title_app_functions
 doc_title_connections
 doc_title_debug_logs
@@ -545,6 +565,7 @@ double_tap_as_button_press
 downlink_enabled
 downlink_feature_description
 download
+download_this_area
 duplicated_public_key_title
 dynamic
 easily_set_up_private_mesh_networks
@@ -636,6 +657,24 @@ firmware
 firmware_edition
 firmware_event_ended_banner
 firmware_event_ended_button
+firmware_maintenance_cdc_unblock_failed
+firmware_maintenance_copy_failed
+firmware_maintenance_data_unavailable
+firmware_maintenance_erase_action
+firmware_maintenance_erase_confirm_button
+firmware_maintenance_erase_confirm_text
+firmware_maintenance_erase_confirm_title
+firmware_maintenance_no_release
+firmware_maintenance_not_a_bootloader_volume
+firmware_maintenance_select_drive
+firmware_maintenance_softdevice_conflict
+firmware_maintenance_unknown_board
+firmware_maintenance_unknown_softdevice
+firmware_maintenance_unsupported_device
+firmware_maintenance_upgrade_bootloader_action
+firmware_maintenance_upgrade_confirm_text
+firmware_maintenance_upgrade_confirm_title
+firmware_maintenance_wrong_destination
 firmware_old
 firmware_recovery_banner
 firmware_recovery_ble_failed
@@ -692,6 +731,7 @@ firmware_update_open
 firmware_update_open_flasher
 firmware_update_ota_failed
 firmware_update_ota_unsupported_reason
+firmware_update_preparing_flash
 firmware_update_rak4631_bootloader_hint
 firmware_update_rebooting
 firmware_update_release_notes
@@ -700,6 +740,7 @@ firmware_update_requires_ota_zip
 firmware_update_requires_uf2
 firmware_update_retrieval_failed
 firmware_update_retry
+firmware_update_retrying_upload
 firmware_update_save_dfu_file
 firmware_update_searching_device
 firmware_update_select_file
@@ -709,6 +750,7 @@ firmware_update_stable
 firmware_update_starting_dfu
 firmware_update_starting_ota
 firmware_update_success
+firmware_update_success_wiped
 firmware_update_taking_a_while
 firmware_update_target
 firmware_update_title
@@ -727,6 +769,10 @@ firmware_update_verification_failed
 firmware_update_verifying
 firmware_update_waiting_reboot
 firmware_update_waiting_reconnect
+firmware_update_wipe_ble_detail
+firmware_update_wipe_confirm_warning
+firmware_update_wipe_label
+firmware_update_wipe_usb_detail
 firmware_version
 fixed_pin
 fixed_position
@@ -786,6 +832,7 @@ gps_receive_gpio
 gps_transmit_gpio
 grant_permission
 green
+ham_long_name_summary
 hardware
 hardware_model
 heading
@@ -823,6 +870,8 @@ import_configuration
 import_export_label
 import_known_shared_contact_text
 import_label
+import_pending_channels_connect
+import_pending_contact_connect
 import_shared_contact
 incoming_messages
 indoor_air_quality_iaq
@@ -844,6 +893,8 @@ ip_address
 ip_port
 ipv4_mode
 json_output_enabled
+jump_to_latest_from
+jump_to_latest_from_and_more
 ### KEY ###
 key_backup_deleted
 key_backup_not_found
@@ -906,6 +957,10 @@ load_indexed
 loading
 ### LOCAL ###
 local_mbtiles_file
+local_network_permission
+local_network_permission_blocked_rationale
+local_network_permission_denied_hint
+local_network_permission_rationale
 local_stats_bad
 local_stats_battery
 local_stats_diagnostics_prefix
@@ -919,7 +974,13 @@ local_stats_traffic
 local_stats_updated_at
 local_stats_uptime
 local_stats_utilization
+### LOCATION ###
 location_disabled
+location_permission
+location_permission_blocked_notice
+location_permission_blocked_toast
+location_permission_denied_notice
+location_permission_rationale
 location_sharing
 ### LOCKDOWN ###
 lockdown_backoff
@@ -976,16 +1037,23 @@ manual_position_request
 map
 map_cache_info
 map_cache_manager
+map_cache_megabytes
 map_cache_size
 map_cache_tiles
 map_clear_tiles
 map_download_complete
 map_download_errors
 map_download_region
+map_download_status_complete
+map_download_status_downloading
+map_download_status_paused
 map_filter
 map_layer_formats
 map_node_popup_details
 map_offline_manager
+map_overlay_hillshade
+map_overlay_precipitation
+map_overlay_weather_radar
 map_purge_fail
 map_purge_success
 map_reporting
@@ -998,12 +1066,15 @@ map_start_download
 map_style_selection
 map_subDescription
 map_tile_download_estimate
+map_tile_limit_reached
 map_tile_source
 map_type_hybrid
 map_type_normal
 map_type_satellite
 map_type_terrain
+map_zoom_levels
 mark_as_read
+mark_unread_selected
 match_all
 match_any
 max
@@ -1039,7 +1110,6 @@ mesh_beacon_on_preset
 mesh_beacon_on_region
 mesh_beacon_preset_indicator
 mesh_beacon_preset_none
-mesh_beacon_send_as_node
 mesh_beacon_target
 mesh_beacon_target_add
 mesh_beacon_target_channel_index
@@ -1164,6 +1234,7 @@ name
 name_cannot_be_empty
 navigate_back
 navigate_into_label
+nearby_devices_permission
 need_hardware
 need_hardware_description
 neighbor_info
@@ -1248,7 +1319,6 @@ node_sort_last_heard
 node_sort_title
 node_sort_via_favorite
 node_sort_via_mqtt
-node_status_summary
 nodedb_reset
 nodeinfo_broadcast_interval
 ### NODES ###
@@ -1265,8 +1335,12 @@ noise_floor_no_reading
 none
 none_quality
 not_connected
+not_now
 note
 notes
+notification_permission_blocked_notice
+notification_permission_denied_notice
+notification_permission_rationale
 notification_permissions_description
 ### NOTIFICATIONS ###
 notifications_for_channel_and_direct_messages
@@ -1277,6 +1351,8 @@ notifications_on_message_receipt
 now
 ntp_server
 number_of_records
+offline_maps
+offline_maps_empty
 ok_to_mqtt
 okay
 oled_type
@@ -1291,6 +1367,7 @@ only_favorites
 ### OPEN ###
 open_bluetooth_settings
 open_compass
+open_location_settings
 open_settings
 open_source_description
 open_source_libraries
@@ -1336,9 +1413,30 @@ paxcounter
 paxcounter_config
 paxcounter_enabled
 periodic_position_broadcast
+### PERMISSION ###
+permission_camera_summary
+permission_local_network_summary
+permission_location_summary
+permission_location_summary_pre31
 permission_missing_31
+permission_missing_pre31
+permission_nearby_devices_summary
+permission_notifications_summary
+permission_state_allowed
+permission_state_blocked
+permission_state_denied
+permission_state_not_applicable
+permission_state_not_asked
+### PERMISSIONS ###
+permissions
+permissions_all_allowed
+permissions_hide
+permissions_need_attention
+permissions_nothing_needed
+permissions_show
 phone_location
 phone_location_description
+pin_selected
 play
 plurals_hours
 plurals_minutes
@@ -1616,6 +1714,7 @@ signal_quality
 site_planner
 site_planner_antenna_gain_dbi
 site_planner_antenna_height_meters
+site_planner_browser_note
 site_planner_color_scale
 site_planner_estimate
 site_planner_estimating
@@ -1638,6 +1737,7 @@ site_planner_tx_power_watts
 site_planner_use_current_location
 site_planner_use_map_center
 site_planner_use_node_location
+site_planner_webview_updating
 skip
 slot
 smart_position
@@ -1652,7 +1752,7 @@ spread_factor
 ssid
 state_broadcast_seconds
 status_message
-status_message_config
+status_message_summary
 stay_connected_anywhere
 stop_connecting
 store_forward
@@ -1663,6 +1763,9 @@ success
 super_deep_sleep_duration_seconds
 supported
 supported_by_community
+swipe_action_delete
+swipe_action_mute
+swipe_action_unmute
 sx126x_rx_boosted_gain
 system_settings
 ### TAK ###
@@ -1679,12 +1782,16 @@ tak_role_teamlead
 tak_role_teammember
 tak_role_unspecified
 tak_server
+tak_server_channel
+tak_server_channel_desc
+tak_server_channel_option
 tak_server_enabled
 tak_server_enabled_desc
 tak_server_export_data_package_desc
 tak_server_loading
 tak_server_mesh_to_cot
 tak_server_mesh_to_cot_desc
+tak_server_permission_blocked
 tak_server_section
 tak_server_status
 tak_server_status_connected
@@ -1696,11 +1803,15 @@ tak_server_status_unavailable
 tak_server_status_waiting
 tak_server_test_card_title
 tak_server_test_idle
+tak_server_test_protocol_v1_label
+tak_server_test_protocol_v2_label
 tak_server_test_result_bytes
+tak_server_test_result_expected_drop
 tak_server_test_result_unknown_error
-tak_server_test_results
+tak_server_test_results_v2
 tak_server_test_run
 tak_server_test_running
+tak_server_v1_fallback_notice
 tak_team
 tak_team_blue
 tak_team_brown
@@ -1776,6 +1887,8 @@ translation_downloading
 translation_failed
 translation_model_download_failed
 translation_not_required
+transmit_disabled
+transmit_disabled_summary
 transmit_over_lora
 ### TRANSPORT ###
 transport
@@ -1795,6 +1908,13 @@ tx_power_dbm
 type
 type_a_message
 udp_enabled
+undo
+### UNITS ###
+units
+units_follow_system
+units_imperial
+units_metric
+units_scope_summary
 ### UNKNOWN ###
 unknown
 unknown_age
@@ -1806,6 +1926,7 @@ unmessageable
 unmonitored_or_infrastructure
 unmute
 unmute_selected
+unpin_selected
 unrecognized
 unset
 up_down_select_input_enabled
@@ -1818,6 +1939,7 @@ uptime
 ### URL ###
 url
 url_cannot_be_empty
+url_must_be_http
 url_must_contain_placeholders
 url_template
 url_template_hint
@@ -1914,3 +2036,5 @@ write_nfc_text
 you
 zh_CN
 zh_TW
+zoom_in
+zoom_out

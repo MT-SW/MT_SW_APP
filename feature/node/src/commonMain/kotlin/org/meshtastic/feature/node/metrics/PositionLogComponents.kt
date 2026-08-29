@@ -37,13 +37,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.DateFormatter
+import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.formatString
 import org.meshtastic.core.model.util.GeoConstants.DEG_D
 import org.meshtastic.core.model.util.GeoConstants.HEADING_DEG
 import org.meshtastic.core.model.util.TimeConstants.MS_PER_SEC
 import org.meshtastic.core.model.util.kmhIn
-import org.meshtastic.core.model.util.metersIn
-import org.meshtastic.core.model.util.toString
+import org.meshtastic.core.model.util.toElevationString
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.alt
 import org.meshtastic.core.resources.heading
@@ -53,7 +53,6 @@ import org.meshtastic.core.resources.sats
 import org.meshtastic.core.resources.speed_kmh
 import org.meshtastic.core.resources.speed_mph
 import org.meshtastic.core.ui.theme.GraphColors
-import org.meshtastic.proto.Config
 import org.meshtastic.proto.Position
 
 /**
@@ -63,12 +62,7 @@ import org.meshtastic.proto.Position
  */
 @Composable
 @Suppress("LongMethod")
-fun PositionCard(
-    position: Position,
-    displayUnits: Config.DisplayConfig.DisplayUnits,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-) {
+fun PositionCard(position: Position, displayUnits: MeasurementSystem, isSelected: Boolean, onClick: () -> Unit) {
     val time = position.time.toLong() * MS_PER_SEC
     val latitude = formatString("%.5f", (position.latitude_i ?: 0) * DEG_D)
     val longitude = formatString("%.5f", (position.longitude_i ?: 0) * DEG_D)
@@ -120,17 +114,20 @@ fun PositionCard(
                 itemVerticalAlignment = Alignment.CenterVertically,
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    MetricValueRow(
-                        color = GraphColors.Purple,
-                        text =
-                        "${stringResource(Res.string.alt)}: ${
-                            (position.altitude ?: 0).metersIn(displayUnits).toString(displayUnits)
-                        }",
-                    )
+                    val altitude = position.altitude
+                    if (altitude != null) {
+                        MetricValueRow(
+                            color = GraphColors.Purple,
+                            text =
+                            "${stringResource(Res.string.alt)}: ${
+                                altitude.toElevationString(displayUnits)
+                            }",
+                        )
+                    }
                     if (position.ground_speed != null && position.ground_speed != 0) {
                         Spacer(Modifier.width(12.dp))
                         val speedRes =
-                            if (displayUnits == Config.DisplayConfig.DisplayUnits.IMPERIAL) {
+                            if (displayUnits == MeasurementSystem.IMPERIAL) {
                                 Res.string.speed_mph
                             } else {
                                 Res.string.speed_kmh

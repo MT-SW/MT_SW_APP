@@ -44,6 +44,7 @@
     <!-- CHIRPY -->
     <string name="choose_theme">Escoller tema</string>
     <!-- CLEAN -->
+    <!-- CLEAR -->
     <string name="clear">Limpar</string>
     <string name="close">Pechar</string>
     <!-- COMPASS -->
@@ -108,6 +109,7 @@
     <!-- LICENSED -->
     <!-- LOAD -->
     <!-- LOCAL -->
+    <!-- LOCATION -->
     <string name="location_disabled">Acceso á úbicación está apagado, non se pode prover posición na rede.</string>
     <!-- LOCKDOWN -->
     <string name="locked">Bloqueado</string>
@@ -171,6 +173,8 @@
     <!-- OUTPUT -->
     <!-- PACKET -->
     <!-- PAX -->
+    <!-- PERMISSION -->
+    <!-- PERMISSIONS -->
     <!-- POSITION -->
     <!-- POWER -->
     <string name="preferences_language">Linguaxe</string>
@@ -214,6 +218,8 @@
     <!-- SHOW -->
     <string name="shutdown">Apagar</string>
     <!-- SITE -->
+    <string name="swipe_action_delete">Eliminar</string>
+    <string name="swipe_action_mute">Silenciar</string>
     <!-- TAK -->
     <string name="theme">Tema</string>
     <string name="theme_dark">Escuro</string>
@@ -226,6 +232,8 @@
     <!-- TRANSLATION -->
     <!-- TRANSPORT -->
     <string name="two_days">48 Horas</string>
+    <!-- UNITS -->
+    <string name="units_follow_system">Predeterminado do sistema</string>
     <!-- UNKNOWN -->
     <string name="unknown_username">Nome de usuario descoñecido</string>
     <string name="unrecognized">Non recoñecido</string>

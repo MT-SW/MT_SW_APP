@@ -51,6 +51,7 @@
     <!-- CHIRPY -->
     <string name="choose_theme">Chwazi tèm</string>
     <!-- CLEAN -->
+    <!-- CLEAR -->
     <string name="clear">Netwaye</string>
     <string name="close">Fèmen</string>
     <!-- COMPASS -->
@@ -120,6 +121,7 @@
     <!-- LICENSED -->
     <!-- LOAD -->
     <!-- LOCAL -->
+    <!-- LOCATION -->
     <string name="location_disabled">Aksè lokasyon enfim, pa ka bay pozisyon mesh la.</string>
     <!-- LOCKDOWN -->
     <string name="locked">Loken</string>
@@ -189,6 +191,8 @@
     <!-- OUTPUT -->
     <!-- PACKET -->
     <!-- PAX -->
+    <!-- PERMISSION -->
+    <!-- PERMISSIONS -->
     <!-- POSITION -->
     <!-- POWER -->
     <string name="preferences_language">Lang</string>
@@ -258,6 +262,8 @@
     <string name="signal_quality">Kalite Siynal</string>
     <!-- SITE -->
     <string name="snr_definition">Rapò Siynal sou Bri, yon mezi ki itilize nan kominikasyon pou mezire nivo siynal vle a kont nivo bri ki nan anviwònman an. Nan Meshtastic ak lòt sistèm san fil, yon SNR pi wo endike yon siynal pi klè ki ka amelyore fyab ak kalite transmisyon done.</string>
+    <string name="swipe_action_delete">Efase</string>
+    <string name="swipe_action_mute">Fèmen son</string>
     <!-- TAK -->
     <string name="theme">Tèm</string>
     <string name="theme_dark">Fènwa</string>
@@ -271,6 +277,8 @@
     <!-- TRANSLATION -->
     <!-- TRANSPORT -->
     <string name="two_days">48 Èdtan</string>
+    <!-- UNITS -->
+    <string name="units_follow_system">Sistèm default</string>
     <!-- UNKNOWN -->
     <string name="unknown_username">Non itilizatè enkoni</string>
     <string name="unrecognized">Inkonu</string>

@@ -45,21 +45,8 @@ if (keystorePropertiesFile.exists()) {
     keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
 }
 
-// The templated Android Auto experience (CarAppService + HomeScreen) is a Google "templated
-// messaging" beta feature that is publishable only to Closed/Internal tracks — Open/Production
-// submissions are auto-rejected (https://developer.android.com/training/cars/communication/templated-messaging).
-// Default builds therefore ship *notification-only* car messaging, which is GA and production-safe.
-// Build a Closed-track templated AAB with: -PenableCarTemplates=true
-val enableCarTemplates = providers.gradleProperty("enableCarTemplates").map { it.toBoolean() }.getOrElse(false)
-
 configure<ApplicationExtension> {
     namespace = "org.meshtastic.app"
-
-    // When templates are enabled, this res dir overrides feature:car's notification-only
-    // automotive_app_desc.xml with one that also declares <uses name="template" />.
-    if (enableCarTemplates) {
-        sourceSets.getByName("google").res.srcDir("src/googleCarTemplates/res")
-    }
 
     signingConfigs {
         // Shared debug key (checked in; debug keys are not secret) so local builds and CI snapshots
@@ -178,6 +165,13 @@ configure<ApplicationExtension> {
         configureEach {
             versionName = "${defaultConfig.versionName} (${defaultConfig.versionCode}) $name"
             if (name == "google") {
+                // Only the unit-test manifest merge needs this. The secrets plugin injects
+                // MAPS_API_KEY at *variant* level (from secrets.properties, else
+                // secrets.defaults.properties), which overrides this for the app manifest -- but
+                // variant-level placeholders do not reach the unit-test component, so with no
+                // flavor-level value mergeGoogleDebugUnitTestManifest fails on the unsubstituted
+                // ${MAPS_API_KEY} in src/google/AndroidManifest.xml. This value is never shipped;
+                // what a real build carries comes from the plugin. See #6883.
                 manifestPlaceholders["MAPS_API_KEY"] = "dummy"
             }
         }
@@ -298,12 +292,16 @@ dependencies {
     // instead of manually polling `dumpsys meminfo`.
     debugImplementation(libs.leakcanary.android)
 
-    googleImplementation(projects.feature.car)
     googleImplementation(libs.location.services)
     googleImplementation(libs.play.services.maps)
     googleImplementation(libs.maps.compose)
     googleImplementation(libs.maps.compose.utils)
     googleImplementation(libs.maps.compose.widgets)
+    // Direct declaration raises the transitive android-maps-utils 5.0.0 (via maps-utils-ktx 6.2.0)
+    // to 5.1.1, whose KmlParser is built against the xmlutil 1.0.x compat API the app actually ships
+    // — 5.0.0's is compiled against 0.91.x's removed policyBuilder(), so every KML/KMZ map import
+    // crashed with NoSuchMethodError. Drop when maps-compose's chain requires >= 5.1.1 on its own.
+    googleImplementation(libs.android.maps.utils)
     // maps-compose-widgets requests androidx.compose.material:material version-less (expects a BOM
     // we exclude). Name it with a version so the version is published in the app's graph metadata.
     googleImplementation(libs.androidx.compose.material)
@@ -322,12 +320,9 @@ dependencies {
     googleImplementation(libs.androidx.appfunctions)
     add("kspGoogle", libs.androidx.appfunctions.compiler)
 
-    fdroidImplementation(libs.osmdroid.android)
-    fdroidImplementation(libs.geopackage.android) {
-        because("6.7.5 depends on 16 KB page-size compatible SQLite Android Bindings")
-        exclude(group = "com.j256.ormlite")
-    }
-    fdroidImplementation(libs.osmbonuspack)
+    // MapLibre replaces OSMdroid on this flavor; the module also backs the desktop app, and is
+    // deliberately NOT visible to `google`, which stays on Google Maps.
+    fdroidImplementation(projects.feature.mapMaplibre)
 
     testImplementation(kotlin("test-junit"))
     testImplementation(libs.androidx.work.testing)

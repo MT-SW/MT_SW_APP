@@ -84,6 +84,9 @@ import org.meshtastic.core.repository.notificationId
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.client_notification
 import org.meshtastic.core.resources.compromised_keys
+import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.import_pending_channels_connect
+import org.meshtastic.core.resources.import_pending_contact_connect
 import org.meshtastic.core.ui.component.ScrollToTopEvent
 import org.meshtastic.core.ui.util.AlertManager
 import org.meshtastic.core.ui.util.ComposableContent
@@ -139,6 +142,18 @@ class UIViewModel(
 
     private val _navigationDeepLink = MutableSharedFlow<List<NavKey>>(replay = 1)
     val navigationDeepLink = _navigationDeepLink.asSharedFlow()
+
+    /**
+     * Clears the buffered deep link once its collector has applied it to the backstack.
+     *
+     * [_navigationDeepLink] replays its last value so a deep link emitted before the collector subscribes (e.g. on cold
+     * start) isn't lost. But this ViewModel is Activity-scoped and survives configuration changes, while the collecting
+     * `LaunchedEffect` does not — without this, a device rotation after a deep link re-subscribes and replays the same
+     * value, duplicate-appending it onto [MultiBackstack]'s current tab.
+     */
+    fun onDeepLinkHandled() {
+        _navigationDeepLink.resetReplayCache()
+    }
 
     /**
      * Unified handler for all Meshtastic deep links and OS intents.
@@ -334,6 +349,16 @@ class UIViewModel(
 
     fun setSharedContactRequested(contact: SharedContact?) {
         _sharedContactRequested.value = contact
+        if (contact != null) notifyImportPendingIfNotConnected(Res.string.import_pending_contact_connect)
+    }
+
+    /**
+     * The import dialogs in `SharedDialogs` only render while [ConnectionState.Connected], so a QR scanned while
+     * disconnected would otherwise queue silently with no feedback.
+     */
+    private fun notifyImportPendingIfNotConnected(messageRes: StringResource) {
+        if (connectionState.value is ConnectionState.Connected) return
+        safeLaunch(tag = "notifyImportPending") { snackbarManager.showSnackbar(message = getStringSuspend(messageRes)) }
     }
 
     /** Clears the pending shared contact request. */
@@ -351,6 +376,7 @@ class UIViewModel(
 
     fun setRequestChannelSet(channelSet: ChannelSet?) {
         _requestChannelSet.value = channelSet
+        if (channelSet != null) notifyImportPendingIfNotConnected(Res.string.import_pending_channels_connect)
     }
 
     val latestStableFirmwareRelease = firmwareReleaseRepository.stableRelease.mapNotNull { it?.asDeviceVersion() }

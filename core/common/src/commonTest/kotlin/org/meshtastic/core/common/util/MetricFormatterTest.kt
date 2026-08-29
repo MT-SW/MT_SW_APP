@@ -68,7 +68,9 @@ class MetricFormatterTest {
 
     @Test
     fun pressure() {
-        assertEquals("1013.3 hPa", MetricFormatter.pressure(1013.25f))
+        // Grouped, because display formatting follows the locale and en-US groups thousands. The test JVMs are pinned
+        // to en-US for exactly this reason.
+        assertEquals("1,013.3 hPa", MetricFormatter.pressure(1013.25f))
     }
 
     @Test
@@ -140,12 +142,12 @@ class MetricFormatterTest {
 
     @Test
     fun windSpeed() {
-        assertEquals("12.3 m/s", MetricFormatter.windSpeed(12.34f, isImperial = false))
+        assertEquals("44.4 km/h", MetricFormatter.windSpeed(12.34f, isImperial = false))
     }
 
     @Test
     fun windSpeedZero() {
-        assertEquals("0.0 m/s", MetricFormatter.windSpeed(0.0f, isImperial = false))
+        assertEquals("0.0 km/h", MetricFormatter.windSpeed(0.0f, isImperial = false))
     }
 
     @Test

@@ -16,7 +16,6 @@
  */
 package org.meshtastic.app.map
 
-import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
+import org.meshtastic.core.common.util.LocaleUnitsProvider
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.repository.MapCameraPosition
 import org.meshtastic.core.repository.MapPrefs
@@ -34,7 +34,9 @@ import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
 import org.meshtastic.feature.map.BaseMapViewModel
-import java.io.InputStream
+import org.meshtastic.feature.map.layers.MapLayerItem
+import org.meshtastic.feature.map.layers.MapLayersManager
+import org.meshtastic.feature.map.layers.PickedMapFile
 
 @Suppress("LongParameterList")
 @KoinViewModel
@@ -47,6 +49,7 @@ class MapViewModel(
     notificationPrefs: NotificationPrefs,
     private val mapLayersManager: MapLayersManager,
     savedStateHandle: SavedStateHandle,
+    localeUnitsProvider: LocaleUnitsProvider,
 ) : BaseMapViewModel(
     mapPrefs,
     nodeRepository,
@@ -54,6 +57,7 @@ class MapViewModel(
     radioController,
     radioConfigRepository,
     notificationPrefs,
+    localeUnitsProvider,
 ) {
 
     private val mutableInitialCameraState = MutableStateFlow<InitialCameraState>(InitialCameraState.Loading)
@@ -84,10 +88,10 @@ class MapViewModel(
             mapPrefs.setMapStyle(value)
         }
 
-    /** Imported overlay layers; owned by the flavor-neutral [MapLayersManager] and drawn on the OSMdroid map. */
+    /** Imported overlay layers; owned by the flavor-neutral [MapLayersManager] and drawn by the MapLibre map. */
     val mapLayers: StateFlow<List<MapLayerItem>> = mapLayersManager.mapLayers
 
-    fun addMapLayer(uri: Uri, fileName: String?) = mapLayersManager.addMapLayer(uri, fileName)
+    fun addMapLayer(picked: PickedMapFile) = mapLayersManager.addMapLayer(picked)
 
     fun addGeoJsonLayer(name: String, geoJson: String) = mapLayersManager.addGeoJsonLayer(name, geoJson)
 
@@ -103,8 +107,7 @@ class MapViewModel(
 
     fun refreshAllVisibleNetworkLayers() = mapLayersManager.refreshAllVisibleNetworkLayers()
 
-    suspend fun getInputStreamFromUri(layerItem: MapLayerItem): InputStream? =
-        mapLayersManager.getInputStreamFromUri(layerItem)
+    suspend fun readLayerBytes(layerItem: MapLayerItem): ByteArray? = mapLayersManager.readLayerBytes(layerItem)
 
     // Injected by the map provider because this SavedStateHandle is not the Navigation 3 entry's route state.
     private val sitePlannerRequestState = SitePlannerRequestState(nodeRepository.nodeDBbyNum)

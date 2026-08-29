@@ -23,6 +23,7 @@ import dev.mokkery.matcher.any
 import dev.mokkery.verifySuspend
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.resetMain
@@ -51,6 +52,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -242,7 +244,9 @@ class ScannerViewModelTest {
         viewModel.startBleScan()
         assertEquals(1, scanAttempts)
         assertEquals(false, viewModel.isBleScanning.value)
-        assertEquals("Bluetooth is off. Turn it on to scan for nearby devices.", serviceRepository.errorMessage.value)
+        // No modal: the Connections screen already carries a live "Bluetooth is off" card with the settings action, so
+        // a dialog here would interrupt the user to repeat what is on screen behind it.
+        assertNull(serviceRepository.errorMessage.value)
 
         // Immediately retryable — no waiting on the scheduler.
         viewModel.startBleScan()
@@ -264,13 +268,55 @@ class ScannerViewModelTest {
 
         viewModel.startBleScan()
         assertEquals(1, scanAttempts)
-        assertEquals(
-            "Location services are off. Turn them on to scan for nearby devices.",
-            serviceRepository.errorMessage.value,
-        )
+        // Same reasoning as the Bluetooth-off case: the screen owns a live card for this, so no modal is raised.
+        assertNull(serviceRepository.errorMessage.value)
 
         viewModel.startBleScan()
         assertEquals(2, scanAttempts)
+    }
+
+    @Test
+    fun `missing scan permission raises no modal but flags a refusal`() = runTest {
+        warmScanFailureStrings()
+        every { bleScanner.scan(any(), any()) } returns
+            flow {
+                throw BleScanStartException(
+                    reason = BleScanStartFailureReason.MissingScanPermission,
+                    cause = IllegalStateException("Bluetooth scan permission missing"),
+                )
+            }
+
+        viewModel.startBleScan()
+
+        // The permission card on the Connections screen is driven by live status and carries the recovery action, so
+        // the old modal only restated it. The refusal flag covers the case the card cannot see: the platform refusing
+        // a scan the app believes it is permitted to run.
+        assertNull(serviceRepository.errorMessage.value)
+        assertEquals(true, viewModel.blePermissionRefusal.value)
+
+        viewModel.clearBlePermissionRefusal()
+        assertEquals(false, viewModel.blePermissionRefusal.value)
+    }
+
+    @Test
+    fun `a scan that starts clears a stale permission refusal`() = runTest {
+        warmScanFailureStrings()
+        every { bleScanner.scan(any(), any()) } returns
+            flow {
+                throw BleScanStartException(
+                    reason = BleScanStartFailureReason.MissingScanPermission,
+                    cause = IllegalStateException("Bluetooth scan permission missing"),
+                )
+            }
+        viewModel.startBleScan()
+        assertEquals(true, viewModel.blePermissionRefusal.value)
+
+        // Immediately retryable, with no cooldown: the user answers a permission dialog, not a rate limit. A cooldown
+        // here would refuse the very scan the grant was for.
+        every { bleScanner.scan(any(), any()) } returns emptyFlow()
+        viewModel.startBleScan()
+
+        assertEquals(false, viewModel.blePermissionRefusal.value)
     }
 
     @Test

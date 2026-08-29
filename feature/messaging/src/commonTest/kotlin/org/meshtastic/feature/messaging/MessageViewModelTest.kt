@@ -25,16 +25,20 @@ import dev.mokkery.every
 import dev.mokkery.everySuspend
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import dev.mokkery.verify.VerifyMode
 import dev.mokkery.verifySuspend
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.withContext
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.ContactSettings
+import org.meshtastic.core.repository.ActiveConversationTracker
 import org.meshtastic.core.repository.ConnectionStateProvider
 import org.meshtastic.core.repository.CustomEmojiPrefs
 import org.meshtastic.core.repository.HomoglyphPrefs
@@ -58,6 +62,10 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
 
 class MessageViewModelTest {
 
@@ -73,7 +81,9 @@ class MessageViewModelTest {
     private val customEmojiPrefs: CustomEmojiPrefs = mock(MockMode.autofill)
     private val homoglyphPrefs: HomoglyphPrefs = mock(MockMode.autofill)
     private val uiPrefs: UiPrefs = mock(MockMode.autofill)
-    private val notificationManager: org.meshtastic.core.repository.NotificationManager = mock(MockMode.autofill)
+    private val meshNotificationManager: org.meshtastic.core.repository.MeshNotificationManager =
+        mock(MockMode.autofill)
+    private val activeConversationTracker = ActiveConversationTracker()
     private val messageTranslationService: MessageTranslationService = mock(MockMode.autofill)
     private val snackbarManager: SnackbarManager = SnackbarManager()
 
@@ -132,7 +142,8 @@ class MessageViewModelTest {
                 customEmojiPrefs = customEmojiPrefs,
                 homoglyphEncodingPrefs = homoglyphPrefs,
                 uiPrefs = uiPrefs,
-                notificationManager = notificationManager,
+                meshNotificationManager = meshNotificationManager,
+                activeConversationTracker = activeConversationTracker,
                 messageTranslationService = messageTranslationService,
                 snackbarManager = snackbarManager,
             )
@@ -143,10 +154,63 @@ class MessageViewModelTest {
         Dispatchers.resetMain()
     }
 
+    /**
+     * Waits for work the view model launched on the real IO dispatcher.
+     *
+     * [advanceUntilIdle] only drains the test scheduler, but `safeLaunch(context = ioDispatcher)` passes an explicit
+     * dispatcher to `viewModelScope.launch`, which overrides the `Dispatchers.setMain` replacement — so that coroutine
+     * runs on real `Dispatchers.IO` and an assertion straight after `advanceUntilIdle` races it. That is why these
+     * tests pass locally and fail on a loaded CI machine. Retries [verification] in real time until it holds, then
+     * gives up with the assertion's own error.
+     */
+    private suspend fun eventually(timeout: Duration = 5.seconds, verification: () -> Unit) {
+        withContext(Dispatchers.Default) {
+            val start = TimeSource.Monotonic.markNow()
+            while (true) {
+                try {
+                    verification()
+                    return@withContext
+                } catch (e: AssertionError) {
+                    if (start.elapsedNow() >= timeout) throw e
+                    delay(POLL_INTERVAL)
+                }
+            }
+        }
+    }
+
     @Test fun testInitialization() = runTest { assertNotNull(viewModel) }
+
+    private val draftContact = "0!12345678"
+
+    /** Draft edits are ignored until the stored value has been read back, so every draft test loads first. */
+    private suspend fun loadDraftAndAwait(stored: String = "") {
+        everySuspend { packetRepository.getDraft(draftContact) } returns stored
+        viewModel.draftMessage.test {
+            assertNull(awaitItem())
+            viewModel.loadDraft(draftContact)
+            assertEquals(stored, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+        // Drain the load coroutine fully before the caller starts asserting on debounce timing, so a slow CI machine
+        // cannot interleave its tail with the edits that follow.
+        testDispatcher.scheduler.advanceUntilIdle()
+    }
+
+    @Test fun testDraftIsRestoredFromTheRepository() = runTest { loadDraftAndAwait(stored = "half typed") }
+
+    @Test
+    fun testDraftEditsAreIgnoredBeforeTheStoredValueIsRead() = runTest {
+        // The composer reports its initial empty value as soon as it composes; that must not erase a stored draft.
+        viewModel.setDraftMessage("")
+        assertNull(viewModel.draftMessage.value)
+
+        loadDraftAndAwait(stored = "survived")
+        assertEquals("survived", viewModel.draftMessage.value)
+    }
 
     @Test
     fun testDraftPersistenceDebouncesRapidEdits() = runTest {
+        loadDraftAndAwait()
         viewModel.setDraftMessage("a")
         testDispatcher.scheduler.runCurrent()
         testDispatcher.scheduler.advanceTimeBy(100L)
@@ -159,29 +223,32 @@ class MessageViewModelTest {
         testDispatcher.scheduler.runCurrent()
 
         assertEquals("abc", viewModel.draftMessage.value)
-        assertNull(savedStateHandle.get<String>("draftMessage"))
+        assertNull(savedStateHandle.get<String>("draftMessage:$draftContact"))
 
         testDispatcher.scheduler.advanceTimeBy(299L)
         testDispatcher.scheduler.runCurrent()
-        assertNull(savedStateHandle.get<String>("draftMessage"))
+        assertNull(savedStateHandle.get<String>("draftMessage:$draftContact"))
 
         testDispatcher.scheduler.advanceTimeBy(1L)
         testDispatcher.scheduler.runCurrent()
-        assertEquals("abc", savedStateHandle.get<String>("draftMessage"))
+        assertEquals("abc", savedStateHandle.get<String>("draftMessage:$draftContact"))
+        advanceUntilIdle()
+        eventually { verifySuspend { packetRepository.setDraft(draftContact, "abc") } }
     }
 
     @Test
     fun testClearDraftCancelsPendingPersistenceAndClearsImmediately() = runTest {
+        loadDraftAndAwait()
         viewModel.setDraftMessage("pending")
         testDispatcher.scheduler.runCurrent()
 
         viewModel.clearDraftMessage()
         assertEquals("", viewModel.draftMessage.value)
-        assertEquals("", savedStateHandle.get<String>("draftMessage"))
+        assertEquals("", savedStateHandle.get<String>("draftMessage:$draftContact"))
 
         testDispatcher.scheduler.advanceTimeBy(300L)
         testDispatcher.scheduler.runCurrent()
-        assertEquals("", savedStateHandle.get<String>("draftMessage"))
+        assertEquals("", savedStateHandle.get<String>("draftMessage:$draftContact"))
     }
 
     @Test
@@ -248,7 +315,7 @@ class MessageViewModelTest {
         advanceUntilIdle()
 
         // Verify via mokkery
-        verifySuspend { sendMessageUseCase.invoke("Hello", "0!12345678", null) }
+        eventually { verifySuspend { sendMessageUseCase.invoke("Hello", "0!12345678", null) } }
     }
 
     @Test
@@ -266,7 +333,7 @@ class MessageViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
 
-        verifySuspend { sendMessageUseCase.invoke("Hello", "0!12345678", null) }
+        eventually { verifySuspend { sendMessageUseCase.invoke("Hello", "0!12345678", null) } }
     }
 
     @Test
@@ -277,7 +344,7 @@ class MessageViewModelTest {
 
         advanceUntilIdle()
 
-        verifySuspend { messagingController.sendReaction("❤️", 123, "0!12345678") }
+        eventually { verifySuspend { messagingController.sendReaction("❤️", 123, "0!12345678") } }
     }
 
     @Test
@@ -288,7 +355,7 @@ class MessageViewModelTest {
 
         advanceUntilIdle()
 
-        verifySuspend { packetRepository.deleteMessages(listOf(1L, 2L)) }
+        eventually { verifySuspend { packetRepository.deleteMessages(listOf(1L, 2L)) } }
     }
 
     @Test
@@ -315,15 +382,37 @@ class MessageViewModelTest {
         everySuspend { packetRepository.clearUnreadCount(contact, 1000L) } returns Unit
         everySuspend { packetRepository.updateLastReadMessage(contact, 1L, 1000L) } returns Unit
         everySuspend { packetRepository.getUnreadCount(contact) } returns 0
-        every { notificationManager.cancel(contact.hashCode()) } returns Unit
+        everySuspend { meshNotificationManager.cancelMessageNotification(contact) } returns Unit
+        activeConversationTracker.setActive(contact)
 
         viewModel.clearUnreadCount(contact, 1L, 1000L)
 
         advanceUntilIdle()
 
-        verifySuspend { packetRepository.clearUnreadCount(contact, 1000L) }
-        verifySuspend { packetRepository.updateLastReadMessage(contact, 1L, 1000L) }
-        verifySuspend { notificationManager.cancel(contact.hashCode()) }
+        eventually {
+            verifySuspend { packetRepository.clearUnreadCount(contact, 1000L) }
+            verifySuspend { packetRepository.updateLastReadMessage(contact, 1L, 1000L) }
+            verifySuspend { meshNotificationManager.cancelMessageNotification(contact) }
+        }
+    }
+
+    @Test
+    fun testClearUnreadCountLeavesNotificationAloneOnceTheUserHasLeft() = runTest {
+        // The count was read before this coroutine suspended. If the user left in the meantime, a message that
+        // arrived since posted a notification that is legitimately theirs to see — cancelling would erase it.
+        val contact = "0!12345678"
+        everySuspend { packetRepository.clearUnreadCount(contact, 1000L) } returns Unit
+        everySuspend { packetRepository.updateLastReadMessage(contact, 1L, 1000L) } returns Unit
+        everySuspend { packetRepository.getUnreadCount(contact) } returns 0
+        activeConversationTracker.clearActive(contact)
+
+        viewModel.clearUnreadCount(contact, 1L, 1000L)
+
+        advanceUntilIdle()
+        // A negative assertion cannot be retried into correctness — retrying would pass on the first attempt and
+        // miss a cancel that lands a moment later. Wait for the IO work to have had its chance, then assert.
+        eventually { verifySuspend { packetRepository.updateLastReadMessage(contact, 1L, 1000L) } }
+        verifySuspend(mode = VerifyMode.not) { meshNotificationManager.cancelMessageNotification(contact) }
     }
 
     @Test
@@ -339,5 +428,9 @@ class MessageViewModelTest {
             assertEquals(3, list.size)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    private companion object {
+        val POLL_INTERVAL = 10.milliseconds
     }
 }

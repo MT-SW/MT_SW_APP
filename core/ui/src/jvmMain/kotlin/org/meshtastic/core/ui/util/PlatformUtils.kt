@@ -29,6 +29,7 @@ import java.awt.FileDialog
 import java.awt.Frame
 import java.io.File
 import java.net.URI
+import javax.swing.JFileChooser
 
 /** JVM stub — NFC settings are not available on Desktop. */
 @Composable
@@ -88,6 +89,18 @@ actual fun rememberOpenFileLauncher(onUriReceived: (CommonUri?) -> Unit): (mimeT
     }
 }
 
+/** JVM — Opens a native dialog to pick a directory. */
+@Composable
+actual fun rememberOpenDocumentTreeLauncher(onTreeUriSelect: (CommonUri?) -> Unit): () -> Unit = {
+    // AWT FileDialog cannot select directories portably; JFileChooser can.
+    val chooser = JFileChooser().apply { fileSelectionMode = JFileChooser.DIRECTORIES_ONLY }
+    if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+        onTreeUriSelect(CommonUri.parse(chooser.selectedFile.toURI().toString()))
+    } else {
+        onTreeUriSelect(null)
+    }
+}
+
 /** JVM — Reads text from a file URI. */
 @Composable
 actual fun rememberReadTextFromUri(): suspend (uri: CommonUri, maxChars: Int) -> String? = { uri, maxChars ->
@@ -131,6 +144,8 @@ actual fun rememberOpenBluetoothSettings(): () -> Unit = {
 actual fun rememberOpenWifiSettings(): () -> Unit = { Logger.w { "Wi-Fi settings not available on JVM/Desktop" } }
 
 /** JVM — GPS is never disabled on Desktop (concept doesn't apply). */
+actual val bleScanRequiresLocationServices: Boolean = false
+
 @Composable actual fun isGpsDisabled(): Boolean = false
 
 /** JVM — Bluetooth adapter state is not surfaced on Desktop. */

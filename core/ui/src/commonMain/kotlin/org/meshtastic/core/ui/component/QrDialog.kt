@@ -38,6 +38,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.isSensitiveData
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -63,13 +66,14 @@ import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.core.ui.util.rememberQrCodePainter
 
 private const val QR_DISPLAY_SIZE = 320
-private const val QR_RENDER_SIZE = 960
 
 @Composable
 fun QrDialog(title: String, uriString: String, onDismiss: () -> Unit) {
     val clipboardManager = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
-    val qrPainter = rememberQrCodePainter(uriString, QR_RENDER_SIZE)
+    // Render at the actual on-screen pixel size so low-density devices don't over-allocate bitmap memory.
+    val qrRenderSizePx = with(LocalDensity.current) { QR_DISPLAY_SIZE.dp.roundToPx() }
+    val qrPainter = rememberQrCodePainter(uriString, qrRenderSizePx)
 
     val nfcSupported = LocalNfcScannerSupported.current
     val nfcWriter = LocalNfcWriterProvider.current
@@ -134,7 +138,7 @@ fun QrDialog(title: String, uriString: String, onDismiss: () -> Unit) {
                 ) {
                     Text(
                         text = uriString,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).semantics { isSensitiveData = true },
                         style = MaterialTheme.typography.bodySmall,
                         overflow = TextOverflow.Visible,
                         softWrap = true,

@@ -147,6 +147,15 @@ actual fun rememberSaveFileLauncher(
 }
 
 @Composable
+actual fun rememberOpenDocumentTreeLauncher(onTreeUriSelect: (CommonUri?) -> Unit): () -> Unit {
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+            onTreeUriSelect(uri?.toKmpUri())
+        }
+    return remember(launcher) { { launcher.launch(null) } }
+}
+
+@Composable
 actual fun rememberOpenFileLauncher(onUriReceived: (CommonUri?) -> Unit): (mimeType: String) -> Unit {
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -256,6 +265,9 @@ actual fun rememberOpenWifiSettings(): () -> Unit {
         }
     }
 }
+
+actual val bleScanRequiresLocationServices: Boolean =
+    android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S
 
 @Composable
 actual fun isBluetoothDisabled(): Boolean {

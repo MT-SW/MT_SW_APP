@@ -79,7 +79,7 @@ jobs:
       APP_VERSION_CODE: ${{ steps.calculate_version_code.outputs.versionCode }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.commit_sha || inputs.tag_name }}
           fetch-depth: 0
@@ -124,7 +124,7 @@ jobs:
       USER_FRACTION: ${{ (inputs.channel == 'production' && '0.1') || (inputs.channel == 'open' && '0.5') || '1.0' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.commit_sha || inputs.tag_name }}
 
@@ -156,7 +156,7 @@ jobs:
       # reusable workflow is caller-associated, so it resolves to the caller's
       # workflow too. A cross-repo caller would need explicit repo+ref inputs.
       - name: Checkout preflight script from caller commit
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.sha }}
           path: .workflow-ref
@@ -171,18 +171,35 @@ jobs:
           bash .workflow-ref/scripts/play-track-preflight.sh \
             fastlane/play-store-credentials.json "$PKG" "$TO_TRACK" "$VERSION_CODE"
 
+      # --version_code pins release selection. Without it supply picks the
+      # source release by status (default "completed"), so a staged inProgress
+      # rollout on the source track silently promotes the OLD release instead.
       - name: Promote to next channel
         if: ${{ steps.preflight.outputs.already_on_track != 'true' }}
+        env:
+          VERSION_CODE: ${{ needs.prepare-build-info.outputs.APP_VERSION_CODE }}
         run: |
           bundle exec fastlane supply \
             --track "$FROM_TRACK" \
             --track_promote_to "$TO_TRACK" \
+            --version_code "$VERSION_CODE" \
             --rollout "$USER_FRACTION" \
             --changes_not_sent_for_review true \
             --skip_upload_metadata \
             --skip_upload_changelogs \
             --skip_upload_images \
             --skip_upload_screenshots
+
+      # supply exits 0 even when its edit changed nothing, so a promotion only
+      # counts once the destination track is seen holding this versionCode.
+      - name: Verify versionCode landed on the target track
+        if: ${{ steps.preflight.outputs.already_on_track != 'true' }}
+        env:
+          VERSION_CODE: ${{ needs.prepare-build-info.outputs.APP_VERSION_CODE }}
+        run: |
+          PKG=$(grep '^APPLICATION_ID=' config.properties | cut -d'=' -f2)
+          bash .workflow-ref/scripts/play-track-preflight.sh \
+            fastlane/play-store-credentials.json "$PKG" "$TO_TRACK" "$VERSION_CODE" verify
 
       - name: Clean up credentials
         if: always()
@@ -203,7 +220,7 @@ jobs:
       actions: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.commit_sha || inputs.tag_name }}
           fetch-depth: 0
@@ -396,7 +413,7 @@ jobs:
     needs: [ update-github-release ]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.commit_sha || inputs.tag_name }}
 

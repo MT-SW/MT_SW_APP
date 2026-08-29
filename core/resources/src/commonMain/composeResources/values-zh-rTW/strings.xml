@@ -182,6 +182,7 @@
     <string name="clean_nodes_older_than">清除最後出現時間超過 %1$d 日的節點</string>
     <string name="clean_now">立即清理</string>
     <string name="clean_unknown_nodes">僅清除不明節點</string>
+    <!-- CLEAR -->
     <string name="clear">清除</string>
     <string name="clear_selection">清除所選</string>
     <string name="clear_time_zone">清除時區</string>
@@ -271,6 +272,8 @@
     <string name="current">當前</string>
     <string name="currently">目前：</string>
     <string name="date">日期</string>
+    <string name="date_separator_today">今日</string>
+    <string name="date_separator_yesterday">昨天</string>
     <string name="dbm_value">%1$d dBm</string>
     <!-- DEBUG -->
     <string name="debug">除錯</string>
@@ -393,7 +396,6 @@
     <string name="doc_section_user">使用者指南</string>
     <string name="doc_title_connections">連線</string>
     <string name="doc_title_desktop">桌面應用程式</string>
-    <string name="doc_title_discovery">尋找</string>
     <string name="doc_title_firmware">韌體更新</string>
     <string name="doc_title_map">地圖 &amp; 航點</string>
     <string name="doc_title_measurement">測量 &amp; 格式化</string>
@@ -519,7 +521,6 @@
     <string name="firmware_update_node_info_missing">缺少節點使用者資訊。</string>
     <string name="firmware_update_not_found_in_release">在發行版本中找不到 %1$s 的韌體。</string>
     <string name="firmware_update_ota_failed">OTA 更新失敗: %1$s</string>
-    <string name="firmware_update_rak4631_bootloader_hint">對於 RAK WisBlock RAK4631，請使用廠商的序列 DFU 工具（例如，搭配提供的 bootloader .zip 檔使用 adafruit-nrfutil dfu serial）。僅複製 .uf2 檔案並不會更新 bootloader。</string>
     <string name="firmware_update_rebooting">正在進入 DFU 模式⋯⋯</string>
     <string name="firmware_update_release_notes">版本說明</string>
     <string name="firmware_update_retrieval_failed">無法取得韌體檔案。</string>
@@ -629,6 +630,7 @@
     <string name="ip_port">IP連接埠：</string>
     <string name="ipv4_mode">第四代IP模式</string>
     <string name="json_output_enabled">JSON輸出已啟用</string>
+    <string name="jump_to_latest_from">%1$s</string>
     <!-- KEY -->
     <string name="key_verification_final_title">金鑰驗證已完成</string>
     <string name="key_verification_request_title">金鑰驗證請求</string>
@@ -687,6 +689,7 @@
     <string name="local_stats_updated_at">%1$s</string>
     <string name="local_stats_uptime">上線時間: %1$s</string>
     <string name="local_stats_utilization">頻道使用率: %1$s% | 空中傳輸佔用率: %2$s%</string>
+    <!-- LOCATION -->
     <string name="location_disabled">定位服務已關閉，無法向設備提供位置。</string>
     <string name="location_sharing">位置分享</string>
     <!-- LOCKDOWN -->
@@ -972,9 +975,12 @@
     <string name="paxcounter_config">人流計數（Paxcount）設置</string>
     <string name="paxcounter_enabled">已啟用人流計數（Paxcount）</string>
     <string name="periodic_position_broadcast">週期性位置廣播</string>
+    <!-- PERMISSION -->
     <string name="permission_missing_31">Meshtastic 應用程式需要啟用「鄰近裝置」權限，才能透過藍牙尋找並連接到裝置，可以選擇在不使用時停用。</string>
+    <!-- PERMISSIONS -->
     <string name="phone_location">手機定位</string>
     <string name="phone_location_description">Meshtastic 會使用您手機的定位資訊來啟用多項功能。您隨時可以在設定中修改定位權限。</string>
+    <string name="pin_selected">配對碼</string>
     <string name="play">播放</string>
     <plurals name="plurals_hours">
         <item quantity="other">%1$d 小時</item>
@@ -1240,6 +1246,9 @@
     <string name="super_deep_sleep_duration_seconds">超深度睡眠時長</string>
     <string name="supported">已支援</string>
     <string name="supported_by_community">由 Meshtastic 社群協作</string>
+    <string name="swipe_action_delete">刪除</string>
+    <string name="swipe_action_mute">靜音</string>
+    <string name="swipe_action_unmute">解除靜默</string>
     <string name="sx126x_rx_boosted_gain">接收增益提升</string>
     <string name="system_settings">系統設定</string>
     <!-- TAK -->
@@ -1263,7 +1272,6 @@
     <string name="tak_server_test_idle">傳送所有 %1$d 個測試固定裝置至 mesh</string>
     <string name="tak_server_test_result_bytes">%1$dB ✓</string>
     <string name="tak_server_test_result_unknown_error">✗</string>
-    <string name="tak_server_test_results">%1$d 個通過，%2$d 個失敗，共 %3$d/%4$d</string>
     <string name="tak_server_test_run">執行</string>
     <string name="tak_server_test_running">執行中：%1$s</string>
     <string name="tak_team">隊伍顏色</string>
@@ -1353,6 +1361,10 @@
     <string name="type">類別</string>
     <string name="type_a_message">請輸入訊息</string>
     <string name="udp_enabled">UDP 廣播</string>
+    <!-- UNITS -->
+    <string name="units_follow_system">系統預設</string>
+    <string name="units_imperial">英制（英里/英尺）</string>
+    <string name="units_metric">公制（公里/公尺）</string>
     <!-- UNKNOWN -->
     <string name="unknown">不明</string>
     <string name="unknown_age">未知年齡</string>

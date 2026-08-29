@@ -1,13 +1,13 @@
 ---
 title: Getting Started
-parent: User Guide
+parent: Kasutusjuhend
 nav_order: 1
-last_updated: 2026-07-08
+last_updated: 2026-08-27
 description: Esimese käivitamise seadistus — õigused, sissejuhatav voog ja järgmised sammud pärast raadio ühendamist.
 aliases:
   - first-launch
   - seadistamine
-  - intro
+  - sissejuhatus
 ---
 
 # Getting Started
@@ -16,23 +16,25 @@ Tere tulemast Meshtasticusse! See juhend juhendab sind Meshtastic Androidi raken
 
 ## First Launch
 
-Rakenduse esmakordsel avamisel juhendatakse sind sissejuhatavas voos, mis aitab konfigureerida olulisi õigusi ja sätteid. Iga sammu saab läbida järjekorras või võid selle vahele jätta ja õigused hiljem Androidi seadetes konfigureerida.
+Rakenduse esmakordsel avamisel juhendatakse sind sissejuhatavas voos, mis aitab konfigureerida olulisi õigusi ja sätteid. Complete each step in order or skip it — nothing here is a one-time offer. Every permission can be reviewed and granted later from **Settings → Permissions** inside the app.
 
 ### Tervituskuva
 
-Tervituskuval tutvustatakse Meshtasticut ja selle põhifunktsioone:
+The welcome screen introduces Meshtastic with three feature rows:
 
-- Off-grid mesh communication
-- No cellular or internet required
-- End-to-end encrypted messaging
+|                               |                                                                                                                       |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Stay Connected Anywhere**   | Saada sõnumeid sõpradele ja kommuunile ilma võrguühenduse või mobiilivõrguta.                         |
+| **Create Your Own Networks**  | Loo hõlpsalt privaatseid kärgvõrke turvaliseks ja usaldusväärseks suhtluseks asustamata piirkondades. |
+| **Track and Share Locations** | Jaga reaalajas oma asukohta ja hoia oma grupp ühtsena integreeritud GPS funktsioonide abil.           |
 
-Puuduta **Alusta** seadistusvoo jätkamiseks.
+Tap **Get started** to proceed through the setup flow.
 
 ![Tervituskuva](../../assets/screenshots/onboarding_welcome.png)
 
 ## Permissions
 
-Rakendus küsib seadistamise ajal mitmeid lube. Each one serves a specific purpose, and some are required for core functionality.
+Rakendus küsib seadistamise ajal mitmeid lube. Igal neist on kindel eesmärk ja mõned on vajalikud põhifunktsioonide täitmiseks.
 
 ### Sinihamba load
 
@@ -45,20 +47,17 @@ Grant both permissions when prompted. Ilma sinihambata peate kasutama USB- või 
 
 ### Asukoha luba
 
-> ⚠️ **Miks on sinihamba ​​jaoks vaja asukohateavet?** Android vajab lähedalasuvate sinihamba madala energia seadmete avastamiseks asukohale juurdepääsu luba. See on Androidi süsteeminõue, mitte Meshtastic põhine valik.
+> ⚠️ **Is location required for Bluetooth?** On **Android 11 and older**, yes — those releases treat a Bluetooth scan as a location capability, so the app asks for Location instead of "Nearby devices", and system **Location Services** must also be switched on for a scan to return anything. There you will see **one** location step rather than two, on the Bluetooth screen, because it is a single system permission — and asking twice for it would push you toward the point where Android stops offering the dialog at all (a second denial on Android 11; the "Don't ask again" checkbox on Android 10 and older). On **Android 12 and newer** the two are separate: "Nearby devices" is declared `neverForLocation`, and declining Location does not stop you finding or connecting to a radio.
 
 Meshtastic kasutab sinu asukohta ka järgmiseks:
 
 - Kuvatakse asukoht kärgvõrgu kaardil
 - Calculating distances to other nodes
-- GPS koordinaatide jagamine teiste võrgusilma liikmetega (kui lubatud)
+- GPS koordinaatide jagamine teiste kärgvõrgu liikmetega (kui lubatud)
 
-Grant **"While using the app"** or **"Always"** depending on your preference:
+Grant **"While using the app"**. The app does not request background location — `ACCESS_BACKGROUND_LOCATION` is not in its manifest — so Android will not offer an "Always" option, and position updates happen while the app is in the foreground or running its foreground service.
 
-- **Rakenduse kasutamise ajal** – asukohta uuendatakse kui rakendus on avatud
-- **Alati** – lubab taustal asukoha värskendusi, et kärgvõrgu oleks alati sisse lülitatud
-
-Kui keelatud, siis sinihamba otsing ei toimi ja sõlm ei edasta asukohta.
+Declining leaves the rest of the app working: on Android 12 and newer, Bluetooth is unaffected and only the map position and position sharing are disabled. On Android 11 and older, Bluetooth scanning also stops, because that is the permission Android gates it behind.
 
 ### Märguannete load
 
@@ -72,29 +71,40 @@ Märguanded teavitavad teid järgmisest:
 
 ### Critical Alerts Permission
 
-On supported devices, the app may request permission for critical alerts:
+Critical alerts are high-priority notifications that break through Do Not Disturb — for emergency mesh alerts and urgent messages.
 
-- Need on kõrge prioriteediga märguanded, mis võivad režiimist „Ära sega” läbi murda
-- Useful for emergency mesh alerts or urgent messages
-- Võid selle sammu **vahele jätta**, kui te kõrge prioriteediga märguandeid ei vaja
-- Seadistada või tühistada hiljem Androidi teavitusseadetes
+This step is not a runtime permission prompt. There is no grant/deny dialog: the button opens the Android system settings page for the app's **Alerts** notification channel, where you turn the breakthrough behaviour on yourself. You can **skip** it, and reach the same page later from Android notification settings.
+
+### Reviewing permissions later
+
+**Settings → Permissions** summarizes where every runtime permission stands. It covers five: **Nearby devices** (Bluetooth), **Location**, **Notifications**, **Camera** (scanning channel and contact QR codes) and **Local network** (finding radios over Wi-Fi by mDNS) — the last two are never asked for during setup, only when a feature first needs them. It reads _All allowed_ when nothing needs you, and names the count when something does — opening itself automatically in that case. Tap the row to see the full list at any time:
+
+| Olek                                        | What tapping the row does                                                                    |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| **Allowed**                                 | Opens the system page, so you can review or revoke it                                        |
+| **Not asked yet**                           | Requests it                                                                                  |
+| **Denied — tap to allow**                   | Explains what the permission is for, then asks again if you agree                            |
+| **Blocked — tap to open system settings**   | Android will no longer show its dialog, so this opens the page where you can turn it back on |
+| **Not required on this version of Android** | Nothing — the permission does not exist on your device                                       |
+
+This matters most for notifications. The app used to ask for them in exactly one place — the setup flow — so declining there meant no message, new-node, or low-battery alerts, with nothing in the app that could ask again. Android itself stops showing the dialog once you have declined firmly (a second denial on Android 11 and newer), at which point this row switches to **Blocked** and sends you to the system settings page instead.
 
 ## Peale seadistamist
 
 Kui load on antud, läheb rakendus üle põhiliidesele. Esimene samm peaks olema ühenduse loomine Meshtastic raadioga – üksikasjalike juhiste saamiseks vaata [Ühendused] (connections).
 
-> 💡 **Vihje:** Kui jätsid seadistamise ajal mõne õiguse andmata, saad selle hiljem anda jaotises **Androidi seaded → Rakendused → Meshtastic → Load**. The app will prompt you again if a missing permission blocks a feature you try to use.
+> 💡 **Tip:** If you skipped any permissions during setup, open **Settings → Permissions** in the app. Every runtime permission is listed there with its current state and a way back to it — including notifications, which the system will not prompt for a second time on its own.
 
-## What's Next?
-
-Kui raadioga on ühendus loodud, uuri:
-
-- [Ühendused(connections) — seo oma esimene raadioseade
-- [Sõnumid ja kanalid](messages-and-channels) — saada oma esimene sõnum
-- [Seadmed](nodes) — vaata, kes on sinu võrgus
-- [Kaart ja teekonnapunktid](map-and-waypoints) — vaata sõlmede asukohti
-- [Seaded](settings-radio-user) — raadio ja kasutajaprofiili seadistamine
+Features also ask in context. Tapping **Scan** on the Connections screen with Bluetooth permission missing explains what it is for and offers to request it; once Android stops prompting, the same control opens the system settings page instead of doing nothing.
 
 Kas oled Meshtasticus algaja? Meshtastic.org lehel olev [alustusjuhend](https://meshtastic.org/docs/getting-started) käsitleb riistvara valimist, raadio esialgset seadistamist ja esimest võrgu seadistamist.
+
+## Seotud teemad
+
+- [Connections](connections) — pair your first radio
+- [Sõnumid ja kanalid](messages-and-channels) — saada oma esimene sõnum
+- [Nodes](nodes) — see who else is on your mesh
+- [Kaart ja teekonnapunktid](map-and-waypoints) — vaata sõlmede asukohti
+- [Settings — Radio & User](settings-radio-user) — configure your radio and user profile
 
 ---

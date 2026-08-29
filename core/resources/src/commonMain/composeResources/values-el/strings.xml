@@ -60,6 +60,7 @@
     <!-- CHIRPY -->
     <string name="choose_theme">Επέλεξε θέμα</string>
     <!-- CLEAN -->
+    <!-- CLEAR -->
     <string name="clear">Καθαρό, Εκκαθάριση,</string>
     <string name="close">Κλείσιμο</string>
     <!-- COMPASS -->
@@ -132,6 +133,7 @@
     <!-- LICENSED -->
     <!-- LOAD -->
     <!-- LOCAL -->
+    <!-- LOCATION -->
     <string name="location_disabled">Η πρόσβαση στην τοποθεσία είναι απενεργοποιημένη, δεν μπορεί να παρέχει θέση στο πλέγμα.</string>
     <!-- LOCKDOWN -->
     <string name="locked">Κλειδωμένο</string>
@@ -193,6 +195,8 @@
     <!-- PACKET -->
     <string name="password">Κωδικός πρόσβασης</string>
     <!-- PAX -->
+    <!-- PERMISSION -->
+    <!-- PERMISSIONS -->
     <!-- POSITION -->
     <string name="position">Τοποθεσία</string>
     <string name="position_log">Τοποθεσία</string>
@@ -248,6 +252,8 @@
     <!-- SITE -->
     <string name="site_planner_section_display">Οθόνη</string>
     <string name="ssid">SSID</string>
+    <string name="swipe_action_delete">Διαγραφή</string>
+    <string name="swipe_action_mute">Σίγαση</string>
     <!-- TAK -->
     <string name="tak_team_blue">Μπλε</string>
     <string name="tak_team_green">Πράσινο</string>
@@ -267,6 +273,8 @@
     <string name="transport_lora">LoRa</string>
     <string name="transport_mqtt">MQTT</string>
     <string name="two_days">48 Ώρες</string>
+    <!-- UNITS -->
+    <string name="units_follow_system">Προκαθορισμένο του συστήματος</string>
     <!-- UNKNOWN -->
     <string name="unknown_username">Άγνωστο Όνομα Χρήστη</string>
     <!-- URL -->

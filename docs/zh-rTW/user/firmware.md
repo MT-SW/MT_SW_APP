@@ -2,7 +2,7 @@
 title: 韌體更新
 parent: 使用者指南
 nav_order: 13
-last_updated: 2026-07-07
+last_updated: 2026-08-27
 description: Update your radio firmware over Bluetooth or USB — OTA process, version channels, pre-flight checks, and recovery.
 aliases:
   - 韌體
@@ -35,7 +35,28 @@ Android 使用者最常用的更新方式：
 
 ![Firmware checking for updates](../../assets/screenshots/firmware_checking.png)
 
-> ⚠️ 警告：中斷韌體更新可能導致裝置變磚。 請確認無線電裝置電量充足（建議 50% 以上），並在整個更新過程中保持藍牙通訊距離。
+> ⚠️ 警告：中斷韌體更新可能導致裝置變磚。 Keep the radio charged and stay in Bluetooth range for the whole update. The app itself only blocks the update below **10%** battery; 50% or more is the safe habit, not an enforced limit.
+
+#### Erase device during update
+
+Where the app offers it, an **Erase device during update** checkbox appears next to the update button. It is a per-update opt-in and is never remembered.
+
+| Method         | What erasing does                                                                                                                      |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| BLE / WiFi OTA | Factory-resets the device once the update is verified. All settings and Bluetooth pairing are removed. |
+| USB            | Wipes the device's flash completely, then installs the selected firmware from scratch.                                 |
+
+It is not offered for a local firmware file, during a recovery update, or on USB devices whose board does not support the erase step. Afterwards the device needs setting up — and pairing — again.
+
+### OTA via WiFi (network-connected ESP32)
+
+When an ESP32 radio is connected over the network rather than Bluetooth, the app offers **WiFi OTA**, which pushes the same update over TCP:
+
+1. Connect to the radio over the network (see [Connections](connections)).
+2. Open the Firmware Update screen and pick a version.
+3. Tap **Update**. Keep the radio and phone on the same network for the whole transfer.
+
+WiFi OTA takes the ESP32 `-update.bin` image rather than the `.uf2` a USB update uses; the app selects the right artifact for you.
 
 ![Firmware disclaimer](../../assets/screenshots/firmware_disclaimer.png)
 
@@ -43,7 +64,15 @@ Android 使用者最常用的更新方式：
 
 When your radio is connected over **USB/serial** (rather than Bluetooth), the Firmware Update screen offers **USB File Transfer**. The app reboots the device into DFU mode, then prompts you to save the `.uf2` file to the device's DFU drive using the system file picker. This option appears only on a USB/serial connection — it is not available over Bluetooth.
 
-> ℹ️ **nRF bootloader note:** Some devices (e.g. RAK WisBlock RAK4631) need their bootloader flashed with the vendor's serial DFU tool (such as `adafruit-nrfutil`) — copying the `.uf2` alone won't update the bootloader. The app surfaces a hint when this applies.
+> ℹ️ **nRF bootloader note:** A vendor bootloader supplied as a `.zip` (e.g. RAK WisBlock RAK4631) has to be flashed with a serial DFU tool such as `adafruit-nrfutil` — copying that `.zip` to the drive won't work. A bootloader supplied as an `update-....uf2` **can** be installed by copying it to the drive; that is how the app's own bootloader upgrade works. The app surfaces a hint when the serial-only route applies.
+
+### Factory Erase and Bootloader Upgrade
+
+On a **USB/serial** connection, nRF52 and RP2040 devices also offer **Erase and reinstall** and, where an upgraded bootloader is published for the board, **Upgrade bootloader**.
+
+Erasing wipes everything on the device — channels, keys and all settings — and there is no backup, so the app asks for confirmation first. Both operations write two files in turn, so you will be asked to select the device's update drive twice: once for the erase or bootloader image, then again for the firmware.
+
+The app reads `INFO_UF2.TXT` from the drive you select to confirm it really is the device's update drive and to identify the board before writing anything. If it can't confirm which Bluetooth stack your device uses it refuses to erase and points you at the [Web Flasher](https://flasher.meshtastic.org) instead — picking wrong there can leave the device needing a hardware programmer to recover.
 
 ### Other Flashing Options
 
@@ -90,9 +119,9 @@ Once the update succeeds:
 
 若更新似乎停滯不動：
 
-- 請至少等待 5 分鐘再採取行動
-- 若確實卡住，請將無線電裝置重新開關機
-- 再次嘗試更新
+- Give it a minute. After writing the image the app waits up to **60 seconds** for the radio to come back and report its new version, so a pause at the verify step is expected.
+- If it is still stuck after that, power-cycle the radio.
+- Attempt the update again.
 
 ![Firmware update error](../../assets/screenshots/firmware_error.png)
 
@@ -107,11 +136,15 @@ Once the update succeeds:
 
 ### 相容性警告
 
-應用程式在以下情況可能顯示警告：
+On connecting, the app compares the radio's firmware against two thresholds and reacts differently to each:
 
-- 已連接的無線電裝置韌體低於最低支援版本
-- 應用程式與韌體之間的主要版本不相符
-- 已棄用的功能需要進行遷移
+| 韌體版本                                                                                                            | What you see                                     | What happens                                                                                                         |
+| --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| Below **2.3.15**                                                                | **Firmware update required.**    | The app disconnects from the radio. It will not operate against firmware this old.   |
+| **2.3.15** up to, but not including, **2.5.14** | **Firmware Update Recommended.** | Advisory only — dismiss it and carry on. The dialog names the latest stable release. |
+| **2.5.14** or newer                                                             | Nothing                                          | —                                                                                                                    |
+
+A version string the app cannot parse is ignored rather than treated as too old, so a transient read never disconnects a working radio.
 
 > ⚠️ 重要：請在韌體更新之前或同時更新 Meshtastic 應用程式，以確保相容性。
 

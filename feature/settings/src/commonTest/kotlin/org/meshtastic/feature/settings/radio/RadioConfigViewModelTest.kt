@@ -78,6 +78,7 @@ import org.meshtastic.core.ui.util.SnackbarManager
 import org.meshtastic.feature.settings.navigation.ConfigRoute
 import org.meshtastic.feature.settings.navigation.ModuleRoute
 import org.meshtastic.feature.settings.radio.component.loRaBandwidthSelection
+import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.Channel
 import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.ChannelSettings
@@ -110,13 +111,39 @@ class RadioConfigViewModelTest {
     @Test
     fun `route read fan-out flags match multi-request loaders`() {
         assertEquals(
-            setOf(ConfigRoute.CHANNELS, ConfigRoute.LORA, ConfigRoute.NETWORK),
+            setOf(ConfigRoute.CHANNELS, ConfigRoute.LORA, ConfigRoute.NETWORK, ConfigRoute.USER),
             ConfigRoute.entries.filter(ConfigRoute::hasReadFanOut).toSet(),
         )
         assertEquals(
             setOf(ModuleRoute.CANNED_MESSAGE, ModuleRoute.EXT_NOTIFICATION),
             ModuleRoute.entries.filter(ModuleRoute::hasReadFanOut).toSet(),
         )
+    }
+
+    @Test
+    fun `USER route reads the status message config on capable firmware`() = runTest {
+        val node = Node(num = 123, user = User(id = "!123"), metadata = DeviceMetadata(firmware_version = "2.8.0"))
+        nodeRepository.setNodes(listOf(node))
+        viewModel = createViewModel(destNum = 123)
+
+        viewModel.setResponseStateLoading(ConfigRoute.USER)
+        advanceUntilIdle()
+
+        verifySuspend {
+            radioConfigUseCase.getModuleConfig(123, AdminMessage.ModuleConfigType.STATUSMESSAGE_CONFIG.value, any())
+        }
+    }
+
+    @Test
+    fun `USER route skips the status message config on firmware without the module`() = runTest {
+        val node = Node(num = 123, user = User(id = "!123"), metadata = DeviceMetadata(firmware_version = "2.7.21"))
+        nodeRepository.setNodes(listOf(node))
+        viewModel = createViewModel(destNum = 123)
+
+        viewModel.setResponseStateLoading(ConfigRoute.USER)
+        advanceUntilIdle()
+
+        verifySuspend(exactly(0)) { radioConfigUseCase.getModuleConfig(any(), any(), any()) }
     }
 
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -959,6 +986,28 @@ class RadioConfigViewModelTest {
     }
 
     @Test
+    fun `saveUserConfig splits a composed ham name into call sign and long name`() = runTest {
+        val node = Node(num = 123, user = User(id = "!123"))
+        nodeRepository.setNodes(listOf(node))
+        nodeRepository.setMyNodeInfo(myNodeInfo(myNodeNum = 123))
+        viewModel = createViewModel()
+
+        // The User form carries the composed name firmware builds; set_ham_mode wants the halves back.
+        val user = User(long_name = "KK7ABC//Attic Heltec", short_name = "KK7A", is_licensed = true)
+        everySuspend { radioConfigUseCase.setHamMode(any(), any(), any()) } returns 42
+
+        viewModel.saveUserConfig(user)
+
+        verifySuspend {
+            radioConfigUseCase.setHamMode(
+                123,
+                HamParameters(call_sign = "KK7ABC", short_name = "KK7A", long_name = "Attic Heltec"),
+                any(),
+            )
+        }
+    }
+
+    @Test
     fun `saveUserConfig sends setOwner for unlicensed user`() = runTest {
         val node = Node(num = 123, user = User(id = "!123"))
         nodeRepository.setNodes(listOf(node))
@@ -1407,6 +1456,50 @@ class RadioConfigViewModelTest {
         runCurrent()
 
         assertEquals(config.device, viewModel.radioConfigState.value.radioConfig.device)
+        assertEquals(ResponseState.Empty, viewModel.radioConfigState.value.responseState)
+    }
+
+    @Test
+    fun `late owner read is retained when the user route reads only the owner`() = runTest {
+        val localNode = Node(num = 100, user = User(id = "!100"))
+        val remoteNode =
+            Node(num = 456, user = User(id = "!456"), metadata = DeviceMetadata(firmware_version = "2.7.21"))
+        val packetFlow = MutableSharedFlow<MeshPacket>()
+        val maxRetransmit = org.meshtastic.core.resources.UiText.DynamicString("Max Retransmission Reached")
+        val owner = User(id = "!456", long_name = "Late")
+        var response: RadioResponseResult = RadioResponseResult.Error(maxRetransmit, Routing.Error.MAX_RETRANSMIT)
+
+        every { serviceRepository.meshPacketFlow } returns packetFlow
+        everySuspend { radioConfigUseCase.getOwner(any(), any()) } calls
+            {
+                it.args.onRequestIdArg()(42)
+                42
+            }
+        every { processRadioResponseUseCase(any(), 456, any()) } calls
+            {
+                @Suppress("UNCHECKED_CAST")
+                val pendingRequestIds = it.args[2] as Set<Int>
+                response.takeIf { 42 in pendingRequestIds }
+            }
+        nodeRepository.setNodes(listOf(localNode, remoteNode))
+        nodeRepository.setMyNodeInfo(myNodeInfo(myNodeNum = 100))
+        viewModel = createViewModel(destNum = 456)
+
+        viewModel.loadConfigRoute(ConfigRoute.USER)
+        runCurrent()
+        packetFlow.emit(MeshPacket(decoded = Data(request_id = 42)))
+        runCurrent()
+        advanceTimeBy(30_001)
+        runCurrent()
+        assertEquals(ResponseState.Error(maxRetransmit), viewModel.radioConfigState.value.responseState)
+
+        // Firmware without the status message module answers one get, so the route is a single-response read
+        // whatever ConfigRoute.USER.hasReadFanOut says, and the late owner still lands.
+        response = RadioResponseResult.Owner(owner)
+        packetFlow.emit(MeshPacket(decoded = Data(request_id = 42)))
+        runCurrent()
+
+        assertEquals(owner, viewModel.radioConfigState.value.userConfig)
         assertEquals(ResponseState.Empty, viewModel.radioConfigState.value.responseState)
     }
 

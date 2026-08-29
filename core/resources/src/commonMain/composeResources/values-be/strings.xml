@@ -55,6 +55,7 @@
     <string name="channels">Каналы</string>
     <!-- CHIRPY -->
     <!-- CLEAN -->
+    <!-- CLEAR -->
     <string name="clear">Скінуць</string>
     <string name="close">Закрыть</string>
     <!-- COMPASS -->
@@ -142,6 +143,7 @@
     <!-- LICENSED -->
     <!-- LOAD -->
     <!-- LOCAL -->
+    <!-- LOCATION -->
     <!-- LOCKDOWN -->
     <!-- LOG -->
     <string name="logs">Журнал</string>
@@ -210,6 +212,8 @@
     <!-- PACKET -->
     <string name="password">Пароль</string>
     <!-- PAX -->
+    <!-- PERMISSION -->
+    <!-- PERMISSIONS -->
     <string name="phone_location">Месцазнаходжанне тэлефона</string>
     <string name="play">Граць</string>
     <!-- POSITION -->
@@ -274,6 +278,7 @@
     <string name="snr">сігнал-шум</string>
     <string name="speed">Хуткасць</string>
     <string name="ssid">SSID</string>
+    <string name="swipe_action_delete">Прыбраць</string>
     <!-- TAK -->
     <string name="tak_server_section">Сервер</string>
     <string name="tak_team_blue">Сіні</string>
@@ -292,6 +297,7 @@
     <string name="two_days">48 Гадзін</string>
     <string name="two_weeks">2тыд</string>
     <string name="type">Тып</string>
+    <!-- UNITS -->
     <!-- UNKNOWN -->
     <string name="unrecognized">Нераспазнанае</string>
     <!-- URL -->

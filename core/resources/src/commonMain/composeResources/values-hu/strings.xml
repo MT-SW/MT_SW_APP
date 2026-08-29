@@ -127,6 +127,7 @@
     <string name="clean_nodes_older_than">%1$d napnál régebben látott csomópontok törlése</string>
     <string name="clean_now">Azonnali tisztítás</string>
     <string name="clean_unknown_nodes">Csak ismeretlen csomópontok törlése</string>
+    <!-- CLEAR -->
     <string name="clear">Töröl</string>
     <string name="clear_selection">Kijelölés törlése</string>
     <string name="client_notification">Kliens értesítés</string>
@@ -193,6 +194,8 @@
     <string name="current">Áramerősség</string>
     <string name="currently">Jelenleg:</string>
     <string name="date">Dátum</string>
+    <string name="date_separator_today">Ma</string>
+    <string name="date_separator_yesterday">Tegnap</string>
     <string name="dbm_value">%1$d dBm</string>
     <!-- DEBUG -->
     <string name="debug">Debug</string>
@@ -425,6 +428,7 @@
     <string name="load">Terhelés</string>
     <string name="load_indexed">Terhelés %1$d</string>
     <!-- LOCAL -->
+    <!-- LOCATION -->
     <string name="location_disabled">A földrajzi helyhez való hozzáférés le van tiltva, nem lehet pozíciót közölni a mesh hálózattal.</string>
     <string name="location_sharing">Helymegosztás</string>
     <!-- LOCKDOWN -->
@@ -626,7 +630,9 @@
     <string name="paxcounter_config">Paxcounter beállításai</string>
     <string name="paxcounter_enabled">Paxcounter engedélyezve</string>
     <string name="periodic_position_broadcast">Időszakos pozíció-sugárzás</string>
+    <!-- PERMISSION -->
     <string name="permission_missing_31">A Meshtastic-nek engedélyezni kell a „Közeli eszközök” hozzáférést, hogy Bluetooth-on keresztül eszközöket találjon és csatlakozzon. Használaton kívül kikapcsolható.</string>
+    <!-- PERMISSIONS -->
     <string name="phone_location">Telefon helyzete</string>
     <string name="phone_location_description">A Meshtastic a telefonod helyzetét használja több funkció engedélyezéséhez. A helyhozzáférést bármikor módosíthatod a beállításokban.</string>
     <string name="play">Lejátszás</string>
@@ -831,6 +837,9 @@
     <string name="super_deep_sleep_duration_seconds">Szuper mélyalvás időtartama</string>
     <string name="supported">Támogatott</string>
     <string name="supported_by_community">Meshtastic közösség által támogatott</string>
+    <string name="swipe_action_delete">Törlés</string>
+    <string name="swipe_action_mute">Némítás</string>
+    <string name="swipe_action_unmute">Némítás feloldása</string>
     <string name="sx126x_rx_boosted_gain">RX fokozott erősítés</string>
     <string name="system_settings">Rendszerbeállítások</string>
     <!-- TAK -->
@@ -881,6 +890,8 @@
     <string name="tx_power_dbm">Adásteljesítmény</string>
     <string name="type">Típus</string>
     <string name="type_a_message">Írj üzenetet</string>
+    <!-- UNITS -->
+    <string name="units_follow_system">Rendszer alapértelmezett</string>
     <!-- UNKNOWN -->
     <string name="unknown">Ismeretlen</string>
     <string name="unknown_age">Ismeretlen ideje</string>

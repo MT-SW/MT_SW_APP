@@ -28,13 +28,25 @@
     <string name="accept">Přijmout</string>
     <string name="acknowledgements">Poděkování</string>
     <!-- ACTION -->
+    <string name="action_copy_message">Kopírovat zprávu</string>
     <string name="action_delete_message">Smazat zprávu</string>
+    <string name="action_more_message_actions">Další akce zprávy</string>
     <string name="action_react_with_emoji">Reagovat s emoji</string>
+    <string name="action_select_device">Vybrat zařízení</string>
+    <string name="action_select_message">Vybrat zprávu</string>
+    <string name="action_select_network">Vybrat síť</string>
+    <string name="action_send_reply">Odpovědět</string>
+    <string name="action_show_message_status">Zobrazit stav zprávy</string>
+    <string name="action_toggle_translation">Přepnout mezi původním a přeloženým textem</string>
+    <string name="action_translate_message">Přeložit zprávu</string>
     <string name="actions">Akce</string>
+    <string name="adc_multiplier_override">Přepsání násobiče ADC</string>
     <string name="adc_multiplier_override_ratio">Vlastní hodnota násobiče pro ADC</string>
+    <string name="adc_voltage">ADC napětí</string>
     <!-- ADD -->
     <string name="add">Přidat</string>
     <string name="add_a_note">Přidat soukromou poznámku…</string>
+    <string name="add_channels_description">QR kód obsahuje následující kanály. Vyberte ty, které chcete přidat do zařízení. Stávající kanály zůstanou zachovány.</string>
     <string name="add_favorite">Přidat do oblíbených</string>
     <string name="add_layer">Přidat vrstvu</string>
     <string name="add_network_device">Přidat</string>
@@ -75,16 +87,24 @@
     <string name="app_functions_get_channel_info">Získat informace o kanálu</string>
     <string name="app_functions_get_device_status">Získat stav zařízení</string>
     <string name="app_functions_get_mesh_metrics">Získat metriky sítě</string>
+    <string name="app_functions_get_mesh_status">Získat stav mesh sítě</string>
+    <string name="app_functions_get_node_details">Získat podrobnosti o uzlu</string>
+    <string name="app_functions_get_node_list">Získat seznam uzlů</string>
+    <string name="app_functions_get_recent_messages">Získat poslední zprávy</string>
+    <string name="app_functions_get_unread_summary">Získat souhrn nepřečtených zpráv</string>
     <string name="app_functions_master_summary">Povolit systémovým AI asistentům (např. Gemini) přístup k funkcím mesh sítě</string>
     <string name="app_functions_master_toggle">Povolit AI přístup</string>
+    <string name="app_functions_read_section">Funkce pro čtení</string>
     <string name="app_functions_send_message">Odeslat zprávu</string>
     <string name="app_functions_settings">Systémová AI</string>
     <string name="app_functions_settings_summary">Určete, které funkce mohou AI asistenti používat</string>
+    <string name="app_functions_write_section">Funkce pro zápis</string>
     <string name="app_notifications">Oznámení aplikace</string>
     <string name="app_settings">Aplikace</string>
     <string name="app_too_old">Aplikace je příliš stará</string>
     <string name="app_version">Verze</string>
     <string name="apply">Použít</string>
+    <string name="apps">Aplikace</string>
     <!-- AQI -->
     <string name="aqi">AQI</string>
     <string name="aqi_good">Silný</string>
@@ -100,11 +120,16 @@
     <string name="bad">Špatný</string>
     <!-- BANDWIDTH -->
     <string name="bandwidth">Šířka pásma</string>
+    <string name="bandwidth_default">Výchozí (%1$s kHz)</string>
+    <string name="bandwidth_option_khz">%1$s kHz</string>
+    <string name="bandwidth_unsupported">Nepodporováno (%1$s)</string>
+    <string name="bandwidth_unsupported_summary">Připojené rádio v tomto regionu nepodporuje tuto šířku pásma. Před uložením vyberte podporovanou hodnotu.</string>
     <string name="baro_pressure">Tlak</string>
     <string name="battery">Baterie</string>
     <string name="battery_ina_2xx_i2c_address">Adresa INA_2XX I2C baterie</string>
     <string name="ble_devices">Zařízení bluetooth</string>
     <string name="ble_rssi_threshold_defaults_to_80">Práh BLE RSSI (výchozí hodnota -80)</string>
+    <string name="ble_scan_needs_location_services">Skenování Bluetooth v této verzi Androidu vyžaduje také zapnuté služby určování polohy. Vaše poloha se nepoužívá.</string>
     <string name="blue">Modrá</string>
     <!-- BLUETOOTH -->
     <string name="bluetooth">Bluetooth</string>
@@ -117,17 +142,41 @@
     <string name="bluetooth_feature_discovery">Objevujte</string>
     <string name="bluetooth_feature_discovery_description">Najděte a identifikujte zařízení Meshtastic ve svém okolí.</string>
     <string name="bluetooth_permission">Bluetooth</string>
+    <string name="bluetooth_permission_blocked_notice">Přístup k zařízením v okolí je vypnutý a Android se už nezeptá. Zapněte ho v nastavení aplikace pro připojení přes Bluetooth, nebo použijte Wi-Fi či USB.</string>
+    <string name="bluetooth_permission_blocked_notice_pre31">Oprávnění k poloze je vypnuté a Android se už nezeptá. Zapněte ho v nastavení aplikace pro vyhledávání Bluetooth zařízení, nebo se připojte přes Wi-Fi či USB.</string>
+    <string name="bluetooth_permission_blocked_rationale">Přístup k zařízením v okolí je vypnutý a Android se už nezeptá. Zapněte ho v nastavení aplikace pro vyhledávání a připojení přes Bluetooth.</string>
+    <string name="bluetooth_permission_blocked_rationale_pre31">Oprávnění k poloze je vypnuté a Android se už znovu nezeptá. Zapněte ho v nastavení aplikace, abyste mohli vyhledávat a připojovat zařízení přes Bluetooth.</string>
+    <string name="bluetooth_permission_denied_notice">Bez přístupu k zařízením v okolí nemůže Meshtastic vyhledat ani se připojit k vašemu rádiu přes Bluetooth. Přes Wi-Fi nebo USB se můžete připojit i nadále.</string>
+    <string name="bluetooth_permission_denied_notice_pre31">Bez oprávnění k poloze Android blokuje skenování Bluetooth, takže Meshtastic nemůže najít vaše rádio. Přes Wi-Fi nebo USB se můžete připojit i nadále.</string>
+    <string name="bluetooth_permission_rationale">Meshtastic potřebuje přístup k zařízením v okolí, aby našel vaše rádio a mohl se k němu připojit. Toto oprávnění slouží pouze ke komunikaci s vašimi vlastními zařízeními a nikdy se nepoužívá ke zjišťování vaší polohy. Bez tohoto oprávnění nebude Bluetooth dostupné – Wi-Fi a USB budou nadále fungovat.</string>
+    <string name="bluetooth_permission_rationale_pre31">Meshtastic potřebuje oprávnění k poloze, protože tato verze Androidu považuje skenování Bluetooth za funkci související s polohou. Vaše poloha se pro tento účel nikdy nezjišťuje ani nesdílí. Bez tohoto oprávnění nebude Bluetooth dostupné – Wi-Fi a USB budou nadále fungovat.</string>
     <string name="bluetooth_scan_location_services_disabled">Služby určování polohy jsou vypnuté. Zapněte je pro vyhledávání blízkých zařízení.</string>
     <string name="bluetooth_scan_missing_permission">Vyhledávání zařízení přes Bluetooth vyžaduje oprávnění. Povolte oprávnění „Blízká zařízení“ (nebo „Poloha“), aby bylo možné vyhledávat zařízení.</string>
     <string name="bluetooth_scan_start_failed">Nepodařilo se spustit skenování přes Bluetooth. Zkuste to znovu nebo Bluetooth vypněte a znovu zapněte, pokud problém přetrvává.</string>
+    <plurals name="bluetooth_scan_too_frequent">
+        <item quantity="one">Byl dosažen limit vyhledávání přes Bluetooth. Zkuste to znovu za %1$d sekundu.</item>
+        <item quantity="few">Byl dosažen limit vyhledávání přes Bluetooth. Zkuste to znovu za %1$d sekund.</item>
+        <item quantity="many">Byl dosažen limit vyhledávání přes Bluetooth. Zkuste to znovu za %1$d sekund.</item>
+        <item quantity="other">Byl dosažen limit vyhledávání přes Bluetooth. Zkuste to znovu za %1$d sekund.</item>
+    </plurals>
     <string name="bold_heading">Tučný nadpis</string>
     <string name="bonding_failed_permissions">Párování se nezdařilo. Povolte oprávnění k přístupu k blízkým zařízením a zkuste to znovu.</string>
     <string name="bonding_failed_retry">Párování nebylo dokončeno. Zkuste zařízení spárovat znovu.</string>
+    <string name="boot_reconnect_blocked_message">Přístup k zařízením v okolí je vypnutý, takže rádio není dostupné přes Bluetooth. Klepnutím ho znovu povolíte.</string>
+    <string name="boot_reconnect_blocked_title">Meshtastic se nemůže znovu připojit</string>
     <string name="bottom_nav_settings">Nastavení</string>
     <string name="broadcast_interval">Interval vysílání</string>
     <string name="button_gpio">Tlačítko GPIO</string>
     <string name="buzzer_gpio">Bzučák GPIO</string>
+    <plurals name="cache_limit_eviction_warning">
+        <item quantity="one">Pokud tuto hodnotu snížíte, trvale se smaže uložená historie pro %1$d zařízení.</item>
+        <item quantity="few">Pokud tuto hodnotu snížíte, trvale se smaže uložená historie pro %1$d zařízení.</item>
+        <item quantity="many">Pokud tuto hodnotu snížíte, trvale se smaže uložená historie pro %1$d zařízení.</item>
+        <item quantity="other">Pokud tuto hodnotu snížíte, trvale se smaže uložená historie pro %1$d zařízení.</item>
+    </plurals>
     <string name="calculating">Vypočítávám…</string>
+    <string name="call_sign">Volací znak</string>
+    <string name="call_sign_summary">Váš radioamatérský volací znak, maximálně 7 znaků</string>
     <string name="camera_permission">Oprávnění přístupu k fotoaparátu</string>
     <string name="camera_permission_rationale">Povolte přístup k fotoaparátu pro skenování QR kódů.</string>
     <string name="camera_unavailable">Nepodařilo se spustit fotoaparát. Zkuste to znovu, nebo zavřete skener a znovu jej otevřete.</string>
@@ -150,6 +199,7 @@
     <string name="channel_6">Kanál 6</string>
     <string name="channel_7">Kanál 7</string>
     <string name="channel_8">Kanál 8</string>
+    <string name="channel_features">Možnosti kanálu</string>
     <string name="channel_invalid">Tato adresa URL kanálu je neplatná a nelze ji použít</string>
     <string name="channel_label">Kanál</string>
     <string name="channel_name">Název kanálu</string>
@@ -157,9 +207,26 @@
     <string name="channel_utilization">ChUtil</string>
     <string name="channels">Kanály</string>
     <!-- CHIRPY -->
+    <string name="chirpy">Chirpy</string>
+    <string name="chirpy_assistant_title">Asistent Chirpy</string>
+    <string name="chirpy_checking">Ověřování dostupnosti Chirpyho…</string>
+    <string name="chirpy_downloading">Chirpy se stahuje…</string>
+    <string name="chirpy_downloading_progress">Stahování modelu Chirpy: %1$d%%</string>
+    <string name="chirpy_downloading_subtitle">Toto proběhne pouze jednou. Chirpy bude brzy připraven!</string>
+    <string name="chirpy_error_busy">Páni! Kanál je právě úplně zahlcený silným provozem! 📶 Počkejme na volný slot a zkusme přenos znovu.</string>
+    <string name="chirpy_error_model_unavailable">Moje baterie se nabíjí nebo se stále stahuje firmware! 🔋Dejte mi pár okamžiků na synchronizaci a spuštění!</string>
+    <string name="chirpy_error_token_budget_exceeded">Tato zpráva je příliš velká pro můj vysílací limit!📱 Zkuste ji zkrátit, abychom ji mohli bez problémů směrovat.</string>
+    <string name="chirpy_error_unknown">Ups! Došlo k výrazné ztrátě paketů nebo rušení signálu! 📡 Zkusme tento požadavek odeslat znovu a uvidíme, jestli se nám podaří projít.</string>
+    <string name="chirpy_error_unsupported_flavor">V této variantě aplikace mám omezené možnosti! 🔌 Zkuste použít verzi s plnou integrací AI Core.</string>
+    <string name="chirpy_error_unsupported_platform">Ach ne! Moje anténa se na této platformě zřejmě nedokáže připojit. 📡 Zkontrolujte prosím kompatibilitu svého hardwaru!</string>
+    <string name="chirpy_intro">Ahoj! 📡 Jsem Chirpy, váš asistent Meshtastic přímo v zařízení! Mohu vám pomoci s nastavením, konfigurací, řešením problémů a tipy pro mesh sítě. S čím vám mohu pomoci?</string>
+    <string name="chirpy_ready">Zeptat se Chirpyho</string>
+    <string name="chirpy_search_placeholder">Zeptejte se na Meshtastic…</string>
     <string name="chirpy_suggested_pages_help">Zde jsou některé stránky dokumentace, které by vám mohly pomoci:</string>
+    <string name="chirpy_thinking">Chirpy směruje komunikaci přes mesh síť…📡</string>
     <string name="choose_contrast">Úroveň kontrastu</string>
     <string name="choose_theme">Vyberte vzhled</string>
+    <string name="choose_units">Vybrat jednotky</string>
     <!-- CLEAN -->
     <string name="clean_node_database_confirmation">Tímto odstraníte %1$d uzlů z databáze. Tuto akci nelze vrátit zpět.</string>
     <string name="clean_node_database_description">Varování: Tímto odstraníte uzly z databází v aplikaci i v zařízení.\nVybrané položky se sčítají (kombinují).</string>
@@ -167,12 +234,15 @@
     <string name="clean_nodes_older_than">Vyčistit uzly neaktivní déle než %1$d dnů</string>
     <string name="clean_now">Vyčistit</string>
     <string name="clean_unknown_nodes">Vyčistit pouze neznámé uzly</string>
+    <!-- CLEAR -->
     <string name="clear">Vymazat</string>
+    <string name="clear_position_track_message">Zaznamenaná GPS trasa tohoto uzlu bude trvale smazána. Tuto akci nelze vrátit zpět.</string>
     <string name="clear_selection">Zrušit výběr</string>
     <string name="clear_time_zone">Vymazat časové pásmo</string>
     <string name="client_notification">Oznámení klienta</string>
     <string name="close">Zavřít</string>
     <string name="close_selection">Zavřít výběr</string>
+    <string name="collapse_chart">Sbalit graf</string>
     <string name="communicate_off_the_grid">Komunikujte off-the-grid s přáteli a komunitou bez mobilních služeb.</string>
     <!-- COMPASS -->
     <string name="compass_bearing">Směr: %1$s</string>
@@ -206,6 +276,7 @@
     <string name="config_display_wake_on_tap_or_motion_summary">Tato funkce vyžaduje, aby vaše zařízení mělo akcelerometr.</string>
     <string name="config_lora_frequency_slot_summary">Provozní frekvence vašeho uzlu se vypočítává na základě regionu, předvolby modemu a této hodnoty. Pokud je nastavena na 0, slot se automaticky určí podle názvu primárního kanálu a změní se z výchozího veřejného slotu. Vraťte tuto hodnotu zpět na výchozí veřejný slot, pokud jsou nakonfigurovány soukromé primární a veřejné sekundární kanály.</string>
     <string name="config_lora_hop_limit_summary">Nastaví maximální počet skoků, výchozí hodnota je 3. Zvýšení počtu skoků zároveň zvyšuje zahlcení sítě, proto je třeba tuto možnost používat opatrně. Zprávy s 0 skoky (broadcast) neobdrží potvrzení (ACK).</string>
+    <string name="config_lora_modem_preset_licensed_summary">Předvolby pro tento region jsou určeny pouze licencovaným radioamatérům. Chcete-li je používat, povolte v konfiguraci uživatele režim Licencovaný radioamatér (Ham).</string>
     <string name="config_lora_modem_preset_summary">Dostupné předvolby modemu, výchozí je Long Fast.</string>
     <string name="config_lora_region_summary">Oblast, ve které budete svá rádia používat.</string>
     <string name="config_network_eth_enabled_summary">Zapnutí Ethernetu deaktivuje Bluetooth připojení k aplikaci. TCP připojení k uzlu není na zařízeních Apple k dispozici.</string>
@@ -222,6 +293,7 @@
     <string name="config_security_debug_log_api_enabled">Živý debug přes sériový port, prohlížení a export logů s anonymizovanou polohou přes Bluetooth.</string>
     <string name="config_security_is_managed">Toto zařízení spravuje správce mesh sítě, uživatel nemůže měnit žádná jeho nastavení.</string>
     <string name="config_security_private_key">Slouží k vytvoření sdíleného klíče se vzdáleným zařízením.</string>
+    <string name="config_security_private_key_remote">Zařízení nepředává soukromý klíč prostřednictvím vzdálené správy. Nový klíč můžete nastavit, ale nelze jej zpětně načíst.</string>
     <string name="config_security_public_key">Je generován z vašeho soukromého klíče a odesílán ostatním uzlům v mesh síti, aby mohly vypočítat sdílený tajný klíč.</string>
     <string name="config_security_serial_enabled">Sériová konzole pomocí Stream API.</string>
     <string name="configuration">Nastavení</string>
@@ -235,13 +307,17 @@
     <string name="connected_device">Připojená zařízení</string>
     <string name="connected_sleeping">Připojené k uspanému vysílači</string>
     <string name="connecting">Připojování</string>
+    <string name="connection_status">Aktuální připojení:</string>
     <string name="connections">Připojení</string>
+    <string name="contact_muted_snackbar">Ztlumeno %1$s</string>
+    <string name="contact_pinned">Připnuto</string>
     <string name="contrast">Kontrast</string>
     <string name="contrast_high">Vysoká</string>
     <string name="contrast_medium">Střední</string>
     <string name="contrast_standard">Standardní</string>
     <string name="conversations">Konverzace</string>
     <string name="copy">Kopírovat</string>
+    <string name="copyright_notice">Meshtastic® Copyright Meshtastic LLC</string>
     <string name="create_your_own_networks">Vytvořte si vlastní sítě</string>
     <string name="critical_alert">Kritické varování!</string>
     <string name="critical_alerts">Kritická upozornění</string>
@@ -249,12 +325,15 @@
     <string name="current">Proud</string>
     <string name="currently">Aktuálně:</string>
     <string name="date">Datum</string>
+    <string name="date_separator_today">Dnes</string>
+    <string name="date_separator_yesterday">Včera</string>
     <string name="dbm_value">%1$d dBm</string>
     <!-- DEBUG -->
     <string name="debug">Ladění</string>
     <string name="debug_active_filters">Aktivní filtry</string>
     <string name="debug_clear">Vymazat protokoly</string>
     <string name="debug_clear_logs_confirm">Tímto odstraníte všechny logované pakety a záznamy databáze ze zařízení – jde o úplný reset a je nevratný.</string>
+    <string name="debug_decoded_payload">Dekódovaný obsah:</string>
     <string name="debug_default_search">Hledat v protokolech…</string>
     <string name="debug_export_failed">Nepodařilo se zapsat soubor protokolu: %1$s</string>
     <string name="debug_export_success">%1$d exportováno</string>
@@ -298,11 +377,14 @@
     <string name="delivery_confirmed">Doručeno</string>
     <string name="delivery_confirmed_reboot_warning">Vaše zařízení se může odpojit a restartovat při aplikaci nastavení.</string>
     <string name="demo_mode">Demo režim</string>
+    <string name="demo_mode_replay">Demo režim (přehrávání)</string>
     <string name="desc_node_filter_clear">vyčistit filtr uzlů</string>
     <string name="description">Popis</string>
     <!-- DESKTOP -->
     <string name="desktop_notification_title">Meshtastic</string>
+    <string name="desktop_tray_quit">Ukončit</string>
     <string name="desktop_update_available_title">Je k dispozici aktualizace aplikace</string>
+    <string name="desktop_update_download">Stáhnout aktualizaci %1$s</string>
     <string name="details">Podrobnosti</string>
     <string name="detection_sensor">Detekční senzor</string>
     <string name="detection_sensor_config">Konfigurace detekčního senzoru</string>
@@ -322,6 +404,7 @@
     <string name="device_metrics_numeric_value">%1$s</string>
     <string name="device_metrics_percent_value">%1$s: %2$s%%</string>
     <string name="device_metrics_update_interval_seconds">Interval aktualizace metrik zařízení</string>
+    <string name="device_metrics_voltage_value">%1$s: %2$s V</string>
     <string name="device_sleeping">Zařízení spí</string>
     <string name="device_telemetry_enabled">Odesílat telemetrii zařízení</string>
     <string name="device_telemetry_enabled_summary">Povolí/zakáže modul telemetrie zařízení pro odesílání metrik do mesh sítě. Jde o nominální hodnoty. Přetížené mesh sítě se automaticky přizpůsobí na delší intervaly podle počtu online uzlů.</string>
@@ -339,28 +422,65 @@
     <string name="discovery_delete_session">Smazat relaci</string>
     <string name="discovery_delete_session_confirm">Opravdu chcete tuto relaci vyhledávání odstranit? Tuto akci nelze vrátit zpět.</string>
     <string name="discovery_dwell_progress">Naslouchání na %1$s, %2$s zbývá</string>
+    <string name="discovery_dwell_time">Doba poslechu</string>
+    <string name="discovery_dwell_time_description">Doba poslechu na každé předvolbě</string>
+    <string name="discovery_empty_history">Zatím nebyla provedena žádná vyhledávání</string>
+    <string name="discovery_history">Historie vyhledávání</string>
+    <string name="discovery_keep_screen_awake">Udržovat obrazovku zapnutou</string>
+    <string name="discovery_keep_screen_awake_description">Zabraňuje režimu Doze v Androidu zahazovat rádiové pakety během dlouhého skenování. Doporučeno.</string>
     <string name="discovery_local_mesh">Vyhledávání zařízení v místní mesh síti</string>
+    <string name="discovery_lora_presets">Předvolby LoRa</string>
+    <string name="discovery_lora_presets_description">Vyberte jednu nebo více předvoleb ke skenování</string>
+    <string name="discovery_map">Mapa vyhledávání</string>
     <string name="discovery_not_connected">Nepřipojeno</string>
+    <string name="discovery_not_connected_description">Připojte se k zařízení Meshtastic a spusťte skenování.</string>
+    <string name="discovery_paused">Pozastaveno: %1$s</string>
+    <string name="discovery_preparing">Příprava skenování</string>
+    <string name="discovery_reconnecting">Obnovuji připojení k %1$s</string>
+    <string name="discovery_rerun_analysis">Spustit analýzu znovu</string>
+    <string name="discovery_scan_complete">Relace dokončena</string>
+    <string name="discovery_scan_incomplete">Relace nebyla dokončena</string>
     <string name="discovery_scan_progress">Průběh vyhledávání</string>
     <string name="discovery_scan_summary">Výsledek vyhledávání</string>
+    <string name="discovery_session_detail">Podrobnosti relace</string>
+    <string name="discovery_shifting_to">Přepínám na %1$s</string>
     <string name="discovery_start_scan">Spustit vyhledávání</string>
     <string name="discovery_start_scan_reason_24ghz_unsupported">rádiový hardware nepodporuje pásmo 2,4 GHz</string>
     <string name="discovery_start_scan_reason_no_presets">není vybrána žádná předvolba</string>
     <string name="discovery_start_scan_reason_not_connected">zařízení není připojeno</string>
+    <string name="discovery_stat_analysis">Analýza</string>
+    <string name="discovery_stat_avg_airtime_rate">Průměrné využití vysílacího času</string>
+    <string name="discovery_stat_avg_channel_utilization">Průměrné využití kanálu</string>
+    <string name="discovery_stat_bad_packets">Chybné pakety</string>
     <string name="discovery_stat_channel_utilization">Využití kanálu</string>
     <string name="discovery_stat_date">Datum</string>
     <string name="discovery_stat_direct">Přímý</string>
     <string name="discovery_stat_duplicate_packets">Duplicitní pakety</string>
     <string name="discovery_stat_dwelling_on">Naslouchání na %1$s</string>
+    <string name="discovery_stat_failure_rate">Míra selhání</string>
+    <string name="discovery_stat_mesh">Mesh</string>
     <string name="discovery_stat_messages">Zprávy</string>
     <string name="discovery_stat_online_total_nodes">Online / Celkem uzlů</string>
+    <string name="discovery_stat_packets_rx">Přijaté pakety</string>
+    <string name="discovery_stat_packets_tx">Odeslané pakety</string>
+    <string name="discovery_stat_presets_scanned">Naskenované předvolby</string>
+    <string name="discovery_stat_rf_health">Stav RF</string>
     <string name="discovery_stat_selected">Vybrané</string>
+    <string name="discovery_stat_sensor_pkts">Pakety senzorů</string>
+    <string name="discovery_stat_session_overview">Přehled relace</string>
     <string name="discovery_stat_status">Stav</string>
+    <string name="discovery_stat_success_rate">Úspěšnost</string>
+    <string name="discovery_stat_total_dwell_time">Celková doba poslechu</string>
     <string name="discovery_stat_total_messages">Celkový počet zpráv</string>
+    <string name="discovery_stat_total_unique_nodes">Celkem jedinečných uzlů</string>
+    <string name="discovery_stat_unique_nodes">Jedinečné uzly</string>
     <string name="discovery_stat_unselected">Nevybráno</string>
     <string name="discovery_stop_scan">Zastavit vyhledávání</string>
+    <string name="discovery_summary_not_available">Analýza pomocí AI není k dispozici</string>
     <string name="discovery_time_remaining">%1$s zbývá</string>
+    <string name="discovery_unique_nodes">%1$d jedinečných uzlů</string>
     <string name="discovery_view_map">Zobrazit na mapě</string>
+    <string name="disk_free_indexed">Volný disk %1$d</string>
     <!-- DISPLAY -->
     <string name="display">Obrazovka</string>
     <string name="display_config">Obrazovka zařízení</string>
@@ -379,12 +499,11 @@
     <string name="doc_search_placeholder">Hledat v dokumentaci…</string>
     <string name="doc_section_developer">Příručka vývojáře</string>
     <string name="doc_section_user">Uživatelská příručka</string>
-    <string name="doc_title_android_auto">Android Auto</string>
     <string name="doc_title_app_functions">Funkce aplikace</string>
     <string name="doc_title_connections">Připojení</string>
     <string name="doc_title_debug_logs">Protokoly ladění</string>
     <string name="doc_title_desktop">Aplikace pro stolní počítače</string>
-    <string name="doc_title_discovery">Objevujte</string>
+    <string name="doc_title_discovery">Vyhledávání zařízení v místní mesh síti</string>
     <string name="doc_title_firmware">Aktualizace firmware</string>
     <string name="doc_title_help">Nápověda a dokumentace v aplikaci</string>
     <string name="doc_title_map">Mapa a trasové body</string>
@@ -402,17 +521,22 @@
     <string name="doc_title_translate">Překlad aplikace</string>
     <string name="doc_title_units">Jednotky a místní nastavení</string>
     <string name="doc_title_widget">Widget na domovské obrazovce</string>
+    <string name="documentation">Dokumentace</string>
     <string name="done">Hotovo</string>
     <string name="dont_show_again_for_device">U tohoto zařízení již nezobrazovat</string>
     <string name="double_tap_as_button_press">Dvojité klepnutí jako stisk tlačítka</string>
+    <string name="downlink_enabled">Příjem MQTT dat povolen</string>
     <string name="downlink_feature_description">Zprávy z veřejné internetové brány jsou předávány do místní mesh sítě. Kvůli politice nulového počtu skoků se provoz z výchozího MQTT serveru nebude šířit dál než do tohoto zařízení.</string>
     <string name="download">Stáhnout</string>
     <string name="duplicated_public_key_title">Byl zjištěn duplicitní veřejný klíč</string>
     <string name="dynamic">Dynamický</string>
     <string name="easily_set_up_private_mesh_networks">Jednoduché nastavení soukromých mesh sítí pro bezpečnou a spolehlivou komunikaci i v odlehlých místech.</string>
+    <string name="echo_enabled">Povolit echo</string>
     <string name="edit">Upravit</string>
     <string name="eight_hours">8 hodin</string>
     <!-- EMOJI -->
+    <string name="emoji_category_symbols">Symboly</string>
+    <string name="emoji_category_travel_places">Cestování a místa</string>
     <string name="enable_power_saving_mode">Povolit úsporný režim</string>
     <string name="enabled">Povoleno</string>
     <!-- ENCRYPTION -->
@@ -441,6 +565,8 @@
     <!-- EXPORT -->
     <string name="export_configuration">Exportovat nastavení</string>
     <string name="export_data_csv">Exportovat všechny pakety</string>
+    <string name="export_node_db">Exportovat databázi uzlů</string>
+    <string name="export_tak_data_package">Exportovat datový balíček TAK</string>
     <string name="external_notification">Externí oznámení</string>
     <string name="external_notification_config">Nastavení externího oznámení</string>
     <string name="external_notification_enabled">Externí oznámení povoleno</string>
@@ -451,6 +577,7 @@
     <string name="favorite_add">Přidat '%1$s' jako oblíbený uzel?</string>
     <string name="favorite_remove">Odstranit '%1$s' z oblíbených uzlů?</string>
     <!-- FILTER -->
+    <string name="filter_add_placeholder">Přidat slovo nebo regex:vzor</string>
     <string name="filter_disable_for_contact">Vypnout filtrování</string>
     <string name="filter_enable">Zapnout filtrování</string>
     <string name="filter_enable_for_contact">Zapnout filtrování</string>
@@ -468,6 +595,15 @@
     <string name="firmware">Firmware</string>
     <string name="firmware_edition">Firmware edice</string>
     <string name="firmware_event_ended_button">Aktualizovat firmware</string>
+    <string name="firmware_maintenance_erase_confirm_text">Tímto se ze zařízení %1$s vymaže vše včetně kanálů, klíčů a všech nastavení a poté se znovu nainstaluje firmware. Tuto akci nelze vrátit zpět a neexistuje žádná záloha.\n\nBudete dvakrát vyzváni k výběru disku zařízení: nejprve pro soubor pro vymazání a poté znovu pro firmware.</string>
+    <string name="firmware_maintenance_no_release">Nejprve vyberte verzi firmwaru, aby bylo možné po vymazání zařízení firmware znovu nainstalovat.</string>
+    <string name="firmware_maintenance_not_a_bootloader_volume">Vybraný disk není aktualizační disk zařízení. Vyberte disk, který se zobrazí v režimu aktualizace zařízení (obsahuje soubor INFO_UF2.TXT).</string>
+    <string name="firmware_maintenance_select_drive">Vyberte disk zařízení určený pro aktualizaci</string>
+    <string name="firmware_maintenance_unknown_board">Bootloader tohoto zařízení nelze pomocí této aplikace aktualizovat.</string>
+    <string name="firmware_maintenance_upgrade_bootloader_action">Aktualizovat bootloader</string>
+    <string name="firmware_maintenance_upgrade_confirm_text">Do zařízení %1$s se nainstaluje nový bootloader, který výrazně urychlí budoucí aktualizace přes Bluetooth. Poté se znovu nainstaluje firmware.\n\nBěhem procesu zařízení neodpojujte.</string>
+    <string name="firmware_maintenance_upgrade_confirm_title">Aktualizovat bootloader?</string>
+    <string name="firmware_maintenance_wrong_destination">Toto umístění není aktualizační disk zařízení, takže do zařízení nebylo nic zapsáno. Vyberte vyměnitelný disk, který se zobrazí, když je zařízení v režimu aktualizace.</string>
     <string name="firmware_old">Firmware rádia je příliš starý na to, aby mohl komunikovat s touto aplikací. Více informací o tomto naleznete v <a href="https://meshtastic.org/docs/getting-started/flashing-firmware">naší firmware instalační příručce</a>.</string>
     <string name="firmware_recovery_banner">Dokončit aktualizaci %1$s</string>
     <string name="firmware_recovery_ble_failed">Aktualizaci se nepodařilo dokončit přes Bluetooth. Původní bootloader tohoto zařízení nedokáže spolehlivě dokončit přerušenou bezdrátovou aktualizaci. Připojte zařízení k počítači pomocí USB a znovu nahrajte firmware pomocí sériového DFU nástroje výrobce (například adafruit-nrfutil), aby bylo zařízení obnoveno.</string>
@@ -523,7 +659,8 @@
     <string name="firmware_update_open_flasher">Otevřít Meshtastic Flasher</string>
     <string name="firmware_update_ota_failed">Aktualizace OTA selhala: %1$s</string>
     <string name="firmware_update_ota_unsupported_reason">OTA zavaděč tohoto zařízení odmítl požadovaný způsob aktualizace: %1$s</string>
-    <string name="firmware_update_rak4631_bootloader_hint">Pro RAK WisBlock RAK4631 použijte sériový DFU nástroj výrobce (například adafruit-nrfutil dfu serial s dodaným .zip souborem bootloaderu). Pouhé zkopírování souboru .uf2 bootloader neaktualizuje.</string>
+    <string name="firmware_update_preparing_flash">Příprava zařízení: mazání flash paměti. Může trvat až minutu...</string>
+    <string name="firmware_update_rak4631_bootloader_hint">U zařízení RAK WisBlock RAK4631 je nutné bootloader výrobce ve formátu .zip nahrát pomocí sériového DFU nástroje, jako je adafruit-nrfutil – pouhé zkopírování souboru .zip na disk zařízení nebude fungovat. Případně připojte zařízení přes USB a použijte funkci aktualizace bootloaderu v této aplikaci.</string>
     <string name="firmware_update_rebooting">Restartuji do DFU...</string>
     <string name="firmware_update_release_notes">Poznámky k vydání</string>
     <string name="firmware_update_requires_bin">Pro zařízení %1$s je vyžadován soubor .bin určený pro tento model.</string>
@@ -531,6 +668,7 @@
     <string name="firmware_update_requires_uf2">Pro zařízení %1$s je vyžadován soubor .uf2 určený pro odpovídající cílovou platformu.</string>
     <string name="firmware_update_retrieval_failed">Nelze načíst soubor firmwaru.</string>
     <string name="firmware_update_retry">Zkusit znovu</string>
+    <string name="firmware_update_retrying_upload">Zařízení neodpovědělo. Nahrávání se opakuje (pokus %1$d/%2$d)...</string>
     <string name="firmware_update_save_dfu_file">Uložte soubor .uf2 na DFU jednotku svého zařízení.</string>
     <string name="firmware_update_searching_device">Vyhledávám zařízení podporující OTA v síti...</string>
     <string name="firmware_update_select_file">Vybrat soubor</string>
@@ -540,6 +678,7 @@
     <string name="firmware_update_starting_dfu">Spouštění DFU...</string>
     <string name="firmware_update_starting_ota">Spouštění aktualizace OTA...</string>
     <string name="firmware_update_success">Aktualizace byla úspěšná!</string>
+    <string name="firmware_update_success_wiped">Zařízení bylo obnoveno do továrního nastavení a je nutné jej znovu nastavit a spárovat s aplikací.</string>
     <string name="firmware_update_taking_a_while">Může to chvíli trvat...</string>
     <string name="firmware_update_target">Cíl: %1$s</string>
     <string name="firmware_update_title">Aktualizace firmware</string>
@@ -558,6 +697,10 @@
     <string name="firmware_update_verifying">Ověřuji aktualizaci...</string>
     <string name="firmware_update_waiting_reboot">Čekání na restart zařízení do OTA režimu...</string>
     <string name="firmware_update_waiting_reconnect">Čekání na opětovné připojení zařízení...</string>
+    <string name="firmware_update_wipe_ble_detail">Po ověření aktualizace obnoví zařízení do továrního nastavení. Dojde k odstranění všech nastavení a párování přes Bluetooth.</string>
+    <string name="firmware_update_wipe_confirm_warning">Zařízení bude také vymazáno. Všechna nastavení, kanály a klíče budou ztraceny.</string>
+    <string name="firmware_update_wipe_label">Vymazat zařízení během aktualizace</string>
+    <string name="firmware_update_wipe_usb_detail">Úplně vymaže paměť zařízení a poté od začátku nainstaluje vybraný firmware.</string>
     <string name="firmware_version">Verze firmware: %1$s</string>
     <string name="fixed_pin">Pevný PIN</string>
     <string name="fixed_position">Pevná poloha</string>
@@ -595,6 +738,7 @@
     <string name="geofence_remove_area">Smazat oblast</string>
     <string name="geofence_set_area">Nastavit oblast na mapě</string>
     <string name="get_started">Začněte hned</string>
+    <string name="github_repository">GitHub repozitář</string>
     <string name="good">Silný</string>
     <!-- GPIO -->
     <string name="gpio">GPIO</string>
@@ -606,6 +750,7 @@
     <string name="gps_mode">Režim GPS (fyzický modul)</string>
     <string name="grant_permission">Udělit oprávnění</string>
     <string name="green">Zelená</string>
+    <string name="ham_long_name_summary">Volitelné. Přidá se k vašemu volacímu znaku, např. KD2ABC//Attic Heltec</string>
     <string name="hardware">Hardware</string>
     <string name="hardware_model">Hardwarový model</string>
     <string name="heading">Směr</string>
@@ -613,9 +758,14 @@
     <string name="help_and_documentation">Nápověda a dokumentace</string>
     <string name="hide_layer">Skrýt vrstvu</string>
     <string name="hide_password">Skrýt heslo</string>
+    <string name="history_return_max">Max. počet záznamů historie</string>
+    <string name="history_return_window">Časové okno historie</string>
+    <string name="hop_histogram_empty">Žádné uzly v tomto okně</string>
     <string name="hop_histogram_title">Uzly podle počtu skoků</string>
     <string name="hop_limit">Počet skoků</string>
     <string name="hops_away">Počet skoků</string>
+    <string name="host">Hostitel</string>
+    <string name="host_metrics_log">Metriky hostitele</string>
     <string name="humidity">Vlhkost</string>
     <string name="i_agree">Souhlasím.</string>
     <string name="i_agree_to_share_my_location">Četl jsem a rozumím výše uvedenému. Dobrovolně souhlasím s nešifrovaným přenosem dat svého uzlu přes MQTT</string>
@@ -625,6 +775,7 @@
     <string name="i2s_word_select">I2S výběr slov</string>
     <string name="iaq">IAQ</string>
     <string name="iaq_definition">(Vnitřní kvalita ovzduší) relativní hodnota IAQ měřená Bosch BME680. Hodnota rozsahu 0–500.</string>
+    <string name="icon_meanings">Význam ikon</string>
     <!-- IGNORE -->
     <string name="ignore">Ignorovat</string>
     <string name="ignore_add">Přidat '%1$s' do seznamu ignorovaných?</string>
@@ -634,6 +785,8 @@
     <!-- IMPORT -->
     <string name="import_configuration">Importovat nastavení</string>
     <string name="import_known_shared_contact_text">Upozornění: Tento kontakt je znám, import přepíše předchozí kontaktní informace.</string>
+    <string name="import_pending_channels_connect">Nastavení kanálů přijato. Pro jejich import se připojte k zařízení.</string>
+    <string name="import_pending_contact_connect">Kontakt přijat. Pro jeho import se připojte k zařízení.</string>
     <string name="import_shared_contact">Importovat sdílený kontakt?</string>
     <string name="incoming_messages">Příchozí zprávy</string>
     <string name="indoor_air_quality_iaq">Kvalita vnitřního ovzduší (IAQ)</string>
@@ -651,10 +804,16 @@
     <string name="ip_port">Port:</string>
     <string name="ipv4_mode">Režim IPv4</string>
     <string name="json_output_enabled">JSON výstup povolen</string>
+    <string name="jump_to_latest_from">%1$s</string>
     <!-- KEY -->
+    <string name="key_backup_deleted">Záloha klíče byla odstraněna</string>
+    <string name="key_backup_not_found">Pro tento uzel nebyla nalezena žádná záloha klíče</string>
     <string name="key_backup_restore_failed">Nepodařilo se obnovit klíče ze zálohy</string>
     <string name="key_backup_restored">Klíče obnoveny — ukládání do zařízení</string>
     <string name="key_backup_saved">Klíče byly bezpečně zálohovány</string>
+    <string name="key_verification_final_title">Ověření klíče dokončeno</string>
+    <string name="key_verification_request_title">Požadavek na ověření klíče</string>
+    <string name="key_verification_title">Ověření klíče</string>
     <!-- LABEL -->
     <string name="last_heard_filter_label">Filtrovat podle času posledního slyšení: %1$s</string>
     <string name="last_position_update">Poslední aktualizace pozice</string>
@@ -663,16 +822,25 @@
     <string name="latitude">Zeměpisná šířka</string>
     <!-- LAYER -->
     <string name="learn_more">Zjistit více</string>
+    <string name="led_heartbeat">Blikání LED při provozu</string>
     <string name="led_state">Stav LED</string>
     <string name="legacy_admin_channel">Starý kanál správce</string>
     <string name="library_count">%1$d knihoven</string>
     <!-- LICENSED -->
     <string name="licensed_amateur_radio">Licencované amatérské rádio (Ham)</string>
     <string name="licensed_amateur_radio_text">Povolení této možnosti zruší šifrování a není kompatibilní se základním nastavením Meshtastic sítě.</string>
+    <string name="licensed_mode_enable_confirm">Povolit licencovaný režim</string>
+    <string name="licensed_mode_enable_title">Povolit licencovaný režim (Ham)?</string>
+    <string name="licensed_mode_enable_warning">Licencovaný režim odstraní šifrovací klíče kanálů a deaktivuje administrátorský kanál, takže veškerý provoz bude odesílán v otevřeném textu, který může kdokoli číst. Tento firmware jej navíc nemůže podepisovat, takže ostatní uzly nemohou ověřit, že pochází od vás. Tento režim není kompatibilní s výchozí sítí Meshtastic a nadále odpovídáte za dodržování podmínek své radioamatérské licence a místních předpisů.</string>
+    <string name="licensed_mode_enable_warning_signed">Licencovaný režim odstraní šifrovací klíče kanálů a deaktivuje administrátorský kanál, takže veškerý provoz bude odesílán v otevřeném textu, který může kdokoli číst. Zprávy jsou však digitálně podepisovány, takže ostatní uzly mohou ověřit, že pocházejí od vás. Číslo vašeho uzlu se může jednou změnit tak, aby odpovídalo vašemu identifikačnímu klíči, takže oblíbené položky, historie zpráv, vzdálená správa a ostatní uzly jej mohou zpočátku považovat za nový uzel. Nadále odpovídáte za dodržování podmínek své radioamatérské licence a místních předpisů.</string>
     <!-- LOAD -->
     <string name="load">Zatížení</string>
     <string name="loading">Načítám</string>
     <!-- LOCAL -->
+    <string name="local_network_permission">Oprávnění k místní síti</string>
+    <string name="local_network_permission_blocked_rationale">Přístup k místní síti je vypnutý a Android se už nezeptá. Rádio v síti Wi-Fi nelze najít ani k němu přistupovat, dokud tento přístup nezapnete v nastavení aplikace. Rádio na veřejné adrese nebo přes VPN to neovlivní.</string>
+    <string name="local_network_permission_denied_hint">Přístup k místní síti je pro Meshtastic vypnutý. Pokud je toto rádio v místní síti, připojení se nezdaří, dokud v nastavení systému nepovolíte přístup k místní síti.</string>
+    <string name="local_network_permission_rationale">Meshtastic potřebuje přístup k místní síti, aby mohl vyhledat rádia v síti Wi-Fi. Vyhledává pouze v síti, ke které jste právě připojeni. Bez tohoto přístupu se stále můžete připojit k rádiu zadáním jeho adresy.</string>
     <string name="local_stats_bad">Poškozené %1$d</string>
     <string name="local_stats_battery">Baterie: %1$d%</string>
     <string name="local_stats_diagnostics_prefix">Diagnostika: %1$s</string>
@@ -685,10 +853,44 @@
     <string name="local_stats_updated_at">%1$s</string>
     <string name="local_stats_uptime">Doba provozu: %1$s</string>
     <string name="local_stats_utilization">ChUtil: %1$s% | AirTX: %2$s%</string>
+    <!-- LOCATION -->
     <string name="location_disabled">Přístup k poloze zařízení nebyl povolen, není možné poskytnout polohu zařízení do Mesh sítě.</string>
+    <string name="location_permission">Oprávnění k poloze</string>
+    <string name="location_permission_blocked_notice">Přístup k poloze je vypnutý a Android se už nezeptá. Kdykoli budete chtít znovu používat mapu a sdílení polohy, zapněte ho v nastavení aplikace.</string>
+    <string name="location_permission_blocked_toast">Přístup k poloze je vypnutý. Zapněte ho v nastavení aplikace, chcete-li sdílet svou polohu.</string>
+    <string name="location_permission_denied_notice">Bez přístupu k poloze mapa nezobrazí vaši polohu a Meshtastic ji nebude moci sdílet v mesh síti. Vše ostatní bude fungovat dál a přístup můžete později zapnout.</string>
+    <string name="location_permission_rationale">Meshtastic používá vaši polohu pro zobrazení na mapě, měření vzdálenosti k uzlům a po zapnutí i pro její sdílení v mesh síti. Po zamítnutí oprávnění ostatní funkce fungují dál.</string>
     <string name="location_sharing">Sdílení polohy</string>
     <!-- LOCKDOWN -->
+    <string name="lockdown_backoff">Zkuste to znovu za %1$d sekund.</string>
+    <string name="lockdown_boots_remaining">Zbývající počet restartů</string>
+    <string name="lockdown_confirm_passphrase">Potvrdit přístupovou frázi</string>
+    <string name="lockdown_disable">Zakázat uzamčení</string>
+    <string name="lockdown_disable_message">Zadejte přístupovou frázi pro vypnutí režimu uzamčení. Zařízení dešifruje své úložiště a restartuje se.</string>
+    <string name="lockdown_enable">Povolit uzamčení</string>
     <string name="lockdown_enable_ack">Rozumím</string>
+    <string name="lockdown_enable_warning">Pozor: povolením režimu uzamčení se na podporovaném hardwaru uzamkne ladicí port (SWD). Režim uzamčení můžete kdykoli vypnout pomocí přístupové fráze a v případě potřeby vše obnovit úplným vymazáním zařízení.</string>
+    <string name="lockdown_enter_passphrase">Zadejte přístupovou frázi</string>
+    <string name="lockdown_hide_passphrase">Skrýt</string>
+    <string name="lockdown_hours_until_expiry">Hodiny do vypršení platnosti</string>
+    <string name="lockdown_incorrect_passphrase">Nesprávná přístupová fráze.</string>
+    <string name="lockdown_lock_now">Uzamknout nyní</string>
+    <string name="lockdown_lock_reason">Důvod: %1$s</string>
+    <string name="lockdown_mode">Režim uzamčení</string>
+    <string name="lockdown_mode_setting_up">Nastavování…</string>
+    <string name="lockdown_mode_summary_locked">Aktivní — pro odemknutí tohoto připojení zadejte přístupovou frázi.</string>
+    <string name="lockdown_mode_summary_off">Šifruje úložiště zařízení a pro každé připojení vyžaduje přístupovou frázi.</string>
+    <string name="lockdown_mode_summary_unlocked">Aktivní — úložiště je šifrované, toto připojení je ověřené.</string>
+    <string name="lockdown_passphrase">Přístupová fráze</string>
+    <string name="lockdown_passphrases_do_not_match">Přístupové fráze se neshodují</string>
+    <string name="lockdown_session_boots_remaining">Relace: zbývá %1$d restartů</string>
+    <string name="lockdown_session_expires">Vyprší %1$s</string>
+    <string name="lockdown_session_minutes">Limit relace (minuty)</string>
+    <string name="lockdown_session_minutes_help">Limit doby provozu na jedno spuštění. 0 = bez omezení.</string>
+    <string name="lockdown_session_no_time_limit">Bez časového omezení</string>
+    <string name="lockdown_set_passphrase">Nastavit přístupovou frázi</string>
+    <string name="lockdown_show_passphrase">Zobrazit</string>
+    <string name="lockdown_submit">Odeslat</string>
     <string name="locked">Uzamknout</string>
     <!-- LOG -->
     <string name="log_retention_days">Doba ukládání mesh logů</string>
@@ -764,9 +966,19 @@
     <string name="mesh_beacon_message">Majáková zpráva</string>
     <string name="mesh_beacon_notification_body">Blízká mesh síť vás pozvala k připojení</string>
     <string name="mesh_beacon_notification_title">Pozvánka do mesh sítě</string>
+    <string name="mesh_beacon_offer_add">Přidat kanál</string>
     <string name="mesh_beacon_offer_channel">Kanál: %1$s</string>
+    <string name="mesh_beacon_offer_channel_key">Klíč nabízeného kanálu (base64)</string>
+    <string name="mesh_beacon_offer_channel_name">Název nabízeného kanálu</string>
     <string name="mesh_beacon_offer_dismiss">Zavřít</string>
+    <string name="mesh_beacon_offer_preset_setting">Nabízený přednastavený profil</string>
+    <string name="mesh_beacon_offer_region_setting">Nabízený region</string>
+    <string name="mesh_beacon_on_preset">Vysílací profil</string>
+    <string name="mesh_beacon_on_region">Vysílací region</string>
     <string name="mesh_beacon_preset_none">Žádný</string>
+    <string name="mesh_beacon_target">Cíl: %1$d</string>
+    <string name="mesh_beacon_target_add">Přidat cíl</string>
+    <string name="mesh_beacon_targets">Cíle vysílání</string>
     <string name="mesh_map_location">Poloha v mesh mapě</string>
     <string name="mesh_map_location_description">Zobrazí modrou tečku polohy vašeho telefonu v mesh mapě.</string>
     <!-- MESHTASTIC -->
@@ -786,9 +998,22 @@
     <string name="message_delivery_status">Stav doručení zprávy</string>
     <string name="message_device_managed">Toto rádio je spravováno vzdáleným správcem a změny může provádět jen on.</string>
     <string name="message_input_label">Zpráva</string>
+    <string name="message_routing_error_admin_bad_session_key_detail">Klíč relace správce chybí, vypršela jeho platnost nebo je neplatný. Před dalším pokusem si vyžádejte novou relaci.</string>
+    <string name="message_routing_error_duty_cycle_limit_detail">Místní limity vysílacího času dočasně blokují odesílání. Před dalším pokusem chvíli počkejte.</string>
+    <string name="message_routing_error_got_nak_detail">Uzel tuto zprávu odmítl. Zkuste to znovu, až se změní trasa.</string>
     <string name="message_routing_error_max_retransmit">Nepodařilo se doručit do mesh sítě</string>
+    <string name="message_routing_error_max_retransmit_detail">Žádný uzel tuto zprávu nepotvrdil. Zkuste to znovu, až budete mít lepší signál nebo větší pokrytí mesh sítě.</string>
+    <string name="message_routing_error_no_response_detail">Cílové zařízení požadavek přijalo, ale žádná aplikace ani modul neodpověděly. Zkuste to znovu, až bude příjemce dostupný.</string>
+    <string name="message_routing_error_no_route_detail">V mesh síti nebyla nalezena žádná cesta k cílovému uzlu. Zkuste to znovu, až bude dostupných více uzlů.</string>
+    <string name="message_routing_error_not_authorized">Neautorizováno</string>
     <string name="message_routing_error_pki_failed">Nepodařilo se odeslat šifrovanou zprávu</string>
+    <string name="message_routing_error_pki_failed_detail">Šifrovanou cestu pro odeslání se nepodařilo použít. Počkejte, až se synchronizují informace o uzlu nebo klíče, a poté to zkuste znovu.</string>
+    <string name="message_routing_error_pki_send_fail_public_key_detail">Váš uzel zatím nemá veřejný klíč příjemce. Počkejte, až se synchronizují informace o uzlu, a poté to zkuste znovu.</string>
+    <string name="message_routing_error_pki_unknown_pubkey_detail">Příjemce zatím nezná váš veřejný klíč. Váš uzel může své informace sdílet automaticky; zkuste to znovu, až se synchronizují.</string>
+    <string name="message_routing_error_rate_limit_exceeded_detail">Zprávy se odesílají příliš rychle. Před dalším pokusem počkejte.</string>
+    <string name="message_routing_error_timeout_detail">Ve stanoveném čase nebylo přijato žádné potvrzení. Zkuste to znovu, až budete mít lepší signál nebo větší pokrytí mesh sítě.</string>
     <string name="message_routing_error_too_large">Zpráva je příliš dlouhá pro odeslání</string>
+    <string name="message_routing_error_too_large_detail">Zkraťte zprávu a odešlete ji znovu.</string>
     <string name="message_status_delivered">Doručeno do mesh sítě</string>
     <string name="message_status_enroute">Odesílání...</string>
     <string name="message_status_queued">Ve frontě k odeslání</string>
@@ -797,6 +1022,8 @@
     <string name="message_status_unknown">Neznámé</string>
     <string name="message_translated_label">Překlad</string>
     <string name="messages">Zprávy</string>
+    <string name="micrograms_per_cubic_meter">μg/m3</string>
+    <string name="min">Min</string>
     <string name="minimum_broadcast_seconds">Minimální vysílání (sekundy)</string>
     <string name="minimum_distance">Chytrá vzdálenost</string>
     <string name="minimum_interval">Chytrý Interval</string>
@@ -813,12 +1040,15 @@
     <string name="mqtt_error_credentials_rejected">MQTT: připojení odmítnuto (ověřte přihlašovací údaje)</string>
     <string name="mqtt_error_proxy_failed">Proxy MQTT selhala: %1$s</string>
     <string name="mqtt_error_rejected">MQTT: připojení odmítnuto: %1$s</string>
+    <string name="mqtt_probe_dns_failure">Hostitel nebyl nalezen</string>
     <string name="mqtt_probe_other_failure">Připojení se nezdařilo</string>
     <string name="mqtt_probe_success">Dosažitelný. Broker přijal přihlašovací údaje.</string>
     <string name="mqtt_proxy_local">MQTT proxy na tomto telefonu</string>
     <string name="mqtt_proxy_local_summary">Tento telefon přeposílá MQTT provoz pro připojené zařízení. Vypnutím okamžitě zastavíte přenos (relay), aniž byste museli měnit nastavení MQTT v zařízení — užitečné v případě, že MQTT provoz zahlcuje připojení. Opětovným zapnutím obnovíte přeposílání.</string>
     <string name="mqtt_status_connected">Připojeno</string>
     <string name="mqtt_status_disconnected">Odpojeno</string>
+    <string name="mqtt_status_inactive">Neaktivní</string>
+    <string name="mqtt_status_reconnecting">Opětovné připojování…</string>
     <string name="mqtt_test_connection">Test připojení</string>
     <string name="must_set_region">Musíte nastavit region!</string>
     <string name="must_update">Musíte aktualizovat aplikaci v obchodu Google Play (nebo z Githubu). Je příliš stará pro komunikaci s touto verzí firmware vysílače. Přečtěte si prosím naše <a href="https://meshtastic.org/docs/software/android/installation">dokumenty</a> na toto téma.</string>
@@ -835,7 +1065,11 @@
     <string name="mute_status_unmuted">Neztlumeno</string>
     <string name="nag_timeout_seconds">Interval opakovaného zvonění</string>
     <string name="name">Jméno</string>
+    <string name="name_cannot_be_empty">Název nesmí být prázdný.</string>
     <string name="navigate_back">Přejít zpět</string>
+    <string name="nearby_devices_permission">Oprávnění k zařízením v okolí</string>
+    <string name="need_hardware">Potřebujete zařízení?</string>
+    <string name="need_hardware_description">Pro používání Meshtastic potřebujete kompatibilní zařízení. Naši podporovatelé a partneři nabízejí zařízení připravená k použití. Zde jsou některé z nejoblíbenějších možností.</string>
     <string name="neighbor_info">Informace o sousedech</string>
     <string name="neighbor_info_config">Nastavení informace o sousedech</string>
     <string name="neighbor_info_enabled">Informace o sousedech povoleny</string>
@@ -856,10 +1090,12 @@
     <string name="no_network_devices_found">Nenalezena žádná síťová zařízení</string>
     <string name="no_network_devices_hint">Ujistěte se, že jste připojeni ke stejné síti jako zařízení.</string>
     <string name="no_network_devices_seen">Nenalezena žádná síťová zařízení</string>
+    <string name="no_pax_metrics_logs">Metriky PAX nejsou k dispozici.</string>
     <string name="no_usb_devices_found">Nenalezena žádná USB zařízení</string>
     <string name="no_usb_devices_hint">Připojte zařízení datovým USB kabelem, chcete-li použít sériové připojení.</string>
     <string name="no_usb_devices_seen">Nebyla nalezena žádná USB zařízení</string>
     <!-- NODE -->
+    <string name="node_count_online">%1$d online</string>
     <string name="node_count_shown">%1$d zobrazeno</string>
     <string name="node_count_template">(%1$d online / %2$d zobrazeno / %3$d celkem)</string>
     <string name="node_count_total">%1$d celkem</string>
@@ -873,10 +1109,11 @@
     <string name="node_filter_show_ignored">Zobrazit jen ignorované uzly</string>
     <string name="node_filter_title">Filtrovat podle</string>
     <string name="node_id">Identifikátor uzlu</string>
+    <string name="node_incomplete">Nedokončeno</string>
     <string name="node_layout_channel">Kanál</string>
     <string name="node_layout_compact">Kompaktní</string>
     <string name="node_layout_compact_fields_header">Kompaktní pole</string>
-    <string name="node_layout_complete">Kompletní</string>
+    <string name="node_layout_complete">Dokončeno</string>
     <string name="node_layout_complete_description">Kompletní rozložení zobrazuje všechna dostupná data uzlu. Pole bez dat jsou automaticky skryta.</string>
     <string name="node_layout_device_role">Zařízení a Role</string>
     <string name="node_layout_distance_and_bearing">Vzdálenost a směr</string>
@@ -886,6 +1123,7 @@
     <string name="node_layout_help_signal_indicator">Kombinuje SNR a RSSI do úrovně kvality zobrazené jako barevná ikona s popisem. Zobrazeno pouze v úplném rozložení.</string>
     <string name="node_layout_help_signal_none">Nebyl detekován žádný použitelný signál. Hodnoty jsou pod všemi prahovými úrovněmi kvality.</string>
     <string name="node_layout_hops_away">Počet skoků</string>
+    <string name="node_layout_last_heard_time">Čas posledního zachycení</string>
     <string name="node_layout_log_icons">Metriky prostředí</string>
     <string name="node_layout_power">Napájení</string>
     <string name="node_layout_preview">Náhled</string>
@@ -895,6 +1133,7 @@
     <string name="node_list_help_node_details">Detaily uzlu</string>
     <string name="node_list_help_title">Nápověda pro seznam uzlů</string>
     <string name="node_number">Číslo uzlu</string>
+    <string name="node_request_send_failed">Požadavek se nepodařilo odeslat. Zkuste to znovu.</string>
     <string name="node_restarting">Restartování…</string>
     <string name="node_sort_alpha">A-Z</string>
     <string name="node_sort_button">Možnosti řazení uzlů</string>
@@ -911,13 +1150,23 @@
     <!-- NODES -->
     <string name="nodes">Uzly</string>
     <string name="nodes_at_this_location">Uzly na tomto místě</string>
+    <string name="nodes_empty_disconnected_hint">Připojte se k zařízení a vyhledejte okolní uzly.</string>
     <string name="nodes_empty_disconnected_title">Není připojeno žádné zařízení</string>
+    <string name="nodes_empty_searching_hint">Zde se budou postupně zobrazovat nalezené uzly v okolí.</string>
+    <string name="nodes_empty_searching_title">Vyhledávání uzlů</string>
     <string name="nodes_queued_for_deletion">%1$d uzlů zařazeno k odstranění:</string>
+    <string name="noise_floor">Úroveň šumu</string>
+    <string name="noise_floor_definition">Úroveň okolního rádiového šumu naměřená přijímačem. Nižší hodnoty obvykle znamenají klidnější rádiové prostředí; −85 dBm je orientační hodnota pro silné rušení, nikoli pevná hranice.</string>
+    <string name="noise_floor_no_reading">Úroveň šumu: bez měření</string>
     <string name="none">Žádný (zakázat)</string>
     <string name="none_quality">Žádný</string>
     <string name="not_connected">Nepřipojeno</string>
+    <string name="not_now">Teď ne</string>
     <string name="note">Poznámka</string>
     <string name="notes">Poznámka</string>
+    <string name="notification_permission_blocked_notice">Oznámení jsou vypnutá a Android se už nezeptá. Zapněte je v nastavení aplikace, abyste dostávali upozornění na nové zprávy a další události.</string>
+    <string name="notification_permission_denied_notice">Bez oznámení vás Meshtastic nemůže upozornit na nové zprávy, nové uzly ani nízký stav baterie, když aplikace běží na pozadí.</string>
+    <string name="notification_permission_rationale">Oznámení vás upozorní, když aplikace Meshtastic není otevřená: na nové zprávy, nově nalezené uzly a nízký stav baterie rádia. Pokud je zamítnete, nic dalšího se nezmění.</string>
     <string name="notification_permissions_description">Meshtastic vás pomocí oznámení upozorní na nové zprávy a důležité události. Nastavení oznámení si můžete kdykoli upravit.</string>
     <!-- NOTIFICATIONS -->
     <string name="notifications_for_channel_and_direct_messages">Oznámení z kanálů a přímých zpráv.</string>
@@ -941,9 +1190,11 @@
     <!-- OPEN -->
     <string name="open_bluetooth_settings">Otevřít nastavení Bluetooth</string>
     <string name="open_compass">Otevřít kompas</string>
+    <string name="open_location_settings">Otevřít nastavení polohy</string>
     <string name="open_settings">Otevřít nastavení</string>
     <string name="open_source_description">Meshtastic používá následující open-source knihovny. Klepnutím zobrazíte jejich licence.</string>
     <string name="open_source_libraries">Open source knihovny</string>
+    <string name="open_wifi_settings">Otevřít nastavení Wi-Fi</string>
     <string name="options">Nastavení</string>
     <!-- OUTPUT -->
     <string name="output_buzzer_gpio">Výstupní pin bzučáku (GPIO)</string>
@@ -955,13 +1206,55 @@
     <string name="override_duty_cycle">Přepsat pracovní cyklus</string>
     <string name="override_frequency_mhz">Ruční nastavení frekvence</string>
     <!-- PACKET -->
+    <string name="packet_authenticity">Pravost paketu</string>
+    <string name="packet_authenticity_balanced">Vyvážená — upřednostňovat ověřené</string>
+    <string name="packet_authenticity_balanced_summary">Doporučeno. Odmítat pokusy o přechod na nepodepsaný provoz u uzlů, o kterých je známo, že používají podpisy.</string>
+    <string name="packet_authenticity_compatible">Kompatibilní — přijímat nepodepsané</string>
+    <string name="packet_authenticity_compatible_summary">Pokud je to možné, ověřovat autenticitu paketů, ale pro maximální kompatibilitu přijímat i nepodepsaný provoz.</string>
+    <string name="packet_authenticity_level">Úroveň ochrany</string>
+    <string name="packet_authenticity_strict">Přísná — vyžadovat ověření</string>
+    <string name="packet_authenticity_strict_confirm">Povolit přísný režim</string>
+    <string name="packet_authenticity_strict_confirmation">Přísný režim ignoruje každý paket z okolní mesh sítě, který není kryptograficky ověřený. Starší firmware, licencované nebo radioamatérské uzly bez klíčů PKI a příliš velké pakety nemusí být dostupné. Přímé zprávy ověřené pomocí PKI zůstávají dostupné.</string>
+    <string name="packet_authenticity_strict_summary">Zobrazovat a zpracovávat pouze kryptograficky ověřené pakety mesh sítě. Starší uzly a příliš velké pakety nemusí být dostupné.</string>
+    <string name="packet_authenticity_strict_title">Povolit přísné ověřování?</string>
+    <string name="packet_authenticity_unsupported">Toto připojené zařízení nepodporuje ověřování kryptografických podpisů paketů.</string>
     <string name="pairing_mode">Režim párování</string>
     <string name="password">Heslo</string>
     <!-- PAX -->
+    <string name="pax">PAX</string>
+    <string name="pax_metrics_log">Metriky PAX</string>
+    <string name="pax_total_format">PAX: %1$d</string>
     <string name="pax_total_marker">PAX: %1$s</string>
     <string name="pax_wifi_marker">WiFi: %1$s</string>
+    <string name="paxcounter">Paxcounter</string>
+    <string name="paxcounter_config">Nastavení Paxcounteru</string>
+    <string name="paxcounter_enabled">Paxcounter povolen</string>
     <string name="periodic_position_broadcast">Pravidelné vysílání polohy</string>
+    <!-- PERMISSION -->
+    <string name="permission_camera_summary">Skenovat QR kódy kanálů a kontaktů</string>
+    <string name="permission_local_network_summary">Vyhledat rádia v síti Wi-Fi</string>
+    <string name="permission_location_summary">Zobrazit svou polohu na mapě a sdílet ji přes mesh síť</string>
+    <string name="permission_location_summary_pre31">Najít vaše rádio přes Bluetooth, zobrazit vaši polohu na mapě a sdílet ji v mesh síti</string>
     <string name="permission_missing_31">Meshtastic potřebuje mít povoleno oprávnění ‚Blízká zařízení‘, aby mohl vyhledávat a připojovat zařízení přes Bluetooth. Když jej nepoužíváte, můžete jej vypnout.</string>
+    <string name="permission_missing_pre31">V této verzi Androidu jedno oprávnění k poloze zajišťuje dvě věci: umožňuje skenování Bluetooth a zobrazuje vaši polohu na mapě mesh sítě. Sdílení vaší polohy v mesh síti zůstává vypnuté, dokud ho sami nezapnete.</string>
+    <string name="permission_nearby_devices_summary">Najít a připojit se k vašemu rádiu přes Bluetooth</string>
+    <string name="permission_notifications_summary">Upozorňovat na zprávy, nové uzly a vybitou baterii</string>
+    <string name="permission_state_allowed">Povoleno</string>
+    <string name="permission_state_blocked">Blokováno — klepnutím otevřete nastavení systému</string>
+    <string name="permission_state_denied">Zamítnuto — klepnutím povolíte</string>
+    <string name="permission_state_not_applicable">V této verzi Androidu není vyžadováno</string>
+    <!-- PERMISSIONS -->
+    <string name="permissions">Oprávnění</string>
+    <string name="permissions_all_allowed">Vše povoleno</string>
+    <string name="permissions_hide">Skrýt oprávnění</string>
+    <plurals name="permissions_need_attention">
+        <item quantity="one">%1$d vyžaduje pozornost</item>
+        <item quantity="few">%1$d vyžaduje pozornost</item>
+        <item quantity="many">%1$d vyžadují pozornost</item>
+        <item quantity="other">%1$d vyžadují pozornost</item>
+    </plurals>
+    <string name="permissions_nothing_needed">Nic nevyžaduje vaši pozornost</string>
+    <string name="permissions_show">Zobrazit oprávnění</string>
     <string name="phone_location">Poloha telefonu</string>
     <string name="phone_location_description">Meshtastic využívá polohu telefonu pro některé funkce. Oprávnění k poloze si můžete kdykoli upravit v nastavení.</string>
     <plurals name="plurals_hours">
@@ -1041,6 +1334,7 @@
     <string name="rebroadcast_mode_none_desc">Povoleno pouze pro role SENSOR, TRACKER a TAK_TRACKER. Toto nastavení zabrání všem opakovaným vysíláním, podobně jako role CLIENT_MUTE.</string>
     <string name="recent_network_devices">Nedávná síťová zařízení</string>
     <string name="red">Červená</string>
+    <string name="refresh">Obnovit</string>
     <string name="refresh_metadata">Obnovit metadata</string>
     <string name="regenerate_keys_confirmation">Jste si jisti, že chcete obnovit svůj soukromý klíč?\n\nUzly, které si již vyměnily klíče s tímto uzlem, budou muset odebrat tento uzel a vyměnit klíče pro obnovení bezpečné komunikace.</string>
     <string name="regenerate_private_key">Obnovit soukromý klíč</string>
@@ -1075,8 +1369,10 @@
     <string name="request_air_quality_metrics">Metriky kvality ovzduší</string>
     <string name="request_device_metrics">Metriky zařízení</string>
     <string name="request_environment_metrics">Metriky prostředí</string>
+    <string name="request_host_metrics">Metriky hostitele</string>
     <string name="request_local_stats">Lokální statistiky</string>
     <string name="request_metadata">Metadata</string>
+    <string name="request_pax_metrics">Metriky Pax</string>
     <string name="request_power_metrics">Metriky napájení</string>
     <string name="request_telemetry">Vyžádat telemetrii</string>
     <string name="requesting_from">Vyžádání %1$s od %2$s</string>
@@ -1104,6 +1400,7 @@
     <string name="role_tracker_desc">Prioritně vysílá pakety s pozicí GPS.</string>
     <string name="root_topic">Kořenové téma</string>
     <string name="rotary_encoder_1_enabled">Rotační enkodér #1 povolen</string>
+    <string name="router_role_confirmation_text">Seznámil jsem se s &lt;a href="https://meshtastic.org/docs/configuration/radio/device/#roles"&gt;dokumentací k rolím zařízení&lt;/a&gt; a příspěvkem na blogu o &lt;a href="http://meshtastic.org/blog/choosing-the-right-device-role"&gt;výběru správné role zařízení&lt;/a&gt;.</string>
     <!-- ROUTING -->
     <string name="routing_error_got_nak">Obdrženo negativní potvrzení</string>
     <string name="routing_error_max_retransmit">Nepodařilo se doručit do mesh sítě</string>
@@ -1136,6 +1433,7 @@
     <string name="scanning_network">Vyhledávání…</string>
     <string name="screen_on_for">Obrazovka zapnutá po dobu</string>
     <string name="search_emoji">Hledat emoji...</string>
+    <string name="search_messages">Hledat zprávy…</string>
     <string name="secondary">Sekundární</string>
     <string name="secondary_channel_position_feature">Vypnutí odesílání polohy na primárním kanálu umožní pravidelné vysílání polohy na prvním sekundárním kanálu, kde je odesílání polohy povoleno. V opačném případě je nutné polohu vyžádat ručně.</string>
     <string name="secondary_no_telemetry">Žádné pravidelné telemetrické vysílání</string>
@@ -1195,9 +1493,13 @@
     <string name="should_update">Chcete-li využít nejnovějších oprav a funkcí, aktualizujte firmware vašeho uzlu.\n\nPoslední stabilní verze firmwaru: %1$s</string>
     <string name="should_update_firmware">Doporučena aktualizace firmwaru.</string>
     <!-- SHOW -->
+    <string name="show_full_message_timestamps">Zobrazovat úplná časová razítka zpráv</string>
+    <string name="show_full_message_timestamps_summary">Vždy zobrazovat datum a čas v záhlaví konverzací a při akcích se zprávami</string>
     <string name="show_layer">Zobrazit vrstvu</string>
+    <string name="show_original">Zobrazit originál</string>
     <string name="show_password">Zobrazit heslo</string>
     <string name="show_precision_circle">Zobrazit kruhy přesnosti</string>
+    <string name="show_translation">Zobrazit překlad</string>
     <string name="show_waypoints">Zobrazit trasové body</string>
     <string name="shutdown">Vypnout</string>
     <string name="shutdown_node_name">Uzel: %1$s</string>
@@ -1232,26 +1534,62 @@
     <string name="snr_definition">Poměr signálu k šumu (SNR) je veličina používaná k vyjádření poměru mezi úrovní požadovaného signálu a úrovní šumu na pozadí. V Meshtastic a dalších bezdrátových systémech vyšší hodnota SNR značí čistší signál, což může zvýšit spolehlivost a kvalitu přenosu dat.</string>
     <string name="speed">Rychlost</string>
     <string name="ssid">SSID</string>
+    <string name="state_broadcast_seconds">Vysílání stavu (v sekundách)</string>
     <string name="status_message">Stavová zpráva</string>
     <string name="status_message_config">Nastavení stavové zprávy</string>
     <string name="stay_connected_anywhere">Zůstaňte připojeni kdekoliv</string>
     <string name="stop_connecting">Zastavit připojování</string>
+    <string name="store_forward">Ukládání a předávání</string>
+    <string name="store_forward_config">Nastavení ukládání a předávání</string>
+    <string name="store_forward_enabled">Ukládání a předávání povoleno</string>
     <string name="subnet">Podsíť</string>
     <string name="super_deep_sleep_duration_seconds">Doba super hlubokého spánku</string>
     <string name="supported">Podporované</string>
     <string name="supported_by_community">Podporováno komunitou Meshtastic</string>
+    <string name="swipe_action_delete">Smazat</string>
+    <string name="swipe_action_mute">Ztlumit</string>
+    <string name="swipe_action_unmute">Zrušit ztlumení</string>
     <string name="sx126x_rx_boosted_gain">Zvýšené zesílení přijímače (RX)</string>
     <string name="system_settings">Nastavení systému</string>
     <!-- TAK -->
     <string name="tak">TAK (ATAK)</string>
     <string name="tak_config">Nastavení TAK</string>
-    <string name="tak_server_enabled">Povolit lokální TAK server</string>
+    <string name="tak_server">TAK server</string>
+    <string name="tak_server_channel">TAK mesh kanál</string>
+    <string name="tak_server_channel_desc">Kanál Meshtastic používaný pro odchozí provoz TAK</string>
+    <string name="tak_server_enabled">Povolit místní TAK server</string>
+    <string name="tak_server_enabled_desc">Spustí místní TLS server na portu 8089 pro připojení k ATAK</string>
+    <string name="tak_server_export_data_package_desc">Vygenerovat soubor .zip pro připojení ATAK k tomuto serveru</string>
+    <string name="tak_server_loading">…</string>
+    <string name="tak_server_mesh_to_cot">Převodník Mesh na CoT</string>
+    <string name="tak_server_mesh_to_cot_desc">Zobrazovat uzly Meshtastic na mapě ATAK jako kontakty</string>
+    <string name="tak_server_permission_blocked">Server TAK potřebuje pro přijímání připojení přístup k místní síti a Android se už nezeptá. Funkce byla prozatím vypnuta – povolte přístup v nastavení aplikace a znovu ji zapněte.</string>
     <string name="tak_server_section">Server</string>
     <string name="tak_server_status">Stav</string>
+    <string name="tak_server_status_failed">Server TAK se nepodařilo spustit. Vypněte a znovu zapněte tuto funkci a zkuste to znovu.</string>
+    <string name="tak_server_status_not_running">TAK server není spuštěn</string>
     <string name="tak_server_status_off">Vypnuto</string>
+    <string name="tak_server_status_unavailable">Místní TAK server je k dispozici v aplikaci Meshtastic pro Android</string>
+    <string name="tak_server_status_waiting">Server naslouchá na 127.0.0.1:8089 — čeká na ATAK</string>
+    <string name="tak_server_test_result_bytes">%1$dB ✓</string>
+    <string name="tak_server_test_result_unknown_error">✗</string>
+    <string name="tak_server_v1_fallback_notice">Firmware připojeného uzlu nepodporuje plnou integraci TAK – do ATAK se budou přenášet pouze polohy a chatové zprávy. Značky a další typy událostí vyžadují firmware verze 2.8.0 nebo novější.</string>
+    <string name="tak_team">Barva týmu</string>
     <string name="tak_team_blue">Modrá</string>
+    <string name="tak_team_brown">Hnědá</string>
+    <string name="tak_team_cyan">Azurová</string>
+    <string name="tak_team_dark_blue">Tmavě modrá</string>
+    <string name="tak_team_dark_green">Tmavě zelená</string>
     <string name="tak_team_green">Zelená</string>
+    <string name="tak_team_magenta">Purpurová</string>
+    <string name="tak_team_maroon">Vínová</string>
+    <string name="tak_team_orange">Oranžová</string>
+    <string name="tak_team_purple">Fialová</string>
     <string name="tak_team_red">Červená</string>
+    <string name="tak_team_teal">Tyrkysová</string>
+    <string name="tak_team_unspecified_color">Nespecifikováno</string>
+    <string name="tak_team_white">Bílá</string>
+    <string name="tak_team_yellow">Žlutá</string>
     <string name="telemetry">Telemetrie</string>
     <string name="telemetry_config">Nastavení telemetrie</string>
     <string name="temperature">Teplota</string>
@@ -1291,6 +1629,8 @@
     <string name="track_and_share_locations">Sledujte a sdílejte polohu</string>
     <string name="track_point">bod trasy</string>
     <!-- TRAFFIC -->
+    <string name="traffic_management_drop_unknown_enabled">Zahazovat neznámé pakety</string>
+    <string name="traffic_management_enabled">Modul povolen</string>
     <string name="traffic_management_position_min_interval">Minimální interval pozice (v sekundách)</string>
     <string name="translate">Překlad</string>
     <!-- TRANSLATION -->
@@ -1298,6 +1638,7 @@
     <string name="translation_download_title">Stáhnout překladový model?</string>
     <string name="translation_downloading">Stahování překladového modelu…</string>
     <string name="translation_model_download_failed">Stažení překladového modelu se nezdařilo</string>
+    <string name="translation_not_required">Zpráva je již ve vašem jazyce</string>
     <string name="transmit_over_lora">Přenos přes LoRa</string>
     <!-- TRANSPORT -->
     <string name="transport">Přenos</string>
@@ -1317,6 +1658,12 @@
     <string name="type">Typ</string>
     <string name="type_a_message">Napište zprávu</string>
     <string name="udp_enabled">UDP vysílání</string>
+    <!-- UNITS -->
+    <string name="units">Jednotky</string>
+    <string name="units_follow_system">Podle systému</string>
+    <string name="units_imperial">Imperiální</string>
+    <string name="units_metric">Metrický</string>
+    <string name="units_scope_summary">Určuje, jak aplikace zobrazuje vzdálenost, nadmořskou výšku, rychlost a teplotu. Displej samotného zařízení se řídí jeho vlastním nastavením displeje.</string>
     <!-- UNKNOWN -->
     <string name="unknown">Neznámé</string>
     <string name="unknown_age">Neznámé stáří</string>
@@ -1333,6 +1680,7 @@
     <string name="update_interval">Interval aktualizace GPS</string>
     <string name="update_interval_seconds">Interval aktualizace (v sekundách)</string>
     <string name="updated">Aktualizováno</string>
+    <string name="uplink_enabled">Odesílání MQTT dat povoleno</string>
     <string name="uplink_feature_description">Zprávy z mesh sítě budou odesílány do veřejného internetu prostřednictvím libovolného uzlu, který má nakonfigurovanou bránu.</string>
     <string name="uptime">Doba provozu</string>
     <!-- URL -->
@@ -1340,6 +1688,7 @@
     <string name="url_cannot_be_empty">Adresa URL nesmí být prázdná.</string>
     <string name="url_template">URL šablona</string>
     <string name="usb">USB</string>
+    <string name="usb_permission_denied">Přístup k USB byl zamítnut. Odpojte a znovu připojte zařízení a zkuste to znovu.</string>
     <!-- USE -->
     <string name="use_12h_format">Použít 12h formát hodin</string>
     <string name="use_homoglyph_characters_encoding">Úsporné kódování pro cyriliku</string>
@@ -1355,7 +1704,9 @@
     <string name="userinfo">Informace o uživateli</string>
     <string name="username">Uživatelské jméno</string>
     <string name="uv_lux">UV lux</string>
+    <string name="via_api">přes API</string>
     <string name="via_mqtt">přes MQTT</string>
+    <string name="via_udp">přes UDP</string>
     <string name="view_on_map">Zobrazit na mapě</string>
     <string name="view_release">Zobrazit vydání</string>
     <string name="voltage">Napětí</string>
@@ -1366,11 +1717,20 @@
     <string name="waypoint_edit">Upravit waypoint</string>
     <string name="waypoint_new">Nový waypoint</string>
     <string name="waypoint_received">Přijatý waypoint: %1$s</string>
+    <string name="website">Webová stránka</string>
     <string name="weight">Hmotnost</string>
+    <string name="what_is_meshtastic">Co je Meshtastic?</string>
+    <string name="what_is_meshtastic_description">Open source, decentralizovaná mesh síť fungující bez běžné infrastruktury, která využívá cenově dostupná rádiová zařízení s nízkou spotřebou.</string>
     <!-- WIFI -->
     <string name="wifi_config">Nastavení WiFi</string>
+    <string name="wifi_devices">Nastavení Wi-Fi pro mPWRD-OS</string>
     <string name="wifi_enabled">WiFi povoleno</string>
+    <string name="wifi_provision_available_networks">Dostupné sítě</string>
+    <string name="wifi_provision_connect_failed">Nelze se připojit: %1$s</string>
+    <string name="wifi_provision_description">Nastavit přihlašovací údaje k Wi-Fi v zařízení mPWRD-OS přes Bluetooth.</string>
+    <string name="wifi_provision_device_found">Zařízení nalezeno</string>
     <string name="wifi_provision_device_found_detail">Připraveno prohledávat WiFi sítě.</string>
+    <string name="wifi_provision_hidden_network">Skrytá síť</string>
     <string name="wifi_provision_mpwrd_disclaimer">Více informací o projektu mPWRD-OS\nhttps://github.com/mPWRD-OS</string>
     <string name="wifi_provision_no_networks">Žádná síť nebyla nalezena</string>
     <string name="wifi_provision_scan_failed">Nepodařilo se prohledat WiFi sítě: %1$s</string>
@@ -1378,15 +1738,34 @@
     <string name="wifi_provision_scanning_ble">Vyhledávání zařízení…</string>
     <string name="wifi_provision_scanning_wifi">Vyhledávání…</string>
     <string name="wifi_provision_signal_strength">%1$d%</string>
+    <string name="wifi_provision_ssid_label">Název sítě (SSID)</string>
+    <string name="wifi_provision_ssid_placeholder">Zadejte nebo vyberte síť</string>
+    <string name="wifi_provision_status_applied">Wi-Fi byla úspěšně nakonfigurována!</string>
+    <string name="wifi_provision_status_failed">Nepodařilo se použít konfiguraci Wi-Fi</string>
     <string name="wifi_provision_success_description">Vaše zařízení mPWRD-OS se připojilo k Wi-Fi síti.</string>
+    <string name="wifi_provision_success_device_connected">Zařízení připojeno</string>
     <string name="wifi_provision_success_done">Hotovo</string>
     <string name="wifi_provision_success_ip_address">IP adresa</string>
+    <string name="wifi_provision_success_missing_ip">IP adresa není k dispozici</string>
+    <string name="wifi_provision_success_open_ssh">Otevřít SSH klienta</string>
+    <string name="wifi_provision_success_open_ssh_fallback">Pokud se žádná aplikace neotevře, zkopírujte příkaz SSH a vložte jej do svého SSH klienta.</string>
+    <string name="wifi_provision_success_setup_description">Přihlaste se přes SSH a změňte výchozí uživatelské jméno a heslo.</string>
+    <string name="wifi_provision_success_setup_title">Dokončit nastavení zařízení</string>
+    <string name="wifi_provision_success_ssh_command">ssh %1$s@%2$s</string>
+    <string name="wifi_provision_success_ssh_label">Příkaz SSH</string>
+    <string name="wifi_provision_success_ssh_unavailable">Příkaz SSH bude k dispozici po přidělení IP adresy.</string>
     <string name="wifi_provision_success_username">Uživatelské jméno</string>
+    <string name="wifi_provisioning">Nastavení Wi-Fi pro mPWRD-OS</string>
     <string name="wifi_qr_code_error">Neplatný formát QR kódu WiFi</string>
     <string name="wifi_qr_code_scan">Skenovat WiFi QR kód</string>
     <string name="wifi_rssi_threshold_defaults_to_80">Práh WiFi RSSI (výchozí hodnota -80)</string>
+    <string name="wifi_unavailable">Nejste připojeni k Wi-Fi. Vyhledávání v síti nemusí najít zařízení v okolí.</string>
     <!-- WIND -->
     <string name="wind">Vítr</string>
+    <string name="wind_direction">Směr větru</string>
+    <string name="wind_gust">Nárazy větru</string>
+    <string name="wind_lull">Nejnižší rychlost větru</string>
+    <string name="wind_speed">Rychlost větru</string>
     <!-- WRITE -->
     <string name="write_nfc">Zapsat na NFC tag</string>
     <string name="write_nfc_failed">Nelze zapsat do tagu. Použijte zapisovatelný, prázdný NFC tag a podržte jej stabilně.</string>

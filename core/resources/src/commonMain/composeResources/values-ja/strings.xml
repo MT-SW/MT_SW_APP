@@ -167,7 +167,6 @@
     <string name="buzzer_gpio">ブザー GPIO</string>
     <string name="calculating">計算中…</string>
     <string name="call_sign">コールサイン</string>
-    <string name="call_sign_summary">アマチュア無線のコールサイン（最大8文字）</string>
     <string name="camera_permission">カメラの権限</string>
     <string name="camera_permission_rationale">QR コードをスキャンするために、カメラへのアクセスを許可してください。</string>
     <string name="camera_unavailable">カメラを起動できませんでした。もう一度試すか、スキャナーを閉じて開き直してください。</string>
@@ -224,6 +223,7 @@
     <string name="clean_nodes_older_than">最終確認が %1$d 日より前のノードをクリーンアップ</string>
     <string name="clean_now">今すぐクリーンアップ</string>
     <string name="clean_unknown_nodes">不明なノードのみをクリーンアップ</string>
+    <!-- CLEAR -->
     <string name="clear">削除</string>
     <string name="clear_selection">選択を解除</string>
     <string name="clear_time_zone">タイムゾーンをクリア</string>
@@ -501,7 +501,6 @@
     <string name="dns">DNS</string>
     <!-- DOC -->
     <string name="doc_clear_search">検索をクリア</string>
-    <string name="doc_keywords_android_auto">Android Auto,車,カーナビ,運転,ハンズフリー,メッセージ,android auto,car,head unit,driving,hands free,messaging</string>
     <string name="doc_keywords_app_functions">システムAI,Gemini,アシスタント,機能,自動化,音声,system ai,gemini,assistant,functions,automation,voice</string>
     <string name="doc_keywords_connections">Bluetooth,接続,ペアリング,シリアル,WiFi,bluetooth,usb,tcp,pairing,serial,wifi</string>
     <string name="doc_keywords_debug_logs">デバッグ,ログ,logcat,エクスポート,バグ報告,問題,トラブルシューティング,診断,debug,logs,logcat,export,bug report,issue,troubleshooting,diagnostics</string>
@@ -527,12 +526,11 @@
     <string name="doc_search_placeholder">ドキュメントを検索…</string>
     <string name="doc_section_developer">開発者ガイド</string>
     <string name="doc_section_user">ユーザーガイド</string>
-    <string name="doc_title_android_auto">Android Auto</string>
     <string name="doc_title_app_functions">アプリ機能</string>
     <string name="doc_title_connections">接続</string>
     <string name="doc_title_debug_logs">デバッグログ</string>
     <string name="doc_title_desktop">デスクトップアプリ</string>
-    <string name="doc_title_discovery">探索</string>
+    <string name="doc_title_discovery">ローカルメッシュ探索</string>
     <string name="doc_title_firmware">ファームウェア更新</string>
     <string name="doc_title_help">ヘルプとアプリ内ドキュメント</string>
     <string name="doc_title_map">マップとウェイポイント</string>
@@ -686,7 +684,6 @@
     <string name="firmware_update_open_flasher">Meshtastic Flasher を開く</string>
     <string name="firmware_update_ota_failed">OTA 更新に失敗しました：%1$s</string>
     <string name="firmware_update_ota_unsupported_reason">このデバイスの OTA ローダーが、要求された更新方法を拒否しました：%1$s</string>
-    <string name="firmware_update_rak4631_bootloader_hint">RAK WisBlock RAK4631 では、ベンダー提供のシリアル DFU ツール（例：付属のブートローダー .zip ファイルを使った adafruit-nrfutil dfu serial）を使用してください。.uf2 ファイルをコピーするだけではブートローダーは更新されません。</string>
     <string name="firmware_update_rebooting">DFU モードへ再起動しています…</string>
     <string name="firmware_update_release_notes">リリースノート</string>
     <string name="firmware_update_requires_bin">%1$s には、ターゲットに一致する .bin ファイルが必要です。</string>
@@ -836,6 +833,7 @@
     <string name="ip_port">ポート：</string>
     <string name="ipv4_mode">IPv4 モード</string>
     <string name="json_output_enabled">JSON出力の有効化</string>
+    <string name="jump_to_latest_from">%1$s</string>
     <!-- KEY -->
     <string name="key_backup_deleted">鍵のバックアップを削除しました</string>
     <string name="key_backup_not_found">このノードの鍵のバックアップが見つかりません</string>
@@ -902,6 +900,7 @@
     <string name="local_stats_updated_at">%1$s</string>
     <string name="local_stats_uptime">稼働時間： %1$s</string>
     <string name="local_stats_utilization">ChUtil: %1$s% | AirTX: %2$s%</string>
+    <!-- LOCATION -->
     <string name="location_disabled">位置情報が無効なため、メッシュネットワークに位置情報を提供できません。</string>
     <string name="location_sharing">位置情報の共有</string>
     <!-- LOCKDOWN -->
@@ -1026,7 +1025,6 @@
     <string name="mesh_beacon_on_region">送信リージョン</string>
     <string name="mesh_beacon_preset_indicator">近くのビーコンによって告知</string>
     <string name="mesh_beacon_preset_none">なし</string>
-    <string name="mesh_beacon_send_as_node">発信元のノード番号（0 = このノード）</string>
     <string name="mesh_beacon_target">ターゲット %1$d</string>
     <string name="mesh_beacon_target_add">ターゲットを追加</string>
     <string name="mesh_beacon_target_channel_index">チャンネルインデックス</string>
@@ -1289,7 +1287,10 @@
     <string name="paxcounter_config">Paxcounter 設定</string>
     <string name="paxcounter_enabled">Paxcounter を有効化</string>
     <string name="periodic_position_broadcast">定期的な位置情報ブロードキャスト</string>
+    <!-- PERMISSION -->
     <string name="permission_missing_31">Meshtastic が Bluetooth でデバイスを検出して接続するには、「付近のデバイス」の権限を有効にする必要があります。使用しないときは無効にできます。</string>
+    <!-- PERMISSIONS -->
+    <string name="permissions">権限</string>
     <string name="phone_location">スマートフォンの位置情報</string>
     <string name="phone_location_description">Meshtastic は、さまざまな機能を有効にするためにスマートフォンの位置情報を使用します。位置情報の権限は、設定からいつでも更新できます。</string>
     <string name="play">再生</string>
@@ -1608,6 +1609,9 @@
     <string name="super_deep_sleep_duration_seconds">スーパーディープスリープの時間</string>
     <string name="supported">対応済み</string>
     <string name="supported_by_community">Meshtastic コミュニティによるサポート</string>
+    <string name="swipe_action_delete">削除</string>
+    <string name="swipe_action_mute">ミュート</string>
+    <string name="swipe_action_unmute">ミュート解除</string>
     <string name="sx126x_rx_boosted_gain">RX ブーストゲイン</string>
     <string name="system_settings">システム設定</string>
     <!-- TAK -->
@@ -1633,7 +1637,6 @@
     <string name="tak_server_test_idle">%1$d 件のテストフィクスチャをすべてメッシュに送信</string>
     <string name="tak_server_test_result_bytes">%1$dB ✓</string>
     <string name="tak_server_test_result_unknown_error">✗</string>
-    <string name="tak_server_test_results">%1$d 件成功、%2$d 件失敗 / %3$d/%4$d</string>
     <string name="tak_server_test_run">実行</string>
     <string name="tak_server_test_running">実行中：%1$s</string>
     <string name="tak_team">チームカラー</string>
@@ -1732,6 +1735,9 @@
     <string name="type">種別</string>
     <string name="type_a_message">メッセージを入力</string>
     <string name="udp_enabled">UDP ブロードキャスト</string>
+    <!-- UNITS -->
+    <string name="units_follow_system">システムのデフォルト</string>
+    <string name="units_metric">メートル法</string>
     <!-- UNKNOWN -->
     <string name="unknown">不明</string>
     <string name="unknown_age">年齢不明</string>

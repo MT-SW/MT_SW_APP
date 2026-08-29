@@ -2,7 +2,7 @@
 title: Connections
 parent: User Guide
 nav_order: 2
-last_updated: 2026-07-08
+last_updated: 2026-08-27
 description: Connect your phone or desktop to a Meshtastic radio via Bluetooth, USB, or TCP/IP.
 aliases:
   - bluetooth
@@ -33,18 +33,31 @@ Use the transport selector — a segmented button row below the connection card 
 
 ![Transport selector](../../assets/screenshots/connections_transport_filters.png)
 
-> 💡 **Tip:** If your device doesn't appear, check that Bluetooth and Location permissions are granted, and that the radio is not already connected to another device.
+> 💡 **Tip:** If your device doesn't appear, check that the radio is not already connected to another device or out of range.
+
+The screen names anything on the app's side that is blocking a scan, with the fix attached:
+
+| What you see                                        | What it means                                                                                                                                                              |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A card asking for **Nearby devices**                | The permission has not been granted. **Grant permission** requests it; once Android stops prompting, the button becomes **Open settings**. |
+| **Bluetooth is off**                                | The adapter is disabled — the card opens Bluetooth settings.                                                                                               |
+| **Bluetooth scanning also needs location services** | Android 11 and older only: the permission is held but the system location toggle is off.                                                   |
+| No card, empty list                                 | Nothing on this side is blocking the scan — the radio is out of range, off, or already connected elsewhere.                                                |
+
+Tapping **Scan** after you have declined the permission once explains what it is for before asking again, and lets you decline again without being cornered.
 
 ### Connection Status
 
-| Иконица | State          | Опис                          |
-| ------- | -------------- | ----------------------------- |
-| 🟢      | Блутут повезан | Active radio link established |
-| 🟡      | Connecting     | Handshake in progress         |
-| 🔴      | Раскачено      | No active connection          |
-| ⚪       | Not configured | No device selected            |
+| Иконица | State                     | Опис                                                                                       |
+| ------- | ------------------------- | ------------------------------------------------------------------------------------------ |
+| 🟢      | Блутут повезан            | Active radio link established                                                              |
+| 🟡      | Connecting                | Handshake in progress                                                                      |
+| 🔴      | Раскачено                 | No active connection; the app keeps trying to reconnect                                    |
+| ⚪       | Уређај је у стању спавања | The radio is in light sleep — the app is waiting for it to wake and reconnect, not failing |
 
-When connecting, a status indicator shows the current connection state:
+These are the four states the app models. "Device sleeping" is normal on power-saving configurations and needs no action.
+
+When connecting, a status indicator shows the current connection state — tap **Stop Connecting** to abandon the attempt:
 
 ![Connecting status](../../assets/screenshots/connections_connecting.png)
 
@@ -68,11 +81,17 @@ USB connections provide a wired alternative, useful for desktop or when Bluetoot
 2. The app will prompt for USB permission — tap **Allow**.
 3. The connection is established automatically.
 
-> ⚠️ **Note:** USB connections require OTG support on Android devices.
+> ℹ️ **Note:** USB connections require OTG support on Android devices.
 
 ## TCP/IP (Network)
 
 Some Meshtastic radios support WiFi/Ethernet connectivity, allowing TCP-based connections over your local network. Get the radio onto your network first — using the radio's own WiFi settings (via the firmware web interface or another connection) — then connect to it from the app.
+
+> ℹ️ **Note:** **Settings → Wi-Fi Provisioning for mPWRD-OS** is a separate, narrower tool. It provisions WiFi
+> credentials over Bluetooth to **mPWRD-OS** devices only, using their own protocol — it does not
+> configure WiFi on an ordinary Meshtastic radio. It scans over BLE, lists the networks the device
+> can see (including an option for a hidden SSID), takes the password, and reports success or
+> failure. Available on both Android and Desktop.
 
 ### Connecting over the Network
 

@@ -17,13 +17,17 @@
 package org.meshtastic.app.map
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.res.Resources
 import android.os.Handler
 import android.os.Looper
+import android.util.AndroidRuntimeException
 import android.webkit.JavascriptInterface
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -60,12 +64,13 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.site_planner_estimating
 import org.meshtastic.core.resources.site_planner_failed
+import org.meshtastic.core.resources.site_planner_webview_updating
+import org.meshtastic.feature.map.component.SITE_PLANNER_URL
 import org.meshtastic.feature.map.component.SitePlannerParams
 import org.meshtastic.feature.map.component.SitePlannerSheet
 
 // The official hosted Site Planner (static PWA on GitHub Pages). The estimate flow loads it headless with
 // run=1&bridge=1; the native bridge + full flat query contract it relies on shipped in site-planner #74.
-private const val SITE_PLANNER_BASE_URL = "https://site.meshtastic.org"
 private const val SITE_PLANNER_TIMEOUT_MS = 45_000L
 
 /**
@@ -92,6 +97,7 @@ fun SitePlannerHost(
     val context = LocalContext.current
     val failedText = stringResource(Res.string.site_planner_failed)
     val estimatingText = stringResource(Res.string.site_planner_estimating)
+    val webViewUpdatingText = stringResource(Res.string.site_planner_webview_updating)
 
     val current = running
     if (current == null) {
@@ -129,7 +135,7 @@ fun SitePlannerHost(
             // a detached or 0-size WebView can't get a WebGL context, and the planner's autorun waits on map load.
             Box(modifier = Modifier.size(280.dp), contentAlignment = Alignment.Center) {
                 SitePlannerRunner(
-                    url = current.toQueryUrl(SITE_PLANNER_BASE_URL),
+                    url = current.toQueryUrl(SITE_PLANNER_URL),
                     onResult = { geoJson ->
                         onImport(current.name, geoJson, current.latitude, current.longitude)
                         onDismiss()
@@ -137,6 +143,10 @@ fun SitePlannerHost(
                     onError = { detail ->
                         Logger.withTag("SitePlanner").e { "Coverage estimate failed: $detail" }
                         Toast.makeText(context, failedText, Toast.LENGTH_SHORT).show()
+                        onDismiss()
+                    },
+                    onWebViewUnavailable = {
+                        Toast.makeText(context, webViewUpdatingText, Toast.LENGTH_LONG).show()
                         onDismiss()
                     },
                     // Headless: fully transparent so the WebGL first-paint frame never flashes through, but still
@@ -173,59 +183,137 @@ fun SitePlannerHost(
 /**
  * Headless WebView that loads [url] (the planner with `run=1&bridge=1`), exposes a `window.__meshtasticNative` bridge,
  * and reports the coverage GeoJSON via [onResult] once the planner posts it. Main-frame load failures go to [onError].
+ * Construction rides out the system WebView provider-update race with one deferred retry, then [onWebViewUnavailable].
  */
-@SuppressLint("SetJavaScriptEnabled")
 @Composable
 private fun SitePlannerRunner(
     url: String,
     onResult: (String) -> Unit,
     onError: (String) -> Unit,
+    onWebViewUnavailable: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val onResultState by rememberUpdatedState(onResult)
     val onErrorState by rememberUpdatedState(onError)
+    val onWebViewUnavailableState by rememberUpdatedState(onWebViewUnavailable)
     AndroidView(
         modifier = modifier,
         factory = { context ->
-            val main = Handler(Looper.getMainLooper())
-            WebView(context).apply {
-                setBackgroundColor(android.graphics.Color.TRANSPARENT) // no opaque black backing before first paint
-                settings.javaScriptEnabled = true
-                settings.domStorageEnabled = true
-                addJavascriptInterface(
-                    object {
-                        // Called from the planner's JS thread — hop to main before touching Compose state.
-                        @JavascriptInterface fun onCoverage(geoJson: String) = main.post { onResultState(geoJson) }
-                    },
-                    "__meshtasticNative",
+            SitePlannerWebViewContainer(context).apply {
+                attachPlannerWebView(
+                    url = url,
+                    retriesLeft = 1,
+                    onResult = { onResultState(it) },
+                    onError = { onErrorState(it) },
+                    onUnavailable = { onWebViewUnavailableState() },
                 )
-                webViewClient =
-                    object : WebViewClient() {
-                        // Keep the __meshtasticNative bridge exclusive to the planner's own origin: block any
-                        // navigation
-                        // elsewhere (redirect/compromise/open-redirect) so foreign content can never reach
-                        // onCoverage().
-                        // Sub-resource fetches (tiles, XHR) aren't navigations, so this doesn't affect the sim itself.
-                        override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                            val target = request?.url ?: return false
-                            val trusted = SITE_PLANNER_BASE_URL.toUri()
-                            return target.scheme != trusted.scheme || target.host != trusted.host
-                        }
-
-                        override fun onReceivedError(
-                            view: WebView?,
-                            request: WebResourceRequest?,
-                            error: WebResourceError?,
-                        ) {
-                            // Only a failed main-frame load is fatal; a stray tile/asset 404 is not.
-                            if (request?.isForMainFrame == true) {
-                                main.post { onErrorState("${error?.errorCode} ${error?.description}") }
-                            }
-                        }
-                    }
-                loadUrl(url)
             }
         },
-        onRelease = WebView::destroy,
+        onRelease = SitePlannerWebViewContainer::release,
     )
+}
+
+// One deferred retry bridges the moment the system WebView provider package finishes updating.
+private const val WEBVIEW_RETRY_DELAY_MS = 250L
+
+/**
+ * True for the exceptions WebView construction throws while the system WebView provider package updates underneath a
+ * running app: the AOSP ResourcesImpl redirect race and the AndroidRuntimeException wrapper around provider failures.
+ */
+internal fun isWebViewProviderUpdateException(throwable: Throwable): Boolean =
+    throwable is Resources.NotFoundException ||
+        (throwable is AndroidRuntimeException && throwable.message?.contains("WebView", ignoreCase = true) == true)
+
+/** Hosts the planner WebView; owns the retry/bridge handler so [release] cancels anything still pending. */
+private class SitePlannerWebViewContainer(context: Context) : FrameLayout(context) {
+    val main = Handler(Looper.getMainLooper())
+
+    fun release() {
+        main.removeCallbacksAndMessages(null)
+        val webView = getChildAt(0) as? WebView
+        removeAllViews() // detach from the view system before destroy(), per the WebView docs
+        webView?.destroy()
+    }
+}
+
+/** Builds and attaches the planner WebView, absorbing the provider-update race with a single deferred retry. */
+private fun SitePlannerWebViewContainer.attachPlannerWebView(
+    url: String,
+    retriesLeft: Int,
+    onResult: (String) -> Unit,
+    onError: (String) -> Unit,
+    onUnavailable: () -> Unit,
+) {
+    // Only bare construction races the provider update; configure outside the try so no half-built view leaks.
+    val webView =
+        try {
+            WebView(context)
+        } catch (e: Resources.NotFoundException) {
+            if (!isWebViewProviderUpdateException(e)) throw e
+            retryOrFailSoft(e, retriesLeft, onUnavailable) {
+                attachPlannerWebView(url, retriesLeft - 1, onResult, onError, onUnavailable)
+            }
+            return
+        } catch (e: AndroidRuntimeException) {
+            if (!isWebViewProviderUpdateException(e)) throw e
+            retryOrFailSoft(e, retriesLeft, onUnavailable) {
+                attachPlannerWebView(url, retriesLeft - 1, onResult, onError, onUnavailable)
+            }
+            return
+        }
+    addView(configurePlannerWebView(webView, main, url, onResult, onError))
+}
+
+private fun SitePlannerWebViewContainer.retryOrFailSoft(
+    cause: Throwable,
+    retriesLeft: Int,
+    onUnavailable: () -> Unit,
+    retry: () -> Unit,
+) {
+    if (retriesLeft > 0) {
+        Logger.withTag("SitePlanner").w(cause) { "WebView provider is updating; retrying construction once" }
+        main.postDelayed({ retry() }, WEBVIEW_RETRY_DELAY_MS)
+    } else {
+        Logger.withTag("SitePlanner").e(cause) { "WebView unavailable after retry; failing soft" }
+        onUnavailable()
+    }
+}
+
+@SuppressLint("SetJavaScriptEnabled")
+private fun configurePlannerWebView(
+    webView: WebView,
+    main: Handler,
+    url: String,
+    onResult: (String) -> Unit,
+    onError: (String) -> Unit,
+): WebView = webView.apply {
+    setBackgroundColor(android.graphics.Color.TRANSPARENT) // no opaque black backing before first paint
+    settings.javaScriptEnabled = true
+    settings.domStorageEnabled = true
+    addJavascriptInterface(
+        object {
+            // Called from the planner's JS thread; hop to main before touching Compose state.
+            @JavascriptInterface fun onCoverage(geoJson: String) = main.post { onResult(geoJson) }
+        },
+        "__meshtasticNative",
+    )
+    webViewClient =
+        object : WebViewClient() {
+            // Keep the __meshtasticNative bridge exclusive to the planner's own origin: block any navigation
+            // elsewhere (redirect/compromise/open-redirect) so foreign content can never reach onCoverage().
+            // Sub-resource fetches (tiles, XHR) aren't navigations, so this doesn't affect the sim itself.
+            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                val target = request?.url ?: return false
+                val trusted = SITE_PLANNER_URL.toUri()
+                return target.scheme != trusted.scheme || target.host != trusted.host
+            }
+
+            override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+                // Only a failed main-frame load is fatal; a stray tile/asset 404 is not.
+                if (request?.isForMainFrame == true) {
+                    main.post { onError("${error?.errorCode} ${error?.description}") }
+                }
+            }
+        }
+    loadUrl(url)
 }

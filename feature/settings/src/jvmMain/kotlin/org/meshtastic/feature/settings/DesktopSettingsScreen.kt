@@ -41,6 +41,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.common.util.UnitsOverride
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.database.DatabaseConstants
 import org.meshtastic.core.navigation.DiscoveryRoute
@@ -53,8 +54,6 @@ import org.meshtastic.core.resources.app_settings
 import org.meshtastic.core.resources.app_version
 import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.bottom_nav_settings
-import org.meshtastic.core.resources.device_db_cache_limit
-import org.meshtastic.core.resources.device_db_cache_limit_summary
 import org.meshtastic.core.resources.device_links
 import org.meshtastic.core.resources.discovery_local_mesh
 import org.meshtastic.core.resources.export_configuration
@@ -67,14 +66,15 @@ import org.meshtastic.core.resources.node_layout_section_title
 import org.meshtastic.core.resources.preferences_language
 import org.meshtastic.core.resources.remotely_administrating
 import org.meshtastic.core.resources.theme
+import org.meshtastic.core.resources.units
 import org.meshtastic.core.resources.wifi_devices
-import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.ChevronRight
 import org.meshtastic.core.ui.icon.Device
+import org.meshtastic.core.ui.icon.Distance
 import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.HelpOutline
 import org.meshtastic.core.ui.icon.Info
@@ -87,10 +87,14 @@ import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.core.ui.util.rememberOpenFileLauncher
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.core.ui.util.rememberShowToastResource
+import org.meshtastic.feature.settings.component.CacheLimitPreference
 import org.meshtastic.feature.settings.component.ExpressiveSection
+import org.meshtastic.feature.settings.component.FullMessageTimestampsSetting
 import org.meshtastic.feature.settings.component.HomoglyphSetting
 import org.meshtastic.feature.settings.component.NotificationSection
 import org.meshtastic.feature.settings.component.ThemePickerDialog
+import org.meshtastic.feature.settings.component.UnitsOption
+import org.meshtastic.feature.settings.component.UnitsPickerDialog
 import org.meshtastic.feature.settings.navigation.ConfigRoute
 import org.meshtastic.feature.settings.navigation.ModuleRoute
 import org.meshtastic.feature.settings.radio.RadioConfigItemList
@@ -122,9 +126,19 @@ fun DesktopSettingsScreen(
     val cacheLimit by settingsViewModel.dbCacheLimit.collectAsStateWithLifecycle()
     val isOtaCapable by settingsViewModel.isOtaCapable.collectAsStateWithLifecycle()
     val autoLoadChatImages by settingsViewModel.autoLoadChatImages.collectAsStateWithLifecycle()
+    val showFullMessageTimestamps by settingsViewModel.showFullMessageTimestamps.collectAsStateWithLifecycle()
 
     var showThemePickerDialog by remember { mutableStateOf(false) }
     var showLanguagePickerDialog by remember { mutableStateOf(false) }
+    var showUnitsPickerDialog by remember { mutableStateOf(false) }
+    val unitsOverride = UnitsOverride.fromValue(settingsViewModel.unitsOverride.collectAsStateWithLifecycle().value)
+    if (showUnitsPickerDialog) {
+        UnitsPickerDialog(
+            current = unitsOverride,
+            onClickUnits = { settingsViewModel.setUnitsOverride(it) },
+            onDismiss = { showUnitsPickerDialog = false },
+        )
+    }
     if (showThemePickerDialog) {
         ThemePickerDialog(
             onClickTheme = { settingsViewModel.setTheme(it) },
@@ -261,23 +275,30 @@ fun DesktopSettingsScreen(
                         showLanguagePickerDialog = true
                     }
 
+                    ListItem(
+                        text = stringResource(Res.string.units),
+                        supportingText =
+                            stringResource(UnitsOption.entries.first { it.override == unitsOverride }.label),
+                        leadingIcon = MeshtasticIcons.Distance,
+                        trailingIcon = null,
+                    ) {
+                        showUnitsPickerDialog = true
+                    }
+
+                    FullMessageTimestampsSetting(
+                        checked = showFullMessageTimestamps,
+                        onCheckedChange = settingsViewModel::setShowFullMessageTimestamps,
+                    )
+
                     HomoglyphSetting(
                         homoglyphEncodingEnabled = homoglyphEnabled,
                         onToggle = { radioConfigViewModel.toggleHomoglyphCharactersEncodingEnabled() },
                     )
 
-                    val cacheItems = remember {
-                        (DatabaseConstants.MIN_CACHE_LIMIT..DatabaseConstants.MAX_CACHE_LIMIT).map {
-                            it.toLong() to it.toString()
-                        }
-                    }
-                    DropDownPreference(
-                        title = stringResource(Res.string.device_db_cache_limit),
-                        enabled = true,
-                        items = cacheItems,
-                        selectedItem = cacheLimit.toLong(),
-                        onItemSelected = { selected -> settingsViewModel.setDbCacheLimit(selected.toInt()) },
-                        summary = stringResource(Res.string.device_db_cache_limit_summary),
+                    CacheLimitPreference(
+                        cacheLimit = cacheLimit,
+                        onCheckEvictionCount = { settingsViewModel.cachedDeviceCountExceeding(it) },
+                        onSetCacheLimit = { settingsViewModel.setDbCacheLimit(it) },
                     )
 
                     SwitchListItem(
