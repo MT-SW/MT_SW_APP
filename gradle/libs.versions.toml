@@ -85,7 +85,7 @@ ktor = "3.5.2"
 # Other
 aboutlibraries = "15.2.0"
 jserialcomm = "2.11.4"
-coil = "3.6.0"
+coil = "3.6.1"
 jcefmaven = "146.0.10"
 datadog-gradle = "1.30.0"
 dd-sdk-android = "3.13.1"
@@ -105,7 +105,7 @@ mqttastic = "0.8.1"
 jmdns = "3.6.3"
 qrcode-kotlin = "4.5.0"
 takpacket-sdk = "0.9.1"
-meshtastic-protobufs = "2.7.26.159-g7b2464c-SNAPSHOT"
+meshtastic-protobufs = "2.8.0"
 
 # Gradle Plugins
 ccud = "2.8.0"
@@ -280,7 +280,6 @@ turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutlibraries" }
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutlibraries" }
 coil = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
-jcefmaven = { module = "me.friwi:jcefmaven", version.ref = "jcefmaven" }
 coil-network-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil" }
 
@@ -329,7 +328,7 @@ compose-gradlePlugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-
 compose-multiplatform-gradlePlugin = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose-multiplatform" }
 datadog-gradlePlugin = { module = "com.datadoghq.dd-sdk-android-gradle-plugin:com.datadoghq.dd-sdk-android-gradle-plugin.gradle.plugin", version.ref = "datadog-gradle" }
 compose-screenshot-gradlePlugin = { module = "com.android.compose.screenshot:screenshot-test-gradle-plugin", version.ref = "compose-screenshot" }
-detekt-compose = { module = "io.nlopez.compose.rules:detekt", version = "0.6.4" }
+detekt-compose = { module = "io.nlopez.compose.rules:detekt", version = "0.6.5" }
 detekt-formatting = { module = "dev.detekt:detekt-rules-ktlint-wrapper", version.ref = "detekt" }
 detekt-gradlePlugin = { module = "dev.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 firebase-crashlytics-gradlePlugin = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebase-crashlytics-gradle" }

@@ -77,4 +77,31 @@ class MapPrefsImplTest {
 
         assertEquals(expected, prefs.awaitCameraPosition())
     }
+
+    @Test
+    fun `map style await sees the persisted value rather than the eager default`() = testScope.runTest {
+        prefs.setMapStyle(3)
+
+        assertEquals(3, prefs.awaitMapStyle())
+    }
+
+    @Test
+    fun `layer opacity is absent until a slider is moved`() =
+        testScope.runTest { assertEquals(emptySet<String>(), prefs.layerOpacity.value) }
+
+    @Test
+    fun `layer opacity is persisted`() = testScope.runTest {
+        prefs.updateLayerOpacity { it + "hillshade|:|0.4" }
+
+        assertEquals(setOf("hillshade|:|0.4"), prefs.layerOpacity.value)
+    }
+
+    @Test
+    fun `a layer opacity update sees the persisted value rather than the eager default`() = testScope.runTest {
+        prefs.updateLayerOpacity { it + "hillshade|:|0.4" }
+
+        prefs.updateLayerOpacity { it + "weather|:|0.8" }
+
+        assertEquals(setOf("hillshade|:|0.4", "weather|:|0.8"), prefs.layerOpacity.value)
+    }
 }

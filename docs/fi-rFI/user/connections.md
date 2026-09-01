@@ -2,7 +2,7 @@
 title: Yhteydet
 parent: Käyttöopas
 nav_order: 2
-last_updated: 2026-08-27
+last_updated: 2026-08-30
 description: Yhdistä puhelin tai työpöytä Meshtastic-radioon Bluetoothin, USB:n tai TCP/IP:n kautta.
 aliases:
   - bluetooth
@@ -13,27 +13,29 @@ aliases:
 
 # Yhteydet
 
-Meshtastic tukee useita siirtotapoja puhelimen/työpöydän ja radion välillä viestimiseen.
+Meshtastic tukee useita yhteystapoja puhelimen tai työpöydän ja radion väliseen tiedonsiirtoon.
 
 ## Bluetooth (BLE)
 
 Bluetooth Low Energy on oletus ja yleisin yhteystapa Androidilla.
 
-### Laitteen pariliitos
+### Radion pariliittäminen
 
-1. Varmista, että Meshtastic-radio on päällä ja paritustilassa.
+1. Power on your radio. Most radios advertise over Bluetooth as soon as they boot — there is no pairing mode to enter. Radios with a color touchscreen ship with Bluetooth switched off, so turn it on from the radio's own on-screen menu first.
 2. Avaa sovellus ja siirry **Yhdistä**-välilehdelle.
 3. Napauta **Hae bluetooth-laitteita** — lähellä olevat Meshtastic-radiot ilmestyvät näkyville.
-4. Valitse laitteesi listasta.
-5. Hyväksy Bluetooth-pariliitospyyntö, jos se tulee näkyviin.
+4. Valitse radiosi luettelosta.
+5. Android asks you to pair. If your radio has a screen, it shows a six-digit PIN — type that into the Android dialog. If your radio has no screen, the PIN is `123456`.
 
 ![Bluetooth-laitteiden haku, jossa löytynyt radio näkyy luettelossa](../../assets/screenshots/connections_bluetooth_scan.png)
 
+You can change the pairing method, or turn Bluetooth on for a radio that ships with it off, under **Settings → Device configuration → Bluetooth** — see [Settings — Radio & User](settings-radio-user). For more information, see [Bluetooth configuration](https://meshtastic.org/docs/configuration/radio/bluetooth) on meshtastic.org.
+
 Vaihda bluetooth-, verkko- ja USB-yhteyksien välillä käyttämällä yhteyskortin alapuolella olevaa yhteysvalitsinta (vain yksi yhteystapa voi olla aktiivinen kerrallaan):
 
-![Yhteysvalitsin](../../assets/screenshots/connections_transport_filters.png)
+![Yhteydet-näkymä, jossa yhteystavan valitsin näyttää Bluetooth-, Verkko- ja USB-vaihtoehdot](../../assets/screenshots/connections_transport_filters.png)
 
-> 💡 **Vinkki:** Jos laitettasi ei näy, tarkista, ettei radio ole jo yhdistetty toiseen laitteeseen tai kantaman ulkopuolella.
+> 💡 **Vinkki:** Jos radioasi ei näy, varmista, ettei se ole jo yhdistetty toiseen puhelimeen tai ettei se ole kantaman ulkopuolella.
 
 Näytössä kerrotaan kaikki sovelluksen puolella olevat syyt, jotka estävät haun, sekä niiden ratkaisut:
 
@@ -44,20 +46,20 @@ Näytössä kerrotaan kaikki sovelluksen puolella olevat syyt, jotka estävät h
 | **Bluetooth-laitteiden haku edellyttää myös sijaintipalvelujen käyttöä** | Vain Android 11:ssä ja vanhemmissa versioissa: käyttöoikeus on myönnetty, mutta järjestelmän sijaintipalvelut ovat pois käytöstä.            |
 | Ei korttia, tyhjä luettelo                                               | Mikään sovelluksen puolella ei estä hakua – radio on kantaman ulkopuolella, pois käytöstä tai jo yhdistetty toiseen laitteeseen.                                             |
 
-Kun napautat **Hae** sen jälkeen, kun olet kerran hylännyt käyttöoikeuspyynnön, sovellus kertoo ensin, mihin käyttöoikeutta tarvitaan, ennen kuin pyytää sitä uudelleen. Näin voit myös kieltäytyä rauhassa ilman painostusta.
+The explanation lives in that card, not in the scan control: tapping **Scan for Bluetooth devices** after you have declined once asks Android again directly.
 
 ### Yhteyden tila
 
-| Ikoni | Tila                 | Kuvaus                                                                                     |
-| ----- | -------------------- | ------------------------------------------------------------------------------------------ |
-| 🟢    | Yhdistetty           | Aktiivinen radiolinkki muodostettu                                                         |
-| 🟡    | Yhdistetään          | Yhteyden muodostus käynnissä                                                               |
-| 🔴    | Ei yhdistetty        | No active connection; the app keeps trying to reconnect                                    |
-| ⚪     | Laite on lepotilassa | The radio is in light sleep — the app is waiting for it to wake and reconnect, not failing |
+| Ikoni | Tila                 | Kuvaus                                                                                                                 |
+| ----- | -------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| 🟢    | Yhdistetty           | Aktiivinen radiolinkki muodostettu                                                                                     |
+| 🟡    | Yhdistetään          | Yhteyden muodostus käynnissä                                                                                           |
+| 🔴    | Ei yhdistetty        | No active connection. The app retries automatically, with a growing delay between attempts             |
+| ⚪     | Laite on lepotilassa | Radio on kevyessä lepotilassa — sovellus odottaa sen heräävän ja muodostavan yhteyden uudelleen, kyse ei ole virheestä |
 
-These are the four states the app models. "Device sleeping" is normal on power-saving configurations and needs no action.
+Nämä ovat neljä yhteystilaa, joita sovellus käyttää. "Laite lepotilassa" on normaali virransäästöasetuksissa eikä vaadi mitään toimenpiteitä.
 
-When connecting, a status indicator shows the current connection state — tap **Stop Connecting** to abandon the attempt:
+Yhteyttä muodostettaessa tilailmaisin näyttää nykyisen yhteyden tilan — napauta **Lopeta yhteyden muodostaminen** keskeyttääksesi yrityksen:
 
 ![Yhdistämisen tila](../../assets/screenshots/connections_connecting.png)
 
@@ -67,9 +69,12 @@ Jos laitteita ei löydy, sovellus näyttää tyhjän näkymän ohjeiden kanssa:
 
 ### Bluetoothin vianmääritys
 
-- **Laitetta ei löydy:** Kytke Bluetooth pois/päälle ja varmista, että sijainti on käytössä.
+- **Radio not found:** Turn Bluetooth off and back on. On Android 11 and older, also check that system location services are switched on — those releases do not return scan results without them.
+- **Bluetooth scan couldn't start:** Try again, and toggle Bluetooth off and on if it repeats.
 - **Yhteys katkeaa:** Siirry lähemmäs radiota ja tarkista mahdolliset häiriöt.
+- **Pairing failed, or pairing did not complete:** Check that the **Nearby devices** permission is granted, then pair again.
 - **Paritus hylätty:** Poista laite Androidin Bluetooth-asetuksista ja yritä uudelleen.
+- **Could not establish a stable connection after repeated attempts:** The app stopped retrying after three failed handshakes — a radio that keeps failing here is usually crashing on reconnect. Power-cycle the radio, then tap it again on the **Connect** tab to start a fresh attempt.
 
 ## USB-sarjaporttiyhteys
 
@@ -77,32 +82,31 @@ USB-yhteydet tarjoavat langallisen vaihtoehdon, hyödyllinen työpöytäkäytös
 
 ### Asetukset
 
-1. Yhdistä radio USB-kaapelilla laitteeseesi.
-2. Sovellus pyytää USB-oikeuksia — paina **Salli**.
+1. Connect your radio to your phone with a USB data cable. Charge-only cables carry no data lines, and a radio on one never appears in the list.
+2. Sovellus pyytää USB-käyttöoikeutta — napauta **Salli**.
 3. Yhteys muodostetaan automaattisesti.
 
-> ℹ️ **Note:** USB connections require OTG support on Android devices.
+> ℹ️ **Huomautus:** USB-yhteydet edellyttävät Android-laitteissa OTG-tukea.
+
+### Troubleshooting USB
+
+- **USB permission denied:** Unplug the radio and plug it back in — Android asks again on reconnect.
+- **No radio in the list:** Check that the cable carries data rather than only power, and that the phone supports OTG.
 
 ## TCP/IP (Verkko)
 
-Jotkin Meshtastic-radiot tukevat WiFi tai Ethernet-yhteyttä, mikä mahdollistaa TCP-pohjaiset yhteydet lähiverkkosi kautta. Liitä radio ensin verkkoon käyttämällä radion omia WiFi-asetuksia (laiteohjelmiston verkkokäyttöliittymän tai muun yhteystavan kautta) — yhdistä siihen sitten sovelluksesta.
-
-> ℹ️ **Note:** **Settings → Wi-Fi Provisioning for mPWRD-OS** is a separate, narrower tool. It provisions WiFi
-> credentials over Bluetooth to **mPWRD-OS** devices only, using their own protocol — it does not
-> configure WiFi on an ordinary Meshtastic radio. It scans over BLE, lists the networks the device
-> can see (including an option for a hidden SSID), takes the password, and reports success or
-> failure. Available on both Android and Desktop.
+Jotkin Meshtastic-radiot tukevat WiFi-/Ethernet-yhteyttä, jolloin TCP-pohjaiset yhteydet toimivat lähiverkon kautta. Get the radio onto your network first. Connect to it over Bluetooth or USB, open **Settings → Device configuration → Network**, and under **Wi-Fi Options** turn on **Wi-Fi enabled** and enter the **SSID** and **Password**. The Network screen appears only for radios whose hardware supports Wi-Fi or Ethernet. Once the radio has an address, come back and connect to it over the network.
 
 ### Yhdistäminen verkon kautta
 
 1. Varmista, että radio on samassa lähiverkossa kuin puhelimesi tai tietokoneesi.
-2. Valitse yhdistä-näytössä yhteysvalitsimesta **Verkko**.
+2. On the **Connect** tab, select **Network** in the transport selector.
 3. Valitse radio jommallakummalla seuraavista tavoista:
    - **Hae verkkolaitteita** — ota tämä käyttöön, jotta lähiverkossa itsensä ilmoittavat radiot löytyvät automaattisesti (mDNS / `_meshtastic._tcp`). Löydetyt laitteet näkyvät luettelossa; yhdistä napauttamalla haluamaasi laitetta.
    - **Lisää laite manuaalisesti** — anna radion IP-osoite (tai isäntänimi) ja portti (oletus: `4403`).
-4. Aiemmin käytetyt verkko-osoitteet tallennetaan **Viimeisimmät verkkolaitteet** -osioon nopeaa uudelleenyhdistämistä varten (poista pitämällä painettuna).
+4. Aiemmin käytetyt verkko-osoitteet muistetaan kohdassa **Viimeisimmät verkkolaitteet**, jotta yhteyden muodostaminen uudelleen käy nopeasti (poista osoite koskettamalla sitä pitkään).
 
-> 💡 **Vinkki:** Verkkolaitteiden haku käyttää mDNS:ää, joka toimii vain, kun molemmat laitteet ovat samassa aliverkossa. Android 17:ssä ja uudemmissa versioissa sovellus tarvitsee lähiverkon käyttöoikeuden laitteiden hakuun. Jos haku ei löydä mitään, lisää laite manuaalisesti IP-osoitteella.
+Network discovery uses mDNS, which only works when both your phone and the radio are on the same subnet. If the phone is not on Wi-Fi at all, the app warns that a network scan may find nothing. On Android 17 and newer, the app needs the **Local network permission** to reach a radio on your own Wi-Fi at all — not only to discover it — so typing the address by hand does not work around a denied permission. Grant it from the card on the Network pane, or from the **Permissions** section of **Settings**. A radio on a public address, or one reached over a VPN, needs no permission.
 
 ### Milloin TCP-yhteyttä kannattaa käyttää
 
@@ -110,11 +114,31 @@ Jotkin Meshtastic-radiot tukevat WiFi tai Ethernet-yhteyttä, mikä mahdollistaa
 - Testaus simuloidulla radiolla
 - Ympäristöt, joissa Bluetoothissa on häiriöongelmia
 
+### WiFi-määritys mPWRD-OS:lle
+
+**Settings → Wi-Fi Provisioning for mPWRD-OS** is a separate, narrower tool. It sends Wi-Fi credentials over Bluetooth to **mPWRD-OS** devices only, using their own protocol — it does not configure Wi-Fi on an ordinary Meshtastic radio. It is available on both Android and desktop.
+
+1. Open the screen and wait while the app finds the device over Bluetooth.
+2. Tap **Scan for Networks**, then pick a network from **Available Networks** — or turn on **Hidden network** and type the name into **Network Name (SSID)**.
+3. Enter the **Password** and tap **Apply**.
+
+If the scan reports **No networks found** or fails outright, move the phone closer to the device and scan again. If **Failed to apply Wi-Fi configuration** comes back, check the password and try again.
+
+## After Your First Connection
+
+Being connected is not the same as being able to transmit.
+
+A radio leaves the factory with no LoRa region set, and it does not transmit until you set one. When you connect such a radio, the **Connect** tab shows a **Set your region** card; tap it to open the LoRa screen and choose the region you are in.
+
+Once the region is set, the tab warns you if the radio is receive-only: a **Transmit is disabled** card, reading "This device can receive but will not send anything over LoRa." Tap it to open the same screen and turn **Transmit Enabled** back on. Only one of the two cards appears at a time — an unset region already stops the radio transmitting, so the app names that first and holds the transmit card back until you have set a region.
+
+For more information, see [Settings — Radio & User](settings-radio-user#lora-config).
+
 ## Uudelleenyhdistämisen toiminta
 
-Sovellus yhdistyy käynnistyksen yhteydessä **viimeksi valittuun laitteeseen**. Voit vaihtaa yhteystapaa Yhdistä-näkymästä milloin tahansa.
+Sovellus muodostaa käynnistyessään automaattisesti yhteyden viimeksi valittuun radioon. You can switch transports from the **Connect** tab at any time.
 
-Yhteyden katkaisemiseksi paina Yhdistä-näkymän katkaisupainiketta:
+To disconnect, tap the disconnect button on the **Connect** tab:
 
 ![Katkaise yhteys radiosta](../../assets/screenshots/connections_disconnect.png)
 
@@ -131,9 +155,8 @@ Katso [Työpöytäsovellus](desktop) alustakohtaiset tiedot ja pikanäppäimet.
 ## Aiheeseen liittyvät aiheet
 
 - [Aloitus](onboarding) — ensikäynnistyksen käyttöönotto ja käyttöoikeudet
-- [Asetukset — Radio & käyttäjä](settings-radio-user) — Bluetooth- ja verkkoasetukset
+- [Settings — Radio & User](settings-radio-user) — Bluetooth, region, and network configuration
+- [Messages & Channels](messages-and-channels) — send your first message once the radio is connected
+- [Radiot](nodes) — katso, ketkä muut ovat mesh-verkossasi
 - [Työpöytäsovellus](desktop) — työpöytäkohtaiset yhteystiedot
 - [Tuetut laitteet](https://meshtastic.org/docs/hardware/devices) — täydellinen lista yhteensopivista radioista meshtastic.org -sivustolla
-
----
-

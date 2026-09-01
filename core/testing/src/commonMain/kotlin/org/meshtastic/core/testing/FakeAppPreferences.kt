@@ -280,6 +280,8 @@ class FakeMapPrefs : MapPrefs {
         mapStyle.value = style
     }
 
+    override suspend fun awaitMapStyle(): Int = mapStyle.value
+
     override val showOnlyFavorites = MutableStateFlow(false)
 
     override fun setShowOnlyFavorites(show: Boolean) {
@@ -310,6 +312,42 @@ class FakeMapPrefs : MapPrefs {
         lastHeardTrackFilter.value = seconds
     }
 
+    override val onlyOnlineOnMap = MutableStateFlow(false)
+
+    override fun setOnlyOnlineOnMap(only: Boolean) {
+        onlyOnlineOnMap.value = only
+    }
+
+    override val onlyDirectOnMap = MutableStateFlow(false)
+
+    override fun setOnlyDirectOnMap(only: Boolean) {
+        onlyDirectOnMap.value = only
+    }
+
+    override val excludeMqttOnMap = MutableStateFlow(false)
+
+    override fun setExcludeMqttOnMap(exclude: Boolean) {
+        excludeMqttOnMap.value = exclude
+    }
+
+    override val showIgnoredOnMap = MutableStateFlow(false)
+
+    override fun setShowIgnoredOnMap(show: Boolean) {
+        showIgnoredOnMap.value = show
+    }
+
+    override val includeUnknownOnMap = MutableStateFlow(true)
+
+    override fun setIncludeUnknownOnMap(include: Boolean) {
+        includeUnknownOnMap.value = include
+    }
+
+    override val excludedMapRoles = MutableStateFlow<Set<String>>(emptySet())
+
+    override fun setExcludedMapRoles(roles: Set<String>) {
+        excludedMapRoles.value = roles
+    }
+
     override val hiddenLayerUrls = MutableStateFlow<Set<String>>(emptySet())
 
     override fun updateHiddenLayerUrls(transform: (Set<String>) -> Set<String>) {
@@ -317,6 +355,12 @@ class FakeMapPrefs : MapPrefs {
     }
 
     override suspend fun awaitHiddenLayerUrls(): Set<String> = hiddenLayerUrls.value
+
+    override val layerOpacity = MutableStateFlow<Set<String>>(emptySet())
+
+    override fun updateLayerOpacity(transform: (Set<String>) -> Set<String>) {
+        layerOpacity.value = transform(layerOpacity.value)
+    }
 
     override val networkMapLayers = MutableStateFlow<Set<String>>(emptySet())
 

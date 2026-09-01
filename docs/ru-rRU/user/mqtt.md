@@ -2,7 +2,7 @@
 title: MQTT
 parent: Руководство пользователя
 nav_order: 11
-last_updated: 2026-08-27
+last_updated: 2026-08-30
 description: Подключите свою mesh-сеть к интернету — настройка MQTT-брокера, уровни шифрования и отчётность на карте.
 aliases:
   - mqtt
@@ -26,36 +26,38 @@ MQTT соединяет твою mesh-сеть Meshtastic с интернето�
 ## Как это работает
 
 ```
-[Ваша нода] → Радио → [Шлюзовая нода с WiFi] → MQTT-брокер → [Удалённый шлюз] → Радио → [Удалённая нода]
+[Your Node] → Radio → [Gateway Node with Wi-Fi] → MQTT Broker → [Remote Gateway] → Radio → [Remote Node]
 ```
 
-Шлюзовая нода с доступом в интернет (WiFi или Ethernet) публикует сообщения mesh-сети в топик MQTT. Удалённые шлюзы, подписанные на тот же топик, передают эти сообщения в свою локальную mesh-сеть.
+A gateway node with internet access (Wi-Fi or Ethernet) publishes mesh messages to an MQTT topic. Удалённые шлюзы, подписанные на тот же топик, передают эти сообщения в свою локальную mesh-сеть.
 
 ## Настройки
 
 ### Включение MQTT
 
-1. Перейдите в **Настройки → Конфигурация модулей → MQTT**.
+1. Navigate to **Settings → Module configuration → MQTT**.
 2. Включите модуль MQTT.
 3. Настройте подключение к брокеру:
 
-![Переключатель MQTT](../../assets/screenshots/settings_switch.png)
-
-| Настройка           | Описание                                                                                                                                                                            | По умолчанию                                        |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| Адрес сервера       | Имя хоста MQTT-брокера                                                                                                                                                              | mqtt.meshtastic.org |
-| Имя пользователя    | Аутентификация брокера                                                                                                                                                              | meshdev                                             |
-| Пароль              | Аутентификация брокера                                                                                                                                                              | large4cats                                          |
-| Корневая тема       | Базовый топик для сообщений                                                                                                                                                         | msh                                                 |
-| Шифрование          | Шифровать полезную нагрузку MQTT                                                                                                                                                    | Включено                                            |
-| Вывод JSON          | Also publish and consume the `/2/json/` topic. Deprecated in the protobuf schema, but still the only toggle for this behaviour — and the app's own proxy honours it | Отключено                                           |
-| TLS                 | Безопасное подключение к брокеру                                                                                                                                                    | Отключено                                           |
-| Публикация на карте | Сообщать о местоположении на публичную карту                                                                                                                                        | Отключено                                           |
+| Настройка                   | Описание                                                                                                                                                                          | По умолчанию                                                            |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **Address**                 | Имя хоста MQTT-брокера                                                                                                                                                            | mqtt.meshtastic.org                     |
+| **Username**                | Аутентификация брокера                                                                                                                                                            | meshdev                                                                 |
+| **Password**                | Аутентификация брокера                                                                                                                                                            | large4cats                                                              |
+| **Root topic**              | Базовый топик для сообщений                                                                                                                                                       | `msh`, which the radio rewrites to `msh/<REGION>` once you set a region |
+| **Encryption enabled**      | Шифровать полезную нагрузку MQTT                                                                                                                                                  | Включено                                                                |
+| **JSON output enabled**     | Also publish and consume the `/2/json/` topic. Deprecated in the protobuf schema, but still the only toggle for this behavior — and the app's own proxy honors it | Отключено                                                               |
+| **TLS enabled**             | Безопасное подключение к брокеру                                                                                                                                                  | Отключено                                                               |
+| **Map reporting**           | Сообщать о местоположении на публичную карту                                                                                                                                      | Отключено                                                               |
+| **Proxy to client enabled** | Relay MQTT through the connected phone                                                                                                                                            | Включено                                                                |
 
 ### Connection Status and Test Connection
 
-The top of the MQTT settings screen shows the live broker connection — **Connected**,
-**Connecting**, **Reconnecting**, **Disconnected**, or **Inactive**.
+The top of the MQTT settings screen shows the status of the relay this phone runs —
+**Connected**, **Connecting**, **Reconnecting**, **Disconnected**, or **Inactive**. It reads
+**Inactive** whenever the phone is not relaying, which includes the normal case of a radio
+reaching the broker over its own Wi-Fi or Ethernet. The radio's own connection to the broker is
+not reported here.
 
 **Test connection** probes the broker before you commit the settings to the radio, and
 distinguishes the failure modes: the hostname not resolving, the TCP connection being refused,
@@ -63,17 +65,17 @@ TLS failing, the attempt timing out, or the broker rejecting your credentials wi
 
 ### MQTT-прокси на этом телефоне
 
-Если у твоей ноды нет собственного доступа в интернет, она может использовать подключённый телефон как MQTT-шлюз: включите **MQTT** и **Прокси для клиента** в конфигурации модуля, и приложение будет передавать трафик MQTT между радио и брокером через интернет-соединение твоего телефона.
+If your radio has no internet access of its own, it can use the connected phone as its MQTT gateway: enable **MQTT** and **Proxy to client enabled** in the module config, and the app relays MQTT traffic between the radio and the broker over your phone's internet connection.
 
 > ℹ️ **Note:** The proxy relay is mobile-only. On the Desktop app the MQTT settings are present, but no relay runs behind them.
 
-Переключатель **MQTT-прокси на этом телефоне** в верхней части экрана настроек MQTT показывает, запущена ли сейчас эта ретрансляция, и позволяет тебе немедленно отключить (или перезапустить) её — без редактирования и повторного сохранения конфигурации MQTT устройства.
+The **MQTT proxy on this phone** toggle at the top of the MQTT settings screen shows whether this relay is running and lets you cut it off (or restart it) immediately — without editing and re-saving the radio's MQTT configuration.
 
 ### Стандартный брокер Meshtastic
 
 Сообщество поддерживает публичный брокер по адресу `mqtt.meshtastic.org`. Он предназначен для общего использования и тестирования.
 
-> ℹ️ **Примечание:** Подключения к `mqtt.meshtastic.org` всегда используют TLS (порт 8883), даже если переключатель TLS выключен. Для любого другого брокера TLS используется только при включении (порт 8883 с TLS, 1883 без).
+When this phone relays MQTT for the radio, connections to that broker always use TLS on port 8883 even if **TLS enabled** is off — the app forces the switch on and grays it out. A radio that reaches the broker over its own Wi-Fi or Ethernet forces nothing: turn **TLS enabled** on yourself, or it connects in the clear on port 1883. For any other broker the toggle decides in both cases (port 8883 with TLS, 1883 without).
 
 > 🔒 **Приватность:** Сообщения на публичном брокере доступны для чтения всем, кто подписан. Всегда используйте шифрование каналов для конфиденциальной связи.
 
@@ -89,11 +91,13 @@ TLS failing, the attempt timing out, or the broker rejecting your credentials wi
 
 ## Публикация на карте
 
-Когда публикация на карте включена, твоя нода отправляет своё местоположение на карту сообщества Meshtastic:
+When **Map reporting** is on, your node periodically publishes a map report to the broker. The report goes out unencrypted, whatever keys your channels use, and carries your node id, long and short name, approximate location, hardware model, role, firmware version, LoRa region, modem preset, and primary channel name.
 
-- Доступно на [meshmap.net](https://meshmap.net) и аналогичных картографических сервисах сообщества
-- Передаются только координаты и информация о ноде
-- Отключи эту функцию, если не хочешь, чтобы твоё местоположение было общедоступным
+Turning it on opens a consent card. Turn on **I agree.** and choose a **Map reporting interval (seconds)** of one hour or more — the screen will not save until you do. A slider sets the position precision, and the app shows the resulting accuracy as a ± distance, so you can publish an approximate location rather than an exact one.
+
+Reports appear at [meshmap.net](https://meshmap.net) and similar community map services.
+
+> 🔒 **Privacy:** A map report is readable by anyone subscribed to the broker. Leave **Map reporting** off if you do not want your approximate location published.
 
 ## Uplink и Downlink
 
@@ -102,7 +106,7 @@ TLS failing, the attempt timing out, or the broker rejecting your credentials wi
 | **Uplink** (восходящий)   | Сообщения из mesh-сети → MQTT-брокер  |
 | **Downlink** (нисходящий) | Сообщения от MQTT-брокера → mesh-сеть |
 
-Настройте для каждого канала активные направления, чтобы управлять потоком сообщений и использованием эфирного времени.
+Uplink and downlink are per-channel settings, not MQTT module settings. Open **Settings → Channels**, tap the channel, and use **MQTT Uplink Enabled** and **MQTT Downlink Enabled**. Every channel you want bridged out needs uplink on, and every channel you want MQTT traffic injected into needs downlink on.
 
 ## Форматы сообщений
 
@@ -122,7 +126,7 @@ MQTT carries two payload formats:
 Понимание многоуровневой модели шифрования:
 
 1. **Шифрование канала** происходит в mesh-сети _до_ MQTT. Если твой канал использует PSK, полезная нагрузка MQTT уже зашифрована — брокер и любые подписчики видят только зашифрованный текст.
-2. **Шифрование MQTT** (настройка модуля) добавляет дополнительный уровень шифрования при передаче к брокеру. Это защищает метаданные и информацию о маршрутизации.
+2. **Encryption enabled** (the module setting) decides which copy of the packet the gateway publishes — it is not an extra layer. Leave it on and the broker receives the packet still encrypted with your channel key. Turn it off and the gateway publishes the decrypted packet, so anyone subscribed to the topic reads your messages in the clear. Turn it off only when you own the broker and want plain payloads for a dashboard.
 3. **TLS** шифрует само TCP-соединение с брокером, предотвращая перехват на сетевом уровне.
 
 > 🔒 **Security:** The default public channel has a well-known key. Сообщения в канале по умолчанию, отправленные через MQTT, фактически **не зашифрованы** — кто угодно может их расшифровать. Всегда используйте собственный PSK для конфиденциальной связи.
@@ -130,7 +134,7 @@ MQTT carries two payload formats:
 ## Рекомендации
 
 - Используйте шифрование на уровне канала (PSK) на каналах, подключённых к MQTT
-- Не включайте MQTT на нодах без доступа в интернет (это приведёт к буферизации и напрасной трате памяти)
+- Don't enable MQTT on nodes without internet access (the radio buffers unsendable messages and wastes memory)
 - Используйте частный брокер для задач, требующих повышенной безопасности
 - Учитывайте эфирное время при передаче сообщений из загруженных MQTT-топиков — каждое такое сообщение расходует радиоэфирное время в вашей локальной mesh-сети
 - Рассмотрите включение режима "только uplink", если нужно лишь удалённо наблюдать за mesh-сетью, не отправляя сообщения обратно
@@ -139,22 +143,21 @@ MQTT carries two payload formats:
 
 ### MQTT не подключается
 
-- **Проверьте WiFi** — шлюзовая нода должна иметь активное подключение к интернету (WiFi или Ethernet). MQTT не работает через сам радиоканал LoRa.
-- **Проверьте учётные данные** — неверное имя пользователя или пароль на большинстве брокеров приводят к тихому сбою. Проверьте, нет ли лишних пробелов в конце.
-- **Брандмауэр** — порт 1883 (MQTT) или 8883 (MQTT+TLS) должен быть открыт. Некоторые сети блокируют нестандартные порты.
+- **Check Wi-Fi** — the gateway node must have an active internet connection (Wi-Fi or Ethernet). MQTT не работает через сам радиоканал LoRa.
+- **Verify credentials** — with incorrect credentials, most brokers fail silently — double-check for trailing spaces.
+- **Firewall** — port 1883 (MQTT) or 8883 (MQTT over TLS) must be reachable. Some networks allow only web traffic (ports 80 and 443).
 - **Разрешение DNS** — если используется имя хоста собственного брокера, убедитесь, что нода может его разрешить. Попробуйте подключиться напрямую по IP-адресу брокера.
 
 ### Сообщения не проходят через мост
 
 - **Проверьте настройки uplink/downlink** — если включён только uplink, сообщения идут из mesh-сети в MQTT, но не обратно. Включите downlink на принимающем шлюзе.
 - **Несовпадение каналов** — оба шлюза должны использовать один и тот же канал с одинаковым PSK. Несовпадение означает, что сообщения зашифрованы разными ключами и выглядят как мусор.
-- **Несовпадение топиков** — убедитесь, что оба шлюза используют одинаковый корневой топик. Стандартный `msh` работает для публичного брокера.
+- **Topic mismatch** — both gateways must use exactly the same root topic. Setting a region rewrites a default root to `msh/<REGION>` (for example `msh/US`), so gateways in different regions do not meet until you give both the same explicit root.
+- **Ignore MQTT is on** — in a region with a duty-cycle limit, the radio turns on **Ignore MQTT** (LoRa config, **Advanced**) when you set the region, and then drops every packet that reached it via MQTT. Turn it off on the receiving nodes, not only on the gateway.
+- **Ok to MQTT is off** — on a public broker a gateway uplinks other nodes' packets only when the sending node has **Ok to MQTT** (LoRa config, **Advanced**) on. Your own traffic bridges either way; your neighbors' does not until they opt in.
 
 ## Связанные темы
 
 - [Настройки — Модули и администрирование](settings-module-admin) — справочник по конфигурации модуля MQTT
 - [Сообщения и каналы](messages-and-channels) — шифрование каналов и настройка PSK
 - [Руководство по интеграции MQTT](https://meshtastic.org/docs/software/integrations/mqtt) — подробная документация по MQTT на meshtastic.org
-
----
-

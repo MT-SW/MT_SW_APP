@@ -21,9 +21,6 @@ on:
       run_desktop_builds:
         type: boolean
         default: false
-      run_desktop_flatpak_src:
-        type: boolean
-        default: false
       upload_artifacts:
         type: boolean
         default: true
@@ -427,7 +424,9 @@ jobs:
           files: "desktopApp/build/reports/kover/report*.xml"
 
       - name: Upload shard reports
-        if: ${{ always() && inputs.upload_artifacts }}
+        # !cancelled(), not always(): a shard cancelled before Gradle ran has no
+        # reports, and the upload warns "No files were found" on the way out.
+        if: ${{ !cancelled() && inputs.upload_artifacts }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: reports-${{ matrix.shard.name }}
@@ -613,18 +612,24 @@ jobs:
         # packageDistributionForCurrentOS (debug build type, no ProGuard) produces real
         # installers (dmg/msi+exe/deb+rpm+AppImage-dir) so the snapshot release below can
         # ship something testers can actually install, not just an unpacked app dir.
-        # On Gradle 9.7.1 CMP's Windows MSI/WiX packaging reads Project.layout on the root project
-        # from ':desktopApp'. Isolated Projects and the configuration cache reject that
-        # independently, so both have to go — disabling only IP still fails as "1 problem was found
-        # storing the configuration cache", and Gradle refuses --no-configuration-cache while IP is
-        # still on. This job never persists a CC entry (cache_configuration_cache defaults to
-        # false), so dropping the cache costs nothing.
-        # Flags, not -D properties: -Dorg.gradle.isolated-projects=false took effect on macOS and
-        # both Linux runners but NOT on windows-latest, which still died on "Configuration Cache
-        # cannot be disabled when Isolated Projects is enabled". --no-isolated-projects is
-        # unambiguous; it needs 9.7+, which is exactly what this PR moves us to, so a pin-back below
-        # 9.7 has to revert this line with it.
-        run: ./gradlew :desktopApp:packageDistributionForCurrentOS :desktopApp:proguardReleaseJars -Pci=true --no-isolated-projects --no-configuration-cache
+        # Windows only: CMP's WiX packaging reads Project.layout on the root project from
+        # ':desktopApp', which Isolated Projects rejects. Stack, from a --dry-run on
+        # windows-latest against compose-multiplatform 1.12.0:
+        #     WixToolsetKt.configureWix(wixToolset.kt:43)
+        #     ConfigureJvmApplicationKt.configureJvmApplication(configureJvmApplication.kt:46)
+        #     ComposePlugin.apply$lambda$2(ComposePlugin.kt:58)
+        # configureWix only runs where MSI/EXE are target formats, which is why macOS,
+        # ubuntu-24.04 and ubuntu-24.04-arm all package fine with IP on — verified by
+        # running this exact task list unflagged on all four runners. Keep the escape
+        # pinned to the one OS that needs it, and drop it when CMP stops reaching for
+        # the root project.
+        # Both flags go together: IP implies the configuration cache, and Gradle refuses
+        # --no-configuration-cache while IP is still on. Flags, not -D properties —
+        # -Dorg.gradle.isolated-projects=false is inert on windows-latest. --no-isolated-projects
+        # needs Gradle 9.7+, so a pin-back below 9.7 has to revert this line with it.
+        run: >
+          ./gradlew :desktopApp:packageDistributionForCurrentOS :desktopApp:proguardReleaseJars -Pci=true
+          ${{ runner.os == 'Windows' && '--no-isolated-projects --no-configuration-cache' || '' }}
 
       # CMP's TargetFormat.AppImage is jpackage's "app-image" — an unpacked directory, not
       # a Linux .AppImage. Wrap it into a real AppImage, same as the release workflow.
@@ -649,56 +654,3 @@ jobs:
             desktopApp/build/compose/binaries/main/*/*.AppImage
           retention-days: 7
           if-no-files-found: error
-
-  # ── Flatpak Sources ───────────────────────────────────────────────────
-  build-flatpak-src:
-    name: Generate Flatpak Sources (${{ matrix.os }})
-    if: inputs.run_desktop_flatpak_src == true
-    runs-on: ${{ matrix.os }}
-    permissions:
-      contents: read
-      pull-requests: write
-    timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-24.04, ubuntu-24.04-arm]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          filter: 'blob:none'
-          submodules: true
-
-      - name: Gradle Setup
-        uses: ./.github/actions/gradle-setup
-        with:
-          gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
-          job_summary_pr_comment: ${{ env.GRADLE_PR_COMMENT }}
-          cache_read_only: true
-          install_jetbrains_jdk: 'true'
-
-      # Isolated Gradle user home — see explanation in release.yml.
-      # packageUberJarForCurrentOS is what the in-flatpak build invokes; it resolves the FULL
-      # runtime classpath. :assemble alone would miss runtime-only deps (skiko, ktor-cio, …).
-      - name: Generate Flatpak Sources
-        run: >
-          ./gradlew --no-build-cache
-          -Dgradle.user.home=${{ runner.temp }}/flatpak-gradle-home
-          :desktopApp:packageUberJarForCurrentOS :captureFlatpakSources
-
-      - name: Stage manifest
-        run: cp build/flatpak-sources.json flatpak-sources.json
-
-      - run: ls -lah flatpak-sources.json
-
-      - name: Upload Flatpak Sources
-        if: ${{ inputs.upload_artifacts }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
-        with:
-          name: flatpak-sources-${{ runner.arch }}
-          path: flatpak-sources.json
-          retention-days: 7

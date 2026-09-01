@@ -121,7 +121,6 @@
     <string name="intro_show">Shfaq prezantimin</string>
     <string name="ip_address">Adresa IP:</string>
     <!-- KEY -->
-    <!-- LABEL -->
     <!-- LAYER -->
     <!-- LICENSED -->
     <!-- LOAD -->
@@ -151,6 +150,8 @@
     <string name="map_tile_source">Burimi i pllakatave</string>
     <!-- MESH -->
     <string name="mesh_beacon_preset_none">Asnjë</string>
+    <string name="mesh_beacon_region_label">Rajon</string>
+    <string name="mesh_beacon_target_channel_index">Kanal</string>
     <!-- MESHTASTIC -->
     <string name="meshtastic_new_nodes_notifications">Njoftimet për nyje të reja</string>
     <string name="meshtastic_service_notifications">Njoftime shërbimi</string>
@@ -238,7 +239,6 @@
     <string name="role_client_desc">Pajisje e lidhur ose pajisje mesazhi autonome.</string>
     <string name="role_client_hidden_desc">Pajisje që transmeton vetëm kur është e nevojshme për fshehtësi ose kursim energjie.</string>
     <string name="role_client_mute_desc">Pajisje që nuk kalon paketa nga pajisje të tjera.</string>
-    <string name="role_lost_and_found_desc">Transmeton vendndodhjen si mesazh në kanalin e parazgjedhur rregullisht për të ndihmuar në rikuperimin e pajisjeve.</string>
     <string name="role_repeater_desc">Nyjë infrastrukture për zgjerimin e mbulimit të rrjetit duke transmetuar mesazhe me ngarkesë minimale. Nuk është e dukshme në listën e nyjeve.</string>
     <string name="role_router_client_desc">Kombinim i të dyjave ROUTER dhe CLIENT. Nuk është për pajisje mobile.</string>
     <string name="role_router_desc">Nyjë infrastrukture për zgjerimin e mbulimit të rrjetit duke transmetuar mesazhe. E dukshme në listën e nyjeve.</string>
@@ -299,8 +299,6 @@
     <string name="waypoint_received">Pikë rreshti e marrë: %1$s</string>
     <!-- WIFI -->
     <string name="wifi_provision_success_ip_address">Adresa IP</string>
-    <string name="wifi_qr_code_error">Formati i gabuar i kodit QR të kredencialeve WiFi</string>
-    <string name="wifi_qr_code_scan">Skano QR kodi WiFi</string>
     <!-- WIND -->
     <!-- WRITE -->
     <string name="you">Ju</string>

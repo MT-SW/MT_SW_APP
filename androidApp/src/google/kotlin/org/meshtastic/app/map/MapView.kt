@@ -181,18 +181,19 @@ import org.meshtastic.feature.map.component.DeleteWaypointDialog
 import org.meshtastic.feature.map.component.EditWaypointDialog
 import org.meshtastic.feature.map.component.MapButton
 import org.meshtastic.feature.map.component.MapControlsOverlay
-import org.meshtastic.feature.map.component.MapFilterActions
-import org.meshtastic.feature.map.component.MapFilterMenu
+import org.meshtastic.feature.map.component.MapFilterSheet
 import org.meshtastic.feature.map.component.NodeTrackFilterMenu
 import org.meshtastic.feature.map.component.RasterOverlayToggles
 import org.meshtastic.feature.map.component.SitePlannerLaunch
 import org.meshtastic.feature.map.component.WaypointInfoDialog
+import org.meshtastic.feature.map.component.mapFilterActions
 import org.meshtastic.feature.map.component.toSitePlannerParams
 import org.meshtastic.feature.map.includes
 import org.meshtastic.feature.map.kml.ICON_URL_PROPERTY
 import org.meshtastic.feature.map.kml.KmlGroundOverlay
 import org.meshtastic.feature.map.layers.LayerType
 import org.meshtastic.feature.map.layers.MapLayerItem
+import org.meshtastic.feature.map.layers.opacityOf
 import org.meshtastic.feature.map.layers.toPickedMapFile
 import org.meshtastic.feature.map.tiles.mapAttributionText
 import org.meshtastic.feature.map.tracerouteNodeSelection
@@ -318,6 +319,7 @@ fun MapView(
     val selectedGoogleMapType by mapViewModel.selectedGoogleMapType.collectAsStateWithLifecycle()
     val currentRasterBasemap by mapViewModel.selectedRasterBasemap.collectAsStateWithLifecycle()
     val enabledOverlayIds by mapViewModel.enabledOverlayIds.collectAsStateWithLifecycle()
+    val layerOpacity by mapViewModel.layerOpacity.collectAsStateWithLifecycle()
 
     var mapTypeMenuExpanded by remember { mutableStateOf(false) }
     var showCustomTileManagerSheet by remember { mutableStateOf(false) }
@@ -673,7 +675,12 @@ fun MapView(
                 .forEach { overlay ->
                     key(overlay.id) {
                         val provider = remember(overlay.id) { mapViewModel.createTileProvider(overlay.spec) }
-                        TileOverlay(tileProvider = provider, fadeIn = true, transparency = 0f, zIndex = OVERLAY_Z_INDEX)
+                        TileOverlay(
+                            tileProvider = provider,
+                            fadeIn = true,
+                            transparency = 1f - layerOpacity.opacityOf(overlay.id),
+                            zIndex = OVERLAY_Z_INDEX,
+                        )
                     }
                 }
 
@@ -704,6 +711,7 @@ fun MapView(
                         onShowGeofenceInfo = { geofenceInfoWaypoint = it },
                         selectedWaypointId = selectedWaypointId,
                         mapLayers = mapLayers,
+                        layerOpacity = layerOpacity,
                         mapViewModel = mapViewModel,
                         cameraPositionState = cameraPositionState,
                         coroutineScope = coroutineScope,
@@ -901,6 +909,7 @@ fun MapView(
         MapControlsOverlay(
             modifier = Modifier.align(Alignment.TopCenter).padding(top = 8.dp),
             onToggleFilterMenu = { mapFilterMenuExpanded = true },
+            filtersActive = mode !is GoogleMapMode.NodeTrack && mapFilterState.isNarrowing,
             filterDropdownContent = {
                 if (mode is GoogleMapMode.NodeTrack) {
                     NodeTrackFilterMenu(
@@ -909,18 +918,11 @@ fun MapView(
                         selected = mapFilterState.lastHeardTrackFilter,
                         onSelect = mapViewModel::setLastHeardTrackFilter,
                     )
-                } else {
-                    MapFilterMenu(
-                        expanded = mapFilterMenuExpanded,
+                } else if (mapFilterMenuExpanded) {
+                    MapFilterSheet(
                         onDismissRequest = { mapFilterMenuExpanded = false },
                         filterState = mapFilterState,
-                        actions =
-                        MapFilterActions(
-                            onToggleOnlyFavorites = mapViewModel::toggleOnlyFavorites,
-                            onToggleShowWaypoints = mapViewModel::toggleShowWaypointsOnMap,
-                            onToggleShowPrecisionCircle = mapViewModel::toggleShowPrecisionCircleOnMap,
-                            onSelectLastHeard = mapViewModel::setLastHeardFilter,
-                        ),
+                        actions = mapViewModel.mapFilterActions(),
                     )
                 }
             },
@@ -1005,6 +1007,8 @@ fun MapView(
                 available = mapViewModel.availableOverlays,
                 enabledIds = enabledOverlayIds,
                 onToggle = { mapViewModel.toggleOverlay(it) },
+                opacity = layerOpacity,
+                onOpacityChange = { key, value -> mapViewModel.setLayerOpacity(key, value) },
             )
             HorizontalDivider()
             CustomMapLayersSheet(
@@ -1014,6 +1018,8 @@ fun MapView(
                 onAddLayerClicked = onAddLayerClicked,
                 onRefreshLayer = { mapViewModel.refreshMapLayer(it) },
                 onAddNetworkLayer = { name, url -> mapViewModel.addNetworkMapLayer(name, url) },
+                opacity = layerOpacity,
+                onOpacityChange = { key, value -> mapViewModel.setLayerOpacity(key, value) },
             )
         }
     }
@@ -1153,6 +1159,7 @@ private fun MainMapContent(
     onShowGeofenceInfo: (Waypoint) -> Unit,
     selectedWaypointId: Int?,
     mapLayers: List<MapLayerItem>,
+    layerOpacity: Map<String, Float>,
     mapViewModel: MapViewModel,
     cameraPositionState: CameraPositionState,
     coroutineScope: CoroutineScope,
@@ -1201,7 +1208,10 @@ private fun MainMapContent(
         displayableWaypoints.forEach { waypoint -> WaypointGeofenceOverlay(waypoint) }
     }
 
-    mapLayers.forEach { layerItem -> key(layerItem.id) { MapLayerOverlay(layerItem, mapViewModel) } }
+    mapLayers.forEach { layerItem ->
+        val opacity = layerItem.uri?.let { layerOpacity.opacityOf(it) } ?: 1f
+        key(layerItem.id) { MapLayerOverlay(layerItem, opacity, mapViewModel) }
+    }
 }
 
 /**
@@ -1465,10 +1475,12 @@ private fun offsetPolyline(
 
 @OptIn(MapsComposeExperimentalApi::class)
 @Composable
-private fun MapLayerOverlay(layerItem: MapLayerItem, mapViewModel: MapViewModel) {
+private fun MapLayerOverlay(layerItem: MapLayerItem, opacity: Float, mapViewModel: MapViewModel) {
     var currentLayer by remember { mutableStateOf<RenderedMapLayer?>(null) }
 
-    MapEffect(layerItem.id, layerItem.refreshToken) { map ->
+    // Opacity is part of the key: maps-utils has no way to restyle a layer already on the map, so a fade is a
+    // teardown and a redraw.
+    MapEffect(layerItem.id, layerItem.refreshToken, opacity) { map ->
         currentLayer?.safeHide()
         currentLayer = null
         val bytes = mapViewModel.readLayerBytes(layerItem) ?: return@MapEffect
@@ -1485,7 +1497,7 @@ private fun MapLayerOverlay(layerItem: MapLayerItem, mapViewModel: MapViewModel)
                     Logger.withTag("MapView").e { "Error loading map layer: ${layerItem.name} (unrecognized format)" }
                     null
                 } else {
-                    RenderedMapLayer(map, dataLayer)
+                    RenderedMapLayer(map, dataLayer.scaledByOpacity(opacity), opacity)
                 }
             } catch (e: CancellationException) {
                 // Not a load failure: this MapEffect is relaunched on every refresh (refreshToken) and cancelled when
@@ -1554,7 +1566,11 @@ private fun parseMapLayer(layerType: LayerType, stream: InputStream): DataLayer?
  * ([MapViewRenderer.removeFeature]) silently no-ops for MultiGeometry features (the renderer keys rendered map objects
  * by internal per-geometry copies), so clear() is the only teardown that reliably takes everything off the map.
  */
-private class RenderedMapLayer(private val map: GmsGoogleMap, private val dataLayer: DataLayer) {
+private class RenderedMapLayer(
+    private val map: GmsGoogleMap,
+    private val dataLayer: DataLayer,
+    private val opacity: Float,
+) {
     private var renderer: MapViewRenderer? = null
 
     /** Images extracted from a KMZ archive, keyed by archive path; the KML mapper stashes them in layer properties. */
@@ -1591,7 +1607,9 @@ private class RenderedMapLayer(private val map: GmsGoogleMap, private val dataLa
                     )
                     .image(BitmapDescriptorFactory.fromBitmap(image))
                     // KML's rotation is degrees counter-clockwise about the box centre; bearing is clockwise.
-                    .bearing((-overlay.rotationDegrees).toFloat()),
+                    .bearing((-overlay.rotationDegrees).toFloat())
+                    // A draped image is a raster, so unlike the vector features it does have a transparency to set.
+                    .transparency((1f - opacity).coerceIn(0f, 1f)),
             )
                 ?.let { renderedGroundOverlays += it }
         }
@@ -1664,6 +1682,43 @@ internal fun Feature.applySimpleStyleSpec(): Feature {
         else -> this // Mixed geometry collections keep the mapper's style.
     }
 }
+
+/**
+ * The same layer with every feature's alpha scaled by [opacity].
+ *
+ * maps-utils draws an imported layer as ordinary map objects — polygons, polylines, markers — so unlike a tile overlay
+ * there is nothing layer-wide to fade. Scaling rather than replacing the alpha keeps an import's own relative
+ * transparency: a coverage export whose contour bands are already translucent stays a gradient as the layer fades.
+ *
+ * Points included: [PointStyle] carries an ARGB colour the renderer turns into marker alpha, so a point-only layer
+ * would otherwise stay fully visible at 0%.
+ */
+internal fun DataLayer.scaledByOpacity(opacity: Float): DataLayer =
+    if (opacity >= 1f) this else copy(features = features.map { it.scaledByOpacity(opacity) })
+
+private fun Feature.scaledByOpacity(opacity: Float): Feature = when (val featureStyle = style) {
+    is PolygonStyle ->
+        copy(
+            style =
+            featureStyle.copy(
+                fillColor = featureStyle.fillColor.scaleAlpha(opacity),
+                strokeColor = featureStyle.strokeColor.scaleAlpha(opacity),
+            ),
+        )
+
+    is LineStyle -> copy(style = featureStyle.copy(color = featureStyle.color.scaleAlpha(opacity)))
+
+    is PointStyle -> copy(style = featureStyle.copy(color = featureStyle.color.scaleAlpha(opacity)))
+
+    else -> this
+}
+
+private fun Int.scaleAlpha(opacity: Float): Int = AndroidColor.argb(
+    (AndroidColor.alpha(this) * opacity.coerceIn(0f, 1f)).roundToInt(),
+    AndroidColor.red(this),
+    AndroidColor.green(this),
+    AndroidColor.blue(this),
+)
 
 /** Point or MultiPoint (a multi-geometry whose members are all points). */
 private fun Geometry.isPointLike(): Boolean = this is PointGeometry ||

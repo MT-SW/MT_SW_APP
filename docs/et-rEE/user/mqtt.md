@@ -2,7 +2,7 @@
 title: MQTT
 parent: Kasutusjuhend
 nav_order: 11
-last_updated: 2026-08-27
+last_updated: 2026-08-30
 description: Silda oma võrk internetiga – MQTT maakleri seadistamine, krüpteerimiskihid ja kaardiaruandlus.
 aliases:
   - mqtt
@@ -26,36 +26,38 @@ MQTT moodul ühendab sinu sõlme MQTT vahendajaga, võimaldades:
 ## Kuidas see toimib
 
 ```
-[Sinu sõlm] → Raadio → [WiFi-ga lüüsisõlm] → MQTT vahendaja → [Kauglüüs] → Raadio → [Kaugsõlm]
+[Your Node] → Radio → [Gateway Node with Wi-Fi] → MQTT Broker → [Remote Gateway] → Radio → [Remote Node]
 ```
 
-Internetiühendusega (WiFi või Ethernet) lüüsisõlm jagab võrgusõnumeid MQTT. Sama teemaga liitunud kauglüüsid sisestavad need sõnumid oma kohalikku kärgvõrku.
+A gateway node with internet access (Wi-Fi or Ethernet) publishes mesh messages to an MQTT topic. Sama teemaga liitunud kauglüüsid sisestavad need sõnumid oma kohalikku kärgvõrku.
 
 ## Sätted
 
 ### Luba MQTT
 
-1. Mine menüüsse **Seaded → Mooduli konfiguratsioon → MQTT**.
+1. Navigate to **Settings → Module configuration → MQTT**.
 2. Luba MQTT moodul.
 3. Configure the broker connection:
 
-![MQTT lüliti](/assets/screenshots/settings_switch.png)
-
-| Sätted                     | Kirjeldus                                                                                                                                                                           | Vaikimisi                                           |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| Server Address             | MQTT vahendaja hostinimi                                                                                                                                                            | mqtt.meshtastic.org |
-| Kasutajatunnus             | Broker authentication                                                                                                                                                               | meshdev                                             |
-| Parool                     | Broker authentication                                                                                                                                                               | large4cats                                          |
-| Root Topic                 | Base topic for messages                                                                                                                                                             | msh                                                 |
-| Encryption                 | Krüpteeri MQTT liiklus                                                                                                                                                              | Lubatud                                             |
-| JSON Output                | Also publish and consume the `/2/json/` topic. Deprecated in the protobuf schema, but still the only toggle for this behaviour — and the app's own proxy honours it | Keelatud                                            |
-| TLS                        | Secure connection to broker                                                                                                                                                         | Keelatud                                            |
-| Kaardiaruannete koostamine | Teavita asukoht avalikul kaardil                                                                                                                                                    | Keelatud                                            |
+| Sätted                      | Kirjeldus                                                                                                                                                                         | Vaikimisi                                                               |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **Address**                 | MQTT vahendaja hostinimi                                                                                                                                                          | mqtt.meshtastic.org                     |
+| **Username**                | Broker authentication                                                                                                                                                             | meshdev                                                                 |
+| **Password**                | Broker authentication                                                                                                                                                             | large4cats                                                              |
+| **Root topic**              | Base topic for messages                                                                                                                                                           | `msh`, which the radio rewrites to `msh/<REGION>` once you set a region |
+| **Encryption enabled**      | Krüpteeri MQTT liiklus                                                                                                                                                            | Lubatud                                                                 |
+| **JSON output enabled**     | Also publish and consume the `/2/json/` topic. Deprecated in the protobuf schema, but still the only toggle for this behavior — and the app's own proxy honors it | Keelatud                                                                |
+| **TLS enabled**             | Secure connection to broker                                                                                                                                                       | Keelatud                                                                |
+| **Map reporting**           | Teavita asukoht avalikul kaardil                                                                                                                                                  | Keelatud                                                                |
+| **Proxy to client enabled** | Relay MQTT through the connected phone                                                                                                                                            | Keelatud                                                                |
 
 ### Connection Status and Test Connection
 
-The top of the MQTT settings screen shows the live broker connection — **Connected**,
-**Connecting**, **Reconnecting**, **Disconnected**, or **Inactive**.
+The top of the MQTT settings screen shows the status of the relay this phone runs —
+**Connected**, **Connecting**, **Reconnecting**, **Disconnected**, or **Inactive**. It reads
+**Inactive** whenever the phone is not relaying, which includes the normal case of a radio
+reaching the broker over its own Wi-Fi or Ethernet. The radio's own connection to the broker is
+not reported here.
 
 **Test connection** probes the broker before you commit the settings to the radio, and
 distinguishes the failure modes: the hostname not resolving, the TCP connection being refused,
@@ -63,17 +65,17 @@ TLS failing, the attempt timing out, or the broker rejecting your credentials wi
 
 ### MQTT puhverserver sellel telefonil
 
-Kui sõlmel puudub oma internetiühendus, saab see kasutada ühendatud telefoni MQTT-lüüsina: luba mooduli konfiguratsioonis **MQTT** ja **Proksi kliendiga lubatud** ning rakendus edastab MQTT-liikluse raadio ja maakleri vahel telefoni internetiühenduse kaudu.
+If your radio has no internet access of its own, it can use the connected phone as its MQTT gateway: enable **MQTT** and **Proxy to client enabled** in the module config, and the app relays MQTT traffic between the radio and the broker over your phone's internet connection.
 
 > ℹ️ **Note:** The proxy relay is mobile-only. On the Desktop app the MQTT settings are present, but no relay runs behind them.
 
-MQTT sätete ekraani ülaosas olev lüliti **MQTT puhverserver sellel telefonil** näitab, kas see relee töötab praegu, ja võimaldab selle kohe välja lülitada (või taaskäivitada) – ilma seadme MQTT konfiguratsiooni muutmata ja uuesti salvestamata.
+The **MQTT proxy on this phone** toggle at the top of the MQTT settings screen shows whether this relay is running and lets you cut it off (or restart it) immediately — without editing and re-saving the radio's MQTT configuration.
 
 ### Meshtastic vaikemaakler
 
 Kogukond haldab avaliku vahendajat aadressil `mqtt.meshtastic.org`. This is intended for general use and testing.
 
-> ℹ️ **Märkus:** Ühendused saidiga `mqtt.meshtastic.org` kasutavad alati TLS-i (port 8883), isegi kui TLS-i lüliti on välja lülitatud. For any other broker, TLS is used only when you enable it (port 8883 with TLS, 1883 without).
+When this phone relays MQTT for the radio, connections to that broker always use TLS on port 8883 even if **TLS enabled** is off — the app forces the switch on and grays it out. A radio that reaches the broker over its own Wi-Fi or Ethernet forces nothing: turn **TLS enabled** on yourself, or it connects in the clear on port 1883. For any other broker the toggle decides in both cases (port 8883 with TLS, 1883 without).
 
 > 🔒 **Privaatsus:** Avaliku vahendaja sõnumeid saavad lugeda kõik tellijad. Privaatse suhtluse jaoks kasuta alati kanali krüpteerimist.
 
@@ -89,11 +91,13 @@ Konfigureeri oma sõlm nii, et see osutaks sinu privaatsele maaklerile sobivate 
 
 ## Kaardiaruannete koostamine
 
-Kui kaardiaruandlus on lubatud, avaldab sõlm oma asukoha Meshtasticu kogukonnakaardil:
+When **Map reporting** is on, your node periodically publishes a map report to the broker. The report goes out unencrypted, whatever keys your channels use, and carries your node id, long and short name, approximate location, hardware model, role, firmware version, LoRa region, modem preset, and primary channel name.
 
-- Nähtav aadressil [meshmap.net](https://meshmap.net) ja sarnastes kogukonna kaarditeenustes
-- Only position and node info are shared
-- Keela see valik, kui sa ei soovi, et sinu asukoht oleks avalikult nähtav
+Turning it on opens a consent card. Turn on **I agree.** and choose a **Map reporting interval (seconds)** of one hour or more — the screen will not save until you do. A slider sets the position precision, and the app shows the resulting accuracy as a ± distance, so you can publish an approximate location rather than an exact one.
+
+Reports appear at [meshmap.net](https://meshmap.net) and similar community map services.
+
+> 🔒 **Privacy:** A map report is readable by anyone subscribed to the broker. Leave **Map reporting** off if you do not want your approximate location published.
 
 ## Üleslink vs allalink
 
@@ -102,7 +106,7 @@ Kui kaardiaruandlus on lubatud, avaldab sõlm oma asukoha Meshtasticu kogukonnak
 | **Üleslink** | Sõnumid kärgvõrgust → MQTT maakler |
 | **Allalink** | Sõnumid MQTT maaklerist → kärgvõrk |
 
-Konfi iga kanali kohta, millised suunad on aktiivsed, et kontrollida sõnumivoogu ja eetriaega.
+Uplink and downlink are per-channel settings, not MQTT module settings. Open **Settings → Channels**, tap the channel, and use **MQTT Uplink Enabled** and **MQTT Downlink Enabled**. Every channel you want bridged out needs uplink on, and every channel you want MQTT traffic injected into needs downlink on.
 
 ## Sõnumivormingud
 
@@ -122,7 +126,7 @@ MQTT carries two payload formats:
 Understanding the layered encryption model:
 
 1. **Kanali krüptimine** toimub kärgvõrgus _enne_ MQTT. Kui kanalil on PSK, on ​​MQTT liiklus juba krüptitud – maakler ja kõik tellijad näevad ainult šifriteksti.
-2. **MQTT krüptimine** (mooduli säte) lisab vahendajale edastamiseks täiendava krüptimiskihi. This protects metadata and routing information.
+2. **Encryption enabled** (the module setting) decides which copy of the packet the gateway publishes — it is not an extra layer. Leave it on and the broker receives the packet still encrypted with your channel key. Turn it off and the gateway publishes the decrypted packet, so anyone subscribed to the topic reads your messages in the clear. Turn it off only when you own the broker and want plain payloads for a dashboard.
 3. **TLS** krüpteerib TCP ühenduse vahendaja endaga, takistades võrgutasandil pealtkuulamist.
 
 > 🔒 **Security:** The default public channel has a well-known key. MQTT kaudu saadetud vaikekanalil olevad sõnumid on sisuliselt **krüpteerimata** – igaüks saab neid dekodeerida. Always use a custom PSK for private communications.
@@ -130,7 +134,7 @@ Understanding the layered encryption model:
 ## Parimad tavad
 
 - Kasuta kanali krüptimist (PSK), kanalitel mis on sillatud MQTT-ga
-- Ära luba MQTT internetiühenduseta sõlmedel (see puhverdab ja raiskab mälu)
+- Don't enable MQTT on nodes without internet access (the radio buffers unsendable messages and wastes memory)
 - Use a private broker for sensitive deployments
 - MQTT sõnumite allalaadimisel arvesta eetriaja kuluga – iga allalingitud sõnum tarbib sinu kohalikus võrgus raadioeetriaega
 - Kaalu ainult üleslingi lubamist, kui sul on vaja oma kärgvõrku eemalt jälgida ilma sõnumeid tagasi tõmbamata
@@ -139,22 +143,21 @@ Understanding the layered encryption model:
 
 ### MQTT ei ühendu
 
-- **Kontrolli WiFit** – lüüssõlmel peab olema aktiivne internetiühendus (WiFi või Ethernet). MQTT ei tööta LoRa raadiolingi enda kaudu.
-- **Verify credentials** — incorrect username or password will silently fail on most brokers. Double-check for trailing spaces.
-- **Tulemüür** — port 1883 (MQTT) või 8883 (MQTT+TLS) peab olema avatud. Some networks block non-standard ports.
+- **Check Wi-Fi** — the gateway node must have an active internet connection (Wi-Fi or Ethernet). MQTT ei tööta LoRa raadiolingi enda kaudu.
+- **Verify credentials** — with incorrect credentials, most brokers fail silently — double-check for trailing spaces.
+- **Firewall** — port 1883 (MQTT) or 8883 (MQTT over TLS) must be reachable. Some networks allow only web traffic (ports 80 and 443).
 - **DNS-i lahendamine** – kui kasutad kohandatud maakleri hostinime, veenduge, et sõlm suudab seda lahendada. Try the broker's IP address directly.
 
 ### Messages Not Bridging
 
 - **Kontrolli üleslingi/allalingi seadeid** — kui lubatud on ainult üleslink, liiguvad sõnumid võrgust MQTT-sse, aga mitte tagasi. Luba vastuvõtval lüüsil allalink.
 - **Kanali mittevastavus** – mõlemad lüüsid peavad jagama sama kanalit sama PSK-ga. Vastuolu tähendab, et sõnumid on krüpteeritud erinevate võtmetega ja kuvatakse prügina.
-- **Teema mittevastavus** — veendu, et mõlemad lüüsid kasutaksid sama juurteemat. The default `msh` works for the public broker.
+- **Topic mismatch** — both gateways must use exactly the same root topic. Setting a region rewrites a default root to `msh/<REGION>` (for example `msh/US`), so gateways in different regions do not meet until you give both the same explicit root.
+- **Ignore MQTT is on** — in a region with a duty-cycle limit, the radio turns on **Ignore MQTT** (LoRa config, **Advanced**) when you set the region, and then drops every packet that reached it via MQTT. Turn it off on the receiving nodes, not only on the gateway.
+- **Ok to MQTT is off** — on a public broker a gateway uplinks other nodes' packets only when the sending node has **Ok to MQTT** (LoRa config, **Advanced**) on. Your own traffic bridges either way; your neighbors' does not until they opt in.
 
 ## Seotud teemad
 
 - [Seaded — Moodulid ja administreerimine](settings-module-admin) — MQTT mooduli konfi viide
 - [Sõnumid ja kanalid](messages-and-channels) — kanali krüptimine ja PSK seadistamine
 - [MQTT integratsioonijuhend](https://meshtastic.org/docs/software/integrations/mqtt) — üksikasjalik MQTT dokumentatsioon aadressil meshtastic.org
-
----
-

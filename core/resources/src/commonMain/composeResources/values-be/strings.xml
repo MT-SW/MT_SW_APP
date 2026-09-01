@@ -138,7 +138,6 @@
     <string name="ip_address">IP-адрас:</string>
     <string name="ip_port">Порт:</string>
     <!-- KEY -->
-    <!-- LABEL -->
     <!-- LAYER -->
     <!-- LICENSED -->
     <!-- LOAD -->
@@ -151,12 +150,16 @@
     <string name="lora_config">LoRa</string>
     <string name="lux">Люкс</string>
     <!-- MAP -->
+    <string name="map_filter_all_roles">Усе</string>
+    <string name="map_filter_display_title">Экран</string>
     <string name="map_type_hybrid">Гібрыд</string>
     <string name="map_type_normal">Звычайная</string>
     <string name="map_type_satellite">Спадарожнік</string>
     <string name="map_type_terrain">Рэльеф</string>
     <!-- MESH -->
     <string name="mesh_beacon_preset_none">Нічога</string>
+    <string name="mesh_beacon_region_label">Рэгіён</string>
+    <string name="mesh_beacon_target_channel_index">Канал</string>
     <!-- MESHTASTIC -->
     <string name="meshtastic">Meshtastic</string>
     <string name="meshtastic_app_name">Meshtastic</string>
@@ -241,11 +244,23 @@
     <string name="reset">Скінуць</string>
     <string name="retry">Паспрабаваць яшчэ раз</string>
     <!-- ROLE -->
+    <string name="role_client">CLIENT</string>
     <string name="role_client_desc">Прылада для паведамленняў, што працуе з прыкладаннем або самастойна.</string>
+    <string name="role_client_hidden">CLIENT HIDDEN</string>
+    <string name="role_client_mute">CLIENT MUTE</string>
     <string name="role_client_mute_desc">Прылада, якая не перасылае пакеты ад іншых прылад.</string>
+    <string name="role_lost_and_found">LOST AND FOUND</string>
+    <string name="role_repeater">REPEATER</string>
     <string name="role_repeater_desc">Інфраструктурны вузел для пашырэння пакрыцця сеткі праз перасылку паведамленняў з мінімальнымі накладнымі выдаткамі. Не бачны ў спісе вузлоў.</string>
+    <string name="role_router">ROUTER</string>
+    <string name="role_router_client">ROUTER CLIENT</string>
     <string name="role_router_desc">Інфраструктурны вузел для пашырэння пакрыцця сеткі праз перасылку паведамленняў. Бачны ў спісе вузлоў.</string>
+    <string name="role_router_late">ROUTER LATE</string>
+    <string name="role_sensor">SENSOR</string>
+    <string name="role_tak">TAK</string>
     <string name="role_tak_desc">Аптымізавана для сувязі з сістэмай ATAK, змяншае руцінныя трансляцыі.</string>
+    <string name="role_tak_tracker">TAK TRACKER</string>
+    <string name="role_tracker">TRACKER</string>
     <string name="role_tracker_desc">Транслюе пакеты з GPS-каардынатамі з высокім прыярытэтам.</string>
     <!-- ROUTING -->
     <string name="routing_error_got_nak">Атрымана адмоўнае пацвярджэнне</string>
@@ -307,7 +322,6 @@
     <string name="username">Імя карыстальніка</string>
     <string name="via_mqtt">праз MQTT</string>
     <!-- WIFI -->
-    <string name="wifi_ip">Wifi IP:</string>
     <string name="wifi_provision_success_ip_address">IP-адрас</string>
     <string name="wifi_provision_success_username">Імя карыстальніка</string>
     <!-- WIND -->

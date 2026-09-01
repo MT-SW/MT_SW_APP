@@ -110,7 +110,6 @@
     <string name="config_lora_hop_limit_summary">Подешава максималан број скокова. Подразумевано је 3, а повећање броја одобрених скокова такође повећава загушење и треба га користити опрезно. Поруке емитоване са 0 скокова неће добити потврде пријема (ACK).</string>
     <string name="config_lora_modem_preset_summary">Доступна унапред подешена подешавања модема, подразумевана је Long Fast.</string>
     <string name="config_lora_region_summary">Регион у коме ћете користити ваше радио уређаје.</string>
-    <string name="config_network_wifi_enabled_summary">Омогућавање ВајФаја ће онемогућити блутут везу са апликацијом.</string>
     <string name="config_position_broadcast_smart_minimum_distance_summary">Минимална промена растојања у метрима која ће се узети у обзир за паметно емитовање позиције.</string>
     <string name="config_position_flags_summary">Опциони поља за укључивање при склапању порука о позицији. Што више поља је укључено, порука ће бити већа, што доводи до дужег времена емитовања и већег ризика од губитка пакета.</string>
     <string name="config_power_is_power_saving_summary">Спаваће све што је више могуће, за улогу трагача и сензора ово ће укључивати и лора радио. Не користите ово подешавање ако желите да користите свој уређај са мобилним апликацијама или користите уређај без корисничког дугмета.</string>
@@ -237,15 +236,6 @@
     <string name="intro_show">Прикажи упутства</string>
     <string name="ip_address">IP адреса:</string>
     <!-- KEY -->
-    <!-- LABEL -->
-    <string name="label_long_fast">Дугачки домет - Брзо</string>
-    <string name="label_long_moderate">Дугачки домет - Умерено</string>
-    <string name="label_long_slow">Дугачки домет - Споро</string>
-    <string name="label_medium_fast">Средњи домет - Брзо</string>
-    <string name="label_medium_slow">Средњи домет - Споро</string>
-    <string name="label_short_fast">Кратки домет - Брзо</string>
-    <string name="label_short_slow">Кратки домет - Споро</string>
-    <string name="label_short_turbo">Кратки домет - Турбо</string>
     <string name="latitude">Ширина</string>
     <!-- LAYER -->
     <string name="led_heartbeat">LED срчани откуцаји</string>
@@ -274,6 +264,9 @@
     <string name="map_download_complete">Преузимање готово!</string>
     <string name="map_download_errors">Преузимање довршено са %1$d грешака</string>
     <string name="map_download_region">Регион за преузимање</string>
+    <string name="map_filter_all_roles">Сви</string>
+    <string name="map_filter_display_title">Приказ</string>
+    <string name="map_filter_nodes_title">Чворови</string>
     <string name="map_offline_manager">Менаџер офлајн мапа</string>
     <string name="map_purge_fail">Пражњење SQL кеша није успело, погледајте logcat за детаље</string>
     <string name="map_purge_success">Кеш SQL очишћен за %1$s</string>
@@ -288,6 +281,8 @@
     <!-- MESH -->
     <string name="mesh_beacon_offer_dismiss">Отпусти</string>
     <string name="mesh_beacon_preset_none">Ништа</string>
+    <string name="mesh_beacon_region_label">Регион</string>
+    <string name="mesh_beacon_target_channel_index">Канал</string>
     <!-- MESHTASTIC -->
     <string name="meshtastic_alerts_notifications">Обавештења о упозорењима</string>
     <string name="meshtastic_low_battery_notifications">Нотификације о ниском нивоу батерије</string>
@@ -416,17 +411,26 @@
     <string name="ringtone">Мелодија звона</string>
     <!-- ROLE -->
     <string name="role">Улога уређаја</string>
+    <string name="role_client">Клијент</string>
     <string name="role_client_desc">Повезана апликација или самостални уређај за слање порука.</string>
+    <string name="role_client_hidden">Скривени клијент</string>
     <string name="role_client_hidden_desc">Уређај који емитује само по потреби ради прикривености или уштеде енергије.</string>
+    <string name="role_client_mute">Клијент мутиран</string>
     <string name="role_client_mute_desc">Уређај који не прослеђује пакете примљене од других уређаја.</string>
-    <string name="role_lost_and_found_desc">Редовно емитује локацију као поруку подразумеваном каналу ради помоћи при проналаску уређаја.</string>
+    <string name="role_lost_and_found">Изгубљено и нађено</string>
+    <string name="role_repeater">Поновљач</string>
     <string name="role_repeater_desc">Инфраструктурни чвор за проширење покривености мреже прослеђивањем порука са минималним трошковима енергије. Није видљив на листи чворова.</string>
+    <string name="role_router">Рутер</string>
     <string name="role_router_client_desc">Комбинација и РУТЕРА и КЛИЈЕНТА. Нису намењени за мобилне уређаје.</string>
     <string name="role_router_desc">Инфраструктурни чвор за проширење покривености мреже прослеђивањем порука. Видљив на листи чворова.</string>
+    <string name="role_router_late">Рутер са кашњењем</string>
     <string name="role_router_late_desc">Инфраструктурни чвор који увек поново емитује пакете само једном, али тек након свих других режима, обезбеђујући додатно покривање за локалне кластере. Видљиво на листи чворова.</string>
+    <string name="role_sensor">Сензор</string>
     <string name="role_sensor_desc">Емитује телеметријске пакете као приоритет.</string>
     <string name="role_tak_desc">Оптимизован за комуникацију са ATAK системом, смањује рутинске емисије.</string>
+    <string name="role_tak_tracker">ТАК Трекер</string>
     <string name="role_tak_tracker_desc">Омогућава аутоматске TAK PLI емисије и смањује рутинске емисије.</string>
+    <string name="role_tracker">Трекер</string>
     <string name="role_tracker_desc">Емитује пакете са GPS позицијом као приоритет.</string>
     <!-- ROUTING -->
     <string name="routing_error_got_nak">Примљена негативна потврда</string>
@@ -535,11 +539,8 @@
     <string name="what_is_meshtastic">Шта је Мештастик?</string>
     <string name="what_is_meshtastic_description">Отворена, off-grid, децентрализована, меш мрежа која ради на приступачним радио уређајима мале снаге.</string>
     <!-- WIFI -->
-    <string name="wifi_config">Опције вајфаја</string>
     <string name="wifi_provision_success_ip_address">IP адреса</string>
     <string name="wifi_provision_success_username">Корисничко име</string>
-    <string name="wifi_qr_code_error">Неважећи формат QR кода за ВајФАј податке</string>
-    <string name="wifi_qr_code_scan">Скенирај ВајФај QR код</string>
     <!-- WIND -->
     <string name="wind_speed">Брзина ветра</string>
     <!-- WRITE -->

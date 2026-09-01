@@ -19,7 +19,6 @@
     <!-- A11Y -->
     <string name="a11y_label_value">%1$s: %2$s</string>
     <string name="a11y_message_from">来自 %1$s: %2$s 的消息</string>
-    <string name="a11y_node_battery">电量: %1$d%%</string>
     <string name="a11y_node_distance_away">%1$s 离开</string>
     <string name="a11y_node_favorite">收藏</string>
     <string name="a11y_node_hops_away">%1$d 跳数</string>
@@ -201,7 +200,6 @@
     <string name="chirpy_assistant_title">Chirpy 助手</string>
     <string name="chirpy_checking">正在检查 Chirpy 助手的可用性…</string>
     <string name="chirpy_downloading">Chirpy 助手正在下载中…</string>
-    <string name="chirpy_downloading_progress">正在下载 Chirpy 语音模型: %1$d%%</string>
     <string name="chirpy_downloading_subtitle">Chirpy 语音助手马上就好啦！</string>
     <string name="chirpy_error_busy">当前信道因为流量太大，已经完全拥堵了！📶 让我们等待一个空闲的时段，然后再重试发送。</string>
     <string name="chirpy_error_model_unavailable">请充电，固件还在下载中！🔋 给我一点时间来同步数据并启动吧！</string>
@@ -276,7 +274,6 @@
     <string name="config_lora_region_summary">使用电台的地区。</string>
     <string name="config_network_eth_enabled_summary">启用以太网将禁用蓝牙连接。TCP节点连接在 Apple 设备上不可用。</string>
     <string name="config_network_udp_enabled_summary">在本地网络上启用通过 UDP广播数据包。</string>
-    <string name="config_network_wifi_enabled_summary">启用 WiFi 将禁用应用程序的蓝牙连接。</string>
     <string name="config_position_broadcast_secs_summary">无节点广播位置的最大间隔。</string>
     <string name="config_position_broadcast_smart_minimum_distance_summary">智能位置广播考虑的最小距离变化以米为单位。</string>
     <string name="config_position_broadcast_smart_minimum_interval_secs_summary">如果达到最小距离，位置更新将会发送最快的。</string>
@@ -438,7 +435,6 @@
     <string name="discovery_map">网络拓扑地图</string>
     <string name="discovery_not_connected">未连接</string>
     <string name="discovery_not_connected_description">请连接到一台 Meshtastic 设备以开始扫描。</string>
-    <string name="discovery_paused">已暂停: %1$s</string>
     <string name="discovery_preparing">正在扫描</string>
     <string name="discovery_preset_home_label">%1$s (主页)</string>
     <string name="discovery_reconnecting">正在重新连接 %1$s</string>
@@ -685,7 +681,6 @@
     <string name="firmware_update_method_ble">BLE OTA</string>
     <string name="firmware_update_method_detail">更新到%1$s</string>
     <string name="firmware_update_method_usb">USB文件传输</string>
-    <string name="firmware_update_method_wifi">WiFi OTA</string>
     <string name="firmware_update_missing_target">该设备无法获取固件目标信息。</string>
     <string name="firmware_update_nightly">每日构建</string>
     <string name="firmware_update_no_device">设备未连接</string>
@@ -856,24 +851,6 @@
     <string name="key_verification_final_title">密钥验证完成</string>
     <string name="key_verification_request_title">密钥验证请求</string>
     <string name="key_verification_title">密钥验证</string>
-    <!-- LABEL -->
-    <string name="label_lite_fast">Lite - Fast</string>
-    <string name="label_lite_slow">Lite - Slow</string>
-    <string name="label_long_fast">长距离 / 快速模式</string>
-    <string name="label_long_moderate">长距离 / 中速模式</string>
-    <string name="label_long_slow">长距离 / 低速模式</string>
-    <string name="label_long_turbo">长距离 / 高速模式</string>
-    <string name="label_medium_fast">中距离 / 快速模式</string>
-    <string name="label_medium_slow">中距离 / 低速模式</string>
-    <string name="label_medium_turbo">中距离 - 快速模式</string>
-    <string name="label_narrow_fast">Narrow - Fast</string>
-    <string name="label_narrow_slow">Narrow - Slow</string>
-    <string name="label_short_fast">短距离 / 快速模式</string>
-    <string name="label_short_slow">短距离 / 低速模式</string>
-    <string name="label_short_turbo">短距离 / 高速模式</string>
-    <string name="label_tiny_fast">Tiny - Fast</string>
-    <string name="label_tiny_slow">Tiny - Slow</string>
-    <string name="label_very_long_slow">超长距离 / 低速模式</string>
     <string name="last_heard_filter_label">按最后听到时间筛选：%1$s</string>
     <string name="last_position_update">最后位置更新</string>
     <string name="latest_alpha_firmware">最新测试版</string>
@@ -983,7 +960,11 @@
     <string name="map_download_complete">下载已完成！</string>
     <string name="map_download_errors">下载完成，但有 %1$d 个错误</string>
     <string name="map_download_region">下载区域</string>
+    <string name="map_download_status_complete">完成</string>
     <string name="map_filter">地图过滤器\n</string>
+    <string name="map_filter_all_roles">全部</string>
+    <string name="map_filter_display_title">显示</string>
+    <string name="map_filter_nodes_title">节点</string>
     <string name="map_layer_formats">地图图层支持 .kml, .kmz, 或 GeoJSON 格式。</string>
     <string name="map_node_popup_details">%1$s&lt;br&gt;最后通信时间: %2$s&lt;br&gt;最后位置: %3$s&lt;br&gt;电池电量: %4$s</string>
     <string name="map_offline_manager">离线管理</string>
@@ -1013,8 +994,6 @@
     <string name="mesh_beacon_broadcast">广播一个信标</string>
     <string name="mesh_beacon_broadcast_summary">定期向附近的节点发布网格信息</string>
     <string name="mesh_beacon_channels_title">广播频道</string>
-    <string name="mesh_beacon_interval">广播间隔 (秒)</string>
-    <string name="mesh_beacon_interval_error">最小值 %1$d 秒</string>
     <string name="mesh_beacon_invitations_title">Mesh 活动邀请</string>
     <string name="mesh_beacon_listen">接收广播信标</string>
     <string name="mesh_beacon_listen_summary">搜索附近设备广播的邀请</string>
@@ -1024,25 +1003,21 @@
     <string name="mesh_beacon_notification_title">Mesh 组网加入邀请</string>
     <string name="mesh_beacon_offer_add">添加频道</string>
     <string name="mesh_beacon_offer_channel">频道: %1$s</string>
-    <string name="mesh_beacon_offer_channel_key">提供的频道密钥 (base64)</string>
-    <string name="mesh_beacon_offer_channel_name">提供的频道名称</string>
     <string name="mesh_beacon_offer_discover">设备发现</string>
     <string name="mesh_beacon_offer_dismiss">忽略</string>
     <string name="mesh_beacon_offer_from_unknown">来自一个未知节点</string>
     <string name="mesh_beacon_offer_join">Join</string>
     <string name="mesh_beacon_offer_preset">预设: %1$s</string>
-    <string name="mesh_beacon_offer_preset_setting">提供的预设配置</string>
     <string name="mesh_beacon_offer_region">地区: %1$s</string>
-    <string name="mesh_beacon_offer_region_setting">提供的地区频段</string>
     <string name="mesh_beacon_offer_signal">信号: %1$s / %2$s</string>
     <string name="mesh_beacon_offer_title">Mesh 组网邀请</string>
     <string name="mesh_beacon_on_preset">调制预设</string>
-    <string name="mesh_beacon_on_region">发射地区</string>
     <string name="mesh_beacon_preset_indicator">附近信标广播</string>
     <string name="mesh_beacon_preset_none">无</string>
+    <string name="mesh_beacon_region_label">区域</string>
     <string name="mesh_beacon_target">目标节点 %1$d</string>
     <string name="mesh_beacon_target_add">添加目标</string>
-    <string name="mesh_beacon_target_channel_index">频道索引</string>
+    <string name="mesh_beacon_target_channel_index">频道</string>
     <string name="mesh_beacon_target_remove">取消目标</string>
     <string name="mesh_beacon_targets">广播目标</string>
     <string name="mesh_map_location">网格地图位置</string>
@@ -1184,11 +1159,6 @@
     <string name="node_layout_complete_description">完整布局会显示所有可用的节点数据.没有数据将被自动隐藏。</string>
     <string name="node_layout_device_role">设备 &amp; 角色</string>
     <string name="node_layout_distance_and_bearing">距离与方位</string>
-    <string name="node_layout_help_signal_bad">信号质量差.当前信噪比高于 -18 dB且 接收信号强度高于 -125。</string>
-    <string name="node_layout_help_signal_fair">信号质量中等.当前信噪比高于 -12 dB且 接收信号强度高于 -120 dBm。</string>
-    <string name="node_layout_help_signal_good">信号质量极佳.当前信噪比高于 -7 dB且接收信号强度高于 -115 dBm。</string>
-    <string name="node_layout_help_signal_indicator">将 SNR 和 RSSI 综合为一个质量等级，并以带有描述文字的彩色图标形式显示.此功能仅在完整布局下可见。</string>
-    <string name="node_layout_help_signal_none">未检测到可用信号.当前指标低于所有质量阈值。</string>
     <string name="node_layout_hops_away">跃点数</string>
     <string name="node_layout_last_heard_time">最后活跃时间</string>
     <string name="node_layout_log_icons">传感器指标</string>
@@ -1214,7 +1184,6 @@
     <string name="node_sort_title">排序规则</string>
     <string name="node_sort_via_favorite">通过收藏夹</string>
     <string name="node_sort_via_mqtt">通过 MQTT</string>
-    <string name="node_status_summary">当前状态字符串</string>
     <string name="nodedb_reset">重置节点数据库</string>
     <string name="nodeinfo_broadcast_interval">节点信息广播间隔</string>
     <!-- NODES -->
@@ -1297,7 +1266,6 @@
     <string name="pax_total_format">人员: %1$d</string>
     <string name="pax_total_marker">人员: %1$s</string>
     <string name="pax_wifi_format">W:%1$d</string>
-    <string name="pax_wifi_marker">无线网络: %1$s</string>
     <string name="paxcounter">客流计数</string>
     <string name="paxcounter_config">Paxcount 配置</string>
     <string name="paxcounter_enabled">启用 Paxcount</string>
@@ -1446,18 +1414,30 @@
     <string name="ringtone_imported">已导入铃声</string>
     <!-- ROLE -->
     <string name="role">设备角色</string>
+    <string name="role_client">客户端</string>
+    <string name="role_client_base">客户群</string>
     <string name="role_client_base_desc">将来自或收藏节点的数据包视为ROUTER_LATE，所有其他数据包均为CLIENT。</string>
     <string name="role_client_desc">应用配对或独立使用的消息传递设备</string>
+    <string name="role_client_hidden">客户端隐藏</string>
     <string name="role_client_hidden_desc">只在需要时才广播的设备，以达到隐蔽或省电的目的。</string>
+    <string name="role_client_mute">客户端静默</string>
     <string name="role_client_mute_desc">不转发其他设备数据包的设备。</string>
-    <string name="role_lost_and_found_desc">定期向默认信道发送位置信息，以协助设备恢复。</string>
+    <string name="role_lost_and_found">失物招领</string>
+    <string name="role_repeater">中继</string>
     <string name="role_repeater_desc">通过最低开销转发消息扩展网络覆盖的基础设施节点。不可见于节点列表。</string>
+    <string name="role_router">路由</string>
+    <string name="role_router_client">路由客户端</string>
     <string name="role_router_client_desc">同时兼具路由器和客户端功能的设备。不适用于移动设备。</string>
     <string name="role_router_desc">用于通过转发消息扩展网络覆盖范围的基础设施节点。可在节点列表中看到。</string>
+    <string name="role_router_late">延迟时间</string>
     <string name="role_router_late_desc">基础设施节点，总是在所有其他模式之后重新广播数据包一次，以确保本地集群的额外覆盖范围。会在节点列表中显示。</string>
+    <string name="role_sensor">传感器</string>
     <string name="role_sensor_desc">将遥测数据包优先广播。</string>
+    <string name="role_tak">TAK</string>
     <string name="role_tak_desc">针对 ATAK 系统通信进行优化，减少常规广播。</string>
+    <string name="role_tak_tracker">TAK 追踪器</string>
     <string name="role_tak_tracker_desc">启用自动 TAK PLI（Position Location Information）广播，并减少常规广播。</string>
+    <string name="role_tracker">追踪器</string>
     <string name="role_tracker_desc">定位模式 - 用于作为 GPS 跟踪器。从该设备发送的定位数据包优先级较高，每两分钟广播一次。智能位置广播默认为关闭。</string>
     <string name="root_topic">根主题</string>
     <string name="rotary_encoder_1_enabled">启用旋转编码器 #1 </string>
@@ -1614,7 +1594,6 @@
     <string name="ssid">SSID</string>
     <string name="state_broadcast_seconds">状态广播(秒)</string>
     <string name="status_message">状态消息</string>
-    <string name="status_message_config">状态消息配置</string>
     <string name="stay_connected_anywhere">随时随地保持联系</string>
     <string name="stop_connecting">停止连接</string>
     <string name="store_forward">存储 &amp; 转发</string>
@@ -1719,7 +1698,6 @@
     <string name="traffic_management_nodeinfo_direct_response_max_hops">直接响应的最大节点数</string>
     <string name="traffic_management_position_dedup">调度位置</string>
     <string name="traffic_management_position_min_interval">最小位置间隔(秒)</string>
-    <string name="traffic_management_position_precision">位置精度 (bits)</string>
     <string name="traffic_management_rate_limit_enabled">调用次数限制</string>
     <string name="traffic_management_rate_limit_max_packets">窗口最大数据包</string>
     <string name="traffic_management_rate_limit_window">速度限制窗口 (秒)</string>
@@ -1816,28 +1794,20 @@
     <string name="what_is_meshtastic">什么是 Meshtastic?</string>
     <string name="what_is_meshtastic_description">这是一个开源、离网、分布式 Mesh 网络，可在价格低廉的低功率无线电设备上运行。</string>
     <!-- WIFI -->
-    <string name="wifi_config">WiFi设置</string>
     <string name="wifi_devices">MPWRD-OS 系统 Wi-Fi 配置</string>
-    <string name="wifi_enabled">启用 WiFi</string>
-    <string name="wifi_ip">Wifi IP地址：</string>
     <string name="wifi_provision_available_networks">可用网络</string>
     <string name="wifi_provision_connect_failed">无法连接: %1$s</string>
     <string name="wifi_provision_description">通过蓝牙将 Wi-Fi 凭证预置/配置到你的 mPWRD-OS 设备中。</string>
     <string name="wifi_provision_device_found">已发现设备</string>
-    <string name="wifi_provision_device_found_detail">准备开始搜索 Wi-Fi 网络。</string>
     <string name="wifi_provision_hidden_network">隐藏网络</string>
     <string name="wifi_provision_mpwrd_disclaimer">了解更多关于 mPWRD-OS 项目\nhttps://github.com/mPWRD-OS</string>
     <string name="wifi_provision_no_networks">未发现网络</string>
-    <string name="wifi_provision_scan_failed">扫描WiFi网络失败: %1$s</string>
     <string name="wifi_provision_scan_networks">扫描网络</string>
     <string name="wifi_provision_scanning_ble">正在搜索设备…</string>
     <string name="wifi_provision_scanning_wifi">正在扫描…</string>
-    <string name="wifi_provision_sending_credentials">正在应用 WiFi 配置…</string>
     <string name="wifi_provision_signal_strength">%1$d%</string>
     <string name="wifi_provision_ssid_label">网络名称(SSID)</string>
     <string name="wifi_provision_ssid_placeholder">输入或选择一个网络</string>
-    <string name="wifi_provision_status_applied">WiFi配置成功！</string>
-    <string name="wifi_provision_status_failed">应用 Wi-Fi 配置失败</string>
     <string name="wifi_provision_success_description">您的 mPWRD-OS 设备已经加入 Wi-Fi 网络。</string>
     <string name="wifi_provision_success_device_connected">设备已连接</string>
     <string name="wifi_provision_success_done">完成</string>
@@ -1852,9 +1822,6 @@
     <string name="wifi_provision_success_ssh_unavailable">分配 IP 地址后，SSH 命令即可使用。</string>
     <string name="wifi_provision_success_username">用户名称</string>
     <string name="wifi_provisioning">为 mPWRD-OS 系统配置 Wi-Fi 网络</string>
-    <string name="wifi_qr_code_error">WiFi凭据二维码格式无效</string>
-    <string name="wifi_qr_code_scan">扫描 WiFi 二维码</string>
-    <string name="wifi_rssi_threshold_defaults_to_80">WiFi RSSI 阈值(默认为-80)</string>
     <string name="wifi_unavailable">未连接到 Wi-Fi,网络扫描可能找不到附近的设备。</string>
     <!-- WIND -->
     <string name="wind">风</string>
@@ -1869,4 +1836,6 @@
     <string name="write_nfc_success">数据已成功写入标签</string>
     <string name="write_nfc_text">请将一张可写入的 NFC 标签贴在手机背面。</string>
     <string name="you">你</string>
+    <string name="zoom_in">放大</string>
+    <string name="zoom_out">缩小</string>
 </resources>

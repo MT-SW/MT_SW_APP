@@ -2,7 +2,7 @@
 title: Virheenjäljityslokitiedot
 parent: Käyttöopas
 nav_order: 22
-last_updated: 2026-08-27
+last_updated: 2026-08-30
 description: Tarkastele ja vie sovelluksen omat virheenjäljityslokitiedot suoraan sovelluksesta ja liitä lokitiedot GitHub-vikaraporttiin ongelmien selvittämisen helpottamiseksi — adb:tä ei tarvita.
 aliases:
   - debug-lokitiedot
@@ -13,11 +13,11 @@ aliases:
 
 # Virheenjäljityslokitiedot
 
-Kun jokin toimii odottamattomasti, sovelluksen virheenjäljityslokitiedot ovat hyödyllisin liite vikaraporttiin. Meshtastic voi kerätä ne **puolestasi suoraan sovelluksessa** — et enää tarvitse `adb`:tä tai työpöytätyökaluja niiden keräämiseen.
+Kun jokin toimii odottamattomasti, sovelluksen virheenjäljityslokitiedot ovat hyödyllisin liite vikaraporttiin. Meshtastic voi kerätä ne **puolestasi suoraan sovelluksessa** — niiden keräämiseen ei tarvita `adb`:tä eikä työpöydän työkaluja.
 
 Avaa **Virheenjäljityspaneeli** kohdasta **Asetukset → Lisäasetukset → Virheenjäljityspaneeli**.
 
-> 💡 **Ilmoitatko ongelmasta?** Vie lokitiedot (katso alla) ja liitä `.txt`-tiedosto raporttiisi osoitteessa [github.com/meshtastic/Meshtastic-Android/issues](https://github.com/meshtastic/Meshtastic-Android/issues). Lokitietotallenne, joka kattaa hetken jolloin ongelma ilmeni, auttaa muuttamaan "ei toimi" -kuvauksen sellaiseksi, jonka kehittäjä pystyy oikeasti selvittämään.
+Jos teet vikailmoituksen, vie lokit (katso [Lokien vieminen](#exporting)) ja liitä `.txt`-tiedosto raporttiisi [Meshtastic-Androidin vikaseurannassa](https://github.com/meshtastic/Meshtastic-Android/issues). Lokitietotallenne, joka kattaa hetken jolloin ongelma ilmeni, auttaa muuttamaan "ei toimi" -kuvauksen sellaiseksi, jonka kehittäjä pystyy oikeasti selvittämään.
 
 ## Kaksi välilehteä
 
@@ -30,7 +30,7 @@ Jokaisella välilehdellä on oma **Vie**-painikkeensa, ja kumpikin tuottaa oman 
 
 ## Sovelluslokitietojen tarkastelu
 
-**Sovelluslokitiedot**-välilehti näyttää viimeisimmät lokirivit **vain tästä sovelluksesta** — ei koskaan muista laitteesi sovelluksista.
+**Sovelluksen lokit** -välilehdellä näkyvät tämän **sovelluksen** uusimmat lokirivit — ei koskaan muiden puhelimesi sovellusten.
 
 - **Haku** — kirjoita hakukenttään suodattaaksesi vastaavat lokirivit.
 - **Tasosuodatin** — **V / D / I / W / E** -painikkeilla voit näyttää tai piilottaa Verbose-, Debug-, Info-, Warn- ja Error-lokirivit. Piilota taso napauttamalla sitä. Napauta uudelleen, niin se tulee takaisin näkyviin. Vakavat virheet näytetään aina.
@@ -40,11 +40,11 @@ Virhe- ja varoitusrivit on korostettu, jotta ongelmat erottuvat paremmin.
 
 ## Lokien vienti
 
-Napauta **latauskuvaketta** tallentaaksesi nykyiset lokitiedot tiedostoon. Valitset tallennuspaikan järjestelmän tiedostonvalitsimessa, ja tiedosto nimetään aikaleimalla (esimerkiksi `meshtastic_logcat_20260701_143312.txt`), jotta aiemmat viennit eivät ylikirjoitu.
+Napauta **latauskuvaketta** tallentaaksesi nykyiset lokitiedot tiedostoon. The app first shows a warning about what the file contains — confirm it, then choose where the file goes through the system file picker. The file is named with a timestamp (for example `meshtastic_logcat_20260701_143312.txt`) so repeated exports never overwrite each other. The same warning guards the **Packets** tab export.
 
 Liitä tämä tiedosto GitHub-vikaraporttiisi.
 
-> 🔒 **Privacy:** Exports automatically **redact** private keys, admin keys, session passkeys and channel PSKs before writing the file. Logs can still contain node names, positions, and other identifying details — glance through the file before sharing it publicly, and share privately if you have any doubt.
+> 🔒 **Privacy:** Exports automatically **redact** private keys, admin keys, session passkeys, and channel PSKs, and suppress raw packet bytes. Everything else stays — the file can contain your message text, precise locations, and node details. Read it before sharing it publicly, and share privately if you have any doubt.
 
 ## Työpöytä
 
@@ -54,5 +54,3 @@ Työpöytäsovelluksessa ei ole järjestelmän logcat-lokitietoa, joten **Sovell
 
 - [Ohjeet ja sovelluksen sisäinen dokumentaatio](help-and-docs) — tämän dokumentaation lukeminen offline-tilassa sovelluksessa
 - [Yhteydet](connections) — jos ongelma liittyy radion yhdistämiseen
-
----

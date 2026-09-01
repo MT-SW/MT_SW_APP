@@ -2,7 +2,7 @@
 title: マップとウェイポイント
 parent: User Guide
 nav_order: 6
-last_updated: 2026-08-27
+last_updated: 2026-08-30
 description: マップ上でノードの位置を確認し、ウェイポイントの作成・共有、マップレイヤーとサイトプランナーの管理、位置共有とプライバシーの制御を行います。
 aliases:
   - map
@@ -35,36 +35,44 @@ aliases:
 
 - **ズーム：** ピンチ操作、または +/− ボタンを使います
 - **移動：** ドラッグして見て回ります
-- **中央に配置：** 位置ボタンを選ぶと、自分の位置を中央に表示します
+- **Center** — tap the location button to center on your position
 - **ノードのタップ：** ノードのマーカーをタップすると詳細を表示します
 
-フローティングツールバーから、コンパス、レイヤーの切り替え、ノードの絞り込み、更新、位置追跡にすばやくアクセスできます。 コンパスをタップすると北を上に向け直し、位置ボタンをタップすると現在の位置を中央に表示します。
+The floating toolbar provides quick access to the compass, the map type and layers pickers, node filters, Site Planner, and location tracking. コンパスをタップすると北を上に向け直し、位置ボタンをタップすると現在の位置を中央に表示します。 On **Google Play** builds a refresh button joins them while a network layer is showing; on **F-Droid** and **Desktop**, refresh a network layer from its own row in the layers sheet instead.
 
-![マップ操作のオーバーレイ](../../assets/screenshots/map_controls_overlay.png)
+![Map floating toolbar with compass, filter, refresh, and location controls](../../assets/screenshots/map_controls_overlay.png)
+
+### Filtering the Map
+
+Tap the filter button in the floating toolbar to open **Filter map**. **Display** controls what is drawn: **Only Favorites**, **Show Waypoints**, **Show Precision Circles**, and a slider that hides nodes not heard from recently. **Node roles** is a chip per device role, plus **All** to show every role; a selected chip means that role is shown. **Nodes** narrows the set further with **Hide offline nodes**, **Only show direct nodes**, **Exclude MQTT**, **Show ignored nodes**, and **Include unknown**.
+
+A dot on the filter button means at least one filter is hiding something — check it before concluding the mesh is quiet. Turning **Show Waypoints** off hides every waypoint, including your own. **Show ignored nodes** adds them to the map rather than showing only them — unlike the node list's **Only show ignored Nodes**.
 
 ## ウェイポイント
 
-ウェイポイントは、メッシュの全メンバーが見られる、共有された地理的な注目地点です。
+Waypoints are shared points of interest, visible to everyone on your mesh.
 
 ### ウェイポイントを作成する
 
-1. マップ上の目的の場所を長押しします。
+Your radio must be connected — the map ignores a touch & hold while it is not, because saving a waypoint means broadcasting it.
+
+1. Touch & hold the map at the desired location.
 2. 名前と、任意で説明を入力します。
 3. ウェイポイントのアイコン／絵文字を選びます。
 4. 「**送信**」をタップしてメッシュに共有します。
 
-ウェイポイントはメッセージと同じように宛先を指定します。既定ではプライマリチャンネルにブロードキャストされますが、特定のチャンネルに送ったり、単一のノードへのダイレクトメッセージとして送ったりすることもできます。
+Waypoints always broadcast to the whole mesh on the primary channel. Unlike a message, a waypoint cannot be addressed to one channel or sent as a direct message.
 
 ### ウェイポイントのプロパティ
 
-| プロパティ  | 説明                          |
-| ------ | --------------------------- |
-| 名前     | 短い識別子（最大 29 文字）             |
-| 説明     | 任意の、より詳しい説明                 |
-| アイコン   | マップ上の視覚的なマーカー絵文字            |
-| ロック済み  | ロックすると、作成者だけが編集・削除できます      |
-| 有効期限   | 任意の、自動削除する日時                |
-| ジオフェンス | 任意の、進入／退出を通知するエリア。詳しくは後述します |
+| プロパティ  | 説明                                                                             |
+| ------ | ------------------------------------------------------------------------------ |
+| 名前     | 短い識別子（最大 29 文字）                                                                |
+| 説明     | 任意の、より詳しい説明                                                                    |
+| アイコン   | マップ上の視覚的なマーカー絵文字                                                               |
+| ロック済み  | ロックすると、作成者だけが編集・削除できます                                                         |
+| 有効期限   | 任意の、自動削除する日時                                                                   |
+| ジオフェンス | Optional enter/exit alert area — see [Waypoint Geofences](#waypoint-geofences) |
 
 ### ウェイポイントの有効期限
 
@@ -83,22 +91,24 @@ aliases:
 2. エリアを設定したら、「**進入時に通知**」や「**退出時に通知**」を切り替えます。
 3. 任意で「**お気に入りのみ**」を有効にすると、通知をお気に入りのノードに限定できます。
 
-ウェイポイント（およびそのジオフェンス）はメッシュ全体にブロードキャストされるため、デフォルトでは**作成者**だけに通知されます。 他の人がジオフェンス付きのウェイポイントを共有した場合、その詳細ビューに「**通過を通知する**」というオプトインが表示され、あなたも進入／退出の通知を受け取れます。
+ウェイポイント（およびそのジオフェンス）はメッシュ全体にブロードキャストされるため、デフォルトでは**作成者**だけに通知されます。 If someone else shares a geofenced waypoint with you, its detail view offers a **Notify me of crossings** opt-in so you can also receive enter/exit alerts for it.
 
 ### ウェイポイントを管理する
 
-- マップ上のウェイポイントをタップすると、その詳細と座標を表示します
-- 自分が作成したウェイポイントを編集または削除できます
-- **ロックされたウェイポイント**は、他のノードから変更・削除できません。元の作成者だけが変更できます
-- ロックされていないウェイポイントは、どのメッシュメンバーでも編集できます
+- Tap a waypoint to see its name, description, and geofence radius. On **Google Play** builds the first tap opens the marker's info bubble — tap the bubble to open the waypoint itself
+- **Locked waypoints** can only be changed on the mesh by the node that locked them
+- Unlocked waypoints can be edited by any mesh member while connected to a radio — saving re-broadcasts the waypoint
+- Confirming a delete removes your own copy. To remove it from everyone else's map too, select **Delete for everyone** in the delete dialog; that box appears only for a waypoint you may change (unlocked, or locked by you) and only while you are connected
 
 ## マップレイヤー
 
-マップのレイヤーアイコンをタップすると「**マップレイヤーの管理**」が開き、`.kml`、`.kmz`、または GeoJSON 形式の独自のオーバーレイをインポートできます。Meshtastic でファイルを開くか、別のアプリからアプリに共有することでインポートします。 インポートしたレイヤーは、それぞれ表示／非表示を切り替えるトグルと、削除するオプションとともに一覧表示されます。 これは Google Play 版と F-Droid 版の両方で利用できます。
+Tap the layers icon on the map to open **Manage Map Layers**. It imports your own overlays in `.kml`, `.kmz`, or GeoJSON format — including KMZ ground overlays (georeferenced images, such as exported topo or aerial tiles), which drape at their stated bounds. Add one by picking a file with **Add Layer**, opening a file with Meshtastic, or sharing it into the app from another app. **Add Network Layer** instead takes a name and an `http://` or `https://` URL pointing at a KML or GeoJSON file; that layer then carries its own refresh button in the sheet. On **Google Play** builds the toolbar's refresh button re-fetches every visible network layer at once.
+
+インポートしたレイヤーは、それぞれ表示／非表示を切り替えるトグルと、削除するオプションとともに一覧表示されます。 Each layer — imported or built-in overlay — carries its own opacity slider while it is switched on, so an overlay can be faded back rather than only switched off. This works on the Google Play build, the F-Droid build, and **Desktop**, which shares the same layer store and file picker.
 
 ### サイトプランナー
 
-**サイトプランナー**は、送信機の RF カバレッジを推定し、色分けされたオーバーレイとしてマップに描画します。 マップの操作から開くか、ノードの詳細ページから「**カバレッジを推定**」で開きます（位置が判明しているノードでのみ表示されます）。 送信機（位置、周波数、送信出力、アンテナ利得と高さ）、受信機（感度、高さ）、シミュレーションのオプション（最大範囲、高解像度の地形、カラーパレット）を設定してから、推定を実行します。 マップレイヤーと同様に、サイトプランナーも Google Play 版と F-Droid 版の両方で動作します。
+**サイトプランナー**は、送信機の RF カバレッジを推定し、色分けされたオーバーレイとしてマップに描画します。 マップの操作から開くか、ノードの詳細ページから「**カバレッジを推定**」で開きます（位置が判明しているノードでのみ表示されます）。 送信機（位置、周波数、送信出力、アンテナ利得と高さ）、受信機（感度、高さ）、シミュレーションのオプション（最大範囲、高解像度の地形、カラーパレット）を設定してから、推定を実行します。 Like map layers, Site Planner works on both the Google Play and F-Droid builds, where the finished estimate is drawn on the map as a coverage overlay. On **Desktop** the same form is shown but the planner opens in your browser; to bring the estimate onto the map, click the transmitter pin in the browser, choose the planner's GeoJSON export, then add the downloaded file under **Manage Map Layers** with **Add Layer**. Use the GeoJSON export, not the KML one — the KML is a ground-overlay image this map cannot draw.
 
 ## 位置の共有
 
@@ -106,23 +116,59 @@ aliases:
 
 ノードは、次のいずれかに基づいて GPS 位置を共有します：
 
-- **固定間隔：** 一定間隔で位置をブロードキャストします
-- **スマート位置：** 移動がしきい値を超えたときにブロードキャストします
-- **手動：** 明示的に要求されたときのみ共有します
+- **Broadcast Interval** — share the position on a fixed timer
+- **Smart Position** — share only once you have moved far enough; **Smart Interval** sets the shortest gap between broadcasts and **Smart Distance** how far you must move
+- **Fixed Position** — publish a latitude, longitude, and altitude you enter by hand instead of the GPS reading
+- **GPS Mode (Physical Hardware)** — GPS enabled, disabled, or not present on this hardware; offered only while **Fixed Position** is off
 
-位置の動作は「**設定 → 位置**」で設定します。
+Configure position behavior in **Settings → Device configuration → Position**. The screen is only reachable while your radio is connected, and saving it reboots the radio. For the full field list, see [Settings — Radio & User](settings-radio-user).
 
 ### プライバシーに関する注意
 
-> 🔒 **プライバシー：** 位置データは、チャンネル上のすべてのノードにブロードキャストされます。 位置を共有したくない場合は、設定で GPS 位置を無効にするか、固定／ダミーの位置を使用してください。
+> 🔒 **プライバシー：** 位置データは、チャンネル上のすべてのノードにブロードキャストされます。 位置を共有したくない場合は、設定で GPS 位置を無効にするか、固定／ダミーの位置を使用してください。 To keep sharing a position without pinpointing yourself, edit the channel in **Settings → Channels**, turn **Precise location** off, and set the slider beneath it — the channel then publishes an approximate area, shown as ± a distance, instead of an exact point.
 
 ## マップソース
 
-ベースマップはアプリの版によって異なります。**Google Play** 版は Google マップを、**F-Droid** 版とデスクトップ版は OpenStreetMap を使用します。 ベースマップの上に、オーバーレイまたは代替として、追加のタイルソースを利用できます：
+Every build offers a base map picker from the map toolbar. **Google Play** builds open on Google's own
+map types; **F-Droid** and **Desktop** builds open on MapLibre's vector styles. Further down the base map
+picker, all three offer the same raster base maps:
 
-- Satellite imagery — on both Google Play and F-Droid
-- Offline tiles — **F-Droid only**. Download map areas for offline use through OSMdroid's tile
-  cache. Google Play and Desktop builds have no offline download
+| Base map                              | 備考                                                                                                    |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Normal / Satellite / Terrain / Hybrid | Google Play only — Google's own map types                                                             |
+| Liberty                               | Default on F-Droid and Desktop. Vector street map                                     |
+| Positron                              | F-Droid and Desktop only. Low-contrast vector map; keeps node markers legible over it |
+| ダーク                                   | F-Droid and Desktop only. Vector map suited to dark themes                            |
+| OpenStreetMap                         | Classic raster street tiles                                                                           |
+| OpenTopoMap                           | Raster topographic                                                                                    |
+| USGS Topo / USGS Imagery              | US coverage only                                                                                      |
+| Esri Topo / Esri Imagery              | Topographic and satellite imagery                                                                     |
+
+Overlays can be toggled on top of any base map, from the layers sheet:
+
+- **Weather radar** — NOAA NEXRAD reflectivity (US coverage)
+- **Hillshade** — terrain relief, on **F-Droid** and **Desktop** only. Useful for understanding why a
+  link fails, since LoRa range is limited by terrain
+
+### Adding your own tile source
+
+Any XYZ tile endpoint can be added as a base map, on every flavor and on desktop. Open **Manage Custom
+Tile Sources** at the foot of the base map picker and paste a URL template using `{z}`, `{x}` and `{y}`
+— plus `{s}` if the provider uses rotating subdomains. A national mapping service, for example:
+
+```
+https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg
+```
+
+Tiles are cached on disk, so panning does not re-download what you were just looking at.
+
+On **Android**, the same screen also imports a local `.mbtiles` archive for fully offline use.
+
+Offline area downloads are **F-Droid only**. Select a vector base map first — Liberty, Positron, or Dark —
+since a download is defined against a vector style and **Start Download** stays disabled over a raster one.
+Frame the area you want on screen, then tap **Start Download** in the layers sheet: that creates a paused
+pack covering the current zoom plus two levels deeper. Press play on the pack's row to actually download it.
+**Google Play** builds import pre-made MBTiles files instead, and **Desktop** has neither.
 
 ## 関連トピック
 
@@ -130,6 +176,3 @@ aliases:
 - [ノードメトリクス](node-metrics)：各ノードの信号品質と位置履歴
 - [Local Mesh Discovery](discovery) — traceroute and neighbor info for understanding mesh topology
 - [単位とロケール](units-and-locale)：距離と座標の表示形式
-
----
-

@@ -2,7 +2,7 @@
 title: Отладочные журналы
 parent: Инструкция пользователя
 nav_order: 22
-last_updated: 2026-08-27
+last_updated: 2026-08-30
 description: Просматривайте и экспортируйте отладочные журналы приложения из самого приложения, а также прикрепляйте их к задаче на GitHub для помощи в диагностике ошибок — без необходимости в adb.
 aliases:
   - debug-logs
@@ -13,11 +13,11 @@ aliases:
 
 # Отладочные журналы
 
-Когда что-то работает неправильно, отладочные журналы приложения — это самое полезное, что вы можете приложить к отчёту об ошибке. Meshtastic может захватить их **за вас, прямо из приложения** — вам больше не нужен adb или какие-либо инструменты на компьютере для их сбора.
+Когда что-то работает неправильно, отладочные журналы приложения — это самое полезное, что вы можете приложить к отчёту об ошибке. Meshtastic can capture them **for you, from inside the app** — you don't need `adb` or any desktop tooling to collect them.
 
 Откройте **Панель отладки** через **Настройки → Дополнительно → Панель отладки**.
 
-> 📎 **Создаёте задачу?** Экспортируйте свои журналы (см. ниже) и прикрепите файл `.txt` к отчёту на [github.com/meshtastic/Meshtastic-Android/issues]. Захват журнала, охватывающий момент возникновения проблемы, превращает «это не работает» в то, что разработчик действительно может отследить.
+If you're filing an issue, export your logs (see [Exporting](#exporting)) and attach the `.txt` file to your report on the [Meshtastic-Android issue tracker](https://github.com/meshtastic/Meshtastic-Android/issues). Захват журнала, охватывающий момент возникновения проблемы, превращает «это не работает» в то, что разработчик действительно может отследить.
 
 ## Две вкладки
 
@@ -30,7 +30,7 @@ aliases:
 
 ## Просмотр журналов приложения
 
-Вкладка **Журналы приложения** показывает самые последние строки журнала **только из этого приложения** — но не из других приложений на вашем устройстве.
+The **App logs** tab shows the most recent log lines from **this app only** — never other apps on your phone.
 
 - **Поиск** — введите текст в поле поиска, чтобы отфильтровать строки по совпадению.
 - **Фильтр по уровню** — кнопки V / D / I / W / E переключают отображение строк с уровнями Verbose (Подробный), Debug (Отладка), Info (Информация), Warn (Предупреждение) и Error (Ошибка). Нажмите на уровень, чтобы скрыть его; нажмите ещё раз, чтобы вернуть обратно. Строки с фатальными ошибками отображаются всегда.
@@ -40,11 +40,11 @@ aliases:
 
 ## Экспорт
 
-Нажмите на значок **загрузки**, чтобы сохранить текущие журналы в файл. Вы выбираете расположение через системное окно выбора файлов, а файл получает имя с меткой времени (например, `meshtastic_logcat_20260701_143312.txt`), поэтому повторные экспорты никогда не перезаписывают друг друга.
+Нажмите на значок **загрузки**, чтобы сохранить текущие журналы в файл. The app first shows a warning about what the file contains — confirm it, then choose where the file goes through the system file picker. The file is named with a timestamp (for example `meshtastic_logcat_20260701_143312.txt`) so repeated exports never overwrite each other. The same warning guards the **Packets** tab export.
 
 Прикрепите этот файл к своей задаче на GitHub.
 
-> 🔒 **Privacy:** Exports automatically **redact** private keys, admin keys, session passkeys and channel PSKs before writing the file. Logs can still contain node names, positions, and other identifying details — glance through the file before sharing it publicly, and share privately if you have any doubt.
+> 🔒 **Privacy:** Exports automatically **redact** private keys, admin keys, session passkeys, and channel PSKs, and suppress raw packet bytes. Everything else stays — the file can contain your message text, precise locations, and node details. Read it before sharing it publicly, and share privately if you have any doubt.
 
 ## Desktop
 
@@ -54,5 +54,3 @@ aliases:
 
 - [Справка и встроенная документация](help-and-docs) — чтение этой документации офлайн внутри приложения
 - [Подключения](connections) — если проблема в первую очередь связана с подключением к вашему радио
-
----

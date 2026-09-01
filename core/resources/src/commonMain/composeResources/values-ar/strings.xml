@@ -117,7 +117,6 @@
     <string name="interval_unset">إلغاء تعيين</string>
     <string name="ip_address">عنوان الـ IP:</string>
     <!-- KEY -->
-    <!-- LABEL -->
     <!-- LAYER -->
     <!-- LICENSED -->
     <!-- LOAD -->
@@ -132,11 +131,14 @@
     <string name="lora_config">إعدادات لورا</string>
     <string name="low_battery_title">البطارية منخفضه: %1$s</string>
     <!-- MAP -->
+    <string name="map_filter_display_title">إعدادات الشاشة</string>
     <string name="map_select_download_region">حدد جهة التحميل</string>
     <string name="map_start_download">ابدأ التحميل</string>
     <string name="max">الأعلى</string>
     <!-- MESH -->
     <string name="mesh_beacon_preset_none">لا يوجد</string>
+    <string name="mesh_beacon_region_label">الجهة</string>
+    <string name="mesh_beacon_target_channel_index">عربي</string>
     <!-- MESHTASTIC -->
     <string name="meshtastic_low_battery_notifications">إشعارات انخفاض شدة البطارية</string>
     <string name="meshtastic_new_nodes_notifications">إشعارات العقدة الجديدة</string>

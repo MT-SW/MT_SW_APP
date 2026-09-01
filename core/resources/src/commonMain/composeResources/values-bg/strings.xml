@@ -19,7 +19,6 @@
     <!-- A11Y -->
     <string name="a11y_label_value">%1$s: %2$s</string>
     <string name="a11y_message_from">Съобщение от %1$s: %2$s</string>
-    <string name="a11y_node_battery">батерия %1$d%%</string>
     <string name="a11y_node_favorite">любим</string>
     <string name="a11y_node_last_heard">последно чут %1$s</string>
     <string name="a11y_node_offline">офлайн</string>
@@ -215,7 +214,6 @@
     <string name="config_lora_modem_preset_summary">Налични предварително зададени настройки на модема, по подразбиране е Дълъг Бърз.</string>
     <string name="config_lora_region_summary">Регионът, където ще използвате радиостанциите си.</string>
     <string name="config_network_eth_enabled_summary">Активирането на Ethernet ще деактивира Bluetooth връзката с приложението. TCP връзки с възли не са налични на устройства на Apple.</string>
-    <string name="config_network_wifi_enabled_summary">Активирането на WiFi ще деактивира Bluetooth връзката с приложението.</string>
     <string name="config_position_broadcast_secs_summary">Максималният интервал, който може да изтече, без възела да излъчи позиция.</string>
     <string name="config_position_broadcast_smart_minimum_interval_secs_summary">Най-бързо ще бъдат изпратени актуализации на позицията, ако е спазено минималното разстояние.</string>
     <string name="config_saved_restarting">Възелът се рестартира и ще бъде за кратко недостъпен.</string>
@@ -495,7 +493,6 @@
     <string name="firmware_update_method_ble">BLE OTA</string>
     <string name="firmware_update_method_detail">Актуализиране чрез %1$s</string>
     <string name="firmware_update_method_usb">Прехвърляне на файл през USB</string>
-    <string name="firmware_update_method_wifi">WiFi OTA</string>
     <string name="firmware_update_nightly">Нощен</string>
     <string name="firmware_update_no_device">Няма свързано устройство</string>
     <string name="firmware_update_node_info_missing">Липсва информация за потребителя на възела.</string>
@@ -608,7 +605,6 @@
     <string name="key_verification_final_title">Проверката на ключа е завършена</string>
     <string name="key_verification_request_title">Заявка за проверка на ключ</string>
     <string name="key_verification_title">Проверка на ключ</string>
-    <!-- LABEL -->
     <string name="last_heard_filter_label">Филтриране по време на последното чуване: %1$s</string>
     <string name="last_position_update">Последна актуализация на позицията</string>
     <string name="latest_alpha_firmware">Най-новия алфа</string>
@@ -688,7 +684,11 @@
     <string name="map_download_complete">Свалянето приключи!</string>
     <string name="map_download_errors">Свалянето приключи с %1$d грешки</string>
     <string name="map_download_region">Сваляне на регион</string>
+    <string name="map_download_status_complete">Пълно</string>
     <string name="map_filter">Филтър на картата\n</string>
+    <string name="map_filter_all_roles">Всички</string>
+    <string name="map_filter_display_title">Дисплей</string>
+    <string name="map_filter_nodes_title">Възли</string>
     <string name="map_layer_formats">Слоевете на картата поддържат формати .kml, .kmz или GeoJSON.</string>
     <string name="map_node_popup_details">%1$s&lt;br&gt;Последно чут: %2$s&lt;br&gt;Последна позиция: %3$s&lt;br&gt;Батерия: %4$s</string>
     <string name="map_offline_manager">Управление извън линия</string>
@@ -710,7 +710,6 @@
     <string name="mark_as_read">Маркиране като прочетено</string>
     <string name="max">Макс</string>
     <!-- MESH -->
-    <string name="mesh_beacon_interval_error">Минимум %1$d секунди</string>
     <string name="mesh_beacon_listen">Слушане за маяци</string>
     <string name="mesh_beacon_offer_add">Добавяне на канал</string>
     <string name="mesh_beacon_offer_channel">Канал: %1$s</string>
@@ -718,8 +717,10 @@
     <string name="mesh_beacon_offer_region">Регион: %1$s</string>
     <string name="mesh_beacon_offer_signal">Сигнал: %1$s / %2$s</string>
     <string name="mesh_beacon_preset_none">Няма</string>
+    <string name="mesh_beacon_region_label">Регион</string>
     <string name="mesh_beacon_target">Цел %1$d</string>
     <string name="mesh_beacon_target_add">Добавяне на цел</string>
+    <string name="mesh_beacon_target_channel_index">Канал</string>
     <string name="mesh_beacon_target_remove">Премахване на целта</string>
     <string name="mesh_map_location">Местоположение на mesh карта</string>
     <string name="mesh_map_location_description">Активира синята точка за местоположение на телефона ви в mesh карта.</string>
@@ -833,11 +834,6 @@
     <string name="node_layout_complete">Пълно</string>
     <string name="node_layout_complete_description">Пълното оформление показва всички налични данни за възлите. Полетата без данни се скриват автоматично.</string>
     <string name="node_layout_device_role">Устройство &amp; Роля</string>
-    <string name="node_layout_help_signal_bad">Сигналът е слаб. SNR е над −18 dB и RSSI е над −125 dBm.</string>
-    <string name="node_layout_help_signal_fair">Сигналът е умерен. SNR е над −12 dB и RSSI е над −120 dBm.</string>
-    <string name="node_layout_help_signal_good">Сигналът е силен. SNR е над −7 dB и RSSI е над −115 dBm.</string>
-    <string name="node_layout_help_signal_indicator">Комбинира SNR и RSSI в ниво на качество, показано като цветна икона с описание. Показва се само в пълния дизайн.</string>
-    <string name="node_layout_help_signal_none">Не е открит използваем сигнал. Под всички прагове за качество.</string>
     <string name="node_layout_hops_away">Брой отскоци</string>
     <string name="node_layout_log_icons">Показатели на околната среда</string>
     <string name="node_layout_no_preview_available">Няма налични възли за преглед.</string>
@@ -913,7 +909,6 @@
     <string name="pax_total_format">PAX: %1$d</string>
     <string name="pax_total_marker">PAX: %1$s</string>
     <string name="pax_wifi_format">W:%1$d</string>
-    <string name="pax_wifi_marker">WiFi: %1$s</string>
     <string name="paxcounter">Paxcounter</string>
     <string name="paxcounter_config">Конфигуриране на Paxcounter</string>
     <string name="paxcounter_enabled">Paxcounter е активиран</string>
@@ -1035,17 +1030,25 @@
     <string name="ringtone_imported">Импортирана мелодия</string>
     <!-- ROLE -->
     <string name="role">Роля на устройството</string>
+    <string name="role_client">Клиент</string>
     <string name="role_client_base_desc">Третира пакетите от или до предпочитани възли като ROUTER_LATE, а всички останали пакети като CLIENT.</string>
     <string name="role_client_desc">Свързано с приложение или самостоятелно устройство за съобщения.</string>
+    <string name="role_client_hidden">Скрит клиент</string>
     <string name="role_client_hidden_desc">Устройство, което излъчва само при необходимост за скритост или пестене на енергия.</string>
     <string name="role_client_mute_desc">Устройство, което не препредава пакети от други устройства.фигурир</string>
-    <string name="role_lost_and_found_desc">Редовно излъчва местоположението като съобщение до канала по подразбиране, за да подпомогне възстановяването на устройството.</string>
+    <string name="role_lost_and_found">Загубено и намерено</string>
+    <string name="role_repeater">Ретранслатор</string>
     <string name="role_repeater_desc">Инфраструктурен възел за разширяване на мрежовото покритие чрез препредаване на съобщения с минимални разходи. Не се вижда в списъка с възли.</string>
+    <string name="role_router">Рутер</string>
+    <string name="role_router_client">Рутер клиент</string>
     <string name="role_router_client_desc">Комбинация от РУТЕР и КЛИЕНТ. Не е за мобилни устройства.</string>
     <string name="role_router_desc">Инфраструктурен възел за разширяване на мрежовото покритие чрез препредаване на съобщения. Вижда се в списъка с възли.</string>
     <string name="role_router_late_desc">Инфраструктурен възел, който винаги препредава пакети веднъж, но само след всички останали режими, осигурявайки допълнително покритие за локалните клъстери. Вижда се в списъка с възли.</string>
+    <string name="role_sensor">Сензор</string>
     <string name="role_sensor_desc">Излъчва приоритетно телеметрични пакети.</string>
+    <string name="role_tak">TAK</string>
     <string name="role_tak_desc">Оптимизирано за комуникация със системата ATAK, намалява рутинните излъчвания.</string>
+    <string name="role_tracker">Тракер</string>
     <string name="role_tracker_desc">Излъчва приоритетно пакети за GPS позиция</string>
     <string name="rotary_encoder_1_enabled">Ротационен енкодер #1 е активиран</string>
     <!-- ROUTING -->
@@ -1311,27 +1314,19 @@
     <string name="waypoint_received">Получена пътна точка: %1$s</string>
     <string name="weight">Тегло</string>
     <!-- WIFI -->
-    <string name="wifi_config">Опции за Wi-Fi</string>
     <string name="wifi_devices">Осигуряване на Wi-Fi за mPWRD-OS</string>
-    <string name="wifi_enabled">Wi-Fi е активиран</string>
-    <string name="wifi_ip">Wifi IP:</string>
     <string name="wifi_provision_available_networks">Налични мрежи</string>
     <string name="wifi_provision_connect_failed">Не можа да се свърже: %1$s</string>
     <string name="wifi_provision_description">Предоставете идентификационни данни за Wi-Fi на вашето mPWRD-OS устройство чрез Bluetooth.</string>
-    <string name="wifi_provision_device_found_detail">Готово за сканиране за WiFi мрежи.</string>
     <string name="wifi_provision_hidden_network">Скрита мрежа</string>
     <string name="wifi_provision_mpwrd_disclaimer">Научете повече за проекта mPWRD-OS \nhttps://github.com/mPWRD-OS</string>
     <string name="wifi_provision_no_networks">Няма намерени мрежи</string>
-    <string name="wifi_provision_scan_failed">Неуспешно сканиране за WiFi мрежи: %1$s</string>
     <string name="wifi_provision_scan_networks">Сканиране за мрежи</string>
     <string name="wifi_provision_scanning_ble">Търси се устройство…</string>
     <string name="wifi_provision_scanning_wifi">Сканиране…</string>
-    <string name="wifi_provision_sending_credentials">Прилагане на конфигурацията на WiFi…</string>
     <string name="wifi_provision_signal_strength">%1$d%</string>
     <string name="wifi_provision_ssid_label">Име на мрежата (SSID)</string>
     <string name="wifi_provision_ssid_placeholder">Въведете или изберете мрежа</string>
-    <string name="wifi_provision_status_applied">WiFi е конфигуриран успешно!</string>
-    <string name="wifi_provision_status_failed">Прилагането на конфигурацията за WiFi не е успешно</string>
     <string name="wifi_provision_success_description">Вашето mPWRD-OS устройство се е присъединило към Wi-Fi мрежата.</string>
     <string name="wifi_provision_success_device_connected">Устройството е свързано</string>
     <string name="wifi_provision_success_done">Готово</string>
@@ -1339,9 +1334,6 @@
     <string name="wifi_provision_success_ssh_command">ssh %1$s@%2$s</string>
     <string name="wifi_provision_success_username">Потребителско име</string>
     <string name="wifi_provisioning">Осигуряване на Wi-Fi за mPWRD-OS</string>
-    <string name="wifi_qr_code_error">Невалиден формат на QR кода на идентификационните данни за WiFi</string>
-    <string name="wifi_qr_code_scan">Сканиране на QR код за WiFi</string>
-    <string name="wifi_rssi_threshold_defaults_to_80">Праг на WiFi RSSI (по подразбиране -80)</string>
     <!-- WIND -->
     <string name="wind">Вятър</string>
     <string name="wind_direction">Посока на вятъра</string>
@@ -1349,4 +1341,6 @@
     <string name="wind_speed">Скорост на вятъра</string>
     <!-- WRITE -->
     <string name="you">Вие</string>
+    <string name="zoom_in">Увеличаване</string>
+    <string name="zoom_out">Намаляване</string>
 </resources>

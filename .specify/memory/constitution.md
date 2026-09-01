@@ -1,6 +1,42 @@
 <!--
 SYNC IMPACT REPORT
 ==================
+Version change: 1.3.5 → 1.3.6
+Modified principles:
+  - VI. Documentation Freshness: the verification-tooling block gains
+    scripts/check-doc-aliases.js, a fourth check and the third blocking one. Every page
+    carries an `aliases:` frontmatter list and DocBundleLoader.kt carries its own alias
+    list per page; only the loader's copy reaches a running app (the in-app renderer
+    strips frontmatter before render, and sync-android-docs.js discards aliases for
+    Docusaurus), so a frontmatter-only alias is a search term no consumer ever sees.
+    Nothing compared the two and six pages had silently drifted. The check requires the
+    loader to be a superset of the frontmatter, not equal to it: loader-only aliases are
+    deliberate extra search vocabulary and are reported as non-fatal notes.
+Modified sections: None.
+Added sections: None.
+
+Version change: 1.3.4 → 1.3.5
+Modified principles:
+  - VI. Documentation Freshness: (1) image references — the rule said root-relative
+    (/assets/…) MUST; every page, the in-app renderer's own documentation
+    (ComposeResourceImageTransformer: "Authored pages use paths relative to the Jekyll
+    source layout"), and the docs style guide use page-relative ../../assets/… paths,
+    which all three consumers resolve. The rule now matches the working convention.
+    (2) The verification tooling is wired into CI again: .github/workflows/docs-quality.yml
+    (restoring the enforcing half of the pruned docs-governance.yml) runs
+    validate-doc-links.js, check-doc-coverage.js and a two-way DocBundleLoader registry
+    check as a blocking gate on PRs touching docs/en/**, with check-doc-freshness.js
+    advisory. This closes 1.3.4's follow-up TODO, which anticipated exactly this
+    re-amendment if the gate came back.
+Modified sections: None.
+Added sections: None.
+Removed sections: None.
+Templates requiring updates:
+  - .skills/speckit/SKILL.md (version 1.3.4 → 1.3.5; principle VI summary no longer says
+    "not wired into CI")
+Follow-up TODOs: None.
+
+Previous report (1.3.3 → 1.3.4):
 Version change: 1.3.3 → 1.3.4
 Modified principles:
   - I. Kotlin Multiplatform Core: "androidMain/desktopMain" → "androidMain/jvmMain" (no desktopMain source set exists)
@@ -126,19 +162,24 @@ Governance rules:
   `navOrder`. Jekyll picks new pages up automatically via `_config.yml` scope-based
   defaults, and `sync-android-docs.js` discovers slugs from the source tree — neither
   needs a manual registration step.
-- Image references MUST use root-relative paths (`/assets/screenshots/filename.png`) so
-  they resolve correctly in both Jekyll and the in-app renderer. The sync script rewrites
-  these to Docusaurus paths automatically.
+- Image references MUST use paths relative to the page
+  (`../../assets/screenshots/filename.png`) — the authored form the in-app renderer
+  documents and every existing page uses. Jekyll resolves them directly, the in-app
+  renderer anchors on the `assets/` segment, and the sync script rewrites them to
+  Docusaurus paths automatically.
 - English pages are the only ones written by hand. `docs/<locale>/user/` is downloaded
   from Crowdin (`crowdin.yml`) — never hand-edit a locale page; deleting an English page
   means deleting its locale copies in the same commit.
 
-Verification tooling (run on demand; **none of these is wired into CI** — an inaccurate
-page will not fail a build, which is why the rules above are on the author):
+Verification tooling — also enforced in CI: `.github/workflows/docs-quality.yml` runs the
+link check, the coverage check, a two-way `DocBundleLoader.kt` registry check, and the alias
+registration check as a **blocking** gate on PRs touching `docs/en/**` (freshness stays
+advisory). Run locally before pushing docs changes:
 
 ```bash
 node scripts/check-doc-coverage.js    # every user-facing feature module has a page
 node scripts/validate-doc-links.js    # internal cross-references and image paths resolve
+node scripts/check-doc-aliases.js     # frontmatter aliases are registered in DocBundleLoader.kt
 node scripts/check-doc-freshness.js   # advisory: pages >180 days old, or missing last_updated
 ```
 <!-- Rationale: Documentation drift misleads users and increases support burden. Three distinct consumers means changes must be verified across all delivery channels. -->
@@ -222,4 +263,4 @@ summary derived from this constitution. The files `.github/copilot-instructions.
 Constitution Check confirming all seven principles were evaluated. Complexity violations
 require explicit justification in the Complexity Tracking table of the plan document.
 
-**Version**: 1.3.4 | **Ratified**: 2026-05-07 | **Last Amended**: 2026-08-27
+**Version**: 1.3.6 | **Ratified**: 2026-05-07 | **Last Amended**: 2026-08-30

@@ -19,7 +19,6 @@
     <!-- A11Y -->
     <string name="a11y_label_value">%1$s：%2$s</string>
     <string name="a11y_message_from">%1$s からのメッセージ：%2$s</string>
-    <string name="a11y_node_battery">バッテリー %1$d%%</string>
     <string name="a11y_node_distance_away">%1$s 先</string>
     <string name="a11y_node_favorite">お気に入り</string>
     <string name="a11y_node_hops_away">%1$d ホップ先</string>
@@ -201,7 +200,6 @@
     <string name="chirpy_assistant_title">Chirpy アシスタント</string>
     <string name="chirpy_checking">Chirpy の利用可否を確認しています…</string>
     <string name="chirpy_downloading">Chirpy をダウンロードしています…</string>
-    <string name="chirpy_downloading_progress">Chirpy モデルをダウンロード中：%1$d%%</string>
     <string name="chirpy_downloading_subtitle">これは最初の一度だけです。Chirpy はまもなく準備完了します！</string>
     <string name="chirpy_error_busy">おっと！今チャンネルがトラフィックでかなり混雑しています！📶 空きスロットを待ってから、送信をやり直しましょう。</string>
     <string name="chirpy_error_model_unavailable">バッテリーを充電中か、ファームウェアをまだダウンロード中です！🔋 同期して起動するまで少し待ってください！</string>
@@ -276,7 +274,6 @@
     <string name="config_lora_region_summary">無線デバイスを使用される地域を指定してくだい。</string>
     <string name="config_network_eth_enabled_summary">イーサネットを有効にすると、アプリへの Bluetooth 接続が無効になります。TCP でのノード接続は Apple デバイスでは利用できません。</string>
     <string name="config_network_udp_enabled_summary">UDP 経由でローカルネットワーク上のパケットのブロードキャスト通信を有効にする。</string>
-    <string name="config_network_wifi_enabled_summary">WiFi を有効にすると、アプリへの Bluetooth 接続が無効になります。</string>
     <string name="config_position_broadcast_secs_summary">ノードが位置情報をブロードキャストせずに経過し得る最大間隔。</string>
     <string name="config_position_broadcast_smart_minimum_distance_summary">スマート位置情報ブロードキャストの対象とする最小の移動距離（メートル）。</string>
     <string name="config_position_broadcast_smart_minimum_interval_secs_summary">最小距離を満たした場合に位置情報の更新を送信する最短間隔。</string>
@@ -432,7 +429,6 @@
     <string name="discovery_map">探索マップ</string>
     <string name="discovery_not_connected">未接続</string>
     <string name="discovery_not_connected_description">スキャンを開始するには Meshtastic デバイスに接続してください。</string>
-    <string name="discovery_paused">一時停止：%1$s</string>
     <string name="discovery_preparing">スキャンを準備しています</string>
     <string name="discovery_preset_home_label">%1$s（ホーム）</string>
     <string name="discovery_reconnecting">%1$s で再接続しています</string>
@@ -672,7 +668,6 @@
     <string name="firmware_update_method_ble">BLE OTA</string>
     <string name="firmware_update_method_detail">%1$s で更新</string>
     <string name="firmware_update_method_usb">USB ファイル転送</string>
-    <string name="firmware_update_method_wifi">WiFi OTA</string>
     <string name="firmware_update_missing_target">このデバイスのファームウェアターゲット情報を利用できません。</string>
     <string name="firmware_update_nightly">ナイトリー版</string>
     <string name="firmware_update_no_device">デバイスが接続されていません</string>
@@ -843,24 +838,6 @@
     <string name="key_verification_final_title">鍵の検証が完了しました</string>
     <string name="key_verification_request_title">鍵の検証リクエスト</string>
     <string name="key_verification_title">鍵の検証</string>
-    <!-- LABEL -->
-    <string name="label_lite_fast">Lite・高速</string>
-    <string name="label_lite_slow">Lite・低速</string>
-    <string name="label_long_fast">長距離・高速</string>
-    <string name="label_long_moderate">長距離・中速</string>
-    <string name="label_long_slow">長距離・低速</string>
-    <string name="label_long_turbo">長距離・ターボ</string>
-    <string name="label_medium_fast">中距離・高速</string>
-    <string name="label_medium_slow">中距離・低速</string>
-    <string name="label_medium_turbo">中距離・ターボ</string>
-    <string name="label_narrow_fast">狭帯域・高速</string>
-    <string name="label_narrow_slow">狭帯域・低速</string>
-    <string name="label_short_fast">短距離・高速</string>
-    <string name="label_short_slow">短距離・低速</string>
-    <string name="label_short_turbo">短距離・ターボ</string>
-    <string name="label_tiny_fast">極短距離・高速</string>
-    <string name="label_tiny_slow">極短距離・低速</string>
-    <string name="label_very_long_slow">超長距離・低速</string>
     <string name="last_heard_filter_label">最後に受信した時間でフィルター: %1$s</string>
     <string name="last_position_update">最終位置更新</string>
     <string name="latest_alpha_firmware">最新のアルファ版</string>
@@ -968,7 +945,11 @@
     <string name="map_download_complete">ダウンロード完了！</string>
     <string name="map_download_errors">ダウンロード完了、%1$dのエラーがあります。</string>
     <string name="map_download_region">エリアをダウンロードする</string>
+    <string name="map_download_status_complete">詳細</string>
     <string name="map_filter">マップフィルター\n</string>
+    <string name="map_filter_all_roles">すべて</string>
+    <string name="map_filter_display_title">表示</string>
+    <string name="map_filter_nodes_title">ノード</string>
     <string name="map_layer_formats">マップレイヤーは .kml、.kmz、または GeoJSON 形式に対応しています。</string>
     <string name="map_node_popup_details">%1$s&lt;br&gt;最終受信：%2$s&lt;br&gt;最終位置：%3$s&lt;br&gt;バッテリー：%4$s</string>
     <string name="map_offline_manager">オフライン地図の管理</string>
@@ -998,8 +979,6 @@
     <string name="mesh_beacon_broadcast">ビーコンを発信</string>
     <string name="mesh_beacon_broadcast_summary">このメッシュを近くのノードに定期的に告知します</string>
     <string name="mesh_beacon_channels_title">ビーコンのチャンネル</string>
-    <string name="mesh_beacon_interval">発信間隔（秒）</string>
-    <string name="mesh_beacon_interval_error">最小 %1$d 秒</string>
     <string name="mesh_beacon_invitations_title">メッシュへの招待</string>
     <string name="mesh_beacon_listen">ビーコンを受信</string>
     <string name="mesh_beacon_listen_summary">近くのメッシュが発信する招待を受け取ります</string>
@@ -1009,25 +988,21 @@
     <string name="mesh_beacon_notification_title">メッシュへの招待</string>
     <string name="mesh_beacon_offer_add">チャンネルを追加</string>
     <string name="mesh_beacon_offer_channel">チャンネル：%1$s</string>
-    <string name="mesh_beacon_offer_channel_key">提示されたチャンネル鍵（base64）</string>
-    <string name="mesh_beacon_offer_channel_name">提示されたチャンネル名</string>
     <string name="mesh_beacon_offer_discover">探索</string>
     <string name="mesh_beacon_offer_dismiss">中止</string>
     <string name="mesh_beacon_offer_from_unknown">不明なノードから</string>
     <string name="mesh_beacon_offer_join">参加</string>
     <string name="mesh_beacon_offer_preset">プリセット：%1$s</string>
-    <string name="mesh_beacon_offer_preset_setting">提示されたプリセット</string>
     <string name="mesh_beacon_offer_region">リージョン：%1$s</string>
-    <string name="mesh_beacon_offer_region_setting">提示されたリージョン</string>
     <string name="mesh_beacon_offer_signal">信号：%1$s / %2$s</string>
     <string name="mesh_beacon_offer_title">メッシュへの招待</string>
     <string name="mesh_beacon_on_preset">送信プリセット</string>
-    <string name="mesh_beacon_on_region">送信リージョン</string>
     <string name="mesh_beacon_preset_indicator">近くのビーコンによって告知</string>
     <string name="mesh_beacon_preset_none">なし</string>
+    <string name="mesh_beacon_region_label">リージョン</string>
     <string name="mesh_beacon_target">ターゲット %1$d</string>
     <string name="mesh_beacon_target_add">ターゲットを追加</string>
-    <string name="mesh_beacon_target_channel_index">チャンネルインデックス</string>
+    <string name="mesh_beacon_target_channel_index">チャンネル</string>
     <string name="mesh_beacon_target_remove">ターゲットを削除</string>
     <string name="mesh_beacon_targets">発信ターゲット</string>
     <string name="mesh_map_location">メッシュマップの位置情報</string>
@@ -1169,11 +1144,6 @@
     <string name="node_layout_complete_description">「詳細」レイアウトは、利用可能なすべてのノードデータを表示します。データのない項目は自動的に非表示になります。</string>
     <string name="node_layout_device_role">デバイスと役割</string>
     <string name="node_layout_distance_and_bearing">距離と方位</string>
-    <string name="node_layout_help_signal_bad">信号は弱いです。SNR が −18 dB 以上、RSSI が −125 dBm 以上です。</string>
-    <string name="node_layout_help_signal_fair">信号は中程度です。SNR が −12 dB 以上、RSSI が −120 dBm 以上です。</string>
-    <string name="node_layout_help_signal_good">信号は強いです。SNR が −7 dB 以上、RSSI が −115 dBm 以上です。</string>
-    <string name="node_layout_help_signal_indicator">SNR と RSSI を組み合わせて品質レベルを算出し、色付きアイコンと説明で表示します。「詳細」レイアウトでのみ表示されます。</string>
-    <string name="node_layout_help_signal_none">利用可能な信号がありません。すべての品質しきい値を下回っています。</string>
     <string name="node_layout_hops_away">ホップ数</string>
     <string name="node_layout_last_heard_time">最終受信時刻</string>
     <string name="node_layout_log_icons">環境メトリクス</string>
@@ -1199,7 +1169,6 @@
     <string name="node_sort_title">並べ替え</string>
     <string name="node_sort_via_favorite">お気に入り経由</string>
     <string name="node_sort_via_mqtt">MQTT経由</string>
-    <string name="node_status_summary">ステータスメッセージ</string>
     <string name="nodedb_reset">NodeDBをリセット</string>
     <string name="nodeinfo_broadcast_interval">ノード情報のブロードキャスト間隔</string>
     <!-- NODES -->
@@ -1282,7 +1251,6 @@
     <string name="pax_total_format">PAX：%1$d</string>
     <string name="pax_total_marker">PAX：%1$s</string>
     <string name="pax_wifi_format">W:%1$d</string>
-    <string name="pax_wifi_marker">WiFi：%1$s</string>
     <string name="paxcounter">Paxcounter</string>
     <string name="paxcounter_config">Paxcounter 設定</string>
     <string name="paxcounter_enabled">Paxcounter を有効化</string>
@@ -1430,18 +1398,30 @@
     <string name="ringtone_imported">着信音をインポートしました</string>
     <!-- ROLE -->
     <string name="role">デバイスの役割</string>
+    <string name="role_client">クライアント</string>
+    <string name="role_client_base">クライアント・ベース</string>
     <string name="role_client_base_desc">お気に入りのノードとの間のパケットを ROUTER_LATE として扱い、その他のすべてのパケットを CLIENT として扱います。</string>
     <string name="role_client_desc">アプリに接続されているか、スタンドアロンのメッセージングデバイスです。</string>
+    <string name="role_client_hidden">クライアント・非表示</string>
     <string name="role_client_hidden_desc">ステルスまたは電力節約のため、必要に応じてのみブロードキャストするデバイス。</string>
+    <string name="role_client_mute">クライアント・ミュート</string>
     <string name="role_client_mute_desc">このデバイスは他のデバイスからのパケットを転送しません。</string>
-    <string name="role_lost_and_found_desc">デバイスを見つけやすくするために、デバイス自身の位置情報をメッセージ形式で定期的にデフォルトのチャンネルにブロードキャストします。</string>
+    <string name="role_lost_and_found">紛失モード</string>
+    <string name="role_repeater">リピーター</string>
     <string name="role_repeater_desc">最小限のオーバーヘッドでメッセージを中継することでネットワークの通信範囲を拡大するためのインフラストラクチャノード。ノードリストには表示されません。</string>
+    <string name="role_router">ルーター</string>
+    <string name="role_router_client">ルータークライアント</string>
     <string name="role_router_client_desc">ROUTERとCLIENTの組み合わせ。モバイルデバイス向けではありません。</string>
     <string name="role_router_desc">メッセージを中継することでネットワークの通信範囲を拡大するためのインフラストラクチャノード。ノードリストに表示されます。</string>
+    <string name="role_router_late">ルーター・レイト</string>
     <string name="role_router_late_desc">周辺クラスターの通信範囲を拡大させるインフラストラクチャノード。他のすべてのノードが通信し終わった後で、必ずパケットを1回だけ再ブロードキャストする。ノードリストに表示される。</string>
+    <string name="role_sensor">センサー</string>
     <string name="role_sensor_desc">テレメトリパケットを優先してブロードキャストします。</string>
+    <string name="role_tak">TAK</string>
     <string name="role_tak_desc">ATAKシステムとの通信に最適化し、定期的なブロードキャストを削減します。</string>
+    <string name="role_tak_tracker">TAK Tracker</string>
     <string name="role_tak_tracker_desc">TAK PLIの自動ブロードキャストを有効にし、ルーチンブロードキャストを削減します。</string>
+    <string name="role_tracker">トラッカー</string>
     <string name="role_tracker_desc">GPSの位置情報パケットを優先してブロードキャストします。</string>
     <string name="root_topic">ルート トピック</string>
     <string name="rotary_encoder_1_enabled">ロータリーエンコーダ #1 を有効化</string>
@@ -1598,7 +1578,6 @@
     <string name="ssid">SSID</string>
     <string name="state_broadcast_seconds">状態のブロードキャスト間隔 (秒)</string>
     <string name="status_message">ステータスメッセージ</string>
-    <string name="status_message_config">ステータスメッセージ設定</string>
     <string name="stay_connected_anywhere">どこでもつながる</string>
     <string name="stop_connecting">接続を停止</string>
     <string name="store_forward">ストアアンドフォワード</string>
@@ -1702,7 +1681,6 @@
     <string name="traffic_management_nodeinfo_direct_response_max_hops">直接応答の最大ホップ数</string>
     <string name="traffic_management_position_dedup">位置情報の重複排除</string>
     <string name="traffic_management_position_min_interval">位置情報の最小間隔（秒）</string>
-    <string name="traffic_management_position_precision">位置情報の精度（ビット）</string>
     <string name="traffic_management_rate_limit_enabled">レート制限</string>
     <string name="traffic_management_rate_limit_max_packets">ウィンドウ内の最大パケット数</string>
     <string name="traffic_management_rate_limit_window">レート制限のウィンドウ（秒）</string>
@@ -1795,28 +1773,20 @@
     <string name="waypoint_received">受信したウェイポイント: %1$s</string>
     <string name="weight">重さ</string>
     <!-- WIFI -->
-    <string name="wifi_config">WiFi オプション</string>
     <string name="wifi_devices">mPWRD-OS の Wi-Fi プロビジョニング</string>
-    <string name="wifi_enabled">Wi-Fiを有効化</string>
-    <string name="wifi_ip">Wi-Fi IP：</string>
     <string name="wifi_provision_available_networks">利用可能なネットワーク</string>
     <string name="wifi_provision_connect_failed">接続できませんでした：%1$s</string>
     <string name="wifi_provision_description">mPWRD-OS デバイスに Bluetooth 経由で Wi-Fi 認証情報をプロビジョニングします。</string>
     <string name="wifi_provision_device_found">デバイスが見つかりました</string>
-    <string name="wifi_provision_device_found_detail">WiFi ネットワークをスキャンする準備ができました。</string>
     <string name="wifi_provision_hidden_network">非表示のネットワーク</string>
     <string name="wifi_provision_mpwrd_disclaimer">mPWRD-OS プロジェクトの詳細はこちら\nhttps://github.com/mPWRD-OS</string>
     <string name="wifi_provision_no_networks">ネットワークが見つかりません</string>
-    <string name="wifi_provision_scan_failed">WiFi ネットワークのスキャンに失敗しました：%1$s</string>
     <string name="wifi_provision_scan_networks">ネットワークをスキャン</string>
     <string name="wifi_provision_scanning_ble">デバイスを検索しています…</string>
     <string name="wifi_provision_scanning_wifi">スキャンしています…</string>
-    <string name="wifi_provision_sending_credentials">WiFi 設定を適用しています…</string>
     <string name="wifi_provision_signal_strength">%1$d%</string>
     <string name="wifi_provision_ssid_label">ネットワーク名（SSID）</string>
     <string name="wifi_provision_ssid_placeholder">ネットワークを入力または選択</string>
-    <string name="wifi_provision_status_applied">WiFi の設定が完了しました！</string>
-    <string name="wifi_provision_status_failed">WiFi 設定の適用に失敗しました</string>
     <string name="wifi_provision_success_description">mPWRD-OS デバイスが Wi-Fi ネットワークに接続しました。</string>
     <string name="wifi_provision_success_device_connected">デバイスが接続されました</string>
     <string name="wifi_provision_success_done">完了</string>
@@ -1831,9 +1801,6 @@
     <string name="wifi_provision_success_ssh_unavailable">SSH コマンドは IP 割り当て後に利用可能になります。</string>
     <string name="wifi_provision_success_username">ユーザー名</string>
     <string name="wifi_provisioning">mPWRD-OS の Wi-Fi プロビジョニング</string>
-    <string name="wifi_qr_code_error">WiFi認証のQRコードの形式が無効です</string>
-    <string name="wifi_qr_code_scan">WiFiのQRコードをスキャン</string>
-    <string name="wifi_rssi_threshold_defaults_to_80">WiFi RSSI閾値（デフォルトは -80）</string>
     <string name="wifi_unavailable">Wi-Fi に接続されていません。ネットワークスキャンで近くのデバイスが見つからない場合があります。</string>
     <!-- WIND -->
     <string name="wind">風力</string>

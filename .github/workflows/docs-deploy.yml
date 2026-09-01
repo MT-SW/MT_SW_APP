@@ -56,7 +56,7 @@ jobs:
           develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
         with:
           ruby-version: '4.0.6'
           bundler-cache: true
@@ -110,7 +110,7 @@ jobs:
             --baseurl /${{ github.event.repository.name }}/main &
           jekyll_pid=$!
           if [ "$BUILD_DOKKA" = "true" ]; then
-            ./gradlew dokkaGeneratePublicationHtml -Dorg.gradle.isolated-projects=false --no-configuration-cache
+            ./gradlew dokkaGeneratePublicationHtml
           else
             echo "No Dokka-relevant changes — skipping API reference rebuild."
           fi

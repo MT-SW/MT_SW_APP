@@ -263,7 +263,6 @@
     <string name="ipv4_mode">IPv4 모드</string>
     <string name="json_output_enabled">JSON 사용</string>
     <!-- KEY -->
-    <!-- LABEL -->
     <string name="last_position_update">최근 위치 업데이트</string>
     <string name="latitude">위도</string>
     <!-- LAYER -->
@@ -299,6 +298,9 @@
     <string name="map_download_errors">%1$d 에러로 다운로드 완료되지 않았습니다.</string>
     <string name="map_download_region">다운로드 지역</string>
     <string name="map_filter">맵 필터\n</string>
+    <string name="map_filter_all_roles">All</string>
+    <string name="map_filter_display_title">화면</string>
+    <string name="map_filter_nodes_title">노드</string>
     <string name="map_offline_manager">오프라인 관리자</string>
     <string name="map_purge_fail">SQL 캐시 제거 실패, 자세한 내용은 logcat 참조</string>
     <string name="map_purge_success">%1$s에 대한 SQL 캐시가 제거되었습니다.</string>
@@ -316,6 +318,8 @@
     <!-- MESH -->
     <string name="mesh_beacon_offer_dismiss">취소</string>
     <string name="mesh_beacon_preset_none">없음</string>
+    <string name="mesh_beacon_region_label">지역</string>
+    <string name="mesh_beacon_target_channel_index">채널</string>
     <!-- MESHTASTIC -->
     <string name="meshtastic">Meshtastic</string>
     <string name="meshtastic_alerts_notifications">경고 알림</string>
@@ -483,7 +487,6 @@
     <string name="role_client_desc">앱과 연결해서 사용하거나 독립형 메시징 장치.</string>
     <string name="role_client_hidden_desc">스텔스 또는 절전을 위해 필요한 경우에만 전송.</string>
     <string name="role_client_mute_desc">다른 장치에서 온 패킷을 전달하지 않는 장치.</string>
-    <string name="role_lost_and_found_desc">분실 장치의 회수를 돕기 위해 기본 채널에 정기적으로 위치 정보를 전송.</string>
     <string name="role_repeater_desc">최소한의 오버헤드로 메시지를 전달하여 네트워크 범위를 확장하기 위한 인프라 노드. 노드 목록에 표시되지 않음.</string>
     <string name="role_router_client_desc">CLIENT와 ROUTER의 조합. 이동형 장치에는 적합하지 않음.</string>
     <string name="role_router_desc">메시지를 중계하여 네트워크 범위를 확장하는 인프라 노드. 노드 목록에 표시.</string>
@@ -628,14 +631,12 @@
     <string name="waypoint_received">웨이포인트 수신: %1$s</string>
     <string name="weight">무게</string>
     <!-- WIFI -->
-    <string name="wifi_enabled">WiFi 활성화</string>
     <string name="wifi_provision_success_ip_address">IP 주소</string>
     <string name="wifi_provision_success_username">사용자명</string>
-    <string name="wifi_qr_code_error">WiFi QR코드 형식이 잘못됨</string>
-    <string name="wifi_qr_code_scan">WiFi QR코드 스캔</string>
-    <string name="wifi_rssi_threshold_defaults_to_80">WiFi RSSI 임계값 (기본값 -80)</string>
     <!-- WIND -->
     <string name="wind">바람</string>
     <!-- WRITE -->
     <string name="you">나</string>
+    <string name="zoom_in">확대</string>
+    <string name="zoom_out">축소</string>
 </resources>

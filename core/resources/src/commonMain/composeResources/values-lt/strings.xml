@@ -119,7 +119,6 @@
     <string name="intro_show">Rodyti įvadą</string>
     <string name="ip_address">IP adresas:</string>
     <!-- KEY -->
-    <!-- LABEL -->
     <!-- LAYER -->
     <!-- LICENSED -->
     <!-- LOAD -->
@@ -150,6 +149,8 @@
     <string name="max">Max</string>
     <!-- MESH -->
     <string name="mesh_beacon_preset_none">Nėra</string>
+    <string name="mesh_beacon_region_label">Regionas</string>
+    <string name="mesh_beacon_target_channel_index">Kanalas</string>
     <!-- MESHTASTIC -->
     <string name="meshtastic_new_nodes_notifications">Naujo įtaiso pranešimas</string>
     <string name="meshtastic_service_notifications">Paslaugos pranešimai</string>
@@ -239,7 +240,6 @@
     <string name="role_client_desc">Programėlė prijungta prie atskiro susirašinėjimo įtaiso.</string>
     <string name="role_client_hidden_desc">Įtaisas transliuojantis tik prireikus. Naudojama slaptumo ar energijos taupymui.</string>
     <string name="role_client_mute_desc">Įtaisas kuris nepersiunčia kitų įtaisų paketų.</string>
-    <string name="role_lost_and_found_desc">Reguliariai siunčia GPS pozicijos informaciją į pagrindinį kanalą, lengvesniam įtaiso radimui.</string>
     <string name="role_repeater_desc">Stacionarus įtaisas tinklo išplėtimui, persiunčiantis žinutes. Nerodomas įtaisų sąraše.</string>
     <string name="role_router_client_desc">ROUTER ir CLIENT kombinacija. Neskirta mobiliems įtaisams.</string>
     <string name="role_router_desc">Stacionarus aukštuminis įtaisas geresniam tinklo padengimui. Matomas node`ų sąraše.</string>
@@ -312,8 +312,6 @@
     <string name="waypoint_received">Gautas orientyras: %1$s</string>
     <!-- WIFI -->
     <string name="wifi_provision_success_ip_address">IP adresas</string>
-    <string name="wifi_qr_code_error">Neteisingas WiFi prisijungimo QR kodo formatas</string>
-    <string name="wifi_qr_code_scan">Nuskenuoti WiFi QR kodą</string>
     <!-- WIND -->
     <!-- WRITE -->
     <string name="you">Tu</string>

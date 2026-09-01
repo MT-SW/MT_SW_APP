@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.maplibre.compose.camera.CameraState
 import org.maplibre.compose.camera.rememberCameraState
@@ -50,8 +52,9 @@ import org.meshtastic.feature.map.component.ClusterMemberEntry
 import org.meshtastic.feature.map.component.ClusterMembersDialog
 import org.meshtastic.feature.map.component.EditWaypointDialog
 import org.meshtastic.feature.map.component.MapControlsOverlay
-import org.meshtastic.feature.map.component.MapFilterActions
-import org.meshtastic.feature.map.component.MapFilterMenu
+import org.meshtastic.feature.map.component.MapFilterSheet
+import org.meshtastic.feature.map.component.mapFilterActions
+import org.meshtastic.feature.map.layers.LayerOpacityStore
 import org.meshtastic.feature.map.maplibre.component.BasemapButton
 import org.meshtastic.feature.map.maplibre.component.BasemapSelection
 import org.meshtastic.feature.map.maplibre.component.BoxAuthoringBar
@@ -129,7 +132,8 @@ class MapLibreMapViewProvider(
         sitePlannerNodeNum: Int?,
     ) {
         val viewModel: SharedMapViewModel = koinViewModel()
-        val basemaps = rememberBasemapSelection(customBasemaps())
+        // Null for the one frame before the basemap preference has loaded from disk; see rememberBasemapSelection.
+        val basemaps = rememberBasemapSelection(customBasemaps()) ?: return
 
         val cameraState = rememberCameraState()
         val location = rememberLocationControls(cameraState)
@@ -141,6 +145,8 @@ class MapLibreMapViewProvider(
         // same reason, and a map that sleeps mid-walk is the one complaint a location-follow feature always draws.
         KeepScreenOn(location.following)
 
+        val layerOpacity by koinInject<LayerOpacityStore>().opacity.collectAsState()
+
         Box(modifier = modifier.fillMaxSize()) {
             MeshMap(
                 viewModel = viewModel,
@@ -148,6 +154,7 @@ class MapLibreMapViewProvider(
                 modifier = Modifier.fillMaxSize(),
                 basemap = basemaps.current,
                 overlays = screen.overlays,
+                layerOpacity = layerOpacity,
                 customLayers = customLayers(),
                 cameraState = cameraState,
                 locationState = location.state,
@@ -315,28 +322,25 @@ private fun BoxScope.MapToolbar(
 ) {
     var filterMenuExpanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    // Hoisted out of the dropdown slot: the button's badge needs the same state the sheet does.
+    val filterViewModel: SharedMapViewModel = koinViewModel()
+    val filterState by filterViewModel.mapFilterStateFlow.collectAsStateWithLifecycle()
 
     MapControlsOverlay(
         modifier = Modifier.align(Alignment.TopCenter).padding(top = TOOLBAR_INSET.dp),
         onToggleFilterMenu = { filterMenuExpanded = !filterMenuExpanded },
+        filtersActive = filterState.isNarrowing,
         bearing = cameraState.position.bearing.toFloat(),
         followPhoneBearing = location.followingBearing,
         onCompassClick = location.onCompassClick,
         filterDropdownContent = {
-            val filterViewModel: SharedMapViewModel = koinViewModel()
-            val filterState by filterViewModel.mapFilterStateFlow.collectAsStateWithLifecycle()
-            MapFilterMenu(
-                expanded = filterMenuExpanded,
-                onDismissRequest = { filterMenuExpanded = false },
-                filterState = filterState,
-                actions =
-                MapFilterActions(
-                    onToggleOnlyFavorites = filterViewModel::toggleOnlyFavorites,
-                    onToggleShowWaypoints = filterViewModel::toggleShowWaypointsOnMap,
-                    onToggleShowPrecisionCircle = filterViewModel::toggleShowPrecisionCircleOnMap,
-                    onSelectLastHeard = filterViewModel::setLastHeardFilter,
-                ),
-            )
+            if (filterMenuExpanded) {
+                MapFilterSheet(
+                    onDismissRequest = { filterMenuExpanded = false },
+                    filterState = filterState,
+                    actions = filterViewModel.mapFilterActions(),
+                )
+            }
         },
         mapTypeContent = { BasemapButton(selection = basemaps, extra = basemapMenuExtra) },
         layersContent = {

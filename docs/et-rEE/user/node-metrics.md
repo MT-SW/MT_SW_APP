@@ -2,7 +2,7 @@
 title: Sõlme mõõdikud
 parent: Kasutusjuhend
 nav_order: 5
-last_updated: 2026-08-27
+last_updated: 2026-08-30
 description: Telemeetria armatuurlauad iga võrgusõlme kohta – seadme tervis, keskkonnaandurid, õhu kvaliteet, signaali kvaliteet, võimsus, marsruut ja asukoha ajalugu.
 aliases:
   - meetriline
@@ -15,21 +15,36 @@ aliases:
 
 Sõlme detailvaates on iga kärgvõrgu sõlme kohta põhjalikud telemeetria ja mõõdikud.
 
+## Viewing Metrics
+
+1. Mine **Seadmed**.
+2. Puuduta sõlme, mida soovite kontrollida.
+3. Scroll to the **Telemetry** section and find the category you want — **Signal Quality**, **Device Metrics**, **Environment Metrics**, **Air-Quality Metrics**, **Power Metrics**, **Position**, and the rest.
+4. Tap the refresh button on a row to ask the node for a fresh reading. The chart button beside it opens that category's history, and appears once the node has reported that kind of telemetry.
+
+![Sõlme detailid — kohalik seade](../../assets/screenshots/nodes_detail_local.png)
+
+The **Position** row expands to show location data for nodes that share GPS:
+
+![Asukoha tekstisisene sisu](../../assets/screenshots/nodes_position.png)
+
+> ℹ️ **Note:** Metrics are only available when they have been reported by the remote node. Mõõdikud värskendatakse iga sõlme telemeetria sätetes seadistatud intervallidega.
+
 ## Seadme mõõdikud
 
 Basic operating information reported by each node:
 
-| Meetriline     | Kirjeldus                                |
-| -------------- | ---------------------------------------- |
-| Aku tase       | Praegune aku protsent                    |
-| Vool           | Aku pinge näit                           |
-| Kanali kasutus | Percentage of airtime consumed           |
-| Airtime        | Transmission time used by this node      |
-| Töötamise aeg  | Viimasest taaskäivitamisest möödunud aeg |
+| Meetriline     | Kirjeldus                                                |
+| -------------- | -------------------------------------------------------- |
+| Aku tase       | Praegune aku protsent                                    |
+| Vool           | Aku pinge näit                                           |
+| Kanali kasutus | Percentage of local airtime in use                       |
+| Saate kasutus  | Percentage of the last hour this node spent transmitting |
+| Töötamise aeg  | Viimasest taaskäivitamisest möödunud aeg                 |
 
-Seadme mõõdikud kuvatakse individuaalsete kaartidena, millel on trendigraafikud, mis näitavad aku taset, pinget, kanali kasutamist, eetriaega ja tööaega aja jooksul.
+Device Metrics has no cards on the node detail screen. Use the chart button on its row to open the Device Metrics screen, where battery level, voltage, ChUtil, and AirUtil are plotted over time and every reading — uptime included — is listed with its timestamp underneath. Pick a time frame at the top of the screen, and use the save icon in the app bar to export the visible history as CSV.
 
-> 💡 **Vihje:** Puuduta mis tahes mõõdikukaarti, et laiendada see ajalooliste andmepunktidega täisdiagrammiks. Ajatelje suumimiseks näpista sõrmed kokku.
+> 💡 **Tip:** Where a category does show cards — Environment, Air Quality, and Power — touch & hold a card to copy its value to the clipboard. On a chart screen, pinch to zoom the time axis.
 
 ## Keskkonnamõõdikud
 
@@ -43,7 +58,7 @@ Environmental sensor data (requires compatible hardware):
 | Gaasi surve                          | BME680                |
 | IAQ (Air Quality) | BME680                |
 
-Keskkonnanäitajaid joonistatakse aja jooksul lihtsaks trendianalüüsiks – temperatuur, niiskus ja rõhk saavad igaüks oma joondiagrammi, mille mõõtühik kuvatakse Y-teljel.
+Environment metrics are charted over time — temperature, humidity, and pressure each get their own line chart with the measurement unit displayed on the Y axis.
 
 BME680 **IAQ (siseõhu kvaliteet)** indeks on üksik väärtus vahemikus 0–500+, mis on tuletatud gaasitakistusest ja näidatud värvikoodiga skaalal _Suurepärane_ kuni _Ohtlikult saastunud_:
 
@@ -55,17 +70,17 @@ BME680 **IAQ (siseõhu kvaliteet)** indeks on üksik väärtus vahemikus 0–500
 
 Air Quality is a dedicated metrics view for nodes equipped with a particulate-matter and/or CO₂ sensor. See on **eraldi BME680 siseõhu kvaliteedi näidust**, mis on loetletud keskkonnamõõdikute all – siseõhu kvaliteet on ühtne gaasitakistusest tuletatud indeks, samas kui õhukvaliteedi vaade diagrammib aluseks olevaid tahkete osakeste ja CO₂ mõõtmisi.
 
-| Meetriline            | Unit       | Kirjeldus                                                                                                                                                                                                                                             |
-| --------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PM1.0 | µg/m³      | Particulate matter up to 1.0 micron                                                                                                                                                                                                   |
-| PM2,5                 | µg/m³      | Particulate matter up to 2.5 microns                                                                                                                                                                                                  |
-| PM10                  | µg/m³      | Particulate matter up to 10 microns                                                                                                                                                                                                                   |
-| AQI                   | EPA indeks | EPA **NowCast** õhukvaliteedi indeks on arvutatud hiljutise PM2.5 ajaloo põhjal ja sellel on värvikoodiga raskusastme silt. Kuvatakse PM2.5 kõrval, kui on kogunenud piisavalt näite. |
-| CO₂                   | ppm        | Süsinikdioksiidi kontsentratsioon                                                                                                                                                                                                                     |
-| CO₂ temperatuur       | °C / °F    | Temperature reported by the CO₂ sensor itself (e.g. SCD4x)                                                                                                                                         |
-| CO₂ niiskus           | %          | Relative humidity reported by the CO₂ sensor                                                                                                                                                                                                          |
+| Meetriline            | Unit       | Kirjeldus                                                                                                                                                                                                                       |
+| --------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PM1.0 | µg/m³      | Particulate matter up to 1.0 micron                                                                                                                                                                             |
+| PM2,5                 | µg/m³      | Particulate matter up to 2.5 microns                                                                                                                                                                            |
+| PM10                  | µg/m³      | Particulate matter up to 10 microns                                                                                                                                                                                             |
+| AQI                   | EPA indeks | EPA **NowCast** AQI computed from the node's recent PM2.5 history, with a color-coded severity label. Kuvatakse PM2.5 kõrval, kui on kogunenud piisavalt näite. |
+| CO₂                   | ppm        | Süsinikdioksiidi kontsentratsioon                                                                                                                                                                                               |
+| CO₂ temperatuur       | °C / °F    | Temperature reported by the CO₂ sensor itself (e.g. SCD4x)                                                                                                                   |
+| CO₂ niiskus           | %          | Relative humidity reported by the CO₂ sensor                                                                                                                                                                                    |
 
-CO₂ näidud on vastavalt raskusastmele värvikoodiga kodeeritud, et õhukvaliteeti oleks kiirelt loetav:
+CO₂ readings are color-coded by severity so you can read air quality at a glance:
 
 | Band         | CO₂ ulatus (ppm) | Värv        |
 | ------------ | ----------------------------------- | ----------- |
@@ -84,9 +99,9 @@ An air-quality log/metrics button appears on the node detail screen **only when 
 - **Refresh / request** the latest air-quality telemetry.
 - **Ekspordi CSV** analüüsimiseks arvutustabeli vaates.
 
-> 💡 **Vihje:** Õhukvaliteedi mõõdikute jaoks on vaja kaugsõlmega ühendatud andurit. If a node has no particulate or CO₂ sensor, the air-quality button won't appear. Vaata [Telemeetria & Sensorid](telemetry-and-sensors) toetatud raudvara kohta.
+> 💡 **Vihje:** Õhukvaliteedi mõõdikute jaoks on vaja kaugsõlmega ühendatud andurit. Vaata [Telemeetria & Sensorid](telemetry-and-sensors) toetatud raudvara kohta.
 
-## Signaali mõõdikud
+## Levi Kvaliteet
 
 Radio signal quality information:
 
@@ -99,7 +114,7 @@ Radio signal quality information:
 
 ### Signal Quality Reference
 
-Signaali kvaliteeti hinnatakse **SNR-i põhjal, mis on seotud aktiivse LoRa modemi eelseadistuse demodulatsiooni alumise piiriga**, mitte fikseeritud läviväärtuste põhjal – antud SNR tähendab erinevatel eelseadistustel erinevat väärtust (nt −15 dB on LongSlow režiimil hea, kuid ShortFast režiimil mittekasutatav). RSSI on kuvatud, aga see ei ole osa hinnangust. Letting `limit` be the preset's SNR limit:
+Signaali kvaliteeti hinnatakse **SNR-i põhjal, mis on seotud aktiivse LoRa modemi eelseadistuse demodulatsiooni alumise piiriga**, mitte fikseeritud läviväärtuste põhjal – antud SNR tähendab erinevatel eelseadistustel erinevat väärtust (nt −15 dB on LongSlow režiimil hea, kuid ShortFast režiimil mittekasutatav). RSSI on kuvatud, aga see ei ole osa hinnangust. In the table, _limit_ is the preset's SNR limit.
 
 | Kvaliteet | Kriteerium                                |
 | --------- | ----------------------------------------- |
@@ -110,7 +125,11 @@ Signaali kvaliteeti hinnatakse **SNR-i põhjal, mis on seotud aktiivse LoRa mode
 
 See [Understanding the Signal Meter](signal-meter) for the full explanation.
 
-Kohalik statistika ühendatud raadiost kuvatakse ka signaali kvaliteedi all, kui see on saadaval. Need logid sisaldavad mürataset, liiklusloendureid, edastusloendureid, võrgus olevate sõlmede arvu ja raadio tööaega. The noise floor chart uses a dashed reference line at -85 dBm to help identify a busy RF environment. Kasuta **Taotle**, et küsida ühendatud raadiost uut kohaliku statistika telemeetriaaruannet, **Tühjenda**, et eemaldada selle sõlme kohaliku statistika logi ja **Salvesta**, et salvestada nähtavat kohaliku statistika ajalugu CSV-failina.
+Kohalik statistika ühendatud raadiost kuvatakse ka signaali kvaliteedi all, kui see on saadaval. Need logid sisaldavad mürataset, liiklusloendureid, edastusloendureid, võrgus olevate sõlmede arvu ja raadio tööaega. The noise floor chart uses a dashed reference line at -85 dBm to help identify a busy RF environment.
+
+- **Request** — ask the connected radio for a fresh Local Stats telemetry report
+- **Clear** — remove Local Stats logs for that node
+- **Save** — export the visible Local Stats history as CSV
 
 ## Võimsusnäitajad
 
@@ -121,24 +140,21 @@ Power management telemetry (requires INA sensor or compatible hardware):
 | Vool       | Per-channel voltage reading    |
 | Pinge      | Per-channel draw, in milliamps |
 
-Up to three channels (ch1–ch3) are charted, each with a label you can edit. The app does not
-derive a wattage figure from them.
+The node detail screen shows cards for channels 1 to 3. Use the chart button on the **Power Metrics** row to open the chart screen, which lists a chip for every channel that reported data — up to eight — and charts the one you select. Use the label field under the chips to give a channel a name of your own, such as Solar or Battery. The app does not derive a wattage figure from voltage and current.
 
 ## Marsruudi
 
 Traceroute näitab sõnumi teed läbi kärgvõrgu:
 
-1. Sõlme üksikasjade ekraanil puuduta **Traceroute**.
+1. From the node detail screen's **Telemetry** section, tap the refresh button on the **Traceroute** row. You cannot traceroute your own node, and the button accepts one request every 30 seconds.
 2. Rakendus saadab sihtsõlmele traceroute-päringu.
-3. Tulemused näitavad iga hüpet koos SNR/RSSI väärtustega.
+3. Results show each hop with its SNR.
 
 ### Traceroute'i tulemuste lugemine
 
-```
-Sina → seade A (SNR: 8,5) → seade B (SNR: 5,2) → sihtkoht
-```
+A traceroute is a round trip, so each saved result carries a hop count in each direction — **Forward Hops** and **Return Hops** — and the **Round Trip** time in seconds. A result marked **Direct** reached the target with no relay in between. Tap a result to read the route traced toward the destination and the route traced back to you, with the SNR of every hop. On Android that view offers **View on map**, which draws the same path, as long as the start and destination nodes have both shared a position.
 
-Iga hüpe esindab vahendussõlme, mis sõnumi edastas.
+A result marked **No Response** means the target never answered. It may be out of range, asleep, or configured not to reply. Wait for the 30-second cooldown to clear and try again; if it keeps failing, send a direct message first to confirm the node is reachable at all.
 
 ## Asukoha logi
 
@@ -153,19 +169,13 @@ Asukohta jagavate sõlmede ajaloolised asukohaandmed:
 
 Näitab, milliseid sõlmi antud sõlm otse kuuleb, kasulik kärgvõrgu topoloogia mõistmiseks.
 
-## Viewing Metrics
+## Hosti mõõdik
 
-1. Mine **Seadmed**.
-2. Puuduta sõlme, mida soovite kontrollida.
-3. Vali detailvaadete vahekaartidelt mõõdiku kategooria.
+Nodes that run Meshtastic on a Linux host, such as a Raspberry Pi, report the host's own health — free memory, free disk space, one-, five-, and fifteen-minute load averages, and how long the host has been up. The **Host Metrics** row is always listed; its chart button appears once a node has reported them.
 
-![Sõlme detailid — kohalik seade](../../assets/screenshots/nodes_detail_local.png)
+## Pax mõõdiku logi
 
-Asukoha vahekaart kuvab GPS-i jagavate sõlmede asukohaandmeid:
-
-![Asukoha tekstisisene sisu](../../assets/screenshots/nodes_position.png)
-
-> ℹ️ **Note:** Metrics are only available when they have been reported by the remote node. Mõõdikud värskendatakse iga sõlme telemeetria sätetes seadistatud intervallidega.
+A node running the PAX counter module reports how many Wi-Fi and Bluetooth devices it saw nearby, as a crowd-size estimate, and charts the two counts alongside their total. The **PAX Metrics** row is always listed; its chart button appears once a node has reported them. The counts are of devices, not people.
 
 ## Seotud teemad
 
@@ -174,5 +184,3 @@ Asukoha vahekaart kuvab GPS-i jagavate sõlmede asukohaandmeid:
 - [Signal Meter](signal-meter) — how signal quality is calculated from SNR and RSSI
 - [Local Mesh Discovery](discovery) — traceroute details and neighbor info
 - [Ühikud ja lokaat](units-and-locale) — temperatuuri, kauguse ja kiiruse kuvamise ühikud
-
----

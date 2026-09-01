@@ -162,7 +162,6 @@
     <string name="config_lora_region_summary">La región donde utilizará su radio.</string>
     <string name="config_network_eth_enabled_summary">Habilitar Ethernet desactivará la conexión bluetooth a la aplicación. Las conexiones TCP no están disponibles en dispositivos Apple.</string>
     <string name="config_network_udp_enabled_summary">Habilitar paquetes de difusión vía UDP en la red local.</string>
-    <string name="config_network_wifi_enabled_summary">Habilitar WiFi desactivará la conexión bluetooth a la aplicación.</string>
     <string name="config_position_broadcast_secs_summary">El intervalo máximo que puede transcurrir sin que un nodo transmita una posición.</string>
     <string name="config_position_broadcast_smart_minimum_distance_summary">La distancia mínima de cambio en metros que se tendrá en cuenta para una transmisión inteligente de posición.</string>
     <string name="config_position_broadcast_smart_minimum_interval_secs_summary">La máxima velocidad a la que se enviarán las actualizaciones de posición si se ha cumplido la distancia mínima.</string>
@@ -415,7 +414,6 @@ Rango de Valores 0 - 500.</string>
     <string name="ipv4_mode">Modo IPv4</string>
     <string name="json_output_enabled">Salida JSON activada</string>
     <!-- KEY -->
-    <!-- LABEL -->
     <string name="last_heard_filter_label">Filtrar por tiempo de la última escucha: %1$s</string>
     <string name="last_position_update">Última actualización</string>
     <string name="latest_alpha_firmware">Última alfa</string>
@@ -470,6 +468,9 @@ Rango de Valores 0 - 500.</string>
     <string name="map_download_errors">Descarga completa con %1$d errores</string>
     <string name="map_download_region">Descargar región</string>
     <string name="map_filter">Filtro de mapa\n</string>
+    <string name="map_filter_all_roles">Todos</string>
+    <string name="map_filter_display_title">Pantalla</string>
+    <string name="map_filter_nodes_title">Nodos</string>
     <string name="map_offline_manager">Administrador sin conexión</string>
     <string name="map_purge_fail">Error en la purga del caché SQL, consulte logcat para obtener más detalles</string>
     <string name="map_purge_success">Caché SQL purgado para %1$s</string>
@@ -495,6 +496,8 @@ Estos datos de ubicación pueden ser utilizados para fines como aparecer en un m
     <!-- MESH -->
     <string name="mesh_beacon_offer_dismiss">Descartar</string>
     <string name="mesh_beacon_preset_none">Ninguna</string>
+    <string name="mesh_beacon_region_label">Región</string>
+    <string name="mesh_beacon_target_channel_index">Canal</string>
     <string name="mesh_map_location_description">Habilita el punto de posición azul para tu teléfono en el mapa de la malla.</string>
     <!-- MESHTASTIC -->
     <string name="meshtastic">Meshtastic</string>
@@ -730,17 +733,28 @@ Estos datos de ubicación pueden ser utilizados para fines como aparecer en un m
     <string name="ringtone">Tono de notificación</string>
     <!-- ROLE -->
     <string name="role">Rol del dispositivo</string>
+    <string name="role_client">Cliente</string>
+    <string name="role_client_base">Base cliente</string>
     <string name="role_client_desc">Aplicación conectada o dispositivo de mensajería autónomo.</string>
+    <string name="role_client_hidden">Cliente oculto</string>
     <string name="role_client_hidden_desc">Dispositivo que solo emite según sea necesario por sigilo o para ahorrar energía.</string>
+    <string name="role_client_mute">Cliente silenciado</string>
     <string name="role_client_mute_desc">El dispositivo no reenvía mensajes de otros dispositivos.</string>
-    <string name="role_lost_and_found_desc">Transmite regularmente la ubicación como mensaje al canal predeterminado para asistir en la recuperación del dispositivo.</string>
+    <string name="role_lost_and_found">Perdido y encontrado</string>
+    <string name="role_repeater">Repetidor</string>
     <string name="role_repeater_desc">Un nodo que es parte de infraestructura para extender el rango de esta misma, reemitiendo mensajes de nodos con poco alcance. No aparecerá en la lista de nodos visibles.</string>
+    <string name="role_router">Router</string>
+    <string name="role_router_client">Cliente de router</string>
     <string name="role_router_client_desc">Combinación de ROUTER y CLIENTE. No para dispositivos móviles.</string>
     <string name="role_router_desc">Nodo de infraestructura para ampliar la cobertura de la red mediante la retransmisión de mensajes. Visible en la lista de nodos.</string>
     <string name="role_router_late_desc">Nodo de infraestructura que permite la retransmisión de paquetes una vez posterior a los demás modos, asegurando cobertura adicional a los grupos locales. Es visible en la lista de nodos.</string>
+    <string name="role_sensor">Sensor</string>
     <string name="role_sensor_desc">Transmite paquetes de telemetría como prioridad.</string>
+    <string name="role_tak">TAK</string>
     <string name="role_tak_desc">Optimizado para el sistema de comunicación ATAK, reduciendo las transmisiones rutinarias.</string>
+    <string name="role_tak_tracker">Rastreador TAK</string>
     <string name="role_tak_tracker_desc">Permite la transmisión automática TAK PLI y reduce las transmisiones rutinarias.</string>
+    <string name="role_tracker">Rastreador</string>
     <string name="role_tracker_desc">Transmisión de paquetes de posición GPS como prioridad.</string>
     <string name="root_topic">Tema raíz</string>
     <string name="rotary_encoder_1_enabled">Encoder Número 1 Activado</string>
@@ -929,15 +943,9 @@ Estos datos de ubicación pueden ser utilizados para fines como aparecer en un m
     <string name="waypoint_received">Punto de referencia recibido: %1$s</string>
     <string name="weight">Peso</string>
     <!-- WIFI -->
-    <string name="wifi_config">Opciones WiFi</string>
-    <string name="wifi_enabled">WiFi del Nodo Activada</string>
-    <string name="wifi_ip">IP Wifi:</string>
     <string name="wifi_provision_success_done">Hecho</string>
     <string name="wifi_provision_success_ip_address">Dirección IP</string>
     <string name="wifi_provision_success_username">Usuario</string>
-    <string name="wifi_qr_code_error">Formato de código QR de credencial wifi inválido</string>
-    <string name="wifi_qr_code_scan">Escanear código QR WiFi</string>
-    <string name="wifi_rssi_threshold_defaults_to_80">Umbral mínimo de RSSI de WiFi (por defecto es -80)</string>
     <!-- WIND -->
     <string name="wind">Viento</string>
     <!-- WRITE -->

@@ -210,17 +210,6 @@
     <string name="ip_port">Port:</string>
     <string name="ipv4_mode">IPv4 režim</string>
     <!-- KEY -->
-    <!-- LABEL -->
-    <string name="label_long_fast">Ďaleký Dosah - Rýchlo</string>
-    <string name="label_long_moderate">Ďaleký Dosah - Mierne</string>
-    <string name="label_long_slow">Ďaleký Dosah - Pomali</string>
-    <string name="label_long_turbo">Ďaleký Dosah - Turbo</string>
-    <string name="label_medium_fast">Stredný Dosah - Rýchlo</string>
-    <string name="label_medium_slow">Stredný Dosah - Pomali</string>
-    <string name="label_short_fast">Krátky Dosah -  Rýchlo</string>
-    <string name="label_short_slow">Krátky Dosah - Pomali</string>
-    <string name="label_short_turbo">Krátky Dosah - Turbo</string>
-    <string name="label_very_long_slow">Veľmi Ďaleký Dosah - Pomali</string>
     <!-- LAYER -->
     <string name="led_state">Stav LED</string>
     <!-- LICENSED -->
@@ -260,6 +249,8 @@
     <string name="map_download_complete">Sťahovanie dokončené!</string>
     <string name="map_download_errors">Sťahovanie ukončené s %1$d chybami</string>
     <string name="map_download_region">Stiahnuť oblasť</string>
+    <string name="map_filter_all_roles">Všetky</string>
+    <string name="map_filter_display_title">Obrazovka</string>
     <string name="map_offline_manager">Offline manager</string>
     <string name="map_purge_fail">Vyčistenie SQL Cache zlyhalo, podrobnosti nájdete v logcat</string>
     <string name="map_purge_success">SQL Cache vyčistená pre %1$s</string>
@@ -271,6 +262,8 @@
     <string name="max">Maximum</string>
     <!-- MESH -->
     <string name="mesh_beacon_preset_none">Žiadny</string>
+    <string name="mesh_beacon_region_label">Región</string>
+    <string name="mesh_beacon_target_channel_index">Kanál</string>
     <!-- MESHTASTIC -->
     <string name="meshtastic">Meshtastic</string>
     <string name="meshtastic_alerts_notifications">Notifikácie upozornení</string>
@@ -402,17 +395,28 @@
     <string name="reset_to_defaults">Obnoviť na predvolené nastavenia</string>
     <string name="ringtone">Zvonenie</string>
     <!-- ROLE -->
+    <string name="role_client">Klient</string>
     <string name="role_client_desc">Pripojená aplikácia, alebo samostatné zariadenie na odosielanie správ.</string>
+    <string name="role_client_hidden">Skrytý Klient</string>
     <string name="role_client_hidden_desc">Zariadenie, ktoré vysiela len podľa potreby pre utajenie, alebo úsporu energie.</string>
+    <string name="role_client_mute">Stlmený Klient</string>
     <string name="role_client_mute_desc">Zariadenie, ktoré nepreposiela pakety z ďalších zariadení.</string>
-    <string name="role_lost_and_found_desc">Pravidelne vysiela polohu ako správu na predvolený kanál, aby pomohol pri obnove zariadenia.</string>
+    <string name="role_lost_and_found">Straty a nálezy</string>
+    <string name="role_repeater">Opakovač</string>
     <string name="role_repeater_desc">Uzol infraštruktúry na rozšírenie pokrytia siete prenosom správ s minimálnou réžiou. Nezobrazuje sa v zozname uzlov.</string>
+    <string name="role_router">Smerovač</string>
+    <string name="role_router_client">Smerovač Klient</string>
     <string name="role_router_client_desc">Kombinácia ROUTER a CLIENT. Nie pre mobilné zariadenia.</string>
     <string name="role_router_desc">Uzol infraštruktúry na rozšírenie pokrytia siete prenosom správ. Viditeľný v zozname uzlov.</string>
+    <string name="role_router_late">Smerovač s Oneskorením</string>
     <string name="role_router_late_desc">Uzol infraštruktúry, ktorý vždy preposiela pakety raz, ale až po všetkých ostatných režimoch, čím zabezpečuje dodatočné pokrytie pre miestne zväzky. Viditeľný v zozname uzlov.</string>
+    <string name="role_sensor">Senzor</string>
     <string name="role_sensor_desc">Prioritne vysiela telemetrické pakety.</string>
+    <string name="role_tak">TAK</string>
     <string name="role_tak_desc">Optimalizované pre systémovú komunikáciu ATAK, znižuje rutinné vysielanie.</string>
+    <string name="role_tak_tracker">TAK Sledovač</string>
     <string name="role_tak_tracker_desc">Umožňuje automatické vysielanie TAK PLI a znižuje rutinné vysielanie.</string>
+    <string name="role_tracker">Sledovač</string>
     <string name="role_tracker_desc">Prioritne vysiela pakety polohy GPS.</string>
     <string name="rotary_encoder_1_enabled">Enkóder #1 aktivovaný</string>
     <!-- ROUTING -->
@@ -509,12 +513,8 @@
     <string name="waypoint_received">Prijatý cieľový bod: %1$s</string>
     <string name="weight">Hmotnosť</string>
     <!-- WIFI -->
-    <string name="wifi_enabled">WiFi zapnutá</string>
-    <string name="wifi_ip">Wifi IP:</string>
     <string name="wifi_provision_success_ip_address">IP adresa</string>
     <string name="wifi_provision_success_username">Používateľské meno</string>
-    <string name="wifi_qr_code_error">Neplatný formát QR kódu poverenia WiFi</string>
-    <string name="wifi_qr_code_scan">Skenuj WiFi QR kód</string>
     <!-- WIND -->
     <string name="wind">Vietor</string>
     <!-- WRITE -->

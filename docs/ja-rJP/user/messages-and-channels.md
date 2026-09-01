@@ -2,7 +2,7 @@
 title: メッセージとチャンネル
 parent: User Guide
 nav_order: 3
-last_updated: 2026-08-27
+last_updated: 2026-08-30
 description: メッセージの送受信、チャンネルの管理、暗号化の設定、会話の検索、クイックチャット・リアクション・メッセージ操作の使い方を説明します。
 aliases:
   - channels
@@ -21,44 +21,53 @@ Meshtastic は、**チャンネルブロードキャスト**と**ダイレクト
 
 ### デフォルトチャンネル
 
-すべての Meshtastic デバイスには、デフォルトの **LongFast** チャンネルが用意されています。 これは、一般的なメッシュ通信に使われる暗号化されていないチャンネルです。
+Every Meshtastic radio comes with a default **LongFast** channel. It is encrypted with a well-known default key, so anyone running Meshtastic on the same preset can read it.
 
 ### チャンネルのセキュリティ
 
-チャンネルは複数の暗号化レベルに対応しています：
+Each channel carries a lock icon that shows how well it is protected. Tap the icon to see the same explanation inside the app.
 
-| アイコン | セキュリティレベル        | 説明                                                                     |
-| ---- | ---------------- | ---------------------------------------------------------------------- |
-| 🔒   | PSK（256 ビット AES） | 強力な事前共有鍵で完全に暗号化されます。 一致する鍵を持つノードだけがメッセージを読めます。                         |
-| 🔐   | PSK（128 ビット AES） | より短い鍵で暗号化されます。 ほとんどの用途で安全ですが、機密性の高いデータには 256 ビットが推奨されます。               |
-| 🔓   | デフォルト／オープン       | よく知られたデフォルトの鍵を使用します。 同じプリセットの**あらゆる Meshtastic デバイス**が、これらのメッセージを読めます。 |
-| ⚠️   | 非セキュア＋位置情報       | GPS 位置情報も一斉送信するオープンチャンネルです。 公開メッシュでは注意して使用してください。                      |
+| アイコン                               | 意味                                                                                                                                                    |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Green closed lock                  | The channel is securely encrypted, with either a 128-bit or a 256-bit AES key.                                                        |
+| Yellow open lock                   | The channel is not securely encrypted — it uses no key at all, or a well-known one-byte key — and it does not carry precise location. |
+| Red open lock                      | Not securely encrypted, and the channel carries precise location data.                                                                |
+| Red open lock with a warning badge | Not securely encrypted, carrying precise location data, and uplinking that data to the internet over MQTT.                            |
+
+Key length alone does not change the icon: a 128-bit key and a 256-bit key both show the green lock.
 
 > 🔒 **Security:** Always configure a unique PSK for private communications. デフォルトチャンネルは、新規ユーザーがメッシュを見つけられるよう意図的にオープンになっています。ただし、機密性の高い内容には別途、暗号化されたチャンネルを作成してください。
 
 ### チャンネルを追加する
 
-1. 「**設定 → チャンネル**」に移動します。
-2. Tap the **+** button to add a channel, or import one by scanning a channel QR code.
-3. チャンネル名と暗号化鍵を設定します。
-4. アクセスが必要な相手に、チャンネルの URL／QR コードを共有します。
+1. Connect to your radio. The **Channels** row stays grayed out until the app has a connection — see [Connections](connections).
+2. Go to **Settings**, then tap **Channels** under **Configuration**.
+3. Tap the **+** button to add a channel. The editor opens on the new entry.
+4. Set the channel name and the **PSK**, and choose whether the channel uses MQTT uplink and downlink. Naming a new channel generates a fresh 256-bit key for you; the refresh icon beside **PSK** generates another one.
+5. Tap **Save** to close the editor. The change is still only on your phone.
+6. Tap **Send** at the bottom of the channel list to write the changes to the radio. **Cancel**, or leaving the screen without tapping **Send**, throws them away.
+7. Optional: share the channel URL or QR code with the people who need access.
 
-チャンネルをタップすると、その詳細と共有オプションが表示されます。
+Tapping an existing channel opens the same editor, where you can change the name, the PSK, MQTT uplink and downlink, and position precision. Every edit on this screen — adding, editing, deleting, or dragging a channel into a new order — waits on **Send** the same way.
 
 ## ダイレクトメッセージ
 
-ダイレクトメッセージ（DM）は、特定の 2 つのノード間で行われる、ポイントツーポイントの暗号化通信です。
+Direct messages (DMs) go to one specific node. When both radios hold each other's public keys, your radio encrypts the message to that node's public key, so no one else on the mesh can read it — not even nodes that share your channel.
+
+Your radio must already hold the other node's public key before it can send a DM. Keys travel inside node info, which nodes broadcast periodically, so the key usually arrives on its own once you have heard from that node. Until it does, a radio that has its own key pair — the default — refuses the send rather than falling back to channel encryption, and the message shows **Recipient key unavailable**.
+
+A public-key conversation carries a key icon in its top bar. A green closed lock means the direct message is protected by public-key encryption; a red key-off icon means the node's public key changed and no longer matches the one your radio stored. Tap the icon for the details.
 
 ### ダイレクトメッセージを送信する
 
 1. 「**メッセージ**」タブを開きます。
-2. 連絡先リストからノードを選択するか、ノードリストでノードをタップします。
+2. Select a conversation, or tap a node in the node list.
 3. メッセージを入力し、「**送信**」をタップします。
 
 ### Managing the Conversation List
 
-The **Messages** tab lists your conversations. Each row carries what you need to triage it at a
-glance, and the list itself is directly actionable:
+The **Messages** tab lists your conversations. Each row shows what you need at a glance, and you
+can act on it directly:
 
 - **Unsent drafts survive.** Type into a conversation and leave without sending, and the text is
   still there when you come back. The row shows it as `Draft: …` in place of the last message —
@@ -66,7 +75,7 @@ glance, and the list itself is directly actionable:
 - **Unread badge.** A count sits on the row until you open the conversation.
 - **Swipe right to mute** (swipe again to unmute) and **swipe left to delete**. Deleting asks
   first; muting shows a snackbar with **Undo**.
-- **Long-press to select** one or more conversations, then use the action bar to **Pin**,
+- **Touch & hold to select** one or more conversations, then use the action bar to **Pin**,
   **Mark unread**, mute or delete them together. Pinned conversations carry a pin marker and rise
   to the top of **their own section**.
 - **The list is split into Channels and Direct Messages**, each with a collapsible header and each
@@ -84,15 +93,15 @@ control whether they are offered at all.
 
 ステータスラベルは、**自分が**送信したメッセージの下にのみ表示されます（他のユーザーからの受信メッセージにはステータスラベルは表示されません）：
 
-| 状態                   | 意味                                                                                                                                                                                                                                        |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 送信中…                 | Queued or already handed to the radio, not yet resolved either way. Both stages share this text, but the icon and colour change as it progresses — a yellow upload cloud while queued, a blue arrow once the radio has it |
-| 受信者に配信済み             | ダイレクトメッセージで最も確実な確認です。受信確認が返ってきています                                                                                                                                                                                                        |
-| メッシュに配信済み            | チャンネルブロードキャストでは、メッセージがメッシュに届いたことを示します（ブロードキャストには受信者ごとの確認応答はありません）                                                                                                                                                                         |
-| 中継済み、受信者による確認なし      | ダイレクトメッセージでは警告色で表示されます。メッセージは中継されましたが、まだ受信確認が返ってきていません                                                                                                                                                                                    |
-| SF++ チェーン経由でルーティング中… | Store & Forward Plus Plus チェーンによってルーティング／バッファリングされています                                                                                                                                                                |
-| SF++ チェーンで確認済み       | SF++ チェーン経由で配信が確認されました                                                                                                                                                                                                                    |
-| エラー                  | 配信に失敗しました。具体的な理由はステータスをタップして確認してください（下記の「配信エラー」を参照）                                                                                                                                                                                       |
+| 状態                   | 意味                                                                                                                                                                                                                                       |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 送信中…                 | Queued or already handed to the radio, not yet resolved either way. Both stages share this text, but the icon and color change as it progresses — a yellow upload cloud while queued, a blue arrow once the radio has it |
+| 受信者に配信済み             | ダイレクトメッセージで最も確実な確認です。受信確認が返ってきています                                                                                                                                                                                                       |
+| メッシュに配信済み            | チャンネルブロードキャストでは、メッセージがメッシュに届いたことを示します（ブロードキャストには受信者ごとの確認応答はありません）                                                                                                                                                                        |
+| 中継済み、受信者による確認なし      | ダイレクトメッセージでは警告色で表示されます。メッセージは中継されましたが、まだ受信確認が返ってきていません                                                                                                                                                                                   |
+| SF++ チェーン経由でルーティング中… | Store & Forward Plus Plus チェーンによってルーティング／バッファリングされています                                                                                                                                                               |
+| SF++ チェーンで確認済み       | SF++ チェーン経由で配信が確認されました                                                                                                                                                                                                                   |
+| エラー                  | Delivery failed — tap the status for the specific reason (see [Delivery Errors](#delivery-errors))                                                                                                                    |
 
 ### 配信エラー
 
@@ -100,7 +109,7 @@ control whether they are offered at all.
 
 | エラー                      | 意味                                                                                                                                                                            | 対処方法                                                                                                                                  |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| ルートなし                    | 宛先ノードへの経路が存在しません                                                                                                                                                              | 受信者がオフラインか、メッシュの範囲外の可能性があります。 時間をおくか、距離を縮めてください。                                                                                      |
+| ルートがありません                | 宛先ノードへの経路が存在しません                                                                                                                                                              | 受信者がオフラインか、メッシュの範囲外の可能性があります。 時間をおくか、距離を縮めてください。                                                                                      |
 | No radio interface       | 送信に使える無線インターフェースがありません                                                                                                                                                        | Check that your radio is connected and available.                                                                     |
 | メッシュへの配信に失敗しました          | Retries exhausted. The same label covers three underlying causes — a relay refusing (NAK), a plain timeout, and running out of retransmits | Move closer, improve signal, or wait for conditions to improve. Tap the error for the specific cause. |
 | Rate limited             | The mesh is throttling you for sending too fast                                                                                                                               | Wait before sending again.                                                                                            |
@@ -116,26 +125,23 @@ control whether they are offered at all.
 | Duty cycle limit         | 地域ごとの電波利用時間の上限に達しました                                                                                                                                                          | Wait for the duty cycle window to reset.                                                                              |
 | Invalid request          | Malformed or invalid request                                                                                                                                                  | Retry after updating or restarting the app if this persists.                                                          |
 
-> 💡 **ヒント：** ほとんどの配信エラーは自然に解消します。 ノードに断続的に到達できる場合、メッシュは再試行します。 「ルートなし」エラーが続く場合は、中間のルーターノードがオンラインになっているか確認してください。
+> 💡 **ヒント：** ほとんどの配信エラーは自然に解消します。 ノードに断続的に到達できる場合、メッシュは再試行します。 For persistent **No route** errors, check that intermediate Router nodes are online.
 
 ## メッセージの機能
 
 ### クイックチャット
 
-すばやくやり取りするための、あらかじめ設定されたメッセージです：
+Pre-configured messages for rapid communication, useful when typing is impractical (gloves, small screen, urgent):
 
-- メッセージ入力欄のクイックチャットボタンから利用できます
-- 組み込みの定型文またはカスタムメッセージから選べます
-- クイックチャットのメッセージは「**設定 → クイックチャット**」でカスタマイズできます
-- 入力が難しい場面（手袋の着用、小さな画面、急いでいるとき）に便利です
+- The quick chat row is hidden until you turn it on. Open a conversation, tap the overflow menu in the top bar, then tap **Show quick chat menu**. **Hide quick chat menu** puts the row away again.
+- The row carries one built-in entry, the 🔔 alert bell. It appends an alert message that includes a bell character, which clients that support it flag as an alert. Every other button on the row is one you created.
+- Add, edit, reorder, and delete your own entries from the same overflow menu — tap **Quick chat options**.
 
 ![クイックチャットのオプション](../../assets/screenshots/messages_quick_chat.png)
 
-各クイックチャット項目には、短い**名前**（ボタンのラベル）、挿入される**メッセージ**、そして**即時送信**トグルがあります。有効にすると、ボタンをタップした時点で、メッセージが入力欄に置かれて編集できる状態になるのではなく、すぐに送信されます：
+Each quick chat entry has a **Name** — the button label, capped at five characters, forced to uppercase, and filled in for you from the message text — and the **Message** it carries. A switch decides what tapping the button does. A new entry starts on **Instantly send**, so a tap sends the message straight away; turn the switch off and the label changes to **Append to message**, which puts the text in the input field for you to edit first.
 
 ![名前・メッセージ・即時送信トグルを備えた新規クイックチャットのダイアログ](../../assets/screenshots/messages_edit_quick_chat.png)
-
-チャンネルリストには、各チャンネルが最新メッセージのプレビューとともに表示されます。
 
 ### メッセージを検索する
 
@@ -166,7 +172,7 @@ control whether they are offered at all.
 | インラインコード | `` `code` ``                   | 等幅の `code`    |
 | リンク      | `[label](https://example.com)` | タップできる**ラベル** |
 
-メッセージを作成するときは、入力欄にフォーカスして 3 文字以上入力すると、入力欄の下に**書式ツールバー**が表示されます。 テキストを選択してスタイルをタップすると、そのテキストが囲まれます（もう一度タップすると解除されます）。選択していない場合は、空のペアが挿入され、カーソルがマーカーの間に置かれます。 リンクボタンをタップすると、URL を入力するダイアログが開きます。 入力中は下書きに書式が適用されて表示されますが、内部のテキストは Markdown の文字を保持しています。
+メッセージを作成するときは、入力欄にフォーカスして 3 文字以上入力すると、入力欄の下に**書式ツールバー**が表示されます。 テキストを選択してスタイルをタップすると、そのテキストが囲まれます（もう一度タップすると解除されます）。選択していない場合は、空のペアが挿入され、カーソルがマーカーの間に置かれます。 リンクボタンをタップすると、URL を入力するダイアログが開きます。 As you type, the field shows the styled text, but the message you send still contains the Markdown characters.
 
 > 💡 **ヒント：** 書式はメッシュ上ではそのままの文字として送られます。iOS が送信するのと同じバイト列です。 Markdown に対応していないクライアント（古いアプリや、素のファームウェアのクライアント）では、`**` や `~~` の文字がそのまま表示されます。 URL、メールアドレス、電話番号は、Markdown を使うかどうかにかかわらず、引き続き自動的にリンクになります。
 
@@ -178,15 +184,13 @@ control whether they are offered at all.
 
 絵文字でメッセージにリアクションできます：
 
-- **Double-tap** a message — or long-press it — to raise a quick reaction bar above the bubble
-- Tap an emoji in the bar to send it; tap **more** to open the full picker, or anywhere outside
-  the bar to dismiss it without sending
+- **Touch & hold** a message — or double-tap it — to raise a quick reaction bar above the bubble. Opening the bar sends nothing.
+- Tap an emoji in the bar to send it; tap **More reactions** to open the full picker, or anywhere outside
+  the bar to dismiss it without sending. A reaction is a real mesh packet, so it only goes out
+  when you pick an emoji.
 - リアクションはメッセージの吹き出しの下に表示されます
 - 複数のユーザーが同じメッセージにリアクションできます
 - 自分のメッセージにも、他の人のメッセージにもリアクションできます
-
-> ℹ️ **Note:** Opening the bar sends nothing. A reaction is a real mesh packet, so it only goes
-> out when you pick an emoji.
 
 ![メッセージの下に表示された絵文字リアクションのバッジ](../../assets/screenshots/messages_reaction.png)
 
@@ -196,7 +200,7 @@ control whether they are offered at all.
 
 **Swipe a message to the right** to reply to it — the composer opens with that message quoted.
 Swiping past the reply threshold arms the action; releasing before it springs back with nothing sent.
-Reply is also in the actions menu, reached by long-pressing and then tapping **More**.
+Reply is also in the actions sheet, reached by touching & holding and then tapping **More message actions**.
 
 ### Day Separators
 
@@ -212,14 +216,16 @@ messages. That count is messages, not people — five unread from one person rea
 
 ### メッセージの操作
 
-Long-press or double-tap a message to open the quick reaction bar, then tap **More** (the
-overflow icon on that bar) to reach:
+Touch & hold or double-tap a message to open the quick reaction bar, then tap **More message actions**
+(the overflow icon on that bar) to open the actions sheet. The emoji row runs across the top of the
+sheet — that is where reactions live — and beneath it, along with the message's timestamp and
+delivery status, are:
 
-- **コピー：** メッセージのテキストをクリップボードにコピーします
 - **返信：** そのメッセージを引用して返信します
-- **リアクション：** 絵文字のリアクションを追加します
-- **翻訳：** 受信メッセージをデバイスの言語に翻訳し、原文と翻訳を切り替えます（Google Play 版のみ。オンデバイス翻訳を使用します）
-- **削除：** 自分が送信したメッセージを削除します（端末内での削除）
+- **Copy** — copy the message text to the clipboard
+- **Translate** — translate a received message into your device language, and toggle between the original and translated text (Google Play build only; uses on-device translation). The first translation into a language asks to download a one-time language model and tells you its size, then translates once the download finishes. If the download fails, or the message is already in your language, the app says so instead of translating
+- **Select** — start multi-select, so you can act on several messages at once
+- **Delete** — remove the message from this phone. It works on any message in the conversation, yours or not, and does not remove it from anyone else's radio or phone
 
 ### メッセージの優先度
 
@@ -232,7 +238,7 @@ reliable or background, but that is not something you control from the message c
 ### メッセージの制限
 
 - **最大長：** 200 バイト（ASCII テキストで約 200 文字）
-- The 200-byte cap applies to the in-app composer — the mesh payload limit itself is ~233 bytes, so messages from other senders (e.g., App Functions) may arrive slightly longer
+- The 200-byte cap applies to the in-app composer — the mesh payload limit itself is 233 bytes, so messages from other senders (e.g., App Functions) may arrive slightly longer
 - **レート制限：** メッシュは電波利用時間の公平性を確保するため、大量のメッセージは制限されることがあります
 - **配信：** 受信確認がない場合、メッセージは自動的に再送されます
 
@@ -249,6 +255,3 @@ reliable or background, but that is not something you control from the message c
 - [設定：無線機とユーザー](settings-radio-user)：チャンネルの暗号化とプリセットを設定します
 - [MQTT](mqtt)：チャンネルのメッセージをインターネットに橋渡しします
 - [チャンネル設定](https://meshtastic.org/docs/configuration/radio/channels)：meshtastic.org にある詳細なチャンネル設定
-
----
-

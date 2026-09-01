@@ -48,6 +48,8 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         scope.launch { dataStore.edit { it[KEY_MAP_STYLE_PREF] = style } }
     }
 
+    override suspend fun awaitMapStyle(): Int = dataStore.data.map { it[KEY_MAP_STYLE_PREF] ?: 0 }.first()
+
     override val showOnlyFavorites: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_SHOW_ONLY_FAVORITES_PREF] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
 
@@ -83,6 +85,50 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         scope.launch { dataStore.edit { it[KEY_LAST_HEARD_TRACK_FILTER_PREF] = seconds } }
     }
 
+    override val onlyOnlineOnMap: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_ONLY_ONLINE_PREF] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setOnlyOnlineOnMap(only: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_ONLY_ONLINE_PREF] = only } }
+    }
+
+    override val onlyDirectOnMap: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_ONLY_DIRECT_PREF] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setOnlyDirectOnMap(only: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_ONLY_DIRECT_PREF] = only } }
+    }
+
+    override val excludeMqttOnMap: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_EXCLUDE_MQTT_PREF] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setExcludeMqttOnMap(exclude: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_EXCLUDE_MQTT_PREF] = exclude } }
+    }
+
+    override val showIgnoredOnMap: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_SHOW_IGNORED_PREF] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setShowIgnoredOnMap(show: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_SHOW_IGNORED_PREF] = show } }
+    }
+
+    override val includeUnknownOnMap: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_INCLUDE_UNKNOWN_PREF] ?: true }.stateIn(scope, SharingStarted.Eagerly, true)
+
+    override fun setIncludeUnknownOnMap(include: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_INCLUDE_UNKNOWN_PREF] = include } }
+    }
+
+    override val excludedMapRoles: StateFlow<Set<String>> =
+        dataStore.data
+            .map { it[KEY_EXCLUDED_ROLES_PREF] ?: emptySet() }
+            .stateIn(scope, SharingStarted.Eagerly, emptySet())
+
+    override fun setExcludedMapRoles(roles: Set<String>) {
+        scope.launch { dataStore.edit { it[KEY_EXCLUDED_ROLES_PREF] = roles } }
+    }
+
     override val hiddenLayerUrls: StateFlow<Set<String>> =
         dataStore.data
             .map { it[KEY_HIDDEN_LAYER_URLS_PREF] ?: emptySet() }
@@ -98,6 +144,17 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
     // dataStore.data's first emission is the persisted value (unlike the eager StateFlow, which starts at emptySet()).
     override suspend fun awaitHiddenLayerUrls(): Set<String> =
         dataStore.data.map { it[KEY_HIDDEN_LAYER_URLS_PREF] ?: emptySet() }.first()
+
+    override val layerOpacity: StateFlow<Set<String>> =
+        dataStore.data
+            .map { it[KEY_LAYER_OPACITY_PREF] ?: emptySet() }
+            .stateIn(scope, SharingStarted.Eagerly, emptySet())
+
+    override fun updateLayerOpacity(transform: (Set<String>) -> Set<String>) {
+        scope.launch {
+            dataStore.edit { it[KEY_LAYER_OPACITY_PREF] = transform(it[KEY_LAYER_OPACITY_PREF] ?: emptySet()) }
+        }
+    }
 
     override val networkMapLayers: StateFlow<Set<String>> =
         dataStore.data
@@ -143,6 +200,13 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         val KEY_LAST_HEARD_TRACK_FILTER_PREF = longPreferencesKey("last_heard_track_filter")
         val KEY_HIDDEN_LAYER_URLS_PREF = stringSetPreferencesKey("hidden_layer_urls")
         val KEY_NETWORK_MAP_LAYERS_PREF = stringSetPreferencesKey("network_map_layers")
+        val KEY_LAYER_OPACITY_PREF = stringSetPreferencesKey("layer_opacity")
+        val KEY_ONLY_ONLINE_PREF = booleanPreferencesKey("map_only_online")
+        val KEY_ONLY_DIRECT_PREF = booleanPreferencesKey("map_only_direct")
+        val KEY_EXCLUDE_MQTT_PREF = booleanPreferencesKey("map_exclude_mqtt")
+        val KEY_SHOW_IGNORED_PREF = booleanPreferencesKey("map_show_ignored")
+        val KEY_INCLUDE_UNKNOWN_PREF = booleanPreferencesKey("map_include_unknown")
+        val KEY_EXCLUDED_ROLES_PREF = stringSetPreferencesKey("map_excluded_roles")
         val KEY_CAMERA_LATITUDE = doublePreferencesKey("camera_latitude")
         val KEY_CAMERA_LONGITUDE = doublePreferencesKey("camera_longitude")
         val KEY_CAMERA_ZOOM = doublePreferencesKey("camera_zoom")

@@ -2,7 +2,7 @@
 title: デバッグログ
 parent: ユーザーガイド
 nav_order: 22
-last_updated: 2026-08-27
+last_updated: 2026-08-30
 description: アプリのデバッグログをアプリ内で表示・エクスポートし、バグの診断に役立つよう GitHub の issue にキャプチャを添付できます。adb は不要です。
 aliases:
   - debug-logs
@@ -13,11 +13,11 @@ aliases:
 
 # デバッグログ
 
-何か不具合が起きたとき、アプリのデバッグログは、バグ報告に添付できる最も役立つものです。 Meshtastic は、**アプリ内で自動的に**ログをキャプチャできます。収集に `adb` やデスクトップのツールは不要になりました。
+何か不具合が起きたとき、アプリのデバッグログは、バグ報告に添付できる最も役立つものです。 Meshtastic can capture them **for you, from inside the app** — you don't need `adb` or any desktop tooling to collect them.
 
 「**設定 → 詳細設定 → デバッグパネル**」から「**デバッグパネル**」を開きます。
 
-> 📎 **issue を作成しますか？** ログをエクスポートし（下記参照）、[github.com/meshtastic/Meshtastic-Android/issues](https://github.com/meshtastic/Meshtastic-Android/issues) の報告に `.txt` ファイルを添付してください。 問題が起きた瞬間を含むログのキャプチャは、「動かない」という報告を、開発者が実際に追跡できるものに変えます。
+If you're filing an issue, export your logs (see [Exporting](#exporting)) and attach the `.txt` file to your report on the [Meshtastic-Android issue tracker](https://github.com/meshtastic/Meshtastic-Android/issues). 問題が起きた瞬間を含むログのキャプチャは、「動かない」という報告を、開発者が実際に追跡できるものに変えます。
 
 ## 2 つのタブ
 
@@ -30,7 +30,7 @@ aliases:
 
 ## アプリログを表示する
 
-「**アプリログ**」タブは、**このアプリのみ**の最新のログ行を表示します。デバイス上の他のアプリのものは表示しません。
+The **App logs** tab shows the most recent log lines from **this app only** — never other apps on your phone.
 
 - **検索**：検索ボックスに入力すると、一致する行に絞り込めます。
 - **レベルフィルター**：**V／D／I／W／E** のチップで、Verbose、Debug、Info、Warn、Error の行を切り替えます。 レベルをタップすると非表示になり、もう一度タップすると再表示されます。 Fatal の行は常に表示されます。
@@ -40,11 +40,11 @@ aliases:
 
 ## エクスポート
 
-**ダウンロード**アイコンをタップすると、現在のログをファイルに保存できます。 保存先はシステムのファイル選択画面で選び、ファイルにはタイムスタンプ付きの名前（例：`meshtastic_logcat_20260701_143312.txt`）が付くため、繰り返しエクスポートしても互いに上書きされることはありません。
+**ダウンロード**アイコンをタップすると、現在のログをファイルに保存できます。 The app first shows a warning about what the file contains — confirm it, then choose where the file goes through the system file picker. The file is named with a timestamp (for example `meshtastic_logcat_20260701_143312.txt`) so repeated exports never overwrite each other. The same warning guards the **Packets** tab export.
 
 そのファイルを GitHub の issue に添付してください。
 
-> 🔒 **Privacy:** Exports automatically **redact** private keys, admin keys, session passkeys and channel PSKs before writing the file. Logs can still contain node names, positions, and other identifying details — glance through the file before sharing it publicly, and share privately if you have any doubt.
+> 🔒 **Privacy:** Exports automatically **redact** private keys, admin keys, session passkeys, and channel PSKs, and suppress raw packet bytes. Everything else stays — the file can contain your message text, precise locations, and node details. Read it before sharing it publicly, and share privately if you have any doubt.
 
 ## デスクトップ
 
@@ -54,5 +54,3 @@ aliases:
 
 - [ヘルプとアプリ内ドキュメント](help-and-docs)：このドキュメントをアプリ内でオフラインで読む
 - [コネクション](connections)：そもそも無線機に接続できないことが問題の場合
-
----

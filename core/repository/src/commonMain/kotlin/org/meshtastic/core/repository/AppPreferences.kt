@@ -304,6 +304,16 @@ interface MapPrefs {
 
     fun setMapStyle(style: Int)
 
+    /**
+     * Persisted [mapStyle]; suspends for the first disk load to avoid a cold-start default.
+     *
+     * [mapStyle] is shared eagerly and starts at `0` before the first disk read completes, same as [hiddenLayerUrls]'s
+     * empty-set default. A caller that renders a basemap from the eager value before this resolves can render the wrong
+     * one and then swap moments later — which, for a MapLibre style, means tearing down and rebuilding the whole style
+     * subcomposition out from under sources still attaching to it.
+     */
+    suspend fun awaitMapStyle(): Int
+
     val showOnlyFavorites: StateFlow<Boolean>
 
     fun setShowOnlyFavorites(show: Boolean)
@@ -324,6 +334,41 @@ interface MapPrefs {
 
     fun setLastHeardTrackFilter(seconds: Long)
 
+    /**
+     * Node filters shared with the node list's vocabulary, persisted separately: a user filtering the map to routers
+     * has not asked for the same of their contact list.
+     */
+    val onlyOnlineOnMap: StateFlow<Boolean>
+
+    fun setOnlyOnlineOnMap(only: Boolean)
+
+    val onlyDirectOnMap: StateFlow<Boolean>
+
+    fun setOnlyDirectOnMap(only: Boolean)
+
+    val excludeMqttOnMap: StateFlow<Boolean>
+
+    fun setExcludeMqttOnMap(exclude: Boolean)
+
+    val showIgnoredOnMap: StateFlow<Boolean>
+
+    fun setShowIgnoredOnMap(show: Boolean)
+
+    val includeUnknownOnMap: StateFlow<Boolean>
+
+    fun setIncludeUnknownOnMap(include: Boolean)
+
+    /**
+     * Names of the device roles the user has switched off on the map.
+     *
+     * Excluded rather than included, and by name rather than ordinal: an included set would make nodes reporting a role
+     * added by future firmware invisible with no way to discover why, and `ROUTER_CLIENT = 3` is already a deprecated
+     * slot.
+     */
+    val excludedMapRoles: StateFlow<Set<String>>
+
+    fun setExcludedMapRoles(roles: Set<String>)
+
     /** URIs of imported map layers the user has toggled off; a layer is visible unless its URI is in this set. */
     val hiddenLayerUrls: StateFlow<Set<String>>
 
@@ -332,6 +377,17 @@ interface MapPrefs {
 
     /** Persisted [hiddenLayerUrls]; suspends for the first disk load to avoid a cold-start empty default. */
     suspend fun awaitHiddenLayerUrls(): Set<String>
+
+    /**
+     * Per-layer opacity, each entry encoded as `key|:|opacity`. A layer absent from the set is fully opaque.
+     *
+     * One set spans both kinds of layer: a built-in overlay keyed by its catalogue id, an imported one by its URI — the
+     * same key [hiddenLayerUrls] uses, and for the same reason (a file-backed layer's id is regenerated on load).
+     */
+    val layerOpacity: StateFlow<Set<String>>
+
+    /** Atomically mutate [layerOpacity]; [transform] runs against the persisted value, avoiding lost updates. */
+    fun updateLayerOpacity(transform: (Set<String>) -> Set<String>)
 
     /** Persisted network (URL-backed) map layers, each encoded as `id|:|name|:|uri`. */
     val networkMapLayers: StateFlow<Set<String>>

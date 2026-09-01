@@ -107,7 +107,6 @@
     <string name="intro_show">Prikaži uvod</string>
     <string name="ip_address">IP Adresa:</string>
     <!-- KEY -->
-    <!-- LABEL -->
     <!-- LAYER -->
     <!-- LICENSED -->
     <!-- LOAD -->
@@ -135,6 +134,8 @@
     <string name="map_tile_download_estimate">Procjena preuzimanja:</string>
     <string name="map_tile_source">Izvor karte</string>
     <!-- MESH -->
+    <string name="mesh_beacon_region_label">Regija</string>
+    <string name="mesh_beacon_target_channel_index">Kanal</string>
     <!-- MESHTASTIC -->
     <string name="meshtastic">Meshtastic</string>
     <string name="meshtastic_app_name">Meshtastic</string>

@@ -113,7 +113,6 @@
     <string name="config_lora_hop_limit_summary">Define o número máximo de saltos; o valor predefinido é 3. Aumentar o número de saltos também aumenta a congestão e deve ser usado com precaução. Mensagens de broadcast com 0 saltos não receberão ACKs.</string>
     <string name="config_network_eth_enabled_summary">Ativar a Ethernet irá desativar a ligação Bluetooth à aplicação. As ligações TCP do nó não estão disponíveis em dispositivos Apple.</string>
     <string name="config_network_udp_enabled_summary">Ativar a transmissão de pacotes via UDP através da rede local.</string>
-    <string name="config_network_wifi_enabled_summary">Ativar o WiFi irá desativar a ligação Bluetooth à aplicação.</string>
     <string name="config_position_broadcast_secs_summary">O intervalo máximo que pode decorrer sem que um nó transmita a sua posição.</string>
     <string name="configuration">Configuração</string>
     <string name="connect">Ligar</string>
@@ -260,7 +259,6 @@
     <string name="ipv4_mode">Modo IPv4</string>
     <string name="json_output_enabled">Saída JSON ativada</string>
     <!-- KEY -->
-    <!-- LABEL -->
     <string name="latitude">Latitude</string>
     <!-- LAYER -->
     <string name="led_state">Estado do LED</string>
@@ -292,6 +290,9 @@
     <string name="map_download_complete">Download concluído!</string>
     <string name="map_download_errors">Download concluído com %1$d erros</string>
     <string name="map_download_region">Baixar região</string>
+    <string name="map_filter_all_roles">Tudo</string>
+    <string name="map_filter_display_title">Ecrã</string>
+    <string name="map_filter_nodes_title">Nodes</string>
     <string name="map_offline_manager">Gerenciador offline</string>
     <string name="map_purge_fail">Falha na remoção do cache SQL, consulte logcat para obter detalhes</string>
     <string name="map_purge_success">Cache SQL removido para %1$s</string>
@@ -308,6 +309,8 @@
     <string name="max">Máximo</string>
     <!-- MESH -->
     <string name="mesh_beacon_preset_none">Nenhum</string>
+    <string name="mesh_beacon_region_label">Região</string>
+    <string name="mesh_beacon_target_channel_index">Canal</string>
     <!-- MESHTASTIC -->
     <string name="meshtastic">Nome do nó de alternativo</string>
     <string name="meshtastic_alerts_notifications">Notificações de alerta</string>
@@ -462,17 +465,26 @@
     <string name="reset_to_defaults">Redefinir para configurações originais</string>
     <string name="ringtone">Toque</string>
     <!-- ROLE -->
+    <string name="role_client">Cliente</string>
     <string name="role_client_desc">Ligado por app, ou dispositivo autónomo de mensagens.</string>
+    <string name="role_client_hidden">Cliente oculto</string>
     <string name="role_client_hidden_desc">Dispositivo que só transmite quando necessário para economizar energia ou anonimidade.</string>
+    <string name="role_client_mute">Cliente silenciado</string>
     <string name="role_client_mute_desc">Dispositivo que não encaminha mensagens de outros dispositivos.</string>
-    <string name="role_lost_and_found_desc">Transmite regularmente a localização como uma mensagem para o canal default, para auxiliar na recuperação do dispositivo.</string>
+    <string name="role_lost_and_found">Perdidos e Achados</string>
+    <string name="role_repeater">Repetidor</string>
     <string name="role_repeater_desc">Node de infraestrutura para estender a cobertura da rede retransmitindo mensagens com overhead mínimo. Não visível na lista de nodes.</string>
+    <string name="role_router">Roteador</string>
+    <string name="role_router_client">Cliente Roteador</string>
     <string name="role_router_client_desc">Combinação de ROUTER e CLIENT. Não indicado para dispositivos móveis.</string>
     <string name="role_router_desc">Node de infraestrutura que retransmite mensagens para estender a cobertura da rede (Router). Visível na lista de nodes.</string>
     <string name="role_router_late_desc">Node de infraestrutura que vai sempre retransmitir dados uma vez, mas apenas após todos os outros modos, garantindo cobertura adicional para grupos locais. Visível na lista de nós.</string>
+    <string name="role_sensor">Sensor</string>
     <string name="role_sensor_desc">Transmite dados de telemetria como prioridade.</string>
+    <string name="role_tak">TAK — ‘Kit’ de Consciencialização da Equipa</string>
     <string name="role_tak_desc">Otimizado para comunicação do sistema ATAK, reduz as transmissões de rotina.</string>
     <string name="role_tak_tracker_desc">Permite transmissões automáticas do TAK PLI e reduz as transmissões de rotina.</string>
+    <string name="role_tracker">Monitor</string>
     <string name="role_tracker_desc">Transmite dados de posições GPS como prioridade.</string>
     <string name="root_topic">Tópico principal</string>
     <string name="rotary_encoder_1_enabled">Ativar Codificador rotativo #1</string>
@@ -598,12 +610,8 @@
     <string name="waypoint_received">Ponto de passagem recebido %1$s</string>
     <string name="weight">Peso</string>
     <!-- WIFI -->
-    <string name="wifi_enabled">WiFi ligado</string>
     <string name="wifi_provision_success_ip_address">Endereço IP</string>
     <string name="wifi_provision_success_username">Utilizador</string>
-    <string name="wifi_qr_code_error">Código QR do Wi-Fi com formato inválido</string>
-    <string name="wifi_qr_code_scan">Ler o código QR do Wi-Fi</string>
-    <string name="wifi_rssi_threshold_defaults_to_80">Limite de RSSI do Wi-Fi (o padrão é -80)</string>
     <!-- WIND -->
     <string name="wind">Vento</string>
     <!-- WRITE -->

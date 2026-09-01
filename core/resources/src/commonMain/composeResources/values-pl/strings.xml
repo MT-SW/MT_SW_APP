@@ -1108,6 +1108,9 @@
     <string name="map_download_status_downloading">Pobieranie</string>
     <string name="map_download_status_paused">Wstrzymano</string>
     <string name="map_filter">Filtr mapy\n</string>
+    <string name="map_filter_all_roles">Wszystkie</string>
+    <string name="map_filter_display_title">Wyświetlacz</string>
+    <string name="map_filter_nodes_title">Węzeł</string>
     <string name="map_layer_formats">Warstwy mapy obsługują formaty .kml, .kmz lub GeoJSON.</string>
     <string name="map_node_popup_details">%1$s&lt;br&gt;Ostatnio słyszany: %2$s&lt;br&gt;Ostatnia pozycja: %3$s&lt;br&gt;Bateria: %4$s</string>
     <string name="map_offline_manager">Menedżer map offline</string>
@@ -1170,6 +1173,7 @@
     <string name="mesh_beacon_on_region">Nadawaj region</string>
     <string name="mesh_beacon_preset_indicator">Ogłoszone przez pobliską latarnię</string>
     <string name="mesh_beacon_preset_none">Brak</string>
+    <string name="mesh_beacon_region_label">Region</string>
     <string name="mesh_beacon_send_as_node">Nadawaj jako numer węzła (0 = ten węzeł)</string>
     <string name="mesh_beacon_target">Cel %1$d</string>
     <string name="mesh_beacon_target_add">Dodaj cel</string>
@@ -1658,16 +1662,26 @@
     <string name="ringtone_imported">Zaimportowano dzwonek</string>
     <!-- ROLE -->
     <string name="role">Rola urządzenia</string>
+    <string name="role_client">Klient</string>
+    <string name="role_client_base">Klient bazowy</string>
     <string name="role_client_base_desc">Traktuje pakiety od lub do ulubionych węzłów jako ROUTER_LATE, a wszystkie pozostałe jako CLIENT.</string>
     <string name="role_client_desc">Urządzenie samodzielne lub sparowane z aplikacją.</string>
+    <string name="role_client_hidden">Klient ukryty</string>
     <string name="role_client_hidden_desc">Urządzenie, które nadaje tylko w razie potrzeby, dla ukrycia lub oszczędności energii.</string>
+    <string name="role_client_mute">Klient pasywny</string>
     <string name="role_client_mute_desc">Urządzenie, które nie przekazuje dalej pakietów od innych urządzeń.</string>
+    <string name="role_lost_and_found">Zgubiony i znaleziony</string>
     <string name="role_lost_and_found_desc">Nadaje regularnie lokalizację jako wiadomości do głównego kanału, aby pomóc w odzyskaniu urządzenia.</string>
+    <string name="role_repeater">Repeater</string>
     <string name="role_repeater_desc">PORZUCONY: Węzeł infrastruktury do rozszerzenia zasięgu sieci poprzez przekazywanie pakietów z minimalnym narzutem. Niewidoczny na liście węzłów.</string>
+    <string name="role_router">Router</string>
+    <string name="role_router_client">Router Klienta</string>
     <string name="role_router_client_desc">PORZUCONY: Połączenie zarówno trybu ROUTER, jak i CLIENT. Nie dla urządzeń przenośnych.</string>
     <string name="role_router_desc">Węzeł infrastruktury do rozszerzenia zasięgu sieci poprzez przekazywanie pakietów. Widoczny na liście węzłów.</string>
     <string name="role_router_late_desc">Węzeł infrastruktury, który zawsze powtarza pakiety raz, ale tylko po wszystkich innych trybach, zapewniając dodatkowe pokrycie lokalnych klastrów. Widoczne na liście węzłów.</string>
+    <string name="role_sensor">Czujnik</string>
     <string name="role_sensor_desc">Nadaje priorytetowo pakiety telemetryczne.</string>
+    <string name="role_tak">TAK</string>
     <string name="role_tak_desc">Zoptymalizowany pod kątem komunikacji systemowej ATAK, redukuje nadmiarowe transmisje.</string>
     <string name="role_tak_tracker_desc">Umożliwia automatyczne transmisje TAK PLI i zmniejsza liczbę nadmiarowych transmisji.</string>
     <string name="role_tracker_desc">Nadaje priorytetowo pakiety pozycji GPS.</string>

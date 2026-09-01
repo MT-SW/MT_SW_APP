@@ -19,7 +19,7 @@
     <!-- A11Y -->
     <string name="a11y_label_value">%1$s: %2$s</string>
     <string name="a11y_message_from">Viesti käyttäjältä %1$s: %2$s</string>
-    <string name="a11y_node_battery">akku %1$d%%</string>
+    <string name="a11y_node_battery">akku %1$d %</string>
     <string name="a11y_node_distance_away">%1$s pois</string>
     <string name="a11y_node_favorite">suosikki</string>
     <string name="a11y_node_hops_away">%1$d hypyn päässä</string>
@@ -225,7 +225,7 @@
     <string name="chirpy_assistant_title">Chirpy Apulainen</string>
     <string name="chirpy_checking">Tarkistetaan Chirpyn saatavuutta…</string>
     <string name="chirpy_downloading">Chirpy lataa…</string>
-    <string name="chirpy_downloading_progress">Ladataan Chirpy mallia: %1$d%%</string>
+    <string name="chirpy_downloading_progress">Chirpy-mallia ladataan: %1$d %</string>
     <string name="chirpy_downloading_subtitle">Tämä tapahtuu vain kerran. Chirpy on valmis pian!</string>
     <string name="chirpy_error_busy">Kanava on tällä hetkellä erittäin ruuhkainen. 📶 Odotetaan vapaata lähetysvuoroa ja yritetään uudelleen.</string>
     <string name="chirpy_error_model_unavailable">Akkua ladataan tai laiteohjelmistoa päivitetään parhaillaan! 🔋 Odota hetki, niin saan synkronoinnin ja käynnistyksen valmiiksi.</string>
@@ -303,7 +303,7 @@
     <string name="config_lora_region_summary">Alue, jossa aiot käyttää radiolaitteitasi.</string>
     <string name="config_network_eth_enabled_summary">Ethernetin ottaminen käyttöön poistaa Bluetooth-yhteyden sovellukseen. TCP-laiteyhteydet eivät ole käytettävissä Applen laitteilla.</string>
     <string name="config_network_udp_enabled_summary">Ota käyttöön pakettien lähettäminen UDP:n kautta paikallisverkossa.</string>
-    <string name="config_network_wifi_enabled_summary">WiFi:n käyttöön ottaminen poistaa Bluetooth-yhteyden sovellukseen.</string>
+    <string name="config_network_wifi_enabled_summary">WiFi-yhteyden käyttöönotto katkaisee Bluetooth-yhteyden sovellukseen.</string>
     <string name="config_position_broadcast_secs_summary">Suurin aikaväli, jonka aikana laite ei lähetä sijaintia.</string>
     <string name="config_position_broadcast_smart_minimum_distance_summary">Vähimmäisetäisyys metreinä, jonka muutos otetaan huomioon älykkäässä sijainnin lähetyksessä.</string>
     <string name="config_position_broadcast_smart_minimum_interval_secs_summary">Nopein mahdollinen sijaintipäivitysten lähetysväli, kun minimietäisyys on täyttynyt.</string>
@@ -470,7 +470,6 @@
     <string name="discovery_map">Löydettyjen radioiden kartta</string>
     <string name="discovery_not_connected">Ei yhdistetty</string>
     <string name="discovery_not_connected_description">Yhdistä Meshtastic-radioon aloittaaksesi skannauksen.</string>
-    <string name="discovery_paused">Pysäytetty: %1$s</string>
     <string name="discovery_preparing">Valmistellaan skannausta</string>
     <string name="discovery_preset_home_label">%1$s (koti)</string>
     <string name="discovery_reconnecting">Yhdistetään uudelleen laitteeseen %1$s</string>
@@ -593,6 +592,7 @@
     <string name="downlink_enabled">MQTT-vastaanotto käytössä</string>
     <string name="downlink_feature_description">Julkisesta internet-yhdyskäytävästä tulevat viestit välitetään paikalliseen mesh-verkkoon. Nollahyppysääntöjen vuoksi oletuksena MQTT-palvelimelta tuleva liikenne ei etene tätä laitetta pidemmälle.</string>
     <string name="download">Lataa</string>
+    <string name="download_this_area">Lataa tämä alue</string>
     <string name="duplicated_public_key_title">Päällekkäinen julkinen avain havaittu</string>
     <string name="dynamic">Dynaaminen</string>
     <string name="easily_set_up_private_mesh_networks">Luo vaivattomasti yksityisiä meshtastic verkkoja turvalliseen ja luotettavaan viestintään kaukana asutuista paikoista.</string>
@@ -685,10 +685,6 @@
     <string name="firmware_maintenance_cdc_unblock_failed">Poistotiedosto kopioitiin, mutta laite ei aloittanut poistamista. Mitään ei ole vielä muutettu. Irrota laite, paina sen nollauspainiketta kahdesti ja yritä uudelleen.</string>
     <string name="firmware_maintenance_copy_failed">Tiedostoa ei voitu kopioida laitteen asemalle. Varmista, että asema on edelleen yhdistetty ja yritä uudelleen.</string>
     <string name="firmware_maintenance_data_unavailable">Laitteen tyhjennystiedostoja ei ole tällä hetkellä saatavilla. Tarkista yhteytesi ja yritä uudelleen tai käytä Web Flasheria osoitteessa flasher.meshtastic.org</string>
-    <string name="firmware_maintenance_erase_action">Tyhjennä ja asenna uudelleen</string>
-    <string name="firmware_maintenance_erase_confirm_button">Tyhjennä laite</string>
-    <string name="firmware_maintenance_erase_confirm_text">Tämä tyhjentää kaiken laitteesta %1$s, mukaan lukien kanavat, avaimet ja kaikki asetukset, ja asentaa sitten laiteohjelmiston uudelleen.\n\nToimintoa ei voi peruuttaa, eikä varmuuskopiota ole. Sinua pyydetään valitsemaan laitteen asema kahdesti: ensin poistotiedostoa ja sitten laiteohjelmistoa varten.</string>
-    <string name="firmware_maintenance_erase_confirm_title">Tyhjennetäänkö tämä laite?</string>
     <string name="firmware_maintenance_no_release">Valitse ensin laiteohjelmiston versio, jotta laite voidaan asentaa uudelleen tyhjentämisen jälkeen.</string>
     <string name="firmware_maintenance_not_a_bootloader_volume">Tämä asema ei ole laitteen päivitysasema. Valitse asema, joka näkyy, kun laite on päivitystilassa (se sisältää tiedoston nimeltä INFO_UF2.TXT).</string>
     <string name="firmware_maintenance_select_drive">Valitse laitteen päivitysasema</string>
@@ -929,24 +925,6 @@
     <string name="key_verification_final_title">Avaimen varmennus valmis</string>
     <string name="key_verification_request_title">Avaimen varmennuspyyntö</string>
     <string name="key_verification_title">Avaimen varmennus</string>
-    <!-- LABEL -->
-    <string name="label_lite_fast">Lite - Fast</string>
-    <string name="label_lite_slow">Lite - Slow</string>
-    <string name="label_long_fast">Long Range - Fast</string>
-    <string name="label_long_moderate">Long Range - Moderate</string>
-    <string name="label_long_slow">Long Range - Slow</string>
-    <string name="label_long_turbo">Long Range - Turbo</string>
-    <string name="label_medium_fast">Medium Range - Fast</string>
-    <string name="label_medium_slow">Medium Range - Slow</string>
-    <string name="label_medium_turbo">Medium Range - Turbo</string>
-    <string name="label_narrow_fast">Narrow - Fast</string>
-    <string name="label_narrow_slow">Narrow - Slow</string>
-    <string name="label_short_fast">Short Range - Fast</string>
-    <string name="label_short_slow">Short Range - Slow</string>
-    <string name="label_short_turbo">Short Range - Turbo</string>
-    <string name="label_tiny_fast">Tiny - Fast</string>
-    <string name="label_tiny_slow">Tiny - Slow</string>
-    <string name="label_very_long_slow">Very Long Range - Slow</string>
     <string name="last_heard_filter_label">Suodata viimeksi kuullun ajan mukaan: %1$s</string>
     <string name="last_position_update">Viimeisin sijainnin päivitys</string>
     <string name="latest_alpha_firmware">Viimeisin epävakaa (alpha)</string>
@@ -983,7 +961,6 @@
     <string name="local_network_permission">Paikallisverkon käyttöoikeus</string>
     <string name="local_network_permission_blocked_rationale">Paikallisverkon käyttöoikeus on poistettu käytöstä, eikä Android enää pyydä sitä. Wi-Fi-verkossasi olevaa radiota ei voida löytää eikä siihen voida muodostaa yhteyttä, ennen kuin otat käyttöoikeuden käyttöön sovelluksen asetuksissa. Julkisessa verkossa tai VPN:n kautta oleva radio toimii normaalisti.</string>
     <string name="local_network_permission_denied_hint">Meshtasticin paikallisverkon käyttöoikeus on poistettu käytöstä. Jos tämä radio on paikallisverkossasi, yhteys epäonnistuu, kunnes sallit paikallisverkon käytön järjestelmän asetuksissa.</string>
-    <string name="local_network_permission_rationale">Meshtastic tarvitsee paikallisverkon käyttöoikeuden löytääkseen Wi-Fi-verkossasi olevat radiot. Sovellus etsii vain verkosta, johon olet jo yhdistetty. Ilman käyttöoikeutta voit silti muodostaa yhteyden radioon kirjoittamalla sen osoitteen.</string>
     <string name="local_stats_bad">Huonot %1$d</string>
     <string name="local_stats_battery">Akku: %1$d%</string>
     <string name="local_stats_diagnostics_prefix">Vianmääritys: %1$s</string>
@@ -1066,16 +1043,30 @@
     <string name="map">Mesh-kartta</string>
     <string name="map_cache_info">Välimuistin tallennustilan määrä: %1$d Mt\nVälimuistin käyttö: %2$d Mt</string>
     <string name="map_cache_manager">Välimuistin Hallinta</string>
+    <string name="map_cache_megabytes">%1$s MB</string>
     <string name="map_cache_size">Nykyinen välimuistin koko</string>
     <string name="map_cache_tiles">%1$d Laattaa</string>
     <string name="map_clear_tiles">Tyhjennä kartan laatat</string>
     <string name="map_download_complete">Lataus on valmis!</string>
     <string name="map_download_errors">Lataus valmis %1$d virheellä</string>
     <string name="map_download_region">Lataa alue</string>
+    <string name="map_download_status_complete">Valmis</string>
+    <string name="map_download_status_downloading">Ladataan</string>
+    <string name="map_download_status_paused">Keskeytetty</string>
     <string name="map_filter">Karttasuodatin\n</string>
+    <string name="map_filter_all_roles">Kaikki</string>
+    <string name="map_filter_display_title">Näyttö</string>
+    <string name="map_filter_nodes_title">Laitteet</string>
+    <string name="map_filter_roles_title">Radioiden roolit</string>
+    <string name="map_filter_show_ignored">Näytä ohitetut radiot</string>
+    <string name="map_filter_title">Karttasuodatin</string>
     <string name="map_layer_formats">Karttatasot tukevat .kml-, .kmz- tai GeoJSON-tiedostomuotoja.</string>
+    <string name="map_layer_opacity">Peittävyys: %1$d%</string>
     <string name="map_node_popup_details">%1$s&lt;br&gt;Viimeksi kuultu: %2$s&lt;br&gt;Viimeisin sijainti: %3$s&lt;br&gt;Akku: %4$s</string>
     <string name="map_offline_manager">Offline hallinta</string>
+    <string name="map_overlay_hillshade">Vinovalovarjostus</string>
+    <string name="map_overlay_precipitation">Sademäärä</string>
+    <string name="map_overlay_weather_radar">Säätutka</string>
     <string name="map_purge_fail">SQL-välimuistin tyhjennys epäonnistui, katso logcat saadaksesi lisätietoja</string>
     <string name="map_purge_success">SQL-välimuisti tyhjennetty %1$s: lle</string>
     <string name="map_reporting">Karttaraportointi</string>
@@ -1088,6 +1079,7 @@
     <string name="map_style_selection">Karttatyylin valinta</string>
     <string name="map_subDescription">suunta: %1$d° etäisyys: %2$s</string>
     <string name="map_tile_download_estimate">Laattojen latauksessa kuluva aika-arvio:</string>
+    <string name="map_tile_limit_reached">Karttatiiliraja saavutettu (%1$d)</string>
     <string name="map_tile_source">Laatatietolähde</string>
     <string name="map_type_hybrid">Hybridi</string>
     <string name="map_type_normal">Normaali</string>
@@ -1101,38 +1093,39 @@
     <!-- MESH -->
     <string name="mesh_beacon">Verkkokutsu</string>
     <string name="mesh_beacon_broadcast">Lähetä verkkokutsu</string>
+    <string name="mesh_beacon_broadcast_requires_preset">Majakan lähetys ilmoittaa muille käytetyn modeemiesiasetuksen, johon voi liittyä. Tämä radio käyttää tavallisen esiasetuksen sijaan mukautettuja LoRa-asetuksia, joten majakka voisi kutsua käyttäjiä asetuksiin, joita he eivät voi vastaanottaa. Lähetyksen voi poistaa käytöstä täällä, mutta sitä ei voi ottaa käyttöön ennen kuin radio käyttää tavallista modeemiesiasetusta.</string>
     <string name="mesh_beacon_broadcast_summary">Lähetä tämän verkon kutsua säännöllisesti lähellä oleville radioille</string>
+    <string name="mesh_beacon_channel_number">Kanava %1$d</string>
     <string name="mesh_beacon_channels_title">Verkkokutsun kanavat</string>
-    <string name="mesh_beacon_interval">Lähetysväli (sekuntia)</string>
-    <string name="mesh_beacon_interval_error">Vähintään %1$d sekuntia</string>
+    <string name="mesh_beacon_interval">Lähetysväli</string>
+    <string name="mesh_beacon_interval_error">Valitse vähintään yhden tunnin väli</string>
     <string name="mesh_beacon_invitations_title">Mesh-verkon kutsut</string>
     <string name="mesh_beacon_listen">Kuuntele verkkokutsuja</string>
     <string name="mesh_beacon_listen_summary">Vastaanota lähellä olevien mesh-verkkojen lähettämiä verkkokutsuja</string>
     <string name="mesh_beacon_message">Verkkokutsuviesti</string>
     <string name="mesh_beacon_message_error">Enintään %1$d tavua</string>
+    <string name="mesh_beacon_no_channels">Kanavia ei ole käytettävissä</string>
     <string name="mesh_beacon_notification_body">Lähellä oleva mesh-verkko kutsuu sinut liittymään</string>
     <string name="mesh_beacon_notification_title">Mesh-verkon kutsu</string>
     <string name="mesh_beacon_offer_add">Lisää kanava</string>
     <string name="mesh_beacon_offer_channel">Kanava: %1$s</string>
-    <string name="mesh_beacon_offer_channel_key">Tarjottu kanava-avain (Base64)</string>
-    <string name="mesh_beacon_offer_channel_name">Tarjottu kanavan nimi</string>
+    <string name="mesh_beacon_offer_channel_name">Tarjottu kanava</string>
     <string name="mesh_beacon_offer_discover">Haku</string>
     <string name="mesh_beacon_offer_dismiss">Hylkää</string>
     <string name="mesh_beacon_offer_from_unknown">Tuntemattomasta radiosta</string>
     <string name="mesh_beacon_offer_join">Liity</string>
     <string name="mesh_beacon_offer_preset">Esiasetus: %1$s</string>
-    <string name="mesh_beacon_offer_preset_setting">Tarjottu esiasetus</string>
     <string name="mesh_beacon_offer_region">Alue: %1$s</string>
-    <string name="mesh_beacon_offer_region_setting">Tarjottu alue</string>
     <string name="mesh_beacon_offer_signal">Signaali: %1$s / %2$s</string>
     <string name="mesh_beacon_offer_title">Mesh-verkon kutsu</string>
     <string name="mesh_beacon_on_preset">Lähetä esiasetus</string>
-    <string name="mesh_beacon_on_region">Lähetä alue</string>
     <string name="mesh_beacon_preset_indicator">Lähellä olevan verkkokutsun ilmoittama</string>
     <string name="mesh_beacon_preset_none">ei mitään</string>
+    <string name="mesh_beacon_region_label">Alue</string>
+    <string name="mesh_beacon_region_required">Määritä radion alue ennen majakan määrittämistä.</string>
     <string name="mesh_beacon_target">Kohde %1$d</string>
     <string name="mesh_beacon_target_add">Lisää kohde</string>
-    <string name="mesh_beacon_target_channel_index">Kanavan hakemisto</string>
+    <string name="mesh_beacon_target_channel_index">Kanava</string>
     <string name="mesh_beacon_target_remove">Poista kohde</string>
     <string name="mesh_beacon_targets">Lähetyksen kohteet</string>
     <string name="mesh_map_location">Meshtastic kartan sijainti</string>
@@ -1306,11 +1299,6 @@
     <string name="node_layout_complete_description">Täydellinen-näkymä näyttää kaikki saatavilla olevat tiedot. Kentät, joista ei ole tietoja saatavilla, piilotetaan automaattisesti.</string>
     <string name="node_layout_device_role">Laite &amp; rooli</string>
     <string name="node_layout_distance_and_bearing">Etäisyys ja suuntima</string>
-    <string name="node_layout_help_signal_bad">Signaalin laatu on heikko. SNR-arvo on yli −18 dB ja RSSI-arvo yli −125 dBm.</string>
-    <string name="node_layout_help_signal_fair">Signaali on kohtalainen. SNR-arvo on yli −12 dB ja RSSI-arvo yli −120 dBm.</string>
-    <string name="node_layout_help_signal_good">Signaalin laatu on hyvä. SNR-arvo on yli −7 dB ja RSSI-arvo yli −115 dBm.</string>
-    <string name="node_layout_help_signal_indicator">Yhdistää SNR- ja RSSI-arvot signaalin laatuluokitukseksi, joka näytetään värillisenä kuvakkeena ja kuvauksena. Näytetään vain täydellinen-näkymässä. 📶</string>
-    <string name="node_layout_help_signal_none">Käyttökelpoista signaalia ei havaittu. Signaali alittaa kaikki laatukriteerit.</string>
     <string name="node_layout_hops_away">Hyppyjä</string>
     <string name="node_layout_last_heard_time">Viimeksi kuultu</string>
     <string name="node_layout_log_icons">Ympäristöarvot</string>
@@ -1337,7 +1325,6 @@
     <string name="node_sort_title">Lajittele otsikon mukaan</string>
     <string name="node_sort_via_favorite">Suosikkien kautta</string>
     <string name="node_sort_via_mqtt">MQTT:n kautta</string>
-    <string name="node_status_summary">Käytössä oleva tilaviesti</string>
     <string name="nodedb_reset">Tyhjennä NodeDB-tietokanta</string>
     <string name="nodeinfo_broadcast_interval">Laitteen tietojen lähetyksen aikaväli</string>
     <!-- NODES -->
@@ -1370,6 +1357,8 @@
     <string name="now">Nyt</string>
     <string name="ntp_server">NTP palvelin</string>
     <string name="number_of_records">Kirjausten määrä</string>
+    <string name="offline_maps">Offline-kartat</string>
+    <string name="offline_maps_empty">Alueita ei ole vielä ladattu</string>
     <string name="ok_to_mqtt">MQTT päällä</string>
     <string name="okay">OK</string>
     <string name="oled_type">OLED-tyyppi</string>
@@ -1599,18 +1588,31 @@
     <string name="ringtone_imported">Tuotu soittoääni</string>
     <!-- ROLE -->
     <string name="role">Laitteen rooli</string>
+    <string name="role_client">Client</string>
+    <string name="role_client_base">Client Base</string>
     <string name="role_client_base_desc">Suosikkiradioihin liittyvät paketit käsitellään ROUTER_LATE-tilassa, muut paketit CLIENT-tilassa.</string>
     <string name="role_client_desc">Yhdistetty sovellukseen tai itsenäinen viestintälaite.</string>
+    <string name="role_client_hidden">Client Hidden</string>
     <string name="role_client_hidden_desc">Laite, joka lähettää vain tarvittaessa tai virransäästotilassa.</string>
+    <string name="role_client_mute">Client Mute</string>
     <string name="role_client_mute_desc">Laite, joka ei välitä paketteja muilta laitteilta.</string>
-    <string name="role_lost_and_found_desc">Lähettää laitteen sijainnin viestillä oletuskanavalle sen löytämisen helpottamiseksi.</string>
+    <string name="role_lost_and_found">Lost and Found</string>
+    <string name="role_lost_and_found_desc">Lähettää sijainnin säännöllisesti oletuskanavalle helpottaakseen laitteen löytämistä.</string>
+    <string name="role_repeater">Repeater</string>
     <string name="role_repeater_desc">Laite, joka laajentaa verkon kattavuutta välittämällä viestejä verkkoa kuormittamatta. Ei näy laitelistauksessa.</string>
+    <string name="role_router">Router</string>
+    <string name="role_router_client">Router Client</string>
     <string name="role_router_client_desc">Yhdistelmä ROUTER sekä CLIENT roolista. Ei mobiililaitteille.</string>
     <string name="role_router_desc">Laite, joka laajentaa verkon infrastruktuuria viestejä välittämällä. Näkyy laitelistauksessa.</string>
+    <string name="role_router_late">Router Late</string>
     <string name="role_router_late_desc">Muuten samanlainen kuin ROUTER rooli, mutta se uudelleen lähettää paketteja vasta kaikkien muiden tilojen jälkeen, varmistaen paremman peittoalueen muille laitteille. Laite näkyy mesh-verkon laiteluettelossa muille käyttäjille.</string>
+    <string name="role_sensor">Sensor</string>
     <string name="role_sensor_desc">Lähettää telemetriatiedot ensisijaisesti.</string>
+    <string name="role_tak">TAK</string>
     <string name="role_tak_desc">Optimoitu ATAK-järjestelmän viestintään, joka vähentää tavanomaisia lähetyksiä.</string>
+    <string name="role_tak_tracker">TAK Tracker</string>
     <string name="role_tak_tracker_desc">Ottaa käyttöön automaattisen TAK PLI -lähetyksen vähentäen tavanomaisia lähetyksiä.</string>
+    <string name="role_tracker">Tracker</string>
     <string name="role_tracker_desc">Lähettää GPS-sijaintitiedot ensisijaisesti.</string>
     <string name="root_topic">Palvelimen osoite (root topic)</string>
     <string name="rotary_encoder_1_enabled">Kiertovalitsin #1 käytössä</string>
@@ -1742,6 +1744,7 @@
     <string name="site_planner">Site Planner</string>
     <string name="site_planner_antenna_gain_dbi">Antennin vahvistus (dBi)</string>
     <string name="site_planner_antenna_height_meters">Antennin korkeus (m)</string>
+    <string name="site_planner_browser_note">Arvio avautuu selaimessasi. Jos haluat tuoda sen tälle kartalle, napsauta siellä lähettimen merkkiä, valitse Vie → GeoJSON ja lisää ladattu tiedosto kohdassa Hallitse karttatasoja → Lisää taso. Käytä GeoJSON-vientiä – KML on maanpinnan peittokuva, jota tämä kartta ei voi näyttää.</string>
     <string name="site_planner_color_scale">Väripaletti</string>
     <string name="site_planner_estimate">Arvio peittoalueesta</string>
     <string name="site_planner_estimating">Arvioidaan peittoaluetta…</string>
@@ -1779,7 +1782,7 @@
     <string name="ssid">SSID</string>
     <string name="state_broadcast_seconds">Tilatiedon lähetys (sekuntia)</string>
     <string name="status_message">Tilaviesti</string>
-    <string name="status_message_config">Tilaviestin asetukset</string>
+    <string name="status_message_summary">Julkinen tilaviesti, joka lähetetään mesh-verkkoon aina muuttuessaan ja lisäksi 12 tunnin välein.</string>
     <string name="stay_connected_anywhere">Pysy yhteydessä kaikkialla</string>
     <string name="stop_connecting">Lopeta yhdistäminen</string>
     <string name="store_forward">Varastoi &amp; välitä</string>
@@ -1906,7 +1909,6 @@
     <string name="traffic_management_nodeinfo_direct_response_max_hops">Suoran vastauksen enimmäishyppyjen määrä</string>
     <string name="traffic_management_position_dedup">Sijaintiduplikaattien poisto (liikenteenhallinta)</string>
     <string name="traffic_management_position_min_interval">Sijainnin vähimmäislähetysväli (sekunteina)</string>
-    <string name="traffic_management_position_precision">Sijainnin tarkkuus (bitteinä)</string>
     <string name="traffic_management_rate_limit_enabled">Lähetysnopeuden rajoitus</string>
     <string name="traffic_management_rate_limit_max_packets">Pakettien enimmäismäärä aikajaksossa</string>
     <string name="traffic_management_rate_limit_window">Lähetysrajoituksen aikajakso (sekunteina)</string>
@@ -1972,6 +1974,7 @@
     <!-- URL -->
     <string name="url">URL-osoite</string>
     <string name="url_cannot_be_empty">URL-osoite ei voi olla tyhjä.</string>
+    <string name="url_must_be_http">URL-osoitteen on alettava joko http:// tai https://.</string>
     <string name="url_must_contain_placeholders">URL-osoitteessa on oltava paikkamerkkejä.</string>
     <string name="url_template">URL-mallipohja</string>
     <string name="usb">USB</string>
@@ -2010,10 +2013,10 @@
     <string name="what_is_meshtastic">Mikä on Meshtastic?</string>
     <string name="what_is_meshtastic_description">Avoimen lähdekoodin, internetistä riippumaton ja hajautettu mesh-verkko, joka toimii edullisilla ja vähän virtaa kuluttavilla radioilla.</string>
     <!-- WIFI -->
-    <string name="wifi_config">WiFi:n asetukset</string>
+    <string name="wifi_config">WiFi-asetukset</string>
     <string name="wifi_devices">WiFi-määritys mPWRD-OS:lle</string>
     <string name="wifi_enabled">WiFi käytössä</string>
-    <string name="wifi_ip">WiFi-verkon IP:</string>
+    <string name="wifi_ip">WiFI-verkon IP-osoite:</string>
     <string name="wifi_provision_available_networks">Saatavilla olevat verkot</string>
     <string name="wifi_provision_connect_failed">Yhteyden muodostaminen epäonnistui: %1$s</string>
     <string name="wifi_provision_description">Siirrä WiFi-tunnukset mPWRD-OS-laitteeseen Bluetoothin kautta.</string>
@@ -2026,11 +2029,11 @@
     <string name="wifi_provision_scan_networks">Etsi verkkoja</string>
     <string name="wifi_provision_scanning_ble">Etsitään laitetta…</string>
     <string name="wifi_provision_scanning_wifi">Etsitään…</string>
-    <string name="wifi_provision_sending_credentials">Otetaan WiFi-asetukset käyttöön…</string>
+    <string name="wifi_provision_sending_credentials">Otetaan WiFi-asetuksia käyttöön…</string>
     <string name="wifi_provision_signal_strength">%1$d%</string>
     <string name="wifi_provision_ssid_label">Verkon nimi (SSID)</string>
     <string name="wifi_provision_ssid_placeholder">Syötä tai valitse verkko</string>
-    <string name="wifi_provision_status_applied">WiFi määritetty onnistuneesti!</string>
+    <string name="wifi_provision_status_applied">WiFi määritettiin onnistuneesti!</string>
     <string name="wifi_provision_status_failed">WiFi-asetusten käyttöönotto epäonnistui</string>
     <string name="wifi_provision_success_description">mPWRD-OS-laitteesi on yhdistetty Wi-Fi-verkkoon.</string>
     <string name="wifi_provision_success_device_connected">Laite yhdistetty</string>
@@ -2046,9 +2049,9 @@
     <string name="wifi_provision_success_ssh_unavailable">SSH-komento on käytettävissä IP-osoitteen määrityksen jälkeen.</string>
     <string name="wifi_provision_success_username">Käyttäjänimi</string>
     <string name="wifi_provisioning">WiFi-määritys mPWRD-OS:lle</string>
-    <string name="wifi_qr_code_error">WiFi-verkon käyttöoikeustiedoissa on virheellinen QR-koodin muoto</string>
-    <string name="wifi_qr_code_scan">Skannaa WiFi QR-koodi</string>
-    <string name="wifi_rssi_threshold_defaults_to_80">WiFi-signaalin RSSI-kynnysarvo (oletus -80)</string>
+    <string name="wifi_qr_code_error">Virheellinen WiFi-tunnusten QR-koodin muoto</string>
+    <string name="wifi_qr_code_scan">Skannaa WiFi:n QR-koodi</string>
+    <string name="wifi_rssi_threshold_defaults_to_80">WiFi-signaalin RSSI-kynnys (oletus: -80)</string>
     <string name="wifi_unavailable">Et ole yhteydessä Wi-Fi-verkkoon. Verkkohaku ei välttämättä löydä lähellä olevia laitteita.</string>
     <!-- WIND -->
     <string name="wind">Tuuli</string>
@@ -2063,4 +2066,6 @@
     <string name="write_nfc_success">Kirjoitettu tunnisteeseen</string>
     <string name="write_nfc_text">Pidä kirjoitettavaa NFC-tunnistetta puhelimesi takapuolta vasten.</string>
     <string name="you">Sinä</string>
+    <string name="zoom_in">Suurenna</string>
+    <string name="zoom_out">Pienennä</string>
 </resources>
