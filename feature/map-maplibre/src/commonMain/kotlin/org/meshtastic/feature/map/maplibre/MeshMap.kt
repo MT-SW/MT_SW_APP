@@ -16,6 +16,7 @@
  */
 package org.meshtastic.feature.map.maplibre
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -210,10 +211,15 @@ private fun FrameOnce(enabled: Boolean, nodes: List<Node>, cameraState: CameraSt
         if (hasFramed || !hasViewport) return@LaunchedEffect
         nodesBoundingBox(nodes)?.let { box ->
             hasFramed = true
-            cameraState.jumpTo(boundingBox = box)
+            // Without padding, a node sitting right on the box's edge lands exactly on the screen edge —
+            // behind the top toolbar or the zoom controls, not just tightly framed.
+            cameraState.jumpTo(boundingBox = box, padding = PaddingValues(FRAME_PADDING_DP.dp))
         }
     }
 }
+
+/** Clearance around the fitted bounding box, so an edge node lands clear of the toolbar and zoom controls. */
+private const val FRAME_PADDING_DP = 56
 
 /** Keeps the camera on the user while tracking is on. No-op without a location source. */
 @Composable

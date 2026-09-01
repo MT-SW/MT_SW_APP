@@ -42,7 +42,15 @@ internal fun RasterTileSpec.toTileSetOptions(): TileSetOptions =
  */
 @Composable
 internal fun RasterBasemapLayer(basemap: Basemap.Raster) {
-    val source = rememberRasterSource(tiles = basemap.spec.tiles, options = basemap.spec.toTileSetOptions())
+    val source =
+        rememberRasterSource(
+            tiles = basemap.spec.tiles,
+            options = basemap.spec.toTileSetOptions(),
+            // TileSetOptions itself has no tileSize field — MapLibre defaults raster sources to 512px tiles
+            // unless told otherwise here, so a 256px source (OSM and most XYZ tile servers) rendered stretched
+            // and blurry without this.
+            tileSize = basemap.spec.tileSize,
+        )
     RasterLayer(id = "basemap-${basemap.id}", source = source)
 }
 
@@ -60,7 +68,12 @@ internal fun MapOverlayLayers(overlays: List<MapOverlay>, opacity: Map<String, F
             is MapOverlay.Hillshade -> HillshadeOverlayLayer(overlay, layerOpacity)
 
             is MapOverlay.Raster -> {
-                val source = rememberRasterSource(tiles = overlay.spec.tiles, options = overlay.spec.toTileSetOptions())
+                val source =
+                    rememberRasterSource(
+                        tiles = overlay.spec.tiles,
+                        options = overlay.spec.toTileSetOptions(),
+                        tileSize = overlay.spec.tileSize,
+                    )
                 RasterLayer(id = "overlay-${overlay.id}", source = source, opacity = const(layerOpacity))
             }
         }
@@ -80,13 +93,14 @@ private fun HillshadeOverlayLayer(overlay: MapOverlay.Hillshade, opacity: Float)
         rememberRasterDemSource(
             tiles = overlay.spec.tiles,
             options = overlay.spec.toTileSetOptions(),
+            tileSize = overlay.spec.tileSize,
             // Not the default. MapLibre assumes Mapbox Terrain-RGB; every keyless public DEM is
             // Terrarium, and the mismatch is silent — shading looks plausible but is wrong.
             encoding =
-            when (overlay.encoding) {
-                DemEncoding.TERRARIUM -> RasterDemEncoding.Terrarium
-                DemEncoding.MAPBOX -> RasterDemEncoding.Mapbox
-            },
+                when (overlay.encoding) {
+                    DemEncoding.TERRARIUM -> RasterDemEncoding.Terrarium
+                    DemEncoding.MAPBOX -> RasterDemEncoding.Mapbox
+                },
         )
     HillshadeLayer(
         id = "overlay-${overlay.id}",

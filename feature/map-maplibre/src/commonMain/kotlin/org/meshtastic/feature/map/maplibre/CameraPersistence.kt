@@ -39,8 +39,17 @@ import org.meshtastic.core.repository.MapPrefs
  * read, then whether there was one — the caller needs that to decide between the remembered view and framing the mesh,
  * and must not do either while the answer is unknown.
  */
+/**
+ * Disabled per Cezary's request: the map should always frame on the mesh on open instead of reopening wherever it was
+ * last left. Flip back to `true` to re-enable — the restore/save plumbing below is untouched, just skipped while this
+ * is `false`.
+ */
+private const val RESTORE_CAMERA_ENABLED = false
+
 @Composable
 internal fun rememberRestoredCamera(cameraState: CameraState): Boolean? {
+    if (!RESTORE_CAMERA_ENABLED) return false
+
     val mapPrefs: MapPrefs = koinInject()
     var restored by remember { mutableStateOf<Boolean?>(null) }
 

@@ -56,7 +56,7 @@ import org.meshtastic.feature.map.maplibre.unclusteredNodes
 private const val NO_EXPANSION_ZOOM = 0.0
 private const val CLUSTER_LEAF_LIMIT = 100L
 private const val CLUSTER_LEAF_OFFSET = 0L
-private const val CLUSTER_RADIUS = 50
+private const val CLUSTER_RADIUS = 18
 
 /**
  * Cluster all the way in, rather than stopping at some mid zoom.
@@ -69,10 +69,11 @@ private const val CLUSTER_RADIUS = 50
 private const val CLUSTER_MAX_ZOOM = 20
 
 /**
- * Matches the Google flavor's `MIN_CLUSTER_SIZE`: fewer than this many together are drawn as themselves rather than
- * collapsed into a bubble. Two nearby nodes turning into a cluster hides more than it explains.
+ * Fewer than this many together are drawn as themselves rather than collapsed into a bubble. Raised well past the
+ * Google flavor's own `MIN_CLUSTER_SIZE` (10) — small groups of a handful of nearby nodes reading as a numbered
+ * bubble hid more than it explained; only genuinely dense clusters should bubble now.
  */
-private const val CLUSTER_MIN_POINTS = 10
+private const val CLUSTER_MIN_POINTS = 20
 
 /**
  * The mesh node layers: ground-truth precision circles underneath, then clusters, then individual node chips.

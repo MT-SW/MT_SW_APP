@@ -31,6 +31,9 @@ Co to oznacza w praktyce:
 - **Domyślnie włączone nakładki terenu i pogody** — nakładka cieniowania rzeźby terenu (hillshade, przydatna do oceny zasięgu LoRa ograniczonego ukształtowaniem terenu) oraz radar pogodowy NOAA są teraz zaznaczone od razu po otwarciu mapy, zamiast wymagać ręcznego włączenia w warstwach.
 - **Mniejsze plakietki węzłów z ogonkiem wskazującym dokładną pozycję** — plakietka jest teraz kompaktowa, z małym zaokrąglonym ogonkiem pod spodem wskazującym dokładny punkt GPS węzła, zamiast być wyśrodkowana na nim.
 - **Węzły na tej samej pozycji GPS są od siebie subtelnie odsunięte** — kilka urządzeń zgłaszających identyczną (np. ustawioną na sztywno) lokalizację jest teraz rozstawionych o kilka metrów w rzeczywistości: niewidoczne przy oddaleniu, ale pozwalające zobaczyć i tapnąć każde z osobna po zbliżeniu, oraz rozbić taki klaster zoomem zamiast utykać na liście.
+- **Mapa zawsze otwiera się dopasowana do wszystkich węzłów** — zamiast wracać do ostatnio zapamiętanej pozycji i przybliżenia.
+- **Ostrzejsze kafelki map rastrowych (np. OSM)** — naprawiony błąd powodujący rozmycie przez błędny domyślny rozmiar kafelka.
+- **Dostrojone klastrowanie węzłów na mapie** — małe grupki węzłów nie zlewają się już w jeden bąbel z liczbą; grupowanie zaczyna się dopiero przy realnie gęstym skupisku.
 
 ## Ustawienia desktopowe
 
@@ -114,6 +117,9 @@ What this means in practice:
 - **Terrain and weather overlays enabled by default** — the hillshade overlay (useful for judging LoRa range limited by terrain) and the NOAA weather radar overlay are now checked as soon as the map opens, instead of requiring a manual toggle in the layers menu.
 - **Smaller node chips with a tail pointing at the exact GPS position** — the chip badge is now more compact, with a small rounded tail underneath pointing at the node's precise coordinate instead of being centered over it.
 - **Nodes reporting an identical GPS position are nudged slightly apart** — several devices reporting an identical (e.g. fixed) position are now spread a few metres apart in real space: invisible when zoomed out, but letting each one be seen and tapped individually once zoomed in, and letting such a cluster break apart by zooming instead of getting stuck.
+- **Map always opens framed on all nodes** — instead of reopening at the last remembered position and zoom.
+- **Sharper raster basemap tiles (e.g. OSM)** — fixed a bug causing blur from an incorrect default tile size.
+- **Tuned node clustering on the map** — small groups of nodes no longer collapse into a single numbered bubble; clustering now only kicks in for a genuinely dense cluster.
 
 ## Desktop settings
 
