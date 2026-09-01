@@ -233,7 +233,7 @@ internal fun NodeLayers(
 }
 
 /** Small enough that a chip drawn over it hides it completely. */
-private const val NODE_DOT_RADIUS = 12
+private const val NODE_DOT_RADIUS = 4
 
 private const val PRECISION_FILL_OPACITY = 0.15f
 private const val CLUSTER_OPACITY = 0.9f

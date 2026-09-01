@@ -24,6 +24,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
@@ -56,6 +59,7 @@ import org.maplibre.compose.expressions.dsl.nil
 import org.maplibre.compose.expressions.dsl.switch
 import org.maplibre.compose.expressions.value.BooleanValue
 import org.maplibre.compose.expressions.value.FloatValue
+import org.maplibre.compose.expressions.value.SymbolAnchor
 import org.maplibre.compose.layers.SymbolLayer
 import org.maplibre.compose.sources.Source
 import org.maplibre.compose.util.ClickResult
@@ -176,6 +180,9 @@ internal fun MapChipLayer(
             // Nothing at all for a node past the image ceiling, rather than someone else's chip.
             fallback = image(blank, DpSize(1.dp, 1.dp)),
         ),
+        // The bottom of the sprite is the tail's tip, so this — not the sprite's centre — is what lands on
+        // the node's exact coordinate.
+        iconAnchor = const(SymbolAnchor.Bottom),
         iconAllowOverlap = const(true),
         sortKey = chipSortKey(),
         onClick = onClick,
@@ -196,7 +203,7 @@ private class ChipImage(val painter: Painter, val size: DpSize)
 private fun rememberChipImages(chips: List<MapChipKey>): Map<String, ChipImage> {
     val measurer = rememberTextMeasurer()
     val density = LocalDensity.current
-    val textStyle = MaterialTheme.typography.labelLarge
+    val textStyle = MaterialTheme.typography.labelSmall
 
     // Vector painters have to be built in composition, so they are resolved here and handed to the rasterizer rather
     // than looked up inside it.
@@ -234,15 +241,20 @@ private fun MapChipKey.rasterize(
 
     return ChipImage(
         painter =
-        ChipPainter(
-            chip = this,
-            layout = layout,
-            cornerRadiusPx = cornerRadiusPx,
-            borderPx = borderPx,
-            glyphPainter = glyph?.let(glyphs::get),
-            glyphSizePx = with(density) { GLYPH_DP.dp.toPx() },
-        ),
-        size = DpSize(width, HEIGHT_DP.dp),
+            ChipPainter(
+                chip = this,
+                layout = layout,
+                cornerRadiusPx = cornerRadiusPx,
+                borderPx = borderPx,
+                glyphPainter = glyph?.let(glyphs::get),
+                glyphSizePx = with(density) { GLYPH_DP.dp.toPx() },
+                tailHeightPx = with(density) { TAIL_HEIGHT_DP.dp.toPx() },
+                tailWidthPx = with(density) { TAIL_WIDTH_DP.dp.toPx() },
+                gapPx = with(density) { GAP_DP.dp.toPx() },
+            ),
+        // Taller than the chip itself: the extra strip at the bottom is the tail plus a blank gap, drawn (or
+        // left blank) by ChipPainter.
+        size = DpSize(width, HEIGHT_DP.dp + TAIL_HEIGHT_DP.dp + GAP_DP.dp),
     )
 }
 
@@ -254,25 +266,59 @@ private class ChipPainter(
     private val borderPx: Float,
     private val glyphPainter: Painter?,
     private val glyphSizePx: Float,
+    private val tailHeightPx: Float,
+    private val tailWidthPx: Float,
+    private val gapPx: Float,
 ) : Painter() {
     // Never read: the caller always names an explicit size, which is what makes the chip's width follow its text.
     override val intrinsicSize: Size = Size.Unspecified
 
     override fun DrawScope.onDraw() {
-        drawRoundRect(color = Color(chip.background), cornerRadius = CornerRadius(cornerRadiusPx))
+        // The body is the chip proper, then the tail, then a blank gap at the very bottom — the anchor point
+        // stays there so the dot drawn separately at the node's exact coordinate shows through beneath the
+        // tail's tip instead of touching it.
+        val bodyHeightPx = size.height - tailHeightPx - gapPx
+
+        drawRoundRect(
+            color = Color(chip.background),
+            size = Size(size.width, bodyHeightPx),
+            cornerRadius = CornerRadius(cornerRadiusPx),
+        )
         if (borderPx > 0f) {
             // Inset by half the stroke: a centred stroke on the sprite's own edge would be clipped to half width.
             drawRoundRect(
                 color = Color.White,
                 topLeft = Offset(borderPx / 2f, borderPx / 2f),
-                size = Size(size.width - borderPx, size.height - borderPx),
+                size = Size(size.width - borderPx, bodyHeightPx - borderPx),
                 cornerRadius = CornerRadius(cornerRadiusPx),
                 style = Stroke(width = borderPx),
             )
         }
+        if (tailHeightPx > 0f) {
+            // The tail ends at bodyHeightPx + tailHeightPx, not at size.height — the remaining strip down to
+            // size.height is the blank gap that keeps the tip clear of the dot at the node's exact coordinate.
+            val centerX = size.width / 2f
+            val halfTail = tailWidthPx / 2f
+            val tailTipY = bodyHeightPx + tailHeightPx
+            val tailPath = Path().apply {
+                moveTo(centerX - halfTail, bodyHeightPx)
+                lineTo(centerX + halfTail, bodyHeightPx)
+                lineTo(centerX, tailTipY)
+                close()
+            }
+            // A sharp fill of the triangle, then the same outline stroked with round joins on top — the
+            // rounded stroke smooths every corner (the tip and both where it meets the chip body) into one
+            // continuous curve instead of a sharp point or a separate circle stuck on top of one.
+            drawPath(path = tailPath, color = Color(chip.background))
+            drawPath(
+                path = tailPath,
+                color = Color(chip.background),
+                style = Stroke(width = TAIL_ROUNDING_DP.dp.toPx() * 2f, cap = StrokeCap.Round, join = StrokeJoin.Round),
+            )
+        }
         if (glyphPainter != null) {
             val glyph = Size(glyphSizePx, glyphSizePx)
-            translate(left = (size.width - glyphSizePx) / 2f, top = (size.height - glyphSizePx) / 2f) {
+            translate(left = (size.width - glyphSizePx) / 2f, top = (bodyHeightPx - glyphSizePx) / 2f) {
                 with(glyphPainter) { draw(glyph, colorFilter = ColorFilter.tint(Color(chip.foreground))) }
             }
         } else if (layout != null) {
@@ -280,7 +326,7 @@ private class ChipPainter(
                 textLayoutResult = layout,
                 topLeft = Offset(
                     x = (size.width - layout.size.width) / 2f,
-                    y = (size.height - layout.size.height) / 2f,
+                    y = (bodyHeightPx - layout.size.height) / 2f,
                 ),
             )
         }
@@ -298,16 +344,26 @@ private fun rememberBlankPainter(): Painter = remember {
 }
 
 /** Material 3's `shapes.small`, which is the shape NodeChip asks its Card for. */
-private const val CORNER_RADIUS_DP = 8
-private const val MIN_WIDTH_DP = 64
-private const val HEIGHT_DP = 28
-private const val HORIZONTAL_PADDING_DP = 8
+private const val CORNER_RADIUS_DP = 6
+private const val MIN_WIDTH_DP = 44
+private const val HEIGHT_DP = 20
+private const val HORIZONTAL_PADDING_DP = 6
 
 /** Border width for an outlined chip, matching the discovery map's own 1dp. */
 private const val BORDER_DP = 1
 
 /** Icon size inside a glyph chip, matching the discovery marker's own 16dp. */
-private const val GLYPH_DP = 16
+private const val GLYPH_DP = 12
+
+/** The little triangular tail under the chip, pointing at the node's exact coordinate. */
+private const val TAIL_HEIGHT_DP = 6
+private const val TAIL_WIDTH_DP = 8
+
+/** Blank space between the tail's tip and the node's exact coordinate, so the tail does not touch the dot. */
+private const val GAP_DP = 8
+
+/** Fillet radius rounding every corner of the tail — the tip and both where it meets the chip body. */
+private const val TAIL_ROUNDING_DP = 2
 
 /**
  * A ceiling on how many chip images one layer will hold.
