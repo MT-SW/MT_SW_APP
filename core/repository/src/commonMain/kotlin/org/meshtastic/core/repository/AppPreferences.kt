@@ -81,6 +81,18 @@ interface CustomEmojiPrefs {
     fun setPreferredSkinToneIndex(index: Int)
 }
 
+/** Persisted policy used by background node-database inactivity cleanup. */
+data class AutoCleanNodesPolicy(val enabled: Boolean, val inactivityDays: Int, val checkIntervalDays: Int) {
+    companion object {
+        const val MIN_INACTIVITY_DAYS = 1
+        const val MAX_INACTIVITY_DAYS = 90
+        const val DEFAULT_INACTIVITY_DAYS = 30
+        const val MIN_CHECK_INTERVAL_DAYS = 1
+        const val MAX_CHECK_INTERVAL_DAYS = 30
+        const val DEFAULT_CHECK_INTERVAL_DAYS = 1
+    }
+}
+
 /** Reactive interface for general UI preferences. */
 @Suppress("TooManyFunctions")
 interface UiPrefs {
@@ -255,6 +267,32 @@ interface UiPrefs {
     val lastRegionWarningShownMillis: StateFlow<Long>
 
     fun setLastRegionWarningShownMillis(millis: Long)
+
+    /** Whether inactive nodes are automatically deleted from the local database after a period of inactivity. */
+    val autoCleanNodesEnabled: StateFlow<Boolean>
+
+    fun setAutoCleanNodesEnabled(enabled: Boolean)
+
+    /** Inactivity threshold, in days, after which a node becomes eligible for automatic deletion. */
+    val autoCleanNodesInactivityDays: StateFlow<Int>
+
+    fun setAutoCleanNodesInactivityDays(days: Int)
+
+    /** How often, in days, the background auto-clean check runs. Only relevant while auto-clean is enabled. */
+    val autoCleanNodesCheckIntervalDays: StateFlow<Int>
+
+    fun setAutoCleanNodesCheckIntervalDays(days: Int)
+
+    /** All auto-clean settings from one persisted snapshot; suspends until the store's initial load completes. */
+    suspend fun awaitAutoCleanNodesPolicy(): AutoCleanNodesPolicy
+
+    /**
+     * Epoch millis of the last successful auto-clean run. Used on platforms with no OS-level job scheduler (Desktop)
+     * to space runs roughly [AutoCleanNodesPolicy.checkIntervalDays] apart across app restarts.
+     */
+    val autoCleanNodesLastRunMillis: StateFlow<Long>
+
+    fun setAutoCleanNodesLastRunMillis(millis: Long)
 }
 
 /** Reactive interface for notification preferences. */

@@ -51,8 +51,10 @@ import org.meshtastic.app.di.AndroidKoinApp
 import org.meshtastic.core.common.ContextServices
 import org.meshtastic.core.database.DatabaseManager
 import org.meshtastic.core.repository.MeshPrefs
+import org.meshtastic.core.repository.MeshWorkerManager
 import org.meshtastic.core.repository.PlatformAnalytics
 import org.meshtastic.core.repository.ServiceRepository
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.discovery_interrupted_scan_restored
 import org.meshtastic.core.resources.getStringSuspend
@@ -106,6 +108,9 @@ open class MeshUtilApplication :
         // Schedule periodic MeshLog cleanup. Off-main: WorkManager uses on-demand init here
         // (the startup provider is removed), so getInstance() opens WorkManager's Room DB.
         applicationScope.launch { scheduleMeshLogCleanup() }
+
+        // Schedule periodic node-database auto-clean, using the persisted check interval.
+        applicationScope.launch { scheduleNodeCleanup() }
 
         // ApplicationExitInfo requires API 30+. A "MemoryLimiter:AnonSwap" reason means Android 17's per-app
         // memory ceiling zram-swapped then killed the previous process — see reportMemoryLimiterExitIfPresent.
@@ -237,6 +242,11 @@ open class MeshUtilApplication :
                 ExistingPeriodicWorkPolicy.UPDATE,
                 cleanupRequest,
             )
+    }
+
+    private suspend fun scheduleNodeCleanup() {
+        val intervalDays = get<UiPrefs>().awaitAutoCleanNodesPolicy().checkIntervalDays
+        get<MeshWorkerManager>().scheduleNodeCleanup(intervalDays)
     }
 
     override val workManagerConfiguration: Configuration

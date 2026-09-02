@@ -117,6 +117,11 @@
     <string name="app_version">Version</string>
     <string name="apply">Apply</string>
     <string name="apps">Apps</string>
+    <string name="auto_clean_nodes_check_interval_days">Check every %1$d days</string>
+    <string name="auto_clean_nodes_description">Automatically remove nodes after a period of inactivity.</string>
+    <string name="auto_clean_nodes_enabled">Enable automatic cleanup</string>
+    <string name="auto_clean_nodes_inactivity_days">Remove nodes inactive for more than %1$d days</string>
+    <string name="auto_clean_nodes_title">Automatic Cleanup</string>
     <string name="auto_load_chat_images">Automatically load images from links in chat</string>
     <!-- AQI -->
     <string name="aqi">AQI</string>

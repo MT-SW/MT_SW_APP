@@ -80,6 +80,7 @@ import org.meshtastic.desktop.stub.NoopMQTTRepository
 import org.meshtastic.desktop.stub.NoopMagneticFieldProvider
 import org.meshtastic.desktop.stub.NoopMeshLocationManager
 import org.meshtastic.desktop.stub.NoopMeshWorkerManager
+import org.meshtastic.desktop.worker.DesktopNodeCleanupScheduler
 import org.meshtastic.desktop.stub.NoopPhoneLocationProvider
 import org.meshtastic.desktop.stub.NoopPlatformAnalytics
 import org.meshtastic.feature.discovery.ai.AlgorithmicSummaryProvider
@@ -221,6 +222,7 @@ private fun desktopPlatformStubsModule() = module {
     single<PlatformAnalytics> { NoopPlatformAnalytics() }
     single<AppWidgetUpdater> { NoopAppWidgetUpdater() }
     single<MeshWorkerManager> { NoopMeshWorkerManager() }
+    single { DesktopNodeCleanupScheduler(uiPrefs = get(), cleanNodeDatabaseUseCase = get()) }
     single<MessageQueue> { DesktopMessageQueue(packetRepository = get(), radioController = get(), dispatchers = get()) }
     single<MeshLocationManager> { NoopMeshLocationManager() }
     single<LocationRepository> { NoopLocationRepository() }

@@ -24,6 +24,8 @@ import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.domain.usecase.settings.CleanNodeDatabaseUseCase
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.repository.MeshWorkerManager
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.are_you_sure
 import org.meshtastic.core.resources.clean_node_database_confirmation
@@ -41,7 +43,25 @@ private const val MIN_DAYS_THRESHOLD = 7f
 class CleanNodeDatabaseViewModel(
     private val cleanNodeDatabaseUseCase: CleanNodeDatabaseUseCase,
     private val alertManager: AlertManager,
+    private val uiPrefs: UiPrefs,
+    private val meshWorkerManager: MeshWorkerManager,
 ) : ViewModel() {
+    val autoCleanEnabled = uiPrefs.autoCleanNodesEnabled
+    val autoCleanInactivityDays = uiPrefs.autoCleanNodesInactivityDays
+    val autoCleanCheckIntervalDays = uiPrefs.autoCleanNodesCheckIntervalDays
+
+    fun onAutoCleanEnabledChanged(enabled: Boolean) {
+        uiPrefs.setAutoCleanNodesEnabled(enabled)
+    }
+
+    fun onAutoCleanInactivityDaysChanged(days: Int) {
+        uiPrefs.setAutoCleanNodesInactivityDays(days)
+    }
+
+    fun onAutoCleanCheckIntervalDaysChanged(days: Int) {
+        uiPrefs.setAutoCleanNodesCheckIntervalDays(days)
+        meshWorkerManager.scheduleNodeCleanup(days)
+    }
     private val _olderThanDays = MutableStateFlow(30f)
     val olderThanDays = _olderThanDays.asStateFlow()
 

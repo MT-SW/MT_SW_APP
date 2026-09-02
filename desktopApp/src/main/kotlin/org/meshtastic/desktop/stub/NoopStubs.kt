@@ -155,6 +155,8 @@ class NoopAppWidgetUpdater : AppWidgetUpdater {
 
 class NoopMeshWorkerManager : MeshWorkerManager {
     override fun enqueueSendMessage(persistedId: PersistedPacketId) {}
+
+    override fun scheduleNodeCleanup(intervalDays: Int) {}
 }
 
 class NoopMeshLocationManager : MeshLocationManager {

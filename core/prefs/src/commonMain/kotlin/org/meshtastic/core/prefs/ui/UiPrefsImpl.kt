@@ -28,6 +28,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -36,6 +37,7 @@ import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.prefs.cachedFlow
 import org.meshtastic.core.prefs.di.UiDataStore
+import org.meshtastic.core.repository.AutoCleanNodesPolicy
 import org.meshtastic.core.repository.UiPrefs
 
 @Single
@@ -350,6 +352,48 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_LAST_REGION_WARNING_SHOWN] = millis } }
     }
 
+    override val autoCleanNodesEnabled: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_AUTO_CLEAN_NODES_ENABLED] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setAutoCleanNodesEnabled(enabled: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_AUTO_CLEAN_NODES_ENABLED] = enabled } }
+    }
+
+    override val autoCleanNodesInactivityDays: StateFlow<Int> =
+        dataStore.data
+            .map { it[KEY_AUTO_CLEAN_NODES_INACTIVITY_DAYS] ?: AutoCleanNodesPolicy.DEFAULT_INACTIVITY_DAYS }
+            .stateIn(scope, SharingStarted.Eagerly, AutoCleanNodesPolicy.DEFAULT_INACTIVITY_DAYS)
+
+    override fun setAutoCleanNodesInactivityDays(days: Int) {
+        scope.launch { dataStore.edit { it[KEY_AUTO_CLEAN_NODES_INACTIVITY_DAYS] = days } }
+    }
+
+    override val autoCleanNodesCheckIntervalDays: StateFlow<Int> =
+        dataStore.data
+            .map { it[KEY_AUTO_CLEAN_NODES_CHECK_INTERVAL_DAYS] ?: AutoCleanNodesPolicy.DEFAULT_CHECK_INTERVAL_DAYS }
+            .stateIn(scope, SharingStarted.Eagerly, AutoCleanNodesPolicy.DEFAULT_CHECK_INTERVAL_DAYS)
+
+    override fun setAutoCleanNodesCheckIntervalDays(days: Int) {
+        scope.launch { dataStore.edit { it[KEY_AUTO_CLEAN_NODES_CHECK_INTERVAL_DAYS] = days } }
+    }
+
+    override suspend fun awaitAutoCleanNodesPolicy(): AutoCleanNodesPolicy = dataStore.data.first().let { preferences ->
+        AutoCleanNodesPolicy(
+            enabled = preferences[KEY_AUTO_CLEAN_NODES_ENABLED] ?: false,
+            inactivityDays = preferences[KEY_AUTO_CLEAN_NODES_INACTIVITY_DAYS]
+                ?: AutoCleanNodesPolicy.DEFAULT_INACTIVITY_DAYS,
+            checkIntervalDays = preferences[KEY_AUTO_CLEAN_NODES_CHECK_INTERVAL_DAYS]
+                ?: AutoCleanNodesPolicy.DEFAULT_CHECK_INTERVAL_DAYS,
+        )
+    }
+
+    override val autoCleanNodesLastRunMillis: StateFlow<Long> =
+        dataStore.data.map { it[KEY_AUTO_CLEAN_NODES_LAST_RUN] ?: 0L }.stateIn(scope, SharingStarted.Eagerly, 0L)
+
+    override fun setAutoCleanNodesLastRunMillis(millis: Long) {
+        scope.launch { dataStore.edit { it[KEY_AUTO_CLEAN_NODES_LAST_RUN] = millis } }
+    }
+
     companion object {
         val KEY_HAS_SHOWN_NOT_PAIRED_WARNING_PREF = booleanPreferencesKey("has_shown_not_paired_warning")
         val KEY_SHOW_QUICK_CHAT_PREF = booleanPreferencesKey("show-quick-chat")
@@ -376,6 +420,10 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_LAST_NARROW_BAND_WARNING_SHOWN = longPreferencesKey("last-narrow-band-warning-shown")
         val KEY_WAS_INSIDE_SWIETOKRZYSKIE_REGION = booleanPreferencesKey("was-inside-swietokrzyskie-region")
         val KEY_LAST_REGION_WARNING_SHOWN = longPreferencesKey("last-region-warning-shown")
+        val KEY_AUTO_CLEAN_NODES_ENABLED = booleanPreferencesKey("auto-clean-nodes-enabled")
+        val KEY_AUTO_CLEAN_NODES_INACTIVITY_DAYS = intPreferencesKey("auto-clean-nodes-inactivity-days")
+        val KEY_AUTO_CLEAN_NODES_CHECK_INTERVAL_DAYS = intPreferencesKey("auto-clean-nodes-check-interval-days")
+        val KEY_AUTO_CLEAN_NODES_LAST_RUN = longPreferencesKey("auto-clean-nodes-last-run")
         val KEY_SHOW_BLE_TRANSPORT = booleanPreferencesKey("show-ble-transport")
         val KEY_SHOW_NETWORK_TRANSPORT = booleanPreferencesKey("show-network-transport")
         val KEY_SHOW_USB_TRANSPORT = booleanPreferencesKey("show-usb-transport")

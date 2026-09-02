@@ -19,6 +19,7 @@ Stan roboczy — repo służy głównie do własnego użytku i testów z niewiel
 - **Spolszczone nazwy ról urządzeń** — appka wcześniej pokazywała surową, angielską nazwę techniczną roli (np. `ROUTER_LATE`) wszędzie: w ustawieniach, na liście węzłów, w szczegółach węzła i w telemetrii; teraz każda rola ma właściwą polską nazwę (np. "Router pomocniczy"), a opisy ról też odwołują się do nich po polsku zamiast po angielsku.
 - **Nowa sekcja "Role" w oknie pomocy listy węzłów** — pełny opis wszystkich ról urządzenia (ikona, nazwa, znaczenie) dostępny bezpośrednio z listy węzłów.
 - Poprawiony wygląd czasu działania (uptime) na liście węzłów — dodana ikonka odróżniająca go wizualnie od czasu ostatniego kontaktu.
+- **Automatyczne czyszczenie bazy węzłów** — na ekranie "Wyczyść bazę węzłów" można włączyć automatyczne usuwanie nieaktywnych węzłów: suwak progu nieaktywności (1–90 dni) i suwak częstotliwości sprawdzania (1–30 dni). Działa zarówno na Androidzie (WorkManager), jak i na desktopie (własna pętla sprawdzająca co godzinę, z zapamiętanym czasem ostatniego uruchomienia, żeby przetrwać restart appki); domyślnie wyłączone, węzły ulubione i ignorowane nigdy nie są usuwane automatycznie.
 
 ## Mapa
 
@@ -111,6 +112,7 @@ Work in progress — this repo is mainly for personal use and testing with a sma
 - **Localized device role names** — the app used to show the raw, English technical role name (e.g. `ROUTER_LATE`) everywhere: settings, node list, node detail, and telemetry; every role now has a proper localized name (e.g. "Router pomocniczy" in Polish), and the role descriptions reference them the same way instead of the raw English name.
 - **New "Roles" section in the node list help sheet** — a full reference of every device role (icon, name, meaning) available directly from the node list.
 - Cleaned up the uptime display in the node list — added an icon to visually separate it from the last-heard time.
+- **Automatic node-database cleanup** — the "Clean Node Database" screen now has a toggle for automatically removing inactive nodes, with sliders for the inactivity threshold (1–90 days) and how often the check runs (1–30 days). Works on both Android (WorkManager) and desktop (a lightweight hourly check loop with the last run persisted so timing survives app restarts); off by default, and favorited/ignored nodes are never auto-deleted.
 
 ## Map
 

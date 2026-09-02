@@ -22,6 +22,7 @@ import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.repository.AnalyticsPrefs
 import org.meshtastic.core.repository.AppFunctionsPrefs
 import org.meshtastic.core.repository.AppPreferences
+import org.meshtastic.core.repository.AutoCleanNodesPolicy
 import org.meshtastic.core.repository.CustomEmojiPrefs
 import org.meshtastic.core.repository.FilterPrefs
 import org.meshtastic.core.repository.HomoglyphPrefs
@@ -267,6 +268,36 @@ class FakeUiPrefs : UiPrefs {
 
     override fun setShouldShowTelemetry(value: Boolean) {
         shouldShowTelemetry.value = value
+    }
+
+    override val autoCleanNodesEnabled = MutableStateFlow(false)
+
+    override fun setAutoCleanNodesEnabled(enabled: Boolean) {
+        autoCleanNodesEnabled.value = enabled
+    }
+
+    override val autoCleanNodesInactivityDays = MutableStateFlow(AutoCleanNodesPolicy.DEFAULT_INACTIVITY_DAYS)
+
+    override fun setAutoCleanNodesInactivityDays(days: Int) {
+        autoCleanNodesInactivityDays.value = days
+    }
+
+    override val autoCleanNodesCheckIntervalDays = MutableStateFlow(AutoCleanNodesPolicy.DEFAULT_CHECK_INTERVAL_DAYS)
+
+    override fun setAutoCleanNodesCheckIntervalDays(days: Int) {
+        autoCleanNodesCheckIntervalDays.value = days
+    }
+
+    override suspend fun awaitAutoCleanNodesPolicy() = AutoCleanNodesPolicy(
+        autoCleanNodesEnabled.value,
+        autoCleanNodesInactivityDays.value,
+        autoCleanNodesCheckIntervalDays.value,
+    )
+
+    override val autoCleanNodesLastRunMillis = MutableStateFlow(0L)
+
+    override fun setAutoCleanNodesLastRunMillis(millis: Long) {
+        autoCleanNodesLastRunMillis.value = millis
     }
 }
 

@@ -20,4 +20,7 @@ package org.meshtastic.core.repository
 interface MeshWorkerManager {
     /** Enqueues a worker to send a specific packet. */
     fun enqueueSendMessage(persistedId: PersistedPacketId)
+
+    /** (Re)schedules the periodic node-database auto-clean check to run every [intervalDays] days. */
+    fun scheduleNodeCleanup(intervalDays: Int)
 }

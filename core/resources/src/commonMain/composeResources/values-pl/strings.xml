@@ -117,6 +117,11 @@
     <string name="app_version">Wersja</string>
     <string name="apply">Zastosuj</string>
     <string name="apps">Aplikacje</string>
+    <string name="auto_clean_nodes_check_interval_days">Sprawdzaj co %1$d dni</string>
+    <string name="auto_clean_nodes_description">Automatycznie usuwaj węzły po okresie ich nieaktywności.</string>
+    <string name="auto_clean_nodes_enabled">Włącz automatyczne czyszczenie</string>
+    <string name="auto_clean_nodes_inactivity_days">Usuwaj węzły nieaktywne dłużej niż %1$d dni</string>
+    <string name="auto_clean_nodes_title">Automatyczne czyszczenie</string>
     <string name="auto_load_chat_images">Automatycznie ładuj obrazki z linków w czacie</string>
     <!-- AQI -->
     <string name="aqi">AQI</string>

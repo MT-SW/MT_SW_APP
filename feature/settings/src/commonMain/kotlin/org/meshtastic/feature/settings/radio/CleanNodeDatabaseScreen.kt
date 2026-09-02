@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -41,6 +42,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.auto_clean_nodes_check_interval_days
+import org.meshtastic.core.resources.auto_clean_nodes_description
+import org.meshtastic.core.resources.auto_clean_nodes_enabled
+import org.meshtastic.core.resources.auto_clean_nodes_inactivity_days
+import org.meshtastic.core.resources.auto_clean_nodes_title
 import org.meshtastic.core.resources.clean_node_database_description
 import org.meshtastic.core.resources.clean_node_database_title
 import org.meshtastic.core.resources.clean_nodes_older_than
@@ -59,6 +65,9 @@ fun CleanNodeDatabaseScreen(viewModel: CleanNodeDatabaseViewModel, onBack: () ->
     val olderThanDays by viewModel.olderThanDays.collectAsStateWithLifecycle()
     val onlyUnknownNodes by viewModel.onlyUnknownNodes.collectAsStateWithLifecycle()
     val nodesToDelete by viewModel.nodesToDelete.collectAsStateWithLifecycle()
+    val autoCleanEnabled by viewModel.autoCleanEnabled.collectAsStateWithLifecycle()
+    val autoCleanInactivityDays by viewModel.autoCleanInactivityDays.collectAsStateWithLifecycle()
+    val autoCleanCheckIntervalDays by viewModel.autoCleanCheckIntervalDays.collectAsStateWithLifecycle()
 
     SideEffect(olderThanDays, onlyUnknownNodes) { viewModel.getNodesToDelete() }
 
@@ -76,6 +85,19 @@ fun CleanNodeDatabaseScreen(viewModel: CleanNodeDatabaseViewModel, onBack: () ->
         },
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues).padding(16.dp).verticalScroll(rememberScrollState())) {
+            AutoCleanNodesSection(
+                autoCleanEnabled = autoCleanEnabled,
+                autoCleanInactivityDays = autoCleanInactivityDays,
+                autoCleanCheckIntervalDays = autoCleanCheckIntervalDays,
+                onAutoCleanEnabledChanged = viewModel::onAutoCleanEnabledChanged,
+                onAutoCleanInactivityDaysChanged = viewModel::onAutoCleanInactivityDaysChanged,
+                onAutoCleanCheckIntervalDaysChanged = viewModel::onAutoCleanCheckIntervalDaysChanged,
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+            HorizontalDivider()
+            Spacer(modifier = Modifier.height(16.dp))
+
             Text(stringResource(Res.string.clean_node_database_description), style = MaterialTheme.typography.bodySmall)
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -112,6 +134,73 @@ fun CleanNodeDatabaseScreen(viewModel: CleanNodeDatabaseViewModel, onBack: () ->
 private const val MIN_UNKNOWN_DAYS_THRESHOLD = 0f
 private const val MIN_KNOWN_DAYS_THRESHOLD = 7f
 private const val MAX_DAYS_THRESHOLD = 365f
+
+private const val MIN_AUTO_CLEAN_INACTIVITY_DAYS = 1f
+private const val MAX_AUTO_CLEAN_INACTIVITY_DAYS = 90f
+private const val MIN_AUTO_CLEAN_CHECK_INTERVAL_DAYS = 1f
+private const val MAX_AUTO_CLEAN_CHECK_INTERVAL_DAYS = 30f
+
+/**
+ * Composable for the automatic cleanup section: a switch to enable/disable it, and — when enabled — sliders for the
+ * inactivity threshold (in days) after which a node is removed, and for how often the check itself runs.
+ *
+ * @param autoCleanEnabled Whether automatic cleanup is enabled.
+ * @param autoCleanInactivityDays The inactivity threshold, in days.
+ * @param autoCleanCheckIntervalDays How often, in days, the background check runs.
+ * @param onAutoCleanEnabledChanged Callback for when the enabled state changes.
+ * @param onAutoCleanInactivityDaysChanged Callback for when the inactivity threshold changes.
+ * @param onAutoCleanCheckIntervalDaysChanged Callback for when the check interval changes.
+ */
+@Composable
+private fun AutoCleanNodesSection(
+    autoCleanEnabled: Boolean,
+    autoCleanInactivityDays: Int,
+    autoCleanCheckIntervalDays: Int,
+    onAutoCleanEnabledChanged: (Boolean) -> Unit,
+    onAutoCleanInactivityDaysChanged: (Int) -> Unit,
+    onAutoCleanCheckIntervalDaysChanged: (Int) -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(stringResource(Res.string.auto_clean_nodes_title), style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(stringResource(Res.string.auto_clean_nodes_description), style = MaterialTheme.typography.bodySmall)
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(Res.string.auto_clean_nodes_enabled))
+            Spacer(Modifier.weight(1f))
+            Switch(checked = autoCleanEnabled, onCheckedChange = onAutoCleanEnabledChanged)
+        }
+
+        if (autoCleanEnabled) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                modifier = Modifier.padding(bottom = 8.dp),
+                text = stringResource(Res.string.auto_clean_nodes_inactivity_days, autoCleanInactivityDays),
+            )
+            Slider(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                value = autoCleanInactivityDays.toFloat(),
+                onValueChange = { onAutoCleanInactivityDaysChanged(it.toInt()) },
+                valueRange = MIN_AUTO_CLEAN_INACTIVITY_DAYS..MAX_AUTO_CLEAN_INACTIVITY_DAYS,
+                steps = (MAX_AUTO_CLEAN_INACTIVITY_DAYS - MIN_AUTO_CLEAN_INACTIVITY_DAYS - 1).toInt(),
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                modifier = Modifier.padding(bottom = 8.dp),
+                text = stringResource(Res.string.auto_clean_nodes_check_interval_days, autoCleanCheckIntervalDays),
+            )
+            Slider(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                value = autoCleanCheckIntervalDays.toFloat(),
+                onValueChange = { onAutoCleanCheckIntervalDaysChanged(it.toInt()) },
+                valueRange = MIN_AUTO_CLEAN_CHECK_INTERVAL_DAYS..MAX_AUTO_CLEAN_CHECK_INTERVAL_DAYS,
+                steps = (MAX_AUTO_CLEAN_CHECK_INTERVAL_DAYS - MIN_AUTO_CLEAN_CHECK_INTERVAL_DAYS - 1).toInt(),
+            )
+        }
+    }
+}
 
 /**
  * Composable for the "older than X days" filter. This filter is always active.

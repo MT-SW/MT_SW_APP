@@ -64,7 +64,9 @@ import coil3.request.crossfade
 import coil3.svg.SvgDecoder
 import coil3.util.DebugLogger
 import io.ktor.client.HttpClient
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.isActive
 import okio.Path.Companion.toPath
 import org.jetbrains.compose.resources.decodeToSvgPainter
 import org.jetbrains.compose.resources.getString
@@ -111,6 +113,7 @@ import org.meshtastic.desktop.map.DesktopTracerouteMap
 import org.meshtastic.desktop.map.desktopMapViewProvider
 import org.meshtastic.desktop.notification.DesktopOS
 import org.meshtastic.desktop.ui.DesktopMainScreen
+import org.meshtastic.desktop.worker.DesktopNodeCleanupScheduler
 import org.meshtastic.feature.map.MapScreen
 import org.meshtastic.feature.map.SharedMapViewModel
 import org.meshtastic.feature.map.maplibre.MapLibreDiscoveryMap
@@ -119,6 +122,7 @@ import org.meshtastic.feature.map.maplibre.MapLibreNodeTrackMap
 import java.awt.Desktop
 import java.util.Locale
 import kotlin.system.exitProcess
+import kotlin.time.Duration.Companion.hours
 import coil3.util.Logger as CoilLogger
 
 /** Meshtastic Desktop — the first non-Android target for the shared KMP module graph. */
@@ -164,6 +168,7 @@ fun main(args: Array<String>) {
 
         DeepLinkHandler(args, uiViewModel)
         MeshServiceLifecycle()
+        NodeCleanupLifecycle()
         ThemeAndLocaleProvider(uiViewModel)
     }
 
@@ -217,6 +222,23 @@ private fun MeshServiceLifecycle() {
     DisposableEffect(Unit) {
         meshServiceController.start()
         onDispose { meshServiceController.stop() }
+    }
+}
+
+private val NODE_CLEANUP_CHECK_INTERVAL = 1.hours
+
+/**
+ * Runs the periodic node-database auto-clean check for the lifetime of the composition. There is no WorkManager on
+ * the JVM, so this simply checks — and, if due, runs — the cleanup once an hour while the app is open.
+ */
+@Composable
+private fun NodeCleanupLifecycle() {
+    val scheduler = koinInject<DesktopNodeCleanupScheduler>()
+    LaunchedEffect(Unit) {
+        while (isActive) {
+            scheduler.runIfDue()
+            delay(NODE_CLEANUP_CHECK_INTERVAL)
+        }
     }
 }
 
