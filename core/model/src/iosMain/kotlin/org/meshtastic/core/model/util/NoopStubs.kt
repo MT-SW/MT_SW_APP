@@ -22,3 +22,8 @@ actual fun getShortDateTime(time: Long): String = ""
 // Deliberately not a no-op: this backs channel PSK and private-key generation, so an all-zeros stub must not be
 // allowed to ship silently. Fail loudly until it is wired to SecRandomCopyBytes.
 actual fun platformRandomBytes(size: Int): ByteArray = error("platformRandomBytes is not implemented on iOS")
+
+// Same reasoning as platformRandomBytes above: silently returning garbage would let the vanity-color grinder run
+// and hand back a key/color pair the device would never actually derive. Fail loudly until a Kotlin/Native X25519
+// (BouncyCastle has no iOS target) is wired up here.
+actual fun x25519PublicKey(privateKey: ByteArray): ByteArray = error("x25519PublicKey is not implemented on iOS")

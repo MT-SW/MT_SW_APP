@@ -112,6 +112,13 @@ data class Capabilities(val firmwareVersion: String?, internal val forceEnableAl
      */
     fun supportsPreset(preset: ChannelOption): Boolean = preset.minFirmware?.let { atLeast(it) } ?: true
 
+    /**
+     * Support for deriving nodeNum from the X25519 public key (nodeNum = crc32(public_key)). This is what makes a
+     * "vanity" node color meaningful — on older firmware, nodeNum still comes from the MAC/random guess, so a
+     * grinder-picked color would never match the node's real on-mesh color. Gated to firmware v2.8.0.
+     */
+    val supportsVanityKeyColor = atLeast(V2_8_0)
+
     companion object {
         private val V2_6_8 = DeviceVersion("2.6.8")
         private val V2_6_9 = DeviceVersion("2.6.9")

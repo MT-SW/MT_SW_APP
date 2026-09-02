@@ -58,6 +58,10 @@ kotlin {
                 exclude(group = "org.meshtastic", module = "protobufs-android")
             }
         }
+        // BouncyCastle only here (not commonMain): core:model also builds for iOS as a compile-only
+        // validation target, and bcprov-jdk18on is a JVM-only artifact with no Kotlin/Native variant.
+        getByName("jvmAndroidMain") { dependencies { implementation(libs.bouncycastle.bcprov) } }
+
         androidMain.dependencies {
             api(libs.androidx.annotation)
             api(libs.androidx.core.ktx)

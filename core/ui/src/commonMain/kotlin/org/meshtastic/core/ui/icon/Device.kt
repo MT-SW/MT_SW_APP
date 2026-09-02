@@ -18,6 +18,7 @@ package org.meshtastic.core.ui.icon
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ic_android
@@ -39,6 +40,19 @@ import org.meshtastic.core.resources.ic_search
 import org.meshtastic.core.resources.ic_sensors
 import org.meshtastic.core.resources.ic_visibility_off
 import org.meshtastic.core.resources.ic_work
+import org.meshtastic.core.resources.role_client
+import org.meshtastic.core.resources.role_client_base
+import org.meshtastic.core.resources.role_client_hidden
+import org.meshtastic.core.resources.role_client_mute
+import org.meshtastic.core.resources.role_lost_and_found
+import org.meshtastic.core.resources.role_repeater
+import org.meshtastic.core.resources.role_router
+import org.meshtastic.core.resources.role_router_client
+import org.meshtastic.core.resources.role_router_late
+import org.meshtastic.core.resources.role_sensor
+import org.meshtastic.core.resources.role_tak
+import org.meshtastic.core.resources.role_tak_tracker
+import org.meshtastic.core.resources.role_tracker
 import org.meshtastic.proto.Config
 
 val MeshtasticIcons.Role: ImageVector
@@ -62,6 +76,24 @@ fun MeshtasticIcons.role(role: Config.DeviceConfig.Role?): ImageVector = when (r
     Config.DeviceConfig.Role.ROUTER_LATE -> vectorResource(Res.drawable.ic_router)
     else -> vectorResource(Res.drawable.ic_work)
 }
+
+/** Zasób tekstowy z nazwą danej roli — użyj przez `stringResource(role.label)` w miejscu wywołania. */
+val Config.DeviceConfig.Role.label: StringResource
+    get() = when (this) {
+        Config.DeviceConfig.Role.CLIENT -> Res.string.role_client
+        Config.DeviceConfig.Role.CLIENT_BASE -> Res.string.role_client_base
+        Config.DeviceConfig.Role.CLIENT_MUTE -> Res.string.role_client_mute
+        Config.DeviceConfig.Role.ROUTER -> Res.string.role_router
+        Config.DeviceConfig.Role.ROUTER_CLIENT -> Res.string.role_router_client
+        Config.DeviceConfig.Role.REPEATER -> Res.string.role_repeater
+        Config.DeviceConfig.Role.TRACKER -> Res.string.role_tracker
+        Config.DeviceConfig.Role.SENSOR -> Res.string.role_sensor
+        Config.DeviceConfig.Role.TAK -> Res.string.role_tak
+        Config.DeviceConfig.Role.CLIENT_HIDDEN -> Res.string.role_client_hidden
+        Config.DeviceConfig.Role.LOST_AND_FOUND -> Res.string.role_lost_and_found
+        Config.DeviceConfig.Role.TAK_TRACKER -> Res.string.role_tak_tracker
+        Config.DeviceConfig.Role.ROUTER_LATE -> Res.string.role_router_late
+    }
 
 val MeshtasticIcons.Device: ImageVector
     @Composable get() = vectorResource(Res.drawable.ic_router)

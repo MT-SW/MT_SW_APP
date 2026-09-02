@@ -89,6 +89,7 @@ fun SecurityConfigScreenCommon(viewModel: RadioConfigViewModel, onBack: () -> Un
     val formState = rememberConfigState(initialValue = securityConfig)
 
     var showKeyGenerationDialog by rememberSaveable { mutableStateOf(false) }
+    var showColorPicker by rememberSaveable { mutableStateOf(false) }
     PrivateKeyRegenerateDialog(
         showKeyGenerationDialog = showKeyGenerationDialog,
         onConfirm = {
@@ -99,6 +100,17 @@ fun SecurityConfigScreenCommon(viewModel: RadioConfigViewModel, onBack: () -> Un
         },
         onDismiss = { showKeyGenerationDialog = false },
     )
+
+    if (showColorPicker) {
+        VanityColorPickerDialog(
+            supported = capabilities.supportsVanityKeyColor,
+            onKeyFound = { key ->
+                formState.value = formState.value.copy(private_key = key)
+                showColorPicker = false
+            },
+            onDismiss = { showColorPicker = false },
+        )
+    }
 
     val focusManager = LocalFocusManager.current
     RadioConfigScreenList(
@@ -143,6 +155,12 @@ fun SecurityConfigScreenCommon(viewModel: RadioConfigViewModel, onBack: () -> Un
                     enabled = state.connected,
                     icon = MeshtasticIcons.Warning,
                     onClick = { showKeyGenerationDialog = true },
+                )
+                NodeActionButton(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    title = "Wybierz kolor",
+                    enabled = state.connected,
+                    onClick = { showColorPicker = true },
                 )
                 // Backup/restore operates on this phone's own key file, so it is meaningless for a remote node
                 // whose private key we never receive.

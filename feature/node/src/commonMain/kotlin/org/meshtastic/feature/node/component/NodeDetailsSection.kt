@@ -84,7 +84,6 @@ import org.meshtastic.core.resources.uptime
 import org.meshtastic.core.resources.user_id
 import org.meshtastic.core.ui.component.SignedNodeDialog
 import org.meshtastic.core.ui.component.determineSignalQuality
-import org.meshtastic.core.ui.component.label
 import org.meshtastic.core.ui.component.transportInfo
 import org.meshtastic.core.ui.icon.ArrowCircleUp
 import org.meshtastic.core.ui.icon.DeviceNumbers
@@ -100,6 +99,7 @@ import org.meshtastic.core.ui.icon.ShieldCheck
 import org.meshtastic.core.ui.icon.Snr
 import org.meshtastic.core.ui.icon.Verified
 import org.meshtastic.core.ui.icon.role
+import org.meshtastic.core.ui.icon.label
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.core.ui.util.createClipEntry

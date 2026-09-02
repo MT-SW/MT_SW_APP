@@ -48,8 +48,24 @@ import org.meshtastic.core.resources.node_layout_help_signal_indicator
 import org.meshtastic.core.resources.node_layout_help_signal_none
 import org.meshtastic.core.resources.node_layout_signal_quality_indicator
 import org.meshtastic.core.resources.node_list_help_node_details
+import org.meshtastic.core.resources.node_list_help_roles_title
 import org.meshtastic.core.resources.node_list_help_title
+import org.meshtastic.core.resources.role_client_base_desc
+import org.meshtastic.core.resources.role_client_desc
+import org.meshtastic.core.resources.role_client_hidden_desc
+import org.meshtastic.core.resources.role_client_mute_desc
+import org.meshtastic.core.resources.role_lost_and_found_desc
+import org.meshtastic.core.resources.role_router_desc
+import org.meshtastic.core.resources.role_router_late_desc
+import org.meshtastic.core.resources.role_sensor_desc
+import org.meshtastic.core.resources.role_tak_desc
+import org.meshtastic.core.resources.role_tak_tracker_desc
+import org.meshtastic.core.resources.role_tracker_desc
 import org.meshtastic.core.ui.component.Quality
+import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.label
+import org.meshtastic.core.ui.icon.role
+import org.meshtastic.proto.Config
 
 private const val ICON_SIZE = 24
 
@@ -100,6 +116,16 @@ fun NodeListHelp(onDismiss: () -> Unit) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+
+            HorizontalDivider()
+
+            Text(
+                text = stringResource(Res.string.node_list_help_roles_title),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.semantics { heading() },
+            )
+
+            roleHelpEntries.forEach { (role, descRes) -> RoleEntry(role, stringResource(descRes)) }
         }
     }
 }
@@ -119,6 +145,43 @@ private fun SignalQualityEntry(quality: Quality, description: String) {
         )
         Column(modifier = Modifier.weight(1f)) {
             Text(text = stringResource(quality.nameRes), style = MaterialTheme.typography.titleSmall)
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+private val roleHelpEntries =
+    listOf(
+        Config.DeviceConfig.Role.CLIENT to Res.string.role_client_desc,
+        Config.DeviceConfig.Role.CLIENT_BASE to Res.string.role_client_base_desc,
+        Config.DeviceConfig.Role.CLIENT_MUTE to Res.string.role_client_mute_desc,
+        Config.DeviceConfig.Role.ROUTER to Res.string.role_router_desc,
+        Config.DeviceConfig.Role.TRACKER to Res.string.role_tracker_desc,
+        Config.DeviceConfig.Role.SENSOR to Res.string.role_sensor_desc,
+        Config.DeviceConfig.Role.TAK to Res.string.role_tak_desc,
+        Config.DeviceConfig.Role.CLIENT_HIDDEN to Res.string.role_client_hidden_desc,
+        Config.DeviceConfig.Role.LOST_AND_FOUND to Res.string.role_lost_and_found_desc,
+        Config.DeviceConfig.Role.TAK_TRACKER to Res.string.role_tak_tracker_desc,
+        Config.DeviceConfig.Role.ROUTER_LATE to Res.string.role_router_late_desc,
+    )
+
+@Composable
+private fun RoleEntry(role: Config.DeviceConfig.Role, description: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            imageVector = MeshtasticIcons.role(role),
+            contentDescription = stringResource(role.label),
+            modifier = Modifier.size(ICON_SIZE.dp),
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = stringResource(role.label), style = MaterialTheme.typography.titleSmall)
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,

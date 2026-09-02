@@ -84,6 +84,7 @@ ktor = "3.5.2"
 
 # Other
 aboutlibraries = "15.2.0"
+bouncycastle = "1.85.2"
 jserialcomm = "2.11.4"
 coil = "3.6.1"
 jcefmaven = "146.0.10"
@@ -237,6 +238,7 @@ mlkit-translate = { module = "com.google.mlkit:translate", version.ref = "mlkit-
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version = "20.0.0" }
 zxing-core = { module = "com.google.zxing:core", version = "3.5.4" }
 qrcode-kotlin = { module = "io.github.g0dkar:qrcode-kotlin", version.ref = "qrcode-kotlin" }
+bouncycastle-bcprov = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
 
 # Jetbrains
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }

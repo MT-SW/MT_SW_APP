@@ -1371,6 +1371,7 @@
     <string name="node_layout_signal_quality_indicator">Wskaźnik jakości sygnału</string>
     <string name="node_list_click_label">Otwórz szczegóły węzła</string>
     <string name="node_list_help_node_details">Szczegóły węzła</string>
+    <string name="node_list_help_roles_title">Role węzłów</string>
     <string name="node_list_help_title">Pomoc listy węzłów</string>
     <string name="node_list_long_click_label">Opcje węzła</string>
     <string name="node_number">Numer węzła</string>
@@ -1597,11 +1598,11 @@
     <!-- REBROADCAST -->
     <string name="rebroadcast_mode">Tryb retransmisji</string>
     <string name="rebroadcast_mode_all_desc">Przekazuje ponownie każdy odebrany pakiet, niezależnie od tego, czy został wysłany na nasz prywatny kanał, czy z innej sieci Mesh o tych samych parametrach radia.</string>
-    <string name="rebroadcast_mode_all_skip_decoding_desc">To samo zachowanie co ALL, ale pomija dekodowanie pakietów i po prostu je retransmituje. Dostępne tylko w roli REPEATER. Ustawienie tego w innych rolach spowoduje zachowanie jak ALL.</string>
+    <string name="rebroadcast_mode_all_skip_decoding_desc">To samo zachowanie co ALL, ale pomija dekodowanie pakietów i po prostu je retransmituje. Dostępne tylko w roli Repeater. Ustawienie tego w innych rolach spowoduje zachowanie jak ALL.</string>
     <string name="rebroadcast_mode_core_portnums_only_desc">Ignoruje niestandardowe pakiety (non-standard portnums) takie jak: TAK, RangeTest, PaxCounter, itp. Przekazuje dalej jedynie standardowe pakiety (standard portnums): NodeInfo, Text, Position, Telemetry oraz Routing.</string>
     <string name="rebroadcast_mode_known_only_desc">Ignoruje odebrane pakiety z obcych sieci, podobnie jak LOCAL_ONLY, ale idzie o krok dalej, ignorując również pakiety z węzłów, które nie znajdują się jeszcze na liście znanych węzłów.</string>
     <string name="rebroadcast_mode_local_only_desc">Ignoruje odebrane pakiety z obcych sieci Mesh, które są otwarte lub których nie można odszyfrować. Retransmituje wiadomość tylko na lokalnych kanałach primary / secondary.</string>
-    <string name="rebroadcast_mode_none_desc">Dozwolone wyłącznie dla ról SENSOR, TRACKER i TAK_TRACKER. Spowoduje to zablokowanie wszystkich retransmisji, podobnie jak rola CLIENT_MUTE.</string>
+    <string name="rebroadcast_mode_none_desc">Dozwolone wyłącznie dla ról Czujnik, Tracker i TAK Tracker. Spowoduje to zablokowanie wszystkich retransmisji, podobnie jak rola Klient pasywny.</string>
     <string name="recent_network_devices">Ostatnie urządzenia sieciowe</string>
     <string name="reconnecting">Ponowne łączenie…</string>
     <string name="red">Czerwony</string>
@@ -1664,7 +1665,7 @@
     <string name="role">Rola urządzenia</string>
     <string name="role_client">Klient</string>
     <string name="role_client_base">Klient bazowy</string>
-    <string name="role_client_base_desc">Traktuje pakiety od lub do ulubionych węzłów jako ROUTER_LATE, a wszystkie pozostałe jako CLIENT.</string>
+    <string name="role_client_base_desc">Traktuje pakiety od lub do ulubionych węzłów jako Router pomocniczy, a wszystkie pozostałe jako Klient.</string>
     <string name="role_client_desc">Urządzenie samodzielne lub sparowane z aplikacją.</string>
     <string name="role_client_hidden">Klient ukryty</string>
     <string name="role_client_hidden_desc">Urządzenie, które nadaje tylko w razie potrzeby, dla ukrycia lub oszczędności energii.</string>
@@ -1676,14 +1677,17 @@
     <string name="role_repeater_desc">PORZUCONY: Węzeł infrastruktury do rozszerzenia zasięgu sieci poprzez przekazywanie pakietów z minimalnym narzutem. Niewidoczny na liście węzłów.</string>
     <string name="role_router">Router</string>
     <string name="role_router_client">Router Klienta</string>
-    <string name="role_router_client_desc">PORZUCONY: Połączenie zarówno trybu ROUTER, jak i CLIENT. Nie dla urządzeń przenośnych.</string>
+    <string name="role_router_client_desc">PORZUCONY: Połączenie zarówno trybu Router, jak i Klient. Nie dla urządzeń przenośnych.</string>
     <string name="role_router_desc">Węzeł infrastruktury do rozszerzenia zasięgu sieci poprzez przekazywanie pakietów. Widoczny na liście węzłów.</string>
+    <string name="role_router_late">Router pomocniczy</string>
     <string name="role_router_late_desc">Węzeł infrastruktury, który zawsze powtarza pakiety raz, ale tylko po wszystkich innych trybach, zapewniając dodatkowe pokrycie lokalnych klastrów. Widoczne na liście węzłów.</string>
     <string name="role_sensor">Czujnik</string>
     <string name="role_sensor_desc">Nadaje priorytetowo pakiety telemetryczne.</string>
     <string name="role_tak">TAK</string>
     <string name="role_tak_desc">Zoptymalizowany pod kątem komunikacji systemowej ATAK, redukuje nadmiarowe transmisje.</string>
+    <string name="role_tak_tracker">TAK Tracker</string>
     <string name="role_tak_tracker_desc">Umożliwia automatyczne transmisje TAK PLI i zmniejsza liczbę nadmiarowych transmisji.</string>
+    <string name="role_tracker">Tracker</string>
     <string name="role_tracker_desc">Nadaje priorytetowo pakiety pozycji GPS.</string>
     <string name="root_topic">Główny temat</string>
     <string name="rotary_encoder_1_enabled">Enkoder obrotowy #1 włączony</string>
