@@ -181,6 +181,8 @@ sealed interface SettingsRoute : Route {
 
     @Serializable data object DebugPanel : SettingsRoute
 
+    @Serializable data object SnifferLog : SettingsRoute
+
     @Serializable data object About : SettingsRoute
 
     @Serializable data object Acknowledgements : SettingsRoute

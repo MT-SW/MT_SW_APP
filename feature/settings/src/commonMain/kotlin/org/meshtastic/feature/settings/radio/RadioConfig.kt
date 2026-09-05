@@ -57,8 +57,11 @@ import org.meshtastic.core.resources.nodedb_reset
 import org.meshtastic.core.resources.reboot
 import org.meshtastic.core.resources.set_time
 import org.meshtastic.core.resources.shutdown
+import org.meshtastic.core.resources.sniffer_enabled_summary
+import org.meshtastic.core.resources.sniffer_enabled_title
 import org.meshtastic.core.resources.tak_server
 import org.meshtastic.core.ui.component.ListItem
+import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.icon.AdminPanelSettings
 import org.meshtastic.core.ui.icon.AppSettingsAlt
 import org.meshtastic.core.ui.icon.BugReport
@@ -72,6 +75,8 @@ import org.meshtastic.core.ui.icon.SystemUpdate
 import org.meshtastic.core.ui.icon.Upload
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.navigation.ConfigRoute
+import org.meshtastic.core.resources.sniffer_log_title
+import org.meshtastic.core.ui.icon.Rssi
 
 @Composable
 fun RadioConfigItemList(
@@ -82,6 +87,7 @@ fun RadioConfigItemList(
     onImport: () -> Unit = {},
     onExport: () -> Unit = {},
     onNavigate: (Route) -> Unit,
+    onSetSnifferEnabled: (Boolean) -> Unit = {},
 ) {
     val enabled = state.connected && !state.responseState.isWaiting() && !isManaged
 
@@ -98,7 +104,14 @@ fun RadioConfigItemList(
 
         if (state.isLocal) {
             BackupRestoreSection(isManaged, enabled, onImport, onExport)
-            AdvancedSection(isManaged, isOtaCapable, enabled, onNavigate)
+            AdvancedSection(
+                isManaged = isManaged,
+                isOtaCapable = isOtaCapable,
+                enabled = enabled,
+                onNavigate = onNavigate,
+                snifferEnabled = state.moduleConfig.nodemodadmin?.sniffer_enabled == true,
+                onSetSnifferEnabled = onSetSnifferEnabled,
+            )
         }
     }
 }
@@ -178,7 +191,14 @@ private fun ColumnScope.AdministrationContent(enabled: Boolean, onNavigate: (Rou
 }
 
 @Composable
-private fun AdvancedSection(isManaged: Boolean, isOtaCapable: Boolean, enabled: Boolean, onNavigate: (Route) -> Unit) {
+private fun AdvancedSection(
+    isManaged: Boolean,
+    isOtaCapable: Boolean,
+    enabled: Boolean,
+    onNavigate: (Route) -> Unit,
+    snifferEnabled: Boolean,
+    onSetSnifferEnabled: (Boolean) -> Unit,
+) {
     ExpressiveSection(title = stringResource(Res.string.advanced_title)) {
         if (isManaged) {
             ManagedMessage()
@@ -220,6 +240,20 @@ private fun AdvancedSection(isManaged: Boolean, isOtaCapable: Boolean, enabled: 
             text = stringResource(Res.string.debug_panel),
             leadingIcon = MeshtasticIcons.BugReport,
             onClick = { onNavigate(SettingsRoute.DebugPanel) },
+        )
+
+        SwitchPreference(
+            title = stringResource(Res.string.sniffer_enabled_title),
+            enabled = enabled,
+            checked = snifferEnabled,
+            onCheckedChange = onSetSnifferEnabled,
+            summary = stringResource(Res.string.sniffer_enabled_summary),
+        )
+
+        ListItem(
+            text = stringResource(Res.string.sniffer_log_title),
+            leadingIcon = MeshtasticIcons.Rssi,
+            onClick = { onNavigate(SettingsRoute.SnifferLog) },
         )
     }
 }

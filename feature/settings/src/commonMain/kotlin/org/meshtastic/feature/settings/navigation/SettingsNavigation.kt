@@ -51,6 +51,8 @@ import org.meshtastic.feature.settings.appfunctions.AppFunctionsSettingsScreen
 import org.meshtastic.feature.settings.appfunctions.AppFunctionsSettingsViewModel
 import org.meshtastic.feature.settings.debugging.DebugScreen
 import org.meshtastic.feature.settings.debugging.DebugViewModel
+import org.meshtastic.feature.settings.sniffer.SnifferLogScreen
+import org.meshtastic.feature.settings.sniffer.SnifferLogViewModel
 import org.meshtastic.feature.settings.filter.FilterSettingsScreen
 import org.meshtastic.feature.settings.filter.FilterSettingsViewModel
 import org.meshtastic.feature.settings.radio.CleanNodeDatabaseScreen
@@ -404,6 +406,11 @@ fun EntryProviderScope<NavKey>.settingsGraph(
     entry<SettingsRoute.DebugPanel> {
         val viewModel: DebugViewModel = koinViewModel()
         DebugScreen(viewModel = viewModel, onNavigateUp = dropUnlessResumed { backStack.removeLastOrNull() })
+    }
+
+    entry<SettingsRoute.SnifferLog> {
+        val viewModel: SnifferLogViewModel = koinViewModel()
+        SnifferLogScreen(viewModel = viewModel, onNavigateUp = dropUnlessResumed { backStack.removeLastOrNull() })
     }
 
     entry<SettingsRoute.About> {

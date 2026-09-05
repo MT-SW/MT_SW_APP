@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.KoinViewModel
@@ -37,6 +38,7 @@ import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.ioDispatcher
 import org.meshtastic.core.common.util.nowInstant
 import org.meshtastic.core.database.entity.Packet
+import org.meshtastic.core.domain.usecase.settings.RadioConfigUseCase
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.getTracerouteResponse
@@ -45,6 +47,7 @@ import org.meshtastic.core.model.util.toReadableString
 import org.meshtastic.core.repository.MeshLogPrefs
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.debug_clear
 import org.meshtastic.core.resources.debug_clear_logs_confirm
@@ -53,6 +56,7 @@ import org.meshtastic.core.ui.viewmodel.safeLaunch
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
 import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.MeshPacket
+import org.meshtastic.proto.ModuleConfig
 import org.meshtastic.proto.NeighborInfo
 import org.meshtastic.proto.Paxcount
 import org.meshtastic.proto.PortNum
@@ -221,6 +225,8 @@ class DebugViewModel(
     private val meshLogPrefs: MeshLogPrefs,
     private val alertManager: AlertManager,
     private val dispatchers: org.meshtastic.core.di.CoroutineDispatchers,
+    private val radioConfigRepository: RadioConfigRepository,
+    private val radioConfigUseCase: RadioConfigUseCase,
 ) : ViewModel() {
 
     @OptIn(FlowPreview::class)
@@ -242,6 +248,12 @@ class DebugViewModel(
 
     private val _loggingEnabled = MutableStateFlow(meshLogPrefs.loggingEnabled.value)
     val loggingEnabled: StateFlow<Boolean> = _loggingEnabled.asStateFlow()
+
+    /** Sniffer mode (MT-SW): mirrors the device's cached `nodemodadmin.sniffer_enabled` module config. */
+    val snifferEnabled: StateFlow<Boolean> =
+        radioConfigRepository.moduleConfigFlow
+            .map { it.nodemodadmin?.sniffer_enabled == true }
+            .stateInWhileSubscribed(initialValue = false)
 
     // --- Managers ---
     val searchManager = LogSearchManager()
@@ -286,6 +298,17 @@ class DebugViewModel(
             safeLaunch(tag = "enableLogging") {
                 meshLogRepository.deleteLogsOlderThan(meshLogPrefs.retentionDays.value)
             }
+        }
+    }
+
+    /** Sends the sniffer toggle to the locally connected node as a `nodemodadmin` module config write. */
+    fun setSnifferEnabled(enabled: Boolean) {
+        val destNum = nodeRepository.myNodeInfo.value?.myNodeNum ?: return
+        safeLaunch(tag = "setSnifferEnabled") {
+            radioConfigUseCase.setModuleConfig(
+                destNum,
+                ModuleConfig(nodemodadmin = ModuleConfig.NodeModAdminConfig(sniffer_enabled = enabled)),
+            )
         }
     }
 

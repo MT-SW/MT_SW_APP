@@ -61,6 +61,15 @@ Osobny ekran dostępny z ekranu szczegółów węzła (Administracja → "Diagno
 - Odpowiedzi przychodzą na dedykowanym porcie protokołu (354) i są dekodowane na żywo z istniejącego logu zdarzeń mesh — ten sam wzorzec danych co ekran "Zdrowie sieci", nic nie jest dodatkowo zapisywane.
 - **Wymaga customowego firmware z modułem OnDemand** — protokół zdefiniowany we własnym forku protobufs ([MT_SW_PROTOBUFS](https://github.com/MT-SW/MT_SW_PROTOBUFS)); na starszym lub oficjalnym firmware przyciski wysyłają zapytanie, ale węzeł na nie nie odpowiada.
 
+## Sniffer
+
+Tryb pokazujący ruch w eterze, który normalnie by zniknął — pakiety usłyszane przez węzeł podczas floodingu mesh, ale nieadresowane do niego, są teraz przekazywane surowo do telefonu zamiast po prostu odrzucane.
+
+- **Przełącznik w Ustawienia → Advanced** ("Tryb sniffera"), tuż pod Panelem Debugowania.
+- **Ekran "Sniffer Log"** — link pod przełącznikiem, pokazuje na żywo nadawcę/odbiorcę, kanał, liczbę przeskoków, RSSI/SNR oraz dane pakietu (zdekodowane, jeśli appka zna klucz kanału; w przeciwnym razie surowy hex zaszyfrowanej treści).
+- **Działa wyłącznie lokalnie** — pokazuje tylko to, co fizycznie usłyszy radiem węzeł aktualnie podłączony do telefonu; włączenie na zdalnym węźle nic nie da z perspektywy tego telefonu, bo podsłuchane pakiety trafiają do urządzenia podłączonego do TAMTEGO węzła.
+- **Wymaga customowego firmware z modułem sniffera** (własny fork protobufs, [MT_SW_PROTOBUFS](https://github.com/MT-SW/MT_SW_PROTOBUFS)) — na starszym lub oficjalnym firmware przełącznik nic nie zmienia.
+
 ## Komunikator
 
 - **Zdjęcia w czacie przez link** — appka nie wysyła surowych bajtów zdjęcia przez LoRa (za mała przepustowość), tylko uploaduje je anonimowo na zewnętrzny serwer i wysyła sam link jako wiadomość tekstową; odbiorca widzi automatyczny podgląd. Przed wysyłką pojawia się dialog ostrzegający, że serwer hostingu jest publiczny.
@@ -161,6 +170,15 @@ A dedicated screen reachable from the node detail screen (Administration → "On
 - **10 query types**: node stats (battery, uptime, CPU/heap/flash/PSRAM, flood and nexthop counters, hop-limit blocks), ping (RSSI/SNR), nodes online, routing error history, port usage counters, air activity, recent packet exchange log, average RX time history, RX packet count history, and the MT_SW firmware version.
 - Responses arrive on a dedicated protocol port (354) and are decoded live from the existing mesh event log — the same data pattern as the "Network Health" screen, nothing is persisted separately.
 - **Requires custom firmware with the OnDemand module** — the protocol is defined in a dedicated protobufs fork ([MT_SW_PROTOBUFS](https://github.com/MT-SW/MT_SW_PROTOBUFS)); on older or stock firmware the buttons send the request, but the node never responds.
+
+## Sniffer
+
+A mode that surfaces air traffic that would normally just vanish — packets the node overhears during normal mesh flooding but that aren't addressed to it are now forwarded raw to the phone instead of being dropped.
+
+- **Toggle in Settings → Advanced** ("Sniffer mode"), right below the Debug Panel entry.
+- **"Sniffer Log" screen** — a link below the toggle, showing sender/receiver, channel, hop count, RSSI/SNR, and the packet payload live (decoded when the app has the channel key, otherwise shown as raw encrypted hex).
+- **Local only** — surfaces only what the node currently connected to the phone physically hears over the radio; enabling it on a remote node does nothing useful from this phone's perspective, since the sniffed traffic goes to whichever device is connected to THAT node.
+- **Requires custom firmware with the sniffer module** (dedicated protobufs fork, [MT_SW_PROTOBUFS](https://github.com/MT-SW/MT_SW_PROTOBUFS)) — on older or stock firmware the toggle has no effect.
 
 ## Messaging
 
