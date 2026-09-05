@@ -183,8 +183,10 @@ class OnDemandLogViewModel(
         if (newest != null && newest.second > lastAttributed) {
             setLastAttributed(newest.second)
             if (sentAt != null) {
-                setLastResult((newest.second - sentAt).coerceAtLeast(0))
+                val computed = (newest.second - sentAt).coerceAtLeast(0)
+                setLastResult(computed)
                 clearSentAt()
+                return computed
             }
         }
         return lastResult
