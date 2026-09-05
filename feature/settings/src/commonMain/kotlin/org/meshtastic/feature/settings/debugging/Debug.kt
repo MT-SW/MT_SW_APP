@@ -74,8 +74,6 @@ import org.meshtastic.core.resources.debug_decoded_payload
 import org.meshtastic.core.resources.debug_logs_export
 import org.meshtastic.core.resources.debug_logs_export_warning
 import org.meshtastic.core.resources.debug_panel
-import org.meshtastic.core.resources.debug_sniffer_summary
-import org.meshtastic.core.resources.debug_sniffer_title
 import org.meshtastic.core.resources.debug_store_logs_summary
 import org.meshtastic.core.resources.debug_store_logs_title
 import org.meshtastic.core.resources.debug_tab_app_logs
@@ -231,7 +229,6 @@ fun DebugScreen(onNavigateUp: () -> Unit, viewModel: DebugViewModel) {
 private fun DebugLogSettings(viewModel: DebugViewModel) {
     val retentionDays = viewModel.retentionDays.collectAsStateWithLifecycle().value
     val loggingEnabled = viewModel.loggingEnabled.collectAsStateWithLifecycle().value
-    val snifferEnabled = viewModel.snifferEnabled.collectAsStateWithLifecycle().value
 
     Column(
         modifier =
@@ -262,14 +259,6 @@ private fun DebugLogSettings(viewModel: DebugViewModel) {
             checked = loggingEnabled,
             onCheckedChange = { viewModel.setLoggingEnabled(it) },
             summary = stringResource(Res.string.debug_store_logs_summary),
-        )
-
-        SwitchPreference(
-            title = stringResource(Res.string.debug_sniffer_title),
-            enabled = true,
-            checked = snifferEnabled,
-            onCheckedChange = { viewModel.setSnifferEnabled(it) },
-            summary = stringResource(Res.string.debug_sniffer_summary),
         )
     }
 }
