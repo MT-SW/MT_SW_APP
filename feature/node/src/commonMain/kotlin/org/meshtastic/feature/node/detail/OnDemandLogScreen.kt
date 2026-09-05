@@ -555,7 +555,10 @@ private fun nodeStatsRows(stats: NodeStats): List<Pair<StringResource, String>> 
 
 private fun pingRows(ping: Ping, roundTripMs: Long?): List<Pair<StringResource, String>> = buildList {
     roundTripMs?.let { add(Res.string.on_demand_round_trip to "${it}ms") }
-    add(Res.string.on_demand_hops to "${ping.hops}")
-    ping.rx_rssi?.let { add(Res.string.on_demand_rssi to "$it") }
-    ping.snr?.let { add(Res.string.on_demand_snr to "$it") }
+    if (ping.rx_rssi != null || ping.snr != null) {
+        ping.rx_rssi?.let { add(Res.string.on_demand_rssi to "$it") }
+        ping.snr?.let { add(Res.string.on_demand_snr to "$it") }
+    } else {
+        add(Res.string.on_demand_hops to "${ping.hops}")
+    }
 }
