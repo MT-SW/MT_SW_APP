@@ -17,6 +17,7 @@
 package org.meshtastic.core.repository
 
 import org.meshtastic.core.model.Position
+import org.meshtastic.proto.OnDemandType
 
 /**
  * Mesh query operations — position, traceroute, telemetry, user info, and metadata.
@@ -36,6 +37,9 @@ interface QueryController {
 
     /** Requests detailed user info from a remote node. */
     suspend fun requestUserInfo(destNum: Int)
+
+    /** Sends an OnDemand diagnostics query (e.g. node stats) to a remote node. */
+    suspend fun requestOnDemand(destNum: Int, requestType: OnDemandType)
 
     /** Initiates a traceroute request to a remote node. */
     suspend fun requestTraceroute(requestId: Int, destNum: Int)

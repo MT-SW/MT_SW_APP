@@ -60,6 +60,7 @@ import org.meshtastic.core.model.DeviceVersion
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.SessionStatus
+import org.meshtastic.core.navigation.NodeDetailRoute
 import org.meshtastic.core.repository.EventFirmwareRepository
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.add
@@ -82,6 +83,7 @@ import org.meshtastic.core.resources.latest_alpha_firmware
 import org.meshtastic.core.resources.latest_stable_firmware
 import org.meshtastic.core.resources.long_name
 import org.meshtastic.core.resources.node_id
+import org.meshtastic.core.resources.on_demand_log_title
 import org.meshtastic.core.resources.refresh_metadata
 import org.meshtastic.core.resources.remote_admin
 import org.meshtastic.core.resources.remove
@@ -150,6 +152,14 @@ fun AdministrationSection(
                         onClick = { onAction(NodeDetailAction.RefreshMetadata(node.num)) },
                     )
                 }
+
+                SectionDivider()
+
+                ListItem(
+                    text = stringResource(Res.string.on_demand_log_title),
+                    leadingIcon = MeshtasticIcons.Memory,
+                    onClick = { onAction(NodeDetailAction.Navigate(NodeDetailRoute.OnDemandLog(node.num))) },
+                )
             }
         }
 

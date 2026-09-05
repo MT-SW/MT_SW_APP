@@ -48,6 +48,7 @@ dependencyResolutionManagement {
     repositories {
         // Only enable mavenLocal for local JitPack testing; never in CI.
         if (providers.gradleProperty("useMavenLocal").isPresent) mavenLocal()
+        maven { url = uri("https://jitpack.io") }
         google {
             content {
                 includeGroupByRegex("com\\.android.*")

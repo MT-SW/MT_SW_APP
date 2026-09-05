@@ -106,7 +106,7 @@ mqttastic = "0.8.1"
 jmdns = "3.6.3"
 qrcode-kotlin = "4.5.0"
 takpacket-sdk = "0.9.1"
-meshtastic-protobufs = "2.8.0"
+meshtastic-protobufs = "v2_2.8.0"
 
 # Gradle Plugins
 ccud = "2.8.0"
@@ -356,7 +356,7 @@ jna = { module = "net.java.dev.jna:jna", version = "5.19.1" }
 takpacket-sdk-kmp = { module = "org.meshtastic:takpacket-sdk", version.ref = "takpacket-sdk" }
 
 # Meshtastic Protobufs SDK (Wire-generated KMP models from meshtastic/protobufs)
-meshtastic-protobufs = { module = "org.meshtastic:protobufs", version.ref = "meshtastic-protobufs" }
+meshtastic-protobufs = { module = "com.github.MT-SW.MT_SW_PROTOBUFS:protobufs-android", version.ref = "meshtastic-protobufs" }
 
 
 [bundles]

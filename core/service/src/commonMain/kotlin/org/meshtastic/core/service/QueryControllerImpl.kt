@@ -22,6 +22,7 @@ import org.meshtastic.core.repository.NodeManager
 import org.meshtastic.core.repository.QueryController
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.proto.AdminMessage
+import org.meshtastic.proto.OnDemandType
 
 /**
  * [QueryController] implementation: position, traceroute, telemetry, user info, and metadata "pull" queries.
@@ -59,6 +60,12 @@ internal class QueryControllerImpl(
     override suspend fun requestUserInfo(destNum: Int) {
         if (destNum != nodeManager.myNodeNum.value) {
             commandSender.requestUserInfo(destNum)
+        }
+    }
+
+    override suspend fun requestOnDemand(destNum: Int, requestType: OnDemandType) {
+        if (destNum != nodeManager.myNodeNum.value) {
+            commandSender.requestOnDemand(destNum, requestType)
         }
     }
 

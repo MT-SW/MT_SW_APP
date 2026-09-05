@@ -19,6 +19,7 @@ package org.meshtastic.feature.node.detail
 import kotlinx.coroutines.flow.StateFlow
 import org.meshtastic.core.model.Position
 import org.meshtastic.core.model.TelemetryType
+import org.meshtastic.proto.OnDemandType
 
 /** Interface for high-level node request actions (e.g., requesting user info, position, telemetry). */
 interface NodeRequestActions {
@@ -34,4 +35,6 @@ interface NodeRequestActions {
     suspend fun requestTelemetry(destNum: Int, longName: String, type: TelemetryType)
 
     suspend fun requestTraceroute(destNum: Int, longName: String)
+
+    suspend fun requestOnDemand(destNum: Int, longName: String, requestType: OnDemandType)
 }

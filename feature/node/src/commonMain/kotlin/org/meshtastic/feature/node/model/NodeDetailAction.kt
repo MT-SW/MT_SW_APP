@@ -20,6 +20,7 @@ import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.feature.node.component.NodeMenuAction
+import org.meshtastic.proto.OnDemandType
 
 sealed interface NodeDetailAction {
     data class Navigate(val route: Route) : NodeDetailAction
@@ -71,4 +72,7 @@ sealed interface NodeDetailAction {
 
     // Opens the compass sheet scoped to a target node and the user’s preferred units.
     data class OpenCompass(val node: Node, val displayUnits: MeasurementSystem) : NodeDetailAction
+
+    /** Sends an OnDemand diagnostics query (e.g. node stats) to [destNum]. */
+    data class RequestOnDemand(val destNum: Int, val longName: String, val requestType: OnDemandType) : NodeDetailAction
 }

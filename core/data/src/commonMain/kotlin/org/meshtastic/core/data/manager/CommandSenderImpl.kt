@@ -62,6 +62,9 @@ import org.meshtastic.proto.LockdownAuth
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.Neighbor
 import org.meshtastic.proto.NeighborInfo
+import org.meshtastic.proto.OnDemand
+import org.meshtastic.proto.OnDemandRequest
+import org.meshtastic.proto.OnDemandType
 import org.meshtastic.proto.Paxcount
 import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.PowerMetrics
@@ -321,13 +324,30 @@ class CommandSenderImpl(
                 to = destNum,
                 channel = getChannelIndex(destNum),
                 decoded =
-                Data(
-                    portnum = PortNum.NODEINFO_APP,
-                    want_response = true,
-                    payload = myNode.user.encode().toByteString(),
-                ),
+                    Data(
+                        portnum = PortNum.NODEINFO_APP,
+                        want_response = true,
+                        payload = myNode.user.encode().toByteString(),
+                    ),
             ),
             "User-info request",
+        )
+    }
+
+    override suspend fun requestOnDemand(destNum: Int, requestType: OnDemandType) {
+        val onDemand = OnDemand(request = OnDemandRequest(request_type = requestType))
+        enqueueOrThrow(
+            buildMeshPacket(
+                to = destNum,
+                channel = getChannelIndex(destNum),
+                decoded =
+                    Data(
+                        portnum = PortNum.ON_DEMAND_APP,
+                        payload = onDemand.encode().toByteString(),
+                        want_response = true,
+                    ),
+            ),
+            "OnDemand request",
         )
     }
 

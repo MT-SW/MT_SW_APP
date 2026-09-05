@@ -56,6 +56,9 @@ internal fun handleNodeAction(
 
         is NodeDetailAction.SendQuickMessage -> viewModel.sendQuickMessage(action.node, action.text)
 
+        is NodeDetailAction.RequestOnDemand ->
+            viewModel.requestOnDemand(action.destNum, action.longName, action.requestType)
+
         is NodeDetailAction.HandleNodeMenuAction -> {
             when (val menuAction = action.action) {
                 is NodeMenuAction.DirectMessage -> {

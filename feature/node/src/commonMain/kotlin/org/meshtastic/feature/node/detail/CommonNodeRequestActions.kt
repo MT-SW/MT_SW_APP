@@ -32,6 +32,7 @@ import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.UiText
 import org.meshtastic.core.resources.neighbor_info
+import org.meshtastic.core.resources.on_demand_node_stats
 import org.meshtastic.core.resources.position
 import org.meshtastic.core.resources.request_air_quality_metrics
 import org.meshtastic.core.resources.request_device_metrics
@@ -44,6 +45,7 @@ import org.meshtastic.core.resources.requesting_from
 import org.meshtastic.core.resources.traceroute
 import org.meshtastic.core.resources.user_info
 import org.meshtastic.core.ui.util.SnackbarManager
+import org.meshtastic.proto.OnDemandType
 
 @Single(binds = [NodeRequestActions::class])
 class CommonNodeRequestActions
@@ -128,5 +130,12 @@ constructor(
         analytics.trackAction("traceroute_request")
         _lastTracerouteTime.value = nowMillis
         showFeedback(UiText.Resource(Res.string.requesting_from, Res.string.traceroute, longName))
+    }
+
+    override suspend fun requestOnDemand(destNum: Int, longName: String, requestType: OnDemandType) = runRequest {
+        Logger.i { "Requesting OnDemand ($requestType) for '$destNum'" }
+        radioController.requestOnDemand(destNum, requestType)
+        analytics.trackAction("on_demand_request", mapOf("request_type" to requestType.name))
+        showFeedback(UiText.Resource(Res.string.requesting_from, Res.string.on_demand_node_stats, longName))
     }
 }

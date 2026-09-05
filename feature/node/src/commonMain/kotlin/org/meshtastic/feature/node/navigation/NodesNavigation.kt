@@ -59,6 +59,8 @@ import org.meshtastic.core.ui.component.ScrollToTopEvent
 import org.meshtastic.feature.node.compass.CompassViewModel
 import org.meshtastic.feature.node.detail.NodeDetailScreen
 import org.meshtastic.feature.node.detail.NodeDetailViewModel
+import org.meshtastic.feature.node.detail.OnDemandLogScreen
+import org.meshtastic.feature.node.detail.OnDemandLogViewModel
 import org.meshtastic.feature.node.metrics.AirQualityMetricsScreen
 import org.meshtastic.feature.node.metrics.DeviceMetricsScreen
 import org.meshtastic.feature.node.metrics.EnvironmentMetricsScreen
@@ -170,6 +172,11 @@ fun EntryProviderScope<NavKey>.nodeDetailGraph(backStack: NavBackStack<NavKey>) 
             args.logUuid,
             dropUnlessResumed { backStack.removeLastOrNull() },
         )
+    }
+
+    entry<NodeDetailRoute.OnDemandLog>(metadata = { ListDetailSceneStrategy.extraPane() }) { args ->
+        val viewModel = koinViewModel<OnDemandLogViewModel> { parametersOf(args.destNum) }
+        OnDemandLogScreen(viewModel = viewModel, onNavigateUp = dropUnlessResumed { backStack.removeLastOrNull() })
     }
 
     NodeDetailScreen.entries.forEach { routeInfo ->

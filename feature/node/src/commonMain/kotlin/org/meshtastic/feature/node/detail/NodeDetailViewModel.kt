@@ -68,6 +68,7 @@ import org.meshtastic.feature.node.metrics.EnvironmentMetricsState
 import org.meshtastic.feature.node.model.LogsType
 import org.meshtastic.feature.node.model.MetricsState
 import org.meshtastic.proto.LocalConfig
+import org.meshtastic.proto.OnDemandType
 
 private const val QUEUE_REJECTION_LOG_MESSAGE = "Node-detail request rejected by outbound packet queue"
 private const val LOCAL_NODE_UNAVAILABLE_LOG_MESSAGE =
@@ -231,6 +232,10 @@ class NodeDetailViewModel(
             radioController.sendMessage(DataPacket(to = node.user.id, channel = channel, text = text))
         }
     }
+
+    /** Sends an OnDemand diagnostics query (e.g. node stats) to [destNum]. */
+    fun requestOnDemand(destNum: Int, longName: String, requestType: OnDemandType) =
+        safeLaunch(tag = "requestOnDemand") { nodeRequestActions.requestOnDemand(destNum, longName, requestType) }
 
     /** Shows a snackbar confirming (or not) mesh delivery for a remote favorite/ignore command. */
     private suspend fun showRemoteCommandResult(delivered: Boolean) {
