@@ -641,8 +641,6 @@
     <string name="encryption_error_text">Klucz publiczny nie pasuje do zapisanego klucza. Możesz usunąć węzeł i pozwolić mu na ponowną wymianę kluczy, ale może to oznaczać poważniejszy problem z bezpieczeństwem. Skontaktuj się z użytkownikiem przez inny zaufany kanał, żeby sprawdzić, czy zmiana klucza była spowodowana przywróceniem ustawień fabrycznych lub innym celowym działaniem.</string>
     <string name="encryption_pkc">Szyfrowanie klucza publicznego</string>
     <string name="encryption_pkc_text">Bezpośrednie wiadomości wykorzystują nową infrastrukturę klucza publicznego do szyfrowania.</string>
-    <string name="encryption_psk">Klucz współdzielony</string>
-    <string name="encryption_psk_text">Tylko wiadomości kanału mogą być wysyłane/odbierane. Bezpośrednie wiadomości wymagają funkcji infrastruktury klucza publicznego w oprogramowaniu 2.5+.</string>
     <string name="env_metrics_log">Metryki środowiskowe</string>
     <!-- ENVIRONMENT -->
     <string name="environment">Środowisko</string>
@@ -1143,6 +1141,28 @@
     <string name="map_type_satellite">Satelita</string>
     <string name="map_type_terrain">Terenowa</string>
     <string name="map_zoom_levels" translatable="false">(z%1$d–%2$d)</string>
+    <string name="map_engine_unavailable">Mapa niedostępna na tym urządzeniu</string>
+    <string name="map_engine_unavailable_detail">Ta wersja aplikacji nie zawiera renderera mapy dla procesora Twojego telefonu. Wszystko inne działa normalnie.</string>
+    <string name="map_filter_roles_title">Role węzłów</string>
+    <string name="map_filter_show_ignored">Pokaż ignorowane węzły</string>
+    <string name="map_filter_title">Filtruj mapę</string>
+    <string name="map_layer_opacity">Przezroczystość: %1$d%</string>
+    <string name="map_offline_banner">Offline — pokazywane dane mapy z pamięci podręcznej</string>
+    <string name="map_offline_download_failed_build">Brak dostępnych danych mapy offline w tej chwili — spróbuj ponownie później</string>
+    <string name="map_offline_download_failed_io">Pobieranie nieudane — sprawdź połączenie i spróbuj ponownie</string>
+    <string name="map_offline_download_failed_region_limit">Pobrano już zbyt wiele regionów offline — usuń jeden, żeby zwolnić miejsce</string>
+    <string name="map_offline_download_failed_storage">Pobrane regiony zajmują zbyt dużo miejsca — usuń jeden</string>
+    <string name="map_offline_download_failed_tile_limit">Wybrany obszar jest zbyt duży — przybliż lub wybierz mniejszy region</string>
+    <string name="map_offline_download_terrain">Pobierz teren</string>
+    <string name="map_offline_downloading_progress">Pobieranie… %1$d / %2$d kafelków</string>
+    <string name="map_offline_region_label">%1$s, %2$s  %3$s</string>
+    <string name="map_offline_show_on_map">Pokaż na mapie</string>
+    <string name="map_offline_terrain_contours">Warstwice</string>
+    <string name="map_offline_terrain_download_complete">Pobieranie terenu zakończone</string>
+    <string name="map_offline_terrain_download_failed_io">Pobieranie terenu nieudane — sprawdź połączenie i spróbuj ponownie</string>
+    <string name="map_offline_terrain_download_failed_tile_limit">Wybrany obszar jest zbyt duży dla terenu — przybliż lub wybierz mniejszy region</string>
+    <string name="map_offline_terrain_downloading_progress">Pobieranie terenu… %1$d / %2$d kafelków</string>
+    <string name="map_tile_download_estimate_detail">%1$s %2$s %3$s</string>
     <string name="mark_as_read">Oznacz jako przeczytane</string>
     <string name="mark_unread_selected">Oznacz jako nieprzeczytane</string>
     <string name="match_all">Dopasuj Wszystkie | Dowolne</string>
@@ -1185,8 +1205,13 @@
     <string name="mesh_beacon_target">Cel %1$d</string>
     <string name="mesh_beacon_target_add">Dodaj cel</string>
     <string name="mesh_beacon_target_channel_index">Indeks kanału</string>
+    <string name="mesh_beacon_target_default">Domyślny</string>
     <string name="mesh_beacon_target_remove">Usuń cel</string>
     <string name="mesh_beacon_targets">Cele nadawania</string>
+    <string name="mesh_beacon_broadcast_requires_preset">Nadawanie beacona ogłasza preset modemu, do którego mogą dołączyć inni. To radio używa niestandardowych ustawień LoRa zamiast standardowego presetu, więc beacon mógłby zapraszać do ustawień, których inni nie usłyszą. Nadawanie można tu wyłączyć, ale nie włączyć, dopóki radio nie użyje standardowego presetu modemu.</string>
+    <string name="mesh_beacon_channel_number">Kanał %1$d</string>
+    <string name="mesh_beacon_no_channels">Brak dostępnych kanałów</string>
+    <string name="mesh_beacon_region_required">Ustaw region radia przed skonfigurowaniem beacona.</string>
     <string name="mesh_map_location">Lokalizacja na mapie sieci</string>
     <string name="mesh_map_location_description">Włącza niebieską kropkę lokalizacji Twojego telefonu na mapie sieci.</string>
     <!-- MESHTASTIC -->
@@ -1522,11 +1547,16 @@
     <string name="now">Teraz</string>
     <string name="ntp_server">Serwer NTP</string>
     <string name="number_of_records">Liczba rekordów</string>
+    <!-- OFFLINE -->
     <string name="offline_maps">Mapy offline</string>
     <string name="offline_maps_empty">Brak jeszcze pobranych obszarów</string>
     <string name="ok_to_mqtt">Ok dla MQTT</string>
     <string name="okay">OK</string>
     <string name="oled_type">Typ ekranu OLED</string>
+    <string name="offline_terrain_cache_detail">%1$s: %2$s · %3$s</string>
+    <string name="offline_terrain_empty">Nie pobrano jeszcze żadnego terenu</string>
+    <string name="offline_terrain_manager">Teren offline</string>
+    <string name="offline_terrain_regional_detail">Zawiera szczegółowy teren regionalny</string>
     <!-- ONE -->
     <string name="one_day">24 Godzin</string>
     <string name="one_hour">1 godzina</string>
@@ -1754,6 +1784,10 @@
     <string name="request_power_metrics">Metryki zasilania</string>
     <string name="request_telemetry">Żądanie telemetrii</string>
     <string name="requesting_from">Żądanie %1$s od %2$s</string>
+    <string name="request_user_info">Poproś o informacje użytkownika</string>
+    <string name="no_public_key">Brak klucza publicznego</string>
+    <string name="no_public_key_text">Ten węzeł nie udostępnił jeszcze klucza publicznego, więc nie można wysłać do niego bezpośredniej wiadomości. Poproś o informacje użytkownika, aby go uzyskać.</string>
+    <string name="shared_contact_no_public_key">Ten kontakt nie ma klucza publicznego, więc nie można go zaimportować. Kontakt bez niego usuwa klucz, który Twoje radio już posiada dla tego węzła. Poproś nadawcę o ponowne udostępnienie, gdy jego węzeł wymieni już klucze.</string>
     <string name="resend">Ponów</string>
     <string name="reset">Zresetuj</string>
     <string name="reset_to_defaults">Przywróć domyślne</string>
@@ -1902,6 +1936,7 @@
     <string name="short_name">Krótka nazwa</string>
     <string name="should_update">Aby skorzystać z najnowszych poprawek i funkcji, zaktualizuj firmware swojego węzła.\n\nNajnowsza stabilna wersja firmware: %1$s</string>
     <string name="should_update_firmware">Zalecana aktualizacja.</string>
+    <string name="update_status">Status aktualizacji</string>
     <!-- SHOW -->
     <string name="show_all_key_title">Znaczenie klucza szyfrowania</string>
     <string name="show_full_message_timestamps">Wyświetlaj pełne znaczniki czasu</string>

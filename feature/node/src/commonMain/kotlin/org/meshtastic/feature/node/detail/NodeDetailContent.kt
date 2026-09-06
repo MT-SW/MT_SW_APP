@@ -43,6 +43,7 @@ import org.meshtastic.feature.node.component.AdministrationSection
 import org.meshtastic.feature.node.component.DeviceActions
 import org.meshtastic.feature.node.component.DeviceLinksSection
 import org.meshtastic.feature.node.component.NodeDetailsSection
+import org.meshtastic.feature.node.component.NodeMenuAction
 import org.meshtastic.feature.node.component.NotesSection
 import org.meshtastic.feature.node.model.NodeDetailAction
 
@@ -109,6 +110,10 @@ fun NodeDetailList(
                 deviceHardware = uiState.metricsState.deviceHardware,
                 reportedTarget = uiState.metricsState.reportedTarget,
                 relayNodeName = uiState.relayNodeName,
+                isLocal = uiState.metricsState.isLocal,
+                onRequestUserInfo = {
+                    onAction(NodeDetailAction.HandleNodeMenuAction(NodeMenuAction.RequestUserInfo(node)))
+                },
             )
         }
         if (uiState.metricsState.deviceLinks.isNotEmpty()) {
@@ -125,6 +130,7 @@ fun NodeDetailList(
                 displayUnits = uiState.metricsState.displayUnits,
                 isFahrenheit = uiState.metricsState.isFahrenheit,
                 isLocal = uiState.metricsState.isLocal,
+                hasConversation = uiState.hasConversation,
                 airQualityHistory = uiState.metricsState.airQualityMetrics,
             )
         }

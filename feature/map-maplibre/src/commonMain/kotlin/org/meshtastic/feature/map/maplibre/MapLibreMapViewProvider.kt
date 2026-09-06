@@ -52,7 +52,9 @@ import org.meshtastic.feature.map.component.ClusterMemberEntry
 import org.meshtastic.feature.map.component.ClusterMembersDialog
 import org.meshtastic.feature.map.component.EditWaypointDialog
 import org.meshtastic.feature.map.component.MapControlsOverlay
+import org.meshtastic.feature.map.component.MapEngineUnavailable
 import org.meshtastic.feature.map.component.MapFilterSheet
+import org.meshtastic.feature.map.component.OfflineStatusBanner
 import org.meshtastic.feature.map.component.mapFilterActions
 import org.meshtastic.feature.map.layers.LayerOpacityStore
 import org.meshtastic.feature.map.maplibre.component.BasemapButton
@@ -131,6 +133,9 @@ class MapLibreMapViewProvider(
         waypointId: Int?,
         sitePlannerNodeNum: Int?,
     ) {
+        // Guarded here too, or the toolbar and zoom controls float over an empty screen driving a missing map.
+        if (!LocalMapLibreRuntimeProbe.current()) return MapEngineUnavailable(modifier)
+
         val viewModel: SharedMapViewModel = koinViewModel()
         // Null for the one frame before the basemap preference has loaded from disk; see rememberBasemapSelection.
         val basemaps = rememberBasemapSelection(customBasemaps()) ?: return
@@ -145,8 +150,6 @@ class MapLibreMapViewProvider(
         // same reason, and a map that sleeps mid-walk is the one complaint a location-follow feature always draws.
         KeepScreenOn(location.following)
 
-        val layerOpacity by koinInject<LayerOpacityStore>().opacity.collectAsState()
-
         Box(modifier = modifier.fillMaxSize()) {
             MeshMap(
                 viewModel = viewModel,
@@ -154,7 +157,7 @@ class MapLibreMapViewProvider(
                 modifier = Modifier.fillMaxSize(),
                 basemap = basemaps.current,
                 overlays = screen.overlays,
-                layerOpacity = layerOpacity,
+                layerOpacity = koinInject<LayerOpacityStore>().opacity.collectAsState().value,
                 customLayers = customLayers(),
                 cameraState = cameraState,
                 locationState = location.state,
@@ -169,6 +172,8 @@ class MapLibreMapViewProvider(
             )
 
             MapZoom(cameraState = cameraState, basemap = basemaps.current)
+
+            OfflineIndicator(viewModel)
 
             MapToolbar(
                 basemaps = basemaps,
@@ -203,6 +208,16 @@ class MapLibreMapViewProvider(
             )
         }
     }
+}
+
+/** The "you're offline" pill, top-start so it never collides with the toolbar's top-center controls. */
+@Composable
+private fun BoxScope.OfflineIndicator(viewModel: SharedMapViewModel) {
+    val networkAvailable by viewModel.mapNetworkAvailable.collectAsStateWithLifecycle()
+    OfflineStatusBanner(
+        visible = !networkAvailable,
+        modifier = Modifier.align(Alignment.TopStart).padding(top = 8.dp, start = 8.dp),
+    )
 }
 
 /** Everything the main map screen holds open over the map: dialogs, sheets and the chosen overlays. */

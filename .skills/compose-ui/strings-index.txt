@@ -594,8 +594,6 @@ encryption_error
 encryption_error_text
 encryption_pkc
 encryption_pkc_text
-encryption_psk
-encryption_psk_text
 env_metrics_log
 ### ENVIRONMENT ###
 environment
@@ -1024,6 +1022,8 @@ map_download_region
 map_download_status_complete
 map_download_status_downloading
 map_download_status_paused
+map_engine_unavailable
+map_engine_unavailable_detail
 map_filter
 map_filter_all_roles
 map_filter_display_title
@@ -1034,7 +1034,22 @@ map_filter_title
 map_layer_formats
 map_layer_opacity
 map_node_popup_details
+map_offline_banner
+map_offline_download_failed_build
+map_offline_download_failed_io
+map_offline_download_failed_region_limit
+map_offline_download_failed_storage
+map_offline_download_failed_tile_limit
+map_offline_download_terrain
+map_offline_downloading_progress
 map_offline_manager
+map_offline_region_label
+map_offline_show_on_map
+map_offline_terrain_contours
+map_offline_terrain_download_complete
+map_offline_terrain_download_failed_io
+map_offline_terrain_download_failed_tile_limit
+map_offline_terrain_downloading_progress
 map_overlay_hillshade
 map_overlay_precipitation
 map_overlay_weather_radar
@@ -1050,6 +1065,7 @@ map_start_download
 map_style_selection
 map_subDescription
 map_tile_download_estimate
+map_tile_download_estimate_detail
 map_tile_limit_reached
 map_tile_source
 map_type_hybrid
@@ -1098,6 +1114,7 @@ mesh_beacon_region_required
 mesh_beacon_target
 mesh_beacon_target_add
 mesh_beacon_target_channel_index
+mesh_beacon_target_default
 mesh_beacon_target_remove
 mesh_beacon_targets
 mesh_map_location
@@ -1246,6 +1263,8 @@ no_network_devices_found
 no_network_devices_hint
 no_network_devices_seen
 no_pax_metrics_logs
+no_public_key
+no_public_key_text
 no_usb_devices_found
 no_usb_devices_hint
 no_usb_devices_seen
@@ -1336,8 +1355,13 @@ notifications_on_message_receipt
 now
 ntp_server
 number_of_records
+### OFFLINE ###
 offline_maps
 offline_maps_empty
+offline_terrain_cache_detail
+offline_terrain_empty
+offline_terrain_manager
+offline_terrain_regional_detail
 ok_to_mqtt
 okay
 oled_type
@@ -1542,6 +1566,7 @@ request_metadata
 request_pax_metrics
 request_power_metrics
 request_telemetry
+request_user_info
 requesting_from
 resend
 reset
@@ -1688,6 +1713,7 @@ share_location
 share_location_description
 share_to
 share_your_location_in_real_time
+shared_contact_no_public_key
 short_name
 should_update
 should_update_firmware
@@ -1929,6 +1955,7 @@ unset
 up_down_select_input_enabled
 update_interval
 update_interval_seconds
+update_status
 updated
 uplink_enabled
 uplink_feature_description

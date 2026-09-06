@@ -2,7 +2,7 @@
 title: Nós
 parent: User Guide
 nav_order: 4
-last_updated: 2026-08-30
+last_updated: 2026-09-04
 description: Browse, filter, and sort mesh nodes — view details, signal quality, roles, and quick actions.
 aliases:
   - node-list
@@ -78,13 +78,13 @@ Most users should keep the default **Client** role. Consider a different role wh
 
 Nodes display encryption status icons next to their name:
 
-| Icon        | Meaning                                                                                                             |
-| ----------- | ------------------------------------------------------------------------------------------------------------------- |
-| 🔒 Locked   | Communication uses PKI (public key infrastructure) — end-to-end encrypted with verified identity |
-| 🔓 Unlocked | Communication uses shared channel PSK — encrypted but identity not individually verified                            |
-| ⚠️ Mismatch | Public key mismatch — the node's key has changed since last seen (investigate before trusting)   |
+| Icon        | Meaning                                                                                                                                           |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🔒 Locked   | Communication uses PKI (public key infrastructure) — end-to-end encrypted with verified identity                               |
+| 🔓 Unlocked | No public key has been received for this node, so it cannot be direct messaged — use **Request User Info** on the node detail page to ask for one |
+| ⚠️ Mismatch | Public key mismatch — the node's key has changed since last seen (investigate before trusting)                                 |
 
-> 💡 **Tip:** PKI encryption (firmware 2.5+) provides stronger security than channel PSK because each node has a unique key pair. If you see a key mismatch warning, the node may have been reset or compromised.
+> 💡 **Tip:** Direct messages always use PKI, so the radio needs the other node's public key before it can send one. It refuses the send rather than falling back to channel encryption. Keys arrive inside node info, which is why an open lock usually clears itself once that node is heard from properly. If you see a key mismatch warning, the node may have been reset or compromised.
 
 To clear a mismatch, first confirm through another trusted channel that the key change was intentional — a factory reset causes one. Then touch & hold the node, choose **Remove**, and let the two radios exchange keys again the next time yours hears it.
 
@@ -100,6 +100,11 @@ From the node list, you can:
   - Trace route
   - Ignore/unignore
   - Excluir
+
+Touch & hold **your own node** instead and you get one action, **Update status**, which opens the
+User settings screen with the cursor already in the Status Message field. It only appears while the
+radio is connected and running firmware 2.8 or newer — see
+[Settings — Radio & User](settings-radio-user.md) for the field itself.
 
 ## Sharing a Contact
 

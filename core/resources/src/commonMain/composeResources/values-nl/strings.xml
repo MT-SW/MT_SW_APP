@@ -145,7 +145,6 @@
     <string name="encryption_enabled">Encryptie ingeschakeld</string>
     <string name="encryption_error">Publieke sleutel komt niet overeen</string>
     <string name="encryption_pkc">Publieke sleutel encryptie</string>
-    <string name="encryption_psk">Gedeelde Key</string>
     <!-- ENVIRONMENT -->
     <string name="environment">Omgeving</string>
     <string name="error">Fout</string>
@@ -254,6 +253,7 @@
     <string name="mesh_beacon_preset_none">Geen</string>
     <string name="mesh_beacon_region_label">Regio</string>
     <string name="mesh_beacon_target_channel_index">Kanaal</string>
+    <string name="mesh_beacon_target_default">Standaard</string>
     <!-- MESHTASTIC -->
     <string name="meshtastic_alerts_notifications">Waarschuwingsmeldingen</string>
     <string name="meshtastic_low_battery_notifications">Batterij bijna leeg</string>
@@ -309,6 +309,7 @@
     <!-- NOTIFICATIONS -->
     <string name="ntp_server">NTP server</string>
     <string name="number_of_records">Aantal records</string>
+    <!-- OFFLINE -->
     <string name="okay">OK</string>
     <!-- ONE -->
     <string name="one_day">24 Uur</string>

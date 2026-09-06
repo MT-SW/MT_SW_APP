@@ -136,6 +136,7 @@
     <!-- MESH -->
     <string name="mesh_beacon_region_label">Regija</string>
     <string name="mesh_beacon_target_channel_index">Kanal</string>
+    <string name="mesh_beacon_target_default">Zadano</string>
     <!-- MESHTASTIC -->
     <string name="meshtastic">Meshtastic</string>
     <string name="meshtastic_app_name">Meshtastic</string>
@@ -172,6 +173,7 @@
     <string name="none">Ništa (onemogućeno)</string>
     <string name="not_connected">Nije povezano</string>
     <!-- NOTIFICATIONS -->
+    <!-- OFFLINE -->
     <string name="okay">U redu</string>
     <!-- ONE -->
     <string name="one_day">24 Sati</string>

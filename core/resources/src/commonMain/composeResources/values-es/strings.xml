@@ -286,7 +286,6 @@
     <string name="encryption_error">Clave pública no coincide</string>
     <string name="encryption_pkc">Cifrado de Clave Pública</string>
     <string name="encryption_pkc_text">Los mensajes directos están utilizando la nueva infraestructura de clave pública para el cifrado.</string>
-    <string name="encryption_psk">Clave compartida</string>
     <string name="env_metrics_log">Métricas de Entorno</string>
     <!-- ENVIRONMENT -->
     <string name="environment">Ambiente</string>
@@ -498,6 +497,7 @@ Estos datos de ubicación pueden ser utilizados para fines como aparecer en un m
     <string name="mesh_beacon_preset_none">Ninguna</string>
     <string name="mesh_beacon_region_label">Región</string>
     <string name="mesh_beacon_target_channel_index">Canal</string>
+    <string name="mesh_beacon_target_default">Por defecto</string>
     <string name="mesh_map_location_description">Habilita el punto de posición azul para tu teléfono en el mapa de la malla.</string>
     <!-- MESHTASTIC -->
     <string name="meshtastic">Meshtastic</string>
@@ -599,6 +599,7 @@ Estos datos de ubicación pueden ser utilizados para fines como aparecer en un m
     <string name="now">Ahora</string>
     <string name="ntp_server">Servidor NTP</string>
     <string name="number_of_records">Número de registros</string>
+    <!-- OFFLINE -->
     <string name="ok_to_mqtt">Permitir MQTT</string>
     <string name="okay">Vale</string>
     <string name="oled_type">Tipo de OLED</string>

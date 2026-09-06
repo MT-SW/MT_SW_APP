@@ -193,7 +193,6 @@
     <string name="encryption_enabled">Şifreleme etkin</string>
     <string name="encryption_error">Genel Anahtar Uyuşmazlığı</string>
     <string name="encryption_pkc">Genel Anahtar Şifrelemesi</string>
-    <string name="encryption_psk">Paylaşılan Anahtar</string>
     <!-- ENVIRONMENT -->
     <string name="environment">Çevre</string>
     <string name="environment_metrics_module_enabled">Çevre metrikleri modülü etkin</string>
@@ -334,6 +333,7 @@
     <string name="mesh_beacon_preset_none">Yok</string>
     <string name="mesh_beacon_region_label">Bölge</string>
     <string name="mesh_beacon_target_channel_index">Kanal</string>
+    <string name="mesh_beacon_target_default">Varsayılan</string>
     <string name="mesh_map_location">Mesh Harita Konumu</string>
     <string name="mesh_map_location_description">Telefonunuz için mesh haritasında mavi konum noktasını etkinleştirir.</string>
     <!-- MESHTASTIC -->
@@ -406,6 +406,7 @@
     <string name="now">Şimdi</string>
     <string name="ntp_server">NTP sunucusu</string>
     <string name="number_of_records">Kayıt sayısı</string>
+    <!-- OFFLINE -->
     <string name="okay">Tamam</string>
     <!-- ONE -->
     <string name="one_day">24 Saat</string>
