@@ -282,7 +282,7 @@ compose.desktop {
             packageVersion = sanitizedVersion
 
             description = "MT_SW_APP Desktop"
-            vendor = "Meshtastic LLC"
+            vendor = "MT-SW"
         }
     }
 }
