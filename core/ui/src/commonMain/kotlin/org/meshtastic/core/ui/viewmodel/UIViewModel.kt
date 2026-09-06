@@ -16,6 +16,7 @@
  */
 package org.meshtastic.core.ui.viewmodel
 
+import androidx.compose.ui.text.intl.Locale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation3.runtime.NavKey
@@ -420,15 +421,32 @@ class UIViewModel(
     val showNarrowBandWarning: StateFlow<Boolean> = narrowBandWarningFlow.asStateFlow()
 
     /**
-     * Checks the locally-connected radio's LoRa channel bandwidth on a foreground app-open/resume, throttled to at most
-     * once per [NARROW_BAND_WARNING_THROTTLE_MILLIS] so it surfaces roughly twice a day. Foreground-only by design — no
-     * background/WorkManager check. Unrelated to the unthrottled check shown every time remote admin is opened from
-     * Node Details.
+     * Checks, on a foreground app-open/resume, whether this general NarrowFast/NarrowSlow notice should be shown: the
+     * locally-connected radio's LoRa channel must be wide (>[NARROW_BAND_WARNING_THRESHOLD_KHZ]), its region must be
+     * [RegionInfo.EU_868] or [RegionInfo.EU_N_868] (the presets this notice talks about), and EITHER the app's language
+     * is Polish OR the phone is physically within [POLAND_REGION] — checked in that order so a Polish-language user
+     * never pays for a location fetch. Throttled to at most once per [NARROW_BAND_WARNING_THROTTLE_MILLIS] so it
+     * surfaces roughly twice a day. Foreground-only by design — no background/WorkManager check. Unrelated to the
+     * unthrottled check shown every time remote admin is opened from Node Details.
      */
     fun checkNarrowBandWarningThrottled() {
+        viewModelScope.launch { performNarrowBandCheck() }
+    }
+
+    private suspend fun performNarrowBandCheck() {
         val lora = localConfig.value.lora ?: return
         val regionInfo = RegionInfo.fromRegionCode(lora.region)
         if (lora.effectiveBandwidthKHz(regionInfo) <= NARROW_BAND_WARNING_THRESHOLD_KHZ) return
+        if (regionInfo != RegionInfo.EU_868 && regionInfo != RegionInfo.EU_N_868) return
+
+        val isPolishLanguage = Locale.current.language == "pl"
+        val isInPoland =
+            isPolishLanguage ||
+                    run {
+                        val location = locationService.getCurrentLocation() ?: return
+                        POLAND_REGION.contains(location.latitude, location.longitude)
+                    }
+        if (!isInPoland) return
 
         val now = nowMillis
         if (now - uiPrefs.lastNarrowBandWarningShownMillis.value < NARROW_BAND_WARNING_THROTTLE_MILLIS) return
@@ -519,6 +537,232 @@ class UIViewModel(
 
         /** ~12h throttle → the foreground check can fire at most twice in a 24h period. */
         private const val NARROW_BAND_WARNING_THROTTLE_MILLIS = 12 * 60 * 60 * 1000L
+
+        /**
+         * Simplified national border for Poland (214 vertices, simplified union of all 16 voivodeship polygons from
+         * the ppatrzyk/polska-geojson dataset) — (lat, lon) pairs, connects back to the first vertex. Used by the
+         * general NarrowFast notice, which fires nationwide rather than only inside Świętokrzyskie.
+         */
+        @Suppress("MagicNumber", "LargeClass")
+        private val POLAND_REGION =
+            GeofencePolygon(
+                listOf(
+                    49.6134 to 19.466,
+                    49.5361 to 19.3624,
+                    49.5312 to 19.2607,
+                    49.4111 to 19.1916,
+                    49.3952 to 18.9799,
+                    49.5043 to 18.9716,
+                    49.5236 to 18.8373,
+                    49.5507 to 18.8592,
+                    49.6768 to 18.807,
+                    49.7224 to 18.6252,
+                    49.8292 to 18.5689,
+                    49.8616 to 18.6057,
+                    49.8807 to 18.5657,
+                    49.9212 to 18.5737,
+                    49.8995 to 18.524,
+                    49.9487 to 18.3331,
+                    49.9157 to 18.3179,
+                    50.066 to 18.0336,
+                    50.0378 to 18.0043,
+                    50.0051 to 18.0455,
+                    49.9725 to 17.8686,
+                    50.1127 to 17.7078,
+                    50.1116 to 17.6491,
+                    50.1696 to 17.6012,
+                    50.2082 to 17.759,
+                    50.2567 to 17.725,
+                    50.2995 to 17.7521,
+                    50.3226 to 17.713,
+                    50.266 to 17.6121,
+                    50.2637 to 17.3507,
+                    50.3283 to 17.3487,
+                    50.3189 to 17.2825,
+                    50.3861 to 17.2038,
+                    50.4477 to 16.8985,
+                    50.4077 to 16.8603,
+                    50.3021 to 17.0026,
+                    50.23 to 17.0283,
+                    50.2073 to 16.8469,
+                    50.0985 to 16.6893,
+                    50.1425 to 16.5801,
+                    50.2204 to 16.5573,
+                    50.3288 to 16.3832,
+                    50.3795 to 16.3608,
+                    50.3675 to 16.2792,
+                    50.4321 to 16.1957,
+                    50.5796 to 16.4449,
+                    50.6615 to 16.3431,
+                    50.6717 to 16.2357,
+                    50.6272 to 16.1842,
+                    50.6634 to 16.1037,
+                    50.5986 to 16.0248,
+                    50.6135 to 15.9864,
+                    50.6302 to 16.0218,
+                    50.6831 to 15.9912,
+                    50.6744 to 15.861,
+                    50.7553 to 15.8162,
+                    50.7373 to 15.7057,
+                    50.8091 to 15.4388,
+                    50.7776 to 15.3748,
+                    50.8381 to 15.3672,
+                    50.891 to 15.2771,
+                    50.9795 to 15.2741,
+                    50.983 to 15.1799,
+                    51.02 to 15.1718,
+                    50.9903 to 15.1304,
+                    51.0108 to 14.9854,
+                    50.99 to 14.9682,
+                    50.9671 to 15.0217,
+                    50.869 to 15.0021,
+                    50.8709 to 14.8227,
+                    51.0501 to 14.9647,
+                    51.2742 to 15.0418,
+                    51.3618 to 14.965,
+                    51.4713 to 14.9491,
+                    51.5314 to 14.7291,
+                    51.6615 to 14.7576,
+                    51.821 to 14.5901,
+                    51.9021 to 14.6944,
+                    52.0657 to 14.7591,
+                    52.1166 to 14.6816,
+                    52.2355 to 14.716,
+                    52.2886 to 14.5758,
+                    52.395 to 14.5344,
+                    52.4923 to 14.6345,
+                    52.5313 to 14.6039,
+                    52.573 to 14.6391,
+                    52.7515 to 14.351,
+                    52.8361 to 14.1234,
+                    52.8881 to 14.1616,
+                    52.9614 to 14.1437,
+                    53.0547 to 14.3486,
+                    53.2018 to 14.3773,
+                    53.2623 to 14.4506,
+                    53.5534 to 14.3026,
+                    53.7723 to 14.2836,
+                    53.9141 to 14.1853,
+                    53.9162 to 14.3934,
+                    54.1475 to 15.2839,
+                    54.2709 to 16.0885,
+                    54.5407 to 16.5299,
+                    54.5917 to 16.89,
+                    54.7317 to 17.2507,
+                    54.8323 to 17.9678,
+                    54.8353 to 18.3294,
+                    54.6819 to 18.7332,
+                    54.6018 to 18.8254,
+                    54.7805 to 18.4496,
+                    54.7464 to 18.3964,
+                    54.6946 to 18.473,
+                    54.6337 to 18.4689,
+                    54.6362 to 18.5155,
+                    54.4383 to 18.58,
+                    54.3485 to 18.876,
+                    54.3667 to 19.3314,
+                    54.4592 to 19.6377,
+                    54.3182 to 21.4461,
+                    54.3542 to 22.65,
+                    54.4095 to 22.8834,
+                    54.3828 to 23.0102,
+                    54.3124 to 23.051,
+                    54.2517 to 23.3375,
+                    54.1634 to 23.4755,
+                    54.0658 to 23.5286,
+                    53.9988 to 23.4812,
+                    53.8507 to 23.552,
+                    53.7678 to 23.5491,
+                    53.2742 to 23.799,
+                    53.1576 to 23.9183,
+                    53.0841 to 23.8719,
+                    52.9587 to 23.9463,
+                    52.9388 to 23.9165,
+                    52.7129 to 23.9386,
+                    52.616 to 23.7609,
+                    52.5494 to 23.4666,
+                    52.2831 to 23.1783,
+                    52.2266 to 23.2037,
+                    52.1789 to 23.5012,
+                    52.1516 to 23.4882,
+                    52.0738 to 23.6529,
+                    51.9919 to 23.689,
+                    51.9511 to 23.6276,
+                    51.8405 to 23.6001,
+                    51.8004 to 23.6414,
+                    51.7298 to 23.527,
+                    51.6984 to 23.5604,
+                    51.5344 to 23.5651,
+                    51.4825 to 23.6703,
+                    51.4463 to 23.6494,
+                    51.4192 to 23.7028,
+                    51.2918 to 23.646,
+                    51.2914 to 23.6953,
+                    51.2117 to 23.7396,
+                    51.1506 to 23.8689,
+                    51.0995 to 23.8572,
+                    51.0742 to 23.9114,
+                    51.0073 to 23.915,
+                    50.9509 to 23.9697,
+                    50.8649 to 24.1455,
+                    50.8375 to 23.9896,
+                    50.7951 to 23.9577,
+                    50.7662 to 24.0238,
+                    50.7229 to 24.017,
+                    50.7206 to 24.072,
+                    50.6374 to 24.0982,
+                    50.4448 to 24.0345,
+                    50.4121 to 23.9975,
+                    50.388 to 23.727,
+                    50.3316 to 23.6863,
+                    50.1005 to 23.2801,
+                    49.53 to 22.6408,
+                    49.4951 to 22.6967,
+                    49.3599 to 22.7468,
+                    49.2265 to 22.7149,
+                    49.2159 to 22.7477,
+                    49.1748 to 22.7075,
+                    49.1825 to 22.7563,
+                    49.1581 to 22.7389,
+                    49.0946 to 22.8928,
+                    49.0667 to 22.8647,
+                    49.0077 to 22.8916,
+                    49.1525 to 22.2257,
+                    49.1845 to 22.2225,
+                    49.2252 to 22.0304,
+                    49.278 to 22.0343,
+                    49.3491 to 21.961,
+                    49.3917 to 21.8376,
+                    49.356 to 21.778,
+                    49.4473 to 21.6309,
+                    49.4123 to 21.4341,
+                    49.4609 to 21.2775,
+                    49.401 to 21.1921,
+                    49.4366 to 21.124,
+                    49.4183 to 21.0475,
+                    49.3651 to 21.0941,
+                    49.2961 to 20.9256,
+                    49.3476 to 20.8653,
+                    49.3438 to 20.7965,
+                    49.4164 to 20.7397,
+                    49.4178 to 20.6149,
+                    49.3762 to 20.5762,
+                    49.418 to 20.4348,
+                    49.4017 to 20.3221,
+                    49.3435 to 20.3142,
+                    49.318 to 20.146,
+                    49.1797 to 20.0882,
+                    49.2365 to 19.9322,
+                    49.1993 to 19.7843,
+                    49.2366 to 19.7668,
+                    49.2768 to 19.8228,
+                    49.4107 to 19.7906,
+                    49.4088 to 19.6317,
+                    49.4576 to 19.6411,
+                    49.4554 to 19.5815,
+                    49.573 to 19.5293,
+                ),
+            )
 
         /**
          * Simplified border polygon for Świętokrzyskie voivodeship (52 vertices, Douglas-Peucker simplified from the

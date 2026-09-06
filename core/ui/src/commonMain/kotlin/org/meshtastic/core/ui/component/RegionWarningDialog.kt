@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
@@ -48,22 +49,37 @@ fun RegionWarningDialog(onClose: () -> Unit) {
         }
     }
 
+    val isEnglish = Locale.current.language == "en"
+
     MeshtasticDialog(
-        title = "Witamy w woj. Świętokrzyskim!",
+        title = if (isEnglish) "Welcome to the Świętokrzyskie region!" else "Witamy w woj. Świętokrzyskim!",
         dismissable = false,
         text = {
             Column {
                 Text(
                     text =
-                    "Na naszym terenie pracujemy na nastawach Custom (62KHz, SF7, CR6) lub preset NarrowFast. " +
-                        "Więcej szczegółów znajdziesz na https://mt-sw.pl",
+                        if (isEnglish) {
+                            "In this area we operate on Custom settings (62KHz, SF7, CR6) or the NarrowFast preset. " +
+                                    "More details at https://mt-sw.pl"
+                        } else {
+                            "Na naszym terenie pracujemy na nastawach Custom (62KHz, SF7, CR6) lub preset NarrowFast. " +
+                                    "Więcej szczegółów znajdziesz na https://mt-sw.pl"
+                        },
                 )
                 TextButton(
                     onClick = onClose,
                     enabled = secondsRemaining <= 0,
                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                 ) {
-                    Text(text = if (secondsRemaining > 0) "Zamknij (${secondsRemaining}s)" else "Zamknij")
+                    Text(
+                        text =
+                            when {
+                                secondsRemaining > 0 && isEnglish -> "Close (${secondsRemaining}s)"
+                                secondsRemaining > 0 -> "Zamknij (${secondsRemaining}s)"
+                                isEnglish -> "Close"
+                                else -> "Zamknij"
+                            },
+                    )
                 }
             }
         },
