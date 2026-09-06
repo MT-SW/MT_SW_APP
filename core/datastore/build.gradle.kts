@@ -27,7 +27,6 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.core.common)
             implementation(projects.core.model)
-            implementation(libs.meshtastic.protobufs)
             api(libs.androidx.datastore)
             api(libs.androidx.datastore.preferences)
             implementation(libs.kotlinx.serialization.json)

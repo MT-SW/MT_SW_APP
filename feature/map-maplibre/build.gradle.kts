@@ -58,7 +58,6 @@ kotlin {
             // Imported layers can name an icon image by URL; Coil fetches and decodes it.
             implementation(libs.coil)
             implementation(libs.coil.network.ktor3)
-            implementation(libs.meshtastic.protobufs)
 
             api(libs.maplibre.compose)
             api(libs.maplibre.compose.material3)

@@ -31,7 +31,6 @@ kotlin {
             implementation(projects.core.model)
             implementation(projects.core.navigation)
             implementation(projects.core.prefs)
-            implementation(libs.meshtastic.protobufs)
             implementation(projects.core.resources)
             implementation(projects.core.service)
             implementation(projects.core.ui)

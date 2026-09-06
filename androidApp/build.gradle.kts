@@ -230,7 +230,6 @@ dependencies {
     implementation(projects.core.network)
     implementation(projects.core.nfc)
     implementation(projects.core.prefs)
-    implementation(libs.meshtastic.protobufs)
     implementation(projects.core.service)
     implementation(projects.core.resources)
     implementation(projects.core.ui)

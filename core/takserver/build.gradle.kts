@@ -32,7 +32,6 @@ kotlin {
             implementation(projects.core.common)
             implementation(projects.core.di)
             implementation(projects.core.model)
-            implementation(libs.meshtastic.protobufs)
 
             // org.meshtastic.proto.TAKPacketV2 and friends come from the
             // protobufs SDK (api()-exported by :core:model for every target).

@@ -26,7 +26,6 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(projects.core.model)
-            api(libs.meshtastic.protobufs)
             implementation(projects.core.common)
             implementation(projects.core.database)
 

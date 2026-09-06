@@ -317,7 +317,6 @@ dependencies {
     implementation(projects.core.resources)
     implementation(projects.core.service)
     implementation(projects.core.ui)
-    implementation(libs.meshtastic.protobufs)
     implementation(projects.core.ble)
 
     // Feature modules (JVM variants for real composable wiring)

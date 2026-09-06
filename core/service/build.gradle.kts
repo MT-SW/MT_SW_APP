@@ -37,7 +37,6 @@ kotlin {
             implementation(projects.core.ble)
             implementation(projects.core.prefs)
             implementation(projects.core.resources)
-            implementation(libs.meshtastic.protobufs)
             implementation(projects.core.takserver)
 
             implementation(libs.jetbrains.lifecycle.runtime)

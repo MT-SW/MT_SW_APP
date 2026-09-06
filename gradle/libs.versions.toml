@@ -361,7 +361,7 @@ jna = { module = "net.java.dev.jna:jna", version = "5.19.1" }
 takpacket-sdk-kmp = { module = "org.meshtastic:takpacket-sdk", version.ref = "takpacket-sdk" }
 
 # Meshtastic Protobufs SDK (Wire-generated KMP models from meshtastic/protobufs)
-meshtastic-protobufs = { module = "com.github.MT-SW.MT_SW_PROTOBUFS:protobufs-android", version.ref = "meshtastic-protobufs" }
+meshtastic-protobufs = { module = "com.github.MT-SW.MT_SW_PROTOBUFS:protobufs", version.ref = "meshtastic-protobufs" }
 
 
 [bundles]
