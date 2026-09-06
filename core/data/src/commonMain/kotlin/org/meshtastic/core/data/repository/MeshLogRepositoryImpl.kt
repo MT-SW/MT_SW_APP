@@ -103,9 +103,14 @@ open class MeshLogRepositoryImpl(
         .map { list -> list.map { it.asExternalModel() } }
         .flowOn(dispatchers.io)
 
-    /** Retrieves all [MeshLog]s associated with a specific [nodeNum] and [portNum]. */
-    override fun getLogsFrom(nodeNum: Int, portNum: Int): Flow<List<MeshLog>> = dbManager
-        .observeCurrentDb { it.meshLogDao().getLogsFrom(nodeNum, portNum, DEFAULT_MAX_LOGS) }
+    /**
+     * Retrieves all [MeshLog]s associated with a specific [nodeNum] and [portNum], automatically remapping the
+     * locally connected node's number to [MeshLog.NODE_NUM_LOCAL] — see [effectiveLogId].
+     */
+    override fun getLogsFrom(nodeNum: Int, portNum: Int): Flow<List<MeshLog>> = effectiveLogId(nodeNum)
+        .flatMapLatest { logId ->
+            dbManager.observeCurrentDb { it.meshLogDao().getLogsFrom(logId, portNum, DEFAULT_MAX_LOGS) }
+        }
         .map { list -> list.map { it.asExternalModel() } }
         .distinctUntilChanged()
         .flowOn(dispatchers.io)
