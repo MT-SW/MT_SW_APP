@@ -64,9 +64,7 @@ internal class QueryControllerImpl(
     }
 
     override suspend fun requestOnDemand(destNum: Int, requestType: OnDemandType) {
-        if (destNum != nodeManager.myNodeNum.value) {
-            commandSender.requestOnDemand(destNum, requestType)
-        }
+        commandSender.requestOnDemand(destNum, requestType)
     }
 
     override suspend fun requestTraceroute(requestId: Int, destNum: Int) {
