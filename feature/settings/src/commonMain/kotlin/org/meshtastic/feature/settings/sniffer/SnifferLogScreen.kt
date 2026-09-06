@@ -113,13 +113,16 @@ private fun SniffedPacketCard(packet: SniffedPacket, isExpanded: Boolean, onClic
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            val portText = if (packet.isEncrypted) "encrypted" else packet.portNum?.let { "port $it" } ?: "unknown port"
+            Text(
+                text = portText,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             if (isExpanded) {
-                val portText =
-                    if (packet.isEncrypted) "encrypted" else packet.portNum?.let { "port $it" } ?: "unknown port"
                 Text(
-                    text = "$portText — ${packet.payloadHex}",
+                    text = packet.decodedPayload ?: packet.payloadHex,
                     style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
-                    maxLines = 3,
                 )
             }
         }

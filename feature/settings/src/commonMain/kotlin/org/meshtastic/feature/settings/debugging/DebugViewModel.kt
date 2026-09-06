@@ -33,15 +33,11 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.DateFormatter
-import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.ioDispatcher
 import org.meshtastic.core.common.util.nowInstant
 import org.meshtastic.core.database.entity.Packet
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.Node
-import org.meshtastic.core.model.getTracerouteResponse
-import org.meshtastic.core.model.util.decodeOrNull
-import org.meshtastic.core.model.util.toReadableString
 import org.meshtastic.core.repository.MeshLogPrefs
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
@@ -51,19 +47,9 @@ import org.meshtastic.core.resources.debug_clear_logs_confirm
 import org.meshtastic.core.ui.util.AlertManager
 import org.meshtastic.core.ui.viewmodel.safeLaunch
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
-import org.meshtastic.proto.AdminMessage
+import org.meshtastic.feature.settings.util.decodePayloadFromMeshLog
 import org.meshtastic.proto.MeshPacket
-import org.meshtastic.proto.NeighborInfo
-import org.meshtastic.proto.Paxcount
 import org.meshtastic.proto.PortNum
-import org.meshtastic.proto.Position
-import org.meshtastic.proto.RouteDiscovery
-import org.meshtastic.proto.Routing
-import org.meshtastic.proto.StoreAndForward
-import org.meshtastic.proto.StoreForwardPlusPlus
-import org.meshtastic.proto.Telemetry
-import org.meshtastic.proto.User
-import org.meshtastic.proto.Waypoint
 
 enum class FilterMode {
     AND,
@@ -327,7 +313,7 @@ class DebugViewModel(
                     messageType = it.message_type,
                     formattedReceivedDate = DateFormatter.formatDateTime(it.received_date),
                     logMessage = annotateMeshLogMessage(it, nodeList, myNodeNum),
-                    decodedPayload = decodePayloadFromMeshLog(it),
+                    decodedPayload = decodePayloadFromMeshLog(it, nodeRepository),
                 )
             }
             .toImmutableList()
@@ -463,110 +449,4 @@ class DebugViewModel(
         _selectedLogId.value = id
     }
 
-    /**
-     * Attempts to fully decode the payload of a MeshLog's MeshPacket using the appropriate protobuf definition, based
-     * on the portnum of the packet.
-     *
-     * For known portnums, the payload is parsed into its corresponding proto message and returned as a string. For text
-     * and alert messages, the payload is interpreted as UTF-8 text. For unknown portnums, the payload is shown as a hex
-     * string.
-     *
-     * @param log The MeshLog containing the packet and payload to decode.
-     * @return A human-readable string representation of the decoded payload, or an error message if decoding fails, or
-     *   null if the log does not contain a decodable packet.
-     */
-    @Suppress("CyclomaticComplexMethod", "NestedBlockDepth")
-    private fun decodePayloadFromMeshLog(log: MeshLog): String? {
-        val packet = log.meshPacket
-        val decoded = packet?.decoded ?: return null
-
-        val portnumValue = decoded.portnum.value
-        val payload = decoded.payload.toByteArray()
-        return try {
-            when (portnumValue) {
-                PortNum.TEXT_MESSAGE_APP.value,
-                PortNum.ALERT_APP.value,
-                -> payload.decodeToString()
-
-                PortNum.POSITION_APP.value ->
-                    Position.ADAPTER.decodeOrNull(payload)?.let { Position.ADAPTER.toReadableString(it) }
-                        ?: "Failed to decode Position"
-
-                PortNum.WAYPOINT_APP.value ->
-                    Waypoint.ADAPTER.decodeOrNull(payload)?.let { Waypoint.ADAPTER.toReadableString(it) }
-                        ?: "Failed to decode Waypoint"
-
-                PortNum.NODEINFO_APP.value ->
-                    User.ADAPTER.decodeOrNull(payload)?.let { User.ADAPTER.toReadableString(it) }
-                        ?: "Failed to decode User"
-
-                PortNum.TELEMETRY_APP.value ->
-                    Telemetry.ADAPTER.decodeOrNull(payload)?.let { Telemetry.ADAPTER.toReadableString(it) }
-                        ?: "Failed to decode Telemetry"
-
-                PortNum.ROUTING_APP.value ->
-                    Routing.ADAPTER.decodeOrNull(payload)?.let { Routing.ADAPTER.toReadableString(it) }
-                        ?: "Failed to decode Routing"
-
-                PortNum.ADMIN_APP.value ->
-                    AdminMessage.ADAPTER.decodeOrNull(payload)?.let { AdminMessage.ADAPTER.toReadableString(it) }
-                        ?: "Failed to decode AdminMessage"
-
-                PortNum.PAXCOUNTER_APP.value ->
-                    Paxcount.ADAPTER.decodeOrNull(payload)?.let { Paxcount.ADAPTER.toReadableString(it) }
-                        ?: "Failed to decode Paxcount"
-
-                PortNum.STORE_FORWARD_APP.value ->
-                    StoreAndForward.ADAPTER.decodeOrNull(payload)?.let { StoreAndForward.ADAPTER.toReadableString(it) }
-                        ?: "Failed to decode StoreAndForward"
-
-                PortNum.STORE_FORWARD_PLUSPLUS_APP.value ->
-                    StoreForwardPlusPlus.ADAPTER.decodeOrNull(payload)?.let {
-                        StoreForwardPlusPlus.ADAPTER.toReadableString(it)
-                    } ?: "Failed to decode StoreForwardPlusPlus"
-
-                PortNum.NEIGHBORINFO_APP.value -> decodeNeighborInfo(payload)
-
-                PortNum.TRACEROUTE_APP.value -> decodeTraceroute(packet, payload)
-
-                else -> payload.joinToString(" ") { it.toHex() }
-            }
-        } catch (e: Exception) {
-            "Failed to decode payload: ${e.message}"
-        }
-    }
-
-    private fun Byte.toHex(): String = this.toUByte().toString(16).padStart(2, '0')
-
-    private fun formatNodeWithShortName(nodeNum: Int): String {
-        val user = nodeRepository.nodeDBbyNum.value[nodeNum]?.user
-        val shortName = user?.short_name?.takeIf { it.isNotEmpty() } ?: ""
-        val nodeId = nodeNum.toHex(8)
-        return if (shortName.isNotEmpty()) "$nodeId ($shortName)" else nodeId
-    }
-
-    private fun decodeNeighborInfo(payload: ByteArray): String {
-        val info = NeighborInfo.ADAPTER.decode(payload)
-        return buildString {
-            appendLine("NeighborInfo:")
-            appendLine("  node_id: ${formatNodeWithShortName(info.node_id)}")
-            appendLine("  last_sent_by_id: ${formatNodeWithShortName(info.last_sent_by_id)}")
-            appendLine("  node_broadcast_interval_secs: ${info.node_broadcast_interval_secs}")
-            if (info.neighbors.isNotEmpty()) {
-                appendLine("  neighbors:")
-                info.neighbors.forEach {
-                    appendLine(
-                        "    - node_id: ${formatNodeWithShortName(it.node_id)} snr: ${MetricFormatter.snr(it.snr)}",
-                    )
-                }
-            }
-        }
-    }
-
-    private fun decodeTraceroute(packet: MeshPacket, payload: ByteArray): String {
-        val getUsername: (Int) -> String = { nodeNum -> formatNodeWithShortName(nodeNum) }
-        return packet.getTracerouteResponse(getUsername)
-            ?: runCatching { RouteDiscovery.ADAPTER.decode(payload).toString() }.getOrNull()
-            ?: payload.joinToString(" ") { it.toHex() }
-    }
 }

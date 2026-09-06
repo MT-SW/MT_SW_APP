@@ -59,6 +59,8 @@ import org.meshtastic.core.resources.app_version
 import org.meshtastic.core.resources.apps
 import org.meshtastic.core.resources.copyright_notice
 import org.meshtastic.core.resources.documentation
+import org.meshtastic.core.resources.feature_credits_description
+import org.meshtastic.core.resources.feature_credits_title
 import org.meshtastic.core.resources.github_repository
 import org.meshtastic.core.resources.need_hardware
 import org.meshtastic.core.resources.need_hardware_description
@@ -148,6 +150,7 @@ fun AboutScreen(
                 onOpenWebsite = { uriHandler.openUri(WEBSITE_URL) },
                 onOpenDocs = { uriHandler.openUri(DOCS_URL) },
             )
+            FeatureCreditsSection()
             CopyrightFooter()
         }
     }
@@ -214,6 +217,18 @@ private fun ProjectInformationSection(
             leadingIcon = MeshtasticIcons.HelpOutline,
             trailingIcon = MeshtasticIcons.ChevronRight,
             onClick = onOpenDocs,
+        )
+    }
+}
+
+@Composable
+private fun FeatureCreditsSection(modifier: Modifier = Modifier) {
+    ExpressiveSection(title = stringResource(Res.string.feature_credits_title), modifier = modifier) {
+        Text(
+            text = stringResource(Res.string.feature_credits_description),
+            modifier = Modifier.padding(16.dp),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

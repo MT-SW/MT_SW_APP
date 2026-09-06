@@ -1293,6 +1293,8 @@
     <string name="mute_status_muted_for_hours">Muted for %1$s hours</string>
     <string name="mute_status_unmuted">Not muted</string>
     <string name="unofficial_fork_disclaimer">Unofficial fork of Meshtastic-Android. Not affiliated with or endorsed by Meshtastic LLC.</string>
+    <string name="feature_credits_title">Feature credits</string>
+    <string name="feature_credits_description">Sniffer mode and On-Demand diagnostics were adapted from a historical Meshtastic firmware fork (musznik/firmware, trunk-io/update-trunk branch).</string>
     <string name="nag_timeout_seconds">Nag timeout (seconds)</string>
     <string name="name">Name</string>
     <string name="name_cannot_be_empty">Name cannot be empty.</string>

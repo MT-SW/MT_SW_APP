@@ -25,6 +25,7 @@ import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
+import org.meshtastic.feature.settings.util.decodePayloadFromMeshLog
 
 /** One packet the locally connected node overheard but which was not addressed to it. */
 data class SniffedPacket(
@@ -38,6 +39,7 @@ data class SniffedPacket(
     val portNum: Int?,
     val isEncrypted: Boolean,
     val payloadHex: String,
+    val decodedPayload: String?,
     val receivedAtMillis: Long,
 )
 
@@ -77,6 +79,7 @@ class SnifferLogViewModel(private val meshLogRepository: MeshLogRepository, priv
             portNum = packet.decoded?.portnum?.value,
             isEncrypted = decodedPayload == null,
             payloadHex = (decodedPayload ?: packet.encrypted)?.hex().orEmpty(),
+            decodedPayload = if (decodedPayload != null) decodePayloadFromMeshLog(log, nodeRepository) else null,
             receivedAtMillis = log.received_date,
         )
     }

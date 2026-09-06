@@ -60,15 +60,18 @@ Osobny ekran dostępny z ekranu szczegółów węzła (Administracja → "Diagno
 - **10 typów zapytań**: statystyki węzła (bateria, czas pracy, CPU/heap/flash/PSRAM, liczniki floodu i nexthop, blokady limitem hopów), ping (RSSI/SNR), lista węzłów online, historia błędów routingu, liczniki użycia portów, aktywność eteru, log ostatnich wymian pakietów, historia średniego czasu odbioru, historia liczby odebranych pakietów oraz wersja firmware MT_SW.
 - Odpowiedzi przychodzą na dedykowanym porcie protokołu (354) i są dekodowane na żywo z istniejącego logu zdarzeń mesh — ten sam wzorzec danych co ekran "Zdrowie sieci", nic nie jest dodatkowo zapisywane.
 - **Wymaga customowego firmware z modułem OnDemand** — protokół zdefiniowany we własnym forku protobufs ([MT_SW_PROTOBUFS](https://github.com/MT-SW/MT_SW_PROTOBUFS)); na starszym lub oficjalnym firmware przyciski wysyłają zapytanie, ale węzeł na nie nie odpowiada.
+- **Pochodzenie funkcji** — zaadaptowana z historycznego forka firmware Meshtastic (`musznik/firmware`, gałąź `trunk-io/update-trunk`).
 
 ## Sniffer
 
 Tryb pokazujący ruch w eterze, który normalnie by zniknął — pakiety usłyszane przez węzeł podczas floodingu mesh, ale nieadresowane do niego, są teraz przekazywane surowo do telefonu zamiast po prostu odrzucane.
 
 - **Przełącznik w Ustawienia → Advanced** ("Tryb sniffera"), tuż pod Panelem Debugowania.
-- **Ekran "Sniffer Log"** — link pod przełącznikiem, pokazuje na żywo nadawcę/odbiorcę, kanał, liczbę przeskoków, RSSI/SNR oraz dane pakietu (zdekodowane, jeśli appka zna klucz kanału; w przeciwnym razie surowy hex zaszyfrowanej treści).
+- **Ekran "Sniffer Log"** — link pod przełącznikiem, pokazuje na żywo nadawcę/odbiorcę, kanał, liczbę przeskoków, RSSI/SNR i port pakietu. Zawartość pakietu dekoduje się dopiero po kliknięciu w niego — tym samym mechanizmem co Panel Debugowania (trasa traceroute z nazwami węzłów, pozycja, telemetria, NodeInfo itd., a dla nieznanych/zaszyfrowanych danych surowy hex jako fallback) — zamiast pokazywać się automatycznie dla każdego pakietu na liście.
+- **Podsłuchane odpowiedzi traceroute adresowane do innych węzłów nie są już mylnie pokazywane jako wynik własnego zapytania o trasę** — appka rozróżnia teraz, czy pakiet traceroute faktycznie był skierowany do lokalnie podłączonego węzła.
 - **Działa wyłącznie lokalnie** — pokazuje tylko to, co fizycznie usłyszy radiem węzeł aktualnie podłączony do telefonu; włączenie na zdalnym węźle nic nie da z perspektywy tego telefonu, bo podsłuchane pakiety trafiają do urządzenia podłączonego do TAMTEGO węzła.
 - **Wymaga customowego firmware z modułem sniffera** (własny fork protobufs, [MT_SW_PROTOBUFS](https://github.com/MT-SW/MT_SW_PROTOBUFS)) — na starszym lub oficjalnym firmware przełącznik nic nie zmienia.
+- **Pochodzenie funkcji** — zaadaptowana z historycznego forka firmware Meshtastic (`musznik/firmware`, gałąź `trunk-io/update-trunk`).
 
 ## Komunikator
 
@@ -170,15 +173,18 @@ A dedicated screen reachable from the node detail screen (Administration → "On
 - **10 query types**: node stats (battery, uptime, CPU/heap/flash/PSRAM, flood and nexthop counters, hop-limit blocks), ping (RSSI/SNR), nodes online, routing error history, port usage counters, air activity, recent packet exchange log, average RX time history, RX packet count history, and the MT_SW firmware version.
 - Responses arrive on a dedicated protocol port (354) and are decoded live from the existing mesh event log — the same data pattern as the "Network Health" screen, nothing is persisted separately.
 - **Requires custom firmware with the OnDemand module** — the protocol is defined in a dedicated protobufs fork ([MT_SW_PROTOBUFS](https://github.com/MT-SW/MT_SW_PROTOBUFS)); on older or stock firmware the buttons send the request, but the node never responds.
+- **Feature origin** — adapted from a historical Meshtastic firmware fork (`musznik/firmware`, `trunk-io/update-trunk` branch).
 
 ## Sniffer
 
 A mode that surfaces air traffic that would normally just vanish — packets the node overhears during normal mesh flooding but that aren't addressed to it are now forwarded raw to the phone instead of being dropped.
 
 - **Toggle in Settings → Advanced** ("Sniffer mode"), right below the Debug Panel entry.
-- **"Sniffer Log" screen** — a link below the toggle, showing sender/receiver, channel, hop count, RSSI/SNR, and the packet payload live (decoded when the app has the channel key, otherwise shown as raw encrypted hex).
+- **"Sniffer Log" screen** — a link below the toggle, showing sender/receiver, channel, hop count, RSSI/SNR, and the packet's port live. The packet's content only decodes once you tap on it — using the same decoder as the Debug Panel (traceroute path with node names, position, telemetry, NodeInfo, etc., falling back to raw hex for unknown or still-encrypted data) — instead of showing up automatically for every packet in the list.
+- **Sniffed traceroute responses addressed to other nodes no longer show up as if they were the result of your own traceroute request** — the app now checks whether a traceroute packet was actually addressed to the locally connected node.
 - **Local only** — surfaces only what the node currently connected to the phone physically hears over the radio; enabling it on a remote node does nothing useful from this phone's perspective, since the sniffed traffic goes to whichever device is connected to THAT node.
 - **Requires custom firmware with the sniffer module** (dedicated protobufs fork, [MT_SW_PROTOBUFS](https://github.com/MT-SW/MT_SW_PROTOBUFS)) — on older or stock firmware the toggle has no effect.
+- **Feature origin** — adapted from a historical Meshtastic firmware fork (`musznik/firmware`, `trunk-io/update-trunk` branch).
 
 ## Messaging
 

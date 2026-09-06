@@ -54,6 +54,11 @@ class TracerouteHandlerImpl(
         logInsertJob: Job?,
         session: RadioSessionContext,
     ) {
+        // Sniffer mode can deliver traceroute responses addressed to other nodes; only ones addressed
+        // to us are a genuine response to our own request, so ignore anything sniffed from others.
+        val myNodeNum = nodeRepository.myNodeInfo.value?.myNodeNum
+        if (myNodeNum == null || packet.to != myNodeNum) return
+
         // Decode the route discovery once — avoids triple protobuf decode.
         val routeDiscovery = packet.fullRouteDiscovery ?: return
         val forwardRoute = routeDiscovery.route

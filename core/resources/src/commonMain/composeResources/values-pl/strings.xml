@@ -1327,6 +1327,8 @@
     <string name="mute_status_muted_for_hours">Wyciszono na %1$s godzin</string>
     <string name="mute_status_unmuted">Nie wyciszony</string>
     <string name="unofficial_fork_disclaimer">Nieoficjalny fork Meshtastic-Android. Niezwiązany z Meshtastic LLC ani przez nią niewspierany.</string>
+    <string name="feature_credits_title">Źródła funkcji</string>
+    <string name="feature_credits_description">Tryb Sniffer i diagnostyka On-Demand zostały zaadaptowane z historycznego forka firmware Meshtastic (musznik/firmware, gałąź trunk-io/update-trunk).</string>
     <string name="nag_timeout_seconds">Czas przypomnienia (sekundy)</string>
     <string name="name">Nazwa</string>
     <string name="name_cannot_be_empty">Nazwa nie może być pusta.</string>
