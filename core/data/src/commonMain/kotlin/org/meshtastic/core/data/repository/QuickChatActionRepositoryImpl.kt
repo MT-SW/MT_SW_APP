@@ -17,6 +17,7 @@
 package org.meshtastic.core.data.repository
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.sync.Mutex
@@ -27,13 +28,11 @@ import org.meshtastic.core.database.DatabaseProvider
 import org.meshtastic.core.database.entity.QuickChatAction
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.repository.QuickChatActionRepository
-import org.meshtastic.core.repository.UiPrefs
 
 @Single
 class QuickChatActionRepositoryImpl(
     private val dbManager: DatabaseProvider,
     private val dispatchers: CoroutineDispatchers,
-    private val uiPrefs: UiPrefs,
 ) : QuickChatActionRepository {
 
     private val seedMutex = Mutex()
@@ -44,19 +43,22 @@ class QuickChatActionRepositoryImpl(
             .flowOn(dispatchers.io)
 
     /**
-     * Populates the built-in default Quick Chat templates the first time this fork is used, so a fresh install
-     * doesn't start with an empty list. Gated by [UiPrefs.quickChatDefaultsSeeded] so it only ever runs once —
-     * if the user later deletes some or all of them, they stay deleted.
+     * Populates the built-in default Quick Chat templates whenever the currently active device database has none —
+     * covers first use of this fork as well as every subsequent device/database this account connects to. Gated per
+     * database on emptiness rather than on a single global "already seeded" flag, since each device has its own Room
+     * database. If the user deletes all templates on a given device, they will be reseeded next time that database's
+     * table is read as empty — this trades "stays deleted forever" for actually working across multiple devices.
      */
     private suspend fun seedDefaultsIfNeeded() {
-        if (uiPrefs.quickChatDefaultsSeeded.value) return
         seedMutex.withLock {
-            if (uiPrefs.quickChatDefaultsSeeded.value) return@withLock
-            val seeded =
-                withContext(dispatchers.io) {
-                    dbManager.withDb { db -> DEFAULT_QUICK_CHAT_ACTIONS.forEach { db.quickChatActionDao().upsert(it) } }
-                }
-            if (seeded != null) uiPrefs.setQuickChatDefaultsSeeded(true)
+            val isEmpty =
+                withContext(dispatchers.io) { dbManager.withReadDb { db -> db.quickChatActionDao().getAll() } }
+                    .first()
+                    .isEmpty()
+            if (!isEmpty) return@withLock
+            withContext(dispatchers.io) {
+                dbManager.withDb { db -> DEFAULT_QUICK_CHAT_ACTIONS.forEach { db.quickChatActionDao().upsert(it) } }
+            }
         }
     }
 
