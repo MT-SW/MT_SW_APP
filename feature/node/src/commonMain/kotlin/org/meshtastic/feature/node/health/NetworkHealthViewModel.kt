@@ -282,7 +282,7 @@ internal fun org.meshtastic.core.model.MeshLog.toHistoryEntry(): org.meshtastic.
     val telemetry = runCatching { org.meshtastic.proto.Telemetry.ADAPTER.decode(payload) }.getOrNull() ?: return null
     val voltage = telemetry.power_metrics?.ch3_voltage ?: telemetry.environment_metrics?.voltage
     val current = telemetry.power_metrics?.ch3_current ?: telemetry.environment_metrics?.current
-    val localStatsExtended = telemetry.unknownFields.decodeLocalStatsExtended()
+    val localStatsExtended = telemetry.decodeLocalStatsExtended()
     val heapTotal = telemetry.local_stats?.heap_total_bytes ?: 0
     val heapFree = telemetry.local_stats?.heap_free_bytes ?: 0
     return org.meshtastic.core.model.NodeMetricsHistoryEntry(

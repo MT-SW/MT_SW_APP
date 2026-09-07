@@ -137,7 +137,7 @@ fun HostMetricsLogScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) 
 @Composable
 private fun HostMetricsCard(telemetryGroup: List<Telemetry>, isSelected: Boolean, onClick: () -> Unit) {
     val hostMetrics = telemetryGroup.firstNotNullOfOrNull { it.host_metrics }
-    val localStatsExtended = telemetryGroup.firstNotNullOfOrNull { it.unknownFields.decodeLocalStatsExtended() }
+    val localStatsExtended = telemetryGroup.firstNotNullOfOrNull { it.decodeLocalStatsExtended() }
     val localStats = telemetryGroup.firstNotNullOfOrNull { it.local_stats }
     val heapFreeBytes = localStats?.heap_free_bytes
     val heapTotalBytes = localStats?.heap_total_bytes

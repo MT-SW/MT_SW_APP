@@ -168,7 +168,7 @@ internal fun buildHostMetricsChartData(data: List<Telemetry>): HostMetricsChartD
         },
     cpuPercent =
         data.mapNotNull { telemetry ->
-            telemetry.unknownFields
+            telemetry
                 .decodeLocalStatsExtended()
                 ?.cpuUsagePercent
                 ?.let { HostMetricsChartPoint(time = telemetry.time, value = it.toDouble()) }
@@ -185,7 +185,7 @@ internal fun buildHostMetricsChartData(data: List<Telemetry>): HostMetricsChartD
         },
     flashUsedPercent =
         data.mapNotNull { telemetry ->
-            telemetry.unknownFields.decodeLocalStatsExtended()?.let { ext ->
+            telemetry.decodeLocalStatsExtended()?.let { ext ->
                 if (ext.flashTotalBytes > 0) {
                     HostMetricsChartPoint(
                         time = telemetry.time,
@@ -198,7 +198,7 @@ internal fun buildHostMetricsChartData(data: List<Telemetry>): HostMetricsChartD
         },
     psramFreePercent =
         data.mapNotNull { telemetry ->
-            telemetry.unknownFields.decodeLocalStatsExtended()?.let { ext ->
+            telemetry.decodeLocalStatsExtended()?.let { ext ->
                 if (ext.memoryPsramTotal > 0) {
                     HostMetricsChartPoint(
                         time = telemetry.time,

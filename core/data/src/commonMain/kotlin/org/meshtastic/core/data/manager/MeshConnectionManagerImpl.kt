@@ -789,7 +789,7 @@ class MeshConnectionManagerImpl(
 
     override fun updateTelemetry(t: Telemetry) {
         t.local_stats?.let { nodeRepository.updateLocalStats(it) }
-        t.unknownFields.decodeLocalStatsExtended()?.let { nodeRepository.updateLocalStatsExtended(it) }
+        t.decodeLocalStatsExtended()?.let { nodeRepository.updateLocalStatsExtended(it) }
         updateStatusNotification(t)
     }
 

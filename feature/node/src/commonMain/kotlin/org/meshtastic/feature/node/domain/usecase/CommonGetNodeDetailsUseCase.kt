@@ -234,7 +234,7 @@ constructor(
                         logs.telemetry.filter {
                             it.host_metrics != null ||
                                     it.local_stats != null ||
-                                    it.unknownFields.decodeLocalStatsExtended() != null
+                                    it.decodeLocalStatsExtended() != null
                         },
                     signalMetrics = logs.packets.filter { it.isDirectSignal() },
                     positionLogs = logs.posPackets.mapNotNull { it.toPosition() },
