@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
@@ -88,8 +89,16 @@ fun RadioConfigItemList(
     onExport: () -> Unit = {},
     onNavigate: (Route) -> Unit,
     onSetSnifferEnabled: (Boolean) -> Unit = {},
+    onClearResponse: () -> Unit = {},
 ) {
-    val enabled = state.connected && !state.responseState.isWaiting() && !isManaged
+    val enabled = state.connected && !isManaged
+    val snifferLoading = state.responseState.isWaiting()
+
+    LaunchedEffect(state.responseState) {
+        if (state.responseState is ResponseState.Success || state.responseState is ResponseState.Error) {
+            onClearResponse()
+        }
+    }
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         ExpressiveSection(title = stringResource(Res.string.configuration)) {
@@ -110,6 +119,7 @@ fun RadioConfigItemList(
                 enabled = enabled,
                 onNavigate = onNavigate,
                 snifferEnabled = state.moduleConfig.nodemodadmin?.sniffer_enabled == true,
+                snifferLoading = snifferLoading,
                 onSetSnifferEnabled = onSetSnifferEnabled,
             )
         }
@@ -197,6 +207,7 @@ private fun AdvancedSection(
     enabled: Boolean,
     onNavigate: (Route) -> Unit,
     snifferEnabled: Boolean,
+    snifferLoading: Boolean,
     onSetSnifferEnabled: (Boolean) -> Unit,
 ) {
     ExpressiveSection(title = stringResource(Res.string.advanced_title)) {
@@ -244,7 +255,8 @@ private fun AdvancedSection(
 
         SwitchPreference(
             title = stringResource(Res.string.sniffer_enabled_title),
-            enabled = enabled,
+            enabled = enabled && !snifferLoading,
+            loading = snifferLoading,
             checked = snifferEnabled,
             onCheckedChange = onSetSnifferEnabled,
             summary = stringResource(Res.string.sniffer_enabled_summary),

@@ -1430,7 +1430,7 @@
     <string name="port_name_map_report">Raport dla mapy</string>
     <string name="port_desc_map_report">dane węzła dla mapy publicznej (MQTT)</string>
     <string name="port_name_on_demand">OnDemand</string>
-    <string name="port_desc_on_demand">diagnostyka na żądanie (ten protokół)</string>
+    <string name="port_desc_on_demand">diagnostyka na żądanie</string>
     <string name="port_name_unknown">Port</string>
     <string name="port_desc_unknown">inny typ pakietu</string>
     <string name="on_demand_hops">Liczba skoków</string>

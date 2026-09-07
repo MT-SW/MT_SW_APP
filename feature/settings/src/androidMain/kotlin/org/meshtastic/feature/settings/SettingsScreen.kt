@@ -230,6 +230,7 @@ fun SettingsScreen(
                 state = state,
                 isManaged = localConfig.security?.is_managed ?: false,
                 isOtaCapable = isOtaCapable,
+                onClearResponse = viewModel::clearPacketResponse,
                 onRouteClick = { route ->
                     val navRoute =
                         when (route) {

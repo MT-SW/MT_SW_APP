@@ -235,6 +235,7 @@ fun DesktopSettingsScreen(
                 state = state,
                 isManaged = localConfig.security?.is_managed ?: false,
                 isOtaCapable = isOtaCapable,
+                onClearResponse = radioConfigViewModel::clearPacketResponse,
                 onRouteClick = { route ->
                     val navRoute =
                         when (route) {

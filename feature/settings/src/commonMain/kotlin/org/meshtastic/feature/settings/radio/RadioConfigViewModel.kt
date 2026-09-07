@@ -1514,6 +1514,7 @@ internal fun Config.saveRebootBehavior(): RebootBehavior = when {
     else -> RebootBehavior.MAY_RESTART
 }
 
-/** Firmware `AdminModule::handleSetModuleConfig` reboots for every module section except status message. */
+/** Firmware `AdminModule::handleSetModuleConfig` reboots for every module section except status message and
+ * the Sniffer toggle (nodemodadmin) — both apply live with no reboot and don't disable Bluetooth either. */
 internal fun ModuleConfig.saveRebootBehavior(): RebootBehavior =
-    if (statusmessage != null) RebootBehavior.NEVER else RebootBehavior.ALWAYS
+    if (statusmessage != null || nodemodadmin != null) RebootBehavior.NEVER else RebootBehavior.ALWAYS
