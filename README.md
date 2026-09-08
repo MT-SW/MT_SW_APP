@@ -96,6 +96,10 @@ Tryb pokazujący ruch w eterze, który normalnie by zniknął — pakiety usłys
 - Rozpoznawanie niestandardowej edycji firmware używanej w sieci Świętokrzyskiej — appka pokazuje czytelną nazwę zamiast surowej wartości technicznej.
 - Wygenerowany plik tłumaczeń PL uzupełniający ok. 1000 wcześniej brakujących stringów (appka była przetłumaczona na polski w ok. 43%).
 
+## Łączność Bluetooth
+
+- **Naprawiona zawodność ponownego łączenia z już sparowanym urządzeniem** — na części telefonów (potwierdzone na Xiaomi/MIUI) appka potrafiła nie połączyć się ponownie z węzłem po tym, jak ten na chwilę zniknął z zasięgu lub się wyłączył, mimo że urządzenie pozostawało sparowane; jedynym działającym obejściem było ręczne odparowanie i sparowanie od nowa. Naprawione poprzez: odświeżanie cache usług GATT przy każdym połączeniu (a nie tylko reaktywnie, po wykryciu problemu), samodzielną negocjację MTU z automatycznym ponowieniem próby zamiast pojedynczej próby wystrzelonej natychmiast po odkryciu usług, oraz dodatkowe mechanizmy wykrywania i odzyskiwania połączenia działające również wtedy, gdy ręczne przerwanie i ponowienie łączenia zerowałoby licznik nieudanych prób.
+
 ## Status i zastrzeżenia
 
 - To osobisty, roboczy fork — część zmian jest zweryfikowana buildem i przetestowana na urządzeniu, część czeka na potwierdzenie w terenie.
@@ -208,6 +212,10 @@ A mode that surfaces air traffic that would normally just vanish — packets the
 - The desktop build renamed from "Meshtastic Desktop" to match the mobile app's name, with a Privacy section added to its settings (previously missing on desktop even though the underlying logic already existed).
 - Detection of the custom firmware edition used on the Świętokrzyskie network — the app shows a readable name instead of the raw technical value.
 - A generated PL translation file filling in roughly 1,000 previously untranslated strings (the app was only about 43% translated into Polish).
+
+## Bluetooth connectivity
+
+- **Fixed unreliable reconnection to an already-paired device** — on some phones (confirmed on Xiaomi/MIUI) the app could fail to reconnect to a node after it briefly went out of range or powered off, even though the device remained paired; the only working workaround was manually unpairing and re-pairing. Fixed by: refreshing the GATT service cache on every connect (not just reactively after a detected problem), negotiating MTU explicitly with an automatic retry instead of a single attempt fired immediately after service discovery, and additional detection/recovery mechanisms that keep working even when a manual stop-and-retry would otherwise reset the failure counter.
 
 ## Status and caveats
 
