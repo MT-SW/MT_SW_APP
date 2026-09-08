@@ -552,6 +552,7 @@
     <string name="dns">DNS</string>
     <!-- DOC -->
     <string name="doc_clear_search">Clear search</string>
+    <string name="doc_keywords_android_auto">android auto,car,head unit,driving,hands-free,messages</string>
     <string name="doc_keywords_app_functions">system ai,gemini,assistant,functions,automation,voice</string>
     <string name="doc_keywords_connections">bluetooth,usb,tcp,pairing,serial,wifi</string>
     <string name="doc_keywords_debug_logs">debug,logs,logcat,export,bug report,issue,troubleshooting,diagnostics</string>
@@ -699,6 +700,9 @@
     <string name="firmware_maintenance_cdc_unblock_failed">The erase file was copied but the device didn't start erasing. Nothing has been changed yet. Unplug the device, double-press its reset button, and try again.</string>
     <string name="firmware_maintenance_copy_failed">Couldn't copy the file to the device's drive. Make sure the drive is still connected and try again.</string>
     <string name="firmware_maintenance_data_unavailable">The erase image list isn't available right now. Check your connection and try again, or use the web flasher at flasher.meshtastic.org.</string>
+    <string name="firmware_maintenance_erase_action">Erase and reinstall</string>
+    <string name="firmware_maintenance_erase_confirm_button">Erase device</string>
+    <string name="firmware_maintenance_erase_confirm_text">This erases everything on %1$s, including channels, keys, and all settings, then reinstalls the firmware. This cannot be undone and there is no backup.\n\nYou'll be asked to select the device's drive twice: once for the erase file, then for the firmware.</string>
     <string name="firmware_maintenance_no_release">Select a firmware version first, so the device can be reinstalled after erasing.</string>
     <string name="firmware_maintenance_not_a_bootloader_volume">That drive isn't the device's update drive. Select the drive that appears when the device is in update mode (it contains a file named INFO_UF2.TXT).</string>
     <string name="firmware_maintenance_select_drive">Select the device's update drive</string>
@@ -944,6 +948,24 @@
     <string name="key_verification_final_title">Key Verification Complete</string>
     <string name="key_verification_request_title">Key Verification Request</string>
     <string name="key_verification_title">Key Verification</string>
+    <!-- LABEL -->
+    <string name="label_lite_fast">Lite Fast</string>
+    <string name="label_lite_slow">Lite Slow</string>
+    <string name="label_long_fast">Long Fast</string>
+    <string name="label_long_moderate">Long Moderate</string>
+    <string name="label_long_slow">Long Slow</string>
+    <string name="label_long_turbo">Long Turbo</string>
+    <string name="label_medium_fast">Medium Fast</string>
+    <string name="label_medium_slow">Medium Slow</string>
+    <string name="label_medium_turbo">Medium Turbo</string>
+    <string name="label_narrow_fast">Narrow Fast</string>
+    <string name="label_narrow_slow">Narrow Slow</string>
+    <string name="label_short_fast">Short Fast</string>
+    <string name="label_short_slow">Short Slow</string>
+    <string name="label_short_turbo">Short Turbo</string>
+    <string name="label_tiny_fast">Tiny Fast</string>
+    <string name="label_tiny_slow">Tiny Slow</string>
+    <string name="label_very_long_slow">Very Long Slow</string>
     <string name="last_heard_filter_label">Filter by Last Heard time: %1$s</string>
     <string name="last_position_update">Last position update</string>
     <string name="latest_alpha_firmware">Latest alpha</string>
@@ -1134,6 +1156,7 @@
     <string name="map_type_satellite">Satellite</string>
     <string name="map_type_terrain">Terrain</string>
     <string name="map_zoom_levels" translatable="false">(z%1$d–%2$d)</string>
+    <string name="network">Network</string>
     <string name="mark_as_read">Mark as read</string>
     <string name="mark_unread_selected">Mark unread</string>
     <string name="match_all">Match All | Any</string>
@@ -1158,19 +1181,24 @@
     <string name="mesh_beacon_notification_title">Mesh invitation</string>
     <string name="mesh_beacon_offer_add">Add channel</string>
     <string name="mesh_beacon_offer_channel">Channel: %1$s</string>
+    <string name="mesh_beacon_offer_channel_key">Offered channel key (base64)</string>
     <string name="mesh_beacon_offer_channel_name">Offered channel</string>
     <string name="mesh_beacon_offer_discover">Discover</string>
     <string name="mesh_beacon_offer_dismiss">Dismiss</string>
     <string name="mesh_beacon_offer_from_unknown">From an unknown node</string>
     <string name="mesh_beacon_offer_join">Join</string>
     <string name="mesh_beacon_offer_preset">Preset: %1$s</string>
+    <string name="mesh_beacon_offer_preset_setting">Offered preset</string>
     <string name="mesh_beacon_offer_region">Region: %1$s</string>
+    <string name="mesh_beacon_offer_region_setting">Offered region</string>
     <string name="mesh_beacon_offer_signal">Signal: %1$s / %2$s</string>
     <string name="mesh_beacon_offer_title">Mesh invitation</string>
     <string name="mesh_beacon_on_preset">Transmit preset</string>
+    <string name="mesh_beacon_on_region">Transmit region</string>
     <string name="mesh_beacon_preset_indicator">Advertised by a nearby beacon</string>
     <string name="mesh_beacon_preset_none">None</string>
     <string name="mesh_beacon_region_label">Region</string>
+    <string name="mesh_beacon_send_as_node">Transmit as node number (0 = this node)</string>
     <string name="mesh_beacon_region_required">Set your radio's region before setting up a beacon.</string>
     <string name="mesh_beacon_target">Target %1$d</string>
     <string name="mesh_beacon_target_add">Add target</string>
@@ -1483,6 +1511,7 @@
     <string name="node_sort_title">Sort by</string>
     <string name="node_sort_via_favorite">via Favorite</string>
     <string name="node_sort_via_mqtt">via MQTT</string>
+    <string name="node_status_summary">Status text</string>
     <string name="nodedb_reset">NodeDB reset</string>
     <string name="nodeinfo_broadcast_interval">Node Info Broadcast Interval</string>
     <!-- NODES -->
@@ -1956,6 +1985,7 @@
     <string name="ssid">SSID</string>
     <string name="state_broadcast_seconds">State broadcast (seconds)</string>
     <string name="status_message">Status Message</string>
+    <string name="status_message_config">Status Message Config</string>
     <string name="status_message_summary">A public status message that is broadcast to the mesh on change and every 12 hours.</string>
     <string name="stay_connected_anywhere">Stay Connected Anywhere</string>
     <string name="stop_connecting">Stop Connecting</string>
@@ -2015,6 +2045,7 @@
     <string name="tak_server_test_result_bytes">%1$dB ✓</string>
     <string name="tak_server_test_result_expected_drop">Not in v1 schema (expected)</string>
     <string name="tak_server_test_result_unknown_error">✗</string>
+    <string name="tak_server_test_results">%1$d passed, %2$d failed of %3$d/%4$d</string>
     <string name="tak_server_test_results_v2">%1$d passed, %2$d expected drop, %3$d failed of %4$d/%5$d</string>
     <string name="tak_server_test_run">Run</string>
     <string name="tak_server_test_running">Running: %1$s</string>
@@ -2083,6 +2114,7 @@
     <string name="traffic_management_nodeinfo_direct_response_max_hops">Max Hops for Direct Response</string>
     <string name="traffic_management_position_dedup">Position Deduplication</string>
     <string name="traffic_management_position_min_interval">Min Position Interval (secs)</string>
+    <string name="traffic_management_position_precision">Position Precision (bits)</string>
     <string name="traffic_management_rate_limit_enabled">Rate Limiting</string>
     <string name="traffic_management_rate_limit_max_packets">Max Packets in Window</string>
     <string name="traffic_management_rate_limit_window">Rate Limit Window (secs)</string>
