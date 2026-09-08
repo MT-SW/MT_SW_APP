@@ -215,6 +215,27 @@ fun EntryProviderScope<NavKey>.nodeDetailGraph(backStack: NavBackStack<NavKey>) 
 
 fun NavKey.isNodeDetailRoute(): Boolean = NodeDetailScreen.entries.any { this::class == it.routeClass }
 
+/**
+ * Returns the equivalent extra-pane (third desktop column) route for a different node, preserving the screen
+ * *type* — e.g. Device Metrics stays Device Metrics — so switching nodes on the list updates that column instead of
+ * leaving it on the previous node. Routes whose state is tied to a specific request/session for the old node
+ * (a traceroute map result, a live on-demand session) have no sensible equivalent for a different node; this
+ * returns null for those, and the third pane simply closes.
+ */
+fun NavKey.withDestNum(destNum: Int): NavKey? = when (this) {
+    is NodeDetailRoute.DeviceMetrics -> NodeDetailRoute.DeviceMetrics(destNum)
+    is NodeDetailRoute.PositionLog -> NodeDetailRoute.PositionLog(destNum)
+    is NodeDetailRoute.EnvironmentMetrics -> NodeDetailRoute.EnvironmentMetrics(destNum)
+    is NodeDetailRoute.SignalMetrics -> NodeDetailRoute.SignalMetrics(destNum)
+    is NodeDetailRoute.PowerMetrics -> NodeDetailRoute.PowerMetrics(destNum)
+    is NodeDetailRoute.TracerouteLog -> NodeDetailRoute.TracerouteLog(destNum)
+    is NodeDetailRoute.HostMetricsLog -> NodeDetailRoute.HostMetricsLog(destNum)
+    is NodeDetailRoute.PaxMetrics -> NodeDetailRoute.PaxMetrics(destNum)
+    is NodeDetailRoute.AirQualityMetrics -> NodeDetailRoute.AirQualityMetrics(destNum)
+    is NodeDetailRoute.NeighborInfoLog -> NodeDetailRoute.NeighborInfoLog(destNum)
+    else -> null
+}
+
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 private inline fun <reified R : Route> EntryProviderScope<NavKey>.addNodeDetailScreenComposable(
     backStack: NavBackStack<NavKey>,

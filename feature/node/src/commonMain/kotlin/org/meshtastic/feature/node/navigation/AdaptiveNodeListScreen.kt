@@ -24,6 +24,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.meshtastic.core.navigation.ContactsRoute
 import org.meshtastic.core.navigation.NodesRoute
 import org.meshtastic.core.navigation.SettingsRoute
+import org.meshtastic.feature.node.navigation.withDestNum
 import org.meshtastic.core.ui.component.ScrollToTopEvent
 import org.meshtastic.feature.node.list.NodeListScreen
 import org.meshtastic.feature.node.list.NodeListViewModel
@@ -39,7 +40,19 @@ fun AdaptiveNodeListScreen(
 
     NodeListScreen(
         viewModel = nodeListViewModel,
-        navigateToNodeDetails = { nodeId -> backStack.add(NodesRoute.NodeDetail(nodeId)) },
+        navigateToNodeDetails = { nodeId ->
+            // Zapamiętaj, jaki typ ekranu był otwarty w trzeciej kolumnie (np. metryki urządzenia),
+            // zanim wyczyścimy "ogon" backstacku wskazujący na poprzedni węzeł — dzięki temu po
+            // przełączeniu węzła trzecia kolumna pokaże ten sam typ ekranu dla nowego węzła zamiast
+            // się zamykać albo zostawać przy starym.
+            val currentExtra = backStack.lastOrNull()?.takeIf { it !is NodesRoute.NodeDetail && it != NodesRoute.Nodes }
+
+            while (backStack.lastOrNull() != NodesRoute.Nodes && backStack.size > 1) {
+                backStack.removeLastOrNull()
+            }
+            backStack.add(NodesRoute.NodeDetail(nodeId))
+            currentExtra?.withDestNum(nodeId)?.let { backStack.add(it) }
+        },
         navigateToMessages = { key -> backStack.add(ContactsRoute.Messages(key)) },
         scrollToTopEvents = scrollToTopEvents,
         activeNodeId = null,
