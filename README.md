@@ -20,6 +20,7 @@ Stan roboczy — repo służy głównie do własnego użytku i testów z niewiel
 - **Nowa sekcja "Role" w oknie pomocy listy węzłów** — pełny opis wszystkich ról urządzenia (ikona, nazwa, znaczenie) dostępny bezpośrednio z listy węzłów.
 - Poprawiony wygląd czasu działania (uptime) na liście węzłów — dodana ikonka odróżniająca go wizualnie od czasu ostatniego kontaktu.
 - **Automatyczne czyszczenie bazy węzłów** — na ekranie "Wyczyść bazę węzłów" można włączyć automatyczne usuwanie nieaktywnych węzłów: suwak progu nieaktywności (1–90 dni) i suwak częstotliwości sprawdzania (1–30 dni). Działa zarówno na Androidzie (WorkManager), jak i na desktopie (własna pętla sprawdzająca co godzinę, z zapamiętanym czasem ostatniego uruchomienia, żeby przetrwać restart appki); domyślnie wyłączone, węzły ulubione i ignorowane nigdy nie są usuwane automatycznie.
+- **Naprawione gubienie/przestawianie znaków w polu wyszukiwania listy węzłów** — gdy lista była przewinięta niżej, wpisywanie tekstu w trakcie przeliczania przewijania mogło przestawiać kolejność wpisywanych znaków; pole ma teraz własny, natychmiastowy stan wpisywania niezależny od odświeżania listy.
 
 ## Mapa
 
@@ -42,6 +43,7 @@ Co to oznacza w praktyce:
 
 - **Naprawiony import/eksport konfiguracji urządzenia** — wcześniej przycisk działał, ale nie tworzył żadnego pliku (błąd w parsowaniu ścieżki na Windowsie, cichy błąd bez informacji dla użytkownika).
 - Przywrócony brakujący przełącznik **automatyczne ładowanie obrazków w czacie** (zgubiony przy jednym z merge'y z upstreamem).
+- **Trzecia kolumna widoku węzła (metryki/traceroute) na desktopie teraz podąża za wybranym węzłem** — wcześniej po kliknięciu innego węzła na liście trzecia kolumna (np. otwarte metryki urządzenia) zostawała przy poprzednio wybranym węźle; teraz przełącza się na ten sam typ ekranu dla nowo wybranego węzła.
 
 ## Ekran "Zdrowie sieci"
 
@@ -137,6 +139,7 @@ Work in progress — this repo is mainly for personal use and testing with a sma
 - **New "Roles" section in the node list help sheet** — a full reference of every device role (icon, name, meaning) available directly from the node list.
 - Cleaned up the uptime display in the node list — added an icon to visually separate it from the last-heard time.
 - **Automatic node-database cleanup** — the "Clean Node Database" screen now has a toggle for automatically removing inactive nodes, with sliders for the inactivity threshold (1–90 days) and how often the check runs (1–30 days). Works on both Android (WorkManager) and desktop (a lightweight hourly check loop with the last run persisted so timing survives app restarts); off by default, and favorited/ignored nodes are never auto-deleted.
+- **Fixed the node list search field losing/reordering characters while typing** — when the list was scrolled down, typing in the search field while the list recalculated its scroll position could scramble the order of the characters you typed; the field now keeps its own immediate local typing state, independent of the list's scroll recalculation.
 
 ## Map
 
@@ -159,6 +162,7 @@ What this means in practice:
 
 - **Fixed device configuration import/export** — the button worked but silently failed to create any file (a URI-parsing bug on Windows, with no error shown to the user).
 - Restored the missing **auto-load chat images** toggle (lost during an upstream merge).
+- **The node detail third column (metrics/traceroute) on desktop now follows the selected node** — previously, clicking a different node in the list left the third column (e.g. an open Device Metrics view) showing the previously selected node; it now switches to the same screen type for the newly selected node.
 
 ## "Network Health" screen
 
