@@ -60,17 +60,6 @@ internal actual fun PeripheralBuilder.platformConfig(device: BleDevice, autoConn
     // with no upside. If a future hardware revision exposes 2M PHY, override `phy = Phy.Le2M`
     // here after confirming the firmware advertises it.
 
-    onServicesDiscovered {
-        try {
-            // Android defaults to 23 bytes MTU. Meshtastic packets can be 512 bytes.
-            // Requesting the max MTU is critical for preventing dropped packets and stalls.
-            @Suppress("MagicNumber")
-            val negotiatedMtu = requestMtu(512)
-            Logger.i { "[${device.address.anonymize()}] Negotiated MTU: $negotiatedMtu" }
-        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-            Logger.w(e) { "[${device.address.anonymize()}] Failed to request MTU" }
-        }
-    }
 }
 
 internal actual fun createPeripheral(address: String, builderAction: PeripheralBuilder.() -> Unit): Peripheral =
@@ -82,6 +71,11 @@ private const val ATT_HEADER_SIZE = 3
 internal actual fun Peripheral.negotiatedMaxWriteLength(): Int? {
     val mtu = (this as? AndroidPeripheral)?.mtu?.value ?: return null
     return (mtu - ATT_HEADER_SIZE).takeIf { it > 0 }
+}
+
+internal actual suspend fun Peripheral.negotiateMtu(mtu: Int): Int? {
+    val androidPeripheral = this as? AndroidPeripheral ?: return null
+    return androidPeripheral.requestMtu(mtu)
 }
 
 internal actual fun Peripheral.requestHighConnectionPriority(): Boolean {

@@ -46,4 +46,7 @@ internal actual fun Peripheral.requestBalancedConnectionPriority(): Boolean = fa
 
 internal actual fun Peripheral.refreshGattCache(): Boolean = false
 
+// JVM/desktop Kable does not expose MTU negotiation control.
+internal actual suspend fun Peripheral.negotiateMtu(mtu: Int): Int? = null
+
 private const val DEFAULT_JVM_MTU = 512

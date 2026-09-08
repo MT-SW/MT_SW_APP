@@ -55,6 +55,7 @@ import org.meshtastic.core.ble.MeshtasticBleConstants.SERVICE_UUID
 import org.meshtastic.core.ble.MeshtasticRadioProfile
 import org.meshtastic.core.ble.classifyBleException
 import org.meshtastic.core.ble.retryBleOperation
+import org.meshtastic.core.ble.suggestsStaleGattHandle
 import org.meshtastic.core.ble.toMeshtasticRadioProfile
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.RadioNotConnectedException
@@ -68,6 +69,19 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 private val CONNECTION_TIMEOUT = 15.seconds
+
+/** ATT MTU requested on every connect. Android defaults to 23 bytes; Meshtastic packets can be 512. */
+private const val MTU_SIZE = 512
+
+/**
+ * Attempts for the initial MTU negotiation, including the first try. On some OEM stacks (observed on a
+ * Xiaomi/MIUI device) Android briefly re-verifies the encrypted link for an already-bonded device right around
+ * this point in the connect sequence — a short (~15-30 ms observed), OS-driven bond-state blip this app doesn't
+ * trigger. A request that lands mid-blip fails outright with no automatic retry; a second attempt after
+ * [MTU_RETRY_DELAY_MS] lands safely after it.
+ */
+private const val MTU_NEGOTIATION_ATTEMPTS = 2
+private const val MTU_RETRY_DELAY_MS = 300L
 
 /**
  * Delay after writing a heartbeat before re-polling FROMRADIO.
@@ -232,6 +246,11 @@ class BleRadioTransport(
     // recovering (issue #6685). This gate decides when a long failure streak has earned one cache refresh.
     private val gattCacheInvalidationGate = GattCacheInvalidationGate()
 
+    // Set when a single attempt fails with the GATT-133 stale-handle signature against a bonded device (see
+    // suggestsStaleGattHandle). Consumed on the very next attempt to request an immediate cache refresh, without
+    // waiting for gattCacheInvalidationGate's failure-count threshold.
+    private val gattErrorSignatureFlagged = atomic(false)
+
     // For the same reason, a bonded radio that stays away would otherwise keep paying the full bonded-fallback price
     // (a GATT open against Android's stale-GATT window plus up to CONNECTION_TIMEOUT) on every retry. This gate makes
     // most long-streak attempts cheap scan-only probes while periodically yielding to bonded autoConnect as a self-heal
@@ -265,15 +284,34 @@ class BleRadioTransport(
             connectionScope.launch {
                 reconnectPolicy.execute(
                     attempt = {
-                        try {
-                            attemptConnection()
-                        } catch (e: CancellationException) {
-                            throw e
-                        } catch (e: Exception) {
-                            val failureTime = (nowMillis - connectionStartTime).milliseconds
-                            Logger.w(e) { "[$address] Failed to connect after $failureTime" }
-                            BleReconnectPolicy.Outcome.Failed(e)
+                        val outcome =
+                            try {
+                                attemptConnection()
+                            } catch (e: CancellationException) {
+                                throw e
+                            } catch (e: Exception) {
+                                val failureTime = (nowMillis - connectionStartTime).milliseconds
+                                Logger.w(e) { "[$address] Failed to connect after $failureTime" }
+                                if (e.suggestsStaleGattHandle() && bluetoothRepository.isBonded(address)) {
+                                    Logger.i {
+                                        "[$address] GATT 133 against a bonded device — flagging an immediate " +
+                                                "cache refresh for the next attempt"
+                                    }
+                                    gattErrorSignatureFlagged.value = true
+                                }
+                                BleReconnectPolicy.Outcome.Failed(e)
+                            }
+                        // Mirror this outcome into the cross-transport-instance failure tracker so a manual
+                        // Stop Connecting -> reconnect cycle doesn't erase progress towards the
+                        // stale-cache-refresh threshold.
+                        if (outcome is BleReconnectPolicy.Outcome.Disconnected &&
+                            (outcome.wasStable || outcome.wasIntentional)
+                        ) {
+                            PersistentReconnectFailures.recordSuccess(address)
+                        } else {
+                            PersistentReconnectFailures.recordFailure(address)
                         }
+                        outcome
                     },
                     onTransientDisconnect = { error ->
                         // Guard: if handleFailure already emitted the disconnect callback for this
@@ -323,7 +361,7 @@ class BleRadioTransport(
         if (isBonded && consecutiveFailures >= scanOnlyProbeGate.failureThreshold && !shouldProbe) {
             Logger.d {
                 "[${address.anonymize()}] $consecutiveFailures consecutive failures; " +
-                    "trying periodic bonded fallback"
+                        "trying periodic bonded fallback"
             }
         }
 
@@ -357,26 +395,52 @@ class BleRadioTransport(
             throw RadioNotConnectedException("Failed to connect to device at address $address")
         }
 
-        // GATT cache invalidation has two triggers, both repaired the same way — refresh the platform's cached
+        // Unconditionally refresh the platform's cached GATT service table before negotiating MTU, on every
+        // connect — mirroring the pre-KMP app's long-proven behavior (it called BluetoothGatt.refresh() on every
+        // connect, before any other GATT operation) instead of only refreshing reactively after a suspected
+        // problem. Cheap: a single reflective call, no disconnect involved. Android-only/no-op elsewhere.
+        bleConnection.invalidateServiceCache()
+        try {
+            val negotiatedMtu =
+                retryBleOperation(count = MTU_NEGOTIATION_ATTEMPTS, delayMs = MTU_RETRY_DELAY_MS, tag = address) {
+                    bleConnection.negotiateMtu(MTU_SIZE)
+                }
+            Logger.i { "[${address.anonymize()}] Negotiated MTU: $negotiatedMtu" }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Logger.w(e) { "[$address] Failed to negotiate MTU after $MTU_NEGOTIATION_ATTEMPTS attempts" }
+        }
+
+        // GATT cache invalidation has three triggers, all repaired the same way — refresh the platform's cached
         // service table, then reconnect so discovery re-reads the device:
         //  1. Post-OTA: the device rebooted with potentially different BLE service table handles.
-        //  2. Stale cache after a long absence: a bonded radio that went out of range or powered off can come back
+        //  2. Same-attempt signature: the previous attempt failed with GATT status 133 against a bonded device (see
+        //     suggestsStaleGattHandle) — a strong enough signal on its own, no need to wait for a failure streak.
+        //  3. Stale cache after a long absence: a bonded radio that went out of range or powered off can come back
         //     with Android still serving the old cached service table, failing every attempt until the user unpairs
         //     at the OS level (issue #6685).
         // consumeGattCacheInvalidationRequest() is read into a val first: `||` short-circuiting must never skip
         // consuming the one-shot post-OTA flag.
         val postOtaRequested = (callback as? RadioInterfaceService)?.consumeGattCacheInvalidationRequest() == true
-        val staleCacheSuspected = gattCacheInvalidationGate.shouldInvalidateOnAttempt(consecutiveFailures)
-        if (postOtaRequested || staleCacheSuspected) {
+        val gattErrorSignatureRequested = gattErrorSignatureFlagged.compareAndSet(expect = true, update = false)
+        // Combine this transport instance's own streak with any failures persisted across a manual
+        // Stop Connecting -> reconnect cycle for this address (see PersistentReconnectFailures), so a
+        // user who stops and retries repeatedly still reaches the threshold instead of resetting it.
+        val persistedFailures = PersistentReconnectFailures.currentCount(address)
+        val staleCacheSuspected =
+            gattCacheInvalidationGate.shouldInvalidateOnAttempt(maxOf(consecutiveFailures, persistedFailures))
+        if (postOtaRequested || gattErrorSignatureRequested || staleCacheSuspected) {
             val triggers = buildList {
                 if (postOtaRequested) add("post-OTA reboot")
+                if (gattErrorSignatureRequested) add("GATT 133 against bonded device")
                 if (staleCacheSuspected) add("$consecutiveFailures consecutive reconnect failures")
             }
             val reason = triggers.joinToString(" + ")
             // Only the stale-cache trigger spends the streak's one refresh. A post-OTA refresh is scheduled by the
-            // firmware-update flow, not by any failure streak, so charging it to the streak would disable stale-cache
-            // recovery for a streak that had not even started — and the gate can only be re-armed by a stable or
-            // intentional disconnect, which by definition cannot happen while a streak is running.
+            // firmware-update flow, and a GATT-133 signature match is specific enough on its own, so neither should
+            // be charged to the streak's single allowance — doing so would disable stale-cache recovery for a
+            // streak that had not even started.
             refreshGattCacheAndReconnect(device, reason, consumeStreakAllowance = staleCacheSuspected)
         }
 
@@ -470,7 +534,7 @@ class BleRadioTransport(
         if (!wasStable && !wasIntentional) {
             Logger.w {
                 "[$address] Connection lasted only $connectionUptime " +
-                    "(< ${reconnectPolicy.minStableConnection}) — treating as unstable"
+                        "(< ${reconnectPolicy.minStableConnection}) — treating as unstable"
             }
         }
 
@@ -545,7 +609,7 @@ class BleRadioTransport(
                 val rssi = retryBleOperation(tag = address) { device.readRssi() }
                 Logger.d {
                     "[${address.anonymize()}] Connection confirmed. " +
-                        "Initial RSSI: ${rssi?.let { "$it dBm" } ?: "unknown"}"
+                            "Initial RSSI: ${rssi?.let { "$it dBm" } ?: "unknown"}"
                 }
             }
         } catch (e: CancellationException) {
@@ -800,7 +864,7 @@ class BleRadioTransport(
             if (activeSession.value === session) {
                 Logger.w(e) {
                     "[$address] Failed to write packet to toRadioCharacteristic after " +
-                        "${packetsSent.value} successful writes"
+                            "${packetsSent.value} successful writes"
                 }
                 handleFailure(e, session)
             } else {
@@ -935,8 +999,8 @@ class BleRadioTransport(
     private fun formatSessionStats(): String {
         val uptime = if (connectionStartTime > 0) nowMillis - connectionStartTime else 0
         return "Uptime: ${uptime}ms, " +
-            "Packets RX: ${packetsReceived.value} (${bytesReceived.value} bytes), " +
-            "Packets TX: ${packetsSent.value} (${bytesSent.value} bytes)"
+                "Packets RX: ${packetsReceived.value} (${bytesReceived.value} bytes), " +
+                "Packets TX: ${packetsSent.value} (${bytesSent.value} bytes)"
     }
 
     private fun Throwable.toDisconnectReason(): Pair<Boolean, String> {
@@ -950,7 +1014,7 @@ class BleRadioTransport(
 
                 is NoSuchElementException,
                 is IllegalArgumentException,
-                -> "Required characteristic missing"
+                    -> "Required characteristic missing"
 
                 else -> this.message ?: this::class.simpleName ?: "Unknown"
             }

@@ -305,6 +305,8 @@ class KableBleConnection(private val scope: CoroutineScope, private val loggingC
 
     override fun invalidateServiceCache(): Boolean = peripheral?.refreshGattCache() == true
 
+    override suspend fun negotiateMtu(mtu: Int): Int? = peripheral?.negotiateMtu(mtu)
+
     /** Ensures the previous peripheral's GATT resources are fully released. */
     private suspend fun cleanUpPeripheral(tag: String) {
         withContext(NonCancellable) { safeClosePeripheral(tag) }

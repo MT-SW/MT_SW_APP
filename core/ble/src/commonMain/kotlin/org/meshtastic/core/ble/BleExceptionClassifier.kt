@@ -110,3 +110,27 @@ private fun Throwable.isSessionFatalBleExceptionInternal(maxDepth: Int): Boolean
         else -> cause?.isSessionFatalBleExceptionInternal(maxDepth - 1) ?: false
     }
 }
+
+/**
+ * GATT status commonly observed when Android replays a stale cached service table against a bonded device that
+ * reconnected after being away — see [FATAL_GATT_STATUSES]'s status 133 comment above.
+ */
+private const val STALE_HANDLE_GATT_STATUS = 133
+
+/**
+ * Returns `true` if this throwable (or a cause up to depth 10) is a [GattStatusException] with
+ * [STALE_HANDLE_GATT_STATUS] — the status Android returns most often when serving a stale cached GATT table.
+ *
+ * Unlike [GattCacheInvalidationGate]'s failure-count heuristic, this is a same-attempt signature: a single
+ * occurrence against a bonded device is strong enough evidence to request a cache refresh immediately, instead of
+ * waiting several minutes for a failure streak to build up.
+ */
+fun Throwable.suggestsStaleGattHandle(): Boolean = suggestsStaleGattHandleInternal(maxDepth = 10)
+
+private fun Throwable.suggestsStaleGattHandleInternal(maxDepth: Int): Boolean {
+    if (maxDepth <= 0) return false
+    return when (this) {
+        is GattStatusException -> status == STALE_HANDLE_GATT_STATUS
+        else -> cause?.suggestsStaleGattHandleInternal(maxDepth - 1) ?: false
+    }
+}
