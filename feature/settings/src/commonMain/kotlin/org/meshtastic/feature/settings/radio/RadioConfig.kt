@@ -31,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
@@ -68,6 +69,7 @@ import org.meshtastic.core.resources.sniffer_enabled_summary
 import org.meshtastic.core.resources.sniffer_enabled_title
 import org.meshtastic.core.resources.sniffer_warning_accept
 import org.meshtastic.core.resources.sniffer_warning_cancel
+import org.meshtastic.core.resources.sniffer_warning_compatibility
 import org.meshtastic.core.resources.sniffer_warning_message
 import org.meshtastic.core.resources.sniffer_warning_title
 import org.meshtastic.core.resources.tak_server
@@ -320,7 +322,15 @@ private fun SnifferWarningDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(Res.string.sniffer_warning_title)) },
-        text = { Text(stringResource(Res.string.sniffer_warning_message)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(stringResource(Res.string.sniffer_warning_message))
+                Text(
+                    text = stringResource(Res.string.sniffer_warning_compatibility),
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        },
         confirmButton = { TextButton(onClick = onConfirm) { Text(stringResource(Res.string.sniffer_warning_accept)) } },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.sniffer_warning_cancel)) } },
     )

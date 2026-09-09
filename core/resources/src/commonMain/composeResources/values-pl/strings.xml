@@ -396,6 +396,7 @@
     <string name="sniffer_warning_message">Sniffer przekazuje do telefonu każdy pakiet odebrany przez radio, nie tylko te adresowane do tego urządzenia. Przy dużym ruchu w sieci może to spowodować opóźnienie lub utratę części wiadomości czatu bądź telemetrii, ponieważ współdzielą tę samą kolejkę transmisji do telefonu.</string>
     <string name="sniffer_warning_accept">Włącz</string>
     <string name="sniffer_warning_cancel">Anuluj</string>
+    <string name="sniffer_warning_compatibility">UWAGA: wymaga brandowanej aplikacji i firmware MT_SW. Inne kombinacje mogą zawiesić węzeł.</string>
     <string name="debug_store_logs_summary">Wyłącz, aby pominąć zapisywanie logów na dysku</string>
     <string name="debug_store_logs_title">Przechowuj logi sieci</string>
     <string name="debug_tab_app_logs">Dzienniki aplikacji</string>
