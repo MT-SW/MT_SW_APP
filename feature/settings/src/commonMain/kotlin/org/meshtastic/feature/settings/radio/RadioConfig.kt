@@ -105,6 +105,12 @@ fun RadioConfigItemList(
 ) {
     val enabled = state.connected && !isManaged
     val snifferLoading = state.responseState.isWaiting()
+    // nodemodadmin is cleared at the start of every fresh handshake (MeshConfigFlowManagerImpl.handleMyInfo)
+    // and only repopulated if the connected firmware actually streams that module config section during the
+    // Stage 1 sync. Its presence — not the firmware version — is therefore the reliable signal that THIS
+    // specific connected device (any firmware, not just this fork's) actually has the Sniffer module. Sending
+    // the toggle to firmware that never advertised it is what caused the desktop freeze.
+    val snifferSupported = state.moduleConfig.nodemodadmin != null
 
     LaunchedEffect(state.responseState) {
         if (state.responseState is ResponseState.Success || state.responseState is ResponseState.Error) {
@@ -132,6 +138,7 @@ fun RadioConfigItemList(
                 onNavigate = onNavigate,
                 snifferEnabled = state.moduleConfig.nodemodadmin?.sniffer_enabled == true,
                 snifferLoading = snifferLoading,
+                snifferSupported = snifferSupported,
                 onSetSnifferEnabled = onSetSnifferEnabled,
             )
         }
@@ -220,6 +227,7 @@ private fun AdvancedSection(
     onNavigate: (Route) -> Unit,
     snifferEnabled: Boolean,
     snifferLoading: Boolean,
+    snifferSupported: Boolean,
     onSetSnifferEnabled: (Boolean) -> Unit,
 ) {
     ExpressiveSection(title = stringResource(Res.string.advanced_title)) {
@@ -269,7 +277,7 @@ private fun AdvancedSection(
 
         SwitchPreference(
             title = stringResource(Res.string.sniffer_enabled_title),
-            enabled = enabled && !snifferLoading,
+            enabled = enabled && !snifferLoading && snifferSupported,
             loading = snifferLoading,
             checked = snifferEnabled,
             onCheckedChange = { checked ->
@@ -279,7 +287,12 @@ private fun AdvancedSection(
                     onSetSnifferEnabled(false)
                 }
             },
-            summary = stringResource(Res.string.sniffer_enabled_summary),
+            summary =
+                if (snifferSupported) {
+                    stringResource(Res.string.sniffer_enabled_summary)
+                } else {
+                    stringResource(Res.string.sniffer_not_supported_summary)
+                },
         )
 
         if (showSnifferWarning) {

@@ -1962,6 +1962,7 @@
     <string name="signal">Sygnał:</string>
     <string name="signal_quality">Jakość sygnału</string>
     <string name="sniffer_enabled_summary">Przekazuj do aplikacji lokalnie odsłuchane pakiety nieadresowane do tego węzła</string>
+    <string name="sniffer_not_supported_summary">Wymaga podłączonego urządzenia z modułem Sniffer — to konkretne urządzenie go nie zgłosiło</string>
     <string name="sniffer_enabled_title">Tryb sniffera</string>
     <string name="sniffer_log_empty">Brak podsłuchanych pakietów — pojawią się tutaj pakiety nieadresowane do tego węzła, gdy zostaną odebrane</string>
     <string name="sniffer_log_title">Log Sniffera</string>

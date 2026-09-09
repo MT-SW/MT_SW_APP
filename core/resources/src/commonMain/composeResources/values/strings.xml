@@ -1945,6 +1945,7 @@
     <string name="signal">Signal</string>
     <string name="signal_quality">Signal Quality</string>
     <string name="sniffer_enabled_summary">Forward locally-heard packets not addressed to this node to this app for inspection</string>
+    <string name="sniffer_not_supported_summary">Requires a connected device with the Sniffer module — this device hasn't reported one</string>
     <string name="sniffer_enabled_title">Sniffer mode</string>
     <string name="sniffer_log_empty">No sniffed packets yet — packets not addressed to this node will appear here once heard</string>
     <string name="sniffer_log_title">Sniffer Log</string>
