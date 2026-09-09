@@ -150,9 +150,12 @@ open class MeshLogRepositoryImpl(
                 .filter { log ->
                     val packet = log.fromRadio.packet ?: return@filter false
                     log.fromNum == MeshLog.NODE_NUM_LOCAL &&
-                        packet.to == targetNodeNum &&
-                        packet.decoded?.want_response == true
+                            packet.to == targetNodeNum &&
+                            packet.decoded?.want_response == true
                 }
+                // Sniffer mode's firmware hook can deliver a second echo of our own just-sent request packet
+                // (same packet.id, different MeshLog row) — collapse to one entry per request.
+                .distinctBy { it.fromRadio.packet?.id }
         }
         .distinctUntilChanged()
         .conflate()
