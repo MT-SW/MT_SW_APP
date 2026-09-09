@@ -38,6 +38,7 @@ Co to oznacza w praktyce:
 - **Mapa zawsze otwiera się dopasowana do wszystkich węzłów** — zamiast wracać do ostatnio zapamiętanej pozycji i przybliżenia.
 - **Ostrzejsze kafelki map rastrowych (np. OSM)** — naprawiony błąd powodujący rozmycie przez błędny domyślny rozmiar kafelka.
 - **Dostrojone klastrowanie węzłów na mapie** — małe grupki węzłów nie zlewają się już w jeden bąbel z liczbą; grupowanie zaczyna się dopiero przy realnie gęstym skupisku.
+- **Domyślna mapa bazowa zmieniona na OpenStreetMap** — zamiast wektorowego stylu MapLibre Liberty, appka startuje teraz z rastrowymi kafelkami OSM.
 
 ## Ustawienia desktopowe
 
@@ -66,11 +67,13 @@ Osobny ekran dostępny z ekranu szczegółów węzła (Administracja → "Diagno
 
 ## Sniffer
 
-Tryb pokazujący ruch w eterze, który normalnie by zniknął — pakiety usłyszane przez węzeł podczas floodingu mesh, ale nieadresowane do niego, są teraz przekazywane surowo do telefonu zamiast po prostu odrzucane.
+Tryb pokazujący ruch w eterze, który normalnie by zniknął — wszystkie pakiety usłyszane przez węzeł, łącznie z ruchem broadcastowym (wiadomości na kanałach, telemetria), są teraz przekazywane surowo do telefonu zamiast po prostu odrzucane.
 
-- **Przełącznik w Ustawienia → Advanced** ("Tryb sniffera"), tuż pod Panelem Debugowania.
+- **Przełącznik w Ustawienia → Advanced** ("Tryb sniffera"), tuż pod Panelem Debugowania. Przed włączeniem appka pyta o potwierdzenie, informując że może to opóźniać lub gubić część wiadomości czatu bądź telemetrii, bo dzielą tę samą kolejkę transmisji do telefonu.
 - **Ekran "Sniffer Log"** — link pod przełącznikiem, pokazuje na żywo nadawcę/odbiorcę, kanał, liczbę przeskoków, RSSI/SNR i port pakietu. Zawartość pakietu dekoduje się dopiero po kliknięciu w niego — tym samym mechanizmem co Panel Debugowania (trasa traceroute z nazwami węzłów, pozycja, telemetria, NodeInfo itd., a dla nieznanych/zaszyfrowanych danych surowy hex jako fallback) — zamiast pokazywać się automatycznie dla każdego pakietu na liście.
+- **Ruch broadcastowy pokazywany tak samo jak ruch prywatny** — wcześniej log pokazywał tylko pakiety adresowane do konkretnego węzła; wiadomości na kanałach i telemetria od innych węzłów widać teraz jako `!nadawca > !ffffffff`, dekodowane tym samym mechanizmem po kliknięciu.
 - **Podsłuchane odpowiedzi traceroute adresowane do innych węzłów nie są już mylnie pokazywane jako wynik własnego zapytania o trasę** — appka rozróżnia teraz, czy pakiet traceroute faktycznie był skierowany do lokalnie podłączonego węzła.
+- **Naprawione podwójne wpisy przy własnym traceroute** — po włączeniu snifera świeżo wysłane zapytanie traceroute potrafiło pojawić się w logu dwukrotnie (firmware podsłuchiwał echo własnego pakietu); appka filtruje teraz duplikaty po ID pakietu.
 - **Działa wyłącznie lokalnie** — pokazuje tylko to, co fizycznie usłyszy radiem węzeł aktualnie podłączony do telefonu; włączenie na zdalnym węźle nic nie da z perspektywy tego telefonu, bo podsłuchane pakiety trafiają do urządzenia podłączonego do TAMTEGO węzła.
 - **Wymaga customowego firmware z modułem sniffera** (własny fork protobufs, [MT_SW_PROTOBUFS](https://github.com/MT-SW/MT_SW_PROTOBUFS)) — na starszym lub oficjalnym firmware przełącznik nic nie zmienia.
 - **Pochodzenie funkcji** — zaadaptowana z historycznego forka firmware Meshtastic (`musznik/firmware`, gałąź `trunk-io/update-trunk`).
@@ -157,6 +160,7 @@ What this means in practice:
 - **Map always opens framed on all nodes** — instead of reopening at the last remembered position and zoom.
 - **Sharper raster basemap tiles (e.g. OSM)** — fixed a bug causing blur from an incorrect default tile size.
 - **Tuned node clustering on the map** — small groups of nodes no longer collapse into a single numbered bubble; clustering now only kicks in for a genuinely dense cluster.
+- **Default basemap changed to OpenStreetMap** — instead of MapLibre's vector Liberty style, the app now starts with raster OSM tiles by default.
 
 ## Desktop settings
 
@@ -185,11 +189,13 @@ A dedicated screen reachable from the node detail screen (Administration → "On
 
 ## Sniffer
 
-A mode that surfaces air traffic that would normally just vanish — packets the node overhears during normal mesh flooding but that aren't addressed to it are now forwarded raw to the phone instead of being dropped.
+A mode that surfaces air traffic that would normally just vanish — every packet the node overhears, including broadcast traffic (channel messages, telemetry), is now forwarded raw to the phone instead of being dropped.
 
-- **Toggle in Settings → Advanced** ("Sniffer mode"), right below the Debug Panel entry.
+- **Toggle in Settings → Advanced** ("Sniffer mode"), right below the Debug Panel entry. Enabling it prompts for confirmation first, warning that it can delay or drop some chat messages or telemetry since sniffed traffic shares the same queue to the phone.
 - **"Sniffer Log" screen** — a link below the toggle, showing sender/receiver, channel, hop count, RSSI/SNR, and the packet's port live. The packet's content only decodes once you tap on it — using the same decoder as the Debug Panel (traceroute path with node names, position, telemetry, NodeInfo, etc., falling back to raw hex for unknown or still-encrypted data) — instead of showing up automatically for every packet in the list.
+- **Broadcast traffic shown the same as private traffic** — the log used to show only packets addressed to a specific node; channel messages and telemetry from other nodes now show as `!sender > !ffffffff`, decoded the same way on tap.
 - **Sniffed traceroute responses addressed to other nodes no longer show up as if they were the result of your own traceroute request** — the app now checks whether a traceroute packet was actually addressed to the locally connected node.
+- **Fixed duplicate entries for your own traceroute** — with Sniffer on, a freshly sent traceroute request could show up twice in the log (firmware picking up the echo of your own packet); the app now filters duplicates by packet ID.
 - **Local only** — surfaces only what the node currently connected to the phone physically hears over the radio; enabling it on a remote node does nothing useful from this phone's perspective, since the sniffed traffic goes to whichever device is connected to THAT node.
 - **Requires custom firmware with the sniffer module** (dedicated protobufs fork, [MT_SW_PROTOBUFS](https://github.com/MT-SW/MT_SW_PROTOBUFS)) — on older or stock firmware the toggle has no effect.
 - **Feature origin** — adapted from a historical Meshtastic firmware fork (`musznik/firmware`, `trunk-io/update-trunk` branch).
