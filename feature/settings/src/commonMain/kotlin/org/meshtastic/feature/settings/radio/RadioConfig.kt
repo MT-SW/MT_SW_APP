@@ -308,6 +308,7 @@ private fun AdvancedSection(
         ListItem(
             text = stringResource(Res.string.sniffer_log_title),
             leadingIcon = MeshtasticIcons.Rssi,
+            enabled = snifferEnabled,
             onClick = { onNavigate(SettingsRoute.SnifferLog) },
         )
     }
