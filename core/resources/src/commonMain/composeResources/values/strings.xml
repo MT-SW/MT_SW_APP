@@ -395,7 +395,7 @@
     <string name="sniffer_warning_message">Sniffer forwards every packet the radio receives to the phone, not just the ones addressed to this device. Under heavy mesh traffic this can delay or drop some chat messages or telemetry, since they share the same queue to the phone.</string>
     <string name="sniffer_warning_accept">Enable</string>
     <string name="sniffer_warning_cancel">Cancel</string>
-    <string name="sniffer_warning_compatibility">WARNING: requires the branded MT_SW app and firmware. Other combinations may hang the node.</string>
+    <string name="sniffer_warning_compatibility">WARNING: Requires the branded MT_SW app and firmware. Other combinations may hang the node.</string>
     <string name="debug_store_logs_summary">Disable to skip writing mesh logs to disk</string>
     <string name="debug_store_logs_title">Store mesh logs</string>
     <string name="debug_tab_app_logs">App logs</string>
