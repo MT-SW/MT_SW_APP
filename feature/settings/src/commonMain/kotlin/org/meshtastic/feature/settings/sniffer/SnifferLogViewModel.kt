@@ -25,6 +25,7 @@ import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
+import org.meshtastic.feature.settings.debugging.sanitizeForExport
 import org.meshtastic.feature.settings.util.decodePayloadFromMeshLog
 
 /** One packet the locally connected node overheard but which was not addressed to it. */
@@ -41,7 +42,19 @@ data class SniffedPacket(
     val payloadHex: String,
     val decodedPayload: String?,
     val receivedAtMillis: Long,
-)
+) {
+    /** Multi-line, redacted representation for the per-packet copy action — reuses the Debug Panel's redaction. */
+    val copyText: String
+        get() = sanitizeForExport(
+            buildString {
+                appendLine("$fromId → $toId")
+                appendLine("ch $channel • hops ${hopStart - hopLimit}/$hopStart")
+                appendLine(listOfNotNull(rssi?.let { "RSSI $it" }, "SNR $snr").joinToString(" • "))
+                appendLine(if (isEncrypted) "encrypted" else portNum?.let { "port $it" } ?: "unknown port")
+                append(decodedPayload ?: payloadHex)
+            },
+        )
+}
 
 /**
  * Sniffer Log screen ViewModel, reached from Settings → Advanced. Sniffer mode has no distinguishing marker on the
