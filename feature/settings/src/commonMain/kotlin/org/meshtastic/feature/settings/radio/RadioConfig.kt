@@ -67,6 +67,7 @@ import org.meshtastic.core.resources.set_time
 import org.meshtastic.core.resources.shutdown
 import org.meshtastic.core.resources.sniffer_enabled_summary
 import org.meshtastic.core.resources.sniffer_enabled_title
+import org.meshtastic.core.resources.sniffer_not_supported_summary
 import org.meshtastic.core.resources.sniffer_warning_accept
 import org.meshtastic.core.resources.sniffer_warning_cancel
 import org.meshtastic.core.resources.sniffer_warning_compatibility
