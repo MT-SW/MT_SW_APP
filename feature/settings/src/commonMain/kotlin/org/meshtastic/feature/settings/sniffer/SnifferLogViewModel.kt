@@ -47,9 +47,11 @@ data class SniffedPacket(
  * Sniffer Log screen ViewModel, reached from Settings → Advanced. Sniffer mode has no distinguishing marker on the
  * wire — firmware's `sendPacketToPhoneRaw()` forwards a sniffed packet through the exact same `FromRadio.packet`
  * channel as ordinary traffic. So this decodes live from the same [MeshLog] stream as everything else and applies a
- * heuristic: any packet whose `to` is neither the locally connected node nor the broadcast address was not meant for
- * us, so it must have been sniffed. Local module-reply copies (`from == myNodeNum`) are rarer and not distinguished
- * from genuinely sniffed traffic in this first pass. Always reflects the locally connected node — there is no
+ * heuristic: any packet not addressed to the locally connected node was not meant for us, so it must have been
+ * sniffed — this now includes broadcast traffic (channel messages, telemetry) from other nodes, excluding only our
+ * own outgoing broadcasts. Local module-reply copies (`from == myNodeNum`, `to` a specific other node) are rarer and
+ * not distinguished from genuinely sniffed traffic in this first pass. Always reflects the locally connected node —
+ * there is no
  * per-node variant of this screen.
  */
 @KoinViewModel
@@ -65,7 +67,8 @@ class SnifferLogViewModel(private val meshLogRepository: MeshLogRepository, priv
     private fun toSniffedPacket(log: MeshLog): SniffedPacket? {
         val packet = log.meshPacket ?: return null
         val myNodeNum = nodeRepository.myNodeInfo.value?.myNodeNum ?: return null
-        if (packet.to == myNodeNum || packet.to == NodeAddress.NODENUM_BROADCAST) return null
+        if (packet.to == myNodeNum) return null
+        if (packet.to == NodeAddress.NODENUM_BROADCAST && packet.from == myNodeNum) return null
 
         val decodedPayload = packet.decoded?.payload
         return SniffedPacket(

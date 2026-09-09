@@ -20,10 +20,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
@@ -60,6 +66,10 @@ import org.meshtastic.core.resources.set_time
 import org.meshtastic.core.resources.shutdown
 import org.meshtastic.core.resources.sniffer_enabled_summary
 import org.meshtastic.core.resources.sniffer_enabled_title
+import org.meshtastic.core.resources.sniffer_warning_accept
+import org.meshtastic.core.resources.sniffer_warning_cancel
+import org.meshtastic.core.resources.sniffer_warning_message
+import org.meshtastic.core.resources.sniffer_warning_title
 import org.meshtastic.core.resources.tak_server
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.SwitchPreference
@@ -253,14 +263,32 @@ private fun AdvancedSection(
             onClick = { onNavigate(SettingsRoute.DebugPanel) },
         )
 
+        var showSnifferWarning by remember { mutableStateOf(false) }
+
         SwitchPreference(
             title = stringResource(Res.string.sniffer_enabled_title),
             enabled = enabled && !snifferLoading,
             loading = snifferLoading,
             checked = snifferEnabled,
-            onCheckedChange = onSetSnifferEnabled,
+            onCheckedChange = { checked ->
+                if (checked) {
+                    showSnifferWarning = true
+                } else {
+                    onSetSnifferEnabled(false)
+                }
+            },
             summary = stringResource(Res.string.sniffer_enabled_summary),
         )
+
+        if (showSnifferWarning) {
+            SnifferWarningDialog(
+                onConfirm = {
+                    showSnifferWarning = false
+                    onSetSnifferEnabled(true)
+                },
+                onDismiss = { showSnifferWarning = false },
+            )
+        }
 
         ListItem(
             text = stringResource(Res.string.sniffer_log_title),
@@ -284,5 +312,16 @@ private fun ManagedMessage() {
         text = stringResource(Res.string.message_device_managed),
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
         color = MaterialTheme.colorScheme.error,
+    )
+}
+
+@Composable
+private fun SnifferWarningDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(Res.string.sniffer_warning_title)) },
+        text = { Text(stringResource(Res.string.sniffer_warning_message)) },
+        confirmButton = { TextButton(onClick = onConfirm) { Text(stringResource(Res.string.sniffer_warning_accept)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.sniffer_warning_cancel)) } },
     )
 }

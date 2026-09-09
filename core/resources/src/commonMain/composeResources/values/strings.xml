@@ -391,6 +391,10 @@
     <string name="debug_search_prev">Previous match</string>
     <string name="debug_sniffer_summary">Forward locally-heard packets not addressed to this node to this app for inspection</string>
     <string name="debug_sniffer_title">Sniffer mode</string>
+    <string name="sniffer_warning_title">Enable Sniffer mode?</string>
+    <string name="sniffer_warning_message">Sniffer forwards every packet the radio receives to the phone, not just the ones addressed to this device. Under heavy mesh traffic this can delay or drop some chat messages or telemetry, since they share the same queue to the phone.</string>
+    <string name="sniffer_warning_accept">Enable</string>
+    <string name="sniffer_warning_cancel">Cancel</string>
     <string name="debug_store_logs_summary">Disable to skip writing mesh logs to disk</string>
     <string name="debug_store_logs_title">Store mesh logs</string>
     <string name="debug_tab_app_logs">App logs</string>
