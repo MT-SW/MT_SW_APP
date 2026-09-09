@@ -66,7 +66,7 @@ object Basemaps {
     /** Menu order: vector styles first, then the raster carry-overs. */
     val all: List<Basemap> = listOf(Liberty, Positron, Dark) + catalogueRasters
 
-    val default: Basemap = Liberty
+    val default: Basemap = all.first { it.id == MapTileCatalogue.OpenStreetMap.id }
 
     fun byId(id: String?): Basemap = all.firstOrNull { it.id == id } ?: default
 }
