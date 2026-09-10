@@ -16,13 +16,13 @@
  */
 package org.meshtastic.feature.node.metrics
 
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material3.ButtonGroup
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedToggleButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -31,15 +31,10 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.overflow_menu
-import org.meshtastic.core.ui.icon.Check
-import org.meshtastic.core.ui.icon.MeshtasticIcons
-import org.meshtastic.core.ui.icon.More
 import org.meshtastic.feature.node.model.TimeFrame
 
-@Suppress("LambdaParameterEventTrailing")
 @Composable
 fun TimeFrameSelector(
     selectedTimeFrame: TimeFrame,
@@ -49,53 +44,27 @@ fun TimeFrameSelector(
 ) {
     if (availableTimeFrames.size <= 1) return
 
-    // Items that don't fit collapse into overflowIndicator's menu instead of squeezing every label.
-    ButtonGroup(
-        overflowIndicator = { menuState ->
-            IconButton(onClick = { if (menuState.isShowing) menuState.dismiss() else menuState.show() }) {
-                Icon(imageVector = MeshtasticIcons.More, contentDescription = stringResource(Res.string.overflow_menu))
-            }
-        },
-        modifier = modifier.fillMaxWidth().selectableGroup(),
+    // Plain scrollable row of FilterChips instead of Material3's experimental ButtonGroup: that API throws
+    // IllegalArgumentException("maxWidth must be >= than minWidth") whenever the fixed items plus its overflow
+    // indicator don't fit the available width — which longer Polish labels hit reliably. Horizontal scroll takes
+    // the place of the overflow menu. Same pattern NodeMetricDetailScreen already uses for its own range selector.
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).selectableGroup(),
     ) {
         availableTimeFrames.forEach { timeFrame ->
             val isSelected = timeFrame == selectedTimeFrame
-            customItem(
-                buttonGroupContent = {
-                    // ToggleButton hardcodes Role.Checkbox; override it so the group still
-                    // reads as single-choice radio semantics to a screen reader.
-                    OutlinedToggleButton(
-                        checked = isSelected,
-                        onCheckedChange = { onTimeFrameSelected(timeFrame) },
-                        modifier =
-                        Modifier.semantics {
-                            role = Role.RadioButton
-                            selected = isSelected
-                        },
-                    ) {
-                        Text(text = stringResource(timeFrame.strRes), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    }
+            FilterChip(
+                selected = isSelected,
+                onClick = { onTimeFrameSelected(timeFrame) },
+                label = {
+                    Text(text = stringResource(timeFrame.strRes), maxLines = 1, overflow = TextOverflow.Ellipsis)
                 },
-                menuContent = { menuState ->
-                    DropdownMenuItem(
-                        text = { Text(text = stringResource(timeFrame.strRes)) },
-                        onClick = {
-                            onTimeFrameSelected(timeFrame)
-                            menuState.dismiss()
-                        },
-                        trailingIcon =
-                        if (isSelected) {
-                            { Icon(imageVector = MeshtasticIcons.Check, contentDescription = null) }
-                        } else {
-                            null
-                        },
-                        modifier =
-                        Modifier.semantics {
-                            role = Role.RadioButton
-                            selected = isSelected
-                        },
-                    )
-                },
+                modifier =
+                    Modifier.semantics {
+                        role = Role.RadioButton
+                        selected = isSelected
+                    },
             )
         }
     }

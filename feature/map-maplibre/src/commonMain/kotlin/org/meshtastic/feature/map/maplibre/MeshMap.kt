@@ -311,7 +311,7 @@ private fun FrameOnce(enabled: Boolean, nodes: List<Node>, mapState: MapState) {
         // Waits for the first node set that has anything to frame; a mesh still filling in reports none.
         val box = snapshotFlow { nodesBoundingBox(currentNodes) }.filterNotNull().first()
         hasFramed = true
-        mapState.fitCameraToBounds(box)
+        mapState.fitCameraToBounds(box, padding = PaddingValues(FRAME_PADDING_DP.dp))
     }
 }
 
