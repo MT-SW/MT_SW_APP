@@ -128,6 +128,13 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_EXCLUDE_MQTT] = value } }
     }
 
+    override val excludeUnheard: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_EXCLUDE_UNHEARD] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
+
+    override fun setExcludeUnheard(value: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_EXCLUDE_UNHEARD] = value } }
+    }
+
     override val autoLoadChatImages: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_AUTO_LOAD_CHAT_IMAGES] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
 
@@ -412,6 +419,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_ONLY_DIRECT = booleanPreferencesKey("only-direct")
         val KEY_SHOW_IGNORED = booleanPreferencesKey("show-ignored")
         val KEY_EXCLUDE_MQTT = booleanPreferencesKey("exclude-mqtt")
+        val KEY_EXCLUDE_UNHEARD = booleanPreferencesKey("exclude-unheard")
         val KEY_AUTO_LOAD_CHAT_IMAGES = booleanPreferencesKey("auto-load-chat-images")
         val KEY_BLE_AUTO_SCAN = booleanPreferencesKey("ble-auto-scan")
         val KEY_NETWORK_AUTO_SCAN = booleanPreferencesKey("network-auto-scan")

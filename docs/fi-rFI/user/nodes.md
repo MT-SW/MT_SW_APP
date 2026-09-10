@@ -120,14 +120,14 @@ Kirjoita hakukenttään suodattaaksesi radioita nimen tai lyhyen nimen perusteel
 
 ### Suodatusvalinnat
 
-| Suodatus                          | Kuvaus                                                                                                                                                                                                                                                                                |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Hide offline nodes**            | Näytä vain radiot, joista on kuultu viimeisten 2 tunnin aikana                                                                                                                                                                                                                        |
-| **Only show direct nodes**        | Show only nodes your radio heard directly, with no relay in between                                                                                                                                                                                                                   |
-| **Näytä tuntemattomat**           | Näytä radiot, jotka eivät ole vielä lähettäneet käyttäjätietoja. **Oletuksena käytössä**, joten radio, joka on kuultu ennen käyttäjätietojensa saapumista, pysyy näkyvissä ja sille voi lähettää viestejä. Tällaiset radiot merkitään keskeneräisiksi |
-| **Ohita infrastruktuurilaitteet** | Hide infrastructure-role nodes (Router, Router Late, Client Base, and legacy Repeater nodes) and any node that cannot be messaged, whatever its role                                                                                                               |
-| **Rajaa MQTT pois**               | Piilottaa radiot, joista on kuultu vain MQTT-internetsillan kautta                                                                                                                                                                                                                    |
-| **Only show ignored Nodes**       | Replace the list with the nodes you have ignored. Every other node is hidden while this is on, and a banner appears at the top of the list to take you back                                                                                                           |
+| Suodatus                          | Kuvaus                                                                                                                                                                                                                                                                          |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Hide offline nodes**            | Näytä vain radiot, joista on kuultu viimeisten 2 tunnin aikana                                                                                                                                                                                                                  |
+| **Only show direct nodes**        | Show only nodes your radio heard directly, with no relay in between                                                                                                                                                                                                             |
+| **Näytä tuntemattomat**           | Näytä radiot, jotka eivät ole vielä lähettäneet käyttäjätietoja. **On by default**, so a node heard before its info arrives stays visible; these carry a badge marking them incomplete, and cannot be direct messaged until their user info brings a public key |
+| **Ohita infrastruktuurilaitteet** | Hide infrastructure-role nodes (Router, Router Late, Client Base, and legacy Repeater nodes) and any node that cannot be messaged, whatever its role                                                                                                         |
+| **Rajaa MQTT pois**               | Piilottaa radiot, joista on kuultu vain MQTT-internetsillan kautta                                                                                                                                                                                                              |
+| **Only show ignored Nodes**       | Replace the list with the nodes you have ignored. Every other node is hidden while this is on, and a banner appears at the top of the list to take you back                                                                                                     |
 
 ### Lajitteluvaihtoehdot
 
@@ -168,6 +168,8 @@ Rivinsisäiset tilailmaisimet näyttävät tärkeimmät tiedot yhdellä silmäyk
 Kun radion laitteisto tunnistetaan, tietonäkymä näyttää avattavan **"Haluan sellaisen"** -osion, jossa on linkkejä laitteen ostamiseen tai lisätietojen hankkimiseen: valmistajan tuotesivu, tuoteversiot sekä alueelliset kauppapaikkalistaukset (esim. AliExpress, Amazon ja tuetut jälleenmyyjät), suodatettuna maasi mukaan. Jokainen linkki avautuu mesh.to -uudelleenohjauspalvelun kautta. Laitteet, joille ei löydy vastaavia linkkejä, eivät näytä tätä osiota.
 
 A full, browsable directory of every link is also available at **Settings → Device Links**. The item is hidden while you have Settings open for a remote node.
+
+Some of these are affiliate links. Both places say so above the links: product links may be affiliate links, and purchases may earn Meshtastic a commission.
 
 ## When No Nodes Appear
 

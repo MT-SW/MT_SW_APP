@@ -445,6 +445,7 @@
     <string name="device_db_cache_limit_summary">Max device databases to keep on this phone</string>
     <string name="device_gps">Device GPS</string>
     <string name="device_links">Device Links</string>
+    <string name="device_links_affiliate_disclosure">Product links may be affiliate links — purchases may earn Meshtastic a commission.</string>
     <string name="device_links_i_want_one">I want one</string>
     <string name="device_links_open_in_browser">Open in browser</string>
     <string name="device_metrics_label_value">%1$s: %2$s</string>
@@ -580,7 +581,10 @@
     <string name="doc_keywords_translate">translate,crowdin,localization,language,i18n,contribute</string>
     <string name="doc_keywords_units">units,locale,metric,imperial,temperature,distance</string>
     <string name="doc_keywords_widget">widget,home screen,local stats,glance,battery,utilization</string>
-    <string name="doc_search_placeholder">Search documentationÔÇŽ</string>
+    <string name="doc_loading">Loading documentation…</string>
+    <string name="doc_no_documentation">No documentation available</string>
+    <string name="doc_no_results">No results found</string>
+    <string name="doc_search_placeholder">Search documentation…</string>
     <string name="doc_section_developer">Developer Guide</string>
     <string name="doc_section_user">User Guide</string>
     <string name="doc_title_app_functions">App Functions</string>
@@ -1467,6 +1471,7 @@
     <string name="node_count_total">%1$d total</string>
     <string name="node_filter_exclude_infrastructure">Exclude infrastructure</string>
     <string name="node_filter_exclude_mqtt">Exclude MQTT</string>
+    <string name="node_filter_exclude_unheard">Hide unheard nodes</string>
     <string name="node_filter_ignored">You are viewing ignored nodes,\nPress to return to the node list.</string>
     <string name="node_filter_include_unknown">Include unknown</string>
     <string name="node_filter_only_direct">Only show direct nodes</string>
@@ -1504,6 +1509,7 @@
     <string name="node_list_help_roles_title">Node Roles</string>
     <string name="node_list_help_title">Node List Help</string>
     <string name="node_list_long_click_label">Node options</string>
+    <string name="node_not_heard_on_current_lora">Not heard since you changed settings</string>
     <string name="node_number">Node Number</string>
     <string name="node_request_send_failed">Couldn't send request. Try again.</string>
     <string name="node_restarting">Restarting…</string>
@@ -1527,6 +1533,10 @@
     <string name="nodes_empty_searching_hint">Nearby nodes will appear here as they're discovered.</string>
     <string name="nodes_empty_searching_title">Searching for nodes</string>
     <string name="nodes_queued_for_deletion">%1$d nodes queued for deletion:</string>
+    <string name="nodes_unheard_banner">%1$d nodes not heard since you changed settings</string>
+    <string name="nodes_unheard_banner_one">1 node not heard since you changed settings</string>
+    <string name="nodes_unheard_keep">Keep</string>
+    <string name="nodes_unheard_remove">Remove</string>
     <string name="noise_floor">Noise Floor</string>
     <string name="noise_floor_definition">The background RF noise measured by the radio receiver. Lower values usually indicate a quieter receiver environment; -85 dBm is a busy reference point, not a hard failure threshold.</string>
     <string name="noise_floor_no_reading">Noise Floor: No reading</string>

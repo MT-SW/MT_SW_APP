@@ -23,8 +23,8 @@ import org.maplibre.compose.layers.HillshadeLayer
 import org.maplibre.compose.layers.RasterLayer
 import org.maplibre.compose.sources.RasterDemEncoding
 import org.maplibre.compose.sources.TileSetOptions
-import org.maplibre.compose.sources.rememberRasterDemSource
-import org.maplibre.compose.sources.rememberRasterSource
+import org.maplibre.compose.sources.rememberRasterDemTileSource
+import org.maplibre.compose.sources.rememberRasterTileSource
 import org.meshtastic.feature.map.layers.opacityOf
 import org.meshtastic.feature.map.maplibre.style.Basemap
 import org.meshtastic.feature.map.maplibre.style.MapOverlay
@@ -43,7 +43,7 @@ internal fun RasterTileSpec.toTileSetOptions(): TileSetOptions =
 @Composable
 internal fun RasterBasemapLayer(basemap: Basemap.Raster) {
     val source =
-        rememberRasterSource(
+        rememberRasterTileSource(
             tiles = basemap.spec.tiles,
             options = basemap.spec.toTileSetOptions(),
             // TileSetOptions itself has no tileSize field — MapLibre defaults raster sources to 512px tiles
@@ -69,7 +69,7 @@ internal fun MapOverlayLayers(overlays: List<MapOverlay>, opacity: Map<String, F
 
             is MapOverlay.Raster -> {
                 val source =
-                    rememberRasterSource(
+                    rememberRasterTileSource(
                         tiles = overlay.spec.tiles,
                         options = overlay.spec.toTileSetOptions(),
                         tileSize = overlay.spec.tileSize,
@@ -90,7 +90,7 @@ internal fun MapOverlayLayers(overlays: List<MapOverlay>, opacity: Map<String, F
 @Composable
 private fun HillshadeOverlayLayer(overlay: MapOverlay.Hillshade, opacity: Float) {
     val source =
-        rememberRasterDemSource(
+        rememberRasterDemTileSource(
             tiles = overlay.spec.tiles,
             options = overlay.spec.toTileSetOptions(),
             tileSize = overlay.spec.tileSize,

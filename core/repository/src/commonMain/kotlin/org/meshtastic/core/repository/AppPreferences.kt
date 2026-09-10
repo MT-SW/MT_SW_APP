@@ -139,7 +139,12 @@ interface UiPrefs {
 
     val excludeMqtt: StateFlow<Boolean>
 
+    /** Hide nodes not heard since the radio's current LoRa config took effect. */
+    val excludeUnheard: StateFlow<Boolean>
+
     fun setExcludeMqtt(value: Boolean)
+
+    fun setExcludeUnheard(value: Boolean)
 
     /**
      * Whether image URLs found in chat messages are automatically loaded as inline previews. Off by default — fetching

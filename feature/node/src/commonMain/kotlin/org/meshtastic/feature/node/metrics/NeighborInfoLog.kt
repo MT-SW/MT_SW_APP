@@ -50,7 +50,9 @@ import org.meshtastic.core.ui.icon.PersonOff
 import org.meshtastic.core.ui.icon.Refresh
 import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
 import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
+import org.meshtastic.core.ui.theme.StatusColors.StatusRed
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
+import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.core.ui.util.annotateNeighborInfo
 import org.meshtastic.feature.node.component.CooldownIconButton
 import org.meshtastic.proto.MeshPacket
@@ -88,6 +90,8 @@ fun NeighborInfoLogScreen(modifier: Modifier = Modifier, viewModel: MetricsViewM
     val statusGreen = MaterialTheme.colorScheme.StatusGreen
     val statusYellow = MaterialTheme.colorScheme.StatusYellow
     val statusOrange = MaterialTheme.colorScheme.StatusOrange
+    val statusRed = MaterialTheme.colorScheme.StatusRed
+    val modemPreset = LocalModemPreset.current
 
     // Combine our own requests (matched to a result, or "no response") with any NeighborInfo packets overheard on
     // the mesh that don't correspond to a request we sent — sorted newest-first.
@@ -165,18 +169,20 @@ fun NeighborInfoLogScreen(modifier: Modifier = Modifier, viewModel: MetricsViewM
                         text = text,
                         contentDescription = stringResource(Res.string.neighbor_info),
                         modifier =
-                        Modifier.combinedClickable(onLongClick = { expanded = true }) {
-                            item.packet?.getNeighborInfoResponse(::getUsername, header = header)?.let {
-                                val message =
-                                    annotateNeighborInfo(
-                                        it,
-                                        statusGreen = statusGreen,
-                                        statusYellow = statusYellow,
-                                        statusOrange = statusOrange,
-                                    )
-                                viewModel.showLogDetail(Res.string.neighbor_info, message)
-                            }
-                        },
+                            Modifier.combinedClickable(onLongClick = { expanded = true }) {
+                                item.packet?.getNeighborInfoResponse(::getUsername, header = header)?.let {
+                                    val message =
+                                        annotateNeighborInfo(
+                                            it,
+                                            statusGreen = statusGreen,
+                                            statusYellow = statusYellow,
+                                            statusOrange = statusOrange,
+                                            statusRed = statusRed,
+                                            modemPreset = modemPreset,
+                                        )
+                                    viewModel.showLogDetail(Res.string.neighbor_info, message)
+                                }
+                            },
                     )
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                         DeleteItem {

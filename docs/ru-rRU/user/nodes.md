@@ -120,14 +120,14 @@ To add someone else's contact, use the import button on the node list and choose
 
 ### Переключатели фильтра
 
-| Фильтр                       | Описание                                                                                                                                                                                          |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Hide offline nodes**       | Показывать только ноды, услышанные за последние 2 часа                                                                                                                                            |
-| **Only show direct nodes**   | Show only nodes your radio heard directly, with no relay in between                                                                                                                               |
-| **Включить неизвестные**     | Show nodes that haven't sent user info yet. **On by default**, so a node heard before its info arrives stays visible and messageable; these carry a badge marking them incomplete |
-| **Исключить инфраструктуру** | Hide infrastructure-role nodes (Router, Router Late, Client Base, and legacy Repeater nodes) and any node that cannot be messaged, whatever its role                           |
-| **Исключить MQTT**           | Скрыть ноды, слышимые только через интернет-мост MQTT                                                                                                                                             |
-| **Only show ignored Nodes**  | Replace the list with the nodes you have ignored. Every other node is hidden while this is on, and a banner appears at the top of the list to take you back                       |
+| Фильтр                       | Описание                                                                                                                                                                                                                                                   |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Hide offline nodes**       | Показывать только ноды, услышанные за последние 2 часа                                                                                                                                                                                                     |
+| **Only show direct nodes**   | Show only nodes your radio heard directly, with no relay in between                                                                                                                                                                                        |
+| **Включить неизвестные**     | Show nodes that haven't sent user info yet. **On by default**, so a node heard before its info arrives stays visible; these carry a badge marking them incomplete, and cannot be direct messaged until their user info brings a public key |
+| **Исключить инфраструктуру** | Hide infrastructure-role nodes (Router, Router Late, Client Base, and legacy Repeater nodes) and any node that cannot be messaged, whatever its role                                                                                    |
+| **Исключить MQTT**           | Скрыть ноды, слышимые только через интернет-мост MQTT                                                                                                                                                                                                      |
+| **Only show ignored Nodes**  | Replace the list with the nodes you have ignored. Every other node is hidden while this is on, and a banner appears at the top of the list to take you back                                                                                |
 
 ### Параметры сортировки
 
@@ -168,6 +168,8 @@ The Details card carries the node's short name, role, IDs, last heard time, hops
 Когда оборудование ноды распознано, в детальном просмотре появляется сворачиваемый раздел **"Хочу такой"**, содержащий ссылки на места, где можно купить или узнать больше об этом устройстве: страницу продукта у производителя, варианты продукта и объявления на региональных торговых площадках (например, AliExpress, Amazon и у поддерживаемых продавцов), отфильтрованные по твоей стране. Каждая ссылка открывается через сервис перенаправления `msh.to`. Устройства без подходящих ссылок не показывают этот раздел.
 
 A full, browsable directory of every link is also available at **Settings → Device Links**. The item is hidden while you have Settings open for a remote node.
+
+Some of these are affiliate links. Both places say so above the links: product links may be affiliate links, and purchases may earn Meshtastic a commission.
 
 ## When No Nodes Appear
 

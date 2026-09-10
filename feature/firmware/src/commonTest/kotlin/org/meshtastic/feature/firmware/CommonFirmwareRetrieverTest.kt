@@ -41,7 +41,14 @@ import kotlin.test.assertTrue
 abstract class CommonFirmwareRetrieverTest {
 
     protected companion object {
-        const val BASE_URL = "https://raw.githubusercontent.com/meshtastic/meshtastic.github.io/master"
+        /** Stable and alpha artifacts: one directory per version at this host's root. */
+        const val RELEASE_BASE_URL = "https://release.meshtastic.org"
+
+        /** Nightly artifacts are served flat at this host's root, in its own bucket. */
+        const val NIGHTLY_BASE_URL = "https://nightly.meshtastic.org"
+
+        /** The retired host. No channel may resolve against it any more. */
+        const val RETIRED_BASE_URL = "https://raw.githubusercontent.com/meshtastic/meshtastic.github.io/master"
 
         val TEST_RELEASE = FirmwareRelease(id = "v2.7.17", zipUrl = "https://example.com/esp32-s3.zip")
 
@@ -81,10 +88,10 @@ abstract class CommonFirmwareRetrieverTest {
         val retriever = FirmwareRetriever(handler)
 
         // Manifest is available
-        handler.textResponses["$BASE_URL/firmware-2.7.17/firmware-heltec-v3-2.7.17.mt.json"] = MANIFEST_JSON
+        handler.textResponses["$RELEASE_BASE_URL/2.7.17/firmware-heltec-v3-2.7.17.mt.json"] = MANIFEST_JSON
 
         // Direct download of the manifest-resolved filename succeeds
-        handler.existingUrls.add("$BASE_URL/firmware-2.7.17/firmware-heltec-v3-2.7.17.bin")
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.7.17/firmware-heltec-v3-2.7.17.bin")
 
         val result = retriever.retrieveEsp32Firmware(TEST_RELEASE, TEST_HARDWARE) {}
 
@@ -102,9 +109,9 @@ abstract class CommonFirmwareRetrieverTest {
         val name = "firmware-heltec-v3-2.7.17-app0.bin"
         val payload = ByteArray(2048) { it.toByte() }
         val md5 = FirmwareHashUtil.calculateMd5Hex(payload)
-        handler.textResponses["$BASE_URL/firmware-2.7.17/firmware-heltec-v3-2.7.17.mt.json"] =
+        handler.textResponses["$RELEASE_BASE_URL/2.7.17/firmware-heltec-v3-2.7.17.mt.json"] =
             """{"files":[{"name":"$name","part_name":"app0","md5":"$md5","bytes":${payload.size}}]}"""
-        handler.existingUrls.add("$BASE_URL/firmware-2.7.17/$name")
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.7.17/$name")
         handler.fileBytes[name] = payload
 
         val result = retriever.retrieveEsp32Firmware(TEST_RELEASE, TEST_HARDWARE) {}
@@ -120,12 +127,12 @@ abstract class CommonFirmwareRetrieverTest {
 
         val name = "firmware-heltec-v3-2.7.17-app0.bin"
         // Size matches (4) so md5 is computed; the manifest md5 is wrong, so the artifact must be rejected.
-        handler.textResponses["$BASE_URL/firmware-2.7.17/firmware-heltec-v3-2.7.17.mt.json"] =
+        handler.textResponses["$RELEASE_BASE_URL/2.7.17/firmware-heltec-v3-2.7.17.mt.json"] =
             """{"files":[{"name":"$name","part_name":"app0","md5":"deadbeef","bytes":4}]}"""
-        handler.existingUrls.add("$BASE_URL/firmware-2.7.17/$name")
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.7.17/$name")
         handler.fileBytes[name] = byteArrayOf(0x01, 0x02, 0x03, 0x04)
         // Heuristic fallback the rejection should land on.
-        handler.existingUrls.add("$BASE_URL/firmware-2.7.17/firmware-heltec-v3-2.7.17.bin")
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.7.17/firmware-heltec-v3-2.7.17.bin")
 
         val result = retriever.retrieveEsp32Firmware(TEST_RELEASE, TEST_HARDWARE) {}
 
@@ -140,11 +147,11 @@ abstract class CommonFirmwareRetrieverTest {
 
         val name = "firmware-heltec-v3-2.7.17-app0.bin"
         // Blank md5 → only size is checked; the declared size disagrees with the download, so it must be rejected.
-        handler.textResponses["$BASE_URL/firmware-2.7.17/firmware-heltec-v3-2.7.17.mt.json"] =
+        handler.textResponses["$RELEASE_BASE_URL/2.7.17/firmware-heltec-v3-2.7.17.mt.json"] =
             """{"files":[{"name":"$name","part_name":"app0","md5":"","bytes":9999}]}"""
-        handler.existingUrls.add("$BASE_URL/firmware-2.7.17/$name")
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.7.17/$name")
         handler.fileBytes[name] = ByteArray(10)
-        handler.existingUrls.add("$BASE_URL/firmware-2.7.17/firmware-heltec-v3-2.7.17.bin")
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.7.17/firmware-heltec-v3-2.7.17.bin")
 
         val result = retriever.retrieveEsp32Firmware(TEST_RELEASE, TEST_HARDWARE) {}
 
@@ -159,7 +166,7 @@ abstract class CommonFirmwareRetrieverTest {
 
         // No manifest
         // Current naming direct download succeeds
-        handler.existingUrls.add("$BASE_URL/firmware-2.7.17/firmware-heltec-v3-2.7.17.bin")
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.7.17/firmware-heltec-v3-2.7.17.bin")
 
         val result = retriever.retrieveEsp32Firmware(TEST_RELEASE, TEST_HARDWARE) {}
 
@@ -173,7 +180,7 @@ abstract class CommonFirmwareRetrieverTest {
         val retriever = FirmwareRetriever(handler)
 
         // No manifest, no plain .bin; only the bare app `-update.bin` is published.
-        handler.existingUrls.add("$BASE_URL/firmware-2.7.17/firmware-heltec-v3-2.7.17-update.bin")
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.7.17/firmware-heltec-v3-2.7.17-update.bin")
 
         val result = retriever.retrieveEsp32Firmware(TEST_RELEASE, TEST_HARDWARE) {}
 
@@ -189,8 +196,8 @@ abstract class CommonFirmwareRetrieverTest {
         // No manifest. Both files exist: on pre-2.7.17 releases the plain `.bin` is a *merged* bootloader+app image
         // (which esp_ota_end rejects when flashed to app0), while `-update.bin` is the bare app image. Confirmed on
         // hardware with 2.7.15: the merged image failed `OTA End`, the -update.bin app image is the OTA-able one.
-        handler.existingUrls.add("$BASE_URL/firmware-2.7.17/firmware-heltec-v3-2.7.17.bin")
-        handler.existingUrls.add("$BASE_URL/firmware-2.7.17/firmware-heltec-v3-2.7.17-update.bin")
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.7.17/firmware-heltec-v3-2.7.17.bin")
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.7.17/firmware-heltec-v3-2.7.17-update.bin")
 
         val result = retriever.retrieveEsp32Firmware(TEST_RELEASE, TEST_HARDWARE) {}
 
@@ -257,10 +264,10 @@ abstract class CommonFirmwareRetrieverTest {
         val retriever = FirmwareRetriever(handler)
 
         // Malformed manifest
-        handler.textResponses["$BASE_URL/firmware-2.7.17/firmware-heltec-v3-2.7.17.mt.json"] = "{ not valid json }"
+        handler.textResponses["$RELEASE_BASE_URL/2.7.17/firmware-heltec-v3-2.7.17.mt.json"] = "{ not valid json }"
 
         // Current naming succeeds
-        handler.existingUrls.add("$BASE_URL/firmware-2.7.17/firmware-heltec-v3-2.7.17.bin")
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.7.17/firmware-heltec-v3-2.7.17.bin")
 
         val result = retriever.retrieveEsp32Firmware(TEST_RELEASE, TEST_HARDWARE) {}
 
@@ -274,11 +281,11 @@ abstract class CommonFirmwareRetrieverTest {
         val retriever = FirmwareRetriever(handler)
 
         // Manifest with no app0 entry
-        handler.textResponses["$BASE_URL/firmware-2.7.17/firmware-heltec-v3-2.7.17.mt.json"] =
+        handler.textResponses["$RELEASE_BASE_URL/2.7.17/firmware-heltec-v3-2.7.17.mt.json"] =
             """{"files": [{"name": "bootloader.bin", "md5": "abc", "bytes": 1024, "part_name": "bootloader"}]}"""
 
         // Current naming succeeds
-        handler.existingUrls.add("$BASE_URL/firmware-2.7.17/firmware-heltec-v3-2.7.17.bin")
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.7.17/firmware-heltec-v3-2.7.17.bin")
 
         val result = retriever.retrieveEsp32Firmware(TEST_RELEASE, TEST_HARDWARE) {}
 
@@ -291,7 +298,7 @@ abstract class CommonFirmwareRetrieverTest {
         val handler = FakeFirmwareFileHandler()
         val retriever = FirmwareRetriever(handler)
 
-        handler.existingUrls.add("$BASE_URL/firmware-2.7.17/firmware-heltec-v3-2.7.17.bin")
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.7.17/firmware-heltec-v3-2.7.17.bin")
 
         retriever.retrieveEsp32Firmware(TEST_RELEASE, TEST_HARDWARE) {}
 
@@ -312,7 +319,7 @@ abstract class CommonFirmwareRetrieverTest {
         val handler = FakeFirmwareFileHandler()
         val retriever = FirmwareRetriever(handler)
 
-        handler.existingUrls.add("$BASE_URL/firmware-2.7.17/firmware-heltec-v3-2.7.17.bin")
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.7.17/firmware-heltec-v3-2.7.17.bin")
 
         retriever.retrieveEsp32Firmware(TEST_RELEASE, TEST_HARDWARE) {}
 
@@ -329,7 +336,7 @@ abstract class CommonFirmwareRetrieverTest {
         val retriever = FirmwareRetriever(handler)
         val hardware = TEST_HARDWARE.copy(platformioTarget = "", hwModelSlug = "CUSTOM_BOARD")
 
-        handler.existingUrls.add("$BASE_URL/firmware-2.7.17/firmware-CUSTOM_BOARD-2.7.17.bin")
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.7.17/firmware-CUSTOM_BOARD-2.7.17.bin")
 
         val result = retriever.retrieveEsp32Firmware(TEST_RELEASE, hardware) {}
 
@@ -338,38 +345,41 @@ abstract class CommonFirmwareRetrieverTest {
     }
 
     // -----------------------------------------------------------------------
-    // Nightly channel (fixed firmware-nightly/ folder, no release zip)
+    // Nightly channel (flat at the nightly host root, no release zip)
     // -----------------------------------------------------------------------
 
     @Test
-    fun `nightly release resolves from the fixed firmware-nightly folder`() = runTest {
+    fun `nightly release resolves from the nightly host root`() = runTest {
         val handler = FakeFirmwareFileHandler()
         val retriever = FirmwareRetriever(handler)
         val nightly = FirmwareRelease(id = "v2.8.0.f52e2ea", zipUrl = "", releaseType = FirmwareReleaseType.NIGHTLY)
 
-        handler.textResponses["$BASE_URL/firmware-nightly/firmware-heltec-v3-2.8.0.f52e2ea.mt.json"] =
+        handler.textResponses["$NIGHTLY_BASE_URL/firmware-heltec-v3-2.8.0.f52e2ea.mt.json"] =
             """{"files":[{"name":"firmware-heltec-v3-2.8.0.f52e2ea.bin","md5":"","bytes":0,"part_name":"app0"}]}"""
-        handler.existingUrls.add("$BASE_URL/firmware-nightly/firmware-heltec-v3-2.8.0.f52e2ea.bin")
+        handler.existingUrls.add("$NIGHTLY_BASE_URL/firmware-heltec-v3-2.8.0.f52e2ea.bin")
 
         val result = retriever.retrieveEsp32Firmware(nightly, TEST_HARDWARE) {}
 
-        assertNotNull(result, "Nightly should resolve from firmware-nightly/, not firmware-<version>/")
+        assertNotNull(result, "Nightly should resolve from the nightly host, not the release host")
         assertEquals("firmware-heltec-v3-2.8.0.f52e2ea.bin", result.fileName)
-        assertTrue(handler.checkedUrls.none { "firmware-2.8.0.f52e2ea/" in it }, "versioned folder must not be used")
         assertTrue(
-            "$BASE_URL/firmware-nightly/firmware-heltec-v3-2.8.0.f52e2ea.mt.json" in handler.fetchedTextUrls,
-            "manifest must be fetched from firmware-nightly/",
+            handler.checkedUrls.none { RELEASE_BASE_URL in it || RETIRED_BASE_URL in it },
+            "nightly must resolve only against the nightly host",
+        )
+        assertTrue(
+            "$NIGHTLY_BASE_URL/firmware-heltec-v3-2.8.0.f52e2ea.mt.json" in handler.fetchedTextUrls,
+            "manifest must be fetched from the nightly host root",
         )
     }
 
     @Test
-    fun `nightly ota zip resolves from the fixed firmware-nightly folder`() = runTest {
+    fun `nightly ota zip resolves from the nightly host root`() = runTest {
         val handler = FakeFirmwareFileHandler()
         val retriever = FirmwareRetriever(handler)
         val hardware = DeviceHardware(hwModelSlug = "RAK4631", platformioTarget = "rak4631", architecture = "nrf52840")
         val nightly = FirmwareRelease(id = "v2.8.0.f52e2ea", zipUrl = "", releaseType = FirmwareReleaseType.NIGHTLY)
 
-        handler.existingUrls.add("$BASE_URL/firmware-nightly/firmware-rak4631-2.8.0.f52e2ea-ota.zip")
+        handler.existingUrls.add("$NIGHTLY_BASE_URL/firmware-rak4631-2.8.0.f52e2ea-ota.zip")
 
         val result = retriever.retrieveOtaFirmware(nightly, hardware) {}
 
@@ -390,6 +400,28 @@ abstract class CommonFirmwareRetrieverTest {
         assertTrue(handler.downloadedUrls.isEmpty(), "no zip download may be attempted when zipUrl is blank")
     }
 
+    @Test
+    fun `stable release resolves from a per-version directory on the release host`() = runTest {
+        val handler = FakeFirmwareFileHandler()
+        val retriever = FirmwareRetriever(handler)
+        val stable = FirmwareRelease(id = "v2.8.0", zipUrl = "", releaseType = FirmwareReleaseType.STABLE)
+
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.8.0/firmware-heltec-v3-2.8.0.bin")
+
+        val result = retriever.retrieveEsp32Firmware(stable, TEST_HARDWARE) {}
+
+        assertNotNull(result, "stable must resolve from the release host's per-version directory")
+        assertTrue(
+            handler.checkedUrls.any { it == "$RELEASE_BASE_URL/2.8.0/firmware-heltec-v3-2.8.0.bin" },
+            "stable must be looked up at <release host>/<version>/, got ${handler.checkedUrls}",
+        )
+        assertTrue(
+            handler.checkedUrls.none { NIGHTLY_BASE_URL in it },
+            "the nightly host is a separate bucket, so stable must never be looked up there",
+        )
+        assertTrue(handler.checkedUrls.none { RETIRED_BASE_URL in it }, "the retired host must not be used")
+    }
+
     // -----------------------------------------------------------------------
     // OTA firmware (nRF52 DFU zip)
     // -----------------------------------------------------------------------
@@ -401,7 +433,7 @@ abstract class CommonFirmwareRetrieverTest {
         val hardware = DeviceHardware(hwModelSlug = "RAK4631", platformioTarget = "rak4631", architecture = "nrf52840")
         val release = FirmwareRelease(id = "v2.5.0", zipUrl = "https://example.com/nrf52.zip")
 
-        handler.existingUrls.add("$BASE_URL/firmware-2.5.0/firmware-rak4631-2.5.0-ota.zip")
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.5.0/firmware-rak4631-2.5.0-ota.zip")
 
         val result = retriever.retrieveOtaFirmware(release, hardware) {}
 
@@ -421,7 +453,7 @@ abstract class CommonFirmwareRetrieverTest {
             )
         val release = FirmwareRelease(id = "v2.5.0", zipUrl = "https://example.com/nrf52.zip")
 
-        handler.existingUrls.add("$BASE_URL/firmware-2.5.0/firmware-rak4631_nomadstar_meteor_pro-2.5.0-ota.zip")
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.5.0/firmware-rak4631_nomadstar_meteor_pro-2.5.0-ota.zip")
 
         val result = retriever.retrieveOtaFirmware(release, hardware) {}
 
@@ -440,7 +472,7 @@ abstract class CommonFirmwareRetrieverTest {
         val hardware = DeviceHardware(hwModelSlug = "RPI_PICO", platformioTarget = "pico", architecture = "rp2040")
         val release = FirmwareRelease(id = "v2.5.0", zipUrl = "https://example.com/rp2040.zip")
 
-        handler.existingUrls.add("$BASE_URL/firmware-2.5.0/firmware-pico-2.5.0.uf2")
+        handler.existingUrls.add("$RELEASE_BASE_URL/2.5.0/firmware-pico-2.5.0.uf2")
 
         val result = retriever.retrieveUsbFirmware(release, hardware) {}
 
@@ -530,6 +562,112 @@ abstract class CommonFirmwareRetrieverTest {
         handler.fileBytes[asset.fileName] = payload
 
         assertNotNull(retriever.retrieveMaintenanceUf2(asset) {}, "No expected address means no address check")
+    }
+
+    // ── Bootloader-driven erase image (family-ID contract) ───────────────────
+
+    /** The family OTAFIX consumes as a factory-erase command: 0x4D455348, "MESH". */
+    private val meshFamily = 0x4D455348L
+
+    /**
+     * Rebuilds `tools/meshtastic_factory_erase.uf2` byte for byte from its published header: one 512-byte block,
+     * family-ID flag set, targetAddr 0, 256 zero payload bytes. Parameterised only where a test needs a wrong value.
+     */
+    private fun factoryEraseBlock(flags: Long = UF2_FLAG_FAMILY_ID, familyId: Long = meshFamily): ByteArray {
+        val block = ByteArray(UF2_BLOCK_BYTES)
+        fun putLe32(offset: Int, value: Long) {
+            for (i in 0 until 4) {
+                block[offset + i] = ((value shr (8 * i)) and 0xFF).toByte()
+            }
+        }
+        putLe32(0, 0x0A324655L) // magicStart0
+        putLe32(4, 0x9E5D5157L) // magicStart1
+        putLe32(UF2_FLAGS_OFFSET, flags)
+        putLe32(UF2_TARGET_ADDR_OFFSET, 0L)
+        putLe32(16, 256L) // payloadSize
+        putLe32(20, 0L) // blockNo
+        putLe32(24, 1L) // numBlocks
+        putLe32(UF2_FAMILY_ID_OFFSET, familyId)
+        putLe32(508, 0x0AB16F30L) // magicEnd
+        return block
+    }
+
+    private fun bootloaderEraseAsset(payload: ByteArray, expectedFamily: Long?) = MaintenanceUf2(
+        url = "https://example.com/uf2/meshtastic_factory_erase.uf2",
+        fileName = "meshtastic_factory_erase.uf2",
+        sha256 = FirmwareHashUtil.bytesToHex(FirmwareHashUtil.calculateSha256Bytes(payload)),
+        expectedFamilyId = expectedFamily,
+    )
+
+    @Test
+    fun `the bootloader erase image rebuilt from its contract matches the shipped digest and family`() {
+        // Pins the reader to the bytes that actually ship (OTAFIX c8ccd1d7 tools/meshtastic_factory_erase.uf2), not
+        // just to a synthetic block: the digest is the manifest's, so a header drift here would show up as a mismatch.
+        val block = factoryEraseBlock()
+
+        assertEquals(
+            "6ef3146505c40079ee9e7e692448e40a793dad636f55d1545063299d28908f0d",
+            FirmwareHashUtil.bytesToHex(FirmwareHashUtil.calculateSha256Bytes(block)),
+        )
+        assertEquals(meshFamily, uf2FamilyId(block))
+        assertEquals(0L, uf2FirstTargetAddress(block), "targetAddr is 0 — the address check would reject this file")
+    }
+
+    @Test
+    fun `bootloader erase image with matching digest and family id is returned`() = runTest {
+        val handler = FakeFirmwareFileHandler()
+        val retriever = FirmwareRetriever(handler)
+        val payload = factoryEraseBlock()
+        val asset = bootloaderEraseAsset(payload, expectedFamily = meshFamily)
+        handler.existingUrls.add(asset.url)
+        handler.fileBytes[asset.fileName] = payload
+
+        val result = retriever.retrieveMaintenanceUf2(asset) {}
+
+        assertNotNull(result, "A verified bootloader erase image should be returned")
+        assertTrue(handler.deletedFiles.isEmpty(), "A verified image must not be deleted")
+    }
+
+    @Test
+    fun `bootloader erase image with the wrong family id is rejected even when the digest matches`() = runTest {
+        // A row pointing at some other single-block UF2: intact, digest-correct, and not the command the bootloader
+        // recognises. It would be written and then silently ignored by the device.
+        val handler = FakeFirmwareFileHandler()
+        val retriever = FirmwareRetriever(handler)
+        val payload = factoryEraseBlock(familyId = 0xADA52840L)
+        val asset = bootloaderEraseAsset(payload, expectedFamily = meshFamily)
+        handler.existingUrls.add(asset.url)
+        handler.fileBytes[asset.fileName] = payload
+
+        val result = retriever.retrieveMaintenanceUf2(asset) {}
+
+        assertNull(result, "A family-ID mismatch must not yield an artifact")
+        assertEquals(1, handler.deletedFiles.size, "The rejected download must be deleted")
+    }
+
+    @Test
+    fun `bootloader erase image without the family flag is rejected when a family is expected`() = runTest {
+        val handler = FakeFirmwareFileHandler()
+        val retriever = FirmwareRetriever(handler)
+        val payload = factoryEraseBlock(flags = 0L)
+        val asset = bootloaderEraseAsset(payload, expectedFamily = meshFamily)
+        handler.existingUrls.add(asset.url)
+        handler.fileBytes[asset.fileName] = payload
+
+        assertNull(retriever.retrieveMaintenanceUf2(asset) {}, "Offset 28 is a file size without the flag")
+        assertEquals(1, handler.deletedFiles.size)
+    }
+
+    @Test
+    fun `bootloader erase image skips the family check when the asset declares no expected family`() = runTest {
+        val handler = FakeFirmwareFileHandler()
+        val retriever = FirmwareRetriever(handler)
+        val payload = factoryEraseBlock(familyId = 0xADA52840L)
+        val asset = bootloaderEraseAsset(payload, expectedFamily = null)
+        handler.existingUrls.add(asset.url)
+        handler.fileBytes[asset.fileName] = payload
+
+        assertNotNull(retriever.retrieveMaintenanceUf2(asset) {}, "No expected family means no family check")
     }
 
     // -----------------------------------------------------------------------
