@@ -629,10 +629,14 @@ class MeshMessageProcessorImplTest {
         verifySuspend { nodeManager.updateNodeAndPersist(senderNode, any(), any()) }
     }
 
-    // ---------- handleReceivedMeshPacket: null decoded ----------
+    // ---------- handleReceivedMeshPacket: null decoded (undecryptable packet) ----------
 
     @Test
-    fun `packet with null decoded is skipped`() = runTest(testDispatcher) {
+    fun `packet with null decoded is still logged but skips downstream processing`() = runTest(testDispatcher) {
+        // A packet the firmware couldn't decrypt (no matching channel key) still arrives with decoded == null and
+        // only `encrypted` populated. It must be persisted to MeshLog — Sniffer/Debug read from that table and
+        // need to show it — but everything past that early return (node metric updates, live emission, dataHandler
+        // dispatch) requires actual decoded content and must NOT run.
         processor = createProcessor(backgroundScope)
         isNodeDbReady.value = true
 
@@ -640,7 +644,11 @@ class MeshMessageProcessorImplTest {
 
         processor.handleReceivedMeshPacket(packet, myNodeNum)
         advanceUntilIdle()
-        // No crash, no emitMeshPacket call (decoded is null so processReceivedMeshPacket returns early)
+
+        verifySuspend { meshLogRepository.insert(any()) }
+        verifySuspend(mode = VerifyMode.exactly(0)) { serviceRepository.emitMeshPacket(any()) }
+        verifySuspend(mode = VerifyMode.exactly(0)) { nodeManager.updateNodeAndPersist(any(), any(), any()) }
+        verifySuspend(mode = VerifyMode.exactly(0)) { dataHandler.handleReceivedData(any(), any(), any(), any(), any()) }
     }
 
     // ---------- handleReceivedMeshPacket: myNodeNum not yet known ----------

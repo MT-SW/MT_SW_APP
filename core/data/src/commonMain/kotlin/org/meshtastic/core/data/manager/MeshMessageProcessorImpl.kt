@@ -264,7 +264,7 @@ class MeshMessageProcessorImpl(
 
     @Suppress("LongMethod")
     private suspend fun processReceivedMeshPacket(packet: MeshPacket, myNodeNum: Int, session: RadioSessionContext) {
-        val decoded = packet.decoded ?: return
+        val decoded = packet.decoded
         val log =
             MeshLog(
                 uuid = Uuid.random().toString(),
@@ -272,10 +272,18 @@ class MeshMessageProcessorImpl(
                 received_date = nowMillis,
                 raw_message = packet.toString(),
                 fromNum = if (packet.from == myNodeNum) MeshLog.NODE_NUM_LOCAL else packet.from,
-                portNum = decoded.portnum.value,
+                portNum = decoded?.portnum?.value ?: 0,
                 fromRadio = FromRadio(packet = packet),
             )
         val logJob = insertMeshLog(log, session)
+
+        // A packet the firmware could not decrypt (no matching channel key) still arrives via the same
+        // sendPacketToPhoneRaw() path, with `decoded` null and only `encrypted` populated — see
+        // SnifferLogViewModel's doc comment, which already handles this case on the read side. It's logged above
+        // so Sniffer/Debug can show it, but everything below needs real payload content: node metric updates read
+        // decoded.bitfield/portnum, and dataHandler dispatches by decoded.portnum — neither is meaningful without
+        // an actual decode.
+        if (decoded == null) return
 
         launchSessionBound(session, "mesh-packet emission") { serviceStateWriter.emitMeshPacket(packet) }
 
