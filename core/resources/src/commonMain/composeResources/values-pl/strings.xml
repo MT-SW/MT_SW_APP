@@ -1975,6 +1975,7 @@
     <string name="sniffer_enabled_title">Tryb sniffera</string>
     <string name="sniffer_log_empty">Brak podsłuchanych pakietów — pojawią się tutaj pakiety nieadresowane do tego węzła, gdy zostaną odebrane</string>
     <string name="sniffer_log_title">Log Sniffera</string>
+    <string name="sniffer_auto_scroll">Automatyczne przewijanie</string>
     <!-- SITE -->
     <string name="site_planner">Planer lokalizacji</string>
     <string name="site_planner_antenna_gain_dbi">Zysk anteny (dBi)</string>

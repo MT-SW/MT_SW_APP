@@ -1959,6 +1959,7 @@
     <string name="sniffer_enabled_title">Sniffer mode</string>
     <string name="sniffer_log_empty">No sniffed packets yet — packets not addressed to this node will appear here once heard</string>
     <string name="sniffer_log_title">Sniffer Log</string>
+    <string name="sniffer_auto_scroll">Auto-scroll</string>
     <!-- SITE -->
     <string name="site_planner">Site Planner</string>
     <string name="site_planner_antenna_gain_dbi">Antenna gain (dBi)</string>

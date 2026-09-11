@@ -28,17 +28,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -46,15 +46,28 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.sniffer_auto_scroll
 import org.meshtastic.core.resources.sniffer_log_empty
 import org.meshtastic.core.resources.sniffer_log_title
 import org.meshtastic.core.ui.component.CopyIconButton
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.icon.ArrowCircleUp
+import org.meshtastic.core.ui.icon.MeshtasticIcons
 
 /** Sniffer Log: live view of locally-heard packets not addressed to this node. See [SnifferLogViewModel]. */
 @Composable
 fun SnifferLogScreen(viewModel: SnifferLogViewModel, onNavigateUp: () -> Unit) {
     val sniffedPackets by viewModel.sniffedPackets.collectAsStateWithLifecycle()
+    val listState = rememberLazyListState()
+    // Newest packet is always at index 0 (sortedByDescending). Auto-scroll is now a manual toggle via the FAB
+    // below, not inferred from scroll position — the old "am I near the top" heuristic raced against the list's
+    // own key-based item recycling and turned itself off on almost every new packet, even without the user
+    // touching the list.
+    var autoScroll by remember { mutableStateOf(true) }
+
+    LaunchedEffect(sniffedPackets.size) {
+        if (autoScroll && sniffedPackets.isNotEmpty()) listState.animateScrollToItem(0)
+    }
 
     Scaffold(
         topBar = {
@@ -69,6 +82,11 @@ fun SnifferLogScreen(viewModel: SnifferLogViewModel, onNavigateUp: () -> Unit) {
                 onClickChip = {},
             )
         },
+        floatingActionButton = {
+            if (sniffedPackets.isNotEmpty()) {
+                AutoScrollFab(autoScroll = autoScroll, onClick = { autoScroll = !autoScroll })
+            }
+        },
     ) { paddingValues ->
         if (sniffedPackets.isEmpty()) {
             Column(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
@@ -79,17 +97,6 @@ fun SnifferLogScreen(viewModel: SnifferLogViewModel, onNavigateUp: () -> Unit) {
                 )
             }
             return@Scaffold
-        }
-        val listState = rememberLazyListState()
-        // Newest packet is always at index 0 (sortedByDescending). Only follow new arrivals while the user is
-        // already at (or near) the top — scrolling away to inspect an older entry must not get yanked back.
-        val isNearTop by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
-        var autoScroll by remember { mutableStateOf(true) }
-
-        LaunchedEffect(listState) { snapshotFlow { isNearTop }.collect { autoScroll = it } }
-
-        LaunchedEffect(sniffedPackets.size) {
-            if (autoScroll && sniffedPackets.isNotEmpty()) listState.animateScrollToItem(0)
         }
 
         LazyColumn(
@@ -149,6 +156,29 @@ private fun SniffedPacketCard(packet: SniffedPacket, isExpanded: Boolean, onClic
                 )
                 CopyIconButton(valueToCopy = packet.copyText, modifier = Modifier.padding(top = 4.dp))
             }
+        }
+    }
+}
+
+@Composable
+private fun AutoScrollFab(autoScroll: Boolean, onClick: () -> Unit) {
+    if (autoScroll) {
+        FloatingActionButton(onClick = onClick) {
+            Icon(
+                imageVector = MeshtasticIcons.ArrowCircleUp,
+                contentDescription = stringResource(Res.string.sniffer_auto_scroll),
+            )
+        }
+    } else {
+        FloatingActionButton(
+            onClick = onClick,
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        ) {
+            Icon(
+                imageVector = MeshtasticIcons.ArrowCircleUp,
+                contentDescription = stringResource(Res.string.sniffer_auto_scroll),
+            )
         }
     }
 }
