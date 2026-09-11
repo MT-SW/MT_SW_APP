@@ -19,13 +19,12 @@ package org.meshtastic.feature.settings.sniffer
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -35,6 +34,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
@@ -50,8 +50,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -67,6 +71,7 @@ import org.meshtastic.core.ui.component.CopyIconButton
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.icon.ArrowCircleUp
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.theme.StatusColors.StatusReceive
 
 /** Sniffer Log: live view of locally-heard packets not addressed to this node. See [SnifferLogViewModel]. */
 @Composable
@@ -238,63 +243,95 @@ private fun AutoScrollFab(fabState: FabDisplayState, flashTrigger: Int, onClick:
 }
 
 /**
- * Whole-button alpha that dips and recovers once per [flashTrigger] change — a single flash on each real packet
- * arrival, not a looping animation. `flashTrigger == 0` means "nothing has arrived yet since screen entry", so the
- * button stays fully opaque until the first genuine new arrival.
+ * 0f (resting) to 1f (peak) once per [flashTrigger] change, then eases back to 0f — a single "ping" on each real
+ * packet arrival, not a looping animation. Drives the button's container color, icon/text color, and the glow
+ * around it together, so all three flash in sync. `flashTrigger == 0` means nothing has arrived yet since screen
+ * entry, so it never fires until a genuine new packet comes in.
  */
 @Composable
-private fun rememberFlashAlpha(flashTrigger: Int): Float {
-    val alpha = remember { Animatable(1f) }
+private fun rememberFlash(flashTrigger: Int): Float {
+    val flash = remember { Animatable(0f) }
     LaunchedEffect(flashTrigger) {
         if (flashTrigger == 0) return@LaunchedEffect
-        alpha.snapTo(1f)
-        alpha.animateTo(0.4f, animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing))
-        alpha.animateTo(1f, animationSpec = tween(durationMillis = 280, easing = FastOutSlowInEasing))
+        flash.snapTo(1f)
+        flash.animateTo(0f, animationSpec = tween(durationMillis = 650, easing = FastOutSlowInEasing))
     }
-    return alpha.value
+    return flash.value
+}
+
+/**
+ * Radial glow sized to match the actual button underneath via [Modifier.matchParentSize] — a circle behind a plain
+ * FAB, a wider oval behind the pill-shaped extended FAB — rather than a fixed size that only fit one shape.
+ */
+@Composable
+private fun BoxScope.FabGlow(flash: Float) {
+    val glowColor = MaterialTheme.colorScheme.StatusReceive
+    Box(
+        modifier =
+            Modifier.matchParentSize()
+                .graphicsLayer {
+                    val scale = 1f + flash * 0.7f
+                    scaleX = scale
+                    scaleY = scale
+                    alpha = flash * 0.85f
+                }
+                .background(
+                    brush = Brush.radialGradient(colors = listOf(glowColor, glowColor.copy(alpha = 0f))),
+                    shape = RoundedCornerShape(percent = 50),
+                ),
+    )
 }
 
 @Composable
 private fun LiveAutoScrollFab(flashTrigger: Int, onClick: () -> Unit) {
-    val flashAlpha = rememberFlashAlpha(flashTrigger)
-    FloatingActionButton(onClick = onClick, modifier = Modifier.alpha(flashAlpha)) {
-        Icon(
-            imageVector = MeshtasticIcons.ArrowCircleUp,
-            contentDescription = stringResource(Res.string.sniffer_auto_scroll),
-        )
+    val flash = rememberFlash(flashTrigger)
+    val containerColor = lerp(MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.StatusReceive, flash)
+    val contentColor = lerp(MaterialTheme.colorScheme.onPrimaryContainer, Color.White, flash)
+    Box(contentAlignment = Alignment.Center) {
+        FabGlow(flash)
+        FloatingActionButton(onClick = onClick, containerColor = containerColor, contentColor = contentColor) {
+            Icon(
+                imageVector = MeshtasticIcons.ArrowCircleUp,
+                contentDescription = stringResource(Res.string.sniffer_auto_scroll),
+            )
+        }
     }
 }
 
 @Composable
 private fun PausedAutoScrollFab(flashTrigger: Int, onClick: () -> Unit) {
-    val flashAlpha = rememberFlashAlpha(flashTrigger)
-    FloatingActionButton(
-        onClick = onClick,
-        modifier = Modifier.alpha(flashAlpha),
-        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-    ) {
-        Icon(
-            imageVector = MeshtasticIcons.ArrowCircleUp,
-            contentDescription = stringResource(Res.string.sniffer_auto_scroll),
-        )
+    val flash = rememberFlash(flashTrigger)
+    val containerColor = lerp(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.StatusReceive, flash)
+    val contentColor = lerp(MaterialTheme.colorScheme.onSurfaceVariant, Color.White, flash)
+    Box(contentAlignment = Alignment.Center) {
+        FabGlow(flash)
+        FloatingActionButton(onClick = onClick, containerColor = containerColor, contentColor = contentColor) {
+            Icon(
+                imageVector = MeshtasticIcons.ArrowCircleUp,
+                contentDescription = stringResource(Res.string.sniffer_auto_scroll),
+            )
+        }
     }
 }
 
 @Composable
 private fun NewPacketsFab(count: Int, flashTrigger: Int, onClick: () -> Unit) {
-    val flashAlpha = rememberFlashAlpha(flashTrigger)
-    ExtendedFloatingActionButton(
-        onClick = onClick,
-        modifier = Modifier.alpha(flashAlpha),
-        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        icon = {
-            Icon(
-                imageVector = MeshtasticIcons.ArrowCircleUp,
-                contentDescription = stringResource(Res.string.sniffer_auto_scroll),
-            )
-        },
-        text = { Text(stringResource(Res.string.sniffer_new_packets, count)) },
-    )
+    val flash = rememberFlash(flashTrigger)
+    val containerColor = lerp(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.StatusReceive, flash)
+    val contentColor = lerp(MaterialTheme.colorScheme.onSurfaceVariant, Color.White, flash)
+    Box(contentAlignment = Alignment.Center) {
+        FabGlow(flash)
+        ExtendedFloatingActionButton(
+            onClick = onClick,
+            containerColor = containerColor,
+            contentColor = contentColor,
+            icon = {
+                Icon(
+                    imageVector = MeshtasticIcons.ArrowCircleUp,
+                    contentDescription = stringResource(Res.string.sniffer_auto_scroll),
+                )
+            },
+            text = { Text(stringResource(Res.string.sniffer_new_packets, count)) },
+        )
+    }
 }
