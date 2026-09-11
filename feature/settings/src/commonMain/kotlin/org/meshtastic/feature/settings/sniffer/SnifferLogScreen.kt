@@ -17,28 +17,24 @@
 package org.meshtastic.feature.settings.sniffer
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
@@ -48,14 +44,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -85,7 +81,12 @@ fun SnifferLogScreen(viewModel: SnifferLogViewModel, onNavigateUp: () -> Unit) {
     // count unseen packets by comparing timestamps rather than list length — robust to MeshLogRepository's
     // DEFAULT_MAX_LOGS cap, where the list's *length* can stop changing even as its *content* keeps changing.
     var pausedAtTimestamp by remember { mutableStateOf<Long?>(null) }
-    val unseenCount = pausedAtTimestamp?.let { threshold -> sniffedPackets.count { it.receivedAtMillis > threshold } } ?: 0
+    // Unseen packets always sit at indices 0 until (unseenByTimestamp - 1), newest first — so anything at or past
+    // the current first visible index has already scrolled into view. This only feeds a display count, never the
+    // `autoScroll` boolean itself, so it can't reintroduce the earlier scroll-position race.
+    val firstVisibleIndex by remember { derivedStateOf { listState.firstVisibleItemIndex } }
+    val unseenByTimestamp = pausedAtTimestamp?.let { threshold -> sniffedPackets.count { it.receivedAtMillis > threshold } } ?: 0
+    val unseenCount = if (autoScroll) 0 else minOf(unseenByTimestamp, firstVisibleIndex)
 
     val fabState =
         when {
@@ -101,6 +102,16 @@ fun SnifferLogScreen(viewModel: SnifferLogViewModel, onNavigateUp: () -> Unit) {
     val newestPacketKey = sniffedPackets.firstOrNull()?.let { "${it.receivedAtMillis}-${it.fromId}-${it.toId}" }
     LaunchedEffect(newestPacketKey) {
         if (autoScroll && newestPacketKey != null) listState.animateScrollToItem(0)
+    }
+
+    // One-shot flash trigger for the FAB, incremented only on an actual new arrival — not a looping animation.
+    // The first packet on screen entry doesn't count as an "arrival" (hasSeenFirstPacket guards that), so the FAB
+    // stays still until something genuinely new comes in.
+    var flashTrigger by remember { mutableStateOf(0) }
+    var hasSeenFirstPacket by remember { mutableStateOf(false) }
+    LaunchedEffect(newestPacketKey) {
+        if (newestPacketKey == null) return@LaunchedEffect
+        if (hasSeenFirstPacket) flashTrigger++ else hasSeenFirstPacket = true
     }
 
     fun onFabClick() {
@@ -129,7 +140,7 @@ fun SnifferLogScreen(viewModel: SnifferLogViewModel, onNavigateUp: () -> Unit) {
         },
         floatingActionButton = {
             if (sniffedPackets.isNotEmpty()) {
-                AutoScrollFab(fabState = fabState, onClick = ::onFabClick)
+                AutoScrollFab(fabState = fabState, flashTrigger = flashTrigger, onClick = ::onFabClick)
             }
         },
     ) { paddingValues ->
@@ -215,51 +226,51 @@ private sealed class FabDisplayState {
 }
 
 @Composable
-private fun AutoScrollFab(fabState: FabDisplayState, onClick: () -> Unit) {
+private fun AutoScrollFab(fabState: FabDisplayState, flashTrigger: Int, onClick: () -> Unit) {
     Crossfade(targetState = fabState, label = "auto_scroll_fab") { state ->
         when (state) {
-            is FabDisplayState.Live -> LiveAutoScrollFab(onClick = onClick)
-            is FabDisplayState.PausedIdle -> PausedAutoScrollFab(onClick = onClick)
-            is FabDisplayState.PausedWithNew -> NewPacketsFab(count = state.count, onClick = onClick)
+            is FabDisplayState.Live -> LiveAutoScrollFab(flashTrigger = flashTrigger, onClick = onClick)
+            is FabDisplayState.PausedIdle -> PausedAutoScrollFab(flashTrigger = flashTrigger, onClick = onClick)
+            is FabDisplayState.PausedWithNew ->
+                NewPacketsFab(count = state.count, flashTrigger = flashTrigger, onClick = onClick)
         }
     }
 }
 
+/**
+ * Whole-button alpha that dips and recovers once per [flashTrigger] change — a single flash on each real packet
+ * arrival, not a looping animation. `flashTrigger == 0` means "nothing has arrived yet since screen entry", so the
+ * button stays fully opaque until the first genuine new arrival.
+ */
 @Composable
-private fun LiveAutoScrollFab(onClick: () -> Unit) {
-    Box {
-        FloatingActionButton(onClick = onClick) {
-            Icon(
-                imageVector = MeshtasticIcons.ArrowCircleUp,
-                contentDescription = stringResource(Res.string.sniffer_auto_scroll),
-            )
-        }
-        val infiniteTransition = rememberInfiniteTransition(label = "live_dot")
-        val dotAlpha by infiniteTransition.animateFloat(
-            initialValue = 1f,
-            targetValue = 0.4f,
-            animationSpec =
-                infiniteRepeatable(
-                    animation = tween(durationMillis = 900, easing = FastOutSlowInEasing),
-                    repeatMode = RepeatMode.Reverse,
-                ),
-            label = "live_dot_alpha",
-        )
-        Box(
-            modifier =
-                Modifier.size(10.dp)
-                    .align(Alignment.TopEnd)
-                    .offset(x = (-4).dp, y = 4.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.tertiary.copy(alpha = dotAlpha)),
+private fun rememberFlashAlpha(flashTrigger: Int): Float {
+    val alpha = remember { Animatable(1f) }
+    LaunchedEffect(flashTrigger) {
+        if (flashTrigger == 0) return@LaunchedEffect
+        alpha.snapTo(1f)
+        alpha.animateTo(0.4f, animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing))
+        alpha.animateTo(1f, animationSpec = tween(durationMillis = 280, easing = FastOutSlowInEasing))
+    }
+    return alpha.value
+}
+
+@Composable
+private fun LiveAutoScrollFab(flashTrigger: Int, onClick: () -> Unit) {
+    val flashAlpha = rememberFlashAlpha(flashTrigger)
+    FloatingActionButton(onClick = onClick, modifier = Modifier.alpha(flashAlpha)) {
+        Icon(
+            imageVector = MeshtasticIcons.ArrowCircleUp,
+            contentDescription = stringResource(Res.string.sniffer_auto_scroll),
         )
     }
 }
 
 @Composable
-private fun PausedAutoScrollFab(onClick: () -> Unit) {
+private fun PausedAutoScrollFab(flashTrigger: Int, onClick: () -> Unit) {
+    val flashAlpha = rememberFlashAlpha(flashTrigger)
     FloatingActionButton(
         onClick = onClick,
+        modifier = Modifier.alpha(flashAlpha),
         containerColor = MaterialTheme.colorScheme.surfaceVariant,
         contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
     ) {
@@ -271,9 +282,13 @@ private fun PausedAutoScrollFab(onClick: () -> Unit) {
 }
 
 @Composable
-private fun NewPacketsFab(count: Int, onClick: () -> Unit) {
+private fun NewPacketsFab(count: Int, flashTrigger: Int, onClick: () -> Unit) {
+    val flashAlpha = rememberFlashAlpha(flashTrigger)
     ExtendedFloatingActionButton(
         onClick = onClick,
+        modifier = Modifier.alpha(flashAlpha),
+        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         icon = {
             Icon(
                 imageVector = MeshtasticIcons.ArrowCircleUp,
