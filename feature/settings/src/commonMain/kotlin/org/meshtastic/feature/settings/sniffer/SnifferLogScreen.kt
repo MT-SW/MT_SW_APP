@@ -82,16 +82,29 @@ fun SnifferLogScreen(viewModel: SnifferLogViewModel, onNavigateUp: () -> Unit) {
 
     // Newest packet is always at index 0 (sortedByDescending). Auto-scroll is a manual toggle via the FAB below.
     var autoScroll by remember { mutableStateOf(true) }
-    // Timestamp of the newest packet at the moment auto-scroll was paused. Null while auto-scroll is on. Used to
-    // count unseen packets by comparing timestamps rather than list length — robust to MeshLogRepository's
-    // DEFAULT_MAX_LOGS cap, where the list's *length* can stop changing even as its *content* keeps changing.
+    // Timestamp of the newest packet at the moment auto-scroll was paused. Null while auto-scroll is on. This is
+    // the pause-time baseline that `seenUpToTimestamp` below starts from.
     var pausedAtTimestamp by remember { mutableStateOf<Long?>(null) }
-    // Unseen packets always sit at indices 0 until (unseenByTimestamp - 1), newest first — so anything at or past
-    // the current first visible index has already scrolled into view. This only feeds a display count, never the
-    // `autoScroll` boolean itself, so it can't reintroduce the earlier scroll-position race.
-    val firstVisibleIndex by remember { derivedStateOf { listState.firstVisibleItemIndex } }
-    val unseenByTimestamp = pausedAtTimestamp?.let { threshold -> sniffedPackets.count { it.receivedAtMillis > threshold } } ?: 0
-    val unseenCount = if (autoScroll) 0 else minOf(unseenByTimestamp, firstVisibleIndex)
+
+    // Timestamp of whichever packet currently sits at the top of the viewport, recomputed reactively as the list or
+    // scroll position changes.
+    val visibleTopTimestamp by remember {
+        derivedStateOf { sniffedPackets.getOrNull(listState.firstVisibleItemIndex)?.receivedAtMillis }
+    }
+
+    // High-water mark of the newest packet the user has actually scrolled into view since this pause began. Only
+    // ever rises — scrolling back down afterward does not lower it, so packets already brought on-screen stay
+    // "seen" and don't reappear in the unseen count. Unlike a raw scroll index, a timestamp mark isn't disturbed by
+    // new packets getting prepended above the viewport (which shifts every index but never a timestamp already
+    // reached), so genuinely new arrivals — always carrying a timestamp beyond anything seen so far — still count
+    // correctly no matter how the indices shuffle around them.
+    var seenUpToTimestamp by remember(pausedAtTimestamp) { mutableStateOf(pausedAtTimestamp ?: 0L) }
+    LaunchedEffect(visibleTopTimestamp, pausedAtTimestamp) {
+        val ts = visibleTopTimestamp ?: return@LaunchedEffect
+        if (pausedAtTimestamp != null && ts > seenUpToTimestamp) seenUpToTimestamp = ts
+    }
+
+    val unseenCount = if (autoScroll) 0 else sniffedPackets.count { it.receivedAtMillis > seenUpToTimestamp }
 
     val fabState =
         when {
