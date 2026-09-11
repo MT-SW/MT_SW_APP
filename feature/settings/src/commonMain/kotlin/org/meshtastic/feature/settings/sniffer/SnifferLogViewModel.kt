@@ -32,6 +32,8 @@ import org.meshtastic.feature.settings.util.decodePayloadFromMeshLog
 data class SniffedPacket(
     val fromId: String,
     val toId: String,
+    val fromShortName: String?,
+    val toShortName: String?,
     val channel: Int,
     val hopStart: Int,
     val hopLimit: Int,
@@ -79,10 +81,13 @@ class SnifferLogViewModel(private val meshLogRepository: MeshLogRepository, priv
         val packet = log.meshPacket ?: return null
         nodeRepository.myNodeInfo.value?.myNodeNum ?: return null
 
+        val nodeMap = nodeRepository.nodeDBbyNum.value
         val decodedPayload = packet.decoded?.payload
         return SniffedPacket(
             fromId = NodeAddress.numToDefaultId(packet.from),
             toId = NodeAddress.numToDefaultId(packet.to),
+            fromShortName = nodeMap[packet.from]?.user?.short_name?.takeIf { it.isNotBlank() },
+            toShortName = nodeMap[packet.to]?.user?.short_name?.takeIf { it.isNotBlank() },
             channel = packet.channel,
             hopStart = packet.hop_start,
             hopLimit = packet.hop_limit,

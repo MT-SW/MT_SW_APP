@@ -16,18 +16,31 @@
  */
 package org.meshtastic.feature.settings.sniffer
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -38,17 +51,22 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.sniffer_auto_scroll
 import org.meshtastic.core.resources.sniffer_log_empty
 import org.meshtastic.core.resources.sniffer_log_title
+import org.meshtastic.core.resources.sniffer_new_packets
 import org.meshtastic.core.ui.component.CopyIconButton
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.icon.ArrowCircleUp
@@ -59,14 +77,41 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 fun SnifferLogScreen(viewModel: SnifferLogViewModel, onNavigateUp: () -> Unit) {
     val sniffedPackets by viewModel.sniffedPackets.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
-    // Newest packet is always at index 0 (sortedByDescending). Auto-scroll is now a manual toggle via the FAB
-    // below, not inferred from scroll position — the old "am I near the top" heuristic raced against the list's
-    // own key-based item recycling and turned itself off on almost every new packet, even without the user
-    // touching the list.
-    var autoScroll by remember { mutableStateOf(true) }
+    val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(sniffedPackets.size) {
-        if (autoScroll && sniffedPackets.isNotEmpty()) listState.animateScrollToItem(0)
+    // Newest packet is always at index 0 (sortedByDescending). Auto-scroll is a manual toggle via the FAB below.
+    var autoScroll by remember { mutableStateOf(true) }
+    // Timestamp of the newest packet at the moment auto-scroll was paused. Null while auto-scroll is on. Used to
+    // count unseen packets by comparing timestamps rather than list length — robust to MeshLogRepository's
+    // DEFAULT_MAX_LOGS cap, where the list's *length* can stop changing even as its *content* keeps changing.
+    var pausedAtTimestamp by remember { mutableStateOf<Long?>(null) }
+    val unseenCount = pausedAtTimestamp?.let { threshold -> sniffedPackets.count { it.receivedAtMillis > threshold } } ?: 0
+
+    val fabState =
+        when {
+            autoScroll -> FabDisplayState.Live
+            unseenCount > 0 -> FabDisplayState.PausedWithNew(unseenCount)
+            else -> FabDisplayState.PausedIdle
+        }
+
+    // Keying on `.size` broke once the shared `log` table passed MeshLogRepository's DEFAULT_MAX_LOGS cap (5000
+    // rows): getAllLogs() then always returns exactly that many rows — a new packet pushes the oldest one out of
+    // the capped result at the same time it adds itself, so the list's *length* stops changing even though its
+    // *content* keeps changing. Keying on the newest item's identity instead reacts correctly regardless of the cap.
+    val newestPacketKey = sniffedPackets.firstOrNull()?.let { "${it.receivedAtMillis}-${it.fromId}-${it.toId}" }
+    LaunchedEffect(newestPacketKey) {
+        if (autoScroll && newestPacketKey != null) listState.animateScrollToItem(0)
+    }
+
+    fun onFabClick() {
+        if (autoScroll) {
+            pausedAtTimestamp = sniffedPackets.firstOrNull()?.receivedAtMillis
+            autoScroll = false
+        } else {
+            pausedAtTimestamp = null
+            autoScroll = true
+            coroutineScope.launch { if (sniffedPackets.isNotEmpty()) listState.animateScrollToItem(0) }
+        }
     }
 
     Scaffold(
@@ -84,7 +129,7 @@ fun SnifferLogScreen(viewModel: SnifferLogViewModel, onNavigateUp: () -> Unit) {
         },
         floatingActionButton = {
             if (sniffedPackets.isNotEmpty()) {
-                AutoScrollFab(autoScroll = autoScroll, onClick = { autoScroll = !autoScroll })
+                AutoScrollFab(fabState = fabState, onClick = ::onFabClick)
             }
         },
     ) { paddingValues ->
@@ -124,7 +169,9 @@ private fun SniffedPacketCard(packet: SniffedPacket, isExpanded: Boolean, onClic
     Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
         Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(text = "${packet.fromId} → ${packet.toId}", style = MaterialTheme.typography.titleSmall)
+                val fromLabel = packet.fromShortName?.let { "${packet.fromId} ($it)" } ?: packet.fromId
+                val toLabel = packet.toShortName?.let { "${packet.toId} ($it)" } ?: packet.toId
+                Text(text = "$fromLabel → $toLabel", style = MaterialTheme.typography.titleSmall)
                 Text(
                     // formatDateTime lacks a seconds guarantee across platforms (Android's DateUtils.formatDateTime
                     // has no seconds flag at all); a live packet log needs second-level precision, so compose it
@@ -160,25 +207,79 @@ private fun SniffedPacketCard(packet: SniffedPacket, isExpanded: Boolean, onClic
     }
 }
 
+/** Auto-scroll FAB display state: following live, paused with nothing new, or paused with [PausedWithNew.count]. */
+private sealed class FabDisplayState {
+    data object Live : FabDisplayState()
+    data object PausedIdle : FabDisplayState()
+    data class PausedWithNew(val count: Int) : FabDisplayState()
+}
+
 @Composable
-private fun AutoScrollFab(autoScroll: Boolean, onClick: () -> Unit) {
-    if (autoScroll) {
+private fun AutoScrollFab(fabState: FabDisplayState, onClick: () -> Unit) {
+    Crossfade(targetState = fabState, label = "auto_scroll_fab") { state ->
+        when (state) {
+            is FabDisplayState.Live -> LiveAutoScrollFab(onClick = onClick)
+            is FabDisplayState.PausedIdle -> PausedAutoScrollFab(onClick = onClick)
+            is FabDisplayState.PausedWithNew -> NewPacketsFab(count = state.count, onClick = onClick)
+        }
+    }
+}
+
+@Composable
+private fun LiveAutoScrollFab(onClick: () -> Unit) {
+    Box {
         FloatingActionButton(onClick = onClick) {
             Icon(
                 imageVector = MeshtasticIcons.ArrowCircleUp,
                 contentDescription = stringResource(Res.string.sniffer_auto_scroll),
             )
         }
-    } else {
-        FloatingActionButton(
-            onClick = onClick,
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        ) {
+        val infiniteTransition = rememberInfiniteTransition(label = "live_dot")
+        val dotAlpha by infiniteTransition.animateFloat(
+            initialValue = 1f,
+            targetValue = 0.4f,
+            animationSpec =
+                infiniteRepeatable(
+                    animation = tween(durationMillis = 900, easing = FastOutSlowInEasing),
+                    repeatMode = RepeatMode.Reverse,
+                ),
+            label = "live_dot_alpha",
+        )
+        Box(
+            modifier =
+                Modifier.size(10.dp)
+                    .align(Alignment.TopEnd)
+                    .offset(x = (-4).dp, y = 4.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.tertiary.copy(alpha = dotAlpha)),
+        )
+    }
+}
+
+@Composable
+private fun PausedAutoScrollFab(onClick: () -> Unit) {
+    FloatingActionButton(
+        onClick = onClick,
+        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    ) {
+        Icon(
+            imageVector = MeshtasticIcons.ArrowCircleUp,
+            contentDescription = stringResource(Res.string.sniffer_auto_scroll),
+        )
+    }
+}
+
+@Composable
+private fun NewPacketsFab(count: Int, onClick: () -> Unit) {
+    ExtendedFloatingActionButton(
+        onClick = onClick,
+        icon = {
             Icon(
                 imageVector = MeshtasticIcons.ArrowCircleUp,
                 contentDescription = stringResource(Res.string.sniffer_auto_scroll),
             )
-        }
-    }
+        },
+        text = { Text(stringResource(Res.string.sniffer_new_packets, count)) },
+    )
 }
