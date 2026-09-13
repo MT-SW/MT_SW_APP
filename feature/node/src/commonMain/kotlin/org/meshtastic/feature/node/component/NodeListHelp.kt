@@ -61,7 +61,12 @@ import org.meshtastic.core.resources.role_sensor_desc
 import org.meshtastic.core.resources.role_tak_desc
 import org.meshtastic.core.resources.role_tak_tracker_desc
 import org.meshtastic.core.resources.role_tracker_desc
+import org.meshtastic.core.ui.component.ConnectionActivityLegendItems
+import org.meshtastic.core.ui.component.ConnectionStatusLegendItems
 import org.meshtastic.core.ui.component.Quality
+import org.meshtastic.core.ui.component.SecurityLegendItems
+import org.meshtastic.core.resources.connections
+import org.meshtastic.core.resources.security
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.label
 import org.meshtastic.core.ui.icon.role
@@ -90,6 +95,28 @@ fun NodeListHelp(onDismiss: () -> Unit) {
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.semantics { heading() },
             )
+
+            HorizontalDivider()
+
+            Text(
+                text = stringResource(Res.string.security),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.semantics { heading() },
+            )
+
+            SecurityLegendItems()
+
+            HorizontalDivider()
+
+            Text(
+                text = stringResource(Res.string.connections),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.semantics { heading() },
+            )
+
+            ConnectionStatusLegendItems()
+
+            ConnectionActivityLegendItems()
 
             HorizontalDivider()
 

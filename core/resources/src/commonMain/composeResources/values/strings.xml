@@ -1900,6 +1900,13 @@
     <string name="security_legend_any_version">Shown at any firmware version.</string>
     <string name="security_legend_legacy_firmware">Shown for nodes on firmware before 2.8, or that report no version.</string>
     <string name="security_legend_signing_firmware">Shown for nodes on firmware 2.8 or later, and for any node whose signature the radio has verified.</string>
+    <string name="node_list_help_activity_note">The connection icon briefly glows this color when the radio sends or receives mesh traffic.</string>
+    <string name="node_list_help_activity_receive">Receiving</string>
+    <string name="node_list_help_activity_transmit">Transmitting</string>
+    <string name="security_local_node">This device</string>
+    <string name="security_local_node_help">This is the radio your phone is currently connected to.</string>
+    <string name="security_node_info_pending">Awaiting node info</string>
+    <string name="security_node_info_pending_help">This node hasn\'t sent its info yet, so it\'s not yet known whether it has a public key.</string>
     <string name="security_signed_message_info">Verified with the sender's key.</string>
     <string name="security_signed_node">Signed node</string>
     <string name="security_signed_node_desc">Verified automatically</string>

@@ -19,13 +19,23 @@ package org.meshtastic.core.ui.component
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
@@ -33,11 +43,17 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.conflate
+import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.MeshActivity
+import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.node_list_help_activity_note
+import org.meshtastic.core.resources.node_list_help_activity_receive
+import org.meshtastic.core.resources.node_list_help_activity_transmit
 import org.meshtastic.core.ui.theme.StatusColors.StatusReceive
 import org.meshtastic.core.ui.theme.StatusColors.StatusTransmit
 
@@ -107,5 +123,38 @@ fun AnimatedConnectionsNavIcon(
         val blendedTint = lerp(baseTint, currentGlowColor, animatedGlowAlpha.value)
 
         ConnectionsNavIcon(connectionState = connectionState, deviceType = deviceType, tintOverride = blendedTint)
+    }
+}
+
+
+/** Compact color-swatch + label row, matching [SecurityLegendItems]'s row shape but for a plain color, not a glyph. */
+@Composable
+private fun ActivityLegendRow(color: Color, label: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
+            Box(modifier = Modifier.size(16.dp).background(color, CircleShape))
+        }
+        Text(text = label, style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(start = 12.dp))
+    }
+}
+
+/** The two mesh-activity glow colors [AnimatedConnectionsNavIcon] blinks briefly on — for the node list help sheet. */
+@Composable
+fun ConnectionActivityLegendItems() {
+    val colorScheme = MaterialTheme.colorScheme
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        ActivityLegendRow(
+            color = colorScheme.StatusTransmit,
+            label = stringResource(Res.string.node_list_help_activity_transmit),
+        )
+        ActivityLegendRow(
+            color = colorScheme.StatusReceive,
+            label = stringResource(Res.string.node_list_help_activity_receive),
+        )
+        Text(
+            text = stringResource(Res.string.node_list_help_activity_note),
+            style = MaterialTheme.typography.bodySmall,
+            color = colorScheme.onSurfaceVariant,
+        )
     }
 }

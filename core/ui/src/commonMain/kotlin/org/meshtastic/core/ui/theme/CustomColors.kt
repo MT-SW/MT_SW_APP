@@ -235,9 +235,18 @@ object StatusColors {
         @Composable
         get() =
             if (isEffectivelyDark) {
-                Color(0xFF5C6BC0) // Info
+                Color(0xFF3D5AFE) // deeper indigo blue, dark surfaces
             } else {
-                Color(0xFF5C6BC0) // Info
+                Color(0xFF283593) // deep indigo blue, light surfaces
+            }
+
+    val ColorScheme.StatusPurple: Color
+        @Composable
+        get() =
+            if (isEffectivelyDark) {
+                Color(0xFF9C27B0) // deeper purple, dark surfaces
+            } else {
+                Color(0xFF6A1B9A) // deep purple, light surfaces
             }
 }
 

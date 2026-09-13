@@ -1911,6 +1911,13 @@
     <string name="security_icon_insecure_precise_only">Niepewny kanał, precyzyjna lokalizacja</string>
     <string name="security_icon_secure">Bezpieczne</string>
     <string name="security_icon_warning_precise_mqtt">Ostrzeżenie: Niezabezpieczone, precyzyjna lokalizacja i uplink MQTT</string>
+    <string name="node_list_help_activity_note">Ikona połączenia na chwilę rozbłyskuje tym kolorem, gdy radio wysyła lub odbiera dane przez mesh.</string>
+    <string name="node_list_help_activity_receive">Odbieranie</string>
+    <string name="node_list_help_activity_transmit">Nadawanie</string>
+    <string name="security_local_node">To urządzenie</string>
+    <string name="security_local_node_help">To jest radio, z którym Twój telefon jest obecnie połączony.</string>
+    <string name="security_node_info_pending">Oczekiwanie na dane węzła</string>
+    <string name="security_node_info_pending_help">Ten węzeł nie przesłał jeszcze swoich danych, więc nie wiadomo jeszcze, czy ma klucz publiczny.</string>
     <string name="security_signed_message_info">Zweryfikowano kluczem nadawcy.</string>
     <string name="security_signed_node">Podpisany węzeł</string>
     <string name="security_signed_node_desc">Zweryfikowano automatycznie</string>

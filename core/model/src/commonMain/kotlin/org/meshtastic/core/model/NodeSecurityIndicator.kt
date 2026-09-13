@@ -26,7 +26,10 @@ enum class NodeSecurityIndicator {
     /** The node's latest key does not match the stored one. Outranks every other state, at any version. */
     KEY_MISMATCH,
 
-    /** The user verified this node's key in person, or it is the connected radio itself. */
+    /** This device — the radio the phone is currently connected to. Distinct from [VERIFIED_CONTACT]. */
+    LOCAL_NODE,
+
+    /** The user verified this node's key in person. */
     VERIFIED_CONTACT,
 
     /**
@@ -36,6 +39,9 @@ enum class NodeSecurityIndicator {
 
     /** Pre-2.8 or unknown firmware: a public key is on file and matches. */
     PUBLIC_KEY,
+
+    /** NodeInfo has not arrived yet, so whether this node even has a public key is still unknown. */
+    NODE_INFO_PENDING,
 
     /** Pre-2.8 or unknown firmware: no public key on file. Not a channel-key fallback, the send is refused (#145). */
     NO_PUBLIC_KEY,
@@ -51,6 +57,7 @@ enum class NodeSecurityIndicator {
             signed = node.signsPackets,
             verified = node.manuallyVerified,
             isOwnNode = isOwnNode,
+            hasNodeInfo = !node.isUnknownUser,
         )
 
         /** Decides the indicator from snapshot fields alone, so the precedence is testable without a [Node]. */
@@ -61,16 +68,22 @@ enum class NodeSecurityIndicator {
             signed: Boolean = false,
             verified: Boolean = false,
             isOwnNode: Boolean = false,
+            hasNodeInfo: Boolean = true,
         ): NodeSecurityIndicator = when {
             mismatchKey -> KEY_MISMATCH
 
-            // Neither is gated on 2.8: you hold your own radio's key, and meeting someone in person stays true.
-            verified || isOwnNode -> VERIFIED_CONTACT
+            // Your own radio's key — distinct from a mesh contact verified in person.
+            isOwnNode -> LOCAL_NODE
+
+            verified -> VERIFIED_CONTACT
 
             // A heard signature is the fact itself, the version gate is only its proxy.
             signed || signsBroadcasts(firmwareVersion) -> SIGNED_NODE
 
             hasPublicKey -> PUBLIC_KEY
+
+            // NodeInfo hasn't arrived yet — this isn't "no key", it's "don't know yet".
+            !hasNodeInfo -> NODE_INFO_PENDING
 
             else -> NO_PUBLIC_KEY
         }

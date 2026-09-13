@@ -29,7 +29,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -66,6 +65,10 @@ import org.meshtastic.core.resources.error
 import org.meshtastic.core.resources.no_public_key
 import org.meshtastic.core.resources.no_public_key_text
 import org.meshtastic.core.resources.security
+import org.meshtastic.core.resources.security_local_node
+import org.meshtastic.core.resources.security_local_node_help
+import org.meshtastic.core.resources.security_node_info_pending
+import org.meshtastic.core.resources.security_node_info_pending_help
 import org.meshtastic.core.resources.security_icon_help_dismiss
 import org.meshtastic.core.resources.security_icon_help_show_all
 import org.meshtastic.core.resources.security_icon_help_show_less
@@ -84,14 +87,14 @@ import org.meshtastic.core.ui.icon.Nodes
 import org.meshtastic.core.ui.icon.Person
 import org.meshtastic.core.ui.icon.ShieldCheck
 import org.meshtastic.core.ui.theme.AppTheme
-import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
+import org.meshtastic.core.ui.theme.StatusColors.StatusBlue
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
+import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 import org.meshtastic.core.ui.theme.StatusColors.StatusRed
-import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 
 /** Key verified in person, by exchanging contact QR codes. Stronger than [SignedNodeIcon], the over-the-mesh one. */
 @Composable
-fun VerifiedContactIcon(modifier: Modifier = Modifier, tint: Color = colorScheme.StatusGreen) {
+fun VerifiedContactIcon(modifier: Modifier = Modifier, tint: Color = colorScheme.StatusOnline) {
     BadgedIcon(
         icon = MeshtasticIcons.Person,
         badge = MeshtasticIcons.ShieldCheck,
@@ -118,9 +121,11 @@ val NodeSecurityIndicator.title: StringResource
     get() =
         when (this) {
             NodeSecurityIndicator.KEY_MISMATCH -> Res.string.encryption_error
+            NodeSecurityIndicator.LOCAL_NODE -> Res.string.security_local_node
             NodeSecurityIndicator.VERIFIED_CONTACT -> Res.string.security_verified_contact
             NodeSecurityIndicator.SIGNED_NODE -> Res.string.security_signed_node
             NodeSecurityIndicator.PUBLIC_KEY -> Res.string.encryption_pkc
+            NodeSecurityIndicator.NODE_INFO_PENDING -> Res.string.security_node_info_pending
             NodeSecurityIndicator.NO_PUBLIC_KEY -> Res.string.no_public_key
         }
 
@@ -129,9 +134,11 @@ val NodeSecurityIndicator.helpText: StringResource
     get() =
         when (this) {
             NodeSecurityIndicator.KEY_MISMATCH -> Res.string.encryption_error_text
+            NodeSecurityIndicator.LOCAL_NODE -> Res.string.security_local_node_help
             NodeSecurityIndicator.VERIFIED_CONTACT -> Res.string.security_verified_contact_help
             NodeSecurityIndicator.SIGNED_NODE -> Res.string.security_signed_node_help
             NodeSecurityIndicator.PUBLIC_KEY -> Res.string.encryption_pkc_text
+            NodeSecurityIndicator.NODE_INFO_PENDING -> Res.string.security_node_info_pending_help
             NodeSecurityIndicator.NO_PUBLIC_KEY -> Res.string.no_public_key_text
         }
 
@@ -144,8 +151,10 @@ val NodeSecurityIndicator.legendFirmwareNote: StringResource
     get() =
         when (this) {
             NodeSecurityIndicator.KEY_MISMATCH,
+            NodeSecurityIndicator.LOCAL_NODE,
             NodeSecurityIndicator.VERIFIED_CONTACT,
-            -> Res.string.security_legend_any_version
+            NodeSecurityIndicator.NODE_INFO_PENDING,
+                -> Res.string.security_legend_any_version
 
             NodeSecurityIndicator.SIGNED_NODE -> Res.string.security_legend_signing_firmware
 
@@ -162,6 +171,8 @@ val NodeSecurityIndicator.legendFirmwareNote: StringResource
 @Composable
 fun NodeSecurityIndicator.Glyph(modifier: Modifier = Modifier) {
     when (this) {
+        NodeSecurityIndicator.LOCAL_NODE -> VerifiedContactIcon(modifier)
+
         NodeSecurityIndicator.VERIFIED_CONTACT -> VerifiedContactIcon(modifier)
 
         NodeSecurityIndicator.SIGNED_NODE -> SignedNodeIcon(modifier)
@@ -170,8 +181,9 @@ fun NodeSecurityIndicator.Glyph(modifier: Modifier = Modifier) {
             val (icon, tint) =
                 when (this) {
                     NodeSecurityIndicator.KEY_MISMATCH -> MeshtasticIcons.KeyOff to colorScheme.StatusRed
-                    NodeSecurityIndicator.PUBLIC_KEY -> MeshtasticIcons.Lock to colorScheme.StatusGreen
-                    else -> MeshtasticIcons.LockOpen to colorScheme.StatusYellow
+                    NodeSecurityIndicator.PUBLIC_KEY -> MeshtasticIcons.Lock to colorScheme.StatusOnline
+                    NodeSecurityIndicator.NODE_INFO_PENDING -> MeshtasticIcons.LockOpen to colorScheme.StatusBlue
+                    else -> MeshtasticIcons.LockOpen to colorScheme.StatusPurple
                 }
             Icon(imageVector = icon, contentDescription = stringResource(title), tint = tint, modifier = modifier)
         }
@@ -239,9 +251,12 @@ private val DEFAULT_GLYPH_SIZE = 20.dp
 /** The legend order, weakest claim last — the same reading order as the help sheet on the other clients. */
 private val LEGEND_ORDER =
     listOf(
+        // LOCAL_NODE renders identically to VERIFIED_CONTACT (same glyph, same color), so it's intentionally
+        // omitted here to avoid a visually duplicate row — the per-node dialog still says "Twoje urządzenie".
         NodeSecurityIndicator.VERIFIED_CONTACT,
         NodeSecurityIndicator.SIGNED_NODE,
         NodeSecurityIndicator.PUBLIC_KEY,
+        NodeSecurityIndicator.NODE_INFO_PENDING,
         NodeSecurityIndicator.NO_PUBLIC_KEY,
         NodeSecurityIndicator.KEY_MISMATCH,
     )
@@ -320,27 +335,34 @@ private fun PublicKeyContent(key: ByteString) = Column(horizontalAlignment = Ali
 
 /** Every state the node list can show, with the firmware each one applies to (design#149, point 11). */
 @Composable
-private fun SecurityLegend() {
+fun SecurityLegend() {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier.verticalScroll(rememberScrollState()),
     ) {
+        SecurityLegendItems()
+    }
+}
+
+/**
+ * [SecurityLegend]'s rows alone, with no scroll modifier of its own — for embedding in a surface that already
+ * scrolls (e.g. the node list help sheet), where nesting another [Modifier.verticalScroll] would crash.
+ */
+@Composable
+fun SecurityLegendItems() {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         LEGEND_ORDER.forEach { state ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // Content, not a control: an IconButton here is focusable and activatable but does nothing.
-                Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) { state.Glyph() }
-                Column(modifier = Modifier.padding(start = 16.dp)) {
-                    Text(text = stringResource(state.title), style = MaterialTheme.typography.titleMedium)
-                    Text(text = stringResource(state.helpText), style = MaterialTheme.typography.bodyMedium)
+                Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) { state.Glyph() }
+                Column(modifier = Modifier.padding(start = 12.dp)) {
+                    Text(text = stringResource(state.title), style = MaterialTheme.typography.titleSmall)
                     Text(
-                        text = stringResource(state.legendFirmwareNote),
+                        text = stringResource(state.helpText),
                         style = MaterialTheme.typography.bodySmall,
                         color = colorScheme.onSurfaceVariant,
                     )
                 }
-            }
-            if (state != LEGEND_ORDER.last()) {
-                HorizontalDivider(modifier = Modifier.padding(top = 8.dp))
             }
         }
     }

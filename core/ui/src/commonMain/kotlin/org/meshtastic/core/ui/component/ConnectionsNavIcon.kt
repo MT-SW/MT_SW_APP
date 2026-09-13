@@ -27,8 +27,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
+import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.connected
+import org.meshtastic.core.resources.connected_sleeping
+import org.meshtastic.core.resources.connecting
+import org.meshtastic.core.resources.disconnected
 import org.meshtastic.core.ui.icon.Bluetooth
 import org.meshtastic.core.ui.icon.Device
 import org.meshtastic.core.ui.icon.DeviceSleep
@@ -40,7 +56,7 @@ import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.core.ui.theme.StatusColors.StatusConnecting
 import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
-import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
+import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 
 @Composable
 fun ConnectionsNavIcon(
@@ -78,7 +94,7 @@ fun ConnectionsNavIcon(
 fun getTint(connectionState: ConnectionState): Color = when (connectionState) {
     ConnectionState.Connecting -> colorScheme.StatusConnecting
     ConnectionState.Disconnected -> colorScheme.StatusDisconnected
-    ConnectionState.DeviceSleep -> colorScheme.StatusYellow
+    ConnectionState.DeviceSleep -> colorScheme.StatusPurple
     else -> colorScheme.StatusOnline
 }
 
@@ -100,3 +116,36 @@ fun getIconPair(connectionState: ConnectionState, deviceType: DeviceType? = null
                     else -> null
                 }
     }
+
+
+/** The connection states the icon can show, compact and description-free like [SecurityLegendItems]. */
+private val CONNECTION_STATUS_ORDER =
+    listOf(
+        ConnectionState.Connected to Res.string.connected,
+        ConnectionState.Connecting to Res.string.connecting,
+        ConnectionState.DeviceSleep to Res.string.connected_sleeping,
+        ConnectionState.Disconnected to Res.string.disconnected,
+    )
+
+/** Every state [ConnectionsNavIcon] can show, one compact row per state — for the node list help sheet. */
+@Composable
+fun ConnectionStatusLegendItems() {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        CONNECTION_STATUS_ORDER.forEach { (state, labelRes) ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(modifier = androidx.compose.ui.Modifier.size(32.dp), contentAlignment = Alignment.Center) {
+                    ConnectionsNavIcon(
+                        connectionState = state,
+                        deviceType = null,
+                        modifier = androidx.compose.ui.Modifier.size(24.dp),
+                    )
+                }
+                Text(
+                    text = stringResource(labelRes),
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = androidx.compose.ui.Modifier.padding(start = 12.dp),
+                )
+            }
+        }
+    }
+}
