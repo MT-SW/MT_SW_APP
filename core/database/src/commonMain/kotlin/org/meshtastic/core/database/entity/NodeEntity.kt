@@ -70,6 +70,8 @@ data class NodeWithRelations(
         manuallyVerified = node.manuallyVerified,
         signsPackets = node.signsPackets,
         heardOnCurrentLora = node.heardOnCurrentLora,
+        keyMatch = node.keyMatch,
+        newPublicKey = node.newPublicKey,
     )
 
     fun toEntity() = with(node) {
@@ -99,6 +101,8 @@ data class NodeWithRelations(
             lastTransport = lastTransport,
             signsPackets = signsPackets,
             heardOnCurrentLora = heardOnCurrentLora,
+            keyMatch = keyMatch,
+            newPublicKey = newPublicKey,
         )
     }
 }
@@ -159,11 +163,31 @@ data class NodeEntity(
     /** True when this node signs its broadcasts via XEdDSA (NodeInfo.has_xeddsa_signed). */
     @ColumnInfo(name = "has_xeddsa_signed", defaultValue = "0") var signsPackets: Boolean = false,
     /**
-     * True when the radio has heard this node over RF since its current LoRa config took effect
-     * (NodeInfo.heard_on_current_lora). Defaults true so nodes stored before this column existed, and nodes from
-     * firmware that does not report it, are never shown as unheard.
+     * True when the radio has heard this node over RF on the LoRa configuration it is using now
+     * (NodeInfo.heard_on_current_lora). The radio derives this from the slot each node was heard on rather than
+     * clearing it on a config change, so returning to a configuration restores the previous answers. Defaults true so
+     * nodes stored before this column existed, and nodes from firmware that does not report it, are never shown as
+     * unheard.
      */
     @ColumnInfo(name = "heard_on_current_lora", defaultValue = "1") var heardOnCurrentLora: Boolean = true,
+    /**
+     * False once a *different* public key has arrived for a node one is already stored for.
+     *
+     * The stored key stands (first-wins) and this records the refusal, matching firmware — which drops the whole
+     * NodeInfo on a key mismatch rather than overwriting — and Meshtastic-Apple. Overwriting the trusted key instead
+     * would let any mesh or MQTT peer destroy it by broadcasting a NodeInfo under that node's number.
+     *
+     * Defaults true so rows written before this column existed are not read as mismatched; those rows record a mismatch
+     * the old way, as [ERROR_BYTE_STRING] in [publicKey].
+     */
+    @ColumnInfo(name = "key_match", defaultValue = "1") var keyMatch: Boolean = true,
+    /**
+     * The key that was refused, kept so the mismatch can be shown as more than a warning.
+     *
+     * Null whenever [keyMatch] is true. Rows that recorded a mismatch the old way, as [ERROR_BYTE_STRING] in
+     * [publicKey], have no rejected key to report and stay null.
+     */
+    @ColumnInfo(name = "new_public_key") var newPublicKey: ByteString? = null,
 ) {
     val deviceMetrics: org.meshtastic.proto.DeviceMetrics?
         get() = deviceTelemetry.device_metrics
@@ -231,5 +255,7 @@ data class NodeEntity(
         lastTransport = lastTransport,
         signsPackets = signsPackets,
         heardOnCurrentLora = heardOnCurrentLora,
+        keyMatch = keyMatch,
+        newPublicKey = newPublicKey,
     )
 }

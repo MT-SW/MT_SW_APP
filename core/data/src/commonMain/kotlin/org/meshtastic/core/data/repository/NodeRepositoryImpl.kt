@@ -319,6 +319,8 @@ class NodeRepositoryImpl(
         lastTransport = lastTransport,
         signsPackets = signsPackets,
         heardOnCurrentLora = heardOnCurrentLora,
+        keyMatch = keyMatch,
+        newPublicKey = newPublicKey,
     )
 
     private fun LocalStatsExtendedPrefs.toDomain() = LocalStatsExtended(

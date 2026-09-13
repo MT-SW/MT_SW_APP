@@ -101,6 +101,7 @@ import org.meshtastic.feature.node.component.LocalNodeContextMenu
 import org.meshtastic.feature.node.component.NodeContextMenu
 import org.meshtastic.feature.node.component.NodeCountSummary
 import org.meshtastic.feature.node.component.NodeFilterTextField
+import org.meshtastic.feature.node.component.NodeFilterToggles
 import org.meshtastic.feature.node.component.NodeHopHistogramSheet
 import org.meshtastic.feature.node.component.NodeListHelp
 
@@ -143,15 +144,7 @@ fun NodeListScreen(
     // radio is not something the node list may delete. ourNode and unfilteredNodes come from independent flows, so
     // the list can already contain the local node while ourNode is still null. Offer nothing until it is known,
     // rather than risk removing the user's own node from the radio.
-    val unheardNodes =
-        remember(unfilteredNodes, ourNode) {
-            val ourNum = ourNode?.num
-            if (ourNum == null) {
-                emptyList()
-            } else {
-                unfilteredNodes.filter { !it.heardOnCurrentLora && !it.isFavorite && it.num != ourNum }
-            }
-        }
+    val unheardNodes = remember(unfilteredNodes, ourNode) { selectRemovableUnheardNodes(unfilteredNodes, ourNode?.num) }
     val deviceImageUrls by viewModel.deviceImageUrls.collectAsStateWithLifecycle()
     val relayNodeIds by viewModel.relayNodeIds.collectAsStateWithLifecycle()
     val ignoredNodeCount = unfilteredNodes.count { it.isIgnored }
@@ -197,7 +190,7 @@ fun NodeListScreen(
 
     var showShareContact by remember { mutableStateOf(false) }
     if (showShareContact) {
-        SharedContactDialog(contact = ourNode, onDismiss = { showShareContact = false })
+        SharedContactDialog(contact = ourNode, onDismiss = { showShareContact = false }, isOwnContact = true)
     }
 
     Scaffold(
@@ -273,29 +266,35 @@ fun NodeListScreen(
                             onRemoveAll = { unheardNodes.forEach(viewModel::removeNode) },
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
                         )
+                        val filterPrefs = viewModel.nodeFilterPreferences
                         NodeFilterTextField(
-                            modifier = Modifier.fillMaxWidth(),
                             filterText = state.filter.filterText,
                             onTextChange = { viewModel.nodeFilterText = it },
                             currentSortOption = state.sort,
                             onSortSelect = viewModel::setSortOption,
-                            includeUnknown = state.filter.includeUnknown,
-                            onToggleIncludeUnknown = { viewModel.nodeFilterPreferences.toggleIncludeUnknown() },
-                            excludeInfrastructure = state.filter.excludeInfrastructure,
-                            onToggleExcludeInfrastructure = {
-                                viewModel.nodeFilterPreferences.toggleExcludeInfrastructure()
-                            },
-                            onlyOnline = state.filter.onlyOnline,
-                            onToggleOnlyOnline = { viewModel.nodeFilterPreferences.toggleOnlyOnline() },
-                            onlyDirect = state.filter.onlyDirect,
-                            onToggleOnlyDirect = { viewModel.nodeFilterPreferences.toggleOnlyDirect() },
-                            showIgnored = state.filter.showIgnored,
-                            onToggleShowIgnored = { viewModel.nodeFilterPreferences.toggleShowIgnored() },
-                            ignoredNodeCount = ignoredNodeCount,
-                            excludeMqtt = state.filter.excludeMqtt,
-                            onToggleExcludeMqtt = { viewModel.nodeFilterPreferences.toggleExcludeMqtt() },
-                            excludeUnheard = state.filter.excludeUnheard,
-                            onToggleExcludeUnheard = { viewModel.nodeFilterPreferences.toggleExcludeUnheard() },
+                            modifier = Modifier.fillMaxWidth(),
+                            toggles =
+                            NodeFilterToggles(
+                                includeUnknown = state.filter.includeUnknown,
+                                onToggleIncludeUnknown = filterPrefs::toggleIncludeUnknown,
+                                excludeInfrastructure = state.filter.excludeInfrastructure,
+                                onToggleExcludeInfrastructure = filterPrefs::toggleExcludeInfrastructure,
+                                onlyOnline = state.filter.onlyOnline,
+                                onToggleOnlyOnline = filterPrefs::toggleOnlyOnline,
+                                onlyDirect = state.filter.onlyDirect,
+                                onToggleOnlyDirect = filterPrefs::toggleOnlyDirect,
+                                showIgnored = state.filter.showIgnored,
+                                onToggleShowIgnored = filterPrefs::toggleShowIgnored,
+                                ignoredNodeCount = ignoredNodeCount,
+                                excludeUnheard = state.filter.excludeUnheard,
+                                onToggleExcludeUnheard = filterPrefs::toggleExcludeUnheard,
+                                excludeMqtt = state.filter.excludeMqtt,
+                                onToggleExcludeMqtt = filterPrefs::toggleExcludeMqtt,
+                                onlySigned = state.filter.onlySigned,
+                                onToggleOnlySigned = filterPrefs::toggleOnlySigned,
+                                onlyEncrypted = state.filter.onlyEncrypted,
+                                onToggleOnlyEncrypted = filterPrefs::toggleOnlyEncrypted,
+                            ),
                         )
                     }
                 }

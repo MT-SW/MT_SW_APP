@@ -1914,8 +1914,10 @@
     <string name="security_signed_message_info">Zweryfikowano kluczem nadawcy.</string>
     <string name="security_signed_node">Podpisany węzeł</string>
     <string name="security_signed_node_desc">Zweryfikowano automatycznie</string>
-    <string name="security_signed_node_help">Ten węzeł podpisuje swoje transmisje przy pomocy XEdDSA. Transmisje od niego są weryfikowane przez radio przy użyciu jego klucza tożsamości.</string>
+    <string name="security_signed_node_help">Radio zweryfikowało podpisane transmisje tego węzła przy użyciu jego klucza tożsamości, więc jego tożsamość jest spójna w czasie, ale nie zweryfikowałeś/aś jej osobiście. Każdy węzeł na firmware 2.8 lub nowszym podpisuje swoje transmisje.</string>
     <string name="security_signed_verified">Podpisany · zweryfikowany</string>
+    <string name="security_verified_contact">Zweryfikowany kontakt</string>
+    <string name="security_verified_contact_help">Zweryfikowałeś/aś klucz tego węzła osobiście, wymieniając się kodami QR kontaktu, więc jego tożsamość jest potwierdzona. Najsilniejsze zaufanie pokazywane na liście, widoczne przy każdej wersji firmware.</string>
     <string name="select">Wybierz</string>
     <string name="select_all">Zaznacz wszystko</string>
     <string name="selected">Wybrane</string>
@@ -1947,6 +1949,7 @@
     <string name="share_contact">Udostępnij kontakt</string>
     <string name="share_location">Udostępnij lokalizację</string>
     <string name="share_location_description">Użyj GPS telefonu do wysyłania lokalizacji do węzła zamiast GPS sprzętowego w węźle.</string>
+    <string name="share_qr_subtext">Zeskanuj ten kod inną aplikacją MT_SW_APP, aby dodać go tam.</string>
     <string name="share_to">Udostępnij…</string>
     <string name="share_your_location_in_real_time">Udostępniaj swoją lokalizację w czasie rzeczywistym i koordynuj działania swojej grupy dzięki zintegrowanym funkcjom GPS.</string>
     <string name="short_name">Krótka nazwa</string>

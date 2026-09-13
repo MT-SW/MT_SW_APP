@@ -145,7 +145,15 @@ private fun NodeDetailScaffold(
         )
     }
 
-    NodeDetailOverlays(activeOverlay, node, compassUiState, actualCompassViewModel, { activeOverlay = null }) {
+    val isLocalNode = node != null && node.num == uiState.ourNode?.num
+    NodeDetailOverlays(
+        activeOverlay,
+        node,
+        isLocalNode,
+        compassUiState,
+        actualCompassViewModel,
+        { activeOverlay = null },
+    ) {
         viewModel.handleNodeMenuAction(NodeMenuAction.RequestPosition(it))
     }
 
@@ -159,6 +167,7 @@ private fun NodeDetailScaffold(
 private fun NodeDetailOverlays(
     overlay: NodeDetailOverlay?,
     node: Node?,
+    isLocal: Boolean,
     compassUiState: CompassUiState,
     compassViewModel: CompassViewModel?,
     onDismiss: () -> Unit,
@@ -186,7 +195,7 @@ private fun NodeDetailOverlays(
     }
 
     when (overlay) {
-        is NodeDetailOverlay.SharedContact -> node?.let { SharedContactDialog(it, onDismiss) }
+        is NodeDetailOverlay.SharedContact -> node?.let { SharedContactDialog(it, onDismiss, isOwnContact = isLocal) }
 
         is NodeDetailOverlay.FirmwareReleaseInfo ->
             NodeDetailBottomSheet(onDismiss) { FirmwareReleaseSheetContent(firmwareRelease = overlay.release) }
