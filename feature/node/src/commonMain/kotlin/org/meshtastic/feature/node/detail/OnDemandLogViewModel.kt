@@ -19,6 +19,7 @@ package org.meshtastic.feature.node.detail
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.repository.MeshLogRepository
@@ -71,7 +72,7 @@ data class OnDemandLogUiState(
  */
 @KoinViewModel
 class OnDemandLogViewModel(
-    private val destNum: Int,
+    @InjectedParam private val destNum: Int,
     private val nodeRequestActions: NodeRequestActions,
     private val meshLogRepository: MeshLogRepository,
     private val nodeManager: NodeManager,

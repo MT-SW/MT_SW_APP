@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.repository.MeshLogRepository
@@ -59,8 +60,8 @@ data class NodeMetricDetailUiState(
 
 @KoinViewModel
 class NodeMetricDetailViewModel(
-    private val nodeNum: Int,
-    private val initialMetric: NetworkHealthMetric,
+    @InjectedParam private val nodeNum: Int,
+    @InjectedParam private val initialMetric: NetworkHealthMetric,
     private val nodeRepository: NodeRepository,
     private val meshLogRepository: MeshLogRepository,
 ) : ViewModel() {
