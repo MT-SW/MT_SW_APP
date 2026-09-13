@@ -84,8 +84,8 @@ import org.maplibre.spatialk.geojson.Position as GeoPosition
 internal const val DEG_SCALE = 1e-7
 internal const val DETAIL_ZOOM = 13.0
 
-/** Tighter than [DETAIL_ZOOM]: the node-detail mini-map shows one node, and the Google flavor opens it at 15. */
-private const val INLINE_ZOOM = 15.0
+/** Node-detail mini-map zoom. Tuned looser than the Google flavor's 15 (felt too close). */
+private const val INLINE_ZOOM = 11.0
 
 /**
  * Single-node mini-map embedded in the node detail sheet.
