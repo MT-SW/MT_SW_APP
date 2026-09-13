@@ -88,9 +88,9 @@ import org.meshtastic.core.ui.icon.Person
 import org.meshtastic.core.ui.icon.ShieldCheck
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.StatusColors.StatusBlue
+import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
-import org.meshtastic.core.ui.theme.StatusColors.StatusRed
 
 /** Key verified in person, by exchanging contact QR codes. Stronger than [SignedNodeIcon], the over-the-mesh one. */
 @Composable
@@ -180,7 +180,7 @@ fun NodeSecurityIndicator.Glyph(modifier: Modifier = Modifier) {
         else -> {
             val (icon, tint) =
                 when (this) {
-                    NodeSecurityIndicator.KEY_MISMATCH -> MeshtasticIcons.KeyOff to colorScheme.StatusRed
+                    NodeSecurityIndicator.KEY_MISMATCH -> MeshtasticIcons.KeyOff to colorScheme.StatusDisconnected
                     NodeSecurityIndicator.PUBLIC_KEY -> MeshtasticIcons.Lock to colorScheme.StatusOnline
                     NodeSecurityIndicator.NODE_INFO_PENDING -> MeshtasticIcons.LockOpen to colorScheme.StatusBlue
                     else -> MeshtasticIcons.LockOpen to colorScheme.StatusPurple
