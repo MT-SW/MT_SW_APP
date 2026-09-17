@@ -142,6 +142,10 @@ internal data class MessageListPagedState(
     val searchQuery: String = "",
     val translationAvailable: Boolean = false,
     val showFullMessageTimestamps: Boolean = false,
+    /** False for an archived conversation: existing reactions still render, but none can be added. */
+    val canReact: Boolean = true,
+    /** False for an archived conversation: its channel is gone, so nothing can be sent or resent into it. */
+    val canSend: Boolean = true,
 )
 
 private fun MutableState<Set<Long>>.toggle(uuid: Long) {
@@ -176,11 +180,15 @@ internal fun MessageListPaged(
         MessageStatusDialog(
             message = message,
             isDirectMessage = isDirectMessageConversation,
-            resendOption = message.isStatusRetryable(isDirectMessageConversation),
+            resendOption = message.isStatusRetryable(isDirectMessageConversation) && state.canSend,
             relayNodeNames = relayNodeNames,
             onResend = {
-                handlers.onDeleteMessages(listOf(message.uuid))
-                handlers.onSendMessage(message.text, state.contactKey)
+                // Resend deletes the old row and sends a fresh one. Never take the first half without the second:
+                // on an archived conversation the send is refused, which would leave the message simply gone.
+                if (state.canSend) {
+                    handlers.onDeleteMessages(listOf(message.uuid))
+                    handlers.onSendMessage(message.text, state.contactKey)
+                }
                 showStatusDialog = null
             },
             onDismiss = { showStatusDialog = null },
@@ -192,6 +200,7 @@ internal fun MessageListPaged(
         ReactionDialog(
             reactions = reactions,
             myId = state.ourNode?.user?.id,
+            canReact = state.canReact,
             onDismiss = { showReactionDialog = null },
             onResend = { reaction ->
                 handlers.onSendReaction(reaction.emoji, reaction.replyId)
@@ -481,6 +490,8 @@ private fun RenderPagedChatMessageRow(
         hasSamePrev = hasSamePrev,
         hasSameNext = hasSameNext,
         quickEmojis = quickEmojis,
+        canReact = state.canReact,
+        canReply = state.canSend,
         searchQuery = state.searchQuery,
         translationAvailable = state.translationAvailable,
         isDirectMessage = isDirectMessageConversation,

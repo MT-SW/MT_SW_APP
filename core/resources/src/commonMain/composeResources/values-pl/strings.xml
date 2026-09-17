@@ -75,6 +75,7 @@
     <string name="air_quality_metrics_update_interval_seconds">Czas aktualizacji metryk jakości powietrza</string>
     <string name="air_util_definition">Procent czasu  wykorzystanego do transmisji w ciągu ostatniej godziny.</string>
     <string name="air_utilization">AirUtil</string>
+
     <!-- ALERT -->
     <string name="alert_bell_buzzer">Brzęczyk dzwonka alarmowego</string>
     <string name="alert_bell_led">Dioda dzwonka alarmowego</string>
@@ -95,6 +96,12 @@
     <string name="analytics_okay">Zezwalaj na analizę i raportowanie awarii.</string>
     <string name="analytics_platforms">Platformy analityczne:</string>
     <string name="any">Dowolny</string>
+    <string name="archived_channel">Zarchiwizowany kanał</string>
+    <string name="archived_channel_read_only">Ten kanał nie jest już skonfigurowany na Twoim radiu. Wiadomości pozostają tutaj, ale nie możesz wysyłać ani reagować.</string>
+    <string name="discovery_scan_in_progress">Skanowanie presetów LoRa…</string>
+    <string name="firmware_update_in_progress">Aktualizowanie firmware…</string>
+    <string name="license">Licencja</string>
+    <string name="license_notice">Wolne oprogramowanie na licencji GNU General Public License w wersji 3, bez żadnej gwarancji. Możesz je rozpowszechniać na tej samej licencji.</string>
     <!-- APP -->
     <string name="app_functions_get_channel_info">Pobierz informacje o kanale</string>
     <string name="app_functions_get_device_status">Pobierz status urządzenia</string>
@@ -1053,7 +1060,7 @@
     <string name="lockdown_disable_message">Wpisz hasło, aby wyłączyć blokadę. Urządzenie odszyfruje pamięć i zrestartuje się.</string>
     <string name="lockdown_enable">Włącz blokadę</string>
     <string name="lockdown_enable_ack">Rozumiem</string>
-    <string name="lockdown_enable_warning">Uwaga: włączenie blokady blokuje port debugowania (SWD) na obsługiwanym sprzęcie. Możesz wyłączyć blokadę w dowolnym momencie hasłem, a pełne wymazanie urządzenia przywraca wszystko w razie potrzeby.</string>
+    <string name="lockdown_enable_warning">Włączenie blokady blokuje port debugowania (SWD) na sprzęcie, na którym blokada faktycznie działa. Wyłączenie blokady później odszyfrowuje Twoje dane, ale port pozostaje zablokowany. Ponowne jego otwarcie wymaga pełnego wymazania układu sondą debugującą, co niszczy wszystkie dane na urządzeniu.</string>
     <string name="lockdown_enter_passphrase">Wpisz hasło</string>
     <string name="lockdown_hide_passphrase">Ukryj</string>
     <string name="lockdown_hours_until_expiry">Godziny do wygaśnięcia</string>
