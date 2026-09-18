@@ -90,7 +90,6 @@ import org.meshtastic.feature.settings.radio.component.EditDeviceProfileDialog
 import org.meshtastic.feature.settings.util.LanguageUtils
 import org.meshtastic.feature.settings.util.LanguageUtils.languageMap
 import org.meshtastic.proto.DeviceProfile
-import org.meshtastic.proto.ModuleConfig
 import kotlin.time.Instant.Companion.fromEpochMilliseconds
 
 @Suppress("LongMethod", "CyclomaticComplexMethod")
@@ -257,9 +256,7 @@ fun SettingsScreen(
                 },
                 onNavigate = onNavigate,
                 onSetSnifferEnabled = {
-                    viewModel.setModuleConfig(
-                        ModuleConfig(nodemodadmin = ModuleConfig.NodeModAdminConfig(sniffer_enabled = it)),
-                    )
+                    viewModel.setSnifferEnabled(it)
                 },
             )
 

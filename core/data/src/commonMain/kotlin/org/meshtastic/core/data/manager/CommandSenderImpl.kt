@@ -32,7 +32,9 @@ import org.meshtastic.core.model.MessageStatus
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.Position
 import org.meshtastic.core.model.TelemetryType
+import org.meshtastic.core.model.util.ON_DEMAND_PORT_NUM
 import org.meshtastic.core.model.util.isWithinSizeLimit
+import org.meshtastic.core.model.util.privatePortNumUnknownFields
 import org.meshtastic.core.repository.AwaitedSendResult
 import org.meshtastic.core.repository.CommandSender
 import org.meshtastic.core.repository.LocalNodeUnavailableException
@@ -342,9 +344,10 @@ class CommandSenderImpl(
                 channel = getChannelIndex(destNum),
                 decoded =
                     Data(
-                        portnum = PortNum.ON_DEMAND_APP,
+                        // No PortNum constant exists for 354 (OnDemand/Sniffer) -- see PrivatePortNum.kt.
                         payload = onDemand.encode().toByteString(),
                         want_response = true,
+                        unknownFields = privatePortNumUnknownFields(ON_DEMAND_PORT_NUM),
                     ),
             ),
             "OnDemand request",

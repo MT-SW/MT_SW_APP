@@ -42,6 +42,7 @@ import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.MessageStatus
 import org.meshtastic.core.model.RadioNotConnectedException
+import org.meshtastic.core.model.util.effectivePortNum
 import org.meshtastic.core.model.util.toOneLineString
 import org.meshtastic.core.model.util.toPIIString
 import org.meshtastic.core.repository.AwaitedSendResult
@@ -237,7 +238,7 @@ class PacketHandlerImpl(
                     received_date = nowMillis,
                     raw_message = packet.toString(),
                     fromNum = MeshLog.NODE_NUM_LOCAL,
-                    portNum = packet.decoded?.portnum?.value ?: 0,
+                    portNum = packet.decoded?.effectivePortNum() ?: 0,
                     fromRadio = FromRadio(packet = packet),
                 )
             insertMeshLog(packetToSave)

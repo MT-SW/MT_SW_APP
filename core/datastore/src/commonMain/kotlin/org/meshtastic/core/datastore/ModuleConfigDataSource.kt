@@ -80,8 +80,6 @@ class ModuleConfigDataSource(private val moduleConfigStore: CoreModuleConfigData
 
             config.mesh_beacon != null -> current.copy(mesh_beacon = config.mesh_beacon)
 
-            config.nodemodadmin != null -> current.copy(nodemodadmin = config.nodemodadmin)
-
             else -> current
         }
     }

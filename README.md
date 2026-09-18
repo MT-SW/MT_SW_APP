@@ -63,7 +63,7 @@ Osobny ekran dostępny z ekranu szczegółów węzła (Administracja → "Diagno
 
 - **10 typów zapytań**: statystyki węzła (bateria, czas pracy, CPU/heap/flash/PSRAM, liczniki floodu i nexthop, blokady limitem hopów), ping (RSSI/SNR), lista węzłów online, historia błędów routingu, liczniki użycia portów, aktywność eteru, log ostatnich wymian pakietów, historia średniego czasu odbioru, historia liczby odebranych pakietów oraz wersja firmware MT_SW.
 - Odpowiedzi przychodzą na dedykowanym porcie protokołu (354) i są dekodowane na żywo z istniejącego logu zdarzeń mesh — ten sam wzorzec danych co ekran "Zdrowie sieci", nic nie jest dodatkowo zapisywane.
-- **Wymaga customowego firmware z modułem OnDemand** — protokół zdefiniowany we własnym forku protobufs ([MT_SW_PROTOBUFS](https://github.com/MT-SW/MT_SW_PROTOBUFS)); na starszym lub oficjalnym firmware przyciski wysyłają zapytanie, ale węzeł na nie nie odpowiada.
+- **Wymaga customowego firmware z modułem OnDemand** — protokół zdefiniowany we własnym module `ondemand.proto` dołączonym bezpośrednio do appki (wcześniej żył w osobnym forku protobufów, [MT_SW_PROTOBUFS](https://github.com/MT-SW/MT_SW_PROTOBUFS)); na starszym lub oficjalnym firmware przyciski wysyłają zapytanie, ale węzeł na nie nie odpowiada.
 - **Pochodzenie funkcji** — zaadaptowana z historycznego forka firmware Meshtastic (`musznik/firmware`, gałąź `trunk-io/update-trunk`).
 
 ## Sniffer
@@ -79,7 +79,7 @@ Tryb pokazujący ruch w eterze, który normalnie by zniknął — wszystkie paki
 - **Podsłuchane odpowiedzi traceroute adresowane do innych węzłów nie są już mylnie pokazywane jako wynik własnego zapytania o trasę** — appka rozróżnia teraz, czy pakiet traceroute faktycznie był skierowany do lokalnie podłączonego węzła.
 - **Naprawione podwójne wpisy przy własnym traceroute** — po włączeniu snifera świeżo wysłane zapytanie traceroute potrafiło pojawić się w logu dwukrotnie (firmware podsłuchiwał echo własnego pakietu); appka filtruje teraz duplikaty po ID pakietu.
 - **Działa wyłącznie lokalnie** — pokazuje tylko to, co fizycznie usłyszy radiem węzeł aktualnie podłączony do telefonu; włączenie na zdalnym węźle nic nie da z perspektywy tego telefonu, bo podsłuchane pakiety trafiają do urządzenia podłączonego do TAMTEGO węzła.
-- **Wymaga customowego firmware z modułem sniffera** (własny fork protobufs, [MT_SW_PROTOBUFS](https://github.com/MT-SW/MT_SW_PROTOBUFS)) — appka rozpoznaje to po tym, czy samo podłączone urządzenie zgłosiło moduł podczas synchronizacji konfiguracji przy połączeniu, a nie po numerze wersji firmware (bo to funkcja tylko tego forka). Jeśli urządzenie go nie zgłosiło, przełącznik jest wyszarzony z odpowiednim opisem, zamiast wysyłać konfigurację, która na niewspierającym firmware potrafiła całkowicie zawiesić appkę (zwłaszcza w wersji desktopowej).
+- **Wymaga customowego firmware z modułem sniffera** — sterowanie przeniesiono z osobnego pola konfiguracji (istniejącego tylko w naszym dawnym forku protobufów) na protokół OnDemand (port 354): appka po połączeniu pyta węzeł o stan snifera i czeka na odpowiedź, zamiast odczytywać go z synchronizacji konfiguracji. Firmware, które nie obsługuje tego zapytania (starsze lub oficjalne), po prostu nigdy nie odpowiada — appka rozpoznaje to po przekroczeniu limitu czasu i wyszarza przełącznik z odpowiednim opisem, zamiast czekać w nieskończoność albo ryzykować zawieszenie appki (zwłaszcza w wersji desktopowej).
 - **Pochodzenie funkcji** — zaadaptowana z historycznego forka firmware Meshtastic (`musznik/firmware`, gałąź `trunk-io/update-trunk`).
 
 ## Komunikator
@@ -190,7 +190,7 @@ A dedicated screen reachable from the node detail screen (Administration → "On
 
 - **10 query types**: node stats (battery, uptime, CPU/heap/flash/PSRAM, flood and nexthop counters, hop-limit blocks), ping (RSSI/SNR), nodes online, routing error history, port usage counters, air activity, recent packet exchange log, average RX time history, RX packet count history, and the MT_SW firmware version.
 - Responses arrive on a dedicated protocol port (354) and are decoded live from the existing mesh event log — the same data pattern as the "Network Health" screen, nothing is persisted separately.
-- **Requires custom firmware with the OnDemand module** — the protocol is defined in a dedicated protobufs fork ([MT_SW_PROTOBUFS](https://github.com/MT-SW/MT_SW_PROTOBUFS)); on older or stock firmware the buttons send the request, but the node never responds.
+- **Requires custom firmware with the OnDemand module** — the protocol is defined in a small `ondemand.proto` Wire module bundled directly with the app (it used to live in a separate protobufs fork, [MT_SW_PROTOBUFS](https://github.com/MT-SW/MT_SW_PROTOBUFS)); on older or stock firmware the buttons send the request, but the node never responds.
 - **Feature origin** — adapted from a historical Meshtastic firmware fork (`musznik/firmware`, `trunk-io/update-trunk` branch).
 
 ## Sniffer
@@ -206,7 +206,7 @@ A mode that surfaces air traffic that would normally just vanish — every packe
 - **Sniffed traceroute responses addressed to other nodes no longer show up as if they were the result of your own traceroute request** — the app now checks whether a traceroute packet was actually addressed to the locally connected node.
 - **Fixed duplicate entries for your own traceroute** — with Sniffer on, a freshly sent traceroute request could show up twice in the log (firmware picking up the echo of your own packet); the app now filters duplicates by packet ID.
 - **Local only** — surfaces only what the node currently connected to the phone physically hears over the radio; enabling it on a remote node does nothing useful from this phone's perspective, since the sniffed traffic goes to whichever device is connected to THAT node.
-- **Requires custom firmware with the sniffer module** (dedicated protobufs fork, [MT_SW_PROTOBUFS](https://github.com/MT-SW/MT_SW_PROTOBUFS)) — the app detects this from whether the connected device itself reported the module during its config sync on connect, not from the firmware version (since this is fork-only). If the device didn't report it, the toggle is grayed out with an explanation instead of sending a config write that could hang the app entirely on unsupported firmware (especially on desktop).
+- **Requires custom firmware with the sniffer module** — control has moved off a dedicated config field (which only ever existed in our former protobufs fork) onto the OnDemand protocol (port 354): on connect, the app asks the node for the sniffer's current state and waits for a reply, instead of reading it off the config sync. Firmware that doesn't support the request (older or stock) simply never answers — the app detects this via a timeout and grays out the toggle with an explanation, instead of waiting forever or risking a hang (especially on desktop).
 - **Feature origin** — adapted from a historical Meshtastic firmware fork (`musznik/firmware`, `trunk-io/update-trunk` branch).
 
 ## Messaging

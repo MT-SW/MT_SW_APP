@@ -103,7 +103,6 @@ import org.meshtastic.feature.settings.radio.component.EditDeviceProfileDialog
 import org.meshtastic.proto.DeviceProfile
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant.Companion.fromEpochMilliseconds
-import org.meshtastic.proto.ModuleConfig
 
 /**
  * Desktop-specific top-level settings screen. Replaces the Android `SettingsScreen` which uses Android-specific APIs
@@ -257,9 +256,7 @@ fun DesktopSettingsScreen(
                     showEditDeviceProfileDialog = true
                 },
                 onSetSnifferEnabled = {
-                    radioConfigViewModel.setModuleConfig(
-                        ModuleConfig(nodemodadmin = ModuleConfig.NodeModAdminConfig(sniffer_enabled = it)),
-                    )
+                    radioConfigViewModel.setSnifferEnabled(it)
                 },
             )
 

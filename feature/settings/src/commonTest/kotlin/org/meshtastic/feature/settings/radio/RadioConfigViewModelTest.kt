@@ -53,6 +53,7 @@ import org.meshtastic.core.domain.usecase.settings.ImportSecurityConfigUseCase
 import org.meshtastic.core.domain.usecase.settings.InstallProfileUseCase
 import org.meshtastic.core.domain.usecase.settings.ProcessRadioResponseUseCase
 import org.meshtastic.core.domain.usecase.settings.RadioConfigUseCase
+import org.meshtastic.core.domain.usecase.settings.SnifferControlUseCase
 import org.meshtastic.core.domain.usecase.settings.RadioResponseResult
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.MqttProbeStatus
@@ -313,6 +314,7 @@ class RadioConfigViewModelTest {
     private val installProfileUseCase: InstallProfileUseCase = mock(MockMode.autofill)
     private val radioConfigUseCase: RadioConfigUseCase = mock(MockMode.autofill)
     private val adminActionsUseCase: AdminActionsUseCase = mock(MockMode.autofill)
+    private val snifferControlUseCase: SnifferControlUseCase = mock(MockMode.autofill)
     private val processRadioResponseUseCase: ProcessRadioResponseUseCase = mock(MockMode.autofill)
     private val locationService: LocationService = mock(MockMode.autofill)
     private val fileService: FileService = mock(MockMode.autofill)
@@ -358,6 +360,8 @@ class RadioConfigViewModelTest {
 
         every { uiPrefs.showQuickChat } returns MutableStateFlow(false)
 
+        every { snifferControlUseCase.snifferEnabledFlow(any()) } returns MutableStateFlow(null)
+
         viewModel = createViewModel()
     }
 
@@ -396,6 +400,7 @@ class RadioConfigViewModelTest {
         installProfileUseCase = installProfileUseCase,
         radioConfigUseCase = radioConfigUseCase,
         adminActionsUseCase = adminActionsUseCase,
+        snifferControlUseCase = snifferControlUseCase,
         processRadioResponseUseCase = processRadioResponseUseCase,
         locationService = locationService,
         fileService = fileService,

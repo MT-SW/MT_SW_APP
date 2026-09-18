@@ -111,6 +111,7 @@ jmdns = "3.6.3"
 qrcode-kotlin = "4.5.0"
 takpacket-sdk = "0.9.1"
 meshtastic-protobufs = "2.8.0.63-g8fc402a-SNAPSHOT"
+wire = "6.4.7"
 
 # Gradle Plugins
 ccud = "2.8.0"
@@ -368,6 +369,10 @@ takpacket-sdk-kmp = { module = "org.meshtastic:takpacket-sdk", version.ref = "ta
 # Meshtastic Protobufs SDK (Wire-generated KMP models from meshtastic/protobufs)
 meshtastic-protobufs = { module = "org.meshtastic:protobufs", version.ref = "meshtastic-protobufs" }
 
+# Wire runtime for locally-compiled ondemand.proto (OnDemand/Sniffer port-354 protocol) -- not part of
+# the official protobufs artifact above.
+wire-runtime = { module = "com.squareup.wire:wire-runtime", version.ref = "wire" }
+
 
 [bundles]
 # Datadog RUM/telemetry stack — always consumed together (androidApp google flavor)
@@ -398,6 +403,7 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
+wire = { id = "com.squareup.wire", version.ref = "wire" }
 
 # Google
 devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "devtools-ksp" }

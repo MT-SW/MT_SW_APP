@@ -36,7 +36,7 @@ import org.meshtastic.proto.OnDemandResponse
 import org.meshtastic.proto.OnDemandType
 import org.meshtastic.proto.Ping
 import org.meshtastic.proto.PortCounterEntry
-import org.meshtastic.proto.PortNum
+import org.meshtastic.core.model.util.ON_DEMAND_PORT_NUM
 import org.meshtastic.proto.RoutingErrorEntry
 
 /** UI state for the OnDemand diagnostics screen — one field per query type. */
@@ -59,7 +59,8 @@ data class OnDemandLogUiState(
 
 /**
  * ViewModel for the OnDemand diagnostics screen. Reads every response type live from [MeshLog] on port
- * [PortNum.ON_DEMAND_APP] — nothing new is persisted, matching the app's Network Health/Traceroute precedent.
+ * port 354 (ON_DEMAND_PORT_NUM; no PortNum constant exists for it, see PrivatePortNum.kt) — nothing new
+ * is persisted, matching the app's Network Health/Traceroute precedent.
  *
  * Nodes Online arrives split across several packets ([OnDemand.packet_index]/[OnDemand.packet_total]);
  * [decodeNodesOnline] merges the newest copy received for each index. Best-effort — not yet verified against real
@@ -90,7 +91,7 @@ class OnDemandLogViewModel(
 
     val uiState: StateFlow<OnDemandLogUiState> =
         meshLogRepository
-            .getLogsFrom(destNum, PortNum.ON_DEMAND_APP.value)
+            .getLogsFrom(destNum, ON_DEMAND_PORT_NUM)
             .map(::decodeState)
             .stateInWhileSubscribed(initialValue = OnDemandLogUiState())
 

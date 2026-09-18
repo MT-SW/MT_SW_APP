@@ -95,3 +95,24 @@
 # the changed fields, and the SDK is rebuilt on each release. Suppress to avoid
 # blocking desktop builds while we coordinate proto alignment.
 -dontwarn org.meshtastic.tak.TakPacketV2Serializer
+
+# ---- JCEF (me.friwi:jcefmaven) -- embedded web view rendering ---------------
+# jcefmaven's Java bindings (org.cef.**, com.jetbrains.cef.**) support several
+# optional windowing/rendering backends we never use on this build: Swing/AWT
+# is the only one wired up. The unused code paths reference javafx.*,
+# org.eclipse.swt.*, JogAmp's com.jogamp/jogamp OpenGL+OpenAL bindings (for a
+# hardware-accelerated off-screen rendering mode), and macOS AWT internals --
+# none of that is on our classpath, and none of it is reachable at runtime.
+# jcefmaven also pulls in Apache Commons Compress purely to unpack the
+# downloaded native CEF distribution on first run; its optional pack200
+# (ASM-based), xz, zstd and brotli codecs are never invoked for that. First
+# surfaced when actually running a full desktopApp release/MSI ProGuard pass
+# end-to-end -- these dependencies were already present, just never exercised
+# through this task before.
+-dontwarn org.cef.**
+-dontwarn com.jetbrains.cef.**
+-dontwarn com.jogamp.**
+-dontwarn jogamp.**
+-dontwarn org.apache.commons.compress.**
+-dontwarn okhttp3.internal.graal.**
+-dontwarn okhttp3.internal.platform.**

@@ -1,0 +1,181 @@
+syntax = "proto3";
+
+package meshtastic;
+
+option csharp_namespace = "Meshtastic.Protobufs";
+option go_package = "github.com/meshtastic/go/generated";
+option java_outer_classname = "OnDemandProtos";
+option java_package = "org.meshtastic.proto";
+option swift_prefix = "";
+
+message FwPlusVersion {
+    uint32 version_number = 2;
+}
+
+message NodeStats {
+    optional uint32 battery_level = 1;
+    optional float voltage = 2;
+    optional float channel_utilization = 3;
+    optional float air_util_tx = 4;
+    optional uint32 uptime_seconds = 5;
+    optional uint32 num_packets_tx = 6;
+    optional uint32 num_packets_rx = 7;
+    optional uint32 num_packets_rx_bad = 8;
+    optional uint32 num_online_nodes = 9;
+    optional uint32 num_total_nodes = 10;
+    optional uint32 num_rx_dupe = 11;
+    optional uint32 num_tx_relay = 12;
+    optional uint32 num_tx_relay_canceled = 13;
+    optional uint32 reboots = 14;
+    optional uint32 memory_free_cheap = 15;
+    optional uint32 memory_total = 16;
+    optional uint32 cpu_usage_percent = 17;
+    optional uint32 flash_used_bytes = 18;
+    optional uint32 flash_total_bytes = 19;
+    optional uint32 memory_psram_free = 20;
+    optional uint32 memory_psram_total = 21;
+    optional uint32 rx_total_bytes = 22;
+    optional uint32 tx_total_bytes = 23;
+    optional float ch1_voltage = 24;
+    optional float ch1_current = 25;
+    optional float ch2_voltage = 26;
+    optional float ch2_current = 27;
+    optional float ch3_voltage = 28;
+    optional float ch3_current = 29;
+    optional uint32 flood_counter = 30;
+    optional uint32 nexthop_counter = 31;
+    optional string firmware_version = 32;
+    optional uint32 blocked_by_hoplimit = 33;
+    optional uint32 fw_plus_version = 34;
+}
+
+message RxPacketHistory {
+    repeated uint32 rx_packet_history = 1;
+}
+
+message RxAvgTimeHistory {
+    repeated uint32 rx_avg_history = 1;
+}
+
+message PortCounterEntry {
+    uint32 port = 1;
+    uint32 count = 2;
+}
+
+message PortCountersHistory {
+    repeated PortCounterEntry port_counter_history = 1;
+}
+
+message RoutingErrorEntry {
+    uint32 num = 1;
+    uint32 counter = 2;
+}
+
+message RoutingErrorsHistory {
+    repeated RoutingErrorEntry routing_errors = 1;
+}
+
+message AirActivityEntry {
+    uint32 tx_time = 1;
+    uint32 rx_time = 2;
+    uint32 rxBad_time = 3;
+}
+
+message AirActivityHistory {
+    repeated AirActivityEntry air_activity_history = 1;
+}
+
+message NodeEntry {
+    uint32 node_id = 1;
+    string long_name = 2;
+    string short_name = 3;
+    fixed32 last_heard = 4;
+    float snr = 5;
+    uint32 hops = 6;
+}
+
+message ExchangeEntry {
+    uint32 from_node = 1;
+    uint32 to_node = 2;
+    uint32 port_num = 3;
+}
+
+message ExchangeList {
+    repeated ExchangeEntry exchange_list = 1;
+}
+
+message NodesList {
+    repeated NodeEntry node_list = 1;
+}
+
+message Ping {
+    optional int32 rx_rssi = 1;
+    optional float snr = 2;
+    optional uint32 hop_count = 3;
+}
+
+enum OnDemandType {
+    UNKNOWN_TYPE = 0;
+    REQUEST_PACKET_RX_HISTORY = 1;
+    RESPONSE_PACKET_RX_HISTORY = 2;
+    REQUEST_NODES_ONLINE = 3;
+    RESPONSE_NODES_ONLINE = 4;
+    REQUEST_PING = 5;
+    RESPONSE_PING = 6;
+    REQUEST_RX_AVG_TIME = 7;
+    RESPONSE_RX_AVG_TIME = 8;
+    REQUEST_PORT_COUNTER_HISTORY = 9;
+    RESPONSE_PORT_COUNTER_HISTORY = 10;
+    REQUEST_PACKET_EXCHANGE_HISTORY = 11;
+    RESPONSE_PACKET_EXCHANGE_HISTORY = 12;
+    REQUEST_AIR_ACTIVITY_HISTORY = 13;
+    RESPONSE_AIR_ACTIVITY_HISTORY = 14;
+    REQUEST_NODE_STATS = 15;
+    RESPONSE_NODE_STATS = 16;
+    REQUEST_FW_PLUS_VERSION = 17;
+    RESPONSE_FW_PLUS_VERSION = 18;
+    REQUEST_ROUTING_ERRORS = 19;
+    RESPONSE_ROUTING_ERRORS = 20;
+    REQUEST_PING_ACK = 21;
+    RESPONSE_PING_ACK = 22;
+    // Sniffer on/off is RAM-only (never persisted, always off after boot) and only ever acted on when
+    // it arrives from the locally-attached phone (mp.from == 0) - see OnDemandModule::handleReceivedProtobuf().
+    REQUEST_SNIFFER_ENABLE = 23;
+    REQUEST_SNIFFER_DISABLE = 24;
+    REQUEST_SNIFFER_STATE = 25;
+    RESPONSE_SNIFFER_STATE = 26;
+}
+
+message OnDemandRequest {
+    OnDemandType request_type = 1;
+}
+
+message SnifferState {
+    bool enabled = 1;
+}
+
+message OnDemandResponse {
+    OnDemandType response_type = 1;
+    oneof response_data {
+        RxPacketHistory rx_packet_history = 2;
+        NodesList node_list = 3;
+        Ping ping = 4;
+        RxAvgTimeHistory rx_avg_time_history = 5;
+        PortCountersHistory port_counter_history = 6;
+        ExchangeList exchange_packet_log = 7;
+        AirActivityHistory air_activity_history = 8;
+        NodeStats node_stats = 9;
+        FwPlusVersion fw_plus_version = 10;
+        RoutingErrorsHistory routing_errors = 11;
+        SnifferState sniffer_state = 12;
+    }
+}
+
+message OnDemand {
+    optional uint32 packet_index = 1;
+    optional uint32 packet_total = 2;
+    oneof variant {
+        OnDemandRequest request = 3;
+        OnDemandResponse response = 4;
+    }
+}

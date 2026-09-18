@@ -35,6 +35,7 @@ import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.common.util.safeCatching
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.util.effectivePortNum
 import org.meshtastic.core.model.util.isLora
 import org.meshtastic.core.model.util.rxTimeOrNull
 import org.meshtastic.core.model.util.snrOrNull
@@ -272,7 +273,7 @@ class MeshMessageProcessorImpl(
                 received_date = nowMillis,
                 raw_message = packet.toString(),
                 fromNum = if (packet.from == myNodeNum) MeshLog.NODE_NUM_LOCAL else packet.from,
-                portNum = decoded?.portnum?.value ?: 0,
+                portNum = decoded?.effectivePortNum() ?: 0,
                 fromRadio = FromRadio(packet = packet),
             )
         val logJob = insertMeshLog(log, session)

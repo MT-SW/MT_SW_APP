@@ -17,6 +17,7 @@
 
 plugins {
     alias(libs.plugins.meshtastic.kmp.library)
+    alias(libs.plugins.wire)
     alias(libs.plugins.meshtastic.kotlinx.serialization)
     alias(libs.plugins.meshtastic.kmp.jvm.android)
 }
@@ -30,6 +31,9 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(libs.meshtastic.protobufs)
+            // ondemand.proto is compiled locally by the Wire plugin below (see the wire {} block) --
+            // it is the OnDemand/Sniffer port-354 protocol, kept out of the official protobufs artifact.
+            api(libs.wire.runtime)
             api(projects.core.common)
             api(projects.core.resources)
 
@@ -75,4 +79,15 @@ kotlin {
 
         commonTest.dependencies { implementation(projects.core.testing) }
     }
+}
+
+// Compiles ondemand.proto (OnDemand diagnostics + Sniffer control, port 354) locally, since it is not part
+// of the official meshtastic/protobufs artifact (libs.meshtastic.protobufs above). java_package in the proto
+// file matches the official artifact's (org.meshtastic.proto), so generated classes land in the same package
+// and every existing OnDemand call site keeps working with no import changes. boxOneOfsMinSize mirrors the
+// official meshtastic/protobufs Wire config so oneof fields (e.g. OnDemandResponse.node_stats/.ping/...)
+// flatten to nullable properties instead of a sealed class, matching how the rest of the app already uses them.
+wire {
+    sourcePath { srcDir("src/commonMain/proto") }
+    kotlin { boxOneOfsMinSize = 5000 }
 }
