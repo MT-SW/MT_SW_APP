@@ -39,6 +39,7 @@ Co to oznacza w praktyce:
 - **Mapa zawsze otwiera się dopasowana do wszystkich węzłów** — zamiast wracać do ostatnio zapamiętanej pozycji i przybliżenia.
 - **Ostrzejsze kafelki map rastrowych (np. OSM)** — naprawiony błąd powodujący rozmycie przez błędny domyślny rozmiar kafelka.
 - **Dostrojone klastrowanie węzłów na mapie** — małe grupki węzłów nie zlewają się już w jeden bąbel z liczbą; grupowanie zaczyna się dopiero przy realnie gęstym skupisku.
+- **Naprawiona migająca liczba w bąblu klastra** — liczba zgrupowanych węzłów potrafiła pojawić się na chwilę i zniknąć, wracając dopiero przy kolejnym przeliczeniu etykiet (sama bąbelkowa otoczka zawsze zostawała widoczna) — to efekt domyślnej kolizyjnej obsługi etykiet w MapLibre; liczba jest teraz zawsze widoczna niezależnie od kolizji z innymi plakietkami.
 - **Domyślna mapa bazowa zmieniona na OpenStreetMap** — zamiast wektorowego stylu MapLibre Liberty, appka startuje teraz z rastrowymi kafelkami OSM.
 
 ## Ustawienia desktopowe
@@ -166,6 +167,7 @@ What this means in practice:
 - **Map always opens framed on all nodes** — instead of reopening at the last remembered position and zoom.
 - **Sharper raster basemap tiles (e.g. OSM)** — fixed a bug causing blur from an incorrect default tile size.
 - **Tuned node clustering on the map** — small groups of nodes no longer collapse into a single numbered bubble; clustering now only kicks in for a genuinely dense cluster.
+- **Fixed a flickering count inside the cluster bubble** — the number of grouped nodes could show for a moment then vanish, only coming back on the next label-placement pass (the bubble itself always stayed visible throughout) — caused by MapLibre's default label collision handling; the count is now always shown regardless of collisions with other chips.
 - **Default basemap changed to OpenStreetMap** — instead of MapLibre's vector Liberty style, the app now starts with raster OSM tiles by default.
 
 ## Desktop settings

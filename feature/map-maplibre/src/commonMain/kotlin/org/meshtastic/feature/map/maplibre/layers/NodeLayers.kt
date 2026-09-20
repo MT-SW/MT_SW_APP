@@ -209,6 +209,14 @@ fun NodeLayers(
         textField = feature["point_count_abbreviated"].asString(),
         textColor = const(Color.White),
         textFont = const(listOf("Noto Sans Regular")),
+        // Without these the count is a text symbol subject to MapLibre's normal label collision system: it
+        // gets hidden on placement passes where it is judged to collide with a nearby chip or another cluster's
+        // own count, then reappears once that pass clears -- reading as the number flickering in and out while
+        // the bubble underneath (a CircleLayer, not collision-checked) stays put throughout. The count is the
+        // whole point of the bubble, so it must never be dropped for occlusion, and must never cause some other
+        // symbol placed after it to be hidden either.
+        textAllowOverlap = const(true),
+        textIgnorePlacement = const(true),
     )
 
     // Under the chips, so a pulse reads as a halo around the node rather than covering it.
