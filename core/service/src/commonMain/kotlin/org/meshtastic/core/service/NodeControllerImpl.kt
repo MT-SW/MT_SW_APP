@@ -48,9 +48,9 @@ internal class NodeControllerImpl(
             if (node != null && node.isFavorite != favorite) {
                 commandSender.sendAdmin(myNum) {
                     if (favorite) {
-                        AdminMessage(set_favorite_node = node.num)
+                        AdminMessage.Builder().also { wb -> wb.set_favorite_node = node.num }.build()
                     } else {
-                        AdminMessage(remove_favorite_node = node.num)
+                        AdminMessage.Builder().also { wb -> wb.remove_favorite_node = node.num }.build()
                     }
                 }
                 nodeManager.updateNode(node.num) { it.copy(isFavorite = favorite) }
@@ -62,9 +62,9 @@ internal class NodeControllerImpl(
             // even be in ours), so this is unconditional — no local idempotency check, no local DB update.
             commandSender.sendAdminAndAwaitDelivery(target) {
                 if (favorite) {
-                    AdminMessage(set_favorite_node = nodeNum)
+                    AdminMessage.Builder().also { wb -> wb.set_favorite_node = nodeNum }.build()
                 } else {
-                    AdminMessage(remove_favorite_node = nodeNum)
+                    AdminMessage.Builder().also { wb -> wb.remove_favorite_node = nodeNum }.build()
                 }
             }
         }
@@ -78,9 +78,9 @@ internal class NodeControllerImpl(
             if (node != null && node.isIgnored != ignored) {
                 commandSender.sendAdmin(myNum) {
                     if (ignored) {
-                        AdminMessage(set_ignored_node = node.num)
+                        AdminMessage.Builder().also { wb -> wb.set_ignored_node = node.num }.build()
                     } else {
-                        AdminMessage(remove_ignored_node = node.num)
+                        AdminMessage.Builder().also { wb -> wb.remove_ignored_node = node.num }.build()
                     }
                 }
                 nodeManager.updateNode(node.num) { it.copy(isIgnored = ignored) }
@@ -89,15 +89,18 @@ internal class NodeControllerImpl(
             true
         } else {
             commandSender.sendAdminAndAwaitDelivery(target) {
-                if (ignored) AdminMessage(set_ignored_node = nodeNum) else AdminMessage(remove_ignored_node = nodeNum)
+                if (ignored) {
+                    AdminMessage.Builder().also { wb -> wb.set_ignored_node = nodeNum }.build()
+                } else {
+                    AdminMessage.Builder().also { wb -> wb.remove_ignored_node = nodeNum }.build()
+                }
             }
         }
     }
-
     override suspend fun toggleMuted(nodeNum: Int) {
         val myNum = nodeManager.myNodeNum.value ?: return
         val node = nodeManager.nodeDBbyNodeNum[nodeNum] ?: return
-        commandSender.sendAdmin(myNum) { AdminMessage(toggle_muted_node = node.num) }
+        commandSender.sendAdmin(myNum) { AdminMessage.Builder().also { wb -> wb.toggle_muted_node = node.num }.build() }
         nodeManager.updateNode(node.num) { it.copy(isMuted = !node.isMuted) }
     }
 
@@ -105,7 +108,9 @@ internal class NodeControllerImpl(
         nodeManager.removeByNodenum(nodeNum)
         val myNum = nodeManager.myNodeNum.value ?: return
         try {
-            commandSender.sendAdmin(myNum, packetId) { AdminMessage(remove_by_nodenum = nodeNum) }
+            commandSender.sendAdmin(myNum, packetId) {
+                AdminMessage.Builder().also { wb -> wb.remove_by_nodenum = nodeNum }.build()
+            }
         } catch (e: PacketQueueRejectedException) {
             // Node removal has always been local-first and is allowed while disconnected. Preserve that contract when
             // the connected transport is transitioning and cannot admit the best-effort radio cleanup command.

@@ -29,8 +29,10 @@ import kotlin.test.assertTrue
  */
 class StatusMessageActionGateTest {
 
-    private fun node(num: Int, firmware: String?) =
-        Node(num = num, metadata = firmware?.let { DeviceMetadata(firmware_version = it) })
+    private fun node(num: Int, firmware: String?) = Node(
+        num = num,
+        metadata = firmware?.let { DeviceMetadata.Builder().also { wb -> wb.firmware_version = it }.build() },
+    )
 
     private val ourNode = node(num = 1, firmware = "2.8.0")
 
@@ -48,7 +50,7 @@ class StatusMessageActionGateTest {
 
     @Test
     fun `older firmware does not offer the action`() {
-        val old = node(num = 1, firmware = "2.7.21")
+        val old = node(num = 1, firmware = "2.7.19")
 
         assertFalse(canEditStatusMessage(old, old, ConnectionState.Connected))
     }

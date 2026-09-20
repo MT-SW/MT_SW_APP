@@ -92,6 +92,7 @@
     <string name="always_point_north">Zawsze wskazuj północ</string>
     <string name="ambient_lighting">Oświetlenie otoczenia</string>
     <string name="ambient_lighting_config">Konfiguracja oświetlenia otoczenia</string>
+    <string name="ammonium">Amon</string>
     <string name="analytics_notice">Zbierane są dane analityczne, które pomagają nam ulepszać aplikację na Androida (dziękujemy) - otrzymujemy zanonimizowane informacje o zachowaniu użytkownika. Obejmuje to raporty awarii, ekrany używane w aplikacji itd.</string>
     <string name="analytics_okay">Zezwalaj na analizę i raportowanie awarii.</string>
     <string name="analytics_platforms">Platformy analityczne:</string>
@@ -158,6 +159,7 @@
     <string name="baro_pressure">Baro</string>
     <string name="battery">Bateria</string>
     <string name="battery_ina_2xx_i2c_address">Adres I2C  dla wartości baterii INA_2XX</string>
+    <string name="biochemical_oxygen_demand">BZT</string>
     <string name="ble_devices">Urządzenia Bluetooth</string>
     <string name="ble_rssi_threshold_defaults_to_80">Próg RSSI BLE (domyślnie -80)</string>
     <string name="ble_scan_needs_location_services">Skanowanie Bluetooth wymaga też włączonych usług lokalizacji w tej wersji Androida. Twoja pozycja nie jest wykorzystywana.</string>
@@ -238,6 +240,7 @@
     <string name="channel_url">URL kanału</string>
     <string name="channel_utilization">ChUtil</string>
     <string name="channels">Kanały</string>
+    <string name="chemical_oxygen_demand">ChZT</string>
     <!-- CHIRPY -->
     <string name="chirpy">Chirpy</string>
     <string name="chirpy_assistant_title">Asystent Chirpy</string>
@@ -559,6 +562,7 @@
     <string name="display_mode">Tryb wyświetlania</string>
     <string name="display_time_in_12h_format">Gdy włączone, urządzenie będzie wyświetlać czas na ekranie w formacie 12-godzinnym.</string>
     <string name="display_units">Wyświetlana jednostka</string>
+    <string name="dissolved_oxygen">Rozp. O₂</string>
     <!-- DISTANCE -->
     <string name="distance">Dystans</string>
     <string name="distance_filters">Filtry odległości</string>
@@ -635,6 +639,7 @@
     <string name="edit">Edytuj</string>
     <string name="edit_custom_tile_source">Edytuj własne źródło kafelków mapy</string>
     <string name="eight_hours">8 Godzin</string>
+    <string name="electrical_conductivity">Przewodność</string>
     <string name="elevation_suffix" translatable="false">MSL</string>
     <!-- EMOJI -->
     <string name="emoji_category_activities">Aktywności</string>
@@ -1008,6 +1013,8 @@
     <string name="licensed_mode_enable_title">Włączyć tryb licencjonowany (Ham)?</string>
     <string name="licensed_mode_enable_warning">Tryb licencjonowany usuwa klucze szyfrowania kanałów i wyłącza kanał administracyjny, więc cały ruch jest wysyłany jako czysty tekst, który każdy może odczytać — a to firmware nie może go podpisać, więc inne węzły nie mogą zweryfikować, że pochodzi od Ciebie. Nie jest to zgodne z domyślną siecią Meshtastic, a Ty pozostajesz odpowiedzialny za spełnienie wymagań swojej licencji radioamatorskiej i lokalnych przepisów.</string>
     <string name="licensed_mode_enable_warning_signed">Tryb licencjonowany usuwa klucze szyfrowania kanałów i wyłącza kanał administracyjny, więc cały ruch jest wysyłany jako czysty tekst, który każdy może odczytać — ale jest cyfrowo podpisany, co pozwala innym węzłom zweryfikować, że pochodzi od Ciebie. Numer Twojego węzła może się raz zmienić, aby dopasować się do klucza tożsamości, więc ulubione, historia wiadomości, zdalne zarządzanie i inne węzły mogą początkowo traktować go jako nowy; pozostajesz odpowiedzialny za spełnienie wymagań swojej licencji radioamatorskiej i lokalnych przepisów.</string>
+    <string name="lightning_distance">Odległość burzy</string>
+    <string name="lightning_strikes_1h">Wyładowania (1h)</string>
     <!-- LOAD -->
     <string name="load">Wczytaj</string>
     <string name="load_15_min">Obc. 15m</string>
@@ -1460,6 +1467,8 @@
     <string name="new_nodes">Nowe węzły</string>
     <string name="next">Dalej</string>
     <string name="nfc_disabled">NFC jest wyłączone. Włącz je w ustawieniach systemowych.</string>
+    <string name="nitrate">Azotany</string>
+    <string name="nitrogen">Azot</string>
     <!-- NO -->
     <string name="no_bluetooth_devices_hint">Upewnij się, że jesteś w zasięgu urządzenia.</string>
     <string name="no_bluetooth_devices_seen">Nie widziano urządzeń Bluetooth</string>
@@ -1483,10 +1492,13 @@
     <string name="node_count_total">%1$d łącznie</string>
     <string name="node_filter_exclude_infrastructure">Wyklucz infrastrukturę</string>
     <string name="node_filter_exclude_mqtt">Wyklucz MQTT</string>
+    <string name="node_filter_exclude_unheard">Wyklucz nieusłyszane węzły</string>
     <string name="node_filter_ignored">Przeglądasz ignorowane węzły,\nNaciśnij aby powrócić do listy węzłów.</string>
     <string name="node_filter_include_unknown">Pokaż nierozpoznane</string>
     <string name="node_filter_only_direct">Pokaż tylko bezpośrednie węzły</string>
+    <string name="node_filter_only_encrypted">Pokaż tylko szyfrowane węzły</string>
     <string name="node_filter_only_online">Schowaj nieaktywne węzły</string>
+    <string name="node_filter_only_signed">Pokaż tylko podpisane węzły</string>
     <string name="node_filter_placeholder">Filtr</string>
     <string name="node_filter_show_ignored">Pokaż tylko ignorowane węzły</string>
     <string name="node_filter_title">Filtry</string>
@@ -1598,6 +1610,7 @@
     <string name="open_wifi_settings">Otwórz ustawienia Wi-Fi</string>
     <string name="options">Opcje</string>
     <string name="orient_north">Zorientuj na północ</string>
+    <string name="orp">ORP</string>
     <!-- OUTPUT -->
     <string name="output_buzzer_gpio">Wyjście buzzera (GPIO)</string>
     <string name="output_duration_milliseconds">Czas trwania (w milisekundach)</string>
@@ -1665,6 +1678,7 @@
     <!-- PERMISSIONS -->
     <string name="phone_location">Lokalizacja telefonu</string>
     <string name="phone_location_description">MT_SW_APP używa lokalizacji Twojego telefonu, aby udostępnić szereg funkcji. Możesz zaktualizować uprawnienia lokalizacji w każdej chwili w ustawieniach.</string>
+    <string name="phosphorus">Fosfor</string>
     <string name="pin_selected">Pin</string>    <string name="play">Odtwórz</string>
     <plurals name="plurals_hours">
         <item quantity="one">%1$d godzina</item>
@@ -1684,6 +1698,16 @@
         <item quantity="many">%1$d sekund</item>
         <item quantity="other">%1$d sekundy</item>
     </plurals>
+    <!-- PM -->
+    <string name="pm_sensor_status">Stan czujnika</string>
+    <string name="pm_status_co2_error">Błąd CO₂</string>
+    <string name="pm_status_fan_error">Błąd wentylatora</string>
+    <string name="pm_status_fan_speed_warning">Ostrzeżenie o prędkości wentylatora</string>
+    <string name="pm_status_gas_error">Błąd czujnika gazu</string>
+    <string name="pm_status_hcho_error">Błąd HCHO</string>
+    <string name="pm_status_pm_error">Błąd PM</string>
+    <string name="pm_status_rht_error">Błąd RH&amp;T</string>
+    <string name="pm_status_unknown_flags">Nieznane flagi 0x%1$s</string>
     <string name="pm1_0">PM1.0</string>
     <string name="pm10">PM10</string>
     <string name="pm2_5">PM2.5</string>
@@ -1694,6 +1718,7 @@
     <string name="position_flags">Flagi położenia</string>
     <string name="position_log">Pozycjonowanie</string>
     <string name="position_packet">Pakiet lokalizacji</string>
+    <string name="potassium">Potas</string>
     <!-- POWER -->
     <string name="power">Zasilanie</string>
     <string name="power_config">Konfiguracja zarządzania energią</string>
@@ -1874,6 +1899,7 @@
     <string name="rssi">RSSI:</string>
     <string name="rssi_definition">Received Signal Strength Indicator - miara używana do określenia poziomu mocy odbieranej przez antenę. Wyższa wartość RSSI zazwyczaj oznacza silniejsze i bardziej stabilne połączenie.</string>
     <string name="rsyslog_server">Serwer rsyslog</string>
+    <string name="salinity">Zasolenie</string>
     <string name="sample_message" translatable="false">hey I found the cache, it is over here next to the big tiger. I'm kinda scared.</string>
     <string name="sats">Sat.</string>
     <!-- SAVE -->
@@ -1918,6 +1944,9 @@
     <string name="security_icon_insecure_precise_only">Niepewny kanał, precyzyjna lokalizacja</string>
     <string name="security_icon_secure">Bezpieczne</string>
     <string name="security_icon_warning_precise_mqtt">Ostrzeżenie: Niezabezpieczone, precyzyjna lokalizacja i uplink MQTT</string>
+    <string name="security_legend_any_version">Widoczne przy każdej wersji firmware.</string>
+    <string name="security_legend_legacy_firmware">Widoczne dla węzłów z firmware starszym niż 2.8 lub niepodających wersji.</string>
+    <string name="security_legend_signing_firmware">Widoczne dla węzłów z firmware 2.8 lub nowszym oraz dla każdego węzła, którego podpis radio zweryfikowało.</string>
     <string name="node_list_help_activity_note">Ikona połączenia na chwilę rozbłyskuje tym kolorem, gdy radio wysyła lub odbiera dane przez mesh.</string>
     <string name="node_list_help_activity_receive">Odbieranie</string>
     <string name="node_list_help_activity_transmit">Nadawanie</string>
@@ -1958,9 +1987,16 @@
     <string name="settings">ustawienia</string>
     <!-- SHARE -->
     <string name="share">Udostępnij</string>
+    <string name="share_action">Udostępnij link</string>
+    <string name="share_by_tap_subtext">Gdy to okno jest otwarte, inny telefon może odebrać dane, stukając w Twój.</string>
+    <string name="share_channels">Udostępnij kanały</string>
+    <string name="share_channels_add_hint">Dodanie zachowuje kanały, które już mają, i dokłada Twoje.</string>
     <string name="share_channels_qr">Udostępnij kod QR kanałów</string>
+    <string name="share_channels_replace_hint">Zastąpienie nadpisuje wszystkie kanały na ich radiu Twoimi.</string>
+    <string name="share_channels_subject">Kanały Meshtastic</string>
     <string name="share_connected_node">Udostępnij połączony węzeł</string>
     <string name="share_contact">Udostępnij kontakt</string>
+    <string name="share_contact_subject">Kontakt Meshtastic</string>
     <string name="share_location">Udostępnij lokalizację</string>
     <string name="share_location_description">Użyj GPS telefonu do wysyłania lokalizacji do węzła zamiast GPS sprzętowego w węźle.</string>
     <string name="share_qr_subtext">Zeskanuj ten kod inną aplikacją MT_SW_APP, aby dodać go tam.</string>
@@ -2028,7 +2064,10 @@
     <string name="snr">SNR:</string>
     <string name="snr_definition">Współczynnik sygnału do szumu (Signal-to-Noise Ratio) - miara stosowana w komunikacji do określania poziomu pożądanego sygnału w stosunku do poziomu szumu tła. W MT_SW i innych systemach bezprzewodowych wyższy współczynnik SNR oznacza czystszy sygnał, który może zwiększyć niezawodność i jakość transmisji danych.</string>
     <string name="soil_moisture">Wilg. gleby</string>
+    <string name="soil_ph">pH gleby</string>
     <string name="soil_temperature">Temp. gleby</string>
+    <string name="soil_water_metrics">Gleba i woda</string>
+    <string name="solar_irradiance">Nasłonecznienie</string>
     <string name="speed">Prędkość</string>
     <string name="speed_kmh">%1$d km/h</string>
     <string name="speed_mph">%1$d mph</string>
@@ -2048,6 +2087,7 @@
     <string name="super_deep_sleep_duration_seconds">Czas trwania głębokiego uśpienia</string>
     <string name="supported">Obsługiwane</string>
     <string name="supported_by_community">Wspierane przez społeczność Meshtastic</string>
+    <string name="supported_by_maker">Sprzęt od niezależnego twórcy</string>
     <string name="swipe_action_delete">Usuń</string>
     <string name="swipe_action_mute">Wycisz</string>
     <string name="swipe_action_unmute">Wyłącz wyciszenie</string>
@@ -2131,6 +2171,7 @@
     <string name="timeout">Limit czasu</string>
     <string name="timestamp">Znacznik czasu</string>
     <string name="tls_enabled">Włącz TLS</string>
+    <string name="tls_enabled_public_broker_summary">Gdy ten telefon przekazuje MQTT, zawsze łączy się z mqtt.meshtastic.org przez TLS. To ustawienie dotyczy sytuacji, gdy radio łączy się z brokerem przez własne Wi-Fi lub Ethernet.</string>
     <string name="toggle_my_position">Pokaż moją pozycję</string>
     <string name="trace_route">Śledzenie trasy</string>
     <!-- TRACEROUTE -->
@@ -2196,6 +2237,7 @@
     <string name="transport_udp">UDP</string>
     <string name="transport_usb">USB</string>
     <string name="triple_click_adhoc_ping">Potrójne kliknięcie: Ping adhoc</string>
+    <string name="turbidity">Mętność</string>
     <string name="twenty_four_hours">24H</string>
     <string name="two_days">48 Godzin</string>
     <string name="two_weeks">2W</string>
@@ -2266,6 +2308,7 @@
     <string name="wait_for_bluetooth_duration_seconds">Czas oczekiwania na Bluetooth</string>
     <string name="wake_on_tap_or_motion">Wybudź przy dotknięciu lub ruchu</string>
     <string name="warning">Uwaga</string>
+    <string name="water_ph">pH wody</string>
     <string name="waypoint_delete">Usuń punkt nawigacji?</string>
     <string name="waypoint_edit">Edytuj punkt nawigacji</string>
     <string name="waypoint_new">Nowy punkt nawigacyjny</string>

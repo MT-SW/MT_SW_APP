@@ -36,17 +36,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.model.Capabilities
 import org.meshtastic.core.model.MqttConnectionState
 import org.meshtastic.core.model.MqttProbeStatus
 import org.meshtastic.core.network.repository.effectiveTlsEnabled
@@ -81,6 +84,7 @@ import org.meshtastic.core.resources.password
 import org.meshtastic.core.resources.proxy_to_client_enabled
 import org.meshtastic.core.resources.root_topic
 import org.meshtastic.core.resources.tls_enabled
+import org.meshtastic.core.resources.tls_enabled_public_broker_summary
 import org.meshtastic.core.resources.username
 import org.meshtastic.core.ui.component.EditPasswordPreference
 import org.meshtastic.core.ui.component.EditTextPreference
@@ -89,26 +93,33 @@ import org.meshtastic.core.ui.component.TitledCard
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 import org.meshtastic.feature.settings.radio.RebootBehavior
 import org.meshtastic.proto.ModuleConfig
+import org.meshtastic.proto.json_enabled
 
-// json_enabled is deprecated in the protobuf schema but remains the only toggle for MQTT JSON
-// publish/consume, so the settings UI must keep exposing it until the proto provides a replacement.
+// json_enabled still drives MQTT JSON on firmware below its deprecated_since; beyond that the schema gate hides it
+// unless the node still holds it set, so a stale value stays visible.
 @Suppress("DEPRECATION")
 @Composable
 fun MQTTConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
     val state by viewModel.radioConfigState.collectAsStateWithLifecycle()
+    val firmwareVersion = state.metadata?.firmware_version
+    val capabilities = remember(firmwareVersion) { Capabilities(firmwareVersion) }
     val destNode by viewModel.destNode.collectAsStateWithLifecycle()
     val mqttProxyState by viewModel.mqttConnectionState.collectAsStateWithLifecycle()
     val mqttProxyActive by viewModel.mqttProxyActive.collectAsStateWithLifecycle()
     val probeStatus by viewModel.mqttProbeStatus.collectAsStateWithLifecycle()
     val destNum = destNode?.num
-    val mqttConfig = state.moduleConfig.mqtt ?: ModuleConfig.MQTTConfig()
+    val mqttConfig = state.moduleConfig.mqtt ?: ModuleConfig.MQTTConfig.Builder().build()
     val formState = rememberConfigState(initialValue = mqttConfig)
 
-    val currentMapReportSettings = formState.value.map_report_settings ?: ModuleConfig.MapReportSettings()
+    val currentMapReportSettings =
+        formState.value.map_report_settings ?: ModuleConfig.MapReportSettings.Builder().build()
     if (!currentMapReportSettings.should_report_location) {
         val settings =
-            currentMapReportSettings.copy(should_report_location = viewModel.shouldReportLocation(destNum).value)
-        formState.value = formState.value.copy(map_report_settings = settings)
+            currentMapReportSettings
+                .newBuilder()
+                .also { wb -> wb.should_report_location = viewModel.shouldReportLocation(destNum).value }
+                .build()
+        formState.value = formState.value.newBuilder().also { wb -> wb.map_report_settings = settings }.build()
     }
 
     val consentValid =
@@ -129,7 +140,7 @@ fun MQTTConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
         responseState = state.responseState,
         onDismissPacketResponse = viewModel::clearPacketResponse,
         onSave = {
-            val config = ModuleConfig(mqtt = it)
+            val config = ModuleConfig.Builder().also { wb -> wb.mqtt = it }.build()
             viewModel.setModuleConfig(config)
         },
     ) {
@@ -161,7 +172,9 @@ fun MQTTConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                     title = stringResource(Res.string.mqtt_enabled),
                     checked = formState.value.enabled,
                     enabled = state.connected,
-                    onCheckedChange = { formState.value = formState.value.copy(enabled = it) },
+                    onCheckedChange = {
+                        formState.value = formState.value.newBuilder().also { wb -> wb.enabled = it }.build()
+                    },
                     containerColor = CardDefaults.cardColors().containerColor,
                 )
                 HorizontalDivider()
@@ -183,7 +196,9 @@ fun MQTTConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                     keyboardOptions =
                     KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                    onValueChanged = { formState.value = formState.value.copy(username = it) },
+                    onValueChanged = {
+                        formState.value = formState.value.newBuilder().also { wb -> wb.username = it }.build()
+                    },
                 )
                 HorizontalDivider()
                 EditPasswordPreference(
@@ -192,33 +207,40 @@ fun MQTTConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                     maxSize = 63, // password max_size:64
                     enabled = state.connected,
                     keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                    onValueChanged = { formState.value = formState.value.copy(password = it) },
+                    onValueChanged = {
+                        formState.value = formState.value.newBuilder().also { wb -> wb.password = it }.build()
+                    },
                 )
                 HorizontalDivider()
                 SwitchPreference(
                     title = stringResource(Res.string.encryption_enabled),
                     checked = formState.value.encryption_enabled,
                     enabled = state.connected,
-                    onCheckedChange = { formState.value = formState.value.copy(encryption_enabled = it) },
+                    onCheckedChange = {
+                        formState.value = formState.value.newBuilder().also { wb -> wb.encryption_enabled = it }.build()
+                    },
                     containerColor = CardDefaults.cardColors().containerColor,
                 )
                 HorizontalDivider()
-                SwitchPreference(
-                    title = stringResource(Res.string.json_output_enabled),
-                    checked = formState.value.json_enabled,
+                if (capabilities.offers(ModuleConfig.MQTTConfig.json_enabled, isSet = formState.value.json_enabled)) {
+                    SwitchPreference(
+                        title = stringResource(Res.string.json_output_enabled),
+                        checked = formState.value.json_enabled,
+                        enabled = state.connected,
+                        onCheckedChange = {
+                            formState.value = formState.value.newBuilder().also { wb -> wb.json_enabled = it }.build()
+                        },
+                        containerColor = CardDefaults.cardColors().containerColor,
+                    )
+                    HorizontalDivider()
+                }
+                MqttTlsPreference(
                     enabled = state.connected,
-                    onCheckedChange = { formState.value = formState.value.copy(json_enabled = it) },
-                    containerColor = CardDefaults.cardColors().containerColor,
-                )
-                HorizontalDivider()
-                val resolvedAddress = formState.value.address.ifEmpty { "mqtt.meshtastic.org" }
-                val enforceTls = effectiveTlsEnabled(resolvedAddress, tlsEnabled = false)
-                SwitchPreference(
-                    title = stringResource(Res.string.tls_enabled),
-                    checked = formState.value.tls_enabled || enforceTls,
-                    enabled = state.connected && !enforceTls,
-                    onCheckedChange = { formState.value = formState.value.copy(tls_enabled = it) },
-                    containerColor = CardDefaults.cardColors().containerColor,
+                    address = formState.value.address,
+                    tlsEnabled = formState.value.tls_enabled,
+                    onCheckedChange = {
+                        formState.value = formState.value.newBuilder().also { wb -> wb.tls_enabled = it }.build()
+                    },
                 )
                 HorizontalDivider()
                 EditTextPreference(
@@ -230,14 +252,19 @@ fun MQTTConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                     keyboardOptions =
                     KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                    onValueChanged = { formState.value = formState.value.copy(root = it) },
+                    onValueChanged = {
+                        formState.value = formState.value.newBuilder().also { wb -> wb.root = it }.build()
+                    },
                 )
                 HorizontalDivider()
                 SwitchPreference(
                     title = stringResource(Res.string.proxy_to_client_enabled),
                     checked = formState.value.proxy_to_client_enabled,
                     enabled = state.connected,
-                    onCheckedChange = { formState.value = formState.value.copy(proxy_to_client_enabled = it) },
+                    onCheckedChange = {
+                        formState.value =
+                            formState.value.newBuilder().also { wb -> wb.proxy_to_client_enabled = it }.build()
+                    },
                     containerColor = CardDefaults.cardColors().containerColor,
                 )
             }
@@ -245,27 +272,34 @@ fun MQTTConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
 
         item {
             TitledCard(title = stringResource(Res.string.map_reporting)) {
-                val mapReportSettings = formState.value.map_report_settings ?: ModuleConfig.MapReportSettings()
+                val mapReportSettings =
+                    formState.value.map_report_settings ?: ModuleConfig.MapReportSettings.Builder().build()
                 MapReportingPreference(
                     mapReportingEnabled = formState.value.map_reporting_enabled,
                     onMapReportingEnabledChanged = {
-                        formState.value = formState.value.copy(map_reporting_enabled = it)
+                        formState.value =
+                            formState.value.newBuilder().also { wb -> wb.map_reporting_enabled = it }.build()
                     },
                     shouldReportLocation = mapReportSettings.should_report_location,
                     onShouldReportLocationChanged = {
                         viewModel.setShouldReportLocation(destNum, it)
-                        val settings = mapReportSettings.copy(should_report_location = it)
-                        formState.value = formState.value.copy(map_report_settings = settings)
+                        val settings =
+                            mapReportSettings.newBuilder().also { wb -> wb.should_report_location = it }.build()
+                        formState.value =
+                            formState.value.newBuilder().also { wb -> wb.map_report_settings = settings }.build()
                     },
                     positionPrecision = mapReportSettings.position_precision,
                     onPositionPrecisionChanged = {
-                        val settings = mapReportSettings.copy(position_precision = it)
-                        formState.value = formState.value.copy(map_report_settings = settings)
+                        val settings = mapReportSettings.newBuilder().also { wb -> wb.position_precision = it }.build()
+                        formState.value =
+                            formState.value.newBuilder().also { wb -> wb.map_report_settings = settings }.build()
                     },
                     publishIntervalSecs = mapReportSettings.publish_interval_secs,
                     onPublishIntervalSecsChanged = {
-                        val settings = mapReportSettings.copy(publish_interval_secs = it)
-                        formState.value = formState.value.copy(map_report_settings = settings)
+                        val settings =
+                            mapReportSettings.newBuilder().also { wb -> wb.publish_interval_secs = it }.build()
+                        formState.value =
+                            formState.value.newBuilder().also { wb -> wb.map_report_settings = settings }.build()
                     },
                     enabled = state.connected,
                 )
@@ -275,6 +309,36 @@ fun MQTTConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
 }
 
 private const val MIN_INTERVAL_SECS = 600
+
+// An empty address means the public broker, both here and in the firmware's PubSubConfig.
+private const val DEFAULT_MQTT_ADDRESS = "mqtt.meshtastic.org"
+
+internal const val MQTT_TLS_SWITCH_TEST_TAG = "mqtt_tls_switch"
+
+/**
+ * The radio uses the stored `tls_enabled` verbatim when it reaches the broker over its own Wi-Fi or Ethernet, so what
+ * this switch shows must be what gets stored and sent: it renders and writes that flag alone, never a forced value. The
+ * phone-relay's own TLS upgrade for the public broker is stated in the summary instead.
+ */
+@Composable
+internal fun MqttTlsPreference(
+    enabled: Boolean,
+    address: String,
+    tlsEnabled: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    val resolvedAddress = address.ifEmpty { DEFAULT_MQTT_ADDRESS }
+    val relayForcesTls = effectiveTlsEnabled(resolvedAddress, tlsEnabled = false)
+    SwitchPreference(
+        title = stringResource(Res.string.tls_enabled),
+        summary = if (relayForcesTls) stringResource(Res.string.tls_enabled_public_broker_summary) else "",
+        checked = tlsEnabled,
+        enabled = enabled,
+        modifier = Modifier.testTag(MQTT_TLS_SWITCH_TEST_TAG),
+        onCheckedChange = onCheckedChange,
+        containerColor = CardDefaults.cardColors().containerColor,
+    )
+}
 
 private val AmberColor = Color(0xFFFFA000)
 private val GreenColor = Color(0xFF4CAF50)
@@ -340,7 +404,7 @@ private fun MqttAddressAndProbe(
         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
         onValueChanged = {
-            formState.value = formState.value.copy(address = it)
+            formState.value = formState.value.newBuilder().also { wb -> wb.address = it }.build()
             onClearProbe()
         },
     )
@@ -350,7 +414,7 @@ private fun MqttAddressAndProbe(
         status = probeStatus,
         onTestClick = {
             focusManager.clearFocus()
-            val resolvedAddress = formState.value.address.ifEmpty { "mqtt.meshtastic.org" }
+            val resolvedAddress = formState.value.address.ifEmpty { DEFAULT_MQTT_ADDRESS }
             val effectiveTls = effectiveTlsEnabled(resolvedAddress, formState.value.tls_enabled)
             onProbe(formState.value.address, effectiveTls, formState.value.username, formState.value.password)
         },

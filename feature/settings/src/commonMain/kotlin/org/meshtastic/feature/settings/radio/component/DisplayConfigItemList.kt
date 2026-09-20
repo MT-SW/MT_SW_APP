@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.model.Capabilities
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.advanced
 import org.meshtastic.core.resources.always_point_north
@@ -55,12 +56,16 @@ import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 import org.meshtastic.feature.settings.util.IntervalConfiguration
 import org.meshtastic.feature.settings.util.toDisplayString
 import org.meshtastic.proto.Config
+import org.meshtastic.proto.compass_north_top
+import org.meshtastic.proto.use_12h_clock
 
 @Suppress("DEPRECATION", "LongMethod")
 @Composable
 fun DisplayConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
     val state by viewModel.radioConfigState.collectAsStateWithLifecycle()
-    val displayConfig = state.radioConfig.display ?: Config.DisplayConfig()
+    val firmwareVersion = state.metadata?.firmware_version
+    val capabilities = remember(firmwareVersion) { Capabilities(firmwareVersion) }
+    val displayConfig = state.radioConfig.display ?: Config.DisplayConfig.Builder().build()
     val formState = rememberConfigState(initialValue = displayConfig)
 
     RadioConfigScreenList(
@@ -71,36 +76,52 @@ fun DisplayConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
         responseState = state.responseState,
         onDismissPacketResponse = viewModel::clearPacketResponse,
         onSave = {
-            val config = Config(display = it)
+            val config = Config.Builder().also { wb -> wb.display = it }.build()
             viewModel.setConfig(config)
         },
     ) {
         item {
             TitledCard(title = stringResource(Res.string.display_config)) {
-                SwitchPreference(
-                    title = stringResource(Res.string.always_point_north),
-                    summary = stringResource(Res.string.config_display_compass_north_top_summary),
-                    checked = formState.value.compass_north_top,
-                    enabled = state.connected,
-                    onCheckedChange = { formState.value = formState.value.copy(compass_north_top = it) },
-                    containerColor = CardDefaults.cardColors().containerColor,
-                )
-                HorizontalDivider()
-                SwitchPreference(
-                    title = stringResource(Res.string.use_12h_format),
-                    summary = stringResource(Res.string.display_time_in_12h_format),
-                    enabled = state.connected,
-                    checked = formState.value.use_12h_clock,
-                    onCheckedChange = { formState.value = formState.value.copy(use_12h_clock = it) },
-                    containerColor = CardDefaults.cardColors().containerColor,
-                )
-                HorizontalDivider()
+                if (
+                    capabilities.offers(
+                        Config.DisplayConfig.compass_north_top,
+                        isSet = formState.value.compass_north_top,
+                    )
+                ) {
+                    SwitchPreference(
+                        title = stringResource(Res.string.always_point_north),
+                        summary = stringResource(Res.string.config_display_compass_north_top_summary),
+                        checked = formState.value.compass_north_top,
+                        enabled = state.connected,
+                        onCheckedChange = {
+                            formState.value =
+                                formState.value.newBuilder().also { wb -> wb.compass_north_top = it }.build()
+                        },
+                        containerColor = CardDefaults.cardColors().containerColor,
+                    )
+                    HorizontalDivider()
+                }
+                if (capabilities.offers(Config.DisplayConfig.use_12h_clock)) {
+                    SwitchPreference(
+                        title = stringResource(Res.string.use_12h_format),
+                        summary = stringResource(Res.string.display_time_in_12h_format),
+                        enabled = state.connected,
+                        checked = formState.value.use_12h_clock,
+                        onCheckedChange = {
+                            formState.value = formState.value.newBuilder().also { wb -> wb.use_12h_clock = it }.build()
+                        },
+                        containerColor = CardDefaults.cardColors().containerColor,
+                    )
+                    HorizontalDivider()
+                }
                 SwitchPreference(
                     title = stringResource(Res.string.bold_heading),
                     summary = stringResource(Res.string.config_display_heading_bold_summary),
                     checked = formState.value.heading_bold,
                     enabled = state.connected,
-                    onCheckedChange = { formState.value = formState.value.copy(heading_bold = it) },
+                    onCheckedChange = {
+                        formState.value = formState.value.newBuilder().also { wb -> wb.heading_bold = it }.build()
+                    },
                     containerColor = CardDefaults.cardColors().containerColor,
                 )
                 HorizontalDivider()
@@ -110,7 +131,9 @@ fun DisplayConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                     enabled = state.connected,
                     items = Config.DisplayConfig.DisplayUnits.entries.map { it to it.name },
                     selectedItem = formState.value.units,
-                    onItemSelected = { formState.value = formState.value.copy(units = it) },
+                    onItemSelected = {
+                        formState.value = formState.value.newBuilder().also { wb -> wb.units = it }.build()
+                    },
                 )
             }
         }
@@ -126,7 +149,10 @@ fun DisplayConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                     selectedItem =
                     screenOnIntervals.find { it.value == formState.value.screen_on_secs.toLong() }
                         ?: screenOnIntervals.first(),
-                    onItemSelected = { formState.value = formState.value.copy(screen_on_secs = it.value.toInt()) },
+                    onItemSelected = {
+                        formState.value =
+                            formState.value.newBuilder().also { wb -> wb.screen_on_secs = it.value.toInt() }.build()
+                    },
                 )
                 HorizontalDivider()
                 DropDownPreference(
@@ -138,7 +164,11 @@ fun DisplayConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                     carouselIntervals.find { it.value == formState.value.auto_screen_carousel_secs.toLong() }
                         ?: carouselIntervals.first(),
                     onItemSelected = {
-                        formState.value = formState.value.copy(auto_screen_carousel_secs = it.value.toInt())
+                        formState.value =
+                            formState.value
+                                .newBuilder()
+                                .also { wb -> wb.auto_screen_carousel_secs = it.value.toInt() }
+                                .build()
                     },
                 )
                 HorizontalDivider()
@@ -147,7 +177,10 @@ fun DisplayConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                     summary = stringResource(Res.string.config_display_wake_on_tap_or_motion_summary),
                     checked = formState.value.wake_on_tap_or_motion,
                     enabled = state.connected,
-                    onCheckedChange = { formState.value = formState.value.copy(wake_on_tap_or_motion = it) },
+                    onCheckedChange = {
+                        formState.value =
+                            formState.value.newBuilder().also { wb -> wb.wake_on_tap_or_motion = it }.build()
+                    },
                     containerColor = CardDefaults.cardColors().containerColor,
                 )
                 HorizontalDivider()
@@ -156,7 +189,9 @@ fun DisplayConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                     summary = stringResource(Res.string.config_display_flip_screen_summary),
                     checked = formState.value.flip_screen,
                     enabled = state.connected,
-                    onCheckedChange = { formState.value = formState.value.copy(flip_screen = it) },
+                    onCheckedChange = {
+                        formState.value = formState.value.newBuilder().also { wb -> wb.flip_screen = it }.build()
+                    },
                     containerColor = CardDefaults.cardColors().containerColor,
                 )
                 HorizontalDivider()
@@ -166,7 +201,9 @@ fun DisplayConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                     enabled = state.connected,
                     items = Config.DisplayConfig.DisplayMode.entries.map { it to it.name },
                     selectedItem = formState.value.displaymode,
-                    onItemSelected = { formState.value = formState.value.copy(displaymode = it) },
+                    onItemSelected = {
+                        formState.value = formState.value.newBuilder().also { wb -> wb.displaymode = it }.build()
+                    },
                 )
                 HorizontalDivider()
                 DropDownPreference(
@@ -175,7 +212,9 @@ fun DisplayConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                     enabled = state.connected,
                     items = Config.DisplayConfig.OledType.entries.map { it to it.name },
                     selectedItem = formState.value.oled,
-                    onItemSelected = { formState.value = formState.value.copy(oled = it) },
+                    onItemSelected = {
+                        formState.value = formState.value.newBuilder().also { wb -> wb.oled = it }.build()
+                    },
                 )
                 HorizontalDivider()
                 DropDownPreference(
@@ -183,7 +222,10 @@ fun DisplayConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                     enabled = state.connected,
                     items = Config.DisplayConfig.CompassOrientation.entries.map { it to it.name },
                     selectedItem = formState.value.compass_orientation,
-                    onItemSelected = { formState.value = formState.value.copy(compass_orientation = it) },
+                    onItemSelected = {
+                        formState.value =
+                            formState.value.newBuilder().also { wb -> wb.compass_orientation = it }.build()
+                    },
                 )
             }
         }

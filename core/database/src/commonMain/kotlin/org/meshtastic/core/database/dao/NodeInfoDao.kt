@@ -261,7 +261,8 @@ interface NodeInfoDao {
             }
 
         return incomingNode.copy(
-            user = incomingNode.user.copy(public_key = resolved.key ?: ByteString.EMPTY),
+            user =
+            incomingNode.user.newBuilder().also { wb -> wb.public_key = resolved.key ?: ByteString.EMPTY }.build(),
             publicKey = resolved.key,
             keyMatch = resolved.keyMatch,
             newPublicKey = resolved.newPublicKey,
@@ -321,6 +322,9 @@ interface NodeInfoDao {
 
     // Text search (name/id) is applied in Kotlin (NodeRepositoryImpl), not here: SQLite's LIKE/UPPER/LOWER only
     // case-fold ASCII a-z/A-Z, so a WHERE-clause LIKE can't match e.g. "kolså" against "KOLSÅS" (#6750).
+    //
+    // Direct means hops_away = 0 AND NOT via_mqtt: an MQTT-bridged node carries the hop count the uplink gateway
+    // heard, not ours, so zero hops there is no claim about our radio. The row renderers read it the same way.
     @Query(
         """
     WITH OurNode AS (
@@ -331,7 +335,7 @@ interface NodeInfoDao {
     SELECT * FROM nodes
     WHERE (:includeUnknown = 1 OR short_name IS NOT NULL)
         AND (:lastHeardMin = -1 OR last_heard >= :lastHeardMin)
-        AND (:hopsAwayMax = -1 OR (hops_away <= :hopsAwayMax AND hops_away >= 0) OR num = (SELECT myNodeNum FROM my_node LIMIT 1))
+        AND (:onlyDirect = 0 OR (hops_away = 0 AND via_mqtt = 0) OR num = (SELECT myNodeNum FROM my_node LIMIT 1))
     ORDER BY CASE
         WHEN num = (SELECT myNodeNum FROM my_node LIMIT 1) THEN 0
         ELSE 1
@@ -366,7 +370,7 @@ interface NodeInfoDao {
     fun getNodes(
         sort: String,
         includeUnknown: Boolean,
-        hopsAwayMax: Int,
+        onlyDirect: Boolean,
         lastHeardMin: Int,
     ): Flow<List<NodeWithRelations>>
 

@@ -229,7 +229,7 @@ class NodeListViewModel(
         radioConfigRepository.replaceAllSettings(channelSet.settings)
         val newLoraConfig = channelSet.lora_config
         if (newLoraConfig != null) {
-            adminController.setLocalConfig(Config(lora = newLoraConfig))
+            adminController.setLocalConfig(Config.Builder().also { wb -> wb.lora = newLoraConfig }.build())
         }
     }
 

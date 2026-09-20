@@ -239,7 +239,7 @@ class PacketHandlerImpl(
                     raw_message = packet.toString(),
                     fromNum = MeshLog.NODE_NUM_LOCAL,
                     portNum = packet.decoded?.effectivePortNum() ?: 0,
-                    fromRadio = FromRadio(packet = packet),
+                    fromRadio = FromRadio.Builder().also { wb -> wb.packet = packet }.build(),
                 )
             insertMeshLog(packetToSave)
         }
@@ -752,7 +752,7 @@ class PacketHandlerImpl(
                     throw RadioNotConnectedException()
                 }
                 val departureEpoch = lifecycle.epochs.departures
-                val accepted = dispatchToRadio(ToRadio(packet = packet))
+                val accepted = dispatchToRadio(ToRadio.Builder().also { wb -> wb.packet = packet }.build())
                 pending.recordDispatch(accepted = accepted, departureEpoch = departureEpoch)
                 if (!accepted) pending.completeAll(AwaitedSendStatus.SEND_FAILED)
             }
