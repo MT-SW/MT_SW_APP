@@ -81,7 +81,7 @@ import org.meshtastic.core.ui.icon.Lock
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Search
 import org.meshtastic.core.ui.icon.Sort
-import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
+import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 
 @Composable
 fun NodeFilterTextField(
@@ -299,7 +299,10 @@ private fun NodeSortButton(
                     Icon(
                         imageVector = MeshtasticIcons.Lock,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.StatusGreen,
+                        // Matches NodeSecurityIcon's PUBLIC_KEY color -- the same lock icon shown on an
+                        // encrypted node's own row, so the filter icon reads as the same signal instead of a
+                        // different, unrelated green.
+                        tint = MaterialTheme.colorScheme.StatusOnline,
                         modifier = Modifier.size(20.dp),
                     )
                 },
