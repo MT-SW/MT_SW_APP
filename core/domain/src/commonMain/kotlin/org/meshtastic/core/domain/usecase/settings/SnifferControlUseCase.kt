@@ -77,4 +77,46 @@ open class SnifferControlUseCase(
         }
         .maxByOrNull { it.second }
         ?.first
+
+    /**
+     * Sends REQUEST_FW_PLUS_VERSION to [destNum]; the answer arrives asynchronously via [fwPlusVersionFlow].
+     * This is a custom "firmware edition" version number (see `FwPlusVersion` in ondemand.proto) maintained by
+     * this fork's own firmware, distinct from official Meshtastic semver -- other firmware never answers it.
+     */
+    open suspend fun requestFwPlusVersion(destNum: Int) {
+        radioController.requestOnDemand(destNum, OnDemandType.REQUEST_FW_PLUS_VERSION)
+    }
+
+    /**
+     * The most recently logged RESPONSE_FW_PLUS_VERSION's `version_number` for [destNum], or `null` when none has
+     * been received yet -- either it hasn't been queried this session, or the connected firmware doesn't
+     * implement fw+ versioning at all (official Meshtastic firmware, or an fw+ build predating this query).
+     */
+    open fun fwPlusVersionFlow(destNum: Int): Flow<Int?> =
+        meshLogRepository.getLogsFrom(destNum, ON_DEMAND_PORT_NUM).map(::decodeLatestFwPlusVersion)
+
+    private fun decodeLatestFwPlusVersion(logs: List<MeshLog>): Int? = logs
+        .mapNotNull { log ->
+            log.fromRadio
+                ?.packet
+                ?.decoded
+                ?.payload
+                ?.let { payload -> runCatching { OnDemand.ADAPTER.decode(payload) }.getOrNull() }
+                ?.response
+                ?.takeIf { it.response_type == OnDemandType.RESPONSE_FW_PLUS_VERSION }
+                ?.fw_plus_version
+                ?.version_number
+                ?.let { versionNumber -> versionNumber to log.received_date }
+        }
+        .maxByOrNull { it.second }
+        ?.first
+
+    companion object {
+        /**
+         * Minimum fw+ `version_number` (see [requestFwPlusVersion]/[fwPlusVersionFlow]) at which Sniffer is
+         * considered supported -- agreed with firmware at 2 (not the originally-discussed 3), to preserve
+         * release-numbering continuity.
+         */
+        const val MIN_FW_PLUS_VERSION_FOR_SNIFFER = 2
+    }
 }

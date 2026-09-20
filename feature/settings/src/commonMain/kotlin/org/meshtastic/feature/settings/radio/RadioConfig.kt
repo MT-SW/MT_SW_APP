@@ -37,6 +37,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
+import org.meshtastic.core.domain.usecase.settings.SnifferControlUseCase
 import org.meshtastic.core.navigation.DiscoveryRoute
 import org.meshtastic.core.navigation.FirmwareRoute
 import org.meshtastic.core.navigation.Route
@@ -107,10 +108,13 @@ fun RadioConfigItemList(
     val enabled = state.connected && !isManaged
     val snifferLoading = state.snifferLoading
     // Sniffer is no longer a ModuleConfig section (our abandoned fork's nodemodadmin field) -- it's answered
-    // on demand over port 354 (see SnifferControlUseCase), so "supported" is now: has RadioConfigViewModel
-    // heard a RESPONSE_SNIFFER_STATE from this connection at all. A firmware that doesn't implement the
-    // protocol simply never answers, so this settles to false once the request times out.
-    val snifferSupported = state.snifferEnabled != null
+    // on demand over port 354 (see SnifferControlUseCase), so "supported" is now: either RadioConfigViewModel has
+    // already heard a RESPONSE_SNIFFER_STATE from this connection, or the connected firmware's own fw+ edition
+    // version (RESPONSE_FW_PLUS_VERSION) is at or past MIN_FW_PLUS_VERSION_FOR_SNIFFER -- letting fw+ builds that
+    // know they support Sniffer say so immediately, instead of waiting out the state-request timeout below. A
+    // firmware that answers neither settles to false once that timeout elapses.
+    val snifferSupported = state.snifferEnabled != null ||
+        (state.fwPlusVersion?.let { it >= SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_SNIFFER } == true)
 
     LaunchedEffect(state.responseState) {
         if (state.responseState is ResponseState.Success || state.responseState is ResponseState.Error) {

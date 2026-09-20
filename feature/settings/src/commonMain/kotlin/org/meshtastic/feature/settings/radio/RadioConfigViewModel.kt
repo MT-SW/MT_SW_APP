@@ -154,6 +154,9 @@ data class RadioConfigState(
     val snifferEnabled: Boolean? = null,
     /** True while a Sniffer state/enable/disable OnDemand request is outstanding. */
     val snifferLoading: Boolean = false,
+    /** Latest RESPONSE_FW_PLUS_VERSION's `version_number` for the local node, or null if none has arrived yet
+     * this connection -- see [SnifferControlUseCase.fwPlusVersionFlow]. */
+    val fwPlusVersion: Int? = null,
     val analyticsAvailable: Boolean = true,
     val analyticsEnabled: Boolean = true,
     val nodeDbResetPreserveFavorites: Boolean = false,
@@ -393,9 +396,12 @@ open class RadioConfigViewModel(
             .distinctUntilChanged()
             .onEach { localNum ->
                 if (localNum == null) {
-                    _radioConfigState.update { it.copy(snifferEnabled = null, snifferLoading = false) }
+                    _radioConfigState.update {
+                        it.copy(snifferEnabled = null, snifferLoading = false, fwPlusVersion = null)
+                    }
                 } else {
                     requestSnifferState(localNum)
+                    requestFwPlusVersion(localNum)
                 }
             }
             .launchIn(viewModelScope)
@@ -407,6 +413,15 @@ open class RadioConfigViewModel(
             .distinctUntilChanged()
             .flatMapLatest { localNum -> localNum?.let(snifferControlUseCase::snifferEnabledFlow) ?: flowOf(null) }
             .onEach { enabled -> _radioConfigState.update { it.copy(snifferEnabled = enabled, snifferLoading = false) } }
+            .launchIn(viewModelScope)
+
+        combine(nodeRepository.myNodeInfo, activeDestNum) { ni, dest ->
+            val isLocal = (dest == null) || (dest == ni?.myNodeNum)
+            if (isLocal) ni?.myNodeNum else null
+        }
+            .distinctUntilChanged()
+            .flatMapLatest { localNum -> localNum?.let(snifferControlUseCase::fwPlusVersionFlow) ?: flowOf(null) }
+            .onEach { version -> _radioConfigState.update { it.copy(fwPlusVersion = version) } }
             .launchIn(viewModelScope)
 
         radioConfigRepository.deviceUIConfigFlow
@@ -683,6 +698,12 @@ open class RadioConfigViewModel(
             delay(SNIFFER_STATE_TIMEOUT)
             _radioConfigState.update { if (it.snifferEnabled == null) it.copy(snifferLoading = false) else it }
         }
+    }
+
+    /** Sends REQUEST_FW_PLUS_VERSION for [localNum]; see [SnifferControlUseCase.requestFwPlusVersion] and
+     * [SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_SNIFFER] for how the answer feeds Sniffer support detection. */
+    private fun requestFwPlusVersion(localNum: Int) {
+        safeLaunch(tag = "requestFwPlusVersion") { snifferControlUseCase.requestFwPlusVersion(localNum) }
     }
 
     /** Toggles the Sniffer module on the local node via OnDemand (port 354); see [SnifferControlUseCase]. */
