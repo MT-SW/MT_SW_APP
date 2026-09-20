@@ -257,7 +257,8 @@ class CommandSenderImpl(
         packetHandler.sendToRadioAndAwaitResult(buildAdminMessagePacket(destNum, requestId, wantResponse, initFn))
 
     override suspend fun sendAdminAndAwaitDelivery(destNum: Int, requestId: Int, initFn: () -> AdminMessage): Boolean {
-        val adminMsg = initFn().copy(session_passkey = sessionManager.getPasskey(destNum))
+        val adminMsg =
+            initFn().newBuilder().also { wb -> wb.session_passkey = sessionManager.getPasskey(destNum) }.build()
         val packet = buildAdminPacket(to = destNum, id = requestId, wantResponse = false, adminMessage = adminMsg)
         return packetHandler.sendToRadioAndAwaitRoutingAck(packet)
     }
@@ -357,12 +358,14 @@ class CommandSenderImpl(
                 to = destNum,
                 channel = getChannelIndex(destNum),
                 decoded =
-                    Data(
-                        // No PortNum constant exists for 354 (OnDemand/Sniffer) -- see PrivatePortNum.kt.
-                        payload = onDemand.encode().toByteString(),
-                        want_response = true,
-                        unknownFields = privatePortNumUnknownFields(ON_DEMAND_PORT_NUM),
-                    ),
+                    Data.Builder()
+                        .also { wb ->
+                            wb.payload = onDemand.encode().toByteString()
+                            wb.want_response = true
+                            // No PortNum constant exists for 354 (OnDemand/Sniffer) -- see PrivatePortNum.kt.
+                            wb.addUnknownFields(privatePortNumUnknownFields(ON_DEMAND_PORT_NUM))
+                        }
+                        .build(),
             ),
             "OnDemand request",
         )

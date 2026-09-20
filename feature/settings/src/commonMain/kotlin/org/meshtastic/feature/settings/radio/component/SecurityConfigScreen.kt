@@ -105,7 +105,8 @@ fun SecurityConfigScreenCommon(viewModel: RadioConfigViewModel, onBack: () -> Un
         VanityColorPickerDialog(
             supported = capabilities.supportsVanityKeyColor,
             onKeyFound = { key ->
-                formState.value = formState.value.copy(private_key = key)
+                formState.value =
+                    formState.value.newBuilder().also { wb -> wb.private_key = key }.build()
                 showColorPicker = false
             },
             onDismiss = { showColorPicker = false },

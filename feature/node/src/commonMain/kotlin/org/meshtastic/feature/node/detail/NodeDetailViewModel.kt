@@ -140,7 +140,11 @@ class NodeDetailViewModel(
      * collects it — a lazily-started, subscriber-gated flow would never actually receive an update.
      */
     private val localConfig: StateFlow<LocalConfig> =
-        radioConfigRepository.localConfigFlow.stateIn(viewModelScope, SharingStarted.Eagerly, LocalConfig())
+        radioConfigRepository.localConfigFlow.stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            LocalConfig.Builder().build(),
+        )
 
     private val narrowBandWarningFlow = MutableStateFlow(false)
 

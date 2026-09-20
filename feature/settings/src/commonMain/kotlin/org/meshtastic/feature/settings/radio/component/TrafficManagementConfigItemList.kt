@@ -51,7 +51,7 @@ import org.meshtastic.proto.ModuleConfig
 @Composable
 fun TrafficManagementConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
     val state by viewModel.radioConfigState.collectAsStateWithLifecycle()
-    val tmConfig = state.moduleConfig.traffic_management ?: ModuleConfig.TrafficManagementConfig()
+    val tmConfig = state.moduleConfig.traffic_management ?: ModuleConfig.TrafficManagementConfig.Builder().build()
     val formState = rememberConfigState(initialValue = tmConfig)
     val focusManager = LocalFocusManager.current
 
@@ -65,7 +65,7 @@ fun TrafficManagementConfigScreen(viewModel: RadioConfigViewModel, onBack: () ->
         responseState = state.responseState,
         onDismissPacketResponse = viewModel::clearPacketResponse,
         onSave = {
-            val config = ModuleConfig(traffic_management = it)
+            val config = ModuleConfig.Builder().also { wb -> wb.traffic_management = it }.build()
             viewModel.setModuleConfig(config)
         },
     ) {
@@ -76,7 +76,9 @@ fun TrafficManagementConfigScreen(viewModel: RadioConfigViewModel, onBack: () ->
                     value = formState.value.position_min_interval_secs,
                     enabled = state.connected,
                     keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
-                    onValueChanged = { formState.value = formState.value.copy(position_min_interval_secs = it) },
+                    onValueChanged = {
+                        formState.value = formState.value.newBuilder().also { wb -> wb.position_min_interval_secs = it }.build()
+                    },
                 )
                 HorizontalDivider()
                 EditTextPreference(
@@ -84,7 +86,10 @@ fun TrafficManagementConfigScreen(viewModel: RadioConfigViewModel, onBack: () ->
                     value = formState.value.nodeinfo_direct_response_max_hops,
                     enabled = state.connected,
                     keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
-                    onValueChanged = { formState.value = formState.value.copy(nodeinfo_direct_response_max_hops = it) },
+                    onValueChanged = {
+                        formState.value =
+                            formState.value.newBuilder().also { wb -> wb.nodeinfo_direct_response_max_hops = it }.build()
+                    },
                 )
                 HorizontalDivider()
                 EditTextPreference(
@@ -92,7 +97,9 @@ fun TrafficManagementConfigScreen(viewModel: RadioConfigViewModel, onBack: () ->
                     value = formState.value.rate_limit_window_secs,
                     enabled = state.connected,
                     keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
-                    onValueChanged = { formState.value = formState.value.copy(rate_limit_window_secs = it) },
+                    onValueChanged = {
+                        formState.value = formState.value.newBuilder().also { wb -> wb.rate_limit_window_secs = it }.build()
+                    },
                 )
                 HorizontalDivider()
                 EditTextPreference(
@@ -100,7 +107,9 @@ fun TrafficManagementConfigScreen(viewModel: RadioConfigViewModel, onBack: () ->
                     value = formState.value.rate_limit_max_packets,
                     enabled = state.connected,
                     keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
-                    onValueChanged = { formState.value = formState.value.copy(rate_limit_max_packets = it) },
+                    onValueChanged = {
+                        formState.value = formState.value.newBuilder().also { wb -> wb.rate_limit_max_packets = it }.build()
+                    },
                 )
                 HorizontalDivider()
                 EditTextPreference(
@@ -108,7 +117,9 @@ fun TrafficManagementConfigScreen(viewModel: RadioConfigViewModel, onBack: () ->
                     value = formState.value.unknown_packet_threshold,
                     enabled = state.connected,
                     keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
-                    onValueChanged = { formState.value = formState.value.copy(unknown_packet_threshold = it) },
+                    onValueChanged = {
+                        formState.value = formState.value.newBuilder().also { wb -> wb.unknown_packet_threshold = it }.build()
+                    },
                 )
             }
         }
