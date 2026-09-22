@@ -1,0 +1,484 @@
+/*
+ * Copyright (c) 2026 Meshtastic LLC
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+@file:OptIn(ExperimentalMaterial3Api::class)
+
+package org.meshtastic.feature.settings.sniffer
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularWavyProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.common.util.DateFormatter
+import org.meshtastic.core.datastore.SnifferLogFormat
+import org.meshtastic.core.datastore.SnifferSource
+import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.mqtt_sniffer_log_empty
+import org.meshtastic.core.resources.save_log_to_file
+import org.meshtastic.core.resources.sniffer_auto_scroll
+import org.meshtastic.core.resources.sniffer_clear_log
+import org.meshtastic.core.resources.sniffer_decrypt_payloads_summary
+import org.meshtastic.core.resources.sniffer_decrypt_payloads_title
+import org.meshtastic.core.resources.sniffer_export_format_csv
+import org.meshtastic.core.resources.sniffer_export_format_json
+import org.meshtastic.core.resources.sniffer_export_format_title
+import org.meshtastic.core.resources.sniffer_export_format_txt
+import org.meshtastic.core.resources.sniffer_gear_menu
+import org.meshtastic.core.resources.sniffer_group_by_gateway_summary
+import org.meshtastic.core.resources.sniffer_group_by_gateway_title
+import org.meshtastic.core.resources.sniffer_load_log_summary
+import org.meshtastic.core.resources.sniffer_load_log_title
+import org.meshtastic.core.resources.sniffer_log_empty
+import org.meshtastic.core.resources.sniffer_mqtt_section_title
+import org.meshtastic.core.resources.sniffer_not_supported_summary
+import org.meshtastic.core.resources.sniffer_panel_off_summary
+import org.meshtastic.core.resources.sniffer_radio_section_title
+import org.meshtastic.core.resources.sniffer_source_mqtt_unavailable_summary
+import org.meshtastic.core.resources.sniffer_source_off
+import org.meshtastic.core.resources.sniffer_source_title
+import org.meshtastic.core.resources.sniffer_via_gateways
+import org.meshtastic.core.resources.sniffer_via_relays
+import org.meshtastic.core.ui.component.BasicListItem
+import org.meshtastic.core.ui.component.CopyIconButton
+import org.meshtastic.core.ui.component.SwitchPreference
+import org.meshtastic.core.ui.icon.Delete
+import org.meshtastic.core.ui.icon.FolderOpen
+import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.Save
+import org.meshtastic.core.ui.icon.Settings
+import org.meshtastic.feature.settings.export.LogExportSaverLauncher
+import org.meshtastic.feature.settings.sniffer.mqtt.GroupedMqttSniffedPacket
+
+/** The three top-bar actions for [SnifferSettingsScreen] -- save, open the gear menu, and clear. */
+@Composable
+internal fun SnifferTopBarActions(
+    display: SnifferDisplayState,
+    exportFormat: SnifferLogFormat,
+    exportSaver: LogExportSaverLauncher,
+    onOpenGearSheet: () -> Unit,
+    onClear: () -> Unit,
+) {
+    Row {
+        IconButton(
+            enabled = display.itemCount > 0,
+            onClick = {
+                val rows =
+                    if (display.showingMqtt) {
+                        display.groupedMqttPackets.asReversed().map {
+                            it.packet.toExportRow(gatewayIds = it.gatewayIds)
+                        }
+                    } else {
+                        display.displayedRadioPackets.asReversed().map { it.toExportRow() }
+                    }
+                val sourceLabel = if (display.showingMqtt) "mqtt" else "radio"
+                exportSaver.save(buildSnifferExport(rows, exportFormat, sourceLabel))
+            },
+        ) {
+            Icon(imageVector = MeshtasticIcons.Save, contentDescription = stringResource(Res.string.save_log_to_file))
+        }
+        IconButton(onClick = onOpenGearSheet) {
+            Icon(
+                imageVector = MeshtasticIcons.Settings,
+                contentDescription = stringResource(Res.string.sniffer_gear_menu),
+            )
+        }
+        IconButton(enabled = display.itemCount > 0, onClick = onClear) {
+            Icon(
+                imageVector = MeshtasticIcons.Delete,
+                contentDescription = stringResource(Res.string.sniffer_clear_log),
+            )
+        }
+    }
+}
+
+/** The empty-state message for [SnifferSettingsScreen] -- what to say depends on why there's nothing to show. */
+@Composable
+internal fun snifferEmptyStateText(loadedLog: LoadedSnifferLog?, activeSource: SnifferSource): String = when {
+    loadedLog != null -> stringResource(Res.string.sniffer_log_empty)
+    activeSource == SnifferSource.RADIO -> stringResource(Res.string.sniffer_log_empty)
+    activeSource == SnifferSource.MQTT -> stringResource(Res.string.mqtt_sniffer_log_empty)
+    else -> stringResource(Res.string.sniffer_panel_off_summary)
+}
+
+@Composable
+internal fun SnifferGearSheet(
+    onDismissRequest: () -> Unit,
+    activeSource: SnifferSource,
+    onSelectSource: (SnifferSource) -> Unit,
+    radioSelectable: Boolean,
+    radioLoading: Boolean,
+    mqttConfigured: Boolean,
+    groupByGateway: Boolean,
+    onGroupByGatewayChange: (Boolean) -> Unit,
+    autoScroll: Boolean,
+    onAutoScrollChange: (Boolean) -> Unit,
+    decryptPayloads: Boolean,
+    onDecryptPayloadsChange: (Boolean) -> Unit,
+    exportFormat: SnifferLogFormat,
+    onExportFormatChange: (SnifferLogFormat) -> Unit,
+    onLoadLogClick: () -> Unit,
+) {
+    ModalBottomSheet(onDismissRequest = onDismissRequest) {
+        Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(bottom = 16.dp)) {
+            SnifferSourceSelector(
+                activeSource = activeSource,
+                onSelectSource = onSelectSource,
+                radioSelectable = radioSelectable,
+                radioLoading = radioLoading,
+                mqttConfigured = mqttConfigured,
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            SnifferPreferencesSection(
+                groupByGateway = groupByGateway,
+                onGroupByGatewayChange = onGroupByGatewayChange,
+                autoScroll = autoScroll,
+                onAutoScrollChange = onAutoScrollChange,
+                decryptPayloads = decryptPayloads,
+                onDecryptPayloadsChange = onDecryptPayloadsChange,
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            SnifferExportFormatSelector(exportFormat = exportFormat, onExportFormatChange = onExportFormatChange)
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            BasicListItem(
+                text = stringResource(Res.string.sniffer_load_log_title),
+                supportingText = stringResource(Res.string.sniffer_load_log_summary),
+                leadingIcon = MeshtasticIcons.FolderOpen,
+                onClick = onLoadLogClick,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SnifferSourceSelector(
+    activeSource: SnifferSource,
+    onSelectSource: (SnifferSource) -> Unit,
+    radioSelectable: Boolean,
+    radioLoading: Boolean,
+    mqttConfigured: Boolean,
+) {
+    Text(
+        text = stringResource(Res.string.sniffer_source_title),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp),
+    )
+    BasicListItem(
+        text = stringResource(Res.string.sniffer_source_off),
+        onClick = { onSelectSource(SnifferSource.OFF) },
+        trailingContent = { RadioButton(selected = activeSource == SnifferSource.OFF, onClick = null) },
+    )
+    BasicListItem(
+        text = stringResource(Res.string.sniffer_radio_section_title),
+        enabled = radioSelectable,
+        supportingText =
+        if (!radioLoading && !radioSelectable) {
+            stringResource(Res.string.sniffer_not_supported_summary)
+        } else {
+            null
+        },
+        onClick = { onSelectSource(SnifferSource.RADIO) },
+        trailingContent = {
+            if (radioLoading) {
+                CircularWavyProgressIndicator(modifier = Modifier.size(24.dp))
+            } else {
+                RadioButton(selected = activeSource == SnifferSource.RADIO, onClick = null, enabled = radioSelectable)
+            }
+        },
+    )
+    BasicListItem(
+        text = stringResource(Res.string.sniffer_mqtt_section_title),
+        enabled = mqttConfigured,
+        supportingText =
+        if (!mqttConfigured) stringResource(Res.string.sniffer_source_mqtt_unavailable_summary) else null,
+        onClick = { onSelectSource(SnifferSource.MQTT) },
+        trailingContent = {
+            RadioButton(selected = activeSource == SnifferSource.MQTT, onClick = null, enabled = mqttConfigured)
+        },
+    )
+}
+
+@Composable
+private fun SnifferPreferencesSection(
+    groupByGateway: Boolean,
+    onGroupByGatewayChange: (Boolean) -> Unit,
+    autoScroll: Boolean,
+    onAutoScrollChange: (Boolean) -> Unit,
+    decryptPayloads: Boolean,
+    onDecryptPayloadsChange: (Boolean) -> Unit,
+) {
+    SwitchPreference(
+        title = stringResource(Res.string.sniffer_group_by_gateway_title),
+        summary = stringResource(Res.string.sniffer_group_by_gateway_summary),
+        checked = groupByGateway,
+        enabled = true,
+        onCheckedChange = onGroupByGatewayChange,
+    )
+    SwitchPreference(
+        title = stringResource(Res.string.sniffer_auto_scroll),
+        checked = autoScroll,
+        enabled = true,
+        onCheckedChange = onAutoScrollChange,
+    )
+    SwitchPreference(
+        title = stringResource(Res.string.sniffer_decrypt_payloads_title),
+        summary = stringResource(Res.string.sniffer_decrypt_payloads_summary),
+        checked = decryptPayloads,
+        enabled = true,
+        onCheckedChange = onDecryptPayloadsChange,
+    )
+}
+
+@Composable
+private fun SnifferExportFormatSelector(
+    exportFormat: SnifferLogFormat,
+    onExportFormatChange: (SnifferLogFormat) -> Unit,
+) {
+    Column {
+        Text(
+            text = stringResource(Res.string.sniffer_export_format_title),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 16.dp, bottom = 4.dp),
+        )
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+            val formats = SnifferLogFormat.entries
+            formats.forEachIndexed { index, format ->
+                val label =
+                    when (format) {
+                        SnifferLogFormat.TXT -> stringResource(Res.string.sniffer_export_format_txt)
+                        SnifferLogFormat.JSON -> stringResource(Res.string.sniffer_export_format_json)
+                        SnifferLogFormat.CSV -> stringResource(Res.string.sniffer_export_format_csv)
+                    }
+                SegmentedButton(
+                    shape = SegmentedButtonDefaults.itemShape(index, formats.size),
+                    onClick = { onExportFormatChange(format) },
+                    selected = exportFormat == format,
+                    label = { Text(label) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+internal fun GroupedRadioPacketCard(
+    grouped: GroupedSniffedPacket,
+    decryptPayloads: Boolean,
+    isExpanded: Boolean,
+    onClick: () -> Unit,
+) {
+    val packet = grouped.packet
+    Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
+        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                val fromLabel = packet.fromShortName?.let { "${packet.fromId} ($it)" } ?: packet.fromId
+                val toLabel = packet.toShortName?.let { "${packet.toId} ($it)" } ?: packet.toId
+                Text(text = "$fromLabel → $toLabel", style = MaterialTheme.typography.titleSmall)
+                Text(
+                    text =
+                    "${DateFormatter.formatDate(packet.receivedAtMillis)} " +
+                        DateFormatter.formatTimeWithSeconds(packet.receivedAtMillis),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            val hopsText = "hops ${packet.hopStart - packet.hopLimit}/${packet.hopStart}"
+            val signalText = listOfNotNull(packet.rssi?.let { "RSSI $it" }, "SNR ${packet.snr}").joinToString(" • ")
+            Text(
+                text = "ch ${packet.channel} • $hopsText • $signalText",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            val portText = if (packet.isEncrypted) "encrypted" else packet.portNum?.let { "port $it" } ?: "unknown port"
+            Text(
+                text = portText,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            if (grouped.relayIds.isNotEmpty()) {
+                Text(
+                    text = stringResource(Res.string.sniffer_via_relays, grouped.relayIds.joinToString(", ")),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (isExpanded) {
+                val payload = if (decryptPayloads) packet.decodedPayload ?: packet.payloadHex else packet.payloadHex
+                Text(text = payload, style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace))
+                CopyIconButton(valueToCopy = packet.copyText, modifier = Modifier.padding(top = 4.dp))
+            }
+        }
+    }
+}
+
+@Composable
+internal fun GroupedMqttPacketCard(
+    grouped: GroupedMqttSniffedPacket,
+    decryptPayloads: Boolean,
+    isExpanded: Boolean,
+    onClick: () -> Unit,
+) {
+    val packet = grouped.packet
+    Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
+        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(text = packet.topic, style = MaterialTheme.typography.titleSmall)
+                Text(
+                    text =
+                    "${DateFormatter.formatDate(packet.receivedAtMillis)} " +
+                        DateFormatter.formatTimeWithSeconds(packet.receivedAtMillis),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (!packet.isJson && packet.fromId.isNotEmpty()) {
+                val fromLabel = packet.fromShortName?.let { "${packet.fromId} ($it)" } ?: packet.fromId
+                val toLabel = packet.toShortName?.let { "${packet.toId} ($it)" } ?: packet.toId
+                Text(
+                    text = "$fromLabel -> $toLabel" + (packet.channelId?.let { " • $it" } ?: ""),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            val portText =
+                when {
+                    packet.isJson -> "JSON"
+                    packet.isEncrypted -> "encrypted"
+                    else -> packet.portNum?.let { "port $it" } ?: "unknown port"
+                }
+            Text(
+                text = portText,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            if (grouped.gatewayIds.isNotEmpty()) {
+                Text(
+                    text = stringResource(Res.string.sniffer_via_gateways, grouped.gatewayIds.joinToString(", ")),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (isExpanded) {
+                val payload = if (decryptPayloads) packet.decodedPayload ?: packet.payloadHex else packet.payloadHex
+                Text(text = payload, style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace))
+                CopyIconButton(valueToCopy = packet.copyText, modifier = Modifier.padding(top = 4.dp))
+            }
+        }
+    }
+}
+
+private const val MIN_THUMB_HEIGHT_FRACTION = 0.05f
+
+/**
+ * A small draggable thumb along the trailing edge of [listState]'s list for fast-scrolling through a long log -- built
+ * from scratch rather than a platform scrollbar API since this screen needs to look and behave identically on Android,
+ * Desktop and iOS. Dragging anywhere on the track jumps the list to the proportional item rather than scrolling
+ * incrementally, which is the point of a *fast*-scroll affordance.
+ */
+@Composable
+internal fun FastScrollSidebar(listState: LazyListState, itemCount: Int, modifier: Modifier = Modifier) {
+    if (itemCount <= 1) return
+    val coroutineScope = rememberCoroutineScope()
+    val density = LocalDensity.current
+    var trackHeightPx by remember { mutableFloatStateOf(0f) }
+    val minThumbHeightPx = with(density) { 24.dp.toPx() }
+
+    val visibleCount = listState.layoutInfo.visibleItemsInfo.size.coerceAtLeast(1)
+    val maxFirstIndex = (itemCount - visibleCount).coerceAtLeast(1)
+    val scrollFraction = (listState.firstVisibleItemIndex.toFloat() / maxFirstIndex.toFloat()).coerceIn(0f, 1f)
+    val thumbHeightFraction = (visibleCount.toFloat() / itemCount.toFloat()).coerceIn(MIN_THUMB_HEIGHT_FRACTION, 1f)
+
+    Box(
+        modifier =
+        modifier
+            .fillMaxHeight()
+            .width(20.dp)
+            .onGloballyPositioned { trackHeightPx = it.size.height.toFloat() }
+            .pointerInput(itemCount) {
+                detectDragGestures { change, _ ->
+                    change.consume()
+                    if (trackHeightPx <= 0f) return@detectDragGestures
+                    val fraction = (change.position.y / trackHeightPx).coerceIn(0f, 1f)
+                    val targetIndex = (fraction * (itemCount - 1)).toInt().coerceIn(0, itemCount - 1)
+                    coroutineScope.launch { listState.scrollToItem(targetIndex) }
+                }
+            },
+    ) {
+        val thumbHeightDp =
+            with(density) { (trackHeightPx * thumbHeightFraction).coerceAtLeast(minThumbHeightPx).toDp() }
+        val thumbOffsetPx = (trackHeightPx - with(density) { thumbHeightDp.toPx() }) * scrollFraction
+        Box(
+            modifier =
+            Modifier.align(Alignment.TopCenter)
+                .offset { IntOffset(0, thumbOffsetPx.toInt()) }
+                .width(4.dp)
+                .height(thumbHeightDp)
+                .clip(RoundedCornerShape(2.dp))
+                .background(MaterialTheme.colorScheme.outline),
+        )
+    }
+}

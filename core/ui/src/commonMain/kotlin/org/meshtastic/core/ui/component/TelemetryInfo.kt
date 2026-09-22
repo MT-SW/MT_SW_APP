@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import org.jetbrains.compose.resources.stringResource
-import org.meshtastic.core.ui.icon.label
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.baro_pressure
 import org.meshtastic.core.resources.env_metrics_log
@@ -68,6 +67,7 @@ import org.meshtastic.core.ui.icon.Pressure
 import org.meshtastic.core.ui.icon.Role
 import org.meshtastic.core.ui.icon.SoilMoisture
 import org.meshtastic.core.ui.icon.Temperature
+import org.meshtastic.core.ui.icon.label
 import org.meshtastic.core.ui.icon.role
 import org.meshtastic.proto.Config
 

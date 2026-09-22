@@ -32,7 +32,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import org.meshtastic.core.ui.component.MainAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -41,6 +40,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.meshtastic.core.common.util.MetricFormatter
+import org.meshtastic.core.ui.component.MainAppBar
 
 @Composable
 fun NetworkHealthScreen(
@@ -63,9 +63,7 @@ fun NetworkHealthScreen(
                 onNavigateUp = {},
                 onClickChip = {},
                 actions = {
-                    IconButton(onClick = onSummaryClick) {
-                        Text("📋", style = MaterialTheme.typography.titleLarge)
-                    }
+                    IconButton(onClick = onSummaryClick) { Text("📋", style = MaterialTheme.typography.titleLarge) }
                 },
             )
         },

@@ -80,6 +80,18 @@ val ChannelSet.subscribeList: List<String>
         return settings.filter { it.downlink_enabled }.map { Channel(it, loraConfig).name }
     }
 
+/**
+ * @return Every configured channel's globally unique ID usable with MQTT subscribe(), regardless of `downlink_enabled`.
+ *   Unlike [subscribeList] (which only lists channels the device wants broker traffic relayed back for), this is for
+ *   observability features -- e.g. the MQTT Sniffer -- that want to see everything published for this device's channels
+ *   rather than only what would actually be relayed back to it.
+ */
+val ChannelSet.allChannelIds: List<String>
+    get() {
+        val loraConfig = this.lora_config ?: LoRaConfig.Builder().build()
+        return settings.map { Channel(it, loraConfig).name }
+    }
+
 fun ChannelSet.getChannel(index: Int): Channel? = if (settings.size > index) {
     val s = settings[index]
     Channel(s, lora_config ?: LoRaConfig.Builder().build())

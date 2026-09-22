@@ -41,6 +41,7 @@ kotlin {
 
             implementation(libs.kotlinx.atomicfu)
             implementation(libs.kotlinx.collections.immutable)
+            implementation(libs.kotlinx.serialization.json)
             implementation(libs.aboutlibraries.compose.m3)
             implementation(libs.coil)
         }

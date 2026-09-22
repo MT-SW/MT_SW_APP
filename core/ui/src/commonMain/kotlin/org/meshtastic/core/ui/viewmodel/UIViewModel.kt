@@ -446,10 +446,10 @@ class UIViewModel(
         val isPolishLanguage = Locale.current.language == "pl"
         val isInPoland =
             isPolishLanguage ||
-                    run {
-                        val location = locationService.getCurrentLocation() ?: return
-                        POLAND_REGION.contains(location.latitude, location.longitude)
-                    }
+                run {
+                    val location = locationService.getCurrentLocation() ?: return
+                    POLAND_REGION.contains(location.latitude, location.longitude)
+                }
         if (!isInPoland) return
 
         val now = nowMillis
@@ -543,9 +543,9 @@ class UIViewModel(
         private const val NARROW_BAND_WARNING_THROTTLE_MILLIS = 12 * 60 * 60 * 1000L
 
         /**
-         * Simplified national border for Poland (214 vertices, simplified union of all 16 voivodeship polygons from
-         * the ppatrzyk/polska-geojson dataset) — (lat, lon) pairs, connects back to the first vertex. Used by the
-         * general NarrowFast notice, which fires nationwide rather than only inside Świętokrzyskie.
+         * Simplified national border for Poland (214 vertices, simplified union of all 16 voivodeship polygons from the
+         * ppatrzyk/polska-geojson dataset) — (lat, lon) pairs, connects back to the first vertex. Used by the general
+         * NarrowFast notice, which fires nationwide rather than only inside Świętokrzyskie.
          */
         @Suppress("MagicNumber", "LargeClass")
         private val POLAND_REGION =

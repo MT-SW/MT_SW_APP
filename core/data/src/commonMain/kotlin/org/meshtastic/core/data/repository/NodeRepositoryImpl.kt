@@ -103,7 +103,10 @@ class NodeRepositoryImpl(
         processLifecycle.coroutineScope.launch { localStatsDataSource.setLocalStats(stats) }
     }
 
-    /** The latest fw+ extended local stats telemetry received from the locally connected node, persisted across restarts. */
+    /**
+     * The latest fw+ extended local stats telemetry received from the locally connected node, persisted across
+     * restarts.
+     */
     override val localStatsExtended: StateFlow<LocalStatsExtended> =
         localStatsExtendedDataSource.localStatsExtendedFlow
             .map { it.toDomain() }

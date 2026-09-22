@@ -255,9 +255,7 @@ fun SettingsScreen(
                     showEditDeviceProfileDialog = true
                 },
                 onNavigate = onNavigate,
-                onSetSnifferEnabled = {
-                    viewModel.setSnifferEnabled(it)
-                },
+                onSetSnifferEnabled = { viewModel.setSnifferEnabled(it) },
             )
 
             // App-local settings are only relevant when configuring the local node

@@ -1327,6 +1327,12 @@
     <string name="mqtt_probe_tls_failure">Uzgadnianie TLS nieudane: %1$s</string>
     <string name="mqtt_proxy_local">Proxy MQTT na tym telefonie</string>
     <string name="mqtt_proxy_local_summary">Ten telefon przekazuje ruch MQTT dla połączonego urządzenia. Wyłącz, aby natychmiast przerwać przekazywanie bez zmiany ustawień MQTT urządzenia - przydatne, gdy ruch MQTT przeciąża połączenie. Włącz ponownie, aby wznowić przekazywanie.</string>
+    <string name="mqtt_sniffer_enabled_title">Sniffer MQTT</string>
+    <string name="mqtt_sniffer_enabled_summary">Obserwuj ruch sieci mesh widoczny na brokerze, z którym skonfigurowany jest ten węzeł, korzystając z własnego połączenia MQTT tego telefonu — nie tylko to, co połączony węzeł usłyszy przez LoRa.</string>
+    <string name="mqtt_sniffer_warning_title">Włączyć Sniffer MQTT?</string>
+    <string name="mqtt_sniffer_warning_message">Otwiera własne połączenie ze skonfigurowanym brokerem MQTT. Klient MQTT tej aplikacji obsługuje tylko jedno aktywne połączenie naraz, więc jeśli "Proxy MQTT na tym telefonie" aktualnie przekazuje ruch dla połączonego węzła, włączenie tego przerwie je na czas działania sniffera.</string>
+    <string name="mqtt_sniffer_log_title">Log Sniffera MQTT</string>
+    <string name="mqtt_sniffer_log_empty">Brak pakietów MQTT — włącz powyżej Sniffer MQTT, aby zacząć obserwować ruch na brokerze</string>
     <string name="mqtt_status_connected">Połączony</string>
     <string name="mqtt_status_connecting">Łączenie…</string>
     <string name="mqtt_status_disconnected">Rozłączono</string>
@@ -1907,6 +1913,7 @@
     <string name="save_and_restart">Zapisz i uruchom ponownie</string>
     <string name="save_changes">Zapisz</string>
     <string name="save_csv_in_storage_esp32_only">Zapisz .CSV w pamięci (tylko ESP32)</string>
+    <string name="save_log_to_file">Zapisz log do pliku</string>
     <string name="save_rangetest">Eksportuj pakiety zasięgu</string>
     <!-- SCAN -->
     <string name="scan">Skanowanie</string>
@@ -2030,6 +2037,31 @@
     <string name="sniffer_log_title">Log Sniffera</string>
     <string name="sniffer_auto_scroll">Automatyczne przewijanie</string>
     <string name="sniffer_new_packets">%1$d nowych</string>
+    <string name="sniffer_mqtt_section_title">MQTT</string>
+    <string name="sniffer_radio_section_title">Radio</string>
+    <string name="sniffer_settings_title">Sniffer</string>
+    <string name="sniffer_gear_menu">Ustawienia sniffera</string>
+    <string name="sniffer_clear_log">Wyczyść wyświetlane logi</string>
+    <string name="sniffer_source_title">Aktywny sniffer</string>
+    <string name="sniffer_source_off">Wyłączony</string>
+    <string name="sniffer_source_mqtt_unavailable_summary">Włącz i skonfiguruj moduł MQTT na tym urządzeniu, aby podsłuchiwać ruch brokera</string>
+    <string name="sniffer_group_by_gateway_title">Grupuj duplikaty</string>
+    <string name="sniffer_group_by_gateway_summary">Łącz ten sam pakiet widziany więcej niż raz (wiele bramek MQTT lub różne węzły przekazujące) w jeden wiersz</string>
+    <string name="sniffer_decrypt_payloads_title">Próbuj deszyfrować</string>
+    <string name="sniffer_decrypt_payloads_summary">Próbuj odkodować zaszyfrowane dane, używając znanych kluczy kanałów tej aplikacji</string>
+    <string name="sniffer_export_format_title">Format zapisu</string>
+    <string name="sniffer_export_format_txt">Tekst</string>
+    <string name="sniffer_export_format_json">JSON</string>
+    <string name="sniffer_export_format_csv">CSV</string>
+    <string name="sniffer_load_log_title">Wczytaj zapisany log…</string>
+    <string name="sniffer_load_log_summary">Wyświetl wcześniej wyeksportowany log JSON</string>
+    <string name="sniffer_load_failed">Nie udało się odczytać tego pliku jako logu sniffera</string>
+    <string name="sniffer_viewing_loaded_file">Wyświetlanie %1$s</string>
+    <string name="sniffer_dismiss_loaded_file">Wróć do widoku na żywo</string>
+    <string name="sniffer_enable_failed">Nie udało się włączyć snifera — urządzenie nie odpowiedziało (może nie obsługiwać tej funkcji)</string>
+    <string name="sniffer_panel_off_summary">Wybierz Radio lub MQTT w ustawieniach Sniffera, aby zacząć obserwować ruch</string>
+    <string name="sniffer_via_gateways">Widziane przez bramki: %1$s</string>
+    <string name="sniffer_via_relays">Przekazane przez: %1$s</string>
     <!-- SITE -->
     <string name="site_planner">Planer lokalizacji</string>
     <string name="site_planner_antenna_gain_dbi">Zysk anteny (dBi)</string>

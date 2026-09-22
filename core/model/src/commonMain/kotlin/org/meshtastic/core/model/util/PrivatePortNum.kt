@@ -21,40 +21,41 @@ import okio.ByteString.Companion.toByteString
 import org.meshtastic.proto.Data
 
 /**
- * Support for Meshtastic's "private app port" convention (see the `PRIVATE_APP = 256` comment in
- * portnums.proto): ports >= 256 are used by mutual agreement between firmware and client without adding a
- * named [org.meshtastic.proto.PortNum] enum entry, specifically so a client doesn't need to fork the official
- * protobufs just for one experimental port number (here: 354, used by the OnDemand/Sniffer protocol -- see
- * `ondemand.proto`).
+ * Support for Meshtastic's "private app port" convention (see the `PRIVATE_APP = 256` comment in portnums.proto):
+ * ports >= 256 are used by mutual agreement between firmware and client without adding a named
+ * [org.meshtastic.proto.PortNum] enum entry, specifically so a client doesn't need to fork the official protobufs just
+ * for one experimental port number (here: 354, used by the OnDemand/Sniffer protocol -- see `ondemand.proto`).
  *
- * Wire's default `enum_class` codegen mode is a closed Kotlin enum: it cannot represent a `PortNum` value that
- * has no matching constant. On *decode*, Wire handles this gracefully already -- an out-of-range portnum is
- * redirected into the containing [Data] message's own [Data.unknownFields] (tag 1, varint) instead of throwing,
- * leaving `Data.portnum` at its default ([org.meshtastic.proto.PortNum.UNKNOWN_APP]). On *encode* there is no
- * built-in equivalent, so sending on a private port means constructing that same tag-1 varint by hand and
- * leaving `portnum` at its default (which proto3 omits from the wire, so there is no duplicate/conflicting tag).
+ * Wire's default `enum_class` codegen mode is a closed Kotlin enum: it cannot represent a `PortNum` value that has no
+ * matching constant. On *decode*, Wire handles this gracefully already -- an out-of-range portnum is redirected into
+ * the containing [Data] message's own [Data.unknownFields] (tag 1, varint) instead of throwing, leaving `Data.portnum`
+ * at its default ([org.meshtastic.proto.PortNum.UNKNOWN_APP]). On *encode* there is no built-in equivalent, so sending
+ * on a private port means constructing that same tag-1 varint by hand and leaving `portnum` at its default (which
+ * proto3 omits from the wire, so there is no duplicate/conflicting tag).
  *
  * [Data.effectivePortNum] and [privatePortNumUnknownFields] are the read/write halves of that pattern.
  */
-/** Port 354 -- OnDemand diagnostics + Sniffer control (`ondemand.proto`). No PortNum constant exists for it
-  * (see the class doc above); this is what code should compare/send against instead. */
+/**
+ * Port 354 -- OnDemand diagnostics + Sniffer control (`ondemand.proto`). No PortNum constant exists for it (see the
+ * class doc above); this is what code should compare/send against instead.
+ */
 const val ON_DEMAND_PORT_NUM = 354
 
 private const val DATA_PORTNUM_TAG = 1
 
 /**
  * This packet's real port number, recovering it from [Data.unknownFields] when Wire couldn't represent it as a
- * [org.meshtastic.proto.PortNum] constant (see class doc above). Use this instead of `portnum.value` anywhere a
- * packet might be on a private app port -- logging/persistence in particular, since `portnum.value` alone would
- * silently collapse a private-port packet to 0 (UNKNOWN_APP).
+ * [org.meshtastic.proto.PortNum] constant (see class doc above). Use this instead of `portnum.value` anywhere a packet
+ * might be on a private app port -- logging/persistence in particular, since `portnum.value` alone would silently
+ * collapse a private-port packet to 0 (UNKNOWN_APP).
  */
 fun Data.effectivePortNum(): Int =
     portnum.value.takeIf { it != 0 } ?: unknownFields.readTopLevelVarintField(DATA_PORTNUM_TAG)?.toInt() ?: 0
 
 /**
- * Builds the raw bytes for a private [Data.portnum] value, to pass as `Data(unknownFields = ..., ...)` when
- * sending on a port with no [org.meshtastic.proto.PortNum] constant (leave the `portnum` parameter itself at its
- * default). See the class doc above for why this works.
+ * Builds the raw bytes for a private [Data.portnum] value, to pass as `Data(unknownFields = ..., ...)` when sending on
+ * a port with no [org.meshtastic.proto.PortNum] constant (leave the `portnum` parameter itself at its default). See the
+ * class doc above for why this works.
  */
 fun privatePortNumUnknownFields(port: Int): ByteString = writeTopLevelVarintField(DATA_PORTNUM_TAG, port.toLong())
 
@@ -91,12 +92,18 @@ private fun ByteString.readTopLevelVarintField(tag: Int): Long? {
                 if (fieldTag == tag) return value
                 i = afterValue
             }
-            1 -> i = afterKey + 8 // fixed64
+
+            1 -> i = afterKey + 8
+
+            // fixed64
             2 -> { // length-delimited
                 val (len, afterLen) = readVarint(bytes, afterKey) ?: return null
                 i = afterLen + len.toInt()
             }
-            5 -> i = afterKey + 4 // fixed32
+
+            5 -> i = afterKey + 4
+
+            // fixed32
             else -> return null
         }
     }

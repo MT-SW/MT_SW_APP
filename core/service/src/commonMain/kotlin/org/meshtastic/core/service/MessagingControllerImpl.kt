@@ -165,7 +165,13 @@ internal class MessagingControllerImpl(
                     wb.short_name = shortName
                 }
                 .build()
-        val contact = SharedContact.Builder().also { wb -> wb.node_num = nodeNum; wb.user = user }.build()
+        val contact =
+            SharedContact.Builder()
+                .also { wb ->
+                    wb.node_num = nodeNum
+                    wb.user = user
+                }
+                .build()
         return if (target == myNum) {
             commandSender.sendAdmin(myNum) { AdminMessage.Builder().also { wb -> wb.add_contact = contact }.build() }
             nodeManager.handleReceivedUser(nodeNum, user, manuallyVerified = false)

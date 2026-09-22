@@ -74,11 +74,11 @@ private val CONNECTION_TIMEOUT = 15.seconds
 private const val MTU_SIZE = 512
 
 /**
- * Attempts for the initial MTU negotiation, including the first try. On some OEM stacks (observed on a
- * Xiaomi/MIUI device) Android briefly re-verifies the encrypted link for an already-bonded device right around
- * this point in the connect sequence — a short (~15-30 ms observed), OS-driven bond-state blip this app doesn't
- * trigger. A request that lands mid-blip fails outright with no automatic retry; a second attempt after
- * [MTU_RETRY_DELAY_MS] lands safely after it.
+ * Attempts for the initial MTU negotiation, including the first try. On some OEM stacks (observed on a Xiaomi/MIUI
+ * device) Android briefly re-verifies the encrypted link for an already-bonded device right around this point in the
+ * connect sequence — a short (~15-30 ms observed), OS-driven bond-state blip this app doesn't trigger. A request that
+ * lands mid-blip fails outright with no automatic retry; a second attempt after [MTU_RETRY_DELAY_MS] lands safely after
+ * it.
  */
 private const val MTU_NEGOTIATION_ATTEMPTS = 2
 private const val MTU_RETRY_DELAY_MS = 300L
@@ -295,7 +295,7 @@ class BleRadioTransport(
                                 if (e.suggestsStaleGattHandle() && bluetoothRepository.isBonded(address)) {
                                     Logger.i {
                                         "[$address] GATT 133 against a bonded device — flagging an immediate " +
-                                                "cache refresh for the next attempt"
+                                            "cache refresh for the next attempt"
                                     }
                                     gattErrorSignatureFlagged.value = true
                                 }
@@ -304,7 +304,8 @@ class BleRadioTransport(
                         // Mirror this outcome into the cross-transport-instance failure tracker so a manual
                         // Stop Connecting -> reconnect cycle doesn't erase progress towards the
                         // stale-cache-refresh threshold.
-                        if (outcome is BleReconnectPolicy.Outcome.Disconnected &&
+                        if (
+                            outcome is BleReconnectPolicy.Outcome.Disconnected &&
                             (outcome.wasStable || outcome.wasIntentional)
                         ) {
                             PersistentReconnectFailures.recordSuccess(address)
@@ -361,7 +362,7 @@ class BleRadioTransport(
         if (isBonded && consecutiveFailures >= scanOnlyProbeGate.failureThreshold && !shouldProbe) {
             Logger.d {
                 "[${address.anonymize()}] $consecutiveFailures consecutive failures; " +
-                        "trying periodic bonded fallback"
+                    "trying periodic bonded fallback"
             }
         }
 
@@ -534,7 +535,7 @@ class BleRadioTransport(
         if (!wasStable && !wasIntentional) {
             Logger.w {
                 "[$address] Connection lasted only $connectionUptime " +
-                        "(< ${reconnectPolicy.minStableConnection}) — treating as unstable"
+                    "(< ${reconnectPolicy.minStableConnection}) — treating as unstable"
             }
         }
 
@@ -609,7 +610,7 @@ class BleRadioTransport(
                 val rssi = retryBleOperation(tag = address) { device.readRssi() }
                 Logger.d {
                     "[${address.anonymize()}] Connection confirmed. " +
-                            "Initial RSSI: ${rssi?.let { "$it dBm" } ?: "unknown"}"
+                        "Initial RSSI: ${rssi?.let { "$it dBm" } ?: "unknown"}"
                 }
             }
         } catch (e: CancellationException) {
@@ -864,7 +865,7 @@ class BleRadioTransport(
             if (activeSession.value === session) {
                 Logger.w(e) {
                     "[$address] Failed to write packet to toRadioCharacteristic after " +
-                            "${packetsSent.value} successful writes"
+                        "${packetsSent.value} successful writes"
                 }
                 handleFailure(e, session)
             } else {
@@ -999,8 +1000,8 @@ class BleRadioTransport(
     private fun formatSessionStats(): String {
         val uptime = if (connectionStartTime > 0) nowMillis - connectionStartTime else 0
         return "Uptime: ${uptime}ms, " +
-                "Packets RX: ${packetsReceived.value} (${bytesReceived.value} bytes), " +
-                "Packets TX: ${packetsSent.value} (${bytesSent.value} bytes)"
+            "Packets RX: ${packetsReceived.value} (${bytesReceived.value} bytes), " +
+            "Packets TX: ${packetsSent.value} (${bytesSent.value} bytes)"
     }
 
     private fun Throwable.toDisconnectReason(): Pair<Boolean, String> {
@@ -1014,7 +1015,7 @@ class BleRadioTransport(
 
                 is NoSuchElementException,
                 is IllegalArgumentException,
-                    -> "Required characteristic missing"
+                -> "Required characteristic missing"
 
                 else -> this.message ?: this::class.simpleName ?: "Unknown"
             }

@@ -30,12 +30,12 @@ import org.meshtastic.proto.OnDemandType
  * Use case for the Sniffer module's enable/disable/state protocol.
  *
  * Sniffer used to be a [org.meshtastic.proto.ModuleConfig] section (`nodemodadmin`) synced and saved like any other
- * module config. The protocol this now follows (matching the "original" protobufs, replacing our team's abandoned
- * fork) instead uses three OnDemand requests on port 354 (see PrivatePortNum.kt) --
- * [OnDemandType.REQUEST_SNIFFER_ENABLE] / [OnDemandType.REQUEST_SNIFFER_DISABLE] / [OnDemandType.REQUEST_SNIFFER_STATE]
- * -- answered by [OnDemandType.RESPONSE_SNIFFER_STATE]. Firmware keeps this state in RAM only (it is never written to
- * ModuleConfig), so the app does not persist it either: [snifferEnabledFlow] always reflects the most recently logged
- * response for that node, the same way OnDemand diagnostics already work (see OnDemandLogViewModel).
+ * module config. The protocol this now follows (matching the "original" protobufs, replacing our team's abandoned fork)
+ * instead uses three OnDemand requests on port 354 (see PrivatePortNum.kt) -- [OnDemandType.REQUEST_SNIFFER_ENABLE] /
+ * [OnDemandType.REQUEST_SNIFFER_DISABLE] / [OnDemandType.REQUEST_SNIFFER_STATE] -- answered by
+ * [OnDemandType.RESPONSE_SNIFFER_STATE]. Firmware keeps this state in RAM only (it is never written to ModuleConfig),
+ * so the app does not persist it either: [snifferEnabledFlow] always reflects the most recently logged response for
+ * that node, the same way OnDemand diagnostics already work (see OnDemandLogViewModel).
  */
 @Single
 open class SnifferControlUseCase(
@@ -79,18 +79,18 @@ open class SnifferControlUseCase(
         ?.first
 
     /**
-     * Sends REQUEST_FW_PLUS_VERSION to [destNum]; the answer arrives asynchronously via [fwPlusVersionFlow].
-     * This is a custom "firmware edition" version number (see `FwPlusVersion` in ondemand.proto) maintained by
-     * this fork's own firmware, distinct from official Meshtastic semver -- other firmware never answers it.
+     * Sends REQUEST_FW_PLUS_VERSION to [destNum]; the answer arrives asynchronously via [fwPlusVersionFlow]. This is a
+     * custom "firmware edition" version number (see `FwPlusVersion` in ondemand.proto) maintained by this fork's own
+     * firmware, distinct from official Meshtastic semver -- other firmware never answers it.
      */
     open suspend fun requestFwPlusVersion(destNum: Int) {
         radioController.requestOnDemand(destNum, OnDemandType.REQUEST_FW_PLUS_VERSION)
     }
 
     /**
-     * The most recently logged RESPONSE_FW_PLUS_VERSION's `version_number` for [destNum], or `null` when none has
-     * been received yet -- either it hasn't been queried this session, or the connected firmware doesn't
-     * implement fw+ versioning at all (official Meshtastic firmware, or an fw+ build predating this query).
+     * The most recently logged RESPONSE_FW_PLUS_VERSION's `version_number` for [destNum], or `null` when none has been
+     * received yet -- either it hasn't been queried this session, or the connected firmware doesn't implement fw+
+     * versioning at all (official Meshtastic firmware, or an fw+ build predating this query).
      */
     open fun fwPlusVersionFlow(destNum: Int): Flow<Int?> =
         meshLogRepository.getLogsFrom(destNum, ON_DEMAND_PORT_NUM).map(::decodeLatestFwPlusVersion)
@@ -113,9 +113,9 @@ open class SnifferControlUseCase(
 
     companion object {
         /**
-         * Minimum fw+ `version_number` (see [requestFwPlusVersion]/[fwPlusVersionFlow]) at which Sniffer is
-         * considered supported -- agreed with firmware at 2 (not the originally-discussed 3), to preserve
-         * release-numbering continuity.
+         * Minimum fw+ `version_number` (see [requestFwPlusVersion]/[fwPlusVersionFlow]) at which Sniffer is considered
+         * supported -- agreed with firmware at 2 (not the originally-discussed 3), to preserve release-numbering
+         * continuity.
          */
         const val MIN_FW_PLUS_VERSION_FOR_SNIFFER = 2
     }

@@ -110,8 +110,8 @@ import org.meshtastic.core.ui.component.TitledCard
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PhoneAndroid
-import org.meshtastic.core.ui.icon.role
 import org.meshtastic.core.ui.icon.label
+import org.meshtastic.core.ui.icon.role
 import org.meshtastic.core.ui.util.annotatedStringFromHtml
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 import org.meshtastic.feature.settings.util.IntervalConfiguration
@@ -201,8 +201,7 @@ fun DeviceConfigScreenCommon(viewModel: RadioConfigViewModel, onBack: () -> Unit
                     summary = stringResource(currentRole.description),
                     itemIcon = { MeshtasticIcons.role(it) },
                     itemLabel = { stringResource(it.label) },
-                    excludedItems =
-                        setOf(Config.DeviceConfig.Role.REPEATER, Config.DeviceConfig.Role.ROUTER_CLIENT),
+                    excludedItems = setOf(Config.DeviceConfig.Role.REPEATER, Config.DeviceConfig.Role.ROUTER_CLIENT),
                 )
 
                 HorizontalDivider()

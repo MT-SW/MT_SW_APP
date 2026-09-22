@@ -52,7 +52,6 @@ import org.meshtastic.proto.ModuleConfig.StatusMessageConfig
 import org.meshtastic.proto.ModuleConfig.StoreForwardConfig
 import org.meshtastic.proto.ModuleConfig.TAKConfig
 import org.meshtastic.proto.ModuleConfig.TelemetryConfig
-import org.meshtastic.proto.ModuleConfig.TrafficManagementConfig
 import org.meshtastic.proto.User
 import kotlin.test.BeforeTest
 import kotlin.test.Test

@@ -16,8 +16,6 @@
  */
 package org.meshtastic.core.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -172,20 +170,16 @@ object StatusColors {
         get() = background.luminance() < 0.5f
 
     val ColorScheme.StatusConnecting: Color
-        @Composable
-        get() = Color(0xFFFFFFFF) // White — connecting/reconnecting
+        @Composable get() = Color(0xFFFFFFFF) // White — connecting/reconnecting
 
     val ColorScheme.StatusDisconnected: Color
-        @Composable
-        get() = Color(0xFFF4212E) // Vivid red — disconnected
+        @Composable get() = Color(0xFFF4212E) // Vivid red — disconnected
 
     val ColorScheme.StatusTransmit: Color
-        @Composable
-        get() = Color(0xFF00C853) // Vivid green — sending
+        @Composable get() = Color(0xFF00C853) // Vivid green — sending
 
     val ColorScheme.StatusReceive: Color
-        @Composable
-        get() = Color(0xFF2979FF) // Vivid blue — receiving
+        @Composable get() = Color(0xFF2979FF) // Vivid blue — receiving
 
     val ColorScheme.StatusGreen: Color
         @Composable

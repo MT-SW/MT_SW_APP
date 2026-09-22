@@ -49,7 +49,9 @@ class NodeCleanupWorker(
             if (nodesToDelete.isEmpty()) {
                 logger.i { "No inactive nodes to clean" }
             } else {
-                logger.d { "Cleaning ${nodesToDelete.size} node(s) inactive for over ${policy.inactivityDays} days" }
+                logger.d {
+                    "Cleaning ${nodesToDelete.size} node(s) inactive for over ${policy.inactivityDays} days"
+                }
                 cleanNodeDatabaseUseCase.cleanNodes(nodesToDelete.map { it.num })
                 logger.i { "Successfully auto-cleaned inactive nodes" }
             }

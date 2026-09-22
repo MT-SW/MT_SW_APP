@@ -169,20 +169,20 @@ fun NeighborInfoLogScreen(modifier: Modifier = Modifier, viewModel: MetricsViewM
                         text = text,
                         contentDescription = stringResource(Res.string.neighbor_info),
                         modifier =
-                            Modifier.combinedClickable(onLongClick = { expanded = true }) {
-                                item.packet?.getNeighborInfoResponse(::getUsername, header = header)?.let {
-                                    val message =
-                                        annotateNeighborInfo(
-                                            it,
-                                            statusGreen = statusGreen,
-                                            statusYellow = statusYellow,
-                                            statusOrange = statusOrange,
-                                            statusRed = statusRed,
-                                            modemPreset = modemPreset,
-                                        )
-                                    viewModel.showLogDetail(Res.string.neighbor_info, message)
-                                }
-                            },
+                        Modifier.combinedClickable(onLongClick = { expanded = true }) {
+                            item.packet?.getNeighborInfoResponse(::getUsername, header = header)?.let {
+                                val message =
+                                    annotateNeighborInfo(
+                                        it,
+                                        statusGreen = statusGreen,
+                                        statusYellow = statusYellow,
+                                        statusOrange = statusOrange,
+                                        statusRed = statusRed,
+                                        modemPreset = modemPreset,
+                                    )
+                                viewModel.showLogDetail(Res.string.neighbor_info, message)
+                            }
+                        },
                     )
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                         DeleteItem {

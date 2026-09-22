@@ -184,15 +184,15 @@ private fun NodeFilterTextField(filterText: String, onTextChange: (String) -> Un
                     MeshtasticIcons.Close,
                     contentDescription = stringResource(Res.string.desc_node_filter_clear),
                     modifier =
-                        Modifier.clickable(
-                            onClickLabel = clearLabel,
-                            role = Role.Button,
-                            onClick = {
-                                localText = ""
-                                onTextChange("")
-                                focusManager.clearFocus()
-                            },
-                        ),
+                    Modifier.clickable(
+                        onClickLabel = clearLabel,
+                        role = Role.Button,
+                        onClick = {
+                            localText = ""
+                            onTextChange("")
+                            focusManager.clearFocus()
+                        },
+                    ),
                 )
             }
         },

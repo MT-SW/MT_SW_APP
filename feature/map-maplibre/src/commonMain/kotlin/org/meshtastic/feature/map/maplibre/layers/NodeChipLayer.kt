@@ -240,17 +240,17 @@ private fun MapChipKey.rasterize(
 
     return ChipImage(
         painter =
-            ChipPainter(
-                chip = this,
-                layout = layout,
-                cornerRadiusPx = cornerRadiusPx,
-                borderPx = borderPx,
-                glyphPainter = glyph?.let(glyphs::get),
-                glyphSizePx = with(density) { GLYPH_DP.dp.toPx() },
-                tailHeightPx = with(density) { TAIL_HEIGHT_DP.dp.toPx() },
-                tailWidthPx = with(density) { TAIL_WIDTH_DP.dp.toPx() },
-                gapPx = with(density) { GAP_DP.dp.toPx() },
-            ),
+        ChipPainter(
+            chip = this,
+            layout = layout,
+            cornerRadiusPx = cornerRadiusPx,
+            borderPx = borderPx,
+            glyphPainter = glyph?.let(glyphs::get),
+            glyphSizePx = with(density) { GLYPH_DP.dp.toPx() },
+            tailHeightPx = with(density) { TAIL_HEIGHT_DP.dp.toPx() },
+            tailWidthPx = with(density) { TAIL_WIDTH_DP.dp.toPx() },
+            gapPx = with(density) { GAP_DP.dp.toPx() },
+        ),
         // Taller than the chip itself: the extra strip at the bottom is the tail plus a blank gap, drawn (or
         // left blank) by ChipPainter.
         size = DpSize(width, HEIGHT_DP.dp + TAIL_HEIGHT_DP.dp + GAP_DP.dp),
@@ -299,12 +299,13 @@ private class ChipPainter(
             val centerX = size.width / 2f
             val halfTail = tailWidthPx / 2f
             val tailTipY = bodyHeightPx + tailHeightPx
-            val tailPath = Path().apply {
-                moveTo(centerX - halfTail, bodyHeightPx)
-                lineTo(centerX + halfTail, bodyHeightPx)
-                lineTo(centerX, tailTipY)
-                close()
-            }
+            val tailPath =
+                Path().apply {
+                    moveTo(centerX - halfTail, bodyHeightPx)
+                    lineTo(centerX + halfTail, bodyHeightPx)
+                    lineTo(centerX, tailTipY)
+                    close()
+                }
             // A sharp fill of the triangle, then the same outline stroked with round joins on top — the
             // rounded stroke smooths every corner (the tip and both where it meets the chip body) into one
             // continuous curve instead of a sharp point or a separate circle stuck on top of one.
@@ -323,10 +324,8 @@ private class ChipPainter(
         } else if (layout != null) {
             drawText(
                 textLayoutResult = layout,
-                topLeft = Offset(
-                    x = (size.width - layout.size.width) / 2f,
-                    y = (bodyHeightPx - layout.size.height) / 2f,
-                ),
+                topLeft =
+                Offset(x = (size.width - layout.size.width) / 2f, y = (bodyHeightPx - layout.size.height) / 2f),
             )
         }
     }

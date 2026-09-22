@@ -2,7 +2,6 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>LongMethod:ZipArchiver.kt:ZipArchiver$actual fun createZip: ByteArray</ID>
     <ID>ReturnCount:TAKServerJvm.kt:TAKServerJvm$override suspend fun start: Result&lt;Unit></ID>
   </CurrentIssues>
 </SmellBaseline>

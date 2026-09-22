@@ -30,7 +30,10 @@ import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerRangeProvi
 import com.patrykandpatrick.vico.compose.cartesian.data.lineModel
 import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
 import org.meshtastic.core.common.util.formatString
+import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.cpu_usage
+import org.meshtastic.core.resources.cpu_usage_description
 import org.meshtastic.core.resources.free_memory
 import org.meshtastic.core.resources.free_memory_description
 import org.meshtastic.core.resources.load_15_min
@@ -39,9 +42,6 @@ import org.meshtastic.core.resources.load_1_min
 import org.meshtastic.core.resources.load_1_min_description
 import org.meshtastic.core.resources.load_5_min
 import org.meshtastic.core.resources.load_5_min_description
-import org.meshtastic.core.model.util.decodeLocalStatsExtended
-import org.meshtastic.core.resources.cpu_usage
-import org.meshtastic.core.resources.cpu_usage_description
 import org.meshtastic.core.resources.local_stats_flash
 import org.meshtastic.core.resources.local_stats_flash_description
 import org.meshtastic.core.resources.local_stats_heap
@@ -160,55 +160,54 @@ internal fun buildHostMetricsChartData(data: List<Telemetry>): HostMetricsChartD
             ?.let { HostMetricsChartPoint(time = telemetry.time, value = it / 100.0) }
     },
     freeMemoryMb =
-        data.mapNotNull { telemetry ->
-            telemetry.host_metrics
-                ?.freemem_bytes
-                ?.takeIf { it > 0 }
-                ?.let { HostMetricsChartPoint(time = telemetry.time, value = it.toDouble() / BYTES_IN_MB) }
-        },
+    data.mapNotNull { telemetry ->
+        telemetry.host_metrics
+            ?.freemem_bytes
+            ?.takeIf { it > 0 }
+            ?.let { HostMetricsChartPoint(time = telemetry.time, value = it.toDouble() / BYTES_IN_MB) }
+    },
     cpuPercent =
-        data.mapNotNull { telemetry ->
-            telemetry
-                .decodeLocalStatsExtended()
-                ?.cpuUsagePercent
-                ?.let { HostMetricsChartPoint(time = telemetry.time, value = it.toDouble()) }
-        },
+    data.mapNotNull { telemetry ->
+        telemetry.decodeLocalStatsExtended()?.cpuUsagePercent?.let {
+            HostMetricsChartPoint(time = telemetry.time, value = it.toDouble())
+        }
+    },
     heapFreePercent =
-        data.mapNotNull { telemetry ->
-            val total = telemetry.local_stats?.heap_total_bytes ?: 0
-            val free = telemetry.local_stats?.heap_free_bytes ?: 0
-            if (total > 0) {
-                HostMetricsChartPoint(time = telemetry.time, value = free.toDouble() / total * PERCENT_MULTIPLIER)
+    data.mapNotNull { telemetry ->
+        val total = telemetry.local_stats?.heap_total_bytes ?: 0
+        val free = telemetry.local_stats?.heap_free_bytes ?: 0
+        if (total > 0) {
+            HostMetricsChartPoint(time = telemetry.time, value = free.toDouble() / total * PERCENT_MULTIPLIER)
+        } else {
+            null
+        }
+    },
+    flashUsedPercent =
+    data.mapNotNull { telemetry ->
+        telemetry.decodeLocalStatsExtended()?.let { ext ->
+            if (ext.flashTotalBytes > 0) {
+                HostMetricsChartPoint(
+                    time = telemetry.time,
+                    value = ext.flashUsedBytes.toDouble() / ext.flashTotalBytes * PERCENT_MULTIPLIER,
+                )
             } else {
                 null
             }
-        },
-    flashUsedPercent =
-        data.mapNotNull { telemetry ->
-            telemetry.decodeLocalStatsExtended()?.let { ext ->
-                if (ext.flashTotalBytes > 0) {
-                    HostMetricsChartPoint(
-                        time = telemetry.time,
-                        value = ext.flashUsedBytes.toDouble() / ext.flashTotalBytes * PERCENT_MULTIPLIER,
-                    )
-                } else {
-                    null
-                }
-            }
-        },
+        }
+    },
     psramFreePercent =
-        data.mapNotNull { telemetry ->
-            telemetry.decodeLocalStatsExtended()?.let { ext ->
-                if (ext.memoryPsramTotal > 0) {
-                    HostMetricsChartPoint(
-                        time = telemetry.time,
-                        value = ext.memoryPsramFree.toDouble() / ext.memoryPsramTotal * PERCENT_MULTIPLIER,
-                    )
-                } else {
-                    null
-                }
+    data.mapNotNull { telemetry ->
+        telemetry.decodeLocalStatsExtended()?.let { ext ->
+            if (ext.memoryPsramTotal > 0) {
+                HostMetricsChartPoint(
+                    time = telemetry.time,
+                    value = ext.memoryPsramFree.toDouble() / ext.memoryPsramTotal * PERCENT_MULTIPLIER,
+                )
+            } else {
+                null
             }
-        },
+        }
+    },
 )
 
 private const val PERCENT_MULTIPLIER = 100.0
@@ -241,7 +240,8 @@ internal fun HostMetricsChart(
         val heapData = chartData.heapFreePercent
         val flashData = chartData.flashUsedPercent
         val psramData = chartData.psramFreePercent
-        val hasResources = cpuData.isNotEmpty() || heapData.isNotEmpty() || flashData.isNotEmpty() || psramData.isNotEmpty()
+        val hasResources =
+            cpuData.isNotEmpty() || heapData.isNotEmpty() || flashData.isNotEmpty() || psramData.isNotEmpty()
 
         LaunchedEffect(chartData) {
             modelProducer.runTransaction {
@@ -292,18 +292,18 @@ internal fun HostMetricsChart(
         val marker =
             ChartStyling.rememberMarker(
                 valueFormatter =
-                    ChartStyling.createColoredMarkerValueFormatter { value, color ->
-                        when (color) {
-                            load1Color -> formatString("L1: %.2f", value)
-                            load5Color -> formatString("L5: %.2f", value)
-                            load15Color -> formatString("L15: %.2f", value)
-                            cpuColor -> formatString("CPU: %.0f%%", value)
-                            heapColor -> formatString("Heap: %.0f%%", value)
-                            flashColor -> formatString("Flash: %.0f%%", value)
-                            psramColor -> formatString("PSRAM: %.0f%%", value)
-                            else -> formatString("Mem: %.0f MB", value)
-                        }
-                    },
+                ChartStyling.createColoredMarkerValueFormatter { value, color ->
+                    when (color) {
+                        load1Color -> formatString("L1: %.2f", value)
+                        load5Color -> formatString("L5: %.2f", value)
+                        load15Color -> formatString("L15: %.2f", value)
+                        cpuColor -> formatString("CPU: %.0f%%", value)
+                        heapColor -> formatString("Heap: %.0f%%", value)
+                        flashColor -> formatString("Flash: %.0f%%", value)
+                        psramColor -> formatString("PSRAM: %.0f%%", value)
+                        else -> formatString("Mem: %.0f MB", value)
+                    }
+                },
             )
 
         val hasLoad = chartData.hasLoad
@@ -351,8 +351,8 @@ internal fun HostMetricsChart(
                 modifier = chartModifier,
                 layers = layers,
                 startAxis =
-                    if (hasLoad || hasResources) {
-                        VerticalAxis.rememberStart(
+                if (hasLoad || hasResources) {
+                    VerticalAxis.rememberStart(
                         label = ChartStyling.rememberAxisLabel(color = load1Color),
                         valueFormatter = { _, value, _ -> formatString("%.1f", value) },
                     )

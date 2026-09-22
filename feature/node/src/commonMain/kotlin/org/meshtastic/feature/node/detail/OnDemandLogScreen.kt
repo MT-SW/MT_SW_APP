@@ -29,7 +29,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import org.meshtastic.core.common.util.DateFormatter
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,10 +37,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import org.meshtastic.core.common.util.formatString
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.common.util.DateFormatter
+import org.meshtastic.core.common.util.formatString
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.util.formatUptime
 import org.meshtastic.core.resources.Res
@@ -58,11 +58,10 @@ import org.meshtastic.core.resources.on_demand_firmware_version
 import org.meshtastic.core.resources.on_demand_flash
 import org.meshtastic.core.resources.on_demand_flood_counter
 import org.meshtastic.core.resources.on_demand_fw_plus_version
-import org.meshtastic.core.resources.on_demand_hops
-import org.meshtastic.core.resources.on_demand_round_trip
 import org.meshtastic.core.resources.on_demand_fw_plus_version_desc
 import org.meshtastic.core.resources.on_demand_heap_free
 import org.meshtastic.core.resources.on_demand_heap_total
+import org.meshtastic.core.resources.on_demand_hops
 import org.meshtastic.core.resources.on_demand_log_title
 import org.meshtastic.core.resources.on_demand_nexthop_counter
 import org.meshtastic.core.resources.on_demand_node_stats
@@ -80,9 +79,10 @@ import org.meshtastic.core.resources.on_demand_port_counters_desc
 import org.meshtastic.core.resources.on_demand_psram
 import org.meshtastic.core.resources.on_demand_reboots
 import org.meshtastic.core.resources.on_demand_received_at
-import org.meshtastic.core.resources.on_demand_rssi
+import org.meshtastic.core.resources.on_demand_round_trip
 import org.meshtastic.core.resources.on_demand_routing_errors
 import org.meshtastic.core.resources.on_demand_routing_errors_desc
+import org.meshtastic.core.resources.on_demand_rssi
 import org.meshtastic.core.resources.on_demand_rx_avg_time
 import org.meshtastic.core.resources.on_demand_rx_avg_time_desc
 import org.meshtastic.core.resources.on_demand_rx_packet_history
@@ -144,8 +144,8 @@ import org.meshtastic.core.resources.port_name_zps
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.icon.AirUtilization
-import org.meshtastic.core.ui.icon.Chart
 import org.meshtastic.core.ui.icon.ChannelUtilization
+import org.meshtastic.core.ui.icon.Chart
 import org.meshtastic.core.ui.icon.DataArray
 import org.meshtastic.core.ui.icon.ErrorOutline
 import org.meshtastic.core.ui.icon.History
@@ -188,12 +188,12 @@ fun OnDemandLogScreen(viewModel: OnDemandLogViewModel, onNavigateUp: () -> Unit)
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding =
-                PaddingValues(
-                    top = paddingValues.calculateTopPadding() + 16.dp,
-                    start = 16.dp,
-                    end = 16.dp,
-                    bottom = 16.dp,
-                ),
+            PaddingValues(
+                top = paddingValues.calculateTopPadding() + 16.dp,
+                start = 16.dp,
+                end = 16.dp,
+                bottom = 16.dp,
+            ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item(key = "node-stats") {
@@ -264,14 +264,16 @@ fun OnDemandLogScreen(viewModel: OnDemandLogViewModel, onNavigateUp: () -> Unit)
                     onRequest = viewModel::requestRoutingErrors,
                     receivedAtMillis = uiState.receivedAt[OnDemandType.RESPONSE_ROUTING_ERRORS],
                 ) {
-                    uiState.routingErrors.filter { it.counter > 0 }.forEach { entry ->
-                        ListItem(
-                            text = "#${entry.num}",
-                            leadingIcon = MeshtasticIcons.ErrorOutline,
-                            supportingText = "${entry.counter}",
-                            trailingIcon = null,
-                        )
-                    }
+                    uiState.routingErrors
+                        .filter { it.counter > 0 }
+                        .forEach { entry ->
+                            ListItem(
+                                text = "#${entry.num}",
+                                leadingIcon = MeshtasticIcons.ErrorOutline,
+                                supportingText = "${entry.counter}",
+                                trailingIcon = null,
+                            )
+                        }
                 }
             }
 
@@ -307,7 +309,8 @@ fun OnDemandLogScreen(viewModel: OnDemandLogViewModel, onNavigateUp: () -> Unit)
                         ListItem(
                             text = "#$i",
                             leadingIcon = MeshtasticIcons.AirUtilization,
-                            supportingText = "TX ${entry.tx_time}ms • RX ${entry.rx_time}ms • RX! ${entry.rxBad_time}ms",
+                            supportingText =
+                            "TX ${entry.tx_time}ms • RX ${entry.rx_time}ms • RX! ${entry.rxBad_time}ms",
                             trailingIcon = null,
                         )
                     }
@@ -452,26 +455,40 @@ private fun StatRows(rows: List<Pair<StringResource, String>>) {
 @Composable
 private fun iconForLabel(label: StringResource): ImageVector = when (label) {
     Res.string.on_demand_battery_level -> MeshtasticIcons.Voltage
+
     Res.string.on_demand_uptime -> MeshtasticIcons.History
+
     Res.string.on_demand_channel_utilization -> MeshtasticIcons.ChannelUtilization
+
     Res.string.on_demand_air_util_tx -> MeshtasticIcons.AirUtilization
+
     Res.string.on_demand_packets_tx,
     Res.string.on_demand_packets_rx,
     Res.string.on_demand_packets_rx_bad,
-        -> MeshtasticIcons.DataArray
+    -> MeshtasticIcons.DataArray
+
     Res.string.on_demand_stat_nodes_online,
     Res.string.on_demand_stat_nodes_total,
-        -> MeshtasticIcons.Nodes
+    -> MeshtasticIcons.Nodes
+
     Res.string.on_demand_reboots -> MeshtasticIcons.Reconnecting
+
     Res.string.on_demand_flood_counter,
     Res.string.on_demand_nexthop_counter,
-        -> MeshtasticIcons.Chart
+    -> MeshtasticIcons.Chart
+
     Res.string.on_demand_blocked_hoplimit -> MeshtasticIcons.HopCount
+
     Res.string.on_demand_firmware_version -> MeshtasticIcons.MeshRadio
+
     Res.string.on_demand_rssi -> MeshtasticIcons.Rssi
+
     Res.string.on_demand_snr -> MeshtasticIcons.Snr
+
     Res.string.on_demand_hops -> MeshtasticIcons.HopCount
+
     Res.string.on_demand_round_trip -> MeshtasticIcons.History
+
     else -> MeshtasticIcons.Memory
 }
 
@@ -514,12 +531,9 @@ private fun portInfo(port: Int): ResolvedPortInfo {
     val known = KNOWN_PORTS[port]
     if (known != null) return ResolvedPortInfo(stringResource(known.labelRes), stringResource(known.descRes))
     val fallbackLabel =
-        PortNum.fromValue(port)
-            ?.name
-            ?.removeSuffix("_APP")
-            ?.split("_")
-            ?.joinToString(" ") { it.lowercase().replaceFirstChar(Char::titlecase) }
-            ?: stringResource(Res.string.port_name_unknown)
+        PortNum.fromValue(port)?.name?.removeSuffix("_APP")?.split("_")?.joinToString(" ") {
+            it.lowercase().replaceFirstChar(Char::titlecase)
+        } ?: stringResource(Res.string.port_name_unknown)
     return ResolvedPortInfo(fallbackLabel, stringResource(Res.string.port_desc_unknown))
 }
 

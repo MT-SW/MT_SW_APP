@@ -358,14 +358,14 @@ class CommandSenderImpl(
                 to = destNum,
                 channel = getChannelIndex(destNum),
                 decoded =
-                    Data.Builder()
-                        .also { wb ->
-                            wb.payload = onDemand.encode().toByteString()
-                            wb.want_response = true
-                            // No PortNum constant exists for 354 (OnDemand/Sniffer) -- see PrivatePortNum.kt.
-                            wb.addUnknownFields(privatePortNumUnknownFields(ON_DEMAND_PORT_NUM))
-                        }
-                        .build(),
+                Data.Builder()
+                    .also { wb ->
+                        wb.payload = onDemand.encode().toByteString()
+                        wb.want_response = true
+                        // No PortNum constant exists for 354 (OnDemand/Sniffer) -- see PrivatePortNum.kt.
+                        wb.addUnknownFields(privatePortNumUnknownFields(ON_DEMAND_PORT_NUM))
+                    }
+                    .build(),
             ),
             "OnDemand request",
         )

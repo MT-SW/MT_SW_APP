@@ -37,10 +37,10 @@ class QuickChatActionRepositoryImpl(
 
     private val seedMutex = Mutex()
 
-    override fun getAllActions(): Flow<List<QuickChatAction>> =
-        dbManager.observeCurrentDb { it.quickChatActionDao().getAll() }
-            .onStart { seedDefaultsIfNeeded() }
-            .flowOn(dispatchers.io)
+    override fun getAllActions(): Flow<List<QuickChatAction>> = dbManager
+        .observeCurrentDb { it.quickChatActionDao().getAll() }
+        .onStart { seedDefaultsIfNeeded() }
+        .flowOn(dispatchers.io)
 
     /**
      * Populates the built-in default Quick Chat templates whenever the currently active device database has none —

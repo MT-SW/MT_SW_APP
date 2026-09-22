@@ -83,6 +83,34 @@ private fun supportsKotlinNative(): Boolean {
     }
 }
 
+/**
+ * Opt-out from Apple/iOS native target registration, read from `meshtastic.skipIosNativeTargets=true` in
+ * (normally) the root `gradle.properties` -- Gradle properties are inherited by every subproject, so setting
+ * it once at the root disables iOS target registration for every module that applies this convention plugin.
+ * A module could instead set it in its own `gradle.properties` to opt out on its own, since Gradle loads a
+ * subproject's `gradle.properties` before its build script's `plugins {}` block applies this convention plugin
+ * (a project.extra flag set later in the same build.gradle.kts would not be visible in time here).
+ *
+ * Currently set project-wide because core:model -- api()/implementation()-depended-on from commonMain by
+ * essentially every KMP module in this repo -- itself needs io.github.pdvrieze.xmlutil (via the external
+ * takpacket-sdk artifact it api()-exports); core:takserver depends on xmlutil directly for CoT XML parsing.
+ * As of the version pinned in gradle/libs.versions.toml (1.0.2.1), xmlutil publishes no Apple-native variant
+ * at all (only jvm/js/wasmJs/wasmWasi/linuxX64/metadata -- confirmed from Gradle's own "no matching variant"
+ * error output, and from Maven Central never publishing a core-iosarm64 or core-iossimulatorarm64 xmlutil artifact
+ * past 0.91.1). Since core:model sits near the root of the dependency graph, that missing variant fails
+ * iOS-target dependency resolution for nearly every module that transitively depends on it, not just
+ * core:model/core:takserver themselves -- hence the project-wide (not per-module) opt-out.
+ *
+ * iOS targets here are compile-only validation (see the comment below); that validation is simply impossible
+ * while this incompatibility exists, so we skip registering the targets instead of leaving the build
+ * permanently red. This only bites on hosts where supportsKotlinNative() is true (Windows/macOS/Linux
+ * x86_64) -- CI's linux-aarch64 runners never register iOS targets at all, which is why this was never
+ * caught there. Revisit (drop the opt-out) once xmlutil resumes publishing Apple-native klibs, or
+ * takpacket-sdk drops its xmlutil dependency for the iOS target.
+ */
+private fun Project.skipsIosNativeTargets(): Boolean =
+    providers.gradleProperty("meshtastic.skipIosNativeTargets").getOrElse("false").toBoolean()
+
 /** Configure Kotlin Multiplatform options */
 internal fun Project.configureKotlinMultiplatform() {
     // Note: we used to force `org.jetbrains.skiko` to a hard-coded version here to
@@ -101,7 +129,7 @@ internal fun Project.configureKotlinMultiplatform() {
         // and crashes at configuration time on unsupported hosts (e.g. linux-aarch64)
         // with "Could not create task ':…:kspKotlinIosArm64' > Unknown host target".
         // Supported set: https://kotlinlang.org/docs/native-target-support.html
-        if (supportsKotlinNative()) {
+        if (supportsKotlinNative() && !skipsIosNativeTargets()) {
             iosArm64()
             iosSimulatorArm64()
         }
@@ -177,6 +205,21 @@ internal fun Project.configureJvmAndroidMainHierarchy() {
 
 /** Configure common test dependencies for KMP modules */
 internal fun Project.configureKmpTestDependencies() {
+    // kotest-property 6.2.5 transitively pulls xmlutil:serialization:0.91.3, which conflicts with this
+    // project's own pinned xmlutil (1.0.2.1) and has no resolvable variant for iosSimulatorArm64/iosArm64
+    // -- fails dependency resolution for compileTestKotlin<iosTarget> on hosts where supportsKotlinNative()
+    // registers those targets (e.g. Windows/macOS/Linux-x64 dev machines; CI's linux-aarch64 runners never
+    // hit this since iOS targets aren't registered there). kotest-property doesn't use xmlutil directly, so
+    // excluding it project-wide from test configurations is safe. Excluding at the Configuration level
+    // (rather than on the dependency notation itself) is required here: a version-catalog accessor
+    // (`libs.foo`) resolves to an immutable "minimal" dependency, and Gradle throws
+    // "Minimal dependencies are immutable" if you try to call exclude()/get().exclude() on it directly.
+    configurations.configureEach {
+        if (name.contains("Test")) {
+            exclude(mapOf("group" to "io.github.pdvrieze.xmlutil"))
+        }
+    }
+
     extensions.configure<KotlinMultiplatformExtension> {
         sourceSets.apply {
             val commonTest = findByName("commonTest") ?: return@apply

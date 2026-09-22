@@ -23,7 +23,6 @@ import com.juul.kable.PeripheralBuilder
 import com.juul.kable.PooledThreadingStrategy
 import com.juul.kable.ScannerBuilder
 import com.juul.kable.toIdentifier
-import org.meshtastic.core.model.util.anonymize
 
 // The scan callback never blocks; a capacity of 1 conflates, so a dense BLE environment cannot back
 // advertisements up behind a slow collector.
@@ -59,7 +58,6 @@ internal actual fun PeripheralBuilder.platformConfig(device: BleDevice, autoConn
     // the LE 2M PHY in any first-party firmware, so changing these would be a regression risk
     // with no upside. If a future hardware revision exposes 2M PHY, override `phy = Phy.Le2M`
     // here after confirming the firmware advertises it.
-
 }
 
 internal actual fun createPeripheral(address: String, builderAction: PeripheralBuilder.() -> Unit): Peripheral =

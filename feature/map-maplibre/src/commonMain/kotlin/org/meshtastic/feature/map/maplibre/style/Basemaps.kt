@@ -63,8 +63,10 @@ object Basemaps {
     private val catalogueRasters: List<Basemap.Raster> =
         MapTileCatalogue.basemaps.map { Basemap.Raster(id = it.id, label = it.label, spec = it.spec) }
 
-    /** Menu order: vector styles first, then the raster carry-overs, with the default (OSM) moved to the front —
-     * a never-set style preference resolves to index 0, so that slot has to be the one we want shown by default. */
+    /**
+     * Menu order: vector styles first, then the raster carry-overs, with the default (OSM) moved to the front — a
+     * never-set style preference resolves to index 0, so that slot has to be the one we want shown by default.
+     */
     val all: List<Basemap> =
         (listOf(Liberty, Positron, Dark) + catalogueRasters).sortedByDescending {
             it.id == MapTileCatalogue.OpenStreetMap.id

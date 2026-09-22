@@ -9,24 +9,27 @@
     <ID>ComposableParamOrder:DebugSearch.kt:@Composable fun DebugSearchStateWithViewModel</ID>
     <ID>ComposableParamOrder:ExternalNotificationConfigScreen.kt:@Suppress("LongMethod", "TooGenericExceptionCaught") @Composable fun ExternalNotificationConfigScreenCommon</ID>
     <ID>ComposableParamOrder:NodeActionButton.kt:@Composable fun NodeActionButton</ID>
+    <ID>ComposableParamOrder:RadioConfig.kt:@Composable fun RadioConfigItemList</ID>
     <ID>ComposableParamOrder:WarningDialog.kt:@Composable fun WarningDialog</ID>
     <ID>CyclomaticComplexMethod:RadioConfigViewModel.kt:RadioConfigViewModel$private fun processPacketResponse</ID>
     <ID>LambdaParameterEventTrailing:NodeActionButton.kt:onClick: () -> Unit</ID>
     <ID>LambdaParameterInRestartableEffect:PacketResponseStateDialog.kt:onBack: () -> Unit = {}</ID>
     <ID>LambdaParameterInRestartableEffect:PacketResponseStateDialog.kt:onDismiss: () -> Unit = {}</ID>
-    <ID>LambdaParameterInRestartableEffect:PrivacySection.kt:startProvideLocation: () -> Unit</ID>
-    <ID>LambdaParameterInRestartableEffect:PrivacySection.kt:stopProvideLocation: () -> Unit</ID>
+    <ID>LambdaParameterInRestartableEffect:RadioConfig.kt:onClearResponse: () -> Unit = {}</ID>
     <ID>LambdaParameterInRestartableEffect:TakPermissionUtil.kt:onPermissionResult: (Boolean) -> Unit</ID>
     <ID>LongMethod:AudioConfigItemList.kt:@Composable fun AudioConfigScreen</ID>
     <ID>LongMethod:DetectionSensorConfigItemList.kt:@Composable fun DetectionSensorConfigScreen</ID>
     <ID>LongMethod:LoRaConfigItemList.kt:@Composable fun LoRaConfigScreen</ID>
     <ID>LongMethod:PowerConfigItemList.kt:@Composable fun PowerConfigScreen</ID>
     <ID>LongMethod:RadioConfigViewModel.kt:RadioConfigViewModel$private fun processPacketResponse</ID>
-    <ID>LongMethod:SecurityConfigScreen.android.kt:@Composable actual fun SecurityKeyBackupActions</ID>
     <ID>LongMethod:SerialConfigItemList.kt:@Composable fun SerialConfigScreen</ID>
+    <ID>LongMethod:SnifferLogScreen.kt:@Composable fun SnifferLogScreen</ID>
+    <ID>LongMethod:SnifferSettingsScreen.kt:@Composable fun SnifferSettingsScreen</ID>
     <ID>LongMethod:StoreForwardConfigItemList.kt:@Composable fun StoreForwardConfigScreen</ID>
     <ID>LongMethod:TelemetryConfigItemList.kt:@Composable fun TelemetryConfigScreen</ID>
     <ID>LongMethod:UserConfigItemList.kt:@Composable fun UserConfigScreen</ID>
+    <ID>LongMethod:VanityColorPickerDialog.kt:@OptIn(ExperimentalLayoutApi::class) @Composable fun VanityColorPickerDialog</ID>
+    <ID>LoopWithTooManyJumpStatements:MeshPacketPayloadDecoder.kt:for</ID>
     <ID>MagicNumber:Debug.kt:3</ID>
     <ID>MagicNumber:DebugViewModel.kt:DebugViewModel$16</ID>
     <ID>MagicNumber:DebugViewModel.kt:DebugViewModel$8</ID>
@@ -36,6 +39,10 @@
     <ID>MagicNumber:EditDeviceProfileDialog.kt:ProfileField.CONFIG$4</ID>
     <ID>MagicNumber:EditDeviceProfileDialog.kt:ProfileField.FIXED_POSITION$6</ID>
     <ID>MagicNumber:EditDeviceProfileDialog.kt:ProfileField.MODULE_CONFIG$5</ID>
+    <ID>MagicNumber:MeshPacketPayloadDecoder.kt:16</ID>
+    <ID>MagicNumber:MeshPacketPayloadDecoder.kt:8</ID>
+    <ID>MagicNumber:SnifferLogScreen.kt:0.7f</ID>
+    <ID>MagicNumber:SnifferLogScreen.kt:0.85f</ID>
     <ID>ModifierClickableOrder:ChannelScreen.kt:clickable(onClick = onClick)</ID>
     <ID>ModifierMissing:AcknowledgementsScreen.kt:@Composable fun AcknowledgementsScreen</ID>
     <ID>ModifierMissing:AdministrationScreen.kt:@Composable fun AdministrationScreen</ID>
@@ -58,6 +65,7 @@
     <ID>ModifierMissing:MQTTConfigItemList.kt:@Suppress("DEPRECATION") @Composable fun MQTTConfigScreen</ID>
     <ID>ModifierMissing:MapReportingPreference.kt:@Suppress("LongMethod") @Composable fun MapReportingPreference</ID>
     <ID>ModifierMissing:ModuleConfigurationScreen.kt:@Composable fun ModuleConfigurationScreen</ID>
+    <ID>ModifierMissing:MqttSnifferLogScreen.kt:@Composable fun MqttSnifferLogScreen</ID>
     <ID>ModifierMissing:NeighborInfoConfigItemList.kt:@Composable fun NeighborInfoConfigScreen</ID>
     <ID>ModifierMissing:NetworkConfigItemList.kt:@Suppress("LongMethod", "CyclomaticComplexMethod") @Composable fun NetworkConfigScreen</ID>
     <ID>ModifierMissing:PacketResponseStateDialog.kt:@Composable fun &lt;T> PacketResponseStateDialog</ID>
@@ -72,16 +80,24 @@
     <ID>ModifierMissing:SecurityConfigScreen.kt:@Composable @Suppress("LongMethod") fun SecurityConfigScreenCommon</ID>
     <ID>ModifierMissing:SerialConfigItemList.kt:@Composable fun SerialConfigScreen</ID>
     <ID>ModifierMissing:SettingsScreen.kt:@Suppress("LongMethod", "CyclomaticComplexMethod") @Composable fun SettingsScreen</ID>
+    <ID>ModifierMissing:SnifferLogScreen.kt:@Composable fun SnifferLogScreen</ID>
+    <ID>ModifierMissing:SnifferSettingsScreen.kt:@Composable fun SnifferSettingsScreen</ID>
     <ID>ModifierMissing:StoreForwardConfigItemList.kt:@Composable fun StoreForwardConfigScreen</ID>
     <ID>ModifierMissing:TelemetryConfigItemList.kt:@Composable fun TelemetryConfigScreen</ID>
     <ID>ModifierMissing:ThemePickerDialog.kt:@Composable fun ThemePickerDialog</ID>
+    <ID>ModifierMissing:TrafficManagementConfigItemList.kt:@Suppress("LongMethod") @Composable fun TrafficManagementConfigScreen</ID>
     <ID>ModifierMissing:UserConfigItemList.kt:@Composable fun UserConfigScreen</ID>
+    <ID>ModifierMissing:VanityColorPickerDialog.kt:@OptIn(ExperimentalLayoutApi::class) @Composable fun VanityColorPickerDialog</ID>
     <ID>MultipleEmitters:MQTTConfigItemList.kt:@Composable private fun MqttAddressAndProbe</ID>
     <ID>MultipleEmitters:PacketResponseStateDialog.kt:@Composable private fun ErrorContent</ID>
     <ID>MultipleEmitters:PacketResponseStateDialog.kt:@Composable private fun SuccessContent</ID>
     <ID>MultipleEmitters:SecurityConfigScreen.android.kt:@Composable actual fun SecurityKeyBackupActions</ID>
     <ID>MutableStateAutoboxing:DesktopSettingsScreen.kt:mutableStateOf(0)</ID>
+    <ID>MutableStateAutoboxing:SnifferLogScreen.kt:mutableStateOf(0)</ID>
     <ID>ParameterNaming:ChannelConfigScreen.kt:onPositiveClicked: (List&lt;ChannelSettings>) -> Unit</ID>
+    <ID>ParameterNaming:CleanNodeDatabaseScreen.kt:onAutoCleanCheckIntervalDaysChanged: (Int) -> Unit</ID>
+    <ID>ParameterNaming:CleanNodeDatabaseScreen.kt:onAutoCleanEnabledChanged: (Boolean) -> Unit</ID>
+    <ID>ParameterNaming:CleanNodeDatabaseScreen.kt:onAutoCleanInactivityDaysChanged: (Int) -> Unit</ID>
     <ID>ParameterNaming:CleanNodeDatabaseScreen.kt:onCheckedChanged: (Boolean) -> Unit</ID>
     <ID>ParameterNaming:CleanNodeDatabaseScreen.kt:onDaysChanged: (Float) -> Unit</ID>
     <ID>ParameterNaming:ExternalNotificationConfigScreen.android.kt:onRingtoneImported: (String) -> Unit</ID>
@@ -96,13 +112,19 @@
     <ID>ParameterNaming:PositionConfigScreen.ios.kt:onLocationReceived: (Position) -> Unit</ID>
     <ID>ParameterNaming:PositionConfigScreen.jvm.kt:onLocationReceived: (Position) -> Unit</ID>
     <ID>ParameterNaming:PositionConfigScreen.kt:onLocationReceived: (Position) -> Unit</ID>
+    <ID>ParameterNaming:RadioConfig.kt:onSetSnifferEnabled: (Boolean) -> Unit</ID>
+    <ID>ParameterNaming:RadioConfig.kt:onSetSnifferEnabled: (Boolean) -> Unit = {}</ID>
+    <ID>ParameterNaming:VanityColorPickerDialog.kt:onKeyFound: (ByteString) -> Unit</ID>
     <ID>PreviewPublic:AppInfoSection.kt:@Preview(showBackground = true) @Composable fun AppInfoSectionPreview</ID>
     <ID>PreviewPublic:AppearanceSection.kt:@Preview(showBackground = true) @Composable fun AppearanceSectionPreview</ID>
     <ID>PreviewPublic:NodeLayoutSettingsPreviews.kt:@PreviewLightDark @Composable fun NodeLayoutSettingsCompactPreview</ID>
     <ID>PreviewPublic:NodeLayoutSettingsPreviews.kt:@PreviewLightDark @Composable fun NodeLayoutSettingsCompletePreview</ID>
     <ID>PreviewPublic:PersistenceSection.kt:@Preview(showBackground = true) @Composable fun PersistenceSectionPreview</ID>
+    <ID>ReturnCount:MeshPacketPayloadDecoder.kt:private fun decryptWithKnownChannels: Data?</ID>
+    <ID>ReturnCount:MqttSnifferLogViewModel.kt:MqttSnifferManager$private fun decodeMessage: MqttSniffedPacket?</ID>
     <ID>ReturnCount:RadioConfigViewModel.kt:RadioConfigViewModel$private fun processPacketResponse</ID>
-    <ID>TooGenericExceptionCaught:DebugViewModel.kt:DebugViewModel$e: Exception</ID>
+    <ID>ReturnCount:SnifferLogViewModel.kt:SnifferLogViewModel$private fun toSniffedPacket: SniffedPacket?</ID>
+    <ID>TooGenericExceptionCaught:MeshPacketPayloadDecoder.kt:e: Exception</ID>
     <ID>TooManyFunctions:RadioConfigViewModel.kt:RadioConfigViewModel : ViewModel</ID>
     <ID>ViewModelForwarding:AdministrationScreen.kt:AdminRouteItems(viewModel = viewModel, enabled = enabled, state = state, destNode = destNode)</ID>
     <ID>ViewModelForwarding:PositionConfigScreen.kt:DeviceLocationButton( viewModel = viewModel, enabled = state.connected, onLocationReceived = { locationInput = it }, )</ID>

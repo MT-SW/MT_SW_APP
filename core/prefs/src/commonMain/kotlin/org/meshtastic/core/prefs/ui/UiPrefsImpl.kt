@@ -121,7 +121,8 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
     }
 
     override val quickChatDefaultsSeeded: StateFlow<Boolean> =
-        dataStore.data.map { it[KEY_QUICK_CHAT_DEFAULTS_SEEDED_PREF] ?: false }
+        dataStore.data
+            .map { it[KEY_QUICK_CHAT_DEFAULTS_SEEDED_PREF] ?: false }
             .stateIn(scope, SharingStarted.Eagerly, false)
 
     override fun setQuickChatDefaultsSeeded(seeded: Boolean) {
@@ -349,9 +350,10 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
     override suspend fun awaitAutoCleanNodesPolicy(): AutoCleanNodesPolicy = dataStore.data.first().let { preferences ->
         AutoCleanNodesPolicy(
             enabled = preferences[KEY_AUTO_CLEAN_NODES_ENABLED] ?: false,
-            inactivityDays = preferences[KEY_AUTO_CLEAN_NODES_INACTIVITY_DAYS]
-                ?: AutoCleanNodesPolicy.DEFAULT_INACTIVITY_DAYS,
-            checkIntervalDays = preferences[KEY_AUTO_CLEAN_NODES_CHECK_INTERVAL_DAYS]
+            inactivityDays =
+            preferences[KEY_AUTO_CLEAN_NODES_INACTIVITY_DAYS] ?: AutoCleanNodesPolicy.DEFAULT_INACTIVITY_DAYS,
+            checkIntervalDays =
+            preferences[KEY_AUTO_CLEAN_NODES_CHECK_INTERVAL_DAYS]
                 ?: AutoCleanNodesPolicy.DEFAULT_CHECK_INTERVAL_DAYS,
         )
     }

@@ -306,13 +306,13 @@ internal fun org.meshtastic.core.model.MeshLog.toHistoryEntry(): org.meshtastic.
         cpuUsagePercent = localStatsExtended?.cpuUsagePercent,
         heapFreePercent = if (heapTotal > 0) heapFree.toFloat() / heapTotal * PERCENT_MULTIPLIER else null,
         flashUsedPercent =
-            localStatsExtended
-                ?.takeIf { it.flashTotalBytes > 0 }
-                ?.let { it.flashUsedBytes.toFloat() / it.flashTotalBytes * PERCENT_MULTIPLIER },
+        localStatsExtended
+            ?.takeIf { it.flashTotalBytes > 0 }
+            ?.let { it.flashUsedBytes.toFloat() / it.flashTotalBytes * PERCENT_MULTIPLIER },
         psramFreePercent =
-            localStatsExtended
-                ?.takeIf { it.memoryPsramTotal > 0 }
-                ?.let { it.memoryPsramFree.toFloat() / it.memoryPsramTotal * PERCENT_MULTIPLIER },
+        localStatsExtended
+            ?.takeIf { it.memoryPsramTotal > 0 }
+            ?.let { it.memoryPsramFree.toFloat() / it.memoryPsramTotal * PERCENT_MULTIPLIER },
     )
 }
 

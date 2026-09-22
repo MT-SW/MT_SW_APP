@@ -104,8 +104,8 @@ open class MeshLogRepositoryImpl(
         .flowOn(dispatchers.io)
 
     /**
-     * Retrieves all [MeshLog]s associated with a specific [nodeNum] and [portNum], automatically remapping the
-     * locally connected node's number to [MeshLog.NODE_NUM_LOCAL] — see [effectiveLogId].
+     * Retrieves all [MeshLog]s associated with a specific [nodeNum] and [portNum], automatically remapping the locally
+     * connected node's number to [MeshLog.NODE_NUM_LOCAL] — see [effectiveLogId].
      */
     override fun getLogsFrom(nodeNum: Int, portNum: Int): Flow<List<MeshLog>> = effectiveLogId(nodeNum)
         .flatMapLatest { logId ->
@@ -150,8 +150,8 @@ open class MeshLogRepositoryImpl(
                 .filter { log ->
                     val packet = log.fromRadio.packet ?: return@filter false
                     log.fromNum == MeshLog.NODE_NUM_LOCAL &&
-                            packet.to == targetNodeNum &&
-                            packet.decoded?.want_response == true
+                        packet.to == targetNodeNum &&
+                        packet.decoded?.want_response == true
                 }
                 // Sniffer mode's firmware hook can deliver a second echo of our own just-sent request packet
                 // (same packet.id, different MeshLog row) — collapse to one entry per request.

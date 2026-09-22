@@ -20,11 +20,12 @@ import okio.ByteString
 import org.meshtastic.proto.Telemetry
 
 /**
- * Local device mesh statistics extension (heap, CPU, flash, PSRAM) beyond the standard [org.meshtastic.proto.LocalStats].
+ * Local device mesh statistics extension (heap, CPU, flash, PSRAM) beyond the standard
+ * [org.meshtastic.proto.LocalStats].
  *
  * Mirrors the `LocalStatsExtended` message (`local_stats_extended`, tag 20 in `Telemetry.variant`) sent by the fw+
- * firmware fork. This message is NOT part of the official `meshtastic/protobufs` artifact this app consumes, so
- * Wire's generated `Telemetry.ADAPTER` cannot parse it -- it is preserved as raw bytes in
+ * firmware fork. This message is NOT part of the official `meshtastic/protobufs` artifact this app consumes, so Wire's
+ * generated `Telemetry.ADAPTER` cannot parse it -- it is preserved as raw bytes in
  * [org.meshtastic.proto.Telemetry.unknownFields] instead. [decodeLocalStatsExtended] hand-decodes that byte range
  * rather than vendoring/forking the protobufs dependency.
  */
@@ -49,8 +50,8 @@ private const val WIRE_TYPE_FIXED32 = 5
 
 /**
  * Scans these [ByteString] unknown fields (from [org.meshtastic.proto.Telemetry.unknownFields]) for the
- * `local_stats_extended` (tag 20) oneof entry and decodes its 7 uint32 sub-fields by hand. Returns null if the field
- * is absent (e.g. stock firmware) or malformed.
+ * `local_stats_extended` (tag 20) oneof entry and decodes its 7 uint32 sub-fields by hand. Returns null if the field is
+ * absent (e.g. stock firmware) or malformed.
  */
 fun ByteString.decodeLocalStatsExtended(): LocalStatsExtended? {
     val submessage = findLengthDelimitedField(toByteArray(), LOCAL_STATS_EXTENDED_TAG) ?: return null
@@ -93,12 +94,16 @@ private fun parseVarintFields(bytes: ByteArray): Map<Int, Long> {
                 result[tag] = value
                 i = afterValue
             }
+
             WIRE_TYPE_LENGTH_DELIMITED -> {
                 val (len, afterLen) = readVarint(bytes, afterKey) ?: break
                 i = afterLen + len.toInt()
             }
+
             WIRE_TYPE_FIXED64 -> i = afterKey + 8
+
             WIRE_TYPE_FIXED32 -> i = afterKey + 4
+
             else -> break
         }
         if (i > bytes.size) break
@@ -116,6 +121,7 @@ private fun findLengthDelimitedField(bytes: ByteArray, tag: Int): ByteArray? {
                 val (_, afterValue) = readVarint(bytes, afterKey) ?: return null
                 i = afterValue
             }
+
             WIRE_TYPE_LENGTH_DELIMITED -> {
                 val (len, afterLen) = readVarint(bytes, afterKey) ?: return null
                 val end = afterLen + len.toInt()
@@ -123,8 +129,11 @@ private fun findLengthDelimitedField(bytes: ByteArray, tag: Int): ByteArray? {
                 if (fieldTag == tag) return bytes.copyOfRange(afterLen, end)
                 i = end
             }
+
             WIRE_TYPE_FIXED64 -> i = afterKey + 8
+
             WIRE_TYPE_FIXED32 -> i = afterKey + 4
+
             else -> return null
         }
     }

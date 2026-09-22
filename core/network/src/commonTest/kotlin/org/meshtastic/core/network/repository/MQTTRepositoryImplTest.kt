@@ -375,7 +375,7 @@ class MQTTRepositoryImplTest {
             )
         val jsonPayload = """{"type":"text","from":1,"to":2,"payload":"hello","hop_limit":3,"id":4,"time":5}"""
 
-        val nextMessage = backgroundScope.async { harness.repository.proxyMessageFlow.first() }
+        val nextMessage = backgroundScope.async { harness.repository.proxyMessageFlow().first() }
         runCurrent()
         harness.client.emitMessage(
             MqttMessage(topic = "msh/2/json/alpha/node", payload = jsonPayload.encodeToByteArray(), retain = true),
@@ -393,7 +393,7 @@ class MQTTRepositoryImplTest {
         val harness = createHarness()
         val payload = byteArrayOf(0x01, 0x23, 0x45)
 
-        val nextMessage = backgroundScope.async { harness.repository.proxyMessageFlow.first() }
+        val nextMessage = backgroundScope.async { harness.repository.proxyMessageFlow().first() }
         runCurrent()
         harness.client.emitMessage(MqttMessage(topic = "msh/2/e/alpha/node", payload = payload, retain = false))
 
@@ -457,7 +457,7 @@ class MQTTRepositoryImplTest {
             MqttException.ConnectionRejected(ReasonCode.BAD_USER_NAME_OR_PASSWORD, "Connection refused"),
         )
 
-        val outcome = backgroundScope.async { safeCatching { harness.repository.proxyMessageFlow.collect {} } }
+        val outcome = backgroundScope.async { safeCatching { harness.repository.proxyMessageFlow().collect {} } }
         runCurrent()
         advanceTimeBy(60_000)
         runCurrent()
@@ -814,7 +814,7 @@ class MQTTRepositoryImplTest {
                 packet = MeshPacket.Builder().also { wb -> wb.decoded = Data.Builder().build() }.build(),
             ) // has payload → forwarded
 
-        val nextMessage = backgroundScope.async { harness.repository.proxyMessageFlow.first() }
+        val nextMessage = backgroundScope.async { harness.repository.proxyMessageFlow().first() }
         runCurrent()
         harness.client.emitMessage(MqttMessage(topic = "msh/2/e/alpha/node", payload = stub, retain = false))
         harness.client.emitMessage(MqttMessage(topic = "msh/2/e/alpha/node", payload = real, retain = false))
@@ -848,7 +848,7 @@ class MQTTRepositoryImplTest {
     }
 
     private fun TestScope.startProxyCollection(repository: MQTTRepositoryImpl): Job =
-        backgroundScope.launch { repository.proxyMessageFlow.collect {} }
+        backgroundScope.launch { repository.proxyMessageFlow().collect {} }
 
     private fun defaultRadioConfigRepository(): FakeRadioConfigRepository = FakeRadioConfigRepository().apply {
         setChannelSet(

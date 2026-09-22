@@ -48,6 +48,7 @@ import org.koin.core.annotation.Single
 import org.meshtastic.core.common.util.safeCatching
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.MqttJsonPayload
+import org.meshtastic.core.model.util.allChannelIds
 import org.meshtastic.core.model.util.decodeOrNull
 import org.meshtastic.core.model.util.subscribeList
 import org.meshtastic.core.repository.NodeRepository
@@ -124,11 +125,8 @@ class MQTTRepositoryImpl(
         closeSession(takeActiveSession())
     }
 
-    // json_enabled is deprecated in the protobuf schema but remains the only way to toggle MQTT JSON
-    // publish/consume, so we must keep reading it until the firmware/proto provides a replacement.
-    @Suppress("DEPRECATION")
     @OptIn(ExperimentalSerializationApi::class)
-    override val proxyMessageFlow: Flow<MqttClientProxyMessage> = callbackFlow {
+    override fun proxyMessageFlow(subscribeAllChannels: Boolean): Flow<MqttClientProxyMessage> = callbackFlow {
         // Append a per-connection random id. myId identifies the *node* (and is null →
         // "unknown" before the local node record loads), so it is not unique per client:
         // clients sharing a node id — and the whole "unknown" pool on the public broker —
@@ -154,33 +152,10 @@ class MQTTRepositoryImpl(
         val session = ActiveMqttSession(newClient)
         closeSession(replaceActiveSession(session))
 
-        val subscriptions: List<Subscription> = buildList {
-            channelSet.subscribeList.forEach { globalId ->
-                add(
-                    Subscription(
-                        "$rootTopic$DEFAULT_TOPIC_LEVEL$globalId/+",
-                        maxQos = QoS.AT_LEAST_ONCE,
-                        noLocal = true,
-                    ),
-                )
-                if (mqttConfig?.json_enabled == true) {
-                    add(
-                        Subscription(
-                            "$rootTopic$JSON_TOPIC_LEVEL$globalId/+",
-                            maxQos = QoS.AT_LEAST_ONCE,
-                            noLocal = true,
-                        ),
-                    )
-                }
-            }
-            add(
-                Subscription(
-                    "$rootTopic$DEFAULT_TOPIC_LEVEL$PKI_CHANNEL_ID/+",
-                    maxQos = QoS.AT_LEAST_ONCE,
-                    noLocal = true,
-                ),
-            )
-        }
+        // The Client Proxy only wants channels the device asked for downlink on (subscribeList); the Sniffer
+        // wants to observe everything published for this device's channels, so it ignores that flag entirely.
+        val channelIds = if (subscribeAllChannels) channelSet.allChannelIds else channelSet.subscribeList
+        val subscriptions: List<Subscription> = buildSniffSubscriptions(channelIds, rootTopic, mqttConfig)
 
         // Collect from the SharedFlow before connecting to avoid missing retained messages
         // that arrive immediately after SUBSCRIBE.
@@ -188,56 +163,7 @@ class MQTTRepositoryImpl(
 
         // Retry the initial connect with exponential backoff. Once established,
         // autoReconnect handles subsequent drops and re-subscribes internally.
-        val connectJob =
-            launch(start = CoroutineStart.LAZY) {
-                var reconnectDelay = INITIAL_RECONNECT_DELAY_MS
-                while (isActiveSession(session)) {
-                    val result = safeCatching {
-                        if (!isActiveSession(session)) return@launch
-                        Logger.i {
-                            if (buildConfigProvider.isDebug) "MQTT Connecting to $endpoint" else "MQTT Connecting..."
-                        }
-                        newClient.connect(endpoint)
-                        if (!isActiveSession(session)) return@launch
-                        if (subscriptions.isNotEmpty()) {
-                            Logger.d { "MQTT subscribing to ${subscriptions.size} topics" }
-                            newClient.subscribe(subscriptions)
-                        }
-                        Logger.i { "MQTT connected and subscribed" }
-                    }
-                    val failure = result.exceptionOrNull()
-                    when {
-                        result.isSuccess -> return@launch
-
-                        failure is MqttException.ConnectionRejected && failure.isCredentialRejection() -> {
-                            Logger.e(failure) { "MQTT connection rejected (unrecoverable), stopping" }
-                            close(failure)
-                            return@launch
-                        }
-
-                        else -> {
-                            if (!isActiveSession(session)) return@launch
-                            // Broker- and network-side failures are what this retry loop exists to absorb — an
-                            // unreachable host, a TLS problem, a dropped connection, or a broker that violates the
-                            // MQTT 5 spec (e.g. the topic-alias limit). None are defects in this app, and reporting
-                            // every retry as a non-fatal drowned real regressions.
-                            //
-                            // Anything else landing here is unexpected — a fault in our own connect/subscribe setup
-                            // rather than the peer's — so it keeps reporting.
-                            if (failure.isExpectedMqttRetryFailure()) {
-                                Logger.w(failure) { "MQTT connect failed, retrying in ${reconnectDelay}ms" }
-                            } else {
-                                Logger.e(failure) {
-                                    "MQTT connect failed unexpectedly, retrying in ${reconnectDelay}ms"
-                                }
-                            }
-                            delay(reconnectDelay)
-                            reconnectDelay =
-                                (reconnectDelay * RECONNECT_BACKOFF_MULTIPLIER).coerceAtMost(MAX_RECONNECT_DELAY_MS)
-                        }
-                    }
-                }
-            }
+        val connectJob = launchConnectRetryLoop(session, newClient, endpoint, subscriptions)
         session.connectJob.value = connectJob
         if (isActiveSession(session)) {
             connectJob.start()
@@ -248,6 +174,79 @@ class MQTTRepositoryImpl(
         awaitClose {
             activeSession.compareAndSet(session, null)
             closeSession(session)
+        }
+    }
+
+    // json_enabled is deprecated in the protobuf schema but remains the only way to toggle MQTT JSON
+    // publish/consume, so we must keep reading it until the firmware/proto provides a replacement.
+    @Suppress("DEPRECATION")
+    private fun buildSniffSubscriptions(
+        channelIds: List<String>,
+        rootTopic: String,
+        mqttConfig: ModuleConfig.MQTTConfig?,
+    ): List<Subscription> = buildList {
+        channelIds.forEach { globalId ->
+            add(Subscription("$rootTopic$DEFAULT_TOPIC_LEVEL$globalId/+", maxQos = QoS.AT_LEAST_ONCE, noLocal = true))
+            if (mqttConfig?.json_enabled == true) {
+                add(Subscription("$rootTopic$JSON_TOPIC_LEVEL$globalId/+", maxQos = QoS.AT_LEAST_ONCE, noLocal = true))
+            }
+        }
+        add(Subscription("$rootTopic$DEFAULT_TOPIC_LEVEL$PKI_CHANNEL_ID/+", maxQos = QoS.AT_LEAST_ONCE, noLocal = true))
+    }
+
+    // Extracted from proxyMessageFlow to keep it under detekt's LongMethod limit. Retries the initial connect
+    // with exponential backoff; once established, autoReconnect handles subsequent drops and re-subscribes
+    // internally.
+    private fun ProducerScope<MqttClientProxyMessage>.launchConnectRetryLoop(
+        session: ActiveMqttSession,
+        newClient: MqttClientSession,
+        endpoint: MqttEndpoint,
+        subscriptions: List<Subscription>,
+    ): Job = launch(start = CoroutineStart.LAZY) {
+        var reconnectDelay = INITIAL_RECONNECT_DELAY_MS
+        while (isActiveSession(session)) {
+            val result = safeCatching {
+                if (!isActiveSession(session)) return@launch
+                Logger.i {
+                    if (buildConfigProvider.isDebug) "MQTT Connecting to $endpoint" else "MQTT Connecting..."
+                }
+                newClient.connect(endpoint)
+                if (!isActiveSession(session)) return@launch
+                if (subscriptions.isNotEmpty()) {
+                    Logger.d { "MQTT subscribing to ${subscriptions.size} topics" }
+                    newClient.subscribe(subscriptions)
+                }
+                Logger.i { "MQTT connected and subscribed" }
+            }
+            val failure = result.exceptionOrNull()
+            when {
+                result.isSuccess -> return@launch
+
+                failure is MqttException.ConnectionRejected && failure.isCredentialRejection() -> {
+                    Logger.e(failure) { "MQTT connection rejected (unrecoverable), stopping" }
+                    close(failure)
+                    return@launch
+                }
+
+                else -> {
+                    if (!isActiveSession(session)) return@launch
+                    // Broker- and network-side failures are what this retry loop exists to absorb — an
+                    // unreachable host, a TLS problem, a dropped connection, or a broker that violates the
+                    // MQTT 5 spec (e.g. the topic-alias limit). None are defects in this app, and reporting
+                    // every retry as a non-fatal drowned real regressions.
+                    //
+                    // Anything else landing here is unexpected — a fault in our own connect/subscribe setup
+                    // rather than the peer's — so it keeps reporting.
+                    if (failure.isExpectedMqttRetryFailure()) {
+                        Logger.w(failure) { "MQTT connect failed, retrying in ${reconnectDelay}ms" }
+                    } else {
+                        Logger.e(failure) { "MQTT connect failed unexpectedly, retrying in ${reconnectDelay}ms" }
+                    }
+                    delay(reconnectDelay)
+                    reconnectDelay =
+                        (reconnectDelay * RECONNECT_BACKOFF_MULTIPLIER).coerceAtMost(MAX_RECONNECT_DELAY_MS)
+                }
+            }
         }
     }
 

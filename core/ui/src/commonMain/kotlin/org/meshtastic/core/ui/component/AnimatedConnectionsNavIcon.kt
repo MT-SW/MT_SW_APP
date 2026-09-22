@@ -126,7 +126,6 @@ fun AnimatedConnectionsNavIcon(
     }
 }
 
-
 /** Compact color-swatch + label row, matching [SecurityLegendItems]'s row shape but for a plain color, not a glyph. */
 @Composable
 private fun ActivityLegendRow(color: Color, label: String) {

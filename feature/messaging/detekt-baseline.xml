@@ -13,6 +13,12 @@
     <ID>LambdaParameterEventTrailing:Message.kt:onSendMessage: () -> Unit</ID>
     <ID>LambdaParameterEventTrailing:MessageScreenComponents.kt:onClick: (QuickChatAction) -> Unit</ID>
     <ID>LambdaParameterEventTrailing:QuickChat.kt:onNavigateUp: () -> Unit</ID>
+    <ID>MagicNumber:Message.kt:11f</ID>
+    <ID>MagicNumber:Message.kt:13f</ID>
+    <ID>MagicNumber:Message.kt:19f</ID>
+    <ID>MagicNumber:Message.kt:5f</ID>
+    <ID>MagicNumber:MessageItem.kt:5f</ID>
+    <ID>MaxLineLength:Message.kt:"Zdjęcie zostanie wysłane na publiczny serwer catbox.moe i będzie dostępne dla każdego, kto zna link. Upewnij się, że nie zawiera niczego prywatnego."</ID>
     <ID>ModifierMissing:Contacts.kt:@Suppress("LongMethod", "CyclomaticComplexMethod", "LongParameterList") @Composable fun ContactsScreen</ID>
     <ID>ModifierMissing:DeliveryInfoDialog.kt:@Composable fun DeliveryInfo</ID>
     <ID>ModifierMissing:Message.kt:@Suppress("LongMethod", "CyclomaticComplexMethod") @OptIn(ExperimentalFoundationApi::class) @Composable fun MessageScreen</ID>
@@ -23,8 +29,12 @@
     <ID>ModifierMissing:MessageScreenComponents.kt:@OptIn(ExperimentalMaterial3Api::class) @Composable fun MessageTopBar</ID>
     <ID>ModifierMissing:Share.kt:@Composable fun ShareScreen</ID>
     <ID>ModifierNotUsedAtRoot:QuickChat.kt:modifier = modifier.fillMaxSize().padding(innerPadding)</ID>
+    <ID>MutableStateAutoboxing:MessageItem.kt:mutableStateOf(1f)</ID>
     <ID>ParameterNaming:Contacts.kt:onDeleteSelected: () -> Unit</ID>
     <ID>ParameterNaming:Contacts.kt:onMuteSelected: () -> Unit</ID>
+    <ID>ParameterNaming:ImagePickerLauncher.android.kt:onImagePicked: (bytes: ByteArray, mimeType: String) -> Unit</ID>
+    <ID>ParameterNaming:ImagePickerLauncher.jvm.kt:onImagePicked: (bytes: ByteArray, mimeType: String) -> Unit</ID>
+    <ID>ParameterNaming:ImagePickerLauncher.kt:onImagePicked: (bytes: ByteArray, mimeType: String) -> Unit</ID>
     <ID>ParameterNaming:MessageScreenComponents.kt:onToggleFilteringDisabled: () -> Unit</ID>
     <ID>ParameterNaming:MessageScreenComponents.kt:onToggleFilteringDisabled: () -> Unit = {}</ID>
     <ID>ParameterNaming:MessageScreenComponents.kt:onToggleShowFiltered: () -> Unit</ID>
@@ -35,5 +45,7 @@
     <ID>PreviewPublic:QuickChatPreviews.kt:@PreviewLightDark @Composable fun EditQuickChatDialogPreview</ID>
     <ID>PreviewPublic:QuickChatPreviews.kt:@PreviewLightDark @Composable fun QuickChatItemPreview</ID>
     <ID>PreviewPublic:ReactionPreviews.kt:@PreviewLightDark @Composable fun ReactionItemPreview</ID>
+    <ID>TooGenericExceptionCaught:ImagePickerLauncher.jvm.kt:ex: Exception</ID>
+    <ID>TooGenericExceptionCaught:Message.kt:e: Exception</ID>
   </CurrentIssues>
 </SmellBaseline>

@@ -43,7 +43,6 @@ import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.UnitsOverride
 import org.meshtastic.core.common.util.nowMillis
-import org.meshtastic.core.database.DatabaseConstants
 import org.meshtastic.core.navigation.DiscoveryRoute
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
@@ -255,9 +254,7 @@ fun DesktopSettingsScreen(
                     deviceProfile = null
                     showEditDeviceProfileDialog = true
                 },
-                onSetSnifferEnabled = {
-                    radioConfigViewModel.setSnifferEnabled(it)
-                },
+                onSetSnifferEnabled = { radioConfigViewModel.setSnifferEnabled(it) },
             )
 
             // App-local settings are only relevant when configuring the local node
@@ -282,7 +279,7 @@ fun DesktopSettingsScreen(
                     ListItem(
                         text = stringResource(Res.string.units),
                         supportingText =
-                            stringResource(UnitsOption.entries.first { it.override == unitsOverride }.label),
+                        stringResource(UnitsOption.entries.first { it.override == unitsOverride }.label),
                         leadingIcon = MeshtasticIcons.Distance,
                         trailingIcon = null,
                     ) {

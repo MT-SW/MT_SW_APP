@@ -39,8 +39,8 @@ data class LocalStatsExtendedPrefs(
 )
 
 /**
- * Persists the latest fw+ `local_stats_extended` telemetry snapshot in the shared [CorePreferencesDataStore] — the
- * same store already used by [BootloaderWarningDataSource] and others — rather than a new dedicated DataStore file.
+ * Persists the latest fw+ `local_stats_extended` telemetry snapshot in the shared [CorePreferencesDataStore] — the same
+ * store already used by [BootloaderWarningDataSource] and others — rather than a new dedicated DataStore file.
  */
 @Single
 open class LocalStatsExtendedDataSource(private val dataStore: CorePreferencesDataStore) {

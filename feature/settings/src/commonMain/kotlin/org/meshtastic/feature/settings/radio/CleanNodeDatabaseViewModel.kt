@@ -62,6 +62,7 @@ class CleanNodeDatabaseViewModel(
         uiPrefs.setAutoCleanNodesCheckIntervalDays(days)
         meshWorkerManager.scheduleNodeCleanup(days)
     }
+
     private val _olderThanDays = MutableStateFlow(30f)
     val olderThanDays = _olderThanDays.asStateFlow()
 

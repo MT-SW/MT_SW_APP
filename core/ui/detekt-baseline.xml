@@ -12,7 +12,6 @@
     <ID>ComposableParamOrder:MainAppBar.kt:@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class) @Composable fun MainAppBar</ID>
     <ID>ComposableParamOrder:MaterialBatteryInfo.kt:@Suppress("MagicNumber", "LongMethod") @Composable fun MaterialBatteryInfo</ID>
     <ID>ComposableParamOrder:NodeChip.kt:@Composable fun NodeChip</ID>
-    <ID>ComposableParamOrder:NodeKeyStatusIcon.kt:@Composable fun NodeKeyStatusIcon</ID>
     <ID>ComposableParamOrder:SignalInfo.kt:@Composable fun SignalInfo</ID>
     <ID>ComposableParamOrder:SwitchPreference.kt:@Composable fun SwitchPreference</ID>
     <ID>CompositionLocalAllowlist:LocalAnalyticsIntroProvider.kt:val LocalAnalyticsIntroProvider = compositionLocalOf&lt;@Composable () -> Unit> { {} }</ID>
@@ -33,19 +32,25 @@
     <ID>LambdaParameterInRestartableEffect:EmojiPickerDialog.kt:onCategoryChanged: (Int) -> Unit</ID>
     <ID>LambdaParameterInRestartableEffect:PlatformUtils.kt:check: () -> Boolean</ID>
     <ID>LambdaParameterInRestartableEffect:TracerouteAlertHandler.kt:onNavigateToMap: (destinationNodeNum: Int, requestId: Int, logUuid: String?) -> Unit</ID>
+    <ID>LongMethod:NarrowBandWarningDialog.kt:@Composable fun NarrowBandWarningDialog</ID>
     <ID>MagicNumber:EditIPv4Preference.kt:0xff</ID>
     <ID>MagicNumber:EditIPv4Preference.kt:16</ID>
     <ID>MagicNumber:EditIPv4Preference.kt:24</ID>
     <ID>MagicNumber:EditIPv4Preference.kt:8</ID>
-    <ID>MagicNumber:EditListPreference.kt:12345</ID>
-    <ID>MagicNumber:EditListPreference.kt:67890</ID>
-    <ID>MagicNumber:LazyColumnDragAndDropDemo.kt:50</ID>
+    <ID>MagicNumber:NarrowBandWarningDialog.kt:1000L</ID>
+    <ID>MagicNumber:RegionWarningDialog.kt:1000L</ID>
     <ID>MatchingDeclarationName:LocalTracerouteMapOverlayInsetsProvider.kt:TracerouteMapOverlayInsets</ID>
+    <ID>ModifierMissing:AnimatedConnectionsNavIcon.kt:@Composable fun ConnectionActivityLegendItems</ID>
     <ID>ModifierMissing:ChannelItem.kt:@Composable fun ChannelItem</ID>
     <ID>ModifierMissing:ChannelSelection.kt:@Composable fun ChannelSelection</ID>
+    <ID>ModifierMissing:ConnectionsNavIcon.kt:@Composable fun ConnectionStatusLegendItems</ID>
     <ID>ModifierMissing:IndoorAirQuality.kt:@Suppress("LongMethod", "UnusedPrivateProperty") @Composable fun IndoorAirQuality</ID>
+    <ID>ModifierMissing:NarrowBandWarningDialog.kt:@Composable fun NarrowBandWarningDialog</ID>
+    <ID>ModifierMissing:NodeSecurityIcon.kt:@Composable fun SecurityLegend</ID>
+    <ID>ModifierMissing:NodeSecurityIcon.kt:@Composable fun SecurityLegendItems</ID>
     <ID>ModifierMissing:PlaceholderScreen.kt:@Composable fun PlaceholderScreen</ID>
     <ID>ModifierMissing:PreferenceDivider.kt:@Composable fun PreferenceDivider</ID>
+    <ID>ModifierMissing:RegionWarningDialog.kt:@Composable fun RegionWarningDialog</ID>
     <ID>ModifierMissing:SecurityIcon.kt:@Composable fun SecurityIcon</ID>
     <ID>ModifierMissing:TracerouteAlertHandler.kt:@Composable fun TracerouteAlertHandler</ID>
     <ID>ModifierNaming:MeshtasticAppShell.kt:hostModifier: Modifier = Modifier</ID>
@@ -117,6 +122,8 @@
     <ID>PreviewPublic:SwitchPreference.kt:@Preview(showBackground = true) @Composable fun SwitchPreferencePreview</ID>
     <ID>PreviewPublic:TextDividerPreference.kt:@Preview(showBackground = true) @Composable fun TextDividerPreferencePreview</ID>
     <ID>PreviewPublic:TitledCard.kt:@PreviewLightDark @Composable fun TitledCardPreview</ID>
+    <ID>ReturnCount:UIViewModel.kt:UIViewModel$private suspend fun performNarrowBandCheck</ID>
+    <ID>ReturnCount:UIViewModel.kt:UIViewModel$private suspend fun performRegionCheck</ID>
     <ID>TooManyFunctions:NoopStubs.kt:org.meshtastic.core.ui.util.NoopStubs.kt</ID>
     <ID>ViewModelForwarding:MeshtasticAppShell.kt:MeshtasticCommonAppSetup( uiViewModel = uiViewModel, onNavigateToTracerouteMap = { destNum, requestId, logUuid -> multiBackstack.handleDeepLink( listOf( NodesRoute.Nodes, NodeDetailRoute.TracerouteMap(destNum = destNum, requestId = requestId, logUuid = logUuid), ), ) }, )</ID>
     <ID>ViewModelForwarding:MeshtasticCommonAppSetup.kt:FirmwareVersionCheck(viewModel = uiViewModel)</ID>

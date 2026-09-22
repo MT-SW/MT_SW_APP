@@ -180,7 +180,7 @@ class NoopLocationRepository : LocationRepository {
 class NoopMQTTRepository : MQTTRepository {
     override fun disconnect() {}
 
-    override val proxyMessageFlow: Flow<MqttClientProxyMessage> = emptyFlow()
+    override fun proxyMessageFlow(subscribeAllChannels: Boolean): Flow<MqttClientProxyMessage> = emptyFlow()
 
     override fun publish(topic: String, data: ByteArray, retained: Boolean) {}
 

@@ -27,8 +27,11 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -55,8 +58,8 @@ import org.meshtastic.core.domain.usecase.settings.ImportSecurityConfigUseCase
 import org.meshtastic.core.domain.usecase.settings.InstallProfileUseCase
 import org.meshtastic.core.domain.usecase.settings.ProcessRadioResponseUseCase
 import org.meshtastic.core.domain.usecase.settings.RadioConfigUseCase
-import org.meshtastic.core.domain.usecase.settings.SnifferControlUseCase
 import org.meshtastic.core.domain.usecase.settings.RadioResponseResult
+import org.meshtastic.core.domain.usecase.settings.SnifferControlUseCase
 import org.meshtastic.core.model.Capabilities
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.HamName
@@ -123,8 +126,10 @@ import kotlin.time.Duration.Companion.seconds
 internal val MANUAL_CHANNEL_WRITE_DELAY: Duration = 1.seconds
 private val REMOTE_READ_LATE_RESPONSE_GRACE: Duration = 2.minutes
 
-/** How long to wait for a RESPONSE_SNIFFER_STATE before giving up on the loading spinner (unsupported firmware
- * never answers at all). */
+/**
+ * How long to wait for a RESPONSE_SNIFFER_STATE before giving up on the loading spinner (unsupported firmware never
+ * answers at all).
+ */
 private val SNIFFER_STATE_TIMEOUT: Duration = 5.seconds
 
 /** Data class that represents the current RadioConfig state. */
@@ -149,13 +154,17 @@ data class RadioConfigState(
     /** Whether the device being configured is flagged as a licensed (amateur) operator; gates licensed-only presets. */
     val localIsLicensed: Boolean = false,
     val responseState: ResponseState<Boolean> = ResponseState.Empty,
-    /** Latest RESPONSE_SNIFFER_STATE for the local node, or null if none has arrived yet this connection
-     * (unqueried, or unsupported firmware -- see [SnifferControlUseCase]). */
+    /**
+     * Latest RESPONSE_SNIFFER_STATE for the local node, or null if none has arrived yet this connection (unqueried, or
+     * unsupported firmware -- see [SnifferControlUseCase]).
+     */
     val snifferEnabled: Boolean? = null,
     /** True while a Sniffer state/enable/disable OnDemand request is outstanding. */
     val snifferLoading: Boolean = false,
-    /** Latest RESPONSE_FW_PLUS_VERSION's `version_number` for the local node, or null if none has arrived yet
-     * this connection -- see [SnifferControlUseCase.fwPlusVersionFlow]. */
+    /**
+     * Latest RESPONSE_FW_PLUS_VERSION's `version_number` for the local node, or null if none has arrived yet this
+     * connection -- see [SnifferControlUseCase.fwPlusVersionFlow].
+     */
     val fwPlusVersion: Int? = null,
     val analyticsAvailable: Boolean = true,
     val analyticsEnabled: Boolean = true,
@@ -315,6 +324,17 @@ open class RadioConfigViewModel(
     private val _radioConfigState = MutableStateFlow(RadioConfigState())
     val radioConfigState: StateFlow<RadioConfigState> = _radioConfigState
 
+    private val _snifferEnableFailed = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
+    /**
+     * One-shot signal that a [setSnifferEnabled]`(true)` call timed out with no RESPONSE_SNIFFER_STATE at all -- e.g.
+     * the connected firmware doesn't implement the Sniffer OnDemand protocol. [setSnifferEnabled] already clears
+     * [RadioConfigState.snifferLoading] in that case, but callers need this separate one-shot event to tell the user
+     * the enable attempt specifically failed, rather than just quietly stopping the spinner -- distinct from the
+     * passive support probe every connection already runs (see `requestSnifferState`), which should stay silent.
+     */
+    val snifferEnableFailed: SharedFlow<Unit> = _snifferEnableFailed.asSharedFlow()
+
     fun setPreserveFavorites(preserveFavorites: Boolean) {
         _radioConfigState.update { it.copy(nodeDbResetPreserveFavorites = preserveFavorites) }
     }
@@ -412,7 +432,9 @@ open class RadioConfigViewModel(
         }
             .distinctUntilChanged()
             .flatMapLatest { localNum -> localNum?.let(snifferControlUseCase::snifferEnabledFlow) ?: flowOf(null) }
-            .onEach { enabled -> _radioConfigState.update { it.copy(snifferEnabled = enabled, snifferLoading = false) } }
+            .onEach { enabled ->
+                _radioConfigState.update { it.copy(snifferEnabled = enabled, snifferLoading = false) }
+            }
             .launchIn(viewModelScope)
 
         combine(nodeRepository.myNodeInfo, activeDestNum) { ni, dest ->
@@ -689,8 +711,10 @@ open class RadioConfigViewModel(
         }
     }
 
-    /** Sends REQUEST_SNIFFER_STATE for [localNum] and clears the loading spinner if nothing answers in time --
-     * see [SnifferControlUseCase] for why this can no longer read "supported" off ModuleConfig. */
+    /**
+     * Sends REQUEST_SNIFFER_STATE for [localNum] and clears the loading spinner if nothing answers in time -- see
+     * [SnifferControlUseCase] for why this can no longer read "supported" off ModuleConfig.
+     */
     private fun requestSnifferState(localNum: Int) {
         safeLaunch(tag = "requestSnifferState") {
             _radioConfigState.update { it.copy(snifferLoading = true) }
@@ -700,20 +724,28 @@ open class RadioConfigViewModel(
         }
     }
 
-    /** Sends REQUEST_FW_PLUS_VERSION for [localNum]; see [SnifferControlUseCase.requestFwPlusVersion] and
-     * [SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_SNIFFER] for how the answer feeds Sniffer support detection. */
+    /**
+     * Sends REQUEST_FW_PLUS_VERSION for [localNum]; see [SnifferControlUseCase.requestFwPlusVersion] and
+     * [SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_SNIFFER] for how the answer feeds Sniffer support detection.
+     */
     private fun requestFwPlusVersion(localNum: Int) {
         safeLaunch(tag = "requestFwPlusVersion") { snifferControlUseCase.requestFwPlusVersion(localNum) }
     }
 
-    /** Toggles the Sniffer module on the local node via OnDemand (port 354); see [SnifferControlUseCase]. */
+    /**
+     * Toggles the Sniffer module on the local node via OnDemand (port 354); see [SnifferControlUseCase]. Emits
+     * [snifferEnableFailed] if an `enabled = true` call times out with no response at all, so the caller can tell the
+     * user and back the selection out instead of leaving it looking enabled when it silently isn't.
+     */
     fun setSnifferEnabled(enabled: Boolean) {
         val destNum = destNum ?: destNode.value?.num ?: return
         safeLaunch(tag = "setSnifferEnabled") {
             _radioConfigState.update { it.copy(snifferLoading = true) }
             snifferControlUseCase.setEnabled(destNum, enabled)
             delay(SNIFFER_STATE_TIMEOUT)
-            _radioConfigState.update { if (it.snifferEnabled == null) it.copy(snifferLoading = false) else it }
+            val timedOut = _radioConfigState.value.snifferEnabled == null
+            _radioConfigState.update { if (timedOut) it.copy(snifferLoading = false) else it }
+            if (enabled && timedOut) _snifferEnableFailed.emit(Unit)
         }
     }
 
@@ -1618,9 +1650,10 @@ internal fun Config.saveRebootBehavior(): RebootBehavior = when {
     else -> RebootBehavior.MAY_RESTART
 }
 
-/** Firmware `AdminModule::handleSetModuleConfig` reboots for every module section except status message --
- * it applies live with no reboot and doesn't disable Bluetooth either. The Sniffer toggle used to share this
- * carve-out via its old ModuleConfig field (nodemodadmin); it no longer goes through ModuleConfig at all, see
- * SnifferControlUseCase. */
+/**
+ * Firmware `AdminModule::handleSetModuleConfig` reboots for every module section except status message -- it applies
+ * live with no reboot and doesn't disable Bluetooth either. The Sniffer toggle used to share this carve-out via its old
+ * ModuleConfig field (nodemodadmin); it no longer goes through ModuleConfig at all, see SnifferControlUseCase.
+ */
 internal fun ModuleConfig.saveRebootBehavior(): RebootBehavior =
     if (statusmessage != null) RebootBehavior.NEVER else RebootBehavior.ALWAYS

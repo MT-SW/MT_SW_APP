@@ -76,6 +76,7 @@ import org.meshtastic.core.resources.local_stats_battery
 import org.meshtastic.core.resources.local_stats_diagnostics_prefix
 import org.meshtastic.core.resources.local_stats_dropped
 import org.meshtastic.core.resources.local_stats_heap
+import org.meshtastic.core.resources.local_stats_heap_value_kb
 import org.meshtastic.core.resources.local_stats_nodes
 import org.meshtastic.core.resources.local_stats_noise
 import org.meshtastic.core.resources.local_stats_relays
@@ -109,7 +110,6 @@ import org.meshtastic.proto.LocalStats
 import org.meshtastic.proto.Telemetry
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration.Companion.minutes
-import org.meshtastic.core.resources.local_stats_heap_value_kb
 
 /**
  * Manages the creation and display of all app notifications.
@@ -1164,13 +1164,13 @@ class MeshNotificationManagerImpl(
         if (heap_free_bytes > 0 || heap_total_bytes > 0) {
             parts.add(
                 BULLET +
-                        getStringSuspend(Res.string.local_stats_heap) +
-                        ": " +
-                        getStringSuspend(
-                            Res.string.local_stats_heap_value_kb,
-                            NumberFormatter.format(heap_free_bytes / BYTES_PER_KB, 2),
-                            NumberFormatter.format(heap_total_bytes / BYTES_PER_KB, 2),
-                        ),
+                    getStringSuspend(Res.string.local_stats_heap) +
+                    ": " +
+                    getStringSuspend(
+                        Res.string.local_stats_heap_value_kb,
+                        NumberFormatter.format(heap_free_bytes / BYTES_PER_KB, 2),
+                        NumberFormatter.format(heap_total_bytes / BYTES_PER_KB, 2),
+                    ),
             )
         }
 

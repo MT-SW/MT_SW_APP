@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.model.MeshLog
+import org.meshtastic.core.model.util.ON_DEMAND_PORT_NUM
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeManager
 import org.meshtastic.core.ui.viewmodel.safeLaunch
@@ -36,7 +37,6 @@ import org.meshtastic.proto.OnDemandResponse
 import org.meshtastic.proto.OnDemandType
 import org.meshtastic.proto.Ping
 import org.meshtastic.proto.PortCounterEntry
-import org.meshtastic.core.model.util.ON_DEMAND_PORT_NUM
 import org.meshtastic.proto.RoutingErrorEntry
 
 /** UI state for the OnDemand diagnostics screen — one field per query type. */
@@ -58,18 +58,18 @@ data class OnDemandLogUiState(
 )
 
 /**
- * ViewModel for the OnDemand diagnostics screen. Reads every response type live from [MeshLog] on port
- * port 354 (ON_DEMAND_PORT_NUM; no PortNum constant exists for it, see PrivatePortNum.kt) — nothing new
- * is persisted, matching the app's Network Health/Traceroute precedent.
+ * ViewModel for the OnDemand diagnostics screen. Reads every response type live from [MeshLog] on port port 354
+ * (ON_DEMAND_PORT_NUM; no PortNum constant exists for it, see PrivatePortNum.kt) — nothing new is persisted, matching
+ * the app's Network Health/Traceroute precedent.
  *
  * Nodes Online arrives split across several packets ([OnDemand.packet_index]/[OnDemand.packet_total]);
  * [decodeNodesOnline] merges the newest copy received for each index. Best-effort — not yet verified against real
  * multi-segment traffic.
  *
  * Ping/Ping-Ack round-trip time is measured client-side: [requestPing]/[requestPingAck] stamp the tap time, and
- * [updateRoundTrip] attributes the next newer matching response's [MeshLog.received_date] to it once. Not
- * request-id correlated (OnDemand responses don't carry one) — acceptable for a manually-tapped diagnostics screen
- * with one request in flight at a time.
+ * [updateRoundTrip] attributes the next newer matching response's [MeshLog.received_date] to it once. Not request-id
+ * correlated (OnDemand responses don't carry one) — acceptable for a manually-tapped diagnostics screen with one
+ * request in flight at a time.
  */
 @KoinViewModel
 class OnDemandLogViewModel(
@@ -83,10 +83,15 @@ class OnDemandLogViewModel(
         get() = nodeManager.nodeDBbyNodeNum[destNum]?.user?.long_name.orEmpty()
 
     @Volatile private var pingSentAtMillis: Long? = null
+
     @Volatile private var pingAckSentAtMillis: Long? = null
+
     @Volatile private var lastPingRoundTripMs: Long? = null
+
     @Volatile private var lastPingAckRoundTripMs: Long? = null
+
     @Volatile private var lastAttributedPingReceivedDate: Long = 0L
+
     @Volatile private var lastAttributedPingAckReceivedDate: Long = 0L
 
     val uiState: StateFlow<OnDemandLogUiState> =
@@ -106,18 +111,18 @@ class OnDemandLogViewModel(
                     ?.let { it to log.received_date }
             }
 
-        fun <T> latest(vararg types: OnDemandType, extract: (OnDemandResponse) -> T?): T? =
-            decoded
-                .filter { (od, _) -> od.response?.response_type in types }
-                .maxByOrNull { it.second }
-                ?.first
-                ?.response
-                ?.let(extract)
+        fun <T> latest(vararg types: OnDemandType, extract: (OnDemandResponse) -> T?): T? = decoded
+            .filter { (od, _) -> od.response?.response_type in types }
+            .maxByOrNull { it.second }
+            ?.first
+            ?.response
+            ?.let(extract)
 
         return OnDemandLogUiState(
             nodeStats = latest(OnDemandType.RESPONSE_NODE_STATS) { it.node_stats },
             pingResult = latest(OnDemandType.RESPONSE_PING) { it.ping },
-            pingRoundTripMs = updateRoundTrip(
+            pingRoundTripMs =
+            updateRoundTrip(
                 decoded = decoded,
                 type = OnDemandType.RESPONSE_PING,
                 sentAt = pingSentAtMillis,
@@ -128,7 +133,8 @@ class OnDemandLogViewModel(
                 setLastResult = { lastPingRoundTripMs = it },
             ),
             pingAckResult = latest(OnDemandType.RESPONSE_PING_ACK) { it.ping },
-            pingAckRoundTripMs = updateRoundTrip(
+            pingAckRoundTripMs =
+            updateRoundTrip(
                 decoded = decoded,
                 type = OnDemandType.RESPONSE_PING_ACK,
                 sentAt = pingAckSentAtMillis,
@@ -140,27 +146,26 @@ class OnDemandLogViewModel(
             ),
             nodesOnline = decodeNodesOnline(decoded),
             routingErrors =
-                latest(OnDemandType.RESPONSE_ROUTING_ERRORS) { it.routing_errors }?.routing_errors.orEmpty(),
+            latest(OnDemandType.RESPONSE_ROUTING_ERRORS) { it.routing_errors }?.routing_errors.orEmpty(),
             portCounterHistory =
-                latest(OnDemandType.RESPONSE_PORT_COUNTER_HISTORY) { it.port_counter_history }
-                    ?.port_counter_history
-                    .orEmpty(),
+            latest(OnDemandType.RESPONSE_PORT_COUNTER_HISTORY) { it.port_counter_history }
+                ?.port_counter_history
+                .orEmpty(),
             airActivityHistory =
-                latest(OnDemandType.RESPONSE_AIR_ACTIVITY_HISTORY) { it.air_activity_history }
-                    ?.air_activity_history
-                    .orEmpty(),
+            latest(OnDemandType.RESPONSE_AIR_ACTIVITY_HISTORY) { it.air_activity_history }
+                ?.air_activity_history
+                .orEmpty(),
             exchangeLog =
-                latest(OnDemandType.RESPONSE_PACKET_EXCHANGE_HISTORY) { it.exchange_packet_log }
-                    ?.exchange_list
-                    .orEmpty(),
+            latest(OnDemandType.RESPONSE_PACKET_EXCHANGE_HISTORY) { it.exchange_packet_log }
+                ?.exchange_list
+                .orEmpty(),
             rxAvgTimeHistory =
-                latest(OnDemandType.RESPONSE_RX_AVG_TIME) { it.rx_avg_time_history }?.rx_avg_history.orEmpty(),
+            latest(OnDemandType.RESPONSE_RX_AVG_TIME) { it.rx_avg_time_history }?.rx_avg_history.orEmpty(),
             rxPacketHistory =
-                latest(OnDemandType.RESPONSE_PACKET_RX_HISTORY) { it.rx_packet_history }
-                    ?.rx_packet_history
-                    .orEmpty(),
+            latest(OnDemandType.RESPONSE_PACKET_RX_HISTORY) { it.rx_packet_history }?.rx_packet_history.orEmpty(),
             fwPlusVersion = latest(OnDemandType.RESPONSE_FW_PLUS_VERSION) { it.fw_plus_version },
-            receivedAt = decoded
+            receivedAt =
+            decoded
                 .mapNotNull { (od, ts) -> od.response?.response_type?.let { it to ts } }
                 .groupBy({ it.first }, { it.second })
                 .mapValues { (_, timestamps) -> timestamps.max() },
@@ -168,8 +173,8 @@ class OnDemandLogViewModel(
     }
 
     /**
-     * Attributes the most recent [type] response's timestamp to the pending request's send time, once, then
-     * remembers that result until the next request overwrites it.
+     * Attributes the most recent [type] response's timestamp to the pending request's send time, once, then remembers
+     * that result until the next request overwrites it.
      */
     private fun updateRoundTrip(
         decoded: List<Pair<OnDemand, Long>>,

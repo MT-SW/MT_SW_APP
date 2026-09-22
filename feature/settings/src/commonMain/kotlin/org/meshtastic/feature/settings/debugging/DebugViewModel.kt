@@ -448,5 +448,4 @@ class DebugViewModel(
     fun setSelectedLogId(id: String?) {
         _selectedLogId.value = id
     }
-
 }

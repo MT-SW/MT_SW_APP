@@ -30,8 +30,10 @@ import org.meshtastic.core.model.util.crc32
 import org.meshtastic.core.model.util.platformRandomBytes
 import org.meshtastic.core.model.util.x25519PublicKey
 
-/** Result of a successful grind: the private key found, and the actual node color it produces (may differ slightly
- * from the requested target — up to [tolerance] per channel). */
+/**
+ * Result of a successful grind: the private key found, and the actual node color it produces (may differ slightly from
+ * the requested target — up to [tolerance] per channel).
+ */
 data class VanityKeyResult(val privateKey: ByteString, val nodeColor: Int)
 
 /**
@@ -41,8 +43,8 @@ data class VanityKeyResult(val privateKey: ByteString, val nodeColor: Int)
  * "Node color" means what [nodeColorsFromNum] would paint the node once connected: the low 24 bits of
  * `crc32(public_key)`, matching both the colleague's mvgrind tool and firmware v2.8+'s nodeNum derivation. Each
  * candidate is an independent random key — a plain parallel random search, not mvgrind's optimized incremental
- * point-addition grinder — so a tight tolerance (or an exact match) can take a while; a tolerance of a few units
- * per channel keeps it fast, the same trade `--tol` makes in mvgrind itself.
+ * point-addition grinder — so a tight tolerance (or an exact match) can take a while; a tolerance of a few units per
+ * channel keeps it fast, the same trade `--tol` makes in mvgrind itself.
  */
 @Single
 open class GenerateVanityKeyUseCase {
@@ -79,12 +81,11 @@ open class GenerateVanityKeyUseCase {
         return key
     }
 
-    private fun colorWithinTolerance(a: Int, b: Int, tolerance: Int): Boolean =
-        CHANNEL_SHIFTS.all { shift ->
-            val ca = (a shr shift) and 0xFF
-            val cb = (b shr shift) and 0xFF
-            kotlin.math.abs(ca - cb) <= tolerance
-        }
+    private fun colorWithinTolerance(a: Int, b: Int, tolerance: Int): Boolean = CHANNEL_SHIFTS.all { shift ->
+        val ca = (a shr shift) and 0xFF
+        val cb = (b shr shift) and 0xFF
+        kotlin.math.abs(ca - cb) <= tolerance
+    }
 
     companion object {
         private const val PRIVATE_KEY_SIZE = 32

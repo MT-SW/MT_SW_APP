@@ -67,6 +67,7 @@ import org.meshtastic.core.resources.license_notice
 import org.meshtastic.core.resources.need_hardware
 import org.meshtastic.core.resources.need_hardware_description
 import org.meshtastic.core.resources.project_information
+import org.meshtastic.core.resources.unofficial_fork_disclaimer
 import org.meshtastic.core.resources.website
 import org.meshtastic.core.resources.what_is_meshtastic
 import org.meshtastic.core.resources.what_is_meshtastic_description
@@ -82,7 +83,6 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Notes
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.feature.settings.component.ExpressiveSection
-import org.meshtastic.core.resources.unofficial_fork_disclaimer
 
 private const val CAROUSEL_INTERVAL_MS = 3000L
 private const val CROSSFADE_DURATION_MS = 500

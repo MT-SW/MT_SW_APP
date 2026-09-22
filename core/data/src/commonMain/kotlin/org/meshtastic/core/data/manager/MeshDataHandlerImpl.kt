@@ -493,8 +493,8 @@ class MeshDataHandlerImpl(
             if (existingPackets.any { it.hasSameSenderAs(dataPacket, myNodeNum) }) {
                 Logger.d {
                     "Skipping duplicate packet: packetId=${dataPacket.id} from=${dataPacket.from} " +
-                            "to=${dataPacket.to} contactKey=$contactKey" +
-                            " (already have ${existingPackets.size} packet(s))"
+                        "to=${dataPacket.to} contactKey=$contactKey" +
+                        " (already have ${existingPackets.size} packet(s))"
                 }
                 return
             }
@@ -632,11 +632,11 @@ class MeshDataHandlerImpl(
                     snr = packet.snrOrNull() ?: 0f,
                     rssi = packet.rx_rssi,
                     hopsAway =
-                        if (packet.hop_start == 0 || packet.hop_limit > packet.hop_start) {
-                            HOPS_AWAY_UNAVAILABLE
-                        } else {
-                            packet.hop_start - packet.hop_limit
-                        },
+                    if (packet.hop_start == 0 || packet.hop_limit > packet.hop_start) {
+                        HOPS_AWAY_UNAVAILABLE
+                    } else {
+                        packet.hop_start - packet.hop_limit
+                    },
                     packetId = packet.id,
                     status = MessageStatus.RECEIVED,
                     to = toId,
@@ -648,7 +648,7 @@ class MeshDataHandlerImpl(
             if (existingReactions.any { it.user.id == fromId }) {
                 Logger.d {
                     "Skipping duplicate reaction: packetId=${packet.id} replyId=${decoded.reply_id} " +
-                            "(already have ${existingReactions.size} reaction(s))"
+                        "(already have ${existingReactions.size} reaction(s))"
                 }
                 return@launchSessionWork
             }

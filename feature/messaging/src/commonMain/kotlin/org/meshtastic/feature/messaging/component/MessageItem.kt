@@ -40,6 +40,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -84,10 +85,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import co.touchlab.kermit.Logger
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.DateFormatter
@@ -120,10 +123,14 @@ import org.meshtastic.core.ui.icon.FormatQuote
 import org.meshtastic.core.ui.icon.HopCount
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Reply
+import org.meshtastic.core.ui.icon.Save
 import org.meshtastic.core.ui.icon.ShieldCheck
 import org.meshtastic.core.ui.theme.MessageItemColors
 import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
 import org.meshtastic.core.ui.util.createClipEntry
+import org.meshtastic.feature.messaging.downloadImageBytes
+import org.meshtastic.feature.messaging.rememberImageSaver
+import org.meshtastic.feature.messaging.toImageFileExtension
 
 internal const val MESSAGE_STATUS_LABEL_TEST_TAG = "message_status_label"
 
@@ -520,9 +527,9 @@ fun MessageItem(
                             contentScale = ContentScale.Fit,
                             onError = { linkImageFailed = true },
                             modifier =
-                                Modifier.padding(top = 8.dp).fillMaxWidth().heightIn(max = 240.dp).clickable {
-                                    fullScreenImageUrl = linkUrl
-                                },
+                            Modifier.padding(top = 8.dp).fillMaxWidth().heightIn(max = 240.dp).clickable {
+                                fullScreenImageUrl = linkUrl
+                            },
                         )
                     }
 
@@ -810,9 +817,42 @@ private fun FullScreenImageViewer(imageUrl: String, onDismiss: () -> Unit) {
                         )
                     },
             )
+            SaveImageButton(imageUrl = imageUrl, modifier = Modifier.align(Alignment.TopStart).padding(16.dp))
             IconButton(onClick = onDismiss, modifier = Modifier.align(Alignment.TopEnd).padding(16.dp)) {
                 Icon(imageVector = MeshtasticIcons.Close, contentDescription = "Zamknij", tint = Color.White)
             }
+        }
+    }
+}
+
+/** Downloads [imageUrl]'s bytes and hands them to the platform's save-file flow; shows a spinner while working. */
+@Composable
+private fun SaveImageButton(imageUrl: String, modifier: Modifier = Modifier) {
+    val scope = rememberCoroutineScope()
+    val imageSaver = rememberImageSaver()
+    var isSaving by remember(imageUrl) { mutableStateOf(false) }
+    IconButton(
+        modifier = modifier,
+        enabled = !isSaving,
+        onClick = {
+            isSaving = true
+            scope.launch {
+                val downloaded = downloadImageBytes(imageUrl)
+                isSaving = false
+                if (downloaded == null) {
+                    Logger.e { "SaveImageButton: failed to download image: $imageUrl" }
+                } else {
+                    val timestamp = Clock.System.now().toEpochMilliseconds()
+                    val ext = downloaded.mimeType.toImageFileExtension()
+                    imageSaver.save(downloaded.bytes, "meshtastic_$timestamp.$ext", downloaded.mimeType)
+                }
+            }
+        },
+    ) {
+        if (isSaving) {
+            CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
+        } else {
+            Icon(imageVector = MeshtasticIcons.Save, contentDescription = "Zapisz zdjęcie", tint = Color.White)
         }
     }
 }

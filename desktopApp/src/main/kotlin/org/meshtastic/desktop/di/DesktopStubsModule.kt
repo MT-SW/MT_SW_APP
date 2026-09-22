@@ -58,10 +58,8 @@ class DesktopStubsModule {
     fun desktopNodeCleanupScheduler(
         uiPrefs: UiPrefs,
         cleanNodeDatabaseUseCase: CleanNodeDatabaseUseCase,
-    ): DesktopNodeCleanupScheduler = DesktopNodeCleanupScheduler(
-        uiPrefs = uiPrefs,
-        cleanNodeDatabaseUseCase = cleanNodeDatabaseUseCase,
-    )
+    ): DesktopNodeCleanupScheduler =
+        DesktopNodeCleanupScheduler(uiPrefs = uiPrefs, cleanNodeDatabaseUseCase = cleanNodeDatabaseUseCase)
 
     @Single fun meshLocationManager(): MeshLocationManager = NoopMeshLocationManager()
 

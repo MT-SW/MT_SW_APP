@@ -51,8 +51,6 @@ import org.meshtastic.feature.settings.appfunctions.AppFunctionsSettingsScreen
 import org.meshtastic.feature.settings.appfunctions.AppFunctionsSettingsViewModel
 import org.meshtastic.feature.settings.debugging.DebugScreen
 import org.meshtastic.feature.settings.debugging.DebugViewModel
-import org.meshtastic.feature.settings.sniffer.SnifferLogScreen
-import org.meshtastic.feature.settings.sniffer.SnifferLogViewModel
 import org.meshtastic.feature.settings.filter.FilterSettingsScreen
 import org.meshtastic.feature.settings.filter.FilterSettingsViewModel
 import org.meshtastic.feature.settings.radio.CleanNodeDatabaseScreen
@@ -85,6 +83,10 @@ import org.meshtastic.feature.settings.radio.component.TakServerScreen
 import org.meshtastic.feature.settings.radio.component.TelemetryConfigScreen
 import org.meshtastic.feature.settings.radio.component.TrafficManagementConfigScreen
 import org.meshtastic.feature.settings.radio.component.UserConfigScreen
+import org.meshtastic.feature.settings.sniffer.SnifferLogViewModel
+import org.meshtastic.feature.settings.sniffer.SnifferPanelViewModel
+import org.meshtastic.feature.settings.sniffer.SnifferSettingsScreen
+import org.meshtastic.feature.settings.sniffer.mqtt.MqttSnifferLogViewModel
 import kotlin.reflect.KClass
 
 /**
@@ -422,9 +424,17 @@ fun EntryProviderScope<NavKey>.settingsGraph(
         DebugScreen(viewModel = viewModel, onNavigateUp = dropUnlessResumed { backStack.removeLastOrNull() })
     }
 
-    entry<SettingsRoute.SnifferLog> {
-        val viewModel: SnifferLogViewModel = koinViewModel()
-        SnifferLogScreen(viewModel = viewModel, onNavigateUp = dropUnlessResumed { backStack.removeLastOrNull() })
+    entry<SettingsRoute.Sniffer> {
+        val radioLogViewModel: SnifferLogViewModel = koinViewModel()
+        val mqttViewModel: MqttSnifferLogViewModel = koinViewModel()
+        val panelViewModel: SnifferPanelViewModel = koinViewModel()
+        SnifferSettingsScreen(
+            radioConfigViewModel = radioConfigViewModelProvider(null),
+            radioLogViewModel = radioLogViewModel,
+            mqttViewModel = mqttViewModel,
+            panelViewModel = panelViewModel,
+            onBack = dropUnlessResumed { backStack.removeLastOrNull() },
+        )
     }
 
     entry<SettingsRoute.About> {

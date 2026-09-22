@@ -274,8 +274,8 @@ interface UiPrefs {
     suspend fun awaitAutoCleanNodesPolicy(): AutoCleanNodesPolicy
 
     /**
-     * Epoch millis of the last successful auto-clean run. Used on platforms with no OS-level job scheduler (Desktop)
-     * to space runs roughly [AutoCleanNodesPolicy.checkIntervalDays] apart across app restarts.
+     * Epoch millis of the last successful auto-clean run. Used on platforms with no OS-level job scheduler (Desktop) to
+     * space runs roughly [AutoCleanNodesPolicy.checkIntervalDays] apart across app restarts.
      */
     val autoCleanNodesLastRunMillis: StateFlow<Long>
 

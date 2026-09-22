@@ -24,8 +24,8 @@ import kotlin.time.Duration.Companion.days
 
 /**
  * Desktop equivalent of the Android `NodeCleanupWorker`. There is no WorkManager on the JVM, so the caller (see
- * `NodeCleanupLifecycle` in `Main.kt`) drives this with a simple periodic loop for the lifetime of the app process.
- * The last successful run is tracked in [UiPrefs.autoCleanNodesLastRunMillis] so runs stay spaced roughly
+ * `NodeCleanupLifecycle` in `Main.kt`) drives this with a simple periodic loop for the lifetime of the app process. The
+ * last successful run is tracked in [UiPrefs.autoCleanNodesLastRunMillis] so runs stay spaced roughly
  * `AutoCleanNodesPolicy.checkIntervalDays` apart across app restarts.
  */
 class DesktopNodeCleanupScheduler(

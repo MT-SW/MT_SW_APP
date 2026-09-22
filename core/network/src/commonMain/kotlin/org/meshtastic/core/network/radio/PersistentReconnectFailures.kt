@@ -26,15 +26,15 @@ import kotlin.time.Duration.Companion.minutes
  *
  * [BleReconnectPolicy] and [GattCacheInvalidationGate] both live inside a single [BleRadioTransport], which is
  * recreated whenever the user manually stops and restarts a connection ("Stop Connecting", or picking a different
- * device and back). That recreation resets every in-memory failure counter to zero — so a user who reacts to a
- * stuck "Not connected" screen by stopping and retrying every 20-30 seconds never lets a single streak reach
- * [GattCacheInvalidationGate.DEFAULT_FAILURE_THRESHOLD], even though the underlying stale-cache condition
- * (issue #6685) hasn't changed between those attempts.
+ * device and back). That recreation resets every in-memory failure counter to zero — so a user who reacts to a stuck
+ * "Not connected" screen by stopping and retrying every 20-30 seconds never lets a single streak reach
+ * [GattCacheInvalidationGate.DEFAULT_FAILURE_THRESHOLD], even though the underlying stale-cache condition (issue #6685)
+ * hasn't changed between those attempts.
  *
  * This object persists a small failure count per address for the lifetime of the process, independent of transport
- * recreation, so repeated manual retries accumulate towards the same threshold instead of resetting it. Entries
- * older than [STALE_AFTER] are dropped so a failure from a much earlier, unrelated session can't wrongly bank
- * itself into a later attempt.
+ * recreation, so repeated manual retries accumulate towards the same threshold instead of resetting it. Entries older
+ * than [STALE_AFTER] are dropped so a failure from a much earlier, unrelated session can't wrongly bank itself into a
+ * later attempt.
  */
 internal object PersistentReconnectFailures {
 

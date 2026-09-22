@@ -66,7 +66,6 @@ import org.meshtastic.core.resources.load_indexed
 import org.meshtastic.core.resources.local_stats_cpu
 import org.meshtastic.core.resources.local_stats_flash
 import org.meshtastic.core.resources.local_stats_heap
-import org.meshtastic.core.resources.local_stats_heap_value
 import org.meshtastic.core.resources.local_stats_psram
 import org.meshtastic.core.resources.uptime
 import org.meshtastic.core.resources.user_string
@@ -147,19 +146,19 @@ private fun HostMetricsCard(telemetryGroup: List<Telemetry>, isSelected: Boolean
     Box {
         Card(
             modifier =
-                Modifier.fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-                    .combinedClickable(onClick = onClick, onLongClick = { expanded = true }),
+            Modifier.fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+                .combinedClickable(onClick = onClick, onLongClick = { expanded = true }),
             border = if (isSelected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
             colors =
-                CardDefaults.cardColors(
-                    containerColor =
-                        if (isSelected) {
-                            MaterialTheme.colorScheme.primaryContainer
-                        } else {
-                            MaterialTheme.colorScheme.surfaceVariant
-                        },
-                ),
+            CardDefaults.cardColors(
+                containerColor =
+                if (isSelected) {
+                    MaterialTheme.colorScheme.primaryContainer
+                } else {
+                    MaterialTheme.colorScheme.surfaceVariant
+                },
+            ),
         ) {
             HostMetricsCardContent(
                 time = time,
@@ -229,13 +228,17 @@ private fun HostMetricsCardContent(
             if (ext.flashTotalBytes > 0) {
                 LogLine(
                     label = stringResource(Res.string.local_stats_flash),
-                    value = "${formatBytes(ext.flashUsedBytes.toLong())} / ${formatBytes(ext.flashTotalBytes.toLong())}",
+                    value =
+                    "${formatBytes(
+                        ext.flashUsedBytes.toLong(),
+                    )} / ${formatBytes(ext.flashTotalBytes.toLong())}",
                 )
             }
             if (ext.memoryPsramTotal > 0) {
                 LogLine(
                     label = stringResource(Res.string.local_stats_psram),
-                    value = "${formatBytes(ext.memoryPsramFree.toLong())} / ${formatBytes(ext.memoryPsramTotal.toLong())}",
+                    value =
+                    "${formatBytes(ext.memoryPsramFree.toLong())} / ${formatBytes(ext.memoryPsramTotal.toLong())}",
                 )
             }
         }

@@ -85,7 +85,8 @@ class MqttManagerImpl(
         if (enabled && proxyToClientEnabled) {
             _proxyActive.value = true
             mqttMessageFlow =
-                mqttRepository.proxyMessageFlow
+                mqttRepository
+                    .proxyMessageFlow()
                     .onEach { message ->
                         packetHandler.sendToRadio(
                             ToRadio.Builder().also { wb -> wb.mqttClientProxyMessage = message }.build(),

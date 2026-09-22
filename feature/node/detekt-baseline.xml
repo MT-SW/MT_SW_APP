@@ -11,8 +11,6 @@
     <ID>ComposableParamOrder:LastHeardInfo.kt:@Composable fun LastHeardInfo</ID>
     <ID>ComposableParamOrder:NeighborInfoLog.kt:@OptIn(ExperimentalFoundationApi::class) @Suppress("LongMethod", "CyclomaticComplexMethod") @Composable fun NeighborInfoLogScreen</ID>
     <ID>ComposableParamOrder:NodeDetailScreens.kt:@Composable fun NodeDetailScreen</ID>
-    <ID>ComposableParamOrder:NodeFilterTextField.kt:@Suppress("LongParameterList") @Composable fun NodeFilterTextField</ID>
-    <ID>ComposableParamOrder:NodeItem.kt:@Composable @Suppress("LongMethod") fun NodeItem</ID>
     <ID>ComposableParamOrder:PaxMetrics.kt:@Suppress("LongMethod") @Composable private fun PaxMetricsChart</ID>
     <ID>ComposableParamOrder:PowerMetrics.kt:@Suppress("LongMethod") @Composable private fun PowerMetricsChart</ID>
     <ID>ComposableParamOrder:SignalMetrics.kt:@Suppress("LongMethod", "CyclomaticComplexMethod") @Composable private fun SignalMetricsChart</ID>
@@ -21,30 +19,55 @@
     <ID>ComposableParamOrder:TracerouteMapScreen.kt:@Composable private fun TracerouteNodeCount</ID>
     <ID>ContentSlotReused:BaseMetricChart.kt:chartPart: @Composable (Modifier) -> Unit</ID>
     <ID>ContentSlotReused:BaseMetricChart.kt:listPart: @Composable (Modifier) -> Unit</ID>
+    <ID>DestructuringDeclarationWithTooManyEntries:NetworkHealthViewModel.kt:NetworkHealthViewModel$val (sortField, sortAscending, favoritesFirst, hideWithoutData, searchText) = sortSettings</ID>
+    <ID>Kdoc:NetworkHealthViewModel.kt:/** Extracts this metric's value from a raw history entry, for sparkline plotting. */</ID>
+    <ID>Kdoc:NodeDetailAction.kt:NodeDetailAction$/** Reads the GPIO pins in [gpioMask] on [destNum], via the Remote Hardware module. */</ID>
     <ID>LambdaParameterEventTrailing:DeviceMetrics.kt:onPointSelected: (Double) -> Unit</ID>
     <ID>LambdaParameterEventTrailing:EnvironmentCharts.kt:onPointSelected: (Double) -> Unit</ID>
     <ID>LambdaParameterEventTrailing:HostMetricsChart.kt:onPointSelected: (Double) -> Unit</ID>
     <ID>LambdaParameterEventTrailing:NeighborInfoLog.kt:onNavigateUp: () -> Unit</ID>
-    <ID>LambdaParameterEventTrailing:NodeFilterTextField.kt:onToggleExcludeMqtt: () -> Unit</ID>
     <ID>LambdaParameterEventTrailing:PaxMetrics.kt:onPointSelected: (Double) -> Unit</ID>
     <ID>LambdaParameterEventTrailing:PowerMetrics.kt:onPointSelected: (Double) -> Unit</ID>
     <ID>LambdaParameterEventTrailing:SignalMetrics.kt:onPointSelected: (Double) -> Unit</ID>
     <ID>LambdaParameterEventTrailing:TracerouteChart.kt:onPointSelected: (Double) -> Unit</ID>
     <ID>LambdaParameterInRestartableEffect:NodeDetailScreens.kt:onNavigate: (Route) -> Unit = {}</ID>
+    <ID>LongMethod:AdministrationSection.kt:@OptIn(ExperimentalMaterial3Api::class) @Composable private fun RemoteNodeManagementCard</ID>
+    <ID>LongMethod:HostMetricsChart.kt:internal fun buildHostMetricsChartData: HostMetricsChartData</ID>
+    <ID>LongMethod:NetworkSummaryScreen.kt:@Composable fun NetworkSummaryScreen</ID>
+    <ID>LongMethod:NodeMetricDetailScreen.kt:@Composable fun NodeMetricDetailScreen</ID>
+    <ID>LongMethod:OnDemandLogScreen.kt:@Composable fun OnDemandLogScreen</ID>
+    <ID>MagicNumber:AdministrationSection.kt:16</ID>
+    <ID>MagicNumber:AdministrationSection.kt:62</ID>
     <ID>MagicNumber:CompassViewModel.kt:CompassViewModel$180.0</ID>
-    <ID>ModifierMissing:BaseMetricChart.kt:@Composable @Suppress("LongMethod") fun &lt;T> BaseMetricScreen</ID>
+    <ID>MagicNumber:NeighborInfoSummaryViewModel.kt:NeighborInfoSummaryViewModel$16</ID>
+    <ID>MagicNumber:NetworkSummaryViewModel.kt:NetworkSummaryViewModel$100</ID>
+    <ID>MagicNumber:NetworkSummaryViewModel.kt:NetworkSummaryViewModel$3</ID>
+    <ID>MagicNumber:NetworkSummaryViewModel.kt:NetworkSummaryViewModel$4</ID>
+    <ID>MagicNumber:NetworkSummaryViewModel.kt:NetworkSummaryViewModel$5</ID>
+    <ID>MagicNumber:NetworkSummaryViewModel.kt:NetworkSummaryViewModel$6</ID>
+    <ID>MagicNumber:NodeMetricDetailViewModel.kt:NodeMetricRange.DAY$1000L</ID>
+    <ID>MagicNumber:NodeMetricDetailViewModel.kt:NodeMetricRange.DAY$24</ID>
+    <ID>MagicNumber:NodeMetricDetailViewModel.kt:NodeMetricRange.DAY$60</ID>
+    <ID>MagicNumber:NodeMetricDetailViewModel.kt:NodeMetricRange.MONTH$1000L</ID>
+    <ID>MagicNumber:NodeMetricDetailViewModel.kt:NodeMetricRange.MONTH$24</ID>
+    <ID>MagicNumber:NodeMetricDetailViewModel.kt:NodeMetricRange.MONTH$30L</ID>
+    <ID>MagicNumber:NodeMetricDetailViewModel.kt:NodeMetricRange.MONTH$60</ID>
+    <ID>MagicNumber:NodeMetricDetailViewModel.kt:NodeMetricRange.WEEK$1000L</ID>
+    <ID>MagicNumber:NodeMetricDetailViewModel.kt:NodeMetricRange.WEEK$24</ID>
+    <ID>MagicNumber:NodeMetricDetailViewModel.kt:NodeMetricRange.WEEK$60</ID>
+    <ID>MagicNumber:NodeMetricDetailViewModel.kt:NodeMetricRange.WEEK$7</ID>
     <ID>ModifierMissing:CommonCharts.kt:@Composable fun LegendIndicator</ID>
     <ID>ModifierMissing:DeviceMetrics.kt:@Suppress("LongMethod") @Composable fun DeviceMetricsScreen</ID>
     <ID>ModifierMissing:EnvironmentMetrics.kt:@Composable fun EnvironmentMetricsScreen</ID>
     <ID>ModifierMissing:HostMetricsLog.kt:@OptIn(ExperimentalFoundationApi::class) @Suppress("LongMethod") @Composable fun HostMetricsLogScreen</ID>
     <ID>ModifierMissing:LinkedCoordinatesItem.kt:@OptIn(ExperimentalFoundationApi::class) @Composable fun LinkedCoordinatesItem</ID>
     <ID>ModifierMissing:MetricLogComponents.kt:@Composable fun DeleteItem</ID>
+    <ID>ModifierMissing:OnDemandLogScreen.kt:@Composable fun OnDemandLogScreen</ID>
     <ID>ModifierMissing:PaxMetrics.kt:@Composable @Suppress("MagicNumber", "LongMethod") fun PaxMetricsScreen</ID>
     <ID>ModifierMissing:PaxMetrics.kt:@Composable fun PaxMetricsItem</ID>
     <ID>ModifierMissing:PositionLogComponents.kt:@Composable @Suppress("LongMethod") fun PositionCard</ID>
     <ID>ModifierMissing:PositionLogScreens.kt:@Composable fun PositionLogScreen</ID>
     <ID>ModifierMissing:PowerMetrics.kt:@Suppress("LongMethod") @Composable fun PowerMetricsScreen</ID>
-    <ID>ModifierMissing:SignalMetrics.kt:@Suppress("LongMethod") @Composable fun SignalMetricsScreen</ID>
     <ID>ModifierNotUsedAtRoot:NeighborInfoLog.kt:modifier = modifier.fillMaxSize().padding(innerPadding)</ID>
     <ID>ModifierNotUsedAtRoot:TracerouteMapScreen.kt:modifier = modifier.fillMaxSize().padding(paddingValues)</ID>
     <ID>ModifierWithoutDefault:NodeDetailScreens.kt:modifier: Modifier</ID>
@@ -59,7 +82,6 @@
     <ID>ParameterNaming:DeviceMetrics.kt:onPointSelected: (Double) -> Unit</ID>
     <ID>ParameterNaming:EnvironmentCharts.kt:onPointSelected: (Double) -> Unit</ID>
     <ID>ParameterNaming:HostMetricsChart.kt:onPointSelected: (Double) -> Unit</ID>
-    <ID>ParameterNaming:NodeFilterTextField.kt:onToggleShowIgnored: () -> Unit</ID>
     <ID>ParameterNaming:PaxMetrics.kt:onPointSelected: (Double) -> Unit</ID>
     <ID>ParameterNaming:PowerMetrics.kt:onPointSelected: (Double) -> Unit</ID>
     <ID>ParameterNaming:SignalMetrics.kt:onPointSelected: (Double) -> Unit</ID>
@@ -77,13 +99,11 @@
     <ID>PreviewPublic:NodeDetailPreviews.kt:@PreviewLightDark @Composable fun NodeDetailContentLoadingPreview</ID>
     <ID>PreviewPublic:NodeDetailPreviews.kt:@PreviewLightDark @Composable fun NodeDetailContentLocalPreview</ID>
     <ID>PreviewPublic:NodeDetailPreviews.kt:@PreviewLightDark @Composable fun NodeDetailContentRemotePreview</ID>
-    <ID>PreviewPublic:NodeListItemPreviews.kt:@PreviewLightDark @Composable fun NodeItemCompactActivePreview</ID>
-    <ID>PreviewPublic:NodeListItemPreviews.kt:@PreviewLightDark @Composable fun NodeItemCompactAllFieldsPreview</ID>
-    <ID>PreviewPublic:NodeListItemPreviews.kt:@PreviewLightDark @Composable fun NodeItemCompactMinimalPreview</ID>
-    <ID>PreviewPublic:NodeListItemPreviews.kt:@PreviewLightDark @Composable fun NodeItemCompleteActivePreview</ID>
-    <ID>PreviewPublic:NodeListItemPreviews.kt:@PreviewLightDark @Composable fun NodeItemCompletePreview</ID>
+    <ID>ReturnCount:NetworkHealthViewModel.kt:internal fun org.meshtastic.core.model.MeshLog.toHistoryEntry: org.meshtastic.core.model.NodeMetricsHistoryEntry?</ID>
+    <ID>ReturnCount:NetworkHealthViewModel.kt:internal fun org.meshtastic.core.model.MeshLog.toSignalHistoryEntry: org.meshtastic.core.model.NodeMetricsHistoryEntry?</ID>
     <ID>TooGenericExceptionCaught:MetricsViewModel.kt:MetricsViewModel$e: Exception</ID>
-    <ID>TooGenericExceptionCaught:NodeManagementActions.kt:NodeManagementActions$ex: Exception</ID>
+    <ID>TooManyFunctions:NodeDetailViewModel.kt:NodeDetailViewModel : ViewModel</ID>
+    <ID>TooManyFunctions:OnDemandLogViewModel.kt:OnDemandLogViewModel : ViewModel</ID>
     <ID>ViewModelForwarding:NodeDetailScreens.kt:NodeDetailScaffold( modifier = modifier, uiState = uiState, viewModel = viewModel, navigateToMessages = navigateToMessages, onNavigate = onNavigate, onNavigateUp = onNavigateUp, compassViewModel = compassViewModel, )</ID>
   </CurrentIssues>
 </SmellBaseline>

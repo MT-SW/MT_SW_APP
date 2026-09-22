@@ -20,18 +20,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
@@ -66,17 +61,9 @@ import org.meshtastic.core.resources.nodedb_reset
 import org.meshtastic.core.resources.reboot
 import org.meshtastic.core.resources.set_time
 import org.meshtastic.core.resources.shutdown
-import org.meshtastic.core.resources.sniffer_enabled_summary
-import org.meshtastic.core.resources.sniffer_enabled_title
-import org.meshtastic.core.resources.sniffer_not_supported_summary
-import org.meshtastic.core.resources.sniffer_warning_accept
-import org.meshtastic.core.resources.sniffer_warning_cancel
-import org.meshtastic.core.resources.sniffer_warning_compatibility
-import org.meshtastic.core.resources.sniffer_warning_message
-import org.meshtastic.core.resources.sniffer_warning_title
+import org.meshtastic.core.resources.sniffer_settings_title
 import org.meshtastic.core.resources.tak_server
 import org.meshtastic.core.ui.component.ListItem
-import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.icon.AdminPanelSettings
 import org.meshtastic.core.ui.icon.AppSettingsAlt
 import org.meshtastic.core.ui.icon.BugReport
@@ -85,13 +72,12 @@ import org.meshtastic.core.ui.icon.CleaningServices
 import org.meshtastic.core.ui.icon.Download
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PermScanWifi
+import org.meshtastic.core.ui.icon.Rssi
 import org.meshtastic.core.ui.icon.Settings
 import org.meshtastic.core.ui.icon.SystemUpdate
 import org.meshtastic.core.ui.icon.Upload
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.navigation.ConfigRoute
-import org.meshtastic.core.resources.sniffer_log_title
-import org.meshtastic.core.ui.icon.Rssi
 
 @Composable
 fun RadioConfigItemList(
@@ -113,8 +99,9 @@ fun RadioConfigItemList(
     // version (RESPONSE_FW_PLUS_VERSION) is at or past MIN_FW_PLUS_VERSION_FOR_SNIFFER -- letting fw+ builds that
     // know they support Sniffer say so immediately, instead of waiting out the state-request timeout below. A
     // firmware that answers neither settles to false once that timeout elapses.
-    val snifferSupported = state.snifferEnabled != null ||
-        (state.fwPlusVersion?.let { it >= SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_SNIFFER } == true)
+    val snifferSupported =
+        state.snifferEnabled != null ||
+            (state.fwPlusVersion?.let { it >= SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_SNIFFER } == true)
 
     LaunchedEffect(state.responseState) {
         if (state.responseState is ResponseState.Success || state.responseState is ResponseState.Error) {
@@ -224,6 +211,7 @@ private fun ColumnScope.AdministrationContent(enabled: Boolean, onNavigate: (Rou
 }
 
 @Composable
+@Suppress("UNUSED_PARAMETER") // sniffer_* params kept for call-site stability; the Sniffer screen now owns this logic
 private fun AdvancedSection(
     isManaged: Boolean,
     isOtaCapable: Boolean,
@@ -277,43 +265,12 @@ private fun AdvancedSection(
             onClick = { onNavigate(SettingsRoute.DebugPanel) },
         )
 
-        var showSnifferWarning by remember { mutableStateOf(false) }
-
-        SwitchPreference(
-            title = stringResource(Res.string.sniffer_enabled_title),
-            enabled = enabled && !snifferLoading && snifferSupported,
-            loading = snifferLoading,
-            checked = snifferEnabled,
-            onCheckedChange = { checked ->
-                if (checked) {
-                    showSnifferWarning = true
-                } else {
-                    onSetSnifferEnabled(false)
-                }
-            },
-            summary =
-                if (snifferSupported) {
-                    stringResource(Res.string.sniffer_enabled_summary)
-                } else {
-                    stringResource(Res.string.sniffer_not_supported_summary)
-                },
-        )
-
-        if (showSnifferWarning) {
-            SnifferWarningDialog(
-                onConfirm = {
-                    showSnifferWarning = false
-                    onSetSnifferEnabled(true)
-                },
-                onDismiss = { showSnifferWarning = false },
-            )
-        }
-
+        // Radio + MQTT Sniffer live together on one combined settings screen now -- see SnifferSettingsScreen.
         ListItem(
-            text = stringResource(Res.string.sniffer_log_title),
+            text = stringResource(Res.string.sniffer_settings_title),
             leadingIcon = MeshtasticIcons.Rssi,
-            enabled = snifferEnabled,
-            onClick = { onNavigate(SettingsRoute.SnifferLog) },
+            enabled = enabled,
+            onClick = { onNavigate(SettingsRoute.Sniffer) },
         )
     }
 }
@@ -332,24 +289,5 @@ private fun ManagedMessage() {
         text = stringResource(Res.string.message_device_managed),
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
         color = MaterialTheme.colorScheme.error,
-    )
-}
-
-@Composable
-private fun SnifferWarningDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(Res.string.sniffer_warning_title)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(stringResource(Res.string.sniffer_warning_message))
-                Text(
-                    text = stringResource(Res.string.sniffer_warning_compatibility),
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-        },
-        confirmButton = { TextButton(onClick = onConfirm) { Text(stringResource(Res.string.sniffer_warning_accept)) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.sniffer_warning_cancel)) } },
     )
 }

@@ -77,7 +77,8 @@ fun TrafficManagementConfigScreen(viewModel: RadioConfigViewModel, onBack: () ->
                     enabled = state.connected,
                     keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
                     onValueChanged = {
-                        formState.value = formState.value.newBuilder().also { wb -> wb.position_min_interval_secs = it }.build()
+                        formState.value =
+                            formState.value.newBuilder().also { wb -> wb.position_min_interval_secs = it }.build()
                     },
                 )
                 HorizontalDivider()
@@ -88,7 +89,10 @@ fun TrafficManagementConfigScreen(viewModel: RadioConfigViewModel, onBack: () ->
                     keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
                     onValueChanged = {
                         formState.value =
-                            formState.value.newBuilder().also { wb -> wb.nodeinfo_direct_response_max_hops = it }.build()
+                            formState.value
+                                .newBuilder()
+                                .also { wb -> wb.nodeinfo_direct_response_max_hops = it }
+                                .build()
                     },
                 )
                 HorizontalDivider()
@@ -98,7 +102,8 @@ fun TrafficManagementConfigScreen(viewModel: RadioConfigViewModel, onBack: () ->
                     enabled = state.connected,
                     keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
                     onValueChanged = {
-                        formState.value = formState.value.newBuilder().also { wb -> wb.rate_limit_window_secs = it }.build()
+                        formState.value =
+                            formState.value.newBuilder().also { wb -> wb.rate_limit_window_secs = it }.build()
                     },
                 )
                 HorizontalDivider()
@@ -108,7 +113,8 @@ fun TrafficManagementConfigScreen(viewModel: RadioConfigViewModel, onBack: () ->
                     enabled = state.connected,
                     keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
                     onValueChanged = {
-                        formState.value = formState.value.newBuilder().also { wb -> wb.rate_limit_max_packets = it }.build()
+                        formState.value =
+                            formState.value.newBuilder().also { wb -> wb.rate_limit_max_packets = it }.build()
                     },
                 )
                 HorizontalDivider()
@@ -118,7 +124,8 @@ fun TrafficManagementConfigScreen(viewModel: RadioConfigViewModel, onBack: () ->
                     enabled = state.connected,
                     keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
                     onValueChanged = {
-                        formState.value = formState.value.newBuilder().also { wb -> wb.unknown_packet_threshold = it }.build()
+                        formState.value =
+                            formState.value.newBuilder().also { wb -> wb.unknown_packet_threshold = it }.build()
                     },
                 )
             }

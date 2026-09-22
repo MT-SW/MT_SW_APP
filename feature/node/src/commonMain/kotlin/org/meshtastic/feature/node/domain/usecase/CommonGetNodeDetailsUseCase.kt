@@ -34,6 +34,7 @@ import org.meshtastic.core.model.DeviceLink
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.MyNodeInfo
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.model.util.hasValidEnvironmentMetrics
 import org.meshtastic.core.model.util.isDirectSignal
 import org.meshtastic.core.repository.DeviceHardwareRepository
@@ -56,7 +57,6 @@ import org.meshtastic.proto.FirmwareEdition
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.Telemetry
-import org.meshtastic.core.model.util.decodeLocalStatsExtended
 
 @Single(binds = [GetNodeDetailsUseCase::class])
 class CommonGetNodeDetailsUseCase
@@ -231,11 +231,9 @@ constructor(
                     powerMetrics = logs.telemetry.filter { it.power_metrics != null },
                     airQualityMetrics = logs.telemetry.filter { it.air_quality_metrics != null },
                     hostMetrics =
-                        logs.telemetry.filter {
-                            it.host_metrics != null ||
-                                    it.local_stats != null ||
-                                    it.decodeLocalStatsExtended() != null
-                        },
+                    logs.telemetry.filter {
+                        it.host_metrics != null || it.local_stats != null || it.decodeLocalStatsExtended() != null
+                    },
                     signalMetrics = logs.packets.filter { it.isDirectSignal() },
                     positionLogs = logs.posPackets.mapNotNull { it.toPosition() },
                     paxMetrics = logs.pax,

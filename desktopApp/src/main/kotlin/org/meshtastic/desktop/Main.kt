@@ -233,8 +233,8 @@ private fun MeshServiceLifecycle() {
 private val NODE_CLEANUP_CHECK_INTERVAL = 1.hours
 
 /**
- * Runs the periodic node-database auto-clean check for the lifetime of the composition. There is no WorkManager on
- * the JVM, so this simply checks — and, if due, runs — the cleanup once an hour while the app is open.
+ * Runs the periodic node-database auto-clean check for the lifetime of the composition. There is no WorkManager on the
+ * JVM, so this simply checks — and, if due, runs — the cleanup once an hour while the app is open.
  */
 @Composable
 private fun NodeCleanupLifecycle() {
@@ -446,34 +446,34 @@ private fun ApplicationScope.MeshtasticWindow(
                 // mapGraph renders the Map tab through this seam, not through LocalMapViewProvider
                 // directly; without it the tab falls back to the "Map" placeholder.
                 LocalMapMainScreenProvider provides
-                        { onClickNodeChip, navigateToNodeDetails, waypointId, sitePlannerNodeNum ->
-                            MapScreen(
-                                viewModel = koinViewModel<SharedMapViewModel>(),
-                                onClickNodeChip = onClickNodeChip,
-                                navigateToNodeDetails = navigateToNodeDetails,
-                                waypointId = waypointId,
-                                sitePlannerNodeNum = sitePlannerNodeNum,
-                            )
-                        },
+                    { onClickNodeChip, navigateToNodeDetails, waypointId, sitePlannerNodeNum ->
+                        MapScreen(
+                            viewModel = koinViewModel<SharedMapViewModel>(),
+                            onClickNodeChip = onClickNodeChip,
+                            navigateToNodeDetails = navigateToNodeDetails,
+                            waypointId = waypointId,
+                            sitePlannerNodeNum = sitePlannerNodeNum,
+                        )
+                    },
                 LocalInlineMapProvider provides { node, modifier -> MapLibreInlineMap(node, modifier) },
                 LocalNodeTrackMapProvider provides
-                        { destNum, positions, modifier, selectedPositionTime, onPositionSelect ->
-                            MapLibreNodeTrackMap(
-                                destNum = destNum,
-                                positions = positions,
-                                modifier = modifier,
-                                selectedPositionTime = selectedPositionTime,
-                                onPositionSelect = onPositionSelect,
-                            )
-                        },
+                    { destNum, positions, modifier, selectedPositionTime, onPositionSelect ->
+                        MapLibreNodeTrackMap(
+                            destNum = destNum,
+                            positions = positions,
+                            modifier = modifier,
+                            selectedPositionTime = selectedPositionTime,
+                            onPositionSelect = onPositionSelect,
+                        )
+                    },
                 LocalDiscoveryMapProvider provides
-                        { userLatitude, userLongitude, nodes, modifier ->
-                            MapLibreDiscoveryMap(userLatitude, userLongitude, nodes, modifier)
-                        },
+                    { userLatitude, userLongitude, nodes, modifier ->
+                        MapLibreDiscoveryMap(userLatitude, userLongitude, nodes, modifier)
+                    },
                 LocalTracerouteMapProvider provides
-                        { overlay, nodePositions, onMappableCountChanged, modifier ->
-                            DesktopTracerouteMap(overlay, nodePositions, onMappableCountChanged, modifier)
-                        },
+                    { overlay, nodePositions, onMappableCountChanged, modifier ->
+                        DesktopTracerouteMap(overlay, nodePositions, onMappableCountChanged, modifier)
+                    },
             ) {
                 AppTheme(darkTheme = isDarkTheme) { DesktopMainScreen(uiViewModel, multiBackstack) }
             }

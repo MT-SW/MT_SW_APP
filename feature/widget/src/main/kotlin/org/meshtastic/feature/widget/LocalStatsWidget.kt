@@ -303,11 +303,11 @@ class LocalStatsWidget :
                                     StatRow(
                                         label = stringResource(Res.string.local_stats_psram),
                                         value =
-                                            stringResource(
-                                                Res.string.local_stats_heap_value,
-                                                state.memoryPsramFree,
-                                                state.memoryPsramTotal,
-                                            ),
+                                        stringResource(
+                                            Res.string.local_stats_heap_value,
+                                            state.memoryPsramFree,
+                                            state.memoryPsramTotal,
+                                        ),
                                         progress = psramProgress,
                                         isSmall = isSmall,
                                         modifier = GlanceModifier.defaultWeight().padding(start = 4.dp),
@@ -319,11 +319,11 @@ class LocalStatsWidget :
                                 StatRow(
                                     label = stringResource(Res.string.local_stats_flash),
                                     value =
-                                        stringResource(
-                                            Res.string.local_stats_heap_value,
-                                            state.flashUsedBytes,
-                                            state.flashTotalBytes,
-                                        ),
+                                    stringResource(
+                                        Res.string.local_stats_heap_value,
+                                        state.flashUsedBytes,
+                                        state.flashTotalBytes,
+                                    ),
                                     progress = flashProgress,
                                     isSmall = isSmall,
                                 )

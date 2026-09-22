@@ -105,8 +105,8 @@ interface BleConnection {
     fun invalidateServiceCache(): Boolean = false
 
     /**
-     * Requests the given ATT MTU on the connected peripheral and returns the negotiated value, or `null` if
-     * negotiation failed or isn't applicable on this platform. Default implementation returns `null`.
+     * Requests the given ATT MTU on the connected peripheral and returns the negotiated value, or `null` if negotiation
+     * failed or isn't applicable on this platform. Default implementation returns `null`.
      *
      * Driven explicitly by the caller (rather than automatically after service discovery) so it can be retried and
      * sequenced relative to [invalidateServiceCache] — see [BleRadioTransport]'s connect sequence for why.

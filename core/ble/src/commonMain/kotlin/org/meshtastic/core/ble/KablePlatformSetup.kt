@@ -70,7 +70,7 @@ internal expect fun Peripheral.requestBalancedConnectionPriority(): Boolean
 internal expect fun Peripheral.refreshGattCache(): Boolean
 
 /**
- * Requests the given ATT MTU on the connected [Peripheral] and returns the negotiated value, or `null` if
- * negotiation failed, hasn't run, or the platform has no equivalent API (JVM/iOS).
+ * Requests the given ATT MTU on the connected [Peripheral] and returns the negotiated value, or `null` if negotiation
+ * failed, hasn't run, or the platform has no equivalent API (JVM/iOS).
  */
 internal expect suspend fun Peripheral.negotiateMtu(mtu: Int): Int?

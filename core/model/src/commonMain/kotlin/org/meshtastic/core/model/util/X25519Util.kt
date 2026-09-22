@@ -17,7 +17,7 @@
 package org.meshtastic.core.model.util
 
 /**
- * Derives the X25519 public key for an already-clamped 32-byte private scalar (RFC 7748 scalar multiplication
- * against the base point, u = 9). JVM/Android only — see the iOS stub in NoopStubs.kt for why.
+ * Derives the X25519 public key for an already-clamped 32-byte private scalar (RFC 7748 scalar multiplication against
+ * the base point, u = 9). JVM/Android only — see the iOS stub in NoopStubs.kt for why.
  */
 expect fun x25519PublicKey(privateKey: ByteArray): ByteArray

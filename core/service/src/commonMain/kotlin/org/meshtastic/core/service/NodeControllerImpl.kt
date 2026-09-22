@@ -97,6 +97,7 @@ internal class NodeControllerImpl(
             }
         }
     }
+
     override suspend fun toggleMuted(nodeNum: Int) {
         val myNum = nodeManager.myNodeNum.value ?: return
         val node = nodeManager.nodeDBbyNodeNum[nodeNum] ?: return

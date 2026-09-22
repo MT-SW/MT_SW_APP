@@ -65,16 +65,16 @@ import org.meshtastic.core.resources.error
 import org.meshtastic.core.resources.no_public_key
 import org.meshtastic.core.resources.no_public_key_text
 import org.meshtastic.core.resources.security
-import org.meshtastic.core.resources.security_local_node
-import org.meshtastic.core.resources.security_local_node_help
-import org.meshtastic.core.resources.security_node_info_pending
-import org.meshtastic.core.resources.security_node_info_pending_help
 import org.meshtastic.core.resources.security_icon_help_dismiss
 import org.meshtastic.core.resources.security_icon_help_show_all
 import org.meshtastic.core.resources.security_icon_help_show_less
 import org.meshtastic.core.resources.security_legend_any_version
 import org.meshtastic.core.resources.security_legend_legacy_firmware
 import org.meshtastic.core.resources.security_legend_signing_firmware
+import org.meshtastic.core.resources.security_local_node
+import org.meshtastic.core.resources.security_local_node_help
+import org.meshtastic.core.resources.security_node_info_pending
+import org.meshtastic.core.resources.security_node_info_pending_help
 import org.meshtastic.core.resources.security_signed_node
 import org.meshtastic.core.resources.security_signed_node_help
 import org.meshtastic.core.resources.security_verified_contact
@@ -154,7 +154,7 @@ val NodeSecurityIndicator.legendFirmwareNote: StringResource
             NodeSecurityIndicator.LOCAL_NODE,
             NodeSecurityIndicator.VERIFIED_CONTACT,
             NodeSecurityIndicator.NODE_INFO_PENDING,
-                -> Res.string.security_legend_any_version
+            -> Res.string.security_legend_any_version
 
             NodeSecurityIndicator.SIGNED_NODE -> Res.string.security_legend_signing_firmware
 
@@ -345,8 +345,8 @@ fun SecurityLegend() {
 }
 
 /**
- * [SecurityLegend]'s rows alone, with no scroll modifier of its own — for embedding in a surface that already
- * scrolls (e.g. the node list help sheet), where nesting another [Modifier.verticalScroll] would crash.
+ * [SecurityLegend]'s rows alone, with no scroll modifier of its own — for embedding in a surface that already scrolls
+ * (e.g. the node list help sheet), where nesting another [Modifier.verticalScroll] would crash.
  */
 @Composable
 fun SecurityLegendItems() {

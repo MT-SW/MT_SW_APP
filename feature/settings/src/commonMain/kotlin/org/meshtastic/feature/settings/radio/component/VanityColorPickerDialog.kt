@@ -17,10 +17,10 @@
 package org.meshtastic.feature.settings.radio.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -51,7 +51,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import kotlin.math.roundToInt
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import okio.ByteString
@@ -59,6 +58,7 @@ import org.koin.compose.koinInject
 import org.meshtastic.core.domain.usecase.settings.GenerateVanityKeyUseCase
 import org.meshtastic.core.domain.usecase.settings.VanityKeyResult
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import kotlin.math.roundToInt
 
 private data class VanityColorOption(val name: String, val rgb: Int)
 
@@ -106,10 +106,10 @@ private fun ColorPreview(label: String, color: Color) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier =
-                Modifier.size(48.dp)
-                    .clip(CircleShape)
-                    .background(color)
-                    .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape),
+            Modifier.size(48.dp)
+                .clip(CircleShape)
+                .background(color)
+                .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape),
         )
         Text(text = label, modifier = Modifier.padding(top = 4.dp))
     }
@@ -152,28 +152,31 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
         },
         text = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
                     VANITY_COLOR_PALETTE.forEach { option ->
                         val swatchColor = Color(0xFF000000.toInt() or option.rgb)
                         Box(
                             modifier =
-                                Modifier.size(40.dp)
-                                    .clip(CircleShape)
-                                    .background(swatchColor)
-                                    .border(
-                                        width = if (option.rgb == selectedColor) 3.dp else 1.dp,
-                                        color =
-                                            if (option.rgb == selectedColor) {
-                                                MaterialTheme.colorScheme.primary
-                                            } else {
-                                                MaterialTheme.colorScheme.outline
-                                            },
-                                        shape = CircleShape,
-                                    )
-                                    .clickable(enabled = status !is VanityGrindStatus.Grinding) {
-                                        selectedColor = option.rgb
-                                        status = VanityGrindStatus.Idle
+                            Modifier.size(40.dp)
+                                .clip(CircleShape)
+                                .background(swatchColor)
+                                .border(
+                                    width = if (option.rgb == selectedColor) 3.dp else 1.dp,
+                                    color =
+                                    if (option.rgb == selectedColor) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.outline
                                     },
+                                    shape = CircleShape,
+                                )
+                                .clickable(enabled = status !is VanityGrindStatus.Grinding) {
+                                    selectedColor = option.rgb
+                                    status = VanityGrindStatus.Idle
+                                },
                         )
                     }
                 }
@@ -195,6 +198,7 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
                             Text(text = "Szukam klucza...")
                         }
                     }
+
                     is VanityGrindStatus.Found -> {
                         Row(
                             modifier = Modifier.padding(top = 16.dp),
@@ -215,6 +219,7 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
                             }
                         }
                     }
+
                     is VanityGrindStatus.TimedOut -> {
                         Text(
                             text = "Nie znaleziono w rozsądnym czasie — spróbuj zwiększyć tolerancję.",
@@ -222,6 +227,7 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
                             modifier = Modifier.padding(top = 16.dp),
                         )
                     }
+
                     else -> Unit
                 }
 
@@ -236,22 +242,23 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
                             grindJob =
                                 scope.launch {
                                     val result = grinder(selectedColor, tolerance.roundToInt())
-                                    status = if (result != null) {
-                                        VanityGrindStatus.Found(result)
-                                    } else {
-                                        VanityGrindStatus.TimedOut
-                                    }
+                                    status =
+                                        if (result != null) {
+                                            VanityGrindStatus.Found(result)
+                                        } else {
+                                            VanityGrindStatus.TimedOut
+                                        }
                                 }
                         },
                         enabled = status !is VanityGrindStatus.Grinding,
                         colors =
-                            if (supported) {
-                                ButtonDefaults.textButtonColors()
-                            } else {
-                                ButtonDefaults.textButtonColors(
-                                    contentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                                )
-                            },
+                        if (supported) {
+                            ButtonDefaults.textButtonColors()
+                        } else {
+                            ButtonDefaults.textButtonColors(
+                                contentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                            )
+                        },
                         modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                     ) {
                         Text(text = "Zatwierdź")

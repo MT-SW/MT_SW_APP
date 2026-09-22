@@ -71,8 +71,8 @@ private const val CLUSTER_MAX_ZOOM = 20
 
 /**
  * Fewer than this many together are drawn as themselves rather than collapsed into a bubble. Raised well past the
- * Google flavor's own `MIN_CLUSTER_SIZE` (10) — small groups of a handful of nearby nodes reading as a numbered
- * bubble hid more than it explained; only genuinely dense clusters should bubble now.
+ * Google flavor's own `MIN_CLUSTER_SIZE` (10) — small groups of a handful of nearby nodes reading as a numbered bubble
+ * hid more than it explained; only genuinely dense clusters should bubble now.
  */
 private const val CLUSTER_MIN_POINTS = 20
 

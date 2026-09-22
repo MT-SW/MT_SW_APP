@@ -1,5 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <SmellBaseline>
   <ManuallySuppressedIssues/>
-  <CurrentIssues/>
+  <CurrentIssues>
+    <ID>Kdoc:MeshLogDao.kt:MeshLogDao$/** * All logs for a given port across every sender since [sinceTimestamp] — unlike [getLogsByPortNum], this has no * count cap, so a busy mesh's frequent packets from one node can never crowd out a rarer variant from another. */</ID>
+  </CurrentIssues>
 </SmellBaseline>

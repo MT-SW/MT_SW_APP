@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>MagicNumber:GenerateVanityKeyUseCase.kt:GenerateVanityKeyUseCase$0x40</ID>
+    <ID>MagicNumber:GenerateVanityKeyUseCase.kt:GenerateVanityKeyUseCase$0x7F</ID>
+    <ID>MagicNumber:GenerateVanityKeyUseCase.kt:GenerateVanityKeyUseCase$0xF8</ID>
+    <ID>MagicNumber:GenerateVanityKeyUseCase.kt:GenerateVanityKeyUseCase$0xFF</ID>
+    <ID>MagicNumber:GenerateVanityKeyUseCase.kt:GenerateVanityKeyUseCase$31</ID>
+  </CurrentIssues>
+</SmellBaseline>

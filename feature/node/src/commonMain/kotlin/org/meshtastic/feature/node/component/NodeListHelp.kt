@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.connections
 import org.meshtastic.core.resources.node_layout_help_signal_bad
 import org.meshtastic.core.resources.node_layout_help_signal_fair
 import org.meshtastic.core.resources.node_layout_help_signal_good
@@ -61,12 +62,11 @@ import org.meshtastic.core.resources.role_sensor_desc
 import org.meshtastic.core.resources.role_tak_desc
 import org.meshtastic.core.resources.role_tak_tracker_desc
 import org.meshtastic.core.resources.role_tracker_desc
+import org.meshtastic.core.resources.security
 import org.meshtastic.core.ui.component.ConnectionActivityLegendItems
 import org.meshtastic.core.ui.component.ConnectionStatusLegendItems
 import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.component.SecurityLegendItems
-import org.meshtastic.core.resources.connections
-import org.meshtastic.core.resources.security
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.label
 import org.meshtastic.core.ui.icon.role
@@ -180,6 +180,7 @@ private fun SignalQualityEntry(quality: Quality, description: String) {
         }
     }
 }
+
 private val roleHelpEntries =
     listOf(
         Config.DeviceConfig.Role.CLIENT to Res.string.role_client_desc,

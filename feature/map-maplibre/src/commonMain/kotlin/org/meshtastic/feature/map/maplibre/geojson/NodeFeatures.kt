@@ -43,10 +43,10 @@ internal fun Int.toCssHex(): String {
  * Nodes without a usable fix are dropped rather than emitted at (0, 0) — that is what produced the "flying through the
  * ocean" jump on the OSMdroid map.
  *
- * Nodes sharing an effectively identical position (e.g. several fixed-position devices at one address) are nudged
- * apart by a few metres in a small circle around that shared point, via [spreadCoincidentPositions] — invisible at any
- * normal zoom, but enough that they stop landing on the exact same pixel once zoomed in close, and enough that a
- * cluster of them is no longer mathematically unbreakable by zooming further.
+ * Nodes sharing an effectively identical position (e.g. several fixed-position devices at one address) are nudged apart
+ * by a few metres in a small circle around that shared point, via [spreadCoincidentPositions] — invisible at any normal
+ * zoom, but enough that they stop landing on the exact same pixel once zoomed in close, and enough that a cluster of
+ * them is no longer mathematically unbreakable by zooming further.
  */
 fun nodesToFeatureCollection(nodes: List<Node>, myNodeNum: Int? = null): FeatureCollection<Point, JsonObject?> {
     val validNodes = nodes.filter { it.validPosition != null }
@@ -58,36 +58,35 @@ fun nodesToFeatureCollection(nodes: List<Node>, myNodeNum: Int? = null): Feature
             Feature(
                 geometry = Point(positions.getValue(node.num)),
                 properties =
-                    buildJsonObject {
-                        put(NodeFeatureKeys.NODE_NUM, node.num)
-                        put(NodeFeatureKeys.SHORT_NAME, node.user.short_name)
-                        put(NodeFeatureKeys.LONG_NAME, node.user.long_name)
-                        put(NodeFeatureKeys.IS_FAVORITE, node.isFavorite)
-                        put(NodeFeatureKeys.IS_ONLINE, node.isOnline)
-                        put(NodeFeatureKeys.IS_SELF, myNodeNum != null && node.num == myNodeNum)
-                        put(NodeFeatureKeys.FOREGROUND, foreground.toCssHex())
-                        put(NodeFeatureKeys.BACKGROUND, background.toCssHex())
-                        put(NodeFeatureKeys.LAST_HEARD, node.lastHeard)
-                        // Omitted rather than written as 0.0 when the node reports no precision: 0 is a real
-                        // radius, and a reader cannot tell the difference. GeoCircle drops such nodes instead.
-                        precisionRadiusMetersOrNull(node.position.precision_bits)?.let {
-                            put(NodeFeatureKeys.PRECISION_METERS, it)
-                        }
-                        put(NodeFeatureKeys.CHIP, node.toNodeChip().featureValue())
-                    },
+                buildJsonObject {
+                    put(NodeFeatureKeys.NODE_NUM, node.num)
+                    put(NodeFeatureKeys.SHORT_NAME, node.user.short_name)
+                    put(NodeFeatureKeys.LONG_NAME, node.user.long_name)
+                    put(NodeFeatureKeys.IS_FAVORITE, node.isFavorite)
+                    put(NodeFeatureKeys.IS_ONLINE, node.isOnline)
+                    put(NodeFeatureKeys.IS_SELF, myNodeNum != null && node.num == myNodeNum)
+                    put(NodeFeatureKeys.FOREGROUND, foreground.toCssHex())
+                    put(NodeFeatureKeys.BACKGROUND, background.toCssHex())
+                    put(NodeFeatureKeys.LAST_HEARD, node.lastHeard)
+                    // Omitted rather than written as 0.0 when the node reports no precision: 0 is a real
+                    // radius, and a reader cannot tell the difference. GeoCircle drops such nodes instead.
+                    precisionRadiusMetersOrNull(node.position.precision_bits)?.let {
+                        put(NodeFeatureKeys.PRECISION_METERS, it)
+                    }
+                    put(NodeFeatureKeys.CHIP, node.toNodeChip().featureValue())
+                },
             )
         },
     )
 }
 
 /**
- * Maps each node's number to a [Position], nudged a few metres off its real fix when it shares one with other nodes
- * in the list.
+ * Maps each node's number to a [Position], nudged a few metres off its real fix when it shares one with other nodes in
+ * the list.
  *
  * Grouped by rounding to roughly 11cm at the equator — tight enough to only catch nodes reporting an effectively
- * identical fixed position, not ordinary GPS jitter between two nearby real readings (which is usually several
- * metres). A group of one is returned unchanged; real position data should never be altered for a node that has no
- * collision.
+ * identical fixed position, not ordinary GPS jitter between two nearby real readings (which is usually several metres).
+ * A group of one is returned unchanged; real position data should never be altered for a node that has no collision.
  */
 private fun spreadCoincidentPositions(nodes: List<Node>): Map<Int, Position> {
     val groups = nodes.groupBy { coincidenceKey(it) }
@@ -130,8 +129,10 @@ private const val SPREAD_RADIUS_METERS = 8.0
 /** Standard equatorial approximation; fine at this scale, no need for a proper geodesic library here. */
 private const val METERS_PER_DEGREE_LATITUDE = 111_320.0
 
-/** Floor for the latitude-adjusted metres-per-degree-of-longitude, so a node exactly at a pole cannot divide by
- * (near) zero. Never actually reached by this app's mesh, but cheap to guard against. */
+/**
+ * Floor for the latitude-adjusted metres-per-degree-of-longitude, so a node exactly at a pole cannot divide by (near)
+ * zero. Never actually reached by this app's mesh, but cheap to guard against.
+ */
 private const val MIN_METERS_PER_DEGREE_LONGITUDE = 1.0
 
 /**

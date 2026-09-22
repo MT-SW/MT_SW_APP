@@ -28,9 +28,16 @@ interface MQTTRepository {
 
     /**
      * A flow of incoming messages from the subscribed MQTT topics. Connecting/subscribing is initiated when this flow
-     * is collected.
+     * is collected -- each call returns a fresh flow, so collecting it again opens a new broker session (see
+     * [MQTTRepositoryImpl]'s single-active-session behavior).
+     *
+     * @param subscribeAllChannels When `true`, subscribes to every locally known channel regardless of its
+     *   `downlink_enabled` setting. The default (`false`, matching the MQTT Client Proxy's existing behavior) only
+     *   subscribes to channels the device itself wants broker traffic relayed back for -- too narrow for an
+     *   observability feature like the MQTT Sniffer, which wants to see everything published for this device's
+     *   channels, not just what would actually be relayed back to it.
      */
-    val proxyMessageFlow: Flow<MqttClientProxyMessage>
+    fun proxyMessageFlow(subscribeAllChannels: Boolean = false): Flow<MqttClientProxyMessage>
 
     /**
      * Publishes a message to the given MQTT topic.

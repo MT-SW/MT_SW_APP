@@ -19,8 +19,8 @@ package org.meshtastic.core.repository
 import org.meshtastic.core.model.DataPacket
 import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.ChannelSet
-import org.meshtastic.proto.OnDemandType
 import org.meshtastic.proto.LocalConfig
+import org.meshtastic.proto.OnDemandType
 import org.meshtastic.core.model.Position as ModelPosition
 import org.meshtastic.proto.Position as ProtoPosition
 
@@ -158,7 +158,9 @@ interface CommandSender {
      */
     suspend fun requestNeighborInfo(requestId: Int, destNum: Int)
 
-    /** Sends an OnDemand diagnostics query (e.g. node stats) to [destNum], or throws if the outbound queue rejects it. */
+    /**
+     * Sends an OnDemand diagnostics query (e.g. node stats) to [destNum], or throws if the outbound queue rejects it.
+     */
     suspend fun requestOnDemand(destNum: Int, requestType: OnDemandType)
 
     /**

@@ -97,10 +97,10 @@ private fun HillshadeOverlayLayer(overlay: MapOverlay.Hillshade, opacity: Float)
             // Not the default. MapLibre assumes Mapbox Terrain-RGB; every keyless public DEM is
             // Terrarium, and the mismatch is silent — shading looks plausible but is wrong.
             encoding =
-                when (overlay.encoding) {
-                    DemEncoding.TERRARIUM -> RasterDemEncoding.Terrarium
-                    DemEncoding.MAPBOX -> RasterDemEncoding.Mapbox
-                },
+            when (overlay.encoding) {
+                DemEncoding.TERRARIUM -> RasterDemEncoding.Terrarium
+                DemEncoding.MAPBOX -> RasterDemEncoding.Mapbox
+            },
         )
     HillshadeLayer(
         id = "overlay-${overlay.id}",

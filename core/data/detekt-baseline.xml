@@ -2,9 +2,11 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
+    <ID>LongMethod:CommandSenderImpl.kt:CommandSenderImpl$override suspend fun requestNeighborInfo</ID>
     <ID>MagicNumber:XModemManagerImpl.kt:XModemManagerImpl$0x8000</ID>
     <ID>MagicNumber:XModemManagerImpl.kt:XModemManagerImpl$0xFF</ID>
     <ID>MagicNumber:XModemManagerImpl.kt:XModemManagerImpl$0xFFFF</ID>
     <ID>MagicNumber:XModemManagerImpl.kt:XModemManagerImpl$8</ID>
+    <ID>ReturnCount:TracerouteHandlerImpl.kt:TracerouteHandlerImpl$override fun handleTraceroute</ID>
   </CurrentIssues>
 </SmellBaseline>

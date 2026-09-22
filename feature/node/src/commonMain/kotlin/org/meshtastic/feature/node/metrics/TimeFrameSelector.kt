@@ -61,10 +61,10 @@ fun TimeFrameSelector(
                     Text(text = stringResource(timeFrame.strRes), maxLines = 1, overflow = TextOverflow.Ellipsis)
                 },
                 modifier =
-                    Modifier.semantics {
-                        role = Role.RadioButton
-                        selected = isSelected
-                    },
+                Modifier.semantics {
+                    role = Role.RadioButton
+                    selected = isSelected
+                },
             )
         }
     }

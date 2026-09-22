@@ -58,13 +58,13 @@ fun RegionWarningDialog(onClose: () -> Unit) {
             Column {
                 Text(
                     text =
-                        if (isEnglish) {
-                            "In this area we operate on Custom settings (62KHz, SF7, CR6) or the NarrowFast preset. " +
-                                    "More details at https://mt-sw.pl"
-                        } else {
-                            "Na naszym terenie pracujemy na nastawach Custom (62KHz, SF7, CR6) lub preset NarrowFast. " +
-                                    "Więcej szczegółów znajdziesz na https://mt-sw.pl"
-                        },
+                    if (isEnglish) {
+                        "In this area we operate on Custom settings (62KHz, SF7, CR6) or the NarrowFast preset. " +
+                            "More details at https://mt-sw.pl"
+                    } else {
+                        "Na naszym terenie pracujemy na nastawach Custom (62KHz, SF7, CR6) lub preset NarrowFast. " +
+                            "Więcej szczegółów znajdziesz na https://mt-sw.pl"
+                    },
                 )
                 TextButton(
                     onClick = onClose,
@@ -73,12 +73,12 @@ fun RegionWarningDialog(onClose: () -> Unit) {
                 ) {
                     Text(
                         text =
-                            when {
-                                secondsRemaining > 0 && isEnglish -> "Close (${secondsRemaining}s)"
-                                secondsRemaining > 0 -> "Zamknij (${secondsRemaining}s)"
-                                isEnglish -> "Close"
-                                else -> "Zamknij"
-                            },
+                        when {
+                            secondsRemaining > 0 && isEnglish -> "Close (${secondsRemaining}s)"
+                            secondsRemaining > 0 -> "Zamknij (${secondsRemaining}s)"
+                            isEnglish -> "Close"
+                            else -> "Zamknij"
+                        },
                     )
                 }
             }
