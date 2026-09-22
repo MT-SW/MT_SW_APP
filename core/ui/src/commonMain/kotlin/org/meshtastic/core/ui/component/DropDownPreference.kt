@@ -65,15 +65,10 @@ fun <T : Enum<T>> DropDownPreference(
     // A deprecated value the radio currently holds stays on the list: dropping it leaves the field showing nothing and
     // writes a different value on the next save.
     val enumConstants =
-<<<<<<< HEAD
         remember(selectedItem, excludedItems) {
             enumEntriesOf(selectedItem).filter {
-                it.name != "UNRECOGNIZED" && !it.isDeprecatedEnumEntry() && it !in excludedItems
-=======
-        remember(selectedItem) {
-            enumEntriesOf(selectedItem).filter {
-                it.name != "UNRECOGNIZED" && (it == selectedItem || !it.isDeprecatedEnumEntry())
->>>>>>> upstream/main
+                it.name != "UNRECOGNIZED" &&
+                    (it == selectedItem || (!it.isDeprecatedEnumEntry() && it !in excludedItems))
             }
         }
 

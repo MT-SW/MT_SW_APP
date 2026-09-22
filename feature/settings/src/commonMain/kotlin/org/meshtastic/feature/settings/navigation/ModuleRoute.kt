@@ -174,45 +174,6 @@ enum class ModuleRoute(
     val excludedAs: ExcludedModules
         get() =
             when (this) {
-<<<<<<< HEAD
-                MQTT -> 0x0001
-
-                SERIAL -> 0x0002
-
-                EXT_NOTIFICATION -> 0x0004
-
-                STORE_FORWARD -> 0x0008
-
-                RANGE_TEST -> 0x0010
-
-                TELEMETRY -> 0x0020
-
-                CANNED_MESSAGE -> 0x0040
-
-                AUDIO -> 0x0080
-
-                REMOTE_HARDWARE -> 0x0000
-
-                // Not excludable yet
-
-                NEIGHBOR_INFO -> 0x0200
-
-                AMBIENT_LIGHTING -> 0x0400
-
-                DETECTION_SENSOR -> 0x0800
-
-                PAXCOUNTER -> 0x1000
-
-                // Not excludable yet
-                TRAFFIC_MANAGEMENT -> 0x0000
-
-                // Not excludable yet
-                TAK -> 0x0000
-
-                // Not excludable yet
-
-                MESH_BEACON -> 0x0000 // Not excludable yet
-=======
                 MQTT -> ExcludedModules.MQTT_CONFIG
                 SERIAL -> ExcludedModules.SERIAL_CONFIG
                 EXT_NOTIFICATION -> ExcludedModules.EXTNOTIF_CONFIG
@@ -228,7 +189,6 @@ enum class ModuleRoute(
                 PAXCOUNTER -> ExcludedModules.PAXCOUNTER_CONFIG
                 TAK -> ExcludedModules.TAK_CONFIG
                 MESH_BEACON -> ExcludedModules.MESHBEACON_CONFIG
->>>>>>> upstream/main
             }
 
     companion object {

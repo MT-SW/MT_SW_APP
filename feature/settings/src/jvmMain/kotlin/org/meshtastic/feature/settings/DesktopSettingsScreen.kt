@@ -99,13 +99,10 @@ import org.meshtastic.feature.settings.navigation.ConfigRoute
 import org.meshtastic.feature.settings.navigation.ModuleRoute
 import org.meshtastic.feature.settings.radio.RadioConfigItemList
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
-<<<<<<< HEAD
 import org.meshtastic.feature.settings.radio.component.EditDeviceProfileDialog
-import org.meshtastic.proto.DeviceProfile
-=======
 import org.meshtastic.feature.settings.search.SettingsSearchBar
 import org.meshtastic.feature.settings.search.SettingsSearchViewModel
->>>>>>> upstream/main
+import org.meshtastic.proto.DeviceProfile
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant.Companion.fromEpochMilliseconds
 

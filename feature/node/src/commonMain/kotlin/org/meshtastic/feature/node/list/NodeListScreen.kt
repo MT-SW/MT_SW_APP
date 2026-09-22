@@ -392,7 +392,6 @@ fun NodeListScreen(
                     }
                 }
 
-<<<<<<< HEAD
                 items(nodes, key = { it.num }) { node ->
                     var expanded by remember { mutableStateOf(false) }
 
@@ -481,9 +480,6 @@ fun NodeListScreen(
                         }
                     }
                 }
-=======
-                items(nodes, key = { it.num }, itemContent = nodeRow)
->>>>>>> upstream/main
                 if (nodes.isEmpty() && !state.filter.isActive) {
                     item {
                         NodeListEmptyState(

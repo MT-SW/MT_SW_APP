@@ -767,7 +767,6 @@ gpio_mask_display
 gpio_off
 gpio_on
 gpio_pin
-<<<<<<< HEAD
 gpio_pin_for_rotary_encoder_a_port
 gpio_pin_for_rotary_encoder_b_port
 gpio_pin_for_rotary_encoder_press_port
@@ -778,8 +777,6 @@ gps_en_gpio
 gps_mode
 gps_receive_gpio
 gps_transmit_gpio
-=======
->>>>>>> upstream/main
 grant_permission
 ham_long_name_summary
 hardware
@@ -842,7 +839,6 @@ key_backup_saved
 key_verification_final_title
 key_verification_request_title
 key_verification_title
-<<<<<<< HEAD
 ### LABEL ###
 label_lite_fast
 label_lite_slow
@@ -861,9 +857,7 @@ label_short_turbo
 label_tiny_fast
 label_tiny_slow
 label_very_long_slow
-=======
 label_with_unit
->>>>>>> upstream/main
 last_heard_filter_label
 last_position_update
 latest_alpha_firmware
@@ -1354,7 +1348,6 @@ offline_terrain_empty
 offline_terrain_manager
 offline_terrain_regional_detail
 okay
-<<<<<<< HEAD
 oled_type
 ### ON ###
 on_demand_air_activity
@@ -1403,8 +1396,6 @@ on_demand_snr
 on_demand_stat_nodes_online
 on_demand_stat_nodes_total
 on_demand_uptime
-=======
->>>>>>> upstream/main
 ### ONE ###
 one_day
 one_hour
@@ -1697,11 +1688,8 @@ sats
 save
 save_and_restart
 save_changes
-<<<<<<< HEAD
 save_csv_in_storage_esp32_only
 save_log_to_file
-=======
->>>>>>> upstream/main
 save_rangetest
 ### SCAN ###
 scan
@@ -1833,7 +1821,6 @@ site_planner_use_node_location
 site_planner_webview_updating
 skip
 slot
-<<<<<<< HEAD
 smart_position
 ### SNIFFER ###
 sniffer_auto_scroll
@@ -1851,8 +1838,6 @@ sniffer_warning_cancel
 sniffer_warning_compatibility
 sniffer_warning_message
 sniffer_warning_title
-=======
->>>>>>> upstream/main
 snr
 snr_definition
 soil_moisture

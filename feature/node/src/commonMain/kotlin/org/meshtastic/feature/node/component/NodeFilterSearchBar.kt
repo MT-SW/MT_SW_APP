@@ -147,67 +147,6 @@ data class NodeFilterToggles(
     val onToggleOnlyEncrypted: () -> Unit,
 )
 
-<<<<<<< HEAD:feature/node/src/commonMain/kotlin/org/meshtastic/feature/node/component/NodeFilterTextField.kt
-@Composable
-private fun NodeFilterTextField(filterText: String, onTextChange: (String) -> Unit, modifier: Modifier = Modifier) {
-    val focusManager = LocalFocusManager.current
-    var isFocused by remember { mutableStateOf(false) }
-
-    // Lokalny stan, żeby pisanie było natychmiastowe i nie czekało na round-trip przez ViewModel/StateFlow.
-    // Synchronizujemy z zewnętrznym filterText tylko wtedy, gdy faktycznie się różni (np. reset z zewnątrz),
-    // żeby spóźniona emisja z ViewModelu nie nadpisała znaku, który użytkownik właśnie wpisał.
-    var localText by remember { mutableStateOf(filterText) }
-    LaunchedEffect(filterText) {
-        if (filterText != localText) {
-            localText = filterText
-        }
-    }
-
-    OutlinedTextField(
-        modifier = modifier.defaultMinSize(minHeight = 48.dp).onFocusEvent { isFocused = it.isFocused },
-        value = localText,
-        placeholder = {
-            Text(
-                text = stringResource(Res.string.node_filter_placeholder),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.35F),
-            )
-        },
-        leadingIcon = {
-            Icon(MeshtasticIcons.Search, contentDescription = stringResource(Res.string.node_filter_placeholder))
-        },
-        onValueChange = {
-            localText = it
-            onTextChange(it)
-        },
-        trailingIcon = {
-            if (localText.isNotEmpty() || isFocused) {
-                val clearLabel = stringResource(Res.string.clear)
-                Icon(
-                    MeshtasticIcons.Close,
-                    contentDescription = stringResource(Res.string.desc_node_filter_clear),
-                    modifier =
-                    Modifier.clickable(
-                        onClickLabel = clearLabel,
-                        role = Role.Button,
-                        onClick = {
-                            localText = ""
-                            onTextChange("")
-                            focusManager.clearFocus()
-                        },
-                    ),
-                )
-            }
-        },
-        textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onBackground),
-        maxLines = 1,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-    )
-}
-
-=======
->>>>>>> upstream/main:feature/node/src/commonMain/kotlin/org/meshtastic/feature/node/component/NodeFilterSearchBar.kt
 @Suppress("LongMethod")
 @Composable
 private fun NodeSortButton(

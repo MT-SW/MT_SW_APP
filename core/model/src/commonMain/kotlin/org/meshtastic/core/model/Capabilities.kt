@@ -114,11 +114,7 @@ data class Capabilities(val firmwareVersion: String?, internal val forceEnableAl
      * its `ModuleConfig` field declares. The proto is upstream but the firmware module traces to a community fork, so
      * an older radio would silently ignore the config the editor writes.
      */
-<<<<<<< HEAD
-    val supportsMeshBeacon = atLeast(V2_7_18)
-=======
     val supportsMeshBeacon = offers(ModuleConfig.mesh_beacon)
->>>>>>> upstream/main
 
     /**
      * Whether the node reports [NodeInfo.heard_on_current_lora] - whether it has heard each node over RF on the LoRa

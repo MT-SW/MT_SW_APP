@@ -248,18 +248,12 @@
     <string name="client_notification">Client Notification</string>
     <string name="close">Close</string>
     <string name="close_selection">Close selection</string>
-<<<<<<< HEAD
-    <string name="co2">COÔéé</string>
-    <string name="co2_humidity">COÔéé Hum</string>
-    <string name="co2_temperature">COÔéé Temp</string>
-    <string name="codec_2_enabled">CODEC 2 enabled</string>
-    <string name="codec2_sample_rate">CODEC2 sample rate</string>
-    <string name="coding_rate">Coding Rate</string>
-=======
     <string name="co2">CO₂</string>
     <string name="co2_humidity">CO₂ Hum</string>
     <string name="co2_temperature">CO₂ Temp</string>
->>>>>>> upstream/main
+    <string name="codec_2_enabled">CODEC 2 enabled</string>
+    <string name="codec2_sample_rate">CODEC2 sample rate</string>
+    <string name="coding_rate">Coding Rate</string>
     <string name="collapse_chart">Collapse chart</string>
     <string name="collapsed">Collapsed</string>
     <string name="communicate_off_the_grid">Communicate off-the-grid with your friends and community without cell service.</string>
@@ -281,7 +275,6 @@
     <string name="config_device_tripleClickAsAdHocPing_summary">Send a position on the primary channel when the user button is triple clicked.</string>
     <string name="config_device_tzdef_summary">Time zone for dates on the device screen and log.</string>
     <string name="config_device_use_phone_tz">Use phone time zone</string>
-<<<<<<< HEAD
     <string name="config_display_auto_screen_carousel_secs_summary">Automatically toggles to the next page on the screen like a carousel, based the specified interval.</string>
     <string name="config_display_compass_north_top_summary">The compass heading on the screen outside of the circle will always point north.</string>
     <string name="config_display_displaymode_summary">Override default screen layout.</string>
@@ -291,10 +284,8 @@
     <string name="config_display_screen_on_secs_summary">How long the screen remains on after the user button is pressed or messages are received.</string>
     <string name="config_display_units_summary">Units displayed on the device screen.</string>
     <string name="config_display_wake_on_tap_or_motion_summary">Requires that there be an accelerometer on your device.</string>
-    <string name="config_lora_frequency_slot_summary">Your nodeÔÇÖs operating frequency is calculated based on the region, modem preset, and this field. When 0, the slot is automatically calculated based on the primary channel name and will change from the default public slot. Change back to the public default slot if private primary and public secondary channels are configured.</string>
+    <string name="config_lora_frequency_slot_summary">Your node’s operating frequency is calculated based on the region, modem preset, and this field. When 0, the slot is automatically calculated based on the primary channel name and will change from the default public slot. Change back to the public default slot if private primary and public secondary channels are configured.</string>
     <string name="config_lora_hop_limit_summary">Sets the maximum number of hops, default is 3. Increasing hops also increases congestion and should be used carefully. 0 hop broadcast messages will not get ACKs.</string>
-=======
->>>>>>> upstream/main
     <string name="config_lora_modem_preset_licensed_summary">This region's presets are for licensed (amateur radio) operators only. Enable Licensed amateur radio (Ham) in User Config to select them.</string>
     <string name="config_lora_modem_preset_summary">Available modem presets, default is Narrow Fast.</string>
     <string name="config_lora_region_summary">The region where you will be using your radios.</string>
@@ -519,12 +510,8 @@
     <string name="distance_filters">Distance Filters</string>
     <string name="distance_filters_description">Filter the node list and mesh map based on proximity to your phone.</string>
     <string name="distance_measurements">Distance Measurements</string>
-<<<<<<< HEAD
     <string name="distance_measurements_description">Display the distance between your phone and other mt compatible nodes with positions.</string>
     <string name="dns">DNS</string>
-=======
-    <string name="distance_measurements_description">Display the distance between your phone and other Meshtastic nodes with positions.</string>
->>>>>>> upstream/main
     <!-- DOC -->
     <string name="doc_clear_search">Clear search</string>
     <string name="doc_keywords_android_auto">android auto,car,head unit,driving,hands-free,messages</string>
@@ -825,7 +812,6 @@
     <string name="gpio_off">Off</string>
     <string name="gpio_on">On</string>
     <string name="gpio_pin">GPIO pin</string>
-<<<<<<< HEAD
     <string name="gpio_pin_for_rotary_encoder_a_port">GPIO pin for rotary encoder A port</string>
     <string name="gpio_pin_for_rotary_encoder_b_port">GPIO pin for rotary encoder B port</string>
     <string name="gpio_pin_for_rotary_encoder_press_port">GPIO pin for rotary encoder Press port</string>
@@ -836,8 +822,6 @@
     <string name="gps_mode">GPS Mode (Physical Hardware)</string>
     <string name="gps_receive_gpio">GPS Receive GPIO</string>
     <string name="gps_transmit_gpio">GPS Transmit GPIO</string>
-=======
->>>>>>> upstream/main
     <string name="grant_permission">Grant permission</string>
     <string name="ham_long_name_summary">Optional. Appended to your call sign, e.g. KD2ABC//Attic Heltec</string>
     <string name="hardware">Hardware</string>
@@ -900,7 +884,6 @@
     <string name="key_verification_final_title">Key Verification Complete</string>
     <string name="key_verification_request_title">Key Verification Request</string>
     <string name="key_verification_title">Key Verification</string>
-<<<<<<< HEAD
     <!-- LABEL -->
     <string name="label_lite_fast">Lite Fast</string>
     <string name="label_lite_slow">Lite Slow</string>
@@ -919,9 +902,7 @@
     <string name="label_tiny_fast">Tiny Fast</string>
     <string name="label_tiny_slow">Tiny Slow</string>
     <string name="label_very_long_slow">Very Long Slow</string>
-=======
     <string name="label_with_unit">%1$s (%2$s)</string>
->>>>>>> upstream/main
     <string name="last_heard_filter_label">Filter by Last Heard time: %1$s</string>
     <string name="last_position_update">Last position update</string>
     <string name="latest_alpha_firmware">Latest alpha</string>
@@ -1095,13 +1076,9 @@
     <string name="map_purge_fail">SQL Cache purge failed, see logcat for details</string>
     <string name="map_purge_success">SQL Cache purged for %1$s</string>
     <string name="map_reporting_consent_header">Consent to Share Unencrypted Node Data via MQTT</string>
-<<<<<<< HEAD
-    <string name="map_reporting_consent_text">By enabling this feature, you acknowledge and expressly consent to the transmission of your deviceÔÇÖs real-time geographic location over the MQTT protocol without encryption. This location data may be used for purposes such as live map reporting, device tracking, and related telemetry functions.</string>
+    <string name="map_reporting_consent_text">By enabling this feature, you acknowledge and expressly consent to the transmission of your device’s real-time geographic location over the MQTT protocol without encryption. This location data may be used for purposes such as live map reporting, device tracking, and related telemetry functions.</string>
     <string name="map_reporting_interval_seconds">Map reporting interval (seconds)</string>
     <string name="map_reporting_summary">Your node will periodically send an unencrypted map report packet to the configured MQTT server, this includes id, long and short name, approximate location, hardware model, role, firmware version, LoRa region, modem preset and primary channel name.</string>
-=======
-    <string name="map_reporting_consent_text">By enabling this feature, you acknowledge and expressly consent to the transmission of your device’s real-time geographic location over the MQTT protocol without encryption. This location data may be used for purposes such as live map reporting, device tracking, and related telemetry functions.</string>
->>>>>>> upstream/main
     <string name="map_select_download_region">Select download region</string>
     <string name="map_start_download">Start Download</string>
     <string name="map_style_selection">Map style selection</string>
@@ -1262,15 +1239,10 @@
     <string name="mqtt_status_disconnected">Disconnected</string>
     <string name="mqtt_status_disconnected_with_reason">Disconnected ÔÇö %1$s</string>
     <string name="mqtt_status_inactive">Inactive</string>
-<<<<<<< HEAD
-    <string name="mqtt_status_reconnecting">ReconnectingÔÇŽ</string>
-    <string name="mqtt_status_reconnecting_with_attempt">Reconnecting (attempt %1$d) ÔÇö %2$s</string>
-=======
     <string name="mqtt_status_reconnecting">Reconnecting…</string>
     <string name="mqtt_status_reconnecting_with_attempt">Reconnecting (attempt %1$d) — %2$s</string>
     <string name="mqtt_status_topics_refused_all">Connected, but the broker refused every topic: %1$s</string>
     <string name="mqtt_status_topics_refused_some">Connected, but the broker refused %1$s</string>
->>>>>>> upstream/main
     <string name="mqtt_test_connection">Test connection</string>
     <string name="must_set_region">You must set a region!</string>
     <string name="must_update">You must update this application on the app store (or Github). It is too old to talk to this radio firmware.  Please read our <a href="https://meshtastic.org/docs/software/android/installation">docs</a> on this topic.</string>
@@ -1429,7 +1401,6 @@
     <string name="offline_terrain_manager">Offline Terrain</string>
     <string name="offline_terrain_regional_detail">Includes high-detail regional terrain</string>
     <string name="okay">OK</string>
-<<<<<<< HEAD
     <string name="oled_type">OLED type</string>
     <!-- ON -->
     <string name="on_demand_air_activity">Air Activity</string>
@@ -1478,8 +1449,6 @@
     <string name="on_demand_stat_nodes_online">Nodes Online</string>
     <string name="on_demand_stat_nodes_total">Nodes Total</string>
     <string name="on_demand_uptime">Uptime</string>
-=======
->>>>>>> upstream/main
     <!-- ONE -->
     <string name="one_day">24 Hours</string>
     <string name="one_hour">1 Hour</string>
@@ -1672,12 +1641,8 @@
     <string name="provide_location_to_mesh">Provide phone location to mesh</string>
     <string name="provider_name_exists">Provider name exists.</string>
     <string name="psk">PSK</string>
-<<<<<<< HEAD
-    <string name="pt_BR" translatable="false">Portugu├¬s do Brasil</string>
-    <string name="ptt_pin">PTT pin</string>
-=======
     <string name="pt_BR" translatable="false">Português do Brasil</string>
->>>>>>> upstream/main
+    <string name="ptt_pin">PTT pin</string>
     <string name="public_key">Public Key</string>
     <string name="public_key_changed">Public Key Changed</string>
     <string name="qr_code">QR code</string>
@@ -1698,12 +1663,8 @@
     <string name="react">React</string>
     <string name="reboot">Reboot</string>
     <string name="recent_network_devices">Recent Network Devices</string>
-<<<<<<< HEAD
-    <string name="reconnecting">ReconnectingÔÇŽ</string>
-    <string name="red">Red</string>
-=======
     <string name="reconnecting">Reconnecting…</string>
->>>>>>> upstream/main
+    <string name="red">Red</string>
     <string name="redacted" translatable="false">***[REDACTED]***</string>
     <string name="refresh">Refresh</string>
     <string name="refresh_metadata">Refresh metadata</string>
@@ -1800,11 +1761,8 @@
     <string name="save">Save</string>
     <string name="save_and_restart">Save &amp; restart</string>
     <string name="save_changes">Save</string>
-<<<<<<< HEAD
     <string name="save_csv_in_storage_esp32_only">Save .CSV in storage (ESP32 only)</string>
     <string name="save_log_to_file">Save log to file</string>
-=======
->>>>>>> upstream/main
     <string name="save_rangetest">Export rangetest packets</string>
     <!-- SCAN -->
     <string name="scan">Scan</string>
@@ -1816,14 +1774,9 @@
     <string name="scan_nfc_text">Bring your device close to the NFC tag to scan.</string>
     <string name="scan_shared_contact_nfc">Scan Shared Contact NFC</string>
     <string name="scan_shared_contact_qr">Scan Shared Contact QR Code</string>
-<<<<<<< HEAD
-    <string name="scanning_bluetooth">ScanningÔÇŽ</string>
-    <string name="scanning_network">ScanningÔÇŽ</string>
-    <string name="screen_on_for">Screen on for</string>
-=======
     <string name="scanning_bluetooth">Scanning…</string>
     <string name="scanning_network">Scanning…</string>
->>>>>>> upstream/main
+    <string name="screen_on_for">Screen on for</string>
     <string name="scroll_to_bottom">Scroll to bottom</string>
     <string name="search_emoji">Search emoji...</string>
     <string name="search_messages">Search messagesÔÇŽ</string>
@@ -1909,12 +1862,8 @@
     <string name="show_waypoints">Show Waypoints</string>
     <string name="shutdown">Shutdown</string>
     <string name="shutdown_node_name">Node: %1$s</string>
-<<<<<<< HEAD
     <string name="shutdown_on_power_loss">Shutdown on power loss</string>
-    <string name="shutdown_warning">ÔÜá´ŞĆ This will SHUTDOWN the node. Physical interaction will be required to turn it back on.</string>
-=======
     <string name="shutdown_warning">⚠️ This will SHUTDOWN the node. Physical interaction will be required to turn it back on.</string>
->>>>>>> upstream/main
     <string name="signal">Signal</string>
     <string name="signal_quality">Signal Quality</string>
     <!-- SITE -->
@@ -1947,7 +1896,6 @@
     <string name="site_planner_webview_updating">The system WebView is updating. Please try again in a moment.</string>
     <string name="skip">Skip</string>
     <string name="slot">Slot</string>
-<<<<<<< HEAD
     <string name="smart_position">Smart Position</string>
     <!-- SNIFFER -->
     <string name="sniffer_auto_scroll">Auto-scroll</string>
@@ -1987,8 +1935,6 @@
     <string name="sniffer_warning_compatibility">WARNING: Requires the branded MT_SW app and firmware. Other combinations may hang the node.</string>
     <string name="sniffer_warning_message">Sniffer forwards every packet the radio receives to the phone, not just the ones addressed to this device. Under heavy mesh traffic this can delay or drop some chat messages or telemetry, since they share the same queue to the phone.</string>
     <string name="sniffer_warning_title">Enable Sniffer mode?</string>
-=======
->>>>>>> upstream/main
     <string name="snr">SNR</string>
     <string name="snr_definition">Signal-to-Noise Ratio, a measure used in communications to quantify the level of a desired signal to the level of background noise. In Meshtastic and other wireless systems, a higher SNR indicates a clearer signal that can enhance the reliability and quality of data transmission.</string>
     <string name="soil_moisture">Soil Moist</string>

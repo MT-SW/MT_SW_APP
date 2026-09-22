@@ -1,0 +1,614 @@
+72: <<<<<<< HEAD
+73:     <string name="air_quality_metrics_log">Dziennik jakości powietrza</string>
+74:     <string name="air_quality_metrics_module_enabled">Włącz moduł metryk jakości powietrza</string>
+75:     <string name="air_quality_metrics_update_interval_seconds">Czas aktualizacji metryk jakości powietrza</string>
+76:     <string name="air_util_definition">Procent czasu  wykorzystanego do transmisji w ciągu ostatniej godziny.</string>
+77:     <string name="air_utilization">AirUtil</string>
+78: 
+79:     <!-- ALERT -->
+80:     <string name="alert_bell_buzzer">Brzęczyk dzwonka alarmowego</string>
+81:     <string name="alert_bell_led">Dioda dzwonka alarmowego</string>
+82: =======
+83:     <string name="air_util_definition">Procent czasu  wykorzystanego do transmisji w ciągu ostatniej godziny.</string>
+84: >>>>>>> upstream/main
+91: <<<<<<< HEAD
+92:     <string name="allow_input_source">Zezwól na źródło wejściowe</string>
+93:     <string name="allow_undefined_pin_access">Zezwól na dostęp do niezdefiniowanych pinów</string>
+94:     <string name="alt">Alt</string>
+95:     <string name="altitude">Wys.</string>
+96:     <string name="always_point_north">Zawsze wskazuj północ</string>
+97: =======
+98:     <string name="altitude">Wysokość</string>
+99: >>>>>>> upstream/main
+160: <<<<<<< HEAD
+161:     <string name="bandwidth">Pasmo</string>
+162:     <!-- BANDWIDTH -->
+163:     <string name="bandwidth_default">Domyślne (%1$s kHz)</string>
+164:     <string name="bandwidth_option_khz">%1$s kHz</string>
+165:     <string name="bandwidth_unsupported">Nieobsługiwane (%1$s)</string>
+166:     <string name="bandwidth_unsupported_summary">Ta przepustowość nie jest obsługiwana przez podłączone radio w wybranym regionie. Wybierz obsługiwaną wartość przed zapisaniem.</string>
+167:     <string name="baro_pressure">Baro</string>
+168:     <string name="battery">Bateria</string>
+169:     <string name="battery_ina_2xx_i2c_address">Adres I2C  dla wartości baterii INA_2XX</string>
+170:     <string name="biochemical_oxygen_demand">BZT</string>
+171:     <string name="ble_devices">Urządzenia Bluetooth</string>
+172:     <string name="ble_rssi_threshold_defaults_to_80">Próg RSSI BLE (domyślnie -80)</string>
+173:     <string name="ble_scan_needs_location_services">Skanowanie Bluetooth wymaga też włączonych usług lokalizacji w tej wersji Androida. Twoja pozycja nie jest wykorzystywana.</string>
+174:     <string name="blue">Niebieski</string>
+175: =======
+176:     <string name="battery">Bateria</string>
+177: >>>>>>> upstream/main
+182: <<<<<<< HEAD
+183:     <string name="bluetooth_disabled">Bluetooth jest wyłączony. Włącz go, aby wyszukać pobliskie urządzenia.</string>
+184:     <string name="bluetooth_enabled">Bluetooth włączony</string>
+185: =======
+186: >>>>>>> upstream/main
+192: <<<<<<< HEAD
+193:     <string name="bluetooth_permission_blocked_notice">Dostęp do pobliskich urządzeń jest wyłączony i Android nie zapyta ponownie. Włącz go w ustawieniach aplikacji, aby połączyć się przez Bluetooth, lub połącz się przez Wi-Fi albo USB.</string>
+194:     <string name="bluetooth_permission_blocked_notice_pre31">Uprawnienie lokalizacji jest wyłączone i Android nie zapyta ponownie. Włącz je w ustawieniach aplikacji, aby wyszukiwać urządzenia Bluetooth, lub połącz się przez Wi-Fi albo USB.</string>
+195:     <string name="bluetooth_permission_blocked_rationale">Dostęp do pobliskich urządzeń jest wyłączony i Android nie zapyta ponownie. Włącz go w ustawieniach aplikacji, aby wyszukiwać i łączyć się przez Bluetooth.</string>
+196:     <string name="bluetooth_permission_blocked_rationale_pre31">Uprawnienie lokalizacji jest wyłączone i Android nie zapyta ponownie. Włącz je w ustawieniach aplikacji, aby wyszukiwać i łączyć się przez Bluetooth.</string>
+197:     <string name="bluetooth_permission_denied_notice">Bez dostępu do pobliskich urządzeń MT_SW_APP nie może znaleźć ani połączyć się z Twoim radiem przez Bluetooth. Nadal możesz połączyć się przez Wi-Fi lub USB.</string>
+198:     <string name="bluetooth_permission_denied_notice_pre31">Bez uprawnienia lokalizacji Android blokuje wyszukiwanie Bluetooth, więc MT_SW_APP nie może znaleźć Twojego radia. Nadal możesz połączyć się przez Wi-Fi lub USB.</string>
+199:     <string name="bluetooth_permission_rationale">MT_SW_APP potrzebuje dostępu do pobliskich urządzeń, aby znaleźć Twoje radio i się z nim połączyć. Jest to używane wyłącznie do komunikacji z Twoimi urządzeniami, nigdy do ustalania Twojej lokalizacji. Bez tego Bluetooth jest niedostępny — Wi-Fi i USB nadal działają.</string>
+200:     <string name="bluetooth_permission_rationale_pre31">MT_SW_APP potrzebuje uprawnienia lokalizacji, ponieważ ta wersja Androida traktuje skanowanie Bluetooth jako funkcję lokalizacyjną. Twoja pozycja nigdy nie jest w tym celu odczytywana ani udostępniana. Bez tego Bluetooth jest niedostępny — Wi-Fi i USB nadal działają.</string>
+201:     <string name="boot_reconnect_blocked_message">Uprawnienie do pobliskich urządzeń jest wyłączone, więc nie można połączyć się z radiem przez Bluetooth. Dotknij, aby je włączyć ponownie.</string>
+202:     <string name="boot_reconnect_blocked_title">MT_SW_APP nie może się połączyć ponownie</string>
+203:     <string name="bluetooth_scan_location_services_disabled">Usługi lokalizacji są wyłączone. Włącz je, aby wyszukać pobliskie urządzenia.</string>
+204:     <string name="bluetooth_scan_missing_permission">Skanowanie Bluetooth wymaga uprawnień. Przyznaj uprawnienie Pobliskie urządzenia (lub Lokalizacja), aby wyszukać urządzenia.</string>
+205:     <string name="bluetooth_scan_start_failed">Nie udało się uruchomić skanowania Bluetooth. Spróbuj ponownie lub przełącz Bluetooth, jeśli problem będzie się powtarzał.</string>
+206:     <plurals name="bluetooth_scan_too_frequent">
+207:         <item quantity="one">Osiągnięto limit skanowania Bluetooth. Spróbuj ponownie za %1$d sekundę.</item>
+208:         <item quantity="few">Osiągnięto limit skanowania Bluetooth. Spróbuj ponownie za %1$d sekundy.</item>
+209:         <item quantity="many">Osiągnięto limit skanowania Bluetooth. Spróbuj ponownie za %1$d sekund.</item>
+210:         <item quantity="other">Osiągnięto limit skanowania Bluetooth. Spróbuj ponownie za %1$d sekundy.</item>
+211:     </plurals>
+212:     <string name="bold_heading">Pogrubiony nagłówek</string>
+213:     <string name="bonding_failed_permissions">Parowanie nie powiodło się. Przyznaj uprawnienia do pobliskich urządzeń i spróbuj ponownie.</string>
+214:     <string name="bonding_failed_retry">Parowanie nie zostało ukończone. Spróbuj sparować ponownie.</string>
+215:     <string name="bottom_nav_settings">Ustawienia</string>
+216:     <string name="broadcast_interval">Interwał transmisji</string>
+217:     <string name="busy_noise_floor">Poziom szumu</string>
+218:     <string name="button_gpio">Przycisk GPIO</string>
+219:     <string name="buzzer_gpio">Buzzer GPIO</string>
+220:     <plurals name="cache_limit_eviction_warning">
+221:         <item quantity="one">Obniżenie tej wartości trwale usunie zapisaną historię dla %1$d urządzenia.</item>
+222:         <item quantity="few">Obniżenie tej wartości trwale usunie zapisaną historię dla %1$d urządzeń.</item>
+223:         <item quantity="many">Obniżenie tej wartości trwale usunie zapisaną historię dla %1$d urządzeń.</item>
+224:         <item quantity="other">Obniżenie tej wartości trwale usunie zapisaną historię dla %1$d urządzenia.</item>
+225:     </plurals>
+226: =======
+227:     <string name="bottom_nav_settings">Ustawienia</string>
+228: >>>>>>> upstream/main
+242: <<<<<<< HEAD
+243:     <string name="carousel_interval">Interwał "karuzeli"</string>
+244: =======
+245: >>>>>>> upstream/main
+302: <<<<<<< HEAD
+303:     <string name="co2">CO₂</string>
+304:     <string name="co2_humidity">Wilg. CO₂</string>
+305:     <string name="co2_temperature">Temp. CO₂</string>
+306:     <string name="codec_2_enabled">CODEC 2 włączony</string>
+307:     <string name="codec2_sample_rate">Częstotliwość próbkowania CODEC2</string>
+308:     <string name="coding_rate">Szybkość kodowania</string>
+309:     <string name="collapse_chart">Zwiń wykres</string>
+310:     <string name="collapsed">Zwinięte</string>
+311:     <string name="communicate_off_the_grid">Komunikuj się z przyjaciółmi i społecznością bez zasięgu sieci komórkowej.</string>
+312: =======
+313: >>>>>>> upstream/main
+322: <<<<<<< HEAD
+323:     <string name="compass_north_top">Północ u góry kompasu</string>
+324:     <string name="compass_orientation">Orientacja kompasu</string>
+325: =======
+326: >>>>>>> upstream/main
+333: <<<<<<< HEAD
+334:     <string name="config_device_transmitOverLora_summary">Czy oprócz wysyłania do MQTT i PhoneAPI, NeighborInfo powinny być przesłane przez LoRa? Niedostępny na kanale z domyślnym kluczem i nazwą (z wyjątkiem MT_SW_FIRMWARE).</string>
+335:     <string name="config_device_tripleClickAsAdHocPing_summary">Wyślij lokalizację na kanale głównym, gdy przycisk użytkownika jest trzykrotnie kliknięty.</string>
+336:     <string name="config_device_tzdef_summary">Strefa czasowa dla dat na ekranie urządzenia i dzienniku.</string>
+337:     <string name="config_device_use_phone_tz">Użyj strefy czasowej telefonu</string>
+338:     <string name="config_display_auto_screen_carousel_secs_summary">Automatycznie przewija się na następną stronę na ekranie jak karuzela, co określony interwał czasowy.</string>
+339:     <string name="config_display_compass_north_top_summary">Kierunek kompasu poza okręgiem na ekranie zawsze będzie wskazywał północ.</string>
+340:     <string name="config_display_displaymode_summary">Nadpisz domyślny układ ekranu.</string>
+341:     <string name="config_display_flip_screen_summary">Odwróć ekran pionowo.</string>
+342:     <string name="config_display_heading_bold_summary">Pogrub tekst nagłówka na ekranie.</string>
+343:     <string name="config_display_oled_summary">Nadpisz automatyczne wykrywanie ekranu OLED.</string>
+344:     <string name="config_display_screen_on_secs_summary">Jak długo ekran pozostaje włączony po naciśnięciu przycisku użytkownika lub odebraniu wiadomości.</string>
+345:     <string name="config_display_units_summary">Jednostki wyświetlane na ekranie urządzenia.</string>
+346:     <string name="config_display_wake_on_tap_or_motion_summary">Wymagany jest akcelerometr na urządzeniu.</string>
+347:     <string name="config_lora_frequency_slot_summary">Częstotliwość robocza węzła jest obliczana na podstawie regionu, ustawień modemu i tego pola. Gdy wartość wynosi 0, slot jest automatycznie obliczany na podstawie nazwy kanału podstawowego i zmienia się z domyślnego slotu publicznego. Jeśli skonfigurowano prywatny kanał podstawowy i publiczny kanał dodatkowy, należy przywrócić domyślny slot publiczny.</string>
+348:     <string name="config_lora_hop_limit_summary">Ustawia maksymalną liczbę przeskoków, domyślnie jest to 3. Zwiększenie liczby przeskoków powoduje również wzrost przeciążenia i należy stosować tę opcję ostrożnie. Komunikaty rozgłoszeniowe z 0 przeskokami nie otrzymają potwierdzeń ACK.</string>
+349:     <string name="config_lora_modem_preset_licensed_summary">Presety tego regionu są przeznaczone tylko dla operatorów licencjonowanych (radioamatorów). Włącz opcję Radioamator (Ham) w Konfiguracji użytkownika, aby je wybrać.</string>
+350:     <string name="config_lora_modem_preset_summary">Dostępne presety modemu, domyślnie Narrow Fast.</string>
+351: =======
+352:     <string name="config_device_tripleClickAsAdHocPing_summary">Wyślij lokalizację na kanale głównym, gdy przycisk użytkownika jest trzykrotnie kliknięty.</string>
+353:     <string name="config_device_tzdef_summary">Strefa czasowa dla dat na ekranie urządzenia i dzienniku.</string>
+354:     <string name="config_device_use_phone_tz">Użyj strefy czasowej telefonu</string>
+355:     <string name="config_lora_modem_preset_summary">Dostępne presety modemu, domyślnie Long Fast.</string>
+356: >>>>>>> upstream/main
+359: <<<<<<< HEAD
+360:     <string name="config_network_wifi_enabled_summary">Włączenie WiFi spowoduje wyłączenie bluetooth.</string>
+361:     <string name="config_position_broadcast_secs_summary">Maksymalny odstęp czasu, jaki może upłynąć bez nadawania lokalizacji przez węzeł.</string>
+362:     <string name="config_position_broadcast_smart_minimum_distance_summary">Minimalna zmiana odległości w metrach, którą należy uwzględnić w przypadku inteligentnego pozycjonowania.</string>
+363:     <string name="config_position_broadcast_smart_minimum_interval_secs_summary">Kiedy najszybciej pozycja zostanie zaktualizowana, jeśli minimalna odległość została osiągnięta.</string>
+364:     <string name="config_position_flags_summary">Opcjonalne pola dołączane do danych lokalizacji. Im więcej pól, tym większy rozmiar pakietu, co wydłuża czas transmisji i zwiększa ryzyko jego utraty.</string>
+365:     <string name="config_position_gps_update_interval_summary">Jak często powinniśmy próbować uzyskać pozycję GPS (&lt;10 sekund utrzymuje GPS włączony).</string>
+366:     <string name="config_power_is_power_saving_summary">Uśpij wszystko na tak długo, jak to możliwe, w przypadku funkcji trackera i czujnika obejmie to również radio lora. Nie używaj tego ustawienia, jeśli chcesz korzystać z urządzenia z aplikacjami na telefon lub używasz urządzenia bez przycisków.</string>
+367:     <string name="config_saved_restarting">Węzeł restartuje się i będzie chwilowo niedostępny.</string>
+368:     <string name="config_security_admin_key">Klucz publiczny uprawniony do wysyłania poleceń administracyjnych do tego węzła.</string>
+369:     <string name="config_security_debug_log_api_enabled">Pokaż na żywo logi debugowania przez połączenie szeregowe, podejrzyj i eksportuj logi węzła (bez informacji lokalizacyjnych) przez Bluetooth.</string>
+370:     <string name="config_security_is_managed">Urządzenie jest zarządzane przez administratora sieci mesh, użytkownik nie ma dostępu do żadnych ustawień urządzenia.</string>
+371:     <string name="config_security_private_key">Klucz prywatny, na podstawie którego generujemy ID (fw 2.8) oraz klucz publiczny.</string>
+372:     <string name="config_security_private_key_remote">Urządzenie nie udostępnia swojego klucza prywatnego poprzez zdalne zarządzanie. Możesz ustawić nowy klucz, ale nie będzie można go odczytać ponownie.</string>
+373:     <string name="config_security_public_key">Wygenerowany z Twojego klucza prywatnego i wysyłany do innych węzłów w sieci mesh.</string>
+374:     <string name="config_security_serial_enabled">Konsola szeregowa przez Stream API.</string>
+375: =======
+376:     <string name="config_position_broadcast_smart_minimum_interval_secs_summary">Kiedy najszybciej pozycja zostanie zaktualizowana, jeśli minimalna odległość została osiągnięta.</string>
+377:     <string name="config_security_private_key">Używane do tworzenia klucza współdzielonego ze zdalnym urządzeniem.</string>
+378: >>>>>>> upstream/main
+489: <<<<<<< HEAD
+490:     <string name="detection_sensor_enabled">Czujnik detekcji włączony</string>
+491:     <string name="detection_trigger_type">Typ wyzwalacza wykrywania</string>
+492: =======
+493: >>>>>>> upstream/main
+584: <<<<<<< HEAD
+585:     <string name="discovery_stat_sensor_pkts">Pakiety czujników</string>
+586:     <string name="discovery_stat_session_overview">Przegląd sesji</string>
+587:     <string name="discovery_stat_status">Status</string>
+588:     <string name="discovery_stat_success_rate">Wskaźnik sukcesu</string>
+589:     <string name="discovery_stat_total_dwell_time">Łączny czas nasłuchu</string>
+590:     <string name="discovery_stat_total_messages">Łącznie wiadomości</string>
+591:     <string name="discovery_stat_total_unique_nodes">Łącznie unikalnych węzłów</string>
+592:     <string name="discovery_stat_unique_nodes">Unikalne węzły</string>
+593:     <string name="discovery_stat_unselected">Nie wybrano</string>
+594:     <string name="discovery_stop_scan">Zatrzymaj skan</string>
+595:     <string name="discovery_summary_not_available">Analiza AI niedostępna</string>
+596:     <string name="discovery_time_remaining">Pozostało %1$s</string>
+597:     <string name="discovery_unique_nodes">%1$d unikalnych węzłów</string>
+598:     <string name="discovery_view_map">Zobacz mapę</string>
+599:     <string name="disk_free_indexed">Wolne miejsce na dysku %1$d</string>
+600:     <!-- DISPLAY -->
+601:     <string name="display">Wyświetlacz</string>
+602:     <string name="display_config">Ustawienia wyświetlacza</string>
+603:     <string name="display_mode">Tryb wyświetlania</string>
+604:     <string name="display_time_in_12h_format">Gdy włączone, urządzenie będzie wyświetlać czas na ekranie w formacie 12-godzinnym.</string>
+605:     <string name="display_units">Wyświetlana jednostka</string>
+606:     <string name="dissolved_oxygen">Rozp. O₂</string>
+607: =======
+608:     <string name="display">Wyświetlacz</string>
+609:     <string name="display_config">Ustawienia wyświetlacza</string>
+610: >>>>>>> upstream/main
+674: <<<<<<< HEAD
+675:     <string name="dont_show_again_for_device">Nie pokazuj ponownie dla tego urządzenia</string>
+676:     <string name="double_tap_as_button_press">Podwójne dotknięcie jako naciśnięcie przycisku</string>
+677:     <string name="downlink_enabled">Odbiór włączony</string>
+678:     <string name="downlink_feature_description">Wiadomości z publicznej bramy internetowej są przekazywane do lokalnej sieci mesh. Ze względu na politykę zero-hop, ruch z domyślnego serwera MQTT nie rozejdzie się dalej niż to urządzenie.</string>
+679:     <string name="download">Pobierz</string>
+680:     <string name="download_this_area">Pobierz ten obszar</string>
+681:     <string name="duplicated_public_key_title">Wykryto zduplikowany klucz publiczny</string>
+682:     <string name="dynamic">Dynamiczny</string>
+683:     <string name="easily_set_up_private_mesh_networks">Łatwo skonfiguruj prywatne sieci mesh do bezpiecznej i niezawodnej komunikacji na odległych obszarach.</string>
+684:     <string name="echo_enabled">Włącz echo</string>
+685: =======
+686:     <string name="download">Pobierz</string>
+687: >>>>>>> upstream/main
+694: <<<<<<< HEAD
+695:     <string name="emoji_category_activities">Aktywności</string>
+696:     <string name="emoji_category_animals_nature">Zwierzęta i przyroda</string>
+697:     <string name="emoji_category_flags">Flagi</string>
+698:     <string name="emoji_category_food_drink">Jedzenie i napoje</string>
+699:     <string name="emoji_category_objects">Obiekty</string>
+700:     <string name="emoji_category_people_body">Ludzie i ciało</string>
+701:     <string name="emoji_category_smileys_emotion">Buźki i emocje</string>
+702:     <string name="emoji_category_symbols">Symbole</string>
+703:     <string name="emoji_category_travel_places">Podróże i miejsca</string>
+704:     <string name="emoji_load_error">Nie można załadować emoji</string>
+705:     <string name="emoji_no_results">Nie znaleziono emoji</string>
+706:     <string name="emoji_recently_used">Ostatnio używane</string>
+707:     <string name="enable_power_saving_mode">Włącz tryb oszczędzania energii</string>
+708: =======
+709: >>>>>>> upstream/main
+890: <<<<<<< HEAD
+891:     <string name="flip_screen">Odwróć ekran</string>
+892:     <string name="for_more_information_see_our_privacy_policy">Aby dowiedzieć się więcej, zapoznaj się z naszą polityką prywatności.</string>
+893:     <!-- FORMAT -->
+894:     <string name="format_bold">Pogrubienie</string>
+895:     <string name="format_code">Kod</string>
+896:     <string name="format_italic">Kursywa</string>
+897:     <string name="format_link">Link</string>
+898:     <string name="format_strikethrough">Przekreślenie</string>
+899:     <string name="fr_HT" translatable="false">Kreyòl ayisyen</string>
+900:     <string name="free_memory">Wolna pamięć</string>
+901:     <string name="free_memory_description">Dostępna pamięć systemowa w bajtach</string>
+902:     <string name="freq">Częst.</string>
+903:     <string name="frequency_slot">Slot częstotliwości</string>
+904:     <string name="friendly_name">Przyjazna nazwa</string>
+905: =======
+906:     <!-- FORMAT -->
+907: >>>>>>> upstream/main
+938: <<<<<<< HEAD
+939:     <string name="gpio_mask_display">Maska: %1$s</string>
+940:     <string name="gpio_off">0</string>
+941:     <string name="gpio_on">1</string>
+942:     <string name="gpio_pin">Funkcja wymaga kanału "gpio" na 1 pozycji. Podaj GPIO (liczba całkowita)</string>
+943:     <string name="gpio_pin_for_rotary_encoder_a_port">Pin GPIO dla portu A enkodera obrotowego</string>
+944:     <string name="gpio_pin_for_rotary_encoder_b_port">Pin GPIO dla portu B enkodera obrotowego</string>
+945:     <string name="gpio_pin_for_rotary_encoder_press_port">Pin GPIO dla portu Press enkodera obrotowego</string>
+946:     <string name="gpio_pin_to_monitor">Pin GPIO do monitorowania</string>
+947:     <string name="gpio_read">Odczyt</string>
+948:     <string name="gpio_read_result">Odczyt GPIO: %1$s</string>
+949:     <string name="gps_en_gpio">GPS EN GPIO</string>
+950:     <string name="gps_mode">Tryb GPS (sprzęt fizyczny)</string>
+951:     <string name="gps_receive_gpio">GPS Rx GPIO</string>
+952:     <string name="gps_transmit_gpio">GPS Tx GPIO</string>
+953:     <string name="grant_permission">Przyznaj uprawnienie</string>
+954:     <string name="green">Zielony</string>
+955:     <string name="ham_long_name_summary">Opcjonalnie. Dołączane do Twojego znaku wywoławczego, np. KD2ABC//Strych Heltec</string>
+956: =======
+957:     <string name="gpio_pin">Pin GPIO</string>
+958: >>>>>>> upstream/main
+962: <<<<<<< HEAD
+963:     <string name="heartbeat">Bicie serca</string>
+964:     <string name="help_and_documentation">Pomoc i dokumentacja</string>
+965: =======
+966: >>>>>>> upstream/main
+981: <<<<<<< HEAD
+982:     <string name="i2s_clock">Zegar I2S</string>
+983:     <string name="i2s_data_in">I2S dane wejściowe</string>
+984:     <string name="i2s_data_out">I2S dane wyjściowe</string>
+985:     <string name="i2s_word_select">I2S wybór słowa</string>
+986: =======
+987: >>>>>>> upstream/main
+1064: <<<<<<< HEAD
+1065:     <string name="led_state">Stan diody LED</string>
+1066:     <string name="legacy_admin_channel">Stary kanał administracyjny</string>
+1067:     <string name="library_count">%1$d bibliotek</string>
+1068:     <string name="licensed_amateur_radio">Radioamator licencjonowany (Ham)</string>
+1069:     <string name="licensed_amateur_radio_text">Włączenie tej opcji wyłącza szyfrowanie i jest niezgodne z domyślną siecią MT_SW.</string>
+1070:     <string name="licensed_mode_enable_confirm">Włącz tryb licencjonowany</string>
+1071:     <string name="licensed_mode_enable_title">Włączyć tryb licencjonowany (Ham)?</string>
+1072:     <string name="licensed_mode_enable_warning">Tryb licencjonowany usuwa klucze szyfrowania kanałów i wyłącza kanał administracyjny, więc cały ruch jest wysyłany jako czysty tekst, który każdy może odczytać — a to firmware nie może go podpisać, więc inne węzły nie mogą zweryfikować, że pochodzi od Ciebie. Nie jest to zgodne z domyślną siecią Meshtastic, a Ty pozostajesz odpowiedzialny za spełnienie wymagań swojej licencji radioamatorskiej i lokalnych przepisów.</string>
+1073:     <string name="licensed_mode_enable_warning_signed">Tryb licencjonowany usuwa klucze szyfrowania kanałów i wyłącza kanał administracyjny, więc cały ruch jest wysyłany jako czysty tekst, który każdy może odczytać — ale jest cyfrowo podpisany, co pozwala innym węzłom zweryfikować, że pochodzi od Ciebie. Numer Twojego węzła może się raz zmienić, aby dopasować się do klucza tożsamości, więc ulubione, historia wiadomości, zdalne zarządzanie i inne węzły mogą początkowo traktować go jako nowy; pozostajesz odpowiedzialny za spełnienie wymagań swojej licencji radioamatorskiej i lokalnych przepisów.</string>
+1074:     <string name="lightning_distance">Odległość burzy</string>
+1075:     <string name="lightning_strikes_1h">Wyładowania (1h)</string>
+1076: =======
+1077:     <!-- LICENSED -->
+1078: >>>>>>> upstream/main
+1375: <<<<<<< HEAD
+1376:     <string name="mqtt_enabled">Włącz MQTT</string>
+1377:     <string name="mqtt_error_connection_lost">MQTT: utracono połączenie</string>
+1378:     <string name="mqtt_error_credentials_rejected">MQTT: połączenie odrzucone (sprawdź dane logowania)</string>
+1379:     <string name="mqtt_error_proxy_failed">Proxy MQTT nieudane: %1$s</string>
+1380:     <string name="mqtt_error_rejected">MQTT: połączenie odrzucone: %1$s</string>
+1381:     <string name="mqtt_probe_dns_failure">Nie znaleziono hosta</string>
+1382:     <string name="mqtt_probe_other_failure">Połączenie nieudane</string>
+1383:     <string name="mqtt_probe_rejected">Broker odrzucił: %1$s</string>
+1384:     <string name="mqtt_probe_running">Sprawdzanie brokera…</string>
+1385:     <string name="mqtt_probe_success">Osiągalny. Broker zaakceptował dane uwierzytelniające.</string>
+1386:     <string name="mqtt_probe_success_with_info">Osiągalny (%1$s)</string>
+1387:     <string name="mqtt_probe_tcp_failure">Nie można połączyć się z brokerem (TCP)</string>
+1388:     <string name="mqtt_probe_timeout">Przekroczono czas oczekiwania po %1$d ms</string>
+1389:     <string name="mqtt_probe_tls_failure">Uzgadnianie TLS nieudane: %1$s</string>
+1390:     <string name="mqtt_proxy_local">Proxy MQTT na tym telefonie</string>
+1391:     <string name="mqtt_proxy_local_summary">Ten telefon przekazuje ruch MQTT dla połączonego urządzenia. Wyłącz, aby natychmiast przerwać przekazywanie bez zmiany ustawień MQTT urządzenia - przydatne, gdy ruch MQTT przeciąża połączenie. Włącz ponownie, aby wznowić przekazywanie.</string>
+1392:     <string name="mqtt_sniffer_enabled_title">Sniffer MQTT</string>
+1393:     <string name="mqtt_sniffer_enabled_summary">Obserwuj ruch sieci mesh widoczny na brokerze, z którym skonfigurowany jest ten węzeł, korzystając z własnego połączenia MQTT tego telefonu — nie tylko to, co połączony węzeł usłyszy przez LoRa.</string>
+1394:     <string name="mqtt_sniffer_warning_title">Włączyć Sniffer MQTT?</string>
+1395:     <string name="mqtt_sniffer_warning_message">Otwiera własne połączenie ze skonfigurowanym brokerem MQTT. Klient MQTT tej aplikacji obsługuje tylko jedno aktywne połączenie naraz, więc jeśli "Proxy MQTT na tym telefonie" aktualnie przekazuje ruch dla połączonego węzła, włączenie tego przerwie je na czas działania sniffera.</string>
+1396:     <string name="mqtt_sniffer_log_title">Log Sniffera MQTT</string>
+1397:     <string name="mqtt_sniffer_log_empty">Brak pakietów MQTT — włącz powyżej Sniffer MQTT, aby zacząć obserwować ruch na brokerze</string>
+1398: =======
+1399: >>>>>>> upstream/main
+1429: <<<<<<< HEAD
+1430:     <string name="navigate_into_label">Wejdź do środka</string>
+1431:     <string name="nearby_devices_permission">Uprawnienie do pobliskich urządzeń</string>
+1432:     <string name="need_hardware">Potrzebujesz sprzętu?</string>
+1433:     <string name="need_hardware_description">MT_SW wymaga kompatybilnego urządzenia. Nasi wspierający i partnerzy oferują gotowy do użycia sprzęt. Oto niektóre z najpopularniejszych opcji.</string>
+1434:     <string name="neighbor_info">Informacje o sąsiadach</string>
+1435:     <string name="neighbor_info_config">Konfiguracja Info o sąsiadach</string>
+1436:     <string name="neighbor_info_enabled">Włącz informacje o sąsiadach</string>
+1437:     <string name="on_demand_node_stats">Statystyki węzła</string>
+1438:     <string name="on_demand_log_title">Diagnostyka na żądanie</string>
+1439:     <string name="on_demand_ping">Ping</string>
+1440:     <string name="on_demand_ping_ack">Ping (potwierdzenie)</string>
+1441:     <string name="on_demand_nodes_online">Węzły online</string>
+1442:     <string name="on_demand_routing_errors">Błędy routingu</string>
+1443:     <string name="on_demand_port_counters">Liczniki portów</string>
+1444:     <string name="on_demand_air_activity">Aktywność eteru</string>
+1445:     <string name="on_demand_exchange_log">Log wymiany pakietów</string>
+1446:     <string name="on_demand_rx_avg_time">Średni czas RX</string>
+1447:     <string name="on_demand_fw_plus_version">Wersja MT_SW Firmware</string>
+1448:     <string name="on_demand_rx_packet_history">Historia odebranych pakietów</string>
+1449:     <string name="on_demand_battery_level">Bateria</string>
+1450:     <string name="on_demand_uptime">Czas pracy</string>
+1451:     <string name="on_demand_channel_utilization">Wykorzystanie kanału</string>
+1452:     <string name="on_demand_air_util_tx">Wykorzystanie eteru TX</string>
+1453:     <string name="on_demand_packets_tx">Pakiety TX</string>
+1454:     <string name="on_demand_packets_rx">Pakiety RX</string>
+1455:     <string name="on_demand_packets_rx_bad">Pakiety RX (błędne)</string>
+1456:     <string name="on_demand_stat_nodes_online">Węzły online</string>
+1457:     <string name="on_demand_stat_nodes_total">Węzły łącznie</string>
+1458:     <string name="on_demand_reboots">Restarty</string>
+1459:     <string name="on_demand_heap_free">Wolny heap</string>
+1460:     <string name="on_demand_heap_total">Heap łącznie</string>
+1461:     <string name="on_demand_cpu_usage">Użycie CPU</string>
+1462:     <string name="on_demand_flash">Flash</string>
+1463:     <string name="on_demand_psram">PSRAM</string>
+1464:     <string name="on_demand_flood_counter">Licznik flood</string>
+1465:     <string name="on_demand_nexthop_counter">Licznik nexthop</string>
+1466:     <string name="on_demand_blocked_hoplimit">Zablokowane limitem hopów</string>
+1467:     <string name="on_demand_firmware_version">Wersja firmware</string>
+1468:     <string name="on_demand_rssi">RSSI</string>
+1469:     <string name="on_demand_snr">SNR</string>
+1470:     <string name="on_demand_node_stats_desc">Bieżące statystyki węzła: bateria, czas pracy, CPU, pamięć, liczniki sieciowe.</string>
+1471:     <string name="on_demand_ping_desc">Sprawdza siłę sygnału do tego węzła (RSSI/SNR).</string>
+1472:     <string name="on_demand_nodes_online_desc">Węzły widziane przez ten węzeł w ciągu ostatnich 2 godzin.</string>
+1473:     <string name="on_demand_routing_errors_desc">Liczniki błędów routingu zgłoszonych przez ten węzeł (pusto = brak błędów).</string>
+1474:     <string name="on_demand_port_counters_desc">Ile pakietów danego typu (portu) ten węzeł przetworzył.</string>
+1475:     <string name="on_demand_air_activity_desc">Aktywność radiowa (TX/RX/błędny RX) w kolejnych 10-minutowych oknach.</string>
+1476:     <string name="on_demand_exchange_log_desc">Ostatnie pary nadawca → odbiorca zaobserwowane przez ten węzeł.</string>
+1477:     <string name="on_demand_rx_avg_time_desc">Średni czas odbioru pakietu w kolejnych oknach czasowych.</string>
+1478:     <string name="on_demand_rx_packet_history_desc">Liczba odebranych pakietów w kolejnych 10-minutowych oknach.</string>
+1479:     <string name="on_demand_fw_plus_version_desc">Wersja protokołu OnDemand działającego na tym węźle.</string>
+1480:     <string name="port_name_text_message">Wiadomość tekstowa</string>
+1481:     <string name="port_desc_text_message">wiadomości tekstowe czatu</string>
+1482:     <string name="port_name_remote_hardware">Zdalny sprzęt (GPIO)</string>
+1483:     <string name="port_desc_remote_hardware">zdalne sterowanie GPIO</string>
+1484:     <string name="port_name_position">Pozycja</string>
+1485:     <string name="port_desc_position">pozycja GPS</string>
+1486:     <string name="port_name_nodeinfo">Info o węźle</string>
+1487:     <string name="port_desc_nodeinfo">dane użytkownika węzła (nazwa, klucz)</string>
+1488:     <string name="port_name_routing">Trasowanie</string>
+1489:     <string name="port_desc_routing">potwierdzenia i błędy trasowania (ACK/NAK)</string>
+1490:     <string name="port_name_admin">Administracja</string>
+1491:     <string name="port_desc_admin">zdalne polecenia administracyjne</string>
+1492:     <string name="port_name_text_message_compressed">Wiadomość tekstowa (skompresowana)</string>
+1493:     <string name="port_desc_text_message_compressed">skompresowane wiadomości tekstowe</string>
+1494:     <string name="port_name_waypoint">Punkt na mapie</string>
+1495:     <string name="port_desc_waypoint">punkty na mapie (waypointy)</string>
+1496:     <string name="port_name_detection_sensor">Czujnik detekcji</string>
+1497:     <string name="port_desc_detection_sensor">moduł czujnika detekcji</string>
+1498:     <string name="port_name_alert">Alert</string>
+1499:     <string name="port_desc_alert">alerty krytyczne (SOS)</string>
+1500:     <string name="port_name_paxcounter">Licznik osób</string>
+1501:     <string name="port_desc_paxcounter">licznik osób w zasięgu</string>
+1502:     <string name="port_name_store_forward_plus">Przechowaj i prześlij++</string>
+1503:     <string name="port_desc_store_forward_plus">przechowywanie i przekazywanie wiadomości (Linux)</string>
+1504:     <string name="port_name_node_status">Status węzła</string>
+1505:     <string name="port_desc_node_status">niestandardowy status tekstowy węzła</string>
+1506:     <string name="port_name_mesh_beacon">Sygnał mesh (beacon)</string>
+1507:     <string name="port_desc_mesh_beacon">rozgłoszenia zaproszeń do innej sieci mesh</string>
+1508:     <string name="port_name_serial">Port szeregowy</string>
+1509:     <string name="port_desc_serial">most szeregowy UART</string>
+1510:     <string name="port_name_store_forward">Przechowaj i prześlij</string>
+1511:     <string name="port_desc_store_forward">przechowywanie i przekazywanie wiadomości</string>
+1512:     <string name="port_name_range_test">Test zasięgu</string>
+1513:     <string name="port_desc_range_test">test zasięgu</string>
+1514:     <string name="port_name_telemetry">Telemetria</string>
+1515:     <string name="port_desc_telemetry">telemetria (bateria, środowisko, zasoby)</string>
+1516:     <string name="port_name_zps">ZPS</string>
+1517:     <string name="port_desc_zps">eksperymentalne pozycjonowanie bez GPS</string>
+1518:     <string name="port_name_simulator">Symulator</string>
+1519:     <string name="port_desc_simulator">symulator węzła</string>
+1520:     <string name="port_name_traceroute">Śledzenie trasy</string>
+1521:     <string name="port_desc_traceroute">śledzenie trasy pakietu przez sieć</string>
+1522:     <string name="port_name_neighborinfo">Info o sąsiadach</string>
+1523:     <string name="port_desc_neighborinfo">lista sąsiadów węzła</string>
+1524:     <string name="port_name_map_report">Raport dla mapy</string>
+1525:     <string name="port_desc_map_report">dane węzła dla mapy publicznej (MQTT)</string>
+1526:     <string name="port_name_on_demand">OnDemand</string>
+1527:     <string name="port_desc_on_demand">diagnostyka na żądanie</string>
+1528:     <string name="port_name_unknown">Port</string>
+1529:     <string name="port_desc_unknown">inny typ pakietu</string>
+1530:     <string name="on_demand_hops">Liczba skoków</string>
+1531:     <string name="on_demand_round_trip">Czas odpowiedzi</string>
+1532:     <string name="on_demand_received_at">Odebrano: %1$s</string>
+1533: =======
+1534:     <string name="neighbor_info">Informacje o sąsiadze</string>
+1535:     <string name="neighbor_info_config">Konfiguracja Info o sąsiedzie</string>
+1536: >>>>>>> upstream/main
+1657: <<<<<<< HEAD
+1658:     <string name="ntp_server">Serwer NTP</string>
+1659:     <string name="number_of_records">Liczba rekordów</string>
+1660:     <!-- OFFLINE -->
+1661:     <string name="offline_maps">Mapy offline</string>
+1662:     <string name="offline_maps_empty">Brak jeszcze pobranych obszarów</string>
+1663:     <string name="ok_to_mqtt">Ok dla MQTT</string>
+1664:     <string name="okay">OK</string>
+1665:     <string name="oled_type">Typ ekranu OLED</string>
+1666:     <string name="offline_terrain_cache_detail">%1$s: %2$s · %3$s</string>
+1667:     <string name="offline_terrain_empty">Nie pobrano jeszcze żadnego terenu</string>
+1668:     <string name="offline_terrain_manager">Teren offline</string>
+1669:     <string name="offline_terrain_regional_detail">Zawiera szczegółowy teren regionalny</string>
+1670: =======
+1671:     <!-- OFFLINE -->
+1672:     <string name="okay">OK</string>
+1673: >>>>>>> upstream/main
+1692: <<<<<<< HEAD
+1693:     <string name="orp">ORP</string>
+1694:     <!-- OUTPUT -->
+1695:     <string name="output_buzzer_gpio">Wyjście buzzera (GPIO)</string>
+1696:     <string name="output_duration_milliseconds">Czas trwania (w milisekundach)</string>
+1697:     <string name="output_led_active_high">Wyjście LED aktywne wysokim stanem</string>
+1698:     <string name="output_led_gpio">Wyjście LED (GPIO)</string>
+1699:     <string name="output_vibra_gpio">Wyjście silnika wibracyjnego (GPIO)</string>
+1700:     <string name="overflow_menu">Menu dodatkowe</string>
+1701:     <string name="override_console_serial_port">Nadpisz port szeregowy konsoli</string>
+1702:     <string name="override_duty_cycle">Pomiń limit czasu nadawania</string>
+1703:     <string name="override_frequency_mhz">Wymuszenie częstotliwości</string>
+1704:     <string name="pa_fan_disabled">Wentylator PA wyłączony</string>
+1705:     <!-- PACKET -->
+1706:     <string name="packet_authenticity">Autentyczność pakietów</string>
+1707:     <string name="packet_authenticity_balanced">Zrównoważony — Preferuj uwierzytelnione</string>
+1708:     <string name="packet_authenticity_balanced_summary">Zalecane. Odrzuca próby degradacji bez podpisu od węzłów znanych z podpisywania.</string>
+1709:     <string name="packet_authenticity_compatible">Kompatybilny — Akceptuj niepodpisane</string>
+1710:     <string name="packet_authenticity_compatible_summary">Uwierzytelnia pakiety, gdy to możliwe, ale akceptuje niepodpisany ruch dla maksymalnej kompatybilności.</string>
+1711:     <string name="packet_authenticity_level">Poziom ochrony</string>
+1712:     <string name="packet_authenticity_strict">Ścisły — Wymagaj uwierzytelnienia</string>
+1713:     <string name="packet_authenticity_strict_confirm">Włącz Ścisły</string>
+1714:     <string name="packet_authenticity_strict_confirmation">Tryb Ścisły ignoruje każdy zdalny pakiet sieci mesh, który nie jest kryptograficznie uwierzytelniony. Starsze firmware, węzły licencjonowane lub radioamatorskie bez kluczy PKI oraz zbyt duże pakiety mogą zniknąć. Wiadomości bezpośrednie uwierzytelnione PKI pozostają dostępne.</string>
+1715:     <string name="packet_authenticity_strict_summary">Pokazuj i przetwarzaj tylko kryptograficznie uwierzytelnione pakiety sieci mesh. Starsze węzły i zbyt duże pakiety mogą zniknąć.</string>
+1716:     <string name="packet_authenticity_strict_title">Włączyć uwierzytelnianie Ścisłe?</string>
+1717:     <string name="packet_authenticity_unsupported">To połączone urządzenie nie obsługuje weryfikacji podpisów pakietów.</string>
+1718:     <string name="pairing_mode">Tryb parowania</string>
+1719: =======
+1720:     <string name="output_duration_milliseconds">Czas trwania (w milisekundach)</string>
+1721:     <!-- PACKET -->
+1722: >>>>>>> upstream/main
+1804: <<<<<<< HEAD
+1805:     <string name="potassium">Potas</string>
+1806:     <!-- POWER -->
+1807:     <string name="power">Zasilanie</string>
+1808:     <string name="power_config">Konfiguracja zarządzania energią</string>
+1809:     <string name="power_metrics_log">Metryki zasilania</string>
+1810:     <string name="power_metrics_module_enabled">Włącz moduł metryk zasilania</string>
+1811:     <string name="power_metrics_on_screen_enabled">Wyświetlaj metryki zasilania na ekranie</string>
+1812:     <string name="power_metrics_update_interval_seconds">Czas aktualizacji metryk zasilania</string>
+1813:     <string name="powered">Zasilany</string>
+1814:     <string name="ppm">ppm</string>
+1815: =======
+1816:     <string name="power">Zasilanie</string>
+1817:     <string name="power_config">Konfiguracja zarządzania energią</string>
+1818:     <string name="power_metrics_log">Metryki zasilania</string>
+1819: >>>>>>> upstream/main
+1838: <<<<<<< HEAD
+1839:     <string name="primary_channel_feature">Okresowe nadawanie pozycji i telemetrii</string>
+1840:     <string name="privacy_url" translatable="false">https://meshtastic.org/docs/legal/privacy/</string>
+1841:     <string name="private_key">Klucz prywatny</string>
+1842:     <string name="project_information">Informacje o projekcie</string>
+1843: =======
+1844: >>>>>>> upstream/main
+1849: <<<<<<< HEAD
+1850:     <string name="pt_BR" translatable="false">Português do Brasil</string>
+1851:     <string name="ptt_pin">Pin PTT (Push-To-Talk)</string>
+1852: =======
+1853: >>>>>>> upstream/main
+1880: <<<<<<< HEAD
+1881:     <string name="rebroadcast_mode_none_desc">Dozwolone wyłącznie dla ról Czujnik, Tracker i TAK Tracker. Spowoduje to zablokowanie wszystkich retransmisji, podobnie jak rola Klient pasywny.</string>
+1882:     <string name="recent_network_devices">Ostatnie urządzenia sieciowe</string>
+1883:     <string name="reconnecting">Ponowne łączenie…</string>
+1884:     <string name="red">Czerwony</string>
+1885:     <string name="redacted" translatable="false">***[REDACTED]***</string>
+1886:     <string name="refresh">Odśwież</string>
+1887:     <string name="refresh_metadata">Odśwież metadane</string>
+1888:     <string name="regenerate_keys_confirmation">Czy na pewno chcesz wygenerować nowy klucz prywatny?\n\nWęzły, które mogły wcześniej wymienić klucze z tym węzłem, będą musiały go usunąć i ponownie wymienić klucze, aby wznowić bezpieczną komunikację.</string>
+1889:     <string name="regenerate_private_key">Wygeneruj nowy klucz prywatny</string>
+1890: =======
+1891:     <string name="rebroadcast_mode_none_desc">Dozwolone wyłącznie dla ról SENSOR, TRACKER i TAK_TRACKER. Spowoduje to zablokowanie wszystkich retransmisji, podobnie jak rola CLIENT_MUTE.</string>
+1892: >>>>>>> upstream/main
+1973: <<<<<<< HEAD
+1974:     <string name="role_tracker">Tracker</string>
+1975:     <string name="role_tracker_desc">Nadaje priorytetowo pakiety pozycji GPS.</string>
+1976:     <string name="root_topic">Główny temat</string>
+1977:     <string name="rotary_encoder_1_enabled">Enkoder obrotowy #1 włączony</string>
+1978:     <string name="router_role_confirmation_text">Przeczytałem &lt;a href="https://meshtastic.org/docs/configuration/radio/device/#roles"&gt;dokumentację ról urządzenia&lt;/a&gt; oraz wpis na blogu o &lt;a href="http://meshtastic.org/blog/choosing-the-right-device-role"&gt;wyborze właściwej roli urządzenia&lt;/a&gt;.</string>
+1979: =======
+1980:     <string name="role_tracker_desc">Tracker - Do użytku z urządzeniami przeznaczonymi jako śledzenie GPS. Pakiety pozycyjne wysyłane z tego urządzenia będą miały wyższy priorytet, z nadawaniem pozycji co dwie minuty. Inteligentna transmisja pozycji będzie domyślnie wyłączona.</string>
+1981: >>>>>>> upstream/main
+2003: <<<<<<< HEAD
+2004:     <string name="rsyslog_server">Serwer rsyslog</string>
+2005:     <string name="salinity">Zasolenie</string>
+2006:     <string name="sample_message" translatable="false">hey I found the cache, it is over here next to the big tiger. I'm kinda scared.</string>
+2007:     <string name="sats">Sat.</string>
+2008:     <!-- SAVE -->
+2009: =======
+2010: >>>>>>> upstream/main
+2019: <<<<<<< HEAD
+2020:     <string name="scan_bluetooth_devices">Skanuj w poszukiwaniu urządzeń Bluetooth</string>
+2021:     <string name="scan_channels_nfc">Skanuj udostępnione kanały (NFC)</string>
+2022:     <string name="scan_channels_qr">Skanuj kod QR udostępnionych kanałów</string>
+2023:     <string name="scan_network_devices">Skanuj w poszukiwaniu urządzeń sieciowych</string>
+2024:     <string name="scan_nfc">Skanuj NFC</string>
+2025:     <string name="scan_nfc_text">Zbliż urządzenie do znacznika NFC, aby zeskanować.</string>
+2026:     <string name="scan_shared_contact_nfc">Skanuj udostępniony kontakt (NFC)</string>
+2027:     <string name="scan_shared_contact_qr">Skanuj kod QR udostępnionego kontaktu</string>
+2028:     <string name="scanning_bluetooth">Skanowanie…</string>
+2029:     <string name="scanning_network">Skanowanie…</string>
+2030:     <string name="screen_on_for">Ekran włączony na</string>
+2031: =======
+2032: >>>>>>> upstream/main
+2078: <<<<<<< HEAD
+2079:     <string name="send_bell">Wyślij dzwonek</string>
+2080:     <string name="send_bell_with_alert_message">Wyślij dzwonek z wiadomością alarmową</string>
+2081:     <string name="sender_message_interval_seconds">Interwał wiadomości nadawcy (sekundy)</string>
+2082:     <!-- SERIAL -->
+2083:     <string name="serial">Port szeregowy</string>
+2084:     <string name="serial_baud_rate">Prędkość transmisji</string>
+2085:     <string name="serial_config">Konfiguracja seryjna</string>
+2086:     <string name="serial_console">Konsola szeregowa</string>
+2087:     <string name="serial_enabled">Włącz tryb serial</string>
+2088:     <string name="serial_mode">Tryb serial</string>
+2089:     <string name="serial_rx_pin">RX</string>
+2090:     <string name="serial_tx_pin">TX</string>
+2091:     <string name="server">Serwer</string>
+2092:     <string name="session_active">Sesja aktywna</string>
+2093:     <string name="session_refresh_required">Wymagane odświeżenie</string>
+2094:     <string name="set_time">Ustaw czas</string>
+2095:     <string name="set_up_connection">Skonfiguruj połączenie</string>
+2096: =======
+2097:     <string name="serial">Seryjny</string>
+2098:     <string name="serial_config">Konfiguracja seryjna</string>
+2099: >>>>>>> upstream/main
+2201: <<<<<<< HEAD
+2202:     <string name="slot">Slot</string>
+2203:     <string name="smart_position">Inteligentne Pozycjonowanie</string>
+2204: =======
+2205: >>>>>>> upstream/main
+2214: <<<<<<< HEAD
+2215:     <string name="speed_kmh">%1$d km/h</string>
+2216:     <string name="speed_mph">%1$d mph</string>
+2217:     <string name="spread_factor">Współczynnik rozproszenia</string>
+2218:     <string name="ssid">SSID</string>
+2219:     <string name="state_broadcast_seconds">Nadawanie stanu (sekundy)</string>
+2220:     <string name="status_message">Wiadomość statusu</string>
+2221:     <string name="status_message_config">Konfiguracja wiadomości statusu</string>
+2222:     <string name="status_message_summary">Wiadomość statusu, która jest rozgłaszana do sieci mesh. Inne węzły zobaczą ten status na liście węzłów.</string>
+2223:     <string name="stay_connected_anywhere">Bądź w kontakcie wszędzie</string>
+2224:     <string name="stop_connecting">Zatrzymaj łączenie</string>
+2225:     <string name="store_forward">Store &amp; Forward</string>
+2226:     <string name="store_forward_config">Konfiguracja Store &amp; Forward</string>
+2227:     <string name="store_forward_enabled">Store &amp; Forward włączony</string>
+2228: =======
+2229: >>>>>>> upstream/main
+2366: <<<<<<< HEAD
+2367:     <string name="translation_download_message">Tłumaczenie wiadomości wymaga jednorazowego pobrania modelu językowego (ok. %1$d MB).</string>
+2368:     <string name="translation_download_title">Pobrać model tłumaczenia?</string>
+2369:     <string name="translation_downloading">Pobieranie modelu tłumaczenia…</string>
+2370:     <string name="translation_failed">Nie udało się przetłumaczyć wiadomości</string>
+2371:     <string name="translation_model_download_failed">Pobieranie modelu tłumaczenia nieudane</string>
+2372:     <string name="translation_not_required">Wiadomość jest już w Twoim języku</string>
+2373:     <string name="transmit_disabled">Nadawanie jest wyłączone</string>
+2374:     <string name="transmit_disabled_summary">To urządzenie może odbierać, ale nie będzie niczego wysyłać przez LoRa.</string>
+2375:     <string name="transmit_over_lora">Nadaj przez LoRa</string>
+2376: =======
+2377: >>>>>>> upstream/main
+2425: <<<<<<< HEAD
+2426:     <string name="url_cannot_be_empty">URL nie może być pusty.</string>
+2427:     <string name="url_must_be_http">URL musi zaczynać się od http:// lub https://.</string>
+2428:     <string name="url_must_contain_placeholders">URL musi zawierać symbole zastępcze.</string>
+2429:     <string name="url_template">Szablon URL</string>
+2430:     <string name="url_template_hint" translatable="false">https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png</string>
+2431:     <string name="usb">USB</string>
+2432:     <string name="usb_permission_denied">Odmowa uprawnienia USB. Podłącz urządzenie ponownie, aby spróbować jeszcze raz.</string>
+2433:     <!-- USE -->
+2434:     <string name="use_12h_format">Użyj formatu 12-godzinnego</string>
+2435:     <string name="use_homoglyph_characters_encoding">Kompaktowe kodowanie dla cyrylicy</string>
+2436:     <string name="use_i2s_as_buzzer">Użyj I2S jako buzzer</string>
+2437:     <string name="use_input_pullup_mode">Użyj trybu INPUT_PULLUP</string>
+2438:     <string name="use_modem_preset">Użyj predefiniowanych ustawień</string>
+2439:     <string name="use_pwm_buzzer">Użyj buzzera PWM</string>
+2440: =======
+2441: >>>>>>> upstream/main
+2449: <<<<<<< HEAD
+2450:     <string name="username">Nazwa użytkownika</string>
+2451:     <string name="uv_lux">UV Lux</string>
+2452:     <string name="via_api">przez API</string>
+2453: =======
+2454: >>>>>>> upstream/main
+2458: <<<<<<< HEAD
+2459:     <string name="view_release">Zobacz wydanie</string>
+2460:     <string name="voltage">Nap.</string>
+2461:     <string name="wait_for_bluetooth_duration_seconds">Czas oczekiwania na Bluetooth</string>
+2462:     <string name="wake_on_tap_or_motion">Wybudź przy dotknięciu lub ruchu</string>
+2463: =======
+2464:     <string name="voltage">Napięcie</string>
+2465: >>>>>>> upstream/main
