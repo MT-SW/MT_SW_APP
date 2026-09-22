@@ -19,6 +19,7 @@ package org.meshtastic.feature.settings.navigation
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.meshtastic.core.model.Capabilities
+import org.meshtastic.core.model.excludes
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.resources.Res
@@ -55,6 +56,7 @@ import org.meshtastic.core.resources.traffic_management
 import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.Config
 import org.meshtastic.proto.DeviceMetadata
+import org.meshtastic.proto.ExcludedModules
 
 enum class ModuleRoute(
     val title: StringResource,
@@ -168,9 +170,11 @@ enum class ModuleRoute(
     ),
     ;
 
-    val bitfield: Int
+    /** The `excluded_modules` bit a node sets when this module is compiled out of its firmware. */
+    val excludedAs: ExcludedModules
         get() =
             when (this) {
+<<<<<<< HEAD
                 MQTT -> 0x0001
 
                 SERIAL -> 0x0002
@@ -208,15 +212,30 @@ enum class ModuleRoute(
                 // Not excludable yet
 
                 MESH_BEACON -> 0x0000 // Not excludable yet
+=======
+                MQTT -> ExcludedModules.MQTT_CONFIG
+                SERIAL -> ExcludedModules.SERIAL_CONFIG
+                EXT_NOTIFICATION -> ExcludedModules.EXTNOTIF_CONFIG
+                STORE_FORWARD -> ExcludedModules.STOREFORWARD_CONFIG
+                RANGE_TEST -> ExcludedModules.RANGETEST_CONFIG
+                TELEMETRY -> ExcludedModules.TELEMETRY_CONFIG
+                CANNED_MESSAGE -> ExcludedModules.CANNEDMSG_CONFIG
+                AUDIO -> ExcludedModules.AUDIO_CONFIG
+                REMOTE_HARDWARE -> ExcludedModules.REMOTEHARDWARE_CONFIG
+                NEIGHBOR_INFO -> ExcludedModules.NEIGHBORINFO_CONFIG
+                AMBIENT_LIGHTING -> ExcludedModules.AMBIENTLIGHTING_CONFIG
+                DETECTION_SENSOR -> ExcludedModules.DETECTIONSENSOR_CONFIG
+                PAXCOUNTER -> ExcludedModules.PAXCOUNTER_CONFIG
+                TAK -> ExcludedModules.TAK_CONFIG
+                MESH_BEACON -> ExcludedModules.MESHBEACON_CONFIG
+>>>>>>> upstream/main
             }
 
     companion object {
         fun filterExcludedFrom(metadata: DeviceMetadata?, role: Config.DeviceConfig.Role?): List<ModuleRoute> {
             val capabilities = Capabilities(metadata?.firmware_version)
             return entries.filter {
-                val excludedModules = metadata?.excluded_modules ?: 0
-                val isExcluded = (excludedModules and it.bitfield) != 0
-                !isExcluded && it.isSupported(capabilities) && it.isApplicable(role)
+                !metadata.excludes(it.excludedAs) && it.isSupported(capabilities) && it.isApplicable(role)
             }
         }
     }

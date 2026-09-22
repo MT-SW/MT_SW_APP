@@ -127,5 +127,6 @@ include(
     ":screenshot-tests",
     ":docs-screenshots",
     ":marketing-screenshots",
+    ":schema-strings",
     ":baselineprofile",
 )

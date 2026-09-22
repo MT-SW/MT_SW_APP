@@ -61,7 +61,6 @@
     <string name="add_network_device_manually">Dodaj urządzenie ręcznie…</string>
     <string name="add_network_layer">Dodaj warstwę sieciową</string>
     <string name="address">Adres</string>
-    <string name="admin_key">Klucz administratora</string>
     <string name="admin_keys">Klucze administratora</string>
     <string name="administration">Zarządzanie</string>
     <string name="advanced">Zaawansowane</string>
@@ -70,6 +69,7 @@
     <!-- AIR -->
     <string name="air_quality">Jakość powietrza</string>
     <string name="air_quality_icon">Ikona jakości powietrza</string>
+<<<<<<< HEAD
     <string name="air_quality_metrics_log">Dziennik jakości powietrza</string>
     <string name="air_quality_metrics_module_enabled">Włącz moduł metryk jakości powietrza</string>
     <string name="air_quality_metrics_update_interval_seconds">Czas aktualizacji metryk jakości powietrza</string>
@@ -79,17 +79,24 @@
     <!-- ALERT -->
     <string name="alert_bell_buzzer">Brzęczyk dzwonka alarmowego</string>
     <string name="alert_bell_led">Dioda dzwonka alarmowego</string>
+=======
+    <string name="air_util_definition">Procent czasu  wykorzystanego do transmisji w ciągu ostatniej godziny.</string>
+>>>>>>> upstream/main
     <string name="alert_bell_text">Znak ostrzegawczy!</string>
     <string name="alert_bell_vibra">Wibracja dzwonka alarmowego</string>
     <string name="alert_message_buzzer">Brzęczyk wiadomości alarmowej</string>
     <string name="alert_message_led">Dioda wiadomości alarmowej</string>
     <string name="alert_message_vibra">Wibracja wiadomości alarmowej</string>
     <string name="all_time">Wszystkie</string>
+<<<<<<< HEAD
     <string name="allow_input_source">Zezwól na źródło wejściowe</string>
     <string name="allow_undefined_pin_access">Zezwól na dostęp do niezdefiniowanych pinów</string>
     <string name="alt">Alt</string>
     <string name="altitude">Wys.</string>
     <string name="always_point_north">Zawsze wskazuj północ</string>
+=======
+    <string name="altitude">Wysokość</string>
+>>>>>>> upstream/main
     <string name="ambient_lighting">Oświetlenie otoczenia</string>
     <string name="ambient_lighting_config">Konfiguracja oświetlenia otoczenia</string>
     <string name="ammonium">Amon</string>
@@ -150,6 +157,7 @@
     <string name="backup_keys_confirmation">Zapisuje klucz publiczny i prywatny w bezpiecznej, zaszyfrowanej pamięci tego urządzenia.</string>
     <string name="backup_restore">Kopia zapasowa i przywracanie</string>
     <string name="bad">słaby</string>
+<<<<<<< HEAD
     <string name="bandwidth">Pasmo</string>
     <!-- BANDWIDTH -->
     <string name="bandwidth_default">Domyślne (%1$s kHz)</string>
@@ -164,17 +172,24 @@
     <string name="ble_rssi_threshold_defaults_to_80">Próg RSSI BLE (domyślnie -80)</string>
     <string name="ble_scan_needs_location_services">Skanowanie Bluetooth wymaga też włączonych usług lokalizacji w tej wersji Androida. Twoja pozycja nie jest wykorzystywana.</string>
     <string name="blue">Niebieski</string>
+=======
+    <string name="battery">Bateria</string>
+>>>>>>> upstream/main
     <!-- BLUETOOTH -->
     <string name="bluetooth">Bluetooth</string>
     <string name="bluetooth_available_devices">Dostępne urządzenia Bluetooth</string>
     <string name="bluetooth_config">Konfiguracja Bluetooth</string>
+<<<<<<< HEAD
     <string name="bluetooth_disabled">Bluetooth jest wyłączony. Włącz go, aby wyszukać pobliskie urządzenia.</string>
     <string name="bluetooth_enabled">Bluetooth włączony</string>
+=======
+>>>>>>> upstream/main
     <string name="bluetooth_feature_config">Konfiguracja</string>
     <string name="bluetooth_feature_config_description">Zarządzaj bezprzewodowo ustawieniami i kanałami swojego urządzenia.</string>
     <string name="bluetooth_feature_discovery">Odkrywanie</string>
     <string name="bluetooth_feature_discovery_description">Znajdź i zidentyfikuj urządzenia mesh w pobliżu.</string>
     <string name="bluetooth_permission">Bluetooth</string>
+<<<<<<< HEAD
     <string name="bluetooth_permission_blocked_notice">Dostęp do pobliskich urządzeń jest wyłączony i Android nie zapyta ponownie. Włącz go w ustawieniach aplikacji, aby połączyć się przez Bluetooth, lub połącz się przez Wi-Fi albo USB.</string>
     <string name="bluetooth_permission_blocked_notice_pre31">Uprawnienie lokalizacji jest wyłączone i Android nie zapyta ponownie. Włącz je w ustawieniach aplikacji, aby wyszukiwać urządzenia Bluetooth, lub połącz się przez Wi-Fi albo USB.</string>
     <string name="bluetooth_permission_blocked_rationale">Dostęp do pobliskich urządzeń jest wyłączony i Android nie zapyta ponownie. Włącz go w ustawieniach aplikacji, aby wyszukiwać i łączyć się przez Bluetooth.</string>
@@ -208,6 +223,9 @@
         <item quantity="many">Obniżenie tej wartości trwale usunie zapisaną historię dla %1$d urządzeń.</item>
         <item quantity="other">Obniżenie tej wartości trwale usunie zapisaną historię dla %1$d urządzenia.</item>
     </plurals>
+=======
+    <string name="bottom_nav_settings">Ustawienia</string>
+>>>>>>> upstream/main
     <string name="calculating">Obliczanie…</string>
     <string name="call_sign">Znak wywoławczy</string>
     <string name="call_sign_summary">Twój znak wywoławczy radioamatorski, do 8 znaków</string>
@@ -221,7 +239,10 @@
     <string name="canned_message_enabled">Wiadomości predefiniowane włączone</string>
     <string name="cant_change_no_radio">Nie można zmienić kanału, ponieważ urządzenie nie jest jeszcze podłączone. Proszę, spróbuj ponownie.</string>
     <string name="cant_shutdown">Wyłączenie nie jest obsługiwane w tym urządzeniu</string>
+<<<<<<< HEAD
     <string name="carousel_interval">Interwał "karuzeli"</string>
+=======
+>>>>>>> upstream/main
     <string name="ch_util_definition">Wykorzystanie dla bieżącego kanału, w tym prawidłowego TX/RX oraz zniekształconego RX (czyli szumu).</string>
     <!-- CHANNEL -->
     <string name="channel">Kan.</string>
@@ -278,6 +299,7 @@
     <string name="client_notification">Powiadomienie klienta</string>
     <string name="close">Zamknij</string>
     <string name="close_selection">Zamknij wybór</string>
+<<<<<<< HEAD
     <string name="co2">CO₂</string>
     <string name="co2_humidity">Wilg. CO₂</string>
     <string name="co2_temperature">Temp. CO₂</string>
@@ -287,6 +309,8 @@
     <string name="collapse_chart">Zwiń wykres</string>
     <string name="collapsed">Zwinięte</string>
     <string name="communicate_off_the_grid">Komunikuj się z przyjaciółmi i społecznością bez zasięgu sieci komórkowej.</string>
+=======
+>>>>>>> upstream/main
     <!-- COMPASS -->
     <string name="compass_bearing">Kurs: %1$s</string>
     <string name="compass_bearing_na">Kurs: B/D</string>
@@ -295,15 +319,18 @@
     <string name="compass_no_location_fix">Oczekiwanie na poprawkę GPS, aby obliczyć odległość i kurs.</string>
     <string name="compass_no_location_permission">Aby pokazać odległość i kurs, wymagane jest uprawnienie do lokalizacji.</string>
     <string name="compass_no_magnetometer">To urządzenie nie posiada czujnika kompasu. Kurs jest niedostępny.</string>
+<<<<<<< HEAD
     <string name="compass_north_top">Północ u góry kompasu</string>
     <string name="compass_orientation">Orientacja kompasu</string>
+=======
+>>>>>>> upstream/main
     <string name="compass_title">Kompas</string>
     <string name="compass_uncertainty">Szacowany obszar: \u00b1%1$s (\u00b1%2$s)</string>
     <string name="compass_uncertainty_unknown">Szacowany obszar: nieznana dokładność</string>
     <string name="compromised_keys">Wykryto powielone klucze, wybierz OK, aby je wygenerować ponownie.</string>
     <!-- CONFIG -->
-    <string name="config_device_doubleTapAsButtonPress_summary">Traktuj podwójne dotknięcie na obsługiwanych akcelerometrach jako naciśnięcie przycisku użytkownika.</string>
     <string name="config_device_ledHeartbeatEnabled_summary">Kontroluje miganie LED na urządzeniu. Dla większości urządzeń będzie to sterować jednym z maksymalnie 4 diod LED, ładowarka i diody GPS nie są sterowane.</string>
+<<<<<<< HEAD
     <string name="config_device_transmitOverLora_summary">Czy oprócz wysyłania do MQTT i PhoneAPI, NeighborInfo powinny być przesłane przez LoRa? Niedostępny na kanale z domyślnym kluczem i nazwą (z wyjątkiem MT_SW_FIRMWARE).</string>
     <string name="config_device_tripleClickAsAdHocPing_summary">Wyślij lokalizację na kanale głównym, gdy przycisk użytkownika jest trzykrotnie kliknięty.</string>
     <string name="config_device_tzdef_summary">Strefa czasowa dla dat na ekranie urządzenia i dzienniku.</string>
@@ -321,9 +348,15 @@
     <string name="config_lora_hop_limit_summary">Ustawia maksymalną liczbę przeskoków, domyślnie jest to 3. Zwiększenie liczby przeskoków powoduje również wzrost przeciążenia i należy stosować tę opcję ostrożnie. Komunikaty rozgłoszeniowe z 0 przeskokami nie otrzymają potwierdzeń ACK.</string>
     <string name="config_lora_modem_preset_licensed_summary">Presety tego regionu są przeznaczone tylko dla operatorów licencjonowanych (radioamatorów). Włącz opcję Radioamator (Ham) w Konfiguracji użytkownika, aby je wybrać.</string>
     <string name="config_lora_modem_preset_summary">Dostępne presety modemu, domyślnie Narrow Fast.</string>
+=======
+    <string name="config_device_tripleClickAsAdHocPing_summary">Wyślij lokalizację na kanale głównym, gdy przycisk użytkownika jest trzykrotnie kliknięty.</string>
+    <string name="config_device_tzdef_summary">Strefa czasowa dla dat na ekranie urządzenia i dzienniku.</string>
+    <string name="config_device_use_phone_tz">Użyj strefy czasowej telefonu</string>
+    <string name="config_lora_modem_preset_summary">Dostępne presety modemu, domyślnie Long Fast.</string>
+>>>>>>> upstream/main
     <string name="config_lora_region_summary">Region, w którym będziesz używać urządzenia.</string>
-    <string name="config_network_eth_enabled_summary">Włączenie połączenia Ethernet spowoduje wyłączenie bluetootha. Połączania TCP nie są dostępne na urządzeniach Apple.</string>
     <string name="config_network_udp_enabled_summary">Włącz nadawanie pakietów poprzez UDP w lokalnej sieci.</string>
+<<<<<<< HEAD
     <string name="config_network_wifi_enabled_summary">Włączenie WiFi spowoduje wyłączenie bluetooth.</string>
     <string name="config_position_broadcast_secs_summary">Maksymalny odstęp czasu, jaki może upłynąć bez nadawania lokalizacji przez węzeł.</string>
     <string name="config_position_broadcast_smart_minimum_distance_summary">Minimalna zmiana odległości w metrach, którą należy uwzględnić w przypadku inteligentnego pozycjonowania.</string>
@@ -339,6 +372,10 @@
     <string name="config_security_private_key_remote">Urządzenie nie udostępnia swojego klucza prywatnego poprzez zdalne zarządzanie. Możesz ustawić nowy klucz, ale nie będzie można go odczytać ponownie.</string>
     <string name="config_security_public_key">Wygenerowany z Twojego klucza prywatnego i wysyłany do innych węzłów w sieci mesh.</string>
     <string name="config_security_serial_enabled">Konsola szeregowa przez Stream API.</string>
+=======
+    <string name="config_position_broadcast_smart_minimum_interval_secs_summary">Kiedy najszybciej pozycja zostanie zaktualizowana, jeśli minimalna odległość została osiągnięta.</string>
+    <string name="config_security_private_key">Używane do tworzenia klucza współdzielonego ze zdalnym urządzeniem.</string>
+>>>>>>> upstream/main
     <string name="configuration">Konfiguracja</string>
     <string name="configure_bluetooth_permissions">Skonfiguruj uprawnienia Bluetooth</string>
     <string name="configure_critical_alerts">Skonfiguruj alerty krytyczne</string>
@@ -449,8 +486,11 @@
     <string name="details">Szczegóły</string>
     <string name="detection_sensor">Czujnik detekcji</string>
     <string name="detection_sensor_config">Konfiguracja czujnika detekcji</string>
+<<<<<<< HEAD
     <string name="detection_sensor_enabled">Czujnik detekcji włączony</string>
     <string name="detection_trigger_type">Typ wyzwalacza wykrywania</string>
+=======
+>>>>>>> upstream/main
     <!-- DEVICE -->
     <string name="device">Urządzenie</string>
     <string name="device_configuration">Konfiguracja urządzenia</string>
@@ -541,6 +581,7 @@
     <string name="discovery_stat_presets_scanned">Przeskanowane presety</string>
     <string name="discovery_stat_rf_health">Kondycja RF</string>
     <string name="discovery_stat_selected">Wybrane</string>
+<<<<<<< HEAD
     <string name="discovery_stat_sensor_pkts">Pakiety czujników</string>
     <string name="discovery_stat_session_overview">Przegląd sesji</string>
     <string name="discovery_stat_status">Status</string>
@@ -563,6 +604,10 @@
     <string name="display_time_in_12h_format">Gdy włączone, urządzenie będzie wyświetlać czas na ekranie w formacie 12-godzinnym.</string>
     <string name="display_units">Wyświetlana jednostka</string>
     <string name="dissolved_oxygen">Rozp. O₂</string>
+=======
+    <string name="display">Wyświetlacz</string>
+    <string name="display_config">Ustawienia wyświetlacza</string>
+>>>>>>> upstream/main
     <!-- DISTANCE -->
     <string name="distance">Dystans</string>
     <string name="distance_filters">Filtry odległości</string>
@@ -626,6 +671,7 @@
     <string name="doc_title_widget">Widżet ekranu głównego</string>
     <string name="documentation">Dokumentacja</string>
     <string name="done">Wykonano</string>
+<<<<<<< HEAD
     <string name="dont_show_again_for_device">Nie pokazuj ponownie dla tego urządzenia</string>
     <string name="double_tap_as_button_press">Podwójne dotknięcie jako naciśnięcie przycisku</string>
     <string name="downlink_enabled">Odbiór włączony</string>
@@ -636,12 +682,16 @@
     <string name="dynamic">Dynamiczny</string>
     <string name="easily_set_up_private_mesh_networks">Łatwo skonfiguruj prywatne sieci mesh do bezpiecznej i niezawodnej komunikacji na odległych obszarach.</string>
     <string name="echo_enabled">Włącz echo</string>
+=======
+    <string name="download">Pobierz</string>
+>>>>>>> upstream/main
     <string name="edit">Edytuj</string>
     <string name="edit_custom_tile_source">Edytuj własne źródło kafelków mapy</string>
     <string name="eight_hours">8 Godzin</string>
     <string name="electrical_conductivity">Przewodność</string>
     <string name="elevation_suffix" translatable="false">MSL</string>
     <!-- EMOJI -->
+<<<<<<< HEAD
     <string name="emoji_category_activities">Aktywności</string>
     <string name="emoji_category_animals_nature">Zwierzęta i przyroda</string>
     <string name="emoji_category_flags">Flagi</string>
@@ -655,15 +705,14 @@
     <string name="emoji_no_results">Nie znaleziono emoji</string>
     <string name="emoji_recently_used">Ostatnio używane</string>
     <string name="enable_power_saving_mode">Włącz tryb oszczędzania energii</string>
+=======
+>>>>>>> upstream/main
     <string name="enabled">Włączony</string>
-    <!-- ENCRYPTION -->
-    <string name="encryption_enabled">Szyfrowanie włączone</string>
     <string name="encryption_error">Niezgodność klucza publicznego</string>
     <string name="encryption_error_text">Klucz publiczny nie pasuje do zapisanego klucza. Możesz usunąć węzeł i pozwolić mu na ponowną wymianę kluczy, ale może to oznaczać poważniejszy problem z bezpieczeństwem. Skontaktuj się z użytkownikiem przez inny zaufany kanał, żeby sprawdzić, czy zmiana klucza była spowodowana przywróceniem ustawień fabrycznych lub innym celowym działaniem.</string>
     <string name="encryption_pkc">Szyfrowanie klucza publicznego</string>
     <string name="encryption_pkc_text">Bezpośrednie wiadomości wykorzystują nową infrastrukturę klucza publicznego do szyfrowania.</string>
     <string name="env_metrics_log">Metryki środowiskowe</string>
-    <!-- ENVIRONMENT -->
     <string name="environment">Środowisko</string>
     <string name="environment_metrics_module_enabled">Moduł metryk środowiskowych włączony</string>
     <string name="environment_metrics_on_screen_enabled">Metryki środowiskowe na ekranie włączone</string>
@@ -675,7 +724,6 @@
     <string name="establish_session">Połącz i zarządzaj</string>
     <string name="establishing_session">Nawiązywanie sesji zdalnej…</string>
     <string name="ethernet_config">Ustawienia Ethernet</string>
-    <string name="ethernet_enabled">Ethernet włączony</string>
     <string name="ethernet_ip">Ethernet IP:</string>
     <string name="event_firmware_running">Uruchomiona wersja firmware wydarzenia</string>
     <string name="event_use_event_theme">Użyj motywu wydarzenia</string>
@@ -690,7 +738,6 @@
     <string name="export_tak_data_package">Eksportuj pakiet danych TAK</string>
     <string name="external_notification">Zewnętrzne Powiadomienie</string>
     <string name="external_notification_config">Konfiguracja Zewnętrznego Powiadomienia</string>
-    <string name="external_notification_enabled">Powiadomienia zewnętrzne włączone</string>
     <string name="factory_reset">Ustawienia fabryczne</string>
     <string name="fair">wystarczający</string>
     <string name="fallback_node_name">MT_SW_APP %1$s</string>
@@ -840,6 +887,7 @@
     <string name="firmware_version">Wersja oprogramowania: %1$s</string>
     <string name="fixed_pin">Stały PIN</string>
     <string name="fixed_position">Położenie stałe</string>
+<<<<<<< HEAD
     <string name="flip_screen">Odwróć ekran</string>
     <string name="for_more_information_see_our_privacy_policy">Aby dowiedzieć się więcej, zapoznaj się z naszą polityką prywatności.</string>
     <!-- FORMAT -->
@@ -854,6 +902,9 @@
     <string name="freq">Częst.</string>
     <string name="frequency_slot">Slot częstotliwości</string>
     <string name="friendly_name">Przyjazna nazwa</string>
+=======
+    <!-- FORMAT -->
+>>>>>>> upstream/main
     <string name="gas_resistance">Rezystancja gazu</string>
     <string name="gateway">Brama domyślna</string>
     <string name="generate_input_event_on_ccw">Generuj zdarzenie wejścia przy CCW</string>
@@ -883,8 +934,8 @@
     <string name="get_started">Rozpocznij</string>
     <string name="github_repository">Repozytorium GitHub</string>
     <string name="good">dobry</string>
-    <!-- GPIO -->
     <string name="gpio">GPIO</string>
+<<<<<<< HEAD
     <string name="gpio_mask_display">Maska: %1$s</string>
     <string name="gpio_off">0</string>
     <string name="gpio_on">1</string>
@@ -902,11 +953,17 @@
     <string name="grant_permission">Przyznaj uprawnienie</string>
     <string name="green">Zielony</string>
     <string name="ham_long_name_summary">Opcjonalnie. Dołączane do Twojego znaku wywoławczego, np. KD2ABC//Strych Heltec</string>
+=======
+    <string name="gpio_pin">Pin GPIO</string>
+>>>>>>> upstream/main
     <string name="hardware">Sprzęt</string>
     <string name="hardware_model">Model sprzętu</string>
     <string name="heading">Kierunek</string>
+<<<<<<< HEAD
     <string name="heartbeat">Bicie serca</string>
     <string name="help_and_documentation">Pomoc i dokumentacja</string>
+=======
+>>>>>>> upstream/main
     <string name="hide_layer">Ukryj warstwę</string>
     <string name="hide_password">Ukryj hasło</string>
     <string name="history_return_max">Maks. zwracana historia</string>
@@ -921,18 +978,19 @@
     <string name="i_agree">Zgadzam się.</string>
     <string name="i_agree_to_share_my_location">Przeczytałem powyższe informacje i rozumiem je. Wyrażam dobrowolną zgodę na niezaszyfrowaną transmisję danych mojego węzła za pośrednictwem protokołu MQTT</string>
     <string name="i_know_what_i_m_doing">Wiem, co robię.</string>
+<<<<<<< HEAD
     <string name="i2s_clock">Zegar I2S</string>
     <string name="i2s_data_in">I2S dane wejściowe</string>
     <string name="i2s_data_out">I2S dane wyjściowe</string>
     <string name="i2s_word_select">I2S wybór słowa</string>
+=======
+>>>>>>> upstream/main
     <string name="iaq">IAQ</string>
     <string name="iaq_definition">Jakość powietrza w pomieszczeniach (Indoor Air Quality) - wartość względna w skali IAQ mierzona czujnikiem BME680. Zakres wartości: 0–500.</string>
     <string name="icon_meanings">Znaczenia ikon</string>
-    <!-- IGNORE -->
     <string name="ignore">Zignoruj</string>
     <string name="ignore_add">Dodać '%1$s' do listy ignorowanych?</string>
     <string name="ignore_incoming">Ignoruj przychodzące</string>
-    <string name="ignore_mqtt">Zignoruj MQTT</string>
     <string name="ignore_remove">Usunąć '%1$s' z listy ignorowanych? Twoje urządzenie zostanie zrestartowane po tej zmianie.</string>
     <!-- IMPORT -->
     <string name="import_configuration">Import konfiguracji</string>
@@ -960,7 +1018,6 @@
     <string name="ip">IP</string>
     <string name="ip_address">Adres IP:</string>
     <string name="ip_port">Port:</string>
-    <string name="ipv4_mode">Tryb IPv4</string>
     <string name="json_output_enabled">Włącz wyjście JSON</string>
     <string name="jump_to_latest_from">%1$s</string>
     <string name="jump_to_latest_from_and_more">%1$s +%2$d</string>
@@ -1004,6 +1061,7 @@
     <string name="layer_type_network">Warstwa sieciowa</string>
     <string name="learn_more">Dowiedz się więcej</string>
     <string name="led_heartbeat">LED bicia serca</string>
+<<<<<<< HEAD
     <string name="led_state">Stan diody LED</string>
     <string name="legacy_admin_channel">Stary kanał administracyjny</string>
     <string name="library_count">%1$d bibliotek</string>
@@ -1015,6 +1073,9 @@
     <string name="licensed_mode_enable_warning_signed">Tryb licencjonowany usuwa klucze szyfrowania kanałów i wyłącza kanał administracyjny, więc cały ruch jest wysyłany jako czysty tekst, który każdy może odczytać — ale jest cyfrowo podpisany, co pozwala innym węzłom zweryfikować, że pochodzi od Ciebie. Numer Twojego węzła może się raz zmienić, aby dopasować się do klucza tożsamości, więc ulubione, historia wiadomości, zdalne zarządzanie i inne węzły mogą początkowo traktować go jako nowy; pozostajesz odpowiedzialny za spełnienie wymagań swojej licencji radioamatorskiej i lokalnych przepisów.</string>
     <string name="lightning_distance">Odległość burzy</string>
     <string name="lightning_strikes_1h">Wyładowania (1h)</string>
+=======
+    <!-- LICENSED -->
+>>>>>>> upstream/main
     <!-- LOAD -->
     <string name="load">Wczytaj</string>
     <string name="load_15_min">Obc. 15m</string>
@@ -1311,6 +1372,7 @@
     <!-- MQTT -->
     <string name="mqtt">MQTT</string>
     <string name="mqtt_config">Konfiguracja MQTT</string>
+<<<<<<< HEAD
     <string name="mqtt_enabled">Włącz MQTT</string>
     <string name="mqtt_error_connection_lost">MQTT: utracono połączenie</string>
     <string name="mqtt_error_credentials_rejected">MQTT: połączenie odrzucone (sprawdź dane logowania)</string>
@@ -1333,6 +1395,8 @@
     <string name="mqtt_sniffer_warning_message">Otwiera własne połączenie ze skonfigurowanym brokerem MQTT. Klient MQTT tej aplikacji obsługuje tylko jedno aktywne połączenie naraz, więc jeśli "Proxy MQTT na tym telefonie" aktualnie przekazuje ruch dla połączonego węzła, włączenie tego przerwie je na czas działania sniffera.</string>
     <string name="mqtt_sniffer_log_title">Log Sniffera MQTT</string>
     <string name="mqtt_sniffer_log_empty">Brak pakietów MQTT — włącz powyżej Sniffer MQTT, aby zacząć obserwować ruch na brokerze</string>
+=======
+>>>>>>> upstream/main
     <string name="mqtt_status_connected">Połączony</string>
     <string name="mqtt_status_connecting">Łączenie…</string>
     <string name="mqtt_status_disconnected">Rozłączono</string>
@@ -1362,6 +1426,7 @@
     <string name="name">Nazwa</string>
     <string name="name_cannot_be_empty">Nazwa nie może być pusta.</string>
     <string name="navigate_back">Przejdź wstecz</string>
+<<<<<<< HEAD
     <string name="navigate_into_label">Wejdź do środka</string>
     <string name="nearby_devices_permission">Uprawnienie do pobliskich urządzeń</string>
     <string name="need_hardware">Potrzebujesz sprzętu?</string>
@@ -1465,6 +1530,10 @@
     <string name="on_demand_hops">Liczba skoków</string>
     <string name="on_demand_round_trip">Czas odpowiedzi</string>
     <string name="on_demand_received_at">Odebrano: %1$s</string>
+=======
+    <string name="neighbor_info">Informacje o sąsiadze</string>
+    <string name="neighbor_info_config">Konfiguracja Info o sąsiedzie</string>
+>>>>>>> upstream/main
     <string name="network">Sieć</string>
     <string name="network_layer_url_hint" translatable="false">https://example.com/map.kml lub .geojson</string>
     <string name="new_channel_rcvd">Otrzymano nowy URL kanału</string>
@@ -1553,7 +1622,6 @@
     <string name="node_sort_via_mqtt">Przez MQTT</string>
     <string name="node_status_summary">Treść statusu</string>
     <string name="nodedb_reset">Zresetuj NodeDB</string>
-    <string name="nodeinfo_broadcast_interval">Interwał transmisji informacji o węźle</string>
     <!-- NODES -->
     <string name="nodes">Węzły</string>
     <string name="nodes_at_this_location">Węzły w tej lokalizacji</string>
@@ -1586,6 +1654,7 @@
     <string name="notifications_on_alert_bell_receipt">Powiadomienia przy odbiorze alertu/dzwonka</string>
     <string name="notifications_on_message_receipt">Powiadomienia o otrzymaniu wiadomości</string>
     <string name="now">Teraz</string>
+<<<<<<< HEAD
     <string name="ntp_server">Serwer NTP</string>
     <string name="number_of_records">Liczba rekordów</string>
     <!-- OFFLINE -->
@@ -1598,6 +1667,10 @@
     <string name="offline_terrain_empty">Nie pobrano jeszcze żadnego terenu</string>
     <string name="offline_terrain_manager">Teren offline</string>
     <string name="offline_terrain_regional_detail">Zawiera szczegółowy teren regionalny</string>
+=======
+    <!-- OFFLINE -->
+    <string name="okay">OK</string>
+>>>>>>> upstream/main
     <!-- ONE -->
     <string name="one_day">24 Godzin</string>
     <string name="one_hour">1 godzina</string>
@@ -1616,6 +1689,7 @@
     <string name="open_wifi_settings">Otwórz ustawienia Wi-Fi</string>
     <string name="options">Opcje</string>
     <string name="orient_north">Zorientuj na północ</string>
+<<<<<<< HEAD
     <string name="orp">ORP</string>
     <!-- OUTPUT -->
     <string name="output_buzzer_gpio">Wyjście buzzera (GPIO)</string>
@@ -1642,6 +1716,10 @@
     <string name="packet_authenticity_strict_title">Włączyć uwierzytelnianie Ścisłe?</string>
     <string name="packet_authenticity_unsupported">To połączone urządzenie nie obsługuje weryfikacji podpisów pakietów.</string>
     <string name="pairing_mode">Tryb parowania</string>
+=======
+    <string name="output_duration_milliseconds">Czas trwania (w milisekundach)</string>
+    <!-- PACKET -->
+>>>>>>> upstream/main
     <string name="password">Hasło</string>
     <!-- PAX -->
     <string name="pax">PAX</string>
@@ -1721,9 +1799,9 @@
     <string name="position">Pozycjonowanie</string>
     <string name="position_config_set_fixed_from_phone">Ustaw z aktualnej lokalizacji telefonu</string>
     <string name="position_enabled">Lokalizacja włączona</string>
-    <string name="position_flags">Flagi położenia</string>
     <string name="position_log">Pozycjonowanie</string>
     <string name="position_packet">Pakiet lokalizacji</string>
+<<<<<<< HEAD
     <string name="potassium">Potas</string>
     <!-- POWER -->
     <string name="power">Zasilanie</string>
@@ -1734,6 +1812,11 @@
     <string name="power_metrics_update_interval_seconds">Czas aktualizacji metryk zasilania</string>
     <string name="powered">Zasilany</string>
     <string name="ppm">ppm</string>
+=======
+    <string name="power">Zasilanie</string>
+    <string name="power_config">Konfiguracja zarządzania energią</string>
+    <string name="power_metrics_log">Metryki zasilania</string>
+>>>>>>> upstream/main
     <string name="precise_location">Precyzyjna lokalizacja</string>
     <string name="preferences_language">Język</string>
     <string name="preferences_system_default">Domyślny systemu</string>
@@ -1752,16 +1835,22 @@
     <string name="preview_pill">Kapsuła</string>
     <string name="preview_text">Tekst</string>
     <string name="primary">Podstawowy</string>
+<<<<<<< HEAD
     <string name="primary_channel_feature">Okresowe nadawanie pozycji i telemetrii</string>
     <string name="privacy_url" translatable="false">https://meshtastic.org/docs/legal/privacy/</string>
     <string name="private_key">Klucz prywatny</string>
     <string name="project_information">Informacje o projekcie</string>
+=======
+>>>>>>> upstream/main
     <string name="provide_location_to_mesh">Podaj lokalizację telefonu do sieci</string>
     <string name="provider_name_exists">Nazwa dostawcy już istnieje.</string>
     <string name="proxy_to_client_enabled">Proxy do klienta włączone</string>
     <string name="psk">PSK</string>
+<<<<<<< HEAD
     <string name="pt_BR" translatable="false">Português do Brasil</string>
     <string name="ptt_pin">Pin PTT (Push-To-Talk)</string>
+=======
+>>>>>>> upstream/main
     <string name="public_key">Klucz publiczny</string>
     <string name="public_key_changed">Klucz publiczny zmieniony</string>
     <string name="qr_code">Kod QR</string>
@@ -1783,12 +1872,12 @@
     <string name="react">Reaguj</string>
     <string name="reboot">Restart</string>
     <!-- REBROADCAST -->
-    <string name="rebroadcast_mode">Tryb retransmisji</string>
     <string name="rebroadcast_mode_all_desc">Przekazuje ponownie każdy odebrany pakiet, niezależnie od tego, czy został wysłany na nasz prywatny kanał, czy z innej sieci Mesh o tych samych parametrach radia.</string>
     <string name="rebroadcast_mode_all_skip_decoding_desc">To samo zachowanie co ALL, ale pomija dekodowanie pakietów i po prostu je retransmituje. Dostępne tylko w roli Repeater. Ustawienie tego w innych rolach spowoduje zachowanie jak ALL.</string>
     <string name="rebroadcast_mode_core_portnums_only_desc">Ignoruje niestandardowe pakiety (non-standard portnums) takie jak: TAK, RangeTest, PaxCounter, itp. Przekazuje dalej jedynie standardowe pakiety (standard portnums): NodeInfo, Text, Position, Telemetry oraz Routing.</string>
     <string name="rebroadcast_mode_known_only_desc">Ignoruje odebrane pakiety z obcych sieci, podobnie jak LOCAL_ONLY, ale idzie o krok dalej, ignorując również pakiety z węzłów, które nie znajdują się jeszcze na liście znanych węzłów.</string>
     <string name="rebroadcast_mode_local_only_desc">Ignoruje odebrane pakiety z obcych sieci Mesh, które są otwarte lub których nie można odszyfrować. Retransmituje wiadomość tylko na lokalnych kanałach primary / secondary.</string>
+<<<<<<< HEAD
     <string name="rebroadcast_mode_none_desc">Dozwolone wyłącznie dla ról Czujnik, Tracker i TAK Tracker. Spowoduje to zablokowanie wszystkich retransmisji, podobnie jak rola Klient pasywny.</string>
     <string name="recent_network_devices">Ostatnie urządzenia sieciowe</string>
     <string name="reconnecting">Ponowne łączenie…</string>
@@ -1798,6 +1887,9 @@
     <string name="refresh_metadata">Odśwież metadane</string>
     <string name="regenerate_keys_confirmation">Czy na pewno chcesz wygenerować nowy klucz prywatny?\n\nWęzły, które mogły wcześniej wymienić klucze z tym węzłem, będą musiały go usunąć i ponownie wymienić klucze, aby wznowić bezpieczną komunikację.</string>
     <string name="regenerate_private_key">Wygeneruj nowy klucz prywatny</string>
+=======
+    <string name="rebroadcast_mode_none_desc">Dozwolone wyłącznie dla ról SENSOR, TRACKER i TAK_TRACKER. Spowoduje to zablokowanie wszystkich retransmisji, podobnie jak rola CLIENT_MUTE.</string>
+>>>>>>> upstream/main
     <string name="region_frequency_plan">Region</string>
     <plurals name="relays">
         <item quantity="one">Usłyszano %1$d przekaźnik</item>
@@ -1878,11 +1970,15 @@
     <string name="role_tak_desc">Zoptymalizowany pod kątem komunikacji systemowej ATAK, redukuje nadmiarowe transmisje.</string>
     <string name="role_tak_tracker">TAK Tracker</string>
     <string name="role_tak_tracker_desc">Umożliwia automatyczne transmisje TAK PLI i zmniejsza liczbę nadmiarowych transmisji.</string>
+<<<<<<< HEAD
     <string name="role_tracker">Tracker</string>
     <string name="role_tracker_desc">Nadaje priorytetowo pakiety pozycji GPS.</string>
     <string name="root_topic">Główny temat</string>
     <string name="rotary_encoder_1_enabled">Enkoder obrotowy #1 włączony</string>
     <string name="router_role_confirmation_text">Przeczytałem &lt;a href="https://meshtastic.org/docs/configuration/radio/device/#roles"&gt;dokumentację ról urządzenia&lt;/a&gt; oraz wpis na blogu o &lt;a href="http://meshtastic.org/blog/choosing-the-right-device-role"&gt;wyborze właściwej roli urządzenia&lt;/a&gt;.</string>
+=======
+    <string name="role_tracker_desc">Tracker - Do użytku z urządzeniami przeznaczonymi jako śledzenie GPS. Pakiety pozycyjne wysyłane z tego urządzenia będą miały wyższy priorytet, z nadawaniem pozycji co dwie minuty. Inteligentna transmisja pozycji będzie domyślnie wyłączona.</string>
+>>>>>>> upstream/main
     <!-- ROUTING -->
     <string name="routing_error_admin_bad_session_key">Nieprawidłowy klucz sesji</string>
     <string name="routing_error_admin_public_key_unauthorized">Nieautoryzowany klucz publiczny</string>
@@ -1904,11 +2000,14 @@
     <string name="routing_error_too_large">Pakiet jest zbyt duży</string>
     <string name="rssi">RSSI:</string>
     <string name="rssi_definition">Received Signal Strength Indicator - miara używana do określenia poziomu mocy odbieranej przez antenę. Wyższa wartość RSSI zazwyczaj oznacza silniejsze i bardziej stabilne połączenie.</string>
+<<<<<<< HEAD
     <string name="rsyslog_server">Serwer rsyslog</string>
     <string name="salinity">Zasolenie</string>
     <string name="sample_message" translatable="false">hey I found the cache, it is over here next to the big tiger. I'm kinda scared.</string>
     <string name="sats">Sat.</string>
     <!-- SAVE -->
+=======
+>>>>>>> upstream/main
     <string name="save">Zapisz</string>
     <string name="save_and_restart">Zapisz i uruchom ponownie</string>
     <string name="save_changes">Zapisz</string>
@@ -1917,6 +2016,7 @@
     <string name="save_rangetest">Eksportuj pakiety zasięgu</string>
     <!-- SCAN -->
     <string name="scan">Skanowanie</string>
+<<<<<<< HEAD
     <string name="scan_bluetooth_devices">Skanuj w poszukiwaniu urządzeń Bluetooth</string>
     <string name="scan_channels_nfc">Skanuj udostępnione kanały (NFC)</string>
     <string name="scan_channels_qr">Skanuj kod QR udostępnionych kanałów</string>
@@ -1928,6 +2028,8 @@
     <string name="scanning_bluetooth">Skanowanie…</string>
     <string name="scanning_network">Skanowanie…</string>
     <string name="screen_on_for">Ekran włączony na</string>
+=======
+>>>>>>> upstream/main
     <string name="scroll_to_bottom">Przewiń w dół</string>
     <string name="search_emoji">Szukaj emoji...</string>
     <string name="search_messages">Szukaj wiadomości…</string>
@@ -1973,6 +2075,7 @@
     <string name="selected">Wybrane</string>
     <string name="selected_map_type">Wybierz typ mapy</string>
     <string name="send">Wyślij</string>
+<<<<<<< HEAD
     <string name="send_bell">Wyślij dzwonek</string>
     <string name="send_bell_with_alert_message">Wyślij dzwonek z wiadomością alarmową</string>
     <string name="sender_message_interval_seconds">Interwał wiadomości nadawcy (sekundy)</string>
@@ -1990,6 +2093,10 @@
     <string name="session_refresh_required">Wymagane odświeżenie</string>
     <string name="set_time">Ustaw czas</string>
     <string name="set_up_connection">Skonfiguruj połączenie</string>
+=======
+    <string name="serial">Seryjny</string>
+    <string name="serial_config">Konfiguracja seryjna</string>
+>>>>>>> upstream/main
     <string name="set_your_region">Wybierz swój region</string>
     <string name="settings">ustawienia</string>
     <!-- SHARE -->
@@ -2091,8 +2198,11 @@
     <string name="site_planner_use_node_location">Użyj aktualnej lokalizacji węzła</string>
     <string name="site_planner_webview_updating">System WebView jest aktualizowany. Spróbuj ponownie za chwilę.</string>
     <string name="skip">Pomiń</string>
+<<<<<<< HEAD
     <string name="slot">Slot</string>
     <string name="smart_position">Inteligentne Pozycjonowanie</string>
+=======
+>>>>>>> upstream/main
     <string name="snr">SNR:</string>
     <string name="snr_definition">Współczynnik sygnału do szumu (Signal-to-Noise Ratio) - miara stosowana w komunikacji do określania poziomu pożądanego sygnału w stosunku do poziomu szumu tła. W MT_SW i innych systemach bezprzewodowych wyższy współczynnik SNR oznacza czystszy sygnał, który może zwiększyć niezawodność i jakość transmisji danych.</string>
     <string name="soil_moisture">Wilg. gleby</string>
@@ -2101,6 +2211,7 @@
     <string name="soil_water_metrics">Gleba i woda</string>
     <string name="solar_irradiance">Nasłonecznienie</string>
     <string name="speed">Prędkość</string>
+<<<<<<< HEAD
     <string name="speed_kmh">%1$d km/h</string>
     <string name="speed_mph">%1$d mph</string>
     <string name="spread_factor">Współczynnik rozproszenia</string>
@@ -2114,6 +2225,8 @@
     <string name="store_forward">Store &amp; Forward</string>
     <string name="store_forward_config">Konfiguracja Store &amp; Forward</string>
     <string name="store_forward_enabled">Store &amp; Forward włączony</string>
+=======
+>>>>>>> upstream/main
     <string name="subnet">Podsieć</string>
     <string name="success">Sukces</string>
     <string name="super_deep_sleep_duration_seconds">Czas trwania głębokiego uśpienia</string>
@@ -2250,6 +2363,7 @@
     <string name="traffic_management_unknown_packet_threshold">Próg nieznanych pakietów</string>
     <string name="translate">Przetłumacz</string>
     <!-- TRANSLATION -->
+<<<<<<< HEAD
     <string name="translation_download_message">Tłumaczenie wiadomości wymaga jednorazowego pobrania modelu językowego (ok. %1$d MB).</string>
     <string name="translation_download_title">Pobrać model tłumaczenia?</string>
     <string name="translation_downloading">Pobieranie modelu tłumaczenia…</string>
@@ -2259,6 +2373,8 @@
     <string name="transmit_disabled">Nadawanie jest wyłączone</string>
     <string name="transmit_disabled_summary">To urządzenie może odbierać, ale nie będzie niczego wysyłać przez LoRa.</string>
     <string name="transmit_over_lora">Nadaj przez LoRa</string>
+=======
+>>>>>>> upstream/main
     <!-- TRANSPORT -->
     <string name="transport">Transport</string>
     <string name="transport_api">API</string>
@@ -2273,8 +2389,6 @@
     <string name="twenty_four_hours">24H</string>
     <string name="two_days">48 Godzin</string>
     <string name="two_weeks">2W</string>
-    <string name="tx_enabled">Nadawanie włączone</string>
-    <string name="tx_power_dbm">Moc nadawania</string>
     <string name="type">Typ</string>
     <string name="type_a_message">Napisz wiadomość</string>
     <string name="udp_enabled">Nadawanie UDP</string>
@@ -2308,6 +2422,7 @@
     <string name="uptime">Czas pracy</string>
     <!-- URL -->
     <string name="url">URL</string>
+<<<<<<< HEAD
     <string name="url_cannot_be_empty">URL nie może być pusty.</string>
     <string name="url_must_be_http">URL musi zaczynać się od http:// lub https://.</string>
     <string name="url_must_contain_placeholders">URL musi zawierać symbole zastępcze.</string>
@@ -2322,6 +2437,8 @@
     <string name="use_input_pullup_mode">Użyj trybu INPUT_PULLUP</string>
     <string name="use_modem_preset">Użyj predefiniowanych ustawień</string>
     <string name="use_pwm_buzzer">Użyj buzzera PWM</string>
+=======
+>>>>>>> upstream/main
     <!-- USER -->
     <string name="user">Użytkownik</string>
     <string name="user_config">Konfiguracja użytkownika</string>
@@ -2329,16 +2446,23 @@
     <string name="user_info">Informacje o użytkowniku</string>
     <string name="user_string">Ciąg użytkownika</string>
     <string name="userinfo">Informacje o użytkowniku</string>
+<<<<<<< HEAD
     <string name="username">Nazwa użytkownika</string>
     <string name="uv_lux">UV Lux</string>
     <string name="via_api">przez API</string>
+=======
+>>>>>>> upstream/main
     <string name="via_mqtt">Przez MQTT</string>
     <string name="via_udp">przez UDP</string>
     <string name="view_on_map">Pokaż na mapie</string>
+<<<<<<< HEAD
     <string name="view_release">Zobacz wydanie</string>
     <string name="voltage">Nap.</string>
     <string name="wait_for_bluetooth_duration_seconds">Czas oczekiwania na Bluetooth</string>
     <string name="wake_on_tap_or_motion">Wybudź przy dotknięciu lub ruchu</string>
+=======
+    <string name="voltage">Napięcie</string>
+>>>>>>> upstream/main
     <string name="warning">Uwaga</string>
     <string name="water_ph">pH wody</string>
     <string name="waypoint_delete">Usuń punkt nawigacji?</string>
