@@ -73,6 +73,9 @@ import org.meshtastic.proto.ServiceEnvelope
 import kotlin.uuid.Uuid
 
 @Single(binds = [MQTTRepository::class])
+// The SUBACK-refusal handling (subscribe()) added one more small, cohesive helper than detekt allows per class;
+// splitting connection-lifecycle helpers into another class would hurt readability more than it would help.
+@Suppress("TooManyFunctions")
 class MQTTRepositoryImpl(
     private val radioConfigRepository: RadioConfigRepository,
     private val nodeRepository: NodeRepository,
@@ -189,7 +192,9 @@ class MQTTRepositoryImpl(
     // with exponential backoff, building the SUBSCRIBE list only after a successful CONNECT -- see
     // [buildSubscriptions] for why the option set depends on the protocol version the broker actually accepted.
     // Once established, autoReconnect handles subsequent drops and re-subscribes internally.
-    @Suppress("DEPRECATION") // json_enabled: only way to toggle MQTT JSON until the firmware/proto provides a replacement.
+    @Suppress(
+        "DEPRECATION",
+    ) // json_enabled: only way to toggle MQTT JSON until the firmware/proto provides a replacement.
     private fun ProducerScope<MqttClientProxyMessage>.launchConnectRetryLoop(
         session: ActiveMqttSession,
         newClient: MqttClientSession,
@@ -197,61 +202,62 @@ class MQTTRepositoryImpl(
         channelIds: List<String>,
         rootTopic: String,
         mqttConfig: ModuleConfig.MQTTConfig?,
-    ): Job = launch(start = CoroutineStart.LAZY) {
-        var reconnectDelay = INITIAL_RECONNECT_DELAY_MS
-        while (isActiveSession(session)) {
-            val result = safeCatching {
-                if (!isActiveSession(session)) return@launch
-                Logger.i {
-                    if (buildConfigProvider.isDebug) "MQTT Connecting to $endpoint" else "MQTT Connecting..."
-                }
-                newClient.connect(endpoint)
-                if (!isActiveSession(session)) return@launch
-                // Built here, not before connect: the option set depends on the version the broker accepted.
-                val subscriptions =
-                    buildSubscriptions(
-                        globalIds = channelIds,
-                        rootTopic = rootTopic,
-                        jsonEnabled = mqttConfig?.json_enabled == true,
-                        version = newClient.negotiatedProtocolVersion,
-                    )
-                if (subscriptions.isNotEmpty()) {
-                    Logger.d { "MQTT subscribing to ${subscriptions.size} topics" }
-                    subscribe(session, subscriptions)
-                }
-                Logger.i { "MQTT connected and subscribed" }
-            }
-            val failure = result.exceptionOrNull()
-            when {
-                result.isSuccess -> return@launch
-
-                failure is MqttException.ConnectionRejected && failure.isCredentialRejection() -> {
-                    Logger.e(failure) { "MQTT connection rejected (unrecoverable), stopping" }
-                    close(failure)
-                    return@launch
-                }
-
-                else -> {
+    ): Job =
+        launch(start = CoroutineStart.LAZY) {
+            var reconnectDelay = INITIAL_RECONNECT_DELAY_MS
+            while (isActiveSession(session)) {
+                val result = safeCatching {
                     if (!isActiveSession(session)) return@launch
-                    // Broker- and network-side failures are what this retry loop exists to absorb — an
-                    // unreachable host, a TLS problem, a dropped connection, or a broker that violates the
-                    // MQTT 5 spec (e.g. the topic-alias limit). None are defects in this app, and reporting
-                    // every retry as a non-fatal drowned real regressions.
-                    //
-                    // Anything else landing here is unexpected — a fault in our own connect/subscribe setup
-                    // rather than the peer's — so it keeps reporting.
-                    if (failure.isExpectedMqttRetryFailure()) {
-                        Logger.w(failure) { "MQTT connect failed, retrying in ${reconnectDelay}ms" }
-                    } else {
-                        Logger.e(failure) { "MQTT connect failed unexpectedly, retrying in ${reconnectDelay}ms" }
+                    Logger.i {
+                        if (buildConfigProvider.isDebug) "MQTT Connecting to $endpoint" else "MQTT Connecting..."
                     }
-                    delay(reconnectDelay)
-                    reconnectDelay =
-                        (reconnectDelay * RECONNECT_BACKOFF_MULTIPLIER).coerceAtMost(MAX_RECONNECT_DELAY_MS)
+                    newClient.connect(endpoint)
+                    if (!isActiveSession(session)) return@launch
+                    // Built here, not before connect: the option set depends on the version the broker accepted.
+                    val subscriptions =
+                        buildSubscriptions(
+                            globalIds = channelIds,
+                            rootTopic = rootTopic,
+                            jsonEnabled = mqttConfig?.json_enabled == true,
+                            version = newClient.negotiatedProtocolVersion,
+                        )
+                    if (subscriptions.isNotEmpty()) {
+                        Logger.d { "MQTT subscribing to ${subscriptions.size} topics" }
+                        subscribe(session, subscriptions)
+                    }
+                    Logger.i { "MQTT connected and subscribed" }
+                }
+                val failure = result.exceptionOrNull()
+                when {
+                    result.isSuccess -> return@launch
+
+                    failure is MqttException.ConnectionRejected && failure.isCredentialRejection() -> {
+                        Logger.e(failure) { "MQTT connection rejected (unrecoverable), stopping" }
+                        close(failure)
+                        return@launch
+                    }
+
+                    else -> {
+                        if (!isActiveSession(session)) return@launch
+                        // Broker- and network-side failures are what this retry loop exists to absorb — an
+                        // unreachable host, a TLS problem, a dropped connection, or a broker that violates the
+                        // MQTT 5 spec (e.g. the topic-alias limit). None are defects in this app, and reporting
+                        // every retry as a non-fatal drowned real regressions.
+                        //
+                        // Anything else landing here is unexpected — a fault in our own connect/subscribe setup
+                        // rather than the peer's — so it keeps reporting.
+                        if (failure.isExpectedMqttRetryFailure()) {
+                            Logger.w(failure) { "MQTT connect failed, retrying in ${reconnectDelay}ms" }
+                        } else {
+                            Logger.e(failure) { "MQTT connect failed unexpectedly, retrying in ${reconnectDelay}ms" }
+                        }
+                        delay(reconnectDelay)
+                        reconnectDelay =
+                            (reconnectDelay * RECONNECT_BACKOFF_MULTIPLIER).coerceAtMost(MAX_RECONNECT_DELAY_MS)
+                    }
                 }
             }
         }
-    }
 
     // A refusal is the broker's verdict on a filter, not a failed attempt: the client keeps the filters it granted,
     // and retrying the connect would only draw the same SUBACK on a backoff for ever. Record it for the UI instead.
