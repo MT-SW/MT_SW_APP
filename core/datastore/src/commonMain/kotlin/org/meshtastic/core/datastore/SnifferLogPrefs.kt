@@ -73,12 +73,14 @@ open class SnifferLogPrefs(private val dataStore: CorePreferencesDataStore) {
     /**
      * The last RADIO/MQTT source a real selection was made for -- never Off. Lets a freshly created
      * [org.meshtastic.feature.settings.sniffer.SnifferPanelViewModel] (the panel is recreated every time the Sniffer
-     * screen is reopened) keep showing that source's history while [activeSource] is currently Off, instead of the
-     * log appearing to vanish just from navigating away and back. Null only when no source has ever been selected.
+     * screen is reopened) keep showing that source's history while [activeSource] is currently Off, instead of the log
+     * appearing to vanish just from navigating away and back. Null only when no source has ever been selected.
      */
     open val lastRealSource: Flow<SnifferSource?> =
         dataStore.data.map { prefs ->
-            prefs[PreferencesKeys.LAST_REAL_SOURCE]?.let { raw -> runCatching { SnifferSource.valueOf(raw) }.getOrNull() }
+            prefs[PreferencesKeys.LAST_REAL_SOURCE]?.let { raw ->
+                runCatching { SnifferSource.valueOf(raw) }.getOrNull()
+            }
         }
 
     open suspend fun setLastRealSource(source: SnifferSource) {
@@ -86,10 +88,10 @@ open class SnifferLogPrefs(private val dataStore: CorePreferencesDataStore) {
     }
 
     /**
-     * Watermark set by the trash icon ([org.meshtastic.feature.settings.sniffer.SnifferPanelViewModel.clearDisplayedLogs]):
-     * packets timestamped at or before this are hidden from the panel. Persisted for the same reason as
-     * [lastRealSource] -- a cleared log must stay cleared across a revisit, not reappear because the panel's
-     * ViewModel was recreated.
+     * Watermark set by the trash icon
+     * ([org.meshtastic.feature.settings.sniffer.SnifferPanelViewModel.clearDisplayedLogs]): packets timestamped at or
+     * before this are hidden from the panel. Persisted for the same reason as [lastRealSource] -- a cleared log must
+     * stay cleared across a revisit, not reappear because the panel's ViewModel was recreated.
      */
     open val clearedAtMillis: Flow<Long> = dataStore.data.map { it[PreferencesKeys.CLEARED_AT_MILLIS] ?: 0L }
 
