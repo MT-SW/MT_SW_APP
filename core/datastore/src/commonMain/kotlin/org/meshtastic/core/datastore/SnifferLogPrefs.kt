@@ -92,6 +92,12 @@ open class SnifferLogPrefs(private val dataStore: CorePreferencesDataStore) {
      * ([org.meshtastic.feature.settings.sniffer.SnifferPanelViewModel.clearDisplayedLogs]): packets timestamped at or
      * before this are hidden from the panel. Persisted for the same reason as [lastRealSource] -- a cleared log must
      * stay cleared across a revisit, not reappear because the panel's ViewModel was recreated.
+     *
+     * Also set the first time a real source is ever selected while still at the 0L default (see
+     * [org.meshtastic.feature.settings.sniffer.SnifferPanelViewModel]'s init) -- so a sniffing run only ever shows
+     * packets it actually captured, never the shared MeshLog table's full unrelated history from before that run
+     * started. [org.meshtastic.feature.settings.sniffer.SnifferLogViewModel.sniffedPackets] queries from this watermark
+     * directly, treating 0L (nothing captured yet) as "show nothing" rather than "show everything".
      */
     open val clearedAtMillis: Flow<Long> = dataStore.data.map { it[PreferencesKeys.CLEARED_AT_MILLIS] ?: 0L }
 

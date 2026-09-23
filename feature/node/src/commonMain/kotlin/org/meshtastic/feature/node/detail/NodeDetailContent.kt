@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -36,6 +37,8 @@ import org.meshtastic.core.database.entity.FirmwareRelease
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.loading
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.feature.node.component.AdministrationSection
 import org.meshtastic.feature.node.component.DeviceActions
 import org.meshtastic.feature.node.component.DeviceLinksSection
@@ -95,54 +98,64 @@ fun NodeDetailList(
     onSaveNotes: (Int, String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        state = listState,
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-    ) {
-        item {
-            NodeDetailsSection(
-                node = node,
-                deviceHardware = uiState.metricsState.deviceHardware,
-                reportedTarget = uiState.metricsState.reportedTarget,
-                relayNodeName = uiState.relayNodeName,
-                isLocal = uiState.metricsState.isLocal,
-                onRequestUserInfo = {
-                    onAction(NodeDetailAction.HandleNodeMenuAction(NodeMenuAction.RequestUserInfo(node)))
-                },
-            )
-        }
-        if (uiState.metricsState.deviceLinks.isNotEmpty()) {
-            item { DeviceLinksSection(links = uiState.metricsState.deviceLinks) }
-        }
-        item {
-            DeviceActions(
-                node = node,
-                ourNode = ourNode,
-                lastTracerouteTime = uiState.lastTracerouteTime,
-                lastRequestNeighborsTime = uiState.lastRequestNeighborsTime,
-                availableLogs = uiState.availableLogs,
-                onAction = onAction,
-                displayUnits = uiState.metricsState.displayUnits,
-                isFahrenheit = uiState.metricsState.isFahrenheit,
-                isLocal = uiState.metricsState.isLocal,
-                hasConversation = uiState.hasConversation,
-                airQualityHistory = uiState.metricsState.airQualityMetrics,
-            )
-        }
-        item { NotesSection(node = node, onSaveNotes = onSaveNotes) }
-        if (!uiState.metricsState.isManaged) {
+    Box(modifier = modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+            state = listState,
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+        ) {
             item {
-                AdministrationSection(
+                NodeDetailsSection(
                     node = node,
-                    metricsState = uiState.metricsState,
-                    onAction = onAction,
-                    onFirmwareSelect = onFirmwareSelect,
-                    sessionStatus = uiState.sessionStatus,
-                    isEnsuringSession = uiState.isEnsuringSession,
+                    deviceHardware = uiState.metricsState.deviceHardware,
+                    reportedTarget = uiState.metricsState.reportedTarget,
+                    relayNodeName = uiState.relayNodeName,
+                    isLocal = uiState.metricsState.isLocal,
+                    onRequestUserInfo = {
+                        onAction(NodeDetailAction.HandleNodeMenuAction(NodeMenuAction.RequestUserInfo(node)))
+                    },
                 )
             }
+            if (uiState.metricsState.deviceLinks.isNotEmpty()) {
+                item { DeviceLinksSection(links = uiState.metricsState.deviceLinks) }
+            }
+            item {
+                DeviceActions(
+                    node = node,
+                    ourNode = ourNode,
+                    lastTracerouteTime = uiState.lastTracerouteTime,
+                    lastRequestNeighborsTime = uiState.lastRequestNeighborsTime,
+                    availableLogs = uiState.availableLogs,
+                    onAction = onAction,
+                    displayUnits = uiState.metricsState.displayUnits,
+                    isFahrenheit = uiState.metricsState.isFahrenheit,
+                    isLocal = uiState.metricsState.isLocal,
+                    hasConversation = uiState.hasConversation,
+                    airQualityHistory = uiState.metricsState.airQualityMetrics,
+                )
+            }
+            item { NotesSection(node = node, onSaveNotes = onSaveNotes) }
+            if (!uiState.metricsState.isManaged) {
+                item {
+                    AdministrationSection(
+                        node = node,
+                        metricsState = uiState.metricsState,
+                        onAction = onAction,
+                        onFirmwareSelect = onFirmwareSelect,
+                        sessionStatus = uiState.sessionStatus,
+                        isEnsuringSession = uiState.isEnsuringSession,
+                    )
+                }
+            }
         }
+        FastScrollSidebar(
+            listState = listState,
+            itemCount =
+            3 +
+                (if (uiState.metricsState.deviceLinks.isNotEmpty()) 1 else 0) +
+                (if (!uiState.metricsState.isManaged) 1 else 0),
+            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
+        )
     }
 }

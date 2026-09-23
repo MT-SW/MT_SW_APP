@@ -45,6 +45,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.administration
 import org.meshtastic.core.resources.preserve_favorites
 import org.meshtastic.core.resources.remotely_administrating
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.feature.settings.component.ExpressiveSection
@@ -84,16 +85,23 @@ fun AdministrationScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                 )
             },
         ) { paddingValues ->
-            Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()).padding(paddingValues).padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                ExpressiveSection(
-                    title = stringResource(Res.string.administration),
-                    titleColor = MaterialTheme.colorScheme.error,
+            val scrollState = rememberScrollState()
+            Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+                Column(
+                    modifier = Modifier.verticalScroll(scrollState).fillMaxSize().padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    AdminRouteItems(viewModel = viewModel, enabled = enabled, state = state, destNode = destNode)
+                    ExpressiveSection(
+                        title = stringResource(Res.string.administration),
+                        titleColor = MaterialTheme.colorScheme.error,
+                    ) {
+                        AdminRouteItems(viewModel = viewModel, enabled = enabled, state = state, destNode = destNode)
+                    }
                 }
+                FastScrollSidebar(
+                    scrollState = scrollState,
+                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
+                )
             }
         }
 

@@ -53,6 +53,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import kotlin.math.abs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
@@ -64,12 +65,13 @@ import org.meshtastic.core.model.Message
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.Reaction
+import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.feature.messaging.component.DateSeparator
 import org.meshtastic.feature.messaging.component.MessageItem
 import org.meshtastic.feature.messaging.component.MessageStatusDialog
 import org.meshtastic.feature.messaging.component.ReactionDialog
 import org.meshtastic.feature.messaging.component.UnreadMessagesDivider
-import kotlin.math.abs
 
 private const val HEX_RADIX = 16
 private const val RELAY_NODE_SUFFIX_MASK = 0xFF
@@ -291,7 +293,7 @@ private fun MessageListPagedContent(
         },
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
             state = listState,
             reverseLayout = true,
             contentPadding = PaddingValues(bottom = 24.dp),
@@ -391,6 +393,12 @@ private fun MessageListPagedContent(
                 }
             }
         }
+        FastScrollSidebar(
+            listState = listState,
+            itemCount = state.messages.itemCount,
+            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
+            reverseLayout = true,
+        )
     }
 }
 

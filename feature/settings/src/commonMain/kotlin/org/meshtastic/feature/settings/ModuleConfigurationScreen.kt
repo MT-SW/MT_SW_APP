@@ -17,7 +17,9 @@
 package org.meshtastic.feature.settings
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -25,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,6 +37,7 @@ import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.module_settings
 import org.meshtastic.core.resources.remotely_administrating
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.feature.settings.component.ExpressiveSection
@@ -80,21 +84,28 @@ fun ModuleConfigurationScreen(
             )
         },
     ) { paddingValues ->
-        Column(
-            modifier = Modifier.verticalScroll(rememberScrollState()).padding(paddingValues).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            ExpressiveSection(title = stringResource(Res.string.module_settings)) {
-                modules.forEach {
-                    ListItem(
-                        text = stringResource(it.title),
-                        leadingIcon = it.icon?.let { res -> vectorResource(res) },
-                        enabled = state.connected && !state.responseState.isWaiting(),
-                    ) {
-                        onNavigate(it.route)
+        val scrollState = rememberScrollState()
+        Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+            Column(
+                modifier = Modifier.verticalScroll(scrollState).fillMaxSize().padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                ExpressiveSection(title = stringResource(Res.string.module_settings)) {
+                    modules.forEach {
+                        ListItem(
+                            text = stringResource(it.title),
+                            leadingIcon = it.icon?.let { res -> vectorResource(res) },
+                            enabled = state.connected && !state.responseState.isWaiting(),
+                        ) {
+                            onNavigate(it.route)
+                        }
                     }
                 }
             }
+            FastScrollSidebar(
+                scrollState = scrollState,
+                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
+            )
         }
     }
 }

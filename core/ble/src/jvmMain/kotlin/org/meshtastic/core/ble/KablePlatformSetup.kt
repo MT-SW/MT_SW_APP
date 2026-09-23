@@ -29,6 +29,14 @@ internal actual fun ScannerBuilder.platformScanConfig() {
 // nothing and the scan yields no advertisements at all.
 internal actual val supportsNativeAddressScanFilter: Boolean = false
 
+// Kable's JVM target scans through the Rust btleplug library. On Windows, btleplug's WinRT-backed scanner does not
+// implement ScanFilter at all (github.com/deviceplug/btleplug issue #249): a service-UUID filter is accepted by the
+// API but silently produces zero results instead of narrowing the scan, so Meshtastic devices were never discovered
+// on Windows desktop -- the scan callback fires ("Starting scan") but the native layer discards every advertisement
+// before Kable's Flow ever sees it. KableBleScanner.advertisements skips requesting this filter here and
+// KableBleScanner.scan narrows client-side using Advertisement.uuids instead.
+internal actual val supportsNativeServiceScanFilter: Boolean = false
+
 internal actual fun PeripheralBuilder.platformConfig(device: BleDevice, autoConnect: () -> Boolean) {
     // Desktop Kable uses direct connections without needing autoConnect.
 }

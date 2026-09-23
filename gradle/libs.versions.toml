@@ -105,7 +105,11 @@ okio = "3.18.2"
 uri-kmp = "0.0.21"
 spotless = "8.10.2"
 vico = "3.3.1"
-kable = "0.45.0"
+# Pinned below 0.45.0 (which bumps the vendored Rust btleplug to 0.13.0): that version unconditionally enables
+# SetAllowExtendedAdvertisements(true) on its Windows/WinRT scan backend, which makes some peripherals (Realtek
+# adapters confirmed) invisible to BLE scanning entirely -- see github.com/deviceplug/btleplug issue #472. This broke
+# Meshtastic device discovery on Windows desktop. Un-pin once Kable ships a fix or exposes a way to disable it.
+kable = "0.44.3"
 mqttastic = "0.9.0"
 jmdns = "3.6.3"
 qrcode-kotlin = "4.5.0"

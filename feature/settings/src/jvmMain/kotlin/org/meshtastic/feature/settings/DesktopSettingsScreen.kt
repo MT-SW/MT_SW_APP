@@ -17,7 +17,9 @@
 package org.meshtastic.feature.settings
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -31,6 +33,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -68,6 +71,7 @@ import org.meshtastic.core.resources.remotely_administrating
 import org.meshtastic.core.resources.theme
 import org.meshtastic.core.resources.units
 import org.meshtastic.core.resources.wifi_devices
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticDialog
@@ -228,152 +232,160 @@ fun DesktopSettingsScreen(
             )
         },
     ) { paddingValues ->
-        Column(
-            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            SettingsSearchBar(
-                viewModel = koinViewModel<SettingsSearchViewModel>(),
-                onNavigate = onNavigate,
-                // This phone's own settings are hidden below while administering another node; search hides them too.
-                includeAppLocal = state.isLocal,
-            )
+        val scrollState = rememberScrollState()
+        Box(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+            Column(
+                modifier = Modifier.verticalScroll(scrollState).fillMaxSize().padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                SettingsSearchBar(
+                    viewModel = koinViewModel<SettingsSearchViewModel>(),
+                    onNavigate = onNavigate,
+                    // This phone's own settings are hidden below while administering another node; search hides them
+                    // too.
+                    includeAppLocal = state.isLocal,
+                )
 
-            RadioConfigItemList(
-                state = state,
-                isManaged = localConfig.security?.is_managed ?: false,
-                isOtaCapable = isOtaCapable,
-                onClearResponse = radioConfigViewModel::clearPacketResponse,
-                onRouteClick = { route ->
-                    val navRoute =
-                        when (route) {
-                            is ConfigRoute -> route.route
-                            is ModuleRoute -> route.route
-                            else -> null
+                RadioConfigItemList(
+                    state = state,
+                    isManaged = localConfig.security?.is_managed ?: false,
+                    isOtaCapable = isOtaCapable,
+                    onClearResponse = radioConfigViewModel::clearPacketResponse,
+                    onRouteClick = { route ->
+                        val navRoute =
+                            when (route) {
+                                is ConfigRoute -> route.route
+                                is ModuleRoute -> route.route
+                                else -> null
+                            }
+                        navRoute?.let { onNavigate(it) }
+                    },
+                    onNavigate = onNavigate,
+                    onImport = {
+                        radioConfigViewModel.clearPacketResponse()
+                        deviceProfile = null
+                        openConfigLauncher("application/octet-stream")
+                    },
+                    onExport = {
+                        radioConfigViewModel.clearPacketResponse()
+                        deviceProfile = null
+                        showEditDeviceProfileDialog = true
+                    },
+                    onSetSnifferEnabled = { radioConfigViewModel.setSnifferEnabled(it) },
+                )
+
+                // App-local settings are only relevant when configuring the local node
+                if (state.isLocal) {
+                    ExpressiveSection(title = stringResource(Res.string.app_settings)) {
+                        ListItem(
+                            text = stringResource(Res.string.theme),
+                            leadingIcon = MeshtasticIcons.FormatPaint,
+                            trailingIcon = null,
+                        ) {
+                            showThemePickerDialog = true
                         }
-                    navRoute?.let { onNavigate(it) }
-                },
-                onNavigate = onNavigate,
-                onImport = {
-                    radioConfigViewModel.clearPacketResponse()
-                    deviceProfile = null
-                    openConfigLauncher("application/octet-stream")
-                },
-                onExport = {
-                    radioConfigViewModel.clearPacketResponse()
-                    deviceProfile = null
-                    showEditDeviceProfileDialog = true
-                },
-                onSetSnifferEnabled = { radioConfigViewModel.setSnifferEnabled(it) },
-            )
 
-            // App-local settings are only relevant when configuring the local node
-            if (state.isLocal) {
-                ExpressiveSection(title = stringResource(Res.string.app_settings)) {
-                    ListItem(
-                        text = stringResource(Res.string.theme),
-                        leadingIcon = MeshtasticIcons.FormatPaint,
-                        trailingIcon = null,
-                    ) {
-                        showThemePickerDialog = true
+                        ListItem(
+                            text = stringResource(Res.string.preferences_language),
+                            leadingIcon = MeshtasticIcons.Language,
+                            trailingIcon = null,
+                        ) {
+                            showLanguagePickerDialog = true
+                        }
+
+                        ListItem(
+                            text = stringResource(Res.string.units),
+                            supportingText =
+                            stringResource(UnitsOption.entries.first { it.override == unitsOverride }.label),
+                            leadingIcon = MeshtasticIcons.Distance,
+                            trailingIcon = null,
+                        ) {
+                            showUnitsPickerDialog = true
+                        }
+
+                        FullMessageTimestampsSetting(
+                            checked = showFullMessageTimestamps,
+                            onCheckedChange = settingsViewModel::setShowFullMessageTimestamps,
+                        )
+
+                        HomoglyphSetting(
+                            homoglyphEncodingEnabled = homoglyphEnabled,
+                            onToggle = { radioConfigViewModel.toggleHomoglyphCharactersEncodingEnabled() },
+                        )
+
+                        CacheLimitPreference(
+                            cacheLimit = cacheLimit,
+                            onCheckEvictionCount = { settingsViewModel.cachedDeviceCountExceeding(it) },
+                            onSetCacheLimit = { settingsViewModel.setDbCacheLimit(it) },
+                        )
+
+                        SwitchListItem(
+                            text = stringResource(Res.string.auto_load_chat_images),
+                            checked = autoLoadChatImages,
+                            onClick = { settingsViewModel.setAutoLoadChatImages(!autoLoadChatImages) },
+                        )
                     }
 
-                    ListItem(
-                        text = stringResource(Res.string.preferences_language),
-                        leadingIcon = MeshtasticIcons.Language,
-                        trailingIcon = null,
-                    ) {
-                        showLanguagePickerDialog = true
+                    ExpressiveSection(title = stringResource(Res.string.node_layout_section_title)) {
+                        ListItem(
+                            text = stringResource(Res.string.node_layout_section_title),
+                            leadingIcon = MeshtasticIcons.List,
+                        ) {
+                            onNavigate(SettingsRoute.NodeList)
+                        }
                     }
 
-                    ListItem(
-                        text = stringResource(Res.string.units),
-                        supportingText =
-                        stringResource(UnitsOption.entries.first { it.override == unitsOverride }.label),
-                        leadingIcon = MeshtasticIcons.Distance,
-                        trailingIcon = null,
-                    ) {
-                        showUnitsPickerDialog = true
+                    ExpressiveSection(title = stringResource(Res.string.discovery_local_mesh)) {
+                        ListItem(
+                            text = stringResource(Res.string.discovery_local_mesh),
+                            leadingIcon = MeshtasticIcons.PermScanWifi,
+                        ) {
+                            onNavigate(DiscoveryRoute.DiscoveryGraph)
+                        }
                     }
 
-                    FullMessageTimestampsSetting(
-                        checked = showFullMessageTimestamps,
-                        onCheckedChange = settingsViewModel::setShowFullMessageTimestamps,
+                    ExpressiveSection(title = stringResource(Res.string.device_links)) {
+                        ListItem(text = stringResource(Res.string.device_links), leadingIcon = MeshtasticIcons.Device) {
+                            onNavigate(SettingsRoute.DeviceLinks)
+                        }
+                    }
+
+                    ExpressiveSection(title = stringResource(Res.string.wifi_devices)) {
+                        ListItem(text = stringResource(Res.string.wifi_devices), leadingIcon = MeshtasticIcons.Wifi) {
+                            onNavigate(WifiProvisionRoute.WifiProvision())
+                        }
+                    }
+
+                    NotificationSection(
+                        messagesEnabled = settingsViewModel.messagesEnabled.collectAsStateWithLifecycle().value,
+                        onToggleMessages = { settingsViewModel.setMessagesEnabled(it) },
+                        nodeEventsEnabled = settingsViewModel.nodeEventsEnabled.collectAsStateWithLifecycle().value,
+                        onToggleNodeEvents = { settingsViewModel.setNodeEventsEnabled(it) },
+                        lowBatteryEnabled = settingsViewModel.lowBatteryEnabled.collectAsStateWithLifecycle().value,
+                        onToggleLowBattery = { settingsViewModel.setLowBatteryEnabled(it) },
                     )
 
-                    HomoglyphSetting(
-                        homoglyphEncodingEnabled = homoglyphEnabled,
-                        onToggle = { radioConfigViewModel.toggleHomoglyphCharactersEncodingEnabled() },
+                    ExpressiveSection(title = stringResource(Res.string.help_and_documentation)) {
+                        ListItem(
+                            text = stringResource(Res.string.help_and_documentation),
+                            leadingIcon = MeshtasticIcons.HelpOutline,
+                        ) {
+                            onNavigate(SettingsRoute.HelpDocs)
+                        }
+                    }
+
+                    DesktopAppInfoSection(
+                        appVersionName = settingsViewModel.appVersionName,
+                        hiddenFeaturesUnlocked = hiddenFeaturesUnlocked,
+                        onUnlockHiddenFeatures = { settingsViewModel.unlockHiddenFeatures() },
+                        onNavigateToAbout = { onNavigate(SettingsRoute.About) },
                     )
-
-                    CacheLimitPreference(
-                        cacheLimit = cacheLimit,
-                        onCheckEvictionCount = { settingsViewModel.cachedDeviceCountExceeding(it) },
-                        onSetCacheLimit = { settingsViewModel.setDbCacheLimit(it) },
-                    )
-
-                    SwitchListItem(
-                        text = stringResource(Res.string.auto_load_chat_images),
-                        checked = autoLoadChatImages,
-                        onClick = { settingsViewModel.setAutoLoadChatImages(!autoLoadChatImages) },
-                    )
                 }
-
-                ExpressiveSection(title = stringResource(Res.string.node_layout_section_title)) {
-                    ListItem(
-                        text = stringResource(Res.string.node_layout_section_title),
-                        leadingIcon = MeshtasticIcons.List,
-                    ) {
-                        onNavigate(SettingsRoute.NodeList)
-                    }
-                }
-
-                ExpressiveSection(title = stringResource(Res.string.discovery_local_mesh)) {
-                    ListItem(
-                        text = stringResource(Res.string.discovery_local_mesh),
-                        leadingIcon = MeshtasticIcons.PermScanWifi,
-                    ) {
-                        onNavigate(DiscoveryRoute.DiscoveryGraph)
-                    }
-                }
-
-                ExpressiveSection(title = stringResource(Res.string.device_links)) {
-                    ListItem(text = stringResource(Res.string.device_links), leadingIcon = MeshtasticIcons.Device) {
-                        onNavigate(SettingsRoute.DeviceLinks)
-                    }
-                }
-
-                ExpressiveSection(title = stringResource(Res.string.wifi_devices)) {
-                    ListItem(text = stringResource(Res.string.wifi_devices), leadingIcon = MeshtasticIcons.Wifi) {
-                        onNavigate(WifiProvisionRoute.WifiProvision())
-                    }
-                }
-
-                NotificationSection(
-                    messagesEnabled = settingsViewModel.messagesEnabled.collectAsStateWithLifecycle().value,
-                    onToggleMessages = { settingsViewModel.setMessagesEnabled(it) },
-                    nodeEventsEnabled = settingsViewModel.nodeEventsEnabled.collectAsStateWithLifecycle().value,
-                    onToggleNodeEvents = { settingsViewModel.setNodeEventsEnabled(it) },
-                    lowBatteryEnabled = settingsViewModel.lowBatteryEnabled.collectAsStateWithLifecycle().value,
-                    onToggleLowBattery = { settingsViewModel.setLowBatteryEnabled(it) },
-                )
-
-                ExpressiveSection(title = stringResource(Res.string.help_and_documentation)) {
-                    ListItem(
-                        text = stringResource(Res.string.help_and_documentation),
-                        leadingIcon = MeshtasticIcons.HelpOutline,
-                    ) {
-                        onNavigate(SettingsRoute.HelpDocs)
-                    }
-                }
-
-                DesktopAppInfoSection(
-                    appVersionName = settingsViewModel.appVersionName,
-                    hiddenFeaturesUnlocked = hiddenFeaturesUnlocked,
-                    onUnlockHiddenFeatures = { settingsViewModel.unlockHiddenFeatures() },
-                    onNavigateToAbout = { onNavigate(SettingsRoute.About) },
-                )
             }
+            FastScrollSidebar(
+                scrollState = scrollState,
+                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
+            )
         }
     }
 }

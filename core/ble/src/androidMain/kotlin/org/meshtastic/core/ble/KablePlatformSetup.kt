@@ -24,14 +24,19 @@ import com.juul.kable.PooledThreadingStrategy
 import com.juul.kable.ScannerBuilder
 import com.juul.kable.toIdentifier
 
-// The scan callback never blocks; a capacity of 1 conflates, so a dense BLE environment cannot back
-// advertisements up behind a slow collector.
+// The scan callback never blocks; pre-conflating means a dense BLE environment cannot back
+// advertisements up behind a slow collector. (Kable 0.44.3's `ScannerBuilder` predates
+// `bufferCapacity`, added in 0.45.0 -- `preConflate = true` is the 0.44.3 equivalent of
+// `bufferCapacity = 1`.)
 internal actual fun ScannerBuilder.platformScanConfig() {
-    bufferCapacity = 1
+    preConflate = true
 }
 
 /** Android's scanner filters on address in hardware, so Kable's `Filter.Address` works natively here. */
 internal actual val supportsNativeAddressScanFilter: Boolean = true
+
+/** Android's scanner filters on service UUID in hardware, so Kable's `Filter.Service` works natively here. */
+internal actual val supportsNativeServiceScanFilter: Boolean = true
 
 /**
  * Shared thread pool for Kable BLE connections.

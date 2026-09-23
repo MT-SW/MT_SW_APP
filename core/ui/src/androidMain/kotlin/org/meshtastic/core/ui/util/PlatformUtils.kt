@@ -291,6 +291,8 @@ actual fun rememberOpenWifiSettings(): () -> Unit {
 actual val bleScanRequiresLocationServices: Boolean =
     android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S
 
+actual val isDesktopPlatform: Boolean = false
+
 @Composable
 actual fun isBluetoothDisabled(): Boolean {
     val context = LocalContext.current

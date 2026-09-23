@@ -60,10 +60,12 @@ import org.meshtastic.core.resources.debug_logcat_empty
 import org.meshtastic.core.resources.debug_logcat_refresh
 import org.meshtastic.core.resources.debug_logs_export
 import org.meshtastic.core.resources.debug_logs_export_warning
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MeshtasticResourceDialog
 import org.meshtastic.core.ui.icon.FileDownload
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Refresh
+import org.meshtastic.core.ui.util.isDesktopPlatform
 
 /** Logcat priority levels the user can toggle. Fatal/assert lines carry an unknown code and are always shown. */
 enum class LogLevel(val code: Char) {
@@ -171,19 +173,26 @@ fun LogcatContent(modifier: Modifier = Modifier) {
                 Text(stringResource(Res.string.debug_logcat_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         } else {
-            SelectionContainer {
-                LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
-                    items(lines) { line ->
-                        Text(
-                            text = line,
-                            color = logcatLineColor(line),
-                            fontFamily = FontFamily.Monospace,
-                            fontSize = 11.sp,
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
-                        )
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            Box(modifier = Modifier.fillMaxSize()) {
+                SelectionContainer {
+                    LazyColumn(state = listState, modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp)) {
+                        items(lines) { line ->
+                            Text(
+                                text = line,
+                                color = logcatLineColor(line),
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 11.sp,
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                            )
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                        }
                     }
                 }
+                FastScrollSidebar(
+                    listState = listState,
+                    itemCount = lines.size,
+                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
+                )
             }
         }
     }

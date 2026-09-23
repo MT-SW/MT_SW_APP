@@ -47,6 +47,7 @@ Co to oznacza w praktyce:
 - **Naprawiony import/eksport konfiguracji urządzenia** — wcześniej przycisk działał, ale nie tworzył żadnego pliku (błąd w parsowaniu ścieżki na Windowsie, cichy błąd bez informacji dla użytkownika).
 - Przywrócony brakujący przełącznik **automatyczne ładowanie obrazków w czacie** (zgubiony przy jednym z merge'y z upstreamem).
 - **Trzecia kolumna widoku węzła (metryki/traceroute) na desktopie teraz podąża za wybranym węzłem** — wcześniej po kliknięciu innego węzła na liście trzecia kolumna (np. otwarte metryki urządzenia) zostawała przy poprzednio wybranym węźle; teraz przełącza się na ten sam typ ekranu dla nowo wybranego węzła.
+- **Pasek szybkiego przewijania na desktopie** — każda dłuższa lista w appce (węzły, wiadomości, kontakty, ekrany metryk/logów węzła, logi appki, panel debugowania, konfiguracja radia/modułów, główne menu Ustawień, ekran "Zdrowie sieci") ma teraz przeciągany pasek przy prawej krawędzi do szybkiego skoku w dowolne miejsce listy — przydatny na desktopie, gdzie nawigacja jest tylko myszką/kółkiem, bez dotykowego przewijania jak na telefonie. Widoczny wyłącznie na desktopie — na Androidzie/iOS lista działa bez zmian (dotyk/swipe).
 
 ## Ekran "Zdrowie sieci"
 
@@ -73,6 +74,7 @@ Tryb pokazujący ruch w eterze, który normalnie by zniknął — wszystkie paki
 
 - **Jeden wspólny ekran "Sniffer" w Ustawienia → Advanced** zamiast dwóch osobnych — z menu ustawień (ikona koła zębatego) wybiera się aktywne źródło: Wyłączony / Radio / MQTT, tylko jedno naraz. Każde włączenie pyta osobno o potwierdzenie: Radio ostrzega, że może opóźniać lub gubić część wiadomości czatu bądź telemetrii (dzielą tę samą kolejkę transmisji do telefonu); MQTT ostrzega, że otwiera własne połączenie z brokerem i przerwie na czas swojego działania "Proxy MQTT na tym telefonie", bo appka obsługuje tylko jedno aktywne połączenie MQTT naraz.
 - **Log zostaje na ekranie po wyłączeniu snifera** — znika dopiero po ręcznym kliknięciu ikony kosza albo przy realnej zmianie aktywnego źródła (Radio↔MQTT), co czyści widok i zaczyna zbierać od nowa.
+- **Naprawiony log snifera pokazujący stare wpisy mimo wyłączenia** — log filtrował się tylko wizualnie (znacznik czasu ostatniego wyczyszczenia), ale samo zapytanie do bazy nie miało żadnego ograniczenia czasowego i czytało całą, współdzieloną tabelę logów appki (do 5000 wpisów, nie tylko ze snifera) — stąd wrażenie, że po włączeniu radia pokazują się logi sprzed dnia mimo wyłączonego snifera. Teraz zapytanie jest związane z tym samym znacznikiem co widok (ustawianym automatycznie przy pierwszym włączeniu źródła, jeśli nikt wcześniej nie kliknął kosza), więc log pokazuje wyłącznie to, co sniffer faktycznie zebrał od ostatniego uruchomienia/wyczyszczenia — nic więcej, i mniej pracy przy dekodowaniu przy każdym odświeżeniu.
 - **Grupowanie duplikatów** — ten sam pakiet usłyszany więcej niż raz (przez kilka bramek MQTT albo przekazany przez różne węzły pośredniczące w sieci radiowej) pokazuje się jako jeden wiersz z pełną listą źródeł ("Widziane przez bramki: ..." / "Przekazane przez: ..."), zamiast osobnego wpisu dla każdej kopii. Włącznik w ustawieniach snifera.
 - **Automatyczne przewijanie i próba deszyfrowania jako osobne przełączniki** w ustawieniach snifera — pierwszy decyduje, czy lista ma skakać do najnowszego pakietu; drugi, czy zaszyfrowana zawartość ma być automatycznie odkodowywana znanymi kluczami kanałów appki, czy pokazywana jako surowy hex.
 - **Zapis i wczytywanie logu** — ikona zapisu w pasku górnym eksportuje aktualnie wyświetlany log do pliku (txt/JSON/CSV do wyboru w ustawieniach), a z menu ustawień można wczytać wcześniej zapisany log JSON z powrotem do podglądu (np. do analizy offline albo przesłania komuś innemu).
@@ -113,6 +115,11 @@ Tryb pokazujący ruch w eterze, który normalnie by zniknął — wszystkie paki
 ## Łączność Bluetooth
 
 - **Naprawiona zawodność ponownego łączenia z już sparowanym urządzeniem** — na części telefonów (potwierdzone na Xiaomi/MIUI) appka potrafiła nie połączyć się ponownie z węzłem po tym, jak ten na chwilę zniknął z zasięgu lub się wyłączył, mimo że urządzenie pozostawało sparowane; jedynym działającym obejściem było ręczne odparowanie i sparowanie od nowa. Naprawione poprzez: odświeżanie cache usług GATT przy każdym połączeniu (a nie tylko reaktywnie, po wykryciu problemu), samodzielną negocjację MTU z automatycznym ponowieniem próby zamiast pojedynczej próby wystrzelonej natychmiast po odkryciu usług, oraz dodatkowe mechanizmy wykrywania i odzyskiwania połączenia działające również wtedy, gdy ręczne przerwanie i ponowienie łączenia zerowałoby licznik nieudanych prób.
+- **Naprawione niewykrywanie węzła po Bluetooth na desktopie (Windows)** — appka skanowała bez końca, nie znajdując żadnego urządzenia, mimo że telefon widział ten sam węzeł bez problemu. Przyczyna: aktualizacja biblioteki Kable (0.44.3 → 0.45.0) przyniosła nowszą wersję Rustowego `btleplug`, która na Windowsie/WinRT bezwarunkowo włącza `SetAllowExtendedAdvertisements`, co u części adapterów BT czyni je całkowicie niewidocznymi dla skanowania (potwierdzony błąd w upstreamie btleplug). Naprawione przez przypięcie Kable z powrotem do 0.44.3.
+
+## Podziękowania
+
+- Za korektę tłumaczeń oraz część pomysłów na nowe funkcje odpowiada [cheaterenator](https://github.com/cheaterenator).
 
 ## Status i zastrzeżenia
 
@@ -178,6 +185,7 @@ What this means in practice:
 - **Fixed device configuration import/export** — the button worked but silently failed to create any file (a URI-parsing bug on Windows, with no error shown to the user).
 - Restored the missing **auto-load chat images** toggle (lost during an upstream merge).
 - **The node detail third column (metrics/traceroute) on desktop now follows the selected node** — previously, clicking a different node in the list left the third column (e.g. an open Device Metrics view) showing the previously selected node; it now switches to the same screen type for the newly selected node.
+- **Fast-scroll sidebar on desktop** — every long list in the app (nodes, messages, contacts, node metrics/log screens, app logs, the debug panel, radio/module config screens, the main Settings menu, the "Network Health" screen) now has a draggable thumb along the right edge to jump straight to any point in the list — useful on desktop, where navigation is mouse/wheel-only, unlike a phone's touch scrolling. Desktop-only — Android/iOS lists behave exactly as before (touch/swipe).
 
 ## "Network Health" screen
 
@@ -204,6 +212,7 @@ A mode that surfaces air traffic that would normally just vanish — every packe
 
 - **One shared "Sniffer" screen in Settings → Advanced** instead of two separate ones — the settings menu (gear icon) picks the active source: Off / Radio / MQTT, only one at a time. Enabling either one prompts for confirmation separately: Radio warns it can delay or drop some chat messages or telemetry (sniffed traffic shares the same queue to the phone); MQTT warns that it opens its own connection to the broker and will interrupt "MQTT proxy on this phone" for as long as it runs, since the app only supports one active MQTT connection at a time.
 - **The log stays on screen after the sniffer is turned off** — it only clears when you tap the trash icon, or when the active source actually changes (Radio↔MQTT), which resets the view and starts collecting fresh.
+- **Fixed the sniffer log showing stale entries even when off** — the log was only filtered visually (a last-cleared watermark); the underlying database query itself had no time bound and read the entire, app-wide log table (up to 5000 entries, not sniffer-specific) — hence logs from the previous day showing up right after turning the radio on, despite the sniffer being off. The query is now tied to the same watermark as the view (auto-set the first time a source is ever turned on, if the trash icon was never clicked before), so the log shows only what the sniffer has actually collected since the last activation/clear — nothing else, and less decode work on every refresh.
 - **Duplicate grouping** — the same packet heard more than once (via several MQTT gateways, or relayed through different nodes on the radio mesh) shows as a single row with the full list of sources ("Seen via gateways: ..." / "Relayed via: ...") instead of a separate entry per copy. Toggle in the sniffer settings.
 - **Auto-scroll and attempt-decryption as separate toggles** in the sniffer settings — the first decides whether the list jumps to the newest packet; the second whether encrypted content is automatically decoded with this app's known channel keys, or shown as raw hex.
 - **Save and load a log** — the save icon in the top bar exports the currently displayed log to a file (txt/JSON/CSV, chosen in settings), and the settings menu can load a previously saved JSON log back in for viewing (e.g. for offline analysis or sharing with someone else).
@@ -244,6 +253,11 @@ A mode that surfaces air traffic that would normally just vanish — every packe
 ## Bluetooth connectivity
 
 - **Fixed unreliable reconnection to an already-paired device** — on some phones (confirmed on Xiaomi/MIUI) the app could fail to reconnect to a node after it briefly went out of range or powered off, even though the device remained paired; the only working workaround was manually unpairing and re-pairing. Fixed by: refreshing the GATT service cache on every connect (not just reactively after a detected problem), negotiating MTU explicitly with an automatic retry instead of a single attempt fired immediately after service discovery, and additional detection/recovery mechanisms that keep working even when a manual stop-and-retry would otherwise reset the failure counter.
+- **Fixed BLE device discovery not working on desktop (Windows)** — the app would scan indefinitely without ever finding a device, even though the phone saw the same node fine. Root cause: a Kable library bump (0.44.3 → 0.45.0) pulled in a newer version of the Rust `btleplug` backend that unconditionally enables `SetAllowExtendedAdvertisements` on Windows/WinRT, which makes some BT adapters completely invisible to scanning (a confirmed upstream btleplug bug). Fixed by pinning Kable back to 0.44.3.
+
+## Credits
+
+- Translation corrections and some new feature ideas courtesy of [cheaterenator](https://github.com/cheaterenator).
 
 ## Status and caveats
 

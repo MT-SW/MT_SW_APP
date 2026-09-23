@@ -44,6 +44,17 @@ internal sealed interface KableScanFilter {
 internal data class KableScanResult(val identifier: String, val name: String?, val advertisement: Advertisement?)
 
 /**
+ * Whether this scan result should be kept for a scan that asked for [serviceUuid].
+ *
+ * When [trustNativeFilter] is true, the native scanner is trusted to have already narrowed to matching advertisements
+ * (see [supportsNativeServiceScanFilter]), so every result passes through untouched. Otherwise this re-checks
+ * client-side against the advertisement's own [Advertisement.uuids] -- the only way to narrow a scan whose native
+ * filter request was skipped because the platform can't be trusted to apply it.
+ */
+internal fun KableScanResult.matchesServiceUuid(serviceUuid: Uuid?, trustNativeFilter: Boolean): Boolean =
+    serviceUuid == null || trustNativeFilter || advertisement?.uuids?.contains(serviceUuid) == true
+
+/**
  * Picks the native filter to hand Kable: address only where the platform honours it
  * ([supportsNativeAddressScanFilter]), otherwise the service UUID, since a filter the platform ignores matches nothing.
  * [KableBleScanner.scan] narrows to the address client-side either way.
@@ -79,8 +90,14 @@ open class KableBleScanner(private val loggingConfig: BleLoggingConfig) : BleSca
             logging { applyConfig(loggingConfig) }
             when (filter) {
                 KableScanFilter.None -> Unit
+
                 is KableScanFilter.Address -> filters { match { address = filter.value } }
-                is KableScanFilter.ServiceUuid -> filters { match { services = listOf(filter.value) } }
+
+                is KableScanFilter.ServiceUuid ->
+                    // Only request the native filter where it's trusted (see supportsNativeServiceScanFilter) --
+                    // asking for one the platform silently ignores or mismatches is worse than not asking, since
+                    // scan() narrows client-side via matchesServiceUuid either way.
+                    if (supportsNativeServiceScanFilter) filters { match { services = listOf(filter.value) } }
             }
         }
         return scanner.advertisements.map(Advertisement::toScanResult)
@@ -104,6 +121,7 @@ open class KableBleScanner(private val loggingConfig: BleLoggingConfig) : BleSca
                     // native address filter must never widen the scan to other devices.
                     advertisements(nativeFilter)
                         .filter { address == null || it.identifier.equals(address, ignoreCase = true) }
+                        .filter { it.matchesServiceUuid(serviceUuid, supportsNativeServiceScanFilter) }
                         .collect { advertisement ->
                             send(
                                 MeshtasticBleDevice(

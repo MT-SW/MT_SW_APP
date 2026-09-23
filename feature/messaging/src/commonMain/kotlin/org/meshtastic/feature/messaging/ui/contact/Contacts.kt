@@ -19,6 +19,7 @@ package org.meshtastic.feature.messaging.ui.contact
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -68,6 +69,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlin.time.Duration.Companion.days
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
@@ -121,6 +123,7 @@ import org.meshtastic.core.resources.undo
 import org.meshtastic.core.resources.unmute
 import org.meshtastic.core.resources.unmute_selected
 import org.meshtastic.core.resources.unpin_selected
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.MeshtasticImportFAB
@@ -138,10 +141,10 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.SelectAll
 import org.meshtastic.core.ui.icon.VolumeMute
 import org.meshtastic.core.ui.icon.VolumeUp
+import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.core.ui.util.parseDeepLinkOrInvalid
 import org.meshtastic.core.ui.util.rememberShowToastResource
 import org.meshtastic.proto.ChannelSet
-import kotlin.time.Duration.Companion.days
 
 @Suppress("LongMethod", "CyclomaticComplexMethod", "LongParameterList")
 @Composable
@@ -576,39 +579,46 @@ private fun ContactListView(
     val channelsTitle = stringResource(Res.string.channels)
     val dmTitle = stringResource(Res.string.direct_messages)
 
-    LazyColumn(state = listState, modifier = modifier.fillMaxSize()) {
-        contactSection(
-            section = ContactSection.CHANNELS,
-            title = channelsTitle,
-            sectionContacts = channelContacts,
-            collapsed = ContactSection.CHANNELS.key in collapsedSections,
-            onToggleCollapse = onToggleSectionCollapse,
-            selectedList = selectedList,
-            activeContactKey = activeContactKey,
-            onClick = onClick,
-            onLongClick = onLongClick,
-            onNodeChipClick = onNodeChipClick,
-            onSwipeMute = onSwipeMute,
-            onSwipeDelete = onSwipeDelete,
-            channels = channels,
-            haptic = haptic,
-        )
+    Box(modifier = modifier.fillMaxSize()) {
+        LazyColumn(state = listState, modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp)) {
+            contactSection(
+                section = ContactSection.CHANNELS,
+                title = channelsTitle,
+                sectionContacts = channelContacts,
+                collapsed = ContactSection.CHANNELS.key in collapsedSections,
+                onToggleCollapse = onToggleSectionCollapse,
+                selectedList = selectedList,
+                activeContactKey = activeContactKey,
+                onClick = onClick,
+                onLongClick = onLongClick,
+                onNodeChipClick = onNodeChipClick,
+                onSwipeMute = onSwipeMute,
+                onSwipeDelete = onSwipeDelete,
+                channels = channels,
+                haptic = haptic,
+            )
 
-        contactSection(
-            section = ContactSection.DIRECT_MESSAGES,
-            title = dmTitle,
-            sectionContacts = dmContacts,
-            collapsed = ContactSection.DIRECT_MESSAGES.key in collapsedSections,
-            onToggleCollapse = onToggleSectionCollapse,
-            selectedList = selectedList,
-            activeContactKey = activeContactKey,
-            onClick = onClick,
-            onLongClick = onLongClick,
-            onNodeChipClick = onNodeChipClick,
-            onSwipeMute = onSwipeMute,
-            onSwipeDelete = onSwipeDelete,
-            channels = channels,
-            haptic = haptic,
+            contactSection(
+                section = ContactSection.DIRECT_MESSAGES,
+                title = dmTitle,
+                sectionContacts = dmContacts,
+                collapsed = ContactSection.DIRECT_MESSAGES.key in collapsedSections,
+                onToggleCollapse = onToggleSectionCollapse,
+                selectedList = selectedList,
+                activeContactKey = activeContactKey,
+                onClick = onClick,
+                onLongClick = onLongClick,
+                onNodeChipClick = onNodeChipClick,
+                onSwipeMute = onSwipeMute,
+                onSwipeDelete = onSwipeDelete,
+                channels = channels,
+                haptic = haptic,
+            )
+        }
+        FastScrollSidebar(
+            listState = listState,
+            itemCount = contacts.size,
+            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
         )
     }
 }

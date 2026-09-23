@@ -19,6 +19,7 @@ package org.meshtastic.feature.node.metrics
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -41,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -72,6 +74,7 @@ import org.meshtastic.core.resources.expand_chart
 import org.meshtastic.core.resources.info
 import org.meshtastic.core.resources.logs
 import org.meshtastic.core.resources.save
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.icon.BarChart
 import org.meshtastic.core.ui.icon.Info
@@ -79,6 +82,7 @@ import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Refresh
 import org.meshtastic.core.ui.icon.Save
+import org.meshtastic.core.ui.util.isDesktopPlatform
 
 /** Minimum x-step (in seconds) to prevent the default GCD from producing a value of 1 with irregular timestamps. */
 private const val MIN_X_STEP_SECONDS = 60.0
@@ -346,11 +350,18 @@ fun <T> BaseMetricScreen(
                     }
                 },
                 listPart = { modifier ->
-                    listPart(modifier, selectedX, lazyListState) { x ->
-                        selectedX = x
-                        coroutineScope.launch {
-                            vicoScrollState.animateScroll(Scroll.Absolute.x(x, CommonCharts.SCROLL_BIAS))
+                    Box(modifier = modifier) {
+                        listPart(Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp), selectedX, lazyListState) { x ->
+                            selectedX = x
+                            coroutineScope.launch {
+                                vicoScrollState.animateScroll(Scroll.Absolute.x(x, CommonCharts.SCROLL_BIAS))
+                            }
                         }
+                        FastScrollSidebar(
+                            listState = lazyListState,
+                            itemCount = data.size,
+                            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
+                        )
                     }
                 },
             )

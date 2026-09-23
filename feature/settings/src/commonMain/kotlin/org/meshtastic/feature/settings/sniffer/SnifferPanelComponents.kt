@@ -18,23 +18,14 @@
 
 package org.meshtastic.feature.settings.sniffer
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularWavyProgressIndicator
@@ -51,20 +42,10 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.datastore.SnifferLogFormat
@@ -428,57 +409,5 @@ internal fun GroupedMqttPacketCard(
                 CopyIconButton(valueToCopy = packet.copyText, modifier = Modifier.padding(top = 4.dp))
             }
         }
-    }
-}
-
-private const val MIN_THUMB_HEIGHT_FRACTION = 0.05f
-
-/**
- * A small draggable thumb along the trailing edge of [listState]'s list for fast-scrolling through a long log -- built
- * from scratch rather than a platform scrollbar API since this screen needs to look and behave identically on Android,
- * Desktop and iOS. Dragging anywhere on the track jumps the list to the proportional item rather than scrolling
- * incrementally, which is the point of a *fast*-scroll affordance.
- */
-@Composable
-internal fun FastScrollSidebar(listState: LazyListState, itemCount: Int, modifier: Modifier = Modifier) {
-    if (itemCount <= 1) return
-    val coroutineScope = rememberCoroutineScope()
-    val density = LocalDensity.current
-    var trackHeightPx by remember { mutableFloatStateOf(0f) }
-    val minThumbHeightPx = with(density) { 24.dp.toPx() }
-
-    val visibleCount = listState.layoutInfo.visibleItemsInfo.size.coerceAtLeast(1)
-    val maxFirstIndex = (itemCount - visibleCount).coerceAtLeast(1)
-    val scrollFraction = (listState.firstVisibleItemIndex.toFloat() / maxFirstIndex.toFloat()).coerceIn(0f, 1f)
-    val thumbHeightFraction = (visibleCount.toFloat() / itemCount.toFloat()).coerceIn(MIN_THUMB_HEIGHT_FRACTION, 1f)
-
-    Box(
-        modifier =
-        modifier
-            .fillMaxHeight()
-            .width(20.dp)
-            .onGloballyPositioned { trackHeightPx = it.size.height.toFloat() }
-            .pointerInput(itemCount) {
-                detectDragGestures { change, _ ->
-                    change.consume()
-                    if (trackHeightPx <= 0f) return@detectDragGestures
-                    val fraction = (change.position.y / trackHeightPx).coerceIn(0f, 1f)
-                    val targetIndex = (fraction * (itemCount - 1)).toInt().coerceIn(0, itemCount - 1)
-                    coroutineScope.launch { listState.scrollToItem(targetIndex) }
-                }
-            },
-    ) {
-        val thumbHeightDp =
-            with(density) { (trackHeightPx * thumbHeightFraction).coerceAtLeast(minThumbHeightPx).toDp() }
-        val thumbOffsetPx = (trackHeightPx - with(density) { thumbHeightDp.toPx() }) * scrollFraction
-        Box(
-            modifier =
-            Modifier.align(Alignment.TopCenter)
-                .offset { IntOffset(0, thumbOffsetPx.toInt()) }
-                .width(4.dp)
-                .height(thumbHeightDp)
-                .clip(RoundedCornerShape(2.dp))
-                .background(MaterialTheme.colorScheme.outline),
-        )
     }
 }

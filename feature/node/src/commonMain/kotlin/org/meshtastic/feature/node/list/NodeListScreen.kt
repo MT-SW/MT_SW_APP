@@ -82,6 +82,7 @@ import org.meshtastic.core.resources.nodes_unheard_banner_one
 import org.meshtastic.core.resources.nodes_unheard_keep
 import org.meshtastic.core.resources.nodes_unheard_remove
 import org.meshtastic.core.resources.set_up_connection
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticImportFAB
 import org.meshtastic.core.ui.component.NodeItem
@@ -96,6 +97,7 @@ import org.meshtastic.core.ui.icon.NoDevice
 import org.meshtastic.core.ui.icon.Nodes
 import org.meshtastic.core.ui.icon.SignalOff
 import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
+import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.core.ui.util.parseDeepLinkOrInvalid
 import org.meshtastic.feature.node.component.LocalNodeContextMenu
 import org.meshtastic.feature.node.component.NodeContextMenu
@@ -331,7 +333,7 @@ fun NodeListScreen(
         },
     ) { contentPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(contentPadding).focusable()) {
-            LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+            LazyColumn(state = listState, modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp)) {
                 stickyHeader {
                     val animatedAlpha by
                         animateFloatAsState(targetValue = if (!isScrollInProgress) 1.0f else 0f, label = "alpha")
@@ -501,6 +503,11 @@ fun NodeListScreen(
                 }
                 item { Spacer(modifier = Modifier.height(88.dp)) }
             }
+            FastScrollSidebar(
+                listState = listState,
+                itemCount = nodes.size,
+                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
+            )
         }
     }
 }

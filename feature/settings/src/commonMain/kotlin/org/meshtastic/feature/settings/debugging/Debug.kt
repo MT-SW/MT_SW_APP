@@ -21,6 +21,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -85,6 +86,7 @@ import org.meshtastic.core.resources.log_retention_hours
 import org.meshtastic.core.resources.log_retention_never
 import org.meshtastic.core.ui.component.CopyIconButton
 import org.meshtastic.core.ui.component.DropDownPreference
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticResourceDialog
 import org.meshtastic.core.ui.component.SwitchPreference
@@ -92,6 +94,7 @@ import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Settings
 import org.meshtastic.core.ui.theme.AnnotationColor
+import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.feature.settings.debugging.DebugViewModel.UiMeshLog
 
 // No end-of-line anchor: Wire's toString is single-line, so annotations land mid-line
@@ -189,37 +192,46 @@ fun DebugScreen(onNavigateUp: () -> Unit, viewModel: DebugViewModel) {
                 LogcatContent(modifier = Modifier.fillMaxSize())
                 return@Column
             }
-            LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
-                stickyHeader {
-                    val animatedAlpha by
-                        animateFloatAsState(
-                            targetValue = if (!listState.isScrollInProgress) 1.0f else 0f,
-                            label = "alpha",
+            Box(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp), state = listState) {
+                    stickyHeader {
+                        val animatedAlpha by
+                            animateFloatAsState(
+                                targetValue = if (!listState.isScrollInProgress) 1.0f else 0f,
+                                label = "alpha",
+                            )
+                        DebugSearchStateWithViewModel(
+                            viewModel = viewModel,
+                            modifier = Modifier.graphicsLayer(alpha = animatedAlpha),
+                            searchState = searchState,
+                            filterTexts = filterTexts,
+                            presetFilters = viewModel.presetFilters,
+                            logs = logs,
+                            filterMode = filterMode,
+                            onFilterModeChange = { filterMode = it },
+                            onExportLogs = { showExportWarning = true },
                         )
-                    DebugSearchStateWithViewModel(
-                        viewModel = viewModel,
-                        modifier = Modifier.graphicsLayer(alpha = animatedAlpha),
-                        searchState = searchState,
-                        filterTexts = filterTexts,
-                        presetFilters = viewModel.presetFilters,
-                        logs = logs,
-                        filterMode = filterMode,
-                        onFilterModeChange = { filterMode = it },
-                        onExportLogs = { showExportWarning = true },
-                    )
-                    if (showSettings) {
-                        DebugLogSettings(viewModel = viewModel)
+                        if (showSettings) {
+                            DebugLogSettings(viewModel = viewModel)
+                        }
+                    }
+                    items(filteredLogs, key = { it.uuid }) { log ->
+                        DebugItem(
+                            modifier = Modifier.animateItem(),
+                            log = log,
+                            searchText = searchState.searchText,
+                            isSelected = selectedLogId == log.uuid,
+                            onLogClick = {
+                                viewModel.setSelectedLogId(if (selectedLogId == log.uuid) null else log.uuid)
+                            },
+                        )
                     }
                 }
-                items(filteredLogs, key = { it.uuid }) { log ->
-                    DebugItem(
-                        modifier = Modifier.animateItem(),
-                        log = log,
-                        searchText = searchState.searchText,
-                        isSelected = selectedLogId == log.uuid,
-                        onLogClick = { viewModel.setSelectedLogId(if (selectedLogId == log.uuid) null else log.uuid) },
-                    )
-                }
+                FastScrollSidebar(
+                    listState = listState,
+                    itemCount = filteredLogs.size,
+                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
+                )
             }
         }
     }

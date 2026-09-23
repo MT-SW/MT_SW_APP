@@ -20,9 +20,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import org.koin.core.annotation.KoinViewModel
+import org.meshtastic.core.datastore.SnifferLogPrefs
 import org.meshtastic.core.model.Channel
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.Node
@@ -126,11 +129,22 @@ class SnifferLogViewModel(
     private val meshLogRepository: MeshLogRepository,
     private val nodeRepository: NodeRepository,
     radioConfigRepository: RadioConfigRepository,
+    private val prefs: SnifferLogPrefs,
 ) : ViewModel() {
 
+    /**
+     * Bound to [SnifferLogPrefs.clearedAtMillis] rather than an unbounded/most-recent-N query over the whole shared
+     * MeshLog table: that table holds every packet the app has ever logged, sniffed or not, so querying it without a
+     * lower bound would surface a sniffing run's own history mixed in with days of unrelated ordinary traffic -- and do
+     * the decode/heuristic work for all of it on every collection. 0L (nothing captured since the last clear, or the
+     * sniffer has never been activated yet) means "show nothing" rather than "show everything ever logged" -- see
+     * [SnifferPanelViewModel]'s init, which guarantees this is never left at 0L once a real source has been selected.
+     */
     val sniffedPackets: StateFlow<List<SniffedPacket>> =
-        meshLogRepository
-            .getAllLogs()
+        prefs.clearedAtMillis
+            .flatMapLatest { clearedAtMillis ->
+                if (clearedAtMillis <= 0L) flowOf(emptyList()) else meshLogRepository.getAllLogsSince(clearedAtMillis)
+            }
             .map { logs -> logs.mapNotNull(::toSniffedPacket).sortedByDescending { it.receivedAtMillis } }
             .stateInWhileSubscribed(initialValue = emptyList())
 

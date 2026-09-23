@@ -19,6 +19,8 @@ package org.meshtastic.core.ble
 import app.cash.turbine.test
 import com.juul.kable.Advertisement
 import dev.mokkery.MockMode
+import dev.mokkery.answering.returns
+import dev.mokkery.every
 import dev.mokkery.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
@@ -35,6 +37,7 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
@@ -130,6 +133,38 @@ class KableBleConnectionTest {
         scanner.scan(timeout = 1.seconds, serviceUuid = serviceUuid).toList()
 
         assertEquals(KableScanFilter.ServiceUuid(serviceUuid), scanner.lastFilter)
+    }
+
+    @Test
+    fun `matchesServiceUuid trusts the native filter when the platform supports it`() {
+        val serviceUuid = Uuid.parse("12345678-1234-1234-1234-1234567890ab")
+        // No advertisement at all -- would fail a client-side check, but a trusted native filter must not care: the
+        // native layer already did the narrowing before this result ever reached us.
+        val result = KableScanResult(identifier = "AA:BB:CC:DD:EE:FF", name = null, advertisement = null)
+
+        assertTrue(result.matchesServiceUuid(serviceUuid, trustNativeFilter = true))
+    }
+
+    @Test
+    fun `matchesServiceUuid narrows client-side when the native filter cannot be trusted`() {
+        val wanted = Uuid.parse("12345678-1234-1234-1234-1234567890ab")
+        val other = Uuid.parse("87654321-4321-4321-4321-ba0987654321")
+        val matching: Advertisement = mock(MockMode.autofill) { every { uuids } returns listOf(wanted) }
+        val nonMatching: Advertisement = mock(MockMode.autofill) { every { uuids } returns listOf(other) }
+
+        val matchingResult = KableScanResult(identifier = "AA:BB:CC:DD:EE:FF", name = null, advertisement = matching)
+        val nonMatchingResult =
+            KableScanResult(identifier = "11:22:33:44:55:66", name = null, advertisement = nonMatching)
+
+        assertTrue(matchingResult.matchesServiceUuid(wanted, trustNativeFilter = false))
+        assertFalse(nonMatchingResult.matchesServiceUuid(wanted, trustNativeFilter = false))
+    }
+
+    @Test
+    fun `matchesServiceUuid passes through when no service uuid was requested`() {
+        val result = KableScanResult(identifier = "AA:BB:CC:DD:EE:FF", name = null, advertisement = null)
+
+        assertTrue(result.matchesServiceUuid(serviceUuid = null, trustNativeFilter = false))
     }
 
     @Test

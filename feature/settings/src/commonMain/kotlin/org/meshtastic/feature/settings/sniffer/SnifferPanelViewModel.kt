@@ -131,6 +131,11 @@ class SnifferPanelViewModel(
      * Packets timestamped at or before this watermark are hidden from the panel -- see [clearDisplayedLogs]. Backed by
      * [SnifferLogPrefs.clearedAtMillis] (not a local MutableStateFlow) so a clear survives this ViewModel being
      * recreated -- otherwise leaving the Sniffer screen and coming back would silently un-clear the log.
+     *
+     * Also set automatically (see [init]) the first time a real source is ever selected, while it's still at its 0L
+     * sentinel -- without that, the very first activation would show every "not addressed to us" packet the shared
+     * MeshLog table has ever accumulated, going back to whenever this install started logging, rather than just what
+     * this sniffing run actually captures. [SnifferLogViewModel.sniffedPackets] queries from this same watermark.
      */
     val clearedAtMillis: StateFlow<Long> = prefs.clearedAtMillis.stateInWhileSubscribed(0L)
 
@@ -182,10 +187,24 @@ class SnifferPanelViewModel(
         // and coming back, even though nothing was ever cleared. Restoring from the persisted lastRealSource (set
         // below, right alongside activeSource, whenever a real source is selected) fixes that: Off still freezes
         // the log instead of blanking it, exactly as it does within a single visit to the screen.
-        combine(prefs.activeSource, prefs.lastRealSource) { source, persistedLastReal -> source to persistedLastReal }
-            .onEach { (source, persistedLastReal) ->
+        combine(prefs.activeSource, prefs.lastRealSource, prefs.clearedAtMillis) {
+                source,
+                persistedLastReal,
+                clearedAt,
+            ->
+            Triple(source, persistedLastReal, clearedAt)
+        }
+            .onEach { (source, persistedLastReal, clearedAt) ->
                 if (source != SnifferSource.OFF) {
-                    if (lastRealSource != null && lastRealSource != source) clearDisplayedLogs()
+                    when {
+                        lastRealSource != null && lastRealSource != source -> clearDisplayedLogs()
+
+                        // First-ever activation: clearedAt is still at its 0L sentinel because the trash icon has
+                        // never been clicked. Anchor it to now instead of leaving the panel (and
+                        // SnifferLogViewModel's query) unbounded -- see clearedAtMillis's doc.
+                        clearedAt == 0L ->
+                            viewModelScope.launch { prefs.setClearedAtMillis(Clock.System.now().toEpochMilliseconds()) }
+                    }
                     lastRealSource = source
                     _displaySource.value = source
                     _freezeAtMillis.value = Long.MAX_VALUE

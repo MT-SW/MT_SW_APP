@@ -29,6 +29,19 @@ internal expect fun ScannerBuilder.platformScanConfig()
  */
 internal expect val supportsNativeAddressScanFilter: Boolean
 
+/**
+ * Whether Kable honours a scan filter on advertised service UUID here.
+ *
+ * True on Android and Apple, where the OS-level scanner reliably narrows to matching advertisements. False on
+ * JVM/desktop: Kable's JVM target scans through btleplug, and btleplug's Windows (WinRT) backend does not implement
+ * `ScanFilter` at all -- mirroring the already-known gap in [supportsNativeAddressScanFilter] for address filtering on
+ * this same backend, a service filter can be silently accepted by the API but never actually narrow the scan, up to and
+ * including suppressing every advertisement instead of none. [KableBleScanner.advertisements] skips requesting the
+ * native filter here, and [KableBleScanner.scan] narrows client-side using [com.juul.kable.Advertisement.uuids]
+ * instead.
+ */
+internal expect val supportsNativeServiceScanFilter: Boolean
+
 /** Platform-specific configuration for the Peripheral builder based on device type. */
 internal expect fun PeripheralBuilder.platformConfig(device: BleDevice, autoConnect: () -> Boolean)
 

@@ -71,6 +71,7 @@ import org.meshtastic.core.resources.unofficial_fork_disclaimer
 import org.meshtastic.core.resources.website
 import org.meshtastic.core.resources.what_is_meshtastic
 import org.meshtastic.core.resources.what_is_meshtastic_description
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.icon.ChevronRight
@@ -135,28 +136,32 @@ fun AboutScreen(
             )
         },
     ) { innerPadding ->
-        Column(
-            modifier =
-            Modifier.fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            WhatIsMeshtasticSection()
-            AppsSection(
-                appVersionName = appVersionName,
-                onNavigateToAcknowledgements = onNavigateToAcknowledgements,
-                onOpenHardwareLink = { uriHandler.openUri(HARDWARE_URL) },
-                onOpenRepoLink = { uriHandler.openUri(GITHUB_REPO_URL) },
+        val scrollState = rememberScrollState()
+        Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+            Column(
+                modifier =
+                Modifier.fillMaxSize().verticalScroll(scrollState).padding(horizontal = 16.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                WhatIsMeshtasticSection()
+                AppsSection(
+                    appVersionName = appVersionName,
+                    onNavigateToAcknowledgements = onNavigateToAcknowledgements,
+                    onOpenHardwareLink = { uriHandler.openUri(HARDWARE_URL) },
+                    onOpenRepoLink = { uriHandler.openUri(GITHUB_REPO_URL) },
+                )
+                ProjectInformationSection(
+                    onOpenWebsite = { uriHandler.openUri(WEBSITE_URL) },
+                    onOpenDocs = { uriHandler.openUri(DOCS_URL) },
+                    onOpenLicense = { uriHandler.openUri(LICENSE_URL) },
+                )
+                FeatureCreditsSection()
+                CopyrightFooter()
+            }
+            FastScrollSidebar(
+                scrollState = scrollState,
+                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
             )
-            ProjectInformationSection(
-                onOpenWebsite = { uriHandler.openUri(WEBSITE_URL) },
-                onOpenDocs = { uriHandler.openUri(DOCS_URL) },
-                onOpenLicense = { uriHandler.openUri(LICENSE_URL) },
-            )
-            FeatureCreditsSection()
-            CopyrightFooter()
         }
     }
 }

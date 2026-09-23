@@ -18,13 +18,16 @@ package org.meshtastic.feature.node.health
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,14 +37,18 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.meshtastic.core.common.util.MetricFormatter
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.util.isDesktopPlatform
 
+@Suppress("LongMethod")
 @Composable
 fun NetworkHealthScreen(
     viewModel: NetworkHealthViewModel,
@@ -51,6 +58,7 @@ fun NetworkHealthScreen(
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val listState = rememberLazyListState()
 
     Scaffold(
         modifier = modifier,
@@ -99,21 +107,27 @@ fun NetworkHealthScreen(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
             )
 
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(uiState.nodes, key = { it.num }) { node ->
-                    NodeHealthRow(
-                        node = node,
-                        metric = uiState.activeMetric,
-                        onClick = {
-                            if (uiState.activeMetric == NetworkHealthMetric.NEIGHBORS) {
-                                onNeighborInfoNodeClick(node.num)
-                            } else {
-                                onNodeClick(node.num, uiState.activeMetric)
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-                    )
+            Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                LazyColumn(modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp), state = listState) {
+                    items(uiState.nodes, key = { it.num }) { node ->
+                        NodeHealthRow(
+                            node = node,
+                            metric = uiState.activeMetric,
+                            onClick = {
+                                if (uiState.activeMetric == NetworkHealthMetric.NEIGHBORS) {
+                                    onNeighborInfoNodeClick(node.num)
+                                } else {
+                                    onNodeClick(node.num, uiState.activeMetric)
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                        )
+                    }
                 }
+                FastScrollSidebar(
+                    listState = listState,
+                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
+                )
             }
         }
     }

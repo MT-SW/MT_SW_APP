@@ -97,6 +97,14 @@ expect fun rememberSaveFileLauncher(
 expect val bleScanRequiresLocationServices: Boolean
 
 /**
+ * True on the desktop/JVM target, false everywhere else. [org.meshtastic.core.ui.component.FastScrollSidebar] uses this
+ * to only render on desktop: there's no native touch scrollbar there and long lists are otherwise mouse-wheel-only,
+ * whereas Android/iOS already have touch scroll/fling and a permanent trailing-edge strip would sit on top of gestures
+ * such as swipe-to-mute/-delete on a contact or message row.
+ */
+expect val isDesktopPlatform: Boolean
+
+/**
  * Returns whether Bluetooth is currently turned off at the system level (the adapter exists but is disabled). Always
  * `false` on devices without Bluetooth and on platforms where the concept doesn't apply.
  */

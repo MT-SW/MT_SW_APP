@@ -71,6 +71,7 @@ import org.meshtastic.core.resources.sniffer_warning_cancel
 import org.meshtastic.core.resources.sniffer_warning_compatibility
 import org.meshtastic.core.resources.sniffer_warning_message
 import org.meshtastic.core.resources.sniffer_warning_title
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.feature.settings.export.rememberLogExportSaver
 import org.meshtastic.feature.settings.export.rememberLogImportPicker
