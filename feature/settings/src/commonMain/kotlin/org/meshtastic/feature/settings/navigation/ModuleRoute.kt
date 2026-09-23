@@ -189,6 +189,7 @@ enum class ModuleRoute(
                 PAXCOUNTER -> ExcludedModules.PAXCOUNTER_CONFIG
                 TAK -> ExcludedModules.TAK_CONFIG
                 MESH_BEACON -> ExcludedModules.MESHBEACON_CONFIG
+                TRAFFIC_MANAGEMENT -> ExcludedModules.TRAFFICMANAGEMENT_CONFIG
             }
 
     companion object {

@@ -978,6 +978,7 @@
     <string name="label_tiny_fast">Mikro - szybki</string>
     <string name="label_tiny_slow">Mikro - wolny</string>
     <string name="label_very_long_slow">Bardzo daleki zasięg — Wolno</string>
+    <string name="label_with_unit">%1$s (%2$s)</string>
     <string name="last_heard_filter_label">Filtruj po czasie ostatniej aktywności: %1$s</string>
     <string name="last_position_update">Ostatnia aktualizacja lokalizacji</string>
     <string name="latest_alpha_firmware">Ostatnia wersja alpha</string>
@@ -1137,6 +1138,8 @@
     <string name="map_purge_success">Pamięć podręczna wyczyszczona dla %1$s</string>
     <string name="map_reporting_consent_header">Zgoda na udostępnianie niezaszyfrowanych danych węzła za pośrednictwem protokołu MQTT</string>
     <string name="map_reporting_consent_text">Włączając tę funkcję, użytkownik przyjmuje do wiadomości i wyraźnie wyraża zgodę na przesyłanie informacji o aktualnej lokalizacji geograficznej swojego urządzenia za pośrednictwem protokołu MQTT bez szyfrowania. Dane dotyczące lokalizacji mogą być wykorzystywane do takich celów, jak raportowanie na żywo na mapie, śledzenie urządzeń i powiązane funkcje telemetryczne.</string>
+    <string name="map_reporting_interval_seconds">Interwał raportowania map (sekundy)</string>
+    <string name="map_reporting_summary">Twój węzeł będzie okresowo wysyłał niezaszyfrowany pakiet raportu mapy do skonfigurowanego serwera MQTT, zawierający identyfikator, długą i krótką nazwę, przybliżoną lokalizację, model sprzętu, rolę, wersję oprogramowania układowego, region LoRa, ustawienia modemu i nazwę głównego kanału.</string>
     <string name="map_select_download_region">Wybierz region do pobrania</string>
     <string name="map_start_download">Rozpocznij pobieranie</string>
     <string name="map_style_selection">Wybór stylu mapy</string>
@@ -1325,6 +1328,8 @@
     <string name="mqtt_status_inactive">Nieaktywny</string>
     <string name="mqtt_status_reconnecting">Ponowne łączenie…</string>
     <string name="mqtt_status_reconnecting_with_attempt">Ponowne łączenie (próba %1$d) — %2$s</string>
+    <string name="mqtt_status_topics_refused_all">Połączono, ale broker odrzucił każdy temat: %1$s</string>
+    <string name="mqtt_status_topics_refused_some">Połączono, ale broker odrzucił %1$s</string>
     <string name="mqtt_test_connection">Testuj połączenie</string>
     <string name="must_set_region">Musisz ustawić region!</string>
     <string name="must_update">Należy zaktualizować aplikację za pomocą Sklepu Play lub z GitHub, ponieważ aplikacja jest zbyt stara, by skomunikować się z oprogramowaniem zainstalowanym na tym urządzeniu. <a href="https://meshtastic.org/docs/software/android/installation">Więcej informacji (ang.)</a>.</string>
@@ -1490,7 +1495,7 @@
     <string name="node_filter_only_encrypted">Pokaż tylko szyfrowane węzły</string>
     <string name="node_filter_only_online">Schowaj nieaktywne węzły</string>
     <string name="node_filter_only_signed">Pokaż tylko podpisane węzły</string>
-    <string name="node_filter_placeholder">Filtr</string>
+    <string name="node_filter_placeholder">Szukaj węzła…</string>
     <string name="node_filter_show_ignored">Pokaż tylko ignorowane węzły</string>
     <string name="node_filter_title">Filtry</string>
     <string name="node_id">ID węzła</string>
@@ -1675,6 +1680,12 @@
         <item quantity="few">%1$d godzin</item>
         <item quantity="many">%1$d godzin</item>
         <item quantity="other">%1$d godzin</item>
+    </plurals>
+    <plurals name="plurals_milliseconds">
+        <item quantity="one">%1$d milisekunda</item>
+        <item quantity="few">%1$d milisekundy</item>
+        <item quantity="many">%1$d milisekund</item>
+        <item quantity="other">%1$d milisekundy</item>
     </plurals>
     <plurals name="plurals_minutes">
         <item quantity="one">%1$d minuta</item>
@@ -1974,6 +1985,8 @@
     <string name="set_up_connection">Skonfiguruj połączenie</string>
     <string name="set_your_region">Wybierz swój region</string>
     <string name="settings">ustawienia</string>
+    <string name="settings_search_no_results">Żadne ustawienie nie pasuje</string>
+    <string name="settings_search_placeholder">Szukaj w ustawieniach</string>
     <!-- SHARE -->
     <string name="share">Udostępnij</string>
     <string name="share_action">Udostępnij link</string>
@@ -2259,6 +2272,7 @@
     <string name="udp_enabled">Nadawanie UDP</string>
     <string name="undo">Cofnij</string>
     <string name="unit_dbm">dBm</string>
+    <string name="unit_khz">kHz</string>
     <string name="unit_meters">m</string>
     <!-- UNITS -->
     <string name="units">Jednostki</string>
@@ -2268,7 +2282,7 @@
     <string name="units_scope_summary">Jak ta aplikacja wyświetla odległość, wysokość, prędkość i temperaturę. Ekran samego urządzenia korzysta zamiast tego z własnej konfiguracji Wyświetlacza.</string>
     <!-- UNKNOWN -->
     <string name="unknown">Nieznany</string>
-    <string name="unknown_age">Unknown Age</string>
+    <string name="unknown_age">Nieznany wiek</string>
     <string name="unknown_channel">Nieznany kanał</string>
     <string name="unknown_device">Nieznane urządzenie</string>
     <string name="unknown_error">Nieznany błąd</string>

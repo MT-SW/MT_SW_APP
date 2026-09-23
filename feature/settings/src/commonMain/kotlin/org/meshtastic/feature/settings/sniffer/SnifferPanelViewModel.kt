@@ -19,6 +19,7 @@ package org.meshtastic.feature.settings.sniffer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -115,9 +116,13 @@ class SnifferPanelViewModel(
     val decryptPayloads: StateFlow<Boolean> = prefs.decryptPayloads.stateInWhileSubscribed(true)
     val exportFormat: StateFlow<SnifferLogFormat> = prefs.exportFormat.stateInWhileSubscribed(SnifferLogFormat.TXT)
 
+    // Raw, unseeded version of mqttConfigured below, for init's own reactive fallback -- see the comment there
+    // for why the seeded public StateFlow is the wrong thing to react to internally.
+    private val rawMqttConfigured: Flow<Boolean> =
+        radioConfigRepository.moduleConfigFlow.map { it.mqtt?.enabled == true }
+
     /** Whether the MQTT module is enabled (and so configured enough to sniff) on the currently connected device. */
-    val mqttConfigured: StateFlow<Boolean> =
-        radioConfigRepository.moduleConfigFlow.map { it.mqtt?.enabled == true }.stateInWhileSubscribed(false)
+    val mqttConfigured: StateFlow<Boolean> = rawMqttConfigured.stateInWhileSubscribed(false)
 
     private val channelSet = radioConfigRepository.channelSetFlow.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
@@ -137,16 +142,27 @@ class SnifferPanelViewModel(
     val loadFailed: SharedFlow<Unit> = _loadFailed.asSharedFlow()
 
     init {
+        // The three blocks below drive real side effects (opening/closing the MQTT connection, auto-falling-back to
+        // Off, freezing the displayed log) from the *persisted* selection -- so they deliberately collect
+        // prefs.activeSource / rawMqttConfigured directly, never the activeSource/mqttConfigured StateFlows exposed
+        // above. Those StateFlows are seeded with a synthetic placeholder (Off / false) via stateIn's initialValue so
+        // the screen has something to render before the real DataStore/BLE value has loaded -- harmless for a label,
+        // but wrong here: this ViewModel is recreated every time the user leaves this screen and comes back (it's
+        // scoped to the destination's own back stack entry), and reacting to that placeholder as if it were a
+        // genuine change used to immediately stop a still-selected MQTT session, and could even auto-select Off --
+        // i.e. the sniffer looked like it had turned itself off just from revisiting the screen. Reading the raw
+        // flows instead sidesteps that: their first emission is always the real current value, never a placeholder.
+
         // Keep the shared MQTT session open only while MQTT is the selected source, same gating the old standalone
-        // MQTT Sniffer screen had -- selecting Radio or Off (including on first launch, when nothing was ever
-        // selected) must stop it, not leave a stale connection running in the background.
-        activeSource
+        // MQTT Sniffer screen had -- selecting Radio or Off must stop it, not leave a stale connection running in
+        // the background.
+        prefs.activeSource
             .onEach { source -> mqttSnifferManager.setActive(source == SnifferSource.MQTT) }
             .launchIn(viewModelScope)
 
         // If the device's MQTT module gets disabled/unconfigured while MQTT is selected, fall back to Off rather than
         // silently keep a now-invalid selection around.
-        mqttConfigured
+        rawMqttConfigured
             .onEach { configured ->
                 if (!configured && activeSource.value == SnifferSource.MQTT) selectSource(SnifferSource.OFF)
             }
@@ -155,7 +171,7 @@ class SnifferPanelViewModel(
         // lastRealSource starts null so the very first value seen (e.g. a source restored from prefs on a fresh
         // launch) only seeds displaySource, without wiping out that source's existing MeshLog history. From then
         // on, a genuine switch between two real sources clears the panel; passing through Off does not.
-        activeSource
+        prefs.activeSource
             .onEach { source ->
                 if (source != SnifferSource.OFF) {
                     if (lastRealSource != null && lastRealSource != source) clearDisplayedLogs()
