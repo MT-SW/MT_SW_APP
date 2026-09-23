@@ -561,7 +561,7 @@
     <string name="display_units">Wyświetlana jednostka</string>
     <string name="dissolved_oxygen">Rozp. O₂</string>
     <!-- DISTANCE -->
-    <string name="distance">Dystans</string>
+    <string name="distance">Odległość</string>
     <string name="distance_filters">Filtry odległości</string>
     <string name="distance_filters_description">Filtruj listę węzłów i mapę sieci mesh na podstawie odległości od Twojego urządzenia.</string>
     <string name="distance_measurements">Pomiary odległości</string>
@@ -830,7 +830,6 @@
     <string name="firmware_update_wipe_label">Wykasuj urządzenie podczas aktualizacji</string>
     <string name="firmware_update_wipe_usb_detail">Całkowicie kasuje pamięć flash urządzenia, a następnie instaluje wybrane firmware od nowa.</string>
     <string name="firmware_version">Wersja oprogramowania: %1$s</string>
-    <string name="fixed_pin">Stały PIN</string>
     <string name="fixed_position">Położenie stałe</string>
     <string name="flip_screen">Odwróć ekran</string>
     <string name="for_more_information_see_our_privacy_policy">Aby dowiedzieć się więcej, zapoznaj się z naszą polityką prywatności.</string>
@@ -1136,11 +1135,8 @@
     <string name="map_overlay_weather_radar">Radar pogodowy</string>
     <string name="map_purge_fail">Usuwanie pamięci podręcznej SQL nie powiodło się, zobacz logcat</string>
     <string name="map_purge_success">Pamięć podręczna wyczyszczona dla %1$s</string>
-    <string name="map_reporting">Raportowanie map</string>
     <string name="map_reporting_consent_header">Zgoda na udostępnianie niezaszyfrowanych danych węzła za pośrednictwem protokołu MQTT</string>
     <string name="map_reporting_consent_text">Włączając tę funkcję, użytkownik przyjmuje do wiadomości i wyraźnie wyraża zgodę na przesyłanie informacji o aktualnej lokalizacji geograficznej swojego urządzenia za pośrednictwem protokołu MQTT bez szyfrowania. Dane dotyczące lokalizacji mogą być wykorzystywane do takich celów, jak raportowanie na żywo na mapie, śledzenie urządzeń i powiązane funkcje telemetryczne.</string>
-    <string name="map_reporting_interval_seconds">Interwał raportowania map (sekundy)</string>
-    <string name="map_reporting_summary">Twój węzeł będzie okresowo wysyłał niezaszyfrowany pakiet raportu mapy do skonfigurowanego serwera MQTT, zawierający identyfikator, długą i krótką nazwę, przybliżoną lokalizację, model sprzętu, rolę, wersję oprogramowania układowego, region LoRa, ustawienia modemu i nazwę głównego kanału.</string>
     <string name="map_select_download_region">Wybierz region do pobrania</string>
     <string name="map_start_download">Rozpocznij pobieranie</string>
     <string name="map_style_selection">Wybór stylu mapy</string>
@@ -1859,7 +1855,6 @@
     <string name="role_router_late">Router pomocniczy</string>
     <string name="role_router_late_desc">Węzeł infrastruktury, który zawsze powtarza pakiety raz, ale tylko po wszystkich innych trybach, zapewniając dodatkowe pokrycie lokalnych klastrów. Widoczne na liście węzłów.</string>
     <string name="role_sensor">Czujnik</string>
-    <string name="role_sensor_desc">Nadaje priorytetowo pakiety telemetryczne.</string>
     <string name="role_tak">TAK</string>
     <string name="role_tak_desc">Zoptymalizowany pod kątem komunikacji systemowej ATAK, redukuje nadmiarowe transmisje.</string>
     <string name="role_tak_tracker">TAK Tracker</string>
@@ -2133,7 +2128,7 @@
     <string name="tak_server_export_data_package_desc">Generuje plik .zip dla ATAK/iTAK do połączenia z tym serwerem</string>
     <string name="tak_server_loading">…</string>
     <string name="tak_server_mesh_to_cot">Konwerter Mesh na CoT</string>
-    <string name="tak_server_mesh_to_cot_desc">Pokazuj węzły Meshtastic na mapie ATAK jako kontakty</string>
+    <string name="tak_server_mesh_to_cot_desc">Pokazuj węzły MT_SW na mapie ATAK jako kontakty</string>
     <string name="tak_server_permission_blocked">Serwer TAK potrzebuje dostępu do sieci lokalnej, aby akceptować połączenia, a Android nie zapyta ponownie. Został na razie wyłączony — włącz uprawnienie w ustawieniach aplikacji i włącz go ponownie.</string>
     <string name="tak_server_section">Serwer</string>
     <string name="tak_server_status">Status</string>
@@ -2185,7 +2180,6 @@
     <string name="theme_light">Jasny</string>
     <string name="theme_system">Domyślne ustawienie systemowe</string>
     <string name="time">Czas</string>
-    <string name="time_zone">Strefa czasowa</string>
     <string name="timeout">Limit czasu</string>
     <string name="timestamp">Znacznik czasu</string>
     <string name="tls_enabled">Włącz TLS</string>
@@ -2263,6 +2257,8 @@
     <string name="type_a_message">Napisz wiadomość</string>
     <string name="udp_enabled">Nadawanie UDP</string>
     <string name="undo">Cofnij</string>
+    <string name="unit_dbm">dBm</string>
+    <string name="unit_meters">m</string>
     <!-- UNITS -->
     <string name="units">Jednostki</string>
     <string name="units_follow_system">Domyślny systemu</string>
