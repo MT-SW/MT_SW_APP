@@ -1855,6 +1855,7 @@
     <string name="role_router_late">Router pomocniczy</string>
     <string name="role_router_late_desc">Węzeł infrastruktury, który zawsze powtarza pakiety raz, ale tylko po wszystkich innych trybach, zapewniając dodatkowe pokrycie lokalnych klastrów. Widoczne na liście węzłów.</string>
     <string name="role_sensor">Czujnik</string>
+    <string name="role_sensor_desc">Nadaje priorytetowo pakiety telemetryczne.</string>
     <string name="role_tak">TAK</string>
     <string name="role_tak_desc">Zoptymalizowany pod kątem komunikacji systemowej ATAK, redukuje nadmiarowe transmisje.</string>
     <string name="role_tak_tracker">TAK Tracker</string>
@@ -1981,10 +1982,10 @@
     <string name="share_channels_add_hint">Dodanie zachowuje kanały, które już mają, i dokłada Twoje.</string>
     <string name="share_channels_qr">Udostępnij kod QR kanałów</string>
     <string name="share_channels_replace_hint">Zastąpienie nadpisuje wszystkie kanały na ich radiu Twoimi.</string>
-    <string name="share_channels_subject">Kanały Meshtastic</string>
+    <string name="share_channels_subject">Kanały MT_SW</string>
     <string name="share_connected_node">Udostępnij połączony węzeł</string>
     <string name="share_contact">Udostępnij kontakt</string>
-    <string name="share_contact_subject">Kontakt Meshtastic</string>
+    <string name="share_contact_subject">Kontakt MT_SW</string>
     <string name="share_location">Udostępnij lokalizację</string>
     <string name="share_location_description">Użyj GPS telefonu do wysyłania lokalizacji do węzła zamiast GPS sprzętowego w węźle.</string>
     <string name="share_qr_subtext">Zeskanuj ten kod inną aplikacją MT_SW_APP, aby dodać go tam.</string>
@@ -2099,7 +2100,7 @@
     <string name="success">Sukces</string>
     <string name="super_deep_sleep_duration_seconds">Czas trwania głębokiego uśpienia</string>
     <string name="supported">Obsługiwane</string>
-    <string name="supported_by_community">Wspierane przez społeczność Meshtastic</string>
+    <string name="supported_by_community">Wspierane przez społeczność MT_SW</string>
     <string name="supported_by_maker">Sprzęt od niezależnego twórcy</string>
     <string name="swipe_action_delete">Usuń</string>
     <string name="swipe_action_mute">Wycisz</string>
@@ -2121,7 +2122,7 @@
     <string name="tak_role_unspecified">Nieokreślona</string>
     <string name="tak_server">Serwer TAK</string>
     <string name="tak_server_channel">Kanał sieci TAK</string>
-    <string name="tak_server_channel_desc">Kanał Meshtastic używany do wychodzącego ruchu TAK</string>
+    <string name="tak_server_channel_desc">Kanał MT_SW używany do wychodzącego ruchu TAK</string>
     <string name="tak_server_channel_option">%1$d: %2$s</string>
     <string name="tak_server_enabled">Włącz lokalny serwer TAK</string>
     <string name="tak_server_enabled_desc">Uruchamia lokalny serwer TLS na porcie 8089 dla połączeń ATAK/iTAK</string>
