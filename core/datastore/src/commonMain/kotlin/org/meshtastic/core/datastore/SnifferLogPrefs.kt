@@ -18,6 +18,7 @@ package org.meshtastic.core.datastore
 
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -51,6 +52,8 @@ enum class SnifferLogFormat {
 open class SnifferLogPrefs(private val dataStore: CorePreferencesDataStore) {
     private object PreferencesKeys {
         val ACTIVE_SOURCE = stringPreferencesKey("sniffer-active-source")
+        val LAST_REAL_SOURCE = stringPreferencesKey("sniffer-last-real-source")
+        val CLEARED_AT_MILLIS = longPreferencesKey("sniffer-cleared-at-millis")
         val GROUP_BY_GATEWAY = booleanPreferencesKey("sniffer-group-by-gateway")
         val AUTO_SCROLL = booleanPreferencesKey("sniffer-auto-scroll")
         val DECRYPT_PAYLOADS = booleanPreferencesKey("sniffer-decrypt-payloads")
@@ -65,6 +68,33 @@ open class SnifferLogPrefs(private val dataStore: CorePreferencesDataStore) {
 
     open suspend fun setActiveSource(source: SnifferSource) {
         dataStore.edit { it[PreferencesKeys.ACTIVE_SOURCE] = source.name }
+    }
+
+    /**
+     * The last RADIO/MQTT source a real selection was made for -- never Off. Lets a freshly created
+     * [org.meshtastic.feature.settings.sniffer.SnifferPanelViewModel] (the panel is recreated every time the Sniffer
+     * screen is reopened) keep showing that source's history while [activeSource] is currently Off, instead of the
+     * log appearing to vanish just from navigating away and back. Null only when no source has ever been selected.
+     */
+    open val lastRealSource: Flow<SnifferSource?> =
+        dataStore.data.map { prefs ->
+            prefs[PreferencesKeys.LAST_REAL_SOURCE]?.let { raw -> runCatching { SnifferSource.valueOf(raw) }.getOrNull() }
+        }
+
+    open suspend fun setLastRealSource(source: SnifferSource) {
+        dataStore.edit { it[PreferencesKeys.LAST_REAL_SOURCE] = source.name }
+    }
+
+    /**
+     * Watermark set by the trash icon ([org.meshtastic.feature.settings.sniffer.SnifferPanelViewModel.clearDisplayedLogs]):
+     * packets timestamped at or before this are hidden from the panel. Persisted for the same reason as
+     * [lastRealSource] -- a cleared log must stay cleared across a revisit, not reappear because the panel's
+     * ViewModel was recreated.
+     */
+    open val clearedAtMillis: Flow<Long> = dataStore.data.map { it[PreferencesKeys.CLEARED_AT_MILLIS] ?: 0L }
+
+    open suspend fun setClearedAtMillis(millis: Long) {
+        dataStore.edit { it[PreferencesKeys.CLEARED_AT_MILLIS] = millis }
     }
 
     /** Merge packets seen from several gateways/nodes for the same over-the-air transmission into one entry. */

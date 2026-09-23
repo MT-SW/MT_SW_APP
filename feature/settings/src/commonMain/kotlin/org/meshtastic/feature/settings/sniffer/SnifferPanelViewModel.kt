@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -126,10 +127,12 @@ class SnifferPanelViewModel(
 
     private val channelSet = radioConfigRepository.channelSetFlow.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    private val _clearedAtMillis = MutableStateFlow(0L)
-
-    /** Packets timestamped at or before this watermark are hidden from the panel -- see [clearDisplayedLogs]. */
-    val clearedAtMillis: StateFlow<Long> = _clearedAtMillis.asStateFlow()
+    /**
+     * Packets timestamped at or before this watermark are hidden from the panel -- see [clearDisplayedLogs]. Backed by
+     * [SnifferLogPrefs.clearedAtMillis] (not a local MutableStateFlow) so a clear survives this ViewModel being
+     * recreated -- otherwise leaving the Sniffer screen and coming back would silently un-clear the log.
+     */
+    val clearedAtMillis: StateFlow<Long> = prefs.clearedAtMillis.stateInWhileSubscribed(0L)
 
     private val _loadedLog = MutableStateFlow<LoadedSnifferLog?>(null)
 
@@ -171,15 +174,28 @@ class SnifferPanelViewModel(
         // lastRealSource starts null so the very first value seen (e.g. a source restored from prefs on a fresh
         // launch) only seeds displaySource, without wiping out that source's existing MeshLog history. From then
         // on, a genuine switch between two real sources clears the panel; passing through Off does not.
-        prefs.activeSource
-            .onEach { source ->
+        //
+        // Paired with prefs.lastRealSource: this ViewModel is recreated every time the Sniffer screen is reopened
+        // (it's scoped to the destination's own back stack entry), so a plain in-memory `lastRealSource` field is
+        // blank on every fresh instance. While activeSource is Off, that used to mean displaySource had nothing to
+        // fall back to and stayed Off forever -- the log looked like it had vanished just from leaving the screen
+        // and coming back, even though nothing was ever cleared. Restoring from the persisted lastRealSource (set
+        // below, right alongside activeSource, whenever a real source is selected) fixes that: Off still freezes
+        // the log instead of blanking it, exactly as it does within a single visit to the screen.
+        combine(prefs.activeSource, prefs.lastRealSource) { source, persistedLastReal -> source to persistedLastReal }
+            .onEach { (source, persistedLastReal) ->
                 if (source != SnifferSource.OFF) {
                     if (lastRealSource != null && lastRealSource != source) clearDisplayedLogs()
                     lastRealSource = source
                     _displaySource.value = source
                     _freezeAtMillis.value = Long.MAX_VALUE
+                    if (persistedLastReal != source) prefs.setLastRealSource(source)
                 } else {
                     _freezeAtMillis.value = Clock.System.now().toEpochMilliseconds()
+                    if (lastRealSource == null && persistedLastReal != null) {
+                        lastRealSource = persistedLastReal
+                        _displaySource.value = persistedLastReal
+                    }
                 }
             }
             .launchIn(viewModelScope)
@@ -212,7 +228,7 @@ class SnifferPanelViewModel(
      * file, so the trash icon always returns to a clean live view.
      */
     fun clearDisplayedLogs() {
-        _clearedAtMillis.value = Clock.System.now().toEpochMilliseconds()
+        viewModelScope.launch { prefs.setClearedAtMillis(Clock.System.now().toEpochMilliseconds()) }
         mqttSnifferManager.clear()
         _loadedLog.value = null
     }
