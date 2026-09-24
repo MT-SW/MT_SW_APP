@@ -1273,6 +1273,9 @@
     <string name="message_routing_error_timeout_detail">Nie otrzymano potwierdzenia w wyznaczonym czasie. Spróbuj ponownie, gdy będziesz mieć lepszy sygnał lub większy zasięg sieci mesh.</string>
     <string name="message_routing_error_too_large">Wiadomość jest za duża, aby ją wysłać</string>
     <string name="message_routing_error_too_large_detail">Skróć wiadomość i wyślij ją ponownie.</string>
+    <string name="message_split_incomplete">Niekompletna wiadomość — brakuje %1$d z %2$d części</string>
+    <string name="message_split_pending">Zostanie wysłana jako %1$d wiadomości</string>
+    <string name="message_split_receiving">Odbieranie… (%1$d/%2$d)</string>
     <string name="message_status_delivered">Dostarczono do sieci mesh</string>
     <string name="message_status_enroute">Wysyłanie...</string>
     <string name="message_status_queued">Zakolejkowane do wysłania</string>

@@ -807,6 +807,7 @@
     <string name="get_started">Get started</string>
     <string name="github_repository">GitHub Repository</string>
     <string name="good">Good</string>
+    <!-- GPIO -->
     <string name="gpio">GPIO</string>
     <string name="gpio_mask_display">Mask: %1$s</string>
     <string name="gpio_off">Off</string>
@@ -1190,6 +1191,9 @@
     <string name="message_routing_error_timeout_detail">No acknowledgment was received in time. Try again when you have better signal or more mesh coverage.</string>
     <string name="message_routing_error_too_large">Message is too large to send</string>
     <string name="message_routing_error_too_large_detail">Shorten the message and send it again.</string>
+    <string name="message_split_incomplete">Incomplete message — missing %1$d of %2$d parts</string>
+    <string name="message_split_pending">Will be sent as %1$d messages</string>
+    <string name="message_split_receiving">Receiving… (%1$d/%2$d)</string>
     <string name="message_status_delivered">Delivered to mesh</string>
     <string name="message_status_enroute">Sending...</string>
     <string name="message_status_queued">Queued for sending</string>
@@ -1758,6 +1762,7 @@
     <string name="salinity">Salinity</string>
     <string name="sample_message" translatable="false">hey I found the cache, it is over here next to the big tiger. I'm kinda scared.</string>
     <string name="sats">Sats</string>
+    <!-- SAVE -->
     <string name="save">Save</string>
     <string name="save_and_restart">Save &amp; restart</string>
     <string name="save_changes">Save</string>

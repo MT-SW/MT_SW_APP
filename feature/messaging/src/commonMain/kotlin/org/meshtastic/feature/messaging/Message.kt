@@ -105,7 +105,9 @@ import org.meshtastic.core.model.MENTION_TOKEN_REGEX
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.util.getChannel
+import org.meshtastic.core.model.util.MessageSplitter
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.message_split_pending
 import org.meshtastic.core.resources.archived_channel_read_only
 import org.meshtastic.core.resources.send
 import org.meshtastic.core.resources.type_a_message
@@ -123,6 +125,7 @@ import org.meshtastic.feature.messaging.component.ActionModeTopBar
 import org.meshtastic.feature.messaging.component.DeleteMessageDialog
 import org.meshtastic.feature.messaging.component.FormattingToolbar
 import org.meshtastic.feature.messaging.component.MESSAGE_CHARACTER_LIMIT_BYTES
+import org.meshtastic.feature.messaging.component.MESSAGE_COMPOSER_MAX_BYTES
 import org.meshtastic.feature.messaging.component.MessageMenuAction
 import org.meshtastic.feature.messaging.component.MessageSearchBar
 import org.meshtastic.feature.messaging.component.MessageTopBar
@@ -856,7 +859,7 @@ internal fun MessageInput(
     textFieldState: TextFieldState,
     mentionCandidates: ImmutableMap<String, MentionCandidate>,
     modifier: Modifier = Modifier,
-    maxByteSize: Int = MESSAGE_CHARACTER_LIMIT_BYTES,
+    maxByteSize: Int = MESSAGE_COMPOSER_MAX_BYTES,
     onSendMessage: () -> Unit,
 ) {
     val currentTextRaw = textFieldState.text.toString()
@@ -873,6 +876,10 @@ internal fun MessageInput(
             // Recalculate only when text changes
             currentText.encodeToByteArray().size
         }
+
+    // >1 as soon as the text no longer fits one mesh packet — MessageSplitter itself decides the real threshold
+    // (MESSAGE_CHARACTER_LIMIT_BYTES), which is well below this field's own maxByteSize ceiling.
+    val splitChunkCount = remember(currentText) { MessageSplitter.splitForMesh(currentText).size }
 
     val isOverLimit = currentByteLength > maxByteSize
     val canSend = !isOverLimit && currentText.isNotEmpty() && isEnabled
@@ -987,10 +994,21 @@ internal fun MessageInput(
             KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Default),
             supportingText = {
                 // The counter is only useful as the limit approaches. Showing 0/200 before a character is typed is
-                // chrome that every chat client has learned to hide.
-                if (isEnabled && currentByteLength >= maxByteSize - COUNTER_VISIBLE_WITHIN_BYTES) {
+                // chrome that every chat client has learned to hide. A message that will be split is worth a hint
+                // regardless of how close to maxByteSize it is, since MESSAGE_CHARACTER_LIMIT_BYTES (the real,
+                // per-packet threshold) sits far below it.
+                val showCounter = isEnabled && currentByteLength >= maxByteSize - COUNTER_VISIBLE_WITHIN_BYTES
+                val showSplitHint = isEnabled && splitChunkCount > 1
+                if (showCounter || showSplitHint) {
                     Text(
-                        text = "$currentByteLength/$maxByteSize",
+                        text =
+                        buildString {
+                            if (showCounter) append("$currentByteLength/$maxByteSize")
+                            if (showSplitHint) {
+                                if (isNotEmpty()) append("  •  ")
+                                append(stringResource(Res.string.message_split_pending, splitChunkCount))
+                            }
+                        },
                         style = MaterialTheme.typography.bodySmall,
                         color =
                         if (isOverLimit) {

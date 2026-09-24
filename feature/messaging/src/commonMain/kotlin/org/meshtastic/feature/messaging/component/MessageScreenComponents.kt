@@ -658,7 +658,7 @@ fun handleQuickChatAction(
                         }
                         append(action.message)
                     }
-                        .limitBytes(MESSAGE_CHARACTER_LIMIT_BYTES)
+                        .limitBytes(MESSAGE_COMPOSER_MAX_BYTES)
                 onUpdateText(newText)
             }
         }
@@ -723,8 +723,15 @@ fun MessageStatusDialog(
 /** The maximum number of characters to display in the reply snippet. */
 internal const val SNIPPET_CHARACTER_LIMIT = 50
 
-/** The maximum byte size for a message. */
+/** The maximum byte size of a single mesh packet a message chunk has to fit in. */
 const val MESSAGE_CHARACTER_LIMIT_BYTES = 200
+
+/**
+ * The maximum byte size the composer accepts for one logical message. Text over
+ * [MESSAGE_CHARACTER_LIMIT_BYTES] is split into several packets by [org.meshtastic.core.model.util.MessageSplitter]
+ * — this is the ceiling on that whole (pre-split) message, not on a single packet.
+ */
+const val MESSAGE_COMPOSER_MAX_BYTES = 1400
 
 /**
  * Ellipsizes a string if its length exceeds [maxLength].

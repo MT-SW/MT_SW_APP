@@ -227,6 +227,9 @@ close_selection
 co2
 co2_humidity
 co2_temperature
+codec_2_enabled
+codec2_sample_rate
+coding_rate
 collapse_chart
 collapsed
 communicate_off_the_grid
@@ -248,6 +251,17 @@ config_device_ledHeartbeatEnabled_summary
 config_device_tripleClickAsAdHocPing_summary
 config_device_tzdef_summary
 config_device_use_phone_tz
+config_display_auto_screen_carousel_secs_summary
+config_display_compass_north_top_summary
+config_display_displaymode_summary
+config_display_flip_screen_summary
+config_display_heading_bold_summary
+config_display_oled_summary
+config_display_screen_on_secs_summary
+config_display_units_summary
+config_display_wake_on_tap_or_motion_summary
+config_lora_frequency_slot_summary
+config_lora_hop_limit_summary
 config_lora_modem_preset_licensed_summary
 config_lora_modem_preset_summary
 config_lora_region_summary
@@ -467,6 +481,7 @@ distance_filters
 distance_filters_description
 distance_measurements
 distance_measurements_description
+dns
 ### DOC ###
 doc_clear_search
 doc_keywords_android_auto
@@ -762,6 +777,7 @@ geofence_set_area
 get_started
 github_repository
 good
+### GPIO ###
 gpio
 gpio_mask_display
 gpio_off
@@ -1026,6 +1042,8 @@ map_purge_fail
 map_purge_success
 map_reporting_consent_header
 map_reporting_consent_text
+map_reporting_interval_seconds
+map_reporting_summary
 map_select_download_region
 map_start_download
 map_style_selection
@@ -1137,6 +1155,9 @@ message_routing_error_rate_limit_exceeded_detail
 message_routing_error_timeout_detail
 message_routing_error_too_large
 message_routing_error_too_large_detail
+message_split_incomplete
+message_split_pending
+message_split_receiving
 message_status_delivered
 message_status_enroute
 message_status_queued
@@ -1574,6 +1595,7 @@ provide_location_to_mesh
 provider_name_exists
 psk
 pt_BR
+ptt_pin
 public_key
 public_key_changed
 qr_code
@@ -1595,6 +1617,7 @@ react
 reboot
 recent_network_devices
 reconnecting
+red
 redacted
 refresh
 refresh_metadata
@@ -1685,6 +1708,7 @@ rssi_definition
 salinity
 sample_message
 sats
+### SAVE ###
 save
 save_and_restart
 save_changes
@@ -1703,6 +1727,7 @@ scan_shared_contact_nfc
 scan_shared_contact_qr
 scanning_bluetooth
 scanning_network
+screen_on_for
 scroll_to_bottom
 search_emoji
 search_messages
@@ -1788,6 +1813,7 @@ show_translation
 show_waypoints
 shutdown
 shutdown_node_name
+shutdown_on_power_loss
 shutdown_warning
 signal
 signal_quality
@@ -1824,15 +1850,37 @@ slot
 smart_position
 ### SNIFFER ###
 sniffer_auto_scroll
+sniffer_clear_log
+sniffer_decrypt_payloads_summary
+sniffer_decrypt_payloads_title
+sniffer_dismiss_loaded_file
+sniffer_enable_failed
 sniffer_enabled_summary
 sniffer_enabled_title
+sniffer_export_format_csv
+sniffer_export_format_json
+sniffer_export_format_title
+sniffer_export_format_txt
+sniffer_gear_menu
+sniffer_group_by_gateway_summary
+sniffer_group_by_gateway_title
+sniffer_load_failed
+sniffer_load_log_summary
+sniffer_load_log_title
 sniffer_log_empty
 sniffer_log_title
 sniffer_mqtt_section_title
 sniffer_new_packets
 sniffer_not_supported_summary
+sniffer_panel_off_summary
 sniffer_radio_section_title
 sniffer_settings_title
+sniffer_source_mqtt_unavailable_summary
+sniffer_source_off
+sniffer_source_title
+sniffer_via_gateways
+sniffer_via_relays
+sniffer_viewing_loaded_file
 sniffer_warning_accept
 sniffer_warning_cancel
 sniffer_warning_compatibility

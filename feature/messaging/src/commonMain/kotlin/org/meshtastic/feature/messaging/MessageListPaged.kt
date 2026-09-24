@@ -53,7 +53,6 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
-import kotlin.math.abs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
@@ -72,6 +71,7 @@ import org.meshtastic.feature.messaging.component.MessageItem
 import org.meshtastic.feature.messaging.component.MessageStatusDialog
 import org.meshtastic.feature.messaging.component.ReactionDialog
 import org.meshtastic.feature.messaging.component.UnreadMessagesDivider
+import kotlin.math.abs
 
 private const val HEX_RADIX = 16
 private const val RELAY_NODE_SUFFIX_MASK = 0xFF
@@ -272,6 +272,11 @@ private fun MessageListPagedContent(
     // Disable animations during scroll to prevent jank/stutter
     val enableAnimations by remember { derivedStateOf { !listState.isScrollInProgress } }
 
+    // Recomputes only when the loaded item count changes (a message arrives/loads) — same invalidation signal
+    // already used above for unreadDividerIndex.
+    val splitReassembly =
+        remember(state.messages.itemCount) { buildSplitReassembly(state.messages.itemSnapshotList.filterNotNull()) }
+
     // One bar at a time, owned above the rows: a row cannot see a tap that lands on another row or on the space
     // between them, and two rows owning their own state could both be open at once.
     var openReactionBarFor by remember { mutableStateOf<Long?>(null) }
@@ -303,7 +308,24 @@ private fun MessageListPagedContent(
                 key = state.messages.itemKey { it.uuid },
                 contentType = state.messages.itemContentType { "message" },
             ) { index ->
-                val message = state.messages[index]
+                val rawMessage = state.messages[index]
+                if (rawMessage != null && splitReassembly.suppressed.contains(rawMessage.uuid)) {
+                    // A non-hosting chunk of a split message: its content already shows in the merged bubble
+                    // rendered at the group's host chunk, so this row contributes nothing.
+                    return@items
+                }
+                val splitInfo = rawMessage?.let { splitReassembly.groups[it.uuid] }
+                val message =
+                    if (splitInfo != null && rawMessage != null) {
+                        rawMessage.copy(
+                            text = splitInfo.displayText(),
+                            replyId = splitInfo.replyId,
+                            originalMessage = splitInfo.originalMessage,
+                            packetId = splitInfo.packetId,
+                        )
+                    } else {
+                        rawMessage
+                    }
                 val visuallyPrevMessage = if (index < state.messages.itemCount - 1) state.messages[index + 1] else null
                 val visuallyNextMessage = if (index > 0) state.messages[index - 1] else null
 
