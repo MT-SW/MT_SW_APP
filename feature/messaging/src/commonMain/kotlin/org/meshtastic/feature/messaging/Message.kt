@@ -104,11 +104,11 @@ import org.meshtastic.core.model.ContactKey
 import org.meshtastic.core.model.MENTION_TOKEN_REGEX
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
-import org.meshtastic.core.model.util.getChannel
 import org.meshtastic.core.model.util.MessageSplitter
+import org.meshtastic.core.model.util.getChannel
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.message_split_pending
 import org.meshtastic.core.resources.archived_channel_read_only
+import org.meshtastic.core.resources.message_split_pending
 import org.meshtastic.core.resources.send
 import org.meshtastic.core.resources.type_a_message
 import org.meshtastic.core.resources.unknown_channel
@@ -124,7 +124,6 @@ import org.meshtastic.core.ui.util.isFromSoftKeyboard
 import org.meshtastic.feature.messaging.component.ActionModeTopBar
 import org.meshtastic.feature.messaging.component.DeleteMessageDialog
 import org.meshtastic.feature.messaging.component.FormattingToolbar
-import org.meshtastic.feature.messaging.component.MESSAGE_CHARACTER_LIMIT_BYTES
 import org.meshtastic.feature.messaging.component.MESSAGE_COMPOSER_MAX_BYTES
 import org.meshtastic.feature.messaging.component.MessageMenuAction
 import org.meshtastic.feature.messaging.component.MessageSearchBar

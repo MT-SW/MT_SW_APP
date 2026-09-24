@@ -175,7 +175,10 @@ fun LogcatContent(modifier: Modifier = Modifier) {
         } else {
             Box(modifier = Modifier.fillMaxSize()) {
                 SelectionContainer {
-                    LazyColumn(state = listState, modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp)) {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+                    ) {
                         items(lines) { line ->
                             Text(
                                 text = line,

@@ -351,7 +351,11 @@ fun <T> BaseMetricScreen(
                 },
                 listPart = { modifier ->
                     Box(modifier = modifier) {
-                        listPart(Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp), selectedX, lazyListState) { x ->
+                        listPart(
+                            Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+                            selectedX,
+                            lazyListState,
+                        ) { x ->
                             selectedX = x
                             coroutineScope.launch {
                                 vicoScrollState.animateScroll(Scroll.Absolute.x(x, CommonCharts.SCROLL_BIAS))

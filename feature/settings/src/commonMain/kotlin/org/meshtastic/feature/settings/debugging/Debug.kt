@@ -193,7 +193,10 @@ fun DebugScreen(onNavigateUp: () -> Unit, viewModel: DebugViewModel) {
                 return@Column
             }
             Box(modifier = Modifier.fillMaxSize()) {
-                LazyColumn(modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp), state = listState) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+                    state = listState,
+                ) {
                     stickyHeader {
                         val animatedAlpha by
                             animateFloatAsState(

@@ -333,7 +333,10 @@ fun NodeListScreen(
         },
     ) { contentPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(contentPadding).focusable()) {
-            LazyColumn(state = listState, modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp)) {
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+            ) {
                 stickyHeader {
                     val animatedAlpha by
                         animateFloatAsState(targetValue = if (!isScrollInProgress) 1.0f else 0f, label = "alpha")

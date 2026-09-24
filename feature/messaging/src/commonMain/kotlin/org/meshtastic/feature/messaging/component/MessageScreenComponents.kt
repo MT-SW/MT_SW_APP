@@ -727,9 +727,9 @@ internal const val SNIPPET_CHARACTER_LIMIT = 50
 const val MESSAGE_CHARACTER_LIMIT_BYTES = 200
 
 /**
- * The maximum byte size the composer accepts for one logical message. Text over
- * [MESSAGE_CHARACTER_LIMIT_BYTES] is split into several packets by [org.meshtastic.core.model.util.MessageSplitter]
- * — this is the ceiling on that whole (pre-split) message, not on a single packet.
+ * The maximum byte size the composer accepts for one logical message. Text over [MESSAGE_CHARACTER_LIMIT_BYTES] is
+ * split into several packets by [org.meshtastic.core.model.util.MessageSplitter] — this is the ceiling on that whole
+ * (pre-split) message, not on a single packet.
  */
 const val MESSAGE_COMPOSER_MAX_BYTES = 1400
 

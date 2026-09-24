@@ -70,7 +70,10 @@ fun DeviceLinkDirectoryScreen(
     ) { paddingValues ->
         val listState = rememberLazyListState()
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            LazyColumn(modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp), state = listState) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+                state = listState,
+            ) {
                 if (links.isNotEmpty()) {
                     // The disclosure sits above the links it covers.
                     item {

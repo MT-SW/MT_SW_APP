@@ -108,7 +108,10 @@ fun NetworkHealthScreen(
             )
 
             Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
-                LazyColumn(modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp), state = listState) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+                    state = listState,
+                ) {
                     items(uiState.nodes, key = { it.num }) { node ->
                         NodeHealthRow(
                             node = node,
