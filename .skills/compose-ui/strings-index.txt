@@ -1158,6 +1158,7 @@ message_routing_error_too_large_detail
 message_split_incomplete
 message_split_pending
 message_split_receiving
+message_split_sending
 message_status_ack_proof_invalid
 message_status_delivered
 message_status_enroute

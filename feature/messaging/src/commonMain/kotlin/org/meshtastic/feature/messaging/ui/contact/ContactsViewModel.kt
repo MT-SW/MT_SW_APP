@@ -32,6 +32,7 @@ import org.meshtastic.core.model.MyNodeInfo
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.isBroadcast
 import org.meshtastic.core.model.isFromLocal
+import org.meshtastic.core.model.util.MessageSplitter
 import org.meshtastic.core.model.util.getChannel
 import org.meshtastic.core.repository.ConnectionStateProvider
 import org.meshtastic.core.repository.NodeRepository
@@ -146,7 +147,12 @@ class ContactsViewModel(
                     },
                     longName = longName,
                     lastMessageTime = if (packetData.time != 0L) packetData.time else null,
-                    lastMessageText = if (fromLocal) packetData.text else "$shortName: ${packetData.text}",
+                    lastMessageText =
+                    if (fromLocal) {
+                        splitPreviewOf(packetData.text)
+                    } else {
+                        "$shortName: ${splitPreviewOf(packetData.text)}"
+                    },
                     unreadCount = packetRepository.getUnreadCount(contactKey),
                     messageCount = packetRepository.getMessageCount(contactKey),
                     isMuted = settings[contactKey]?.isMuted == true,
@@ -168,6 +174,18 @@ class ContactsViewModel(
             }
         }
             .stateInWhileSubscribed(initialValue = emptyList())
+
+    /**
+     * The list's "last message" preview only ever has the single newest packet in hand, not the whole thread -- see
+     * [org.meshtastic.feature.messaging.buildSplitReassembly] for the full reassembly used in the message list itself.
+     * Here we just make sure a split chunk never shows its raw tag (e.g. "[k9 4/4] ") in the preview: chunk 1 already
+     * carries the true start of the message, so its own body is shown as-is; any later chunk only ever holds a
+     * mid-message fragment, so it's prefixed with an ellipsis rather than presented as if it were the beginning.
+     */
+    private fun splitPreviewOf(text: String): String {
+        val tag = MessageSplitter.parseSplitTag(text) ?: return text
+        return if (tag.index == 1) tag.body else "\u2026 ${tag.body}"
+    }
 
     fun getNode(userId: String?) = nodeRepository.getNode(userId ?: NodeAddress.ID_BROADCAST)
 

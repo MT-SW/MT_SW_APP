@@ -24,6 +24,7 @@ import org.meshtastic.core.model.util.MessageSplitter
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.message_split_incomplete
 import org.meshtastic.core.resources.message_split_receiving
+import org.meshtastic.core.resources.message_split_sending
 
 // A group stops waiting for its missing chunks after this long and just shows what arrived, permanently — mirrors
 // how a real SMS app eventually gives up on a concatenated message that never fully landed.
@@ -39,6 +40,8 @@ internal data class SplitGroupInfo(
     val replyId: Int?,
     val originalMessage: Message?,
     val packetId: Int,
+    /** Whether this group is a message we're sending (all its chunks originated on this device) vs. receiving. */
+    val fromLocal: Boolean,
 )
 
 internal data class SplitReassembly(
@@ -92,6 +95,7 @@ internal fun buildSplitReassembly(messages: List<Message>): SplitReassembly {
                 replyId = firstChunk?.replyId,
                 originalMessage = firstChunk?.originalMessage,
                 packetId = firstChunk?.packetId ?: hostEntry.first.packetId,
+                fromLocal = hostEntry.first.fromLocal,
             )
         entries.forEach { (message, _) -> if (message.uuid != hostEntry.first.uuid) suppressed += message.uuid }
     }
@@ -107,10 +111,13 @@ internal fun buildSplitReassembly(messages: List<Message>): SplitReassembly {
 internal fun SplitGroupInfo.displayText(): String {
     if (isComplete) return mergedBody
     val statusLine =
-        if (timedOut) {
-            stringResource(Res.string.message_split_incomplete, total - haveCount, total)
-        } else {
-            stringResource(Res.string.message_split_receiving, haveCount, total)
+        when {
+            timedOut -> stringResource(Res.string.message_split_incomplete, total - haveCount, total)
+            // Direction matters here: while our own outgoing chunks are still being paced out, this is *our* send
+            // still in progress, not something arriving from the other end -- showing "Receiving..." on your own
+            // message reads as if the app had the direction backwards.
+            fromLocal -> stringResource(Res.string.message_split_sending, haveCount, total)
+            else -> stringResource(Res.string.message_split_receiving, haveCount, total)
         }
     return "$mergedBody\n\n$statusLine"
 }
