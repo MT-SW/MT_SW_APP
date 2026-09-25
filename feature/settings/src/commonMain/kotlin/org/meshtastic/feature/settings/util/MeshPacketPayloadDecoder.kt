@@ -197,7 +197,8 @@ fun summarizePacketPayload(packet: MeshPacket, knownChannelPsks: List<ByteArray>
 
             else -> null
         }
-    } catch (e: Exception) {
+    } catch (_: Exception) {
+        // Malformed/undecodable payload -- the always-visible summary line just falls back to the port label.
         null
     }
 }

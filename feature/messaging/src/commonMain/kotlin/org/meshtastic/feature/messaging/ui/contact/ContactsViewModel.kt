@@ -182,11 +182,6 @@ class ContactsViewModel(
      * carries the true start of the message, so its own body is shown as-is; any later chunk only ever holds a
      * mid-message fragment, so it's prefixed with an ellipsis rather than presented as if it were the beginning.
      */
-    private fun splitPreviewOf(text: String): String {
-        val tag = MessageSplitter.parseSplitTag(text) ?: return text
-        return if (tag.index == 1) tag.body else "\u2026 ${tag.body}"
-    }
-
     fun getNode(userId: String?) = nodeRepository.getNode(userId ?: NodeAddress.ID_BROADCAST)
 
     fun deleteContacts(contacts: List<String>) =
@@ -235,6 +230,18 @@ class ContactsViewModel(
 }
 
 private fun String.toSectionSet(): Set<String> = split(",").filter { it.isNotEmpty() }.toSet()
+
+/**
+ * Strips a long message's split tag for the contact list's "last message" preview -- see
+ * [org.meshtastic.feature.messaging.buildSplitReassembly] for the full reassembly used in the message list itself.
+ * Here we just make sure a split chunk never shows its raw tag (e.g. "[k9 4/4] ") in the preview: chunk 1 already
+ * carries the true start of the message, so its own body is shown as-is; any later chunk only ever holds a
+ * mid-message fragment, so it's prefixed with an ellipsis rather than presented as if it were the beginning.
+ */
+private fun splitPreviewOf(text: String): String {
+    val tag = MessageSplitter.parseSplitTag(text) ?: return text
+    return if (tag.index == 1) tag.body else "\u2026 ${tag.body}"
+}
 
 /** The two conversation-list sections a [Contact] is grouped into. */
 enum class ContactSection(val key: String) {
