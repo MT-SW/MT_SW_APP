@@ -149,9 +149,9 @@ class ContactsViewModel(
                     lastMessageTime = if (packetData.time != 0L) packetData.time else null,
                     lastMessageText =
                     if (fromLocal) {
-                        splitPreviewOf(packetData.text)
+                        splitPreviewOf(packetData.text.orEmpty())
                     } else {
-                        "$shortName: ${splitPreviewOf(packetData.text)}"
+                        "$shortName: ${splitPreviewOf(packetData.text.orEmpty())}"
                     },
                     unreadCount = packetRepository.getUnreadCount(contactKey),
                     messageCount = packetRepository.getMessageCount(contactKey),
