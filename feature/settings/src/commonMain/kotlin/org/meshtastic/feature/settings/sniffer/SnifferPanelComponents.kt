@@ -50,6 +50,10 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.mqtt_sniffer_log_empty
 import org.meshtastic.core.resources.save_log_to_file
 import org.meshtastic.core.resources.sniffer_auto_scroll
+import org.meshtastic.core.resources.sniffer_buffer_overflow_overwrite
+import org.meshtastic.core.resources.sniffer_buffer_overflow_stop
+import org.meshtastic.core.resources.sniffer_buffer_overflow_summary
+import org.meshtastic.core.resources.sniffer_buffer_overflow_title
 import org.meshtastic.core.resources.sniffer_clear_log
 import org.meshtastic.core.resources.sniffer_decrypt_payloads_summary
 import org.meshtastic.core.resources.sniffer_decrypt_payloads_title
