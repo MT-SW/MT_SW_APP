@@ -31,6 +31,8 @@ import okio.ByteString
 import org.koin.core.annotation.KoinViewModel
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.di.ServiceScope
+import org.meshtastic.core.datastore.SnifferBufferOverflowPolicy
+import org.meshtastic.core.datastore.SnifferLogPrefs
 import org.meshtastic.core.model.Channel
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.network.repository.MQTTRepository
@@ -43,8 +45,6 @@ import org.meshtastic.proto.Config.LoRaConfig
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.MqttClientProxyMessage
 import org.meshtastic.proto.ServiceEnvelope
-
-private const val MAX_MQTT_SNIFFED_PACKETS = 1000
 
 /**
  * One packet observed on the MQTT broker's mesh topics -- the MQTT counterpart to `SniffedPacket` (Radio Sniffer).
@@ -139,6 +139,7 @@ class MqttSnifferManager(
     private val mqttRepository: MQTTRepository,
     private val nodeRepository: NodeRepository,
     radioConfigRepository: RadioConfigRepository,
+    private val prefs: SnifferLogPrefs,
     private val scope: ServiceScope,
 ) {
     private val _active = MutableStateFlow(false)
@@ -152,6 +153,14 @@ class MqttSnifferManager(
     private val channelSet = radioConfigRepository.channelSetFlow.stateIn(scope, SharingStarted.Eagerly, null)
 
     private var collectJob: Job? = null
+
+    // Mirrors the Radio Sniffer's same setting (SnifferLogPrefs.bufferOverflowPolicy) -- one shared preference for
+    // both sniffer sources' buffers, read here as a plain field since onMessage() isn't itself a Flow collector.
+    private var overflowPolicy = SnifferBufferOverflowPolicy.STOP
+
+    init {
+        scope.launch { prefs.bufferOverflowPolicy.collect { overflowPolicy = it } }
+    }
 
     /** Starts or stops the MQTT connection for this sniffer. See the class doc for the session-sharing caveat. */
     fun setActive(enabled: Boolean) {
@@ -177,7 +186,16 @@ class MqttSnifferManager(
 
     private fun onMessage(message: MqttClientProxyMessage) {
         val entry = decodeMessage(message) ?: return
-        _packets.update { current -> (listOf(entry) + current).take(MAX_MQTT_SNIFFED_PACKETS) }
+        _packets.update { current ->
+            when (overflowPolicy) {
+                // Full: stop buffering entirely, keep whatever was captured first, same as the Radio Sniffer.
+                SnifferBufferOverflowPolicy.STOP ->
+                    if (current.size >= SnifferLogPrefs.MAX_BUFFERED_PACKETS) current else listOf(entry) + current
+
+                SnifferBufferOverflowPolicy.OVERWRITE ->
+                    (listOf(entry) + current).take(SnifferLogPrefs.MAX_BUFFERED_PACKETS)
+            }
+        }
     }
 
     /** Every channel this app currently holds an (already-expanded, see [Channel.psk]) key for. */

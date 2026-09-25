@@ -44,6 +44,16 @@ enum class SnifferLogFormat {
 }
 
 /**
+ * What happens once a sniffer's live packet list reaches [SnifferLogPrefs.MAX_BUFFERED_PACKETS]: [STOP] freezes on
+ * whatever was captured first (matches "off" semantics -- nothing further is buffered until the trash icon clears the
+ * panel), [OVERWRITE] keeps collecting and drops the oldest entries first, like a ring buffer.
+ */
+enum class SnifferBufferOverflowPolicy {
+    STOP,
+    OVERWRITE,
+}
+
+/**
  * Persisted settings for the combined Sniffer Log panel. The Radio and MQTT sniffers were merged into a single screen
  * reached from one entry point; these preferences apply to whichever source [activeSource] currently selects, so
  * switching sources keeps the same grouping/auto-scroll/decrypt/export choices rather than resetting them.
@@ -58,6 +68,12 @@ open class SnifferLogPrefs(private val dataStore: CorePreferencesDataStore) {
         val AUTO_SCROLL = booleanPreferencesKey("sniffer-auto-scroll")
         val DECRYPT_PAYLOADS = booleanPreferencesKey("sniffer-decrypt-payloads")
         val EXPORT_FORMAT = stringPreferencesKey("sniffer-export-format")
+        val BUFFER_OVERFLOW_POLICY = stringPreferencesKey("sniffer-buffer-overflow-policy")
+    }
+
+    companion object {
+        /** Shared cap for both live sniffer packet lists (Radio and MQTT) -- matches the HA panel's own buffer cap. */
+        const val MAX_BUFFERED_PACKETS = 5000
     }
 
     open val activeSource: Flow<SnifferSource> =
@@ -135,5 +151,17 @@ open class SnifferLogPrefs(private val dataStore: CorePreferencesDataStore) {
 
     open suspend fun setExportFormat(format: SnifferLogFormat) {
         dataStore.edit { it[PreferencesKeys.EXPORT_FORMAT] = format.name }
+    }
+
+    /** What to do once a live sniffer packet list reaches [MAX_BUFFERED_PACKETS]. Defaults to [SnifferBufferOverflowPolicy.STOP]. */
+    open val bufferOverflowPolicy: Flow<SnifferBufferOverflowPolicy> =
+        dataStore.data.map { prefs ->
+            prefs[PreferencesKeys.BUFFER_OVERFLOW_POLICY]?.let { raw ->
+                runCatching { SnifferBufferOverflowPolicy.valueOf(raw) }.getOrNull()
+            } ?: SnifferBufferOverflowPolicy.STOP
+        }
+
+    open suspend fun setBufferOverflowPolicy(policy: SnifferBufferOverflowPolicy) {
+        dataStore.edit { it[PreferencesKeys.BUFFER_OVERFLOW_POLICY] = policy.name }
     }
 }

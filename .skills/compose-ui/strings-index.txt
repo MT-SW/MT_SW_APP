@@ -1858,6 +1858,10 @@ slot
 smart_position
 ### SNIFFER ###
 sniffer_auto_scroll
+sniffer_buffer_overflow_overwrite
+sniffer_buffer_overflow_stop
+sniffer_buffer_overflow_summary
+sniffer_buffer_overflow_title
 sniffer_clear_log
 sniffer_decrypt_payloads_summary
 sniffer_decrypt_payloads_title

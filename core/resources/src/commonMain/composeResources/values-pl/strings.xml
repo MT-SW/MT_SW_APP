@@ -2047,6 +2047,10 @@
     <string name="sniffer_radio_section_title">Radio</string>
     <string name="sniffer_settings_title">Sniffer</string>
     <string name="sniffer_gear_menu">Ustawienia sniffera</string>
+    <string name="sniffer_buffer_overflow_overwrite">Nadpisuj najstarsze</string>
+    <string name="sniffer_buffer_overflow_stop">Zatrzymaj</string>
+    <string name="sniffer_buffer_overflow_summary">Co zrobić, gdy log snifera od ostatniego wyczyszczenia osiągnie 5000 pakietów</string>
+    <string name="sniffer_buffer_overflow_title">Gdy bufor jest pełny</string>
     <string name="sniffer_clear_log">Wyczyść wyświetlane logi</string>
     <string name="sniffer_source_title">Aktywny sniffer</string>
     <string name="sniffer_source_off">Wyłączony</string>

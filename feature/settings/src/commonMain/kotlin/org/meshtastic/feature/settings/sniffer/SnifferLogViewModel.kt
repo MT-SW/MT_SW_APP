@@ -20,12 +20,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import org.koin.core.annotation.KoinViewModel
+import org.meshtastic.core.datastore.SnifferBufferOverflowPolicy
 import org.meshtastic.core.datastore.SnifferLogPrefs
+import org.meshtastic.core.datastore.SnifferSource
 import org.meshtastic.core.model.Channel
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.Node
@@ -141,14 +144,41 @@ class SnifferLogViewModel(
      * [SnifferPanelViewModel]'s init, which guarantees this is never left at 0L once a real source has been selected.
      */
     val sniffedPackets: StateFlow<List<SniffedPacket>> =
-        prefs.clearedAtMillis
-            .flatMapLatest { clearedAtMillis ->
-                if (clearedAtMillis <= 0L) flowOf(emptyList()) else meshLogRepository.getAllLogsSince(clearedAtMillis)
+        combine(prefs.activeSource, prefs.clearedAtMillis) { source, clearedAtMillis -> source to clearedAtMillis }
+            .flatMapLatest { (source, clearedAtMillis) ->
+                // Off truly means off: no query, no decoding, nothing buffered -- not just hidden at the display
+                // layer. A stale RADIO selection left over from before a disconnect/reconnect is what used to make
+                // this look like it kept "filling up" while the sniffer toggle showed off; see SnifferSettingsScreen's
+                // state.snifferEnabled reconciliation, which is what keeps activeSource itself honest.
+                if (source != SnifferSource.RADIO || clearedAtMillis <= 0L) {
+                    flowOf(emptyList())
+                } else {
+                    meshLogRepository.getAllLogsSince(clearedAtMillis)
+                }
             }
-            .map { logs -> logs.mapNotNull(::toSniffedPacket).sortedByDescending { it.receivedAtMillis } }
+            .combine(prefs.bufferOverflowPolicy) { logs, policy -> logs to policy }
+            .map { (logs, policy) -> capBuffer(logs.mapNotNull(::toSniffedPacket), policy) }
             .stateInWhileSubscribed(initialValue = emptyList())
 
     private val channelSet = radioConfigRepository.channelSetFlow.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    /**
+     * Applies [SnifferLogPrefs.MAX_BUFFERED_PACKETS] according to [policy]: [SnifferBufferOverflowPolicy.STOP] keeps
+     * whichever [SnifferLogPrefs.MAX_BUFFERED_PACKETS] packets were captured first (oldest since the last clear) and
+     * ignores anything beyond that until cleared; [SnifferBufferOverflowPolicy.OVERWRITE] keeps the newest
+     * [SnifferLogPrefs.MAX_BUFFERED_PACKETS], dropping older ones as new packets arrive. Always returned newest-first.
+     */
+    private fun capBuffer(packets: List<SniffedPacket>, policy: SnifferBufferOverflowPolicy): List<SniffedPacket> {
+        val capped =
+            when (policy) {
+                SnifferBufferOverflowPolicy.STOP ->
+                    packets.sortedBy { it.receivedAtMillis }.take(SnifferLogPrefs.MAX_BUFFERED_PACKETS)
+
+                SnifferBufferOverflowPolicy.OVERWRITE ->
+                    packets.sortedByDescending { it.receivedAtMillis }.take(SnifferLogPrefs.MAX_BUFFERED_PACKETS)
+            }
+        return capped.sortedByDescending { it.receivedAtMillis }
+    }
 
     /** Every channel this app currently holds an (already-expanded, see [Channel.psk]) key for. */
     private fun knownChannelPsks(): List<ByteArray> {

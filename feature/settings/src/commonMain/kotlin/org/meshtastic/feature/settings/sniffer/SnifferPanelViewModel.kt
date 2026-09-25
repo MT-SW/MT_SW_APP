@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import org.koin.core.annotation.KoinViewModel
+import org.meshtastic.core.datastore.SnifferBufferOverflowPolicy
 import org.meshtastic.core.datastore.SnifferLogFormat
 import org.meshtastic.core.datastore.SnifferLogPrefs
 import org.meshtastic.core.datastore.SnifferSource
@@ -116,6 +117,8 @@ class SnifferPanelViewModel(
     val autoScroll: StateFlow<Boolean> = prefs.autoScroll.stateInWhileSubscribed(true)
     val decryptPayloads: StateFlow<Boolean> = prefs.decryptPayloads.stateInWhileSubscribed(true)
     val exportFormat: StateFlow<SnifferLogFormat> = prefs.exportFormat.stateInWhileSubscribed(SnifferLogFormat.TXT)
+    val bufferOverflowPolicy: StateFlow<SnifferBufferOverflowPolicy> =
+        prefs.bufferOverflowPolicy.stateInWhileSubscribed(SnifferBufferOverflowPolicy.STOP)
 
     // Raw, unseeded version of mqttConfigured below, for init's own reactive fallback -- see the comment there
     // for why the seeded public StateFlow is the wrong thing to react to internally.
@@ -238,6 +241,10 @@ class SnifferPanelViewModel(
 
     fun setExportFormat(format: SnifferLogFormat) {
         viewModelScope.launch { prefs.setExportFormat(format) }
+    }
+
+    fun setBufferOverflowPolicy(policy: SnifferBufferOverflowPolicy) {
+        viewModelScope.launch { prefs.setBufferOverflowPolicy(policy) }
     }
 
     /**

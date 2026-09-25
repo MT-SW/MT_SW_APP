@@ -115,6 +115,7 @@ fun SnifferSettingsScreen(
     val mqttConfigured by panelViewModel.mqttConfigured.collectAsStateWithLifecycle()
     val clearedAtMillis by panelViewModel.clearedAtMillis.collectAsStateWithLifecycle()
     val loadedLog by panelViewModel.loadedLog.collectAsStateWithLifecycle()
+    val bufferOverflowPolicy by panelViewModel.bufferOverflowPolicy.collectAsStateWithLifecycle()
 
     val snifferSupported =
         state.snifferEnabled != null ||
@@ -125,9 +126,19 @@ fun SnifferSettingsScreen(
     // left running from outside this screen, e.g. still-active from before a navigation-away-and-back) should show
     // what's actually happening rather than a stale preference. See SnifferPanelViewModel's doc for the rest of the
     // exclusivity contract.
+    //
+    // The false branch matters just as much as the true one: nodemodadmin (and so snifferEnabled) is cleared to null
+    // and freshly resynced from the device on every reconnect (MeshConfigFlowManagerImpl.handleMyInfo). If the radio
+    // came back up with sniffing off -- e.g. it lost power while it was on and defaults to off after a reboot, or the
+    // phone connected to a different device than before -- a RADIO selection left over from a previous session must
+    // not keep showing as on just because nothing ever told it otherwise. Without this, the panel looked like it was
+    // still sniffing (and kept "collecting", see SnifferLogViewModel.sniffedPackets) against a device that had
+    // already turned it off.
     LaunchedEffect(state.snifferEnabled) {
-        if (state.snifferEnabled == true && activeSource != SnifferSource.RADIO) {
-            panelViewModel.selectSource(SnifferSource.RADIO)
+        when (state.snifferEnabled) {
+            true -> if (activeSource != SnifferSource.RADIO) panelViewModel.selectSource(SnifferSource.RADIO)
+            false -> if (activeSource == SnifferSource.RADIO) panelViewModel.selectSource(SnifferSource.OFF)
+            null -> Unit // not yet synced with the (re)connected device -- don't guess either way
         }
     }
     LaunchedEffect(mqttSessionActive) {
@@ -311,6 +322,8 @@ fun SnifferSettingsScreen(
             onDecryptPayloadsChange = panelViewModel::setDecryptPayloads,
             exportFormat = exportFormat,
             onExportFormatChange = panelViewModel::setExportFormat,
+            bufferOverflowPolicy = bufferOverflowPolicy,
+            onBufferOverflowPolicyChange = panelViewModel::setBufferOverflowPolicy,
             onLoadLogClick = {
                 showGearSheet = false
                 importPicker.pick()

@@ -48,6 +48,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.DateFormatter
+import org.meshtastic.core.datastore.SnifferBufferOverflowPolicy
 import org.meshtastic.core.datastore.SnifferLogFormat
 import org.meshtastic.core.datastore.SnifferSource
 import org.meshtastic.core.resources.Res
@@ -154,6 +155,8 @@ internal fun SnifferGearSheet(
     onDecryptPayloadsChange: (Boolean) -> Unit,
     exportFormat: SnifferLogFormat,
     onExportFormatChange: (SnifferLogFormat) -> Unit,
+    bufferOverflowPolicy: SnifferBufferOverflowPolicy,
+    onBufferOverflowPolicyChange: (SnifferBufferOverflowPolicy) -> Unit,
     onLoadLogClick: () -> Unit,
 ) {
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
@@ -180,6 +183,13 @@ internal fun SnifferGearSheet(
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             SnifferExportFormatSelector(exportFormat = exportFormat, onExportFormatChange = onExportFormatChange)
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            SnifferBufferOverflowSelector(
+                bufferOverflowPolicy = bufferOverflowPolicy,
+                onBufferOverflowPolicyChange = onBufferOverflowPolicyChange,
+            )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
@@ -298,6 +308,44 @@ private fun SnifferExportFormatSelector(
                     shape = SegmentedButtonDefaults.itemShape(index, formats.size),
                     onClick = { onExportFormatChange(format) },
                     selected = exportFormat == format,
+                    label = { Text(label) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SnifferBufferOverflowSelector(
+    bufferOverflowPolicy: SnifferBufferOverflowPolicy,
+    onBufferOverflowPolicyChange: (SnifferBufferOverflowPolicy) -> Unit,
+) {
+    Column {
+        Text(
+            text = stringResource(Res.string.sniffer_buffer_overflow_title),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 16.dp, bottom = 4.dp),
+        )
+        Text(
+            text = stringResource(Res.string.sniffer_buffer_overflow_summary),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+        )
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+            val policies = SnifferBufferOverflowPolicy.entries
+            policies.forEachIndexed { index, policy ->
+                val label =
+                    when (policy) {
+                        SnifferBufferOverflowPolicy.STOP -> stringResource(Res.string.sniffer_buffer_overflow_stop)
+                        SnifferBufferOverflowPolicy.OVERWRITE ->
+                            stringResource(Res.string.sniffer_buffer_overflow_overwrite)
+                    }
+                SegmentedButton(
+                    shape = SegmentedButtonDefaults.itemShape(index, policies.size),
+                    onClick = { onBufferOverflowPolicyChange(policy) },
+                    selected = bufferOverflowPolicy == policy,
                     label = { Text(label) },
                 )
             }

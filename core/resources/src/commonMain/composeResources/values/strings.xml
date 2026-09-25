@@ -1912,6 +1912,10 @@
     <string name="smart_position">Smart Position</string>
     <!-- SNIFFER -->
     <string name="sniffer_auto_scroll">Auto-scroll</string>
+    <string name="sniffer_buffer_overflow_overwrite">Overwrite oldest</string>
+    <string name="sniffer_buffer_overflow_stop">Stop</string>
+    <string name="sniffer_buffer_overflow_summary">What to do once a live sniffer log reaches 5000 packets since the last clear</string>
+    <string name="sniffer_buffer_overflow_title">When the buffer is full</string>
     <string name="sniffer_clear_log">Clear displayed logs</string>
     <string name="sniffer_decrypt_payloads_summary">Try to decode encrypted payloads using this app\'s known channel keys</string>
     <string name="sniffer_decrypt_payloads_title">Attempt decryption</string>
