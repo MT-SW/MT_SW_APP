@@ -39,7 +39,9 @@ import org.meshtastic.core.network.repository.MQTTRepository
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.feature.settings.debugging.sanitizeForExport
+import org.meshtastic.feature.settings.util.PacketSummary
 import org.meshtastic.feature.settings.util.decodePayloadFromPacket
+import org.meshtastic.feature.settings.util.summarizePacketPayload
 import org.meshtastic.mqtt.ConnectionState
 import org.meshtastic.proto.Config.LoRaConfig
 import org.meshtastic.proto.MeshPacket
@@ -74,6 +76,11 @@ data class MqttSniffedPacket(
      * several same-[packetId] entries into one displayed row is done downstream, not here.
      */
     val gatewayId: String? = null,
+    /** From the originating MeshPacket's own rx_rssi/rx_snr -- present even for MQTT-sourced copies. */
+    val rssi: Int? = null,
+    val snr: Float? = null,
+    /** Structured summary of the decoded content, for the always-visible card content line -- see [PacketSummary]. */
+    val summary: PacketSummary? = null,
 ) {
     /** Multi-line, redacted representation for the per-packet copy action -- reuses the Debug Panel's redaction. */
     val copyText: String
@@ -95,7 +102,16 @@ data class MqttSniffedPacket(
  * this packet was seen from, most-recently-seen first, deduplicated. [packet] is the most recently received copy -- its
  * own [MqttSniffedPacket.gatewayId] is superseded by [gatewayIds] for display.
  */
-data class GroupedMqttSniffedPacket(val packet: MqttSniffedPacket, val gatewayIds: List<String>)
+data class GroupedMqttSniffedPacket(
+    val packet: MqttSniffedPacket,
+    val gatewayIds: List<String>,
+    /** One entry per underlying reception, oldest first -- the Sniffer Log card's expandable "receipts" list. */
+    val receipts: List<MqttPacketReceipt> =
+        listOf(MqttPacketReceipt(packet.gatewayId, packet.snr, packet.rssi, packet.receivedAtMillis)),
+)
+
+/** One physical reception of a grouped MQTT packet -- which gateway it came through, its signal, and when. */
+data class MqttPacketReceipt(val gatewayId: String?, val snr: Float?, val rssi: Int?, val receivedAtMillis: Long)
 
 /**
  * Groups packets sharing the same [MqttSniffedPacket.packetId] -- i.e. the same over-the-air transmission relayed by
@@ -113,7 +129,11 @@ fun List<MqttSniffedPacket>.groupedByGateway(): List<GroupedMqttSniffedPacket> {
             .map { packets ->
                 val newest = packets.maxBy { it.receivedAtMillis }
                 val gatewayIds = packets.mapNotNull { it.gatewayId }.distinct()
-                GroupedMqttSniffedPacket(newest, gatewayIds)
+                val receipts =
+                    packets
+                        .sortedBy { it.receivedAtMillis }
+                        .map { MqttPacketReceipt(it.gatewayId, it.snr, it.rssi, it.receivedAtMillis) }
+                GroupedMqttSniffedPacket(newest, gatewayIds, receipts)
             }
     val singles = ungroupable.map { GroupedMqttSniffedPacket(it, listOfNotNull(it.gatewayId)) }
     return (grouped + singles).sortedByDescending { it.packet.receivedAtMillis }
@@ -257,6 +277,9 @@ class MqttSnifferManager(
             receivedAtMillis = receivedAtMillis,
             packetId = packet.id,
             gatewayId = gatewayId?.let { id -> formatGatewayLabel(id, nodeMap) },
+            rssi = packet.rx_rssi,
+            snr = packet.rx_snr,
+            summary = summarizePacketPayload(packet, knownChannelPsks()),
         )
     }
 

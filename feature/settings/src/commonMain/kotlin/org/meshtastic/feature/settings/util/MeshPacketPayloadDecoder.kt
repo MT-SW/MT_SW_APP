@@ -169,6 +169,62 @@ private fun decodeNeighborInfoPayload(payload: ByteArray, nodeRepository: NodeRe
     }
 }
 
+/**
+ * Builds a [PacketSummary] for the Sniffer Log's always-visible card content line -- the structured counterpart to
+ * [decodePayloadFromPacket]'s full text dump, which stays reserved for once a card is expanded. Returns null when the
+ * packet is still undecodable (encrypted, no known channel key) or its portnum has no dedicated summary; callers fall
+ * back to the port/category label alone in that case.
+ */
+fun summarizePacketPayload(packet: MeshPacket, knownChannelPsks: List<ByteArray> = emptyList()): PacketSummary? {
+    val decoded = packet.decoded ?: decryptWithKnownChannels(packet, knownChannelPsks) ?: return null
+    val payload = decoded.payload.toByteArray()
+    return try {
+        when (decoded.portnum.value) {
+            PortNum.TEXT_MESSAGE_APP.value, PortNum.ALERT_APP.value -> PacketSummary.Text(payload.decodeToString())
+
+            PortNum.POSITION_APP.value -> Position.ADAPTER.decodeOrNull(payload)?.let(::summarizePosition)
+
+            PortNum.NODEINFO_APP.value -> User.ADAPTER.decodeOrNull(payload)?.let(::summarizeUser)
+
+            PortNum.TELEMETRY_APP.value -> Telemetry.ADAPTER.decodeOrNull(payload)?.let(::summarizeTelemetry)
+
+            PortNum.NEIGHBORINFO_APP.value ->
+                NeighborInfo.ADAPTER.decodeOrNull(payload)?.let { info -> PacketSummary.NeighborCount(info.neighbors.size) }
+
+            else -> null
+        }
+    } catch (e: Exception) {
+        null
+    }
+}
+
+private const val POSITION_COORDINATE_SCALE = 1e7
+
+private fun summarizePosition(position: Position): PacketSummary.PositionSummary = PacketSummary.PositionSummary(
+    latitude = position.latitude_i?.takeIf { it != 0 }?.let { it / POSITION_COORDINATE_SCALE },
+    longitude = position.longitude_i?.takeIf { it != 0 }?.let { it / POSITION_COORDINATE_SCALE },
+    altitudeMeters = position.altitude,
+)
+
+private fun summarizeUser(user: User): PacketSummary.NodeInfoSummary = PacketSummary.NodeInfoSummary(
+    longName = user.long_name?.takeIf { it.isNotBlank() },
+    shortName = user.short_name?.takeIf { it.isNotBlank() },
+)
+
+/** Null when neither metrics variant is present -- an empty/unknown Telemetry packet has nothing worth summarizing. */
+private fun summarizeTelemetry(telemetry: Telemetry): PacketSummary.TelemetrySummary? {
+    val env = telemetry.environment_metrics
+    val device = telemetry.device_metrics
+    if (env == null && device == null) return null
+    return PacketSummary.TelemetrySummary(
+        temperatureCelsius = env?.temperature?.takeIf { !it.isNaN() },
+        humidityPercent = env?.relative_humidity?.takeIf { !it.isNaN() },
+        pressureHpa = env?.barometric_pressure?.takeIf { !it.isNaN() },
+        voltage = (env?.voltage ?: device?.voltage)?.takeIf { !it.isNaN() },
+        batteryPercent = device?.battery_level,
+    )
+}
+
 private fun decodeTraceroutePayload(packet: MeshPacket, payload: ByteArray, nodeRepository: NodeRepository): String {
     val getUsername: (Int) -> String = { nodeNum -> formatNodeWithShortNameForPayload(nodeNum, nodeRepository) }
     return packet.getTracerouteResponse(getUsername)

@@ -38,7 +38,9 @@ import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
 import org.meshtastic.feature.settings.debugging.sanitizeForExport
+import org.meshtastic.feature.settings.util.PacketSummary
 import org.meshtastic.feature.settings.util.decodePayloadFromPacket
+import org.meshtastic.feature.settings.util.summarizePacketPayload
 import org.meshtastic.proto.Config.LoRaConfig
 
 /** One packet the locally connected node overheard but which was not addressed to it. */
@@ -71,6 +73,8 @@ data class SniffedPacket(
      * [groupedByRelay]), not here -- mirrors MQTT's own gatewayId field.
      */
     val relayId: String? = null,
+    /** Structured summary of the decoded content, for the always-visible card content line -- see [PacketSummary]. */
+    val summary: PacketSummary? = null,
 ) {
     /** Multi-line, redacted representation for the per-packet copy action — reuses the Debug Panel's redaction. */
     val copyText: String
@@ -94,7 +98,16 @@ data class SniffedPacket(
  * [SniffedPacket.relayId] is superseded by [relayIds] for display. Mirrors
  * [org.meshtastic.feature.settings.sniffer.mqtt.GroupedMqttSniffedPacket].
  */
-data class GroupedSniffedPacket(val packet: SniffedPacket, val relayIds: List<String>)
+data class GroupedSniffedPacket(
+    val packet: SniffedPacket,
+    val relayIds: List<String>,
+    /** One entry per underlying reception, oldest first -- the Sniffer Log card's expandable "receipts" list. */
+    val receipts: List<SniffedPacketReceipt> =
+        listOf(SniffedPacketReceipt(packet.relayId, packet.snr, packet.rssi, packet.receivedAtMillis)),
+)
+
+/** One physical reception of a grouped packet -- who it came through, its signal, and when. */
+data class SniffedPacketReceipt(val relayId: String?, val snr: Float, val rssi: Int?, val receivedAtMillis: Long)
 
 /**
  * Groups packets sharing the same [SniffedPacket.packetId] -- i.e. the same over-the-air transmission re-heard through
@@ -112,7 +125,11 @@ fun List<SniffedPacket>.groupedByRelay(): List<GroupedSniffedPacket> {
             .map { packets ->
                 val newest = packets.maxBy { it.receivedAtMillis }
                 val relayIds = packets.mapNotNull { it.relayId }.distinct()
-                GroupedSniffedPacket(newest, relayIds)
+                val receipts =
+                    packets
+                        .sortedBy { it.receivedAtMillis }
+                        .map { SniffedPacketReceipt(it.relayId, it.snr, it.rssi, it.receivedAtMillis) }
+                GroupedSniffedPacket(newest, relayIds, receipts)
             }
     val singles = ungroupable.map { GroupedSniffedPacket(it, listOfNotNull(it.relayId)) }
     return (grouped + singles).sortedByDescending { it.packet.receivedAtMillis }
@@ -211,6 +228,7 @@ class SnifferLogViewModel(
             receivedAtMillis = log.received_date,
             packetId = packet.id,
             relayId = resolveRelayId(packet.relay_node, nodeMap, myNodeNum),
+            summary = summarizePacketPayload(packet, knownChannelPsks()),
         )
     }
 
