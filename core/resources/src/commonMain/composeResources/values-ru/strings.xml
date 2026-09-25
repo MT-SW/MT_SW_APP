@@ -606,9 +606,9 @@
     <!-- FILTER -->
     <string name="filter_add_placeholder">Добавьте слово или регулярное выражение:шаблон</string>
     <string name="filter_disable_for_contact">Отключить фильтрацию</string>
-    <string name="filter_enable">Включить фильтрацию</string>
+    <string name="filter_enable">Фильтровать все диалоги</string>
     <string name="filter_enable_for_contact">Включить фильтрацию</string>
-    <string name="filter_enable_summary">Скрывать сообщения, содержащие слова-фильтры</string>
+    <string name="filter_enable_summary">Скрывать сообщения, содержащие фильтры в каждом канале и ЛС. Выключает их для одного разговора из меню.</string>
     <string name="filter_hide_count">Скрыть %1$d отфильтрованных</string>
     <string name="filter_icon">Фильтр</string>
     <string name="filter_message_label">Отфильтрованные</string>
@@ -838,6 +838,7 @@
     <string name="key_verification_final_title">Проверка ключа завершена</string>
     <string name="key_verification_request_title">Запрос проверки ключа</string>
     <string name="key_verification_title">Проверка ключа</string>
+    <string name="label_with_unit">%1$s (%2$s)</string>
     <string name="last_heard_filter_label">Фильтр по времени последнего сообщения: %1$s</string>
     <string name="last_position_update">Обновление последнего местоположения</string>
     <string name="latest_alpha_firmware">Последняя альфа</string>
@@ -1112,10 +1113,12 @@
     <string name="message_routing_error_timeout_detail">Подтверждение не было получено вовремя. Повтори попытку, когда улучшится сигнал или покрытие mesh-сети.</string>
     <string name="message_routing_error_too_large">Слишком большое сообщение для отправки</string>
     <string name="message_routing_error_too_large_detail">Сократи сообщение и отправь его снова.</string>
+    <string name="message_status_ack_proof_invalid">Сбой проверки доставки</string>
     <string name="message_status_delivered">Отправлено в сеть</string>
     <string name="message_status_enroute">Отправка...</string>
     <string name="message_status_queued">В очереди на отправку</string>
     <string name="message_status_recipient_delivered">Доставлено получателю</string>
+    <string name="message_status_recipient_delivered_proven">Доставлено получателю - доказано</string>
     <string name="message_status_relayed_not_confirmed">Передано, не подтверждено получателем</string>
     <string name="message_status_sfpp_confirmed">Подтверждено в цепочке SF++</string>
     <string name="message_status_sfpp_routing">Маршрутизация по SF++ цепочке…</string>
@@ -1156,6 +1159,8 @@
     <string name="mqtt_status_inactive">Неактивно</string>
     <string name="mqtt_status_reconnecting">Восстановление связи…</string>
     <string name="mqtt_status_reconnecting_with_attempt">Восстановление (попытка %1$d) — %2$s</string>
+    <string name="mqtt_status_topics_refused_all">Подключено, но брокер отклонил все темы: %1$s</string>
+    <string name="mqtt_status_topics_refused_some">Подключено, но брокер отказал %1$s</string>
     <string name="mqtt_test_connection">Проверить соединение</string>
     <string name="must_set_region">Вы должны задать регион!</string>
     <string name="must_update">Вам необходимо обновить данное приложение в магазине приложений (или с Github). Оно слишком старо для взаимодействия с прошивкой радиостанции. Пожалуйста, прочитайте нашу <a href="https://meshtastic.org/docs/software/android/installation">документацию</a> по этой теме.</string>
@@ -1333,7 +1338,6 @@
     <string name="packet_authenticity_balanced">Сбалансировано — предпочтительно аутентифицировать</string>
     <string name="packet_authenticity_balanced_summary">Рекомендуется. Отклонять неподписанные попытки понижения от нод, которые, как известно, подписывают.</string>
     <string name="packet_authenticity_compatible">Совместимо — принять не подписано</string>
-    <string name="packet_authenticity_compatible_summary">Аутентифицировать пакеты по возможности, но принимать неподписанный трафик для максимальной совместимости.</string>
     <string name="packet_authenticity_level">Уровень защиты</string>
     <string name="packet_authenticity_strict">Строгий — требуется аутентификация</string>
     <string name="packet_authenticity_strict_confirm">Включить строгий</string>
@@ -1390,6 +1394,12 @@
         <item quantity="few">%1$d часов</item>
         <item quantity="many">%1$d часа</item>
         <item quantity="other">%1$d часы</item>
+    </plurals>
+    <plurals name="plurals_milliseconds">
+        <item quantity="one">%1$d миллисекунда</item>
+        <item quantity="few">%1$d миллисекунды</item>
+        <item quantity="many">%1$d миллисекунд</item>
+        <item quantity="other">%1$d миллисекунд</item>
     </plurals>
     <plurals name="plurals_minutes">
         <item quantity="one">%1$d минута</item>
@@ -1588,6 +1598,12 @@
     <string name="secondary_no_telemetry">Нет периодической телеметрической передачи</string>
     <!-- SECURITY -->
     <string name="security">Безопасность</string>
+    <string name="security_ack_proof_failed">Сбой проверки доставки</string>
+    <string name="security_ack_proof_failed_info">Что-то признало это сообщение без ключа, только зацепки получателя.</string>
+    <string name="security_ack_proof_no_key">Доказательство доставки не проверено</string>
+    <string name="security_ack_proof_no_key_info">Доказательство доставки прибыло, но не было ключа для его проверки.</string>
+    <string name="security_ack_proof_verified">Доставка проверена</string>
+    <string name="security_ack_proof_verified_info">Упомянутая вами нода подтвердила, что она получил это сообщение.</string>
     <string name="security_icon_badge_warning_description">Предупреждающий Знак</string>
     <string name="security_icon_description">Статус безопасности</string>
     <string name="security_icon_help_dismiss">Отменить</string>
@@ -1626,6 +1642,8 @@
     <string name="set_up_connection">Настроить соединение</string>
     <string name="set_your_region">Установите ваш регион</string>
     <string name="settings">настройки</string>
+    <string name="settings_search_no_results">Нет настроек, соответствующих этой</string>
+    <string name="settings_search_placeholder">Настройки поиска</string>
     <!-- SHARE -->
     <string name="share">Поделиться</string>
     <string name="share_action">Поделиться ссылкой</string>
@@ -1839,6 +1857,7 @@
     <string name="udp_enabled">UDP трансляция</string>
     <string name="undo">Отменить</string>
     <string name="unit_dbm">дБм</string>
+    <string name="unit_khz">кГц</string>
     <string name="unit_meters">м</string>
     <!-- UNITS -->
     <string name="units">Единицы измерения</string>

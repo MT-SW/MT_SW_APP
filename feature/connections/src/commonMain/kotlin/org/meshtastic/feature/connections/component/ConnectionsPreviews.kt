@@ -162,6 +162,30 @@ fun TransportSelectorPreview() {
 
 @PreviewLightDark
 @Composable
+fun TransportSelectorNoBluetoothPreview() {
+    AppTheme {
+        Surface {
+            Box(modifier = Modifier.width(360.dp).padding(16.dp)) {
+                TransportSelector(activeTransport = DeviceType.TCP, onSelectTransport = {}, showBluetooth = false)
+            }
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun TransportSelectorNoUsbPreview() {
+    AppTheme {
+        Surface {
+            Box(modifier = Modifier.width(360.dp).padding(16.dp)) {
+                TransportSelector(activeTransport = DeviceType.BLE, onSelectTransport = {}, showUsb = false)
+            }
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
 private fun BluetoothPanePreview() {
     AppTheme {
         DeviceList(
@@ -257,6 +281,30 @@ private fun UsbPaneEmptyPreview() {
             onToggleNetworkScan = {},
             onAddManualAddress = { _, _ -> },
             onRemoveRecentAddress = {},
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun DemoModeSectionPreview() {
+    AppTheme {
+        DeviceList(
+            connectionState = ConnectionState.Disconnected,
+            selectedDevice = "",
+            bleDevices = emptyList(),
+            usbDevices = emptyList(),
+            discoveredTcpDevices = emptyList(),
+            recentTcpDevices = emptyList(),
+            isBleScanning = false,
+            isNetworkScanning = false,
+            activeTransport = DeviceType.TCP,
+            onSelectDevice = {},
+            onToggleBleScan = {},
+            onToggleNetworkScan = {},
+            onAddManualAddress = { _, _ -> },
+            onRemoveRecentAddress = {},
+            virtualDevices = listOf(DeviceListEntry.Mock("Demo Mode"), DeviceListEntry.Replay("Demo Mode (Replay)")),
         )
     }
 }

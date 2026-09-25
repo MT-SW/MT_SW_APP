@@ -633,10 +633,10 @@
     <string name="files_available">Files available (%1$d):</string>
     <!-- FILTER -->
     <string name="filter_add_placeholder">Add word or regex:pattern</string>
-    <string name="filter_disable_for_contact">Disable filtering</string>
-    <string name="filter_enable">Enable Filtering</string>
-    <string name="filter_enable_for_contact">Enable filtering</string>
-    <string name="filter_enable_summary">Hide messages containing filter words</string>
+    <string name="filter_disable_for_contact">Disable filter here</string>
+    <string name="filter_enable">Filter all conversations</string>
+    <string name="filter_enable_for_contact">Enable filter here</string>
+    <string name="filter_enable_summary">Hide messages containing filter words in every channel and DM. Turn it off for one conversation from its menu.</string>
     <string name="filter_hide_count">Hide %1$d filtered</string>
     <string name="filter_icon">Filter</string>
     <string name="filter_message_label">Filtered</string>
@@ -1194,10 +1194,12 @@
     <string name="message_split_incomplete">Incomplete message — missing %1$d of %2$d parts</string>
     <string name="message_split_pending">Will be sent as %1$d messages</string>
     <string name="message_split_receiving">Receiving… (%1$d/%2$d)</string>
+    <string name="message_status_ack_proof_invalid">Delivery proof failed</string>
     <string name="message_status_delivered">Delivered to mesh</string>
     <string name="message_status_enroute">Sending...</string>
     <string name="message_status_queued">Queued for sending</string>
     <string name="message_status_recipient_delivered">Delivered to recipient</string>
+    <string name="message_status_recipient_delivered_proven">Delivered to recipient · proven</string>
     <string name="message_status_relayed_not_confirmed">Relayed, not confirmed by recipient</string>
     <string name="message_status_sfpp_confirmed">Confirmed on SF++ chain</string>
     <string name="message_status_sfpp_routing">Routing via SF++ chainÔÇŽ</string>
@@ -1478,8 +1480,8 @@
     <string name="packet_authenticity">Packet authenticity</string>
     <string name="packet_authenticity_balanced">Balanced ÔÇö Prefer authenticated</string>
     <string name="packet_authenticity_balanced_summary">Recommended. Reject unsigned downgrade attempts from nodes known to sign.</string>
-    <string name="packet_authenticity_compatible">Compatible ÔÇö Accept unsigned</string>
-    <string name="packet_authenticity_compatible_summary">Authenticate packets when possible, but accept unsigned traffic for maximum compatibility.</string>
+    <string name="packet_authenticity_compatible">Compatible — Accept unsigned</string>
+    <string name="packet_authenticity_compatible_summary">Accept unsigned traffic for maximum compatibility. A signature that can be checked and is wrong still drops the packet.</string>
     <string name="packet_authenticity_level">Protection level</string>
     <string name="packet_authenticity_strict">Strict ÔÇö Require authentication</string>
     <string name="packet_authenticity_strict_confirm">Enable Strict</string>
@@ -1790,6 +1792,12 @@
     <string name="secondary_no_telemetry">No periodic telemetry broadcast</string>
     <!-- SECURITY -->
     <string name="security">Security</string>
+    <string name="security_ack_proof_failed">Delivery proof failed</string>
+    <string name="security_ack_proof_failed_info">Something acknowledged this message without the key only the recipient holds.</string>
+    <string name="security_ack_proof_no_key">Delivery proof unchecked</string>
+    <string name="security_ack_proof_no_key_info">A delivery proof arrived, but there was no key to check it against.</string>
+    <string name="security_ack_proof_verified">Delivery proven</string>
+    <string name="security_ack_proof_verified_info">The node you addressed proved it received this message.</string>
     <string name="security_icon_badge_warning_description">Warning Badge</string>
     <string name="security_icon_description">Security Status</string>
     <string name="security_icon_help_dismiss">Dismiss</string>

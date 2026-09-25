@@ -399,6 +399,7 @@ class MeshDataHandlerImpl(
             r.error_reason?.value ?: 0,
             dataPacket.relayNode,
             session,
+            ackProofStatus = packet.ack_proof_status.value,
         )
     }
 
@@ -409,16 +410,19 @@ class MeshDataHandlerImpl(
         routingError: Int,
         relayNode: Int?,
         session: RadioSessionContext,
+        ackProofStatus: Int = MeshPacket.AckProofStatus.ACK_PROOF_ABSENT.value,
     ) {
         radioInterfaceService.launchSessionWork(scope, session) {
             val isAck = routingError == Routing.Error.NONE.value
             // Wake up any generic sendAdminAndAwaitDelivery() waiter for this requestId (e.g. remote favorite/ignore
             // commands), independent of whether this ACK/NAK also corresponds to a stored message/reaction below.
             packetHandler.completeRoutingAck(requestId, isAck)
-            val packets =
-                packetRepository.value.findPacketsWithId(requestId).filter { it.status != MessageStatus.RECEIVED }
-            val reactions =
-                packetRepository.value.findReactionsWithId(requestId).filter { it.status != MessageStatus.RECEIVED }
+            val absentAckProof = MeshPacket.AckProofStatus.ACK_PROOF_ABSENT.value
+            val provenAckProof = MeshPacket.AckProofStatus.ACK_PROOF_VALID.value
+            val allPackets = packetRepository.value.findPacketsWithId(requestId)
+            val packets = allPackets.filter { it.status != MessageStatus.RECEIVED }
+            val allReactions = packetRepository.value.findReactionsWithId(requestId)
+            val reactions = allReactions.filter { it.status != MessageStatus.RECEIVED }
             val p = packets.filter { it.to == fromId }.singleOrNull() ?: packets.singleOrNull()
             val reaction = reactions.filter { it.to == fromId }.singleOrNull() ?: reactions.singleOrNull()
 
@@ -448,17 +452,39 @@ class MeshDataHandlerImpl(
                         relays = if (isAck) p.relays + 1 else p.relays,
                         relayNode = relayNode,
                         relayNodes = updatedRelayNodes,
+                        // Several acks can close out one packet, and only the addressed node's carries a proof. An
+                        // unproven later ack must not erase the verdict an earlier one established.
+                        ackProofStatus = ackProofStatus.takeIf { it != absentAckProof } ?: p.ackProofStatus,
                     )
                 packetRepository.value.update(updatedPacket, routingError = routingError)
+            } else if (p == null && ackProofStatus == provenAckProof) {
+                // A forged ack can arrive first and settle the packet as RECEIVED, which hides it from every later
+                // ack. Let the addressed node's proof still be recorded, without disturbing the settled status.
+                val settled = allPackets.filter { it.to == fromId }.singleOrNull() ?: allPackets.singleOrNull()
+                if (settled != null && settled.ackProofStatus != provenAckProof) {
+                    packetRepository.value.update(
+                        settled.copy(ackProofStatus = provenAckProof),
+                        routingError = routingError,
+                    )
+                }
             }
 
-            reaction?.let { r ->
-                if (r.status != MessageStatus.RECEIVED) {
-                    var updated = r.copy(status = m, routingError = routingError, relayNode = relayNode)
-                    if (isAck) {
-                        updated = updated.copy(relays = updated.relays + 1)
-                    }
-                    packetRepository.value.updateReaction(updated)
+            if (reaction != null) {
+                var updated =
+                    reaction.copy(
+                        status = m,
+                        routingError = routingError,
+                        relayNode = relayNode,
+                        ackProofStatus = ackProofStatus.takeIf { it != absentAckProof } ?: reaction.ackProofStatus,
+                    )
+                if (isAck) {
+                    updated = updated.copy(relays = updated.relays + 1)
+                }
+                packetRepository.value.updateReaction(updated)
+            } else if (ackProofStatus == provenAckProof) {
+                val settled = allReactions.filter { it.to == fromId }.singleOrNull() ?: allReactions.singleOrNull()
+                if (settled != null && settled.ackProofStatus != provenAckProof) {
+                    packetRepository.value.updateReaction(settled.copy(ackProofStatus = provenAckProof))
                 }
             }
             packetHandler.completeDispatchedResponse(requestId, complete = isAck)
@@ -641,6 +667,7 @@ class MeshDataHandlerImpl(
                     status = MessageStatus.RECEIVED,
                     to = toId,
                     channel = dataPacket.channel,
+                    xeddsaSigned = packet.xeddsa_signed,
                 )
 
             // Check for duplicates before inserting

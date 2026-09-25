@@ -74,6 +74,7 @@ data class PacketEntity(
             filtered = filtered,
             transportMechanism = data.transportMechanism,
             xeddsaSigned = data.xeddsaSigned,
+            ackProofStatus = data.ackProofStatus,
             translatedText = translatedText,
             showTranslated = showTranslated,
         )
@@ -218,6 +219,8 @@ data class ReactionEntity(
     @ColumnInfo(name = "to") val to: String? = null,
     @ColumnInfo(name = "channel", defaultValue = "0") val channel: Int = 0,
     @ColumnInfo(name = "sfpp_hash") val sfpp_hash: ByteString? = null,
+    @ColumnInfo(name = "xeddsa_signed", defaultValue = "0") val xeddsaSigned: Boolean = false,
+    @ColumnInfo(name = "ack_proof_status", defaultValue = "0") val ackProofStatus: Int = 0,
 )
 
 suspend fun ReactionEntity.toReaction(getNode: suspend (userId: String?) -> Node?): Reaction {
@@ -238,6 +241,8 @@ suspend fun ReactionEntity.toReaction(getNode: suspend (userId: String?) -> Node
         to = to,
         channel = channel,
         sfppHash = sfpp_hash,
+        xeddsaSigned = xeddsaSigned,
+        ackProofStatus = ackProofStatus,
     )
 }
 

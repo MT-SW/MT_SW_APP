@@ -586,10 +586,6 @@
     <string name="files_available">Saatavilla olevat tiedostot (%1$d):</string>
     <!-- FILTER -->
     <string name="filter_add_placeholder">Lisää sana tai regex-sääntö</string>
-    <string name="filter_disable_for_contact">Poista suodatus käytöstä</string>
-    <string name="filter_enable">Ota suodatus käyttöön</string>
-    <string name="filter_enable_for_contact">Ota suodatus käyttöön</string>
-    <string name="filter_enable_summary">Piilota suodatussanoja sisältävät viestit</string>
     <string name="filter_hide_count">Piilota %1$d suodatettu</string>
     <string name="filter_icon">Suodatus</string>
     <string name="filter_message_label">Suodatettu</string>
@@ -1265,7 +1261,6 @@
     <string name="packet_authenticity_balanced">Tasapainoinen – Suosi todennettuja paketteja</string>
     <string name="packet_authenticity_balanced_summary">Suositeltu. Hylkää allekirjoittamattomat tason alentamisyritykset radioilta, joiden tiedetään allekirjoittavan paketit.</string>
     <string name="packet_authenticity_compatible">Yhteensopiva – Hyväksy allekirjoittamattomat paketit</string>
-    <string name="packet_authenticity_compatible_summary">Todenna paketit aina kun mahdollista, mutta hyväksy myös allekirjoittamaton liikenne parhaan yhteensopivuuden varmistamiseksi.</string>
     <string name="packet_authenticity_level">Suojaustaso</string>
     <string name="packet_authenticity_strict">Tiukka – Vaadi pakettien todentamista</string>
     <string name="packet_authenticity_strict_confirm">Ota tiukka tila käyttöön</string>

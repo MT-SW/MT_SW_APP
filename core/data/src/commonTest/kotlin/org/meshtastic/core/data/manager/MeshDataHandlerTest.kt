@@ -41,6 +41,7 @@ import okio.ByteString.Companion.toByteString
 import org.meshtastic.core.common.di.asServiceScope
 import org.meshtastic.core.model.ContactSettings
 import org.meshtastic.core.model.DataPacket
+import org.meshtastic.core.model.MessageStatus
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.Reaction
@@ -719,12 +720,16 @@ class MeshDataHandlerTest {
 
     // --- Routing/ACK-NAK handling ---
 
-    private fun routingPacket(error: Routing.Error): MeshPacket {
+    private fun routingPacket(
+        error: Routing.Error,
+        ackProofStatus: MeshPacket.AckProofStatus = MeshPacket.AckProofStatus.ACK_PROOF_ABSENT,
+    ): MeshPacket {
         val routing = Routing.Builder().also { wb -> wb.error_reason = error }.build()
         val packet =
             MeshPacket.Builder()
                 .also { wb ->
                     wb.from = 456
+                    wb.ack_proof_status = ackProofStatus
                     wb.decoded =
                         Data.Builder()
                             .also { wb ->
@@ -752,6 +757,140 @@ class MeshDataHandlerTest {
         advanceUntilIdle()
 
         verifySuspend { packetHandler.completeDispatchedResponse(99, complete = true) }
+    }
+
+    private fun sentPacket(ackProofStatus: Int = 0) = DataPacket(
+        from = NodeAddress.ID_LOCAL,
+        to = "!remote",
+        bytes = byteArrayOf(1).toByteString(),
+        dataType = PortNum.TEXT_MESSAGE_APP.value,
+        id = 99,
+        status = MessageStatus.ENROUTE,
+        ackProofStatus = ackProofStatus,
+    )
+
+    @Test
+    fun `a proven ack records its verdict on the packet it acknowledges`() = testScope.runTest {
+        val updates = mutableListOf<DataPacket>()
+        everySuspend { packetRepository.findPacketsWithId(99) } returns listOf(sentPacket())
+        everySuspend { packetRepository.update(any(), any()) } calls { call -> updates.add(call.arg(0)) }
+
+        handler.handleReceivedData(
+            routingPacket(Routing.Error.NONE, MeshPacket.AckProofStatus.ACK_PROOF_VALID),
+            123,
+        )
+        advanceUntilIdle()
+
+        assertEquals(MeshPacket.AckProofStatus.ACK_PROOF_VALID.value, updates.single().ackProofStatus)
+    }
+
+    @Test
+    fun `a forged ack is recorded as invalid rather than as a plain delivery`() = testScope.runTest {
+        val updates = mutableListOf<DataPacket>()
+        everySuspend { packetRepository.findPacketsWithId(99) } returns listOf(sentPacket())
+        everySuspend { packetRepository.update(any(), any()) } calls { call -> updates.add(call.arg(0)) }
+
+        handler.handleReceivedData(
+            routingPacket(Routing.Error.NONE, MeshPacket.AckProofStatus.ACK_PROOF_INVALID),
+            123,
+        )
+        advanceUntilIdle()
+
+        assertEquals(MeshPacket.AckProofStatus.ACK_PROOF_INVALID.value, updates.single().ackProofStatus)
+    }
+
+    @Test
+    fun `an unproven ack does not erase a verdict an earlier ack established`() = testScope.runTest {
+        val updates = mutableListOf<DataPacket>()
+        val proven = MeshPacket.AckProofStatus.ACK_PROOF_VALID.value
+        everySuspend { packetRepository.findPacketsWithId(99) } returns listOf(sentPacket(proven))
+        everySuspend { packetRepository.update(any(), any()) } calls { call -> updates.add(call.arg(0)) }
+
+        handler.handleReceivedData(routingPacket(Routing.Error.NONE), 123)
+        advanceUntilIdle()
+
+        assertEquals(proven, updates.single().ackProofStatus)
+    }
+
+    @Test
+    fun `a genuine proof is still recorded after a forged ack has settled the packet`() = testScope.runTest {
+        val updates = mutableListOf<DataPacket>()
+        val forged =
+            sentPacket(MeshPacket.AckProofStatus.ACK_PROOF_INVALID.value).copy(status = MessageStatus.RECEIVED)
+        everySuspend { packetRepository.findPacketsWithId(99) } returns listOf(forged)
+        everySuspend { packetRepository.update(any(), any()) } calls { call -> updates.add(call.arg(0)) }
+
+        handler.handleReceivedData(
+            routingPacket(Routing.Error.NONE, MeshPacket.AckProofStatus.ACK_PROOF_VALID),
+            123,
+        )
+        advanceUntilIdle()
+
+        val updated = updates.single()
+        assertEquals(MeshPacket.AckProofStatus.ACK_PROOF_VALID.value, updated.ackProofStatus)
+        assertEquals(MessageStatus.RECEIVED, updated.status)
+    }
+
+    private fun sentReaction(ackProofStatus: Int = 0, status: MessageStatus = MessageStatus.ENROUTE) = Reaction(
+        replyId = 42,
+        user = User.Builder().also { wb -> wb.id = NodeAddress.ID_LOCAL }.build(),
+        emoji = "👍",
+        timestamp = 1000L,
+        snr = null,
+        rssi = null,
+        hopsAway = 0,
+        packetId = 99,
+        status = status,
+        to = "!remote",
+        ackProofStatus = ackProofStatus,
+    )
+
+    @Test
+    fun `a proven ack records its verdict on the reaction it acknowledges`() = testScope.runTest {
+        val updates = mutableListOf<Reaction>()
+        everySuspend { packetRepository.findReactionsWithId(99) } returns listOf(sentReaction())
+        everySuspend { packetRepository.updateReaction(any()) } calls { call -> updates.add(call.arg(0)) }
+
+        handler.handleReceivedData(
+            routingPacket(Routing.Error.NONE, MeshPacket.AckProofStatus.ACK_PROOF_VALID),
+            123,
+        )
+        advanceUntilIdle()
+
+        val updated = updates.single()
+        assertEquals(MeshPacket.AckProofStatus.ACK_PROOF_VALID.value, updated.ackProofStatus)
+        assertEquals(MessageStatus.RECEIVED, updated.status)
+    }
+
+    @Test
+    fun `an unproven ack does not erase a verdict an earlier ack established on a reaction`() = testScope.runTest {
+        val updates = mutableListOf<Reaction>()
+        val proven = MeshPacket.AckProofStatus.ACK_PROOF_VALID.value
+        everySuspend { packetRepository.findReactionsWithId(99) } returns listOf(sentReaction(proven))
+        everySuspend { packetRepository.updateReaction(any()) } calls { call -> updates.add(call.arg(0)) }
+
+        handler.handleReceivedData(routingPacket(Routing.Error.NONE), 123)
+        advanceUntilIdle()
+
+        assertEquals(proven, updates.single().ackProofStatus)
+    }
+
+    @Test
+    fun `a genuine proof is still recorded after a forged ack has settled the reaction`() = testScope.runTest {
+        val updates = mutableListOf<Reaction>()
+        val forged = sentReaction(MeshPacket.AckProofStatus.ACK_PROOF_INVALID.value, MessageStatus.RECEIVED)
+        everySuspend { packetRepository.findReactionsWithId(99) } returns listOf(forged)
+        everySuspend { packetRepository.updateReaction(any()) } calls { call -> updates.add(call.arg(0)) }
+
+        handler.handleReceivedData(
+            routingPacket(Routing.Error.NONE, MeshPacket.AckProofStatus.ACK_PROOF_VALID),
+            123,
+        )
+        advanceUntilIdle()
+
+        val updated = updates.single()
+        assertEquals(MeshPacket.AckProofStatus.ACK_PROOF_VALID.value, updated.ackProofStatus)
+        assertEquals(MessageStatus.RECEIVED, updated.status)
     }
 
     @Test
@@ -1131,6 +1270,51 @@ class MeshDataHandlerTest {
         advanceUntilIdle()
 
         verifySuspend { packetRepository.insertReaction(any(), 123) }
+    }
+
+    @Test
+    fun `a signed broadcast reaction is persisted as signed`() = testScope.runTest {
+        val emojiBytes = "👍".encodeToByteArray()
+        val packet =
+            MeshPacket.Builder()
+                .also { wb ->
+                    wb.id = 99
+                    wb.from = 456
+                    wb.to = NodeAddress.NODENUM_BROADCAST
+                    wb.xeddsa_signed = true
+                    wb.decoded =
+                        Data.Builder()
+                            .also { wb ->
+                                wb.portnum = PortNum.TEXT_MESSAGE_APP
+                                wb.payload = emojiBytes.toByteString()
+                                wb.reply_id = 42
+                                wb.emoji = 1
+                            }
+                            .build()
+                }
+                .build()
+        var persistedReaction: Reaction? = null
+        every { dataMapper.toDataPacket(packet) } returns
+            DataPacket(
+                id = 99,
+                from = "!remote",
+                to = NodeAddress.ID_BROADCAST,
+                bytes = emojiBytes.toByteString(),
+                dataType = PortNum.TEXT_MESSAGE_APP.value,
+                xeddsaSigned = true,
+            )
+        every { nodeManager.toNodeID(456) } returns "!remote"
+        every { nodeManager.myNodeNum } returns MutableStateFlow(123)
+        everySuspend { packetRepository.findReactionsWithId(99) } returns emptyList()
+        everySuspend { packetRepository.insertReaction(any(), 123) } calls
+            {
+                persistedReaction = it.args[0] as Reaction
+            }
+
+        handler.handleReceivedData(packet, 123)
+        advanceUntilIdle()
+
+        assertEquals(true, assertNotNull(persistedReaction).xeddsaSigned)
     }
 
     @Test

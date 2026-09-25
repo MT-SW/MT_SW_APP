@@ -56,6 +56,7 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import org.meshtastic.core.common.gpsDisabled
+import org.meshtastic.core.common.hasBluetoothLe
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.common.util.ioDispatcher
 import java.net.URLEncoder
@@ -292,6 +293,12 @@ actual val bleScanRequiresLocationServices: Boolean =
     android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.S
 
 actual val isDesktopPlatform: Boolean = false
+
+@Composable
+actual fun isBluetoothSupported(): Boolean {
+    val context = LocalContext.current
+    return remember(context) { context.hasBluetoothLe() }
+}
 
 @Composable
 actual fun isBluetoothDisabled(): Boolean {

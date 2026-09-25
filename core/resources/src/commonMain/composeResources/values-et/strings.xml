@@ -574,10 +574,6 @@
     <string name="files_available">Saadaval failid (%1$d):</string>
     <!-- FILTER -->
     <string name="filter_add_placeholder">Lisa sõna või regulaaravaldise:muster</string>
-    <string name="filter_disable_for_contact">Keela filtreerimine</string>
-    <string name="filter_enable">Luba filtreerimine</string>
-    <string name="filter_enable_for_contact">Luba filtreerimine</string>
-    <string name="filter_enable_summary">Peida filtrisõnu sisaldavad sõnumid</string>
     <string name="filter_hide_count">Peida %1$d filtreeritud</string>
     <string name="filter_icon">Filtreeri</string>
     <string name="filter_message_label">Filtreeritud</string>
@@ -1229,7 +1225,6 @@
     <string name="packet_authenticity_balanced">Tasakaalustatud — eelista autentitud</string>
     <string name="packet_authenticity_balanced_summary">Soovitatav. Keeldu allkirjastamata madalamale versioonile ülemineku katsetest sõlmedelt, mis teadaolevalt allkirjastavad.</string>
     <string name="packet_authenticity_compatible">Ühildub – aktsepteeri allkirjastamata</string>
-    <string name="packet_authenticity_compatible_summary">Autentige pakette võimaluse korral, kuid maksimaalse ühilduvuse tagamiseks aktsepteerige allkirjastamata liiklust.</string>
     <string name="packet_authenticity_level">Kaitsetase</string>
     <string name="packet_authenticity_strict">Range – nõuab autentimist</string>
     <string name="packet_authenticity_strict_confirm">Luba range</string>

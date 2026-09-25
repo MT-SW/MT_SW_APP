@@ -140,7 +140,7 @@ open class KableBleScanner(private val loggingConfig: BleLoggingConfig) : BleSca
                     // typed, non-reported BleScanStartException instead.
                     throw ex.asBleScanStartException()
                 } catch (ex: IllegalStateException) {
-                    throw ex.asBleScanStartExceptionOrNull() ?: ex
+                    throw ex.asBleScanStartExceptionOrNull() ?: ex.asBluetoothUnsupportedExceptionOrNull() ?: ex
                 }
             }
         }

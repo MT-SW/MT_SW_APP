@@ -42,14 +42,18 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import org.meshtastic.core.ble.BleConnectionFactory
+import org.meshtastic.core.ble.BleScanner
 import org.meshtastic.core.common.state.RadioOperationLock
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
+import org.meshtastic.core.network.radio.BaseRadioTransportFactory
 import org.meshtastic.core.network.repository.NetworkRepository
 import org.meshtastic.core.network.repository.SerialDevicePresence
 import org.meshtastic.core.repository.PlatformAnalytics
 import org.meshtastic.core.repository.RadioInterfaceService
+import org.meshtastic.core.repository.RadioPrefs
 import org.meshtastic.core.repository.RadioTransport
 import org.meshtastic.core.repository.RadioTransportFactory
 import org.meshtastic.core.repository.TransportDisconnectReason
@@ -284,6 +288,7 @@ class SharedRadioInterfaceServiceLivenessTest {
         transportProvider: () -> RadioTransport = { FakeRadioTransport().also { createdTransports.add(it) } },
         networkAvailability: MutableStateFlow<Boolean> = MutableStateFlow(true),
         startConnected: Boolean = true,
+        radioPrefs: RadioPrefs = this.radioPrefs,
     ): SharedRadioInterfaceService {
         every { networkRepository.networkAvailable } returns networkAvailability
         every { networkRepository.resolvedList } returns MutableSharedFlow()
@@ -386,6 +391,121 @@ class SharedRadioInterfaceServiceLivenessTest {
                 service.disconnect()
             }
         }
+
+    /**
+     * The path `MeshServiceOrchestrator.coldStartConnect` takes with a persisted `x` address restored from a backup.
+     */
+    @Test
+    fun `cold start with a saved BLE address arms no transport on hardware without Bluetooth`() =
+        runTest(testDispatcher) {
+            bluetoothRepository.isSupported = false
+            every { networkRepository.networkAvailable } returns MutableStateFlow(true)
+            every { networkRepository.resolvedList } returns MutableSharedFlow()
+            every { analytics.isPlatformServicesAvailable } returns false
+            val requestedTransports = mutableListOf<String>()
+            val realFactory =
+                object :
+                    BaseRadioTransportFactory(
+                        scanner = mock<BleScanner>(MockMode.autofill),
+                        bluetoothRepository = bluetoothRepository,
+                        connectionFactory = mock<BleConnectionFactory>(MockMode.autofill),
+                        dispatchers = dispatchers,
+                    ) {
+                    override val supportedDeviceTypes: List<DeviceType> = listOf(DeviceType.TCP)
+
+                    override val mockTransportEnabled: StateFlow<Boolean> = MutableStateFlow(false)
+
+                    override val isReplayTransportAvailable: Boolean = false
+
+                    override fun createTransport(address: String, service: RadioInterfaceService): RadioTransport {
+                        requestedTransports += address
+                        return super.createTransport(address, service)
+                    }
+
+                    override fun createPlatformTransport(address: String, service: RadioInterfaceService) =
+                        FakeRadioTransport()
+                }
+            val savedAddress = "xAA:BB:CC:DD:EE:FF"
+            radioPrefs.setDevAddr(savedAddress)
+            bluetoothRepository.setBluetoothEnabled(false)
+            val service =
+                SharedRadioInterfaceService(
+                    dispatchers = dispatchers,
+                    bluetoothRepository = bluetoothRepository,
+                    networkRepository = networkRepository,
+                    serialDevicePresence = serialDevicePresence,
+                    processLifecycle = processLifecycleOwner.lifecycle,
+                    radioPrefs = radioPrefs,
+                    transportFactory = realFactory,
+                    analytics = analytics,
+                    radioOperationLock = radioOperationLock,
+                )
+            try {
+                service.connect()
+                // A Bluetooth-state recovery must not arm it either.
+                bluetoothRepository.setBluetoothEnabled(true)
+
+                assertTrue(requestedTransports.isEmpty(), "no transport may be built for an unusable BLE address")
+                assertNull(service.activeSession.value)
+                assertEquals(ConnectionState.Disconnected, service.connectionState.value)
+                assertEquals(savedAddress, radioPrefs.devAddr.value, "the saved address is kept, not cleared")
+            } finally {
+                service.disconnect()
+            }
+        }
+
+    /** Persists like DataStore: a write lands only when the test commits it, in order. */
+    private class DeferredRadioPrefs(saved: String?) : RadioPrefs {
+        override val devAddr = MutableStateFlow(saved)
+        override val devName = MutableStateFlow<String?>(null)
+        private val pending = ArrayDeque<String?>()
+
+        override fun setDevAddr(address: String?) {
+            pending.addLast(address)
+        }
+
+        override fun setDevName(name: String?) {
+            devName.value = name
+        }
+
+        fun commitThrough(address: String) {
+            do {
+                val next = pending.removeFirst()
+                devAddr.value = next
+            } while (next != address)
+        }
+    }
+
+    @Test
+    fun `a late commit of an older selection does not rewind the selected address`() = runTest(testDispatcher) {
+        val prefs = DeferredRadioPrefs(saved = "xAA:AA:AA:AA:AA:AA")
+        val service = createConnectedService("xAA:AA:AA:AA:AA:AA", startConnected = false, radioPrefs = prefs)
+        try {
+            service.setDeviceAddress("xBB:BB:BB:BB:BB:BB")
+            service.setDeviceAddress("xCC:CC:CC:CC:CC:CC")
+
+            prefs.commitThrough("xBB:BB:BB:BB:BB:BB")
+            testDispatcher.scheduler.runCurrent()
+
+            assertEquals("xCC:CC:CC:CC:CC:CC", service.currentDeviceAddressFlow.value)
+        } finally {
+            service.disconnect()
+        }
+    }
+
+    @Test
+    fun `the saved address still reaches the flow when it loads after construction`() = runTest(testDispatcher) {
+        val prefs = DeferredRadioPrefs(saved = null)
+        val service = createConnectedService("xAA:AA:AA:AA:AA:AA", startConnected = false, radioPrefs = prefs)
+        try {
+            prefs.devAddr.value = "xAA:AA:AA:AA:AA:AA"
+            testDispatcher.scheduler.runCurrent()
+
+            assertEquals("xAA:AA:AA:AA:AA:AA", service.currentDeviceAddressFlow.value)
+        } finally {
+            service.disconnect()
+        }
+    }
 
     @Test
     fun `setDeviceAddress contains factory failure and same-address repair can retry`() = runTest(testDispatcher) {
@@ -576,6 +696,28 @@ class SharedRadioInterfaceServiceLivenessTest {
             assertEquals(2, createdTransports.size, "Liveness restart should create exactly one fresh transport")
             assertTrue(createdTransports.first().closeCalled, "Old transport must be closed")
             assertEquals(1, createdTransports.first().closeCount, "Old transport closed exactly once")
+        } finally {
+            service.disconnect()
+            advanceTimeBy(1_000L)
+        }
+    }
+
+    @Test
+    fun `BLE liveness timeout restarts a transport saved with the legacy bang prefix`() = runTest(testDispatcher) {
+        clock = 0L
+        val service = createConnectedService("!AA:BB:CC:DD:EE:FF")
+        try {
+            clock = 65_000L
+            service.checkLiveness()
+            testDispatcher.scheduler.runCurrent()
+            advanceTimeBy(1_000L)
+
+            assertEquals(
+                2,
+                createdTransports.size,
+                "A silent legacy BLE link should be restarted like any BLE link",
+            )
+            assertTrue(createdTransports.first().closeCalled, "Old transport must be closed")
         } finally {
             service.disconnect()
             advanceTimeBy(1_000L)

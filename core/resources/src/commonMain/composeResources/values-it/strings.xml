@@ -535,10 +535,6 @@
     <string name="files_available">File disponibili (%1$d):</string>
     <!-- FILTER -->
     <string name="filter_add_placeholder">Aggiungi parola o regex:pattern</string>
-    <string name="filter_disable_for_contact">Disabilita filtro</string>
-    <string name="filter_enable">Abilita Filtro</string>
-    <string name="filter_enable_for_contact">Abilita filtro</string>
-    <string name="filter_enable_summary">Nascondi messaggi contenenti parole del filtro</string>
     <string name="filter_hide_count">Nascondi %1$d filtrati</string>
     <string name="filter_icon">Filtro</string>
     <string name="filter_message_label">Filtrato</string>
@@ -1107,7 +1103,6 @@
     <string name="packet_authenticity_balanced">Bilanciato — Preferisci autenticati</string>
     <string name="packet_authenticity_balanced_summary">Consigliato. Rifiuta i tentativi di downgrade non firmati provenienti da nodi noti per firmare.</string>
     <string name="packet_authenticity_compatible">Compatibile — Accetta non firmati</string>
-    <string name="packet_authenticity_compatible_summary">Autentica i pacchetti quando possibile, ma accetta traffico non firmato per la massima compatibilità.</string>
     <string name="packet_authenticity_level">Livello di protezione</string>
     <string name="packet_authenticity_strict">Rigoroso — Richiedi l'autenticazione</string>
     <string name="packet_authenticity_strict_confirm">Attiva Rigoroso</string>

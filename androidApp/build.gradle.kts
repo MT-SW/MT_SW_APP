@@ -197,8 +197,6 @@ secrets {
     propertiesFileName = "secrets.properties"
 }
 
-ksp { arg("appfunctions:aggregateAppFunctions", "true") }
-
 androidComponents {
     onVariants(selector().withBuildType("debug")) { variant ->
         variant.flavorName?.let { flavor -> variant.applicationId.set("pl.sw.mt.$flavor.debug") }

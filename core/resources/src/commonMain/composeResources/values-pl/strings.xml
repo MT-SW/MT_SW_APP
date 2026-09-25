@@ -1276,10 +1276,12 @@
     <string name="message_split_incomplete">Niekompletna wiadomość — brakuje %1$d z %2$d części</string>
     <string name="message_split_pending">Zostanie wysłana jako %1$d wiadomości</string>
     <string name="message_split_receiving">Odbieranie… (%1$d/%2$d)</string>
+    <string name="message_status_ack_proof_invalid">Dowód doręczenia nieprawidłowy</string>
     <string name="message_status_delivered">Dostarczono do sieci mesh</string>
     <string name="message_status_enroute">Wysyłanie...</string>
     <string name="message_status_queued">Zakolejkowane do wysłania</string>
     <string name="message_status_recipient_delivered">Dostarczono do odbiorcy</string>
+    <string name="message_status_recipient_delivered_proven">Dostarczono do odbiorcy · potwierdzone</string>
     <string name="message_status_relayed_not_confirmed">Przekazane, niepotwierdzone przez odbiorcę</string>
     <string name="message_status_sfpp_confirmed">Potwierdzone w łańcuchu SF++</string>
     <string name="message_status_sfpp_routing">Trasowanie przez łańcuch SF++…</string>
@@ -1932,6 +1934,12 @@
     <string name="secondary_no_telemetry">Brak okresowego nadawania telemetrii</string>
     <!-- SECURITY -->
     <string name="security">Bezpieczeństwo</string>
+    <string name="security_ack_proof_failed">Dowód doręczenia nieprawidłowy</string>
+    <string name="security_ack_proof_failed_info">Coś potwierdziło tę wiadomość bez klucza, który posiada tylko odbiorca.</string>
+    <string name="security_ack_proof_no_key">Dowód doręczenia niesprawdzony</string>
+    <string name="security_ack_proof_no_key_info">Dowód doręczenia dotarł, ale nie było klucza, względem którego można by go sprawdzić.</string>
+    <string name="security_ack_proof_verified">Doręczenie potwierdzone</string>
+    <string name="security_ack_proof_verified_info">Węzeł, do którego wysłano wiadomość, potwierdził jej odebranie.</string>
     <string name="security_icon_badge_warning_description">Odznaka ostrzeżenia</string>
     <string name="security_icon_description">Status bezpieczeństwa</string>
     <string name="security_icon_help_dismiss">Zamknij</string>
