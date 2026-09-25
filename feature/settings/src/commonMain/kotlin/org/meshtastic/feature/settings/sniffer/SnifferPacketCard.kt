@@ -29,8 +29,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -59,52 +57,44 @@ import org.meshtastic.core.resources.sniffer_category_text_message
 import org.meshtastic.core.resources.sniffer_category_traceroute
 import org.meshtastic.core.resources.sniffer_category_unknown
 import org.meshtastic.core.resources.sniffer_category_waypoint
-import org.meshtastic.core.resources.sniffer_chip_hops
-import org.meshtastic.core.resources.sniffer_chip_received
-import org.meshtastic.core.resources.sniffer_chip_source_count
 import org.meshtastic.core.resources.sniffer_content_title
-import org.meshtastic.core.resources.sniffer_packet_metadata_channel
-import org.meshtastic.core.resources.sniffer_packet_metadata_id
 import org.meshtastic.core.resources.sniffer_packet_metadata_title
-import org.meshtastic.core.resources.sniffer_receipt_direct
 import org.meshtastic.core.resources.sniffer_receipts_title
-import org.meshtastic.core.resources.sniffer_source_mqtt_chip
-import org.meshtastic.core.resources.sniffer_source_radio_chip
 import org.meshtastic.core.resources.sniffer_summary_neighbor_count
 import org.meshtastic.core.resources.sniffer_summary_nodeinfo_unknown
 import org.meshtastic.core.resources.sniffer_summary_position_unknown
 import org.meshtastic.core.resources.sniffer_summary_telemetry_unknown
 import org.meshtastic.core.ui.component.CopyIconButton
-import org.meshtastic.feature.settings.sniffer.mqtt.GroupedMqttSniffedPacket
 import org.meshtastic.feature.settings.util.PacketSummary
 import org.meshtastic.proto.PortNum
 
 /**
- * The Sniffer Log's per-packet card, for both the Radio ([GroupedRadioPacketCard]) and MQTT
- * ([GroupedMqttPacketCard]) sources. Split out of SnifferPanelComponents.kt because the cards' own rendering logic
- * (category colors/labels, the summary line, the expandable receipts list) is a self-contained concern distinct from
- * that file's gear-menu/settings composables.
+ * The Sniffer Log's per-packet card, for both the Radio ([GroupedRadioPacketCard]) and MQTT ([GroupedMqttPacketCard])
+ * sources. Split out of SnifferPanelComponents.kt because the cards' own rendering logic (category colors/labels, the
+ * summary line, the expandable receipts list) is a self-contained concern distinct from that file's gear-menu/settings
+ * composables.
  */
 @Composable
 // A lookup table of fixed category colors -- named constants would be noisier here than the literals.
 @Suppress("MagicNumber")
-internal fun packetCategoryColor(portNum: Int?, isEncrypted: Boolean): Color = when {
-    isEncrypted -> Color(0xFF9E9E9E)
-    portNum == PortNum.POSITION_APP.value -> Color(0xFF4CAF50)
-    portNum == PortNum.NODEINFO_APP.value -> Color(0xFF9C27B0)
-    portNum == PortNum.NEIGHBORINFO_APP.value -> Color(0xFF00BCD4)
-    portNum == PortNum.TELEMETRY_APP.value -> Color(0xFFFF9800)
-    portNum == PortNum.TEXT_MESSAGE_APP.value -> Color(0xFF2196F3)
-    portNum == PortNum.ALERT_APP.value -> Color(0xFFF44336)
-    portNum == PortNum.TRACEROUTE_APP.value -> Color(0xFFFFC107)
-    portNum == PortNum.ROUTING_APP.value -> Color(0xFF607D8B)
-    portNum == PortNum.ADMIN_APP.value -> Color(0xFFFF5722)
-    portNum == PortNum.WAYPOINT_APP.value -> Color(0xFF8BC34A)
-    portNum == PortNum.PAXCOUNTER_APP.value -> Color(0xFF795548)
-    portNum == PortNum.STORE_FORWARD_APP.value -> Color(0xFF3F51B5)
-    portNum == PortNum.STORE_FORWARD_PLUSPLUS_APP.value -> Color(0xFF3F51B5)
-    else -> Color(0xFF757575)
-}
+internal fun packetCategoryColor(portNum: Int?, isEncrypted: Boolean): Color =
+    when {
+        isEncrypted -> Color(0xFF9E9E9E)
+        portNum == PortNum.POSITION_APP.value -> Color(0xFF4CAF50)
+        portNum == PortNum.NODEINFO_APP.value -> Color(0xFF9C27B0)
+        portNum == PortNum.NEIGHBORINFO_APP.value -> Color(0xFF00BCD4)
+        portNum == PortNum.TELEMETRY_APP.value -> Color(0xFFFF9800)
+        portNum == PortNum.TEXT_MESSAGE_APP.value -> Color(0xFF2196F3)
+        portNum == PortNum.ALERT_APP.value -> Color(0xFFF44336)
+        portNum == PortNum.TRACEROUTE_APP.value -> Color(0xFFFFC107)
+        portNum == PortNum.ROUTING_APP.value -> Color(0xFF607D8B)
+        portNum == PortNum.ADMIN_APP.value -> Color(0xFFFF5722)
+        portNum == PortNum.WAYPOINT_APP.value -> Color(0xFF8BC34A)
+        portNum == PortNum.PAXCOUNTER_APP.value -> Color(0xFF795548)
+        portNum == PortNum.STORE_FORWARD_APP.value -> Color(0xFF3F51B5)
+        portNum == PortNum.STORE_FORWARD_PLUSPLUS_APP.value -> Color(0xFF3F51B5)
+        else -> Color(0xFF757575)
+    }
 
 @Composable
 internal fun packetCategoryLabel(portNum: Int?, isEncrypted: Boolean): String = when {
@@ -143,19 +133,18 @@ internal fun PacketSummary.render(): String? = when (this) {
         }
 
     is PacketSummary.NodeInfoSummary ->
-        listOfNotNull(longName, shortName?.let { "($it)" })
-            .joinToString(" ")
-            .ifBlank { stringResource(Res.string.sniffer_summary_nodeinfo_unknown) }
+        listOfNotNull(longName, shortName?.let { "($it)" }).joinToString(" ").ifBlank {
+            stringResource(Res.string.sniffer_summary_nodeinfo_unknown)
+        }
 
     is PacketSummary.TelemetrySummary -> {
-        val parts =
-            buildList {
-                temperatureCelsius?.let { add(MetricFormatter.temperature(it, isFahrenheit = false)) }
-                humidityPercent?.let { add(MetricFormatter.humidity(it)) }
-                pressureHpa?.let { add(MetricFormatter.pressure(it)) }
-                voltage?.let { add(MetricFormatter.voltage(it)) }
-                batteryPercent?.let { add(MetricFormatter.percent(it)) }
-            }
+        val parts = buildList {
+            temperatureCelsius?.let { add(MetricFormatter.temperature(it, isFahrenheit = false)) }
+            humidityPercent?.let { add(MetricFormatter.humidity(it)) }
+            pressureHpa?.let { add(MetricFormatter.pressure(it)) }
+            voltage?.let { add(MetricFormatter.voltage(it)) }
+            batteryPercent?.let { add(MetricFormatter.percent(it)) }
+        }
         parts.joinToString(" • ").ifBlank { stringResource(Res.string.sniffer_summary_telemetry_unknown) }
     }
 
@@ -206,10 +195,7 @@ internal fun PacketCardShell(
 ) {
     Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
         Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
-            Box(
-                modifier =
-                Modifier.width(4.dp).fillMaxHeight().background(packetCategoryColor(portNum, isEncrypted)),
-            )
+            Box(modifier = Modifier.width(4.dp).fillMaxHeight().background(packetCategoryColor(portNum, isEncrypted)))
             Column(
                 modifier = Modifier.weight(1f).padding(12.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -226,7 +212,8 @@ internal fun PacketCardHeader(label: String, color: Color, receivedAtMillis: Lon
         Text(text = label, style = MaterialTheme.typography.labelLarge, color = color)
         Text(
             text =
-            "${DateFormatter.formatDate(receivedAtMillis)} " + DateFormatter.formatTimeWithSeconds(receivedAtMillis),
+            "${DateFormatter.formatDate(receivedAtMillis)} " +
+                DateFormatter.formatTimeWithSeconds(receivedAtMillis),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -244,38 +231,40 @@ internal fun PacketExpandedDetails(
     metadataLines: List<String>,
     copyText: String,
 ) {
-    if (receipts.size > 1) {
-        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-        Text(
-            text = stringResource(Res.string.sniffer_receipts_title, receipts.size),
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        val firstAt = receipts.minOf { it.receivedAtMillis }
-        receipts.forEach { receipt ->
-            ReceiptRow(
-                label = receipt.label,
-                snr = receipt.snr,
-                rssi = receipt.rssi,
-                timeLabel = formatReceiptTime(receipt.receivedAtMillis, firstAt),
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        if (receipts.size > 1) {
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+            Text(
+                text = stringResource(Res.string.sniffer_receipts_title, receipts.size),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            val firstAt = receipts.minOf { it.receivedAtMillis }
+            receipts.forEach { receipt ->
+                ReceiptRow(
+                    label = receipt.label,
+                    snr = receipt.snr,
+                    rssi = receipt.rssi,
+                    timeLabel = formatReceiptTime(receipt.receivedAtMillis, firstAt),
+                )
+            }
         }
-    }
-    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-    Text(
-        text = stringResource(Res.string.sniffer_content_title),
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
-    Text(text = decodedText, style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace))
-    if (metadataLines.isNotEmpty()) {
         HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         Text(
-            text = stringResource(Res.string.sniffer_packet_metadata_title),
+            text = stringResource(Res.string.sniffer_content_title),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        metadataLines.forEach { line -> Text(text = line, style = MaterialTheme.typography.bodySmall) }
+        Text(text = decodedText, style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace))
+        if (metadataLines.isNotEmpty()) {
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+            Text(
+                text = stringResource(Res.string.sniffer_packet_metadata_title),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            metadataLines.forEach { line -> Text(text = line, style = MaterialTheme.typography.bodySmall) }
+        }
+        CopyIconButton(valueToCopy = copyText, modifier = Modifier.padding(top = 4.dp))
     }
-    CopyIconButton(valueToCopy = copyText, modifier = Modifier.padding(top = 4.dp))
 }

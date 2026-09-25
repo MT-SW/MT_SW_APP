@@ -147,15 +147,12 @@ internal fun GroupedRadioPacketCard(
         RadioChipsRow(grouped, onClick)
         if (isExpanded) {
             val directLabel = stringResource(Res.string.sniffer_receipt_direct)
-            val metadataLines =
-                buildList {
-                    add(stringResource(Res.string.sniffer_packet_metadata_channel, packet.channel))
-                    packet.packetId?.let { add(stringResource(Res.string.sniffer_packet_metadata_id, it.toString())) }
-                }
+            val metadataLines = buildList {
+                add(stringResource(Res.string.sniffer_packet_metadata_channel, packet.channel))
+                packet.packetId?.let { add(stringResource(Res.string.sniffer_packet_metadata_id, it.toString())) }
+            }
             val receipts =
-                grouped.receipts.map {
-                    DisplayReceipt(it.relayId ?: directLabel, it.snr, it.rssi, it.receivedAtMillis)
-                }
+                grouped.receipts.map { DisplayReceipt(it.relayId ?: directLabel, it.snr, it.rssi, it.receivedAtMillis) }
             PacketExpandedDetails(
                 receipts = receipts,
                 decodedText = if (decryptPayloads) packet.decodedPayload ?: packet.payloadHex else packet.payloadHex,

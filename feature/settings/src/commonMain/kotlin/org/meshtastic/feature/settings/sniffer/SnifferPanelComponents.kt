@@ -18,25 +18,13 @@
 
 package org.meshtastic.feature.settings.sniffer
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -53,13 +41,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import org.meshtastic.core.common.util.DateFormatter
-import org.meshtastic.core.common.util.MetricFormatter
-import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.datastore.SnifferBufferOverflowPolicy
 import org.meshtastic.core.datastore.SnifferLogFormat
 import org.meshtastic.core.datastore.SnifferSource
@@ -67,25 +50,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.mqtt_sniffer_log_empty
 import org.meshtastic.core.resources.save_log_to_file
 import org.meshtastic.core.resources.sniffer_auto_scroll
-import org.meshtastic.core.resources.sniffer_category_admin
-import org.meshtastic.core.resources.sniffer_category_alert
-import org.meshtastic.core.resources.sniffer_category_encrypted
-import org.meshtastic.core.resources.sniffer_category_neighborinfo
-import org.meshtastic.core.resources.sniffer_category_nodeinfo
-import org.meshtastic.core.resources.sniffer_category_paxcounter
-import org.meshtastic.core.resources.sniffer_category_position
-import org.meshtastic.core.resources.sniffer_category_routing
-import org.meshtastic.core.resources.sniffer_category_storeforward
-import org.meshtastic.core.resources.sniffer_category_telemetry
-import org.meshtastic.core.resources.sniffer_category_text_message
-import org.meshtastic.core.resources.sniffer_category_traceroute
-import org.meshtastic.core.resources.sniffer_category_unknown
-import org.meshtastic.core.resources.sniffer_category_waypoint
-import org.meshtastic.core.resources.sniffer_chip_hops
-import org.meshtastic.core.resources.sniffer_chip_received
-import org.meshtastic.core.resources.sniffer_chip_source_count
 import org.meshtastic.core.resources.sniffer_clear_log
-import org.meshtastic.core.resources.sniffer_content_title
 import org.meshtastic.core.resources.sniffer_decrypt_payloads_summary
 import org.meshtastic.core.resources.sniffer_decrypt_payloads_title
 import org.meshtastic.core.resources.sniffer_export_format_csv
@@ -100,24 +65,12 @@ import org.meshtastic.core.resources.sniffer_load_log_title
 import org.meshtastic.core.resources.sniffer_log_empty
 import org.meshtastic.core.resources.sniffer_mqtt_section_title
 import org.meshtastic.core.resources.sniffer_not_supported_summary
-import org.meshtastic.core.resources.sniffer_packet_metadata_channel
-import org.meshtastic.core.resources.sniffer_packet_metadata_id
-import org.meshtastic.core.resources.sniffer_packet_metadata_title
 import org.meshtastic.core.resources.sniffer_panel_off_summary
 import org.meshtastic.core.resources.sniffer_radio_section_title
-import org.meshtastic.core.resources.sniffer_receipt_direct
-import org.meshtastic.core.resources.sniffer_receipts_title
-import org.meshtastic.core.resources.sniffer_source_mqtt_chip
 import org.meshtastic.core.resources.sniffer_source_mqtt_unavailable_summary
 import org.meshtastic.core.resources.sniffer_source_off
-import org.meshtastic.core.resources.sniffer_source_radio_chip
 import org.meshtastic.core.resources.sniffer_source_title
-import org.meshtastic.core.resources.sniffer_summary_neighbor_count
-import org.meshtastic.core.resources.sniffer_summary_nodeinfo_unknown
-import org.meshtastic.core.resources.sniffer_summary_position_unknown
-import org.meshtastic.core.resources.sniffer_summary_telemetry_unknown
 import org.meshtastic.core.ui.component.BasicListItem
-import org.meshtastic.core.ui.component.CopyIconButton
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.FolderOpen
@@ -125,9 +78,6 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Save
 import org.meshtastic.core.ui.icon.Settings
 import org.meshtastic.feature.settings.export.LogExportSaverLauncher
-import org.meshtastic.feature.settings.sniffer.mqtt.GroupedMqttSniffedPacket
-import org.meshtastic.feature.settings.util.PacketSummary
-import org.meshtastic.proto.PortNum
 
 /** The three top-bar actions for [SnifferSettingsScreen] -- save, open the gear menu, and clear. */
 @Composable
@@ -174,11 +124,11 @@ internal fun SnifferTopBarActions(
 /** The empty-state message for [SnifferSettingsScreen] -- what to say depends on why there's nothing to show. */
 @Composable
 internal fun snifferEmptyStateText(loadedLog: LoadedSnifferLog?, activeSource: SnifferSource): String = when {
-        loadedLog != null -> stringResource(Res.string.sniffer_log_empty)
-        activeSource == SnifferSource.RADIO -> stringResource(Res.string.sniffer_log_empty)
-        activeSource == SnifferSource.MQTT -> stringResource(Res.string.mqtt_sniffer_log_empty)
-        else -> stringResource(Res.string.sniffer_panel_off_summary)
-    }
+    loadedLog != null -> stringResource(Res.string.sniffer_log_empty)
+    activeSource == SnifferSource.RADIO -> stringResource(Res.string.sniffer_log_empty)
+    activeSource == SnifferSource.MQTT -> stringResource(Res.string.mqtt_sniffer_log_empty)
+    else -> stringResource(Res.string.sniffer_panel_off_summary)
+}
 
 @Composable
 internal fun SnifferGearSheet(
@@ -267,11 +217,11 @@ private fun SnifferSourceSelector(
         text = stringResource(Res.string.sniffer_radio_section_title),
         enabled = radioSelectable,
         supportingText =
-            if (!radioLoading && !radioSelectable) {
-                stringResource(Res.string.sniffer_not_supported_summary)
-            } else {
-                null
-            },
+        if (!radioLoading && !radioSelectable) {
+            stringResource(Res.string.sniffer_not_supported_summary)
+        } else {
+            null
+        },
         onClick = { onSelectSource(SnifferSource.RADIO) },
         trailingContent = {
             if (radioLoading) {
@@ -285,7 +235,7 @@ private fun SnifferSourceSelector(
         text = stringResource(Res.string.sniffer_mqtt_section_title),
         enabled = mqttConfigured,
         supportingText =
-            if (!mqttConfigured) stringResource(Res.string.sniffer_source_mqtt_unavailable_summary) else null,
+        if (!mqttConfigured) stringResource(Res.string.sniffer_source_mqtt_unavailable_summary) else null,
         onClick = { onSelectSource(SnifferSource.MQTT) },
         trailingContent = {
             RadioButton(selected = activeSource == SnifferSource.MQTT, onClick = null, enabled = mqttConfigured)
