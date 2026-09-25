@@ -22,6 +22,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
@@ -38,6 +39,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
+import kotlinx.coroutines.withTimeout
 import kotlinx.io.IOException
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
@@ -211,7 +213,18 @@ class MQTTRepositoryImpl(
                     Logger.i {
                         if (buildConfigProvider.isDebug) "MQTT Connecting to $endpoint" else "MQTT Connecting..."
                     }
-                    newClient.connect(endpoint)
+                    try {
+                        withTimeout(MQTT_CONNECT_TIMEOUT_MS) { newClient.connect(endpoint) }
+                    } catch (e: TimeoutCancellationException) {
+                        // The TCP transport (ktor-network, on JVM/desktop) has no proxy awareness and can block
+                        // on connect() forever with no exception if the host is unreachable -- e.g. behind a
+                        // firewall/proxy that silently drops outbound packets. Without this timeout, that wedges
+                        // the retry loop for good instead of backing off like every other network failure.
+                        // Rethrown as an IOException (not the CancellationException withTimeout throws) so
+                        // safeCatching below captures it as a normal retryable failure instead of treating it as
+                        // real coroutine cancellation, which it would otherwise rethrow unchanged.
+                        throw IOException("MQTT connect timed out after ${MQTT_CONNECT_TIMEOUT_MS}ms", e)
+                    }
                     if (!isActiveSession(session)) return@launch
                     // Built here, not before connect: the option set depends on the version the broker accepted.
                     val subscriptions =
@@ -583,6 +596,7 @@ private fun defaultMqttClientFactory(setup: MqttClientSetup): MqttClientSession 
 // Public (not internal/private) so MqttManagerImpl's probe in :core:data can mirror the live client —
 // some brokers reject a keepalive-0 CONNECT (misleadingly, as CLIENT_IDENTIFIER_NOT_VALID).
 const val MQTT_KEEPALIVE_SECONDS = 30
+private const val MQTT_CONNECT_TIMEOUT_MS = 15_000L
 private const val MQTT_PORT_PLAIN = 1883
 private const val MQTT_PORT_TLS = 8883
 
