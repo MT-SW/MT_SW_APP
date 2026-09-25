@@ -180,7 +180,9 @@ fun summarizePacketPayload(packet: MeshPacket, knownChannelPsks: List<ByteArray>
     val payload = decoded.payload.toByteArray()
     return try {
         when (decoded.portnum.value) {
-            PortNum.TEXT_MESSAGE_APP.value, PortNum.ALERT_APP.value -> PacketSummary.Text(payload.decodeToString())
+            PortNum.TEXT_MESSAGE_APP.value,
+            PortNum.ALERT_APP.value,
+            -> PacketSummary.Text(payload.decodeToString())
 
             PortNum.POSITION_APP.value -> Position.ADAPTER.decodeOrNull(payload)?.let(::summarizePosition)
 
@@ -189,7 +191,9 @@ fun summarizePacketPayload(packet: MeshPacket, knownChannelPsks: List<ByteArray>
             PortNum.TELEMETRY_APP.value -> Telemetry.ADAPTER.decodeOrNull(payload)?.let(::summarizeTelemetry)
 
             PortNum.NEIGHBORINFO_APP.value ->
-                NeighborInfo.ADAPTER.decodeOrNull(payload)?.let { info -> PacketSummary.NeighborCount(info.neighbors.size) }
+                NeighborInfo.ADAPTER.decodeOrNull(payload)?.let { info ->
+                    PacketSummary.NeighborCount(info.neighbors.size)
+                }
 
             else -> null
         }

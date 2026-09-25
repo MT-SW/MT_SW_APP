@@ -102,7 +102,6 @@ import org.meshtastic.core.resources.sniffer_mqtt_section_title
 import org.meshtastic.core.resources.sniffer_not_supported_summary
 import org.meshtastic.core.resources.sniffer_packet_metadata_channel
 import org.meshtastic.core.resources.sniffer_packet_metadata_id
-import org.meshtastic.core.resources.sniffer_packet_metadata_size
 import org.meshtastic.core.resources.sniffer_packet_metadata_title
 import org.meshtastic.core.resources.sniffer_panel_off_summary
 import org.meshtastic.core.resources.sniffer_radio_section_title
@@ -127,7 +126,6 @@ import org.meshtastic.core.ui.icon.Save
 import org.meshtastic.core.ui.icon.Settings
 import org.meshtastic.feature.settings.export.LogExportSaverLauncher
 import org.meshtastic.feature.settings.sniffer.mqtt.GroupedMqttSniffedPacket
-import org.meshtastic.feature.settings.sniffer.mqtt.MqttPacketReceipt
 import org.meshtastic.feature.settings.util.PacketSummary
 import org.meshtastic.proto.PortNum
 
@@ -175,12 +173,13 @@ internal fun SnifferTopBarActions(
 
 /** The empty-state message for [SnifferSettingsScreen] -- what to say depends on why there's nothing to show. */
 @Composable
-internal fun snifferEmptyStateText(loadedLog: LoadedSnifferLog?, activeSource: SnifferSource): String = when {
-    loadedLog != null -> stringResource(Res.string.sniffer_log_empty)
-    activeSource == SnifferSource.RADIO -> stringResource(Res.string.sniffer_log_empty)
-    activeSource == SnifferSource.MQTT -> stringResource(Res.string.mqtt_sniffer_log_empty)
-    else -> stringResource(Res.string.sniffer_panel_off_summary)
-}
+internal fun snifferEmptyStateText(loadedLog: LoadedSnifferLog?, activeSource: SnifferSource): String =
+    when {
+        loadedLog != null -> stringResource(Res.string.sniffer_log_empty)
+        activeSource == SnifferSource.RADIO -> stringResource(Res.string.sniffer_log_empty)
+        activeSource == SnifferSource.MQTT -> stringResource(Res.string.mqtt_sniffer_log_empty)
+        else -> stringResource(Res.string.sniffer_panel_off_summary)
+    }
 
 @Composable
 internal fun SnifferGearSheet(
@@ -269,11 +268,11 @@ private fun SnifferSourceSelector(
         text = stringResource(Res.string.sniffer_radio_section_title),
         enabled = radioSelectable,
         supportingText =
-        if (!radioLoading && !radioSelectable) {
-            stringResource(Res.string.sniffer_not_supported_summary)
-        } else {
-            null
-        },
+            if (!radioLoading && !radioSelectable) {
+                stringResource(Res.string.sniffer_not_supported_summary)
+            } else {
+                null
+            },
         onClick = { onSelectSource(SnifferSource.RADIO) },
         trailingContent = {
             if (radioLoading) {
@@ -287,7 +286,7 @@ private fun SnifferSourceSelector(
         text = stringResource(Res.string.sniffer_mqtt_section_title),
         enabled = mqttConfigured,
         supportingText =
-        if (!mqttConfigured) stringResource(Res.string.sniffer_source_mqtt_unavailable_summary) else null,
+            if (!mqttConfigured) stringResource(Res.string.sniffer_source_mqtt_unavailable_summary) else null,
         onClick = { onSelectSource(SnifferSource.MQTT) },
         trailingContent = {
             RadioButton(selected = activeSource == SnifferSource.MQTT, onClick = null, enabled = mqttConfigured)
@@ -398,77 +397,79 @@ private fun SnifferBufferOverflowSelector(
 }
 
 @Composable
-private fun packetCategoryColor(portNum: Int?, isEncrypted: Boolean): Color = when {
-    isEncrypted -> Color(0xFF9E9E9E)
-    portNum == PortNum.POSITION_APP.value -> Color(0xFF4CAF50)
-    portNum == PortNum.NODEINFO_APP.value -> Color(0xFF9C27B0)
-    portNum == PortNum.NEIGHBORINFO_APP.value -> Color(0xFF00BCD4)
-    portNum == PortNum.TELEMETRY_APP.value -> Color(0xFFFF9800)
-    portNum == PortNum.TEXT_MESSAGE_APP.value -> Color(0xFF2196F3)
-    portNum == PortNum.ALERT_APP.value -> Color(0xFFF44336)
-    portNum == PortNum.TRACEROUTE_APP.value -> Color(0xFFFFC107)
-    portNum == PortNum.ROUTING_APP.value -> Color(0xFF607D8B)
-    portNum == PortNum.ADMIN_APP.value -> Color(0xFFFF5722)
-    portNum == PortNum.WAYPOINT_APP.value -> Color(0xFF8BC34A)
-    portNum == PortNum.PAXCOUNTER_APP.value -> Color(0xFF795548)
-    portNum == PortNum.STORE_FORWARD_APP.value -> Color(0xFF3F51B5)
-    portNum == PortNum.STORE_FORWARD_PLUSPLUS_APP.value -> Color(0xFF3F51B5)
-    else -> Color(0xFF757575)
-}
+private fun packetCategoryColor(portNum: Int?, isEncrypted: Boolean): Color =
+    when {
+        isEncrypted -> Color(0xFF9E9E9E)
+        portNum == PortNum.POSITION_APP.value -> Color(0xFF4CAF50)
+        portNum == PortNum.NODEINFO_APP.value -> Color(0xFF9C27B0)
+        portNum == PortNum.NEIGHBORINFO_APP.value -> Color(0xFF00BCD4)
+        portNum == PortNum.TELEMETRY_APP.value -> Color(0xFFFF9800)
+        portNum == PortNum.TEXT_MESSAGE_APP.value -> Color(0xFF2196F3)
+        portNum == PortNum.ALERT_APP.value -> Color(0xFFF44336)
+        portNum == PortNum.TRACEROUTE_APP.value -> Color(0xFFFFC107)
+        portNum == PortNum.ROUTING_APP.value -> Color(0xFF607D8B)
+        portNum == PortNum.ADMIN_APP.value -> Color(0xFFFF5722)
+        portNum == PortNum.WAYPOINT_APP.value -> Color(0xFF8BC34A)
+        portNum == PortNum.PAXCOUNTER_APP.value -> Color(0xFF795548)
+        portNum == PortNum.STORE_FORWARD_APP.value -> Color(0xFF3F51B5)
+        portNum == PortNum.STORE_FORWARD_PLUSPLUS_APP.value -> Color(0xFF3F51B5)
+        else -> Color(0xFF757575)
+    }
 
 @Composable
-private fun packetCategoryLabel(portNum: Int?, isEncrypted: Boolean): String = when {
-    isEncrypted -> stringResource(Res.string.sniffer_category_encrypted)
-    portNum == PortNum.POSITION_APP.value -> stringResource(Res.string.sniffer_category_position)
-    portNum == PortNum.NODEINFO_APP.value -> stringResource(Res.string.sniffer_category_nodeinfo)
-    portNum == PortNum.NEIGHBORINFO_APP.value -> stringResource(Res.string.sniffer_category_neighborinfo)
-    portNum == PortNum.TELEMETRY_APP.value -> stringResource(Res.string.sniffer_category_telemetry)
-    portNum == PortNum.TEXT_MESSAGE_APP.value -> stringResource(Res.string.sniffer_category_text_message)
-    portNum == PortNum.ALERT_APP.value -> stringResource(Res.string.sniffer_category_alert)
-    portNum == PortNum.TRACEROUTE_APP.value -> stringResource(Res.string.sniffer_category_traceroute)
-    portNum == PortNum.ROUTING_APP.value -> stringResource(Res.string.sniffer_category_routing)
-    portNum == PortNum.ADMIN_APP.value -> stringResource(Res.string.sniffer_category_admin)
-    portNum == PortNum.WAYPOINT_APP.value -> stringResource(Res.string.sniffer_category_waypoint)
-    portNum == PortNum.PAXCOUNTER_APP.value -> stringResource(Res.string.sniffer_category_paxcounter)
-    portNum == PortNum.STORE_FORWARD_APP.value -> stringResource(Res.string.sniffer_category_storeforward)
-    portNum == PortNum.STORE_FORWARD_PLUSPLUS_APP.value -> stringResource(Res.string.sniffer_category_storeforward)
-    else -> stringResource(Res.string.sniffer_category_unknown)
-}
+private fun packetCategoryLabel(portNum: Int?, isEncrypted: Boolean): String =
+    when {
+        isEncrypted -> stringResource(Res.string.sniffer_category_encrypted)
+        portNum == PortNum.POSITION_APP.value -> stringResource(Res.string.sniffer_category_position)
+        portNum == PortNum.NODEINFO_APP.value -> stringResource(Res.string.sniffer_category_nodeinfo)
+        portNum == PortNum.NEIGHBORINFO_APP.value -> stringResource(Res.string.sniffer_category_neighborinfo)
+        portNum == PortNum.TELEMETRY_APP.value -> stringResource(Res.string.sniffer_category_telemetry)
+        portNum == PortNum.TEXT_MESSAGE_APP.value -> stringResource(Res.string.sniffer_category_text_message)
+        portNum == PortNum.ALERT_APP.value -> stringResource(Res.string.sniffer_category_alert)
+        portNum == PortNum.TRACEROUTE_APP.value -> stringResource(Res.string.sniffer_category_traceroute)
+        portNum == PortNum.ROUTING_APP.value -> stringResource(Res.string.sniffer_category_routing)
+        portNum == PortNum.ADMIN_APP.value -> stringResource(Res.string.sniffer_category_admin)
+        portNum == PortNum.WAYPOINT_APP.value -> stringResource(Res.string.sniffer_category_waypoint)
+        portNum == PortNum.PAXCOUNTER_APP.value -> stringResource(Res.string.sniffer_category_paxcounter)
+        portNum == PortNum.STORE_FORWARD_APP.value -> stringResource(Res.string.sniffer_category_storeforward)
+        portNum == PortNum.STORE_FORWARD_PLUSPLUS_APP.value -> stringResource(Res.string.sniffer_category_storeforward)
+        else -> stringResource(Res.string.sniffer_category_unknown)
+    }
 
 /** Localizes a [PacketSummary] into the card's always-visible content line -- null when there is nothing to show. */
 @Composable
-private fun PacketSummary.render(): String? = when (this) {
-    is PacketSummary.Text -> text
+private fun PacketSummary.render(): String? =
+    when (this) {
+        is PacketSummary.Text -> text
 
-    is PacketSummary.PositionSummary ->
-        if (latitude != null && longitude != null) {
-            val coords =
-                "${NumberFormatter.format(latitude, POSITION_DECIMAL_PLACES)}, " +
-                    NumberFormatter.format(longitude, POSITION_DECIMAL_PLACES)
-            altitudeMeters?.let { "$coords ($it m)" } ?: coords
-        } else {
-            stringResource(Res.string.sniffer_summary_position_unknown)
-        }
+        is PacketSummary.PositionSummary ->
+            if (latitude != null && longitude != null) {
+                val coords =
+                    "${NumberFormatter.format(latitude, POSITION_DECIMAL_PLACES)}, " +
+                        NumberFormatter.format(longitude, POSITION_DECIMAL_PLACES)
+                altitudeMeters?.let { "$coords ($it m)" } ?: coords
+            } else {
+                stringResource(Res.string.sniffer_summary_position_unknown)
+            }
 
-    is PacketSummary.NodeInfoSummary ->
-        listOfNotNull(longName, shortName?.let { "($it)" })
-            .joinToString(" ")
-            .ifBlank { stringResource(Res.string.sniffer_summary_nodeinfo_unknown) }
+        is PacketSummary.NodeInfoSummary ->
+            listOfNotNull(longName, shortName?.let { "($it)" }).joinToString(" ").ifBlank {
+                stringResource(Res.string.sniffer_summary_nodeinfo_unknown)
+            }
 
-    is PacketSummary.TelemetrySummary -> {
-        val parts =
-            buildList {
+        is PacketSummary.TelemetrySummary -> {
+            val parts = buildList {
                 temperatureCelsius?.let { add(MetricFormatter.temperature(it, isFahrenheit = false)) }
                 humidityPercent?.let { add(MetricFormatter.humidity(it)) }
                 pressureHpa?.let { add(MetricFormatter.pressure(it)) }
                 voltage?.let { add(MetricFormatter.voltage(it)) }
                 batteryPercent?.let { add(MetricFormatter.percent(it)) }
             }
-        parts.joinToString(" • ").ifBlank { stringResource(Res.string.sniffer_summary_telemetry_unknown) }
-    }
+            parts.joinToString(" • ").ifBlank { stringResource(Res.string.sniffer_summary_telemetry_unknown) }
+        }
 
-    is PacketSummary.NeighborCount -> stringResource(Res.string.sniffer_summary_neighbor_count, count)
-}
+        is PacketSummary.NeighborCount -> stringResource(Res.string.sniffer_summary_neighbor_count, count)
+    }
 
 private const val POSITION_DECIMAL_PLACES = 5
 
@@ -490,10 +491,7 @@ private const val MILLIS_PER_SECOND = 1000L
 /** One row of the expandable "receipts" list -- who this copy came through, its signal, and when. */
 @Composable
 private fun ReceiptRow(label: String, snr: Float?, rssi: Int?, timeLabel: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Text(text = label, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
         Text(
             text = listOfNotNull(MetricFormatter.snr(snr), MetricFormatter.rssi(rssi)).joinToString(" • "),
@@ -519,10 +517,7 @@ private fun PacketCardShell(
 ) {
     Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
         Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
-            Box(
-                modifier =
-                Modifier.width(4.dp).fillMaxHeight().background(packetCategoryColor(portNum, isEncrypted)),
-            )
+            Box(modifier = Modifier.width(4.dp).fillMaxHeight().background(packetCategoryColor(portNum, isEncrypted)))
             Column(
                 modifier = Modifier.weight(1f).padding(12.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -549,8 +544,8 @@ internal fun GroupedRadioPacketCard(
             )
             Text(
                 text =
-                "${DateFormatter.formatDate(packet.receivedAtMillis)} " +
-                    DateFormatter.formatTimeWithSeconds(packet.receivedAtMillis),
+                    "${DateFormatter.formatDate(packet.receivedAtMillis)} " +
+                        DateFormatter.formatTimeWithSeconds(packet.receivedAtMillis),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -572,7 +567,7 @@ internal fun GroupedRadioPacketCard(
                             stringResource(Res.string.sniffer_chip_source_count, label, grouped.relayIds.size)
                         } else {
                             label
-                        },
+                        }
                     )
                 },
             )
@@ -580,11 +575,7 @@ internal fun GroupedRadioPacketCard(
                 onClick = onClick,
                 label = {
                     Text(
-                        stringResource(
-                            Res.string.sniffer_chip_hops,
-                            packet.hopStart - packet.hopLimit,
-                            packet.hopStart,
-                        ),
+                        stringResource(Res.string.sniffer_chip_hops, packet.hopStart - packet.hopLimit, packet.hopStart)
                     )
                 },
             )
@@ -599,10 +590,10 @@ internal fun GroupedRadioPacketCard(
                 AssistChip(
                     onClick = onClick,
                     colors =
-                    AssistChipDefaults.assistChipColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    ),
+                        AssistChipDefaults.assistChipColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        ),
                     label = { Text(stringResource(Res.string.sniffer_chip_received, grouped.receipts.size)) },
                 )
             }
@@ -666,18 +657,18 @@ internal fun GroupedMqttPacketCard(
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(
                 text =
-                if (packet.isJson) {
-                    packet.topic
-                } else {
-                    packetCategoryLabel(packet.portNum, packet.isEncrypted)
-                },
+                    if (packet.isJson) {
+                        packet.topic
+                    } else {
+                        packetCategoryLabel(packet.portNum, packet.isEncrypted)
+                    },
                 style = MaterialTheme.typography.labelLarge,
                 color = packetCategoryColor(packet.portNum, packet.isEncrypted),
             )
             Text(
                 text =
-                "${DateFormatter.formatDate(packet.receivedAtMillis)} " +
-                    DateFormatter.formatTimeWithSeconds(packet.receivedAtMillis),
+                    "${DateFormatter.formatDate(packet.receivedAtMillis)} " +
+                        DateFormatter.formatTimeWithSeconds(packet.receivedAtMillis),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -707,7 +698,7 @@ internal fun GroupedMqttPacketCard(
                             stringResource(Res.string.sniffer_chip_source_count, label, grouped.gatewayIds.size)
                         } else {
                             label
-                        },
+                        }
                     )
                 },
             )
@@ -724,10 +715,10 @@ internal fun GroupedMqttPacketCard(
                 AssistChip(
                     onClick = onClick,
                     colors =
-                    AssistChipDefaults.assistChipColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    ),
+                        AssistChipDefaults.assistChipColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        ),
                     label = { Text(stringResource(Res.string.sniffer_chip_received, grouped.receipts.size)) },
                 )
             }

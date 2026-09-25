@@ -17,17 +17,16 @@
 package org.meshtastic.feature.settings.util
 
 /**
- * A structured, source-agnostic summary of a decoded packet's content, built once from the parsed proto at decode
- * time (see [summarizePacketPayload]) and formatted into a localized display string only at the Compose layer (see
+ * A structured, source-agnostic summary of a decoded packet's content, built once from the parsed proto at decode time
+ * (see [summarizePacketPayload]) and formatted into a localized display string only at the Compose layer (see
  * SnifferPanelComponents.kt's `render()`) -- no user-facing text lives in this non-Composable module. This is the
- * always-visible, single-line counterpart to [decodePayloadFromPacket]'s fuller multi-line dump, which is still what
- * a Sniffer Log card shows once expanded.
+ * always-visible, single-line counterpart to [decodePayloadFromPacket]'s fuller multi-line dump, which is still what a
+ * Sniffer Log card shows once expanded.
  */
 sealed interface PacketSummary {
     data class Text(val text: String) : PacketSummary
 
-    data class PositionSummary(val latitude: Double?, val longitude: Double?, val altitudeMeters: Int?) :
-        PacketSummary
+    data class PositionSummary(val latitude: Double?, val longitude: Double?, val altitudeMeters: Int?) : PacketSummary
 
     data class NodeInfoSummary(val longName: String?, val shortName: String?) : PacketSummary
 
@@ -40,11 +39,10 @@ sealed interface PacketSummary {
     ) : PacketSummary
 
     /**
-     * Just the neighbor count -- the per-neighbor breakdown (id, short name, SNR) stays in
-     * [decodePayloadFromPacket]'s expanded text, already one row per neighbor there. Keeping the always-visible
-     * summary to a single count is the fix for a specific complaint about the HA integration this screen's redesign
-     * is otherwise modeled on: it crams every neighbor into one long wrapped line, which reads poorly with more than
-     * a couple of neighbors.
+     * Just the neighbor count -- the per-neighbor breakdown (id, short name, SNR) stays in [decodePayloadFromPacket]'s
+     * expanded text, already one row per neighbor there. Keeping the always-visible summary to a single count is the
+     * fix for a specific complaint about the HA integration this screen's redesign is otherwise modeled on: it crams
+     * every neighbor into one long wrapped line, which reads poorly with more than a couple of neighbors.
      */
     data class NeighborCount(val count: Int) : PacketSummary
 }
