@@ -153,7 +153,10 @@ open class SnifferLogPrefs(private val dataStore: CorePreferencesDataStore) {
         dataStore.edit { it[PreferencesKeys.EXPORT_FORMAT] = format.name }
     }
 
-    /** What to do once a live sniffer packet list reaches [MAX_BUFFERED_PACKETS]. Defaults to [SnifferBufferOverflowPolicy.STOP]. */
+    /**
+     * What to do once a live sniffer packet list reaches [MAX_BUFFERED_PACKETS]. Defaults to
+     * [SnifferBufferOverflowPolicy.STOP].
+     */
     open val bufferOverflowPolicy: Flow<SnifferBufferOverflowPolicy> =
         dataStore.data.map { prefs ->
             prefs[PreferencesKeys.BUFFER_OVERFLOW_POLICY]?.let { raw ->

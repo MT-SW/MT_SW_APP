@@ -113,10 +113,12 @@ internal fun SplitGroupInfo.displayText(): String {
     val statusLine =
         when {
             timedOut -> stringResource(Res.string.message_split_incomplete, total - haveCount, total)
+
             // Direction matters here: while our own outgoing chunks are still being paced out, this is *our* send
             // still in progress, not something arriving from the other end -- showing "Receiving..." on your own
             // message reads as if the app had the direction backwards.
             fromLocal -> stringResource(Res.string.message_split_sending, haveCount, total)
+
             else -> stringResource(Res.string.message_split_receiving, haveCount, total)
         }
     return "$mergedBody\n\n$statusLine"
