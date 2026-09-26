@@ -43,13 +43,6 @@ import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.air_utilization
-import org.meshtastic.core.resources.channel_utilization
-import org.meshtastic.core.resources.discovery_stat_packets_rx
-import org.meshtastic.core.resources.discovery_stat_packets_tx
-import org.meshtastic.core.resources.free_memory
-import org.meshtastic.core.resources.load_indexed
-import org.meshtastic.core.resources.local_stats_heap
 import org.meshtastic.core.resources.sniffer_category_admin
 import org.meshtastic.core.resources.sniffer_category_alert
 import org.meshtastic.core.resources.sniffer_category_encrypted
@@ -67,12 +60,7 @@ import org.meshtastic.core.resources.sniffer_category_waypoint
 import org.meshtastic.core.resources.sniffer_content_title
 import org.meshtastic.core.resources.sniffer_packet_metadata_title
 import org.meshtastic.core.resources.sniffer_receipts_title
-import org.meshtastic.core.resources.sniffer_summary_neighbor_count
-import org.meshtastic.core.resources.sniffer_summary_nodeinfo_unknown
-import org.meshtastic.core.resources.sniffer_summary_position_unknown
-import org.meshtastic.core.resources.sniffer_summary_telemetry_unknown
 import org.meshtastic.core.ui.component.CopyIconButton
-import org.meshtastic.feature.settings.util.PacketSummary
 import org.meshtastic.proto.PortNum
 
 /**
@@ -122,117 +110,7 @@ internal fun packetCategoryLabel(portNum: Int?, isEncrypted: Boolean): String = 
     else -> stringResource(Res.string.sniffer_category_unknown)
 }
 
-private const val POSITION_DECIMAL_PLACES = 5
-
-/** Localizes a [PacketSummary] into the card's always-visible content line -- null when there is nothing to show. */
-@Composable
-internal fun PacketSummary.render(): String? = when (this) {
-    is PacketSummary.Text -> text
-
-    is PacketSummary.PositionSummary ->
-        if (latitude != null && longitude != null) {
-            val coords =
-                "${NumberFormatter.format(latitude, POSITION_DECIMAL_PLACES)}, " +
-                    NumberFormatter.format(longitude, POSITION_DECIMAL_PLACES)
-            altitudeMeters?.let { "$coords ($it m)" } ?: coords
-        } else {
-            stringResource(Res.string.sniffer_summary_position_unknown)
-        }
-
-    is PacketSummary.NodeInfoSummary ->
-        listOfNotNull(longName, shortName?.let { "($it)" }).joinToString(" ").ifBlank {
-            stringResource(Res.string.sniffer_summary_nodeinfo_unknown)
-        }
-
-    is PacketSummary.TelemetrySummary -> {
-        val chUtilLabel = stringResource(Res.string.channel_utilization)
-        val airUtilLabel = stringResource(Res.string.air_utilization)
-        val parts = buildList {
-            temperatureCelsius?.let { add(MetricFormatter.temperature(it, isFahrenheit = false)) }
-            humidityPercent?.let { add(MetricFormatter.humidity(it)) }
-            pressureHpa?.let { add(MetricFormatter.pressure(it)) }
-            voltage?.let { add(MetricFormatter.voltage(it)) }
-            currentMilliAmps?.let { add(MetricFormatter.current(it, decimalPlaces = 2)) }
-            batteryPercent?.let { add(MetricFormatter.percent(it)) }
-            uptimeSeconds?.let { add(formatUptimeShort(it)) }
-            // Labelled, unlike the metrics above: with battery/humidity already on the same line, a bare "%" is
-            // ambiguous between four different percentages. ChUtil/AirUtil reuse the app's existing short labels.
-            channelUtilizationPercent?.let { add("$chUtilLabel ${MetricFormatter.percent(it)}") }
-            airUtilTxPercent?.let { add("$airUtilLabel ${MetricFormatter.percent(it)}") }
-        }
-        parts.joinToString(" • ").ifBlank { stringResource(Res.string.sniffer_summary_telemetry_unknown) }
-    }
-
-    is PacketSummary.HostMetricsSummary -> {
-        val loadLabel = stringResource(Res.string.load_indexed, 1)
-        val freeMemLabel = stringResource(Res.string.free_memory)
-        val parts = buildList {
-            uptimeSeconds?.let { add(formatUptimeShort(it)) }
-            freeMemBytes?.let { add("$freeMemLabel ${formatBytesShort(it)}") }
-            load1?.let { add("$loadLabel ${NumberFormatter.format(it / LOAD_SCALE, 2)}") }
-        }
-        parts.joinToString(" • ").ifBlank { stringResource(Res.string.sniffer_summary_telemetry_unknown) }
-    }
-
-    is PacketSummary.PowerMetricsSummary ->
-        channels
-            .joinToString(" \u2022 ") { ch ->
-                val readings =
-                    buildList {
-                        ch.voltage?.let { add(MetricFormatter.voltage(it)) }
-                        ch.currentMilliAmps?.let { add(MetricFormatter.current(it, decimalPlaces = 1)) }
-                    }
-                "CH${ch.channel} ${readings.joinToString(" ")}"
-            }
-            .ifBlank { stringResource(Res.string.sniffer_summary_telemetry_unknown) }
-
-    is PacketSummary.LocalStatsSummary -> {
-        val txLabel = stringResource(Res.string.discovery_stat_packets_tx)
-        val rxLabel = stringResource(Res.string.discovery_stat_packets_rx)
-        val heapLabel = stringResource(Res.string.local_stats_heap)
-        val chUtilLabel = stringResource(Res.string.channel_utilization)
-        val airUtilLabel = stringResource(Res.string.air_utilization)
-        val parts = buildList {
-            uptimeSeconds?.let { add(formatUptimeShort(it)) }
-            if (numOnlineNodes != null && numTotalNodes != null) add("$numOnlineNodes/$numTotalNodes")
-            numPacketsTx?.let { add("$txLabel $it") }
-            numPacketsRx?.let { add("$rxLabel $it") }
-            if (heapFreeBytes != null && heapTotalBytes != null) {
-                val free = formatBytesShort(heapFreeBytes.toLong())
-                val total = formatBytesShort(heapTotalBytes.toLong())
-                add("$heapLabel $free/$total")
-            }
-            channelUtilizationPercent?.let { add("$chUtilLabel ${MetricFormatter.percent(it)}") }
-            airUtilTxPercent?.let { add("$airUtilLabel ${MetricFormatter.percent(it)}") }
-        }
-        parts.joinToString(" \u2022 ").ifBlank { stringResource(Res.string.sniffer_summary_telemetry_unknown) }
-    }
-
-    is PacketSummary.NeighborCount -> stringResource(Res.string.sniffer_summary_neighbor_count, count)
-}
-
 private const val MILLIS_PER_SECOND = 1000L
-private const val SECONDS_PER_HOUR = 3600
-private const val HOURS_PER_DAY = 24
-private const val BYTES_PER_KB = 1024.0
-private const val LOAD_SCALE = 100f
-
-/** "2d 3h" once past a day, else just "Xh" -- mirrors the app's other uptime display (NetworkSummaryScreen). */
-private fun formatUptimeShort(seconds: Int): String {
-    val hours = seconds / SECONDS_PER_HOUR
-    val days = hours / HOURS_PER_DAY
-    return if (days > 0) "${days}d ${hours % HOURS_PER_DAY}h" else "${hours}h"
-}
-
-/** Compact free-memory reading for the summary line -- KB below 1 MB, MB above. */
-private fun formatBytesShort(bytes: Long): String {
-    val kb = bytes / BYTES_PER_KB
-    return if (kb < BYTES_PER_KB) {
-        "${NumberFormatter.format(kb, 0)} KB"
-    } else {
-        "${NumberFormatter.format(kb / BYTES_PER_KB, 1)} MB"
-    }
-}
 
 /** Timestamp for the first (oldest) receipt, absolute; every later one as a delta from it -- "+32ms" / "+2.4s". */
 private fun formatReceiptTime(receivedAtMillis: Long, firstReceivedAtMillis: Long): String {
