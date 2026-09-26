@@ -25,6 +25,12 @@ jobs:
     if: ${{ inputs.build_android }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # GitHub Actions nie pozwala odwoływać się do `secrets` bezpośrednio w warunku `if:` --
+    # trzeba je najpierw przepuścić przez `env:` na poziomie joba, i sprawdzać `env.*` w `if:`.
+    env:
+      KEYSTORE: ${{ secrets.KEYSTORE }}
+      KEYSTORE_FILENAME: ${{ secrets.KEYSTORE_FILENAME }}
+      KEYSTORE_PROPERTIES: ${{ secrets.KEYSTORE_PROPERTIES }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -40,17 +46,13 @@ jobs:
       # KEYSTORE_PROPERTIES (Settings > Secrets and variables > Actions) -- bez nich
       # ten krok jest po prostu pominięty i build kończy się na APK debug.
       - name: Decode signing keystore
-        if: ${{ secrets.KEYSTORE != '' }}
-        env:
-          KEYSTORE: ${{ secrets.KEYSTORE }}
-          KEYSTORE_FILENAME: ${{ secrets.KEYSTORE_FILENAME }}
-          KEYSTORE_PROPERTIES: ${{ secrets.KEYSTORE_PROPERTIES }}
+        if: ${{ env.KEYSTORE != '' }}
         run: |
           echo "$KEYSTORE" | base64 -di > "./androidApp/$KEYSTORE_FILENAME"
           echo "$KEYSTORE_PROPERTIES" > ./keystore.properties
 
       - name: Build fdroid release APK
-        if: ${{ secrets.KEYSTORE != '' }}
+        if: ${{ env.KEYSTORE != '' }}
         run: ./gradlew :androidApp:assembleFdroidRelease
 
       - uses: actions/upload-artifact@v4
