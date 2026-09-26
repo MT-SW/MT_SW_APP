@@ -25,11 +25,16 @@ import org.meshtastic.core.model.util.toReadableString
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.Data
+import org.meshtastic.proto.DeviceMetrics
+import org.meshtastic.proto.EnvironmentMetrics
+import org.meshtastic.proto.HostMetrics
+import org.meshtastic.proto.LocalStats
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.NeighborInfo
 import org.meshtastic.proto.Paxcount
 import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.Position
+import org.meshtastic.proto.PowerMetrics
 import org.meshtastic.proto.RouteDiscovery
 import org.meshtastic.proto.Routing
 import org.meshtastic.proto.StoreAndForward
@@ -218,22 +223,72 @@ private fun summarizeUser(user: User): PacketSummary.NodeInfoSummary = PacketSum
 
 /**
  * Null when none of the Telemetry oneof's variants this screen understands are present -- an empty/unknown Telemetry
- * packet, or one carrying a variant (air_quality_metrics, power_metrics, local_stats, health_metrics) this summary
- * doesn't break out yet, has nothing worth summarizing; the raw decode in the expanded card still shows it in full.
+ * packet, or one carrying a variant (air_quality_metrics, health_metrics) this summary doesn't break out yet, has
+ * nothing worth summarizing; the raw decode in the expanded card still shows it in full. Split into one
+ * expression-bodied function per oneof variant (rather than a chain of early `return`s in one function) to stay
+ * under this repo's detekt ReturnCount limit.
  */
-private fun summarizeTelemetry(telemetry: Telemetry): PacketSummary? {
-    telemetry.host_metrics?.let { host ->
-        return PacketSummary.HostMetricsSummary(
-            uptimeSeconds = host.uptime_seconds,
-            freeMemBytes = host.freemem_bytes,
-            load1 = host.load1,
-            load5 = host.load5,
-            load15 = host.load15,
+private fun summarizeTelemetry(telemetry: Telemetry): PacketSummary? =
+    summarizeHostMetrics(telemetry.host_metrics)
+        ?: summarizeLocalStats(telemetry.local_stats)
+        ?: summarizePowerMetrics(telemetry.power_metrics)
+        ?: summarizeDeviceOrEnvironmentMetrics(telemetry.environment_metrics, telemetry.device_metrics)
+
+private fun summarizeHostMetrics(host: HostMetrics?): PacketSummary.HostMetricsSummary? =
+    host?.let {
+        PacketSummary.HostMetricsSummary(
+            uptimeSeconds = it.uptime_seconds,
+            freeMemBytes = it.freemem_bytes,
+            load1 = it.load1,
+            load5 = it.load5,
+            load15 = it.load15,
         )
     }
-    val env = telemetry.environment_metrics
-    val device = telemetry.device_metrics
-    return if (env == null && device == null) {
+
+private fun summarizeLocalStats(stats: LocalStats?): PacketSummary.LocalStatsSummary? =
+    stats?.let {
+        PacketSummary.LocalStatsSummary(
+            uptimeSeconds = it.uptime_seconds,
+            channelUtilizationPercent = it.channel_utilization?.takeIf { u -> !u.isNaN() },
+            airUtilTxPercent = it.air_util_tx?.takeIf { u -> !u.isNaN() },
+            numPacketsTx = it.num_packets_tx,
+            numPacketsRx = it.num_packets_rx,
+            numOnlineNodes = it.num_online_nodes,
+            numTotalNodes = it.num_total_nodes,
+            heapFreeBytes = it.heap_free_bytes,
+            heapTotalBytes = it.heap_total_bytes,
+        )
+    }
+
+private fun summarizePowerMetrics(pm: PowerMetrics?): PacketSummary.PowerMetricsSummary? =
+    pm?.let(::powerChannelReadings)?.takeIf { it.isNotEmpty() }?.let(PacketSummary::PowerMetricsSummary)
+
+/** One [PacketSummary.PowerChannelReading] per CH1..CH8 that carries a non-NaN voltage and/or current reading. */
+private fun powerChannelReadings(pm: PowerMetrics): List<PacketSummary.PowerChannelReading> =
+    listOf(
+        Triple(1, pm.ch1_voltage, pm.ch1_current),
+        Triple(2, pm.ch2_voltage, pm.ch2_current),
+        Triple(3, pm.ch3_voltage, pm.ch3_current),
+        Triple(4, pm.ch4_voltage, pm.ch4_current),
+        Triple(5, pm.ch5_voltage, pm.ch5_current),
+        Triple(6, pm.ch6_voltage, pm.ch6_current),
+        Triple(7, pm.ch7_voltage, pm.ch7_current),
+        Triple(8, pm.ch8_voltage, pm.ch8_current),
+    ).mapNotNull { (channel, voltage, current) ->
+        val validVoltage = voltage?.takeIf { !it.isNaN() }
+        val validCurrent = current?.takeIf { !it.isNaN() }
+        if (validVoltage == null && validCurrent == null) {
+            null
+        } else {
+            PacketSummary.PowerChannelReading(channel, validVoltage, validCurrent)
+        }
+    }
+
+private fun summarizeDeviceOrEnvironmentMetrics(
+    env: EnvironmentMetrics?,
+    device: DeviceMetrics?,
+): PacketSummary.TelemetrySummary? =
+    if (env == null && device == null) {
         null
     } else {
         PacketSummary.TelemetrySummary(
@@ -248,7 +303,6 @@ private fun summarizeTelemetry(telemetry: Telemetry): PacketSummary? {
             airUtilTxPercent = device?.air_util_tx?.takeIf { !it.isNaN() },
         )
     }
-}
 
 private fun decodeTraceroutePayload(packet: MeshPacket, payload: ByteArray, nodeRepository: NodeRepository): String {
     val getUsername: (Int) -> String = { nodeNum -> formatNodeWithShortNameForPayload(nodeNum, nodeRepository) }

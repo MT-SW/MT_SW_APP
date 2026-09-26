@@ -45,8 +45,11 @@ import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.air_utilization
 import org.meshtastic.core.resources.channel_utilization
+import org.meshtastic.core.resources.discovery_stat_packets_rx
+import org.meshtastic.core.resources.discovery_stat_packets_tx
 import org.meshtastic.core.resources.free_memory
 import org.meshtastic.core.resources.load_indexed
+import org.meshtastic.core.resources.local_stats_heap
 import org.meshtastic.core.resources.sniffer_category_admin
 import org.meshtastic.core.resources.sniffer_category_alert
 import org.meshtastic.core.resources.sniffer_category_encrypted
@@ -169,6 +172,40 @@ internal fun PacketSummary.render(): String? = when (this) {
             load1?.let { add("$loadLabel ${NumberFormatter.format(it / LOAD_SCALE, 2)}") }
         }
         parts.joinToString(" • ").ifBlank { stringResource(Res.string.sniffer_summary_telemetry_unknown) }
+    }
+
+    is PacketSummary.PowerMetricsSummary ->
+        channels
+            .joinToString(" \u2022 ") { ch ->
+                val readings =
+                    buildList {
+                        ch.voltage?.let { add(MetricFormatter.voltage(it)) }
+                        ch.currentMilliAmps?.let { add(MetricFormatter.current(it, decimalPlaces = 1)) }
+                    }
+                "CH${ch.channel} ${readings.joinToString(" ")}"
+            }
+            .ifBlank { stringResource(Res.string.sniffer_summary_telemetry_unknown) }
+
+    is PacketSummary.LocalStatsSummary -> {
+        val txLabel = stringResource(Res.string.discovery_stat_packets_tx)
+        val rxLabel = stringResource(Res.string.discovery_stat_packets_rx)
+        val heapLabel = stringResource(Res.string.local_stats_heap)
+        val chUtilLabel = stringResource(Res.string.channel_utilization)
+        val airUtilLabel = stringResource(Res.string.air_utilization)
+        val parts = buildList {
+            uptimeSeconds?.let { add(formatUptimeShort(it)) }
+            if (numOnlineNodes != null && numTotalNodes != null) add("$numOnlineNodes/$numTotalNodes")
+            numPacketsTx?.let { add("$txLabel $it") }
+            numPacketsRx?.let { add("$rxLabel $it") }
+            if (heapFreeBytes != null && heapTotalBytes != null) {
+                val free = formatBytesShort(heapFreeBytes.toLong())
+                val total = formatBytesShort(heapTotalBytes.toLong())
+                add("$heapLabel $free/$total")
+            }
+            channelUtilizationPercent?.let { add("$chUtilLabel ${MetricFormatter.percent(it)}") }
+            airUtilTxPercent?.let { add("$airUtilLabel ${MetricFormatter.percent(it)}") }
+        }
+        parts.joinToString(" \u2022 ").ifBlank { stringResource(Res.string.sniffer_summary_telemetry_unknown) }
     }
 
     is PacketSummary.NeighborCount -> stringResource(Res.string.sniffer_summary_neighbor_count, count)

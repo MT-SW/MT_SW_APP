@@ -127,7 +127,12 @@ fun List<MqttSniffedPacket>.groupedByGateway(): List<GroupedMqttSniffedPacket> {
             .groupBy { it.packetId }
             .values
             .map { packets ->
-                val newest = packets.maxBy { it.receivedAtMillis }
+                // See the mirrored comment in SnifferLogViewModel.groupedByRelay: prefer the newest copy that
+                // actually decoded, so a later still-encrypted gateway relay of the same transmission can't blank
+                // out content this row already showed.
+                val newest =
+                    packets.filterNot { it.isEncrypted }.maxByOrNull { it.receivedAtMillis }
+                        ?: packets.maxBy { it.receivedAtMillis }
                 val gatewayIds = packets.mapNotNull { it.gatewayId }.distinct()
                 val receipts =
                     packets

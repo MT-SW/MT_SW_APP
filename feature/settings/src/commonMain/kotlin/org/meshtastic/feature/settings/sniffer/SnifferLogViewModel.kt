@@ -125,7 +125,13 @@ fun List<SniffedPacket>.groupedByRelay(): List<GroupedSniffedPacket> {
             .groupBy { it.packetId }
             .values
             .map { packets ->
-                val newest = packets.maxBy { it.receivedAtMillis }
+                // Prefer the newest copy that actually decoded: several relayed copies of the same over-the-air
+                // transmission can arrive with different decode outcomes (e.g. one relay's copy fails a signature
+                // or arrives before this app's channel keys were ready), and picking by timestamp alone let a
+                // later still-encrypted copy blank out content this same row had already shown.
+                val newest =
+                    packets.filterNot { it.isEncrypted }.maxByOrNull { it.receivedAtMillis }
+                        ?: packets.maxBy { it.receivedAtMillis }
                 val relayIds = packets.mapNotNull { it.relayId }.distinct()
                 val receipts =
                     packets

@@ -55,6 +55,34 @@ sealed interface PacketSummary {
     ) : PacketSummary
 
     /**
+     * One [org.meshtastic.proto.PowerMetrics] channel with a non-NaN reading -- built only from channels that carry
+     * a voltage and/or current, so an unpopulated multi-channel power monitor doesn't pad the summary with empty
+     * channels. Channel numbers are 1-based, matching the physical CH1..CH8 labeling on the hardware and the
+     * PowerMetrics screen ([org.meshtastic.feature.node.metrics.PowerMetricsCard]).
+     */
+    data class PowerChannelReading(val channel: Int, val voltage: Float?, val currentMilliAmps: Float?)
+
+    /** The `power_metrics` Telemetry variant -- one or more [PowerChannelReading]s from a multi-channel power monitor. */
+    data class PowerMetricsSummary(val channels: List<PowerChannelReading>) : PacketSummary
+
+    /**
+     * The `local_stats` Telemetry variant -- this node's own runtime/link counters (as opposed to [TelemetrySummary]'s
+     * sensor/battery readings from itself or a remote node). Previously fell through to no summary at all, so this
+     * frame's content was invisible until the card was expanded.
+     */
+    data class LocalStatsSummary(
+        val uptimeSeconds: Int?,
+        val channelUtilizationPercent: Float?,
+        val airUtilTxPercent: Float?,
+        val numPacketsTx: Int?,
+        val numPacketsRx: Int?,
+        val numOnlineNodes: Int?,
+        val numTotalNodes: Int?,
+        val heapFreeBytes: Int?,
+        val heapTotalBytes: Int?,
+    ) : PacketSummary
+
+    /**
      * Just the neighbor count -- the per-neighbor breakdown (id, short name, SNR) stays in [decodePayloadFromPacket]'s
      * expanded text, already one row per neighbor there. Keeping the always-visible summary to a single count is the
      * fix for a specific complaint about the HA integration this screen's redesign is otherwise modeled on: it crams
