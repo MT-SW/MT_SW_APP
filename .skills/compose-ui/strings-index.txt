@@ -1895,6 +1895,8 @@ sniffer_export_format_txt
 sniffer_gear_menu
 sniffer_group_by_gateway_summary
 sniffer_group_by_gateway_title
+sniffer_hide_ondemand_ch0_summary
+sniffer_hide_ondemand_ch0_title
 sniffer_load_failed
 sniffer_load_log_summary
 sniffer_load_log_title
