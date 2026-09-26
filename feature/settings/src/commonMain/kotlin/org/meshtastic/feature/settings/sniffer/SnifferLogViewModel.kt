@@ -128,9 +128,18 @@ fun List<SniffedPacket>.groupedByRelay(): List<GroupedSniffedPacket> {
                 // Prefer the newest copy that actually decoded: several relayed copies of the same over-the-air
                 // transmission can arrive with different decode outcomes (e.g. one relay's copy fails a signature
                 // or arrives before this app's channel keys were ready), and picking by timestamp alone let a
-                // later still-encrypted copy blank out content this same row had already shown.
+                // later still-encrypted copy blank out content this same row had already shown -- and among
+                // decoded copies, prefer the longest payload over the most recently received one, for the same
+                // reason as the mirrored MQTT version (groupedByGateway): TRACEROUTE_APP's route_back/snr_back
+                // grow with every hop it's relayed through, so the relay with the longest raw payload has
+                // necessarily seen the most complete picture so far -- when this node happens to hear a relay's
+                // still-partial copy after an already-more-complete one, "most recently heard" is no guarantee of
+                // "traveled the furthest", and could otherwise show fewer hops and "?" SNR than the same response's
+                // own record elsewhere in the app.
                 val newest =
-                    packets.filterNot { it.isEncrypted }.maxByOrNull { it.receivedAtMillis }
+                    packets
+                        .filterNot { it.isEncrypted }
+                        .maxWithOrNull(compareBy({ it.payloadHex.length }, { it.receivedAtMillis }))
                         ?: packets.maxBy { it.receivedAtMillis }
                 val relayIds = packets.mapNotNull { it.relayId }.distinct()
                 val receipts =

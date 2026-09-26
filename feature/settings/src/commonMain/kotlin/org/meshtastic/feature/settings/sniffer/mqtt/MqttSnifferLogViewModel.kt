@@ -129,9 +129,19 @@ fun List<MqttSniffedPacket>.groupedByGateway(): List<GroupedMqttSniffedPacket> {
             .map { packets ->
                 // See the mirrored comment in SnifferLogViewModel.groupedByRelay: prefer the newest copy that
                 // actually decoded, so a later still-encrypted gateway relay of the same transmission can't blank
-                // out content this row already showed.
+                // out content this row already showed -- and among decoded copies, prefer the longest payload over
+                // the most recently received one. TRACEROUTE_APP (and anything else that appends to its own
+                // payload as it's relayed, e.g. route_back/snr_back) grows with every hop it travels, so whichever
+                // gateway's copy has the longest raw payload has necessarily seen the most complete picture so
+                // far; MQTT broker latency has nothing to do with mesh hop order, so "arrived at the broker last"
+                // was no guarantee of "traveled the furthest" -- an earlier, shorter copy of the same response
+                // could overtake a more complete one and get shown instead, which is how a sniffed traceroute
+                // response could end up displaying fewer hops and "?" SNR than that same response's own record
+                // elsewhere in the app.
                 val newest =
-                    packets.filterNot { it.isEncrypted }.maxByOrNull { it.receivedAtMillis }
+                    packets
+                        .filterNot { it.isEncrypted }
+                        .maxWithOrNull(compareBy({ it.payloadHex.length }, { it.receivedAtMillis }))
                         ?: packets.maxBy { it.receivedAtMillis }
                 val gatewayIds = packets.mapNotNull { it.gatewayId }.distinct()
                 val receipts =
