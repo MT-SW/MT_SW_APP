@@ -42,6 +42,7 @@ import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
 import org.meshtastic.feature.settings.debugging.sanitizeForExport
 import org.meshtastic.feature.settings.util.PacketSummary
 import org.meshtastic.feature.settings.util.decodePayloadFromPacket
+import org.meshtastic.feature.settings.util.decodedData
 import org.meshtastic.feature.settings.util.summarizePacketPayload
 import org.meshtastic.proto.Config.LoRaConfig
 
@@ -148,22 +149,20 @@ fun List<SniffedPacket>.groupedByRelay(): List<GroupedSniffedPacket> {
             .groupBy { it.fromId to it.packetId }
             .values
             .map { packets ->
-                // Prefer the newest copy that actually decoded: several relayed copies of the same over-the-air
-                // transmission can arrive with different decode outcomes (e.g. one relay's copy fails a signature
-                // or arrives before this app's channel keys were ready), and picking by timestamp alone let a
-                // later still-encrypted copy blank out content this same row had already shown -- and among
-                // decoded copies, prefer the longest payload over the most recently received one, for the same
-                // reason as the mirrored MQTT version (groupedByGateway): TRACEROUTE_APP's route_back/snr_back
-                // grow with every hop it's relayed through, so the relay with the longest raw payload has
-                // necessarily seen the most complete picture so far -- when this node happens to hear a relay's
-                // still-partial copy after an already-more-complete one, "most recently heard" is no guarantee of
-                // "traveled the furthest", and could otherwise show fewer hops and "?" SNR than the same response's
-                // own record elsewhere in the app.
-                val newest =
-                    packets
-                        .filterNot { it.isEncrypted }
-                        .maxWithOrNull(compareBy({ it.payloadHex.length }, { it.receivedAtMillis }))
-                        ?: packets.maxBy { it.receivedAtMillis }
+                // Prefer the SHORTEST successfully-decoded copy, not the longest: confirmed against real Sniffer
+                // captures (see the discussion around groupedByGateway, this function's MQTT mirror) that a
+                // longer route_back doesn't mean "more complete" -- it means more redundant flood hops. Meshtastic's
+                // flood routing lets several relay-eligible nodes each independently hear an in-flight traceroute
+                // response, decide they still have hop budget, append THEMSELVES to route_back, and rebroadcast --
+                // even after the response has already reached its real destination by a shorter path. Every one of
+                // those extra rebroadcasts decodes and formats perfectly fine on its own; it just isn't the path the
+                // destination node actually recorded as its own route. The shortest decoded copy is the one least
+                // diluted by that redundant relaying, so it's the closer proxy for the real route -- among
+                // same-length copies, prefer the most recently received one.
+                val shortestFirst =
+                    compareBy<SniffedPacket> { it.payloadHex.length }.thenByDescending { it.receivedAtMillis }
+                val decoded = packets.filterNot { it.isEncrypted }
+                val newest = decoded.minWithOrNull(shortestFirst) ?: packets.maxBy { it.receivedAtMillis }
                 val relayIds = packets.mapNotNull { it.relayId }.distinct()
                 val receipts =
                     packets
@@ -258,7 +257,8 @@ class SnifferLogViewModel(
         val myNodeNum = nodeRepository.myNodeInfo.value?.myNodeNum ?: return null
 
         val nodeMap = nodeRepository.nodeDBbyNum.value
-        val decodedText = decodePayloadFromPacket(packet, nodeRepository, knownChannels())
+        val channels = knownChannels()
+        val decodedText = decodePayloadFromPacket(packet, nodeRepository, channels)
         val rawBytes = packet.decoded?.payload ?: packet.encrypted
         return SniffedPacket(
             fromId = NodeAddress.numToDefaultId(packet.from),
@@ -270,14 +270,14 @@ class SnifferLogViewModel(
             hopLimit = packet.hop_limit,
             rssi = packet.rx_rssi,
             snr = packet.rx_snr,
-            portNum = packet.decoded?.effectivePortNum(),
+            portNum = decodedData(packet, channels)?.effectivePortNum(),
             isEncrypted = decodedText == null,
             payloadHex = rawBytes?.hex().orEmpty(),
             decodedPayload = decodedText,
             receivedAtMillis = log.received_date,
             packetId = packet.id,
             relayId = resolveRelayId(packet.relay_node, nodeMap, myNodeNum),
-            summary = summarizePacketPayload(packet, knownChannels()),
+            summary = summarizePacketPayload(packet, channels),
         )
     }
 

@@ -154,6 +154,20 @@ private fun decryptWithKnownChannels(packet: MeshPacket, knownChannels: List<Cha
     return null
 }
 
+/**
+ * The [Data] this packet's payload decodes to -- its own [MeshPacket.decoded] if firmware already decrypted it, or
+ * whatever [decryptWithKnownChannels] recovers from still-encrypted bytes using [knownChannels], the same fallback
+ * [decodePayloadFromPacket] and [summarizePacketPayload] already apply for the decoded *text*.
+ *
+ * Exists so callers can read [Data.portnum] (or [org.meshtastic.core.model.util.effectivePortNum] for a
+ * private-app-port-aware version) for a packet that only decrypts via this app-side fallback -- e.g. anything Sniffer
+ * mode forwards raw per its own kdoc. Without this, reading `packet.decoded?.portnum` directly leaves such a packet's
+ * portnum permanently null and its category shown as "Unknown" in the UI, even once [decodePayloadFromPacket]
+ * successfully decodes and displays its actual content.
+ */
+fun decodedData(packet: MeshPacket, knownChannels: List<Channel> = emptyList()): Data? =
+    packet.decoded ?: decryptWithKnownChannels(packet, knownChannels)
+
 private fun Byte.toPayloadHex(): String = this.toUByte().toString(16).padStart(2, '0')
 
 private fun formatNodeWithShortNameForPayload(nodeNum: Int, nodeRepository: NodeRepository): String {
