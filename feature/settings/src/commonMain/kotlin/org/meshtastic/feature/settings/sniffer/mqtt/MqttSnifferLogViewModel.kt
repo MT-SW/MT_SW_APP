@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -81,6 +82,12 @@ data class MqttSniffedPacket(
     val snr: Float? = null,
     /** Structured summary of the decoded content, for the always-visible card content line -- see [PacketSummary]. */
     val summary: PacketSummary? = null,
+    /**
+     * The original wire packet, kept around so a still-encrypted entry can be re-decoded later -- see
+     * [MqttSnifferManager.retryDecodingEncryptedPackets] for why that's needed. Null for JSON entries, which have no
+     * MeshPacket to retry against.
+     */
+    val rawPacket: MeshPacket? = null,
 ) {
     /** Multi-line, redacted representation for the per-packet copy action -- reuses the Debug Panel's redaction. */
     val copyText: String
@@ -203,6 +210,46 @@ class MqttSnifferManager(
 
     init {
         scope.launch { prefs.bufferOverflowPolicy.collect { overflowPolicy = it } }
+        // A packet decoded the moment it arrived only ever sees channelSet.value as of that instant -- and right
+        // after a (re)connect, the handshake downloads channels one by one (see SwitchingChannelSetDataSource's
+        // kdoc), so a packet on a channel that just hasn't arrived yet gets marked encrypted even though this app
+        // holds (or is about to hold) its key. Since MqttSniffedPacket is decoded once and buffered as-is -- unlike
+        // the Radio Sniffer, whose packet list is recomputed fresh from its source query on every new arrival and so
+        // effectively self-heals -- that packet would otherwise stay marked encrypted forever, even after the
+        // channel shows up moments later. Every channel-list update gets a retry pass over whatever is still marked
+        // encrypted to catch up.
+        scope.launch { channelSet.filterNotNull().collect { retryDecodingEncryptedPackets() } }
+    }
+
+    /**
+     * Re-decodes every currently-buffered packet this sniffer couldn't read, against the channel list as of right now
+     * -- see the comment in [init] for why a packet can be stuck needing this instead of having decoded correctly the
+     * first time.
+     */
+    private fun retryDecodingEncryptedPackets() {
+        _packets.update { current ->
+            if (current.none { it.isEncrypted && it.rawPacket != null }) {
+                return@update current
+            }
+            val psks = knownChannelPsks()
+            current.map { entry ->
+                val raw = entry.rawPacket
+                if (!entry.isEncrypted || raw == null) {
+                    entry
+                } else {
+                    val decodedPayload = decodePayloadFromPacket(raw, nodeRepository, psks)
+                    if (decodedPayload == null) {
+                        entry
+                    } else {
+                        entry.copy(
+                            isEncrypted = false,
+                            decodedPayload = decodedPayload,
+                            summary = summarizePacketPayload(raw, psks),
+                        )
+                    }
+                }
+            }
+        }
     }
 
     /** Starts or stops the MQTT connection for this sniffer. See the class doc for the session-sharing caveat. */
@@ -303,6 +350,7 @@ class MqttSnifferManager(
             rssi = packet.rx_rssi,
             snr = packet.rx_snr,
             summary = summarizePacketPayload(packet, knownChannelPsks()),
+            rawPacket = packet,
         )
     }
 
