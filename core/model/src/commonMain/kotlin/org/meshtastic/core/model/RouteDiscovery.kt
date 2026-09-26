@@ -35,24 +35,24 @@ val MeshPacket.fullRouteDiscovery: RouteDiscovery?
             val fullRoute = listOf(destinationId) + originalRd.route + sourceId
             val fullRouteBack = listOf(sourceId) + originalRd.route_back + destinationId
 
-            // hop_start/bitfield used to gate this (as a proxy for "firmware new enough to have set
-            // hop_start"), but that proxy fires on ANY nonzero bitfield bit -- unrelated ones included -- so a
-            // sniffed packet (especially via MQTT, relayed through other nodes) could get route_back wrapped with
-            // endpoints even though snr_back didn't have the matching count, which is what formatTraceroutePath
-            // needs below; that mismatch made it fall back to showing "?" for every hop, and separately made the
-            // route look one hop longer than it really was.
+            // route_back only ever carries the *intermediate* relay hops, same as route does for the forward
+            // path above -- the actual endpoints are never part of either list, they come from the packet's own
+            // header (source/destinationId), so both directions get wrapped unconditionally and symmetrically.
             //
-            // A genuine per-hop snr_back always has exactly one more entry than there are intermediate route_back
-            // nodes (the extra entry is the final hop back to us), so checking that directly -- instead of
-            // guessing from hop_start/bitfield -- only wraps route_back when doing so is actually consistent with
-            // the SNR data the packet carries.
-            val snrBackMatchesFullPath = originalRd.snr_back.size == originalRd.route_back.size + 1
-
+            // An earlier version of this gated the route_back wrap on snr_back having exactly one more entry than
+            // there are intermediate hops (route_back.size + 1), on the theory that a sniffed-mid-transit copy
+            // (heard by a relay or MQTT gateway that isn't the packet's actual destination) wouldn't yet carry
+            // that final hop's own SNR measurement -- true, but the wrong conclusion: that only means the LAST
+            // edge's SNR is unknown for that copy, not that the destination node itself is unknown or shouldn't be
+            // shown. Gating the wrap on it meant a sniffed copy silently lost BOTH endpoints from the displayed
+            // route whenever it hadn't reached its true destination yet -- exactly the packets the Sniffer mostly
+            // sees. formatTraceroutePath already degrades a length-mismatched snr_back to "?" per edge while still
+            // showing every node name, so there's no need to withhold the nodes themselves over missing SNR.
             return originalRd
                 .newBuilder()
                 .also { wb ->
                     wb.route = fullRoute
-                    wb.route_back = if (snrBackMatchesFullPath) fullRouteBack else originalRd.route_back
+                    wb.route_back = fullRouteBack
                 }
                 .build()
         }
