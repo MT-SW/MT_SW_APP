@@ -2088,6 +2088,8 @@
     <string name="sniffer_source_mqtt_unavailable_summary">Włącz i skonfiguruj moduł MQTT na tym urządzeniu, aby podsłuchiwać ruch brokera</string>
     <string name="sniffer_group_by_gateway_title">Grupuj duplikaty</string>
     <string name="sniffer_group_by_gateway_summary">Łącz ten sam pakiet widziany więcej niż raz (wiele bramek MQTT lub różne węzły przekazujące) w jeden wiersz</string>
+    <string name="sniffer_hide_ondemand_ch0_title">Ukryj OnDemand na kanale 0</string>
+    <string name="sniffer_hide_ondemand_ch0_summary">Ruch OnDemand (port 354) na głównym kanale to własna komunikacja diagnostyczno-kontrolna aplikacji z połączonym urządzeniem, a nie ruch sieci mesh</string>
     <string name="sniffer_decrypt_payloads_title">Próbuj deszyfrować</string>
     <string name="sniffer_decrypt_payloads_summary">Próbuj odkodować zaszyfrowane dane, używając znanych kluczy kanałów tej aplikacji</string>
     <string name="sniffer_export_format_title">Format zapisu</string>

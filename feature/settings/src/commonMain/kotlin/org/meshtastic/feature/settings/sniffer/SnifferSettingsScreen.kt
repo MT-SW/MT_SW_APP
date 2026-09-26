@@ -116,6 +116,7 @@ fun SnifferSettingsScreen(
     val clearedAtMillis by panelViewModel.clearedAtMillis.collectAsStateWithLifecycle()
     val loadedLog by panelViewModel.loadedLog.collectAsStateWithLifecycle()
     val bufferOverflowPolicy by panelViewModel.bufferOverflowPolicy.collectAsStateWithLifecycle()
+    val hideOnDemandChannel0 by panelViewModel.hideOnDemandChannel0.collectAsStateWithLifecycle()
 
     val snifferSupported =
         state.snifferEnabled != null ||
@@ -324,6 +325,8 @@ fun SnifferSettingsScreen(
             onExportFormatChange = panelViewModel::setExportFormat,
             bufferOverflowPolicy = bufferOverflowPolicy,
             onBufferOverflowPolicyChange = panelViewModel::setBufferOverflowPolicy,
+            hideOnDemandChannel0 = hideOnDemandChannel0,
+            onHideOnDemandChannel0Change = panelViewModel::setHideOnDemandChannel0,
             onLoadLogClick = {
                 showGearSheet = false
                 importPicker.pick()

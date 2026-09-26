@@ -64,6 +64,8 @@ import org.meshtastic.core.resources.sniffer_export_format_txt
 import org.meshtastic.core.resources.sniffer_gear_menu
 import org.meshtastic.core.resources.sniffer_group_by_gateway_summary
 import org.meshtastic.core.resources.sniffer_group_by_gateway_title
+import org.meshtastic.core.resources.sniffer_hide_ondemand_ch0_summary
+import org.meshtastic.core.resources.sniffer_hide_ondemand_ch0_title
 import org.meshtastic.core.resources.sniffer_load_log_summary
 import org.meshtastic.core.resources.sniffer_load_log_title
 import org.meshtastic.core.resources.sniffer_log_empty
@@ -152,6 +154,8 @@ internal fun SnifferGearSheet(
     onExportFormatChange: (SnifferLogFormat) -> Unit,
     bufferOverflowPolicy: SnifferBufferOverflowPolicy,
     onBufferOverflowPolicyChange: (SnifferBufferOverflowPolicy) -> Unit,
+    hideOnDemandChannel0: Boolean,
+    onHideOnDemandChannel0Change: (Boolean) -> Unit,
     onLoadLogClick: () -> Unit,
 ) {
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
@@ -173,6 +177,8 @@ internal fun SnifferGearSheet(
                 onAutoScrollChange = onAutoScrollChange,
                 decryptPayloads = decryptPayloads,
                 onDecryptPayloadsChange = onDecryptPayloadsChange,
+                hideOnDemandChannel0 = hideOnDemandChannel0,
+                onHideOnDemandChannel0Change = onHideOnDemandChannel0Change,
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -255,6 +261,8 @@ private fun SnifferPreferencesSection(
     onAutoScrollChange: (Boolean) -> Unit,
     decryptPayloads: Boolean,
     onDecryptPayloadsChange: (Boolean) -> Unit,
+    hideOnDemandChannel0: Boolean,
+    onHideOnDemandChannel0Change: (Boolean) -> Unit,
 ) {
     SwitchPreference(
         title = stringResource(Res.string.sniffer_group_by_gateway_title),
@@ -275,6 +283,13 @@ private fun SnifferPreferencesSection(
         checked = decryptPayloads,
         enabled = true,
         onCheckedChange = onDecryptPayloadsChange,
+    )
+    SwitchPreference(
+        title = stringResource(Res.string.sniffer_hide_ondemand_ch0_title),
+        summary = stringResource(Res.string.sniffer_hide_ondemand_ch0_summary),
+        checked = hideOnDemandChannel0,
+        enabled = true,
+        onCheckedChange = onHideOnDemandChannel0Change,
     )
 }
 

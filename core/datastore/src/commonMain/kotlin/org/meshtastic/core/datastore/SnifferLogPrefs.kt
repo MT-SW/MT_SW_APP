@@ -69,6 +69,7 @@ open class SnifferLogPrefs(private val dataStore: CorePreferencesDataStore) {
         val DECRYPT_PAYLOADS = booleanPreferencesKey("sniffer-decrypt-payloads")
         val EXPORT_FORMAT = stringPreferencesKey("sniffer-export-format")
         val BUFFER_OVERFLOW_POLICY = stringPreferencesKey("sniffer-buffer-overflow-policy")
+        val HIDE_ONDEMAND_CHANNEL0 = booleanPreferencesKey("sniffer-hide-ondemand-channel0")
     }
 
     companion object {
@@ -166,5 +167,18 @@ open class SnifferLogPrefs(private val dataStore: CorePreferencesDataStore) {
 
     open suspend fun setBufferOverflowPolicy(policy: SnifferBufferOverflowPolicy) {
         dataStore.edit { it[PreferencesKeys.BUFFER_OVERFLOW_POLICY] = policy.name }
+    }
+
+    /**
+     * Hide OnDemand (port 354, see `ON_DEMAND_PORT_NUM`) packets sent on the primary channel (index 0) from the
+     * Radio sniffer -- that traffic is the phone app's own OnDemand/diagnostic chatter with the connected node,
+     * not mesh traffic, and on a busy channel 0 it can crowd out everything else in the log. Defaults to hidden;
+     * the toggle exists for anyone who specifically wants to watch that traffic.
+     */
+    open val hideOnDemandChannel0: Flow<Boolean> =
+        dataStore.data.map { it[PreferencesKeys.HIDE_ONDEMAND_CHANNEL0] ?: true }
+
+    open suspend fun setHideOnDemandChannel0(enabled: Boolean) {
+        dataStore.edit { it[PreferencesKeys.HIDE_ONDEMAND_CHANNEL0] = enabled }
     }
 }

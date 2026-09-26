@@ -35,7 +35,24 @@ sealed interface PacketSummary {
         val humidityPercent: Float?,
         val pressureHpa: Float?,
         val voltage: Float?,
+        val currentMilliAmps: Float?,
         val batteryPercent: Int?,
+        val uptimeSeconds: Int?,
+        val channelUtilizationPercent: Float?,
+        val airUtilTxPercent: Float?,
+    ) : PacketSummary
+
+    /**
+     * The `host_metrics` Telemetry variant (Linux-native / Station G2-class nodes) -- CPU load and memory, not
+     * sensor readings, so it gets its own case rather than being folded into [TelemetrySummary]'s device/environment
+     * fields.
+     */
+    data class HostMetricsSummary(
+        val uptimeSeconds: Int?,
+        val freeMemBytes: Long?,
+        val load1: Int?,
+        val load5: Int?,
+        val load15: Int?,
     ) : PacketSummary
 
     /**

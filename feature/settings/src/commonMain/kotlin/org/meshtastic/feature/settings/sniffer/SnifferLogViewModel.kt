@@ -33,6 +33,8 @@ import org.meshtastic.core.model.Channel
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
+import org.meshtastic.core.model.util.ON_DEMAND_PORT_NUM
+import org.meshtastic.core.model.util.effectivePortNum
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioConfigRepository
@@ -174,7 +176,16 @@ class SnifferLogViewModel(
                 }
             }
             .combine(prefs.bufferOverflowPolicy) { logs, policy -> logs to policy }
-            .map { (logs, policy) -> capBuffer(logs.mapNotNull(::toSniffedPacket), policy) }
+            .combine(prefs.hideOnDemandChannel0) { (logs, policy), hideOnDemand -> Triple(logs, policy, hideOnDemand) }
+            .map { (logs, policy, hideOnDemand) ->
+                val packets =
+                    logs.mapNotNull(::toSniffedPacket).filterNot { packet ->
+                        // OnDemand (port 354) on the primary channel is the phone app's own diagnostic/control
+                        // chatter with the connected node, not mesh traffic -- see hideOnDemandChannel0's doc.
+                        hideOnDemand && packet.channel == 0 && packet.portNum == ON_DEMAND_PORT_NUM
+                    }
+                capBuffer(packets, policy)
+            }
             .stateInWhileSubscribed(initialValue = emptyList())
 
     private val channelSet = radioConfigRepository.channelSetFlow.stateIn(viewModelScope, SharingStarted.Eagerly, null)
@@ -221,7 +232,7 @@ class SnifferLogViewModel(
             hopLimit = packet.hop_limit,
             rssi = packet.rx_rssi,
             snr = packet.rx_snr,
-            portNum = packet.decoded?.portnum?.value,
+            portNum = packet.decoded?.effectivePortNum(),
             isEncrypted = decodedText == null,
             payloadHex = rawBytes?.hex().orEmpty(),
             decodedPayload = decodedText,

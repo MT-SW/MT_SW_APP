@@ -1949,6 +1949,8 @@
     <string name="sniffer_gear_menu">Sniffer settings</string>
     <string name="sniffer_group_by_gateway_summary">Combine the same packet seen more than once (multiple MQTT gateways, or relayed through different nodes) into one row</string>
     <string name="sniffer_group_by_gateway_title">Group duplicates</string>
+    <string name="sniffer_hide_ondemand_ch0_summary">OnDemand (port 354) traffic on the primary channel is the app\'s own diagnostic/control chatter with the connected node, not mesh traffic</string>
+    <string name="sniffer_hide_ondemand_ch0_title">Hide OnDemand on channel 0</string>
     <string name="sniffer_load_failed">Couldn\'t read that file as a sniffer log</string>
     <string name="sniffer_load_log_summary">View a previously exported JSON log</string>
     <string name="sniffer_load_log_title">Load saved log…</string>
