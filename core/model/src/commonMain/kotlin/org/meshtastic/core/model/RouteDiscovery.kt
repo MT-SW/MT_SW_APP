@@ -41,12 +41,23 @@ val MeshPacket.fullRouteDiscovery: RouteDiscovery?
             val hopStartVal = hop_start
             val hasBitfield = (d.bitfield ?: 0) != 0
 
+            // A genuine per-hop snr_back always has exactly one more entry than there are intermediate
+            // route_back nodes (the extra entry is the final hop back to us) -- that's a more reliable sign
+            // that route_back should be wrapped with its endpoints than hop_start/bitfield, which sniffed
+            // packets from other (often older-firmware) nodes on the mesh frequently don't carry. Without this,
+            // a real snr_back got silently discarded by formatTraceroutePath's own size check below, so a
+            // sniffed traceroute could show a resolved forward path but no signal at all for the return path.
+            val snrBackMatchesFullPath = originalRd.snr_back.size == originalRd.route_back.size + 1
+
             return originalRd
                 .newBuilder()
                 .also { wb ->
                     wb.route = fullRoute
                     wb.route_back =
-                        if ((hopStartVal > 0 || hasBitfield) && originalRd.snr_back.isNotEmpty()) {
+                        if (
+                            (hopStartVal > 0 || hasBitfield || snrBackMatchesFullPath) &&
+                            originalRd.snr_back.isNotEmpty()
+                        ) {
                             fullRouteBack
                         } else {
                             originalRd.route_back

@@ -19,7 +19,6 @@ package org.meshtastic.desktop.di
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 import org.meshtastic.core.domain.usecase.settings.CleanNodeDatabaseUseCase
-import org.meshtastic.core.network.repository.MQTTRepository
 import org.meshtastic.core.repository.AppWidgetUpdater
 import org.meshtastic.core.repository.LocationRepository
 import org.meshtastic.core.repository.MeshLocationManager
@@ -29,7 +28,6 @@ import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.desktop.stub.NoopAppWidgetUpdater
 import org.meshtastic.desktop.stub.NoopCompassHeadingProvider
 import org.meshtastic.desktop.stub.NoopLocationRepository
-import org.meshtastic.desktop.stub.NoopMQTTRepository
 import org.meshtastic.desktop.stub.NoopMagneticFieldProvider
 import org.meshtastic.desktop.stub.NoopMeshLocationManager
 import org.meshtastic.desktop.stub.NoopMeshWorkerManager
@@ -42,8 +40,7 @@ import org.meshtastic.feature.node.compass.PhoneLocationProvider
 
 /**
  * Stubs for interfaces whose only real implementation needs Android APIs — WorkManager, widgets, location, sensors and
- * analytics. [MQTTRepository] is the exception: it has a working `commonMain` implementation, and this binding
- * deliberately shadows it because desktop does not run the MQTT bridge.
+ * analytics.
  */
 @Module
 class DesktopStubsModule {
@@ -64,8 +61,6 @@ class DesktopStubsModule {
     @Single fun meshLocationManager(): MeshLocationManager = NoopMeshLocationManager()
 
     @Single fun locationRepository(): LocationRepository = NoopLocationRepository()
-
-    @Single fun mqttRepository(): MQTTRepository = NoopMQTTRepository()
 
     @Single fun compassHeadingProvider(): CompassHeadingProvider = NoopCompassHeadingProvider()
 
