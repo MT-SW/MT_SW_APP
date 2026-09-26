@@ -112,17 +112,18 @@ data class GroupedSniffedPacket(
 data class SniffedPacketReceipt(val relayId: String?, val snr: Float, val rssi: Int?, val receivedAtMillis: Long)
 
 /**
- * Groups packets sharing the same [SniffedPacket.packetId] -- i.e. the same over-the-air transmission re-heard through
- * several relaying nodes -- into a single row per packet, newest first. Entries with no packetId are never merged and
- * each get their own single-relay row. Pure and stateless, mirroring
- * [org.meshtastic.feature.settings.sniffer.mqtt.groupedByGateway]: called from the display layer only when the user has
- * grouping enabled -- the underlying live packet list itself always stays ungrouped.
+ * Groups packets sharing the same [SniffedPacket.packetId] *and* the same [SniffedPacket.fromId] -- i.e. the same
+ * over-the-air transmission re-heard through several relaying nodes -- into a single row per packet, newest first.
+ * Entries with no packetId are never merged and each get their own single-relay row. Pure and stateless, mirroring
+ * [org.meshtastic.feature.settings.sniffer.mqtt.groupedByGateway] -- see its kdoc for why packetId alone (a per-node
+ * rolling id, not a global one) isn't a safe grouping key by itself: called from the display layer only when the user
+ * has grouping enabled -- the underlying live packet list itself always stays ungrouped.
  */
 fun List<SniffedPacket>.groupedByRelay(): List<GroupedSniffedPacket> {
     val (groupable, ungroupable) = partition { it.packetId != null }
     val grouped =
         groupable
-            .groupBy { it.packetId }
+            .groupBy { it.fromId to it.packetId }
             .values
             .map { packets ->
                 // Prefer the newest copy that actually decoded: several relayed copies of the same over-the-air

@@ -114,17 +114,25 @@ data class GroupedMqttSniffedPacket(
 data class MqttPacketReceipt(val gatewayId: String?, val snr: Float?, val rssi: Int?, val receivedAtMillis: Long)
 
 /**
- * Groups packets sharing the same [MqttSniffedPacket.packetId] -- i.e. the same over-the-air transmission relayed by
- * several gateways -- into a single row per packet, newest first. Entries with no packetId (JSON entries, or anything
- * whose originating MeshPacket id wasn't available) are never merged and each get their own single-gateway row. Pure
- * and stateless: called from the display layer only when the user has grouping enabled -- the underlying
- * [MqttSnifferManager.packets] list itself always stays ungrouped.
+ * Groups packets sharing the same [MqttSniffedPacket.packetId] *and* the same [MqttSniffedPacket.fromId] -- i.e. the
+ * same over-the-air transmission relayed by several gateways -- into a single row per packet, newest first. Entries
+ * with no packetId (JSON entries, or anything whose originating MeshPacket id wasn't available) are never merged and
+ * each get their own single-gateway row. Pure and stateless: called from the display layer only when the user has
+ * grouping enabled -- the underlying [MqttSnifferManager.packets] list itself always stays ungrouped.
+ *
+ * packetId alone isn't unique across the mesh -- it's a per-node rolling id, not a global one, so two different nodes
+ * can independently land on the same value. Over a single radio neighborhood that's rare enough to ignore, but MQTT
+ * aggregates traffic from every gateway across the whole regional network, where it happens often enough to matter: an
+ * unrelated packet from a different origin (possibly on a channel this app can't decrypt at all) would get merged into
+ * a real transmission's group on packetId alone, appending bogus hops -- or a bogus "encrypted" receipt -- to a row
+ * that had nothing to do with it. Keying on (fromId, packetId) together is what actually identifies a single
+ * transmission.
  */
 fun List<MqttSniffedPacket>.groupedByGateway(): List<GroupedMqttSniffedPacket> {
     val (groupable, ungroupable) = partition { it.packetId != null }
     val grouped =
         groupable
-            .groupBy { it.packetId }
+            .groupBy { it.fromId to it.packetId }
             .values
             .map { packets ->
                 // See the mirrored comment in SnifferLogViewModel.groupedByRelay: prefer the newest copy that
