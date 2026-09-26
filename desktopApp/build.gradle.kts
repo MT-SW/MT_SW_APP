@@ -392,6 +392,9 @@ dependencies {
 
     // Compose Desktop
     implementation(compose.desktop.currentOs)
+    // Bundles macOS ARM64 Skiko natives too, so one jar built on this Windows dev machine also runs on an
+    // Apple Silicon Mac for testing -- currentOs alone only brings the natives for whatever OS runs the build.
+    implementation(compose.desktop.macos_arm64)
 
     // The MapLibre map surfaces, shared with the F-Droid Android flavor.
     implementation(projects.feature.mapMaplibre)

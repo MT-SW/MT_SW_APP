@@ -145,6 +145,21 @@ fun SnifferSettingsScreen(
             null -> Unit // not yet synced with the (re)connected device -- don't guess either way
         }
     }
+
+    // The block above can only react once state.snifferEnabled actually resolves to true/false -- but a device
+    // running clean/stock firmware with no REQUEST_SNIFFER_STATE handler at all (e.g. reflashed away from this
+    // fork's firmware) never answers either query, so snifferEnabled AND fwPlusVersion both stay null forever and
+    // that block's `null -> Unit` branch never fires. Once loading has settled (the request timed out or was
+    // answered) and neither query ever confirmed support, the ambiguity that comment is protecting against is
+    // gone: this device will never turn Sniffer on, so a RADIO selection left over from a previous, sniffer-capable
+    // device must not keep showing as on against one that can't. Requiring state.connected keeps this from firing
+    // during the brief null window right after a disconnect, before the next device's own queries have even gone
+    // out.
+    LaunchedEffect(state.connected, state.snifferLoading, snifferSupported) {
+        if (state.connected && !state.snifferLoading && !snifferSupported && activeSource == SnifferSource.RADIO) {
+            panelViewModel.selectSource(SnifferSource.OFF)
+        }
+    }
     LaunchedEffect(mqttSessionActive) {
         if (mqttSessionActive && activeSource != SnifferSource.MQTT) panelViewModel.selectSource(SnifferSource.MQTT)
     }
