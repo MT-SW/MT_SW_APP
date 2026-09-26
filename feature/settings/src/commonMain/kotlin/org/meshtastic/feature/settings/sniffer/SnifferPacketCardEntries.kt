@@ -36,6 +36,7 @@ import org.meshtastic.core.resources.sniffer_receipt_direct
 import org.meshtastic.core.resources.sniffer_source_mqtt_chip
 import org.meshtastic.core.resources.sniffer_source_radio_chip
 import org.meshtastic.feature.settings.sniffer.mqtt.GroupedMqttSniffedPacket
+import org.meshtastic.feature.settings.sniffer.mqtt.copyText
 
 /** The chip row for a Radio sniffer card -- source/relay count, hop count, signal, and the "received N×" highlight. */
 @Composable
@@ -157,7 +158,7 @@ internal fun GroupedRadioPacketCard(
                 receipts = receipts,
                 decodedText = if (decryptPayloads) packet.decodedPayload ?: packet.payloadHex else packet.payloadHex,
                 metadataLines = metadataLines,
-                copyText = packet.copyText,
+                copyText = grouped.copyText,
             )
         }
     }
@@ -204,7 +205,7 @@ internal fun GroupedMqttPacketCard(
                 receipts = receipts,
                 decodedText = if (decryptPayloads) packet.decodedPayload ?: packet.payloadHex else packet.payloadHex,
                 metadataLines = emptyList(),
-                copyText = packet.copyText,
+                copyText = grouped.copyText,
             )
         }
     }

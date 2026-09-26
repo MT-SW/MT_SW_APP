@@ -106,7 +106,29 @@ data class GroupedSniffedPacket(
     /** One entry per underlying reception, oldest first -- the Sniffer Log card's expandable "receipts" list. */
     val receipts: List<SniffedPacketReceipt> =
         listOf(SniffedPacketReceipt(packet.relayId, packet.snr, packet.rssi, packet.receivedAtMillis)),
+    /**
+     * Every underlying reception this row groups, oldest first -- not just the chosen [packet] -- so the copy action
+     * (see [copyText]) can hand over all of them at once. Several relayed copies of the same over-the-air transmission
+     * can decode differently from each other (see [groupedByRelay]'s kdoc); showing only the one this card picked hides
+     * exactly the discrepancy someone copying a packet out to diagnose a decode problem would need to see.
+     */
+    val allPackets: List<SniffedPacket> = listOf(packet),
 )
+
+/**
+ * Combined, redacted copy-action text for a grouped row: every underlying reception's own [SniffedPacket.copyText] from
+ * [GroupedSniffedPacket.allPackets], oldest first -- not just the single copy [GroupedSniffedPacket.packet] shows on
+ * the card.
+ */
+val GroupedSniffedPacket.copyText: String
+    get() =
+        if (allPackets.size <= 1) {
+            packet.copyText
+        } else {
+            allPackets
+                .mapIndexed { index, p -> "--- Copy ${index + 1}/${allPackets.size} ---\n${p.copyText}" }
+                .joinToString("\n\n")
+        }
 
 /** One physical reception of a grouped packet -- who it came through, its signal, and when. */
 data class SniffedPacketReceipt(val relayId: String?, val snr: Float, val rssi: Int?, val receivedAtMillis: Long)
@@ -147,7 +169,7 @@ fun List<SniffedPacket>.groupedByRelay(): List<GroupedSniffedPacket> {
                     packets
                         .sortedBy { it.receivedAtMillis }
                         .map { SniffedPacketReceipt(it.relayId, it.snr, it.rssi, it.receivedAtMillis) }
-                GroupedSniffedPacket(newest, relayIds, receipts)
+                GroupedSniffedPacket(newest, relayIds, receipts, packets.sortedBy { it.receivedAtMillis })
             }
     val singles = ungroupable.map { GroupedSniffedPacket(it, listOfNotNull(it.relayId)) }
     return (grouped + singles).sortedByDescending { it.packet.receivedAtMillis }
@@ -225,10 +247,10 @@ class SnifferLogViewModel(
     }
 
     /** Every channel this app currently holds an (already-expanded, see [Channel.psk]) key for. */
-    private fun knownChannelPsks(): List<ByteArray> {
+    private fun knownChannels(): List<Channel> {
         val set = channelSet.value ?: return emptyList()
         val loraConfig = set.lora_config ?: LoRaConfig.Builder().build()
-        return set.settings.map { Channel(it, loraConfig).psk.toByteArray() }
+        return set.settings.map { Channel(it, loraConfig) }
     }
 
     private fun toSniffedPacket(log: MeshLog): SniffedPacket? {
@@ -236,7 +258,7 @@ class SnifferLogViewModel(
         val myNodeNum = nodeRepository.myNodeInfo.value?.myNodeNum ?: return null
 
         val nodeMap = nodeRepository.nodeDBbyNum.value
-        val decodedText = decodePayloadFromPacket(packet, nodeRepository, knownChannelPsks())
+        val decodedText = decodePayloadFromPacket(packet, nodeRepository, knownChannels())
         val rawBytes = packet.decoded?.payload ?: packet.encrypted
         return SniffedPacket(
             fromId = NodeAddress.numToDefaultId(packet.from),
@@ -255,7 +277,7 @@ class SnifferLogViewModel(
             receivedAtMillis = log.received_date,
             packetId = packet.id,
             relayId = resolveRelayId(packet.relay_node, nodeMap, myNodeNum),
-            summary = summarizePacketPayload(packet, knownChannelPsks()),
+            summary = summarizePacketPayload(packet, knownChannels()),
         )
     }
 

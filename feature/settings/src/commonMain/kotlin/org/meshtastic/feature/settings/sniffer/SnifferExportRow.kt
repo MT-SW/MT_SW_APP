@@ -19,6 +19,7 @@ package org.meshtastic.feature.settings.sniffer
 import kotlinx.serialization.Serializable
 import okio.ByteString
 import okio.ByteString.Companion.toByteString
+import org.meshtastic.core.model.Channel
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.feature.settings.sniffer.mqtt.MqttSniffedPacket
@@ -158,22 +159,22 @@ fun SnifferExportRow.toMqttSniffedPackets(): List<MqttSniffedPacket> {
  */
 fun SnifferExportRow.reattemptDecryption(
     nodeRepository: NodeRepository,
-    knownChannelPsks: List<ByteArray>,
+    knownChannels: List<Channel>,
 ): SnifferExportRow {
-    if (!isEncrypted || decodedPayload != null || knownChannelPsks.isEmpty()) return this
-    val decoded = decodeRetriedPayload(nodeRepository, knownChannelPsks)
+    if (!isEncrypted || decodedPayload != null || knownChannels.isEmpty()) return this
+    val decoded = decodeRetriedPayload(nodeRepository, knownChannels)
     return decoded?.let { copy(decodedPayload = it, isEncrypted = false) } ?: this
 }
 
 /**
  * Reconstructs just enough of a [MeshPacket] (id, from, the encrypted bytes) for [decodePayloadFromPacket] to attempt
- * [knownChannelPsks] against it, then reuses its normal portnum-aware decoding so a reloaded log can show
- * newly-readable payloads for channels added/joined since the log was saved. Split out of [reattemptDecryption] to keep
- * each function's guard clauses within detekt's ReturnCount limit.
+ * [knownChannels] against it, then reuses its normal portnum-aware decoding so a reloaded log can show newly-readable
+ * payloads for channels added/joined since the log was saved. Split out of [reattemptDecryption] to keep each
+ * function's guard clauses within detekt's ReturnCount limit.
  */
 private fun SnifferExportRow.decodeRetriedPayload(
     nodeRepository: NodeRepository,
-    knownChannelPsks: List<ByteArray>,
+    knownChannels: List<Channel>,
 ): String? {
     val id = packetId
     val from = NodeAddress.idToNum(fromId)
@@ -187,7 +188,7 @@ private fun SnifferExportRow.decodeRetriedPayload(
                 wb.encrypted = encrypted
             }
             .build()
-    return decodePayloadFromPacket(packet, nodeRepository, knownChannelPsks)
+    return decodePayloadFromPacket(packet, nodeRepository, knownChannels)
 }
 
 private const val HEX_SHIFT_HIGH_NIBBLE = 4

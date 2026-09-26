@@ -115,7 +115,29 @@ data class GroupedMqttSniffedPacket(
     /** One entry per underlying reception, oldest first -- the Sniffer Log card's expandable "receipts" list. */
     val receipts: List<MqttPacketReceipt> =
         listOf(MqttPacketReceipt(packet.gatewayId, packet.snr, packet.rssi, packet.receivedAtMillis)),
+    /**
+     * Every underlying reception this row groups, oldest first -- not just the chosen [packet] -- so the copy action
+     * (see [copyText]) can hand over all of them at once. Several gateway copies of the same over-the-air transmission
+     * can decode differently from each other (see [groupedByGateway]'s kdoc); showing only the one this card picked
+     * hides exactly the discrepancy someone copying a packet out to diagnose a decode problem would need to see.
+     */
+    val allPackets: List<MqttSniffedPacket> = listOf(packet),
 )
+
+/**
+ * Combined, redacted copy-action text for a grouped row: every underlying reception's own [MqttSniffedPacket.copyText]
+ * from [GroupedMqttSniffedPacket.allPackets], oldest first -- not just the single copy
+ * [GroupedMqttSniffedPacket.packet] shows on the card.
+ */
+val GroupedMqttSniffedPacket.copyText: String
+    get() =
+        if (allPackets.size <= 1) {
+            packet.copyText
+        } else {
+            allPackets
+                .mapIndexed { index, p -> "--- Copy ${index + 1}/${allPackets.size} ---\n${p.copyText}" }
+                .joinToString("\n\n")
+        }
 
 /** One physical reception of a grouped MQTT packet -- which gateway it came through, its signal, and when. */
 data class MqttPacketReceipt(val gatewayId: String?, val snr: Float?, val rssi: Int?, val receivedAtMillis: Long)
@@ -163,7 +185,7 @@ fun List<MqttSniffedPacket>.groupedByGateway(): List<GroupedMqttSniffedPacket> {
                     packets
                         .sortedBy { it.receivedAtMillis }
                         .map { MqttPacketReceipt(it.gatewayId, it.snr, it.rssi, it.receivedAtMillis) }
-                GroupedMqttSniffedPacket(newest, gatewayIds, receipts)
+                GroupedMqttSniffedPacket(newest, gatewayIds, receipts, packets.sortedBy { it.receivedAtMillis })
             }
     val singles = ungroupable.map { GroupedMqttSniffedPacket(it, listOfNotNull(it.gatewayId)) }
     return (grouped + singles).sortedByDescending { it.packet.receivedAtMillis }
@@ -231,20 +253,20 @@ class MqttSnifferManager(
             if (current.none { it.isEncrypted && it.rawPacket != null }) {
                 return@update current
             }
-            val psks = knownChannelPsks()
+            val channels = knownChannels()
             current.map { entry ->
                 val raw = entry.rawPacket
                 if (!entry.isEncrypted || raw == null) {
                     entry
                 } else {
-                    val decodedPayload = decodePayloadFromPacket(raw, nodeRepository, psks)
+                    val decodedPayload = decodePayloadFromPacket(raw, nodeRepository, channels)
                     if (decodedPayload == null) {
                         entry
                     } else {
                         entry.copy(
                             isEncrypted = false,
                             decodedPayload = decodedPayload,
-                            summary = summarizePacketPayload(raw, psks),
+                            summary = summarizePacketPayload(raw, channels),
                         )
                     }
                 }
@@ -289,10 +311,10 @@ class MqttSnifferManager(
     }
 
     /** Every channel this app currently holds an (already-expanded, see [Channel.psk]) key for. */
-    private fun knownChannelPsks(): List<ByteArray> {
+    private fun knownChannels(): List<Channel> {
         val set = channelSet.value ?: return emptyList()
         val loraConfig = set.lora_config ?: LoRaConfig.Builder().build()
-        return set.settings.map { Channel(it, loraConfig).psk.toByteArray() }
+        return set.settings.map { Channel(it, loraConfig) }
     }
 
     private fun decodeMessage(message: MqttClientProxyMessage): MqttSniffedPacket? {
@@ -330,7 +352,7 @@ class MqttSnifferManager(
     ): MqttSniffedPacket {
         val nodeMap = nodeRepository.nodeDBbyNum.value
         val decodedFromWire = packet.decoded?.payload
-        val decodedPayload = decodePayloadFromPacket(packet, nodeRepository, knownChannelPsks())
+        val decodedPayload = decodePayloadFromPacket(packet, nodeRepository, knownChannels())
         val rawBytes: ByteString? = decodedFromWire ?: packet.encrypted
         return MqttSniffedPacket(
             topic = topic,
@@ -349,7 +371,7 @@ class MqttSnifferManager(
             gatewayId = gatewayId?.let { id -> formatGatewayLabel(id, nodeMap) },
             rssi = packet.rx_rssi,
             snr = packet.rx_snr,
-            summary = summarizePacketPayload(packet, knownChannelPsks()),
+            summary = summarizePacketPayload(packet, knownChannels()),
             rawPacket = packet,
         )
     }

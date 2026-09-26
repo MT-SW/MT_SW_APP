@@ -280,8 +280,8 @@ class SnifferPanelViewModel(
             }
             val rows =
                 if (decryptPayloads.value) {
-                    val psks = knownChannelPsks()
-                    parsed.map { it.reattemptDecryption(nodeRepository, psks) }
+                    val channels = knownChannels()
+                    parsed.map { it.reattemptDecryption(nodeRepository, channels) }
                 } else {
                     parsed
                 }
@@ -296,9 +296,9 @@ class SnifferPanelViewModel(
     /**
      * Every channel this app currently holds an (already-expanded) key for -- mirrors the live sniffers' own helper.
      */
-    private fun knownChannelPsks(): List<ByteArray> {
+    private fun knownChannels(): List<Channel> {
         val set = channelSet.value ?: return emptyList()
         val loraConfig = set.lora_config ?: LoRaConfig.Builder().build()
-        return set.settings.map { Channel(it, loraConfig).psk.toByteArray() }
+        return set.settings.map { Channel(it, loraConfig) }
     }
 }

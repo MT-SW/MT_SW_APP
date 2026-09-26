@@ -18,6 +18,7 @@ package org.meshtastic.feature.settings.util
 
 import org.meshtastic.core.common.crypto.ChannelCrypto
 import org.meshtastic.core.common.util.MetricFormatter
+import org.meshtastic.core.model.Channel
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.getTracerouteResponse
 import org.meshtastic.core.model.util.decodeOrNull
@@ -58,7 +59,7 @@ fun decodePayloadFromMeshLog(log: MeshLog, nodeRepository: NodeRepository): Stri
  * Decodes a [MeshPacket]'s payload the same way [decodePayloadFromMeshLog] does, but from a bare packet -- used by the
  * MQTT Sniffer, which sources packets from MQTT-published `ServiceEnvelope`s rather than a [MeshLog] row.
  *
- * If the packet is still channel-encrypted, first tries [ChannelCrypto] against [knownChannelPsks] (channels this app
+ * If the packet is still channel-encrypted, first tries [ChannelCrypto] against [knownChannels] (channels this app
  * already holds the key for -- the same channels firmware itself would be able to decrypt) before giving up and
  * returning null (hex display) for anything it truly can't read.
  */
@@ -66,9 +67,9 @@ fun decodePayloadFromMeshLog(log: MeshLog, nodeRepository: NodeRepository): Stri
 fun decodePayloadFromPacket(
     packet: MeshPacket,
     nodeRepository: NodeRepository,
-    knownChannelPsks: List<ByteArray> = emptyList(),
+    knownChannels: List<Channel> = emptyList(),
 ): String? {
-    val decoded = packet.decoded ?: decryptWithKnownChannels(packet, knownChannelPsks) ?: return null
+    val decoded = packet.decoded ?: decryptWithKnownChannels(packet, knownChannels) ?: return null
 
     val portnumValue = decoded.portnum.value
     val payload = decoded.payload.toByteArray()
@@ -126,13 +127,25 @@ fun decodePayloadFromPacket(
 }
 
 /**
- * Tries each of [knownChannelPsks] against [packet]'s `encrypted` bytes (AES-CTR, see [ChannelCrypto]), returning the
+ * Tries each of [knownChannels] against [packet]'s `encrypted` bytes (AES-CTR, see [ChannelCrypto]), returning the
  * first successfully-decoded [Data] submessage, or null if none of them fit -- either because this app doesn't hold the
  * right channel's key, or the packet isn't encrypted at all.
+ *
+ * [packet.channel] carries the same on-air channel hash firmware computes ([Channel.hash]) precisely so a receiver
+ * doesn't have to brute-force every key it knows -- it can go straight to the one channel that hash identifies. This
+ * tries the hash-matching channel(s) first (stable sort keeps [knownChannels]' own order among ties) and only falls
+ * back to every other known channel if none match, rather than trying them in plain list order. That matters because
+ * `Data.ADAPTER.decodeOrNull` has no integrity/MAC check: with several channels configured, an earlier *wrong* PSK can
+ * still decrypt a ciphertext into bytes that happen to parse as a *valid-looking* protobuf -- especially likely for
+ * TRACEROUTE_APP, whose RouteDiscovery is almost entirely small `repeated int32` fields, permissive to parse from
+ * near-arbitrary bytes. Trying list order first, this could silently return a fully-formed but wrong RouteDiscovery for
+ * a packet this app actually has the right key for, instead of ever reaching that correct channel's own PSK.
  */
-private fun decryptWithKnownChannels(packet: MeshPacket, knownChannelPsks: List<ByteArray>): Data? {
+private fun decryptWithKnownChannels(packet: MeshPacket, knownChannels: List<Channel>): Data? {
     val encrypted = packet.encrypted?.toByteArray() ?: return null
-    for (psk in knownChannelPsks) {
+    val ordered = knownChannels.sortedByDescending { it.hash == packet.channel }
+    for (channel in ordered) {
+        val psk = channel.psk.toByteArray()
         val plain =
             ChannelCrypto.decrypt(psk, packetId = packet.id, fromNode = packet.from, data = encrypted) ?: continue
         val data = Data.ADAPTER.decodeOrNull(plain) ?: continue
@@ -175,8 +188,8 @@ private fun decodeNeighborInfoPayload(payload: ByteArray, nodeRepository: NodeRe
  * packet is still undecodable (encrypted, no known channel key) or its portnum has no dedicated summary; callers fall
  * back to the port/category label alone in that case.
  */
-fun summarizePacketPayload(packet: MeshPacket, knownChannelPsks: List<ByteArray> = emptyList()): PacketSummary? {
-    val decoded = packet.decoded ?: decryptWithKnownChannels(packet, knownChannelPsks) ?: return null
+fun summarizePacketPayload(packet: MeshPacket, knownChannels: List<Channel> = emptyList()): PacketSummary? {
+    val decoded = packet.decoded ?: decryptWithKnownChannels(packet, knownChannels) ?: return null
     val payload = decoded.payload.toByteArray()
     return try {
         when (decoded.portnum.value) {
