@@ -35,10 +35,10 @@ import org.meshtastic.core.resources.sniffer_summary_telemetry_unknown
 import org.meshtastic.feature.settings.util.PacketSummary
 
 /**
- * Renders a [PacketSummary] into the Sniffer Log card's always-visible content line. Split out of
- * SnifferPacketCard.kt, whose `render()` plus its per-variant helpers had grown past this repo's detekt
- * CyclomaticComplexMethod/LongMethod limits as a single function, and once split into helpers, past its
- * TooManyFunctions-per-file limit alongside that file's other card-chrome composables.
+ * Renders a [PacketSummary] into the Sniffer Log card's always-visible content line. Split out of SnifferPacketCard.kt,
+ * whose `render()` plus its per-variant helpers had grown past this repo's detekt CyclomaticComplexMethod/LongMethod
+ * limits as a single function, and once split into helpers, past its TooManyFunctions-per-file limit alongside that
+ * file's other card-chrome composables.
  */
 private const val POSITION_DECIMAL_PLACES = 5
 
@@ -106,16 +106,15 @@ private fun renderHostMetricsSummary(summary: PacketSummary.HostMetricsSummary):
 }
 
 @Composable
-private fun renderPowerMetricsSummary(summary: PacketSummary.PowerMetricsSummary): String =
-    summary.channels
-        .joinToString(" \u2022 ") { ch ->
-            val readings = buildList {
-                ch.voltage?.let { add(MetricFormatter.voltage(it)) }
-                ch.currentMilliAmps?.let { add(MetricFormatter.current(it, decimalPlaces = 1)) }
-            }
-            "CH${ch.channel} ${readings.joinToString(" ")}"
+private fun renderPowerMetricsSummary(summary: PacketSummary.PowerMetricsSummary): String = summary.channels
+    .joinToString(" \u2022 ") { ch ->
+        val readings = buildList {
+            ch.voltage?.let { add(MetricFormatter.voltage(it)) }
+            ch.currentMilliAmps?.let { add(MetricFormatter.current(it, decimalPlaces = 1)) }
         }
-        .ifBlank { stringResource(Res.string.sniffer_summary_telemetry_unknown) }
+        "CH${ch.channel} ${readings.joinToString(" ")}"
+    }
+    .ifBlank { stringResource(Res.string.sniffer_summary_telemetry_unknown) }
 
 @Composable
 private fun renderLocalStatsSummary(summary: PacketSummary.LocalStatsSummary): String {
