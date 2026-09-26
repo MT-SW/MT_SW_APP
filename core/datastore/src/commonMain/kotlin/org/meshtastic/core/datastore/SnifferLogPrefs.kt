@@ -170,10 +170,10 @@ open class SnifferLogPrefs(private val dataStore: CorePreferencesDataStore) {
     }
 
     /**
-     * Hide OnDemand (port 354, see `ON_DEMAND_PORT_NUM`) packets sent on the primary channel (index 0) from the
-     * Radio sniffer -- that traffic is the phone app's own OnDemand/diagnostic chatter with the connected node,
-     * not mesh traffic, and on a busy channel 0 it can crowd out everything else in the log. Defaults to hidden;
-     * the toggle exists for anyone who specifically wants to watch that traffic.
+     * Hide OnDemand (port 354, see `ON_DEMAND_PORT_NUM`) packets sent on the primary channel (index 0) from the Radio
+     * sniffer -- that traffic is the phone app's own OnDemand/diagnostic chatter with the connected node, not mesh
+     * traffic, and on a busy channel 0 it can crowd out everything else in the log. Defaults to hidden; the toggle
+     * exists for anyone who specifically wants to watch that traffic.
      */
     open val hideOnDemandChannel0: Flow<Boolean> =
         dataStore.data.map { it[PreferencesKeys.HIDE_ONDEMAND_CHANNEL0] ?: true }

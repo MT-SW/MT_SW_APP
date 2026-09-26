@@ -217,10 +217,9 @@ private fun summarizeUser(user: User): PacketSummary.NodeInfoSummary = PacketSum
 )
 
 /**
- * Null when none of the Telemetry oneof's variants this screen understands are present -- an empty/unknown
- * Telemetry packet, or one carrying a variant (air_quality_metrics, power_metrics, local_stats, health_metrics)
- * this summary doesn't break out yet, has nothing worth summarizing; the raw decode in the expanded card still
- * shows it in full.
+ * Null when none of the Telemetry oneof's variants this screen understands are present -- an empty/unknown Telemetry
+ * packet, or one carrying a variant (air_quality_metrics, power_metrics, local_stats, health_metrics) this summary
+ * doesn't break out yet, has nothing worth summarizing; the raw decode in the expanded card still shows it in full.
  */
 private fun summarizeTelemetry(telemetry: Telemetry): PacketSummary? {
     telemetry.host_metrics?.let { host ->
@@ -234,18 +233,21 @@ private fun summarizeTelemetry(telemetry: Telemetry): PacketSummary? {
     }
     val env = telemetry.environment_metrics
     val device = telemetry.device_metrics
-    if (env == null && device == null) return null
-    return PacketSummary.TelemetrySummary(
-        temperatureCelsius = env?.temperature?.takeIf { !it.isNaN() },
-        humidityPercent = env?.relative_humidity?.takeIf { !it.isNaN() },
-        pressureHpa = env?.barometric_pressure?.takeIf { !it.isNaN() },
-        voltage = (env?.voltage ?: device?.voltage)?.takeIf { !it.isNaN() },
-        currentMilliAmps = env?.current?.takeIf { !it.isNaN() },
-        batteryPercent = device?.battery_level,
-        uptimeSeconds = device?.uptime_seconds,
-        channelUtilizationPercent = device?.channel_utilization?.takeIf { !it.isNaN() },
-        airUtilTxPercent = device?.air_util_tx?.takeIf { !it.isNaN() },
-    )
+    return if (env == null && device == null) {
+        null
+    } else {
+        PacketSummary.TelemetrySummary(
+            temperatureCelsius = env?.temperature?.takeIf { !it.isNaN() },
+            humidityPercent = env?.relative_humidity?.takeIf { !it.isNaN() },
+            pressureHpa = env?.barometric_pressure?.takeIf { !it.isNaN() },
+            voltage = (env?.voltage ?: device?.voltage)?.takeIf { !it.isNaN() },
+            currentMilliAmps = env?.current?.takeIf { !it.isNaN() },
+            batteryPercent = device?.battery_level,
+            uptimeSeconds = device?.uptime_seconds,
+            channelUtilizationPercent = device?.channel_utilization?.takeIf { !it.isNaN() },
+            airUtilTxPercent = device?.air_util_tx?.takeIf { !it.isNaN() },
+        )
+    }
 }
 
 private fun decodeTraceroutePayload(packet: MeshPacket, payload: ByteArray, nodeRepository: NodeRepository): String {
