@@ -28,8 +28,10 @@ enum class FlavorDimension {
 
 @Suppress("EnumEntryName")
 enum class MeshtasticFlavor(val dimension: FlavorDimension, val default: Boolean = false) {
-    fdroid(FlavorDimension.marketplace),
-    google(FlavorDimension.marketplace, default = true),
+    // The "google" flavor (Play Services/Maps/Crashlytics/Datadog) has been removed for this fork -- fdroid is
+    // now the only marketplace flavor and the default, so a plain assembleDebug/assembleRelease (no flavor
+    // specified) or opening the project in Android Studio builds it, not a nonexistent Google variant.
+    fdroid(FlavorDimension.marketplace, default = true),
 }
 
 fun configureFlavors(
