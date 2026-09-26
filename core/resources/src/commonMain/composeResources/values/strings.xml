@@ -1913,6 +1913,7 @@
     <string name="smart_position">Smart Position</string>
     <!-- SNIFFER -->
     <string name="sniffer_auto_scroll">Auto-scroll</string>
+    <string name="sniffer_buffer_count">%1$d/%2$d</string>
     <string name="sniffer_buffer_overflow_overwrite">Overwrite oldest</string>
     <string name="sniffer_buffer_overflow_stop">Stop</string>
     <string name="sniffer_buffer_overflow_summary">What to do once a live sniffer log reaches 5000 packets since the last clear</string>

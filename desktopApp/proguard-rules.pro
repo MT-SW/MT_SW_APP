@@ -72,6 +72,25 @@
 -keep class org.maplibre.nativeffi.** { *; }
 -keep interface org.maplibre.nativeffi.** { *; }
 
+# ---- LWJGL (Vulkan/OpenGL bindings maplibre-compose's desktop renderer uses) ---
+# MemoryUtil picks its low-level memory-access backend by probing a list of
+# candidate implementations with Class.forName (MemoryBackendUnsafe, its five
+# ...Legacy* variants, and MemoryBackendFFM) and instantiating whichever one
+# loads first -- nothing ever references them by a normal bytecode call, so
+# the shrinker drops every one of them. MemoryUtil's <clinit> then fails to
+# find any backend at all, and every native call that touches it -- including
+# the Vulkan bindings the map renderer needs on Windows -- throws before the
+# map can ever draw a frame:
+#   java.lang.Error: Failed to initialize a backend for MemoryUtil
+# Same shape as the JNA callbacks and MapLibre FFI upcalls above: reflection
+# is the only path in, so an explicit keep is the only way out. LWJGL does
+# this kind of Class.forName probing throughout (backend selection, platform
+# detection, native library loading), so the keep covers the whole library
+# rather than chasing one missing class at a time.
+-keep class org.lwjgl.** { *; }
+-keep interface org.lwjgl.** { *; }
+-dontwarn org.lwjgl.**
+
 # ---- jSerialComm Android stubs (cross-platform serial library) --------------
 # jSerialComm bundles Android shims that reference android.* classes; harmless
 # on JVM/desktop but ProGuard fails the build on unresolved program classes

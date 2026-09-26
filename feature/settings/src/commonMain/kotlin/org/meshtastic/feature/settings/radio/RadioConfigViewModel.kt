@@ -82,6 +82,7 @@ import org.meshtastic.core.repository.MeshConnectionManager
 import org.meshtastic.core.repository.MqttManager
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.NodeRestartTracker
+import org.meshtastic.core.repository.PacketQueueRejectedException
 import org.meshtastic.core.repository.PlatformAnalytics
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.SecurityKeyBackupStore
@@ -133,6 +134,20 @@ private val REMOTE_READ_LATE_RESPONSE_GRACE: Duration = 2.minutes
  * answers at all).
  */
 private val SNIFFER_STATE_TIMEOUT: Duration = 5.seconds
+
+/**
+ * Bounded retry for the Sniffer OnDemand requests below, mirroring MeshConnectionManagerImpl's
+ * retryPostHandshakeRequest: firing the instant a reconnect resolves can still race the transport actually being ready
+ * to accept packets, and a single rejection here used to be swallowed by safeLaunch with nothing left to re-ask
+ * afterwards -- which is how the app could end up never learning the real on-device Sniffer state after a reconnect.
+ */
+private const val SNIFFER_REQUEST_MAX_ATTEMPTS = 5
+private val SNIFFER_REQUEST_INITIAL_RETRY_DELAY: Duration = 1.seconds
+
+private fun snifferRequestRetryDelay(attempt: Int): Duration {
+    val exponent = (attempt - 1).coerceAtMost(2)
+    return SNIFFER_REQUEST_INITIAL_RETRY_DELAY * (1 shl exponent)
+}
 
 /** Data class that represents the current RadioConfig state. */
 data class RadioConfigState(
@@ -407,15 +422,28 @@ open class RadioConfigViewModel(
             .launchIn(viewModelScope)
 
         // Sniffer state/support no longer comes from ModuleConfig (nodemodadmin was our abandoned fork's
-        // field); it's now answered on demand over port 354 -- see SnifferControlUseCase. Re-subscribes
-        // whenever the effective local node changes (dest switches, or a reconnect resolves myNodeNum) and
-        // re-requests the current state once per such change, matching how nodemodadmin used to be
-        // re-populated once per fresh handshake.
-        combine(nodeRepository.myNodeInfo, activeDestNum) { ni, dest ->
-            val isLocal = (dest == null) || (dest == ni?.myNodeNum)
-            if (isLocal) ni?.myNodeNum else null
-        }
-            .distinctUntilChanged()
+        // field); it's now answered on demand over port 354 -- see SnifferControlUseCase. Re-requests the current
+        // state on every transition to Connected, not only when myNodeNum itself changes: myNodeInfo is a
+        // persisted DB row that keeps the same myNodeNum across an ordinary reconnect to the *same* device, so
+        // keying only on that number missed every reconnect after the first -- and firing the very first request
+        // from that combine alone raced the actual transport handshake, landing before the outbound queue would
+        // accept anything and dying as a silently-swallowed PacketQueueRejectedException with nothing left to
+        // re-ask afterwards. That combination is why a device reset could leave the panel showing whatever
+        // Sniffer state this app last knew about instead of what the radio actually came back up with. Anchoring
+        // on Connected fixes the timing, and requestWithQueueRetry below covers the rare case a request still
+        // lands a beat too early.
+        val localNumIfConnected =
+            combine(
+                nodeRepository.myNodeInfo,
+                activeDestNum,
+                serviceRepository.connectionState.map { it == ConnectionState.Connected }.distinctUntilChanged(),
+            ) { ni, dest, connected ->
+                val isLocal = (dest == null) || (dest == ni?.myNodeNum)
+                if (isLocal && connected) ni?.myNodeNum else null
+            }
+                .distinctUntilChanged()
+
+        localNumIfConnected
             .onEach { localNum ->
                 if (localNum == null) {
                     _radioConfigState.update {
@@ -428,11 +456,7 @@ open class RadioConfigViewModel(
             }
             .launchIn(viewModelScope)
 
-        combine(nodeRepository.myNodeInfo, activeDestNum) { ni, dest ->
-            val isLocal = (dest == null) || (dest == ni?.myNodeNum)
-            if (isLocal) ni?.myNodeNum else null
-        }
-            .distinctUntilChanged()
+        localNumIfConnected
             .flatMapLatest { localNum -> localNum?.let(snifferControlUseCase::snifferEnabledFlow) ?: flowOf(null) }
             .onEach { enabled ->
                 _radioConfigState.update { it.copy(snifferEnabled = enabled, snifferLoading = false) }
@@ -714,13 +738,37 @@ open class RadioConfigViewModel(
     }
 
     /**
+     * Runs [send] and retries with capped exponential backoff ([snifferRequestRetryDelay]) if the outbound packet queue
+     * rejects it, instead of dying on the first attempt -- see the constants above this class for why this exists.
+     * Bails out early once [localNum] is no longer the connected local node, so a retry loop left over from a dropped
+     * connection can't keep firing into a new one.
+     */
+    private suspend fun requestWithQueueRetry(label: String, localNum: Int, send: suspend () -> Unit) {
+        var attempt = 0
+        while (myNodeNum == localNum) {
+            try {
+                send()
+                return
+            } catch (e: PacketQueueRejectedException) {
+                attempt++
+                if (attempt >= SNIFFER_REQUEST_MAX_ATTEMPTS) {
+                    Logger.w(e) { "[$label] abandoned after $attempt packet-queue rejections" }
+                    return
+                }
+                Logger.d { "[$label] rejected by the packet queue, retrying (attempt $attempt)" }
+                delay(snifferRequestRetryDelay(attempt))
+            }
+        }
+    }
+
+    /**
      * Sends REQUEST_SNIFFER_STATE for [localNum] and clears the loading spinner if nothing answers in time -- see
      * [SnifferControlUseCase] for why this can no longer read "supported" off ModuleConfig.
      */
     private fun requestSnifferState(localNum: Int) {
         safeLaunch(tag = "requestSnifferState") {
             _radioConfigState.update { it.copy(snifferLoading = true) }
-            snifferControlUseCase.requestState(localNum)
+            requestWithQueueRetry("requestSnifferState", localNum) { snifferControlUseCase.requestState(localNum) }
             delay(SNIFFER_STATE_TIMEOUT)
             _radioConfigState.update { if (it.snifferEnabled == null) it.copy(snifferLoading = false) else it }
         }
@@ -731,7 +779,11 @@ open class RadioConfigViewModel(
      * [SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_SNIFFER] for how the answer feeds Sniffer support detection.
      */
     private fun requestFwPlusVersion(localNum: Int) {
-        safeLaunch(tag = "requestFwPlusVersion") { snifferControlUseCase.requestFwPlusVersion(localNum) }
+        safeLaunch(tag = "requestFwPlusVersion") {
+            requestWithQueueRetry("requestFwPlusVersion", localNum) {
+                snifferControlUseCase.requestFwPlusVersion(localNum)
+            }
+        }
     }
 
     /**

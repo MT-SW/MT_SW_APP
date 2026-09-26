@@ -35,33 +35,24 @@ val MeshPacket.fullRouteDiscovery: RouteDiscovery?
             val fullRoute = listOf(destinationId) + originalRd.route + sourceId
             val fullRouteBack = listOf(sourceId) + originalRd.route_back + destinationId
 
-            // hopStart was not populated prior to 2.3.0. The bitfield was added in 2.5.0 and
-            // is used to detect versions where hopStart can be trusted to have been set.
-            // Assuming default integer values of 0 for hop_start and snr_back_count if unset.
-            val hopStartVal = hop_start
-            val hasBitfield = (d.bitfield ?: 0) != 0
-
-            // A genuine per-hop snr_back always has exactly one more entry than there are intermediate
-            // route_back nodes (the extra entry is the final hop back to us) -- that's a more reliable sign
-            // that route_back should be wrapped with its endpoints than hop_start/bitfield, which sniffed
-            // packets from other (often older-firmware) nodes on the mesh frequently don't carry. Without this,
-            // a real snr_back got silently discarded by formatTraceroutePath's own size check below, so a
-            // sniffed traceroute could show a resolved forward path but no signal at all for the return path.
+            // hop_start/bitfield used to gate this (as a proxy for "firmware new enough to have set
+            // hop_start"), but that proxy fires on ANY nonzero bitfield bit -- unrelated ones included -- so a
+            // sniffed packet (especially via MQTT, relayed through other nodes) could get route_back wrapped with
+            // endpoints even though snr_back didn't have the matching count, which is what formatTraceroutePath
+            // needs below; that mismatch made it fall back to showing "?" for every hop, and separately made the
+            // route look one hop longer than it really was.
+            //
+            // A genuine per-hop snr_back always has exactly one more entry than there are intermediate route_back
+            // nodes (the extra entry is the final hop back to us), so checking that directly -- instead of
+            // guessing from hop_start/bitfield -- only wraps route_back when doing so is actually consistent with
+            // the SNR data the packet carries.
             val snrBackMatchesFullPath = originalRd.snr_back.size == originalRd.route_back.size + 1
 
             return originalRd
                 .newBuilder()
                 .also { wb ->
                     wb.route = fullRoute
-                    wb.route_back =
-                        if (
-                            (hopStartVal > 0 || hasBitfield || snrBackMatchesFullPath) &&
-                            originalRd.snr_back.isNotEmpty()
-                        ) {
-                            fullRouteBack
-                        } else {
-                            originalRd.route_back
-                        }
+                    wb.route_back = if (snrBackMatchesFullPath) fullRouteBack else originalRd.route_back
                 }
                 .build()
         }

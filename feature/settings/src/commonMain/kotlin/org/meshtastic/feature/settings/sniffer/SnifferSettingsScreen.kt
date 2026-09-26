@@ -50,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.datastore.SnifferLogPrefs
 import org.meshtastic.core.datastore.SnifferSource
 import org.meshtastic.core.domain.usecase.settings.SnifferControlUseCase
 import org.meshtastic.core.resources.Res
@@ -61,6 +62,7 @@ import org.meshtastic.core.resources.mqtt_status_disconnected_with_reason
 import org.meshtastic.core.resources.mqtt_status_inactive
 import org.meshtastic.core.resources.mqtt_status_reconnecting
 import org.meshtastic.core.resources.mqtt_status_reconnecting_with_attempt
+import org.meshtastic.core.resources.sniffer_buffer_count
 import org.meshtastic.core.resources.sniffer_dismiss_loaded_file
 import org.meshtastic.core.resources.sniffer_enable_failed
 import org.meshtastic.core.resources.sniffer_load_failed
@@ -128,13 +130,14 @@ fun SnifferSettingsScreen(
     // what's actually happening rather than a stale preference. See SnifferPanelViewModel's doc for the rest of the
     // exclusivity contract.
     //
-    // The false branch matters just as much as the true one: nodemodadmin (and so snifferEnabled) is cleared to null
-    // and freshly resynced from the device on every reconnect (MeshConfigFlowManagerImpl.handleMyInfo). If the radio
-    // came back up with sniffing off -- e.g. it lost power while it was on and defaults to off after a reboot, or the
-    // phone connected to a different device than before -- a RADIO selection left over from a previous session must
-    // not keep showing as on just because nothing ever told it otherwise. Without this, the panel looked like it was
-    // still sniffing (and kept "collecting", see SnifferLogViewModel.sniffedPackets) against a device that had
-    // already turned it off.
+    // The false branch matters just as much as the true one: snifferEnabled is cleared to null and freshly
+    // resynced from the device on every reconnect (RadioConfigViewModel's Connected-gated resync -- see its kdoc
+    // for why this used to miss reconnects to the same device). If the radio came back up with sniffing off --
+    // e.g. it lost power while it was on and defaults to off after a reboot, or the phone connected to a
+    // different device than before -- a RADIO selection left over from a previous session must not keep showing
+    // as on just because nothing ever told it otherwise. Without this, the panel looked like it was still
+    // sniffing (and kept "collecting", see SnifferLogViewModel.sniffedPackets) against a device that had already
+    // turned it off.
     LaunchedEffect(state.snifferEnabled) {
         when (state.snifferEnabled) {
             true -> if (activeSource != SnifferSource.RADIO) panelViewModel.selectSource(SnifferSource.RADIO)
@@ -212,11 +215,29 @@ fun SnifferSettingsScreen(
 
     LaunchedEffect(display.newestKey) { if (autoScroll && display.newestKey != null) listState.animateScrollToItem(0) }
 
+    // A small "how full is the live buffer" readout, e.g. "1530/5000" -- capBuffer (SnifferLogViewModel /
+    // MqttSnifferLogViewModel) caps radioPackets/mqttPackets at SnifferLogPrefs.MAX_BUFFERED_PACKETS, so this
+    // doubles as an early warning that STOP is about to freeze the log or OVERWRITE is about to start dropping
+    // the oldest packets. Hidden while viewing a loaded file or with no live source selected -- there's no live
+    // buffer to report on then.
+    val bufferCountText =
+        when {
+            loadedLog != null -> null
+
+            activeSource == SnifferSource.RADIO ->
+                stringResource(Res.string.sniffer_buffer_count, radioPackets.size, SnifferLogPrefs.MAX_BUFFERED_PACKETS)
+
+            activeSource == SnifferSource.MQTT ->
+                stringResource(Res.string.sniffer_buffer_count, mqttPackets.size, SnifferLogPrefs.MAX_BUFFERED_PACKETS)
+
+            else -> null
+        }
+
     Scaffold(
         topBar = {
             MainAppBar(
                 title = stringResource(Res.string.sniffer_settings_title),
-                subtitle = null,
+                subtitle = bufferCountText,
                 ourNode = null,
                 showNodeChip = false,
                 canNavigateUp = true,

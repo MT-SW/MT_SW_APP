@@ -100,6 +100,18 @@
 -keep class * implements io.ktor.serialization.kotlinx.KotlinxSerializationExtensionProvider { *; }
 -keep class io.ktor.serialization.kotlinx.json.** { *; }
 
+# ---- Coil3 (ServiceLoader gap, same shape as the Ktor one above) -----------
+# coil3's ComponentRegistry discovers optional fetchers/decoders (e.g. the Ktor3
+# network fetcher used to load device hardware icons) via ServiceLoader against
+# coil3.util.FetcherServiceLoaderTarget/DecoderServiceLoaderTarget. Nothing calls
+# these implementations directly, so the shrinker drops them while leaving the
+# META-INF/services entry (a plain-text resource ProGuard doesn't touch) pointing
+# at a class that's no longer there, and coil3 crashes every image load with:
+#   ServiceConfigurationError: coil3.util.FetcherServiceLoaderTarget: Provider
+#   coil3.network.ktor3.internal.KtorNetworkFetcherServiceLoaderTarget not found
+-keep class * implements coil3.util.FetcherServiceLoaderTarget { *; }
+-keep class * implements coil3.util.DecoderServiceLoaderTarget { *; }
+
 # ---- androidx.annotation.Keep (inlined from androidx-annotations.pro) -------
 -keep,allowobfuscation @interface androidx.annotation.Keep
 -keep @androidx.annotation.Keep class * {*;}
