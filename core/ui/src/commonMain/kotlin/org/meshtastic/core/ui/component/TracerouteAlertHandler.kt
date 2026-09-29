@@ -36,7 +36,6 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.okay
 import org.meshtastic.core.resources.traceroute
 import org.meshtastic.core.resources.view_on_map
-import org.meshtastic.core.ui.theme.StatusColors.StatusConnecting
 import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
@@ -74,7 +73,7 @@ fun TracerouteAlertHandler(
                                 statusGreen = colorScheme.StatusOnline,
                                 statusYellow = colorScheme.StatusDisconnected,
                                 statusOrange = colorScheme.StatusPurple,
-                                statusRed = colorScheme.StatusConnecting,
+                                statusRed = Quality.NONE.color.invoke(),
                                 modemPreset = LocalModemPreset.current,
                             ),
                         )

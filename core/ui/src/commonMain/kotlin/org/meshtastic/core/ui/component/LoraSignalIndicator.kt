@@ -32,6 +32,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
@@ -96,7 +97,12 @@ enum class Quality(
     @Stable val color: @Composable () -> Color,
 ) {
     // Colours match the connection-status palette: gold (connected / key OK), red (disconnected), purple, white.
-    NONE(Res.string.none_quality, Res.drawable.ic_signal_cellular_alt_1_bar, { colorScheme.StatusConnecting }),
+    // NONE is white on a dark theme and black on a light one, where white would be invisible.
+    NONE(
+        Res.string.none_quality,
+        Res.drawable.ic_signal_cellular_alt_1_bar,
+        { if (colorScheme.background.luminance() < 0.5f) colorScheme.StatusConnecting else Color.Black },
+    ),
     BAD(Res.string.bad, Res.drawable.ic_signal_cellular_alt_2_bar, { colorScheme.StatusPurple }),
     FAIR(Res.string.fair, Res.drawable.ic_signal_cellular_alt, { colorScheme.StatusDisconnected }),
     GOOD(Res.string.good, Res.drawable.ic_signal_cellular_4_bar, { colorScheme.StatusOnline }),

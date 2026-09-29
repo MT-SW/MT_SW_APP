@@ -75,13 +75,13 @@ import org.meshtastic.core.resources.traceroute_return_hops
 import org.meshtastic.core.resources.traceroute_round_trip
 import org.meshtastic.core.resources.traceroute_route_back_to_us
 import org.meshtastic.core.resources.traceroute_route_towards_dest
+import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.icon.Group
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PersonOff
 import org.meshtastic.core.ui.icon.Refresh
 import org.meshtastic.core.ui.icon.Route
 import org.meshtastic.core.ui.theme.GraphColors
-import org.meshtastic.core.ui.theme.StatusColors.StatusConnecting
 import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
@@ -116,7 +116,7 @@ fun TracerouteLogScreen(
     val statusGreen = MaterialTheme.colorScheme.StatusOnline
     val statusYellow = MaterialTheme.colorScheme.StatusDisconnected
     val statusOrange = MaterialTheme.colorScheme.StatusPurple
-    val statusRed = MaterialTheme.colorScheme.StatusConnecting
+    val statusRed = Quality.NONE.color.invoke()
     val modemPreset = LocalModemPreset.current
 
     val headerTowardsStr = stringResource(Res.string.traceroute_route_towards_dest)
