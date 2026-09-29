@@ -48,10 +48,10 @@ import org.meshtastic.core.ui.icon.Groups
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PersonOff
 import org.meshtastic.core.ui.icon.Refresh
-import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
-import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
-import org.meshtastic.core.ui.theme.StatusColors.StatusRed
-import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
+import org.meshtastic.core.ui.theme.StatusColors.StatusConnecting
+import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
+import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
+import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.core.ui.util.annotateNeighborInfo
 import org.meshtastic.feature.node.component.CooldownIconButton
@@ -87,10 +87,11 @@ fun NeighborInfoLogScreen(modifier: Modifier = Modifier, viewModel: MetricsViewM
 
     fun getUsername(nodeNum: Int): String = with(viewModel.getUser(nodeNum)) { "$long_name ($short_name)" }
 
-    val statusGreen = MaterialTheme.colorScheme.StatusGreen
-    val statusYellow = MaterialTheme.colorScheme.StatusYellow
-    val statusOrange = MaterialTheme.colorScheme.StatusOrange
-    val statusRed = MaterialTheme.colorScheme.StatusRed
+    // Named by SNR tier (good/sufficient/weak/none); the palette matches the signal-quality colours.
+    val statusGreen = MaterialTheme.colorScheme.StatusOnline
+    val statusYellow = MaterialTheme.colorScheme.StatusDisconnected
+    val statusOrange = MaterialTheme.colorScheme.StatusPurple
+    val statusRed = MaterialTheme.colorScheme.StatusConnecting
     val modemPreset = LocalModemPreset.current
 
     // Combine our own requests (matched to a result, or "no response") with any NeighborInfo packets overheard on
