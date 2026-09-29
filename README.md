@@ -107,6 +107,15 @@ Tryb pokazujący ruch w eterze, który normalnie by zniknął — wszystkie paki
 - **Desktop: Enter = nowa linijka, Ctrl+Enter = wyślij** — zamiast wymuszonego wysyłania samym Enterem, zachowanie typowe dla komunikatorów na komputerze; na telefonie wysyłanie zostaje osobnym przyciskiem obok pola tekstowego.
 - **Domyślne szablony w Szybkim Czacie (Quick Chat)** — appka wcześniej startowała z pustą listą szablonów wiadomości; teraz przy pierwszym uruchomieniu automatycznie wypełnia ją zestawem własnych komend sieciowych (np. `scyzoryk pomoc`, `scyzoryk test`, `scyzoryk range`, `scyzoryk pogoda`, `scyzoryk info`, `scyzoryk aktualnosci`).
 
+## Jakość sygnału i korekta LNA
+
+- **Korekta wzmocnienia LNA** — w Ustawienia → LoRa jest pole „Wzmocnienie LNA (dB)” dla własnego urządzenia. Wyświetlany poziom szumu i RSSI są pomniejszane o tę wartość (np. 20 dB: −98 dBm pokaże się jako −118 dBm); korekta dotyczy też RSSI wszystkich pakietów odbieranych przez to urządzenie. Wartość jest pamiętana na telefonie osobno dla każdego urządzenia, także po restarcie.
+- **Korekta szumu obcych węzłów** — w szczegółach węzła jest własne pole wzmocnienia LNA, które koryguje wyłącznie poziom szumu zgłaszany przez ten węzeł. RSSI pakietów od innych urządzeń jest korygowane wzmocnieniem własnego urządzenia.
+- **Tylko przy wyświetlaniu** — korekta jest liczona w momencie pokazywania, więc obejmuje też historię, wykresy i tabelę w „Jakości sygnału”; surowe dane w bazie zostają bez zmian. Ocena jakości nie zależy od korekty.
+- **Progi jakości sygnału (SNR)** — dobry: powyżej −3 dB, wystarczający: powyżej −7 dB, słaby: powyżej −12 dB, brak: −12 dB i niżej. Ocena zależy tylko od SNR (RSSI jej nie zmienia) i nie zależy od trybu modemu.
+- **Kolory jak w statusach połączenia** — dobry = złoty, wystarczający = czerwony, słaby = fioletowy, brak = biały. Te same kolory mają wyróżnienia SNR w logach sąsiadów i traceroute oraz ekran pomocy.
+- **Statusy wiadomości** — dostarczenie do sieci na czacie i potwierdzenie odbioru na priv są złote; na priv samo „dostarczono do sieci” (bez potwierdzenia odbiorcy) jest czerwone; błąd wysyłania jest fioletowy. Tarcza podpisanej wiadomości jest złota.
+
 ## Bezpieczeństwo
 
 - **Wybór koloru węzła przy generowaniu klucza** — na ekranie Zabezpieczenia, obok pola klucza prywatnego, dostępny jest wybór koloru z palety; appka miele losowe klucze X25519 lokalnie na telefonie (kilka równoległych wątków, z suwakiem tolerancji dopasowania) aż trafi kolor węzła zbliżony do wybranego. Ponieważ tolerancja dopuszcza pewien rozrzut, appka pokazuje obok siebie wybrany kolor i faktyczny wynik przed wpisaniem klucza — można go zaakceptować albo szukać dalej; klucz trafia do pola dopiero po potwierdzeniu, bez automatycznego zapisu. Wymaga customowego firmware wyprowadzającego numer węzła z klucza publicznego (od wersji 2.8) — na starszym firmware przycisk potwierdzenia jest wyszarzony i pokazuje komunikat o wymaganej aktualizacji zamiast mielić klucz, który i tak nie dałby oczekiwanego koloru po połączeniu z urządzeniem.
@@ -256,6 +265,15 @@ A mode that surfaces air traffic that would normally just vanish — every packe
 - **Preview for images pasted as links** — controlled by a separate toggle in Settings → Privacy (off by default), available on both Android and the desktop version.
 - **Desktop: Enter = new line, Ctrl+Enter = send** — instead of forcing a send on plain Enter, matching the behavior people expect from desktop chat apps; on the phone, sending stays a separate button next to the text field.
 - **Default Quick Chat templates** — the app's Quick Chat template list used to start out empty; now on first launch it's automatically seeded with a set of custom network commands (e.g. `scyzoryk pomoc`, `scyzoryk test`, `scyzoryk range`, `scyzoryk pogoda`, `scyzoryk info`, `scyzoryk aktualnosci`).
+
+## Signal quality and LNA correction
+
+- **LNA gain correction** — Settings → LoRa has an "LNA gain (dB)" field for your own device. The displayed noise floor and RSSI are reduced by this value (e.g. 20 dB: −98 dBm is shown as −118 dBm); it also corrects the RSSI of every packet received by that device. The value is remembered on the phone per device, including after a restart.
+- **Per-node noise correction** — node details have their own LNA gain field that corrects only the noise floor reported by that node. The RSSI of packets from other devices is corrected using your own device's gain.
+- **Display-time only** — the correction is applied when values are shown, so it also covers history, charts and the table in "Signal quality"; raw database data is unchanged. The quality rating is not affected by the correction.
+- **Signal quality thresholds (SNR)** — good: above −3 dB, sufficient: above −7 dB, weak: above −12 dB, none: −12 dB and below. The rating depends on SNR only (RSSI does not change it) and not on the modem preset.
+- **Colors match the connection statuses** — good = gold, sufficient = red, weak = purple, none = white. The SNR highlights in the neighbor and traceroute logs and the help screen use the same colors.
+- **Message statuses** — delivered to the network in a channel and acknowledged by the recipient in a DM are gold; a DM that was only delivered to the network (no recipient ack) is red; a send error is purple. The signed-message shield is gold.
 
 ## Security
 

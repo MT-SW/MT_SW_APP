@@ -127,7 +127,7 @@ import org.meshtastic.core.ui.icon.Reply
 import org.meshtastic.core.ui.icon.Save
 import org.meshtastic.core.ui.icon.ShieldCheck
 import org.meshtastic.core.ui.theme.MessageItemColors
-import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
+import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.feature.messaging.downloadImageBytes
@@ -553,7 +553,7 @@ fun MessageItem(
                                         imageVector = MeshtasticIcons.ShieldCheck,
                                         contentDescription = stringResource(Res.string.security_signed_verified),
                                         modifier = Modifier.size(14.dp),
-                                        tint = MaterialTheme.colorScheme.StatusGreen,
+                                        tint = MaterialTheme.colorScheme.StatusOnline,
                                     )
                                 }
                                 TransportIcon(
@@ -610,6 +610,7 @@ fun MessageItem(
                                 text = stringResource(statusString.second),
                                 metadataStyle = metadataStyle,
                                 isWarning = isDirectImplicitAck || isRetryableFailure || isForgedAck,
+                                isDirectMessage = isDirectMessage,
                                 onStatusClick = onStatusClick,
                             )
                         }
@@ -679,10 +680,11 @@ private fun MessageStatusLabel(
     text: String,
     metadataStyle: TextStyle,
     isWarning: Boolean,
+    isDirectMessage: Boolean,
     onStatusClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val statusColor = messageStatusColor(status, isWarning = isWarning)
+    val statusColor = messageStatusColor(status, isWarning = isWarning, isDirectMessage = isDirectMessage)
     Row(
         modifier =
         modifier

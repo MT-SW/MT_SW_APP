@@ -75,7 +75,7 @@ import org.meshtastic.core.ui.icon.AddReaction
 import org.meshtastic.core.ui.icon.HopCount
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.ShieldCheck
-import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
+import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.feature.messaging.DeliveryInfo
@@ -306,7 +306,7 @@ internal fun ReactionDialog(
                                 imageVector = MeshtasticIcons.ShieldCheck,
                                 contentDescription = stringResource(Res.string.security_signed_verified),
                                 modifier = Modifier.size(14.dp),
-                                tint = MaterialTheme.colorScheme.StatusGreen,
+                                tint = MaterialTheme.colorScheme.StatusOnline,
                             )
                         }
                     }
