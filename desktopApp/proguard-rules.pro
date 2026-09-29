@@ -152,3 +152,12 @@
 -dontwarn org.apache.commons.compress.**
 -dontwarn okhttp3.internal.graal.**
 -dontwarn okhttp3.internal.platform.**
+
+# ---- Enum reflection (dropdown lists) ----------------------------------------
+# DropDownPreference builds its options from `Class.getEnumConstants()`, which calls the enum's synthetic `values()`
+# through reflection. Without this rule ProGuard strips `values()` as unused and every enum dropdown (GPS mode, display
+# mode, ...) renders empty in the packaged desktop build.
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
