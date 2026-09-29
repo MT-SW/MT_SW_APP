@@ -37,8 +37,9 @@ import org.meshtastic.core.ui.icon.MessageError
 import org.meshtastic.core.ui.icon.MqttDelivered
 import org.meshtastic.core.ui.icon.Warning
 import org.meshtastic.core.ui.theme.StatusColors.StatusBlue
-import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
-import org.meshtastic.core.ui.theme.StatusColors.StatusRed
+import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
+import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
+import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 
 @Composable
@@ -74,16 +75,24 @@ fun MessageStatusIcon(
 }
 
 @Composable
-internal fun messageStatusColor(status: MessageStatus, isWarning: Boolean = false): Color {
+internal fun messageStatusColor(
+    status: MessageStatus,
+    isWarning: Boolean = false,
+    isDirectMessage: Boolean = false,
+): Color {
     val colorScheme = MaterialTheme.colorScheme
-    if (isWarning) {
+    // Palette matches the connection-status colours: gold = confirmed, red = only delivered to the network on a DM
+    // (no recipient ack), purple = send error. A warning (e.g. forged ack) keeps the amber alert colour.
+    val isDmNetworkOnly = isDirectMessage && status == MessageStatus.DELIVERED
+    if (isWarning && status != MessageStatus.ERROR && !isDmNetworkOnly) {
         return colorScheme.StatusYellow
     }
     return when (status) {
+        MessageStatus.DELIVERED -> if (isDirectMessage) colorScheme.StatusDisconnected else colorScheme.StatusOnline
+
         MessageStatus.RECEIVED,
-        MessageStatus.DELIVERED,
         MessageStatus.SFPP_CONFIRMED,
-        -> colorScheme.StatusGreen
+        -> colorScheme.StatusOnline
 
         MessageStatus.QUEUED,
         MessageStatus.UNKNOWN,
@@ -93,6 +102,6 @@ internal fun messageStatusColor(status: MessageStatus, isWarning: Boolean = fals
         MessageStatus.SFPP_ROUTING,
         -> colorScheme.StatusBlue
 
-        MessageStatus.ERROR -> colorScheme.StatusRed
+        MessageStatus.ERROR -> colorScheme.StatusPurple
     }
 }
