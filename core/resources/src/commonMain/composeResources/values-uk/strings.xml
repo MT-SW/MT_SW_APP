@@ -634,7 +634,6 @@
     <string name="mqtt_probe_success_with_info">Доступно (%1$s)</string>
     <string name="mqtt_probe_tcp_failure">Неможливо зв'язатися з брокером (TCP)</string>
     <string name="mqtt_probe_timeout">Тайм-аут після %1$d мілісекунд</string>
-    <string name="mqtt_proxy_local">MQTT проксі на цьому телефоні</string>
     <string name="mqtt_status_connected">Під’єднано</string>
     <string name="mqtt_status_connecting">З'єднання…</string>
     <string name="mqtt_status_disconnected">Відключено</string>
@@ -731,6 +730,7 @@
     <string name="none_quality">Жоден</string>
     <string name="not_connected">Не підключено</string>
     <string name="notes">Нотатки</string>
+    <!-- NOTIFICATION -->
     <!-- NOTIFICATIONS -->
     <string name="notifications_for_channel_and_direct_messages">Сповіщення для каналу та особистих повідомлень.</string>
     <string name="notifications_for_low_battery_alerts">Сповіщення про низький заряд акумулятора підключеного пристрою.</string>

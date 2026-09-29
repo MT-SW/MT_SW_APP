@@ -1,12 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <SmellBaseline>
   <ManuallySuppressedIssues/>
-  <CurrentIssues>
-    <ID>MagicNumber:ChannelCrypto.kt:ChannelCrypto$0xFF</ID>
-    <ID>MagicNumber:ChannelCrypto.kt:ChannelCrypto$16</ID>
-    <ID>MagicNumber:ChannelCrypto.kt:ChannelCrypto$24</ID>
-    <ID>MagicNumber:ChannelCrypto.kt:ChannelCrypto$3</ID>
-    <ID>MagicNumber:ChannelCrypto.kt:ChannelCrypto$8</ID>
-    <ID>MixedConditionOperators:BuildUtils.kt:BuildUtils$Build.BRAND.startsWith("generic") &amp;&amp; Build.DEVICE.startsWith("generic")</ID>
-  </CurrentIssues>
+  <CurrentIssues/>
 </SmellBaseline>

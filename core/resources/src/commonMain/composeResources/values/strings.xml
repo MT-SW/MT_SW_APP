@@ -275,17 +275,11 @@
     <string name="config_device_tripleClickAsAdHocPing_summary">Send a position on the primary channel when the user button is triple clicked.</string>
     <string name="config_device_tzdef_summary">Time zone for dates on the device screen and log.</string>
     <string name="config_device_use_phone_tz">Use phone time zone</string>
-    <string name="config_display_auto_screen_carousel_secs_summary">Automatically toggles to the next page on the screen like a carousel, based the specified interval.</string>
-    <string name="config_display_compass_north_top_summary">The compass heading on the screen outside of the circle will always point north.</string>
-    <string name="config_display_displaymode_summary">Override default screen layout.</string>
-    <string name="config_display_flip_screen_summary">Flip screen vertically.</string>
-    <string name="config_display_heading_bold_summary">Bold the heading text on the screen.</string>
-    <string name="config_display_oled_summary">Override automatic OLED screen detection.</string>
-    <string name="config_display_screen_on_secs_summary">How long the screen remains on after the user button is pressed or messages are received.</string>
-    <string name="config_display_units_summary">Units displayed on the device screen.</string>
-    <string name="config_display_wake_on_tap_or_motion_summary">Requires that there be an accelerometer on your device.</string>
-    <string name="config_lora_frequency_slot_summary">Your node’s operating frequency is calculated based on the region, modem preset, and this field. When 0, the slot is automatically calculated based on the primary channel name and will change from the default public slot. Change back to the public default slot if private primary and public secondary channels are configured.</string>
-    <string name="config_lora_hop_limit_summary">Sets the maximum number of hops, default is 3. Increasing hops also increases congestion and should be used carefully. 0 hop broadcast messages will not get ACKs.</string>
+    <string name="config_lora_coding_rate_fraction">4/%1$d</string>
+    <string name="config_lora_coding_rate_override">Coding Rate Override</string>
+    <string name="config_lora_coding_rate_override_max_summary">This preset already uses the highest coding rate.</string>
+    <string name="config_lora_coding_rate_override_summary">Adds error correction on top of the preset. A higher coding rate makes every packet longer on air and uses more of the duty cycle and channel utilization budget.</string>
+    <string name="config_lora_coding_rate_preset_default">Preset default (%1$s)</string>
     <string name="config_lora_modem_preset_licensed_summary">This region's presets are for licensed (amateur radio) operators only. Enable Licensed amateur radio (Ham) in User Config to select them.</string>
     <string name="config_lora_modem_preset_summary">Available modem presets, default is Narrow Fast.</string>
     <string name="config_lora_region_summary">The region where you will be using your radios.</string>
@@ -528,6 +522,7 @@
     <string name="doc_keywords_mqtt">mqtt,broker,internet,bridge,uplink,downlink</string>
     <string name="doc_keywords_node_metrics">metrics,telemetry,signal,snr,rssi,battery,traceroute</string>
     <string name="doc_keywords_nodes">node,mesh,list,role,status,favorite,filter</string>
+    <string name="doc_keywords_notifications">notification,alert,sound,mute,reply,watch,wear os</string>
     <string name="doc_keywords_onboarding">setup,welcome,permissions,first-launch</string>
     <string name="doc_keywords_settings_module">module,serial,telemetry,canned,store-forward,administration</string>
     <string name="doc_keywords_settings_radio">settings,radio,lora,region,modem,device,power,security</string>
@@ -556,6 +551,7 @@
     <string name="doc_title_mqtt">MQTT</string>
     <string name="doc_title_node_metrics">Node Metrics</string>
     <string name="doc_title_nodes">Nodes</string>
+    <string name="doc_title_notifications">Notifications</string>
     <string name="doc_title_onboarding">Getting Started</string>
     <string name="doc_title_settings_module">Settings ÔÇö Modules &amp; Admin</string>
     <string name="doc_title_settings_radio">Settings ÔÇö Radio &amp; User</string>
@@ -653,6 +649,11 @@
     <string name="firmware_edition">Firmware Edition</string>
     <string name="firmware_event_ended_banner">%1$s has ended. Return to standard MT_SW firmware to restore normal features.</string>
     <string name="firmware_event_ended_button">Update firmware</string>
+    <string name="firmware_maintenance_bootloader_available">Latest: %1$s</string>
+    <string name="firmware_maintenance_bootloader_installed">Installed: %1$s</string>
+    <string name="firmware_maintenance_bootloader_latest_hint">Latest version: %1$s. The installed version is shown once the device restarts into update mode.</string>
+    <string name="firmware_maintenance_bootloader_up_to_date">Bootloader is up to date</string>
+    <string name="firmware_maintenance_bootloader_up_to_date_hint">Nothing to upgrade. The firmware is reinstalled next, which restarts the device.</string>
     <string name="firmware_maintenance_cdc_unblock_failed">The erase file was copied but the device didn't start erasing. Nothing has been changed yet. Unplug the device, double-press its reset button, and try again.</string>
     <string name="firmware_maintenance_copy_failed">Couldn't copy the file to the device's drive. Make sure the drive is still connected and try again.</string>
     <string name="firmware_maintenance_data_unavailable">The erase image list isn't available right now. Check your connection and try again, or use the web flasher at flasher.meshtastic.org.</string>
@@ -972,6 +973,8 @@
     <string name="location_permission_blocked_toast">Location permission is off. Turn it on in app settings to share your position.</string>
     <string name="location_permission_denied_notice">Without location access, the map will not show where you are and Meshtastic cannot share your position with the mesh. Everything else keeps working, and you can turn it on later.</string>
     <string name="location_permission_rationale">Meshtastic uses your location to place you on the map, measure distance to nodes, and — only if you turn it on — share your position with the mesh. Declining leaves everything else working.</string>
+    <string name="location_precise_blocked_toast">Precise location is off. Turn on Use precise location in app settings to share your position.</string>
+    <string name="location_precise_rationale">Sharing your position with the mesh needs precise location, so other nodes see where you are rather than a rough area. When Android asks, choose Precise. The map and everything else keep working with approximate location.</string>
     <string name="location_sharing">Location Sharing</string>
     <!-- LOCKDOWN -->
     <string name="lockdown_backoff">Try again in %1$d seconds.</string>
@@ -1146,15 +1149,28 @@
     <!-- MESHTASTIC -->
     <string name="meshtastic">MT_SW_APP</string>
     <string name="meshtastic_alerts_notifications">Alert notifications</string>
+    <string name="meshtastic_alerts_notifications_description">Critical alerts sent by nodes on the mesh.</string>
     <string name="meshtastic_app_name">MT_SW_APP</string>
     <string name="meshtastic_broadcast_notifications">Broadcast message notifications</string>
+    <string name="meshtastic_broadcast_notifications_description">Messages sent to your channels.</string>
+    <string name="meshtastic_client_notifications">Radio notifications</string>
+    <string name="meshtastic_client_notifications_description">Notices from your radio, such as key verification requests and security warnings.</string>
+    <string name="meshtastic_device_status_notifications">Update and connection notifications</string>
+    <string name="meshtastic_device_status_notifications_description">Firmware updates for your radio, and problems reconnecting to it.</string>
     <string name="meshtastic_low_battery_notifications">Low battery notifications</string>
+    <string name="meshtastic_low_battery_notifications_description">Your radio's battery is running low.</string>
     <string name="meshtastic_low_battery_temporary_remote_notifications">Low battery notifications (favorite nodes)</string>
+    <string name="meshtastic_low_battery_temporary_remote_notifications_description">A favorite node's battery is running low.</string>
     <string name="meshtastic_mesh_beacon_notifications">Mesh invitation notifications</string>
+    <string name="meshtastic_mesh_beacon_notifications_description">Invitations to join a nearby mesh.</string>
     <string name="meshtastic_messages_notifications">Direct message notifications</string>
+    <string name="meshtastic_messages_notifications_description">Messages sent directly to you.</string>
     <string name="meshtastic_new_nodes_notifications">New node notifications</string>
+    <string name="meshtastic_new_nodes_notifications_description">Nodes heard for the first time.</string>
     <string name="meshtastic_service_notifications">Service notifications</string>
+    <string name="meshtastic_service_notifications_description">Shows the connection to your radio while MT_SW_APP runs in the background.</string>
     <string name="meshtastic_waypoints_notifications">Waypoint notifications</string>
+    <string name="meshtastic_waypoints_notifications_description">Waypoints shared on the mesh, and geofence crossings.</string>
     <!-- MESSAGE -->
     <string name="message">Message</string>
     <string name="message_delivery_status">Message delivery status</string>
@@ -1233,8 +1249,8 @@
     <string name="mqtt_probe_tcp_failure">Cannot reach broker (TCP)</string>
     <string name="mqtt_probe_timeout">Timed out after %1$d ms</string>
     <string name="mqtt_probe_tls_failure">TLS handshake failed: %1$s</string>
-    <string name="mqtt_proxy_local">MQTT proxy on this phone</string>
-    <string name="mqtt_proxy_local_summary">This phone relays MQTT traffic for the connected device. Turn off to cut the relay immediately without changing the device's MQTT setting ÔÇö useful when MQTT traffic is overwhelming the connection. Turn back on to resume relaying.</string>
+    <string name="mqtt_proxy_local">MQTT proxy in this app</string>
+    <string name="mqtt_proxy_local_summary">This app relays MQTT traffic for the connected device. Turn off to cut the relay immediately without changing the device's MQTT setting, which helps when MQTT traffic is overwhelming the connection. Turn back on to resume relaying.</string>
     <string name="mqtt_sniffer_enabled_summary">Watch mesh traffic seen on the broker this node is configured to use, using this phone\'s own MQTT connection -- not limited to what the connected node overhears over LoRa.</string>
     <string name="mqtt_sniffer_enabled_title">MQTT Sniffer</string>
     <string name="mqtt_sniffer_log_empty">No MQTT packets yet -- turn on MQTT Sniffer above to start watching broker traffic</string>
@@ -1389,10 +1405,13 @@
     <string name="not_now">Not now</string>
     <string name="note">Note</string>
     <string name="notes">Notes</string>
+    <!-- NOTIFICATION -->
+    <string name="notification_group_mesh">Mesh</string>
     <string name="notification_permission_blocked_notice">Notifications are turned off and Android will not ask again. Turn them on in app settings to hear about new messages and alerts.</string>
     <string name="notification_permission_denied_notice">Without notifications, MT_SW_APP cannot alert you to new messages, new nodes, or a low battery while the app is in the background.</string>
     <string name="notification_permission_rationale">Notifications are how MT_SW_APP reaches you when the app is not open: new messages, newly discovered nodes, and a radio running low on battery. Nothing else changes if you decline.</string>
     <string name="notification_permissions_description">MT_SW_APP uses notifications to keep you updated on new messages and other important events. You can update your notification permissions at any time from settings.</string>
+    <string name="notification_reaction_to">%1$s to “%2$s”</string>
     <!-- NOTIFICATIONS -->
     <string name="notifications_for_channel_and_direct_messages">Notifications for channel and direct messages.</string>
     <string name="notifications_for_low_battery_alerts">Notifications for low battery alerts for the connected device.</string>
@@ -1513,6 +1532,7 @@
     <string name="permission_nearby_devices_summary">Find and connect to your radio over Bluetooth</string>
     <string name="permission_notifications_summary">Alert you to messages, new nodes and low battery</string>
     <string name="permission_state_allowed">Allowed</string>
+    <string name="permission_state_approximate_only">Approximate only. Sharing your position with the mesh needs precise location.</string>
     <string name="permission_state_blocked">Blocked — tap to open system settings</string>
     <string name="permission_state_denied">Denied — tap to allow</string>
     <string name="permission_state_not_applicable">Not required on this version of Android</string>
@@ -2060,7 +2080,7 @@
     <string name="time">Time</string>
     <string name="timeout">Timeout</string>
     <string name="timestamp">Timestamp</string>
-    <string name="tls_enabled_public_broker_summary">When this phone relays MQTT it always connects to mqtt.meshtastic.org over TLS. This setting applies when the radio reaches the broker over its own Wi-Fi or Ethernet.</string>
+    <string name="tls_enabled_public_broker_summary">When this app relays MQTT it always connects to mqtt.meshtastic.org over TLS. This setting applies when the radio reaches the broker over its own Wi-Fi or Ethernet.</string>
     <string name="toggle_my_position">Toggle my position</string>
     <string name="trace_route">Trace Route</string>
     <!-- TRACEROUTE -->

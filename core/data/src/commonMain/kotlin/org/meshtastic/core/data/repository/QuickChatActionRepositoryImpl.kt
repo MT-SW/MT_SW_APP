@@ -22,11 +22,14 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.Single
 import org.meshtastic.core.database.DatabaseProvider
-import org.meshtastic.core.database.entity.QuickChatAction
+import org.meshtastic.core.database.entity.asEntity
+import org.meshtastic.core.database.entity.asExternalModel
 import org.meshtastic.core.di.CoroutineDispatchers
+import org.meshtastic.core.model.QuickChatAction
 import org.meshtastic.core.repository.QuickChatActionRepository
 
 @Single
@@ -39,15 +42,16 @@ class QuickChatActionRepositoryImpl(
 
     override fun getAllActions(): Flow<List<QuickChatAction>> = dbManager
         .observeCurrentDb { it.quickChatActionDao().getAll() }
+        .map { actions -> actions.map { it.asExternalModel() } }
         .onStart { seedDefaultsIfNeeded() }
         .flowOn(dispatchers.io)
 
     /**
-     * Populates the built-in default Quick Chat templates whenever the currently active device database has none —
+     * Populates the built-in default Quick Chat templates whenever the currently active device database has none --
      * covers first use of this fork as well as every subsequent device/database this account connects to. Gated per
      * database on emptiness rather than on a single global "already seeded" flag, since each device has its own Room
      * database. If the user deletes all templates on a given device, they will be reseeded next time that database's
-     * table is read as empty — this trades "stays deleted forever" for actually working across multiple devices.
+     * table is read as empty.
      */
     private suspend fun seedDefaultsIfNeeded() {
         seedMutex.withLock {
@@ -57,14 +61,16 @@ class QuickChatActionRepositoryImpl(
                     .isEmpty()
             if (!isEmpty) return@withLock
             withContext(dispatchers.io) {
-                dbManager.withDb { db -> DEFAULT_QUICK_CHAT_ACTIONS.forEach { db.quickChatActionDao().upsert(it) } }
+                dbManager.withDb { db ->
+                    DEFAULT_QUICK_CHAT_ACTIONS.forEach { db.quickChatActionDao().upsert(it.asEntity()) }
+                }
             }
         }
     }
 
     // Writes go through withDb so they register with the cross-transport merge drain barrier (see DatabaseProvider).
     override suspend fun upsert(action: QuickChatAction) {
-        withContext(dispatchers.io) { dbManager.withDb { it.quickChatActionDao().upsert(action) } }
+        withContext(dispatchers.io) { dbManager.withDb { it.quickChatActionDao().upsert(action.asEntity()) } }
     }
 
     override suspend fun deleteAll() {
@@ -72,7 +78,7 @@ class QuickChatActionRepositoryImpl(
     }
 
     override suspend fun delete(action: QuickChatAction) {
-        withContext(dispatchers.io) { dbManager.withDb { it.quickChatActionDao().delete(action) } }
+        withContext(dispatchers.io) { dbManager.withDb { it.quickChatActionDao().delete(action.asEntity()) } }
     }
 
     override suspend fun setItemPosition(uuid: Long, newPos: Int) {

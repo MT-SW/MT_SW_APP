@@ -647,23 +647,21 @@ class RadioConfigViewModelTest {
     }
 
     @Test
-    fun `toggleAnalyticsAllowed calls prefs`() {
-        every { analyticsPrefs.analyticsAllowed } returns MutableStateFlow(true)
-        every { analyticsPrefs.setAnalyticsAllowed(false) } returns Unit
+    fun `toggleAnalyticsAllowed delegates to the prefs toggle`() {
+        every { analyticsPrefs.toggleAnalyticsAllowed() } returns Unit
 
         viewModel.toggleAnalyticsAllowed()
 
-        verify { analyticsPrefs.setAnalyticsAllowed(false) }
+        verify { analyticsPrefs.toggleAnalyticsAllowed() }
     }
 
     @Test
-    fun `toggleHomoglyphCharactersEncodingEnabled calls prefs`() {
-        every { homoglyphEncodingPrefs.homoglyphEncodingEnabled } returns MutableStateFlow(true)
-        every { homoglyphEncodingPrefs.setHomoglyphEncodingEnabled(false) } returns Unit
+    fun `toggleHomoglyphCharactersEncodingEnabled delegates to the prefs toggle`() {
+        every { homoglyphEncodingPrefs.toggleHomoglyphEncodingEnabled() } returns Unit
 
         viewModel.toggleHomoglyphCharactersEncodingEnabled()
 
-        verify { homoglyphEncodingPrefs.setHomoglyphEncodingEnabled(false) }
+        verify { homoglyphEncodingPrefs.toggleHomoglyphEncodingEnabled() }
     }
 
     @Test
@@ -1132,7 +1130,7 @@ class RadioConfigViewModelTest {
             }
         every { processRadioResponseUseCase(any(), 123, any()) } calls
             {
-                val pendingRequestIds = it.args[2] as Set<Int>
+                val pendingRequestIds = it.arg<Set<Int>>(2)
                 if (42 in pendingRequestIds) RadioResponseResult.Owner(owner) else null
             }
 
@@ -1294,8 +1292,8 @@ class RadioConfigViewModelTest {
         // Channel A (index 1) completed before channel B (index 2) threw.
         assertEquals(listOf(1, 2), writtenIndexes)
         assertNotNull(interrupted)
-        assertEquals(1, interrupted!!.appliedWriteCount)
-        assertEquals("A", interrupted!!.appliedSettings[1].name)
+        assertEquals(1, interrupted.appliedWriteCount)
+        assertEquals("A", interrupted.appliedSettings[1].name)
     }
 
     @Test
@@ -1945,7 +1943,7 @@ class RadioConfigViewModelTest {
         var response: RadioResponseResult = RadioResponseResult.Error(maxRetransmit, Routing.Error.MAX_RETRANSMIT)
         every { processRadioResponseUseCase(any(), 456, any()) } calls
             {
-                val pendingRequestIds = it.args[2] as Set<Int>
+                val pendingRequestIds = it.arg<Set<Int>>(2)
                 if (42 in pendingRequestIds) response else null
             }
         nodeRepository.setNodes(listOf(localNode, remoteNode))
@@ -2802,6 +2800,48 @@ class RadioConfigViewModelTest {
             Config.Builder()
                 .also { wb ->
                     wb.network = Config.NetworkConfig.Builder().also { wb -> wb.wifi_enabled = true }.build()
+                }
+                .build(),
+        )
+        runCurrent()
+
+        assertFalse(nodeRestartTracker.restartExpected.value)
+    }
+
+    @Test
+    fun `local module save that reboots opens the restart window`() = runTest {
+        val node = Node(num = 123, user = User.Builder().also { wb -> wb.id = "!123" }.build())
+        nodeRepository.setNodes(listOf(node))
+        nodeRepository.setMyNodeInfo(myNodeInfo(myNodeNum = 123))
+        viewModel = createViewModel()
+        runCurrent()
+        everySuspend { radioConfigUseCase.setModuleConfig(any(), any(), any()) } returns 42
+
+        nodeRestartTracker.onConnected()
+        viewModel.setModuleConfig(
+            ModuleConfig.Builder()
+                .also { wb -> wb.mqtt = ModuleConfig.MQTTConfig.Builder().also { wb -> wb.enabled = true }.build() }
+                .build(),
+        )
+        runCurrent()
+
+        assertTrue(nodeRestartTracker.restartExpected.value)
+    }
+
+    @Test
+    fun `local Mesh Beacon save does not open the restart window`() = runTest {
+        val node = Node(num = 123, user = User.Builder().also { wb -> wb.id = "!123" }.build())
+        nodeRepository.setNodes(listOf(node))
+        nodeRepository.setMyNodeInfo(myNodeInfo(myNodeNum = 123))
+        viewModel = createViewModel()
+        runCurrent()
+        everySuspend { radioConfigUseCase.setModuleConfig(any(), any(), any()) } returns 42
+
+        nodeRestartTracker.onConnected()
+        viewModel.setModuleConfig(
+            ModuleConfig.Builder()
+                .also { wb ->
+                    wb.mesh_beacon = MeshBeaconConfig.Builder().also { wb -> wb.broadcast_message = "hi" }.build()
                 }
                 .build(),
         )

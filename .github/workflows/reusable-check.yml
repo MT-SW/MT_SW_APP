@@ -58,9 +58,9 @@ jobs:
   # jobs could even enter the queue. Its two outputs are now sourced without a
   # job: cache writability is the pure expression above, and the versionCode
   # comes from one of two places:
-  #   - Jobs whose artifacts ship (android-check, build-desktop,
-  #     build-flatpak-src) check out full — blob-less — history so the build's
-  #     GitVersionValueSource derives the real commit-count versionCode.
+  #   - Jobs whose artifacts ship (android-check, build-desktop) check out full,
+  #     blob-less history so the build's GitVersionValueSource derives the real
+  #     commit-count versionCode.
   #   - Validation-only jobs (lint, screenshot, test shards) pin VERSION_CODE
   #     to a constant instead: their outputs are never shipped, and the real
   #     value changes on every commit, which poisons the versionCode-dependent
@@ -103,10 +103,10 @@ jobs:
           # reproducible from a local store/reuse pair. Re-enable when that is fixed
           # upstream; VERSION_CODE is still pinned above so entries would reuse.
           cache_configuration_cache: 'false'
-          install_jetbrains_jdk: 'true'
 
-      - name: Lint, Analysis & KMP Smoke Compile
-        run: ./gradlew spotlessCheck detekt androidApp:lintFdroidDebug androidApp:lintGoogleDebug core:barcode:lintFdroidDebug core:barcode:lintGoogleDebug -Pci=true --continue
+      - name: Spotless, Detekt & Android Lint
+        # The root spotlessCheck and detekt do not reach the included build-logic build.
+        run: ./gradlew spotlessCheck detekt :build-logic:convention:spotlessCheck :build-logic:convention:detekt androidApp:lintFdroidDebug androidApp:lintGoogleDebug core:barcode:lintFdroidDebug core:barcode:lintGoogleDebug -Pci=true --continue
 
   # ── Screenshot Test Validation ──────────────────────────────────────
   screenshot-check:
@@ -198,8 +198,8 @@ jobs:
   # guards them against drift (every module in settings.gradle.kts with test
   # sources must appear here or be explicitly exempted).
   #   shard-core:    remaining core:* KMP module tests (allTests), plus kmpSmokeCompile,
-  #                  which is the only iOS compile :core:di, :core:nfc and :core:resources
-  #                  get. It lived in lint-check until a cold build there blew the 30m budget.
+  #                  which is the only iOS compile :core:di and :core:resources get.
+  #                  It lived in lint-check until a cold build there blew the 30m budget.
   #   shard-feature: feature:* KMP module tests + :core:service
   #   shard-app:     Pure-Android/JVM tests (androidApp, desktopApp,
   #                  core:barcode, feature:widget)
@@ -209,7 +209,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    timeout-minutes: 45
+    timeout-minutes: 35
     if: inputs.run_unit_tests == true
     env:
       VERSION_CODE: 30000000 # pinned for cache stability -- see comment above
@@ -320,6 +320,7 @@ jobs:
           cache_configuration_cache: 'false'
           # Shards run different task graphs; kover flips the graph again.
           cache_key_suffix: ${{ matrix.shard.name }}${{ inputs.run_coverage && '-kover' || '' }}
+          cache_konan: 'true'
 
       - name: Run Tests & Coverage (${{ matrix.shard.name }})
         run: |
@@ -456,12 +457,13 @@ jobs:
           retention-days: 7
 
   # ── Android Build ────────────────────────────────────────────────────
-  # Also generates the dependency graph — assembling both flavors resolves the widest set.
+  # On main it also submits the dependency graph, since assembling both flavors resolves
+  # the widest set.
   android-check:
     runs-on: ubuntu-26.04
     # No permissions block on purpose: inherits the caller's. main grants contents: write
-    # (graph submit); PRs grant read (upload only).
-    timeout-minutes: 60
+    # for the graph submit.
+    timeout-minutes: 30
     if: inputs.run_android_build == true
 
     steps:
@@ -479,8 +481,7 @@ jobs:
           develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
           job_summary_pr_comment: ${{ env.GRADLE_PR_COMMENT }}
           cache_read_only: ${{ env.GRADLE_CACHE_READ_ONLY }}
-          # main submits; PRs upload (no contents: write), dependency-graph-submit.yml finishes.
-          dependency_graph: ${{ github.event_name == 'pull_request' && 'generate-and-upload' || (github.ref == 'refs/heads/main' && 'generate-and-submit' || 'disabled') }}
+          dependency_graph: ${{ github.ref == 'refs/heads/main' && 'generate-and-submit' || 'disabled' }}
 
       - name: Tag main-branch builds as -SNAPSHOT
         if: github.event_name == 'push'
@@ -604,7 +605,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    timeout-minutes: 60
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
@@ -625,7 +626,6 @@ jobs:
           develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
           job_summary_pr_comment: ${{ env.GRADLE_PR_COMMENT }}
           cache_read_only: ${{ env.GRADLE_CACHE_READ_ONLY }}
-          install_jetbrains_jdk: 'true'
 
       - name: Install dependencies for AppImage
         if: runner.os == 'Linux'

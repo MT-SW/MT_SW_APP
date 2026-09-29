@@ -16,7 +16,7 @@
  */
 package org.meshtastic.feature.map.maplibre
 
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,21 +28,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
 import org.maplibre.compose.camera.CameraAnimation
 import org.maplibre.compose.camera.CameraPosition
+import org.maplibre.compose.camera.CameraUpdate
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.interaction.ClickResult
 import org.maplibre.compose.interaction.MapInteractions
 import org.maplibre.compose.layers.CircleLayer
 import org.maplibre.compose.location.BearingUpdate
-import org.maplibre.compose.location.LocationPuck
 import org.maplibre.compose.location.LocationState
 import org.maplibre.compose.location.LocationTrackingEffect
 import org.maplibre.compose.location.updateCamera
@@ -52,7 +54,8 @@ import org.maplibre.compose.map.LocalViewport
 import org.maplibre.compose.map.MapState
 import org.maplibre.compose.map.MaplibreMap
 import org.maplibre.compose.map.rememberMapState
-import org.maplibre.compose.material3.LocationPuckDefaults
+import org.maplibre.compose.material3.LocationIndicatorDefaults
+import org.maplibre.compose.material3.LocationIndicatorLayer
 import org.maplibre.compose.overlay.include
 import org.maplibre.compose.util.MaplibreComposable
 import org.maplibre.spatialk.geojson.BoundingBox
@@ -65,6 +68,7 @@ import org.meshtastic.core.model.Node
 import org.meshtastic.feature.map.BaseMapViewModel
 import org.meshtastic.feature.map.MapNodePolicy
 import org.meshtastic.feature.map.component.MapEngineUnavailable
+import org.meshtastic.feature.map.component.MeshMapFitPadding
 import org.meshtastic.feature.map.maplibre.component.MeshMapOrnaments
 import org.meshtastic.feature.map.maplibre.geojson.ClusterMember
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
@@ -82,6 +86,8 @@ import org.meshtastic.feature.map.maplibre.style.MapOverlay
 import org.meshtastic.feature.map.maplibre.style.toBaseStyle
 import org.meshtastic.feature.map.maplibre.style.zoomRange
 import kotlin.math.floor
+import kotlin.time.Duration.Companion.seconds
+import org.maplibre.compose.layers.LocationIndicatorDefaults as CoreLocationIndicatorDefaults
 
 /**
  * Everything the mesh map draws, as one [MapState].
@@ -281,9 +287,9 @@ private fun MeshMapNodeLayers(
                 val current = mapState.cameraPosition
                 // A cluster that cannot report an expansion zoom answers with a sentinel (0 on
                 // Android and desktop, -1 on iOS), so clamp — never zoom out on a tap.
-                mapState.animateCameraPosition(
-                    current.copy(target = centre, zoom = maxOf(expansionZoom, current.zoom)),
-                    animation = CameraAnimation.Ease(),
+                mapState.animateCamera(
+                    CameraUpdate(target = centre, zoom = maxOf(expansionZoom, current.zoom)),
+                    CameraAnimation.Ease(),
                 )
             }
         },
@@ -308,6 +314,7 @@ private fun FrameOnce(enabled: Boolean, nodes: List<Node>, mapState: MapState) {
     // packet re-frames over them) one of the two failure modes was always reachable. Nothing here restarts on
     // node changes now, so the latch and the fit cannot come apart.
     val currentNodes by rememberUpdatedState(nodes)
+    val fitPadding = MeshMapFitPadding.toDpPadding(LocalLayoutDirection.current)
     // An effect, not composition-body work: a launch from composition fires even if the composition is
     // abandoned, while its state write is rolled back — a camera jump with no framing recorded. Fitting before
     // the map reports a viewport silently lands on a default, hence the gate.
@@ -316,12 +323,9 @@ private fun FrameOnce(enabled: Boolean, nodes: List<Node>, mapState: MapState) {
         // Waits for the first node set that has anything to frame; a mesh still filling in reports none.
         val box = snapshotFlow { nodesBoundingBox(currentNodes) }.filterNotNull().first()
         hasFramed = true
-        mapState.frameBounds(box, padding = PaddingValues(FRAME_PADDING_DP.dp))
+        mapState.frameBounds(box, padding = fitPadding)
     }
 }
-
-/** Clearance around the fitted bounding box, so an edge node lands clear of the toolbar and zoom controls. */
-private const val FRAME_PADDING_DP = 56
 
 /** Keeps the camera on the user while tracking is on. No-op without a location source. */
 @Composable
@@ -346,11 +350,40 @@ private fun FollowUserLocation(
 @Composable
 @MaplibreComposable
 private fun UserLocationPuck(locationState: LocationState?, visible: Boolean) {
-    if (locationState == null || !visible) return
+    if (locationState == null) return
 
-    // The state overload, which resolves the latest measurement and its most accurate bearing itself.
-    LocationPuck(idPrefix = "user-location", locationState = locationState, colors = LocationPuckDefaults.colors())
+    // The indicator has no notion of age, so a fix that stops arriving is greyed and loses its accuracy ring here,
+    // or an old position reads as a current one.
+    val mark = locationState.lastLocationMeasurementMark
+    var stale by remember(mark) { mutableStateOf(mark != null && mark.elapsedNow() > STALE_LOCATION_AFTER) }
+    LaunchedEffect(mark) {
+        if (mark == null || stale) return@LaunchedEffect
+        delay(STALE_LOCATION_AFTER - mark.elapsedNow())
+        stale = true
+    }
+    val colors = MaterialTheme.colorScheme
+
+    // The state overload, which resolves the latest measurement and its most accurate bearing itself. Hidden rather
+    // than unmounted when tracking stops, since layer additions are queued and a quick toggle could lose the re-add.
+    LocationIndicatorLayer(
+        id = "user-location",
+        locationState = locationState,
+        visible = visible,
+        accuracyRadiusColor = if (stale) Color.Transparent else colors.primary.copy(alpha = ACCURACY_FILL_ALPHA),
+        accuracyRadiusBorderColor = if (stale) Color.Transparent else colors.primary,
+        topImage =
+        if (stale) {
+            CoreLocationIndicatorDefaults.topImage(colors.surfaceDim, colors.onPrimary)
+        } else {
+            LocationIndicatorDefaults.topImage()
+        },
+    )
 }
+
+/** How long a location fix counts as current, the threshold the library's own puck used before 0.18. */
+private val STALE_LOCATION_AFTER = 30.seconds
+
+private const val ACCURACY_FILL_ALPHA = 0.15f
 
 /**
  * The first corner tapped while authoring a geofence box.

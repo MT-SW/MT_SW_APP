@@ -30,8 +30,8 @@ import org.meshtastic.core.resources.analytics_okay
 import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.location_disabled
 import org.meshtastic.core.resources.location_permission
-import org.meshtastic.core.resources.location_permission_blocked_toast
-import org.meshtastic.core.resources.location_permission_rationale
+import org.meshtastic.core.resources.location_precise_blocked_toast
+import org.meshtastic.core.resources.location_precise_rationale
 import org.meshtastic.core.resources.provide_location_to_mesh
 import org.meshtastic.core.ui.component.PermissionRationaleDialog
 import org.meshtastic.core.ui.component.SwitchListItem
@@ -42,7 +42,7 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.PermissionGateAction
 import org.meshtastic.core.ui.util.isGpsDisabled
 import org.meshtastic.core.ui.util.permissionGateAction
-import org.meshtastic.core.ui.util.rememberLocationPermissionState
+import org.meshtastic.core.ui.util.rememberPreciseLocationPermissionState
 import org.meshtastic.core.ui.util.rememberShowToastResource
 
 /** Section managing privacy settings like analytics and location sharing. */
@@ -61,7 +61,8 @@ internal fun ColumnScope.PrivacySettingsContent(
     onToggleAutoLoadChatImages: (Boolean) -> Unit,
 ) {
     val showToast = rememberShowToastResource()
-    val locationPermission = rememberLocationPermissionState()
+    // Mesh sharing needs precise location: the service drops an approximate-only grant, so this toggle asks for fine.
+    val locationPermission = rememberPreciseLocationPermissionState()
     val isGpsOff = isGpsDisabled()
 
     // Captured through rememberUpdatedState: the effect below restarts on every status change, and reading the
@@ -76,7 +77,7 @@ internal fun ColumnScope.PrivacySettingsContent(
     if (showLocationRationale) {
         PermissionRationaleDialog(
             titleRes = Res.string.location_permission,
-            rationaleRes = Res.string.location_permission_rationale,
+            rationaleRes = Res.string.location_precise_rationale,
             icon = MeshtasticIcons.LocationOn,
             onConfirm = {
                 showLocationRationale = false
@@ -110,7 +111,7 @@ internal fun ColumnScope.PrivacySettingsContent(
             // put it back until it can be.
             PermissionGateAction.OPEN_SETTINGS -> {
                 currentToggleLocation(false)
-                currentShowToast(Res.string.location_permission_blocked_toast)
+                currentShowToast(Res.string.location_precise_blocked_toast)
                 locationPermission.openAppSettings()
             }
         }

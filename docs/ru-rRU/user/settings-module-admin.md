@@ -1,8 +1,7 @@
 ---
 title: Настройки — Модули и администрирование
-parent: Руководство пользователя
 nav_order: 8
-last_updated: 2026-09-19
+last_updated: 2026-09-28
 description: Настрой дополнительные функциональные модули (MQTT, телеметрия, готовые сообщения, TAK и другие) и выполняй администрирование устройств.
 aliases:
   - modules
@@ -30,25 +29,25 @@ aliases:
 
 Every module lives under **Settings → Module configuration**.
 
-> ⚠️ **Important:** Saving a module screen restarts the node — the button reads **Save & restart**, and the node is unreachable for a few seconds afterwards. External Notification and Mesh Beacon are the exceptions: their button reads **Save**, and the node may still restart for some changes.
+> ⚠️ **Important:** Saving a module screen restarts the node: the button reads **Save & restart**, and the node is unreachable for a few seconds afterwards. External Notification and Mesh Beacon are the exceptions: their button reads **Save**. External Notification may still restart the node for some changes, while a Mesh Beacon change applies without a restart.
 
 ### MQTT module
 
 Мосты передают сообщения туда и обратно от брокера MQTT для подключения к интернету. This is how you extend your mesh beyond LoRa range or integrate with home automation systems.
 
-| Настройка                    | Описание                                                                                                                                                                                |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MQTT включен                 | Переключить MQTT мост                                                                                                                                                                   |
-| Адрес                        | Адрес MQTT брокера                                                                                                                                                                      |
-| Имя пользователя             | Имя пользователя для аутентификации                                                                                                                                                     |
-| Пароль                       | Пароль аутентификации                                                                                                                                                                   |
-| Шифрование включено          | Зашифровать MQTT-пейлоады                                                                                                                                                               |
-| Вывод JSON включен           | Publish and consume MQTT messages as JSON. Marked deprecated in the protobuf schema, but it is still the only toggle for this behavior and the firmware still honors it |
-| TLS включен                  | Использовать защищённое соединение                                                                                                                                                      |
-| Корневая тема                | Базовый путь темы MQTT                                                                                                                                                                  |
-| Прокси клиенту включен       | Let a connected phone carry the node's MQTT traffic, instead of the node reaching the broker itself                                                                                     |
-| MQTT-прокси на этом телефоне | The phone-side half of **Proxy to client enabled**: whether this phone acts as that relay. See [MQTT](mqtt)                                             |
-| Отчёты по карте              | Publish position to the public map — see the Map reporting group that follows                                                                                                           |
+| Настройка              | Описание                                                                                                                                                                                |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MQTT включен           | Переключить MQTT мост                                                                                                                                                                   |
+| Адрес                  | Адрес MQTT брокера                                                                                                                                                                      |
+| Имя пользователя       | Имя пользователя для аутентификации                                                                                                                                                     |
+| Пароль                 | Пароль аутентификации                                                                                                                                                                   |
+| Шифрование включено    | Зашифровать MQTT-пейлоады                                                                                                                                                               |
+| Вывод JSON включен     | Publish and consume MQTT messages as JSON. Marked deprecated in the protobuf schema, but it is still the only toggle for this behavior and the firmware still honors it |
+| TLS включен            | Использовать защищённое соединение                                                                                                                                                      |
+| Корневая тема          | Базовый путь темы MQTT                                                                                                                                                                  |
+| Прокси клиенту включен | Let the connected app carry the node's MQTT traffic, instead of the node reaching the broker itself                                                                                     |
+| MQTT proxy in this app | The app-side half of **Proxy to client enabled**: whether this app acts as that relay. See [MQTT](mqtt)                                                 |
+| Отчёты по карте        | Publish position to the public map — see the Map reporting group that follows                                                                                                           |
 
 Turning **Map reporting** on reveals a consent card headed _Consent to Share Unencrypted Node Data
 via MQTT_, with an **I agree.** switch under it. The rest of the card doesn't exist on screen
@@ -292,8 +291,9 @@ true before the entry appears in the module list: the node runs firmware 2.8.0 o
 ### Бэкап & Восстановление
 
 **Settings → Backup & Restore** writes the connected node's whole configuration to a file with
-**Export configuration**, and reads a saved file back in with **Import configuration**. Export
-before a factory reset, or to copy one node's setup onto another. The section is shown for your
+**Export configuration**, and reads a saved file back in with **Import configuration**.
+Traffic Management settings are exported but not applied on import. Export before a factory
+reset, or to copy one node's setup onto another. The section is shown for your
 own node only, not over remote admin.
 
 ### Расширенные
@@ -331,6 +331,7 @@ appears only when your own node is selected. It is grouped rather than flat:
 
 - **Allow analytics and crash reporting** — opt in or out of diagnostics.
 - **Provide phone location to mesh** — share this phone's position when the node has no GPS fix.
+  It needs precise location: with approximate location allowed, turning it on asks for precise.
 - **Homoglyph encoding** — how look-alike characters in names are handled.
 
 **Appearance**

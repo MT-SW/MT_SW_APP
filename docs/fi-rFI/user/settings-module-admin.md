@@ -1,8 +1,7 @@
 ---
 title: Asetukset — Moduulit ja ylläpito
-parent: Käyttöopas
 nav_order: 8
-last_updated: 2026-09-19
+last_updated: 2026-09-28
 description: Määritä valinnaiset ominaisuusmoduulit (MQTT, telemetria, valmiit viestit, TAK ja muut) sekä suorita laitteen ylläpitotoimia.
 aliases:
   - moduulit
@@ -30,7 +29,7 @@ Moduuliasetukset käyttävät korttipohjaista asettelua, jossa on kytkimiä, pud
 
 Every module lives under **Settings → Module configuration**.
 
-> ⚠️ **Important:** Saving a module screen restarts the node — the button reads **Save & restart**, and the node is unreachable for a few seconds afterwards. External Notification and Mesh Beacon are the exceptions: their button reads **Save**, and the node may still restart for some changes.
+> ⚠️ **Important:** Saving a module screen restarts the node: the button reads **Save & restart**, and the node is unreachable for a few seconds afterwards. External Notification and Mesh Beacon are the exceptions: their button reads **Save**. External Notification may still restart the node for some changes, while a Mesh Beacon change applies without a restart.
 
 ### MQTT module
 
@@ -46,8 +45,8 @@ Yhdistää verkon viestejä MQTT-välityspalvelimeen ja sieltä takaisin interne
 | JSON ulostulo käytössä                            | Julkaise ja vastaanota MQTT-viestejä JSON-muodossa. Merkitty protobuf-rakenteessa vanhentuneeksi, mutta tämä on edelleen ainoa asetus tähän toimintaan, ja laiteohjelmisto käyttää sitä yhä |
 | TLS käytössä                                      | Käytä suojattua yhteyttä                                                                                                                                                                                    |
 | Palvelimen osoite (root topic) | MQTT:n perusaihepolku                                                                                                                                                                       |
-| Välityspalvelin käytössä                          | Anna yhdistetyn puhelimen välittää radion MQTT-liikenne sen sijaan, että radio muodostaisi itse yhteyden välityspalvelimeen                                                                                 |
-| MQTT-välityspalvelin tällä puhelimella            | Yllä olevan **Välitys asiakkaalle käytössä** -asetuksen puhelinpään osuus: käyttääkö tämä puhelin kyseistä välitystä. Katso [MQTT](mqtt)                                    |
+| Välityspalvelin käytössä                          | Let the connected app carry the node's MQTT traffic, instead of the node reaching the broker itself                                                                                                         |
+| MQTT proxy in this app                            | The app-side half of **Proxy to client enabled**: whether this app acts as that relay. Katso [MQTT](mqtt)                                                                   |
 | Karttaraportointi                                 | Publish position to the public map — see the Map reporting group that follows                                                                                                                               |
 
 Turning **Map reporting** on reveals a consent card headed _Consent to Share Unencrypted Node Data
@@ -289,8 +288,9 @@ Määritä etänä radiot, jotka jakavat saman ylläpitoavaimen:
 ### Varmuuskopiointi ja palautus
 
 **Settings → Backup & Restore** writes the connected node's whole configuration to a file with
-**Export configuration**, and reads a saved file back in with **Import configuration**. Export
-before a factory reset, or to copy one node's setup onto another. The section is shown for your
+**Export configuration**, and reads a saved file back in with **Import configuration**.
+Traffic Management settings are exported but not applied on import. Export before a factory
+reset, or to copy one node's setup onto another. The section is shown for your
 own node only, not over remote admin.
 
 ### Lisäasetukset
@@ -328,6 +328,7 @@ appears only when your own node is selected. It is grouped rather than flat:
 
 - **Allow analytics and crash reporting** — opt in or out of diagnostics.
 - **Provide phone location to mesh** — share this phone's position when the node has no GPS fix.
+  It needs precise location: with approximate location allowed, turning it on asks for precise.
 - **Homoglyph encoding** — how look-alike characters in names are handled.
 
 **Appearance**

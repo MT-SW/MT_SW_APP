@@ -27,18 +27,13 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.coil)
             implementation(projects.core.common)
-            implementation(projects.core.data)
-            implementation(projects.core.database)
-            implementation(projects.core.datastore)
             implementation(projects.core.domain)
             implementation(projects.core.model)
             implementation(projects.core.navigation)
             implementation(projects.core.repository)
             implementation(projects.core.resources)
-            implementation(projects.core.service)
             implementation(projects.core.ui)
             implementation(projects.core.di)
-            implementation(projects.feature.map)
 
             implementation(libs.markdown.renderer)
             implementation(libs.markdown.renderer.m3)

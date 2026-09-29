@@ -38,33 +38,34 @@ import kotlin.test.assertTrue
  */
 abstract class CommonUsbPassWriterTest {
 
+    private val manifestJson = Json { ignoreUnknownKeys = true }
+
     private val manifest =
-        Json { ignoreUnknownKeys = true }
-            .decodeFromString<MaintenanceUf2Manifest>(
-                """
-                {
-                  "manifestVersion": 1,
-                  "otafixReleaseTag": "0.9.2-OTAFIX2.3-BP1.5",
-                  "otafixBase": "https://example.invalid/otafix",
-                  "erase": {
-                    "nrf52": {
-                      "6.1.1": { "fileName": "nrf_erase2.uf2", "sha256": "00", "expectedFirstTargetAddress": 155648 }
-                    },
-                    "nrf52Bootloader": {
-                      "fileName": "meshtastic_factory_erase.uf2",
-                      "sha256": "00",
-                      "expectedFamilyId": 1296388936
-                    },
-                    "rp2040": { "fileName": "pico_erase.uf2", "sha256": "00" }
-                  },
-                  "otafixByBoardId": {
-                    "WisBlock-RAK4631-Board": { "otafixBoardSlug": "wiscore_rak4631_board", "sha256": "00" }
-                  },
-                  "otafixSupportedTargets": ["rak4631"]
-                }
-                """
-                    .trimIndent(),
-            )
+        manifestJson.decodeFromString<MaintenanceUf2Manifest>(
+            """
+            {
+              "manifestVersion": 1,
+              "otafixReleaseTag": "0.9.2-OTAFIX2.3-BP1.5",
+              "otafixBase": "https://example.invalid/otafix",
+              "erase": {
+                "nrf52": {
+                  "6.1.1": { "fileName": "nrf_erase2.uf2", "sha256": "00", "expectedFirstTargetAddress": 155648 }
+                },
+                "nrf52Bootloader": {
+                  "fileName": "meshtastic_factory_erase.uf2",
+                  "sha256": "00",
+                  "expectedFamilyId": 1296388936
+                },
+                "rp2040": { "fileName": "pico_erase.uf2", "sha256": "00" }
+              },
+              "otafixByBoardId": {
+                "WisBlock-RAK4631-Board": { "otafixBoardSlug": "wiscore_rak4631_board", "sha256": "00" }
+              },
+              "otafixSupportedTargets": ["rak4631"]
+            }
+            """
+                .trimIndent(),
+        )
 
     private val treeUri = CommonUri.parse("content://com.android.externalstorage.documents/tree/1234-5678%3A")
 
@@ -156,6 +157,23 @@ abstract class CommonUsbPassWriterTest {
         val bootloader = harness(bootloaderEraseInfo).apply { unblockResult = false }
         assertEquals(UsbPassResult.Written, bootloader.writer.write(erasePass, treeUri, rak) {})
         assertTrue(bootloader.unblockCalls.isEmpty())
+    }
+
+    @Test
+    fun `reviewing a bootloader upgrade reads the drive and writes nothing`() = runTest {
+        val h = harness(sketchInfo)
+
+        val review = h.writer.review(treeUri)
+
+        assertEquals(BootloaderReview.Ready(BootloaderVersions("0.4.3", "0.9.2-OTAFIX2.3-BP1.5")), review)
+        assertTrue(h.written.isEmpty(), "no image is fetched until the user confirms")
+    }
+
+    @Test
+    fun `reviewing refuses a drive that is not a bootloader volume`() = runTest {
+        val h = harness("Model: Something\r\n")
+
+        assertEquals(BootloaderReview.Refused(UsbMaintenanceRefusal.NotABootloaderVolume), h.writer.review(treeUri))
     }
 
     @Test

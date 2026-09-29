@@ -65,12 +65,6 @@ expect fun rememberSaveFileLauncher(
  */
 @Composable expect fun rememberOpenDocumentTreeLauncher(onTreeUriSelect: (CommonUri?) -> Unit): () -> Unit
 
-/**
- * Returns a suspend function that reads up to [maxChars] characters of text from a [CommonUri]. Returns `null` if the
- * file is empty or cannot be read.
- */
-@Composable expect fun rememberReadTextFromUri(): suspend (uri: CommonUri, maxChars: Int) -> String?
-
 /** Keeps the screen awake while [enabled] is true. No-op on platforms that don't support it. */
 @Composable expect fun KeepScreenOn(enabled: Boolean)
 
@@ -131,6 +125,12 @@ expect val isDesktopPlatform: Boolean
  * without runtime permissions the status is always [PermissionStatus.GRANTED].
  */
 @Composable expect fun rememberLocationPermissionState(): PermissionUiState
+
+/**
+ * Like [rememberLocationPermissionState], but granted only with precise location. Use it where an approximate fix would
+ * be wrong rather than merely less useful, such as sharing the phone's position to the mesh.
+ */
+@Composable expect fun rememberPreciseLocationPermissionState(): PermissionUiState
 
 /**
  * Returns the reactive [PermissionUiState] for the Bluetooth scan/connect permissions. On pre-Android-12 devices BLE
