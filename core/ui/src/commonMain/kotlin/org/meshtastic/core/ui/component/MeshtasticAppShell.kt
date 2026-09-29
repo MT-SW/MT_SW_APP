@@ -75,18 +75,6 @@ fun MeshtasticAppShell(
         }
     }
 
-    MeshtasticCommonAppSetup(
-        uiViewModel = uiViewModel,
-        onNavigateToTracerouteMap = { destNum, requestId, logUuid ->
-            multiBackstack.handleDeepLink(
-                listOf(
-                    NodesRoute.Nodes,
-                    NodeDetailRoute.TracerouteMap(destNum = destNum, requestId = requestId, logUuid = logUuid),
-                ),
-            )
-        },
-    )
-
     // Connected device's modem preset, provided once here so signal-quality rating is preset-relative across all
     // screens without per-screen plumbing. Distinct so the value only changes when the preset itself does.
     val radioConfigRepository = koinInject<RadioConfigRepository>()
@@ -121,6 +109,18 @@ fun MeshtasticAppShell(
             LocalLnaCorrection provides lnaCorrection,
             LocalMeshActivity provides uiViewModel.meshActivity,
         ) {
+            // Inside the provider: dialogs raised here (e.g. the traceroute result) read LocalModemPreset etc.
+            MeshtasticCommonAppSetup(
+                uiViewModel = uiViewModel,
+                onNavigateToTracerouteMap = { destNum, requestId, logUuid ->
+                    multiBackstack.handleDeepLink(
+                        listOf(
+                            NodesRoute.Nodes,
+                            NodeDetailRoute.TracerouteMap(destNum = destNum, requestId = requestId, logUuid = logUuid),
+                        ),
+                    )
+                },
+            )
             content()
         }
     }

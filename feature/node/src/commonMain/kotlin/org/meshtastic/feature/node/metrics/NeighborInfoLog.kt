@@ -44,11 +44,11 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.neighbor_info
 import org.meshtastic.core.resources.routing_error_no_response
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.icon.Groups
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PersonOff
 import org.meshtastic.core.ui.icon.Refresh
-import org.meshtastic.core.ui.theme.StatusColors.StatusConnecting
 import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
@@ -91,7 +91,7 @@ fun NeighborInfoLogScreen(modifier: Modifier = Modifier, viewModel: MetricsViewM
     val statusGreen = MaterialTheme.colorScheme.StatusOnline
     val statusYellow = MaterialTheme.colorScheme.StatusDisconnected
     val statusOrange = MaterialTheme.colorScheme.StatusPurple
-    val statusRed = MaterialTheme.colorScheme.StatusConnecting
+    val statusRed = Quality.NONE.color.invoke()
     val modemPreset = LocalModemPreset.current
 
     // Combine our own requests (matched to a result, or "no response") with any NeighborInfo packets overheard on
