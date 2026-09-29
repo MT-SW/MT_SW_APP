@@ -931,6 +931,10 @@
     <string name="lightning_distance">Storm Distance</string>
     <string name="lightning_strikes_1h">Lightning (1h)</string>
     <!-- LOAD -->
+    <string name="lna_gain_correction">LNA gain correction</string>
+    <string name="lna_gain_correction_description">Enter this device's LNA gain in dB. The displayed noise floor and RSSI are reduced by this value (e.g. 20 dB: -98 dBm is shown as -118 dBm). It is stored on this phone only; the device configuration is not changed.</string>
+    <string name="lna_gain_db">LNA gain (dB)</string>
+    <string name="lna_gain_node_description">Corrects only the noise floor reported by this node. RSSI of received packets is corrected using the gain of your own device.</string>
     <string name="load">Load</string>
     <string name="load_15_min">Load 15m</string>
     <string name="load_15_min_description">Fifteen-minute system load average</string>

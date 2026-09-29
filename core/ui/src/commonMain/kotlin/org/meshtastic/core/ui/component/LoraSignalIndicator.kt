@@ -131,9 +131,18 @@ fun Snr(snr: Float?, modifier: Modifier = Modifier, modemPreset: ModemPreset? = 
     )
 }
 
-/** Renders nothing when [rssi] is absent — 0 dBm is a real reading, so it must not stand in for "no reading". */
+/**
+ * [displayOffset] (LNA gain, dB) is subtracted from the shown text only; the colour is still rated from the raw [rssi].
+ *
+ * Renders nothing when [rssi] is absent — 0 dBm is a real reading, so it must not stand in for "no reading".
+ */
 @Composable
-fun Rssi(rssi: Int?, modifier: Modifier = Modifier, label: String = stringResource(Res.string.rssi)) {
+fun Rssi(
+    rssi: Int?,
+    modifier: Modifier = Modifier,
+    label: String = stringResource(Res.string.rssi),
+    displayOffset: Int = 0,
+) {
     if (rssi == null) return
     val color: Color =
         when {
@@ -144,7 +153,7 @@ fun Rssi(rssi: Int?, modifier: Modifier = Modifier, label: String = stringResour
         }
     Text(
         modifier = modifier,
-        text = "$label ${MetricFormatter.rssi(rssi)}",
+        text = "$label ${MetricFormatter.rssi(rssi - displayOffset)}",
         color = color,
         style = MaterialTheme.typography.labelSmall,
     )

@@ -82,6 +82,7 @@ import org.meshtastic.core.ui.icon.Notes
 import org.meshtastic.core.ui.icon.SignalOff
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
+import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.LocalModemPreset
 
 private const val GRID_COLUMNS = 3
@@ -376,7 +377,7 @@ private fun NodeSignalRow(thatNode: Node, isThisNode: Boolean, contentColor: Col
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
                                 Snr(snr)
-                                Rssi(rssi)
+                                Rssi(rssi, displayOffset = LocalLnaCorrection.current.localGain)
                                 if (snr != null) {
                                     val quality = determineSignalQuality(snr, LocalModemPreset.current)
                                     IconInfo(

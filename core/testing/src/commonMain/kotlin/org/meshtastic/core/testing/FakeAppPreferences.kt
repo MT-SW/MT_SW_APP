@@ -186,6 +186,12 @@ class FakeUiPrefs : UiPrefs {
         nodeLocationEnabled.getOrPut(nodeNum) { MutableStateFlow(provide) }.value = provide
     }
 
+    override val lnaGains = MutableStateFlow<Map<Int, Int>>(emptyMap())
+
+    override fun setLnaGain(nodeNum: Int, gainDb: Int) {
+        lnaGains.value = if (gainDb == 0) lnaGains.value - nodeNum else lnaGains.value + (nodeNum to gainDb)
+    }
+
     override val nodeListDensity = MutableStateFlow("COMPLETE")
 
     override fun setNodeListDensity(value: String) {

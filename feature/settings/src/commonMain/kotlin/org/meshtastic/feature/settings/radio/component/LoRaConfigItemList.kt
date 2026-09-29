@@ -26,7 +26,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.flow.map
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.meshtastic.core.model.Capabilities
 import org.meshtastic.core.model.Channel
 import org.meshtastic.core.model.ChannelOption
@@ -36,6 +38,8 @@ import org.meshtastic.core.model.constraintFor
 import org.meshtastic.core.model.normalizeCodingRateOverride
 import org.meshtastic.core.model.numChannels
 import org.meshtastic.core.model.presetForRegionChange
+import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.advanced
 import org.meshtastic.core.resources.bandwidth_default
@@ -50,6 +54,9 @@ import org.meshtastic.core.resources.config_lora_coding_rate_preset_default
 import org.meshtastic.core.resources.config_lora_modem_preset_licensed_summary
 import org.meshtastic.core.resources.config_lora_modem_preset_summary
 import org.meshtastic.core.resources.config_lora_region_summary
+import org.meshtastic.core.resources.lna_gain_correction
+import org.meshtastic.core.resources.lna_gain_correction_description
+import org.meshtastic.core.resources.lna_gain_db
 import org.meshtastic.core.resources.lora
 import org.meshtastic.core.resources.options
 import org.meshtastic.core.resources.schema_lora_bandwidth
@@ -283,6 +290,28 @@ fun LoRaConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
             }
         }
 
+        item {
+            // LNA gain correction is an app-side display offset for this phone's own device, not device config.
+            val uiPrefs = koinInject<UiPrefs>()
+            val nodeRepository = koinInject<NodeRepository>()
+            val myNodeNum by
+                remember(nodeRepository) { nodeRepository.myNodeInfo.map { it?.myNodeNum } }
+                    .collectAsStateWithLifecycle(initialValue = null)
+            val lnaGains by uiPrefs.lnaGains.collectAsStateWithLifecycle()
+            val localNodeNum = myNodeNum
+            if (state.isLocal && localNodeNum != null) {
+                TitledCard(title = stringResource(Res.string.lna_gain_correction)) {
+                    SignedIntegerEditTextPreference(
+                        title = stringResource(Res.string.lna_gain_db),
+                        summary = stringResource(Res.string.lna_gain_correction_description),
+                        value = lnaGains[localNodeNum] ?: 0,
+                        enabled = true,
+                        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                        onValueChanged = { uiPrefs.setLnaGain(localNodeNum, it.coerceIn(-30, 60)) },
+                    )
+                }
+            }
+        }
         item {
             TitledCard(title = stringResource(Res.string.advanced)) {
                 SwitchPreference(

@@ -190,6 +190,16 @@ interface UiPrefs {
 
     fun setShouldProvideNodeLocation(nodeNum: Int, provide: Boolean)
 
+    /**
+     * LNA gain correction in dB, per node number (0 = none, entry absent). The local device's entry corrects its noise
+     * floor and the RSSI of every packet it receives; a remote node's entry corrects only that node's noise floor.
+     * Displayed value = raw value - gain. Raw data in the database is never modified.
+     */
+    val lnaGains: StateFlow<Map<Int, Int>>
+
+    /** Sets the LNA gain for [nodeNum]; 0 removes the correction. */
+    fun setLnaGain(nodeNum: Int, gainDb: Int)
+
     // Node list layout preferences
 
     /** Active density mode stored as the enum name (e.g. "COMPLETE", "COMPACT"). */

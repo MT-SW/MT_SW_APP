@@ -213,6 +213,30 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
 
     private fun provideLocationKey(nodeNum: Int) = "provide-location-$nodeNum"
 
+    override val lnaGains: StateFlow<Map<Int, Int>> =
+        dataStore.data.map { decodeLnaGains(it[KEY_LNA_GAINS]) }.stateIn(scope, SharingStarted.Eagerly, emptyMap())
+
+    override fun setLnaGain(nodeNum: Int, gainDb: Int) {
+        scope.launch {
+            dataStore.edit { preferences ->
+                val gains = decodeLnaGains(preferences[KEY_LNA_GAINS]).toMutableMap()
+                if (gainDb == 0) gains.remove(nodeNum) else gains[nodeNum] = gainDb
+                preferences[KEY_LNA_GAINS] = gains.entries.joinToString(";") { "${it.key}:${it.value}" }
+            }
+        }
+    }
+
+    private fun decodeLnaGains(raw: String?): Map<Int, Int> = raw
+        .orEmpty()
+        .split(';')
+        .mapNotNull { entry ->
+            val parts = entry.split(':')
+            val num = parts.getOrNull(0)?.toIntOrNull()
+            val gain = parts.getOrNull(1)?.toIntOrNull()
+            if (num != null && gain != null && gain != 0) num to gain else null
+        }
+        .toMap()
+
     // Node list layout preferences
 
     override val nodeListDensity: StateFlow<String> =
@@ -396,6 +420,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
     }
 
     companion object {
+        val KEY_LNA_GAINS = stringPreferencesKey("lna-gains-by-node")
         val KEY_HAS_SHOWN_NOT_PAIRED_WARNING_PREF = booleanPreferencesKey("has_shown_not_paired_warning")
         val KEY_SHOW_QUICK_CHAT_PREF = booleanPreferencesKey("show-quick-chat")
         val KEY_QUICK_CHAT_DEFAULTS_SEEDED_PREF = booleanPreferencesKey("quick-chat-defaults-seeded")

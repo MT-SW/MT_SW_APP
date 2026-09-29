@@ -91,6 +91,7 @@ import org.meshtastic.core.ui.theme.GraphColors.Gold
 import org.meshtastic.core.ui.theme.GraphColors.Green
 import org.meshtastic.core.ui.theme.GraphColors.Orange
 import org.meshtastic.core.ui.theme.GraphColors.Red
+import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.Telemetry
@@ -210,6 +211,7 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
         chartPart = { contentModifier, selectedX, vicoScrollState, onPointSelected ->
             SignalMetricsChart(
                 modifier = contentModifier,
+                nodeNum = state.node?.num,
                 localStats = localStatsData.reversed(),
                 meshPackets = signalData.reversed(),
                 vicoScrollState = vicoScrollState,
@@ -236,6 +238,7 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
                         when (entry) {
                             is SignalLogEntry.LocalStatsEntry ->
                                 LocalStatsCard(
+                                    nodeNum = state.node?.num,
                                     telemetry = entry.telemetry,
                                     isSelected = entry.timeSeconds.toDouble() == selectedX,
                                     onClick = { onCardClick(entry.timeSeconds.toDouble()) },
@@ -309,12 +312,18 @@ private fun LocalStatsActionButtons(
 @Composable
 private fun SignalMetricsChart(
     modifier: Modifier = Modifier,
+    nodeNum: Int?,
     localStats: List<Telemetry>,
     meshPackets: List<MeshPacket>,
     vicoScrollState: VicoScrollState,
     selectedX: Double?,
     onPointSelected: (Double) -> Unit,
 ) {
+    // LNA gain correction: display-only. The viewed node's own gain shifts its noise floor; our gain shifts the RSSI of
+    // packets we received.
+    val lna = LocalLnaCorrection.current
+    val noiseGain = nodeNum?.let { lna.gains[it] } ?: 0
+    val rssiGain = lna.localGain
     val noiseFloorData = remember(localStats) { localStats.filter { it.local_stats?.noiseFloorOrNull != null } }
     val busyFloorData =
         remember(noiseFloorData) {
@@ -348,22 +357,22 @@ private fun SignalMetricsChart(
         val rssiLabel = stringResource(Res.string.rssi)
         val snrLabel = stringResource(Res.string.snr)
 
-        LaunchedEffect(noiseFloorData, busyFloorData, rssiData, snrData) {
+        LaunchedEffect(noiseFloorData, busyFloorData, rssiData, snrData, noiseGain, rssiGain) {
             modelProducer.runTransaction {
                 if (noiseFloorData.isNotEmpty()) {
                     lineModel {
                         series(
                             x = noiseFloorData.map { it.time },
-                            y = noiseFloorData.map { it.local_stats?.noise_floor ?: 0 },
+                            y = noiseFloorData.map { (it.local_stats?.noise_floor ?: 0) - noiseGain },
                         )
                     }
                 }
                 if (busyFloorData.isNotEmpty()) {
-                    lineModel { series(x = busyFloorData.map { it.time }, y = busyFloorData.map { BUSY_FLOOR_DBM }) }
+                    lineModel { series(x = busyFloorData.map { it.time }, y = busyFloorData.map { BUSY_FLOOR_DBM - noiseGain }) }
                 }
                 if (rssiData.isNotEmpty()) {
                     lineModel {
-                        series(x = rssiData.map { it.rxTimeOrNull() ?: 0 }, y = rssiData.mapNotNull { it.rx_rssi })
+                        series(x = rssiData.map { it.rxTimeOrNull() ?: 0 }, y = rssiData.mapNotNull { it.rx_rssi?.minus(rssiGain) })
                     }
                 }
                 if (snrData.isNotEmpty()) {
@@ -389,7 +398,8 @@ private fun SignalMetricsChart(
                 },
             )
 
-        val dbmRangeProvider = remember { CartesianLayerRangeProvider.fixed(minY = MIN_DBM_AXIS, maxY = MAX_DBM_AXIS) }
+        val axisMin = MIN_DBM_AXIS - maxOf(0, noiseGain, rssiGain)
+        val dbmRangeProvider = remember(axisMin) { CartesianLayerRangeProvider.fixed(minY = axisMin, maxY = MAX_DBM_AXIS) }
         val noiseFloorLayer =
             rememberConditionalLayer(
                 hasData = noiseFloorData.isNotEmpty(),
@@ -469,7 +479,7 @@ private fun noiseFloorTextColor(value: Int?): Color = when {
 
 @Suppress("LongMethod")
 @Composable
-private fun LocalStatsCard(telemetry: Telemetry, isSelected: Boolean, onClick: () -> Unit) {
+private fun LocalStatsCard(nodeNum: Int?, telemetry: Telemetry, isSelected: Boolean, onClick: () -> Unit) {
     val localStats = telemetry.local_stats
     val time = telemetry.time.toLong() * MS_PER_SEC
     val noiseFloor = localStats?.noiseFloorOrNull
@@ -486,7 +496,7 @@ private fun LocalStatsCard(telemetry: Telemetry, isSelected: Boolean, onClick: (
                 Text(
                     text =
                     if (noiseFloor != null) {
-                        stringResource(Res.string.local_stats_noise, noiseFloor)
+                        stringResource(Res.string.local_stats_noise, LocalLnaCorrection.current.noiseFloor(nodeNum, noiseFloor))
                     } else {
                         stringResource(Res.string.noise_floor_no_reading)
                     },
@@ -585,7 +595,7 @@ private fun SignalMetricsCard(meshPacket: MeshPacket, isSelected: Boolean, onCli
 
                     /* SNR and RSSI */
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        MetricValueRow(color = SignalMetric.RSSI.color, text = MetricFormatter.rssi(meshPacket.rx_rssi))
+                        MetricValueRow(color = SignalMetric.RSSI.color, text = MetricFormatter.rssi(meshPacket.rx_rssi?.let { LocalLnaCorrection.current.rssi(it) }))
                         Spacer(Modifier.width(12.dp))
                         MetricValueRow(
                             color = SignalMetric.SNR.color,
