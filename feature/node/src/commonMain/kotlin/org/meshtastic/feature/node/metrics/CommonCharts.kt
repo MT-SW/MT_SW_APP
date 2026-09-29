@@ -200,7 +200,11 @@ fun Legend(
 
 /** Displays a dialog with information about the legend items. */
 @Composable
-fun LegendInfoDialog(infoData: List<InfoDialogData>, onDismiss: () -> Unit) {
+fun LegendInfoDialog(
+    infoData: List<InfoDialogData>,
+    onDismiss: () -> Unit,
+    extraContent: (@Composable () -> Unit)? = null,
+) {
     AlertDialog(
         icon = { Icon(imageVector = MeshtasticIcons.Info, contentDescription = null) },
         title = {
@@ -233,6 +237,7 @@ fun LegendInfoDialog(infoData: List<InfoDialogData>, onDismiss: () -> Unit) {
                         )
                     }
                 }
+                extraContent?.invoke()
             }
         },
         onDismissRequest = onDismiss,

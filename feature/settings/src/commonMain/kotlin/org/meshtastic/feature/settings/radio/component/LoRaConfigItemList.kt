@@ -56,7 +56,6 @@ import org.meshtastic.core.resources.config_lora_modem_preset_summary
 import org.meshtastic.core.resources.config_lora_region_summary
 import org.meshtastic.core.resources.lna_gain_correction
 import org.meshtastic.core.resources.lna_gain_correction_description
-import org.meshtastic.core.resources.lna_gain_db
 import org.meshtastic.core.resources.lora
 import org.meshtastic.core.resources.options
 import org.meshtastic.core.resources.schema_lora_bandwidth
@@ -291,28 +290,6 @@ fun LoRaConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
         }
 
         item {
-            // LNA gain correction is an app-side display offset for this phone's own device, not device config.
-            val uiPrefs = koinInject<UiPrefs>()
-            val nodeRepository = koinInject<NodeRepository>()
-            val myNodeNum by
-                remember(nodeRepository) { nodeRepository.myNodeInfo.map { it?.myNodeNum } }
-                    .collectAsStateWithLifecycle(initialValue = null)
-            val lnaGains by uiPrefs.lnaGains.collectAsStateWithLifecycle()
-            val localNodeNum = myNodeNum
-            if (state.isLocal && localNodeNum != null) {
-                TitledCard(title = stringResource(Res.string.lna_gain_correction)) {
-                    SignedIntegerEditTextPreference(
-                        title = stringResource(Res.string.lna_gain_db),
-                        summary = stringResource(Res.string.lna_gain_correction_description),
-                        value = lnaGains[localNodeNum] ?: 0,
-                        enabled = true,
-                        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                        onValueChanged = { uiPrefs.setLnaGain(localNodeNum, it.coerceIn(-30, 60)) },
-                    )
-                }
-            }
-        }
-        item {
             TitledCard(title = stringResource(Res.string.advanced)) {
                 SwitchPreference(
                     title = stringResource(Res.string.schema_lora_ignore_mqtt),
@@ -431,6 +408,25 @@ fun LoRaConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                         formState.value = formState.value.newBuilder().also { wb -> wb.tx_power = it }.build()
                     },
                 )
+                // LNA gain correction is an app-side display offset for this phone's own device, not device config.
+                val uiPrefs = koinInject<UiPrefs>()
+                val nodeRepository = koinInject<NodeRepository>()
+                val myNodeNum by
+                    remember(nodeRepository) { nodeRepository.myNodeInfo.map { it?.myNodeNum } }
+                        .collectAsStateWithLifecycle(initialValue = null)
+                val lnaGains by uiPrefs.lnaGains.collectAsStateWithLifecycle()
+                val localNodeNum = myNodeNum
+                if (state.isLocal && localNodeNum != null) {
+                    HorizontalDivider()
+                    SignedIntegerEditTextPreference(
+                        title = stringResource(Res.string.lna_gain_correction),
+                        summary = stringResource(Res.string.lna_gain_correction_description),
+                        value = lnaGains[localNodeNum] ?: 0,
+                        enabled = true,
+                        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                        onValueChanged = { uiPrefs.setLnaGain(localNodeNum, it.coerceIn(-30, 60)) },
+                    )
+                }
                 if (viewModel.hasPaFan) {
                     HorizontalDivider()
                     SwitchPreference(

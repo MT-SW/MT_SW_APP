@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -47,7 +46,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.Clipboard
 import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.isSensitiveData
@@ -60,14 +58,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlin.io.encoding.Base64
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.model.DeviceHardware
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.NodeSecurityIndicator
 import org.meshtastic.core.model.util.formatUptime
-import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.a11y_label_value
 import org.meshtastic.core.resources.copy
@@ -76,8 +72,6 @@ import org.meshtastic.core.resources.encryption_error
 import org.meshtastic.core.resources.encryption_error_text
 import org.meshtastic.core.resources.error
 import org.meshtastic.core.resources.hops_away
-import org.meshtastic.core.resources.lna_gain_db
-import org.meshtastic.core.resources.lna_gain_node_description
 import org.meshtastic.core.resources.no_public_key
 import org.meshtastic.core.resources.no_public_key_text
 import org.meshtastic.core.resources.node_id
@@ -96,7 +90,6 @@ import org.meshtastic.core.resources.uptime
 import org.meshtastic.core.resources.user_id
 import org.meshtastic.core.ui.component.Glyph
 import org.meshtastic.core.ui.component.NodeSecurityDialog
-import org.meshtastic.core.ui.component.SignedIntegerEditTextPreference
 import org.meshtastic.core.ui.component.determineSignalQuality
 import org.meshtastic.core.ui.component.label
 import org.meshtastic.core.ui.component.title
@@ -210,10 +203,6 @@ private fun MainNodeDetails(
             SectionDivider()
             TransportRow(node)
         }
-        if (!isLocal) {
-            SectionDivider()
-            LnaGainRow(node)
-        }
         SectionDivider()
         SecurityRow(node, isLocal)
         val publicKey = node.publicKey ?: node.user.public_key
@@ -320,25 +309,6 @@ private fun UserAndUptimeRow(node: Node) {
         }
     }
 }
-
-/** Per-node LNA gain (dB): corrects only this node's displayed noise floor; stored on this phone (see LnaCorrection). */
-@Composable
-private fun LnaGainRow(node: Node) {
-    val uiPrefs = koinInject<UiPrefs>()
-    val gains by uiPrefs.lnaGains.collectAsStateWithLifecycle()
-    val focusManager = LocalFocusManager.current
-    SignedIntegerEditTextPreference(
-        title = stringResource(Res.string.lna_gain_db),
-        summary = stringResource(Res.string.lna_gain_node_description),
-        value = gains[node.num] ?: 0,
-        enabled = true,
-        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-        onValueChanged = { uiPrefs.setLnaGain(node.num, it.coerceIn(MIN_LNA_GAIN_DB, MAX_LNA_GAIN_DB)) },
-    )
-}
-
-private const val MIN_LNA_GAIN_DB = -30
-private const val MAX_LNA_GAIN_DB = 60
 
 @Composable
 private fun SignalRow(node: Node) {
