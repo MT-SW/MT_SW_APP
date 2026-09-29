@@ -111,8 +111,8 @@ Tryb pokazujący ruch w eterze, który normalnie by zniknął — wszystkie paki
 
 - **Korekta wzmocnienia LNA** — w Ustawienia → LoRa jest pole „Wzmocnienie LNA (dB)” dla własnego urządzenia. Wyświetlany poziom szumu i RSSI są pomniejszane o tę wartość (np. 20 dB: −98 dBm pokaże się jako −118 dBm); korekta dotyczy też RSSI wszystkich pakietów odbieranych przez to urządzenie. Wartość jest pamiętana na telefonie osobno dla każdego urządzenia, także po restarcie.
 - **Korekta szumu obcych węzłów** — w szczegółach węzła jest własne pole wzmocnienia LNA, które koryguje wyłącznie poziom szumu zgłaszany przez ten węzeł. RSSI pakietów od innych urządzeń jest korygowane wzmocnieniem własnego urządzenia.
-- **Tylko przy wyświetlaniu** — korekta jest liczona w momencie pokazywania, więc obejmuje też historię, wykresy i tabelę w „Jakości sygnału”; surowe dane w bazie zostają bez zmian. Ocena jakości nie zależy od korekty.
-- **Progi jakości sygnału (SNR)** — dobry: powyżej −3 dB, wystarczający: powyżej −7 dB, słaby: powyżej −12 dB, brak: −12 dB i niżej. Ocena zależy tylko od SNR (RSSI jej nie zmienia) i nie zależy od trybu modemu.
+- **Tylko przy wyświetlaniu** — korekta jest liczona w momencie pokazywania, więc obejmuje też historię, wykresy i tabelę w „Jakości sygnału”; surowe dane w bazie zostają bez zmian. Ocena jakości używa tych samych wartości po korekcie, które są wyświetlane.
+- **Ocena jakości sygnału (SNR)** — jak w oryginale: względem limitu SNR trybu modemu (dobry: powyżej limitu, wystarczający: do 5,5 dB poniżej, słaby: do 7,5 dB poniżej, reszta: brak); RSSI (zapas nad poziomem szumu) może tylko obniżyć ocenę. Tryby Narrow mają stałe progi −3 / −7 / −12 dB, a tryby Lite −5 / −10 / −15 dB.
 - **Kolory jak w statusach połączenia** — dobry = złoty, wystarczający = czerwony, słaby = fioletowy, brak = biały. Te same kolory mają wyróżnienia SNR w logach sąsiadów i traceroute oraz ekran pomocy.
 - **Statusy wiadomości** — dostarczenie do sieci na czacie i potwierdzenie odbioru na priv są złote; na priv samo „dostarczono do sieci” (bez potwierdzenia odbiorcy) jest czerwone; błąd wysyłania jest fioletowy. Tarcza podpisanej wiadomości jest złota.
 
@@ -270,8 +270,8 @@ A mode that surfaces air traffic that would normally just vanish — every packe
 
 - **LNA gain correction** — Settings → LoRa has an "LNA gain (dB)" field for your own device. The displayed noise floor and RSSI are reduced by this value (e.g. 20 dB: −98 dBm is shown as −118 dBm); it also corrects the RSSI of every packet received by that device. The value is remembered on the phone per device, including after a restart.
 - **Per-node noise correction** — node details have their own LNA gain field that corrects only the noise floor reported by that node. The RSSI of packets from other devices is corrected using your own device's gain.
-- **Display-time only** — the correction is applied when values are shown, so it also covers history, charts and the table in "Signal quality"; raw database data is unchanged. The quality rating is not affected by the correction.
-- **Signal quality thresholds (SNR)** — good: above −3 dB, sufficient: above −7 dB, weak: above −12 dB, none: −12 dB and below. The rating depends on SNR only (RSSI does not change it) and not on the modem preset.
+- **Display-time only** — the correction is applied when values are shown, so it also covers history, charts and the table in "Signal quality"; raw database data is unchanged. The quality rating uses the same corrected values that are displayed.
+- **Signal quality rating (SNR)** — as in the original: relative to the SNR limit of the modem preset (good: above the limit, sufficient: up to 5.5 dB below, weak: up to 7.5 dB below, otherwise none); RSSI (margin over the noise floor) can only lower the rating. Narrow presets use fixed bands of −3 / −7 / −12 dB and Lite presets −5 / −10 / −15 dB.
 - **Colors match the connection statuses** — good = gold, sufficient = red, weak = purple, none = white. The SNR highlights in the neighbor and traceroute logs and the help screen use the same colors.
 - **Message statuses** — delivered to the network in a channel and acknowledged by the recipient in a DM are gold; a DM that was only delivered to the network (no recipient ack) is red; a send error is purple. The signed-message shield is gold.
 

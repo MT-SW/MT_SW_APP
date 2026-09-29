@@ -38,6 +38,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.common.util.MetricFormatter
+import org.meshtastic.core.model.snrLimit
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.bad
 import org.meshtastic.core.resources.fair
@@ -64,11 +65,29 @@ const val RSSI_GOOD_THRESHOLD = -115
 const val RSSI_FAIR_THRESHOLD = -120
 const val RSSI_BAD_THRESHOLD = -126
 
-// Absolute SNR thresholds (dB) for the quality bands: above -3 is GOOD, above -7 is FAIR (sufficient), above -12 is
-// BAD (weak); anything at or below that is NONE.
-private const val SNR_GOOD_THRESHOLD = -3f
-private const val SNR_FAIR_THRESHOLD = -7f
-private const val SNR_BAD_THRESHOLD = -12f
+// Default SNR bands, relative to a preset's demodulation floor (as in the original app, matching Meshtastic-Apple's
+// getSnrColor()): above the limit is GOOD, within 5.5 dB below is FAIR, within 7.5 dB below is BAD, further is NONE.
+private const val SNR_FAIR_OFFSET = 5.5f
+private const val SNR_BAD_OFFSET = 7.5f
+
+/** Absolute SNR (dB) band edges: above [good] is GOOD, above [fair] is FAIR, at or above [bad] is BAD, else NONE. */
+private data class SnrBands(val good: Float, val fair: Float, val bad: Float)
+
+// Fixed bands for the narrow and lite presets, chosen for our network.
+private val NARROW_BANDS = SnrBands(good = -3f, fair = -7f, bad = -12f)
+private val LITE_BANDS = SnrBands(good = -5f, fair = -10f, bad = -15f)
+
+private fun ModemPreset?.snrBands(): SnrBands = when (this) {
+    ModemPreset.NARROW_FAST,
+    ModemPreset.NARROW_SLOW,
+    -> NARROW_BANDS
+
+    ModemPreset.LITE_FAST,
+    ModemPreset.LITE_SLOW,
+    -> LITE_BANDS
+
+    else -> snrLimit.let { SnrBands(good = it, fair = it - SNR_FAIR_OFFSET, bad = it - SNR_BAD_OFFSET) }
+}
 
 @Stable
 enum class Quality(
@@ -161,16 +180,23 @@ fun Rssi(
 }
 
 /**
- * Rates link quality from SNR alone, against fixed thresholds: above -3 dB is GOOD, above -7 dB is FAIR (sufficient),
- * above -12 dB is BAD (weak), and anything lower is NONE. RSSI does not affect the rating.
+ * Rates link quality from SNR relative to the active modem preset's demodulation floor ([ModemPreset.snrLimit]). A
+ * given SNR means different things per preset, so the bands are preset-relative: above the limit is GOOD, within 5.5 dB
+ * below is FAIR, within 7.5 dB below is BAD, further down is NONE. The narrow presets use fixed bands of -3 / -7 / -12
+ * dB and the lite presets -5 / -10 / -15 dB.
  *
- * [modemPreset], [rssi] and [noiseFloor] are kept so existing call sites stay unchanged; they are no longer used.
+ * RSSI joins the rating only when the noise floor is also known: `(rssi - noiseFloor)` is an SNR-like value rated
+ * against the same bands and the *worse* of the two tiers wins — a strong SNR reading over a noisy channel is still a
+ * bad link. With either missing, the rating is SNR-only. A null preset falls back to the LongFast default limit.
  */
-@Suppress("UNUSED_PARAMETER")
-fun determineSignalQuality(snr: Float, modemPreset: ModemPreset?, rssi: Int? = null, noiseFloor: Int? = null): Quality =
-    when {
-        snr > SNR_GOOD_THRESHOLD -> Quality.GOOD
-        snr > SNR_FAIR_THRESHOLD -> Quality.FAIR
-        snr > SNR_BAD_THRESHOLD -> Quality.BAD
+fun determineSignalQuality(snr: Float, modemPreset: ModemPreset?, rssi: Int? = null, noiseFloor: Int? = null): Quality {
+    val bands = modemPreset.snrBands()
+    val effective = if (rssi != null && noiseFloor != null) minOf(snr, (rssi - noiseFloor).toFloat()) else snr
+    return when {
+        effective > bands.good -> Quality.GOOD
+        effective > bands.fair -> Quality.FAIR
+        effective >= bands.bad -> Quality.BAD
         else -> Quality.NONE
     }
+}
+

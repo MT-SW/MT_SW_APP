@@ -59,7 +59,15 @@ fun SignalInfo(
     val snr = node.snrOrNull
     if (snr != null) {
         val rssi = node.rssiOrNull
-        val quality = determineSignalQuality(snr, LocalModemPreset.current, rssi, LocalNoiseFloor.current)
+        // Rated from the same LNA-corrected values that are displayed.
+        val lna = LocalLnaCorrection.current
+        val quality =
+            determineSignalQuality(
+                snr,
+                LocalModemPreset.current,
+                rssi?.let { lna.rssi(it) },
+                LocalNoiseFloor.current?.let { lna.localNoiseFloor(it) },
+            )
         val signalColor = quality.color.invoke()
         Row(
             modifier = modifier,
