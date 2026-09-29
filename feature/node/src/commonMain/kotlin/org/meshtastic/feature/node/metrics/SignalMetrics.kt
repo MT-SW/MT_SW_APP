@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -53,6 +55,7 @@ import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerRangeProvi
 import com.patrykandpatrick.vico.compose.cartesian.data.lineModel
 import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.model.TelemetryType
@@ -61,9 +64,12 @@ import org.meshtastic.core.model.util.TimeConstants.MS_PER_SEC
 import org.meshtastic.core.model.util.formatUptime
 import org.meshtastic.core.model.util.rxTimeOrNull
 import org.meshtastic.core.model.util.snrOrNull
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.busy_noise_floor
 import org.meshtastic.core.resources.clear
+import org.meshtastic.core.resources.lna_gain_db
+import org.meshtastic.core.resources.lna_gain_node_description
 import org.meshtastic.core.resources.local_stats_bad
 import org.meshtastic.core.resources.local_stats_nodes
 import org.meshtastic.core.resources.local_stats_noise
@@ -82,6 +88,7 @@ import org.meshtastic.core.resources.signal_quality
 import org.meshtastic.core.resources.snr
 import org.meshtastic.core.resources.snr_definition
 import org.meshtastic.core.ui.component.LoraSignalIndicator
+import org.meshtastic.core.ui.component.SignedIntegerEditTextPreference
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Refresh
@@ -172,6 +179,10 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
     val localStatsExportLauncher = rememberSaveFileLauncher { uri -> viewModel.saveLocalStatsCSV(uri, localStatsData) }
     val signalExportLauncher = rememberSaveFileLauncher { uri -> viewModel.saveSignalMetricsCSV(uri, signalData) }
 
+    // The LNA field for a remote node sits under the info text; our own gain is set in the LoRa settings.
+    val myNodeNum = LocalLnaCorrection.current.myNodeNum
+    val lnaNodeNum = state.node?.num?.takeIf { it != myNodeNum }
+
     BaseMetricScreen(
         onNavigateUp = onNavigateUp,
         telemetryType = null,
@@ -200,6 +211,8 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
             if (hasSnr) add(InfoDialogData(Res.string.snr, Res.string.snr_definition, SignalMetric.SNR.color))
             if (hasRssi) add(InfoDialogData(Res.string.rssi, Res.string.rssi_definition, SignalMetric.RSSI.color))
         },
+        infoExtraContent =
+        lnaNodeNum?.let { num -> @Composable { LnaGainField(num) } },
         controlPart = {
             TimeFrameSelector(
                 selectedTimeFrame = timeFrame,
@@ -307,6 +320,25 @@ private fun LocalStatsActionButtons(
         }
     }
 }
+
+/** Per-node LNA gain (dB): corrects only this node's displayed noise floor; stored on this phone (see LnaCorrection). */
+@Composable
+private fun LnaGainField(nodeNum: Int) {
+    val uiPrefs = koinInject<UiPrefs>()
+    val gains by uiPrefs.lnaGains.collectAsStateWithLifecycle()
+    val focusManager = LocalFocusManager.current
+    SignedIntegerEditTextPreference(
+        title = stringResource(Res.string.lna_gain_db),
+        summary = stringResource(Res.string.lna_gain_node_description),
+        value = gains[nodeNum] ?: 0,
+        enabled = true,
+        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+        onValueChanged = { uiPrefs.setLnaGain(nodeNum, it.coerceIn(MIN_LNA_GAIN_DB, MAX_LNA_GAIN_DB)) },
+    )
+}
+
+private const val MIN_LNA_GAIN_DB = -30
+private const val MAX_LNA_GAIN_DB = 60
 
 @Suppress("LongMethod", "CyclomaticComplexMethod")
 @Composable

@@ -254,6 +254,7 @@ fun <T> BaseMetricScreen(
     data: List<T>,
     timeProvider: (T) -> Double,
     infoData: List<InfoDialogData> = emptyList(),
+    infoExtraContent: (@Composable () -> Unit)? = null,
     onRequestTelemetry: (() -> Unit)? = null,
     onExportCsv: (() -> Unit)? = null,
     extraActions: @Composable () -> Unit = {},
@@ -332,7 +333,11 @@ fun <T> BaseMetricScreen(
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             if (displayInfoDialog) {
-                LegendInfoDialog(infoData = infoData, onDismiss = { displayInfoDialog = false })
+                LegendInfoDialog(
+                    infoData = infoData,
+                    onDismiss = { displayInfoDialog = false },
+                    extraContent = infoExtraContent,
+                )
             }
 
             controlPart()

@@ -39,6 +39,21 @@ import org.meshtastic.core.ui.util.LocalMeshActivity
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.core.ui.util.LocalNoiseFloor
 import org.meshtastic.core.ui.viewmodel.UIViewModel
+import org.meshtastic.proto.Config
+
+/**
+ * The preset to rate signal quality against. With a manual (non-preset) configuration `modem_preset` is only a
+ * leftover default, so the bandwidth decides: up to 62.5 kHz is rated as Narrow, up to 125 kHz as Lite.
+ */
+private fun Config.LoRaConfig.effectiveModemPreset(): Config.LoRaConfig.ModemPreset = when {
+    use_preset -> modem_preset
+    bandwidth in 1..NARROW_MAX_BANDWIDTH_KHZ -> Config.LoRaConfig.ModemPreset.NARROW_FAST
+    bandwidth in 1..LITE_MAX_BANDWIDTH_KHZ -> Config.LoRaConfig.ModemPreset.LITE_FAST
+    else -> modem_preset
+}
+
+private const val NARROW_MAX_BANDWIDTH_KHZ = 64
+private const val LITE_MAX_BANDWIDTH_KHZ = 130
 
 /**
  * Shared shell for setting up global UI logic across platforms (Android, Desktop).
@@ -77,7 +92,7 @@ fun MeshtasticAppShell(
     val radioConfigRepository = koinInject<RadioConfigRepository>()
     val modemPreset by
         remember(radioConfigRepository) {
-            radioConfigRepository.localConfigFlow.map { it.lora?.modem_preset }.distinctUntilChanged()
+            radioConfigRepository.localConfigFlow.map { it.lora?.effectiveModemPreset() }.distinctUntilChanged()
         }
             .collectAsStateWithLifecycle(initialValue = null)
 
