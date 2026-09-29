@@ -38,7 +38,6 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.common.util.MetricFormatter
-import org.meshtastic.core.model.snrLimit
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.bad
 import org.meshtastic.core.resources.fair
@@ -53,10 +52,10 @@ import org.meshtastic.core.resources.signal
 import org.meshtastic.core.resources.signal_quality
 import org.meshtastic.core.resources.snr
 import org.meshtastic.core.resources.unknown
-import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
-import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
-import org.meshtastic.core.ui.theme.StatusColors.StatusRed
-import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
+import org.meshtastic.core.ui.theme.StatusColors.StatusConnecting
+import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
+import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
+import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
 
@@ -65,10 +64,11 @@ const val RSSI_GOOD_THRESHOLD = -115
 const val RSSI_FAIR_THRESHOLD = -120
 const val RSSI_BAD_THRESHOLD = -126
 
-// SNR offsets (dB) below a preset's demodulation floor that delimit the quality bands, matching Meshtastic-Apple's
-// getSnrColor(): within 5.5 dB below the limit is FAIR, within 7.5 dB is BAD, further down is NONE.
-private const val SNR_FAIR_OFFSET = 5.5f
-private const val SNR_BAD_OFFSET = 7.5f
+// Absolute SNR thresholds (dB) for the quality bands: above -3 is GOOD, above -7 is FAIR (sufficient), above -12 is
+// BAD (weak); anything at or below that is NONE.
+private const val SNR_GOOD_THRESHOLD = -3f
+private const val SNR_FAIR_THRESHOLD = -7f
+private const val SNR_BAD_THRESHOLD = -12f
 
 @Stable
 enum class Quality(
@@ -76,10 +76,11 @@ enum class Quality(
     @Stable val icon: DrawableResource,
     @Stable val color: @Composable () -> Color,
 ) {
-    NONE(Res.string.none_quality, Res.drawable.ic_signal_cellular_alt_1_bar, { colorScheme.StatusRed }),
-    BAD(Res.string.bad, Res.drawable.ic_signal_cellular_alt_2_bar, { colorScheme.StatusOrange }),
-    FAIR(Res.string.fair, Res.drawable.ic_signal_cellular_alt, { colorScheme.StatusYellow }),
-    GOOD(Res.string.good, Res.drawable.ic_signal_cellular_4_bar, { colorScheme.StatusGreen }),
+    // Colours match the connection-status palette: gold (connected / key OK), red (disconnected), purple, white.
+    NONE(Res.string.none_quality, Res.drawable.ic_signal_cellular_alt_1_bar, { colorScheme.StatusConnecting }),
+    BAD(Res.string.bad, Res.drawable.ic_signal_cellular_alt_2_bar, { colorScheme.StatusPurple }),
+    FAIR(Res.string.fair, Res.drawable.ic_signal_cellular_alt, { colorScheme.StatusDisconnected }),
+    GOOD(Res.string.good, Res.drawable.ic_signal_cellular_4_bar, { colorScheme.StatusOnline }),
 }
 
 private const val SIZE_ICON_DP = 16
@@ -160,35 +161,16 @@ fun Rssi(
 }
 
 /**
- * Rates link quality from SNR relative to the active modem preset's demodulation floor ([ModemPreset.snrLimit]). A
- * given SNR means different things per preset — e.g. -15 dB is excellent on LongSlow (SF12) but unusable on ShortFast
- * (SF7) — so a fixed threshold mis-rates most presets.
+ * Rates link quality from SNR alone, against fixed thresholds: above -3 dB is GOOD, above -7 dB is FAIR (sufficient),
+ * above -12 dB is BAD (weak), and anything lower is NONE. RSSI does not affect the rating.
  *
- * RSSI alone cannot indicate whether a signal is demodulable without knowing the noise floor, so it is ignored unless
- * both [rssi] and [noiseFloor] are known (design#15, android#6826): when both are present, `(rssi - noiseFloor)` is
- * rated against the same preset-relative bands as SNR and the *worse* of the two tiers wins — a strong SNR reading over
- * a noisy channel is still a bad link. With either missing, the rating is SNR-only, unchanged from #5446.
- *
- * A null/unknown [modemPreset] falls back to the LongFast default limit.
- *
- * Without a noise floor, fixed RSSI thresholds cannot account for the preset's bandwidth, so rating stays SNR-only.
+ * [modemPreset], [rssi] and [noiseFloor] are kept so existing call sites stay unchanged; they are no longer used.
  */
-fun determineSignalQuality(snr: Float, modemPreset: ModemPreset?, rssi: Int? = null, noiseFloor: Int? = null): Quality {
-    val limit = modemPreset.snrLimit
-    val snrMargin = snr - limit
-    val margin =
-        if (rssi != null && noiseFloor != null) {
-            minOf(snrMargin, (rssi - noiseFloor) - limit)
-        } else {
-            snrMargin
-        }
-    return qualityForMargin(margin)
-}
-
-/** Classifies a demodulation-floor margin (dB above [ModemPreset.snrLimit]) into a [Quality] band. */
-private fun qualityForMargin(margin: Float): Quality = when {
-    margin > 0f -> Quality.GOOD
-    margin > -SNR_FAIR_OFFSET -> Quality.FAIR
-    margin >= -SNR_BAD_OFFSET -> Quality.BAD
-    else -> Quality.NONE
-}
+@Suppress("UNUSED_PARAMETER")
+fun determineSignalQuality(snr: Float, modemPreset: ModemPreset?, rssi: Int? = null, noiseFloor: Int? = null): Quality =
+    when {
+        snr > SNR_GOOD_THRESHOLD -> Quality.GOOD
+        snr > SNR_FAIR_THRESHOLD -> Quality.FAIR
+        snr > SNR_BAD_THRESHOLD -> Quality.BAD
+        else -> Quality.NONE
+    }

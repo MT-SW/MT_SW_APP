@@ -36,10 +36,10 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.okay
 import org.meshtastic.core.resources.traceroute
 import org.meshtastic.core.resources.view_on_map
-import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
-import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
-import org.meshtastic.core.ui.theme.StatusColors.StatusRed
-import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
+import org.meshtastic.core.ui.theme.StatusColors.StatusConnecting
+import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
+import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
+import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.core.ui.util.annotateTraceroute
 import org.meshtastic.core.ui.util.toMessageRes
@@ -70,10 +70,11 @@ fun TracerouteAlertHandler(
                             text =
                             annotateTraceroute(
                                 response.message,
-                                statusGreen = colorScheme.StatusGreen,
-                                statusYellow = colorScheme.StatusYellow,
-                                statusOrange = colorScheme.StatusOrange,
-                                statusRed = colorScheme.StatusRed,
+                                // Parameters are named by SNR tier; the palette matches the signal-quality colours.
+                                statusGreen = colorScheme.StatusOnline,
+                                statusYellow = colorScheme.StatusDisconnected,
+                                statusOrange = colorScheme.StatusPurple,
+                                statusRed = colorScheme.StatusConnecting,
                                 modemPreset = LocalModemPreset.current,
                             ),
                         )
