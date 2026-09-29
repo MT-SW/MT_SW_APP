@@ -1548,11 +1548,11 @@
     <string name="node_layout_complete_description">Pełny układ wyświetla wszystkie dostępne dane węzła. Pola bez danych są automatycznie ukrywane.</string>
     <string name="node_layout_device_role">Urządzenie i rola</string>
     <string name="node_layout_distance_and_bearing">Odległość i kierunek</string>
-    <string name="node_layout_help_signal_bad">Sygnał jest słaby. SNR powyżej −12 dB.</string>
-    <string name="node_layout_help_signal_fair">Sygnał jest wystarczający. SNR powyżej −7 dB.</string>
-    <string name="node_layout_help_signal_good">Sygnał jest dobry. SNR powyżej −3 dB.</string>
-    <string name="node_layout_help_signal_indicator">Ocenia SNR według stałych progów i pokazuje wynik jako kolorową ikonę z opisem. RSSI jest wyświetlane, ale nie wpływa na ocenę. Widoczne tylko w pełnym układzie.</string>
-    <string name="node_layout_help_signal_none">Brak użytecznego sygnału. SNR poniżej −12 dB.</string>
+    <string name="node_layout_help_signal_bad">Sygnał jest słaby. SNR do 7,5 dB poniżej limitu trybu (Narrow: do −12 dB, Lite: do −15 dB).</string>
+    <string name="node_layout_help_signal_fair">Sygnał jest wystarczający. SNR do 5,5 dB poniżej limitu trybu (Narrow: do −7 dB, Lite: do −10 dB).</string>
+    <string name="node_layout_help_signal_good">Sygnał jest dobry. SNR powyżej limitu SNR trybu modemu (Narrow: powyżej −3 dB, Lite: powyżej −5 dB).</string>
+    <string name="node_layout_help_signal_indicator">Ocenia SNR względem limitu SNR trybu modemu i pokazuje wynik jako kolorową ikonę z opisem. Gdy znane są RSSI i poziom szumu, zapas RSSI nad szumem może obniżyć ocenę. Widoczne tylko w pełnym układzie.</string>
+    <string name="node_layout_help_signal_none">Brak użytecznego sygnału. SNR poniżej progu słabego sygnału.</string>
     <string name="node_layout_hops_away">Skoków</string>
     <string name="node_layout_last_heard_time">Czas ostatniej aktywności</string>
     <string name="node_layout_log_icons">Metryki środowiskowe</string>

@@ -346,7 +346,15 @@ private fun SignalRow(node: Node) {
         val snr = node.snrOrNull
         val rssi = node.rssiOrNull
         if (snr != null) {
-            val quality = determineSignalQuality(snr, LocalModemPreset.current, rssi, LocalNoiseFloor.current)
+            // Rated from the same LNA-corrected values that are displayed.
+            val lna = LocalLnaCorrection.current
+            val quality =
+                determineSignalQuality(
+                    snr,
+                    LocalModemPreset.current,
+                    rssi?.let { lna.rssi(it) },
+                    LocalNoiseFloor.current?.let { lna.localNoiseFloor(it) },
+                )
             // Value-before-quality with " · " matches the node-list signal pill in SignalInfo.kt.
             InfoItem(
                 label = stringResource(Res.string.snr),

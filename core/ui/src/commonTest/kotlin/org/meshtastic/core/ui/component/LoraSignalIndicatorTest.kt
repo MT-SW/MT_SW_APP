@@ -21,7 +21,7 @@ import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-/** Tests for signal-quality rating: fixed SNR thresholds (-3 / -7 / -12 dB); RSSI and preset do not affect it. */
+/** Tests for signal-quality rating: preset-relative bands (narrow: -3/-7/-12, lite: -5/-10/-15 dB); RSSI over noise floor can only lower the tier. */
 class LoraSignalIndicatorTest {
 
     // Firmware spreading factors (MeshRadio.h) paired with literal Semtech demodulation floors.
@@ -92,30 +92,62 @@ class LoraSignalIndicatorTest {
     }
 
     @Test
-    fun `quality bands use fixed SNR thresholds`() {
-        val preset = ModemPreset.LONG_FAST
-        assertEquals(Quality.GOOD, determineSignalQuality(snr = 5f, modemPreset = preset))
-        assertEquals(Quality.GOOD, determineSignalQuality(snr = -2.9f, modemPreset = preset))
-        assertEquals(Quality.FAIR, determineSignalQuality(snr = -3f, modemPreset = preset))
-        assertEquals(Quality.FAIR, determineSignalQuality(snr = -6.9f, modemPreset = preset))
-        assertEquals(Quality.BAD, determineSignalQuality(snr = -7f, modemPreset = preset))
-        assertEquals(Quality.BAD, determineSignalQuality(snr = -11.9f, modemPreset = preset))
-        assertEquals(Quality.NONE, determineSignalQuality(snr = -12f, modemPreset = preset))
+    fun `default presets rate relative to the preset floor`() {
+        val preset = ModemPreset.LONG_FAST // limit -17.5
+        assertEquals(Quality.GOOD, determineSignalQuality(snr = -17f, modemPreset = preset))
+        assertEquals(Quality.FAIR, determineSignalQuality(snr = -17.5f, modemPreset = preset))
+        assertEquals(Quality.FAIR, determineSignalQuality(snr = -22f, modemPreset = preset))
+        assertEquals(Quality.BAD, determineSignalQuality(snr = -23f, modemPreset = preset))
         assertEquals(Quality.NONE, determineSignalQuality(snr = -30f, modemPreset = preset))
     }
 
     @Test
-    fun `the rating does not depend on the modem preset`() {
-        assertEquals(
-            determineSignalQuality(snr = -9f, modemPreset = ModemPreset.LONG_SLOW),
-            determineSignalQuality(snr = -9f, modemPreset = ModemPreset.SHORT_FAST),
-        )
+    fun `the same SNR is rated relative to the preset`() {
+        assertEquals(Quality.GOOD, determineSignalQuality(snr = -15f, modemPreset = ModemPreset.LONG_SLOW))
+        assertEquals(Quality.BAD, determineSignalQuality(snr = -15f, modemPreset = ModemPreset.SHORT_FAST))
     }
 
     @Test
-    fun `RSSI and noise floor do not influence the rating`() {
-        val quality = determineSignalQuality(snr = -2f, modemPreset = null, rssi = -140, noiseFloor = -70)
-        assertEquals(Quality.GOOD, quality)
+    fun `narrow presets use fixed -3 -7 -12 bands`() {
+        for (preset in listOf(ModemPreset.NARROW_FAST, ModemPreset.NARROW_SLOW)) {
+            assertEquals(Quality.GOOD, determineSignalQuality(snr = -2.9f, modemPreset = preset))
+            assertEquals(Quality.FAIR, determineSignalQuality(snr = -3f, modemPreset = preset))
+            assertEquals(Quality.FAIR, determineSignalQuality(snr = -6.9f, modemPreset = preset))
+            assertEquals(Quality.BAD, determineSignalQuality(snr = -7f, modemPreset = preset))
+            assertEquals(Quality.BAD, determineSignalQuality(snr = -12f, modemPreset = preset))
+            assertEquals(Quality.NONE, determineSignalQuality(snr = -12.1f, modemPreset = preset))
+        }
+    }
+
+    @Test
+    fun `lite presets use fixed -5 -10 -15 bands`() {
+        for (preset in listOf(ModemPreset.LITE_FAST, ModemPreset.LITE_SLOW)) {
+            assertEquals(Quality.GOOD, determineSignalQuality(snr = -4.9f, modemPreset = preset))
+            assertEquals(Quality.FAIR, determineSignalQuality(snr = -5f, modemPreset = preset))
+            assertEquals(Quality.BAD, determineSignalQuality(snr = -10f, modemPreset = preset))
+            assertEquals(Quality.BAD, determineSignalQuality(snr = -15f, modemPreset = preset))
+            assertEquals(Quality.NONE, determineSignalQuality(snr = -15.1f, modemPreset = preset))
+        }
+    }
+
+    @Test
+    fun `RSSI alone or noise floor alone does not influence the rating`() {
+        val preset = ModemPreset.NARROW_FAST
+        assertEquals(Quality.GOOD, determineSignalQuality(snr = -2f, modemPreset = preset, rssi = -140))
+        assertEquals(Quality.GOOD, determineSignalQuality(snr = -2f, modemPreset = preset, noiseFloor = -70))
+    }
+
+    @Test
+    fun `RSSI over noise floor lowers the rating when worse than SNR`() {
+        val preset = ModemPreset.NARROW_FAST
+        assertEquals(Quality.BAD, determineSignalQuality(snr = -2f, modemPreset = preset, rssi = -90, noiseFloor = -80))
+        assertEquals(Quality.FAIR, determineSignalQuality(snr = -2f, modemPreset = preset, rssi = -84, noiseFloor = -80))
+    }
+
+    @Test
+    fun `a good RSSI margin never improves a worse SNR`() {
+        val preset = ModemPreset.NARROW_FAST
+        assertEquals(Quality.BAD, determineSignalQuality(snr = -9f, modemPreset = preset, rssi = -60, noiseFloor = -80))
     }
 
     @Test
