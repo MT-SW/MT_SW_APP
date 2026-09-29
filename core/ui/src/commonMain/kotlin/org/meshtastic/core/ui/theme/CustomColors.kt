@@ -245,14 +245,9 @@ object StatusColors {
                 Color(0xFF283593) // deep indigo blue, light surfaces
             }
 
+    /** One vivid violet for both themes, so "weak signal" / "send error" look the same everywhere and stay readable. */
     val ColorScheme.StatusPurple: Color
-        @Composable
-        get() =
-            if (isEffectivelyDark) {
-                Color(0xFF9C27B0) // deeper purple, dark surfaces
-            } else {
-                Color(0xFF6A1B9A) // deep purple, light surfaces
-            }
+        @Composable get() = Color(0xFFB03CFF)
 
     /**
      * The maker hardware rung's hue from meshtastic/design#160, shared with the flasher; declared, never derived. The
