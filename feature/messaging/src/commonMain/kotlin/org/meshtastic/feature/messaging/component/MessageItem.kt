@@ -128,6 +128,7 @@ import org.meshtastic.core.ui.icon.Save
 import org.meshtastic.core.ui.icon.ShieldCheck
 import org.meshtastic.core.ui.theme.MessageItemColors
 import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
+import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.feature.messaging.downloadImageBytes
 import org.meshtastic.feature.messaging.rememberImageSaver
@@ -563,7 +564,7 @@ fun MessageItem(
                                 )
                                 if (message.hopsAway == 0 && !message.viaMqtt) {
                                     Snr(message.snr)
-                                    Rssi(message.rssi)
+                                    Rssi(message.rssi, displayOffset = LocalLnaCorrection.current.localGain)
                                 } else {
                                     Icon(
                                         imageVector = MeshtasticIcons.HopCount,

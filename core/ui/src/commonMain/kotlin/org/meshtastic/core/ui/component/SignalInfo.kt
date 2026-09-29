@@ -40,6 +40,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.signal_quality
 import org.meshtastic.core.ui.component.preview.NodePreviewParameterProvider
 import org.meshtastic.core.ui.theme.AppTheme
+import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.core.ui.util.LocalNoiseFloor
 
@@ -73,7 +74,7 @@ fun SignalInfo(
             )
             Text(
                 text =
-                "${MetricFormatter.snr(snr)} · ${MetricFormatter.rssi(rssi)} · " + stringResource(quality.nameRes),
+                "${MetricFormatter.snr(snr)} · ${MetricFormatter.rssi(rssi?.let { LocalLnaCorrection.current.rssi(it) })} · " + stringResource(quality.nameRes),
                 style =
                 MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.Bold,

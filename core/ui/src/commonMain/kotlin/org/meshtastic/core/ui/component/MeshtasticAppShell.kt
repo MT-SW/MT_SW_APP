@@ -32,6 +32,9 @@ import org.meshtastic.core.navigation.NodeDetailRoute
 import org.meshtastic.core.navigation.NodesRoute
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioConfigRepository
+import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.ui.util.LnaCorrection
+import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.LocalMeshActivity
 import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.core.ui.util.LocalNoiseFloor
@@ -86,12 +89,21 @@ fun MeshtasticAppShell(
         remember(nodeRepository) { nodeRepository.localStats.map { it.noiseFloorOrNull }.distinctUntilChanged() }
             .collectAsStateWithLifecycle(initialValue = null)
 
+    // LNA gain correction: display-only offsets for noise floor / RSSI, remembered per node (see [LnaCorrection]).
+    val uiPrefs = koinInject<UiPrefs>()
+    val myNodeNum by
+        remember(nodeRepository) { nodeRepository.myNodeInfo.map { it?.myNodeNum }.distinctUntilChanged() }
+            .collectAsStateWithLifecycle(initialValue = null)
+    val lnaGains by uiPrefs.lnaGains.collectAsStateWithLifecycle()
+    val lnaCorrection = remember(myNodeNum, lnaGains) { LnaCorrection(myNodeNum, lnaGains) }
+
     MeshtasticSnackbarProvider(snackbarManager = uiViewModel.snackbarManager, hostModifier = hostModifier) {
         // Provide the activity FLOW (stable ref) — not a collected value — so it costs no recomposition; only the
         // local-node connection badge collects it, animating in the draw phase. See LocalMeshActivity.
         CompositionLocalProvider(
             LocalModemPreset provides modemPreset,
             LocalNoiseFloor provides noiseFloor,
+            LocalLnaCorrection provides lnaCorrection,
             LocalMeshActivity provides uiViewModel.meshActivity,
         ) {
             content()

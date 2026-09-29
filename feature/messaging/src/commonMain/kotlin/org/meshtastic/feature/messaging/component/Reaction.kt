@@ -77,6 +77,7 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.ShieldCheck
 import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
+import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.feature.messaging.DeliveryInfo
 
 @Composable
@@ -333,7 +334,7 @@ internal fun ReactionDialog(
                         if (reaction.hopsAway == 0) {
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Snr(reaction.snr)
-                                Rssi(reaction.rssi)
+                                Rssi(reaction.rssi, displayOffset = LocalLnaCorrection.current.localGain)
                             }
                         } else {
                             Row(
