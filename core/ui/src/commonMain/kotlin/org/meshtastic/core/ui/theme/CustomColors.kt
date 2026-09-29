@@ -180,7 +180,8 @@ object StatusColors {
         get() = background.luminance() < 0.5f
 
     val ColorScheme.StatusConnecting: Color
-        @Composable get() = Color(0xFFFFFFFF) // White — connecting/reconnecting
+        // White on a dark theme, black on a light one (white would be invisible) — connecting/reconnecting, no signal
+        @Composable get() = if (isEffectivelyDark) Color(0xFFFFFFFF) else Color(0xFF000000)
 
     val ColorScheme.StatusDisconnected: Color
         @Composable get() = Color(0xFFF4212E) // Vivid red — disconnected
