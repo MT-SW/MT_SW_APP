@@ -1,8 +1,7 @@
 ---
 title: Settings — Modules & Admin
-parent: User Guide
 nav_order: 8
-last_updated: 2026-09-19
+last_updated: 2026-09-28
 description: Configure optional feature modules (MQTT, telemetry, canned messages, TAK, and more) and perform device administration.
 aliases:
   - modules
@@ -30,7 +29,7 @@ Module settings use a card-based layout with toggle switches, dropdowns, text fi
 
 Every module lives under **Settings → Module configuration**.
 
-> ⚠️ **Important:** Saving a module screen restarts the node — the button reads **Save & restart**, and the node is unreachable for a few seconds afterwards. External Notification and Mesh Beacon are the exceptions: their button reads **Save**, and the node may still restart for some changes.
+> ⚠️ **Important:** Saving a module screen restarts the node: the button reads **Save & restart**, and the node is unreachable for a few seconds afterwards. External Notification and Mesh Beacon are the exceptions: their button reads **Save**. External Notification may still restart the node for some changes, while a Mesh Beacon change applies without a restart.
 
 ### MQTT module
 
@@ -46,8 +45,8 @@ Bridges mesh messages to and from an MQTT broker for internet connectivity. This
 | JSON kimenet engedélyezve      | Publish and consume MQTT messages as JSON. Marked deprecated in the protobuf schema, but it is still the only toggle for this behavior and the firmware still honors it |
 | TLS engedélyezve               | Use secure connection                                                                                                                                                                   |
 | Gyökér téma                    | Base MQTT topic path                                                                                                                                                                    |
-| Proxy kliens felé engedélyezve | Let a connected phone carry the node's MQTT traffic, instead of the node reaching the broker itself                                                                                     |
-| MQTT proxy on this phone       | The phone-side half of **Proxy to client enabled**: whether this phone acts as that relay. See [MQTT](mqtt)                                             |
+| Proxy kliens felé engedélyezve | Let the connected app carry the node's MQTT traffic, instead of the node reaching the broker itself                                                                                     |
+| MQTT proxy in this app         | The app-side half of **Proxy to client enabled**: whether this app acts as that relay. See [MQTT](mqtt)                                                 |
 | Térképadat-jelentés            | Publish position to the public map — see the Map reporting group that follows                                                                                                           |
 
 Turning **Map reporting** on reveals a consent card headed _Consent to Share Unencrypted Node Data
@@ -292,8 +291,9 @@ Remotely configure nodes that share your admin key:
 ### Biztonsági mentés és visszaállítás
 
 **Settings → Backup & Restore** writes the connected node's whole configuration to a file with
-**Export configuration**, and reads a saved file back in with **Import configuration**. Export
-before a factory reset, or to copy one node's setup onto another. The section is shown for your
+**Export configuration**, and reads a saved file back in with **Import configuration**.
+Traffic Management settings are exported but not applied on import. Export before a factory
+reset, or to copy one node's setup onto another. The section is shown for your
 own node only, not over remote admin.
 
 ### Haladó
@@ -331,6 +331,7 @@ appears only when your own node is selected. It is grouped rather than flat:
 
 - **Allow analytics and crash reporting** — opt in or out of diagnostics.
 - **Provide phone location to mesh** — share this phone's position when the node has no GPS fix.
+  It needs precise location: with approximate location allowed, turning it on asks for precise.
 - **Homoglyph encoding** — how look-alike characters in names are handled.
 
 **Appearance**

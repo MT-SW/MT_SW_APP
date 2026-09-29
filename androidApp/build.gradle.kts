@@ -124,8 +124,6 @@ configure<ApplicationExtension> {
             )
         }
         ndk { abiFilters += listOf("armeabi-v7a", "arm64-v8a") }
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     // Disable ABI splits for bundle builds or when explicitly requested via Gradle property.
@@ -196,6 +194,9 @@ secrets {
     defaultPropertiesFileName = "secrets.defaults.properties"
     propertiesFileName = "secrets.properties"
 }
+
+// AppSearch without dynamic-schema support indexes only the v1 XML named by the `android.app.appfunctions` property.
+ksp { arg("appfunctions:generateV1Xml", "true") }
 
 androidComponents {
     onVariants(selector().withBuildType("debug")) { variant ->

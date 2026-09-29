@@ -41,7 +41,7 @@ import org.meshtastic.core.data.datasource.NodeInfoReadDataSource
 import org.meshtastic.core.data.datasource.NodeInfoWriteDataSource
 import org.meshtastic.core.database.entity.MetadataEntity
 import org.meshtastic.core.database.entity.MyNodeEntity
-import org.meshtastic.core.database.entity.NodeEntity
+import org.meshtastic.core.database.entity.toEntity
 import org.meshtastic.core.datastore.LocalStatsDataSource
 import org.meshtastic.core.datastore.LocalStatsExtendedDataSource
 import org.meshtastic.core.datastore.LocalStatsExtendedPrefs
@@ -157,9 +157,6 @@ class NodeRepositoryImpl(
         .myNodeInfoFlow()
         .map { info -> if (nodeNum == info?.myNodeNum) MeshLog.NODE_NUM_LOCAL else nodeNum }
         .distinctUntilChanged()
-
-    fun getNodeEntityDBbyNumFlow() =
-        nodeInfoReadDataSource.nodeDBbyNumFlow().map { map -> map.mapValues { (_, it) -> it.toEntity() } }
 
     /** Returns the [Node] associated with a given [userId]. Falls back to a generic node if not found. */
     override fun getNode(userId: String): Node = nodeDBbyNum.value.values.find { it.user.id == userId }
@@ -303,49 +300,6 @@ class NodeRepositoryImpl(
         hasWifi = hasWifi,
         deviceId = deviceId,
         pioEnv = pioEnv,
-    )
-
-    private fun Node.toEntity() = NodeEntity(
-        num = num,
-        user = user,
-        position = position,
-        latitude = latitude,
-        longitude = longitude,
-        snr = snr,
-        rssi = rssi,
-        lastHeard = lastHeard,
-        deviceTelemetry =
-        org.meshtastic.proto.Telemetry.Builder().also { wb -> wb.device_metrics = deviceMetrics }.build(),
-        channel = channel,
-        viaMqtt = viaMqtt,
-        hopsAway = hopsAway,
-        isFavorite = isFavorite,
-        isIgnored = isIgnored,
-        isMuted = isMuted,
-        environmentTelemetry =
-        org.meshtastic.proto.Telemetry.Builder()
-            .also { wb -> wb.environment_metrics = environmentMetrics }
-            .build(),
-        powerTelemetry =
-        org.meshtastic.proto.Telemetry.Builder().also { wb -> wb.power_metrics = powerMetrics }.build(),
-        airQualityTelemetry =
-        org.meshtastic.proto.Telemetry.Builder()
-            .also { wb -> wb.air_quality_metrics = airQualityMetrics }
-            .build(),
-        soilWaterTelemetry =
-        org.meshtastic.proto.Telemetry.Builder()
-            .also { wb -> wb.soil_water_metrics = soilWaterMetrics }
-            .build(),
-        paxcounter = paxcounter,
-        publicKey = publicKey,
-        notes = notes,
-        manuallyVerified = manuallyVerified,
-        nodeStatus = nodeStatus,
-        lastTransport = lastTransport,
-        signsPackets = signsPackets,
-        heardOnCurrentLora = heardOnCurrentLora,
-        keyMatch = keyMatch,
-        newPublicKey = newPublicKey,
     )
 
     private fun LocalStatsExtendedPrefs.toDomain() = LocalStatsExtended(

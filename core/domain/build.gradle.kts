@@ -29,8 +29,6 @@ kotlin {
             implementation(projects.core.repository)
             implementation(projects.core.model)
             implementation(projects.core.common)
-            implementation(projects.core.database)
-            implementation(projects.core.datastore)
             implementation(projects.core.resources)
 
             implementation(libs.kermit)

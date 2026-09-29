@@ -16,10 +16,7 @@
  */
 package org.meshtastic.core.data.manager
 
-import co.touchlab.kermit.LogWriter
-import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
-import co.touchlab.kermit.platformLogWriter
 import dev.mokkery.MockMode
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
@@ -67,6 +64,7 @@ import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.ServiceRepository
 import org.meshtastic.core.repository.SessionManager
 import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.testing.CapturingLogWriter
 import org.meshtastic.core.testing.FakeLockdownCoordinator
 import org.meshtastic.core.testing.FakeNodeRepository
 import org.meshtastic.proto.Config
@@ -195,21 +193,8 @@ class MeshConnectionManagerImplTest {
 
     @AfterTest
     fun tearDown() {
-        Logger.setLogWriters(platformLogWriter())
+        CapturingLogWriter.uninstall()
     }
-
-    private class CapturingLogWriter : LogWriter() {
-        val entries = mutableListOf<Pair<Severity, String>>()
-
-        override fun log(severity: Severity, message: String, tag: String, throwable: Throwable?) {
-            entries += severity to message
-        }
-    }
-
-    private fun captureLogs(): CapturingLogWriter = CapturingLogWriter().also { Logger.setLogWriters(it) }
-
-    private fun CapturingLogWriter.messages(severity: Severity): List<String> =
-        entries.filter { it.first == severity }.map { it.second }
 
     @Test
     fun `Connected state triggers broadcast and config start`() = runTest(testDispatcher) {
@@ -467,7 +452,6 @@ class MeshConnectionManagerImplTest {
                 admissionVersions += call.arg<Long>(1)
                 seedAttempts++
                 if (seedAttempts < 3) throw PacketQueueRejectedException("test passkey seed")
-                Unit
             }
         everySuspend { commandSender.requestTelemetryForConnection(any(), any(), any(), any()) } calls
             { call ->
@@ -476,14 +460,12 @@ class MeshConnectionManagerImplTest {
                 val attempts = telemetryAttempts.getOrElse(type) { 0 } + 1
                 telemetryAttempts[type] = attempts
                 if (attempts == 1) throw PacketQueueRejectedException("test telemetry request")
-                Unit
             }
         everySuspend { historyManager.requestHistoryReplay(any(), any(), any(), any(), any()) } calls
             { call ->
                 admissionVersions += call.arg<Long>(4)
                 historyAttempts++
                 if (historyAttempts == 1) throw PacketQueueRejectedException("test history replay")
-                Unit
             }
         every { nodeManager.myNodeNum } returns MutableStateFlow(123)
         every { mqttManager.startProxy(any(), any()) } returns Unit
@@ -994,7 +976,7 @@ class MeshConnectionManagerImplTest {
     @Test
     fun `TCP Stage 1 stall report names TCP`() = runTest(testDispatcher) {
         every { radioInterfaceService.getDeviceAddress() } returns "t192.168.1.42"
-        val logs = captureLogs()
+        val logs = CapturingLogWriter.install()
         manager = createManager(backgroundScope)
         radioConnectionState.value = ConnectionState.Connected
         advanceTimeBy(200)
@@ -1015,7 +997,7 @@ class MeshConnectionManagerImplTest {
     @Test
     fun `USB Stage 1 stall report names USB`() = runTest(testDispatcher) {
         every { radioInterfaceService.getDeviceAddress() } returns "s/dev/bus/usb/001/002"
-        val logs = captureLogs()
+        val logs = CapturingLogWriter.install()
         manager = createManager(backgroundScope)
         radioConnectionState.value = ConnectionState.Connected
         advanceTimeBy(200)
@@ -1037,7 +1019,7 @@ class MeshConnectionManagerImplTest {
     @Test
     fun `Demo Mode keeps the fast stall budget and names MOCK`() = runTest(testDispatcher) {
         every { radioInterfaceService.getDeviceAddress() } returns "m"
-        val logs = captureLogs()
+        val logs = CapturingLogWriter.install()
         manager = createManager(backgroundScope)
         radioConnectionState.value = ConnectionState.Connected
         advanceTimeBy(200)
@@ -1059,7 +1041,7 @@ class MeshConnectionManagerImplTest {
     @Test
     fun `BLE Stage 1 stall report names BLE`() = runTest(testDispatcher) {
         every { radioInterfaceService.getDeviceAddress() } returns "xAA:BB:CC:DD:EE:FF"
-        val logs = captureLogs()
+        val logs = CapturingLogWriter.install()
         manager = createManager(backgroundScope)
         radioConnectionState.value = ConnectionState.Connected
         advanceTimeBy(200)
@@ -1078,7 +1060,7 @@ class MeshConnectionManagerImplTest {
     @Test
     fun `TCP fast watchdog report names TCP`() = runTest(testDispatcher) {
         every { radioInterfaceService.getDeviceAddress() } returns "t192.168.1.42"
-        val logs = captureLogs()
+        val logs = CapturingLogWriter.install()
         manager = createManager(backgroundScope)
         radioConnectionState.value = ConnectionState.Connected
         advanceTimeBy(200)

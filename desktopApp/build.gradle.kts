@@ -20,8 +20,10 @@ import org.gradle.api.file.FileSystemOperations
 import org.gradle.process.ExecOperations
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
+import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.meshtastic.buildlogic.configureGraphTasks
+import org.meshtastic.buildlogic.kotlinWarningsAsErrors
 import org.meshtastic.buildlogic.maplibreDesktopRuntime
 import org.meshtastic.buildlogic.resolveVersionInfo
 import java.io.File
@@ -113,7 +115,8 @@ kotlin {
     }
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_25)
-        freeCompilerArgs.add("-jvm-default=no-compatibility")
+        jvmDefault.set(JvmDefaultMode.NO_COMPATIBILITY)
+        allWarningsAsErrors.set(kotlinWarningsAsErrors)
     }
 }
 
@@ -376,6 +379,7 @@ dependencies {
     implementation(projects.core.resources)
     implementation(projects.core.service)
     implementation(projects.core.ui)
+    implementation(libs.meshtastic.protobufs)
     implementation(projects.core.ble)
 
     // Feature modules (JVM variants for real composable wiring)
@@ -439,7 +443,6 @@ dependencies {
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.sqlite.bundled)
-    implementation(libs.kotlinx.collections.immutable)
 
     implementation(libs.jna)
 
