@@ -32,7 +32,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
@@ -101,7 +100,7 @@ enum class Quality(
     NONE(
         Res.string.none_quality,
         Res.drawable.ic_signal_cellular_alt_1_bar,
-        { if (colorScheme.background.luminance() < 0.5f) colorScheme.StatusConnecting else Color.Black },
+        { colorScheme.StatusConnecting },
     ),
     BAD(Res.string.bad, Res.drawable.ic_signal_cellular_alt_2_bar, { colorScheme.StatusPurple }),
     FAIR(Res.string.fair, Res.drawable.ic_signal_cellular_alt, { colorScheme.StatusDisconnected }),
