@@ -80,16 +80,21 @@ fun annotateNeighborInfo(
             if (i > 0) append("\n")
             // Example line: "• NodeName (SNR: 5.5)"
             if (line.contains("(SNR: ")) {
-                val snrRegex = Regex("""\(SNR: ([\d.?-]+)\)""")
+                // The value is formatted as "-5.5 dB" (possibly with a decimal comma or a Unicode minus), so accept
+                // an optional unit and normalise the number before parsing.
+                val snrRegex = Regex("""\(SNR: ([^\s)]+)(?: dB)?\)""")
                 val snrMatch = snrRegex.find(line)
-                val snrValue = snrMatch?.groupValues?.getOrNull(1)?.toFloatOrNull()
+                val snrText = snrMatch?.groupValues?.getOrNull(1)
+                val snrValue = snrText?.replace(',', '.')?.replace('\u2212', '-')?.toFloatOrNull()
 
                 if (snrValue != null) {
                     val snrColor =
                         snrTierColor(snrValue, modemPreset, statusGreen, statusYellow, statusOrange, statusRed)
                     val snrPrefix = "(SNR: "
                     append(line.substring(0, line.indexOf(snrPrefix) + snrPrefix.length))
-                    withStyle(style = SpanStyle(color = snrColor, fontWeight = FontWeight.Bold)) { append("$snrValue") }
+                    // Colour exactly what the line shows between "(SNR: " and ")", unit included.
+                    val shown = line.substring(line.indexOf(snrPrefix) + snrPrefix.length).substringBefore(")")
+                    withStyle(style = SpanStyle(color = snrColor, fontWeight = FontWeight.Bold)) { append(shown) }
                     append(")")
                 } else {
                     append(line)
