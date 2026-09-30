@@ -31,6 +31,9 @@ import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
 import co.touchlab.kermit.Logger
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -62,9 +65,11 @@ import org.meshtastic.core.repository.FirmwareUpdateProgress
 import org.meshtastic.core.repository.FirmwareUpdateStatusRepository
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.repository.Notification as MeshNotification
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.SERVICE_NOTIFY_ID
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.repository.notificationId
 import org.meshtastic.core.resources.R.drawable
 import org.meshtastic.core.resources.Res
@@ -106,10 +111,6 @@ import org.meshtastic.proto.ClientNotification
 import org.meshtastic.proto.DeviceMetrics
 import org.meshtastic.proto.LocalStats
 import org.meshtastic.proto.Telemetry
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
-import org.meshtastic.core.repository.Notification as MeshNotification
 
 /**
  * Manages the creation and display of all app notifications.
@@ -128,6 +129,7 @@ class MeshNotificationManagerImpl(
     private val radioOperationLock: RadioOperationLock,
     private val firmwareUpdateStatusRepository: FirmwareUpdateStatusRepository,
     private val scope: ServiceScope,
+    private val uiPrefs: Lazy<UiPrefs>,
 ) : MeshNotificationManager {
 
     private val notificationManager =
@@ -1221,7 +1223,12 @@ class MeshNotificationManagerImpl(
         // Diagnostic Fields
         val diagnosticParts = mutableListOf<String>()
         val noiseFloor = noiseFloorOrNull
-        if (noiseFloor != null) diagnosticParts.add(getStringSuspend(Res.string.local_stats_noise, noiseFloor))
+        if (noiseFloor != null) {
+            // Shown with the same LNA gain correction as in the app (display-only; raw data is unchanged).
+            val myNodeNum = nodeRepository.value.myNodeInfo.value?.myNodeNum
+            val gain = myNodeNum?.let { uiPrefs.value.lnaGains.value[it] } ?: 0
+            diagnosticParts.add(getStringSuspend(Res.string.local_stats_noise, noiseFloor - gain))
+        }
         if (num_packets_rx_bad > 0) {
             diagnosticParts.add(getStringSuspend(Res.string.local_stats_bad, num_packets_rx_bad))
         }

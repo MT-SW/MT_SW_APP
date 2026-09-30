@@ -60,7 +60,7 @@ data class NodeMetricDetailUiState(
 
 @KoinViewModel
 class NodeMetricDetailViewModel(
-    @InjectedParam private val nodeNum: Int,
+    @InjectedParam val nodeNum: Int,
     @InjectedParam private val initialMetric: NetworkHealthMetric,
     private val nodeRepository: NodeRepository,
     private val meshLogRepository: MeshLogRepository,

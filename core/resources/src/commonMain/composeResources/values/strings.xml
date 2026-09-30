@@ -966,6 +966,7 @@
     <string name="local_stats_psram">PSRAM</string>
     <string name="local_stats_psram_description">Percentage of PSRAM free</string>
     <string name="local_stats_relays">Relays: %1$d (Canceled: %2$d)</string>
+    <string name="local_stats_rx_share">Share of received: dupes %1$s, bad %2$s, relayed %3$s</string>
     <string name="local_stats_traffic">Traffic: TX %1$d / RX %2$d (D: %3$d)</string>
     <string name="local_stats_updated_at">%1$s</string>
     <string name="local_stats_uptime">Uptime: %1$s</string>

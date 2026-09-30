@@ -33,6 +33,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -49,9 +50,12 @@ import org.meshtastic.core.ui.theme.GraphColors.Gold
 import org.meshtastic.core.ui.theme.GraphColors.Green
 import org.meshtastic.core.ui.theme.GraphColors.Orange
 import org.meshtastic.core.ui.theme.GraphColors.Red
+import org.meshtastic.core.ui.util.LnaCorrection
+import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.feature.node.metrics.ChartStyling
 import org.meshtastic.feature.node.metrics.CommonCharts
 import org.meshtastic.feature.node.metrics.GenericMetricChart
+import org.meshtastic.feature.node.metrics.LnaGainField
 import org.meshtastic.feature.node.metrics.MetricChartScaffold
 
 private val SERIES_COLORS = listOf(Green, Blue, Gold, Orange, Red)
@@ -62,7 +66,12 @@ fun NodeMetricDetailScreen(
     onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val rawState by viewModel.uiState.collectAsStateWithLifecycle()
+    // LNA gain correction (display-only): RSSI by our own gain, noise floor by the viewed node's gain.
+    val lna = LocalLnaCorrection.current
+    val nodeNum = viewModel.nodeNum
+    val uiState =
+        remember(rawState, lna, nodeNum) { rawState.copy(series = rawState.series.map { it.withLnaCorrection(lna, nodeNum) }) }
 
     Scaffold(
         modifier = modifier,
@@ -86,6 +95,11 @@ fun NodeMetricDetailScreen(
                 }
             }
 
+            if (uiState.metric == NetworkHealthMetric.SIGNAL && nodeNum != lna.myNodeNum) {
+                // Our own gain is set in the LoRa settings; a remote node's gain only corrects its noise floor.
+                LnaGainField(nodeNum)
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
 
             val seriesByLabel = uiState.series.associateBy { it.label }
@@ -104,10 +118,30 @@ fun NodeMetricDetailScreen(
             groups.forEachIndexed { groupIndex, groupSeries ->
                 groupSeries.forEach { s ->
                     val color = colorFor(groups, groupIndex, s.label)
+                    // Traffic counters (except RX itself) also show their share of all received packets.
+                    val rx = seriesByLabel["RX"].takeIf { s.label in RX_SHARE_LABELS }
                     Row(horizontalArrangement = Arrangement.spacedBy(24.dp), modifier = Modifier.fillMaxWidth()) {
-                        StatLabel(label = "${s.label} — min", value = s.minValue, seriesLabel = s.label, color = color)
-                        StatLabel(label = "max", value = s.maxValue, seriesLabel = s.label, color = color)
-                        StatLabel(label = "ostatnia", value = s.latestValue, seriesLabel = s.label, color = color)
+                        StatLabel(
+                            label = "${s.label} — min",
+                            value = s.minValue,
+                            seriesLabel = s.label,
+                            color = color,
+                            rxTotal = rx?.minValue,
+                        )
+                        StatLabel(
+                            label = "max",
+                            value = s.maxValue,
+                            seriesLabel = s.label,
+                            color = color,
+                            rxTotal = rx?.maxValue,
+                        )
+                        StatLabel(
+                            label = "ostatnia",
+                            value = s.latestValue,
+                            seriesLabel = s.label,
+                            color = color,
+                            rxTotal = rx?.latestValue,
+                        )
                     }
                 }
             }
@@ -192,12 +226,36 @@ private fun colorFor(groups: List<List<MetricSeries>>, groupIndex: Int, label: S
 
 private const val MILLIS_PER_SEC = 1000L
 
+/** RSSI is corrected by our own LNA gain, "Noise Floor" by the viewed node's gain; other series are untouched. */
+private fun MetricSeries.withLnaCorrection(lna: LnaCorrection, nodeNum: Int): MetricSeries {
+    val gain =
+        when (label) {
+            "RSSI" -> lna.localGain
+            "Noise Floor" -> lna.gains[nodeNum] ?: 0
+            else -> 0
+        }
+    if (gain == 0) return this
+    return copy(
+        points = points.map { it.copy(value = it.value - gain) },
+        minValue = minValue?.minus(gain),
+        maxValue = maxValue?.minus(gain),
+        latestValue = latestValue?.minus(gain),
+    )
+}
+
+private val RX_SHARE_LABELS = setOf("TX", "Duplikaty", "Przekazane", "Uszkodzone")
+
+/** " (2,5%)" — [value] as a share of the received-packet total, or nothing when that total is unknown/zero. */
+private fun rxSharePart(value: Float, rxTotal: Float?): String =
+    if (rxTotal != null && rxTotal > 0f) " (${MetricFormatter.percent(value * 100f / rxTotal, decimalPlaces = 1)})" else ""
+
 @Composable
 private fun StatLabel(
     label: String,
     value: Float?,
     seriesLabel: String,
     color: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    rxTotal: Float? = null,
 ) {
     Column {
         Text(
@@ -206,7 +264,8 @@ private fun StatLabel(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
-            text = value?.let { formatSeriesValue(seriesLabel, it) } ?: "—",
+            text =
+            value?.let { formatSeriesValue(seriesLabel, it) + rxSharePart(it, rxTotal) } ?: "—",
             style = MaterialTheme.typography.titleMedium,
             color = color,
         )

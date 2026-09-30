@@ -24,6 +24,7 @@ import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
 import org.meshtastic.proto.NeighborInfo
 import org.meshtastic.proto.PortNum
@@ -84,6 +85,7 @@ data class NetworkSummaryUiState(
 class NetworkSummaryViewModel(
     private val nodeRepository: NodeRepository,
     private val meshLogRepository: MeshLogRepository,
+    private val uiPrefs: UiPrefs,
 ) : ViewModel() {
 
     val uiState: StateFlow<NetworkSummaryUiState> =
@@ -141,7 +143,13 @@ class NetworkSummaryViewModel(
                     .map { SignalLeader(nameByNum[it.num] ?: "?", it.snr) }
             val weakSignalNodes = snrByNode.filter { it.snr < WEAK_SNR_THRESHOLD }
 
-            val noiseFloors = latestPerNode.values.mapNotNull { it?.noiseFloor }
+            // Noise floors shown with each node's LNA gain correction (display-only). Local logs may carry node 0.
+            val lnaGains = uiPrefs.lnaGains.value
+            val myNodeNum = nodeRepository.myNodeInfo.value?.myNodeNum
+            val noiseFloors =
+                latestPerNode.mapNotNull { (num, entry) ->
+                    entry?.noiseFloor?.let { it - (lnaGains[if (num == 0) myNodeNum else num] ?: 0) }
+                }
             val channelUtils = latestPerNode.values.mapNotNull { it?.channelUtilization }
             val airUtils = latestPerNode.values.mapNotNull { it?.airUtilTx }
 
