@@ -149,7 +149,8 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
                     Text("Pakiety TX: ${uiState.totalPacketsTx}", style = MaterialTheme.typography.bodyMedium)
                     Text("Pakiety RX: ${uiState.totalPacketsRx}", style = MaterialTheme.typography.bodyMedium)
                     Text(
-                        "Duplikaty: ${uiState.totalDupes}, Uszkodzone: ${uiState.totalBad}",
+                        "Duplikaty: ${uiState.totalDupes}${sharePart(uiState.totalDupes, uiState.totalPacketsRx)}, " +
+                            "Uszkodzone: ${uiState.totalBad}${sharePart(uiState.totalBad, uiState.totalPacketsRx)}",
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     if (uiState.topRelayNodeName != null) {
@@ -315,3 +316,7 @@ private fun formatUptime(seconds: Int): String {
 private const val SECONDS_PER_HOUR = 3600
 private const val HOURS_PER_DAY = 24
 private const val METERS_PER_KM = 1000
+
+/** " (2,5%)" — [count] as a share of all received packets, or nothing when nothing was received. */
+private fun sharePart(count: Int, totalRx: Int): String =
+    if (totalRx > 0) " (${MetricFormatter.percent(count * 100f / totalRx, decimalPlaces = 1)})" else ""

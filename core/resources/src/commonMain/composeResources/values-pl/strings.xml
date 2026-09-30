@@ -415,6 +415,7 @@
     <string name="lna_gain_correction_description">Wpisz wzmocnienie LNA tego urządzenia w dB. Wyświetlany poziom szumu i RSSI zostaną pomniejszone o tę wartość (np. 20 dB: -98 dBm wyświetli się jako -118 dBm). Wartość jest zapamiętana tylko w telefonie – konfiguracja urządzenia nie jest zmieniana.</string>
     <string name="lna_gain_db">Wzmocnienie LNA (dB)</string>
     <string name="lna_gain_node_description">Koryguje tylko poziom szumu zgłaszany przez ten węzeł. RSSI odbieranych pakietów jest korygowane wzmocnieniem Twojego urządzenia.</string>
+    <string name="local_stats_rx_share">Udział w odebranych: duplikaty %1$s, błędne %2$s, przekazane %3$s</string>
     <string name="location_precise_blocked_toast">Dokładna lokalizacja jest wyłączona. Włącz „Użyj dokładnej lokalizacji” w ustawieniach aplikacji, aby udostępniać swoją pozycję.</string>
     <string name="location_precise_rationale">Udostępnianie pozycji w sieci mesh wymaga dokładnej lokalizacji, aby inne węzły widziały, gdzie jesteś, a nie tylko przybliżony obszar. Gdy Android zapyta, wybierz „Dokładna”. Mapa i wszystko inne działają także z lokalizacją przybliżoną.</string>
     <string name="meshtastic_alerts_notifications_description">Krytyczne alerty wysyłane przez węzły w sieci mesh.</string>

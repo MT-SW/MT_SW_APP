@@ -74,6 +74,7 @@ import org.meshtastic.core.resources.local_stats_bad
 import org.meshtastic.core.resources.local_stats_nodes
 import org.meshtastic.core.resources.local_stats_noise
 import org.meshtastic.core.resources.local_stats_relays
+import org.meshtastic.core.resources.local_stats_rx_share
 import org.meshtastic.core.resources.local_stats_traffic
 import org.meshtastic.core.resources.local_stats_uptime
 import org.meshtastic.core.resources.no_local_stats
@@ -98,6 +99,9 @@ import org.meshtastic.core.ui.theme.GraphColors.Gold
 import org.meshtastic.core.ui.theme.GraphColors.Green
 import org.meshtastic.core.ui.theme.GraphColors.Orange
 import org.meshtastic.core.ui.theme.GraphColors.Red
+import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
+import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
+import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.proto.MeshPacket
@@ -323,7 +327,7 @@ private fun LocalStatsActionButtons(
 
 /** Per-node LNA gain (dB): corrects only this node's displayed noise floor; stored on this phone (see LnaCorrection). */
 @Composable
-private fun LnaGainField(nodeNum: Int) {
+internal fun LnaGainField(nodeNum: Int) {
     val uiPrefs = koinInject<UiPrefs>()
     val gains by uiPrefs.lnaGains.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
@@ -504,9 +508,10 @@ private fun SignalMetricsChart(
 @Composable
 private fun noiseFloorTextColor(value: Int?): Color = when {
     value == null -> MaterialTheme.colorScheme.onSurfaceVariant
-    value < QUIET_NOISE_FLOOR_DBM -> SignalMetric.SNR.color
-    value < BUSY_FLOOR_DBM -> Orange
-    else -> MaterialTheme.colorScheme.error
+    // Palette matches the signal-quality / connection-status colours: gold = quiet, red = busy, purple = very noisy.
+    value < QUIET_NOISE_FLOOR_DBM -> MaterialTheme.colorScheme.StatusOnline
+    value < BUSY_FLOOR_DBM -> MaterialTheme.colorScheme.StatusDisconnected
+    else -> MaterialTheme.colorScheme.StatusPurple
 }
 
 @Suppress("LongMethod")
@@ -569,6 +574,22 @@ private fun LocalStatsCard(nodeNum: Int?, telemetry: Telemetry, isSelected: Bool
                 )
             }
 
+            val rx = localStats?.num_packets_rx ?: 0
+            if (rx > 0) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text =
+                    stringResource(
+                        Res.string.local_stats_rx_share,
+                        rxShare(localStats?.num_rx_dupe ?: 0, rx),
+                        rxShare(localStats?.num_packets_rx_bad ?: 0, rx),
+                        rxShare(localStats?.num_tx_relay ?: 0, rx),
+                    ),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
             Spacer(modifier = Modifier.height(4.dp))
 
             // FlowRow(SpaceBetween): the uptime stat wraps to its own line when the nodes label is too long,
@@ -605,6 +626,9 @@ private fun LocalStatsCard(nodeNum: Int?, telemetry: Telemetry, isSelected: Bool
         }
     }
 }
+
+/** [count] as a percentage of all received packets [total], e.g. "2,5%". */
+private fun rxShare(count: Int, total: Int): String = MetricFormatter.percent(count * 100f / total, decimalPlaces = 1)
 
 @Composable
 private fun SignalMetricsCard(meshPacket: MeshPacket, isSelected: Boolean, onClick: () -> Unit) {
