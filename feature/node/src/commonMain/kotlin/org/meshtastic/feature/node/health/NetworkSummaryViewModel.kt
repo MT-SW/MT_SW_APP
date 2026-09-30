@@ -143,12 +143,11 @@ class NetworkSummaryViewModel(
                     .map { SignalLeader(nameByNum[it.num] ?: "?", it.snr) }
             val weakSignalNodes = snrByNode.filter { it.snr < WEAK_SNR_THRESHOLD }
 
-            // Noise floors shown with each node's LNA gain correction (display-only). Local logs may carry node 0.
+            // Noise floors shown with each node's LNA gain correction (display-only). Local logs may carry node 0 (see remapLocal).
             val lnaGains = uiPrefs.lnaGains.value
-            val myNodeNum = nodeRepository.myNodeInfo.value?.myNodeNum
             val noiseFloors =
                 latestPerNode.mapNotNull { (num, entry) ->
-                    entry?.noiseFloor?.let { it - (lnaGains[if (num == 0) myNodeNum else num] ?: 0) }
+                    entry?.noiseFloor?.let { it - (lnaGains[remapLocal(num)] ?: 0) }
                 }
             val channelUtils = latestPerNode.values.mapNotNull { it?.channelUtilization }
             val airUtils = latestPerNode.values.mapNotNull { it?.airUtilTx }
