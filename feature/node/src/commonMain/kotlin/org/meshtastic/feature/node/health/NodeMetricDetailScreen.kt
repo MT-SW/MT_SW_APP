@@ -55,7 +55,6 @@ import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.feature.node.metrics.ChartStyling
 import org.meshtastic.feature.node.metrics.CommonCharts
 import org.meshtastic.feature.node.metrics.GenericMetricChart
-import org.meshtastic.feature.node.metrics.LnaGainField
 import org.meshtastic.feature.node.metrics.MetricChartScaffold
 
 private val SERIES_COLORS = listOf(Green, Blue, Gold, Orange, Red)
@@ -93,11 +92,6 @@ fun NodeMetricDetailScreen(
                         label = { Text(range.label) },
                     )
                 }
-            }
-
-            if (uiState.metric == NetworkHealthMetric.SIGNAL && nodeNum != lna.myNodeNum) {
-                // Our own gain is set in the LoRa settings; a remote node's gain only corrects its noise floor.
-                LnaGainField(nodeNum)
             }
 
             Spacer(modifier = Modifier.height(16.dp))

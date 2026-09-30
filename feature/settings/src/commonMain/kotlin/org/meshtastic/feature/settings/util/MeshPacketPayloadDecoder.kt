@@ -232,11 +232,12 @@ fun summarizePacketPayload(packet: MeshPacket, knownChannels: List<Channel> = em
 
 private const val POSITION_COORDINATE_SCALE = 1e7
 
-private fun summarizePosition(position: Position): PacketSummary.PositionSummary = PacketSummary.PositionSummary(
+private fun summarizePosition(position: Position): PacketSummary = PacketSummary.PositionSummary(
     latitude = position.latitude_i?.takeIf { it != 0 }?.let { it / POSITION_COORDINATE_SCALE },
     longitude = position.longitude_i?.takeIf { it != 0 }?.let { it / POSITION_COORDINATE_SCALE },
     altitudeMeters = position.altitude,
 )
+    .withFrameTime(position.time)
 
 private fun summarizeUser(user: User): PacketSummary.NodeInfoSummary = PacketSummary.NodeInfoSummary(
     longName = user.long_name?.takeIf { it.isNotBlank() },

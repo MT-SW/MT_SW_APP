@@ -33,10 +33,11 @@ import org.meshtastic.proto.Telemetry
  * packet, or one carrying a variant (air_quality_metrics, health_metrics) this summary doesn't break out yet, has
  * nothing worth summarizing; the raw decode in the expanded card still shows it in full.
  */
-internal fun summarizeTelemetry(telemetry: Telemetry): PacketSummary? = summarizeHostMetrics(telemetry.host_metrics)
+internal fun summarizeTelemetry(telemetry: Telemetry): PacketSummary? = (summarizeHostMetrics(telemetry.host_metrics)
     ?: summarizeLocalStats(telemetry.local_stats)
     ?: summarizePowerMetrics(telemetry.power_metrics)
-    ?: summarizeDeviceOrEnvironmentMetrics(telemetry.environment_metrics, telemetry.device_metrics)
+    ?: summarizeDeviceOrEnvironmentMetrics(telemetry.environment_metrics, telemetry.device_metrics))
+    ?.withFrameTime(telemetry.time)
 
 private fun summarizeHostMetrics(host: HostMetrics?): PacketSummary.HostMetricsSummary? = host?.let {
     PacketSummary.HostMetricsSummary(

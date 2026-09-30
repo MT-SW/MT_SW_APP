@@ -66,10 +66,16 @@ import org.meshtastic.core.resources.security
 import org.meshtastic.core.ui.component.ConnectionActivityLegendItems
 import org.meshtastic.core.ui.component.ConnectionStatusLegendItems
 import org.meshtastic.core.ui.component.Quality
+import org.meshtastic.core.ui.component.RSSI_BAD_THRESHOLD
+import org.meshtastic.core.ui.component.RSSI_FAIR_THRESHOLD
+import org.meshtastic.core.ui.component.RSSI_GOOD_THRESHOLD
 import org.meshtastic.core.ui.component.SecurityLegendItems
+import org.meshtastic.core.ui.component.formatThreshold
+import org.meshtastic.core.ui.component.snrBands
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.label
 import org.meshtastic.core.ui.icon.role
+import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.proto.Config
 
 private const val ICON_SIZE = 24
@@ -126,10 +132,38 @@ fun NodeListHelp(onDismiss: () -> Unit) {
                 modifier = Modifier.semantics { heading() },
             )
 
-            SignalQualityEntry(Quality.GOOD, stringResource(Res.string.node_layout_help_signal_good))
-            SignalQualityEntry(Quality.FAIR, stringResource(Res.string.node_layout_help_signal_fair))
-            SignalQualityEntry(Quality.BAD, stringResource(Res.string.node_layout_help_signal_bad))
-            SignalQualityEntry(Quality.NONE, stringResource(Res.string.node_layout_help_signal_none))
+            val bands = LocalModemPreset.current.snrBands()
+            val snrGood = formatThreshold(bands.good)
+            val snrFair = formatThreshold(bands.fair)
+            val snrBad = formatThreshold(bands.bad)
+            SignalQualityEntry(
+                Quality.GOOD,
+                stringResource(Res.string.node_layout_help_signal_good, snrGood, RSSI_GOOD_THRESHOLD.toString()),
+            )
+            SignalQualityEntry(
+                Quality.FAIR,
+                stringResource(
+                    Res.string.node_layout_help_signal_fair,
+                    snrFair,
+                    snrGood,
+                    RSSI_FAIR_THRESHOLD.toString(),
+                    RSSI_GOOD_THRESHOLD.toString(),
+                ),
+            )
+            SignalQualityEntry(
+                Quality.BAD,
+                stringResource(
+                    Res.string.node_layout_help_signal_bad,
+                    snrBad,
+                    snrFair,
+                    RSSI_BAD_THRESHOLD.toString(),
+                    RSSI_FAIR_THRESHOLD.toString(),
+                ),
+            )
+            SignalQualityEntry(
+                Quality.NONE,
+                stringResource(Res.string.node_layout_help_signal_none, snrBad, RSSI_BAD_THRESHOLD.toString()),
+            )
 
             HorizontalDivider()
 

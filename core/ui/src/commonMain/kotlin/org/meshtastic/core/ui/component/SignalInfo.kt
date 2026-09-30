@@ -26,7 +26,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -80,9 +83,18 @@ fun SignalInfo(
                 modifier = Modifier.size(16.dp),
                 tint = signalColor,
             )
+            val correctedRssi = rssi?.let { lna.rssi(it) }
+            val snrColor = determineSignalQuality(snr, LocalModemPreset.current).color.invoke()
+            val rssiColor = correctedRssi?.let { determineRssiQuality(it).color.invoke() } ?: signalColor
+            val qualityName = stringResource(quality.nameRes)
             Text(
                 text =
-                "${MetricFormatter.snr(snr)} · ${MetricFormatter.rssi(rssi?.let { LocalLnaCorrection.current.rssi(it) })} · " + stringResource(quality.nameRes),
+                buildAnnotatedString {
+                    withStyle(SpanStyle(color = snrColor)) { append(MetricFormatter.snr(snr)) }
+                    withStyle(SpanStyle(color = signalColor)) { append(" · ") }
+                    withStyle(SpanStyle(color = rssiColor)) { append(MetricFormatter.rssi(correctedRssi)) }
+                    withStyle(SpanStyle(color = signalColor)) { append(" · $qualityName") }
+                },
                 style =
                 MaterialTheme.typography.labelSmall.copy(
                     fontWeight = FontWeight.Bold,

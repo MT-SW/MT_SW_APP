@@ -18,8 +18,10 @@ package org.meshtastic.feature.settings.sniffer
 
 import androidx.compose.runtime.Composable
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.air_utilization
 import org.meshtastic.core.resources.channel_utilization
@@ -28,6 +30,8 @@ import org.meshtastic.core.resources.discovery_stat_packets_tx
 import org.meshtastic.core.resources.free_memory
 import org.meshtastic.core.resources.load_indexed
 import org.meshtastic.core.resources.local_stats_heap
+import org.meshtastic.core.resources.sniffer_summary_frame_time
+import org.meshtastic.core.resources.sniffer_summary_frame_time_suspicious
 import org.meshtastic.core.resources.sniffer_summary_neighbor_count
 import org.meshtastic.core.resources.sniffer_summary_nodeinfo_unknown
 import org.meshtastic.core.resources.sniffer_summary_position_unknown
@@ -41,11 +45,16 @@ import org.meshtastic.feature.settings.util.PacketSummary
  * file's other card-chrome composables.
  */
 private const val POSITION_DECIMAL_PLACES = 5
+private const val MILLIS_PER_SECOND = 1000L
+private const val MILLIS_PER_DAY = 86_400_000L
+private const val MIN_PLAUSIBLE_FRAME_MILLIS = 1_577_836_800_000L // 2020-01-01
 
 /** Localizes a [PacketSummary] into the card's always-visible content line -- null when there is nothing to show. */
 @Composable
 internal fun PacketSummary.render(): String? = when (this) {
     is PacketSummary.Text -> text
+
+    is PacketSummary.Timed -> listOfNotNull(summary.render(), renderFrameTime(frameTimeSeconds)).joinToString("\n")
 
     is PacketSummary.PositionSummary ->
         if (latitude != null && longitude != null) {
@@ -71,6 +80,19 @@ internal fun PacketSummary.render(): String? = when (this) {
     is PacketSummary.LocalStatsSummary -> renderLocalStatsSummary(this)
 
     is PacketSummary.NeighborCount -> stringResource(Res.string.sniffer_summary_neighbor_count, count)
+}
+
+/** The time the sender wrote into the frame; flagged when it is impossible (before 2020 or over a day ahead). */
+@Composable
+private fun renderFrameTime(seconds: Int): String {
+    val millis = seconds * MILLIS_PER_SECOND
+    val text = DateFormatter.formatDateTime(millis)
+    val suspicious = millis < MIN_PLAUSIBLE_FRAME_MILLIS || millis > nowMillis + MILLIS_PER_DAY
+    return if (suspicious) {
+        stringResource(Res.string.sniffer_summary_frame_time_suspicious, text)
+    } else {
+        stringResource(Res.string.sniffer_summary_frame_time, text)
+    }
 }
 
 @Composable

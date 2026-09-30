@@ -71,13 +71,13 @@ private const val SNR_FAIR_OFFSET = 5.5f
 private const val SNR_BAD_OFFSET = 7.5f
 
 /** Absolute SNR (dB) band edges: above [good] is GOOD, above [fair] is FAIR, at or above [bad] is BAD, else NONE. */
-private data class SnrBands(val good: Float, val fair: Float, val bad: Float)
+data class SnrBands(val good: Float, val fair: Float, val bad: Float)
 
 // Fixed bands for the narrow and lite presets, chosen for our network.
 private val NARROW_BANDS = SnrBands(good = -3f, fair = -7f, bad = -12f)
 private val LITE_BANDS = SnrBands(good = -5f, fair = -10f, bad = -15f)
 
-private fun ModemPreset?.snrBands(): SnrBands = when (this) {
+fun ModemPreset?.snrBands(): SnrBands = when (this) {
     ModemPreset.NARROW_FAST,
     ModemPreset.NARROW_SLOW,
     -> NARROW_BANDS
@@ -156,8 +156,22 @@ fun Snr(snr: Float?, modifier: Modifier = Modifier, modemPreset: ModemPreset? = 
     )
 }
 
+/** Formats a threshold for the help text: "-3" for whole numbers, "-7.5" otherwise. */
+fun formatThreshold(value: Float): String {
+    val rounded = kotlin.math.round(value * 10f) / 10f
+    return if (rounded == kotlin.math.round(rounded)) rounded.toInt().toString() else rounded.toString()
+}
+
+/** Rates a single (already LNA-corrected) RSSI value by its own bands, independent of SNR. */
+fun determineRssiQuality(rssi: Int): Quality = when {
+    rssi > RSSI_GOOD_THRESHOLD -> Quality.GOOD
+    rssi > RSSI_FAIR_THRESHOLD -> Quality.FAIR
+    rssi > RSSI_BAD_THRESHOLD -> Quality.BAD
+    else -> Quality.NONE
+}
+
 /**
- * [displayOffset] (LNA gain, dB) is subtracted from the shown text only; the colour is still rated from the raw [rssi].
+ * [displayOffset] (LNA gain, dB) is subtracted from [rssi]; the shown text and its colour both use the corrected value.
  *
  * Renders nothing when [rssi] is absent — 0 dBm is a real reading, so it must not stand in for "no reading".
  */
@@ -169,16 +183,11 @@ fun Rssi(
     displayOffset: Int = 0,
 ) {
     if (rssi == null) return
-    val color: Color =
-        when {
-            rssi > RSSI_GOOD_THRESHOLD -> Quality.GOOD.color.invoke()
-            rssi > RSSI_FAIR_THRESHOLD -> Quality.FAIR.color.invoke()
-            rssi > RSSI_BAD_THRESHOLD -> Quality.BAD.color.invoke()
-            else -> Quality.NONE.color.invoke()
-        }
+    val shown = rssi - displayOffset
+    val color: Color = determineRssiQuality(shown).color.invoke()
     Text(
         modifier = modifier,
-        text = "$label ${MetricFormatter.rssi(rssi - displayOffset)}",
+        text = "$label ${MetricFormatter.rssi(shown)}",
         color = color,
         style = MaterialTheme.typography.labelSmall,
     )

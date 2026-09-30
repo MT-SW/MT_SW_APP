@@ -140,6 +140,7 @@ import org.meshtastic.feature.connections.ui.components.CurrentlyConnectedInfo
 import org.meshtastic.feature.connections.ui.components.CurrentlyConnectedText
 import org.meshtastic.feature.connections.ui.components.DeviceList
 import org.meshtastic.feature.connections.ui.components.EventFirmwareCard
+import org.meshtastic.feature.connections.ui.components.TerminateApplicationButton
 import org.meshtastic.feature.connections.ui.components.TransportSelector
 
 /**
@@ -499,6 +500,8 @@ fun ConnectionsScreen(
                                 }
                             }
                         }
+
+                        TerminateApplicationButton()
 
                         // Event firmware is reported here rather than by swapping the app-bar logo: the Meshtastic
                         // identity stays put, and the edition reads as one more fact about the connected device.

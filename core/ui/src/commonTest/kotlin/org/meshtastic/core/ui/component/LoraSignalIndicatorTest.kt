@@ -159,4 +159,27 @@ class LoraSignalIndicatorTest {
     fun `absent SNR is not a quality band`() {
         assertEquals(listOf(Quality.NONE, Quality.BAD, Quality.FAIR, Quality.GOOD), Quality.entries.toList())
     }
+
+    @Test
+    fun rssiQuality_usesFixedBandsForAllPresets() {
+        assertEquals(Quality.GOOD, determineRssiQuality(-114))
+        assertEquals(Quality.FAIR, determineRssiQuality(-115))
+        assertEquals(Quality.FAIR, determineRssiQuality(-119))
+        assertEquals(Quality.BAD, determineRssiQuality(-120))
+        assertEquals(Quality.BAD, determineRssiQuality(-125))
+        assertEquals(Quality.NONE, determineRssiQuality(-126))
+    }
+
+    @Test
+    fun snrBands_followThePreset() {
+        assertEquals(SnrBands(-3f, -7f, -12f), ModemPreset.NARROW_FAST.snrBands())
+        assertEquals(SnrBands(-5f, -10f, -15f), ModemPreset.LITE_SLOW.snrBands())
+        assertEquals(SnrBands(-17.5f, -23f, -25f), ModemPreset.LONG_FAST.snrBands())
+    }
+
+    @Test
+    fun formatThreshold_dropsTrailingZero() {
+        assertEquals("-3", formatThreshold(-3f))
+        assertEquals("-7.5", formatThreshold(-7.5f))
+    }
 }
