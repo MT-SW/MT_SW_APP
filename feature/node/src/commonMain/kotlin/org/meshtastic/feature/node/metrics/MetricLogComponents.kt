@@ -132,10 +132,15 @@ fun SelectableMetricCard(
 
 /** A compact row displaying a colored [MetricIndicator] dot/line followed by a text value. */
 @Composable
-fun MetricValueRow(color: Color, text: String, modifier: Modifier = Modifier) {
+fun MetricValueRow(
+    color: Color,
+    text: String,
+    modifier: Modifier = Modifier,
+    textColor: Color = MaterialTheme.colorScheme.onSurface,
+) {
     Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
         MetricIndicator(color)
         Spacer(Modifier.width(4.dp))
-        Text(text = text, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.labelLarge)
+        Text(text = text, color = textColor, style = MaterialTheme.typography.labelLarge)
     }
 }

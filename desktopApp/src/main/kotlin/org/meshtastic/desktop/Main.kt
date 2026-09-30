@@ -108,6 +108,7 @@ import org.meshtastic.core.ui.util.LocalMapMainScreenProvider
 import org.meshtastic.core.ui.util.LocalMapViewProvider
 import org.meshtastic.core.ui.util.LocalNodeTrackMapProvider
 import org.meshtastic.core.ui.util.LocalSitePlannerAvailable
+import org.meshtastic.core.ui.util.LocalTerminateApplication
 import org.meshtastic.core.ui.util.LocalTracerouteMapOverlayInsetsProvider
 import org.meshtastic.core.ui.util.LocalTracerouteMapProvider
 import org.meshtastic.core.ui.util.TracerouteMapOverlayInsets
@@ -461,6 +462,7 @@ private fun ApplicationScope.MeshtasticWindow(
         ProvideMapPresentationHost(host = rememberAwtComposeMapPresentationHost(window)) {
             CompositionLocalProvider(
                 LocalEventBranding provides eventEdition,
+                LocalTerminateApplication provides { exitApplication() },
                 LocalMapViewProvider provides desktopMapViewProvider(),
                 // The planner runs in the browser here rather than in the app; the button is still offered.
                 LocalSitePlannerAvailable provides true,

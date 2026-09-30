@@ -356,6 +356,8 @@
     <string name="debug_store_logs_summary">Disable to skip writing mesh logs to disk</string>
     <string name="debug_store_logs_title">Store mesh logs</string>
     <string name="debug_tab_app_logs">App logs</string>
+    <string name="debug_tab_device_logs">Device logs</string>
+    <string name="debug_device_logs_empty">No device logs yet. Enable "Debug Logs" in the device security settings so the radio sends the same logs to the app that appear on its serial port.</string>
     <string name="debug_tab_packets">Packets</string>
     <string name="deep_link_connect_message">A link is asking this app to connect to the device at %1$s. Only continue if you trust where the link came from.</string>
     <string name="deep_link_connect_title">Connect to this device?</string>
@@ -417,6 +419,8 @@
     <string name="direct_messages">Direct Messages</string>
     <string name="discard_changes">Discard</string>
     <string name="disconnect">Disconnect</string>
+    <string name="terminate_app">Force stop the app</string>
+    <string name="terminate_app_message">The app will disconnect from the device, stop its background service and end the whole process, like "Force stop" in the system settings. Start it again to resume.</string>
     <string name="disconnected">Disconnected</string>
     <string name="discovered_network_devices">Discovered Network Devices</string>
     <!-- DISCOVERY -->
@@ -1351,11 +1355,11 @@
     <string name="node_layout_complete_description">The Complete layout displays all available node data. Fields with no data are automatically hidden.</string>
     <string name="node_layout_device_role">Device &amp; Role</string>
     <string name="node_layout_distance_and_bearing">Distance and Bearing</string>
-    <string name="node_layout_help_signal_bad">Signal is weak. SNR is up to 7.5 dB below the preset limit (Narrow: down to -12 dB, Lite: down to -15 dB).</string>
-    <string name="node_layout_help_signal_fair">Signal is sufficient. SNR is up to 5.5 dB below the preset limit (Narrow: down to -7 dB, Lite: down to -10 dB).</string>
-    <string name="node_layout_help_signal_good">Signal is good. SNR is above the SNR limit of the modem preset (Narrow: above -3 dB, Lite: above -5 dB).</string>
-    <string name="node_layout_help_signal_indicator">Rates SNR against the SNR limit of the modem preset and shows the result as a colored icon with a label. When RSSI and the noise floor are known, the RSSI margin over the noise can lower the rating.</string>
-    <string name="node_layout_help_signal_none">No usable signal. SNR is below the weak-signal threshold.</string>
+    <string name="node_layout_help_signal_bad">Signal is weak. SNR from %1$s to %2$s dB, RSSI above %3$s up to %4$s dBm.</string>
+    <string name="node_layout_help_signal_fair">Signal is sufficient. SNR above %1$s up to %2$s dB, RSSI above %3$s up to %4$s dBm.</string>
+    <string name="node_layout_help_signal_good">Signal is good. SNR above %1$s dB, RSSI above %2$s dBm.</string>
+    <string name="node_layout_help_signal_indicator">SNR thresholds change with the selected modem preset, while RSSI thresholds are the same for all presets. SNR and RSSI are colored by their own value (RSSI after LNA correction). The icon and label are the combined rating: when RSSI and the noise floor are known, the RSSI margin over the noise can lower it.</string>
+    <string name="node_layout_help_signal_none">No usable signal. SNR below %1$s dB, RSSI %2$s dBm or lower.</string>
     <string name="node_layout_hops_away">Hops Away</string>
     <string name="node_layout_last_heard_time">Last Heard Time</string>
     <string name="node_layout_log_icons">Environment Metrics</string>
@@ -2000,6 +2004,8 @@
     <string name="sniffer_source_radio_chip">Radio</string>
     <string name="sniffer_source_title">Active sniffer</string>
     <string name="sniffer_summary_neighbor_count">%1$d neighbors</string>
+    <string name="sniffer_summary_frame_time">Time in frame: %1$s</string>
+    <string name="sniffer_summary_frame_time_suspicious">Time in frame: %1$s (wrong time!)</string>
     <string name="sniffer_summary_nodeinfo_unknown">Unknown node</string>
     <string name="sniffer_summary_position_unknown">Unknown position</string>
     <string name="sniffer_summary_telemetry_unknown">No readings</string>

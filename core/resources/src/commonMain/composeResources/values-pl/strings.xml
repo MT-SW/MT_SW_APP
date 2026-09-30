@@ -442,6 +442,8 @@
     <string name="debug_store_logs_summary">Wyłącz, aby pominąć zapisywanie logów na dysku</string>
     <string name="debug_store_logs_title">Przechowuj logi sieci</string>
     <string name="debug_tab_app_logs">Dzienniki aplikacji</string>
+    <string name="debug_tab_device_logs">Logi urządzenia</string>
+    <string name="debug_device_logs_empty">Brak logów urządzenia. Włącz „Logi debugowania” w ustawieniach zabezpieczeń urządzenia, aby radio wysyłało do aplikacji te same logi, które widać na porcie szeregowym.</string>
     <string name="debug_tab_packets">Pakiety</string>
     <string name="deep_link_connect_message">Link prosi tę aplikację o połączenie z urządzeniem pod adresem %1$s. Kontynuuj tylko jeśli ufasz źródłu tego linku.</string>
     <string name="deep_link_connect_title">Połączyć z tym urządzeniem?</string>
@@ -510,6 +512,8 @@
     <string name="direct_messages">Bezpośrednie Wiadomości</string>
     <string name="discard_changes">Odrzuć</string>
     <string name="disconnect">Rozłącz</string>
+    <string name="terminate_app">Wymuś zatrzymanie aplikacji</string>
+    <string name="terminate_app_message">Aplikacja rozłączy się z urządzeniem, zatrzyma usługę działającą w tle i zamknie cały proces, tak jak „Wymuś zatrzymanie” w ustawieniach systemu. Aby wrócić do pracy, uruchom ją ponownie.</string>
     <string name="disconnected">Rozłączono</string>
     <string name="discovered_network_devices">Wykryte urządzenia sieciowe</string>
     <!-- DISCOVERY -->
@@ -1549,11 +1553,11 @@
     <string name="node_layout_complete_description">Pełny układ wyświetla wszystkie dostępne dane węzła. Pola bez danych są automatycznie ukrywane.</string>
     <string name="node_layout_device_role">Urządzenie i rola</string>
     <string name="node_layout_distance_and_bearing">Odległość i kierunek</string>
-    <string name="node_layout_help_signal_bad">Sygnał jest słaby. SNR do 7,5 dB poniżej limitu trybu (Narrow: do −12 dB, Lite: do −15 dB).</string>
-    <string name="node_layout_help_signal_fair">Sygnał jest wystarczający. SNR do 5,5 dB poniżej limitu trybu (Narrow: do −7 dB, Lite: do −10 dB).</string>
-    <string name="node_layout_help_signal_good">Sygnał jest dobry. SNR powyżej limitu SNR trybu modemu (Narrow: powyżej −3 dB, Lite: powyżej −5 dB).</string>
-    <string name="node_layout_help_signal_indicator">Ocenia SNR względem limitu SNR trybu modemu i pokazuje wynik jako kolorową ikonę z opisem. Gdy znane są RSSI i poziom szumu, zapas RSSI nad szumem może obniżyć ocenę. Widoczne tylko w pełnym układzie.</string>
-    <string name="node_layout_help_signal_none">Brak użytecznego sygnału. SNR poniżej progu słabego sygnału.</string>
+    <string name="node_layout_help_signal_bad">Sygnał jest słaby. SNR od %1$s do %2$s dB, RSSI powyżej %3$s do %4$s dBm.</string>
+    <string name="node_layout_help_signal_fair">Sygnał jest wystarczający. SNR powyżej %1$s do %2$s dB, RSSI powyżej %3$s do %4$s dBm.</string>
+    <string name="node_layout_help_signal_good">Sygnał jest dobry. SNR powyżej %1$s dB, RSSI powyżej %2$s dBm.</string>
+    <string name="node_layout_help_signal_indicator">Progi SNR zmieniają się razem z wybranym presetem modemu, a progi RSSI są takie same dla wszystkich presetów. SNR i RSSI mają kolor zależny od własnej wartości (RSSI po korekcie LNA). Ikona i opis to ocena łączna: gdy znane są RSSI i poziom szumu, zapas RSSI nad szumem może ją obniżyć. Widoczne tylko w pełnym układzie.</string>
+    <string name="node_layout_help_signal_none">Brak użytecznego sygnału. SNR poniżej %1$s dB, RSSI %2$s dBm lub mniej.</string>
     <string name="node_layout_hops_away">Skoków</string>
     <string name="node_layout_last_heard_time">Czas ostatniej aktywności</string>
     <string name="node_layout_log_icons">Metryki środowiskowe</string>
@@ -2105,6 +2109,8 @@
     <string name="sniffer_source_mqtt_chip">MQTT</string>
     <string name="sniffer_source_radio_chip">Radio</string>
     <string name="sniffer_summary_neighbor_count">Liczba sąsiadów: %1$d</string>
+    <string name="sniffer_summary_frame_time">Czas w ramce: %1$s</string>
+    <string name="sniffer_summary_frame_time_suspicious">Czas w ramce: %1$s (błędny czas!)</string>
     <string name="sniffer_summary_nodeinfo_unknown">Nieznany węzeł</string>
     <string name="sniffer_summary_position_unknown">Nieznana pozycja</string>
     <string name="sniffer_summary_telemetry_unknown">Brak odczytów</string>

@@ -27,6 +27,9 @@ import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Process
 import android.view.WindowManager
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.ReportDrawnWhen
@@ -96,6 +99,7 @@ import org.meshtastic.core.ui.util.LocalNfcWriterProvider
 import org.meshtastic.core.ui.util.LocalNodeTrackMapProvider
 import org.meshtastic.core.ui.util.LocalSitePlannerAvailable
 import org.meshtastic.core.ui.util.LocalTracerouteMapOverlayInsetsProvider
+import org.meshtastic.core.ui.util.LocalTerminateApplication
 import org.meshtastic.core.ui.util.LocalTracerouteMapProvider
 import org.meshtastic.core.ui.util.accentColorOrNull
 import org.meshtastic.core.ui.util.brandHighlightOrNull
@@ -258,6 +262,7 @@ class MainActivity : AppCompatActivity() {
             LocalNfcScannerProvider provides { onResult, onDisabled -> NfcScannerEffect(onResult, onDisabled) },
             LocalNfcWriterProvider provides { url, onResult, onDisabled -> NfcWriterEffect(url, onResult, onDisabled) },
             LocalBarcodeScannerSupported provides true,
+            LocalTerminateApplication provides ::terminateApplication,
             // Was a constant true, so the NFC affordance appeared on phones with no NFC radio and
             // failed when used. uses-feature declares nfc as not required, so such devices do install.
             LocalNfcScannerSupported provides packageManager.hasSystemFeature(PackageManager.FEATURE_NFC),
@@ -317,6 +322,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     @Suppress("NestedBlockDepth")
+    /**
+     * "Force stop" from inside the app: stops the mesh service (which disconnects the radio and drops its
+     * notification) and then kills the whole process, so nothing keeps reconnecting to a device that is switched off.
+     * The kill is posted a moment later to give the service time to be stopped first.
+     */
+    private fun terminateApplication() {
+        stopService(MeshService.createIntent(this))
+        finishAndRemoveTask()
+        Handler(Looper.getMainLooper()).postDelayed({ Process.killProcess(Process.myPid()) }, TERMINATE_DELAY_MS)
+    }
+
     private fun handleIntent(intent: Intent) {
         val appLinkAction = intent.action
         val appLinkData: Uri? = intent.data
@@ -428,6 +444,9 @@ class MainActivity : AppCompatActivity() {
     private companion object {
         const val EXTRA_SKIP_ONBOARDING = "skip_onboarding"
         const val EXTRA_SKIP_CONNECT_CONFIRM = "skip_connect_confirm"
+
+        /** Time given to the stopped service before the process is killed. */
+        const val TERMINATE_DELAY_MS = 400L
 
         /** The DUMP-guarded alias in the debug manifest. */
         const val AUTOMATION_LAUNCHER = "org.meshtastic.app.AutomationLauncher"

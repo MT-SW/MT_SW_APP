@@ -307,9 +307,19 @@ class DebugViewModel(
                     formattedReceivedDate = DateFormatter.formatDateTime(it.received_date),
                     logMessage = annotateMeshLogMessage(it, nodeList, myNodeNum),
                     decodedPayload = decodePayloadFromMeshLog(it, nodeRepository),
+                    deviceLogLine = deviceLogLine(it),
                 )
             }
             .toImmutableList()
+    }
+
+    /** Serial-console style line for a firmware [LogRecord] entry, or null for any other log type. */
+    private fun deviceLogLine(meshLog: MeshLog): String? {
+        if (meshLog.message_type != DEVICE_LOG_MESSAGE_TYPE) return null
+        val record = meshLog.fromRadio.log_record ?: return null
+        val level = record.level.name.firstOrNull() ?: '?'
+        val source = record.source.ifBlank { "-" }
+        return "$level/$source: ${record.message.trimEnd()}"
     }
 
     /** Transform the input [MeshLog] by enhancing the raw message with annotations. */
@@ -422,6 +432,8 @@ class DebugViewModel(
         val formattedReceivedDate: String,
         val logMessage: String,
         val decodedPayload: String? = null,
+        /** For device log records: "L/source: message" like the radio's serial console; null for other types. */
+        val deviceLogLine: String? = null,
     )
 
     val presetFilters: List<String>

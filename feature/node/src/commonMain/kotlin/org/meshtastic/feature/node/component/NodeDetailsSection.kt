@@ -90,6 +90,7 @@ import org.meshtastic.core.resources.uptime
 import org.meshtastic.core.resources.user_id
 import org.meshtastic.core.ui.component.Glyph
 import org.meshtastic.core.ui.component.NodeSecurityDialog
+import org.meshtastic.core.ui.component.determineRssiQuality
 import org.meshtastic.core.ui.component.determineSignalQuality
 import org.meshtastic.core.ui.component.label
 import org.meshtastic.core.ui.component.title
@@ -329,7 +330,7 @@ private fun SignalRow(node: Node) {
             InfoItem(
                 label = stringResource(Res.string.snr),
                 value = "${MetricFormatter.snr(snr)} · ${stringResource(quality.nameRes)}",
-                valueColor = quality.color(),
+                valueColor = determineSignalQuality(snr, LocalModemPreset.current).color(),
                 icon = MeshtasticIcons.Snr,
                 modifier = Modifier.weight(1f),
             )
@@ -337,10 +338,12 @@ private fun SignalRow(node: Node) {
             Spacer(Modifier.weight(1f))
         }
         if (rssi != null) {
-            // No quality word here: RSSI alone can't be rated without the noise floor - see determineSignalQuality.
+            // No quality word here, but the value is coloured by its own (LNA-corrected) RSSI band.
+            val shownRssi = LocalLnaCorrection.current.rssi(rssi)
             InfoItem(
                 label = stringResource(Res.string.rssi),
-                value = MetricFormatter.rssi(LocalLnaCorrection.current.rssi(rssi)),
+                value = MetricFormatter.rssi(shownRssi),
+                valueColor = determineRssiQuality(shownRssi).color(),
                 icon = MeshtasticIcons.Rssi,
                 modifier = Modifier.weight(1f),
             )

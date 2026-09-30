@@ -26,6 +26,9 @@ package org.meshtastic.feature.settings.util
 sealed interface PacketSummary {
     data class Text(val text: String) : PacketSummary
 
+    /** [summary] plus the timestamp (Unix seconds) the sender wrote into the frame itself (Position / Telemetry). */
+    data class Timed(val summary: PacketSummary, val frameTimeSeconds: Int) : PacketSummary
+
     data class PositionSummary(val latitude: Double?, val longitude: Double?, val altitudeMeters: Int?) : PacketSummary
 
     data class NodeInfoSummary(val longName: String?, val shortName: String?) : PacketSummary
@@ -92,3 +95,7 @@ sealed interface PacketSummary {
      */
     data class NeighborCount(val count: Int) : PacketSummary
 }
+
+/** Attaches the sender-supplied frame time when the frame carries one (0 means "not set" and is skipped). */
+internal fun PacketSummary.withFrameTime(seconds: Int): PacketSummary =
+    if (seconds > 0) PacketSummary.Timed(this, seconds) else this

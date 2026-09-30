@@ -90,6 +90,8 @@ import org.meshtastic.core.resources.snr
 import org.meshtastic.core.resources.snr_definition
 import org.meshtastic.core.ui.component.LoraSignalIndicator
 import org.meshtastic.core.ui.component.SignedIntegerEditTextPreference
+import org.meshtastic.core.ui.component.determineRssiQuality
+import org.meshtastic.core.ui.component.determineSignalQuality
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Refresh
@@ -103,6 +105,7 @@ import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 import org.meshtastic.core.ui.util.LocalLnaCorrection
+import org.meshtastic.core.ui.util.LocalModemPreset
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.Telemetry
@@ -652,11 +655,23 @@ private fun SignalMetricsCard(meshPacket: MeshPacket, isSelected: Boolean, onCli
 
                     /* SNR and RSSI */
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        MetricValueRow(color = SignalMetric.RSSI.color, text = MetricFormatter.rssi(meshPacket.rx_rssi?.let { LocalLnaCorrection.current.rssi(it) }))
+                        // The dot keeps the chart series colour; the value is coloured by its own quality band.
+                        val shownRssi = meshPacket.rx_rssi?.let { LocalLnaCorrection.current.rssi(it) }
+                        val cardSnr = meshPacket.snrOrNull()
+                        MetricValueRow(
+                            color = SignalMetric.RSSI.color,
+                            text = MetricFormatter.rssi(shownRssi),
+                            textColor =
+                            shownRssi?.let { determineRssiQuality(it).color.invoke() }
+                                ?: MaterialTheme.colorScheme.onSurface,
+                        )
                         Spacer(Modifier.width(12.dp))
                         MetricValueRow(
                             color = SignalMetric.SNR.color,
-                            text = MetricFormatter.snr(meshPacket.snrOrNull()),
+                            text = MetricFormatter.snr(cardSnr),
+                            textColor =
+                            cardSnr?.let { determineSignalQuality(it, LocalModemPreset.current).color.invoke() }
+                                ?: MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }
