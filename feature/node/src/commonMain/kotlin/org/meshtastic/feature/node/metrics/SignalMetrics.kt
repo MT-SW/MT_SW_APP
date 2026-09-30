@@ -519,7 +519,8 @@ private fun noiseFloorTextColor(value: Int?): Color = when {
 private fun LocalStatsCard(nodeNum: Int?, telemetry: Telemetry, isSelected: Boolean, onClick: () -> Unit) {
     val localStats = telemetry.local_stats
     val time = telemetry.time.toLong() * MS_PER_SEC
-    val noiseFloor = localStats?.noiseFloorOrNull
+    // Shown (and coloured) after the LNA gain correction of the node that reported it.
+    val noiseFloor = localStats?.noiseFloorOrNull?.let { LocalLnaCorrection.current.noiseFloor(nodeNum, it) }
 
     SelectableMetricCard(isSelected = isSelected, onClick = onClick) {
         Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
@@ -533,7 +534,7 @@ private fun LocalStatsCard(nodeNum: Int?, telemetry: Telemetry, isSelected: Bool
                 Text(
                     text =
                     if (noiseFloor != null) {
-                        stringResource(Res.string.local_stats_noise, LocalLnaCorrection.current.noiseFloor(nodeNum, noiseFloor))
+                        stringResource(Res.string.local_stats_noise, noiseFloor)
                     } else {
                         stringResource(Res.string.noise_floor_no_reading)
                     },
