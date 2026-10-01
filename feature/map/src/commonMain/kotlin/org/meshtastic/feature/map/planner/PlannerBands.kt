@@ -54,6 +54,20 @@ object PlannerBands {
     fun idFor(mHz: Double): String =
         all.firstOrNull { it.id != FREE_ID && mHz >= it.minMHz && mHz <= it.maxMHz }?.id ?: FREE_ID
 
+    /**
+     * Default operating frequency (MHz) for [bandId] with a channel of [bandwidthKhz]. In the 868 MHz band the Narrow
+     * presets (62.5 kHz) use the MT_SW frequency 869.14465 MHz; every other bandwidth uses the first slot of the EU
+     * 868 sub-band (869.4 MHz + half the bandwidth, e.g. 869.525 MHz for 250 kHz). Other bands use their centre.
+     */
+    fun defaultFrequencyMHz(bandId: String, bandwidthKhz: Double): Double {
+        val band = byId(bandId) ?: return 868.0
+        if (band.id != "868") return band.centerMHz
+        return if (kotlin.math.abs(bandwidthKhz - 62.5) < 1.0) NARROW_868_MHZ else 869.4 + bandwidthKhz / 2000.0
+    }
+
+    /** MT_SW default frequency for the Narrow presets in the 868 MHz band. */
+    const val NARROW_868_MHZ = 869.14465
+
     /** Clamps to the supported 20..20000 MHz range (ITM validity). */
     fun clampMHz(mHz: Double): Double = if (mHz.isNaN()) 868.0 else mHz.coerceIn(FREE_MIN_MHZ, FREE_MAX_MHZ)
 }
