@@ -34,6 +34,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -59,6 +60,7 @@ import org.meshtastic.core.resources.planner_coverage_extent
 import org.meshtastic.core.resources.planner_coverage_need_point
 import org.meshtastic.core.resources.planner_coverage_radials
 import org.meshtastic.core.resources.planner_coverage_range
+import org.meshtastic.core.resources.planner_coverage_opacity
 import org.meshtastic.core.resources.planner_coverage_rx_gain
 import org.meshtastic.core.resources.planner_coverage_rx_height
 import org.meshtastic.core.resources.planner_coverage_side
@@ -172,6 +174,15 @@ internal fun CoverageSection(
                 max = MAX_RX_GAIN,
             )
         }
+        Text(
+            text = stringResource(Res.string.planner_coverage_opacity, "${(state.coverageOpacity * 100).roundToInt()}%"),
+            style = MaterialTheme.typography.labelLarge,
+        )
+        Slider(
+            value = state.coverageOpacity.toFloat(),
+            onValueChange = { vm.setCoverageOpacity(it.toDouble()) },
+            valueRange = 0.15f..1f,
+        )
         if (!state.end(side).isComplete) {
             PlannerNotice(text = stringResource(Res.string.planner_coverage_need_point, sideName(side)))
         }
