@@ -99,6 +99,9 @@
     <string name="planner_feeder_cable_n">Kabel za złączem %1$s</string>
     <string name="planner_feeder_connector_count">Liczba złączy</string>
     <string name="planner_feeder_connector_n">Złącze %1$s</string>
+    <string name="planner_feeder_no_cable">Bez kabla (sama przejściówka)</string>
+    <string name="planner_feeder_preset_adapter_sma_n">Przejściówka SMA → N</string>
+    <string name="planner_feeder_preset_adapter_n_n">Przejściówka N → N</string>
     <string name="planner_feeder_custom_cable">Własny kabel</string>
     <string name="planner_feeder_custom_loss">Tłumienie</string>
     <string name="planner_feeder_fewer">Mniej złączy</string>

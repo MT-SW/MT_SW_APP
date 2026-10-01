@@ -25,6 +25,16 @@ class FeederTest {
     private val freqs = listOf(20.0, 50.0, 100.0, 144.0, 433.0, 868.0, 915.0, 1500.0, 2400.0, 5800.0, 10000.0, 20000.0)
 
     @Test
+    fun adapterWithoutCableCountsOnlyConnectors() {
+        val cfg = FeederConfig(listOf("sma", "n"), listOf(FeederSection(FeederBuilder.NONE_ID, 0.0)))
+        val r = FeederBuilder.compute(cfg, 868.0)
+        val expected = CableDb.connector("sma")!!.lossDb(868.0) + CableDb.connector("n")!!.lossDb(868.0)
+        assertEquals(expected, r.totalDb, 1e-9)
+        assertEquals(2, r.lines.size)
+        assertTrue(r.warnings.isEmpty())
+    }
+
+    @Test
     fun allRequiredCablesPresent() {
         val ids = listOf(
             "rg174", "rg178", "rg316", "rg58", "rg59", "rg8x", "rg213", "lmr100", "lmr195", "lmr200", "lmr240",
@@ -195,7 +205,7 @@ class FeederTest {
 
     @Test
     fun presetsAreConsistent() {
-        assertTrue(FeederBuilder.presets.size in 4..6)
+        assertTrue(FeederBuilder.presets.size in 4..10)
         assertEquals(FeederBuilder.presets.size, FeederBuilder.presets.map { it.id }.toSet().size)
         for (p in FeederBuilder.presets) {
             val n = p.config.connectorIds.size

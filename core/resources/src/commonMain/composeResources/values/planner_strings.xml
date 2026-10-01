@@ -99,6 +99,9 @@
     <string name="planner_feeder_cable_n">Cable after connector %1$s</string>
     <string name="planner_feeder_connector_count">Number of connectors</string>
     <string name="planner_feeder_connector_n">Connector %1$s</string>
+    <string name="planner_feeder_no_cable">No cable (adapter only)</string>
+    <string name="planner_feeder_preset_adapter_sma_n">Adapter SMA → N</string>
+    <string name="planner_feeder_preset_adapter_n_n">Adapter N → N</string>
     <string name="planner_feeder_custom_cable">Custom cable</string>
     <string name="planner_feeder_custom_loss">Loss</string>
     <string name="planner_feeder_fewer">Fewer connectors</string>

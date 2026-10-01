@@ -43,6 +43,9 @@ data class FeederPreset(val id: String, val config: FeederConfig)
 
 object FeederBuilder {
     const val CUSTOM_ID = "custom"
+
+    /** Section without a cable: the connectors are joined directly (an adapter / barrel), only their losses count. */
+    const val NONE_ID = "none"
     const val MAX_CONNECTORS = 8
     private const val DEFAULT_CONNECTOR = "sma"
     private const val DEFAULT_CABLE = "rg316"
@@ -55,6 +58,8 @@ object FeederBuilder {
                 "pigtail",
                 FeederConfig(listOf("ufl", "sma"), listOf(FeederSection("rg316", 0.2))),
             ),
+            FeederPreset("adapter_sma_n", FeederConfig(listOf("sma", "n"), listOf(FeederSection(NONE_ID, 0.0)))),
+            FeederPreset("adapter_n_n", FeederConfig(listOf("n", "n"), listOf(FeederSection(NONE_ID, 0.0)))),
             FeederPreset(
                 "pigtail_cable",
                 FeederConfig(
@@ -126,7 +131,9 @@ object FeederBuilder {
                     len = 0.0
                 }
                 val lenLabel = fmt(len)
-                if (s.cableId == CUSTOM_ID) {
+                if (s.cableId == NONE_ID) {
+                    // adapter only: no cable loss and no breakdown line
+                } else if (s.cableId == CUSTOM_ID) {
                     val perM = s.customDbPerM
                     if (perM == null || perM.isNaN() || perM < 0.0) {
                         warnings += "CUSTOM_LOSS_MISSING"
