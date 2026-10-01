@@ -120,7 +120,7 @@ private fun RadioCard(state: PlannerUiState, vm: PlannerViewModel) {
             label = stringResource(Res.string.planner_frequency),
             value = state.frequencyMHz,
             onValue = { vm.setFrequency(it) },
-            decimals = 3,
+            decimals = 5,
             suffix = stringResource(Res.string.planner_unit_mhz),
             min = PlannerBands.FREE_MIN_MHZ,
             max = PlannerBands.FREE_MAX_MHZ,
