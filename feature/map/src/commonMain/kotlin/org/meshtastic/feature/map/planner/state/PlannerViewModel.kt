@@ -213,7 +213,7 @@ class PlannerViewModel(
         if (mHz.isNaN()) return
         mutate { st ->
             val f = PlannerBands.clampMHz(mHz)
-            st.copy(frequencyMHz = f, bandId = PlannerBands.idFor(f))
+            withBandRadio(st.copy(frequencyMHz = f, bandId = PlannerBands.idFor(f)), st.bandId)
         }
     }
 
@@ -224,15 +224,18 @@ class PlannerViewModel(
             if (band.id == PlannerBands.FREE_ID) {
                 st.copy(bandId = band.id)
             } else {
-                st.copy(bandId = band.id, frequencyMHz = PlannerBands.defaultFrequencyMHz(band.id, st.bandwidthKhz))
+                // The band decides the effective bandwidth (2.4 GHz is wide LoRa), then the default frequency.
+                val moved = withBandRadio(st.copy(bandId = band.id), st.bandId)
+                moved.copy(frequencyMHz = PlannerBands.defaultFrequencyMHz(band.id, moved.bandwidthKhz))
             }
         }
     }
 
     /** Takes bandwidth and spreading factor from an app modem preset. */
     fun setRadioFromPreset(preset: ModemPreset?) {
-        val radio = plannerRadioFromPreset(preset)
+        val base = plannerRadioFromPreset(preset)
         mutate { st ->
+            val radio = base.copy(bandwidthKhz = base.bandwidthKhz * PlannerBands.bandwidthScale(st.bandId))
             // A frequency still sitting on the previous preset's default follows the new preset.
             val followsDefault = kotlin.math.abs(
                 st.frequencyMHz - PlannerBands.defaultFrequencyMHz(st.bandId, st.bandwidthKhz),
@@ -249,6 +252,17 @@ class PlannerViewModel(
                 },
             )
         }
+    }
+
+    /**
+     * Keeps the preset's bandwidth in step with the band: entering or leaving 2.4 GHz rescales it (wide LoRa x3.25).
+     * A hand-typed bandwidth ([PlannerUiState.radioOverride]) is left alone.
+     */
+    private fun withBandRadio(st: PlannerUiState, previousBandId: String): PlannerUiState {
+        val preset = st.modemPreset
+        if (st.radioOverride || preset == null || st.bandId == previousBandId) return st
+        val base = plannerRadioFromPreset(preset)
+        return st.copy(bandwidthKhz = base.bandwidthKhz * PlannerBands.bandwidthScale(st.bandId))
     }
 
     /** Manual bandwidth in kHz (sets [PlannerUiState.radioOverride]). */
