@@ -431,7 +431,7 @@
     <string name="schema_security_admin_key">Klucz administratora</string>
     <string name="schema_security_admin_key_description">Klucz publiczny uprawniony do wysyłania wiadomości administracyjnych do tego węzła.</string>
     <string name="schema_security_debug_log_api_enabled">Logi debugowania</string>
-    <string name="schema_security_debug_log_api_enabled_description">Pokaż na żywo logi debugowania przez połączenie szeregowe, podejrzyj i eksportuj logi węzła (bez informacji lokalizacyjnych) przez Bluetooth.</string>
+    <string name="schema_security_debug_log_api_enabled_description">Pokaż na żywo logi debugowania przez połączenie szeregowe, podejrzyj i eksportuj logi węzła (bez informacji lokalizacyjnych) przez Bluetooth. (Przez Wi-Fi i USB działa tylko z firmware MT_SW.)</string>
     <string name="schema_security_is_managed">Urządzenie zarządzane</string>
     <string name="schema_security_is_managed_description">Urządzenie jest zarządzane przez administratora sieci mesh, użytkownik nie ma dostępu do żadnych ustawień urządzenia.</string>
     <string name="schema_security_packetsignaturepolicy_packet_signature_policy_balanced">Zrównoważony — Preferuj uwierzytelnione</string>

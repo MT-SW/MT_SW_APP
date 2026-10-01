@@ -357,7 +357,7 @@
     <string name="debug_store_logs_title">Store mesh logs</string>
     <string name="debug_tab_app_logs">App logs</string>
     <string name="debug_tab_device_logs">Device logs</string>
-    <string name="debug_device_logs_empty">No device logs yet. Enable "Debug Logs" in the device security settings so the radio sends the same logs to the app that appear on its serial port. The app shows every log it receives, but the firmware decides which connection carries them - if nothing appears over Wi-Fi, try Bluetooth or USB.</string>
+    <string name="debug_device_logs_empty">No device logs yet. Enable "Debug Logs" in the device security settings so the radio sends the same logs to the app that appear on its serial port. Over Bluetooth this works with any firmware; over Wi-Fi and USB only with MT_SW firmware.</string>
     <string name="debug_tab_packets">Packets</string>
     <string name="deep_link_connect_message">A link is asking this app to connect to the device at %1$s. Only continue if you trust where the link came from.</string>
     <string name="deep_link_connect_title">Connect to this device?</string>
