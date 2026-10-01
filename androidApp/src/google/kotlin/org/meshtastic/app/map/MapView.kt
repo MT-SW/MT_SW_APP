@@ -18,12 +18,10 @@
 
 package org.meshtastic.app.map
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Paint
-import android.location.Location
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
@@ -72,7 +70,6 @@ import androidx.core.graphics.applyCanvas
 import androidx.core.graphics.createBitmap
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.touchlab.kermit.Logger
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -126,7 +123,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -202,10 +198,8 @@ import org.meshtastic.feature.map.component.MeshMapFitPadding
 import org.meshtastic.feature.map.component.NodeTrackFilterMenu
 import org.meshtastic.feature.map.component.OfflineStatusBanner
 import org.meshtastic.feature.map.component.RasterOverlayToggles
-import org.meshtastic.feature.map.component.SitePlannerLaunch
 import org.meshtastic.feature.map.component.WaypointInfoDialog
 import org.meshtastic.feature.map.component.mapFilterActions
-import org.meshtastic.feature.map.component.toSitePlannerParams
 import org.meshtastic.feature.map.geojson.sanitizeImportedIconUrl
 import org.meshtastic.feature.map.includes
 import org.meshtastic.feature.map.kml.ICON_URL_PROPERTY
@@ -215,6 +209,9 @@ import org.meshtastic.feature.map.layers.MapLayerItem
 import org.meshtastic.feature.map.layers.opacityOf
 import org.meshtastic.feature.map.layers.toPickedMapFile
 import org.meshtastic.feature.map.mergeStationaryRuns
+import org.meshtastic.feature.map.planner.ui.PlannerMapBridge
+import org.meshtastic.feature.map.planner.ui.PlannerMapPickBanner
+import org.meshtastic.feature.map.planner.ui.PlannerSheet
 import org.meshtastic.feature.map.terrain.MapterhornEndpoints
 import org.meshtastic.feature.map.tiles.mapAttributionText
 import org.meshtastic.feature.map.tracerouteNodeSelection
@@ -224,7 +221,6 @@ import org.meshtastic.proto.Waypoint
 import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
 import java.io.InputStream
-import kotlin.coroutines.resume
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -357,7 +353,6 @@ fun MapView(
     var mapFilterMenuExpanded by remember { mutableStateOf(false) }
     val mapFilterState by mapViewModel.mapFilterStateFlow.collectAsStateWithLifecycle()
     val ourNodeInfo by mapViewModel.ourNodeInfo.collectAsStateWithLifecycle()
-    val channelSet by mapViewModel.channelSet.collectAsStateWithLifecycle()
     var editingWaypoint by remember { mutableStateOf<Waypoint?>(null) }
     var deletingWaypoint by remember { mutableStateOf<Waypoint?>(null) }
     var geofenceInfoWaypoint by remember { mutableStateOf<Waypoint?>(null) }
@@ -643,8 +638,19 @@ fun MapView(
 
     // --- Tile & layers state ---
     var showLayersBottomSheet by remember { mutableStateOf(false) }
-    // Non-null while the Site Planner estimate dialog/runner is open, retaining its node-location source.
-    var sitePlannerLaunch by remember { mutableStateOf<SitePlannerLaunch?>(null) }
+    // The native MT_SW Planner: whether its sheet is open, and the node a deep link asked it to plan for.
+    var plannerOpen by remember { mutableStateOf(false) }
+    var plannerNodeNum by remember { mutableStateOf<Int?>(null) }
+    val plannerBridge =
+        remember(cameraPositionState, mapViewModel, coroutineScope) {
+            PlannerMapBridge(
+                mapCenter = { cameraPositionState.position.target.let { it.latitude to it.longitude } },
+                moveTo = { lat, lon ->
+                    coroutineScope.launch { cameraPositionState.animate(CameraUpdateFactory.newLatLng(LatLng(lat, lon))) }
+                },
+                addGeoJsonLayer = { name, geoJson -> mapViewModel.addGeoJsonLayer(name, geoJson) },
+            )
+        }
 
     val onAddLayerClicked = {
         val intent =
@@ -690,7 +696,10 @@ fun MapView(
             ),
             onMapLoaded = { isMapLoaded = true },
             onMapClick = { latLng ->
-                if (isMainMode && boxAuthoringDraft != null) {
+                if (plannerBridge.pickingSide != null) {
+                    // The Planner is waiting for a point: the tap belongs to it, not to the box-authoring tool.
+                    plannerBridge.deliverTap(latLng.latitude, latLng.longitude)
+                } else if (isMainMode && boxAuthoringDraft != null) {
                     val first = boxAuthoringFirstCorner
                     if (first == null) {
                         boxAuthoringFirstCorner = latLng
@@ -1083,9 +1092,9 @@ fun MapView(
                     onClick = { showLayersBottomSheet = true },
                 )
             },
-            // Hands params to the hosted Site Planner and imports the returned coverage.
-            onSitePlannerClick = {
-                sitePlannerLaunch = SitePlannerLaunch(initialParams = ourNodeInfo.toSitePlannerParams(channelSet))
+            onPlannerClick = {
+                plannerNodeNum = null
+                plannerOpen = true
             },
             isLocationTrackingEnabled = isLocationTrackingEnabled,
             onToggleLocationTracking = {
@@ -1129,6 +1138,13 @@ fun MapView(
             isRefreshing = isRefreshingLayers,
             onRefresh = { mapViewModel.refreshAllVisibleNetworkLayers() },
         )
+
+        if (plannerBridge.pickingSide != null) {
+            PlannerMapPickBanner(
+                bridge = plannerBridge,
+                modifier = Modifier.align(Alignment.BottomCenter).padding(start = 16.dp, end = 16.dp, bottom = 72.dp),
+            )
+        }
     }
 
     // --- Bottom sheets & dialogs ---
@@ -1185,44 +1201,27 @@ fun MapView(
             )
         }
     }
-    // Site Planner deep link from a node's detail screen — open the estimate dialog prefilled with that node.
-    val sitePlannerRequest by mapViewModel.sitePlannerRequest.collectAsStateWithLifecycle()
-    LaunchedEffect(sitePlannerRequest) {
-        sitePlannerRequest?.let { node ->
-            sitePlannerLaunch =
-                SitePlannerLaunch(initialParams = node.toSitePlannerParams(channelSet), selectedNode = node)
+    // Planner deep link from a node's detail screen — open the Planner prefilled with that node.
+    val plannerRequest by mapViewModel.plannerRequest.collectAsStateWithLifecycle()
+    LaunchedEffect(plannerRequest) {
+        plannerRequest?.let { node ->
+            plannerNodeNum = node.num
+            plannerOpen = true
             if (node.validPosition != null) {
                 cameraPositionState.animate(CameraUpdateFactory.newLatLng(LatLng(node.latitude, node.longitude)))
             }
-            mapViewModel.consumeSitePlannerRequest(node.num)
+            mapViewModel.consumePlannerRequest(node.num)
         }
     }
-    sitePlannerLaunch?.let { launch ->
-        // Phone GPS: only when permission is already granted; otherwise the field stays manual.
-        val onRequestCurrentLocation: (suspend () -> Pair<Double, Double>?)? =
-            if (locationPermission.isGranted) {
-                { fusedLocationClient.awaitLastLocation()?.let { it.latitude to it.longitude } }
-            } else {
-                null
-            }
-        // Route launches retain the selected node; manual map launches continue following our connected node.
-        val onUseNodeLocation: (() -> Pair<Double, Double>)? =
-            launch.nodeLocation(ourNodeInfo)?.let { location -> { location } }
-        SitePlannerHost(
-            initialParams = launch.initialParams,
-            onDismiss = { sitePlannerLaunch = null },
-            onImport = { name, geoJson, latitude, longitude ->
-                mapViewModel.addGeoJsonLayer(name, geoJson)
-                // Recenter on the estimate's transmitter so the freshly-imported coverage is on-screen.
-                coroutineScope.launch {
-                    cameraPositionState.animate(CameraUpdateFactory.newLatLng(LatLng(latitude, longitude)))
-                }
-            },
-            onRequestCurrentLocation = onRequestCurrentLocation,
-            onUseNodeLocation = onUseNodeLocation,
-            onUseMapCenter = { cameraPositionState.position.target.let { it.latitude to it.longitude } },
-        )
-    }
+    PlannerSheet(
+        visible = plannerOpen,
+        nodeNum = plannerNodeNum,
+        bridge = plannerBridge,
+        onDismiss = {
+            plannerOpen = false
+            plannerNodeNum = null
+        },
+    )
     showClusterItemsDialog?.let { items ->
         ClusterMembersDialog(
             members =
@@ -1785,7 +1784,7 @@ private class RenderedMapLayer(
         groundOverlays.forEach { overlay ->
             val image = localImages[overlay.href]
             if (image == null) {
-                // The Site Planner's KML export names a sibling file that was never in an archive; there is
+                // An external planner's KML export names a sibling file that was never in an archive; there is
                 // nothing to drape. Count, not href — the image name is user content.
                 Logger.withTag("MapView").w { "Skipping a ground overlay whose image is not packed in the archive" }
                 return@forEach
@@ -1833,7 +1832,7 @@ private fun RenderedMapLayer.safeHide() {
  * Apply simplestyle-spec (https://github.com/mapbox/simplestyle-spec) properties to a parsed GeoJSON layer.
  *
  * The maps-utils GeoJSON mapper reads `fill`/`stroke`/`stroke-width`/`fill-opacity`/`stroke-opacity` itself, but
- * attaches no style at all to a feature carrying none of those keys — which is every Meshtastic Site Planner coverage
+ * attaches no style at all to a feature carrying none of those keys — which is every externally generated coverage
  * export that predates them, and leaves the opacity slider nothing to fade. So each feature's style is resolved here,
  * adding what the mapper does not cover: the legacy `color` fallback, `rgb()`/`rgba()` colors, `stroke-opacity` on
  * lines, a default fill opacity so stacked contour bands read as a gradient, and the imported `icon-url` it has no
@@ -1971,18 +1970,6 @@ internal fun convertIntToEmoji(unicodeCodePoint: Int): String {
 
 /** Converts protobuf [Position] integer coordinates to a Google Maps [LatLng]. */
 internal fun Position.toLatLng(): LatLng = LatLng((this.latitude_i ?: 0) * DEG_D, (this.longitude_i ?: 0) * DEG_D)
-
-/** One-shot last known location as a suspend call. Guarded by a permission check at the call site. */
-@SuppressLint("MissingPermission")
-private suspend fun FusedLocationProviderClient.awaitLastLocation(): Location? = suspendCancellableCoroutine { cont ->
-    // lastLocation can throw SecurityException synchronously if permission is revoked between the compose-time
-    // isGranted check and this call; treat that as "no location" rather than crashing the estimate flow.
-    try {
-        lastLocation.addOnSuccessListener { cont.resume(it) }.addOnFailureListener { cont.resume(null) }
-    } catch (_: SecurityException) {
-        cont.resume(null)
-    }
-}
 
 /** Builds a proto [BoundingBox] (degrees ×1e7) from two opposite corner taps. */
 private fun boundingBoxFromCorners(a: LatLng, b: LatLng): BoundingBox = BoundingBox.Builder()

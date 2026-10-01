@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2025 MT_SW contributors
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<resources>
+    <!-- MT_SW Planner: credit and licence lines (About screen, README). One line per entry. -->
+    <string name="planner_credits_header">MT_SW Planner – sources and licences</string>
+    <string name="planner_credits_line_meshmap">MeshMap Planner (ModerateWinGuy) – inspiration for the approach and defaults; GPL v3 licence; github.com/ModerateWinGuy/MeshMap-Planner</string>
+    <string name="planner_credits_line_siteplanner_original">Meshtastic Site Planner – inspiration for the approach and defaults; GPL-3.0 licence; site.meshtastic.org</string>
+    <string name="planner_credits_line_splat">SPLAT! – John A. Magliacane, KD2BD; GNU GPL licence; inspiration for the Longley-Rice calculations</string>
+    <string name="planner_credits_line_itm">Propagation model: NTIA/ITS Irregular Terrain Model (Longley-Rice); public domain; modified Kotlin port</string>
+    <string name="planner_credits_line_mapterhorn">Terrain data: © Mapterhorn and the sources it aggregates (mapterhorn.com/attribution); source licences as listed by the project</string>
+    <string name="planner_credits_line_openmeteo">Weather data (optional): Open-Meteo.com; CC BY 4.0 licence</string>
+    <string name="planner_credits_line_osm">Map data: © OpenStreetMap contributors; ODbL licence (openstreetmap.org/copyright)</string>
+    <string name="planner_credits_line_cables">Cable and connector data: manufacturers' data sheets (Times Microwave, Belden, Huber+Suhner, SSB-Electronic, CommScope/Andrew, Fairview Microwave and others); approximate values are marked in the planner</string>
+</resources>

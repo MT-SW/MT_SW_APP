@@ -19,7 +19,6 @@ package org.meshtastic.app.map
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.koinInject
-import org.meshtastic.app.map.component.SitePlannerSlot
 import org.meshtastic.core.ui.util.MapViewProvider
 import org.meshtastic.feature.map.layers.MapLayersManager
 import org.meshtastic.feature.map.maplibre.MapLibreMapViewProvider
@@ -40,7 +39,6 @@ fun getMapViewProvider(): MapViewProvider = MapLibreMapViewProvider(
     // waypointEditor is not passed: EditWaypointDialog is multiplatform now and the provider defaults to it.
     // MapLibre's offline packs actually download here; on desktop they never do, so the default is off.
     offlineMapsSupported = true,
-    sitePlanner = { session -> SitePlannerSlot(session) },
     // The same imported-layer manager the Google flavour opens from its layers button.
     layersSheetExtra = { ImportedLayersSlot() },
 )

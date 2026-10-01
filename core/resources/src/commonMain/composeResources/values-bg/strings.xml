@@ -1058,20 +1058,6 @@
     <string name="signal">Сигнал</string>
     <string name="signal_quality">Качество на сигнала</string>
     <!-- SITE -->
-    <string name="site_planner_antenna_gain_dbi">Усилване на антената (dBi)</string>
-    <string name="site_planner_antenna_height_meters">Височина на антената (м)</string>
-    <string name="site_planner_color_scale">Цветова палитра</string>
-    <string name="site_planner_frequency_mhz">Честота (MHz)</string>
-    <string name="site_planner_invalid_positive">Трябва да е по-голямо от 0</string>
-    <string name="site_planner_max_range_km">Максимален обхват (km)</string>
-    <string name="site_planner_rx_height_meters">Височина на приемника (m)</string>
-    <string name="site_planner_rx_sensitivity_dbm">Чувствителност на приемника (dBm)</string>
-    <string name="site_planner_section_display">Дисплей</string>
-    <string name="site_planner_section_receiver">Приемник</string>
-    <string name="site_planner_tx_power_watts">Мощност на предавателя (W)</string>
-    <string name="site_planner_use_current_location">Използване на текущото местоположение</string>
-    <string name="site_planner_use_map_center">Използване на центъра на картата</string>
-    <string name="site_planner_use_node_location">Използване на текущото местоположение на възела</string>
     <string name="skip">Пропускане</string>
     <string name="slot">Слот</string>
     <string name="snr">SNR</string>

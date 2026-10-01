@@ -437,7 +437,6 @@
     <string name="signal">Sinyal</string>
     <string name="signal_quality">Sinyal Kalitesi</string>
     <!-- SITE -->
-    <string name="site_planner_section_display">Ekran</string>
     <string name="skip">Atla</string>
     <string name="slot">Yuva</string>
     <string name="snr">SNR</string>

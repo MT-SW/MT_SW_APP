@@ -91,7 +91,7 @@ open class BaseMapViewModel(
     val ourNodeInfo = nodeRepository.ourNodeInfo
 
     /**
-     * Connected radio's channel set (primary-channel frequency + LoRa config); used to prefill a Site Planner estimate.
+     * Connected radio's channel set (primary-channel frequency + LoRa config); used to prefill the Planner.
      */
     val channelSet: StateFlow<ChannelSet?> =
         radioConfigRepository.channelSetFlow.stateInWhileSubscribed(initialValue = null)

@@ -663,7 +663,6 @@ Estos datos de ubicación pueden ser utilizados para fines como aparecer en un m
     <string name="signal">Señal</string>
     <string name="signal_quality">Calidad de señal</string>
     <!-- SITE -->
-    <string name="site_planner_section_display">Pantalla</string>
     <string name="skip">Saltar</string>
     <string name="slot">Ranura</string>
     <string name="snr">SNR</string>

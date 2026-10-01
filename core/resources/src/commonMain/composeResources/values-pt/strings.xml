@@ -415,7 +415,6 @@
     <string name="signal">Sinal</string>
     <string name="signal_quality">Qualidade do Sinal</string>
     <!-- SITE -->
-    <string name="site_planner_section_display">Ecrã</string>
     <string name="slot">Slot</string>
     <string name="snr">SNR</string>
     <string name="snr_definition">Relação sinal-para-ruído, uma medida utilizada nas comunicações para quantificar o nível de um sinal desejado com o nível de ruído de fundo. Em Meshtastic e outros sistemas sem fio. Quanto mais alta for a relação sinal-ruído, menor é o efeito do ruído de fundo sobre a deteção ou medição do sinal.</string>

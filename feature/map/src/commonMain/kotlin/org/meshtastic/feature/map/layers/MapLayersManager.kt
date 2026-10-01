@@ -151,7 +151,7 @@ class MapLayersManager(
     }
 
     /**
-     * Import a GeoJSON string (e.g. handed back by the Site Planner headless bridge) as a visible local overlay,
+     * Import a GeoJSON string (e.g. a coverage estimate produced by the Planner) as a visible local overlay,
      * reusing the same storage-backed layer plumbing as file imports.
      */
     fun addGeoJsonLayer(name: String, geoJson: String) {

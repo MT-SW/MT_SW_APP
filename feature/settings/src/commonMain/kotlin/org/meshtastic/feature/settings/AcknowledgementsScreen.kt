@@ -39,6 +39,15 @@ import org.meshtastic.core.resources.acknowledgements
 import org.meshtastic.core.resources.library_count
 import org.meshtastic.core.resources.open_source_description
 import org.meshtastic.core.resources.open_source_libraries
+import org.meshtastic.core.resources.planner_credits_header
+import org.meshtastic.core.resources.planner_credits_line_meshmap
+import org.meshtastic.core.resources.planner_credits_line_siteplanner_original
+import org.meshtastic.core.resources.planner_credits_line_splat
+import org.meshtastic.core.resources.planner_credits_line_itm
+import org.meshtastic.core.resources.planner_credits_line_mapterhorn
+import org.meshtastic.core.resources.planner_credits_line_openmeteo
+import org.meshtastic.core.resources.planner_credits_line_osm
+import org.meshtastic.core.resources.planner_credits_line_cables
 import org.meshtastic.core.ui.component.MainAppBar
 
 /**
@@ -115,6 +124,60 @@ private fun AcknowledgementsHeader() {
         )
         Text(
             text = stringResource(Res.string.open_source_description),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        Text(
+            text = stringResource(Res.string.planner_credits_header),
+            style = MaterialTheme.typography.titleMediumEmphasized,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(top = 16.dp),
+        )
+        Text(
+            text = stringResource(Res.string.planner_credits_line_meshmap),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        Text(
+            text = stringResource(Res.string.planner_credits_line_siteplanner_original),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        Text(
+            text = stringResource(Res.string.planner_credits_line_splat),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        Text(
+            text = stringResource(Res.string.planner_credits_line_itm),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        Text(
+            text = stringResource(Res.string.planner_credits_line_mapterhorn),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        Text(
+            text = stringResource(Res.string.planner_credits_line_openmeteo),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        Text(
+            text = stringResource(Res.string.planner_credits_line_osm),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        Text(
+            text = stringResource(Res.string.planner_credits_line_cables),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 4.dp),

@@ -60,7 +60,7 @@ class MapLibreRuntimeTest {
                         modifier = Modifier,
                         navigateToNodeDetails = {},
                         waypointId = null,
-                        sitePlannerNodeNum = null,
+                        plannerNodeNum = null,
                     )
             }
         }

@@ -982,14 +982,6 @@
     <string name="signal">Сигнал</string>
     <string name="signal_quality">Якість сигналу</string>
     <!-- SITE -->
-    <string name="site_planner_antenna_gain_dbi">Підсилення антени (dBi)</string>
-    <string name="site_planner_antenna_height_meters">Висота антени (м)</string>
-    <string name="site_planner_frequency_mhz">Частота (МГц)</string>
-    <string name="site_planner_invalid_positive">Має бути більше 0</string>
-    <string name="site_planner_rx_height_meters">Висота приймача (м)</string>
-    <string name="site_planner_rx_sensitivity_dbm">Чутливість приймача (dBm)</string>
-    <string name="site_planner_section_display">Дисплей</string>
-    <string name="site_planner_section_receiver">Приймач</string>
     <string name="skip">Пропустити</string>
     <string name="slot">Слот</string>
     <string name="snr">SNR</string>

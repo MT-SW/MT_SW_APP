@@ -72,19 +72,19 @@ class NavigationAssemblyTest {
     }
 
     @Test
-    fun mapRouteForwardsWaypointAndSitePlannerNode() = runComposeUiTest {
-        val route = MapRoute.Map(waypointId = 42, sitePlannerNodeNum = 8675309)
+    fun mapRouteForwardsWaypointAndPlannerNode() = runComposeUiTest {
+        val route = MapRoute.Map(waypointId = 42, plannerNodeNum = 8675309)
         var receivedWaypointId: Int? = null
-        var receivedSitePlannerNodeNum: Int? = null
+        var receivedPlannerNodeNum: Int? = null
 
         setContent {
             val backStack = rememberNavBackStack(route)
             CompositionLocalProvider(
                 LocalMapMainScreenProvider provides
-                    { _, _, waypointId, sitePlannerNodeNum ->
+                    { _, _, waypointId, plannerNodeNum ->
                         SideEffect {
                             receivedWaypointId = waypointId
-                            receivedSitePlannerNodeNum = sitePlannerNodeNum
+                            receivedPlannerNodeNum = plannerNodeNum
                         }
                     },
             ) {
@@ -98,13 +98,13 @@ class NavigationAssemblyTest {
         waitForIdle()
         runOnIdle {
             assertEquals(route.waypointId, receivedWaypointId)
-            assertEquals(route.sitePlannerNodeNum, receivedSitePlannerNodeNum)
+            assertEquals(route.plannerNodeNum, receivedPlannerNodeNum)
         }
     }
 
     @Test
     fun mapRouteEffectRestartsWhenEntryReturnsFromBackStack() = runComposeUiTest {
-        val route = MapRoute.Map(sitePlannerNodeNum = 8675309)
+        val route = MapRoute.Map(plannerNodeNum = 8675309)
         lateinit var backStack: NavBackStack<NavKey>
         var effectStarts = 0
         var disposals = 0
@@ -113,8 +113,8 @@ class NavigationAssemblyTest {
             backStack = rememberNavBackStack(route)
             CompositionLocalProvider(
                 LocalMapMainScreenProvider provides
-                    { _, _, _, sitePlannerNodeNum ->
-                        LaunchedEffect(sitePlannerNodeNum) { effectStarts += 1 }
+                    { _, _, _, plannerNodeNum ->
+                        LaunchedEffect(plannerNodeNum) { effectStarts += 1 }
                         DisposableEffect(Unit) { onDispose { disposals += 1 } }
                     },
             ) {

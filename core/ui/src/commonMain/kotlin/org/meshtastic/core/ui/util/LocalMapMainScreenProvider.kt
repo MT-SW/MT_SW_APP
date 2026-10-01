@@ -31,7 +31,7 @@ val LocalMapMainScreenProvider =
             onClickNodeChip: (Int) -> Unit,
             navigateToNodeDetails: (Int) -> Unit,
             waypointId: Int?,
-            sitePlannerNodeNum: Int?,
+            plannerNodeNum: Int?,
         ) -> Unit,
         > {
         { _, _, _, _ -> PlaceholderScreen("Map") }

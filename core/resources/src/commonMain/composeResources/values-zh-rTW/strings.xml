@@ -1034,7 +1034,6 @@
     <string name="signal">信號</string>
     <string name="signal_quality">信號品質</string>
     <!-- SITE -->
-    <string name="site_planner_section_display">顯示器</string>
     <string name="skip">跳過</string>
     <string name="slot">時隙</string>
     <string name="snr">SNR</string>

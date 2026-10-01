@@ -47,6 +47,7 @@ import org.maplibre.compose.location.rememberDefaultLocationProvider
 import org.maplibre.compose.location.rememberLocationState
 import org.maplibre.compose.location.rememberSystemSettingsLauncher
 import org.maplibre.compose.map.MapState
+import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.ui.util.KeepScreenOn
 import org.meshtastic.core.ui.util.MapViewProvider
 import org.meshtastic.feature.map.SharedMapViewModel
@@ -59,6 +60,7 @@ import org.meshtastic.feature.map.component.MapFilterSheet
 import org.meshtastic.feature.map.component.OfflineStatusBanner
 import org.meshtastic.feature.map.component.mapFilterActions
 import org.meshtastic.feature.map.layers.LayerOpacityStore
+import org.meshtastic.feature.map.layers.MapLayersManager
 import org.meshtastic.feature.map.maplibre.component.BasemapButton
 import org.meshtastic.feature.map.maplibre.component.BasemapSelection
 import org.meshtastic.feature.map.maplibre.component.BoxAuthoringBar
@@ -76,6 +78,9 @@ import org.meshtastic.feature.map.maplibre.layers.CustomLayer
 import org.meshtastic.feature.map.maplibre.style.Basemap
 import org.meshtastic.feature.map.maplibre.style.MapOverlay
 import org.meshtastic.feature.map.maplibre.style.MapOverlays
+import org.meshtastic.feature.map.planner.ui.PlannerMapBridge
+import org.meshtastic.feature.map.planner.ui.PlannerMapPickBanner
+import org.meshtastic.feature.map.planner.ui.PlannerSheet
 
 /**
  * MapLibre implementation of [MapViewProvider], shared by the F-Droid flavor and the desktop app.
@@ -117,11 +122,6 @@ class MapLibreMapViewProvider(
         DefaultWaypointEditor(request)
     },
     /**
-     * Runs a Site Planner session. Null hides the button entirely. The F-Droid app hosts the planner in a WebView;
-     * desktop hands the same form to the system browser. See [SitePlannerSession].
-     */
-    private val sitePlanner: (@Composable (SitePlannerSession) -> Unit)? = null,
-    /**
      * Extra content for the foot of the layers sheet. Both hosts mount the shared imported-layer manager there — the
      * picker behind its Add button is the platform-specific part, which is why the slot is the host's to fill.
      */
@@ -133,7 +133,7 @@ class MapLibreMapViewProvider(
         modifier: Modifier,
         navigateToNodeDetails: (Int) -> Unit,
         waypointId: Int?,
-        sitePlannerNodeNum: Int?,
+        plannerNodeNum: Int?,
     ) {
         // Guarded here too, or the toolbar and zoom controls float over an empty screen driving a missing map.
         if (!LocalMapLibreRuntimeProbe.current()) return MapEngineUnavailable(modifier)
@@ -148,7 +148,7 @@ class MapLibreMapViewProvider(
 
         val location = rememberLocationControls()
         val waypoints = rememberWaypointEditing()
-        val screen = rememberMapScreenState(waypointId = waypointId, sitePlannerNodeNum = sitePlannerNodeNum)
+        val screen = rememberMapScreenState(waypointId = waypointId, plannerNodeNum = plannerNodeNum)
 
         val mapState =
             rememberMapScreenMapState(
@@ -163,6 +163,8 @@ class MapLibreMapViewProvider(
 
         SaveCameraPosition(mapState)
 
+        val plannerBridge = rememberPlannerBridge(mapState)
+
         // Following the user means the screen is the thing being watched — the Google flavor holds it awake for the
         // same reason, and a map that sleeps mid-walk is the one complaint a location-follow feature always draws.
         KeepScreenOn(location.following)
@@ -173,7 +175,14 @@ class MapLibreMapViewProvider(
                 modifier = Modifier.fillMaxSize(),
                 basemap = basemaps.current,
                 onMapLongClick = waypoints.onLongPress,
-                onMapClick = waypoints.onMapTap,
+                onMapClick = { position ->
+                    // While the Planner is waiting for a point, the tap belongs to it rather than to the waypoint tools.
+                    if (plannerBridge.pickingSide != null) {
+                        plannerBridge.deliverTap(position.latitude, position.longitude)
+                    } else {
+                        waypoints.onMapTap(position)
+                    }
+                },
             )
 
             MapZoom(mapState = mapState, basemap = basemaps.current)
@@ -189,18 +198,36 @@ class MapLibreMapViewProvider(
                 basemapMenuExtra = basemapMenuExtra,
                 layersSheetExtra = layersSheetExtra,
                 offlineMapsSupported = offlineMapsSupported,
-                onSitePlannerClick = sitePlanner?.let { { screen.plannerOpen = true } },
+                onPlannerClick = {
+                    screen.plannerNodeNum = null
+                    screen.plannerOpen = true
+                },
             )
 
             ClusterMembersSlot(screen.clusterMembers, navigateToNodeDetails) { screen.clusterMembers = emptyList() }
 
-            SitePlannerSlot(
-                open = screen.plannerOpen,
-                nodeNum = sitePlannerNodeNum,
-                mapState = mapState,
-                planner = sitePlanner,
-                onDismiss = { screen.plannerOpen = false },
+            PlannerSheet(
+                visible = screen.plannerOpen,
+                nodeNum = screen.plannerNodeNum,
+                bridge = plannerBridge,
+                onDismiss = {
+                    screen.plannerOpen = false
+                    screen.plannerNodeNum = null
+                },
             )
+
+            if (plannerBridge.pickingSide != null) {
+                PlannerMapPickBanner(
+                    bridge = plannerBridge,
+                    modifier =
+                    Modifier.align(Alignment.BottomCenter)
+                        .padding(
+                            start = AUTHORING_BAR_SIDE.dp,
+                            end = AUTHORING_BAR_SIDE.dp,
+                            bottom = AUTHORING_BAR_BOTTOM.dp,
+                        ),
+                )
+            }
 
             BoxAuthoringSlot(editing = waypoints, mapState = mapState)
 
@@ -262,18 +289,24 @@ private class MapScreenState {
     var infoWaypointId by mutableStateOf<Int?>(null)
     var clusterMembers by mutableStateOf(emptyList<ClusterMember>())
     var plannerOpen by mutableStateOf(false)
+
+    /** The node a deep link asked the Planner to start from; cleared whenever the sheet closes or is opened by hand. */
+    var plannerNodeNum by mutableStateOf<Int?>(null)
     var overlays by mutableStateOf(MapOverlays.all)
 }
 
 /** Holds the screen's open-thing state, and opens whatever the incoming deep link named. */
 @Composable
-private fun rememberMapScreenState(waypointId: Int?, sitePlannerNodeNum: Int?): MapScreenState {
+private fun rememberMapScreenState(waypointId: Int?, plannerNodeNum: Int?): MapScreenState {
     val state = remember { MapScreenState() }
 
     // Both of these this provider used to drop on the floor.
-    LaunchedEffect(waypointId, sitePlannerNodeNum) {
+    LaunchedEffect(waypointId, plannerNodeNum) {
         waypointId?.let { state.infoWaypointId = it }
-        if (sitePlannerNodeNum != null) state.plannerOpen = true
+        if (plannerNodeNum != null) {
+            state.plannerNodeNum = plannerNodeNum
+            state.plannerOpen = true
+        }
     }
     return state
 }
@@ -327,29 +360,29 @@ private fun ClusterMembersSlot(members: List<ClusterMember>, onPick: (Int) -> Un
     )
 }
 
-/** Runs the host's Site Planner while [open], handing it the map centre and a way to move the map. */
+/**
+ * The Planner's window onto this map: where it is pointed, a way to move it, and a place to draw coverage.
+ *
+ * Coverage lands as an imported GeoJSON layer in the shared layer store, which the map already renders.
+ */
 @Composable
-private fun SitePlannerSlot(
-    open: Boolean,
-    nodeNum: Int?,
-    mapState: MapState,
-    planner: (@Composable (SitePlannerSession) -> Unit)?,
-    onDismiss: () -> Unit,
-) {
-    if (!open || planner == null) return
-
+private fun rememberPlannerBridge(mapState: MapState): PlannerMapBridge {
     val scope = rememberCoroutineScope()
-
-    planner(
-        SitePlannerSession(
-            nodeNum = nodeNum,
-            mapCenter = { mapState.cameraPosition.target },
-            moveTo = { target ->
-                scope.launch { mapState.animateCamera(CameraUpdate(target = target), CameraAnimation.Ease()) }
+    val layersManager: MapLayersManager = koinInject()
+    return remember(mapState, layersManager) {
+        PlannerMapBridge(
+            mapCenter = { mapState.cameraPosition.target.let { it.latitude to it.longitude } },
+            moveTo = { lat, lon ->
+                scope.launch {
+                    mapState.animateCamera(
+                        CameraUpdate(target = Position(longitude = lon, latitude = lat)),
+                        CameraAnimation.Ease(),
+                    )
+                }
             },
-            onDismiss = onDismiss,
-        ),
-    )
+            addGeoJsonLayer = { name, geoJson -> layersManager.addGeoJsonLayer(name, geoJson) },
+        )
+    }
 }
 
 /**
@@ -371,7 +404,7 @@ private fun BoxScope.MapToolbar(
     basemapMenuExtra: @Composable () -> Unit,
     layersSheetExtra: @Composable () -> Unit,
     offlineMapsSupported: Boolean,
-    onSitePlannerClick: (() -> Unit)?,
+    onPlannerClick: (() -> Unit)?,
 ) {
     var filterMenuExpanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -420,7 +453,7 @@ private fun BoxScope.MapToolbar(
                 extra = layersSheetExtra,
             )
         },
-        onSitePlannerClick = onSitePlannerClick,
+        onPlannerClick = onPlannerClick,
         isLocationTrackingEnabled = location.following,
         onToggleLocationTracking = location.onToggleFollow,
     )
