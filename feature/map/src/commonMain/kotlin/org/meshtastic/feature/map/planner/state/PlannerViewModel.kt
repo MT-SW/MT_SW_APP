@@ -221,7 +221,11 @@ class PlannerViewModel(
     fun setBand(bandId: String) {
         val band = PlannerBands.byId(bandId) ?: return
         mutate { st ->
-            if (band.id == PlannerBands.FREE_ID) st.copy(bandId = band.id) else st.copy(bandId = band.id, frequencyMHz = band.centerMHz)
+            if (band.id == PlannerBands.FREE_ID) {
+                st.copy(bandId = band.id)
+            } else {
+                st.copy(bandId = band.id, frequencyMHz = PlannerBands.defaultFrequencyMHz(band.id, st.bandwidthKhz))
+            }
         }
     }
 
@@ -229,11 +233,20 @@ class PlannerViewModel(
     fun setRadioFromPreset(preset: ModemPreset?) {
         val radio = plannerRadioFromPreset(preset)
         mutate { st ->
+            // A frequency still sitting on the previous preset's default follows the new preset.
+            val followsDefault = kotlin.math.abs(
+                st.frequencyMHz - PlannerBands.defaultFrequencyMHz(st.bandId, st.bandwidthKhz),
+            ) < 1.0e-6
             st.copy(
                 bandwidthKhz = radio.bandwidthKhz,
                 spreadingFactor = radio.spreadingFactor,
                 modemPreset = preset,
                 radioOverride = false,
+                frequencyMHz = if (followsDefault && st.bandId != PlannerBands.FREE_ID) {
+                    PlannerBands.defaultFrequencyMHz(st.bandId, radio.bandwidthKhz)
+                } else {
+                    st.frequencyMHz
+                },
             )
         }
     }

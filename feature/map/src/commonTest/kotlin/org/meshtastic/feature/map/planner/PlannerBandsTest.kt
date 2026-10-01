@@ -24,6 +24,13 @@ import kotlin.test.assertTrue
 
 class PlannerBandsTest {
     @Test
+    fun defaultFrequencyFollowsThePreset() {
+        assertEquals(869.14465, PlannerBands.defaultFrequencyMHz("868", 62.5), 1e-9)
+        assertEquals(869.525, PlannerBands.defaultFrequencyMHz("868", 250.0), 1e-9)
+        assertEquals(433.5, PlannerBands.defaultFrequencyMHz("433", 62.5), 1e-9)
+    }
+
+    @Test
     fun bandListHasAllBands() {
         val ids = PlannerBands.all.map { it.id }
         assertEquals(listOf("169", "433", "470", "868", "915", "923", "2400", "free"), ids)
