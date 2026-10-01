@@ -63,7 +63,7 @@ import org.meshtastic.core.resources.planner_close
 import org.meshtastic.core.resources.planner_credits_button
 import org.meshtastic.core.resources.planner_disclaimer
 import org.meshtastic.core.resources.planner_pick_banner
-import org.meshtastic.core.resources.planner_subtitle
+import org.meshtastic.core.resources.planner_title_by
 import org.meshtastic.core.resources.planner_title
 import org.meshtastic.core.ui.icon.Close
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -235,16 +235,21 @@ private fun PlannerHeader(onClose: () -> Unit) {
         modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        Row(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.Bottom,
+        ) {
             Text(
                 text = stringResource(Res.string.planner_title),
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.semantics { heading() },
             )
             Text(
-                text = stringResource(Res.string.planner_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
+                text = stringResource(Res.string.planner_title_by),
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 3.dp),
             )
         }
         PlannerInfoButton(PlannerInfoTopic.GENERAL)

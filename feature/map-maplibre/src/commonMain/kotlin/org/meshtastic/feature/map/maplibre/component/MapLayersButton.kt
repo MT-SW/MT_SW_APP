@@ -23,6 +23,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -45,6 +47,7 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.map.component.MapButton
 import org.meshtastic.feature.map.component.RasterOverlayToggles
 import org.meshtastic.feature.map.layers.LayerOpacityStore
+import org.meshtastic.feature.map.layers.MapLayersManager
 import org.meshtastic.feature.map.maplibre.style.MapOverlay
 import org.meshtastic.feature.map.maplibre.style.MapOverlays
 import org.meshtastic.feature.map.tiles.MapTileCatalogue
@@ -74,11 +77,23 @@ internal fun MapLayersButton(
     val opacityStore: LayerOpacityStore = koinInject()
     val opacity by opacityStore.opacity.collectAsState()
 
-    MapButton(
-        icon = MeshtasticIcons.Layers,
-        contentDescription = stringResource(Res.string.manage_map_layers),
-        onClick = { sheetVisible = true },
-    )
+    val layersManager: MapLayersManager = koinInject()
+    val layerCount = layersManager.mapLayers.collectAsState().value.size
+
+    // The count badge only exists while at least one layer does; otherwise this is the plain button.
+    BadgedBox(
+        badge = {
+            if (layerCount > 0) {
+                Badge { Text(layerCount.toString()) }
+            }
+        },
+    ) {
+        MapButton(
+            icon = MeshtasticIcons.Layers,
+            contentDescription = stringResource(Res.string.manage_map_layers),
+            onClick = { sheetVisible = true },
+        )
+    }
 
     if (sheetVisible) {
         ModalBottomSheet(onDismissRequest = { sheetVisible = false }) {

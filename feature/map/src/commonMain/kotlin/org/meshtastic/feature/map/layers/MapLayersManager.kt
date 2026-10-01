@@ -131,6 +131,7 @@ class MapLayersManager(
     /** Import a file the user picked. Unsupported types and unreadable sources are logged and skipped. */
     fun addMapLayer(picked: PickedMapFile) {
         scope.launch {
+            if (_mapLayers.value.size >= MAX_MAP_LAYERS) return@launch
             val layerName = picked.displayName.substringBeforeLast('.').ifBlank { "Layer ${mapLayers.value.size + 1}" }
             // Not split on '.': a MIME subtype like `vnd.google-earth.kml+xml` is matched whole, and taking
             // the part after its last dot would leave `kml+xml`, which resolves to nothing.
@@ -161,6 +162,12 @@ class MapLayersManager(
      */
     fun addGeoJsonLayer(name: String, geoJson: String) {
         scope.launch {
+            // At the limit the oldest planner result makes room; without one nothing is added.
+            if (_mapLayers.value.size >= MAX_MAP_LAYERS) {
+                val oldest = _mapLayers.value.filter { it.layerType == LayerType.COVERAGE }.minByOrNull { it.createdAt ?: 0L }
+                if (oldest == null) return@launch
+                removeMapLayer(oldest.id)
+            }
             val displayName = name.ifBlank { "Coverage" }
             val uri = write(geoJson.encodeToByteArray(), layerFileName(displayName, COVERAGE_EXTENSION))
             if (uri != null) {
@@ -182,6 +189,7 @@ class MapLayersManager(
     fun addNetworkMapLayer(name: String, url: String): String? {
         if (name.isBlank() || url.isBlank()) return "Invalid name or URL for network layer."
         if (!isValidNetworkLayerUrl(url)) return "URL must be a valid http or https URL."
+        if (_mapLayers.value.size >= MAX_MAP_LAYERS) return "Maximum $MAX_MAP_LAYERS map layers."
 
         val newItem = MapLayerItem(name = name, uri = url, layerType = networkLayerTypeFor(url), isNetwork = true)
         _mapLayers.update { it + newItem }

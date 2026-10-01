@@ -79,6 +79,7 @@ import org.meshtastic.core.ui.icon.Refresh
 import org.meshtastic.core.ui.icon.Visibility
 import org.meshtastic.core.ui.icon.VisibilityOff
 import org.meshtastic.feature.map.layers.LayerType
+import org.meshtastic.feature.map.layers.MAX_MAP_LAYERS
 import org.meshtastic.feature.map.layers.MapLayerItem
 import org.meshtastic.feature.map.layers.isValidNetworkLayerUrl
 import org.meshtastic.feature.map.layers.opacityOf
@@ -117,10 +118,14 @@ fun CustomMapLayersSheet(
 
         item {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(modifier = Modifier.fillMaxWidth(), onClick = onAddLayerClicked) {
+                Button(modifier = Modifier.fillMaxWidth(), enabled = mapLayers.size < MAX_MAP_LAYERS, onClick = onAddLayerClicked) {
                     Text(stringResource(Res.string.add_layer))
                 }
-                Button(modifier = Modifier.fillMaxWidth(), onClick = { showAddNetworkLayerDialog = true }) {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = mapLayers.size < MAX_MAP_LAYERS,
+                    onClick = { showAddNetworkLayerDialog = true },
+                ) {
                     Text(stringResource(Res.string.add_network_layer))
                 }
             }
