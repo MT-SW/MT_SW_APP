@@ -115,6 +115,17 @@ fun CustomMapLayersSheet(
             )
         }
 
+        item {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(modifier = Modifier.fillMaxWidth(), onClick = onAddLayerClicked) {
+                    Text(stringResource(Res.string.add_layer))
+                }
+                Button(modifier = Modifier.fillMaxWidth(), onClick = { showAddNetworkLayerDialog = true }) {
+                    Text(stringResource(Res.string.add_network_layer))
+                }
+            }
+        }
+
         if (mapLayers.isEmpty()) {
             item {
                 Text(
@@ -134,16 +145,6 @@ fun CustomMapLayersSheet(
                     onOpacityChange = onOpacityChange,
                 )
                 HorizontalDivider()
-            }
-        }
-        item {
-            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(modifier = Modifier.fillMaxWidth(), onClick = onAddLayerClicked) {
-                    Text(stringResource(Res.string.add_layer))
-                }
-                Button(modifier = Modifier.fillMaxWidth(), onClick = { showAddNetworkLayerDialog = true }) {
-                    Text(stringResource(Res.string.add_network_layer))
-                }
             }
         }
     }

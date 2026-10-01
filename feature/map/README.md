@@ -44,7 +44,7 @@ Rules both renderers must agree on, so a behaviour difference between the flavor
 ## Map Providers
 
 - **Google Maps (`google` flavor)**: Uses Google Play Services Maps SDK. Implementations in `androidApp/src/google/kotlin/org/meshtastic/app/map/`.
-- **MapLibre (`fdroid` flavor and Desktop)**: Uses `maplibre-compose` for a fully open-source experience. The surfaces live in the multiplatform `:feature:map-maplibre` module and are shared verbatim by both hosts; the thin flavor-unified entry points that pick up Android-only extras (file-picker layer import, MT_SW Planner) are in `androidApp/src/fdroid/kotlin/org/meshtastic/app/map/`. `osmdroid` is gone.
+- **MapLibre (`fdroid` flavor and Desktop)**: Uses `maplibre-compose` for a fully open-source experience. The surfaces live in the multiplatform `:feature:map-maplibre` module and are shared verbatim by both hosts; the thin flavor-unified entry points that pick up Android-only extras (file-picker layer import, Mesh Link Planner) are in `androidApp/src/fdroid/kotlin/org/meshtastic/app/map/`. `osmdroid` is gone.
 
 ## Features
 - **Live Node Tracking**: Real-time position updates for nodes on the mesh.

@@ -153,7 +153,7 @@
     <string name="planner_k_factor">Współczynnik promienia Ziemi k</string>
     <string name="planner_k_factor_title">Atmosfera (współczynnik k)</string>
     <string name="planner_latitude">Szerokość geograficzna</string>
-    <string name="planner_layer_name">Planer MT_SW</string>
+    <string name="planner_layer_name">Mesh Link Planer</string>
     <string name="planner_legend_excellent">&gt;= 20 dB (doskonały)</string>
     <string name="planner_legend_good">10 do 20 dB (dobry)</string>
     <string name="planner_legend_marginal">0 do 10 dB (graniczny)</string>
@@ -202,7 +202,7 @@
     <string name="planner_report_chart_y_axis">Wysokosc n.p.m. [m]</string>
     <string name="planner_report_coverage_title">Prognoza zasięgu</string>
     <string name="planner_report_disclaimer">Wyniki są jedynie szacunkami i nie gwarantują zasięgu.</string>
-    <string name="planner_report_footer">Planer MT_SW</string>
+    <string name="planner_report_footer">Mesh Link Planer</string>
     <string name="planner_report_generated">Wygenerowano:</string>
     <string name="planner_report_lbl_antenna_gain">Zysk anteny</string>
     <string name="planner_report_lbl_antenna_height">Wysokość anteny nad terenem</string>
@@ -268,7 +268,7 @@
     <string name="planner_report_section_station_a">Stacja A</string>
     <string name="planner_report_section_station_b">Stacja B</string>
     <string name="planner_report_section_weather">Pogoda i propagacja</string>
-    <string name="planner_report_title">Planer MT_SW - raport łącza</string>
+    <string name="planner_report_title">Mesh Link Planer - raport łącza</string>
     <string name="planner_result_need_points">Ustaw oba punkty, aby obliczyć łącze.</string>
     <string name="planner_rx_power">Moc odbierana</string>
     <string name="planner_section_coverage">Zasięg</string>
@@ -297,7 +297,7 @@
     <string name="planner_subtitle">zasięg i łącza</string>
     <string name="planner_summary_radio">%1$s dBm · %2$s dBi · %3$s m · %4$s dB</string>
     <string name="planner_swap_ab">Zamień A↔B</string>
-    <string name="planner_title">Planer MT_SW</string>
+    <string name="planner_title">Mesh Link Planer (by mt_sw)</string>
     <string name="planner_total_loss">Całkowite tłumienie trasy</string>
     <string name="planner_tx_power_dbm">Moc nadawania [dBm]</string>
     <string name="planner_tx_power_title">Moc nadawania</string>

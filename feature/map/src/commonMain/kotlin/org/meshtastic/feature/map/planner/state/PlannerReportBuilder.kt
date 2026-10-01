@@ -35,8 +35,8 @@ import org.meshtastic.feature.map.planner.export.ReportSection
  */
 @Suppress("LongParameterList")
 data class PlannerReportStrings(
-    val title: String = "MT_SW Planner - link report",
-    val footer: String = "MT_SW Planner",
+    val title: String = "Mesh Link Planner - link report",
+    val footer: String = "Mesh Link Planner",
     /** Already formatted generation time, e.g. "Generated: 2026-10-01 12:00". */
     val generatedAt: String = "",
     // sections
