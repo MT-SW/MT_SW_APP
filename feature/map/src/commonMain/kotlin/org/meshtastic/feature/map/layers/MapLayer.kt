@@ -79,6 +79,9 @@ const val MAX_KMZ_INFLATED_BYTES: Long = 50L * 1024 * 1024
 /** On-disk extension marking a saved coverage estimate, so [LayerType.COVERAGE] survives a restart. */
 const val COVERAGE_EXTENSION = "coverage"
 
+/** The most map layers that can exist at once (imported files, network layers and planner coverage together). */
+const val MAX_MAP_LAYERS = 9
+
 /**
  * The extension an imported layer is stored under.
  *

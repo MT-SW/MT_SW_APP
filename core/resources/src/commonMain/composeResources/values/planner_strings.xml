@@ -294,10 +294,10 @@
     <string name="planner_source_station_used">my station</string>
     <string name="planner_source_tap_map">Tap on the map</string>
     <string name="planner_spreading_factor">Spreading factor</string>
-    <string name="planner_subtitle">range and links</string>
     <string name="planner_summary_radio">%1$s dBm · %2$s dBi · %3$s m · %4$s dB</string>
     <string name="planner_swap_ab">Swap A↔B</string>
-    <string name="planner_title">Mesh Link Planner (by mt_sw)</string>
+    <string name="planner_title">Mesh Link Planner</string>
+    <string name="planner_title_by">(by MT_SW)</string>
     <string name="planner_total_loss">Total path loss</string>
     <string name="planner_tx_power_dbm">Transmit power [dBm]</string>
     <string name="planner_tx_power_title">Transmit power</string>
