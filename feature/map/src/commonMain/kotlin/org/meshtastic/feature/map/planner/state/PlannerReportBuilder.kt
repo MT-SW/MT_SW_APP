@@ -268,7 +268,7 @@ object PlannerReportBuilder {
             null
         }
 
-        val subtitle = nameA + " - " + nameB + " | " + Num.fmtTrim(state.frequencyMHz, 3) + " " + s.unitMHz + " | " +
+        val subtitle = nameA + " - " + nameB + " | " + Num.fmtTrim(state.frequencyMHz, 5) + " " + s.unitMHz + " | " +
             Num.fmtTrim(state.bandwidthKhz, 3) + " " + s.unitKHz + " | SF" + state.spreadingFactor
 
         return PlannerReport(
@@ -354,7 +354,7 @@ object PlannerReportBuilder {
             state.noiseFigureDb,
         )
         return listOf(
-            kv(s.lblFrequency, Num.fmtTrim(state.frequencyMHz, 3) + " " + s.unitMHz),
+            kv(s.lblFrequency, Num.fmtTrim(state.frequencyMHz, 5) + " " + s.unitMHz),
             kv(s.lblBandwidth, Num.fmtTrim(state.bandwidthKhz, 3) + " " + s.unitKHz),
             kv(s.lblSpreadingFactor, "SF" + state.spreadingFactor),
             kv(s.lblNoiseFigure, db(state.noiseFigureDb, s)),
