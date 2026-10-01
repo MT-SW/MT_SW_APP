@@ -17,6 +17,7 @@
 package org.meshtastic.feature.map.planner
 
 import org.meshtastic.core.model.ChannelOption
+import org.meshtastic.core.model.RegionInfo
 import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
 
 /**
@@ -55,15 +56,38 @@ object PlannerBands {
         all.firstOrNull { it.id != FREE_ID && mHz >= it.minMHz && mHz <= it.maxMHz }?.id ?: FREE_ID
 
     /**
-     * Default operating frequency (MHz) for [bandId] with a channel of [bandwidthKhz]. In the 868 MHz band the Narrow
-     * presets (62.5 kHz) use the MT_SW frequency 869.44165 MHz; every other bandwidth uses the first slot of the EU
-     * 868 sub-band (869.4 MHz + half the bandwidth, e.g. 869.525 MHz for 250 kHz). Other bands use their centre.
+     * Default operating frequency (MHz) for [bandId] with a channel of [bandwidthKhz] (the effective one, already
+     * scaled for 2.4 GHz). In the 868 MHz band the Narrow presets (62.5 kHz) use the MT_SW frequency 869.44165 MHz;
+     * every other bandwidth uses the first slot of the EU 868 sub-band (869.4 MHz + half the bandwidth, e.g.
+     * 869.525 MHz for 250 kHz). 433, 470 and 2400 MHz use the first slot of their region; other bands their centre.
      */
     fun defaultFrequencyMHz(bandId: String, bandwidthKhz: Double): Double {
         val band = byId(bandId) ?: return 868.0
-        if (band.id != "868") return band.centerMHz
-        return if (kotlin.math.abs(bandwidthKhz - 62.5) < 1.0) NARROW_868_MHZ else 869.4 + bandwidthKhz / 2000.0
+        val region = regionFor(band.id, bandwidthKhz) ?: return band.centerMHz
+        // First slot of the region, exactly as the radio computes it: band start + padding + half the bandwidth.
+        // Float -> text -> Double avoids float noise such as 869.4000244 for 869.4f.
+        return region.freqStart.toString().toDouble() + region.padding.toString().toDouble() + bandwidthKhz / 2000.0
     }
+
+    /**
+     * The app's [RegionInfo] a band stands for (band start, slot padding, wide LoRa), or null when there is no
+     * matching region (169 and 923 MHz keep their centre). Narrow presets in 868 MHz use the narrow EU region.
+     */
+    fun regionFor(bandId: String, bandwidthKhz: Double): RegionInfo? = when (bandId) {
+        "433" -> RegionInfo.EU_433
+        "470" -> RegionInfo.CN
+        "868" -> if (kotlin.math.abs(bandwidthKhz - 62.5) < 1.0) RegionInfo.EU_N_868 else RegionInfo.EU_868
+        "915" -> RegionInfo.US
+        "2400" -> RegionInfo.LORA_24
+        else -> null
+    }
+
+    /**
+     * Bandwidth multiplier of a band: 2.4 GHz LoRa is "wide LoRa" and the firmware scales the preset bandwidth by
+     * 3.25 there (250 kHz becomes 812.5 kHz); the spreading factor stays the same.
+     */
+    fun bandwidthScale(bandId: String): Double =
+        if (regionFor(bandId, 0.0)?.wideLora == true) 3.25 else 1.0
 
     /** MT_SW default frequency for the Narrow presets in the 868 MHz band. */
     const val NARROW_868_MHZ = 869.44165

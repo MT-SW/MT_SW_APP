@@ -88,11 +88,11 @@ class PlannerViewModelTest {
     fun bandSelectsFrequencyAndBack() {
         val v = vm()
         v.setBand("433")
-        assertEquals(433.5, v.state.frequencyMHz)
+        assertEquals(433.03125, v.state.frequencyMHz)
         assertEquals("433", v.state.bandId)
         v.setBand("free")
         assertEquals("free", v.state.bandId)
-        assertEquals(433.5, v.state.frequencyMHz)
+        assertEquals(433.03125, v.state.frequencyMHz)
         v.setFrequency(868.2)
         assertEquals("868", v.state.bandId)
         v.setFrequency(5.0)

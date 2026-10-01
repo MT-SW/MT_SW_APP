@@ -27,7 +27,11 @@ class PlannerBandsTest {
     fun defaultFrequencyFollowsThePreset() {
         assertEquals(869.44165, PlannerBands.defaultFrequencyMHz("868", 62.5), 1e-9)
         assertEquals(869.525, PlannerBands.defaultFrequencyMHz("868", 250.0), 1e-9)
-        assertEquals(433.5, PlannerBands.defaultFrequencyMHz("433", 62.5), 1e-9)
+        assertEquals(433.03125, PlannerBands.defaultFrequencyMHz("433", 62.5), 1e-9)
+        assertEquals(2400.40625, PlannerBands.defaultFrequencyMHz("2400", 812.5), 1e-9)
+        assertEquals(902.125, PlannerBands.defaultFrequencyMHz("915", 250.0), 1e-6)
+        assertEquals(470.125, PlannerBands.defaultFrequencyMHz("470", 250.0), 1e-6)
+        assertEquals(812.5, 250.0 * PlannerBands.bandwidthScale("2400"), 1e-9)
     }
 
     @Test
