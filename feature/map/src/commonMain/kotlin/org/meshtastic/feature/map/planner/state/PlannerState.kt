@@ -181,13 +181,13 @@ data class PlannerUiState(
     val b: PlannerEnd = PlannerEnd(),
     val selectedSide: PlannerSide = PlannerSide.A,
     // ---- radio ----
-    val frequencyMHz: Double = 869.525,
+    val frequencyMHz: Double = 869.14465,
     val bandId: String = PlannerBands.DEFAULT_ID,
-    val bandwidthKhz: Double = 250.0,
-    val spreadingFactor: Int = 11,
+    val bandwidthKhz: Double = 62.5,
+    val spreadingFactor: Int = 7,
     /** True when BW/SF were edited by hand (then [modemPreset] is null). */
     val radioOverride: Boolean = false,
-    val modemPreset: ModemPreset? = ModemPreset.LONG_FAST,
+    val modemPreset: ModemPreset? = ModemPreset.NARROW_FAST,
     val noiseFigureDb: Double = 6.0,
     // ---- environment ----
     val useWeather: Boolean = false,
