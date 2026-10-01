@@ -49,7 +49,10 @@ import org.meshtastic.core.resources.planner_feeder_length
 import org.meshtastic.core.resources.planner_feeder_manual
 import org.meshtastic.core.resources.planner_feeder_more
 import org.meshtastic.core.resources.planner_feeder_precise
+import org.meshtastic.core.resources.planner_feeder_no_cable
 import org.meshtastic.core.resources.planner_feeder_preset
+import org.meshtastic.core.resources.planner_feeder_preset_adapter_n_n
+import org.meshtastic.core.resources.planner_feeder_preset_adapter_sma_n
 import org.meshtastic.core.resources.planner_feeder_preset_custom
 import org.meshtastic.core.resources.planner_feeder_preset_direct
 import org.meshtastic.core.resources.planner_feeder_preset_ecoflex_roof
@@ -123,6 +126,8 @@ internal fun FeederSection(side: PlannerSide, end: PlannerEnd, vm: PlannerViewMo
 private fun presetName(id: String): String = stringResource(
     when (id) {
         "direct" -> Res.string.planner_feeder_preset_direct
+        "adapter_sma_n" -> Res.string.planner_feeder_preset_adapter_sma_n
+        "adapter_n_n" -> Res.string.planner_feeder_preset_adapter_n_n
         "pigtail" -> Res.string.planner_feeder_preset_pigtail
         "pigtail_cable" -> Res.string.planner_feeder_preset_pigtail_cable
         "long_lmr400" -> Res.string.planner_feeder_preset_long_lmr400
@@ -208,9 +213,12 @@ private fun SectionEditor(
     onChange: (FeederSectionData) -> Unit,
 ) {
     val isCustom = section.cableId == FeederBuilder.CUSTOM_ID
+    val isNone = section.cableId == FeederBuilder.NONE_ID
+    val noneLabel = stringResource(Res.string.planner_feeder_no_cable)
     val cable = CableDb.cable(section.cableId)
     val cableOptions =
-        CableDb.cables.map { it.id to (if (it.approximate) it.name + approxMark else it.name) } +
+        listOf(FeederBuilder.NONE_ID to noneLabel) +
+            CableDb.cables.map { it.id to (if (it.approximate) it.name + approxMark else it.name) } +
             (FeederBuilder.CUSTOM_ID to customLabel)
     Column(
         modifier = Modifier.padding(start = 16.dp),
@@ -220,6 +228,7 @@ private fun SectionEditor(
             label = stringResource(Res.string.planner_feeder_cable_n, (index + 1).toString()),
             selectedLabel =
             when {
+                isNone -> noneLabel
                 isCustom -> customLabel
                 cable != null -> cable.name + if (cable.approximate) approxMark else ""
                 else -> section.cableId
@@ -235,7 +244,7 @@ private fun SectionEditor(
                 )
             },
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Top) {
+        if (!isNone) Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Top) {
             PlannerNumberField(
                 label = stringResource(Res.string.planner_feeder_length),
                 value = section.lengthM,

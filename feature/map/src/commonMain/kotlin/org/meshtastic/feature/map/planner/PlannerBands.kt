@@ -41,7 +41,7 @@ object PlannerBands {
             PlannerBand("169", "169 MHz", 169.4, 160.0, 180.0),
             PlannerBand("433", "433 MHz (ISM)", 433.5, 430.0, 440.0),
             PlannerBand("470", "470 MHz", 490.0, 470.0, 510.0),
-            PlannerBand("868", "868 MHz (EU)", 869.14465, 863.0, 870.0),
+            PlannerBand("868", "868 MHz (EU)", 869.44165, 863.0, 870.0),
             PlannerBand("915", "915 MHz", 915.0, 902.0, 922.0),
             PlannerBand("923", "923 MHz", 923.0, 922.0, 930.0),
             PlannerBand("2400", "2400 MHz", 2440.0, 2400.0, 2500.0),
@@ -56,7 +56,7 @@ object PlannerBands {
 
     /**
      * Default operating frequency (MHz) for [bandId] with a channel of [bandwidthKhz]. In the 868 MHz band the Narrow
-     * presets (62.5 kHz) use the MT_SW frequency 869.14465 MHz; every other bandwidth uses the first slot of the EU
+     * presets (62.5 kHz) use the MT_SW frequency 869.44165 MHz; every other bandwidth uses the first slot of the EU
      * 868 sub-band (869.4 MHz + half the bandwidth, e.g. 869.525 MHz for 250 kHz). Other bands use their centre.
      */
     fun defaultFrequencyMHz(bandId: String, bandwidthKhz: Double): Double {
@@ -66,7 +66,7 @@ object PlannerBands {
     }
 
     /** MT_SW default frequency for the Narrow presets in the 868 MHz band. */
-    const val NARROW_868_MHZ = 869.14465
+    const val NARROW_868_MHZ = 869.44165
 
     /** Clamps to the supported 20..20000 MHz range (ITM validity). */
     fun clampMHz(mHz: Double): Double = if (mHz.isNaN()) 868.0 else mHz.coerceIn(FREE_MIN_MHZ, FREE_MAX_MHZ)

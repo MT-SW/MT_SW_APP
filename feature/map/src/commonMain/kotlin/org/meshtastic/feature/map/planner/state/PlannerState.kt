@@ -181,7 +181,7 @@ data class PlannerUiState(
     val b: PlannerEnd = PlannerEnd(),
     val selectedSide: PlannerSide = PlannerSide.A,
     // ---- radio ----
-    val frequencyMHz: Double = 869.14465,
+    val frequencyMHz: Double = 869.44165,
     val bandId: String = PlannerBands.DEFAULT_ID,
     val bandwidthKhz: Double = 62.5,
     val spreadingFactor: Int = 7,
