@@ -79,6 +79,11 @@ class MapLayersManager(
                             val metadata = fileSystem.metadataOrNull(path)
                             if (metadata?.isRegularFile != true) return@mapNotNull null
                             resolveLayerType(path.name.substringAfterLast('.', "").ifBlank { null })?.let { type ->
+                                // Planner coverage is a scratch result: it is dropped on restart, not restored.
+                                if (type == LayerType.COVERAGE) {
+                                    runCatching { fileSystem.delete(path) }
+                                    return@let null
+                                }
                                 val uri = path.toFileUri()
                                 MapLayerItem(
                                     name = displayNameFromFileName(path.name.substringBeforeLast('.')),

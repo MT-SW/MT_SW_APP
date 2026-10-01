@@ -153,7 +153,7 @@
     <string name="planner_k_factor">Earth radius factor k</string>
     <string name="planner_k_factor_title">Atmosphere (k factor)</string>
     <string name="planner_latitude">Latitude</string>
-    <string name="planner_layer_name">MT_SW Planner</string>
+    <string name="planner_layer_name">Mesh Link Planner</string>
     <string name="planner_legend_excellent">&gt;= 20 dB (excellent)</string>
     <string name="planner_legend_good">10 to 20 dB (good)</string>
     <string name="planner_legend_marginal">0 to 10 dB (marginal)</string>
@@ -202,7 +202,7 @@
     <string name="planner_report_chart_y_axis">Height ASL [m]</string>
     <string name="planner_report_coverage_title">Coverage prediction</string>
     <string name="planner_report_disclaimer">Results are estimates only and no guarantee of coverage.</string>
-    <string name="planner_report_footer">MT_SW Planner</string>
+    <string name="planner_report_footer">Mesh Link Planner</string>
     <string name="planner_report_generated">Generated:</string>
     <string name="planner_report_lbl_antenna_gain">Antenna gain</string>
     <string name="planner_report_lbl_antenna_height">Antenna height above ground</string>
@@ -268,7 +268,7 @@
     <string name="planner_report_section_station_a">Station A</string>
     <string name="planner_report_section_station_b">Station B</string>
     <string name="planner_report_section_weather">Weather and propagation</string>
-    <string name="planner_report_title">MT_SW Planner - link report</string>
+    <string name="planner_report_title">Mesh Link Planner - link report</string>
     <string name="planner_result_need_points">Set both points to calculate the link.</string>
     <string name="planner_rx_power">Received power</string>
     <string name="planner_section_coverage">Coverage</string>
@@ -297,7 +297,7 @@
     <string name="planner_subtitle">range and links</string>
     <string name="planner_summary_radio">%1$s dBm · %2$s dBi · %3$s m · %4$s dB</string>
     <string name="planner_swap_ab">Swap A↔B</string>
-    <string name="planner_title">MT_SW Planner</string>
+    <string name="planner_title">Mesh Link Planner (by mt_sw)</string>
     <string name="planner_total_loss">Total path loss</string>
     <string name="planner_tx_power_dbm">Transmit power [dBm]</string>
     <string name="planner_tx_power_title">Transmit power</string>

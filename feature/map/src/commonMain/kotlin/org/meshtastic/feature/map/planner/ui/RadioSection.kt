@@ -99,7 +99,7 @@ internal fun RadioSection(state: PlannerUiState, vm: PlannerViewModel) {
 }
 
 private fun presetLabel(option: ChannelOption): String =
-    option.modemPreset.name + " (" + Num.fmtTrim(option.bandwidth.toDouble() * 1000.0, 1) + " kHz, SF" + option.spreadingFactor + ")"
+    option.modemPreset.name
 
 @Composable
 private fun RadioCard(state: PlannerUiState, vm: PlannerViewModel) {

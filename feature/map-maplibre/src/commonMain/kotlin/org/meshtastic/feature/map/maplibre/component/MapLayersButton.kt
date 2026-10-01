@@ -16,9 +16,13 @@
  */
 package org.meshtastic.feature.map.maplibre.component
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -103,7 +107,13 @@ private fun MapLayersSheet(
     onDismiss: () -> Unit,
     extra: @Composable () -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    // The whole sheet scrolls, and the imported layers (with their add buttons) come first with their own bounded
+    // height, so they are never pushed off the bottom of a full-screen sheet.
+    Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
+        Box(modifier = Modifier.fillMaxWidth().heightIn(max = 420.dp)) { extra() }
+
+        HorizontalDivider()
+
         Text(
             text = stringResource(Res.string.manage_map_layers),
             style = MaterialTheme.typography.titleMedium,
@@ -142,9 +152,6 @@ private fun MapLayersSheet(
             },
         )
 
-        HorizontalDivider()
-
-        extra()
     }
 }
 

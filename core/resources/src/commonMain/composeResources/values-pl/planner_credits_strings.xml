@@ -16,8 +16,8 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 <resources>
-    <!-- Planer MT_SW: linie z podziękowaniami i licencjami (ekran O aplikacji, README). Jedna linia na wpis. -->
-    <string name="planner_credits_header">Planer MT_SW – źródła i licencje</string>
+    <!-- Mesh Link Planer: linie z podziękowaniami i licencjami (ekran O aplikacji, README). Jedna linia na wpis. -->
+    <string name="planner_credits_header">Mesh Link Planer – źródła i licencje</string>
     <string name="planner_credits_line_meshmap">MeshMap Planner (ModerateWinGuy) – inspiracja podejściem i wartościami domyślnymi; licencja GPL v3; github.com/ModerateWinGuy/MeshMap-Planner</string>
     <string name="planner_credits_line_siteplanner_original">Meshtastic Site Planner – inspiracja podejściem i wartościami domyślnymi; licencja GPL-3.0; site.meshtastic.org</string>
     <string name="planner_credits_line_splat">SPLAT! – John A. Magliacane, KD2BD; licencja GNU GPL; inspiracja dla obliczeń Longley-Rice</string>

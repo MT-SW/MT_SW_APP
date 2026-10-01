@@ -30,7 +30,7 @@ Silnik mapy (Android i desktop) korzysta teraz ze współdzielonej, natywnie ren
 Co to oznacza w praktyce:
 
 - **Desktop ma teraz mapę "za darmo"** — wcześniej zakładka "Mapa" na desktopie była pustym placeholderem, potem dorobiona jako własny renderer od zera; teraz korzysta z tego samego współdzielonego komponentu co Android, więc funkcje typu import warstw GeoJSON/KML, pobieranie kafelków offline czy filtry mapy pochodzą już ze wspólnego modułu, a nie z osobnej implementacji tylko dla desktopu.
-- **Planer MT_SW** (symulacja zasięgu radiowego) działa teraz natywnie w aplikacji, na Androidzie i desktopie — opis w sekcji „Planer MT_SW" poniżej.
+- **Mesh Link Planer** (symulacja zasięgu radiowego) działa teraz natywnie w aplikacji, na Androidzie i desktopie — opis w sekcji „Mesh Link Planer" poniżej.
 - Mini-mapa w szczegółach węzła, mapa trasy pozycji i główny ekran mapy korzystają z tego samego, wspólnego komponentu na obu platformach.
 - Kliknięcie węzła na mapie desktopowej nadal otwiera najpierw listę węzłów, potem szczegóły — to zachowanie przetrwało przejście na nowy silnik mapy.
 - **Domyślnie włączone nakładki terenu i pogody** — nakładka cieniowania rzeźby terenu (hillshade, przydatna do oceny zasięgu LoRa ograniczonego ukształtowaniem terenu) oraz radar pogodowy NOAA są teraz zaznaczone od razu po otwarciu mapy, zamiast wymagać ręcznego włączenia w warstwach.
@@ -143,9 +143,9 @@ Tryb pokazujący ruch w eterze, który normalnie by zniknął — wszystkie paki
 - **Naprawiona zawodność ponownego łączenia z już sparowanym urządzeniem** — na części telefonów (potwierdzone na Xiaomi/MIUI) appka potrafiła nie połączyć się ponownie z węzłem po tym, jak ten na chwilę zniknął z zasięgu lub się wyłączył, mimo że urządzenie pozostawało sparowane; jedynym działającym obejściem było ręczne odparowanie i sparowanie od nowa. Naprawione poprzez: odświeżanie cache usług GATT przy każdym połączeniu (a nie tylko reaktywnie, po wykryciu problemu), samodzielną negocjację MTU z automatycznym ponowieniem próby zamiast pojedynczej próby wystrzelonej natychmiast po odkryciu usług, oraz dodatkowe mechanizmy wykrywania i odzyskiwania połączenia działające również wtedy, gdy ręczne przerwanie i ponowienie łączenia zerowałoby licznik nieudanych prób.
 - **Naprawione niewykrywanie węzła po Bluetooth na desktopie (Windows)** — appka skanowała bez końca, nie znajdując żadnego urządzenia, mimo że telefon widział ten sam węzeł bez problemu. Przyczyna: aktualizacja biblioteki Kable (0.44.3 → 0.45.0) przyniosła nowszą wersję Rustowego `btleplug`, która na Windowsie/WinRT bezwarunkowo włącza `SetAllowExtendedAdvertisements`, co u części adapterów BT czyni je całkowicie niewidocznymi dla skanowania (potwierdzony błąd w upstreamie btleplug). Naprawione przez przypięcie Kable z powrotem do 0.44.3.
 
-## Planer MT_SW
+## Mesh Link Planer
 
-Natywny **Planer MT_SW** (symulacja zasięgu radiowego, dostępny na Androidzie i desktopie) zastępuje dawny zewnętrzny Site Planner — działa w całości w aplikacji, bez przeglądarki i bez serwera.
+Natywny **Mesh Link Planer** (symulacja zasięgu radiowego, dostępny na Androidzie i desktopie) zastępuje dawny zewnętrzny Site Planner — działa w całości w aplikacji, bez przeglądarki i bez serwera.
 
 - **Dwa niezależne punkty A i B** — każdy można ustawić z listy węzłów, kliknięciem w mapę, wpisanymi współrzędnymi albo z podłączonej stacji.
 - **Teren z modelu DEM Mapterhorn** — wysokość terenu pod punktem jest ustalana automatycznie albo wpisywana ręcznie.
@@ -161,7 +161,7 @@ Natywny **Planer MT_SW** (symulacja zasięgu radiowego, dostępny na Androidzie 
 
 ## Licencje i podziękowania
 
-- **Planer MT_SW – źródła i licencje:**
+- **Mesh Link Planer – źródła i licencje:**
   - MeshMap Planner (ModerateWinGuy) – inspiracja podejściem i wartościami domyślnymi; licencja GPL v3; github.com/ModerateWinGuy/MeshMap-Planner
   - Meshtastic Site Planner – inspiracja podejściem i wartościami domyślnymi; licencja GPL-3.0; site.meshtastic.org
   - SPLAT! – John A. Magliacane, KD2BD; licencja GNU GPL; inspiracja dla obliczeń Longley-Rice
@@ -223,7 +223,7 @@ The map engine (Android and desktop) now uses the shared, natively rendered **Ma
 What this means in practice:
 
 - **Desktop gets a map "for free" now** — the desktop "Map" tab used to be an empty placeholder, then a from-scratch custom renderer; it now uses the same shared component as Android, so features like GeoJSON/KML layer import, offline tile downloads, and map filters come from the shared module rather than a desktop-only implementation.
-- **MT_SW Planner** (radio coverage simulation) now runs natively inside the app on Android and desktop — see the "MT_SW Planner" section below.
+- **Mesh Link Planner** (radio coverage simulation) now runs natively inside the app on Android and desktop — see the "Mesh Link Planner" section below.
 - The node-detail mini-map, the position-track map, and the main map screen all use the same shared component on both platforms.
 - Clicking a node on the desktop map still opens the node list first, then details — that behavior survived the switch to the new map engine.
 - **Terrain and weather overlays enabled by default** — the hillshade overlay (useful for judging LoRa range limited by terrain) and the NOAA weather radar overlay are now checked as soon as the map opens, instead of requiring a manual toggle in the layers menu.
@@ -336,9 +336,9 @@ A mode that surfaces air traffic that would normally just vanish — every packe
 - **Fixed unreliable reconnection to an already-paired device** — on some phones (confirmed on Xiaomi/MIUI) the app could fail to reconnect to a node after it briefly went out of range or powered off, even though the device remained paired; the only working workaround was manually unpairing and re-pairing. Fixed by: refreshing the GATT service cache on every connect (not just reactively after a detected problem), negotiating MTU explicitly with an automatic retry instead of a single attempt fired immediately after service discovery, and additional detection/recovery mechanisms that keep working even when a manual stop-and-retry would otherwise reset the failure counter.
 - **Fixed BLE device discovery not working on desktop (Windows)** — the app would scan indefinitely without ever finding a device, even though the phone saw the same node fine. Root cause: a Kable library bump (0.44.3 → 0.45.0) pulled in a newer version of the Rust `btleplug` backend that unconditionally enables `SetAllowExtendedAdvertisements` on Windows/WinRT, which makes some BT adapters completely invisible to scanning (a confirmed upstream btleplug bug). Fixed by pinning Kable back to 0.44.3.
 
-## MT_SW Planner
+## Mesh Link Planner
 
-The native **MT_SW Planner** (radio coverage simulation, available on Android and desktop) replaces the former hosted Site Planner — it runs entirely inside the app, with no browser and no server.
+The native **Mesh Link Planner** (radio coverage simulation, available on Android and desktop) replaces the former hosted Site Planner — it runs entirely inside the app, with no browser and no server.
 
 - **Two independent points A and B** — each can be set from the node list, by tapping the map, by typed coordinates, or from the connected station.
 - **Terrain from the Mapterhorn DEM** — ground altitude under a point is determined automatically or entered manually.
@@ -354,7 +354,7 @@ The native **MT_SW Planner** (radio coverage simulation, available on Android an
 
 ## Licences and credits
 
-- **MT_SW Planner – sources and licences:**
+- **Mesh Link Planner – sources and licences:**
   - MeshMap Planner (ModerateWinGuy) – inspiration for the approach and defaults; GPL v3 licence; github.com/ModerateWinGuy/MeshMap-Planner
   - Meshtastic Site Planner – inspiration for the approach and defaults; GPL-3.0 licence; site.meshtastic.org
   - SPLAT! – John A. Magliacane, KD2BD; GNU GPL licence; inspiration for the Longley-Rice calculations
