@@ -300,6 +300,8 @@ class PlannerViewModel(
         mutate(recompute = false) { it.copy(coverageMaxRangeKm = km.coerceIn(1.0, 300.0)) }
     }
 
+    fun setCoverageOpacity(value: Double) = mutate(recompute = false) { it.copy(coverageOpacity = value.coerceIn(0.15, 1.0)) }
+
     fun setCoverageRadials(count: Int) = mutate(recompute = false) { it.copy(coverageRadials = count.coerceIn(8, 360)) }
 
     fun setCoverageRxHeightM(meters: Double) {
@@ -386,7 +388,7 @@ class PlannerViewModel(
     /** Map-layer GeoJSON (filled sectors, heat-map look) of the calculated coverage, or null when there is none. */
     suspend fun coverageLayerGeoJson(name: String): String? {
         val coverage = uiState.value.coverage ?: return null
-        return withContext(Dispatchers.Default) { CoverageLayer.render(coverage, name) }
+        return withContext(Dispatchers.Default) { CoverageLayer.render(coverage, name, uiState.value.coverageOpacity) }
     }
 
     /** PNG of the terrain profile chart, or null when no profile has been calculated. */

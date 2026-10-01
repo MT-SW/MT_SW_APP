@@ -212,6 +212,8 @@ data class PlannerUiState(
     val coverageSide: PlannerSide = PlannerSide.A,
     val coverageMaxRangeKm: Double = 50.0,
     val coverageRadials: Int = 180,
+    /** Fill opacity of the coverage layer shown on the map (0.15..1). */
+    val coverageOpacity: Double = 0.62,
     val coverageRxHeightM: Double = 2.0,
     val coverageRxGainDbi: Double = 0.0,
     val coverageComputing: Boolean = false,

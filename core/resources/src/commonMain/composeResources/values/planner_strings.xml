@@ -57,6 +57,7 @@
     <string name="planner_coverage_need_point">%1$s has no position - set it above before calculating.</string>
     <string name="planner_coverage_radials">Number of radials</string>
     <string name="planner_coverage_range">Maximum range</string>
+    <string name="planner_coverage_opacity">Layer opacity on the map: %1$s (applies after “Show on map”)</string>
     <string name="planner_coverage_rx_gain">Receiver antenna gain</string>
     <string name="planner_coverage_rx_height">Receiver antenna height</string>
     <string name="planner_coverage_side">Station for the coverage calculation</string>

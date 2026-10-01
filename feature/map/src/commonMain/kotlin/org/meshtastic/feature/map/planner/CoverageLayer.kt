@@ -22,36 +22,56 @@ import kotlin.math.PI
 import kotlin.math.cos
 
 /**
- * Map-layer GeoJSON of a coverage prediction: a fine grid of tiny semi-transparent dots (small squares with gaps between them) (simplestyle `fill` /
- * `fill-opacity`, rendered by both map flavours). Only cells with a non-negative margin are drawn.
+ * Map-layer GeoJSON of a coverage prediction as a continuous raster: a fine grid of small, adjacent, semi-transparent
+ * squares coloured with a smooth purple → orange → yellow scale (simplestyle `fill` / `fill-opacity`, rendered by both
+ * map flavours). Only cells with a non-negative margin are drawn, so terrain shadows stay empty and the base map shows
+ * through. Neighbouring cells of the same colour are merged into one polygon to keep the layer light.
  */
 object CoverageLayer {
-    /** Lower margin bound (dB) of each class; the last class is open ended. */
-    val classBoundsDb = floatArrayOf(0f, 3f, 6f, 10f, 15f, 20f, 30f)
+    /** Margin (dB) at which the scale reaches its strongest colour. */
+    const val MAX_DB = 30f
 
-    /** Weakest → strongest (plasma-like palette). */
-    val classColors = arrayOf("#4b0c6b", "#781c6d", "#a52c60", "#cf4446", "#ed6925", "#fb9b06", "#f7d13d")
+    /** Number of colour steps between 0 dB and [MAX_DB]. */
+    const val CLASS_COUNT = 24
 
-    const val FILL_OPACITY = 0.5
-
-    /** Side of a dot relative to its grid cell; the rest stays empty so the base map shows through. */
-    private const val DOT_FRACTION = 0.5
+    const val FILL_OPACITY = 0.62
 
     /** Target number of grid cells across the coverage diameter. */
-    private const val GRID_CELLS = 180
+    private const val GRID_CELLS = 280
+
+    // Weakest → strongest, picked to match the familiar MeshMap look.
+    private val stopPos = doubleArrayOf(0.0, 0.3, 0.55, 0.78, 1.0)
+    private val stopRgb = arrayOf(
+        intArrayOf(0x7a, 0x3c, 0xb5),
+        intArrayOf(0xb6, 0x4f, 0xa8),
+        intArrayOf(0xee, 0x7f, 0x5c),
+        intArrayOf(0xfb, 0xa7, 0x3a),
+        intArrayOf(0xe9, 0xf0, 0x3b),
+    )
 
     fun classOf(marginDb: Float): Int {
-        if (marginDb.isNaN() || marginDb < classBoundsDb[0]) return -1
-        var c = 0
-        for (i in classBoundsDb.indices) if (marginDb >= classBoundsDb[i]) c = i
-        return c
+        if (marginDb.isNaN() || marginDb < 0f) return -1
+        val t = (marginDb / MAX_DB).coerceIn(0f, 1f)
+        return (t * (CLASS_COUNT - 1) + 0.5f).toInt().coerceIn(0, CLASS_COUNT - 1)
     }
 
-    /**
-     * Fine grid of tiny semi-transparent dots: only places the signal really reaches get one, so terrain shadows
-     * (hills, valleys) stay empty and the base map stays visible between the dots.
-     */
-    fun render(coverage: CoverageResult, name: String): String {
+    /** `#rrggbb` of colour step [cls]. */
+    fun colorOf(cls: Int): String {
+        val t = cls.coerceIn(0, CLASS_COUNT - 1).toDouble() / (CLASS_COUNT - 1)
+        var i = 0
+        while (i < stopPos.size - 2 && t > stopPos[i + 1]) i++
+        val f = ((t - stopPos[i]) / (stopPos[i + 1] - stopPos[i])).coerceIn(0.0, 1.0)
+        val sb = StringBuilder("#")
+        for (c in 0..2) {
+            val v = (stopRgb[i][c] + (stopRgb[i + 1][c] - stopRgb[i][c]) * f + 0.5).toInt().coerceIn(0, 255)
+            sb.append(HEX[v shr 4]).append(HEX[v and 15])
+        }
+        return sb.toString()
+    }
+
+    private const val HEX = "0123456789abcdef"
+
+    fun render(coverage: CoverageResult, name: String, opacity: Double = FILL_OPACITY): String {
         val features = ArrayList<String>()
         val radiusM = coverage.ringsM.lastOrNull() ?: 0.0
         if (radiusM > 0.0 && coverage.radials >= 3) {
@@ -62,18 +82,24 @@ object CoverageLayer {
             val rows = GRID_CELLS
             val lat0 = coverage.center.lat - dLat * rows / 2.0
             val lon0 = coverage.center.lon - dLon * rows / 2.0
-            val insetLat = dLat * (1.0 - DOT_FRACTION) / 2.0
-            val insetLon = dLon * (1.0 - DOT_FRACTION) / 2.0
             for (row in 0 until rows) {
                 val latS = lat0 + dLat * row
                 val latC = latS + dLat / 2.0
-                for (col in 0 until rows) {
-                    val lonW = lon0 + dLon * col
-                    val cls = classOf(coverage.marginAt(latC, lonW + dLon / 2.0) ?: Float.NaN)
-                    if (cls < 0) continue
-                    features.add(
-                        cell(latS + insetLat, latS + dLat - insetLat, lonW + insetLon, lonW + dLon - insetLon, cls),
-                    )
+                var col = 0
+                while (col < rows) {
+                    val cls = classOf(coverage.marginAt(latC, lon0 + dLon * (col + 0.5)) ?: Float.NaN)
+                    if (cls < 0) {
+                        col++
+                        continue
+                    }
+                    var end = col
+                    while (end + 1 < rows &&
+                        classOf(coverage.marginAt(latC, lon0 + dLon * (end + 1.5)) ?: Float.NaN) == cls
+                    ) {
+                        end++
+                    }
+                    features.add(cell(latS, latS + dLat, lon0 + dLon * col, lon0 + dLon * (end + 1), cls, opacity))
+                    col = end + 1
                 }
             }
         }
@@ -86,11 +112,11 @@ object CoverageLayer {
             features.joinToString(",\n") + "\n]}\n"
     }
 
-    private fun cell(south: Double, north: Double, west: Double, east: Double, cls: Int): String {
+    private fun cell(south: Double, north: Double, west: Double, east: Double, cls: Int, opacity: Double): String {
         val ring = pos(south, west) + "," + pos(south, east) + "," + pos(north, east) + "," + pos(north, west) + "," +
             pos(south, west)
         return "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[" + ring +
-            "]]},\"properties\":{\"fill\":\"" + classColors[cls] + "\",\"fill-opacity\":" + FILL_OPACITY.toString() +
+            "]]},\"properties\":{\"fill\":\"" + colorOf(cls) + "\",\"fill-opacity\":" + opacity.toString() +
             ",\"stroke-width\":0,\"stroke-opacity\":0,\"class\":" + cls + "}}"
     }
 

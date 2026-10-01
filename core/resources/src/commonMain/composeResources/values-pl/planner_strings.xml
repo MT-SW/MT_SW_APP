@@ -57,6 +57,7 @@
     <string name="planner_coverage_need_point">%1$s nie ma położenia – ustaw je wyżej przed obliczeniem.</string>
     <string name="planner_coverage_radials">Liczba promieni</string>
     <string name="planner_coverage_range">Maksymalny zasięg</string>
+    <string name="planner_coverage_opacity">Krycie warstwy na mapie: %1$s (działa po ponownym „Pokaż na mapie”)</string>
     <string name="planner_coverage_rx_gain">Zysk anteny odbiorczej</string>
     <string name="planner_coverage_rx_height">Wysokość anteny odbiorczej</string>
     <string name="planner_coverage_side">Stacja do obliczenia zasięgu</string>
