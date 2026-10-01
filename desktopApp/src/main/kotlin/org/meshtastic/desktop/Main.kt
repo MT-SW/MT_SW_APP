@@ -107,7 +107,7 @@ import org.meshtastic.core.ui.util.LocalInlineMapProvider
 import org.meshtastic.core.ui.util.LocalMapMainScreenProvider
 import org.meshtastic.core.ui.util.LocalMapViewProvider
 import org.meshtastic.core.ui.util.LocalNodeTrackMapProvider
-import org.meshtastic.core.ui.util.LocalSitePlannerAvailable
+import org.meshtastic.core.ui.util.LocalPlannerAvailable
 import org.meshtastic.core.ui.util.LocalTerminateApplication
 import org.meshtastic.core.ui.util.LocalTracerouteMapOverlayInsetsProvider
 import org.meshtastic.core.ui.util.LocalTracerouteMapProvider
@@ -464,18 +464,17 @@ private fun ApplicationScope.MeshtasticWindow(
                 LocalEventBranding provides eventEdition,
                 LocalTerminateApplication provides { exitApplication() },
                 LocalMapViewProvider provides desktopMapViewProvider(),
-                // The planner runs in the browser here rather than in the app; the button is still offered.
-                LocalSitePlannerAvailable provides true,
+                LocalPlannerAvailable provides true,
                 // mapGraph renders the Map tab through this seam, not through LocalMapViewProvider
                 // directly; without it the tab falls back to the "Map" placeholder.
                 LocalMapMainScreenProvider provides
-                    { onClickNodeChip, navigateToNodeDetails, waypointId, sitePlannerNodeNum ->
+                    { onClickNodeChip, navigateToNodeDetails, waypointId, plannerNodeNum ->
                         MapScreen(
                             viewModel = koinViewModel<SharedMapViewModel>(),
                             onClickNodeChip = onClickNodeChip,
                             navigateToNodeDetails = navigateToNodeDetails,
                             waypointId = waypointId,
-                            sitePlannerNodeNum = sitePlannerNodeNum,
+                            plannerNodeNum = plannerNodeNum,
                         )
                     },
                 LocalInlineMapProvider provides { node, modifier -> MapLibreInlineMap(node, modifier) },

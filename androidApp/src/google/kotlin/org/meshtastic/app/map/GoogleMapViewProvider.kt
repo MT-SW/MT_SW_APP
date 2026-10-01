@@ -31,11 +31,11 @@ class GoogleMapViewProvider : MapViewProvider {
         modifier: Modifier,
         navigateToNodeDetails: (Int) -> Unit,
         waypointId: Int?,
-        sitePlannerNodeNum: Int?,
+        plannerNodeNum: Int?,
     ) {
         val mapViewModel: MapViewModel = koinViewModel()
         SideEffect(waypointId) { mapViewModel.setWaypointId(waypointId) }
-        SideEffect(sitePlannerNodeNum) { mapViewModel.setSitePlannerNodeNum(sitePlannerNodeNum) }
+        SideEffect(plannerNodeNum) { mapViewModel.setPlannerNodeNum(plannerNodeNum) }
         org.meshtastic.app.map.MapView(
             modifier = modifier,
             mapViewModel = mapViewModel,

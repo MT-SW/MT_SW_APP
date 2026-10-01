@@ -239,7 +239,6 @@
     <!-- SHOW -->
     <string name="shutdown">Τερματισμός λειτουργίας</string>
     <!-- SITE -->
-    <string name="site_planner_section_display">Οθόνη</string>
     <string name="swipe_action_delete">Διαγραφή</string>
     <string name="swipe_action_mute">Σίγαση</string>
     <!-- TAK -->

@@ -143,16 +143,16 @@ class MapViewModel(
     val selectedWaypointId: StateFlow<Int?> = _selectedWaypointId.asStateFlow()
 
     // Injected by the map provider because this SavedStateHandle is not the Navigation 3 entry's route state.
-    private val sitePlannerRequestState = SitePlannerRequestState(nodeRepository.nodeDBbyNum)
-    val sitePlannerRequest: StateFlow<Node?> =
-        sitePlannerRequestState.request.stateInWhileSubscribed(initialValue = null)
+    private val plannerRequestState = PlannerRequestState(nodeRepository.nodeDBbyNum)
+    val plannerRequest: StateFlow<Node?> =
+        plannerRequestState.request.stateInWhileSubscribed(initialValue = null)
 
-    fun setSitePlannerNodeNum(nodeNum: Int?) {
-        sitePlannerRequestState.setNodeNum(nodeNum)
+    fun setPlannerNodeNum(nodeNum: Int?) {
+        plannerRequestState.setNodeNum(nodeNum)
     }
 
-    fun consumeSitePlannerRequest(nodeNum: Int) {
-        sitePlannerRequestState.consume(nodeNum)
+    fun consumePlannerRequest(nodeNum: Int) {
+        plannerRequestState.consume(nodeNum)
     }
 
     fun setWaypointId(id: Int?) {

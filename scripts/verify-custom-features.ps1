@@ -61,7 +61,6 @@ $checks = @(
         @{ File = "desktopApp\src\main\kotlin\org\meshtastic\desktop\map\DesktopMapScreen.kt"; Pattern = "DesktopMapFilterDropdown"; Feature = "Desktop: filtr mapy + dialog warstw" }
         @{ File = "desktopApp\src\main\kotlin\org\meshtastic\desktop\map\DesktopMapLayerManager.kt"; Pattern = "addGeoJsonLayer"; Feature = "Desktop: import warstw GeoJSON/KML" }
         @{ File = "desktopApp\src\main\kotlin\org\meshtastic\desktop\map\TileCache.kt"; Pattern = "TileCache"; Feature = "Desktop: cache kafelków offline" }
-        @{ File = "desktopApp\src\main\kotlin\org\meshtastic\desktop\siteplanner\JcefRuntime.kt"; Pattern = "CefAppBuilder"; Feature = "Desktop:
 
 Write-Host ""
 Write-Host "=== Weryfikacja autorskich funkcji forka ===" -ForegroundColor Cyan

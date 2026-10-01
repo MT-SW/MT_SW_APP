@@ -72,10 +72,7 @@ fun EntryProviderScope<NavKey>.desktopNavGraph(
             multiBackstack.navigateTopLevel(TopLevelDestination.Nodes.route)
             multiBackstack.backStacks[TopLevelDestination.Nodes.route]?.add(NodesRoute.NodeDetail(id))
         }
-        // ZAŁOŻENIE DO WERYFIKACJI: zakładam że MapRoute.Map ma teraz pole sitePlannerNodeNum
-        // analogiczne do waypointId. Jeśli kompilator powie "unresolved reference", wklej mi
-        // definicję MapRoute.Map, żeby sprawdzić jak faktycznie się nazywa / czy istnieje.
-        mapScreen(openNodeInNodesTab, openNodeInNodesTab, args.waypointId, args.sitePlannerNodeNum)
+        mapScreen(openNodeInNodesTab, openNodeInNodesTab, args.waypointId, args.plannerNodeNum)
     }
     firmwareGraph(backStack)
     settingsGraph(backStack, settingsRadioConfigViewModel)

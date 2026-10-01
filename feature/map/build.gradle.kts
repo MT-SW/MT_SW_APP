@@ -41,6 +41,8 @@ kotlin {
             implementation(projects.core.resources)
             implementation(projects.core.ui)
             implementation(projects.core.di)
+            // Planner: Terrarium elevation tiles (Mapterhorn) for the native MT_SW Planner. map-terrain has no dependency on this module.
+            implementation(projects.feature.mapTerrain)
             // The imported-layer store: Okio for the files it keeps, Ktor for the network layers it fetches.
             implementation(libs.okio)
             implementation(libs.ktor.client.core)

@@ -95,7 +95,7 @@ import org.maplibre.compose.layers.LocationIndicatorDefaults as CoreLocationIndi
  * Since maplibre-compose 0.16.0 the base style and the sources and layers over it belong to the state rather than to a
  * trailing block on `MaplibreMap`, so this is where the mesh data is read and turned into layers. [MeshMap] presents
  * the result. The state is returned because the caller also needs it: the toolbar reads the bearing off it, the zoom
- * buttons move it, and the Site Planner asks it where the map is pointed.
+ * buttons move it, and the Planner asks it where the map is pointed.
  *
  * The camera effects stay out of the style block, even though that is where upstream puts `LocationTrackingEffect`. The
  * library hosts style content in a subcomposition keyed on the loaded style and disposes it on every base-style switch,

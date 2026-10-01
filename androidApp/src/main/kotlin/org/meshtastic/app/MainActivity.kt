@@ -97,7 +97,7 @@ import org.meshtastic.core.ui.util.LocalNfcScannerProvider
 import org.meshtastic.core.ui.util.LocalNfcScannerSupported
 import org.meshtastic.core.ui.util.LocalNfcWriterProvider
 import org.meshtastic.core.ui.util.LocalNodeTrackMapProvider
-import org.meshtastic.core.ui.util.LocalSitePlannerAvailable
+import org.meshtastic.core.ui.util.LocalPlannerAvailable
 import org.meshtastic.core.ui.util.LocalTracerouteMapOverlayInsetsProvider
 import org.meshtastic.core.ui.util.LocalTerminateApplication
 import org.meshtastic.core.ui.util.LocalTracerouteMapProvider
@@ -279,7 +279,7 @@ class MainActivity : AppCompatActivity() {
                 packageManager.hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION),
             LocalAnalyticsIntroProvider provides { AnalyticsIntro() },
             LocalMapViewProvider provides getMapViewProvider(),
-            LocalSitePlannerAvailable provides true,
+            LocalPlannerAvailable provides true,
             LocalInlineMapProvider provides { node, modifier -> InlineMap(node, modifier) },
             LocalNodeTrackMapProvider provides
                 { destNum, positions, modifier, selectedPositionTime, onPositionSelected, showAttribution ->
@@ -307,14 +307,14 @@ class MainActivity : AppCompatActivity() {
                     org.meshtastic.app.map.discovery.DiscoveryMap(userLat, userLon, nodes, modifier)
                 },
             LocalMapMainScreenProvider provides
-                { onClickNodeChip, navigateToNodeDetails, waypointId, sitePlannerNodeNum ->
+                { onClickNodeChip, navigateToNodeDetails, waypointId, plannerNodeNum ->
                     val viewModel = koinViewModel<SharedMapViewModel>()
                     MapScreen(
                         viewModel = viewModel,
                         onClickNodeChip = onClickNodeChip,
                         navigateToNodeDetails = navigateToNodeDetails,
                         waypointId = waypointId,
-                        sitePlannerNodeNum = sitePlannerNodeNum,
+                        plannerNodeNum = plannerNodeNum,
                     )
                 },
             content = content,
@@ -395,7 +395,7 @@ class MainActivity : AppCompatActivity() {
         when {
             stream != null -> importMapFile(stream)
 
-            // shared .geojson/.kml file (e.g. Site Planner)
+            // shared .geojson/.kml file (e.g. from an external planner)
             text != null -> createShareIntent(text).send()
         }
     }
@@ -407,7 +407,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Import a map file received via an OS "Open in / Send to Meshtastic" intent — the Site Planner's "Send to App"
+     * Import a map file received via an OS "Open in / Send to Meshtastic" intent — an external planner's "Send to App"
      * share among them — then bring the Map tab forward so the overlay is visible.
      *
      * Handed to the layer store directly rather than through a one-slot bus for the map to drain. The store is common

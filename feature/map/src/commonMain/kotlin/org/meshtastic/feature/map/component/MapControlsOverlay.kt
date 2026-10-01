@@ -33,8 +33,8 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.map_filter
 import org.meshtastic.core.resources.orient_north
+import org.meshtastic.core.resources.planner_title
 import org.meshtastic.core.resources.refresh
-import org.meshtastic.core.resources.site_planner
 import org.meshtastic.core.resources.toggle_my_position
 import org.meshtastic.core.ui.icon.CellTower
 import org.meshtastic.core.ui.icon.LocationDisabled
@@ -78,7 +78,8 @@ fun MapControlsOverlay(
     filtersActive: Boolean = false,
     mapTypeContent: @Composable () -> Unit = {},
     layersContent: @Composable () -> Unit = {},
-    onSitePlannerClick: (() -> Unit)? = null,
+    /** Null hides the button; opens the native MT_SW Planner. */
+    onPlannerClick: (() -> Unit)? = null,
     isLocationTrackingEnabled: Boolean = false,
     /** Null hides the button, for maps with no location plumbing behind it — the node-track map. */
     onToggleLocationTracking: (() -> Unit)? = null,
@@ -114,11 +115,11 @@ fun MapControlsOverlay(
         // Layers button (flavor-specific)
         layersContent()
 
-        // Site Planner coverage estimate (optional; provided by the Google flavor)
-        onSitePlannerClick?.let { onClick ->
+        // MT_SW Planner (optional)
+        onPlannerClick?.let { onClick ->
             MapButton(
                 icon = MeshtasticIcons.CellTower,
-                contentDescription = stringResource(Res.string.site_planner),
+                contentDescription = stringResource(Res.string.planner_title),
                 onClick = onClick,
             )
         }

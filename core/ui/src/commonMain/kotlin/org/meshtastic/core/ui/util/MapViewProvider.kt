@@ -30,7 +30,7 @@ interface MapViewProvider {
         modifier: Modifier,
         navigateToNodeDetails: (Int) -> Unit,
         waypointId: Int? = null,
-        sitePlannerNodeNum: Int? = null,
+        plannerNodeNum: Int? = null,
     )
 }
 

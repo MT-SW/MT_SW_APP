@@ -25,9 +25,9 @@ import org.meshtastic.feature.map.maplibre.component.ImportedLayersSlot
 import org.meshtastic.feature.map.maplibre.layers.rememberRenderableLayers
 
 /**
- * The desktop map provider: the shared MapLibre surfaces, the browser-handed Site Planner, and — through the same
- * imported-layer manager the Android flavours mount — the layers sheet that lets a Site Planner GeoJSON, or any
- * KML/KMZ/GeoJSON, be imported here too.
+ * The desktop map provider: the shared MapLibre surfaces (which include the native MT_SW Planner) and — through the
+ * same imported-layer manager the Android flavours mount — the layers sheet that lets any KML/KMZ/GeoJSON be imported
+ * here too.
  */
 internal fun desktopMapViewProvider(): MapLibreMapViewProvider = MapLibreMapViewProvider(
     customLayers = {
@@ -35,6 +35,5 @@ internal fun desktopMapViewProvider(): MapLibreMapViewProvider = MapLibreMapView
         val importedLayers by layersManager.mapLayers.collectAsState()
         rememberRenderableLayers(layersManager, importedLayers.filter { it.isVisible })
     },
-    sitePlanner = { session -> DesktopSitePlannerSlot(session) },
     layersSheetExtra = { ImportedLayersSlot() },
 )
