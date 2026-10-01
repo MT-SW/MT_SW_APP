@@ -185,6 +185,7 @@ class PlannerComputer(
             extraLossDb = state.extraLossDb,
             maxRangeKm = state.coverageMaxRangeKm,
             radials = state.coverageRadials,
+            rangeSteps = (state.coverageMaxRangeKm * 2.0).toInt().coerceIn(60, 150),
         )
         return withContext(computeDispatcher) { Coverage.compute(input, sampler, onProgress) }
     }

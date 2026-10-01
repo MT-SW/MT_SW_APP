@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.KoinViewModel
+import org.meshtastic.feature.map.planner.CoverageLayer
 import org.meshtastic.feature.map.planner.FeederBuilder
 import org.meshtastic.feature.map.planner.FeederConfig
 import org.meshtastic.feature.map.planner.PlannerBands
@@ -296,10 +297,10 @@ class PlannerViewModel(
 
     fun setCoverageMaxRangeKm(km: Double) {
         if (km.isNaN()) return
-        mutate(recompute = false) { it.copy(coverageMaxRangeKm = km.coerceIn(1.0, 100.0)) }
+        mutate(recompute = false) { it.copy(coverageMaxRangeKm = km.coerceIn(1.0, 300.0)) }
     }
 
-    fun setCoverageRadials(count: Int) = mutate(recompute = false) { it.copy(coverageRadials = count.coerceIn(8, 180)) }
+    fun setCoverageRadials(count: Int) = mutate(recompute = false) { it.copy(coverageRadials = count.coerceIn(8, 360)) }
 
     fun setCoverageRxHeightM(meters: Double) {
         if (meters.isNaN()) return
@@ -380,6 +381,12 @@ class PlannerViewModel(
     suspend fun exportGeoJson(strings: PlannerReportStrings): String {
         val report = buildReport(strings)
         return withContext(Dispatchers.Default) { PlannerGeoJson.render(report) }
+    }
+
+    /** Map-layer GeoJSON (filled sectors, heat-map look) of the calculated coverage, or null when there is none. */
+    suspend fun coverageLayerGeoJson(name: String): String? {
+        val coverage = uiState.value.coverage ?: return null
+        return withContext(Dispatchers.Default) { CoverageLayer.render(coverage, name) }
     }
 
     /** PNG of the terrain profile chart, or null when no profile has been calculated. */

@@ -210,8 +210,8 @@ data class PlannerUiState(
     val hintsBySide: Map<PlannerSide, List<PlannerHint>> = emptyMap(),
     // ---- coverage ----
     val coverageSide: PlannerSide = PlannerSide.A,
-    val coverageMaxRangeKm: Double = 30.0,
-    val coverageRadials: Int = 72,
+    val coverageMaxRangeKm: Double = 50.0,
+    val coverageRadials: Int = 180,
     val coverageRxHeightM: Double = 2.0,
     val coverageRxGainDbi: Double = 0.0,
     val coverageComputing: Boolean = false,
