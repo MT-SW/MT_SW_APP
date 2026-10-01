@@ -443,7 +443,7 @@
     <string name="debug_store_logs_title">Przechowuj logi sieci</string>
     <string name="debug_tab_app_logs">Dzienniki aplikacji</string>
     <string name="debug_tab_device_logs">Logi urządzenia</string>
-    <string name="debug_device_logs_empty">Brak logów urządzenia. Włącz „Logi debugowania” w ustawieniach zabezpieczeń urządzenia, aby radio wysyłało do aplikacji te same logi, które widać na porcie szeregowym.</string>
+    <string name="debug_device_logs_empty">Brak logów urządzenia. Włącz „Logi debugowania” w ustawieniach zabezpieczeń urządzenia, aby radio wysyłało do aplikacji te same logi, które widać na porcie szeregowym. Aplikacja wyświetla każdy log, który dostanie, ale to firmware decyduje, przez jakie połączenie go wysyła — jeśli przez Wi-Fi nic się nie pojawia, spróbuj przez Bluetooth lub USB.</string>
     <string name="debug_tab_packets">Pakiety</string>
     <string name="deep_link_connect_message">Link prosi tę aplikację o połączenie z urządzeniem pod adresem %1$s. Kontynuuj tylko jeśli ufasz źródłu tego linku.</string>
     <string name="deep_link_connect_title">Połączyć z tym urządzeniem?</string>
