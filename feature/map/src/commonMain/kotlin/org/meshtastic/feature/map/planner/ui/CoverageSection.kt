@@ -86,8 +86,8 @@ import kotlin.math.roundToInt
 private const val GRID = 80
 private const val METERS_PER_DEG_LAT = 110_574.0
 private const val METERS_PER_DEG_LON_EQUATOR = 111_320.0
-private const val MAX_RANGE_KM = 100.0
-private const val MAX_RADIALS = 180
+private const val MAX_RANGE_KM = 300.0
+private const val MAX_RADIALS = 360
 private const val MIN_RADIALS = 8
 private const val MAX_RX_HEIGHT_M = 100.0
 private const val MIN_RX_GAIN = -10.0
@@ -243,7 +243,7 @@ internal suspend fun showOnMap(
     bridge: PlannerMapBridge,
     layerName: String,
 ) {
-    val json = vm.exportGeoJson(strings)
+    val json = vm.coverageLayerGeoJson(layerName) ?: vm.exportGeoJson(strings)
     bridge.addGeoJsonLayer(layerName, json)
     val st = vm.uiState.value
     val target = st.coverage?.center ?: st.a.point ?: st.b.point
