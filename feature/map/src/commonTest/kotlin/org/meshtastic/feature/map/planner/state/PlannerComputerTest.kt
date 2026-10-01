@@ -151,7 +151,7 @@ class PlannerComputerTest {
         assertEquals(PlannerSide.B, cmp.nodeSide)
         assertTrue(cmp.direct)
         assertEquals(link.bToA.rxPowerDbm, cmp.predictedRssiDbm, 1e-9)
-        val floor = -174.0 + 10.0 * kotlin.math.log10(250000.0) + 6.0
+        val floor = -174.0 + 10.0 * kotlin.math.log10(62500.0) + 6.0
         assertEquals(floor, cmp.noiseFloorDbm, 1e-9)
         assertEquals(link.bToA.rxPowerDbm - floor, cmp.predictedSnrDb, 1e-9)
         assertEquals(-100 - link.bToA.rxPowerDbm, assertNotNull(cmp.rssiDeltaDb), 1e-9)
