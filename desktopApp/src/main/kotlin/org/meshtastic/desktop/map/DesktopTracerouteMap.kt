@@ -65,6 +65,8 @@ fun DesktopTracerouteMap(
     MapLibreTracerouteMap(
         forwardRoute = tracerouteOverlay?.forwardRoute.orEmpty(),
         returnRoute = tracerouteOverlay?.returnRoute.orEmpty(),
+        forwardSnr = tracerouteOverlay?.forwardSnr.orEmpty(),
+        returnSnr = tracerouteOverlay?.returnSnr.orEmpty(),
         nodeLookup = selection.nodeLookup,
         modifier = modifier,
     )

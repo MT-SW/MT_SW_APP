@@ -154,6 +154,8 @@ fun MapLibreTracerouteMap(
     returnRoute: List<Int>,
     nodeLookup: Map<Int, Node>,
     modifier: Modifier = Modifier,
+    forwardSnr: List<Int> = emptyList(),
+    returnSnr: List<Int> = emptyList(),
     customBasemaps: @Composable () -> List<Basemap.Raster> = { customRasterBasemaps() },
 ) {
     // Null for the one frame before the basemap preference has loaded from disk; see rememberBasemapSelection.
@@ -162,7 +164,13 @@ fun MapLibreTracerouteMap(
 
     val mapState =
         rememberSecondaryMapState(basemaps) {
-            TracerouteLayers(forwardRoute = forwardRoute, returnRoute = returnRoute, nodeLookup = nodeLookup)
+            TracerouteLayers(
+                forwardRoute = forwardRoute,
+                returnRoute = returnRoute,
+                forwardSnr = forwardSnr,
+                returnSnr = returnSnr,
+                nodeLookup = nodeLookup,
+            )
             TracerouteHopLayers(hops)
         }
 

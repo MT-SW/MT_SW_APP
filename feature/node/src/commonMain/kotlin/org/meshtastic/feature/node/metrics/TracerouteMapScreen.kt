@@ -45,13 +45,11 @@ import org.meshtastic.core.model.TracerouteOverlay
 import org.meshtastic.core.model.fullRouteDiscovery
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.traceroute
-import org.meshtastic.core.resources.traceroute_outgoing_route
-import org.meshtastic.core.resources.traceroute_return_route
 import org.meshtastic.core.resources.traceroute_showing_nodes
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Route
-import org.meshtastic.core.ui.theme.TracerouteColors
 import org.meshtastic.core.ui.util.LocalTracerouteMapOverlayInsetsProvider
 import org.meshtastic.core.ui.util.LocalTracerouteMapProvider
 import org.meshtastic.proto.Position
@@ -78,7 +76,7 @@ fun TracerouteMapScreen(
     val routeDiscovery = tracerouteResult?.fromRadio?.packet?.fullRouteDiscovery
     val overlayFromLogs =
         remember(routeDiscovery, requestId) {
-            routeDiscovery?.let { TracerouteOverlay(requestId, it.route, it.route_back) }
+            routeDiscovery?.let { TracerouteOverlay(requestId, it.route, it.route_back, it.snr_towards, it.snr_back) }
         }
     val overlayFromService = remember(requestId) { metricsViewModel.getTracerouteOverlay(requestId) }
     val overlay = overlayFromLogs ?: overlayFromService
@@ -140,16 +138,15 @@ private fun TracerouteMapScaffold(
 
 @Composable
 private fun TracerouteLegend(modifier: Modifier = Modifier) {
+    // Every hop is coloured by the quality its SNR rates, the same palette as the signal indicators in the app.
     Card(modifier = modifier) {
         Column(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            LegendRow(
-                color = TracerouteColors.OutgoingRoute,
-                label = stringResource(Res.string.traceroute_outgoing_route),
-            )
-            LegendRow(color = TracerouteColors.ReturnRoute, label = stringResource(Res.string.traceroute_return_route))
+            Quality.entries.reversed().forEach { quality ->
+                LegendRow(color = quality.color.invoke(), label = stringResource(quality.nameRes))
+            }
         }
     }
 }

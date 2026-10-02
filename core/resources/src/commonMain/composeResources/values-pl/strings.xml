@@ -2268,6 +2268,7 @@
     <string name="traceroute_diff">Skoki do: %1$d. Skoki od: %2$d</string>
     <string name="traceroute_direct">Bezpośrednio</string>
     <string name="traceroute_duration">Czas trwania: %1$s s</string>
+    <string name="traceroute_relays_missing">Mapa jest dostępna tylko wtedy, gdy wszystkie węzły na trasie mają lokalizację, a przynajmniej jeden węzeł pośredni jej nie ma.</string>
     <string name="traceroute_endpoint_missing">Nie można wyświetlić trasy na mapie, ponieważ węzeł początkowy lub końcowy nie posiada aktualnej lokalizacji.</string>
     <string name="traceroute_forward_hops">Skoki w przód</string>
     <plurals name="traceroute_hops">

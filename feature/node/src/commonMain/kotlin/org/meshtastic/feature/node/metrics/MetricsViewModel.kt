@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
@@ -69,6 +70,10 @@ import org.meshtastic.core.resources.traceroute
 import org.meshtastic.core.resources.view_on_map
 import org.meshtastic.core.ui.util.AlertManager
 import org.meshtastic.core.ui.util.toMessageRes
+import org.jetbrains.compose.resources.stringResource
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.unit.dp
 import org.meshtastic.core.ui.viewmodel.safeLaunch
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
 import org.meshtastic.feature.node.detail.NodeRequestActions
@@ -321,38 +326,33 @@ open class MetricsViewModel(
     ) {
         safeLaunch(tag = "showTracerouteDetail") {
             val snapshotPositions = tracerouteSnapshotRepository.getSnapshotPositions(responseLogUuid).first()
+            val positionedNodeNums =
+                if (snapshotPositions.isNotEmpty()) {
+                    snapshotPositions.keys
+                } else {
+                    positionedNodeNums()
+                }
+            val availability =
+                evaluateTracerouteMapAvailability(
+                    forwardRoute = overlay?.forwardRoute.orEmpty(),
+                    returnRoute = overlay?.returnRoute.orEmpty(),
+                    positionedNodeNums = positionedNodeNums,
+                )
+            // The map button exists only when the whole route can be drawn; otherwise the reason is shown instead.
+            val errorRes = availability.toMessageRes()
             alertManager.showAlert(
                 titleRes = Res.string.traceroute,
                 composableMessage = {
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                         SelectionContainer { Text(text = annotatedMessage) }
+                        if (errorRes != null) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(text = stringResource(errorRes), color = MaterialTheme.colorScheme.error)
+                        }
                     }
                 },
-                confirmTextRes = Res.string.view_on_map,
-                onConfirm = {
-                    val positionedNodeNums =
-                        if (snapshotPositions.isNotEmpty()) {
-                            snapshotPositions.keys
-                        } else {
-                            positionedNodeNums()
-                        }
-                    val availability =
-                        evaluateTracerouteMapAvailability(
-                            forwardRoute = overlay?.forwardRoute.orEmpty(),
-                            returnRoute = overlay?.returnRoute.orEmpty(),
-                            positionedNodeNums = positionedNodeNums,
-                        )
-                    val errorRes = availability.toMessageRes()
-                    if (errorRes != null) {
-                        // Post the error alert after the current alert is dismissed to avoid
-                        // the wrapping dismissAlert() in AlertManager immediately clearing it.
-                        safeLaunch(tag = "tracerouteError") {
-                            alertManager.showAlert(titleRes = Res.string.traceroute, messageRes = errorRes)
-                        }
-                    } else {
-                        onViewOnMap(requestId, responseLogUuid)
-                    }
-                },
+                confirmTextRes = if (errorRes == null) Res.string.view_on_map else null,
+                onConfirm = if (errorRes == null) ({ onViewOnMap(requestId, responseLogUuid) }) else null,
                 dismissTextRes = Res.string.okay,
             )
         }
