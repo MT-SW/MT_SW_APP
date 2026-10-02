@@ -21,24 +21,20 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
-import org.maplibre.compose.expressions.dsl.and
-import org.maplibre.compose.expressions.dsl.asNumber
 import org.maplibre.compose.expressions.dsl.const
-import org.maplibre.compose.expressions.dsl.feature
-import org.maplibre.compose.expressions.dsl.gt
-import org.maplibre.compose.expressions.dsl.not
 import org.maplibre.compose.layers.CircleLayer
-import org.maplibre.compose.sources.VectorSource
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.model.Node
-import org.meshtastic.feature.map.RECENTLY_HEARD_SECONDS
 import org.meshtastic.feature.map.heardJustNow
-import org.meshtastic.feature.map.maplibre.geojson.NodeFeatureKeys
+import org.meshtastic.feature.map.maplibre.geojson.nodesToFeatureCollection
+import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
 import org.meshtastic.feature.map.maplibre.style.MapColors
+import kotlin.math.roundToInt
 
 /**
  * A one-second halo under any node heard in the last few seconds.
@@ -56,10 +52,15 @@ import org.meshtastic.feature.map.maplibre.style.MapColors
  * between packets is invisible.
  */
 @Composable
-internal fun NodePulseLayer(nodes: List<Node>, source: VectorSource) {
-    val heardJustNow = remember(nodes) { nodes.heardJustNow(nowSeconds) }
-    // Frozen with the membership so the filter cannot drift out from under a pulse already running.
-    val cutoff = remember(heardJustNow) { (nowSeconds - RECENTLY_HEARD_SECONDS).toInt() }
+internal fun NodePulseLayer(nodes: List<Node>, unclustered: List<Node>) {
+    // Which unclustered nodes were just heard. Only this small list reaches the pulse's own source, so a packet no
+    // longer republishes (and re-clusters) the whole mesh just to flash one halo.
+    val heardJustNow =
+        remember(nodes, unclustered) {
+            val visible = unclustered.mapTo(HashSet()) { it.num }
+            nodes.heardJustNow(nowSeconds).filter { it.num in visible }
+        }
+    val source = rememberFeatureSource(heardJustNow) { nodesToFeatureCollection(heardJustNow) }
 
     val progress = remember { Animatable(PULSE_FINISHED) }
     LaunchedEffect(heardJustNow) {
@@ -69,16 +70,18 @@ internal fun NodePulseLayer(nodes: List<Node>, source: VectorSource) {
         }
     }
 
+    // The halo moves in PULSE_STEPS notches instead of every frame: each change is a style update on the map thread,
+    // and the eye cannot tell fifteen from sixty on a one-second fade, but the map can.
+    val step by remember { derivedStateOf { (progress.value * PULSE_STEPS).roundToInt() } }
+    val fraction = step.toFloat() / PULSE_STEPS
+    val idle = heardJustNow.isEmpty() || step >= PULSE_STEPS
+
     // The layer stays mounted and idles at zero opacity rather than existing only while a pulse runs. Layer addition
     // is queued onto the map thread, so a layer that lives for a single second can be removed again before it is ever
     // added — which is what the first attempt did, and why nothing drew at all.
-    val fraction by progress.asState()
-    val idle = heardJustNow.isEmpty() || fraction >= PULSE_FINISHED
-
     CircleLayer(
         id = "node-pulse",
         source = source,
-        filter = !feature.has("point_count") and (feature[NodeFeatureKeys.LAST_HEARD].asNumber() gt const(cutoff)),
         color = const(MapColors.Highlight),
         opacity = const(if (idle) 0f else (PULSE_FINISHED - fraction) * PULSE_PEAK_OPACITY),
         radius = const(lerp(PULSE_START_DP.dp, PULSE_END_DP.dp, fraction)),
@@ -97,6 +100,7 @@ internal fun List<Node>.heardJustNow(now: Long): List<Node> = filter { heardJust
 /** How long one pulse takes to grow and fade, in milliseconds. The membership window is [RECENTLY_HEARD_SECONDS]. */
 private const val PULSE_MILLIS = 1000
 private const val PULSE_FINISHED = 1f
+private const val PULSE_STEPS = 15
 
 /**
  * Starts just inside the node chip and grows well past it, so the halo emerges from behind the chip rather than being

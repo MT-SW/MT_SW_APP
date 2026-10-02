@@ -29,7 +29,6 @@ object NodeFeatureKeys {
     const val IS_SELF = "isSelf"
     const val FOREGROUND = "fg"
     const val BACKGROUND = "bg"
-    const val LAST_HEARD = "lastHeard"
     const val PRECISION_METERS = "precisionMeters"
 
     /** Which rasterized chip image this node's marker should use. See NodeChipLayer. */

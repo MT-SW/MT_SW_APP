@@ -35,6 +35,7 @@ import coil3.request.ImageRequest
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.decodeToImageBitmap
 import org.maplibre.compose.expressions.ast.Expression
+import org.maplibre.compose.expressions.dsl.and
 import org.maplibre.compose.expressions.dsl.asNumber
 import org.maplibre.compose.expressions.dsl.asString
 import org.maplibre.compose.expressions.dsl.case
@@ -44,6 +45,7 @@ import org.maplibre.compose.expressions.dsl.convertToColor
 import org.maplibre.compose.expressions.dsl.dp
 import org.maplibre.compose.expressions.dsl.eq
 import org.maplibre.compose.expressions.dsl.feature
+import org.maplibre.compose.expressions.dsl.gt
 import org.maplibre.compose.expressions.dsl.image
 import org.maplibre.compose.expressions.dsl.or
 import org.maplibre.compose.expressions.dsl.switch
@@ -120,13 +122,15 @@ private fun ImportedLayer(layer: CustomLayer, opacity: Float) {
         source = source,
         // Polygons are here too, for their rings: `fill-outline-color` is always a hairline, so an import asking
         // for a 5dp border would silently get one pixel. The Google flavor honours the width, and so does this.
+        // Features that asked for an invisible stroke (the planner's coverage cells) are filtered out here, so
+        // thousands of outlines nobody can see are never built.
         filter =
         geometryIsOneOf(
             GeometryType.LineString,
             GeometryType.MultiLineString,
             GeometryType.Polygon,
             GeometryType.MultiPolygon,
-        ),
+        ) and (feature["stroke-opacity"].asNumber(const(1f)) gt const(0f)),
         color = strokeColor,
         opacity = feature["stroke-opacity"].asNumber(const(1f)) * const(opacity),
         width = strokeWidth,
