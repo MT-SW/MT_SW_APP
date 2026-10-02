@@ -102,10 +102,11 @@ fun NodeLayers(
     // What clustering will leave standing on its own. Both the precision circles and the chips are only wanted for
     // these: a node folded into a cluster is not drawn, so decorating it paints something nobody asked about — at
     // event density 2,500 translucent circles stack into one opaque disc over the whole venue.
+    val drawnNodes = rememberDrawnNodes(nodes)
     val unclustered =
-        remember(nodes, zoom) {
+        remember(drawnNodes, zoom) {
             unclusteredNodes(
-                nodes = nodes,
+                nodes = drawnNodes,
                 zoom = zoom,
                 radiusPx = CLUSTER_RADIUS,
                 minPoints = CLUSTER_MIN_POINTS,
@@ -130,7 +131,7 @@ fun NodeLayers(
     // spatial property, so a node at the edge of the viewport with neighbours just outside it is not in fact alone;
     // and this keeps the O(n) grid pass keyed on the zoom rather than on the viewport, which changes every frame of
     // a pan. Narrowing afterwards is an order-preserving filter.
-    val rankedNodes = remember(nodes, zoom) { nodesByIsolation(nodes, zoom, CLUSTER_RADIUS) }
+    val rankedNodes = remember(drawnNodes, zoom) { nodesByIsolation(drawnNodes, zoom, CLUSTER_RADIUS) }
     val chipNodes = remember(rankedNodes, visibleBounds) { nodesInView(rankedNodes, visibleBounds) }
 
     // getClusterExpansionZoom became a suspend function in maplibre-compose 0.15.0 (feature queries
@@ -143,7 +144,7 @@ fun NodeLayers(
 
     val nodeSource =
         rememberFeatureSource(
-            nodes,
+            drawnNodes,
             myNodeNum,
             options =
             GeoJsonOptions(
@@ -153,7 +154,7 @@ fun NodeLayers(
                 clusterMinPoints = CLUSTER_MIN_POINTS,
             ),
         ) {
-            nodesToFeatureCollection(nodes, myNodeNum)
+            nodesToFeatureCollection(drawnNodes, myNodeNum)
         }
 
     CircleLayer(
@@ -220,7 +221,7 @@ fun NodeLayers(
     )
 
     // Under the chips, so a pulse reads as a halo around the node rather than covering it.
-    NodePulseLayer(nodes = nodes, source = nodeSource)
+    NodePulseLayer(nodes = nodes, unclustered = unclustered)
 
     // Under the chips, and normally invisible behind them: a chip is 64x28dp and covers this entirely. It exists for
     // the node whose chip image did not fit under NodeChipLayer's ceiling — without it such a node resolves to a
@@ -248,6 +249,50 @@ fun NodeLayers(
         onNodeClick = onNodeClick,
         chipFilter = !feature.has("point_count"),
     )
+}
+
+/**
+ * What decides how a node is drawn: where it is, what it is called, and the flags that change its chip. Everything
+ * else on a [Node] — last heard, SNR, battery, telemetry — changes with nearly every packet and changes nothing on the
+ * map.
+ */
+private data class NodeDrawKey(
+    val num: Int,
+    val latitude: Double,
+    val longitude: Double,
+    val shortName: String,
+    val longName: String,
+    val isFavorite: Boolean,
+    val isOnline: Boolean,
+    val isIgnored: Boolean,
+    val precisionBits: Int,
+)
+
+private fun Node.toDrawKey() =
+    NodeDrawKey(
+        num = num,
+        latitude = latitude,
+        longitude = longitude,
+        shortName = user.short_name,
+        longName = user.long_name,
+        isFavorite = isFavorite,
+        isOnline = isOnline,
+        isIgnored = isIgnored,
+        precisionBits = position.precision_bits,
+    )
+
+/**
+ * The same list for as long as nothing visible about it has changed.
+ *
+ * The node list is re-emitted on every received packet, because each one touches its sender's `lastHeard`. Everything
+ * downstream is keyed on the list, so without this each packet re-clustered the whole mesh, re-ranked it and rebuilt
+ * the precision circles — the main source of map stutter on a busy mesh. Only the pulse reads the volatile fields, and
+ * it takes the raw list.
+ */
+@Composable
+private fun rememberDrawnNodes(nodes: List<Node>): List<Node> {
+    val signature = remember(nodes) { nodes.map { it.toDrawKey() } }
+    return remember(signature) { nodes }
 }
 
 /** Small enough that a chip drawn over it hides it completely. */
