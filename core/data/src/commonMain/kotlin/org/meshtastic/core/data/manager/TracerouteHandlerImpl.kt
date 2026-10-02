@@ -99,6 +99,8 @@ class TracerouteHandlerImpl(
                     requestId = requestId,
                     forwardRoute = forwardRoute,
                     returnRoute = returnRoute,
+                    forwardSnr = routeDiscovery.snr_towards,
+                    returnSnr = routeDiscovery.snr_back,
                     logUuid = logUuid,
                 ),
             )

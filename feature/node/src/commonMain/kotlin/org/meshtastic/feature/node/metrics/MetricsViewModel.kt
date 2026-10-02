@@ -227,6 +227,8 @@ open class MetricsViewModel(
                         requestId = response.requestId,
                         forwardRoute = response.forwardRoute,
                         returnRoute = response.returnRoute,
+                        forwardSnr = response.forwardSnr,
+                        returnSnr = response.returnSnr,
                     )
                 }
                 ?.takeIf { it.hasRoutes }
@@ -255,6 +257,8 @@ open class MetricsViewModel(
                         requestId = response.requestId,
                         forwardRoute = response.forwardRoute,
                         returnRoute = response.returnRoute,
+                        forwardSnr = response.forwardSnr,
+                        returnSnr = response.returnSnr,
                     )
                 if (overlay.hasRoutes) {
                     tracerouteOverlayCache.update { it + (response.requestId to overlay) }

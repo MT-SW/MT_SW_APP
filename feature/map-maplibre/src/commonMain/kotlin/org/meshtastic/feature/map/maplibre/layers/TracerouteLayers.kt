@@ -20,12 +20,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import org.maplibre.compose.expressions.dsl.asNumber
 import org.maplibre.compose.expressions.dsl.asString
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.expressions.dsl.convertToColor
@@ -50,13 +51,9 @@ import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
  * Forward and return traceroute paths, hop by hop.
  *
  * Every hop is its own line in the colour of the signal quality its SNR rates (the same bands and palette as the
- * signal indicators elsewhere in the app), with the way the packet went and the SNR written next to it. The two
- * directions run side by side, so a route that comes back the same way, or a direct link, shows two separate arrows,
- * one per direction.
- *
- * The separation is a screen-space translate rather than an offset of the geometry, so it stays legible at every zoom.
- * A translate only separates lines that are not parallel to it, so east-west hops are pushed apart vertically and the
- * others horizontally.
+ * signal indicators elsewhere in the app), with an arrowhead at its far end and the SNR written along it. The two
+ * directions run side by side: each line is shifted a few pixels to the right of its own direction of travel, so the
+ * pair always sits at equal distances on either side of the axis between the nodes, at every zoom and orientation.
  */
 @Composable
 internal fun TracerouteLayers(
@@ -71,56 +68,71 @@ internal fun TracerouteLayers(
     val forwardEdges = remember(forwardRoute, forwardSnr, nodeLookup) { tracerouteEdges(forwardRoute, forwardSnr, nodeLookup) }
     val returnEdges = remember(returnRoute, returnSnr, nodeLookup) { tracerouteEdges(returnRoute, returnSnr, nodeLookup) }
 
-    DirectionLayers(id = "traceroute-forward", edges = forwardEdges, side = -1, preset = preset, palette = palette)
-    DirectionLayers(id = "traceroute-return", edges = returnEdges, side = 1, preset = preset, palette = palette)
+    DirectionLayers(id = "traceroute-forward", edges = forwardEdges, preset = preset, palette = palette)
+    DirectionLayers(id = "traceroute-return", edges = returnEdges, preset = preset, palette = palette)
 }
 
-/** One direction's lines and labels; [side] is -1 for the upper/left copy and 1 for the lower/right one. */
+/** One direction's lines, arrowheads and labels. */
 @Composable
 private fun DirectionLayers(
     id: String,
     edges: List<TracerouteEdge>,
-    side: Int,
     preset: ModemPreset?,
     palette: Map<Quality, String>,
-) {
-    val eastWest = edges.filter { it.isMostlyEastWest }
-    val other = edges.filterNot { it.isMostlyEastWest }
-    EdgeLayers("$id-ew", eastWest, preset, palette, dx = 0, dy = side)
-    EdgeLayers("$id-ns", other, preset, palette, dx = side, dy = 0)
-}
-
-@Composable
-private fun EdgeLayers(
-    id: String,
-    edges: List<TracerouteEdge>,
-    preset: ModemPreset?,
-    palette: Map<Quality, String>,
-    dx: Int,
-    dy: Int,
 ) {
     val lines = rememberFeatureSource(edges, preset, palette) { edgesToLines(edges, preset, palette) }
-    val labels = rememberFeatureSource(edges, preset, palette) { edgesToLabels(edges, preset, palette) }
+    val arrows = rememberFeatureSource(edges, preset, palette) { edgesToArrows(edges, preset, palette) }
 
     LineLayer(
         id = "$id-line",
         source = lines,
-        cap = const(LineCap.Round),
+        cap = const(LineCap.Butt),
         join = const(LineJoin.Round),
         color = feature[COLOR].convertToColor(const(Color.White)),
         width = const(LINE_WIDTH_DP.dp),
-        translate = const(DpOffset((dx * SEPARATION_DP).dp, (dy * SEPARATION_DP).dp)),
+        // Positive offsets are to the right of the line's own direction, so the opposite direction lands on the far side.
+        offset = const(SEPARATION_DP.dp),
     )
     SymbolLayer(
-        id = "$id-label",
+        id = "$id-arrow",
+        source = arrows,
+        textField = feature[ARROW].asString(),
+        textFont = const(listOf("Noto Sans Regular")),
+        textColor = feature[COLOR].convertToColor(const(Color.White)),
+        textHaloColor = const(Color.Black),
+        textHaloWidth = const(1.dp),
+        textRotate = feature[ROTATION].asNumber(),
+        // The offset turns with the glyph: back from the node so the tip lands on it, and to the right onto the line.
+        textOffset = textOffset((-ARROW_BACK_EM).em, SEPARATION_EM.em),
+        textAllowOverlap = const(true),
+        textIgnorePlacement = const(true),
+    )
+    // Text turned half a circle to stay upright has its left and right swapped, so those labels need the opposite side.
+    LabelLayer("$id-label", edges.filterNot { it.labelFlipped }, preset, palette, LABEL_SIDE_EM)
+    LabelLayer("$id-label-flipped", edges.filter { it.labelFlipped }, preset, palette, -LABEL_SIDE_EM)
+}
+
+@Composable
+private fun LabelLayer(
+    id: String,
+    edges: List<TracerouteEdge>,
+    preset: ModemPreset?,
+    palette: Map<Quality, String>,
+    sideEm: Float,
+) {
+    val labels = rememberFeatureSource(edges, preset, palette) { edgesToLabels(edges, preset, palette) }
+    SymbolLayer(
+        id = id,
         source = labels,
         textField = feature[LABEL].asString(),
         textFont = const(listOf("Noto Sans Regular")),
         textColor = feature[COLOR].convertToColor(const(Color.White)),
         textHaloColor = const(Color.Black),
         textHaloWidth = const(1.5.dp),
-        // Labels sit on their own side of the line, so the two directions never print on top of each other.
-        textOffset = textOffset((dx * LABEL_SIDE_X_EM).em, (dy * LABEL_SIDE_Y_EM).em),
+        textSize = const(LABEL_TEXT_SIZE_SP.sp),
+        textRotate = feature[ROTATION].asNumber(),
+        // On the outer side of its own line, where the other direction's label cannot reach.
+        textOffset = textOffset(0.em, sideEm.em),
         textAllowOverlap = const(true),
         textIgnorePlacement = const(true),
     )
@@ -138,8 +150,26 @@ private fun edgesToLines(
 ): FeatureCollection<LineString, JsonObject?> = FeatureCollection(
     edges.map { e ->
         Feature(
-            geometry = LineString(listOf(e.from, e.to)),
+            geometry = LineString(listOf(e.lineStart, e.lineEnd)),
             properties = buildJsonObject { put(COLOR, edgeColor(e, preset, palette)) },
+        )
+    },
+)
+
+private fun edgesToArrows(
+    edges: List<TracerouteEdge>,
+    preset: ModemPreset?,
+    palette: Map<Quality, String>,
+): FeatureCollection<Point, JsonObject?> = FeatureCollection(
+    edges.map { e ->
+        Feature(
+            geometry = Point(e.lineEnd),
+            properties =
+            buildJsonObject {
+                put(COLOR, edgeColor(e, preset, palette))
+                put(ARROW, ARROW_GLYPH)
+                put(ROTATION, e.arrowRotationDeg)
+            },
         )
     },
 )
@@ -156,6 +186,7 @@ private fun edgesToLabels(
             buildJsonObject {
                 put(COLOR, edgeColor(e, preset, palette))
                 put(LABEL, e.label)
+                put(ROTATION, e.labelRotationDeg)
             },
         )
     },
@@ -169,11 +200,16 @@ private fun Color.toCssHex(): String {
 
 private const val COLOR = "color"
 private const val LABEL = "label"
+private const val ARROW = "arrow"
+private const val ROTATION = "rotation"
+private const val ARROW_GLYPH = "→"
 private const val UNKNOWN_COLOR = "#9E9E9E"
 private const val LINE_WIDTH_DP = 4
 private const val SEPARATION_DP = 5
-private const val LABEL_SIDE_Y_EM = 0.9f
-private const val LABEL_SIDE_X_EM = 3.6f
+private const val SEPARATION_EM = 0.31f
+private const val ARROW_BACK_EM = 0.5f
+private const val LABEL_SIDE_EM = 1.1f
+private const val LABEL_TEXT_SIZE_SP = 12
 private const val RGB_MASK = 0xFFFFFF
 private const val HEX_RADIX = 16
 private const val HEX_DIGITS = 6
