@@ -38,15 +38,15 @@ class RouteDiscoveryTest {
     }
 
     @Test
-    fun ok_whenEndpointsPositioned_andIntermediateNot() {
-        // Endpoints (1 and 3) are positioned, intermediate (2) is not
+    fun missingRelays_whenEndpointsPositioned_andIntermediateNot() {
+        // Endpoints (1 and 3) are positioned, intermediate (2) is not: the map needs every hop
         val forward = listOf(1, 2, 3)
         val back = listOf(3, 2, 1)
         val positioned = setOf(1, 3)
 
         val result = evaluateTracerouteMapAvailability(forward, back, positioned)
 
-        assertEquals(TracerouteMapAvailability.Ok, result)
+        assertEquals(TracerouteMapAvailability.MissingRelays, result)
     }
 
     @Test
@@ -95,11 +95,11 @@ class RouteDiscoveryTest {
     }
 
     @Test
-    fun ok_whenOnlyForwardRoute_endpointsPositioned() {
+    fun ok_whenOnlyForwardRoute_allPositioned() {
         // Only forward route, no return route
         val forward = listOf(1, 2, 3)
         val back = emptyList<Int>()
-        val positioned = setOf(1, 3)
+        val positioned = setOf(1, 2, 3)
 
         val result = evaluateTracerouteMapAvailability(forward, back, positioned)
 
@@ -107,7 +107,7 @@ class RouteDiscoveryTest {
     }
 
     @Test
-    fun missingEndpoints_whenReturnRouteEndpointMissing() {
+    fun missingRelays_whenReturnRouteUsesAnUnpositionedRelay() {
         // Return route has different endpoints than forward (asymmetric path)
         val forward = listOf(1, 2, 3)
         val back = listOf(3, 4, 1)
@@ -117,7 +117,7 @@ class RouteDiscoveryTest {
 
         val result = evaluateTracerouteMapAvailability(forward, back, positioned)
 
-        assertEquals(TracerouteMapAvailability.Ok, result)
+        assertEquals(TracerouteMapAvailability.MissingRelays, result)
     }
 
     @Test

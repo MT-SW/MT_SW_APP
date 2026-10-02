@@ -2072,6 +2072,7 @@
     <string name="traceroute_diff">Hops towards %1$d Hops back %2$d</string>
     <string name="traceroute_direct">Direct</string>
     <string name="traceroute_duration">Duration: %1$s s</string>
+    <string name="traceroute_relays_missing">The map is available only when every node on the route has a position, and at least one relay has none.</string>
     <string name="traceroute_endpoint_missing">Cannot show traceroute map because the start or destination node has no position information.</string>
     <string name="traceroute_forward_hops">Forward Hops</string>
     <plurals name="traceroute_hops">

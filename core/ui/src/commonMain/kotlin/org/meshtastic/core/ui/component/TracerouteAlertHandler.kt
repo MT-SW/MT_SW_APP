@@ -17,6 +17,8 @@
 package org.meshtastic.core.ui.component
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -26,12 +28,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import co.touchlab.kermit.Logger
-import kotlinx.coroutines.launch
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.okay
 import org.meshtastic.core.resources.traceroute
@@ -56,11 +57,18 @@ fun TracerouteAlertHandler(
     val traceRouteResponse by uiViewModel.tracerouteResponse.collectAsStateWithLifecycle(null)
     var dismissedTracerouteRequestId by remember { mutableStateOf<Int?>(null) }
     val colorScheme = MaterialTheme.colorScheme
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(traceRouteResponse, dismissedTracerouteRequestId) {
         val response = traceRouteResponse
         if (response != null && response.requestId != dismissedTracerouteRequestId) {
+            // The map button exists only when every node on the route has a position; otherwise the reason is shown.
+            val unavailableRes =
+                uiViewModel
+                    .tracerouteMapAvailability(
+                        forwardRoute = response.forwardRoute,
+                        returnRoute = response.returnRoute,
+                    )
+                    .toMessageRes()
             uiViewModel.showAlert(
                 titleRes = Res.string.traceroute,
                 composableMessage = {
@@ -77,31 +85,20 @@ fun TracerouteAlertHandler(
                                 modemPreset = LocalModemPreset.current,
                             ),
                         )
+                        if (unavailableRes != null) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(text = stringResource(unavailableRes), color = MaterialTheme.colorScheme.error)
+                        }
                     }
                 },
-                confirmTextRes = Res.string.view_on_map,
-                onConfirm = {
-                    val availability =
-                        uiViewModel.tracerouteMapAvailability(
-                            forwardRoute = response.forwardRoute,
-                            returnRoute = response.returnRoute,
-                        )
-                    val errorRes = availability.toMessageRes()
-                    if (errorRes == null) {
+                confirmTextRes = if (unavailableRes == null) Res.string.view_on_map else null,
+                onConfirm =
+                if (unavailableRes != null) {
+                    null
+                } else {
+                    {
                         dismissedTracerouteRequestId = response.requestId
                         onNavigateToMap(response.destinationNodeNum, response.requestId, response.logUuid)
-                    } else {
-                        uiViewModel.clearTracerouteResponse()
-                        // Post the error alert after the current alert is dismissed to avoid
-                        // the wrapping dismissAlert() in AlertManager immediately clearing it.
-                        @Suppress("TooGenericExceptionCaught")
-                        scope.launch {
-                            try {
-                                uiViewModel.showAlert(titleRes = Res.string.traceroute, messageRes = errorRes)
-                            } catch (e: Exception) {
-                                Logger.e(e) { "[TracerouteAlertHandler] Failed to show error alert" }
-                            }
-                        }
                     }
                 },
                 dismissTextRes = Res.string.okay,

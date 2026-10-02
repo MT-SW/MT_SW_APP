@@ -144,18 +144,25 @@ class RecentAddressesDataSourceTest {
     }
 
     @Test
-    fun `add enforces CACHE_CAPACITY of 3 evicting oldest entry`() = testScope.runTest {
-        dataSource.setRecentAddresses(
-            listOf(RecentAddress("1.1.1.1", "A"), RecentAddress("2.2.2.2", "B"), RecentAddress("3.3.3.3", "C")),
-        )
+    fun `add enforces CACHE_CAPACITY evicting oldest entry`() = testScope.runTest {
+        val full = (1..CACHE_CAPACITY).map { RecentAddress("10.0.0.$it", "N$it") }
+        dataSource.setRecentAddresses(full)
         dataSource.add(RecentAddress("4.4.4.4", "D"))
 
         val result = dataSource.recentAddresses.first()
-        assertEquals(3, result.size)
+        assertEquals(CACHE_CAPACITY, result.size)
         assertEquals("4.4.4.4", result[0].address)
-        assertEquals("1.1.1.1", result[1].address)
-        assertEquals("2.2.2.2", result[2].address)
-        assertFalse(result.any { it.address == "3.3.3.3" })
+        assertEquals("10.0.0.1", result[1].address)
+        assertFalse(result.any { it.address == "10.0.0.$CACHE_CAPACITY" })
+    }
+
+    @Test
+    fun `add keeps more than three recent devices`() = testScope.runTest {
+        for (i in 1..10) dataSource.add(RecentAddress("10.0.1.$i", "N$i"))
+
+        val result = dataSource.recentAddresses.first()
+        assertEquals(10, result.size)
+        assertEquals("10.0.1.10", result[0].address)
     }
 
     @Test
@@ -163,10 +170,11 @@ class RecentAddressesDataSourceTest {
         dataSource.setRecentAddresses(
             listOf(RecentAddress("1.1.1.1", "A"), RecentAddress("2.2.2.2", "B"), RecentAddress("3.3.3.3", "C")),
         )
-        dataSource.add(RecentAddress("1.1.1.1", "A"))
+        dataSource.add(RecentAddress("3.3.3.3", "C"))
 
         val result = dataSource.recentAddresses.first()
         assertEquals(3, result.size)
+        assertEquals("3.3.3.3", result[0].address)
         assertEquals("1.1.1.1", result[0].address)
     }
 

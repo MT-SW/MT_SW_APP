@@ -368,6 +368,8 @@ private fun showTracerouteDetail(
                 requestId = point.request.fromRadio.packet?.id ?: 0,
                 forwardRoute = it.route,
                 returnRoute = it.route_back,
+                forwardSnr = it.snr_towards,
+                returnSnr = it.snr_back,
             )
         }
 

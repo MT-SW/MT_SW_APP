@@ -106,6 +106,9 @@ fun MeshPacket.getTracerouteResponse(
 enum class TracerouteMapAvailability {
     Ok,
     MissingEndpoints,
+
+    /** Start and destination are known, but at least one relay on the way has no position. */
+    MissingRelays,
     NoMappableNodes,
 }
 
@@ -126,5 +129,11 @@ fun evaluateTracerouteMapAvailability(
     if (missingEndpoint) return TracerouteMapAvailability.MissingEndpoints
     val relatedNodeNums = (forwardRoute + returnRoute).toSet()
     val hasAnyMappable = relatedNodeNums.any { positionedNodeNums.contains(it) }
-    return if (hasAnyMappable) TracerouteMapAvailability.Ok else TracerouteMapAvailability.NoMappableNodes
+    if (!hasAnyMappable) return TracerouteMapAvailability.NoMappableNodes
+    // The map draws every hop with its signal strength, so a relay without a position would leave a gap.
+    return if (relatedNodeNums.all { positionedNodeNums.contains(it) }) {
+        TracerouteMapAvailability.Ok
+    } else {
+        TracerouteMapAvailability.MissingRelays
+    }
 }

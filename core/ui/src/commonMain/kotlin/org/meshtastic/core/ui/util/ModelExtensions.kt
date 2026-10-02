@@ -21,9 +21,11 @@ import org.meshtastic.core.model.TracerouteMapAvailability
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.traceroute_endpoint_missing
 import org.meshtastic.core.resources.traceroute_map_no_data
+import org.meshtastic.core.resources.traceroute_relays_missing
 
 fun TracerouteMapAvailability.toMessageRes(): StringResource? = when (this) {
     TracerouteMapAvailability.Ok -> null
     TracerouteMapAvailability.MissingEndpoints -> Res.string.traceroute_endpoint_missing
+    TracerouteMapAvailability.MissingRelays -> Res.string.traceroute_relays_missing
     TracerouteMapAvailability.NoMappableNodes -> Res.string.traceroute_map_no_data
 }
