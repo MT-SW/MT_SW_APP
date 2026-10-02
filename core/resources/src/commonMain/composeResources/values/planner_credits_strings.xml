@@ -24,6 +24,6 @@
     <string name="planner_credits_line_itm">Propagation model: NTIA/ITS Irregular Terrain Model (Longley-Rice); public domain; modified Kotlin port</string>
     <string name="planner_credits_line_mapterhorn">Terrain data: © Mapterhorn and the sources it aggregates (mapterhorn.com/attribution); source licences as listed by the project</string>
     <string name="planner_credits_line_openmeteo">Weather data (optional): Open-Meteo.com; CC BY 4.0 licence</string>
-    <string name="planner_credits_line_osm">Map data: © OpenStreetMap contributors; ODbL licence (openstreetmap.org/copyright)</string>
+    <string name="planner_credits_line_osm">Map data and obstacles (buildings, forests; optional, via the Overpass API): © OpenStreetMap contributors; ODbL licence (openstreetmap.org/copyright)</string>
     <string name="planner_credits_line_cables">Cable and connector data: manufacturers' data sheets (Times Microwave, Belden, Huber+Suhner, SSB-Electronic, CommScope/Andrew, Fairview Microwave and others); approximate values are marked in the planner</string>
 </resources>

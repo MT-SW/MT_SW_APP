@@ -92,3 +92,10 @@ classDef unknown fill:#FFADAD,stroke:#000,stroke-width:2px,color:#000;
 
 ```
 <!--endregion-->
+
+### Mesh Link Planer – przeszkody OpenStreetMap / obstacles from OpenStreetMap
+
+**PL:** `planner/data/PlannerOverpass` (Overpass API, dane © współtwórcy OpenStreetMap, ODbL) dostarcza budynki i lasy przez `PlannerClutterSource`; `OsmClutterParser` składa wielokąty (także relacje multipolygon), `ClutterMap` odpowiada na pytanie „jak wysoko jest przeszkoda w tym punkcie"; `PlannerClutter.withClutter` i `Coverage.compute(clutterAt = …)` dodają wysokość do profilu terenu (z pominięciem 100 m wokół anten). Opcja `PlannerUiState.preciseTerrain` jest domyślnie wyłączona; błąd pobierania → powrót do presetu (`PlannerClutterStatus.Failed`). Limit zasięgu z danymi OSM: 30 km.
+
+**EN:** `planner/data/PlannerOverpass` (Overpass API, data © OpenStreetMap contributors, ODbL) supplies buildings and forests through `PlannerClutterSource`; `OsmClutterParser` assembles polygons (including multipolygon relations), `ClutterMap` answers "how tall is the obstacle at this point"; `PlannerClutter.withClutter` and `Coverage.compute(clutterAt = ...)` add the height to the terrain profile (skipping 100 m around the antennas). `PlannerUiState.preciseTerrain` is off by default; a download failure falls back to the preset (`PlannerClutterStatus.Failed`). Coverage with OSM data is limited to 30 km.
+

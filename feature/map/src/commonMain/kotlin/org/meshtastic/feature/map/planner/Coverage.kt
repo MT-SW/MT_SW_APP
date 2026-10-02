@@ -17,6 +17,7 @@
  */
 package org.meshtastic.feature.map.planner
 
+import org.meshtastic.feature.map.planner.data.PlannerClutter
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
@@ -65,9 +66,15 @@ object Coverage {
     private const val DEFAULT_RINGS = 40
     private const val ERROR_MARGIN_DB = -200f
 
+    /**
+     * @param clutterAt height (m above ground) of buildings and trees at a point, or null for bare terrain. It is added
+     *   to the terrain of the in-between samples only: the centre's neighbourhood ([PlannerClutter.CLEAR_AROUND_ANTENNA_M])
+     *   and the receiving point itself stay on the ground.
+     */
     fun compute(
         input: CoverageInput,
         elevationAt: (lat: Double, lon: Double) -> Double,
+        clutterAt: ((lat: Double, lon: Double) -> Double)? = null,
         onProgress: ((Float) -> Unit)? = null,
     ): CoverageResult {
         val radials = max(1, input.radials)
@@ -85,13 +92,20 @@ object Coverage {
         val reach = DoubleArray(radials)
         for (r in 0 until radials) {
             val bearing = 360.0 * r / radials
-            val ground = DoubleArray(n + 1) { i ->
+            val ground = DoubleArray(n + 1)
+            val obstacle = DoubleArray(n + 1)
+            for (i in 0..n) {
                 val p = if (i == 0) input.center else Geodesy.destination(input.center, bearing, i * step)
-                elevationAt(p.lat, p.lon)
+                ground[i] = elevationAt(p.lat, p.lon)
+                if (clutterAt != null && i > 0 && i * step >= PlannerClutter.CLEAR_AROUND_ANTENNA_M) {
+                    obstacle[i] = clutterAt(p.lat, p.lon)
+                }
             }
             for (j in 0 until rings) {
                 val idx = ringIdx[j]
-                val sub = ground.copyOfRange(0, idx + 1)
+                val sub = DoubleArray(idx + 1) { ground[it] + obstacle[it] }
+                sub[0] = ground[0]
+                sub[idx] = ground[idx]
                 val res = Itm.pointToPoint(
                     elevationsM = sub,
                     stepM = step,

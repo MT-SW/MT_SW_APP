@@ -24,6 +24,9 @@ import org.meshtastic.feature.map.planner.GeoPoint
 import org.meshtastic.feature.map.planner.LinkResult
 import org.meshtastic.feature.map.planner.PlannerBands
 import org.meshtastic.feature.map.planner.ProfileSeries
+import org.meshtastic.feature.map.planner.data.ClutterHeights
+import org.meshtastic.feature.map.planner.data.ClutterStats
+import org.meshtastic.feature.map.planner.data.PlannerClutterFailure
 import org.meshtastic.feature.map.planner.data.PropagationConditions
 import org.meshtastic.feature.map.planner.data.PlannerWeatherError
 import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
@@ -106,6 +109,20 @@ sealed interface PlannerWeatherStatus {
 
     /** The planner falls back to k = 4/3 and N0 = 301. */
     data class Failed(val error: PlannerWeatherError) : PlannerWeatherStatus
+}
+
+/** State of the optional OpenStreetMap obstacles (buildings, forests). */
+sealed interface PlannerClutterStatus {
+    /** Not requested (or no link yet). */
+    data object Idle : PlannerClutterStatus
+
+    data object Loading : PlannerClutterStatus
+
+    /** Data loaded; [stats] counts what was found along the path. */
+    data class Ready(val stats: ClutterStats) : PlannerClutterStatus
+
+    /** The planner falls back to the clutter preset / manual extra loss. */
+    data class Failed(val failure: PlannerClutterFailure) : PlannerClutterStatus
 }
 
 /** One link end. All values are plain data; derived values are computed properties. */
@@ -199,6 +216,15 @@ data class PlannerUiState(
     /** Manual clutter / extra loss in dB (gas and rain are added automatically when weather is on). */
     val extraLossDb: Double = 0.0,
     val clutterPreset: PlannerClutterPreset = PlannerClutterPreset.NONE,
+    /**
+     * Use real buildings and forests from OpenStreetMap instead of the preset (heavier: downloads data, longer
+     * calculation). Off by default.
+     */
+    val preciseTerrain: Boolean = false,
+    val forestHeightM: Double = ClutterHeights.DEFAULT_FOREST_M,
+    /** Height of buildings that carry no height or level count in the map data. */
+    val buildingHeightM: Double = ClutterHeights.DEFAULT_BUILDING_M,
+    val clutter: PlannerClutterStatus = PlannerClutterStatus.Idle,
     /** Gas + rain loss over the path that was added by the last calculation (0 below 1 GHz). */
     val atmosphericLossDb: Double = 0.0,
     // ---- results ----
@@ -222,6 +248,21 @@ data class PlannerUiState(
     val coverage: CoverageResult? = null,
     val coverageError: PlannerError? = null,
 ) {
+    /** Heights assumed for map obstacles. */
+    val clutterHeights: ClutterHeights get() = ClutterHeights(forestM = forestHeightM, buildingM = buildingHeightM)
+
+    /**
+     * Extra loss applied by the calculation. With the OpenStreetMap option the preset is replaced by the real
+     * obstacles; if the map data failed to load the preset
+     * is used after all.
+     */
+    val effectiveExtraLossDb: Double
+        get() {
+            val replaced = preciseTerrain &&
+                clutter !is PlannerClutterStatus.Failed
+            return if (replaced) 0.0 else extraLossDb
+        }
+
     fun end(side: PlannerSide): PlannerEnd = if (side == PlannerSide.A) a else b
 
     internal fun withEnd(side: PlannerSide, end: PlannerEnd): PlannerUiState =

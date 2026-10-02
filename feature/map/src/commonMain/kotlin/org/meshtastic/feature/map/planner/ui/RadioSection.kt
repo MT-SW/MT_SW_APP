@@ -69,6 +69,18 @@ import org.meshtastic.core.resources.planner_unit_dbm
 import org.meshtastic.core.resources.planner_unit_khz
 import org.meshtastic.core.resources.planner_unit_mhz
 import org.meshtastic.core.resources.planner_use_weather
+import org.meshtastic.core.resources.planner_precise_terrain
+import org.meshtastic.core.resources.planner_precise_warning
+import org.meshtastic.core.resources.planner_precise_forest_height
+import org.meshtastic.core.resources.planner_precise_building_height
+import org.meshtastic.core.resources.planner_precise_loading
+import org.meshtastic.core.resources.planner_precise_ready
+import org.meshtastic.core.resources.planner_precise_failed_network
+import org.meshtastic.core.resources.planner_precise_failed_data
+import org.meshtastic.core.resources.planner_precise_coverage_note
+import org.meshtastic.core.resources.planner_unit_m
+import org.meshtastic.feature.map.planner.data.ClutterHeights
+import org.meshtastic.feature.map.planner.data.PlannerClutterFailure
 import org.meshtastic.core.resources.planner_weather_failed
 import org.meshtastic.core.resources.planner_weather_idle
 import org.meshtastic.core.resources.planner_weather_loading
@@ -81,6 +93,7 @@ import org.meshtastic.feature.map.planner.PlannerBands
 import org.meshtastic.feature.map.planner.Sensitivity
 import org.meshtastic.feature.map.planner.export.Num
 import org.meshtastic.feature.map.planner.state.PlannerClutterPreset
+import org.meshtastic.feature.map.planner.state.PlannerClutterStatus
 import org.meshtastic.feature.map.planner.state.PlannerUiState
 import org.meshtastic.feature.map.planner.state.PlannerViewModel
 import org.meshtastic.feature.map.planner.state.PlannerWeatherStatus
@@ -224,21 +237,107 @@ private fun EnvironmentCard(state: PlannerUiState, vm: PlannerViewModel) {
         }
 
         PlannerSubheading(text = stringResource(Res.string.planner_clutter_title), info = PlannerInfoTopic.CLUTTER)
-        PlannerDropdown(
-            label = stringResource(Res.string.planner_clutter),
-            selectedLabel = clutterLabel(state.clutterPreset),
-            options = PlannerClutterPreset.entries.map { it to clutterLabel(it) },
-            onSelect = { vm.setClutterPreset(it) },
-        )
-        PlannerNumberField(
-            label = stringResource(Res.string.planner_extra_loss),
-            value = state.extraLossDb,
-            onValue = { vm.setExtraLossDb(it) },
-            decimals = 1,
-            suffix = stringResource(Res.string.planner_unit_db),
-            min = 0.0,
-            max = MAX_EXTRA_LOSS_DB,
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth().clickable { vm.setPreciseTerrain(!state.preciseTerrain) },
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Checkbox(checked = state.preciseTerrain, onCheckedChange = null)
+            Text(
+                text = stringResource(Res.string.planner_precise_terrain),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(start = 8.dp).weight(1f),
+            )
+            PlannerInfoButton(PlannerInfoTopic.CLUTTER)
+        }
+        if (state.preciseTerrain) {
+            Text(
+                text = stringResource(Res.string.planner_precise_warning),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.tertiary,
+            )
+            PlannerNumberField(
+                label = stringResource(Res.string.planner_precise_forest_height),
+                value = state.forestHeightM,
+                onValue = { vm.setForestHeight(it) },
+                decimals = 0,
+                suffix = stringResource(Res.string.planner_unit_m),
+                min = 0.0,
+                max = ClutterHeights.MAX_HEIGHT_M,
+            )
+            PlannerNumberField(
+                label = stringResource(Res.string.planner_precise_building_height),
+                value = state.buildingHeightM,
+                onValue = { vm.setBuildingHeight(it) },
+                decimals = 0,
+                suffix = stringResource(Res.string.planner_unit_m),
+                min = 0.0,
+                max = ClutterHeights.MAX_HEIGHT_M,
+            )
+            ClutterStatusBlock(state.clutter)
+            Text(
+                text = stringResource(Res.string.planner_precise_coverage_note),
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+        // The preset stays as the default and as the fallback when the map data cannot be loaded.
+        if (!state.preciseTerrain || state.clutter is PlannerClutterStatus.Failed) {
+            PlannerDropdown(
+                label = stringResource(Res.string.planner_clutter),
+                selectedLabel = clutterLabel(state.clutterPreset),
+                options = PlannerClutterPreset.entries.map { it to clutterLabel(it) },
+                onSelect = { vm.setClutterPreset(it) },
+            )
+            PlannerNumberField(
+                label = stringResource(Res.string.planner_extra_loss),
+                value = state.extraLossDb,
+                onValue = { vm.setExtraLossDb(it) },
+                decimals = 1,
+                suffix = stringResource(Res.string.planner_unit_db),
+                min = 0.0,
+                max = MAX_EXTRA_LOSS_DB,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ClutterStatusBlock(status: PlannerClutterStatus) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        when (status) {
+            PlannerClutterStatus.Idle -> Unit
+            PlannerClutterStatus.Loading -> {
+                CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                Text(
+                    text = stringResource(Res.string.planner_precise_loading),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            is PlannerClutterStatus.Ready ->
+                Text(
+                    text = stringResource(
+                        Res.string.planner_precise_ready,
+                        status.stats.buildings,
+                        status.stats.forests,
+                        status.stats.areas,
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.weight(1f),
+                )
+            is PlannerClutterStatus.Failed ->
+                Text(
+                    text = stringResource(
+                        if (status.failure == PlannerClutterFailure.NETWORK) {
+                            Res.string.planner_precise_failed_network
+                        } else {
+                            Res.string.planner_precise_failed_data
+                        },
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.weight(1f),
+                )
+        }
     }
 }
 

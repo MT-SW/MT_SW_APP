@@ -45,6 +45,8 @@ import org.meshtastic.core.resources.planner_report_lbl_ducting
 import org.meshtastic.core.resources.planner_report_lbl_elevation_a
 import org.meshtastic.core.resources.planner_report_lbl_elevation_b
 import org.meshtastic.core.resources.planner_report_lbl_extra_loss
+import org.meshtastic.core.resources.planner_report_lbl_terrain_data
+import org.meshtastic.core.resources.planner_report_val_terrain_osm
 import org.meshtastic.core.resources.planner_report_lbl_feeder_approx
 import org.meshtastic.core.resources.planner_report_lbl_feeder_loss
 import org.meshtastic.core.resources.planner_report_lbl_frequency
@@ -155,6 +157,8 @@ fun rememberPlannerReportStrings(): PlannerReportStrings {
         lblFspl = stringResource(Res.string.planner_report_lbl_fspl),
         lblItmLoss = stringResource(Res.string.planner_report_lbl_itm_loss),
         lblExtraLoss = stringResource(Res.string.planner_report_lbl_extra_loss),
+        lblTerrainData = stringResource(Res.string.planner_report_lbl_terrain_data),
+        valTerrainOsm = stringResource(Res.string.planner_report_val_terrain_osm),
         lblTotalLoss = stringResource(Res.string.planner_report_lbl_total_loss),
         lblLineOfSight = stringResource(Res.string.planner_report_lbl_line_of_sight),
         lblFresnel = stringResource(Res.string.planner_report_lbl_fresnel),
