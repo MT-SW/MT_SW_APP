@@ -28,7 +28,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do upstreamu, od pocz
 
 **Mapa**
 * Płynne przewijanie i powiększanie przy dużej liczbie węzłów: usunięte z danych mapy pola „ostatnio słyszany”/„online”, węzły odświeżane tylko przy zmianie pozycji, nazwy, ulubionego i ignorowanego, błysk na własnym małym źródle w 15 krokach, stabilny obszar widoku podczas przesuwania, pamięć podręczna obrazków plakietek, brak niewidocznych obrysów w warstwie zasięgu.
-* **Trasa traceroute na mapie z siłą sygnału:** przycisk „Pokaż na mapie” tylko gdy wszystkie węzły trasy mają lokalizację (inaczej okno tłumaczy dlaczego); osobna linia na skok w kolorze jakości sygnału, strzałka kierunku i SNR w dB, oba kierunki obok siebie; legenda jakości.
+* **Trasa traceroute na mapie z siłą sygnału:** przycisk „Pokaż na mapie” tylko gdy wszystkie węzły trasy mają lokalizację (inaczej okno tłumaczy dlaczego); osobna cienka linia na skok w kolorze jakości sygnału, ze strzałką na końcu i SNR w dB wzdłuż linii, kończąca się tuż przed węzłem (węzły jako punkty pod plakietkami), oba kierunki symetrycznie obok siebie; legenda jakości; świeżo otrzymany wynik traceroute od razu ma wartości SNR (wcześniej linie były szare do otwarcia z zapisanych tras).
 
 **Sieć**
 * Lista ostatnio używanych urządzeń sieciowych (WiFi/TCP): 20 wpisów zamiast 3.
@@ -902,7 +902,7 @@ The entries below describe only what this fork adds on top of upstream, from the
 
 **Map**
 * Smooth panning and zooming with many nodes: the "last heard"/"online" fields removed from map data, nodes refreshed only when position, name, favorite or ignored state change, pulse on its own small source in 15 steps, a stable view area while panning, cached chip images, no invisible outlines in the coverage layer.
-* **Traceroute on the map with signal strength:** the "View on map" button only when every node on the route has a position (otherwise the dialog explains why); one line per hop in the colour of its signal quality, a direction arrow and SNR in dB, both directions side by side; quality legend.
+* **Traceroute on the map with signal strength:** the "View on map" button only when every node on the route has a position (otherwise the dialog explains why); one thin line per hop in the colour of its signal quality, with an arrowhead at its end and the SNR in dB along the line, stopping just short of the node (nodes as dots under their chips), both directions symmetrically side by side; quality legend; a freshly received traceroute now has its SNR values straight away (previously the lines were grey until opened from the saved traces).
 
 **Network**
 * Recently used network (WiFi/TCP) devices: 20 entries instead of 3.
