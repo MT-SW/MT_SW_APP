@@ -101,6 +101,7 @@ private fun DirectionLayers(
         textColor = feature[COLOR].convertToColor(const(Color.White)),
         textHaloColor = const(Color.Black),
         textHaloWidth = const(1.dp),
+        textSize = const(ARROW_TEXT_SIZE_SP.sp),
         textRotate = feature[ROTATION].asNumber(),
         // The offset turns with the glyph: back from the node so the tip lands on it, and to the right onto the line.
         textOffset = textOffset((-ARROW_BACK_EM).em, SEPARATION_EM.em),
@@ -204,12 +205,13 @@ private const val ARROW = "arrow"
 private const val ROTATION = "rotation"
 private const val ARROW_GLYPH = "→"
 private const val UNKNOWN_COLOR = "#9E9E9E"
-private const val LINE_WIDTH_DP = 4
-private const val SEPARATION_DP = 5
-private const val SEPARATION_EM = 0.31f
-private const val ARROW_BACK_EM = 0.5f
-private const val LABEL_SIDE_EM = 1.1f
+private const val LINE_WIDTH_DP = 3
+private const val SEPARATION_DP = 3
+private const val SEPARATION_EM = 0.125f
+private const val ARROW_BACK_EM = 0.45f
+private const val LABEL_SIDE_EM = 0.95f
 private const val LABEL_TEXT_SIZE_SP = 12
+private const val ARROW_TEXT_SIZE_SP = 24
 private const val RGB_MASK = 0xFFFFFF
 private const val HEX_RADIX = 16
 private const val HEX_DIGITS = 6
