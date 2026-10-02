@@ -326,4 +326,17 @@
     <string name="planner_weather_ready">Warunki: %1$s · k = %2$s · dane z %3$s UTC · %4$s</string>
     <string name="planner_weather_refresh">Odśwież pogodę</string>
     <string name="planner_yes">tak</string>
+
+    <!-- Mesh Link Planer: dokładne odwzorowanie terenu (OpenStreetMap) -->
+    <string name="planner_precise_terrain">Dokładne odwzorowanie terenu (budynki i lasy z OpenStreetMap)</string>
+    <string name="planner_precise_warning">Dokładniejsze, ale cięższe: planer pobiera dane mapy, mocniej obciąża urządzenie i liczy dłużej (zasięg dużego obszaru może liczyć się znacznie dłużej). Domyślnie wyłączone.</string>
+    <string name="planner_precise_forest_height">Wysokość lasu</string>
+    <string name="planner_precise_building_height">Wysokość budynku (gdy mapa jej nie podaje)</string>
+    <string name="planner_precise_loading">Pobieranie budynków i lasów z OpenStreetMap…</string>
+    <string name="planner_precise_ready">Dane mapy: %1$d budynków, %2$d lasów, %3$d obszarów zabudowy wzdłuż trasy.</string>
+    <string name="planner_precise_failed_network">Dane OpenStreetMap niedostępne (brak połączenia lub serwer nie odpowiedział). Użyto presetu przeszkód.</string>
+    <string name="planner_precise_failed_data">Nie udało się użyć danych OpenStreetMap (obszar zbyt duży lub nieprawidłowa odpowiedź). Użyto presetu przeszkód.</string>
+    <string name="planner_precise_coverage_note">Zasięg uwzględnia prawdziwe przeszkody tylko do 30 km od środka; dalej liczy się sam teren.</string>
+    <string name="planner_report_lbl_terrain_data">Dane o przeszkodach</string>
+    <string name="planner_report_val_terrain_osm">OpenStreetMap (budynki, lasy)</string>
 </resources>

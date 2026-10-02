@@ -20,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
 import org.meshtastic.feature.map.planner.Geodesy
 import org.meshtastic.feature.map.planner.LinkVerdict
+import org.meshtastic.feature.map.planner.data.PlannerClutterFailure
 import org.meshtastic.feature.map.planner.data.PlannerElevationFailure
 import org.meshtastic.feature.map.planner.data.PlannerWeatherError
 import org.meshtastic.feature.map.planner.data.PlannerWeatherResult
@@ -32,7 +33,8 @@ import kotlin.test.assertTrue
 class PlannerComputerTest {
     private val elevation = FakeElevation()
     private val weather = FakeWeather()
-    private val computer = PlannerComputer(elevation, weather, Dispatchers.Unconfined, { 0L })
+    private val clutter = FakeClutter()
+    private val computer = PlannerComputer(elevation, weather, Dispatchers.Unconfined, { 0L }, clutter)
 
     private fun readyState() = PlannerUiState(a = endAt(POINT_A), b = endAt(POINT_B))
 
@@ -174,5 +176,63 @@ class PlannerComputerTest {
         assertEquals(POINT_A, cov.center)
         assertEquals(1f, progress)
         assertTrue(cov.marginDb[0][0] > 0f)
+    }
+
+    @Test
+    fun preciseTerrainOffNeverAsksForObstacles() = runTest {
+        clutter.map = forestAroundLink()
+        val r = computer.compute(readyState())
+        assertEquals(0, clutter.linkCalls)
+        assertEquals(PlannerClutterStatus.Idle, r.clutter)
+    }
+
+    @Test
+    fun preciseTerrainForestReducesMargin() = runTest {
+        val base = assertNotNull(computer.compute(readyState()).link).aToB.marginDb
+        clutter.map = forestAroundLink()
+        val r = computer.compute(readyState().copy(preciseTerrain = true, forestHeightM = 25.0))
+        val withForest = assertNotNull(r.link).aToB.marginDb
+        assertEquals(1, clutter.linkCalls)
+        assertTrue(withForest < base, "base=$base forest=$withForest")
+        val status = r.clutter
+        assertTrue(status is PlannerClutterStatus.Ready && status.stats.forests == 1)
+    }
+
+    @Test
+    fun preciseTerrainReplacesThePreset() = runTest {
+        val st = readyState().copy(
+            preciseTerrain = true,
+            clutterPreset = PlannerClutterPreset.URBAN,
+            extraLossDb = 12.0,
+        )
+        val precise = assertNotNull(computer.compute(st).link).aToB.marginDb
+        val bare = assertNotNull(computer.compute(readyState()).link).aToB.marginDb
+        // empty map: no obstacles, and the 12 dB of the preset must not be applied on top
+        assertEquals(bare, precise, 1e-9)
+    }
+
+    @Test
+    fun preciseTerrainFailureFallsBackToThePreset() = runTest {
+        clutter.failure = PlannerClutterFailure.NETWORK
+        val st = readyState().copy(
+            preciseTerrain = true,
+            clutterPreset = PlannerClutterPreset.URBAN,
+            extraLossDb = 12.0,
+        )
+        val r = computer.compute(st)
+        assertNull(r.error)
+        assertEquals(PlannerClutterStatus.Failed(PlannerClutterFailure.NETWORK), r.clutter)
+        val bare = assertNotNull(computer.compute(readyState()).link).aToB.marginDb
+        assertEquals(bare - 12.0, assertNotNull(r.link).aToB.marginDb, 1e-6)
+    }
+
+    @Test
+    fun preciseTerrainCoverageUsesAreaData() = runTest {
+        clutter.map = forestAroundLink()
+        val st = readyState().copy(preciseTerrain = true, coverageMaxRangeKm = 5.0, coverageRadials = 8)
+        computer.computeCoverage(st)
+        assertEquals(1, clutter.areaCalls)
+        computer.computeCoverage(readyState().copy(coverageMaxRangeKm = 5.0, coverageRadials = 8))
+        assertEquals(1, clutter.areaCalls)
     }
 }

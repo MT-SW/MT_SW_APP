@@ -35,6 +35,8 @@ import org.meshtastic.feature.map.planner.CoverageLayer
 import org.meshtastic.feature.map.planner.FeederBuilder
 import org.meshtastic.feature.map.planner.FeederConfig
 import org.meshtastic.feature.map.planner.PlannerBands
+import org.meshtastic.feature.map.planner.data.ClutterHeights
+import org.meshtastic.feature.map.planner.data.PlannerClutterSource
 import org.meshtastic.feature.map.planner.data.PlannerElevationException
 import org.meshtastic.feature.map.planner.data.PlannerElevationFailure
 import org.meshtastic.feature.map.planner.data.PlannerElevationSource
@@ -62,10 +64,11 @@ class PlannerViewModel(
     elevation: PlannerElevationSource,
     weather: PlannerWeatherSource,
     nodeSource: PlannerNodeSource,
+    clutter: PlannerClutterSource,
 ) : ViewModel() {
 
     /** Replaceable in tests (e.g. to change the compute dispatcher). */
-    internal var computer: PlannerComputer = PlannerComputer(elevation, weather)
+    internal var computer: PlannerComputer = PlannerComputer(elevation, weather, clutter = clutter)
 
     /** Debounce before a recalculation starts; tests may lower it. */
     internal var debounceMs: Long = DEBOUNCE_MS
@@ -313,6 +316,19 @@ class PlannerViewModel(
         if (preset == PlannerClutterPreset.CUSTOM) st.copy(clutterPreset = preset) else st.copy(clutterPreset = preset, extraLossDb = preset.extraDb)
     }
 
+    /** Switches the real buildings / forests (OpenStreetMap) on or off; off keeps the preset behaviour. */
+    fun setPreciseTerrain(on: Boolean) = mutate { it.copy(preciseTerrain = on, clutter = PlannerClutterStatus.Idle) }
+
+    fun setForestHeight(m: Double) {
+        if (m.isNaN()) return
+        mutate { it.copy(forestHeightM = m.coerceIn(0.0, ClutterHeights.MAX_HEIGHT_M)) }
+    }
+
+    fun setBuildingHeight(m: Double) {
+        if (m.isNaN()) return
+        mutate { it.copy(buildingHeightM = m.coerceIn(0.0, ClutterHeights.MAX_HEIGHT_M)) }
+    }
+
     // ------------------------------------------------------------------ computing
 
     /** Recalculates now (no debounce). Normally not needed: every setter schedules a debounced recalculation. */
@@ -472,6 +488,7 @@ class PlannerViewModel(
                 it.copy(
                     computing = true,
                     weather = if (it.useWeather) PlannerWeatherStatus.Loading else PlannerWeatherStatus.Idle,
+                    clutter = if (it.preciseTerrain) PlannerClutterStatus.Loading else PlannerClutterStatus.Idle,
                 )
             }
         } else {
@@ -488,6 +505,7 @@ class PlannerViewModel(
                     comparison = res.comparison,
                     error = res.error,
                     weather = if (cur.useWeather) res.weather else PlannerWeatherStatus.Idle,
+                    clutter = if (cur.preciseTerrain) res.clutter else PlannerClutterStatus.Idle,
                     kFactor = res.kFactor,
                     surfaceRefractivity = res.surfaceRefractivity,
                     atmosphericLossDb = res.atmosphericLossDb,

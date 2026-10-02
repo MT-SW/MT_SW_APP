@@ -38,6 +38,7 @@ import kotlin.test.assertTrue
 class PlannerViewModelTest {
     private val elevation = FakeElevation()
     private val weather = FakeWeather()
+    private val clutter = FakeClutter()
     private val nodes = FakeNodes(
         listOf(
             nodeOption(1, POINT_A, ours = true),
@@ -56,9 +57,9 @@ class PlannerViewModelTest {
     }
 
     private fun vm(): PlannerViewModel {
-        val vm = PlannerViewModel(elevation, weather, nodes)
+        val vm = PlannerViewModel(elevation, weather, nodes, clutter)
         vm.debounceMs = 0L
-        vm.computer = PlannerComputer(elevation, weather, Dispatchers.Unconfined, { 0L })
+        vm.computer = PlannerComputer(elevation, weather, Dispatchers.Unconfined, { 0L }, clutter)
         return vm
     }
 

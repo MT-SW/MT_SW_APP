@@ -22,6 +22,12 @@ import org.meshtastic.feature.map.planner.Atmosphere
 import org.meshtastic.feature.map.planner.AtmosphereSample
 import org.meshtastic.feature.map.planner.GeoPoint
 import org.meshtastic.feature.map.planner.PathProfile
+import org.meshtastic.feature.map.planner.data.ClutterKind
+import org.meshtastic.feature.map.planner.data.ClutterMap
+import org.meshtastic.feature.map.planner.data.ClutterPolygon
+import org.meshtastic.feature.map.planner.data.PlannerClutterException
+import org.meshtastic.feature.map.planner.data.PlannerClutterFailure
+import org.meshtastic.feature.map.planner.data.PlannerClutterSource
 import org.meshtastic.feature.map.planner.data.PlannerElevationException
 import org.meshtastic.feature.map.planner.data.PlannerElevationFailure
 import org.meshtastic.feature.map.planner.data.PlannerElevationSource
@@ -29,6 +35,36 @@ import org.meshtastic.feature.map.planner.data.PlannerWeatherError
 import org.meshtastic.feature.map.planner.data.PlannerWeatherResult
 import org.meshtastic.feature.map.planner.data.PlannerWeatherSource
 import org.meshtastic.feature.map.planner.data.PropagationConditions
+
+/** Obstacle data that is empty, a fixed [map], or failing. Counts the requests. */
+internal class FakeClutter(var map: ClutterMap = ClutterMap.EMPTY, var failure: PlannerClutterFailure? = null) :
+    PlannerClutterSource {
+    var linkCalls = 0
+    var areaCalls = 0
+
+    override suspend fun forLink(a: GeoPoint, b: GeoPoint): ClutterMap {
+        linkCalls++
+        failure?.let { throw PlannerClutterException(it) }
+        return map
+    }
+
+    override suspend fun forArea(center: GeoPoint, radiusKm: Double): ClutterMap {
+        areaCalls++
+        failure?.let { throw PlannerClutterException(it) }
+        return map
+    }
+}
+
+/** A forest covering everything around the test link (the antennas' surroundings are cleared by the engine). */
+internal fun forestAroundLink(): ClutterMap = ClutterMap(
+    listOf(
+        ClutterPolygon(
+            ClutterKind.FOREST,
+            null,
+            doubleArrayOf(50.80, 20.55, 50.80, 20.98, 50.93, 20.98, 50.93, 20.55, 50.80, 20.55),
+        ),
+    ),
+)
 
 /** Flat terrain at [heightM]; optionally failing. */
 internal class FakeElevation(var heightM: Double = 250.0, var failure: PlannerElevationFailure? = null) :

@@ -33,6 +33,11 @@ import org.meshtastic.feature.map.planner.LinkInput
 import org.meshtastic.feature.map.planner.LinkResult
 import org.meshtastic.feature.map.planner.PathProfile
 import org.meshtastic.feature.map.planner.ProfileSeries
+import org.meshtastic.feature.map.planner.data.ClutterMap
+import org.meshtastic.feature.map.planner.data.NoClutterSource
+import org.meshtastic.feature.map.planner.data.PlannerClutter
+import org.meshtastic.feature.map.planner.data.PlannerClutterException
+import org.meshtastic.feature.map.planner.data.PlannerClutterSource
 import org.meshtastic.feature.map.planner.data.PlannerElevationException
 import org.meshtastic.feature.map.planner.data.PlannerElevationFailure
 import org.meshtastic.feature.map.planner.data.PlannerElevationSource
@@ -40,6 +45,7 @@ import org.meshtastic.feature.map.planner.data.PlannerWeatherResult
 import org.meshtastic.feature.map.planner.data.PlannerWeatherSource
 import org.meshtastic.feature.map.planner.data.PropagationConditions
 import kotlin.math.max
+import kotlin.math.min
 
 /** Output of [PlannerComputer.compute]; the ViewModel merges it into [PlannerUiState]. */
 data class PlannerResults(
@@ -54,6 +60,7 @@ data class PlannerResults(
     val atmosphericLossDb: Double,
     val comparison: MeasuredComparison?,
     val error: PlannerError?,
+    val clutter: PlannerClutterStatus = PlannerClutterStatus.Idle,
 )
 
 /**
@@ -62,12 +69,14 @@ data class PlannerResults(
  *
  * @param computeDispatcher where the CPU heavy ITM runs.
  * @param clockMs time source for the weather cache.
+ * @param clutter buildings and forests, asked only when [PlannerUiState.preciseTerrain] is on.
  */
 class PlannerComputer(
     private val elevation: PlannerElevationSource,
     private val weather: PlannerWeatherSource,
     private val computeDispatcher: CoroutineDispatcher = Dispatchers.Default,
     private val clockMs: () -> Long = { nowMillis },
+    private val clutter: PlannerClutterSource = NoClutterSource,
 ) {
     private var cachedKey: String? = null
     private var cachedAtMs: Long = 0L
@@ -117,7 +126,40 @@ class PlannerComputer(
         val ground = profile.groundM.copyOf()
         if (state.a.groundAltManual) state.a.groundAltM?.let { ground[0] = it }
         if (state.b.groundAltManual) state.b.groundAltM?.let { ground[n] = it }
+        // Optional real obstacles (OpenStreetMap). A failure falls back to the preset, like the weather does.
+        var clutterStatus: PlannerClutterStatus = PlannerClutterStatus.Idle
+        if (state.preciseTerrain) {
+            try {
+                val map = clutter.forLink(pa, pb)
+                val heights = state.clutterHeights
+                val totalM = profile.stepM * n
+                val clearM = PlannerClutter.CLEAR_AROUND_ANTENNA_M
+                val withObstacles = withContext(computeDispatcher) {
+                    PlannerClutter.withClutter(
+                        ground = ground,
+                        stepM = profile.stepM,
+                        clutterAt = { i ->
+                            val p = Geodesy.interpolate(pa, pb, if (totalM > 0.0) i * profile.stepM / totalM else 0.0)
+                            map.heightAt(p.lat, p.lon, heights)
+                        },
+                        clearStartM = clearM,
+                        clearEndM = clearM,
+                    )
+                }
+                withObstacles.copyInto(ground)
+                clutterStatus = PlannerClutterStatus.Ready(map.stats)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: PlannerClutterException) {
+                clutterStatus = PlannerClutterStatus.Failed(e.failure)
+            } catch (e: Exception) {
+                clutterStatus = PlannerClutterStatus.Failed(
+                    org.meshtastic.feature.map.planner.data.PlannerClutterFailure.BAD_RESPONSE,
+                )
+            }
+        }
         val used = PathProfile(profile.stepM, ground)
+        val extraDb = state.copy(clutter = clutterStatus).effectiveExtraLossDb
 
         val distKm = used.distanceM / 1000.0
         val atmo = atmosphericLossDb(state.frequencyMHz, conditions, distKm)
@@ -131,7 +173,7 @@ class PlannerComputer(
             noiseFigureDb = state.noiseFigureDb,
             kFactor = k,
             surfaceRefractivity = n0,
-            extraLossDb = state.extraLossDb + atmo,
+            extraLossDb = extraDb + atmo,
         )
         return try {
             val (link, series) = withContext(computeDispatcher) {
@@ -149,6 +191,7 @@ class PlannerComputer(
                 atmosphericLossDb = atmo,
                 comparison = compareMeasured(state, link, nodes),
                 error = null,
+                clutter = clutterStatus,
             )
         } catch (e: CancellationException) {
             throw e
@@ -165,6 +208,19 @@ class PlannerComputer(
         val end = state.end(state.coverageSide)
         val center = end.point ?: throw IllegalArgumentException("coverage side has no point")
         val sampler = elevation.prepareArea(center, state.coverageMaxRangeKm)
+        var clutterMap: ClutterMap? = null
+        if (state.preciseTerrain) {
+            // Only within the radius OpenStreetMap data is requested for; farther out the preset loss still applies.
+            clutterMap = try {
+                clutter.forArea(center, min(state.coverageMaxRangeKm, PlannerClutter.MAX_AREA_RADIUS_KM))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                null
+            }
+        }
+        val heights = state.clutterHeights
+        val clutterAt: ((Double, Double) -> Double)? = clutterMap?.let { m -> { lat, lon -> m.heightAt(lat, lon, heights) } }
         val manualGround = end.groundAltM
         val ground = if (end.groundAltManual && manualGround != null) manualGround else sampler(center.lat, center.lon)
         val input = CoverageInput(
@@ -182,12 +238,12 @@ class PlannerComputer(
             noiseFigureDb = state.noiseFigureDb,
             kFactor = state.kFactor,
             surfaceRefractivity = state.surfaceRefractivity,
-            extraLossDb = state.extraLossDb,
+            extraLossDb = if (clutterMap != null) state.effectiveExtraLossDb else state.extraLossDb,
             maxRangeKm = state.coverageMaxRangeKm,
             radials = state.coverageRadials,
             rangeSteps = (state.coverageMaxRangeKm * 2.0).toInt().coerceIn(60, 150),
         )
-        return withContext(computeDispatcher) { Coverage.compute(input, sampler, onProgress) }
+        return withContext(computeDispatcher) { Coverage.compute(input, sampler, clutterAt = clutterAt, onProgress = onProgress) }
     }
 
     // ---- helpers ----

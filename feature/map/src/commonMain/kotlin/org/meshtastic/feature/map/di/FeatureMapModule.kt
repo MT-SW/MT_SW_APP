@@ -25,8 +25,10 @@ import org.meshtastic.core.repository.MapPrefs
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.feature.map.layers.MapLayersManager
+import org.meshtastic.feature.map.planner.data.PlannerClutterSource
 import org.meshtastic.feature.map.planner.data.PlannerElevation
 import org.meshtastic.feature.map.planner.data.PlannerElevationSource
+import org.meshtastic.feature.map.planner.data.PlannerOverpass
 import org.meshtastic.feature.map.planner.data.PlannerWeather
 import org.meshtastic.feature.map.planner.data.PlannerWeatherSource
 import org.meshtastic.feature.map.planner.state.PlannerNodeSource
@@ -53,6 +55,9 @@ class FeatureMapModule {
 
     @Single
     fun providePlannerWeatherSource(httpClient: HttpClient): PlannerWeatherSource = PlannerWeather(httpClient)
+
+    @Single
+    fun providePlannerClutterSource(httpClient: HttpClient): PlannerClutterSource = PlannerOverpass(httpClient)
 
     @Single
     fun providePlannerNodeSource(nodeRepository: NodeRepository, uiPrefs: UiPrefs): PlannerNodeSource =

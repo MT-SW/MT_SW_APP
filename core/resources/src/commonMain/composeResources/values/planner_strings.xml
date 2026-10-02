@@ -326,4 +326,17 @@
     <string name="planner_weather_ready">Conditions: %1$s · k = %2$s · data from %3$s UTC · %4$s</string>
     <string name="planner_weather_refresh">Refresh weather</string>
     <string name="planner_yes">yes</string>
+
+    <!-- Mesh Link Planer: dokładne odwzorowanie terenu (OpenStreetMap) -->
+    <string name="planner_precise_terrain">Detailed terrain (buildings and forests from OpenStreetMap)</string>
+    <string name="planner_precise_warning">More accurate, but heavier: the planner downloads map data, loads the device more and calculates for longer (coverage of a large area can take much longer). Off by default.</string>
+    <string name="planner_precise_forest_height">Forest height</string>
+    <string name="planner_precise_building_height">Building height (when the map has none)</string>
+    <string name="planner_precise_loading">Downloading buildings and forests from OpenStreetMap...</string>
+    <string name="planner_precise_ready">Map data: %1$d buildings, %2$d forests, %3$d built-up areas along the path.</string>
+    <string name="planner_precise_failed_network">OpenStreetMap data unavailable (no connection or the server did not answer). The obstacles preset is used instead.</string>
+    <string name="planner_precise_failed_data">OpenStreetMap data could not be used (the area is too large or the answer is invalid). The obstacles preset is used instead.</string>
+    <string name="planner_precise_coverage_note">Coverage uses real obstacles only within 30 km of the centre; farther out only the terrain counts.</string>
+    <string name="planner_report_lbl_terrain_data">Obstacle data</string>
+    <string name="planner_report_val_terrain_osm">OpenStreetMap (buildings, forests)</string>
 </resources>

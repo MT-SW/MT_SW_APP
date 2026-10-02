@@ -75,6 +75,8 @@ data class PlannerReportStrings(
     val lblFspl: String = "Free-space path loss",
     val lblItmLoss: String = "ITM path loss",
     val lblExtraLoss: String = "Extra loss (clutter, gas, rain)",
+    val lblTerrainData: String = "Obstacle data",
+    val valTerrainOsm: String = "OpenStreetMap (buildings, forests)",
     val lblTotalLoss: String = "Total path loss",
     val lblLineOfSight: String = "Line of sight clear",
     val lblFresnel: String = "Worst first Fresnel zone clearance",
@@ -182,6 +184,9 @@ object PlannerReportBuilder {
             pathRows += kv(s.lblFspl, db(link.freeSpaceLossDb, s))
             pathRows += kv(s.lblItmLoss, db(link.itmLossDb, s))
             pathRows += kv(s.lblExtraLoss, db(link.totalPathLossDb - link.itmLossDb, s))
+            if (state.preciseTerrain && state.clutter is PlannerClutterStatus.Ready) {
+                pathRows += kv(s.lblTerrainData, s.valTerrainOsm)
+            }
             pathRows += kv(s.lblTotalLoss, db(link.totalPathLossDb, s))
             pathRows += kv(s.lblLineOfSight, if (link.lineOfSightClear) s.yes else s.no)
             pathRows += kv(

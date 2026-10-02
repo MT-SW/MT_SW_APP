@@ -157,6 +157,7 @@ Natywny **Mesh Link Planer** (symulacja zasięgu radiowego, dostępny na Android
 - **Porównanie predykcji z ostatnim pomiarem** SNR/RSSI (z korektą LNA).
 - **Opcjonalne warunki propagacji z pogody na żywo** (Open-Meteo) — współczynnik k, refrakcja, wskaźnik ducting; bez sieci używane jest k=4/3.
 - **Zasięg dookólny wzdłuż promieni** oraz presety zabudowy/roślinności (clutter).
+- **Opcjonalne dokładne odwzorowanie terenu (OpenStreetMap)** — pole wyboru „Dokładne odwzorowanie terenu"; planer pobiera prawdziwe budynki i lasy z OpenStreetMap (Overpass API) i podnosi o ich wysokość teren na trasie (oraz w obliczeniach zasięgu do 30 km od środka). Domyślnie wyłączone — wtedy działa dotychczasowy wybór przeszkód (preset). Opcja zwiększa dokładność, ale wymaga internetu, mocniej obciąża urządzenie i wydłuża czas obliczeń; w razie błędu pobierania planer wraca do presetu. Wysokości budynków pochodzą z tagów `height` / `building:levels` (3 m na kondygnację plus dach), a lasów i budynków bez danych — z ustawianych wartości domyślnych.
 - **Eksport** do PDF, CSV, KML, GeoJSON i PNG; wszędzie dostępne okna informacyjne „i".
 
 ## Licencje i podziękowania
@@ -168,7 +169,7 @@ Natywny **Mesh Link Planer** (symulacja zasięgu radiowego, dostępny na Android
   - Model propagacji: NTIA/ITS Irregular Terrain Model (Longley-Rice); domena publiczna; port na Kotlin, zmodyfikowany (https://github.com/NTIA/itm)
   - Dane terenu: © Mapterhorn i źródła przez nią agregowane (mapterhorn.com/attribution); licencje źródeł wg strony projektu
   - Dane pogodowe (opcjonalne): Open-Meteo.com; licencja CC BY 4.0
-  - Dane mapy: © współtwórcy OpenStreetMap; licencja ODbL (openstreetmap.org/copyright)
+  - Dane mapy i przeszkód (budynki, lasy; opcjonalnie, przez Overpass API): © współtwórcy OpenStreetMap; licencja ODbL (openstreetmap.org/copyright)
   - Dane kabli i złączy: karty katalogowe producentów (Times Microwave, Belden, Huber+Suhner, SSB-Electronic, CommScope/Andrew, Fairview Microwave i inni); wartości przybliżone są oznaczone w planerze — szczegóły w [docs/planner-cable-sources.md](docs/planner-cable-sources.md)
 - Program na licencji GPL v3, bez żadnej gwarancji. Wyniki planera są predykcjami, a nie gwarancją zasięgu.
 
@@ -350,6 +351,7 @@ The native **Mesh Link Planner** (radio coverage simulation, available on Androi
 - **Prediction vs. last measured** SNR/RSSI comparison (LNA-corrected).
 - **Optional live-weather propagation conditions** (Open-Meteo) — k-factor, refractivity, ducting indicator; offline fallback is k=4/3.
 - **Omnidirectional coverage along radials** and clutter presets.
+- **Optional detailed terrain (OpenStreetMap)** — a "Detailed terrain" checkbox; the planner downloads real buildings and forests from OpenStreetMap (Overpass API) and raises the terrain along the path by their height (and in coverage calculations within 30 km of the centre). Off by default, in which case the existing obstacle presets apply. The option improves accuracy but needs an internet connection, loads the device more and takes longer to calculate; if the download fails the planner falls back to the preset. Building heights come from the `height` / `building:levels` tags (3 m per level plus roof); forests and buildings without data use adjustable defaults.
 - **Exports** to PDF, CSV, KML, GeoJSON and PNG; info "i" dialogs everywhere.
 
 ## Licences and credits
@@ -361,7 +363,7 @@ The native **Mesh Link Planner** (radio coverage simulation, available on Androi
   - Propagation model: NTIA/ITS Irregular Terrain Model (Longley-Rice); public domain; modified Kotlin port (https://github.com/NTIA/itm)
   - Terrain data: © Mapterhorn and the sources it aggregates (mapterhorn.com/attribution); source licences as listed by the project
   - Weather data (optional): Open-Meteo.com; CC BY 4.0 licence
-  - Map data: © OpenStreetMap contributors; ODbL licence (openstreetmap.org/copyright)
+  - Map data and obstacles (buildings, forests; optional, via the Overpass API): © OpenStreetMap contributors; ODbL licence (openstreetmap.org/copyright)
   - Cable and connector data: manufacturers' data sheets (Times Microwave, Belden, Huber+Suhner, SSB-Electronic, CommScope/Andrew, Fairview Microwave and others); approximate values are marked in the planner — see [docs/planner-cable-sources.md](docs/planner-cable-sources.md)
 - Released under GPL v3, with no warranty. Planner results are predictions, not guarantees of coverage.
 
