@@ -22,6 +22,7 @@ Stan roboczy — repo służy głównie do własnego użytku i testów z niewiel
 - Poprawiony wygląd czasu działania (uptime) na liście węzłów — dodana ikonka odróżniająca go wizualnie od czasu ostatniego kontaktu.
 - **Automatyczne czyszczenie bazy węzłów** — na ekranie "Wyczyść bazę węzłów" można włączyć automatyczne usuwanie nieaktywnych węzłów: suwak progu nieaktywności (1–90 dni) i suwak częstotliwości sprawdzania (1–30 dni). Działa zarówno na Androidzie (WorkManager), jak i na desktopie (własna pętla sprawdzająca co godzinę, z zapamiętanym czasem ostatniego uruchomienia, żeby przetrwać restart appki); domyślnie wyłączone, węzły ulubione i ignorowane nigdy nie są usuwane automatycznie.
 - **Naprawione gubienie/przestawianie znaków w polu wyszukiwania listy węzłów** — gdy lista była przewinięta niżej, wpisywanie tekstu w trakcie przeliczania przewijania mogło przestawiać kolejność wpisywanych znaków; pole ma teraz własny, natychmiastowy stan wpisywania niezależny od odświeżania listy.
+- **Płynne przewijanie i powiększanie mapy z dużą liczbą węzłów** — mapa przestała co chwilę przebudowywać dane i warstwy: z danych węzłów na mapie usunięto pola „ostatnio słyszany” i „online” (zmieniały się ciągle i wymuszały odświeżenie wszystkich węzłów, a lista węzłów i tak je pokazuje), węzły są ponownie przekazywane do mapy dopiero gdy zmieni się to, co faktycznie na niej widać (pozycja, nazwa, ikona), animacja pulsowania obejmuje tylko widoczne węzły i odświeża się w 15 krokach zamiast ciągle, obszar „widocznych węzłów” nie jest przeliczany przy każdym drobnym ruchu, a obrazki plakietek są zapamiętywane zamiast rysowane od nowa. Efekt potwierdzony na telefonie (Snapdragon 8 Gen 3): koniec zacinania przy doczytywaniu mapy.
 
 ## Mapa
 
@@ -41,6 +42,8 @@ Co to oznacza w praktyce:
 - **Dostrojone klastrowanie węzłów na mapie** — małe grupki węzłów nie zlewają się już w jeden bąbel z liczbą; grupowanie zaczyna się dopiero przy realnie gęstym skupisku.
 - **Naprawiona migająca liczba w bąblu klastra** — liczba zgrupowanych węzłów potrafiła pojawić się na chwilę i zniknąć, wracając dopiero przy kolejnym przeliczeniu etykiet (sama bąbelkowa otoczka zawsze zostawała widoczna) — to efekt domyślnej kolizyjnej obsługi etykiet w MapLibre; liczba jest teraz zawsze widoczna niezależnie od kolizji z innymi plakietkami.
 - **Domyślna mapa bazowa zmieniona na OpenStreetMap** — zamiast wektorowego stylu MapLibre Liberty, appka startuje teraz z rastrowymi kafelkami OSM.
+- **Trasa traceroute na mapie z siłą sygnału** — przycisk „Pokaż na mapie” przy wyniku traceroute jest dostępny tylko wtedy, gdy wszystkie węzły na trasie mają lokalizację (w przeciwnym razie okno wyjaśnia, dlaczego). Na mapie widoczne są tylko węzły z trasy; każdy skok to osobna linia w kolorze jakości sygnału (te same progi i kolory co wskaźniki sygnału w appce) ze strzałką kierunku i wartością SNR w dB. Oba kierunki (tam i z powrotem, także przy trasie bezpośredniej albo powrocie tą samą drogą) są rysowane osobno, obok siebie; skok bez odczytu SNR jest szary z opisem „?”. Legenda pokazuje cztery kolory jakości.
+- **Mini-mapa w szczegółach węzła mniej przybliżona** (poziom 13 zamiast 15) oraz naprawiony wyjątek przy selektorze zakresu czasu (24h/7d/30d).
 
 ## Ustawienia desktopowe
 
@@ -106,6 +109,7 @@ Tryb pokazujący ruch w eterze, który normalnie by zniknął — wszystkie paki
 - **Podgląd obrazków wklejonych jako link** — sterowany osobnym przełącznikiem w Ustawienia → Prywatność (domyślnie wyłączone), dostępny zarówno na Androidzie, jak i w wersji desktopowej.
 - **Desktop: Enter = nowa linijka, Ctrl+Enter = wyślij** — zamiast wymuszonego wysyłania samym Enterem, zachowanie typowe dla komunikatorów na komputerze; na telefonie wysyłanie zostaje osobnym przyciskiem obok pola tekstowego.
 - **Domyślne szablony w Szybkim Czacie (Quick Chat)** — appka wcześniej startowała z pustą listą szablonów wiadomości; teraz przy pierwszym uruchomieniu automatycznie wypełnia ją zestawem własnych komend sieciowych (np. `scyzoryk pomoc`, `scyzoryk test`, `scyzoryk range`, `scyzoryk pogoda`, `scyzoryk info`, `scyzoryk aktualnosci`).
+- **Długie wiadomości dzielone na części i składane na bieżąco** — tekst, który nie mieści się w jednym pakiecie, jest dzielony po słowach na kilka pakietów, a każdy dostaje na początku widoczny znacznik w rodzaju `[k9 2/4] ` (dwuznakowy identyfikator grupy, numer części i liczba części). Odbiorca z tym forkiem widzi jedną, złożoną wiadomość z informacją, ile części już dotarło; po 3 minutach bez brakujących części appka przestaje czekać i pokazuje to, co przyszło. Inni klienci Meshtastic widzą kolejne części jako osobne wiadomości ze znacznikiem. Podgląd na liście kontaktów i status wysyłania/odbierania uwzględniają kierunek.
 
 ## Jakość sygnału i korekta LNA
 
@@ -142,6 +146,7 @@ Tryb pokazujący ruch w eterze, który normalnie by zniknął — wszystkie paki
 
 - **Naprawiona zawodność ponownego łączenia z już sparowanym urządzeniem** — na części telefonów (potwierdzone na Xiaomi/MIUI) appka potrafiła nie połączyć się ponownie z węzłem po tym, jak ten na chwilę zniknął z zasięgu lub się wyłączył, mimo że urządzenie pozostawało sparowane; jedynym działającym obejściem było ręczne odparowanie i sparowanie od nowa. Naprawione poprzez: odświeżanie cache usług GATT przy każdym połączeniu (a nie tylko reaktywnie, po wykryciu problemu), samodzielną negocjację MTU z automatycznym ponowieniem próby zamiast pojedynczej próby wystrzelonej natychmiast po odkryciu usług, oraz dodatkowe mechanizmy wykrywania i odzyskiwania połączenia działające również wtedy, gdy ręczne przerwanie i ponowienie łączenia zerowałoby licznik nieudanych prób.
 - **Naprawione niewykrywanie węzła po Bluetooth na desktopie (Windows)** — appka skanowała bez końca, nie znajdując żadnego urządzenia, mimo że telefon widział ten sam węzeł bez problemu. Przyczyna: aktualizacja biblioteki Kable (0.44.3 → 0.45.0) przyniosła nowszą wersję Rustowego `btleplug`, która na Windowsie/WinRT bezwarunkowo włącza `SetAllowExtendedAdvertisements`, co u części adapterów BT czyni je całkowicie niewidocznymi dla skanowania (potwierdzony błąd w upstreamie btleplug). Naprawione przez przypięcie Kable z powrotem do 0.44.3.
+- **Lista ostatnio używanych urządzeń sieciowych (WiFi/TCP) pamięta do 20 wpisów** zamiast 3. Lista Bluetooth nie miała limitu — pokazuje wszystkie urządzenia sparowane w systemie.
 
 ## Mesh Link Planer
 
@@ -159,6 +164,7 @@ Natywny **Mesh Link Planer** (symulacja zasięgu radiowego, dostępny na Android
 - **Zasięg dookólny wzdłuż promieni** oraz presety zabudowy/roślinności (clutter).
 - **Opcjonalne dokładne odwzorowanie terenu (OpenStreetMap)** — pole wyboru „Dokładne odwzorowanie terenu"; planer pobiera prawdziwe budynki i lasy z OpenStreetMap (Overpass API) i podnosi o ich wysokość teren na trasie (oraz w obliczeniach zasięgu do 30 km od środka). Domyślnie wyłączone — wtedy działa dotychczasowy wybór przeszkód (preset). Opcja zwiększa dokładność, ale wymaga internetu, mocniej obciąża urządzenie i wydłuża czas obliczeń; w razie błędu pobierania planer wraca do presetu. Wysokości budynków pochodzą z tagów `height` / `building:levels` (3 m na kondygnację plus dach), a lasów i budynków bez danych — z ustawianych wartości domyślnych.
 - **Eksport** do PDF, CSV, KML, GeoJSON i PNG; wszędzie dostępne okna informacyjne „i".
+- **Domyślne ustawienia i warstwy** — domyślnie preset Narrow Fast i częstotliwość 869,44165 MHz; wybór pasma lub zmiana presetu ustawia odpowiednią częstotliwość i szerokość kanału (2,4 GHz jako szeroki LoRa, pierwszy slot dla 433 i 470 MHz). Zasięg jest rysowany jako gęsty raster z płynną skalą kolorów (styl MeshMap Planner) i suwakiem krycia; menu warstw ma listę u góry z przewijaniem, licznik na ikonie i limit 9 warstw, a warstwy zasięgu nie są zapamiętywane po restarcie. Nagłówek: „Mesh Link Planer (by MT_SW)”.
 
 ## Licencje i podziękowania
 
@@ -181,6 +187,7 @@ Natywny **Mesh Link Planer** (symulacja zasięgu radiowego, dostępny na Android
 
 - To osobisty, roboczy fork — część zmian jest zweryfikowana buildem i przetestowana na urządzeniu, część czeka na potwierdzenie w terenie.
 - Brak oficjalnych release'ów/tagów — zmiany trzymane na bieżąco na gałęzi `main`.
+- Pełna lista zmian forka: [CHANGELOG.md](CHANGELOG.md) (sekcja „MT_SW — zmiany forka”).
 - Fork korzysta z tej samej licencji GPL-3.0 co projekt macierzysty.
 
 ---
@@ -216,6 +223,7 @@ Work in progress — this repo is mainly for personal use and testing with a sma
 - Cleaned up the uptime display in the node list — added an icon to visually separate it from the last-heard time.
 - **Automatic node-database cleanup** — the "Clean Node Database" screen now has a toggle for automatically removing inactive nodes, with sliders for the inactivity threshold (1–90 days) and how often the check runs (1–30 days). Works on both Android (WorkManager) and desktop (a lightweight hourly check loop with the last run persisted so timing survives app restarts); off by default, and favorited/ignored nodes are never auto-deleted.
 - **Fixed the node list search field losing/reordering characters while typing** — when the list was scrolled down, typing in the search field while the list recalculated its scroll position could scramble the order of the characters you typed; the field now keeps its own immediate local typing state, independent of the list's scroll recalculation.
+- **Smooth panning and zooming with many nodes** — the map no longer keeps rebuilding its data and layers: the "last heard" and "online" fields were removed from the node data sent to the map (they changed constantly, forcing every node to refresh, and the node list shows them anyway); nodes are handed to the map again only when something actually visible changes (position, name, icon); the pulse animation covers visible nodes only and runs in 15 steps; the "visible nodes" area is not recalculated on every small movement; and chip images are cached instead of redrawn. Confirmed on a phone (Snapdragon 8 Gen 3): no more stutter while the map loads.
 
 ## Map
 
@@ -235,6 +243,8 @@ What this means in practice:
 - **Tuned node clustering on the map** — small groups of nodes no longer collapse into a single numbered bubble; clustering now only kicks in for a genuinely dense cluster.
 - **Fixed a flickering count inside the cluster bubble** — the number of grouped nodes could show for a moment then vanish, only coming back on the next label-placement pass (the bubble itself always stayed visible throughout) — caused by MapLibre's default label collision handling; the count is now always shown regardless of collisions with other chips.
 - **Default basemap changed to OpenStreetMap** — instead of MapLibre's vector Liberty style, the app now starts with raster OSM tiles by default.
+- **Traceroute on the map with signal strength** — the "View on map" button on a traceroute result is available only when every node on the route has a position (otherwise the dialog explains why). Only the nodes of the route are shown; each hop is its own line in the colour of its signal quality (same bands and colours as the signal indicators in the app), with a direction arrow and the SNR in dB. Both directions (there and back, including a direct link or a return along the same path) are drawn separately, side by side; a hop with no SNR reading is grey and labelled "?". The legend shows the four quality colours.
+- **Node-detail mini-map less zoomed in** (level 13 instead of 15) and a fixed crash in the time-range selector (24h/7d/30d).
 
 ## Desktop settings
 
@@ -300,6 +310,7 @@ A mode that surfaces air traffic that would normally just vanish — every packe
 - **Preview for images pasted as links** — controlled by a separate toggle in Settings → Privacy (off by default), available on both Android and the desktop version.
 - **Desktop: Enter = new line, Ctrl+Enter = send** — instead of forcing a send on plain Enter, matching the behavior people expect from desktop chat apps; on the phone, sending stays a separate button next to the text field.
 - **Default Quick Chat templates** — the app's Quick Chat template list used to start out empty; now on first launch it's automatically seeded with a set of custom network commands (e.g. `scyzoryk pomoc`, `scyzoryk test`, `scyzoryk range`, `scyzoryk pogoda`, `scyzoryk info`, `scyzoryk aktualnosci`).
+- **Long messages are split into parts and reassembled live** — text that does not fit in one packet is split on word boundaries into several packets, each starting with a visible tag such as `[k9 2/4] ` (a two-character group id, the part number and the part count). A receiver running this fork sees one merged message with a note on how many parts have arrived; after 3 minutes with parts still missing the app stops waiting and shows what came. Other Meshtastic clients see the parts as separate messages with the tag. The contact list preview and the sending/receiving status are direction-aware.
 
 ## Signal quality and LNA correction
 
@@ -336,6 +347,7 @@ A mode that surfaces air traffic that would normally just vanish — every packe
 
 - **Fixed unreliable reconnection to an already-paired device** — on some phones (confirmed on Xiaomi/MIUI) the app could fail to reconnect to a node after it briefly went out of range or powered off, even though the device remained paired; the only working workaround was manually unpairing and re-pairing. Fixed by: refreshing the GATT service cache on every connect (not just reactively after a detected problem), negotiating MTU explicitly with an automatic retry instead of a single attempt fired immediately after service discovery, and additional detection/recovery mechanisms that keep working even when a manual stop-and-retry would otherwise reset the failure counter.
 - **Fixed BLE device discovery not working on desktop (Windows)** — the app would scan indefinitely without ever finding a device, even though the phone saw the same node fine. Root cause: a Kable library bump (0.44.3 → 0.45.0) pulled in a newer version of the Rust `btleplug` backend that unconditionally enables `SetAllowExtendedAdvertisements` on Windows/WinRT, which makes some BT adapters completely invisible to scanning (a confirmed upstream btleplug bug). Fixed by pinning Kable back to 0.44.3.
+- **The list of recently used network (WiFi/TCP) devices remembers up to 20 entries** instead of 3. The Bluetooth list had no limit — it shows every device paired in the system.
 
 ## Mesh Link Planner
 
@@ -353,6 +365,7 @@ The native **Mesh Link Planner** (radio coverage simulation, available on Androi
 - **Omnidirectional coverage along radials** and clutter presets.
 - **Optional detailed terrain (OpenStreetMap)** — a "Detailed terrain" checkbox; the planner downloads real buildings and forests from OpenStreetMap (Overpass API) and raises the terrain along the path by their height (and in coverage calculations within 30 km of the centre). Off by default, in which case the existing obstacle presets apply. The option improves accuracy but needs an internet connection, loads the device more and takes longer to calculate; if the download fails the planner falls back to the preset. Building heights come from the `height` / `building:levels` tags (3 m per level plus roof); forests and buildings without data use adjustable defaults.
 - **Exports** to PDF, CSV, KML, GeoJSON and PNG; info "i" dialogs everywhere.
+- **Defaults and layers** — the default is the Narrow Fast preset and 869.44165 MHz; choosing a band or changing the preset sets the matching frequency and channel width (2.4 GHz as wide LoRa, first slot for 433 and 470 MHz). Coverage is drawn as a dense raster with a smooth colour scale (MeshMap Planner style) and an opacity slider; the layer menu has a list on top with scrolling, a counter on the icon and a limit of 9 layers, and coverage layers are not remembered after a restart. Header: "Mesh Link Planer (by MT_SW)".
 
 ## Licences and credits
 
@@ -375,6 +388,7 @@ The native **Mesh Link Planner** (radio coverage simulation, available on Androi
 
 - This is a personal, work-in-progress fork — some changes are build-verified and tested on-device, others are still awaiting confirmation in the field.
 - No official releases/tags — changes are kept up to date directly on the `main` branch.
+- Full list of fork changes: [CHANGELOG.md](CHANGELOG.md) (section “MT_SW — fork changes”).
 - The fork uses the same GPL-3.0 license as the upstream project.
 
 ---
