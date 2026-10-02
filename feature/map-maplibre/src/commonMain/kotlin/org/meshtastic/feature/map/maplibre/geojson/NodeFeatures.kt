@@ -63,7 +63,6 @@ fun nodesToFeatureCollection(nodes: List<Node>, myNodeNum: Int? = null): Feature
                     put(NodeFeatureKeys.SHORT_NAME, node.user.short_name)
                     put(NodeFeatureKeys.LONG_NAME, node.user.long_name)
                     put(NodeFeatureKeys.IS_FAVORITE, node.isFavorite)
-                    put(NodeFeatureKeys.IS_ONLINE, node.isOnline)
                     put(NodeFeatureKeys.IS_SELF, myNodeNum != null && node.num == myNodeNum)
                     put(NodeFeatureKeys.FOREGROUND, foreground.toCssHex())
                     put(NodeFeatureKeys.BACKGROUND, background.toCssHex())

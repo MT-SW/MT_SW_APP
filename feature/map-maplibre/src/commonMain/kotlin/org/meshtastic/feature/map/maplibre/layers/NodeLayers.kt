@@ -263,7 +263,6 @@ private data class NodeDrawKey(
     val shortName: String,
     val longName: String,
     val isFavorite: Boolean,
-    val isOnline: Boolean,
     val isIgnored: Boolean,
     val precisionBits: Int,
 )
@@ -276,7 +275,6 @@ private fun Node.toDrawKey() =
         shortName = user.short_name,
         longName = user.long_name,
         isFavorite = isFavorite,
-        isOnline = isOnline,
         isIgnored = isIgnored,
         precisionBits = position.precision_bits,
     )
