@@ -37,6 +37,7 @@ import org.meshtastic.feature.map.planner.data.ClutterMap
 import org.meshtastic.feature.map.planner.data.NoClutterSource
 import org.meshtastic.feature.map.planner.data.PlannerClutter
 import org.meshtastic.feature.map.planner.data.PlannerClutterException
+import org.meshtastic.feature.map.planner.data.PlannerClutterFailure
 import org.meshtastic.feature.map.planner.data.PlannerClutterSource
 import org.meshtastic.feature.map.planner.data.PlannerElevationException
 import org.meshtastic.feature.map.planner.data.PlannerElevationFailure
@@ -204,7 +205,11 @@ class PlannerComputer(
      * Coverage around the end [PlannerUiState.coverageSide] using the state's radio, environment (k and N as of the
      * last [compute]) and coverage settings. Throws [PlannerElevationException] when terrain is unavailable.
      */
-    suspend fun computeCoverage(state: PlannerUiState, onProgress: (Float) -> Unit = {}): CoverageResult {
+    suspend fun computeCoverage(
+        state: PlannerUiState,
+        onClutterFailure: (PlannerClutterFailure) -> Unit = {},
+        onProgress: (Float) -> Unit = {},
+    ): CoverageResult {
         val end = state.end(state.coverageSide)
         val center = end.point ?: throw IllegalArgumentException("coverage side has no point")
         val sampler = elevation.prepareArea(center, state.coverageMaxRangeKm)
@@ -215,7 +220,11 @@ class PlannerComputer(
                 clutter.forArea(center, min(state.coverageMaxRangeKm, state.clutterRadiusKm))
             } catch (e: CancellationException) {
                 throw e
+            } catch (e: PlannerClutterException) {
+                onClutterFailure(e.failure)
+                null
             } catch (e: Exception) {
+                onClutterFailure(PlannerClutterFailure.BAD_RESPONSE)
                 null
             }
         }

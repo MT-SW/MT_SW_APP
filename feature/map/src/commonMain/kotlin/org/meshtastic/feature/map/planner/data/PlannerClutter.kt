@@ -210,6 +210,9 @@ enum class PlannerClutterFailure {
 
     /** The answer could not be understood, or the server reported that the request was too large. */
     BAD_RESPONSE,
+
+    /** Too much data for this range (or for the memory of the device): a smaller range is the way out. */
+    TOO_LARGE,
 }
 
 /** Thrown by [PlannerClutterSource] when obstacle data is unavailable. */

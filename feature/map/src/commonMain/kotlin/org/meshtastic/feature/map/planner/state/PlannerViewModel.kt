@@ -374,7 +374,11 @@ class PlannerViewModel(
         _uiState.update { it.copy(coverageComputing = true, coverageProgress = 0f, coverageError = null) }
         coverageJob = viewModelScope.launch {
             try {
-                val result = computer.computeCoverage(snapshot) { p -> _uiState.update { it.copy(coverageProgress = p) } }
+                val result =
+                    computer.computeCoverage(
+                        snapshot,
+                        onClutterFailure = { f -> _uiState.update { it.copy(clutter = PlannerClutterStatus.Failed(f)) } },
+                    ) { p -> _uiState.update { it.copy(coverageProgress = p) } }
                 _uiState.update { it.copy(coverage = result, coverageComputing = false, coverageProgress = 1f) }
             } catch (e: CancellationException) {
                 throw e
@@ -382,6 +386,8 @@ class PlannerViewModel(
                 val err = if (e.failure == PlannerElevationFailure.NETWORK) PlannerError.ELEVATION_OFFLINE else PlannerError.ELEVATION_DECODE
                 _uiState.update { it.copy(coverageComputing = false, coverageError = err) }
             } catch (e: Exception) {
+                _uiState.update { it.copy(coverageComputing = false, coverageError = PlannerError.COMPUTE_FAILED) }
+            } catch (e: Throwable) { // out of memory is not an Exception
                 _uiState.update { it.copy(coverageComputing = false, coverageError = PlannerError.COMPUTE_FAILED) }
             }
         }
