@@ -197,9 +197,9 @@ class ClutterTest {
         val c = GeoPoint(50.0, 20.0)
         val q = OsmQueries.area(c, 300.0)
         assertTrue(q.contains("""["landuse"~"^(forest|residential|commercial|industrial|retail)$"]("""))
-        // 30 km cap: about 0.27 degrees of latitude each way
-        assertTrue(q.contains("49.72"), q)
-        assertTrue(q.contains("50.27"), q)
+        // 100 km cap: about 0.904 degrees of latitude each way
+        assertTrue(q.contains("49.09"), q)
+        assertTrue(q.contains("50.90"), q)
         assertFalse(q.contains("47."))
     }
 

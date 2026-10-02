@@ -339,4 +339,7 @@
     <string name="planner_precise_coverage_note">Coverage uses real obstacles only within 30 km of the centre; farther out only the terrain counts.</string>
     <string name="planner_report_lbl_terrain_data">Obstacle data</string>
     <string name="planner_report_val_terrain_osm">OpenStreetMap (buildings, forests)</string>
+    <string name="planner_precise_radius">Terrain data range</string>
+    <string name="planner_precise_radius_value">%1$d km</string>
+    <string name="planner_precise_radius_hint">The larger the range, the more data is downloaded; if there is too much of it, the planner falls back to the preset loss.</string>
 </resources>

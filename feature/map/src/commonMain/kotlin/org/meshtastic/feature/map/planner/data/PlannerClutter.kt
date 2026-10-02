@@ -235,7 +235,13 @@ object NoClutterSource : PlannerClutterSource {
 /** Shared numbers for putting obstacles into a terrain profile. */
 object PlannerClutter {
     /** Largest radius (km) around the coverage centre for which obstacle data is requested. */
-    const val MAX_AREA_RADIUS_KM = 30.0
+    const val MAX_AREA_RADIUS_KM = 100.0
+
+    /** Default radius (km) of the obstacle data around the coverage centre; larger areas download much more. */
+    const val DEFAULT_AREA_RADIUS_KM = 30.0
+
+    /** The radii offered in the planner. */
+    val AREA_RADIUS_OPTIONS_KM = listOf(5, 10, 15, 30, 50, 100)
 
     /** Obstacles this close to an antenna are ignored: the antenna height is measured from the ground it stands on. */
     const val CLEAR_AROUND_ANTENNA_M = 100.0

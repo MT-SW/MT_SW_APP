@@ -212,7 +212,7 @@ class PlannerComputer(
         if (state.preciseTerrain) {
             // Only within the radius OpenStreetMap data is requested for; farther out the preset loss still applies.
             clutterMap = try {
-                clutter.forArea(center, min(state.coverageMaxRangeKm, PlannerClutter.MAX_AREA_RADIUS_KM))
+                clutter.forArea(center, min(state.coverageMaxRangeKm, state.clutterRadiusKm))
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

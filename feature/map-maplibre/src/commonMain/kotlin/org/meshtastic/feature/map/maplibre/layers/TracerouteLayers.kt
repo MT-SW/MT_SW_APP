@@ -129,7 +129,7 @@ private fun LabelLayer(
         textFont = const(listOf("Noto Sans Regular")),
         textColor = feature[COLOR].convertToColor(const(Color.White)),
         textHaloColor = const(Color.Black),
-        textHaloWidth = const(1.5.dp),
+        textHaloWidth = const(LABEL_HALO_DP.dp),
         textSize = const(LABEL_TEXT_SIZE_SP.sp),
         textRotate = feature[ROTATION].asNumber(),
         // On the outer side of its own line, where the other direction's label cannot reach.
@@ -210,7 +210,8 @@ private const val SEPARATION_DP = 3
 private const val SEPARATION_EM = 0.125f
 private const val ARROW_BACK_EM = 0.45f
 private const val LABEL_SIDE_EM = 0.95f
-private const val LABEL_TEXT_SIZE_SP = 12
+private const val LABEL_TEXT_SIZE_SP = 13
+private const val LABEL_HALO_DP = 0.8f
 private const val ARROW_TEXT_SIZE_SP = 24
 private const val RGB_MASK = 0xFFFFFF
 private const val HEX_RADIX = 16

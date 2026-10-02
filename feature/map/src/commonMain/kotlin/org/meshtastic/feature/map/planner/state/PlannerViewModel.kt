@@ -36,6 +36,7 @@ import org.meshtastic.feature.map.planner.FeederBuilder
 import org.meshtastic.feature.map.planner.FeederConfig
 import org.meshtastic.feature.map.planner.PlannerBands
 import org.meshtastic.feature.map.planner.data.ClutterHeights
+import org.meshtastic.feature.map.planner.data.PlannerClutter
 import org.meshtastic.feature.map.planner.data.PlannerClutterSource
 import org.meshtastic.feature.map.planner.data.PlannerElevationException
 import org.meshtastic.feature.map.planner.data.PlannerElevationFailure
@@ -318,6 +319,11 @@ class PlannerViewModel(
 
     /** Switches the real buildings / forests (OpenStreetMap) on or off; off keeps the preset behaviour. */
     fun setPreciseTerrain(on: Boolean) = mutate { it.copy(preciseTerrain = on, clutter = PlannerClutterStatus.Idle) }
+
+    fun setClutterRadius(km: Double) {
+        if (km.isNaN()) return
+        mutate { it.copy(clutterRadiusKm = km.coerceIn(1.0, PlannerClutter.MAX_AREA_RADIUS_KM), clutter = PlannerClutterStatus.Idle) }
+    }
 
     fun setForestHeight(m: Double) {
         if (m.isNaN()) return

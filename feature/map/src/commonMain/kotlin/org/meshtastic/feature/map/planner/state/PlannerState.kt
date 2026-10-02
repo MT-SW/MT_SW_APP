@@ -26,6 +26,7 @@ import org.meshtastic.feature.map.planner.PlannerBands
 import org.meshtastic.feature.map.planner.ProfileSeries
 import org.meshtastic.feature.map.planner.data.ClutterHeights
 import org.meshtastic.feature.map.planner.data.ClutterStats
+import org.meshtastic.feature.map.planner.data.PlannerClutter
 import org.meshtastic.feature.map.planner.data.PlannerClutterFailure
 import org.meshtastic.feature.map.planner.data.PropagationConditions
 import org.meshtastic.feature.map.planner.data.PlannerWeatherError
@@ -221,6 +222,8 @@ data class PlannerUiState(
      * calculation). Off by default.
      */
     val preciseTerrain: Boolean = false,
+    /** How far (km) around the coverage centre obstacle data is loaded; the rest keeps the preset loss. */
+    val clutterRadiusKm: Double = PlannerClutter.DEFAULT_AREA_RADIUS_KM,
     val forestHeightM: Double = ClutterHeights.DEFAULT_FOREST_M,
     /** Height of buildings that carry no height or level count in the map data. */
     val buildingHeightM: Double = ClutterHeights.DEFAULT_BUILDING_M,

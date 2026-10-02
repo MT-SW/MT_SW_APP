@@ -69,6 +69,9 @@ import org.meshtastic.core.resources.planner_unit_dbm
 import org.meshtastic.core.resources.planner_unit_khz
 import org.meshtastic.core.resources.planner_unit_mhz
 import org.meshtastic.core.resources.planner_use_weather
+import org.meshtastic.core.resources.planner_precise_radius
+import org.meshtastic.core.resources.planner_precise_radius_hint
+import org.meshtastic.core.resources.planner_precise_radius_value
 import org.meshtastic.core.resources.planner_precise_terrain
 import org.meshtastic.core.resources.planner_precise_warning
 import org.meshtastic.core.resources.planner_precise_forest_height
@@ -80,6 +83,7 @@ import org.meshtastic.core.resources.planner_precise_failed_data
 import org.meshtastic.core.resources.planner_precise_coverage_note
 import org.meshtastic.core.resources.planner_unit_m
 import org.meshtastic.feature.map.planner.data.ClutterHeights
+import org.meshtastic.feature.map.planner.data.PlannerClutter
 import org.meshtastic.feature.map.planner.data.PlannerClutterFailure
 import org.meshtastic.core.resources.planner_weather_failed
 import org.meshtastic.core.resources.planner_weather_idle
@@ -254,6 +258,19 @@ private fun EnvironmentCard(state: PlannerUiState, vm: PlannerViewModel) {
                 text = stringResource(Res.string.planner_precise_warning),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.tertiary,
+            )
+            PlannerDropdown(
+                label = stringResource(Res.string.planner_precise_radius),
+                selectedLabel = stringResource(Res.string.planner_precise_radius_value, state.clutterRadiusKm.toInt()),
+                options =
+                PlannerClutter.AREA_RADIUS_OPTIONS_KM.map {
+                    it.toDouble() to stringResource(Res.string.planner_precise_radius_value, it)
+                },
+                onSelect = { vm.setClutterRadius(it) },
+            )
+            Text(
+                text = stringResource(Res.string.planner_precise_radius_hint),
+                style = MaterialTheme.typography.bodySmall,
             )
             PlannerNumberField(
                 label = stringResource(Res.string.planner_precise_forest_height),

@@ -17,10 +17,11 @@
 package org.meshtastic.feature.map.planner.data
 
 import io.ktor.client.HttpClient
-import io.ktor.client.request.get
+import io.ktor.client.request.prepareGet
 import io.ktor.client.request.parameter
-import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.isSuccess
+import io.ktor.utils.io.readAvailable
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
@@ -67,16 +68,18 @@ class PlannerOverpass(
         map
     }
 
+    @Suppress("TooGenericExceptionCaught")
     private suspend fun fetch(query: String): ClutterMap {
         val body: String? = try {
-            withTimeoutOrNull(timeoutMs) {
-                val response = httpClient.get(baseUrl) { parameter("data", query) }
-                if (response.status.isSuccess()) response.bodyAsText() else null
-            }
+            withTimeoutOrNull(timeoutMs) { download(query) }
         } catch (e: CancellationException) {
+            throw e
+        } catch (e: PlannerClutterException) {
             throw e
         } catch (e: Exception) {
             throw PlannerClutterException(PlannerClutterFailure.NETWORK, e)
+        } catch (e: Throwable) { // OutOfMemoryError is not an Exception
+            throw PlannerClutterException(PlannerClutterFailure.BAD_RESPONSE, e)
         }
         if (body == null) throw PlannerClutterException(PlannerClutterFailure.NETWORK)
         return try {
@@ -85,8 +88,33 @@ class PlannerOverpass(
             throw e
         } catch (e: Exception) {
             throw PlannerClutterException(PlannerClutterFailure.BAD_RESPONSE, e)
+        } catch (e: Throwable) { // OutOfMemoryError is not an Exception
+            throw PlannerClutterException(PlannerClutterFailure.BAD_RESPONSE, e)
         }
     }
+
+    /**
+     * Reads the answer in chunks and gives up as soon as it passes [MAX_BODY_BYTES]: a dense area can answer with
+     * tens of megabytes, which a phone with a small heap cannot hold (and the parsed tree is several times larger).
+     * Null when the server answered with an error status.
+     */
+    private suspend fun download(query: String): String? =
+        httpClient.prepareGet(baseUrl) { parameter("data", query) }.execute { response ->
+            if (!response.status.isSuccess()) return@execute null
+            val channel = response.bodyAsChannel()
+            val chunk = ByteArray(CHUNK_BYTES)
+            var buffer = ByteArray(INITIAL_BYTES)
+            var size = 0
+            while (true) {
+                val n = channel.readAvailable(chunk, 0, chunk.size)
+                if (n < 0) break
+                if (size + n > MAX_BODY_BYTES) throw PlannerClutterException(PlannerClutterFailure.BAD_RESPONSE)
+                if (size + n > buffer.size) buffer = buffer.copyOf(maxOf(buffer.size * 2, size + n))
+                chunk.copyInto(buffer, size, 0, n)
+                size += n
+            }
+            buffer.decodeToString(0, size)
+        }
 
     /** Clears the in-memory answers (used by "refresh"). */
     suspend fun invalidate() = lock.withLock { cache.clear() }
@@ -95,6 +123,9 @@ class PlannerOverpass(
         const val BASE_URL = "https://overpass-api.de/api/interpreter"
         const val TIMEOUT_MS = 60_000L
         const val CACHE_MS = 30 * 60 * 1000L
+        private const val MAX_BODY_BYTES = 12_000_000
+        private const val CHUNK_BYTES = 16 * 1024
+        private const val INITIAL_BYTES = 256 * 1024
         private const val CACHE_ENTRIES = 6
 
         /** Rounded to about 1 m so that the same pick always hits the cache. */
