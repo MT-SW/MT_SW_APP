@@ -257,6 +257,37 @@ fun MeshMap(
     )
 }
 
+/** Remembers the last padded box between recompositions; see [rememberStickyBounds]. */
+private class StickyBounds {
+    var box: BoundingBox? = null
+}
+
+/**
+ * The padded viewport, held still while the camera stays well inside it.
+ *
+ * The viewport changes on every frame of a pan, and everything keyed on it — which chips and precision circles are in
+ * view — was recomputed, and handed to the map as a new list, once per frame. This keeps the same box until the real
+ * viewport leaves it (or zooming in leaves it far too large), so a drag costs nothing until it has actually travelled.
+ */
+@Composable
+private fun rememberStickyBounds(viewport: BoundingBox?): BoundingBox? {
+    val holder = remember { StickyBounds() }
+    if (viewport == null) return holder.box
+    val current = holder.box
+    val inside =
+        current != null &&
+            viewport.west >= current.west &&
+            viewport.east <= current.east &&
+            viewport.south >= current.south &&
+            viewport.north <= current.north &&
+            (viewport.east - viewport.west) * STICKY_MAX_RATIO >= (current.east - current.west)
+    if (!inside) holder.box = viewport.padded(CHIP_VIEW_PADDING)
+    return holder.box
+}
+
+/** How many times larger than the viewport the held box may get before zooming in rebuilds it. */
+private const val STICKY_MAX_RATIO = 4
+
 /** The node chips, clusters and precision circles — split out of [MeshMap] itself only to keep that function short. */
 @Composable
 @MaplibreComposable
@@ -274,7 +305,7 @@ private fun MeshMapNodeLayers(
         nodes = visibleNodes,
         // Padded so a modest pan keeps the same nodes in view, and the chips are not redrawn for every frame of a
         // drag. Without a viewport at all — the first composition — every node is a candidate, as before.
-        visibleBounds = viewportBounds?.padded(CHIP_VIEW_PADDING),
+        visibleBounds = rememberStickyBounds(viewportBounds),
         // Floored: clustering indexes per whole zoom level, so the set only changes when the level does — and a
         // pinch does not recompute it for every fractional step in between.
         zoom = floor(mapState.cameraPosition.zoom).toInt(),
