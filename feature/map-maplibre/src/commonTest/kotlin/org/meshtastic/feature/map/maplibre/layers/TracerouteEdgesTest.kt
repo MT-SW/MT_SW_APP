@@ -28,23 +28,34 @@ class TracerouteEdgesTest {
         TracerouteEdge(from = Position(longitude = 20.0, latitude = 50.0), to = Position(longitude = toLon, latitude = toLat), snrDb = snr)
 
     @Test
-    fun arrowPointsTheWayTheHopGoes() {
-        assertEquals("↑", edge(50.1, 20.0).arrow)
-        assertEquals("→", edge(50.0, 20.1).arrow)
-        assertEquals("↓", edge(49.9, 20.0).arrow)
-        assertEquals("←", edge(50.0, 19.9).arrow)
+    fun arrowRotationFollowsTheHop() {
+        assertEquals(0.0, edge(50.0, 20.1).arrowRotationDeg, 1e-6)
+        assertEquals(-90.0, edge(50.1, 20.0).arrowRotationDeg, 1e-6)
+        assertEquals(90.0, edge(49.9, 20.0).arrowRotationDeg, 1e-6)
+    }
+
+    @Test
+    fun labelNeverRunsUpsideDown() {
+        val east = edge(50.0, 20.1)
+        assertEquals(0.0, east.labelRotationDeg, 1e-6)
+        assertFalse(east.labelFlipped)
+        val west = edge(50.0, 19.9)
+        assertEquals(0.0, west.labelRotationDeg, 1e-6)
+        assertTrue(west.labelFlipped)
     }
 
     @Test
     fun labelShowsSnrOrQuestionMark() {
-        assertEquals("→ -3.5 dB", edge(50.0, 20.1, -3.5f).label)
-        assertEquals("→ ?", edge(50.0, 20.1, null).label)
+        assertEquals("-3.5 dB", edge(50.0, 20.1, -3.5f).label)
+        assertEquals("?", edge(50.0, 20.1, null).label)
     }
 
     @Test
-    fun eastWestHopsAreSeparatedVertically() {
-        assertTrue(edge(50.0, 20.1).isMostlyEastWest)
-        assertFalse(edge(50.1, 20.0).isMostlyEastWest)
+    fun lineStopsShortOfBothNodes() {
+        val e = edge(50.0, 21.0)
+        assertTrue(e.lineStart.longitude > 20.0)
+        assertTrue(e.lineEnd.longitude < 21.0)
+        assertTrue(e.lineEnd.longitude > e.lineStart.longitude)
     }
 
     @Test

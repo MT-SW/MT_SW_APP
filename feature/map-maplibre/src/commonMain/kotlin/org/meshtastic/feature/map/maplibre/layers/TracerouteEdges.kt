@@ -19,7 +19,6 @@ package org.meshtastic.feature.map.maplibre.layers
 import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.model.Node
-import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
 
@@ -34,20 +33,37 @@ internal data class TracerouteEdge(val from: Position, val to: Position, val snr
             return if (deg < 0.0) deg + FULL_CIRCLE else deg
         }
 
-    /** True when the hop runs mostly east-west on a north-up map, so a copy of it is separated vertically. */
-    val isMostlyEastWest: Boolean
-        get() = abs(kotlin.math.sin(bearingDeg * RAD_PER_DEG)) >= HALF_DIAGONAL
+    /** Rotation for an arrowhead glyph that points right ("→") at rest, so it points along the hop. */
+    val arrowRotationDeg: Double
+        get() = bearingDeg - QUARTER_CIRCLE
+
+    /** True when the text had to be turned half a circle to stay upright, which swaps its left and right. */
+    val labelFlipped: Boolean
+        get() = arrowRotationDeg > QUARTER_CIRCLE
+
+    /** Rotation for the SNR text so it runs along the hop but is never upside down. */
+    val labelRotationDeg: Double
+        get() = if (labelFlipped) arrowRotationDeg - HALF_CIRCLE else arrowRotationDeg
+
+    /** Where the drawn line begins: a little past the sending node, so the node's marker stays clear. */
+    val lineStart: Position
+        get() = along(LINE_START_FRACTION)
+
+    /** Where the drawn line, and its arrowhead, end: a little short of the receiving node. */
+    val lineEnd: Position
+        get() = along(LINE_END_FRACTION)
+
+    private fun along(fraction: Double) = Position(
+        longitude = from.longitude + (to.longitude - from.longitude) * fraction,
+        latitude = from.latitude + (to.latitude - from.latitude) * fraction,
+    )
 
     val midpoint: Position
         get() = Position(longitude = (from.longitude + to.longitude) / 2.0, latitude = (from.latitude + to.latitude) / 2.0)
 
-    /** The arrow pointing the way the packet travelled, e.g. "↗". */
-    val arrow: String
-        get() = ARROWS[(((bearingDeg + EIGHTH_CIRCLE / 2.0) / EIGHTH_CIRCLE).toInt()) % ARROWS.size]
-
-    /** "↗ -3.5 dB", or "↗ ?" when the radio did not report a value. */
+    /** "-3.5 dB", or "?" when the radio did not report a value. */
     val label: String
-        get() = arrow + " " + (snrDb?.let { NumberFormatter.format(it.toDouble(), 1) + " dB" } ?: "?")
+        get() = snrDb?.let { NumberFormatter.format(it.toDouble(), 1) + " dB" } ?: "?"
 }
 
 /**
@@ -77,6 +93,7 @@ internal const val UNKNOWN_SNR = -128
 private const val SNR_UNITS_PER_DB = 4f
 private const val RAD_PER_DEG = kotlin.math.PI / 180.0
 private const val FULL_CIRCLE = 360.0
-private const val EIGHTH_CIRCLE = 45.0
-private const val HALF_DIAGONAL = 0.70710678
-private val ARROWS = listOf("↑", "↗", "→", "↘", "↓", "↙", "←", "↖")
+private const val LINE_START_FRACTION = 0.04
+private const val LINE_END_FRACTION = 0.93
+private const val HALF_CIRCLE = 180.0
+private const val QUARTER_CIRCLE = 90.0

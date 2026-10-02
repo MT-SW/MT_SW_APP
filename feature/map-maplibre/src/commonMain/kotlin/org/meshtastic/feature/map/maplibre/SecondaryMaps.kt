@@ -45,6 +45,7 @@ import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.CameraUpdate
 import org.maplibre.compose.expressions.dsl.asBoolean
 import org.maplibre.compose.expressions.dsl.const
+import org.maplibre.compose.layers.CircleLayer
 import org.maplibre.compose.expressions.dsl.feature
 import org.maplibre.compose.expressions.dsl.not
 import org.maplibre.compose.expressions.value.LineCap
@@ -184,10 +185,22 @@ fun MapLibreTracerouteMap(
     }
 }
 
+private const val HOP_DOT_RADIUS_DP = 4
+private const val HOP_DOT_STROKE_DP = 2
+
 /** Every hop the route passes through, as the node chip it is elsewhere in the app. */
 @Composable
 private fun TracerouteHopLayers(hops: List<Node>) {
     val hopSource = rememberFeatureSource(hops) { nodesToFeatureCollection(hops) }
+    // A dot on the exact spot first, as on the main map, with the chip standing on it; the lines stop just short.
+    CircleLayer(
+        id = "traceroute-hop-dots",
+        source = hopSource,
+        radius = const(HOP_DOT_RADIUS_DP.dp),
+        color = const(Color.White),
+        strokeColor = const(Color.Black),
+        strokeWidth = const(HOP_DOT_STROKE_DP.dp),
+    )
     NodeChipLayer(id = "traceroute-hops", source = hopSource, nodes = hops)
 }
 
