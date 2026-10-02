@@ -79,7 +79,7 @@ class PlannerOverpass(
         } catch (e: Exception) {
             throw PlannerClutterException(PlannerClutterFailure.NETWORK, e)
         } catch (e: Throwable) { // OutOfMemoryError is not an Exception
-            throw PlannerClutterException(PlannerClutterFailure.BAD_RESPONSE, e)
+            throw PlannerClutterException(PlannerClutterFailure.TOO_LARGE, e)
         }
         if (body == null) throw PlannerClutterException(PlannerClutterFailure.NETWORK)
         return try {
@@ -87,9 +87,11 @@ class PlannerOverpass(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            throw PlannerClutterException(PlannerClutterFailure.BAD_RESPONSE, e)
+            val msg = e.message.orEmpty().lowercase()
+            val tooLarge = msg.contains("memory") || msg.contains("maxsize")
+            throw PlannerClutterException(if (tooLarge) PlannerClutterFailure.TOO_LARGE else PlannerClutterFailure.BAD_RESPONSE, e)
         } catch (e: Throwable) { // OutOfMemoryError is not an Exception
-            throw PlannerClutterException(PlannerClutterFailure.BAD_RESPONSE, e)
+            throw PlannerClutterException(PlannerClutterFailure.TOO_LARGE, e)
         }
     }
 
@@ -108,7 +110,7 @@ class PlannerOverpass(
             while (true) {
                 val n = channel.readAvailable(chunk, 0, chunk.size)
                 if (n < 0) break
-                if (size + n > MAX_BODY_BYTES) throw PlannerClutterException(PlannerClutterFailure.BAD_RESPONSE)
+                if (size + n > MAX_BODY_BYTES) throw PlannerClutterException(PlannerClutterFailure.TOO_LARGE)
                 if (size + n > buffer.size) buffer = buffer.copyOf(maxOf(buffer.size * 2, size + n))
                 chunk.copyInto(buffer, size, 0, n)
                 size += n

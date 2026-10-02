@@ -78,6 +78,7 @@ import org.meshtastic.core.resources.planner_precise_forest_height
 import org.meshtastic.core.resources.planner_precise_building_height
 import org.meshtastic.core.resources.planner_precise_loading
 import org.meshtastic.core.resources.planner_precise_ready
+import org.meshtastic.core.resources.planner_precise_failed_large
 import org.meshtastic.core.resources.planner_precise_failed_network
 import org.meshtastic.core.resources.planner_precise_failed_data
 import org.meshtastic.core.resources.planner_precise_coverage_note
@@ -344,10 +345,10 @@ private fun ClutterStatusBlock(status: PlannerClutterStatus) {
             is PlannerClutterStatus.Failed ->
                 Text(
                     text = stringResource(
-                        if (status.failure == PlannerClutterFailure.NETWORK) {
-                            Res.string.planner_precise_failed_network
-                        } else {
-                            Res.string.planner_precise_failed_data
+                        when (status.failure) {
+                            PlannerClutterFailure.NETWORK -> Res.string.planner_precise_failed_network
+                            PlannerClutterFailure.TOO_LARGE -> Res.string.planner_precise_failed_large
+                            PlannerClutterFailure.BAD_RESPONSE -> Res.string.planner_precise_failed_data
                         },
                     ),
                     style = MaterialTheme.typography.bodySmall,
