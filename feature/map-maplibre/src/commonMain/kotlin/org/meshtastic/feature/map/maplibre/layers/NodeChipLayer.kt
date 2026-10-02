@@ -164,7 +164,16 @@ internal fun MapChipLayer(
     filter: Expression<BooleanValue>? = null,
     onClick: FeaturesClickHandler? = null,
 ) {
-    val distinct = remember(chips) { chips.distinct().take(MAX_CHIP_IMAGES) }
+    // Only ever grows (until the ceiling): a chip that scrolls out of view stays registered, so panning back does not
+    // drop and re-upload its image, and a newly visible node adds one image instead of swapping the whole set.
+    val seen = remember { LinkedHashSet<MapChipKey>() }
+    val distinct =
+        remember(chips) {
+            val wanted = chips.distinct().take(MAX_CHIP_IMAGES)
+            if (seen.size + wanted.count { it !in seen } > MAX_CHIP_IMAGES) seen.clear()
+            seen.addAll(wanted)
+            seen.toList()
+        }
     val images = rememberChipImages(distinct)
     val blank = rememberBlankPainter()
 
@@ -212,8 +221,14 @@ private fun rememberChipImages(chips: List<MapChipKey>): Map<String, ChipImage> 
             MapChipGlyph.SOCIAL to rememberVectorPainter(MeshtasticIcons.Person),
         )
 
-    return remember(chips, measurer, density, textStyle, glyphs) {
-        chips.associate { chip -> chip.featureValue() to chip.rasterize(measurer, textStyle, density, glyphs) }
+    // One painter per chip for as long as its inputs hold: a painter's identity is what the map keys its image by, so
+    // rebuilding every chip because one more was added would re-upload them all.
+    val cache = remember(measurer, density, textStyle, glyphs) { HashMap<String, ChipImage>() }
+    return remember(chips, cache) {
+        chips.associate { chip ->
+            val key = chip.featureValue()
+            key to cache.getOrPut(key) { chip.rasterize(measurer, textStyle, density, glyphs) }
+        }
     }
 }
 
