@@ -30,7 +30,7 @@ object OsmQueries {
 
     /** Server side time limit (s) and memory cap (bytes) written into every query. */
     const val SERVER_TIMEOUT_S = 40
-    const val SERVER_MAX_BYTES = 134_217_728
+    const val SERVER_MAX_BYTES = 16_777_216
 
     private const val POLYLINE_SPACING_M = 1500.0
     private const val MAX_POLYLINE_POINTS = 40

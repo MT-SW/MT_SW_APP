@@ -339,4 +339,7 @@
     <string name="planner_precise_coverage_note">Zasięg uwzględnia prawdziwe przeszkody tylko do 30 km od środka; dalej liczy się sam teren.</string>
     <string name="planner_report_lbl_terrain_data">Dane o przeszkodach</string>
     <string name="planner_report_val_terrain_osm">OpenStreetMap (budynki, lasy)</string>
+    <string name="planner_precise_radius">Zasięg danych o terenie</string>
+    <string name="planner_precise_radius_value">%1$d km</string>
+    <string name="planner_precise_radius_hint">Im większy zasięg, tym więcej danych do pobrania; gdy będzie ich za dużo, planer wróci do strat z ustawienia wstępnego.</string>
 </resources>
