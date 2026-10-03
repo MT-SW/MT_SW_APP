@@ -78,7 +78,8 @@ internal fun MapLayersButton(
     val opacity by opacityStore.opacity.collectAsStateWithLifecycle()
 
     val layersManager: MapLayersManager = koinInject()
-    val layerCount = layersManager.mapLayers.collectAsState().value.size
+    val mapLayers by layersManager.mapLayers.collectAsStateWithLifecycle()
+    val layerCount = mapLayers.size
 
     // The count badge only exists while at least one layer does; otherwise this is the plain button.
     BadgedBox(
