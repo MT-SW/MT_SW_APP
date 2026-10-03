@@ -64,7 +64,24 @@ class PlannerOverpass(
     private val cache = LinkedHashMap<String, Pair<Long, ClutterMap>>()
 
     override suspend fun forLink(a: GeoPoint, b: GeoPoint): ClutterMap =
-        cached("L:" + pointKey(a) + ":" + pointKey(b)) { fetch(OsmQueries.link(a, b)) }
+        cached("L:" + pointKey(a) + ":" + pointKey(b)) { fetchLink(a, b) }
+
+    /** The obstacles along a link, asked for in lighter parts (woods, then the buildings of each end). */
+    private suspend fun fetchLink(a: GeoPoint, b: GeoPoint): ClutterMap {
+        val seen = HashSet<Long>()
+        val polygons = ArrayList<ClutterPolygon>()
+        for (query in OsmQueries.linkParts(a, b)) {
+            try {
+                polygons.addAll(fetch(query, seen).polygons)
+            } catch (e: PlannerClutterException) {
+                // A server that timed out or dropped the connection once often answers the second time.
+                if (e.failure != PlannerClutterFailure.SERVER_LIMIT && e.failure != PlannerClutterFailure.NETWORK) throw e
+                delay(LINK_RETRY_WAIT_MS)
+                polygons.addAll(fetch(query, seen).polygons)
+            }
+        }
+        return ClutterMap(polygons)
+    }
 
     override suspend fun forArea(center: GeoPoint, radiusKm: Double): ClutterMap {
         val r = radiusKm.coerceIn(0.1, PlannerClutter.MAX_AREA_RADIUS_KM)
@@ -173,6 +190,11 @@ class PlannerOverpass(
                         pending.addFirst(TileWork(work.box, work.tries + 1))
                     }
                     splittable -> work.box.quarters().asReversed().forEach { pending.addFirst(TileWork(it)) }
+                    // The smallest piece timed out: the server is overloaded rather than the piece heavy; wait and ask again.
+                    e.failure == PlannerClutterFailure.SERVER_LIMIT && work.tries < OVERLOAD_RETRIES -> {
+                        delay(OVERLOAD_WAIT_MS)
+                        pending.addFirst(TileWork(work.box, work.tries + 1))
+                    }
                     else -> throw e
                 }
                 continue
@@ -284,6 +306,9 @@ class PlannerOverpass(
         private const val CONNECT_TIMEOUT_MS = 15_000L
         private const val READ_TIMEOUT_MS = 90_000L
         private const val NETWORK_RETRIES = 2
+        private const val OVERLOAD_RETRIES = 2
+        private const val OVERLOAD_WAIT_MS = 8_000L
+        private const val LINK_RETRY_WAIT_MS = 3_000L
         private const val NETWORK_RETRY_WAIT_MS = 2_000L
 
         /** Up to this radius an area is a single request. */
