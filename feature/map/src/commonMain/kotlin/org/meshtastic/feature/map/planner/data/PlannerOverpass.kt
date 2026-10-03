@@ -24,6 +24,7 @@ import io.ktor.http.isSuccess
 import io.ktor.utils.io.readAvailable
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -31,6 +32,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.feature.map.planner.GeoPoint
 import org.meshtastic.feature.map.planner.export.Num
+import kotlin.math.max
 
 /**
  * [PlannerClutterSource] that asks an Overpass API server (default: the public overpass-api.de instance) for the
@@ -51,44 +53,113 @@ class PlannerOverpass(
     private val cache = LinkedHashMap<String, Pair<Long, ClutterMap>>()
 
     override suspend fun forLink(a: GeoPoint, b: GeoPoint): ClutterMap =
-        cached("L:" + pointKey(a) + ":" + pointKey(b)) { OsmQueries.link(a, b) }
+        cached("L:" + pointKey(a) + ":" + pointKey(b)) { fetch(OsmQueries.link(a, b)) }
 
     override suspend fun forArea(center: GeoPoint, radiusKm: Double): ClutterMap {
         val r = radiusKm.coerceIn(0.1, PlannerClutter.MAX_AREA_RADIUS_KM)
-        return cached("A:" + pointKey(center) + ":" + Num.fmt(r, 1)) { OsmQueries.area(center, r) }
+        val key = "A:" + pointKey(center) + ":" + Num.fmt(r, 1)
+        // A small area is one request. A large one (50 or 100 km is a box of 100 to 200 km on a side) would be one
+        // answer of tens of megabytes: it is fetched piece by piece instead.
+        return if (r <= SINGLE_REQUEST_KM) {
+            cached(key) { fetch(OsmQueries.area(center, r)) }
+        } else {
+            cached(key) { fetchTiled(ClutterBox.around(center.lat, center.lon, r)) }
+        }
     }
 
-    private suspend fun cached(key: String, query: () -> String): ClutterMap = lock.withLock {
+    private suspend fun cached(key: String, load: suspend () -> ClutterMap): ClutterMap = lock.withLock {
         val now = clockMs()
         val hit = cache[key]
         if (hit != null && now - hit.first < CACHE_MS) return@withLock hit.second
-        val map = fetch(query())
+        val map = load()
         cache.remove(key)
         cache[key] = now to map
         while (cache.size > CACHE_ENTRIES) cache.remove(cache.keys.first())
         map
     }
 
+    /** The server that answered last is asked first: a dead main server must not cost a timeout for every piece. */
+    private var lastGoodUrl: String? = null
+
     /**
-     * Asks the main server and, when it refuses, is busy or does not answer, the mirrors one after another. Data that
-     * is genuinely too big for this device ([PlannerClutterFailure.TOO_LARGE]) stops at once: another server would
-     * send the same amount.
+     * Asks the main server and, when it is busy or does not answer, the mirrors one after another. An answer that is
+     * too big, or a refusal because of the query itself ("out of memory", "timed out"), stops at once: another server
+     * would say the same, and the caller can split the area instead.
      */
-    private suspend fun fetch(query: String): ClutterMap {
+    private suspend fun fetch(query: String, seen: MutableSet<Long>? = null, thinM: Double = 0.0): ClutterMap {
+        val urls = (listOf(baseUrl) + fallbackUrls).distinct()
+        val ordered = lastGoodUrl?.let { good -> listOf(good) + urls.filter { it != good } } ?: urls
         var last: PlannerClutterException? = null
-        for (url in listOf(baseUrl) + fallbackUrls.filter { it != baseUrl }) {
+        for (url in ordered) {
             try {
-                return fetchFrom(url, query)
+                val map = fetchFrom(url, query, seen, thinM)
+                lastGoodUrl = url
+                return map
             } catch (e: PlannerClutterException) {
-                if (e.failure == PlannerClutterFailure.TOO_LARGE) throw e
+                if (!worthAskingAnotherServer(e)) throw e
                 last = e
             }
         }
         throw last ?: PlannerClutterException(PlannerClutterFailure.NETWORK)
     }
 
+    private fun worthAskingAnotherServer(e: PlannerClutterException): Boolean = when (e.failure) {
+        PlannerClutterFailure.NETWORK, PlannerClutterFailure.BAD_RESPONSE -> true
+        PlannerClutterFailure.SERVER_LIMIT -> e.detail?.startsWith("HTTP") == true
+        PlannerClutterFailure.TOO_LARGE -> false
+    }
+
+    private class TileWork(val box: ClutterBox, val tries: Int = 0)
+
+    /**
+     * A large area as many requests, one at a time (the public server limits parallel use): the box is cut into tiles
+     * of about [TILE_START_KM]; a tile the server finds too heavy (or whose answer is too big) is cut into four and
+     * asked again, down to [MIN_TILE_KM], so dense places end up in small pieces and empty land in big ones. An element
+     * on the border of two tiles is kept once, outlines are thinned to fit in memory, and a server that says "too many
+     * requests" is waited for. Everything or an error: half a map would look like open ground where it is not.
+     */
+    private suspend fun fetchTiled(whole: ClutterBox): ClutterMap {
+        val deadline = clockMs() + TILED_BUDGET_MS
+        val pending = ArrayDeque<TileWork>()
+        ClutterTiles.grid(whole, TILE_START_KM).forEach { pending.addLast(TileWork(it)) }
+        val seen = HashSet<Long>()
+        val polygons = ArrayList<ClutterPolygon>()
+        var points = 0L
+        // The farther the area reaches, the coarser the picture needs to be: the coverage raster of 100 km has cells of
+        // hundreds of metres, so outlines are thinned (and woods smaller than that dropped) more the bigger the area is.
+        val thinM = max(THIN_M, whole.maxSideKm / 2.0 * THIN_M_PER_KM)
+        while (pending.isNotEmpty()) {
+            if (clockMs() > deadline) throw PlannerClutterException(PlannerClutterFailure.SERVER_LIMIT, detail = "time limit")
+            val work = pending.removeFirst()
+            val part = try {
+                fetch(OsmQueries.box(work.box), seen, thinM)
+            } catch (e: PlannerClutterException) {
+                val busy = e.detail == "HTTP 429"
+                val splittable = (e.failure == PlannerClutterFailure.TOO_LARGE || e.failure == PlannerClutterFailure.SERVER_LIMIT) &&
+                    !busy && work.box.maxSideKm > MIN_TILE_KM
+                when {
+                    busy && work.tries < BUSY_RETRIES -> {
+                        delay(BUSY_WAIT_MS)
+                        pending.addFirst(TileWork(work.box, work.tries + 1))
+                    }
+                    splittable -> work.box.quarters().asReversed().forEach { pending.addFirst(TileWork(it)) }
+                    else -> throw e
+                }
+                continue
+            }
+            for (polygon in part.polygons) {
+                polygons.add(polygon)
+                points += polygon.outer.size / 2
+                for (hole in polygon.holes) points += hole.size / 2
+            }
+            if (points > MAX_POINTS) throw PlannerClutterException(PlannerClutterFailure.TOO_LARGE, detail = "too many points")
+            delay(PAUSE_BETWEEN_TILES_MS)
+        }
+        return ClutterMap(polygons)
+    }
+
     @Suppress("TooGenericExceptionCaught")
-    private suspend fun fetchFrom(url: String, query: String): ClutterMap {
+    private suspend fun fetchFrom(url: String, query: String, seen: MutableSet<Long>?, thinM: Double): ClutterMap {
         val body: String? = try {
             withTimeoutOrNull(timeoutMs) { download(url, query) }
         } catch (e: CancellationException) {
@@ -102,7 +173,7 @@ class PlannerOverpass(
         }
         if (body == null) throw PlannerClutterException(PlannerClutterFailure.NETWORK, detail = "timeout")
         return try {
-            withContext(Dispatchers.Default) { OsmClutterParser.parse(body) }
+            withContext(Dispatchers.Default) { OsmClutterParser.parse(body, seen, thinM) }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -161,7 +232,27 @@ class PlannerOverpass(
         private const val MAX_BODY_BYTES = 12_000_000
         private const val CHUNK_BYTES = 16 * 1024
         private const val INITIAL_BYTES = 256 * 1024
-        private const val CACHE_ENTRIES = 6
+        private const val CACHE_ENTRIES = 3
+
+        /** Up to this radius an area is a single request. */
+        private const val SINGLE_REQUEST_KM = 15.0
+
+        /** Size of the first tiles of a large area, and the smallest tile a heavy one is cut down to (km on a side). */
+        private const val TILE_START_KM = 20.0
+        private const val MIN_TILE_KM = 4.0
+
+        /** Outline points closer than this (m) are dropped in tiled areas, and more so for a larger radius. */
+        private const val THIN_M = 25.0
+        private const val THIN_M_PER_KM = 0.8
+
+        /** Outline points kept in memory for a large area (each is two doubles) before it is called too large. */
+        private const val MAX_POINTS = 6_000_000L
+
+        /** The whole of a large area has to arrive within this time. */
+        private const val TILED_BUDGET_MS = 12 * 60 * 1000L
+        private const val PAUSE_BETWEEN_TILES_MS = 250L
+        private const val BUSY_WAIT_MS = 5_000L
+        private const val BUSY_RETRIES = 4
         private const val DETAIL_MAX_CHARS = 140
 
         /** Public mirrors tried when the main server refuses, is busy or does not answer. */

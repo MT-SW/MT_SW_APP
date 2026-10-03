@@ -341,7 +341,7 @@
     <string name="planner_report_val_terrain_osm">OpenStreetMap (budynki, lasy)</string>
     <string name="planner_precise_radius">Zasięg danych o terenie</string>
     <string name="planner_precise_radius_value">%1$d km</string>
-    <string name="planner_precise_radius_hint">Im większy zasięg, tym więcej danych do pobrania; gdy będzie ich za dużo, planer wróci do strat z ustawienia wstępnego.</string>
+    <string name="planner_precise_radius_hint">Im większy zasięg, tym więcej danych do pobrania; gdy będzie ich za dużo, planer wróci do strat z ustawienia wstępnego. Zasięg powyżej 15 km jest pobierany kawałkami i może potrwać kilka minut.</string>
     <string name="planner_precise_failed_large">Za dużo danych o terenie dla tego zasięgu (albo urządzeniu zabrakło pamięci). Zmniejsz „Zasięg danych o terenie” (na przykład do 15 km) i policz ponownie. Użyto ustawienia wstępnego przeszkód.</string>
     <string name="planner_precise_failed_server">Serwer OpenStreetMap odmówił lub nie dał rady dokończyć zapytania (jest przeciążony albo zapytanie było dla niego za ciężkie). Spróbuj za chwilę lub zmniejsz „Zasięg danych o terenie”. Użyto ustawienia wstępnego przeszkód.</string>
 </resources>

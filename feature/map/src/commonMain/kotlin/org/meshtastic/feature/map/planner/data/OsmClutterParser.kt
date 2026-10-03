@@ -23,6 +23,8 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.jsonObject
+import kotlin.math.PI
+import kotlin.math.cos
 
 /**
  * Turns an Overpass API answer (`[out:json]` with `out tags geom`) into a [ClutterMap].
@@ -33,8 +35,16 @@ import kotlinx.serialization.json.jsonObject
 object OsmClutterParser {
     private val json = Json { ignoreUnknownKeys = true }
 
-    /** Throws when [text] is not an Overpass answer, or when the server says it gave up (`remark`). */
-    fun parse(text: String): ClutterMap {
+    /**
+     * Throws when [text] is not an Overpass answer, or when the server says it gave up (`remark`).
+     *
+     * @param seen keys (`id * 2 + 1` for a relation, `id * 2` for a way) of the elements taken from earlier pieces of a
+     *   large area: an element crossing the border of two pieces is answered by both and must be counted once. The
+     *   keys of this answer are added only when the whole answer was read.
+     * @param thinM when above zero, outline points closer than this (m) to the previously kept one are dropped: a
+     *   forest outline of a large area does not need a point every few metres, and the points are what fills memory.
+     */
+    fun parse(text: String, seen: MutableSet<Long>? = null, thinM: Double = 0.0): ClutterMap {
         val root = json.parseToJsonElement(text).jsonObject
         val remark = (root["remark"] as? JsonPrimitive)?.content
         val elements = root["elements"] as? JsonArray ?: throw IllegalArgumentException("no elements")
@@ -42,13 +52,24 @@ object OsmClutterParser {
             throw IllegalStateException("overpass: $remark")
         }
         val out = ArrayList<ClutterPolygon>(elements.size)
+        val fresh = if (seen != null) ArrayList<Long>() else null
         for (e in elements) {
             val o = e as? JsonObject ?: continue
-            when ((o["type"] as? JsonPrimitive)?.content) {
-                "way" -> wayPolygon(o)?.let { out.add(it) }
-                "relation" -> out.addAll(relationPolygons(o))
+            val type = (o["type"] as? JsonPrimitive)?.content
+            if (seen != null && (type == "way" || type == "relation")) {
+                val id = (o["id"] as? JsonPrimitive)?.content?.toLongOrNull()
+                if (id != null) {
+                    val key = id * 2 + (if (type == "relation") 1L else 0L)
+                    if (key in seen) continue
+                    fresh?.add(key)
+                }
+            }
+            when (type) {
+                "way" -> wayPolygon(o, thinM)?.let { if (!isNegligible(it, thinM)) out.add(it) }
+                "relation" -> relationPolygons(o, thinM).forEach { if (!isNegligible(it, thinM)) out.add(it) }
             }
         }
+        if (seen != null && fresh != null) seen.addAll(fresh)
         return ClutterMap(out)
     }
 
@@ -113,16 +134,16 @@ object OsmClutterParser {
         return if (n == arr.size) out else out.copyOf(2 * n)
     }
 
-    private fun wayPolygon(o: JsonObject): ClutterPolygon? {
+    private fun wayPolygon(o: JsonObject, thinM: Double): ClutterPolygon? {
         val tags = tagsOf(o)
         val kind = classify(tags) ?: return null
         val ring = geometryOf(o["geometry"]) ?: return null
         if (!isClosed(ring)) return null
         val explicit = if (kind == ClutterKind.BUILDING) buildingHeight(tags) else null
-        return ClutterPolygon(kind, explicit, ring)
+        return ClutterPolygon(kind, explicit, thinRing(ring, thinM))
     }
 
-    private fun relationPolygons(o: JsonObject): List<ClutterPolygon> {
+    private fun relationPolygons(o: JsonObject, thinM: Double): List<ClutterPolygon> {
         val tags = tagsOf(o)
         val kind = classify(tags) ?: return emptyList()
         val members = o["members"] as? JsonArray ?: return emptyList()
@@ -137,8 +158,8 @@ object OsmClutterParser {
                 "inner" -> inners.add(geom)
             }
         }
-        val outerRings = assembleRings(outers)
-        val innerRings = assembleRings(inners)
+        val outerRings = assembleRings(outers).map { thinRing(it, thinM) }
+        val innerRings = assembleRings(inners).map { thinRing(it, thinM) }
         if (outerRings.isEmpty()) return emptyList()
         val holesFor = Array(outerRings.size) { ArrayList<DoubleArray>() }
         for (h in innerRings) {
@@ -147,6 +168,46 @@ object OsmClutterParser {
         }
         val explicit = if (kind == ClutterKind.BUILDING) buildingHeight(tags) else null
         return outerRings.mapIndexed { i, ring -> ClutterPolygon(kind, explicit, ring, holesFor[i]) }
+    }
+
+    // ---- thinning ----
+
+    /** True when thinning is on and the whole outline fits in a square of [thinM] metres: invisible at that scale. */
+    private fun isNegligible(p: ClutterPolygon, thinM: Double): Boolean {
+        if (thinM <= 0.0) return false
+        val heightM = (p.maxLat - p.minLat) * METERS_PER_DEG
+        val widthM = (p.maxLon - p.minLon) * METERS_PER_DEG * cos(p.minLat * PI / 180.0)
+        return heightM < thinM && widthM < thinM
+    }
+
+    /**
+     * [ring] without the points that lie closer than [tolM] metres to the previously kept one; the first point (which is
+     * also the last of a closed ring) always stays. A ring that would be left with fewer than four points (a small
+     * building, say) is returned as it was.
+     */
+    internal fun thinRing(ring: DoubleArray, tolM: Double): DoubleArray {
+        val n = ring.size / 2
+        if (tolM <= 0.0 || n <= MIN_RING_POINTS) return ring
+        val tolDeg = tolM / METERS_PER_DEG
+        val tol2 = tolDeg * tolDeg
+        val cosLat = cos(ring[0] * PI / 180.0)
+        val out = DoubleArray(ring.size)
+        out[0] = ring[0]
+        out[1] = ring[1]
+        var kept = 1
+        for (i in 1 until n - 1) {
+            val dy = ring[2 * i] - out[2 * (kept - 1)]
+            val dx = (ring[2 * i + 1] - out[2 * (kept - 1) + 1]) * cosLat
+            if (dx * dx + dy * dy >= tol2) {
+                out[2 * kept] = ring[2 * i]
+                out[2 * kept + 1] = ring[2 * i + 1]
+                kept++
+            }
+        }
+        out[2 * kept] = ring[2 * (n - 1)]
+        out[2 * kept + 1] = ring[2 * (n - 1) + 1]
+        kept++
+        return if (kept < MIN_RING_POINTS) ring else out.copyOf(2 * kept)
     }
 
     // ---- ring assembly ----
@@ -216,4 +277,5 @@ object OsmClutterParser {
     private const val LEVEL_M = 3.0
     private const val ROOF_M = 1.0
     private const val MIN_RING_POINTS = 4
+    private const val METERS_PER_DEG = 111_320.0
 }

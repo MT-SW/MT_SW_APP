@@ -211,6 +211,53 @@ class ClutterTest {
         assertTrue(OsmQueries.area(GeoPoint(50.0, 20.0), 5.0).contains("[maxsize:${OsmQueries.SERVER_MAX_BYTES}]"))
     }
 
+    // ---- large areas: pieces, duplicates, thinning ----
+
+    @Test
+    fun anElementOnTheBorderOfTwoPiecesIsCountedOnce() {
+        val seen = HashSet<Long>()
+        val text = answer(way(""""natural":"wood"""", *square))
+        assertEquals(1, OsmClutterParser.parse(text, seen).stats.forests)
+        assertEquals(0, OsmClutterParser.parse(text, seen).stats.forests) // the second piece answers it again
+        assertEquals(1, OsmClutterParser.parse(text).stats.forests) // without a memory every answer counts
+    }
+
+    @Test
+    fun thinningKeepsTheOutlineClosedAndDropsClosePoints() {
+        // a 1 km line of points every ~1.1 m along one side of a square, then three more corners
+        val ring = ArrayList<Double>()
+        for (i in 0..900) {
+            ring.add(50.0)
+            ring.add(20.0 + i * 0.00001)
+        }
+        ring.addAll(listOf(50.01, 20.009, 50.01, 20.0, 50.0, 20.0))
+        val full = ring.toDoubleArray()
+        val thin = OsmClutterParser.thinRing(full, 25.0)
+        assertTrue(thin.size < full.size / 4, "thin=${thin.size} full=${full.size}")
+        assertEquals(thin[0], thin[thin.size - 2], 0.0)
+        assertEquals(thin[1], thin[thin.size - 1], 0.0)
+        // a small outline is not thinned into nothing
+        assertTrue(OsmClutterParser.thinRing(square, 25.0).contentEquals(square))
+        // zero tolerance leaves the outline alone
+        assertTrue(OsmClutterParser.thinRing(full, 0.0).contentEquals(full))
+    }
+
+    @Test
+    fun tilesCoverTheBoxAndQuartersSplitIt() {
+        val box = ClutterBox.around(50.0, 20.0, 50.0) // 100 km square
+        val tiles = ClutterTiles.grid(box, 20.0)
+        assertTrue(tiles.size in 25..36, "tiles=${tiles.size}")
+        assertTrue(tiles.all { it.maxSideKm <= 20.5 }, "side=${tiles.maxOf { it.maxSideKm }}")
+        assertEquals(box.south, tiles.minOf { it.south }, 1e-9)
+        assertEquals(box.north, tiles.maxOf { it.north }, 1e-9)
+        assertEquals(box.west, tiles.minOf { it.west }, 1e-9)
+        assertEquals(box.east, tiles.maxOf { it.east }, 1e-9)
+        assertEquals(1, ClutterTiles.grid(ClutterBox.around(50.0, 20.0, 5.0), 20.0).size)
+        val q = tiles.first().quarters()
+        assertEquals(4, q.size)
+        assertTrue(q.all { it.maxSideKm < tiles.first().maxSideKm * 0.6 })
+    }
+
     // ---- profile helper and coverage ----
 
     @Test
