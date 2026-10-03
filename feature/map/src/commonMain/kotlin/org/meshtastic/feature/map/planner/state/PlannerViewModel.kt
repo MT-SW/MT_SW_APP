@@ -377,7 +377,7 @@ class PlannerViewModel(
                 val result =
                     computer.computeCoverage(
                         snapshot,
-                        onClutterFailure = { f -> _uiState.update { it.copy(clutter = PlannerClutterStatus.Failed(f)) } },
+                        onClutterFailure = { f, d -> _uiState.update { it.copy(clutter = PlannerClutterStatus.Failed(f, d)) } },
                     ) { p -> _uiState.update { it.copy(coverageProgress = p) } }
                 _uiState.update { it.copy(coverage = result, coverageComputing = false, coverageProgress = 1f) }
             } catch (e: CancellationException) {

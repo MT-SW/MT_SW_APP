@@ -28,9 +28,15 @@ object OsmQueries {
     /** Buildings and forests are looked for this far (m) either side of the path; the profile samples lie on it. */
     const val CORRIDOR_M = 30
 
-    /** Server side time limit (s) and memory cap (bytes) written into every query. */
+    /**
+     * Server side time limit (s) and memory cap (bytes) written into every query.
+     *
+     * [SERVER_MAX_BYTES] is the RAM the Overpass SERVER may use to answer (its own default is 512 MiB), not memory of
+     * this device. Set too low (it was 16 MiB once) the server answers "out of memory" even for a tiny area. What the
+     * device downloads is bounded separately by the answer size limit in PlannerOverpass.
+     */
     const val SERVER_TIMEOUT_S = 40
-    const val SERVER_MAX_BYTES = 16_777_216
+    const val SERVER_MAX_BYTES = 268_435_456
 
     private const val POLYLINE_SPACING_M = 1500.0
     private const val MAX_POLYLINE_POINTS = 40

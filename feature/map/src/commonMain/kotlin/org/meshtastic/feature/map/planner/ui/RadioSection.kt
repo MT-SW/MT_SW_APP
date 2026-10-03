@@ -342,19 +342,23 @@ private fun ClutterStatusBlock(status: PlannerClutterStatus) {
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.weight(1f),
                 )
-            is PlannerClutterStatus.Failed ->
+            is PlannerClutterStatus.Failed -> {
+                val message = stringResource(
+                    when (status.failure) {
+                        PlannerClutterFailure.NETWORK -> Res.string.planner_precise_failed_network
+                        PlannerClutterFailure.TOO_LARGE -> Res.string.planner_precise_failed_large
+                        PlannerClutterFailure.BAD_RESPONSE -> Res.string.planner_precise_failed_data
+                        PlannerClutterFailure.SERVER_LIMIT -> Res.string.planner_precise_failed_server
+                    },
+                )
                 Text(
-                    text = stringResource(
-                        when (status.failure) {
-                            PlannerClutterFailure.NETWORK -> Res.string.planner_precise_failed_network
-                            PlannerClutterFailure.TOO_LARGE -> Res.string.planner_precise_failed_large
-                            PlannerClutterFailure.BAD_RESPONSE -> Res.string.planner_precise_failed_data
-                        },
-                    ),
+                    // the reason given by the server / connection, when there is one, helps to tell what happened
+                    text = status.detail?.let { "$message ($it)" } ?: message,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.weight(1f),
                 )
+            }
         }
     }
 }

@@ -26,6 +26,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do upstreamu, od pocz
 * Opcjonalna pogoda na żywo (Open-Meteo): współczynnik k, refrakcja, ducting.
 * Przeszkody: presety zabudowy/roślinności (domyślnie) albo opcjonalne **dokładne odwzorowanie terenu z OpenStreetMap** (budynki i lasy przez Overpass API, na trasie i w zasięgu do 30 km od środka), z ostrzeżeniem o większym zużyciu zasobów i dłuższym liczeniu; przy błędzie pobierania powrót do presetu.
 * Menu zasięgu danych o terenie (5 / 10 / 15 / 30 / 50 / 100 km, domyślnie 30 km); pobieranie z OpenStreetMap jest czytane kawałkami z limitem rozmiaru, a brak pamięci jest łapany, więc gęsty obszar nie wywala już aplikacji (także na emulatorze z małą pamięcią), tylko pokazuje komunikat „za dużo danych, zmniejsz zasięg” i wraca do ustawienia wstępnego przeszkód, także podczas liczenia zasięgu.
+* Naprawa „zabrakło pamięci” przy dokładnym odwzorowaniu terenu: limit pamięci serwera Overpass w zapytaniu (wcześniej błędnie obniżony do 16 MB) wrócił do bezpiecznej wartości, więc serwer nie odmawia już nawet dla małego obszaru; odmowa serwera („out of memory”, przeciążenie, HTTP 429/504) ma teraz osobny komunikat zamiast „urządzeniu zabrakło pamięci”, z krótkim powodem podanym przez serwer; przy odmowie planer próbuje zapasowych serwerów Overpass.
 * Okno traceroute: gdy trasy nie da się pokazać na mapie, jest jeden przycisk OK (wcześniej obok pojawiał się drugi); opisy trasy na mapie mają cieńszą obwódkę i większą czcionkę.
 
 **Mapa**
@@ -902,6 +903,7 @@ The entries below describe only what this fork adds on top of upstream, from the
 * Optional live weather (Open-Meteo): k-factor, refractivity, ducting.
 * Obstacles: clutter presets (default) or the optional **detailed terrain from OpenStreetMap** (buildings and forests via the Overpass API, along the path and in coverage within 30 km of the centre), with a warning about higher resource use and longer calculation; falls back to the preset if the download fails.
 * Terrain data range menu (5 / 10 / 15 / 30 / 50 / 100 km, 30 km by default); the OpenStreetMap download is read in chunks with a size limit and out-of-memory is caught, so a dense area no longer crashes the app (an emulator with little memory included) but shows "too much data, reduce the range" and falls back to the obstacles preset, also during the coverage calculation.
+* Fix for "out of memory" with detailed terrain: the Overpass server memory cap written into the query (wrongly lowered to 16 MB earlier) is back to a safe value, so the server no longer refuses even a small area; a server refusal ("out of memory", overload, HTTP 429/504) now has its own message instead of "the device ran out of memory", with the short reason given by the server; on a refusal the planner tries backup Overpass servers.
 * Traceroute dialog: when the route cannot be shown on the map there is a single OK button (before, a second one appeared next to it); traceroute labels on the map have a thinner outline and a larger font.
 
 **Map**

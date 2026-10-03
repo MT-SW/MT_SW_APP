@@ -123,7 +123,7 @@ sealed interface PlannerClutterStatus {
     data class Ready(val stats: ClutterStats) : PlannerClutterStatus
 
     /** The planner falls back to the clutter preset / manual extra loss. */
-    data class Failed(val failure: PlannerClutterFailure) : PlannerClutterStatus
+    data class Failed(val failure: PlannerClutterFailure, val detail: String? = null) : PlannerClutterStatus
 }
 
 /** One link end. All values are plain data; derived values are computed properties. */

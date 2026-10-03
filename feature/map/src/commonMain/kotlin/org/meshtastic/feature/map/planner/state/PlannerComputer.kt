@@ -152,7 +152,7 @@ class PlannerComputer(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: PlannerClutterException) {
-                clutterStatus = PlannerClutterStatus.Failed(e.failure)
+                clutterStatus = PlannerClutterStatus.Failed(e.failure, e.detail)
             } catch (e: Exception) {
                 clutterStatus = PlannerClutterStatus.Failed(
                     org.meshtastic.feature.map.planner.data.PlannerClutterFailure.BAD_RESPONSE,
@@ -207,7 +207,7 @@ class PlannerComputer(
      */
     suspend fun computeCoverage(
         state: PlannerUiState,
-        onClutterFailure: (PlannerClutterFailure) -> Unit = {},
+        onClutterFailure: (PlannerClutterFailure, String?) -> Unit = { _, _ -> },
         onProgress: (Float) -> Unit = {},
     ): CoverageResult {
         val end = state.end(state.coverageSide)
@@ -221,10 +221,10 @@ class PlannerComputer(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: PlannerClutterException) {
-                onClutterFailure(e.failure)
+                onClutterFailure(e.failure, e.detail)
                 null
             } catch (e: Exception) {
-                onClutterFailure(PlannerClutterFailure.BAD_RESPONSE)
+                onClutterFailure(PlannerClutterFailure.BAD_RESPONSE, null)
                 null
             }
         }
