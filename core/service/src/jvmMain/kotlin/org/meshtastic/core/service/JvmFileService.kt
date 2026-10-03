@@ -17,6 +17,7 @@
 package org.meshtastic.core.service
 
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 import okio.BufferedSink
 import okio.BufferedSource
@@ -35,10 +36,12 @@ class JvmFileService(private val dispatchers: CoroutineDispatchers) : FileServic
     override suspend fun write(uri: CommonUri, block: suspend (BufferedSink) -> Unit): Boolean =
         withContext(dispatchers.io) {
             try {
-                val file = File(URI(uri.toString()))
+                val file = uri.toFile()
                 file.parentFile?.mkdirs()
                 file.sink().buffer().use { sink -> block(sink) }
                 true
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 Logger.e(e) { "Failed to write to URI: $uri" }
                 false
@@ -48,12 +51,21 @@ class JvmFileService(private val dispatchers: CoroutineDispatchers) : FileServic
     override suspend fun read(uri: CommonUri, block: suspend (BufferedSource) -> Unit): Boolean =
         withContext(dispatchers.io) {
             try {
-                val file = File(URI(uri.toString()))
+                val file = uri.toFile()
                 file.source().buffer().use { source -> block(source) }
                 true
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 Logger.e(e) { "Failed to read from URI: $uri" }
                 false
             }
         }
+
+    /** The desktop file pickers hand back `file:` URIs; anything else is taken as a plain path. */
+    private fun CommonUri.toFile(): File {
+        val text = toString()
+        val parsed = runCatching { URI(text) }.getOrNull()
+        return if (parsed?.scheme == "file") File(parsed) else File(text)
+    }
 }

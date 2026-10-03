@@ -17,6 +17,8 @@
   -->
 <resources>
     <!-- A11Y -->
+    <string name="a11y_humidity">Páratartalom</string>
+    <string name="a11y_temperature">Hőmérséklet</string>
     <string name="about">A programról</string>
     <string name="accept">Elfogadni</string>
     <string name="acknowledgements">Visszaigazolások (ACK-ek)</string>
@@ -93,7 +95,6 @@
     <string name="channel_8">8. csatorna</string>
     <string name="channel_features">Csatorna funkciók</string>
     <string name="channel_invalid">Ez a csatorna URL érvénytelen, ezért nem használható.</string>
-    <string name="channel_label">Csatorna</string>
     <string name="channel_name">Csatorna neve</string>
     <string name="channels">Csatornák</string>
     <!-- CHIRPY -->
@@ -217,6 +218,7 @@
     <string name="doc_title_nodes">Csomópontok</string>
     <string name="downlink_feature_description">A nyilvános internetes átjáróból érkező üzenetek továbbításra kerülnek a helyi mesh hálózatra. A zéró-ugrási szabály miatt az alapértelmezett MQTT szerver forgalma nem terjed tovább ennél az eszköznél.</string>
     <string name="download">Letöltés</string>
+    <!-- DURATION -->
     <string name="dynamic">Dinamikus</string>
     <string name="easily_set_up_private_mesh_networks">Egyszerűen állíts be privát mesh hálózatokat a biztonságos és megbízható kommunikáció érdekében távoli területeken.</string>
     <string name="edit">Szerkesztés</string>
@@ -343,7 +345,6 @@
     <string name="manual_position_request">Kézi pozíciólekérés szükséges</string>
     <!-- MAP -->
     <string name="map">Mesh-térkép</string>
-    <string name="map_cache_info">Gyorsítótár kapacitása: %1$d MB\nGyorsítótár kihasználtsága: %2$d MB</string>
     <string name="map_cache_manager">Gyorsítótár kezelő</string>
     <string name="map_cache_size">Gyorsítótár mérete jelenleg</string>
     <string name="map_cache_tiles">%1$d csempe</string>
@@ -555,6 +556,10 @@
     <string name="remote_hardware">Távoli hardver</string>
     <string name="remote_hardware_config">Távoli hardver beállításai</string>
     <string name="remote_hardware_enabled">Távoli hardver engedélyezve</string>
+    <string name="remote_shell_key_alt">Magasság</string>
+    <string name="remote_shell_modifier_locked">Zárolt</string>
+    <string name="remote_shell_send">Küldeni</string>
+    <string name="remote_shell_status_not_connected">Nincs csatlakoztatva</string>
     <string name="remotely_administrating">"[Távoli] %1$s"</string>
     <!-- REMOVE -->
     <string name="remove">Törlés</string>

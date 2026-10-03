@@ -17,6 +17,8 @@
   -->
 <resources>
     <!-- A11Y -->
+    <string name="a11y_humidity">Vochtigheid</string>
+    <string name="a11y_temperature">Temperatuur</string>
     <string name="about">Over</string>
     <string name="accept">Accepteer</string>
     <!-- ACTION -->
@@ -66,7 +68,6 @@
     <string name="channel_7">Kanaal 7</string>
     <string name="channel_8">Kanaal 8</string>
     <string name="channel_invalid">Deze Kanaal URL is ongeldig en kan niet worden gebruikt</string>
-    <string name="channel_label">Kanaal</string>
     <string name="channel_name">Kanaalnaam</string>
     <string name="channels">Kanalen</string>
     <!-- CHIRPY -->
@@ -119,6 +120,7 @@
     <string name="distance">Afstand</string>
     <!-- DOC -->
     <string name="doc_title_mqtt">MQTT</string>
+    <!-- DURATION -->
     <string name="dynamic">Dynamisch</string>
     <string name="edit">Wijzig</string>
     <string name="eight_hours">8 Uur</string>
@@ -192,7 +194,6 @@
     <string name="lux">Lux</string>
     <string name="manual_position_request">Handmatige positieaanvraag vereist</string>
     <!-- MAP -->
-    <string name="map_cache_info">Cache capaciteit: %1$d MB\nCache gebruik: %2$d MB</string>
     <string name="map_cache_manager">Cachemanager</string>
     <string name="map_cache_size">Huidige cache grootte</string>
     <string name="map_cache_tiles">%1$d tegels</string>
@@ -314,6 +315,10 @@
     <string name="remote_hardware">Externe Hardware</string>
     <string name="remote_hardware_config">Externe hardwareconfiguratie</string>
     <string name="remote_hardware_enabled">Externe hardware ingeschakeld</string>
+    <string name="remote_shell_key_alt">Alt</string>
+    <string name="remote_shell_modifier_locked">Vergrendeld</string>
+    <string name="remote_shell_send">Verzend</string>
+    <string name="remote_shell_status_not_connected">Niet verbonden</string>
     <!-- REMOVE -->
     <string name="remove">Verwijder</string>
     <string name="remove_node_text">Deze node zal worden verwijderd uit jouw lijst totdat je node hier opnieuw gegevens van ontvangt.</string>

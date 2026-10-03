@@ -31,13 +31,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.resources.Res
@@ -75,7 +75,7 @@ internal fun MapLayersButton(
 ) {
     var sheetVisible by remember { mutableStateOf(false) }
     val opacityStore: LayerOpacityStore = koinInject()
-    val opacity by opacityStore.opacity.collectAsState()
+    val opacity by opacityStore.opacity.collectAsStateWithLifecycle()
 
     val layersManager: MapLayersManager = koinInject()
     val layerCount = layersManager.mapLayers.collectAsState().value.size

@@ -24,6 +24,7 @@ import androidx.room3.Transaction
 import kotlinx.coroutines.flow.Flow
 import org.meshtastic.core.database.DatabaseConstants.SQLITE_MAX_BIND_PARAMETERS
 import org.meshtastic.core.database.entity.MeshLog
+import org.meshtastic.core.database.entity.MeshLogRow
 
 @Dao
 @Suppress("TooManyFunctions")
@@ -52,11 +53,6 @@ interface MeshLogDao {
      * All logs for a given port across every sender since [sinceTimestamp] — unlike [getLogsByPortNum], this has no
      * count cap, so a busy mesh's frequent packets from one node can never crowd out a rarer variant from another.
      */
-
-    /**
-     * All logs for a given port across every sender since [sinceTimestamp] — unlike [getLogsByPortNum], this has no
-     * count cap, so a busy mesh's frequent packets from one node can never crowd out a rarer variant from another.
-     */
     @Query(
         "SELECT * FROM log WHERE port_num = :portNum AND received_date >= :sinceTimestamp ORDER BY received_date DESC",
     )
@@ -79,8 +75,20 @@ interface MeshLogDao {
     @Query("SELECT * FROM log WHERE received_date >= :sinceTimestamp ORDER BY received_date ASC")
     fun getAllLogsSince(sinceTimestamp: Long): Flow<List<MeshLog>>
 
-    @Query("SELECT * FROM log ORDER BY received_date ASC LIMIT :maxItem")
-    fun getAllLogsInReceiveOrder(maxItem: Int): Flow<List<MeshLog>>
+    /**
+     * Returns up to [pageSize] logs after ([afterReceivedDate], [afterRowId]), oldest first. Equal received dates stay
+     * in rowid order, which is the order a scan of the received_date index returns. Start from [Long.MIN_VALUE] for
+     * both and continue from the last row returned.
+     */
+    @Query(
+        """
+        SELECT rowid AS log_rowid, * FROM log
+        WHERE (received_date, rowid) > (:afterReceivedDate, :afterRowId)
+        ORDER BY received_date ASC, rowid ASC
+        LIMIT :pageSize
+        """,
+    )
+    suspend fun getLogsInReceiveOrderAfter(afterReceivedDate: Long, afterRowId: Long, pageSize: Int): List<MeshLogRow>
 
     /**
      * Retrieves [MeshLog]s matching 'from_num' (nodeNum) and 'port_num' (PortNum).

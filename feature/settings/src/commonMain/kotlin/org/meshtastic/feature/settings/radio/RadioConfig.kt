@@ -54,11 +54,13 @@ import org.meshtastic.core.resources.ic_restart_alt
 import org.meshtastic.core.resources.ic_restore
 import org.meshtastic.core.resources.ic_schedule
 import org.meshtastic.core.resources.ic_storage
+import org.meshtastic.core.resources.ic_system_update
 import org.meshtastic.core.resources.import_configuration
 import org.meshtastic.core.resources.message_device_managed
 import org.meshtastic.core.resources.module_settings
 import org.meshtastic.core.resources.nodedb_reset
 import org.meshtastic.core.resources.reboot
+import org.meshtastic.core.resources.reboot_into_dfu
 import org.meshtastic.core.resources.set_time
 import org.meshtastic.core.resources.shutdown
 import org.meshtastic.core.resources.sniffer_settings_title
@@ -278,6 +280,7 @@ private fun AdvancedSection(
 enum class AdminRoute(val icon: DrawableResource, val title: StringResource) {
     SET_TIME(Res.drawable.ic_schedule, Res.string.set_time),
     REBOOT(Res.drawable.ic_restart_alt, Res.string.reboot),
+    REBOOT_DFU(Res.drawable.ic_system_update, Res.string.reboot_into_dfu),
     SHUTDOWN(Res.drawable.ic_power_settings_new, Res.string.shutdown),
     FACTORY_RESET(Res.drawable.ic_restore, Res.string.factory_reset),
     NODEDB_RESET(Res.drawable.ic_storage, Res.string.nodedb_reset),

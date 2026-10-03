@@ -20,15 +20,24 @@
     <string name="a11y_label_value">%1$s: %2$s</string>
     <string name="a11y_message_from">Wiadomość od %1$s: %2$s</string>
     <string name="a11y_node_battery">bateria %1$d%%</string>
+    <string name="a11y_node_channel">Kanał %1$d</string>
     <string name="a11y_node_distance_away">%1$s stąd</string>
     <string name="a11y_node_favorite">ulubiony</string>
     <string name="a11y_node_hops_away">%1$d skoków stąd</string>
+    <plurals name="a11y_node_hops_count">
+        <item quantity="one">%1$d skok stąd</item>
+        <item quantity="few">%1$d skoki stąd</item>
+        <item quantity="many">%1$d skoków stąd</item>
+        <item quantity="other">%1$d skoku stąd</item>
+    </plurals>
     <string name="a11y_node_last_heard">ostatnio słyszany %1$s</string>
     <string name="a11y_node_offline">offline</string>
     <string name="a11y_node_online">online</string>
     <string name="a11y_node_role">rola %1$s</string>
     <string name="a11y_node_signal">sygnał %1$s</string>
     <string name="a11y_nodes_at_hop">Skok %1$d: %2$d węzłów</string>
+    <string name="a11y_humidity">Wilgotność</string>
+    <string name="a11y_temperature">Temperatura</string>
     <string name="about">O aplikacji</string>
     <string name="accept">Akceptuj</string>
     <string name="acknowledgements">Potwierdzenia</string>
@@ -246,7 +255,6 @@
     <string name="channel_8">Kanał 8</string>
     <string name="channel_features">Funkcje kanału</string>
     <string name="channel_invalid">Ten adres URL kanału jest nieprawidłowy i nie można go użyć</string>
-    <string name="channel_label">Kanał</string>
     <string name="channel_name">Nazwa Kanału</string>
     <string name="channel_url">URL kanału</string>
     <string name="channel_utilization">ChUtil</string>
@@ -265,6 +273,7 @@
     <string name="chirpy_error_unknown">Ups! Trafiliśmy na spore straty pakietów albo zakłócenia sygnału! 📡 Spróbujmy wysłać to zapytanie ponownie.</string>
     <string name="chirpy_error_unsupported_flavor">Działam na ograniczonej częstotliwości w tej wersji appki! 🔌 Spróbuj wersji z pełną integracją AI Core.</string>
     <string name="chirpy_error_unsupported_platform">O nie! Moja antena nie potrafi nawiązać połączenia na tej platformie. 📡 Sprawdź zgodność swojego sprzętu!</string>
+    <string name="chirpy_fallback_unavailable">Asystent AI nie jest dostępny na tej platformie. Oto strony, które mogą pomóc:</string>
     <string name="chirpy_intro">Cześć! 📡 Jestem Chirpy, Twój asystent MT_SW_APP działający na urządzeniu! Mogę pomóc z konfiguracją, ustawieniami, rozwiązywaniem problemów i wskazówkami dot. sieci mesh. W czym mogę pomóc?</string>
     <string name="chirpy_ready">Zapytaj Chirpy</string>
     <string name="chirpy_search_placeholder">Zapytaj o MT_SW_APP…</string>
@@ -510,6 +519,7 @@
     <string name="direct_message">Bezpośrednia wiadomość</string>
     <string name="direct_message_key">Klucz wiadomości bezpośredniej</string>
     <string name="direct_messages">Bezpośrednie Wiadomości</string>
+    <string name="disabled">Wyłączony</string>
     <string name="discard_changes">Odrzuć</string>
     <string name="disconnect">Rozłącz</string>
     <string name="terminate_app">Wymuś zatrzymanie aplikacji</string>
@@ -527,6 +537,7 @@
     <string name="discovery_dwell_time">Czas nasłuchu</string>
     <string name="discovery_dwell_time_description">Czas nasłuchu na każdym presecie</string>
     <string name="discovery_empty_history">Brak sesji odkrywania</string>
+    <string name="discovery_empty_history_hint">Rozpocznij skanowanie w Local Mesh Discovery, aby zobaczyć tutaj jego wyniki.</string>
     <string name="discovery_export_report">Eksportuj raport</string>
     <string name="discovery_history">Historia odkrywania</string>
     <string name="discovery_interrupted_scan_restored">Przywrócono konfigurację domową radia (%1$s) po przerwanym skanowaniu odkrywania</string>
@@ -590,6 +601,12 @@
     <string name="discovery_summary_not_available">Analiza AI niedostępna</string>
     <string name="discovery_time_remaining">Pozostało %1$s</string>
     <string name="discovery_unique_nodes">%1$d unikalnych węzłów</string>
+    <plurals name="discovery_unique_nodes_count">
+        <item quantity="one">%1$d unikalny węzeł</item>
+        <item quantity="few">%1$d unikalne węzły</item>
+        <item quantity="many">%1$d unikalnych węzłów</item>
+        <item quantity="other">%1$d unikalnego węzła</item>
+    </plurals>
     <string name="discovery_view_map">Zobacz mapę</string>
     <string name="disk_free_indexed">Wolne miejsce na dysku %1$d</string>
     <!-- DISPLAY -->
@@ -606,8 +623,10 @@
     <string name="distance_measurements">Pomiary odległości</string>
     <string name="distance_measurements_description">Wyświetlaj odległość między Twoim urządzeniem a innymi węzłami mesh z ustaloną pozycją.</string>
     <string name="dns">DNS</string>
+    <string name="doc_auto_translated">Tłumaczenie automatyczne</string>
     <!-- DOC -->
     <string name="doc_clear_search">Wyczyść wyszukiwanie</string>
+    <string name="doc_community_translated">Tłumaczenie społeczności</string>
     <string name="doc_keywords_android_auto">android auto,samochód,jednostka główna,jazda,tryb wolnych rąk,wiadomości</string>
     <string name="doc_keywords_app_functions">system ai,gemini,asystent,funkcje,automatyzacja,głos</string>
     <string name="doc_keywords_connections">bluetooth,usb,tcp,parowanie,port szeregowy,wifi</string>
@@ -632,8 +651,12 @@
     <string name="doc_keywords_units">jednostki,lokalizacja,metryczne,imperialne,temperatura,odległość</string>
     <string name="doc_keywords_widget">widget,ekran główny,statystyki lokalne,podgląd,bateria,wykorzystanie</string>
     <string name="doc_loading">Ładowanie dokumentacji…</string>
+    <string name="doc_no_content">Brak dostępnej treści.</string>
     <string name="doc_no_documentation">Brak dostępnej dokumentacji</string>
     <string name="doc_no_results">Nie znaleziono wyników</string>
+    <string name="doc_open_page">Otwórz %1$s</string>
+    <string name="doc_page_not_found">Nie znaleziono strony: %1$s</string>
+    <string name="doc_page_not_found_detail">Ta strona mogła zostać przeniesiona lub usunięta.</string>
     <string name="doc_search_placeholder">Szukaj w dokumentacji…</string>
     <string name="doc_section_developer">Przewodnik dewelopera</string>
     <string name="doc_section_user">Przewodnik użytkownika</string>
@@ -669,9 +692,15 @@
     <string name="download">Pobierz</string>
     <string name="download_this_area">Pobierz ten obszar</string>
     <string name="duplicated_public_key_title">Wykryto zduplikowany klucz publiczny</string>
+    <string name="duration_ago">%1$s temu</string>
+    <string name="duration_days_short">%1$dd</string>
+    <string name="duration_hours_short">%1$dh</string>
+    <string name="duration_minutes_short">%1$dm</string>
+    <string name="duration_seconds_short">%1$ds</string>
     <string name="dynamic">Dynamiczny</string>
     <string name="easily_set_up_private_mesh_networks">Łatwo skonfiguruj prywatne sieci mesh do bezpiecznej i niezawodnej komunikacji na odległych obszarach.</string>
     <string name="echo_enabled">Włącz echo</string>
+    <!-- DURATION -->
     <string name="edit">Edytuj</string>
     <string name="edit_custom_tile_source">Edytuj własne źródło kafelków mapy</string>
     <string name="eight_hours">8 Godzin</string>
@@ -722,6 +751,7 @@
     <string name="export_tak_data_package">Eksportuj pakiet danych TAK</string>
     <string name="external_notification">Zewnętrzne Powiadomienie</string>
     <string name="external_notification_config">Konfiguracja Zewnętrznego Powiadomienia</string>
+    <string name="external_power_short">ZASIL.</string>
     <string name="factory_reset">Ustawienia fabryczne</string>
     <string name="fair">wystarczający</string>
     <string name="fallback_node_name">MT_SW_APP %1$s</string>
@@ -849,6 +879,8 @@
     <string name="firmware_update_taking_a_while">To może zająć minutę...</string>
     <string name="firmware_update_target">Cel: %1$s</string>
     <string name="firmware_update_title">Aktualizacja oprogramowania</string>
+    <string name="firmware_update_transfer_percent">%1$d%</string>
+    <string name="firmware_update_transfer_progress">%1$d% (%2$s/s, pozostało: %3$ds)</string>
     <string name="firmware_update_unknown_error">Nieznany błąd</string>
     <string name="firmware_update_unknown_hardware">Nieznany model sprzętu: %1$d</string>
     <string name="firmware_update_unknown_release">Nieznane wydanie zdalne</string>
@@ -956,6 +988,7 @@
     <string name="i2s_word_select">I2S wybór słowa</string>
     <string name="iaq">IAQ</string>
     <string name="iaq_definition">Jakość powietrza w pomieszczeniach (Indoor Air Quality) - wartość względna w skali IAQ mierzona czujnikiem BME680. Zakres wartości: 0–500.</string>
+    <string name="iaq_value">IAQ %1$d</string>
     <string name="icon_meanings">Znaczenia ikon</string>
     <string name="ignore">Zignoruj</string>
     <string name="ignore_add">Dodać '%1$s' do listy ignorowanych?</string>
@@ -1139,6 +1172,8 @@
     <string name="longitude">Długość geograficzna</string>
     <string name="lora">LoRa</string>
     <string name="lora_config">LoRa</string>
+    <string name="lora_config_change_value">%1$s: %2$s → %3$s</string>
+    <string name="lora_config_changes">Zmiany konfiguracji LoRa:</string>
     <string name="low_battery">Słaba bateria</string>
     <string name="low_battery_message">Węzeł %1$s ma niski poziom baterii (%2$d%)</string>
     <string name="low_battery_title">Niski poziom baterii: %1$s</string>
@@ -1151,7 +1186,6 @@
     <!-- MAP -->
     <string name="map">Mapa Sieci</string>
     <string name="network_health">Zdrowie sieci</string>
-    <string name="map_cache_info">Pojemność pamięci: %1$d MB\nUżycie pamięci: %2$d MB</string>
     <string name="map_cache_manager">Zarządzanie pamięcią podręczną</string>
     <string name="map_cache_megabytes">%1$s MB</string>
     <string name="map_cache_size">Aktualny rozmiar pamięci podręcznej</string>
@@ -1197,6 +1231,8 @@
     <string name="map_filter_show_ignored">Pokaż ignorowane węzły</string>
     <string name="map_filter_title">Filtruj mapę</string>
     <string name="map_layer_opacity">Przezroczystość: %1$d%</string>
+    <string name="map_layer_open_failed">Nie udało się otworzyć tego pliku mapy.</string>
+    <string name="map_layer_too_large">Plików map większych niż %1$d MB nie można zaimportować.</string>
     <string name="map_offline_banner">Offline — pokazywane dane mapy z pamięci podręcznej</string>
     <string name="map_offline_download_failed_build">Brak dostępnych danych mapy offline w tej chwili — spróbuj ponownie później</string>
     <string name="map_offline_download_failed_io">Pobieranie nieudane — sprawdź połączenie i spróbuj ponownie</string>
@@ -1274,6 +1310,8 @@
     <string name="meshtastic_mesh_beacon_notifications">Powiadomienia o zaproszeniach do sieci mesh</string>
     <string name="meshtastic_messages_notifications">Powiadomienia o bezpośredniej wiadomości</string>
     <string name="meshtastic_new_nodes_notifications">Powiadomienia o nowych węzłach</string>
+    <string name="meshtastic_reactions_notifications">Powiadomienia o reakcjach</string>
+    <string name="meshtastic_reactions_notifications_description">Reakcje emoji na wiadomości.</string>
     <string name="meshtastic_service_notifications">Powiadomienia o usługach</string>
     <string name="meshtastic_waypoints_notifications">Powiadomienia punktów orientacyjnych</string>
     <!-- MESSAGE -->
@@ -1821,6 +1859,8 @@
     <string name="range_test_enabled">Test zasięgu włączony</string>
     <string name="react">Reaguj</string>
     <string name="reboot">Restart</string>
+    <string name="reboot_into_dfu">Uruchom ponownie w trybie DFU</string>
+    <string name="reboot_into_dfu_warning">Węzeł pozostaje w bootloaderze i poza siecią mesh, dopóki nie zostanie wgrane nowe oprogramowanie lub nie zostanie zresetowany.</string>
     <!-- REBROADCAST -->
     <string name="rebroadcast_mode_all_desc">Przekazuje ponownie każdy odebrany pakiet, niezależnie od tego, czy został wysłany na nasz prywatny kanał, czy z innej sieci Mesh o tych samych parametrach radia.</string>
     <string name="rebroadcast_mode_all_skip_decoding_desc">To samo zachowanie co ALL, ale pomija dekodowanie pakietów i po prostu je retransmituje. Dostępne tylko w roli Repeater. Ustawienie tego w innych rolach spowoduje zachowanie jak ALL.</string>
@@ -1851,7 +1891,46 @@
     <string name="remote_hardware">Zdalny sprzęt</string>
     <string name="remote_hardware_config">Konfiguracja zdalnego sprzętu</string>
     <string name="remote_hardware_enabled">Zdalny sprzęt włączony</string>
+    <string name="remote_shell">Zdalny terminal</string>
+    <string name="remote_shell_command_hint">Polecenie</string>
+    <string name="remote_shell_error_notice">Błąd z węzła: %1$s</string>
+    <string name="remote_shell_full_screen">Programy pełnoekranowe wymagają więcej, niż może przenieść sieć mesh, więc ich wynik może wyświetlać się nieprawidłowo</string>
+    <string name="remote_shell_input_dropped">Odrzucono %1$d bajtów wejścia, węzeł nie nadąża</string>
+    <string name="remote_shell_key_alt">Alt</string>
+    <string name="remote_shell_key_ctrl">Control</string>
+    <string name="remote_shell_key_down">Strzałka w dół</string>
+    <string name="remote_shell_key_end">End</string>
+    <string name="remote_shell_key_escape">Escape</string>
+    <string name="remote_shell_key_home">Home</string>
+    <string name="remote_shell_key_left">Strzałka w lewo</string>
+    <string name="remote_shell_key_page_down">Page Down</string>
+    <string name="remote_shell_key_page_up">Page Up</string>
+    <string name="remote_shell_key_right">Strzałka w prawo</string>
+    <string name="remote_shell_key_tab">Tab</string>
+    <string name="remote_shell_key_up">Strzałka w górę</string>
+    <string name="remote_shell_last_contact">Oczekiwanie na węzeł, ostatnio słyszany %1$d s temu</string>
+    <string name="remote_shell_menu_line_mode">Tryb liniowy</string>
+    <string name="remote_shell_menu_paste">Wklej</string>
+    <string name="remote_shell_menu_text_larger">Większy tekst</string>
+    <string name="remote_shell_menu_text_smaller">Mniejszy tekst</string>
     <string name="remotely_administrating">"[Zdalnie] %1$s"</string>
+    <string name="remote_shell_modifier_locked">Zablokowany</string>
+    <string name="remote_shell_modifier_once">Dotyczy następnego klawisza</string>
+    <string name="remote_shell_more_options">Więcej opcji</string>
+    <string name="remote_shell_no_reply">Brak odpowiedzi z węzła. Musi on mieć na liście kluczy administratora klucz publiczny Twojego radia i być w zasięgu.</string>
+    <string name="remote_shell_no_reply_reason">Nie udało się otworzyć sesji (%1$s). Węzeł musi mieć na liście kluczy administratora klucz publiczny Twojego radia i być w zasięgu.</string>
+    <string name="remote_shell_open">Otwórz terminal</string>
+    <string name="remote_shell_open_description">Otwiera powłokę na tym węźle, w razie potrzeby najpierw rozpoczynając sesję zdalnej administracji</string>
+    <string name="remote_shell_reconnect">Połącz ponownie</string>
+    <string name="remote_shell_send">Wyślij</string>
+    <string name="remote_shell_session_closed">Sesja zamknięta</string>
+    <string name="remote_shell_session_closed_reason">Sesja zamknięta: %1$s</string>
+    <string name="remote_shell_status_closed">Sesja zamknięta</string>
+    <string name="remote_shell_status_closing">Zamykanie…</string>
+    <string name="remote_shell_status_failed">Sesja nieudana</string>
+    <string name="remote_shell_status_not_connected">Rozłączony</string>
+    <string name="remote_shell_status_opening">Otwieranie sesji…</string>
+    <string name="remote_shell_subtitle_round_trip">%1$s, czas odpowiedzi %2$d ms</string>
     <!-- REMOVE -->
     <string name="remove">Usuń</string>
     <string name="remove_favorite">Usuń z ulubionych</string>
@@ -2358,6 +2437,7 @@
     <string name="unpin_selected">Odepnij</string>
     <string name="unrecognized">Nierozpoznany</string>
     <string name="unset">Nieustawiony - 0</string>
+    <string name="unsupported_device">To urządzenie nie jest obsługiwane</string>
     <string name="up_down_select_input_enabled">Wejście Góra/Dół/Wybór włączone</string>
     <string name="update_interval">Interwał odpytywania GPS</string>
     <string name="update_interval_seconds">Częstotliwość aktualizacji (w sekundach)</string>
@@ -2368,6 +2448,7 @@
     <!-- URL -->
     <string name="url">URL</string>
     <string name="url_cannot_be_empty">URL nie może być pusty.</string>
+    <string name="url_http_localhost_only">Użyj tutaj https://. Zwykłe http:// działa tylko dla localhost.</string>
     <string name="url_must_be_http">URL musi zaczynać się od http:// lub https://.</string>
     <string name="url_must_contain_placeholders">URL musi zawierać symbole zastępcze.</string>
     <string name="url_template">Szablon URL</string>

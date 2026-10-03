@@ -40,7 +40,6 @@
     <string name="cant_change_no_radio">Nije moguće promijeniti kanal jer radio još nije povezan. Molim pokušajte ponovno.</string>
     <!-- CHANNEL -->
     <string name="channel_invalid">Ovaj URL kanala je nevažeći i ne može se koristiti</string>
-    <string name="channel_label">Kanal</string>
     <string name="channel_name">Naziv kanala</string>
     <!-- CHIRPY -->
     <string name="choose_theme">Odaberi temu</string>
@@ -77,6 +76,7 @@
     <!-- DISTANCE -->
     <string name="distance">Udaljenost</string>
     <!-- DOC -->
+    <!-- DURATION -->
     <string name="edit">Uredi</string>
     <string name="eight_hours">8 Sati</string>
     <!-- EMOJI -->
@@ -110,7 +110,6 @@
     <string name="locked">Zaključano</string>
     <!-- LOG -->
     <!-- MAP -->
-    <string name="map_cache_info">Kapacitet predmemorije: %1$d MB\nUpotreba predmemorije: %2$d MB</string>
     <string name="map_cache_manager">Upravitelj predmemorije</string>
     <string name="map_cache_size">Trenutna veličina predmemorije</string>
     <string name="map_cache_tiles">%1$d dijelova karte</string>
@@ -193,6 +192,9 @@
     <string name="radio_configuration">Konfiguracija uređaja</string>
     <string name="reboot">Ponovno pokreni</string>
     <!-- REMOTE -->
+    <string name="remote_shell_modifier_locked">Zaključano</string>
+    <string name="remote_shell_send">Potvrdi</string>
+    <string name="remote_shell_status_not_connected">Nije povezano</string>
     <!-- REMOVE -->
     <string name="remove">Ukloni</string>
     <string name="remove_node_text">Ovaj će čvor biti uklonjen s vašeg popisa sve dok vaš čvor ponovno ne primi podatke s njega.</string>

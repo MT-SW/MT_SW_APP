@@ -17,6 +17,8 @@
   -->
 <resources>
     <!-- A11Y -->
+    <string name="a11y_humidity">Υγρασία</string>
+    <string name="a11y_temperature">Θερμοκρασία</string>
     <string name="about">Σχετικά</string>
     <string name="accept">Αποδοχή</string>
     <!-- ACTION -->
@@ -51,7 +53,6 @@
     <string name="channel_7">Κανάλι 7</string>
     <string name="channel_8">Κανάλι 8</string>
     <string name="channel_invalid">Αυτό το κανάλι URL δεν είναι ορθό και δεν μπορεί να χρησιμοποιηθεί</string>
-    <string name="channel_label">Κανάλι</string>
     <string name="channel_name">Όνομα Καναλιού</string>
     <string name="channels">Κανάλια</string>
     <!-- CHIRPY -->
@@ -90,6 +91,7 @@
     <string name="distance">Απόσταση</string>
     <!-- DOC -->
     <string name="doc_title_mqtt">MQTT</string>
+    <!-- DURATION -->
     <string name="edit">Επεξεργασία</string>
     <string name="eight_hours">8 Ώρες</string>
     <!-- EMOJI -->
@@ -132,7 +134,6 @@
     <string name="lora">LoRa</string>
     <string name="lora_config">LoRa</string>
     <!-- MAP -->
-    <string name="map_cache_info">Χωρητικότητα προσωρινής μνήμης: %1$d MB\nΧρήση προσωρινής μνήμης: %2$d MB</string>
     <string name="map_cache_manager">Διαχείριση Προσωρινής Αποθήκευσης</string>
     <string name="map_cache_size">Μέγεθος τρέχουσας προσωρινής μνήμης</string>
     <string name="map_download_complete">Η λήψη ολοκληρώθηκε!</string>
@@ -211,6 +212,9 @@
     <string name="reboot">Επανεκκίνηση</string>
     <!-- REMOTE -->
     <string name="remote_admin">Απομακρυσμένη Διαχείριση</string>
+    <string name="remote_shell_modifier_locked">Κλειδωμένο</string>
+    <string name="remote_shell_send">Αποστολή</string>
+    <string name="remote_shell_status_not_connected">Αποσυνδεδεμένο</string>
     <!-- REMOVE -->
     <string name="remove">Διαγραφή</string>
     <string name="remove_node_text">Αυτός ο κόμβος θα αφαιρεθεί από τη λίστα σας έως ότου ο κόμβος σας λάβει εκ νέου δεδομένα από αυτόν.</string>

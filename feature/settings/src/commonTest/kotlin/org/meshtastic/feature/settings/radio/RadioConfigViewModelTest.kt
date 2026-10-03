@@ -37,6 +37,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
@@ -56,11 +57,13 @@ import org.meshtastic.core.domain.usecase.settings.RadioConfigUseCase
 import org.meshtastic.core.domain.usecase.settings.RadioResponseResult
 import org.meshtastic.core.domain.usecase.settings.SnifferControlUseCase
 import org.meshtastic.core.model.ConnectionState
+import org.meshtastic.core.model.DeviceHardware
 import org.meshtastic.core.model.MqttProbeStatus
 import org.meshtastic.core.model.MyNodeInfo
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.util.MalformedMeshtasticUrlException
 import org.meshtastic.core.repository.AnalyticsPrefs
+import org.meshtastic.core.repository.DeviceHardwareRepository
 import org.meshtastic.core.repository.FileService
 import org.meshtastic.core.repository.HomoglyphPrefs
 import org.meshtastic.core.repository.LocationRepository
@@ -90,6 +93,7 @@ import org.meshtastic.proto.DeviceMetadata
 import org.meshtastic.proto.DeviceProfile
 import org.meshtastic.proto.ExcludedModules
 import org.meshtastic.proto.HamParameters
+import org.meshtastic.proto.HardwareModel
 import org.meshtastic.proto.LoRaPresetGroup
 import org.meshtastic.proto.LoRaRegionPresetMap
 import org.meshtastic.proto.LocalConfig
@@ -401,6 +405,7 @@ class RadioConfigViewModelTest {
     private val radioConfigUseCase: RadioConfigUseCase = mock(MockMode.autofill)
     private val adminActionsUseCase: AdminActionsUseCase = mock(MockMode.autofill)
     private val snifferControlUseCase: SnifferControlUseCase = mock(MockMode.autofill)
+    private val deviceHardwareRepository: DeviceHardwareRepository = mock(MockMode.autofill)
     private val processRadioResponseUseCase: ProcessRadioResponseUseCase = mock(MockMode.autofill)
     private val locationService: LocationService = mock(MockMode.autofill)
     private val fileService: FileService = mock(MockMode.autofill)
@@ -445,6 +450,7 @@ class RadioConfigViewModelTest {
         every { mqttManager.proxyActive } returns MutableStateFlow(false)
 
         every { uiPrefs.showQuickChat } returns MutableStateFlow(false)
+        every { deviceHardwareRepository.observeDeviceHardware(any(), any()) } returns flowOf(null)
 
         every { snifferControlUseCase.snifferEnabledFlow(any()) } returns MutableStateFlow(null)
 
@@ -472,6 +478,7 @@ class RadioConfigViewModelTest {
         radioConfigRepository = radioConfigRepository,
         serviceRepository = serviceRepository,
         nodeRepository = nodeRepository,
+        deviceHardwareRepository = deviceHardwareRepository,
         locationRepository = locationRepository,
         mapConsentPrefs = mapConsentPrefs,
         analyticsPrefs = analyticsPrefs,
@@ -1318,6 +1325,85 @@ class RadioConfigViewModelTest {
         packetFlow.emit(MeshPacket.Builder().build())
 
         verifySuspend { adminActionsUseCase.reboot(123, any()) }
+    }
+
+    @Test
+    fun `setResponseStateLoading for REBOOT_DFU calls useCase after config response`() = runTest {
+        val node = Node(num = 123, user = User.Builder().also { wb -> wb.id = "!123" }.build())
+        nodeRepository.setNodes(listOf(node))
+
+        val packetFlow = MutableSharedFlow<MeshPacket>()
+        every { serviceRepository.meshPacketFlow } returns packetFlow
+        every { processRadioResponseUseCase(any(), any(), any()) } returns
+            RadioResponseResult.ConfigResponse(Config.Builder().build())
+
+        viewModel = createViewModel()
+
+        everySuspend { adminActionsUseCase.rebootToDfu(any(), any()) } returns 42
+
+        viewModel.setResponseStateLoading(AdminRoute.REBOOT_DFU)
+        packetFlow.emit(MeshPacket.Builder().build())
+
+        verifySuspend { adminActionsUseCase.rebootToDfu(123, any()) }
+    }
+
+    @Test
+    fun `an unacknowledged DFU request settles as success instead of a timeout error`() = runTest {
+        val node = Node(num = 123, user = User.Builder().also { wb -> wb.id = "!123" }.build())
+        nodeRepository.setNodes(listOf(node))
+
+        val packetFlow = MutableSharedFlow<MeshPacket>()
+        every { serviceRepository.meshPacketFlow } returns packetFlow
+        every { processRadioResponseUseCase(any(), any(), any()) } returns
+            RadioResponseResult.ConfigResponse(Config.Builder().build())
+
+        viewModel = createViewModel()
+
+        everySuspend { adminActionsUseCase.rebootToDfu(any(), any()) } calls
+            {
+                it.args.onRequestIdArg()(42)
+                42
+            }
+
+        viewModel.setResponseStateLoading(AdminRoute.REBOOT_DFU)
+        packetFlow.emit(MeshPacket.Builder().build())
+        runCurrent()
+        verifySuspend { adminActionsUseCase.rebootToDfu(123, any()) }
+        assertTrue(viewModel.radioConfigState.value.responseState is ResponseState.Loading)
+
+        advanceTimeBy(31_000)
+        runCurrent()
+
+        assertTrue(viewModel.radioConfigState.value.responseState is ResponseState.Success)
+    }
+
+    @Test
+    fun `canRebootToDfu is true only for nRF52 hardware`() = runTest {
+        val node =
+            Node(
+                num = 123,
+                user =
+                User.Builder()
+                    .also { wb ->
+                        wb.id = "!123"
+                        wb.hw_model = HardwareModel.RAK4631
+                    }
+                    .build(),
+            )
+        nodeRepository.setNodes(listOf(node))
+        every { deviceHardwareRepository.observeDeviceHardware(HardwareModel.RAK4631.value, any()) } returns
+            flowOf(DeviceHardware(architecture = "nrf52840"))
+
+        viewModel = createViewModel(destNum = 123)
+        advanceUntilIdle()
+        assertTrue(viewModel.radioConfigState.value.canRebootToDfu)
+
+        every { deviceHardwareRepository.observeDeviceHardware(HardwareModel.RAK4631.value, any()) } returns
+            flowOf(DeviceHardware(architecture = "esp32-s3"))
+
+        viewModel = createViewModel(destNum = 123)
+        advanceUntilIdle()
+        assertFalse(viewModel.radioConfigState.value.canRebootToDfu)
     }
 
     @Test

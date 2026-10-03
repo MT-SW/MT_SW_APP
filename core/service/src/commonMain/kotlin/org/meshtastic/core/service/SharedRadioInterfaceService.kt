@@ -22,6 +22,7 @@ import co.touchlab.kermit.Logger
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -273,24 +274,27 @@ class SharedRadioInterfaceService(
         }
     }
 
-    override suspend fun runWhileSessionActive(session: RadioSessionContext, block: suspend () -> Unit): Boolean =
-        sessionOperationMutex.withLock {
-            runWithSessionLease(session) {
-                // Bound the handler: it holds sessionOperationMutex (the whole inbound pipeline) and an admitted
-                // lease (which teardown's drain awaits), so an indefinite suspension here is a total wedge, not a
-                // slow packet. Cancelling the block releases both. Only OUR timeout is swallowed — ensureActive()
-                // rethrows if the surrounding scope was cancelled concurrently.
-                try {
-                    withTimeout(SESSION_HANDLER_TIMEOUT_MILLIS) { block() }
-                } catch (timeout: TimeoutCancellationException) {
-                    currentCoroutineContext().ensureActive()
-                    Logger.e(timeout) {
-                        "Session handler exceeded ${SESSION_HANDLER_TIMEOUT_MILLIS}ms and was cancelled; " +
-                            "dropping its packet to keep the receive pipeline alive"
-                    }
+    override suspend fun runWhileSessionActive(
+        session: RadioSessionContext,
+        label: String,
+        block: suspend () -> Unit,
+    ): Boolean = sessionOperationMutex.withLock {
+        runWithSessionLease(session) {
+            // Bound the handler: it holds sessionOperationMutex (the whole inbound pipeline) and an admitted
+            // lease (which teardown's drain awaits), so an indefinite suspension here is a total wedge, not a
+            // slow packet. Cancelling the block releases both. Only OUR timeout is swallowed — ensureActive()
+            // rethrows if the surrounding scope was cancelled concurrently.
+            try {
+                withTimeout(SESSION_HANDLER_TIMEOUT_MILLIS) { block() }
+            } catch (timeout: TimeoutCancellationException) {
+                currentCoroutineContext().ensureActive()
+                Logger.e(timeout) {
+                    "Session handler exceeded ${SESSION_HANDLER_TIMEOUT_MILLIS}ms and was cancelled; " +
+                        "dropping its packet to keep the receive pipeline alive (handler=$label)"
                 }
             }
         }
+    }
 
     private fun releaseSessionOperation(admittedSession: RadioTransportSession) {
         val drainWaiter =
@@ -939,6 +943,7 @@ class SharedRadioInterfaceService(
             try {
                 withContext(NonCancellable) { newTransport.close() }
             } catch (closeFailure: Exception) {
+                if (closeFailure is CancellationException) currentCoroutineContext().ensureActive()
                 publicationFailure.addSuppressed(closeFailure)
             }
             throw publicationFailure
@@ -1011,14 +1016,13 @@ class SharedRadioInterfaceService(
     private fun startHeartbeat() {
         heartbeatJob?.cancel()
         lastDataReceivedMillis = now()
-        heartbeatJob =
-            serviceScope.launch {
-                while (true) {
-                    delay(HEARTBEAT_INTERVAL_MILLIS)
-                    keepAlive()
-                    checkLiveness()
-                }
+        heartbeatJob = serviceScope.launch {
+            while (true) {
+                delay(HEARTBEAT_INTERVAL_MILLIS)
+                keepAlive()
+                checkLiveness()
             }
+        }
     }
 
     /**
@@ -1143,10 +1147,11 @@ class SharedRadioInterfaceService(
 
     private fun sendThroughAdmittedTransport(admission: TransportSendAdmission.Admitted, bytes: ByteArray): Boolean =
         try {
-            val sent =
-                safeCatching { admission.transport.handleSendToRadio(bytes) }
-                    .onFailure { Logger.w(it) { "trySendToRadio: active transport rejected ${bytes.size} bytes" } }
-                    .getOrDefault(false)
+            val sent = safeCatching {
+                admission.transport.handleSendToRadio(bytes)
+            }
+                .onFailure { Logger.w(it) { "trySendToRadio: active transport rejected ${bytes.size} bytes" } }
+                .getOrDefault(false)
             if (sent) {
                 safeCatching { _meshActivity.tryEmit(MeshActivity.Send) }
                     .onFailure { Logger.w(it) { "trySendToRadio: failed to publish mesh activity" } }

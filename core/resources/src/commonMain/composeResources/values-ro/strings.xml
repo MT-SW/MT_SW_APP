@@ -106,7 +106,6 @@
     <string name="channel_8">Canalul 8</string>
     <string name="channel_features">Funcții canal</string>
     <string name="channel_invalid">Acest URL de canal este invalid și nu poate fi folosit</string>
-    <string name="channel_label">Canal</string>
     <string name="channel_name">Numele canalului</string>
     <string name="channel_url">Adresa canalului</string>
     <string name="channel_utilization">ChUtil</string>
@@ -264,6 +263,7 @@
     <string name="downlink_feature_description">Mesajele provenite de la o un gateway public de internet sunt redirecționate către rețeaua locală. Datorită politicii de zero salturi, traficul provenit de la serverul MQTT implicit nu se va propaga mai departe de acest dispozitiv.</string>
     <string name="download">Descărcare</string>
     <string name="duplicated_public_key_title">Duplicat Cheie Publică detectată</string>
+    <!-- DURATION -->
     <string name="dynamic">Dinamic</string>
     <string name="easily_set_up_private_mesh_networks">Înființarea cu ușurință a rețelelor private de plasare pentru comunicații sigure și fiabile în zonele îndepărtate;</string>
     <string name="edit">Editare</string>
@@ -356,6 +356,7 @@
     <string name="firmware_update_taking_a_while">Acest lucru ar putea dura un minut...</string>
     <string name="firmware_update_target">Target: %1$s</string>
     <string name="firmware_update_title">Actualizare firmware</string>
+    <string name="firmware_update_transfer_percent">%1$d%</string>
     <string name="firmware_update_unknown_error">Eroare necunoscuta</string>
     <string name="firmware_update_unknown_hardware">Model hardware necunoscut: %1$d</string>
     <string name="firmware_update_unknown_release">Lansare la distanţă necunoscută</string>
@@ -493,7 +494,6 @@
     <string name="manual_position_request">Solicitarea de poziție manuală este necesară</string>
     <!-- MAP -->
     <string name="map">Harta retea</string>
-    <string name="map_cache_info">Capacitate cache: %1$d MB\nUtilizare cache: %2$d MB</string>
     <string name="map_cache_manager">Manager cache</string>
     <string name="map_cache_size">Dimensiunea actuală a cache-ului</string>
     <string name="map_cache_tiles">%1$d secțiuni</string>
@@ -749,6 +749,10 @@
     <string name="remote_hardware">Hardware la distanță</string>
     <string name="remote_hardware_config">Configurare hardware la distanță</string>
     <string name="remote_hardware_enabled">Hardware extern activat</string>
+    <string name="remote_shell_key_alt">Alt</string>
+    <string name="remote_shell_modifier_locked">Blocat</string>
+    <string name="remote_shell_send">Trimite</string>
+    <string name="remote_shell_status_not_connected">Neconectat</string>
     <string name="remotely_administrating">"[Remote] %1$s"</string>
     <!-- REMOVE -->
     <string name="remove">Eliminare</string>

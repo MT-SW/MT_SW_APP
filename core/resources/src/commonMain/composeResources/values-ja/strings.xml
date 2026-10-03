@@ -17,17 +17,21 @@
   -->
 <resources>
     <!-- A11Y -->
+    <string name="a11y_humidity">湿度</string>
     <string name="a11y_label_value">%1$s：%2$s</string>
     <string name="a11y_message_from">%1$s からのメッセージ：%2$s</string>
     <string name="a11y_node_distance_away">%1$s 先</string>
     <string name="a11y_node_favorite">お気に入り</string>
-    <string name="a11y_node_hops_away">%1$d ホップ先</string>
+    <plurals name="a11y_node_hops_count">
+        <item quantity="other">%1$d ホップ先</item>
+    </plurals>
     <string name="a11y_node_last_heard">最終受信 %1$s</string>
     <string name="a11y_node_offline">オフライン</string>
     <string name="a11y_node_online">オンライン</string>
     <string name="a11y_node_role">役割 %1$s</string>
     <string name="a11y_node_signal">信号 %1$s</string>
     <string name="a11y_nodes_at_hop">ホップ %1$d：%2$d ノード</string>
+    <string name="a11y_temperature">温度</string>
     <string name="about">概要</string>
     <string name="accept">同意</string>
     <string name="acknowledgements">謝辞</string>
@@ -168,7 +172,6 @@
     <string name="channel_8">チャンネル 8</string>
     <string name="channel_features">チャンネル機能</string>
     <string name="channel_invalid">このチャンネルURLは無効なため使用できません</string>
-    <string name="channel_label">チャンネル</string>
     <string name="channel_name">チャンネル名</string>
     <string name="channel_url">チャンネル URL</string>
     <string name="channel_utilization">ChUtil</string>
@@ -347,6 +350,7 @@
     <string name="direct_message">ダイレクトメッセージ</string>
     <string name="direct_message_key">ダイレクトメッセージの鍵</string>
     <string name="direct_messages">ダイレクトメッセージ</string>
+    <string name="disabled">無効</string>
     <string name="discard_changes">破棄</string>
     <string name="disconnect">切断</string>
     <string name="disconnected">切断</string>
@@ -423,7 +427,9 @@
     <string name="discovery_stop_scan">スキャン停止</string>
     <string name="discovery_summary_not_available">AI 分析は利用できません</string>
     <string name="discovery_time_remaining">残り %1$s</string>
-    <string name="discovery_unique_nodes">%1$d 個のユニークノード</string>
+    <plurals name="discovery_unique_nodes_count">
+        <item quantity="other">%1$d 個のユニークノード</item>
+    </plurals>
     <string name="discovery_view_map">マップを表示</string>
     <string name="disk_free_indexed">空きディスク %1$d</string>
     <string name="display">表示</string>
@@ -448,7 +454,6 @@
     <string name="doc_keywords_messages">メッセージ,チャンネル,暗号化,ダイレクト,ブロードキャスト,クイックチャット,message,channel,encryption,direct,broadcast,quick-chat</string>
     <string name="doc_keywords_mqtt">MQTT,サーバー,インターネット,ブリッジ,アップリンク,ダウンリンク,mqtt,broker,internet,bridge,uplink,downlink</string>
     <string name="doc_keywords_node_metrics">メトリクス,テレメトリ,信号,SNR,RSSI,バッテリー,トレースルート,metrics,telemetry,signal,snr,rssi,battery,traceroute</string>
-    <string name="doc_keywords_nodes">ノード,メッシュ,リスト,役割,ステータス,お気に入り,フィルター,node,mesh,list,role,status,favorite,filter</string>
     <string name="doc_keywords_onboarding">セットアップ,ようこそ,権限,初回起動,setup,welcome,permissions,first-launch</string>
     <string name="doc_keywords_settings_module">モジュール,シリアル,テレメトリ,定型文,ストアアンドフォワード,管理,module,serial,telemetry,canned,store-forward,administration</string>
     <string name="doc_keywords_settings_radio">設定,無線,LoRa,リージョン,モデム,デバイス,電源,セキュリティ,settings,radio,lora,region,modem,device,power,security</string>
@@ -489,6 +494,7 @@
     <string name="downlink_feature_description">パブリックなインターネットゲートウェイからのメッセージが、ローカルメッシュに転送されます。ゼロホップポリシーにより、デフォルトの MQTT サーバーからのトラフィックはこのデバイスより先には伝播しません。</string>
     <string name="download">ダウンロード</string>
     <string name="duplicated_public_key_title">公開鍵の重複を検出</string>
+    <!-- DURATION -->
     <string name="dynamic">動的</string>
     <string name="easily_set_up_private_mesh_networks">遠隔地での安全で信頼性の高い通信のために、プライベートメッシュネットワークを簡単にセットアップできます。</string>
     <string name="edit">編集</string>
@@ -825,7 +831,6 @@
     <string name="manual_position_request">手動での位置情報のリクエストが必要</string>
     <!-- MAP -->
     <string name="map">メッシュマップ</string>
-    <string name="map_cache_info">キャッシュ容量: %1$d MB\nキャッシュ使用量: %2$d MB</string>
     <string name="map_cache_manager">キャッシュの管理</string>
     <string name="map_cache_size">現在のキャッシュサイズ</string>
     <string name="map_cache_tiles">%1$d タイル</string>
@@ -988,7 +993,6 @@
     <string name="no_bluetooth_devices_seen">Bluetooth デバイスが見つかりません</string>
     <string name="no_custom_tile_sources_found">カスタムタイルソースが見つかりません。</string>
     <string name="no_device_selected">デバイスが選択されていません</string>
-    <string name="no_devices_found">デバイスが見つかりません</string>
     <string name="no_files_manifested">ファイルがありません。</string>
     <string name="no_local_stats">統計がありません</string>
     <string name="no_map_layers_loaded">マップレイヤーが読み込まれていません。</string>
@@ -1207,6 +1211,12 @@
     <string name="remote_hardware">遠隔ハードウェア</string>
     <string name="remote_hardware_config">リモートハードウェア設定</string>
     <string name="remote_hardware_enabled">リモートハードウェアを有効化</string>
+    <string name="remote_shell_key_alt">高度</string>
+    <string name="remote_shell_key_ctrl">コントロール</string>
+    <string name="remote_shell_key_home">ホーム</string>
+    <string name="remote_shell_modifier_locked">ロック済み</string>
+    <string name="remote_shell_send">送信</string>
+    <string name="remote_shell_status_not_connected">未接続</string>
     <string name="remotely_administrating">"[リモート] %1$s"</string>
     <!-- REMOVE -->
     <string name="remove">削除</string>

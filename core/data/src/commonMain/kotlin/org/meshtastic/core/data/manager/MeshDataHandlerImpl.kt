@@ -64,6 +64,7 @@ import org.meshtastic.core.repository.PlatformAnalytics
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.RadioSessionContext
+import org.meshtastic.core.repository.RemoteShellHandler
 import org.meshtastic.core.repository.ServiceStateWriter
 import org.meshtastic.core.repository.StoreForwardPacketHandler
 import org.meshtastic.core.repository.TelemetryPacketHandler
@@ -110,6 +111,7 @@ class MeshDataHandlerImpl(
     private val storeForwardHandler: StoreForwardPacketHandler,
     private val telemetryHandler: TelemetryPacketHandler,
     private val adminPacketHandler: AdminPacketHandler,
+    private val remoteShellHandler: RemoteShellHandler,
     private val collectorRegistry: DiscoveryPacketCollectorRegistry,
     private val geofenceMonitor: GeofenceMonitor,
     private val meshBeaconRepository: MeshBeaconRepository,
@@ -197,6 +199,10 @@ class MeshDataHandlerImpl(
 
             PortNum.ADMIN_APP -> {
                 adminPacketHandler.handleAdminMessage(packet, myNodeNum, session)
+            }
+
+            PortNum.REMOTE_SHELL_APP -> {
+                remoteShellHandler.handleRemoteShell(packet)
             }
 
             PortNum.NEIGHBORINFO_APP -> {
@@ -411,8 +417,8 @@ class MeshDataHandlerImpl(
             val packets = allPackets.filter { it.status != MessageStatus.RECEIVED }
             val allReactions = packetRepository.value.findReactionsWithId(requestId)
             val reactions = allReactions.filter { it.status != MessageStatus.RECEIVED }
-            val p = packets.filter { it.to == fromId }.singleOrNull() ?: packets.singleOrNull()
-            val reaction = reactions.filter { it.to == fromId }.singleOrNull() ?: reactions.singleOrNull()
+            val p = packets.singleOrNull { it.to == fromId } ?: packets.singleOrNull()
+            val reaction = reactions.singleOrNull { it.to == fromId } ?: reactions.singleOrNull()
 
             @Suppress("MaxLineLength")
             Logger.d {
@@ -448,7 +454,7 @@ class MeshDataHandlerImpl(
             } else if (p == null && ackProofStatus == provenAckProof) {
                 // A forged ack can arrive first and settle the packet as RECEIVED, which hides it from every later
                 // ack. Let the addressed node's proof still be recorded, without disturbing the settled status.
-                val settled = allPackets.filter { it.to == fromId }.singleOrNull() ?: allPackets.singleOrNull()
+                val settled = allPackets.singleOrNull { it.to == fromId } ?: allPackets.singleOrNull()
                 if (settled != null && settled.ackProofStatus != provenAckProof) {
                     packetRepository.value.update(
                         settled.copy(ackProofStatus = provenAckProof),
@@ -470,7 +476,7 @@ class MeshDataHandlerImpl(
                 }
                 packetRepository.value.updateReaction(updated)
             } else if (ackProofStatus == provenAckProof) {
-                val settled = allReactions.filter { it.to == fromId }.singleOrNull() ?: allReactions.singleOrNull()
+                val settled = allReactions.singleOrNull { it.to == fromId } ?: allReactions.singleOrNull()
                 if (settled != null && settled.ackProofStatus != provenAckProof) {
                     packetRepository.value.updateReaction(settled.copy(ackProofStatus = provenAckProof))
                 }
@@ -599,30 +605,30 @@ class MeshDataHandlerImpl(
 
     private suspend fun updateNotification(contactKey: String, dataPacket: DataPacket, isSilent: Boolean) {
         when (dataPacket.dataType) {
-            PortNum.TEXT_MESSAGE_APP.value -> {
-                val message = dataPacket.text!!
-                val isBroadcast = dataPacket.destination is NodeAddress.Broadcast
-                val channelName = if (isBroadcast) effectiveChannelName(dataPacket.channel) else null
-                serviceNotifications.updateMessageNotification(
-                    contactKey,
-                    getSenderName(dataPacket),
-                    message,
-                    isBroadcast,
-                    channelName,
-                    isSilent,
-                )
-            }
+            PortNum.TEXT_MESSAGE_APP.value ->
+                dataPacket.text?.let { message ->
+                    val isBroadcast = dataPacket.destination is NodeAddress.Broadcast
+                    val channelName = if (isBroadcast) effectiveChannelName(dataPacket.channel) else null
+                    serviceNotifications.updateMessageNotification(
+                        contactKey,
+                        getSenderName(dataPacket),
+                        message,
+                        isBroadcast,
+                        channelName,
+                        isSilent,
+                    )
+                }
 
-            PortNum.WAYPOINT_APP.value -> {
-                val waypoint = dataPacket.waypoint!!
-                serviceNotifications.updateWaypointNotification(
-                    contactKey,
-                    getSenderName(dataPacket),
-                    waypointMessageFormatter(waypoint.name),
-                    waypoint.id,
-                    isSilent,
-                )
-            }
+            PortNum.WAYPOINT_APP.value ->
+                dataPacket.waypoint?.let { waypoint ->
+                    serviceNotifications.updateWaypointNotification(
+                        contactKey,
+                        getSenderName(dataPacket),
+                        waypointMessageFormatter(waypoint.name),
+                        waypoint.id,
+                        isSilent,
+                    )
+                }
 
             else -> return
         }
@@ -678,8 +684,7 @@ class MeshDataHandlerImpl(
             // A reply ID is sender-scoped, so only use a parent that is unique within this reaction's conversation.
             packetRepository.value
                 .findPacketsWithId(decoded.reply_id)
-                .filter { it.contactKey(myNodeNum) == contactKey }
-                .singleOrNull()
+                .singleOrNull { it.contactKey(myNodeNum) == contactKey }
                 ?.let { originalPacket ->
                     // Skip notification if the original message was filtered
                     val conversationMuted = packetRepository.value.getContactSettings(contactKey).isMuted

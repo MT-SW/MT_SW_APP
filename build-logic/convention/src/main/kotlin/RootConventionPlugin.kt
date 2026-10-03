@@ -53,7 +53,7 @@ class RootConventionPlugin : Plugin<Project> {
 
 /**
  * Registers a `kmpSmokeCompile` lifecycle task that depends on `compileKotlinJvm` and `compileKotlinIosSimulatorArm64`
- * tasks from all KMP modules using task path strings.
+ * tasks from all KMP modules, plus `assembleAndroidDeviceTest` for [DEVICE_TEST_MODULES], using task path strings.
  *
  * Non-KMP modules simply won't have these tasks, so the path-based dependencies will be silently ignored.
  */
@@ -61,20 +61,20 @@ private fun Project.registerKmpSmokeCompileTask() {
     val kmp = kmpModules()
     tasks.register("kmpSmokeCompile") {
         group = "verification"
-        description = "Compile all KMP modules for JVM and iOS Simulator ARM64 targets."
+        description = "Compile all KMP modules for JVM and iOS Simulator ARM64, and assemble the device-test APKs."
 
         kmp.forEach { path ->
             dependsOn("$path:compileKotlinJvm")
             dependsOn("$path:compileKotlinIosSimulatorArm64")
         }
 
-        // Compile androidDeviceTest sources so instrumented test breakages are caught early.
-        // These tests require a device/emulator to *run*, but compilation alone is cheap.
-        DEVICE_TEST_MODULES.forEach { path -> dependsOn("$path:compileAndroidDeviceTest") }
+        // Assemble, not just compile, the androidDeviceTest APKs: dexing and packaging failures only show up there.
+        // Running them still needs a device.
+        DEVICE_TEST_MODULES.forEach { path -> dependsOn("$path:assembleAndroidDeviceTest") }
     }
 }
 
-/** KMP modules that declare `withDeviceTest {}` and therefore have `compileAndroidDeviceTest` tasks. */
+/** KMP modules that declare `withDeviceTest {}` and therefore have `assembleAndroidDeviceTest` tasks. */
 private val DEVICE_TEST_MODULES = listOf(":core:database", ":core:model")
 
 /**
@@ -147,7 +147,7 @@ private val DOKKA_EXCLUDED_MODULES =
 private fun allModules(): List<String> = ALL_MODULES_FULL
 
 /**
- * Modules that apply the KMP plugin and should be compiled for JVM + iOS targets. Excludes pure-Android modules
- * (:androidApp, :core:barcode, :core:nfc, :feature:widget) and the desktop JVM-only module.
+ * Modules that apply the KMP plugin and should be compiled for JVM and `iosSimulatorArm64`. Excludes pure-Android
+ * modules (:androidApp, :core:barcode, :core:nfc, :feature:widget) and the desktop JVM-only module.
  */
 private fun kmpModules(): List<String> = allModules().filter { it !in ANDROID_ONLY_MODULES + ":desktopApp" }

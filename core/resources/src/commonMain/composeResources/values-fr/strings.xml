@@ -17,18 +17,19 @@
   -->
 <resources>
     <!-- A11Y -->
+    <string name="a11y_humidity">Humidité</string>
     <string name="a11y_label_value">%1$s: %2$s</string>
     <string name="a11y_message_from">Message de %1$s: %2$s</string>
     <string name="a11y_node_battery">batterie : %1$d%</string>
     <string name="a11y_node_distance_away">À %1$s</string>
     <string name="a11y_node_favorite">favori</string>
-    <string name="a11y_node_hops_away">À %1$d sauts</string>
     <string name="a11y_node_last_heard">dernier entendu %1$s</string>
     <string name="a11y_node_offline">hors-ligne</string>
     <string name="a11y_node_online">en ligne</string>
     <string name="a11y_node_role">rôle %1$s</string>
     <string name="a11y_node_signal">signal %1$s</string>
     <string name="a11y_nodes_at_hop">Saut %1$d : %2$d nœuds</string>
+    <string name="a11y_temperature">Température</string>
     <string name="about">A propros</string>
     <string name="accept">Accepter</string>
     <string name="acknowledgements">Remerciements</string>
@@ -182,7 +183,6 @@
     <string name="channel_8">Canal 8</string>
     <string name="channel_features">Fonctionnalités du canal</string>
     <string name="channel_invalid">Cette URL de canal est invalide et ne peut pas être utilisée</string>
-    <string name="channel_label">Canal</string>
     <string name="channel_name">Nom du canal</string>
     <string name="channel_url">URL du canal</string>
     <string name="channel_utilization">UtilCanal</string>
@@ -368,6 +368,7 @@
     <string name="direct_message">Message direct</string>
     <string name="direct_message_key">Clé de message direct</string>
     <string name="direct_messages">Messages directs</string>
+    <string name="disabled">Désactivé</string>
     <string name="discard_changes">Ignorer</string>
     <string name="disconnect">Déconnecter</string>
     <string name="disconnected">Déconnecté</string>
@@ -465,6 +466,7 @@
     <string name="downlink_feature_description">Les messages provenant d'une passerelle Internet publique sont transmis au maillage local. En raison de la politique zéro saut, le trafic du serveur MQTT par défaut ne se propagera pas plus loin que cet appareil.</string>
     <string name="download">Télécharger</string>
     <string name="duplicated_public_key_title">Clé publique dupliquée détectée</string>
+    <!-- DURATION -->
     <string name="dynamic">Dynamique</string>
     <string name="easily_set_up_private_mesh_networks">Installez facilement des réseaux de maillage privé pour une communication sûre et fiable dans les régions éloignées.</string>
     <string name="edit">Modifier</string>
@@ -599,6 +601,7 @@
     <string name="firmware_update_taking_a_while">Ça peut prendre une minute...</string>
     <string name="firmware_update_target">Destination : %1$s</string>
     <string name="firmware_update_title">Mise à jour du firmware</string>
+    <string name="firmware_update_transfer_percent">%1$d%</string>
     <string name="firmware_update_unknown_error">Une erreur inconnue s'est produite</string>
     <string name="firmware_update_unknown_hardware">Modèle de matériel inconnu : %1$d</string>
     <string name="firmware_update_unknown_release">Version distante inconnue</string>
@@ -779,7 +782,6 @@
     <string name="manual_position_request">Requête manuelle de position requise</string>
     <!-- MAP -->
     <string name="map">Carte de maillage</string>
-    <string name="map_cache_info">Capacité du cache : %1$d MB\nUtilisation du cache : %2$d MB</string>
     <string name="map_cache_manager">Gestionnaire du cache</string>
     <string name="map_cache_size">Taille actuelle du cache</string>
     <string name="map_cache_tiles">%1$d tuiles</string>
@@ -900,7 +902,6 @@
     <string name="no_bluetooth_devices_seen">Aucun périphérique Bluetooth détecté</string>
     <string name="no_custom_tile_sources_found">Aucune source de tuiles personnalisées trouvée.</string>
     <string name="no_device_selected">Aucun appareil sélectionné</string>
-    <string name="no_devices_found">Aucun appareil trouvé</string>
     <string name="no_files_manifested">Aucun fichier affiché.</string>
     <string name="no_local_stats">Pas de stats disponibles</string>
     <string name="no_map_layers_loaded">Aucun calque personnalisé chargé.</string>
@@ -1084,6 +1085,11 @@
     <string name="remote_hardware">Matériel télécommande</string>
     <string name="remote_hardware_config">Configuration du matériel distant</string>
     <string name="remote_hardware_enabled">Matériel distant activé</string>
+    <string name="remote_shell_key_alt">Alt</string>
+    <string name="remote_shell_key_home">Accueil</string>
+    <string name="remote_shell_modifier_locked">Verrouillé</string>
+    <string name="remote_shell_send">Envoyer</string>
+    <string name="remote_shell_status_not_connected">Non connecté</string>
     <string name="remotely_administrating">"[Distant] %1$s"</string>
     <!-- REMOVE -->
     <string name="remove">Supprimer</string>

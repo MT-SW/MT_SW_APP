@@ -42,6 +42,7 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import okio.ByteString.Companion.toByteString
 import org.meshtastic.core.common.database.DatabaseManager
+import org.meshtastic.core.common.di.asServiceScope
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DataPacket
 import org.meshtastic.core.model.MessageStatus
@@ -126,12 +127,12 @@ class RadioControllerImplTest {
             activeSession
                 ?: MutableStateFlow(deviceAddress.value?.let { RadioSessionContext(sessionGeneration.value, it) })
         every { radioInterfaceService.activeSession } returns resolvedActiveSession
-        everySuspend { radioInterfaceService.runWhileSessionActive(any(), any()) } calls
+        everySuspend { radioInterfaceService.runWhileSessionActive(any(), any(), any()) } calls
             {
                 val session = it.args[0] as RadioSessionContext
 
                 @Suppress("UNCHECKED_CAST")
-                val block = it.args[1] as (suspend () -> Unit)
+                val block = it.args[2] as (suspend () -> Unit)
                 if (resolvedActiveSession.value == session) {
                     block()
                     true
@@ -176,8 +177,8 @@ class RadioControllerImplTest {
             serviceNotifications = serviceNotifications,
             messageProcessor = lazy { messageProcessor },
             radioConfigRepository = radioConfigRepository,
-            scope = scope,
-            onDeviceAddressChanged = onDeviceAddressChanged,
+            scope = scope.asServiceScope(),
+            deviceAddressChangeHook = { onDeviceAddressChanged?.invoke() },
         )
     }
 

@@ -35,7 +35,7 @@ class GoogleMapViewProvider : MapViewProvider {
     ) {
         val mapViewModel: MapViewModel = koinViewModel()
         SideEffect(waypointId) { mapViewModel.setWaypointId(waypointId) }
-        SideEffect(plannerNodeNum) { mapViewModel.setPlannerNodeNum(plannerNodeNum) }
+        SideEffect(plannerNodeNum) { mapViewModel.setSitePlannerNodeNum(plannerNodeNum) }
         org.meshtastic.app.map.MapView(
             modifier = modifier,
             mapViewModel = mapViewModel,

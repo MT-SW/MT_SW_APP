@@ -29,6 +29,8 @@ import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerRangeProvider
 import com.patrykandpatrick.vico.compose.cartesian.data.lineModel
 import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
+import org.meshtastic.core.common.util.BYTES_PER_MEGABYTE
+import org.meshtastic.core.common.util.formatMegabytes
 import org.meshtastic.core.common.util.formatString
 import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.resources.Res
@@ -164,7 +166,7 @@ internal fun buildHostMetricsChartData(data: List<Telemetry>): HostMetricsChartD
         telemetry.host_metrics
             ?.freemem_bytes
             ?.takeIf { it > 0 }
-            ?.let { HostMetricsChartPoint(time = telemetry.time, value = it.toDouble() / BYTES_IN_MB) }
+            ?.let { HostMetricsChartPoint(time = telemetry.time, value = it.toDouble() / BYTES_PER_MEGABYTE) }
     },
     cpuPercent =
     data.mapNotNull { telemetry ->
@@ -211,6 +213,9 @@ internal fun buildHostMetricsChartData(data: List<Telemetry>): HostMetricsChartD
 )
 
 private const val PERCENT_MULTIPLIER = 100.0
+
+/** Free memory is plotted in megabytes; one unit for every tick keeps the axis comparable. */
+internal fun freeMemoryChartLabel(megabytes: Double): String = formatMegabytes(megabytes, 0)
 
 /**
  * Vico chart composable that renders load averages (1m, 5m, 15m) and free memory as dual-axis line series: load on the
@@ -301,7 +306,7 @@ internal fun HostMetricsChart(
                         heapColor -> formatString("Heap: %.0f%%", value)
                         flashColor -> formatString("Flash: %.0f%%", value)
                         psramColor -> formatString("PSRAM: %.0f%%", value)
-                        else -> formatString("Mem: %.0f MB", value)
+                        else -> formatString("Mem: %s", freeMemoryChartLabel(value))
                     }
                 },
             )
@@ -363,7 +368,7 @@ internal fun HostMetricsChart(
                 if (memData.isNotEmpty()) {
                     VerticalAxis.rememberEnd(
                         label = ChartStyling.rememberAxisLabel(color = memColor),
-                        valueFormatter = { _, value, _ -> formatString("%.0f MB", value) },
+                        valueFormatter = { _, value, _ -> freeMemoryChartLabel(value) },
                     )
                 } else {
                     null

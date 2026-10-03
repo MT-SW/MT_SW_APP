@@ -2,6 +2,6 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>Kdoc:MeshLogDao.kt:MeshLogDao$/** * All logs for a given port across every sender since [sinceTimestamp] — unlike [getLogsByPortNum], this has no * count cap, so a busy mesh's frequent packets from one node can never crowd out a rarer variant from another. */</ID>
+    <ID>UseOrEmpty:NodeInfoDao.kt:NodeInfoDao$getNodeByNum(num)?.node?.powerChannelLabels ?: emptyList()</ID>
   </CurrentIssues>
 </SmellBaseline>

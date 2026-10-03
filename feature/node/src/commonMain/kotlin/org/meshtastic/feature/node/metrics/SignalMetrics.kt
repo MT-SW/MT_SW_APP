@@ -39,6 +39,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -61,7 +62,6 @@ import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.model.TelemetryType
 import org.meshtastic.core.model.noiseFloorOrNull
 import org.meshtastic.core.model.util.TimeConstants.MS_PER_SEC
-import org.meshtastic.core.model.util.formatUptime
 import org.meshtastic.core.model.util.rxTimeOrNull
 import org.meshtastic.core.model.util.snrOrNull
 import org.meshtastic.core.repository.UiPrefs
@@ -70,6 +70,7 @@ import org.meshtastic.core.resources.busy_noise_floor
 import org.meshtastic.core.resources.clear
 import org.meshtastic.core.resources.lna_gain_db
 import org.meshtastic.core.resources.lna_gain_node_description
+import org.meshtastic.core.resources.formatDuration
 import org.meshtastic.core.resources.local_stats_bad
 import org.meshtastic.core.resources.local_stats_nodes
 import org.meshtastic.core.resources.local_stats_noise
@@ -509,6 +510,7 @@ private fun SignalMetricsChart(
 }
 
 @Composable
+@ReadOnlyComposable
 private fun noiseFloorTextColor(value: Int?): Color = when {
     value == null -> MaterialTheme.colorScheme.onSurfaceVariant
     // Palette matches the signal-quality / connection-status colours: gold = quiet, red = busy, purple = very noisy.
@@ -614,7 +616,11 @@ private fun LocalStatsCard(nodeNum: Int?, telemetry: Telemetry, isSelected: Bool
                     style = MaterialTheme.typography.labelLarge,
                 )
                 Text(
-                    text = stringResource(Res.string.local_stats_uptime, formatUptime(localStats?.uptime_seconds ?: 0)),
+                    text =
+                    stringResource(
+                        Res.string.local_stats_uptime,
+                        formatDuration((localStats?.uptime_seconds ?: 0).toLong()),
+                    ),
                     style = MaterialTheme.typography.labelLarge,
                 )
             }

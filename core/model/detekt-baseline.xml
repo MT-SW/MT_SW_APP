@@ -2,38 +2,16 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>Kdoc:PrivatePortNum.kt:/** * Support for Meshtastic's "private app port" convention (see the `PRIVATE_APP = 256` comment in portnums.proto): * ports >= 256 are used by mutual agreement between firmware and client without adding a named * [org.meshtastic.proto.PortNum] enum entry, specifically so a client doesn't need to fork the official protobufs just * for one experimental port number (here: 354, used by the OnDemand/Sniffer protocol -- see `ondemand.proto`). * * Wire's default `enum_class` codegen mode is a closed Kotlin enum: it cannot represent a `PortNum` value that has no * matching constant. On *decode*, Wire handles this gracefully already -- an out-of-range portnum is redirected into * the containing [Data] message's own [Data.unknownFields] (tag 1, varint) instead of throwing, leaving `Data.portnum` * at its default ([org.meshtastic.proto.PortNum.UNKNOWN_APP]). On *encode* there is no built-in equivalent, so sending * on a private port means constructing that same tag-1 varint by hand and leaving `portnum` at its default (which * proto3 omits from the wire, so there is no duplicate/conflicting tag). * * [Data.effectivePortNum] and [privatePortNumUnknownFields] are the read/write halves of that pattern. */</ID>
-    <ID>LoopWithTooManyJumpStatements:LocalStatsExtended.kt:while</ID>
-    <ID>MagicNumber:Crc32.kt:0xEDB88320L</ID>
-    <ID>MagicNumber:Crc32.kt:0xFFFFFFFFL</ID>
-    <ID>MagicNumber:Crc32.kt:0xFFL</ID>
-    <ID>MagicNumber:Crc32.kt:8</ID>
-    <ID>MagicNumber:LocalStatsExtended.kt:0x7</ID>
-    <ID>MagicNumber:LocalStatsExtended.kt:0x7F</ID>
-    <ID>MagicNumber:LocalStatsExtended.kt:0x80</ID>
-    <ID>MagicNumber:LocalStatsExtended.kt:0xFF</ID>
-    <ID>MagicNumber:LocalStatsExtended.kt:3</ID>
-    <ID>MagicNumber:LocalStatsExtended.kt:4</ID>
-    <ID>MagicNumber:LocalStatsExtended.kt:64</ID>
-    <ID>MagicNumber:LocalStatsExtended.kt:7</ID>
-    <ID>MagicNumber:LocalStatsExtended.kt:8</ID>
-    <ID>MagicNumber:PrivatePortNum.kt:0x7</ID>
-    <ID>MagicNumber:PrivatePortNum.kt:0x7F</ID>
-    <ID>MagicNumber:PrivatePortNum.kt:0x80</ID>
-    <ID>MagicNumber:PrivatePortNum.kt:0xFF</ID>
-    <ID>MagicNumber:PrivatePortNum.kt:3</ID>
-    <ID>MagicNumber:PrivatePortNum.kt:4</ID>
-    <ID>MagicNumber:PrivatePortNum.kt:5</ID>
-    <ID>MagicNumber:PrivatePortNum.kt:64</ID>
-    <ID>MagicNumber:PrivatePortNum.kt:7</ID>
-    <ID>MagicNumber:PrivatePortNum.kt:8</ID>
-    <ID>MagicNumber:X25519Util.kt:32</ID>
+    <ID>AbstractClassCanBeInterface:MeshActivity.kt:MeshActivity$MeshActivity</ID>
+    <ID>AbstractClassCanBeInterface:MqttConnectionState.kt:MqttConnectionState$MqttConnectionState</ID>
+    <ID>AbstractClassCanBeInterface:MqttProbeStatus.kt:MqttProbeStatus$MqttProbeStatus</ID>
+    <ID>NoNameShadowing:ChannelSet.kt:wb</ID>
     <ID>PropertyName:DebugUtils.kt:/** * Whether the app is running in debug mode. * * This is a compile-time constant for the shared module. For runtime debug detection, use * [org.meshtastic.core.common.BuildConfigProvider.isDebug] from DI instead. */ @Suppress("ktlint:standard:property-naming", "TopLevelPropertyNaming") const val isDebug: Boolean = false</ID>
-    <ID>ReturnCount:LocalStatsExtended.kt:private fun findLengthDelimitedField: ByteArray?</ID>
-    <ID>ReturnCount:LocalStatsExtended.kt:private fun readVarint: Pair&lt;Long, Int>?</ID>
-    <ID>ReturnCount:PrivatePortNum.kt:private fun ByteString.readTopLevelVarintField: Long?</ID>
-    <ID>ReturnCount:PrivatePortNum.kt:private fun readVarint: Pair&lt;Long, Int>?</ID>
     <ID>SwallowedException:DataPacket.kt:DataPacket$e: Exception</ID>
     <ID>TooGenericExceptionCaught:DataPacket.kt:DataPacket$e: Exception</ID>
+    <ID>UseOrEmpty:ChannelSet.kt:host ?: ""</ID>
+    <ID>UseOrEmpty:NetworkFirmwareRelease.kt:commit?.takeIf { it.isNotBlank() }?.let { "https://github.com/meshtastic/firmware/commit/$it" } ?: ""</ID>
+    <ID>UseOrEmpty:SharedContact.kt:host?.lowercase() ?: ""</ID>
+    <ID>UseOrEmpty:UriUtils.kt:uri.host ?: ""</ID>
   </CurrentIssues>
 </SmellBaseline>

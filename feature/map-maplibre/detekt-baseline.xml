@@ -2,6 +2,7 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>Kdoc:CameraPersistence.kt:/** * Reads back the camera the user left the map on. * * The OSMdroid map did this and the Google flavor still does; the MapLibre map lost it in the cutover even though * `MapPrefs.setCameraPosition` and its stored value survived untouched. * * The stored position is handed to `rememberMapState` as its initial camera rather than written to the map afterwards, * which is what maplibre-compose 0.16.0 made possible — a map created at the remembered position opens there instead of * opening on a default and then moving. * * Pair with [SaveCameraPosition], which is what keeps the value up to date. */</ID>
+    <ID>LongParameterList:WaypointDialogs.kt:WaypointEditing</ID>
+    <ID>UnnecessaryLaunchedEffect:MapLibreMapViewProvider.kt:LaunchedEffect</ID>
   </CurrentIssues>
 </SmellBaseline>

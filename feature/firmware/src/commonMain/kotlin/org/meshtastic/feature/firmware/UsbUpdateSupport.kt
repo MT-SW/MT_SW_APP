@@ -35,9 +35,9 @@ import org.meshtastic.core.resources.firmware_update_rebooting
 import org.meshtastic.core.resources.firmware_update_retrieval_failed
 import org.meshtastic.core.resources.firmware_update_usb_failed
 import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.feature.firmware.ota.formatTransferPercent
 
 private const val USB_REBOOT_DELAY = 5000L
-private const val PERCENT_MAX = 100
 
 /**
  * One leg of a multi-pass USB/UF2 sequence.
@@ -94,13 +94,12 @@ internal suspend fun performUsbMaintenance(
     val firmware =
         try {
             retrieveUsbFirmware(release, hardware) { progress ->
-                val percent = (progress * PERCENT_MAX).toInt()
                 updateState(
                     FirmwareUpdateState.Downloading(
                         ProgressState(
                             message = UiText.DynamicString(downloadingMsg),
                             progress = progress,
-                            details = "$percent%",
+                            details = formatTransferPercent(progress),
                         ),
                     ),
                 )
@@ -128,7 +127,10 @@ internal suspend fun performUsbMaintenance(
         }
 
     updateState(FirmwareUpdateState.Processing(ProgressState(UiText.Resource(Res.string.firmware_update_rebooting))))
-    radioController.rebootToDfu(nodeRepository.myNodeInfo.value?.myNodeNum ?: 0)
+    radioController.rebootToDfu(
+        nodeRepository.myNodeInfo.value?.myNodeNum ?: 0,
+        radioController.generatePacketId(),
+    )
     delay(USB_REBOOT_DELAY)
 
     val passes =
@@ -303,6 +305,7 @@ internal class UsbPassWriter(
                                     ProgressState(
                                         message = UiText.DynamicString(downloadingMsg),
                                         progress = progress,
+                                        details = formatTransferPercent(progress),
                                     ),
                                 ),
                             )
@@ -363,7 +366,7 @@ internal suspend fun performUsbUpdate(
                 FirmwareUpdateState.Processing(ProgressState(UiText.Resource(Res.string.firmware_update_rebooting))),
             )
             val myNodeNum = nodeRepository.myNodeInfo.value?.myNodeNum ?: 0
-            radioController.rebootToDfu(myNodeNum)
+            radioController.rebootToDfu(myNodeNum, radioController.generatePacketId())
             delay(USB_REBOOT_DELAY)
 
             val sourceArtifact =
@@ -373,13 +376,12 @@ internal suspend fun performUsbUpdate(
         } else {
             val firmwareFile =
                 retrieveUsbFirmware(release, hardware) { progress ->
-                    val percent = (progress * PERCENT_MAX).toInt()
                     updateState(
                         FirmwareUpdateState.Downloading(
                             ProgressState(
                                 message = UiText.DynamicString(downloadingMsg),
                                 progress = progress,
-                                details = "$percent%",
+                                details = formatTransferPercent(progress),
                             ),
                         ),
                     )
@@ -397,7 +399,7 @@ internal suspend fun performUsbUpdate(
                 val processingState = ProgressState(UiText.Resource(Res.string.firmware_update_rebooting))
                 updateState(FirmwareUpdateState.Processing(processingState))
                 val myNodeNum = nodeRepository.myNodeInfo.value?.myNodeNum ?: 0
-                radioController.rebootToDfu(myNodeNum)
+                radioController.rebootToDfu(myNodeNum, radioController.generatePacketId())
                 delay(USB_REBOOT_DELAY)
 
                 val fileName = firmwareFile.fileName ?: "firmware.uf2"

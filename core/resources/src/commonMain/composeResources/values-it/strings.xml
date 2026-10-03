@@ -17,17 +17,18 @@
   -->
 <resources>
     <!-- A11Y -->
+    <string name="a11y_humidity">Umidità</string>
     <string name="a11y_label_value">%1$s: %2$s</string>
     <string name="a11y_message_from">Messaggio da %1$s: %2$s</string>
     <string name="a11y_node_distance_away">distante %1$s</string>
     <string name="a11y_node_favorite">preferito</string>
-    <string name="a11y_node_hops_away">%1$d hop di distanza</string>
     <string name="a11y_node_last_heard">sentito l'ultima volta %1$s</string>
     <string name="a11y_node_offline">offline</string>
     <string name="a11y_node_online">online</string>
     <string name="a11y_node_role">ruolo %1$s</string>
     <string name="a11y_node_signal">segnale %1$s</string>
     <string name="a11y_nodes_at_hop">%1$d hop: %2$d nodi</string>
+    <string name="a11y_temperature">Temperatura</string>
     <string name="about">Informazioni</string>
     <string name="accept">Accetta</string>
     <string name="acknowledgements">Ringraziamenti</string>
@@ -168,7 +169,6 @@
     <string name="channel_8">Canale 8</string>
     <string name="channel_features">Caratteristiche del canale</string>
     <string name="channel_invalid">L'URL di questo Canale non è valida e non può essere usata</string>
-    <string name="channel_label">Canale</string>
     <string name="channel_name">Nome del canale</string>
     <string name="channel_url">URL Canale</string>
     <string name="channel_utilization">ChUtil</string>
@@ -429,7 +429,6 @@
     <string name="discovery_stop_scan">Interrompi Scansione</string>
     <string name="discovery_summary_not_available">Analisi AI non disponibile</string>
     <string name="discovery_time_remaining">%1$s rimanenti</string>
-    <string name="discovery_unique_nodes">%1$d nodi unici</string>
     <string name="discovery_view_map">Visualizza mappa</string>
     <string name="disk_free_indexed">Disco libero %1$d</string>
     <string name="display">Schermo</string>
@@ -454,7 +453,6 @@
     <string name="doc_keywords_messages">messaggio,canale,crittografia,diretto,broadcast,chat-rapida</string>
     <string name="doc_keywords_mqtt">mqtt,broker,internet,bridge,uplink,downlink</string>
     <string name="doc_keywords_node_metrics">metriche,telemetria,segnale,snr,rssi,batteria,traceroute</string>
-    <string name="doc_keywords_nodes">nodo,mesh,elenco,ruolo,stato,preferito,filtro</string>
     <string name="doc_keywords_onboarding">configurazione,benvenuto,permessi,primo-avvio</string>
     <string name="doc_keywords_settings_module">modulo,seriale,telemetria,canned,store-forward,amministrazione</string>
     <string name="doc_keywords_settings_radio">impostazioni,radio,lora,regione,modem,dispositivo,alimentazione,sicurezza</string>
@@ -494,6 +492,7 @@
     <string name="downlink_feature_description">I messaggi provenienti da un gateway Internet pubblico vengono inoltrati alla rete mesh locale. A causa della politica zero-hop, il traffico proveniente dal server MQTT predefinito non si propagherà oltre questo dispositivo.</string>
     <string name="download">Scarica</string>
     <string name="duplicated_public_key_title">Rilevata chiave pubblica duplicata</string>
+    <!-- DURATION -->
     <string name="dynamic">Dinamico</string>
     <string name="easily_set_up_private_mesh_networks">Crea reti mesh private in modo semplice per connessioni sicure e affidabili in zone remote.</string>
     <string name="edit">Modifica</string>
@@ -624,6 +623,7 @@
     <string name="firmware_update_taking_a_while">Potrebbe volerci un minuto...</string>
     <string name="firmware_update_target">Target: %1$s</string>
     <string name="firmware_update_title">Aggiornamento Firmware</string>
+    <string name="firmware_update_transfer_percent">%1$d%</string>
     <string name="firmware_update_unknown_error">Errore sconosciuto</string>
     <string name="firmware_update_unknown_hardware">Modello hardware sconosciuto: %1$d</string>
     <string name="firmware_update_unknown_release">Versione remota sconosciuta</string>
@@ -832,7 +832,6 @@
     <string name="manual_position_request">Richiesta posizione manuale mandatoria</string>
     <!-- MAP -->
     <string name="map">Mappa della Mesh</string>
-    <string name="map_cache_info">Capacità Cache: %1$d MB\nCache utilizzata: %2$d MB</string>
     <string name="map_cache_manager">Gestione della cache</string>
     <string name="map_cache_size">Dimensione Cache attuale</string>
     <string name="map_cache_tiles">%1$d riquadri della mappa</string>
@@ -991,7 +990,6 @@
     <string name="no_bluetooth_devices_seen">Nessun dispositivo Bluetooth rilevato</string>
     <string name="no_custom_tile_sources_found">Nessuna sorgente di tile personalizzata trovata.</string>
     <string name="no_device_selected">Nessun dispositivo selezionato</string>
-    <string name="no_devices_found">Nessun dispositivo trovato</string>
     <string name="no_files_manifested">Nessun file nel manifest.</string>
     <string name="no_local_stats">Statistiche Non Disponibili</string>
     <string name="no_map_layers_loaded">Nessun livello di mappa caricato.</string>
@@ -1214,6 +1212,10 @@
     <string name="remote_hardware">Hardware Remoto</string>
     <string name="remote_hardware_config">Configurazione Hardware Remoto</string>
     <string name="remote_hardware_enabled">Hardware Remoto abilitato</string>
+    <string name="remote_shell_key_alt">Alt</string>
+    <string name="remote_shell_modifier_locked">Bloccato</string>
+    <string name="remote_shell_send">Invia</string>
+    <string name="remote_shell_status_not_connected">Non connesso</string>
     <string name="remotely_administrating">"[Remote] %1$s"</string>
     <!-- REMOVE -->
     <string name="remove">Elimina</string>

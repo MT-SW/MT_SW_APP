@@ -36,6 +36,7 @@ import org.meshtastic.app.BuildConfig
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceAddress
 import org.meshtastic.core.model.service.LockdownState
+import org.meshtastic.core.model.util.TimeConstants
 import org.meshtastic.core.navigation.NodesRoute
 import org.meshtastic.core.navigation.TopLevelDestination
 import org.meshtastic.core.navigation.rememberMultiBackstack
@@ -77,7 +78,7 @@ fun MainScreen() {
     LockdownDialog(
         lockdownState = lockdownState,
         onSubmit = { passphrase, boots, hours, sessionMinutes ->
-            viewModel.sendLockdownUnlock(passphrase, boots, hours, sessionMinutes * SECONDS_PER_MINUTE)
+            viewModel.sendLockdownUnlock(passphrase, boots, hours, sessionMinutes * TimeConstants.SECONDS_PER_MINUTE)
         },
         onDisconnect = { viewModel.setDeviceAddress("n") },
     )
@@ -154,5 +155,3 @@ private fun AndroidAppVersionCheck(viewModel: UIViewModel) {
         }
     }
 }
-
-private const val SECONDS_PER_MINUTE = 60

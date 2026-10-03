@@ -52,14 +52,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.DateFormatter
+import org.meshtastic.core.common.util.formatByteSize
 import org.meshtastic.core.common.util.formatString
 import org.meshtastic.core.model.TelemetryType
 import org.meshtastic.core.model.util.LocalStatsExtended
 import org.meshtastic.core.model.util.TimeConstants.MS_PER_SEC
 import org.meshtastic.core.model.util.decodeLocalStatsExtended
-import org.meshtastic.core.model.util.formatUptime
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.disk_free_indexed
+import org.meshtastic.core.resources.formatDuration
 import org.meshtastic.core.resources.free_memory
 import org.meshtastic.core.resources.host_metrics_log
 import org.meshtastic.core.resources.load_indexed
@@ -174,7 +175,7 @@ private fun HostMetricsCard(telemetryGroup: List<Telemetry>, isSelected: Boolean
 
 /** Card body showing timestamp, load averages with progress bars, memory, disk, and uptime. */
 @Composable
-private fun HostMetricsCardContent(
+internal fun HostMetricsCardContent(
     time: String,
     hostMetrics: org.meshtastic.proto.HostMetrics?,
     localStatsExtended: LocalStatsExtended? = null,
@@ -186,21 +187,21 @@ private fun HostMetricsCardContent(
         Spacer(modifier = Modifier.height(8.dp))
 
         hostMetrics?.uptime_seconds?.let {
-            LogLine(label = stringResource(Res.string.uptime), value = formatUptime(it))
+            LogLine(label = stringResource(Res.string.uptime), value = formatDuration(it.toLong()))
         }
         hostMetrics?.freemem_bytes?.let {
-            LogLine(label = stringResource(Res.string.free_memory), value = formatBytes(it))
+            LogLine(label = stringResource(Res.string.free_memory), value = formatByteSize(it))
         }
 
         // Disk free rows
         hostMetrics?.diskfree1_bytes?.let {
-            LogLine(label = stringResource(Res.string.disk_free_indexed, 1), value = formatBytes(it))
+            LogLine(label = stringResource(Res.string.disk_free_indexed, 1), value = formatByteSize(it))
         }
         hostMetrics?.diskfree2_bytes?.let {
-            LogLine(label = stringResource(Res.string.disk_free_indexed, 2), value = formatBytes(it))
+            LogLine(label = stringResource(Res.string.disk_free_indexed, 2), value = formatByteSize(it))
         }
         hostMetrics?.diskfree3_bytes?.let {
-            LogLine(label = stringResource(Res.string.disk_free_indexed, 3), value = formatBytes(it))
+            LogLine(label = stringResource(Res.string.disk_free_indexed, 3), value = formatByteSize(it))
         }
 
         // Load averages with coloured indicators and progress bars
@@ -281,38 +282,5 @@ fun LogLine(modifier: Modifier = Modifier, label: String, value: String) {
     ) {
         Text(text = label)
         Text(text = value)
-    }
-}
-
-const val BYTES_IN_KB = 1024.0
-const val BYTES_IN_MB = BYTES_IN_KB * 1024.0
-const val BYTES_IN_GB = BYTES_IN_MB * 1024.0
-
-private const val DECIMAL_FACTOR_1 = 10.0
-private const val DECIMAL_FACTOR_2 = 100.0
-
-fun formatBytes(bytes: Long, decimalPlaces: Int = 2): String {
-    fun formatValue(value: Double): String {
-        // Simple decimal formatting without java.text.DecimalFormat
-        val factor =
-            when (decimalPlaces) {
-                0 -> 1.0
-                1 -> DECIMAL_FACTOR_1
-                else -> DECIMAL_FACTOR_2
-            }
-        val rounded = kotlin.math.round(value * factor) / factor
-        return if (rounded == rounded.toLong().toDouble()) {
-            rounded.toLong().toString()
-        } else {
-            rounded.toString()
-        }
-    }
-    return when {
-        bytes < 0 -> "N/A"
-        bytes == 0L -> "0 B"
-        bytes >= BYTES_IN_GB -> "${formatValue(bytes / BYTES_IN_GB)} GB"
-        bytes >= BYTES_IN_MB -> "${formatValue(bytes / BYTES_IN_MB)} MB"
-        bytes >= BYTES_IN_KB -> "${formatValue(bytes / BYTES_IN_KB)} KB"
-        else -> "$bytes B"
     }
 }

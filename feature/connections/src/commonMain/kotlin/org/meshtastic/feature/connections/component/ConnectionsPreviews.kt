@@ -34,8 +34,6 @@ import org.meshtastic.core.ble.BleDevice
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.Node
-import org.meshtastic.core.ui.icon.MeshtasticIcons
-import org.meshtastic.core.ui.icon.Search
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.viewmodel.ConnectionStatus
 import org.meshtastic.feature.connections.model.DeviceListEntry
@@ -45,7 +43,6 @@ import org.meshtastic.feature.connections.ui.components.DeviceList
 import org.meshtastic.feature.connections.ui.components.DeviceListItem
 import org.meshtastic.feature.connections.ui.components.DeviceSectionHeader
 import org.meshtastic.feature.connections.ui.components.DisconnectButton
-import org.meshtastic.feature.connections.ui.components.EmptyStateContent
 import org.meshtastic.feature.connections.ui.components.TransportSelector
 import org.meshtastic.proto.User
 
@@ -95,18 +92,6 @@ fun ConnectingDeviceInfoPreview() {
             connectionProgress = "Discovering services...",
             onClickDisconnect = {},
         )
-    }
-}
-
-@PreviewLightDark
-@Composable
-fun EmptyStateContentPreview() {
-    // Bounded height so the docs reference is a tight crop of the empty-state block, not a full-screen frame
-    // (EmptyStateContent fills its parent to center its content).
-    AppTheme {
-        Surface(modifier = Modifier.fillMaxWidth().height(220.dp)) {
-            EmptyStateContent(text = "No devices found", imageVector = MeshtasticIcons.Search)
-        }
     }
 }
 

@@ -17,6 +17,8 @@
   -->
 <resources>
     <!-- A11Y -->
+    <string name="a11y_humidity">Humedad</string>
+    <string name="a11y_temperature">Temperatura:</string>
     <string name="about">Acerca de</string>
     <string name="accept">Aceptar</string>
     <string name="acknowledgements">Agradecimientos</string>
@@ -91,7 +93,6 @@
     <string name="channel_8">Canal 8</string>
     <string name="channel_features">Características del canal</string>
     <string name="channel_invalid">La URL de este canal no es válida y no puede utilizarse</string>
-    <string name="channel_label">Canal</string>
     <string name="channel_name">Nombre del canal</string>
     <string name="channels">Canales</string>
     <!-- CHIRPY -->
@@ -215,6 +216,7 @@
     <string name="doc_title_onboarding">Primeros Pasos</string>
     <string name="done">Hecho</string>
     <string name="download">Descarga</string>
+    <!-- DURATION -->
     <string name="dynamic">Dinámico</string>
     <string name="edit">Editar</string>
     <string name="eight_hours">8 Horas</string>
@@ -356,7 +358,6 @@ Rango de Valores 0 - 500.</string>
     <string name="manual_position_request">Requerir solicitud manual de posición</string>
     <!-- MAP -->
     <string name="map">Mapa Mesh</string>
-    <string name="map_cache_info">Capacidad del caché: %1$d MB\nUso del caché: %2$d MB</string>
     <string name="map_cache_manager">Gestor de Caché</string>
     <string name="map_cache_size">Tamaño actual de Caché</string>
     <string name="map_cache_tiles">%1$d Fichas</string>
@@ -566,6 +567,10 @@ Estos datos de ubicación pueden ser utilizados para fines como aparecer en un m
     <string name="remote_hardware">Hardware Remoto</string>
     <string name="remote_hardware_config">Configuración del hardware remotamente</string>
     <string name="remote_hardware_enabled">Hardware remoto activado</string>
+    <string name="remote_shell_key_alt">Altitud</string>
+    <string name="remote_shell_modifier_locked">Bloqueado</string>
+    <string name="remote_shell_send">Enviar</string>
+    <string name="remote_shell_status_not_connected">No conectado</string>
     <string name="remotely_administrating">"[Remoto] %1$s"</string>
     <!-- REMOVE -->
     <string name="remove">Quitar</string>

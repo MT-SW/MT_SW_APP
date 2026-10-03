@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Size
@@ -91,6 +92,7 @@ fun ConnectionsNavIcon(
 }
 
 @Composable
+@ReadOnlyComposable
 fun getTint(connectionState: ConnectionState): Color = when (connectionState) {
     ConnectionState.Connecting -> colorScheme.StatusConnecting
     ConnectionState.Disconnected -> colorScheme.StatusDisconnected

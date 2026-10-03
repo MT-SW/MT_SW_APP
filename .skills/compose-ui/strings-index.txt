@@ -1,16 +1,19 @@
 ### A11Y ###
+a11y_humidity
 a11y_label_value
 a11y_message_from
 a11y_node_battery
+a11y_node_channel
 a11y_node_distance_away
 a11y_node_favorite
-a11y_node_hops_away
+a11y_node_hops_count
 a11y_node_last_heard
 a11y_node_offline
 a11y_node_online
 a11y_node_role
 a11y_node_signal
 a11y_nodes_at_hop
+a11y_temperature
 about
 accept
 acknowledgements
@@ -181,7 +184,6 @@ channel_7
 channel_8
 channel_features
 channel_invalid
-channel_label
 channel_name
 channel_url
 channel_utilization
@@ -200,6 +202,7 @@ chirpy_error_token_budget_exceeded
 chirpy_error_unknown
 chirpy_error_unsupported_flavor
 chirpy_error_unsupported_platform
+chirpy_fallback_unavailable
 chirpy_intro
 chirpy_ready
 chirpy_search_placeholder
@@ -385,6 +388,7 @@ dew_point
 direct_message
 direct_message_key
 direct_messages
+disabled
 discard_changes
 disconnect
 disconnected
@@ -400,6 +404,7 @@ discovery_dwell_progress
 discovery_dwell_time
 discovery_dwell_time_description
 discovery_empty_history
+discovery_empty_history_hint
 discovery_export_report
 discovery_history
 discovery_interrupted_scan_restored
@@ -463,7 +468,7 @@ discovery_stat_unselected
 discovery_stop_scan
 discovery_summary_not_available
 discovery_time_remaining
-discovery_unique_nodes
+discovery_unique_nodes_count
 discovery_view_map
 disk_free_indexed
 display
@@ -477,7 +482,9 @@ distance_measurements
 distance_measurements_description
 dns
 ### DOC ###
+doc_auto_translated
 doc_clear_search
+doc_community_translated
 doc_keywords_android_auto
 doc_keywords_app_functions
 doc_keywords_connections
@@ -503,8 +510,12 @@ doc_keywords_translate
 doc_keywords_units
 doc_keywords_widget
 doc_loading
+doc_no_content
 doc_no_documentation
 doc_no_results
+doc_open_page
+doc_page_not_found
+doc_page_not_found_detail
 doc_search_placeholder
 doc_section_developer
 doc_section_user
@@ -539,6 +550,12 @@ downlink_feature_description
 download
 download_this_area
 duplicated_public_key_title
+### DURATION ###
+duration_ago
+duration_days_short
+duration_hours_short
+duration_minutes_short
+duration_seconds_short
 dynamic
 easily_set_up_private_mesh_networks
 edit
@@ -587,6 +604,7 @@ export_node_db
 export_tak_data_package
 external_notification
 external_notification_config
+external_power_short
 factory_reset
 fair
 fallback_node_name
@@ -721,6 +739,8 @@ firmware_update_success_wiped
 firmware_update_taking_a_while
 firmware_update_target
 firmware_update_title
+firmware_update_transfer_percent
+firmware_update_transfer_progress
 firmware_update_unknown_error
 firmware_update_unknown_hardware
 firmware_update_unknown_release
@@ -813,6 +833,7 @@ i_agree_to_share_my_location
 i_know_what_i_m_doing
 iaq
 iaq_definition
+iaq_value
 icon_meanings
 ignore
 ignore_add
@@ -988,6 +1009,8 @@ long_name
 longitude
 lora
 lora_config
+lora_config_change_value
+lora_config_changes
 low_battery
 low_battery_message
 low_battery_title
@@ -998,9 +1021,7 @@ manage_map_layers
 manual_position_request
 ### MAP ###
 map
-map_cache_info
 map_cache_manager
-map_cache_megabytes
 map_cache_size
 map_cache_tiles
 map_clear_tiles
@@ -1021,6 +1042,8 @@ map_filter_show_ignored
 map_filter_title
 map_layer_formats
 map_layer_opacity
+map_layer_open_failed
+map_layer_too_large
 map_node_popup_details
 map_offline_banner
 map_offline_download_failed_build
@@ -1131,6 +1154,8 @@ meshtastic_messages_notifications
 meshtastic_messages_notifications_description
 meshtastic_new_nodes_notifications
 meshtastic_new_nodes_notifications_description
+meshtastic_reactions_notifications
+meshtastic_reactions_notifications_description
 meshtastic_service_notifications
 meshtastic_service_notifications_description
 meshtastic_waypoints_notifications
@@ -1270,7 +1295,6 @@ no_bluetooth_devices_hint
 no_bluetooth_devices_seen
 no_custom_tile_sources_found
 no_device_selected
-no_devices_found
 no_files_manifested
 no_local_stats
 no_map_layers_loaded
@@ -1638,6 +1662,8 @@ range_test
 range_test_config
 react
 reboot
+reboot_into_dfu
+reboot_into_dfu_warning
 recent_network_devices
 reconnecting
 red
@@ -1655,6 +1681,45 @@ remote_command_no_response
 remote_hardware
 remote_hardware_config
 remote_hardware_enabled
+remote_shell
+remote_shell_command_hint
+remote_shell_error_notice
+remote_shell_full_screen
+remote_shell_input_dropped
+remote_shell_key_alt
+remote_shell_key_ctrl
+remote_shell_key_down
+remote_shell_key_end
+remote_shell_key_escape
+remote_shell_key_home
+remote_shell_key_left
+remote_shell_key_page_down
+remote_shell_key_page_up
+remote_shell_key_right
+remote_shell_key_tab
+remote_shell_key_up
+remote_shell_last_contact
+remote_shell_menu_line_mode
+remote_shell_menu_paste
+remote_shell_menu_text_larger
+remote_shell_menu_text_smaller
+remote_shell_modifier_locked
+remote_shell_modifier_once
+remote_shell_more_options
+remote_shell_no_reply
+remote_shell_no_reply_reason
+remote_shell_open
+remote_shell_open_description
+remote_shell_reconnect
+remote_shell_send
+remote_shell_session_closed
+remote_shell_session_closed_reason
+remote_shell_status_closed
+remote_shell_status_closing
+remote_shell_status_failed
+remote_shell_status_not_connected
+remote_shell_status_opening
+remote_shell_subtitle_round_trip
 remotely_administrating
 ### REMOVE ###
 remove
@@ -2088,6 +2153,7 @@ unofficial_fork_disclaimer
 unpin_selected
 unrecognized
 unset
+unsupported_device
 update_status
 updated
 uplink_enabled
@@ -2096,6 +2162,7 @@ uptime
 ### URL ###
 url
 url_cannot_be_empty
+url_http_localhost_only
 url_must_be_http
 url_must_contain_placeholders
 url_template
