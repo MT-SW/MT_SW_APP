@@ -54,6 +54,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.planner_cancel
+import org.meshtastic.core.resources.planner_precise_progress
 import org.meshtastic.core.resources.planner_coverage_clear
 import org.meshtastic.core.resources.planner_coverage_compute
 import org.meshtastic.core.resources.planner_coverage_extent
@@ -202,6 +203,12 @@ internal fun CoverageSection(
         }
         if (state.coverageComputing) {
             LinearProgressIndicator(progress = { state.coverageProgress }, modifier = Modifier.fillMaxWidth())
+            state.clutterProgress?.let { p ->
+                Text(
+                    text = stringResource(Res.string.planner_precise_progress, p.done, p.total),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
         }
         state.coverageError?.let { PlannerNotice(text = errorText(it), isError = true) }
         val coverage = state.coverage

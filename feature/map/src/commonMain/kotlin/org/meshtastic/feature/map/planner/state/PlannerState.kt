@@ -25,6 +25,7 @@ import org.meshtastic.feature.map.planner.LinkResult
 import org.meshtastic.feature.map.planner.PlannerBands
 import org.meshtastic.feature.map.planner.ProfileSeries
 import org.meshtastic.feature.map.planner.data.ClutterHeights
+import org.meshtastic.feature.map.planner.data.ClutterProgress
 import org.meshtastic.feature.map.planner.data.ClutterStats
 import org.meshtastic.feature.map.planner.data.PlannerClutter
 import org.meshtastic.feature.map.planner.data.PlannerClutterFailure
@@ -248,6 +249,8 @@ data class PlannerUiState(
     val coverageComputing: Boolean = false,
     /** 0..1 while [coverageComputing]. */
     val coverageProgress: Float = 0f,
+    /** Piece-by-piece download of the obstacle data of a large coverage area (null when none runs). */
+    val clutterProgress: ClutterProgress? = null,
     val coverage: CoverageResult? = null,
     val coverageError: PlannerError? = null,
 ) {

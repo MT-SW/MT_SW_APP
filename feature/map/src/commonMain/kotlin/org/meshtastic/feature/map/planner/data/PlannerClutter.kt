@@ -16,6 +16,8 @@
  */
 package org.meshtastic.feature.map.planner.data
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.meshtastic.feature.map.planner.GeoPoint
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -226,8 +228,16 @@ class PlannerClutterException(
     val detail: String? = null,
 ) : Exception("Planner clutter unavailable: $failure" + (detail?.let { " ($it)" } ?: ""), cause)
 
+/** How far the download of a large area has got: [done] of [total] pieces (the total grows when a piece is split). */
+data class ClutterProgress(val done: Int, val total: Int)
+
+private val noClutterProgress: StateFlow<ClutterProgress?> = MutableStateFlow(null)
+
 /** Obstacle data (buildings, forests) for the planner. Throws [PlannerClutterException] when it cannot be loaded. */
 interface PlannerClutterSource {
+    /** Progress of a large-area download while one runs, otherwise null. Sources that load in one go keep the default. */
+    val progress: StateFlow<ClutterProgress?> get() = noClutterProgress
+
     /** Obstacles along the straight path between [a] and [b]. */
     suspend fun forLink(a: GeoPoint, b: GeoPoint): ClutterMap
 

@@ -25,6 +25,8 @@ import io.ktor.utils.io.readAvailable
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -49,7 +51,14 @@ class PlannerOverpass(
     private val fallbackUrls: List<String> = FALLBACK_URLS,
 ) : PlannerClutterSource {
 
-    private val lock = Mutex()
+    /** Guards the answers kept in memory; held only for a moment. */
+    private val cacheLock = Mutex()
+
+    /** One request at a time (the public server limits parallel use); held for one request, never for a whole area. */
+    private val requestLock = Mutex()
+
+    private val _progress = MutableStateFlow<ClutterProgress?>(null)
+    override val progress: StateFlow<ClutterProgress?> = _progress
     private val cache = LinkedHashMap<String, Pair<Long, ClutterMap>>()
 
     override suspend fun forLink(a: GeoPoint, b: GeoPoint): ClutterMap =
@@ -67,15 +76,18 @@ class PlannerOverpass(
         }
     }
 
-    private suspend fun cached(key: String, load: suspend () -> ClutterMap): ClutterMap = lock.withLock {
-        val now = clockMs()
-        val hit = cache[key]
-        if (hit != null && now - hit.first < CACHE_MS) return@withLock hit.second
+    private suspend fun cached(key: String, load: suspend () -> ClutterMap): ClutterMap {
+        cacheLock.withLock {
+            val hit = cache[key]
+            if (hit != null && clockMs() - hit.first < CACHE_MS) return hit.second
+        }
         val map = load()
-        cache.remove(key)
-        cache[key] = now to map
-        while (cache.size > CACHE_ENTRIES) cache.remove(cache.keys.first())
-        map
+        cacheLock.withLock {
+            cache.remove(key)
+            cache[key] = clockMs() to map
+            while (cache.size > CACHE_ENTRIES) cache.remove(cache.keys.first())
+        }
+        return map
     }
 
     /** The server that answered last is asked first: a dead main server must not cost a timeout for every piece. */
@@ -88,19 +100,21 @@ class PlannerOverpass(
      */
     private suspend fun fetch(query: String, seen: MutableSet<Long>? = null, thinM: Double = 0.0): ClutterMap {
         val urls = (listOf(baseUrl) + fallbackUrls).distinct()
-        val ordered = lastGoodUrl?.let { good -> listOf(good) + urls.filter { it != good } } ?: urls
-        var last: PlannerClutterException? = null
-        for (url in ordered) {
-            try {
-                val map = fetchFrom(url, query, seen, thinM)
-                lastGoodUrl = url
-                return map
-            } catch (e: PlannerClutterException) {
-                if (!worthAskingAnotherServer(e)) throw e
-                last = e
+        return requestLock.withLock {
+            val ordered = lastGoodUrl?.let { good -> listOf(good) + urls.filter { it != good } } ?: urls
+            var last: PlannerClutterException? = null
+            for (url in ordered) {
+                try {
+                    val map = fetchFrom(url, query, seen, thinM)
+                    lastGoodUrl = url
+                    return@withLock map
+                } catch (e: PlannerClutterException) {
+                    if (!worthAskingAnotherServer(e)) throw e
+                    last = e
+                }
             }
+            throw last ?: PlannerClutterException(PlannerClutterFailure.NETWORK)
         }
-        throw last ?: PlannerClutterException(PlannerClutterFailure.NETWORK)
     }
 
     private fun worthAskingAnotherServer(e: PlannerClutterException): Boolean = when (e.failure) {
@@ -118,10 +132,19 @@ class PlannerOverpass(
      * on the border of two tiles is kept once, outlines are thinned to fit in memory, and a server that says "too many
      * requests" is waited for. Everything or an error: half a map would look like open ground where it is not.
      */
-    private suspend fun fetchTiled(whole: ClutterBox): ClutterMap {
+    private suspend fun fetchTiled(whole: ClutterBox): ClutterMap =
+        try {
+            fetchTiledPieces(whole)
+        } finally {
+            _progress.value = null
+        }
+
+    private suspend fun fetchTiledPieces(whole: ClutterBox): ClutterMap {
         val deadline = clockMs() + TILED_BUDGET_MS
         val pending = ArrayDeque<TileWork>()
         ClutterTiles.grid(whole, TILE_START_KM).forEach { pending.addLast(TileWork(it)) }
+        var done = 0
+        _progress.value = ClutterProgress(0, pending.size)
         val seen = HashSet<Long>()
         val polygons = ArrayList<ClutterPolygon>()
         var points = 0L
@@ -147,6 +170,8 @@ class PlannerOverpass(
                 }
                 continue
             }
+            done++
+            _progress.value = ClutterProgress(done, done + pending.size)
             for (polygon in part.polygons) {
                 polygons.add(polygon)
                 points += polygon.outer.size / 2
@@ -223,7 +248,7 @@ class PlannerOverpass(
         }
 
     /** Clears the in-memory answers (used by "refresh"). */
-    suspend fun invalidate() = lock.withLock { cache.clear() }
+    suspend fun invalidate() = cacheLock.withLock { cache.clear() }
 
     companion object {
         const val BASE_URL = "https://overpass-api.de/api/interpreter"
@@ -235,10 +260,10 @@ class PlannerOverpass(
         private const val CACHE_ENTRIES = 3
 
         /** Up to this radius an area is a single request. */
-        private const val SINGLE_REQUEST_KM = 15.0
+        private const val SINGLE_REQUEST_KM = 10.0
 
         /** Size of the first tiles of a large area, and the smallest tile a heavy one is cut down to (km on a side). */
-        private const val TILE_START_KM = 20.0
+        private const val TILE_START_KM = 30.0
         private const val MIN_TILE_KM = 4.0
 
         /** Outline points closer than this (m) are dropped in tiled areas, and more so for a larger radius. */

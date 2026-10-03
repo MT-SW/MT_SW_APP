@@ -196,7 +196,9 @@ class ClutterTest {
     fun areaQueryIsABoxAndCapped() {
         val c = GeoPoint(50.0, 20.0)
         val q = OsmQueries.area(c, 300.0)
-        assertTrue(q.contains("""["landuse"~"^(forest|residential|commercial|industrial|retail)$"]("""))
+        assertTrue(q.contains("""way["landuse"="forest"]("""))
+        assertTrue(q.contains("""relation["landuse"="residential"]["type"="multipolygon"]("""))
+        assertFalse(q.contains("~")) // no regular expression on the value: the server would read every landuse
         // 100 km cap: about 0.904 degrees of latitude each way
         assertTrue(q.contains("49.09"), q)
         assertTrue(q.contains("50.90"), q)
