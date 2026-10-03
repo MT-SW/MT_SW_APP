@@ -17,6 +17,8 @@
 package org.meshtastic.feature.map.planner.data
 
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.retry
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.prepareGet
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsChannel
@@ -157,12 +159,17 @@ class PlannerOverpass(
             val part = try {
                 fetch(OsmQueries.box(work.box), seen, thinM)
             } catch (e: PlannerClutterException) {
-                val busy = e.detail == "HTTP 429"
+                val busy = e.detail == "HTTP 429" || e.detail == "HTTP 503"
+                val flaky = e.failure == PlannerClutterFailure.NETWORK
                 val splittable = (e.failure == PlannerClutterFailure.TOO_LARGE || e.failure == PlannerClutterFailure.SERVER_LIMIT) &&
                     !busy && work.box.maxSideKm > MIN_TILE_KM
                 when {
                     busy && work.tries < BUSY_RETRIES -> {
                         delay(BUSY_WAIT_MS)
+                        pending.addFirst(TileWork(work.box, work.tries + 1))
+                    }
+                    flaky && work.tries < NETWORK_RETRIES -> {
+                        delay(NETWORK_RETRY_WAIT_MS)
                         pending.addFirst(TileWork(work.box, work.tries + 1))
                     }
                     splittable -> work.box.quarters().asReversed().forEach { pending.addFirst(TileWork(it)) }
@@ -192,11 +199,14 @@ class PlannerOverpass(
         } catch (e: PlannerClutterException) {
             throw e
         } catch (e: Exception) {
+            if (e::class.simpleName.orEmpty().contains("Timeout")) {
+                throw PlannerClutterException(PlannerClutterFailure.SERVER_LIMIT, e, "timeout")
+            }
             throw PlannerClutterException(PlannerClutterFailure.NETWORK, e, shortDetail(e.message))
         } catch (e: Throwable) { // OutOfMemoryError is not an Exception: this one really is the device
             throw PlannerClutterException(PlannerClutterFailure.TOO_LARGE, e)
         }
-        if (body == null) throw PlannerClutterException(PlannerClutterFailure.NETWORK, detail = "timeout")
+        if (body == null) throw PlannerClutterException(PlannerClutterFailure.SERVER_LIMIT, detail = "timeout")
         return try {
             withContext(Dispatchers.Default) { OsmClutterParser.parse(body, seen, thinM) }
         } catch (e: CancellationException) {
@@ -223,7 +233,20 @@ class PlannerOverpass(
      * A status other than success is reported with its code: 429/502/503/504 mean the server is busy or gave up.
      */
     private suspend fun download(url: String, query: String): String? =
-        httpClient.prepareGet(url) { parameter("data", query) }.execute { response ->
+        httpClient.prepareGet(url) {
+            parameter("data", query)
+            // The shared client waits 30 s for data and repeats a failed request up to three times. Overpass sends
+            // nothing until the whole answer is computed, so a heavy tile would be cut off and asked again and again.
+            timeout {
+                connectTimeoutMillis = CONNECT_TIMEOUT_MS
+                socketTimeoutMillis = READ_TIMEOUT_MS
+                requestTimeoutMillis = READ_TIMEOUT_MS + 5_000L
+            }
+            retry {
+                retryOnServerErrors(maxRetries = 0)
+                retryOnException(maxRetries = 0, retryOnTimeout = true)
+            }
+        }.execute { response ->
             if (!response.status.isSuccess()) {
                 val code = response.status.value
                 val busy = code == 429 || code == 502 || code == 503 || code == 504
@@ -258,6 +281,10 @@ class PlannerOverpass(
         private const val CHUNK_BYTES = 16 * 1024
         private const val INITIAL_BYTES = 256 * 1024
         private const val CACHE_ENTRIES = 3
+        private const val CONNECT_TIMEOUT_MS = 15_000L
+        private const val READ_TIMEOUT_MS = 90_000L
+        private const val NETWORK_RETRIES = 2
+        private const val NETWORK_RETRY_WAIT_MS = 2_000L
 
         /** Up to this radius an area is a single request. */
         private const val SINGLE_REQUEST_KM = 10.0
