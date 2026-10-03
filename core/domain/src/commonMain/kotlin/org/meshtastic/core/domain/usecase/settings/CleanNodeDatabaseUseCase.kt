@@ -64,6 +64,14 @@ constructor(
     open suspend fun getAllUnknownNodesToClean(): List<Node> =
         nodeRepository.getUnknownNodes().filterNot { node -> node.hasPKC || node.isIgnored || node.isFavorite }
 
+    /**
+     * Empties the app's own node database (favorites are kept) without touching the radio, so it works while
+     * disconnected. A connected radio simply sends its nodes again on the next sync.
+     */
+    open suspend fun clearAppNodeDatabase() {
+        nodeRepository.clearNodeDB(preserveFavorites = true)
+    }
+
     /** Performs the cleanup of specified nodes. */
     open suspend fun cleanNodes(nodeNums: List<Int>) {
         if (nodeNums.isEmpty()) return
