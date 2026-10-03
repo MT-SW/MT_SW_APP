@@ -341,7 +341,8 @@
     <string name="planner_report_val_terrain_osm">OpenStreetMap (buildings, forests)</string>
     <string name="planner_precise_radius">Terrain data range</string>
     <string name="planner_precise_radius_value">%1$d km</string>
-    <string name="planner_precise_radius_hint">The larger the range, the more data is downloaded; if there is too much of it, the planner falls back to the preset loss. A range above 15 km is downloaded in pieces and can take a few minutes.</string>
+    <string name="planner_precise_radius_hint">The larger the range, the more data is downloaded; if there is too much of it, the planner falls back to the preset loss. A range above 10 km is downloaded in pieces and can take a few minutes.</string>
     <string name="planner_precise_failed_large">Too much terrain data for this range (or the device ran out of memory). Reduce "Terrain data range" (for example to 15 km) and calculate again. The obstacles preset is used instead.</string>
     <string name="planner_precise_failed_server">The OpenStreetMap server refused or could not finish the request (it is busy or the query was too heavy for it). Try again in a moment, or reduce "Terrain data range". The obstacles preset is used instead.</string>
+    <string name="planner_precise_progress">Downloading OpenStreetMap terrain data: piece %1$d of %2$d (large ranges are downloaded in pieces and can take a few minutes)</string>
 </resources>

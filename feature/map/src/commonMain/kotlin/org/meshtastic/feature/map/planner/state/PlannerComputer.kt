@@ -19,6 +19,7 @@ package org.meshtastic.feature.map.planner.state
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.feature.map.planner.Atmosphere
@@ -36,6 +37,7 @@ import org.meshtastic.feature.map.planner.ProfileSeries
 import org.meshtastic.feature.map.planner.data.ClutterMap
 import org.meshtastic.feature.map.planner.data.NoClutterSource
 import org.meshtastic.feature.map.planner.data.PlannerClutter
+import org.meshtastic.feature.map.planner.data.ClutterProgress
 import org.meshtastic.feature.map.planner.data.PlannerClutterException
 import org.meshtastic.feature.map.planner.data.PlannerClutterFailure
 import org.meshtastic.feature.map.planner.data.PlannerClutterSource
@@ -79,6 +81,9 @@ class PlannerComputer(
     private val clockMs: () -> Long = { nowMillis },
     private val clutter: PlannerClutterSource = NoClutterSource,
 ) {
+    /** Progress of a large OpenStreetMap download (null when none runs); shown while the coverage is being prepared. */
+    val clutterProgress: StateFlow<ClutterProgress?> get() = clutter.progress
+
     private var cachedKey: String? = null
     private var cachedAtMs: Long = 0L
     private var cachedResult: PlannerWeatherResult? = null

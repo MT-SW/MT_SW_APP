@@ -32,10 +32,11 @@ object OsmQueries {
      * this device. Set too low (it was 16 MiB once) the server answers "out of memory" even for a tiny area. What the
      * device downloads is bounded separately by the answer size limit in PlannerOverpass.
      */
-    const val SERVER_TIMEOUT_S = 40
+    const val SERVER_TIMEOUT_S = 30
     const val SERVER_MAX_BYTES = 268_435_456
 
     private const val POLYLINE_SPACING_M = 1500.0
+    private val AREA_LANDUSE = listOf("forest", "residential", "commercial", "industrial", "retail")
     private const val MAX_POLYLINE_POINTS = 40
 
     private fun header() = "[out:json][timeout:$SERVER_TIMEOUT_S][maxsize:$SERVER_MAX_BYTES];"
@@ -76,10 +77,12 @@ object OsmQueries {
     fun box(box: ClutterBox): String {
         val b = box.asQueryBox()
         val sb = StringBuilder(header()).append('(')
+        // Exact key=value matches, not a regular expression on the value: the server answers those from its index and
+        // looks only at woods and built-up land, while a pattern makes it read every landuse (all the fields and meadows).
         sb.append("way[\"natural\"=\"wood\"]($b);")
-        sb.append("way[\"landuse\"~\"^(forest|residential|commercial|industrial|retail)$\"]($b);")
+        for (v in AREA_LANDUSE) sb.append("way[\"landuse\"=\"$v\"]($b);")
         sb.append("relation[\"natural\"=\"wood\"][\"type\"=\"multipolygon\"]($b);")
-        sb.append("relation[\"landuse\"~\"^(forest|residential|commercial|industrial|retail)$\"][\"type\"=\"multipolygon\"]($b);")
+        for (v in AREA_LANDUSE) sb.append("relation[\"landuse\"=\"$v\"][\"type\"=\"multipolygon\"]($b);")
         return sb.append(");out tags geom;").toString()
     }
 

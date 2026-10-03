@@ -87,6 +87,9 @@ class PlannerViewModel(
     private var coverageJob: Job? = null
 
     init {
+        viewModelScope.launch {
+            computer.clutterProgress.collect { p -> _uiState.update { it.copy(clutterProgress = p) } }
+        }
         // Keep the measured-vs-predicted comparison fresh when node data (SNR/RSSI) changes, without a full recompute.
         viewModelScope.launch {
             nodesWithPosition.collect { nodes ->
