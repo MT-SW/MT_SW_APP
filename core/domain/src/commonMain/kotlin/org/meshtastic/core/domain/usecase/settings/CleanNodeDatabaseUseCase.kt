@@ -72,6 +72,17 @@ constructor(
         nodeRepository.clearNodeDB(preserveFavorites = preserveFavorites)
     }
 
+    /**
+     * Nodes whose public key no longer matches the one on file (the "key mismatch" security state), regardless of age.
+     * Favorites, ignored nodes and our own node are always kept.
+     */
+    open suspend fun getMismatchedKeyNodesToClean(): List<Node> {
+        val myNum = nodeRepository.myNodeInfo.value?.myNodeNum
+        return nodeRepository.nodeDBbyNum.value.values.filter { node ->
+            node.mismatchKey && !node.isIgnored && !node.isFavorite && node.num != myNum
+        }
+    }
+
     /** Performs the cleanup of specified nodes. */
     open suspend fun cleanNodes(nodeNums: List<Int>) {
         if (nodeNums.isEmpty()) return
