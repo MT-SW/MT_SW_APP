@@ -28,6 +28,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -47,6 +48,8 @@ import org.meshtastic.core.resources.auto_clean_nodes_description
 import org.meshtastic.core.resources.auto_clean_nodes_enabled
 import org.meshtastic.core.resources.auto_clean_nodes_inactivity_days
 import org.meshtastic.core.resources.auto_clean_nodes_title
+import org.meshtastic.core.resources.clean_app_node_db_button
+import org.meshtastic.core.resources.clean_app_node_db_description
 import org.meshtastic.core.resources.clean_node_database_description
 import org.meshtastic.core.resources.clean_node_database_title
 import org.meshtastic.core.resources.clean_nodes_older_than
@@ -141,6 +144,16 @@ fun CleanNodeDatabaseScreen(viewModel: CleanNodeDatabaseViewModel, onBack: () ->
                 enabled = nodesToDelete.isNotEmpty(),
             ) {
                 Text(stringResource(Res.string.clean_now))
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+            HorizontalDivider()
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(stringResource(Res.string.clean_app_node_db_description), style = MaterialTheme.typography.bodySmall)
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedButton(onClick = viewModel::requestClearAppNodeDatabase, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(Res.string.clean_app_node_db_button))
             }
         }
     }

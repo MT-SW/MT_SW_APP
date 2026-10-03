@@ -29,6 +29,7 @@ import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.are_you_sure
 import org.meshtastic.core.resources.clean_node_database_confirmation
+import org.meshtastic.core.resources.clean_app_node_db_confirmation
 import org.meshtastic.core.resources.clean_now
 import org.meshtastic.core.ui.util.AlertManager
 import org.meshtastic.core.ui.viewmodel.safeLaunch
@@ -116,6 +117,24 @@ class CleanNodeDatabaseViewModel(
                 confirmTextRes = Res.string.clean_now,
                 onConfirm = { cleanNodes() },
             )
+        }
+    }
+
+    fun requestClearAppNodeDatabase() {
+        safeLaunch(tag = "requestClearAppNodeDatabase") {
+            alertManager.showAlert(
+                titleRes = Res.string.are_you_sure,
+                message = getString(Res.string.clean_app_node_db_confirmation),
+                confirmTextRes = Res.string.clean_now,
+                onConfirm = { clearAppNodeDatabase() },
+            )
+        }
+    }
+
+    private fun clearAppNodeDatabase() {
+        safeLaunch(tag = "clearAppNodeDatabase") {
+            cleanNodeDatabaseUseCase.clearAppNodeDatabase()
+            _nodesToDelete.value = emptyList()
         }
     }
 

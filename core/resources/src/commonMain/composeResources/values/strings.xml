@@ -245,6 +245,9 @@
     <string name="clean_nodes_older_than">Clean up nodes last seen older than %1$d days</string>
     <string name="clean_now">Clean Now</string>
     <string name="clean_unknown_nodes">Clean up only unknown nodes</string>
+    <string name="clean_app_node_db_button">Clear node database in the app</string>
+    <string name="clean_app_node_db_description">Empties the node list stored in the app only, without contacting the radio, so it also works while disconnected. Favorites are kept. A connected radio sends its nodes again on the next sync.</string>
+    <string name="clean_app_node_db_confirmation">Remove all nodes (except favorites) from the app database? The radio is not changed.</string>
     <string name="clean_unknown_nodes_any_date">Ignore the date: all unknown nodes without a key</string>
     <!-- CLEAR -->
     <string name="clear">Clear</string>
