@@ -336,7 +336,7 @@
     <string name="planner_precise_ready">Dane mapy: %1$d budynków, %2$d lasów, %3$d obszarów zabudowy wzdłuż trasy.</string>
     <string name="planner_precise_failed_network">Dane OpenStreetMap niedostępne (brak połączenia lub serwer nie odpowiedział). Użyto presetu przeszkód.</string>
     <string name="planner_precise_failed_data">Nie udało się użyć danych OpenStreetMap (obszar zbyt duży lub nieprawidłowa odpowiedź). Użyto presetu przeszkód.</string>
-    <string name="planner_precise_coverage_note">Zasięg uwzględnia prawdziwe przeszkody tylko do 30 km od środka; dalej liczy się sam teren.</string>
+    <string name="planner_precise_coverage_note">Zasięg uwzględnia prawdziwe przeszkody tylko do %1$d km od środka (wybrany zasięg); dalej liczy się sam teren.</string>
     <string name="planner_report_lbl_terrain_data">Dane o przeszkodach</string>
     <string name="planner_report_val_terrain_osm">OpenStreetMap (budynki, lasy)</string>
     <string name="planner_precise_radius">Zasięg danych o terenie</string>

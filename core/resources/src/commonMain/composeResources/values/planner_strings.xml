@@ -336,7 +336,7 @@
     <string name="planner_precise_ready">Map data: %1$d buildings, %2$d forests, %3$d built-up areas along the path.</string>
     <string name="planner_precise_failed_network">OpenStreetMap data unavailable (no connection or the server did not answer). The obstacles preset is used instead.</string>
     <string name="planner_precise_failed_data">OpenStreetMap data could not be used (the area is too large or the answer is invalid). The obstacles preset is used instead.</string>
-    <string name="planner_precise_coverage_note">Coverage uses real obstacles only within 30 km of the centre; farther out only the terrain counts.</string>
+    <string name="planner_precise_coverage_note">Coverage uses real obstacles only within %1$d km of the centre (the selected range); farther out only the terrain counts.</string>
     <string name="planner_report_lbl_terrain_data">Obstacle data</string>
     <string name="planner_report_val_terrain_osm">OpenStreetMap (buildings, forests)</string>
     <string name="planner_precise_radius">Terrain data range</string>
