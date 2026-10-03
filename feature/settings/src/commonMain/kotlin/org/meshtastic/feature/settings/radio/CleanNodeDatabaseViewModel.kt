@@ -69,6 +69,9 @@ class CleanNodeDatabaseViewModel(
     private val _onlyUnknownNodes = MutableStateFlow(false)
     val onlyUnknownNodes = _onlyUnknownNodes.asStateFlow()
 
+    private val _ignoreDate = MutableStateFlow(false)
+    val ignoreDate = _ignoreDate.asStateFlow()
+
     private val _nodesToDelete = MutableStateFlow<List<Node>>(emptyList())
     val nodesToDelete = _nodesToDelete.asStateFlow()
 
@@ -83,15 +86,23 @@ class CleanNodeDatabaseViewModel(
         }
     }
 
+    fun onIgnoreDateChanged(value: Boolean) {
+        _ignoreDate.value = value
+    }
+
     /** Updates the list of nodes to be deleted based on the current filter criteria. */
     fun getNodesToDelete() {
         safeLaunch(tag = "getNodesToDelete") {
             _nodesToDelete.value =
-                cleanNodeDatabaseUseCase.getNodesToClean(
-                    olderThanDays = _olderThanDays.value,
-                    onlyUnknownNodes = _onlyUnknownNodes.value,
-                    currentTimeSeconds = nowSeconds,
-                )
+                if (_onlyUnknownNodes.value && _ignoreDate.value) {
+                    cleanNodeDatabaseUseCase.getAllUnknownNodesToClean()
+                } else {
+                    cleanNodeDatabaseUseCase.getNodesToClean(
+                        olderThanDays = _olderThanDays.value,
+                        onlyUnknownNodes = _onlyUnknownNodes.value,
+                        currentTimeSeconds = nowSeconds,
+                    )
+                }
         }
     }
 

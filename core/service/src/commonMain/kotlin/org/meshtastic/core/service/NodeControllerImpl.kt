@@ -18,6 +18,7 @@ package org.meshtastic.core.service
 
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import org.meshtastic.core.common.util.handledLaunch
 import org.meshtastic.core.repository.CommandSender
 import org.meshtastic.core.repository.NodeController
@@ -108,14 +109,27 @@ internal class NodeControllerImpl(
     override suspend fun removeByNodenum(packetId: Int, nodeNum: Int) {
         nodeManager.removeByNodenum(nodeNum)
         val myNum = nodeManager.myNodeNum.value ?: return
-        try {
-            commandSender.sendAdmin(myNum, packetId) {
-                AdminMessage.Builder().also { wb -> wb.remove_by_nodenum = nodeNum }.build()
+        // The transport admits only a few writes at a time (Bluetooth especially), so a busy moment makes it reject the
+        // command. Wait and retry instead of silently dropping it, or the radio keeps the node and it returns on the
+        // next connect.
+        repeat(REMOVE_ATTEMPTS) { attempt ->
+            try {
+                commandSender.sendAdmin(myNum, packetId) {
+                    AdminMessage.Builder().also { wb -> wb.remove_by_nodenum = nodeNum }.build()
+                }
+                return
+            } catch (e: PacketQueueRejectedException) {
+                if (attempt == REMOVE_ATTEMPTS - 1) {
+                    // Node removal has always been local-first and is allowed while disconnected. Preserve that
+                    // contract when the connected transport cannot admit the best-effort radio cleanup command.
+                    Logger.w(e) { "Remove-node admin command for $nodeNum was not admitted; local removal retained" }
+                } else {
+                    delay(REMOVE_RETRY_DELAY_MS)
+                }
             }
-        } catch (e: PacketQueueRejectedException) {
-            // Node removal has always been local-first and is allowed while disconnected. Preserve that contract when
-            // the connected transport is transitioning and cannot admit the best-effort radio cleanup command.
-            Logger.w(e) { "Remove-node admin command for $nodeNum was not admitted; local removal retained" }
         }
     }
 }
+
+private const val REMOVE_ATTEMPTS = 8
+private const val REMOVE_RETRY_DELAY_MS = 100L
