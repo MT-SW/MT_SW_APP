@@ -73,6 +73,9 @@ class CleanNodeDatabaseViewModel(
     private val _ignoreDate = MutableStateFlow(false)
     val ignoreDate = _ignoreDate.asStateFlow()
 
+    private val _keepFavorites = MutableStateFlow(true)
+    val keepFavorites = _keepFavorites.asStateFlow()
+
     private val _nodesToDelete = MutableStateFlow<List<Node>>(emptyList())
     val nodesToDelete = _nodesToDelete.asStateFlow()
 
@@ -85,6 +88,10 @@ class CleanNodeDatabaseViewModel(
         if (!value && _olderThanDays.value < MIN_DAYS_THRESHOLD) {
             _olderThanDays.value = MIN_DAYS_THRESHOLD
         }
+    }
+
+    fun onKeepFavoritesChanged(value: Boolean) {
+        _keepFavorites.value = value
     }
 
     fun onIgnoreDateChanged(value: Boolean) {
@@ -133,7 +140,7 @@ class CleanNodeDatabaseViewModel(
 
     private fun clearAppNodeDatabase() {
         safeLaunch(tag = "clearAppNodeDatabase") {
-            cleanNodeDatabaseUseCase.clearAppNodeDatabase()
+            cleanNodeDatabaseUseCase.clearAppNodeDatabase(preserveFavorites = _keepFavorites.value)
             _nodesToDelete.value = emptyList()
         }
     }

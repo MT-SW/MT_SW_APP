@@ -50,6 +50,7 @@ import org.meshtastic.core.resources.auto_clean_nodes_inactivity_days
 import org.meshtastic.core.resources.auto_clean_nodes_title
 import org.meshtastic.core.resources.clean_app_node_db_button
 import org.meshtastic.core.resources.clean_app_node_db_description
+import org.meshtastic.core.resources.clean_app_node_db_keep_favorites
 import org.meshtastic.core.resources.clean_node_database_description
 import org.meshtastic.core.resources.clean_node_database_title
 import org.meshtastic.core.resources.clean_nodes_older_than
@@ -69,6 +70,7 @@ fun CleanNodeDatabaseScreen(viewModel: CleanNodeDatabaseViewModel, onBack: () ->
     val olderThanDays by viewModel.olderThanDays.collectAsStateWithLifecycle()
     val onlyUnknownNodes by viewModel.onlyUnknownNodes.collectAsStateWithLifecycle()
     val ignoreDate by viewModel.ignoreDate.collectAsStateWithLifecycle()
+    val keepFavorites by viewModel.keepFavorites.collectAsStateWithLifecycle()
     val nodesToDelete by viewModel.nodesToDelete.collectAsStateWithLifecycle()
     val autoCleanEnabled by viewModel.autoCleanEnabled.collectAsStateWithLifecycle()
     val autoCleanInactivityDays by viewModel.autoCleanInactivityDays.collectAsStateWithLifecycle()
@@ -151,6 +153,11 @@ fun CleanNodeDatabaseScreen(viewModel: CleanNodeDatabaseViewModel, onBack: () ->
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(stringResource(Res.string.clean_app_node_db_description), style = MaterialTheme.typography.bodySmall)
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(text = stringResource(Res.string.clean_app_node_db_keep_favorites), modifier = Modifier.weight(1f))
+                Switch(checked = keepFavorites, onCheckedChange = viewModel::onKeepFavoritesChanged)
+            }
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedButton(onClick = viewModel::requestClearAppNodeDatabase, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(Res.string.clean_app_node_db_button))
