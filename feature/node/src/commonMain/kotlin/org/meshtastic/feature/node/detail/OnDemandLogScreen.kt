@@ -43,8 +43,8 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.formatString
 import org.meshtastic.core.model.NodeAddress
-import org.meshtastic.core.model.util.formatUptime
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.formatDuration
 import org.meshtastic.core.resources.on_demand_air_activity
 import org.meshtastic.core.resources.on_demand_air_activity_desc
 import org.meshtastic.core.resources.on_demand_air_util_tx
@@ -537,9 +537,10 @@ private fun portInfo(port: Int): ResolvedPortInfo {
     return ResolvedPortInfo(fallbackLabel, stringResource(Res.string.port_desc_unknown))
 }
 
+@Composable
 private fun nodeStatsRows(stats: NodeStats): List<Pair<StringResource, String>> = buildList {
     stats.battery_level?.let { add(Res.string.on_demand_battery_level to "$it%") }
-    stats.uptime_seconds?.let { add(Res.string.on_demand_uptime to formatUptime(it)) }
+    stats.uptime_seconds?.let { add(Res.string.on_demand_uptime to formatDuration(it.toLong())) }
     stats.channel_utilization?.let { add(Res.string.on_demand_channel_utilization to "${formatString("%.2f", it)}%") }
     stats.air_util_tx?.let { add(Res.string.on_demand_air_util_tx to "${formatString("%.2f", it)}%") }
     stats.num_packets_tx?.let { add(Res.string.on_demand_packets_tx to "$it") }
