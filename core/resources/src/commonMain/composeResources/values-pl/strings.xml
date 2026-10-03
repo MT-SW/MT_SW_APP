@@ -293,6 +293,7 @@
     <string name="clean_app_node_db_description">Czyści tylko listę węzłów zapisaną w aplikacji, bez kontaktu z radiem, więc działa też, gdy nie jesteś połączony. Podłączone radio wyśle swoje węzły ponownie przy następnej synchronizacji.</string>
     <string name="clean_app_node_db_keep_favorites">Zachowaj ulubione węzły</string>
     <string name="clean_app_node_db_confirmation">Usunąć z bazy aplikacji wszystkie węzły? Radio zostaje bez zmian.</string>
+    <string name="clean_mismatched_key_nodes">Tylko węzły z niezgodnym kluczem (usuwane z aplikacji i z radia)</string>
     <string name="clean_unknown_nodes_any_date">Ignoruj datę: wszystkie nieznane węzły bez klucza</string>
     <!-- CLEAR -->
     <string name="clear">Czyść</string>

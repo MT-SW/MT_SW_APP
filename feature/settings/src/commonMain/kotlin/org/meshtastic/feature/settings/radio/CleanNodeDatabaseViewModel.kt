@@ -76,6 +76,9 @@ class CleanNodeDatabaseViewModel(
     private val _keepFavorites = MutableStateFlow(true)
     val keepFavorites = _keepFavorites.asStateFlow()
 
+    private val _onlyMismatchedKeys = MutableStateFlow(false)
+    val onlyMismatchedKeys = _onlyMismatchedKeys.asStateFlow()
+
     private val _nodesToDelete = MutableStateFlow<List<Node>>(emptyList())
     val nodesToDelete = _nodesToDelete.asStateFlow()
 
@@ -94,6 +97,10 @@ class CleanNodeDatabaseViewModel(
         _keepFavorites.value = value
     }
 
+    fun onOnlyMismatchedKeysChanged(value: Boolean) {
+        _onlyMismatchedKeys.value = value
+    }
+
     fun onIgnoreDateChanged(value: Boolean) {
         _ignoreDate.value = value
     }
@@ -102,7 +109,9 @@ class CleanNodeDatabaseViewModel(
     fun getNodesToDelete() {
         safeLaunch(tag = "getNodesToDelete") {
             _nodesToDelete.value =
-                if (_onlyUnknownNodes.value && _ignoreDate.value) {
+                if (_onlyMismatchedKeys.value) {
+                    cleanNodeDatabaseUseCase.getMismatchedKeyNodesToClean()
+                } else if (_onlyUnknownNodes.value && _ignoreDate.value) {
                     cleanNodeDatabaseUseCase.getAllUnknownNodesToClean()
                 } else {
                     cleanNodeDatabaseUseCase.getNodesToClean(
