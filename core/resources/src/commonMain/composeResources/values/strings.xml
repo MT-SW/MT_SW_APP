@@ -17,18 +17,24 @@
 
 <resources>
     <!-- A11Y -->
+    <string name="a11y_humidity">Humidity</string>
     <string name="a11y_label_value">%1$s: %2$s</string>
     <string name="a11y_message_from">Message from %1$s: %2$s</string>
     <string name="a11y_node_battery">battery %1$d%</string>
+    <string name="a11y_node_channel">Channel %1$d</string>
     <string name="a11y_node_distance_away">%1$s away</string>
     <string name="a11y_node_favorite">favorite</string>
-    <string name="a11y_node_hops_away">%1$d hops away</string>
+    <plurals name="a11y_node_hops_count">
+        <item quantity="one">%1$d hop away</item>
+        <item quantity="other">%1$d hops away</item>
+    </plurals>
     <string name="a11y_node_last_heard">last heard %1$s</string>
     <string name="a11y_node_offline">offline</string>
     <string name="a11y_node_online">online</string>
     <string name="a11y_node_role">role %1$s</string>
     <string name="a11y_node_signal">signal %1$s</string>
     <string name="a11y_nodes_at_hop">Hop %1$d: %2$d nodes</string>
+    <string name="a11y_temperature">Temperature</string>
     <string name="about">About</string>
     <string name="accept">Accept</string>
     <string name="acknowledgements">Acknowledgements</string>
@@ -49,7 +55,7 @@
     <string name="adc_voltage">ADC Voltage</string>
     <!-- ADD -->
     <string name="add">Add</string>
-    <string name="add_a_note">Add a private noteÔÇŽ</string>
+    <string name="add_a_note">Add a private note…</string>
     <string name="add_channels_description">The following channels were found in the QR code. Select the ones you would like to add to your device. Existing channels will be preserved.</string>
     <string name="add_contact">Add Contact</string>
     <string name="add_custom_tile_source">Add Network Tile Source</string>
@@ -57,7 +63,7 @@
     <string name="add_layer">Add Layer</string>
     <string name="add_local_mbtiles_file">Add Local MBTiles File</string>
     <string name="add_network_device">Add</string>
-    <string name="add_network_device_manually">Add device manuallyÔÇŽ</string>
+    <string name="add_network_device_manually">Add device manually…</string>
     <string name="add_network_layer">Add Network Layer</string>
     <string name="address">Address</string>
     <string name="admin_keys">Admin Keys</string>
@@ -205,7 +211,6 @@
     <string name="channel_8">Channel 8</string>
     <string name="channel_features">Channel Features</string>
     <string name="channel_invalid">This Channel URL is invalid and can not be used</string>
-    <string name="channel_label">Channel</string>
     <string name="channel_name">Channel Name</string>
     <string name="channel_url">Channel URL</string>
     <string name="channel_utilization">ChUtil</string>
@@ -218,17 +223,18 @@
     <string name="chirpy_downloading">Chirpy is downloading…</string>
     <string name="chirpy_downloading_progress">Downloading Chirpy model: %1$d%</string>
     <string name="chirpy_downloading_subtitle">This only happens once. Chirpy will be ready soon!</string>
-    <string name="chirpy_error_busy">Whoa! The channel is totally congested right now with heavy traffic! ­čôÂ Let's wait for a clear slot and retry our transmission.</string>
-    <string name="chirpy_error_model_unavailable">My battery is charging or my firmware is still downloading! ­čöő Give me a few moments to sync up and boot!</string>
-    <string name="chirpy_error_token_budget_exceeded">That payload is too large for my transmission budget! ­čô▒ Try shortening your message so we can route it smoothly.</string>
-    <string name="chirpy_error_unknown">Oops! We hit some heavy packet loss or signal interference! ­čôí Let's re-transmit that query and see if we can get through.</string>
-    <string name="chirpy_error_unsupported_flavor">I'm operating on a limited frequency on this app flavor! ­čöî Try using a version with full AI Core integration.</string>
-    <string name="chirpy_error_unsupported_platform">Oh no! My antenna can't seem to establish a connection on this platform. ­čôí Please double-check your hardware compatibility!</string>
-    <string name="chirpy_intro">Hey there! ­čôí I'm Chirpy, your on-device MT_SW_APP assistant! I can help with setup, configuration, troubleshooting, and mesh networking tips. What can I help you with?</string>
+    <string name="chirpy_error_busy">Whoa! The channel is totally congested right now with heavy traffic! 📶 Let's wait for a clear slot and retry our transmission.</string>
+    <string name="chirpy_error_model_unavailable">My battery is charging or my firmware is still downloading! 🔋 Give me a few moments to sync up and boot!</string>
+    <string name="chirpy_error_token_budget_exceeded">That payload is too large for my transmission budget! 📱 Try shortening your message so we can route it smoothly.</string>
+    <string name="chirpy_error_unknown">Oops! We hit some heavy packet loss or signal interference! 📡 Let's re-transmit that query and see if we can get through.</string>
+    <string name="chirpy_error_unsupported_flavor">I'm operating on a limited frequency on this app flavor! 🔌 Try using a version with full AI Core integration.</string>
+    <string name="chirpy_error_unsupported_platform">Oh no! My antenna can't seem to establish a connection on this platform. 📡 Please double-check your hardware compatibility!</string>
+    <string name="chirpy_fallback_unavailable">AI assistant is not available on this platform. Here are pages that may help:</string>
+    <string name="chirpy_intro">Hey there! 📡 I'm Chirpy, your on-device MT_SW_APP assistant! I can help with setup, configuration, troubleshooting, and mesh networking tips. What can I help you with?</string>
     <string name="chirpy_ready">Ask Chirpy</string>
     <string name="chirpy_search_placeholder">Ask about MT_SW_APP</string>
     <string name="chirpy_suggested_pages_help">Here are some documentation pages that might help:</string>
-    <string name="chirpy_thinking">Chirpy is routing through the meshÔÇŽ ­čôí</string>
+    <string name="chirpy_thinking">Chirpy is routing through the mesh… 📡</string>
     <string name="choose_contrast">Contrast level</string>
     <string name="choose_theme">Choose theme</string>
     <string name="choose_units">Choose units</string>
@@ -333,7 +339,7 @@
     <string name="debug_clear">Clear Logs</string>
     <string name="debug_clear_logs_confirm">This will remove all log packets and database entries from your device - It is a full reset, and is permanent.</string>
     <string name="debug_decoded_payload">Decoded Payload:</string>
-    <string name="debug_default_search">Search in logsÔÇŽ</string>
+    <string name="debug_default_search">Search in logs…</string>
     <string name="debug_export_failed">Failed to write log file: %1$s</string>
     <string name="debug_export_success">%1$d logs exported</string>
     <string name="debug_filter_add">Add filter</string>
@@ -417,6 +423,7 @@
     <string name="direct_message">Direct Message</string>
     <string name="direct_message_key">Direct Message Key</string>
     <string name="direct_messages">Direct Messages</string>
+    <string name="disabled">Disabled</string>
     <string name="discard_changes">Discard</string>
     <string name="disconnect">Disconnect</string>
     <string name="terminate_app">Force stop the app</string>
@@ -434,6 +441,7 @@
     <string name="discovery_dwell_time">Dwell Time</string>
     <string name="discovery_dwell_time_description">Time to listen on each preset</string>
     <string name="discovery_empty_history">No discovery sessions yet</string>
+    <string name="discovery_empty_history_hint">Start a scan from Local Mesh Discovery to see its results here.</string>
     <string name="discovery_export_report">Export report</string>
     <string name="discovery_history">Discovery History</string>
     <string name="discovery_interrupted_scan_restored">Restored radio to home config (%1$s) after an interrupted discovery scan</string>
@@ -497,7 +505,10 @@
     <string name="discovery_stop_scan">Stop Scan</string>
     <string name="discovery_summary_not_available">AI analysis not available</string>
     <string name="discovery_time_remaining">%1$s remaining</string>
-    <string name="discovery_unique_nodes">%1$d unique nodes</string>
+    <plurals name="discovery_unique_nodes_count">
+        <item quantity="one">%1$d unique node</item>
+        <item quantity="other">%1$d unique nodes</item>
+    </plurals>
     <string name="discovery_view_map">View map</string>
     <string name="disk_free_indexed">Disk Free %1$d</string>
     <string name="display">Display</string>
@@ -511,8 +522,10 @@
     <string name="distance_measurements_description">Display the distance between your phone and other mt compatible nodes with positions.</string>
     <string name="dns">DNS</string>
     <!-- DOC -->
+    <string name="doc_auto_translated">Auto-translated</string>
     <string name="doc_clear_search">Clear search</string>
     <string name="doc_keywords_android_auto">android auto,car,head unit,driving,hands-free,messages</string>
+    <string name="doc_community_translated">Community translated</string>
     <string name="doc_keywords_app_functions">system ai,gemini,assistant,functions,automation,voice</string>
     <string name="doc_keywords_connections">bluetooth,usb,tcp,pairing,serial,wifi</string>
     <string name="doc_keywords_debug_logs">debug,logs,logcat,export,bug report,issue,troubleshooting,diagnostics</string>
@@ -525,7 +538,7 @@
     <string name="doc_keywords_messages">message,channel,encryption,direct,broadcast,quick-chat</string>
     <string name="doc_keywords_mqtt">mqtt,broker,internet,bridge,uplink,downlink</string>
     <string name="doc_keywords_node_metrics">metrics,telemetry,signal,snr,rssi,battery,traceroute</string>
-    <string name="doc_keywords_nodes">node,mesh,list,role,status,favorite,filter</string>
+    <string name="doc_keywords_nodes">node,mesh,list,role,status,favorite,filter,shell,terminal</string>
     <string name="doc_keywords_notifications">notification,alert,sound,mute,reply,watch,wear os</string>
     <string name="doc_keywords_onboarding">setup,welcome,permissions,first-launch</string>
     <string name="doc_keywords_settings_module">module,serial,telemetry,canned,store-forward,administration</string>
@@ -537,8 +550,12 @@
     <string name="doc_keywords_units">units,locale,metric,imperial,temperature,distance</string>
     <string name="doc_keywords_widget">widget,home screen,local stats,glance,battery,utilization</string>
     <string name="doc_loading">Loading documentation…</string>
+    <string name="doc_no_content">No content available.</string>
     <string name="doc_no_documentation">No documentation available</string>
     <string name="doc_no_results">No results found</string>
+    <string name="doc_open_page">Open %1$s</string>
+    <string name="doc_page_not_found">Page not found: %1$s</string>
+    <string name="doc_page_not_found_detail">This page may have been moved or removed.</string>
     <string name="doc_search_placeholder">Search documentation…</string>
     <string name="doc_section_developer">Developer Guide</string>
     <string name="doc_section_user">User Guide</string>
@@ -557,8 +574,8 @@
     <string name="doc_title_nodes">Nodes</string>
     <string name="doc_title_notifications">Notifications</string>
     <string name="doc_title_onboarding">Getting Started</string>
-    <string name="doc_title_settings_module">Settings ÔÇö Modules &amp; Admin</string>
-    <string name="doc_title_settings_radio">Settings ÔÇö Radio &amp; User</string>
+    <string name="doc_title_settings_module">Settings — Modules &amp; Admin</string>
+    <string name="doc_title_settings_radio">Settings — Radio &amp; User</string>
     <string name="doc_title_signal_meter">Signal Meter</string>
     <string name="doc_title_tak">TAK Integration</string>
     <string name="doc_title_telemetry">Telemetry &amp; Sensors</string>
@@ -573,6 +590,12 @@
     <string name="download">Download</string>
     <string name="download_this_area">Download this area</string>
     <string name="duplicated_public_key_title">Duplicate Public Key Detected</string>
+    <!-- DURATION -->
+    <string name="duration_ago">%1$s ago</string>
+    <string name="duration_days_short">%1$dd</string>
+    <string name="duration_hours_short">%1$dh</string>
+    <string name="duration_minutes_short">%1$dm</string>
+    <string name="duration_seconds_short">%1$ds</string>
     <string name="dynamic">Dynamic</string>
     <string name="easily_set_up_private_mesh_networks">Easily set up private mesh networks for secure and reliable communication in remote areas.</string>
     <string name="edit">Edit</string>
@@ -604,7 +627,7 @@
     <string name="error_duty_cycle">Duty Cycle limit reached. Cannot send messages right now, please try again later.</string>
     <string name="error_recovery_exhausted">Could not establish a stable connection after repeated attempts. Please re-select the node to retry.</string>
     <string name="establish_session">Connect &amp; administer</string>
-    <string name="establishing_session">Establishing remote sessionÔÇŽ</string>
+    <string name="establishing_session">Establishing remote session…</string>
     <string name="ethernet_config">Ethernet Options</string>
     <string name="ethernet_ip">Ethernet IP:</string>
     <string name="event_firmware_running">Running event firmware</string>
@@ -621,6 +644,7 @@
     <string name="export_tak_data_package">Export TAK Data Package</string>
     <string name="external_notification">External Notification</string>
     <string name="external_notification_config">External Notification Config</string>
+    <string name="external_power_short">PWR</string>
     <string name="factory_reset">Factory reset</string>
     <string name="fair">Fair</string>
     <string name="fallback_node_name">MT_SW_APP %1$s</string>
@@ -697,7 +721,7 @@
     <string name="firmware_update_currently_installed">Currently Installed: %1$s</string>
     <string name="firmware_update_device">Device: %1$s</string>
     <string name="firmware_update_disclaimer_chirpy_says">Chirpy says, "Keep your ladder handy!"</string>
-    <string name="firmware_update_disclaimer_text">You are about to flash new firmware to your device. This process carries risks.\n\nÔÇó Ensure your device is charged.\nÔÇó Keep the device close to your phone.\nÔÇó Do not close the app during the update.\n\nVerify you have selected the correct firmware for your hardware.</string>
+    <string name="firmware_update_disclaimer_text">You are about to flash new firmware to your device. This process carries risks.\n\n• Ensure your device is charged.\n• Keep the device close to your phone.\n• Do not close the app during the update.\n\nVerify you have selected the correct firmware for your hardware.</string>
     <string name="firmware_update_disclaimer_title">Update Warning</string>
     <string name="firmware_update_disconnect_warning">Note: This will temporarily disconnect your device during the update.</string>
     <string name="firmware_update_do_not_close">Do not close the app.</string>
@@ -755,6 +779,8 @@
     <string name="firmware_update_taking_a_while">This might take a minute...</string>
     <string name="firmware_update_target">Target: %1$s</string>
     <string name="firmware_update_title">Firmware Update</string>
+    <string name="firmware_update_transfer_percent">%1$d%</string>
+    <string name="firmware_update_transfer_progress">%1$d% (%2$s/s, ETA: %3$ds)</string>
     <string name="firmware_update_unknown_error">Unknown error</string>
     <string name="firmware_update_unknown_hardware">Unknown hardware model: %1$d</string>
     <string name="firmware_update_unknown_release">Unknown remote release</string>
@@ -783,7 +809,7 @@
     <string name="format_italic">Italic</string>
     <string name="format_link">Link</string>
     <string name="format_strikethrough">Strikethrough</string>
-    <string name="fr_HT" translatable="false">Krey├▓l ayisyen</string>
+    <string name="fr_HT" translatable="false">Kreyòl ayisyen</string>
     <string name="free_memory">Free Memory</string>
     <string name="free_memory_description">Available system memory in bytes</string>
     <string name="freq">Freq</string>
@@ -846,7 +872,8 @@
     <string name="i_agree_to_share_my_location">I have read and understand the above. I voluntarily consent to the unencrypted transmission of my node data via MQTT</string>
     <string name="i_know_what_i_m_doing">I know what I'm doing.</string>
     <string name="iaq">IAQ</string>
-    <string name="iaq_definition">(Indoor Air Quality) relative scale IAQ value as measured by Bosch BME680. Value Range 0ÔÇô500.</string>
+    <string name="iaq_definition">(Indoor Air Quality) relative scale IAQ value as measured by Bosch BME680. Value Range 0–500.</string>
+    <string name="iaq_value">IAQ %1$d</string>
     <string name="icon_meanings">Icon Meanings</string>
     <string name="ignore">Ignore</string>
     <string name="ignore_add">Add '%1$s' to ignore list?</string>
@@ -885,7 +912,7 @@
     <string name="key_backup_deleted">Key backup deleted</string>
     <string name="key_backup_not_found">No key backup found for this node</string>
     <string name="key_backup_restore_failed">Failed to restore keys from backup</string>
-    <string name="key_backup_restored">Keys restored ÔÇö saving to device</string>
+    <string name="key_backup_restored">Keys restored — saving to device</string>
     <string name="key_backup_saved">Keys backed up securely</string>
     <string name="key_verification_final_title">Key Verification Complete</string>
     <string name="key_verification_request_title">Key Verification Request</string>
@@ -915,7 +942,7 @@
     <string name="latest_stable_firmware">Latest stable</string>
     <string name="latitude">Latitude</string>
     <!-- LAYER -->
-    <string name="layer_subtitle">%1$s ÔÇó %2$s</string>
+    <string name="layer_subtitle">%1$s • %2$s</string>
     <string name="layer_type_coverage">Coverage estimate</string>
     <string name="layer_type_geojson" translatable="false">GeoJSON</string>
     <string name="layer_type_kml" translatable="false">KML</string>
@@ -1001,10 +1028,10 @@
     <string name="lockdown_lock_now">Lock Now</string>
     <string name="lockdown_lock_reason">Reason: %1$s</string>
     <string name="lockdown_mode">Lockdown mode</string>
-    <string name="lockdown_mode_setting_up">Setting upÔÇŽ</string>
-    <string name="lockdown_mode_summary_locked">Active ÔÇö enter your passphrase to unlock this connection.</string>
+    <string name="lockdown_mode_setting_up">Setting up…</string>
+    <string name="lockdown_mode_summary_locked">Active — enter your passphrase to unlock this connection.</string>
     <string name="lockdown_mode_summary_off">Encrypt device storage and require a passphrase per connection.</string>
-    <string name="lockdown_mode_summary_unlocked">Active ÔÇö storage encrypted, this connection authenticated.</string>
+    <string name="lockdown_mode_summary_unlocked">Active — storage encrypted, this connection authenticated.</string>
     <string name="lockdown_passphrase">Passphrase</string>
     <string name="lockdown_passphrases_do_not_match">Passphrases do not match</string>
     <string name="lockdown_session_boots_remaining">Session: %1$d reboots remaining</string>
@@ -1033,6 +1060,8 @@
     <string name="longitude">Longitude</string>
     <string name="lora">LoRa</string>
     <string name="lora_config">LoRa</string>
+    <string name="lora_config_change_value">%1$s: %2$s → %3$s</string>
+    <string name="lora_config_changes">LoRa Configuration Changes:</string>
     <string name="low_battery">Low Battery</string>
     <string name="low_battery_message">Node %1$s has a low battery (%2$d%)</string>
     <string name="low_battery_title">Low battery: %1$s</string>
@@ -1043,9 +1072,7 @@
     <string name="manual_position_request">Manual position request required</string>
     <!-- MAP -->
     <string name="map">Mesh Map</string>
-    <string name="map_cache_info">Cache Capacity: %1$d MB\nCache Usage: %2$d MB</string>
     <string name="map_cache_manager">Cache Manager</string>
-    <string name="map_cache_megabytes">%1$s MB</string>
     <string name="map_cache_size">Current Cache size</string>
     <string name="map_cache_tiles">%1$d tiles</string>
     <string name="map_clear_tiles">Clear Downloaded Tiles</string>
@@ -1066,6 +1093,8 @@
     <string name="map_filter_title">Filter map</string>
     <string name="map_layer_formats">Map layers support .kml, .kmz, or GeoJSON formats.</string>
     <string name="map_layer_opacity">Opacity: %1$d%</string>
+    <string name="map_layer_open_failed">Couldn't open that map file.</string>
+    <string name="map_layer_too_large">Map files over %1$d MB can't be imported.</string>
     <string name="map_node_popup_details">%1$s&lt;br&gt;Last heard: %2$s&lt;br&gt;Last position: %3$s&lt;br&gt;Battery: %4$s</string>
     <string name="map_offline_banner">Offline — showing cached map data</string>
     <string name="map_offline_download_failed_build">No offline map data available right now — try again later</string>
@@ -1095,7 +1124,7 @@
     <string name="map_select_download_region">Select download region</string>
     <string name="map_start_download">Start Download</string>
     <string name="map_style_selection">Map style selection</string>
-    <string name="map_subDescription">bearing: %1$d┬░ distance: %2$s</string>
+    <string name="map_subDescription">bearing: %1$d° distance: %2$s</string>
     <string name="map_tile_download_estimate">Tile download estimate:</string>
     <string name="map_tile_download_estimate_detail">%1$s %2$s %3$s</string>
     <string name="map_tile_limit_reached">Tile limit reached (%1$d)</string>
@@ -1176,6 +1205,8 @@
     <string name="meshtastic_messages_notifications_description">Messages sent directly to you.</string>
     <string name="meshtastic_new_nodes_notifications">New node notifications</string>
     <string name="meshtastic_new_nodes_notifications_description">Nodes heard for the first time.</string>
+    <string name="meshtastic_reactions_notifications">Reaction notifications</string>
+    <string name="meshtastic_reactions_notifications_description">Emoji reactions to messages.</string>
     <string name="meshtastic_service_notifications">Service notifications</string>
     <string name="meshtastic_service_notifications_description">Shows the connection to your radio while MT_SW_APP runs in the background.</string>
     <string name="meshtastic_waypoints_notifications">Waypoint notifications</string>
@@ -1228,12 +1259,12 @@
     <string name="message_status_recipient_delivered_proven">Delivered to recipient · proven</string>
     <string name="message_status_relayed_not_confirmed">Relayed, not confirmed by recipient</string>
     <string name="message_status_sfpp_confirmed">Confirmed on SF++ chain</string>
-    <string name="message_status_sfpp_routing">Routing via SF++ chainÔÇŽ</string>
+    <string name="message_status_sfpp_routing">Routing via SF++ chain…</string>
     <string name="message_status_unknown">Unknown</string>
     <string name="message_translated_label">Translated</string>
     <string name="messages">Messages</string>
     <string name="metric_channel_label">%1$s %2$d</string>
-    <string name="micrograms_per_cubic_meter">┬Ág/m┬│</string>
+    <string name="micrograms_per_cubic_meter">µg/m³</string>
     <string name="min">Min</string>
     <string name="minimum_wake_time_seconds">Minimum wake time</string>
     <string name="modem_preset">Presets</string>
@@ -1252,7 +1283,7 @@
     <string name="mqtt_probe_dns_failure">Host not found</string>
     <string name="mqtt_probe_other_failure">Connection failed</string>
     <string name="mqtt_probe_rejected">Broker rejected: %1$s</string>
-    <string name="mqtt_probe_running">Probing brokerÔÇŽ</string>
+    <string name="mqtt_probe_running">Probing broker…</string>
     <string name="mqtt_probe_success">Reachable. Broker accepted credentials.</string>
     <string name="mqtt_probe_success_with_info">Reachable (%1$s)</string>
     <string name="mqtt_probe_tcp_failure">Cannot reach broker (TCP)</string>
@@ -1267,9 +1298,9 @@
     <string name="mqtt_sniffer_warning_message">This opens its own connection to the configured MQTT broker. This app\'s MQTT client allows only one active connection at a time, so if "MQTT proxy on this phone" is currently relaying traffic for the connected node, enabling this will interrupt it for as long as the sniffer stays on.</string>
     <string name="mqtt_sniffer_warning_title">Enable MQTT Sniffer?</string>
     <string name="mqtt_status_connected">Connected</string>
-    <string name="mqtt_status_connecting">ConnectingÔÇŽ</string>
+    <string name="mqtt_status_connecting">Connecting…</string>
     <string name="mqtt_status_disconnected">Disconnected</string>
-    <string name="mqtt_status_disconnected_with_reason">Disconnected ÔÇö %1$s</string>
+    <string name="mqtt_status_disconnected_with_reason">Disconnected — %1$s</string>
     <string name="mqtt_status_inactive">Inactive</string>
     <string name="mqtt_status_reconnecting">Reconnecting…</string>
     <string name="mqtt_status_reconnecting_with_attempt">Reconnecting (attempt %1$d) — %2$s</string>
@@ -1315,7 +1346,6 @@
     <string name="no_bluetooth_devices_seen">No Bluetooth devices seen</string>
     <string name="no_custom_tile_sources_found">No custom tile sources found.</string>
     <string name="no_device_selected">No device selected</string>
-    <string name="no_devices_found">No devices found</string>
     <string name="no_files_manifested">No files manifested.</string>
     <string name="no_local_stats">No Stats Available</string>
     <string name="no_map_layers_loaded">No map layers loaded.</string>
@@ -1507,12 +1537,12 @@
     <string name="override_console_serial_port">Override console serial port</string>
     <!-- PACKET -->
     <string name="packet_authenticity">Packet authenticity</string>
-    <string name="packet_authenticity_balanced">Balanced ÔÇö Prefer authenticated</string>
+    <string name="packet_authenticity_balanced">Balanced — Prefer authenticated</string>
     <string name="packet_authenticity_balanced_summary">Recommended. Reject unsigned downgrade attempts from nodes known to sign.</string>
     <string name="packet_authenticity_compatible">Compatible — Accept unsigned</string>
     <string name="packet_authenticity_compatible_summary">Accept unsigned traffic for maximum compatibility. A signature that can be checked and is wrong still drops the packet.</string>
     <string name="packet_authenticity_level">Protection level</string>
-    <string name="packet_authenticity_strict">Strict ÔÇö Require authentication</string>
+    <string name="packet_authenticity_strict">Strict — Require authentication</string>
     <string name="packet_authenticity_strict_confirm">Enable Strict</string>
     <string name="packet_authenticity_strict_confirmation">Strict ignores every remote mesh packet that is not cryptographically authenticated. Older firmware, licensed or ham nodes without PKI keys, and oversized packets may disappear. PKI-authenticated direct messages remain available.</string>
     <string name="packet_authenticity_strict_summary">Only show and process cryptographically authenticated mesh packets. Older nodes and oversized packets may disappear.</string>
@@ -1698,6 +1728,8 @@
     <string name="range_test_config">Range Test Config</string>
     <string name="react">React</string>
     <string name="reboot">Reboot</string>
+    <string name="reboot_into_dfu">Reboot into DFU mode</string>
+    <string name="reboot_into_dfu_warning">The node stays in its bootloader and off the mesh until new firmware is flashed or it is reset.</string>
     <string name="recent_network_devices">Recent Network Devices</string>
     <string name="reconnecting">Reconnecting…</string>
     <string name="red">Red</string>
@@ -1718,6 +1750,45 @@
     <string name="remote_hardware">Remote Hardware</string>
     <string name="remote_hardware_config">Remote Hardware Config</string>
     <string name="remote_hardware_enabled">Remote Hardware enabled</string>
+    <string name="remote_shell">Remote Shell</string>
+    <string name="remote_shell_command_hint">Command</string>
+    <string name="remote_shell_error_notice">Error from the node: %1$s</string>
+    <string name="remote_shell_full_screen">Full-screen programs need more than the mesh can carry, so their output may not display correctly</string>
+    <string name="remote_shell_input_dropped">%1$d bytes of input dropped, the node is not keeping up</string>
+    <string name="remote_shell_key_alt">Alt</string>
+    <string name="remote_shell_key_ctrl">Control</string>
+    <string name="remote_shell_key_down">Down arrow</string>
+    <string name="remote_shell_key_end">End</string>
+    <string name="remote_shell_key_escape">Escape</string>
+    <string name="remote_shell_key_home">Home</string>
+    <string name="remote_shell_key_left">Left arrow</string>
+    <string name="remote_shell_key_page_down">Page down</string>
+    <string name="remote_shell_key_page_up">Page up</string>
+    <string name="remote_shell_key_right">Right arrow</string>
+    <string name="remote_shell_key_tab">Tab</string>
+    <string name="remote_shell_key_up">Up arrow</string>
+    <string name="remote_shell_last_contact">Waiting for the node, last heard %1$d s ago</string>
+    <string name="remote_shell_menu_line_mode">Line mode</string>
+    <string name="remote_shell_menu_paste">Paste</string>
+    <string name="remote_shell_menu_text_larger">Larger text</string>
+    <string name="remote_shell_menu_text_smaller">Smaller text</string>
+    <string name="remote_shell_modifier_locked">Locked</string>
+    <string name="remote_shell_modifier_once">Applies to the next key</string>
+    <string name="remote_shell_more_options">More options</string>
+    <string name="remote_shell_no_reply">No reply from the node. It must list your radio's public key as an admin key, and be in range.</string>
+    <string name="remote_shell_no_reply_reason">Could not open the session (%1$s). The node must list your radio's public key as an admin key, and be in range.</string>
+    <string name="remote_shell_open">Open terminal</string>
+    <string name="remote_shell_open_description">Opens a shell on this node, starting a remote admin session first if needed</string>
+    <string name="remote_shell_reconnect">Reconnect</string>
+    <string name="remote_shell_send">Send</string>
+    <string name="remote_shell_session_closed">Session closed</string>
+    <string name="remote_shell_session_closed_reason">Session closed: %1$s</string>
+    <string name="remote_shell_status_closed">Session closed</string>
+    <string name="remote_shell_status_closing">Closing…</string>
+    <string name="remote_shell_status_failed">Session failed</string>
+    <string name="remote_shell_status_not_connected">Not connected</string>
+    <string name="remote_shell_status_opening">Opening session…</string>
+    <string name="remote_shell_subtitle_round_trip">%1$s, %2$d ms round trip</string>
     <string name="remotely_administrating">"[Remote] %1$s"</string>
     <!-- REMOVE -->
     <string name="remove">Remove</string>
@@ -1816,7 +1887,7 @@
     <string name="screen_on_for">Screen on for</string>
     <string name="scroll_to_bottom">Scroll to bottom</string>
     <string name="search_emoji">Search emoji...</string>
-    <string name="search_messages">Search messagesÔÇŽ</string>
+    <string name="search_messages">Search messages…</string>
     <string name="secondary">Secondary</string>
     <string name="secondary_channel_position_feature">Disabling position on the primary channel allows periodic position broadcasts on the first secondary channel with the position enabled, otherwise manual position request required.</string>
     <string name="secondary_no_telemetry">No periodic telemetry broadcast</string>
@@ -2026,7 +2097,7 @@
     <string name="tak_server_enabled">Enable Local TAK Server</string>
     <string name="tak_server_enabled_desc">Starts a local TLS server on port 8089 for ATAK connections</string>
     <string name="tak_server_export_data_package_desc">Generate .zip for ATAK to connect to this server</string>
-    <string name="tak_server_loading">ÔÇŽ</string>
+    <string name="tak_server_loading">…</string>
     <string name="tak_server_mesh_to_cot">Mesh to CoT Converter</string>
     <string name="tak_server_mesh_to_cot_desc">Show MT_SW nodes on the ATAK map as contacts</string>
     <string name="tak_server_permission_blocked">The TAK server needs local network access to accept connections, and Android will not ask again. It has been turned off for now — turn the permission on in app settings and switch it back on.</string>
@@ -2041,7 +2112,7 @@
     <string name="tak_server_status_off">Off</string>
     <string name="tak_server_status_starting">Starting TAK Server</string>
     <string name="tak_server_status_unavailable">Local TAK Server is available in MT_SW_APP for Android</string>
-    <string name="tak_server_status_waiting">Listening on 127.0.0.1:8089 ÔÇö waiting for ATAK</string>
+    <string name="tak_server_status_waiting">Listening on 127.0.0.1:8089 — waiting for ATAK</string>
     <string name="tak_server_test_card_title">TAK Mesh Test (Debug)</string>
     <string name="tak_server_test_idle">Send all %1$d test fixtures to mesh</string>
     <string name="tak_server_test_protocol_v1_label">V1 (legacy firmware &lt; 2.8.0 — PLI + chat only)</string>
@@ -2112,7 +2183,7 @@
     <!-- TRANSLATION -->
     <string name="translation_download_message">Translating messages requires a one-time language model download (about %1$d MB).</string>
     <string name="translation_download_title">Download translation model?</string>
-    <string name="translation_downloading">Downloading translation modelÔÇŽ</string>
+    <string name="translation_downloading">Downloading translation model…</string>
     <string name="translation_failed">Unable to translate message</string>
     <string name="translation_model_download_failed">Translation model download failed</string>
     <string name="translation_not_required">Message is already in your language</string>
@@ -2160,6 +2231,7 @@
     <string name="unpin_selected">Unpin</string>
     <string name="unrecognized">Unrecognized</string>
     <string name="unset">Unset - 0</string>
+    <string name="unsupported_device">This device isn't supported</string>
     <string name="update_status">Update status</string>
     <string name="updated">Updated</string>
     <string name="uplink_enabled">MQTT Uplink Enabled</string>
@@ -2168,6 +2240,7 @@
     <!-- URL -->
     <string name="url">URL</string>
     <string name="url_cannot_be_empty">URL cannot be empty.</string>
+    <string name="url_http_localhost_only">Use https:// here. Plain http:// only works for localhost.</string>
     <string name="url_must_be_http">URL must start with http:// or https://.</string>
     <string name="url_must_contain_placeholders">URL must contain placeholders.</string>
     <string name="url_template">URL Template</string>

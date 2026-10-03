@@ -2,7 +2,8 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>LambdaParameterInRestartableEffect:Main.kt:onReady: () -> Unit</ID>
-    <ID>TooManyFunctions:Main.kt:org.meshtastic.desktop.Main.kt</ID>
+    <ID>UnnecessaryLaunchedEffect:DesktopTracerouteMap.kt:LaunchedEffect</ID>
+    <ID>UnnecessaryLaunchedEffect:Main.kt:LaunchedEffect</ID>
+    <ID>UnusedPrivateProperty:MacOSNotificationSender.kt:MacOSNotificationSender$unused: Unit = Unit</ID>
   </CurrentIssues>
 </SmellBaseline>

@@ -17,6 +17,8 @@
   -->
 <resources>
     <!-- A11Y -->
+    <string name="a11y_humidity">Laige</string>
+    <string name="a11y_temperature">Teocht</string>
     <string name="about">Maidir le</string>
     <string name="accept">Glac</string>
     <!-- ACTION -->
@@ -44,7 +46,6 @@
     <string name="ch_util_definition">Úsáid na cainéil reatha, lena n-áirítear TX ceartaithe, RX agus RX mícheart (anáilís ar na fuaimeanna).</string>
     <!-- CHANNEL -->
     <string name="channel_invalid">Tá an URL Cainéil seo neamhdhleathach agus ní féidir é a úsáid</string>
-    <string name="channel_label">Cainéal</string>
     <string name="channel_name">Ainm Cainéal</string>
     <!-- CHIRPY -->
     <string name="choose_theme">Roghnaigh téama</string>
@@ -81,6 +82,7 @@
     <!-- DISTANCE -->
     <string name="distance">Sáth</string>
     <!-- DOC -->
+    <!-- DURATION -->
     <string name="edit">Cuir in eagar</string>
     <string name="eight_hours">8 Uair an chloig</string>
     <!-- EMOJI -->
@@ -123,7 +125,6 @@
     <!-- LOG -->
     <string name="logs">Lógáil</string>
     <!-- MAP -->
-    <string name="map_cache_info">Cumas an Cásla: %1$d MB\nÚsáid an Cásla: %2$d MB</string>
     <string name="map_cache_manager">Bainisteoir Cásla</string>
     <string name="map_cache_size">Méid na Cásla Reatha</string>
     <string name="map_cache_tiles">%1$d tíleanna</string>
@@ -209,6 +210,9 @@
     <string name="reboot">Athmhaoinigh</string>
     <!-- REMOTE -->
     <string name="remote_admin">Rialú iargúlta</string>
+    <string name="remote_shell_modifier_locked">Ceangailte</string>
+    <string name="remote_shell_send">Seol</string>
+    <string name="remote_shell_status_not_connected">Ní ceangailte</string>
     <!-- REMOVE -->
     <string name="remove">Bain</string>
     <string name="remove_node_text">Bainfear an nod seo ón liosta go dtí go bhfaighidh do nod sonraí uaidh arís.</string>

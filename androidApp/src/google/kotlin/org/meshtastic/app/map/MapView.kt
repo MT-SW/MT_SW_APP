@@ -118,9 +118,11 @@ import com.google.maps.android.data.renderer.model.PointStyle
 import com.google.maps.android.data.renderer.model.PolygonStyle
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -138,14 +140,18 @@ import org.meshtastic.app.map.offline.terrain.ContourOverlay
 import org.meshtastic.app.map.offline.terrain.HillshadeTileProvider
 import org.meshtastic.app.map.tiles.RasterBasemap
 import org.meshtastic.core.common.util.MeasurementSystem
+import org.meshtastic.core.common.util.NumberFormatter
+import org.meshtastic.core.common.util.ioDispatcher
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.TracerouteOverlay
 import org.meshtastic.core.model.geofence.toGeofence
+import org.meshtastic.core.model.hasFix
 import org.meshtastic.core.model.isLocked
 import org.meshtastic.core.model.isModifiableBy
 import org.meshtastic.core.model.util.GeoConstants.DEG_D
 import org.meshtastic.core.model.util.GeoConstants.HEADING_DEG
+import org.meshtastic.core.model.util.TimeConstants
 import org.meshtastic.core.model.util.isValidCodePoint
 import org.meshtastic.core.model.util.kmhIn
 import org.meshtastic.core.model.util.metersIn
@@ -182,6 +188,7 @@ import org.meshtastic.core.ui.util.PermissionStatus
 import org.meshtastic.core.ui.util.formatAgo
 import org.meshtastic.core.ui.util.formatPositionTime
 import org.meshtastic.core.ui.util.rememberLocationPermissionState
+import org.meshtastic.core.ui.util.showToast
 import org.meshtastic.feature.map.BaseMapViewModel.MapFilterState
 import org.meshtastic.feature.map.MapBounds
 import org.meshtastic.feature.map.MapNodePolicy
@@ -312,6 +319,7 @@ private const val TRACK_POINT_SIZE_DP = 24f
 private const val SELECTED_TRACK_POINT_SIZE_DP = 32f
 private const val TRACK_POINT_OUTER_FRACTION = 10f / 24f
 private const val TRACK_POINT_RING_FRACTION = 4f / 24f
+private const val COORDINATE_DECIMALS = 5
 
 @Suppress("CyclomaticComplexMethod", "LongMethod")
 @OptIn(MapsComposeExperimentalApi::class, ExperimentalMaterial3Api::class)
@@ -325,6 +333,9 @@ fun MapView(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val mapLayers by mapViewModel.mapLayers.collectAsStateWithLifecycle()
+
+    // Collected here, not in a sheet: basemap selection and network layers report errors while no sheet is open.
+    LaunchedEffect(mapViewModel) { mapViewModel.errorFlow.collectLatest { context.showToast(it) } }
 
     // --- Location permissions ---
     val locationPermission = rememberLocationPermissionState()
@@ -421,6 +432,7 @@ fun MapView(
                             try {
                                 cameraPositionState.animate(cameraUpdate)
                             } catch (e: IllegalStateException) {
+                                if (e is CancellationException) currentCoroutineContext().ensureActive()
                                 Logger.d { "Error animating camera to location: ${e.message}" }
                             }
                         }
@@ -502,12 +514,14 @@ fun MapView(
     val mapColorScheme = if (dark) ComposeMapColorScheme.DARK else ComposeMapColorScheme.LIGHT
 
     // --- Mode-specific data ---
-    // Node track: apply time filter
+    // Node track: apply time filter, and drop reports with no fix so toLatLng never draws them at 0,0
     val sortedTrackPositions =
         if (mode is GoogleMapMode.NodeTrack) {
             val lastHeardTrackFilter = mapFilterState.lastHeardTrackFilter
             remember(mode.positions, lastHeardTrackFilter) {
-                mode.positions.filter { lastHeardTrackFilter.includes(it.time, nowSeconds) }.sortedBy { it.time }
+                mode.positions
+                    .filter { it.hasFix() && lastHeardTrackFilter.includes(it.time, nowSeconds) }
+                    .sortedBy { it.time }
             }
         } else {
             emptyList()
@@ -594,6 +608,8 @@ fun MapView(
                 cameraPositionState.animate(cameraUpdate)
                 hasCentered = true
             } catch (e: IllegalStateException) {
+                if (e is CancellationException) currentCoroutineContext().ensureActive()
+                // Reached for a user gesture interrupting animate() too: that cancels the animation, not this effect.
                 Logger.d { "Error centering track map: ${e.message}" }
             }
         }
@@ -605,6 +621,7 @@ fun MapView(
             try {
                 cameraPositionState.animate(CameraUpdateFactory.newLatLng(selectedPos.toLatLng()))
             } catch (e: IllegalStateException) {
+                if (e is CancellationException) currentCoroutineContext().ensureActive()
                 Logger.d { "Error animating to selected position: ${e.message}" }
             }
         }
@@ -630,6 +647,7 @@ fun MapView(
                     cameraPositionState.animate(cameraUpdate)
                     hasCentered = true
                 } catch (e: IllegalStateException) {
+                    if (e is CancellationException) currentCoroutineContext().ensureActive()
                     Logger.d { "Error centering traceroute overlay: ${e.message}" }
                 }
             }
@@ -694,7 +712,11 @@ fun MapView(
                 mapType = effectiveGoogleMapType,
                 isMyLocationEnabled = isLocationTrackingEnabled && locationPermission.isGranted,
             ),
-            onMapLoaded = { isMapLoaded = true },
+            onMapLoaded = {
+                isMapLoaded = true
+                // The store-screenshot capture waits for this tag instead of a fixed delay.
+                Logger.withTag("MapDrawn").d { "tiles drawn" }
+            },
             onMapClick = { latLng ->
                 if (plannerBridge.pickingSide != null) {
                     // The Planner is waiting for a point: the tap belongs to it, not to the box-authoring tool.
@@ -1128,6 +1150,7 @@ fun MapView(
                             cameraPositionState.animate(CameraUpdateFactory.newCameraPosition(newCameraPosition))
                             Logger.d { "Oriented map to north" }
                         } catch (e: IllegalStateException) {
+                            if (e is CancellationException) currentCoroutineContext().ensureActive()
                             Logger.d { "Error orienting map to north: ${e.message}" }
                         }
                     }
@@ -1202,15 +1225,15 @@ fun MapView(
         }
     }
     // Planner deep link from a node's detail screen — open the Planner prefilled with that node.
-    val plannerRequest by mapViewModel.plannerRequest.collectAsStateWithLifecycle()
-    LaunchedEffect(plannerRequest) {
-        plannerRequest?.let { node ->
+    val sitePlannerRequest by mapViewModel.sitePlannerRequest.collectAsStateWithLifecycle()
+    LaunchedEffect(sitePlannerRequest) {
+        sitePlannerRequest?.let { node ->
             plannerNodeNum = node.num
             plannerOpen = true
             if (node.validPosition != null) {
                 cameraPositionState.animate(CameraUpdateFactory.newLatLng(LatLng(node.latitude, node.longitude)))
             }
-            mapViewModel.consumePlannerRequest(node.num)
+            mapViewModel.consumeSitePlannerRequest(node.num)
         }
     }
     PlannerSheet(
@@ -1247,21 +1270,19 @@ fun MapView(
     }
 }
 
-private const val SECONDS_PER_MINUTE = 60L
-private const val MILLIS_PER_SECOND = 1_000L
-
 @Composable
 private fun rememberRelativeTimeBucket(): Long {
     val buckets = remember { relativeTimeBuckets() }
-    return buckets.collectAsStateWithLifecycle(initialValue = nowSeconds / SECONDS_PER_MINUTE).value
+    return buckets.collectAsStateWithLifecycle(initialValue = nowSeconds / TimeConstants.SECONDS_PER_MINUTE).value
 }
 
 internal fun relativeTimeBuckets(now: () -> Long = { nowSeconds }): Flow<Long> = flow {
     while (true) {
         val currentSeconds = now()
-        emit(currentSeconds / SECONDS_PER_MINUTE)
-        val secondsUntilNextMinute = SECONDS_PER_MINUTE - currentSeconds.mod(SECONDS_PER_MINUTE)
-        delay(secondsUntilNextMinute * MILLIS_PER_SECOND)
+        emit(currentSeconds / TimeConstants.SECONDS_PER_MINUTE)
+        val secondsUntilNextMinute =
+            TimeConstants.SECONDS_PER_MINUTE - currentSeconds.mod(TimeConstants.SECONDS_PER_MINUTE)
+        delay(secondsUntilNextMinute * TimeConstants.MS_PER_SEC)
     }
 }
 
@@ -1546,11 +1567,11 @@ private fun PositionInfoWindowContent(position: Position, displayUnits: Measurem
         Column(modifier = Modifier.padding(8.dp)) {
             PositionRow(
                 label = stringResource(Res.string.latitude),
-                value = "%.5f".format((position.latitude_i ?: 0) * DEG_D),
+                value = NumberFormatter.format((position.latitude_i ?: 0) * DEG_D, COORDINATE_DECIMALS),
             )
             PositionRow(
                 label = stringResource(Res.string.longitude),
-                value = "%.5f".format((position.longitude_i ?: 0) * DEG_D),
+                value = NumberFormatter.format((position.longitude_i ?: 0) * DEG_D, COORDINATE_DECIMALS),
             )
             PositionRow(label = stringResource(Res.string.sats), value = position.sats_in_view.toString())
             PositionRow(
@@ -1560,7 +1581,7 @@ private fun PositionInfoWindowContent(position: Position, displayUnits: Measurem
             PositionRow(label = stringResource(Res.string.speed), value = speedFromPosition(position, displayUnits))
             PositionRow(
                 label = stringResource(Res.string.heading),
-                value = "%.0f°".format((position.ground_track ?: 0) * HEADING_DEG),
+                value = "${NumberFormatter.format((position.ground_track ?: 0) * HEADING_DEG, 0)}°",
             )
             PositionRow(label = stringResource(Res.string.timestamp), value = position.formatPositionTime())
         }
@@ -1636,20 +1657,19 @@ private fun offsetPolyline(
     val headingPoints = headingReferencePoints.takeIf { it.size >= 2 } ?: points
     if (points.size < 2 || headingPoints.size < 2 || offsetMeters == 0.0) return points
 
-    val headings =
-        headingPoints.mapIndexed { index, _ ->
-            when (index) {
-                0 -> SphericalUtil.computeHeading(headingPoints[0], headingPoints[1])
+    val headings = headingPoints.mapIndexed { index, _ ->
+        when (index) {
+            0 -> SphericalUtil.computeHeading(headingPoints[0], headingPoints[1])
 
-                headingPoints.lastIndex ->
-                    SphericalUtil.computeHeading(
-                        headingPoints[headingPoints.lastIndex - 1],
-                        headingPoints[headingPoints.lastIndex],
-                    )
+            headingPoints.lastIndex ->
+                SphericalUtil.computeHeading(
+                    headingPoints[headingPoints.lastIndex - 1],
+                    headingPoints[headingPoints.lastIndex],
+                )
 
-                else -> SphericalUtil.computeHeading(headingPoints[index - 1], headingPoints[index + 1])
-            }
+            else -> SphericalUtil.computeHeading(headingPoints[index - 1], headingPoints[index + 1])
         }
+    }
 
     return points.mapIndexed { index, point ->
         val heading = headings[index.coerceIn(0, headings.lastIndex)]
@@ -1676,7 +1696,7 @@ private fun MapLayerOverlay(layerItem: MapLayerItem, opacity: Float, mapViewMode
         val layer =
             try {
                 val dataLayer =
-                    withContext(Dispatchers.IO) {
+                    withContext(ioDispatcher) {
                         // Buffered because the KMZ sniff marks and resets the stream before the parser reads it.
                         BufferedInputStream(ByteArrayInputStream(bytes)).use { stream ->
                             parseMapLayer(layerItem.layerType, stream)

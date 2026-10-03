@@ -17,17 +17,18 @@
   -->
 <resources>
     <!-- A11Y -->
+    <string name="a11y_humidity">Luftfuktighet</string>
     <string name="a11y_label_value">%1$s: %2$s</string>
     <string name="a11y_message_from">Meddelande från %1$s: %2$s</string>
     <string name="a11y_node_distance_away">%1$s bort</string>
     <string name="a11y_node_favorite">favorit</string>
-    <string name="a11y_node_hops_away">%1$d hopp bort</string>
     <string name="a11y_node_last_heard">hördes senast %1$s</string>
     <string name="a11y_node_offline">offline</string>
     <string name="a11y_node_online">online</string>
     <string name="a11y_node_role">roll %1$s</string>
     <string name="a11y_node_signal">mottagning %1$s</string>
     <string name="a11y_nodes_at_hop">Hopp %1$d: %2$d noder</string>
+    <string name="a11y_temperature">Temperatur</string>
     <string name="about">Om</string>
     <string name="accept">Acceptera</string>
     <string name="acknowledgements">Bekräftelser</string>
@@ -130,7 +131,6 @@
     <string name="channel_8">Kanal 8</string>
     <string name="channel_features">Kanalfunktioner</string>
     <string name="channel_invalid">Denna kanal-URL är ogiltig och kan inte användas</string>
-    <string name="channel_label">Kanal</string>
     <string name="channel_name">Kanalnamn</string>
     <string name="channel_url">Kanal-URL</string>
     <string name="channels">Kanaler</string>
@@ -316,7 +316,6 @@
     <string name="discovery_stat_unselected">Ej vald</string>
     <string name="discovery_stop_scan">Stoppa sökning</string>
     <string name="discovery_time_remaining">%1$s återstår</string>
-    <string name="discovery_unique_nodes">%1$d unika noder</string>
     <string name="discovery_view_map">Visa karta</string>
     <string name="disk_free_indexed">Ledigt lagringutrymme %1$d</string>
     <string name="display">Display</string>
@@ -354,6 +353,7 @@
     <string name="downlink_feature_description">Meddelanden från en offentlig internetgateway vidarebefordras till det lokala nätverket. På grund av noll-hopp-policyn kommer trafiken från standardservern MQTT inte att sprida sig längre än den här enheten.</string>
     <string name="download">Ladda ner</string>
     <string name="duplicated_public_key_title">Dubblett publik nyckel upptäckt</string>
+    <!-- DURATION -->
     <string name="dynamic">Dynamisk</string>
     <string name="easily_set_up_private_mesh_networks">Konfigurera enkelt privata nätverk för säker och tillförlitlig kommunikation i avlägsna områden.</string>
     <string name="edit">Ändra</string>
@@ -442,6 +442,7 @@
     <string name="firmware_update_success">Uppdatering lyckades!</string>
     <string name="firmware_update_taking_a_while">Det här kan ta en stund...</string>
     <string name="firmware_update_title">Uppdatering av fast programvara</string>
+    <string name="firmware_update_transfer_percent">%1$d%</string>
     <string name="firmware_update_unknown_error">Okänt fel</string>
     <string name="firmware_update_unknown_hardware">Okänd hårdvarumodell: %1$d</string>
     <string name="firmware_update_uploading">Laddar upp fast programvara...</string>
@@ -589,7 +590,6 @@
     <string name="manual_position_request">Manuell positionsbegäran krävs</string>
     <!-- MAP -->
     <string name="map">Mesh Map</string>
-    <string name="map_cache_info">Cache-kapacitet: %1$d MB\nCache-användning: %2$d MB</string>
     <string name="map_cache_manager">Cache-hanterare</string>
     <string name="map_cache_size">Aktuell cachestorlek</string>
     <string name="map_cache_tiles">%1$d kartdelar</string>
@@ -704,7 +704,6 @@
     <string name="no_bluetooth_devices_hint">Se till att du är inom räckhåll för enheten.</string>
     <string name="no_bluetooth_devices_seen">Inga bluetooth-enheter hittades</string>
     <string name="no_device_selected">Ingen enhet vald</string>
-    <string name="no_devices_found">Hittade inga enheter</string>
     <string name="no_local_stats">Ingen tillgänglig statistik</string>
     <string name="no_network_devices_hint">Säkerställ att du och din enhet är anslutna till samma nätverk.</string>
     <string name="no_usb_devices_found">Ingen USB-enhet hittades.</string>
@@ -893,6 +892,10 @@
     <string name="remote_hardware">Fjärrstyrd hårdvara</string>
     <string name="remote_hardware_config">Konfiguration av fjärrhårdvara</string>
     <string name="remote_hardware_enabled">Fjärrhårdvara aktiverad</string>
+    <string name="remote_shell_key_alt">Höjd</string>
+    <string name="remote_shell_modifier_locked">Låst</string>
+    <string name="remote_shell_send">Skicka</string>
+    <string name="remote_shell_status_not_connected">Ej ansluten</string>
     <string name="remotely_administrating">"[Fjärr] %1$s"</string>
     <!-- REMOVE -->
     <string name="remove">Ta bort</string>

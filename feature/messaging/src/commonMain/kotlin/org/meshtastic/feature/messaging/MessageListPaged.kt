@@ -64,7 +64,7 @@ import org.meshtastic.core.model.Message
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.Reaction
-import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.ListScrollbar
 import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.feature.messaging.component.DateSeparator
 import org.meshtastic.feature.messaging.component.MessageItem
@@ -411,12 +411,7 @@ private fun MessageListPagedContent(
                 }
             }
         }
-        FastScrollSidebar(
-            listState = listState,
-            itemCount = state.messages.itemCount,
-            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
-            reverseLayout = true,
-        )
+        ListScrollbar(listState)
     }
 }
 

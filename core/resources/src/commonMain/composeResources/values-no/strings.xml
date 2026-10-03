@@ -17,6 +17,8 @@
   -->
 <resources>
     <!-- A11Y -->
+    <string name="a11y_humidity">Luftfuktighet</string>
+    <string name="a11y_temperature">Temperatur</string>
     <string name="about">Om</string>
     <string name="accept">Godta</string>
     <!-- ACTION -->
@@ -45,7 +47,6 @@
     <string name="ch_util_definition">Utnyttelse for denne kanalen, inkludert godt formet TX, RX og feilformet RX (aka støy).</string>
     <!-- CHANNEL -->
     <string name="channel_invalid">Denne kanall URL er ugyldig og kan ikke benyttes</string>
-    <string name="channel_label">Kanal</string>
     <string name="channel_name">Kanal Navn</string>
     <!-- CHIRPY -->
     <string name="choose_theme">Velg tema</string>
@@ -81,6 +82,7 @@
     <!-- DISTANCE -->
     <string name="distance">Distanse</string>
     <!-- DOC -->
+    <!-- DURATION -->
     <string name="edit">Rediger</string>
     <string name="eight_hours">8 Timer</string>
     <!-- EMOJI -->
@@ -123,7 +125,6 @@
     <!-- LOG -->
     <string name="logs">Logger</string>
     <!-- MAP -->
-    <string name="map_cache_info">Cache Kapasitet: %1$d MB\nCache Bruker: %2$d MB</string>
     <string name="map_cache_manager">Mellomlagerbehandler</string>
     <string name="map_cache_size">Nåværende størrelse for mellomlager</string>
     <string name="map_cache_tiles">%1$d fliser</string>
@@ -213,6 +214,9 @@
     <string name="reboot">Omstart</string>
     <!-- REMOTE -->
     <string name="remote_admin">Fjernadministrasjon</string>
+    <string name="remote_shell_modifier_locked">Låst</string>
+    <string name="remote_shell_send">Send</string>
+    <string name="remote_shell_status_not_connected">Ikke tilkoblet</string>
     <!-- REMOVE -->
     <string name="remove">Fjern</string>
     <string name="remove_node_text">Denne noden vil bli fjernet fra listen din helt til din node mottar data fra den igjen.</string>

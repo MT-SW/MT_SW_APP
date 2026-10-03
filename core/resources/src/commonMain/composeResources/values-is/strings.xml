@@ -66,6 +66,7 @@
     <!-- DISCOVERY -->
     <!-- DISTANCE -->
     <!-- DOC -->
+    <!-- DURATION -->
     <!-- EMOJI -->
     <string name="error_duty_cycle">Hámarsksendingartíma náð. Ekki hægt að senda skilaboð, vinsamlegast reynið aftur síðar.</string>
     <!-- EXPORT -->
@@ -95,7 +96,6 @@
     <string name="locked">Læst</string>
     <!-- LOG -->
     <!-- MAP -->
-    <string name="map_cache_info">Stærð skyndiminnis: %1$d MB\nNýtt skyndiminni: %2$d MB</string>
     <string name="map_cache_manager">Sýsla með skyndiminni</string>
     <string name="map_cache_size">Núverandi stærð skyndiminnis</string>
     <string name="map_cache_tiles">%1$d reitar</string>
@@ -159,6 +159,9 @@
     <string name="radio_configuration">Stillingar radíós</string>
     <string name="reboot">Endurræsa</string>
     <!-- REMOTE -->
+    <string name="remote_shell_modifier_locked">Læst</string>
+    <string name="remote_shell_send">Senda</string>
+    <string name="remote_shell_status_not_connected">Ekki tengdur</string>
     <!-- REMOVE -->
     <string name="report">Tilkynna</string>
     <!-- REQUEST -->

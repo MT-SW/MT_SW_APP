@@ -27,18 +27,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
@@ -54,7 +50,6 @@ import org.meshtastic.core.navigation.WifiProvisionRoute
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.about
 import org.meshtastic.core.resources.app_settings
-import org.meshtastic.core.resources.app_version
 import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.bottom_nav_settings
 import org.meshtastic.core.resources.device_links
@@ -63,17 +58,13 @@ import org.meshtastic.core.resources.export_configuration
 import org.meshtastic.core.resources.help_and_documentation
 import org.meshtastic.core.resources.import_configuration
 import org.meshtastic.core.resources.info
-import org.meshtastic.core.resources.modules_already_unlocked
-import org.meshtastic.core.resources.modules_unlocked
 import org.meshtastic.core.resources.node_layout_section_title
 import org.meshtastic.core.resources.preferences_language
-import org.meshtastic.core.resources.remotely_administrating
 import org.meshtastic.core.resources.theme
 import org.meshtastic.core.resources.units
 import org.meshtastic.core.resources.wifi_devices
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ListItem
-import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.ChevronRight
@@ -84,18 +75,18 @@ import org.meshtastic.core.ui.icon.HelpOutline
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.List
-import org.meshtastic.core.ui.icon.Memory
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PermScanWifi
 import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.core.ui.util.rememberOpenFileLauncher
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
-import org.meshtastic.core.ui.util.rememberShowToastResource
+import org.meshtastic.feature.settings.component.AppVersionButton
 import org.meshtastic.feature.settings.component.CacheLimitPreference
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.FullMessageTimestampsSetting
 import org.meshtastic.feature.settings.component.HomoglyphSetting
 import org.meshtastic.feature.settings.component.NotificationSection
+import org.meshtastic.feature.settings.component.RadioAdminAppBar
 import org.meshtastic.feature.settings.component.ThemePickerDialog
 import org.meshtastic.feature.settings.component.UnitsOption
 import org.meshtastic.feature.settings.component.UnitsPickerDialog
@@ -107,7 +98,6 @@ import org.meshtastic.feature.settings.radio.component.EditDeviceProfileDialog
 import org.meshtastic.feature.settings.search.SettingsSearchBar
 import org.meshtastic.feature.settings.search.SettingsSearchViewModel
 import org.meshtastic.proto.DeviceProfile
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant.Companion.fromEpochMilliseconds
 
 /**
@@ -214,21 +204,13 @@ fun DesktopSettingsScreen(
 
     Scaffold(
         topBar = {
-            MainAppBar(
+            RadioAdminAppBar(
                 title = stringResource(Res.string.bottom_nav_settings),
-                subtitle =
-                if (state.isLocal) {
-                    null
-                } else {
-                    val remoteName = destNode?.user?.long_name ?: ""
-                    stringResource(Res.string.remotely_administrating, remoteName)
-                },
-                ourNode = null,
-                showNodeChip = false,
-                canNavigateUp = false,
+                isLocal = state.isLocal,
+                destNode = destNode,
                 onNavigateUp = {},
-                actions = {},
-                onClickChip = {},
+                localSubtitle = null,
+                canNavigateUp = false,
             )
         },
     ) { paddingValues ->
@@ -407,55 +389,11 @@ private fun DesktopAppInfoSection(
             onNavigateToAbout()
         }
 
-        DesktopAppVersionButton(
+        AppVersionButton(
             hiddenFeaturesUnlocked = hiddenFeaturesUnlocked,
             appVersionName = appVersionName,
             onUnlockHiddenFeatures = onUnlockHiddenFeatures,
         )
-    }
-}
-
-private const val UNLOCK_CLICK_COUNT = 5
-private const val UNLOCKED_CLICK_COUNT = 3
-private const val UNLOCK_TIMEOUT_SECONDS = 1
-
-@Composable
-private fun DesktopAppVersionButton(
-    hiddenFeaturesUnlocked: Boolean,
-    appVersionName: String,
-    onUnlockHiddenFeatures: () -> Unit,
-) {
-    val scope = rememberCoroutineScope()
-    val showToast = rememberShowToastResource()
-    var clickCount by remember { mutableStateOf(0) }
-
-    LaunchedEffect(clickCount) {
-        if (clickCount in 1..<UNLOCK_CLICK_COUNT) {
-            delay(UNLOCK_TIMEOUT_SECONDS.seconds)
-            clickCount = 0
-        }
-    }
-
-    ListItem(
-        text = stringResource(Res.string.app_version),
-        leadingIcon = MeshtasticIcons.Memory,
-        supportingText = appVersionName,
-        trailingIcon = null,
-    ) {
-        clickCount = clickCount.inc().coerceIn(0, UNLOCK_CLICK_COUNT)
-
-        when {
-            clickCount == UNLOCKED_CLICK_COUNT && hiddenFeaturesUnlocked -> {
-                clickCount = 0
-                scope.launch { showToast(Res.string.modules_already_unlocked) }
-            }
-
-            clickCount == UNLOCK_CLICK_COUNT -> {
-                clickCount = 0
-                onUnlockHiddenFeatures()
-                scope.launch { showToast(Res.string.modules_unlocked) }
-            }
-        }
     }
 }
 

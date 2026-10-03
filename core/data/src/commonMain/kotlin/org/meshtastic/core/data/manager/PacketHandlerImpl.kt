@@ -307,7 +307,8 @@ class PacketHandlerImpl(
         }
     }
 
-    @Suppress("TooGenericExceptionCaught")
+    // Cancellation settles the pending waiters under NonCancellable before it is rethrown.
+    @Suppress("TooGenericExceptionCaught", "SuspendFunSwallowedCancellation")
     private suspend fun awaitAdmittedPacket(packet: MeshPacket, pending: PendingResponse): AwaitedSendResult {
         val routing = checkNotNull(pending.routingDeferred) { "awaited packet must reserve a routing response" }
         return try {

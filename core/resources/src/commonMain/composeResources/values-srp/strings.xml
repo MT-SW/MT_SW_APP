@@ -17,6 +17,8 @@
   -->
 <resources>
     <!-- A11Y -->
+    <string name="a11y_humidity">Влажност</string>
+    <string name="a11y_temperature">Температура</string>
     <string name="about">О</string>
     <string name="accept">Прихвати</string>
     <!-- ACTION -->
@@ -75,7 +77,6 @@
     <string name="channel_7">Канал 7</string>
     <string name="channel_8">Канал 8</string>
     <string name="channel_invalid">Ова URL адреса канала је неважећа и не може се користити</string>
-    <string name="channel_label">Канал</string>
     <string name="channel_name">Назив канала</string>
     <string name="channel_url">Линк канала</string>
     <string name="channels">Канали</string>
@@ -129,6 +130,7 @@
     <string name="device_sleeping">Уређај је у стању спавања</string>
     <string name="direct_message">Директне поруке</string>
     <string name="direct_messages">Директне поруке</string>
+    <string name="disabled">Онемогућено</string>
     <string name="disconnect">Прекините везу</string>
     <string name="disconnected">Раскачено</string>
     <!-- DISCOVERY -->
@@ -143,6 +145,7 @@
     <string name="doc_title_firmware">Ажурирања фирмвера</string>
     <string name="doc_title_nodes">Чворови</string>
     <string name="documentation">Документација</string>
+    <!-- DURATION -->
     <string name="edit">Измени</string>
     <string name="eight_hours">8 Сати</string>
     <!-- EMOJI -->
@@ -216,7 +219,6 @@
     <string name="low_battery_title">Низак ниво батерије: %1$s</string>
     <!-- MAP -->
     <string name="map">Мапа меша</string>
-    <string name="map_cache_info">Капацитет кеш меморије: %1$d MB\n Употреба кеш меморије: %2$d MB</string>
     <string name="map_cache_manager">Меначер кеш меморије</string>
     <string name="map_cache_size">Тренутна величина кеш меморије</string>
     <string name="map_cache_tiles">%1$d плочице</string>
@@ -341,6 +343,10 @@
     <string name="reboot">Поново покрени</string>
     <!-- REMOTE -->
     <string name="remote_admin">Удаљена администрација</string>
+    <string name="remote_shell_key_alt">Висина</string>
+    <string name="remote_shell_modifier_locked">Закључан</string>
+    <string name="remote_shell_send">Пошаљи</string>
+    <string name="remote_shell_status_not_connected">Није повезан</string>
     <!-- REMOVE -->
     <string name="remove">Уклони</string>
     <string name="remove_favorite">Уклони из омиљених</string>

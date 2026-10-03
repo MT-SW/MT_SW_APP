@@ -17,6 +17,8 @@
   -->
 <resources>
     <!-- A11Y -->
+    <string name="a11y_humidity">Vlhkosť</string>
+    <string name="a11y_temperature">Teplota</string>
     <string name="about">O aplikácii</string>
     <string name="accept">Prijať</string>
     <!-- ACTION -->
@@ -67,7 +69,6 @@
     <string name="channel_7">Kanál 7</string>
     <string name="channel_8">Kanál 8</string>
     <string name="channel_invalid">URL adresa tohoto kanála nie je platná a nedá sa použiť</string>
-    <string name="channel_label">Kanál</string>
     <string name="channel_name">Názov kanála</string>
     <string name="channels">Kanále</string>
     <!-- CHIRPY -->
@@ -133,6 +134,7 @@
     <!-- DOC -->
     <string name="doc_clear_search">Vymazať vyhľadávanie</string>
     <string name="doc_title_mqtt">MQTT</string>
+    <!-- DURATION -->
     <string name="edit">Upraviť</string>
     <string name="eight_hours">8 Hodín</string>
     <!-- EMOJI -->
@@ -211,7 +213,6 @@
     <string name="low_battery_title">Slabá batéria: %1$s</string>
     <string name="lux">Lux</string>
     <!-- MAP -->
-    <string name="map_cache_info">Kapacita cache: %1$d MB\nVyužitie cache: %2$d MB</string>
     <string name="map_cache_manager">Cache Manager</string>
     <string name="map_cache_size">Aktuálna veľkosť cache</string>
     <string name="map_cache_tiles">%1$d dlaždíc</string>
@@ -344,6 +345,9 @@
     <!-- REMOTE -->
     <string name="remote_admin">Administrácia na diaľku</string>
     <string name="remote_hardware">Vzdialený hardvér</string>
+    <string name="remote_shell_modifier_locked">Zamknuté</string>
+    <string name="remote_shell_send">Odoslať</string>
+    <string name="remote_shell_status_not_connected">Nepripojené</string>
     <!-- REMOVE -->
     <string name="remove">Odstrániť</string>
     <string name="remove_node_text">Tento uzol bude odstránený z vášho zoznamu, kým váš uzol opäť príjme jeho údaje.</string>

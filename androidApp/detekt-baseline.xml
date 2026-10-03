@@ -4,7 +4,6 @@
   <CurrentIssues>
     <ID>ComplexCondition:MapViewModel.kt:MapViewModel$name.isBlank() || (urlTemplate.isBlank() &amp;&amp; localUri == null) || (localUri == null &amp;&amp; !isValidTileUrlTemplate(urlTemplate))</ID>
     <ID>ComplexCondition:MapViewModel.kt:MapViewModel$normalized.name.isBlank() || (normalized.urlTemplate.isBlank() &amp;&amp; normalized.localUri == null) || (normalized.localUri == null &amp;&amp; !isValidTileUrlTemplate(normalized.urlTemplate))</ID>
-    <ID>LambdaParameterInRestartableEffect:LocationHandler.kt:onPermissionResult: (Boolean) -> Unit</ID>
     <ID>LongMethod:DiscoveryGoogleMap.kt:@OptIn(MapsComposeExperimentalApi::class) @Composable fun DiscoveryGoogleMap</ID>
     <ID>LongMethod:GeminiNanoDocAssistant.kt:GeminiNanoDocAssistant$override fun answerStream: kotlinx.coroutines.flow.Flow&lt;AIDocAssistantResult></ID>
     <ID>LongMethod:GeminiNanoDocAssistant.kt:GeminiNanoDocAssistant$private fun buildPrompt: String</ID>
@@ -17,7 +16,6 @@
     <ID>ReturnCount:MlKitDocTranslator.kt:MlKitDocTranslator$override suspend fun translatePage: TranslationResult</ID>
     <ID>ReturnCount:MlKitMessageTranslator.kt:MlKitMessageTranslator$override suspend fun downloadLanguageModels: DownloadResult</ID>
     <ID>ReturnCount:MlKitMessageTranslator.kt:MlKitMessageTranslator$override suspend fun translate: TranslationResult</ID>
-    <ID>SwallowedException:MapViewModel.kt:MapViewModel$e: Exception</ID>
     <ID>ThrowsCount:MeshtasticAppFunctions.kt:MeshtasticAppFunctions$suspend fun getChannelInfo: GetChannelInfoResponse</ID>
     <ID>ThrowsCount:MeshtasticAppFunctions.kt:MeshtasticAppFunctions$suspend fun getDeviceStatus: GetDeviceStatusResponse</ID>
     <ID>ThrowsCount:MeshtasticAppFunctions.kt:MeshtasticAppFunctions$suspend fun getMeshMetrics: GetMeshMetricsResponse</ID>
@@ -25,16 +23,23 @@
     <ID>ThrowsCount:MeshtasticAppFunctions.kt:MeshtasticAppFunctions$suspend fun getNodeList: GetNodeListResponse</ID>
     <ID>ThrowsCount:MeshtasticAppFunctions.kt:MeshtasticAppFunctions$suspend fun getRecentMessages: GetRecentMessagesResponse</ID>
     <ID>ThrowsCount:MeshtasticAppFunctions.kt:MeshtasticAppFunctions$suspend fun sendMessage: SendMessageResponse</ID>
-    <ID>TooGenericExceptionCaught:FdroidMapOverlayRenderer.kt:FdroidMapOverlayRenderer$e: Exception</ID>
     <ID>TooGenericExceptionCaught:GeminiNanoDocAssistant.kt:GeminiNanoDocAssistant$e: Exception</ID>
     <ID>TooGenericExceptionCaught:MapView.kt:e: Exception</ID>
     <ID>TooGenericExceptionCaught:MapViewModel.kt:MapViewModel$e: Exception</ID>
     <ID>TooGenericExceptionCaught:MlKitDocTranslator.kt:MlKitDocTranslator$e: Exception</ID>
     <ID>TooGenericExceptionCaught:MlKitMessageTranslator.kt:MlKitMessageTranslator$e: Exception</ID>
     <ID>TooManyFunctions:GeminiNanoDocAssistant.kt:GeminiNanoDocAssistant : AIDocAssistant</ID>
-    <ID>TooManyFunctions:MainActivity.kt:MainActivity : AppCompatActivity</ID>
     <ID>TooManyFunctions:MapView.kt:org.meshtastic.app.map.MapView.kt</ID>
-    <ID>TooManyFunctions:MapViewModel.kt:MapViewModel : BaseMapViewModel</ID>
+    <ID>UnnecessaryLaunchedEffect:Main.kt:LaunchedEffect</ID>
+    <ID>UnnecessaryLaunchedEffect:MapView.kt:LaunchedEffect</ID>
+    <ID>UnnecessaryLaunchedEffect:TracerouteMap.kt:LaunchedEffect</ID>
+    <ID>UnnecessaryLaunchedEffect:WaypointMarkers.kt:LaunchedEffect</ID>
+    <ID>UseOrEmpty:MapView.kt:RenderedMapLayer$dataLayer.properties["groundOverlays"] as? List&lt;KmlGroundOverlay&gt; ?: emptyList()</ID>
+    <ID>UseOrEmpty:MapView.kt:RenderedMapLayer$dataLayer.properties["images"] as? Map&lt;String, Bitmap&gt; ?: emptyMap()</ID>
+    <ID>UseOrEmpty:MapView.kt:mode.overlay?.forwardRoute?.mapNotNull { nodeLookup[it]?.position?.toLatLng() } ?: emptyList()</ID>
+    <ID>UseOrEmpty:MapView.kt:mode.overlay?.returnRoute?.mapNotNull { nodeLookup[it]?.position?.toLatLng() } ?: emptyList()</ID>
+    <ID>UseOrEmpty:MapView.kt:tracerouteSelection?.nodesForMarkers ?: emptyList()</ID>
+    <ID>UseOrEmpty:MapViewModel.kt:MapViewModel$uri.path ?: ""</ID>
     <ID>ViewModelForwarding:MapView.kt:CustomTileProviderManagerSheet(mapViewModel = mapViewModel)</ID>
     <ID>ViewModelForwarding:MapView.kt:MainMapContent( nodeClusterItems = nodeClusterItems, mapFilterState = mapFilterState, navigateToNodeDetails = navigateToNodeDetails, displayableWaypoints = displayableWaypoints, myNodeNum = myNodeNum, onEditWaypointRequest = { editingWaypoint = it }, onDeleteWaypointRequest = { deletingWaypoint = it }, onShowGeofenceInfo = { geofenceInfoWaypoint = it }, selectedWaypointId = selectedWaypointId, mapLayers = mapLayers, layerOpacity = layerOpacity, mapViewModel = mapViewModel, cameraPositionState = cameraPositionState, coroutineScope = coroutineScope, onShowClusterItemsDialog = { showClusterItemsDialog = it }, )</ID>
     <ID>ViewModelForwarding:MapView.kt:MapLayerOverlay(layerItem, opacity, mapViewModel)</ID>

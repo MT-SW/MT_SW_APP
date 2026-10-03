@@ -59,7 +59,6 @@ import org.meshtastic.core.model.Message
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.noiseFloorOrNull
-import org.meshtastic.core.model.util.formatUptime
 import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.repository.FirmwareUpdateProgress
 import org.meshtastic.core.repository.FirmwareUpdateStatusRepository
@@ -82,6 +81,7 @@ import org.meshtastic.core.resources.discovery_scan_in_progress
 import org.meshtastic.core.resources.firmware_update_available
 import org.meshtastic.core.resources.firmware_update_in_progress
 import org.meshtastic.core.resources.firmware_update_notification_android
+import org.meshtastic.core.resources.formatDurationSuspend
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.local_stats_bad
 import org.meshtastic.core.resources.local_stats_battery
@@ -163,6 +163,7 @@ class MeshNotificationManagerImpl(
         private const val BUBBLE_DESIRED_HEIGHT_DP = 600
         private const val TAG_MESSAGE_SUMMARY = "message_summary"
         private const val TAG_WAYPOINT = "waypoint"
+        private const val TAG_REACTION = "reaction"
         private const val TAG_ALERT = "alert"
         private const val TAG_NEW_NODE = "new_node"
         private const val TAG_LOW_BATTERY = "low_battery"
@@ -259,8 +260,7 @@ class MeshNotificationManagerImpl(
      */
     internal suspend fun ensureChannels() = channelsMutex.withLock {
         if (channelsReady) return@withLock
-        val labels =
-            withTimeoutOrNull(CHANNEL_LABEL_TIMEOUT) { safeCatching { resolveChannelLabels() }.getOrNull() }
+        val labels = withTimeoutOrNull(CHANNEL_LABEL_TIMEOUT) { safeCatching { resolveChannelLabels() }.getOrNull() }
         val groups =
             NotificationChannelGroupSpec.entries.map { it.toGroup(labels?.groups?.get(it) ?: applicationLabel) }
         notificationManager.createNotificationChannelGroups(groups)
@@ -464,7 +464,16 @@ class MeshNotificationManagerImpl(
         channelName: String?,
         isSilent: Boolean,
     ) {
-        showConversationNotification(contactKey, isBroadcast, channelName, conversationName = name, isSilent = isSilent)
+        ensureChannels()
+        val builder =
+            commonBuilder(NotificationChannelSpec.Reactions, createOpenMessageIntent(contactKey))
+                .setContentTitle(name)
+                .setContentText(emoji)
+                .setCategory(Notification.CATEGORY_MESSAGE)
+                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                .setAutoCancel(true)
+        if (isSilent) builder.setSilent(true)
+        notificationManager.notify(TAG_REACTION, contactKey.hashCode(), builder.build())
     }
 
     override suspend fun updateWaypointNotification(
@@ -553,24 +562,23 @@ class MeshNotificationManagerImpl(
         // InboxStyle, not MessagingStyle: the summary has no reply or mark-as-read actions, and Android Auto takes a
         // MessagingStyle notification for a conversation it can answer.
         val you = getStringSuspend(Res.string.you)
-        val lines =
-            activeNotifications.mapNotNull { sbn ->
-                // Prefer the child's real MessagingStyle: its latest message carries the actual sender, so the line
-                // reads "Hawk Ridge: …" rather than the conversation title.
-                val latest =
-                    NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(sbn.notification)
-                        ?.messages
-                        ?.lastOrNull()
-                val sender = latest?.person?.name ?: latest?.let { you }
-                val text = latest?.text
-                if (sender != null && text != null) {
-                    "$sender: $text"
-                } else {
-                    val senderTitle = sbn.notification.extras.getCharSequence(Notification.EXTRA_TITLE)
-                    val messageText = sbn.notification.extras.getCharSequence(Notification.EXTRA_TEXT)
-                    if (senderTitle != null && messageText != null) "$senderTitle: $messageText" else null
-                }
+        val lines = activeNotifications.mapNotNull { sbn ->
+            // Prefer the child's real MessagingStyle: its latest message carries the actual sender, so the line
+            // reads "Hawk Ridge: …" rather than the conversation title.
+            val latest =
+                NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(sbn.notification)
+                    ?.messages
+                    ?.lastOrNull()
+            val sender = latest?.person?.name ?: latest?.let { you }
+            val text = latest?.text
+            if (sender != null && text != null) {
+                "$sender: $text"
+            } else {
+                val senderTitle = sbn.notification.extras.getCharSequence(Notification.EXTRA_TITLE)
+                val messageText = sbn.notification.extras.getCharSequence(Notification.EXTRA_TEXT)
+                if (senderTitle != null && messageText != null) "$senderTitle: $messageText" else null
             }
+        }
         val appName = getStringSuspend(Res.string.meshtastic_app_name)
         val inboxStyle = NotificationCompat.InboxStyle().setBigContentTitle(appName)
         lines.forEach { inboxStyle.addLine(it) }
@@ -716,6 +724,7 @@ class MeshNotificationManagerImpl(
     override suspend fun cancelMessageNotification(contactKey: String) {
         val id = contactKey.hashCode()
         notificationManager.cancel(TAG_MESSAGE, id)
+        notificationManager.cancel(TAG_REACTION, id)
         // Rebuild (or clear) the group summary so it doesn't keep showing the dismissed conversation in Android Auto.
         // Pass the id we just cancelled so a stale activeNotifications snapshot doesn't keep the summary alive.
         showGroupSummary(justCancelledId = id)
@@ -1187,7 +1196,8 @@ class MeshNotificationManagerImpl(
             }
         }
         parts.add(BULLET + getStringSuspend(Res.string.local_stats_nodes, num_online_nodes, num_total_nodes))
-        parts.add(BULLET + getStringSuspend(Res.string.local_stats_uptime, formatUptime(uptime_seconds)))
+        val uptime = formatDurationSuspend(uptime_seconds.toLong())
+        parts.add(BULLET + getStringSuspend(Res.string.local_stats_uptime, uptime))
         parts.add(
             BULLET +
                 getStringSuspend(
@@ -1247,7 +1257,9 @@ class MeshNotificationManagerImpl(
     private suspend fun DeviceMetrics.formatToStringSuspend(): String {
         val parts = mutableListOf<String>()
         battery_level?.let { parts.add(BULLET + getStringSuspend(Res.string.local_stats_battery, it)) }
-        uptime_seconds?.let { parts.add(BULLET + getStringSuspend(Res.string.local_stats_uptime, formatUptime(it))) }
+        uptime_seconds?.let {
+            parts.add(BULLET + getStringSuspend(Res.string.local_stats_uptime, formatDurationSuspend(it.toLong())))
+        }
         if (channel_utilization != null || air_util_tx != null) {
             parts.add(
                 BULLET +

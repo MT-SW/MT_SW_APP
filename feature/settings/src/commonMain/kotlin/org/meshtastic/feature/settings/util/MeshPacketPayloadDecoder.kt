@@ -173,7 +173,7 @@ private fun Byte.toPayloadHex(): String = this.toUByte().toString(16).padStart(2
 private fun formatNodeWithShortNameForPayload(nodeNum: Int, nodeRepository: NodeRepository): String {
     val user = nodeRepository.nodeDBbyNum.value[nodeNum]?.user
     val shortName = user?.short_name?.takeIf { it.isNotEmpty() } ?: ""
-    val nodeId = "!${nodeNum.toUInt().toString(16).padStart(8, '0')}"
+    val nodeId = NodeAddress.numToDefaultId(nodeNum)
     return if (shortName.isNotEmpty()) "$nodeId ($shortName)" else nodeId
 }
 

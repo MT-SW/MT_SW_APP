@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withTimeout
-import kotlinx.serialization.encodeToString
 import org.meshtastic.core.ble.BleCharacteristic
 import org.meshtastic.core.ble.BleConnectionFactory
 import org.meshtastic.core.ble.BleConnectionState
@@ -202,22 +201,14 @@ class NymeaWifiService(
             }
     }
 
-    /** Disconnect and cancel the service scope. */
+    /** Disconnect, which releases the BLE peripheral, then cancel the service scope. */
     suspend fun close() {
-        bleConnection.disconnect()
-        reassembler.reset()
-        serviceScope.cancel()
-    }
-
-    /**
-     * Synchronous teardown — cancels the service scope (and its child BLE connection) without suspending.
-     *
-     * Use this from `ViewModel.onCleared()` where `viewModelScope` is already cancelled and launching a new coroutine
-     * is not possible.
-     */
-    fun cancel() {
-        reassembler.reset()
-        serviceScope.cancel()
+        try {
+            bleConnection.disconnect()
+        } finally {
+            reassembler.reset()
+            serviceScope.cancel()
+        }
     }
 
     // endregion
@@ -250,8 +241,7 @@ class NymeaWifiService(
      */
     private suspend fun fetchConnectionIpAddress(): String? = safeCatching {
         sendCommand(CMD_GET_CONNECTION, NymeaJson.encodeToString(NymeaSimpleCommand(CMD_GET_CONNECTION)))
-        val response =
-            NymeaJson.decodeFromString<NymeaResponse>(waitForResponse(timeout = CONNECTION_INFO_TIMEOUT))
+        val response = NymeaJson.decodeFromString<NymeaResponse>(waitForResponse(timeout = CONNECTION_INFO_TIMEOUT))
         if (response.responseCode == RESPONSE_SUCCESS) {
             response.connectionInfo?.ipAddress?.takeIf { it.isNotBlank() }
         } else {

@@ -154,7 +154,7 @@ class KableBleConnection(private val scope: CoroutineScope, private val loggingC
         // _deviceFlow.emit() is intentionally outside this block — making it
         // non-cancellable could hang teardown on a slow collector.
         withContext(NonCancellable) {
-            cleanUpPeripheral(device.address)
+            cleanUpPeripheral()
             peripheral = p
             ActiveBleConnection.active = ActiveConnection(p, device.address)
         }
@@ -262,7 +262,9 @@ class KableBleConnection(private val scope: CoroutineScope, private val loggingC
         _deviceFlow.emit(null)
     }
 
-    @Suppress("ThrowsCount")
+    // The caller's own cancellation is rethrown by ensureActive(); only a dead connection scope becomes
+    // NotConnectedException.
+    @Suppress("ThrowsCount", "SuspendFunSwallowedCancellation")
     override suspend fun <T> profile(
         serviceUuid: Uuid,
         timeout: Duration,
@@ -312,8 +314,8 @@ class KableBleConnection(private val scope: CoroutineScope, private val loggingC
     override suspend fun negotiateMtu(mtu: Int): Int? = peripheral?.negotiateMtu(mtu)
 
     /** Ensures the previous peripheral's GATT resources are fully released. */
-    private suspend fun cleanUpPeripheral(tag: String) {
-        withContext(NonCancellable) { safeClosePeripheral(tag) }
+    private suspend fun cleanUpPeripheral() {
+        withContext(NonCancellable) { safeClosePeripheral("replace") }
     }
 
     /**
@@ -322,7 +324,8 @@ class KableBleConnection(private val scope: CoroutineScope, private val loggingC
      * Kable requires `close()` to release broadcast receivers on Android (Kable issue #359). Separate try/catch blocks
      * ensure `close()` always runs even if `disconnect()` throws.
      */
-    @Suppress("TooGenericExceptionCaught")
+    // Teardown under NonCancellable: close() must run whatever disconnect() throws, cancellation included.
+    @Suppress("TooGenericExceptionCaught", "SuspendFunSwallowedCancellation")
     private suspend fun safeClosePeripheral(tag: String) {
         try {
             peripheral?.disconnect()

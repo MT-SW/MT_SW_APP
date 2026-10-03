@@ -47,6 +47,7 @@ import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.RadioSessionContext
+import org.meshtastic.core.repository.RadioSessionLease
 import org.meshtastic.proto.DeviceMetadata
 import org.meshtastic.proto.DeviceMetrics
 import org.meshtastic.proto.EnvironmentMetrics
@@ -206,7 +207,7 @@ class NodeManagerImplTest {
     }
 
     @Test
-    fun `updateNodeAndPersist awaits the repository write`() = testScope.runTest {
+    fun `persisting a node update awaits the repository write`() = testScope.runTest {
         val nodeNum = 1234
         nodeManager.setNodeDbReady(true)
         nodeManager.setAllowNodeDbWrites(true)
@@ -218,14 +219,14 @@ class NodeManagerImplTest {
                 releaseWrite.await()
             }
 
-        val update = async { nodeManager.updateNodeAndPersist(nodeNum) { node -> node.copy(lastHeard = 42) } }
+        val update = async { nodeManager.updateNodeStatusAndPersist(nodeNum, "away") }
         writeStarted.await()
         assertFalse(update.isCompleted)
         releaseWrite.complete(Unit)
         update.await()
 
         verifySuspend { nodeRepository.upsert(any()) }
-        assertEquals(42, nodeManager.nodeDBbyNodeNum[nodeNum]?.lastHeard)
+        assertEquals("away", nodeManager.nodeDBbyNodeNum[nodeNum]?.nodeStatus)
     }
 
     @Test
@@ -253,12 +254,10 @@ class NodeManagerImplTest {
                 persisted += node
             }
 
-        val first = async { nodeManager.updateNodeAndPersist(nodeNum) { node -> node.copy(lastHeard = 1) } }
+        val first = async { nodeManager.updateNodeStatusAndPersist(nodeNum, "first") }
         firstWriteStarted.await()
         val second =
-            async(start = CoroutineStart.UNDISPATCHED) {
-                nodeManager.updateNodeAndPersist(nodeNum) { node -> node.copy(lastHeard = 2) }
-            }
+            async(start = CoroutineStart.UNDISPATCHED) { nodeManager.updateNodeStatusAndPersist(nodeNum, "second") }
         runCurrent()
         assertFalse(
             secondWriteStarted.isCompleted,
@@ -269,8 +268,100 @@ class NodeManagerImplTest {
         first.await()
         second.await()
 
-        assertEquals(listOf(1, 2), persisted.map(Node::lastHeard))
-        assertEquals(2, nodeManager.nodeDBbyNodeNum[nodeNum]?.lastHeard)
+        assertEquals(listOf("first", "second"), persisted.map(Node::nodeStatus))
+        assertEquals("second", nodeManager.nodeDBbyNodeNum[nodeNum]?.nodeStatus)
+    }
+
+    private fun admitLeases(session: RadioSessionContext) {
+        everySuspend { radioInterfaceService.runWithSessionLease(session, any()) } calls
+            {
+                @Suppress("UNCHECKED_CAST")
+                val block = it.args[1] as (suspend (RadioSessionLease) -> Unit)
+                block(
+                    object : RadioSessionLease {
+                        override val session: RadioSessionContext = session
+
+                        override fun isCurrent(): Boolean = true
+                    },
+                )
+                true
+            }
+    }
+
+    @Test
+    fun `session-bound persistence writes the newest state and coalesces queued updates`() = testScope.runTest {
+        val nodeNum = 1234
+        val session = RadioSessionContext(generation = 7L, address = "ble:same")
+        nodeManager.setNodeDbReady(true)
+        nodeManager.setAllowNodeDbWrites(true)
+        admitLeases(session)
+        val firstWriteStarted = CompletableDeferred<Unit>()
+        val releaseFirstWrite = CompletableDeferred<Unit>()
+        val persisted = mutableListOf<Node>()
+        everySuspend { nodeRepository.upsert(any()) } calls
+            {
+                if (!firstWriteStarted.isCompleted) {
+                    firstWriteStarted.complete(Unit)
+                    releaseFirstWrite.await()
+                }
+                persisted += it.arg<Node>(0)
+            }
+
+        nodeManager.updateNodeForSession(nodeNum, session) { node -> node.copy(lastHeard = 1) }
+        assertTrue(firstWriteStarted.isCompleted, "the first write is in flight")
+        nodeManager.updateNodeForSession(nodeNum, session) { node -> node.copy(lastHeard = 2) }
+        nodeManager.updateNodeForSession(nodeNum, session) { node -> node.copy(lastHeard = 3) }
+        runCurrent()
+        assertTrue(persisted.isEmpty(), "later writes must queue behind the first on the node's lane")
+
+        releaseFirstWrite.complete(Unit)
+        advanceUntilIdle()
+
+        assertEquals(listOf(1, 3), persisted.map(Node::lastHeard))
+        assertEquals(3, nodeManager.nodeDBbyNodeNum[nodeNum]?.lastHeard)
+    }
+
+    @Test
+    fun `an update from a newer session schedules its own write`() = testScope.runTest {
+        val nodeNum = 1234
+        val oldSession = RadioSessionContext(generation = 7L, address = "ble:same")
+        val newSession = RadioSessionContext(generation = 8L, address = "ble:same")
+        nodeManager.setNodeDbReady(true)
+        nodeManager.setAllowNodeDbWrites(true)
+        admitLeases(oldSession)
+        admitLeases(newSession)
+        val releaseFirstWrite = CompletableDeferred<Unit>()
+        var writes = 0
+        everySuspend { nodeRepository.upsert(any()) } calls { if (++writes == 1) releaseFirstWrite.await() }
+
+        nodeManager.updateNodeForSession(nodeNum, oldSession) { node -> node.copy(lastHeard = 1) }
+        nodeManager.updateNodeForSession(nodeNum, oldSession) { node -> node.copy(lastHeard = 2) }
+        nodeManager.updateNodeForSession(nodeNum, newSession) { node -> node.copy(lastHeard = 3) }
+        runCurrent()
+
+        verifySuspend(exactly(1)) { radioInterfaceService.runWithSessionLease(newSession, any()) }
+        releaseFirstWrite.complete(Unit)
+        advanceUntilIdle()
+    }
+
+    @Test
+    fun `a persist rejected by a retired session does not block a later write`() = testScope.runTest {
+        val nodeNum = 1234
+        val oldSession = RadioSessionContext(generation = 7L, address = "ble:same")
+        val newSession = RadioSessionContext(generation = 8L, address = "ble:same")
+        nodeManager.setNodeDbReady(true)
+        nodeManager.setAllowNodeDbWrites(true)
+        everySuspend { radioInterfaceService.runWithSessionLease(oldSession, any()) } returns false
+        admitLeases(newSession)
+        val persisted = mutableListOf<Node>()
+        everySuspend { nodeRepository.upsert(any()) } calls { persisted += it.arg<Node>(0) }
+
+        nodeManager.updateNodeForSession(nodeNum, oldSession) { node -> node.copy(lastHeard = 1) }
+        runCurrent()
+        nodeManager.updateNodeForSession(nodeNum, newSession) { node -> node.copy(lastHeard = 2) }
+        runCurrent()
+
+        assertEquals(listOf(2), persisted.map(Node::lastHeard))
     }
 
     @Test
@@ -294,10 +385,10 @@ class NodeManagerImplTest {
         nodeManager.setNodeDbReady(true)
         nodeManager.setAllowNodeDbWrites(false)
 
-        nodeManager.updateNodeAndPersist(nodeNum) { node -> node.copy(lastHeard = 42) }
+        nodeManager.updateNodeStatusAndPersist(nodeNum, "away")
 
         verifySuspend(exactly(0)) { nodeRepository.upsert(any()) }
-        assertEquals(42, nodeManager.nodeDBbyNodeNum[nodeNum]?.lastHeard)
+        assertEquals("away", nodeManager.nodeDBbyNodeNum[nodeNum]?.nodeStatus)
     }
 
     @Test
@@ -2868,8 +2959,7 @@ class NodeManagerImplTest {
         nodeManager.applyTrustedIdentityMigrations(listOf(oldNum))
         advanceUntilIdle()
         val replayDispatches = mutableListOf<Node>()
-        everySuspend { serviceNotifications.showNewNodeSeenNotification(capture(replayDispatches), any()) } returns
-            Unit
+        everySuspend { serviceNotifications.showNewNodeSeenNotification(capture(replayDispatches), any()) } returns Unit
         // Now replay: the canonical number (crc32(key)) has NOT appeared yet
         nodeManager.handleReceivedUser(oldNum, userWithKey(key, "Replay", "RP"), manuallyVerified = false)
         advanceUntilIdle()
@@ -2971,8 +3061,7 @@ class NodeManagerImplTest {
         advanceUntilIdle()
         // Early replay of old number User packet — should be suppressed
         val dispatchedBefore = mutableListOf<Node>()
-        everySuspend { serviceNotifications.showNewNodeSeenNotification(capture(dispatchedBefore), any()) } returns
-            Unit
+        everySuspend { serviceNotifications.showNewNodeSeenNotification(capture(dispatchedBefore), any()) } returns Unit
         nodeManager.handleReceivedUser(oldNum, userWithKey(key, "Replay", "RP"), manuallyVerified = false)
         advanceUntilIdle()
         // The old number should NOT be in nodeDB
@@ -3268,5 +3357,70 @@ class NodeManagerImplTest {
             assertEquals("Replacement", reused.user.long_name)
             assertEquals(reuseKey, reused.publicKey)
             assertEquals(1, reuseDispatches.count { it.num == num && it.user.long_name == "Replacement" })
+        }
+
+    @Test
+    fun `a stalled normalization from a superseded session cannot clear the next session's unheard flags`() =
+        testScope.runTest {
+            val sessionA = RadioSessionContext(generation = 7L, address = "ble:same")
+            val sessionB = RadioSessionContext(generation = 8L, address = "ble:same")
+            val admissionGate = CompletableDeferred<Unit>()
+            val writeGate = CompletableDeferred<Unit>()
+            var sessionASuperseded = false
+            // The node database as the repository resolves it when the write finally runs: session B's rows.
+            val heardByNum = mutableMapOf<Int, Boolean>()
+            everySuspend { radioInterfaceService.runWithSessionLease(sessionA, any()) } calls
+                {
+                    admissionGate.await()
+                    if (sessionASuperseded) {
+                        false
+                    } else {
+                        @Suppress("UNCHECKED_CAST")
+                        val block = it.args[1] as (suspend (RadioSessionLease) -> Unit)
+                        block(
+                            object : RadioSessionLease {
+                                override val session: RadioSessionContext = sessionA
+
+                                override fun isCurrent(): Boolean = true
+                            },
+                        )
+                        true
+                    }
+                }
+            everySuspend { nodeRepository.markAllHeardOnCurrentLora() } calls
+                {
+                    writeGate.await()
+                    heardByNum.keys.toList().forEach { heardByNum[it] = true }
+                }
+
+            // Session A: firmware without the capability, so normalization is launched and stalls.
+            nodeManager.setFirmwareVersion("2.5.0", sessionA)
+            runCurrent()
+
+            // Session A is superseded by session B, which reports the capability and installs unheard nodes.
+            sessionASuperseded = true
+            nodeManager.setFirmwareVersion("9.9.9", sessionB)
+            val unheard = listOf(0x11, 0x22)
+            unheard.forEach { num ->
+                nodeManager.installNodeInfo(
+                    ProtoNodeInfo.Builder()
+                        .also { wb ->
+                            wb.num = num
+                            wb.heard_on_current_lora = false
+                        }
+                        .build(),
+                )
+                heardByNum[num] = false
+            }
+
+            // The stalled work completes.
+            admissionGate.complete(Unit)
+            writeGate.complete(Unit)
+            advanceUntilIdle()
+
+            unheard.forEach { num ->
+                assertEquals(false, heardByNum[num], "session B's node $num was marked heard by session A's write")
+            }
+            assertTrue(nodeManager.reportsHeardOnCurrentLora.value)
         }
 }

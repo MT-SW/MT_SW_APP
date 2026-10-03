@@ -17,16 +17,20 @@
   -->
 <resources>
     <!-- A11Y -->
+    <string name="a11y_humidity">濕度</string>
     <string name="a11y_label_value">%1$s: %2$s</string>
     <string name="a11y_message_from">來自 %1$s 的訊息：%2$s</string>
     <string name="a11y_node_distance_away">距離 %1$s</string>
     <string name="a11y_node_favorite">最愛</string>
-    <string name="a11y_node_hops_away">距離 %1$d 跳</string>
+    <plurals name="a11y_node_hops_count">
+        <item quantity="other">距離 %1$d 跳</item>
+    </plurals>
     <string name="a11y_node_last_heard">最後收到 %1$s</string>
     <string name="a11y_node_offline">離線</string>
     <string name="a11y_node_online">線上</string>
     <string name="a11y_node_role">角色 %1$s</string>
     <string name="a11y_node_signal">訊號 %1$s</string>
+    <string name="a11y_temperature">溫度</string>
     <string name="about">關於</string>
     <string name="accept">接受</string>
     <string name="acknowledgements">致謝</string>
@@ -127,7 +131,6 @@
     <string name="channel_8">頻道 8</string>
     <string name="channel_features">頻道功能</string>
     <string name="channel_invalid">此頻道 URL 無效，無法使用</string>
-    <string name="channel_label">頻道</string>
     <string name="channel_name">頻道名稱</string>
     <string name="channel_url">頻道網址</string>
     <string name="channel_utilization">頻道利用率</string>
@@ -287,6 +290,7 @@
     <string name="direct_message">直通訊息</string>
     <string name="direct_message_key">私訊金鑰</string>
     <string name="direct_messages">私訊</string>
+    <string name="disabled">已停用</string>
     <string name="discard_changes">放棄變更</string>
     <string name="disconnect">中斷連線</string>
     <string name="disconnected">已中斷連線</string>
@@ -318,7 +322,6 @@
     <string name="doc_keywords_messages">訊息,頻道,加密,直接,廣播,快速對話</string>
     <string name="doc_keywords_mqtt">mqtt,代理,網際網路,橋接,上行,下行</string>
     <string name="doc_keywords_node_metrics">指標,遙測,訊號,snr,rssi,電池,路由追蹤</string>
-    <string name="doc_keywords_nodes">節點,mesh,清單,角色,狀態,最愛,篩選</string>
     <string name="doc_keywords_onboarding">設定,歡迎,權限,首次啟動</string>
     <string name="doc_keywords_settings_module">模組,序列,遙測,罐頭訊息,儲存轉發,管理</string>
     <string name="doc_keywords_settings_radio">設定,無線電,lora,地區,數據機,裝置,電源,安全性</string>
@@ -353,6 +356,7 @@
     <string name="downlink_feature_description">網際網路閘道的訊息會轉發到本地網狀網路，但因為採用零跳躍政策，來自預設 MQTT 伺服器的流量只會到達本裝置，不會再轉發給其他節點。</string>
     <string name="download">下載</string>
     <string name="duplicated_public_key_title">偵測到重複的公鑰</string>
+    <!-- DURATION -->
     <string name="dynamic">動態</string>
     <string name="easily_set_up_private_mesh_networks">輕鬆設定私有網狀網絡，以實現偏遠地區安全可靠的通訊。</string>
     <string name="edit">編輯</string>
@@ -452,6 +456,7 @@
     <string name="firmware_update_taking_a_while">處理中，請稍候⋯⋯</string>
     <string name="firmware_update_target">目標裝置：%1$s</string>
     <string name="firmware_update_title">韌體更新</string>
+    <string name="firmware_update_transfer_percent">%1$d%</string>
     <string name="firmware_update_unknown_error">未知錯誤</string>
     <string name="firmware_update_unknown_hardware">未知的硬體型號: %1$d</string>
     <string name="firmware_update_unknown_release">無法識別的遠端版本</string>
@@ -592,7 +597,6 @@
     <string name="manual_position_request">需要手動定位位置</string>
     <!-- MAP -->
     <string name="map">Mesh 地圖</string>
-    <string name="map_cache_info">快取容量: %1$d MB\n快取使用: %2$d MB</string>
     <string name="map_cache_manager">快取管理</string>
     <string name="map_cache_size">目前快取大小</string>
     <string name="map_cache_tiles">%1$d 圖磚</string>
@@ -715,7 +719,6 @@
     <string name="no_bluetooth_devices_seen">未偵測到藍牙裝置</string>
     <string name="no_custom_tile_sources_found">沒有自定義圖專來源。</string>
     <string name="no_device_selected">未選擇裝置</string>
-    <string name="no_devices_found">找不到裝置</string>
     <string name="no_files_manifested">未發現任何檔案。</string>
     <string name="no_local_stats">沒有可用的統計資料</string>
     <string name="no_map_layers_loaded">未載入自訂圖層。</string>
@@ -908,6 +911,11 @@
     <string name="remote_hardware">遠程硬件</string>
     <string name="remote_hardware_config">遠端硬體設定</string>
     <string name="remote_hardware_enabled">啟動遠端硬體</string>
+    <string name="remote_shell_key_alt">海拔</string>
+    <string name="remote_shell_key_home">主頁</string>
+    <string name="remote_shell_modifier_locked">鎖定</string>
+    <string name="remote_shell_send">傳送</string>
+    <string name="remote_shell_status_not_connected">未連線</string>
     <string name="remotely_administrating">"[遠端] %1$s"</string>
     <!-- REMOVE -->
     <string name="remove">移除</string>

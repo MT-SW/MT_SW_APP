@@ -17,6 +17,8 @@
   -->
 <resources>
     <!-- A11Y -->
+    <string name="a11y_humidity">Vlaga</string>
+    <string name="a11y_temperature">Temperatura</string>
     <string name="about">O programu</string>
     <string name="accept">Sprejmi</string>
     <!-- ACTION -->
@@ -45,7 +47,6 @@
     <string name="ch_util_definition">Uporaba za trenutni kanal, vključno z dobro oblikovanimi TX, RX in napačno oblikovanim RX (šum).</string>
     <!-- CHANNEL -->
     <string name="channel_invalid">Neveljaven kanal</string>
-    <string name="channel_label">Kanal</string>
     <string name="channel_name">Ime kanala</string>
     <!-- CHIRPY -->
     <string name="choose_theme">Izberi temo</string>
@@ -83,6 +84,7 @@
     <!-- DISTANCE -->
     <string name="distance">Razdalja</string>
     <!-- DOC -->
+    <!-- DURATION -->
     <string name="edit">Uredi</string>
     <string name="eight_hours">8 Ur</string>
     <!-- EMOJI -->
@@ -125,7 +127,6 @@
     <!-- LOG -->
     <string name="logs">Dnevniki</string>
     <!-- MAP -->
-    <string name="map_cache_info">Velikost predpomnilnika: %1$d MB\nUporaba predpomnilnika: %2$d MB</string>
     <string name="map_cache_manager">Upravitelj predpomnilnika</string>
     <string name="map_cache_size">Trenutna velikost predpomnilnika</string>
     <string name="map_cache_tiles">%1$d plošče</string>
@@ -215,6 +216,9 @@
     <string name="reboot">Ponovni zagon</string>
     <!-- REMOTE -->
     <string name="remote_admin">Administracija na daljavo</string>
+    <string name="remote_shell_modifier_locked">Zaklenjeno</string>
+    <string name="remote_shell_send">Pošlji</string>
+    <string name="remote_shell_status_not_connected">Ni povezano</string>
     <!-- REMOVE -->
     <string name="remove">Odstrani</string>
     <string name="remove_node_text">To vozlišče bo odstranjeno z vašega seznama, dokler vaše vozlišče znova ne prejme njegovih podatkov.</string>
