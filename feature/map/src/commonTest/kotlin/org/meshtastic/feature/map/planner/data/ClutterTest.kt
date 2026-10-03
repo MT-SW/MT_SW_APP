@@ -184,6 +184,17 @@ class ClutterTest {
     }
 
     @Test
+    fun linkPartsSplitWoodsAndBuildings() {
+        val short = OsmQueries.linkParts(GeoPoint(50.8661, 20.6286), GeoPoint(50.8661, 20.7))
+        assertEquals(2, short.size) // woods, buildings of the whole path
+        assertTrue(short[0].contains("""["natural"="wood"]""") && !short[0].contains("building"))
+        assertTrue(short[1].contains("""way["building"](around:30,""") && !short[1].contains("wood"))
+        val long = OsmQueries.linkParts(GeoPoint(50.0, 20.0), GeoPoint(50.0, 20.6)) // about 43 km
+        assertEquals(3, long.size) // woods, buildings near each end
+        assertTrue(long.all { it.startsWith("[out:json][timeout:${OsmQueries.LINK_SERVER_TIMEOUT_S}]") })
+    }
+
+    @Test
     fun polylineIsBounded() {
         val a = GeoPoint(50.0, 20.0)
         val b = GeoPoint(51.0, 22.0)

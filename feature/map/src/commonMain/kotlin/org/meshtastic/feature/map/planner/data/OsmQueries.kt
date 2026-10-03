@@ -32,39 +32,64 @@ object OsmQueries {
      * this device. Set too low (it was 16 MiB once) the server answers "out of memory" even for a tiny area. What the
      * device downloads is bounded separately by the answer size limit in PlannerOverpass.
      */
-    const val SERVER_TIMEOUT_S = 30
+    const val SERVER_TIMEOUT_S = 40
+
+    /** A link query follows a path of tens of kilometres and may take longer than a piece of a coverage area. */
+    const val LINK_SERVER_TIMEOUT_S = 60
     const val SERVER_MAX_BYTES = 268_435_456
 
     private const val POLYLINE_SPACING_M = 1500.0
     private val AREA_LANDUSE = listOf("forest", "residential", "commercial", "industrial", "retail")
     private const val MAX_POLYLINE_POINTS = 40
 
-    private fun header() = "[out:json][timeout:$SERVER_TIMEOUT_S][maxsize:$SERVER_MAX_BYTES];"
+    private fun header(timeoutS: Int = SERVER_TIMEOUT_S) = "[out:json][timeout:$timeoutS][maxsize:$SERVER_MAX_BYTES];"
 
-    /**
-     * Forests along the whole path, buildings along it too. On a link longer than [PlannerClutter.LONG_LINK_M]
-     * buildings are only requested near the two ends.
-     */
-    fun link(a: GeoPoint, b: GeoPoint): String {
+    private fun forestStatements(whole: String): String = buildString {
+        append("way[\"natural\"=\"wood\"](around:$CORRIDOR_M,$whole);")
+        append("way[\"landuse\"=\"forest\"](around:$CORRIDOR_M,$whole);")
+        append("relation[\"natural\"=\"wood\"][\"type\"=\"multipolygon\"](around:$CORRIDOR_M,$whole);")
+        append("relation[\"landuse\"=\"forest\"][\"type\"=\"multipolygon\"](around:$CORRIDOR_M,$whole);")
+    }
+
+    private fun buildingStatements(line: String): String = buildString {
+        append("way[\"building\"](around:$CORRIDOR_M,$line);")
+        append("relation[\"building\"][\"type\"=\"multipolygon\"](around:$CORRIDOR_M,$line);")
+    }
+
+    /** Fractions of the path where buildings are looked for: all of it, or only near the two ends on a long link. */
+    private fun buildingStretches(a: GeoPoint, b: GeoPoint): List<Pair<Double, Double>> {
         val d = Geodesy.distanceM(a, b)
-        val sb = StringBuilder(header()).append('(')
-        val whole = polyline(a, b, 0.0, 1.0)
-        sb.append("way[\"natural\"=\"wood\"](around:$CORRIDOR_M,$whole);")
-        sb.append("way[\"landuse\"=\"forest\"](around:$CORRIDOR_M,$whole);")
-        sb.append("relation[\"natural\"=\"wood\"][\"type\"=\"multipolygon\"](around:$CORRIDOR_M,$whole);")
-        sb.append("relation[\"landuse\"=\"forest\"][\"type\"=\"multipolygon\"](around:$CORRIDOR_M,$whole);")
-        val stretches = if (d > PlannerClutter.LONG_LINK_M) {
+        return if (d > PlannerClutter.LONG_LINK_M) {
             val f = PlannerClutter.BUILDINGS_NEAR_END_M / d
             listOf(0.0 to f, (1.0 - f) to 1.0)
         } else {
             listOf(0.0 to 1.0)
         }
-        for ((f0, f1) in stretches) {
-            val line = polyline(a, b, f0, f1)
-            sb.append("way[\"building\"](around:$CORRIDOR_M,$line);")
-            sb.append("relation[\"building\"][\"type\"=\"multipolygon\"](around:$CORRIDOR_M,$line);")
-        }
+    }
+
+    /**
+     * Forests along the whole path, buildings along it too. On a link longer than [PlannerClutter.LONG_LINK_M]
+     * buildings are only requested near the two ends. All in one request.
+     */
+    fun link(a: GeoPoint, b: GeoPoint): String {
+        val sb = StringBuilder(header()).append('(')
+        sb.append(forestStatements(polyline(a, b, 0.0, 1.0)))
+        for ((f0, f1) in buildingStretches(a, b)) sb.append(buildingStatements(polyline(a, b, f0, f1)))
         return sb.append(");out tags geom;").toString()
+    }
+
+    /**
+     * The same obstacles as [link], as several lighter requests: the forests of the whole path, then the buildings of
+     * each stretch on its own. One heavy request used to run into the server's time limit on a long link; the parts
+     * are answered one by one and each gets the longer [LINK_SERVER_TIMEOUT_S].
+     */
+    fun linkParts(a: GeoPoint, b: GeoPoint): List<String> {
+        val parts = ArrayList<String>()
+        parts.add(header(LINK_SERVER_TIMEOUT_S) + "(" + forestStatements(polyline(a, b, 0.0, 1.0)) + ");out tags geom;")
+        for ((f0, f1) in buildingStretches(a, b)) {
+            parts.add(header(LINK_SERVER_TIMEOUT_S) + "(" + buildingStatements(polyline(a, b, f0, f1)) + ");out tags geom;")
+        }
+        return parts
     }
 
     /** Forests and built-up areas in the box around [center] ([radiusKm] is capped at the planner's limit). */
