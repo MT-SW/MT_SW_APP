@@ -219,7 +219,7 @@ internal fun HostMetricsCardContent(
             Spacer(modifier = Modifier.height(4.dp))
             LogLine(
                 label = stringResource(Res.string.local_stats_heap),
-                value = "${formatBytes((heapFreeBytes ?: 0).toLong())} / ${formatBytes(heapTotalBytes.toLong())}",
+                value = "${formatByteSize((heapFreeBytes ?: 0).toLong())} / ${formatByteSize(heapTotalBytes.toLong())}",
             )
         }
 
@@ -230,16 +230,16 @@ internal fun HostMetricsCardContent(
                 LogLine(
                     label = stringResource(Res.string.local_stats_flash),
                     value =
-                    "${formatBytes(
+                    "${formatByteSize(
                         ext.flashUsedBytes.toLong(),
-                    )} / ${formatBytes(ext.flashTotalBytes.toLong())}",
+                    )} / ${formatByteSize(ext.flashTotalBytes.toLong())}",
                 )
             }
             if (ext.memoryPsramTotal > 0) {
                 LogLine(
                     label = stringResource(Res.string.local_stats_psram),
                     value =
-                    "${formatBytes(ext.memoryPsramFree.toLong())} / ${formatBytes(ext.memoryPsramTotal.toLong())}",
+                    "${formatByteSize(ext.memoryPsramFree.toLong())} / ${formatByteSize(ext.memoryPsramTotal.toLong())}",
                 )
             }
         }

@@ -41,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.DateFormatter
+import org.meshtastic.core.common.util.formatByteSize
 import org.meshtastic.core.common.util.formatString
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.resources.Res
@@ -160,7 +161,6 @@ import org.meshtastic.core.ui.icon.Reconnecting
 import org.meshtastic.core.ui.icon.Rssi
 import org.meshtastic.core.ui.icon.Snr
 import org.meshtastic.core.ui.icon.Voltage
-import org.meshtastic.feature.node.metrics.formatBytes
 import org.meshtastic.proto.NodeStats
 import org.meshtastic.proto.OnDemandType
 import org.meshtastic.proto.Ping
@@ -549,17 +549,17 @@ private fun nodeStatsRows(stats: NodeStats): List<Pair<StringResource, String>> 
     stats.num_online_nodes?.let { add(Res.string.on_demand_stat_nodes_online to "$it") }
     stats.num_total_nodes?.let { add(Res.string.on_demand_stat_nodes_total to "$it") }
     stats.reboots?.let { add(Res.string.on_demand_reboots to "$it") }
-    stats.memory_free_cheap?.let { add(Res.string.on_demand_heap_free to formatBytes(it.toLong())) }
-    stats.memory_total?.let { add(Res.string.on_demand_heap_total to formatBytes(it.toLong())) }
+    stats.memory_free_cheap?.let { add(Res.string.on_demand_heap_free to formatByteSize(it.toLong())) }
+    stats.memory_total?.let { add(Res.string.on_demand_heap_total to formatByteSize(it.toLong())) }
     stats.cpu_usage_percent?.let { add(Res.string.on_demand_cpu_usage to "$it%") }
     if (stats.flash_used_bytes != null || stats.flash_total_bytes != null) {
-        val used = stats.flash_used_bytes?.let { formatBytes(it.toLong()) } ?: "?"
-        val total = stats.flash_total_bytes?.let { formatBytes(it.toLong()) } ?: "?"
+        val used = stats.flash_used_bytes?.let { formatByteSize(it.toLong()) } ?: "?"
+        val total = stats.flash_total_bytes?.let { formatByteSize(it.toLong()) } ?: "?"
         add(Res.string.on_demand_flash to "$used / $total")
     }
     if (stats.memory_psram_free != null || stats.memory_psram_total != null) {
-        val free = stats.memory_psram_free?.let { formatBytes(it.toLong()) } ?: "?"
-        val total = stats.memory_psram_total?.let { formatBytes(it.toLong()) } ?: "?"
+        val free = stats.memory_psram_free?.let { formatByteSize(it.toLong()) } ?: "?"
+        val total = stats.memory_psram_total?.let { formatByteSize(it.toLong()) } ?: "?"
         add(Res.string.on_demand_psram to "$free / $total")
     }
     stats.flood_counter?.let { add(Res.string.on_demand_flood_counter to "$it") }

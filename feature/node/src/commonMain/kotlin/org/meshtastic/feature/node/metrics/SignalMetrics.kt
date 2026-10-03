@@ -39,7 +39,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -510,7 +509,6 @@ private fun SignalMetricsChart(
 }
 
 @Composable
-@ReadOnlyComposable
 private fun noiseFloorTextColor(value: Int?): Color = when {
     value == null -> MaterialTheme.colorScheme.onSurfaceVariant
     // Palette matches the signal-quality / connection-status colours: gold = quiet, red = busy, purple = very noisy.
