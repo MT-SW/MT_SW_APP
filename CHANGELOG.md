@@ -25,6 +25,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do upstreamu, od pocz
 * Zasięg na mapie jako gęsty raster z płynną skalą kolorów (styl MeshMap Planner), suwak krycia, lista warstw u góry z przewijaniem, licznik warstw na ikonie, limit 9 warstw, warstwy zasięgu nie są zapamiętywane po restarcie. Nazwa „Mesh Link Planer (by MT_SW)”.
 * Opcjonalna pogoda na żywo (Open-Meteo): współczynnik k, refrakcja, ducting.
 * Przeszkody: presety zabudowy/roślinności (domyślnie) albo opcjonalne **dokładne odwzorowanie terenu z OpenStreetMap** (budynki i lasy przez Overpass API, na trasie i w zasięgu do 30 km od środka), z ostrzeżeniem o większym zużyciu zasobów i dłuższym liczeniu; przy błędzie pobierania powrót do presetu.
+* Menu zasięgu danych o terenie (5 / 10 / 15 / 30 / 50 / 100 km, domyślnie 30 km); pobieranie z OpenStreetMap jest czytane kawałkami z limitem rozmiaru, a brak pamięci jest łapany, więc gęsty obszar nie wywala już aplikacji (także na emulatorze z małą pamięcią), tylko pokazuje komunikat „za dużo danych, zmniejsz zasięg” i wraca do ustawienia wstępnego przeszkód, także podczas liczenia zasięgu.
+* Okno traceroute: gdy trasy nie da się pokazać na mapie, jest jeden przycisk OK (wcześniej obok pojawiał się drugi); opisy trasy na mapie mają cieńszą obwódkę i większą czcionkę.
 
 **Mapa**
 * Płynne przewijanie i powiększanie przy dużej liczbie węzłów: usunięte z danych mapy pola „ostatnio słyszany”/„online”, węzły odświeżane tylko przy zmianie pozycji, nazwy, ulubionego i ignorowanego, błysk na własnym małym źródle w 15 krokach, stabilny obszar widoku podczas przesuwania, pamięć podręczna obrazków plakietek, brak niewidocznych obrysów w warstwie zasięgu.
@@ -899,6 +901,8 @@ The entries below describe only what this fork adds on top of upstream, from the
 * Coverage on the map as a dense raster with a smooth colour scale (MeshMap Planner style), an opacity slider, a layer list on top with scrolling, a layer counter on the icon, a limit of 9 layers; coverage layers are not remembered after a restart. Named "Mesh Link Planer (by MT_SW)".
 * Optional live weather (Open-Meteo): k-factor, refractivity, ducting.
 * Obstacles: clutter presets (default) or the optional **detailed terrain from OpenStreetMap** (buildings and forests via the Overpass API, along the path and in coverage within 30 km of the centre), with a warning about higher resource use and longer calculation; falls back to the preset if the download fails.
+* Terrain data range menu (5 / 10 / 15 / 30 / 50 / 100 km, 30 km by default); the OpenStreetMap download is read in chunks with a size limit and out-of-memory is caught, so a dense area no longer crashes the app (an emulator with little memory included) but shows "too much data, reduce the range" and falls back to the obstacles preset, also during the coverage calculation.
+* Traceroute dialog: when the route cannot be shown on the map there is a single OK button (before, a second one appeared next to it); traceroute labels on the map have a thinner outline and a larger font.
 
 **Map**
 * Smooth panning and zooming with many nodes: the "last heard"/"online" fields removed from map data, nodes refreshed only when position, name, favorite or ignored state change, pulse on its own small source in 15 steps, a stable view area while panning, cached chip images, no invisible outlines in the coverage layer.

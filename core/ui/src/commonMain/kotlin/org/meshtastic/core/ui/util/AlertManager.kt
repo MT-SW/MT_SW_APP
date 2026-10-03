@@ -80,9 +80,15 @@ open class AlertManager {
                 composableMessage = composableMessage,
                 html = html,
                 icon = icon,
-                onConfirm = {
-                    onConfirm?.invoke()
-                    dismissAlert()
+                // No confirm action means no confirm button: the dialog then has only its dismiss button.
+                onConfirm =
+                if (onConfirm == null) {
+                    null
+                } else {
+                    {
+                        onConfirm.invoke()
+                        dismissAlert()
+                    }
                 },
                 onDismiss = {
                     onDismiss?.invoke()
