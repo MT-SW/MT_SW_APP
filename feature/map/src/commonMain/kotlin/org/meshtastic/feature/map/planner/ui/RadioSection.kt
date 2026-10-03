@@ -294,7 +294,7 @@ private fun EnvironmentCard(state: PlannerUiState, vm: PlannerViewModel) {
             )
             ClutterStatusBlock(state.clutter)
             Text(
-                text = stringResource(Res.string.planner_precise_coverage_note),
+                text = stringResource(Res.string.planner_precise_coverage_note, state.clutterRadiusKm.toInt()),
                 style = MaterialTheme.typography.bodySmall,
             )
         }
