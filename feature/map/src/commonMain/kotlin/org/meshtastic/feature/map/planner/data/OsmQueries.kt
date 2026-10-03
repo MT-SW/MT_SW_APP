@@ -19,9 +19,6 @@ package org.meshtastic.feature.map.planner.data
 import org.meshtastic.feature.map.planner.GeoPoint
 import org.meshtastic.feature.map.planner.Geodesy
 import org.meshtastic.feature.map.planner.export.Num
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.max
 
 /** Overpass QL text for the obstacles the planner wants. Data © OpenStreetMap contributors (ODbL). */
 object OsmQueries {
@@ -72,15 +69,17 @@ object OsmQueries {
     /** Forests and built-up areas in the box around [center] ([radiusKm] is capped at the planner's limit). */
     fun area(center: GeoPoint, radiusKm: Double): String {
         val r = radiusKm.coerceIn(0.1, PlannerClutter.MAX_AREA_RADIUS_KM)
-        val dLat = r / 110.574
-        val dLon = r / (111.320 * max(0.05, cos(center.lat * PI / 180.0)))
-        val box = Num.fmt(center.lat - dLat, 5) + "," + Num.fmt(center.lon - dLon, 5) + "," +
-            Num.fmt(center.lat + dLat, 5) + "," + Num.fmt(center.lon + dLon, 5)
+        return box(ClutterBox.around(center.lat, center.lon, r))
+    }
+
+    /** Forests and built-up areas inside [box]: the piece of a large coverage area that is asked for on its own. */
+    fun box(box: ClutterBox): String {
+        val b = box.asQueryBox()
         val sb = StringBuilder(header()).append('(')
-        sb.append("way[\"natural\"=\"wood\"]($box);")
-        sb.append("way[\"landuse\"~\"^(forest|residential|commercial|industrial|retail)$\"]($box);")
-        sb.append("relation[\"natural\"=\"wood\"][\"type\"=\"multipolygon\"]($box);")
-        sb.append("relation[\"landuse\"~\"^(forest|residential|commercial|industrial|retail)$\"][\"type\"=\"multipolygon\"]($box);")
+        sb.append("way[\"natural\"=\"wood\"]($b);")
+        sb.append("way[\"landuse\"~\"^(forest|residential|commercial|industrial|retail)$\"]($b);")
+        sb.append("relation[\"natural\"=\"wood\"][\"type\"=\"multipolygon\"]($b);")
+        sb.append("relation[\"landuse\"~\"^(forest|residential|commercial|industrial|retail)$\"][\"type\"=\"multipolygon\"]($b);")
         return sb.append(");out tags geom;").toString()
     }
 
