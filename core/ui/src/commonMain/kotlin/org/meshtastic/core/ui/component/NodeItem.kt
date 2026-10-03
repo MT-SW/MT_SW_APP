@@ -61,13 +61,13 @@ import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.isUnmessageableRole
-import org.meshtastic.core.model.util.formatUptime
 import org.meshtastic.core.model.util.toDistanceString
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.air_utilization
 import org.meshtastic.core.resources.channel_utilization
 import org.meshtastic.core.resources.current
 import org.meshtastic.core.resources.elevation_suffix
+import org.meshtastic.core.resources.formatDuration
 import org.meshtastic.core.resources.node_list_click_label
 import org.meshtastic.core.resources.node_list_long_click_label
 import org.meshtastic.core.resources.node_not_heard_on_current_lora
@@ -622,7 +622,7 @@ private fun NodeItemHeader(
                                 tint = contentColor,
                             )
                             Text(
-                                text = formatUptime(uptime),
+                                text = formatDuration(uptime.toLong()),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = contentColor,
                             )

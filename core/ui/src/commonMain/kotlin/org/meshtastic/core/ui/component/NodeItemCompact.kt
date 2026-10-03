@@ -58,7 +58,6 @@ import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.isUnmessageableRole
-import org.meshtastic.core.model.util.formatUptime
 import org.meshtastic.core.model.util.toDistanceString
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.a11y_humidity
@@ -66,6 +65,7 @@ import org.meshtastic.core.resources.a11y_node_channel
 import org.meshtastic.core.resources.a11y_node_hops_count
 import org.meshtastic.core.resources.a11y_temperature
 import org.meshtastic.core.resources.distance
+import org.meshtastic.core.resources.formatDuration
 import org.meshtastic.core.resources.ic_memory
 import org.meshtastic.core.resources.node_incomplete
 import org.meshtastic.core.resources.node_list_click_label
@@ -349,7 +349,7 @@ private fun CompactHealthRow(
                             icon = rememberRefreshIcon(),
                             contentDescription = "Uptime",
                             contentColor = contentColor,
-                            text = formatUptime(uptime),
+                            text = formatDuration(uptime.toLong()),
                         )
                     },
                 )
