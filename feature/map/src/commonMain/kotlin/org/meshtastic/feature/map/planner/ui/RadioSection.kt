@@ -81,6 +81,7 @@ import org.meshtastic.core.resources.planner_precise_ready
 import org.meshtastic.core.resources.planner_precise_failed_large
 import org.meshtastic.core.resources.planner_precise_failed_network
 import org.meshtastic.core.resources.planner_precise_failed_data
+import org.meshtastic.core.resources.planner_precise_failed_server
 import org.meshtastic.core.resources.planner_precise_coverage_note
 import org.meshtastic.core.resources.planner_unit_m
 import org.meshtastic.feature.map.planner.data.ClutterHeights
