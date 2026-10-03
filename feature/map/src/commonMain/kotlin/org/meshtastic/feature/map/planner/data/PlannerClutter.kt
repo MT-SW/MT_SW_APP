@@ -213,11 +213,18 @@ enum class PlannerClutterFailure {
 
     /** Too much data for this range (or for the memory of the device): a smaller range is the way out. */
     TOO_LARGE,
+
+    /** The server refused or gave up (overloaded, query too heavy for it, timed out): try later or a smaller range. */
+    SERVER_LIMIT,
 }
 
 /** Thrown by [PlannerClutterSource] when obstacle data is unavailable. */
-class PlannerClutterException(val failure: PlannerClutterFailure, cause: Throwable? = null) :
-    Exception("Planner clutter unavailable: $failure", cause)
+class PlannerClutterException(
+    val failure: PlannerClutterFailure,
+    cause: Throwable? = null,
+    /** Short reason from the server or the connection (for example the Overpass remark or `HTTP 429`), if known. */
+    val detail: String? = null,
+) : Exception("Planner clutter unavailable: $failure" + (detail?.let { " ($it)" } ?: ""), cause)
 
 /** Obstacle data (buildings, forests) for the planner. Throws [PlannerClutterException] when it cannot be loaded. */
 interface PlannerClutterSource {

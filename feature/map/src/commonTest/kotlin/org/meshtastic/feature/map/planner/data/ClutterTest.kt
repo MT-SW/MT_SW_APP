@@ -203,6 +203,14 @@ class ClutterTest {
         assertFalse(q.contains("47."))
     }
 
+    @Test
+    fun serverMemoryCapIsNotTooLowForTheServer() {
+        // This is the RAM of the Overpass SERVER. At 16 MiB it answered "out of memory" even for a tiny area.
+        assertTrue(OsmQueries.SERVER_MAX_BYTES >= 128 * 1024 * 1024, "cap=${OsmQueries.SERVER_MAX_BYTES}")
+        assertTrue(OsmQueries.area(GeoPoint(50.0, 20.0), 5.0).startsWith("[out:json][timeout:"))
+        assertTrue(OsmQueries.area(GeoPoint(50.0, 20.0), 5.0).contains("[maxsize:${OsmQueries.SERVER_MAX_BYTES}]"))
+    }
+
     // ---- profile helper and coverage ----
 
     @Test

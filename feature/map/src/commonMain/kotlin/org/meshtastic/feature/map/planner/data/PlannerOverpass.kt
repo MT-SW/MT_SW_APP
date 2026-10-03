@@ -44,6 +44,7 @@ class PlannerOverpass(
     private val baseUrl: String = BASE_URL,
     private val timeoutMs: Long = TIMEOUT_MS,
     private val clockMs: () -> Long = { nowMillis },
+    private val fallbackUrls: List<String> = FALLBACK_URLS,
 ) : PlannerClutterSource {
 
     private val lock = Mutex()
@@ -68,29 +69,54 @@ class PlannerOverpass(
         map
     }
 
-    @Suppress("TooGenericExceptionCaught")
+    /**
+     * Asks the main server and, when it refuses, is busy or does not answer, the mirrors one after another. Data that
+     * is genuinely too big for this device ([PlannerClutterFailure.TOO_LARGE]) stops at once: another server would
+     * send the same amount.
+     */
     private suspend fun fetch(query: String): ClutterMap {
+        var last: PlannerClutterException? = null
+        for (url in listOf(baseUrl) + fallbackUrls.filter { it != baseUrl }) {
+            try {
+                return fetchFrom(url, query)
+            } catch (e: PlannerClutterException) {
+                if (e.failure == PlannerClutterFailure.TOO_LARGE) throw e
+                last = e
+            }
+        }
+        throw last ?: PlannerClutterException(PlannerClutterFailure.NETWORK)
+    }
+
+    @Suppress("TooGenericExceptionCaught")
+    private suspend fun fetchFrom(url: String, query: String): ClutterMap {
         val body: String? = try {
-            withTimeoutOrNull(timeoutMs) { download(query) }
+            withTimeoutOrNull(timeoutMs) { download(url, query) }
         } catch (e: CancellationException) {
             throw e
         } catch (e: PlannerClutterException) {
             throw e
         } catch (e: Exception) {
-            throw PlannerClutterException(PlannerClutterFailure.NETWORK, e)
-        } catch (e: Throwable) { // OutOfMemoryError is not an Exception
+            throw PlannerClutterException(PlannerClutterFailure.NETWORK, e, shortDetail(e.message))
+        } catch (e: Throwable) { // OutOfMemoryError is not an Exception: this one really is the device
             throw PlannerClutterException(PlannerClutterFailure.TOO_LARGE, e)
         }
-        if (body == null) throw PlannerClutterException(PlannerClutterFailure.NETWORK)
+        if (body == null) throw PlannerClutterException(PlannerClutterFailure.NETWORK, detail = "timeout")
         return try {
             withContext(Dispatchers.Default) { OsmClutterParser.parse(body) }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
+            // The server's own "out of memory" / "timed out" remark is a refusal of THE SERVER, not a lack of memory
+            // of this device, so it must not be reported as one.
             val msg = e.message.orEmpty().lowercase()
-            val tooLarge = msg.contains("memory") || msg.contains("maxsize")
-            throw PlannerClutterException(if (tooLarge) PlannerClutterFailure.TOO_LARGE else PlannerClutterFailure.BAD_RESPONSE, e)
-        } catch (e: Throwable) { // OutOfMemoryError is not an Exception
+            val serverRefused = msg.startsWith("overpass:") &&
+                (msg.contains("memory") || msg.contains("maxsize") || msg.contains("timed out") || msg.contains("rate"))
+            throw PlannerClutterException(
+                if (serverRefused) PlannerClutterFailure.SERVER_LIMIT else PlannerClutterFailure.BAD_RESPONSE,
+                e,
+                shortDetail(e.message),
+            )
+        } catch (e: Throwable) { // OutOfMemoryError is not an Exception: this one really is the device
             throw PlannerClutterException(PlannerClutterFailure.TOO_LARGE, e)
         }
     }
@@ -98,11 +124,18 @@ class PlannerOverpass(
     /**
      * Reads the answer in chunks and gives up as soon as it passes [MAX_BODY_BYTES]: a dense area can answer with
      * tens of megabytes, which a phone with a small heap cannot hold (and the parsed tree is several times larger).
-     * Null when the server answered with an error status.
+     * A status other than success is reported with its code: 429/502/503/504 mean the server is busy or gave up.
      */
-    private suspend fun download(query: String): String? =
-        httpClient.prepareGet(baseUrl) { parameter("data", query) }.execute { response ->
-            if (!response.status.isSuccess()) return@execute null
+    private suspend fun download(url: String, query: String): String? =
+        httpClient.prepareGet(url) { parameter("data", query) }.execute { response ->
+            if (!response.status.isSuccess()) {
+                val code = response.status.value
+                val busy = code == 429 || code == 502 || code == 503 || code == 504
+                throw PlannerClutterException(
+                    if (busy) PlannerClutterFailure.SERVER_LIMIT else PlannerClutterFailure.NETWORK,
+                    detail = "HTTP $code",
+                )
+            }
             val channel = response.bodyAsChannel()
             val chunk = ByteArray(CHUNK_BYTES)
             var buffer = ByteArray(INITIAL_BYTES)
@@ -129,6 +162,19 @@ class PlannerOverpass(
         private const val CHUNK_BYTES = 16 * 1024
         private const val INITIAL_BYTES = 256 * 1024
         private const val CACHE_ENTRIES = 6
+        private const val DETAIL_MAX_CHARS = 140
+
+        /** Public mirrors tried when the main server refuses, is busy or does not answer. */
+        val FALLBACK_URLS = listOf(
+            "https://overpass.kumi.systems/api/interpreter",
+            "https://overpass.private.coffee/api/interpreter",
+        )
+
+        /** One line, trimmed: it is shown to the user under the failure message. */
+        internal fun shortDetail(message: String?): String? {
+            val text = message?.replace('\n', ' ')?.replace(Regex("\\s+"), " ")?.trim().orEmpty()
+            return if (text.isEmpty()) null else text.take(DETAIL_MAX_CHARS)
+        }
 
         /** Rounded to about 1 m so that the same pick always hits the cache. */
         private fun pointKey(p: GeoPoint): String = Num.fmt(p.lat, 5) + "," + Num.fmt(p.lon, 5)
