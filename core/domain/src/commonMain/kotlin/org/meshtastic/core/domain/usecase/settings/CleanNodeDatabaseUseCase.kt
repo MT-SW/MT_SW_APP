@@ -16,11 +16,16 @@
  */
 package org.meshtastic.core.domain.usecase.settings
 
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import org.koin.core.annotation.Single
+import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioController
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.milliseconds
 
 /** Use case for cleaning up nodes from the database. */
 @Single
@@ -52,14 +57,32 @@ constructor(
         }
     }
 
+    /**
+     * Every unknown node -- one that never introduced itself (no node info) and that we hold no public key for --
+     * regardless of when it was last heard. Favorites and ignored nodes are always kept.
+     */
+    open suspend fun getAllUnknownNodesToClean(): List<Node> =
+        nodeRepository.getUnknownNodes().filterNot { node -> node.hasPKC || node.isIgnored || node.isFavorite }
+
     /** Performs the cleanup of specified nodes. */
     open suspend fun cleanNodes(nodeNums: List<Int>) {
         if (nodeNums.isEmpty()) return
 
         nodeRepository.deleteNodes(nodeNums)
-        for (nodeNum in nodeNums) {
-            val packetId = radioController.generatePacketId()
-            radioController.removeByNodenum(packetId, nodeNum)
+        // The radio has to be told too, otherwise every node comes back from its own database on the next connect.
+        // Run to the end even if the screen is closed meanwhile, and pace the commands: a Bluetooth link only accepts
+        // a few queued writes at a time, so a burst of hundreds of removals would otherwise be mostly dropped.
+        if (radioController.connectionState.value != ConnectionState.Connected) return
+        withContext(NonCancellable) {
+            for (nodeNum in nodeNums) {
+                val packetId = radioController.generatePacketId()
+                radioController.removeByNodenum(packetId, nodeNum)
+                delay(REMOVE_PACING)
+            }
         }
+    }
+
+    private companion object {
+        val REMOVE_PACING = 40.milliseconds
     }
 }

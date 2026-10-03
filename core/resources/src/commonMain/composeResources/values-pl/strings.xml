@@ -289,6 +289,7 @@
     <string name="clean_nodes_older_than">Wyczyść węzły, które są starsze niż %1$d dni</string>
     <string name="clean_now">Wyczyść teraz</string>
     <string name="clean_unknown_nodes">Wyczyść tylko nieznane węzły</string>
+    <string name="clean_unknown_nodes_any_date">Ignoruj datę: wszystkie nieznane węzły bez klucza</string>
     <!-- CLEAR -->
     <string name="clear">Czyść</string>
     <string name="clear_position_track_message">To trwale usunie zapisaną trasę GPS tego węzła. Tej operacji nie można cofnąć.</string>

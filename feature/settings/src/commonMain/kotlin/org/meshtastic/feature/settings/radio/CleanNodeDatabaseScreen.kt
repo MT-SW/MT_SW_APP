@@ -52,6 +52,7 @@ import org.meshtastic.core.resources.clean_node_database_title
 import org.meshtastic.core.resources.clean_nodes_older_than
 import org.meshtastic.core.resources.clean_now
 import org.meshtastic.core.resources.clean_unknown_nodes
+import org.meshtastic.core.resources.clean_unknown_nodes_any_date
 import org.meshtastic.core.resources.nodes_queued_for_deletion
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.NodeChip
@@ -64,12 +65,13 @@ import org.meshtastic.core.ui.component.NodeChip
 fun CleanNodeDatabaseScreen(viewModel: CleanNodeDatabaseViewModel, onBack: () -> Unit) {
     val olderThanDays by viewModel.olderThanDays.collectAsStateWithLifecycle()
     val onlyUnknownNodes by viewModel.onlyUnknownNodes.collectAsStateWithLifecycle()
+    val ignoreDate by viewModel.ignoreDate.collectAsStateWithLifecycle()
     val nodesToDelete by viewModel.nodesToDelete.collectAsStateWithLifecycle()
     val autoCleanEnabled by viewModel.autoCleanEnabled.collectAsStateWithLifecycle()
     val autoCleanInactivityDays by viewModel.autoCleanInactivityDays.collectAsStateWithLifecycle()
     val autoCleanCheckIntervalDays by viewModel.autoCleanCheckIntervalDays.collectAsStateWithLifecycle()
 
-    SideEffect(olderThanDays, onlyUnknownNodes) { viewModel.getNodesToDelete() }
+    SideEffect(olderThanDays, onlyUnknownNodes, ignoreDate) { viewModel.getNodesToDelete() }
 
     Scaffold(
         topBar = {
@@ -101,11 +103,13 @@ fun CleanNodeDatabaseScreen(viewModel: CleanNodeDatabaseViewModel, onBack: () ->
             Text(stringResource(Res.string.clean_node_database_description), style = MaterialTheme.typography.bodySmall)
             Spacer(modifier = Modifier.height(16.dp))
 
-            DaysThresholdFilter(
-                olderThanDays = olderThanDays,
-                onlyUnknownNodes = onlyUnknownNodes,
-                onDaysChanged = viewModel::onOlderThanDaysChanged,
-            )
+            if (!(onlyUnknownNodes && ignoreDate)) {
+                DaysThresholdFilter(
+                    olderThanDays = olderThanDays,
+                    onlyUnknownNodes = onlyUnknownNodes,
+                    onDaysChanged = viewModel::onOlderThanDaysChanged,
+                )
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -113,6 +117,17 @@ fun CleanNodeDatabaseScreen(viewModel: CleanNodeDatabaseViewModel, onBack: () ->
                 onlyUnknownNodes = onlyUnknownNodes,
                 onCheckedChanged = viewModel::onOnlyUnknownNodesChanged,
             )
+
+            if (onlyUnknownNodes) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(Res.string.clean_unknown_nodes_any_date),
+                        modifier = Modifier.weight(1f),
+                    )
+                    Switch(checked = ignoreDate, onCheckedChange = viewModel::onIgnoreDateChanged)
+                }
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
 
