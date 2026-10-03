@@ -20,6 +20,7 @@ import org.meshtastic.core.common.crypto.ChannelCrypto
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.model.Channel
 import org.meshtastic.core.model.MeshLog
+import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.getTracerouteResponse
 import org.meshtastic.core.model.util.decodeOrNull
 import org.meshtastic.core.model.util.toReadableString
