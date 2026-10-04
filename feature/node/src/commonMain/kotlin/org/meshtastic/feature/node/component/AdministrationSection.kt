@@ -18,12 +18,10 @@ package org.meshtastic.feature.node.component
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
@@ -49,7 +47,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
@@ -201,13 +198,7 @@ fun AdministrationSection(
             }
         }
 
-        SectionCard(title = Res.string.gpio) {
-            Column {
-                RemoteHardwareCard(destNum = node.num, onAction = onAction)
-                SectionDivider()
-                QuickCommandsCard(node = node, onAction = onAction)
-            }
-        }
+        GpioSection(node = node, onAction = onAction)
 
         val firmwareVersion = node.metadata?.firmware_version
         val firmwareEdition = metricsState.firmwareEdition
@@ -380,6 +371,38 @@ private fun RemoteNodeManagementCard(destNum: Int, isEnsuringSession: Boolean, o
     }
 }
 
+/** The GPIO card: its title row has an info icon that opens a short setup guide. */
+@Composable
+private fun GpioSection(node: Node, onAction: (NodeDetailAction) -> Unit) {
+    var showHelp by remember { mutableStateOf(false) }
+    if (showHelp) {
+        MeshtasticDialog(
+            titleRes = Res.string.gpio_help_title,
+            messageRes = Res.string.gpio_help_text,
+            dismissTextRes = Res.string.close,
+            onDismiss = { showHelp = false },
+        )
+    }
+    SectionCard(
+        title = Res.string.gpio,
+        titleTrailing = {
+            IconButton(onClick = { showHelp = true }) {
+                Icon(
+                    imageVector = MeshtasticIcons.Info,
+                    contentDescription = stringResource(Res.string.gpio_help_title),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            }
+        },
+    ) {
+        Column {
+            RemoteHardwareCard(destNum = node.num, onAction = onAction)
+            SectionDivider()
+            QuickCommandsCard(node = node, onAction = onAction)
+        }
+    }
+}
+
 /**
  * Remote Hardware module control: type a GPIO pin number, the app computes the bit mask (`1 shl pin`, matching
  * https://meshtastic.org/docs/configuration/module/remote-hardware/#masks), and On/Off/Read send the corresponding
@@ -392,66 +415,44 @@ private fun RemoteHardwareCard(destNum: Int, onAction: (NodeDetailAction) -> Uni
     val pinNumber = pinState.text.toString().toIntOrNull()
     val gpioMask = pinNumber?.takeIf { it in 0..62 }?.let { 1L shl it }
 
-    var showHelp by remember { mutableStateOf(false) }
-    if (showHelp) {
-        MeshtasticDialog(
-            titleRes = Res.string.gpio_help_title,
-            messageRes = Res.string.gpio_help_text,
-            dismissTextRes = Res.string.close,
-            onDismiss = { showHelp = false },
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        OutlinedTextField(
+            state = pinState,
+            labelPosition = TextFieldLabelPosition.Above(),
+            lineLimits = TextFieldLineLimits.SingleLine,
+            label = { Text(stringResource(Res.string.gpio_pin)) },
+            supportingText =
+            gpioMask?.let { mask ->
+                { Text(stringResource(Res.string.gpio_mask_display, "0x" + mask.toString(16))) }
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+            modifier = Modifier.fillMaxWidth(),
         )
-    }
-
-    Box(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-            OutlinedTextField(
-                state = pinState,
-                labelPosition = TextFieldLabelPosition.Above(),
-                lineLimits = TextFieldLineLimits.SingleLine,
-                label = { Text(stringResource(Res.string.gpio_pin)) },
-                supportingText =
-                gpioMask?.let { mask ->
-                    { Text(stringResource(Res.string.gpio_mask_display, "0x" + mask.toString(16))) }
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-            ) {
-                Button(
-                    modifier = Modifier.weight(1f),
-                    enabled = gpioMask != null,
-                    onClick = { gpioMask?.let { onAction(NodeDetailAction.WriteGpio(destNum, it, it)) } },
-                ) {
-                    Text(stringResource(Res.string.gpio_on))
-                }
-                Button(
-                    modifier = Modifier.weight(1f),
-                    enabled = gpioMask != null,
-                    onClick = { gpioMask?.let { onAction(NodeDetailAction.WriteGpio(destNum, it, 0L)) } },
-                ) {
-                    Text(stringResource(Res.string.gpio_off))
-                }
-                Button(
-                    modifier = Modifier.weight(1f),
-                    enabled = gpioMask != null,
-                    onClick = { gpioMask?.let { onAction(NodeDetailAction.ReadGpio(destNum, it)) } },
-                ) {
-                    Text(stringResource(Res.string.gpio_read))
-                }
-            }
-        }
-        IconButton(
-            onClick = { showHelp = true },
-            modifier = Modifier.align(Alignment.TopEnd).padding(top = 4.dp, end = 4.dp),
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
         ) {
-            Icon(
-                imageVector = MeshtasticIcons.Info,
-                contentDescription = stringResource(Res.string.gpio_help_title),
-                modifier = Modifier.size(20.dp),
-            )
+            Button(
+                modifier = Modifier.weight(1f),
+                enabled = gpioMask != null,
+                onClick = { gpioMask?.let { onAction(NodeDetailAction.WriteGpio(destNum, it, it)) } },
+            ) {
+                Text(stringResource(Res.string.gpio_on))
+            }
+            Button(
+                modifier = Modifier.weight(1f),
+                enabled = gpioMask != null,
+                onClick = { gpioMask?.let { onAction(NodeDetailAction.WriteGpio(destNum, it, 0L)) } },
+            ) {
+                Text(stringResource(Res.string.gpio_off))
+            }
+            Button(
+                modifier = Modifier.weight(1f),
+                enabled = gpioMask != null,
+                onClick = { gpioMask?.let { onAction(NodeDetailAction.ReadGpio(destNum, it)) } },
+            ) {
+                Text(stringResource(Res.string.gpio_read))
+            }
         }
     }
 }
