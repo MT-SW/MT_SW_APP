@@ -431,7 +431,7 @@ sealed class UpdateInterval {
 const val MIN_DEVICE_METRICS_INTERVAL_SECS = 2 * 3600L
 
 /** Shortest interval (seconds) for the other telemetry and position broadcasts unless unlocked. */
-const val MIN_BROADCAST_INTERVAL_SECS = 3600L
+const val MIN_BROADCAST_INTERVAL_SECS = 6 * 3600L
 
 /**
  * The intervals offered in a dropdown. Unless [unlocked] (hidden features, see HiddenFeaturesUnlock), intervals shorter
