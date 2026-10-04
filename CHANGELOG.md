@@ -39,7 +39,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do upstreamu, od pocz
 * Lista ostatnio używanych urządzeń sieciowych (WiFi/TCP): 20 wpisów zamiast 3.
 
 **Opisy i nazewnictwo (4.10)**
-* **Ramka z opisem przy sterowaniu GPIO:** karta GPIO w szczegółach węzła ma teraz krótką instrukcję krok po kroku — moduł Zdalny sprzęt i dostępne piny na węźle docelowym, kanał „gpio” na pozycji 1 z tym samym kluczem na obu urządzeniach, znaczenie przycisków 1 / 0 / Odczyt.
+* **Opis przy sterowaniu GPIO pod ikoną informacji:** nagłówek karty GPIO w szczegółach węzła ma ikonę „i”, która otwiera krótką instrukcję krok po kroku — moduł Zdalny sprzęt i dostępne piny na węźle docelowym, kanał „gpio” na pozycji 1 z tym samym kluczem na obu urządzeniach, znaczenie przycisków 1 / 0 / Odczyt.
 * **Jednolita nazwa „Diagnostyka na żądanie”** w całej aplikacji (sniffer, nazwa portu w pakietach, opisy) zamiast „OnDemand”.
 
 **Węzły, czyszczenie bazy i scalenie z upstreamem (3.10)**
@@ -930,7 +930,7 @@ The entries below describe only what this fork adds on top of upstream, from the
 * Recently used network (WiFi/TCP) devices: 20 entries instead of 3.
 
 **Descriptions and naming (4 Oct)**
-* **Info box on the GPIO control card:** the GPIO card on the node detail screen now has a short step-by-step guide — the Remote Hardware module and available pins on the target node, a "gpio" channel at position 1 with the same key on both devices, and what the 1 / 0 / Read buttons do.
+* **GPIO control guide behind an info icon:** the GPIO card header on the node detail screen now has an info icon that opens a short step-by-step guide — the Remote Hardware module and available pins on the target node, a "gpio" channel at position 1 with the same key on both devices, and what the 1 / 0 / Read buttons do.
 * **One name, "On-Demand Diagnostics",** across the app (sniffer, packet port name, descriptions) instead of "OnDemand".
 
 **Nodes, database cleanup and the upstream merge (3 Oct)**

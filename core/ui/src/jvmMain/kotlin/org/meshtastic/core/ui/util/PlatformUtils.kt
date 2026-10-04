@@ -24,6 +24,8 @@ import androidx.compose.ui.platform.LocalClipboard
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.getString
+import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.CommonUri
 import java.awt.Desktop
 import java.awt.FileDialog
@@ -47,9 +49,16 @@ actual fun rememberOpenNfcSettings(): () -> Unit = { Logger.w { "NFC settings no
 /** JVM stub — toast messages are logged instead. */
 @Composable actual fun rememberShowToast(): suspend (String) -> Unit = { message -> Logger.i { "Toast: $message" } }
 
-/** JVM stub — toast messages are logged instead. */
+/** JVM — desktop has no toasts, so the message is shown as a snackbar (and logged). */
 @Composable
-actual fun rememberShowToastResource(): suspend (StringResource) -> Unit = { _ -> Logger.i { "Toast (resource)" } }
+actual fun rememberShowToastResource(): suspend (StringResource) -> Unit {
+    val snackbarManager = koinInject<SnackbarManager>()
+    return { resource ->
+        val message = getString(resource)
+        Logger.i { "Toast: $message" }
+        snackbarManager.showSnackbar(message)
+    }
+}
 
 /** JVM stub — map opening is not available on Desktop. */
 @Composable
