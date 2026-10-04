@@ -426,3 +426,24 @@ sealed class UpdateInterval {
             FixedUpdateIntervals.fromValue(value)?.let { Fixed(it) } ?: Manual(value)
     }
 }
+
+/** Shortest interval (seconds) the app offers for device metrics unless the hidden developer options are unlocked. */
+const val MIN_DEVICE_METRICS_INTERVAL_SECS = 2 * 3600L
+
+/** Shortest interval (seconds) for the other telemetry and position broadcasts unless unlocked. */
+const val MIN_BROADCAST_INTERVAL_SECS = 3600L
+
+/**
+ * The intervals offered in a dropdown. Unless [unlocked] (hidden features, see HiddenFeaturesUnlock), intervals shorter
+ * than [minSeconds] are hidden to keep needless traffic off the mesh; "unset" (0, firmware default) and the value
+ * currently stored on the radio ([current]) always stay visible, so an existing setting is displayed correctly.
+ */
+fun IntervalConfiguration.intervals(
+    unlocked: Boolean,
+    minSeconds: Long,
+    current: Long? = null,
+): List<FixedUpdateIntervals> = if (unlocked) {
+    allowedIntervals
+} else {
+    allowedIntervals.filter { it.value == 0L || it.value >= minSeconds || it.value == current }
+}

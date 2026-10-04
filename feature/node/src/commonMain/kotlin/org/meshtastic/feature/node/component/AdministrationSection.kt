@@ -36,6 +36,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldLabelPosition
 import androidx.compose.runtime.Composable
@@ -71,6 +72,8 @@ import org.meshtastic.core.resources.favorite
 import org.meshtastic.core.resources.firmware
 import org.meshtastic.core.resources.firmware_edition
 import org.meshtastic.core.resources.gpio
+import org.meshtastic.core.resources.gpio_help_text
+import org.meshtastic.core.resources.gpio_help_title
 import org.meshtastic.core.resources.gpio_mask_display
 import org.meshtastic.core.resources.gpio_off
 import org.meshtastic.core.resources.gpio_on
@@ -383,6 +386,17 @@ private fun RemoteHardwareCard(destNum: Int, onAction: (NodeDetailAction) -> Uni
     val gpioMask = pinNumber?.takeIf { it in 0..62 }?.let { 1L shl it }
 
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            shape = MaterialTheme.shapes.medium,
+            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+        ) {
+            Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(text = stringResource(Res.string.gpio_help_title), style = MaterialTheme.typography.titleSmall)
+                Text(text = stringResource(Res.string.gpio_help_text), style = MaterialTheme.typography.bodySmall)
+            }
+        }
         OutlinedTextField(
             state = pinState,
             labelPosition = TextFieldLabelPosition.Above(),

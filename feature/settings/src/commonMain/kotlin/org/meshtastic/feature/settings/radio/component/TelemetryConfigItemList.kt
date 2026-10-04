@@ -22,6 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.koin.compose.koinInject
+import org.meshtastic.core.common.state.HiddenFeaturesUnlock
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.Capabilities
 import org.meshtastic.core.resources.Res
@@ -55,6 +57,9 @@ import org.meshtastic.core.ui.component.TitledCard
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 import org.meshtastic.feature.settings.radio.RebootBehavior
 import org.meshtastic.feature.settings.util.IntervalConfiguration
+import org.meshtastic.feature.settings.util.MIN_BROADCAST_INTERVAL_SECS
+import org.meshtastic.feature.settings.util.MIN_DEVICE_METRICS_INTERVAL_SECS
+import org.meshtastic.feature.settings.util.intervals
 import org.meshtastic.feature.settings.util.toDisplayString
 import org.meshtastic.proto.ModuleConfig
 import org.meshtastic.proto.device_telemetry_enabled
@@ -62,6 +67,7 @@ import org.meshtastic.proto.device_telemetry_enabled
 @Composable
 fun TelemetryConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
     val state by viewModel.radioConfigState.collectAsStateWithLifecycle()
+    val unlocked by koinInject<HiddenFeaturesUnlock>().unlocked.collectAsStateWithLifecycle()
     val telemetryConfig = state.moduleConfig.telemetry ?: ModuleConfig.TelemetryConfig.Builder().build()
     val formState = rememberConfigState(initialValue = telemetryConfig)
 
@@ -97,7 +103,12 @@ fun TelemetryConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                     )
                     HorizontalDivider()
                 }
-                val items = remember { IntervalConfiguration.BROADCAST_SHORT.allowedIntervals }
+                val items =
+                    IntervalConfiguration.BROADCAST_SHORT.intervals(
+                        unlocked,
+                        MIN_DEVICE_METRICS_INTERVAL_SECS,
+                        formState.value.device_update_interval.toLong(),
+                    )
                 DropDownPreference(
                     title = stringResource(Res.string.schema_telemetry_device_update_interval),
                     summary = stringResource(Res.string.schema_telemetry_device_update_interval_description),
@@ -122,7 +133,12 @@ fun TelemetryConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                     containerColor = CardDefaults.cardColors().containerColor,
                 )
                 HorizontalDivider()
-                val envItems = remember { IntervalConfiguration.BROADCAST_SHORT.allowedIntervals }
+                val envItems =
+                    IntervalConfiguration.BROADCAST_SHORT.intervals(
+                        unlocked,
+                        MIN_BROADCAST_INTERVAL_SECS,
+                        formState.value.environment_update_interval.toLong(),
+                    )
                 DropDownPreference(
                     title = stringResource(Res.string.schema_telemetry_environment_update_interval),
                     summary = stringResource(Res.string.schema_telemetry_environment_update_interval_description),
@@ -174,7 +190,12 @@ fun TelemetryConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                     containerColor = CardDefaults.cardColors().containerColor,
                 )
                 HorizontalDivider()
-                val airItems = remember { IntervalConfiguration.BROADCAST_SHORT.allowedIntervals }
+                val airItems =
+                    IntervalConfiguration.BROADCAST_SHORT.intervals(
+                        unlocked,
+                        MIN_BROADCAST_INTERVAL_SECS,
+                        formState.value.air_quality_interval.toLong(),
+                    )
                 DropDownPreference(
                     title = stringResource(Res.string.schema_telemetry_air_quality_interval),
                     summary = stringResource(Res.string.schema_telemetry_air_quality_interval_description),
@@ -199,7 +220,12 @@ fun TelemetryConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                     containerColor = CardDefaults.cardColors().containerColor,
                 )
                 HorizontalDivider()
-                val powerItems = remember { IntervalConfiguration.BROADCAST_SHORT.allowedIntervals }
+                val powerItems =
+                    IntervalConfiguration.BROADCAST_SHORT.intervals(
+                        unlocked,
+                        MIN_BROADCAST_INTERVAL_SECS,
+                        formState.value.power_update_interval.toLong(),
+                    )
                 DropDownPreference(
                     title = stringResource(Res.string.schema_telemetry_power_update_interval),
                     summary = stringResource(Res.string.schema_telemetry_power_update_interval_description),

@@ -38,6 +38,10 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do upstreamu, od pocz
 **Sieć**
 * Lista ostatnio używanych urządzeń sieciowych (WiFi/TCP): 20 wpisów zamiast 3.
 
+**Opisy i nazewnictwo (4.10)**
+* **Ramka z opisem przy sterowaniu GPIO:** karta GPIO w szczegółach węzła ma teraz krótką instrukcję krok po kroku — moduł Zdalny sprzęt i dostępne piny na węźle docelowym, kanał „gpio” na pozycji 1 z tym samym kluczem na obu urządzeniach, znaczenie przycisków 1 / 0 / Odczyt.
+* **Jednolita nazwa „Diagnostyka na żądanie”** w całej aplikacji (sniffer, nazwa portu w pakietach, opisy) zamiast „OnDemand”.
+
 **Węzły, czyszczenie bazy i scalenie z upstreamem (3.10)**
 * **Czyszczenie węzłów przez Bluetooth działa do końca:** polecenia „usuń węzeł” do radia są wysyłane po kolei, z krótką przerwą i ponawiane, gdy łącze chwilowo ich nie przyjmuje (Bluetooth przyjmuje naraz tylko kilka zapisów, więc wcześniej przy setkach węzłów większość poleceń była po cichu odrzucana, a radio oddawało te węzły po ponownym połączeniu). Wysyłanie kończy się nawet po wyjściu z ekranu; gdy radio nie jest połączone, czyszczone jest tylko to, co w aplikacji. Przez WiFi działało dobrze już wcześniej.
 * **Czyszczenie wszystkich nieznanych węzłów bez względu na datę:** po włączeniu „Wyczyść tylko nieznane węzły” pojawia się przełącznik „Ignoruj datę: wszystkie nieznane węzły bez klucza” (węzły, które się nie przedstawiły i dla których nie ma klucza; ulubione i ignorowane zawsze zostają).
@@ -924,6 +928,10 @@ The entries below describe only what this fork adds on top of upstream, from the
 
 **Network**
 * Recently used network (WiFi/TCP) devices: 20 entries instead of 3.
+
+**Descriptions and naming (4 Oct)**
+* **Info box on the GPIO control card:** the GPIO card on the node detail screen now has a short step-by-step guide — the Remote Hardware module and available pins on the target node, a "gpio" channel at position 1 with the same key on both devices, and what the 1 / 0 / Read buttons do.
+* **One name, "On-Demand Diagnostics",** across the app (sniffer, packet port name, descriptions) instead of "OnDemand".
 
 **Nodes, database cleanup and the upstream merge (3 Oct)**
 * **Node cleanup over Bluetooth now completes:** the "remove node" commands to the radio are sent one by one with a short gap and retried when the link briefly refuses them (Bluetooth accepts only a few writes at a time, so with hundreds of nodes most commands used to be silently dropped and the radio handed those nodes back after reconnecting). Sending runs to the end even if you leave the screen; when the radio is not connected only the app is cleaned. It already worked over WiFi.

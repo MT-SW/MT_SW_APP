@@ -846,6 +846,8 @@
     <string name="good">Good</string>
     <!-- GPIO -->
     <string name="gpio">GPIO</string>
+    <string name="gpio_help_title">How GPIO control works</string>
+    <string name="gpio_help_text">1. On the target node, enable the Remote Hardware module and list the pins it may control under Available pins (or allow any pin).\n2. On both devices, yours and the target, create a channel named gpio at position 1 (right after the primary channel at position 0) and set the same key (PSK) on both.\n3. Enter the pin number here and use the buttons: On sets the pin high, Off sets it low, and Read checks its state.\nThe app always sends the commands on the channel at position 1. Without that channel, or without the module enabled, the command will not work and a read shows no response.</string>
     <string name="gpio_mask_display">Mask: %1$s</string>
     <string name="gpio_off">Off</string>
     <string name="gpio_on">On</string>
@@ -1487,7 +1489,7 @@
     <string name="on_demand_flash">Flash</string>
     <string name="on_demand_flood_counter">Flood Counter</string>
     <string name="on_demand_fw_plus_version">MT_SW Firmware Version</string>
-    <string name="on_demand_fw_plus_version_desc">Version of the OnDemand protocol running on this node.</string>
+    <string name="on_demand_fw_plus_version_desc">Version of the on-demand diagnostics protocol running on this node.</string>
     <string name="on_demand_heap_free">Heap Free</string>
     <string name="on_demand_heap_total">Heap Total</string>
     <string name="on_demand_hops">Hops</string>
@@ -1660,7 +1662,7 @@
     <string name="port_name_neighborinfo">NeighborInfo</string>
     <string name="port_name_node_status">Node Status</string>
     <string name="port_name_nodeinfo">NodeInfo</string>
-    <string name="port_name_on_demand">OnDemand</string>
+    <string name="port_name_on_demand">On-Demand Diagnostics</string>
     <string name="port_name_paxcounter">Paxcounter</string>
     <string name="port_name_position">Position</string>
     <string name="port_name_range_test">Range Test</string>
@@ -2029,8 +2031,8 @@
     <string name="sniffer_gear_menu">Sniffer settings</string>
     <string name="sniffer_group_by_gateway_summary">Combine the same packet seen more than once (multiple MQTT gateways, or relayed through different nodes) into one row</string>
     <string name="sniffer_group_by_gateway_title">Group duplicates</string>
-    <string name="sniffer_hide_ondemand_ch0_summary">OnDemand (port 354) traffic on the primary channel is the app\'s own diagnostic/control chatter with the connected node, not mesh traffic</string>
-    <string name="sniffer_hide_ondemand_ch0_title">Hide OnDemand on channel 0</string>
+    <string name="sniffer_hide_ondemand_ch0_summary">On-demand diagnostics (port 354) traffic on the primary channel is the app\'s own diagnostic/control chatter with the connected node, not mesh traffic</string>
+    <string name="sniffer_hide_ondemand_ch0_title">Hide on-demand diagnostics on channel 0</string>
     <string name="sniffer_load_failed">Couldn\'t read that file as a sniffer log</string>
     <string name="sniffer_load_log_summary">View a previously exported JSON log</string>
     <string name="sniffer_load_log_title">Load saved log…</string>
