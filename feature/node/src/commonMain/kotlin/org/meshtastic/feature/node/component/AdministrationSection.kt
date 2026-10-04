@@ -18,10 +18,12 @@ package org.meshtastic.feature.node.component
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
@@ -30,13 +32,14 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldLabelPosition
 import androidx.compose.runtime.Composable
@@ -46,6 +49,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
@@ -72,6 +76,7 @@ import org.meshtastic.core.resources.favorite
 import org.meshtastic.core.resources.firmware
 import org.meshtastic.core.resources.firmware_edition
 import org.meshtastic.core.resources.gpio
+import org.meshtastic.core.resources.close
 import org.meshtastic.core.resources.gpio_help_text
 import org.meshtastic.core.resources.gpio_help_title
 import org.meshtastic.core.resources.gpio_mask_display
@@ -96,8 +101,10 @@ import org.meshtastic.core.resources.session_active
 import org.meshtastic.core.resources.session_refresh_required
 import org.meshtastic.core.resources.short_name
 import org.meshtastic.core.ui.component.ListItem
+import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.ForkLeft
 import org.meshtastic.core.ui.icon.Icecream
+import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Memory
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Settings
@@ -385,55 +392,66 @@ private fun RemoteHardwareCard(destNum: Int, onAction: (NodeDetailAction) -> Uni
     val pinNumber = pinState.text.toString().toIntOrNull()
     val gpioMask = pinNumber?.takeIf { it in 0..62 }?.let { 1L shl it }
 
-    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Surface(
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            shape = MaterialTheme.shapes.medium,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
-        ) {
-            Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(text = stringResource(Res.string.gpio_help_title), style = MaterialTheme.typography.titleSmall)
-                Text(text = stringResource(Res.string.gpio_help_text), style = MaterialTheme.typography.bodySmall)
+    var showHelp by remember { mutableStateOf(false) }
+    if (showHelp) {
+        MeshtasticDialog(
+            titleRes = Res.string.gpio_help_title,
+            messageRes = Res.string.gpio_help_text,
+            dismissTextRes = Res.string.close,
+            onDismiss = { showHelp = false },
+        )
+    }
+
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+            OutlinedTextField(
+                state = pinState,
+                labelPosition = TextFieldLabelPosition.Above(),
+                lineLimits = TextFieldLineLimits.SingleLine,
+                label = { Text(stringResource(Res.string.gpio_pin)) },
+                supportingText =
+                gpioMask?.let { mask ->
+                    { Text(stringResource(Res.string.gpio_mask_display, "0x" + mask.toString(16))) }
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            ) {
+                Button(
+                    modifier = Modifier.weight(1f),
+                    enabled = gpioMask != null,
+                    onClick = { gpioMask?.let { onAction(NodeDetailAction.WriteGpio(destNum, it, it)) } },
+                ) {
+                    Text(stringResource(Res.string.gpio_on))
+                }
+                Button(
+                    modifier = Modifier.weight(1f),
+                    enabled = gpioMask != null,
+                    onClick = { gpioMask?.let { onAction(NodeDetailAction.WriteGpio(destNum, it, 0L)) } },
+                ) {
+                    Text(stringResource(Res.string.gpio_off))
+                }
+                Button(
+                    modifier = Modifier.weight(1f),
+                    enabled = gpioMask != null,
+                    onClick = { gpioMask?.let { onAction(NodeDetailAction.ReadGpio(destNum, it)) } },
+                ) {
+                    Text(stringResource(Res.string.gpio_read))
+                }
             }
         }
-        OutlinedTextField(
-            state = pinState,
-            labelPosition = TextFieldLabelPosition.Above(),
-            lineLimits = TextFieldLineLimits.SingleLine,
-            label = { Text(stringResource(Res.string.gpio_pin)) },
-            supportingText =
-            gpioMask?.let { mask ->
-                { Text(stringResource(Res.string.gpio_mask_display, "0x" + mask.toString(16))) }
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        IconButton(
+            onClick = { showHelp = true },
+            modifier = Modifier.align(Alignment.TopEnd).padding(top = 4.dp, end = 4.dp),
         ) {
-            Button(
-                modifier = Modifier.weight(1f),
-                enabled = gpioMask != null,
-                onClick = { gpioMask?.let { onAction(NodeDetailAction.WriteGpio(destNum, it, it)) } },
-            ) {
-                Text(stringResource(Res.string.gpio_on))
-            }
-            Button(
-                modifier = Modifier.weight(1f),
-                enabled = gpioMask != null,
-                onClick = { gpioMask?.let { onAction(NodeDetailAction.WriteGpio(destNum, it, 0L)) } },
-            ) {
-                Text(stringResource(Res.string.gpio_off))
-            }
-            Button(
-                modifier = Modifier.weight(1f),
-                enabled = gpioMask != null,
-                onClick = { gpioMask?.let { onAction(NodeDetailAction.ReadGpio(destNum, it)) } },
-            ) {
-                Text(stringResource(Res.string.gpio_read))
-            }
+            Icon(
+                imageVector = MeshtasticIcons.Info,
+                contentDescription = stringResource(Res.string.gpio_help_title),
+                modifier = Modifier.size(20.dp),
+            )
         }
     }
 }
