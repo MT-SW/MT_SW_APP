@@ -83,6 +83,7 @@ import org.meshtastic.core.ui.icon.Memory
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Notes
 import org.meshtastic.core.ui.theme.AppTheme
+import org.meshtastic.feature.settings.component.AppVersionButton
 import org.meshtastic.feature.settings.component.ExpressiveSection
 
 private const val CAROUSEL_INTERVAL_MS = 3000L
@@ -119,6 +120,8 @@ fun AboutScreen(
     onNavigateUp: () -> Unit,
     onNavigateToAcknowledgements: () -> Unit,
     modifier: Modifier = Modifier,
+    hiddenFeaturesUnlocked: Boolean = false,
+    onUnlockHiddenFeatures: () -> Unit = {},
 ) {
     val uriHandler = LocalUriHandler.current
 
@@ -146,6 +149,8 @@ fun AboutScreen(
                 WhatIsMeshtasticSection()
                 AppsSection(
                     appVersionName = appVersionName,
+                    hiddenFeaturesUnlocked = hiddenFeaturesUnlocked,
+                    onUnlockHiddenFeatures = onUnlockHiddenFeatures,
                     onNavigateToAcknowledgements = onNavigateToAcknowledgements,
                     onOpenHardwareLink = { uriHandler.openUri(HARDWARE_URL) },
                     onOpenRepoLink = { uriHandler.openUri(GITHUB_REPO_URL) },
@@ -181,6 +186,8 @@ private fun WhatIsMeshtasticSection(modifier: Modifier = Modifier) {
 @Composable
 private fun AppsSection(
     appVersionName: String,
+    hiddenFeaturesUnlocked: Boolean,
+    onUnlockHiddenFeatures: () -> Unit,
     onNavigateToAcknowledgements: () -> Unit,
     onOpenHardwareLink: () -> Unit,
     onOpenRepoLink: () -> Unit,
@@ -194,11 +201,10 @@ private fun AppsSection(
             trailingIcon = MeshtasticIcons.ChevronRight,
             onClick = onOpenRepoLink,
         )
-        ListItem(
-            text = stringResource(Res.string.app_version),
-            leadingIcon = MeshtasticIcons.Memory,
-            supportingText = appVersionName,
-            trailingIcon = null,
+        AppVersionButton(
+            hiddenFeaturesUnlocked = hiddenFeaturesUnlocked,
+            appVersionName = appVersionName,
+            onUnlockHiddenFeatures = onUnlockHiddenFeatures,
         )
         ListItem(
             text = stringResource(Res.string.acknowledgements),

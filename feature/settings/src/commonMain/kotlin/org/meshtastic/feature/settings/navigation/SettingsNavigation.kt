@@ -439,8 +439,11 @@ fun EntryProviderScope<NavKey>.settingsGraph(
 
     entry<SettingsRoute.About> {
         val settingsViewModel: SettingsViewModel = koinViewModel()
+        val hiddenFeaturesUnlocked by settingsViewModel.hiddenFeaturesUnlocked.collectAsStateWithLifecycle()
         AboutScreen(
             appVersionName = settingsViewModel.appVersionName,
+            hiddenFeaturesUnlocked = hiddenFeaturesUnlocked,
+            onUnlockHiddenFeatures = settingsViewModel::unlockHiddenFeatures,
             onNavigateUp = dropUnlessResumed { backStack.removeLastOrNull() },
             onNavigateToAcknowledgements = dropUnlessResumed { backStack.add(SettingsRoute.Acknowledgements) },
         )

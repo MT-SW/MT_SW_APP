@@ -435,8 +435,8 @@ const val MIN_BROADCAST_INTERVAL_SECS = 3600L
 
 /**
  * The intervals offered in a dropdown. Unless [unlocked] (hidden features, see HiddenFeaturesUnlock), intervals shorter
- * than [minSeconds] are hidden to keep needless traffic off the mesh; "unset" (0, firmware default) and the value
- * currently stored on the radio ([current]) always stay visible, so an existing setting is displayed correctly.
+ * than [minSeconds] (including "unset") are hidden to keep needless traffic off the mesh; only the value currently
+ * stored on the radio ([current]) stays visible, so an existing setting is displayed correctly.
  */
 fun IntervalConfiguration.intervals(
     unlocked: Boolean,
@@ -445,5 +445,5 @@ fun IntervalConfiguration.intervals(
 ): List<FixedUpdateIntervals> = if (unlocked) {
     allowedIntervals
 } else {
-    allowedIntervals.filter { it.value == 0L || it.value >= minSeconds || it.value == current }
+    allowedIntervals.filter { it.value >= minSeconds || it.value == current }
 }
