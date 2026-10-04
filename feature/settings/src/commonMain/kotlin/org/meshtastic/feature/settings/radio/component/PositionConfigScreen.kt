@@ -28,6 +28,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.koin.compose.koinInject
+import org.meshtastic.core.common.state.HiddenFeaturesUnlock
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.Position
 import org.meshtastic.core.resources.Res
@@ -67,6 +69,8 @@ import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 import org.meshtastic.feature.settings.radio.RebootBehavior
 import org.meshtastic.feature.settings.util.FixedUpdateIntervals
 import org.meshtastic.feature.settings.util.IntervalConfiguration
+import org.meshtastic.feature.settings.util.MIN_BROADCAST_INTERVAL_SECS
+import org.meshtastic.feature.settings.util.intervals
 import org.meshtastic.feature.settings.util.fieldTitle
 import org.meshtastic.feature.settings.util.toDisplayString
 import org.meshtastic.proto.Config
@@ -183,7 +187,13 @@ fun PositionConfigScreenCommon(viewModel: RadioConfigViewModel, onBack: () -> Un
     ) {
         item {
             TitledCard(title = stringResource(Res.string.position_packet)) {
-                val items = remember { IntervalConfiguration.POSITION_BROADCAST.allowedIntervals }
+                val unlocked by koinInject<HiddenFeaturesUnlock>().unlocked.collectAsStateWithLifecycle()
+                val items =
+                    IntervalConfiguration.POSITION_BROADCAST.intervals(
+                        unlocked,
+                        MIN_BROADCAST_INTERVAL_SECS,
+                        formState.value.position_broadcast_secs.toLong(),
+                    )
                 DropDownPreference(
                     title = stringResource(Res.string.schema_position_position_broadcast_secs),
                     summary = stringResource(Res.string.schema_position_position_broadcast_secs_description),

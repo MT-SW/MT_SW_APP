@@ -952,6 +952,8 @@
     <string name="github_repository">Repozytorium GitHub</string>
     <string name="good">dobry</string>
     <string name="gpio">GPIO</string>
+    <string name="gpio_help_title">Jak działa sterowanie GPIO</string>
+    <string name="gpio_help_text">1. Na węźle docelowym włącz moduł „Zdalny sprzęt” (Remote Hardware) i w polu „Dostępne piny” wpisz piny, którymi wolno sterować (albo zezwól na dowolne).\n2. Na obu urządzeniach, Twoim i docelowym, utwórz kanał o nazwie „gpio” na pozycji 1 (zaraz po kanale głównym, który ma pozycję 0) i ustaw na obu ten sam klucz (PSK).\n3. Tutaj wpisz numer pinu i użyj przycisków: 1 włącza pin, 0 wyłącza go, a Odczyt sprawdza jego stan.\nAplikacja zawsze wysyła polecenia kanałem na pozycji 1. Bez tego kanału albo bez włączonego modułu polecenie nie zadziała, a przy odczycie zobaczysz brak odpowiedzi.</string>
     <string name="gpio_mask_display">Maska: %1$s</string>
     <string name="gpio_off">0</string>
     <string name="gpio_on">1</string>
@@ -1436,7 +1438,7 @@
     <string name="mute_status_unmuted">Nie wyciszony</string>
     <string name="unofficial_fork_disclaimer">Nieoficjalny fork Meshtastic-Android. Niezwiązany z Meshtastic LLC ani przez nią niewspierany.</string>
     <string name="feature_credits_title">Źródła funkcji</string>
-    <string name="feature_credits_description">Tryb Sniffer i diagnostyka On-Demand zostały zaadaptowane z historycznego forka firmware Meshtastic (musznik/firmware, gałąź trunk-io/update-trunk).</string>
+    <string name="feature_credits_description">Tryb Sniffer i diagnostyka na żądanie zostały zaadaptowane z historycznego forka firmware Meshtastic (musznik/firmware, gałąź trunk-io/update-trunk).</string>
     <string name="nag_timeout_seconds">Czas przypomnienia (sekundy)</string>
     <string name="name">Nazwa</string>
     <string name="name_cannot_be_empty">Nazwa nie może być pusta.</string>
@@ -1490,7 +1492,7 @@
     <string name="on_demand_exchange_log_desc">Ostatnie pary nadawca → odbiorca zaobserwowane przez ten węzeł.</string>
     <string name="on_demand_rx_avg_time_desc">Średni czas odbioru pakietu w kolejnych oknach czasowych.</string>
     <string name="on_demand_rx_packet_history_desc">Liczba odebranych pakietów w kolejnych 10-minutowych oknach.</string>
-    <string name="on_demand_fw_plus_version_desc">Wersja protokołu OnDemand działającego na tym węźle.</string>
+    <string name="on_demand_fw_plus_version_desc">Wersja protokołu diagnostyki na żądanie działającego na tym węźle.</string>
     <string name="port_name_text_message">Wiadomość tekstowa</string>
     <string name="port_desc_text_message">wiadomości tekstowe czatu</string>
     <string name="port_name_remote_hardware">Zdalny sprzęt (GPIO)</string>
@@ -1537,7 +1539,7 @@
     <string name="port_desc_neighborinfo">lista sąsiadów węzła</string>
     <string name="port_name_map_report">Raport dla mapy</string>
     <string name="port_desc_map_report">dane węzła dla mapy publicznej (MQTT)</string>
-    <string name="port_name_on_demand">OnDemand</string>
+    <string name="port_name_on_demand">Diagnostyka na żądanie</string>
     <string name="port_desc_on_demand">diagnostyka na żądanie</string>
     <string name="port_name_unknown">Port</string>
     <string name="port_desc_unknown">inny typ pakietu</string>
@@ -2215,8 +2217,8 @@
     <string name="sniffer_source_mqtt_unavailable_summary">Włącz i skonfiguruj moduł MQTT na tym urządzeniu, aby podsłuchiwać ruch brokera</string>
     <string name="sniffer_group_by_gateway_title">Grupuj duplikaty</string>
     <string name="sniffer_group_by_gateway_summary">Łącz ten sam pakiet widziany więcej niż raz (wiele bramek MQTT lub różne węzły przekazujące) w jeden wiersz</string>
-    <string name="sniffer_hide_ondemand_ch0_title">Ukryj OnDemand na kanale 0</string>
-    <string name="sniffer_hide_ondemand_ch0_summary">Ruch OnDemand (port 354) na głównym kanale to własna komunikacja diagnostyczno-kontrolna aplikacji z połączonym urządzeniem, a nie ruch sieci mesh</string>
+    <string name="sniffer_hide_ondemand_ch0_title">Ukryj diagnostykę na żądanie na kanale 0</string>
+    <string name="sniffer_hide_ondemand_ch0_summary">Ruch diagnostyki na żądanie (port 354) na głównym kanale to własna komunikacja diagnostyczno-kontrolna aplikacji z połączonym urządzeniem, a nie ruch sieci mesh</string>
     <string name="sniffer_decrypt_payloads_title">Próbuj deszyfrować</string>
     <string name="sniffer_decrypt_payloads_summary">Próbuj odkodować zaszyfrowane dane, używając znanych kluczy kanałów tej aplikacji</string>
     <string name="sniffer_export_format_title">Format zapisu</string>
