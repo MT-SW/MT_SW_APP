@@ -111,7 +111,11 @@ sourceSets.main { kotlin.srcDir(generateBuildConfig.map { buildConfigOutputDir }
 kotlin {
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(25))
-        vendor.set(JvmVendorSpec.JETBRAINS)
+        // MT_SW: set `anyJdk=true` in ~/.gradle/gradle.properties on a machine without JetBrains
+        // Runtime 25 (e.g. a fresh Mac) to accept any JDK 25 vendor. Unset keeps JetBrains only.
+        if (!providers.gradleProperty("anyJdk").isPresent) {
+            vendor.set(JvmVendorSpec.JETBRAINS)
+        }
     }
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_25)
@@ -138,17 +142,24 @@ compose.desktop {
         // `tasks.withType<AbstractProguardTask>().configureEach { javaHome.set(provider) }` (PR #6401)
         // does not reach `proguardReleaseJars` — the extension value still wins, ProGuard relaunches
         // under the Gradle JVM, and every Build Desktop leg goes red with the jmods-less signature.
+        // MT_SW: when JBR 25 is not installed (e.g. a fresh Mac), fall back to the JVM running
+        // Gradle so project sync still works; packaging then needs JBR 25 to be installed.
         javaHome =
-            javaToolchains
-                .launcherFor {
-                    languageVersion.set(JavaLanguageVersion.of(25))
-                    vendor.set(JvmVendorSpec.JETBRAINS)
-                }
-                .get()
-                .metadata
-                .installationPath
-                .asFile
-                .absolutePath
+            try {
+                javaToolchains
+                    .launcherFor {
+                        languageVersion.set(JavaLanguageVersion.of(25))
+                        vendor.set(JvmVendorSpec.JETBRAINS)
+                    }
+                    .get()
+                    .metadata
+                    .installationPath
+                    .asFile
+                    .absolutePath
+            } catch (e: Exception) {
+                logger.warn("JetBrains Runtime 25 not found, using the Gradle JVM instead: ${e.message}")
+                System.getProperty("java.home")
+            }
 
         val desktopJvmArgs = buildList {
             add("-Xmx2G")
