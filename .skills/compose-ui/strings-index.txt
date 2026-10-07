@@ -203,6 +203,16 @@ chirpy_error_unknown
 chirpy_error_unsupported_flavor
 chirpy_error_unsupported_platform
 chirpy_fallback_unavailable
+chirpy_hop
+chirpy_hop_back_to_update
+chirpy_hop_best
+chirpy_hop_controls
+chirpy_hop_game_over
+chirpy_hop_play
+chirpy_hop_play_again
+chirpy_hop_tap_to_start
+chirpy_hop_update_complete
+chirpy_hop_update_interrupted
 chirpy_intro
 chirpy_ready
 chirpy_search_placeholder
@@ -212,12 +222,18 @@ choose_contrast
 choose_theme
 choose_units
 ### CLEAN ###
+clean_app_node_db_button
+clean_app_node_db_confirmation
+clean_app_node_db_description
+clean_app_node_db_keep_favorites
+clean_mismatched_key_nodes
 clean_node_database_confirmation
 clean_node_database_description
 clean_node_database_title
 clean_nodes_older_than
 clean_now
 clean_unknown_nodes
+clean_unknown_nodes_any_date
 ### CLEAR ###
 clear
 clear_position_track_message
@@ -310,6 +326,7 @@ debug_clear
 debug_clear_logs_confirm
 debug_decoded_payload
 debug_default_search
+debug_device_logs_empty
 debug_export_failed
 debug_export_success
 debug_filter_add
@@ -332,6 +349,7 @@ debug_sniffer_title
 debug_store_logs_summary
 debug_store_logs_title
 debug_tab_app_logs
+debug_tab_device_logs
 debug_tab_packets
 deep_link_connect_message
 deep_link_connect_title
@@ -800,6 +818,8 @@ github_repository
 good
 ### GPIO ###
 gpio
+gpio_help_text
+gpio_help_title
 gpio_mask_display
 gpio_off
 gpio_on
@@ -921,6 +941,10 @@ licensed_mode_enable_warning
 licensed_mode_enable_warning_signed
 lightning_distance
 lightning_strikes_1h
+lna_gain_correction
+lna_gain_correction_description
+lna_gain_db
+lna_gain_node_description
 ### LOAD ###
 load
 load_15_min
@@ -953,6 +977,7 @@ local_stats_noise
 local_stats_psram
 local_stats_psram_description
 local_stats_relays
+local_stats_rx_share
 local_stats_traffic
 local_stats_updated_at
 local_stats_uptime
@@ -1911,7 +1936,6 @@ shutdown_on_power_loss
 shutdown_warning
 signal
 signal_quality
-### SITE ###
 skip
 slot
 smart_position
@@ -1978,6 +2002,8 @@ sniffer_source_mqtt_unavailable_summary
 sniffer_source_off
 sniffer_source_radio_chip
 sniffer_source_title
+sniffer_summary_frame_time
+sniffer_summary_frame_time_suspicious
 sniffer_summary_neighbor_count
 sniffer_summary_nodeinfo_unknown
 sniffer_summary_position_unknown
@@ -2054,6 +2080,8 @@ tak_server_v1_fallback_notice
 telemetry
 telemetry_config
 temperature
+terminate_app
+terminate_app_message
 theme
 theme_dark
 theme_light
@@ -2076,6 +2104,7 @@ traceroute_log
 traceroute_map_no_data
 traceroute_no_response
 traceroute_outgoing_route
+traceroute_relays_missing
 traceroute_return_hops
 traceroute_return_route
 traceroute_round_trip
@@ -2255,14 +2284,18 @@ zoom_out
 ### SCHEMA (generated, values/schema_strings.xml) ###
 schema_ambientlighting_blue
 schema_ambientlighting_blue_description
+schema_ambientlighting_blue_keywords
 schema_ambientlighting_current
 schema_ambientlighting_current_description
+schema_ambientlighting_current_keywords
 schema_ambientlighting_green
 schema_ambientlighting_green_description
+schema_ambientlighting_green_keywords
 schema_ambientlighting_led_state
 schema_ambientlighting_led_state_description
 schema_ambientlighting_red
 schema_ambientlighting_red_description
+schema_ambientlighting_red_keywords
 schema_audio_audio_baud_codec2_1200
 schema_audio_audio_baud_codec2_1300
 schema_audio_audio_baud_codec2_1400
@@ -2472,6 +2505,7 @@ schema_lora_coding_rate_description
 schema_lora_config_ok_to_mqtt
 schema_lora_hop_limit
 schema_lora_hop_limit_description
+schema_lora_hop_limit_keywords
 schema_lora_ignore_incoming
 schema_lora_ignore_mqtt
 schema_lora_ignore_mqtt_description
@@ -2544,6 +2578,7 @@ schema_lora_tx_enabled
 schema_lora_tx_enabled_description
 schema_lora_tx_power
 schema_lora_tx_power_description
+schema_lora_tx_power_keywords
 schema_lora_use_preset
 schema_lora_use_preset_description
 schema_mapreportsettings_publish_interval_secs

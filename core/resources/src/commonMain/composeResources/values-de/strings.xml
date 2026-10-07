@@ -1007,7 +1007,6 @@
     <string name="override_console_serial_port">Seriellen Anschluss der Konsole überschreiben</string>
     <!-- PACKET -->
     <string name="packet_authenticity">Paket Authentizität</string>
-    <string name="packet_authenticity_balanced_summary">Empfohlen. Lehne unsignierte downgrade-Versuche von Knoten ab, von denen bekannt ist, dass sie signieren.</string>
     <string name="packet_authenticity_level">Schutzstufe</string>
     <string name="packet_authenticity_strict_summary">Zeige und verarbeite nur kryptografisch authentisierte Mesh-Pakete. Ältere Knoten und übergroße Pakete könnten verschwinden.</string>
     <string name="packet_authenticity_unsupported">Dieses verbundene Gerät unterstützt keine Überprüfung der Paketsignatur.</string>
@@ -1256,6 +1255,24 @@
     <string name="signal">Signal</string>
     <string name="signal_quality">Signalqualität</string>
     <!-- SITE -->
+    <string name="site_planner_antenna_gain_dbi">Antennengewinn (dBi)</string>
+    <string name="site_planner_antenna_height_meters">Antennenhöhe (m)</string>
+    <string name="site_planner_color_scale">Farbpalette</string>
+    <string name="site_planner_estimate">Geschätzte Abdeckung</string>
+    <string name="site_planner_frequency_mhz">Frequenz (MHz)</string>
+    <string name="site_planner_invalid_latitude">Eingabe -90 bis 90</string>
+    <string name="site_planner_invalid_longitude">Eingabe -180 bis 180</string>
+    <string name="site_planner_invalid_positive">Muss größer als 0 sein</string>
+    <string name="site_planner_invalid_rx_sensitivity">Eingabe -150 bis -30 dBm</string>
+    <string name="site_planner_max_range_km">Max. Reichweite (km)</string>
+    <string name="site_planner_rx_height_meters">Höhe des Empfängers (m)</string>
+    <string name="site_planner_rx_sensitivity_dbm">Empfindlichkeit des Empfängers (dBm)</string>
+    <string name="site_planner_section_display">Anzeige</string>
+    <string name="site_planner_section_receiver">Empfänger</string>
+    <string name="site_planner_section_simulation">Simulationsoptionen</string>
+    <string name="site_planner_use_current_location">Nutze derzeitige Position</string>
+    <string name="site_planner_use_map_center">Nutze Kartenzentrum</string>
+    <string name="site_planner_use_node_location">Nutze derzeitige Knoten-Position</string>
     <string name="skip">Überspringen</string>
     <string name="slot">Position</string>
     <string name="snr">SNR</string>

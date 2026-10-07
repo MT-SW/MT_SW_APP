@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import org.meshtastic.core.common.util.handledLaunch
 import org.meshtastic.core.repository.CommandSender
+import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.NodeController
 import org.meshtastic.core.repository.NodeManager
 import org.meshtastic.core.repository.PacketQueueRejectedException
@@ -36,6 +37,7 @@ import org.meshtastic.proto.AdminMessage
 internal class NodeControllerImpl(
     private val commandSender: CommandSender,
     private val nodeManager: NodeManager,
+    private val serviceNotifications: MeshNotificationManager,
     private val packetRepository: Lazy<PacketRepository>,
     private val scope: CoroutineScope,
 ) : NodeController {
@@ -55,6 +57,8 @@ internal class NodeControllerImpl(
                     }
                 }
                 nodeManager.updateNode(node.num) { it.copy(isFavorite = favorite) }
+                // Only favorites are warned about, so a warning left on an unfavorited node would never clear.
+                if (!favorite && node.num != myNum) serviceNotifications.cancelLowBatteryNotification(node.num)
             }
             true
         } else {

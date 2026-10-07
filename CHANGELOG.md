@@ -1000,7 +1000,7 @@ The entries below describe only what this fork adds on top of upstream, from the
 <!-- UNRELEASED_START -->
 ## [Unreleased]
 
-### Internal (v2.8.3-internal.4)
+### Internal (v2.8.3-internal.7)
 Changes since [`v2.8.2`](https://github.com/meshtastic/Meshtastic-Android/releases/tag/v2.8.2):
 
 #### 🏗️ Features
@@ -1014,6 +1014,7 @@ Changes since [`v2.8.2`](https://github.com/meshtastic/Meshtastic-Android/releas
 * feat(desktop): add draggable scrollbars to node and message lists by @jamesarich in https://github.com/meshtastic/Meshtastic-Android/pull/7506
 * feat(notifications): post reactions on their own channel by @jamesarich in https://github.com/meshtastic/Meshtastic-Android/pull/7507
 * feat(admin): add Reboot into DFU mode admin action for nRF52 nodes by @jamesarich in https://github.com/meshtastic/Meshtastic-Android/pull/7504
+* feat(remote-shell): mesh terminal for the firmware DMShell module by @jamesarich in https://github.com/meshtastic/Meshtastic-Android/pull/6862
 #### 🖥️ Desktop
 * fix(mqtt): remove noop mqtt to allow the mqtt proxy to work on the desktop builds by @Tha14 in https://github.com/meshtastic/Meshtastic-Android/pull/7400
 * fix(notifications): put every notification on its own channel and tap target by @jamesarich in https://github.com/meshtastic/Meshtastic-Android/pull/7415
@@ -1053,9 +1054,13 @@ Changes since [`v2.8.2`](https://github.com/meshtastic/Meshtastic-Android/releas
 * fix(messaging): let a pinned conversation be unpinned by @jamesarich in https://github.com/meshtastic/Meshtastic-Android/pull/7492
 * fix(app): restore the Apache HTTP legacy library for Google Maps by @jamesarich in https://github.com/meshtastic/Meshtastic-Android/pull/7499
 * fix(metrics): break power chart lines across gaps in readings by @jamesarich in https://github.com/meshtastic/Meshtastic-Android/pull/7505
+* fix(analytics): drop the package from RUM view names by @jamesarich in https://github.com/meshtastic/Meshtastic-Android/pull/7525
+* fix(node): keep verified contacts verified by @jamesarich in https://github.com/meshtastic/Meshtastic-Android/pull/7531
+* fix(settings): stop calling Balanced packet authenticity recommended by @jamesarich in https://github.com/meshtastic/Meshtastic-Android/pull/7535
 #### 📝 Other Changes
 * refactor(data): page the log export, remove dedupe leftovers by @jamesarich in https://github.com/meshtastic/Meshtastic-Android/pull/7449
 * refactor(map): share the Web Mercator projection with node clustering by @jamesarich in https://github.com/meshtastic/Meshtastic-Android/pull/7483
+* refactor(ui): share the remote shell's keyboard sink from core/ui by @jamesarich in https://github.com/meshtastic/Meshtastic-Android/pull/7526
 
 ## New Contributors
 * @Tha14 made their first contribution in https://github.com/meshtastic/Meshtastic-Android/pull/7400

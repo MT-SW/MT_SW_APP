@@ -28,13 +28,7 @@ plugins {
 }
 
 kotlin {
-    jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(25))
-        // MT_SW: `anyJdk=true` in ~/.gradle/gradle.properties accepts any JDK 25 vendor.
-        if (!providers.gradleProperty("anyJdk").isPresent) {
-            vendor.set(JvmVendorSpec.JETBRAINS)
-        }
-    }
+    jvmToolchain(25)
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_25)
         allWarningsAsErrors.set(kotlinWarningsAsErrors)

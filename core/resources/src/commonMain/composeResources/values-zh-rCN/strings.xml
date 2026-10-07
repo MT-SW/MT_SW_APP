@@ -1116,7 +1116,6 @@
     <!-- PACKET -->
     <string name="packet_authenticity">数据包身份验证</string>
     <string name="packet_authenticity_balanced">平衡模式 —优先验证身份</string>
-    <string name="packet_authenticity_balanced_summary">推荐设置拒绝来自已知签名节点的未签名降级尝试。</string>
     <string name="packet_authenticity_compatible">兼容模式 —接受未签名消息</string>
     <string name="packet_authenticity_level">安全等级</string>
     <string name="packet_authenticity_strict">严格模式 —强制要求身份验证</string>
@@ -1376,6 +1375,29 @@
     <string name="signal">信号</string>
     <string name="signal_quality">信号质量</string>
     <!-- SITE -->
+    <string name="site_planner">站点规划器</string>
+    <string name="site_planner_antenna_gain_dbi">天线增益(dBi)</string>
+    <string name="site_planner_antenna_height_meters">天线高度 (米)</string>
+    <string name="site_planner_color_scale">调色板</string>
+    <string name="site_planner_estimate">计算覆盖范围</string>
+    <string name="site_planner_estimating">正在计算覆盖范围…</string>
+    <string name="site_planner_frequency_mhz">频率 (MHz)</string>
+    <string name="site_planner_invalid_latitude">请输入 -90 到 90 之间的数值</string>
+    <string name="site_planner_invalid_longitude">请输入 -180 到 180 之间的数值</string>
+    <string name="site_planner_invalid_positive">必须大于 0</string>
+    <string name="site_planner_invalid_rx_sensitivity">请输入 -150 到 -30 dBm 之间的数值</string>
+    <string name="site_planner_max_range_km">最大通信距离 (公里)</string>
+    <string name="site_planner_rx_height_meters">接收机高度 (米)</string>
+    <string name="site_planner_rx_sensitivity_dbm">接收灵敏度 (dBm)</string>
+    <string name="site_planner_section_display">显示</string>
+    <string name="site_planner_section_receiver">接收机</string>
+    <string name="site_planner_section_simulation">模拟选项</string>
+    <string name="site_planner_section_transmitter">站点 / 发射机</string>
+    <string name="site_planner_subtitle">估计发射机的射频RF覆盖范围</string>
+    <string name="site_planner_tx_power_watts">发射功率（瓦特）</string>
+    <string name="site_planner_use_current_location">使用当前位置</string>
+    <string name="site_planner_use_map_center">使用地图中心点坐标</string>
+    <string name="site_planner_use_node_location">使用当前节点的位置</string>
     <string name="skip">跳过</string>
     <string name="slot">槽位</string>
     <string name="snr">SNR</string>

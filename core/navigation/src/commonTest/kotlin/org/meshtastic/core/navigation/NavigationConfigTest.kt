@@ -107,6 +107,7 @@ class NavigationConfigTest {
             // FirmwareRoute
             FirmwareRoute.FirmwareGraph,
             FirmwareRoute.FirmwareUpdate,
+            FirmwareRoute.ChirpyHop,
             // WifiProvisionRoute
             WifiProvisionRoute.WifiProvisionGraph,
             WifiProvisionRoute.WifiProvision(address = "AA:BB:CC:DD:EE:FF"),

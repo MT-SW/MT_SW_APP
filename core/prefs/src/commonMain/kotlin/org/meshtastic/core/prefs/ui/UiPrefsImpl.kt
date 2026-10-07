@@ -395,6 +395,17 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_AUTO_CLEAN_NODES_LAST_RUN] = millis } }
     }
 
+    override val chirpyHopBestScore: StateFlow<Int> =
+        dataStore.data.map { it[KEY_CHIRPY_HOP_BEST_SCORE] ?: 0 }.stateIn(scope, SharingStarted.Eagerly, 0)
+
+    override fun recordChirpyHopScore(score: Int) {
+        scope.launch {
+            dataStore.edit { prefs ->
+                if (score > (prefs[KEY_CHIRPY_HOP_BEST_SCORE] ?: 0)) prefs[KEY_CHIRPY_HOP_BEST_SCORE] = score
+            }
+        }
+    }
+
     private fun Preferences.toNodeFilterPrefs() = NodeFilterPrefs(
         includeUnknown = this[KEY_INCLUDE_UNKNOWN] ?: NodeFilterPrefs().includeUnknown,
         excludeInfrastructure = this[KEY_EXCLUDE_INFRASTRUCTURE] ?: false,
@@ -432,6 +443,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         private val KEY_UNITS_OVERRIDE = intPreferencesKey("units_override")
         val KEY_LOCALE = stringPreferencesKey("locale")
         val KEY_NODE_SORT = intPreferencesKey("node-sort-option")
+        val KEY_CHIRPY_HOP_BEST_SCORE = intPreferencesKey("chirpy-hop-best-score")
         val KEY_INCLUDE_UNKNOWN = booleanPreferencesKey("include-unknown")
         val KEY_EXCLUDE_INFRASTRUCTURE = booleanPreferencesKey("exclude-infrastructure")
         val KEY_ONLY_ONLINE = booleanPreferencesKey("only-online")
