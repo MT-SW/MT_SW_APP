@@ -1099,7 +1099,6 @@
     <!-- PACKET -->
     <string name="packet_authenticity">Autenticità dei pacchetti</string>
     <string name="packet_authenticity_balanced">Bilanciato — Preferisci autenticati</string>
-    <string name="packet_authenticity_balanced_summary">Consigliato. Rifiuta i tentativi di downgrade non firmati provenienti da nodi noti per firmare.</string>
     <string name="packet_authenticity_compatible">Compatibile — Accetta non firmati</string>
     <string name="packet_authenticity_level">Livello di protezione</string>
     <string name="packet_authenticity_strict">Rigoroso — Richiedi l'autenticazione</string>
@@ -1361,6 +1360,29 @@
     <string name="signal">Segnale</string>
     <string name="signal_quality">Qualità Segnale</string>
     <!-- SITE -->
+    <string name="site_planner">Site Planner</string>
+    <string name="site_planner_antenna_gain_dbi">Guadagno antenna (dBi)</string>
+    <string name="site_planner_antenna_height_meters">Altezza antenna (m)</string>
+    <string name="site_planner_color_scale">Palette di colori</string>
+    <string name="site_planner_estimate">Stima la copertura</string>
+    <string name="site_planner_estimating">Stima della copertura…</string>
+    <string name="site_planner_frequency_mhz">Frequenza (MHz)</string>
+    <string name="site_planner_invalid_latitude">Inserisci da −90 a 90</string>
+    <string name="site_planner_invalid_longitude">Inserisci da −180 a 180</string>
+    <string name="site_planner_invalid_positive">Deve essere maggiore di 0</string>
+    <string name="site_planner_invalid_rx_sensitivity">Inserisci da −150 a −30 dBm</string>
+    <string name="site_planner_max_range_km">Portata massima (km)</string>
+    <string name="site_planner_rx_height_meters">Altezza del ricevitore (m)</string>
+    <string name="site_planner_rx_sensitivity_dbm">Sensibilità del ricevitore (dBm)</string>
+    <string name="site_planner_section_display">Schermo</string>
+    <string name="site_planner_section_receiver">Ricevitore</string>
+    <string name="site_planner_section_simulation">Opzioni Simulazione</string>
+    <string name="site_planner_section_transmitter">Sito / Trasmettitore</string>
+    <string name="site_planner_subtitle">Stima la copertura RF di un trasmettitore</string>
+    <string name="site_planner_tx_power_watts">Potenza TX (W)</string>
+    <string name="site_planner_use_current_location">Usa la posizione attuale</string>
+    <string name="site_planner_use_map_center">Usa il centro della mappa</string>
+    <string name="site_planner_use_node_location">Usa la posizione del nodo attuale</string>
     <string name="skip">Ignora</string>
     <string name="slot">Slot</string>
     <string name="snr">SNR</string>

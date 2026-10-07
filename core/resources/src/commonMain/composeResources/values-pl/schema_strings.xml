@@ -232,8 +232,10 @@
     <string name="schema_lora_channel_num">Slot częstotliwości</string>
     <string name="schema_lora_channel_num_description">Częstotliwość robocza węzła jest obliczana na podstawie regionu, ustawień modemu i tego pola. Gdy wartość wynosi 0, slot jest automatycznie obliczany na podstawie nazwy kanału podstawowego i zmienia się z domyślnego slotu publicznego. Jeśli skonfigurowano prywatny kanał podstawowy i publiczny kanał dodatkowy, należy przywrócić domyślny slot publiczny.</string>
     <string name="schema_lora_coding_rate">Szybkość kodowania</string>
+    <string name="schema_lora_coding_rate_description">Nadmiarowość korekcji błędów, jako mianownik 4/n. Wyższe wartości lepiej znoszą zakłócone łącza, ale wydłużają każdy pakiet.</string>
     <string name="schema_lora_config_ok_to_mqtt">Ok dla MQTT</string>
     <string name="schema_lora_hop_limit">Limit przeskoków</string>
+    <string name="schema_lora_hop_limit_keywords">przeskoki|hop|ttl|zasięg|retransmisja|hops|range|rebroadcast</string>
     <string name="schema_lora_hop_limit_description">Ustawia maksymalną liczbę przeskoków, domyślnie jest to 3. Zwiększenie liczby przeskoków powoduje również wzrost przeciążenia i należy stosować tę opcję ostrożnie. Komunikaty rozgłoszeniowe z 0 przeskokami nie otrzymają potwierdzeń ACK.</string>
     <string name="schema_lora_ignore_incoming">Ignoruj przychodzące</string>
     <string name="schema_lora_ignore_mqtt">Zignoruj MQTT</string>
@@ -306,6 +308,7 @@
     <string name="schema_lora_tx_enabled">Nadawanie włączone</string>
     <string name="schema_lora_tx_enabled_description">Zezwól radiu LoRa na nadawanie. Wyłącz podczas wymiany anten pod napięciem lub testów na stole.</string>
     <string name="schema_lora_tx_power">Moc nadawania</string>
+    <string name="schema_lora_tx_power_keywords">moc|nadawanie|dbm|zysk|tx|power|output|gain</string>
     <string name="schema_lora_tx_power_description">Moc nadawania radia.</string>
     <string name="schema_lora_use_preset">Użyj predefiniowanych ustawień</string>
     <string name="schema_lora_use_preset_description">Użyj ustawień predefiniowanych modemu zamiast ręcznej szerokości pasma, współczynnika rozproszenia i szybkości kodowania</string>
@@ -431,7 +434,7 @@
     <string name="schema_security_admin_key">Klucz administratora</string>
     <string name="schema_security_admin_key_description">Klucz publiczny uprawniony do wysyłania wiadomości administracyjnych do tego węzła.</string>
     <string name="schema_security_debug_log_api_enabled">Logi debugowania</string>
-    <string name="schema_security_debug_log_api_enabled_description">Pokaż na żywo logi debugowania przez połączenie szeregowe, podejrzyj i eksportuj logi węzła (bez informacji lokalizacyjnych) przez Bluetooth. (Przez Wi-Fi i USB działa tylko z firmware MT_SW.)</string>
+    <string name="schema_security_debug_log_api_enabled_description">Pokaż na żywo logi debugowania przez połączenie szeregowe, podejrzyj i eksportuj logi węzła (bez informacji lokalizacyjnych) przez Bluetooth.</string>
     <string name="schema_security_is_managed">Urządzenie zarządzane</string>
     <string name="schema_security_is_managed_description">Urządzenie jest zarządzane przez administratora sieci mesh, użytkownik nie ma dostępu do żadnych ustawień urządzenia.</string>
     <string name="schema_security_packetsignaturepolicy_packet_signature_policy_balanced">Zrównoważony — Preferuj uwierzytelnione</string>
@@ -542,4 +545,8 @@
     <string name="schema_trafficmanagement_rate_limit_window_secs_description">Okno czasowe, w którym liczone są pakiety.</string>
     <string name="schema_trafficmanagement_unknown_packet_threshold">Próg nieznanych pakietów</string>
     <string name="schema_trafficmanagement_unknown_packet_threshold_description">Ile na okno czasowe, zanim nadawca zostanie odrzucony.</string>
+    <string name="schema_ambientlighting_blue_keywords">kolor|barwa|rgb|led|oświetlenie|color|colour|ambient|lighting</string>
+    <string name="schema_ambientlighting_current_keywords">led|jasność|oświetlenie|prąd|brightness|ambient|lighting</string>
+    <string name="schema_ambientlighting_green_keywords">kolor|barwa|rgb|led|oświetlenie|color|colour|ambient|lighting</string>
+    <string name="schema_ambientlighting_red_keywords">kolor|barwa|rgb|led|oświetlenie|color|colour|ambient|lighting</string>
 </resources>

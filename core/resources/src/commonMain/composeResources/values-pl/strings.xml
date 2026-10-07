@@ -274,6 +274,16 @@
     <string name="chirpy_error_unsupported_flavor">Działam na ograniczonej częstotliwości w tej wersji appki! 🔌 Spróbuj wersji z pełną integracją AI Core.</string>
     <string name="chirpy_error_unsupported_platform">O nie! Moja antena nie potrafi nawiązać połączenia na tej platformie. 📡 Sprawdź zgodność swojego sprzętu!</string>
     <string name="chirpy_fallback_unavailable">Asystent AI nie jest dostępny na tej platformie. Oto strony, które mogą pomóc:</string>
+    <string name="chirpy_hop">Chirpy Hop</string>
+    <string name="chirpy_hop_back_to_update">Wróć do aktualizacji</string>
+    <string name="chirpy_hop_best">REKORD %1$s</string>
+    <string name="chirpy_hop_controls">Dotknij, aby skoczyć, przesuń w dół, aby się schylić</string>
+    <string name="chirpy_hop_game_over">KONIEC GRY</string>
+    <string name="chirpy_hop_play">Zagraj w Chirpy Hop</string>
+    <string name="chirpy_hop_play_again">Zagraj ponownie</string>
+    <string name="chirpy_hop_tap_to_start">DOTKNIJ, ABY ROZPOCZĄĆ</string>
+    <string name="chirpy_hop_update_complete">Aktualizacja zakończona</string>
+    <string name="chirpy_hop_update_interrupted">Aktualizacja przerwana</string>
     <string name="chirpy_intro">Cześć! 📡 Jestem Chirpy, Twój asystent MT_SW_APP działający na urządzeniu! Mogę pomóc z konfiguracją, ustawieniami, rozwiązywaniem problemów i wskazówkami dot. sieci mesh. W czym mogę pomóc?</string>
     <string name="chirpy_ready">Zapytaj Chirpy</string>
     <string name="chirpy_search_placeholder">Zapytaj o MT_SW_APP…</string>

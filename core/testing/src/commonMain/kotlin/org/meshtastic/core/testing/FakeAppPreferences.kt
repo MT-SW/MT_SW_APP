@@ -281,6 +281,12 @@ class FakeUiPrefs : UiPrefs {
     override fun setAutoCleanNodesLastRunMillis(millis: Long) {
         autoCleanNodesLastRunMillis.value = millis
     }
+
+    override val chirpyHopBestScore = MutableStateFlow(0)
+
+    override fun recordChirpyHopScore(score: Int) {
+        chirpyHopBestScore.update { maxOf(it, score) }
+    }
 }
 
 @Suppress("TooManyFunctions")

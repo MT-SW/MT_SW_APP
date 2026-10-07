@@ -248,7 +248,6 @@ jobs:
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
           cache_read_only: 'false'
-          install_jetbrains_jdk: 'true'
 
       - name: Install dependencies for AppImage
         if: runner.os == 'Linux'
@@ -322,6 +321,8 @@ jobs:
         if: runner.os == 'Linux'
         env:
           APP_VERSION_NAME: ${{ inputs.version_name }}
+          # GitHub's `latest` skips prereleases, so internal builds also update to the newest production release.
+          UPDATE_RELEASE_TAG: latest
         run: scripts/build-appimage.sh
 
       - name: List Desktop Binaries
@@ -340,6 +341,7 @@ jobs:
             desktopApp/build/compose/binaries/main-release/*/*.deb
             desktopApp/build/compose/binaries/main-release/*/*.rpm
             desktopApp/build/compose/binaries/main-release/*/*.AppImage
+            desktopApp/build/compose/binaries/main-release/*/*.AppImage.zsync
             desktopApp/build/compose/jars/*-release.jar
           retention-days: 1
           if-no-files-found: ignore
@@ -355,6 +357,7 @@ jobs:
             desktopApp/build/compose/binaries/main-release/*/*.deb
             desktopApp/build/compose/binaries/main-release/*/*.rpm
             desktopApp/build/compose/binaries/main-release/*/*.AppImage
+            desktopApp/build/compose/binaries/main-release/*/*.AppImage.zsync
             desktopApp/build/compose/jars/*-release.jar
 
   create-flatpak-src:
@@ -379,7 +382,6 @@ jobs:
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
           cache_read_only: 'true'
-          install_jetbrains_jdk: 'true'
 
       # Uses an isolated Gradle user home so every artifact actually traverses the
       # network — the flatpak-sources plugin captures URLs via BuildOperationListener and

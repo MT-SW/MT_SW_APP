@@ -175,22 +175,23 @@ jobs:
 
   # ── Sharded Unit Tests ──────────────────────────────────────────────
   # Tests are split into 3 shards that run in parallel. Module assignment is
-  # balance-driven (measured test-execution time), not purely semantic: the
-  # three heaviest core modules (:core:database ~135s, :core:service ~119s,
-  # :core:network ~66s) are placed in the lighter shards so all three finish
-  # in roughly the same wall time. shard-app already compiles the full
-  # dependency graph (androidApp depends on everything), so hosting extra
-  # core-module tests there costs only their execution time.
+  # balance-driven (summed test-result times over cold runs), not purely semantic:
+  # heavy modules (:core:database, :core:service, :feature:node) sit in whichever
+  # shard keeps the three close. shard-app already compiles the full dependency
+  # graph (androidApp depends on everything), so hosting extra module tests there
+  # costs only their execution time. -x iosSimulatorArm64Test keeps allTests from
+  # compiling Kotlin/Native in every shard; kmpSmokeCompile in shard-core is the
+  # one place main, test and commonMain metadata compile for iOS.
   # These lists are hand-maintained; pull-request.yml's check-changes job
   # guards them against drift (every module in settings.gradle.kts with test
   # sources must appear here or be explicitly exempted).
   #   shard-core:    remaining core:* KMP module tests (allTests), plus kmpSmokeCompile,
-  #                  which is the only iOS compile :core:di and :core:resources get.
+  #                  the only iOS compile any module gets.
   #                  It lived in lint-check until a cold build there blew the 30m budget.
   #   shard-feature: feature:* KMP module tests + :core:service
   #   shard-app:     Pure-Android/JVM tests (androidApp, desktopApp,
   #                  core:barcode, feature:widget)
-  #                  + :core:database + :core:network
+  #                  + :core:database + :core:network + :feature:node + :feature:wifi-provision
   test-shards:
     runs-on: ubuntu-26.04
     permissions:
@@ -205,6 +206,7 @@ jobs:
       matrix:
         shard:
           - name: shard-core
+            flags: core
             tasks: >-
               :core:ble:allTests
               :core:common:allTests
@@ -235,6 +237,7 @@ jobs:
               :core:testing:koverXmlReport
               :core:ui:koverXmlReport
           - name: shard-feature
+            flags: core feature
             tasks: >-
               :core:service:allTests
               :feature:connections:allTests
@@ -246,9 +249,7 @@ jobs:
               :feature:map-maplibre:allTests
               :feature:map-terrain:allTests
               :feature:messaging:allTests
-              :feature:node:allTests
               :feature:settings:allTests
-              :feature:wifi-provision:allTests
             kover: >-
               :core:service:koverXmlReport
               :feature:connections:koverXmlReport
@@ -260,10 +261,9 @@ jobs:
               :feature:map-maplibre:koverXmlReport
               :feature:map-terrain:koverXmlReport
               :feature:messaging:koverXmlReport
-              :feature:node:koverXmlReport
               :feature:settings:koverXmlReport
-              :feature:wifi-provision:koverXmlReport
           - name: shard-app
+            flags: core feature app desktop
             tasks: >-
               :androidApp:testFdroidDebugUnitTest
               :androidApp:testGoogleDebugUnitTest
@@ -273,6 +273,8 @@ jobs:
               :core:database:allTests
               :core:network:allTests
               :feature:widget:testDebugUnitTest
+              :feature:node:allTests
+              :feature:wifi-provision:allTests
               :schema-strings:test
             kover: >-
               :androidApp:koverXmlReportFdroidDebug
@@ -283,6 +285,8 @@ jobs:
               :core:database:koverXmlReport
               :core:network:koverXmlReport
               :feature:widget:koverXmlReportDebug
+              :feature:node:koverXmlReport
+              :feature:wifi-provision:koverXmlReport
 
     steps:
       - name: Checkout code
@@ -297,8 +301,11 @@ jobs:
           gradle_encryption_key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           develocity_access_key: ${{ secrets.DEVELOCITY_ACCESS_KEY }}
           job_summary_pr_comment: ${{ env.GRADLE_PR_COMMENT }}
-          cache_read_only: ${{ env.GRADLE_CACHE_READ_ONLY }}
+          # One shard writes: the three bundles are near-identical (~1.2 GB each), the other two were never
+          # restored, and the shards race to save the same konan key. PR shards already restore shard-feature's.
+          cache_read_only: ${{ (env.GRADLE_CACHE_READ_ONLY == 'true' || matrix.shard.name != 'shard-feature') && 'true' || 'false' }}
           cache_konan: 'true'
+          cache_robolectric: 'true'
 
       - name: Run Tests & Coverage (${{ matrix.shard.name }})
         run: |
@@ -311,7 +318,7 @@ jobs:
           # otherwise only recoverable by parsing the requested task list.
           # -PwarningsAsErrors: together the shards compile every main and test source set, so a new Kotlin
           # compiler warning fails here.
-          ./gradlew ${{ matrix.shard.tasks }} $kover_tasks -Pci=true -Pkotlin.daemon.useFallbackStrategy=false -PwarningsAsErrors=true --continue \
+          ./gradlew ${{ matrix.shard.tasks }} $kover_tasks -x iosSimulatorArm64Test -Pci=true -Pkotlin.daemon.useFallbackStrategy=false -PwarningsAsErrors=true --continue \
             "-Dscan.value.CI shard=${{ matrix.shard.name }}"
 
       # A test fork that dies in native code (exit 134) names no test, and the JVM's crash report is the
@@ -331,9 +338,10 @@ jobs:
       # Flags are tagged by logical module group (core/feature/app/desktop), matching
       # codecov.yml's flags/component_management — NOT by shard name. Shards are a CI
       # load-balancing detail; which shard happens to run a module must not change
-      # which Codecov flag its coverage lands under.
+      # which Codecov flag its coverage lands under. matrix.shard.flags lists the groups a
+      # shard has reports for, so a shard skips the uploads that would find nothing.
       - name: Upload test results to Codecov (core)
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && contains(matrix.shard.flags, 'core') }}
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -345,7 +353,7 @@ jobs:
           files: "core/**/build/test-results/**/*.xml"
 
       - name: Upload test results to Codecov (feature)
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && contains(matrix.shard.flags, 'feature') }}
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -357,7 +365,7 @@ jobs:
           files: "feature/**/build/test-results/**/*.xml"
 
       - name: Upload test results to Codecov (app)
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && contains(matrix.shard.flags, 'app') }}
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -369,7 +377,7 @@ jobs:
           files: "androidApp/build/test-results/**/*.xml"
 
       - name: Upload test results to Codecov (desktop)
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && contains(matrix.shard.flags, 'desktop') }}
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -381,7 +389,7 @@ jobs:
           files: "desktopApp/build/test-results/**/*.xml"
 
       - name: Upload coverage to Codecov (core)
-        if: ${{ !cancelled() && inputs.run_coverage }}
+        if: ${{ !cancelled() && contains(matrix.shard.flags, 'core') && inputs.run_coverage }}
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -392,7 +400,7 @@ jobs:
           files: "core/**/build/reports/kover/report*.xml"
 
       - name: Upload coverage to Codecov (feature)
-        if: ${{ !cancelled() && inputs.run_coverage }}
+        if: ${{ !cancelled() && contains(matrix.shard.flags, 'feature') && inputs.run_coverage }}
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -403,7 +411,7 @@ jobs:
           files: "feature/**/build/reports/kover/report*.xml"
 
       - name: Upload coverage to Codecov (app)
-        if: ${{ !cancelled() && inputs.run_coverage }}
+        if: ${{ !cancelled() && contains(matrix.shard.flags, 'app') && inputs.run_coverage }}
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -414,7 +422,7 @@ jobs:
           files: "androidApp/build/reports/kover/report*.xml"
 
       - name: Upload coverage to Codecov (desktop)
-        if: ${{ !cancelled() && inputs.run_coverage }}
+        if: ${{ !cancelled() && contains(matrix.shard.flags, 'desktop') && inputs.run_coverage }}
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

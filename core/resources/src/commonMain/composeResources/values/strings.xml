@@ -230,6 +230,16 @@
     <string name="chirpy_error_unsupported_flavor">I'm operating on a limited frequency on this app flavor! 🔌 Try using a version with full AI Core integration.</string>
     <string name="chirpy_error_unsupported_platform">Oh no! My antenna can't seem to establish a connection on this platform. 📡 Please double-check your hardware compatibility!</string>
     <string name="chirpy_fallback_unavailable">AI assistant is not available on this platform. Here are pages that may help:</string>
+    <string name="chirpy_hop">Chirpy Hop</string>
+    <string name="chirpy_hop_back_to_update">Back to update</string>
+    <string name="chirpy_hop_best">HI %1$s</string>
+    <string name="chirpy_hop_controls">Tap to jump, swipe down to crouch</string>
+    <string name="chirpy_hop_game_over">GAME OVER</string>
+    <string name="chirpy_hop_play">Play Chirpy Hop</string>
+    <string name="chirpy_hop_play_again">Play again</string>
+    <string name="chirpy_hop_tap_to_start">TAP TO START</string>
+    <string name="chirpy_hop_update_complete">Update complete</string>
+    <string name="chirpy_hop_update_interrupted">Update interrupted</string>
     <string name="chirpy_intro">Hey there! 📡 I'm Chirpy, your on-device MT_SW_APP assistant! I can help with setup, configuration, troubleshooting, and mesh networking tips. What can I help you with?</string>
     <string name="chirpy_ready">Ask Chirpy</string>
     <string name="chirpy_search_placeholder">Ask about MT_SW_APP</string>
@@ -239,17 +249,17 @@
     <string name="choose_theme">Choose theme</string>
     <string name="choose_units">Choose units</string>
     <!-- CLEAN -->
+    <string name="clean_app_node_db_button">Clear node database in the app</string>
+    <string name="clean_app_node_db_confirmation">Remove all nodes from the app database? The radio is not changed.</string>
+    <string name="clean_app_node_db_description">Empties the node list stored in the app only, without contacting the radio, so it also works while disconnected. A connected radio sends its nodes again on the next sync.</string>
+    <string name="clean_app_node_db_keep_favorites">Keep favorite nodes</string>
+    <string name="clean_mismatched_key_nodes">Only nodes with a mismatched key (removed from the app and the radio)</string>
     <string name="clean_node_database_confirmation">This will remove %1$d nodes from your database. This action cannot be undone.</string>
     <string name="clean_node_database_description">Caution: This removes nodes from in-app and on-device databases.\nSelections are additive.</string>
     <string name="clean_node_database_title">Clean Node Database</string>
     <string name="clean_nodes_older_than">Clean up nodes last seen older than %1$d days</string>
     <string name="clean_now">Clean Now</string>
     <string name="clean_unknown_nodes">Clean up only unknown nodes</string>
-    <string name="clean_app_node_db_button">Clear node database in the app</string>
-    <string name="clean_app_node_db_description">Empties the node list stored in the app only, without contacting the radio, so it also works while disconnected. A connected radio sends its nodes again on the next sync.</string>
-    <string name="clean_app_node_db_keep_favorites">Keep favorite nodes</string>
-    <string name="clean_app_node_db_confirmation">Remove all nodes from the app database? The radio is not changed.</string>
-    <string name="clean_mismatched_key_nodes">Only nodes with a mismatched key (removed from the app and the radio)</string>
     <string name="clean_unknown_nodes_any_date">Ignore the date: all unknown nodes without a key</string>
     <!-- CLEAR -->
     <string name="clear">Clear</string>
@@ -346,6 +356,7 @@
     <string name="debug_clear_logs_confirm">This will remove all log packets and database entries from your device - It is a full reset, and is permanent.</string>
     <string name="debug_decoded_payload">Decoded Payload:</string>
     <string name="debug_default_search">Search in logs…</string>
+    <string name="debug_device_logs_empty">No device logs yet. Enable "Debug Logs" in the device security settings so the radio sends the same logs to the app that appear on its serial port. Over Bluetooth this works with any firmware; over Wi-Fi and USB only with MT_SW firmware.</string>
     <string name="debug_export_failed">Failed to write log file: %1$s</string>
     <string name="debug_export_success">%1$d logs exported</string>
     <string name="debug_filter_add">Add filter</string>
@@ -369,7 +380,6 @@
     <string name="debug_store_logs_title">Store mesh logs</string>
     <string name="debug_tab_app_logs">App logs</string>
     <string name="debug_tab_device_logs">Device logs</string>
-    <string name="debug_device_logs_empty">No device logs yet. Enable "Debug Logs" in the device security settings so the radio sends the same logs to the app that appear on its serial port. Over Bluetooth this works with any firmware; over Wi-Fi and USB only with MT_SW firmware.</string>
     <string name="debug_tab_packets">Packets</string>
     <string name="deep_link_connect_message">A link is asking this app to connect to the device at %1$s. Only continue if you trust where the link came from.</string>
     <string name="deep_link_connect_title">Connect to this device?</string>
@@ -432,8 +442,6 @@
     <string name="disabled">Disabled</string>
     <string name="discard_changes">Discard</string>
     <string name="disconnect">Disconnect</string>
-    <string name="terminate_app">Force stop the app</string>
-    <string name="terminate_app_message">The app will disconnect from the device, stop its background service and end the whole process, like "Force stop" in the system settings. Start it again to resume.</string>
     <string name="disconnected">Disconnected</string>
     <string name="discovered_network_devices">Discovered Network Devices</string>
     <!-- DISCOVERY -->
@@ -530,8 +538,8 @@
     <!-- DOC -->
     <string name="doc_auto_translated">Auto-translated</string>
     <string name="doc_clear_search">Clear search</string>
-    <string name="doc_keywords_android_auto">android auto,car,head unit,driving,hands-free,messages</string>
     <string name="doc_community_translated">Community translated</string>
+    <string name="doc_keywords_android_auto">android auto,car,head unit,driving,hands-free,messages</string>
     <string name="doc_keywords_app_functions">system ai,gemini,assistant,functions,automation,voice</string>
     <string name="doc_keywords_connections">bluetooth,usb,tcp,pairing,serial,wifi</string>
     <string name="doc_keywords_debug_logs">debug,logs,logcat,export,bug report,issue,troubleshooting,diagnostics</string>
@@ -846,8 +854,8 @@
     <string name="good">Good</string>
     <!-- GPIO -->
     <string name="gpio">GPIO</string>
-    <string name="gpio_help_title">How GPIO control works</string>
     <string name="gpio_help_text">1. On the target node, enable the Remote Hardware module and list the pins it may control under Available pins (or allow any pin).\n2. On both devices, yours and the target, create a channel named gpio at position 1 (right after the primary channel at position 0) and set the same key (PSK) on both.\n3. Enter the pin number here and use the buttons: On sets the pin high, Off sets it low, and Read checks its state.\nThe app always sends the commands on the channel at position 1. Without that channel, or without the module enabled, the command will not work and a read shows no response.</string>
+    <string name="gpio_help_title">How GPIO control works</string>
     <string name="gpio_mask_display">Mask: %1$s</string>
     <string name="gpio_off">Off</string>
     <string name="gpio_on">On</string>
@@ -969,11 +977,11 @@
     <string name="licensed_mode_enable_warning_signed">Licensed mode removes channel encryption keys and disables the admin channel, so all traffic is sent as plaintext that anyone can read — but it is digitally signed, letting other nodes verify it came from you. Your node number may change once to match your identity key, so favorites, message history, remote admin, and other nodes may initially treat it as new; you remain responsible for meeting your amateur radio license requirements and local regulations.</string>
     <string name="lightning_distance">Storm Distance</string>
     <string name="lightning_strikes_1h">Lightning (1h)</string>
-    <!-- LOAD -->
     <string name="lna_gain_correction">LNA gain correction</string>
     <string name="lna_gain_correction_description">Enter this device's LNA gain in dB. The displayed noise floor and RSSI are reduced by this value (e.g. 20 dB: -98 dBm is shown as -118 dBm). It is stored on this phone only; the device configuration is not changed.</string>
     <string name="lna_gain_db">LNA gain (dB)</string>
     <string name="lna_gain_node_description">Corrects only the noise floor reported by this node. RSSI of received packets is corrected using the gain of your own device.</string>
+    <!-- LOAD -->
     <string name="load">Load</string>
     <string name="load_15_min">Load 15m</string>
     <string name="load_15_min_description">Fifteen-minute system load average</string>
@@ -1546,7 +1554,7 @@
     <!-- PACKET -->
     <string name="packet_authenticity">Packet authenticity</string>
     <string name="packet_authenticity_balanced">Balanced — Prefer authenticated</string>
-    <string name="packet_authenticity_balanced_summary">Recommended. Reject unsigned downgrade attempts from nodes known to sign.</string>
+    <string name="packet_authenticity_balanced_summary">Reject unsigned downgrade attempts from nodes known to sign.</string>
     <string name="packet_authenticity_compatible">Compatible — Accept unsigned</string>
     <string name="packet_authenticity_compatible_summary">Accept unsigned traffic for maximum compatibility. A signature that can be checked and is wrong still drops the packet.</string>
     <string name="packet_authenticity_level">Protection level</string>
@@ -1988,7 +1996,6 @@
     <string name="shutdown_warning">⚠️ This will SHUTDOWN the node. Physical interaction will be required to turn it back on.</string>
     <string name="signal">Signal</string>
     <string name="signal_quality">Signal Quality</string>
-    <!-- SITE -->
     <string name="skip">Skip</string>
     <string name="slot">Slot</string>
     <string name="smart_position">Smart Position</string>
@@ -2055,9 +2062,9 @@
     <string name="sniffer_source_off">Off</string>
     <string name="sniffer_source_radio_chip">Radio</string>
     <string name="sniffer_source_title">Active sniffer</string>
-    <string name="sniffer_summary_neighbor_count">%1$d neighbors</string>
     <string name="sniffer_summary_frame_time">Time in frame: %1$s</string>
     <string name="sniffer_summary_frame_time_suspicious">Time in frame: %1$s (wrong time!)</string>
+    <string name="sniffer_summary_neighbor_count">%1$d neighbors</string>
     <string name="sniffer_summary_nodeinfo_unknown">Unknown node</string>
     <string name="sniffer_summary_position_unknown">Unknown position</string>
     <string name="sniffer_summary_telemetry_unknown">No readings</string>
@@ -2136,6 +2143,8 @@
     <string name="telemetry">Telemetry</string>
     <string name="telemetry_config">Telemetry Config</string>
     <string name="temperature">Temp</string>
+    <string name="terminate_app">Force stop the app</string>
+    <string name="terminate_app_message">The app will disconnect from the device, stop its background service and end the whole process, like "Force stop" in the system settings. Start it again to resume.</string>
     <string name="theme">Theme</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_light">Light</string>
@@ -2151,7 +2160,6 @@
     <string name="traceroute_diff">Hops towards %1$d Hops back %2$d</string>
     <string name="traceroute_direct">Direct</string>
     <string name="traceroute_duration">Duration: %1$s s</string>
-    <string name="traceroute_relays_missing">The map is available only when every node on the route has a position, and at least one relay has none.</string>
     <string name="traceroute_endpoint_missing">Cannot show traceroute map because the start or destination node has no position information.</string>
     <string name="traceroute_forward_hops">Forward Hops</string>
     <plurals name="traceroute_hops">
@@ -2162,6 +2170,7 @@
     <string name="traceroute_map_no_data">This traceroute does not have any mappable nodes yet.</string>
     <string name="traceroute_no_response">No Response</string>
     <string name="traceroute_outgoing_route">Outgoing route</string>
+    <string name="traceroute_relays_missing">The map is available only when every node on the route has a position, and at least one relay has none.</string>
     <string name="traceroute_return_hops">Return Hops</string>
     <string name="traceroute_return_route">Return route</string>
     <string name="traceroute_round_trip">Round Trip</string>
