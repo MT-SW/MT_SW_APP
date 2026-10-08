@@ -59,10 +59,18 @@ open class SnifferControlUseCase(
      * either it hasn't been queried this session, or the connected firmware doesn't implement the Sniffer OnDemand
      * protocol at all.
      */
-    open fun snifferEnabledFlow(destNum: Int): Flow<Boolean?> =
-        meshLogRepository.getLogsFrom(destNum, ON_DEMAND_PORT_NUM).map(::decodeLatestSnifferState)
+    open fun snifferEnabledFlow(destNum: Int): Flow<Boolean?> = snifferEnabledFlow(destNum, sinceMillis = 0L)
 
-    private fun decodeLatestSnifferState(logs: List<MeshLog>): Boolean? = logs
+    /**
+     * Like [snifferEnabledFlow], but only considers responses logged at or after [sinceMillis]. Used right after a
+     * (re)connect so an answer stored during an earlier connection can't be shown as the radio's current state: the
+     * panel stays empty until the radio really answers this connection's request.
+     */
+    open fun snifferEnabledFlow(destNum: Int, sinceMillis: Long): Flow<Boolean?> =
+        meshLogRepository.getLogsFrom(destNum, ON_DEMAND_PORT_NUM).map { decodeLatestSnifferState(it, sinceMillis) }
+
+    private fun decodeLatestSnifferState(logs: List<MeshLog>, sinceMillis: Long): Boolean? = logs
+        .filter { it.received_date >= sinceMillis }
         .mapNotNull { log ->
             log.fromRadio
                 ?.packet

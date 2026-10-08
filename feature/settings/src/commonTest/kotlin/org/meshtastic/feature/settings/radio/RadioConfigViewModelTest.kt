@@ -452,7 +452,7 @@ class RadioConfigViewModelTest {
         every { uiPrefs.showQuickChat } returns MutableStateFlow(false)
         every { deviceHardwareRepository.observeDeviceHardware(any(), any()) } returns flowOf(null)
 
-        every { snifferControlUseCase.snifferEnabledFlow(any()) } returns MutableStateFlow(null)
+        every { snifferControlUseCase.snifferEnabledFlow(any(), any()) } returns MutableStateFlow(null)
 
         viewModel = createViewModel()
     }

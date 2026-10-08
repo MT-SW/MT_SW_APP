@@ -136,6 +136,10 @@ private val REMOTE_READ_LATE_RESPONSE_GRACE: Duration = 2.minutes
  */
 private val SNIFFER_STATE_TIMEOUT: Duration = 5.seconds
 
+/** How many times, and how far apart, the Sniffer state is asked after a (re)connect until the radio answers. */
+private const val SNIFFER_STATE_ASK_ATTEMPTS = 4
+private val SNIFFER_STATE_ASK_INTERVAL: Duration = 3.seconds
+
 /**
  * Bounded retry for the Sniffer OnDemand requests below, mirroring MeshConnectionManagerImpl's
  * retryPostHandshakeRequest: firing the instant a reconnect resolves can still race the transport actually being ready
@@ -469,23 +473,28 @@ open class RadioConfigViewModel(
             }
                 .distinctUntilChanged()
 
+        // One pipeline on purpose: the moment of each (re)connect is the cut-off for which Sniffer answers count.
+        // Answers logged during an earlier connection are ignored (snifferEnabledFlow(localNum, since)), so after a
+        // reconnect the panel can never keep showing an old state while the radio has a different one.
         localNumIfConnected
-            .onEach { localNum ->
+            .flatMapLatest { localNum ->
                 if (localNum == null) {
                     _radioConfigState.update {
                         it.copy(snifferEnabled = null, snifferLoading = false, fwPlusVersion = null)
                     }
+                    flowOf(null)
                 } else {
+                    val since = nowMillis
                     requestSnifferState(localNum)
                     requestFwPlusVersion(localNum)
+                    snifferControlUseCase.snifferEnabledFlow(localNum, since)
                 }
             }
-            .launchIn(viewModelScope)
-
-        localNumIfConnected
-            .flatMapLatest { localNum -> localNum?.let(snifferControlUseCase::snifferEnabledFlow) ?: flowOf(null) }
             .onEach { enabled ->
-                _radioConfigState.update { it.copy(snifferEnabled = enabled, snifferLoading = false) }
+                // An empty answer must not cancel the spinner of a request that is still being asked.
+                _radioConfigState.update {
+                    it.copy(snifferEnabled = enabled, snifferLoading = if (enabled != null) false else it.snifferLoading)
+                }
             }
             .launchIn(viewModelScope)
 
@@ -767,8 +776,14 @@ open class RadioConfigViewModel(
     private fun requestSnifferState(localNum: Int) {
         safeLaunch(tag = "requestSnifferState") {
             _radioConfigState.update { it.copy(snifferLoading = true) }
-            requestWithQueueRetry("requestSnifferState", localNum) { snifferControlUseCase.requestState(localNum) }
-            delay(SNIFFER_STATE_TIMEOUT)
+            // Asks again a few times: the very first request after a (re)connect can be accepted by the queue and
+            // still never be answered (radio not ready yet), which used to leave the state unknown until the next
+            // reconnect.
+            repeat(SNIFFER_STATE_ASK_ATTEMPTS) {
+                if (myNodeNum != localNum || _radioConfigState.value.snifferEnabled != null) return@repeat
+                requestWithQueueRetry("requestSnifferState", localNum) { snifferControlUseCase.requestState(localNum) }
+                delay(SNIFFER_STATE_ASK_INTERVAL)
+            }
             _radioConfigState.update { if (it.snifferEnabled == null) it.copy(snifferLoading = false) else it }
         }
     }

@@ -1,17 +1,50 @@
 name: Build Binaries (Manual)
 
-# Ręczne budowanie binarek przez Actions — Ty > Actions > "Build Binaries (Manual)" > Run workflow.
+# Ręczne budowanie binarek przez Actions — Actions > "Build Binaries (Manual)" > Run workflow.
+# Zaznacz tylko te pliki, które chcesz zbudować (każdy system i format osobno).
 on:
   workflow_dispatch:
     inputs:
       build_android:
-        description: 'Zbuduj APK (Android, flavor fdroid)'
+        description: 'Android: APK (flavor fdroid)'
         type: boolean
-        default: true
-      build_desktop:
-        description: 'Zbuduj instalatory desktopowe (Windows/macOS/Linux)'
+        default: false
+      windows_msi:
+        description: 'Windows: instalator .msi'
         type: boolean
-        default: true
+        default: false
+      windows_exe:
+        description: 'Windows: instalator .exe'
+        type: boolean
+        default: false
+      windows_jar:
+        description: 'Windows: plik .jar (uber jar)'
+        type: boolean
+        default: false
+      linux_deb:
+        description: 'Linux: pakiet .deb'
+        type: boolean
+        default: false
+      linux_rpm:
+        description: 'Linux: pakiet .rpm'
+        type: boolean
+        default: false
+      linux_appimage:
+        description: 'Linux: plik .AppImage'
+        type: boolean
+        default: false
+      linux_jar:
+        description: 'Linux: plik .jar (uber jar)'
+        type: boolean
+        default: false
+      macos_dmg:
+        description: 'macOS: obraz .dmg'
+        type: boolean
+        default: false
+      macos_jar:
+        description: 'macOS: plik .jar (uber jar)'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -64,13 +97,10 @@ jobs:
           if-no-files-found: ignore
           retention-days: 30
 
-  desktop:
-    if: ${{ inputs.build_desktop }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+
+  desktop-windows:
+    if: ${{ inputs.windows_msi || inputs.windows_exe || inputs.windows_jar }}
+    runs-on: windows-latest
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
@@ -82,21 +112,68 @@ jobs:
         with:
           install_jetbrains_jdk: 'true'
 
-      # AppImage w Compose Multiplatform to tylko jpackage "app-image" (rozpakowany katalog),
-      # nie prawdziwy plik .AppImage -- do jego faktycznego działania (rozpakowania w locie)
-      # potrzebna jest biblioteka FUSE na Linuksie.
-      - name: Install AppImage runtime dependency (Linux)
-        if: runner.os == 'Linux'
+      - name: Build selected packages
+        shell: bash
+        env:
+          B_WINDOWS_MSI: ${{ inputs.windows_msi }}
+          B_WINDOWS_EXE: ${{ inputs.windows_exe }}
+          B_WINDOWS_JAR: ${{ inputs.windows_jar }}
+        run: |
+          TASKS=""
+          [ "$B_WINDOWS_MSI" = "true" ] && TASKS="$TASKS :desktopApp:packageMsi"
+          [ "$B_WINDOWS_EXE" = "true" ] && TASKS="$TASKS :desktopApp:packageExe"
+          [ "$B_WINDOWS_JAR" = "true" ] && TASKS="$TASKS :desktopApp:packageUberJarForCurrentOS"
+          echo "Gradle tasks:$TASKS"
+          ./gradlew $TASKS
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-windows
+          path: |
+            desktopApp/build/compose/binaries/main/msi/*.msi
+            desktopApp/build/compose/binaries/main/exe/*.exe
+            desktopApp/build/compose/jars/*.jar
+          if-no-files-found: ignore
+          retention-days: 30
+
+  desktop-linux:
+    if: ${{ inputs.linux_deb || inputs.linux_rpm || inputs.linux_appimage || inputs.linux_jar }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: ./.github/actions/gradle-setup
+        with:
+          install_jetbrains_jdk: 'true'
+
+      # AppImage potrzebuje biblioteki FUSE na Linuksie.
+      - name: Install AppImage runtime dependency
+        if: ${{ inputs.linux_appimage }}
         run: sudo apt-get update && sudo apt-get install -y libfuse2t64
 
-      - name: Build desktop distributable for this OS
-        run: ./gradlew :desktopApp:packageDistributionForCurrentOS
+      - name: Build selected packages
+        shell: bash
+        env:
+          B_LINUX_DEB: ${{ inputs.linux_deb }}
+          B_LINUX_RPM: ${{ inputs.linux_rpm }}
+          B_LINUX_APPIMAGE: ${{ inputs.linux_appimage }}
+          B_LINUX_JAR: ${{ inputs.linux_jar }}
+        run: |
+          TASKS=""
+          [ "$B_LINUX_DEB" = "true" ] && TASKS="$TASKS :desktopApp:packageDeb"
+          [ "$B_LINUX_RPM" = "true" ] && TASKS="$TASKS :desktopApp:packageRpm"
+          [ "$B_LINUX_APPIMAGE" = "true" ] && TASKS="$TASKS :desktopApp:packageAppImage"
+          [ "$B_LINUX_JAR" = "true" ] && TASKS="$TASKS :desktopApp:packageUberJarForCurrentOS"
+          echo "Gradle tasks:$TASKS"
+          ./gradlew $TASKS
 
-      # Repo ma już gotowy skrypt, który pakuje jpackage'owy "app-image" (goły katalog)
-      # w prawdziwy, jednoplikowy .AppImage -- ten sam, który jest już używany w oficjalnym
-      # workflowie release'owym tego projektu (rpm/deb budują się bez tego dodatkowego kroku).
-      - name: Build real .AppImage (Linux)
-        if: runner.os == 'Linux'
+      # Zamiana jpackage'owego "app-image" (goły katalog) w prawdziwy, jednoplikowy .AppImage.
+      - name: Build real .AppImage
+        if: ${{ inputs.linux_appimage }}
         env:
           APP_VERSION_NAME: dev-${{ github.run_number }}
           BINARIES_DIR: desktopApp/build/compose/binaries/main
@@ -104,13 +181,46 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: desktop-${{ matrix.os }}
+          name: desktop-linux
           path: |
-            desktopApp/build/compose/binaries/main/*/*.msi
-            desktopApp/build/compose/binaries/main/*/*.exe
-            desktopApp/build/compose/binaries/main/*/*.dmg
-            desktopApp/build/compose/binaries/main/*/*.deb
-            desktopApp/build/compose/binaries/main/*/*.rpm
+            desktopApp/build/compose/binaries/main/deb/*.deb
+            desktopApp/build/compose/binaries/main/rpm/*.rpm
             desktopApp/build/compose/binaries/main/appimage/*.AppImage
+            desktopApp/build/compose/jars/*.jar
+          if-no-files-found: ignore
+          retention-days: 30
+
+  desktop-macos:
+    if: ${{ inputs.macos_dmg || inputs.macos_jar }}
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: ./.github/actions/gradle-setup
+        with:
+          install_jetbrains_jdk: 'true'
+
+      - name: Build selected packages
+        shell: bash
+        env:
+          B_MACOS_DMG: ${{ inputs.macos_dmg }}
+          B_MACOS_JAR: ${{ inputs.macos_jar }}
+        run: |
+          TASKS=""
+          [ "$B_MACOS_DMG" = "true" ] && TASKS="$TASKS :desktopApp:packageDmg"
+          [ "$B_MACOS_JAR" = "true" ] && TASKS="$TASKS :desktopApp:packageUberJarForCurrentOS"
+          echo "Gradle tasks:$TASKS"
+          ./gradlew $TASKS
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-macos
+          path: |
+            desktopApp/build/compose/binaries/main/dmg/*.dmg
+            desktopApp/build/compose/jars/*.jar
           if-no-files-found: ignore
           retention-days: 30
