@@ -124,4 +124,12 @@ class ChannelOptionTest {
             wb.coding_rate = codingRate
         }
         .build()
+
+    @Test
+    fun the_default_on_a_narrow_preset_is_stored_as_the_presets_own_rate_not_as_4_5() {
+        assertEquals(6, ChannelOption.NARROW_FAST.storedCodingRate(0))
+        assertEquals(5, ChannelOption.NARROW_FAST.storedCodingRate(5))
+        assertEquals(0, ChannelOption.LONG_FAST.storedCodingRate(0))
+        assertEquals(0, ChannelOption.NARROW_FAST.codingRateOverride(ChannelOption.NARROW_FAST.storedCodingRate(0)))
+    }
 }
