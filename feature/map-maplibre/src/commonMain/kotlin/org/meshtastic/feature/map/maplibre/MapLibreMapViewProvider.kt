@@ -444,6 +444,7 @@ private fun BoxScope.MapToolbar(
                 offlineTarget =
                 OfflineMapTarget(
                     styleUrl = (basemaps.current as? Basemap.Vector)?.styleUri,
+                    rasterBasemap = basemaps.current as? Basemap.Raster,
                     bounds = { mapState.viewport?.visibleBounds?.toBoundingBox() },
                     zoom = { mapState.cameraPosition.zoom },
                     showRegion = { box -> scope.launch { mapState.animateCameraToBounds(box) } },

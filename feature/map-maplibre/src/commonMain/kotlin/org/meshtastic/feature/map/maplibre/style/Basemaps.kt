@@ -16,6 +16,8 @@
  */
 package org.meshtastic.feature.map.maplibre.style
 
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
@@ -132,3 +134,35 @@ internal fun Basemap.zoomRange(): ClosedFloatingPointRange<Float> = when (this) 
 /** MaplibreMap's own default zoom range. */
 internal const val DEFAULT_MIN_ZOOM = 0f
 internal const val DEFAULT_MAX_ZOOM = 20f
+
+/**
+ * A complete style document for a raster basemap, for MapLibre's offline manager.
+ *
+ * An offline pack is defined against a style and downloads the tiles of the sources that style declares. The live map
+ * draws a raster basemap over [RasterBaseStyle] and adds the tile source at runtime, so it has no style of its own to
+ * pack; this declares the same source (the very same tile URL template, which is what the offline cache is keyed by)
+ * and one raster layer over it. Tiles fetched for the pack are then served to the live map from the offline database.
+ */
+internal fun Basemap.Raster.offlineStyleJson(): String = buildJsonObject {
+    put("version", STYLE_SPEC_VERSION)
+    put("name", "Offline $label")
+    putJsonObject("sources") {
+        putJsonObject("basemap") {
+            put("type", "raster")
+            putJsonArray("tiles") { spec.tiles.forEach { add(JsonPrimitive(it)) } }
+            put("tileSize", spec.tileSize)
+            put("minzoom", spec.minZoom)
+            put("maxzoom", spec.maxZoom)
+        }
+    }
+    putJsonArray("layers") {
+        add(
+            buildJsonObject {
+                put("id", "basemap")
+                put("type", "raster")
+                put("source", "basemap")
+            },
+        )
+    }
+}
+    .toString()

@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.stringResource
 import org.maplibre.compose.map.DefaultMapRuntime
 import org.maplibre.compose.offline.DownloadProgress
@@ -71,12 +72,18 @@ import org.meshtastic.core.resources.offline_maps_empty
 import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PlayArrow
+import org.meshtastic.feature.map.layers.mapLayerFileSystem
+import org.meshtastic.feature.map.layers.mapLayersDirectory
+import org.meshtastic.feature.map.maplibre.style.Basemap
+import org.meshtastic.feature.map.maplibre.style.offlineStyleJson
 import org.meshtastic.feature.map.maplibre.tileCount
 import kotlin.math.roundToInt
 
 /** What the map must tell the offline sheet: which style to pack, and which region is on screen. */
 internal class OfflineMapTarget(
     val styleUrl: String?,
+    /** The raster basemap on screen, when there is no [styleUrl]: packed through a style written for it. */
+    val rasterBasemap: Basemap.Raster? = null,
     val bounds: () -> BoundingBox?,
     val zoom: () -> Double,
     /** Moves the map onto a downloaded region, so a pack in the list can actually be gone to. */
@@ -86,8 +93,8 @@ internal class OfflineMapTarget(
 /**
  * Offline downloads, as a section of the layers sheet.
  *
- * Only usable with a vector basemap: a pack is defined against a style document, and a raster basemap draws over
- * `BaseStyle.Empty` and so has no style URL to pack.
+ * A pack is defined against a style document. A vector basemap has one; a raster basemap (such as the default
+ * OpenStreetMap) draws over an empty style, so a small style for it is written out and packed instead.
  */
 @Composable
 internal fun OfflineMapsSection(target: OfflineMapTarget, onShowRegion: (BoundingBox) -> Unit) {
@@ -116,7 +123,7 @@ internal fun OfflineMapsSection(target: OfflineMapTarget, onShowRegion: (Boundin
                 createFailed = false
                 scope.launch { createFailed = !manager.downloadVisibleArea(target, pixelRatio) }
             },
-            enabled = canDownloadOfflinePack(managerState, target.styleUrl, estimate),
+            enabled = canDownloadOfflinePack(managerState, target.styleUrl ?: target.rasterBasemap?.id, estimate),
             modifier = Modifier.padding(vertical = 8.dp),
         ) {
             Text(text = stringResource(Res.string.map_start_download))
@@ -262,13 +269,13 @@ private fun OfflinePackRow(
  * [OfflineManager.resume] is deliberately not called here, so a download never starts itself.
  */
 private suspend fun OfflineManager.downloadVisibleArea(target: OfflineMapTarget, pixelRatio: Float): Boolean {
-    val styleUrl = target.styleUrl
     val bounds = target.bounds()
-    if (styleUrl == null || bounds == null) return false
+    if (bounds == null) return false
 
     val range = target.zoomRange()
 
     return safeCatching {
+        val styleUrl = target.styleUrl ?: target.rasterBasemap?.let { writeOfflineStyle(it) } ?: return@safeCatching null
         create(
             OfflinePackDefinition.TilePyramid(
                 styleUrl = styleUrl,
@@ -280,7 +287,24 @@ private suspend fun OfflineManager.downloadVisibleArea(target: OfflineMapTarget,
         )
     }
         .onFailure { error -> Logger.w(error) { "Could not create an offline pack" } }
-        .isSuccess
+        .map { it != null }
+        .getOrDefault(false)
+}
+
+/**
+ * Writes the style a raster basemap is packed through and returns its `file://` URL.
+ *
+ * Kept in the persistent layers directory rather than a cache: a pack remembers this URL, and a cache the system may
+ * empty would leave a paused pack that cannot be resumed.
+ */
+private suspend fun writeOfflineStyle(basemap: Basemap.Raster): String = withContext(ioDispatcher) {
+    val fs = mapLayerFileSystem()
+    val dir = mapLayersDirectory() / "offline-styles"
+    fs.createDirectories(dir)
+    val file = dir / "${basemap.id}.json"
+    fs.write(file) { writeUtf8(basemap.offlineStyleJson()) }
+    val path = file.toString().replace('\\', '/')
+    if (path.startsWith("/")) "file://$path" else "file:///$path"
 }
 
 private fun OfflinePack.label(): String {

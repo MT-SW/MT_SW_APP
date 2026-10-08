@@ -6,6 +6,8 @@ Stan roboczy — repo służy głównie do własnego użytku i testów z niewiel
 
 ## Zarządzanie węzłami i siecią mesh
 
+- **Coding rate 4/5 dla presetów Narrow** — presety Narrow (Fast/Slow) i Tiny Slow, które domyślnie mają 4/6, mają na liście wyboru także 4/5 (wymaga firmware, które przyjmuje niższy coding rate niż preset).
+
 - **Zdalne sterowanie GPIO** — na ekranie szczegółów węzła (moduł Remote Hardware) można wpisać numer pinu, appka sama liczy maskę bitową i wysyła `WRITE_GPIOS`/`READ_GPIOS` do zdalnego węzła. Przyciski aktywne tylko gdy klucze PKC z węzłem zostały wymienione. W nagłówku karty GPIO jest ikona informacji, która otwiera opis krok po kroku, jak to skonfigurować (moduł Remote Hardware i dostępne piny na węźle docelowym, kanał „gpio” na pozycji 1 z tym samym kluczem na obu urządzeniach).
 - **Zdalne ulubione/ignorowanie węzłów** przez sieć LoRa (nie tylko lokalnie) — z prawdziwym potwierdzeniem doręczenia opartym o routing ACK z mesh, zamiast tylko zmiany po stronie telefonu.
 - **Ręczne dodawanie kontaktu przez ID węzła** — zarówno lokalnie, jak i zdalnie, z ujednoliconym formatem `!a1b2c3d4` (hex) wszędzie w appce.
@@ -26,6 +28,8 @@ Stan roboczy — repo służy głównie do własnego użytku i testów z niewiel
 - **Płynne przewijanie i powiększanie mapy z dużą liczbą węzłów** — mapa przestała co chwilę przebudowywać dane i warstwy: z danych węzłów na mapie usunięto pola „ostatnio słyszany” i „online” (zmieniały się ciągle i wymuszały odświeżenie wszystkich węzłów, a lista węzłów i tak je pokazuje), węzły są ponownie przekazywane do mapy dopiero gdy zmieni się to, co faktycznie na niej widać (pozycja, nazwa, ikona), animacja pulsowania obejmuje tylko widoczne węzły i odświeża się w 15 krokach zamiast ciągle, obszar „widocznych węzłów” nie jest przeliczany przy każdym drobnym ruchu, a obrazki plakietek są zapamiętywane zamiast rysowane od nowa. Efekt potwierdzony na telefonie (Snapdragon 8 Gen 3): koniec zacinania przy doczytywaniu mapy.
 
 ## Mapa
+
+- **Mapy offline działają też dla OpenStreetMap** — w oknie warstw mapy pobieranie widocznego obszaru działa teraz także dla domyślnej mapy OpenStreetMap i pozostałych map rastrowych (wcześniej tylko dla stylów wektorowych). Uwaga: serwer OSM nie lubi masowego pobierania, więc pobieraj małe obszary.
 
 Silnik mapy (Android i desktop) korzysta teraz ze współdzielonej, natywnie renderowanej biblioteki **MapLibre** — przyjętej z upstreamu zamiast wcześniejszego, własnoręcznie napisanego renderera (osmdroid na Androidzie, autorski renderer kafelków OSM na Compose Canvas na desktopie). Powody tej zmiany: wydajniejsze natywne renderowanie (GPU) i brak konieczności utrzymywania osobnego silnika mapy przy każdej synchronizacji z upstreamem.
 
@@ -75,6 +79,8 @@ Osobny ekran dostępny z ekranu szczegółów węzła (Administracja → "Diagno
 - **Pochodzenie funkcji** — zaadaptowana z historycznego forka firmware Meshtastic (`musznik/firmware`, gałąź `trunk-io/update-trunk`).
 
 ## Sniffer
+
+- **Stan snifera po ponownym połączeniu** — po każdym połączeniu z radiem stan jest odczytywany od nowa: appka ignoruje stare odpowiedzi z poprzedniego połączenia i dopytuje radio kilka razy, aż odpowie.
 
 Tryb pokazujący ruch w eterze, który normalnie by zniknął — wszystkie pakiety usłyszane przez węzeł, łącznie z ruchem broadcastowym (wiadomości na kanałach, telemetria), są przekazywane surowo do telefonu zamiast po prostu odrzucane. Appka ma dwa źródła snifera — **radiowy** (LoRa) i **MQTT** (ruch na skonfigurowanym brokerze) — pokazywane na jednym, wspólnym ekranie logu.
 
@@ -127,6 +133,8 @@ Tryb pokazujący ruch w eterze, który normalnie by zniknął — wszystkie paki
 - **Statusy wiadomości** — dostarczenie do sieci na czacie i potwierdzenie odbioru na priv są złote; na priv samo „dostarczono do sieci” (bez potwierdzenia odbiorcy) jest czerwone; błąd wysyłania jest fioletowy. Tarcza podpisanej wiadomości jest złota.
 
 ## Bezpieczeństwo
+
+- **Kopia kluczy także na desktopie** — w Ustawieniach → Zabezpieczenia są przyciski „Kopia kluczy”, „Przywróć klucze” i „Usuń kopię kluczy” (tak jak na telefonie); kopia trafia do szyfrowanego magazynu aplikacji.
 
 - **Wybór koloru węzła przy generowaniu klucza** — na ekranie Zabezpieczenia, obok pola klucza prywatnego, dostępny jest wybór koloru z palety; appka miele losowe klucze X25519 lokalnie na telefonie (kilka równoległych wątków, z suwakiem tolerancji dopasowania) aż trafi kolor węzła zbliżony do wybranego. Ponieważ tolerancja dopuszcza pewien rozrzut, appka pokazuje obok siebie wybrany kolor i faktyczny wynik przed wpisaniem klucza — można go zaakceptować albo szukać dalej; klucz trafia do pola dopiero po potwierdzeniu, bez automatycznego zapisu. Wymaga customowego firmware wyprowadzającego numer węzła z klucza publicznego (od wersji 2.8) — na starszym firmware przycisk potwierdzenia jest wyszarzony i pokazuje komunikat o wymaganej aktualizacji zamiast mielić klucz, który i tak nie dałby oczekiwanego koloru po połączeniu z urządzeniem.
 
@@ -208,6 +216,8 @@ Work in progress — this repo is mainly for personal use and testing with a sma
 
 ## Node and mesh network management
 
+- **Coding rate 4/5 for Narrow presets** — the Narrow (Fast/Slow) and Tiny Slow presets, which default to 4/6, also offer 4/5 in the list (needs firmware that accepts a coding rate lower than the preset's).
+
 - **Remote GPIO control** — on the node detail screen (Remote Hardware module) you can enter a pin number; the app computes the bitmask itself and sends `WRITE_GPIOS`/`READ_GPIOS` to the remote node. Buttons are only enabled once PKC keys have been exchanged with that node. The GPIO card header has an info icon that opens a step-by-step guide on how to set it up (Remote Hardware module and available pins on the target node, a "gpio" channel at position 1 with the same key on both devices).
 - **Remote favorite/ignore over the LoRa mesh** (not just locally) — with real delivery confirmation based on mesh routing ACKs, instead of only a local, phone-side change.
 - **Manual contact add by node ID** — both locally and remotely, with a unified `!a1b2c3d4` (hex) format used everywhere in the app.
@@ -228,6 +238,8 @@ Work in progress — this repo is mainly for personal use and testing with a sma
 - **Smooth panning and zooming with many nodes** — the map no longer keeps rebuilding its data and layers: the "last heard" and "online" fields were removed from the node data sent to the map (they changed constantly, forcing every node to refresh, and the node list shows them anyway); nodes are handed to the map again only when something actually visible changes (position, name, icon); the pulse animation covers visible nodes only and runs in 15 steps; the "visible nodes" area is not recalculated on every small movement; and chip images are cached instead of redrawn. Confirmed on a phone (Snapdragon 8 Gen 3): no more stutter while the map loads.
 
 ## Map
+
+- **Offline maps also work for OpenStreetMap** — in the map layers sheet, downloading the visible area now also works for the default OpenStreetMap and the other raster basemaps (before, only vector styles). Note: the OSM server dislikes bulk downloads, so download small areas.
 
 The map engine (Android and desktop) now uses the shared, natively rendered **MapLibre** library — adopted from upstream in place of the earlier, hand-written renderer (osmdroid on Android, a custom OSM tile renderer on Compose Canvas on desktop). Reasons for the switch: faster native (GPU) rendering, and no longer having to maintain a separate map engine on every sync with upstream.
 
@@ -277,6 +289,8 @@ A dedicated screen reachable from the node detail screen (Administration → "On
 - **Feature origin** — adapted from a historical Meshtastic firmware fork (`musznik/firmware`, `trunk-io/update-trunk` branch).
 
 ## Sniffer
+
+- **Sniffer state after a reconnect** — after every connection to the radio the state is read again: the app ignores old answers from the previous connection and asks the radio several times until it answers.
 
 A mode that surfaces air traffic that would normally just vanish — every packet the node overhears, including broadcast traffic (channel messages, telemetry), is forwarded raw to the phone instead of being dropped. The app has two sniffer sources — **Radio** (LoRa) and **MQTT** (traffic on the configured broker) — shown on one shared log screen.
 
@@ -329,6 +343,8 @@ A mode that surfaces air traffic that would normally just vanish — every packe
 - **Message statuses** — delivered to the network in a channel and acknowledged by the recipient in a DM are gold; a DM that was only delivered to the network (no recipient ack) is red; a send error is purple. The signed-message shield is gold.
 
 ## Security
+
+- **Key backup on desktop too** — Settings → Security has "Back up keys", "Restore keys" and "Delete key backup" buttons (as on the phone); the backup goes to the app's encrypted store.
 
 - **Node color picker when generating a key** — on the Security screen, next to the private key field, there's a color picker; the app grinds random X25519 keys locally on the phone (a few parallel threads, with a tolerance slider) until it finds one whose resulting node color is close enough to the chosen one. Since the tolerance allows some spread, the app shows the chosen color next to the actual result before the key is applied — you can accept it or search again; the key only goes into the field once confirmed, with no auto-save. Requires custom firmware that derives the node number from the public key (firmware 2.8+) — on older firmware the confirm button is grayed out and shows a message about the required update instead of grinding a key that wouldn't produce the expected color once connected to the device anyway.
 
