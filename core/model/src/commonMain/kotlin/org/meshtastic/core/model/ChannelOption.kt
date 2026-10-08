@@ -526,12 +526,19 @@ enum class ChannelOption(
         get() = SNR_FLOOR_SF7_DB - SNR_FLOOR_PER_SF_DB * (spreadingFactor - MIN_SPREADING_FACTOR)
 
     /**
-     * The coding rates `coding_rate` can raise this preset to while `use_preset` is on. Firmware applies it over the
-     * preset only when it is higher than [codingRate] ([Capabilities.supportsCodingRateOverride]), so nothing at or
-     * below that is offered, and a preset already at 4/8 has none.
+     * The coding rates `coding_rate` can set on this preset while `use_preset` is on, besides the preset's own. Stock
+     * firmware applies it only when it is higher than [codingRate] ([Capabilities.supportsCodingRateOverride]), so
+     * normally only higher rates are offered and a preset already at 4/8 has none. The Narrow/Tiny presets that
+     * default to 4/6 also offer 4/5 (less redundancy, shorter packets) for MT_SW firmware.
      */
-    val codingRateOverrides: IntRange
-        get() = (codingRate + 1)..MAX_CODING_RATE
+    val codingRateOverrides: List<Int>
+        get() {
+            val lowest = if (lowerCodingRateAllowed) MIN_CODING_RATE else codingRate + 1
+            return (lowest..MAX_CODING_RATE).filter { it != codingRate }
+        }
+
+    private val lowerCodingRateAllowed: Boolean
+        get() = this == NARROW_FAST || this == NARROW_SLOW || this == TINY_SLOW
 
     /** [stored] as firmware applies it over this preset: the override while it raises [codingRate], else 0. */
     fun codingRateOverride(stored: Int): Int = if (stored in codingRateOverrides) stored else 0
@@ -542,6 +549,9 @@ enum class ChannelOption(
     companion object {
         /** The most redundant LoRa coding rate, 4/8. */
         const val MAX_CODING_RATE = 8
+
+        /** The least redundant LoRa coding rate, 4/5. */
+        const val MIN_CODING_RATE = 5
 
         /** SF7's demodulation floor, the anchor for [snrLimit]. */
         private const val SNR_FLOOR_SF7_DB = -7.5f

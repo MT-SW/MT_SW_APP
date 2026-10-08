@@ -72,8 +72,8 @@ class ChannelOptionTest {
 
     @Test
     fun a_preset_offers_only_the_coding_rates_above_its_own() {
-        assertEquals(6..8, ChannelOption.LONG_FAST.codingRateOverrides)
-        assertEquals(7..8, ChannelOption.NARROW_FAST.codingRateOverrides)
+        assertEquals(listOf(6, 7, 8), ChannelOption.LONG_FAST.codingRateOverrides)
+        assertEquals(listOf(5, 7, 8), ChannelOption.NARROW_FAST.codingRateOverrides)
         assertTrue(ChannelOption.LONG_SLOW.codingRateOverrides.isEmpty())
     }
 
@@ -91,7 +91,7 @@ class ChannelOptionTest {
     fun the_effective_coding_rate_is_the_override_or_else_the_preset() {
         assertEquals(7, ChannelOption.LONG_FAST.effectiveCodingRate(7))
         assertEquals(5, ChannelOption.LONG_FAST.effectiveCodingRate(0))
-        assertEquals(6, ChannelOption.NARROW_FAST.effectiveCodingRate(5))
+        assertEquals(5, ChannelOption.NARROW_FAST.effectiveCodingRate(5))
     }
 
     @Test

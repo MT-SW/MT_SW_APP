@@ -31,6 +31,12 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do upstreamu, od pocz
 * Komunikat pod ustawieniami dokładnego terenu podaje teraz wybrany zasięg danych zamiast stałych „30 km”.
 * Okno traceroute: gdy trasy nie da się pokazać na mapie, jest jeden przycisk OK (wcześniej obok pojawiał się drugi); opisy trasy na mapie mają cieńszą obwódkę i większą czcionkę.
 
+**Sniffer, klucze, coding rate (8.10)**
+* Sniffer: po ponownym połączeniu stan jest odczytywany od nowa — aplikacja nie pokazuje już starej odpowiedzi z poprzedniego połączenia i dopytuje radio kilka razy, aż odpowie.
+* Desktop: w ustawieniach Zabezpieczenia są teraz przyciski „Kopia kluczy”, „Przywróć klucze” i „Usuń kopię kluczy” — tak samo jak w aplikacji na telefon.
+* Coding rate: dla presetów Narrow (Fast/Slow) i Tiny Slow, które domyślnie mają 4/6, na liście dostępne jest także 4/5.
+* Budowanie na GitHubie (Actions → „Build Binaries (Manual)”): każdy system i format wybierasz osobno — Windows (.msi, .exe, .jar), Linux (.deb, .rpm, .AppImage, .jar), macOS (.dmg, .jar) i Android (APK).
+
 **Mapa**
 * Płynne przewijanie i powiększanie przy dużej liczbie węzłów: usunięte z danych mapy pola „ostatnio słyszany”/„online”, węzły odświeżane tylko przy zmianie pozycji, nazwy, ulubionego i ignorowanego, błysk na własnym małym źródle w 15 krokach, stabilny obszar widoku podczas przesuwania, pamięć podręczna obrazków plakietek, brak niewidocznych obrysów w warstwie zasięgu.
 * **Trasa traceroute na mapie z siłą sygnału:** przycisk „Pokaż na mapie” tylko gdy wszystkie węzły trasy mają lokalizację (inaczej okno tłumaczy dlaczego); osobna cienka linia na skok w kolorze jakości sygnału, ze strzałką na końcu i SNR w dB wzdłuż linii, kończąca się tuż przed węzłem (węzły jako punkty pod plakietkami), oba kierunki symetrycznie obok siebie; legenda jakości; świeżo otrzymany wynik traceroute od razu ma wartości SNR (wcześniej linie były szare do otwarcia z zapisanych tras).
@@ -921,6 +927,12 @@ The entries below describe only what this fork adds on top of upstream, from the
 * Terrain data range above 10 km (50 and 100 km): the area is downloaded in pieces (tiles of about 30 km, one request at a time) instead of one huge answer that neither the server nor the device could handle; a tile the server finds too heavy is split into four, a busy server is waited for, elements on tile borders are counted once, outline points are thinned (from 25 m, more the larger the range, and tiny woods below that scale skipped) to save memory, and the last working server is remembered. The terrain query uses exact matches (`landuse=forest`, `residential` etc.) instead of a regular expression, so the server no longer reads every field and meadow in a tile and answers much faster. The whole download has a 12-minute limit and ends either complete or with an error (no half-maps). The progress (piece x of y) is shown under the coverage bar, and a long download no longer blocks the ordinary A–B link calculation. Overpass requests have their own limits (90 s wait for data instead of 30 s and no automatic repeats, which re-sent heavy queries); a timeout now means "tile too heavy" and splits it, and a brief network drop is retried. The obstacle query for a link path is split into lighter parts (woods, then the buildings at each end) with a 60 s server limit and one retry, because a single heavy query for a long link ran into the server time limit; the smallest coverage tile that timed out is retried after a short wait.
 * The note under the detailed terrain settings now shows the selected data range instead of a fixed “30 km”.
 * Traceroute dialog: when the route cannot be shown on the map there is a single OK button (before, a second one appeared next to it); traceroute labels on the map have a thinner outline and a larger font.
+
+**Sniffer, keys, coding rate (Oct 8)**
+* Sniffer: the state is read again after every reconnect — the app no longer shows an old answer from the previous connection and asks the radio several times until it answers.
+* Desktop: the Security settings now have "Back up keys", "Restore keys" and "Delete key backup" buttons, the same as the phone app.
+* Coding rate: the Narrow (Fast/Slow) and Tiny Slow presets, which default to 4/6, now also offer 4/5.
+* GitHub builds (Actions → "Build Binaries (Manual)"): every system and format is picked separately — Windows (.msi, .exe, .jar), Linux (.deb, .rpm, .AppImage, .jar), macOS (.dmg, .jar) and Android (APK).
 
 **Map**
 * Smooth panning and zooming with many nodes: the "last heard"/"online" fields removed from map data, nodes refreshed only when position, name, favorite or ignored state change, pulse on its own small source in 15 steps, a stable view area while panning, cached chip images, no invisible outlines in the coverage layer.
