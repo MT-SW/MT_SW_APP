@@ -124,7 +124,9 @@ jobs:
           [ "$B_WINDOWS_EXE" = "true" ] && TASKS="$TASKS :desktopApp:packageExe"
           [ "$B_WINDOWS_JAR" = "true" ] && TASKS="$TASKS :desktopApp:packageUberJarForCurrentOS"
           echo "Gradle tasks:$TASKS"
-          ./gradlew $TASKS
+          # Windows: pakowanie MSI/EXE (WiX) czyta Project.layout projektu głównego, czego
+          # Isolated Projects nie dopuszcza -- obie flagi muszą iść razem (tak samo jak w release.yml).
+          ./gradlew $TASKS --no-isolated-projects --no-configuration-cache
 
       - uses: actions/upload-artifact@v4
         with:
