@@ -35,6 +35,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do upstreamu, od pocz
 * Sniffer: po ponownym połączeniu stan jest odczytywany od nowa — aplikacja nie pokazuje już starej odpowiedzi z poprzedniego połączenia i dopytuje radio kilka razy, aż odpowie.
 * Desktop: w ustawieniach Zabezpieczenia są teraz przyciski „Kopia kluczy”, „Przywróć klucze” i „Usuń kopię kluczy” — tak samo jak w aplikacji na telefon.
 * Coding rate: dla presetów Narrow (Fast/Slow) i Tiny Slow, które domyślnie mają 4/6, na liście dostępne jest także 4/5.
+* Coding rate: naprawiony powrót do „domyślne dla presetu” — po zapisie i ponownym połączeniu pokazywało się 4/5, bo radio samo wpisuje 5; teraz domyślna wartość jest zapisywana jako własny coding rate presetu (4/6) i nie myli się z wyborem 4/5.
 * Mapy offline: pobieranie działa teraz także dla domyślnej mapy OpenStreetMap i pozostałych map rastrowych (wcześniej tylko dla stylów wektorowych).
 * Budowanie na GitHubie (Actions → „Build Binaries (Manual)”): każdy system i format wybierasz osobno — Windows (.msi, .exe, .jar), Linux (.deb, .rpm, .AppImage, .jar), macOS (.dmg, .jar) i Android (APK).
 
@@ -933,6 +934,7 @@ The entries below describe only what this fork adds on top of upstream, from the
 * Sniffer: the state is read again after every reconnect — the app no longer shows an old answer from the previous connection and asks the radio several times until it answers.
 * Desktop: the Security settings now have "Back up keys", "Restore keys" and "Delete key backup" buttons, the same as the phone app.
 * Coding rate: the Narrow (Fast/Slow) and Tiny Slow presets, which default to 4/6, now also offer 4/5.
+* Coding rate: fixed returning to "preset default" — after saving and reconnecting it showed 4/5 because the radio fills in 5 by itself; the default is now stored as the preset's own coding rate (4/6) and no longer looks like a 4/5 choice.
 * Offline maps: downloading now also works for the default OpenStreetMap and the other raster basemaps (before, only vector styles could be downloaded).
 * GitHub builds (Actions → "Build Binaries (Manual)"): every system and format is picked separately — Windows (.msi, .exe, .jar), Linux (.deb, .rpm, .AppImage, .jar), macOS (.dmg, .jar) and Android (APK).
 

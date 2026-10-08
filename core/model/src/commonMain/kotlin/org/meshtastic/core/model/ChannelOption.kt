@@ -124,7 +124,8 @@ internal fun LoRaConfig.radioFreq(channelNum: Int): Float {
  * or a preset with no [ChannelOption], comes back unchanged.
  */
 fun LoRaConfig.normalizeCodingRateOverride(): LoRaConfig {
-    val normalized = ChannelOption.from(modem_preset)?.takeIf { use_preset }?.codingRateOverride(coding_rate)
+    val preset = ChannelOption.from(modem_preset)?.takeIf { use_preset }
+    val normalized = preset?.storedCodingRate(preset.codingRateOverride(coding_rate))
     return if (normalized == null || normalized == coding_rate) {
         this
     } else {
@@ -543,6 +544,16 @@ enum class ChannelOption(
     /** [stored] as firmware applies it over this preset: the override while it raises [codingRate], else 0. */
     fun codingRateOverride(stored: Int): Int = if (stored in codingRateOverrides) stored else 0
 
+    /**
+     * What goes into `coding_rate` for [override] (0 = "use the preset's"). Firmware fills an unset (0) `coding_rate`
+     * with 5, which on the presets that offer 4/5 is indistinguishable from a real 4/5 choice, so there the preset's
+     * own rate is stored instead: it is ignored by firmware, reads back unchanged, and never looks like 4/5.
+     */
+    fun storedCodingRate(override: Int): Int = if (override == 0 && lowerCodingRateAllowed) codingRate else override
+
+    /** True when [stored] is just this preset's own default written out (see [storedCodingRate]). */
+    fun isDefaultStoredCodingRate(stored: Int): Boolean = lowerCodingRateAllowed && stored == codingRate
+
     /** The coding rate the radio uses on this preset with [stored] in `coding_rate`. */
     fun effectiveCodingRate(stored: Int): Int = codingRateOverride(stored).takeIf { it != 0 } ?: codingRate
 
@@ -571,5 +582,18 @@ enum class ChannelOption(
             // The `entries` property is preferred over `values()` since Kotlin 1.9
             return entries.find { it.modemPreset == modemPreset }
         }
+    }
+}
+
+/**
+ * Call on the config as it is *before* the modem preset changes: a stored preset default (see
+ * [ChannelOption.storedCodingRate]) belongs to the old preset and must not turn into a real override on the new one.
+ */
+fun LoRaConfig.withoutStoredPresetDefaultCodingRate(): LoRaConfig {
+    val preset = ChannelOption.from(modem_preset)
+    return if (use_preset && preset != null && preset.isDefaultStoredCodingRate(coding_rate)) {
+        newBuilder().also { wb -> wb.coding_rate = 0 }.build()
+    } else {
+        this
     }
 }

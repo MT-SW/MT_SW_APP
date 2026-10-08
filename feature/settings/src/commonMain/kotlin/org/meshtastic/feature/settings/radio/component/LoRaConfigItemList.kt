@@ -36,6 +36,7 @@ import org.meshtastic.core.model.RegionInfo
 import org.meshtastic.core.model.RegionPresetConstraint
 import org.meshtastic.core.model.constraintFor
 import org.meshtastic.core.model.normalizeCodingRateOverride
+import org.meshtastic.core.model.withoutStoredPresetDefaultCodingRate
 import org.meshtastic.core.model.numChannels
 import org.meshtastic.core.model.presetForRegionChange
 import org.meshtastic.core.repository.NodeRepository
@@ -236,6 +237,7 @@ fun LoRaConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                             )
                         formState.value =
                             formState.value
+                                .withoutStoredPresetDefaultCodingRate()
                                 .newBuilder()
                                 .also { wb ->
                                     wb.region = region
@@ -281,6 +283,7 @@ fun LoRaConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                         onItemSelected = {
                             formState.value =
                                 formState.value
+                                    .withoutStoredPresetDefaultCodingRate()
                                     .newBuilder()
                                     .also { wb -> wb.modem_preset = it }
                                     .build()
@@ -499,7 +502,9 @@ private fun CodingRateOverridePreference(
         enabled = enabled && !atMax,
         items = items,
         selectedItem = preset.codingRateOverride(config.coding_rate),
-        onItemSelected = { onConfigChange(config.newBuilder().also { wb -> wb.coding_rate = it }.build()) },
+        onItemSelected = {
+            onConfigChange(config.newBuilder().also { wb -> wb.coding_rate = preset.storedCodingRate(it) }.build())
+        },
     )
 }
 
