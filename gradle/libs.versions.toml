@@ -4,7 +4,7 @@ xmlutil = "1.0.2.1"
 # Android
 agp = "9.4.1"
 appcompat = "1.8.0"
-appfunctions = "1.0.0-alpha12"
+appfunctions = "1.0.0-alpha13"
 
 # androidx
 androidx-sqlite-bundled = "2.7.1"
@@ -19,7 +19,7 @@ navigation3 = "1.2.0-rc01"
 # publish every AndroidX version, so they are not always equal.
 navigation3-runtime = "1.2.0"
 navigationevent = "1.1.0"
-paging = "3.5.1"
+paging = "3.5.2"
 room = "3.0.3"
 koin = "4.2.2"
 koin-plugin = "1.2.1"
@@ -207,9 +207,9 @@ jetbrains-compose-material3-adaptive-navigation-suite = { module = "org.jetbrain
 
 # Google
 firebase-ai = { module = "com.google.firebase:firebase-ai" }
-firebase-ai-ondevice = { module = "com.google.firebase:firebase-ai-ondevice", version = "16.0.0-beta05" }
+firebase-ai-ondevice = { module = "com.google.firebase:firebase-ai-ondevice", version = "16.0.0-beta06" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
-firebase-bom = { module = "com.google.firebase:firebase-bom", version = "34.19.0" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version = "35.0.0" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 location-services = { module = "com.google.android.gms:play-services-location", version = "21.4.0" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
