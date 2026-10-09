@@ -54,6 +54,8 @@ import org.meshtastic.core.resources.config_lora_coding_rate_override
 import org.meshtastic.core.resources.config_lora_coding_rate_override_max_summary
 import org.meshtastic.core.resources.config_lora_coding_rate_override_summary
 import org.meshtastic.core.resources.config_lora_coding_rate_preset_default
+import org.meshtastic.core.resources.config_lora_frequency_offset
+import org.meshtastic.core.resources.config_lora_frequency_offset_summary
 import org.meshtastic.core.resources.config_lora_modem_preset_licensed_summary
 import org.meshtastic.core.resources.config_lora_modem_preset_summary
 import org.meshtastic.core.resources.config_lora_region_summary
@@ -104,6 +106,14 @@ import org.meshtastic.proto.tx_power
 
 private val SPREAD_FACTOR_RANGE = 5..12
 private val CODING_RATE_RANGE = 5..8
+
+private const val KHZ_PER_MHZ = 1000f
+
+/** The largest frequency offset the field accepts, either way, in kHz. */
+private const val MAX_FREQUENCY_OFFSET_KHZ = 1000f
+
+/** [Float] MHz as kHz, rounded so 0.0125 MHz reads as 12.5 and not 12.500001. */
+private fun Float.toKilohertz(): Float = kotlin.math.round(this * KHZ_PER_MHZ * 1000f) / 1000f
 
 /**
  * Builds the modem-preset dropdown items: hide presets the target firmware's preset table doesn't have yet
@@ -434,6 +444,26 @@ fun LoRaConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                     },
                     onValueChanged = {
                         formState.value = formState.value.newBuilder().also { wb -> wb.override_frequency = it }.build()
+                    },
+                )
+                HorizontalDivider()
+                // The protobuf field is in MHz; the screen speaks kHz, which is the unit a frequency correction is
+                // actually thought of in.
+                EditTextPreference(
+                    title = stringResource(Res.string.config_lora_frequency_offset),
+                    summary = stringResource(Res.string.config_lora_frequency_offset_summary),
+                    value = formState.value.frequency_offset.toKilohertz(),
+                    enabled = state.connected,
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                    onValueChanged = {
+                        formState.value =
+                            formState.value
+                                .newBuilder()
+                                .also { wb ->
+                                    val khz = it.coerceIn(-MAX_FREQUENCY_OFFSET_KHZ, MAX_FREQUENCY_OFFSET_KHZ)
+                                    wb.frequency_offset = khz / KHZ_PER_MHZ
+                                }
+                                .build()
                     },
                 )
                 HorizontalDivider()
