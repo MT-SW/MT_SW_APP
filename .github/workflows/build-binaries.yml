@@ -116,12 +116,23 @@ jobs:
       # to download one from foojay, and that download sometimes fails ("Bad Request"). Installing 21 up front lets
       # Gradle find it through toolchains.xml; Temurin 25 stays the JVM on PATH.
       - name: Set up JDK 21 for the Gradle daemon
+        id: jdk21
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
         with:
           java-version: '21'
           distribution: 'temurin'
           set-default: false
           token: ${{ github.token }}
+
+      # toolchains.xml alone was not enough for the daemon JVM lookup, so name the JDK 21 folder to Gradle directly
+      # (user-level gradle.properties; gradle-setup has already written that file, so this goes after it).
+      - name: Point Gradle at JDK 21
+        shell: bash
+        run: |
+          jdk21="${{ steps.jdk21.outputs.path }}"
+          jdk21="${jdk21//\\//}"
+          echo "org.gradle.java.installations.paths=$jdk21" >> ~/.gradle/gradle.properties
+          echo "Gradle will also look for a JDK in: $jdk21"
 
       - name: Build selected packages
         shell: bash
@@ -168,12 +179,23 @@ jobs:
       # to download one from foojay, and that download sometimes fails ("Bad Request"). Installing 21 up front lets
       # Gradle find it through toolchains.xml; Temurin 25 stays the JVM on PATH.
       - name: Set up JDK 21 for the Gradle daemon
+        id: jdk21
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
         with:
           java-version: '21'
           distribution: 'temurin'
           set-default: false
           token: ${{ github.token }}
+
+      # toolchains.xml alone was not enough for the daemon JVM lookup, so name the JDK 21 folder to Gradle directly
+      # (user-level gradle.properties; gradle-setup has already written that file, so this goes after it).
+      - name: Point Gradle at JDK 21
+        shell: bash
+        run: |
+          jdk21="${{ steps.jdk21.outputs.path }}"
+          jdk21="${jdk21//\\//}"
+          echo "org.gradle.java.installations.paths=$jdk21" >> ~/.gradle/gradle.properties
+          echo "Gradle will also look for a JDK in: $jdk21"
 
       # AppImage potrzebuje biblioteki FUSE na Linuksie.
       - name: Install AppImage runtime dependency
@@ -233,12 +255,23 @@ jobs:
       # to download one from foojay, and that download sometimes fails ("Bad Request"). Installing 21 up front lets
       # Gradle find it through toolchains.xml; Temurin 25 stays the JVM on PATH.
       - name: Set up JDK 21 for the Gradle daemon
+        id: jdk21
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
         with:
           java-version: '21'
           distribution: 'temurin'
           set-default: false
           token: ${{ github.token }}
+
+      # toolchains.xml alone was not enough for the daemon JVM lookup, so name the JDK 21 folder to Gradle directly
+      # (user-level gradle.properties; gradle-setup has already written that file, so this goes after it).
+      - name: Point Gradle at JDK 21
+        shell: bash
+        run: |
+          jdk21="${{ steps.jdk21.outputs.path }}"
+          jdk21="${jdk21//\\//}"
+          echo "org.gradle.java.installations.paths=$jdk21" >> ~/.gradle/gradle.properties
+          echo "Gradle will also look for a JDK in: $jdk21"
 
       - name: Build selected packages
         shell: bash
