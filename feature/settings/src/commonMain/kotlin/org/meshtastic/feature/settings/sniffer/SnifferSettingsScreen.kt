@@ -142,21 +142,19 @@ fun SnifferSettingsScreen(
         when (state.snifferEnabled) {
             true -> if (activeSource != SnifferSource.RADIO) panelViewModel.selectSource(SnifferSource.RADIO)
             false -> if (activeSource == SnifferSource.RADIO) panelViewModel.selectSource(SnifferSource.OFF)
-            null -> Unit // not yet synced with the (re)connected device -- don't guess either way
+            null -> Unit // handled by the effect below
         }
     }
 
-    // The block above can only react once state.snifferEnabled actually resolves to true/false -- but a device
-    // running clean/stock firmware with no REQUEST_SNIFFER_STATE handler at all (e.g. reflashed away from this
-    // fork's firmware) never answers either query, so snifferEnabled AND fwPlusVersion both stay null forever and
-    // that block's `null -> Unit` branch never fires. Once loading has settled (the request timed out or was
-    // answered) and neither query ever confirmed support, the ambiguity that comment is protecting against is
-    // gone: this device will never turn Sniffer on, so a RADIO selection left over from a previous, sniffer-capable
-    // device must not keep showing as on against one that can't. Requiring state.connected keeps this from firing
-    // during the brief null window right after a disconnect, before the next device's own queries have even gone
-    // out.
-    LaunchedEffect(state.connected, state.snifferLoading, snifferSupported) {
-        if (state.connected && !state.snifferLoading && !snifferSupported && activeSource == SnifferSource.RADIO) {
+    // A RADIO selection is only believed while the connected device has confirmed this very connection that its
+    // Sniffer is on (state.snifferEnabled == true). snifferEnabled is cleared on every disconnect/reconnect and only
+    // becomes true again when the radio answers, so a selection left in the preferences from an earlier session -- the
+    // radio was reset, replaced, or runs firmware that has no Sniffer at all -- is dropped the moment it is seen
+    // unconfirmed, instead of after a timeout. Waiting for the answer (or for the device to be declared unsupported)
+    // used to leave the panel showing and collecting ordinary traffic as if sniffing worked, with the switch spinning,
+    // for tens of seconds. If the radio really is sniffing, its answer selects RADIO again right above.
+    LaunchedEffect(activeSource, state.snifferEnabled) {
+        if (activeSource == SnifferSource.RADIO && state.snifferEnabled != true) {
             panelViewModel.selectSource(SnifferSource.OFF)
         }
     }

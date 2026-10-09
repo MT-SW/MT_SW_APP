@@ -81,6 +81,7 @@ Osobny ekran dostępny z ekranu szczegółów węzła (Administracja → "Diagno
 ## Sniffer
 
 - **Stan snifera po ponownym połączeniu** — po każdym połączeniu z radiem stan jest odczytywany od nowa: appka ignoruje stare odpowiedzi z poprzedniego połączenia i dopytuje radio kilka razy, aż odpowie.
+- **Wybór „Radio” w snifferze tylko po potwierdzeniu przez radio** — zapamiętany wybór jest wierzony dopiero, gdy podłączone radio potwierdzi w tym połączeniu, że sniffer działa; po resecie radia, zmianie urządzenia lub przy firmware bez snifera panel od razu się wyłącza.
 
 Tryb pokazujący ruch w eterze, który normalnie by zniknął — wszystkie pakiety usłyszane przez węzeł, łącznie z ruchem broadcastowym (wiadomości na kanałach, telemetria), są przekazywane surowo do telefonu zamiast po prostu odrzucane. Appka ma dwa źródła snifera — **radiowy** (LoRa) i **MQTT** (ruch na skonfigurowanym brokerze) — pokazywane na jednym, wspólnym ekranie logu.
 
@@ -291,6 +292,7 @@ A dedicated screen reachable from the node detail screen (Administration → "On
 ## Sniffer
 
 - **Sniffer state after a reconnect** — after every connection to the radio the state is read again: the app ignores old answers from the previous connection and asks the radio several times until it answers.
+- **"Radio" sniffer selection only after the radio confirms it** — a remembered selection is trusted only once the connected radio confirms during this connection that its sniffer is on; after a radio reset, a device change, or firmware without a sniffer the panel turns off at once.
 
 A mode that surfaces air traffic that would normally just vanish — every packet the node overhears, including broadcast traffic (channel messages, telemetry), is forwarded raw to the phone instead of being dropped. The app has two sniffer sources — **Radio** (LoRa) and **MQTT** (traffic on the configured broker) — shown on one shared log screen.
 
