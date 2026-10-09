@@ -112,6 +112,17 @@ jobs:
         with:
           install_jetbrains_jdk: 'true'
 
+      # Gradle's daemon JVM criteria (gradle/gradle-daemon-jvm.properties) ask for JDK 21. Without a local 21 it tries
+      # to download one from foojay, and that download sometimes fails ("Bad Request"). Installing 21 up front lets
+      # Gradle find it through toolchains.xml; Temurin 25 stays the JVM on PATH.
+      - name: Set up JDK 21 for the Gradle daemon
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          set-default: false
+          token: ${{ github.token }}
+
       - name: Build selected packages
         shell: bash
         env:
@@ -151,6 +162,17 @@ jobs:
       - uses: ./.github/actions/gradle-setup
         with:
           install_jetbrains_jdk: 'true'
+
+      # Gradle's daemon JVM criteria (gradle/gradle-daemon-jvm.properties) ask for JDK 21. Without a local 21 it tries
+      # to download one from foojay, and that download sometimes fails ("Bad Request"). Installing 21 up front lets
+      # Gradle find it through toolchains.xml; Temurin 25 stays the JVM on PATH.
+      - name: Set up JDK 21 for the Gradle daemon
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          set-default: false
+          token: ${{ github.token }}
 
       # AppImage potrzebuje biblioteki FUSE na Linuksie.
       - name: Install AppImage runtime dependency
@@ -205,6 +227,17 @@ jobs:
       - uses: ./.github/actions/gradle-setup
         with:
           install_jetbrains_jdk: 'true'
+
+      # Gradle's daemon JVM criteria (gradle/gradle-daemon-jvm.properties) ask for JDK 21. Without a local 21 it tries
+      # to download one from foojay, and that download sometimes fails ("Bad Request"). Installing 21 up front lets
+      # Gradle find it through toolchains.xml; Temurin 25 stays the JVM on PATH.
+      - name: Set up JDK 21 for the Gradle daemon
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          set-default: false
+          token: ${{ github.token }}
 
       - name: Build selected packages
         shell: bash
