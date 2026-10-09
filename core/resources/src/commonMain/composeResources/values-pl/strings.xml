@@ -112,6 +112,8 @@
     <string name="config_lora_coding_rate_override_max_summary">Ten preset już używa najwyższego współczynnika kodowania.</string>
     <string name="config_lora_coding_rate_override_summary">Dodaje korekcję błędów ponad presetem. Wyższy współczynnik kodowania wydłuża każdy pakiet w eterze i zużywa więcej budżetu duty cycle oraz wykorzystania kanału.</string>
     <string name="config_lora_coding_rate_preset_default">Domyślny dla presetu (%1$s)</string>
+    <string name="config_lora_frequency_offset">Przesunięcie częstotliwości (kHz)</string>
+    <string name="config_lora_frequency_offset_summary">Przesuwa częstotliwość pracy o podaną liczbę kHz, np. aby skorygować błąd kwarcu radia. 0 oznacza brak przesunięcia.</string>
     <string name="discovery_scan_in_progress">Skanowanie presetów LoRa…</string>
     <string name="doc_keywords_notifications">powiadomienie,alert,dźwięk,wyciszenie,odpowiedź,zegarek,wear os</string>
     <string name="doc_title_notifications">Powiadomienia</string>

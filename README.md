@@ -6,6 +6,8 @@ Stan roboczy — repo służy głównie do własnego użytku i testów z niewiel
 
 ## Zarządzanie węzłami i siecią mesh
 
+- **Przesunięcie częstotliwości w ustawieniach LoRa** — pole „Przesunięcie częstotliwości (kHz)”: wpisujesz przesunięcie w kHz, aplikacja przelicza je na MHz (tak jak oczekuje radio). Przydatne np. do korekty błędu kwarcu.
+
 - **Coding rate 4/5 dla presetów Narrow** — presety Narrow (Fast/Slow) i Tiny Slow, które domyślnie mają 4/6, mają na liście wyboru także 4/5 (wymaga firmware, które przyjmuje niższy coding rate niż preset).
 
 - **Zdalne sterowanie GPIO** — na ekranie szczegółów węzła (moduł Remote Hardware) można wpisać numer pinu, appka sama liczy maskę bitową i wysyła `WRITE_GPIOS`/`READ_GPIOS` do zdalnego węzła. Przyciski aktywne tylko gdy klucze PKC z węzłem zostały wymienione. W nagłówku karty GPIO jest ikona informacji, która otwiera opis krok po kroku, jak to skonfigurować (moduł Remote Hardware i dostępne piny na węźle docelowym, kanał „gpio” na pozycji 1 z tym samym kluczem na obu urządzeniach).
@@ -216,6 +218,8 @@ A fork of the official [Meshtastic-Android](https://github.com/meshtastic/Meshta
 Work in progress — this repo is mainly for personal use and testing with a small group of people; it doesn't necessarily build cleanly at all times.
 
 ## Node and mesh network management
+
+- **Frequency offset in the LoRa settings** — a "Frequency offset (kHz)" field: you enter the offset in kHz and the app converts it to MHz (what the radio expects). Useful for correcting a crystal error, for example.
 
 - **Coding rate 4/5 for Narrow presets** — the Narrow (Fast/Slow) and Tiny Slow presets, which default to 4/6, also offer 4/5 in the list (needs firmware that accepts a coding rate lower than the preset's).
 
