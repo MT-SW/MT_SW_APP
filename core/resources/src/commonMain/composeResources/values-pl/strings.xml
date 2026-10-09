@@ -2569,4 +2569,8 @@
     <string name="zh_TW" translatable="false">繁體中文</string>
     <string name="zoom_in">Powiększ</string>
     <string name="zoom_out">Pomniejsz</string>
+    <string name="delete_key_backup_pick">Wybierz zaszyfrowaną kopię zapasową kluczy do usunięcia z tego urządzenia. Tej operacji nie można cofnąć.</string>
+    <string name="key_backup_choice">%1$s, kopia z %2$s</string>
+    <string name="restore_keys_pick_backup">Wybierz kopię zapasową do przywrócenia w tym węźle. Reset fabryczny lub nowy klucz zmienia identyfikator węzła, więc starsze kopie zostają pod starym identyfikatorem. Przywracaj tylko kopię wykonaną z tego samego radia: klucz innego radia nadaje obu radiom tę samą tożsamość.</string>
+    <string name="slot_auto">Auto</string>
 </resources>
