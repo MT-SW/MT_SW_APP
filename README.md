@@ -6,6 +6,8 @@ Stan roboczy — repo służy głównie do własnego użytku i testów z niewiel
 
 ## Zarządzanie węzłami i siecią mesh
 
+- **Info o sąsiadach — interwał z listy godzin** — w ustawieniach modułu „Info o sąsiadach” interwał aktualizacji wybiera się z listy (6, 8, 10, 12, 18 i 24 godziny) zamiast wpisywać sekundy.
+
 - **Przesunięcie częstotliwości w ustawieniach LoRa** — pole „Przesunięcie częstotliwości (kHz)”: wpisujesz przesunięcie w kHz, aplikacja przelicza je na MHz (tak jak oczekuje radio). Przydatne np. do korekty błędu kwarcu.
 
 - **Coding rate 4/5 dla presetów Narrow** — presety Narrow (Fast/Slow) i Tiny Slow, które domyślnie mają 4/6, mają na liście wyboru także 4/5 (wymaga firmware, które przyjmuje niższy coding rate niż preset).
@@ -218,6 +220,8 @@ A fork of the official [Meshtastic-Android](https://github.com/meshtastic/Meshta
 Work in progress — this repo is mainly for personal use and testing with a small group of people; it doesn't necessarily build cleanly at all times.
 
 ## Node and mesh network management
+
+- **Neighbor info — interval picked from a list of hours** — in the "Neighbor info" module settings the update interval is chosen from a list (6, 8, 10, 12, 18 and 24 hours) instead of typing seconds.
 
 - **Frequency offset in the LoRa settings** — a "Frequency offset (kHz)" field: you enter the offset in kHz and the app converts it to MHz (what the radio expects). Useful for correcting a crystal error, for example.
 

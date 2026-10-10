@@ -66,6 +66,8 @@ enum class FixedUpdateIntervals(
     FOUR_HOURS(4.hours.inWholeSeconds, pluralRes = Res.plurals.plurals_hours, quantity = 4),
     FIVE_HOURS(5.hours.inWholeSeconds, pluralRes = Res.plurals.plurals_hours, quantity = 5),
     SIX_HOURS(6.hours.inWholeSeconds, pluralRes = Res.plurals.plurals_hours, quantity = 6),
+    EIGHT_HOURS(8.hours.inWholeSeconds, pluralRes = Res.plurals.plurals_hours, quantity = 8),
+    TEN_HOURS(10.hours.inWholeSeconds, pluralRes = Res.plurals.plurals_hours, quantity = 10),
     TWELVE_HOURS(12.hours.inWholeSeconds, pluralRes = Res.plurals.plurals_hours, quantity = 12),
     EIGHTEEN_HOURS(18.hours.inWholeSeconds, pluralRes = Res.plurals.plurals_hours, quantity = 18),
     TWENTY_FOUR_HOURS(24.hours.inWholeSeconds, pluralRes = Res.plurals.plurals_hours, quantity = 24),
@@ -106,6 +108,7 @@ enum class IntervalConfiguration {
     PAX_COUNTER,
     POSITION,
     POSITION_BROADCAST,
+    NEIGHBOR_INFO,
     GPS_UPDATE,
     RANGE_TEST_SENDER,
     SMART_BROADCAST_MINIMUM,
@@ -316,6 +319,18 @@ enum class IntervalConfiguration {
                     FixedUpdateIntervals.THIRTY_SIX_HOURS,
                     FixedUpdateIntervals.FORTY_EIGHT_HOURS,
                     FixedUpdateIntervals.SEVENTY_TWO_HOURS,
+                )
+
+            NEIGHBOR_INFO ->
+                listOf(
+                    FixedUpdateIntervals.FOUR_HOURS,
+                    FixedUpdateIntervals.FIVE_HOURS,
+                    FixedUpdateIntervals.SIX_HOURS,
+                    FixedUpdateIntervals.EIGHT_HOURS,
+                    FixedUpdateIntervals.TEN_HOURS,
+                    FixedUpdateIntervals.TWELVE_HOURS,
+                    FixedUpdateIntervals.EIGHTEEN_HOURS,
+                    FixedUpdateIntervals.TWENTY_FOUR_HOURS,
                 )
 
             GPS_UPDATE ->

@@ -16,14 +16,14 @@
  */
 package org.meshtastic.feature.settings.radio.component
 
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
+import org.meshtastic.core.common.state.HiddenFeaturesUnlock
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.neighbor_info
 import org.meshtastic.core.resources.neighbor_info_config
@@ -33,11 +33,16 @@ import org.meshtastic.core.resources.schema_neighborinfo_transmit_over_lora
 import org.meshtastic.core.resources.schema_neighborinfo_transmit_over_lora_description
 import org.meshtastic.core.resources.schema_neighborinfo_update_interval
 import org.meshtastic.core.resources.schema_neighborinfo_update_interval_description
-import org.meshtastic.core.ui.component.EditTextPreference
+import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.component.TitledCard
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 import org.meshtastic.feature.settings.radio.RebootBehavior
+import org.meshtastic.feature.settings.util.FixedUpdateIntervals
+import org.meshtastic.feature.settings.util.IntervalConfiguration
+import org.meshtastic.feature.settings.util.MIN_BROADCAST_INTERVAL_SECS
+import org.meshtastic.feature.settings.util.intervals
+import org.meshtastic.feature.settings.util.toDisplayString
 import org.meshtastic.proto.ModuleConfig
 
 @Composable
@@ -45,7 +50,6 @@ fun NeighborInfoConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit
     val state by viewModel.radioConfigState.collectAsStateWithLifecycle()
     val neighborInfoConfig = state.moduleConfig.neighbor_info ?: ModuleConfig.NeighborInfoConfig.Builder().build()
     val formState = rememberConfigState(initialValue = neighborInfoConfig)
-    val focusManager = LocalFocusManager.current
 
     RadioConfigScreenList(
         rebootBehavior = RebootBehavior.ALWAYS,
@@ -73,14 +77,23 @@ fun NeighborInfoConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit
                     containerColor = CardDefaults.cardColors().containerColor,
                 )
                 HorizontalDivider()
-                EditTextPreference(
+                val unlocked by koinInject<HiddenFeaturesUnlock>().unlocked.collectAsStateWithLifecycle()
+                val items =
+                    IntervalConfiguration.NEIGHBOR_INFO.intervals(
+                        unlocked,
+                        MIN_BROADCAST_INTERVAL_SECS,
+                        formState.value.update_interval.toLong(),
+                    )
+                DropDownPreference(
                     title = stringResource(Res.string.schema_neighborinfo_update_interval),
                     summary = stringResource(Res.string.schema_neighborinfo_update_interval_description),
-                    value = formState.value.update_interval,
                     enabled = state.connected,
-                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                    onValueChanged = {
-                        formState.value = formState.value.newBuilder().also { wb -> wb.update_interval = it }.build()
+                    items = items.map { it to it.toDisplayString() },
+                    selectedItem =
+                    FixedUpdateIntervals.fromValue(formState.value.update_interval.toLong()) ?: items.first(),
+                    onItemSelected = {
+                        formState.value =
+                            formState.value.newBuilder().also { wb -> wb.update_interval = it.value.toInt() }.build()
                     },
                 )
                 HorizontalDivider()
