@@ -32,7 +32,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do upstreamu, od pocz
 * Okno traceroute: gdy trasy nie da się pokazać na mapie, jest jeden przycisk OK (wcześniej obok pojawiał się drugi); opisy trasy na mapie mają cieńszą obwódkę i większą czcionkę.
 
 **Sniffer, klucze, coding rate (8.10)**
-* Windows: instalator (.msi/.exe) ma przy każdym budowaniu wyższy numer wersji (trzeci człon = numer kolejnej wersji kodu), więc nową wersję można zainstalować na starą bez odinstalowywania.
+* Windows: instalator (.msi/.exe) ma w środku wyższy numer przy każdej zmianie kodu, więc można go zainstalować na starą wersję bez odinstalowywania; aplikacja i nazwa pliku dalej pokazują zwykłą wersję (np. 2.8.3).
 * Info o sąsiadach: interwał aktualizacji wybierasz z listy godzin (6, 8, 10, 12, 18, 24) zamiast wpisywać sekundy.
 * Scalenie z oryginałem (10.10): tylko techniczne aktualizacje (biblioteka sprawdzająca styl kodu, profil startowy) — bez zmian w działaniu aplikacji.
 * Sniffer: po ponownym połączeniu stan jest odczytywany od nowa — aplikacja nie pokazuje już starej odpowiedzi z poprzedniego połączenia i dopytuje radio kilka razy, aż odpowie.
@@ -936,7 +936,7 @@ The entries below describe only what this fork adds on top of upstream, from the
 * Traceroute dialog: when the route cannot be shown on the map there is a single OK button (before, a second one appeared next to it); traceroute labels on the map have a thinner outline and a larger font.
 
 **Sniffer, keys, coding rate (Oct 8)**
-* Windows: the installer (.msi/.exe) gets a higher version number on every build (third number = build counter), so a new version installs over the old one without uninstalling.
+* Windows: the installer (.msi/.exe) gets a higher number inside with every code change, so it installs over the old version without uninstalling; the app and file name still show the normal version (e.g. 2.8.3).
 * Neighbor info: the update interval is picked from a list of hours (6, 8, 10, 12, 18, 24) instead of typing seconds.
 * Merge with upstream (Oct 10): technical updates only (code-style checking library, startup profile) — no change in app behaviour.
 * Sniffer: the state is read again after every reconnect — the app no longer shows an old answer from the previous connection and asks the radio several times until it answers.
