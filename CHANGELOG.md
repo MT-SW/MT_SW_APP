@@ -33,6 +33,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do upstreamu, od pocz
 
 **Sniffer, klucze, coding rate (8.10)**
 * Info o sąsiadach: interwał aktualizacji wybierasz z listy godzin (6, 8, 10, 12, 18, 24) zamiast wpisywać sekundy.
+* Scalenie z oryginałem (10.10): tylko techniczne aktualizacje (biblioteka sprawdzająca styl kodu, profil startowy) — bez zmian w działaniu aplikacji.
 * Sniffer: po ponownym połączeniu stan jest odczytywany od nowa — aplikacja nie pokazuje już starej odpowiedzi z poprzedniego połączenia i dopytuje radio kilka razy, aż odpowie.
 * Sniffer: zapamiętany wybór „Radio” nie jest już wierzony, dopóki podłączone radio w tym połączeniu nie potwierdzi, że sniffer jest włączony — po resecie radia, zmianie urządzenia albo przy firmware bez snifera panel od razu przestaje pokazywać i zbierać pakiety (wcześniej robił to dopiero po kilkudziesięciu sekundach).
 * Desktop: w ustawieniach Zabezpieczenia są teraz przyciski „Kopia kluczy”, „Przywróć klucze” i „Usuń kopię kluczy” — tak samo jak w aplikacji na telefon.
@@ -935,6 +936,7 @@ The entries below describe only what this fork adds on top of upstream, from the
 
 **Sniffer, keys, coding rate (Oct 8)**
 * Neighbor info: the update interval is picked from a list of hours (6, 8, 10, 12, 18, 24) instead of typing seconds.
+* Merge with upstream (Oct 10): technical updates only (code-style checking library, startup profile) — no change in app behaviour.
 * Sniffer: the state is read again after every reconnect — the app no longer shows an old answer from the previous connection and asks the radio several times until it answers.
 * Sniffer: a remembered "Radio" selection is no longer trusted until the connected radio confirms during this connection that its sniffer is on — after a radio reset, a device change, or with firmware that has no sniffer, the panel stops showing and collecting packets at once (before, only after tens of seconds).
 * Desktop: the Security settings now have "Back up keys", "Restore keys" and "Delete key backup" buttons, the same as the phone app.
