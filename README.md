@@ -8,6 +8,8 @@ Stan roboczy — repo służy głównie do własnego użytku i testów z niewiel
 
 - **Info o sąsiadach — interwał z listy godzin** — w ustawieniach modułu „Info o sąsiadach” interwał aktualizacji wybiera się z listy (6, 8, 10, 12, 18 i 24 godziny) zamiast wpisywać sekundy.
 
+- **Windows: aktualizacja bez odinstalowywania** — instalator (.msi/.exe) ma teraz za każdym razem wyższy numer wersji (trzeci człon to numer kolejnej wersji kodu), więc nową wersję instaluje się na starą, bez ręcznego odinstalowania.
+
 - **Przesunięcie częstotliwości w ustawieniach LoRa** — pole „Przesunięcie częstotliwości (kHz)”: wpisujesz przesunięcie w kHz, aplikacja przelicza je na MHz (tak jak oczekuje radio). Przydatne np. do korekty błędu kwarcu.
 
 - **Coding rate 4/5 dla presetów Narrow** — presety Narrow (Fast/Slow) i Tiny Slow, które domyślnie mają 4/6, mają na liście wyboru także 4/5 (wymaga firmware, które przyjmuje niższy coding rate niż preset).
@@ -222,6 +224,8 @@ Work in progress — this repo is mainly for personal use and testing with a sma
 ## Node and mesh network management
 
 - **Neighbor info — interval picked from a list of hours** — in the "Neighbor info" module settings the update interval is chosen from a list (6, 8, 10, 12, 18 and 24 hours) instead of typing seconds.
+
+- **Windows: update without uninstalling** — the installer (.msi/.exe) now gets a higher version number every time (the third number is the build counter), so a new version installs over the old one without uninstalling first.
 
 - **Frequency offset in the LoRa settings** — a "Frequency offset (kHz)" field: you enter the offset in kHz and the app converts it to MHz (what the radio expects). Useful for correcting a crystal error, for example.
 
