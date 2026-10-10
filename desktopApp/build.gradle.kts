@@ -291,10 +291,10 @@ compose.desktop {
             // Reuse the resolved version from the top of this script (mirrors app/build.gradle.kts).
             // Native installers require strict numeric semantic versions (X.Y.Z) without suffixes.
             val sanitizedVersion = Regex("^\\d+\\.\\d+\\.\\d+").find(versionInfo.versionName)?.value ?: "1.0.0"
-            // Windows (MSI/EXE) updates an installed copy ONLY when the installer's version is higher; the
-            // third number would otherwise stay at the patch (e.g. 2.8.3) for every build, forcing an
-            // uninstall first. So on Windows the third number is the build counter (git commit count,
-            // always growing, max 65535), keeping major.minor of the app version.
+            // Windows (MSI/EXE) updates an installed copy ONLY when the installer's version is higher.
+            // So on Windows the third number inside the installer is the build counter (git commit count,
+            // always growing, max 65535), keeping major.minor of the app version. The app itself still shows
+            // the normal version (e.g. 2.8.3) and the CI renames the installer files back to it.
             val windowsBuildNumber = versionInfo.versionCode - (project.rootProject.file("config.properties")
                 .takeIf { it.exists() }
                 ?.readLines()
@@ -302,7 +302,8 @@ compose.desktop {
                 ?.substringAfter('=')?.trim()?.toIntOrNull() ?: 0)
             val majorMinor = sanitizedVersion.substringBeforeLast('.')
             packageVersion =
-                if (currentOs.contains("win") && windowsBuildNumber in 1..65535) {
+                if (currentOs.contains("win") &&
+                    windowsBuildNumber in 1..65535) {
                     "$majorMinor.$windowsBuildNumber"
                 } else {
                     sanitizedVersion

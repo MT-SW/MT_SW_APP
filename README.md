@@ -8,7 +8,7 @@ Stan roboczy — repo służy głównie do własnego użytku i testów z niewiel
 
 - **Info o sąsiadach — interwał z listy godzin** — w ustawieniach modułu „Info o sąsiadach” interwał aktualizacji wybiera się z listy (6, 8, 10, 12, 18 i 24 godziny) zamiast wpisywać sekundy.
 
-- **Windows: aktualizacja bez odinstalowywania** — instalator (.msi/.exe) ma teraz za każdym razem wyższy numer wersji (trzeci człon to numer kolejnej wersji kodu), więc nową wersję instaluje się na starą, bez ręcznego odinstalowania.
+- **Windows: aktualizacja bez odinstalowywania** — instalator (.msi/.exe) ma w środku wyższy numer przy każdej zmianie kodu, więc nową wersję instaluje się na starą bez odinstalowywania. Aplikacja i nazwa pliku instalatora dalej pokazują zwykłą wersję (np. 2.8.3); wyższy numer widzi tylko Windows w liście aplikacji.
 
 - **Przesunięcie częstotliwości w ustawieniach LoRa** — pole „Przesunięcie częstotliwości (kHz)”: wpisujesz przesunięcie w kHz, aplikacja przelicza je na MHz (tak jak oczekuje radio). Przydatne np. do korekty błędu kwarcu.
 
@@ -225,7 +225,7 @@ Work in progress — this repo is mainly for personal use and testing with a sma
 
 - **Neighbor info — interval picked from a list of hours** — in the "Neighbor info" module settings the update interval is chosen from a list (6, 8, 10, 12, 18 and 24 hours) instead of typing seconds.
 
-- **Windows: update without uninstalling** — the installer (.msi/.exe) now gets a higher version number every time (the third number is the build counter), so a new version installs over the old one without uninstalling first.
+- **Windows: update without uninstalling** — the installer (.msi/.exe) gets a higher version number inside with every code change, so a new version installs over the old one without uninstalling. The app and the installer file name still show the normal version (e.g. 2.8.3); only Windows' app list shows the higher number.
 
 - **Frequency offset in the LoRa settings** — a "Frequency offset (kHz)" field: you enter the offset in kHz and the app converts it to MHz (what the radio expects). Useful for correcting a crystal error, for example.
 

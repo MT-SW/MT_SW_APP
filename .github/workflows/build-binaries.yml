@@ -151,6 +151,21 @@ jobs:
           # Isolated Projects nie dopuszcza -- obie flagi muszą iść razem (tak samo jak w release.yml).
           ./gradlew $TASKS --no-daemon --no-isolated-projects --no-configuration-cache
 
+      # Wewnątrz instalatora numer wersji rośnie przy każdej zmianie kodu (dzięki temu Windows pozwala zainstalować
+      # nową wersję na starą bez odinstalowywania), ale nazwa pliku ma pokazywać zwykłą wersję aplikacji (np. 2.8.3).
+      - name: Show the normal app version in installer file names
+        shell: bash
+        run: |
+          BASE=$(grep '^VERSION_NAME_BASE=' config.properties | cut -d= -f2 | tr -d '\r')
+          VER=$(echo "$BASE" | grep -oE '^[0-9]+\.[0-9]+\.[0-9]+')
+          MM=${VER%.*}
+          for f in desktopApp/build/compose/binaries/main/msi/*.msi desktopApp/build/compose/binaries/main/exe/*.exe; do
+            [ -f "$f" ] || continue
+            NEW=$(echo "$f" | sed -E "s/-${MM//./\\.}\.[0-9]+\./-${VER}./")
+            [ "$f" = "$NEW" ] || mv "$f" "$NEW"
+            echo "$NEW"
+          done
+
       - uses: actions/upload-artifact@v4
         with:
           name: desktop-windows
