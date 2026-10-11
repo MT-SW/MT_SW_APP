@@ -8,7 +8,7 @@ Stan roboczy — repo służy głównie do własnego użytku i testów z niewiel
 
 - **Info o sąsiadach — interwał z listy godzin** — w ustawieniach modułu „Info o sąsiadach” interwał aktualizacji wybiera się z listy (6, 8, 10, 12, 18 i 24 godziny) zamiast wpisywać sekundy.
 
-- **Zgłaszanie błędów i propozycji w ustawieniach** — sekcja „Masz pomysł albo znalazłeś błąd?” z klikalnymi odnośnikami do naszego serwera Discord oraz grup WhatsApp i Signal, gdzie można zgłaszać błędy aplikacji i pomysły na nowe funkcje; jest też informacja, że można napisać do nas przez samą sieć mesh w województwie świętokrzyskim.
+- **Zgłaszanie błędów i pomysłów w ustawieniach** — pozycja „Zgłoś błąd lub pomysł” otwiera okno „Masz pomysł albo znalazłeś błąd?” z klikalnymi odnośnikami do naszego serwera Discord oraz grup WhatsApp i Signal, informacją, że można napisać do nas przez samą sieć mesh w województwie świętokrzyskim, i podpowiedzią, co podać przy zgłaszaniu błędu.
 
 - **Powiadomienia o nowych wersjach aplikacji** — aplikacja dwa razy dziennie sprawdza na GitHubie (MT-SW/MT_SW_APP), czy wyszło nowsze wydanie, i pokazuje powiadomienie z linkiem do listy wydań, gdzie można przeczytać, co się zmieniło. Powiadomienie przychodzi od razu po wyjściu nowej wersji, a potem przypomina się co dwa dni, dopóki nie zaktualizujesz. Wersje testowe (pre-release) są pomijane, chyba że w Ustawieniach włączysz „Także wersje testowe”; całość można wyłączyć przełącznikiem „Powiadamiaj o nowych wersjach”. Działa na telefonie i na komputerze.
 
@@ -229,7 +229,7 @@ Work in progress — this repo is mainly for personal use and testing with a sma
 
 - **Neighbor info — interval picked from a list of hours** — in the "Neighbor info" module settings the update interval is chosen from a list (6, 8, 10, 12, 18 and 24 hours) instead of typing seconds.
 
-- **Reporting bugs and suggestions in the settings** — a "Got an idea or found a bug?" section with clickable links to our Discord server and the WhatsApp and Signal groups, where app bugs and ideas for new features can be reported; it also says you can write to us over the mesh network itself in the Świętokrzyskie region.
+- **Reporting bugs and ideas in the settings** — the "Report a bug or idea" entry opens a "Got an idea or found a bug?" window with clickable links to our Discord server and the WhatsApp and Signal groups, a note that you can write to us over the mesh network itself in the Świętokrzyskie region, and a hint on what to include in a bug report.
 
 - **New app version notifications** — twice a day the app checks GitHub (MT-SW/MT_SW_APP) for a newer release and shows a notification with a link to the list of releases, where you can read what changed. The notification comes right when a new version is out, then reminds you every two days until you update. Test (pre-release) versions are skipped unless you turn on "Include test versions" in Settings; everything can be switched off with "Notify about new versions". Works on the phone and on the desktop.
 

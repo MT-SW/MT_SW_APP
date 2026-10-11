@@ -2582,10 +2582,13 @@
     <string name="app_update_check_summary">Dwa razy dziennie sprawdza na GitHubie, czy wyszła nowsza wersja MT_SW_APP, i przypomina co dwa dni, dopóki nie zaktualizujesz.</string>
     <string name="app_update_tests_title">Także wersje testowe</string>
     <string name="app_update_tests_summary">Powiadamiaj również o wersjach testowych (pre-release).</string>
-    <string name="report_issues_title">Masz pomysł albo znalazłeś błąd?</string>
-    <string name="report_issues_intro">Wszystkie błędy aplikacji i propozycje nowych funkcji możesz zgłaszać na naszym serwerze Discord oraz w grupach WhatsApp i Signal. Kliknij nazwę, żeby dołączyć — każde zgłoszenie pomaga nam ulepszać aplikację.</string>
+    <string name="report_issues_title">Zgłoś błąd lub pomysł</string>
+    <string name="report_issues_headline">Masz pomysł albo znalazłeś błąd?</string>
+    <string name="report_issues_intro">Poinformuj nas o tym! Możesz zgłaszać błędy aplikacji i propozycje nowych funkcji — każde zgłoszenie pomaga nam ulepszać aplikację.</string>
+    <string name="report_issues_find_us">Znajdziesz nas tutaj:</string>
     <string name="report_issues_discord_summary">Nasz serwer: błędy, pomysły i rozmowy</string>
     <string name="report_issues_whatsapp_summary">Nasza grupa na WhatsAppie</string>
     <string name="report_issues_signal_summary">Nasza grupa na Signalu</string>
     <string name="report_issues_local_mesh">Możesz też napisać do nas przez samą sieć mesh w województwie świętokrzyskim.</string>
+    <string name="report_issues_tips">Zgłaszając błąd, napisz najlepiej, co dokładnie się stało, jakiej wersji aplikacji używasz (na dole Ustawień), jakie masz radio i jaką wersję firmware.</string>
 </resources>

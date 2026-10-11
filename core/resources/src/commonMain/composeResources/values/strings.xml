@@ -1833,10 +1833,13 @@
     <!-- REPORT -->
     <string name="report">Report</string>
     <string name="report_issues_discord_summary">Our server: bugs, ideas and chat</string>
-    <string name="report_issues_intro">You can report all app bugs and suggestions for new features on our Discord server, and in our WhatsApp and Signal groups. Tap a name to join — every report helps us improve the app.</string>
+    <string name="report_issues_find_us">You can find us here:</string>
+    <string name="report_issues_headline">Got an idea or found a bug?</string>
+    <string name="report_issues_intro">Let us know! You can report app bugs and suggest new features — every report helps us improve the app.</string>
     <string name="report_issues_local_mesh">You can also write to us over the mesh network itself in the Świętokrzyskie region.</string>
     <string name="report_issues_signal_summary">Our Signal group</string>
-    <string name="report_issues_title">Got an idea or found a bug?</string>
+    <string name="report_issues_tips">When reporting a bug, it helps if you write what exactly happened, which app version you use (at the bottom of Settings), which radio you have and its firmware version.</string>
+    <string name="report_issues_title">Report a bug or idea</string>
     <string name="report_issues_whatsapp_summary">Our WhatsApp group</string>
     <!-- REQUEST -->
     <string name="request">Request</string>
