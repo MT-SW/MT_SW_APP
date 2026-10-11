@@ -109,7 +109,7 @@ vico = "3.3.1"
 # Meshtastic device discovery on Windows desktop. Un-pin once Kable ships a fix or exposes a way to disable it.
 kable = "0.44.3"
 mqttastic = "0.9.0"
-jmdns = "3.6.3"
+jmdns = "3.6.4"
 # Desktop-only: speaks StatusNotifierItem over D-Bus so the Linux tray icon is clickable (MIT).
 dbus-java = "5.2.2"
 qrcode-kotlin = "4.5.0"
