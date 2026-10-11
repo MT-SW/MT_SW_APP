@@ -78,6 +78,7 @@ import org.meshtastic.feature.settings.component.AppInfoSection
 import org.meshtastic.feature.settings.component.AppearanceSettingsContent
 import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
+import org.meshtastic.feature.settings.component.ReportIssuesSection
 import org.meshtastic.feature.settings.component.PermissionsSettingsContent
 import org.meshtastic.feature.settings.component.PersistenceSettingsContent
 import org.meshtastic.feature.settings.component.PrivacySettingsContent
@@ -358,6 +359,8 @@ fun SettingsScreen(
                     }
                 }
             }
+
+            ReportIssuesSection()
         }
     }
 }
