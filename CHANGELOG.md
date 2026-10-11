@@ -32,7 +32,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Okno traceroute: gdy trasy nie da się pokazać na mapie, jest jeden przycisk OK (wcześniej obok pojawiał się drugi); opisy trasy na mapie mają cieńszą obwódkę i większą czcionkę.
 
 **Sniffer, klucze, coding rate (8.10)**
-* Ustawienia: nowa sekcja „Masz pomysł albo znalazłeś błąd?” — klikalne odnośniki do serwera Discord oraz grup WhatsApp i Signal i informacja, że można też napisać przez sieć mesh w województwie świętokrzyskim.
+* Ustawienia: nowa pozycja „Zgłoś błąd lub pomysł” otwiera okno „Masz pomysł albo znalazłeś błąd?” — klikalne odnośniki do serwera Discord oraz grup WhatsApp i Signal, informacja, że można też napisać przez sieć mesh w województwie świętokrzyskim, i podpowiedź, co podać przy zgłaszaniu błędu.
 * Powiadomienia o nowych wersjach aplikacji: dwa razy dziennie sprawdzanie wydań MT-SW/MT_SW_APP na GitHubie (telefon i komputer), powiadomienie z linkiem do listy wydań od razu po nowej wersji i przypomnienie co dwa dni do czasu aktualizacji. Wersje testowe tylko po włączeniu „Także wersje testowe”; przełącznik „Powiadamiaj o nowych wersjach” wyłącza całość. Zastępuje stare sprawdzanie aktualizacji desktopa, które pytało o wydania oryginału. Powiadamianie działa od wersji V3, więc o wersji V4 i nowszych.
 * Windows: instalator (.msi/.exe) ma w środku wyższy numer przy każdej zmianie kodu, więc można go zainstalować na starą wersję bez odinstalowywania; aplikacja i nazwa pliku dalej pokazują zwykłą wersję (np. 2.8.3).
 * Info o sąsiadach: interwał aktualizacji wybierasz z listy godzin (6, 8, 10, 12, 18, 24) zamiast wpisywać sekundy.
@@ -148,7 +148,7 @@ The entries below describe only what this fork adds on top of the original, from
 * Traceroute dialog: when the route cannot be shown on the map there is a single OK button (before, a second one appeared next to it); traceroute labels on the map have a thinner outline and a larger font.
 
 **Sniffer, keys, coding rate (Oct 8)**
-* Settings: new "Got an idea or found a bug?" section — clickable links to the Discord server and the WhatsApp and Signal groups, plus a note that you can also write over the mesh network in the Świętokrzyskie region.
+* Settings: the new "Report a bug or idea" entry opens a "Got an idea or found a bug?" window — clickable links to the Discord server and the WhatsApp and Signal groups, a note that you can also write over the mesh network in the Świętokrzyskie region, and a hint on what to include in a bug report.
 * New app version notifications: twice a day the app checks the MT-SW/MT_SW_APP releases on GitHub (phone and desktop), shows a notification with a link to the list of releases as soon as a new version is out and reminds every two days until you update. Test versions only when "Include test versions" is on; "Notify about new versions" switches it all off. Replaces the old desktop update check, which looked at the original app's releases. Notifications work from V3 on, so they announce V4 and newer.
 * Windows: the installer (.msi/.exe) gets a higher number inside with every code change, so it installs over the old version without uninstalling; the app and file name still show the normal version (e.g. 2.8.3).
 * Neighbor info: the update interval is picked from a list of hours (6, 8, 10, 12, 18, 24) instead of typing seconds.

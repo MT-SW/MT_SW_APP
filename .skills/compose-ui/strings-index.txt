@@ -1773,9 +1773,12 @@ replying_to
 ### REPORT ###
 report
 report_issues_discord_summary
+report_issues_find_us
+report_issues_headline
 report_issues_intro
 report_issues_local_mesh
 report_issues_signal_summary
+report_issues_tips
 report_issues_title
 report_issues_whatsapp_summary
 ### REQUEST ###
