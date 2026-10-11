@@ -406,6 +406,35 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         }
     }
 
+    override val appUpdateCheckEnabled: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_APP_UPDATE_CHECK] ?: true }.stateIn(scope, SharingStarted.Eagerly, true)
+
+    override fun setAppUpdateCheckEnabled(enabled: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_APP_UPDATE_CHECK] = enabled } }
+    }
+
+    override val appUpdateNotifyTests: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_APP_UPDATE_TESTS] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setAppUpdateNotifyTests(enabled: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_APP_UPDATE_TESTS] = enabled } }
+    }
+
+    override val appUpdateLastNotifiedTag: StateFlow<String> =
+        dataStore.data.map { it[KEY_APP_UPDATE_LAST_TAG] ?: "" }.stateIn(scope, SharingStarted.Eagerly, "")
+
+    override val appUpdateLastNotifiedMillis: StateFlow<Long> =
+        dataStore.data.map { it[KEY_APP_UPDATE_LAST_MILLIS] ?: 0L }.stateIn(scope, SharingStarted.Eagerly, 0L)
+
+    override fun setAppUpdateLastNotified(tag: String, millis: Long) {
+        scope.launch {
+            dataStore.edit {
+                it[KEY_APP_UPDATE_LAST_TAG] = tag
+                it[KEY_APP_UPDATE_LAST_MILLIS] = millis
+            }
+        }
+    }
+
     private fun Preferences.toNodeFilterPrefs() = NodeFilterPrefs(
         includeUnknown = this[KEY_INCLUDE_UNKNOWN] ?: NodeFilterPrefs().includeUnknown,
         excludeInfrastructure = this[KEY_EXCLUDE_INFRASTRUCTURE] ?: false,
@@ -444,6 +473,10 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_LOCALE = stringPreferencesKey("locale")
         val KEY_NODE_SORT = intPreferencesKey("node-sort-option")
         val KEY_CHIRPY_HOP_BEST_SCORE = intPreferencesKey("chirpy-hop-best-score")
+        val KEY_APP_UPDATE_CHECK = booleanPreferencesKey("app-update-check")
+        val KEY_APP_UPDATE_TESTS = booleanPreferencesKey("app-update-tests")
+        val KEY_APP_UPDATE_LAST_TAG = stringPreferencesKey("app-update-last-tag")
+        val KEY_APP_UPDATE_LAST_MILLIS = longPreferencesKey("app-update-last-millis")
         val KEY_INCLUDE_UNKNOWN = booleanPreferencesKey("include-unknown")
         val KEY_EXCLUDE_INFRASTRUCTURE = booleanPreferencesKey("exclude-infrastructure")
         val KEY_ONLY_ONLINE = booleanPreferencesKey("only-online")

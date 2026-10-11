@@ -109,6 +109,13 @@
     <string name="app_notifications">App Notifications</string>
     <string name="app_settings">App</string>
     <string name="app_too_old">Application update required</string>
+    <string name="app_update_check_summary">Checks GitHub twice a day for a newer MT_SW_APP release and shows a reminder every two days until you update.</string>
+    <string name="app_update_check_title">Notify about new versions</string>
+    <string name="app_update_message">Version %1$s has been released. Tap to see the list of releases and what changed.</string>
+    <string name="app_update_test_message">Test version %1$s has been released. Tap to see the list of releases and what changed.</string>
+    <string name="app_update_tests_summary">Also notify about test (pre-release) versions.</string>
+    <string name="app_update_tests_title">Include test versions</string>
+    <string name="app_update_title">New MT_SW_APP version available</string>
     <string name="app_version">Version</string>
     <string name="apply">Apply</string>
     <string name="apps">Apps</string>

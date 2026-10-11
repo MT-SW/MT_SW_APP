@@ -76,6 +76,7 @@ import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.core.ui.util.isBluetoothSupported
 import org.meshtastic.feature.settings.component.AppInfoSection
 import org.meshtastic.feature.settings.component.AppearanceSettingsContent
+import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.PermissionsSettingsContent
 import org.meshtastic.feature.settings.component.PersistenceSettingsContent
@@ -304,6 +305,7 @@ fun SettingsScreen(
                         onExportData = { settingsViewModel.saveDataCsv(it.toKmpUri()) },
                         onExportNodeDb = { settingsViewModel.saveNodeDbJson(it) },
                     )
+                    AppUpdateSettings()
                     ListItem(
                         text = stringResource(Res.string.node_layout_section_title),
                         leadingIcon = MeshtasticIcons.List,

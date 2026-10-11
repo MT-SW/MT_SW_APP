@@ -74,6 +74,26 @@ class FakeMeshLogRepository :
         it.filter { log -> log.fromNum == nodeNum && log.portNum == portNum }
     }
 
+    override fun getLogsByPortNum(portNum: Int, maxItem: Int): Flow<List<MeshLog>> = logsFlow.map {
+        it.filter { log -> log.portNum == portNum }.take(maxItem)
+    }
+
+    override fun getLogsByPortNumSince(portNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>> = logsFlow.map {
+        it.filter { log -> log.portNum == portNum && log.received_date >= sinceTimestamp }
+    }
+
+    override fun getLogsFromNodeSince(nodeNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>> = logsFlow.map {
+        it.filter { log -> log.fromNum == nodeNum && log.received_date >= sinceTimestamp }
+    }
+
+    override fun getAllLogsSince(sinceTimestamp: Long): Flow<List<MeshLog>> = logsFlow.map {
+        it.filter { log -> log.received_date >= sinceTimestamp }
+    }
+
+    override fun getLatestLogPerNode(): Flow<List<MeshLog>> = logsFlow.map {
+        it.groupBy { log -> log.fromNum }.values.map { logs -> logs.maxBy { log -> log.received_date } }
+    }
+
     override fun getMeshPacketsFrom(nodeNum: Int, portNum: Int): Flow<List<MeshPacket>> = MutableStateFlow(emptyList())
 
     override fun getTelemetryFrom(nodeNum: Int): Flow<List<Telemetry>> = MutableStateFlow(emptyList())

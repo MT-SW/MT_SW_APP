@@ -301,6 +301,24 @@ interface UiPrefs {
 
     /** Stores [score] if it beats [chirpyHopBestScore]; lower scores are ignored. */
     fun recordChirpyHopScore(score: Int)
+
+    /** Whether the app checks GitHub for a newer MT_SW_APP release and notifies about it (on by default). */
+    val appUpdateCheckEnabled: StateFlow<Boolean>
+
+    fun setAppUpdateCheckEnabled(enabled: Boolean)
+
+    /** Whether the update notifications also cover test (pre-release) versions (off by default). */
+    val appUpdateNotifyTests: StateFlow<Boolean>
+
+    fun setAppUpdateNotifyTests(enabled: Boolean)
+
+    /** Tag of the release the last update notification was about, empty when none was shown yet. */
+    val appUpdateLastNotifiedTag: StateFlow<String>
+
+    /** Epoch millis of the last update notification. */
+    val appUpdateLastNotifiedMillis: StateFlow<Long>
+
+    fun setAppUpdateLastNotified(tag: String, millis: Long)
 }
 
 /** Reactive interface for notification preferences. */

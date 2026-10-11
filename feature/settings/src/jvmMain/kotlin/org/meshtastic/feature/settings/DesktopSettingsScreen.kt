@@ -89,6 +89,7 @@ import org.meshtastic.core.ui.util.rememberOpenFileLauncher
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.feature.settings.component.AppVersionRows
 import org.meshtastic.feature.settings.component.CacheLimitPreference
+import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.FullMessageTimestampsSetting
 import org.meshtastic.feature.settings.component.HomoglyphSetting
@@ -314,6 +315,8 @@ fun DesktopSettingsScreen(
                             checked = autoLoadChatImages,
                             onClick = { settingsViewModel.setAutoLoadChatImages(!autoLoadChatImages) },
                         )
+
+                        AppUpdateSettings()
                     }
 
                     ExpressiveSection(title = stringResource(Res.string.node_layout_section_title)) {

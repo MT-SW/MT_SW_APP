@@ -112,14 +112,14 @@ class NodeSecurityIndicatorTest {
     }
 
     @Test
-    fun `the connected radio reads as verified at any version`() {
+    fun `the connected radio reads as the local node at any version`() {
         assertEquals(
-            NodeSecurityIndicator.VERIFIED_CONTACT,
+            NodeSecurityIndicator.LOCAL_NODE,
             resolve(firmwareVersion = "2.8.0", hasPublicKey = false, mismatchKey = false, isOwnNode = true),
         )
         // The user holds their own radio's key whatever it runs, so this does not depend on version.
         assertEquals(
-            NodeSecurityIndicator.VERIFIED_CONTACT,
+            NodeSecurityIndicator.LOCAL_NODE,
             resolve(firmwareVersion = "2.7.26", hasPublicKey = true, mismatchKey = false, isOwnNode = true),
         )
     }
@@ -157,7 +157,7 @@ class NodeSecurityIndicatorTest {
                 user = User.Builder().also { wb -> wb.public_key = key }.build(),
             )
         assertEquals(NodeSecurityIndicator.SIGNED_NODE, NodeSecurityIndicator.of(signedOn28))
-        assertEquals(NodeSecurityIndicator.VERIFIED_CONTACT, NodeSecurityIndicator.of(signedOn28, isOwnNode = true))
+        assertEquals(NodeSecurityIndicator.LOCAL_NODE, NodeSecurityIndicator.of(signedOn28, isOwnNode = true))
         assertEquals(
             NodeSecurityIndicator.VERIFIED_CONTACT,
             NodeSecurityIndicator.of(signedOn28.copy(manuallyVerified = true)),
@@ -168,7 +168,7 @@ class NodeSecurityIndicatorTest {
         assertEquals(NodeSecurityIndicator.PUBLIC_KEY, NodeSecurityIndicator.of(legacy))
         assertEquals(NodeSecurityIndicator.SIGNED_NODE, NodeSecurityIndicator.of(legacy.copy(signsPackets = true)))
         assertEquals(
-            NodeSecurityIndicator.NO_PUBLIC_KEY,
+            NodeSecurityIndicator.NODE_INFO_PENDING,
             NodeSecurityIndicator.of(legacy.copy(user = User.Builder().build())),
         )
 

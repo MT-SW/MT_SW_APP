@@ -16,18 +16,22 @@
  */
 package org.meshtastic.core.service
 
+import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import org.koin.core.annotation.Single
 import org.meshtastic.core.repository.MeshWorkerManager
 import org.meshtastic.core.repository.PersistedPacketId
+import org.meshtastic.core.service.worker.AppUpdateWorker
 import org.meshtastic.core.service.worker.NodeCleanupWorker
 import org.meshtastic.core.service.worker.SendMessageWorker
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.toJavaDuration
 
 @Single
@@ -51,6 +55,15 @@ class AndroidMeshWorkerManager(private val workManager: WorkManager) : MeshWorke
             ExistingWorkPolicy.KEEP,
             workRequest,
         )
+    }
+
+    override fun scheduleAppUpdateCheck() {
+        val request =
+            PeriodicWorkRequestBuilder<AppUpdateWorker>(repeatInterval = 12.hours.toJavaDuration())
+                .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+                .build()
+
+        workManager.enqueueUniquePeriodicWork(AppUpdateWorker.WORK_NAME, ExistingPeriodicWorkPolicy.UPDATE, request)
     }
 
     override fun scheduleNodeCleanup(intervalDays: Int) {

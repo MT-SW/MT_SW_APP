@@ -23,4 +23,7 @@ interface MeshWorkerManager {
 
     /** (Re)schedules the periodic node-database auto-clean check to run every [intervalDays] days. */
     fun scheduleNodeCleanup(intervalDays: Int)
+
+    /** (Re)schedules the twice-a-day background check for a newer MT_SW_APP release. No-op where the app polls itself. */
+    fun scheduleAppUpdateCheck() {}
 }

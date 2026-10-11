@@ -287,6 +287,51 @@ class FakeUiPrefs : UiPrefs {
     override fun recordChirpyHopScore(score: Int) {
         chirpyHopBestScore.update { maxOf(it, score) }
     }
+
+    override val autoLoadChatImages = MutableStateFlow(false)
+
+    override fun setAutoLoadChatImages(value: Boolean) {
+        autoLoadChatImages.value = value
+    }
+
+    override val lastNarrowBandWarningShownMillis = MutableStateFlow(0L)
+
+    override fun setLastNarrowBandWarningShownMillis(millis: Long) {
+        lastNarrowBandWarningShownMillis.value = millis
+    }
+
+    override val wasInsideSwietokrzyskieRegion = MutableStateFlow(false)
+
+    override fun setWasInsideSwietokrzyskieRegion(inside: Boolean) {
+        wasInsideSwietokrzyskieRegion.value = inside
+    }
+
+    override val lastRegionWarningShownMillis = MutableStateFlow(0L)
+
+    override fun setLastRegionWarningShownMillis(millis: Long) {
+        lastRegionWarningShownMillis.value = millis
+    }
+
+    override val appUpdateCheckEnabled = MutableStateFlow(true)
+
+    override fun setAppUpdateCheckEnabled(enabled: Boolean) {
+        appUpdateCheckEnabled.value = enabled
+    }
+
+    override val appUpdateNotifyTests = MutableStateFlow(false)
+
+    override fun setAppUpdateNotifyTests(enabled: Boolean) {
+        appUpdateNotifyTests.value = enabled
+    }
+
+    override val appUpdateLastNotifiedTag = MutableStateFlow("")
+
+    override val appUpdateLastNotifiedMillis = MutableStateFlow(0L)
+
+    override fun setAppUpdateLastNotified(tag: String, millis: Long) {
+        appUpdateLastNotifiedTag.value = tag
+        appUpdateLastNotifiedMillis.value = millis
+    }
 }
 
 @Suppress("TooManyFunctions")

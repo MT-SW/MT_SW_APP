@@ -24,6 +24,7 @@ import org.meshtastic.core.model.MyNodeInfo
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeSortOption
 import org.meshtastic.core.model.mergePowerChannelLabel
+import org.meshtastic.core.model.util.LocalStatsExtended
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.proto.DeviceMetadata
 import org.meshtastic.proto.LocalStats
@@ -58,6 +59,9 @@ class FakeNodeRepository :
     private val _localStats = mutableStateFlow(LocalStats.Builder().build())
     override val localStats: StateFlow<LocalStats> = _localStats
 
+    private val _localStatsExtended = mutableStateFlow(LocalStatsExtended())
+    override val localStatsExtended: StateFlow<LocalStatsExtended> = _localStatsExtended
+
     private val _nodeDBbyNum = mutableStateFlow<Map<Int, Node>>(emptyMap())
     override val nodeDBbyNum: StateFlow<Map<Int, Node>> = _nodeDBbyNum
 
@@ -66,6 +70,10 @@ class FakeNodeRepository :
 
     override fun updateLocalStats(stats: LocalStats) {
         _localStats.value = stats
+    }
+
+    override fun updateLocalStatsExtended(stats: LocalStatsExtended) {
+        _localStatsExtended.value = stats
     }
 
     override fun effectiveLogNodeId(nodeNum: Int): Flow<Int> = MutableStateFlow(0)

@@ -2575,4 +2575,11 @@
     <string name="key_backup_choice">%1$s, kopia z %2$s</string>
     <string name="restore_keys_pick_backup">Wybierz kopię zapasową do przywrócenia w tym węźle. Reset fabryczny lub nowy klucz zmienia identyfikator węzła, więc starsze kopie zostają pod starym identyfikatorem. Przywracaj tylko kopię wykonaną z tego samego radia: klucz innego radia nadaje obu radiom tę samą tożsamość.</string>
     <string name="slot_auto">Auto</string>
+    <string name="app_update_title">Dostępna nowa wersja MT_SW_APP</string>
+    <string name="app_update_message">Wyszła wersja %1$s. Stuknij, aby zobaczyć listę wydań i co się zmieniło.</string>
+    <string name="app_update_test_message">Wyszła wersja testowa %1$s. Stuknij, aby zobaczyć listę wydań i co się zmieniło.</string>
+    <string name="app_update_check_title">Powiadamiaj o nowych wersjach</string>
+    <string name="app_update_check_summary">Dwa razy dziennie sprawdza na GitHubie, czy wyszła nowsza wersja MT_SW_APP, i przypomina co dwa dni, dopóki nie zaktualizujesz.</string>
+    <string name="app_update_tests_title">Także wersje testowe</string>
+    <string name="app_update_tests_summary">Powiadamiaj również o wersjach testowych (pre-release).</string>
 </resources>
