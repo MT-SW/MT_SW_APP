@@ -1770,7 +1770,14 @@ replace
 replace_channels_and_settings_description
 reply
 replying_to
+### REPORT ###
 report
+report_issues_discord_summary
+report_issues_intro
+report_issues_local_mesh
+report_issues_signal_summary
+report_issues_title
+report_issues_whatsapp_summary
 ### REQUEST ###
 request
 request_air_quality_metrics
