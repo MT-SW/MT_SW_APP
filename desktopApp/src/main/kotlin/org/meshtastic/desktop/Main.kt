@@ -25,7 +25,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -72,7 +71,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import okio.Path.Companion.toPath
 import org.jetbrains.compose.resources.decodeToSvgPainter
-import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -87,19 +85,16 @@ import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.common.util.ioDispatcher
 import org.meshtastic.core.database.desktopDataDir
 import org.meshtastic.core.model.DeviceAddress
+import org.meshtastic.core.network.update.AppUpdateService
 import org.meshtastic.core.navigation.MultiBackstack
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.navigation.TopLevelDestination
 import org.meshtastic.core.navigation.rememberMultiBackstack
-import org.meshtastic.core.repository.Notification
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.desktop_tray_quit
 import org.meshtastic.core.resources.desktop_tray_show
 import org.meshtastic.core.resources.desktop_tray_tooltip
-import org.meshtastic.core.resources.desktop_update_available_message
-import org.meshtastic.core.resources.desktop_update_available_title
-import org.meshtastic.core.resources.desktop_update_download
 import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.ui.theme.AppTheme
@@ -114,7 +109,6 @@ import org.meshtastic.core.ui.util.LocalTerminateApplication
 import org.meshtastic.core.ui.util.LocalTracerouteMapOverlayInsetsProvider
 import org.meshtastic.core.ui.util.LocalTracerouteMapProvider
 import org.meshtastic.core.ui.util.TracerouteMapOverlayInsets
-import org.meshtastic.core.ui.util.rememberOpenUrl
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.desktop.data.DesktopPreferencesDataSource
 import org.meshtastic.desktop.di.DesktopKoinApp
@@ -194,6 +188,7 @@ fun main(args: Array<String>) {
         DeepLinkHandler(args, uiViewModel, remember { koinApp.koin.get<LaunchOptions>() })
         MeshServiceLifecycle()
         NodeCleanupLifecycle()
+        AppUpdateLifecycle()
         // Desktop has no WorkManager, so the hourly mesh log cleanup lives as long as the application composition.
         LaunchedEffect(Unit) { withContext(ioDispatcher) { koinApp.koin.get<MeshLogCleanup>().runHourly() } }
         ThemeAndLocaleProvider(uiViewModel)
@@ -323,20 +318,13 @@ private fun ApplicationScope.MeshtasticDesktopApp(uiViewModel: UIViewModel, isDa
         notificationManager.fallbackNotifications.collect { notification -> trayState.sendNotification(notification) }
     }
 
-    val openUrl = rememberOpenUrl()
-    val updateInfo = rememberAvailableUpdate(notificationManager)
-
     WindowBoundsManager(desktopPrefs, windowState) { isWindowReady = true }
 
     // One menu model for both tray backends, so the rows cannot drift apart between platforms.
     val trayTooltip = stringResource(Res.string.desktop_tray_tooltip)
-    val updateLabel = updateInfo?.let { stringResource(Res.string.desktop_update_download, it.versionName) }
     val showLabel = stringResource(Res.string.desktop_tray_show)
     val quitLabel = stringResource(Res.string.desktop_tray_quit)
     val trayMenuItems = buildList {
-        if (updateInfo != null && updateLabel != null) {
-            add(TrayMenuItem(updateLabel) { openUrl(updateInfo.releaseUrl) })
-        }
         add(TrayMenuItem(showLabel) { isAppVisible = true })
         add(TrayMenuItem(quitLabel) { exitApplication() })
     }
@@ -387,35 +375,24 @@ private fun ApplicationScope.MeshtasticDesktopApp(uiViewModel: UIViewModel, isDa
 
 // ----- Update discovery -----
 
+private val APP_UPDATE_CHECK_INTERVAL = 12.hours
+
 /**
- * Checks once per launch whether a newer release is published on GitHub and surfaces it via a native notification.
- * Release builds only — dev builds carry the bare base version and would match or trail every published release.
- * Flatpak installs (FLATPAK_ID is set inside the sandbox) update through Flathub instead, so don't point them at
- * GitHub.
+ * Checks GitHub for a newer MT_SW_APP release at startup and then twice a day while the app is open (Android does the
+ * same with a background job). The notification rules and the on/off settings live in `AppUpdateService`. Dev builds
+ * and Flatpak installs (FLATPAK_ID is set inside the sandbox; they update through Flathub) are left out.
  */
 @Composable
-private fun rememberAvailableUpdate(notificationManager: DesktopNotificationManager): UpdateChecker.UpdateInfo? {
+private fun AppUpdateLifecycle() {
     val buildConfig = koinInject<BuildConfigProvider>()
-    val httpClient = koinInject<HttpClient>()
-    val updateInfo by
-        produceState<UpdateChecker.UpdateInfo?>(initialValue = null) {
-            if (!buildConfig.isDebug && System.getenv("FLATPAK_ID") == null) {
-                value = UpdateChecker(httpClient).check(buildConfig.versionName)
-            }
-        }
-
-    LaunchedEffect(updateInfo) {
-        updateInfo?.let { update ->
-            notificationManager.dispatch(
-                Notification(
-                    title = getString(Res.string.desktop_update_available_title),
-                    message = getString(Res.string.desktop_update_available_message, update.versionName),
-                    category = Notification.Category.Service,
-                ),
-            )
+    val service = koinInject<AppUpdateService>()
+    LaunchedEffect(Unit) {
+        if (buildConfig.isDebug || System.getenv("FLATPAK_ID") != null) return@LaunchedEffect
+        while (isActive) {
+            service.checkAndNotify()
+            delay(APP_UPDATE_CHECK_INTERVAL)
         }
     }
-    return updateInfo
 }
 
 // ----- Window bounds persistence -----

@@ -25,6 +25,9 @@ import org.meshtastic.core.repository.Notification
 import org.meshtastic.core.repository.NotificationManager
 import org.meshtastic.core.repository.notificationId
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.app_update_message
+import org.meshtastic.core.resources.app_update_test_message
+import org.meshtastic.core.resources.app_update_title
 import org.meshtastic.core.resources.firmware_update_available
 import org.meshtastic.core.resources.firmware_update_notification_android
 import org.meshtastic.core.resources.getStringSuspend
@@ -34,6 +37,8 @@ import org.meshtastic.core.resources.mesh_beacon_notification_body
 import org.meshtastic.core.resources.mesh_beacon_notification_title
 import org.meshtastic.proto.ClientNotification
 import org.meshtastic.proto.Telemetry
+
+private const val APP_UPDATE_NOTIFICATION_ID = 0x4D5453
 
 /**
  * Desktop implementation of [MeshNotificationManager]: turns each mesh event into a [Notification] record and hands it
@@ -197,6 +202,21 @@ class DesktopMeshNotificationManager(private val notificationManager: Notificati
                 ),
                 category = Notification.Category.Service,
                 id = notice.notificationKey.hashCode(),
+            ),
+        )
+
+    // The desktop notification has no tap target, so the address of the releases page is part of the text.
+    override suspend fun showAppUpdateNotification(tag: String, isTest: Boolean, url: String): Boolean =
+        notificationManager.dispatch(
+            Notification(
+                title = getStringSuspend(Res.string.app_update_title),
+                message =
+                getStringSuspend(
+                    if (isTest) Res.string.app_update_test_message else Res.string.app_update_message,
+                    tag,
+                ) + "\n" + url,
+                category = Notification.Category.Service,
+                id = APP_UPDATE_NOTIFICATION_ID,
             ),
         )
 

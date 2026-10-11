@@ -80,6 +80,9 @@ import org.meshtastic.core.resources.disconnected
 import org.meshtastic.core.resources.discovery_scan_in_progress
 import org.meshtastic.core.resources.firmware_update_available
 import org.meshtastic.core.resources.firmware_update_in_progress
+import org.meshtastic.core.resources.app_update_message
+import org.meshtastic.core.resources.app_update_test_message
+import org.meshtastic.core.resources.app_update_title
 import org.meshtastic.core.resources.firmware_update_notification_android
 import org.meshtastic.core.resources.formatDurationSuspend
 import org.meshtastic.core.resources.getStringSuspend
@@ -170,6 +173,8 @@ class MeshNotificationManagerImpl(
         private const val TAG_CLIENT = "client"
         private const val TAG_MESH_BEACON = "mesh_beacon"
         private const val TAG_FIRMWARE_UPDATE = "firmware_update"
+        private const val TAG_APP_UPDATE = "app_update"
+        private const val APP_UPDATE_ID = 2
         private const val TAG_RECONNECT_BLOCKED = "reconnect_blocked"
         private const val RECONNECT_BLOCKED_ID = 1
         private val CHANNEL_LABEL_TIMEOUT = 2.seconds
@@ -706,6 +711,33 @@ class MeshNotificationManagerImpl(
                 .setStyle(NotificationCompat.BigTextStyle().bigText(message))
                 .build()
         notificationManager.notify(TAG_FIRMWARE_UPDATE, id, notification)
+        return true
+    }
+
+    override suspend fun showAppUpdateNotification(tag: String, isTest: Boolean, url: String): Boolean {
+        ensureChannels()
+        if (!canPost(NotificationChannelSpec.DeviceStatus)) return false
+        val message =
+            getStringSuspend(
+                if (isTest) Res.string.app_update_test_message else Res.string.app_update_message,
+                tag,
+            )
+        val openReleases =
+            PendingIntent.getActivity(
+                context,
+                APP_UPDATE_ID,
+                Intent(Intent.ACTION_VIEW, url.toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            )
+        val notification =
+            commonBuilder(NotificationChannelSpec.DeviceStatus, openReleases)
+                .setCategory(Notification.CATEGORY_RECOMMENDATION)
+                .setAutoCancel(true)
+                .setContentTitle(getStringSuspend(Res.string.app_update_title))
+                .setContentText(message)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(message))
+                .build()
+        notificationManager.notify(TAG_APP_UPDATE, APP_UPDATE_ID, notification)
         return true
     }
 

@@ -144,6 +144,9 @@ open class MeshUtilApplication :
         // Schedule periodic node-database auto-clean, using the persisted check interval.
         applicationScope.launch { scheduleNodeCleanup() }
 
+        // Twice-a-day check for a newer MT_SW_APP release (the worker itself honours the setting).
+        applicationScope.launch { get<MeshWorkerManager>().scheduleAppUpdateCheck() }
+
         // ApplicationExitInfo requires API 30+. A "MemoryLimiter:AnonSwap" reason means Android 17's per-app
         // memory ceiling zram-swapped then killed the previous process — see reportMemoryLimiterExitIfPresent.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

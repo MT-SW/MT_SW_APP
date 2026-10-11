@@ -33,6 +33,7 @@ import org.meshtastic.proto.ClientNotification
 import org.meshtastic.proto.Config
 import org.meshtastic.proto.HamParameters
 import org.meshtastic.proto.ModuleConfig
+import org.meshtastic.proto.OnDemandType
 import org.meshtastic.proto.User
 
 /**
@@ -255,9 +256,10 @@ class FakeRadioController :
         _clientNotification.value = null
     }
 
-    override suspend fun setFavorite(nodeNum: Int, favorite: Boolean) {
+    override suspend fun setFavorite(nodeNum: Int, favorite: Boolean, destNum: Int?): Boolean {
         setFavoriteFailure?.let { throw it }
         if (favorite) favoritedNodes.add(nodeNum) else favoritedNodes.remove(nodeNum)
+        return true
     }
 
     override suspend fun sendSharedContact(nodeNum: Int): Boolean {
@@ -266,7 +268,16 @@ class FakeRadioController :
         return true
     }
 
-    override suspend fun setIgnored(nodeNum: Int, ignored: Boolean) {}
+    override suspend fun setIgnored(nodeNum: Int, ignored: Boolean, destNum: Int?): Boolean = true
+
+    override suspend fun addManualContact(nodeNum: Int, longName: String, shortName: String, destNum: Int?): Boolean =
+        true
+
+    override suspend fun requestOnDemand(destNum: Int, requestType: OnDemandType) {}
+
+    override suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long) {}
+
+    override suspend fun readGpio(destNum: Int, gpioMask: Long): Long? = null
 
     override suspend fun toggleMuted(nodeNum: Int) {}
 

@@ -41,15 +41,15 @@ class CapabilitiesTest {
     }
 
     @Test
-    fun canRequestNeighborInfo_is_currently_disabled() {
-        assertFalse(caps("2.7.14").canRequestNeighborInfo)
-        assertFalse(caps("3.0.0").canRequestNeighborInfo)
+    fun canRequestNeighborInfo_requires_V2_7_18() {
+        assertFalse(caps("2.7.17").canRequestNeighborInfo)
+        assertTrue(caps("2.7.18").canRequestNeighborInfo)
     }
 
     @Test
-    fun supportsLockdown_requires_V2_8_0() {
-        assertFalse(caps("2.7.21").supportsLockdown)
-        assertTrue(caps("2.8.0").supportsLockdown)
+    fun supportsLockdown_requires_V2_7_18() {
+        assertFalse(caps("2.7.17").supportsLockdown)
+        assertTrue(caps("2.7.18").supportsLockdown)
     }
 
     @Test
@@ -121,9 +121,9 @@ class CapabilitiesTest {
     }
 
     @Test
-    fun supportsTrafficManagementConfig_requires_V2_8_0() {
-        assertFalse(caps("2.7.21").supportsTrafficManagementConfig)
-        assertTrue(caps("2.8.0").supportsTrafficManagementConfig)
+    fun supportsTrafficManagementConfig_requires_V2_7_18() {
+        assertFalse(caps("2.7.17").supportsTrafficManagementConfig)
+        assertTrue(caps("2.7.18").supportsTrafficManagementConfig)
     }
 
     @Test

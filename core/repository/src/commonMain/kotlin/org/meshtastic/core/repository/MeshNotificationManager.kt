@@ -101,6 +101,12 @@ interface MeshNotificationManager {
     /** Returns true only when the platform accepted the notification, so the caller can record it as shown. */
     suspend fun showFirmwareUpdateNotification(notice: FirmwareUpdateNotice): Boolean
 
+    /**
+     * Tells the user that a newer MT_SW_APP release ([tag], a test release when [isTest]) is published; tapping it
+     * opens [url]. Returns true only when the platform accepted the notification, so the caller can record it as shown.
+     */
+    suspend fun showAppUpdateNotification(tag: String, isTest: Boolean, url: String): Boolean = false
+
     /** Returns true only when the platform accepted the notification. [title] and [message] arrive resolved. */
     suspend fun showReconnectBlockedNotification(title: String, message: String): Boolean
 

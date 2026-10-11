@@ -27,6 +27,7 @@ import org.meshtastic.core.repository.PacketQueueRejectedException
 import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.LocalConfig
+import org.meshtastic.proto.OnDemandType
 
 /** Shared recording [CommandSender] fake for tests that do not need transport behavior. */
 @Suppress("TooManyFunctions")
@@ -164,6 +165,29 @@ class FakeCommandSender :
         failCommandIfConfigured()
         mutableAdminRequests += AdminRequest(destNum, requestId, wantResponse, initFn())
         return awaitedAdminResult
+    }
+
+    override suspend fun sendAdminAndAwaitDelivery(
+        destNum: Int,
+        requestId: Int,
+        initFn: () -> AdminMessage,
+    ): Boolean {
+        failCommandIfConfigured()
+        mutableAdminRequests += AdminRequest(destNum, requestId, wantResponse = false, message = initFn())
+        return true
+    }
+
+    override suspend fun requestOnDemand(destNum: Int, requestType: OnDemandType) {
+        failCommandIfConfigured()
+    }
+
+    override suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long) {
+        failCommandIfConfigured()
+    }
+
+    override suspend fun readGpio(destNum: Int, gpioMask: Long): Long? {
+        failCommandIfConfigured()
+        return null
     }
 
     override suspend fun sendPosition(pos: org.meshtastic.proto.Position, destNum: Int?, wantResponse: Boolean) {
