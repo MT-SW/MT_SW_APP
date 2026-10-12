@@ -157,12 +157,10 @@ private fun buildRegionItems(
     .filter { capabilities.supportsRegion(it) || it.regionCode == selectedRegion }
     .map { it.regionCode to (labels[it.regionCode] ?: it.description) }
 
-/**
- * Preset labels. Empty on purpose: MT_SW shows the preset names untranslated (LONG_FAST, NARROW_FAST …), as in the
- * original app before schema labels, so every preset reads the same on every phone and in every guide.
- */
+/** Each preset's schema label in the user's language. A preset the schema does not label is absent. */
 @Composable
-internal fun presetLabels(): Map<ModemPreset, String> = emptyMap()
+internal fun presetLabels(): Map<ModemPreset, String> =
+    ModemPreset.entries.mapNotNull { preset -> preset.schemaLabelRes()?.let { preset to stringResource(it) } }.toMap()
 
 @Composable
 private fun regionLabels(): Map<RegionCode, String> =
