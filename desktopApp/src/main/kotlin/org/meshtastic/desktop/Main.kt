@@ -68,6 +68,7 @@ import io.ktor.client.HttpClient
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okio.Path.Companion.toPath
 import org.jetbrains.compose.resources.decodeToSvgPainter
@@ -387,6 +388,7 @@ private fun AppUpdateLifecycle() {
     val service = koinInject<AppUpdateService>()
     LaunchedEffect(Unit) {
         if (System.getenv("FLATPAK_ID") != null) return@LaunchedEffect
+        launch { service.checkWhenSettingsChange() }
         while (isActive) {
             service.checkAndNotify()
             delay(APP_UPDATE_CHECK_INTERVAL)

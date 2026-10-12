@@ -21,6 +21,10 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -51,8 +55,25 @@ class AppUpdateService(
     private val notificationManager: MeshNotificationManager,
     private val dispatchers: CoroutineDispatchers,
 ) {
+    // Checks never overlap, so two triggers close together (start-up and a switch change) cannot both notify.
+    private val checkLock = Mutex()
+
+    /**
+     * Checks again each time the user changes one of the two update switches, so a switch takes effect at once instead
+     * of at the next start. Never returns; run it in a long-lived scope.
+     */
+    suspend fun checkWhenSettingsChange() {
+        combine(uiPrefs.appUpdateCheckEnabled, uiPrefs.appUpdateNotifyTests) { check, tests -> check to tests }
+            .drop(1)
+            .collect { checkAndNotify() }
+    }
+
     /** One check; does nothing when the user switched the update check off. Never throws (offline is normal). */
     suspend fun checkAndNotify() {
+        checkLock.withLock { checkOnce() }
+    }
+
+    private suspend fun checkOnce() {
         withContext(dispatchers.io) {
             val prefs = uiPrefs.loadAppUpdatePrefs()
             Logger.i { "Update check: enabled=${prefs.checkEnabled}, includeTests=${prefs.notifyTests}" }
