@@ -90,7 +90,10 @@ app_settings
 app_too_old
 app_update_check_summary
 app_update_check_title
+app_update_dialog_message
+app_update_dialog_test_message
 app_update_message
+app_update_open_releases
 app_update_test_message
 app_update_tests_summary
 app_update_tests_title

@@ -133,6 +133,7 @@ import java.awt.Desktop
 import java.util.Locale
 import kotlin.system.exitProcess
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import coil3.util.Logger as CoilLogger
 
 /** Meshtastic Desktop — the first non-Android target for the shared KMP module graph. */
@@ -377,6 +378,7 @@ private fun ApplicationScope.MeshtasticDesktopApp(uiViewModel: UIViewModel, isDa
 // ----- Update discovery -----
 
 private val APP_UPDATE_CHECK_INTERVAL = 12.hours
+private val APP_UPDATE_START_DELAY = 1.minutes
 
 /**
  * Checks GitHub for a newer MT_SW_APP release at startup and then twice a day while the app is open (Android does the
@@ -389,6 +391,8 @@ private fun AppUpdateLifecycle() {
     LaunchedEffect(Unit) {
         if (System.getenv("FLATPAK_ID") != null) return@LaunchedEffect
         launch { service.checkWhenSettingsChange() }
+        // A minute after the start, so the app is up and the radio is connecting before the first check.
+        delay(APP_UPDATE_START_DELAY)
         while (isActive) {
             service.checkAndNotify()
             delay(APP_UPDATE_CHECK_INTERVAL)
@@ -511,7 +515,10 @@ private fun ApplicationScope.MeshtasticWindow(
                 LocalTracerouteMapOverlayInsetsProvider provides
                     TracerouteMapOverlayInsets(overlayPadding = PaddingValues(bottom = 48.dp)),
             ) {
-                AppTheme(darkTheme = isDarkTheme) { DesktopMainScreen(uiViewModel, multiBackstack) }
+                AppTheme(darkTheme = isDarkTheme) {
+                    DesktopMainScreen(uiViewModel, multiBackstack)
+                    AppUpdateDialog()
+                }
             }
         }
     }

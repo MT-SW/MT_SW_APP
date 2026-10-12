@@ -21,8 +21,13 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -43,6 +48,9 @@ import org.meshtastic.core.model.ReleaseVersion
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.UiPrefs
 
+/** A newer release the user was told about; the desktop shows it in a window with a button to the releases page. */
+data class PendingAppUpdate(val tag: String, val isTest: Boolean, val url: String)
+
 /**
  * Checks the GitHub releases of MT_SW_APP for a newer version than the running build and, when there is one, tells the
  * user (see [AppUpdatePolicy] for the rules). Runs from a twice-a-day background job on Android and from a timer on
@@ -58,12 +66,25 @@ class AppUpdateService(
     // Checks never overlap, so two triggers close together (start-up and a switch change) cannot both notify.
     private val checkLock = Mutex()
 
+    private val _pendingUpdate = MutableStateFlow<PendingAppUpdate?>(null)
+
+    /** The release of the last update notification that was shown, until the user closes the window about it. */
+    val pendingUpdate: StateFlow<PendingAppUpdate?> = _pendingUpdate.asStateFlow()
+
+    fun dismissPendingUpdate() {
+        _pendingUpdate.value = null
+    }
+
     /**
      * Checks again each time the user changes one of the two update switches, so a switch takes effect at once instead
      * of at the next start. Never returns; run it in a long-lived scope.
      */
     suspend fun checkWhenSettingsChange() {
+        // The flows first hold their defaults and then the stored values; only changes after that are the user's.
+        val stored = uiPrefs.loadAppUpdatePrefs()
         combine(uiPrefs.appUpdateCheckEnabled, uiPrefs.appUpdateNotifyTests) { check, tests -> check to tests }
+            .distinctUntilChanged()
+            .dropWhile { it != (stored.checkEnabled to stored.notifyTests) }
             .drop(1)
             .collect { checkAndNotify() }
     }
@@ -108,7 +129,10 @@ class AppUpdateService(
                         url = RELEASES_PAGE_URL,
                     )
                 Logger.i { "Update check: notification for ${update.tag} shown=$shown" }
-                if (shown) uiPrefs.setAppUpdateLastNotified(update.tag, now)
+                if (shown) {
+                    uiPrefs.setAppUpdateLastNotified(update.tag, now)
+                    _pendingUpdate.value = PendingAppUpdate(update.tag, version?.isTest == true, RELEASES_PAGE_URL)
+                }
             }
                 .onFailure { Logger.w(it) { "Update check failed: offline, rate-limited, or malformed response" } }
         }

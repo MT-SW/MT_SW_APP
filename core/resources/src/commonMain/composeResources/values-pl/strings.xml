@@ -2591,4 +2591,7 @@
     <string name="report_issues_signal_summary">Nasza grupa na Signalu</string>
     <string name="report_issues_local_mesh">Możesz też napisać do nas przez samą sieć mesh w województwie świętokrzyskim.</string>
     <string name="report_issues_tips">Zgłaszając błąd, napisz najlepiej, co dokładnie się stało, jakiej wersji aplikacji używasz (na dole Ustawień), jakie masz radio i jaką wersję firmware.</string>
+    <string name="app_update_dialog_message">Wyszła wersja %1$s. Na stronie wydań zobaczysz, co się zmieniło.</string>
+    <string name="app_update_dialog_test_message">Wyszła wersja testowa %1$s. Na stronie wydań zobaczysz, co się zmieniło.</string>
+    <string name="app_update_open_releases">Pokaż listę wydań</string>
 </resources>
