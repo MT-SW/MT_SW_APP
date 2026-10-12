@@ -411,14 +411,24 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         dataStore.data.map { it[KEY_APP_UPDATE_CHECK] ?: true }.stateIn(scope, SharingStarted.Eagerly, true)
 
     override fun setAppUpdateCheckEnabled(enabled: Boolean) {
-        scope.launch { dataStore.edit { it[KEY_APP_UPDATE_CHECK] = enabled } }
+        scope.launch {
+            dataStore.edit {
+                it[KEY_APP_UPDATE_CHECK] = enabled
+                it.forgetLastAppUpdateNotification()
+            }
+        }
     }
 
     override val appUpdateNotifyTests: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_APP_UPDATE_TESTS] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
 
     override fun setAppUpdateNotifyTests(enabled: Boolean) {
-        scope.launch { dataStore.edit { it[KEY_APP_UPDATE_TESTS] = enabled } }
+        scope.launch {
+            dataStore.edit {
+                it[KEY_APP_UPDATE_TESTS] = enabled
+                it.forgetLastAppUpdateNotification()
+            }
+        }
     }
 
     override val appUpdateLastNotifiedTag: StateFlow<String> =
@@ -434,6 +444,12 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
                 it[KEY_APP_UPDATE_LAST_MILLIS] = millis
             }
         }
+    }
+
+    // Changing an update switch starts over: the next check may notify at once instead of waiting out the reminder.
+    private fun MutablePreferences.forgetLastAppUpdateNotification() {
+        remove(KEY_APP_UPDATE_LAST_TAG)
+        remove(KEY_APP_UPDATE_LAST_MILLIS)
     }
 
     override suspend fun loadAppUpdatePrefs(): AppUpdatePrefs {
