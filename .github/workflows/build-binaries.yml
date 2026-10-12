@@ -149,7 +149,7 @@ jobs:
           # --no-daemon jak w release.yml: bez tego Gradle szuka JDK 21 dla demona i próbuje go pobrać z foojay.
           # Windows: pakowanie MSI/EXE (WiX) czyta Project.layout projektu głównego, czego
           # Isolated Projects nie dopuszcza -- obie flagi muszą iść razem (tak samo jak w release.yml).
-          ./gradlew $TASKS --no-daemon --no-isolated-projects --no-configuration-cache
+          ./gradlew $TASKS -Pdesktop.release=true --no-daemon --no-isolated-projects --no-configuration-cache
 
       # Wewnątrz instalatora numer wersji rośnie przy każdej zmianie kodu (dzięki temu Windows pozwala zainstalować
       # nową wersję na starą bez odinstalowywania), ale nazwa pliku ma pokazywać zwykłą wersję aplikacji (np. 2.8.3).
@@ -231,7 +231,7 @@ jobs:
           [ "$B_LINUX_APPIMAGE" = "true" ] && TASKS="$TASKS :desktopApp:packageAppImage"
           [ "$B_LINUX_JAR" = "true" ] && TASKS="$TASKS :desktopApp:packageUberJarForCurrentOS"
           echo "Gradle tasks:$TASKS"
-          ./gradlew $TASKS --no-daemon
+          ./gradlew $TASKS -Pdesktop.release=true --no-daemon
 
       # Zamiana jpackage'owego "app-image" (goły katalog) w prawdziwy, jednoplikowy .AppImage.
       - name: Build real .AppImage
@@ -298,7 +298,7 @@ jobs:
           [ "$B_MACOS_DMG" = "true" ] && TASKS="$TASKS :desktopApp:packageDmg"
           [ "$B_MACOS_JAR" = "true" ] && TASKS="$TASKS :desktopApp:packageUberJarForCurrentOS"
           echo "Gradle tasks:$TASKS"
-          ./gradlew $TASKS --no-daemon
+          ./gradlew $TASKS -Pdesktop.release=true --no-daemon
 
       - uses: actions/upload-artifact@v4
         with:
