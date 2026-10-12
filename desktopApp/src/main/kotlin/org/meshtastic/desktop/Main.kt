@@ -379,15 +379,14 @@ private val APP_UPDATE_CHECK_INTERVAL = 12.hours
 
 /**
  * Checks GitHub for a newer MT_SW_APP release at startup and then twice a day while the app is open (Android does the
- * same with a background job). The notification rules and the on/off settings live in `AppUpdateService`. Dev builds
- * and Flatpak installs (FLATPAK_ID is set inside the sandbox; they update through Flathub) are left out.
+ * same with a background job). The notification rules and the on/off settings live in `AppUpdateService`. Flatpak
+ * installs (FLATPAK_ID is set inside the sandbox; they update through Flathub) are left out.
  */
 @Composable
 private fun AppUpdateLifecycle() {
-    val buildConfig = koinInject<BuildConfigProvider>()
     val service = koinInject<AppUpdateService>()
     LaunchedEffect(Unit) {
-        if (buildConfig.isDebug || System.getenv("FLATPAK_ID") != null) return@LaunchedEffect
+        if (System.getenv("FLATPAK_ID") != null) return@LaunchedEffect
         while (isActive) {
             service.checkAndNotify()
             delay(APP_UPDATE_CHECK_INTERVAL)
