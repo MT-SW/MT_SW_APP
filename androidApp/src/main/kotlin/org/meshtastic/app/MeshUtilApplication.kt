@@ -52,6 +52,7 @@ import org.koin.plugin.module.dsl.startKoin
 import org.meshtastic.app.di.AndroidKoinApp
 import org.meshtastic.core.common.ContextServices
 import org.meshtastic.core.database.DatabaseManager
+import org.meshtastic.core.network.update.AppUpdateService
 import org.meshtastic.core.repository.MeshPrefs
 import org.meshtastic.core.repository.MeshWorkerManager
 import org.meshtastic.core.repository.PlatformAnalytics
@@ -146,6 +147,8 @@ open class MeshUtilApplication :
 
         // Twice-a-day check for a newer MT_SW_APP release (the worker itself honours the setting).
         applicationScope.launch { get<MeshWorkerManager>().scheduleAppUpdateCheck() }
+        // A change of the update switches in the settings is checked at once, not at the next scheduled run.
+        applicationScope.launch { get<AppUpdateService>().checkWhenSettingsChange() }
 
         // ApplicationExitInfo requires API 30+. A "MemoryLimiter:AnonSwap" reason means Android 17's per-app
         // memory ceiling zram-swapped then killed the previous process — see reportMemoryLimiterExitIfPresent.
