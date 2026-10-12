@@ -295,7 +295,8 @@ compose.desktop {
             // So on Windows the third number inside the installer is the build counter (git commit count,
             // always growing, max 65535), keeping major.minor of the app version. The app itself still shows
             // the normal version (e.g. 2.8.3) and the CI renames the installer files back to it.
-            val windowsBuildNumber = versionInfo.versionCode - (java.io.File(rootDir, "config.properties")
+            val configFile = isolated.rootProject.projectDirectory.file("config.properties").asFile
+            val windowsBuildNumber = versionInfo.versionCode - (configFile
                 .takeIf { it.exists() }
                 ?.readLines()
                 ?.firstOrNull { it.startsWith("VERSION_CODE_OFFSET=") }
