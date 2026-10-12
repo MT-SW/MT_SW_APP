@@ -20,7 +20,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 **Scalenie z oryginałem (12.10)**
 * Scalenie z najnowszym oryginałem Meshtastic-Android: nowsza biblioteka map (maplibre-compose 0.20) z dopasowaniem naszych warstw mapy, planera i map offline oraz drobne poprawki z upstreamu; bez zmian w działaniu aplikacji.
-* Nazwy presetów modemu po polsku, a w nawiasie angielska nazwa, np. „Daleki szybki (Long Fast)”.
+* Nazwy presetów modemu po polsku, a w nawiasie angielska nazwa, np. „Szeroki daleki szybki (Long Fast)”; dopisek „Szeroki” oznacza kanał 250 kHz, „Pośredni” kanał 125 kHz (Lite to teraz „Pośredni”), „Wąski” 62,5 kHz.
 * Opis pod przełącznikiem „Ok dla MQTT” w ustawieniach LoRa, tak jak pod pozostałymi (z zaleceniem, żeby było włączone, by dało się monitorować sieć); opis domyślnego presetu w wyborze presetu po polsku z angielską nazwą w nawiasie.
 
 **Mesh Link Planer (natywny planer zasięgu, 1–2.10)**
@@ -141,7 +141,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 **Merge with the original (12.10)**
 * Merged the latest original Meshtastic-Android: newer map library (maplibre-compose 0.20) with our map layers, planner and offline maps adapted to it, plus small upstream fixes; no change in app behaviour.
-* Modem preset names in Polish with the English name in brackets, e.g. “Daleki szybki (Long Fast)”.
+* Modem preset names in Polish with the English name in brackets, e.g. “Szeroki daleki szybki (Long Fast)”; “Szeroki” means a 250 kHz channel, “Pośredni” (intermediate) 125 kHz (Lite is now “Pośredni”), “Wąski” (narrow) 62.5 kHz.
 * Description under the “Ok to MQTT” switch in LoRa settings, like the other switches (recommending it stays on so the network can be monitored); the default-preset hint in the preset picker now shows the Polish name with the English one in brackets.
 
 **Mesh Link Planner (native coverage planner, 1–2 Oct)**
