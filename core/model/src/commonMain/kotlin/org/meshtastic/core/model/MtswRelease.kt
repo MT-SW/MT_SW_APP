@@ -27,5 +27,5 @@ package org.meshtastic.core.model
  */
 object MtswRelease {
     const val RELEASE = 3
-    const val TEST = 1
+    const val TEST = 2
 }
