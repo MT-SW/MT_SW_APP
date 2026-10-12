@@ -54,19 +54,20 @@ class AppUpdateService(
     /** One check; does nothing when the user switched the update check off. Never throws (offline is normal). */
     suspend fun checkAndNotify() {
         withContext(dispatchers.io) {
-            if (!uiPrefs.appUpdateCheckEnabled.value) return@withContext
+            val prefs = uiPrefs.loadAppUpdatePrefs()
+            if (!prefs.checkEnabled) return@withContext
             safeCatching {
                 val releases = fetchReleases()
                 val current = ReleaseVersion(MtswRelease.RELEASE, MtswRelease.TEST)
                 val update =
-                    AppUpdatePolicy.newestUpdate(current, releases, includeTests = uiPrefs.appUpdateNotifyTests.value)
+                    AppUpdatePolicy.newestUpdate(current, releases, includeTests = prefs.notifyTests)
                         ?: return@safeCatching
                 val now = nowMillis
                 if (
                     !AppUpdatePolicy.shouldNotify(
                         update = update,
-                        lastNotifiedTag = uiPrefs.appUpdateLastNotifiedTag.value,
-                        lastNotifiedMillis = uiPrefs.appUpdateLastNotifiedMillis.value,
+                        lastNotifiedTag = prefs.lastNotifiedTag,
+                        lastNotifiedMillis = prefs.lastNotifiedMillis,
                         nowMillis = now,
                     )
                 ) {

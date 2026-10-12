@@ -38,6 +38,7 @@ import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.prefs.cachedFlow
 import org.meshtastic.core.prefs.di.UiDataStore
+import org.meshtastic.core.repository.AppUpdatePrefs
 import org.meshtastic.core.repository.AutoCleanNodesPolicy
 import org.meshtastic.core.repository.NodeFilterPrefs
 import org.meshtastic.core.repository.UiPrefs
@@ -433,6 +434,16 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
                 it[KEY_APP_UPDATE_LAST_MILLIS] = millis
             }
         }
+    }
+
+    override suspend fun loadAppUpdatePrefs(): AppUpdatePrefs {
+        val prefs = dataStore.data.first()
+        return AppUpdatePrefs(
+            checkEnabled = prefs[KEY_APP_UPDATE_CHECK] ?: true,
+            notifyTests = prefs[KEY_APP_UPDATE_TESTS] ?: false,
+            lastNotifiedTag = prefs[KEY_APP_UPDATE_LAST_TAG] ?: "",
+            lastNotifiedMillis = prefs[KEY_APP_UPDATE_LAST_MILLIS] ?: 0L,
+        )
     }
 
     private fun Preferences.toNodeFilterPrefs() = NodeFilterPrefs(
