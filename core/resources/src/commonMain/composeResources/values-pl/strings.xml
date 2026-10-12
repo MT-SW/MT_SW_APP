@@ -357,7 +357,7 @@
     <string name="config_lora_frequency_slot_summary">Częstotliwość robocza węzła jest obliczana na podstawie regionu, ustawień modemu i tego pola. Gdy wartość wynosi 0, slot jest automatycznie obliczany na podstawie nazwy kanału podstawowego i zmienia się z domyślnego slotu publicznego. Jeśli skonfigurowano prywatny kanał podstawowy i publiczny kanał dodatkowy, należy przywrócić domyślny slot publiczny.</string>
     <string name="config_lora_hop_limit_summary">Ustawia maksymalną liczbę przeskoków, domyślnie jest to 3. Zwiększenie liczby przeskoków powoduje również wzrost przeciążenia i należy stosować tę opcję ostrożnie. Komunikaty rozgłoszeniowe z 0 przeskokami nie otrzymają potwierdzeń ACK.</string>
     <string name="config_lora_modem_preset_licensed_summary">Presety tego regionu są przeznaczone tylko dla operatorów licencjonowanych (radioamatorów). Włącz opcję Radioamator (Ham) w Konfiguracji użytkownika, aby je wybrać.</string>
-    <string name="config_lora_modem_preset_summary">Dostępne presety modemu, domyślnie Narrow Fast.</string>
+    <string name="config_lora_modem_preset_summary">Dostępne presety modemu, domyślnie Wąski szybki (Narrow Fast).</string>
     <string name="config_lora_region_summary">Region, w którym będziesz używać urządzenia.</string>
     <string name="config_network_udp_enabled_summary">Włącz nadawanie pakietów poprzez UDP w lokalnej sieci.</string>
     <string name="config_network_wifi_enabled_summary">Włączenie WiFi spowoduje wyłączenie bluetooth.</string>
@@ -1686,6 +1686,7 @@
     <string name="offline_maps">Mapy offline</string>
     <string name="offline_maps_empty">Brak jeszcze pobranych obszarów</string>
     <string name="ok_to_mqtt">Ok dla MQTT</string>
+    <string name="ok_to_mqtt_description">Pozwala innym węzłom przesyłać wiadomości z tego węzła do internetu przez MQTT. Wyłącz, jeśli nie chcesz, żeby Twoje wiadomości wychodziły poza sieć radiową. Zalecamy włączone, żeby można było monitorować sieć i jej stan.</string>
     <string name="okay">OK</string>
     <string name="oled_type">Typ ekranu OLED</string>
     <string name="offline_terrain_cache_detail">%1$s: %2$s · %3$s</string>

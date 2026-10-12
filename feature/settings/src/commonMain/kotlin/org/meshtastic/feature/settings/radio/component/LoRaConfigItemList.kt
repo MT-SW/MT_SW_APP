@@ -62,6 +62,7 @@ import org.meshtastic.core.resources.config_lora_region_summary
 import org.meshtastic.core.resources.lna_gain_correction
 import org.meshtastic.core.resources.lna_gain_correction_description
 import org.meshtastic.core.resources.lora
+import org.meshtastic.core.resources.ok_to_mqtt_description
 import org.meshtastic.core.resources.options
 import org.meshtastic.core.resources.schema_lora_bandwidth
 import org.meshtastic.core.resources.schema_lora_channel_num
@@ -339,6 +340,7 @@ fun LoRaConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                 HorizontalDivider()
                 SwitchPreference(
                     title = stringResource(Res.string.schema_lora_config_ok_to_mqtt),
+                    summary = stringResource(Res.string.ok_to_mqtt_description),
                     checked = formState.value.config_ok_to_mqtt,
                     enabled = state.connected,
                     onCheckedChange = {
