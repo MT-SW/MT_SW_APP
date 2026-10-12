@@ -1497,6 +1497,7 @@
     <string name="offline_terrain_empty">No terrain downloaded yet</string>
     <string name="offline_terrain_manager">Offline Terrain</string>
     <string name="offline_terrain_regional_detail">Includes high-detail regional terrain</string>
+    <string name="ok_to_mqtt_description">Allow messages from this node to be forwarded to the internet through MQTT by other nodes. Turn off if you do not want your messages to leave the radio network. We recommend leaving it on, so the network and its state can be monitored.</string>
     <string name="okay">OK</string>
     <string name="oled_type">OLED type</string>
     <!-- ON -->
