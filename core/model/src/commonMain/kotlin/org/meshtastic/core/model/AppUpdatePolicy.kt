@@ -40,10 +40,13 @@ object AppUpdatePolicy {
     /** How long to wait before reminding about a release that was already announced. */
     const val REMINDER_INTERVAL_MILLIS: Long = 2L * 24 * 60 * 60 * 1000
 
-    private val RELEASE_REGEX = Regex("""^v(\d+)\(""", RegexOption.IGNORE_CASE)
+    private val RELEASE_REGEX = Regex("""^v(\d+)[(_]""", RegexOption.IGNORE_CASE)
     private val TEST_REGEX = Regex("""\b(?:test|internal)\.?(\d+)?""", RegexOption.IGNORE_CASE)
 
-    /** Reads the position out of a tag like `v3(2.8.3).test.2`; null when the tag is not an MT_SW_APP release tag. */
+    /**
+     * Reads the position out of a tag like `v3(2.8.3).test.2` (or `v3_2.8.3.test.2`, as GitHub spells it); null when
+     * the tag is not an MT_SW_APP release tag.
+     */
     fun parse(tag: String, prerelease: Boolean = false): ReleaseVersion? {
         val release = RELEASE_REGEX.find(tag.trim())?.groupValues?.get(1)?.toIntOrNull() ?: return null
         val marker = TEST_REGEX.find(tag)
