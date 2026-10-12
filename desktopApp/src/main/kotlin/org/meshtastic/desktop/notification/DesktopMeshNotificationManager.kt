@@ -205,7 +205,8 @@ class DesktopMeshNotificationManager(private val notificationManager: Notificati
             ),
         )
 
-    // The desktop notification has no tap target, so the address of the releases page is part of the text.
+    // The desktop notification cannot open a page itself; clicking it brings the app forward, which shows a window with
+    // a button to the releases page (see AppUpdateDialog).
     override suspend fun showAppUpdateNotification(tag: String, isTest: Boolean, url: String): Boolean =
         notificationManager.dispatch(
             Notification(
@@ -214,7 +215,7 @@ class DesktopMeshNotificationManager(private val notificationManager: Notificati
                 getStringSuspend(
                     if (isTest) Res.string.app_update_test_message else Res.string.app_update_message,
                     tag,
-                ) + "\n" + url,
+                ),
                 category = Notification.Category.Service,
                 id = APP_UPDATE_NOTIFICATION_ID,
             ),
