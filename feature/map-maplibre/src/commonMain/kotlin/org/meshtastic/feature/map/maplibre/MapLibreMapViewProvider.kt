@@ -370,12 +370,12 @@ private fun rememberPlannerBridge(mapState: MapState): PlannerMapBridge {
     val layersManager: MapLayersManager = koinInject()
     return remember(mapState, layersManager) {
         PlannerMapBridge(
-            mapCenter = { mapState.cameraPosition.target.let { it.latitude to it.longitude } },
+            mapCenter = { mapState.cameraPosition.center.let { it.latitude to it.longitude } },
             moveTo = { lat, lon ->
                 scope.launch {
                     mapState.animateCamera(
-                        CameraUpdate(target = Position(longitude = lon, latitude = lat)),
-                        CameraAnimation.Ease(),
+                        CameraUpdate(center = Position(longitude = lon, latitude = lat)),
+                        CameraAnimation.Ease.Standard,
                     )
                 }
             },
@@ -424,7 +424,7 @@ private fun BoxScope.MapToolbar(
             if (location.following) {
                 location.onToggleBearingLock()
             } else {
-                scope.launch { mapState.animateCamera(CameraUpdate(bearing = 0.0), CameraAnimation.Ease()) }
+                scope.launch { mapState.animateCamera(CameraUpdate(bearing = 0.0), CameraAnimation.Ease.Standard) }
             }
         },
         filterDropdownContent = {
@@ -469,7 +469,7 @@ private class LocationControls(
     val onToggleBearingLock: () -> Unit,
 ) {
     val bearingUpdate: BearingUpdate
-        get() = if (followingBearing) BearingUpdate.TRACK_HEADING else BearingUpdate.IGNORE
+        get() = if (followingBearing) BearingUpdate.TrackHeading else BearingUpdate.Ignore
 }
 
 /**

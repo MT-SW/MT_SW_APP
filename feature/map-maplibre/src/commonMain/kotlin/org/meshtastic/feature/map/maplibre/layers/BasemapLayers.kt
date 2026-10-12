@@ -31,8 +31,14 @@ import org.meshtastic.feature.map.maplibre.style.MapOverlay
 import org.meshtastic.feature.map.tiles.DemEncoding
 import org.meshtastic.feature.map.tiles.RasterTileSpec
 
-internal fun RasterTileSpec.toTileSetOptions(): TileSetOptions =
-    TileSetOptions(minZoom = minZoom, maxZoom = maxZoom, attributionHtml = attributionHtml)
+internal fun RasterTileSpec.toTileSetOptions(): TileSetOptions {
+    val spec = this
+    return TileSetOptions {
+        minZoom = spec.minZoom
+        maxZoom = spec.maxZoom
+        attributionHtml = spec.attributionHtml
+    }
+}
 
 /**
  * Renders a raster basemap.
@@ -45,7 +51,7 @@ internal fun RasterBasemapLayer(basemap: Basemap.Raster) {
     val source =
         rememberRasterTileSource(
             tiles = basemap.spec.tiles,
-            options = basemap.spec.toTileSetOptions(),
+            from = basemap.spec.toTileSetOptions(),
             // TileSetOptions itself has no tileSize field — MapLibre defaults raster sources to 512px tiles
             // unless told otherwise here, so a 256px source (OSM and most XYZ tile servers) rendered stretched
             // and blurry without this.
@@ -71,7 +77,7 @@ internal fun MapOverlayLayers(overlays: List<MapOverlay>, opacity: Map<String, F
                 val source =
                     rememberRasterTileSource(
                         tiles = overlay.spec.tiles,
-                        options = overlay.spec.toTileSetOptions(),
+                        from = overlay.spec.toTileSetOptions(),
                         tileSize = overlay.spec.tileSize,
                     )
                 RasterLayer(id = "overlay-${overlay.id}", source = source, opacity = const(layerOpacity))
@@ -92,7 +98,7 @@ private fun HillshadeOverlayLayer(overlay: MapOverlay.Hillshade, opacity: Float)
     val source =
         rememberRasterDemTileSource(
             tiles = overlay.spec.tiles,
-            options = overlay.spec.toTileSetOptions(),
+            from = overlay.spec.toTileSetOptions(),
             tileSize = overlay.spec.tileSize,
             // Not the default. MapLibre assumes Mapbox Terrain-RGB; every keyless public DEM is
             // Terrarium, and the mismatch is silent — shading looks plausible but is wrong.

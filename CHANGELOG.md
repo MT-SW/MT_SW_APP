@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Scalenie z oryginałem (12.10)**
+* Scalenie z najnowszym oryginałem Meshtastic-Android: nowsza biblioteka map (maplibre-compose 0.20) z dopasowaniem naszych warstw mapy, planera i map offline oraz drobne poprawki z upstreamu; bez zmian w działaniu aplikacji.
+
 **Mesh Link Planer (natywny planer zasięgu, 1–2.10)**
 * Natywny planer zamiast zewnętrznego Site Plannera, w całości w aplikacji (Android i desktop): dwa niezależne punkty A/B (lista węzłów, mapa, współrzędne, stacja), teren Mapterhorn, ITM/Longley-Rice, strefa Fresnela, wykres profilu, bilans łącza, namiary i kąty anten, porównanie z ostatnim pomiarem, zasięg dookólny, eksport PDF/CSV/KML/GeoJSON/PNG, okna informacji „i”, podziękowania i licencje.
 * Kreator kabli i złączy (baza z kart katalogowych, złącza bez kabla, np. przejściówki SMA→N), wszystkie pasma od 169 MHz do 2,4 GHz i dowolna częstotliwość; wybór pasma ustawia częstotliwość i szerokość kanału (2,4 GHz jako szeroki LoRa, pierwszy slot dla 433 i 470 MHz).
@@ -133,6 +136,9 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Merge with the original (12.10)**
+* Merged the latest original Meshtastic-Android: newer map library (maplibre-compose 0.20) with our map layers, planner and offline maps adapted to it, plus small upstream fixes; no change in app behaviour.
 
 **Mesh Link Planner (native coverage planner, 1–2 Oct)**
 * A native planner replaces the external Site Planner, entirely inside the app (Android and desktop): two independent points A/B (node list, map, coordinates, own station), Mapterhorn terrain, ITM/Longley-Rice, Fresnel zone, profile chart, link budget, antenna bearings and angles, comparison with the last measurement, omnidirectional coverage, export to PDF/CSV/KML/GeoJSON/PNG, "i" info dialogs, credits and licences.
