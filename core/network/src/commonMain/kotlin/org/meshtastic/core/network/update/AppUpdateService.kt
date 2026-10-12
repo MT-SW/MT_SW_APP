@@ -55,13 +55,18 @@ class AppUpdateService(
     suspend fun checkAndNotify() {
         withContext(dispatchers.io) {
             val prefs = uiPrefs.loadAppUpdatePrefs()
+            Logger.i { "Update check: enabled=${prefs.checkEnabled}, includeTests=${prefs.notifyTests}" }
             if (!prefs.checkEnabled) return@withContext
             safeCatching {
                 val releases = fetchReleases()
                 val current = ReleaseVersion(MtswRelease.RELEASE, MtswRelease.TEST)
+                Logger.i { "Update check: this build is $current, GitHub lists ${releases.map { it.tag }}" }
                 val update =
                     AppUpdatePolicy.newestUpdate(current, releases, includeTests = prefs.notifyTests)
-                        ?: return@safeCatching
+                        ?: run {
+                            Logger.i { "Update check: nothing newer than this build" }
+                            return@safeCatching
+                        }
                 val now = nowMillis
                 if (
                     !AppUpdatePolicy.shouldNotify(
@@ -71,6 +76,7 @@ class AppUpdateService(
                         nowMillis = now,
                     )
                 ) {
+                    Logger.i { "Update check: ${update.tag} was announced recently, no reminder yet" }
                     return@safeCatching
                 }
                 val version = AppUpdatePolicy.parse(update.tag, update.prerelease)
@@ -80,9 +86,10 @@ class AppUpdateService(
                         isTest = version?.isTest == true,
                         url = RELEASES_PAGE_URL,
                     )
+                Logger.i { "Update check: notification for ${update.tag} shown=$shown" }
                 if (shown) uiPrefs.setAppUpdateLastNotified(update.tag, now)
             }
-                .onFailure { Logger.d(it) { "Update check skipped: offline, rate-limited, or malformed response" } }
+                .onFailure { Logger.w(it) { "Update check failed: offline, rate-limited, or malformed response" } }
         }
     }
 

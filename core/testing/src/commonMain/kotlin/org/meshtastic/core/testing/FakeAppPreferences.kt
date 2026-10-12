@@ -317,12 +317,14 @@ class FakeUiPrefs : UiPrefs {
 
     override fun setAppUpdateCheckEnabled(enabled: Boolean) {
         appUpdateCheckEnabled.value = enabled
+        setAppUpdateLastNotified("", 0L)
     }
 
     override val appUpdateNotifyTests = MutableStateFlow(false)
 
     override fun setAppUpdateNotifyTests(enabled: Boolean) {
         appUpdateNotifyTests.value = enabled
+        setAppUpdateLastNotified("", 0L)
     }
 
     override val appUpdateLastNotifiedTag = MutableStateFlow("")
