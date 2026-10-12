@@ -29,6 +29,8 @@ class AppUpdatePolicyTest {
     @Test
     fun `parses stable and test tags`() {
         assertEquals(ReleaseVersion(3, 0), AppUpdatePolicy.parse("v3(2.8.3)"))
+        assertEquals(ReleaseVersion(3, 0), AppUpdatePolicy.parse("v3_2.8.3"))
+        assertEquals(ReleaseVersion(3, 1), AppUpdatePolicy.parse("v3_2.8.3.test.1"))
         assertEquals(ReleaseVersion(4, 2), AppUpdatePolicy.parse("v4(2.8.4).test.2"))
         assertEquals(ReleaseVersion(4, 1), AppUpdatePolicy.parse("v4(2.8.4).test"))
         assertEquals(ReleaseVersion(5, 1), AppUpdatePolicy.parse("v5(2.8.5)", prerelease = true))
