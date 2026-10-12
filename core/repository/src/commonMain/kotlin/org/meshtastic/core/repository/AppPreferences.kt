@@ -319,7 +319,21 @@ interface UiPrefs {
     val appUpdateLastNotifiedMillis: StateFlow<Long>
 
     fun setAppUpdateLastNotified(tag: String, millis: Long)
+
+    /**
+     * The stored update settings, read from disk. Unlike the flows above (which start with their default until the
+     * storage has loaded), this waits for the real values, so a check right at app start sees what the user chose.
+     */
+    suspend fun loadAppUpdatePrefs(): AppUpdatePrefs
 }
+
+/** A snapshot of the update-notification settings, see [UiPrefs.loadAppUpdatePrefs]. */
+data class AppUpdatePrefs(
+    val checkEnabled: Boolean,
+    val notifyTests: Boolean,
+    val lastNotifiedTag: String,
+    val lastNotifiedMillis: Long,
+)
 
 /** Reactive interface for notification preferences. */
 interface NotificationPrefs {

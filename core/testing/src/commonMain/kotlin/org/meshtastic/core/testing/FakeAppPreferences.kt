@@ -24,6 +24,7 @@ import org.meshtastic.core.repository.AnalyticsPrefs
 import org.meshtastic.core.repository.AppFunctionsPrefs
 import org.meshtastic.core.repository.AppFunctionsSetting
 import org.meshtastic.core.repository.AppPreferences
+import org.meshtastic.core.repository.AppUpdatePrefs
 import org.meshtastic.core.repository.AutoCleanNodesPolicy
 import org.meshtastic.core.repository.CustomEmojiPrefs
 import org.meshtastic.core.repository.FilterPrefs
@@ -327,6 +328,13 @@ class FakeUiPrefs : UiPrefs {
     override val appUpdateLastNotifiedTag = MutableStateFlow("")
 
     override val appUpdateLastNotifiedMillis = MutableStateFlow(0L)
+
+    override suspend fun loadAppUpdatePrefs() = AppUpdatePrefs(
+        checkEnabled = appUpdateCheckEnabled.value,
+        notifyTests = appUpdateNotifyTests.value,
+        lastNotifiedTag = appUpdateLastNotifiedTag.value,
+        lastNotifiedMillis = appUpdateLastNotifiedMillis.value,
+    )
 
     override fun setAppUpdateLastNotified(tag: String, millis: Long) {
         appUpdateLastNotifiedTag.value = tag
