@@ -21,6 +21,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 **Pomoc i dokumentacja po polsku**
 * Cała dokumentacja w aplikacji (Przewodnik użytkownika i Przewodnik dewelopera, 36 stron) przetłumaczona na polski, wraz z nazwami stron; strona dokumentacji (docs/pl) też jest teraz w całości po polsku.
 * Opis wyboru presetu mówi, że domyślnym presetem dla MT_SW_FIRMWARE jest Wąski szybki (Narrow Fast).
+* Strony pomocy mają mniejsze nagłówki i przyciski „A−” / „A+” w górnym pasku do zmiany wielkości tekstu.
 
 **Okna informacyjne**
 * Okna informacyjne w aplikacji pojawiają się rzadziej, w losowych odstępach; termin jest zapamiętywany trwale.
@@ -153,6 +154,7 @@ The entries below describe only what this fork adds on top of the original, from
 **Help and documentation in Polish**
 * All in-app documentation (User Guide and Developer Guide, 36 pages) translated into Polish, including page names; the documentation site (docs/pl) is now fully in Polish too.
 * The preset picker hint says that the default preset for MT_SW_FIRMWARE is Narrow Fast.
+* Help pages have smaller headings and “A−” / “A+” buttons in the top bar to change the text size.
 
 **Information windows**
 * Information windows in the app now appear less often, at random intervals; the schedule is stored permanently.

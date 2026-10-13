@@ -115,6 +115,11 @@ val syncTranslatedDocsToComposeResources =
 
         into(targetBase)
 
+        // Remove leftovers of earlier syncs (e.g. a stale pl-rPL) so they cannot shadow the current translations.
+        doFirst {
+            targetBase.asFile.listFiles()?.forEach { dir -> File(dir, "docs").deleteRecursively() }
+        }
+
         // Locale goes as a subdirectory *inside* files/ (CMP doesn't support qualifiers on files/).
         eachFile {
             val segments = relativePath.segments
