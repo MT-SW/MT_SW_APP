@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -45,10 +46,12 @@ import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.RegionInfo
 import org.meshtastic.core.model.SessionStatus
 import org.meshtastic.core.model.effectiveBandwidthKHz
+import org.meshtastic.core.model.geofence.SwietokrzyskieRegion
 import org.meshtastic.core.navigation.NodeDetailRoute
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.repository.LocalNodeUnavailableException
+import org.meshtastic.core.repository.LocationService
 import org.meshtastic.core.repository.PacketQueueRejectedException
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.QueryController
@@ -123,6 +126,7 @@ class NodeDetailViewModel(
     private val observeRemoteAdminSessionStatus: ObserveRemoteAdminSessionStatusUseCase,
     private val snackbarManager: SnackbarManager,
     private val radioConfigRepository: RadioConfigRepository,
+    private val locationService: LocationService,
     private val resolveUiText: suspend (UiText) -> String = { it.resolve() },
 ) : ViewModel() {
 
@@ -337,7 +341,7 @@ class NodeDetailViewModel(
      * snackbar with the appropriate guidance on [EnsureSessionResult.Disconnected] or [EnsureSessionResult.Timeout].
      */
     fun openRemoteAdmin(destNum: Int) {
-        checkNarrowBandWarning()
+        checkNarrowBandWarning(destNum)
         ensureSessionThenNavigate(destNum, "openRemoteAdmin") { SettingsRoute.Settings(destNum) }
     }
 
@@ -379,14 +383,27 @@ class NodeDetailViewModel(
     }
 
     /**
-     * Shows [NodeDetailUiState.showNarrowBandWarning] if the locally-connected radio's current LoRa channel bandwidth
-     * exceeds [NARROW_BAND_WARNING_THRESHOLD_KHZ] — unthrottled, shown every time remote admin is opened.
+     * Shows [NodeDetailUiState.showNarrowBandWarning] when remote admin is opened on [destNum] and the
+     * locally-connected radio's LoRa channel is wider than [NARROW_BAND_WARNING_THRESHOLD_KHZ] — but only inside
+     * Świętokrzyskie: either the node being configured has a position there, or this phone is there. The node is
+     * checked first so the phone's location is only fetched when it is needed. Unthrottled: shown every time remote
+     * admin is opened in the region. Separate from the general notice shown at random by the main screen.
      */
-    private fun checkNarrowBandWarning() {
+    private fun checkNarrowBandWarning(destNum: Int) {
         val lora = localConfig.value.lora ?: return
         val regionInfo = RegionInfo.fromRegionCode(lora.region)
-        if (lora.effectiveBandwidthKHz(regionInfo) > NARROW_BAND_WARNING_THRESHOLD_KHZ) {
-            narrowBandWarningFlow.value = true
+        if (lora.effectiveBandwidthKHz(regionInfo) <= NARROW_BAND_WARNING_THRESHOLD_KHZ) return
+
+        safeLaunch(tag = "checkNarrowBandWarning") {
+            val node = getNodeDetailsUseCase(destNum).first().node
+            val nodeInside =
+                node?.validPosition != null && SwietokrzyskieRegion.polygon.contains(node.latitude, node.longitude)
+            val inside =
+                nodeInside ||
+                    locationService.getCurrentLocation()?.let {
+                        SwietokrzyskieRegion.polygon.contains(it.latitude, it.longitude)
+                    } == true
+            if (inside) narrowBandWarningFlow.value = true
         }
     }
 
