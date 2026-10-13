@@ -1,8 +1,9 @@
 ---
-title: Node Metrics
+title: Metryki węzła
+parent: Przewodnik użytkownika
 nav_order: 5
 last_updated: 2026-09-28
-description: Telemetry dashboards for each mesh node — device health, environment sensors, air quality, signal quality, power, traceroute, and position history.
+description: Panele telemetrii każdego węzła sieci mesh — stan urządzenia, czujniki środowiskowe, jakość powietrza, jakość sygnału, zasilanie, traceroute i historia pozycji.
 aliases:
   - metrics
   - telemetry
@@ -10,176 +11,175 @@ aliases:
   - signal
 ---
 
-# Node Metrics
+# Metryki węzła
 
-The node detail screen provides comprehensive telemetry and metrics for each node on your mesh.
+Ekran szczegółów węzła udostępnia pełną telemetrię i metryki każdego węzła w Twojej sieci mesh.
 
-## Viewing Metrics
+## Podgląd metryk
 
-1. Navigate to **Nodes**.
-2. Tap the node you want to inspect.
-3. Scroll to the **Telemetry** section and find the category you want — **Signal Quality**, **Device Metrics**, **Environment Metrics**, **Air-Quality Metrics**, **Power Metrics**, **Position**, and the rest.
-4. Tap the refresh button on a row to ask the node for a fresh reading. The chart button beside it opens that category's history, and appears once the node has reported that kind of telemetry.
+1. Przejdź do **Węzły**.
+2. Dotknij węzła, który chcesz sprawdzić.
+3. Przewiń do sekcji **Telemetria** i znajdź interesującą Cię kategorię — **Jakość sygnału**, **Metryka urządzenia**, **Metryki środowiskowe**, **Metryki jakości powietrza**, **Metryki zasilania**, **Pozycja** i pozostałe.
+4. Dotknij przycisku odświeżania w wierszu, aby poprosić węzeł o świeży odczyt. Przycisk wykresu obok niego otwiera historię tej kategorii i pojawia się, gdy węzeł zgłosi ten rodzaj telemetrii.
 
-![Node detail — local device](../../assets/screenshots/nodes_detail_local.png)
+![Szczegóły węzła — urządzenie lokalne](../../assets/screenshots/nodes_detail_local.png)
 
-The **Position** row expands to show location data for nodes that share GPS:
+Wiersz **Pozycja** rozwija się, pokazując dane o lokalizacji węzłów, które udostępniają GPS:
 
-![Position inline content](../../assets/screenshots/nodes_position.png)
+![Rozwinięta zawartość pozycji](../../assets/screenshots/nodes_position.png)
 
-> ℹ️ **Note:** Metrics are only available when they have been reported by the remote node. Metrics update at intervals configured on each node's telemetry settings.
+> ℹ️ **Uwaga:** Metryki są dostępne tylko wtedy, gdy zostały zgłoszone przez zdalny węzeł. Metryki aktualizują się w odstępach skonfigurowanych w ustawieniach telemetrii każdego węzła.
 
 ## Metryka urządzenia
 
-Basic operating information reported by each node:
+Podstawowe informacje o pracy zgłaszane przez każdy węzeł:
 
-| Metric                     | Opis                                                     |
-| -------------------------- | -------------------------------------------------------- |
-| Poziom naładowania baterii | Current battery percentage                               |
-| Napięcie                   | Battery voltage reading                                  |
-| ChUtil                     | Percentage of local airtime in use                       |
-| AirUtil                    | Percentage of the last hour this node spent transmitting |
-| Czas pracy                 | Time since last reboot                                   |
+| Metryka | Opis |
+|--------|-------------|
+| Poziom baterii | Bieżący procent naładowania baterii |
+| Napięcie | Odczyt napięcia baterii |
+| ChUtil | Procent lokalnego czasu antenowego w użyciu |
+| AirUtil | Procent ostatniej godziny, który ten węzeł spędził na nadawaniu |
+| Czas pracy | Czas od ostatniego restartu |
 
-Device Metrics has no cards on the node detail screen. Use the chart button on its row to open the Device Metrics screen, where battery level, voltage, ChUtil, and AirUtil are plotted over time and every reading — uptime included — is listed with its timestamp underneath. Pick a time frame at the top of the screen, and use the save icon in the app bar to export the visible history as CSV.
+Metryka urządzenia nie ma kart na ekranie szczegółów węzła. Użyj przycisku wykresu w jej wierszu, aby otworzyć ekran Metryki urządzenia, na którym poziom baterii, napięcie, ChUtil i AirUtil są wykreślone w czasie, a każdy odczyt — łącznie z czasem pracy — jest wypisany poniżej wraz ze znacznikiem czasu. Wybierz przedział czasu u góry ekranu i użyj ikony zapisu na pasku aplikacji, aby wyeksportować widoczną historię do CSV.
 
-> 💡 **Tip:** Where a category does show cards — Environment, Air Quality, and Power — touch & hold a card to copy its value to the clipboard. On a chart screen, pinch to zoom the time axis.
+> 💡 **Wskazówka:** Tam, gdzie kategoria pokazuje karty — Środowisko, Jakość powietrza i Zasilanie — dotknij i przytrzymaj kartę, aby skopiować jej wartość do schowka. Na ekranie wykresu szczypnij dwoma palcami, aby powiększyć oś czasu.
 
 ## Metryki środowiskowe
 
-Environmental sensor data (requires compatible hardware):
+Dane z czujników środowiskowych (wymagają zgodnego sprzętu):
 
-| Metric                               | Sensor Examples       |
-| ------------------------------------ | --------------------- |
-| Temperatura                          | BME280, BME680, SHT31 |
-| Wilgotność                           | BME280, BME680, SHT31 |
-| Ciśnienie barometryczne              | BME280, BMP280        |
-| Rezystancja gazu                     | BME680                |
-| IAQ (Air Quality) | BME680                |
+| Metryka | Przykłady czujników |
+|--------|-----------------|
+| Temperatura | BME280, BME680, SHT31 |
+| Wilgotność | BME280, BME680, SHT31 |
+| Ciśnienie atmosferyczne | BME280, BMP280 |
+| Rezystancja gazu | BME680 |
+| IAQ (jakość powietrza) | BME680 |
 
-Environment metrics are charted over time — temperature, humidity, and pressure each get their own line chart with the measurement unit displayed on the Y axis.
+Metryki środowiskowe są wykreślane w czasie — temperatura, wilgotność i ciśnienie mają każde własny wykres liniowy z jednostką miary na osi Y.
 
-The BME680 **IAQ (Indoor Air Quality)** index is a single 0–500+ value derived from gas resistance, shown against a color-coded scale from _Excellent_ to _Dangerously Polluted_:
+Indeks **IAQ (Indoor Air Quality — jakość powietrza w pomieszczeniach)** z BME680 to pojedyncza wartość 0–500+ wyliczana z rezystancji gazu, pokazana na kolorowej skali od *Doskonałe* (Excellent) do *Niebezpiecznie zanieczyszczone* (Dangerously Polluted):
 
-![IAQ index scale from Excellent to Dangerously Polluted](../../assets/screenshots/node-metrics_iaq_scale.png)
+![Skala indeksu IAQ od Doskonałego do Niebezpiecznie zanieczyszczonego](../../assets/screenshots/node-metrics_iaq_scale.png)
 
-> 💡 **Tip:** Environment metrics require a sensor connected to the remote node. Not all nodes report environmental data. See [Telemetry & Sensors](telemetry-and-sensors) for a full list of supported sensors.
+> 💡 **Wskazówka:** Metryki środowiskowe wymagają czujnika podłączonego do zdalnego węzła. Nie wszystkie węzły zgłaszają dane środowiskowe. Pełną listę obsługiwanych czujników znajdziesz w [Telemetria i czujniki](telemetry-and-sensors).
 
-## Air Quality Metrics
+## Metryki jakości powietrza
 
-Air Quality is a dedicated metrics view for nodes equipped with a particulate-matter and/or CO₂ sensor. It is **separate from the BME680 IAQ reading** listed under Environment Metrics — IAQ is a single gas-resistance-derived index, while the Air Quality view charts the underlying particulate and CO₂ measurements.
+Jakość powietrza to osobny widok metryk dla węzłów wyposażonych w czujnik pyłów zawieszonych i/lub CO₂. Jest **odrębny od odczytu IAQ z BME680** wymienionego w Metrykach środowiskowych — IAQ to pojedynczy indeks wyliczany z rezystancji gazu, podczas gdy widok Jakości powietrza wykreśla podstawowe pomiary pyłów i CO₂.
 
-| Metric                | Unit      | Opis                                                                                                                                                                                                                             |
-| --------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PM1.0 | µg/m³     | Particulate matter up to 1.0 micron                                                                                                                                                                              |
-| PM2.5 | µg/m³     | Particulate matter up to 2.5 microns                                                                                                                                                                             |
-| PM10                  | µg/m³     | Particulate matter up to 10 microns                                                                                                                                                                                              |
-| AQI                   | EPA index | EPA **NowCast** AQI computed from the node's recent PM2.5 history, with a color-coded severity label. Shown next to PM2.5 once enough readings have accumulated. |
-| CO₂                   | ppm       | Carbon dioxide concentration                                                                                                                                                                                                     |
-| CO₂ temperature       | °C / °F   | Temperature reported by the CO₂ sensor itself (e.g. SCD4x)                                                                                                                    |
-| CO₂ humidity          | %         | Relative humidity reported by the CO₂ sensor                                                                                                                                                                                     |
+| Metryka | Jednostka | Opis |
+|--------|------|-------------|
+| PM1.0 | µg/m³ | Pył zawieszony do 1,0 mikrona |
+| PM2.5 | µg/m³ | Pył zawieszony do 2,5 mikrona |
+| PM10 | µg/m³ | Pył zawieszony do 10 mikronów |
+| AQI | indeks EPA | AQI EPA **NowCast** wyliczany z niedawnej historii PM2.5 węzła, z kolorową etykietą dotkliwości. Pokazywany obok PM2.5, gdy zbierze się wystarczająco dużo odczytów. |
+| CO₂ | ppm | Stężenie dwutlenku węgla |
+| Temperatura CO₂ | °C / °F | Temperatura zgłaszana przez sam czujnik CO₂ (np. SCD4x) |
+| Wilgotność CO₂ | % | Wilgotność względna zgłaszana przez czujnik CO₂ |
 
-CO₂ readings are color-coded by severity so you can read air quality at a glance:
+Odczyty CO₂ są oznaczone kolorami według dotkliwości, aby jakość powietrza można było ocenić na pierwszy rzut oka:
 
-| Band     | CO₂ Range (ppm) | Color    |
-| -------- | ---------------------------------- | -------- |
-| dobry    | < 1000    | Zielony  |
-| Stuffy   | < 2000    | Amber    |
-| Poor     | < 5000    | Orange   |
-| Unsafe   | < 30000   | Czerwony |
-| Evacuate | ≥ 30000                            | Dark red |
+| Przedział | Zakres CO₂ (ppm) | Kolor |
+|------|-----------------|-------|
+| Dobre | < 1000 | Zielony |
+| Duszno | < 2000 | Bursztynowy |
+| Słabe | < 5000 | Pomarańczowy |
+| Niebezpieczne | < 30000 | Czerwony |
+| Ewakuacja | ≥ 30000 | Ciemnoczerwony |
 
-![Air quality readings with color-coded CO₂ severity](../../assets/screenshots/node-metrics_air_quality.png)
+![Odczyty jakości powietrza z kolorowym oznaczeniem dotkliwości CO₂](../../assets/screenshots/node-metrics_air_quality.png)
 
-An air-quality log/metrics button appears on the node detail screen **only when the node has reported air-quality telemetry**. From the Air Quality view you can:
+Przycisk dziennika/metryk jakości powietrza pojawia się na ekranie szczegółów węzła **tylko wtedy, gdy węzeł zgłosił telemetrię jakości powietrza**. W widoku Jakości powietrza możesz:
 
-- Select a **time frame** for the charts.
-- Filter with **metric chips** — only metrics that have data are shown.
-- **Refresh / request** the latest air-quality telemetry.
-- **Export to CSV** for analysis in a spreadsheet.
+- Wybrać **przedział czasu** dla wykresów.
+- Filtrować za pomocą **chipów metryk** — pokazywane są tylko metryki, które mają dane.
+- **Odświeżyć / zażądać** najnowszej telemetrii jakości powietrza.
+- **Wyeksportować do CSV** do analizy w arkuszu kalkulacyjnym.
 
-> 💡 **Tip:** Air Quality metrics require a compatible air-quality sensor on the remote node. See [Telemetry & Sensors](telemetry-and-sensors) for supported hardware.
+> 💡 **Wskazówka:** Metryki jakości powietrza wymagają zgodnego czujnika jakości powietrza w zdalnym węźle. Obsługiwany sprzęt znajdziesz w [Telemetria i czujniki](telemetry-and-sensors).
 
 ## Jakość sygnału
 
-Radio signal quality information:
+Informacje o jakości sygnału radiowego:
 
-| Metric                | Opis                                                                           |
-| --------------------- | ------------------------------------------------------------------------------ |
-| SNR:  | Signal-to-Noise Ratio (higher is better)                    |
-| RSSI: | Received Signal Strength Indicator (closer to 0 is better)  |
-| Noise Floor           | Local background RF noise in dBm (more negative is quieter) |
-| Hop Count             | Number of mesh hops for last message                                           |
+| Metryka | Opis |
+|--------|-------------|
+| SNR | Stosunek sygnału do szumu (im wyższy, tym lepiej) |
+| RSSI | Wskaźnik siły odbieranego sygnału (im bliżej 0, tym lepiej) |
+| Poziom szumu | Lokalny szum tła RF w dBm (im bardziej ujemny, tym ciszej) |
+| Liczba skoków | Liczba skoków w sieci mesh dla ostatniej wiadomości |
 
-### Signal Quality Reference
+### Opis jakości sygnału
 
-Signal quality is rated from **SNR relative to the active LoRa modem preset's demodulation floor**, not from fixed thresholds — a given SNR means different things on different presets (e.g. −15 dB is fine on LongSlow but unusable on ShortFast). When RSSI and a noise-floor reading are both available, the app also rates their difference against the preset limit and uses the worse rating. Otherwise, RSSI is display-only. In the table, _limit_ is the preset's SNR limit.
+Jakość sygnału jest oceniana na podstawie **SNR względem progu demodulacji aktywnego presetu modemu LoRa**, a nie stałych progów — ten sam SNR znaczy co innego na różnych presetach (np. −15 dB jest w porządku na LongSlow, ale bezużyteczne na ShortFast). Gdy dostępne są zarówno RSSI, jak i odczyt poziomu szumu, aplikacja ocenia też ich różnicę względem limitu presetu i używa gorszej oceny. W przeciwnym razie RSSI służy wyłącznie do wyświetlania. W tabeli *limit* to limit SNR presetu.
 
-| Quality       | Criteria                                                         |
-| ------------- | ---------------------------------------------------------------- |
-| dobry         | SNR above the preset's limit                                     |
-| wystarczający | less than 5.5 dB below the limit                 |
-| słaby         | 5.5 dB to 7.5 dB below the limit |
-| Brak          | more than 7.5 dB below the limit                 |
+| Jakość | Kryteria |
+|---------|----------|
+| Dobra | SNR powyżej limitu presetu |
+| Wystarczająca | mniej niż 5,5 dB poniżej limitu |
+| Słaba | od 5,5 dB do 7,5 dB poniżej limitu |
+| Brak | więcej niż 7,5 dB poniżej limitu |
 
-See [Understanding the Signal Meter](signal-meter) for the full explanation.
+Pełne wyjaśnienie znajdziesz w [Jak działa miernik sygnału](signal-meter).
 
-Local Stats from your connected radio are also shown in Signal Quality when available. These logs include noise floor, traffic counters, relay counters, online node counts, and radio uptime. The noise floor chart uses a dashed reference line at -85 dBm to help identify a busy RF environment.
+Statystyki lokalne z połączonego radia są również pokazywane w Jakości sygnału, gdy są dostępne. Te logi zawierają poziom szumu, liczniki ruchu, liczniki przekazań, liczbę węzłów online i czas pracy radia. Wykres poziomu szumu używa przerywanej linii odniesienia przy -85 dBm, aby pomóc rozpoznać zajęte środowisko RF.
 
-- **Request** — ask the connected radio for a fresh Local Stats telemetry report
-- **Clear** — remove Local Stats logs for that node
-- **Save** — export the visible Local Stats history as CSV
+- **Zażądaj** — poproś połączone radio o świeży raport telemetrii Statystyk lokalnych
+- **Wyczyść** — usuń logi Statystyk lokalnych tego węzła
+- **Zapisz** — wyeksportuj widoczną historię Statystyk lokalnych do CSV
 
 ## Metryki zasilania
 
-Power management telemetry (requires INA sensor or compatible hardware):
+Telemetria zarządzania zasilaniem (wymaga czujnika INA lub zgodnego sprzętu):
 
-| Metric    | Opis                           |
-| --------- | ------------------------------ |
-| Napięcie  | Per-channel voltage reading    |
-| Natężenie | Per-channel draw, in milliamps |
+| Metryka | Opis |
+|--------|-------------|
+| Napięcie | Odczyt napięcia dla każdego kanału |
+| Prąd | Pobór dla każdego kanału, w miliamperach |
 
-The node detail screen shows cards for channels 1 to 3. Use the chart button on the **Power Metrics** row to open the chart screen, which lists a chip for every channel that reported data — up to eight — and charts the one you select. Use the label field under the chips to give a channel a name of your own, such as Solar or Battery. The app does not derive a wattage figure from voltage and current.
+Ekran szczegółów węzła pokazuje karty dla kanałów od 1 do 3. Użyj przycisku wykresu w wierszu **Metryki zasilania**, aby otworzyć ekran wykresu, który wypisuje chip dla każdego kanału, który zgłosił dane — do ośmiu — i wykreśla ten, który wybierzesz. Użyj pola etykiety pod chipami, aby nadać kanałowi własną nazwę, na przykład Solar lub Akumulator. Aplikacja nie wylicza mocy w watach z napięcia i prądu.
 
-## Pokaż trasę
+## Traceroute
 
-Traceroute shows the path a message takes through the mesh:
+Traceroute pokazuje ścieżkę, którą wiadomość pokonuje w sieci mesh:
 
-1. From the node detail screen's **Telemetry** section, tap the refresh button on the **Traceroute** row. You cannot traceroute your own node, and the button accepts one request every 30 seconds.
-2. The app sends a traceroute request to the target node.
-3. Results show each hop with its SNR.
+1. W sekcji **Telemetria** na ekranie szczegółów węzła dotknij przycisku odświeżania w wierszu **Śledzenie trasy**. Nie możesz wykonać traceroute do własnego węzła, a przycisk przyjmuje jedno żądanie na 30 sekund.
+2. Aplikacja wysyła żądanie traceroute do docelowego węzła.
+3. Wyniki pokazują każdy skok wraz z jego SNR.
 
-### Reading Traceroute Results
+### Odczytywanie wyników traceroute
 
-A traceroute is a round trip, so each saved result carries a hop count in each direction, **Forward Hops** and **Return Hops**, plus the **Round Trip** time in seconds. A result marked **Direct** reached the target with no relay in between. Tap a result to read the route traced toward the destination and the route traced back to you, with the SNR of every hop. That view offers **View on map**, which draws the same path, as long as the start and destination nodes have both shared a position.
+Traceroute to podróż w obie strony, więc każdy zapisany wynik zawiera liczbę skoków w każdym kierunku, **Skoki w przód** i **Skoki powrotne**, oraz czas **Trasa w obie strony** w sekundach. Wynik oznaczony **Bezpośrednio** dotarł do celu bez żadnego przekaźnika po drodze. Dotknij wyniku, aby zobaczyć trasę wyznaczoną do celu i trasę wyznaczoną z powrotem do Ciebie, wraz z SNR każdego skoku. Ten widok oferuje **Pokaż na mapie**, który rysuje tę samą ścieżkę, o ile węzeł początkowy i docelowy udostępniły pozycję.
 
-A result marked **No Response** means the target never answered. It may be out of range, asleep, or configured not to reply. Wait for the 30-second cooldown to clear and try again; if it keeps failing, send a direct message first to confirm the node is reachable at all.
+Wynik oznaczony **Brak odpowiedzi** oznacza, że cel nigdy nie odpowiedział. Może być poza zasięgiem, uśpiony lub skonfigurowany tak, by nie odpowiadać. Poczekaj, aż minie 30-sekundowa blokada, i spróbuj ponownie; jeśli nadal się nie udaje, najpierw wyślij wiadomość bezpośrednią, aby sprawdzić, czy węzeł jest w ogóle osiągalny.
 
-## Historia pozycji
+## Dziennik pozycji
 
-Historical position data for nodes that share their location:
-
-- GPS coordinates
+Historyczne dane o pozycji dla węzłów, które udostępniają swoją lokalizację:
+- Współrzędne GPS
 - Wysokość
-- Speed (if moving)
-- Timestamp for each position report
+- Prędkość (w ruchu)
+- Znacznik czasu każdego raportu pozycji
 
-## Informacje o sąsiadze
+## Informacje o sąsiadach
 
-Shows which nodes a given node can directly hear, useful for understanding mesh topology.
+Pokazuje, które węzły dany węzeł słyszy bezpośrednio — przydatne do zrozumienia topologii sieci mesh.
 
 ## Statystyki hosta
 
-Nodes that run Meshtastic on a Linux host, such as a Raspberry Pi, report the host's own health — free memory, free disk space, one-, five-, and fifteen-minute load averages, and how long the host has been up. The **Host Metrics** row is always listed; its chart button appears once a node has reported them.
+Węzły, które działają na hoście z Linuksem, takim jak Raspberry Pi, zgłaszają stan samego hosta — wolną pamięć, wolne miejsce na dysku, średnie obciążenie z jednej, pięciu i piętnastu minut oraz czas pracy hosta. Wiersz **Statystyki hosta** jest zawsze widoczny; jego przycisk wykresu pojawia się, gdy węzeł je zgłosi.
 
-## PAX Metrics
+## Metryki PAX
 
-A node running the PAX counter module reports how many Wi-Fi and Bluetooth devices it saw nearby, as a crowd-size estimate, and charts the two counts alongside their total. The **PAX Metrics** row is always listed; its chart button appears once a node has reported them. The counts are of devices, not people.
+Węzeł z modułem licznika PAX zgłasza, ile urządzeń Wi-Fi i Bluetooth widział w pobliżu, jako szacunek wielkości tłumu, i wykreśla oba liczniki wraz z ich sumą. Wiersz **Metryki PAX** jest zawsze widoczny; jego przycisk wykresu pojawia się, gdy węzeł je zgłosi. Liczniki dotyczą urządzeń, a nie ludzi.
 
-## Related Topics
+## Powiązane tematy
 
-- [Nodes](nodes) — node list, filtering, and sorting
-- [Telemetry & Sensors](telemetry-and-sensors) — supported sensors and configuration
-- [Signal Meter](signal-meter) — how signal quality is calculated from SNR and RSSI
-- [Local Mesh Discovery](discovery) — traceroute details and neighbor info
-- [Units & Locale](units-and-locale) — temperature, distance, and speed display formats
+- [Węzły](nodes) — lista węzłów, filtrowanie i sortowanie
+- [Telemetria i czujniki](telemetry-and-sensors) — obsługiwane czujniki i konfiguracja
+- [Miernik sygnału](signal-meter) — jak jakość sygnału jest wyliczana z SNR i RSSI
+- [Lokalne odkrywanie sieci mesh](discovery) — szczegóły traceroute i informacje o sąsiadach
+- [Jednostki i lokalizacja](units-and-locale) — formaty wyświetlania temperatury, odległości i prędkości

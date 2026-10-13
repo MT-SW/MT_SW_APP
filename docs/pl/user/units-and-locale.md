@@ -1,8 +1,9 @@
 ---
-title: Units, Measurement & Locale
+title: Jednostki i lokalizacja
+parent: Przewodnik użytkownika
 nav_order: 16
 last_updated: 2026-08-30
-description: How the app formats temperature, distance, speed, and other measurements based on your device locale.
+description: Jak aplikacja formatuje temperaturę, odległość, prędkość i inne pomiary na podstawie ustawień regionalnych urządzenia.
 aliases:
   - measurement
   - units
@@ -11,154 +12,154 @@ aliases:
   - imperial
 ---
 
-# Units, Measurement & Locale
+# Jednostki i lokalizacja
 
-The Meshtastic app automatically displays temperatures, distances, speeds, and times in the units your device is configured to use. If your device's settings can't express the units you want, an in-app **Units** setting overrides them.
+Aplikacja automatycznie wyświetla temperatury, odległości, prędkości i czas w jednostkach, które ustawiono na Twoim urządzeniu. Jeśli ustawienia urządzenia nie pozwalają wyrazić potrzebnych Ci jednostek, zastąpi je ustawienie **Jednostki** w aplikacji.
 
-## How It Works
+## Jak to działa
 
-Meshtastic radios always transmit data in **metric units** (meters, °C, m/s, hPa, etc.). When the app receives this data, it converts and displays values in whatever unit system your device's locale specifies.
+Radia zawsze przesyłają dane w **jednostkach metrycznych** (metry, °C, m/s, hPa itd.). Gdy aplikacja odbierze te dane, przelicza je i wyświetla w systemie jednostek wynikającym z ustawień regionalnych urządzenia.
 
-On Android, your measurement preferences are determined by your system **Language & Region** settings. On Desktop (JVM), the app uses the JVM's default `Locale`.
+Na Androidzie preferencje pomiarów wynikają z systemowych ustawień **Język i region**. Na komputerze (JVM) aplikacja używa domyślnego `Locale` JVM.
 
-Units follow your device's **region**, not the display language. Plain languages — like **English** in the app's own Language setting or Android's per-app language — keep the region your device is set to. A choice that names a region of its own, like **English (Canada)**, overrides it and brings that region's units with it. On Android 16+, the system-wide **Measurement system** preference overrides the region for distance, speed, and the other measurements — but not for temperature, which keeps following the region.
+Jednostki zależą od **regionu** urządzenia, a nie od języka wyświetlania. Zwykłe języki — jak **angielski** w ustawieniu Język w samej aplikacji albo w języku aplikacji w Androidzie — zachowują region ustawiony na urządzeniu. Wybór, który zawiera własny region, jak **angielski (Kanada)**, nadpisuje go i wprowadza jednostki tego regionu. W Androidzie 16+ systemowa preferencja **System miar** nadpisuje region dla odległości, prędkości i innych pomiarów — ale nie dla temperatury, która nadal podąża za regionem.
 
-> 💡 **Tip:** By default there is nothing to configure — change your system measurement preferences and every screen in Meshtastic updates automatically. If your device offers no working region or measurement setting (some manufacturer builds don't), set **Settings → Units** in the app instead.
+> 💡 **Wskazówka:** Domyślnie nie ma nic do konfigurowania — zmień systemowe preferencje pomiarów, a każdy ekran aplikacji zaktualizuje się automatycznie. Jeśli urządzenie nie oferuje działającego ustawienia regionu ani miar (niektóre wersje producentów go nie mają), ustaw zamiast tego **Ustawienia → Jednostki** w aplikacji.
 
-## The Radio's Own Screen Is Separate
+## Ekran radia jest osobny
 
-**Settings → Device configuration → Display → Display units** configures the screen on the radio, not the app. The **Use 12h clock format** and **Always point north** settings do too — all three apply to the radio's display only. Temperature on that screen has its own setting, **Environment metrics use Fahrenheit**, on the radio's Telemetry module — see the [Telemetry module reference](https://meshtastic.org/docs/configuration/module/telemetry#display-fahrenheit) on meshtastic.org.
+**Ustawienia → Konfiguracja urządzenia → Wyświetlacz → Wyświetlana jednostka** konfiguruje ekran na radiu, a nie aplikację. Ustawienia **Użyj formatu 12-godzinnego** i **Zawsze wskazuj północ** także dotyczą tylko wyświetlacza radia — wszystkie trzy. Temperatura na tym ekranie ma własne ustawienie, **Metryki środowiskowe w Fahrenheitach**, w module Telemetria radia — zobacz [opis modułu telemetrii](https://meshtastic.org/docs/configuration/module/telemetry#display-fahrenheit) na meshtastic.org.
 
-If your node list shows miles while the radio's screen shows kilometers, this is why: the two are set in different places. Changing the radio's setting never alters what the app displays. See the [Display Config](https://meshtastic.org/docs/configuration/radio/display) guide on meshtastic.org for the device-side options.
+Jeśli lista węzłów pokazuje mile, a ekran radia kilometry, to właśnie dlatego: oba ustawia się w różnych miejscach. Zmiana ustawienia radia nigdy nie zmienia tego, co wyświetla aplikacja. Opcje po stronie urządzenia opisuje przewodnik [Konfiguracja wyświetlacza](https://meshtastic.org/docs/configuration/radio/display) na meshtastic.org.
 
 ## Temperatura
 
-Temperature values from environment sensors are transmitted as **°C** and displayed based on your device's temperature unit preference.
+Wartości temperatury z czujników środowiska są przesyłane w **°C** i wyświetlane według preferencji jednostki temperatury na urządzeniu.
 
-![Environment metrics with temperature](../../assets/screenshots/nodes_environment_metrics.png)
+![Metryki środowiskowe z temperaturą](../../assets/screenshots/nodes_environment_metrics.png)
 
-| Your Setting | You See |
-| ------------ | ------- |
-| Celsius      | 22°C    |
-| Fahrenheit   | 72°F    |
+| Twoje ustawienie | Widzisz |
+|---|---|
+| Celsjusz | 22°C |
+| Fahrenheit | 72°F |
 
-This affects all temperature displays throughout the app: node environment telemetry, soil temperature, dew point, and telemetry chart axes.
+Dotyczy to wszystkich miejsc w aplikacji, gdzie jest temperatura: telemetrii środowiska węzła, temperatury gleby, punktu rosy i osi wykresów telemetrii.
 
-Temperature follows your locale's **temperature preference**, independent of the distance system. Locales that mix systems work correctly — a UK phone shows miles for distance but **°C** for temperature. On Android 14+, the **Temperature** regional preference (Settings → System → Languages → Regional preferences) overrides the locale default.
+Temperatura podąża za **preferencją temperatury** Twojego regionu, niezależnie od systemu odległości. Regiony mieszające systemy działają poprawnie — telefon z Wielkiej Brytanii pokazuje mile dla odległości, ale **°C** dla temperatury. W Androidzie 14+ preferencja **Temperatura** w ustawieniach regionalnych (Ustawienia → System → Języki → Preferencje regionalne) nadpisuje domyślną dla regionu.
 
-## Distance & Altitude
+## Odległość i wysokość
 
-Distances between nodes and GPS altitudes are transmitted as **meters** and automatically scaled and converted.
+Odległości między węzłami i wysokości GPS są przesyłane w **metrach** i automatycznie skalowane oraz przeliczane.
 
-![Distance info display](../../assets/screenshots/nodes_distance_info.png)
+![Informacje o odległości](../../assets/screenshots/nodes_distance_info.png)
 
-| Your Setting                     | Small Distance | Large Distance         | Wysokość |
-| -------------------------------- | -------------- | ---------------------- | -------- |
-| Metric                           | 350 m          | 2.5 km | 1,200 m  |
-| Imperial (US) | 1,148 ft       | 1.6 mi | 3,937 ft |
+| Twoje ustawienie | Mała odległość | Duża odległość | Wysokość |
+|---|---|---|---|
+| Metryczne | 350 m | 2,5 km | 1 200 m |
+| Imperialne (USA) | 1 148 ft | 1,6 mi | 3 937 ft |
 
-The app uses natural scaling — short distances stay in meters or feet, while longer distances switch to kilometers or miles automatically.
+Aplikacja skaluje jednostki naturalnie — krótkie odległości zostają w metrach lub stopach, a dłuższe automatycznie przechodzą na kilometry lub mile.
 
-### Where these appear
+### Gdzie to widać
 
-- **Node list** — distance and bearing to each node
-- **Node detail** — altitude, distance from your position
-- **Map** — waypoint distances, traceroute hop distances
-- **Compass** — distance to selected node
+- **Lista węzłów** — odległość i namiar do każdego węzła
+- **Szczegóły węzła** — wysokość, odległość od Twojej pozycji
+- **Mapa** — odległości do punktów trasy, odległości skoków traceroute
+- **Kompas** — odległość do wybranego węzła
 
 ## Prędkość
 
-GPS ground speed is displayed in your locale's preferred speed unit.
+Prędkość GPS względem ziemi jest wyświetlana w preferowanej dla Twojego regionu jednostce prędkości.
 
-| Your Setting                     | You See |
-| -------------------------------- | ------- |
-| Metric                           | 12 km/h |
-| Imperial (US) | 7 mph   |
+| Twoje ustawienie | Widzisz |
+|---|---|
+| Metryczne | 12 km/h |
+| Imperialne (USA) | 7 mph |
 
 ## Wiatr
 
-Wind speed, gust and lull are transmitted by the sensor as **m/s** and converted for display — the app shows the unit weather forecasts use in your region, not the raw sensor unit.
+Prędkość wiatru, porywy i zastoje (lull) są przesyłane przez czujnik w **m/s** i przeliczane do wyświetlenia — aplikacja pokazuje jednostkę, której w Twoim regionie używają prognozy pogody, a nie surową jednostkę czujnika.
 
-| Your Setting                     | You See                   |
-| -------------------------------- | ------------------------- |
-| Metric                           | 18.0 km/h |
-| Imperial (US) | 11.2 mph  |
+| Twoje ustawienie | Widzisz |
+|---|---|
+| Metryczne | 18,0 km/h |
+| Imperialne (USA) | 11,2 mph |
 
-All three read in the same unit wherever they appear: the Node Detail environment section, the Environment Telemetry log, and the charts.
+Wszystkie trzy wartości są w tej samej jednostce wszędzie, gdzie się pojawiają: w sekcji środowiska w szczegółach węzła, w dzienniku telemetrii środowiska i na wykresach.
 
-## Weight
+## Waga
 
-Readings from a connected scale are transmitted in **kg** and converted for display.
+Odczyty z podłączonej wagi są przesyłane w **kg** i przeliczane do wyświetlenia.
 
-| Your Setting                     | You See                 |
-| -------------------------------- | ----------------------- |
-| Metric                           | 1.50 kg |
-| Imperial (US) | 3.31 lb |
+| Twoje ustawienie | Widzisz |
+|---|---|
+| Metryczne | 1,50 kg |
+| Imperialne (USA) | 3,31 lb |
 
-## Rainfall
+## Opady deszczu
 
-Rainfall measurements (1-hour and 24-hour totals) are transmitted as **mm** and converted for display.
+Pomiary opadów (sumy z 1 godziny i 24 godzin) są przesyłane w **mm** i przeliczane do wyświetlenia.
 
-| Your Setting                     | You See                 |
-| -------------------------------- | ----------------------- |
-| Metric                           | 12.0 mm |
-| Imperial (US) | 0.47 in |
+| Twoje ustawienie | Widzisz |
+|---|---|
+| Metryczne | 12,0 mm |
+| Imperialne (USA) | 0,47 in |
 
-## Units That Never Change
+## Jednostki, które nigdy się nie zmieniają
 
-Some units are international standards and are displayed the same way regardless of your locale:
+Niektóre jednostki są międzynarodowymi standardami i wyświetlają się tak samo niezależnie od regionu:
 
-| Measurement                      | Unit                           | Why                                   |
-| -------------------------------- | ------------------------------ | ------------------------------------- |
-| Barometric pressure              | hPa                            | International meteorological standard |
-| Heading / bearing                | ° (degrees) | Universal navigation convention       |
-| Promieniowanie                   | µR/h                           | Standard dosimetry unit               |
-| GPS coordinates                  | decimal degrees                | Universal geographic standard         |
-| Humidity, battery, soil moisture | %                              | Universal                             |
+| Pomiar | Jednostka | Dlaczego |
+|---|---|---|
+| Ciśnienie atmosferyczne | hPa | Międzynarodowy standard meteorologiczny |
+| Kurs / namiar | ° (stopnie) | Powszechna konwencja nawigacyjna |
+| Promieniowanie | µR/h | Standardowa jednostka dozymetryczna |
+| Współrzędne GPS | stopnie dziesiętne | Powszechny standard geograficzny |
+| Wilgotność, bateria, wilgotność gleby | % | Powszechne |
 
-## Date & Time
+## Data i czas
 
-All timestamps throughout the app — last heard, message times, telemetry logs, chart axes — follow your device's date and time preferences.
+Wszystkie znaczniki czasu w aplikacji — ostatnio słyszany, godziny wiadomości, dzienniki telemetrii, osie wykresów — podążają za preferencjami daty i czasu Twojego urządzenia.
 
-| Setting          | What It Controls | Example                                          |
-| ---------------- | ---------------- | ------------------------------------------------ |
-| **24-Hour Time** | Clock format     | 14:30 vs 2:30 PM |
-| **Date Format**  | Date ordering    | 09/05/2026 vs 05/09/2026                         |
+| Ustawienie | Co kontroluje | Przykład |
+|---|---|---|
+| **Czas 24-godzinny** | Format zegara | 14:30 vs 2:30 PM |
+| **Format daty** | Kolejność w dacie | 09/05/2026 vs 05/09/2026 |
 
-The app also uses **relative time** where it makes sense — for example, "5 min ago" or "2 hours ago" in the node list — which is automatically localized into your device language.
+Aplikacja używa też **czasu względnego** tam, gdzie to ma sens — na przykład „5 min temu" lub „2 godziny temu" na liście węzłów — który jest automatycznie tłumaczony na język urządzenia.
 
-## Changing Your Measurement System
+## Zmiana systemu miar
 
-By default the app follows your device, and your measurement system (metric vs imperial) is tied to your region setting:
+Domyślnie aplikacja podąża za urządzeniem, a Twój system miar (metryczny czy imperialny) jest powiązany z ustawieniem regionu:
 
-1. Open **Android Settings → System → Language & Region**
-2. Change your **Region**
-3. Return to Meshtastic — values update immediately
+1. Otwórz **Ustawienia Androida → System → Język i region**
+2. Zmień swój **Region**
+3. Wróć do aplikacji — wartości aktualizują się natychmiast
 
-On Android 16+, the system-wide **Measurement system** preference overrides the region for distance, speed, and the other measurements — but not for temperature. Temperature is resolved separately, and on Android 14+ you override it on its own under **Regional preferences → Temperature**.
+W Androidzie 16+ systemowa preferencja **System miar** nadpisuje region dla odległości, prędkości i innych pomiarów — ale nie dla temperatury. Temperatura jest ustalana osobno, a w Androidzie 14+ nadpisujesz ją osobno w **Preferencje regionalne → Temperatura**.
 
-Not every English region is fully metric. **English (United Kingdom)** uses miles and feet for distance, so the node list shows miles and altitude in feet. For metric distances, set the app's **Units** setting to Metric (see [Overriding the Units in the App](#overriding-the-units-in-the-app)), or choose a fully metric region such as English (Canada), English (Ireland), or English (New Zealand).
+Nie każdy region anglojęzyczny jest w pełni metryczny. **Angielski (Wielka Brytania)** używa mil i stóp dla odległości, więc lista węzłów pokazuje mile, a wysokość w stopach. Aby mieć odległości metryczne, ustaw w aplikacji **Jednostki** na Metryczne (zobacz [Nadpisywanie jednostek w aplikacji](#overriding-the-units-in-the-app)) albo wybierz region w pełni metryczny, taki jak angielski (Kanada), angielski (Irlandia) lub angielski (Nowa Zelandia).
 
-Some phones do not offer the **Regional preferences** menu at all and list only English (United States). On those devices, use the app's **Units** setting (see [Overriding the Units in the App](#overriding-the-units-in-the-app)).
+Niektóre telefony w ogóle nie oferują menu **Preferencje regionalne** i wymieniają tylko angielski (Stany Zjednoczone). Na takich urządzeniach użyj ustawienia **Jednostki** w aplikacji (zobacz [Nadpisywanie jednostek w aplikacji](#overriding-the-units-in-the-app)).
 
-### Overriding the units in the app
+### Nadpisywanie jednostek w aplikacji
 
-Not every device can express every preference — some manufacturer builds ship no regional preferences at all, some
-offer only one English variant, and UK regions are imperial for distance even if you'd rather read altitude in
-meters. For those cases the app has its own switch:
+Nie każde urządzenie potrafi wyrazić każdą preferencję — niektóre wersje producentów nie mają w ogóle preferencji regionalnych,
+inne oferują tylko jeden wariant angielskiego, a regiony brytyjskie są imperialne dla odległości, nawet jeśli wolisz czytać wysokość
+w metrach. Na takie przypadki aplikacja ma własny przełącznik:
 
-1. Open **Meshtastic Settings → Units**
-2. Choose **System default**, **Metric**, or **Imperial**
-3. Every screen updates immediately — no restart needed
+1. Otwórz **Ustawienia → Jednostki** w aplikacji
+2. Wybierz **Domyślny systemu**, **Metryczne** lub **Imperialne**
+3. Każdy ekran aktualizuje się natychmiast — bez restartu
 
-**System default** follows your phone's or computer's region and measurement settings. Forcing **Metric** or **Imperial** applies to
-everything, temperature included (metric → °C, imperial → °F), even where the system's own regional preferences say
-otherwise. The setting exists on Android and Desktop alike.
+**Domyślny systemu** podąża za regionem i ustawieniami miar Twojego telefonu lub komputera. Wymuszenie **Metryczne** lub **Imperialne** dotyczy
+wszystkiego, także temperatury (metryczne → °C, imperialne → °F), nawet jeśli własne preferencje regionalne systemu mówią
+co innego. To ustawienie istnieje zarówno na Androidzie, jak i na komputerze.
 
-## Related Topics
+## Powiązane tematy
 
-- [Node Metrics](node-metrics) — where temperature, distance, and sensor values are displayed
-- [Telemetry & Sensors](telemetry-and-sensors) — the sensors that produce these measurements
-- [Measurement & Formatting](../developer/measurement) — developer reference for the formatting utilities
-- [Settings — Radio & User](settings-radio-user) — region setting that drives unit selection
-- [Display Config](https://meshtastic.org/docs/configuration/radio/display) — units, clock, and compass settings for the radio's own screen, on meshtastic.org
+- [Metryki węzła](node-metrics) — gdzie wyświetlane są temperatura, odległość i wartości z czujników
+- [Telemetria i czujniki](telemetry-and-sensors) — czujniki, które wytwarzają te pomiary
+- [Pomiary i formatowanie](../developer/measurement) — opis dla programistów narzędzi formatowania
+- [Ustawienia — Radio i użytkownik](settings-radio-user) — ustawienie regionu, od którego zależy wybór jednostek
+- [Konfiguracja wyświetlacza](https://meshtastic.org/docs/configuration/radio/display) — jednostki, zegar i kompas na własnym ekranie radia, na meshtastic.org

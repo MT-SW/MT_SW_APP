@@ -1,8 +1,9 @@
 ---
-title: Map & Waypoints
+title: Mapa i punkty trasy
+parent: Przewodnik użytkownika
 nav_order: 6
 last_updated: 2026-10-07
-description: View node positions on the map, create and share waypoints, manage map layers and Site Planner, and control position sharing and privacy.
+description: Podgląd pozycji węzłów na mapie, tworzenie i udostępnianie punktów trasy, zarządzanie warstwami mapy i Site Planner oraz kontrola udostępniania pozycji i prywatności.
 aliases:
   - map
   - waypoints
@@ -14,193 +15,183 @@ aliases:
   - kml
 ---
 
-# Map & Waypoints
+# Mapa i punkty trasy
 
-The Map screen shows the geographic positions of nodes on your mesh, along with shared waypoints.
+Ekran mapy pokazuje położenie geograficzne węzłów w Twojej sieci mesh oraz udostępnione punkty trasy.
 
-## Map View
+## Widok mapy
 
-The map displays:
+Mapa wyświetla:
+- **Pozycje węzłów** — kolorowe znaczniki dla każdego węzła, który podaje swoją lokalizację
+- **Punkty trasy** — udostępnione miejsca warte uwagi
+- **Twoja pozycja** — Twoja bieżąca lokalizacja GPS
 
-- **Node positions** — colored markers for each node reporting location
-- **Waypoints** — shared points of interest
-- **Your position** — your current GPS location
+### Znaczniki węzłów
 
-### Node Markers
+Każdy węzeł, który podaje pozycję, jest pokazany jako znacznik **chip węzła** z krótką nazwą węzła. Chip ma kolor tożsamości węzła (stały kolor wyliczany z numeru węzła) — ten sam chip jest używany na liście węzłów, więc węzeł wygląda wszędzie tak samo. Kolor znacznika **nie** oznacza statusu online/offline. Gdy pozycja węzła aktualizuje się na żywo, jego znacznik na chwilę pulsuje. Znaczniki blisko siebie są grupowane po oddaleniu widoku.
 
-Each node that reports a position is shown as a **node chip** marker displaying the node's short name. The chip is colored by the node's own identity color (a stable color derived from its node number) — the same chip used in the node list, so a node looks the same everywhere. Marker color does **not** encode online/offline status. When a node's position updates live, its marker briefly pulses. Nearby markers are clustered as you zoom out.
+### Sterowanie mapą
 
-### Map Controls
+- **Powiększanie** — szczypnięcie dwoma palcami lub przyciski +/-
+- **Przesuwanie** — przeciągnij, aby przeglądać mapę
+- **Wyśrodkowanie** — dotknij przycisku lokalizacji, aby wyśrodkować mapę na swojej pozycji
+- **Dotknięcie węzła** — dotknij znacznika węzła, aby zobaczyć szczegóły
 
-- **Zoom** — pinch or use +/- buttons
-- **Pan** — drag to explore
-- **Center** — tap the location button to center on your position
-- **Node tap** — tap a node marker to view details
+Pływający pasek narzędzi daje szybki dostęp do kompasu, wyboru typu mapy i warstw, filtrów węzłów, Site Planner i śledzenia lokalizacji. Dotknij kompasu, aby ustawić mapę północą do góry, lub przycisku lokalizacji, aby wyśrodkować ją na swojej bieżącej pozycji. W wersjach **Google Play** obok nich pojawia się przycisk odświeżania, gdy widoczna jest warstwa sieciowa; w wersjach **F-Droid** i **Desktop** odświeżaj warstwę sieciową z jej własnego wiersza w arkuszu warstw.
 
-The floating toolbar provides quick access to the compass, the map type and layers pickers, node filters, Site Planner, and location tracking. Tap the compass to reorient north-up, or tap the location button to center on your current position. On **Google Play** builds a refresh button joins them while a network layer is showing; on **F-Droid** and **Desktop**, refresh a network layer from its own row in the layers sheet instead.
+![Pływający pasek narzędzi mapy z kompasem, filtrem, odświeżaniem i przyciskami lokalizacji](../../assets/screenshots/map_controls_overlay.png)
 
-![Map floating toolbar with compass, filter, refresh, and location controls](../../assets/screenshots/map_controls_overlay.png)
+### Filtrowanie mapy
 
-### Filtering the Map
+Dotknij przycisku filtra na pływającym pasku narzędzi, aby otworzyć **Filtruj mapę**. Sekcja **Wyświetlacz** określa, co jest rysowane: **Tylko ulubione**, **Pokaż punkty trasy**, **Pokaż okręgi precyzji** oraz suwak, który ukrywa węzły niesłyszane od dłuższego czasu. **Role węzłów** to chip dla każdej roli urządzenia oraz **Wszystkie**, aby pokazać każdą rolę; zaznaczony chip oznacza, że ta rola jest widoczna. Sekcja **Węzeł** zawęża zestaw dalej opcjami **Schowaj nieaktywne węzły**, **Pokaż tylko bezpośrednie węzły**, **Pokaż tylko podpisane węzły**, **Pokaż tylko szyfrowane węzły**, **Wyklucz MQTT**, **Pokaż ignorowane węzły** i **Pokaż nierozpoznane** — to te same zasady co w [przełącznikach filtrów](nodes) listy węzłów.
 
-Tap the filter button in the floating toolbar to open **Filter map**. **Display** controls what is drawn: **Only Favorites**, **Show Waypoints**, **Show Precision Circles**, and a slider that hides nodes not heard from recently. **Node roles** is a chip per device role, plus **All** to show every role; a selected chip means that role is shown. **Nodes** narrows the set further with **Hide offline nodes**, **Only show direct nodes**, **Signed only**, **Encrypted only**, **Exclude MQTT**, **Show ignored nodes**, and **Include unknown** — the same rules as the node list's [filter toggles](nodes).
+Kropka na przycisku filtra oznacza, że co najmniej jeden filtr coś ukrywa — sprawdź to, zanim uznasz, że w sieci jest cicho. Wyłączenie **Pokaż punkty trasy** ukrywa wszystkie punkty trasy, także Twoje własne. **Pokaż ignorowane węzły** dodaje je do mapy, a nie pokazuje wyłącznie ich — inaczej niż **Pokaż tylko ignorowane węzły** na liście węzłów.
 
-A dot on the filter button means at least one filter is hiding something — check it before concluding the mesh is quiet. Turning **Show Waypoints** off hides every waypoint, including your own. **Show ignored nodes** adds them to the map rather than showing only them — unlike the node list's **Only show ignored Nodes**.
+## Punkty trasy
 
-## Waypoints
+Punkty trasy to udostępnione miejsca warte uwagi, widoczne dla wszystkich w Twojej sieci mesh.
 
-Waypoints are shared points of interest, visible to everyone on your mesh.
+### Tworzenie punktu trasy
 
-### Creating a Waypoint
+Twoje radio musi być połączone — mapa ignoruje dotknięcie i przytrzymanie, gdy nie jest, ponieważ zapisanie punktu trasy oznacza jego rozesłanie.
 
-Your radio must be connected — the map ignores a touch & hold while it is not, because saving a waypoint means broadcasting it.
+1. Dotknij i przytrzymaj mapę w wybranym miejscu.
+2. Wpisz nazwę i opcjonalny opis.
+3. Wybierz ikonę/emoji punktu trasy.
+4. Dotknij **Wyślij**, aby udostępnić go w sieci mesh.
 
-1. Touch & hold the map at the desired location.
-2. Enter a name and optional description.
-3. Choose an icon/emoji for the waypoint.
-4. Tap **Send** to share with the mesh.
+Punkty trasy są zawsze rozsyłane do całej sieci mesh na kanale podstawowym. W przeciwieństwie do wiadomości punktu trasy nie można skierować do jednego kanału ani wysłać jako wiadomości bezpośredniej.
 
-Waypoints always broadcast to the whole mesh on the primary channel. Unlike a message, a waypoint cannot be addressed to one channel or sent as a direct message.
+### Właściwości punktu trasy
 
-### Waypoint Properties
+| Właściwość | Opis |
+|----------|-------------|
+| Nazwa | Krótki identyfikator (maks. 29 znaków) |
+| Opis | Opcjonalny dłuższy opis |
+| Ikona | Emoji będące znacznikiem na mapie |
+| Zablokowany | Jeśli zablokowany, tylko twórca może go edytować lub usunąć |
+| Wygasa | Opcjonalna data i godzina automatycznego usunięcia |
+| Geofence | Opcjonalny obszar alertu wejścia/wyjścia — zobacz [Geofence punktów trasy](#waypoint-geofences) |
 
-| Property    | Opis                                                                           |
-| ----------- | ------------------------------------------------------------------------------ |
-| Nazwa       | Short identifier (max 29 characters)                        |
-| Opis        | Optional longer description                                                    |
-| Icon        | Visual marker emoji on the map                                                 |
-| Zablokowany | If locked, only the creator can edit or delete                                 |
-| Expiration  | Optional auto-remove date and time                                             |
-| Geofence    | Optional enter/exit alert area — see [Waypoint Geofences](#waypoint-geofences) |
+### Wygasanie punktu trasy
 
-### Waypoint Expiration
+Punkty trasy można ustawić tak, aby wygasały automatycznie:
+- **Nigdy** (domyślnie) — punkt trasy pozostaje, dopóki nie zostanie usunięty ręcznie
+- **Czasowo** — wybierz konkretną datę i godzinę; punkt trasy zostanie automatycznie usunięty po upływie tego czasu. Przydatne dla tymczasowych znaczników, takich jak punkty zbiórki, zagrożenia lub miejsca spotkań.
 
-Waypoints can be set to expire automatically:
+Wygasłe punkty trasy są automatycznie ukrywane na mapie, aby jej nie zaśmiecały. Odliczanie do wygaśnięcia opiera się na bezwzględnym czasie, który wybrałeś, a nie na czasie liczonym od utworzenia lub otrzymania punktu trasy.
 
-- **Never** (default) — waypoint remains until manually deleted
-- **Timed** — pick a specific date and time; the waypoint is automatically removed once that time passes. Useful for temporary markers like rally points, hazards, or meeting locations.
+### Geofence punktów trasy
 
-Expired waypoints are automatically hidden from the map so they don't clutter the display. The expiration countdown is based on the absolute time you picked, not a duration from when the waypoint was created or received.
+Każdy punkt trasy może też określać **geofence** — obszar alertu — aby Ty lub inni otrzymywali powiadomienie, gdy węzeł wejdzie do niego lub go opuści:
 
-### Waypoint Geofences
+1. Ustaw **promień geofence** za pomocą gotowych chipów (lub **Wyłączony**, aby wyłączyć) albo dotknij **Ustaw obszar na mapie**, aby zamiast tego narysować własny prostokątny obszar.
+2. Po ustawieniu obszaru włącz **Powiadom przy wejściu** i/lub **Powiadom przy wyjściu**.
+3. Opcjonalnie włącz **Tylko ulubione**, aby ograniczyć alerty do węzłów dodanych do ulubionych.
 
-Any waypoint can also define a **geofence** — an alert area — so you or others get notified when a node enters or leaves it:
+Ponieważ punkty trasy (i ich geofence) są rozsyłane do całej sieci mesh, domyślnie alerty dostaje tylko **twórca**. Jeśli ktoś inny udostępni Ci punkt trasy z geofence, jego widok szczegółów oferuje opcję **Powiadamiaj mnie o przekroczeniach**, dzięki której możesz też otrzymywać alerty wejścia/wyjścia.
 
-1. Set a **geofence radius** from the preset chips (or **Off** to disable), or tap **Set area on map** to draw a custom rectangular area instead.
-2. Once a region is set, toggle **Notify on enter** and/or **Notify on exit**.
-3. Optionally enable **Favorites only** to limit alerts to your favorited nodes.
+### Zarządzanie punktami trasy
 
-Since waypoints (and their geofences) are broadcast to the whole mesh, only the **creator** is alerted by default. If someone else shares a geofenced waypoint with you, its detail view offers a **Notify me of crossings** opt-in so you can also receive enter/exit alerts for it.
+- Dotknij punktu trasy, aby zobaczyć jego nazwę, opis i promień geofence. W wersjach **Google Play** pierwsze dotknięcie otwiera dymek informacyjny znacznika — dotknij dymka, aby otworzyć sam punkt trasy
+- **Zablokowane punkty trasy** może zmieniać w sieci mesh tylko węzeł, który je zablokował
+- Odblokowane punkty trasy może edytować każdy członek sieci mesh, gdy jest połączony z radiem — zapisanie ponownie rozsyła punkt trasy
+- Potwierdzenie usunięcia usuwa tylko Twoją kopię. Aby usunąć go także z map wszystkich innych, wybierz **Usuń dla wszystkich** w oknie usuwania; to pole pojawia się tylko dla punktu trasy, który możesz zmieniać (odblokowanego lub zablokowanego przez Ciebie) i tylko gdy jesteś połączony
 
-### Managing Waypoints
+## Warstwy mapy
 
-- Tap a waypoint to see its name, description, and geofence radius. On **Google Play** builds the first tap opens the marker's info bubble — tap the bubble to open the waypoint itself
-- **Locked waypoints** can only be changed on the mesh by the node that locked them
-- Unlocked waypoints can be edited by any mesh member while connected to a radio — saving re-broadcasts the waypoint
-- Confirming a delete removes your own copy. To remove it from everyone else's map too, select **Delete for everyone** in the delete dialog; that box appears only for a waypoint you may change (unlocked, or locked by you) and only while you are connected
+Dotknij ikony warstw na mapie, aby otworzyć **Zarządzaj warstwami map**. Pozwala ona zaimportować własne nakładki w formacie `.kml`, `.kmz` lub GeoJSON, w tym nakładki naziemne KMZ (obrazy z georeferencją, na przykład wyeksportowane kafelki topograficzne lub lotnicze), które są nakładane w podanych granicach. Dodaj nakładkę, wybierając plik przez **Dodaj warstwę**, otwierając plik w MT_SW_APP lub udostępniając go do aplikacji z innej aplikacji. **Dodaj warstwę sieciową** zamiast tego przyjmuje nazwę oraz adres URL `https://` wskazujący plik KML lub GeoJSON (`http://` też działa na Desktopie, a na Androidzie tylko dla `localhost`); taka warstwa ma wtedy w arkuszu własny przycisk odświeżania. W wersjach **Google Play** przycisk odświeżania na pasku narzędzi pobiera ponownie wszystkie widoczne warstwy sieciowe naraz.
 
-## Warstwy map
-
-Tap the layers icon on the map to open **Manage Map Layers**. It imports your own overlays in `.kml`, `.kmz`, or GeoJSON format, including KMZ ground overlays (georeferenced images, such as exported topo or aerial tiles), which drape at their stated bounds. Add one by picking a file with **Add Layer**, opening a file with Meshtastic, or sharing it into the app from another app. **Add Network Layer** instead takes a name and an `https://` URL pointing at a KML or GeoJSON file (`http://` also works on Desktop, but on Android only for `localhost`); that layer then carries its own refresh button in the sheet. On **Google Play** builds the toolbar's refresh button re-fetches every visible network layer at once.
-
-Imported layers are listed with a toggle to show/hide each one and an option to remove it. Each layer — imported or built-in overlay — carries its own opacity slider while it is switched on, so an overlay can be faded back rather than only switched off. This works on the Google Play build, the F-Droid build, and **Desktop**, which shares the same layer store and file picker.
+Zaimportowane warstwy są wymienione z przełącznikiem pokazywania/ukrywania każdej z nich i opcją usunięcia. Każda warstwa — zaimportowana lub wbudowana nakładka — ma własny suwak przezroczystości, gdy jest włączona, więc nakładkę można przyciemnić, a nie tylko wyłączyć. Działa to w wersji Google Play, wersji F-Droid i na **Desktopie**, który korzysta z tego samego magazynu warstw i selektora plików.
 
 ### Site Planner
 
-**Site Planner** estimates RF coverage for a transmitter and draws it on the map as a color-coded overlay. Open it from a map control, or from a node's detail page via **Estimate coverage** (shown only for nodes with a known position). Configure the transmitter (location, frequency, TX power, antenna gain and height), the receiver (sensitivity, height), and simulation options (max range, high-resolution terrain, color palette), then run the estimate. Like map layers, Site Planner works on both the Google Play and F-Droid builds, where the finished estimate is drawn on the map as a coverage overlay. On **Desktop** the same form is shown but the planner opens in your browser; to bring the estimate onto the map, click the transmitter pin in the browser, choose the planner's GeoJSON export, then add the downloaded file under **Manage Map Layers** with **Add Layer**. Use the GeoJSON export, not the KML one — the KML is a ground-overlay image this map cannot draw.
+**Site Planner** szacuje zasięg radiowy nadajnika i rysuje go na mapie jako kolorową nakładkę. Otwórz go z kontrolki na mapie lub ze strony szczegółów węzła przez **Oszacuj zasięg** (Estimate coverage; pokazywane tylko dla węzłów ze znaną pozycją). Skonfiguruj nadajnik (lokalizacja, częstotliwość, moc TX, zysk i wysokość anteny), odbiornik (czułość, wysokość) oraz opcje symulacji (maksymalny zasięg, teren wysokiej rozdzielczości, paleta kolorów), a następnie uruchom szacowanie. Podobnie jak warstwy mapy, Site Planner działa w wersjach Google Play i F-Droid, w których gotowe oszacowanie jest rysowane na mapie jako nakładka zasięgu. Na **Desktopie** pokazywany jest ten sam formularz, ale planer otwiera się w przeglądarce; aby przenieść oszacowanie na mapę, kliknij pinezkę nadajnika w przeglądarce, wybierz eksport GeoJSON z planera, a następnie dodaj pobrany plik w **Zarządzaj warstwami map** przez **Dodaj warstwę**. Użyj eksportu GeoJSON, a nie KML — KML to obraz nakładki naziemnej, którego ta mapa nie potrafi narysować.
 
-## Position Sharing
+## Udostępnianie pozycji
 
-### Enabling Position Sharing
+### Włączanie udostępniania pozycji
 
-Your node shares its GPS position based on:
+Twój węzeł udostępnia pozycję GPS na podstawie:
+- **Interwał transmisji** — udostępnianie pozycji według stałego zegara
+- **Inteligentne Pozycjonowanie** — udostępnianie dopiero po przemieszczeniu się wystarczająco daleko; **Inteligentny interwał** określa najkrótszy odstęp między transmisjami, a **Inteligentny dystans** to, jak daleko musisz się przemieścić
+- **Położenie stałe** — publikowanie wpisanej ręcznie szerokości, długości geograficznej i wysokości zamiast odczytu z GPS
+- **Tryb GPS (sprzęt fizyczny)** — GPS włączony, wyłączony lub nieobecny w tym sprzęcie; dostępne tylko, gdy **Położenie stałe** jest wyłączone
 
-- **Broadcast Interval** — share the position on a fixed timer
-- **Smart Position** — share only once you have moved far enough; **Smart Interval** sets the shortest gap between broadcasts and **Smart Distance** how far you must move
-- **Fixed Position** — publish a latitude, longitude, and altitude you enter by hand instead of the GPS reading
-- **GPS Mode (Physical Hardware)** — GPS enabled, disabled, or not present on this hardware; offered only while **Fixed Position** is off
+Zachowanie pozycji skonfigurujesz w **Ustawienia → Konfiguracja urządzenia → Pozycjonowanie**. Ten ekran jest dostępny tylko wtedy, gdy radio jest połączone, a jego zapisanie restartuje radio. Pełną listę pól znajdziesz w [Ustawienia — Radio i użytkownik](settings-radio-user).
 
-Configure position behavior in **Settings → Device configuration → Position**. The screen is only reachable while your radio is connected, and saving it reboots the radio. For the full field list, see [Settings — Radio & User](settings-radio-user).
+### Kwestie prywatności
 
-### Privacy Considerations
+> 🔒 **Prywatność:** Dane o pozycji są rozsyłane do wszystkich węzłów na Twoim kanale. Jeśli nie chcesz udostępniać swojej lokalizacji, wyłącz pozycję GPS w ustawieniach lub użyj pozycji stałej/fikcyjnej. Aby nadal udostępniać pozycję, nie wskazując dokładnie swojego miejsca, edytuj kanał w **Ustawienia → Kanały**, wyłącz **Precyzyjna lokalizacja** i ustaw suwak pod nią — kanał będzie wtedy publikował przybliżony obszar, pokazany jako ± odległość, zamiast dokładnego punktu.
 
-> 🔒 **Privacy:** Position data is broadcast to all nodes on your channel. If you don't want your location shared, disable GPS position in settings or use a fixed/fake position. To keep sharing a position without pinpointing yourself, edit the channel in **Settings → Channels**, turn **Precise location** off, and set the slider beneath it — the channel then publishes an approximate area, shown as ± a distance, instead of an exact point.
+## Źródła map
 
-## Map Sources
+Każda wersja oferuje wybór mapy bazowej na pasku narzędzi mapy. Wersje **Google Play** otwierają się na własnych typach map Google; wersje **F-Droid** i **Desktop** otwierają się na stylach wektorowych MapLibre. Niżej w wyborze map bazowych wszystkie trzy oferują te same rastrowe mapy bazowe:
 
-Every build offers a base map picker from the map toolbar. **Google Play** builds open on Google's own
-map types; **F-Droid** and **Desktop** builds open on MapLibre's vector styles. Further down the base map
-picker, all three offer the same raster base maps:
+| Mapa bazowa | Uwagi |
+| --- | --- |
+| Normalna / Satelita / Terenowa / Hybrydowy | Tylko Google Play — własne typy map Google |
+| Liberty | Domyślna w F-Droid i Desktop. Wektorowa mapa ulic |
+| Positron | Tylko F-Droid i Desktop. Mapa wektorowa o niskim kontraście; znaczniki węzłów pozostają na niej czytelne |
+| Dark | Tylko F-Droid i Desktop. Mapa wektorowa dopasowana do ciemnych motywów |
+| OpenStreetMap | Klasyczne rastrowe kafelki ulic |
+| OpenTopoMap | Rastrowa mapa topograficzna |
+| USGS Topo / USGS Imagery | Tylko obszar USA |
+| Esri Topo / Esri Imagery | Obrazy topograficzne i satelitarne |
 
-| Base map                              | Notatki                                                                                               |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| Normal / Satellite / Terrain / Hybrid | Google Play only — Google's own map types                                                             |
-| Liberty                               | Default on F-Droid and Desktop. Vector street map                                     |
-| Positron                              | F-Droid and Desktop only. Low-contrast vector map; keeps node markers legible over it |
-| Ciemny                                | F-Droid and Desktop only. Vector map suited to dark themes                            |
-| OpenStreetMap                         | Classic raster street tiles                                                                           |
-| OpenTopoMap                           | Raster topographic                                                                                    |
-| USGS Topo / USGS Imagery              | US coverage only                                                                                      |
-| Esri Topo / Esri Imagery              | Topographic and satellite imagery                                                                     |
+Nakładki można włączać na wierzchu dowolnej mapy bazowej, z arkusza warstw:
 
-Overlays can be toggled on top of any base map, from the layers sheet:
+- **Radar pogodowy** — odbiciowość NOAA NEXRAD (obszar USA)
+- **Cieniowanie rzeźby terenu** — rzeźba terenu z internetowego źródła kafelków, tylko w **F-Droid** i **Desktop**; Google
+  Play rysuje cieniowanie z pobranego terenu offline. Przydatne do zrozumienia, dlaczego łącze
+  nie działa, bo zasięg LoRa jest ograniczony przez teren
 
-- **Weather radar** — NOAA NEXRAD reflectivity (US coverage)
-- **Hillshade** — terrain relief from an online tile source, on **F-Droid** and **Desktop** only; Google
-  Play draws hillshade from downloaded offline terrain instead. Useful for understanding why a link
-  fails, since LoRa range is limited by terrain
+### Dodawanie własnego źródła kafelków
 
-### Adding your own tile source
-
-Any XYZ tile endpoint can be added as a base map, on every flavor and on desktop. Open **Manage Custom
-Tile Sources** at the foot of the base map picker and paste a URL template using `{z}`, `{x}` and `{y}`
-— plus `{s}` if the provider uses rotating subdomains. A national mapping service, for example:
+Dowolny punkt końcowy kafelków XYZ można dodać jako mapę bazową, w każdej wersji i na desktopie. Otwórz **Zarządzaj niestandardowymi źródłami kafelków** na dole wyboru mapy bazowej i wklej szablon adresu URL używający `{z}`, `{x}` i `{y}`
+— oraz `{s}`, jeśli dostawca używa rotujących subdomen. Na przykład krajowa służba mapowa:
 
 ```text
 https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg
 ```
 
-On **Android** the template must use `https://`; plain `http://` works only for `localhost`.
+Na **Androidzie** szablon musi używać `https://`; zwykłe `http://` działa tylko dla `localhost`.
 
-Tiles are cached on disk, so panning does not re-download what you were just looking at.
+Kafelki są buforowane na dysku, więc przesuwanie mapy nie pobiera ponownie tego, co przed chwilą oglądałeś.
 
-On **Android**, the same screen also imports a local `.mbtiles` archive for fully offline use.
+Na **Androidzie** ten sam ekran importuje też lokalne archiwum `.mbtiles` do pełnego użytku offline.
 
-On **F-Droid**, select a vector base map first — Liberty, Positron, or Dark — since a download is defined
-against a vector style and **Start Download** stays disabled over a raster one. Frame the area you want on
-screen, then tap **Start Download** in the layers sheet: that creates a paused pack covering the current zoom
-plus two levels deeper. Press play on the pack's row to actually download it. If the offline database
-cannot be opened, the section says offline maps are unavailable and **Start Download** stays disabled.
+W **F-Droid** najpierw wybierz wektorową mapę bazową — Liberty, Positron lub Dark — ponieważ pobieranie jest zdefiniowane względem stylu wektorowego, a **Rozpocznij pobieranie** pozostaje wyłączone na mapie rastrowej. Ustaw na ekranie obszar, który chcesz mieć, a następnie dotknij **Rozpocznij pobieranie** w arkuszu warstw: powstanie wstrzymana paczka obejmująca bieżący poziom przybliżenia plus dwa poziomy głębiej. Naciśnij odtwarzanie w wierszu paczki, aby faktycznie ją pobrać. Jeśli nie można otworzyć bazy danych offline, sekcja informuje, że mapy offline są niedostępne, a **Rozpocznij pobieranie** pozostaje wyłączone.
 
-On **Google Play**, the layers sheet's **Offline Manager** section downloads its own offline regions instead
-— water, roads and administrative boundaries extracted from the public Protomaps basemap dataset, drawn
-directly as map shapes rather than raster tiles. Frame the area you want, tap **Start Download**, and once
-it finishes flip **Show on map** to draw it (it's off by default so it never surprises you by covering up the
-live map). You can still import a pre-made `.mbtiles` archive here too, as before. **Desktop** has neither, though
-the offline terrain described next does work there.
+W **Google Play** sekcja **Menedżer map offline** w arkuszu warstw pobiera zamiast tego własne regiony offline
+— wodę, drogi i granice administracyjne wyodrębnione z publicznego zbioru danych Protomaps, rysowane
+bezpośrednio jako kształty mapy, a nie kafelki rastrowe. Ustaw obszar, który chcesz mieć, dotknij **Rozpocznij pobieranie**, a po
+zakończeniu przełącz **Pokaż na mapie**, aby go narysować (domyślnie jest wyłączone, żeby nie zaskakiwało zasłonięciem
+mapy na żywo). Nadal możesz też zaimportować tutaj gotowe archiwum `.mbtiles`, jak dawniej. **Desktop** nie ma żadnej z tych opcji, choć
+opisany niżej teren offline działa tam bez problemu.
 
-### Offline terrain
+### Teren offline
 
-Hillshade and elevation contours can be downloaded for offline use as well, so a downloaded area still
-shows why a link fails when there is no network. The terrain data comes from Mapterhorn and is credited on
-the map. On **Google Play**, each downloaded region in the **Offline Manager** list has a **Download Terrain**
-button and **Hillshade** and **Contours** switches; terrain attaches to that region and shares its storage limit, and an area
-too large for terrain asks you to zoom in or pick a smaller region. On **F-Droid** and **Desktop**, the
-layers sheet has an **Offline Terrain** section of its own: frame the area, tap **Start Download**, and the
-hillshade and contours draw from the downloaded tiles from then on.
+Cieniowanie rzeźby terenu i warstwice można również pobrać do użytku offline, aby pobrany obszar nadal
+pokazywał, dlaczego łącze nie działa, gdy nie ma sieci. Dane terenu pochodzą z Mapterhorn i są wskazane jako źródło na
+mapie. W **Google Play** każdy pobrany region na liście **Menedżer map offline** ma przycisk **Pobierz teren**
+oraz przełączniki **Cieniowanie rzeźby terenu** i **Warstwice**; teren jest dołączany do tego regionu i dzieli jego limit miejsca, a obszar
+zbyt duży dla terenu prosi o przybliżenie lub wybranie mniejszego regionu. W **F-Droid** i **Desktop**
+arkusz warstw ma własną sekcję **Teren offline**: ustaw obszar, dotknij **Rozpocznij pobieranie**, a
+cieniowanie rzeźby terenu i warstwice będą od tej pory rysowane z pobranych kafelków.
 
-### Going offline
+### Praca offline
 
-An **Offline** pill appears over the map whenever the device has no network connection. On **Google Play**
-builds, if you've imported a local `.mbtiles` archive, the map switches to it automatically the moment the
-network drops — no toggle to remember — and switches back once you're reconnected, as long as you haven't
-picked a different base map yourself in between. On **F-Droid**, a downloaded offline area keeps rendering on
-its own; the pill is purely informational there. **Desktop** downloads offline terrain but no base-map
-packs, so the pill is informational there too.
+Nad mapą pojawia się plakietka **Offline**, gdy urządzenie nie ma połączenia z siecią. W wersjach **Google Play**,
+jeśli zaimportowałeś lokalne archiwum `.mbtiles`, mapa przełącza się na nie automatycznie w chwili,
+gdy sieć znika — bez przełącznika, o którym trzeba pamiętać — i wraca po odzyskaniu połączenia, o ile
+w międzyczasie sam nie wybrałeś innej mapy bazowej. W **F-Droid** pobrany obszar offline nadal się
+wyświetla sam; plakietka ma tam wyłącznie charakter informacyjny. **Desktop** pobiera teren offline, ale nie paczki map bazowych,
+więc plakietka jest tam także tylko informacyjna.
 
-## Related Topics
+## Powiązane tematy
 
-- [Nodes](nodes) — view and filter your node list
-- [Node Metrics](node-metrics) — signal quality and position history for individual nodes
-- [Local Mesh Discovery](discovery) — traceroute and neighbor info for understanding mesh topology
-- [Units & Locale](units-and-locale) — distance and coordinate display formats
+- [Węzły](nodes) — podgląd i filtrowanie listy węzłów
+- [Metryki węzła](node-metrics) — jakość sygnału i historia pozycji pojedynczych węzłów
+- [Lokalne odkrywanie sieci mesh](discovery) — traceroute i informacje o sąsiadach do zrozumienia topologii sieci mesh
+- [Jednostki i lokalizacja](units-and-locale) — formaty wyświetlania odległości i współrzędnych

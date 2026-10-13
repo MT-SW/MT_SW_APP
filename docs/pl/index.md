@@ -1,26 +1,26 @@
 ---
-title: Home
+title: Strona główna
 layout: default
 nav_order: 0
 ---
 
-# Meshtastic Android App Documentation
+# Dokumentacja aplikacji MT_SW_APP
 
-User and developer documentation for the Meshtastic Android and Desktop app, built with Kotlin Multiplatform.
+Dokumentacja użytkownika i dewelopera aplikacji MT_SW_APP na Androida i komputery stacjonarne, zbudowanej w Kotlin Multiplatform.
 
-Use the sidebar navigation to browse the **User Guide** for app features and the **Developer Guide** for contributing to the project.
+Użyj nawigacji w panelu bocznym, aby przeglądać **Przewodnik użytkownika** (funkcje aplikacji) i **Przewodnik dewelopera** (współtworzenie projektu).
 
-## Quick Links
+## Szybkie linki
 
-| Guide                                                                 | Opis                                                           |
-| --------------------------------------------------------------------- | -------------------------------------------------------------- |
-| [Getting Started](user/onboarding)                                    | Connect your first radio and send a message                    |
-| [Messages & Channels](user/messages-and-channels) | Channel broadcasts, direct messages, reactions, and encryption |
-| [Nodes](user/nodes)                                                   | Understanding the mesh network node list                       |
-| [Signal Meter](user/signal-meter)                                     | How the LoRa signal quality meter works                        |
-| [Units & Locale](user/units-and-locale)           | How temperatures, distances, and times adapt to your region    |
-| [Desktop App](user/desktop)                                           | Linux, macOS, and Windows desktop usage                        |
-| [Architecture](developer/architecture)                                | App architecture overview for contributors                     |
-| [Contributing](developer/contributing)                                | Branch naming, PR workflow, and verification commands          |
+| Przewodnik | Opis |
+|-------|-------------|
+| [Pierwsze kroki](user/onboarding) | Połącz pierwsze radio i wyślij wiadomość |
+| [Wiadomości i kanały](user/messages-and-channels) | Rozgłoszenia na kanałach, wiadomości bezpośrednie, reakcje i szyfrowanie |
+| [Węzły](user/nodes) | Jak działa lista węzłów sieci mesh |
+| [Miernik sygnału](user/signal-meter) | Jak działa miernik jakości sygnału LoRa |
+| [Jednostki i ustawienia regionalne](user/units-and-locale) | Jak temperatury, odległości i czas dostosowują się do Twojego regionu |
+| [Aplikacja desktopowa](user/desktop) | Korzystanie z aplikacji na Linuksie, macOS i Windows |
+| [Architektura](developer/architecture) | Przegląd architektury aplikacji dla współtwórców |
+| [Współtworzenie](developer/contributing) | Nazewnictwo gałęzi, przebieg PR i polecenia weryfikacyjne |
 
-> This documentation is served from the same markdown source that powers the in-app **Help & Documentation** browser.
+> Ta dokumentacja jest udostępniana z tego samego źródła markdown, które zasila przeglądarkę **Pomoc i dokumentacja** w aplikacji.

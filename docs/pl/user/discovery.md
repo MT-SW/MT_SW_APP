@@ -1,8 +1,9 @@
 ---
-title: Local Mesh Discovery
+title: Odkrywanie lokalnej sieci mesh
+parent: Przewodnik użytkownika
 nav_order: 12
 last_updated: 2026-10-12
-description: Explore your mesh network — the Local Mesh Discovery scanner, traceroute paths, neighbor maps, and node discovery tools.
+description: Poznaj swoją sieć mesh — skaner Odkrywania lokalnej sieci mesh, trasy traceroute, mapy sąsiadów i narzędzia do odkrywania węzłów.
 aliases:
   - discovery
   - local-mesh-discovery
@@ -13,125 +14,125 @@ aliases:
   - neighbor-info
 ---
 
-# Local Mesh Discovery
+# Odkrywanie lokalnej sieci mesh
 
-Discovery tools help you understand **how** your mesh network is connected — which nodes can hear each other, what paths messages take, and where bottlenecks or weak links exist.
+Narzędzia odkrywania pomagają zrozumieć, **jak** połączona jest Twoja sieć mesh — które węzły słyszą się nawzajem, jakimi ścieżkami podróżują wiadomości oraz gdzie są wąskie gardła lub słabe łącza.
 
-The app offers two complementary approaches:
+Aplikacja oferuje dwa uzupełniające się podejścia:
 
-- **Local Mesh Discovery (Scanner)** — an automated mode that cycles your connected node through different LoRa presets, listens on each, and ranks which preset performs best at your location.
-- **Manual exploration** — traceroute, Neighbor Info, and the node list, which you can use at any time to investigate specific paths and topology.
+- **Odkrywanie lokalnej sieci mesh (skaner)** — automatyczny tryb, który przełącza Twój podłączony węzeł między różnymi presetami LoRa, nasłuchuje na każdym i ustala ranking, który preset działa najlepiej w Twojej lokalizacji.
+- **Ręczne badanie** — traceroute, Informacje o sąsiadach i lista węzłów, z których możesz korzystać w dowolnej chwili, aby badać konkretne ścieżki i topologię.
 
-## Local Mesh Discovery (Scanner)
+## Odkrywanie lokalnej sieci mesh (skaner)
 
-Local Mesh Discovery is a dedicated scanning mode that helps you find the best LoRa modem preset for your location and see which nodes are active on each preset. It cycles your connected node through one or more presets you choose, dwells on each one — listens for a set time — to collect packets, then analyzes and ranks the results.
+Odkrywanie lokalnej sieci mesh to dedykowany tryb skanowania, który pomaga znaleźć najlepszy preset modemu LoRa dla Twojej lokalizacji i zobaczyć, które węzły są aktywne na każdym presecie. Przełącza Twój podłączony węzeł przez jeden lub więcej wybranych presetów, zatrzymuje się na każdym — nasłuchuje przez ustalony czas — aby zebrać pakiety, a następnie analizuje i porządkuje wyniki.
 
-Connect your node, then open **Settings → Advanced → Local Mesh Discovery**. On Android the **Advanced** section appears only for a locally connected node, never over remote admin, and stays grayed out until the app has finished reading the node's configuration. On a managed device its entries are disabled, except **Debug Panel**, which reads app-local logs and stays available. On desktop, Local Mesh Discovery has its own entry on the Settings screen, with no such gate.
+Podłącz węzeł, a następnie otwórz **Ustawienia → Zaawansowane → Odkrywanie lokalnej sieci mesh**. W Androidzie sekcja **Zaawansowane** pojawia się tylko dla lokalnie połączonego węzła, nigdy przez zdalne zarządzanie, i pozostaje wyszarzona, dopóki aplikacja nie skończy odczytywać konfiguracji węzła. Na urządzeniu zarządzanym jej pozycje są wyłączone, z wyjątkiem **Panelu debugowania**, który czyta lokalne dzienniki aplikacji i pozostaje dostępny. Na komputerze Odkrywanie lokalnej sieci mesh ma własną pozycję na ekranie Ustawień, bez takiego ograniczenia.
 
-> ℹ️ **Note:** Discovery temporarily changes your node's LoRa settings while it scans, then restores your original configuration when it finishes.
+> ℹ️ **Uwaga:** Odkrywanie tymczasowo zmienia ustawienia LoRa Twojego węzła na czas skanowania, a po zakończeniu przywraca Twoją oryginalną konfigurację.
 
-Each preset is scanned on the public mesh: the default frequency slot for that preset, decoded with the default public channel. If your node uses a custom frequency slot, the scan uses the default slot and puts your slot back when it finishes. If your primary channel has a custom name or key, the scan switches it to the default public channel before the first preset change and restores your channel when the scan ends, whether it completes, you stop it, or it fails. Channel changes don't reboot the node, so this happens at once at the start and end of the scan. You no longer need to put your primary channel on the default key before scanning.
+Każdy preset jest skanowany w sieci publicznej: domyślny slot częstotliwości dla tego presetu, dekodowany domyślnym kanałem publicznym. Jeśli Twój węzeł używa własnego slotu częstotliwości, skan używa slotu domyślnego i przywraca Twój slot po zakończeniu. Jeśli Twój kanał główny ma własną nazwę lub klucz, skan przełącza go na domyślny kanał publiczny przed pierwszą zmianą presetu i przywraca Twój kanał po zakończeniu skanu — niezależnie od tego, czy skan się zakończy, zatrzymasz go, czy się nie powiedzie. Zmiany kanału nie restartują węzła, więc dzieje się to od razu na początku i na końcu skanu. Nie musisz już ustawiać na kanale głównym domyślnego klucza przed skanowaniem.
 
-### Setting up a scan
+### Przygotowanie skanu
 
-Before starting, configure these controls:
+Przed rozpoczęciem skonfiguruj te elementy:
 
-| Control                | Opis                                                                                                                                                                                                                                                     |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **LoRa preset picker** | Select one or more presets to scan. Discovery dwells on each selected preset in turn.                                                                                                                                    |
-| **Dwell time**         | Time to listen on each preset. Choose from 1, 5, 15, 30, 45, 60, 90, 120, or 180 minutes. Longer dwell times collect more packets and give a clearer picture, but take longer.                           |
-| **Keep screen awake**  | Keeps the display on for the scan. The scan itself holds a CPU wake lock for its whole run and posts a **Scanning LoRa presets…** notification, so it keeps collecting with the screen off or the app in the background. |
+| Element | Opis |
+|---------|-------------|
+| **Wybór presetów LoRa** | Wybierz jeden lub więcej presetów do przeskanowania. Odkrywanie zatrzymuje się po kolei na każdym wybranym presecie. |
+| **Czas nasłuchu** | Czas nasłuchu na każdym presecie. Wybierz spośród 1, 5, 15, 30, 45, 60, 90, 120 lub 180 minut. Dłuższy czas nasłuchu zbiera więcej pakietów i daje wyraźniejszy obraz, ale trwa dłużej. |
+| **Nie wygaszaj ekranu** | Utrzymuje włączony wyświetlacz podczas skanu. Sam skan trzyma blokadę wybudzenia procesora przez cały czas działania i publikuje powiadomienie **Skanowanie presetów LoRa…**, więc zbiera dane dalej przy wyłączonym ekranie lub aplikacji w tle. |
 
-The **Start Scan** button stays disabled — with an explanation of why — until the scan can run. Common reasons it's disabled:
+Przycisk **Rozpocznij skan** pozostaje wyłączony — z wyjaśnieniem, dlaczego — dopóki skan nie może się uruchomić. Typowe powody wyłączenia:
 
-- The node is **not connected**.
-- **No presets** have been selected to scan.
-- The selected preset uses **2.4 GHz**, which your hardware doesn't support.
+- Węzeł jest **niepołączony**.
+- **Nie wybrano presetów** do skanowania.
+- Wybrany preset używa pasma **2,4 GHz**, którego Twój sprzęt nie obsługuje.
 
-### Live progress
+### Postęp na żywo
 
-While a scan runs, Discovery shows its current stage:
+Podczas skanu Odkrywanie pokazuje bieżący etap:
 
-| Stage                                                                  | What's happening                                                                                                                                                                                                                  |
-| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Preparing scan**                                                     | Saving your current LoRa configuration and primary channel and getting ready to scan.                                                                                                                             |
-| **Shifting to \<preset\>**                  | Switching the node to the next preset to test.                                                                                                                                                                    |
-| **Reconnecting on \<preset\>**              | Re-establishing the connection after the preset change.                                                                                                                                                           |
-| **Dwelling on \<preset\>**                  | Listening on the current preset to collect packets, with a countdown to the next step.                                                                                                                            |
-| **Analyzing results**                                                  | Processing the collected packets and ranking the presets.                                                                                                                                                         |
-| **Restoring home preset**                                              | Putting your original LoRa configuration back.                                                                                                                                                                    |
-| **Cancelling scan**                                                    | You tapped **Stop Scan**; partial results are saved before the original preset is restored.                                                                                                                       |
-| **Scan failed: \<reason\>** | The scan could not continue — most often the node didn't come back within a minute of a preset change. The results collected so far are saved, and the original preset is restored automatically. |
+| Etap | Co się dzieje |
+|-------|------------------|
+| **Przygotowywanie skanu** | Zapisywanie Twojej bieżącej konfiguracji LoRa i kanału głównego oraz przygotowanie do skanu. |
+| **Przełączanie na \<preset\>** | Przełączanie węzła na kolejny testowany preset. |
+| **Ponowne łączenie na \<preset\>** | Ponowne nawiązywanie połączenia po zmianie presetu. |
+| **Nasłuch na \<preset\>** | Nasłuchiwanie na bieżącym presecie w celu zebrania pakietów, z odliczaniem do następnego kroku. |
+| **Analizowanie wyników** | Przetwarzanie zebranych pakietów i porządkowanie presetów w ranking. |
+| **Przywracanie presetu domowego** | Przywracanie Twojej oryginalnej konfiguracji LoRa. |
+| **Anulowanie skanowania** | Dotknąłeś **Zatrzymaj skan**; wyniki częściowe są zapisywane, zanim oryginalny preset zostanie przywrócony. |
+| **Skan nieudany: \<przyczyna\>** | Skan nie mógł być kontynuowany — najczęściej dlatego, że węzeł nie wrócił w ciągu minuty od zmiany presetu. Dotychczas zebrane wyniki są zapisane, a oryginalny preset zostaje przywrócony automatycznie. |
 
-![Dwell countdown showing time remaining on the current preset](../../assets/screenshots/discovery_dwell_progress.png)
+![Odliczanie nasłuchu pokazujące czas pozostały na bieżącym presecie](../../assets/screenshots/discovery_dwell_progress.png)
 
-If a scan is interrupted — the app is closed, or the node goes away — the app restores your original preset and primary channel the next time it reconnects to that node, and tells you it has done so. Reconnect the same node to let that happen; until you do, the node stays on whichever preset and channel the scan left it on.
+Jeśli skan zostanie przerwany — aplikacja zostanie zamknięta lub węzeł zniknie — aplikacja przywróci Twój oryginalny preset i kanał główny przy następnym połączeniu z tym węzłem i poinformuje Cię o tym. Połącz ponownie ten sam węzeł, aby to nastąpiło; dopóki tego nie zrobisz, węzeł pozostaje na tym presecie i kanale, na którym zostawił go skan.
 
-### Reading the results
+### Odczytywanie wyników
 
-When the scan completes, Discovery presents a per-preset result card for each preset it tested, plus an overall summary.
+Gdy skan się zakończy, Odkrywanie przedstawia kartę wyników dla każdego przetestowanego presetu oraz ogólne podsumowanie.
 
-![Per-preset result card with ranking and collected metrics](../../assets/screenshots/discovery_preset_result.png)
+![Karta wyników presetu z rankingiem i zebranymi metrykami](../../assets/screenshots/discovery_preset_result.png)
 
-Metrics include:
+Metryki obejmują:
 
-| Metric                                   | What it tells you                                                                              |
-| ---------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| RF health                                | Overall quality of the radio environment on that preset.                       |
-| Wykorzystanie kanału                     | How busy the airwaves were during the dwell.                                   |
-| Czas nadawania                           | Transmission time observed.                                                    |
-| Direct vs. relayed nodes | How many mesh nodes were heard directly versus via a relay.                    |
-| Bad / duplicate packets                  | Counts of corrupt and repeated packets, indicating congestion or interference. |
+| Metryka | Co mówi |
+|--------|-------------------|
+| Kondycja RF | Ogólna jakość środowiska radiowego na tym presecie. |
+| Wykorzystanie kanału | Jak zajęty był eter podczas nasłuchu. |
+| Czas eteru | Zaobserwowany czas nadawania. |
+| Węzły bezpośrednie a przekazywane | Ile węzłów sieci mesh usłyszano bezpośrednio, a ile przez przekaźnik. |
+| Błędne / zduplikowane pakiety | Liczba uszkodzonych i powtórzonych pakietów, wskazująca na zatłoczenie lub zakłócenia. |
 
-Additional features available from the results:
+Dodatkowe funkcje dostępne z poziomu wyników:
 
-- **Scan History** — saved sessions you can revisit; view or delete past scans.
-- **Discovery Map** — a map of the nodes found during the scan.
-- **Report export** — export a report as a PDF on Android, or as text on other platforms.
+- **Historia skanów** — zapisane sesje, do których możesz wrócić; przeglądaj lub usuwaj dawne skany.
+- **Mapa odkrywania** — mapa węzłów znalezionych podczas skanu.
+- **Eksport raportu** — wyeksportuj raport jako PDF w Androidzie lub jako tekst na innych platformach.
 
-> 💡 **Tip:** On **Google Play** builds, Discovery can generate an on-device AI summary (Gemini Nano) of your results. F-Droid builds always use the algorithmic summary — the proprietary ML Kit dependency is deliberately excluded from that flavor — so you get a readable interpretation of the scan either way.
+> 💡 **Wskazówka:** W wersjach z **Google Play** Odkrywanie może wygenerować podsumowanie wyników przez AI na urządzeniu (Gemini Nano). Wersje z F-Droid zawsze używają podsumowania algorytmicznego — zastrzeżona zależność ML Kit jest z tej wersji celowo wyłączona — więc w obu przypadkach dostajesz czytelną interpretację skanu.
 
-## Mesh Beacon
+## Meshbeacon
 
-Mesh Beacon lets nodes invite others to join their mesh. A beaconing node periodically broadcasts an invitation — optionally advertising a channel, region, and modem preset — that nearby nodes can hear even before they share a configuration.
+Meshbeacon pozwala węzłom zapraszać innych do dołączenia do ich sieci mesh. Węzeł nadający beacon okresowo rozgłasza zaproszenie — opcjonalnie ogłaszając kanał, region i preset modemu — które pobliskie węzły mogą usłyszeć, nawet zanim dzielą wspólną konfigurację.
 
-Configure it under **Settings → Module configuration → Mesh Beacon**. The entry appears only on nodes running firmware 2.8.0 or newer. A read-only **Region** row at the top of the screen shows the region the beacon advertises: that region, and the preset, are always the ones the node itself uses, so a beacon can't invite anyone onto settings your node isn't running.
+Skonfiguruj go w **Ustawienia → Ustawienia modułu → Meshbeacon**. Pozycja pojawia się tylko na węzłach z firmware 2.8.0 lub nowszym. Wiersz **Region** tylko do odczytu na górze ekranu pokazuje region ogłaszany przez beacon: ten region i preset są zawsze tymi, których używa sam węzeł, więc beacon nie może zapraszać nikogo do ustawień, na których Twój węzeł nie działa.
 
-- **Listen for beacons** — receive invitations broadcast by other nodes.
-- **Broadcast a beacon** — periodically advertise this mesh to nearby nodes, with an optional **Beacon message** of up to 100 bytes, a **Broadcast interval** picked from fixed intervals between 1 hour and 72 hours, and an **Offered channel** chosen from your node's own channels. The offered channel is required, and defaults to your primary channel. Over remote admin the picker offers the primary channel only.
-- **Broadcast targets** — where the beacon actually transmits. The list always holds at least one row: the first is the beacon's own transmission, not an extra. Each row picks a **Channel** and a **Transmit preset**. **Add target** appends a row, and **Remove target** deletes one — removing the last row replaces it with a fresh default rather than emptying the list.
+- **Nasłuchuj pakietów meshbeacon** — odbieraj zaproszenia rozgłaszane przez inne węzły.
+- **Nadawaj pakiety meshbeacon** — okresowo ogłaszaj tę sieć mesh pobliskim węzłom, z opcjonalną **Wiadomością meshbeacon** do 100 bajtów, **Interwałem nadawania** wybieranym ze stałych interwałów od 1 godziny do 72 godzin oraz **Oferowanym kanałem** wybranym spośród kanałów Twojego węzła. Oferowany kanał jest wymagany i domyślnie jest nim Twój kanał główny. Przez zdalne zarządzanie selektor oferuje tylko kanał główny.
+- **Cele nadawania** — gdzie beacon faktycznie nadaje. Lista zawsze zawiera co najmniej jeden wiersz: pierwszy to własna transmisja beacona, a nie dodatkowa. Każdy wiersz wybiera **Kanał** i **Preset nadawania**. **Dodaj cel** dopisuje wiersz, a **Usuń cel** usuwa jeden — usunięcie ostatniego wiersza zastępuje go nowym domyślnym zamiast opróżniać listę.
 
-Two conditions block beacon setup:
+Dwa warunki blokują konfigurację beacona:
 
-- **The node has no region set.** The screen shows nothing but _Set your node's region before setting up a beacon._ Set the region on **Settings → LoRa** first.
-- **The node uses custom LoRa settings.** A beacon advertises a modem preset for others to join, so a node with **Use Preset** turned off has no standard preset to offer. In that state **Broadcast a beacon** can be turned off but not on, and the broadcast settings are read-only. Listening for beacons is unaffected.
+- **Węzeł nie ma ustawionego regionu.** Ekran nie pokazuje nic poza *Ustaw region radia przed skonfigurowaniem beacona.* Najpierw ustaw region w **Ustawienia → LoRa**.
+- **Węzeł używa własnych ustawień LoRa.** Beacon ogłasza preset modemu, do którego inni mogą dołączyć, więc węzeł z wyłączonym **Użyj predefiniowanych ustawień** nie ma standardowego presetu do zaoferowania. W takim stanie **Nadawaj pakiety meshbeacon** można wyłączyć, ale nie włączyć, a ustawienia nadawania są tylko do odczytu. Nasłuchiwanie beaconów pozostaje bez zmian.
 
-Received invitations appear as **Mesh invitations** cards on the Discovery screen. Each card shows the sender's message plus the offered channel, region, preset, and signal quality, with these actions:
+Odebrane zaproszenia pojawiają się na ekranie Odkrywania jako karty **Zaproszenia do sieci mesh**. Każda karta pokazuje wiadomość nadawcy oraz oferowany kanał, region, preset i jakość sygnału, z następującymi akcjami:
 
-- **Join** — switch to the offered channel and preset (retunes the node and reboots). When the offer matches your current frequency slot, an **Add channel** action adds it without a reboot.
-- **Discover** — seed a Discovery scan with the offered preset so you can survey that mesh before joining (shown only when the beacon offers a preset).
-- **Dismiss** — ignore the invitation.
+- **Dołącz** — przełącz się na oferowany kanał i preset (przestraja węzeł i restartuje go). Gdy oferta zgadza się z Twoim bieżącym slotem częstotliwości, akcja **Dodaj kanał** dodaje go bez restartu.
+- **Odkryj** — zasiej skan Odkrywania oferowanym presetem, aby zbadać tę sieć mesh przed dołączeniem (pokazywane tylko wtedy, gdy beacon oferuje preset).
+- **Zamknij** — zignoruj zaproszenie.
 
-Channels advertised by beacons also show up in the scan setup as **Beacon channels** — select one to include it as a scan target.
+Kanały ogłaszane przez beacony pojawiają się też w przygotowaniu skanu jako **Kanały meshbeacon** — wybierz jeden, aby dołączyć go jako cel skanu.
 
-An invitation to a mesh your node is already on is suppressed: no card, no notification, and no **Beacon channels** entry. A channel counts as one you already have only when both its name and its key match a channel on your node — the same name with a different key is a different mesh, so that invitation still reaches you.
+Zaproszenie do sieci mesh, w której Twój węzeł już jest, jest wstrzymywane: bez karty, bez powiadomienia i bez pozycji w **Kanały meshbeacon**. Kanał liczy się jako już posiadany tylko wtedy, gdy zarówno jego nazwa, jak i klucz zgadzają się z kanałem na Twoim węźle — ta sama nazwa z innym kluczem to inna sieć mesh, więc takie zaproszenie nadal do Ciebie dotrze.
 
-## Manual exploration
+## Ręczne badanie
 
-The following tools are available at any time from the node list and node detail screens. Use them to investigate specific paths and build a topology picture, alongside or instead of a full scan.
+Poniższe narzędzia są dostępne w dowolnej chwili z listy węzłów i ekranów szczegółów węzła. Używaj ich do badania konkretnych ścieżek i budowania obrazu topologii, razem z pełnym skanem lub zamiast niego.
 
-### Pokaż trasę
+### Traceroute
 
-Traceroute reveals the exact path a message takes from your node to any other node on the mesh. It's the single most useful tool for debugging connectivity problems.
+Traceroute pokazuje dokładną ścieżkę, jaką wiadomość pokonuje od Twojego węzła do dowolnego innego węzła w sieci mesh. To najprzydatniejsze narzędzie do diagnozowania problemów z łącznością.
 
-#### Running a Traceroute
+#### Uruchamianie traceroute
 
-1. Navigate to **Nodes** and tap the node you want to trace.
-2. On the node detail screen, find **Traceroute** in the **Telemetry** section and tap its request button. Once a result arrives, a second button on the same row opens the traceroute log, where each hop is listed with its signal quality.
+1. Przejdź do **Węzłów** i dotknij węzła, do którego chcesz prześledzić trasę.
+2. Na ekranie szczegółów węzła znajdź **Pokaż trasę** w sekcji **Telemetria** i dotknij jej przycisku żądania. Gdy nadejdzie wynik, drugi przycisk w tym samym wierszu otwiera dziennik traceroute, w którym każdy skok jest wymieniony wraz z jakością sygnału.
 
-#### Reading the results
+#### Odczytywanie wyników
 
-A traceroute result looks like this:
+Wynik traceroute wygląda tak:
 
 ```text
 Route traced toward destination:
@@ -143,78 +144,78 @@ Route traced toward destination:
 ■ Target Node (TGT1)
 ```
 
-Each `⇊` line between two nodes is one relay hop, and the SNR on that line is the quality of that segment alone. The app colors it against the demodulation floor of the preset in use, not a fixed number: green above the floor, yellow within 5.5 dB below it, orange within 7.5 dB, and red beyond that. The floor is −7.5 dB on Short Fast and improves 2.5 dB per spreading-factor step, so it is −17.5 dB on Long Fast — the same SNR reads differently on different presets. See [Signal Meter](signal-meter). A request that also gets a reply adds a second block under **Route traced back to us:**.
+Każdy wiersz `⇊` między dwoma węzłami to jeden skok przez przekaźnik, a SNR w tym wierszu to jakość tylko tego odcinka. Aplikacja koloruje go względem progu demodulacji używanego presetu, a nie stałej liczby: zielony powyżej progu, żółty do 5,5 dB poniżej, pomarańczowy do 7,5 dB, a czerwony dalej. Próg wynosi −7,5 dB dla Short Fast i poprawia się o 2,5 dB na każdy stopień współczynnika rozpraszania, więc dla Long Fast jest to −17,5 dB — ten sam SNR jest odczytywany inaczej na różnych presetach. Zobacz [Miernik sygnału](signal-meter). Żądanie, które dostaje też odpowiedź, dodaje drugi blok pod **Route traced back to us:**.
 
-| What to look for                                            | What it means                                                               |
-| ----------------------------------------------------------- | --------------------------------------------------------------------------- |
-| All hops show Good SNR (green)           | Healthy path — messages flow reliably                                       |
-| One hop shows a poor SNR (orange or red) | Weak link — this relay segment is fragile                                   |
-| Many hops (4+)                           | Long path — consider repositioning a node to shorten it                     |
-| Different path on retry                                     | Mesh is adapting — multiple routes exist (this is good!) |
+| Na co zwrócić uwagę | Co to znaczy |
+|------------------|---------------|
+| Wszystkie skoki mają dobry SNR (zielony) | Zdrowa ścieżka — wiadomości płyną niezawodnie |
+| Jeden skok ma słaby SNR (pomarańczowy lub czerwony) | Słabe łącze — ten odcinek przez przekaźnik jest wrażliwy |
+| Wiele skoków (4+) | Długa ścieżka — rozważ przestawienie węzła, aby ją skrócić |
+| Inna ścieżka przy ponownej próbie | Sieć mesh dostosowuje się — istnieje wiele tras (to dobrze!) |
 
-> 💡 **Tip:** Run traceroute several times over a few minutes. If the path changes, your mesh has redundant routes — a sign of a well-connected network.
+> 💡 **Wskazówka:** Uruchom traceroute kilka razy w ciągu kilku minut. Jeśli ścieżka się zmienia, Twoja sieć mesh ma nadmiarowe trasy — to znak dobrze połączonej sieci.
 
-#### Troubleshooting with Traceroute
+#### Rozwiązywanie problemów za pomocą traceroute
 
-- **No Response** — The traceroute got nothing back. The target node may be offline, out of range, or on a different channel. Check that both nodes share at least one channel with the same encryption key.
-- **Traceroute times out** — The path may be too long (exceeds hop limit) or a relay node is congested. Try increasing the hop limit in **Settings → LoRa**.
-- **Cannot show traceroute map because the start or destination node has no position information** — The path was traced, but one end has never shared a position.
-- **Asymmetric paths** — A traceroute from A→B may take a different path than B→A. This is normal — radio propagation isn't always symmetric.
+- **Brak odpowiedzi** — Traceroute nic nie odebrał. Węzeł docelowy może być offline, poza zasięgiem lub na innym kanale. Sprawdź, czy oba węzły mają co najmniej jeden wspólny kanał z tym samym kluczem szyfrowania.
+- **Traceroute przekracza limit czasu** — Ścieżka może być zbyt długa (przekracza limit skoków) albo węzeł przekaźnikowy jest zatłoczony. Spróbuj zwiększyć limit skoków w **Ustawienia → LoRa**.
+- **Nie można wyświetlić trasy na mapie, ponieważ węzeł początkowy lub końcowy nie posiada aktualnej lokalizacji** — Ścieżka została prześledzona, ale jeden z końców nigdy nie udostępnił pozycji.
+- **Ścieżki asymetryczne** — Traceroute z A→B może iść inną ścieżką niż B→A. To normalne — propagacja fal radiowych nie zawsze jest symetryczna.
 
-### Informacje o sąsiadze
+### Informacje o sąsiadach
 
-The Neighbor Info module lets each node broadcast a list of the nodes it can **directly hear** (single-hop). When multiple nodes share their neighbor lists, you can piece together a topology map of the entire mesh.
+Moduł Informacje o sąsiadach pozwala każdemu węzłowi rozgłaszać listę węzłów, które **słyszy bezpośrednio** (jeden skok). Gdy wiele węzłów udostępnia swoje listy sąsiadów, możesz poskładać mapę topologii całej sieci mesh.
 
-#### Enabling Neighbor Info
+#### Włączanie Informacji o sąsiadach
 
-1. Navigate to **Settings → Module configuration → Neighbor Info**.
-2. Enable the module.
-3. Set **Update Interval**. The app accepts whatever you type; the firmware enforces its own minimum and resets a value below it.
-4. Turn on **Transmit over LoRa**. Without it, your neighbor list goes only to MQTT and to this app, never over the air.
+1. Przejdź do **Ustawienia → Ustawienia modułu → Informacje o sąsiadach**.
+2. Włącz moduł.
+3. Ustaw **Częstotliwość aktualizacji**. Aplikacja przyjmuje wszystko, co wpiszesz; firmware wymusza własne minimum i resetuje wartość poniżej niego.
+4. Włącz **Nadaj przez LoRa**. Bez tego Twoja lista sąsiadów trafia tylko do MQTT i do tej aplikacji, nigdy drogą radiową.
 
-Once enabled and transmitting over LoRa, your node periodically broadcasts its neighbor list. Other nodes with Neighbor Info enabled do the same.
+Po włączeniu i nadawaniu przez LoRa Twój węzeł okresowo rozgłasza listę sąsiadów. Inne węzły z włączonymi Informacjami o sąsiadach robią to samo.
 
-#### Viewing neighbor data
+#### Przeglądanie danych o sąsiadach
 
-- Open a node's detail screen and find **Neighbor Info** in the **Telemetry** section. The request button asks the node for its current neighbor list; once the app has received one, a second button on the same row opens the log of everything that node has reported. The row appears only on nodes that can answer a neighbor request, or that have already reported neighbors.
-- Each neighbor entry shows the node that was directly heard and its signal quality.
-- Combine neighbor data from multiple nodes to understand the full mesh topology.
+- Otwórz ekran szczegółów węzła i znajdź **Informacje o sąsiadach** w sekcji **Telemetria**. Przycisk żądania prosi węzeł o jego bieżącą listę sąsiadów; gdy aplikacja ją otrzyma, drugi przycisk w tym samym wierszu otwiera dziennik wszystkiego, co ten węzeł zgłosił. Wiersz pojawia się tylko na węzłach, które mogą odpowiedzieć na żądanie o sąsiadów albo które już zgłosiły sąsiadów.
+- Każdy wpis sąsiada pokazuje węzeł, który został usłyszany bezpośrednio, i jakość jego sygnału.
+- Połącz dane o sąsiadach z wielu węzłów, aby zrozumieć pełną topologię sieci mesh.
 
-> ℹ️ **Note:** Neighbor Info increases airtime usage because every enabled node periodically broadcasts its neighbor list. The firmware doesn't accept an interval shorter than 14400 seconds (4 hours) for this reason; on busy meshes, leave it at the 21600-second default or raise it further.
+> ℹ️ **Uwaga:** Informacje o sąsiadach zwiększają zużycie czasu antenowego, ponieważ każdy włączony węzeł okresowo rozgłasza swoją listę sąsiadów. Z tego powodu firmware nie przyjmuje interwału krótszego niż 14400 sekund (4 godziny); w zajętych sieciach mesh zostaw domyślne 21600 sekund lub zwiększ jeszcze bardziej.
 
-### Node list as a discovery tool
+### Lista węzłów jako narzędzie odkrywania
 
-The node list itself is a powerful discovery tool when you use its filtering and sorting features effectively.
+Sama lista węzłów jest potężnym narzędziem odkrywania, gdy skutecznie używasz jej filtrowania i sortowania.
 
-#### Finding new nodes
+#### Znajdowanie nowych węzłów
 
-- Sort by **Last heard** to see the most recently active nodes at the top.
-- Enable **Include unknown** to see nodes that have appeared on the mesh but haven't sent user info yet — these are often newly powered-on nodes.
+- Posortuj według **Aktywność**, aby zobaczyć na górze ostatnio aktywne węzły.
+- Włącz **Pokaż nierozpoznane**, aby zobaczyć węzły, które pojawiły się w sieci mesh, ale nie wysłały jeszcze informacji o użytkowniku — często są to świeżo włączone węzły.
 
-#### Assessing connectivity
+#### Ocena łączności
 
-- Sort by **Hops away** to see which nodes are directly reachable (0 hops) versus relayed.
-- Sort by **Distance** to find nearby nodes and verify they're reachable.
-- Use **Exclude MQTT** to focus on nodes reachable over LoRa (not via internet bridge).
+- Posortuj według **Liczba skoków**, aby zobaczyć, które węzły są osiągalne bezpośrednio (0 skoków), a które przez przekaźniki.
+- Posortuj według **Dystans**, aby znaleźć pobliskie węzły i sprawdzić, czy są osiągalne.
+- Użyj **Wyklucz MQTT**, aby skupić się na węzłach osiągalnych przez LoRa (nie przez most internetowy).
 
-#### Infrastructure audit
+#### Przegląd infrastruktury
 
-- Disable **Exclude infrastructure** to see Router, Router Late, and Client Base nodes.
-- Check their signal quality and last-heard times to verify your infrastructure nodes are healthy.
+- Wyłącz **Wyklucz infrastrukturę**, aby zobaczyć węzły Router, Router pomocniczy i Klient bazowy.
+- Sprawdź ich jakość sygnału i czasy ostatniej aktywności, aby upewnić się, że Twoje węzły infrastruktury są w dobrej kondycji.
 
-See [Nodes](nodes) for full details on filtering and sorting options.
+Pełne informacje o opcjach filtrowania i sortowania znajdziesz w [Węzły](nodes).
 
-## Tips for Mesh exploration
+## Wskazówki do badania sieci mesh
 
-- **Start with traceroute** — it gives you immediate, actionable information about a specific path.
-- **Enable Neighbor Info on key nodes** — especially routers and repeaters, to build a picture of the backbone.
-- **Check the map** — node positions on the [Map](map-and-waypoints) combined with signal data help you understand why some links are strong and others are weak.
-- **Compare signal over time** — use the [Signal Meter](signal-meter) guide to interpret SNR and RSSI values correctly.
+- **Zacznij od traceroute** — daje natychmiastowe, praktyczne informacje o konkretnej ścieżce.
+- **Włącz Informacje o sąsiadach na kluczowych węzłach** — zwłaszcza routerach i repeaterach, aby zbudować obraz szkieletu sieci.
+- **Sprawdź mapę** — pozycje węzłów na [Mapie](map-and-waypoints) w połączeniu z danymi o sygnale pomagają zrozumieć, dlaczego niektóre łącza są silne, a inne słabe.
+- **Porównuj sygnał w czasie** — użyj przewodnika [Miernik sygnału](signal-meter), aby poprawnie interpretować wartości SNR i RSSI.
 
-## Related Topics
+## Zobacz także
 
-- [Nodes](nodes) — the node list these scans populate
-- [Map & Waypoints](map-and-waypoints) — see discovered nodes geographically
-- [Signal Meter](signal-meter) — interpret the SNR and RSSI a scan reports
-- [Settings — Modules & Admin](settings-module-admin) — configure the Mesh Beacon and Neighbor Info modules
-- [Messages & Channels](messages-and-channels) — join a mesh you found and start talking
+- [Węzły](nodes) — lista węzłów, którą wypełniają te skany
+- [Mapa i punkty trasy](map-and-waypoints) — zobacz odkryte węzły na mapie
+- [Miernik sygnału](signal-meter) — interpretuj SNR i RSSI zgłaszane przez skan
+- [Ustawienia — Moduły i administracja](settings-module-admin) — konfiguracja modułów Meshbeacon i Informacje o sąsiadach
+- [Wiadomości i kanały](messages-and-channels) — dołącz do znalezionej sieci mesh i zacznij rozmawiać

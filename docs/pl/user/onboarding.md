@@ -1,111 +1,109 @@
 ---
-title: Getting Started
+title: Pierwsze kroki
+parent: Przewodnik użytkownika
 nav_order: 1
 last_updated: 2026-09-28
-description: First-launch setup — permissions, onboarding flow, and next steps after connecting your radio.
+description: Konfiguracja przy pierwszym uruchomieniu — uprawnienia, przebieg wprowadzenia i dalsze kroki po połączeniu radia.
 aliases:
   - first-launch
   - setup
   - intro
 ---
 
-# Getting Started
+# Pierwsze kroki
 
-This page covers the first-launch flow of the Meshtastic Android app, what each permission is for, and how to revisit them later.
+Ta strona opisuje przebieg pierwszego uruchomienia aplikacji MT_SW_APP na Androidzie, do czego służy każde uprawnienie i jak do nich wrócić później.
 
-## First Launch
+## Pierwsze uruchomienie
 
-When you open the app for the first time, the app guides you through an introductory flow that configures essential permissions and settings. Complete each step in order or skip it — nothing here is a one-time offer. Every permission can be reviewed and granted later from the **Permissions** section of **Settings** inside the app.
+Przy pierwszym otwarciu aplikacja prowadzi Cię przez wstępny proces, który konfiguruje niezbędne uprawnienia i ustawienia. Wykonuj kolejne kroki po kolei albo je pomijaj — nic tu nie jest jednorazową ofertą. Każde uprawnienie możesz przejrzeć i przyznać później w sekcji **Uprawnienia** w **Ustawieniach** aplikacji.
 
-### Welcome Screen
+### Ekran powitalny
 
-The welcome screen introduces Meshtastic with three feature rows:
+Ekran powitalny przedstawia MT_SW_APP w trzech wierszach funkcji:
 
-|                               |                                                                                                                                           |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Stay Connected Anywhere**   | Communicate off-the-grid with your friends and community without cell service.                                            |
-| **Create Your Own Networks**  | Easily set up private mesh networks for secure and reliable communication in remote areas.                                |
-| **Track and Share Locations** | Udostępniaj swoją lokalizację w czasie rzeczywistym i koordynuj działania swojej grupy dzięki zintegrowanym funkcjom GPS. |
+| | |
+|---|---|
+| **Bądź w kontakcie wszędzie** | Komunikuj się poza siecią komórkową z przyjaciółmi i społecznością, bez zasięgu telefonii. |
+| **Twórz własne sieci** | Łatwo konfiguruj prywatne sieci mesh do bezpiecznej i niezawodnej komunikacji w odległych miejscach. |
+| **Śledź i udostępniaj lokalizacje** | Udostępniaj swoją lokalizację w czasie rzeczywistym i koordynuj grupę dzięki zintegrowanemu GPS. |
 
-Tap **Get started** to proceed through the setup flow.
+Dotknij **Rozpocznij**, aby przejść przez proces konfiguracji.
 
-![Welcome screen](../../assets/screenshots/onboarding_welcome.png)
+![Ekran powitalny](../../assets/screenshots/onboarding_welcome.png)
 
-## Permissions
+## Uprawnienia
 
-The app requests several permissions during setup. Each one serves a specific purpose, and some are required for core functionality.
+Podczas konfiguracji aplikacja prosi o kilka uprawnień. Każde ma konkretne zadanie, a niektóre są wymagane do podstawowego działania.
 
-### Bluetooth Permission
+### Uprawnienie Bluetooth
 
-Bluetooth is the primary connection method between your phone and Meshtastic radio. The **Bluetooth** screen shows what the permission buys you:
+Bluetooth to główna metoda połączenia między telefonem a radiem. Ekran **Bluetooth** pokazuje, co daje to uprawnienie:
+- **Wykrywanie** — znajdowanie i rozpoznawanie pobliskich urządzeń.
+- **Konfiguracja** — bezprzewodowe zarządzanie ustawieniami urządzenia i kanałami.
 
-- **Discovery** — find and identify Meshtastic devices near you.
-- **Configuration** — wirelessly manage your device settings and channels.
+W Androidzie 12 i nowszym system pyta raz, o **Urządzenia w pobliżu**, a ta jedna zgoda obejmuje zarówno skanowanie, jak i łączenie. Bez niej musisz użyć połączenia USB lub TCP.
 
-On Android 12 and newer, Android asks once, for **Nearby devices**, and that one grant covers both scanning and connecting. Without it, you'll need to use USB or TCP connections instead.
+### Uprawnienie lokalizacji
 
-### Location Permission
+> ℹ️ **Uwaga:** Lokalizacja nie jest wymagana dla Bluetooth w Androidzie 12 i nowszym. **Android 11 i starsze** pokazują jeden krok lokalizacji, na ekranie Bluetooth, zamiast dwóch — te wersje traktują skanowanie Bluetooth jako funkcję lokalizacji, więc aplikacja prosi o Lokalizację zamiast o „Urządzenia w pobliżu". Pytanie dwa razy przybliżałoby moment, w którym Android w ogóle przestaje wyświetlać okno (drugie odrzucenie w Androidzie 11; pole „Nie pytaj ponownie" w Androidzie 10 i starszych). W **Androidzie 12 i nowszym** te dwa uprawnienia są osobne: „Urządzenia w pobliżu" jest zadeklarowane jako `neverForLocation`, a odmowa Lokalizacji nie przeszkadza w znajdowaniu ani łączeniu się z radiem.
 
-> ℹ️ **Note:** Location is not required for Bluetooth on Android 12 and newer. **Android 11 and older** show one location step, on the Bluetooth screen, rather than two — those releases treat a Bluetooth scan as a location capability, so the app asks for Location instead of "Nearby devices". Asking twice would push you toward the point where Android stops offering the dialog at all (a second denial on Android 11; the "Don't ask again" checkbox on Android 10 and older). On **Android 12 and newer** the two are separate: "Nearby devices" is declared `neverForLocation`, and declining Location does not stop you finding or connecting to a radio.
+Aplikacja używa Twojej lokalizacji także do:
+- Pokazywania Twojej pozycji na mapie sieci mesh
+- Obliczania odległości do innych węzłów
+- Udostępniania współrzędnych GPS innym członkom sieci mesh (jeśli włączone)
 
-Meshtastic also uses your location for:
+W Androidzie 12 i nowszym wybierz **Dokładna**, aby udostępniać pozycję sieci mesh: lokalizacja przybliżona nadal pokaże Cię na mapie, ale udostępnianie pozycji wymaga lokalizacji dokładnej.
 
-- Showing your position on the mesh map
-- Calculating distances to other nodes
-- Sharing your GPS coordinates with other mesh members (if enabled)
+Przyznaj **„Podczas korzystania z aplikacji"**. Aplikacja nie prosi o lokalizację w tle — `ACCESS_BACKGROUND_LOCATION` nie ma w jej manifeście — więc Android nie zaoferuje opcji „Zawsze", a pozycja jest aktualizowana, gdy aplikacja jest na pierwszym planie lub działa jej usługa pierwszoplanowa.
 
-On Android 12 and newer, choose **Precise** to share your position with the mesh: an approximate grant still shows you on the map, but position sharing needs precise location.
+Odmowa nie psuje reszty aplikacji: w Androidzie 12 i nowszym Bluetooth pozostaje bez zmian, a wyłączone są tylko pozycja na mapie i udostępnianie pozycji. W Androidzie 11 i starszych zatrzymuje się też skanowanie Bluetooth, bo właśnie za tym uprawnieniem Android je ukrywa — a systemowe **Usługi lokalizacji** także muszą być włączone, aby skan cokolwiek zwrócił.
 
-Grant **"While using the app"**. The app does not request background location — `ACCESS_BACKGROUND_LOCATION` is not in its manifest — so Android will not offer an "Always" option, and position updates happen while the app is in the foreground or running its foreground service.
+### Uprawnienie powiadomień
 
-Declining leaves the rest of the app working: on Android 12 and newer, Bluetooth is unaffected and only the map position and position sharing are disabled. On Android 11 and older, Bluetooth scanning also stops, because that is the permission Android gates it behind — and system **Location Services** must also be switched on for a scan to return anything.
+Powiadomienia informują Cię o:
+- Przychodzących wiadomościach z kanałów i wiadomościach bezpośrednich
+- Nowych węzłach dołączających do sieci mesh
+- Niskim poziomie baterii w zdalnym węźle
 
-### Notifications Permission
+> 💡 **Wskazówka:** Preferencje powiadomień możesz dopracować później w ustawieniach systemu Android — aplikacja tworzy osobny kanał powiadomień dla każdej kategorii (oraz kilka wewnętrznych, np. usługę w tle), więc możesz je włączać lub wyciszać osobno.
 
-Notifications alert you to:
+### Uprawnienie alertów krytycznych
 
-- Incoming messages from channels and direct messages
-- New nodes joining the mesh
-- Low battery on a remote node
+Alerty krytyczne to powiadomienia o wysokim priorytecie, które przebijają się przez tryb Nie przeszkadzać — dla alarmów awaryjnych z sieci mesh i pilnych wiadomości.
 
-> 💡 **Tip:** You can fine-tune notification preferences later in Android system settings — the app creates a separate notification channel per category (plus a few internal ones, like the background service), so you can enable or silence them individually.
+Ten krok nie jest zwykłym oknem z prośbą o uprawnienie. Nie ma okna zezwól/odmów: przycisk otwiera stronę ustawień systemu Android dla kanału powiadomień **Alerty** tej aplikacji, gdzie sam włączasz przebijanie się przez tryb Nie przeszkadzać. Dotknij **Skonfiguruj alerty krytyczne**, aby otworzyć tę stronę, lub **Pomiń**, aby iść dalej — do tej samej strony wrócisz później z ustawień powiadomień Androida dla aplikacji. Ten krok pojawia się tylko wtedy, gdy na poprzednim ekranie zezwolono na powiadomienia — jeśli je pominiesz lub odmówisz, konfiguracja kończy się na tym.
 
-### Critical Alerts Permission
+### Późniejsze przeglądanie uprawnień
 
-Critical alerts are high-priority notifications that break through Do Not Disturb — for emergency mesh alerts and urgent messages.
+Sekcja **Uprawnienia** w **Ustawieniach** podsumowuje stan każdego uprawnienia. W Androidzie 12 i nowszym wymienia pięć: **Uprawnienie do pobliskich urządzeń** (Bluetooth), **Uprawnienie do lokalizacji**, **Powiadomienia aplikacji**, **Pozwolenie na dostęp do kamery** (skanowanie kodów QR kanałów i kontaktów) oraz **Uprawnienie do sieci lokalnej** (znajdowanie radiów przez Wi-Fi z użyciem mDNS). W Androidzie 11 i starszych jeden wiersz **Uprawnienie do lokalizacji** obejmuje Bluetooth i lokalizację, więc są cztery. Dwa ostatnie nigdy nie są wymagane podczas konfiguracji, tylko wtedy, gdy funkcja po raz pierwszy ich potrzebuje.
 
-This step is not a runtime permission prompt. There is no grant/deny dialog: the button opens the Android system settings page for the app's **Alerts** notification channel, where you turn the breakthrough behavior on yourself. Tap **Configure Critical Alerts** to open that page, or **Skip** to move on — you can reach the same page later from Android's notification settings for Meshtastic. This step appears only if you granted notifications on the previous screen — skip or decline them and setup ends there.
+Sekcja pokazuje *Wszystkie dozwolone*, gdy każde uprawnienie jest przyznane, *Nic nie wymaga Twojej uwagi*, gdy o niektóre po prostu jeszcze nie pytano, i podaje liczbę, gdy któreś odrzucono — wtedy sama się rozwija. Dotknij wiersza, aby w każdej chwili rozwinąć lub zwinąć sekcję:
 
-### Reviewing permissions later
+| Stan | Co robi dotknięcie wiersza |
+|---|---|
+| **Dozwolone** | Otwiera stronę systemową, abyś mógł je sprawdzić lub cofnąć |
+| **Jeszcze nie zapytano** | Prosi o nie |
+| **Odmówiono — dotknij, aby zezwolić** | Wyjaśnia, do czego służy uprawnienie, a potem pyta ponownie, jeśli się zgodzisz |
+| **Zablokowane — dotknij, aby otworzyć ustawienia systemowe** | Android nie pokaże już swojego okna, więc otwiera stronę, na której możesz je włączyć z powrotem |
+| **Niewymagane w tej wersji Androida** | Nic — to uprawnienie nie istnieje na Twoim urządzeniu |
 
-The **Permissions** section of **Settings** summarizes where every runtime permission stands. On Android 12 and newer it lists five: **Nearby devices permission** (Bluetooth), **Location permission**, **App Notifications**, **Camera permission** (scanning channel and contact QR codes) and **Local network permission** (finding radios over Wi-Fi by mDNS). On Android 11 and older a single **Location permission** row covers both Bluetooth and location, so there are four. The last two are never asked for during setup, only when a feature first needs them.
+Najbardziej liczy się to przy powiadomieniach. Jeśli odmówisz ich podczas konfiguracji, ten wiersz jest drogą powrotną: Android przestaje pokazywać okno, gdy odmówisz stanowczo (drugie odrzucenie), i wtedy ten wiersz przełącza się na **Zablokowane** i kieruje Cię do strony ustawień systemowych. Okno z prośbą o powiadomienia istnieje tylko w Androidzie 13 i nowszym — w starszych wersjach powiadomienia są domyślnie włączone i zarządza się nimi z ustawień Androida.
 
-The section reads _All allowed_ when every permission is granted, _Nothing needs your attention_ when some have simply never been asked for, and names a count when one is denied — in which case it expands itself. Tap the row to expand or collapse it at any time:
+## Po konfiguracji
 
-| State                                       | What tapping the row does                                                                    |
-| ------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| **Allowed**                                 | Opens the system page, so you can review or revoke it                                        |
-| **Not asked yet**                           | Requests it                                                                                  |
-| **Denied — tap to allow**                   | Explains what the permission is for, then asks again if you agree                            |
-| **Blocked — tap to open system settings**   | Android will no longer show its dialog, so this opens the page where you can turn it back on |
-| **Not required on this version of Android** | Nothing — the permission does not exist on your device                                       |
+Po przyznaniu uprawnień aplikacja otwiera główny interfejs. Pierwszą rzeczą powinno być połączenie z radiem — zobacz [Połączenia](connections), aby poznać szczegóły.
 
-This matters most for notifications. If you decline them during setup, this row is the way back: Android stops showing the dialog once you have declined firmly (a second denial), at which point this row switches to **Blocked** and sends you to the system settings page instead. The notification prompt exists only on Android 13 and newer — on older versions notifications are on by default and managed from Android's own settings.
+> 💡 **Wskazówka:** Jeśli podczas konfiguracji pominąłeś jakieś uprawnienia, otwórz sekcję **Uprawnienia** w **Ustawieniach** aplikacji. Każde uprawnienie jest tam wymienione ze stanem i drogą powrotną do niego — także powiadomienia, o które system nie zapyta drugi raz samodzielnie.
 
-## After Setup
+Funkcje proszą też o uprawnienia w kontekście. Na karcie **Połączenie** karta nad listą urządzeń wyjaśnia, do czego służy uprawnienie Bluetooth, i oferuje **Przyznaj uprawnienie**; gdy Android przestanie pytać, ten przycisk zmienia się na **Otwórz ustawienia**.
 
-After you grant permissions, the app opens the main interface. Your first action should be connecting to a Meshtastic radio — see [Connections](connections) for detailed instructions.
+Nowy w Meshtastic? [Poradnik na początek](https://meshtastic.org/docs/getting-started) na meshtastic.org opisuje wybór sprzętu, wstępną konfigurację radia i pierwszą sieć mesh.
 
-> 💡 **Tip:** If you skipped any permissions during setup, open the **Permissions** section of **Settings** in the app. Every runtime permission is listed there with its current state and a way back to it — including notifications, which the system will not prompt for a second time on its own.
+## Powiązane tematy
 
-Features also ask in context. On the **Connect** tab, a card above the device list explains what the Bluetooth permission is for and offers **Grant permission**; once Android stops prompting, that button becomes **Open settings**.
-
-New to Meshtastic? The [getting started guide](https://meshtastic.org/docs/getting-started) on meshtastic.org covers hardware selection, initial radio configuration, and your first mesh setup.
-
-## Related Topics
-
-- [Connections](connections) — pair your first radio
-- [Messages & Channels](messages-and-channels) — send your first message
-- [Nodes](nodes) — see who else is on your mesh
-- [Map & Waypoints](map-and-waypoints) — view node positions
-- [Settings — Radio & User](settings-radio-user) — configure your radio and user profile
+- [Połączenia](connections) — sparuj pierwsze radio
+- [Wiadomości i kanały](messages-and-channels) — wyślij pierwszą wiadomość
+- [Węzły](nodes) — zobacz, kto jeszcze jest w Twojej sieci mesh
+- [Mapa i punkty trasy](map-and-waypoints) — podgląd pozycji węzłów
+- [Ustawienia — Radio i użytkownik](settings-radio-user) — konfiguracja radia i profilu użytkownika

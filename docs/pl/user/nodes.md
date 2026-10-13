@@ -1,8 +1,9 @@
 ---
 title: Węzły
+parent: Przewodnik użytkownika
 nav_order: 4
 last_updated: 2026-10-02
-description: Browse, filter, and sort mesh nodes — view details, signal quality, roles, and quick actions.
+description: Przeglądaj, filtruj i sortuj węzły sieci mesh — szczegóły, jakość sygnału, role i szybkie akcje.
 aliases:
   - node-list
   - mesh-nodes
@@ -14,234 +15,232 @@ aliases:
 
 # Węzły
 
-The Nodes screen lists every node visible on your mesh.
+Ekran Węzły wyświetla listę wszystkich węzłów widocznych w Twojej sieci mesh.
 
-## Node list
+## Lista węzłów
 
-The node list shows every node your node has heard, including:
+Lista węzłów pokazuje każdy węzeł, który Twój węzeł usłyszał, w tym:
+- **Nazwa węzła** — długa nazwa ustawiona przez użytkownika
+- **Nazwa skrócona** — 4-znakowy identyfikator
+- **Jakość sygnału** — SNR, RSSI i określenie jakości, pokazywane tylko dla węzłów, które Twój węzeł usłyszał bezpośrednio. W układzie Pełnym węzeł osiągany przez przekaźnik pokazuje tutaj zamiast tego liczbę skoków; węzeł słyszany wyłącznie przez MQTT nie pokazuje żadnej z tych informacji
+- **Ostatnio słyszany** — czas od ostatniej komunikacji
+- **Odległość** — szacowana odległość (jeśli pozycje są udostępniane)
+- **Bateria** — poziom baterii zdalnego węzła (jeśli telemetria jest włączona)
 
-- **Node name** — user-configured long name
-- **Short name** — 4-character identifier
-- **Signal quality** — SNR, RSSI, and a quality word, shown only for nodes your node heard directly. In the Complete layout a node reached through a relay shows its hop count here instead; a node heard only over MQTT shows neither
-- **Last heard** — time since last communication
-- **Distance** — estimated distance (if positions are shared)
-- **Battery** — remote node battery level (if telemetry is enabled)
+### Wybór tego, co pokazuje lista
 
-### Choosing what the list shows
+Lista ma dwa poziomy szczegółowości, ustawiane w **Ustawienia → Układ węzła** (Node Layout). Układ **Pełny** pokazuje każde pole, które węzeł zgłosił, i ukrywa te, których nie zgłosił. Układ **Kompaktowy** mieści więcej węzłów na ekranie i pozwala samodzielnie wybrać pola — **Zasilanie**, **Czas ostatniej aktywności**, **Względny czas ostatniej aktywności**, **Odległość i kierunek**, **Skoków**, **Sygnał (tylko bezpośredni)**, **Kanał** oraz **Urządzenie i rola**. Przełącznik **Metryki środowiskowe** dotyczy obu układów. Podgląd nad przełącznikami pokazuje efekt, zanim opuścisz ekran.
 
-The list has two densities, set at **Settings → Node Layout**. **Complete** shows every field a node has reported and hides the ones it hasn't. **Compact** fits more nodes on screen and lets you pick the fields yourself — **Power**, **Last Heard Time**, **Relative Last Heard Time**, **Distance and Bearing**, **Hops Away**, **Signal (Direct Only)**, **Channel**, and **Device & Role**. The **Environment Metrics** toggle applies to both densities. A preview above the toggles shows the effect before you leave the screen.
+### Wskaźniki stanu węzła
 
-### Node Status indicators
+| Wskaźnik | Znaczenie |
+|-------|---------|
+| Zielony czas ostatniej aktywności | Węzeł usłyszany w ciągu ostatnich 2 godzin |
+| Zwykły czas ostatniej aktywności | Węzeł nie był słyszany od ponad 2 godzin |
+| Pomarańczowy czas ostatniej aktywności z przekreśloną ikoną sygnału | Nie był słyszany od zmiany ustawień LoRa Twojego węzła, więc nie można się z nim stąd połączyć |
+| Przekreślona nazwa | Węzeł, który zignorowałeś |
+| ⭐ Ulubiony | Węzeł oznaczony jako ulubiony. |
 
-| Indicator                                             | Meaning                                                                             |
-| ----------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Green last-heard time                                 | Node heard within the last 2 hours                                                  |
-| Plain last-heard time                                 | Node not heard for over 2 hours                                                     |
-| Orange last-heard time with a crossed-out signal icon | Not heard since your node's LoRa settings changed, so it can't be reached from here |
-| Struck-through name                                   | Node you have ignored                                                               |
-| ⭐ Favorite                                            | Node you marked as a favorite.                                      |
+Nie ma osobnego poziomu „nieobecny”, ale pomarańczowy stan niedostępności ma pierwszeństwo przed
+zielonym: węzeł może być online i mimo to niedostępny przy Twoich obecnych ustawieniach. Węzły znane
+wyłącznie przez MQTT nigdy nie są pokazywane jako niedostępne.
 
-There is no separate "away" tier, but the orange unreachable state takes precedence over the
-green one: a node can be online and still be unreachable on your current settings. Nodes known
-only over MQTT are never shown as unreachable.
+### Role węzłów
 
-### Node roles
+Węzły można skonfigurować z różnymi rolami, które wpływają na ich zachowanie w sieci mesh:
 
-Nodes can be configured with different roles that affect their mesh behavior:
+| Rola | Opis |
+|------|-------------|
+| Klient (Client) | Standardowy węzeł użytkownika końcowego |
+| Klient bazowy (Client Base) | Traktuje ruch ulubionych węzłów z priorytetem Routera pomocniczego; cały pozostały ruch jak Klient |
+| Klient pasywny (Client Mute) | Odbiera, ale nie retransmituje |
+| Klient ukryty (Client Hidden) | Jak Klient pasywny, a dodatkowo ukrywa się na liście węzłów |
+| Router | Priorytetowo przekazuje wiadomości; pozostaje wybudzony, aby przekazywać |
+| Router pomocniczy (Router Late) | Węzeł infrastruktury, który retransmituje raz, ale dopiero po wszystkich pozostałych trybach (zapewnia dodatkowy zasięg) |
+| ~~Router Klienta (Router Client)~~ | ⚠️ **Przestarzała** (usunięta w firmware 2.3.15) — nie można już jej wybrać; użyj Routera lub Klienta |
+| ~~Repeater~~ | ⚠️ **Przestarzała** (usunięta w firmware 2.7.11) — nie można już jej wybrać; użyj Routera |
+| Tracker | Zoptymalizowany pod raportowanie pozycji w regularnych odstępach |
+| Czujnik (Sensor) | Zoptymalizowany pod raportowanie telemetrii |
+| TAK | Współpracuje z systemami TAK (wysyła/odbiera CoT) |
+| TAK Tracker | Tylko raportowanie pozycji TAK |
+| Zgubiony i znaleziony (Lost and Found) | Wysyła swoją pozycję na kanał domyślny jako wiadomość tekstową w regularnych odstępach, aby pomóc odzyskać zgubiony węzeł |
 
-| Rola              | Opis                                                                                                                                                   |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Klient            | Standard end-user node                                                                                                                                 |
-| Client Base       | Treats favorited-node traffic as Router Late priority; all other traffic as Client                                                                     |
-| Klient pasywny    | Receives but doesn't retransmit                                                                                                                        |
-| Client Hidden     | Like Client Mute, plus hides from node list                                                                                                            |
-| Router            | Prioritizes message forwarding; stays awake to relay                                                                                                   |
-| Router Late       | Infrastructure node that rebroadcasts once, but only after all other modes (provides supplemental coverage)                         |
-| ~~Router Client~~ | ⚠️ **Deprecated** (removed in firmware 2.3.15) — no longer selectable; use Router or Client instead |
-| ~~Repeater~~      | ⚠️ **Deprecated** (removed in firmware 2.7.11) — no longer selectable; use Router instead           |
-| Tracker           | Optimized for position reporting at regular intervals                                                                                                  |
-| Czujnik           | Optimized for telemetry reporting                                                                                                                      |
-| TAK               | Interoperates with TAK systems (sends/receives CoT)                                                                                 |
-| TAK Tracker       | TAK position reporting only                                                                                                                            |
-| Lost and Found    | Sends its position to the default channel as a text message at regular intervals, to help recover a lost node                                          |
+### Wybór roli
 
-### Choosing a role
+Większość użytkowników powinna zostawić domyślną rolę **Klient**. Rozważ inną rolę, gdy:
 
-Most users should keep the default **Client** role. Consider a different role when:
+- **Router** — Masz węzeł w stałym, wyniesionym miejscu z niezawodnym zasilaniem (dach, wzgórze). Routery pozostają stale wybudzone, aby przekazywać wiadomości innym, i są kluczowe dla rozszerzania zasięgu sieci mesh. Nie używaj roli Router w przenośnych węzłach zasilanych z baterii.
+- **Router pomocniczy (Router Late)** — Węzeł infrastruktury, który zawsze retransmituje pakiety raz, ale dopiero po tym, jak wszystkie inne tryby routingu miały swoją kolej. Zapewnia dodatkowy zasięg dla lokalnych skupisk bez rywalizacji z głównymi routerami.
+- **Klient bazowy (Client Base)** — Traktuje ruch od/do Twoich ulubionych węzłów z priorytetem Routera pomocniczego (dzięki czemu te wiadomości dostają dodatkowy zasięg przekazywania), a wszystko inne obsługuje jak zwykły Klient.
+- **Klient pasywny (Client Mute)** — Chcesz odbierać ruch sieci mesh, ale nie uczestniczyć w jego przekazywaniu. Przydatne dla węzłów tylko do obserwacji albo do zmniejszenia zatłoczenia w gęstych obszarach.
+- **Tracker** — Bezobsługowy węzeł, którego jedynym zadaniem jest nadawanie pozycji GPS (np. pojazd, zwierzę lub mienie). Śpi między transmisjami, aby oszczędzać baterię.
+- **Czujnik (Sensor)** — Bezobsługowy węzeł raportujący telemetrię środowiskową (temperatura, wilgotność, jakość powietrza). Podobny profil zasilania jak Tracker.
+- **TAK / TAK Tracker** — Potrzebne tylko przy współpracy z systemami ATAK/WinTAK. Szczegóły w [Integracja TAK](tak).
 
-- **Router** — You have a node in a fixed, elevated location with reliable power (rooftop, hilltop). Routers stay awake continuously to relay messages for others and are essential for extending mesh coverage. Don't use Router on battery-powered handheld nodes.
-- **Router Late** — An infrastructure node that always rebroadcasts packets once but only after all other routing modes have had their turn. Provides supplemental coverage for local clusters without competing with primary routers.
-- **Client Base** — Treats traffic from/to your favorited nodes with Router Late priority (ensuring those messages get extra relay coverage) while handling everything else as a normal Client.
-- **Client Mute** — You want to receive mesh traffic but not contribute to relaying. Useful for monitoring-only nodes or to reduce congestion in dense areas.
-- **Tracker** — An unattended node whose sole purpose is broadcasting its GPS position (e.g., a vehicle, pet, or asset). Sleeps between broadcasts to conserve battery.
-- **Sensor** — An unattended node reporting environmental telemetry (temperature, humidity, air quality). Similar power profile to Tracker.
-- **TAK / TAK Tracker** — Only needed if interoperating with ATAK/WinTAK systems. See [TAK Integration](tak) for details.
+> 💡 **Wskazówka:** Sieć mesh działa najlepiej, gdy większość węzłów to **Klient** lub **Router**. Zbyt wiele węzłów Klient pasywny zmniejsza odporność sieci; zbyt wiele Routerów w gęstym obszarze może powodować zatłoczenie. Dobra zasada: jeden Router na 5–10 Klientów w Twojej okolicy.
 
-> 💡 **Tip:** The mesh works best when most nodes are **Client** or **Router**. Too many Client Mute nodes reduce mesh resilience; too many Routers in a dense area can cause congestion. A good rule of thumb: one Router per 5–10 Clients in your area.
+### Wskaźniki bezpieczeństwa
 
-### Security indicators
+Każdy węzeł ma jedną ikonę bezpieczeństwa obok nazwy na liście węzłów. Dotknij jej, aby przeczytać, co oznacza, i wybierz **Pokaż wszystkie znaczenia** (Show All Meanings) w tym oknie, aby zobaczyć pełną legendę. Ekran szczegółów pokazuje ten sam stan słowami, jako wiersz **Bezpieczeństwo**, który otwiera to samo okno.
 
-Each node carries one security icon beside its name in the node list. Tap it to read what it means, and choose **Show All Meanings** in that dialog for the full legend. The detail screen shows the same state in words, as a **Security** row that opens the same dialog.
+| Ikona | Znaczenie | Pokazywana dla |
+|------|---------|-----------|
+| Osoba z tarczą z ptaszkiem (zielona) | **Zweryfikowany kontakt** — zweryfikowałeś klucz tego węzła osobiście, wymieniając się kodami QR kontaktu, więc jego tożsamość jest potwierdzona. Najsilniejsze zaufanie, jakie pokazuje lista. Twój własny podłączony węzeł też ją ma | Dowolna wersja firmware |
+| Ikona węzłów z tarczą z ptaszkiem (zielona) | **Podpisany węzeł** — ten węzeł podpisuje swoje transmisje kluczem tożsamości, więc jego tożsamość jest spójna w czasie, ale nie zweryfikowałeś go osobiście. W firmware 2.8 ikona pojawia się już na podstawie samej wersji, zanim usłyszysz jakąkolwiek podpisaną transmisję | Firmware 2.8 lub nowsze oraz każdy węzeł, którego podpisaną transmisję Twój węzeł zweryfikował |
+| 🔒 Zamknięta kłódka | Klucz publiczny jest zapisany i zgadza się, więc wiadomości bezpośrednie do tego węzła są szyfrowane | Firmware starsze niż 2.8 lub brak zgłoszonej wersji |
+| 🔓 Otwarta kłódka | Nie otrzymano klucza publicznego tego węzła, więc nie można wysyłać mu wiadomości bezpośrednich — użyj **Poproś o informacje użytkownika** na stronie szczegółów węzła, aby o niego poprosić | Firmware starsze niż 2.8 lub brak zgłoszonej wersji |
+| ⚠️ Niezgodność | **Niezgodność klucza publicznego** — po zapisaniu klucza dla tego węzła nadszedł inny klucz. Zbadaj sprawę, zanim zaufasz | Dowolna wersja firmware |
 
-| Icon                                                      | Meaning                                                                                                                                                                                                                                                                                     | Shown for                                                                                         |
-| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Person with a shield check (green)     | **Verified contact** — you verified this node's key in person by exchanging contact QR codes, so its identity is confirmed. The strongest trust the list shows. Your own connected node carries it too                                                      | Any firmware version                                                                              |
-| Nodes icon with a shield check (green) | **Signed node** — this node signs its broadcasts with its identity key, so its identity is consistent over time, but you haven't verified it in person. On firmware 2.8 the icon appears from the version alone, before any signed broadcast has been heard | Firmware 2.8 or newer, and any node whose signed broadcast your node has verified |
-| 🔒 Closed lock                                            | A public key is on file and matches, so direct messages to this node are encrypted                                                                                                                                                                                                          | Firmware before 2.8, or no reported version                                       |
-| 🔓 Open lock                                              | No public key has been received for this node, so it can't be direct messaged — use **Request User Info** on the node detail page to ask for one                                                                                                                                            | Firmware before 2.8, or no reported version                                       |
-| ⚠️ Mismatch                                               | **Public key mismatch** — a different key arrived for this node after one was stored. Investigate before trusting                                                                                                                                                           | Any firmware version                                                                              |
+Każdy węzeł z firmware 2.8 lub nowszym podpisuje swoje transmisje, więc w tym firmware stan podpisany jest stanem podstawowym, a kłódki nie są pokazywane.
 
-Every node on firmware 2.8 or newer signs its broadcasts, so on that firmware the signed state is the baseline and the locks aren't shown.
+Wiadomości bezpośrednie zawsze używają szyfrowania kluczem publicznym, więc Twój węzeł potrzebuje klucza publicznego drugiego węzła, zanim będzie mógł wysłać wiadomość. Odmawia wysłania zamiast przechodzić na szyfrowanie kanału. Klucze przychodzą wewnątrz informacji o węźle, dlatego otwarta kłódka zwykle znika sama, gdy ten węzeł zostanie poprawnie usłyszany.
 
-Direct messages always use public-key encryption, so your node needs the other node's public key before it can send one. It refuses the send rather than falling back to channel encryption. Keys arrive inside node info, which is why an open lock usually clears itself once that node is heard from properly.
+Niezgodność nigdy nie zastępuje klucza, który już masz. Aplikacja zachowuje pierwszy zapisany klucz i odrzuca nowy, tak jak robi to firmware, aby przypadkowa lub wroga informacja o węźle nie mogła po cichu zepsuć szyfrowanych wiadomości do kontaktu. Aby usunąć niezgodność, najpierw potwierdź innym zaufanym kanałem, że zmiana klucza była zamierzona — powoduje ją na przykład reset do ustawień fabrycznych. Następnie dotknij i przytrzymaj węzeł, wybierz **Usuń** i pozwól obu węzłom ponownie wymienić się kluczami, gdy Twój go usłyszy.
 
-A mismatch never replaces the key you already hold. The app keeps the first key it recorded and refuses the new one, as the firmware does, so a stray or hostile node info can't silently break encrypted messaging to a contact. To clear a mismatch, first confirm through another trusted channel that the key change was intentional — a factory reset causes one. Then touch & hold the node, choose **Remove**, and let the two nodes exchange keys again the next time yours hears it.
+## Szybkie akcje
 
-## Quick Actions
-
-From the node list, you can:
-
-- **Tap** a node to view its detail page
-- **Touch & hold** for quick actions:
-  - Mark/remove favorite
-  - Mute/unmute notifications
-  - Send a direct message
-  - Trace route
-  - Ignore/unignore
+Z listy węzłów możesz:
+- **Dotknąć** węzła, aby zobaczyć jego stronę szczegółów
+- **Dotknąć i przytrzymać**, aby wywołać szybkie akcje:
+  - Oznacz/usuń z ulubionych
+  - Wycisz/wyłącz wyciszenie powiadomień
+  - Wyślij wiadomość bezpośrednią
+  - Pokaż trasę
+  - Zignoruj/przestań ignorować
   - Usuń
 
-Touch & hold **your own node** instead and you get one action, **Update status**, which opens the
-User settings screen with the cursor already in the Status Message field. It only appears while the
-node is connected and running firmware 2.8 or newer — see
-[Settings — Radio & User](settings-radio-user.md) for the field itself.
+Jeśli dotkniesz i przytrzymasz **własny węzeł**, dostaniesz jedną akcję, **Status aktualizacji**, która otwiera
+ekran ustawień Użytkownika z kursorem już w polu Status Message. Pojawia się tylko wtedy, gdy
+węzeł jest połączony i ma firmware 2.8 lub nowsze — samo pole opisano w
+[Ustawienia — Radio i użytkownik](settings-radio-user.md).
 
-## Sharing a contact
+## Udostępnianie kontaktu
 
-On a node's detail screen, tap **Share Contact** to produce a link and a QR code for that node. From the same dialog, **Share link** opens the Android share sheet (on desktop it copies the link instead), **Write to NFC tag** saves it to a writable NFC tag, and **Copy** puts it on the clipboard. While that dialog is open and in front of you, the phone also offers the same link to any NFC reader, so someone can take the contact by tapping their phone against yours with no tag involved.
+Na ekranie szczegółów węzła dotknij **Udostępnij kontakt**, aby uzyskać link i kod QR tego węzła. W tym samym oknie **Udostępnij link** otwiera systemowe menu udostępniania Androida (na komputerze zamiast tego kopiuje link), **Zapisz na tagu NFC** zapisuje go na zapisywalnym tagu NFC, a **Kopiuj** umieszcza go w schowku. Gdy to okno jest otwarte i przed Tobą, telefon oferuje też ten sam link każdemu czytnikowi NFC, więc ktoś może przejąć kontakt, przykładając swój telefon do Twojego, bez żadnego tagu.
 
-Sharing your own contact this way marks it as verified in person, so whoever imports it sees the **Verified contact** icon rather than the signed one. Relaying someone else's contact passes on only what your app had already recorded about them.
+Udostępnienie w ten sposób własnego kontaktu oznacza go jako zweryfikowany osobiście, więc osoba, która go zaimportuje, zobaczy ikonę **Zweryfikowany kontakt**, a nie ikonę podpisanego węzła. Przekazanie cudzego kontaktu dalej przekazuje tylko to, co Twoja aplikacja już o nim zapisała.
 
-To add someone else's contact, use the import button on the node list and choose **Scan Shared Contact QR Code**, **Scan Shared Contact NFC**, or **Input Shared Contact URL**. The app asks you to confirm with **Import Shared Contact?**, and warns you when the contact is one you already have.
+Aby dodać cudzy kontakt, użyj przycisku importu na liście węzłów i wybierz **Skanuj kod QR udostępnionego kontaktu**, **Skanuj udostępniony kontakt (NFC)** albo **Wpisz URL udostępnionego kontaktu**. Aplikacja prosi o potwierdzenie przez **Zaimportować udostępniony kontakt?** i ostrzega, gdy kontakt jest już Twoim kontaktem.
 
-## Filtering & sorting
+## Filtrowanie i sortowanie
 
-### Text search
+### Wyszukiwanie tekstowe
 
-Type in the search field to filter nodes by name or short name. The filter updates in real time as you type.
+Wpisz tekst w polu wyszukiwania, aby filtrować węzły według nazwy lub nazwy skróconej. Filtr aktualizuje się na bieżąco w trakcie pisania.
 
-### Filter toggles
+### Przełączniki filtrów
 
-| Filtr                       | Opis                                                                                                                                                                                                                                                                                                                         |
-| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Hide offline nodes**      | Show only nodes heard within the last 2 hours                                                                                                                                                                                                                                                                                |
-| **Only show direct nodes**  | Show only nodes your node heard directly, with no relay in between                                                                                                                                                                                                                                                           |
-| **Include unknown**         | Show nodes that haven't sent user info yet. **On by default**, so a node heard before its info arrives stays visible; these carry a badge marking them incomplete, and can't be direct messaged until their user info brings a public key                                                                    |
-| **Exclude infrastructure**  | Hide infrastructure-role nodes (Router, Router Late, Client Base, and legacy Repeater nodes) and any node that can't be messaged, whatever its role                                                                                                                                                       |
-| **Exclude MQTT**            | Hide nodes heard only via MQTT internet bridge                                                                                                                                                                                                                                                                               |
-| **Hide unheard nodes**      | Hide nodes your own node hasn't heard since its LoRa settings changed. Off by default, and it does nothing on firmware that doesn't report whether a node was heard on the current settings                                                                                                                  |
-| **Signed only**             | Show only nodes whose signed broadcasts your node has actually heard and verified. Stricter than the icon: a node on 2.8 shows as signed by its firmware version before any signed broadcast arrives, and a contact verified in person on older firmware isn't signed at all |
-| **Encrypted only**          | Show nodes with a matching public key on file, the key an encrypted direct message needs. A node with a key mismatch is excluded                                                                                                                                                                             |
-| **Only show ignored Nodes** | Replace the list with the nodes you have ignored. Every other node is hidden while this is on, and a banner appears at the top of the list to take you back                                                                                                                                                  |
+| Filtr | Opis |
+|--------|-------------|
+| **Schowaj nieaktywne węzły** | Pokazuje tylko węzły usłyszane w ciągu ostatnich 2 godzin |
+| **Pokaż tylko bezpośrednie węzły** | Pokazuje tylko węzły, które Twój węzeł usłyszał bezpośrednio, bez przekaźnika pomiędzy |
+| **Pokaż nierozpoznane** | Pokazuje węzły, które nie wysłały jeszcze informacji o użytkowniku. **Domyślnie włączone**, więc węzeł usłyszany przed nadejściem jego informacji pozostaje widoczny; takie węzły mają plakietkę oznaczającą niekompletność i nie można wysyłać im wiadomości bezpośrednich, dopóki ich informacje o użytkowniku nie przyniosą klucza publicznego |
+| **Wyklucz infrastrukturę** | Ukrywa węzły o rolach infrastrukturalnych (Router, Router pomocniczy, Klient bazowy i dawne węzły Repeater) oraz każdy węzeł, któremu nie można wysłać wiadomości, niezależnie od roli |
+| **Wyklucz MQTT** | Ukrywa węzły słyszane wyłącznie przez most internetowy MQTT |
+| **Wyklucz nieusłyszane węzły** | Ukrywa węzły, których Twój węzeł nie słyszał od zmiany swoich ustawień LoRa. Domyślnie wyłączone i nie robi nic w firmware, które nie zgłasza, czy węzeł został usłyszany przy obecnych ustawieniach |
+| **Pokaż tylko podpisane węzły** | Pokazuje tylko węzły, których podpisane transmisje Twój węzeł faktycznie usłyszał i zweryfikował. Bardziej rygorystyczne niż ikona: węzeł z firmware 2.8 jest pokazywany jako podpisany na podstawie wersji firmware, zanim nadejdzie jakakolwiek podpisana transmisja, a kontakt zweryfikowany osobiście na starszym firmware nie jest w ogóle podpisany |
+| **Pokaż tylko szyfrowane węzły** | Pokazuje węzły z pasującym kluczem publicznym, którego potrzebuje zaszyfrowana wiadomość bezpośrednia. Węzeł z niezgodnością klucza jest wykluczony |
+| **Pokaż tylko ignorowane węzły** | Zastępuje listę węzłami, które zignorowałeś. Wszystkie pozostałe węzły są ukryte, gdy to jest włączone, a u góry listy pojawia się baner umożliwiający powrót |
 
-### Nodes not heard on your current Settings
+### Węzły nie słyszane przy Twoich obecnych ustawieniach
 
-When your node's LoRa settings change — a different preset, region or frequency slot — nodes heard
-under the old settings are still in the list but can no longer be reached. The app marks them with
-an orange last-heard time and a crossed-out signal icon, and shows a banner at the top of the list:
-**N nodes not heard on your current LoRa settings**.
+Gdy ustawienia LoRa Twojego węzła się zmieniają — inny preset, region lub slot częstotliwości — węzły
+słyszane przy starych ustawieniach nadal są na liście, ale nie można się już z nimi połączyć. Aplikacja oznacza je
+pomarańczowym czasem ostatniej aktywności i przekreśloną ikoną sygnału oraz pokazuje u góry listy baner:
+**N węzłów nie słyszanych od zmiany ustawień**.
 
-The banner offers two actions:
+Baner oferuje dwie akcje:
 
-- **Keep** dismisses the banner and leaves every node in place.
-- **Remove** deletes those nodes from the list. Your favorites and your own node are never removed.
+- **Zachowaj** zamyka baner i zostawia wszystkie węzły na miejscu.
+- **Usuń** kasuje te węzły z listy. Twoje ulubione i Twój własny węzeł nigdy nie są usuwane.
 
-**Remove** is a bulk delete and there is no undo, so use **Keep** if you expect to switch back to
-the old settings. Removed nodes reappear if your node hears them again.
+**Usuń** to masowe usuwanie bez możliwości cofnięcia, więc użyj **Zachowaj**, jeśli spodziewasz się powrotu
+do starych ustawień. Usunięte węzły pojawiają się ponownie, jeśli Twój węzeł znów je usłyszy.
 
-The **Hide unheard nodes** filter does the same hiding without deleting anything.
+Filtr **Wyklucz nieusłyszane węzły** ukrywa je w ten sam sposób, ale niczego nie usuwa.
 
-### Sort options
+### Opcje sortowania
 
-| Sort                                          | Opis                                                               |
-| --------------------------------------------- | ------------------------------------------------------------------ |
-| **Last heard**                                | Most recently heard nodes first                                    |
-| **A-Z**                                       | Sorted by node long name                                           |
-| **Distance**                                  | Nearest nodes first (requires position sharing) |
-| **Hops away**                                 | Fewest relay hops first                                            |
-| **Channel**                                   | Grouped by channel index                                           |
-| **via MQTT**                                  | Grouped by MQTT vs. node-heard                     |
-| **via Favorite** (default) | Favorited nodes first, then the rest                               |
+| Sortowanie | Opis |
+|------|-------------|
+| **Aktywność** | Najpierw ostatnio słyszane węzły |
+| **Nazwa** | Według długiej nazwy węzła |
+| **Dystans** | Najpierw najbliższe węzły (wymaga udostępniania pozycji) |
+| **Liczba skoków** | Najpierw najmniej skoków przez przekaźniki |
+| **Kanał** | Pogrupowane według indeksu kanału |
+| **Przez MQTT** | Pogrupowane: przez MQTT i słyszane przez węzeł |
+| **Przez ulubione** (domyślne) | Najpierw ulubione węzły, potem reszta |
 
-## Nodes per hop
+## Węzły na skok
 
-Tap the hop-histogram icon in the node list's app bar to open a bar chart of how many nodes sit at each hop distance (0 = direct, 1 = one relay away, and so on). Filter the chart to a **last heard** window — **All**, **1 Hour**, **8 Hours** or **24H** — to see how the mesh looks right now versus over a longer period. It's a quick way to gauge how busy and spread out your local mesh is.
+Dotknij ikony histogramu skoków na pasku aplikacji listy węzłów, aby otworzyć wykres słupkowy pokazujący, ile węzłów znajduje się na każdej odległości w skokach (0 = bezpośrednio, 1 = jeden przekaźnik dalej itd.). Przefiltruj wykres do okna **ostatnio słyszane** — **Wszystkie**, **1 godzina**, **8 godzin** lub **24H** — aby zobaczyć, jak sieć mesh wygląda teraz, a jak w dłuższym okresie. To szybki sposób na ocenę, jak ruchliwa i rozległa jest Twoja lokalna sieć mesh.
 
-## Node detail
+## Szczegóły węzła
 
-Tapping a node opens the detail view with comprehensive information. See [Node Metrics](node-metrics) for full details on metrics and telemetry.
+Dotknięcie węzła otwiera widok szczegółów z pełnymi informacjami. Pełne informacje o metrykach i telemetrii znajdziesz w [Metryki węzła](node-metrics).
 
-Signal quality is rated against your modem preset. The same SNR can be good on a long-range preset and poor on a faster one. Traceroute and neighbor-info SNR colors use that preset too. RSSI text has its own strength colors; it affects the quality rating only when a noise-floor reading is also available.
+Jakość sygnału jest oceniana względem Twojego presetu modemu. Ten sam SNR może być dobry na presecie dalekiego zasięgu, a słaby na szybszym. Kolory SNR w traceroute i informacjach o sąsiadach również używają tego presetu. Tekst RSSI ma własne kolory siły sygnału; wpływa na ocenę jakości tylko wtedy, gdy dostępny jest też odczyt poziomu szumu.
 
-The Details card carries the node's short name, role, IDs, last heard time, hops away, uptime, and its SNR and RSSI:
+Karta Szczegóły zawiera nazwę skróconą węzła, rolę, identyfikatory, czas ostatniej aktywności, liczbę skoków, czas pracy oraz jego SNR i RSSI:
 
-![Node detail section](../../assets/screenshots/nodes_detail_section.png)
+![Sekcja szczegółów węzła](../../assets/screenshots/nodes_detail_section.png)
 
-Inline status indicators show key metrics at a glance:
+Wbudowane wskaźniki stanu pokazują najważniejsze metryki na pierwszy rzut oka:
 
-| Indicator                  | Screenshot                                                    |
-| -------------------------- | ------------------------------------------------------------- |
-| Signal quality             | ![Signal](../../assets/screenshots/nodes_signal_info.png)     |
-| Poziom naładowania baterii | ![Battery](../../assets/screenshots/nodes_battery_info.png)   |
-| Hop count                  | ![Hops](../../assets/screenshots/nodes_hops_info.png)         |
-| Aktywność                  | ![Last heard](../../assets/screenshots/nodes_last_heard.png)  |
-| Odległość                  | ![Distance](../../assets/screenshots/nodes_distance_info.png) |
+| Wskaźnik | Zrzut ekranu |
+|-----------|------------|
+| Jakość sygnału | ![Sygnał](../../assets/screenshots/nodes_signal_info.png) |
+| Poziom baterii | ![Bateria](../../assets/screenshots/nodes_battery_info.png) |
+| Liczba skoków | ![Skoki](../../assets/screenshots/nodes_hops_info.png) |
+| Ostatnio słyszany | ![Ostatnio słyszany](../../assets/screenshots/nodes_last_heard.png) |
+| Odległość | ![Odległość](../../assets/screenshots/nodes_distance_info.png) |
 
-### Hardware support status
+### Status wsparcia sprzętu
 
-When a node's hardware is recognized, the detail view names the device and marks its support status, taken from the Meshtastic device registry rather than the app:
+Gdy sprzęt węzła zostanie rozpoznany, widok szczegółów podaje nazwę urządzenia i oznacza jego status wsparcia, pobrany z rejestru urządzeń Meshtastic, a nie z aplikacji:
 
-| Mark                                 | Meaning                                                                                                                                         |
-| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| Rosette (green)   | **Supported** — hardware the Meshtastic project actively supports                                                                               |
-| Wrench (sky blue) | **Independent maker hardware** — built and tested by an independent maker, shown as its own rung whether or not the project has promoted it yet |
-| Unverified (red)  | **Supported by Meshtastic Community** — hardware the project does not actively support, including legacy boards                                 |
+| Oznaczenie | Znaczenie |
+| --- | --- |
+| Rozeta (zielona) | **Wspierany** — sprzęt aktywnie wspierany przez projekt Meshtastic |
+| Klucz francuski (błękitny) | **Sprzęt niezależnego producenta** — zbudowany i przetestowany przez niezależnego producenta, pokazywany jako osobny szczebel niezależnie od tego, czy projekt już go awansował |
+| Niezweryfikowany (czerwony) | **Wspierany przez społeczność Meshtastic** — sprzęt, którego projekt aktywnie nie wspiera, w tym starsze płytki |
 
-The label always accompanies the mark, so the status is never conveyed by colour alone.
+Etykieta zawsze towarzyszy oznaczeniu, więc status nigdy nie jest przekazywany samym kolorem.
 
-### Device links ("I want one")
+### Linki do urządzeń („Chcę taki”)
 
-When a node's hardware is recognized, the detail view shows a collapsible **"I want one"** section linking to places to buy or learn more about that device: the vendor's product page, product variants, and regional marketplace listings (such as AliExpress, Amazon, and supported retailers), filtered to your country. Each link opens through the `msh.to` redirect service. Devices with no matching links don't show the section.
+Gdy sprzęt węzła zostanie rozpoznany, widok szczegółów pokazuje zwijaną sekcję **„Chcę taki”** z linkami do miejsc, gdzie można kupić to urządzenie lub dowiedzieć się o nim więcej: strona produktu producenta, warianty produktu i oferty regionalnych sklepów (takich jak AliExpress, Amazon i wspierani sprzedawcy), przefiltrowane do Twojego kraju. Każdy link otwiera się przez usługę przekierowań `msh.to`. Urządzenia bez pasujących linków nie pokazują tej sekcji.
 
-A full, browsable directory of every link is also available at **Settings → Device Links**. The item is hidden while you have Settings open for a remote node.
+Pełny, przeglądalny katalog wszystkich linków jest też dostępny w **Ustawienia → Linki urządzenia**. Pozycja jest ukryta, gdy ustawienia są otwarte dla zdalnego węzła.
 
-Some of these are affiliate links. Both places say so above the links: product links may be affiliate links, and purchases may earn Meshtastic a commission.
+Niektóre z tych linków są linkami afiliacyjnymi. Oba miejsca informują o tym nad linkami: linki do produktów mogą być afiliacyjne, a zakupy mogą przynosić Meshtastic prowizję.
 
-### Remote shell
+### Zdalny terminal
 
-**Open terminal**, in the node's **Administration** card, opens a shell on a Linux node running `meshtasticd` 2.8.2 or later, carried over the mesh. The node accepts it only from a radio whose public key is in its **Security → Admin key** list, the same list remote administration uses; the app starts that admin session first if there isn't one, and the card's title shows whether it is active. The terminal takes the whole window. If the node never answers, the screen says so after a minute.
+**Otwórz terminal**, w karcie **Zarządzanie** węzła, otwiera powłokę na węźle z Linuksem uruchamiającym `meshtasticd` 2.8.2 lub nowszy, przesyłaną przez sieć mesh. Węzeł akceptuje ją tylko od radia, którego klucz publiczny jest na jego liście **Bezpieczeństwo → Klucz administratora**, tej samej, której używa zdalne zarządzanie; aplikacja najpierw rozpoczyna tę sesję administracyjną, jeśli jej nie ma, a tytuł karty pokazuje, czy jest aktywna. Terminal zajmuje całe okno. Jeśli węzeł nigdy nie odpowie, ekran informuje o tym po minucie.
 
-The mesh carries a few hundred bytes a second, and the terminal is built around that:
+Sieć mesh przenosi kilkaset bajtów na sekundę i terminal jest zbudowany z myślą o tym:
 
-- Once the node has echoed the first character of a line, what you type appears **underlined** at the cursor until the node echoes it back. At a prompt that doesn't echo, such as a password, nothing you type is shown; in line mode the command box masks its text and keeps it out of history.
-- The subtitle shows the measured round trip. When the node stops answering, a line at the top of the terminal says how long ago it was last heard.
-- The two rows of extra keys give **ESC**, **TAB**, arrows, **HOME**, **END**, **PGUP** and **PGDN**. **CTRL** and **ALT** are sticky: tap once to apply to the next key, twice to lock, a third time to release. **CTRL** then **c** interrupts a running command. A hardware keyboard's Ctrl and Alt work as usual.
-- **Line mode**, in the **⋮** menu, gives you a command box: each command goes out in one transmission, **↑** and **↓** recall earlier commands without asking the node, and chips offer common commands for a `meshtasticd` host. It is the cheapest way to use the shell on a busy mesh.
-- The **⋮** menu also pastes from the clipboard and changes the text size.
+- Gdy węzeł odeśle echem pierwszy znak wiersza, to, co wpisujesz, pojawia się **podkreślone** przy kursorze, dopóki węzeł nie odeśle echa. Przy znaku zachęty, który nie robi echa, np. przy haśle, nic z tego, co wpisujesz, nie jest pokazywane; w trybie liniowym pole poleceń maskuje tekst i nie zapisuje go w historii.
+- Podtytuł pokazuje zmierzony czas odpowiedzi. Gdy węzeł przestaje odpowiadać, wiersz u góry terminala podaje, jak dawno był ostatnio słyszany.
+- Dwa rzędy dodatkowych klawiszy dają **ESC**, **TAB**, strzałki, **HOME**, **END**, **PGUP** i **PGDN**. **CTRL** i **ALT** są lepkie: dotknij raz, aby zadziałały na następny klawisz, dwa razy, aby zablokować, trzeci raz, aby zwolnić. **CTRL** a potem **c** przerywa uruchomione polecenie. Ctrl i Alt klawiatury sprzętowej działają jak zwykle.
+- **Tryb liniowy** (Line mode), w menu **⋮**, daje pole poleceń: każde polecenie jest wysyłane jedną transmisją, **↑** i **↓** przywołują wcześniejsze polecenia bez pytania węzła, a podpowiedzi oferują typowe polecenia dla hosta `meshtasticd`. To najtańszy sposób użycia powłoki w zajętej sieci mesh.
+- Menu **⋮** pozwala też wklejać ze schowka i zmieniać rozmiar tekstu.
 
-Colour, progress lines and `clear` display as they would in a desktop terminal. Full-screen programs such as `vi` or `top` redraw the whole screen for each key, which the mesh cannot carry; the terminal shows a notice instead.
+Kolory, wiersze postępu i `clear` wyświetlają się tak jak w terminalu na komputerze. Programy pełnoekranowe, takie jak `vi` czy `top`, przerysowują cały ekran przy każdym klawiszu, czego sieć mesh nie uniesie; terminal pokazuje wtedy komunikat.
 
-## When no nodes appear
+## Gdy nie widać żadnych węzłów
 
-The list stays empty until your node hears another node.
+Lista pozostaje pusta, dopóki Twój węzeł nie usłyszy innego węzła.
 
-- **No device connected** — the app isn't connected to a node. See [Connections](connections).
-- **Searching for nodes** — the node is connected and listening, but nothing has arrived yet. Check that its region and modem preset match the mesh around you, and leave **Include unknown** on so a node that hasn't yet sent its name still appears. See [Settings — Radio & User](settings-radio-user).
-- A node you expect is missing — check the filter toggles. **Only show direct nodes**, **Exclude MQTT**, and **Exclude infrastructure** each hide a whole category of node.
+- **Brak podłączonych urządzeń** — aplikacja nie jest połączona z węzłem. Zobacz [Połączenia](connections).
+- **Wyszukiwanie węzłów** — węzeł jest połączony i nasłuchuje, ale nic jeszcze nie dotarło. Sprawdź, czy jego region i preset modemu zgadzają się z siecią mesh wokół Ciebie, i zostaw włączone **Pokaż nierozpoznane**, aby węzeł, który nie wysłał jeszcze swojej nazwy, nadal się pojawiał. Zobacz [Ustawienia — Radio i użytkownik](settings-radio-user).
+- Brakuje oczekiwanego węzła — sprawdź przełączniki filtrów. **Pokaż tylko bezpośrednie węzły**, **Wyklucz MQTT** i **Wyklucz infrastrukturę** ukrywają po całej kategorii węzłów.
 
-## Related Topics
+## Zobacz także
 
-- [Node Metrics](node-metrics) — detailed telemetry dashboards for each node
-- [Messages & Channels](messages-and-channels) — send a direct message to a node
-- [Map & Waypoints](map-and-waypoints) — view node positions geographically
-- [Local Mesh Discovery](discovery) — traceroute and neighbor info for topology exploration
-- [Signal Meter](signal-meter) — understand what the signal bars mean
+- [Metryki węzła](node-metrics) — szczegółowe panele telemetrii każdego węzła
+- [Wiadomości i kanały](messages-and-channels) — wyślij wiadomość bezpośrednią do węzła
+- [Mapa i punkty trasy](map-and-waypoints) — zobacz pozycje węzłów na mapie
+- [Odkrywanie lokalnej sieci mesh](discovery) — traceroute i informacje o sąsiadach do badania topologii
+- [Miernik sygnału](signal-meter) — zrozum, co oznaczają paski sygnału

@@ -1,8 +1,9 @@
 ---
-title: Telemetry & Sensors
+title: Telemetria i czujniki
+parent: Przewodnik użytkownika
 nav_order: 9
 last_updated: 2026-09-18
-description: Sensor data on the mesh — supported environment, air quality, and power sensors, plus configuration and viewing guides.
+description: Dane z czujników w sieci mesh — obsługiwane czujniki środowiska, jakości powietrza i zasilania oraz poradniki konfiguracji i podglądu.
 aliases:
   - sensors
   - environment
@@ -10,144 +11,144 @@ aliases:
   - power-metrics
 ---
 
-# Telemetry & Sensors
+# Telemetria i czujniki
 
-Meshtastic nodes can collect and share sensor data across the mesh network. Telemetry allows nodes equipped with sensors to broadcast environmental, power, and device health information, visible on the node detail screen and logged over time.
+Węzły mogą zbierać dane z czujników i udostępniać je w sieci mesh. Telemetria pozwala węzłom wyposażonym w czujniki rozsyłać informacje o środowisku, zasilaniu i stanie urządzenia, widoczne na ekranie szczegółów węzła i zapisywane w czasie.
 
-## Device Telemetry
+## Telemetria urządzenia
 
-All Meshtastic nodes report basic device telemetry:
+Wszystkie węzły raportują podstawową telemetrię urządzenia:
 
-| Metric                     | Opis                                            | Typical Range                                                      |
-| -------------------------- | ----------------------------------------------- | ------------------------------------------------------------------ |
-| Poziom naładowania baterii | Charge percentage                               | 0–100%                                                             |
-| Napięcie                   | Battery voltage                                 | 3.0–4.2V (LiPo) |
-| ChUtil                     | % of local airtime in use                       | 0–100%                                                             |
-| AirUtil                    | % of the last hour this node spent transmitting | 0–100%                                                             |
-| Czas pracy                 | Seconds since last boot                         | Varies                                                             |
+| Wartość | Opis | Typowy zakres |
+|--------|-------------|---------------|
+| Poziom baterii | Procent naładowania | 0–100% |
+| Napięcie | Napięcie baterii | 3,0–4,2 V (LiPo) |
+| ChUtil | % lokalnego czasu antenowego w użyciu | 0–100% |
+| AirUtil | % ostatniej godziny, który ten węzeł spędził na nadawaniu | 0–100% |
+| Czas pracy | Sekundy od ostatniego uruchomienia | Różnie |
 
-## Environment Sensors
+## Czujniki środowiska
 
-Supported environmental sensors:
+Obsługiwane czujniki środowiskowe:
 
-### Temperature & Humidity
+### Temperatura i wilgotność
 
-| Czujnik | Temperatura | Wilgotność | Ciśnienie | Notatki                 |
-| ------- | ----------- | ---------- | --------- | ----------------------- |
-| BME280  | ✓           | ✓          | ✓         | Recommended all-in-one  |
-| BME680  | ✓           | ✓          | ✓         | Adds gas resistance/IAQ |
-| SHT31   | ✓           | ✓          | —         | High accuracy           |
-| MCP9808 | ✓           | —          | —         | Precision temperature   |
-| LPS22   | —           | —          | ✓         | Pressure only           |
+| Czujnik | Temperatura | Wilgotność | Ciśnienie | Uwagi |
+|--------|-------------|----------|----------|-------|
+| BME280 | ✓ | ✓ | ✓ | Polecany, wszystko w jednym |
+| BME680 | ✓ | ✓ | ✓ | Dodaje rezystancję gazu/IAQ |
+| SHT31 | ✓ | ✓ | — | Wysoka dokładność |
+| MCP9808 | ✓ | — | — | Precyzyjna temperatura |
+| LPS22 | — | — | ✓ | Tylko ciśnienie |
 
-### Air Quality
+### Jakość powietrza
 
-| Czujnik  | Metric                                             | Notatki                                                                                                                                                                                                                    |
-| -------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| BME680   | Gas Resistance / IAQ                               | Volatile organic compounds                                                                                                                                                                                                 |
-| PMSA003I | PM1.0, PM2.5, PM10 | See [Air Quality Metrics](#air-quality-metrics)                                                                                                                                                                            |
-| SEN55    | PM, Temp, Humidity                                 | Multi-sensor. Its NOx and VOC indices are recorded and included in a CSV export, but are not shown as cards or charts                                                                                      |
-| SEN6x    | PM, CO₂, Temp, Humidity                            | Its status register is always exported; when it reports a fault (fan, RH&T, gas, CO₂, HCHO or PM), the fault names appear as a Sensor Status card and on each Air Quality log entry |
+| Czujnik | Wartość | Uwagi |
+|--------|--------|-------|
+| BME680 | Rezystancja gazu / IAQ | Lotne związki organiczne |
+| PMSA003I | PM1.0, PM2.5, PM10 | Zobacz [Metryki jakości powietrza](#air-quality-metrics) |
+| SEN55 | PM, temp., wilgotność | Czujnik wielofunkcyjny. Jego wskaźniki NOx i VOC są zapisywane i dołączane do eksportu CSV, ale nie są pokazywane jako karty ani wykresy |
+| SEN6x | PM, CO₂, temp., wilgotność | Jego rejestr statusu jest zawsze eksportowany; gdy zgłasza usterkę (wentylator, RH&T, gaz, CO₂, HCHO lub PM), nazwy usterek pojawiają się na karcie Status czujnika oraz przy każdym wpisie dziennika jakości powietrza |
 
-### Soil
+### Gleba
 
-| Metric     | Unit    | Notatki                                         |
-| ---------- | ------- | ----------------------------------------------- |
-| Soil Temp  | °C / °F | Reported alongside soil moisture by soil probes |
-| Soil Moist | %       | Volumetric water content                        |
+| Wartość | Jednostka | Uwagi |
+|--------|------|-------|
+| Temp. gleby | °C / °F | Raportowana razem z wilgotnością gleby przez sondy glebowe |
+| Wilgotność gleby | % | Objętościowa zawartość wody |
 
-Both appear as info cards on the node detail screen, next to the other environment readings.
+Obie wartości pojawiają się jako karty informacyjne na ekranie szczegółów węzła, obok pozostałych odczytów środowiska.
 
-Soil probe and water-quality sonde chemistry (pH, conductivity, salinity, NPK, dissolved oxygen, ORP, turbidity, nitrate, ammonium, oxygen demand, solar irradiance) appears as a **Soil & Water** row of info cards on the node detail screen once a node reports any of it, and is included in the node database export. There is no chart or log screen for it yet.
+Chemia z sond glebowych i sond jakości wody (pH, przewodność, zasolenie, NPK, tlen rozpuszczony, ORP, mętność, azotany, amon, zapotrzebowanie na tlen, natężenie promieniowania słonecznego) pojawia się w wierszu kart informacyjnych **Gleba i woda** (Soil & Water) na ekranie szczegółów węzła, gdy tylko węzeł zgłosi którąkolwiek z tych wartości, i jest dołączana do eksportu bazy węzłów. Nie ma dla nich jeszcze wykresu ani ekranu dziennika.
 
-### Light & UV
+### Światło i UV
 
-| Czujnik  | Metric                                 |
-| -------- | -------------------------------------- |
-| OPT3001  | Ambient light (lux) |
-| VEML7700 | Ambient light (lux) |
-| LTR390   | UV index                               |
+| Czujnik | Wartość |
+|--------|--------|
+| OPT3001 | Światło otoczenia (lux) |
+| VEML7700 | Światło otoczenia (lux) |
+| LTR390 | Indeks UV |
 
-### Weather and Other Readings
+### Pogoda i inne odczyty
 
-| Metric                                                 | Unit                 | Where it appears                                                                                                                                                                                                              |
-| ------------------------------------------------------ | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Wind speed                                             | km/h or mph          | Card and chart. Sensors report meters per second; the app converts to match your unit setting, and the chart uses the same unit as the card                                                                   |
-| Wind direction, gust, and lull                         | degrees, km/h or mph | Listed with each reading on the Environment Metrics screen; not charted                                                                                                                                                       |
-| Rainfall, last hour and last 24 hours                  | mm or in             | Listed with each reading on the Environment Metrics screen; not charted                                                                                                                                                       |
-| Lightning, strikes in the last hour and storm distance | count, km or mi      | Card and listed with each reading on the Environment Metrics screen; not charted. From an AS3935 detector. Storm distance is always in km or mi, since the detector resolves whole kilometres |
-| Promieniowanie                                         | µR/h                 | Card and chart                                                                                                                                                                                                                |
-| Weight                                                 | kg or lb             | Card only — load cells, such as a beehive scale                                                                                                                                                                               |
-| Odległość                                              | mm or in             | Card only — water level, from a distance sensor                                                                                                                                                                               |
-| Dew point                                              | °C or °F             | Card only — computed from temperature and humidity                                                                                                                                                                            |
-| 1-Wire temperature                                     | °C or °F             | Card and chart, up to eight DS18B20-style probes                                                                                                                                                                              |
-| ADC voltage                                            | V                    | Card and chart, up to eight raw analog channels                                                                                                                                                                               |
+| Wartość | Jednostka | Gdzie się pojawia |
+|--------|------|------------------|
+| Prędkość wiatru | km/h lub mph | Karta i wykres. Czujniki podają metry na sekundę; aplikacja przelicza na jednostkę z Twoich ustawień, a wykres używa tej samej jednostki co karta |
+| Kierunek wiatru, porywy i zastoje wiatru (lull) | stopnie, km/h lub mph | Wypisane przy każdym odczycie na ekranie Metryki środowiskowe; bez wykresu |
+| Opady deszczu, ostatnia godzina i ostatnie 24 godziny | mm lub in | Wypisane przy każdym odczycie na ekranie Metryki środowiskowe; bez wykresu |
+| Wyładowania, uderzenia w ostatniej godzinie i odległość burzy | liczba, km lub mi | Karta i wypisane przy każdym odczycie na ekranie Metryki środowiskowe; bez wykresu. Z detektora AS3935. Odległość burzy jest zawsze w km lub mi, ponieważ detektor podaje całe kilometry |
+| Promieniowanie | µR/h | Karta i wykres |
+| Waga | kg lub lb | Tylko karta — czujniki tensometryczne, np. waga ula |
+| Odległość | mm lub in | Tylko karta — poziom wody, z czujnika odległości |
+| Punkt rosy | °C lub °F | Tylko karta — obliczany z temperatury i wilgotności |
+| Temperatura 1-Wire | °C lub °F | Karta i wykres, do ośmiu sond typu DS18B20 |
+| Napięcie ADC | V | Karta i wykres, do ośmiu surowych kanałów analogowych |
 
 ## Metryki zasilania
 
-Nodes with INA-series power sensors can report:
+Węzły z czujnikami zasilania serii INA mogą raportować:
 
-| Metric    | Opis                            |
-| --------- | ------------------------------- |
-| Napięcie  | Per-channel voltage reading     |
-| Natężenie | Per-channel current draw, in mA |
+| Wartość | Opis |
+|--------|-------------|
+| Napięcie | Odczyt napięcia dla każdego kanału |
+| Prąd | Pobór prądu dla każdego kanału, w mA |
 
-The node detail screen shows read-only cards for channels 1 to 3. Use the chart button on the **Power Metrics** row to open the chart screen, which lists a chip for every channel that reported data — up to eight — and charts the one you select. Rename a channel there, in the label field under the chips, to something like Solar or Battery. There is no separate wattage reading; the app charts voltage and current, and does not compute power from them.
+Ekran szczegółów węzła pokazuje karty tylko do odczytu dla kanałów od 1 do 3. Przyciskiem wykresu w wierszu **Metryki zasilania** otwierasz ekran wykresu, który wyświetla chip dla każdego kanału, który przysłał dane — do ośmiu — i rysuje wykres wybranego. Tam, w polu etykiety pod chipami, możesz nazwać kanał, np. Solar albo Bateria. Nie ma osobnego odczytu mocy w watach; aplikacja rysuje napięcie i prąd i nie wylicza z nich mocy.
 
-Useful for monitoring solar charging or battery health on remote nodes.
+Przydatne do monitorowania ładowania słonecznego lub stanu baterii w odległych węzłach.
 
-## Configuring Telemetry
+## Konfiguracja telemetrii
 
-1. Navigate to **Settings → Module configuration → Telemetry**.
-2. Each metric group has its own enable toggle and its own interval:
+1. Przejdź do **Ustawienia → Ustawienia modułu → Telemetria**.
+2. Każda grupa wartości ma własny przełącznik włączenia i własny interwał:
+   - **Metryka urządzenia** — bateria, napięcie, czas pracy, ChUtil i AirUtil. Jej przełącznik, **Wysyłaj telemetrię urządzenia**, pojawia się tylko w firmware 2.7.12 i nowszym; w starszym firmware możesz zmienić interwał, ale nie wyłączysz grupy
+   - **Metryki środowiskowe** — temperatura, wilgotność, ciśnienie i inne odczyty z czujników
+   - **Metryki jakości powietrza** — odczyty pyłów i CO₂
+   - **Metryki zasilania** — odczyty napięcia i prądu dla każdego kanału
 
-   - **Device Metrics** — battery, voltage, uptime, ChUtil, and AirUtil. Its enable toggle, **Send Device Telemetry**, appears only on firmware 2.7.12 and later; on older firmware you can change the interval but not turn the group off
-   - **Environment Metrics** — temperature, humidity, pressure and the other sensor readings
-   - **Air Quality Metrics** — particulate and CO₂ readings
-   - **Power Metrics** — the per-channel voltage and current readings
+   Środowisko i zasilanie mają dodatkowy przełącznik pokazywania odczytów na własnym
+   ekranie radia, a środowisko ma jeszcze jeden, który pokazuje tam temperatury w Fahrenheitach.
 
-   Environment and Power each have an extra toggle to show their readings on the radio's own
-   screen, and Environment has one more to show its temperatures there in Fahrenheit.
+### Wybór interwału
 
-### Choosing an Interval
+To wartości nominalne, a nie sztywne harmonogramy. W przeciążonej sieci mesh firmware automatycznie
+wydłuża interwały w zależności od liczby węzłów online, więc nie musisz
+dobierać ich ręcznie do wielkości sieci. Wydłużaj je celowo tylko po to, by oszczędzać baterię.
 
-These are nominal values, not hard schedules. On a congested mesh the firmware automatically
-backs off to longer intervals based on how many nodes are online, so you do not need to
-hand-tune them for mesh size. Lengthen them deliberately only to save battery.
 
-## Air Quality Metrics
+## Metryki jakości powietrza
 
-Nodes with particulate matter or CO₂ sensors report air quality data:
+Węzły z czujnikami pyłów lub CO₂ raportują dane o jakości powietrza:
 
-| Metric                | Unit  | Opis                         |
-| --------------------- | ----- | ---------------------------- |
-| PM1.0 | µg/m³ | Ultrafine particulate matter |
-| PM2.5 | µg/m³ | Fine particulate matter      |
-| PM10                  | µg/m³ | Coarse particulate matter    |
-| CO₂                   | ppm   | Carbon dioxide concentration |
+| Wartość | Jednostka | Opis |
+|--------|------|-------------|
+| PM1.0 | µg/m³ | Pył ultradrobny |
+| PM2.5 | µg/m³ | Pył drobny |
+| PM10 | µg/m³ | Pył gruby |
+| CO₂ | ppm | Stężenie dwutlenku węgla |
 
-CO₂ sensors such as the SCD4x also report their own temperature and humidity, which appear alongside the readings above. From PM2.5 history the app additionally derives an **EPA NowCast AQI** value.
+Czujniki CO₂, takie jak SCD4x, raportują też własną temperaturę i wilgotność, które pojawiają się obok powyższych odczytów. Z historii PM2.5 aplikacja dodatkowo wylicza wartość **EPA NowCast AQI**.
 
-The CO₂ reading is color-coded by severity (Good → Stuffy → Poor → Unsafe → Evacuate). See [Node Metrics — Air Quality](node-metrics#air-quality-metrics) for the exact ppm bands, colors, and AQI detail.
+Odczyt CO₂ jest oznaczony kolorem według poziomu (Dobrze → Duszno → Źle → Niebezpiecznie → Ewakuacja). Dokładne przedziały ppm, kolory i szczegóły AQI znajdziesz w [Metryki węzła — jakość powietrza](node-metrics#air-quality-metrics).
 
-Air quality data can be viewed as info cards on the node detail screen, charted over time, and exported to CSV.
+Dane o jakości powietrza można oglądać jako karty informacyjne na ekranie szczegółów węzła, na wykresie w czasie i eksportować do CSV.
 
-## Viewing Telemetry
+## Podgląd telemetrii
 
-1. Navigate to **Nodes** and select a node.
-2. The **Telemetry** section lists a row for every metric type — Device, Environment, Air Quality, Power, and the rest — whether or not this node has reported it. A row fills in with readings, and grows a chart button, once that node has actually sent that kind of telemetry. An empty row means nothing has arrived yet, not that the sensor is missing.
-3. Use the chart button on a row to open that metric's history, where you can pick a time frame and export the readings as CSV.
+1. Przejdź do **Węzły** i wybierz węzeł.
+2. Sekcja **Telemetria** pokazuje wiersz dla każdego rodzaju wartości — urządzenie, środowisko, jakość powietrza, zasilanie i pozostałe — niezależnie od tego, czy węzeł już je zgłosił. Wiersz wypełnia się odczytami i zyskuje przycisk wykresu, gdy węzeł faktycznie wyśle ten rodzaj telemetrii. Pusty wiersz oznacza, że nic jeszcze nie dotarło, a nie że brakuje czujnika.
+3. Przyciskiem wykresu w wierszu otwierasz historię danej wartości, gdzie możesz wybrać przedział czasu i wyeksportować odczyty do CSV.
 
-![Node detail screen with the telemetry chart action menu open](../../assets/screenshots/node-metrics_telemetric_actions.png)
+![Ekran szczegółów węzła z otwartym menu działań wykresu telemetrii](../../assets/screenshots/node-metrics_telemetric_actions.png)
 
-## Troubleshooting
+## Rozwiązywanie problemów
 
-- **No environment data showing?** The remote node needs a physical sensor connected (e.g., BME280 on I2C). Device telemetry (battery, uptime) is always available, but environment metrics require hardware.
-- **Stale readings?** Check the reporting interval — very long intervals (7200s+) mean data updates infrequently. Also verify the remote node is still online.
-- **Sensor conflict on I2C bus?** Some sensors share I2C addresses. If you have multiple sensors on the same bus, check for address collisions in the radio's serial debug output.
+- **Brak danych środowiskowych?** Zdalny węzeł musi mieć podłączony fizyczny czujnik (np. BME280 na I2C). Telemetria urządzenia (bateria, czas pracy) jest zawsze dostępna, ale metryki środowiskowe wymagają sprzętu.
+- **Nieaktualne odczyty?** Sprawdź interwał raportowania — bardzo długie interwały (7200 s i więcej) oznaczają rzadkie odświeżanie danych. Sprawdź też, czy zdalny węzeł nadal jest online.
+- **Konflikt czujników na magistrali I2C?** Niektóre czujniki mają te same adresy I2C. Jeśli na jednej magistrali jest kilka czujników, sprawdź kolizje adresów w szeregowym wyjściu debugowania radia.
 
-## Related Topics
+## Powiązane tematy
 
-- [Node Metrics](node-metrics) — view telemetry data on the node detail screen
-- [Settings — Modules & Admin](settings-module-admin) — telemetry module configuration
-- [Units & Locale](units-and-locale) — temperature and pressure display units
+- [Metryki węzła](node-metrics) — podgląd telemetrii na ekranie szczegółów węzła
+- [Ustawienia — Moduły i administracja](settings-module-admin) — konfiguracja modułu telemetrii
+- [Jednostki i lokalizacja](units-and-locale) — jednostki wyświetlania temperatury i ciśnienia

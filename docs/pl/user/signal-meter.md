@@ -1,8 +1,9 @@
 ---
-title: How the Meshtastic Signal Meter Works
+title: Jak działa miernik sygnału
+parent: Przewodnik użytkownika
 nav_order: 15
 last_updated: 2026-09-09
-description: How the signal meter rates quality from SNR relative to the LoRa modem preset — spread spectrum, presets, and what the bars really mean.
+description: Jak miernik sygnału ocenia jakość na podstawie SNR względem presetu modemu LoRa — widmo rozproszone, presety i co naprawdę oznaczają paski.
 aliases:
   - signal
   - signal-meter
@@ -10,59 +11,59 @@ aliases:
   - rssi
 ---
 
-# How the Meshtastic Signal Meter Works
+# Jak działa miernik sygnału
 
-The Meshtastic signal meter — the bars or status color next to a node — is calculated differently from the bars on a cell phone or Wi-Fi router. This page explains what it measures and why the same reading can mean something different on another preset.
+Miernik sygnału — paski lub kolor stanu obok węzła — jest obliczany inaczej niż paski w telefonie komórkowym czy routerze Wi-Fi. Ta strona wyjaśnia, co mierzy i dlaczego ten sam odczyt może znaczyć coś innego na innym presecie.
 
-## RSSI and SNR
+## RSSI i SNR
 
-Every time the LoRa radio receives a message, it reports two measurements:
+Za każdym razem, gdy radio LoRa odbiera wiadomość, podaje dwa pomiary:
 
-- **RSSI (Received Signal Strength Indicator)** — the raw power hitting the antenna.
-- **SNR (Signal-to-Noise Ratio)** — how far the signal stands above the background noise.
+- **RSSI (Received Signal Strength Indicator, wskaźnik siły odbieranego sygnału)** — surowa moc docierająca do anteny.
+- **SNR (Signal-to-Noise Ratio, stosunek sygnału do szumu)** — jak bardzo sygnał wyróżnia się ponad szum tła.
 
-> 💡 **Tip:** Think of RSSI as how loud a friend is talking and SNR as how easily you can pick their voice out of the noise in the room. A friend shouting at a rock concert can be loud (high RSSI) yet unintelligible (bad SNR), while a whisper in a quiet library is faint (low RSSI) yet perfectly clear (great SNR).
+> 💡 **Wskazówka:** Pomyśl o RSSI jako o tym, jak głośno mówi znajomy, a o SNR jako o tym, jak łatwo wyłowić jego głos z hałasu w pokoju. Znajomy krzyczący na koncercie rockowym może być głośny (wysokie RSSI), a mimo to niezrozumiały (zły SNR), podczas gdy szept w cichej bibliotece jest słaby (niskie RSSI), a mimo to doskonale wyraźny (świetny SNR).
 
-## Decoding Below the Noise Floor
+## Dekodowanie poniżej poziomu szumu
 
-Standard radios such as FM or Wi-Fi lose a signal to static once the background noise is louder than it (a negative SNR). LoRa's spread spectrum modulation lets the radio pull a signal out of the noise even when the noise is louder, so negative SNR values are common and expected in Meshtastic — for example, −10 dB means the signal is 10 decibels weaker than the background noise.
+Standardowe radia, takie jak FM czy Wi-Fi, tracą sygnał w trzasku, gdy szum tła jest głośniejszy od niego (ujemny SNR). Modulacja z widmem rozproszonym w LoRa pozwala radiu wydobyć sygnał z szumu nawet wtedy, gdy szum jest głośniejszy, więc ujemne wartości SNR są w sieciach Meshtastic częste i oczekiwane — na przykład −10 dB oznacza, że sygnał jest o 10 decybeli słabszy niż szum tła.
 
-Each modem preset has an SNR limit: the lowest SNR at which that preset can still decode a message. Slower presets tolerate a weaker, noisier signal (a more negative limit, longer range); faster presets need a stronger signal (a less negative limit, shorter range).
+Każdy preset modemu ma limit SNR: najniższy SNR, przy którym ten preset jest jeszcze w stanie zdekodować wiadomość. Wolniejsze presety tolerują słabszy, bardziej zaszumiony sygnał (bardziej ujemny limit, większy zasięg); szybsze presety wymagają silniejszego sygnału (mniej ujemny limit, mniejszy zasięg).
 
-## Rating Signal Quality
+## Ocena jakości sygnału
 
-The app rates signal quality (None, Bad, Fair, or Good) from SNR relative to the active preset's SNR limit. When RSSI and a noise-floor reading are both available, it also rates the difference between them against that limit and uses the worse rating. Otherwise, it uses SNR alone.
+Aplikacja ocenia jakość sygnału (Brak, Zły, Dostateczny lub Dobry) na podstawie SNR względem limitu SNR aktywnego presetu. Gdy dostępne są zarówno RSSI, jak i odczyt poziomu szumu, ocenia również różnicę między nimi względem tego limitu i używa gorszej oceny. W przeciwnym razie używa samego SNR.
 
-Because the rating is relative to the preset, the same SNR rates differently on different presets. An SNR of −16 dB rates Good on Long Fast (SNR limit −17.5 dB) but None on Short Fast (SNR limit −7.5 dB). Let `limit` be the active preset's SNR limit:
+Ponieważ ocena jest względna wobec presetu, ten sam SNR jest oceniany inaczej na różnych presetach. SNR równy −16 dB jest oceniany jako Dobry na Long Fast (limit SNR −17,5 dB), ale jako Brak na Short Fast (limit SNR −7,5 dB). Niech `limit` oznacza limit SNR aktywnego presetu:
 
-| Level         | Bars | Criteria                                                       | Meaning                                                                                             |
-| ------------- | ---- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| dobry         | Full | SNR above `limit`                                              | Comfortably above the demodulation floor — a healthy connection.                    |
-| wystarczający | 3    | less than 5.5 dB below `limit`                 | Decodable, but approaching the floor.                                               |
-| słaby         | 2    | 5.5 dB to 7.5 dB below `limit` | At the edge of what the preset can recover.                                         |
-| Brak          | 1    | more than 7.5 dB below `limit`                 | Far below the preset's floor; further packets from this node are likely to be lost. |
+| Poziom | Paski | Kryteria | Znaczenie |
+|-------|------|----------|---------|
+| Dobry | Pełne | SNR powyżej `limit` | Wygodnie powyżej progu demodulacji — zdrowe połączenie. |
+| Dostateczny | 3 | mniej niż 5,5 dB poniżej `limit` | Da się zdekodować, ale zbliża się do progu. |
+| Zły | 2 | od 5,5 dB do 7,5 dB poniżej `limit` | Na granicy tego, co preset jest w stanie odzyskać. |
+| Brak | 1 | więcej niż 7,5 dB poniżej `limit` | Daleko poniżej progu presetu; kolejne pakiety z tego węzła prawdopodobnie zostaną utracone. |
 
-The icon never goes blank, so count the bars carefully: a single bar means None, not a weak but usable link, and Good is a solid wedge rather than a set of bars. A gray three-bar icon labeled Unknown is a different state again — the packet carried no SNR measurement at all, which is not the same as measuring one and finding it too weak.
+Ikona nigdy nie robi się pusta, więc licz paski uważnie: pojedynczy pasek oznacza Brak, a nie słabe, ale użyteczne łącze, a Dobry to pełny klin, a nie zestaw pasków. Szara ikona z trzema paskami z podpisem Nieznany to jeszcze inny stan — pakiet w ogóle nie niósł pomiaru SNR, co nie jest tym samym, co zmierzenie go i stwierdzenie, że jest zbyt słaby.
 
-> ℹ️ **Note:** Traceroute and neighbor-info SNR colors use the active preset's limits too. RSSI text has separate strength colors: green above −115 dBm, yellow above −120 dBm, orange above −126 dBm, and red at or below −126 dBm.
+> ℹ️ **Uwaga:** Kolory SNR w traceroute i informacjach o sąsiadach również używają limitów aktywnego presetu. Tekst RSSI ma osobne kolory siły: zielony powyżej −115 dBm, żółty powyżej −120 dBm, pomarańczowy powyżej −126 dBm i czerwony przy −126 dBm lub mniej.
 
-## Diagnosing Local Interference
+## Diagnozowanie lokalnych zakłóceń
 
-A great RSSI paired with a one- or two-bar rating (None or Bad) points to local interference, not distance. A cheap power supply, a noisy computer, or a nearby transmitter can create enough static to drown out an otherwise strong signal.
+Świetne RSSI w parze z oceną jednego lub dwóch pasków (Brak lub Zły) wskazuje na lokalne zakłócenia, a nie na odległość. Tani zasilacz, hałaśliwy komputer albo pobliski nadajnik mogą wytworzyć dość szumu, by zagłuszyć skądinąd silny sygnał.
 
-## Where Signal Information Appears
+## Gdzie pojawiają się informacje o sygnale
 
-In the app, signal data appears in several places:
+W aplikacji dane o sygnale pojawiają się w kilku miejscach:
 
-- **Node list** — a signal-bars icon, shown only for nodes your radio heard directly. A node reached through a relay shows its hop count instead, because the SNR your radio measured describes the last hop, not the whole path
-- **Node detail** — SNR, RSSI, and the quality word in the **Details** card at the top of the screen
-- **Traceroute** — per-hop signal quality for each relay node
-- **Signal Quality** — historical SNR and RSSI data in the metrics charts
+- **Lista węzłów** — ikona pasków sygnału, pokazywana tylko dla węzłów, które Twoje radio usłyszało bezpośrednio. Węzeł osiągany przez przekaźnik pokazuje zamiast tego liczbę skoków, ponieważ SNR zmierzony przez Twoje radio opisuje ostatni skok, a nie całą ścieżkę
+- **Szczegóły węzła** — SNR, RSSI i określenie jakości na karcie **Szczegóły** u góry ekranu
+- **Traceroute** — jakość sygnału na każdym skoku dla każdego węzła przekaźnikowego
+- **Jakość sygnału** — historyczne dane SNR i RSSI na wykresach metryk
 
-![Node list entry showing a Good signal rating: 12.5 dB SNR, −42 dBm RSSI, and the green signal-strength icon](../../assets/screenshots/nodes_signal_info.png)
+![Wpis na liście węzłów pokazujący ocenę Dobry sygnał: SNR 12,5 dB, RSSI −42 dBm i zieloną ikonę siły sygnału](../../assets/screenshots/nodes_signal_info.png)
 
-## Related Topics
+## Zobacz także
 
-- [Nodes](nodes) — where signal bars appear in the node list
-- [Node Metrics](node-metrics) — SNR/RSSI history and the per-node signal quality reference
-- [Settings — Radio & User](settings-radio-user) — modem presets and their SNR limits
+- [Węzły](nodes) — gdzie na liście węzłów pojawiają się paski sygnału
+- [Metryki węzła](node-metrics) — historia SNR/RSSI i opis jakości sygnału dla każdego węzła
+- [Ustawienia — Radio i użytkownik](settings-radio-user) — presety modemu i ich limity SNR

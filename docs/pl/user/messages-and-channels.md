@@ -1,8 +1,9 @@
 ---
-title: Messages & Channels
+title: Wiadomości i kanały
+parent: Przewodnik użytkownika
 nav_order: 3
 last_updated: 2026-09-14
-description: Send and receive messages, manage channels, configure encryption, search conversations, and use quick chat, reactions, and message actions.
+description: Wysyłanie i odbieranie wiadomości, zarządzanie kanałami, konfiguracja szyfrowania, wyszukiwanie w rozmowach oraz szablony wiadomości, reakcje i działania na wiadomościach.
 aliases:
   - channels
   - direct-messages
@@ -10,262 +11,261 @@ aliases:
   - conversations
 ---
 
-# Messages & Channels
+# Wiadomości i kanały
 
-Meshtastic supports two communication modes: **channel broadcasts** and **direct messages**.
+MT_SW obsługuje dwa tryby komunikacji: **rozgłoszenia na kanałach** i **wiadomości bezpośrednie**.
 
 ## Kanały
 
-Channels are shared communication groups. All nodes configured with the same channel key can read and send messages on that channel.
+Kanały to wspólne grupy komunikacyjne. Wszystkie węzły skonfigurowane z tym samym kluczem kanału mogą czytać i wysyłać wiadomości na tym kanale.
 
-### Default Channel
+### Kanał domyślny
 
-Every Meshtastic radio comes with a default **LongFast** channel. It is encrypted with a well-known default key, so anyone running Meshtastic on the same preset can read it.
+Każde radio z firmware Meshtastic ma domyślny kanał **LongFast**. Jest on szyfrowany powszechnie znanym kluczem domyślnym, więc każdy, kto używa tego samego presetu, może go czytać.
 
 ### Bezpieczeństwo kanału
 
-Each channel carries a lock icon that shows how well it is protected. Tap the icon to see the same explanation inside the app.
+Przy każdym kanale widnieje ikona kłódki, która pokazuje, jak dobrze kanał jest chroniony. Dotknij ikony, aby zobaczyć to samo wyjaśnienie w aplikacji.
 
-| Icon                               | What it means                                                                                                                                         |
-| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Green closed lock                  | The channel is securely encrypted, with either a 128-bit or a 256-bit AES key.                                                        |
-| Yellow open lock                   | The channel is not securely encrypted — it uses no key at all, or a well-known one-byte key — and it does not carry precise location. |
-| Red open lock                      | Not securely encrypted, and the channel carries precise location data.                                                                |
-| Red open lock with a warning badge | Not securely encrypted, carrying precise location data, and uplinking that data to the internet over MQTT.                            |
+| Ikona | Co oznacza |
+|------|---------------|
+| Zielona zamknięta kłódka | Kanał jest bezpiecznie zaszyfrowany kluczem AES 128-bitowym lub 256-bitowym. |
+| Żółta otwarta kłódka | Kanał nie jest bezpiecznie zaszyfrowany — nie ma żadnego klucza albo ma powszechnie znany klucz jednobajtowy — i nie przenosi dokładnej lokalizacji. |
+| Czerwona otwarta kłódka | Brak bezpiecznego szyfrowania, a kanał przenosi dokładne dane o lokalizacji. |
+| Czerwona otwarta kłódka z ostrzegawczą plakietką | Brak bezpiecznego szyfrowania, kanał przenosi dokładne dane o lokalizacji i wysyła je do internetu przez MQTT. |
 
-Key length alone does not change the icon: a 128-bit key and a 256-bit key both show the green lock.
+Sama długość klucza nie zmienia ikony: klucz 128-bitowy i 256-bitowy pokazują tę samą zieloną kłódkę.
 
-> 🔒 **Security:** Always configure a unique PSK for private communications. The default channel is intentionally open so new users can discover the mesh — but you should create a separate encrypted channel for anything sensitive.
+> 🔒 **Bezpieczeństwo:** Do prywatnej komunikacji zawsze ustaw unikalny klucz PSK. Kanał domyślny jest celowo otwarty, aby nowi użytkownicy mogli znaleźć sieć mesh — ale do wszystkiego, co jest poufne, utwórz osobny, szyfrowany kanał.
 
-### Adding a Channel
+### Dodawanie kanału
 
-1. Connect to your radio. The **Channels** row stays grayed out until the app has a connection — see [Connections](connections).
-2. Go to **Settings**, then tap **Channels** under **Configuration**.
-3. Tap the **+** button to add a channel. The editor opens on the new entry.
-4. Set the channel name and the **PSK**, and choose whether the channel uses MQTT uplink and downlink. Naming a new channel generates a fresh 256-bit key for you; the refresh icon beside **PSK** generates another one.
-5. Tap **Save** to close the editor. The change is still only on your phone.
-6. Tap **Send** at the bottom of the channel list to write the changes to the radio. **Cancel**, or leaving the screen without tapping **Send**, throws them away.
-7. Optional: share the channel URL or QR code with the people who need access.
+1. Połącz się ze swoim radiem. Wiersz **Kanały** pozostaje wyszarzony, dopóki aplikacja nie ma połączenia — zobacz [Połączenia](connections).
+2. Przejdź do **Ustawień**, a następnie dotknij **Kanały** w sekcji **Konfiguracja**.
+3. Dotknij przycisku **+**, aby dodać kanał. Edytor otworzy się na nowej pozycji.
+4. Ustaw nazwę kanału i **PSK** oraz wybierz, czy kanał ma używać wysyłania i pobierania przez MQTT. Nadanie nazwy nowemu kanałowi automatycznie generuje nowy 256-bitowy klucz; ikona odświeżania obok **PSK** generuje kolejny.
+5. Dotknij **Zapisz**, aby zamknąć edytor. Zmiana jest na razie tylko w Twoim telefonie.
+6. Dotknij **Wyślij** na dole listy kanałów, aby zapisać zmiany w radiu. **Anuluj** albo opuszczenie ekranu bez dotknięcia **Wyślij** odrzuca zmiany.
+7. Opcjonalnie: udostępnij adres URL kanału lub kod QR osobom, które potrzebują dostępu.
 
-Tapping an existing channel opens the same editor, where you can change the name, the PSK, MQTT uplink and downlink, and position precision. Every edit on this screen — adding, editing, deleting, or dragging a channel into a new order — waits on **Send** the same way.
+Dotknięcie istniejącego kanału otwiera ten sam edytor, w którym możesz zmienić nazwę, PSK, wysyłanie i pobieranie przez MQTT oraz dokładność pozycji. Każda zmiana na tym ekranie — dodanie, edycja, usunięcie lub przeciągnięcie kanału w nowe miejsce — czeka na **Wyślij** w ten sam sposób.
 
-### Archived Channels
+### Zarchiwizowane kanały
 
-A conversation belongs to the channel it was held on, not to the slot that channel occupied. When a channel leaves your radio — you scan a different channel QR, replace a channel's key, or switch the modem preset — its conversation is **archived** rather than deleted or merged into whatever takes the slot.
+Rozmowa należy do kanału, na którym była prowadzona, a nie do miejsca (slotu), które ten kanał zajmował. Gdy kanał znika z Twojego radia — skanujesz kod QR innego kanału, zmieniasz klucz kanału lub przełączasz preset modemu — jego rozmowa zostaje **zarchiwizowana**, a nie usunięta ani wymieszana z tym, co zajmie ten slot.
 
-An archived conversation:
+Zarchiwizowana rozmowa:
 
-- stays in the **Channels** list under the name the channel had, below the channels currently on your radio, marked with a history icon;
-- keeps its full message history, searchable as usual;
-- is read-only — you cannot send, reply, or react, because the channel is no longer on the radio to send on, and it is not offered as a share target;
-- comes back automatically if you re-add that exact channel, taking its messages back to the live slot.
+- pozostaje na liście **Kanały** pod nazwą, jaką miał kanał, poniżej kanałów aktualnie znajdujących się w Twoim radiu, oznaczona ikoną historii;
+- zachowuje całą historię wiadomości, którą można przeszukiwać jak zwykle;
+- jest tylko do odczytu — nie możesz wysyłać, odpowiadać ani reagować, ponieważ kanału nie ma już w radiu, więc nie ma na czym wysyłać, i nie jest on oferowany jako cel udostępniania;
+- wraca automatycznie, jeśli ponownie dodasz dokładnie ten sam kanał, a jego wiadomości wracają do aktywnego slotu.
 
-Changing the modem preset archives the channel too: the preset is part of a default channel's identity, so **LongFast** and **MediumFast** are different channels even though neither the name nor the key changed. Changing only the region does not archive anything.
+Zmiana presetu modemu również archiwizuje kanał: preset jest częścią tożsamości kanału domyślnego, więc **LongFast** i **MediumFast** to różne kanały, mimo że ani nazwa, ani klucz się nie zmieniły. Zmiana samego regionu niczego nie archiwizuje.
 
-To remove an archived conversation for good, long-press it in the conversation list and delete it.
+Aby usunąć zarchiwizowaną rozmowę na stałe, przytrzymaj ją na liście rozmów i usuń.
 
-## Bezpośrednie Wiadomości
+## Wiadomości bezpośrednie
 
-Direct messages (DMs) go to one specific node. When both radios hold each other's public keys, your radio encrypts the message to that node's public key, so no one else on the mesh can read it — not even nodes that share your channel.
+Wiadomości bezpośrednie (DM) trafiają do jednego, konkretnego węzła. Gdy oba radia mają nawzajem swoje klucze publiczne, Twoje radio szyfruje wiadomość kluczem publicznym tego węzła, więc nikt inny w sieci mesh nie może jej przeczytać — nawet węzły, które dzielą z Tobą kanał.
 
-Your radio must already hold the other node's public key before it can send a DM. Keys travel inside node info, which nodes broadcast periodically, so the key usually arrives on its own once you have heard from that node. Until it does, a radio that has its own key pair — the default — refuses the send rather than falling back to channel encryption, and the message shows **Recipient key unavailable**.
+Twoje radio musi już mieć klucz publiczny drugiego węzła, zanim będzie mogło wysłać wiadomość bezpośrednią. Klucze podróżują wewnątrz informacji o węźle, które węzły okresowo rozgłaszają, więc zwykle klucz pojawia się sam, gdy tylko usłyszysz dany węzeł. Dopóki to nie nastąpi, radio mające własną parę kluczy — czyli domyślnie — odmawia wysłania zamiast przechodzić na szyfrowanie kanału, a przy wiadomości widać **Klucz odbiorcy niedostępny**.
 
-A public-key conversation carries a key icon in its top bar. A green closed lock means the direct message is protected by public-key encryption; a red key-off icon means the node's public key changed and no longer matches the one your radio stored. Tap the icon for the details.
+Rozmowa z kluczem publicznym ma ikonę klucza na górnym pasku. Zielona zamknięta kłódka oznacza, że wiadomość bezpośrednia jest chroniona szyfrowaniem kluczem publicznym; czerwona ikona przekreślonego klucza oznacza, że klucz publiczny węzła zmienił się i nie zgadza się już z tym, który zapamiętało Twoje radio. Dotknij ikony, aby zobaczyć szczegóły.
 
-### Sending a Direct Message
+### Wysyłanie wiadomości bezpośredniej
 
-1. Open the **Messages** tab.
-2. Select a conversation, or tap a node in the node list.
-3. Type your message and tap **Send**.
+1. Otwórz kartę **Wiadomości**.
+2. Wybierz rozmowę albo dotknij węzła na liście węzłów.
+3. Wpisz wiadomość i dotknij **Wyślij**.
 
-### Managing the Conversation List
+### Zarządzanie listą rozmów
 
-The **Messages** tab lists your conversations. Each row shows what you need at a glance, and you
-can act on it directly:
+Karta **Wiadomości** pokazuje listę Twoich rozmów. Każdy wiersz pokazuje najważniejsze informacje i
+można na nim działać bezpośrednio:
 
-- **Unsent drafts survive.** Type into a conversation and leave without sending, and the text is
-  still there when you come back. The row shows it as `Draft: …` in place of the last message —
-  an unsent draft is the thing the row is waiting on _you_ for.
-- **Unread badge.** A count sits on the row until you open the conversation.
-- **Swipe right to mute** (swipe again to unmute) and **swipe left to delete**. Deleting asks
-  first; muting shows a snackbar with **Undo**.
-- **Touch & hold to select** one or more conversations, then use the action bar to **Pin**,
-  **Mark unread**, mute or delete them together. Pinned conversations carry a pin marker and rise
-  to the top of **their own section**.
-- **The list is split into Channels and Direct Messages**, each with a collapsible header and each
-  sorted independently — so a pinned direct message rises within its own section, not above the
-  Channels one.
+- **Niewysłane szkice są zachowywane.** Wpisz tekst w rozmowie i wyjdź bez wysyłania, a tekst nadal
+  tam będzie po powrocie. Wiersz pokazuje go jako `Szkic: …` zamiast ostatniej wiadomości —
+  niewysłany szkic to rzecz, na którą wiersz czeka właśnie od *Ciebie*.
+- **Plakietka nieprzeczytanych.** Licznik widnieje na wierszu, dopóki nie otworzysz rozmowy.
+- **Przesuń w prawo, aby wyciszyć** (przesuń ponownie, aby wyłączyć wyciszenie) i **przesuń w lewo, aby usunąć**. Usunięcie
+  najpierw pyta o potwierdzenie; wyciszenie pokazuje komunikat z przyciskiem **Cofnij**.
+- **Dotknij i przytrzymaj, aby zaznaczyć** jedną lub więcej rozmów, a następnie użyj paska działań, aby je **Przypiąć**,
+  **Oznaczyć jako nieprzeczytane**, wyciszyć lub usunąć razem. Przypięte rozmowy mają znacznik pinezki i wędrują
+  na górę **własnej sekcji**.
+- **Lista jest podzielona na Kanały i Wiadomości bezpośrednie**, każda z zwijanym nagłówkiem i każda
+  sortowana niezależnie — dzięki temu przypięta wiadomość bezpośrednia wędruje na górę swojej sekcji, a nie ponad sekcję
+  Kanałów.
 
-### Conversation Bubbles
+### Dymki rozmów
 
-On Android 11 and later, a message notification can be opened as a floating **bubble** that
-stays on top of whatever else you are doing. Tap the bubble icon on the notification to promote
-a conversation; Android remembers the choice per conversation, and the system Bubbles settings
-control whether they are offered at all.
+W Androidzie 11 i nowszym powiadomienie o wiadomości można otworzyć jako pływający **dymek**, który
+pozostaje na wierzchu, cokolwiek innego robisz. Dotknij ikony dymka w powiadomieniu, aby przekształcić
+rozmowę; Android zapamiętuje ten wybór dla każdej rozmowy, a systemowe ustawienia Dymków
+decydują, czy w ogóle są oferowane.
 
-### Message States
+### Stany wiadomości
 
-A status label appears under **your own** outgoing messages only (incoming messages from others show no status label):
+Etykieta statusu pojawia się wyłącznie pod **Twoimi własnymi** wiadomościami wychodzącymi (wiadomości przychodzące od innych nie mają etykiety statusu):
 
-| State                               | Meaning                                                                                                                                                                                                                                  |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Sending…                            | Queued or already handed to the radio, not yet resolved either way. Both stages share this text, but the icon and color change as it progresses — a yellow upload cloud while queued, a blue arrow once the radio has it |
-| Delivered to recipient              | The strongest confirmation for a direct message — an acknowledgment came back                                                                                                                                                            |
-| Delivered to mesh                   | For a channel broadcast, the message reached the mesh (broadcasts have no per-recipient ack)                                                                                                                          |
-| Relayed, not confirmed by recipient | For a direct message, shown in a warning color — the message was relayed but no acknowledgment has come back yet                                                                                                                         |
-| Routing via SF++ chain…             | Being routed/buffered by the Store & Forward Plus Plus chain                                                                                                                                                         |
-| Confirmed on SF++ chain             | Confirmed delivered via the SF++ chain                                                                                                                                                                                                   |
-| Błąd                                | Delivery failed — tap the status for the specific reason (see [Delivery Errors](#delivery-errors))                                                                                                                    |
+| Stan | Znaczenie |
+|-------|---------|
+| Wysyłanie… | W kolejce lub już przekazana radiu, jeszcze nierozstrzygnięta w żadną stronę. Oba etapy mają ten sam tekst, ale ikona i kolor zmieniają się w trakcie — żółta chmurka z strzałką w górę, gdy czeka w kolejce, niebieska strzałka, gdy radio już ją ma |
+| Dostarczono do odbiorcy | Najsilniejsze potwierdzenie dla wiadomości bezpośredniej — wróciło potwierdzenie odbioru |
+| Dostarczono do sieci mesh | Dla rozgłoszenia na kanale: wiadomość dotarła do sieci mesh (rozgłoszenia nie mają potwierdzenia od poszczególnych odbiorców) |
+| Przekazane, niepotwierdzone przez odbiorcę | Dla wiadomości bezpośredniej, pokazywane w kolorze ostrzegawczym — wiadomość została przekazana dalej, ale nie wróciło jeszcze potwierdzenie |
+| Trasowanie przez łańcuch SF++… | Wiadomość jest trasowana/buforowana przez łańcuch Store & Forward Plus Plus |
+| Potwierdzone w łańcuchu SF++ | Potwierdzone jako dostarczone przez łańcuch SF++ |
+| Błąd | Dostarczenie nie powiodło się — dotknij statusu, aby poznać konkretny powód (zobacz [Błędy dostarczania](#delivery-errors)) |
 
-### Delivery Errors
+### Błędy dostarczania
 
-When a message fails to deliver, the error indicator shows what went wrong:
+Gdy wiadomości nie uda się dostarczyć, wskaźnik błędu pokazuje, co poszło nie tak:
 
-| Błąd                             | Meaning                                                                                                                                                                       | What to Do                                                                                                                            |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Brak trasy                       | No path exists to the destination node                                                                                                                                        | The recipient may be offline or out of mesh range. Try later or move closer.                          |
-| No radio interface               | No radio interface available to send                                                                                                                                          | Check that your radio is connected and available.                                                                     |
-| Failed to deliver to mesh        | Retries exhausted. The same label covers three underlying causes — a relay refusing (NAK), a plain timeout, and running out of retransmits | Move closer, improve signal, or wait for conditions to improve. Tap the error for the specific cause. |
-| Rate limited                     | The mesh is throttling you for sending too fast                                                                                                                               | Wait before sending again.                                                                                            |
-| Not authorized                   | The destination refused the request                                                                                                                                           | Check you have the right channel and keys for that node.                                                              |
-| Recipient needs your key         | Direct-message encryption could not complete because the other node does not have your public key yet                                                                         | Exchange node info — the key travels with it. Common on a first DM to a new contact.                  |
-| Recipient key unavailable        | You do not have the recipient's public key                                                                                                                                    | Wait for their node info to arrive, or ask them to broadcast it.                                                      |
-| Could not send encrypted message | Encryption failed for this direct message                                                                                                                                     | Verify both nodes have exchanged keys and are on compatible firmware.                                                 |
-| Admin session expired            | A remote-admin session timed out                                                                                                                                              | Reopen the remote node's settings to start a new session.                                                             |
-| Admin key not authorized         | The target node does not accept your admin key                                                                                                                                | Verify the admin key matches on both nodes.                                                                           |
-| Channel/key mismatch             | Destination channel/key does not match                                                                                                                                        | Verify both nodes share the same channel and PSK.                                                                     |
-| Message is too large to send     | Message exceeds maximum payload size                                                                                                                                          | Shorten the message and try again.                                                                                    |
-| No app response                  | App or plugin did not respond to the request                                                                                                                                  | Retry or check the destination app or module state.                                                                   |
-| Duty cycle limit                 | Regional airtime limit reached                                                                                                                                                | Wait for the duty cycle window to reset.                                                                              |
-| Invalid request                  | Malformed or invalid request                                                                                                                                                  | Retry after updating or restarting the app if this persists.                                                          |
+| Błąd | Znaczenie | Co zrobić |
+|-------|---------|------------|
+| Brak trasy | Nie istnieje ścieżka do węzła docelowego | Odbiorca może być offline lub poza zasięgiem sieci mesh. Spróbuj później albo podejdź bliżej. |
+| Brak interfejsu radiowego | Brak dostępnego interfejsu radiowego do wysyłania | Sprawdź, czy radio jest połączone i dostępne. |
+| Nie udało się dostarczyć do sieci mesh | Wyczerpano ponowienia. Ta sama etykieta obejmuje trzy przyczyny — odmowę przekaźnika (NAK), zwykłe przekroczenie czasu i wyczerpanie retransmisji | Podejdź bliżej, popraw sygnał albo poczekaj na poprawę warunków. Dotknij błędu, aby poznać konkretną przyczynę. |
+| Przekroczono limit wysyłania | Sieć mesh ogranicza Cię za zbyt szybkie wysyłanie | Poczekaj przed ponownym wysłaniem. |
+| Brak autoryzacji | Cel odrzucił żądanie | Sprawdź, czy masz właściwy kanał i klucze dla tego węzła. |
+| Odbiorca potrzebuje Twojego klucza | Szyfrowanie wiadomości bezpośredniej nie mogło zostać dokończone, bo drugi węzeł nie ma jeszcze Twojego klucza publicznego | Wymieńcie się informacjami o węźle — klucz podróżuje razem z nimi. Częste przy pierwszej wiadomości bezpośredniej do nowego kontaktu. |
+| Klucz odbiorcy niedostępny | Nie masz klucza publicznego odbiorcy | Poczekaj na nadejście jego informacji o węźle albo poproś go o ich rozgłoszenie. |
+| Nie udało się wysłać zaszyfrowanej wiadomości | Szyfrowanie tej wiadomości bezpośredniej nie powiodło się | Sprawdź, czy oba węzły wymieniły się kluczami i mają zgodne firmware. |
+| Sesja administratora wygasła | Sesja zdalnego zarządzania przekroczyła limit czasu | Otwórz ponownie ustawienia zdalnego węzła, aby rozpocząć nową sesję. |
+| Klucz administratora nieautoryzowany | Węzeł docelowy nie akceptuje Twojego klucza administratora | Sprawdź, czy klucz administratora zgadza się na obu węzłach. |
+| Niezgodność kanału/klucza | Kanał/klucz docelowy nie pasuje | Sprawdź, czy oba węzły mają ten sam kanał i PSK. |
+| Wiadomość jest za duża, aby ją wysłać | Wiadomość przekracza maksymalny rozmiar danych | Skróć wiadomość i spróbuj ponownie. |
+| Brak odpowiedzi aplikacji | Aplikacja lub wtyczka nie odpowiedziała na żądanie | Spróbuj ponownie albo sprawdź stan docelowej aplikacji lub modułu. |
+| Limit cyklu pracy | Osiągnięto regionalny limit czasu nadawania | Poczekaj, aż okno cyklu pracy się zresetuje. |
+| Nieprawidłowe żądanie | Żądanie jest zniekształcone lub nieprawidłowe | Jeśli problem się powtarza, spróbuj ponownie po zaktualizowaniu lub ponownym uruchomieniu aplikacji. |
 
-> 💡 **Tip:** Most delivery errors resolve themselves. If a node is intermittently reachable, the mesh will retry. For persistent **No route** errors, check that intermediate Router nodes are online.
+> 💡 **Wskazówka:** Większość błędów dostarczania ustępuje sama. Jeśli węzeł jest osiągalny z przerwami, sieć mesh ponowi próbę. W przypadku uporczywych błędów **Brak trasy** sprawdź, czy pośrednie węzły Router są online.
 
-## Message Features
+## Funkcje wiadomości
 
-### Quick Chat
+### Szablony wiadomości
 
-Pre-configured messages for rapid communication, useful when typing is impractical (gloves, small screen, urgent):
+Gotowe wiadomości do szybkiej komunikacji, przydatne, gdy pisanie jest niewygodne (rękawiczki, mały ekran, pilna sytuacja):
 
-- The quick chat row is hidden until you turn it on. Open a conversation, tap the overflow menu in the top bar, then tap **Show quick chat menu**. **Hide quick chat menu** puts the row away again.
-- The row carries one built-in entry, the 🔔 alert bell. It appends an alert message that includes a bell character, which clients that support it flag as an alert. Every other button on the row is one you created.
-- Add, edit, reorder, and delete your own entries from the same overflow menu — tap **Quick chat options**.
+- Wiersz szablonów jest ukryty, dopóki go nie włączysz. Otwórz rozmowę, dotknij menu dodatkowego na górnym pasku, a następnie **Pokaż menu szybkiego wyboru**. **Ukryj menu szybkiego wyboru** chowa wiersz z powrotem.
+- Wiersz zawiera jedną wbudowaną pozycję, dzwonek alarmowy 🔔. Dodaje on wiadomość alarmową zawierającą znak dzwonka, którą klienty obsługujące tę funkcję oznaczają jako alert. Każdy inny przycisk w wierszu to taki, który sam utworzyłeś.
+- Dodawaj, edytuj, zmieniaj kolejność i usuwaj własne pozycje z tego samego menu dodatkowego — dotknij **Szablony wiadomości**.
 
-![Quick chat option](../../assets/screenshots/messages_quick_chat.png)
+![Opcja szablonów wiadomości](../../assets/screenshots/messages_quick_chat.png)
 
-Each quick chat entry has a **Name** — the button label, capped at five characters, forced to uppercase, and filled in for you from the message text — and the **Message** it carries. A switch decides what tapping the button does. A new entry starts on **Instantly send**, so a tap sends the message straight away; turn the switch off and the label changes to **Append to message**, which puts the text in the input field for you to edit first.
+Każdy szablon ma **Nazwę** — etykietę przycisku, ograniczoną do pięciu znaków, zamienianą na wielkie litery i uzupełnianą automatycznie na podstawie tekstu wiadomości — oraz **Wiadomość**, którą niesie. Przełącznik decyduje, co robi dotknięcie przycisku. Nowa pozycja zaczyna z ustawieniem **Wyślij natychmiast**, więc dotknięcie od razu wysyła wiadomość; wyłącz przełącznik, a etykieta zmieni się na **Dodaj do wiadomości**, co wstawia tekst do pola wpisywania, abyś mógł go najpierw zmienić.
 
-![New quick chat dialog with name, message, and instantly-send toggle](../../assets/screenshots/messages_edit_quick_chat.png)
+![Okno nowego szablonu z nazwą, wiadomością i przełącznikiem natychmiastowego wysyłania](../../assets/screenshots/messages_edit_quick_chat.png)
 
-### Searching Messages
+### Wyszukiwanie wiadomości
 
-You can search the full history of any conversation directly from the chat screen:
+Możesz przeszukiwać pełną historię dowolnej rozmowy bezpośrednio z ekranu czatu:
 
-1. Open a conversation (a channel or a direct message).
-2. Tap the **search icon** in the top bar.
-3. Type into the **Search messages…** field. The search runs as you type, across all stored messages in that conversation.
-4. Use the **N / M** result counter and the **previous / next arrows** to jump between matches, which are highlighted in the conversation.
+1. Otwórz rozmowę (kanał lub wiadomość bezpośrednią).
+2. Dotknij **ikony wyszukiwania** na górnym pasku.
+3. Wpisz tekst w polu **Szukaj wiadomości…**. Wyszukiwanie działa w trakcie pisania, we wszystkich zapisanych wiadomościach tej rozmowy.
+4. Użyj licznika wyników **N / M** i **strzałek poprzedni / następny**, aby przeskakiwać między trafieniami, które są podświetlone w rozmowie.
 
-![Message search bar with result counter and previous/next arrows](../../assets/screenshots/messages_search_bar.png)
+![Pasek wyszukiwania wiadomości z licznikiem wyników i strzałkami poprzedni/następny](../../assets/screenshots/messages_search_bar.png)
 
-> 💡 **Tip:** Search is full-text and stays within the conversation you opened it from — it doesn't search across other channels or contacts. It matches against the messages already stored on your device, so it works fully offline.
+> 💡 **Wskazówka:** Wyszukiwanie jest pełnotekstowe i ogranicza się do rozmowy, z której je otworzyłeś — nie przeszukuje innych kanałów ani kontaktów. Porównuje wiadomości już zapisane na Twoim urządzeniu, więc działa w pełni offline.
 
-### Message Bubbles
+### Dymki wiadomości
 
-Messages appear as chat bubbles — sent messages on the right, received messages on the left. Each bubble shows the sender, timestamp, and delivery status. Messages with replies include a quoted preview of the original message above the response.
+Wiadomości wyświetlają się jako dymki czatu — wysłane po prawej, odebrane po lewej. Każdy dymek pokazuje nadawcę, czas i status dostarczenia. Wiadomości z odpowiedziami zawierają cytowany podgląd oryginalnej wiadomości nad odpowiedzią.
 
-### Text Formatting
+### Formatowanie tekstu
 
-Messages support lightweight inline **Markdown**. Received messages render the styling with the syntax characters removed:
+Wiadomości obsługują proste formatowanie **Markdown** w tekście. Odebrane wiadomości pokazują stylizację bez znaków składni:
 
-| Typ           | Syntax                         | Renders as           |
-| ------------- | ------------------------------ | -------------------- |
-| Bold          | `**bold**`                     | **bold**             |
-| Italic        | `*italic*`                     | _italic_             |
-| Strikethrough | `~~strike~~`                   | ~~strike~~           |
-| Inline code   | `` `code` ``                   | monospace `code`     |
-| Link          | `[label](https://example.com)` | a tappable **label** |
+| Rodzaj | Składnia | Wygląda jako |
+|------|--------|------------|
+| Pogrubienie | `**bold**` | **bold** |
+| Kursywa | `*italic*` | *italic* |
+| Przekreślenie | `~~strike~~` | ~~strike~~ |
+| Kod w tekście | `` `code` `` | czcionka monospace `code` |
+| Link | `[label](https://example.com)` | dotykalny **label** |
 
-When composing, focus the message field and type at least three characters to reveal a **formatting toolbar** below the input. Select text and tap a style to wrap it (tap again to remove it); with no selection, a style inserts an empty pair with the cursor between the markers. The link button opens a dialog to enter a URL. As you type, the field shows the styled text, but the message you send still contains the Markdown characters.
+Podczas pisania ustaw kursor w polu wiadomości i wpisz co najmniej trzy znaki, aby pokazać **pasek formatowania** pod polem wpisywania. Zaznacz tekst i dotknij stylu, aby go otoczyć znacznikami (dotknij ponownie, aby usunąć); bez zaznaczenia styl wstawia pustą parę znaczników z kursorem pomiędzy nimi. Przycisk linku otwiera okno do wpisania adresu URL. Podczas pisania pole pokazuje tekst ze stylem, ale wysyłana wiadomość nadal zawiera znaki Markdown.
 
-> 💡 **Tip:** Formatting is carried as literal characters on the mesh — the same bytes iOS sends. Clients that don't support Markdown (older apps, plain firmware clients) will show the raw `**`/`~~` characters. URLs, email addresses, and phone numbers are still auto-linked whether or not you use Markdown.
+> 💡 **Wskazówka:** Formatowanie jest przenoszone jako zwykłe znaki w sieci mesh — te same bajty, które wysyła iOS. Klienty, które nie obsługują Markdown (starsze aplikacje, proste klienty firmware), pokażą surowe znaki `**`/`~~`. Adresy URL, adresy e-mail i numery telefonów są nadal automatycznie zamieniane na linki, niezależnie od tego, czy używasz Markdown.
 
-### Mentions
+### Wzmianki
 
-Type `@` while composing to mention a node — a picker suggests matching contacts as you type. In a received message, a mention appears as a highlighted chip showing the node's name; tap it to jump straight to that node's detail page.
+Wpisz `@` podczas pisania, aby wspomnieć o węźle — selektor podpowiada pasujące kontakty w trakcie pisania. W odebranej wiadomości wzmianka pojawia się jako podświetlony znacznik z nazwą węzła; dotknij go, aby przejść prosto na stronę szczegółów tego węzła.
 
-### Reactions
+### Reakcje
 
-React to messages with emoji:
+Reaguj na wiadomości za pomocą emoji:
+- **Dotknij i przytrzymaj** wiadomość — albo dotknij jej dwukrotnie — aby wyświetlić nad dymkiem pasek szybkich reakcji. Otwarcie paska niczego nie wysyła.
+- Dotknij emoji na pasku, aby je wysłać; dotknij **Więcej reakcji**, aby otworzyć pełny selektor, albo dotknij gdziekolwiek poza
+  paskiem, aby go zamknąć bez wysyłania. Reakcja to prawdziwy pakiet w sieci mesh, więc jest wysyłana
+  dopiero po wybraniu emoji.
+- Reakcje pojawiają się pod dymkiem wiadomości
+- Wielu użytkowników może reagować na tę samą wiadomość
+- Możesz reagować na własne wiadomości lub cudze
 
-- **Touch & hold** a message — or double-tap it — to raise a quick reaction bar above the bubble. Opening the bar sends nothing.
-- Tap an emoji in the bar to send it; tap **More reactions** to open the full picker, or anywhere outside
-  the bar to dismiss it without sending. A reaction is a real mesh packet, so it only goes out
-  when you pick an emoji.
-- Reactions appear below the message bubble
-- Multiple users can react to the same message
-- React to your own messages or others' messages
+![Plakietki reakcji emoji wyświetlane pod wiadomością](../../assets/screenshots/messages_reaction.png)
 
-![Emoji reaction badges displayed beneath a message](../../assets/screenshots/messages_reaction.png)
+> 💡 **Wskazówka:** Reakcje są lekkie — zużywają minimalną przepustowość sieci mesh w porównaniu z pełnymi wiadomościami tekstowymi.
 
-> 💡 **Tip:** Reactions are lightweight — they use minimal mesh bandwidth compared to full text messages.
+### Odpowiadanie
 
-### Replying
+**Przesuń wiadomość w prawo**, aby na nią odpowiedzieć — pole pisania otworzy się z zacytowaną tą wiadomością.
+Przesunięcie poza próg odpowiedzi uzbraja akcję; puszczenie przed progiem cofa gest i nic nie jest wysyłane.
+Odpowiedź jest też w arkuszu działań, do którego dochodzi się przez dotknięcie i przytrzymanie, a następnie dotknięcie **Więcej działań na wiadomości**.
 
-**Swipe a message to the right** to reply to it — the composer opens with that message quoted.
-Swiping past the reply threshold arms the action; releasing before it springs back with nothing sent.
-Reply is also in the actions sheet, reached by touching & holding and then tapping **More message actions**.
+### Separatory dni
 
-### Day Separators
+Wiadomości są grupowane według dni. Separator nad pierwszą wiadomością każdego dnia pokazuje **Dziś**
+lub **Wczoraj** dla dwóch ostatnich dni, a dla starszych samą datę.
 
-Messages are grouped by day. The separator above the first message of each day reads **Today**
-or **Yesterday** for the two most recent days, and the date itself for older ones.
+### Przejdź do najnowszych
 
-### Jump to Latest
-
-Scrolling back through a conversation raises a jump-to-latest control. When messages arrive
-while you are scrolled up, it names the most recent sender and adds a count of the other unread
-messages. That count is messages, not people — five unread from one person reads as their name
+Przewijanie rozmowy wstecz wywołuje przycisk przejścia do najnowszych wiadomości. Gdy wiadomości przychodzą,
+a Ty jesteś przewinięty w górę, przycisk podaje ostatniego nadawcę i dodaje licznik pozostałych nieprzeczytanych
+wiadomości. Licznik dotyczy wiadomości, nie osób — pięć nieprzeczytanych od jednej osoby wyświetla się jako jej nazwa
 **+4**.
 
-### Message Actions
+### Działania na wiadomościach
 
-Touch & hold or double-tap a message to open the quick reaction bar, then tap **More message actions**
-(the overflow icon on that bar) to open the actions sheet. The emoji row runs across the top of the
-sheet — that is where reactions live — and beneath it, along with the message's timestamp and
-delivery status, are:
+Dotknij i przytrzymaj albo dotknij dwukrotnie wiadomość, aby otworzyć pasek szybkich reakcji, a następnie dotknij **Więcej działań na wiadomości**
+(ikona menu dodatkowego na tym pasku), aby otworzyć arkusz działań. Rząd emoji biegnie wzdłuż góry
+arkusza — tam są reakcje — a pod nim, razem z czasem wiadomości i statusem
+dostarczenia, znajdują się:
 
-- **Reply** — quote the message in your response
-- **Copy** — copy the message text to the clipboard
-- **Translate** — translate a received message into your device language, and toggle between the original and translated text (Google Play build only; uses on-device translation). The first translation into a language asks to download a one-time language model and tells you its size, then translates once the download finishes. If the download fails, or the message is already in your language, the app says so instead of translating
-- **Select** — start multi-select, so you can act on several messages at once
-- **Delete** — remove the message from this phone. It works on any message in the conversation, yours or not, and does not remove it from anyone else's radio or phone
+- **Odpowiedz** — zacytuj wiadomość w swojej odpowiedzi
+- **Kopiuj** — skopiuj tekst wiadomości do schowka
+- **Przetłumacz** — przetłumacz odebraną wiadomość na język urządzenia i przełączaj się między oryginałem a tłumaczeniem (tylko wersja Google Play; używa tłumaczenia na urządzeniu). Pierwsze tłumaczenie na dany język prosi o pobranie jednorazowego modelu językowego i podaje jego rozmiar, a po zakończeniu pobierania tłumaczy. Jeśli pobieranie się nie powiedzie albo wiadomość jest już w Twoim języku, aplikacja informuje o tym zamiast tłumaczyć
+- **Wybierz** — włącz zaznaczanie wielu, aby działać na kilku wiadomościach naraz
+- **Usuń** — usuń wiadomość z tego telefonu. Działa na każdej wiadomości w rozmowie, Twojej lub cudzej, i nie usuwa jej z niczyjego radia ani telefonu
 
-### Message Priority
+### Priorytet wiadomości
 
-The app sends every message you compose at the same, default priority — there is no
-emergency or alert tier to choose, and nothing in the app raises a direct message above a
-channel broadcast. Any prioritising between them happens in firmware, not here. (The app
-does mark some of its own internal traffic, such as admin and traceroute packets, as
-reliable or background, but that is not something you control from the message composer.)
+Aplikacja wysyła każdą tworzoną przez Ciebie wiadomość z tym samym, domyślnym priorytetem — nie ma
+poziomu awaryjnego ani alarmowego do wyboru i nic w aplikacji nie podnosi wiadomości bezpośredniej ponad
+rozgłoszenie na kanale. Ewentualne nadawanie pierwszeństwa między nimi odbywa się w firmware, nie tutaj. (Aplikacja
+oznacza część własnego ruchu wewnętrznego, takiego jak pakiety administracyjne i traceroute, jako
+niezawodne lub działające w tle, ale nie masz na to wpływu z poziomu pola tworzenia wiadomości.)
 
-### Message Limits
+### Limity wiadomości
 
-- **Maximum length:** 200 bytes (approximately 200 characters for ASCII text)
-- The 200-byte cap applies to the in-app composer — the mesh payload limit itself is 233 bytes, so messages from other senders (e.g., App Functions) may arrive slightly longer
-- **Rate limiting:** The mesh enforces airtime fairness; heavy message volume may be throttled
-- **Delivery:** Messages are retried automatically if no acknowledgment is received
+- **Maksymalna długość:** 200 bajtów (około 200 znaków dla tekstu ASCII)
+- Limit 200 bajtów dotyczy pola tworzenia wiadomości w aplikacji — sam limit danych w sieci mesh wynosi 233 bajty, więc wiadomości od innych nadawców (np. Funkcje aplikacji) mogą docierać nieco dłuższe
+- **Ograniczanie szybkości:** Sieć mesh egzekwuje sprawiedliwy podział czasu antenowego; duży ruch wiadomości może być ograniczany
+- **Dostarczanie:** Wiadomości są automatycznie ponawiane, jeśli nie nadejdzie potwierdzenie
 
-## Best Practices
+## Dobre praktyki
 
-- Use channels for group coordination
-- Use direct messages for private person-to-person communication
-- Keep messages short — mesh bandwidth is limited
-- Configure encryption for sensitive communications
+- Używaj kanałów do koordynacji grupy
+- Używaj wiadomości bezpośrednich do prywatnej komunikacji między dwiema osobami
+- Pisz krótko — przepustowość sieci mesh jest ograniczona
+- Skonfiguruj szyfrowanie dla poufnej komunikacji
 
-## Related Topics
+## Zobacz także
 
-- [Nodes](nodes) — tap a node to start a direct message
-- [Settings — Radio & User](settings-radio-user) — configure channel encryption and presets
-- [MQTT](mqtt) — bridge channel messages to the internet
-- [Channel configuration](https://meshtastic.org/docs/configuration/radio/channels) — detailed channel settings on meshtastic.org
+- [Węzły](nodes) — dotknij węzła, aby rozpocząć wiadomość bezpośrednią
+- [Ustawienia — Radio i użytkownik](settings-radio-user) — konfiguracja szyfrowania kanałów i presetów
+- [MQTT](mqtt) — most między wiadomościami kanału a internetem
+- [Konfiguracja kanałów](https://meshtastic.org/docs/configuration/radio/channels) — szczegółowe ustawienia kanałów na meshtastic.org

@@ -106,6 +106,7 @@ val syncTranslatedDocsToComposeResources =
         from(docsDir) {
             // Crowdin names these like the values-* dirs (fr, pt-rBR, b+sr+Latn)
             include("*/user/**/*.md")
+            include("*/developer/**/*.md")
             exclude("en/**")
             exclude("_*/**")
             exclude("assets/**")
