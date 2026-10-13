@@ -1,131 +1,130 @@
 ---
-title: TAK Integration
+title: Integracja TAK
+parent: Przewodnik użytkownika
 nav_order: 10
 last_updated: 2026-09-28
-description: Interoperate with ATAK and WinTAK — CoT position sharing, TAK roles, and plugin setup.
+description: Współpraca z ATAK i WinTAK — udostępnianie pozycji CoT, role TAK i konfiguracja wtyczki.
 aliases:
   - tak
   - atak
   - team-awareness-kit
 ---
 
-# TAK Integration
+# Integracja TAK
 
-Meshtastic integrates with the Team Awareness Kit (TAK) ecosystem, enabling interoperability between Meshtastic radios and TAK applications like ATAK and WinTAK.
+MT_SW integruje się z ekosystemem Team Awareness Kit (TAK), umożliwiając współpracę radiów MT_SW z aplikacjami TAK, takimi jak ATAK i WinTAK.
 
-## Overview
+## Przegląd
 
-The TAK module allows Meshtastic nodes to:
+Moduł TAK pozwala węzłom MT_SW:
+- Udostępniać dane o pozycji w formacie CoT (Cursor on Target) zgodnym z TAK
+- Pojawiać się jako członkowie zespołu na mapach TAK
+- Odbierać wiadomości TAK PLI (Position Location Information)
 
-- Share position data in TAK-compatible CoT (Cursor on Target) format
-- Appear as team members on TAK map displays
-- Receive TAK PLI (Position Location Information) messages
+## Konfiguracja
 
-## Setup
+### Wymagania wstępne
 
-### Prerequisites
+- Zainstalowany ATAK (Android Team Awareness Kit), iTAK lub WinTAK
+- **Rola urządzenia** Twojego węzła (Konfiguracja urządzenia) ustawiona na **TAK** lub **TAK Tracker** — to sprawia, że
+  moduł TAK w ogóle pojawia się w Konfiguracji modułów
+- Firmware 2.8.0 lub nowsze w radiu. Wcześniejsze firmware przyjmuje zapis konfiguracji TAK i nigdy go
+  nie przechowuje, więc aplikacja ukrywa pozycję modułu TAK poniżej tej wersji, nawet gdy rola jest ustawiona
+  poprawnie. Zobacz [Aktualizacje firmware](firmware)
 
-- ATAK (Android Team Awareness Kit), iTAK, or WinTAK installed
-- Your node's **Device Role** (Device configuration) set to **TAK** or **TAK Tracker** — this is what makes the
-  TAK module appear in Module configuration at all
-- Firmware 2.8.0 or newer on the radio. Earlier firmware accepts a TAK config write and never
-  stores it, so the app hides the TAK module entry below that version even when the role is set
-  correctly. See [Firmware Updates](firmware)
-
-> ⚠️ **Warning:** The old **Meshtastic ATAK Plugin** is no longer part of this path and cannot
-> work. It bridged through the cross-process AIDL API, which was removed in app 2.8.0; the mesh
-> service is now in-process only. Do not install it. Interop today runs over the app's own local
-> TAK server plus the Mesh to CoT Converter, both described in the following sections, with stock ATAK/iTAK/WinTAK.
+> ⚠️ **Ostrzeżenie:** Stara **wtyczka Meshtastic ATAK** nie jest już częścią tej ścieżki i nie może
+> działać. Łączyła się przez międzyprocesowe API AIDL, które zostało usunięte w aplikacji 2.8.0; usługa
+> mesh działa teraz wyłącznie w obrębie procesu aplikacji. Nie instaluj jej. Współpraca działa dziś przez własny lokalny
+> serwer TAK aplikacji oraz Konwerter Mesh na CoT, opisane w następnych sekcjach, ze zwykłymi ATAK/iTAK/WinTAK.
 
 ### Konfiguracja
 
-Navigate to **Settings → Module configuration → TAK**. The module's own settings are your TAK identity —
-there is no separate enable switch here, because the **Device Role** setting in Device configuration is what
-turns TAK on. Your node broadcasts this identity, which appears on TAK maps.
+Przejdź do **Ustawienia → Konfiguracja modułów → TAK** (Konfiguracja TAK). Własne ustawienia modułu to Twoja tożsamość TAK —
+nie ma tu osobnego przełącznika włączania, ponieważ to ustawienie **Rola urządzenia** w Konfiguracji urządzenia
+włącza TAK. Twój węzeł rozgłasza tę tożsamość, która pojawia się na mapach TAK.
 
-| Setting     | Opis                                                                                                                     |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Team Color  | Your team color on the TAK map (e.g., Blue, Red, Cyan, Green)         |
-| Member Role | Your operational role within that team (Team Member, Team Lead, HQ, Medic, RTO, etc.) |
+| Ustawienie | Opis |
+|---------|-------------|
+| Kolor zespołu | Twój kolor zespołu na mapie TAK (np. Niebieski, Czerwony, Cyjan, Zielony) |
+| Rola członka | Twoja rola operacyjna w tym zespole (Członek zespołu, Lider zespołu, Kwatera główna, Medyk, Operator radiotelefonu itd.) |
 
-Your TAK callsign isn't a separate setting — it's derived automatically from your Meshtastic node
-name.
+Twój znak wywoławczy TAK nie jest osobnym ustawieniem — jest wyprowadzany automatycznie z nazwy Twojego
+węzła MT_SW.
 
-> 💡 **Tip:** Team/role colors are the standard TAK affiliation colors. Coordinate with your TAK
-> team to use consistent team assignments.
+> 💡 **Wskazówka:** Kolory zespołów/ról to standardowe kolory przynależności TAK. Uzgodnij ze swoim zespołem TAK
+> spójne przydziały do zespołów.
 
-### Local TAK Server
+### Lokalny serwer TAK
 
-The app can also run a **local TAK server** so ATAK/iTAK on the **same phone** can connect directly, without a remote TAK server. The server binds to localhost only (`127.0.0.1:8089`) and uses TLS with mutual certificate authentication (mTLS), so it is not reachable from other devices on the network.
+Aplikacja może też uruchomić **lokalny serwer TAK**, aby ATAK/iTAK na **tym samym telefonie** mogły łączyć się bezpośrednio, bez zdalnego serwera TAK. Serwer nasłuchuje wyłącznie na localhost (`127.0.0.1:8089`) i używa TLS z wzajemnym uwierzytelnianiem certyfikatami (mTLS), więc nie jest osiągalny z innych urządzeń w sieci.
 
-Open **Settings → Advanced → TAK Server**. These are app settings stored on this phone, which is why they sit next to **Firmware Update** and **Debug Panel** rather than under the TAK module config — and why they need neither a TAK role nor firmware 2.8.0:
+Otwórz **Ustawienia → Zaawansowane → Serwer TAK**. To ustawienia aplikacji przechowywane na tym telefonie, dlatego są obok **Aktualizacja oprogramowania** i **Panel debugowania**, a nie w konfiguracji modułu TAK — i dlatego nie potrzebują ani roli TAK, ani firmware 2.8.0:
 
-![Local TAK Server settings with enable toggle and export option](../../assets/screenshots/tak_server_enabled.png)
+![Ustawienia lokalnego serwera TAK z przełącznikiem włączania i opcją eksportu](../../assets/screenshots/tak_server_enabled.png)
 
-- **Enable Local TAK Server** — starts the loopback-only mTLS server on port **8089** for ATAK/iTAK connections from the same phone.
-- **TAK Mesh Channel** — selects which Meshtastic channel outgoing TAK traffic is sent on (default: the primary channel, index 0). Incoming TAK traffic is accepted from any channel. Matches the equivalent setting on iOS and in the legacy ATAK plugin.
-- **Mesh to CoT Converter** — off by default, and shown under the server toggle. With the server
-  running, this synthesizes a CoT contact for every node in your node database, so ordinary
-  Meshtastic nodes appear on the ATAK map as contacts. **This is what replaced the old plugin's
-  node visibility** — without it, only TAK-role nodes show up.
-- **Export TAK Data Package** — generates a `.zip` data package that ATAK/iTAK can import to connect to this server.
+- **Włącz lokalny serwer TAK** — uruchamia serwer mTLS tylko na pętli zwrotnej, na porcie **8089**, dla połączeń ATAK/iTAK z tego samego telefonu.
+- **Kanał sieci TAK** — wybiera, na którym kanale MT_SW wysyłany jest wychodzący ruch TAK (domyślnie: kanał podstawowy, indeks 0). Przychodzący ruch TAK jest przyjmowany z dowolnego kanału. Odpowiada analogicznemu ustawieniu w iOS i w starszej wtyczce ATAK.
+- **Konwerter Mesh na CoT** — domyślnie wyłączony, pokazywany pod przełącznikiem serwera. Przy uruchomionym serwerze
+  tworzy kontakt CoT dla każdego węzła w Twojej bazie węzłów, więc zwykłe
+  węzły MT_SW pojawiają się na mapie ATAK jako kontakty. **To właśnie zastąpiło widoczność
+  węzłów starej wtyczki** — bez tego pokazują się tylko węzły z rolą TAK.
+- **Eksportuj pakiet danych TAK** — generuje pakiet danych `.zip`, który ATAK/iTAK mogą zaimportować, aby połączyć się z tym serwerem.
 
-## TAK Roles
+## Role TAK
 
-Nodes configured with TAK-related roles behave differently from standard clients:
+Węzły skonfigurowane z rolami związanymi z TAK zachowują się inaczej niż standardowi klienci:
 
-| Rola            | Opis                                                                                                                                                                                                                                                                                |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **TAK**         | Full TAK interoperability — sends and receives CoT data, chat messages, and PLI updates. Functions as a standard client plus TAK bridge.                                                                                                            |
-| **TAK Tracker** | Position-only TAK output — automatically broadcasts PLI at regular intervals without user interaction. Optimized for unattended position beacons (vehicles, equipment, waypoints). Does not relay chat messages. |
+| Rola | Opis |
+|------|-------------|
+| **TAK** | Pełna współpraca z TAK — wysyła i odbiera dane CoT, wiadomości czatu i aktualizacje PLI. Działa jako standardowy klient plus most TAK. |
+| **TAK Tracker** | Wyjście TAK tylko z pozycją — automatycznie rozsyła PLI w regularnych odstępach bez udziału użytkownika. Zoptymalizowany do bezobsługowych beaconów pozycji (pojazdy, sprzęt, punkty trasy). Nie przekazuje wiadomości czatu. |
 
-> 💡 **Tip:** Use **TAK Tracker** for devices that only need to report position (e.g., a radio mounted in a vehicle). Use **TAK** for devices where users actively participate in TAK operations.
+> 💡 **Wskazówka:** Użyj **TAK Tracker** dla urządzeń, które mają tylko raportować pozycję (np. radio zamontowane w pojeździe). Użyj **TAK** dla urządzeń, w których użytkownicy aktywnie uczestniczą w operacjach TAK.
 
-### CoT (Cursor on Target) Format
+### Format CoT (Cursor on Target)
 
-TAK messages use the Cursor on Target XML format — a military standard for sharing situational awareness data. Meshtastic converts its internal protobuf messages to CoT format when bridging to TAK systems, so no manual format conversion is needed.
+Wiadomości TAK używają formatu XML Cursor on Target — wojskowego standardu wymiany danych o świadomości sytuacyjnej. MT_SW konwertuje swoje wewnętrzne wiadomości protobuf do formatu CoT podczas łączenia z systemami TAK, więc nie jest potrzebna ręczna konwersja formatu.
 
-## Wire Format (V1 / V2)
+## Format transmisji (V1 / V2)
 
-Meshtastic supports two TAK wire formats, chosen automatically based on the connected radio's firmware — no manual configuration needed:
+MT_SW obsługuje dwa formaty transmisji TAK, wybierane automatycznie na podstawie firmware podłączonego radia — nie jest potrzebna ręczna konfiguracja:
 
-| Format                          | Compatibility                                            | Features                                                                                                                                                                                                           |
-| ------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| V1 (Legacy)  | Firmware 2.7.x and older | Bare protobuf encoding on port 72. Supports position sharing (PLI) and chat (GeoChat) only — shapes, markers, routes, and other typed CoT events are dropped |
-| V2 (Current) | Firmware 2.8.0+          | Compact, zstd-compressed encoding on port 78. Adds shapes, markers, routes, aircraft, casevac, emergency, and task CoT types on top of everything V1 supports                                      |
+| Format | Zgodność | Funkcje |
+|--------|--------------|----------|
+| V1 (starszy) | Firmware 2.7.x i starsze | Surowe kodowanie protobuf na porcie 72. Obsługuje tylko udostępnianie pozycji (PLI) i czat (GeoChat) — kształty, znaczniki, trasy i inne typowane zdarzenia CoT są odrzucane |
+| V2 (bieżący) | Firmware 2.8.0+ | Zwarte kodowanie skompresowane zstd na porcie 78. Dodaje kształty, znaczniki, trasy, statki powietrzne, casevac, sytuacje awaryjne i zadania jako typy CoT, oprócz wszystkiego, co obsługuje V1 |
 
-A node still relays legacy V1 packets from older nodes even while running V2 itself, so mixed-firmware meshes keep working.
+Węzeł nadal przekazuje dalej starsze pakiety V1 z dawniejszych węzłów, nawet gdy sam działa w V2, więc sieci mesh z mieszanym firmware nadal działają.
 
-## Usage with ATAK
+## Użycie z ATAK
 
-Once configured:
+Po skonfigurowaniu:
+- Węzły MT_SW pojawiają się jako znaczniki na mapie ATAK z etykietami znaków wywoławczych
+- Wiadomości czatu mogą być mostkowane między siecią mesh a sieciami TAK
+- Aktualizacje pozycji płyną dwukierunkowo między MT_SW a TAK
+- Węzły TAK Tracker automatycznie rozsyłają PLI — ich pozycje pojawiają się na mapach ATAK bez żadnej konfiguracji po stronie ATAK
+- Trasy odebrane z sieci mesh są też zapisywane jako pakiet danych (`.zip`) w **Pobrane**; zaimportuj go w ATAK, aby dodać trasę. W Androidzie 9 i starszych plik trafia zamiast tego do własnego folderu aplikacji w `Android/data`
 
-- Meshtastic nodes appear as markers on the ATAK map with callsign labels
-- Chat messages can bridge between mesh and TAK networks
-- Position updates flow bidirectionally between Meshtastic and TAK
-- TAK Tracker nodes broadcast PLI automatically — their positions appear on ATAK maps without any ATAK-side configuration
-- Routes received from the mesh are also saved as a data package (`.zip`) in **Downloads**; import it in ATAK to add the route. On Android 9 and older the file goes to the app's own folder under `Android/data` instead
+> ℹ️ **Uwaga:** Integracja TAK wymaga określonych ról węzłów. Standardowe węzły klienckie nie uczestniczą automatycznie w operacjach TAK — choć przy włączonym **Konwerter Mesh na CoT** nadal pojawiają się na mapie ATAK jako kontakty.
 
-> ℹ️ **Note:** TAK integration requires specific node roles. Standard client nodes don't automatically participate in TAK operations — though with **Mesh to CoT Converter** enabled they still appear on the ATAK map as contacts.
+## Rozwiązywanie problemów
 
-## Troubleshooting
+| Problem | Przyczyna | Rozwiązanie |
+|---------|-------|----------|
+| Węzeł nie pojawia się na mapie ATAK | Złe ustawienie roli urządzenia lub wyłączony Konwerter Mesh na CoT | Ustaw **Rola urządzenia** węzła na TAK lub TAK Tracker. Aby zwykłe węzły (bez roli TAK) się pojawiały, włącz też **Konwerter Mesh na CoT** w **Ustawienia → Zaawansowane → Serwer TAK** |
+| Aktualizacje pozycji są nieaktualne | Utracony fix GPS lub zbyt długi interwał | Sprawdź stan GPS; skróć interwał transmisji pozycji w konfiguracji pozycji |
+| ATAK pokazuje „disconnected” | Lokalny serwer TAK jest wyłączony lub ATAK wskazuje gdzie indziej | Sprawdź, czy **Włącz lokalny serwer TAK** jest włączone i czy ATAK łączy się z `127.0.0.1:8089` — w razie wątpliwości zaimportuj ponownie wyeksportowany pakiet danych |
+| Kształty, znaczniki lub trasy nie są mostkowane | Węzeł wysyłający jest na starszym V1 (firmware 2.7.x lub starsze) | Zaktualizuj firmware węzła wysyłającego do 2.8.0+, aby uzyskać format transmisji V2 |
+| Dane CoT nie płyną | Niezgodność kanału | Wszystkie węzły TAK muszą być na tym samym kanale ze zgodnym szyfrowaniem |
 
-| Problem                                 | Cause                                                                                                     | Solution                                                                                                                                                                                                               |
-| --------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Node doesn't appear on ATAK map         | Wrong Device Role setting, or Mesh to CoT Converter off                                                   | Set the node's **Device Role** to TAK or TAK Tracker. For ordinary (non-TAK-role) nodes to appear, also enable **Mesh to CoT Converter** under **Settings → Advanced → TAK Server** |
-| Position updates are stale              | GPS fix lost or interval too long                                                                         | Check GPS status; reduce position broadcast interval in Position Config                                                                                                                                                |
-| ATAK shows "disconnected"               | The local TAK server is off, or ATAK is pointed elsewhere                                                 | Check **Enable Local TAK Server** is on, and that ATAK is connecting to `127.0.0.1:8089` — re-import the exported data package if unsure                                                                               |
-| Shapes, markers, or routes not bridging | Sending node is on legacy V1 (firmware 2.7.x or older) | Update the sending node's firmware to 2.8.0+ for V2 wire format                                                                                                                        |
-| CoT data not flowing                    | Channel mismatch                                                                                          | All TAK nodes must be on the same channel with matching encryption                                                                                                                                                     |
+## Kwestie bezpieczeństwa
 
-## Security Considerations
+> 🔒 **Prywatność:** Dane TAK udostępniają Twoją pozycję i znak wywoławczy. Moduł TAK respektuje
+> to samo szyfrowanie kanału co inne wiadomości MT_SW — w wrażliwych środowiskach używaj
+> kanału z kluczem innym niż domyślny.
 
-> 🔒 **Privacy:** TAK data shares your position and callsign information. The TAK module respects
-> the same channel encryption as other Meshtastic messages — in sensitive environments, use a
-> channel with a non-default key.
+## Powiązane tematy
 
-## Related Topics
-
-- [Settings — Modules & Admin](settings-module-admin) — TAK module configuration
-- [Nodes](nodes) — TAK and TAK Tracker roles in the node list
-- [Map & Waypoints](map-and-waypoints) — node positions on the map
+- [Ustawienia — Moduły i administracja](settings-module-admin) — konfiguracja modułu TAK
+- [Węzły](nodes) — role TAK i TAK Tracker na liście węzłów
+- [Mapa i punkty trasy](map-and-waypoints) — pozycje węzłów na mapie

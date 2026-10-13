@@ -1,8 +1,9 @@
 ---
-title: App Functions
+title: Funkcje aplikacji
+parent: Przewodnik użytkownika
 nav_order: 19
 last_updated: 2026-08-30
-description: Expose mesh capabilities to the Android system and on-device AI assistants (e.g. Gemini) so they can run mesh workflows without opening the app.
+description: Udostępnianie możliwości sieci mesh systemowi Android i asystentom AI działającym na urządzeniu (np. Gemini), aby mogły uruchamiać procesy sieci mesh bez otwierania aplikacji.
 aliases:
   - app-functions
   - system-ai
@@ -10,52 +11,52 @@ aliases:
   - assistant
 ---
 
-# App Functions
+# Funkcje aplikacji
 
-App Functions expose Meshtastic capabilities to the Android system and to on-device AI assistants (such as Gemini) through the Android App Functions API. With them enabled, an assistant can discover and trigger mesh workflows for you — for example sending a message or checking your mesh status — without you opening the app. App Functions are available on **Google-flavor Android builds only**.
+Funkcje aplikacji (App Functions) udostępniają możliwości MT_SW systemowi Android i asystentom AI działającym na urządzeniu (takim jak Gemini) za pośrednictwem interfejsu Android App Functions API. Gdy są włączone, asystent może wykryć i uruchamiać za Ciebie procesy sieci mesh — na przykład wysłać wiadomość lub sprawdzić stan sieci — bez otwierania aplikacji. Funkcje aplikacji są dostępne **wyłącznie w kompilacjach Androida w wersji Google**.
 
-> ℹ️ **Note:** This is separate from the in-app **Chirpy** assistant. App Functions let the _system_ AI assistant act on your mesh; Chirpy is a conversational assistant inside the Meshtastic app itself.
+> ℹ️ **Uwaga:** To coś innego niż asystent **Chirpy** wbudowany w aplikację. Funkcje aplikacji pozwalają *systemowemu* asystentowi AI działać w Twojej sieci mesh; Chirpy to asystent konwersacyjny wewnątrz samej aplikacji MT_SW_APP.
 
-## Enabling App Functions
+## Włączanie funkcji aplikacji
 
-Control App Functions from **Settings → System AI**. The screen has:
+Funkcjami aplikacji zarządzasz w **Ustawienia → AI systemowe**. Ekran zawiera:
 
-- A **master toggle** labeled **"Allow AI access"**, with the subtitle _"Let system AI assistants (e.g. Gemini) discover and use mesh functions"_. When off, no functions are exposed to the system.
-- An **individual toggle for each function**, so you can expose only the capabilities you want.
+- **Główny przełącznik** o nazwie **„Zezwól na dostęp AI”**, z podpisem *„Pozwól systemowym asystentom AI (np. Gemini) wykrywać i korzystać z funkcji sieci mesh”*. Gdy jest wyłączony, żadne funkcje nie są udostępniane systemowi.
+- **Osobny przełącznik dla każdej funkcji**, dzięki czemu możesz udostępnić tylko te możliwości, które chcesz.
 
-> ⚠️ **Important:** App Functions ship switched on. On a Google-flavor build the master toggle and every individual function, **Send message** included, start enabled — so an assistant can read your mesh data and send messages to your mesh until you turn **Allow AI access** off.
+> ⚠️ **Ważne:** Funkcje aplikacji są dostarczane włączone. W kompilacji w wersji Google główny przełącznik i każda pojedyncza funkcja, łącznie z **Wyślij wiadomość**, są domyślnie włączone — więc asystent może odczytywać dane Twojej sieci mesh i wysyłać wiadomości do Twojej sieci, dopóki nie wyłączysz **Zezwól na dostęp AI**.
 
-The functions are grouped into a **Write** section (functions that change something or send data to your mesh) and a **Read** section (functions that only return information).
+Funkcje są pogrupowane w sekcję **Funkcje zapisu** (funkcje, które coś zmieniają lub wysyłają dane do Twojej sieci mesh) oraz sekcję **Funkcje odczytu** (funkcje, które tylko zwracają informacje).
 
-![App Functions screen with master and per-function toggles](../../assets/screenshots/app-functions_settings.png)
+![Ekran funkcji aplikacji z głównym przełącznikiem i przełącznikami poszczególnych funkcji](../../assets/screenshots/app-functions_settings.png)
 
-The screenshot has **Send message** and **Get recent messages** switched off to illustrate per-function control; a fresh install shows every switch on.
+Na zrzucie ekranu **Wyślij wiadomość** i **Pobierz ostatnie wiadomości** są wyłączone, aby pokazać sterowanie poszczególnymi funkcjami; świeża instalacja pokazuje wszystkie przełączniki włączone.
 
-### Write Functions
+### Funkcje zapisu
 
-| Function         | What it does                                                                                                                                                                                                  |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Send message** | Sends a text message to a contact (direct message) or to a channel. The mesh carries at most 233 bytes of text, so keep assistant-composed messages short. |
+| Funkcja | Co robi |
+|----------|--------------|
+| **Wyślij wiadomość** | Wysyła wiadomość tekstową do kontaktu (wiadomość bezpośrednia) lub na kanał. Sieć mesh przenosi najwyżej 233 bajty tekstu, więc wiadomości tworzone przez asystenta powinny być krótkie. |
 
-### Read Functions
+### Funkcje odczytu
 
-| Function                | What it returns                                                                     |
-| ----------------------- | ----------------------------------------------------------------------------------- |
-| **Get mesh status**     | Whether you're connected to a radio, and how many nodes are online. |
-| **Get node list**       | The list of nodes on your mesh.                                     |
-| **Get channel info**    | Information about your channels.                                    |
-| **Get device status**   | Status of your connected radio.                                     |
-| **Get node details**    | Detailed information about a specific node.                         |
-| **Get mesh metrics**    | Telemetry and metrics from your mesh.                               |
-| **Get recent messages** | Recent messages from your conversations.                            |
-| **Get unread summary**  | A summary of unread messages.                                       |
+| Funkcja | Co zwraca |
+|----------|-----------------|
+| **Pobierz status sieci mesh** | Informację, czy jesteś połączony z radiem, i ile węzłów jest online. |
+| **Pobierz listę węzłów** | Listę węzłów w Twojej sieci mesh. |
+| **Pobierz informacje o kanale** | Informacje o Twoich kanałach. |
+| **Pobierz status urządzenia** | Stan połączonego radia. |
+| **Pobierz szczegóły węzła** | Szczegółowe informacje o wybranym węźle. |
+| **Pobierz metryki sieci mesh** | Telemetrię i metryki z Twojej sieci mesh. |
+| **Pobierz ostatnie wiadomości** | Ostatnie wiadomości z Twoich rozmów. |
+| **Pobierz podsumowanie nieprzeczytanych** | Podsumowanie nieprzeczytanych wiadomości. |
 
-## Privacy
+## Prywatność
 
-> 🔒 **Privacy:** The **Send message** function lets an assistant send messages to your mesh on your behalf, and the read functions expose node, message, and metric data to it. Because all of them start enabled, the choice you make here is what to turn off rather than what to turn on. Each function has its own toggle, and **Allow AI access** turns all of them off at once.
+> 🔒 **Prywatność:** Funkcja **Wyślij wiadomość** pozwala asystentowi wysyłać wiadomości do Twojej sieci mesh w Twoim imieniu, a funkcje odczytu udostępniają mu dane o węzłach, wiadomościach i metrykach. Ponieważ wszystkie są domyślnie włączone, decyzja, którą tu podejmujesz, dotyczy tego, co wyłączyć, a nie tego, co włączyć. Każda funkcja ma własny przełącznik, a **Zezwól na dostęp AI** wyłącza je wszystkie naraz.
 
-## Related Topics
+## Powiązane tematy
 
-- [Messages & Channels](messages-and-channels) — sending messages directly in the app
-- [Nodes](nodes) — the node list the read functions draw from
-- [Node Metrics](node-metrics) — the telemetry behind Get mesh metrics
+- [Wiadomości i kanały](messages-and-channels) — wysyłanie wiadomości bezpośrednio w aplikacji
+- [Węzły](nodes) — lista węzłów, z której korzystają funkcje odczytu
+- [Metryki węzła](node-metrics) — telemetria stojąca za funkcją Pobierz metryki sieci mesh

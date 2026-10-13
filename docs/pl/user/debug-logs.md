@@ -1,8 +1,9 @@
 ---
-title: Debug Logs
+title: Dzienniki debugowania
+parent: Przewodnik użytkownika
 nav_order: 22
 last_updated: 2026-09-28
-description: View and export the app's own debug logs from inside the app, and attach a capture to a GitHub issue to help diagnose bugs — no adb required.
+description: Przeglądaj i eksportuj własne dzienniki debugowania aplikacji z wnętrza aplikacji oraz dołącz zrzut do zgłoszenia na GitHubie, aby pomóc w diagnozie błędów — bez adb.
 aliases:
   - debug-logs
   - logcat
@@ -10,46 +11,46 @@ aliases:
   - bug-report
 ---
 
-# Debug Logs
+# Dzienniki debugowania
 
-When something misbehaves, the app's debug logs are the single most useful thing you can attach to a bug report. Meshtastic can capture them **for you, from inside the app** — you don't need `adb` or any desktop tooling to collect them.
+Gdy coś działa nieprawidłowo, dzienniki debugowania aplikacji to najbardziej przydatna rzecz, jaką możesz dołączyć do zgłoszenia błędu. MT_SW_APP potrafi je zebrać **za Ciebie, z wnętrza aplikacji** — nie potrzebujesz `adb` ani żadnych narzędzi na komputerze, aby je zebrać.
 
-Open the **Debug Panel** from **Settings → Advanced → Debug Panel**.
+Otwórz **Panel debugowania** w **Ustawienia → Zaawansowane → Panel debugowania**.
 
-If you're filing an issue, export your logs (see [Exporting](#exporting)) and attach the `.txt` file to your report on the [Meshtastic-Android issue tracker](https://github.com/meshtastic/Meshtastic-Android/issues). A log capture that covers the moment the problem happened turns "it doesn't work" into something a developer can actually track down.
+Jeśli zgłaszasz problem, wyeksportuj dzienniki (zobacz [Eksportowanie](#exporting)) i dołącz plik `.txt` do zgłoszenia w [systemie zgłoszeń Meshtastic-Android](https://github.com/meshtastic/Meshtastic-Android/issues). Zrzut dzienników obejmujący moment wystąpienia problemu zamienia „to nie działa” w coś, co programista faktycznie może wyśledzić.
 
-## The two tabs
+## Dwie zakładki
 
-The Debug Panel has two tabs:
+Panel debugowania ma dwie zakładki:
 
-- **Packets** — the decoded mesh traffic your radio has sent and received (protocol-level messages). Useful for diagnosing mesh and routing behavior.
-- **App logs** — the app's own diagnostic log (Android _logcat_), including warnings, errors, and stack traces from the app itself. This is usually what a bug report needs.
+- **Pakiety** — zdekodowany ruch sieci mesh, który Twoje radio wysłało i odebrało (wiadomości na poziomie protokołu). Przydatne do diagnozowania zachowania sieci mesh i routingu.
+- **Dzienniki aplikacji** — własny dziennik diagnostyczny aplikacji (Android *logcat*), w tym ostrzeżenia, błędy i ślady stosu z samej aplikacji. Zwykle to właśnie tego potrzebuje zgłoszenie błędu.
 
-Each tab has its own **export** button and produces its own file, so you can grab whichever is relevant — or both.
+Każda zakładka ma własny przycisk **eksportu** i tworzy własny plik, więc możesz zabrać ten, który jest istotny — albo oba.
 
-## Viewing app logs
+## Przeglądanie dzienników aplikacji
 
-The **App logs** tab shows the most recent log lines from **this app only** — never other apps on your phone.
+Zakładka **Dzienniki aplikacji** pokazuje najnowsze linie dziennika **tylko z tej aplikacji** — nigdy z innych aplikacji w telefonie.
 
-- **Search** — type in the search box to filter to matching lines.
-- **Level filter** — the **V / D / I / W / E** chips toggle Verbose, Debug, Info, Warn, and Error lines. Tap a level to hide it; tap again to bring it back. Fatal lines are always shown.
-- **Refresh** — the refresh icon re-reads the latest logs.
+- **Szukaj** — wpisz tekst w polu wyszukiwania, aby przefiltrować do pasujących linii.
+- **Filtr poziomu** — chipy **V / D / I / W / E** przełączają linie Verbose, Debug, Info, Warn i Error. Dotknij poziomu, aby go ukryć; dotknij ponownie, aby go przywrócić. Linie Fatal są zawsze pokazywane.
+- **Odśwież** — ikona odświeżania odczytuje najnowsze dzienniki jeszcze raz.
 
-Error and warning lines are tinted so problems stand out.
+Linie błędów i ostrzeżeń są podkolorowane, aby problemy rzucały się w oczy.
 
-## Exporting
+## Eksportowanie
 
-Tap the **download** icon to save the current logs to a file. The app first shows a warning about what the file contains — confirm it, then choose where the file goes through the system file picker. The file is named with a timestamp (for example `meshtastic_logcat_20260701_143312.txt`) so repeated exports never overwrite each other. The same warning guards the **Packets** tab export.
+Dotknij ikony **pobierania**, aby zapisać bieżące dzienniki do pliku. Aplikacja najpierw pokazuje ostrzeżenie o zawartości pliku — potwierdź je, a następnie wybierz miejsce zapisu w systemowym selektorze plików. Plik ma w nazwie znacznik czasu (na przykład `meshtastic_logcat_20260701_143312.txt`), więc kolejne eksporty nigdy się nie nadpisują. To samo ostrzeżenie chroni eksport z zakładki **Pakiety**.
 
-Attach that file to your GitHub issue.
+Dołącz ten plik do zgłoszenia na GitHubie.
 
-> 🔒 **Privacy:** Exports automatically **redact** private keys, admin keys, session passkeys, and channel PSKs, and suppress raw packet bytes. Everything else stays — the file can contain your message text, precise locations, and node details. Read it before sharing it publicly, and share privately if you have any doubt.
+> 🔒 **Prywatność:** Eksporty automatycznie **zacierają** klucze prywatne, klucze administratora, hasła sesji i PSK kanałów oraz pomijają surowe bajty pakietów. Cała reszta zostaje — plik może zawierać treść Twoich wiadomości, dokładne lokalizacje i szczegóły węzłów. Przeczytaj go przed publicznym udostępnieniem, a w razie wątpliwości udostępnij go prywatnie.
 
-## Desktop
+## Komputer
 
-The desktop app has no system logcat, so the **App logs** tab shows the app's own captured log output instead. Search, filtering, and export work the same way. Release builds capture Info, Warn, and Error lines; Verbose and Debug lines appear only in development builds.
+Aplikacja na komputer nie ma systemowego logcata, więc zakładka **Dzienniki aplikacji** pokazuje zamiast tego własne zebrane wyjście dziennika aplikacji. Wyszukiwanie, filtrowanie i eksport działają tak samo. Wydania produkcyjne zbierają linie Info, Warn i Error; linie Verbose i Debug pojawiają się tylko w wersjach deweloperskich.
 
-## Related Topics
+## Powiązane tematy
 
-- [Help & In-App Docs](help-and-docs) — reading this documentation offline inside the app
-- [Connections](connections) — if the problem is getting connected to your radio in the first place
+- [Pomoc i dokumentacja w aplikacji](help-and-docs) — czytanie tej dokumentacji offline w aplikacji
+- [Połączenia](connections) — jeśli problem polega na samym połączeniu się z radiem

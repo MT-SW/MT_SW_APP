@@ -315,7 +315,7 @@
     <string name="config_lora_frequency_offset">Frequency offset (kHz)</string>
     <string name="config_lora_frequency_offset_summary">Shifts the operating frequency by this many kHz, for example to correct a radio\'s crystal error. 0 means no offset.</string>
     <string name="config_lora_modem_preset_licensed_summary">This region's presets are for licensed (amateur radio) operators only. Enable Licensed amateur radio (Ham) in User Config to select them.</string>
-    <string name="config_lora_modem_preset_summary">Available modem presets, default is Narrow Fast.</string>
+    <string name="config_lora_modem_preset_summary">Available modem presets. The default preset for MT_SW_FIRMWARE is Narrow Fast.</string>
     <string name="config_lora_region_summary">The region where you will be using your radios.</string>
     <string name="config_network_udp_enabled_summary">Enable broadcasting packets via UDP over the local network.</string>
     <string name="config_saved_restarting">The node is restarting and will be briefly unreachable.</string>
@@ -594,6 +594,16 @@
     <string name="doc_title_firmware">Firmware Updates</string>
     <string name="doc_title_help">Help &amp; In-App Docs</string>
     <string name="doc_title_map">Map &amp; Waypoints</string>
+    <string name="doc_title_dev_architecture">Architecture</string>
+    <string name="doc_title_dev_codebase">Codebase</string>
+    <string name="doc_title_dev_adding_feature_module">Adding a Feature Module</string>
+    <string name="doc_title_dev_navigation">Navigation &amp; Deep Links</string>
+    <string name="doc_title_dev_transport">Transport</string>
+    <string name="doc_title_dev_persistence">Persistence</string>
+    <string name="doc_title_dev_testing">Testing</string>
+    <string name="doc_title_dev_contributing">Contributing</string>
+    <string name="doc_title_dev_test_builds">Test Builds &amp; Obtainium</string>
+    <string name="doc_title_dev_documentation_style">Documentation Style</string>
     <string name="doc_title_measurement">Measurement &amp; Formatting</string>
     <string name="doc_title_messages">Messages &amp; Channels</string>
     <string name="doc_title_mqtt">MQTT</string>

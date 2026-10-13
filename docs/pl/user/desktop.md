@@ -1,8 +1,9 @@
 ---
-title: Desktop App
+title: Aplikacja na komputer
+parent: Przewodnik użytkownika
 nav_order: 14
 last_updated: 2026-09-11
-description: Install and use the Meshtastic Desktop app on Linux, macOS, and Windows — connections, feature parity, and keyboard shortcuts.
+description: Instalacja i obsługa aplikacji MT_SW_APP na komputerze z Linuxem, macOS i Windows — połączenia, zgodność funkcji i skróty klawiszowe.
 aliases:
   - desktop
   - linux
@@ -11,115 +12,115 @@ aliases:
   - jvm
 ---
 
-# Desktop App
+# Aplikacja na komputer
 
-This page covers installing the Meshtastic desktop app, connecting a radio, and how it differs from Android. The desktop app shares its core codebase with Android via Kotlin Multiplatform, so most features work identically across Linux, macOS, and Windows.
+Ta strona opisuje instalację aplikacji na komputer, podłączanie radia i różnice względem wersji na Androida. Aplikacja na komputer dzieli z Androidem główny kod dzięki Kotlin Multiplatform, więc większość funkcji działa tak samo w Linuxie, macOS i Windows.
 
-## Installation
+## Instalacja
 
 ### Linux
 
-- Download the `.deb`, `.rpm`, or `.AppImage` package from the [releases page](https://github.com/meshtastic/Meshtastic-Android/releases)
-- Or install from Flathub: `flatpak install flathub org.meshtastic.MeshtasticDesktop`
-- Or build from source using `./gradlew :desktopApp:run`
+- Pobierz pakiet `.deb`, `.rpm` lub `.AppImage` ze [strony wydań](https://github.com/meshtastic/Meshtastic-Android/releases)
+- Albo zainstaluj z Flathub: `flatpak install flathub org.meshtastic.MeshtasticDesktop`
+- Albo zbuduj ze źródeł poleceniem `./gradlew :desktopApp:run`
 
 ### macOS
 
-- Download the `.dmg` package from the [releases page](https://github.com/meshtastic/Meshtastic-Android/releases)
-- Or build from source
+- Pobierz pakiet `.dmg` ze [strony wydań](https://github.com/meshtastic/Meshtastic-Android/releases)
+- Albo zbuduj ze źródeł
 
 ### Windows
 
-- Download the `.msi` or `.exe` installer from the [releases page](https://github.com/meshtastic/Meshtastic-Android/releases)
-- Or build from source
+- Pobierz instalator `.msi` lub `.exe` ze [strony wydań](https://github.com/meshtastic/Meshtastic-Android/releases)
+- Albo zbuduj ze źródeł
 
-## Connecting Your Radio
+## Podłączanie radia
 
-### USB Serial (Primary)
+### USB Serial (podstawowe)
 
-The most reliable connection method on desktop:
+Najpewniejsza metoda połączenia na komputerze:
 
-Connect your radio via USB. The app detects the serial port automatically; if it doesn't, select the port from the Connect menu.
+Podłącz radio kablem USB. Aplikacja wykrywa port szeregowy automatycznie; jeśli tego nie zrobi, wybierz port z menu Połącz.
 
 ### TCP/IP
 
-For network-connected radios:
+Dla radiów podłączonych do sieci:
 
-1. Enter the radio's IP address and port (default: 4403).
-2. Click **Connect**.
+1. Wpisz adres IP radia i port (domyślnie: 4403).
+2. Kliknij **Połącz**.
 
 ### Bluetooth (BLE)
 
-Bluetooth Low Energy is supported on desktop via the [Kable](https://github.com/JuulLabs/kable) library:
+Bluetooth Low Energy jest obsługiwany na komputerze przez bibliotekę [Kable](https://github.com/JuulLabs/kable):
 
-1. Ensure your system has a Bluetooth adapter. The app scans for nearby Meshtastic radios automatically.
-2. Select your radio from the Connect screen.
+1. Upewnij się, że komputer ma adapter Bluetooth. Aplikacja automatycznie szuka pobliskich radiów Meshtastic.
+2. Wybierz swoje radio na ekranie Połącz.
 
-## Feature Parity
+## Zgodność funkcji
 
-| Feature                                               | Android | Desktop | Notatki                                                                                                                                                                                                                                         |
-| ----------------------------------------------------- | ------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Messaging                                             | ✓       | ✓       | Full parity                                                                                                                                                                                                                                     |
-| Node List                                             | ✓       | ✓       | Full parity                                                                                                                                                                                                                                     |
-| Mapa                                                  | ✓       | ✓       | Interactive MapLibre map, with base map and overlay pickers and custom tile sources. Offline terrain (hillshade and contours) can be downloaded; offline base-map packs and local `.mbtiles` archives cannot |
-| Map layers (`.kml`/`.kmz`/GeoJSON) | ✓       | ✓       | Same layer store and sheet as Android; imported files draw on the desktop map                                                                                                                                                                   |
-| Site Planner                                          | ✓       | ✓\*     | \*Opens in your browser on desktop; the estimate is not drawn on the desktop map                                                                                                                                                                |
-| Ustawienia                                            | ✓       | ✓       | Full parity                                                                                                                                                                                                                                     |
-| Bluetooth (BLE)                    | ✓       | ✓       | Via Kable on desktop                                                                                                                                                                                                                            |
-| Aktualizacja oprogramowania                           | ✓       | ✓       | In-app USB, BLE, and Wi-Fi (ESP32) update work the same as Android. The USB maintenance flow — nRF52/RP2040 factory erase and bootloader upgrade — is Android-only                                           |
-| Notifications                                         | ✓       | ✓       | Native OS notifications                                                                                                                                                                                                                         |
-| Widgets                                               | ✓       | ✗       | Android-only                                                                                                                                                                                                                                    |
-| AI Assistant (Chirpy)              | ✓\*     | ✗       | Google flavor Android only                                                                                                                                                                                                                      |
-| App Functions (system AI)          | ✓†      | ✗       | Google flavor Android only                                                                                                                                                                                                                      |
+| Funkcja | Android | Komputer | Uwagi |
+|---------|---------|----------|-------|
+| Wiadomości | ✓ | ✓ | Pełna zgodność |
+| Lista węzłów | ✓ | ✓ | Pełna zgodność |
+| Mapa | ✓ | ✓ | Interaktywna mapa MapLibre, z wyborem mapy bazowej i nakładek oraz własnymi źródłami kafelków. Można pobrać teren offline (cieniowanie wzniesień i warstwice); pakiety map bazowych offline i lokalne archiwa `.mbtiles` nie są obsługiwane |
+| Warstwy mapy (`.kml`/`.kmz`/GeoJSON) | ✓ | ✓ | Ten sam magazyn warstw i ten sam panel co na Androidzie; zaimportowane pliki są rysowane na mapie na komputerze |
+| Planer stanowisk (Site Planner) | ✓ | ✓* | *Na komputerze otwiera się w przeglądarce; oszacowanie nie jest rysowane na mapie w aplikacji |
+| Ustawienia | ✓ | ✓ | Pełna zgodność |
+| Bluetooth (BLE) | ✓ | ✓ | Na komputerze przez Kable |
+| Aktualizacja firmware | ✓ | ✓ | Aktualizacja w aplikacji przez USB, BLE i Wi-Fi (ESP32) działa tak samo jak na Androidzie. Tryb serwisowy USB — kasowanie fabryczne nRF52/RP2040 i aktualizacja bootloadera — jest tylko na Androidzie |
+| Powiadomienia | ✓ | ✓ | Natywne powiadomienia systemu |
+| Widżety | ✓ | ✗ | Tylko Android |
+| Asystent AI (Chirpy) | ✓* | ✗ | Tylko Android w wersji Google |
+| Funkcje aplikacji (AI systemowe) | ✓† | ✗ | Tylko Android w wersji Google |
 
-\*Chirpy AI requires Android 14+ on Google flavor builds with supported hardware.
+*Chirpy AI wymaga Androida 14+ w wersjach Google na obsługiwanym sprzęcie.
 
-†App Functions exposes app actions to the Android system AI on Google flavor builds. See [App Functions](app-functions).
+†Funkcje aplikacji udostępniają działania aplikacji systemowemu AI Androida w wersjach Google. Zobacz [Funkcje aplikacji](app-functions).
 
-## UI Differences
+## Różnice w interfejsie
 
-The desktop app uses the same Compose Multiplatform UI with adaptations for larger screens and desktop interaction.
+Aplikacja na komputer używa tego samego interfejsu Compose Multiplatform, dostosowanego do większych ekranów i obsługi na komputerze.
 
-### Keyboard Shortcuts
+### Skróty klawiszowe
 
-Shortcuts use **⌘** (Command) on macOS and **Ctrl** on Windows and Linux. (The Super / Windows key is not bound.)
+Skróty używają **⌘** (Command) w macOS oraz **Ctrl** w Windows i Linuxie. (Klawisz Super / Windows nie jest używany.)
 
-| Shortcut     | Action                 |
-| ------------ | ---------------------- |
-| **⌘/Ctrl+Q** | Quit the app           |
-| **⌘/Ctrl+,** | Open Settings          |
-| **⌘/Ctrl+1** | Switch to Messages tab |
-| **⌘/Ctrl+2** | Switch to Nodes tab    |
-| **⌘/Ctrl+3** | Switch to Map tab      |
-| **⌘/Ctrl+4** | Switch to Connect tab  |
-| **⌘/Ctrl+/** | Open About             |
+| Skrót | Działanie |
+|----------|--------|
+| **⌘/Ctrl+Q** | Zamknij aplikację |
+| **⌘/Ctrl+,** | Otwórz Ustawienia |
+| **⌘/Ctrl+1** | Przejdź do karty Wiadomości |
+| **⌘/Ctrl+2** | Przejdź do karty Węzły |
+| **⌘/Ctrl+3** | Przejdź do karty Mapa |
+| **⌘/Ctrl+4** | Przejdź do karty Połączenie |
+| **⌘/Ctrl+/** | Otwórz informacje o aplikacji |
 
-### Window & System Tray
+### Okno i zasobnik systemowy
 
-- **Window resizing** — responsive layout adapts to window dimensions
-- **System tray** — closing the window minimizes to the system tray for background mesh operation. On a desktop environment with no tray, there is nowhere to minimize to, so closing quits the app instead
-- **Tray menu** — right-click the tray icon to show window or quit
-- **Mouse interaction** — hover states and standard desktop navigation
+- **Zmiana rozmiaru okna** — układ dostosowuje się do wymiarów okna
+- **Zasobnik systemowy** — zamknięcie okna minimalizuje aplikację do zasobnika systemowego, aby sieć mesh działała w tle. W środowisku graficznym bez zasobnika nie ma gdzie zminimalizować, więc zamknięcie okna zamyka aplikację
+- **Menu zasobnika** — kliknij prawym przyciskiem ikonę w zasobniku, aby pokazać okno lub zamknąć aplikację
+- **Obsługa myszą** — podświetlanie po najechaniu i standardowa nawigacja jak na komputerze
 
-### Notification Preferences
+### Preferencje powiadomień
 
-The desktop app provides in-app toggles for controlling which notifications are shown. Find them in the **App Notifications** section of the Settings screen: **Direct message notifications**, **New node notifications**, and **Low battery notifications**.
+Aplikacja na komputer ma przełączniki, którymi wybierasz, jakie powiadomienia mają być pokazywane. Znajdziesz je w sekcji **Powiadomienia aplikacji** na ekranie Ustawienia: **Powiadomienia o bezpośredniej wiadomości**, **Powiadomienia o nowych węzłach** i **Powiadomienia o niskim poziomie baterii**.
 
-## Built-in Documentation Browser
+## Wbudowana przeglądarka dokumentacji
 
-The desktop app includes a built-in documentation browser for quick access to help content without leaving the app.
+Aplikacja na komputer zawiera wbudowaną przeglądarkę dokumentacji, dzięki której szybko znajdziesz pomoc bez wychodzenia z aplikacji.
 
-![Docs browser with table of contents](../../assets/screenshots/docs-browser_toc.png)
+![Przeglądarka dokumentacji ze spisem treści](../../assets/screenshots/docs-browser_toc.png)
 
-The browser supports full-text search across all documentation:
+Przeglądarka obsługuje wyszukiwanie pełnotekstowe we wszystkich dokumentach:
 
-![Searching the docs browser](../../assets/screenshots/docs-browser_search.png)
+![Wyszukiwanie w przeglądarce dokumentacji](../../assets/screenshots/docs-browser_search.png)
 
-Individual doc pages render with full formatting:
+Poszczególne strony dokumentacji są wyświetlane z pełnym formatowaniem:
 
-![A documentation page](../../assets/screenshots/docs-browser_page.png)
+![Strona dokumentacji](../../assets/screenshots/docs-browser_page.png)
 
-## Building from Source
+## Budowanie ze źródeł
 
 ```shell
 git clone https://github.com/meshtastic/Meshtastic-Android.git
@@ -127,28 +128,27 @@ cd Meshtastic-Android
 ./gradlew :desktopApp:run
 ```
 
-Requirements:
+Wymagania:
+- JDK 25 (Gradle potrafi sam pobrać potrzebne środowisko przez foojay)
+- Android SDK nie jest potrzebne przy budowaniu samej wersji na komputer
 
-- JDK 25 (Gradle can provision the toolchain itself via foojay)
-- No Android SDK required for desktop-only builds
+## Znane ograniczenia
 
-## Known Limitations
+- Pobieranie map bazowych offline i lokalne archiwa `.mbtiles` nie są dostępne na komputerze. Teren offline jest dostępny — zobacz [Mapa i punkty trasy](map-and-waypoints).
+- Import warstw `.kml`/`.kmz`/GeoJSON działa — zobacz
+  [Mapa i punkty trasy](map-and-waypoints#map-layers). Planer stanowisk (Site Planner) otwiera się w przeglądarce
+  zamiast w aplikacji; aby przenieść jego oszacowanie zasięgu na mapę, kliknij pinezkę nadajnika
+  w przeglądarce i użyj eksportu GeoJSON z planera, a potem dodaj plik jako warstwę — nie eksportu KML,
+  który jest obrazem nakładki na teren i ta mapa nie potrafi go narysować. Własne sieciowe źródła kafelków
+  też działają — zobacz [Mapa i punkty trasy](map-and-waypoints#adding-your-own-tile-source)
+- Tryb serwisowy USB — kasowanie fabryczne nRF52/RP2040 i aktualizacja bootloadera — jest tylko na Androidzie, a
+  aplikacja na komputer go nie oferuje. Użyj zamiast tego [Web Flasher](https://flasher.meshtastic.org)
+- Niektóre funkcje specyficzne dla Androida (widżety, określone kanały powiadomień) są niedostępne
+- Wydajność może być słabsza na komputerach o niskiej specyfikacji z Compose Desktop
+- Parowanie z zapamiętaniem (bonding) BLE nie jest jeszcze obsługiwane na komputerze (parowanie działa bez bondingu)
 
-- Offline base-map downloads and local `.mbtiles` archives are not available on desktop. Offline terrain is — see [Map & Waypoints](map-and-waypoints).
-- `.kml`/`.kmz`/GeoJSON layer import works — see
-  [Map & Waypoints](map-and-waypoints#map-layers). Site Planner opens in your browser
-  rather than in the app; to bring its coverage estimate onto the map, click the transmitter pin
-  in the browser and use the planner's GeoJSON export, then add the file as a layer — not the KML
-  export, which is a ground-overlay image this map cannot draw. Custom network tile sources work
-  too — see [Map & Waypoints](map-and-waypoints#adding-your-own-tile-source)
-- The USB maintenance flow — nRF52/RP2040 factory erase and bootloader upgrade — is Android-only, and the
-  desktop app does not offer it. Use the [Web Flasher](https://flasher.meshtastic.org) instead
-- Some Android-specific features (widgets, specific notification channels) are unavailable
-- Performance may vary on low-spec hardware running Compose Desktop
-- BLE bonding is not yet supported on desktop (pairing works without bonding)
+## Powiązane tematy
 
-## Related Topics
-
-- [Connections](connections) — connection methods overview
-- [Firmware Updates](firmware) — in-app USB, BLE, and Wi-Fi update all work the same as on Android
-- [Map & Waypoints](map-and-waypoints) — base maps, layers, custom tile sources, and what the desktop map does not do
+- [Połączenia](connections) — przegląd metod połączenia
+- [Aktualizacje firmware](firmware) — aktualizacja w aplikacji przez USB, BLE i Wi-Fi działa tak samo jak na Androidzie
+- [Mapa i punkty trasy](map-and-waypoints) — mapy bazowe, warstwy, własne źródła kafelków i to, czego mapa na komputerze nie potrafi

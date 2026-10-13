@@ -1,8 +1,9 @@
 ---
-title: Help & In-App Docs
+title: Pomoc i dokumentacja w aplikacji
+parent: Przewodnik użytkownika
 nav_order: 21
 last_updated: 2026-09-11
-description: Browse this documentation inside the app, search it, and ask Chirpy — the on-device AI assistant — questions about Meshtastic.
+description: Przeglądaj tę dokumentację w aplikacji, przeszukuj ją i zadawaj pytania o MT_SW asystentowi AI działającemu na urządzeniu — Chirpy.
 aliases:
   - help
   - docs-browser
@@ -10,37 +11,37 @@ aliases:
   - assistant
 ---
 
-# Help & In-App Docs
+# Pomoc i dokumentacja w aplikacji
 
-This same user documentation ships **inside the app**, so you can read it offline without leaving Meshtastic. Open it from **Settings → Help & Documentation**.
+Ta sama dokumentacja użytkownika jest dołączona **do aplikacji**, więc możesz ją czytać offline, nie opuszczając MT_SW_APP. Otwórz ją w **Ustawienia → Pomoc i dokumentacja**.
 
-## Browsing
+## Przeglądanie
 
-The docs browser lists every user-guide page. Tap a page to read it; images and cross-links work just like they do here.
+Przeglądarka dokumentacji wyświetla listę wszystkich stron podręcznika użytkownika. Dotknij strony, aby ją przeczytać; obrazy i odnośniki między stronami działają tak samo jak tutaj.
 
-![In-app documentation browser table of contents](../../assets/screenshots/docs-browser_toc.png)
+![Spis treści przeglądarki dokumentacji w aplikacji](../../assets/screenshots/docs-browser_toc.png)
 
-### Search
+### Wyszukiwanie
 
-Tap the search field at the top of the docs browser to open a full-screen search view. Type to filter pages by title and keywords — results update as you type, under the same field. The back arrow, or the keyboard's search action, closes the view. The field hides while you scroll down the page list and comes back when you scroll up.
+Dotknij pola wyszukiwania na górze przeglądarki dokumentacji, aby otworzyć widok wyszukiwania na pełnym ekranie. Pisz, aby filtrować strony według tytułu i słów kluczowych — wyniki aktualizują się w trakcie pisania, pod tym samym polem. Strzałka wstecz lub akcja wyszukiwania na klawiaturze zamyka widok. Pole chowa się podczas przewijania listy stron w dół i wraca, gdy przewijasz w górę.
 
-![Searching the in-app documentation](../../assets/screenshots/docs-browser_search.png)
+![Wyszukiwanie w dokumentacji w aplikacji](../../assets/screenshots/docs-browser_search.png)
 
-A page open in the browser:
+Strona otwarta w przeglądarce:
 
-![A documentation page rendered in the app](../../assets/screenshots/docs-browser_page.png)
+![Strona dokumentacji wyświetlona w aplikacji](../../assets/screenshots/docs-browser_page.png)
 
-## Chirpy — the AI Assistant
+## Chirpy — asystent AI
 
-**Chirpy** answers plain-language questions about Meshtastic using this bundled documentation as its source. Tap the Chirpy button in the docs browser, type a question, and it replies with an answer and links to the relevant pages.
+**Chirpy** odpowiada na pytania o MT_SW zadawane zwykłym językiem, korzystając jako źródła z tej dołączonej dokumentacji. Dotknij przycisku Chirpy w przeglądarce dokumentacji, wpisz pytanie, a asystent odpowie i poda odnośniki do odpowiednich stron.
 
-![Chirpy AI assistant answering a question with page links](../../assets/screenshots/docs-browser_chirpy.png)
+![Asystent AI Chirpy odpowiadający na pytanie z odnośnikami do stron](../../assets/screenshots/docs-browser_chirpy.png)
 
-Chirpy is Google-flavor Android only. On F-Droid, desktop and iOS builds the assistant button does not appear at all — the same is true on a phone whose hardware cannot run the on-device model. Browsing and the docs browser's own search work normally on every platform.
+Chirpy jest dostępny tylko na Androidzie w wersji Google. W kompilacjach F-Droid, na komputery i iOS przycisk asystenta w ogóle się nie pojawia — tak samo jest na telefonie, którego sprzęt nie potrafi uruchomić modelu działającego na urządzeniu. Przeglądanie dokumentacji i jej własne wyszukiwanie działają normalnie na każdej platformie.
 
-> 🔒 **Privacy:** On supported phones running the Google-flavor build, Chirpy runs **on-device** using Gemini Nano — your questions never leave your phone. A small model downloads on first use.
+> 🔒 **Prywatność:** Na obsługiwanych telefonach z kompilacją w wersji Google Chirpy działa **na urządzeniu** z użyciem Gemini Nano — Twoje pytania nigdy nie opuszczają telefonu. Przy pierwszym użyciu pobierany jest niewielki model.
 
-## Related Topics
+## Powiązane tematy
 
-- [Translate the App](translate) — how these pages get localized into other languages
-- [App Functions](app-functions) — the separate system-AI integration (distinct from Chirpy)
+- [Przetłumacz aplikację](translate) — jak te strony są lokalizowane na inne języki
+- [Funkcje aplikacji](app-functions) — osobna integracja z systemowym AI (inna niż Chirpy)

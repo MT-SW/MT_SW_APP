@@ -1,48 +1,49 @@
 ---
-title: Translate the App
+title: Przetłumacz aplikację
+parent: Przewodnik użytkownika
 nav_order: 17
 last_updated: 2026-09-11
-description: How the app and its documentation are translated via Crowdin, and guidelines for contributing translations.
+description: Jak aplikacja i jej dokumentacja są tłumaczone przez Crowdin oraz wskazówki dla osób dodających tłumaczenia.
 aliases:
   - translate
   - crowdin
   - localization
 ---
 
-# Translate the App
+# Przetłumacz aplikację
 
-The app and its in-app docs are translated on Crowdin — this page shows how to contribute. The app uses [Crowdin](https://crowdin.com/) to manage community translations for both the user interface and in-app documentation.
+Aplikacja i jej dokumentacja w aplikacji są tłumaczone na Crowdin — ta strona pokazuje, jak się przyłączyć. Aplikacja używa [Crowdin](https://crowdin.com/) do zarządzania tłumaczeniami społeczności, zarówno interfejsu użytkownika, jak i dokumentacji w aplikacji.
 
-## What Gets Translated
+## Co jest tłumaczone
 
-| Resource          | Source Location                                                     | Notatki                                                                |
-| ----------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| UI strings        | `core/resources/src/commonMain/composeResources/values/strings.xml` | Buttons, labels, messages, and all user-visible text                   |
-| User Guide pages  | `docs/en/user/*.md`                                                 | In-app documentation shown in Help & Documentation |
-| Fastlane metadata | `fastlane/metadata/android/en-US/`                                  | Google Play listing title, description, and changelogs                 |
+| Zasób | Lokalizacja źródła | Uwagi |
+|---|---|---|
+| Teksty interfejsu | `core/resources/src/commonMain/composeResources/values/strings.xml` | Przyciski, etykiety, komunikaty i cały tekst widoczny dla użytkownika |
+| Strony Przewodnika użytkownika | `docs/en/user/*.md` | Dokumentacja w aplikacji, pokazywana w Pomoc i dokumentacja |
+| Metadane Fastlane | `fastlane/metadata/android/en-US/` | Tytuł, opis i dzienniki zmian w Google Play |
 
-> ℹ️ **Note:** Developer Guide pages are English-only. Code-focused documentation targeting contributors is not translated.
+> ℹ️ **Uwaga:** Strony Przewodnika programisty są tylko po angielsku. Dokumentacja skierowana do programistów nie jest tłumaczona.
 
-## How to Contribute
+## Jak pomóc
 
-1. **Visit the Crowdin project.** Open the [Meshtastic Android Crowdin project](https://crowdin.com/project/meshtastic-android) and sign in or create a free account.
-2. **Choose your language.** Select an existing language or request a new one by opening a [GitHub issue](https://github.com/meshtastic/Meshtastic-Android/issues/new).
-3. **Translate strings.** Crowdin shows the English source on the left and your translation on the right. Translate each string and save.
-4. **Review context.** Many strings include screenshots or context comments — check these to understand where the text appears in the app. A scheduled job pulls approved translations from Crowdin and opens a pull request; they ship once a maintainer merges it and a new build goes out.
+1. **Wejdź do projektu Crowdin.** Otwórz [projekt Meshtastic Android na Crowdin](https://crowdin.com/project/meshtastic-android) i zaloguj się lub załóż darmowe konto.
+2. **Wybierz język.** Wybierz istniejący język albo poproś o nowy, zakładając [zgłoszenie na GitHubie](https://github.com/meshtastic/Meshtastic-Android/issues/new).
+3. **Tłumacz teksty.** Crowdin pokazuje angielski oryginał po lewej, a Twoje tłumaczenie po prawej. Przetłumacz każdy tekst i zapisz.
+4. **Sprawdź kontekst.** Wiele tekstów ma zrzuty ekranu lub komentarze z kontekstem — zajrzyj do nich, aby zrozumieć, gdzie tekst pojawia się w aplikacji. Zaplanowane zadanie pobiera zatwierdzone tłumaczenia z Crowdin i otwiera pull request; trafiają do aplikacji, gdy opiekun go zatwierdzi i wyjdzie nowa wersja.
 
-> 💡 **Tip:** Keep translations short. UI strings often appear in buttons, chips, or narrow columns. If a translation is significantly longer than the English original, consider abbreviating where the meaning stays clear.
+> 💡 **Wskazówka:** Pisz krótko. Teksty interfejsu często trafiają na przyciski, chipy lub wąskie kolumny. Jeśli tłumaczenie jest znacznie dłuższe niż angielski oryginał, rozważ skrócenie tam, gdzie sens pozostaje jasny.
 
-## Adding a New Language
+## Dodawanie nowego języka
 
-If your language is not yet listed on Crowdin:
+Jeśli Twojego języka nie ma jeszcze na Crowdin:
 
-1. Open an issue on [GitHub](https://github.com/meshtastic/Meshtastic-Android/issues/new) requesting the new locale.
-2. A maintainer will add the language to Crowdin and configure `crowdin.yml`.
-3. Once added, you can begin translating immediately.
+1. Otwórz zgłoszenie na [GitHubie](https://github.com/meshtastic/Meshtastic-Android/issues/new) z prośbą o nowy język.
+2. Opiekun doda język do Crowdin i skonfiguruje `crowdin.yml`.
+3. Po dodaniu możesz od razu zacząć tłumaczyć.
 
-## How Translations Are Organized
+## Jak zorganizowane są tłumaczenia
 
-The Android app uses **Compose Multiplatform resources** for all user-visible strings:
+Aplikacja na Androida używa **zasobów Compose Multiplatform** dla wszystkich tekstów widocznych dla użytkownika:
 
 ```text
 core/resources/src/commonMain/composeResources/
@@ -55,7 +56,7 @@ core/resources/src/commonMain/composeResources/
 └── ...
 ```
 
-In-app documentation follows a similar pattern under `docs/`:
+Dokumentacja w aplikacji ma podobną strukturę w katalogu `docs/`:
 
 ```text
 docs/
@@ -70,27 +71,27 @@ docs/
 └── ...
 ```
 
-Doc locale folders use Android locale qualifiers, either `{lang}` or `{lang}-r{REGION}` (for example `fr`, `fr-rFR`, `de-rDE`, `ja-rJP`). The `values-*` folders for app strings use bare language codes instead (`values-fr`, `values-de`, `values-ja`), because `crowdin.yml` writes strings with `%two_letters_code%` and doc pages with `%android_code%`. The two sets do not line up one-to-one.
+Foldery lokalizacji dokumentacji używają kwalifikatorów lokalizacji Androida, w postaci `{lang}` lub `{lang}-r{REGION}` (na przykład `fr`, `fr-rFR`, `de-rDE`, `ja-rJP`). Foldery `values-*` dla tekstów aplikacji używają zamiast tego samych kodów języka (`values-fr`, `values-de`, `values-ja`), ponieważ `crowdin.yml` zapisuje teksty z `%two_letters_code%`, a strony dokumentacji z `%android_code%`. Te dwa zestawy nie pokrywają się jeden do jednego.
 
-The app automatically selects the correct locale based on your phone's **Language & Region** settings.
+Aplikacja automatycznie wybiera właściwy język na podstawie ustawień **Język i region** w telefonie.
 
-A page that came from Crowdin is labeled **Community translated** under its title in the app. If a page has no Crowdin translation for your language yet, the Google-flavor Android build machine-translates the English source on the fly and labels it **Auto-translated** instead; F-Droid and desktop builds show the English page. Your Crowdin translation replaces the machine one as soon as it lands.
+Strona pochodząca z Crowdin jest oznaczona **Tłumaczenie społeczności** pod tytułem w aplikacji. Jeśli strona nie ma jeszcze tłumaczenia z Crowdin dla Twojego języka, wersja Android z Google tłumaczy maszynowo angielski oryginał na bieżąco i oznacza go jako **Tłumaczenie automatyczne**; wersje F-Droid i na komputer pokazują stronę po angielsku. Twoje tłumaczenie z Crowdin zastępuje maszynowe, gdy tylko się pojawi.
 
-## Translation Guidelines
+## Wskazówki dla tłumaczy
 
-- **Do not translate** technical terms like "LoRa", "MQTT", "BLE", "TAK", "SNR", or "RSSI" — these are universal.
-- **Keep placeholders intact.** Strings like `%1$s` or `%d` are filled in at runtime. Do not remove or reorder them unless the grammar of your language requires it.
-- **Match tone.** The app uses a friendly, direct voice. Avoid overly formal language.
-- **Test if possible.** Switch your phone's language and open the app to see how translations look in context.
+- **Nie tłumacz** terminów technicznych, takich jak „LoRa", „MQTT", „BLE", „TAK", „SNR" czy „RSSI" — są uniwersalne.
+- **Zachowaj znaczniki zastępcze.** Teksty takie jak `%1$s` lub `%d` są wypełniane w czasie działania. Nie usuwaj ich ani nie zmieniaj kolejności, chyba że wymaga tego gramatyka Twojego języka.
+- **Dopasuj ton.** Aplikacja mówi przyjaźnie i bezpośrednio. Unikaj zbyt oficjalnego języka.
+- **Przetestuj, jeśli możesz.** Zmień język telefonu i otwórz aplikację, aby zobaczyć, jak tłumaczenia wyglądają w kontekście.
 
-## Questions?
+## Pytania?
 
-If you have questions about a specific string's context or need help getting started, open a discussion on the [Meshtastic GitHub Discussions](https://github.com/orgs/meshtastic/discussions) page.
+Jeśli masz pytania o kontekst konkretnego tekstu albo potrzebujesz pomocy na start, otwórz dyskusję na stronie [Meshtastic GitHub Discussions](https://github.com/orgs/meshtastic/discussions).
 
-Thank you for helping expand the reach of Meshtastic.
+Dziękujemy za pomoc w poszerzaniu zasięgu aplikacji.
 
-## Related Topics
+## Powiązane tematy
 
-- [Units & Locale](units-and-locale) — how the app picks number, date, and unit formats for your region
-- [Help & Documentation](help-and-docs) — the in-app docs browser these pages are published to
-- [Onboarding](onboarding) — where a new user first meets the translated strings
+- [Jednostki i lokalizacja](units-and-locale) — jak aplikacja dobiera formaty liczb, dat i jednostek dla Twojego regionu
+- [Pomoc i dokumentacja](help-and-docs) — przeglądarka dokumentacji w aplikacji, w której publikowane są te strony
+- [Pierwsze kroki](onboarding) — miejsce, w którym nowy użytkownik pierwszy raz spotyka przetłumaczone teksty

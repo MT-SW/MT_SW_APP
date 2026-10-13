@@ -1,8 +1,9 @@
 ---
-title: Notifications
+title: Powiadomienia
+parent: Przewodnik użytkownika
 nav_order: 18
 last_updated: 2026-09-28
-description: What each Meshtastic notification is for, how to silence one kind without the others, and what you can do from a message notification or a watch.
+description: Do czego służy każde powiadomienie MT_SW, jak wyciszyć jeden rodzaj bez pozostałych oraz co możesz zrobić z powiadomienia o wiadomości lub na zegarku.
 aliases:
   - notifications
   - notification-channels
@@ -10,63 +11,63 @@ aliases:
   - smartwatch
 ---
 
-# Notifications
+# Powiadomienia
 
-Meshtastic posts a notification when something on the mesh needs you while the app is out of sight: a message, a new node, a low battery, or a notice from your node. Each kind is its own Android notification category, so you can silence one and keep the rest.
+MT_SW wysyła powiadomienie, gdy coś w sieci mesh Cię potrzebuje, a aplikacja jest poza zasięgiem wzroku: wiadomość, nowy węzeł, niski poziom baterii lub komunikat z Twojego węzła. Każdy rodzaj jest osobną kategorią powiadomień Androida, więc możesz wyciszyć jeden i zachować pozostałe.
 
-## Notification categories
+## Kategorie powiadomień
 
-To see the categories, tap **App Notifications** in the **Information** section of **Settings**. It opens Android's notification settings for Meshtastic, where the categories sit in three groups.
+Aby zobaczyć kategorie, dotknij **Powiadomienia aplikacji** w sekcji **Informacje** w **Ustawieniach**. Otwiera to ustawienia powiadomień Androida dla aplikacji, gdzie kategorie są w trzech grupach.
 
-| Group      | Category                                                                    | Posted for                                                                      | Tapping it opens                |
-| ---------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------- |
-| Wiadomości | Powiadomienia o bezpośredniej wiadomości                                    | A message sent directly to you                                                  | The conversation                |
-| Wiadomości | Powiadomienia o wiadomościach rozgłoszeniowych                              | A message on one of your channels                                               | The channel                     |
-| Wiadomości | Powiadomienia punktów orientacyjnych                                        | A waypoint shared on the mesh, or a geofence crossing                           | The waypoint on the map         |
-| Wiadomości | Powiadomienia alertowe                                                      | A critical alert from a node                                                    | The conversation                |
-| Mesh       | Powiadomienia o nowych węzłach                                              | A node heard for the first time                                                 | The node's details              |
-| Mesh       | Mesh invitation notifications                                               | An invitation to join a nearby mesh                                             | Local Mesh Discovery            |
-| Mesh       | Powiadomienia o niskim poziomie baterii (ulubione węzły) | A favorite node's battery running low                                           | The node's details              |
-| Urządzenie | Powiadomienia o usługach                                                    | The connection to your node while the app runs in the background                | The app                         |
-| Urządzenie | Powiadomienia o niskim poziomie baterii                                     | Your node's battery running low                                                 | The node's details              |
-| Urządzenie | Radio notifications                                                         | Notices from your node, such as key verification requests and security warnings | The app                         |
-| Urządzenie | Update and connection notifications                                         | A firmware update for your node, or a problem reconnecting to it                | Firmware update, or Connections |
+| Grupa | Kategoria | Publikowane dla | Dotknięcie otwiera |
+|---|---|---|---|
+| Wiadomości | Powiadomienia o bezpośredniej wiadomości | Wiadomość wysłana bezpośrednio do Ciebie | Rozmowę |
+| Wiadomości | Powiadomienia o wiadomościach rozgłoszeniowych | Wiadomość na jednym z Twoich kanałów | Kanał |
+| Wiadomości | Powiadomienia punktów orientacyjnych | Punkt trasy udostępniony w sieci mesh lub przekroczenie geofence | Punkt trasy na mapie |
+| Wiadomości | Powiadomienia alertowe | Krytyczny alert z węzła | Rozmowę |
+| Mesh | Powiadomienia o nowych węzłach | Węzeł usłyszany po raz pierwszy | Szczegóły węzła |
+| Mesh | Powiadomienia o zaproszeniach do sieci mesh | Zaproszenie do dołączenia do pobliskiej sieci mesh | Odkrywanie lokalnej sieci mesh |
+| Mesh | Powiadomienia o niskim poziomie baterii (ulubione węzły) | Kończąca się bateria ulubionego węzła | Szczegóły węzła |
+| Urządzenie | Powiadomienia o usługach | Połączenie z Twoim węzłem, gdy aplikacja działa w tle | Aplikację |
+| Urządzenie | Powiadomienia o niskim poziomie baterii | Kończąca się bateria Twojego węzła | Szczegóły węzła |
+| Urządzenie | Powiadomienia z radia | Komunikaty z Twojego węzła, takie jak prośby o weryfikację kluczy i ostrzeżenia bezpieczeństwa | Aplikację |
+| Urządzenie | Powiadomienia o aktualizacjach i połączeniu | Aktualizacja firmware dla Twojego węzła lub problem z ponownym połączeniem | Aktualizację firmware lub Połączenia |
 
-By default, direct messages, alerts and radio notices pop up on screen, mesh invitations and the service notification arrive without a sound, and the rest make a sound. Android keeps whatever you change on a category, and the app cannot change it back.
+Domyślnie wiadomości bezpośrednie, alerty i komunikaty z radia wyskakują na ekranie, zaproszenia do sieci mesh i powiadomienie usługi przychodzą bez dźwięku, a pozostałe wydają dźwięk. Android zachowuje wszystko, co zmienisz w kategorii, a aplikacja nie może tego cofnąć.
 
-Alert notifications play an alarm sound. To let them through Do Not Disturb as well, open the category and allow it to override Do Not Disturb, which is the step [Getting Started](onboarding#critical-alerts-permission) offers during setup.
+Powiadomienia alertowe odtwarzają dźwięk alarmu. Aby przepuszczać je także przez tryb Nie przeszkadzać, otwórz kategorię i zezwól jej na pomijanie trybu Nie przeszkadzać — to krok, który [Pierwsze kroki](onboarding#critical-alerts-permission) oferuje podczas konfiguracji.
 
-The service notification stays in the shade while Meshtastic is connected in the background. It shows the connection state, and also shows progress while a firmware update or a preset scan runs.
+Powiadomienie usługi pozostaje w panelu powiadomień, dopóki MT_SW jest połączone w tle. Pokazuje stan połączenia, a także postęp, gdy trwa aktualizacja firmware lub skan presetów.
 
-> ℹ️ **Note:** The Desktop app has no notification categories. It switches notifications from its own settings instead, described in [Notification Preferences](desktop#notification-preferences).
+> ℹ️ **Uwaga:** Aplikacja na komputer nie ma kategorii powiadomień. Zamiast tego włącza powiadomienia we własnych ustawieniach, opisanych w [Preferencje powiadomień](desktop#notification-preferences).
 
-## When a message notifies you
+## Kiedy wiadomość wysyła powiadomienie
 
-One notification collects each conversation's recent messages. Whether a new message adds to it depends on where you are:
+Jedno powiadomienie zbiera ostatnie wiadomości każdej rozmowy. To, czy nowa wiadomość do niego dołącza, zależy od tego, gdzie jesteś:
 
-- **Reading that conversation:** nothing is posted, since the message is already on screen.
-- **In the app, on another screen:** the notification updates without a sound.
-- **Anywhere else:** the notification updates and alerts you as its category is set to.
+- **Czytasz tę rozmowę:** nic nie jest wysyłane, bo wiadomość jest już na ekranie.
+- **W aplikacji, na innym ekranie:** powiadomienie aktualizuje się bez dźwięku.
+- **Gdziekolwiek indziej:** powiadomienie aktualizuje się i alarmuje Cię tak, jak ustawiono jego kategorię.
 
-Muting a conversation or a channel stops its notifications, except for a message that mentions you. Muting a node stops its notifications even when it mentions you. How to mute is in [Messages & Channels](messages-and-channels). A critical alert still alerts you while you are reading its conversation, and only muting silences it.
+Wyciszenie rozmowy lub kanału zatrzymuje jego powiadomienia, z wyjątkiem wiadomości, która wspomina o Tobie. Wyciszenie węzła zatrzymuje jego powiadomienia, nawet gdy wspomina o Tobie. Jak wyciszać, opisano w [Wiadomości i kanały](messages-and-channels). Krytyczny alert nadal Cię powiadamia, gdy czytasz jego rozmowę, i tylko wyciszenie go uciszy.
 
-## Acting from a notification
+## Działania z powiadomienia
 
-A message notification has three actions:
+Powiadomienie o wiadomości ma trzy akcje:
 
-- **Reply** sends a message to that conversation without opening the app. The notification then updates to show your reply.
-- **Mark as read** clears the conversation's unread count and dismisses the notification.
-- **👍** reacts to the newest message with a thumbs-up.
+- **Odpowiedz** wysyła wiadomość do tej rozmowy bez otwierania aplikacji. Powiadomienie następnie aktualizuje się, pokazując Twoją odpowiedź.
+- **Oznacz jako przeczytane** zeruje licznik nieprzeczytanych w rozmowie i zamyka powiadomienie.
+- **👍** reaguje na najnowszą wiadomość kciukiem w górę.
 
-On Android 11 and newer, a message notification can also open as a floating bubble, described in [Conversation Bubbles](messages-and-channels#conversation-bubbles).
+W Androidzie 11 i nowszym powiadomienie o wiadomości może też otworzyć się jako pływający dymek, opisany w [Dymki rozmów](messages-and-channels#conversation-bubbles).
 
-## On a watch
+## Na zegarku
 
-A Wear OS watch paired with your phone shows every Meshtastic notification except the service notification, which Android keeps on the phone because it never goes away. A message notification keeps its actions on the watch, and **Reply** there can offer suggested replies. The watch's own notification settings decide whether Meshtastic appears on it at all.
+Zegarek Wear OS sparowany z telefonem pokazuje każde powiadomienie MT_SW z wyjątkiem powiadomienia usługi, które Android zostawia na telefonie, ponieważ nigdy nie znika. Powiadomienie o wiadomości zachowuje swoje akcje na zegarku, a **Odpowiedz** może tam oferować sugerowane odpowiedzi. To ustawienia powiadomień samego zegarka decydują, czy MT_SW w ogóle się na nim pojawia.
 
-## Related Topics
+## Zobacz także
 
-- [Messages & Channels](messages-and-channels) — muting conversations and nodes, bubbles, and message states
-- [Getting Started](onboarding) — the notification and critical alert steps of setup
-- [Firmware Updates](firmware) — the screen an update notification opens
-- [Local Mesh Discovery](discovery) — what a mesh invitation offers
+- [Wiadomości i kanały](messages-and-channels) — wyciszanie rozmów i węzłów, dymki oraz stany wiadomości
+- [Pierwsze kroki](onboarding) — kroki konfiguracji powiadomień i krytycznych alertów
+- [Aktualizacje firmware](firmware) — ekran, który otwiera powiadomienie o aktualizacji
+- [Odkrywanie lokalnej sieci mesh](discovery) — co oferuje zaproszenie do sieci mesh

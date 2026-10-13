@@ -1,8 +1,9 @@
 ---
-title: Connections
+title: Połączenia
+parent: Przewodnik użytkownika
 nav_order: 2
 last_updated: 2026-09-29
-description: Connect your phone or desktop to a Meshtastic radio via Bluetooth, USB, or TCP/IP.
+description: Połącz telefon lub komputer z radiem przez Bluetooth, USB lub TCP/IP.
 aliases:
   - bluetooth
   - usb
@@ -10,156 +11,155 @@ aliases:
   - pairing
 ---
 
-# Connections
+# Połączenia
 
-Meshtastic supports multiple transport methods to communicate between your phone or desktop and a radio.
+MT_SW_APP obsługuje kilka metod komunikacji między telefonem lub komputerem a radiem.
 
 ## Bluetooth (BLE)
 
-Bluetooth Low Energy is the default and most common connection method on Android.
+Bluetooth Low Energy to domyślna i najczęstsza metoda połączenia na Androidzie.
 
-### Pairing a Radio
+### Parowanie radia
 
-1. Power on your radio. Most radios advertise over Bluetooth as soon as they boot — there is no pairing mode to enter. Radios with a color touchscreen ship with Bluetooth switched off, so turn it on from the radio's own on-screen menu first.
-2. Open the app and navigate to the **Connect** tab.
-3. Tap **Scan for Bluetooth devices** — nearby Meshtastic radios will appear.
-4. Select your radio from the list.
-5. Android asks you to pair. If your radio has a screen, it shows a six-digit PIN — type that into the Android dialog. If your radio has no screen, the PIN is `123456`.
+1. Włącz radio. Większość radiów ogłasza się przez Bluetooth zaraz po uruchomieniu — nie trzeba wchodzić w żaden tryb parowania. Radia z kolorowym ekranem dotykowym są dostarczane z wyłączonym Bluetooth, więc najpierw włącz go z menu na ekranie samego radia.
+2. Otwórz aplikację i przejdź do zakładki **Połącz**.
+3. Dotknij **Skanuj w poszukiwaniu urządzeń Bluetooth** — pobliskie radia MT_SW pojawią się na liście.
+4. Wybierz swoje radio z listy.
+5. Android poprosi o sparowanie. Jeśli Twoje radio ma ekran, pokaże on sześciocyfrowy PIN — wpisz go w oknie Androida. Jeśli radio nie ma ekranu, PIN to `123456`.
 
-![Scanning for Bluetooth devices, with a discovered radio in the list](../../assets/screenshots/connections_bluetooth_scan.png)
+![Skanowanie urządzeń Bluetooth, z wykrytym radiem na liście](../../assets/screenshots/connections_bluetooth_scan.png)
 
-You can change the pairing method, or turn Bluetooth on for a radio that ships with it off, under **Settings → Device configuration → Bluetooth** — see [Settings — Radio & User](settings-radio-user). For more information, see [Bluetooth configuration](https://meshtastic.org/docs/configuration/radio/bluetooth) on meshtastic.org.
+Metodę parowania możesz zmienić, lub włączyć Bluetooth w radiu dostarczanym z wyłączonym, w **Ustawienia → Konfiguracja urządzenia → Bluetooth** — zobacz [Ustawienia — Radio i użytkownik](settings-radio-user). Więcej informacji znajdziesz w [konfiguracji Bluetooth](https://meshtastic.org/docs/configuration/radio/bluetooth) na meshtastic.org.
 
-Use the transport selector — a segmented button row below the connection card — to switch between the Bluetooth, Network, and USB transports (one is active at a time):
+Użyj selektora transportu — rzędu przycisków segmentowych pod kartą połączenia — aby przełączać się między transportami Bluetooth, Sieć i USB (aktywny jest jeden naraz):
 
-![Connections screen with the transport selector showing Bluetooth, Network, and USB](../../assets/screenshots/connections_transport_filters.png)
+![Ekran połączeń z selektorem transportu pokazującym Bluetooth, Sieć i USB](../../assets/screenshots/connections_transport_filters.png)
 
-> 💡 **Tip:** If your radio doesn't appear, check that it isn't already connected to another phone, or out of range.
+> 💡 **Wskazówka:** Jeśli Twoje radio się nie pojawia, sprawdź, czy nie jest już połączone z innym telefonem lub czy nie jest poza zasięgiem.
 
-The screen names anything on the app's side that is blocking a scan, with the fix attached:
+Ekran nazywa wszystko, co po stronie aplikacji blokuje skanowanie, i podaje sposób naprawy:
 
-| What you see                                                | What it means                                                                                                                                                              |
-| ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A card asking for **Nearby devices**                        | The permission has not been granted. **Grant permission** requests it; once Android stops prompting, the button becomes **Open settings**. |
-| **Bluetooth is off**                                        | The adapter is disabled — the card opens Bluetooth settings.                                                                                               |
-| **Bluetooth scanning also needs location services**         | Android 11 and older only: the permission is held but the system location toggle is off.                                                   |
-| No card, and **No Bluetooth devices seen** under the header | Nothing on this side is blocking the scan. The radio is out of range, off, or already connected elsewhere.                                 |
+| Co widzisz | Co to znaczy |
+|---|---|
+| Karta z prośbą o **Pobliskie urządzenia** | Uprawnienie nie zostało przyznane. **Przyznaj uprawnienie** je zgłasza; gdy Android przestanie pytać, przycisk zmienia się na **Otwórz ustawienia**. |
+| **Bluetooth jest wyłączony** | Adapter jest wyłączony — karta otwiera ustawienia Bluetooth. |
+| **Skanowanie Bluetooth wymaga też usług lokalizacji** | Tylko Android 11 i starsze: uprawnienie jest nadane, ale systemowy przełącznik lokalizacji jest wyłączony. |
+| Brak karty oraz **Nie widziano urządzeń Bluetooth** pod nagłówkiem | Nic po tej stronie nie blokuje skanowania. Radio jest poza zasięgiem, wyłączone lub już połączone gdzie indziej. |
 
-The explanation lives in that card, not in the scan control: tapping **Scan for Bluetooth devices** after you have declined once asks Android again directly.
+Wyjaśnienie znajduje się na tej karcie, a nie w kontrolce skanowania: dotknięcie **Skanuj w poszukiwaniu urządzeń Bluetooth** po jednokrotnym odmówieniu ponownie pyta Androida bezpośrednio.
 
-### Connection Status
+### Stan połączenia
 
-| Icon | State              | Opis                                                                                                       |
-| ---- | ------------------ | ---------------------------------------------------------------------------------------------------------- |
-| 🟢   | Połączony          | Active radio link established                                                                              |
-| 🟡   | Łączenie           | Handshake in progress                                                                                      |
-| 🔴   | Rozłączono         | No active connection. The app retries automatically, with a growing delay between attempts |
-| ⚪    | Urządzenie uśpione | The radio is in light sleep — the app is waiting for it to wake and reconnect, not failing                 |
+| Ikona | Stan | Opis |
+|------|-------|-------------|
+| 🟢 | Połączony | Aktywne łącze z radiem nawiązane |
+| 🟡 | Łączenie | Trwa uzgadnianie połączenia |
+| 🔴 | Rozłączono | Brak aktywnego połączenia. Aplikacja ponawia próby automatycznie, z rosnącym odstępem między próbami |
+| ⚪ | Urządzenie śpi | Radio jest w lekkim uśpieniu — aplikacja czeka, aż się obudzi i połączy ponownie, a nie zawodzi |
 
-These are the four states the app models. "Device sleeping" is normal on power-saving configurations and needs no action.
+To cztery stany, które modeluje aplikacja. „Urządzenie śpi” jest normalne w konfiguracjach oszczędzających energię i nie wymaga żadnego działania.
 
-When connecting, a status indicator shows the current connection state — tap **Stop Connecting** to abandon the attempt:
+Podczas łączenia wskaźnik stanu pokazuje bieżący stan połączenia — dotknij **Zatrzymaj łączenie**, aby przerwać próbę:
 
-![Connecting status](../../assets/screenshots/connections_connecting.png)
+![Stan łączenia](../../assets/screenshots/connections_connecting.png)
 
-With no radio chosen yet, the connection card reads **No device selected**. A pane with nothing to list says so under its header, with a hint:
+Gdy nie wybrano jeszcze radia, karta połączenia pokazuje **Nie wybrano urządzenia**. Panel, w którym nie ma czego wyświetlić, mówi o tym pod swoim nagłówkiem, z podpowiedzią:
 
-| Pane      | What it shows                                                                                                                                                                                                                                                                |
-| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Bluetooth | **No Bluetooth devices seen**, and "Ensure you're within range of the device." Start a scan from the header.                                                                                                                                 |
-| Sieć      | **No network devices seen**, and "Ensure you're connected to the same network as the device." Shown only while nothing has been discovered and **Recent Network Devices** is empty. **Add device manually…** stays below it. |
-| USB       | **No USB devices detected**, and "Connect a device with a USB data cable to use serial."                                                                                                                                                                     |
+| Panel | Co pokazuje |
+|---|---|
+| Bluetooth | **Nie widziano urządzeń Bluetooth** oraz „Upewnij się, że jesteś w zasięgu urządzenia.” Rozpocznij skanowanie z nagłówka. |
+| Sieć | **Nie widziano urządzeń sieciowych** oraz „Upewnij się, że jesteś połączony z tą samą siecią co urządzenie.” Pokazywane tylko wtedy, gdy nic nie zostało wykryte, a **Ostatnie urządzenia sieciowe** są puste. **Dodaj urządzenie ręcznie…** pozostaje pod spodem. |
+| USB | **Nie wykryto urządzeń USB** oraz „Podłącz urządzenie kablem danych USB, aby użyć portu szeregowego.” |
 
-### Troubleshooting Bluetooth
+### Rozwiązywanie problemów z Bluetooth
 
-- **Radio not found:** Turn Bluetooth off and back on. On Android 11 and older, also check that system location services are switched on — those releases do not return scan results without them.
-- **Bluetooth scan couldn't start:** Try again, and toggle Bluetooth off and on if it repeats.
-- **Connection drops:** Move closer to the radio; check for interference.
-- **Pairing failed, or pairing did not complete:** Check that the **Nearby devices** permission is granted, then pair again.
-- **Pairing rejected:** Forget the device in Android Bluetooth settings and retry.
-- **Could not establish a stable connection after repeated attempts:** The app stopped retrying after three failed handshakes — a radio that keeps failing here is usually crashing on reconnect. Power-cycle the radio, then tap it again on the **Connect** tab to start a fresh attempt.
+- **Nie znaleziono radia:** Wyłącz Bluetooth i włącz go ponownie. W Androidzie 11 i starszych sprawdź też, czy systemowe usługi lokalizacji są włączone — te wersje nie zwracają wyników skanowania bez nich.
+- **Nie udało się uruchomić skanowania Bluetooth:** Spróbuj ponownie, a jeśli problem się powtarza, wyłącz i włącz Bluetooth.
+- **Połączenie się rozłącza:** Zbliż się do radia; sprawdź, czy nie ma zakłóceń.
+- **Parowanie nie powiodło się lub nie zostało ukończone:** Sprawdź, czy uprawnienie **Pobliskie urządzenia** jest przyznane, a następnie sparuj ponownie.
+- **Parowanie odrzucone:** Zapomnij urządzenie w ustawieniach Bluetooth Androida i spróbuj ponownie.
+- **Nie udało się nawiązać stabilnego połączenia po wielokrotnych próbach:** Aplikacja przestała ponawiać po trzech nieudanych uzgodnieniach — radio, które tu ciągle zawodzi, zwykle zawiesza się przy ponownym połączeniu. Wyłącz i włącz zasilanie radia, a następnie dotknij go ponownie w zakładce **Połącz**, aby rozpocząć nową próbę.
 
-## USB Serial
+## USB szeregowe
 
-USB connections provide a wired alternative, useful for desktop or when Bluetooth is unavailable.
+Połączenia USB to przewodowa alternatywa, przydatna na komputerze lub gdy Bluetooth jest niedostępny.
 
-### Setup
+### Konfiguracja
 
-1. Connect your radio to your phone with a USB data cable. Charge-only cables carry no data lines, and a radio on one never appears in the list.
-2. The app prompts for USB permission — tap **Allow**.
-3. The connection is established automatically.
+1. Podłącz radio do telefonu kablem USB do transmisji danych. Kable tylko do ładowania nie mają linii danych, a radio na takim kablu nigdy nie pojawi się na liście.
+2. Aplikacja poprosi o uprawnienie USB — dotknij **Zezwól**.
+3. Połączenie zostanie nawiązane automatycznie.
 
-> ℹ️ **Note:** USB connections require OTG support on Android devices.
+> ℹ️ **Uwaga:** Połączenia USB wymagają obsługi OTG w urządzeniach z Androidem.
 
-### Troubleshooting USB
+### Rozwiązywanie problemów z USB
 
-- **USB permission denied:** Unplug the radio and plug it back in — Android asks again on reconnect.
-- **No radio in the list:** Check that the cable carries data rather than only power, and that the phone supports OTG.
+- **Odmowa uprawnienia USB:** Odłącz radio i podłącz je ponownie — Android zapyta ponownie przy ponownym połączeniu.
+- **Brak radia na liście:** Sprawdź, czy kabel przesyła dane, a nie tylko zasilanie, i czy telefon obsługuje OTG.
 
-## TCP/IP (Network)
+## TCP/IP (sieć)
 
-Some Meshtastic radios support Wi-Fi/Ethernet connectivity, allowing TCP-based connections over your local network. Get the radio onto your network first. Connect to it over Bluetooth or USB, open **Settings → Device configuration → Network**, and under **Wi-Fi Options** turn on **Wi-Fi enabled** and enter the **SSID** and **Password**. The Network screen appears only for radios whose hardware supports Wi-Fi or Ethernet. Once the radio has an address, come back and connect to it over the network.
+Niektóre radia MT_SW obsługują łączność Wi-Fi/Ethernet, co pozwala na połączenia TCP w sieci lokalnej. Najpierw podłącz radio do swojej sieci. Połącz się z nim przez Bluetooth lub USB, otwórz **Ustawienia → Konfiguracja urządzenia → Sieć** i w **Opcje Wi-Fi** (Wi-Fi Options) włącz **WiFi włączone** oraz wpisz **SSID** i **Hasło**. Ekran Sieć pojawia się tylko dla radiów, których sprzęt obsługuje Wi-Fi lub Ethernet. Gdy radio dostanie adres, wróć i połącz się z nim przez sieć.
 
-### Connecting over the Network
+### Łączenie przez sieć
 
-1. Make sure the radio is on the same local network as your phone/desktop.
-2. On the **Connect** tab, select **Network** in the transport selector.
-3. Choose the radio one of two ways:
-   - **Scan for network devices** — toggle this on to auto-discover radios that advertise themselves on the local network (mDNS / `_meshtastic._tcp`). Discovered devices appear in the list; tap one to connect.
-   - **Add device manually…** — enter the radio's IP address (or hostname) and port (default: `4403`).
-4. Previously-used network addresses are remembered under **Recent Network Devices** for quick reconnection (touch & hold to remove one).
+1. Upewnij się, że radio jest w tej samej sieci lokalnej co telefon/komputer.
+2. W zakładce **Połącz** wybierz **Sieć** w selektorze transportu.
+3. Wybierz radio na jeden z dwóch sposobów:
+   - **Skanuj w poszukiwaniu urządzeń sieciowych** — włącz to, aby automatycznie wykrywać radia, które ogłaszają się w sieci lokalnej (mDNS / `_meshtastic._tcp`). Wykryte urządzenia pojawiają się na liście; dotknij jednego, aby się połączyć.
+   - **Dodaj urządzenie ręcznie…** — wpisz adres IP radia (lub nazwę hosta) i port (domyślnie: `4403`).
+4. Wcześniej używane adresy sieciowe są zapamiętywane w **Ostatnie urządzenia sieciowe** dla szybkiego ponownego połączenia (dotknij i przytrzymaj, aby usunąć).
 
-Network discovery uses mDNS, which only works when both your phone and the radio are on the same subnet. If the phone is not on Wi-Fi at all, the app warns that a network scan may find nothing. On Android 17 and newer, the app needs the **Local network permission** to reach a radio on your own Wi-Fi at all — not only to discover it — so typing the address by hand does not work around a denied permission. Grant it from the card on the Network pane, or from the **Permissions** section of **Settings**. A radio on a public address, or one reached over a VPN, needs no permission.
+Wykrywanie w sieci używa mDNS, które działa tylko wtedy, gdy telefon i radio są w tej samej podsieci. Jeśli telefon w ogóle nie jest w sieci Wi-Fi, aplikacja ostrzega, że skanowanie sieci może nic nie znaleźć. W Androidzie 17 i nowszych aplikacja potrzebuje uprawnienia do sieci lokalnej (**Uprawnienie do sieci lokalnej**), aby w ogóle dotrzeć do radia w Twojej własnej sieci Wi-Fi — nie tylko je wykryć — więc ręczne wpisanie adresu nie omija odmówionego uprawnienia. Przyznaj je z karty w panelu Sieć lub z sekcji **Uprawnienia** w **Ustawienia**. Radio pod adresem publicznym lub osiągane przez VPN nie wymaga uprawnienia.
 
-### When to Use TCP
+### Kiedy używać TCP
 
-- Radio is on the same local network
-- Testing with a simulated radio
-- Environments where Bluetooth has interference issues
+- Radio jest w tej samej sieci lokalnej
+- Testy z symulowanym radiem
+- Środowiska, w których Bluetooth ma problemy z zakłóceniami
 
-### Wi-Fi Provisioning for mPWRD-OS
+### Konfiguracja Wi-Fi dla mPWRD-OS
 
-**Settings → Wi-Fi Provisioning for mPWRD-OS** is a separate, narrower tool. It sends Wi-Fi credentials over Bluetooth to **mPWRD-OS** devices only, using their own protocol — it does not configure Wi-Fi on an ordinary Meshtastic radio. It is available on both Android and desktop.
+**Ustawienia → Konfiguracja Wi-Fi dla mPWRD-OS** (Wi-Fi Provisioning for mPWRD-OS) to osobne, węższe narzędzie. Wysyła dane logowania do Wi-Fi przez Bluetooth wyłącznie do urządzeń **mPWRD-OS**, używając ich własnego protokołu — nie konfiguruje Wi-Fi w zwykłym radiu MT_SW. Jest dostępne zarówno na Androidzie, jak i na desktopie.
 
-1. Open the screen and wait while the app finds the device over Bluetooth.
-2. Tap **Scan for Networks**, then pick a network from **Available Networks** — or turn on **Hidden network** and type the name into **Network Name (SSID)**.
-3. Enter the **Password** and tap **Apply**.
+1. Otwórz ekran i poczekaj, aż aplikacja znajdzie urządzenie przez Bluetooth.
+2. Dotknij **Skanuj sieci**, a następnie wybierz sieć z **Dostępne sieci** — albo włącz **Sieć ukryta** i wpisz nazwę w **Nazwa sieci (SSID)**.
+3. Wpisz **Hasło** i dotknij **Zastosuj**.
 
-If the scan reports **No networks found** or fails outright, move the phone closer to the device and scan again. If **Failed to apply Wi-Fi configuration** comes back, check the password and try again.
+Jeśli skanowanie zgłosi **Nie znaleziono sieci** lub całkowicie się nie powiedzie, zbliż telefon do urządzenia i zeskanuj ponownie. Jeśli wróci **Nie udało się zastosować konfiguracji WiFi**, sprawdź hasło i spróbuj ponownie.
 
-## After Your First Connection
+## Po pierwszym połączeniu
 
-Being connected is not the same as being able to transmit.
+Bycie połączonym nie oznacza możliwości nadawania.
 
-A radio leaves the factory with no LoRa region set, and it does not transmit until you set one. When you connect such a radio, the **Connect** tab shows a **Set your region** card; tap it to open the LoRa screen and choose the region you are in.
+Radio opuszcza fabrykę bez ustawionego regionu LoRa i nie nadaje, dopóki go nie ustawisz. Gdy połączysz takie radio, zakładka **Połącz** pokazuje kartę **Wybierz swój region**; dotknij jej, aby otworzyć ekran LoRa i wybrać region, w którym się znajdujesz.
 
-Once the region is set, the tab warns you if the radio is receive-only: a **Transmit is disabled** card, reading "This device can receive but will not send anything over LoRa." Tap it to open the same screen and turn **Transmit Enabled** back on. Only one of the two cards appears at a time — an unset region already stops the radio transmitting, so the app names that first and holds the transmit card back until you have set a region.
+Po ustawieniu regionu zakładka ostrzega, jeśli radio jest tylko do odbioru: karta **Nadawanie jest wyłączone** z treścią „To urządzenie może odbierać, ale nie będzie niczego wysyłać przez LoRa.” Dotknij jej, aby otworzyć ten sam ekran i ponownie włączyć **Nadawanie włączone** (Transmit Enabled). Naraz pojawia się tylko jedna z tych dwóch kart — nieustawiony region sam w sobie zatrzymuje nadawanie radia, więc aplikacja wskazuje najpierw to i wstrzymuje kartę nadawania, dopóki nie ustawisz regionu.
 
-For more information, see [Settings — Radio & User](settings-radio-user#lora-config).
+Więcej informacji znajdziesz w [Ustawienia — Radio i użytkownik](settings-radio-user#lora-config).
 
-## Reconnection Behavior
+## Ponowne łączenie
 
-The app reconnects to the last selected radio on startup. You can switch transports from the **Connect** tab at any time.
+Aplikacja łączy się ponownie z ostatnio wybranym radiem przy uruchomieniu. Transporty możesz przełączać w zakładce **Połącz** w dowolnym momencie.
 
-To disconnect, tap the disconnect button on the **Connect** tab:
+Aby się rozłączyć, dotknij przycisku rozłączania w zakładce **Połącz**:
 
-![Disconnect from radio](../../assets/screenshots/connections_disconnect.png)
+![Rozłączanie od radia](../../assets/screenshots/connections_disconnect.png)
 
-## Desktop Connections
+## Połączenia na komputerze
 
-On Desktop (Linux/macOS/Windows), the app supports:
+Na komputerze (Linux/macOS/Windows) aplikacja obsługuje:
+- **Bluetooth (BLE)** — przez bibliotekę Kable; działa na macOS, Linuksie i Windows
+- **USB szeregowe** — główna metoda połączenia przewodowego
+- **TCP/IP** — dla radiów podłączonych do sieci
 
-- **Bluetooth (BLE)** — via the Kable library; works on macOS, Linux, and Windows
-- **USB Serial** — primary wired connection method
-- **TCP/IP** — for network-connected radios
+Szczegóły dla poszczególnych platform i skróty klawiszowe znajdziesz w [Aplikacja na komputer](desktop).
 
-See [Desktop App](desktop) for platform-specific details and keyboard shortcuts.
+## Powiązane tematy
 
-## Related Topics
-
-- [Getting Started](onboarding) — first-launch setup and permissions
-- [Settings — Radio & User](settings-radio-user) — Bluetooth, region, and network configuration
-- [Messages & Channels](messages-and-channels) — send your first message once the radio is connected
-- [Nodes](nodes) — see who else is on your mesh
-- [Desktop App](desktop) — desktop-specific connection details
-- [Supported devices](https://meshtastic.org/docs/hardware/devices) — full list of compatible radios on meshtastic.org
+- [Pierwsze kroki](onboarding) — konfiguracja przy pierwszym uruchomieniu i uprawnienia
+- [Ustawienia — Radio i użytkownik](settings-radio-user) — konfiguracja Bluetooth, regionu i sieci
+- [Wiadomości i kanały](messages-and-channels) — wyślij swoją pierwszą wiadomość, gdy radio jest połączone
+- [Węzły](nodes) — zobacz, kto jeszcze jest w Twojej sieci mesh
+- [Aplikacja na komputer](desktop) — szczegóły połączeń specyficzne dla komputera
+- [Obsługiwane urządzenia](https://meshtastic.org/docs/hardware/devices) — pełna lista zgodnych radiów na meshtastic.org

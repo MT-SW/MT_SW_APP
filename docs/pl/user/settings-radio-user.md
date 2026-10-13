@@ -1,283 +1,265 @@
 ---
-title: Settings — Radio & User
+title: Ustawienia — Radio i użytkownik
+parent: Przewodnik użytkownika
 nav_order: 7
 last_updated: 2026-09-28
-description: Configure your node hardware, LoRa presets, user profile, position sharing, power management, and security.
+description: Konfiguracja sprzętu węzła, presetów LoRa, profilu użytkownika, udostępniania pozycji, zarządzania energią i bezpieczeństwa.
 aliases:
-  - ustawienia
+  - settings
   - radio-config
   - user-config
   - lora
 ---
 
-# Settings — Radio & User
+# Ustawienia — Radio i użytkownik
 
-Configure your node's user identity, region and LoRa parameters, position and power behavior, network and Bluetooth connectivity, and security settings.
+Konfiguracja tożsamości użytkownika Twojego węzła, regionu i parametrów LoRa, zachowania pozycji i zasilania, łączności sieciowej i Bluetooth oraz ustawień bezpieczeństwa.
 
-## How these screens work
+## Jak działają te ekrany
 
-Everything here is on the **Settings** screen. **User**, **LoRa**, **Channels** and **Security** are
-listed there directly. **Device**, **Position**, **Power**, **Network**, **Display** and
-**Bluetooth** are one level down, under **Settings → Device configuration**. **Network** appears
-only on nodes with Wi-Fi or Ethernet, and **Bluetooth** only on nodes with Bluetooth.
+Wszystko znajduje się na ekranie **Ustawienia**. **Użytkownik**, **LoRa**, **Kanały** i **Bezpieczeństwo** są wymienione bezpośrednio na nim. **Urządzenie**, **Pozycjonowanie**, **Zasilanie**, **Sieć**, **Wyświetlacz** i **Bluetooth** znajdują się poziom niżej, w **Ustawienia → Konfiguracja urządzenia**. **Sieć** pojawia się tylko w węzłach z Wi-Fi lub Ethernetem, a **Bluetooth** tylko w węzłach z Bluetooth.
 
-Settings use standard preference controls — dropdowns, toggles, and sliders:
+Ustawienia korzystają ze standardowych kontrolek — list rozwijanych, przełączników i suwaków:
 
-| Control  | Screenshot                                                                                                  |
-| -------- | ----------------------------------------------------------------------------------------------------------- |
-| Dropdown | ![A dropdown setting, expanded to show its list of options](../../assets/screenshots/settings_dropdown.png) |
-| Toggle   | ![A toggle setting in the on position](../../assets/screenshots/settings_switch.png)                        |
-| Slider   | ![A slider setting with its current numeric value shown](../../assets/screenshots/settings_slider.png)      |
+| Kontrolka | Zrzut ekranu |
+|---------|------------|
+| Lista rozwijana | ![Lista rozwijana, rozwinięta i pokazująca listę opcji](../../assets/screenshots/settings_dropdown.png) |
+| Przełącznik | ![Przełącznik w pozycji włączonej](../../assets/screenshots/settings_switch.png) |
+| Suwak | ![Suwak z pokazaną bieżącą wartością liczbową](../../assets/screenshots/settings_slider.png) |
 
-## User Settings
+## Ustawienia użytkownika
 
-### User Profile
+### Profil użytkownika
 
-On **Settings → User**.
+W **Ustawienia → Użytkownik**.
 
-| Setting                                        | Opis                                                                                                                                                                                                                                                                                                                              |
-| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Długa nazwa                                    | Your display name (up to 39 characters)                                                                                                                                                                                                                                                                        |
-| Krótka nazwa                                   | 4-character abbreviated name                                                                                                                                                                                                                                                                                                      |
-| Status Message                                 | A short, public free-text status other nodes display alongside your node — up to 80 bytes, cleared with the **✕** in the field. The node broadcasts it to the mesh when you change it and again every 12 hours. Needs firmware 2.8 or newer, and is absent otherwise              |
-| Nie przyjmuje wiadomości                       | Marks the node as one nobody should try to message — for an unmonitored or infrastructure node. Other clients hide it from the contact list. Needs supporting firmware                                                                                                                            |
-| Licensed amateur node (Ham) | Enable if you hold an amateur node license (permits higher power). Turning it on is staged behind a confirmation dialog. On your own node it then relabels **Long Name** as **Call sign** and adds a separate Long Name field; over remote admin the field stays **Long Name** |
+| Ustawienie | Opis |
+|---------|-------------|
+| Długa nazwa | Twoja wyświetlana nazwa (do 39 znaków) |
+| Krótka nazwa | Skrócona nazwa, 4 znaki |
+| Wiadomość statusu | Krótki, publiczny, dowolny status wyświetlany przez inne węzły obok Twojego węzła — do 80 bajtów, usuwany za pomocą **✕** w polu. Węzeł rozgłasza go w sieci mesh po zmianie i ponownie co 12 godzin. Wymaga firmware 2.8 lub nowszego, w innym przypadku jest niedostępny |
+| Nie przyjmuje wiadomości | Oznacza węzeł jako taki, do którego nikt nie powinien próbować pisać — dla węzła bez nadzoru lub węzła infrastrukturalnego. Inni klienci ukrywają go na liście kontaktów. Wymaga obsługującego to firmware |
+| Radioamator licencjonowany (Ham) | Włącz, jeśli posiadasz licencję na amatorski węzeł (pozwala na większą moc). Włączenie wymaga potwierdzenia w oknie dialogowym. We własnym węźle zmienia wtedy etykietę **Długa nazwa** na **Znak wywoławczy** i dodaje osobne pole Długiej nazwy; przez zdalne zarządzanie pole pozostaje **Długa nazwa** |
 
-### Applying changes
+### Stosowanie zmian
 
-The footer appears as soon as you change something. **Discard** throws the change away, and the other button writes it to the node: it reads **Save & restart** on the screens the firmware applies with a reboot — Position, Network, Bluetooth, Security, and most module screens — and **Save** everywhere else.
+Stopka pojawia się, gdy tylko coś zmienisz. **Odrzuć** porzuca zmianę, a drugi przycisk zapisuje ją w węźle: nosi nazwę **Zapisz i uruchom ponownie** na ekranach, które firmware stosuje z restartem — Pozycjonowanie, Sieć, Bluetooth, Bezpieczeństwo i większość ekranów modułów — oraz **Zapisz** wszędzie indziej.
 
-The status message is saved with the same **Save**, but it never reboots the node — and, like the
-rest of this screen, it can be edited on a remote node you administer. For your own node there is a
-shortcut while it is connected: touch & hold your node in the [node list](nodes.md) and choose
-**Update status**. Older firmware and a disconnected node have no shortcut — the field itself is
-still the way in.
+Wiadomość statusu jest zapisywana tym samym przyciskiem **Zapisz**, ale nigdy nie restartuje węzła — i, tak jak reszta tego ekranu, może być edytowana na zdalnym węźle, którym zarządzasz. Dla własnego węzła, gdy jest połączony, istnieje skrót: dotknij i przytrzymaj swój węzeł na [liście węzłów](nodes.md) i wybierz **Status aktualizacji**. Starsze firmware i rozłączony węzeł nie mają skrótu — nadal można skorzystać z samego pola.
 
 ## Konfiguracja
 
 ### Konfiguracja urządzenia
 
-On **Settings → Device configuration → Device**.
+W **Ustawienia → Konfiguracja urządzenia → Urządzenie**.
 
-| Setting                                        | Opis                                                                                                                                                                                                                                                                                                                                        | Domyślny  |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| Rola urządzenia                                | Node behavior. The picker lists the firmware names (`CLIENT`, `ROUTER`, `ROUTER_LATE`, `TAK`, and so on), and the description of whichever role is selected appears under the field. Choosing `ROUTER` or `ROUTER_LATE` asks you to confirm you have read the device-role guidance first | `CLIENT`  |
-| Tryb retransmisji                              | How the node retransmits messages. As with the role, the picker lists the firmware names and describes only the selected one                                                                                                                                                                                                | `ALL`     |
-| Interwał transmisji informacji o węźle         | How often the node re-announces itself. A dropdown of fixed intervals — Unset, then 3 to 72 hours — not a value you type in seconds                                                                                                                                                                                         | 3 hours   |
-| Podwójne dotknięcie jako naciśnięcie przycisku | Treat a double tap as a button press                                                                                                                                                                                                                                                                                                        | Wyłączony |
-| Triple Click Ad Hoc Ping                       | Send an ad-hoc position ping on a triple click                                                                                                                                                                                                                                                                                              | Włączony  |
-| LED bicia serca                                | Blink the status LED periodically                                                                                                                                                                                                                                                                                                           | Włączony  |
-| Strefa czasowa                                 | POSIX time-zone string for the device clock, with buttons to copy your phone's zone or clear it                                                                                                                                                                                                                                             | —         |
-| Button / Buzzer GPIO                           | Advanced: which pins the button and buzzer are wired to                                                                                                                                                                                                                                                                     | —         |
+| Ustawienie | Opis | Domyślnie |
+|---------|-------------|---------|
+| Rola urządzenia | Zachowanie węzła. Lista wyboru zawiera nazwy z firmware (`CLIENT`, `ROUTER`, `ROUTER_LATE`, `TAK` i tak dalej), a opis wybranej roli pojawia się pod polem. Wybór `ROUTER` lub `ROUTER_LATE` prosi o potwierdzenie, że przeczytano wskazówki dotyczące ról urządzeń | `CLIENT` |
+| Tryb retransmisji (Rebroadcast Mode) | Jak węzeł retransmituje wiadomości. Podobnie jak w przypadku roli, lista wyboru zawiera nazwy z firmware i opisuje tylko wybraną | `ALL` |
+| Interwał rozgłaszania informacji o węźle (Node Info Broadcast Interval) | Jak często węzeł ponownie się ogłasza. Lista rozwijana ze stałymi interwałami — Nieustawiony, potem od 3 do 72 godzin — a nie wartość wpisywana w sekundach | 3 godziny |
+| Podwójne dotknięcie jako naciśnięcie przycisku | Traktuje podwójne dotknięcie jak naciśnięcie przycisku | Wyłączone |
+| Potrójne kliknięcie: Ping adhoc | Wysyła doraźny ping z pozycją po potrójnym kliknięciu | Włączone |
+| LED bicia serca | Okresowo miga diodą stanu | Włączone |
+| Strefa czasowa (Time Zone) | Ciąg strefy czasowej POSIX dla zegara urządzenia, z przyciskami do skopiowania strefy telefonu lub jej wyczyszczenia | — |
+| Przycisk GPIO / Buzzer GPIO | Zaawansowane: do jakich pinów podłączone są przycisk i brzęczyk | — |
 
 ### Konfiguracja LoRa
 
-On **Settings → LoRa**.
+W **Ustawienia → LoRa**.
 
-| Setting                                 | Opis                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Domyślny                                       |
-| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| Region                                  | Regulatory region for frequency bands. You must set this before transmitting. On firmware 2.8 or newer, the first region set also creates the node's identity key and gives it a new node number                                                                                                                                                                                                                                                                                                      | Unset (must configure)      |
-| Presety                                 | Speed/range tradeoff                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | LongFast                                       |
-| Number of Hops                          | Maximum retransmit hops                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | 3                                              |
-| Transmit Power (dBm) | Transmission power; 0 = max allowed for region                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | 0 (region max)              |
-| Frequency Override                      | Overrides the computed operating frequency outright (MHz). It doesn't offset the calculated value — leave at 0 unless you know you need a specific frequency                                                                                                                                                                                                                                                                                                                                                       | 0 (use calculated)          |
-| Użyj predefiniowanych ustawień          | On by default. Turn it off to set Spread Factor, Coding Rate and Bandwidth by hand instead of taking them from the modem preset                                                                                                                                                                                                                                                                                                                                                                                                       | On                                             |
-| Coding Rate Override                    | Preset mode only, firmware 2.7.18 or newer: raises the preset's coding rate for more error correction while keeping its bandwidth and spread factor. Only rates above the preset's own are offered, and a preset already at 4/8 has none. Nodes on the same preset still hear each other, but every packet takes longer on air and uses more of the duty cycle. Switching to a preset that already meets the override resets it to the preset default | Preset default                                 |
-| Spread Factor                           | Manual mode only: 5–12. Higher spreads further but slower. On SX127x (RF95) radios the firmware doesn't accept 5 or 6 and uses 11 instead                                                                                                                                                                                                                                                                                                                                          | From preset                                    |
-| Szybkość kodowania                      | Manual mode only: 5–8. More redundancy costs airtime                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | From preset                                    |
-| Pasmo                                   | Manual mode only: the channel bandwidth in kHz, typed in directly. On the 2.4 GHz region the app offers a list of the bandwidths your node supports instead, and a stored value that isn't on that list shows as _Unsupported_ and blocks saving until you pick a supported one                                                                                                                                                                                                                       | From preset                                    |
-| Slot częstotliwości                     | Which slot within the region's band to use. 0 derives it from the primary channel name                                                                                                                                                                                                                                                                                                                                                                                                                                                | 0 (automatic)               |
-| Transmisja włączona                     | Turning this off makes the node receive-only                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | On                                             |
-| Nadpisz cykl pracy                      | Ignores the region's duty-cycle limit. Illegal in most regions; turn it on only where your license permits                                                                                                                                                                                                                                                                                                                                                                                                                            | Wyłączony                                      |
-| Zignoruj MQTT                           | Drop packets that arrived from MQTT rather than over the air. The firmware turns this on for you whenever you set a region that has a duty-cycle limit — the EU bands, Thailand, and Ukraine 433                                                                                                                                                                                                                                                                                                                                      | Off, until you set a duty-cycle-limited region |
-| Ok dla MQTT                             | Allow your packets to be forwarded to MQTT by gateways                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Wyłączony                                      |
-| RX Boosted Gain                         | Extra receive gain on SX126x radios; costs a little current                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Wyłączony                                      |
-| PA fan disabled                         | Turn off the power-amplifier fan on hardware that has one                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Wyłączony                                      |
+| Ustawienie | Opis | Domyślnie |
+|---------|-------------|---------|
+| Region | Region regulacyjny określający pasma częstotliwości. Musisz go ustawić przed nadawaniem. W firmware 2.8 lub nowszym pierwsze ustawienie regionu tworzy także klucz tożsamości węzła i nadaje mu nowy numer węzła | Nieustawiony (trzeba skonfigurować) |
+| Presety | Kompromis między szybkością a zasięgiem | LongFast |
+| Liczba skoków | Maksymalna liczba skoków retransmisji | 3 |
+| Moc nadawania (dBm) | Moc nadawania; 0 = maksimum dozwolone w regionie | 0 (maks. regionu) |
+| Wymuszenie częstotliwości | Całkowicie zastępuje obliczoną częstotliwość pracy (MHz). Nie jest to przesunięcie względem wartości obliczonej — zostaw 0, chyba że wiesz, że potrzebujesz konkretnej częstotliwości | 0 (użyj obliczonej) |
+| Użyj presetu | Domyślnie włączone. Wyłącz, aby ustawić Współczynnik rozproszenia, Szybkość kodowania i Pasmo ręcznie, zamiast brać je z presetu modemu | Włączone |
+| Nadpisanie współczynnika kodowania (Coding Rate Override) | Tylko w trybie presetu, firmware 2.7.18 lub nowszy: podnosi szybkość kodowania presetu, aby uzyskać większą korekcję błędów, zachowując jego pasmo i współczynnik rozproszenia. Oferowane są tylko wartości wyższe od własnej wartości presetu, a preset, który już ma 4/8, nie ma żadnej. Węzły na tym samym presecie nadal się słyszą, ale każdy pakiet trwa dłużej w eterze i zużywa więcej duty cycle. Przełączenie na preset, który już spełnia nadpisanie, resetuje je do wartości domyślnej presetu | Domyślna presetu |
+| Współczynnik rozproszenia | Tylko tryb ręczny: 5–12. Wyższy daje większy zasięg, ale wolniej. W radiach SX127x (RF95) firmware nie przyjmuje 5 ani 6 i używa 11 | Z presetu |
+| Szybkość kodowania | Tylko tryb ręczny: 5–8. Większa redundancja kosztuje czas w eterze | Z presetu |
+| Pasmo | Tylko tryb ręczny: szerokość pasma kanału w kHz, wpisywana bezpośrednio. W regionie 2.4 GHz aplikacja oferuje zamiast tego listę pasm obsługiwanych przez Twój węzeł, a zapisana wartość spoza tej listy jest pokazywana jako *Nieobsługiwane* i blokuje zapis, dopóki nie wybierzesz obsługiwanej | Z presetu |
+| Slot częstotliwości | Którego slotu w paśmie regionu użyć. 0 wyznacza go na podstawie nazwy kanału głównego | 0 (automatycznie) |
+| Nadawanie włączone (Transmit Enabled) | Wyłączenie sprawia, że węzeł tylko odbiera | Włączone |
+| Pomiń limit czasu nadawania | Ignoruje limit duty cycle regionu. W większości regionów nielegalne; włączaj tylko tam, gdzie pozwala na to Twoja licencja | Wyłączone |
+| Ignoruj MQTT | Odrzuca pakiety, które dotarły z MQTT, a nie drogą radiową. Firmware włącza to za Ciebie, ilekroć ustawisz region z limitem duty cycle — pasma UE, Tajlandia i Ukraina 433 | Wyłączone, dopóki nie ustawisz regionu z limitem duty cycle |
+| Ok dla MQTT | Pozwala bramom przekazywać Twoje pakiety do MQTT | Wyłączone |
+| Wzmocniony zysk RX | Dodatkowe wzmocnienie odbioru w radiach SX126x; zużywa nieco więcej prądu | Wyłączone |
+| Wentylator PA wyłączony | Wyłącza wentylator wzmacniacza mocy w sprzęcie, który go ma | Wyłączone |
 
-The preset list is also filtered to what your region legally permits, so a preset allowed in one
-region doesn't appear in another. Changing region can therefore leave your current preset
-illegal — the app repairs it for you, switching to the region's own default rather than leaving an
-unusable setting in place. The region list itself is filtered by what your firmware supports, so
-the newer regions appear only on 2.8 or later, alongside whichever region the node already has set.
+Lista presetów jest również filtrowana do tego, na co pozwala prawo w Twoim regionie, więc preset dozwolony w jednym regionie nie pojawia się w innym. Zmiana regionu może więc sprawić, że Twój obecny preset stanie się niedozwolony — aplikacja naprawia to za Ciebie, przełączając na domyślny preset danego regionu, zamiast zostawiać nieużyteczne ustawienie. Sama lista regionów jest filtrowana według tego, co obsługuje Twój firmware, więc nowsze regiony pojawiają się dopiero w wersji 2.8 lub nowszej, obok regionu, który węzeł już ma ustawiony.
 
-Some regions are amateur-node allocations whose presets only licensed operators may use. On firmware 2.8 or newer the app knows which regions those are and grays the whole **Presets** list out until **Licensed amateur node (Ham)** is turned on for the node you are configuring; the text under the field says so while it is grayed out.
+Niektóre regiony to przydziały dla węzłów amatorskich, których presetów mogą używać tylko licencjonowani operatorzy. W firmware 2.8 lub nowszym aplikacja wie, które to regiony, i wyszarza całą listę **Presetów**, dopóki nie włączysz **Radioamator licencjonowany (Ham)** dla konfigurowanego węzła; tekst pod polem informuje o tym, gdy jest wyszarzona.
 
-> ⚠️ **Important:** Operating without the correct region may violate local radio regulations. See the [region configuration guide](https://meshtastic.org/docs/getting-started/initial-config) on meshtastic.org for details.
+> ⚠️ **Ważne:** Praca bez prawidłowego regionu może naruszać lokalne przepisy radiowe. Szczegóły znajdziesz w [przewodniku konfiguracji regionu](https://meshtastic.org/docs/getting-started/initial-config) na meshtastic.org.
 
-### Modem presets
+### Presety modemu
 
-The Lite, Narrow, Medium Turbo, and Tiny presets need firmware 2.8 or newer — the app hides them on older nodes.
+Presety Lite, Narrow, Medium Turbo i Tiny wymagają firmware 2.8 lub nowszego — aplikacja ukrywa je w starszych węzłach.
 
-> 💡 **Tip:** The **SNR Limit** values are negative on purpose. LoRa can decode signals _below_ the noise floor, so a more-negative limit means the preset tolerates a weaker, noisier signal (more range). See [How the Signal Meter Works](signal-meter) for the full explanation.
+> 💡 **Wskazówka:** Wartości **Limitu SNR** są ujemne celowo. LoRa potrafi dekodować sygnały *poniżej* poziomu szumu, więc bardziej ujemny limit oznacza, że preset toleruje słabszy, bardziej zaszumiony sygnał (większy zasięg). Pełne wyjaśnienie znajdziesz w [Jak działa miernik sygnału](signal-meter).
 
-| Preset             | Range                   | Prędkość                  | SNR Limit                | Best For                                                                                                                                                                                                      |
-| ------------------ | ----------------------- | ------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Short Turbo        | ~1 km   | 21.9 kbps | −7.5 dB  | Dense urban with line-of-sight; data-heavy applications                                                                                                                                                       |
-| Short Fast         | ~3 km   | 10.9 kbps | −7.5 dB  | Urban neighborhoods; buildings within a few blocks                                                                                                                                                            |
-| Short Slow         | ~5 km   | 6.25 kbps | −10 dB                   | Suburban short-range; moderate building density                                                                                                                                                               |
-| Medium Fast        | ~5 km   | 3.52 kbps | −12.5 dB | Suburban areas; moderate building density                                                                                                                                                                     |
-| Medium Slow        | ~8 km   | 1.95 kbps | −15 dB                   | Suburban/rural; moderate range with slower speed                                                                                                                                                              |
-| Long Turbo         | ~10 km  | 1.34 kbps | −17.5 dB | Similar range to Long Fast but with 500 kHz bandwidth; faster throughput                                                                                                                                      |
-| Long Fast          | ~10 km  | 1.1 kbps  | −17.5 dB | **General use (default)** — balanced range and speed                                                                                                                                       |
-| Long Moderate      | ~20 km  | 0.34 kbps | −17.5 dB | Rural with some terrain; occasional use                                                                                                                                                                       |
-| Lite Fast          | ~5 km   | 1.76 kbps | −12.5 dB | EU 866 MHz SRD band (125 kHz BW); comparable to Medium Fast                                                                                                                                |
-| Lite Slow          | ~10 km  | 0.98 kbps | −15 dB                   | EU 866 MHz SRD band (125 kHz BW); comparable to Long Fast                                                                                                                                  |
-| Narrow Fast        | ~5 km   | 2.28 kbps | −7.5 dB  | EU 868 MHz band (62.5 kHz BW); avoids interference with other devices                                                                                                      |
-| Narrow Slow        | ~10 km  | 1.30 kbps | −10 dB                   | EU 868 MHz band (62.5 kHz BW); comparable to Long Fast                                                                                                                     |
-| Medium Turbo       | ~5 km   | 7.0 kbps  | −12.5 dB | Like Medium Fast but with 500 kHz bandwidth; not legal in every region. Needs firmware 2.8 or newer                                                                           |
-| Tiny Fast          | ~10 km  | 0.68 kbps | −7.5 dB  | Amateur bands that cap occupied bandwidth; these presets use 15.6 kHz. Needs firmware 2.8 or newer, an SX126x or SX127x radio, and a TCXO of ±5 ppm or better |
-| Tiny Slow          | ~20 km  | 0.33 kbps | −10 dB                   | Same band restrictions as Tiny Fast, longer range. Same firmware, node, and TCXO requirements                                                                                                 |
-| ~~Long Slow~~      | ~30 km  | 0.18 kbps | −20 dB                   | ⚠️ **Deprecated** — still selectable but may be removed in a future firmware release                                                                                                                          |
-| ~~Very Long Slow~~ | ~40+ km | 0.09 kbps | −20 dB                   | ⚠️ **Deprecated** — still selectable but may be removed in a future firmware release                                                                                                                          |
+| Preset | Zasięg | Szybkość | Limit SNR | Najlepszy do |
+|--------|-------|-------|-----------|----------|
+| Short Turbo | ~1 km | 21,9 kbps | −7,5 dB | Gęsta zabudowa miejska z widocznością bezpośrednią; aplikacje wymagające dużej ilości danych |
+| Short Fast | ~3 km | 10,9 kbps | −7,5 dB | Osiedla miejskie; budynki w odległości kilku przecznic |
+| Short Slow | ~5 km | 6,25 kbps | −10 dB | Przedmieścia, krótki zasięg; umiarkowana gęstość zabudowy |
+| Medium Fast | ~5 km | 3,52 kbps | −12,5 dB | Przedmieścia; umiarkowana gęstość zabudowy |
+| Medium Slow | ~8 km | 1,95 kbps | −15 dB | Przedmieścia/wieś; umiarkowany zasięg przy mniejszej szybkości |
+| Long Turbo | ~10 km | 1,34 kbps | −17,5 dB | Zasięg podobny do Long Fast, ale z pasmem 500 kHz; większa przepustowość |
+| Long Fast | ~10 km | 1,1 kbps | −17,5 dB | **Zastosowanie ogólne (domyślny)** — zrównoważony zasięg i szybkość |
+| Long Moderate | ~20 km | 0,34 kbps | −17,5 dB | Tereny wiejskie z pewnymi przeszkodami terenowymi; sporadyczne użycie |
+| Lite Fast | ~5 km | 1,76 kbps | −12,5 dB | Pasmo SRD 866 MHz w UE (pasmo 125 kHz); porównywalny z Medium Fast |
+| Lite Slow | ~10 km | 0,98 kbps | −15 dB | Pasmo SRD 866 MHz w UE (pasmo 125 kHz); porównywalny z Long Fast |
+| Narrow Fast | ~5 km | 2,28 kbps | −7,5 dB | Pasmo 868 MHz w UE (pasmo 62,5 kHz); unika zakłóceń z innymi urządzeniami |
+| Narrow Slow | ~10 km | 1,30 kbps | −10 dB | Pasmo 868 MHz w UE (pasmo 62,5 kHz); porównywalny z Long Fast |
+| Medium Turbo | ~5 km | 7,0 kbps | −12,5 dB | Jak Medium Fast, ale z pasmem 500 kHz; nie jest legalny w każdym regionie. Wymaga firmware 2.8 lub nowszego |
+| Tiny Fast | ~10 km | 0,68 kbps | −7,5 dB | Pasma amatorskie z limitem zajmowanej szerokości pasma; te presety używają 15,6 kHz. Wymaga firmware 2.8 lub nowszego, radia SX126x lub SX127x oraz TCXO o dokładności ±5 ppm lub lepszej |
+| Tiny Slow | ~20 km | 0,33 kbps | −10 dB | Te same ograniczenia pasma co Tiny Fast, większy zasięg. Te same wymagania co do firmware, węzła i TCXO |
+| ~~Long Slow~~ | ~30 km | 0,18 kbps | −20 dB | ⚠️ **Przestarzały** — nadal można go wybrać, ale może zostać usunięty w przyszłym wydaniu firmware |
+| ~~Very Long Slow~~ | ~40+ km | 0,09 kbps | −20 dB | ⚠️ **Przestarzały** — nadal można go wybrać, ale może zostać usunięty w przyszłym wydaniu firmware |
 
-> ℹ️ **Note:** This table uses the common short names. The app's **Presets** dropdown lists the raw firmware names instead — `SHORT_FAST`, `LONG_FAST`, `LITE_FAST`, `NARROW_FAST`, and so on. Local Mesh Discovery shows the same presets as _Long Fast_ and _Short Turbo_.
+> ℹ️ **Uwaga:** Ta tabela używa powszechnych krótkich nazw angielskich. Lista rozwijana **Presety** w aplikacji pokazuje nazwy polskie z angielską nazwą w nawiasie i prefiksem szerokości pasma, np. „Szeroki daleki szybki (Long Fast)” czy „Wąski szybki (Narrow Fast)”. Odkrywanie lokalnej sieci mesh pokazuje te same presety jako *Long Fast* i *Short Turbo*.
 
-#### Choosing a modem preset
+#### Wybór presetu modemu
 
-The modem preset controls the fundamental tradeoff between **range** and **data rate**:
+Preset modemu określa podstawowy kompromis między **zasięgiem** a **szybkością transmisji danych**:
 
-- **Slower presets** use more spreading, making signals decodable at weaker signal levels (lower SNR limit). This means longer range but fewer bytes per second.
-- **Faster presets** pack more data per transmission but require a stronger signal to decode.
+- **Wolniejsze presety** używają większego rozproszenia, dzięki czemu sygnały da się zdekodować przy słabszych poziomach sygnału (niższy limit SNR). Oznacza to większy zasięg, ale mniej bajtów na sekundę.
+- **Szybsze presety** upakowują więcej danych w jednej transmisji, ale do zdekodowania wymagają silniejszego sygnału.
 
-**Practical guidance:**
+**Praktyczne wskazówki:**
 
-- **Urban mesh (many nodes, short distances):** Use **Long Fast** (default) or **Short Fast**. Higher speed means less airtime congestion when many nodes share the channel.
-- **Rural/sparse mesh (few nodes, long distances):** Use **Long Moderate**. Range matters more than speed when nodes are far apart.
-- **EU 866/868 MHz regulatory compliance:** Use **Lite Fast**, **Lite Slow**, **Narrow Fast**, or **Narrow Slow** — these are optimized for the EU SRD/868 MHz bands with narrower bandwidths.
-- **Fixed infrastructure links:** Use **Short Turbo** or **Long Turbo** for dedicated point-to-point links with good antennas and line-of-sight.
-- **Mixed environments:** Stick with **Long Fast** — it's the community default and ensures compatibility with others in your area.
+- **Sieć miejska (wiele węzłów, małe odległości):** Użyj **Long Fast** (domyślny) lub **Short Fast**. Większa szybkość oznacza mniejsze zatłoczenie eteru, gdy wiele węzłów dzieli kanał.
+- **Sieć wiejska/rzadka (mało węzłów, duże odległości):** Użyj **Long Moderate**. Zasięg jest ważniejszy niż szybkość, gdy węzły są daleko od siebie.
+- **Zgodność z przepisami UE w paśmie 866/868 MHz:** Użyj **Lite Fast**, **Lite Slow**, **Narrow Fast** lub **Narrow Slow** — są zoptymalizowane pod pasma SRD/868 MHz w UE i mają węższe pasma.
+- **Stałe łącza infrastrukturalne:** Użyj **Short Turbo** lub **Long Turbo** do dedykowanych łączy punkt-punkt z dobrymi antenami i widocznością bezpośrednią.
+- **Środowiska mieszane:** Zostań przy **Long Fast** — to domyślny wybór społeczności i zapewnia zgodność z innymi w Twojej okolicy.
 
-All nodes on the same channel must use the same modem preset. Nodes with mismatched presets can't communicate even if they share the same frequency and encryption key.
+Wszystkie węzły na tym samym kanale muszą używać tego samego presetu modemu. Węzły z niezgodnymi presetami nie mogą się komunikować, nawet jeśli mają tę samą częstotliwość i klucz szyfrowania.
 
-The range estimates in the [Modem Presets](#modem-presets) table assume flat terrain and modest antennas. Elevation advantage (hilltop, rooftop) dramatically increases effective range. A well-placed Router with Long Fast can often outperform a ground-level node with Long Slow.
+Szacunki zasięgu w tabeli [Presety modemu](#modem-presets) zakładają płaski teren i skromne anteny. Przewaga wysokości (szczyt wzgórza, dach) dramatycznie zwiększa efektywny zasięg. Dobrze ustawiony Router z Long Fast często może przewyższyć węzeł na poziomie gruntu z Long Slow.
 
 ### Konfiguracja wyświetlacza
 
-On **Settings → Device configuration → Display**. These control the **node's own screen**, not the app's.
+W **Ustawienia → Konfiguracja urządzenia → Wyświetlacz**. Te ustawienia dotyczą **własnego ekranu węzła**, a nie aplikacji.
 
-| Setting                          | Opis                                                                                                                                                                 |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Ekran włączony na                | How long the display stays lit before sleeping                                                                                                                       |
-| Interwał karuzeli                | How often the node cycles between screens on its own                                                                                                                 |
-| Tryb wyświetlania                | Screen layout/density used by the firmware                                                                                                                           |
-| Wyświetlana jednostka            | Metric or Imperial on the node's screen                                                                                                                              |
-| Użyj formatu 12-godzinnego       | Show the node's clock as 12-hour rather than 24-hour                                                                                                                 |
-| Pogrubiony nagłówek              | Draw the screen's heading text in bold                                                                                                                               |
-| Odwróć ekran                     | Rotate the display 180° for an inverted mounting                                                                                                                     |
-| Typ ekranu OLED                  | Six values, shown as the raw constants: `OLED_AUTO`, `OLED_SSD1306`, `OLED_SH1106`, `OLED_SH1107`, `OLED_SH1107_128_128`, `OLED_SH1107_ROTATED`      |
-| Wybudź przy dotknięciu lub ruchu | Light the screen when the node is tapped or moved                                                                                                                    |
-| Orientacja kompasu               | Rotation offset for the compass rose. Eight values, shown as the raw constants `DEGREES_0` through `DEGREES_270` plus an `_INVERTED` variant of each |
-| Zawsze wskazywać na północ       | Locks the compass rose north-up instead of rotating it with your heading. Independent of Compass orientation — neither replaces the other            |
+| Ustawienie | Opis |
+|---------|-------------|
+| Ekran włączony na | Jak długo wyświetlacz pozostaje podświetlony, zanim przejdzie w stan uśpienia |
+| Interwał "karuzeli" | Jak często węzeł sam przełącza się między ekranami |
+| Tryb wyświetlania | Układ/gęstość ekranu używana przez firmware |
+| Wyświetlana jednostka | Metryczne lub imperialne na ekranie węzła |
+| Użyj formatu 12-godzinnego | Pokazuje zegar węzła w formacie 12-godzinnym zamiast 24-godzinnego |
+| Pogrubiony nagłówek | Rysuje tekst nagłówka ekranu pogrubioną czcionką |
+| Odwróć ekran | Obraca wyświetlacz o 180° przy odwróconym montażu |
+| Typ ekranu OLED | Sześć wartości, pokazanych jako surowe stałe: `OLED_AUTO`, `OLED_SSD1306`, `OLED_SH1106`, `OLED_SH1107`, `OLED_SH1107_128_128`, `OLED_SH1107_ROTATED` |
+| Wybudź przy dotknięciu lub ruchu | Zapala ekran, gdy węzeł zostanie dotknięty lub poruszony |
+| Orientacja kompasu | Przesunięcie obrotu różyny kompasu. Osiem wartości, pokazanych jako surowe stałe `DEGREES_0` do `DEGREES_270` oraz wariant `_INVERTED` każdej z nich |
+| Zawsze wskazuj północ | Blokuje różę kompasu północą do góry zamiast obracać ją razem z Twoim kierunkiem. Niezależne od Orientacji kompasu — żadne z nich nie zastępuje drugiego |
 
-### Konfiguracja pozycjonowania
+### Konfiguracja pozycji
 
-On **Settings → Device configuration → Position**.
+W **Ustawienia → Konfiguracja urządzenia → Pozycjonowanie**.
 
-| Setting                                         | Opis                                                                                                                                                  |
-| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GPS Mode (Physical Hardware) | Three-state: GPS enabled, disabled, or not present. Not a simple on/off                                               |
-| GPS Polling Interval                            | How often the node asks its GPS for a fix                                                                                                             |
-| Interwał transmisji                             | How often the position is shared with the mesh                                                                                                        |
-| Inteligentne Pozycjonowanie                     | Broadcast based on movement rather than purely on the clock                                                                                           |
-| Smart Interval                                  | With Smart Position on, the shortest gap between broadcasts                                                                                           |
-| Smart Distance                                  | With Smart Position on, how far you must move before broadcasting                                                                                     |
-| Położenie stałe                                 | Use a manually entered latitude, longitude and altitude instead of the GPS                                                                            |
-| Flagi położenia                                 | A group of toggles choosing which fields ride along with a position — altitude, its reference and precision, satellites in view, timestamp, and so on |
-| GPS EN / Receive / Transmit GPIO                | Advanced: the pins the GPS module is wired to                                                                                         |
+| Ustawienie | Opis |
+|---------|-------------|
+| Tryb GPS (sprzęt fizyczny) | Trzy stany: GPS włączony, wyłączony lub nieobecny. Nie jest to zwykłe włącz/wyłącz |
+| Interwał odpytywania GPS | Jak często węzeł prosi GPS o ustalenie pozycji |
+| Interwał transmisji | Jak często pozycja jest udostępniana w sieci mesh |
+| Inteligentne Pozycjonowanie | Nadaje na podstawie ruchu, a nie wyłącznie według zegara |
+| Inteligentny interwał | Przy włączonym Inteligentnym Pozycjonowaniu — najkrótszy odstęp między transmisjami |
+| Inteligentny dystans | Przy włączonym Inteligentnym Pozycjonowaniu — jak daleko musisz się przemieścić, zanim nastąpi transmisja |
+| Położenie stałe | Używa ręcznie wpisanej szerokości, długości i wysokości zamiast GPS |
+| Flagi pozycji (Position Flags) | Grupa przełączników wybierających, które pola są dołączane do pozycji — wysokość, jej odniesienie i dokładność, widoczne satelity, znacznik czasu itd. |
+| GPS EN / Rx / Tx GPIO | Zaawansowane: piny, do których podłączony jest moduł GPS |
 
-### Konfiguracja zarządzania energią
+### Konfiguracja zasilania
 
-On **Settings → Device configuration → Power**.
+W **Ustawienia → Konfiguracja urządzenia → Zasilanie**.
 
-| Setting                                          | Opis                                                            |
-| ------------------------------------------------ | --------------------------------------------------------------- |
-| Włącz tryb oszczędzania energii                  | Let the node sleep aggressively between activity                |
-| Shutdown on power loss                           | Power the device down after external power disappears           |
-| Super deep sleep duration                        | How long the deepest sleep state lasts                          |
-| Minimum wake time                                | The shortest time the node stays awake once woken               |
-| Wait for Bluetooth duration                      | How long to wait for a phone to connect before sleeping         |
-| ADC multiplier override                          | Turn on a manual correction for battery-voltage readings        |
-| ADC multiplier override ratio                    | The correction factor itself, used only when the override is on |
-| Battery INA_2XX I2C address | Address of an external INA-series power sensor, if fitted       |
+| Ustawienie | Opis |
+|---------|-------------|
+| Włącz tryb oszczędzania energii | Pozwala węzłowi głęboko zasypiać między aktywnościami |
+| Wyłącz przy utracie zasilania | Wyłącza urządzenie po zaniku zasilania zewnętrznego |
+| Czas trwania głębokiego uśpienia | Jak długo trwa najgłębszy stan uśpienia |
+| Minimalny czas czuwania | Najkrótszy czas, przez jaki węzeł pozostaje obudzony po wybudzeniu |
+| Czas oczekiwania na Bluetooth (Wait for Bluetooth duration) | Jak długo czekać na połączenie telefonu przed uśpieniem |
+| Nadpisanie mnożnika ADC | Włącza ręczną korektę odczytów napięcia baterii |
+| Współczynnik nadpisania mnożnika ADC | Sam współczynnik korekty, używany tylko przy włączonym nadpisaniu |
+| Adres I2C dla wartości baterii INA_2XX | Adres zewnętrznego czujnika zasilania serii INA, jeśli jest zamontowany |
 
 ### Konfiguracja sieci
 
-On **Settings → Device configuration → Network**, on nodes with Wi-Fi or Ethernet.
+W **Ustawienia → Konfiguracja urządzenia → Sieć**, w węzłach z Wi-Fi lub Ethernetem.
 
-> ⚠️ **Warning:** Turning on **Wi-Fi enabled** or **Ethernet enabled** ends the Bluetooth connection between your phone and the node. Reconnect over the network afterwards from the [Connections](connections) screen, or turn Wi-Fi off again from the node's own screen or over USB. Saving this screen also always reboots the node.
+> ⚠️ **Ostrzeżenie:** Włączenie **WiFi włączone** lub **Ethernet enabled** kończy połączenie Bluetooth między telefonem a węzłem. Połącz się potem ponownie przez sieć z ekranu [Połączenia](connections) albo wyłącz Wi-Fi ponownie z ekranu samego węzła lub przez USB. Zapisanie tego ekranu zawsze też restartuje węzeł.
 
-| Setting                           | Opis                                                                                                                                                                                                                                                                                                                                                                      |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Wi-Fi enabled                     | Enable the Wi-Fi node (ESP32 nodes)                                                                                                                                                                                                                                                                                                                    |
-| SSID                              | Network name to connect to. Appears only once **Wi-Fi enabled** is on, along with **Password**. **Scan Wi-Fi QR code** fills both from a standard Wi-Fi QR code; on Android, holding the phone against a Wi-Fi NFC tag while this screen is open fills them the same way, and the app offers to open system settings if NFC is turned off |
-| Hasło                             | Hasło do sieci                                                                                                                                                                                                                                                                                                                                                            |
-| Ethernet włączony                 | Use a wired connection on hardware that has one                                                                                                                                                                                                                                                                                                                           |
-| Tryb IPv4                         | DHCP, or a static address configured with the four fields that follow                                                                                                                                                                                                                                                                                                     |
-| Wi-Fi IP / Subnet / Gateway / DNS | The static address, only used when IPv4 mode is static                                                                                                                                                                                                                                                                                                                    |
-| UDP broadcasting                  | Share mesh traffic with other nodes over the local network                                                                                                                                                                                                                                                                                                                |
-| Serwer NTP                        | Time synchronization server                                                                                                                                                                                                                                                                                                                                               |
-| Serwer rsyslog                    | Remote logging server                                                                                                                                                                                                                                                                                                                                                     |
+| Ustawienie | Opis |
+|---------|-------------|
+| WiFi włączone | Włącza Wi-Fi węzła (węzły ESP32) |
+| SSID | Nazwa sieci, z którą ma się połączyć. Pojawia się dopiero po włączeniu **WiFi włączone**, razem z **Hasło**. **Skanuj kod QR Wi-Fi** wypełnia oba pola ze standardowego kodu QR Wi-Fi; na Androidzie przyłożenie telefonu do tagu NFC z danymi Wi-Fi przy otwartym tym ekranie wypełnia je w ten sam sposób, a aplikacja proponuje otwarcie ustawień systemowych, jeśli NFC jest wyłączone |
+| Hasło | Hasło sieci |
+| Ethernet włączony | Używa połączenia przewodowego na sprzęcie, który je ma |
+| Tryb IPv4 | DHCP lub adres statyczny konfigurowany czterema następnymi polami |
+| Wifi IP / Maska podsieci / Brama domyślna / DNS | Adres statyczny, używany tylko gdy tryb IPv4 jest statyczny |
+| Nadawanie UDP | Udostępnia ruch sieci mesh innym węzłom przez sieć lokalną |
+| Serwer NTP | Serwer synchronizacji czasu |
+| Serwer rsyslog | Serwer zdalnego logowania |
 
-![Network Config with a static IPv4 address entered](../../assets/screenshots/settings_ipv4_field.png)
+![Konfiguracja sieci z wpisanym statycznym adresem IPv4](../../assets/screenshots/settings_ipv4_field.png)
 
 ### Konfiguracja Bluetooth
 
-On **Settings → Device configuration → Bluetooth**, on nodes with Bluetooth.
+W **Ustawienia → Konfiguracja urządzenia → Bluetooth**, w węzłach z Bluetooth.
 
-| Setting            | Opis                                                                                                   |
-| ------------------ | ------------------------------------------------------------------------------------------------------ |
-| Bluetooth włączony | Enable/disable BLE radio                                                                               |
-| Tryb parowania     | Fixed PIN, Random PIN, or No PIN                                                                       |
-| Stały PIN          | PIN code for pairing. Must be **exactly six digits** — the field rejects anything else |
+| Ustawienie | Opis |
+|---------|-------------|
+| Bluetooth włączony | Włącza/wyłącza radio BLE |
+| Tryb parowania | Stały PIN, Losowy PIN lub Bez PIN |
+| Stały PIN (Fixed PIN) | Kod PIN do parowania. Musi mieć **dokładnie sześć cyfr** — pole odrzuca wszystko inne |
 
-### Konfiguracja zabezpieczeń
+### Konfiguracja bezpieczeństwa
 
-On **Settings → Security**. The screen is grouped into cards: **Packet authenticity**, **Direct Message Key** (your node's key pair), **Admin Keys**, **Logs**, and **Administration**.
+W **Ustawienia → Bezpieczeństwo**. Ekran jest podzielony na karty: **Autentyczność pakietów**, **Klucz wiadomości bezpośredniej** (para kluczy Twojego węzła), **Klucze administratora**, **Rejestry zdarzeń (logs)** i **Zarządzanie**.
 
-| Setting                   | Opis                                                                                                                                                                                                                                                       |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Klucz publiczny           | Your node's public key (read-only)                                                                                                                                                                                                      |
-| Klucz administratora      | Keys permitted to administer this node remotely — up to three                                                                                                                                                                                              |
-| Klucz prywatny            | Your node's private key (handle securely). Shown redacted when you are viewing another node over remote admin — the firmware doesn't send it                                                                            |
-| Regenerate Private Key    | Issues a new keypair for this node, behind a confirmation. Every peer that knew your old key must learn the new one                                                                                                                        |
-| ~~Admin Channel Enabled~~ | ⚠️ Removed — now configured automatically when an admin key is set                                                                                                                                                                                         |
-| Serial console            | Serial console over the Stream API                                                                                                                                                                                                                         |
-| Debug log API enabled     | Output live debug logging over serial, and view and export position-redacted node logs over Bluetooth                                                                                                                                                      |
-| Managed Mode              | Locks the whole Configuration list, not just channels — every setting on the node becomes read-only and only an admin can change anything. Only selectable once an Admin Key is set                                                        |
-| Klucze zapasowe           | Save an encrypted backup of the node's keys on this phone (Android only, and only for your own node)                                                                                                                                    |
-| Restore Keys              | Write the backed-up keys back to the node (available once a backup exists)                                                                                                                                                              |
-| Delete Key Backup         | Remove the stored key backup from this phone                                                                                                                                                                                                               |
-| Protection level          | How unsigned or relayed packets are treated: **Strict — Require authentication**, **Balanced — Prefer authenticated**, or **Compatible — Accept unsigned** (requires supporting firmware; Strict asks for confirmation) |
+| Ustawienie | Opis |
+|---------|-------------|
+| Klucz publiczny | Klucz publiczny Twojego węzła (tylko do odczytu) |
+| Klucz administratora | Klucze uprawnione do zdalnego zarządzania tym węzłem — do trzech |
+| Klucz prywatny | Klucz prywatny Twojego węzła (obchodź się z nim bezpiecznie). Pokazany jako zaciemniony, gdy oglądasz inny węzeł przez zdalne zarządzanie — firmware go nie wysyła |
+| Wygeneruj nowy klucz prywatny | Wydaje nową parę kluczy dla tego węzła, po potwierdzeniu. Każdy partner, który znał Twój stary klucz, musi poznać nowy |
+| ~~Kanał administracyjny włączony (Admin Channel Enabled)~~ | ⚠️ Usunięte — konfigurowane teraz automatycznie po ustawieniu klucza administratora |
+| Konsola szeregowa | Konsola szeregowa przez Stream API |
+| API dziennika debugowania włączone | Wysyła na żywo logi debugowania przez port szeregowy oraz pozwala przeglądać i eksportować logi węzła z zaciemnioną pozycją przez Bluetooth |
+| Tryb zarządzany | Blokuje całą listę Konfiguracji, a nie tylko kanały — każde ustawienie węzła staje się tylko do odczytu i cokolwiek zmienić może tylko administrator. Można go wybrać dopiero po ustawieniu Klucza administratora |
+| Kopia kluczy | Zapisuje zaszyfrowaną kopię zapasową kluczy węzła na tym telefonie (tylko Android i tylko dla własnego węzła) |
+| Przywróć klucze | Zapisuje kopie zapasowe kluczy z powrotem w węźle (dostępne, gdy istnieje kopia zapasowa) |
+| Usuń kopię zapasową kluczy | Usuwa zapisaną kopię zapasową kluczy z tego telefonu |
+| Poziom ochrony | Jak traktowane są pakiety niepodpisane lub przekazywane dalej: **Ścisły — Wymagaj uwierzytelnienia**, **Zrównoważony — Preferuj uwierzytelnione** lub **Kompatybilny — Akceptuj niepodpisane** (wymaga obsługującego to firmware; Ścisły prosi o potwierdzenie) |
 
-#### Lockdown Mode
+#### Tryb blokady
 
-Lockdown encrypts the device's storage and requires a passphrase for each connection. It needs
-supporting firmware; the row doesn't appear otherwise.
+Blokada szyfruje pamięć urządzenia i wymaga hasła przy każdym połączeniu. Wymaga obsługującego to firmware; w przeciwnym razie wiersz się nie pojawia.
 
-Enabling it asks you to set and confirm a passphrase, and to acknowledge that **it locks the debug
-(SWD) port on hardware where the lockout takes effect**. That part isn't reversible from the app.
-Turning lockdown off later decrypts your storage and reboots the device, but the port stays locked.
-Reopening it takes a full chip erase with a debug probe, which destroys everything on the device.
+Jej włączenie prosi o ustawienie i potwierdzenie hasła oraz o potwierdzenie, że **blokuje port debugowania (SWD) na sprzęcie, na którym blokada faktycznie działa**. Tego kroku nie da się cofnąć z poziomu aplikacji. Późniejsze wyłączenie blokady odszyfrowuje pamięć i restartuje urządzenie, ale port pozostaje zablokowany. Ponowne jego otwarcie wymaga pełnego wymazania układu sondą debugującą, co niszczy wszystko na urządzeniu.
 
-Alongside the passphrase you set the limits that end a session automatically:
+Obok hasła ustawiasz limity, które automatycznie kończą sesję:
 
-| Field                                    | What it does                                                                              |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Boots remaining                          | How many device boots the unlocked state survives                                         |
-| Hours until expiry                       | Wall-clock lifetime of the unlocked state                                                 |
-| Session cap (minutes) | A per-boot uptime cap on the unlocked state. 0, the default, means no cap |
+| Pole | Co robi |
+|---|---|
+| Pozostało restartów | Przez ile restartów urządzenia przetrwa stan odblokowany |
+| Godziny do wygaśnięcia | Czas życia stanu odblokowanego według zegara ściennego |
+| Limit sesji (minuty) | Limit czasu pracy na jeden restart w stanie odblokowanym. 0, wartość domyślna, oznacza brak limitu |
 
-Once active, the row reads _Active — storage encrypted, this connection authenticated_ when
-unlocked, or _Active — enter your passphrase to unlock this connection_ when not. **Lock Now**
-ends the current session immediately. Repeated wrong passphrases are rate-limited with a
-back-off before you can try again.
+Gdy blokada jest aktywna, wiersz pokazuje *Aktywna — pamięć zaszyfrowana, to połączenie uwierzytelnione*, gdy jest odblokowana, lub *Aktywna — wpisz hasło, aby odblokować to połączenie*, gdy nie jest. **Zablokuj teraz** natychmiast kończy bieżącą sesję. Powtarzane błędne hasła są ograniczane czasowo, zanim będzie można spróbować ponownie.
 
-> ⚠️ **Warning:** There is no passphrase recovery. Losing it means erasing the device to get it
-> back, which destroys its keys, channels and settings.
+> ⚠️ **Ostrzeżenie:** Nie ma odzyskiwania hasła. Jego utrata oznacza konieczność wymazania urządzenia, aby odzyskać do niego dostęp, co niszczy jego klucze, kanały i ustawienia.
 
-## Related Topics
+## Powiązane tematy
 
-- [Settings — Modules & Admin](settings-module-admin) — optional feature modules and device administration
-- [Signal Meter](signal-meter) — how modem presets affect signal quality thresholds
-- [LoRa configuration](https://meshtastic.org/docs/configuration/radio/lora) — detailed LoRa settings reference on meshtastic.org
-- [Initial configuration](https://meshtastic.org/docs/getting-started/initial-config) — region setup guide on meshtastic.org
+- [Ustawienia — Moduły i administracja](settings-module-admin) — opcjonalne moduły funkcji i administrowanie urządzeniem
+- [Miernik sygnału](signal-meter) — jak presety modemu wpływają na progi jakości sygnału
+- [Konfiguracja LoRa](https://meshtastic.org/docs/configuration/radio/lora) — szczegółowy opis ustawień LoRa na meshtastic.org
+- [Konfiguracja początkowa](https://meshtastic.org/docs/getting-started/initial-config) — przewodnik ustawiania regionu na meshtastic.org

@@ -1,8 +1,9 @@
 ---
-title: Firmware Updates
+title: Aktualizacje firmware
+parent: Przewodnik użytkownika
 nav_order: 13
 last_updated: 2026-10-05
-description: Update your radio firmware over Bluetooth or USB — OTA process, version channels, pre-flight checks, and recovery.
+description: Aktualizuj firmware radia przez Bluetooth lub USB — proces OTA, kanały wersji, kontrole przed aktualizacją i odzyskiwanie.
 aliases:
   - firmware
   - update
@@ -10,164 +11,159 @@ aliases:
   - flash
 ---
 
-# Firmware Updates
+# Aktualizacje firmware
 
-Keep your Meshtastic radio up to date with the latest firmware for new features, bug fixes, and security improvements.
+Utrzymuj firmware swojego radia w aktualnej wersji, aby mieć nowe funkcje, poprawki błędów i ulepszenia bezpieczeństwa.
 
-## Checking for Updates
+## Sprawdzanie aktualizacji
 
-1. Open the connected radio's configuration and, under **Advanced**, tap **Firmware Update**. The entry appears only for OTA-capable radios.
-2. The app checks for available firmware versions.
-3. Available updates show the version number and changelog summary.
+1. Otwórz konfigurację połączonego radia i w sekcji **Zaawansowane** dotknij **Aktualizacja oprogramowania**. Pozycja pojawia się tylko dla radiów obsługujących OTA.
+2. Aplikacja sprawdza dostępne wersje firmware.
+3. Dostępne aktualizacje pokazują numer wersji i streszczenie listy zmian.
 
-## Update Methods
+## Metody aktualizacji
 
-### OTA (Over-The-Air) via Bluetooth
+### OTA (Over-The-Air) przez Bluetooth
 
-The most common update method for Android users:
+Najczęstsza metoda aktualizacji dla użytkowników Androida:
 
-> ⚠️ **Warning:** Interrupting a firmware update can leave the radio unable to boot. Keep the phone nearby and both devices powered until the update completes.
+> ⚠️ **Ostrzeżenie:** Przerwanie aktualizacji firmware może sprawić, że radio nie uruchomi się. Trzymaj telefon w pobliżu, a oba urządzenia zasilane aż do zakończenia aktualizacji.
 
-1. Ensure your radio is connected via Bluetooth.
-2. Navigate to the Firmware Update screen.
-3. Select the desired firmware version.
-4. Tap **Update**. An **Update Warning** dialog lists the pre-flight checks — read it, then tap **I know what I'm doing.** to start. This dialog appears for every update method, including Wi-Fi OTA, USB, and a local firmware file.
-5. Wait for the update to complete — **do not disconnect** during the update.
+1. Upewnij się, że radio jest połączone przez Bluetooth.
+2. Przejdź do ekranu Aktualizacja oprogramowania.
+3. Wybierz żądaną wersję firmware.
+4. Dotknij **Aktualizuj**. Okno **Ostrzeżenie o aktualizacji** wymienia kontrole przed aktualizacją — przeczytaj je, a następnie dotknij **Wiem, co robię.**, aby rozpocząć. To okno pojawia się dla każdej metody aktualizacji, w tym Wi-Fi OTA, USB i lokalnego pliku firmware.
+5. Poczekaj na zakończenie aktualizacji — **nie rozłączaj** w trakcie aktualizacji.
 
-While the update downloads, uploads or verifies, you can tap **Play Chirpy Hop** to play a short runner game: tap to jump, swipe down to crouch. The update's progress stays visible above the game, and back returns to the update screen. When the update finishes or fails, the game stops and offers **Back to update**. Your best score is kept on this device.
+Gdy aktualizacja jest pobierana, wgrywana lub weryfikowana, możesz dotknąć **Zagraj w Chirpy Hop**, aby zagrać w krótką grę biegową: dotknij, aby skoczyć, przesuń w dół, aby się schylić. Postęp aktualizacji pozostaje widoczny nad grą, a przycisk wstecz wraca do ekranu aktualizacji. Gdy aktualizacja się zakończy lub nie powiedzie, gra się zatrzymuje i oferuje **Wróć do aktualizacji**. Twój najlepszy wynik jest zapisywany na tym urządzeniu.
 
-![Firmware checking for updates](../../assets/screenshots/firmware_checking.png)
+![Firmware — sprawdzanie aktualizacji](../../assets/screenshots/firmware_checking.png)
 
-#### Erase device during update
+#### Wykasuj urządzenie podczas aktualizacji
 
-Where the app offers it, an **Erase device during update** checkbox appears next to the update button. It is a per-update opt-in and is never remembered.
+Tam, gdzie aplikacja to oferuje, obok przycisku aktualizacji pojawia się pole wyboru **Wykasuj urządzenie podczas aktualizacji**. Jest to zgoda dla pojedynczej aktualizacji i nigdy nie jest zapamiętywana.
 
-| Method          | What erasing does                                                                                                                      |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| BLE / Wi-Fi OTA | Factory-resets the device once the update is verified. All settings and Bluetooth pairing are removed. |
-| USB             | Wipes the device's flash completely, then installs the selected firmware from scratch.                                 |
+| Metoda | Co robi kasowanie |
+|---|---|
+| BLE / Wi-Fi OTA | Przywraca ustawienia fabryczne urządzenia po zweryfikowaniu aktualizacji. Wszystkie ustawienia i parowanie Bluetooth zostają usunięte. |
+| USB | Całkowicie kasuje pamięć flash urządzenia, a następnie instaluje wybrane firmware od nowa. |
 
-It is not offered for a local firmware file, during a recovery update, on USB devices whose board does not support the erase step, or over USB in the desktop app — the USB erase runs the Android-only maintenance sequence below. Afterwards the device needs setting up — and pairing — again.
+Nie jest oferowane dla lokalnego pliku firmware, podczas aktualizacji odzyskiwania, na urządzeniach USB, których płyta nie obsługuje kroku kasowania, ani przez USB w aplikacji desktopowej — kasowanie przez USB uruchamia opisaną niżej sekwencję serwisową tylko dla Androida. Potem urządzenie wymaga ponownej konfiguracji — i sparowania.
 
-### OTA via Wi-Fi (network-connected ESP32)
+### OTA przez Wi-Fi (ESP32 podłączony do sieci)
 
-When an ESP32 radio is connected over the network rather than Bluetooth, the app offers **Wi-Fi OTA**, which pushes the same update over TCP:
+Gdy radio ESP32 jest połączone przez sieć, a nie przez Bluetooth, aplikacja oferuje **WiFi OTA**, które przesyła tę samą aktualizację przez TCP:
 
-1. Connect to the radio over the network (see [Connections](connections)).
-2. Open the Firmware Update screen and pick a version.
-3. Tap **Update**. Keep the radio and phone on the same network for the whole transfer.
+1. Połącz się z radiem przez sieć (zobacz [Połączenia](connections)).
+2. Otwórz ekran Aktualizacja oprogramowania i wybierz wersję.
+3. Dotknij **Aktualizuj**. Trzymaj radio i telefon w tej samej sieci przez cały czas transferu.
 
-Wi-Fi OTA takes the ESP32 `-update.bin` image rather than the `.uf2` a USB update uses; the app selects the right artifact for you.
+WiFi OTA używa obrazu ESP32 `-update.bin`, a nie pliku `.uf2` używanego przy aktualizacji przez USB; aplikacja sama wybiera właściwy plik.
 
-### In-App USB Update
+### Aktualizacja USB w aplikacji
 
-When your radio is connected over **USB/serial** (rather than Bluetooth), the Firmware Update screen offers **USB File Transfer**. The app reboots the device into DFU mode, then prompts you to save the `.uf2` file to the device's DFU drive using the system file picker. This option appears only on a USB/serial connection — it is not available over Bluetooth.
+Gdy radio jest połączone przez **USB/port szeregowy** (a nie Bluetooth), ekran Aktualizacja oprogramowania oferuje **Transfer pliku przez USB**. Aplikacja restartuje urządzenie w tryb DFU, a następnie prosi o zapisanie pliku `.uf2` na dysku DFU urządzenia za pomocą systemowego selektora plików. Ta opcja pojawia się tylko przy połączeniu USB/szeregowym — nie jest dostępna przez Bluetooth.
 
-> ℹ️ **Note:** A vendor nRF bootloader supplied as a `.zip` (e.g. RAK WisBlock RAK4631) has to be flashed with a serial DFU tool such as `adafruit-nrfutil` — copying that `.zip` to the drive won't work. A bootloader supplied as an `update-....uf2` **can** be installed by copying it to the drive; that is how the app's own bootloader upgrade works. The app surfaces a hint when the serial-only route applies.
+> ℹ️ **Uwaga:** Bootloader nRF od producenta dostarczany jako `.zip` (np. RAK WisBlock RAK4631) trzeba wgrać narzędziem szeregowego DFU, takim jak `adafruit-nrfutil` — skopiowanie tego `.zip` na dysk nie zadziała. Bootloader dostarczany jako `update-....uf2` **można** zainstalować, kopiując go na dysk; tak działa aktualizacja bootloadera w samej aplikacji. Gdy dotyczy to drogi tylko przez port szeregowy, aplikacja wyświetla podpowiedź.
 
-### Factory Erase and Bootloader Upgrade
+### Kasowanie fabryczne i aktualizacja bootloadera
 
-On a **USB/serial** connection, nRF52 and RP2040 devices can be wiped as part of an update — that is the **Erase device during update** opt-in described earlier on this page. nRF52 devices additionally offer **Upgrade bootloader** where an upgraded bootloader is published for the board; RP2040 devices run no Adafruit bootloader, so they never see it.
+Przy połączeniu **USB/szeregowym** urządzenia nRF52 i RP2040 można wykasować w ramach aktualizacji — to zgoda **Wykasuj urządzenie podczas aktualizacji** opisana wcześniej na tej stronie. Urządzenia nRF52 dodatkowo oferują **Zaktualizuj bootloader**, gdy dla danej płyty opublikowano zaktualizowany bootloader; urządzenia RP2040 nie mają bootloadera Adafruit, więc nigdy go nie widzą.
 
-Both are Android-only. They depend on Android's update-drive checks, so the desktop app does not show them — use the [Web Flasher](https://flasher.meshtastic.org) there instead.
+Obie funkcje są tylko dla Androida. Zależą od kontroli dysku aktualizacji w Androidzie, więc aplikacja desktopowa ich nie pokazuje — tam użyj [Web Flashera](https://flasher.meshtastic.org).
 
-Select a firmware version before either one: the app hides both until a release is chosen, because the firmware is reinstalled after the device is wiped or the new bootloader is written.
+Wybierz wersję firmware przed którąkolwiek z nich: aplikacja ukrywa obie, dopóki nie zostanie wybrane wydanie, ponieważ firmware jest instalowane ponownie po wykasowaniu urządzenia lub zapisaniu nowego bootloadera.
 
-Both a USB erase and a bootloader upgrade write two files in turn, so you are asked to select the device's update drive twice: once for the erase or bootloader image, then again for the firmware.
+Zarówno kasowanie przez USB, jak i aktualizacja bootloadera zapisują po kolei dwa pliki, więc jesteś proszony o wskazanie dysku aktualizacji urządzenia dwa razy: raz dla obrazu kasowania lub bootloadera, a potem ponownie dla firmware.
 
-The app reads `INFO_UF2.TXT` from the drive you select to confirm it really is the device's update drive and to identify the board before writing anything.
+Aplikacja odczytuje `INFO_UF2.TXT` z wybranego dysku, aby potwierdzić, że to naprawdę dysk aktualizacji urządzenia, i rozpoznać płytę przed zapisaniem czegokolwiek.
 
-For a bootloader upgrade, the app also reads the installed bootloader version from `INFO_UF2.TXT` and shows it next to the latest release before writing anything. The running firmware doesn't report its bootloader, so the installed version appears only once the device has restarted into update mode, never on the firmware screen while connected. If the two match, the bootloader is left as it is and the app moves straight on to reinstalling the firmware. Otherwise choose **Upgrade bootloader** to write it, or **Skip** to reinstall the firmware without changing it.
+Przy aktualizacji bootloadera aplikacja odczytuje też zainstalowaną wersję bootloadera z `INFO_UF2.TXT` i pokazuje ją obok najnowszego wydania przed zapisaniem czegokolwiek. Działające firmware nie zgłasza swojego bootloadera, więc zainstalowana wersja pojawia się dopiero po restarcie urządzenia w tryb aktualizacji, nigdy na ekranie firmware podczas połączenia. Jeśli obie wersje są takie same, bootloader zostaje bez zmian, a aplikacja przechodzi od razu do ponownej instalacji firmware. W przeciwnym razie wybierz **Zaktualizuj bootloader**, aby go zapisać, lub **Pomiń**, aby ponownie zainstalować firmware bez zmiany bootloadera.
 
-On nRF52 the app must already know which Bluetooth stack your device uses before it starts, because it can't read the bootloader until the device has rebooted. If it can't confirm the stack, it refuses to erase and points you at the [Web Flasher](https://flasher.meshtastic.org) instead. In the Web Flasher, choosing the wrong Bluetooth stack can leave the radio recoverable only with a hardware programmer.
+W nRF52 aplikacja musi już znać stos Bluetooth używany przez Twoje urządzenie, zanim zacznie, ponieważ nie może odczytać bootloadera, dopóki urządzenie się nie zrestartuje. Jeśli nie może potwierdzić stosu, odmawia kasowania i kieruje Cię do [Web Flashera](https://flasher.meshtastic.org). W Web Flasherze wybranie złego stosu Bluetooth może sprawić, że radio da się odzyskać tylko programatorem sprzętowym.
 
-Once the drive is readable, how an nRF52 device is erased depends on its bootloader:
+Gdy dysk jest już czytelny, sposób kasowania urządzenia nRF52 zależy od jego bootloadera:
 
-- **Newer bootloaders erase themselves.** A bootloader that advertises factory-erase support in `INFO_UF2.TXT` (newer OTAFIX bootloaders) takes a single, board-agnostic erase file. The bootloader wipes your settings, channels, keys and the stored node list itself, leaves the installed firmware in place, and comes back as an update drive a second or two later for the firmware file. There is no Bluetooth-stack choice to get wrong on this path.
-- **Older bootloaders need a Bluetooth-stack-specific erase.** On these the app writes a small erase program matched to your device's Bluetooth stack, then starts it over the serial port. If the drive reports a different stack than expected, the app refuses rather than guessing.
+- **Nowsze bootloadery kasują się same.** Bootloader, który w `INFO_UF2.TXT` zgłasza obsługę kasowania fabrycznego (nowsze bootloadery OTAFIX), przyjmuje jeden, uniwersalny dla płyt plik kasujący. Bootloader sam wymazuje Twoje ustawienia, kanały, klucze i zapisaną listę węzłów, zostawia zainstalowane firmware na miejscu i po sekundzie lub dwóch wraca jako dysk aktualizacji, czekając na plik firmware. Na tej ścieżce nie ma wyboru stosu Bluetooth, w którym można się pomylić.
+- **Starsze bootloadery wymagają kasowania właściwego dla stosu Bluetooth.** Na nich aplikacja zapisuje mały program kasujący dopasowany do stosu Bluetooth Twojego urządzenia, a następnie uruchamia go przez port szeregowy. Jeśli dysk zgłasza inny stos niż oczekiwany, aplikacja odmawia zamiast zgadywać.
 
-The app picks the path from what the drive reports; you don't choose it.
+Aplikacja wybiera ścieżkę na podstawie tego, co zgłasza dysk; nie wybierasz jej Ty.
 
-### Other Flashing Options
+### Inne opcje flashowania
 
-For recovery or when neither OTA nor in-app USB is available:
+Do odzyskiwania lub gdy nie jest dostępne ani OTA, ani USB w aplikacji:
+- Użyj [Meshtastic Web Flasher](https://flasher.meshtastic.org)
+- Albo [narzędzia CLI Meshtastic](https://meshtastic.org/docs/getting-started/flashing-firmware) na komputerze
 
-- Use the [Meshtastic Web Flasher](https://flasher.meshtastic.org)
-- Or the [Meshtastic CLI tool](https://meshtastic.org/docs/getting-started/flashing-firmware) on desktop
+## Kanały wersji
 
-## Version Channels
+| Kanał | Opis |
+|---------|-------------|
+| Stabilna | Zalecana dla większości użytkowników; przetestowane wydania |
+| Alpha | Wydania podglądowe; mogą zawierać błędy |
+| Plik lokalny | Wgraj plik firmware, który wybierzesz sam, zamiast pobranego wydania |
 
-| Kanał      | Opis                                                                       |
-| ---------- | -------------------------------------------------------------------------- |
-| Stabilna   | Recommended for most users; tested releases                                |
-| Alpha      | Preview releases; may contain bugs                                         |
-| Local File | Flash a firmware file you select yourself, instead of a downloaded release |
+## Lista kontrolna przed aktualizacją
 
-## Pre-Update Checklist
+Przed aktualizacją:
+- [ ] Bateria > 50%
+- [ ] Stabilne połączenie Bluetooth
+- [ ] Zanotuj swoje obecne ustawienia (mogą się zresetować przy zmianie wersji głównej)
+- [ ] Sprawdź informacje o wydaniu pod kątem zmian łamiących zgodność
+- [ ] Zaktualizuj samą aplikację przed aktualizacją firmware lub razem z nią, aby zapewnić zgodność
 
-Before updating:
+## Po aktualizacji
 
-- [ ] Battery > 50%
-- [ ] Stable Bluetooth connection
-- [ ] Note your current settings (they may reset on major version changes)
-- [ ] Check the release notes for breaking changes
-- [ ] Update the Meshtastic app itself, before or alongside firmware updates, to ensure compatibility
+Po zapisaniu firmware aplikacja weryfikuje aktualizację i czeka, aż urządzenie wróci online:
 
-## Post-Update
+![Weryfikowanie aktualizacji i oczekiwanie na ponowne połączenie urządzenia](../../assets/screenshots/firmware_verifying.png)
 
-After the firmware is written, the app verifies the update and waits for the device to come back online:
+Gdy aktualizacja się powiedzie:
+- Radio restartuje się automatycznie
+- Połączenie Bluetooth zostaje nawiązane ponownie
+- Sprawdź, czy Twoje ustawienia są nienaruszone
+- Potwierdź nową wersję w **Aktualnie zainstalowano** na ekranie Aktualizacja oprogramowania — jest ona także pokazana na stronie szczegółów węzła i na ekranie Połączenia
 
-![Verifying update and waiting for the device to reconnect](../../assets/screenshots/firmware_verifying.png)
+![Aktualizacja firmware zakończona sukcesem](../../assets/screenshots/firmware_success.png)
 
-Once the update succeeds:
+## Rozwiązywanie problemów
 
-- The radio reboots automatically
-- The Bluetooth connection re-establishes
-- Verify your settings are intact
-- Confirm the new version under **Currently Installed** on the Firmware Update screen — it's also shown on the node's detail page and the Connections screen
+### Aktualizacja się zawiesiła
 
-![Firmware update success](../../assets/screenshots/firmware_success.png)
+Jeśli aktualizacja wygląda na zamarzniętą:
+- Daj jej minutę. Po zapisaniu obrazu aplikacja czeka do **60 sekund**, aż radio wróci i zgłosi swoją nową wersję, więc pauza na etapie weryfikacji jest oczekiwana.
+- Jeśli po tym czasie nadal się zawiesza, wyłącz i włącz zasilanie radia.
+- Spróbuj aktualizacji ponownie.
 
-## Troubleshooting
+Komunikat **Upłynął limit czasu weryfikacji. Urządzenie nie podłączyło się ponownie w czasie.** oznacza, że obraz został zapisany, ale radio nie wróciło w tym oknie czasowym — wyłącz i włącz jego zasilanie i sprawdź wersję w **Aktualnie zainstalowano**, zanim ponowisz aktualizację.
 
-### Update Stuck
+![Błąd aktualizacji firmware](../../assets/screenshots/firmware_error.png)
 
-If the update appears frozen:
+### Radio nie uruchamia się po aktualizacji
 
-- Give it a minute. After writing the image the app waits up to **60 seconds** for the radio to come back and report its new version, so a pause at the verify step is expected.
-- If it is still stuck after that, power-cycle the radio.
-- Attempt the update again.
+Jeśli aplikacja poinformowała, że aktualizacji przez Bluetooth nie udało się dokończyć, postępuj zgodnie z podaną instrukcją: podłącz radio do komputera przez USB i wgraj firmware ponownie narzędziem szeregowego DFU od producenta, takim jak `adafruit-nrfutil`. Standardowy bootloader nRF nie potrafi niezawodnie dokończyć przerwanej aktualizacji bezprzewodowej.
 
-The message **Verification timed out. Device did not reconnect in time.** means the image was written but the radio did not come back within that window — power-cycle it and check the version under **Currently Installed** before re-running the update.
+W przeciwnym razie, jeśli Twoje radio się nie uruchamia:
+1. Spróbuj połączyć się z komputerem przez USB
+2. Użyj web flashera w trybie odzyskiwania/DFU
+3. Wgraj sprawdzoną wersję firmware
+4. Sprawdź Discorda Meshtastic, aby znaleźć kroki odzyskiwania dla konkretnego urządzenia
 
-![Firmware update error](../../assets/screenshots/firmware_error.png)
+### Ostrzeżenia o zgodności
 
-### Radio Won't Boot After Update
+Po połączeniu aplikacja porównuje firmware radia z dwoma progami i na każdy reaguje inaczej:
 
-If the app told you the Bluetooth update could not be finished, follow the instruction it gave: connect the radio to a computer over USB and re-flash it with the vendor's serial DFU tool, such as `adafruit-nrfutil`. A stock nRF bootloader cannot reliably complete an interrupted over-the-air update.
+| Wersja firmware | Co widzisz | Co się dzieje |
+|---|---|---|
+| Poniżej **2.3.15** | **Wymagana aktualizacja firmware'u.** | Aplikacja rozłącza się z radiem. Nie działa z tak starym firmware. |
+| **2.3.15** do, ale bez, **2.5.14** | **Zalecana aktualizacja firmware.** | Tylko ostrzeżenie — zamknij je i kontynuuj. Okno podaje najnowsze wydanie stabilne. |
+| **2.5.14** lub nowsza | Nic | — |
 
-Otherwise, if your radio fails to boot:
+Ciąg wersji, którego aplikacja nie potrafi sparsować, jest ignorowany, a nie traktowany jako zbyt stary, więc chwilowy błąd odczytu nigdy nie rozłączy działającego radia.
 
-1. Try connecting via USB to a computer
-2. Use the web flasher in recovery/DFU mode
-3. Flash a known-good firmware version
-4. Check the Meshtastic Discord for device-specific recovery steps
+## Powiązane tematy
 
-### Compatibility Warnings
-
-On connecting, the app compares the radio's firmware against two thresholds and reacts differently to each:
-
-| Wersja firmware                                                                                                 | What you see                                     | What happens                                                                                                         |
-| --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
-| Below **2.3.15**                                                                | **Firmware update required.**    | The app disconnects from the radio. It does not operate against firmware this old.   |
-| **2.3.15** up to, but not including, **2.5.14** | **Firmware Update Recommended.** | Advisory only — dismiss it and carry on. The dialog names the latest stable release. |
-| **2.5.14** or newer                                                             | Nothing                                          | —                                                                                                                    |
-
-A version string the app cannot parse is ignored rather than treated as too old, so a transient read never disconnects a working radio.
-
-## Related Topics
-
-- [Connections](connections) — reconnecting after a firmware update
-- [Flashing firmware guide](https://meshtastic.org/docs/getting-started/flashing-firmware) — full firmware flashing walkthrough on meshtastic.org
-- [Supported devices](https://meshtastic.org/docs/hardware/devices) — check firmware compatibility by device
-- [FAQ](https://meshtastic.org/docs/faq/) — common questions on meshtastic.org
+- [Połączenia](connections) — ponowne łączenie po aktualizacji firmware
+- [Przewodnik flashowania firmware](https://meshtastic.org/docs/getting-started/flashing-firmware) — pełny opis flashowania firmware na meshtastic.org
+- [Obsługiwane urządzenia](https://meshtastic.org/docs/hardware/devices) — sprawdź zgodność firmware według urządzenia
+- [FAQ](https://meshtastic.org/docs/faq/) — częste pytania na meshtastic.org

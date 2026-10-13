@@ -18,6 +18,10 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Pomoc i dokumentacja po polsku**
+* Cała dokumentacja w aplikacji (Przewodnik użytkownika i Przewodnik dewelopera, 36 stron) przetłumaczona na polski, wraz z nazwami stron; strona dokumentacji (docs/pl) też jest teraz w całości po polsku.
+* Opis wyboru presetu mówi, że domyślnym presetem dla MT_SW_FIRMWARE jest Wąski szybki (Narrow Fast).
+
 **Okna informacyjne**
 * Okna informacyjne w aplikacji pojawiają się rzadziej, w losowych odstępach; termin jest zapamiętywany trwale.
 * Przy zdalnej konfiguracji urządzenia pokazuje się osobne okno, zależne od lokalizacji.
@@ -145,6 +149,10 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Help and documentation in Polish**
+* All in-app documentation (User Guide and Developer Guide, 36 pages) translated into Polish, including page names; the documentation site (docs/pl) is now fully in Polish too.
+* The preset picker hint says that the default preset for MT_SW_FIRMWARE is Narrow Fast.
 
 **Information windows**
 * Information windows in the app now appear less often, at random intervals; the schedule is stored permanently.

@@ -1,49 +1,50 @@
 ---
-title: Home Screen Widget
+title: Widżet ekranu głównego
+parent: Przewodnik użytkownika
 nav_order: 20
 last_updated: 2026-08-30
-description: Add the Meshtastic home screen widget to glance at your connected radio's local stats without opening the app.
+description: Dodaj widżet MT_SW na ekran główny, aby zerknąć na lokalne statystyki połączonego radia bez otwierania aplikacji.
 aliases:
   - widget
   - home-screen-widget
   - local-stats-widget
 ---
 
-# Home Screen Widget
+# Widżet ekranu głównego
 
-On Android, Meshtastic provides a home screen **widget** that shows live local statistics from your connected radio at a glance — no need to open the app.
+Na Androidzie MT_SW udostępnia **widżet** ekranu głównego, który na bieżąco pokazuje lokalne statystyki połączonego radia — bez potrzeby otwierania aplikacji.
 
-## What It Shows
+## Co pokazuje
 
-The widget displays the **connected radio's** current local stats:
+Widżet wyświetla bieżące lokalne statystyki **połączonego radia**:
 
-- A **node chip** across the top, carrying the radio's short name in its own colors
-- **Battery** — the radio's battery level, or _Powered_ when running on external power
-- **ChUtil** — channel utilization (how busy the LoRa channel is, as a percentage)
-- **AirUtil** — airtime utilization (how much of the duty cycle your radio is transmitting)
-- **Traffic** — packets transmitted / received, and duplicates seen
-- **Relays** — packets relayed and relay cancellations (shown when the radio is relaying)
-- **Diagnostics** — a combined line carrying **Noise** (the background noise level in dBm), **Bad** (corrupt packets received), and **Dropped** (packets the radio discarded). Bad and Dropped appear only once they are above zero, so a quiet radio may show the noise reading alone
-- **Heap** — free versus total memory on the radio, drawn as a bar
-- **Nodes** — how many nodes are online, out of the total known
-- **Uptime** — how long the radio has been running since its last reboot, shown beside Nodes
-- **Updated** — the time the stats last refreshed, along the foot of the widget
+- **Znacznik węzła** u góry, zawierający krótką nazwę radia w jego własnych kolorach
+- **Bateria** — poziom naładowania baterii radia lub *Zasilanie*, gdy radio pracuje na zasilaniu zewnętrznym
+- **ChUtil** — wykorzystanie kanału (jak bardzo zajęty jest kanał LoRa, w procentach)
+- **AirUtil** — wykorzystanie czasu antenowego (jaka część limitu czasu nadawania jest zużywana przez Twoje radio)
+- **Ruch** — pakiety wysłane / odebrane oraz zauważone duplikaty
+- **Przekaźniki** — pakiety przekazane dalej i anulowane przekazania (pokazywane, gdy radio przekazuje pakiety)
+- **Diagnostyka** — połączona linia zawierająca **Szum** (poziom szumu tła w dBm), **Błędne** (odebrane uszkodzone pakiety) i **Odrzucone** (pakiety odrzucone przez radio). Błędne i Odrzucone pojawiają się dopiero, gdy są większe od zera, więc spokojne radio może pokazywać samą wartość szumu
+- **Sterta** — wolna i całkowita pamięć radia, przedstawiona jako pasek
+- **Węzły** — ile węzłów jest online spośród wszystkich znanych
+- **Czas pracy** — jak długo radio pracuje od ostatniego restartu, pokazany obok Węzłów
+- **Zaktualizowano** — czas ostatniego odświeżenia statystyk, u dołu widżetu
 
-Tap the widget to open the app, or use its refresh control to request fresh stats.
+Dotknij widżetu, aby otworzyć aplikację, lub użyj jego przycisku odświeżania, aby zażądać nowych statystyk.
 
-> ℹ️ **Note:** The values reflect the connected radio. If the radio disconnects, the widget replaces the stats with a status line — **Disconnected**, **Connecting**, or **Device sleeping**. It does not keep the last-known numbers on screen.
+> ℹ️ **Uwaga:** Wartości odzwierciedlają połączone radio. Jeśli radio się rozłączy, widżet zastępuje statystyki wierszem stanu — **Rozłączono**, **Łączenie** lub **Urządzenie uśpione**. Nie pozostawia na ekranie ostatnio znanych liczb.
 
-## Adding the Widget
+## Dodawanie widżetu
 
-1. Touch & hold an empty area of your Android home screen.
-2. Tap **Widgets**.
-3. Drag the **Meshtastic** widget to your home screen. The app ships one widget, so the picker entry is just the app name.
-4. Resize it as needed — the layout adapts to the available space.
+1. Dotknij i przytrzymaj puste miejsce na ekranie głównym Androida.
+2. Dotknij **Widżety**.
+3. Przeciągnij widżet **MT_SW_APP** na ekran główny. Aplikacja zawiera jeden widżet, więc pozycja w wyborze nosi po prostu nazwę aplikacji.
+4. W razie potrzeby zmień jego rozmiar — układ dostosowuje się do dostępnego miejsca.
 
-> ℹ️ **Note:** The widget is Android-only. It is not available on the Desktop or iOS builds.
+> ℹ️ **Uwaga:** Widżet jest dostępny tylko na Androidzie. Nie ma go w kompilacjach na komputery ani iOS.
 
-## Related Topics
+## Powiązane tematy
 
-- [Node Metrics](node-metrics) — the full Signal Quality and Local Stats history inside the app
-- [Connections](connections) — connect to a radio so the widget has stats to show
-- [Local Mesh Discovery](discovery) — channel and airtime utilization across the mesh
+- [Metryki węzła](node-metrics) — pełna historia Jakości sygnału i Statystyk lokalnych w aplikacji
+- [Połączenia](connections) — połącz się z radiem, aby widżet miał statystyki do pokazania
+- [Odkrywanie lokalnej sieci mesh](discovery) — wykorzystanie kanału i czasu antenowego w całej sieci mesh

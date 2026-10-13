@@ -48,10 +48,21 @@ import org.meshtastic.core.resources.doc_title_app_functions
 import org.meshtastic.core.resources.doc_title_connections
 import org.meshtastic.core.resources.doc_title_debug_logs
 import org.meshtastic.core.resources.doc_title_desktop
+import org.meshtastic.core.resources.doc_title_dev_adding_feature_module
+import org.meshtastic.core.resources.doc_title_dev_architecture
+import org.meshtastic.core.resources.doc_title_dev_codebase
+import org.meshtastic.core.resources.doc_title_dev_contributing
+import org.meshtastic.core.resources.doc_title_dev_documentation_style
+import org.meshtastic.core.resources.doc_title_dev_navigation
+import org.meshtastic.core.resources.doc_title_dev_persistence
+import org.meshtastic.core.resources.doc_title_dev_test_builds
+import org.meshtastic.core.resources.doc_title_dev_testing
+import org.meshtastic.core.resources.doc_title_dev_transport
 import org.meshtastic.core.resources.doc_title_discovery
 import org.meshtastic.core.resources.doc_title_firmware
 import org.meshtastic.core.resources.doc_title_help
 import org.meshtastic.core.resources.doc_title_map
+import org.meshtastic.core.resources.doc_title_measurement
 import org.meshtastic.core.resources.doc_title_messages
 import org.meshtastic.core.resources.doc_title_mqtt
 import org.meshtastic.core.resources.doc_title_node_metrics
@@ -488,14 +499,14 @@ class DefaultDocBundleLoader : DocBundleLoader {
     }
 
     // ---------------------------------------------------------------------------
-    // Developer Guide index — hardcoded English (code-focused, not translated)
+    // Developer Guide index — titles from string resources (translatable)
     // ---------------------------------------------------------------------------
 
     @Suppress("LongMethod", "MagicNumber")
-    private fun buildDeveloperGuideIndex(): List<KeywordIndexEntry> = listOf(
+    private suspend fun buildDeveloperGuideIndex(): List<KeywordIndexEntry> = listOf(
         KeywordIndexEntry(
             "architecture",
-            "Architecture",
+            getString(CoreRes.string.doc_title_dev_architecture),
             "developer",
             "en/developer/architecture.html",
             1,
@@ -506,7 +517,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "codebase",
-            "Codebase",
+            getString(CoreRes.string.doc_title_dev_codebase),
             "developer",
             "en/developer/codebase.html",
             2,
@@ -517,7 +528,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "adding-a-feature-module",
-            "Adding a Feature Module",
+            getString(CoreRes.string.doc_title_dev_adding_feature_module),
             "developer",
             "en/developer/adding-a-feature-module.html",
             3,
@@ -528,7 +539,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "navigation-and-deep-links",
-            "Navigation & Deep Links",
+            getString(CoreRes.string.doc_title_dev_navigation),
             "developer",
             "en/developer/navigation-and-deep-links.html",
             4,
@@ -539,7 +550,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "transport",
-            "Transport",
+            getString(CoreRes.string.doc_title_dev_transport),
             "developer",
             "en/developer/transport.html",
             5,
@@ -550,7 +561,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "persistence",
-            "Persistence",
+            getString(CoreRes.string.doc_title_dev_persistence),
             "developer",
             "en/developer/persistence.html",
             6,
@@ -561,7 +572,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "testing",
-            "Testing",
+            getString(CoreRes.string.doc_title_dev_testing),
             "developer",
             "en/developer/testing.html",
             7,
@@ -572,7 +583,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "contributing",
-            "Contributing",
+            getString(CoreRes.string.doc_title_dev_contributing),
             "developer",
             "en/developer/contributing.html",
             8,
@@ -583,7 +594,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "measurement",
-            "Measurement & Formatting",
+            getString(CoreRes.string.doc_title_measurement),
             "developer",
             "en/developer/measurement.html",
             9,
@@ -594,7 +605,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "test-builds",
-            "Test Builds & Obtainium",
+            getString(CoreRes.string.doc_title_dev_test_builds),
             "developer",
             "en/developer/test-builds.html",
             10,
@@ -605,7 +616,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
         ),
         KeywordIndexEntry(
             "documentation-style",
-            "Documentation Style",
+            getString(CoreRes.string.doc_title_dev_documentation_style),
             "developer",
             "en/developer/documentation-style.html",
             11,
