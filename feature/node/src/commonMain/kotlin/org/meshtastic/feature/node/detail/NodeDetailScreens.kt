@@ -42,7 +42,7 @@ import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.details
 import org.meshtastic.core.ui.component.MainAppBar
-import org.meshtastic.core.ui.component.NarrowBandWarningDialog
+import org.meshtastic.core.ui.component.RemoteAdminRegionDialog
 import org.meshtastic.core.ui.component.ShareContactDialog
 import org.meshtastic.core.ui.util.ActiveWhileStarted
 import org.meshtastic.feature.node.compass.CompassUiState
@@ -159,7 +159,7 @@ private fun NodeDetailScaffold(
     }
 
     if (uiState.showNarrowBandWarning) {
-        NarrowBandWarningDialog(onClose = { viewModel.dismissNarrowBandWarning() })
+        RemoteAdminRegionDialog(onClose = { viewModel.dismissNarrowBandWarning() })
     }
 }
 

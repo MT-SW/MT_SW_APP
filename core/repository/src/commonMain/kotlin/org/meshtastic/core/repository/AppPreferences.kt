@@ -253,6 +253,15 @@ interface UiPrefs {
     fun setLastNarrowBandWarningShownMillis(millis: Long)
 
     /**
+     * Epoch millis from which the general NarrowFast notice may be shown again, or 0 when none is scheduled yet (a
+     * fresh install). Read from storage rather than from a [StateFlow] so the very first read after a start never sees
+     * the not-yet-loaded default and schedules over a stored value.
+     */
+    suspend fun nextNarrowBandWarningMillis(): Long
+
+    suspend fun setNextNarrowBandWarningMillis(millis: Long)
+
+    /**
      * Whether the phone's own location was inside the Świętokrzyskie region geofence as of the last foreground check.
      * Used only to detect the edge (was outside, now inside) that triggers an immediate, unthrottled warning — separate
      * from [lastRegionWarningShownMillis], which throttles the repeat reminder while still inside.

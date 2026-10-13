@@ -45,6 +45,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import org.koin.core.annotation.KoinViewModel
@@ -60,6 +62,7 @@ import org.meshtastic.core.model.effectiveBandwidthKHz
 import org.meshtastic.core.model.asDeviceVersion
 import org.meshtastic.core.model.evaluateTracerouteMapAvailability
 import org.meshtastic.core.model.geofence.GeofencePolygon
+import org.meshtastic.core.model.geofence.SwietokrzyskieRegion
 import org.meshtastic.core.model.service.TracerouteResponse
 import org.meshtastic.core.model.util.dispatchMeshtasticUri
 import org.meshtastic.core.model.util.isOtaStatusNotification
@@ -95,6 +98,7 @@ import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.ClientNotification
 import org.meshtastic.proto.LocalConfig
 import org.meshtastic.proto.SharedContact
+import kotlin.random.Random
 
 /**
  * Shared base for the application-level ViewModel.
@@ -428,15 +432,41 @@ class UIViewModel(
      * locally-connected radio's LoRa channel must be wide (>[NARROW_BAND_WARNING_THRESHOLD_KHZ]), its region must be
      * [RegionInfo.EU_868] or [RegionInfo.EU_N_868] (the presets this notice talks about), and EITHER the app's language
      * is Polish OR the phone is physically within [POLAND_REGION] — checked in that order so a Polish-language user
-     * never pays for a location fetch. Throttled to at most once per [NARROW_BAND_WARNING_THROTTLE_MILLIS] so it
-     * surfaces roughly twice a day. Foreground-only by design — no background/WorkManager check. Unrelated to the
-     * unthrottled check shown every time remote admin is opened from Node Details.
+     * never pays for a location fetch.
+     *
+     * Shown at random, not on a clock: a due time is stored, and each time the notice is shown (and on the very first
+     * run after install, when nothing is stored yet) the next one is set a random
+     * [NARROW_BAND_WARNING_MIN_GAP_MILLIS]..[NARROW_BAND_WARNING_MAX_GAP_MILLIS] ahead, so it comes up every one to two
+     * weeks at an unpredictable hour. The due time lives in storage, so killing the app neither resets nor repeats it.
+     * Foreground-only by design — no background/WorkManager check. Unrelated to the separate notice shown when remote
+     * admin is opened from Node Details.
      */
     fun checkNarrowBandWarningThrottled() {
         viewModelScope.launch { performNarrowBandCheck() }
     }
 
-    private suspend fun performNarrowBandCheck() {
+    private val narrowBandScheduleLock = Mutex()
+
+    /** Stores when the general notice may next appear: a random one to two weeks from [now]. */
+    private suspend fun scheduleNextNarrowBandWarning(now: Long) {
+        val gap = Random.nextLong(NARROW_BAND_WARNING_MIN_GAP_MILLIS, NARROW_BAND_WARNING_MAX_GAP_MILLIS + 1)
+        uiPrefs.setNextNarrowBandWarningMillis(now + gap)
+    }
+
+    private suspend fun performNarrowBandCheck() = narrowBandScheduleLock.withLock {
+        val now = nowMillis
+        val due = uiPrefs.nextNarrowBandWarningMillis()
+        if (due == 0L) {
+            // First run after install: start the clock now, so nothing appears straight after the first launch.
+            scheduleNextNarrowBandWarning(now)
+            return@withLock
+        }
+        if (now < due) return@withLock
+
+        showNarrowBandWarningIfApplicable(now)
+    }
+
+    private suspend fun showNarrowBandWarningIfApplicable(now: Long) {
         val lora = localConfig.value.lora ?: return
         val regionInfo = RegionInfo.fromRegionCode(lora.region)
         if (lora.effectiveBandwidthKHz(regionInfo) <= NARROW_BAND_WARNING_THRESHOLD_KHZ) return
@@ -451,9 +481,7 @@ class UIViewModel(
                 }
         if (!isInPoland) return
 
-        val now = nowMillis
-        if (now - uiPrefs.lastNarrowBandWarningShownMillis.value < NARROW_BAND_WARNING_THROTTLE_MILLIS) return
-
+        scheduleNextNarrowBandWarning(now)
         uiPrefs.setLastNarrowBandWarningShownMillis(now)
         narrowBandWarningFlow.value = true
     }
@@ -486,7 +514,7 @@ class UIViewModel(
         if (lora.effectiveBandwidthKHz(regionInfo) <= NARROW_BAND_WARNING_THRESHOLD_KHZ) return
 
         val location = locationService.getCurrentLocation() ?: return
-        val isInside = SWIETOKRZYSKIE_REGION.contains(location.latitude, location.longitude)
+        val isInside = SwietokrzyskieRegion.polygon.contains(location.latitude, location.longitude)
         val wasInside = uiPrefs.wasInsideSwietokrzyskieRegion.value
         if (isInside != wasInside) uiPrefs.setWasInsideSwietokrzyskieRegion(isInside)
         if (!isInside) return
@@ -538,8 +566,11 @@ class UIViewModel(
         private const val DEFAULT_BOOT_TTL = LockdownPassphraseStore.DEFAULT_BOOTS
         private const val NARROW_BAND_WARNING_THRESHOLD_KHZ = 200f
 
-        /** ~12h throttle → the foreground check can fire at most twice in a 24h period. */
-        private const val NARROW_BAND_WARNING_THROTTLE_MILLIS = 12 * 60 * 60 * 1000L
+        /** The general notice never comes back sooner than a week after the last one... */
+        private const val NARROW_BAND_WARNING_MIN_GAP_MILLIS = 7 * 24 * 60 * 60 * 1000L
+
+        /** ...and is never left longer than two weeks. */
+        private const val NARROW_BAND_WARNING_MAX_GAP_MILLIS = 14 * 24 * 60 * 60 * 1000L
 
         /**
          * Simplified national border for Poland (214 vertices, simplified union of all 16 voivodeship polygons from the
@@ -764,69 +795,6 @@ class UIViewModel(
                     49.4576 to 19.6411,
                     49.4554 to 19.5815,
                     49.573 to 19.5293,
-                ),
-            )
-
-        /**
-         * Simplified border polygon for Świętokrzyskie voivodeship (52 vertices, Douglas-Peucker simplified from the
-         * ppatrzyk/polska-geojson dataset) — (lat, lon) pairs, connects back to the first vertex.
-         */
-        @Suppress("MagicNumber")
-        private val SWIETOKRZYSKIE_REGION =
-            GeofencePolygon(
-                listOf(
-                    50.8660 to 19.7471,
-                    50.9357 to 19.8488,
-                    51.0469 to 19.8752,
-                    50.9726 to 20.0356,
-                    51.0577 to 20.0562,
-                    51.0731 to 19.9818,
-                    51.1647 to 20.0258,
-                    51.1840 to 19.9941,
-                    51.2013 to 20.2324,
-                    51.2588 to 20.2605,
-                    51.2366 to 20.3711,
-                    51.3105 to 20.3644,
-                    51.3394 to 20.4328,
-                    51.3314 to 20.5072,
-                    51.2304 to 20.5460,
-                    51.1960 to 20.7003,
-                    51.1490 to 20.6974,
-                    51.1544 to 20.8798,
-                    51.1953 to 20.9207,
-                    51.1445 to 20.9985,
-                    51.1571 to 21.0566,
-                    51.2114 to 21.0700,
-                    51.1887 to 21.1199,
-                    51.1551 to 21.0912,
-                    51.0803 to 21.1528,
-                    51.0853 to 21.3555,
-                    51.0131 to 21.4636,
-                    51.0590 to 21.5291,
-                    51.0780 to 21.6763,
-                    51.0374 to 21.7521,
-                    51.0721 to 21.8030,
-                    50.8136 to 21.8690,
-                    50.6451 to 21.7801,
-                    50.6454 to 21.7226,
-                    50.5212 to 21.6040,
-                    50.4941 to 21.4541,
-                    50.3298 to 21.1766,
-                    50.2896 to 20.7899,
-                    50.1866 to 20.5724,
-                    50.2160 to 20.3746,
-                    50.2415 to 20.3975,
-                    50.3280 to 20.2925,
-                    50.3623 to 20.3372,
-                    50.4894 to 20.2205,
-                    50.5545 to 19.7887,
-                    50.6394 to 19.9222,
-                    50.6514 to 19.8352,
-                    50.6930 to 19.8717,
-                    50.7254 to 19.8108,
-                    50.7292 to 19.7129,
-                    50.8250 to 19.8257,
-                    50.8660 to 19.7471,
                 ),
             )
 

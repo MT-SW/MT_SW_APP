@@ -301,6 +301,14 @@ class FakeUiPrefs : UiPrefs {
         lastNarrowBandWarningShownMillis.value = millis
     }
 
+    private var nextNarrowBandWarning = 0L
+
+    override suspend fun nextNarrowBandWarningMillis(): Long = nextNarrowBandWarning
+
+    override suspend fun setNextNarrowBandWarningMillis(millis: Long) {
+        nextNarrowBandWarning = millis
+    }
+
     override val wasInsideSwietokrzyskieRegion = MutableStateFlow(false)
 
     override fun setWasInsideSwietokrzyskieRegion(inside: Boolean) {
