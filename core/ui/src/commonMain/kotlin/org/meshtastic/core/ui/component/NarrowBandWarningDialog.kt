@@ -59,9 +59,9 @@ fun NarrowBandWarningDialog(onClose: () -> Unit) {
     MeshtasticDialog(
         title =
         if (isEnglish) {
-            "What is NarrowFast, and why is it worth testing?"
+            "Narrow channel: what it is and what it gives you"
         } else {
-            "Czym jest NarrowFast, i dlaczego warto go przetestować?"
+            "Wąski kanał: co to jest i co daje"
         },
         dismissable = false,
         text = {
@@ -69,42 +69,37 @@ fun NarrowBandWarningDialog(onClose: () -> Unit) {
                 Text(
                     text =
                     if (isEnglish) {
-                        "Until now, the Meshtastic network has relied on the standard LongFast, MediumFast, and " +
-                            "ShortFast presets, which share one common trait — their transmission occupies " +
-                            "exactly 250 kHz of bandwidth on the 869.525 MHz frequency. These allow fast " +
-                            "communication, but they are not resistant to local interference or signal " +
-                            "reflections off terrain obstacles.\n\nThe latest Meshtastic firmware introduces new " +
-                            "presets that operate on a narrow data channel. These presets, named NarrowFast and " +
-                            "NarrowSlow, occupy exactly 62.5 kHz and allow the use of one of 3 channels within " +
-                            "the same band. The narrower data channel in the Narrow presets is more resistant to " +
-                            "interference and signal reflections, and additionally allows several independent " +
-                            "networks to operate on their own separate channels, instead of the single frequency " +
-                            "previously available to the MT network (869.525 MHz). If you're having range or " +
-                            "weak-signal issues, try the new NarrowFast preset today, or if you don't want to " +
-                            "flash unstable firmware yet, use a Custom configuration (an example configuration " +
-                            "can be found at https://mt-sw.pl). If other networks besides Meshtastic operate in " +
-                            "your area, such as Meshcore or Reticulum, try the NarrowFast preset — you'll avoid " +
-                            "interference from those networks, and you won't cause interference to other users " +
-                            "of the band either."
+                        "Until now, the mesh network has mostly run on the Long Fast, Medium Fast and " +
+                            "Short Fast presets. Each of them occupies 250 kHz of bandwidth on the 869.525 " +
+                            "MHz frequency. They give fast communication, but everyone works on one shared " +
+                            "frequency, and the signal is easily disturbed by other devices and reflections " +
+                            "from terrain.\n\n" +
+                            "The new Narrow Fast and Narrow Slow presets occupy only 62.5 kHz. Three such " +
+                            "channels fit in the same band, so several networks can work side by side, each " +
+                            "on its own channel. A narrow channel is also less sensitive to interference " +
+                            "and signal reflections.\n\n" +
+                            "If you have a weak signal or range problems, you can try the Narrow Fast " +
+                            "preset. If you do not want to flash new firmware yet, use Custom settings. You " +
+                            "can find an example configuration at https://mt-sw.pl.\n\n" +
+                            "If other networks also operate in your area, e.g. MeshCore or Reticulum, a " +
+                            "narrow channel helps avoid mutual interference.\n\n" +
+                            "This is for information only. The decision to change is yours."
                     } else {
-                        "Do tej pory, sieć Meshtastic bazowała na standardowych presetach LongFast, MediumFast " +
-                            "czy ShortFast, które łączy jedna wspólna cecha - ich emisja zajmuje dokładnie 250 " +
-                            "KHz pasma na częstotliwości 869,525 MHz. Pozwalają one na komunikację z dużą " +
-                            "prędkością, jednak nie są odporne na lokalne zakłócenia, czy odbicia sygnału od " +
-                            "przeszkód terenowych.\n\nW najnowszej wersji firmware Meshtastic, wprowadzone " +
-                            "zostały nowe presety, pracujące na wąskim kanale transmisji danych. Presety te, " +
-                            "nazwane NarrowFast, oraz NarrowSlow, zajmujące dokładnie 62,5 KHz i pozwalają na " +
-                            "użycie jednego z 3 kanałów w tym samym paśmie. Węższy kanał transmisji danych w " +
-                            "presetach Narrow charakteryzuje się większą odpornością na zakłócenia, oraz odbicia " +
-                            "sygnału, dodatkowo pozwala na dotychczas jednej częstotliwości dostępnej dla sieci " +
-                            "MT czyli 869,525 MHz pracę kilku niezależnych sieci na swoich osobnych kanałach. " +
-                            "Jeśli masz kłopoty z zasięgiem, słabym sygnałem, sprawdź już dziś nowy preset " +
-                            "NarrowFast, lub jeśli nie chcesz jeszcze wgrywać nie stabilnego firmware, " +
-                            "skorzystaj z ustawień Custom (przykład takiej konfiguracji znajdziesz na stronie " +
-                            "https://mt-sw.pl ) Jeśli w Twojej okolicy pracują oprócz Meshtastica inne sieci, " +
-                            "jak Meshcore czy Reticulum, przetestuj preset NarrowFast, unikniesz wtedy zakłóceń " +
-                            "ze strony tych sieci, i zarazem sam nie będziesz ich powodował innym użytkownikom " +
-                            "pasma."
+                        "Do tej pory sieć mesh pracowała głównie na presetach Szeroki daleki szybki " +
+                            "(Long Fast), Szeroki średni szybki (Medium Fast) i Szeroki krótki szybki " +
+                            "(Short Fast). Każdy z nich zajmuje 250 kHz pasma na częstotliwości 869,525 " +
+                            "MHz. Dają szybką łączność, ale wszyscy pracują na jednej częstotliwości, a " +
+                            "sygnał łatwo zakłócają inne urządzenia i odbicia od terenu.\n\n" +
+                            "Nowe presety Wąski szybki (Narrow Fast) i Wąski wolny (Narrow Slow) zajmują " +
+                            "tylko 62,5 kHz. W tym samym paśmie mieszczą się 3 takie kanały, więc kilka " +
+                            "sieci może pracować obok siebie, każda na swoim kanale. Wąski kanał jest też " +
+                            "mniej wrażliwy na zakłócenia i odbicia sygnału.\n\n" +
+                            "Jeśli masz słaby sygnał albo kłopoty z zasięgiem, możesz sprawdzić preset " +
+                            "Wąski szybki (Narrow Fast). Jeśli nie chcesz jeszcze wgrywać nowego firmware, " +
+                            "użyj ustawień Custom. Przykładową konfigurację znajdziesz na https://mt-sw.pl.\n\n" +
+                            "Jeśli w okolicy działają też inne sieci, np. MeshCore albo Reticulum, wąski " +
+                            "kanał pomaga uniknąć wzajemnych zakłóceń.\n\n" +
+                            "To tylko informacja. Decyzja o zmianie należy do Ciebie."
                     },
                 )
                 TextButton(

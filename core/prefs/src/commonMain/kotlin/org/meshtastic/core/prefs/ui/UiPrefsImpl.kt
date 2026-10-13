@@ -360,6 +360,12 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_LAST_REGION_WARNING_SHOWN] = millis } }
     }
 
+    override suspend fun nextRegionWarningMillis(): Long = dataStore.data.first()[KEY_NEXT_REGION_WARNING] ?: 0L
+
+    override suspend fun setNextRegionWarningMillis(millis: Long) {
+        dataStore.edit { it[KEY_NEXT_REGION_WARNING] = millis }
+    }
+
     override val autoCleanNodesEnabled: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_AUTO_CLEAN_NODES_ENABLED] ?: false }.stateIn(scope, SharingStarted.Eagerly, false)
 
@@ -527,6 +533,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_FIRMWARE_UPDATE_NOTIFICATION_KEYS = stringPreferencesKey("firmware-update-notification-keys")
         val KEY_LAST_NARROW_BAND_WARNING_SHOWN = longPreferencesKey("last-narrow-band-warning-shown")
         val KEY_NEXT_NARROW_BAND_WARNING = longPreferencesKey("next-narrow-band-warning")
+        val KEY_NEXT_REGION_WARNING = longPreferencesKey("next-region-warning")
         val KEY_WAS_INSIDE_SWIETOKRZYSKIE_REGION = booleanPreferencesKey("was-inside-swietokrzyskie-region")
         val KEY_LAST_REGION_WARNING_SHOWN = longPreferencesKey("last-region-warning-shown")
         val KEY_AUTO_CLEAN_NODES_ENABLED = booleanPreferencesKey("auto-clean-nodes-enabled")

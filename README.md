@@ -12,6 +12,7 @@ Stan roboczy — repo służy głównie do własnego użytku i testów z niewiel
 
 - **Powiadomienia o nowych wersjach aplikacji** — aplikacja dwa razy dziennie sprawdza na GitHubie (MT-SW/MT_SW_APP), czy wyszło nowsze wydanie, i pokazuje powiadomienie z linkiem do listy wydań, gdzie można przeczytać, co się zmieniło. Powiadomienie przychodzi od razu po wyjściu nowej wersji, a potem przypomina się co dwa dni, dopóki nie zaktualizujesz. Wersje testowe (pre-release) są pomijane, chyba że w Ustawieniach włączysz „Także wersje testowe”; całość można wyłączyć przełącznikiem „Powiadamiaj o nowych wersjach”. Działa na telefonie i na komputerze; na komputerze pierwsze sprawdzenie jest minutę po uruchomieniu, a kliknięcie w powiadomienie otwiera aplikację z oknem i przyciskiem „Pokaż listę wydań”.
 - **Okna informacyjne** — okna z informacjami w aplikacji pojawiają się rzadziej i w losowych odstępach, a ich termin jest zapamiętywany nawet po zamknięciu aplikacji. Przy zdalnej konfiguracji urządzenia pokazuje się osobne okno, zależne od lokalizacji.
+  Teksty okien są spokojniejsze i bardziej informacyjne. Okno powitalne wraca około raz na dwa dni, o losowej porze.
 - **Pomoc i dokumentacja po polsku** — cała dokumentacja w aplikacji (Przewodnik użytkownika i Przewodnik dewelopera) jest przetłumaczona na polski, razem z nazwami stron.
   Wielkość tekstu na stronach pomocy zmienisz przyciskami „A−” / „A+” w górnym pasku.
 
@@ -236,6 +237,7 @@ Work in progress — this repo is mainly for personal use and testing with a sma
 
 - **New app version notifications** — twice a day the app checks GitHub (MT-SW/MT_SW_APP) for a newer release and shows a notification with a link to the list of releases, where you can read what changed. The notification comes right when a new version is out, then reminds you every two days until you update. Test (pre-release) versions are skipped unless you turn on "Include test versions" in Settings; everything can be switched off with "Notify about new versions". Works on the phone and on the desktop; on the desktop the first check is a minute after start, and clicking the notification opens the app with a window and a "Show releases" button.
 - **Information windows** — the information windows in the app now appear less often and at random intervals, and their schedule is remembered even after the app is closed. When configuring a device remotely, a separate, location-dependent window is shown.
+  The window texts are calmer and more informative. The welcome window comes back about once every two days, at a random time.
 - **Help and documentation in Polish** — all in-app documentation (User Guide and Developer Guide) is translated into Polish, including page names.
   The text size on help pages can be changed with the “A−” / “A+” buttons in the top bar.
 

@@ -499,33 +499,42 @@ class UIViewModel(
     /**
      * Checks (on a foreground app-open/resume) whether the phone is physically within the Świętokrzyskie region while
      * the locally-connected radio's LoRa channel is wide (>200 kHz). Fires immediately, unthrottled, the moment a
-     * border crossing is detected (was outside, now inside); otherwise repeats at most ~2x/day, offset by
-     * [REGION_WARNING_OFFSET_FROM_NARROW_BAND_MILLIS] from the NarrowFast dialog's own throttle so the two don't show
-     * back-to-back. On trigger, navigates to the LoRa settings screen first so the preset picker is already on screen
-     * when the dialog appears.
+     * border crossing is detected (was outside, now inside); otherwise repeats about every two days at a random hour,
+     * offset by [REGION_WARNING_OFFSET_FROM_NARROW_BAND_MILLIS] from the NarrowFast dialog's own schedule so the two
+     * don't show back-to-back. On trigger, navigates to the LoRa settings screen first so the preset picker is already
+     * on screen when the dialog appears.
      */
     fun checkRegionWarningThrottled() {
         viewModelScope.launch { performRegionCheck() }
     }
 
-    private suspend fun performRegionCheck() {
-        val lora = localConfig.value.lora ?: return
-        val regionInfo = RegionInfo.fromRegionCode(lora.region)
-        if (lora.effectiveBandwidthKHz(regionInfo) <= NARROW_BAND_WARNING_THRESHOLD_KHZ) return
+    private val regionWarningLock = Mutex()
 
-        val location = locationService.getCurrentLocation() ?: return
+    /** Stores when the repeat reminder may next appear: about every two days, at an unpredictable hour. */
+    private suspend fun scheduleNextRegionWarning(now: Long) {
+        val gap = Random.nextLong(REGION_WARNING_MIN_GAP_MILLIS, REGION_WARNING_MAX_GAP_MILLIS + 1)
+        uiPrefs.setNextRegionWarningMillis(now + gap)
+    }
+
+    private suspend fun performRegionCheck() = regionWarningLock.withLock {
+        val lora = localConfig.value.lora ?: return@withLock
+        val regionInfo = RegionInfo.fromRegionCode(lora.region)
+        if (lora.effectiveBandwidthKHz(regionInfo) <= NARROW_BAND_WARNING_THRESHOLD_KHZ) return@withLock
+
+        val location = locationService.getCurrentLocation() ?: return@withLock
         val isInside = SwietokrzyskieRegion.polygon.contains(location.latitude, location.longitude)
         val wasInside = uiPrefs.wasInsideSwietokrzyskieRegion.value
         if (isInside != wasInside) uiPrefs.setWasInsideSwietokrzyskieRegion(isInside)
-        if (!isInside) return
+        if (!isInside) return@withLock
 
         val now = nowMillis
         val justCrossed = !wasInside
-        val periodicDue = now - uiPrefs.lastRegionWarningShownMillis.value >= REGION_WARNING_THROTTLE_MILLIS
+        val periodicDue = now >= uiPrefs.nextRegionWarningMillis()
         val clearOfNarrowBand =
             now - uiPrefs.lastNarrowBandWarningShownMillis.value >= REGION_WARNING_OFFSET_FROM_NARROW_BAND_MILLIS
 
         if (justCrossed || (periodicDue && clearOfNarrowBand)) {
+            scheduleNextRegionWarning(now)
             uiPrefs.setLastRegionWarningShownMillis(now)
             handleDeepLink(CommonUri.parse("$DEEP_LINK_BASE_URI/lora"))
             regionWarningFlow.value = true
@@ -798,8 +807,9 @@ class UIViewModel(
                 ),
             )
 
-        /** ~12h throttle → the periodic region reminder can also fire at most twice in a 24h period. */
-        private const val REGION_WARNING_THROTTLE_MILLIS = 12 * 60 * 60 * 1000L
+        /** The repeat region reminder comes back after a random 36–60 h, i.e. about every two days at any hour. */
+        private const val REGION_WARNING_MIN_GAP_MILLIS = 36 * 60 * 60 * 1000L
+        private const val REGION_WARNING_MAX_GAP_MILLIS = 60 * 60 * 60 * 1000L
 
         /** Minimum gap kept between the NarrowFast dialog and the periodic region reminder (not the crossing one). */
         private const val REGION_WARNING_OFFSET_FROM_NARROW_BAND_MILLIS = 90 * 60 * 1000L // 1.5h

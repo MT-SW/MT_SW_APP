@@ -279,6 +279,14 @@ interface UiPrefs {
 
     fun setLastRegionWarningShownMillis(millis: Long)
 
+    /**
+     * Epoch millis from which the repeat region reminder may be shown again, or 0 when none is scheduled yet. Read from
+     * storage rather than from a [StateFlow] for the same reason as [nextNarrowBandWarningMillis].
+     */
+    suspend fun nextRegionWarningMillis(): Long
+
+    suspend fun setNextRegionWarningMillis(millis: Long)
+
     /** Whether inactive nodes are automatically deleted from the local database after a period of inactivity. */
     val autoCleanNodesEnabled: StateFlow<Boolean>
 
