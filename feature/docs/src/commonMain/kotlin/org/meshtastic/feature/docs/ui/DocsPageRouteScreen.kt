@@ -28,22 +28,30 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isSpecified
 import com.mikepenz.markdown.compose.components.markdownComponents
 import com.mikepenz.markdown.compose.elements.MarkdownTable
 import com.mikepenz.markdown.compose.elements.MarkdownTableHeader
 import com.mikepenz.markdown.compose.elements.MarkdownTableRow
 import com.mikepenz.markdown.m3.Markdown
+import com.mikepenz.markdown.m3.markdownTypography
 import com.mikepenz.markdown.model.markdownDimens
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
@@ -60,6 +68,39 @@ import org.meshtastic.feature.docs.model.AIDocAssistantSessionState
 import org.meshtastic.feature.docs.model.DocPageContent
 import org.meshtastic.feature.docs.model.ModelReadiness
 import org.meshtastic.feature.docs.model.TranslationSource
+
+private const val TEXT_SCALE_DEFAULT = 1.0f
+private const val TEXT_SCALE_MIN = 0.6f
+private const val TEXT_SCALE_MAX = 1.6f
+private const val TEXT_SCALE_STEP = 0.1f
+
+/** Text scale of the help pages; kept for as long as the app runs, so every page opens with the same size. */
+private object DocsTextScale {
+    var value by mutableFloatStateOf(TEXT_SCALE_DEFAULT)
+}
+
+private fun TextStyle.scaled(factor: Float): TextStyle = copy(
+    fontSize = if (fontSize.isSpecified) fontSize * factor else fontSize,
+    lineHeight = if (lineHeight.isSpecified) lineHeight * factor else lineHeight,
+)
+
+/** Markdown typography with smaller headings than the Material defaults, multiplied by the user's text scale. */
+@Composable
+private fun docsTypography(scale: Float) = MaterialTheme.typography.let { t ->
+    val mono = FontFamily.Monospace
+    markdownTypography(
+        h1 = t.headlineMedium.scaled(scale),
+        h2 = t.headlineSmall.scaled(scale),
+        h3 = t.titleLarge.scaled(scale),
+        h4 = t.titleMedium.scaled(scale),
+        h5 = t.titleSmall.scaled(scale),
+        h6 = t.labelLarge.scaled(scale),
+        text = t.bodyMedium.scaled(scale),
+        paragraph = t.bodyMedium.scaled(scale),
+        code = t.bodySmall.copy(fontFamily = mono).scaled(scale),
+        inlineCode = t.bodyMedium.copy(fontFamily = mono).scaled(scale),
+    )
+}
 
 /** Routes a page ID to the appropriate page renderer surface. */
 @Suppress("LongMethod", "LongParameterList")
@@ -105,6 +146,22 @@ fun DocsPageRouteScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
+                    }
+                },
+                actions = {
+                    TextButton(
+                        onClick = {
+                            DocsTextScale.value = (DocsTextScale.value - TEXT_SCALE_STEP).coerceAtLeast(TEXT_SCALE_MIN)
+                        },
+                    ) {
+                        Text("A−")
+                    }
+                    TextButton(
+                        onClick = {
+                            DocsTextScale.value = (DocsTextScale.value + TEXT_SCALE_STEP).coerceAtMost(TEXT_SCALE_MAX)
+                        },
+                    ) {
+                        Text("A+")
                     }
                 },
                 navigationIcon = {
@@ -165,6 +222,7 @@ fun DocsPageRouteScreen(
                         Markdown(
                             content = markdownText,
                             imageTransformer = ComposeResourceImageTransformer(),
+                            typography = docsTypography(DocsTextScale.value),
                             dimens = markdownDimens(tableCellWidth = 108.dp),
                             components =
                             markdownComponents(
