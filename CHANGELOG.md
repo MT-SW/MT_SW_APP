@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Scalenie z oryginałem (13.10)**
+* Scalenie z najnowszym oryginałem: poprawka skanowania Discovery (presety publiczne skanowane na domyślnym kanale publicznym i slocie, potem przywracany własny kanał i ustawienia LoRa), poprawka działania mapy na pulpicie (LWJGL w wersji z ProGuard), logi mapy w jednym miejscu, aktualizacje bibliotek (paging, markdown, mapy Google) i tłumaczeń. Biblioteka Bluetooth Kable zostaje przypięta do 0.44.3 (nowsza psuje skanowanie BLE w Windows). Bez zmian w działaniu pozostałych funkcji.
+
 **Scalenie z oryginałem (12.10)**
 * Scalenie z najnowszym oryginałem Meshtastic-Android: nowsza biblioteka map (maplibre-compose 0.20) z dopasowaniem naszych warstw mapy, planera i map offline oraz drobne poprawki z upstreamu; bez zmian w działaniu aplikacji.
 * Nazwy presetów modemu po polsku, a w nawiasie angielska nazwa, np. „Szeroki daleki szybki (Long Fast)”; dopisek „Szeroki” oznacza kanał 250 kHz, „Pośredni” kanał 125 kHz (Lite to teraz „Pośredni”), „Wąski” 62,5 kHz, „XXL” 500 kHz (turbo).
@@ -138,6 +141,9 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Merge with the original (13.10)**
+* Merged the latest original: Discovery scan fix (public presets are scanned on the default public channel and slot, then your own channel and LoRa settings are restored), desktop map fix (LWJGL kept through ProGuard), map logging in one place, library updates (paging, markdown, Google Maps) and translations. The Kable Bluetooth library stays pinned at 0.44.3 (newer breaks BLE scanning on Windows). No change to other features.
 
 **Merge with the original (12.10)**
 * Merged the latest original Meshtastic-Android: newer map library (maplibre-compose 0.20) with our map layers, planner and offline maps adapted to it, plus small upstream fixes; no change in app behaviour.

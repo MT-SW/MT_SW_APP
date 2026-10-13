@@ -19,7 +19,7 @@ navigation3 = "1.2.0-rc01"
 # publish every AndroidX version, so they are not always equal.
 navigation3-runtime = "1.2.0"
 navigationevent = "1.1.0"
-paging = "3.5.2"
+paging = "3.5.3"
 room = "3.0.3"
 koin = "4.2.2"
 koin-plugin = "1.2.1"
@@ -97,7 +97,7 @@ dokka = "2.2.0"
 devtools-ksp = "2.3.12"
 firebase-crashlytics-gradle = "3.0.8"
 google-services-gradle = "4.5.0"
-markdown = "0.7.16"
+markdown = "0.7.17"
 markdownRenderer = "0.45.0"
 okio = "3.18.2"
 uri-kmp = "0.0.21"
@@ -244,7 +244,7 @@ mlkit-barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version
 mlkit-genai-prompt = { module = "com.google.mlkit:genai-prompt", version.ref = "mlkit-genai-prompt" }
 mlkit-language-id = { module = "com.google.mlkit:language-id", version.ref = "mlkit-language-id" }
 mlkit-translate = { module = "com.google.mlkit:translate", version.ref = "mlkit-translate" }
-play-services-maps = { module = "com.google.android.gms:play-services-maps", version = "20.0.0" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version = "20.1.0" }
 zxing-core = { module = "com.google.zxing:core", version = "3.5.4" }
 qrcode-kotlin = { module = "io.github.g0dkar:qrcode-kotlin", version.ref = "qrcode-kotlin" }
 bouncycastle-bcprov = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
