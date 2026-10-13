@@ -18,9 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
-**Powiadomienia o wąskim kanale**
-* Ogólne okno o presecie Wąski szybki (Narrow Fast) pojawia się losowo co 1–2 tygodnie o losowej porze (wcześniej dwa razy dziennie); termin jest zapisany trwale, więc ubicie aplikacji niczego nie zeruje ani nie powtarza, a po świeżej instalacji pierwsze okno pojawia się dopiero po takim losowym czasie.
-* Przy zdalnej konfiguracji urządzenia pokazuje się teraz osobne okno z innym tekstem (ustawienia na terenie woj. świętokrzyskiego, preset Wąski szybki (Narrow Fast)), tylko gdy telefon albo konfigurowane urządzenie ma pozycję w województwie świętokrzyskim; nadal 10 s odliczania przed zamknięciem.
+**Okna informacyjne**
+* Okna informacyjne w aplikacji pojawiają się rzadziej, w losowych odstępach; termin jest zapamiętywany trwale.
+* Przy zdalnej konfiguracji urządzenia pokazuje się osobne okno, zależne od lokalizacji.
 
 **Scalenie z oryginałem (13.10)**
 * Scalenie z najnowszym oryginałem: poprawka skanowania Discovery (presety publiczne skanowane na domyślnym kanale publicznym i slocie, potem przywracany własny kanał i ustawienia LoRa), poprawka działania mapy na pulpicie (LWJGL w wersji z ProGuard), logi mapy w jednym miejscu, aktualizacje bibliotek (paging, markdown, mapy Google) i tłumaczeń. Biblioteka Bluetooth Kable zostaje przypięta do 0.44.3 (nowsza psuje skanowanie BLE w Windows). Bez zmian w działaniu pozostałych funkcji.
@@ -146,9 +146,9 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### October 2026
 
-**Narrow-channel notices**
-* The general window about the Narrow Fast preset now appears at random every 1–2 weeks at a random time (previously twice a day); the due date is stored permanently, so killing the app neither resets nor repeats it, and after a fresh install the first window only appears after that random time.
-* Opening remote admin now shows a separate window with its own text (settings changed in the Świętokrzyskie voivodeship, Narrow Fast preset), only when the phone or the device being configured has a position inside the voivodeship; still a 10 s countdown before closing.
+**Information windows**
+* Information windows in the app now appear less often, at random intervals; the schedule is stored permanently.
+* When configuring a device remotely, a separate, location-dependent window is shown.
 
 **Merge with the original (13.10)**
 * Merged the latest original: Discovery scan fix (public presets are scanned on the default public channel and slot, then your own channel and LoRa settings are restored), desktop map fix (LWJGL kept through ProGuard), map logging in one place, library updates (paging, markdown, Google Maps) and translations. The Kable Bluetooth library stays pinned at 0.44.3 (newer breaks BLE scanning on Windows). No change to other features.
