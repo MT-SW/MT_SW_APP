@@ -52,18 +52,22 @@ fun RegionWarningDialog(onClose: () -> Unit) {
     val isEnglish = Locale.current.language == "en"
 
     MeshtasticDialog(
-        title = if (isEnglish) "Welcome to the Świętokrzyskie region!" else "Witamy w woj. Świętokrzyskim!",
+        title = if (isEnglish) "Welcome to the Świętokrzyskie region!" else "Witamy w woj. świętokrzyskim!",
         dismissable = false,
         text = {
             Column {
                 Text(
                     text =
                     if (isEnglish) {
-                        "In this area we operate on Custom settings (62KHz, SF7, CR6) or the NarrowFast preset. " +
-                            "More details at https://mt-sw.pl"
+                        "The local network works here on the Narrow Fast preset or on Custom settings " +
+                            "(62.5 kHz, SF7, CR6). Your radio currently has a wide channel, so it may not " +
+                            "hear part of the local network and may not be heard by it.\n\n" +
+                            "Details and ready-made settings: https://mt-sw.pl"
                     } else {
-                        "Na naszym terenie pracujemy na nastawach Custom (62KHz, SF7, CR6) lub preset NarrowFast. " +
-                            "Więcej szczegółów znajdziesz na https://mt-sw.pl"
+                        "Lokalna sieć pracuje tu na presecie Wąski szybki (Narrow Fast) albo na " +
+                            "ustawieniach Custom (62,5 kHz, SF7, CR6). Twoje radio ma teraz szeroki kanał, " +
+                            "więc może nie słyszeć części lokalnej sieci i nie być przez nią słyszane.\n\n" +
+                            "Szczegóły i gotowe ustawienia: https://mt-sw.pl"
                     },
                 )
                 TextButton(

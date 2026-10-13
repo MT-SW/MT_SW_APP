@@ -321,6 +321,14 @@ class FakeUiPrefs : UiPrefs {
         lastRegionWarningShownMillis.value = millis
     }
 
+    private var nextRegionWarning = 0L
+
+    override suspend fun nextRegionWarningMillis(): Long = nextRegionWarning
+
+    override suspend fun setNextRegionWarningMillis(millis: Long) {
+        nextRegionWarning = millis
+    }
+
     override val appUpdateCheckEnabled = MutableStateFlow(true)
 
     override fun setAppUpdateCheckEnabled(enabled: Boolean) {
