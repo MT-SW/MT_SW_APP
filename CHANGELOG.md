@@ -29,6 +29,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Przepisane, spokojniejsze i bardziej informacyjne teksty okien.
 * Powtarzające się okno powitalne pojawia się około raz na dwa dni, o losowej porze.
 
+**Scalenie z oryginałem (14.10)**
+* Scalenie z najnowszym oryginałem: aktualizacja biblioteki z listą licencji (aboutlibraries 15.3.0), odświeżona lista sprzętu i linków do urządzeń (m.in. Seeed Wio Tracker L2 jest teraz aktywnie wspierany) oraz tłumaczenia. Biblioteka Bluetooth Kable zostaje przypięta do 0.44.3 (0.45.0 nadal jest najnowsza i psuje skanowanie BLE w Windows). Bez zmian w działaniu pozostałych funkcji.
+
 **Scalenie z oryginałem (13.10)**
 * Scalenie z najnowszym oryginałem: poprawka skanowania Discovery (presety publiczne skanowane na domyślnym kanale publicznym i slocie, potem przywracany własny kanał i ustawienia LoRa), poprawka działania mapy na pulpicie (LWJGL w wersji z ProGuard), logi mapy w jednym miejscu, aktualizacje bibliotek (paging, markdown, mapy Google) i tłumaczeń. Biblioteka Bluetooth Kable zostaje przypięta do 0.44.3 (nowsza psuje skanowanie BLE w Windows). Bez zmian w działaniu pozostałych funkcji.
 
@@ -163,6 +166,9 @@ The entries below describe only what this fork adds on top of the original, from
 * When configuring a device remotely, a separate, location-dependent window is shown.
 * Rewritten, calmer and more informative window texts.
 * The repeating welcome window appears about once every two days, at a random time.
+
+**Merge with the original (14.10)**
+* Merged the latest original: license-list library update (aboutlibraries 15.3.0), refreshed device hardware and link lists (e.g. Seeed Wio Tracker L2 is now actively supported) and translations. The Kable Bluetooth library stays pinned at 0.44.3 (0.45.0 is still the newest and breaks BLE scanning on Windows). No change to other features.
 
 **Merge with the original (13.10)**
 * Merged the latest original: Discovery scan fix (public presets are scanned on the default public channel and slot, then your own channel and LoRa settings are restored), desktop map fix (LWJGL kept through ProGuard), map logging in one place, library updates (paging, markdown, Google Maps) and translations. The Kable Bluetooth library stays pinned at 0.44.3 (newer breaks BLE scanning on Windows). No change to other features.
