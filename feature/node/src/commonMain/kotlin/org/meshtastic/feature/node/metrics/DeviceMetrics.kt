@@ -82,6 +82,7 @@ import org.meshtastic.core.ui.theme.GraphColors.Cyan
 import org.meshtastic.core.ui.theme.GraphColors.Gold
 import org.meshtastic.core.ui.theme.GraphColors.Green
 import org.meshtastic.core.ui.theme.GraphColors.Purple
+import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.proto.Telemetry
 
@@ -116,7 +117,9 @@ fun DeviceMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val timeFrame by viewModel.timeFrame.collectAsStateWithLifecycle()
     val availableTimeFrames by viewModel.availableTimeFrames.collectAsStateWithLifecycle()
-    val data = state.deviceMetrics.filter { it.time.toLong() >= timeFrame.timeThreshold() }
+    val swapBattery = LocalLnaCorrection.current.invertsBattery(state.node?.num)
+    val data =
+        state.deviceMetrics.filter { it.time.toLong() >= timeFrame.timeThreshold() }.withBatterySwap(swapBattery)
 
     val exportLauncher = rememberSaveFileLauncher { uri -> viewModel.saveDeviceMetricsCSV(uri, data) }
 
@@ -170,6 +173,7 @@ fun DeviceMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
         data = data,
         timeProvider = { it.time.toDouble() },
         infoData = infoItems,
+        infoExtraContent = state.node?.num?.let { num -> @Composable { BatteryPolaritySwitch(num) } },
         onRequestTelemetry = { viewModel.requestTelemetry(TelemetryType.DEVICE) },
         onExportCsv = { exportLauncher("device_metrics.csv", "text/csv") },
         controlPart = {

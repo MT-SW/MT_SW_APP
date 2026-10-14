@@ -99,8 +99,9 @@ fun MeshtasticAppShell(
             .collectAsStateWithLifecycle(initialValue = null)
     val lnaGains by uiPrefs.lnaGains.collectAsStateWithLifecycle()
     val currentInverted by uiPrefs.currentInverted.collectAsStateWithLifecycle()
-    val lnaCorrection = remember(myNodeNum, lnaGains, currentInverted) {
-        LnaCorrection(myNodeNum, lnaGains, currentInverted)
+    val batteryInverted by uiPrefs.batteryInverted.collectAsStateWithLifecycle()
+    val lnaCorrection = remember(myNodeNum, lnaGains, currentInverted, batteryInverted) {
+        LnaCorrection(myNodeNum, lnaGains, currentInverted, batteryInverted)
     }
 
     MeshtasticSnackbarProvider(snackbarManager = uiViewModel.snackbarManager, hostModifier = hostModifier) {

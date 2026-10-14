@@ -54,6 +54,7 @@ import org.meshtastic.core.ui.component.MaterialBatteryInfo
 import org.meshtastic.core.ui.component.NodeChip
 import org.meshtastic.core.ui.component.Rssi
 import org.meshtastic.core.ui.theme.AppTheme
+import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.feature.connections.model.DeviceListEntry
 import org.meshtastic.proto.EnvironmentMetrics
 import org.meshtastic.proto.Paxcount
@@ -120,7 +121,11 @@ fun CurrentlyConnectedInfo(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            MaterialBatteryInfo(level = node.batteryLevel, voltage = node.voltage, unknownLabel = text.unknownLabel)
+            MaterialBatteryInfo(
+                level = LocalLnaCorrection.current.batteryLevel(node.num, node.batteryLevel, node.voltage),
+                voltage = node.voltage,
+                unknownLabel = text.unknownLabel,
+            )
             if (bleDevice != null) {
                 Rssi(rssi = rssi, label = text.rssiLabel)
             }

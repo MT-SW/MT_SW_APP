@@ -187,6 +187,12 @@ class FakeUiPrefs : UiPrefs {
         nodeLocationEnabled.getOrPut(nodeNum) { MutableStateFlow(provide) }.value = provide
     }
 
+    override val batteryInverted = MutableStateFlow<Set<Int>>(emptySet())
+
+    override fun setBatteryInverted(nodeNum: Int, inverted: Boolean) {
+        batteryInverted.value = if (inverted) batteryInverted.value + nodeNum else batteryInverted.value - nodeNum
+    }
+
     override val currentInverted = MutableStateFlow<Set<Int>>(emptySet())
 
     override fun setCurrentInverted(nodeNum: Int, inverted: Boolean) {

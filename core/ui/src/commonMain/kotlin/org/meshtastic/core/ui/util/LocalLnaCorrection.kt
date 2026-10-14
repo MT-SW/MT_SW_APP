@@ -33,6 +33,7 @@
 package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.compositionLocalOf
+import org.meshtastic.core.model.swapBatteryPolarity
 
 /**
  * LNA gain correction (dB) for displayed noise floor and RSSI. [gains] maps node number to gain; the entry for
@@ -43,7 +44,15 @@ data class LnaCorrection(
     val myNodeNum: Int? = null,
     val gains: Map<Int, Int> = emptyMap(),
     val invertedCurrent: Set<Int> = emptySet(),
+    val invertedBattery: Set<Int> = emptySet(),
 ) {
+    /** True when the powered/battery indication of [nodeNum] is swapped (monitor wired backwards). */
+    fun invertsBattery(nodeNum: Int?): Boolean = nodeNum != null && nodeNum in invertedBattery
+
+    /** Battery level as it should be displayed: above 100 means powered, null means unknown. */
+    fun batteryLevel(nodeNum: Int?, level: Int?, voltage: Float?): Int? =
+        if (invertsBattery(nodeNum)) swapBatteryPolarity(level, voltage) else level
+
     /** True when [nodeNum] has its displayed current (mA) sign flipped (sensor wired backwards). */
     fun invertsCurrent(nodeNum: Int?): Boolean = nodeNum != null && nodeNum in invertedCurrent
 

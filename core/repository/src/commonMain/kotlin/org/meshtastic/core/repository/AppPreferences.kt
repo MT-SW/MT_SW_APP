@@ -209,6 +209,15 @@ interface UiPrefs {
     /** Turns the sign flip of the displayed current on or off for [nodeNum]. */
     fun setCurrentInverted(nodeNum: Int, inverted: Boolean)
 
+    /**
+     * Nodes whose "powered / battery percent" indication is swapped, for power monitors wired backwards. Display
+     * only; the current sign has its own switch ([currentInverted]).
+     */
+    val batteryInverted: StateFlow<Set<Int>>
+
+    /** Turns the swap of the powered/battery indication on or off for [nodeNum]. */
+    fun setBatteryInverted(nodeNum: Int, inverted: Boolean)
+
     // Node list layout preferences
 
     /** Active density mode stored as the enum name (e.g. "COMPLETE", "COMPACT"). */

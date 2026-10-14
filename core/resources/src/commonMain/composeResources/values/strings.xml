@@ -1006,6 +1006,8 @@
     <string name="lna_gain_db">LNA gain (dB)</string>
     <string name="environment_view_weather">Weather</string>
     <string name="environment_view_power">Power</string>
+    <string name="battery_invert">Swap powered / battery indication</string>
+    <string name="battery_invert_description">Turn this on if a power monitor on the bus is wired backwards: the node then shows powered while it runs on battery, and a battery percentage while it charges. Only this indication is swapped, nothing else. The percentage is estimated from the voltage.</string>
     <string name="current_invert">Reverse current sign</string>
     <string name="current_invert_description">Turn this on if the current sensor is connected backwards and charging shows as negative. Only the sign of the displayed current (and its charts) changes; nothing else.</string>
     <string name="lna_gain_node_description">Corrects only the noise floor reported by this node. RSSI of received packets is corrected using the gain of your own device.</string>

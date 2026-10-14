@@ -443,6 +443,8 @@
     <string name="lna_gain_db">Wzmocnienie LNA (dB)</string>
     <string name="environment_view_weather">Pogoda</string>
     <string name="environment_view_power">Zasilanie</string>
+    <string name="battery_invert">Odwróć wskazanie zasilania / baterii</string>
+    <string name="battery_invert_description">Włącz, jeśli moduł pomiarowy na magistrali jest podłączony odwrotnie: węzeł pokazuje wtedy zasilanie, gdy pracuje na baterii, a procent baterii, gdy się ładuje. Zamienia się tylko to wskazanie, nic poza nim. Procent jest szacowany z napięcia.</string>
     <string name="current_invert">Odwróć znak prądu</string>
     <string name="current_invert_description">Włącz, jeśli czujnik prądu jest podłączony odwrotnie i ładowanie pokazuje się na minusie. Zmienia się tylko znak wyświetlanego prądu (i jego wykresów), nic poza tym.</string>
     <string name="lna_gain_node_description">Koryguje tylko poziom szumu zgłaszany przez ten węzeł. RSSI odbieranych pakietów jest korygowane wzmocnieniem Twojego urządzenia.</string>

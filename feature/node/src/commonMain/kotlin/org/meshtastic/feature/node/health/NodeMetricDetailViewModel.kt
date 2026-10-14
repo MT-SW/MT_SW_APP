@@ -31,6 +31,7 @@ import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.feature.node.metrics.withBatterySwap
 import org.meshtastic.feature.node.metrics.withCurrentSign
 import org.meshtastic.proto.PortNum
 
@@ -86,9 +87,9 @@ class NodeMetricDetailViewModel(
                     meshLogRepository.getLogsFromNodeSince(nodeNum, since),
                     meshLogRepository.getLogsFromNodeSince(0, since),
                     meshLogRepository.getMyNodeInfo(),
-                    combine(nodeRepository.getNodes(), uiPrefs.currentInverted, ::Pair),
+                    combine(nodeRepository.getNodes(), uiPrefs.currentInverted, uiPrefs.batteryInverted, ::Triple),
                 ) { telemetryLogs, nodeLogs, localNodeLogs, myNodeInfo, nodesAndInverted ->
-                    val (nodes, invertedNodes) = nodesAndInverted
+                    val (nodes, invertedNodes, batteryInvertedNodes) = nodesAndInverted
                     // MeshLog normalizes the locally-connected device's own logs to node number 0 — if this screen
                     // is showing details for whichever node is currently connected, also pull the 0-numbered logs.
                     val isViewingLocalNode = myNodeInfo?.my_node_num == nodeNum
@@ -96,7 +97,11 @@ class NodeMetricDetailViewModel(
                     val telemetryHistory =
                         telemetryLogs
                             .filter { it.fromNum == nodeNum || (isViewingLocalNode && it.fromNum == 0) }
-                            .mapNotNull { it.toHistoryEntry()?.withCurrentSign(nodeNum in invertedNodes) }
+                            .mapNotNull {
+                                it.toHistoryEntry()
+                                    ?.withCurrentSign(nodeNum in invertedNodes)
+                                    ?.withBatterySwap(nodeNum in batteryInvertedNodes)
+                            }
                     val signalHistory =
                         (nodeLogs + extraLocalLogs).distinctBy { it.uuid }.mapNotNull { it.toSignalHistoryEntry() }
                     val history = signalHistory + telemetryHistory

@@ -23,12 +23,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.model.swapBatteryPolarity
 import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.model.util.isDirectSignal
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
+import org.meshtastic.feature.node.metrics.withBatterySwap
 import org.meshtastic.feature.node.metrics.withCurrentSign
 import org.meshtastic.proto.NeighborInfo
 import org.meshtastic.proto.PortNum
@@ -59,6 +61,7 @@ private fun List<org.meshtastic.core.model.NodeMetricsHistoryEntry>.latestNoiseF
 private data class HistoryBundle(
     val entries: List<org.meshtastic.core.model.NodeMetricsHistoryEntry>,
     val myNodeNum: Int?,
+    val batteryInverted: Set<Int> = emptySet(),
 )
 
 private fun remapLocal(num: Int, myNodeNum: Int?): Int = if (myNodeNum != null && num == 0) myNodeNum else num
@@ -167,7 +170,8 @@ class NetworkHealthViewModel(
                 meshLogRepository.getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, historySince),
                 meshLogRepository.getMyNodeInfo(),
                 uiPrefs.currentInverted,
-            ) { allLogs, telemetryLogs, myNodeInfo, invertedNodes ->
+                uiPrefs.batteryInverted,
+            ) { allLogs, telemetryLogs, myNodeInfo, invertedNodes, batteryInvertedNodes ->
                 // MeshLog normalizes the locally-connected device's own logs to node number 0 (so log continuity
                 // survives a hardware swap) — remap those back to whichever node is actually connected right now.
                 val myNodeNum = myNodeInfo?.my_node_num
@@ -178,13 +182,16 @@ class NetworkHealthViewModel(
                     { entry ->
                         val mapped = if (myNodeNum != null && entry.num == 0) entry.copy(num = myNodeNum) else entry
                         // Sensor wired backwards: only the sign of the current changes, nothing else.
-                        mapped.withCurrentSign(mapped.num in invertedNodes)
+                        mapped
+                            .withCurrentSign(mapped.num in invertedNodes)
+                            .withBatterySwap(mapped.num in batteryInvertedNodes)
                     }
                 HistoryBundle(
                     entries =
                     allLogs.mapNotNull { it.toSignalHistoryEntry()?.let(remap) } +
                         telemetryLogs.mapNotNull { it.toHistoryEntry()?.let(remap) },
                     myNodeNum = myNodeNum,
+                    batteryInverted = batteryInvertedNodes,
                 )
             },
             meshLogRepository.getLogsByPortNum(PortNum.NEIGHBORINFO_APP.value, NEIGHBOR_LOG_LIMIT),
@@ -220,6 +227,14 @@ class NetworkHealthViewModel(
             val healthInfos =
                 nodes.map { node ->
                     val nodeHistory = historyByNode[node.num].orEmpty()
+                    val shownBattery =
+                        node.deviceMetrics.battery_level.let { level ->
+                            if (node.num in historyBundle.batteryInverted) {
+                                swapBatteryPolarity(level, node.deviceMetrics.voltage)
+                            } else {
+                                level
+                            }
+                        }
                     NodeHealthInfo(
                         num = node.num,
                         shortName = node.user.short_name,
@@ -227,10 +242,9 @@ class NetworkHealthViewModel(
                         lastHeard = node.lastHeard,
                         isOnline = node.isOnline,
                         isFavorite = node.isFavorite,
-                        batteryLevel = node.deviceMetrics.battery_level,
+                        batteryLevel = shownBattery,
                         isPowered =
-                        node.deviceMetrics.voltage != null &&
-                            (node.deviceMetrics.battery_level ?: 0) > BATTERY_POWERED_THRESHOLD,
+                        node.deviceMetrics.voltage != null && (shownBattery ?: 0) > BATTERY_POWERED_THRESHOLD,
                         // Our own device and nodes heard through a relay have no SNR of their own: use the latest
                         // direct reading from the last 24 hours instead.
                         snr = node.snr.takeIf { it != Float.MAX_VALUE } ?: nodeHistory.latestSnr(),
@@ -351,6 +365,7 @@ internal fun org.meshtastic.core.model.MeshLog.toHistoryEntry(): org.meshtastic.
         num = fromNum,
         timestamp = received_date,
         batteryLevel = telemetry.device_metrics?.battery_level,
+        deviceVoltage = telemetry.device_metrics?.voltage,
         voltage = voltage,
         current = current,
         channelUtilization = telemetry.device_metrics?.channel_utilization,
