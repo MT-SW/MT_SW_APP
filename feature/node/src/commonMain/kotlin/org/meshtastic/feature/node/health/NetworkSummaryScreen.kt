@@ -131,6 +131,11 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
     val gold = MaterialTheme.colorScheme.StatusOnline
     val purple = HealthLevel.BAD.color()
     val red = HealthLevel.MEDIUM.color()
+    val iconMessage = MeshtasticIcons.Message
+    val iconSpeed = MeshtasticIcons.Speed
+    val iconDistance = MeshtasticIcons.Distance
+    val iconDataUsage = MeshtasticIcons.DataUsage
+    val iconNodes = MeshtasticIcons.Nodes
 
     Scaffold(
         modifier = modifier,
@@ -346,19 +351,19 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
 
             rankingItem(
                 "Najaktywniejsi (tydzień)",
-                MeshtasticIcons.Message,
+                iconMessage,
                 uiState.topMessageSendersWeek.map { ReportBar(it.nodeName, it.count.toFloat(), "${it.count}") },
                 gold,
             )
             rankingItem(
                 "Najaktywniejsi (dziś)",
-                MeshtasticIcons.Message,
+                iconMessage,
                 uiState.topMessageSendersToday.map { ReportBar(it.nodeName, it.count.toFloat(), "${it.count}") },
                 gold,
             )
             rankingItem(
                 "Najdłużej działające węzły",
-                MeshtasticIcons.Speed,
+                iconSpeed,
                 uiState.uptimeLeaders.map {
                     ReportBar(it.nodeName, it.uptimeSeconds.toFloat(), uptimeText(it.uptimeSeconds))
                 },
@@ -366,7 +371,7 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
             )
             rankingItem(
                 "Najwięcej pozycji",
-                MeshtasticIcons.Distance,
+                iconDistance,
                 uiState.topPositionSenders.map {
                     ReportBar(it.nodeName, it.positionCount.toFloat(), "${it.positionCount}")
                 },
@@ -374,7 +379,7 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
             )
             rankingItem(
                 "Najbliżej",
-                MeshtasticIcons.Distance,
+                iconDistance,
                 uiState.closestNodes.map {
                     ReportBar(it.nodeName, it.distanceMeters.toFloat(), distanceText(it.distanceMeters))
                 },
@@ -382,7 +387,7 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
             )
             rankingItem(
                 "Najwięcej danych (telemetria)",
-                MeshtasticIcons.DataUsage,
+                iconDataUsage,
                 uiState.topTelemetryVolumeSenders.map {
                     ReportBar(it.nodeName, it.packetCount.toFloat(), "${it.packetCount}")
                 },
@@ -390,7 +395,7 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
             )
             rankingItem(
                 "Najwięcej danych (wszystkie pakiety)",
-                MeshtasticIcons.DataUsage,
+                iconDataUsage,
                 uiState.topAllPacketVolumeSenders.map {
                     ReportBar(it.nodeName, it.packetCount.toFloat(), "${it.packetCount}")
                 },
@@ -398,7 +403,7 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
             )
             rankingItem(
                 "Najdłużej milczą",
-                MeshtasticIcons.Nodes,
+                iconNodes,
                 uiState.quietestNodes.map { ReportBar(it.nodeName, it.hoursSilent.toFloat(), "${it.hoursSilent} h") },
                 purple,
             )
