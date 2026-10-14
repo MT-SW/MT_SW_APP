@@ -441,6 +441,8 @@
     <string name="lna_gain_correction">Korekta wzmocnienia LNA</string>
     <string name="lna_gain_correction_description">Wpisz wzmocnienie LNA tego urządzenia w dB. Wyświetlany poziom szumu i RSSI zostaną pomniejszone o tę wartość (np. 20 dB: -98 dBm wyświetli się jako -118 dBm). Wartość jest zapamiętana tylko w telefonie – konfiguracja urządzenia nie jest zmieniana.</string>
     <string name="lna_gain_db">Wzmocnienie LNA (dB)</string>
+    <string name="environment_view_weather">Pogoda</string>
+    <string name="environment_view_power">Zasilanie</string>
     <string name="current_invert">Odwróć znak prądu</string>
     <string name="current_invert_description">Włącz, jeśli czujnik prądu jest podłączony odwrotnie i ładowanie pokazuje się na minusie. Zmienia się tylko znak wyświetlanego prądu (i jego wykresów), nic poza tym.</string>
     <string name="lna_gain_node_description">Koryguje tylko poziom szumu zgłaszany przez ten węzeł. RSSI odbieranych pakietów jest korygowane wzmocnieniem Twojego urządzenia.</string>

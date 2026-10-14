@@ -29,12 +29,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -58,6 +62,8 @@ import org.meshtastic.core.resources.adc_voltage
 import org.meshtastic.core.resources.current
 import org.meshtastic.core.resources.device_metrics_label_value
 import org.meshtastic.core.resources.env_metrics_log
+import org.meshtastic.core.resources.environment_view_power
+import org.meshtastic.core.resources.environment_view_weather
 import org.meshtastic.core.resources.gas_resistance
 import org.meshtastic.core.resources.humidity
 import org.meshtastic.core.resources.iaq
@@ -114,6 +120,11 @@ fun EnvironmentMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Un
 
     val isImperial = state.displayUnits == MeasurementSystem.IMPERIAL
 
+    val hasPower = remember(filteredTelemetries) { filteredTelemetries.any { it.hasEnvironmentPower() } }
+    val hasWeather = remember(filteredTelemetries) { filteredTelemetries.any { it.hasEnvironmentWeather() } }
+    var showPower by rememberSaveable { mutableStateOf(false) }
+    val showPowerChart = hasPower && (showPower || !hasWeather)
+
     BaseMetricScreen(
         onNavigateUp = onNavigateUp,
         telemetryType = TelemetryType.ENVIRONMENT,
@@ -126,24 +137,47 @@ fun EnvironmentMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Un
         onExportCsv = { exportLauncher("environment_metrics.csv", "text/csv") },
         infoExtraContent = state.node?.num?.let { num -> @Composable { CurrentPolaritySwitch(num) } },
         controlPart = {
-            TimeFrameSelector(
-                selectedTimeFrame = timeFrame,
-                availableTimeFrames = availableTimeFrames,
-                onTimeFrameSelected = viewModel::setTimeFrame,
-                modifier = Modifier.padding(horizontal = 16.dp),
-            )
+            Column {
+                TimeFrameSelector(
+                    selectedTimeFrame = timeFrame,
+                    availableTimeFrames = availableTimeFrames,
+                    onTimeFrameSelected = viewModel::setTimeFrame,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                // A sensor that only reports voltage and current has no weather to chart; offer both views otherwise.
+                if (hasPower && hasWeather) {
+                    EnvironmentViewToggle(
+                        showPower = showPowerChart,
+                        onChange = { showPower = it },
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    )
+                }
+            }
         },
         chartPart = { modifier, selectedX, vicoScrollState, onPointSelected ->
-            EnvironmentMetricsChart(
-                modifier = modifier,
-                telemetries = filteredTelemetries.reversed(),
-                graphData = graphData,
-                isFahrenheit = state.isFahrenheit,
-                isImperial = isImperial,
-                vicoScrollState = vicoScrollState,
-                selectedX = selectedX,
-                onPointSelected = onPointSelected,
-            )
+            if (showPowerChart) {
+                PowerLineChart(
+                    modifier = modifier,
+                    telemetries = filteredTelemetries.reversed(),
+                    chartKey = "environment-power",
+                    currentOf = { it.environment_metrics?.current ?: Float.NaN },
+                    voltageOf = { it.environment_metrics?.voltage ?: Float.NaN },
+                    vicoScrollState = vicoScrollState,
+                    selectedX = selectedX,
+                    onPointSelected = onPointSelected,
+                )
+            } else {
+                EnvironmentMetricsChart(
+                    modifier = modifier,
+                    telemetries = filteredTelemetries.reversed(),
+                    graphData = graphData,
+                    isFahrenheit = state.isFahrenheit,
+                    isImperial = isImperial,
+                    vicoScrollState = vicoScrollState,
+                    selectedX = selectedX,
+                    onPointSelected = onPointSelected,
+                )
+            }
         },
         listPart = { modifier, selectedX, lazyListState, onCardClick ->
             LazyColumn(modifier = modifier.fillMaxSize(), state = lazyListState) {
@@ -721,4 +755,36 @@ fun PreviewEnvironmentMetricsContentLightning() {
             )
         }
     }
+}
+
+/** Switch above the chart between the weather chart and the voltage/current chart of the same sensor. */
+@Composable
+private fun EnvironmentViewToggle(showPower: Boolean, onChange: (Boolean) -> Unit, modifier: Modifier = Modifier) {
+    Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FilterChip(
+            selected = !showPower,
+            onClick = { onChange(false) },
+            label = { Text(stringResource(Res.string.environment_view_weather)) },
+        )
+        FilterChip(
+            selected = showPower,
+            onClick = { onChange(true) },
+            label = { Text(stringResource(Res.string.environment_view_power)) },
+        )
+    }
+}
+
+private fun Telemetry.hasEnvironmentPower(): Boolean {
+    val env = environment_metrics ?: return false
+    return env.voltage?.isNaN() == false || env.current?.isNaN() == false
+}
+
+/** Anything the environment report carries besides voltage and current. */
+private fun Telemetry.hasEnvironmentWeather(): Boolean {
+    val env = environment_metrics ?: return false
+    val withoutPower = env.newBuilder().also { wb ->
+        wb.voltage = null
+        wb.current = null
+    }.build()
+    return withoutPower != org.meshtastic.proto.EnvironmentMetrics.Builder().build()
 }
