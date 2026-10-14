@@ -34,6 +34,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -81,6 +82,7 @@ import org.meshtastic.core.resources.wind_speed
 import org.meshtastic.core.ui.component.IaqDisplayMode
 import org.meshtastic.core.ui.component.IndoorAirQuality
 import org.meshtastic.core.ui.theme.AppTheme
+import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.proto.Telemetry
 
@@ -100,7 +102,9 @@ private fun degreeUnit(isFahrenheit: Boolean) = MetricFormatter.degreeSymbol(isF
 fun EnvironmentMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val graphData by viewModel.environmentGraphingData.collectAsStateWithLifecycle()
-    val filteredTelemetries by viewModel.filteredEnvironmentMetrics.collectAsStateWithLifecycle()
+    val rawTelemetries by viewModel.filteredEnvironmentMetrics.collectAsStateWithLifecycle()
+    val invertCurrent = LocalLnaCorrection.current.invertsCurrent(state.node?.num)
+    val filteredTelemetries = remember(rawTelemetries, invertCurrent) { rawTelemetries.withCurrentSign(invertCurrent) }
     val timeFrame by viewModel.timeFrame.collectAsStateWithLifecycle()
     val availableTimeFrames by viewModel.availableTimeFrames.collectAsStateWithLifecycle()
 
@@ -121,12 +125,15 @@ fun EnvironmentMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Un
         onRequestTelemetry = { viewModel.requestTelemetry(TelemetryType.ENVIRONMENT) },
         onExportCsv = { exportLauncher("environment_metrics.csv", "text/csv") },
         controlPart = {
-            TimeFrameSelector(
-                selectedTimeFrame = timeFrame,
-                availableTimeFrames = availableTimeFrames,
-                onTimeFrameSelected = viewModel::setTimeFrame,
-                modifier = Modifier.padding(horizontal = 16.dp),
-            )
+            Column {
+                TimeFrameSelector(
+                    selectedTimeFrame = timeFrame,
+                    availableTimeFrames = availableTimeFrames,
+                    onTimeFrameSelected = viewModel::setTimeFrame,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                state.node?.num?.let { CurrentPolaritySwitch(it) }
+            }
         },
         chartPart = { modifier, selectedX, vicoScrollState, onPointSelected ->
             EnvironmentMetricsChart(

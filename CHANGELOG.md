@@ -47,6 +47,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Pole GPIO i szybkie komendy (/ping, /hello, /test) mają kafelki, sprawdzanie numeru pinu, przyciski „Włącz (1)” / „Wyłącz (0)”, czytelny opis z odstępami i opis każdej komendy z informacją, że działają od firmware 2.8.0.
 * Zdalne zarządzanie (ulubione, ignorowane, dodawanie kontaktu) ma kafelki, sprawdzanie ID węzła i krótkie wyjaśnienia.
 * Diagnostyka na żądanie: karta z przeglądem wszystkich możliwości i licznikiem sprawdzonych, a każde zapytanie ma opis, przycisk „Zapytaj” oraz wynik w kolorach, jako kafelki, wskaźniki, wykresy kołowe i słupkowe.
+* Przełącznik „Odwróć znak prądu” dla każdego węzła z osobna (także własnego), na ekranach statystyk zasilania i pogody (tam, gdzie napięcie i natężenie): gdy czujnik jest podłączony odwrotnie, prąd ładowania pokazuje się na plusie na liście węzłów, w szczegółach i w Zdrowiu sieci. Zmienia się tylko znak wyświetlanego prądu i wykresów — nie wpływa to na wykrywanie ładowania ani na nic innego.
+* Pole wzmocnienia LNA jest teraz w szczegółach sygnału także dla własnego węzła (można je ustawić tam i w ustawieniach LoRa).
 * Pomoc listy węzłów tłumaczy kolory baterii oraz kolory w „Zdrowiu sieci”.
 
 **Okna informacyjne**
@@ -206,6 +208,8 @@ The entries below describe only what this fork adds on top of the original, from
 * The GPIO field and quick commands (/ping, /hello, /test) have tiles, pin number checking, “Switch on (1)” / “Switch off (0)” buttons, a clearly spaced help text and a description of every command noting they need firmware 2.8.0 or newer.
 * Remote management (favorites, ignored, adding a contact) has tiles, node ID checking and short explanations.
 * On-demand diagnostics: an overview card of all capabilities with a counter of checked ones, and every query has a description, an “Ask” button and a colored result shown as tiles, gauges, donut and bar charts.
+* A “Reverse current sign” switch for every node separately (ours too), on the power and environment statistics screens (where voltage and current are): when a sensor is wired backwards, the charging current shows as positive on the node list, in details and in Network Health. Only the sign of the displayed current and its charts changes — charging detection and everything else are unaffected.
+* The LNA gain field is now in the signal details for our own node too (it can be set there and in the LoRa settings).
 * The node list help explains battery colors and the colors in Network Health.
 
 **Help and documentation in Polish**

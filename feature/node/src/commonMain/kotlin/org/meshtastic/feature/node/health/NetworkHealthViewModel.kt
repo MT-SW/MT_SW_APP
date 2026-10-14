@@ -27,7 +27,9 @@ import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.model.util.isDirectSignal
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
+import org.meshtastic.feature.node.metrics.withCurrentSign
 import org.meshtastic.proto.NeighborInfo
 import org.meshtastic.proto.PortNum
 
@@ -141,6 +143,7 @@ data class NetworkHealthUiState(
 class NetworkHealthViewModel(
     private val nodeRepository: NodeRepository,
     private val meshLogRepository: MeshLogRepository,
+    private val uiPrefs: UiPrefs,
 ) : ViewModel() {
 
     private val _activeMetric = MutableStateFlow(NetworkHealthMetric.POWER)
@@ -163,7 +166,8 @@ class NetworkHealthViewModel(
                 meshLogRepository.getAllLogsSince(historySince),
                 meshLogRepository.getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, historySince),
                 meshLogRepository.getMyNodeInfo(),
-            ) { allLogs, telemetryLogs, myNodeInfo ->
+                uiPrefs.currentInverted,
+            ) { allLogs, telemetryLogs, myNodeInfo, invertedNodes ->
                 // MeshLog normalizes the locally-connected device's own logs to node number 0 (so log continuity
                 // survives a hardware swap) — remap those back to whichever node is actually connected right now.
                 val myNodeNum = myNodeInfo?.my_node_num
@@ -172,7 +176,9 @@ class NetworkHealthViewModel(
                         org.meshtastic.core.model.NodeMetricsHistoryEntry,
                     ) -> org.meshtastic.core.model.NodeMetricsHistoryEntry =
                     { entry ->
-                        if (myNodeNum != null && entry.num == 0) entry.copy(num = myNodeNum) else entry
+                        val mapped = if (myNodeNum != null && entry.num == 0) entry.copy(num = myNodeNum) else entry
+                        // Sensor wired backwards: only the sign of the current changes, nothing else.
+                        mapped.withCurrentSign(mapped.num in invertedNodes)
                     }
                 HistoryBundle(
                     entries =

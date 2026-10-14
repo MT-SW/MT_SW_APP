@@ -81,6 +81,7 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Save
 import org.meshtastic.core.ui.theme.GraphColors.Gold
 import org.meshtastic.core.ui.theme.GraphColors.InfantryBlue
+import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.proto.Telemetry
 
@@ -112,7 +113,9 @@ fun PowerMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val timeFrame by viewModel.timeFrame.collectAsStateWithLifecycle()
     val availableTimeFrames by viewModel.availableTimeFrames.collectAsStateWithLifecycle()
-    val data = state.powerMetrics.filter { it.time.toLong() >= timeFrame.timeThreshold() }
+    val invertCurrent = LocalLnaCorrection.current.invertsCurrent(state.node?.num)
+    val data =
+        state.powerMetrics.filter { it.time.toLong() >= timeFrame.timeThreshold() }.withCurrentSign(invertCurrent)
 
     val exportLauncher = rememberSaveFileLauncher { uri -> viewModel.savePowerMetricsCSV(uri, data) }
 
@@ -166,6 +169,7 @@ fun PowerMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
                         channelName = stringResource(selectedChannel.strRes),
                         onSave = { label -> viewModel.setPowerChannelLabel(nodeNum, selectedChannel.ordinal, label) },
                     )
+                    CurrentPolaritySwitch(nodeNum)
                 }
             }
         },

@@ -463,7 +463,7 @@ private fun gatherSensors(node: Node, tempInFahrenheit: Boolean, contentColor: C
     env.current?.let { current ->
         items.add {
             PowerInfo(
-                value = MetricFormatter.current(current),
+                value = MetricFormatter.current(LocalLnaCorrection.current.current(node.num, current)),
                 label = stringResource(Res.string.current),
                 contentColor = contentColor,
             )

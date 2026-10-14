@@ -67,9 +67,10 @@ import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.busy_noise_floor
 import org.meshtastic.core.resources.clear
+import org.meshtastic.core.resources.formatDuration
+import org.meshtastic.core.resources.lna_gain_correction_description
 import org.meshtastic.core.resources.lna_gain_db
 import org.meshtastic.core.resources.lna_gain_node_description
-import org.meshtastic.core.resources.formatDuration
 import org.meshtastic.core.resources.local_stats_bad
 import org.meshtastic.core.resources.local_stats_nodes
 import org.meshtastic.core.resources.local_stats_noise
@@ -186,9 +187,11 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
     val localStatsExportLauncher = rememberSaveFileLauncher { uri -> viewModel.saveLocalStatsCSV(uri, localStatsData) }
     val signalExportLauncher = rememberSaveFileLauncher { uri -> viewModel.saveSignalMetricsCSV(uri, signalData) }
 
-    // The LNA field for a remote node sits under the info text; our own gain is set in the LoRa settings.
+    // The LNA gain and current-polarity fields sit under the info text, the same for every node (ours too; our own
+    // values can also be set in the LoRa settings).
     val myNodeNum = LocalLnaCorrection.current.myNodeNum
-    val lnaNodeNum = state.node?.num?.takeIf { it != myNodeNum }
+    val lnaNodeNum = state.node?.num
+    val isLocalNode = lnaNodeNum != null && lnaNodeNum == myNodeNum
 
     BaseMetricScreen(
         onNavigateUp = onNavigateUp,
@@ -219,7 +222,7 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
             if (hasRssi) add(InfoDialogData(Res.string.rssi, Res.string.rssi_definition, SignalMetric.RSSI.color))
         },
         infoExtraContent =
-        lnaNodeNum?.let { num -> @Composable { LnaGainField(num) } },
+        lnaNodeNum?.let { num -> @Composable { LnaGainField(num, isLocalNode) } },
         controlPart = {
             TimeFrameSelector(
                 selectedTimeFrame = timeFrame,
@@ -328,15 +331,18 @@ private fun LocalStatsActionButtons(
     }
 }
 
-/** Per-node LNA gain (dB): corrects only this node's displayed noise floor; stored on this phone (see LnaCorrection). */
+/** Per-node LNA gain (dB); display-only, stored on this phone (see LnaCorrection). */
 @Composable
-internal fun LnaGainField(nodeNum: Int) {
+internal fun LnaGainField(nodeNum: Int, isLocal: Boolean = false) {
     val uiPrefs = koinInject<UiPrefs>()
     val gains by uiPrefs.lnaGains.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
     SignedIntegerEditTextPreference(
         title = stringResource(Res.string.lna_gain_db),
-        summary = stringResource(Res.string.lna_gain_node_description),
+        summary =
+        stringResource(
+            if (isLocal) Res.string.lna_gain_correction_description else Res.string.lna_gain_node_description,
+        ),
         value = gains[nodeNum] ?: 0,
         enabled = true,
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),

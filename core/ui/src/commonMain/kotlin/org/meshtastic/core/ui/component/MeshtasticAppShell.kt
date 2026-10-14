@@ -98,7 +98,10 @@ fun MeshtasticAppShell(
         remember(nodeRepository) { nodeRepository.myNodeInfo.map { it?.myNodeNum }.distinctUntilChanged() }
             .collectAsStateWithLifecycle(initialValue = null)
     val lnaGains by uiPrefs.lnaGains.collectAsStateWithLifecycle()
-    val lnaCorrection = remember(myNodeNum, lnaGains) { LnaCorrection(myNodeNum, lnaGains) }
+    val currentInverted by uiPrefs.currentInverted.collectAsStateWithLifecycle()
+    val lnaCorrection = remember(myNodeNum, lnaGains, currentInverted) {
+        LnaCorrection(myNodeNum, lnaGains, currentInverted)
+    }
 
     MeshtasticSnackbarProvider(snackbarManager = uiViewModel.snackbarManager, hostModifier = hostModifier) {
         // Provide the activity FLOW (stable ref) — not a collected value — so it costs no recomposition; only the
