@@ -23,6 +23,19 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Opis wyboru presetu mówi, że domyślnym presetem dla MT_SW_FIRMWARE jest Wąski szybki (Narrow Fast).
 * Strony pomocy mają mniejsze nagłówki i przyciski „A−” / „A+” w górnym pasku do zmiany wielkości tekstu.
 
+**Zdrowie sieci — nowy wygląd**
+* Na górze karta „Kondycja sieci”: kolorowy pierścień, liczba węzłów w każdym stanie i ile jest online.
+* Kolory jak w całej aplikacji: złoty = dobrze, czerwony = średnio, fioletowy = źle, biały = bardzo źle.
+* Wiersze z kolorowym paskiem, wykresem z wypełnieniem, wartością i słowem oceny; ikony zakładek w kolorze najgorszego węzła.
+* Filtr „Tylko problemy”, prawdziwe ikony zamiast emotikon oraz przycisk (i) z opisem kolorów i progów.
+* Poziom baterii na liście węzłów: pełna = złoty, średnia = czerwony, słaba = fioletowy.
+
+**Podsumowanie sieci i szczegóły węzła — nowy wygląd**
+* Podsumowanie ma kartę z kołowym wykresem online/offline, kolorowe kafelki, wykresy kołowe i słupkowe, rozkład baterii i sygnału oraz wykres wiadomości z 7 dni.
+* Rankingi (najlepszy sygnał, najdłużej działające, najbliżej itd.) pokazane jako paski.
+* Podsumowanie można udostępnić albo zapisać jako PDF, stronę HTML, Markdown, tekst lub CSV (arkusz).
+* Szczegóły węzła: karta z ikoną, wartością w kolorze oceny i wykresem trendu oraz kolorowe karty z min, max i ostatnią wartością.
+
 **Okna informacyjne**
 * Okna informacyjne w aplikacji pojawiają się rzadziej, w losowych odstępach; termin jest zapamiętywany trwale.
 * Przy zdalnej konfiguracji urządzenia pokazuje się osobne okno, zależne od lokalizacji.
@@ -155,6 +168,19 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Network Health — new look**
+* A “Network condition” card on top: a colored ring, the number of nodes in each state and how many are online.
+* The app's usual colors: gold = good, red = fair, purple = poor, white = very poor.
+* Rows with a colored bar, a filled trend line, the value and a verdict word; tab icons take the color of the worst node.
+* A “Problems only” filter, real icons instead of emoji and an (i) button explaining the colors and limits.
+* Battery level on the node list: full = gold, medium = red, low = purple.
+
+**Network summary and node details — new look**
+* The summary has a card with an online/offline donut chart, colored tiles, donut and bar charts, battery and signal distribution and a 7-day message chart.
+* Rankings (best signal, longest running, closest and so on) are shown as bars.
+* The summary can be shared or saved as PDF, an HTML page, Markdown, text or CSV (spreadsheet).
+* Node details: a card with an icon, the value in the verdict color and a trend chart, plus colored cards with min, max and latest value.
 
 **Help and documentation in Polish**
 * All in-app documentation (User Guide and Developer Guide, 36 pages) translated into Polish, including page names; the documentation site (docs/pl) is now fully in Polish too.

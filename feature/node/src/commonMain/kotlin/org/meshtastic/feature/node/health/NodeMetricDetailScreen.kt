@@ -16,7 +16,9 @@
  */
 package org.meshtastic.feature.node.health
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +26,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,7 +43,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,8 +56,11 @@ import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.compose.cartesian.data.lineModel
 import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
+import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
+import org.meshtastic.core.ui.icon.ArrowBack
+import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.theme.GraphColors.Blue
 import org.meshtastic.core.ui.theme.GraphColors.Gold
 import org.meshtastic.core.ui.theme.GraphColors.Green
@@ -78,12 +94,19 @@ fun NodeMetricDetailScreen(
             TopAppBar(
                 title = { Text("${uiState.metric.label} — ${uiState.nodeName}") },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateUp) { Text("←", style = MaterialTheme.typography.titleLarge) }
+                    IconButton(onClick = onNavigateUp) {
+                        Icon(imageVector = MeshtasticIcons.ArrowBack, contentDescription = null)
+                    }
                 },
             )
         },
     ) { contentPadding ->
-        Column(modifier = Modifier.fillMaxSize().padding(contentPadding).padding(16.dp)) {
+        Column(
+            modifier =
+            Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(contentPadding).padding(16.dp),
+        ) {
+            NodeMetricHero(uiState = uiState)
+            Spacer(modifier = Modifier.height(12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 NodeMetricRange.entries.forEach { range ->
                     FilterChip(
@@ -114,28 +137,50 @@ fun NodeMetricDetailScreen(
                     val color = colorFor(groups, groupIndex, s.label)
                     // Traffic counters (except RX itself) also show their share of all received packets.
                     val rx = seriesByLabel["RX"].takeIf { s.label in RX_SHARE_LABELS }
-                    Row(horizontalArrangement = Arrangement.spacedBy(24.dp), modifier = Modifier.fillMaxWidth()) {
-                        StatLabel(
-                            label = "${s.label} — min",
-                            value = s.minValue,
-                            seriesLabel = s.label,
-                            color = color,
-                            rxTotal = rx?.minValue,
-                        )
-                        StatLabel(
-                            label = "max",
-                            value = s.maxValue,
-                            seriesLabel = s.label,
-                            color = color,
-                            rxTotal = rx?.maxValue,
-                        )
-                        StatLabel(
-                            label = "ostatnia",
-                            value = s.latestValue,
-                            seriesLabel = s.label,
-                            color = color,
-                            rxTotal = rx?.latestValue,
-                        )
+                    Card(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                Box(modifier = Modifier.size(10.dp).clip(CircleShape).background(color))
+                                Text(
+                                    text = s.label,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(24.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                StatLabel(
+                                    label = "min",
+                                    value = s.minValue,
+                                    seriesLabel = s.label,
+                                    color = color,
+                                    rxTotal = rx?.minValue,
+                                )
+                                StatLabel(
+                                    label = "max",
+                                    value = s.maxValue,
+                                    seriesLabel = s.label,
+                                    color = color,
+                                    rxTotal = rx?.maxValue,
+                                )
+                                StatLabel(
+                                    label = "ostatnia",
+                                    value = s.latestValue,
+                                    seriesLabel = s.label,
+                                    color = color,
+                                    rxTotal = rx?.latestValue,
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -152,7 +197,7 @@ fun NodeMetricDetailScreen(
                 MetricChartScaffold(
                     isEmpty = false,
                     legendData = emptyList(),
-                    modifier = Modifier.fillMaxWidth().height(260.dp),
+                    modifier = Modifier.fillMaxWidth().height(280.dp),
                 ) { modelProducer, chartModifier ->
                     LaunchedEffect(groups) {
                         modelProducer.runTransaction {
@@ -306,4 +351,103 @@ private fun formatSeriesValue(seriesLabel: String, value: Float): String = when 
     -> MetricFormatter.percent(value, decimalPlaces = 1)
 
     else -> NumberFormatter.format(value, 1)
+}
+
+private const val HERO_TINT_ALPHA = 0.14f
+private const val HERO_ICON_ALPHA = 0.18f
+private const val HERO_ICON_DP = 56
+
+private const val BATTERY_GOOD = 50f
+private const val BATTERY_MEDIUM = 20f
+private const val BATTERY_BAD = 5f
+
+/** Verdict for the headline value of a tab, or [HealthLevel.UNKNOWN] when that tab has no verdict. */
+private fun headlineLevel(metric: NetworkHealthMetric, value: Float?): HealthLevel {
+    if (value == null) return HealthLevel.UNKNOWN
+    return when (metric) {
+        NetworkHealthMetric.POWER ->
+            when {
+                value >= BATTERY_GOOD -> HealthLevel.GOOD
+                value >= BATTERY_MEDIUM -> HealthLevel.MEDIUM
+                value >= BATTERY_BAD -> HealthLevel.BAD
+                else -> HealthLevel.CRITICAL
+            }
+
+        NetworkHealthMetric.SIGNAL -> snrLevel(value)
+        NetworkHealthMetric.ETHER -> etherLevel(value)
+        else -> HealthLevel.UNKNOWN
+    }
+}
+
+/** Top card of the detail screen: tab icon in the verdict colour, node name, the latest value and a trend line. */
+@Composable
+private fun NodeMetricHero(uiState: NodeMetricDetailUiState) {
+    val headline = uiState.series.firstOrNull { it.label == uiState.metric.seriesLabels().first() }
+    val latest = headline?.latestValue
+    val level = headlineLevel(uiState.metric, latest)
+    val accent = if (level == HealthLevel.UNKNOWN) MaterialTheme.colorScheme.primary else level.color()
+    val base = MaterialTheme.colorScheme.surfaceContainer
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(containerColor = accent.copy(alpha = HERO_TINT_ALPHA).compositeOver(base)),
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Box(
+                modifier =
+                Modifier.size(HERO_ICON_DP.dp).clip(CircleShape).background(accent.copy(alpha = HERO_ICON_ALPHA)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = uiState.metric.icon(),
+                    contentDescription = null,
+                    tint = accent,
+                    modifier = Modifier.size(30.dp),
+                )
+            }
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    text = uiState.nodeName,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                )
+                Text(
+                    text = uiState.metric.label,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    text =
+                    if (headline != null && latest != null) formatSeriesValue(headline.label, latest) else "—",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = accent,
+                )
+                if (level != HealthLevel.UNKNOWN) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        HealthDot(color = accent)
+                        Text(
+                            text = stringResource(level.labelRes),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = accent,
+                        )
+                    }
+                }
+            }
+            MetricSparkline(
+                values = headline?.points?.map { it.value }.orEmpty(),
+                color = accent,
+                modifier = Modifier.size(width = 90.dp, height = 44.dp),
+            )
+        }
+    }
 }

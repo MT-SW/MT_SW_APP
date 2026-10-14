@@ -46,9 +46,9 @@ import org.meshtastic.core.ui.icon.BatteryUnknown
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PowerSupply
 import org.meshtastic.core.ui.theme.AppTheme
-import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
-import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
-import org.meshtastic.core.ui.theme.StatusColors.StatusRed
+import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
+import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
+import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 
 private const val SIZE_ICON = 16
 
@@ -89,12 +89,12 @@ fun MaterialBatteryInfo(
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold, fontSize = 12.sp),
             )
         } else {
-            // Map battery percentage to color
+            // Same palette as the signal-quality indicator: gold (full), red (half), purple (low).
             val fillColor =
                 when (level) {
-                    in 0..19 -> MaterialTheme.colorScheme.StatusRed
-                    in 20..39 -> MaterialTheme.colorScheme.StatusOrange
-                    else -> MaterialTheme.colorScheme.StatusGreen
+                    in 0..19 -> MaterialTheme.colorScheme.StatusPurple
+                    in 20..49 -> MaterialTheme.colorScheme.StatusDisconnected
+                    else -> MaterialTheme.colorScheme.StatusOnline
                 }
 
             Icon(

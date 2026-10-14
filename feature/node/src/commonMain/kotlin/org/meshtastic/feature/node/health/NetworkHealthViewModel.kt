@@ -48,11 +48,13 @@ enum class NetworkHealthSortField {
     LAST_HEARD,
 }
 
+private data class FilterFlags(val hideWithoutData: Boolean, val problemsOnly: Boolean)
+
 private data class SortSettings(
     val sortField: NetworkHealthSortField,
     val sortAscending: Boolean,
     val favoritesFirst: Boolean,
-    val hideWithoutData: Boolean,
+    val filters: FilterFlags,
     val searchText: String,
 )
 
@@ -109,6 +111,13 @@ data class NetworkHealthUiState(
     val favoritesFirst: Boolean = true,
     val hideWithoutData: Boolean = false,
     val searchText: String = "",
+    val problemsOnly: Boolean = false,
+    val onlineCount: Int = 0,
+    val totalCount: Int = 0,
+    /** How many nodes fall into each verdict on the active tab (all nodes, ignoring filters). */
+    val levelCounts: Map<HealthLevel, Int> = emptyMap(),
+    /** The worst verdict of every tab, used to tint the tab icons. */
+    val worstLevelByMetric: Map<NetworkHealthMetric, HealthLevel> = emptyMap(),
 )
 
 @KoinViewModel
@@ -124,6 +133,7 @@ class NetworkHealthViewModel(
     private val sortAscendingFlow = MutableStateFlow(false)
     private val favoritesFirstFlow = MutableStateFlow(true)
     private val hideWithoutDataFlow = MutableStateFlow(false)
+    private val problemsOnlyFlow = MutableStateFlow(false)
     private val searchTextFlow = MutableStateFlow("")
 
     private val historySince: Long
@@ -156,7 +166,7 @@ class NetworkHealthViewModel(
                 sortFieldFlow,
                 sortAscendingFlow,
                 favoritesFirstFlow,
-                hideWithoutDataFlow,
+                combine(hideWithoutDataFlow, problemsOnlyFlow, ::FilterFlags),
                 searchTextFlow,
                 ::SortSettings,
             ),
@@ -172,7 +182,9 @@ class NetworkHealthViewModel(
                         log.fromNum to info.neighbors.size
                     }
                     .toMap()
-            val (sortField, sortAscending, favoritesFirst, hideWithoutData, searchText) = sortSettings
+            val (sortField, sortAscending, favoritesFirst, filters, searchText) = sortSettings
+            val hideWithoutData = filters.hideWithoutData
+            val problemsOnly = filters.problemsOnly
             val historyByNode = history.groupBy { it.num }
 
             val healthInfos =
@@ -202,12 +214,18 @@ class NetworkHealthViewModel(
                     )
                 }
 
-            val withoutDataFiltered =
+            val levelCounts = healthInfos.groupingBy { metric.levelFor(it) }.eachCount()
+            val worstByMetric =
+                NetworkHealthMetric.entries.associateWith { m -> worstLevel(healthInfos.map { m.levelFor(it) }) }
+
+            val dataFiltered =
                 if (hideWithoutData) {
                     healthInfos.filter { it.valueFor(metric) != null || it.metricHistory.isNotEmpty() }
                 } else {
                     healthInfos
                 }
+            val withoutDataFiltered =
+                if (problemsOnly) dataFiltered.filter { metric.levelFor(it).isProblem } else dataFiltered
             val filtered =
                 if (searchText.isBlank()) {
                     withoutDataFiltered
@@ -236,6 +254,11 @@ class NetworkHealthViewModel(
                 favoritesFirst = favoritesFirst,
                 hideWithoutData = hideWithoutData,
                 searchText = searchText,
+                problemsOnly = problemsOnly,
+                onlineCount = healthInfos.count { it.isOnline },
+                totalCount = healthInfos.size,
+                levelCounts = levelCounts,
+                worstLevelByMetric = worstByMetric,
             )
         }
             .stateInWhileSubscribed(initialValue = NetworkHealthUiState())
@@ -258,6 +281,10 @@ class NetworkHealthViewModel(
 
     fun toggleHideWithoutData() {
         hideWithoutDataFlow.value = !hideWithoutDataFlow.value
+    }
+
+    fun toggleProblemsOnly() {
+        problemsOnlyFlow.value = !problemsOnlyFlow.value
     }
 
     fun setSearchText(text: String) {
