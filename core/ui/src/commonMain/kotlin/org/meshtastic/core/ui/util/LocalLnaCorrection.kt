@@ -1,19 +1,35 @@
-/*
- * Copyright (c) 2026 Meshtastic LLC
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+/*
+
+ * Copyright (c) 2026 Meshtastic LLC
+
+ *
+
+ * This program is free software: you can redistribute it and/or modify
+
+ * it under the terms of the GNU General Public License as published by
+
+ * the Free Software Foundation, either version 3 of the License, or
+
+ * (at your option) any later version.
+
+ *
+
+ * This program is distributed in the hope that it will be useful,
+
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+
+ * GNU General Public License for more details.
+
+ *
+
+ * You should have received a copy of the GNU General Public License
+
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+ */
+
 package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.compositionLocalOf
@@ -23,7 +39,17 @@ import androidx.compose.runtime.compositionLocalOf
  * [myNodeNum] is the connected device's own gain. Displayed = raw - gain. Raw values (database, quality rating) are
  * never changed, only what is shown.
  */
-data class LnaCorrection(val myNodeNum: Int? = null, val gains: Map<Int, Int> = emptyMap()) {
+data class LnaCorrection(
+    val myNodeNum: Int? = null,
+    val gains: Map<Int, Int> = emptyMap(),
+    val invertedCurrent: Set<Int> = emptySet(),
+) {
+    /** True when [nodeNum] has its displayed current (mA) sign flipped (sensor wired backwards). */
+    fun invertsCurrent(nodeNum: Int?): Boolean = nodeNum != null && nodeNum in invertedCurrent
+
+    /** Current as it should be displayed for [nodeNum]; only the sign may change, nothing else depends on it. */
+    fun current(nodeNum: Int?, raw: Float): Float = if (raw != 0f && invertsCurrent(nodeNum)) -raw else raw
+
     /** Gain of the connected device; it corrects its own noise floor and the RSSI of every packet it receives. */
     val localGain: Int
         get() = myNodeNum?.let { gains[it] } ?: 0

@@ -37,12 +37,12 @@ import org.meshtastic.core.model.RegionInfo
 import org.meshtastic.core.model.RegionPresetConstraint
 import org.meshtastic.core.model.constraintFor
 import org.meshtastic.core.model.normalizeCodingRateOverride
-import org.meshtastic.core.model.withoutStoredPresetDefaultCodingRate
 import org.meshtastic.core.model.numChannels
 import org.meshtastic.core.model.presetForRegionChange
+import org.meshtastic.core.model.schemaLabelRes
+import org.meshtastic.core.model.withoutStoredPresetDefaultCodingRate
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.UiPrefs
-import org.meshtastic.core.model.schemaLabelRes
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.advanced
 import org.meshtastic.core.resources.bandwidth_default

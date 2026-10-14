@@ -227,6 +227,28 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         }
     }
 
+    override val currentInverted: StateFlow<Set<Int>> =
+        dataStore.data
+            .map { prefs ->
+                prefs[KEY_CURRENT_INVERTED].orEmpty().split(';').mapNotNull { it.toIntOrNull() }.toSet()
+            }
+            .stateIn(scope, SharingStarted.Eagerly, emptySet())
+
+    override fun setCurrentInverted(nodeNum: Int, inverted: Boolean) {
+        scope.launch {
+            dataStore.edit { preferences ->
+                val nodes =
+                    preferences[KEY_CURRENT_INVERTED]
+                        .orEmpty()
+                        .split(';')
+                        .mapNotNull { it.toIntOrNull() }
+                        .toMutableSet()
+                if (inverted) nodes.add(nodeNum) else nodes.remove(nodeNum)
+                preferences[KEY_CURRENT_INVERTED] = nodes.joinToString(";")
+            }
+        }
+    }
+
     private fun decodeLnaGains(raw: String?): Map<Int, Int> = raw
         .orEmpty()
         .split(';')
@@ -501,6 +523,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
 
     companion object {
         val KEY_LNA_GAINS = stringPreferencesKey("lna-gains-by-node")
+        val KEY_CURRENT_INVERTED = stringPreferencesKey("current-inverted-nodes")
         val KEY_HAS_SHOWN_NOT_PAIRED_WARNING_PREF = booleanPreferencesKey("has_shown_not_paired_warning")
         val KEY_SHOW_QUICK_CHAT_PREF = booleanPreferencesKey("show-quick-chat")
         val KEY_QUICK_CHAT_DEFAULTS_SEEDED_PREF = booleanPreferencesKey("quick-chat-defaults-seeded")

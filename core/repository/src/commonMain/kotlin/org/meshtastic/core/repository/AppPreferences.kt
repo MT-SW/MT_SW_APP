@@ -200,6 +200,15 @@ interface UiPrefs {
     /** Sets the LNA gain for [nodeNum]; 0 removes the correction. */
     fun setLnaGain(nodeNum: Int, gainDb: Int)
 
+    /**
+     * Nodes whose displayed current (mA) has its sign flipped, for sensors wired backwards. Display-only: charging
+     * detection and every other value are untouched.
+     */
+    val currentInverted: StateFlow<Set<Int>>
+
+    /** Turns the sign flip of the displayed current on or off for [nodeNum]. */
+    fun setCurrentInverted(nodeNum: Int, inverted: Boolean)
+
     // Node list layout preferences
 
     /** Active density mode stored as the enum name (e.g. "COMPLETE", "COMPACT"). */
