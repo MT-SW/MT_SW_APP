@@ -97,7 +97,6 @@ import org.meshtastic.core.ui.icon.SignalCellular4Bar
 import org.meshtastic.core.ui.icon.Temperature
 import org.meshtastic.core.ui.icon.Warning
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
-import org.meshtastic.core.ui.util.LocalLnaCorrection
 
 private const val RING_SIZE_DP = 96
 private const val RING_STROKE_DP = 12
@@ -391,13 +390,13 @@ internal fun NodeHealthRow(
     val accent = level.color()
     val base = MaterialTheme.colorScheme.surfaceContainer
     val container = if (level == HealthLevel.UNKNOWN) base else accent.copy(alpha = ROW_TINT_ALPHA).compositeOver(base)
-    val valueColor = if (level == HealthLevel.UNKNOWN) MaterialTheme.colorScheme.onSurface else accent
-    val lna = LocalLnaCorrection.current
-    // The noise floor is shown after the LNA correction, like everywhere else in the app.
-    val shownValue =
-        node.valueFor(metric)?.let { raw ->
-            if (metric == NetworkHealthMetric.SIGNAL) lna.noiseFloor(node.num, raw.toInt()).toFloat() else raw
-        }
+    // The big number of the signal tab is the noise floor: it gets its own colour (the lower, the better), while the
+    // bar and the row tint keep following the SNR.
+    val valueLevel =
+        if (metric == NetworkHealthMetric.SIGNAL) node.noiseFloor?.let(::noiseFloorLevel) ?: level else level
+    val valueColor = if (valueLevel == HealthLevel.UNKNOWN) MaterialTheme.colorScheme.onSurface else valueLevel.color()
+    // The history already holds the noise floor after the LNA correction.
+    val shownValue = node.valueFor(metric)
 
     Card(
         onClick = onClick,
@@ -472,7 +471,7 @@ internal fun NodeHealthRow(
                             color = valueColor,
                         )
                         Text(
-                            text = stringResource(level.labelRes),
+                            text = stringResource(valueLevel.labelRes),
                             style = MaterialTheme.typography.labelSmall,
                             color = valueColor,
                         )

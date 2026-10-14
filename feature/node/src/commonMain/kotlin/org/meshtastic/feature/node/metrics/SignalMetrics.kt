@@ -117,7 +117,7 @@ import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.Telemetry
 
-private const val QUIET_NOISE_FLOOR_DBM = -95
+private const val QUIET_NOISE_FLOOR_DBM = -100
 private const val BUSY_FLOOR_DBM = -85
 private const val MIN_DBM_AXIS = -120.0
 private const val MAX_DBM_AXIS = 0.0

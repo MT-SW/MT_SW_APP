@@ -170,8 +170,9 @@ class NetworkHealthViewModel(
                 meshLogRepository.getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, historySince),
                 meshLogRepository.getMyNodeInfo(),
                 uiPrefs.currentInverted,
-                uiPrefs.batteryInverted,
-            ) { allLogs, telemetryLogs, myNodeInfo, invertedNodes, batteryInvertedNodes ->
+                combine(uiPrefs.batteryInverted, uiPrefs.lnaGains, ::Pair),
+            ) { allLogs, telemetryLogs, myNodeInfo, invertedNodes, batteryAndLna ->
+                val (batteryInvertedNodes, lnaGains) = batteryAndLna
                 // MeshLog normalizes the locally-connected device's own logs to node number 0 (so log continuity
                 // survives a hardware swap) — remap those back to whichever node is actually connected right now.
                 val myNodeNum = myNodeInfo?.my_node_num
@@ -185,6 +186,11 @@ class NetworkHealthViewModel(
                         mapped
                             .withCurrentSign(mapped.num in invertedNodes)
                             .withBatterySwap(mapped.num in batteryInvertedNodes)
+                            // The noise floor is judged and shown after the node's LNA gain, like on the signal screen.
+                            .let { e ->
+                                val gain = lnaGains[e.num] ?: 0
+                                if (gain == 0 || e.noiseFloor == null) e else e.copy(noiseFloor = e.noiseFloor - gain)
+                            }
                     }
                 HistoryBundle(
                     entries =

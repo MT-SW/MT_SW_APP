@@ -108,17 +108,22 @@ internal fun snrLevel(snr: Float): HealthLevel = when {
     else -> HealthLevel.CRITICAL
 }
 
-/** Noise floor in dBm (raw, before any LNA correction): the lower, the quieter the band. */
+/**
+ * Noise floor in dBm, after the LNA correction like everywhere else: the further below zero, the quieter the band. The
+ * limits are the ones of the "Signal quality" screen (below -100 quiet, below -85 busy, above very noisy).
+ */
 internal fun noiseFloorLevel(dbm: Float): HealthLevel = when {
-    dbm <= NOISE_GOOD -> HealthLevel.GOOD
-    dbm <= NOISE_MEDIUM -> HealthLevel.MEDIUM
-    dbm <= NOISE_BAD -> HealthLevel.BAD
+    dbm < NOISE_GOOD -> HealthLevel.GOOD
+    dbm < NOISE_MEDIUM -> HealthLevel.MEDIUM
+    dbm < NOISE_BAD -> HealthLevel.BAD
     else -> HealthLevel.CRITICAL
 }
 
-private const val NOISE_GOOD = -110f
-private const val NOISE_MEDIUM = -100f
-private const val NOISE_BAD = -90f
+private const val NOISE_GOOD = -100f
+private const val NOISE_MEDIUM = -85f
+
+// Far above anything a real receiver reports; keeps the "very noisy" colour of the signal screen as the worst case.
+private const val NOISE_BAD = -60f
 
 internal fun etherLevel(utilization: Float): HealthLevel = when {
     utilization < ETHER_GOOD -> HealthLevel.GOOD

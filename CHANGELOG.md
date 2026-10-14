@@ -18,6 +18,10 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Zdrowie sieci — kolor szumu tła**
+* Zakładka Sygnał: liczba (szum tła) ma teraz własny kolor — im niższa wartość (większy minus), tym lepiej. Progi jak w „Jakości sygnału”: poniżej −100 dBm złoty, poniżej −85 dBm czerwony, wyżej fioletowy. Pasek i tło wiersza dalej wynikają z SNR.
+* Szum jest oceniany po korekcie LNA węzła (wcześniej kolor liczył się z wartości przed korektą, więc nie zgadzał się z tym, co widać). Dotyczy listy, szczegółów węzła i wykresu z progami.
+
 **Sygnał WiFi urządzenia w „Jakości sygnału” i „Zdrowiu sieci”**
 * Aplikacja odczytuje nowe pola firmware: siła WiFi (RSSI), liczba zerwań łącza WiFi od startu i kod powodu ostatniego zerwania (tylko ESP32).
 * „Jakość sygnału”: osobna linia WiFi RSSI na wykresie obok szumu, RSSI i SNR (z legendą i opisem pod (i)) oraz karty w liście z siłą sygnału, liczbą zerwań i powodem zapisanym po ludzku (np. „utracono punkt dostępowy (200)”); brak siły sygnału przy rosnącej liczbie zerwań jest pokazany jako „WiFi rozłączone”.
@@ -197,6 +201,10 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Network Health — noise floor colour**
+* Signal tab: the number (noise floor) now has its own colour — the lower the value (the bigger the minus), the better. Limits as in "Signal quality": below −100 dBm gold, below −85 dBm red, higher purple. The bar and the row tint still follow the SNR.
+* The noise is judged after the node's LNA correction (before, the colour was computed from the uncorrected value, so it did not match what is shown). This covers the list, the node detail and the chart with limits.
 
 **Device WiFi signal in "Signal quality" and "Network Health"**
 * The app reads the new firmware fields: WiFi strength (RSSI), the number of WiFi link drops since start and the code of the last drop reason (ESP32 only).
