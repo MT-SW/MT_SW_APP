@@ -101,7 +101,11 @@ fun NetworkHealthScreen(
                 singleLine = true,
             )
 
-            NetworkHealthHero(uiState = uiState, modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp))
+            NetworkHealthHero(
+                uiState = uiState,
+                onLevelClick = viewModel::toggleLevelFilter,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            )
 
             ScrollableTabRow(selectedTabIndex = uiState.activeMetric.ordinal) {
                 NetworkHealthMetric.entries.forEach { metric ->

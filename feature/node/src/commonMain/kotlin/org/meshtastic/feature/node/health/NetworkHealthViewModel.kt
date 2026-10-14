@@ -66,7 +66,11 @@ private data class HistoryBundle(
 
 private fun remapLocal(num: Int, myNodeNum: Int?): Int = if (myNodeNum != null && num == 0) myNodeNum else num
 
-private data class FilterFlags(val hideWithoutData: Boolean, val problemsOnly: Boolean)
+private data class FilterFlags(
+    val hideWithoutData: Boolean,
+    val problemsOnly: Boolean,
+    val levelFilters: Map<NetworkHealthMetric, HealthLevel>,
+)
 
 private data class SortSettings(
     val sortField: NetworkHealthSortField,
@@ -132,6 +136,8 @@ data class NetworkHealthUiState(
     val hideWithoutData: Boolean = false,
     val searchText: String = "",
     val problemsOnly: Boolean = false,
+    /** Only nodes with this verdict are listed (a tap on a count in the top card); null = all. */
+    val levelFilter: HealthLevel? = null,
     val onlineCount: Int = 0,
     val totalCount: Int = 0,
     /** Nodes that have any value or history on the active tab. */
@@ -157,6 +163,8 @@ class NetworkHealthViewModel(
     private val favoritesFirstFlow = MutableStateFlow(true)
     private val hideWithoutDataFlow = MutableStateFlow(false)
     private val problemsOnlyFlow = MutableStateFlow(false)
+    // Every tab keeps its own verdict filter.
+    private val levelFilterFlow = MutableStateFlow<Map<NetworkHealthMetric, HealthLevel>>(emptyMap())
     private val searchTextFlow = MutableStateFlow("")
 
     private val historySince: Long
@@ -207,7 +215,7 @@ class NetworkHealthViewModel(
                 sortFieldFlow,
                 sortAscendingFlow,
                 favoritesFirstFlow,
-                combine(hideWithoutDataFlow, problemsOnlyFlow, ::FilterFlags),
+                combine(hideWithoutDataFlow, problemsOnlyFlow, levelFilterFlow, ::FilterFlags),
                 searchTextFlow,
                 ::SortSettings,
             ),
@@ -229,6 +237,7 @@ class NetworkHealthViewModel(
             val (sortField, sortAscending, favoritesFirst, filters, searchText) = sortSettings
             val hideWithoutData = filters.hideWithoutData
             val problemsOnly = filters.problemsOnly
+            val levelFilter = filters.levelFilters[metric]
             val historyByNode = history.groupBy { it.num }
 
             val healthInfos =
@@ -278,8 +287,14 @@ class NetworkHealthViewModel(
                 } else {
                     healthInfos
                 }
-            val withoutDataFiltered =
+            val problemFiltered =
                 if (problemsOnly) dataFiltered.filter { metric.levelFor(it).isProblem } else dataFiltered
+            val withoutDataFiltered =
+                if (levelFilter != null) {
+                    problemFiltered.filter { metric.levelFor(it) == levelFilter }
+                } else {
+                    problemFiltered
+                }
             val filtered =
                 if (searchText.isBlank()) {
                     withoutDataFiltered
@@ -309,6 +324,7 @@ class NetworkHealthViewModel(
                 hideWithoutData = hideWithoutData,
                 searchText = searchText,
                 problemsOnly = problemsOnly,
+                levelFilter = levelFilter,
                 onlineCount = healthInfos.count { it.isOnline },
                 totalCount = healthInfos.size,
                 withDataCount =
@@ -321,6 +337,13 @@ class NetworkHealthViewModel(
 
     fun setActiveMetric(metric: NetworkHealthMetric) {
         _activeMetric.value = metric
+    }
+
+    /** A tap on a verdict count in the top card: list only those nodes on the open tab; a second tap shows all. */
+    fun toggleLevelFilter(level: HealthLevel) {
+        val metric = _activeMetric.value
+        val current = levelFilterFlow.value
+        levelFilterFlow.value = if (current[metric] == level) current - metric else current + (metric to level)
     }
 
     fun setSortField(field: NetworkHealthSortField) {

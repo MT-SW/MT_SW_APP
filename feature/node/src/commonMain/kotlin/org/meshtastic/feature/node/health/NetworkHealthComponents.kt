@@ -21,6 +21,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -110,6 +111,7 @@ private const val SPARKLINE_STROKE_PX = 3f
 private const val SPARKLINE_DOT_RADIUS_PX = 5f
 
 // Range of the SNR bar and the neighbor-count bar: the bar is full at the top of its range.
+private const val LEVEL_CHIP_RADIUS_DP = 8
 private const val NOISE_BAR_MIN = -130f
 private const val NOISE_BAR_MAX = -60f
 private const val SNR_BAR_MIN = -20f
@@ -161,7 +163,11 @@ internal fun NetworkHealthTabLabel(metric: NetworkHealthMetric, worst: HealthLev
 /** The big card at the top: a ring with the share of well-doing nodes, the count per verdict and who is online. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-internal fun NetworkHealthHero(uiState: NetworkHealthUiState, modifier: Modifier = Modifier) {
+internal fun NetworkHealthHero(
+    uiState: NetworkHealthUiState,
+    onLevelClick: (HealthLevel) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val counts = uiState.levelCounts
     val verdictTotal = RANKED_LEVELS.sumOf { counts[it] ?: 0 }
     val good = counts[HealthLevel.GOOD] ?: 0
@@ -234,8 +240,17 @@ internal fun NetworkHealthHero(uiState: NetworkHealthUiState, modifier: Modifier
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
+                    // A tap on a count lists only the nodes with that verdict; a second tap shows all again.
                     RANKED_LEVELS.forEach { level ->
+                        val selected = uiState.levelFilter == level
                         Row(
+                            modifier =
+                            Modifier.clip(RoundedCornerShape(LEVEL_CHIP_RADIUS_DP.dp))
+                                .background(
+                                    if (selected) level.color().copy(alpha = ROW_TINT_ALPHA * 2) else Color.Transparent,
+                                )
+                                .clickable { onLevelClick(level) }
+                                .padding(horizontal = 6.dp, vertical = 4.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
@@ -243,6 +258,7 @@ internal fun NetworkHealthHero(uiState: NetworkHealthUiState, modifier: Modifier
                             Text(
                                 text = "${counts[level] ?: 0} ${stringResource(level.labelRes)}",
                                 style = MaterialTheme.typography.labelSmall,
+                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
                             )
                         }
                     }
