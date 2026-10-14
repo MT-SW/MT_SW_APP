@@ -45,6 +45,42 @@ Nie ma osobnego poziomu „nieobecny”, ale pomarańczowy stan niedostępności
 zielonym: węzeł może być online i mimo to niedostępny przy Twoich obecnych ustawieniach. Węzły znane
 wyłącznie przez MQTT nigdy nie są pokazywane jako niedostępne.
 
+### Kolory baterii na liście
+
+Poziom baterii na liście węzłów ma kolor, który od razu mówi, jak jest z zasilaniem. Używamy tych samych kolorów co w całej aplikacji:
+
+| Kolor | Poziom baterii | Znaczenie |
+|-------|----------------|-----------|
+| Złoty | 50% i więcej (oraz zasilanie zewnętrzne) | Dobrze |
+| Czerwony | od 20% do 49% | Średnio — pora pomyśleć o ładowaniu |
+| Fioletowy | poniżej 20% | Słabo — węzeł może wkrótce zniknąć z sieci |
+
+Węzeł zasilany z zewnątrz (zasilacz, panel słoneczny) pokazuje się jako w pełni naładowany.
+
+### Zdrowie sieci i kolory
+
+Karta **Zdrowie sieci** pokazuje, jak radzą sobie wszystkie węzły naraz. Na górze jest pierścień z procentem węzłów w dobrym stanie, liczbą węzłów w każdym stanie i liczbą węzłów online. Każda zakładka (Zasilanie, Sygnał, Eter, Środowisko, Zasoby, Ruch, Sąsiedzi) ma ikonę w kolorze najgorszego węzła w tej zakładce.
+
+| Kolor | Znaczenie |
+|-------|-----------|
+| Złoty | Dobrze |
+| Czerwony | Średnio |
+| Fioletowy | Źle |
+| Biały (na jasnym motywie czarny) | Bardzo źle |
+| Szary | Brak danych do oceny |
+
+Limity w każdej zakładce:
+
+- **Zasilanie** — dobrze: 50% lub więcej albo zasilanie zewnętrzne; średnio: 20–49%; źle: 5–19%; bardzo źle: poniżej 5%.
+- **Sygnał** — kolor wynika z SNR ostatniego bezpośredniego odbioru: dobrze od 0 dB; średnio od −7,5 do 0 dB; źle od −15 do −7,5 dB; bardzo źle poniżej −15 dB. Węzeł bez żadnego SNR (na przykład Twój własny) jest oceniany po poziomie szumu: do −110 dBm dobrze, do −100 średnio, do −90 źle, powyżej bardzo źle. Duża liczba na liście to poziom szumu (noise floor), po korekcie LNA, jeśli jest ustawiona.
+- **Eter** (zajęcie kanału) — dobrze: poniżej 15%; średnio: 15–25%; źle: 25–40%; bardzo źle: 40% i więcej.
+- **Sąsiedzi** — dobrze: 3 lub więcej; średnio: 2; źle: 1; bardzo źle: 0.
+- **Środowisko, Zasoby, Ruch** — bez oceny kolorem; karta pokazuje, ile węzłów zgłasza dane.
+
+Przycisk **Tylko problemy** zostawia na liście węzły ocenione na źle lub bardzo źle. Przycisk (i) w górnym pasku przypomina te kolory i limity dla wybranej zakładki.
+
+Po dotknięciu węzła otwierają się jego szczegóły. Te same dane możesz tam zobaczyć na cztery sposoby — **Linia** (z kolorowymi strefami), **Zegar**, **Słupki** i **Mapa cieplna** — a dla baterii, SNR i zajęcia kanału także pasek **Czas w każdym stanie**. Ikona **Podsumowanie** w górnym pasku otwiera zbiorcze podsumowanie sieci z wykresami; można je udostępnić albo zapisać jako PDF, stronę HTML, Markdown, tekst lub CSV.
+
 ### Role węzłów
 
 Węzły można skonfigurować z różnymi rolami, które wpływają na ich zachowanie w sieci mesh:
