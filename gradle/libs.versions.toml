@@ -87,7 +87,7 @@ ktor = "3.6.0"
 
 # Other
 aboutlibraries = "15.3.0"
-bouncycastle = "1.85.2"
+bouncycastle = "1.86"
 jserialcomm = "2.11.4"
 coil = "3.6.3"
 datadog-gradle = "1.31.0"
