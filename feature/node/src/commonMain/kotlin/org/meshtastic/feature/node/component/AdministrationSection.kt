@@ -19,27 +19,15 @@ package org.meshtastic.feature.node.component
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.TextFieldLineLimits
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldLabelPosition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
@@ -49,8 +37,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
@@ -58,45 +44,31 @@ import org.koin.compose.koinInject
 import org.meshtastic.core.model.DeviceVersion
 import org.meshtastic.core.model.FirmwareRelease
 import org.meshtastic.core.model.Node
-import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.SessionStatus
-import org.meshtastic.core.navigation.NodeDetailRoute
 import org.meshtastic.core.model.asDeviceVersion
+import org.meshtastic.core.navigation.NodeDetailRoute
 import org.meshtastic.core.repository.EventFirmwareRepository
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.add
-import org.meshtastic.core.resources.add_contact
 import org.meshtastic.core.resources.administration
+import org.meshtastic.core.resources.close
 import org.meshtastic.core.resources.connect_radio_for_remote_admin
 import org.meshtastic.core.resources.establishing_session
-import org.meshtastic.core.resources.favorite
 import org.meshtastic.core.resources.firmware
 import org.meshtastic.core.resources.firmware_edition
 import org.meshtastic.core.resources.gpio
-import org.meshtastic.core.resources.close
 import org.meshtastic.core.resources.gpio_help_text
 import org.meshtastic.core.resources.gpio_help_title
-import org.meshtastic.core.resources.gpio_mask_display
-import org.meshtastic.core.resources.gpio_off
-import org.meshtastic.core.resources.gpio_on
-import org.meshtastic.core.resources.gpio_pin
-import org.meshtastic.core.resources.gpio_read
-import org.meshtastic.core.resources.ignore
 import org.meshtastic.core.resources.ic_terminal
 import org.meshtastic.core.resources.installed_firmware_version
 import org.meshtastic.core.resources.latest_alpha_firmware
 import org.meshtastic.core.resources.latest_stable_firmware
-import org.meshtastic.core.resources.long_name
-import org.meshtastic.core.resources.node_id
 import org.meshtastic.core.resources.on_demand_log_title
 import org.meshtastic.core.resources.refresh_metadata
 import org.meshtastic.core.resources.remote_admin
-import org.meshtastic.core.resources.remove
 import org.meshtastic.core.resources.remote_shell_open
 import org.meshtastic.core.resources.remote_shell_open_description
 import org.meshtastic.core.resources.session_active
 import org.meshtastic.core.resources.session_refresh_required
-import org.meshtastic.core.resources.short_name
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.ForkLeft
@@ -152,7 +124,7 @@ fun AdministrationSection(
 
                     if (sessionStatus is SessionStatus.Active) {
                         SectionDivider()
-                        RemoteNodeManagementCard(
+                        RemoteNodeManagementPanel(
                             destNum = node.num,
                             isEnsuringSession = isEnsuringSession,
                             onAction = onAction,
@@ -249,128 +221,6 @@ private fun RemoteAdminListItem(
     }
 }
 
-private enum class RemoteNodeListType {
-    FAVORITE,
-    IGNORE,
-}
-
-/**
- * Lets the user, while an admin session with [destNum] is active, tell that remote radio to favorite or ignore a node
- * by its numeric ID — the target node need not be in the local node DB, since this command is administered entirely on
- * the remote radio's own node database over the mesh.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun RemoteNodeManagementCard(destNum: Int, isEnsuringSession: Boolean, onAction: (NodeDetailAction) -> Unit) {
-    val targetIdState = rememberTextFieldState("")
-    val longNameState = rememberTextFieldState("")
-    val shortNameState = rememberTextFieldState("")
-    // Accept the app's standard hex node ID format ("!a1b2c3d4", with or without the "!") — matches how IDs are
-    // displayed everywhere else in the app, rather than a raw decimal number the user would have to convert by hand.
-    val targetNodeNum = NodeAddress.idToNum(targetIdState.text.toString())
-    // Which list on the remote radio we're operating on. Chosen explicitly, then Add/Remove performs the action
-    // against it — there's no way to read the remote radio's current state first (the admin protocol only exposes
-    // set/unset — no getter), so the app can't offer a toggle reflecting the real current state.
-    var listType by remember { mutableStateOf(RemoteNodeListType.FAVORITE) }
-
-    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        OutlinedTextField(
-            state = targetIdState,
-            labelPosition = TextFieldLabelPosition.Above(),
-            lineLimits = TextFieldLineLimits.SingleLine,
-            label = { Text(stringResource(Res.string.node_id)) },
-            placeholder = { Text("!a1b2c3d4") },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            enabled = !isEnsuringSession,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
-            SegmentedButton(
-                shape = SegmentedButtonDefaults.itemShape(0, 2),
-                onClick = { listType = RemoteNodeListType.FAVORITE },
-                selected = listType == RemoteNodeListType.FAVORITE,
-                enabled = !isEnsuringSession,
-                label = { Text(stringResource(Res.string.favorite)) },
-            )
-            SegmentedButton(
-                shape = SegmentedButtonDefaults.itemShape(1, 2),
-                onClick = { listType = RemoteNodeListType.IGNORE },
-                selected = listType == RemoteNodeListType.IGNORE,
-                enabled = !isEnsuringSession,
-                label = { Text(stringResource(Res.string.ignore)) },
-            )
-        }
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-        ) {
-            Button(
-                modifier = Modifier.weight(1f),
-                enabled = !isEnsuringSession && targetNodeNum != null,
-                onClick = {
-                    val id = targetNodeNum ?: return@Button
-                    when (listType) {
-                        RemoteNodeListType.FAVORITE -> onAction(NodeDetailAction.SetRemoteFavorite(destNum, id, true))
-                        RemoteNodeListType.IGNORE -> onAction(NodeDetailAction.SetRemoteIgnored(destNum, id, true))
-                    }
-                },
-            ) {
-                Text(stringResource(Res.string.add))
-            }
-            Button(
-                modifier = Modifier.weight(1f),
-                enabled = !isEnsuringSession && targetNodeNum != null,
-                onClick = {
-                    val id = targetNodeNum ?: return@Button
-                    when (listType) {
-                        RemoteNodeListType.FAVORITE -> onAction(NodeDetailAction.SetRemoteFavorite(destNum, id, false))
-                        RemoteNodeListType.IGNORE -> onAction(NodeDetailAction.SetRemoteIgnored(destNum, id, false))
-                    }
-                },
-            ) {
-                Text(stringResource(Res.string.remove))
-            }
-        }
-
-        // Manual contact add is a separate action from Favorite/Ignore above — the admin protocol has no
-        // "remove contact" counterpart, so it doesn't fit the Add/Remove button pair and gets its own row.
-        SectionDivider()
-        OutlinedTextField(
-            state = longNameState,
-            labelPosition = TextFieldLabelPosition.Above(),
-            lineLimits = TextFieldLineLimits.SingleLine,
-            label = { Text(stringResource(Res.string.long_name)) },
-            enabled = !isEnsuringSession,
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-        )
-        OutlinedTextField(
-            state = shortNameState,
-            labelPosition = TextFieldLabelPosition.Above(),
-            lineLimits = TextFieldLineLimits.SingleLine,
-            label = { Text(stringResource(Res.string.short_name)) },
-            enabled = !isEnsuringSession,
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-        )
-        Button(
-            enabled = !isEnsuringSession && targetNodeNum != null && longNameState.text.isNotBlank(),
-            onClick = {
-                val id = targetNodeNum ?: return@Button
-                onAction(
-                    NodeDetailAction.AddRemoteContact(
-                        destNum,
-                        id,
-                        longNameState.text.toString(),
-                        shortNameState.text.toString(),
-                    ),
-                )
-            },
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-        ) {
-            Text(stringResource(Res.string.add_contact))
-        }
-    }
-}
-
 /** The GPIO card: its title row has an info icon that opens a short setup guide. */
 @Composable
 private fun GpioSection(node: Node, onAction: (NodeDetailAction) -> Unit) {
@@ -396,88 +246,9 @@ private fun GpioSection(node: Node, onAction: (NodeDetailAction) -> Unit) {
         },
     ) {
         Column {
-            RemoteHardwareCard(destNum = node.num, onAction = onAction)
+            GpioPanel(node = node, onAction = onAction)
             SectionDivider()
-            QuickCommandsCard(node = node, onAction = onAction)
-        }
-    }
-}
-
-/**
- * Remote Hardware module control: type a GPIO pin number, the app computes the bit mask (`1 shl pin`, matching
- * https://meshtastic.org/docs/configuration/module/remote-hardware/#masks), and On/Off/Read send the corresponding
- * WRITE_GPIOS/READ_GPIOS command to [destNum]. Requires the Remote Hardware module enabled and a shared channel on both
- * ends — the app can't verify that from here, so a failed command surfaces only as "no response" on Read.
- */
-@Composable
-private fun RemoteHardwareCard(destNum: Int, onAction: (NodeDetailAction) -> Unit) {
-    val pinState: TextFieldState = rememberTextFieldState("")
-    val pinNumber = pinState.text.toString().toIntOrNull()
-    val gpioMask = pinNumber?.takeIf { it in 0..62 }?.let { 1L shl it }
-
-    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        OutlinedTextField(
-            state = pinState,
-            labelPosition = TextFieldLabelPosition.Above(),
-            lineLimits = TextFieldLineLimits.SingleLine,
-            label = { Text(stringResource(Res.string.gpio_pin)) },
-            supportingText =
-            gpioMask?.let { mask ->
-                { Text(stringResource(Res.string.gpio_mask_display, "0x" + mask.toString(16))) }
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-            modifier = Modifier.fillMaxWidth(),
-        )
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-        ) {
-            Button(
-                modifier = Modifier.weight(1f),
-                enabled = gpioMask != null,
-                onClick = { gpioMask?.let { onAction(NodeDetailAction.WriteGpio(destNum, it, it)) } },
-            ) {
-                Text(stringResource(Res.string.gpio_on))
-            }
-            Button(
-                modifier = Modifier.weight(1f),
-                enabled = gpioMask != null,
-                onClick = { gpioMask?.let { onAction(NodeDetailAction.WriteGpio(destNum, it, 0L)) } },
-            ) {
-                Text(stringResource(Res.string.gpio_off))
-            }
-            Button(
-                modifier = Modifier.weight(1f),
-                enabled = gpioMask != null,
-                onClick = { gpioMask?.let { onAction(NodeDetailAction.ReadGpio(destNum, it)) } },
-            ) {
-                Text(stringResource(Res.string.gpio_read))
-            }
-        }
-    }
-}
-
-/**
- * Quick preset text commands sent as a private message to [node] — independent of the normal chat entry point, so these
- * work even for nodes whose role would otherwise hide "Message" from their menu (see [isUnmessageableRole]). Enabled
- * only once we've exchanged a valid public key with [node] ([Node.hasPKC] && ![Node.mismatchKey]), so the command
- * actually goes out PKI-encrypted rather than silently falling back to weaker channel encryption.
- */
-@Composable
-private fun QuickCommandsCard(node: Node, onAction: (NodeDetailAction) -> Unit) {
-    val canSend = node.hasPKC && !node.mismatchKey
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-    ) {
-        listOf("/ping", "/hello", "/test").forEach { command ->
-            Button(
-                modifier = Modifier.weight(1f),
-                enabled = canSend,
-                onClick = { onAction(NodeDetailAction.SendQuickMessage(node, command)) },
-            ) {
-                Text(command)
-            }
+            QuickCommandsPanel(node = node, onAction = onAction)
         }
     }
 }
