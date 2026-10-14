@@ -404,27 +404,20 @@ private fun NodeMetricHero(uiState: NodeMetricDetailUiState) {
             latest
         }
     val noiseRaw = uiState.series.firstOrNull { it.label == "Noise Floor" }?.latestValue
-    // A node without any SNR (our own device) is judged by its noise floor; the ring shows how quiet the band is.
+    // The signal tab shows the noise floor, so the verdict and the ring follow it; without one the SNR decides.
     val level =
-        if (uiState.metric == NetworkHealthMetric.SIGNAL && verdictValue == null && noiseRaw != null) {
+        if (uiState.metric == NetworkHealthMetric.SIGNAL && noiseRaw != null) {
             noiseFloorLevel(noiseRaw)
         } else {
             headlineLevel(uiState.metric, verdictValue)
         }
     val gaugeFraction =
-        if (uiState.metric == NetworkHealthMetric.SIGNAL && verdictValue == null && noiseRaw != null) {
+        if (uiState.metric == NetworkHealthMetric.SIGNAL && noiseRaw != null) {
             ((NOISE_RING_MAX - noiseRaw) / NOISE_RING_RANGE).coerceIn(0f, 1f)
         } else {
             gaugeFraction(uiState.metric, verdictValue)
         }
     val accent = if (level == HealthLevel.UNKNOWN) MaterialTheme.colorScheme.primary else level.color()
-    // The big number is the noise floor on the signal tab, so it is coloured by that value (the lower, the better).
-    val valueColor =
-        if (uiState.metric == NetworkHealthMetric.SIGNAL && headline?.label == "Noise Floor" && latest != null) {
-            noiseFloorLevel(latest).color()
-        } else {
-            accent
-        }
     val base = MaterialTheme.colorScheme.surfaceContainer
 
     Card(
@@ -455,7 +448,7 @@ private fun NodeMetricHero(uiState: NodeMetricDetailUiState) {
                     if (headline != null && latest != null) formatSeriesValue(headline.label, latest) else "—",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
-                    color = valueColor,
+                    color = accent,
                 )
                 if (level != HealthLevel.UNKNOWN) {
                     Row(

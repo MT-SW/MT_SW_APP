@@ -19,7 +19,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 ### Październik 2026
 
 **Zdrowie sieci — kolor szumu tła**
-* Zakładka Sygnał: liczba (szum tła) ma teraz własny kolor — im niższa wartość (większy minus), tym lepiej. Progi jak w „Jakości sygnału”: poniżej −100 dBm złoty, od −100 do −90 dBm czerwony, od −90 do −80 dBm fioletowy, wyżej biały. Pasek i tło wiersza dalej wynikają z SNR.
+* Zakładka Sygnał: liczba (szum tła) ma teraz własny kolor — im niższa wartość (większy minus), tym lepiej. Progi jak w „Jakości sygnału”: poniżej −100 dBm złoty, od −100 do −90 dBm czerwony, od −90 do −80 dBm fioletowy, wyżej biały. Pasek, tło wiersza, wykres i ocena „Kondycji sieci” wynikają z tej samej wartości; dopiero gdy węzeł nie wysyła szumu, ocenia go SNR.
 * Szum jest oceniany po korekcie LNA węzła (wcześniej kolor liczył się z wartości przed korektą, więc nie zgadzał się z tym, co widać). Dotyczy listy, szczegółów węzła i wykresu z progami.
 
 **Sygnał WiFi urządzenia w „Jakości sygnału” i „Zdrowiu sieci”**
@@ -203,7 +203,7 @@ The entries below describe only what this fork adds on top of the original, from
 ### October 2026
 
 **Network Health — noise floor colour**
-* Signal tab: the number (noise floor) now has its own colour — the lower the value (the bigger the minus), the better. Limits as in "Signal quality": below −100 dBm gold, −100 to −90 dBm red, −90 to −80 dBm purple, higher white. The bar and the row tint still follow the SNR.
+* Signal tab: the number (noise floor) now has its own colour — the lower the value (the bigger the minus), the better. Limits as in "Signal quality": below −100 dBm gold, −100 to −90 dBm red, −90 to −80 dBm purple, higher white. The bar, the row tint, the chart and the "Network health" rating follow the same value; only a node that sends no noise floor is rated by its SNR.
 * The noise is judged after the node's LNA correction (before, the colour was computed from the uncorrected value, so it did not match what is shown). This covers the list, the node detail and the chart with limits.
 
 **Device WiFi signal in "Signal quality" and "Network Health"**

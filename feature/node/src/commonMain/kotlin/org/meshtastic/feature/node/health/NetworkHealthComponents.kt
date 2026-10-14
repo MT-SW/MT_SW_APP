@@ -110,6 +110,8 @@ private const val SPARKLINE_STROKE_PX = 3f
 private const val SPARKLINE_DOT_RADIUS_PX = 5f
 
 // Range of the SNR bar and the neighbor-count bar: the bar is full at the top of its range.
+private const val NOISE_BAR_MIN = -130f
+private const val NOISE_BAR_MAX = -60f
 private const val SNR_BAR_MIN = -20f
 private const val SNR_BAR_MAX = 10f
 private const val NEIGHBOR_BAR_MAX = 6f
@@ -390,11 +392,7 @@ internal fun NodeHealthRow(
     val accent = level.color()
     val base = MaterialTheme.colorScheme.surfaceContainer
     val container = if (level == HealthLevel.UNKNOWN) base else accent.copy(alpha = ROW_TINT_ALPHA).compositeOver(base)
-    // The big number of the signal tab is the noise floor: it gets its own colour (the lower, the better), while the
-    // bar and the row tint keep following the SNR.
-    val valueLevel =
-        if (metric == NetworkHealthMetric.SIGNAL) node.noiseFloor?.let(::noiseFloorLevel) ?: level else level
-    val valueColor = if (valueLevel == HealthLevel.UNKNOWN) MaterialTheme.colorScheme.onSurface else valueLevel.color()
+    val valueColor = if (level == HealthLevel.UNKNOWN) MaterialTheme.colorScheme.onSurface else accent
     // The history already holds the noise floor after the LNA correction.
     val shownValue = node.valueFor(metric)
 
@@ -471,7 +469,7 @@ internal fun NodeHealthRow(
                             color = valueColor,
                         )
                         Text(
-                            text = stringResource(valueLevel.labelRes),
+                            text = stringResource(level.labelRes),
                             style = MaterialTheme.typography.labelSmall,
                             color = valueColor,
                         )
@@ -530,7 +528,10 @@ private fun NetworkHealthMetric.barFraction(node: NodeHealthInfo): Float? = when
             node.batteryLevel?.let { it / PERCENT.toFloat() }
         }
 
-    NetworkHealthMetric.SIGNAL -> node.snr?.let { (it - SNR_BAR_MIN) / (SNR_BAR_MAX - SNR_BAR_MIN) }
+    // Full bar = quiet band (-130 dBm), empty = very noisy; a node without a noise floor falls back to its SNR.
+    NetworkHealthMetric.SIGNAL ->
+        node.noiseFloor?.let { ((NOISE_BAR_MAX - it) / (NOISE_BAR_MAX - NOISE_BAR_MIN)).coerceIn(0f, 1f) }
+            ?: node.snr?.let { (it - SNR_BAR_MIN) / (SNR_BAR_MAX - SNR_BAR_MIN) }
     NetworkHealthMetric.ETHER -> node.channelUtilization?.let { it / PERCENT }
     NetworkHealthMetric.NEIGHBORS -> node.neighborCount?.let { it / NEIGHBOR_BAR_MAX }
     NetworkHealthMetric.ENVIRONMENT,
