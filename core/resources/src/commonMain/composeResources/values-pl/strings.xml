@@ -2651,6 +2651,14 @@
     <string name="remote_remove_from_list">Usuń z listy</string>
     <string name="remote_contact_title">Dodaj kontakt zdalnie</string>
     <string name="remote_contact_hint">Zapisuje nazwę i ID w liście węzłów zdalnego urządzenia, używając ID wpisanego wyżej.</string>
+    <string name="on_demand_share">Udostępnij</string>
+    <string name="on_demand_export">Zapisz do pliku</string>
+    <string name="on_demand_export_pdf">Zapisz jako PDF</string>
+    <string name="on_demand_export_html">Zapisz jako stronę HTML</string>
+    <string name="on_demand_export_markdown">Zapisz jako Markdown</string>
+    <string name="on_demand_export_text">Zapisz jako tekst</string>
+    <string name="on_demand_export_csv">Zapisz jako CSV (arkusz)</string>
+    <string name="on_demand_received_label">Odebrano</string>
     <string name="on_demand_hero_hint">Zapytaj węzeł, jak się czuje. Odpowiedzi przychodzą po chwili, a ostatnie zostają na ekranie.</string>
     <string name="on_demand_ask">Zapytaj</string>
     <string name="on_demand_no_answer">Brak odpowiedzi</string>

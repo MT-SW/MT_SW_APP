@@ -36,14 +36,20 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -71,6 +77,12 @@ import org.meshtastic.core.resources.on_demand_channel_utilization
 import org.meshtastic.core.resources.on_demand_cpu_usage
 import org.meshtastic.core.resources.on_demand_exchange_log
 import org.meshtastic.core.resources.on_demand_exchange_log_desc
+import org.meshtastic.core.resources.on_demand_export
+import org.meshtastic.core.resources.on_demand_export_csv
+import org.meshtastic.core.resources.on_demand_export_html
+import org.meshtastic.core.resources.on_demand_export_markdown
+import org.meshtastic.core.resources.on_demand_export_pdf
+import org.meshtastic.core.resources.on_demand_export_text
 import org.meshtastic.core.resources.on_demand_firmware_version
 import org.meshtastic.core.resources.on_demand_flash
 import org.meshtastic.core.resources.on_demand_flood_counter
@@ -108,6 +120,7 @@ import org.meshtastic.core.resources.on_demand_rx_avg_time
 import org.meshtastic.core.resources.on_demand_rx_avg_time_desc
 import org.meshtastic.core.resources.on_demand_rx_packet_history
 import org.meshtastic.core.resources.on_demand_rx_packet_history_desc
+import org.meshtastic.core.resources.on_demand_share
 import org.meshtastic.core.resources.on_demand_snr
 import org.meshtastic.core.resources.on_demand_stat_nodes_online
 import org.meshtastic.core.resources.on_demand_stat_nodes_total
@@ -170,6 +183,7 @@ import org.meshtastic.core.ui.icon.Chart
 import org.meshtastic.core.ui.icon.CheckCircle
 import org.meshtastic.core.ui.icon.ChevronRight
 import org.meshtastic.core.ui.icon.DataArray
+import org.meshtastic.core.ui.icon.Download
 import org.meshtastic.core.ui.icon.ErrorOutline
 import org.meshtastic.core.ui.icon.History
 import org.meshtastic.core.ui.icon.HopCount
@@ -182,9 +196,12 @@ import org.meshtastic.core.ui.icon.Nodes
 import org.meshtastic.core.ui.icon.Reconnecting
 import org.meshtastic.core.ui.icon.Rssi
 import org.meshtastic.core.ui.icon.Send
+import org.meshtastic.core.ui.icon.Share
 import org.meshtastic.core.ui.icon.Snr
 import org.meshtastic.core.ui.icon.Voltage
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
+import org.meshtastic.core.ui.util.rememberFileExporter
+import org.meshtastic.core.ui.util.rememberShareText
 import org.meshtastic.feature.node.health.BarList
 import org.meshtastic.feature.node.health.ColumnChart
 import org.meshtastic.feature.node.health.DistributionBar
@@ -196,7 +213,13 @@ import org.meshtastic.feature.node.health.ReportBar
 import org.meshtastic.feature.node.health.StatTile
 import org.meshtastic.feature.node.health.color
 import org.meshtastic.feature.node.health.etherLevel
+import org.meshtastic.feature.node.health.generatedStamp
 import org.meshtastic.feature.node.health.snrLevel
+import org.meshtastic.feature.node.health.toCsv
+import org.meshtastic.feature.node.health.toHtml
+import org.meshtastic.feature.node.health.toMarkdown
+import org.meshtastic.feature.node.health.toPdf
+import org.meshtastic.feature.node.health.toPlainText
 import org.meshtastic.proto.NodeStats
 import org.meshtastic.proto.OnDemandType
 import org.meshtastic.proto.Ping
@@ -209,6 +232,21 @@ fun OnDemandLogScreen(viewModel: OnDemandLogViewModel, onNavigateUp: () -> Unit)
     val gold = MaterialTheme.colorScheme.StatusOnline
     val red = HealthLevel.MEDIUM.color()
     val purple = HealthLevel.BAD.color()
+    val report = rememberOnDemandReport(uiState)
+    val hasAnswers = report.sections.isNotEmpty()
+    val share = rememberShareText()
+    var menuOpen by remember { mutableStateOf(false) }
+    val exportPdf = rememberFileExporter(content = { report.copy(generated = generatedStamp()).toPdf() })
+    val exportHtml =
+        rememberFileExporter(content = { report.copy(generated = generatedStamp()).toHtml().encodeToByteArray() })
+    val exportMarkdown =
+        rememberFileExporter(content = { report.copy(generated = generatedStamp()).toMarkdown().encodeToByteArray() })
+    val exportText =
+        rememberFileExporter(content = { report.copy(generated = generatedStamp()).toPlainText().encodeToByteArray() })
+    val exportCsv =
+        rememberFileExporter(content = { report.copy(generated = generatedStamp()).toCsv().encodeToByteArray() })
+    val iconShare = MeshtasticIcons.Share
+    val iconDownload = MeshtasticIcons.Download
 
     Scaffold(
         topBar = {
@@ -219,7 +257,60 @@ fun OnDemandLogScreen(viewModel: OnDemandLogViewModel, onNavigateUp: () -> Unit)
                 showNodeChip = false,
                 canNavigateUp = true,
                 onNavigateUp = onNavigateUp,
-                actions = {},
+                actions = {
+                    IconButton(
+                        enabled = hasAnswers,
+                        onClick = {
+                            val stamped = report.copy(generated = generatedStamp())
+                            share(stamped.toPlainText(), stamped.title)
+                        },
+                    ) {
+                        Icon(imageVector = iconShare, contentDescription = stringResource(Res.string.on_demand_share))
+                    }
+                    IconButton(enabled = hasAnswers, onClick = { menuOpen = true }) {
+                        Icon(
+                            imageVector = iconDownload,
+                            contentDescription = stringResource(Res.string.on_demand_export),
+                        )
+                    }
+                    DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(Res.string.on_demand_export_pdf)) },
+                            onClick = {
+                                menuOpen = false
+                                exportPdf("diagnostyka_na_zadanie.pdf", MIME_PDF)
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(Res.string.on_demand_export_html)) },
+                            onClick = {
+                                menuOpen = false
+                                exportHtml("diagnostyka_na_zadanie.html", MIME_HTML)
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(Res.string.on_demand_export_markdown)) },
+                            onClick = {
+                                menuOpen = false
+                                exportMarkdown("diagnostyka_na_zadanie.md", MIME_MARKDOWN)
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(Res.string.on_demand_export_text)) },
+                            onClick = {
+                                menuOpen = false
+                                exportText("diagnostyka_na_zadanie.txt", MIME_TEXT)
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(Res.string.on_demand_export_csv)) },
+                            onClick = {
+                                menuOpen = false
+                                exportCsv("diagnostyka_na_zadanie.csv", MIME_CSV)
+                            },
+                        )
+                    }
+                },
                 onClickChip = {},
             )
         },
@@ -400,6 +491,11 @@ fun OnDemandLogScreen(viewModel: OnDemandLogViewModel, onNavigateUp: () -> Unit)
     }
 }
 
+private const val MIME_PDF = "application/pdf"
+private const val MIME_HTML = "text/html"
+private const val MIME_MARKDOWN = "text/markdown"
+private const val MIME_TEXT = "text/plain"
+private const val MIME_CSV = "text/csv"
 private const val PORT_BARS = 8
 private const val TINT_ALPHA = 0.14f
 private const val WINDOW_MINUTES = 10
@@ -1090,7 +1186,7 @@ private fun iconForLabel(label: StringResource): ImageVector = when (label) {
 private data class PortInfo(val labelRes: StringResource, val descRes: StringResource)
 
 /** Localized name + description already resolved to display strings. */
-private data class ResolvedPortInfo(val label: String, val description: String)
+internal data class ResolvedPortInfo(val label: String, val description: String)
 
 private val KNOWN_PORTS =
     mapOf(
@@ -1121,7 +1217,7 @@ private val KNOWN_PORTS =
     )
 
 @Composable
-private fun portInfo(port: Int): ResolvedPortInfo {
+internal fun portInfo(port: Int): ResolvedPortInfo {
     val known = KNOWN_PORTS[port]
     if (known != null) return ResolvedPortInfo(stringResource(known.labelRes), stringResource(known.descRes))
     val fallbackLabel =
@@ -1132,7 +1228,7 @@ private fun portInfo(port: Int): ResolvedPortInfo {
 }
 
 @Composable
-private fun nodeStatsRows(stats: NodeStats): List<Pair<StringResource, String>> = buildList {
+internal fun nodeStatsRows(stats: NodeStats): List<Pair<StringResource, String>> = buildList {
     stats.battery_level?.let { add(Res.string.on_demand_battery_level to "$it%") }
     stats.uptime_seconds?.let { add(Res.string.on_demand_uptime to formatDuration(it.toLong())) }
     stats.channel_utilization?.let { add(Res.string.on_demand_channel_utilization to "${formatString("%.2f", it)}%") }
