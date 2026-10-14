@@ -253,7 +253,8 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
                             label = "Szum (średnio)",
                             value = uiState.averageNoiseFloor?.let { "$it dB" } ?: "—",
                             icon = MeshtasticIcons.SignalCellular4Bar,
-                            color = gold,
+                            // Same limits and colours as the signal tab (the average is already after LNA).
+                            color = uiState.averageNoiseFloor?.let { noiseFloorLevel(it.toFloat()).color() } ?: gold,
                             modifier = Modifier.weight(1f),
                         )
                         StatTile(

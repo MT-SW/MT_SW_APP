@@ -108,6 +108,7 @@ import org.meshtastic.core.ui.theme.GraphColors.Gold
 import org.meshtastic.core.ui.theme.GraphColors.Green
 import org.meshtastic.core.ui.theme.GraphColors.Orange
 import org.meshtastic.core.ui.theme.GraphColors.Red
+import org.meshtastic.core.ui.theme.StatusColors.StatusConnecting
 import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
@@ -118,7 +119,8 @@ import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.Telemetry
 
 private const val QUIET_NOISE_FLOOR_DBM = -100
-private const val BUSY_FLOOR_DBM = -85
+private const val BUSY_FLOOR_DBM = -90
+private const val NOISY_FLOOR_DBM = -80
 private const val MIN_DBM_AXIS = -120.0
 private const val MAX_DBM_AXIS = 0.0
 
@@ -592,10 +594,12 @@ private fun SignalMetricsChart(
 @Composable
 private fun noiseFloorTextColor(value: Int?): Color = when {
     value == null -> MaterialTheme.colorScheme.onSurfaceVariant
-    // Palette matches the signal-quality / connection-status colours: gold = quiet, red = busy, purple = very noisy.
+    // Palette matches the signal-quality / connection-status colours: gold = quiet, red = busy, purple = very noisy,
+    // white = worst.
     value < QUIET_NOISE_FLOOR_DBM -> MaterialTheme.colorScheme.StatusOnline
     value < BUSY_FLOOR_DBM -> MaterialTheme.colorScheme.StatusDisconnected
-    else -> MaterialTheme.colorScheme.StatusPurple
+    value < NOISY_FLOOR_DBM -> MaterialTheme.colorScheme.StatusPurple
+    else -> MaterialTheme.colorScheme.StatusConnecting
 }
 
 @Suppress("LongMethod")
