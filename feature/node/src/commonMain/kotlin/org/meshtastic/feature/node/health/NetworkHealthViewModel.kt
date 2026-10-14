@@ -189,7 +189,8 @@ class NetworkHealthViewModel(
                             // The noise floor is judged and shown after the node's LNA gain, like on the signal screen.
                             .let { e ->
                                 val gain = lnaGains[e.num] ?: 0
-                                if (gain == 0 || e.noiseFloor == null) e else e.copy(noiseFloor = e.noiseFloor - gain)
+                                val noise = e.noiseFloor
+                                if (gain == 0 || noise == null) e else e.copy(noiseFloor = noise - gain)
                             }
                     }
                 HistoryBundle(
