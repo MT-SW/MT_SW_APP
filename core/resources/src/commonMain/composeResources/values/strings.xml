@@ -877,7 +877,7 @@
     <string name="good">Good</string>
     <!-- GPIO -->
     <string name="gpio">GPIO</string>
-    <string name="gpio_help_text">1. On the target node, enable the Remote Hardware module and list the pins it may control under Available pins (or allow any pin).\n2. On both devices, yours and the target, create a channel named gpio at position 1 (right after the primary channel at position 0) and set the same key (PSK) on both.\n3. Enter the pin number here and use the buttons: On sets the pin high, Off sets it low, and Read checks its state.\nThe app always sends the commands on the channel at position 1. Without that channel, or without the module enabled, the command will not work and a read shows no response.</string>
+    <string name="gpio_help_text">1. On the target node, enable the Remote Hardware module and list the pins it may control under Available pins (or allow any pin).\n\n2. On both devices, yours and the target, create a channel named gpio at position 1 (right after the primary channel at position 0) and set the same key (PSK) on both.\n\n3. Enter the pin number here and use the buttons: On sets the pin high, Off sets it low, and Read checks its state.\n\nThe app always sends the commands on the channel at position 1. Without that channel, or without the module enabled, the command will not work and a read shows no response.</string>
     <string name="gpio_help_title">How GPIO control works</string>
     <string name="gpio_mask_display">Mask: %1$s</string>
     <string name="gpio_off">Off</string>
@@ -2407,10 +2407,10 @@
     <string name="gpio_pin_title">Pin control</string>
     <string name="gpio_pin_hint">Type a pin number, then switch it on, off, or read its state.</string>
     <string name="gpio_pin_invalid">Enter a pin number from 0 to 62</string>
-    <string name="gpio_action_on">Switch on</string>
-    <string name="gpio_action_off">Switch off</string>
+    <string name="gpio_action_on">Switch on (1)</string>
+    <string name="gpio_action_off">Switch off (0)</string>
     <string name="quick_commands_title">Quick commands</string>
-    <string name="quick_commands_hint">Short test messages sent privately to this node, even when its role hides manual messages. Handy for checking the link and new firmware builds.</string>
+    <string name="quick_commands_hint">Short test messages sent privately to this node, even when its role hides manual messages. Handy for checking the link and new firmware builds. Works only with firmware 2.8.0 or newer.</string>
     <string name="quick_commands_need_keys">Needs an exchange of keys with this node (encrypted private message).</string>
     <string name="quick_cmd_ping_desc">Check that the node answers</string>
     <string name="quick_cmd_hello_desc">Say hello to the node</string>

@@ -975,7 +975,7 @@
     <string name="good">dobry</string>
     <string name="gpio">GPIO</string>
     <string name="gpio_help_title">Jak działa sterowanie GPIO</string>
-    <string name="gpio_help_text">1. Na węźle docelowym włącz moduł „Zdalny sprzęt” (Remote Hardware) i w polu „Dostępne piny” wpisz piny, którymi wolno sterować (albo zezwól na dowolne).\n2. Na obu urządzeniach, Twoim i docelowym, utwórz kanał o nazwie „gpio” na pozycji 1 (zaraz po kanale głównym, który ma pozycję 0) i ustaw na obu ten sam klucz (PSK).\n3. Tutaj wpisz numer pinu i użyj przycisków: 1 włącza pin, 0 wyłącza go, a Odczyt sprawdza jego stan.\nAplikacja zawsze wysyła polecenia kanałem na pozycji 1. Bez tego kanału albo bez włączonego modułu polecenie nie zadziała, a przy odczycie zobaczysz brak odpowiedzi.</string>
+    <string name="gpio_help_text">1. Na węźle docelowym włącz moduł „Zdalny sprzęt” (Remote Hardware) i w polu „Dostępne piny” wpisz piny, którymi wolno sterować (albo zezwól na dowolne).\n\n2. Na obu urządzeniach, Twoim i docelowym, utwórz kanał o nazwie „gpio” na pozycji 1 (zaraz po kanale głównym, który ma pozycję 0) i ustaw na obu ten sam klucz (PSK).\n\n3. Tutaj wpisz numer pinu i użyj przycisków: 1 włącza pin, 0 wyłącza go, a Odczyt sprawdza jego stan.\n\nAplikacja zawsze wysyła polecenia kanałem na pozycji 1. Bez tego kanału albo bez włączonego modułu polecenie nie zadziała, a przy odczycie zobaczysz brak odpowiedzi.</string>
     <string name="gpio_mask_display">Maska: %1$s</string>
     <string name="gpio_off">0</string>
     <string name="gpio_on">1</string>
@@ -2626,10 +2626,10 @@
     <string name="gpio_pin_title">Sterowanie pinem</string>
     <string name="gpio_pin_hint">Wpisz numer pinu, a potem go włącz, wyłącz albo odczytaj jego stan.</string>
     <string name="gpio_pin_invalid">Podaj numer pinu od 0 do 62</string>
-    <string name="gpio_action_on">Włącz</string>
-    <string name="gpio_action_off">Wyłącz</string>
+    <string name="gpio_action_on">Włącz (1)</string>
+    <string name="gpio_action_off">Wyłącz (0)</string>
     <string name="quick_commands_title">Szybkie komendy</string>
-    <string name="quick_commands_hint">Krótkie wiadomości testowe wysyłane prywatnie do tego węzła, także gdy jego rola ukrywa ręczne wiadomości. Przydatne do sprawdzania łączności i nowych wersji firmware.</string>
+    <string name="quick_commands_hint">Krótkie wiadomości testowe wysyłane prywatnie do tego węzła, także gdy jego rola ukrywa ręczne wiadomości. Przydatne do sprawdzania łączności i nowych wersji firmware. Działa dopiero od wersji firmware 2.8.0.</string>
     <string name="quick_commands_need_keys">Wymaga wymiany kluczy z tym węzłem (szyfrowana wiadomość prywatna).</string>
     <string name="quick_cmd_ping_desc">Sprawdź, czy węzeł odpowiada</string>
     <string name="quick_cmd_hello_desc">Przywitaj się z węzłem</string>
