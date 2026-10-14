@@ -2460,5 +2460,6 @@
     <string name="wifi_reason_auth_expired">authentication expired (%1$d)</string>
     <string name="wifi_reason_self">disconnected by the device (%1$d)</string>
     <string name="wifi_reason_other">code %1$d</string>
+    <string name="wifi_export">Save WiFi</string>
 </resources>
 
