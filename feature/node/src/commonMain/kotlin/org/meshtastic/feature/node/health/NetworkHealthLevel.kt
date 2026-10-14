@@ -79,9 +79,10 @@ private const val NEIGHBORS_MEDIUM = 2
 /** This node's verdict in this metric tab; [HealthLevel.UNKNOWN] for tabs without a good/bad limit. */
 internal fun NetworkHealthMetric.levelFor(node: NodeHealthInfo): HealthLevel = when (this) {
     NetworkHealthMetric.POWER -> powerLevel(node)
-    // Verdict from the SNR; a node without any SNR (e.g. our own device) is judged by its noise floor instead.
+    // The signal tab shows the noise floor, so the verdict follows that same number; a node that reports none is
+    // judged by its SNR instead.
     NetworkHealthMetric.SIGNAL ->
-        node.snr?.let(::snrLevel) ?: node.noiseFloor?.let(::noiseFloorLevel) ?: HealthLevel.UNKNOWN
+        node.noiseFloor?.let(::noiseFloorLevel) ?: node.snr?.let(::snrLevel) ?: HealthLevel.UNKNOWN
     NetworkHealthMetric.ETHER -> node.channelUtilization?.let(::etherLevel) ?: HealthLevel.UNKNOWN
     NetworkHealthMetric.NEIGHBORS -> node.neighborCount?.let(::neighborLevel) ?: HealthLevel.UNKNOWN
     NetworkHealthMetric.ENVIRONMENT,
