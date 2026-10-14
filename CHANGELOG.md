@@ -18,6 +18,10 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Zdrowie sieci — filtr po ocenie**
+* Kliknięcie w liczbę w karcie „Kondycja sieci” (np. „3 Źle”) pokazuje na liście tylko węzły z tą oceną; ponowne kliknięcie pokazuje wszystkie. Wybrana ocena jest podświetlona.
+* Każda zakładka (Zasilanie, Sygnał, Eter…) pamięta swój filtr osobno, więc po przełączeniu zakładek każda zachowuje własny wybór.
+
 **Zdrowie sieci — kolor szumu tła**
 * Zakładka Sygnał: liczba (szum tła) ma teraz własny kolor — im niższa wartość (większy minus), tym lepiej. Progi jak w „Jakości sygnału”: poniżej −100 dBm złoty, od −100 do −90 dBm czerwony, od −90 do −80 dBm fioletowy, wyżej biały. Pasek, tło wiersza, wykres i ocena „Kondycji sieci” wynikają z tej samej wartości; dopiero gdy węzeł nie wysyła szumu, ocenia go SNR.
 * Szum jest oceniany po korekcie LNA węzła (wcześniej kolor liczył się z wartości przed korektą, więc nie zgadzał się z tym, co widać). Dotyczy listy, szczegółów węzła i wykresu z progami.
@@ -201,6 +205,10 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Network Health — filter by rating**
+* Tapping a count in the "Network condition" card (e.g. "3 Bad") lists only the nodes with that rating; tapping again shows all. The chosen rating is highlighted.
+* Every tab (Power, Signal, Ether…) keeps its own filter, so each one retains its own choice when you switch tabs.
 
 **Network Health — noise floor colour**
 * Signal tab: the number (noise floor) now has its own colour — the lower the value (the bigger the minus), the better. Limits as in "Signal quality": below −100 dBm gold, −100 to −90 dBm red, −90 to −80 dBm purple, higher white. The bar, the row tint, the chart and the "Network health" rating follow the same value; only a node that sends no noise floor is rated by its SNR.
