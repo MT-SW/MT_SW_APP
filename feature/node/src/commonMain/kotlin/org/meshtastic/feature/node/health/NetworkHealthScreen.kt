@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.meshtastic.core.common.util.MetricFormatter
+import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.icon.Info
@@ -160,7 +161,7 @@ internal fun formatMetricValue(metric: NetworkHealthMetric, value: Float?): Stri
     if (value == null) return "—"
     return when (metric) {
         NetworkHealthMetric.POWER -> MetricFormatter.percent(value.toInt())
-        NetworkHealthMetric.SIGNAL -> MetricFormatter.snr(value)
+        NetworkHealthMetric.SIGNAL -> "${NumberFormatter.format(value, 1)} dB"
         NetworkHealthMetric.ETHER -> MetricFormatter.percent(value, decimalPlaces = 2)
         NetworkHealthMetric.ENVIRONMENT -> MetricFormatter.temperature(value, isFahrenheit = false)
         NetworkHealthMetric.TRAFFIC -> "${value.toInt()}"

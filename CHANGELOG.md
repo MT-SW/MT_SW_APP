@@ -35,6 +35,10 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Rankingi (najlepszy sygnał, najdłużej działające, najbliżej itd.) pokazane jako paski.
 * Podsumowanie można udostępnić albo zapisać jako PDF, stronę HTML, Markdown, tekst lub CSV (arkusz).
 * Szczegóły węzła: karta z ikoną, wartością w kolorze oceny i wykresem trendu oraz kolorowe karty z min, max i ostatnią wartością.
+* Szczegóły węzła: nowe wykresy (gładka linia, gradient, siatka, dotknięcie pokazuje wartość i godzinę), a ikona ma świecący pierścień wskaźnika.
+* Zdrowie sieci: Sąsiedzi, Ruch i Zasoby pokazują dane zapisane wcześniej (także po ponownym uruchomieniu), a własne urządzenie jest liczone w Sąsiadach.
+* Szczegóły węzła: cztery sposoby pokazania tych samych danych do wyboru — Linia (z kolorowymi strefami), Zegar, Słupki i Mapa cieplna (godziny × dni) — oraz pasek „Czas w każdym stanie” dla baterii, SNR i zajęcia kanału.
+* Zakładka Sygnał pokazuje jako główną wartość poziom szumu (noise floor) po korekcie LNA; kolor nadal wynika z SNR.
 
 **Okna informacyjne**
 * Okna informacyjne w aplikacji pojawiają się rzadziej, w losowych odstępach; termin jest zapamiętywany trwale.
@@ -181,6 +185,10 @@ The entries below describe only what this fork adds on top of the original, from
 * Rankings (best signal, longest running, closest and so on) are shown as bars.
 * The summary can be shared or saved as PDF, an HTML page, Markdown, text or CSV (spreadsheet).
 * Node details: a card with an icon, the value in the verdict color and a trend chart, plus colored cards with min, max and latest value.
+* Node details: new charts (smooth line, gradient, grid, touching shows the value and time) and the icon has a glowing gauge ring.
+* Network Health: Neighbors, Traffic and Resources show previously saved data (also after a restart), and the own device is counted in Neighbors.
+* Node details: four ways to show the same data to choose from — Line (with colored zones), Gauge, Bars and Heatmap (hours × days) — plus a “Time in each state” strip for battery, SNR and channel use.
+* The Signal tab shows the noise floor after LNA correction as the main value; the color still comes from the SNR.
 
 **Help and documentation in Polish**
 * All in-app documentation (User Guide and Developer Guide, 36 pages) translated into Polish, including page names; the documentation site (docs/pl) is now fully in Polish too.

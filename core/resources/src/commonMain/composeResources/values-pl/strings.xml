@@ -2608,6 +2608,7 @@
     <string name="network_health_hero_title">Kondycja sieci</string>
     <string name="network_health_hero_subtitle">%1$d z %2$d węzłów w dobrym stanie</string>
     <string name="network_health_hero_no_data">W tej zakładce nie ma jeszcze danych</string>
+    <string name="network_health_hero_reporting">%1$d z %2$d węzłów raportuje dane</string>
     <string name="network_health_online">Online %1$d / %2$d</string>
     <string name="network_health_level_good">Dobrze</string>
     <string name="network_health_level_medium">Średnio</string>
@@ -2618,7 +2619,7 @@
     <string name="network_health_info_title">Jak czytać kolory</string>
     <string name="network_health_info_intro">Kolor pokazuje, jak węzeł wypada w wybranej zakładce. Te same kolory są w całej aplikacji przy jakości sygnału i baterii. Kolor nigdy nie jest jedyną wskazówką: obok zawsze jest opis słowny.</string>
     <string name="network_health_info_power">Zasilanie. Dobrze: 50 proc. baterii lub więcej albo zasilanie zewnętrzne. Średnio: 20 do 49 proc. Źle: 5 do 19 proc. Bardzo źle: poniżej 5 proc.</string>
-    <string name="network_health_info_signal">Sygnał (SNR ostatniego bezpośredniego odbioru). Dobrze: 0 dB lub więcej. Średnio: od -7,5 do 0 dB. Źle: od -15 do -7,5 dB. Bardzo źle: poniżej -15 dB.</string>
+    <string name="network_health_info_signal">Sygnał (SNR ostatniego bezpośredniego odbioru). Dobrze: 0 dB lub więcej. Średnio: od -7,5 do 0 dB. Źle: od -15 do -7,5 dB. Bardzo źle: poniżej -15 dB. Duża liczba to poziom szumu (po korekcie LNA, jeśli ustawiona); kolor wynika z SNR.</string>
     <string name="network_health_info_ether">Eter (zajętość kanału). Dobrze: poniżej 15 proc. Średnio: 15 do 25 proc. Źle: 25 do 40 proc. Bardzo źle: 40 proc. lub więcej.</string>
     <string name="network_health_info_neighbors">Sąsiedzi (ile węzłów słyszy dany węzeł). Dobrze: 3 lub więcej. Średnio: 2. Źle: 1. Bardzo źle: 0, węzeł jest odizolowany.</string>
     <string name="network_health_info_none">W tej zakładce nie ma kolorów, bo jej wartości nie mają jednej granicy między dobrym a złym.</string>
