@@ -79,7 +79,9 @@ private const val NEIGHBORS_MEDIUM = 2
 /** This node's verdict in this metric tab; [HealthLevel.UNKNOWN] for tabs without a good/bad limit. */
 internal fun NetworkHealthMetric.levelFor(node: NodeHealthInfo): HealthLevel = when (this) {
     NetworkHealthMetric.POWER -> powerLevel(node)
-    NetworkHealthMetric.SIGNAL -> node.snr?.let(::snrLevel) ?: HealthLevel.UNKNOWN
+    // Verdict from the SNR; a node without any SNR (e.g. our own device) is judged by its noise floor instead.
+    NetworkHealthMetric.SIGNAL ->
+        node.snr?.let(::snrLevel) ?: node.noiseFloor?.let(::noiseFloorLevel) ?: HealthLevel.UNKNOWN
     NetworkHealthMetric.ETHER -> node.channelUtilization?.let(::etherLevel) ?: HealthLevel.UNKNOWN
     NetworkHealthMetric.NEIGHBORS -> node.neighborCount?.let(::neighborLevel) ?: HealthLevel.UNKNOWN
     NetworkHealthMetric.ENVIRONMENT,
@@ -105,6 +107,18 @@ internal fun snrLevel(snr: Float): HealthLevel = when {
     snr >= SNR_BAD -> HealthLevel.BAD
     else -> HealthLevel.CRITICAL
 }
+
+/** Noise floor in dBm (raw, before any LNA correction): the lower, the quieter the band. */
+internal fun noiseFloorLevel(dbm: Float): HealthLevel = when {
+    dbm <= NOISE_GOOD -> HealthLevel.GOOD
+    dbm <= NOISE_MEDIUM -> HealthLevel.MEDIUM
+    dbm <= NOISE_BAD -> HealthLevel.BAD
+    else -> HealthLevel.CRITICAL
+}
+
+private const val NOISE_GOOD = -110f
+private const val NOISE_MEDIUM = -100f
+private const val NOISE_BAD = -90f
 
 internal fun etherLevel(utilization: Float): HealthLevel = when {
     utilization < ETHER_GOOD -> HealthLevel.GOOD

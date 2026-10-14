@@ -399,8 +399,20 @@ private fun NodeMetricHero(uiState: NodeMetricDetailUiState) {
         } else {
             latest
         }
-    val level = headlineLevel(uiState.metric, verdictValue)
-    val gaugeFraction = gaugeFraction(uiState.metric, verdictValue)
+    val noiseRaw = uiState.series.firstOrNull { it.label == "Noise Floor" }?.latestValue
+    // A node without any SNR (our own device) is judged by its noise floor; the ring shows how quiet the band is.
+    val level =
+        if (uiState.metric == NetworkHealthMetric.SIGNAL && verdictValue == null && noiseRaw != null) {
+            noiseFloorLevel(noiseRaw)
+        } else {
+            headlineLevel(uiState.metric, verdictValue)
+        }
+    val gaugeFraction =
+        if (uiState.metric == NetworkHealthMetric.SIGNAL && verdictValue == null && noiseRaw != null) {
+            ((NOISE_RING_MAX - noiseRaw) / NOISE_RING_RANGE).coerceIn(0f, 1f)
+        } else {
+            gaugeFraction(uiState.metric, verdictValue)
+        }
     val accent = if (level == HealthLevel.UNKNOWN) MaterialTheme.colorScheme.primary else level.color()
     val base = MaterialTheme.colorScheme.surfaceContainer
 
@@ -457,6 +469,8 @@ private fun NodeMetricHero(uiState: NodeMetricDetailUiState) {
     }
 }
 
+private const val NOISE_RING_MAX = -80f
+private const val NOISE_RING_RANGE = 50f
 private const val SNR_GAUGE_MIN = -20f
 private const val SNR_GAUGE_RANGE = 30f
 private const val PERCENT_MAX = 100f

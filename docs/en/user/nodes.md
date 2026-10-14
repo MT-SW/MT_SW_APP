@@ -45,6 +45,42 @@ There is no separate "away" tier, but the orange unreachable state takes precede
 green one: a node can be online and still be unreachable on your current settings. Nodes known
 only over MQTT are never shown as unreachable.
 
+### Battery colors on the list
+
+The battery level on the node list is colored so you can see the power situation at a glance. The colors are the same as everywhere else in the app:
+
+| Color | Battery level | Meaning |
+|-------|---------------|---------|
+| Gold | 50% and above (and external power) | Good |
+| Red | 20% to 49% | Fair: time to think about charging |
+| Purple | below 20% | Low: the node may soon drop off the network |
+
+A node on external power (adapter, solar panel) shows as fully charged.
+
+### Network Health and colors
+
+The **Network Health** screen shows how all nodes are doing at once. At the top is a ring with the share of nodes in good shape, the number of nodes in each state and how many are online. Every tab (Power, Signal, Ether, Environment, Resources, Traffic, Neighbors) has an icon in the color of the worst node on that tab.
+
+| Color | Meaning |
+|-------|---------|
+| Gold | Good |
+| Red | Fair |
+| Purple | Poor |
+| White (black on a light theme) | Very poor |
+| Gray | No data to judge |
+
+Limits on each tab:
+
+- **Power**: good: 50% or more, or external power; fair: 20-49%; poor: 5-19%; very poor: below 5%.
+- **Signal**: the color comes from the SNR of the last direct reception: good from 0 dB; fair from -7.5 to 0 dB; poor from -15 to -7.5 dB; very poor below -15 dB. A node without any SNR (for example your own) is judged by its noise floor: up to -110 dBm good, up to -100 fair, up to -90 poor, above that very poor. The big number on the list is the noise floor, after LNA correction if one is set.
+- **Ether** (channel utilization): good: below 15%; fair: 15-25%; poor: 25-40%; very poor: 40% and more.
+- **Neighbors**: good: 3 or more; fair: 2; poor: 1; very poor: 0.
+- **Environment, Resources, Traffic**: no color verdict; the card shows how many nodes report data.
+
+The **Problems only** button keeps only the nodes judged poor or very poor. The (i) button in the top bar reminds you of these colors and limits for the selected tab.
+
+Tapping a node opens its details. There you can see the same data in four ways: **Line** (with colored zones), **Gauge**, **Bars** and **Heatmap**, and for battery, SNR and channel utilization also a **Time in each state** strip. The **Summary** icon in the top bar opens an overall network summary with charts; you can share it or save it as PDF, an HTML page, Markdown, text or CSV.
+
 ### Node roles
 
 Nodes can be configured with different roles that affect their mesh behavior:

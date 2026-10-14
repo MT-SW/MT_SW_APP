@@ -48,6 +48,12 @@ enum class NetworkHealthSortField {
     LAST_HEARD,
 }
 
+private fun List<org.meshtastic.core.model.NodeMetricsHistoryEntry>.latestSnr(): Float? =
+    filter { it.snr != null }.maxByOrNull { it.timestamp }?.snr
+
+private fun List<org.meshtastic.core.model.NodeMetricsHistoryEntry>.latestNoiseFloor(): Float? =
+    filter { it.noiseFloor != null }.maxByOrNull { it.timestamp }?.noiseFloor?.toFloat()
+
 private data class HistoryBundle(
     val entries: List<org.meshtastic.core.model.NodeMetricsHistoryEntry>,
     val myNodeNum: Int?,
@@ -84,6 +90,8 @@ data class NodeHealthInfo(
     val barometricPressure: Float?,
     val metricHistory: List<Float> = emptyList(),
     val neighborCount: Int? = null,
+    /** Latest noise floor in dBm (raw), from the last 24 hours of telemetry. */
+    val noiseFloor: Float? = null,
 ) {
     /** Returns this row's value for [metric], or null if that metric has never been reported. */
     fun valueFor(metric: NetworkHealthMetric): Float? = when (metric) {
@@ -217,7 +225,9 @@ class NetworkHealthViewModel(
                         isPowered =
                         node.deviceMetrics.voltage != null &&
                             (node.deviceMetrics.battery_level ?: 0) > BATTERY_POWERED_THRESHOLD,
-                        snr = node.snr.takeIf { it != Float.MAX_VALUE },
+                        // Our own device and nodes heard through a relay have no SNR of their own: use the latest
+                        // direct reading from the last 24 hours instead.
+                        snr = node.snr.takeIf { it != Float.MAX_VALUE } ?: nodeHistory.latestSnr(),
                         rssi = node.rssi.takeIf { it != Int.MAX_VALUE },
                         channelUtilization = node.deviceMetrics.channel_utilization,
                         airUtilTx = node.deviceMetrics.air_util_tx,
@@ -227,6 +237,7 @@ class NetworkHealthViewModel(
                         metricHistory =
                         nodeHistory.sortedBy { it.timestamp }.mapNotNull { metric.historyValue(it) },
                         neighborCount = neighborCountByNode[node.num],
+                        noiseFloor = nodeHistory.latestNoiseFloor(),
                     )
                 }
 
