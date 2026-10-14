@@ -65,6 +65,8 @@ import org.meshtastic.core.ui.icon.Keep
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.VolumeOff
 import org.meshtastic.core.ui.theme.AppTheme
+import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
+import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.proto.ChannelSet
 
 @Suppress("LongMethod")
@@ -122,10 +124,30 @@ private fun ContactHeader(
     modifier: Modifier = Modifier,
     onNodeChipClick: () -> Unit = {},
 ) {
+    // Channels have no node colour: the main channel (index 0) is gold, every other channel red, as in the rest of the
+    // app's palette. Direct messages keep the colour of the node.
+    val nodeColors = contact.nodeColors
+    val isChannel = with(contact.contactKey) { getOrNull(1) == '^' || endsWith("^all") || endsWith("^broadcast") }
+    val channelIndex = if (nodeColors == null && isChannel) ContactKey(contact.contactKey).channelOrNull else null
     val colors =
-        contact.nodeColors?.let {
-            AssistChipDefaults.assistChipColors(labelColor = Color(it.first), containerColor = Color(it.second))
-        } ?: AssistChipDefaults.assistChipColors()
+        when {
+            nodeColors != null ->
+                AssistChipDefaults.assistChipColors(
+                    labelColor = Color(nodeColors.first),
+                    containerColor = Color(nodeColors.second),
+                )
+            channelIndex == 0 ->
+                AssistChipDefaults.assistChipColors(
+                    labelColor = Color.Black,
+                    containerColor = MaterialTheme.colorScheme.StatusOnline,
+                )
+            channelIndex != null ->
+                AssistChipDefaults.assistChipColors(
+                    labelColor = Color.White,
+                    containerColor = MaterialTheme.colorScheme.StatusDisconnected,
+                )
+            else -> AssistChipDefaults.assistChipColors()
+        }
 
     Row(modifier = modifier.padding(0.dp), verticalAlignment = Alignment.CenterVertically) {
         AssistChip(
@@ -146,7 +168,7 @@ private fun ContactHeader(
         )
 
         // Show unlock icon for broadcast with default PSK
-        val isBroadcast = with(contact.contactKey) { getOrNull(1) == '^' || endsWith("^all") || endsWith("^broadcast") }
+        val isBroadcast = isChannel
 
         if (contact.isRetired) {
             // The channel is gone, so there is no key state left to report; say the conversation is archived instead.
