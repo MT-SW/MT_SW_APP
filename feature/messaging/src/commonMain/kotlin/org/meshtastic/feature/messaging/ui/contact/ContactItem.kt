@@ -66,7 +66,6 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.VolumeOff
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
-import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.proto.ChannelSet
 
 @Suppress("LongMethod")
@@ -124,29 +123,21 @@ private fun ContactHeader(
     modifier: Modifier = Modifier,
     onNodeChipClick: () -> Unit = {},
 ) {
-    // Channels have no node colour: the main channel (index 0) is gold, every other channel red, as in the rest of the
-    // app's palette. Direct messages keep the colour of the node.
-    val nodeColors = contact.nodeColors
-    val isChannel = with(contact.contactKey) { getOrNull(1) == '^' || endsWith("^all") || endsWith("^broadcast") }
-    val channelIndex = if (nodeColors == null && isChannel) ContactKey(contact.contactKey).channelOrNull else null
     val colors =
+        contact.nodeColors?.let {
+            AssistChipDefaults.assistChipColors(labelColor = Color(it.first), containerColor = Color(it.second))
+        } ?: AssistChipDefaults.assistChipColors()
+
+    // The name text carries the colour: main channel in the theme colour, other channels red, direct messages the node's colour.
+    val isChannel = with(contact.contactKey) { getOrNull(1) == '^' || endsWith("^all") || endsWith("^broadcast") }
+    val channelIndex = if (isChannel) ContactKey(contact.contactKey).channelOrNull else null
+    val nodeBackground = contact.nodeColors?.second
+    val nameColor =
         when {
-            nodeColors != null ->
-                AssistChipDefaults.assistChipColors(
-                    labelColor = Color(nodeColors.first),
-                    containerColor = Color(nodeColors.second),
-                )
-            channelIndex == 0 ->
-                AssistChipDefaults.assistChipColors(
-                    labelColor = Color.Black,
-                    containerColor = MaterialTheme.colorScheme.StatusOnline,
-                )
-            channelIndex != null ->
-                AssistChipDefaults.assistChipColors(
-                    labelColor = Color.White,
-                    containerColor = MaterialTheme.colorScheme.StatusDisconnected,
-                )
-            else -> AssistChipDefaults.assistChipColors()
+            nodeBackground != null -> Color(nodeBackground)
+            channelIndex == 0 -> MaterialTheme.colorScheme.primary
+            channelIndex != null -> MaterialTheme.colorScheme.StatusDisconnected
+            else -> Color.Unspecified
         }
 
     Row(modifier = modifier.padding(0.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -188,6 +179,7 @@ private fun ContactHeader(
             fontWeight = FontWeight.Medium,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
+            color = nameColor,
             text = contact.longName,
         )
         Text(
