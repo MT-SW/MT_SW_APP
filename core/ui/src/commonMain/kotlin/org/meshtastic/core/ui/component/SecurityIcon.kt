@@ -79,9 +79,10 @@ import org.meshtastic.core.resources.security_icon_insecure_precise_only
 import org.meshtastic.core.resources.security_icon_secure
 import org.meshtastic.core.resources.security_icon_warning_precise_mqtt
 import org.meshtastic.core.ui.theme.AppTheme
-import org.meshtastic.core.ui.theme.StatusColors.StatusGreen
-import org.meshtastic.core.ui.theme.StatusColors.StatusRed
-import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
+import org.meshtastic.core.ui.theme.StatusColors.StatusConnecting
+import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
+import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
+import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.ChannelSettings
 import org.meshtastic.proto.Config.LoRaConfig
@@ -108,47 +109,47 @@ enum class SecurityState(
     @Stable val badgeIcon: DrawableResource? = null,
     @Stable val badgeIconColor: @Composable () -> Color? = { null },
 ) {
-    /** State for a secure channel (green lock). */
+    /** State for a secure channel (gold lock, the app's "good" colour). */
     SECURE(
         icon = Res.drawable.ic_lock,
-        color = { colorScheme.StatusGreen },
+        color = { colorScheme.StatusOnline },
         descriptionResId = Res.string.security_icon_secure,
         helpTextResId = Res.string.security_icon_help_green_lock,
     ),
 
     /**
      * State for an insecure channel, not used for precise location, and MQTT not the primary concern for a higher
-     * warning. (yellow open lock)
+     * warning. (red open lock)
      */
     INSECURE_NO_PRECISE(
         icon = Res.drawable.ic_lock_open,
-        color = { colorScheme.StatusYellow },
+        color = { colorScheme.StatusDisconnected },
         descriptionResId = Res.string.security_icon_insecure_no_precise,
         helpTextResId = Res.string.security_icon_help_yellow_open_lock,
     ),
 
     /**
-     * State for an insecure channel with precise location enabled, but MQTT not causing the highest warning. (red open
+     * State for an insecure channel with precise location enabled, but MQTT not causing the highest warning. (purple open
      * lock)
      */
     INSECURE_PRECISE_ONLY(
         icon = Res.drawable.ic_lock_open,
-        color = { colorScheme.StatusRed },
+        color = { colorScheme.StatusPurple },
         descriptionResId = Res.string.security_icon_insecure_precise_only,
         helpTextResId = Res.string.security_icon_help_red_open_lock,
     ),
 
     /**
-     * State indicating an insecure channel with precise location and MQTT enabled (red open lock with yellow warning
+     * State indicating an insecure channel with precise location and MQTT enabled (purple open lock with a white warning
      * badge).
      */
     INSECURE_PRECISE_MQTT_WARNING(
         icon = Res.drawable.ic_lock_open,
-        color = { colorScheme.StatusRed },
+        color = { colorScheme.StatusPurple },
         descriptionResId = Res.string.security_icon_warning_precise_mqtt,
         helpTextResId = Res.string.security_icon_help_warning_precise_mqtt,
         badgeIcon = Res.drawable.ic_warning,
-        badgeIconColor = { colorScheme.StatusYellow },
+        badgeIconColor = { colorScheme.StatusConnecting },
     ),
 }
 
