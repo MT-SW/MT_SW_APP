@@ -44,7 +44,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Wykresy w szczegółach węzła można oglądać na kilka sposobów (linia, wskaźnik, słupki, mapa cieplna); każdy wybiera ten, który jest dla niego czytelniejszy.
 * Sąsiedzi, ruch i zasoby czytają dane z zapisanych logów (także po restarcie aplikacji); w Sygnale główna wartość to szum tła po korekcie LNA.
 * Kolory sygnału liczone z SNR (a gdy go brak — z szumu tła), także dla węzłów, których nie słychać bezpośrednio; „Kondycja sieci” też to uwzględnia.
-* Pole GPIO i szybkie komendy (/ping, /hello, /test) mają kafelki, sprawdzanie numeru pinu i opis każdej komendy.
+* Pole GPIO i szybkie komendy (/ping, /hello, /test) mają kafelki, sprawdzanie numeru pinu, przyciski „Włącz (1)” / „Wyłącz (0)”, czytelny opis z odstępami i opis każdej komendy z informacją, że działają od firmware 2.8.0.
 * Zdalne zarządzanie (ulubione, ignorowane, dodawanie kontaktu) ma kafelki, sprawdzanie ID węzła i krótkie wyjaśnienia.
 * Diagnostyka na żądanie: karta z przeglądem wszystkich możliwości i licznikiem sprawdzonych, a każde zapytanie ma opis, przycisk „Zapytaj” oraz wynik w kolorach, jako kafelki, wskaźniki, wykresy kołowe i słupkowe.
 * Pomoc listy węzłów tłumaczy kolory baterii oraz kolory w „Zdrowiu sieci”.
@@ -203,7 +203,7 @@ The entries below describe only what this fork adds on top of the original, from
 * Charts in node details can be shown in several ways (line, gauge, bars, heatmap); everyone picks what reads best for them.
 * Neighbors, traffic and resources read their data from the saved logs (also after the app restarts); on Signal the main value is the noise floor after LNA correction.
 * Signal colors are based on SNR (or on the noise floor when SNR is missing), also for nodes that are not heard directly; “Network condition” follows the same rule.
-* The GPIO field and quick commands (/ping, /hello, /test) have tiles, pin number checking and a description of every command.
+* The GPIO field and quick commands (/ping, /hello, /test) have tiles, pin number checking, “Switch on (1)” / “Switch off (0)” buttons, a clearly spaced help text and a description of every command noting they need firmware 2.8.0 or newer.
 * Remote management (favorites, ignored, adding a contact) has tiles, node ID checking and short explanations.
 * On-demand diagnostics: an overview card of all capabilities with a counter of checked ones, and every query has a description, an “Ask” button and a colored result shown as tiles, gauges, donut and bar charts.
 * The node list help explains battery colors and the colors in Network Health.
