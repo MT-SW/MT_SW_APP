@@ -2404,5 +2404,30 @@
     <string name="network_health_info_ether">Ether (channel utilization). Good: below 15 percent. Fair: 15 to 25 percent. Poor: 25 to 40 percent. Very poor: 40 percent or more.</string>
     <string name="network_health_info_neighbors">Neighbors (how many nodes a node hears). Good: 3 or more. Fair: 2. Poor: 1. Very poor: 0, the node is isolated.</string>
     <string name="network_health_info_none">This tab has no colors, because its values have no single good or bad limit.</string>
+    <string name="gpio_pin_title">Pin control</string>
+    <string name="gpio_pin_hint">Type a pin number, then switch it on, off, or read its state.</string>
+    <string name="gpio_pin_invalid">Enter a pin number from 0 to 62</string>
+    <string name="gpio_action_on">Switch on</string>
+    <string name="gpio_action_off">Switch off</string>
+    <string name="quick_commands_title">Quick commands</string>
+    <string name="quick_commands_hint">Short test messages sent privately to this node, even when its role hides manual messages. Handy for checking the link and new firmware builds.</string>
+    <string name="quick_commands_need_keys">Needs an exchange of keys with this node (encrypted private message).</string>
+    <string name="quick_cmd_ping_desc">Check that the node answers</string>
+    <string name="quick_cmd_hello_desc">Say hello to the node</string>
+    <string name="quick_cmd_test_desc">Send a test message</string>
+    <string name="remote_manage_title">Lists and contacts on the remote device</string>
+    <string name="remote_manage_hint">Type the ID of the node you want to manage on the remote device, for example !a1b2c3d4. It does not have to be on your own node list.</string>
+    <string name="remote_id_invalid">This does not look like a node ID (for example !a1b2c3d4)</string>
+    <string name="remote_list_favorites">Favorites</string>
+    <string name="remote_list_ignored">Ignored</string>
+    <string name="remote_add_to_list">Add to list</string>
+    <string name="remote_remove_from_list">Remove from list</string>
+    <string name="remote_contact_title">Add a contact remotely</string>
+    <string name="remote_contact_hint">Saves the name and ID in the node list of the remote device, using the ID typed above.</string>
+    <string name="on_demand_hero_hint">Ask the node how it is doing. Answers arrive after a moment, and the last ones stay on screen.</string>
+    <string name="on_demand_ask">Ask</string>
+    <string name="on_demand_no_answer">No answer yet</string>
+    <string name="on_demand_no_errors">No routing errors reported</string>
+    <string name="on_demand_hero_progress">%1$d of %2$d checked</string>
 </resources>
 

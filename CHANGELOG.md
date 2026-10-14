@@ -40,6 +40,15 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Szczegóły węzła: cztery sposoby pokazania tych samych danych do wyboru — Linia (z kolorowymi strefami), Zegar, Słupki i Mapa cieplna (godziny × dni) — oraz pasek „Czas w każdym stanie” dla baterii, SNR i zajęcia kanału.
 * Zakładka Sygnał pokazuje jako główną wartość poziom szumu (noise floor) po korekcie LNA; kolor nadal wynika z SNR.
 
+**Szczegóły węzła i diagnostyka — nowy wygląd**
+* Wykresy w szczegółach węzła można oglądać na kilka sposobów (linia, wskaźnik, słupki, mapa cieplna); każdy wybiera ten, który jest dla niego czytelniejszy.
+* Sąsiedzi, ruch i zasoby czytają dane z zapisanych logów (także po restarcie aplikacji); w Sygnale główna wartość to szum tła po korekcie LNA.
+* Kolory sygnału liczone z SNR (a gdy go brak — z szumu tła), także dla węzłów, których nie słychać bezpośrednio; „Kondycja sieci” też to uwzględnia.
+* Pole GPIO i szybkie komendy (/ping, /hello, /test) mają kafelki, sprawdzanie numeru pinu i opis każdej komendy.
+* Zdalne zarządzanie (ulubione, ignorowane, dodawanie kontaktu) ma kafelki, sprawdzanie ID węzła i krótkie wyjaśnienia.
+* Diagnostyka na żądanie: karta z przeglądem wszystkich możliwości i licznikiem sprawdzonych, a każde zapytanie ma opis, przycisk „Zapytaj” oraz wynik w kolorach, jako kafelki, wskaźniki, wykresy kołowe i słupkowe.
+* Pomoc listy węzłów tłumaczy kolory baterii oraz kolory w „Zdrowiu sieci”.
+
 **Okna informacyjne**
 * Okna informacyjne w aplikacji pojawiają się rzadziej, w losowych odstępach; termin jest zapamiętywany trwale.
 * Przy zdalnej konfiguracji urządzenia pokazuje się osobne okno, zależne od lokalizacji.
@@ -189,6 +198,15 @@ The entries below describe only what this fork adds on top of the original, from
 * Network Health: Neighbors, Traffic and Resources show previously saved data (also after a restart), and the own device is counted in Neighbors.
 * Node details: four ways to show the same data to choose from — Line (with colored zones), Gauge, Bars and Heatmap (hours × days) — plus a “Time in each state” strip for battery, SNR and channel use.
 * The Signal tab shows the noise floor after LNA correction as the main value; the color still comes from the SNR.
+
+**Node details and diagnostics — new look**
+* Charts in node details can be shown in several ways (line, gauge, bars, heatmap); everyone picks what reads best for them.
+* Neighbors, traffic and resources read their data from the saved logs (also after the app restarts); on Signal the main value is the noise floor after LNA correction.
+* Signal colors are based on SNR (or on the noise floor when SNR is missing), also for nodes that are not heard directly; “Network condition” follows the same rule.
+* The GPIO field and quick commands (/ping, /hello, /test) have tiles, pin number checking and a description of every command.
+* Remote management (favorites, ignored, adding a contact) has tiles, node ID checking and short explanations.
+* On-demand diagnostics: an overview card of all capabilities with a counter of checked ones, and every query has a description, an “Ask” button and a colored result shown as tiles, gauges, donut and bar charts.
+* The node list help explains battery colors and the colors in Network Health.
 
 **Help and documentation in Polish**
 * All in-app documentation (User Guide and Developer Guide, 36 pages) translated into Polish, including page names; the documentation site (docs/pl) is now fully in Polish too.
