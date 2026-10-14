@@ -79,7 +79,15 @@ data class NetworkSummaryUiState(
     val topMessageSendersWeek: List<MessageSender> = emptyList(),
     val topMessageSendersToday: List<MessageSender> = emptyList(),
     val attentionItems: List<AttentionItem> = emptyList(),
+    /** Nodes per battery verdict: good, fair, poor, very poor. */
+    val batteryDistribution: List<Int> = listOf(0, 0, 0, 0),
+    /** Nodes per signal verdict: good, fair, poor, very poor. */
+    val snrDistribution: List<Int> = listOf(0, 0, 0, 0),
+    /** Text messages per day over the last 7 days, oldest first; the last one is the last 24 hours. */
+    val messagesPerDay: List<Int> = List(DAYS_IN_WEEK) { 0 },
 )
+
+const val DAYS_IN_WEEK = 7
 
 @KoinViewModel
 class NetworkSummaryViewModel(
@@ -300,6 +308,16 @@ class NetworkSummaryViewModel(
                     }
             }
 
+            val batteryDistribution =
+                bucketize(batteryLevels.map { it.toFloat() }, BATTERY_GOOD, BATTERY_MEDIUM, BATTERY_BAD)
+            val snrDistribution = bucketize(snrByNode.map { it.snr }, SNR_GOOD, SNR_MEDIUM, SNR_BAD)
+            val messagesPerDay =
+                (DAYS_IN_WEEK - 1 downTo 0).map { daysAgo ->
+                    messageLogsWeek.count {
+                        ((nowMillis - it.received_date) / HISTORY_WINDOW_MILLIS).toInt() == daysAgo
+                    }
+                }
+
             NetworkSummaryUiState(
                 onlineCount = nodes.count { it.isOnline },
                 totalCount = nodes.size,
@@ -332,11 +350,28 @@ class NetworkSummaryViewModel(
                 topMessageSendersWeek = topMessageSendersWeek,
                 topMessageSendersToday = topMessageSendersToday,
                 attentionItems = attentionItems,
+                batteryDistribution = batteryDistribution,
+                snrDistribution = snrDistribution,
+                messagesPerDay = messagesPerDay,
             )
         }
             .stateInWhileSubscribed(initialValue = NetworkSummaryUiState())
 
+    /** Counts values per verdict: at or above [good], [medium], [bad], or below all three. */
+    private fun bucketize(values: List<Float>, good: Float, medium: Float, bad: Float): List<Int> = listOf(
+        values.count { it >= good },
+        values.count { it >= medium && it < good },
+        values.count { it >= bad && it < medium },
+        values.count { it < bad },
+    )
+
     companion object {
+        private const val BATTERY_GOOD = 50f
+        private const val BATTERY_MEDIUM = 20f
+        private const val BATTERY_BAD = 5f
+        private const val SNR_GOOD = 0f
+        private const val SNR_MEDIUM = -7.5f
+        private const val SNR_BAD = -15f
         private const val HISTORY_WINDOW_MILLIS = 24 * 60 * 60 * 1000L
         private const val WEEK_WINDOW_MILLIS = 7 * 24 * 60 * 60 * 1000L
         private const val LOW_BATTERY_THRESHOLD = 20
