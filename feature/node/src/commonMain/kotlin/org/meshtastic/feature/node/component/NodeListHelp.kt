@@ -17,11 +17,13 @@
 package org.meshtastic.feature.node.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,6 +50,12 @@ import org.meshtastic.core.resources.node_layout_help_signal_good
 import org.meshtastic.core.resources.node_layout_help_signal_indicator
 import org.meshtastic.core.resources.node_layout_help_signal_none
 import org.meshtastic.core.resources.node_layout_signal_quality_indicator
+import org.meshtastic.core.resources.node_list_help_battery_external
+import org.meshtastic.core.resources.node_list_help_battery_full
+import org.meshtastic.core.resources.node_list_help_battery_low
+import org.meshtastic.core.resources.node_list_help_battery_medium
+import org.meshtastic.core.resources.node_list_help_battery_title
+import org.meshtastic.core.resources.node_list_help_battery_unknown
 import org.meshtastic.core.resources.node_list_help_node_details
 import org.meshtastic.core.resources.node_list_help_roles_title
 import org.meshtastic.core.resources.node_list_help_title
@@ -65,6 +73,7 @@ import org.meshtastic.core.resources.role_tracker_desc
 import org.meshtastic.core.resources.security
 import org.meshtastic.core.ui.component.ConnectionActivityLegendItems
 import org.meshtastic.core.ui.component.ConnectionStatusLegendItems
+import org.meshtastic.core.ui.component.MaterialBatteryInfo
 import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.component.RSSI_BAD_THRESHOLD
 import org.meshtastic.core.ui.component.RSSI_FAIR_THRESHOLD
@@ -181,6 +190,31 @@ fun NodeListHelp(onDismiss: () -> Unit) {
             HorizontalDivider()
 
             Text(
+                text = stringResource(Res.string.node_list_help_battery_title),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.semantics { heading() },
+            )
+            BatteryEntry(
+                level = BATTERY_SAMPLE_FULL,
+                description = stringResource(Res.string.node_list_help_battery_full),
+            )
+            BatteryEntry(
+                level = BATTERY_SAMPLE_MEDIUM,
+                description = stringResource(Res.string.node_list_help_battery_medium),
+            )
+            BatteryEntry(
+                level = BATTERY_SAMPLE_LOW,
+                description = stringResource(Res.string.node_list_help_battery_low),
+            )
+            BatteryEntry(
+                level = BATTERY_SAMPLE_EXTERNAL,
+                description = stringResource(Res.string.node_list_help_battery_external),
+            )
+            BatteryEntry(level = null, description = stringResource(Res.string.node_list_help_battery_unknown))
+
+            HorizontalDivider()
+
+            Text(
                 text = stringResource(Res.string.node_list_help_roles_title),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.semantics { heading() },
@@ -212,6 +246,30 @@ private fun SignalQualityEntry(quality: Quality, description: String) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+    }
+}
+
+private const val BATTERY_SAMPLE_FULL = 85
+private const val BATTERY_SAMPLE_MEDIUM = 35
+private const val BATTERY_SAMPLE_LOW = 10
+private const val BATTERY_SAMPLE_EXTERNAL = 101
+private const val BATTERY_ENTRY_WIDTH = 72
+
+/** One battery indicator exactly as the node list draws it, with what its colour means. */
+@Composable
+private fun BatteryEntry(level: Int?, description: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(modifier = Modifier.width(BATTERY_ENTRY_WIDTH.dp)) { MaterialBatteryInfo(level = level) }
+        Text(
+            text = description,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f),
+        )
     }
 }
 
