@@ -50,6 +50,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Przełącznik „Odwróć znak prądu” dla każdego węzła z osobna (także własnego), w oknie informacji (ikona „i”) statystyk zasilania i pogody, tak jak LNA: gdy czujnik jest podłączony odwrotnie, prąd ładowania pokazuje się na plusie na liście węzłów, w szczegółach i w Zdrowiu sieci. Zmienia się tylko znak wyświetlanego prądu i wykresów — nie wpływa to na wykrywanie ładowania ani na nic innego.
 * Węzeł, który w danych pogodowych wysyła tylko napięcie i prąd, ma teraz ikonę wejścia w zapisane ramki (wcześniej pojawiała się dopiero z temperaturą, wilgotnością lub burzami).
 * Pole wzmocnienia LNA jest teraz w szczegółach sygnału także dla własnego węzła (można je ustawić tam i w ustawieniach LoRa).
+* Na liście rozmów nazwa głównego kanału jest złota, pozostałych kanałów czerwona (zamiast białej); wiadomości prywatne zostają w kolorze węzła.
 * Kłódki przy kanałach w kolorach aplikacji: złota = bezpieczny kanał, czerwona otwarta = publiczny bez precyzyjnej lokalizacji, fioletowa otwarta = publiczny z precyzyjną lokalizacją (z białym ostrzeżeniem, gdy idzie też przez MQTT); opisy w pomocy dopasowane.
 * Pomoc listy węzłów (w aplikacji i w dokumentacji) ma sekcję „Poziom baterii”: wskaźniki w kolorach złotym, czerwonym i fioletowym, zasilanie zewnętrzne i brak danych, a dokumentacja także kolory w „Zdrowiu sieci”.
 
@@ -213,6 +214,7 @@ The entries below describe only what this fork adds on top of the original, from
 * A “Reverse current sign” switch for every node separately (ours too), in the info window (“i” icon) of the power and environment statistics, like LNA: when a sensor is wired backwards, the charging current shows as positive on the node list, in details and in Network Health. Only the sign of the displayed current and its charts changes — charging detection and everything else are unaffected.
 * A node that sends only voltage and current in its environment data now has the icon to open its saved frames (before, it appeared only with temperature, humidity or lightning).
 * The LNA gain field is now in the signal details for our own node too (it can be set there and in the LoRa settings).
+* On the conversation list the main channel name is gold and other channels red (instead of white); direct messages keep the node's color.
 * Channel locks use the app colors: gold = secure channel, red open = public without precise location, purple open = public with precise location (with a white warning when it also goes through MQTT); help texts updated.
 * The node list help (in the app and in the docs) has a “Battery level” section: gold, red and purple indicators, external power and no data; the docs also explain the colors in Network Health.
 
