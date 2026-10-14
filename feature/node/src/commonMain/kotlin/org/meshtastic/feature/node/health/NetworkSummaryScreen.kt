@@ -100,7 +100,7 @@ private fun etherLevelOf(percent: Float): HealthLevel = when {
     else -> HealthLevel.CRITICAL
 }
 
-private fun generatedStamp(): String {
+internal fun generatedStamp(): String {
     val dt = Instant.fromEpochMilliseconds(nowMillis).toLocalDateTime(TimeZone.currentSystemDefault())
     val time = "${dt.hour.toString().padStart(TWO_DIGITS, '0')}:${dt.minute.toString().padStart(TWO_DIGITS, '0')}"
     return "Wygenerowano: ${dt.date} $time"

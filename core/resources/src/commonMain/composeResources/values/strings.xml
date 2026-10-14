@@ -2432,6 +2432,14 @@
     <string name="remote_remove_from_list">Remove from list</string>
     <string name="remote_contact_title">Add a contact remotely</string>
     <string name="remote_contact_hint">Saves the name and ID in the node list of the remote device, using the ID typed above.</string>
+    <string name="on_demand_share">Share</string>
+    <string name="on_demand_export">Save as file</string>
+    <string name="on_demand_export_pdf">Save as PDF</string>
+    <string name="on_demand_export_html">Save as HTML page</string>
+    <string name="on_demand_export_markdown">Save as Markdown</string>
+    <string name="on_demand_export_text">Save as text</string>
+    <string name="on_demand_export_csv">Save as CSV (spreadsheet)</string>
+    <string name="on_demand_received_label">Received</string>
     <string name="on_demand_hero_hint">Ask the node how it is doing. Answers arrive after a moment, and the last ones stay on screen.</string>
     <string name="on_demand_ask">Ask</string>
     <string name="on_demand_no_answer">No answer yet</string>
