@@ -47,6 +47,13 @@ class TelemetryExtensionsTest {
     }
 
     @Test
+    fun `voltage or current alone is valid`() {
+        assertTrue(telemetry { voltage = 12.1f }.hasValidEnvironmentMetrics())
+        assertTrue(telemetry { current = -250f }.hasValidEnvironmentMetrics())
+        assertFalse(telemetry { voltage = Float.NaN }.hasValidEnvironmentMetrics())
+    }
+
+    @Test
     fun `temperature alone or a NaN temperature is not valid`() {
         assertFalse(telemetry { temperature = 21.5f }.hasValidEnvironmentMetrics())
         assertFalse(

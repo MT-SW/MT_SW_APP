@@ -310,7 +310,7 @@ fun <T> BaseMetricScreen(
                             ),
                         )
                     }
-                    if (infoData.isNotEmpty()) {
+                    if (infoData.isNotEmpty() || infoExtraContent != null) {
                         IconButton(onClick = { displayInfoDialog = true }) {
                             Icon(
                                 imageVector = MeshtasticIcons.Info,

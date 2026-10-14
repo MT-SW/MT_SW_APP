@@ -124,16 +124,14 @@ fun EnvironmentMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Un
         infoData = listOf(InfoDialogData(Res.string.iaq, Res.string.iaq_definition, Environment.IAQ.color)),
         onRequestTelemetry = { viewModel.requestTelemetry(TelemetryType.ENVIRONMENT) },
         onExportCsv = { exportLauncher("environment_metrics.csv", "text/csv") },
+        infoExtraContent = state.node?.num?.let { num -> @Composable { CurrentPolaritySwitch(num) } },
         controlPart = {
-            Column {
-                TimeFrameSelector(
-                    selectedTimeFrame = timeFrame,
-                    availableTimeFrames = availableTimeFrames,
-                    onTimeFrameSelected = viewModel::setTimeFrame,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                )
-                state.node?.num?.let { CurrentPolaritySwitch(it) }
-            }
+            TimeFrameSelector(
+                selectedTimeFrame = timeFrame,
+                availableTimeFrames = availableTimeFrames,
+                onTimeFrameSelected = viewModel::setTimeFrame,
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
         },
         chartPart = { modifier, selectedX, vicoScrollState, onPointSelected ->
             EnvironmentMetricsChart(

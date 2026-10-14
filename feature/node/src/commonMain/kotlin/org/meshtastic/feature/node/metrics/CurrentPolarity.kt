@@ -16,11 +16,9 @@
  */
 package org.meshtastic.feature.node.metrics
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -81,7 +79,7 @@ internal fun CurrentPolaritySwitch(nodeNum: Int, modifier: Modifier = Modifier) 
     val uiPrefs = koinInject<UiPrefs>()
     val inverted by uiPrefs.currentInverted.collectAsStateWithLifecycle()
     SwitchPreference(
-        modifier = modifier.padding(horizontal = 16.dp),
+        modifier = modifier,
         title = stringResource(Res.string.current_invert),
         summary = stringResource(Res.string.current_invert_description),
         checked = nodeNum in inverted,
