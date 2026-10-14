@@ -418,6 +418,13 @@ private fun NodeMetricHero(uiState: NodeMetricDetailUiState) {
             gaugeFraction(uiState.metric, verdictValue)
         }
     val accent = if (level == HealthLevel.UNKNOWN) MaterialTheme.colorScheme.primary else level.color()
+    // The big number is the noise floor on the signal tab, so it is coloured by that value (the lower, the better).
+    val valueColor =
+        if (uiState.metric == NetworkHealthMetric.SIGNAL && headline?.label == "Noise Floor" && latest != null) {
+            noiseFloorLevel(latest).color()
+        } else {
+            accent
+        }
     val base = MaterialTheme.colorScheme.surfaceContainer
 
     Card(
@@ -448,7 +455,7 @@ private fun NodeMetricHero(uiState: NodeMetricDetailUiState) {
                     if (headline != null && latest != null) formatSeriesValue(headline.label, latest) else "—",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
-                    color = accent,
+                    color = valueColor,
                 )
                 if (level != HealthLevel.UNKNOWN) {
                     Row(

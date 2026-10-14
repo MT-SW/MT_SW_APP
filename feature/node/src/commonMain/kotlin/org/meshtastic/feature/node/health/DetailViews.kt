@@ -131,7 +131,7 @@ internal fun scaleFor(metric: NetworkHealthMetric, label: String): LevelScale? =
     metric == NetworkHealthMetric.POWER && label == "Bateria" -> LevelScale(50f, 20f, 5f, true, 0f, 100f)
     metric == NetworkHealthMetric.SIGNAL && label == "SNR" -> LevelScale(0f, -7.5f, -15f, true, -20f, 10f)
     metric == NetworkHealthMetric.ETHER && label == "Ch. Util" -> LevelScale(15f, 25f, 40f, false, 0f, 60f)
-    metric == NetworkHealthMetric.SIGNAL && label == "Noise Floor" -> LevelScale(-110f, -100f, -90f, false, -130f, -80f)
+    metric == NetworkHealthMetric.SIGNAL && label == "Noise Floor" -> LevelScale(-100f, -85f, -60f, false, -130f, -60f)
     else -> null
 }
 
