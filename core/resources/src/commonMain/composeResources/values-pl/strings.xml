@@ -2679,4 +2679,5 @@
     <string name="wifi_reason_auth_expired">wygasło uwierzytelnienie (%1$d)</string>
     <string name="wifi_reason_self">rozłączone przez samo urządzenie (%1$d)</string>
     <string name="wifi_reason_other">kod %1$d</string>
+    <string name="wifi_export">Zapisz WiFi</string>
 </resources>

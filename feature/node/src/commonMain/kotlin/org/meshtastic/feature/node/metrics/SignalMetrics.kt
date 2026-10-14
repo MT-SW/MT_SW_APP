@@ -92,6 +92,7 @@ import org.meshtastic.core.resources.snr_definition
 import org.meshtastic.core.resources.wifi_disconnected_now
 import org.meshtastic.core.resources.wifi_drop_reason_label
 import org.meshtastic.core.resources.wifi_drops_label
+import org.meshtastic.core.resources.wifi_export
 import org.meshtastic.core.resources.wifi_rssi_definition
 import org.meshtastic.core.resources.wifi_rssi_signal
 import org.meshtastic.core.ui.component.LoraSignalIndicator
@@ -208,6 +209,7 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
     val hasSnr = remember(signalData) { signalData.any { it.snrOrNull() != null } }
     val hasAnyLocalStats = state.localStats.isNotEmpty()
     val localStatsExportLauncher = rememberSaveFileLauncher { uri -> viewModel.saveLocalStatsCSV(uri, localStatsData) }
+    val wifiExportLauncher = rememberSaveFileLauncher { uri -> viewModel.saveWifiSignalCSV(uri, wifiData) }
     val signalExportLauncher = rememberSaveFileLauncher { uri -> viewModel.saveSignalMetricsCSV(uri, signalData) }
 
     // The LNA gain and current-polarity fields sit under the info text, the same for every node (ours too; our own
@@ -325,6 +327,8 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
                 onClear = viewModel::clearLocalStats,
                 onRequest = { viewModel.requestTelemetry(TelemetryType.LOCAL_STATS) },
                 onSave = { localStatsExportLauncher("local_stats.csv", "text/csv") },
+                hasWifi = wifiData.isNotEmpty(),
+                onSaveWifi = { wifiExportLauncher("wifi_signal.csv", "text/csv") },
             )
         },
     )
@@ -338,6 +342,8 @@ private fun LocalStatsActionButtons(
     onClear: () -> Unit,
     onRequest: () -> Unit,
     onSave: () -> Unit,
+    hasWifi: Boolean,
+    onSaveWifi: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     FlowRow(
@@ -366,6 +372,13 @@ private fun LocalStatsActionButtons(
                 Icon(imageVector = MeshtasticIcons.Save, contentDescription = stringResource(Res.string.save))
                 Spacer(Modifier.width(8.dp))
                 Text(text = stringResource(Res.string.save), maxLines = 1)
+            }
+        }
+        if (hasWifi) {
+            OutlinedButton(modifier = Modifier.fillMaxWidth(), onClick = onSaveWifi) {
+                Icon(imageVector = MeshtasticIcons.Save, contentDescription = stringResource(Res.string.wifi_export))
+                Spacer(Modifier.width(8.dp))
+                Text(text = stringResource(Res.string.wifi_export), maxLines = 1)
             }
         }
     }
