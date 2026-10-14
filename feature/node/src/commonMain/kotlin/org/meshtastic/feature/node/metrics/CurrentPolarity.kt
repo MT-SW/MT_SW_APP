@@ -127,10 +127,3 @@ internal fun BatteryPolaritySwitch(nodeNum: Int, modifier: Modifier = Modifier) 
         onCheckedChange = { uiPrefs.setBatteryInverted(nodeNum, it) },
     )
 }
-
-/** Both polarity switches together, for the info windows of the screens that show a power sensor. */
-@Composable
-internal fun PolaritySwitches(nodeNum: Int) {
-    CurrentPolaritySwitch(nodeNum)
-    BatteryPolaritySwitch(nodeNum)
-}
