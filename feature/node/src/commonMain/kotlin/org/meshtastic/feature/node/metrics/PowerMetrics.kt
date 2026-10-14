@@ -234,12 +234,40 @@ private fun PowerChannelLabelEditor(
     )
 }
 
-@Suppress("LongMethod")
 @Composable
 private fun PowerMetricsChart(
     modifier: Modifier = Modifier,
     telemetries: List<Telemetry>,
     selectedChannel: PowerChannel,
+    vicoScrollState: VicoScrollState,
+    selectedX: Double?,
+    onPointSelected: (Double) -> Unit,
+) {
+    PowerLineChart(
+        modifier = modifier,
+        telemetries = telemetries,
+        chartKey = selectedChannel,
+        currentOf = { retrieveCurrent(selectedChannel, it) },
+        voltageOf = { retrieveVoltage(selectedChannel, it) },
+        vicoScrollState = vicoScrollState,
+        selectedX = selectedX,
+        onPointSelected = onPointSelected,
+    )
+}
+
+/**
+ * The current (left axis) and voltage (right axis) line chart of the power metrics log. [currentOf] and [voltageOf]
+ * pick the readings out of a telemetry (NaN when absent), so the same chart also draws the voltage and current an
+ * environment sensor reports. [chartKey] restarts the data when the picked source changes.
+ */
+@Suppress("LongMethod")
+@Composable
+internal fun PowerLineChart(
+    modifier: Modifier = Modifier,
+    telemetries: List<Telemetry>,
+    chartKey: Any,
+    currentOf: (Telemetry) -> Float,
+    voltageOf: (Telemetry) -> Float,
     vicoScrollState: VicoScrollState,
     selectedX: Double?,
     onPointSelected: (Double) -> Unit,
@@ -266,21 +294,21 @@ private fun PowerMetricsChart(
             )
 
         val currentData =
-            remember(telemetries, selectedChannel) {
-                telemetries.filter { !retrieveCurrent(selectedChannel, it).isNaN() }
+            remember(telemetries, chartKey) {
+                telemetries.filter { !currentOf(it).isNaN() }
             }
         val voltageData =
-            remember(telemetries, selectedChannel) {
-                telemetries.filter { !retrieveVoltage(selectedChannel, it).isNaN() }
+            remember(telemetries, chartKey) {
+                telemetries.filter { !voltageOf(it).isNaN() }
             }
 
-        LaunchedEffect(selectedChannel, currentData, voltageData) {
+        LaunchedEffect(chartKey, currentData, voltageData) {
             modelProducer.runTransaction {
                 if (currentData.isNotEmpty()) {
                     lineModel {
                         splitAtGaps(currentData) { it.time }
                             .forEach { run ->
-                                series(x = run.map { it.time }, y = run.map { retrieveCurrent(selectedChannel, it) })
+                                series(x = run.map { it.time }, y = run.map { currentOf(it) })
                             }
                     }
                 }
@@ -288,7 +316,7 @@ private fun PowerMetricsChart(
                     lineModel {
                         splitAtGaps(voltageData) { it.time }
                             .forEach { run ->
-                                series(x = run.map { it.time }, y = run.map { retrieveVoltage(selectedChannel, it) })
+                                series(x = run.map { it.time }, y = run.map { voltageOf(it) })
                             }
                     }
                 }

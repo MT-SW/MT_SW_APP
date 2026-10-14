@@ -52,6 +52,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Pole wzmocnienia LNA jest teraz w szczegółach sygnału także dla własnego węzła (można je ustawić tam i w ustawieniach LoRa).
 * Na liście rozmów tekst nazwy głównego kanału ma kolor motywu aplikacji, pozostałych kanałów czerwony (zamiast białego), a wiadomości prywatnych w kolorze węzła.
 * Kłódki przy kanałach w kolorach aplikacji: złota = bezpieczny kanał, czerwona otwarta = publiczny bez precyzyjnej lokalizacji, fioletowa otwarta = publiczny z precyzyjną lokalizacją (z białym ostrzeżeniem, gdy idzie też przez MQTT); opisy w pomocy dopasowane.
+* Statystyki pogodowe: przełącznik „Pogoda / Zasilanie” nad wykresem. „Zasilanie” pokazuje napięcie i prąd czujnika takim samym wykresem jak w metrykach zasilania (dla czujnika, który podaje tylko napięcie i prąd, jest od razu włączone).
 * Diagnostyka na żądanie: udostępnianie i zapis wszystkich odebranych odpowiedzi do PDF, strony HTML, Markdown, tekstu i CSV (arkusz).
 * Pomoc listy węzłów (w aplikacji i w dokumentacji) ma sekcję „Poziom baterii”: wskaźniki w kolorach złotym, czerwonym i fioletowym, zasilanie zewnętrzne i brak danych, a dokumentacja także kolory w „Zdrowiu sieci”.
 
@@ -217,6 +218,7 @@ The entries below describe only what this fork adds on top of the original, from
 * The LNA gain field is now in the signal details for our own node too (it can be set there and in the LoRa settings).
 * On the conversation list the name text of the main channel is in the app theme color and of other channels red (instead of white), and of direct messages the node's color.
 * Channel locks use the app colors: gold = secure channel, red open = public without precise location, purple open = public with precise location (with a white warning when it also goes through MQTT); help texts updated.
+* Environment statistics: a “Weather / Power” switch above the chart. “Power” shows the sensor's voltage and current with the same chart as the power metrics (switched on by itself for a sensor that reports only voltage and current).
 * On-demand diagnostics: sharing and saving all received answers as PDF, an HTML page, Markdown, text and CSV (spreadsheet).
 * The node list help (in the app and in the docs) has a “Battery level” section: gold, red and purple indicators, external power and no data; the docs also explain the colors in Network Health.
 
