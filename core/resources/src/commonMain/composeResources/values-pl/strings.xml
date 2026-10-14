@@ -1679,7 +1679,7 @@
     <string name="nodes_empty_searching_title">Wyszukiwanie węzłów</string>
     <string name="nodes_queued_for_deletion">%1$d węzłów w kolejce do usunięcia:</string>
     <string name="noise_floor">Poziom szumu</string>
-    <string name="noise_floor_definition">Szum tła RF mierzony przez odbiornik radiowy. Niższe wartości zwykle oznaczają cichsze otoczenie odbiornika; -85 dBm to punkt odniesienia dla dużego ruchu, nie twardy próg błędu.</string>
+    <string name="noise_floor_definition">Szum tła RF mierzony przez odbiornik radiowy. Niższe wartości zwykle oznaczają cichsze otoczenie odbiornika; -90 dBm to punkt odniesienia dla dużego ruchu, nie twardy próg błędu.</string>
     <string name="noise_floor_no_reading">Poziom szumu: Brak odczytu</string>
     <string name="nodes_unheard_banner">%1$d węzłów nie słyszanych od zmiany ustawień</string>
     <string name="nodes_unheard_banner_one">1 węzeł nie słyszany od zmiany ustawień</string>
