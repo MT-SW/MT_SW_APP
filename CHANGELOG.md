@@ -18,6 +18,13 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Sygnał WiFi urządzenia w „Jakości sygnału” i „Zdrowiu sieci”**
+* Aplikacja odczytuje nowe pola firmware: siła WiFi (RSSI), liczba zerwań łącza WiFi od startu i kod powodu ostatniego zerwania (tylko ESP32).
+* „Jakość sygnału”: osobna linia WiFi RSSI na wykresie obok szumu, RSSI i SNR (z legendą i opisem pod (i)) oraz karty w liście z siłą sygnału, liczbą zerwań i powodem zapisanym po ludzku (np. „utracono punkt dostępowy (200)”); brak siły sygnału przy rosnącej liczbie zerwań jest pokazany jako „WiFi rozłączone”.
+* „Zdrowie sieci”, zakładka Sygnał: w szczegółach węzła dochodzą wykresy „WiFi RSSI” i „Zerwania WiFi”.
+* „Diagnostyka na żądanie”: odpowiedź ze statystykami węzła pokazuje też WiFi RSSI, zerwania i kod powodu.
+* Statystyki hosta (procesor, pamięć) zostają bez zmian — WiFi jest tylko w sygnale.
+
 **Pomoc i dokumentacja po polsku**
 * Cała dokumentacja w aplikacji (Przewodnik użytkownika i Przewodnik dewelopera, 36 stron) przetłumaczona na polski, wraz z nazwami stron; strona dokumentacji (docs/pl) też jest teraz w całości po polsku.
 * Opis wyboru presetu mówi, że domyślnym presetem dla MT_SW_FIRMWARE jest Wąski szybki (Narrow Fast).
@@ -189,6 +196,13 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Device WiFi signal in "Signal quality" and "Network Health"**
+* The app reads the new firmware fields: WiFi strength (RSSI), the number of WiFi link drops since start and the code of the last drop reason (ESP32 only).
+* "Signal quality": a separate WiFi RSSI line on the chart next to noise, RSSI and SNR (with a legend entry and a description under (i)) and list cards with the strength, the number of drops and the reason in plain words (e.g. "access point lost (200)"); a missing strength with a growing drop count is shown as "WiFi disconnected".
+* "Network Health", Signal tab: the node detail gets "WiFi RSSI" and "WiFi drops" charts.
+* "On-demand diagnostics": the node statistics response also shows WiFi RSSI, drops and the reason code.
+* Host statistics (CPU, memory) are unchanged — WiFi lives only in signal quality.
 
 **Network Health — new look**
 * A “Network condition” card on top: a colored ring, the number of nodes in each state and how many are online.

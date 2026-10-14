@@ -89,6 +89,11 @@ import org.meshtastic.core.resources.save
 import org.meshtastic.core.resources.signal_quality
 import org.meshtastic.core.resources.snr
 import org.meshtastic.core.resources.snr_definition
+import org.meshtastic.core.resources.wifi_disconnected_now
+import org.meshtastic.core.resources.wifi_drop_reason_label
+import org.meshtastic.core.resources.wifi_drops_label
+import org.meshtastic.core.resources.wifi_rssi_definition
+import org.meshtastic.core.resources.wifi_rssi_signal
 import org.meshtastic.core.ui.component.LoraSignalIndicator
 import org.meshtastic.core.ui.component.SignedIntegerEditTextPreference
 import org.meshtastic.core.ui.component.determineRssiQuality
@@ -121,20 +126,27 @@ private enum class SignalMetric(val color: Color) {
     BUSY_FLOOR(Red),
     SNR(Green),
     RSSI(Blue),
+    WIFI_RSSI(Orange),
 }
 
 private val LEGEND_DATA =
     listOf(
         LegendData(nameRes = Res.string.noise_floor, color = SignalMetric.NOISE_FLOOR.color, isLine = true),
         LegendData(nameRes = Res.string.rssi, color = SignalMetric.RSSI.color),
+        LegendData(nameRes = Res.string.wifi_rssi_signal, color = SignalMetric.WIFI_RSSI.color),
         LegendData(nameRes = Res.string.snr, color = SignalMetric.SNR.color),
     )
 
 /** Builds the combined signal log, newest first. Kept out of the composable so the LazyColumn keys are testable. */
-internal fun buildSignalLog(signalData: List<MeshPacket>, localStatsData: List<Telemetry>): List<SignalLogEntry> {
+internal fun buildSignalLog(
+    signalData: List<MeshPacket>,
+    localStatsData: List<Telemetry>,
+    wifiData: List<WifiSample> = emptyList(),
+): List<SignalLogEntry> {
     val localStats = localStatsData.mapIndexed { index, telemetry -> SignalLogEntry.LocalStatsEntry(telemetry, index) }
     val packets = signalData.mapIndexed { index, packet -> SignalLogEntry.PacketEntry(packet, index) }
-    return (localStats + packets).sortedByDescending { it.timeSeconds }
+    val wifi = wifiData.mapIndexed { index, sample -> SignalLogEntry.WifiEntry(sample, index) }
+    return (localStats + packets + wifi).sortedByDescending { it.timeSeconds }
 }
 
 internal sealed interface SignalLogEntry {
@@ -152,6 +164,14 @@ internal sealed interface SignalLogEntry {
         // Local stats telemetry is an id-less proto; the source-list index disambiguates same-second samples.
         override val key: Any = "local_stats_${telemetry.time}_$index"
         override val contentType: Any = "local_stats"
+    }
+
+    data class WifiEntry(val sample: WifiSample, val index: Int) : SignalLogEntry {
+        override val timeSeconds: Int = sample.time
+
+        // Same-second samples are told apart by their position in the source list.
+        override val key: Any = "wifi_${sample.time}_$index"
+        override val contentType: Any = "wifi"
     }
 
     data class PacketEntry(val meshPacket: MeshPacket, val index: Int) : SignalLogEntry {
@@ -179,7 +199,10 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
             rxTime.toLong() >= threshold
         }
     val localStatsData = state.localStats.filter { it.time.toLong() >= threshold && it.local_stats != null }
-    val data = remember(signalData, localStatsData) { buildSignalLog(signalData, localStatsData) }
+    // The device's own WiFi link (fw+ extended stats) arrives in the same telemetry as the host statistics.
+    val wifiData = remember(state.hostMetrics, threshold) { state.hostMetrics.toWifiSamples(threshold) }
+    val data = remember(signalData, localStatsData, wifiData) { buildSignalLog(signalData, localStatsData, wifiData) }
+    val hasWifiRssi = remember(wifiData) { wifiData.any { it.isConnected } }
     val hasNoiseFloor = remember(localStatsData) { localStatsData.any { it.local_stats?.noiseFloorOrNull != null } }
     val hasRssi = remember(signalData) { signalData.any { it.rx_rssi != null } }
     val hasSnr = remember(signalData) { signalData.any { it.snrOrNull() != null } }
@@ -220,6 +243,15 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
             }
             if (hasSnr) add(InfoDialogData(Res.string.snr, Res.string.snr_definition, SignalMetric.SNR.color))
             if (hasRssi) add(InfoDialogData(Res.string.rssi, Res.string.rssi_definition, SignalMetric.RSSI.color))
+            if (hasWifiRssi) {
+                add(
+                    InfoDialogData(
+                        Res.string.wifi_rssi_signal,
+                        Res.string.wifi_rssi_definition,
+                        SignalMetric.WIFI_RSSI.color,
+                    ),
+                )
+            }
         },
         infoExtraContent =
         lnaNodeNum?.let { num -> @Composable { LnaGainField(num, isLocalNode) } },
@@ -237,6 +269,7 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
                 nodeNum = state.node?.num,
                 localStats = localStatsData.reversed(),
                 meshPackets = signalData.reversed(),
+                wifi = wifiData.reversed(),
                 vicoScrollState = vicoScrollState,
                 selectedX = selectedX,
                 onPointSelected = onPointSelected,
@@ -263,6 +296,13 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
                                 LocalStatsCard(
                                     nodeNum = state.node?.num,
                                     telemetry = entry.telemetry,
+                                    isSelected = entry.timeSeconds.toDouble() == selectedX,
+                                    onClick = { onCardClick(entry.timeSeconds.toDouble()) },
+                                )
+
+                            is SignalLogEntry.WifiEntry ->
+                                WifiCard(
+                                    sample = entry.sample,
                                     isSelected = entry.timeSeconds.toDouble() == selectedX,
                                     onClick = { onCardClick(entry.timeSeconds.toDouble()) },
                                 )
@@ -360,6 +400,7 @@ private fun SignalMetricsChart(
     nodeNum: Int?,
     localStats: List<Telemetry>,
     meshPackets: List<MeshPacket>,
+    wifi: List<WifiSample>,
     vicoScrollState: VicoScrollState,
     selectedX: Double?,
     onPointSelected: (Double) -> Unit,
@@ -376,20 +417,22 @@ private fun SignalMetricsChart(
         }
     val rssiData = remember(meshPackets) { meshPackets.filter { it.rx_rssi != null } }
     val snrData = remember(meshPackets) { meshPackets.filter { it.snrOrNull() != null } }
+    val wifiRssiData = remember(wifi) { wifi.filter { it.isConnected } }
     val legendData =
-        remember(noiseFloorData, rssiData, snrData) {
+        remember(noiseFloorData, rssiData, snrData, wifiRssiData) {
             LEGEND_DATA.filter { legend ->
                 when (legend.nameRes) {
                     Res.string.noise_floor -> noiseFloorData.isNotEmpty()
                     Res.string.rssi -> rssiData.isNotEmpty()
                     Res.string.snr -> snrData.isNotEmpty()
+                    Res.string.wifi_rssi_signal -> wifiRssiData.isNotEmpty()
                     else -> true
                 }
             }
         }
 
     MetricChartScaffold(
-        isEmpty = meshPackets.isEmpty() && localStats.isEmpty(),
+        isEmpty = meshPackets.isEmpty() && localStats.isEmpty() && wifiRssiData.isEmpty(),
         legendData = legendData,
         modifier = modifier,
     ) { modelProducer, chartModifier ->
@@ -397,12 +440,14 @@ private fun SignalMetricsChart(
         val busyFloorColor = SignalMetric.BUSY_FLOOR.color
         val rssiColor = SignalMetric.RSSI.color
         val snrColor = SignalMetric.SNR.color
+        val wifiColor = SignalMetric.WIFI_RSSI.color
         val noiseFloorLabel = stringResource(Res.string.noise_floor)
         val busyFloorLabel = stringResource(Res.string.busy_noise_floor)
         val rssiLabel = stringResource(Res.string.rssi)
         val snrLabel = stringResource(Res.string.snr)
+        val wifiLabel = stringResource(Res.string.wifi_rssi_signal)
 
-        LaunchedEffect(noiseFloorData, busyFloorData, rssiData, snrData, noiseGain, rssiGain) {
+        LaunchedEffect(noiseFloorData, busyFloorData, rssiData, wifiRssiData, snrData, noiseGain, rssiGain) {
             modelProducer.runTransaction {
                 if (noiseFloorData.isNotEmpty()) {
                     lineModel {
@@ -419,6 +464,10 @@ private fun SignalMetricsChart(
                     lineModel {
                         series(x = rssiData.map { it.rxTimeOrNull() ?: 0 }, y = rssiData.mapNotNull { it.rx_rssi?.minus(rssiGain) })
                     }
+                }
+                if (wifiRssiData.isNotEmpty()) {
+                    // The WiFi link is the device's own, so the LNA correction of the LoRa radio does not apply.
+                    lineModel { series(x = wifiRssiData.map { it.time }, y = wifiRssiData.map { it.stats.wifiRssi }) }
                 }
                 if (snrData.isNotEmpty()) {
                     /* Use a separate lineModel call to associate SNR with the right axis. */
@@ -437,6 +486,7 @@ private fun SignalMetricsChart(
                         noiseFloorColor -> "$noiseFloorLabel: ${MetricFormatter.rssi(value.toInt())}"
                         busyFloorColor -> "$busyFloorLabel: ${MetricFormatter.rssi(value.toInt())}"
                         rssiColor -> "$rssiLabel: ${MetricFormatter.rssi(value.toInt())}"
+                        wifiColor -> "$wifiLabel: ${MetricFormatter.rssi(value.toInt())}"
                         snrColor -> "$snrLabel: ${MetricFormatter.snr(value.toFloat())}"
                         else -> value.toString()
                     }
@@ -466,6 +516,13 @@ private fun SignalMetricsChart(
                 verticalAxisPosition = Axis.Position.Vertical.Start,
                 rangeProvider = dbmRangeProvider,
             )
+        val wifiLayer =
+            rememberConditionalLayer(
+                hasData = wifiRssiData.isNotEmpty(),
+                lineProvider = LineCartesianLayer.LineProvider.series(ChartStyling.createDashedLine(wifiColor)),
+                verticalAxisPosition = Axis.Position.Vertical.Start,
+                rangeProvider = dbmRangeProvider,
+            )
         val snrLayer =
             rememberConditionalLayer(
                 hasData = snrData.isNotEmpty(),
@@ -474,8 +531,8 @@ private fun SignalMetricsChart(
             )
 
         val layers =
-            remember(noiseFloorLayer, busyFloorLayer, rssiLayer, snrLayer) {
-                listOfNotNull(noiseFloorLayer, busyFloorLayer, rssiLayer, snrLayer)
+            remember(noiseFloorLayer, busyFloorLayer, rssiLayer, wifiLayer, snrLayer) {
+                listOfNotNull(noiseFloorLayer, busyFloorLayer, rssiLayer, wifiLayer, snrLayer)
             }
 
         if (layers.isNotEmpty()) {
@@ -484,11 +541,16 @@ private fun SignalMetricsChart(
                 modifier = chartModifier,
                 layers = layers,
                 startAxis =
-                if (noiseFloorData.isNotEmpty() || rssiData.isNotEmpty()) {
+                if (noiseFloorData.isNotEmpty() || rssiData.isNotEmpty() || wifiRssiData.isNotEmpty()) {
                     VerticalAxis.rememberStart(
                         label =
                         ChartStyling.rememberAxisLabel(
-                            color = if (noiseFloorData.isNotEmpty()) noiseFloorColor else rssiColor,
+                            color =
+                            when {
+                                noiseFloorData.isNotEmpty() -> noiseFloorColor
+                                rssiData.isNotEmpty() -> rssiColor
+                                else -> wifiColor
+                            },
                         ),
                         valueFormatter = { _, value, _ -> MetricFormatter.rssi(value.toInt()) },
                     )
@@ -643,6 +705,68 @@ private fun LocalStatsCard(nodeNum: Int?, telemetry: Telemetry, isSelected: Bool
 
 /** [count] as a percentage of all received packets [total], e.g. "2,5%". */
 private fun rxShare(count: Int, total: Int): String = MetricFormatter.percent(count * 100f / total, decimalPlaces = 1)
+
+/** One report of the device's own WiFi link: strength, how often it dropped and why the last drop happened. */
+@Composable
+private fun WifiCard(sample: WifiSample, isSelected: Boolean, onClick: () -> Unit) {
+    val time = sample.time.toLong() * MS_PER_SEC
+    SelectableMetricCard(isSelected = isSelected, onClick = onClick) {
+        Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(
+                    text = DateFormatter.formatDateTime(time),
+                    style = MaterialTheme.typography.titleMediumEmphasized,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text =
+                    if (sample.isConnected) {
+                        MetricFormatter.rssi(sample.stats.wifiRssi)
+                    } else {
+                        stringResource(Res.string.wifi_disconnected_now)
+                    },
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = wifiRssiTextColor(sample.stats.wifiRssi.takeIf { sample.isConnected }),
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            MetricValueRow(
+                color = SignalMetric.WIFI_RSSI.color,
+                text = stringResource(Res.string.wifi_rssi_signal),
+                textColor = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "${stringResource(Res.string.wifi_drops_label)}: ${sample.stats.wifiDrops}",
+                style = MaterialTheme.typography.labelLarge,
+            )
+            if (sample.stats.wifiDropReason != 0) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text =
+                    "${stringResource(Res.string.wifi_drop_reason_label)}: " +
+                        wifiDropReasonText(sample.stats.wifiDropReason),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+// WiFi strength limits in dBm: above -70 the link is solid, below -85 it tends to drop.
+private const val WIFI_GOOD_DBM = -70
+private const val WIFI_WEAK_DBM = -85
+
+@Composable
+private fun wifiRssiTextColor(rssi: Int?): Color = when {
+    rssi == null -> MaterialTheme.colorScheme.StatusDisconnected
+    rssi >= WIFI_GOOD_DBM -> MaterialTheme.colorScheme.StatusOnline
+    rssi >= WIFI_WEAK_DBM -> MaterialTheme.colorScheme.onSurface
+    else -> MaterialTheme.colorScheme.StatusDisconnected
+}
 
 @Composable
 private fun SignalMetricsCard(meshPacket: MeshPacket, isSelected: Boolean, onClick: () -> Unit) {

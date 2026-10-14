@@ -2668,4 +2668,15 @@
     <string name="on_demand_no_answer">Brak odpowiedzi</string>
     <string name="on_demand_no_errors">Brak błędów routingu</string>
     <string name="on_demand_hero_progress">Sprawdzono %1$d z %2$d</string>
+    <string name="wifi_rssi_signal">WiFi RSSI</string>
+    <string name="wifi_rssi_definition">Siła połączenia WiFi samego urządzenia w dBm, raportowana przez firmware tylko wtedy, gdy jest połączone z siecią. Im bliżej 0, tym silniejszy sygnał; wartości poniżej około -80 dBm zwykle oznaczają niestabilne połączenie.</string>
+    <string name="wifi_drops_label">Zerwania WiFi</string>
+    <string name="wifi_drop_reason_label">Powód ostatniego zerwania WiFi</string>
+    <string name="wifi_disconnected_now">WiFi rozłączone</string>
+    <string name="wifi_reason_signal_lost">utracono punkt dostępowy (%1$d)</string>
+    <string name="wifi_reason_no_network">nie znaleziono sieci (%1$d)</string>
+    <string name="wifi_reason_handshake">nie dokończono logowania (%1$d)</string>
+    <string name="wifi_reason_auth_expired">wygasło uwierzytelnienie (%1$d)</string>
+    <string name="wifi_reason_self">rozłączone przez samo urządzenie (%1$d)</string>
+    <string name="wifi_reason_other">kod %1$d</string>
 </resources>

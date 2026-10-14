@@ -151,6 +151,7 @@ Tryb pokazujący ruch w eterze, który normalnie by zniknął — wszystkie paki
 - **Czas z ramki w snifferze** — karty pozycji i telemetrii pokazują czas zapisany przez nadawcę w samej ramce; czas niemożliwy (sprzed 2020 r. lub o ponad dobę w przyszłości) jest oznaczony jako błędny.
 - **Wymuś zatrzymanie aplikacji** — przycisk w ekranie Połączenia (z potwierdzeniem) rozłącza urządzenie, zatrzymuje usługę w tle i zamyka cały proces aplikacji, tak jak „Wymuś zatrzymanie” w ustawieniach systemu.
 - **Statusy wiadomości** — dostarczenie do sieci na czacie i potwierdzenie odbioru na priv są złote; na priv samo „dostarczono do sieci” (bez potwierdzenia odbiorcy) jest czerwone; błąd wysyłania jest fioletowy. Tarcza podpisanej wiadomości jest złota.
+- **Sygnał WiFi samego urządzenia** — gdy firmware wysyła pola WiFi, „Jakość sygnału” pokazuje na wykresie osobną linię WiFi RSSI, a w liście karty z siłą sygnału, liczbą zerwań łącza od startu i powodem ostatniego zerwania (np. „utracono punkt dostępowy (200)”, „nie znaleziono sieci (201)”); brak siły sygnału oznacza, że WiFi jest właśnie rozłączone. „Zdrowie sieci” (zakładka Sygnał, szczegóły węzła) ma wykresy „WiFi RSSI” i „Zerwania WiFi”, a „Diagnostyka na żądanie” te same wartości w statystykach węzła. Procesor i pamięć zostają w statystykach hosta.
 
 ## Bezpieczeństwo
 
@@ -381,6 +382,7 @@ A mode that surfaces air traffic that would normally just vanish — every packe
 - **Frame time in the sniffer** — position and telemetry cards show the time the sender wrote into the frame itself; an impossible time (before 2020 or more than a day ahead) is flagged as wrong.
 - **Force stop the app** — a button on the Connections screen (with confirmation) disconnects the device, stops the background service and ends the whole app process, like "Force stop" in the system settings.
 - **Message statuses** — delivered to the network in a channel and acknowledged by the recipient in a DM are gold; a DM that was only delivered to the network (no recipient ack) is red; a send error is purple. The signed-message shield is gold.
+- **The device's own WiFi signal** — when the firmware sends the WiFi fields, "Signal quality" shows a separate WiFi RSSI line on the chart and list cards with the strength, the number of link drops since start and the reason of the last drop (e.g. "access point lost (200)", "network not found (201)"); a missing strength means WiFi is disconnected right now. "Network Health" (Signal tab, node detail) has "WiFi RSSI" and "WiFi drops" charts, and "On-demand diagnostics" shows the same values in the node statistics. CPU and memory stay in the host statistics.
 
 ## Security
 

@@ -62,6 +62,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.DateFormatter
+import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.formatByteSize
 import org.meshtastic.core.common.util.formatString
 import org.meshtastic.core.model.NodeAddress
@@ -175,6 +176,9 @@ import org.meshtastic.core.resources.port_name_traceroute
 import org.meshtastic.core.resources.port_name_unknown
 import org.meshtastic.core.resources.port_name_waypoint
 import org.meshtastic.core.resources.port_name_zps
+import org.meshtastic.core.resources.wifi_drop_reason_label
+import org.meshtastic.core.resources.wifi_drops_label
+import org.meshtastic.core.resources.wifi_rssi_signal
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.icon.AirUtilization
@@ -835,6 +839,9 @@ private fun NodeStatsVisual(stats: NodeStats) {
                         Res.string.on_demand_flood_counter,
                         Res.string.on_demand_nexthop_counter,
                         Res.string.on_demand_blocked_hoplimit,
+                        Res.string.wifi_rssi_signal,
+                        Res.string.wifi_drops_label,
+                        Res.string.wifi_drop_reason_label,
                         Res.string.on_demand_firmware_version,
                     )
             }
@@ -1171,7 +1178,9 @@ private fun iconForLabel(label: StringResource): ImageVector = when (label) {
 
     Res.string.on_demand_firmware_version -> MeshtasticIcons.MeshRadio
 
-    Res.string.on_demand_rssi -> MeshtasticIcons.Rssi
+    Res.string.on_demand_rssi,
+    Res.string.wifi_rssi_signal,
+    -> MeshtasticIcons.Rssi
 
     Res.string.on_demand_snr -> MeshtasticIcons.Snr
 
@@ -1255,5 +1264,9 @@ internal fun nodeStatsRows(stats: NodeStats): List<Pair<StringResource, String>>
     stats.flood_counter?.let { add(Res.string.on_demand_flood_counter to "$it") }
     stats.nexthop_counter?.let { add(Res.string.on_demand_nexthop_counter to "$it") }
     stats.blocked_by_hoplimit?.let { add(Res.string.on_demand_blocked_hoplimit to "$it") }
+    stats.wifi_rssi?.let { add(Res.string.wifi_rssi_signal to MetricFormatter.rssi(it)) }
+    stats.wifi_drops?.let { add(Res.string.wifi_drops_label to "$it") }
+    // Only the ESP-IDF code here; the signal quality screen spells out what it means.
+    stats.wifi_drop_reason?.takeIf { it != 0 }?.let { add(Res.string.wifi_drop_reason_label to "$it") }
     stats.firmware_version?.let { add(Res.string.on_demand_firmware_version to it) }
 }

@@ -47,6 +47,9 @@ message NodeStats {
     optional string firmware_version = 32;
     optional uint32 blocked_by_hoplimit = 33;
     optional uint32 fw_plus_version = 34;
+    optional int32 wifi_rssi = 35;
+    optional uint32 wifi_drops = 36;
+    optional uint32 wifi_drop_reason = 37;
 }
 
 message RxPacketHistory {

@@ -37,7 +37,17 @@ data class LocalStatsExtended(
     val flashTotalBytes: Int = 0,
     val memoryPsramFree: Int = 0,
     val memoryPsramTotal: Int = 0,
-)
+    /** WiFi signal strength in dBm; 0 = not reported (no WiFi link right now, or a device without WiFi). */
+    val wifiRssi: Int = 0,
+    /** How many times a working WiFi link dropped since the device started (ESP32 only). */
+    val wifiDrops: Int = 0,
+    /** ESP-IDF code of the last WiFi drop, 0 = none yet. */
+    val wifiDropReason: Int = 0,
+) {
+    /** True when the device reported anything about WiFi in this sample. */
+    val hasWifi: Boolean
+        get() = wifiRssi != 0 || wifiDrops != 0 || wifiDropReason != 0
+}
 
 /** Convenience wrapper so existing call sites keep decoding straight off a [Telemetry] packet. */
 fun Telemetry.decodeLocalStatsExtended(): LocalStatsExtended? = unknownFields.decodeLocalStatsExtended()
@@ -50,7 +60,7 @@ private const val WIRE_TYPE_FIXED32 = 5
 
 /**
  * Scans these [ByteString] unknown fields (from [org.meshtastic.proto.Telemetry.unknownFields]) for the
- * `local_stats_extended` (tag 20) oneof entry and decodes its 7 uint32 sub-fields by hand. Returns null if the field is
+ * `local_stats_extended` (tag 20) oneof entry and decodes its sub-fields (7 memory/CPU uint32s plus the 3 WiFi ones) by hand. Returns null if the field is
  * absent (e.g. stock firmware) or malformed.
  */
 fun ByteString.decodeLocalStatsExtended(): LocalStatsExtended? {
@@ -64,6 +74,10 @@ fun ByteString.decodeLocalStatsExtended(): LocalStatsExtended? {
         flashTotalBytes = fields[5]?.toInt() ?: 0,
         memoryPsramFree = fields[6]?.toInt() ?: 0,
         memoryPsramTotal = fields[7]?.toInt() ?: 0,
+        // wifi_rssi is a negative int32: it travels as a 10-byte varint, and toInt() keeps its sign.
+        wifiRssi = fields[8]?.toInt() ?: 0,
+        wifiDrops = fields[9]?.toInt() ?: 0,
+        wifiDropReason = fields[10]?.toInt() ?: 0,
     )
 }
 
