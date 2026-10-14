@@ -2449,5 +2449,16 @@
     <string name="on_demand_no_answer">No answer yet</string>
     <string name="on_demand_no_errors">No routing errors reported</string>
     <string name="on_demand_hero_progress">%1$d of %2$d checked</string>
+    <string name="wifi_rssi_signal">WiFi RSSI</string>
+    <string name="wifi_rssi_definition">Strength of the WiFi link of the device itself, in dBm, reported by firmware only while it is connected to a network. Closer to 0 is stronger; values below about -80 dBm usually mean an unstable link.</string>
+    <string name="wifi_drops_label">WiFi drops</string>
+    <string name="wifi_drop_reason_label">Last WiFi drop reason</string>
+    <string name="wifi_disconnected_now">WiFi disconnected now</string>
+    <string name="wifi_reason_signal_lost">access point lost (%1$d)</string>
+    <string name="wifi_reason_no_network">network not found (%1$d)</string>
+    <string name="wifi_reason_handshake">handshake not completed (%1$d)</string>
+    <string name="wifi_reason_auth_expired">authentication expired (%1$d)</string>
+    <string name="wifi_reason_self">disconnected by the device (%1$d)</string>
+    <string name="wifi_reason_other">code %1$d</string>
 </resources>
 

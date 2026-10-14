@@ -390,6 +390,9 @@ internal fun org.meshtastic.core.model.MeshLog.toHistoryEntry(): org.meshtastic.
         localStatsExtended
             ?.takeIf { it.memoryPsramTotal > 0 }
             ?.let { it.memoryPsramFree.toFloat() / it.memoryPsramTotal * PERCENT_MULTIPLIER },
+        // The device's own WiFi link: the strength only while connected, the drop counter whenever WiFi is reported.
+        wifiRssi = localStatsExtended?.wifiRssi?.takeIf { it != 0 },
+        wifiDrops = localStatsExtended?.takeIf { it.hasWifi }?.wifiDrops,
     )
 }
 
@@ -439,7 +442,7 @@ internal fun NetworkHealthMetric.historyValue(entry: org.meshtastic.core.model.N
 /** Sub-series labels for a metric tab's detail chart. Most metrics have one; several tabs have multiple. */
 internal fun NetworkHealthMetric.seriesLabels(): List<String> = when (this) {
     NetworkHealthMetric.POWER -> listOf("Bateria", "Napięcie", "Prąd")
-    NetworkHealthMetric.SIGNAL -> listOf("SNR", "RSSI", "Noise Floor")
+    NetworkHealthMetric.SIGNAL -> listOf("SNR", "RSSI", "Noise Floor", "WiFi RSSI", "Zerwania WiFi")
     NetworkHealthMetric.ETHER -> listOf("Ch. Util", "Air Util")
     NetworkHealthMetric.ENVIRONMENT -> listOf("Temperatura", "Wilgotność", "Ciśnienie")
     NetworkHealthMetric.TRAFFIC -> listOf("TX", "RX", "Duplikaty", "Przekazane", "Uszkodzone")
@@ -455,7 +458,8 @@ internal fun NetworkHealthMetric.seriesLabels(): List<String> = when (this) {
  */
 internal fun NetworkHealthMetric.seriesGroups(): List<List<String>> = when (this) {
     NetworkHealthMetric.POWER -> listOf(listOf("Napięcie", "Prąd"), listOf("Bateria"))
-    NetworkHealthMetric.SIGNAL -> listOf(listOf("SNR"), listOf("RSSI", "Noise Floor"))
+    NetworkHealthMetric.SIGNAL ->
+        listOf(listOf("SNR"), listOf("RSSI", "Noise Floor"), listOf("WiFi RSSI", "Zerwania WiFi"))
     NetworkHealthMetric.ETHER -> listOf(listOf("Ch. Util", "Air Util"))
     NetworkHealthMetric.ENVIRONMENT -> listOf(listOf("Temperatura", "Wilgotność"), listOf("Ciśnienie"))
     NetworkHealthMetric.TRAFFIC -> listOf(listOf("TX", "RX"), listOf("Duplikaty", "Przekazane", "Uszkodzone"))
@@ -481,6 +485,8 @@ internal fun NetworkHealthMetric.historySeriesValue(
             "SNR" -> entry.snr
             "RSSI" -> entry.rssi?.toFloat()
             "Noise Floor" -> entry.noiseFloor?.toFloat()
+            "WiFi RSSI" -> entry.wifiRssi?.toFloat()
+            "Zerwania WiFi" -> entry.wifiDrops?.toFloat()
             else -> null
         }
 

@@ -333,6 +333,10 @@ private fun formatSeriesValue(seriesLabel: String, value: Float): String = when 
 
     "Noise Floor" -> "${NumberFormatter.format(value, 1)} dB"
 
+    "WiFi RSSI" -> MetricFormatter.rssi(value.toInt())
+
+    "Zerwania WiFi" -> NumberFormatter.format(value, 0)
+
     "Ch. Util",
     "Air Util",
     -> MetricFormatter.percent(value, decimalPlaces = 2)
