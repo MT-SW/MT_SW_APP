@@ -135,7 +135,7 @@ fun EnvironmentMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Un
         infoData = listOf(InfoDialogData(Res.string.iaq, Res.string.iaq_definition, Environment.IAQ.color)),
         onRequestTelemetry = { viewModel.requestTelemetry(TelemetryType.ENVIRONMENT) },
         onExportCsv = { exportLauncher("environment_metrics.csv", "text/csv") },
-        infoExtraContent = state.node?.num?.let { num -> @Composable { PolaritySwitches(num) } },
+        infoExtraContent = state.node?.num?.let { num -> @Composable { CurrentPolaritySwitch(num) } },
         controlPart = {
             Column {
                 TimeFrameSelector(
