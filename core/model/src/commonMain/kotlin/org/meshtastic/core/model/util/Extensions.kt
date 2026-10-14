@@ -106,13 +106,16 @@ fun MeshPacket.isDirectSignal(): Boolean =
 
 /**
  * Returns true if this telemetry packet carries environment metrics worth listing: a temperature and humidity pair, or
- * a lightning reading. An AS3935 on its own reports only lightning, so it is admitted without the climate pair.
+ * a lightning reading, or a voltage/current reading. An AS3935 on its own reports only lightning, and an INA sensor
+ * only voltage and current, so both are admitted without the climate pair.
  */
 fun Telemetry.hasValidEnvironmentMetrics(): Boolean {
     val metrics = this.environment_metrics ?: return false
     val hasClimate = metrics.relative_humidity != null && metrics.temperature?.isNaN() == false
     val hasLightning = metrics.lightning_strike_count_1h != null || metrics.lightning_distance_km?.isNaN() == false
-    return hasClimate || hasLightning
+    // A node that reports only voltage and current (e.g. an INA sensor) still has frames worth opening.
+    val hasPower = metrics.voltage?.isNaN() == false || metrics.current?.isNaN() == false
+    return hasClimate || hasLightning || hasPower
 }
 
 /**
