@@ -52,6 +52,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Pole wzmocnienia LNA jest teraz w szczegółach sygnału także dla własnego węzła (można je ustawić tam i w ustawieniach LoRa).
 * Na liście rozmów tekst nazwy głównego kanału ma kolor motywu aplikacji, pozostałych kanałów czerwony (zamiast białego), a wiadomości prywatnych w kolorze węzła.
 * Kłódki przy kanałach w kolorach aplikacji: złota = bezpieczny kanał, czerwona otwarta = publiczny bez precyzyjnej lokalizacji, fioletowa otwarta = publiczny z precyzyjną lokalizacją (z białym ostrzeżeniem, gdy idzie też przez MQTT); opisy w pomocy dopasowane.
+* Osobny przełącznik „Odwróć wskazanie zasilania / baterii” (w oknie informacji metryk urządzenia, zasilania i pogody): dla modułu pomiarowego podłączonego odwrotnie zamienia „zasilanie” z „procent baterii” na liście węzłów, w szczegółach, w Zdrowiu sieci i w podsumowaniu. Procent jest szacowany z napięcia. Zmienia tylko to wskazanie; znak prądu ma swój osobny przełącznik.
 * Statystyki pogodowe: przełącznik „Pogoda / Zasilanie” nad wykresem. „Zasilanie” pokazuje napięcie i prąd czujnika takim samym wykresem jak w metrykach zasilania (dla czujnika, który podaje tylko napięcie i prąd, jest od razu włączone).
 * Diagnostyka na żądanie: udostępnianie i zapis wszystkich odebranych odpowiedzi do PDF, strony HTML, Markdown, tekstu i CSV (arkusz).
 * Pomoc listy węzłów (w aplikacji i w dokumentacji) ma sekcję „Poziom baterii”: wskaźniki w kolorach złotym, czerwonym i fioletowym, zasilanie zewnętrzne i brak danych, a dokumentacja także kolory w „Zdrowiu sieci”.
@@ -218,6 +219,7 @@ The entries below describe only what this fork adds on top of the original, from
 * The LNA gain field is now in the signal details for our own node too (it can be set there and in the LoRa settings).
 * On the conversation list the name text of the main channel is in the app theme color and of other channels red (instead of white), and of direct messages the node's color.
 * Channel locks use the app colors: gold = secure channel, red open = public without precise location, purple open = public with precise location (with a white warning when it also goes through MQTT); help texts updated.
+* A separate “Swap powered / battery indication” switch (in the info window of the device, power and environment metrics): for a monitor wired backwards it swaps “powered” and “battery percent” on the node list, in details, in Network Health and in the summary. The percentage is estimated from the voltage. It changes only this indication; the current sign has its own switch.
 * Environment statistics: a “Weather / Power” switch above the chart. “Power” shows the sensor's voltage and current with the same chart as the power metrics (switched on by itself for a sensor that reports only voltage and current).
 * On-demand diagnostics: sharing and saving all received answers as PDF, an HTML page, Markdown, text and CSV (spreadsheet).
 * The node list help (in the app and in the docs) has a “Battery level” section: gold, red and purple indicators, external power and no data; the docs also explain the colors in Network Health.

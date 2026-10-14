@@ -137,7 +137,7 @@ fun PowerMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
         timeProvider = { it.time.toDouble() },
         onRequestTelemetry = { viewModel.requestTelemetry(TelemetryType.POWER) },
         onExportCsv = { exportLauncher("power_metrics.csv", "text/csv") },
-        infoExtraContent = state.node?.num?.let { num -> @Composable { CurrentPolaritySwitch(num) } },
+        infoExtraContent = state.node?.num?.let { num -> @Composable { PolaritySwitches(num) } },
         controlPart = {
             Column {
                 TimeFrameSelector(

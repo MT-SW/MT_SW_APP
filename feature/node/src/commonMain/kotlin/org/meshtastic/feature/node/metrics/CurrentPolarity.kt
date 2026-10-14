@@ -23,8 +23,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.model.NodeMetricsHistoryEntry
+import org.meshtastic.core.model.swapBatteryPolarity
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.battery_invert
+import org.meshtastic.core.resources.battery_invert_description
 import org.meshtastic.core.resources.current_invert
 import org.meshtastic.core.resources.current_invert_description
 import org.meshtastic.core.ui.component.SwitchPreference
@@ -86,4 +89,48 @@ internal fun CurrentPolaritySwitch(nodeNum: Int, modifier: Modifier = Modifier) 
         enabled = true,
         onCheckedChange = { uiPrefs.setCurrentInverted(nodeNum, it) },
     )
+}
+
+/** Same swap of the powered/battery indication for a history entry (see [swapBatteryPolarity]). */
+internal fun NodeMetricsHistoryEntry.withBatterySwap(swap: Boolean): NodeMetricsHistoryEntry =
+    if (swap) copy(batteryLevel = swapBatteryPolarity(batteryLevel, deviceVoltage)) else this
+
+/** Telemetry with the powered/battery indication swapped (see [swapBatteryPolarity]); display only. */
+internal fun Telemetry.withBatterySwap(swap: Boolean): Telemetry {
+    val device = device_metrics
+    if (!swap || device == null) return this
+    return newBuilder()
+        .also { wb ->
+            wb.device_metrics =
+                device
+                    .newBuilder()
+                    .also { it.battery_level = swapBatteryPolarity(device.battery_level, device.voltage) }
+                    .build()
+        }
+        .build()
+}
+
+internal fun List<Telemetry>.withBatterySwap(swap: Boolean): List<Telemetry> =
+    if (swap) map { it.withBatterySwap(true) } else this
+
+/** Per-node switch that swaps "powered" and "battery percent" (power monitor wired backwards). Display only. */
+@Composable
+internal fun BatteryPolaritySwitch(nodeNum: Int, modifier: Modifier = Modifier) {
+    val uiPrefs = koinInject<UiPrefs>()
+    val inverted by uiPrefs.batteryInverted.collectAsStateWithLifecycle()
+    SwitchPreference(
+        modifier = modifier,
+        title = stringResource(Res.string.battery_invert),
+        summary = stringResource(Res.string.battery_invert_description),
+        checked = nodeNum in inverted,
+        enabled = true,
+        onCheckedChange = { uiPrefs.setBatteryInverted(nodeNum, it) },
+    )
+}
+
+/** Both polarity switches together, for the info windows of the screens that show a power sensor. */
+@Composable
+internal fun PolaritySwitches(nodeNum: Int) {
+    CurrentPolaritySwitch(nodeNum)
+    BatteryPolaritySwitch(nodeNum)
 }

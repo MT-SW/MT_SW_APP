@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.combine
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.model.swapBatteryPolarity
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.UiPrefs
@@ -139,9 +140,15 @@ class NetworkSummaryViewModel(
             val historyByNode = history.groupBy { it.num }
             val latestPerNode = historyByNode.mapValues { (_, entries) -> entries.maxByOrNull { it.timestamp } }
 
-            val batteryLevels = nodes.mapNotNull { it.deviceMetrics.battery_level }
-            val lowBatteryNodes = nodes.filter { (it.deviceMetrics.battery_level ?: 100) < LOW_BATTERY_THRESHOLD }
-            val mainsPowered = nodes.count { (it.deviceMetrics.battery_level ?: 0) > MAINS_POWERED_THRESHOLD }
+            // Nodes whose powered/battery indication is swapped (monitor wired backwards) show the other way round.
+            val batteryInverted = uiPrefs.batteryInverted.value
+            val shownBattery: (org.meshtastic.core.model.Node) -> Int? = { node ->
+                val level = node.deviceMetrics.battery_level
+                if (node.num in batteryInverted) swapBatteryPolarity(level, node.deviceMetrics.voltage) else level
+            }
+            val batteryLevels = nodes.mapNotNull(shownBattery)
+            val lowBatteryNodes = nodes.filter { (shownBattery(it) ?: 100) < LOW_BATTERY_THRESHOLD }
+            val mainsPowered = nodes.count { (shownBattery(it) ?: 0) > MAINS_POWERED_THRESHOLD }
 
             val snrByNode = nodes.filter { it.snr != Float.MAX_VALUE }
             val topSignalNodes =
@@ -151,7 +158,8 @@ class NetworkSummaryViewModel(
                     .map { SignalLeader(nameByNum[it.num] ?: "?", it.snr) }
             val weakSignalNodes = snrByNode.filter { it.snr < WEAK_SNR_THRESHOLD }
 
-            // Noise floors shown with each node's LNA gain correction (display-only). Local logs may carry node 0 (see remapLocal).
+            // Noise floors shown with each node's LNA gain correction (display-only). Local logs may carry node 0
+            // (see remapLocal).
             val lnaGains = uiPrefs.lnaGains.value
             val noiseFloors =
                 latestPerNode.mapNotNull { (num, entry) ->
@@ -289,7 +297,7 @@ class NetworkSummaryViewModel(
 
             val attentionItems = buildList {
                 lowBatteryNodes.forEach {
-                    add(AttentionItem(nameByNum[it.num] ?: "?", "Bateria ${it.deviceMetrics.battery_level}%"))
+                    add(AttentionItem(nameByNum[it.num] ?: "?", "Bateria ${shownBattery(it)}%"))
                 }
                 weakSignalNodes.forEach {
                     add(AttentionItem(nameByNum[it.num] ?: "?", "Słaby sygnał: ${MetricFormatter.snr(it.snr)}"))

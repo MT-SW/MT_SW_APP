@@ -46,4 +46,6 @@ data class NodeMetricsHistoryEntry(
     val heapFreePercent: Float? = null,
     val flashUsedPercent: Float? = null,
     val psramFreePercent: Float? = null,
+    /** Battery voltage from the device metrics; only used to estimate a percentage when the indication is swapped. */
+    val deviceVoltage: Float? = null,
 )

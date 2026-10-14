@@ -172,8 +172,9 @@ fun NodeItem(
     val roleLabel = stringResource(thatNode.user.role.label)
     val a11yStrings = rememberNodeDescriptionStrings(hopsAway = thatNode.hopsAway)
     val modemPreset = LocalModemPreset.current
+    val shownBattery = LocalLnaCorrection.current.batteryLevel(thatNode.num, thatNode.batteryLevel, thatNode.voltage)
     val nodeDescription =
-        remember(thatNode, distance, a11yStrings, modemPreset, roleLabel) {
+        remember(thatNode, distance, a11yStrings, modemPreset, roleLabel, shownBattery) {
             buildNodeDescription(
                 name = originalLongName,
                 isOnline = thatNode.isOnline,
@@ -181,7 +182,7 @@ fun NodeItem(
                 lastHeard = thatNode.lastHeard,
                 role = roleLabel,
                 hopsAway = thatNode.hopsAway,
-                batteryLevel = thatNode.batteryLevel,
+                batteryLevel = shownBattery,
                 distance = distance,
                 snr = thatNode.snrOrNull,
                 viaMqtt = thatNode.viaMqtt,
@@ -292,9 +293,11 @@ private fun NodeBatteryPositionRow(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if ((thatNode.batteryLevel ?: 0) > 0) {
+        val lna = LocalLnaCorrection.current
+        val shownBattery = lna.batteryLevel(thatNode.num, thatNode.batteryLevel, thatNode.voltage)
+        if ((shownBattery ?: 0) > 0) {
             MaterialBatteryInfo(
-                level = thatNode.batteryLevel ?: 0,
+                level = shownBattery ?: 0,
                 voltage = thatNode.voltage ?: 0f,
                 contentColor = contentColor,
             )

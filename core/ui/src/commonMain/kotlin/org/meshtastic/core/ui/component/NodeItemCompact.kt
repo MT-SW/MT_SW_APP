@@ -97,6 +97,7 @@ import org.meshtastic.core.ui.icon.Unmessageable
 import org.meshtastic.core.ui.icon.label
 import org.meshtastic.core.ui.icon.role
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
+import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.LocalModemPreset
 
 private const val COMPACT_ICON_SIZE_DP = 16
@@ -149,8 +150,9 @@ fun NodeItemCompact(
     val roleLabel = stringResource(thatNode.user.role.label)
     val a11yStrings = rememberNodeDescriptionStrings(hopsAway = thatNode.hopsAway)
     val modemPreset = LocalModemPreset.current
+    val shownBattery = LocalLnaCorrection.current.batteryLevel(thatNode.num, thatNode.batteryLevel, thatNode.voltage)
     val nodeDescription =
-        remember(thatNode, distance, lastHeardIsRelative, a11yStrings, modemPreset) {
+        remember(thatNode, distance, lastHeardIsRelative, a11yStrings, modemPreset, shownBattery) {
             buildNodeDescription(
                 name = longName,
                 isOnline = thatNode.isOnline,
@@ -158,7 +160,7 @@ fun NodeItemCompact(
                 lastHeard = thatNode.lastHeard,
                 role = roleLabel,
                 hopsAway = thatNode.hopsAway,
-                batteryLevel = thatNode.batteryLevel,
+                batteryLevel = shownBattery,
                 distance = distance,
                 snr = thatNode.snrOrNull,
                 viaMqtt = thatNode.viaMqtt,
@@ -200,9 +202,9 @@ fun NodeItemCompact(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 NodeChip(node = thatNode)
-                if (showPower && (thatNode.batteryLevel ?: 0) > 0) {
+                if (showPower && (shownBattery ?: 0) > 0) {
                     MaterialBatteryInfo(
-                        level = thatNode.batteryLevel ?: 0,
+                        level = shownBattery ?: 0,
                         voltage = thatNode.voltage ?: 0f,
                         contentColor = contentColor,
                     )
