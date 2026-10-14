@@ -69,8 +69,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.network_health_hero_no_data
+import org.meshtastic.core.resources.network_health_hero_reporting
 import org.meshtastic.core.resources.network_health_hero_subtitle
 import org.meshtastic.core.resources.network_health_hero_title
 import org.meshtastic.core.resources.network_health_info_intro
@@ -95,6 +97,7 @@ import org.meshtastic.core.ui.icon.SignalCellular4Bar
 import org.meshtastic.core.ui.icon.Temperature
 import org.meshtastic.core.ui.icon.Warning
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
+import org.meshtastic.core.ui.util.LocalLnaCorrection
 
 private const val RING_SIZE_DP = 96
 private const val RING_STROKE_DP = 12
@@ -176,10 +179,23 @@ internal fun NetworkHealthHero(uiState: NetworkHealthUiState, modifier: Modifier
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            HealthRing(
-                segments = RANKED_LEVELS.map { it to (counts[it] ?: 0) },
-                centerText = if (verdictTotal > 0) "${good * PERCENT / verdictTotal}%" else "—",
-            )
+            if (verdictTotal > 0) {
+                HealthRing(
+                    segments = RANKED_LEVELS.map { it to (counts[it] ?: 0) },
+                    centerText = "${good * PERCENT / verdictTotal}%",
+                )
+            } else {
+                // Tabs without a good/bad verdict (traffic, resources, ...): show how many nodes report anything.
+                DonutChart(
+                    segments =
+                    listOf(
+                        MaterialTheme.colorScheme.StatusOnline to uiState.withDataCount,
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f) to
+                            (uiState.totalCount - uiState.withDataCount).coerceAtLeast(0),
+                    ),
+                    centerText = "${uiState.withDataCount}",
+                )
+            }
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
                     text = stringResource(Res.string.network_health_hero_title),
@@ -190,6 +206,12 @@ internal fun NetworkHealthHero(uiState: NetworkHealthUiState, modifier: Modifier
                     text =
                     if (verdictTotal > 0) {
                         stringResource(Res.string.network_health_hero_subtitle, good, verdictTotal)
+                    } else if (uiState.withDataCount > 0) {
+                        stringResource(
+                            Res.string.network_health_hero_reporting,
+                            uiState.withDataCount,
+                            uiState.totalCount,
+                        )
                     } else {
                         stringResource(Res.string.network_health_hero_no_data)
                     },
@@ -370,6 +392,12 @@ internal fun NodeHealthRow(
     val base = MaterialTheme.colorScheme.surfaceContainer
     val container = if (level == HealthLevel.UNKNOWN) base else accent.copy(alpha = ROW_TINT_ALPHA).compositeOver(base)
     val valueColor = if (level == HealthLevel.UNKNOWN) MaterialTheme.colorScheme.onSurface else accent
+    val lna = LocalLnaCorrection.current
+    // The noise floor is shown after the LNA correction, like everywhere else in the app.
+    val shownValue =
+        node.valueFor(metric)?.let { raw ->
+            if (metric == NetworkHealthMetric.SIGNAL) lna.noiseFloor(node.num, raw.toInt()).toFloat() else raw
+        }
 
     Card(
         onClick = onClick,
@@ -419,7 +447,13 @@ internal fun NodeHealthRow(
                                 },
                             )
                             Text(
-                                text = if (node.isOnline) "Online" else "Offline",
+                                text =
+                                buildString {
+                                    append(if (node.isOnline) "Online" else "Offline")
+                                    if (metric == NetworkHealthMetric.SIGNAL && node.snr != null) {
+                                        append(" · SNR ${MetricFormatter.snr(node.snr)}")
+                                    }
+                                },
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -432,7 +466,7 @@ internal fun NodeHealthRow(
                     )
                     Column(horizontalAlignment = Alignment.End) {
                         Text(
-                            text = formatMetricValue(metric, node.valueFor(metric)),
+                            text = formatMetricValue(metric, shownValue),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = valueColor,

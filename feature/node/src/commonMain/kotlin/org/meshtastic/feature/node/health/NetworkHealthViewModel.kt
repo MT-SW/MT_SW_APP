@@ -48,6 +48,13 @@ enum class NetworkHealthSortField {
     LAST_HEARD,
 }
 
+private data class HistoryBundle(
+    val entries: List<org.meshtastic.core.model.NodeMetricsHistoryEntry>,
+    val myNodeNum: Int?,
+)
+
+private fun remapLocal(num: Int, myNodeNum: Int?): Int = if (myNodeNum != null && num == 0) myNodeNum else num
+
 private data class FilterFlags(val hideWithoutData: Boolean, val problemsOnly: Boolean)
 
 private data class SortSettings(
@@ -82,8 +89,8 @@ data class NodeHealthInfo(
     fun valueFor(metric: NetworkHealthMetric): Float? = when (metric) {
         NetworkHealthMetric.POWER -> batteryLevel?.toFloat()
 
-        // Signal tab sorts/displays by SNR; RSSI and noise floor are extra series in the detail chart.
-        NetworkHealthMetric.SIGNAL -> snr
+        // Signal tab shows the noise floor (latest reading from history); the verdict colour still comes from the SNR.
+        NetworkHealthMetric.SIGNAL -> metricHistory.lastOrNull()
 
         // Ether tab sorts/displays by channel utilization; air util TX is an extra series in the detail chart.
         NetworkHealthMetric.ETHER -> channelUtilization
@@ -93,13 +100,13 @@ data class NodeHealthInfo(
         NetworkHealthMetric.ENVIRONMENT -> temperature
 
         // Traffic tab sorts/displays by packets received; the rest are extra series in the detail chart.
-        NetworkHealthMetric.TRAFFIC -> null
+        NetworkHealthMetric.TRAFFIC -> metricHistory.lastOrNull()
 
         NetworkHealthMetric.NEIGHBORS -> neighborCount?.toFloat()
 
         // Resources tab (fw+ local_stats_extended) isn't part of the live Node model — like Traffic, its sparkline
         // and detail chart are driven entirely by history, not a "current" column value.
-        NetworkHealthMetric.RESOURCES -> null
+        NetworkHealthMetric.RESOURCES -> metricHistory.lastOrNull()
     }
 }
 
@@ -114,6 +121,8 @@ data class NetworkHealthUiState(
     val problemsOnly: Boolean = false,
     val onlineCount: Int = 0,
     val totalCount: Int = 0,
+    /** Nodes that have any value or history on the active tab. */
+    val withDataCount: Int = 0,
     /** How many nodes fall into each verdict on the active tab (all nodes, ignoring filters). */
     val levelCounts: Map<HealthLevel, Int> = emptyMap(),
     /** The worst verdict of every tab, used to tint the tab icons. */
@@ -157,8 +166,12 @@ class NetworkHealthViewModel(
                     { entry ->
                         if (myNodeNum != null && entry.num == 0) entry.copy(num = myNodeNum) else entry
                     }
-                allLogs.mapNotNull { it.toSignalHistoryEntry()?.let(remap) } +
-                    telemetryLogs.mapNotNull { it.toHistoryEntry()?.let(remap) }
+                HistoryBundle(
+                    entries =
+                    allLogs.mapNotNull { it.toSignalHistoryEntry()?.let(remap) } +
+                        telemetryLogs.mapNotNull { it.toHistoryEntry()?.let(remap) },
+                    myNodeNum = myNodeNum,
+                )
             },
             meshLogRepository.getLogsByPortNum(PortNum.NEIGHBORINFO_APP.value, NEIGHBOR_LOG_LIMIT),
             _activeMetric,
@@ -170,16 +183,19 @@ class NetworkHealthViewModel(
                 searchTextFlow,
                 ::SortSettings,
             ),
-        ) { nodes, history, neighborLogs, metric, sortSettings ->
+        ) { nodes, historyBundle, neighborLogs, metric, sortSettings ->
+            val history = historyBundle.entries
             val neighborCountByNode =
                 neighborLogs
-                    .distinctBy { it.fromNum }
+                    .sortedByDescending { it.received_date }
+                    // The connected device's own reports are stored under node 0 (see above).
+                    .distinctBy { remapLocal(it.fromNum, historyBundle.myNodeNum) }
                     .mapNotNull { log ->
                         val payload = log.fromRadio.packet?.decoded?.payload ?: return@mapNotNull null
                         val info =
                             runCatching { NeighborInfo.ADAPTER.decode(payload) }.getOrNull()
                                 ?: return@mapNotNull null
-                        log.fromNum to info.neighbors.size
+                        remapLocal(log.fromNum, historyBundle.myNodeNum) to info.neighbors.size
                     }
                     .toMap()
             val (sortField, sortAscending, favoritesFirst, filters, searchText) = sortSettings
@@ -257,6 +273,8 @@ class NetworkHealthViewModel(
                 problemsOnly = problemsOnly,
                 onlineCount = healthInfos.count { it.isOnline },
                 totalCount = healthInfos.size,
+                withDataCount =
+                healthInfos.count { it.valueFor(metric) != null || it.metricHistory.isNotEmpty() },
                 levelCounts = levelCounts,
                 worstLevelByMetric = worstByMetric,
             )
@@ -372,7 +390,7 @@ internal fun NetworkHealthMetric.historyValue(entry: org.meshtastic.core.model.N
     when (this) {
         NetworkHealthMetric.POWER -> entry.batteryLevel?.toFloat()
 
-        NetworkHealthMetric.SIGNAL -> entry.snr
+        NetworkHealthMetric.SIGNAL -> entry.noiseFloor?.toFloat()
 
         NetworkHealthMetric.ETHER -> entry.channelUtilization
 

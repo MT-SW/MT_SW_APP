@@ -16,7 +16,11 @@
  */
 package org.meshtastic.feature.node.health
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,8 +36,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -42,20 +46,24 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.patrykandpatrick.vico.compose.cartesian.axis.Axis
-import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
-import com.patrykandpatrick.vico.compose.cartesian.data.lineModel
-import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
@@ -68,10 +76,6 @@ import org.meshtastic.core.ui.theme.GraphColors.Orange
 import org.meshtastic.core.ui.theme.GraphColors.Red
 import org.meshtastic.core.ui.util.LnaCorrection
 import org.meshtastic.core.ui.util.LocalLnaCorrection
-import org.meshtastic.feature.node.metrics.ChartStyling
-import org.meshtastic.feature.node.metrics.CommonCharts
-import org.meshtastic.feature.node.metrics.GenericMetricChart
-import org.meshtastic.feature.node.metrics.MetricChartScaffold
 
 private val SERIES_COLORS = listOf(Green, Blue, Gold, Orange, Red)
 
@@ -117,153 +121,157 @@ fun NodeMetricDetailScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            val seriesByLabel = uiState.series.associateBy { it.label }
-            // Groups (from seriesGroups()) share magnitude, so group 0 → left axis, group 1 → right axis; all
-            // series within a group plot on that one real-value axis since their values are already close. Any
-            // series not covered by seriesGroups() (e.g. the SIGNAL tab's "Przeskoki" fallback) still gets shown,
-            // as its own singleton group, rather than silently disappearing.
-            val definedGroups = uiState.metric.seriesGroups().map { labels -> labels.mapNotNull { seriesByLabel[it] } }
-            val knownLabels = uiState.metric.seriesGroups().flatten().toSet()
-            val extraGroups = uiState.series.filter { it.label !in knownLabels }.map { listOf(it) }
-            val allGroups = definedGroups + extraGroups
-            // Stats show with just 1 reading; the chart line itself needs 2+ points to draw anything meaningful.
-            val statGroups = allGroups.map { g -> g.filter { it.points.isNotEmpty() } }.filter { it.isNotEmpty() }
-            val groups = allGroups.map { g -> g.filter { it.points.size >= 2 } }.filter { it.isNotEmpty() }
-
-            groups.forEachIndexed { groupIndex, groupSeries ->
-                groupSeries.forEach { s ->
-                    val color = colorFor(groups, groupIndex, s.label)
-                    // Traffic counters (except RX itself) also show their share of all received packets.
-                    val rx = seriesByLabel["RX"].takeIf { s.label in RX_SHARE_LABELS }
-                    Card(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                        shape = MaterialTheme.shapes.large,
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-                    ) {
-                        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            ) {
-                                Box(modifier = Modifier.size(10.dp).clip(CircleShape).background(color))
-                                Text(
-                                    text = s.label,
-                                    style = MaterialTheme.typography.titleSmall,
-                                    fontWeight = FontWeight.Bold,
-                                )
-                            }
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(24.dp),
-                                modifier = Modifier.fillMaxWidth(),
-                            ) {
-                                StatLabel(
-                                    label = "min",
-                                    value = s.minValue,
-                                    seriesLabel = s.label,
-                                    color = color,
-                                    rxTotal = rx?.minValue,
-                                )
-                                StatLabel(
-                                    label = "max",
-                                    value = s.maxValue,
-                                    seriesLabel = s.label,
-                                    color = color,
-                                    rxTotal = rx?.maxValue,
-                                )
-                                StatLabel(
-                                    label = "ostatnia",
-                                    value = s.latestValue,
-                                    seriesLabel = s.label,
-                                    color = color,
-                                    rxTotal = rx?.latestValue,
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            if (groups.isEmpty()) {
-                Text(
-                    text = "Za mało danych do wykresu — wróć za jakiś czas.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            } else {
-                MetricChartScaffold(
-                    isEmpty = false,
-                    legendData = emptyList(),
-                    modifier = Modifier.fillMaxWidth().height(280.dp),
-                ) { modelProducer, chartModifier ->
-                    LaunchedEffect(groups) {
-                        modelProducer.runTransaction {
-                            groups.forEach { groupSeries ->
-                                groupSeries.forEach { s ->
-                                    lineModel {
-                                        series(
-                                            x = s.points.map { it.timestampMillis / MILLIS_PER_SEC },
-                                            y = s.points.map { it.value },
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    val layers =
-                        groups.flatMapIndexed { groupIndex, groupSeries ->
-                            groupSeries.map { s ->
-                                val color = colorFor(groups, groupIndex, s.label)
-                                rememberLineCartesianLayer(
-                                    lineProvider =
-                                    LineCartesianLayer.LineProvider.series(ChartStyling.createBoldLine(color)),
-                                    verticalAxisPosition =
-                                    if (groupIndex == 0) {
-                                        Axis.Position.Vertical.Start
-                                    } else {
-                                        Axis.Position.Vertical.End
-                                    },
-                                )
-                            }
-                        }
-                    val startColor = groups.getOrNull(0)?.firstOrNull()?.let { colorFor(groups, 0, it.label) }
-                    val endColor = groups.getOrNull(1)?.firstOrNull()?.let { colorFor(groups, 1, it.label) }
-                    GenericMetricChart(
-                        modelProducer = modelProducer,
-                        modifier = chartModifier,
-                        layers = layers,
-                        startAxis =
-                        startColor?.let {
-                            VerticalAxis.rememberStart(label = ChartStyling.rememberAxisLabel(color = it))
-                        },
-                        endAxis =
-                        endColor?.let {
-                            VerticalAxis.rememberEnd(label = ChartStyling.rememberAxisLabel(color = it))
-                        },
-                        bottomAxis = CommonCharts.rememberBottomTimeAxis(),
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            ) {
+                DetailViewMode.entries.forEach { mode ->
+                    FilterChip(
+                        selected = DetailViewModeState.value == mode,
+                        onClick = { DetailViewModeState.value = mode },
+                        label = { Text(mode.label) },
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            val seriesByLabel = uiState.series.associateBy { it.label }
+            // Series not covered by seriesGroups() (e.g. the SIGNAL tab's "Przeskoki") are still shown, after the rest.
+            val knownLabels = uiState.metric.seriesGroups().flatten().toSet()
+            val ordered =
+                uiState.metric.seriesGroups().flatten().mapNotNull { seriesByLabel[it] } +
+                    uiState.series.filter { it.label !in knownLabels }
+            val headlineLabel = headlineLabelFor(uiState)
+            val shown =
+                ordered.filter { it.points.isNotEmpty() }.sortedBy { if (it.label == headlineLabel) 0 else 1 }
+
+            if (shown.isEmpty()) {
+                Text(
+                    text = "Brak danych w tym zakresie — wróć za jakiś czas.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            shown.forEachIndexed { index, s ->
+                // Traffic counters (except RX itself) also show their share of all received packets.
+                val rx = seriesByLabel["RX"].takeIf { s.label in RX_SHARE_LABELS }
+                SeriesCard(
+                    series = s,
+                    color = SERIES_COLORS.getOrElse(index) { Color.Gray },
+                    rx = rx,
+                    scale = scaleFor(uiState.metric, s.label),
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
         }
     }
 }
 
-/** Assigns a distinct color to each series across all groups, offsetting by how many series preceded it. */
-private fun colorFor(groups: List<List<MetricSeries>>, groupIndex: Int, label: String): Color {
-    var flatIndex = 0
-    for ((gi, g) in groups.withIndex()) {
-        for (s in g) {
-            if (gi == groupIndex && s.label == label) return SERIES_COLORS.getOrElse(flatIndex) { Color.Gray }
-            flatIndex++
-        }
+/** Which series the top card shows: the noise floor on the signal tab (the colour still comes from the SNR). */
+private fun headlineLabelFor(uiState: NodeMetricDetailUiState): String {
+    val first = uiState.metric.seriesLabels().first()
+    val preferred = if (uiState.metric == NetworkHealthMetric.SIGNAL) "Noise Floor" else first
+    return if (uiState.series.any { it.label == preferred && it.points.isNotEmpty() }) {
+        preferred
+    } else {
+        first
     }
-    return Color.Gray
 }
 
-private const val MILLIS_PER_SEC = 1000L
+/** One series: its name and latest (or touched) value, the chart, and min / max / latest underneath. */
+@Composable
+private fun SeriesCard(series: MetricSeries, color: Color, rx: MetricSeries?, scale: LevelScale?) {
+    val palette = levelPalette()
+    var touched by remember { mutableStateOf<MetricPoint?>(null) }
+    val shownValue = touched?.value ?: series.latestValue
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+    ) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Box(modifier = Modifier.size(10.dp).clip(CircleShape).background(color))
+                Text(
+                    text = series.label,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f),
+                )
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = shownValue?.let { formatSeriesValue(series.label, it) } ?: "—",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = color,
+                    )
+                    touched?.let {
+                        Text(
+                            text = chartTimeLabel(it.timestampMillis, withDay = true),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+            if (scale != null) TimeInStateStrip(points = series.points, scale = scale, palette = palette)
+            val format = { v: Float -> formatSeriesValue(series.label, v) }
+            val chartModifier = Modifier.fillMaxWidth().height(CHART_HEIGHT_DP.dp)
+            val enoughPoints = series.points.size >= 2
+            when {
+                DetailViewModeState.value == DetailViewMode.GAUGE ->
+                    GaugeView(series = series, color = color, scale = scale, palette = palette, format = format)
+
+                !enoughPoints ->
+                    Text(
+                        text = "Za mało pomiarów do wykresu — wróć za jakiś czas.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+
+                DetailViewModeState.value == DetailViewMode.BARS ->
+                    BucketBarsView(
+                        points = series.points,
+                        color = color,
+                        scale = scale,
+                        palette = palette,
+                        yLabel = format,
+                        onSelect = { touched = it },
+                        modifier = chartModifier,
+                    )
+
+                DetailViewModeState.value == DetailViewMode.HEAT ->
+                    HeatmapView(
+                        points = series.points,
+                        color = color,
+                        scale = scale,
+                        palette = palette,
+                        onSelect = { touched = it },
+                    )
+
+                else ->
+                    LineAreaChart(
+                        points = series.points,
+                        color = color,
+                        yLabel = format,
+                        onSelect = { touched = it },
+                        modifier = chartModifier,
+                        scale = scale,
+                        palette = palette,
+                    )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(24.dp), modifier = Modifier.fillMaxWidth()) {
+                StatLabel("min", series.minValue, series.label, color, rx?.minValue)
+                StatLabel("max", series.maxValue, series.label, color, rx?.maxValue)
+                StatLabel("ostatnia", series.latestValue, series.label, color, rx?.latestValue)
+            }
+        }
+    }
+}
+
+private const val CHART_HEIGHT_DP = 170
 
 /** RSSI is corrected by our own LNA gain, "Noise Floor" by the viewed node's gain; other series are untouched. */
 private fun MetricSeries.withLnaCorrection(lna: LnaCorrection, nodeNum: Int): MetricSeries {
@@ -355,7 +363,7 @@ private fun formatSeriesValue(seriesLabel: String, value: Float): String = when 
 
 private const val HERO_TINT_ALPHA = 0.14f
 private const val HERO_ICON_ALPHA = 0.18f
-private const val HERO_ICON_DP = 56
+private const val HERO_ICON_DP = 76
 
 private const val BATTERY_GOOD = 50f
 private const val BATTERY_MEDIUM = 20f
@@ -382,9 +390,17 @@ private fun headlineLevel(metric: NetworkHealthMetric, value: Float?): HealthLev
 /** Top card of the detail screen: tab icon in the verdict colour, node name, the latest value and a trend line. */
 @Composable
 private fun NodeMetricHero(uiState: NodeMetricDetailUiState) {
-    val headline = uiState.series.firstOrNull { it.label == uiState.metric.seriesLabels().first() }
+    val headline = uiState.series.firstOrNull { it.label == headlineLabelFor(uiState) }
     val latest = headline?.latestValue
-    val level = headlineLevel(uiState.metric, latest)
+    // The verdict comes from the SNR on the signal tab, even though the big number is the noise floor.
+    val verdictValue =
+        if (uiState.metric == NetworkHealthMetric.SIGNAL) {
+            uiState.series.firstOrNull { it.label == "SNR" }?.latestValue
+        } else {
+            latest
+        }
+    val level = headlineLevel(uiState.metric, verdictValue)
+    val gaugeFraction = gaugeFraction(uiState.metric, verdictValue)
     val accent = if (level == HealthLevel.UNKNOWN) MaterialTheme.colorScheme.primary else level.color()
     val base = MaterialTheme.colorScheme.surfaceContainer
 
@@ -398,18 +414,7 @@ private fun NodeMetricHero(uiState: NodeMetricDetailUiState) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Box(
-                modifier =
-                Modifier.size(HERO_ICON_DP.dp).clip(CircleShape).background(accent.copy(alpha = HERO_ICON_ALPHA)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = uiState.metric.icon(),
-                    contentDescription = null,
-                    tint = accent,
-                    modifier = Modifier.size(30.dp),
-                )
-            }
+            GaugeIcon(icon = uiState.metric.icon(), accent = accent, fraction = gaugeFraction)
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(
                     text = uiState.nodeName,
@@ -451,3 +456,65 @@ private fun NodeMetricHero(uiState: NodeMetricDetailUiState) {
         }
     }
 }
+
+private const val SNR_GAUGE_MIN = -20f
+private const val SNR_GAUGE_RANGE = 30f
+private const val PERCENT_MAX = 100f
+
+/** How full the ring around the icon is (0 to 1); a full faint ring when the tab has no scale. */
+private fun gaugeFraction(metric: NetworkHealthMetric, value: Float?): Float {
+    if (value == null) return 0f
+    return when (metric) {
+        NetworkHealthMetric.POWER,
+        NetworkHealthMetric.ETHER,
+        -> value / PERCENT_MAX
+
+        NetworkHealthMetric.SIGNAL -> (value - SNR_GAUGE_MIN) / SNR_GAUGE_RANGE
+        else -> 1f
+    }.coerceIn(0f, 1f)
+}
+
+private const val GAUGE_START_ANGLE = 135f
+private const val GAUGE_SWEEP = 270f
+private const val GAUGE_ANIMATION_MILLIS = 900
+
+/** The tab icon in the middle of a glowing 270 degree gauge that fills to [fraction]. */
+@Composable
+private fun GaugeIcon(icon: ImageVector, accent: Color, fraction: Float) {
+    var target by remember { mutableFloatStateOf(0f) }
+    LaunchedEffect(fraction) { target = fraction }
+    val filled by animateFloatAsState(target, tween(GAUGE_ANIMATION_MILLIS), label = "gauge")
+    val track = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+    Box(modifier = Modifier.size(HERO_ICON_DP.dp), contentAlignment = Alignment.Center) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val stroke = 7.dp.toPx()
+            val topLeft = Offset(stroke / 2, stroke / 2)
+            val arcSize = Size(size.width - stroke, size.height - stroke)
+            drawCircle(
+                brush = Brush.radialGradient(listOf(accent.copy(alpha = 0.30f), Color.Transparent)),
+                radius = size.minDimension / 2,
+            )
+            drawArc(
+                color = track,
+                startAngle = GAUGE_START_ANGLE,
+                sweepAngle = GAUGE_SWEEP,
+                useCenter = false,
+                topLeft = topLeft,
+                size = arcSize,
+                style = Stroke(width = stroke, cap = StrokeCap.Round),
+            )
+            drawArc(
+                color = accent,
+                startAngle = GAUGE_START_ANGLE,
+                sweepAngle = GAUGE_SWEEP * filled,
+                useCenter = false,
+                topLeft = topLeft,
+                size = arcSize,
+                style = Stroke(width = stroke, cap = StrokeCap.Round),
+            )
+        }
+        Icon(imageVector = icon, contentDescription = null, tint = accent, modifier = Modifier.size(HERO_GLYPH_DP.dp))
+    }
+}
+
+private const val HERO_GLYPH_DP = 30
