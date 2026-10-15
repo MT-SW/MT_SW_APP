@@ -21,6 +21,10 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 **Scalenie z oryginałem (15.10)**
 * Scalenie z najnowszym oryginałem: kopia zapasowa i przywracanie danych aplikacji (wiadomości i węzły) w ustawieniach radia, ustawienia radia można otwierać i czytać bez połączenia z radiem (zapis wymaga połączenia), wybór koloru z gotowymi kolorami przy oświetleniu, ponawianie nieudanej wiadomości w tym samym miejscu, karta połączonego radia pokazuje preset LoRa i region, wymóg aktualizacji firmware (stare radio zostaje połączone, ale aplikacja prosi o aktualizację), przełączniki powiadomień o reakcjach i nowych waypointach na pulpicie, wyszukiwarka ustawień przechodzi do konkretnej opcji, nazwy nieznanych przeskoków w traceroute oraz aktualizacje bibliotek (Compose Multiplatform 1.12.2, markdown 0.7.18, kotest, Firebase) i tłumaczeń. Dopisane polskie tłumaczenia nowych tekstów. W forku zostają bez zmian: wyłączone automatyczne udostępnianie kontaktu i ulubione przy wiadomościach prywatnych (także przy ponawianiu), niższy próg firmware dla trybu blokady oraz kolory i podpisy SNR w traceroute. Biblioteka Bluetooth Kable zostaje przypięta do 0.44.3.
 
+**Zdrowie sieci — szczegóły węzła: więcej zakresów i płynność**
+* Zakresy czasu jak w metrykach urządzenia: 1 h, 24 h, 7 dni, 2 tygodnie, 30 dni i „Wszystko”.
+* Wykresy Zegar, Słupki i Mapa cieplna nie zacinają się już przy długich zakresach: dane są liczone poza głównym wątkiem i zmniejszane do rozsądnej liczby punktów, a mapa cieplna jest rysowana jako jeden obraz (pokazuje do 31 dni).
+
 **Zdrowie sieci — filtr po ocenie**
 * Kliknięcie w liczbę w karcie „Kondycja sieci” (np. „3 Źle”) pokazuje na liście tylko węzły z tą oceną; ponowne kliknięcie pokazuje wszystkie. Wybrana ocena jest podświetlona.
 * Każda zakładka (Zasilanie, Sygnał, Eter…) pamięta swój filtr osobno, więc po przełączeniu zakładek każda zachowuje własny wybór.
@@ -208,6 +212,10 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Network Health — node details: more ranges and smoothness**
+* Time ranges as in device metrics: 1 h, 24 h, 7 days, 2 weeks, 30 days and "All".
+* The Gauge, Bars and Heatmap views no longer freeze on long ranges: data is computed off the main thread and reduced to a sensible number of points, and the heatmap is drawn as one image (showing up to 31 days).
 
 **Merge with the original (15.10)**
 * Merge with the latest original: backup and restore of the app data (messages and nodes) in the radio settings, radio settings can be opened and read without a connected radio (saving needs a connection), a colour picker with preset colours for the lighting, resending a failed message in place, the connected-radio card shows the LoRa preset and region, a firmware update requirement (an old radio stays connected, but the app asks for an update), notification switches for reactions and new waypoints on the desktop, the settings search jumps to the exact option, names for unknown traceroute hops, and updates of libraries (Compose Multiplatform 1.12.2, markdown 0.7.18, kotest, Firebase) and translations. Polish translations added for the new texts. Unchanged in the fork: automatic contact sharing and favouriting on direct messages stay off (also when resending), the lowered firmware limit for lockdown mode, and the SNR colours and labels in traceroute. The Bluetooth library Kable stays pinned to 0.44.3.

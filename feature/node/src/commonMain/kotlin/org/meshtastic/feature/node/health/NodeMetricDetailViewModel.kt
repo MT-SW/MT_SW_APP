@@ -18,11 +18,13 @@ package org.meshtastic.feature.node.health
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.koin.core.annotation.InjectedParam
@@ -36,10 +38,29 @@ import org.meshtastic.feature.node.metrics.withCurrentSign
 import org.meshtastic.proto.PortNum
 
 /** Time window options for the metric detail chart. */
-enum class NodeMetricRange(val label: String, val millis: Long) {
-    DAY("24h", 24 * 60 * 60 * 1000L),
+enum class NodeMetricRange(val label: String, val millis: Long?) {
+    HOUR("1 h", 60 * 60 * 1000L),
+    DAY("24 h", 24 * 60 * 60 * 1000L),
     WEEK("7 dni", 7 * 24 * 60 * 60 * 1000L),
+    TWO_WEEKS("2 tyg.", 14L * 24 * 60 * 60 * 1000L),
     MONTH("30 dni", 30L * 24 * 60 * 60 * 1000L),
+    ALL("Wszystko", null),
+    ;
+
+    /** Start of the window in epoch millis; 0 means "from the very beginning". */
+    fun since(now: Long): Long = millis?.let { (now - it).coerceAtLeast(0L) } ?: 0L
+}
+
+/** More points than this make no visible difference on a phone screen, but make long ranges slow. */
+private const val MAX_POINTS_PER_SERIES = 1200
+
+/** Thins a long series by averaging neighbouring points; min / max / latest are taken from the full data first. */
+private fun List<MetricPoint>.thinned(): List<MetricPoint> {
+    if (size <= MAX_POINTS_PER_SERIES) return this
+    val step = (size + MAX_POINTS_PER_SERIES - 1) / MAX_POINTS_PER_SERIES
+    return chunked(step).map { chunk ->
+        MetricPoint(chunk[chunk.size / 2].timestampMillis, chunk.sumOf { it.value.toDouble() }.toFloat() / chunk.size)
+    }
 }
 
 /** A single plotted point: milliseconds-since-epoch timestamp paired with the metric's value at that time. */
@@ -81,7 +102,7 @@ class NodeMetricDetailViewModel(
     init {
         combine(rangeFlow, metricFlow) { range, metric -> range to metric }
             .flatMapLatest { (range, metric) ->
-                val since = nowMillis - range.millis
+                val since = range.since(nowMillis)
                 combine(
                     meshLogRepository.getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, since),
                     meshLogRepository.getLogsFromNodeSince(nodeNum, since),
@@ -118,7 +139,7 @@ class NodeMetricDetailViewModel(
                                 }
                             MetricSeries(
                                 label = seriesLabel,
-                                points = points,
+                                points = points.thinned(),
                                 minValue = points.minOfOrNull { it.value },
                                 maxValue = points.maxOfOrNull { it.value },
                                 latestValue = points.lastOrNull()?.value,
@@ -144,7 +165,7 @@ class NodeMetricDetailViewModel(
                             val hopsSeries =
                                 MetricSeries(
                                     label = "Przeskoki",
-                                    points = hopPoints,
+                                    points = hopPoints.thinned(),
                                     minValue = hopPoints.minOfOrNull { it.value },
                                     maxValue = hopPoints.maxOfOrNull { it.value },
                                     latestValue = hopPoints.lastOrNull()?.value,
@@ -168,6 +189,7 @@ class NodeMetricDetailViewModel(
                     )
                 }
             }
+            .flowOn(Dispatchers.Default)
             .onEach { _uiState.value = it }
             .launchIn(viewModelScope)
     }

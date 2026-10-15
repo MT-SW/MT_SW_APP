@@ -19,9 +19,9 @@ package org.meshtastic.feature.node.health
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -233,7 +233,7 @@ internal fun GaugeView(
     format: (Float) -> String,
     modifier: Modifier = Modifier,
 ) {
-    val values = series.points.sortedBy { it.timestampMillis }.map { it.value }
+    val values = remember(series.points) { series.points.sortedBy { it.timestampMillis }.map { it.value } }
     val latest = series.latestValue ?: values.lastOrNull() ?: return
     val minV = series.minValue ?: values.min()
     val maxV = series.maxValue ?: values.max()
@@ -244,9 +244,9 @@ internal fun GaugeView(
     val fraction = ((latest - gMin) / range).coerceIn(0f, 1f)
     val markerColor = scale?.let { palette[it.level(latest)] } ?: color
     val track = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
-    val average = values.average().toFloat()
+    val average = remember(values) { values.average().toFloat() }
     val third = (values.size / 3).coerceAtLeast(1)
-    val delta = values.takeLast(third).average().toFloat() - values.take(third).average().toFloat()
+    val delta = remember(values) { values.takeLast(third).average().toFloat() - values.take(third).average().toFloat() }
 
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Box(modifier = Modifier.fillMaxWidth().height(GAUGE_HEIGHT_DP.dp), contentAlignment = Alignment.BottomCenter) {
@@ -352,15 +352,19 @@ internal fun BucketBarsView(
     val span = (sorted.last().timestampMillis - t0).coerceAtLeast(1L)
     val buckets =
         remember(sorted) {
+            val sums = DoubleArray(BAR_BUCKETS)
+            val counts = IntArray(BAR_BUCKETS)
+            sorted.forEach { p ->
+                val i = (((p.timestampMillis - t0) * BAR_BUCKETS) / span).toInt().coerceIn(0, BAR_BUCKETS - 1)
+                sums[i] += p.value.toDouble()
+                counts[i]++
+            }
             (0 until BAR_BUCKETS).map { i ->
-                val from = t0 + span * i / BAR_BUCKETS
-                val to = t0 + span * (i + 1) / BAR_BUCKETS
-                val last = i == BAR_BUCKETS - 1
-                val inside = sorted.filter { it.timestampMillis >= from && (it.timestampMillis < to || last) }
-                if (inside.isEmpty()) {
+                if (counts[i] == 0) {
                     null
                 } else {
-                    MetricPoint((from + to) / 2, inside.map { it.value }.average().toFloat())
+                    val mid = t0 + span * (2 * i + 1) / (2 * BAR_BUCKETS)
+                    MetricPoint(mid, (sums[i] / counts[i]).toFloat())
                 }
             }
         }
@@ -433,13 +437,18 @@ internal fun BucketBarsView(
 }
 
 private const val HEAT_HOURS = 24
-private const val HEAT_MAX_ROWS = 14
+private const val HEAT_MAX_ROWS = 31
 private const val HEAT_CELL_DP = 20
 private const val HEAT_LABEL_DP = 46
 private const val HEAT_HOUR_STEP = 6
 private const val DATE_START = 5
+private const val HEAT_CELL_GAP_PX = 2f
+private const val HEAT_CELL_CORNER_PX = 5f
 
-/** A grid of hours (across) by days (down); every cell is the average for that hour, coloured by verdict. */
+/**
+ * A grid of hours (across) by days (down); every cell is the average for that hour, coloured by verdict. The whole grid
+ * is drawn on one canvas (not hundreds of separate boxes), so even a month of data stays smooth.
+ */
 @Composable
 internal fun HeatmapView(
     points: List<MetricPoint>,
@@ -449,26 +458,32 @@ internal fun HeatmapView(
     onSelect: (MetricPoint?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val grid =
+    val data =
         remember(points) {
-            val perCell = mutableMapOf<Pair<String, Int>, MutableList<MetricPoint>>()
+            val zone = TimeZone.currentSystemDefault()
+            val sums = mutableMapOf<Pair<String, Int>, DoubleArray>()
+            val firstTime = mutableMapOf<Pair<String, Int>, Long>()
             points.forEach { p ->
-                val zone = TimeZone.currentSystemDefault()
                 val dt = Instant.fromEpochMilliseconds(p.timestampMillis).toLocalDateTime(zone)
-                perCell.getOrPut(dt.date.toString() to dt.hour) { mutableListOf() }.add(p)
+                val key = dt.date.toString() to dt.hour
+                val acc = sums.getOrPut(key) { DoubleArray(2) }
+                acc[0] += p.value.toDouble()
+                acc[1] += 1.0
+                firstTime.getOrPut(key) { p.timestampMillis }
             }
-            perCell
+            val averages =
+                sums.mapValues { (key, acc) -> MetricPoint(firstTime.getValue(key), (acc[0] / acc[1]).toFloat()) }
+            averages to averages.keys.map { it.first }.distinct().sorted().takeLast(HEAT_MAX_ROWS)
         }
-    val days = grid.keys.map { it.first }.distinct().sorted().takeLast(HEAT_MAX_ROWS)
+    val averages = data.first
+    val days = data.second
     if (days.isEmpty()) return
-    val averages =
-        grid.mapValues { (_, list) ->
-            MetricPoint(list.first().timestampMillis, list.map { it.value }.average().toFloat())
-        }
     val minV = averages.values.minOf { it.value }
     val maxV = averages.values.maxOf { it.value }
     val spread = (maxV - minV).takeIf { it > 0f } ?: 1f
     val empty = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f)
+    val labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val labelStyle = MaterialTheme.typography.labelSmall
 
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(0.dp)) {
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -476,38 +491,53 @@ internal fun HeatmapView(
             (0 until HEAT_HOURS step HEAT_HOUR_STEP).forEach { hour ->
                 Text(
                     text = "$hour:00",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = labelStyle,
+                    color = labelColor,
                     modifier = Modifier.weight(HEAT_HOUR_STEP.toFloat()),
                 )
             }
         }
-        days.forEach { day ->
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = day.substring(DATE_START),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.width(HEAT_LABEL_DP.dp),
-                )
-                (0 until HEAT_HOURS).forEach { hour ->
-                    val cell = averages[day to hour]
-                    val tint =
-                        when {
-                            cell == null -> empty
-                            scale != null -> palette[scale.level(cell.value)] ?: color
-                            else -> color.copy(alpha = 0.2f + 0.8f * ((cell.value - minV) / spread))
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.width(HEAT_LABEL_DP.dp)) {
+                days.forEach { day ->
+                    Box(modifier = Modifier.height(HEAT_CELL_DP.dp), contentAlignment = Alignment.CenterStart) {
+                        Text(text = day.substring(DATE_START), style = labelStyle, color = labelColor)
+                    }
+                }
+            }
+            Canvas(
+                modifier =
+                Modifier
+                    .weight(1f)
+                    .height((HEAT_CELL_DP * days.size).dp)
+                    .pointerInput(days, averages) {
+                        detectTapGestures { pos ->
+                            val col = (pos.x / (size.width / HEAT_HOURS.toFloat())).toInt()
+                            val row = (pos.y / (size.height / days.size.toFloat())).toInt()
+                            if (col in 0 until HEAT_HOURS && row in days.indices) {
+                                onSelect(averages[days[row] to col])
+                            }
                         }
-                    Box(
-                        modifier =
-                        Modifier
-                            .weight(1f)
-                            .height(HEAT_CELL_DP.dp)
-                            .padding(1.dp)
-                            .clip(RoundedCornerShape(3.dp))
-                            .background(tint)
-                            .clickable(enabled = cell != null) { onSelect(cell) },
-                    )
+                    },
+            ) {
+                val cw = size.width / HEAT_HOURS
+                val ch = size.height / days.size
+                days.forEachIndexed { r, day ->
+                    for (hour in 0 until HEAT_HOURS) {
+                        val cell = averages[day to hour]
+                        val tint =
+                            when {
+                                cell == null -> empty
+                                scale != null -> palette[scale.level(cell.value)] ?: color
+                                else -> color.copy(alpha = 0.2f + 0.8f * ((cell.value - minV) / spread))
+                            }
+                        drawRoundRect(
+                            color = tint,
+                            topLeft = Offset(hour * cw + HEAT_CELL_GAP_PX / 2, r * ch + HEAT_CELL_GAP_PX / 2),
+                            size = Size(cw - HEAT_CELL_GAP_PX, ch - HEAT_CELL_GAP_PX),
+                            cornerRadius = CornerRadius(HEAT_CELL_CORNER_PX, HEAT_CELL_CORNER_PX),
+                        )
+                    }
                 }
             }
         }
