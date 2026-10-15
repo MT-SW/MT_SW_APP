@@ -91,6 +91,7 @@ import org.meshtastic.core.resources.on_demand_fw_plus_version
 import org.meshtastic.core.resources.on_demand_fw_plus_version_desc
 import org.meshtastic.core.resources.on_demand_heap_free
 import org.meshtastic.core.resources.on_demand_heap_total
+import org.meshtastic.core.resources.on_demand_heap_used
 import org.meshtastic.core.resources.on_demand_hero_hint
 import org.meshtastic.core.resources.on_demand_hero_progress
 import org.meshtastic.core.resources.on_demand_hops
@@ -779,7 +780,7 @@ private fun NodeStatsVisual(stats: NodeStats) {
             )
         }
         UsageGauge(
-            label = stringResource(Res.string.on_demand_heap_free),
+            label = stringResource(Res.string.on_demand_heap_used),
             free = stats.memory_free_cheap,
             total = stats.memory_total,
         )

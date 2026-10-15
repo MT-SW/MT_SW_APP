@@ -1558,6 +1558,7 @@
     <string name="on_demand_fw_plus_version">MT_SW Firmware Version</string>
     <string name="on_demand_fw_plus_version_desc">Version of the on-demand diagnostics protocol running on this node.</string>
     <string name="on_demand_heap_free">Heap Free</string>
+    <string name="on_demand_heap_used">Heap Used</string>
     <string name="on_demand_heap_total">Heap Total</string>
     <string name="on_demand_hops">Hops</string>
     <string name="on_demand_log_title">On-Demand Diagnostics</string>
