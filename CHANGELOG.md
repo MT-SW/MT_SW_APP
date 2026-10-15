@@ -21,6 +21,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 **Scalenie z oryginałem (15.10)**
 * Scalenie z najnowszym oryginałem: kopia zapasowa i przywracanie danych aplikacji (wiadomości i węzły) w ustawieniach radia, ustawienia radia można otwierać i czytać bez połączenia z radiem (zapis wymaga połączenia), wybór koloru z gotowymi kolorami przy oświetleniu, ponawianie nieudanej wiadomości w tym samym miejscu, karta połączonego radia pokazuje preset LoRa i region, wymóg aktualizacji firmware (stare radio zostaje połączone, ale aplikacja prosi o aktualizację), przełączniki powiadomień o reakcjach i nowych waypointach na pulpicie, wyszukiwarka ustawień przechodzi do konkretnej opcji, nazwy nieznanych przeskoków w traceroute oraz aktualizacje bibliotek (Compose Multiplatform 1.12.2, markdown 0.7.18, kotest, Firebase) i tłumaczeń. Dopisane polskie tłumaczenia nowych tekstów. W forku zostają bez zmian: wyłączone automatyczne udostępnianie kontaktu i ulubione przy wiadomościach prywatnych (także przy ponawianiu), niższy próg firmware dla trybu blokady oraz kolory i podpisy SNR w traceroute. Biblioteka Bluetooth Kable zostaje przypięta do 0.44.3.
 
+**Ustawienia LoRa — opis „Nadpisz cykl pracy”**
+* Opcja ma teraz opis i wyraźne ostrzeżenie wielkimi literami pod nim: włączenie jej łamie przepisy w większości regionów i wolno to robić tylko tam, gdzie pozwalają na to przepisy.
+
 **Niesłyszane węzły i częstotliwość**
 * Przycisk „Zachowaj” przy ostrzeżeniu o niesłyszanych węzłach jest teraz zapamiętywany, dopóki nie zmieni się liczba takich węzłów, nie połączysz radia od nowa lub nie uruchomisz aplikacji ponownie — samo przejście na inny ekran nie przywraca ostrzeżenia.
 * Węzeł, od którego właśnie odebrano pakiet przez radio (LoRa, nie MQTT), przestaje być oznaczany jako niesłyszany. Wcześniej radio podawało tę ocenę tylko przy łączeniu, więc ikona przekreślonego zasięgu zostawała mimo odświeżającego się czasu.
@@ -222,6 +225,9 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**LoRa settings — "Override Duty Cycle" description**
+* The option now has a description and a clear warning in capital letters below it: enabling it breaks the regulations in most regions and may be done only where the regulations allow it.
 
 **Unheard nodes and frequency**
 * "Keep" on the unheard-nodes warning is now remembered until the number of such nodes changes, the radio reconnects or the app restarts — just switching screens no longer brings the warning back.

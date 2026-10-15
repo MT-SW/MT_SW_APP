@@ -1504,6 +1504,7 @@
     <string name="on_demand_reboots">Restarty</string>
     <string name="on_demand_heap_free">Wolny heap</string>
     <string name="on_demand_heap_used">Zajęty heap</string>
+    <string name="lora_override_duty_cycle_summary">Ignoruje limit czasu nadawania obowiązujący w regionie (cykl pracy, duty cycle). Radio nadaje wtedy tyle, ile chce, co obciąża kanał wszystkim wokół.\n\nUWAGA!!! WŁĄCZENIE TEJ OPCJI ŁAMIE PRZEPISY W WIĘKSZOŚCI REGIONÓW!!! WŁĄCZAJ JĄ TYLKO TAM, GDZIE PRZEPISY NA TO POZWALAJĄ!!!</string>
     <string name="on_demand_heap_total">Heap łącznie</string>
     <string name="on_demand_cpu_usage">Użycie CPU</string>
     <string name="on_demand_flash">Flash</string>

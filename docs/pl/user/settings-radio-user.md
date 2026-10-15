@@ -82,7 +82,7 @@ W **Ustawienia → LoRa**.
 | Pasmo | Tylko tryb ręczny: szerokość pasma kanału w kHz, wpisywana bezpośrednio. W regionie 2.4 GHz aplikacja oferuje zamiast tego listę pasm obsługiwanych przez Twój węzeł, a zapisana wartość spoza tej listy jest pokazywana jako *Nieobsługiwane* i blokuje zapis, dopóki nie wybierzesz obsługiwanej | Z presetu |
 | Slot częstotliwości | Którego slotu w paśmie regionu użyć. 0 wyznacza go na podstawie nazwy kanału głównego | 0 (automatycznie) |
 | Nadawanie włączone (Transmit Enabled) | Wyłączenie sprawia, że węzeł tylko odbiera | Włączone |
-| Pomiń limit czasu nadawania | Ignoruje limit duty cycle regionu. W większości regionów nielegalne; włączaj tylko tam, gdzie pozwala na to Twoja licencja | Wyłączone |
+| Nadpisz cykl pracy | Ignoruje limit duty cycle regionu. UWAGA!!! W większości regionów to łamie przepisy — włączaj tylko tam, gdzie przepisy na to pozwalają (apka pokazuje to samo ostrzeżenie pod opcją) | Wyłączone |
 | Ignoruj MQTT | Odrzuca pakiety, które dotarły z MQTT, a nie drogą radiową. Firmware włącza to za Ciebie, ilekroć ustawisz region z limitem duty cycle — pasma UE, Tajlandia i Ukraina 433 | Wyłączone, dopóki nie ustawisz regionu z limitem duty cycle |
 | Ok dla MQTT | Pozwala bramom przekazywać Twoje pakiety do MQTT | Wyłączone |
 | Wzmocniony zysk RX | Dodatkowe wzmocnienie odbioru w radiach SX126x; zużywa nieco więcej prądu | Wyłączone |
