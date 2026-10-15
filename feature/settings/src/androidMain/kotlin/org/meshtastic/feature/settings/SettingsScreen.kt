@@ -91,6 +91,7 @@ import org.meshtastic.feature.settings.navigation.ModuleRoute
 import org.meshtastic.feature.settings.radio.RadioConfigItemList
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 import org.meshtastic.feature.settings.radio.component.EditDeviceProfileDialog
+import org.meshtastic.feature.settings.radio.rememberDatabaseBackupActions
 import org.meshtastic.feature.settings.search.SettingsSearchBar
 import org.meshtastic.feature.settings.search.SettingsSearchViewModel
 import org.meshtastic.feature.settings.util.LanguageUtils
@@ -118,6 +119,7 @@ fun SettingsScreen(
     val destNode by viewModel.destNode.collectAsStateWithLifecycle()
     val state by viewModel.radioConfigState.collectAsStateWithLifecycle()
 
+    val databaseBackup = rememberDatabaseBackupActions()
     var deviceProfile by remember { mutableStateOf<DeviceProfile?>(null) }
     var showEditDeviceProfileDialog by remember { mutableStateOf(false) }
 
@@ -264,6 +266,9 @@ fun SettingsScreen(
                     deviceProfile = null
                     showEditDeviceProfileDialog = true
                 },
+                databaseBackupAvailable = databaseBackup.available,
+                onBackupDatabase = databaseBackup.onBackup,
+                onRestoreDatabase = databaseBackup.onRestore,
                 onNavigate = onNavigate,
                 onSetSnifferEnabled = { viewModel.setSnifferEnabled(it) },
             )

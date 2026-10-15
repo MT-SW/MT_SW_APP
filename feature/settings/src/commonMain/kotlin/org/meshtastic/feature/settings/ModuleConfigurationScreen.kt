@@ -84,7 +84,7 @@ fun ModuleConfigurationScreen(
                         ListItem(
                             text = stringResource(it.title),
                             leadingIcon = it.icon?.let { res -> vectorResource(res) },
-                            enabled = state.connected && !state.responseState.isWaiting(),
+                            enabled = (state.connected || state.isLocal) && !state.responseState.isWaiting(),
                         ) {
                             onNavigate(it.route)
                         }

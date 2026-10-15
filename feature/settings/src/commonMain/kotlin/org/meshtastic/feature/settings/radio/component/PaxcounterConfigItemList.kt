@@ -40,8 +40,10 @@ import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.SignedIntegerEditTextPreference
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.component.TitledCard
+import org.meshtastic.feature.settings.navigation.ModuleRoute
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 import org.meshtastic.feature.settings.radio.RebootBehavior
+import org.meshtastic.feature.settings.search.SettingsSearchCatalog
 import org.meshtastic.feature.settings.util.IntervalConfiguration
 import org.meshtastic.feature.settings.util.fieldTitle
 import org.meshtastic.feature.settings.util.toDisplayString
@@ -62,13 +64,16 @@ fun PaxcounterConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) 
         configState = formState,
         enabled = state.connected,
         responseState = state.responseState,
+        showConnectPrompt = state.connectPromptVisible,
         onDismissPacketResponse = viewModel::clearPacketResponse,
         onSave = {
             val config = ModuleConfig.Builder().also { wb -> wb.paxcounter = it }.build()
             viewModel.setModuleConfig(config)
         },
     ) {
-        item { PaxcounterSettings(formState = formState, enabled = state.connected) }
+        fieldItem(SettingsSearchCatalog.fieldKeys(ModuleRoute.PAXCOUNTER.route)) {
+            PaxcounterSettings(formState = formState, enabled = state.connected)
+        }
     }
 }
 

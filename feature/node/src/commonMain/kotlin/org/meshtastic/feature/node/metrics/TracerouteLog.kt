@@ -62,6 +62,7 @@ import org.meshtastic.core.common.util.formatString
 import org.meshtastic.core.model.TracerouteOverlay
 import org.meshtastic.core.model.fullRouteDiscovery
 import org.meshtastic.core.model.getTracerouteResponse
+import org.meshtastic.core.model.tracerouteHopName
 import org.meshtastic.core.model.util.TimeConstants.MS_PER_SEC
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.traceroute_diff
@@ -110,7 +111,7 @@ fun TracerouteLogScreen(
     val availableTimeFrames by viewModel.availableTimeFrames.collectAsStateWithLifecycle()
     val lastTracerouteTime by viewModel.lastTraceRouteTime.collectAsStateWithLifecycle()
 
-    fun getUsername(nodeNum: Int): String = with(viewModel.getUser(nodeNum)) { "$long_name ($short_name)" }
+    fun getUsername(nodeNum: Int): String = tracerouteHopName(nodeNum, viewModel.getUser(nodeNum))
 
     // Named by SNR tier (good/sufficient/weak/none); the palette matches the signal-quality colours.
     val statusGreen = MaterialTheme.colorScheme.StatusOnline

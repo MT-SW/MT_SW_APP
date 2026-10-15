@@ -234,7 +234,7 @@ W **Ustawienia → Bezpieczeństwo**. Ekran jest podzielony na karty: **Autentyc
 | Konsola szeregowa | Konsola szeregowa przez Stream API |
 | API dziennika debugowania włączone | Wysyła na żywo logi debugowania przez port szeregowy oraz pozwala przeglądać i eksportować logi węzła z zaciemnioną pozycją przez Bluetooth |
 | Tryb zarządzany | Blokuje całą listę Konfiguracji, a nie tylko kanały — każde ustawienie węzła staje się tylko do odczytu i cokolwiek zmienić może tylko administrator. Można go wybrać dopiero po ustawieniu Klucza administratora |
-| Kopia kluczy | Zapisuje zaszyfrowaną kopię zapasową kluczy węzła na tym telefonie (tylko Android i tylko dla własnego węzła) |
+| Kopia kluczy | Zapisuje zaszyfrowaną kopię zapasową kluczy węzła na tym telefonie (tylko dla własnego węzła) |
 | Przywróć klucze | Zapisuje kopie zapasowe kluczy z powrotem w węźle (dostępne, gdy istnieje kopia zapasowa) |
 | Usuń kopię zapasową kluczy | Usuwa zapisaną kopię zapasową kluczy z tego telefonu |
 | Poziom ochrony | Jak traktowane są pakiety niepodpisane lub przekazywane dalej: **Ścisły — Wymagaj uwierzytelnienia**, **Zrównoważony — Preferuj uwierzytelnione** lub **Kompatybilny — Akceptuj niepodpisane** (wymaga obsługującego to firmware; Ścisły prosi o potwierdzenie) |
