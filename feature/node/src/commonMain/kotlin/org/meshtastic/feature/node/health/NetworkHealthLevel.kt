@@ -82,7 +82,7 @@ internal fun NetworkHealthMetric.levelFor(node: NodeHealthInfo): HealthLevel = w
     // The signal tab shows the noise floor, so the verdict follows that same number; a node that reports none is
     // judged by its SNR instead.
     NetworkHealthMetric.SIGNAL ->
-        node.noiseFloor?.let(::noiseFloorLevel) ?: node.snr?.let(::snrLevel) ?: HealthLevel.UNKNOWN
+        node.noiseFloor?.let(::noiseFloorLevel) ?: HealthLevel.UNKNOWN
     NetworkHealthMetric.ETHER -> node.channelUtilization?.let(::etherLevel) ?: HealthLevel.UNKNOWN
     NetworkHealthMetric.NEIGHBORS -> node.neighborCount?.let(::neighborLevel) ?: HealthLevel.UNKNOWN
     NetworkHealthMetric.ENVIRONMENT,
