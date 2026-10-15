@@ -90,5 +90,6 @@ class LoRaPresetItemsTest {
         assertEquals("906.875", formatFrequencyMhz(906.875f))
         assertEquals("869.400", formatFrequencyMhz(869.4f))
         assertEquals("2403.000", formatFrequencyMhz(2403f))
+        assertEquals("869.44165", formatFrequencyMhz(869.44165f))
     }
 }

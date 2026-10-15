@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -103,18 +104,26 @@ class NodeMetricDetailViewModel(
         combine(rangeFlow, metricFlow) { range, metric -> range to metric }
             .flatMapLatest { (range, metric) ->
                 val since = range.since(nowMillis)
+                // Only this node's own logs are read (never every node's telemetry): over 30 days the network-wide
+                // query held far too much in memory and could crash the app.
                 combine(
-                    meshLogRepository.getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, since),
                     meshLogRepository.getLogsFromNodeSince(nodeNum, since),
-                    meshLogRepository.getLogsFromNodeSince(0, since),
+                    meshLogRepository.getMyNodeInfo().flatMapLatest { myNodeInfo ->
+                        // MeshLog normalizes the locally-connected device's own logs to node number 0.
+                        if (myNodeInfo?.my_node_num == nodeNum) {
+                            meshLogRepository.getLogsFromNodeSince(0, since)
+                        } else {
+                            flowOf(emptyList())
+                        }
+                    },
                     meshLogRepository.getMyNodeInfo(),
                     combine(nodeRepository.getNodes(), uiPrefs.currentInverted, uiPrefs.batteryInverted, ::Triple),
-                ) { telemetryLogs, nodeLogs, localNodeLogs, myNodeInfo, nodesAndInverted ->
+                ) { nodeLogs, localNodeLogs, myNodeInfo, nodesAndInverted ->
                     val (nodes, invertedNodes, batteryInvertedNodes) = nodesAndInverted
-                    // MeshLog normalizes the locally-connected device's own logs to node number 0 — if this screen
-                    // is showing details for whichever node is currently connected, also pull the 0-numbered logs.
                     val isViewingLocalNode = myNodeInfo?.my_node_num == nodeNum
                     val extraLocalLogs = if (isViewingLocalNode) localNodeLogs else emptyList()
+                    val telemetryLogs =
+                        (nodeLogs + extraLocalLogs).filter { it.portNum == PortNum.TELEMETRY_APP.value }
                     val telemetryHistory =
                         telemetryLogs
                             .filter { it.fromNum == nodeNum || (isViewingLocalNode && it.fromNum == 0) }

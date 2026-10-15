@@ -535,10 +535,22 @@ fun LoRaConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
     }
 }
 
-/** [mhz] as the override frequency field shows it: fixed three decimals, a dot separator, no grouping. */
-internal fun formatFrequencyMhz(mhz: Float): String = NumberFormatter.formatInvariant(mhz, FREQUENCY_DECIMALS)
+/**
+ * [mhz] as the override frequency field shows it: full resolution (up to five decimals, so 869.44165 is not rounded to
+ * 869.442), at least three decimals, a dot separator, no grouping.
+ */
+internal fun formatFrequencyMhz(mhz: Float): String {
+    // Go through the float's own shortest text, so 869.4f does not turn into 869.40002 when widened to a double.
+    val widened = mhz.toString().toDoubleOrNull() ?: mhz.toDouble()
+    val exact = NumberFormatter.formatInvariant(widened, MAX_FREQUENCY_DECIMALS)
+    val dot = exact.indexOf('.')
+    if (dot < 0) return exact
+    val trimmed = exact.trimEnd('0')
+    return trimmed.padEnd(dot + 1 + MIN_FREQUENCY_DECIMALS, '0')
+}
 
-private const val FREQUENCY_DECIMALS = 3
+private const val MAX_FREQUENCY_DECIMALS = 5
+private const val MIN_FREQUENCY_DECIMALS = 3
 
 /**
  * Frequency override in MHz. Unfocused it shows [formatFrequencyMhz] (or the auto slot's frequency with the auto label

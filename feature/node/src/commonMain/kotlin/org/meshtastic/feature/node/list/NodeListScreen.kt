@@ -169,6 +169,10 @@ fun NodeListScreen(
     }
 
     val connectionState by viewModel.connectionState.collectAsStateWithLifecycle()
+    // A new connection starts fresh: the banner may offer again.
+    LaunchedEffect(connectionState) {
+        if (connectionState !is ConnectionState.Connected) UnheardBannerState.dismissedAt = UnheardBannerState.NONE
+    }
     val deviceType by viewModel.deviceType.collectAsStateWithLifecycle()
 
     val density by viewModel.nodeListDensity.collectAsStateWithLifecycle()
@@ -555,29 +559,28 @@ private fun NodeListEmptyState(
     )
 }
 
+/** Remembers the "Keep" choice for the whole app run, so leaving and re-entering the list does not bring it back. */
+internal object UnheardBannerState {
+    const val NONE = -1
+    var dismissedAt by mutableIntStateOf(NONE)
+}
+
 /**
  * Offers to remove the nodes the radio has not heard since its LoRa settings changed.
  *
  * Shown as an offer, never an automatic removal: the app's node DB is deliberately a superset of the radio's, and a
  * node may simply be out of range rather than on another channel — it comes back on its own when next heard.
  *
- * Dismissal is per-composition rather than saved, and re-arms whenever the count rises, so a later config change offers
- * again instead of staying silent.
+ * Dismissal is remembered while the app runs (also across screens), and re-arms when the count rises or the radio
+ * reconnects, so a later config change offers again instead of staying silent.
  */
 @Composable
 private fun UnheardNodesBanner(unheardNodes: List<Node>, onRemoveAll: () -> Unit, modifier: Modifier = Modifier) {
-    var dismissed by remember { mutableStateOf(false) }
-    var previousCount by remember { mutableIntStateOf(0) }
     val count = unheardNodes.size
+    val dismissedAt = UnheardBannerState.dismissedAt
 
-    // Re-arm on any rise, not only above a historical maximum: dismissing at 3, dropping to 1 and rising to 2 is
-    // still a new config change worth offering for.
-    LaunchedEffect(count) {
-        if (count > previousCount) dismissed = false
-        previousCount = count
-    }
-
-    if (count == 0 || dismissed) return
+    // Hidden after "Keep" until the count rises (a new LoRa change), the radio reconnects or the app restarts.
+    if (count == 0 || (dismissedAt != UnheardBannerState.NONE && count <= dismissedAt)) return
 
     Card(
         modifier = modifier,
@@ -602,11 +605,13 @@ private fun UnheardNodesBanner(unheardNodes: List<Node>, onRemoveAll: () -> Unit
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.align(Alignment.End)) {
-                TextButton(onClick = { dismissed = true }) { Text(stringResource(Res.string.nodes_unheard_keep)) }
+                TextButton(onClick = { UnheardBannerState.dismissedAt = count }) {
+                    Text(stringResource(Res.string.nodes_unheard_keep))
+                }
                 TextButton(
                     onClick = {
                         onRemoveAll()
-                        dismissed = true
+                        UnheardBannerState.dismissedAt = count
                     },
                 ) {
                     Text(stringResource(Res.string.nodes_unheard_remove))

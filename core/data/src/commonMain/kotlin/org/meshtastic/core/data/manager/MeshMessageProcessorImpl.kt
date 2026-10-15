@@ -343,6 +343,10 @@ class MeshMessageProcessorImpl(
             // A packet carrying no rssi must not clobber the node's last real reading.
             rssi = if (updateRadioMetrics) packet.rx_rssi ?: node.rssi else node.rssi,
             hopsAway = hopsAway,
+            // A packet that just arrived over RF proves the node is heard on the current LoRa settings. The radio only
+            // reports this flag during the handshake, so without this the "not heard" marker stays on a node whose
+            // time keeps refreshing.
+            heardOnCurrentLora = node.heardOnCurrentLora || (packet.isLora() && !viaMqtt),
         )
     }
 
