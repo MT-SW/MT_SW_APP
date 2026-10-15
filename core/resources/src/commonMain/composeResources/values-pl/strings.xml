@@ -1503,6 +1503,7 @@
     <string name="on_demand_stat_nodes_total">Węzły łącznie</string>
     <string name="on_demand_reboots">Restarty</string>
     <string name="on_demand_heap_free">Wolny heap</string>
+    <string name="on_demand_heap_used">Zajęty heap</string>
     <string name="on_demand_heap_total">Heap łącznie</string>
     <string name="on_demand_cpu_usage">Użycie CPU</string>
     <string name="on_demand_flash">Flash</string>

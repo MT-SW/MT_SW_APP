@@ -21,6 +21,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 **Scalenie z oryginałem (15.10)**
 * Scalenie z najnowszym oryginałem: kopia zapasowa i przywracanie danych aplikacji (wiadomości i węzły) w ustawieniach radia, ustawienia radia można otwierać i czytać bez połączenia z radiem (zapis wymaga połączenia), wybór koloru z gotowymi kolorami przy oświetleniu, ponawianie nieudanej wiadomości w tym samym miejscu, karta połączonego radia pokazuje preset LoRa i region, wymóg aktualizacji firmware (stare radio zostaje połączone, ale aplikacja prosi o aktualizację), przełączniki powiadomień o reakcjach i nowych waypointach na pulpicie, wyszukiwarka ustawień przechodzi do konkretnej opcji, nazwy nieznanych przeskoków w traceroute oraz aktualizacje bibliotek (Compose Multiplatform 1.12.2, markdown 0.7.18, kotest, Firebase) i tłumaczeń. Dopisane polskie tłumaczenia nowych tekstów. W forku zostają bez zmian: wyłączone automatyczne udostępnianie kontaktu i ulubione przy wiadomościach prywatnych (także przy ponawianiu), niższy próg firmware dla trybu blokady oraz kolory i podpisy SNR w traceroute. Biblioteka Bluetooth Kable zostaje przypięta do 0.44.3.
 
+**Diagnostyka na żądanie — nazwa paska heap**
+* Pasek pamięci heap pokazuje zajętą pamięć, więc nazywa się teraz „Zajęty heap” (wcześniej „Wolny heap”). Lista wartości poniżej nadal podaje wolny i łączny heap.
+
 **Zdrowie sieci — szczegóły węzła: więcej zakresów i płynność**
 * Zakresy czasu jak w metrykach urządzenia: 1 h, 24 h, 7 dni, 2 tygodnie, 30 dni i „Wszystko”.
 * Wykresy Zegar, Słupki i Mapa cieplna nie zacinają się już przy długich zakresach: dane są liczone poza głównym wątkiem i zmniejszane do rozsądnej liczby punktów, a mapa cieplna jest rysowana jako jeden obraz (pokazuje do 31 dni).
@@ -213,6 +216,9 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**On-demand diagnostics — heap bar name**
+* The heap memory bar shows used memory, so it is now called "Heap Used" (before: "Heap Free"). The value list below still shows free and total heap.
 
 **Network Health — node details: more ranges and smoothness**
 * Time ranges as in device metrics: 1 h, 24 h, 7 days, 2 weeks, 30 days and "All".
