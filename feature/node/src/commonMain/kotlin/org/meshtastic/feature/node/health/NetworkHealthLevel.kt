@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.network_health_info_ether
 import org.meshtastic.core.resources.network_health_info_neighbors
@@ -85,10 +86,12 @@ internal fun NetworkHealthMetric.levelFor(node: NodeHealthInfo): HealthLevel = w
         node.noiseFloor?.let(::noiseFloorLevel) ?: HealthLevel.UNKNOWN
     NetworkHealthMetric.ETHER -> node.channelUtilization?.let(::etherLevel) ?: HealthLevel.UNKNOWN
     NetworkHealthMetric.NEIGHBORS -> node.neighborCount?.let(::neighborLevel) ?: HealthLevel.UNKNOWN
+    // These tabs have no good / bad limit: a node that reports anything counts as "has data" (shown as GOOD), one that
+    // reports nothing is "no data".
     NetworkHealthMetric.ENVIRONMENT,
     NetworkHealthMetric.RESOURCES,
     NetworkHealthMetric.TRAFFIC,
-    -> HealthLevel.UNKNOWN
+    -> if (this in node.dataTabs) HealthLevel.GOOD else HealthLevel.UNKNOWN
 }
 
 private fun powerLevel(node: NodeHealthInfo): HealthLevel {
@@ -160,10 +163,10 @@ internal fun NetworkHealthMetric.hasVerdict(): Boolean = this in
         NetworkHealthMetric.NEIGHBORS,
     )
 
-/** Colour for [level] on [metric]'s tab: blue for missing data where a verdict is expected, grey where it is not. */
+/** The word next to the colour; tabs without limits say "ma dane" instead of "dobrze". */
 @Composable
-internal fun HealthLevel.colorFor(metric: NetworkHealthMetric): Color =
-    if (this == HealthLevel.UNKNOWN && !metric.hasVerdict()) MaterialTheme.colorScheme.onSurfaceVariant else color()
+internal fun HealthLevel.labelFor(metric: NetworkHealthMetric): String =
+    if (this == HealthLevel.GOOD && !metric.hasVerdict()) "ma dane" else stringResource(labelRes)
 
 /** "No data" — blue, so it is never mistaken for any of the four verdicts. */
 private val NO_DATA_BLUE = Color(0xFF4DA3FF)

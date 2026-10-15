@@ -101,6 +101,8 @@ data class NodeHealthInfo(
     val neighborCount: Int? = null,
     /** Latest noise floor in dBm (raw), from the last 24 hours of telemetry. */
     val noiseFloor: Float? = null,
+    /** Tabs without good / bad limits (environment, resources, traffic) on which this node reported anything. */
+    val dataTabs: Set<NetworkHealthMetric> = emptySet(),
 ) {
     /** Returns this row's value for [metric], or null if that metric has never been reported. */
     fun valueFor(metric: NetworkHealthMetric): Float? = when (metric) {
@@ -274,12 +276,34 @@ class NetworkHealthViewModel(
                         nodeHistory.sortedBy { it.timestamp }.mapNotNull { metric.historyValue(it) },
                         neighborCount = neighborCountByNode[node.num],
                         noiseFloor = nodeHistory.latestNoiseFloor(),
+                        dataTabs =
+                        buildSet {
+                            val unrated =
+                                listOf(
+                                    NetworkHealthMetric.ENVIRONMENT,
+                                    NetworkHealthMetric.RESOURCES,
+                                    NetworkHealthMetric.TRAFFIC,
+                                )
+                            unrated.forEach { m -> if (nodeHistory.any { m.historyValue(it) != null }) add(m) }
+                            val env = node.environmentMetrics
+                            if (env.temperature != null || env.relative_humidity != null) {
+                                add(NetworkHealthMetric.ENVIRONMENT)
+                            }
+                        },
                     )
                 }
 
             val levelCounts = healthInfos.groupingBy { metric.levelFor(it) }.eachCount()
             val worstByMetric =
-                NetworkHealthMetric.entries.associateWith { m -> worstLevel(healthInfos.map { m.levelFor(it) }) }
+                NetworkHealthMetric.entries.associateWith { m ->
+                    val levels = healthInfos.map { m.levelFor(it) }
+                    // When most nodes have nothing on a tab, the tab icon says so (blue).
+                    if (levels.count { it == HealthLevel.UNKNOWN } * 2 > levels.size) {
+                        HealthLevel.UNKNOWN
+                    } else {
+                        worstLevel(levels)
+                    }
+                }
 
             val dataFiltered =
                 if (hideWithoutData) {

@@ -25,7 +25,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Pod nazwą połączonego radia preset LoRa jest teraz w pierwszej linii, a region w drugiej (mniejszą, szarą czcionką). Długie nazwy zawijają się do dwóch linii zamiast się ucinać.
 
 **Zdrowie sieci — niebieski jako brak danych**
-* Węzeł bez danych w zakładce, która go ocenia (Zasilanie, Sygnał, Eter, Sąsiedzi), ma teraz niebieski kolor i napis „brak danych”, żeby nie mylić go z oceną. Biały zostaje wyłącznie dla „bardzo źle”. Zakładki bez ocen (Środowisko, Zasoby, Ruch) zostają szare.
+* Węzeł bez danych w zakładce, która go ocenia (Zasilanie, Sygnał, Eter, Sąsiedzi), ma teraz niebieski kolor i napis „brak danych”, żeby nie mylić go z oceną. Biały zostaje wyłącznie dla „bardzo źle”. Zakładki bez ocen (Środowisko, Zasoby, Ruch) też liczą brak danych: węzeł, który coś tam zgłasza, jest „ma dane” (złoty), a bez danych — niebieski; liczniki w karcie u góry można klikać. Gdy większość węzłów nie ma nic na danej zakładce, jej ikona na pasku zakładek robi się niebieska.
 * Liczba węzłów bez danych jest też w karcie „Kondycja sieci” u góry (niebieski kółko i licznik, który można kliknąć, żeby je pokazać), więc wszystko sumuje się do liczby wszystkich węzłów. Procent „dobrze” nadal liczy się tylko z węzłów, które mają dane.
 * W „Podsumowaniu sieci” paski rozkładu baterii i sygnału pokazują też, ile węzłów nie ma danych (niebieski), więc sumują się do wszystkich węzłów.
 
@@ -238,7 +238,7 @@ The entries below describe only what this fork adds on top of the original, from
 * Under the connected radio's name the LoRa preset is now on the first line and the region on the second (smaller, grey text). Long names wrap to two lines instead of being cut off.
 
 **Network Health — blue for no data**
-* A node without data in a tab that rates it (Power, Signal, Ether, Neighbours) now shows in blue with the "no data" label, so it is not mistaken for a rating. White stays only for "very bad". Tabs without ratings (Environment, Resources, Traffic) stay grey.
+* A node without data in a tab that rates it (Power, Signal, Ether, Neighbours) now shows in blue with the "no data" label, so it is not mistaken for a rating. White stays only for "very bad". Tabs without ratings (Environment, Resources, Traffic) count missing data too: a node that reports anything there is "has data" (gold), one without data is blue; the counts in the top card are tappable. When most nodes have nothing on a tab, its icon in the tab bar turns blue.
 * The number of nodes without data is also in the "Network health" card at the top (a blue ring segment and a tappable count that lists them), so everything adds up to all nodes. The "good" percentage is still counted only from nodes that have data.
 * In the "Network summary" the battery and signal distribution bars also show how many nodes have no data (blue), so they add up to all nodes.
 
