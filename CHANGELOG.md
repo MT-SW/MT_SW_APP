@@ -21,6 +21,12 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 **Scalenie z oryginałem (15.10)**
 * Scalenie z najnowszym oryginałem: kopia zapasowa i przywracanie danych aplikacji (wiadomości i węzły) w ustawieniach radia, ustawienia radia można otwierać i czytać bez połączenia z radiem (zapis wymaga połączenia), wybór koloru z gotowymi kolorami przy oświetleniu, ponawianie nieudanej wiadomości w tym samym miejscu, karta połączonego radia pokazuje preset LoRa i region, wymóg aktualizacji firmware (stare radio zostaje połączone, ale aplikacja prosi o aktualizację), przełączniki powiadomień o reakcjach i nowych waypointach na pulpicie, wyszukiwarka ustawień przechodzi do konkretnej opcji, nazwy nieznanych przeskoków w traceroute oraz aktualizacje bibliotek (Compose Multiplatform 1.12.2, markdown 0.7.18, kotest, Firebase) i tłumaczeń. Dopisane polskie tłumaczenia nowych tekstów. W forku zostają bez zmian: wyłączone automatyczne udostępnianie kontaktu i ulubione przy wiadomościach prywatnych (także przy ponawianiu), niższy próg firmware dla trybu blokady oraz kolory i podpisy SNR w traceroute. Biblioteka Bluetooth Kable zostaje przypięta do 0.44.3.
 
+**Niesłyszane węzły i częstotliwość**
+* Przycisk „Zachowaj” przy ostrzeżeniu o niesłyszanych węzłach jest teraz zapamiętywany, dopóki nie zmieni się liczba takich węzłów, nie połączysz radia od nowa lub nie uruchomisz aplikacji ponownie — samo przejście na inny ekran nie przywraca ostrzeżenia.
+* Węzeł, od którego właśnie odebrano pakiet przez radio (LoRa, nie MQTT), przestaje być oznaczany jako niesłyszany. Wcześniej radio podawało tę ocenę tylko przy łączeniu, więc ikona przekreślonego zasięgu zostawała mimo odświeżającego się czasu.
+* Pole „Częstotliwość nadpisana” znów pokazuje pełną rozdzielczość (do 5 miejsc po przecinku, np. 869,44165), zamiast zaokrąglać do 3.
+* Szczegóły węzła w „Zdrowiu sieci”: przy 30 dniach i „Wszystko” aplikacja wczytuje już tylko dane wybranego węzła, a nie telemetrię całej sieci, co mogło ją wywalać (brak pamięci).
+
 **Diagnostyka na żądanie — nazwa paska heap**
 * Pasek pamięci heap pokazuje zajętą pamięć, więc nazywa się teraz „Zajęty heap” (wcześniej „Wolny heap”). Lista wartości poniżej nadal podaje wolny i łączny heap.
 
@@ -216,6 +222,12 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Unheard nodes and frequency**
+* "Keep" on the unheard-nodes warning is now remembered until the number of such nodes changes, the radio reconnects or the app restarts — just switching screens no longer brings the warning back.
+* A node from which a packet was just received over the radio (LoRa, not MQTT) is no longer marked as unheard. Before, the radio reported that rating only at connection time, so the crossed-out signal icon stayed while the time kept refreshing.
+* The "Override frequency" field shows full resolution again (up to 5 decimals, e.g. 869.44165) instead of rounding to 3.
+* Node details in "Network Health": for 30 days and "All" the app now loads only the chosen node's data, not the whole network's telemetry, which could crash it (out of memory).
 
 **On-demand diagnostics — heap bar name**
 * The heap memory bar shows used memory, so it is now called "Heap Used" (before: "Heap Free"). The value list below still shows free and total heap.
