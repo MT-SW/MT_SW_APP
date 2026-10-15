@@ -168,6 +168,8 @@ internal fun NetworkHealthHero(
 ) {
     val counts = uiState.levelCounts
     val verdictTotal = RANKED_LEVELS.sumOf { counts[it] ?: 0 }
+    // On tabs that rate nodes, nodes without data are counted too (blue), so the ring and chips add up to all.
+    val shownLevels = if (verdictTotal > 0) RANKED_LEVELS + HealthLevel.UNKNOWN else RANKED_LEVELS
     val good = counts[HealthLevel.GOOD] ?: 0
     val brush =
         Brush.verticalGradient(
@@ -186,7 +188,7 @@ internal fun NetworkHealthHero(
         ) {
             if (verdictTotal > 0) {
                 HealthRing(
-                    segments = RANKED_LEVELS.map { it to (counts[it] ?: 0) },
+                    segments = shownLevels.map { it to (counts[it] ?: 0) },
                     centerText = "${good * PERCENT / verdictTotal}%",
                 )
             } else {
@@ -239,7 +241,7 @@ internal fun NetworkHealthHero(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     // A tap on a count lists only the nodes with that verdict; a second tap shows all again.
-                    RANKED_LEVELS.forEach { level ->
+                    shownLevels.forEach { level ->
                         val selected = uiState.levelFilter == level
                         Row(
                             modifier =
@@ -599,7 +601,7 @@ internal fun NetworkHealthInfoDialog(metric: NetworkHealthMetric, onDismiss: () 
                     text = stringResource(Res.string.network_health_info_intro),
                     style = MaterialTheme.typography.bodyMedium,
                 )
-                RANKED_LEVELS.forEach { level ->
+                (RANKED_LEVELS + HealthLevel.UNKNOWN).forEach { level ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),

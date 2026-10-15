@@ -23,6 +23,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 **Zdrowie sieci — niebieski jako brak danych**
 * Węzeł bez danych w zakładce, która go ocenia (Zasilanie, Sygnał, Eter, Sąsiedzi), ma teraz niebieski kolor i napis „brak danych”, żeby nie mylić go z oceną. Biały zostaje wyłącznie dla „bardzo źle”. Zakładki bez ocen (Środowisko, Zasoby, Ruch) zostają szare.
+* Liczba węzłów bez danych jest też w karcie „Kondycja sieci” u góry (niebieski kółko i licznik, który można kliknąć, żeby je pokazać), więc wszystko sumuje się do liczby wszystkich węzłów. Procent „dobrze” nadal liczy się tylko z węzłów, które mają dane.
+* W „Podsumowaniu sieci” paski rozkładu baterii i sygnału pokazują też, ile węzłów nie ma danych (niebieski), więc sumują się do wszystkich węzłów.
 
 **Ustawienia LoRa — opis „Nadpisz cykl pracy”**
 * Opcja ma teraz opis i wyraźne ostrzeżenie wielkimi literami pod nim: włączenie jej łamie przepisy w większości regionów i wolno to robić tylko tam, gdzie pozwalają na to przepisy.
@@ -231,6 +233,8 @@ The entries below describe only what this fork adds on top of the original, from
 
 **Network Health — blue for no data**
 * A node without data in a tab that rates it (Power, Signal, Ether, Neighbours) now shows in blue with the "no data" label, so it is not mistaken for a rating. White stays only for "very bad". Tabs without ratings (Environment, Resources, Traffic) stay grey.
+* The number of nodes without data is also in the "Network health" card at the top (a blue ring segment and a tappable count that lists them), so everything adds up to all nodes. The "good" percentage is still counted only from nodes that have data.
+* In the "Network summary" the battery and signal distribution bars also show how many nodes have no data (blue), so they add up to all nodes.
 
 **LoRa settings — "Override Duty Cycle" description**
 * The option now has a description and a clear warning in capital letters below it: enabling it breaks the regulations in most regions and may be done only where the regulations allow it.
