@@ -114,8 +114,6 @@ private const val SPARKLINE_DOT_RADIUS_PX = 5f
 private const val LEVEL_CHIP_RADIUS_DP = 8
 private const val NOISE_BAR_MIN = -130f
 private const val NOISE_BAR_MAX = -60f
-private const val SNR_BAR_MIN = -20f
-private const val SNR_BAR_MAX = 10f
 private const val NEIGHBOR_BAR_MAX = 6f
 
 /** The verdict levels that are shown in the summary, best to worst. */
@@ -544,10 +542,9 @@ private fun NetworkHealthMetric.barFraction(node: NodeHealthInfo): Float? = when
             node.batteryLevel?.let { it / PERCENT.toFloat() }
         }
 
-    // Full bar = quiet band (-130 dBm), empty = very noisy; a node without a noise floor falls back to its SNR.
+    // Full bar = quiet band (-130 dBm), empty = very noisy; a node without a noise floor gets no bar.
     NetworkHealthMetric.SIGNAL ->
         node.noiseFloor?.let { ((NOISE_BAR_MAX - it) / (NOISE_BAR_MAX - NOISE_BAR_MIN)).coerceIn(0f, 1f) }
-            ?: node.snr?.let { (it - SNR_BAR_MIN) / (SNR_BAR_MAX - SNR_BAR_MIN) }
     NetworkHealthMetric.ETHER -> node.channelUtilization?.let { it / PERCENT }
     NetworkHealthMetric.NEIGHBORS -> node.neighborCount?.let { it / NEIGHBOR_BAR_MAX }
     NetworkHealthMetric.ENVIRONMENT,
