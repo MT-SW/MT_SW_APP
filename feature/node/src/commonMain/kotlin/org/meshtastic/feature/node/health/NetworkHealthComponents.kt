@@ -152,7 +152,7 @@ internal fun NetworkHealthTabLabel(metric: NetworkHealthMetric, worst: HealthLev
             imageVector = metric.icon(),
             contentDescription = null,
             modifier = Modifier.size(18.dp),
-            tint = worst.colorFor(metric),
+            tint = worst.color(),
         )
         Text(text = metric.label)
     }
@@ -168,8 +168,15 @@ internal fun NetworkHealthHero(
 ) {
     val counts = uiState.levelCounts
     val verdictTotal = RANKED_LEVELS.sumOf { counts[it] ?: 0 }
-    // On tabs that rate nodes, nodes without data are counted too (blue), so the ring and chips add up to all.
-    val shownLevels = if (verdictTotal > 0) RANKED_LEVELS + HealthLevel.UNKNOWN else RANKED_LEVELS
+    val metric = uiState.activeMetric
+    val rated = metric.hasVerdict()
+    // Nodes without data are counted too (blue), so the ring and chips add up to all nodes. Tabs without limits only
+    // tell "has data" from "no data".
+    val shownLevels =
+        when {
+            !rated -> listOf(HealthLevel.GOOD, HealthLevel.UNKNOWN)
+            else -> RANKED_LEVELS + HealthLevel.UNKNOWN
+        }
     val good = counts[HealthLevel.GOOD] ?: 0
     val brush =
         Brush.verticalGradient(
@@ -186,22 +193,19 @@ internal fun NetworkHealthHero(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            if (verdictTotal > 0) {
+            if (!rated) {
+                HealthRing(
+                    segments = shownLevels.map { it to (counts[it] ?: 0) },
+                    centerText = "${uiState.withDataCount}",
+                )
+            } else if (verdictTotal > 0) {
                 HealthRing(
                     segments = shownLevels.map { it to (counts[it] ?: 0) },
                     centerText = "${good * PERCENT / verdictTotal}%",
                 )
             } else {
-                // Tabs without a good/bad verdict (traffic, resources, ...): show how many nodes report anything.
-                DonutChart(
-                    segments =
-                    listOf(
-                        MaterialTheme.colorScheme.StatusOnline to uiState.withDataCount,
-                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f) to
-                            (uiState.totalCount - uiState.withDataCount).coerceAtLeast(0),
-                    ),
-                    centerText = "${uiState.withDataCount}",
-                )
+                // A rated tab where no node has any data yet: the whole ring is "no data".
+                HealthRing(segments = shownLevels.map { it to (counts[it] ?: 0) }, centerText = "—")
             }
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
@@ -211,7 +215,7 @@ internal fun NetworkHealthHero(
                 )
                 Text(
                     text =
-                    if (verdictTotal > 0) {
+                    if (rated && verdictTotal > 0) {
                         stringResource(Res.string.network_health_hero_subtitle, good, verdictTotal)
                     } else if (uiState.withDataCount > 0) {
                         stringResource(
@@ -256,7 +260,7 @@ internal fun NetworkHealthHero(
                         ) {
                             HealthDot(color = level.color())
                             Text(
-                                text = "${counts[level] ?: 0} ${stringResource(level.labelRes)}",
+                                text = "${counts[level] ?: 0} ${level.labelFor(metric)}",
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
                             )
@@ -405,7 +409,7 @@ internal fun NodeHealthRow(
     modifier: Modifier = Modifier,
 ) {
     val level = metric.levelFor(node)
-    val accent = level.colorFor(metric)
+    val accent = level.color()
     val base = MaterialTheme.colorScheme.surfaceContainer
     val container = if (level == HealthLevel.UNKNOWN) base else accent.copy(alpha = ROW_TINT_ALPHA).compositeOver(base)
     val valueColor = if (level == HealthLevel.UNKNOWN) MaterialTheme.colorScheme.onSurface else accent
@@ -485,7 +489,7 @@ internal fun NodeHealthRow(
                             color = valueColor,
                         )
                         Text(
-                            text = stringResource(level.labelRes),
+                            text = level.labelFor(metric),
                             style = MaterialTheme.typography.labelSmall,
                             color = accent,
                         )
