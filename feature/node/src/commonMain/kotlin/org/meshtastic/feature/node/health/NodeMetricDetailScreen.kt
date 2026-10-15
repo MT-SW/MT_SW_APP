@@ -111,7 +111,10 @@ fun NodeMetricDetailScreen(
         ) {
             NodeMetricHero(uiState = uiState)
             Spacer(modifier = Modifier.height(12.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            ) {
                 NodeMetricRange.entries.forEach { range ->
                     FilterChip(
                         selected = uiState.range == range,
