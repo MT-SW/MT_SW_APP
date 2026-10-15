@@ -70,6 +70,7 @@ import kotlin.time.Duration.Companion.seconds
 
 private const val RSSI_DELAY = 3
 private const val RSSI_TIMEOUT = 1
+private const val LORA_LINES = 2
 
 /**
  * Plain text resolved outside the animated connected-device subtree.
@@ -83,7 +84,7 @@ data class CurrentlyConnectedText(
     val rssiLabel: String,
     val disconnectLabel: String,
     val firmwareVersion: String?,
-    val loraSummary: String? = null,
+    val loraSummary: LoraSummary? = null,
 )
 
 /** Preset and region labels for the connected card; [region] is null while the region is unset. */
@@ -178,20 +179,31 @@ fun CurrentlyConnectedInfo(
     }
 }
 
+/** Preset on the first line, region under it, so long names fit and wrap instead of being cut off. */
 @Composable
-private fun LoraRow(summary: String, onClick: () -> Unit) {
+private fun LoraRow(summary: LoraSummary, onClick: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Text(
-            text = summary,
-            style = MaterialTheme.typography.bodyMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f),
-        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = summary.preset,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = LORA_LINES,
+                overflow = TextOverflow.Ellipsis,
+            )
+            summary.region?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = LORA_LINES,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
         Icon(imageVector = MeshtasticIcons.ChevronRight, contentDescription = null)
     }
 }
