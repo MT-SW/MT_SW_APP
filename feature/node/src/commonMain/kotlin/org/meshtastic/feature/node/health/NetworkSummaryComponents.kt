@@ -61,8 +61,9 @@ private const val HEADER_ICON_ALPHA = 0.18f
 private const val TRACK_ALPHA = 0.10f
 private const val CHART_HEIGHT_DP = 96
 
-/** The verdicts in the order used by the distribution counts: good, fair, poor, very poor. */
-private val DISTRIBUTION_LEVELS = listOf(HealthLevel.GOOD, HealthLevel.MEDIUM, HealthLevel.BAD, HealthLevel.CRITICAL)
+/** The verdicts in the order used by the distribution counts: good, fair, poor, very poor, no data. */
+private val DISTRIBUTION_LEVELS =
+    listOf(HealthLevel.GOOD, HealthLevel.MEDIUM, HealthLevel.BAD, HealthLevel.CRITICAL, HealthLevel.UNKNOWN)
 
 /** Goes from 0 to 1 shortly after the screen shows, so charts grow in. */
 @Composable
@@ -135,7 +136,7 @@ internal fun StatTile(
     }
 }
 
-/** One wide bar split into good / fair / poor / very poor parts, with a legend underneath. */
+/** One wide bar split into good / fair / poor / very poor / no data parts, with a legend underneath. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun DistributionBar(counts: List<Int>, modifier: Modifier = Modifier) {
@@ -170,6 +171,8 @@ internal fun DistributionBar(counts: List<Int>, modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             DISTRIBUTION_LEVELS.forEachIndexed { index, level ->
+                // "No data" is listed only when some node has none.
+                if (level == HealthLevel.UNKNOWN && counts.getOrElse(index) { 0 } == 0) return@forEachIndexed
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(5.dp),

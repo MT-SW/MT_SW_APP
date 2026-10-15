@@ -80,10 +80,10 @@ data class NetworkSummaryUiState(
     val topMessageSendersWeek: List<MessageSender> = emptyList(),
     val topMessageSendersToday: List<MessageSender> = emptyList(),
     val attentionItems: List<AttentionItem> = emptyList(),
-    /** Nodes per battery verdict: good, fair, poor, very poor. */
-    val batteryDistribution: List<Int> = listOf(0, 0, 0, 0),
-    /** Nodes per signal verdict: good, fair, poor, very poor. */
-    val snrDistribution: List<Int> = listOf(0, 0, 0, 0),
+    /** Nodes per battery verdict: good, fair, poor, very poor, no data. */
+    val batteryDistribution: List<Int> = listOf(0, 0, 0, 0, 0),
+    /** Nodes per signal verdict: good, fair, poor, very poor, no data. */
+    val snrDistribution: List<Int> = listOf(0, 0, 0, 0, 0),
     /** Text messages per day over the last 7 days, oldest first; the last one is the last 24 hours. */
     val messagesPerDay: List<Int> = List(DAYS_IN_WEEK) { 0 },
 )
@@ -316,9 +316,11 @@ class NetworkSummaryViewModel(
                     }
             }
 
-            val batteryDistribution =
-                bucketize(batteryLevels.map { it.toFloat() }, BATTERY_GOOD, BATTERY_MEDIUM, BATTERY_BAD)
-            val snrDistribution = bucketize(snrByNode.map { it.snr }, SNR_GOOD, SNR_MEDIUM, SNR_BAD)
+            // The fifth number is the nodes with no reading at all, so every bar adds up to all nodes.
+            val batteryRated = bucketize(batteryLevels.map { it.toFloat() }, BATTERY_GOOD, BATTERY_MEDIUM, BATTERY_BAD)
+            val batteryDistribution = batteryRated + (nodes.size - batteryRated.sum()).coerceAtLeast(0)
+            val snrRated = bucketize(snrByNode.map { it.snr }, SNR_GOOD, SNR_MEDIUM, SNR_BAD)
+            val snrDistribution = snrRated + (nodes.size - snrRated.sum()).coerceAtLeast(0)
             val messagesPerDay =
                 (DAYS_IN_WEEK - 1 downTo 0).map { daysAgo ->
                     messageLogsWeek.count {

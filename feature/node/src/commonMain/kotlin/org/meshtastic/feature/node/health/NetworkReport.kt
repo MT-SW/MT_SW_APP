@@ -176,7 +176,7 @@ private fun percentBar(label: String, value: Float) =
     ReportBar(label, value.coerceIn(MIN_PERCENT, MAX_PERCENT), MetricFormatter.percent(value, decimalPlaces = 1))
 
 private fun distributionBars(counts: List<Int>): List<ReportBar> {
-    val names = listOf("Dobrze", "Średnio", "Źle", "Bardzo źle")
+    val names = listOf("Dobrze", "Średnio", "Źle", "Bardzo źle", "Brak danych")
     return counts.mapIndexed { i, c -> ReportBar(names.getOrElse(i) { "?" }, c.toFloat(), "$c") }
 }
 
