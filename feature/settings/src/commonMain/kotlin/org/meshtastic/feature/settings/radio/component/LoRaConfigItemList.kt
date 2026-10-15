@@ -68,6 +68,7 @@ import org.meshtastic.core.resources.config_lora_region_summary
 import org.meshtastic.core.resources.lna_gain_correction
 import org.meshtastic.core.resources.lna_gain_correction_description
 import org.meshtastic.core.resources.lora
+import org.meshtastic.core.resources.lora_override_duty_cycle_summary
 import org.meshtastic.core.resources.ok_to_mqtt_description
 import org.meshtastic.core.resources.options
 import org.meshtastic.core.resources.schema_lora_bandwidth
@@ -392,6 +393,7 @@ fun LoRaConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                 HorizontalDivider()
                 SwitchPreference(
                     title = stringResource(Res.string.schema_lora_override_duty_cycle),
+                    summary = stringResource(Res.string.lora_override_duty_cycle_summary),
                     checked = formState.value.override_duty_cycle,
                     enabled = state.connected,
                     onCheckedChange = {
