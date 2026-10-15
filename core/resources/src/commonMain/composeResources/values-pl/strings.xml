@@ -2680,4 +2680,24 @@
     <string name="wifi_reason_self">rozłączone przez samo urządzenie (%1$d)</string>
     <string name="wifi_reason_other">kod %1$d</string>
     <string name="wifi_export">Zapisz WiFi</string>
+    <string name="app_database_backup_disconnect_confirmation">Radio zostanie najpierw odłączone. Po zakończeniu połącz się ponownie na ekranie Połączenia.</string>
+    <string name="app_database_backup_failed">Nie udało się zapisać kopii zapasowej.</string>
+    <string name="app_database_backup_no_device">Najpierw połącz się z radiem. Nie ma jeszcze danych aplikacji do skopiowania ani przywrócenia.</string>
+    <string name="app_database_backup_saved">Kopia zapasowa zapisana.</string>
+    <string name="app_database_restore_confirmation">Przywrócenie zastąpi wiadomości i węzły tego radia zapisane w aplikacji zawartością kopii zapasowej. Zmiana zadziała po ponownym uruchomieniu aplikacji i ponownym połączeniu z tym radiem.</string>
+    <string name="app_database_restore_corrupt">Ta kopia zapasowa jest uszkodzona lub niepełna.</string>
+    <string name="app_database_restore_failed">Nie udało się odczytać kopii zapasowej.</string>
+    <string name="app_database_restore_not_backup">Ten plik nie jest kopią zapasową danych aplikacji.</string>
+    <string name="app_database_restore_staged">Kopia przyjęta. Uruchom aplikację ponownie i połącz się z tym radiem, aby dokończyć przywracanie.</string>
+    <string name="app_database_restore_wrong_version">Ta kopia pochodzi z innej wersji aplikacji (wersja bazy %1$d, ta aplikacja używa %2$d).</string>
+    <string name="backup_app_database">Kopia zapasowa danych aplikacji</string>
+    <string name="color_picker_presets">Gotowe kolory</string>
+    <string name="color_rgb_description">Czerwony %1$d, zielony %2$d, niebieski %3$d</string>
+    <string name="connect_radio_to_change_settings">Połącz się z radiem, aby zmienić te ustawienia.</string>
+    <string name="firmware_gate_message">Firmware tego radia (%1$s) jest starszy niż minimalny obsługiwany przez aplikację (%2$s). Zaktualizuj firmware, aby dalej korzystać z aplikacji. Najnowsza stabilna wersja firmware: %3$s</string>
+    <string name="firmware_gate_title">Wymagana aktualizacja firmware</string>
+    <string name="firmware_gate_update">Aktualizuj firmware</string>
+    <string name="lora_preset_custom">Własny</string>
+    <string name="lora_preset_region">%1$s · %2$s</string>
+    <string name="restore_app_database">Przywróć dane aplikacji</string>
 </resources>

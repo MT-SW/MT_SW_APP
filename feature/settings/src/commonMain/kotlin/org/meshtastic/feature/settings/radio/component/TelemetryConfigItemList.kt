@@ -54,8 +54,10 @@ import org.meshtastic.core.resources.telemetry_config
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.component.TitledCard
+import org.meshtastic.feature.settings.navigation.ModuleRoute
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 import org.meshtastic.feature.settings.radio.RebootBehavior
+import org.meshtastic.feature.settings.search.SettingsSearchCatalog
 import org.meshtastic.feature.settings.util.IntervalConfiguration
 import org.meshtastic.feature.settings.util.MIN_BROADCAST_INTERVAL_SECS
 import org.meshtastic.feature.settings.util.MIN_DEVICE_METRICS_INTERVAL_SECS
@@ -81,13 +83,14 @@ fun TelemetryConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
         configState = formState,
         enabled = state.connected,
         responseState = state.responseState,
+        showConnectPrompt = state.connectPromptVisible,
         onDismissPacketResponse = viewModel::clearPacketResponse,
         onSave = {
             val config = ModuleConfig.Builder().also { wb -> wb.telemetry = it }.build()
             viewModel.setModuleConfig(config)
         },
     ) {
-        item {
+        fieldItem(SettingsSearchCatalog.fieldKeys(ModuleRoute.TELEMETRY.route)) {
             TitledCard(title = stringResource(Res.string.telemetry_config)) {
                 if (capabilities.offers(ModuleConfig.TelemetryConfig.device_telemetry_enabled)) {
                     SwitchPreference(

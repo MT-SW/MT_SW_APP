@@ -104,6 +104,7 @@ import org.meshtastic.feature.settings.navigation.ModuleRoute
 import org.meshtastic.feature.settings.radio.RadioConfigItemList
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 import org.meshtastic.feature.settings.radio.component.EditDeviceProfileDialog
+import org.meshtastic.feature.settings.radio.rememberDatabaseBackupActions
 import org.meshtastic.feature.settings.search.SettingsSearchBar
 import org.meshtastic.feature.settings.search.SettingsSearchViewModel
 import org.meshtastic.proto.DeviceProfile
@@ -125,6 +126,7 @@ fun DesktopSettingsScreen(
     onNavigate: (Route) -> Unit,
 ) {
     val state by radioConfigViewModel.radioConfigState.collectAsStateWithLifecycle()
+    val databaseBackup = rememberDatabaseBackupActions()
     val destNode by radioConfigViewModel.destNode.collectAsStateWithLifecycle()
     val localConfig by settingsViewModel.localConfig.collectAsStateWithLifecycle()
     val homoglyphEnabled by radioConfigViewModel.homoglyphEncodingEnabledFlow.collectAsStateWithLifecycle(false)
@@ -252,6 +254,9 @@ fun DesktopSettingsScreen(
                             }
                         navRoute?.let { onNavigate(it) }
                     },
+                    databaseBackupAvailable = databaseBackup.available,
+                    onBackupDatabase = databaseBackup.onBackup,
+                    onRestoreDatabase = databaseBackup.onRestore,
                     onNavigate = onNavigate,
                     onImport = {
                         radioConfigViewModel.clearPacketResponse()
@@ -357,6 +362,10 @@ fun DesktopSettingsScreen(
                         onToggleNodeEvents = { settingsViewModel.setNodeEventsEnabled(it) },
                         lowBatteryEnabled = settingsViewModel.lowBatteryEnabled.collectAsStateWithLifecycle().value,
                         onToggleLowBattery = { settingsViewModel.setLowBatteryEnabled(it) },
+                        reactionsEnabled = settingsViewModel.reactionsEnabled.collectAsStateWithLifecycle().value,
+                        onToggleReactions = { settingsViewModel.setReactionsEnabled(it) },
+                        newWaypointsEnabled = settingsViewModel.newWaypointsEnabled.collectAsStateWithLifecycle().value,
+                        onToggleNewWaypoints = { settingsViewModel.setNewWaypointsEnabled(it) },
                     )
 
                     ExpressiveSection(title = stringResource(Res.string.help_and_documentation)) {

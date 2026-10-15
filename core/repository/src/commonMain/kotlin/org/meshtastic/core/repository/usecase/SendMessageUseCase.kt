@@ -52,6 +52,13 @@ interface SendMessageUseCase {
         contactKey: String = "0${NodeAddress.ID_BROADCAST}",
         replyId: Int? = null,
     ): SendMessageOutcome
+
+    /**
+     * Sends the stored message [uuid] again in place. The row keeps its uuid, timestamp, text and reply link and gets a
+     * fresh packet id and a queued status, so it stays where it was in the conversation and delivery status updates on
+     * it. A refused or failed send leaves the row as it was.
+     */
+    suspend fun resend(uuid: Long, contactKey: String): SendMessageOutcome
 }
 
 /** What [SendMessageUseCase] did with a message. */
@@ -59,7 +66,10 @@ sealed interface SendMessageOutcome {
     /** Saved to history and queued for delivery under mesh packet id [packetId]. */
     data class Queued(val packetId: Int) : SendMessageOutcome
 
-    /** Nothing was saved or sent: the conversation is retired, so its channel is no longer on the radio. */
+    /**
+     * Nothing was saved or sent: the conversation is retired (its channel is no longer on the radio) or the row is
+     * gone.
+     */
     data object Refused : SendMessageOutcome
 }
 
@@ -168,5 +178,18 @@ class SendMessageUseCaseImpl(
         }
 
         return SendMessageOutcome.Queued(packetIds.first())
+    }
+
+    override suspend fun resend(uuid: Long, contactKey: String): SendMessageOutcome {
+        val parsedKey = ContactKey(contactKey)
+        if (parsedKey.isRetired) {
+            Logger.w { "Refusing to resend to a retired conversation" }
+            return SendMessageOutcome.Refused
+        }
+
+        val packetId = Random.nextInt(1, Int.MAX_VALUE)
+        // Auto-share-contact / auto-favorite on DM celowo wyłączone (fork MT-SW), także przy ponowieniu.
+        val requeued = packetRepository.resendMessage(uuid, packetId) { messageQueue.enqueue(it) }
+        return if (requeued == null) SendMessageOutcome.Refused else SendMessageOutcome.Queued(packetId)
     }
 }
