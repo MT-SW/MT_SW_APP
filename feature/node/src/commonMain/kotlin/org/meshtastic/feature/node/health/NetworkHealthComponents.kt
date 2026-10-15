@@ -152,7 +152,7 @@ internal fun NetworkHealthTabLabel(metric: NetworkHealthMetric, worst: HealthLev
             imageVector = metric.icon(),
             contentDescription = null,
             modifier = Modifier.size(18.dp),
-            tint = if (worst == HealthLevel.UNKNOWN) MaterialTheme.colorScheme.onSurfaceVariant else worst.color(),
+            tint = worst.colorFor(metric),
         )
         Text(text = metric.label)
     }
@@ -403,7 +403,7 @@ internal fun NodeHealthRow(
     modifier: Modifier = Modifier,
 ) {
     val level = metric.levelFor(node)
-    val accent = level.color()
+    val accent = level.colorFor(metric)
     val base = MaterialTheme.colorScheme.surfaceContainer
     val container = if (level == HealthLevel.UNKNOWN) base else accent.copy(alpha = ROW_TINT_ALPHA).compositeOver(base)
     val valueColor = if (level == HealthLevel.UNKNOWN) MaterialTheme.colorScheme.onSurface else accent
@@ -485,7 +485,7 @@ internal fun NodeHealthRow(
                         Text(
                             text = stringResource(level.labelRes),
                             style = MaterialTheme.typography.labelSmall,
-                            color = valueColor,
+                            color = accent,
                         )
                     }
                 }

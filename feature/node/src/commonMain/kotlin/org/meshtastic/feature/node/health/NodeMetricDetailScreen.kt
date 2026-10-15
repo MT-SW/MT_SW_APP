@@ -420,7 +420,7 @@ private fun NodeMetricHero(uiState: NodeMetricDetailUiState) {
         } else {
             gaugeFraction(uiState.metric, verdictValue)
         }
-    val accent = if (level == HealthLevel.UNKNOWN) MaterialTheme.colorScheme.primary else level.color()
+    val accent = level.colorFor(uiState.metric)
     val base = MaterialTheme.colorScheme.surfaceContainer
 
     Card(

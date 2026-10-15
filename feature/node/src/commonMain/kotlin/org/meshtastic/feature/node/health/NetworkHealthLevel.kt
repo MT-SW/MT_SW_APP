@@ -148,8 +148,25 @@ internal fun HealthLevel.color(): Color = when (this) {
     HealthLevel.MEDIUM -> MaterialTheme.colorScheme.StatusDisconnected
     HealthLevel.BAD -> MaterialTheme.colorScheme.StatusPurple
     HealthLevel.CRITICAL -> MaterialTheme.colorScheme.StatusConnecting
-    HealthLevel.UNKNOWN -> MaterialTheme.colorScheme.onSurfaceVariant
+    HealthLevel.UNKNOWN -> NO_DATA_BLUE
 }
+
+/** Tabs that rate a value good / bad at all; on the others "no verdict" is normal, so it stays neutral grey. */
+internal fun NetworkHealthMetric.hasVerdict(): Boolean = this in
+    setOf(
+        NetworkHealthMetric.POWER,
+        NetworkHealthMetric.SIGNAL,
+        NetworkHealthMetric.ETHER,
+        NetworkHealthMetric.NEIGHBORS,
+    )
+
+/** Colour for [level] on [metric]'s tab: blue for missing data where a verdict is expected, grey where it is not. */
+@Composable
+internal fun HealthLevel.colorFor(metric: NetworkHealthMetric): Color =
+    if (this == HealthLevel.UNKNOWN && !metric.hasVerdict()) MaterialTheme.colorScheme.onSurfaceVariant else color()
+
+/** "No data" — blue, so it is never mistaken for any of the four verdicts. */
+private val NO_DATA_BLUE = Color(0xFF4DA3FF)
 
 /** The word shown next to the colour, so colour is never the only signal. */
 internal val HealthLevel.labelRes: StringResource
