@@ -493,6 +493,7 @@ fun NodeListScreen(
                                     val route = viewModel.getDirectMessageRoute(node)
                                     navigateToMessages(route)
                                 },
+                                lastTracerouteTime = lastTracerouteTime,
                                 onTraceRoute = { viewModel.traceRoute(node) },
                                 onIgnore = { viewModel.ignoreNode(node) },
                                 onRemove = { viewModel.removeNode(node) },
