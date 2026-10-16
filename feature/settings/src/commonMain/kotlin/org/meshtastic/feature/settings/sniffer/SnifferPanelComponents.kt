@@ -66,6 +66,8 @@ import org.meshtastic.core.resources.sniffer_group_by_gateway_summary
 import org.meshtastic.core.resources.sniffer_group_by_gateway_title
 import org.meshtastic.core.resources.sniffer_hide_ondemand_ch0_summary
 import org.meshtastic.core.resources.sniffer_hide_ondemand_ch0_title
+import org.meshtastic.core.resources.sniffer_hide_own_frames_summary
+import org.meshtastic.core.resources.sniffer_hide_own_frames_title
 import org.meshtastic.core.resources.sniffer_load_log_summary
 import org.meshtastic.core.resources.sniffer_load_log_title
 import org.meshtastic.core.resources.sniffer_log_empty
@@ -156,6 +158,8 @@ internal fun SnifferGearSheet(
     onBufferOverflowPolicyChange: (SnifferBufferOverflowPolicy) -> Unit,
     hideOnDemandChannel0: Boolean,
     onHideOnDemandChannel0Change: (Boolean) -> Unit,
+    hideOwnFrames: Boolean,
+    onHideOwnFramesChange: (Boolean) -> Unit,
     onLoadLogClick: () -> Unit,
 ) {
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
@@ -179,6 +183,8 @@ internal fun SnifferGearSheet(
                 onDecryptPayloadsChange = onDecryptPayloadsChange,
                 hideOnDemandChannel0 = hideOnDemandChannel0,
                 onHideOnDemandChannel0Change = onHideOnDemandChannel0Change,
+                hideOwnFrames = hideOwnFrames,
+                onHideOwnFramesChange = onHideOwnFramesChange,
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -263,6 +269,8 @@ private fun SnifferPreferencesSection(
     onDecryptPayloadsChange: (Boolean) -> Unit,
     hideOnDemandChannel0: Boolean,
     onHideOnDemandChannel0Change: (Boolean) -> Unit,
+    hideOwnFrames: Boolean,
+    onHideOwnFramesChange: (Boolean) -> Unit,
 ) {
     SwitchPreference(
         title = stringResource(Res.string.sniffer_group_by_gateway_title),
@@ -290,6 +298,13 @@ private fun SnifferPreferencesSection(
         checked = hideOnDemandChannel0,
         enabled = true,
         onCheckedChange = onHideOnDemandChannel0Change,
+    )
+    SwitchPreference(
+        title = stringResource(Res.string.sniffer_hide_own_frames_title),
+        summary = stringResource(Res.string.sniffer_hide_own_frames_summary),
+        checked = hideOwnFrames,
+        enabled = true,
+        onCheckedChange = onHideOwnFramesChange,
     )
 }
 
