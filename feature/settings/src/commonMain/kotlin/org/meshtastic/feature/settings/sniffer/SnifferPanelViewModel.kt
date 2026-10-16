@@ -33,8 +33,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import org.koin.core.annotation.KoinViewModel
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.datastore.SnifferBufferOverflowPolicy
 import org.meshtastic.core.datastore.SnifferLogFormat
 import org.meshtastic.core.datastore.SnifferLogPrefs
@@ -208,14 +208,14 @@ class SnifferPanelViewModel(
                         // never been clicked. Anchor it to now instead of leaving the panel (and
                         // SnifferLogViewModel's query) unbounded -- see clearedAtMillis's doc.
                         clearedAt == 0L ->
-                            viewModelScope.launch { prefs.setClearedAtMillis(Clock.System.now().toEpochMilliseconds()) }
+                            viewModelScope.launch { prefs.setClearedAtMillis(nowMillis) }
                     }
                     lastRealSource = source
                     _displaySource.value = source
                     _freezeAtMillis.value = Long.MAX_VALUE
                     if (persistedLastReal != source) prefs.setLastRealSource(source)
                 } else {
-                    _freezeAtMillis.value = Clock.System.now().toEpochMilliseconds()
+                    _freezeAtMillis.value = nowMillis
                     if (lastRealSource == null && persistedLastReal != null) {
                         lastRealSource = persistedLastReal
                         _displaySource.value = persistedLastReal
@@ -264,7 +264,7 @@ class SnifferPanelViewModel(
      * file, so the trash icon always returns to a clean live view.
      */
     fun clearDisplayedLogs() {
-        viewModelScope.launch { prefs.setClearedAtMillis(Clock.System.now().toEpochMilliseconds()) }
+        viewModelScope.launch { prefs.setClearedAtMillis(nowMillis) }
         mqttSnifferManager.clear()
         _loadedLog.value = null
     }
