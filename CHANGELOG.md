@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Szczegóły trasy — czas trasy**
+* W szczegółach trasy zamiast „Czas trwania” jest teraz „Czas trasy” — to czas od wysłania zapytania do odebrania odpowiedzi.
+
 **Sniffer — zapamiętane ramki i filtr własnego węzła**
 * Sniffer w trybie „Radio”: po wyłączeniu radia (lub rozłączeniu) zapisane ramki już nie znikają — zostają na liście do czasu kliknięcia kosza, tak jak w trybie WiFi/MQTT.
 * Nowa opcja w ustawieniach Snifera: „Ukryj ramki własnego węzła” — ukrywa ramki wysyłane przez podłączony węzeł, który zgłasza je na bieżąco w dużej liczbie.
@@ -240,6 +243,9 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Traceroute details — route time**
+* In the traceroute details the line formerly labelled "Duration" now reads "Route time" (Polish: „Czas trasy”) — the time from sending the request to receiving the reply.
 
 **Sniffer — kept frames and own-node filter**
 * Sniffer in "Radio" mode: switching the radio off (or disconnecting) no longer makes the saved frames disappear — they stay in the list until the trash icon is pressed, as in WiFi/MQTT mode.
