@@ -19,6 +19,7 @@ package org.meshtastic.core.data.manager
 import co.touchlab.kermit.Logger
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import okio.ByteString
@@ -146,6 +147,30 @@ class CommandSenderImpl(
      * clear inner payloads.
      */
     private fun getChannelIndex(toNum: Int): Int = nodeManager.nodeDBbyNodeNum[toNum]?.channel ?: 0
+
+    /**
+     * Channel a protocol request (traceroute) should go out on: the channel of the newest decoded packet we actually
+     * received from [toNum], because the node's stored channel only follows its last NodeInfo and can be stale for a
+     * node that talks on a secondary channel. Falls back to the stored channel when nothing recent is known.
+     */
+    private suspend fun recentlyHeardChannel(toNum: Int): Int {
+        val fallback = getChannelIndex(toNum)
+        val known = channelSet.value.settings.size.coerceAtLeast(1)
+        val since = nowMillis - RECENT_CHANNEL_WINDOW_MS
+        val heard =
+            runCatching {
+                meshLogRepository
+                    .getLogsFromNodeSince(toNum, since)
+                    .firstOrNull()
+                    .orEmpty()
+                    .filter { log -> log.meshPacket?.let { it.decoded != null && it.channel in 0 until known } == true }
+                    .maxByOrNull { it.received_date }
+                    ?.meshPacket
+                    ?.channel
+            }
+                .getOrNull()
+        return heard ?: fallback
+    }
 
     override suspend fun sendData(p: DataPacket) {
         if (p.id == 0) p.id = generatePacketId()
@@ -382,7 +407,7 @@ class CommandSenderImpl(
                 to = destNum,
                 wantAck = true,
                 id = effectiveRequestId,
-                channel = getChannelIndex(destNum),
+                channel = recentlyHeardChannel(destNum),
                 decoded =
                 Data.Builder()
                     .also { wb ->
@@ -773,6 +798,7 @@ class CommandSenderImpl(
     companion object {
         private const val PACKET_ID_MASK = 0xffffffffL
         private const val PACKET_ID_SHIFT_BITS = 32
+        private const val RECENT_CHANNEL_WINDOW_MS = 3L * 24 * 60 * 60 * 1000
 
         private const val ADMIN_CHANNEL_NAME = "admin"
 
