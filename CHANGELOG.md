@@ -18,6 +18,10 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Trasa — kanał wysyłania i napis czasu**
+* Zapytanie o trasę idzie teraz kanałem, na którym ostatnio faktycznie usłyszeliśmy dany węzeł (z ostatnich 3 dni), a nie kanałem zapisanym z jego ostatniego NodeInfo — naprawia brak wysyłania do węzłów pracujących na drugim kanale. Gdy nic nie wiadomo, zostaje dotychczasowy kanał.
+* Okno wyniku trasy zamiast angielskiego „Duration” pokazuje „Czas trasy”.
+
 **Szczegóły trasy — czas trasy**
 * W szczegółach trasy zamiast „Czas trwania” jest teraz „Czas trasy” — to czas od wysłania zapytania do odebrania odpowiedzi.
 
@@ -243,6 +247,10 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Traceroute — sending channel and time label**
+* A traceroute request now goes out on the channel on which the node was actually last heard (within the last 3 days) instead of the channel stored from its last NodeInfo — fixes requests not leaving for nodes that work on a secondary channel. With nothing known, the previous channel is kept.
+* The traceroute result window shows a localised "Route time" instead of the English "Duration".
 
 **Traceroute details — route time**
 * In the traceroute details the line formerly labelled "Duration" now reads "Route time" (Polish: „Czas trasy”) — the time from sending the request to receiving the reply.

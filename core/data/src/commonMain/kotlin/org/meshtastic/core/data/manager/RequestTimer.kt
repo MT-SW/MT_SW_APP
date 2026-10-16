@@ -55,14 +55,20 @@ internal class RequestTimer {
      * under [logLabel]. Returns [text] unchanged, leaving the start time in place, when no start time was recorded for
      * the id or [from] differs from the recorded destination.
      */
-    fun appendDuration(requestId: Int, text: String, logLabel: String, from: Int? = null): String {
+    fun appendDuration(
+        requestId: Int,
+        text: String,
+        logLabel: String,
+        from: Int? = null,
+        label: String = "Duration",
+    ): String {
         val entry = startTimes.value[requestId]
         if (entry == null || !entry.matches(from)) return text
         startTimes.update { it.removing(requestId) }
         val start = entry.startMillis
         val seconds = (nowMillis - start) / MILLIS_PER_SECOND
         Logger.i { "$logLabel $requestId complete in $seconds s" }
-        return "$text\n\nDuration: ${NumberFormatter.format(seconds, 1)} s"
+        return "$text\n\n$label: ${NumberFormatter.format(seconds, 1)} s"
     }
 
     private companion object {

@@ -2418,6 +2418,7 @@
     <string name="traceroute_route_towards_dest">Trasa do miejsca docelowego:\n\n</string>
     <string name="traceroute_showing_nodes">Pokazywanie %1$d/%2$d węzłów</string>
     <string name="traceroute_traced_by">Trasę sprawdził: %1$s</string>
+    <string name="traceroute_time_label">Czas trasy</string>
     <string name="traceroute_unknown_hop">Nieznany skok</string>
     <string name="track_and_share_locations">Śledź i udostępniaj lokalizacje</string>
     <string name="track_point">punkt trasy</string>

@@ -36,6 +36,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.traceroute_route_back_to_us
 import org.meshtastic.core.resources.traceroute_route_towards_dest
+import org.meshtastic.core.resources.traceroute_time_label
 import org.meshtastic.core.resources.traceroute_unknown_hop
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.PortNum
@@ -105,8 +106,16 @@ class TracerouteHandlerImpl(
                 return@launchSessionWork
             }
 
+            // Localised label for the appended time line; falls back to English where resources cannot load (tests).
+            val timeLabel = runCatching { getStringSuspend(Res.string.traceroute_time_label) }.getOrDefault("Duration")
             val responseText =
-                requestTimer.appendDuration(requestId, renderResponse(routeDiscovery), "Traceroute", packet.from)
+                requestTimer.appendDuration(
+                    requestId,
+                    renderResponse(routeDiscovery),
+                    "Traceroute",
+                    packet.from,
+                    timeLabel,
+                )
             val destination = forwardRoute.firstOrNull() ?: returnRoute.lastOrNull() ?: 0
             serviceStateWriter.setTracerouteResponse(
                 TracerouteResponse(
