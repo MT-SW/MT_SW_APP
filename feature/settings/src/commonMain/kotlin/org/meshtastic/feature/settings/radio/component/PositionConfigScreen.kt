@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.koinInject
@@ -216,6 +217,7 @@ fun PositionConfigScreenCommon(viewModel: RadioConfigViewModel, onBack: () -> Un
                     )
                 DropDownPreference(
                     title = stringResource(Res.string.schema_position_position_broadcast_secs),
+                    modifier = Modifier.settingsField(Res.string.schema_position_position_broadcast_secs),
                     summary = stringResource(Res.string.schema_position_position_broadcast_secs_description),
                     enabled = state.connected,
                     items = items.map { it to it.toDisplayString() },
@@ -233,6 +235,7 @@ fun PositionConfigScreenCommon(viewModel: RadioConfigViewModel, onBack: () -> Un
                 HorizontalDivider()
                 SwitchPreference(
                     title = stringResource(Res.string.schema_position_position_broadcast_smart_enabled),
+                    modifier = Modifier.settingsField(Res.string.schema_position_position_broadcast_smart_enabled),
                     checked = formState.value.position_broadcast_smart_enabled,
                     enabled = state.connected,
                     onCheckedChange = {
@@ -246,6 +249,8 @@ fun PositionConfigScreenCommon(viewModel: RadioConfigViewModel, onBack: () -> Un
                     val smartItems = remember { IntervalConfiguration.SMART_BROADCAST_MINIMUM.allowedIntervals }
                     DropDownPreference(
                         title = stringResource(Res.string.schema_position_broadcast_smart_minimum_interval_secs),
+                        modifier =
+                        Modifier.settingsField(Res.string.schema_position_broadcast_smart_minimum_interval_secs),
                         summary =
                         stringResource(
                             Res.string.schema_position_broadcast_smart_minimum_interval_secs_description,
@@ -271,6 +276,7 @@ fun PositionConfigScreenCommon(viewModel: RadioConfigViewModel, onBack: () -> Un
                             Res.string.schema_position_broadcast_smart_minimum_distance,
                             Config.PositionConfig.broadcast_smart_minimum_distance,
                         ),
+                        modifier = Modifier.settingsField(Res.string.schema_position_broadcast_smart_minimum_distance),
                         summary =
                         stringResource(Res.string.schema_position_broadcast_smart_minimum_distance_description),
                         value = formState.value.broadcast_smart_minimum_distance,
@@ -291,6 +297,7 @@ fun PositionConfigScreenCommon(viewModel: RadioConfigViewModel, onBack: () -> Un
             TitledCard(title = stringResource(Res.string.device_gps)) {
                 SwitchPreference(
                     title = stringResource(Res.string.schema_position_fixed_position),
+                    modifier = Modifier.settingsField(Res.string.schema_position_fixed_position),
                     summary = stringResource(Res.string.schema_position_fixed_position_description),
                     checked = formState.value.fixed_position,
                     enabled = state.connected,
@@ -342,6 +349,7 @@ fun PositionConfigScreenCommon(viewModel: RadioConfigViewModel, onBack: () -> Un
                     HorizontalDivider()
                     DropDownPreference(
                         title = stringResource(Res.string.schema_position_gps_mode),
+                        modifier = Modifier.settingsField(Res.string.schema_position_gps_mode),
                         enabled = state.connected,
                         selectedItem = formState.value.gps_mode,
                         onItemSelected = {
@@ -352,6 +360,7 @@ fun PositionConfigScreenCommon(viewModel: RadioConfigViewModel, onBack: () -> Un
                     val items = remember { IntervalConfiguration.GPS_UPDATE.allowedIntervals }
                     DropDownPreference(
                         title = stringResource(Res.string.schema_position_gps_update_interval),
+                        modifier = Modifier.settingsField(Res.string.schema_position_gps_update_interval),
                         summary = stringResource(Res.string.schema_position_gps_update_interval_description),
                         enabled = state.connected,
                         items = items.map { it to it.toDisplayString() },
@@ -373,6 +382,7 @@ fun PositionConfigScreenCommon(viewModel: RadioConfigViewModel, onBack: () -> Un
             TitledCard(title = stringResource(Res.string.schema_position_position_flags)) {
                 BitwisePreference(
                     title = stringResource(Res.string.schema_position_position_flags),
+                    modifier = Modifier.settingsField(Res.string.schema_position_position_flags),
                     summary = stringResource(Res.string.schema_position_position_flags_description),
                     value = formState.value.position_flags,
                     enabled = state.connected,
@@ -425,6 +435,7 @@ fun PositionConfigScreenCommon(viewModel: RadioConfigViewModel, onBack: () -> Un
                         if (index > 0) HorizontalDivider()
                         DropDownPreference(
                             title = stringResource(row.title),
+                            modifier = Modifier.settingsField(row.title),
                             summary = stringResource(row.description),
                             enabled = state.connected,
                             items = pins,

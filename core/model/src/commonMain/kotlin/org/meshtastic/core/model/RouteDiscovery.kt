@@ -62,10 +62,34 @@ val MeshPacket.fullRouteDiscovery: RouteDiscovery?
     }
 
 /**
- * Display name for a traceroute hop. A node missing from the node DB comes back from the repository as a placeholder
- * user with no hardware model and a generated "Meshtastic xxxx" name; that case is named by its full node id.
+ * The inbound path of a traceroute request that reached us, from its originator to us, with `route_back` empty. The
+ * relays appended themselves on the way and our radio added only its own SNR, so the endpoints are filled in here. Null
+ * unless this packet is a traceroute request.
  */
-fun tracerouteHopName(nodeNum: Int, user: User): String {
+val MeshPacket.inboundRouteDiscovery: RouteDiscovery?
+    get() {
+        val d = decoded ?: return null
+        if (!d.want_response || d.portnum != PortNum.TRACEROUTE_APP) return null
+        val originalRd = RouteDiscovery.ADAPTER.decodeOrNull(d.payload, Logger) ?: return null
+        val sourceId = if (d.source != 0) d.source else this.from
+        val destinationId = if (d.dest != 0) d.dest else this.to
+        return originalRd
+            .newBuilder()
+            .also { wb ->
+                wb.route = listOf(sourceId) + originalRd.route + destinationId
+                wb.route_back = emptyList()
+                wb.snr_back = emptyList()
+            }
+            .build()
+    }
+
+/**
+ * Display name for a traceroute hop. A node missing from the node DB comes back from the repository as a placeholder
+ * user with no hardware model and a generated "Meshtastic xxxx" name; that case is named by its full node id. Firmware
+ * fills a relay that did not add itself with the broadcast address, which is not a node, so it gets [unknownHopLabel].
+ */
+fun tracerouteHopName(nodeNum: Int, user: User, unknownHopLabel: String): String {
+    if (nodeNum == NodeAddress.NODENUM_BROADCAST) return unknownHopLabel
     val id = NodeAddress.numToDefaultId(nodeNum)
     val placeholder =
         user.hw_model == HardwareModel.UNSET &&

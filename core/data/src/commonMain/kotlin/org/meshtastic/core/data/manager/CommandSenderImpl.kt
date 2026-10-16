@@ -394,7 +394,7 @@ class CommandSenderImpl(
             ),
             "Traceroute request",
         )
-        tracerouteHandler.recordStartTime(effectiveRequestId)
+        tracerouteHandler.recordStartTime(effectiveRequestId, destNum)
     }
 
     override suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long) {
