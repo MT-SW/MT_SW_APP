@@ -52,8 +52,8 @@ private fun summarizeHostMetrics(host: HostMetrics?): PacketSummary.HostMetricsS
 private fun summarizeLocalStats(stats: LocalStats?): PacketSummary.LocalStatsSummary? = stats?.let {
     PacketSummary.LocalStatsSummary(
         uptimeSeconds = it.uptime_seconds,
-        channelUtilizationPercent = it.channel_utilization?.takeIf { u -> !u.isNaN() },
-        airUtilTxPercent = it.air_util_tx?.takeIf { u -> !u.isNaN() },
+        channelUtilizationPercent = it.channel_utilization.takeIf { u -> !u.isNaN() },
+        airUtilTxPercent = it.air_util_tx.takeIf { u -> !u.isNaN() },
         numPacketsTx = it.num_packets_tx,
         numPacketsRx = it.num_packets_rx,
         numOnlineNodes = it.num_online_nodes,
@@ -67,7 +67,7 @@ private fun summarizePowerMetrics(pm: PowerMetrics?): PacketSummary.PowerMetrics
     pm?.let(::powerChannelReadings)?.takeIf { it.isNotEmpty() }?.let(PacketSummary::PowerMetricsSummary)
 
 /** One [PacketSummary.PowerChannelReading] per CH1..CH8 that carries a non-NaN voltage and/or current reading. */
-@Suppress("MagicNumber") // 1..8 are channel labels here, not magic values.
+@Suppress("MagicNumber", "DEPRECATION") // 1..8 are channel labels here; ch4..ch8 are deprecated but still read.
 private fun powerChannelReadings(pm: PowerMetrics): List<PacketSummary.PowerChannelReading> =
     listOf(
         Triple(1, pm.ch1_voltage, pm.ch1_current),

@@ -241,8 +241,8 @@ private fun summarizePosition(position: Position): PacketSummary = PacketSummary
     .withFrameTime(position.time)
 
 private fun summarizeUser(user: User): PacketSummary.NodeInfoSummary = PacketSummary.NodeInfoSummary(
-    longName = user.long_name?.takeIf { it.isNotBlank() },
-    shortName = user.short_name?.takeIf { it.isNotBlank() },
+    longName = user.long_name.takeIf { it.isNotBlank() },
+    shortName = user.short_name.takeIf { it.isNotBlank() },
 )
 
 private fun decodeTraceroutePayload(packet: MeshPacket, payload: ByteArray, nodeRepository: NodeRepository): String {
