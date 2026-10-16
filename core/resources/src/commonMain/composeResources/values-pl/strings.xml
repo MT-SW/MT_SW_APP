@@ -2257,6 +2257,8 @@
     <string name="sniffer_source_mqtt_unavailable_summary">Włącz i skonfiguruj moduł MQTT na tym urządzeniu, aby podsłuchiwać ruch brokera</string>
     <string name="sniffer_group_by_gateway_title">Grupuj duplikaty</string>
     <string name="sniffer_group_by_gateway_summary">Łącz ten sam pakiet widziany więcej niż raz (wiele bramek MQTT lub różne węzły przekazujące) w jeden wiersz</string>
+    <string name="sniffer_hide_own_frames_title">Ukryj ramki własnego węzła</string>
+    <string name="sniffer_hide_own_frames_summary">Bezpośrednio połączony węzeł zgłasza swój ruch na bieżąco, co może zalewać listę</string>
     <string name="sniffer_hide_ondemand_ch0_title">Ukryj diagnostykę na żądanie na kanale 0</string>
     <string name="sniffer_hide_ondemand_ch0_summary">Ruch diagnostyki na żądanie (port 354) na głównym kanale to własna komunikacja diagnostyczno-kontrolna aplikacji z połączonym urządzeniem, a nie ruch sieci mesh</string>
     <string name="sniffer_decrypt_payloads_title">Próbuj deszyfrować</string>

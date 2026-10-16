@@ -120,6 +120,7 @@ class SnifferPanelViewModel(
     val bufferOverflowPolicy: StateFlow<SnifferBufferOverflowPolicy> =
         prefs.bufferOverflowPolicy.stateInWhileSubscribed(SnifferBufferOverflowPolicy.STOP)
     val hideOnDemandChannel0: StateFlow<Boolean> = prefs.hideOnDemandChannel0.stateInWhileSubscribed(true)
+    val hideOwnFrames: StateFlow<Boolean> = prefs.hideOwnFrames.stateInWhileSubscribed(false)
 
     // Raw, unseeded version of mqttConfigured below, for init's own reactive fallback -- see the comment there
     // for why the seeded public StateFlow is the wrong thing to react to internally.
@@ -246,6 +247,10 @@ class SnifferPanelViewModel(
 
     fun setHideOnDemandChannel0(enabled: Boolean) {
         viewModelScope.launch { prefs.setHideOnDemandChannel0(enabled) }
+    }
+
+    fun setHideOwnFrames(enabled: Boolean) {
+        viewModelScope.launch { prefs.setHideOwnFrames(enabled) }
     }
 
     fun setBufferOverflowPolicy(policy: SnifferBufferOverflowPolicy) {

@@ -101,6 +101,7 @@ Osobny ekran dostępny z ekranu szczegółów węzła (Administracja → "Diagno
 ## Sniffer
 
 - **Stan snifera po ponownym połączeniu** — po każdym połączeniu z radiem stan jest odczytywany od nowa: appka ignoruje stare odpowiedzi z poprzedniego połączenia i dopytuje radio kilka razy, aż odpowie.
+- **Sniffer „Radio” pamięta ramki po wyłączeniu radia** (znikają dopiero po kliknięciu kosza) oraz ma opcję „Ukryj ramki własnego węzła” w ustawieniach.
 - **Wybór „Radio” w snifferze tylko po potwierdzeniu przez radio** — zapamiętany wybór jest wierzony dopiero, gdy podłączone radio potwierdzi w tym połączeniu, że sniffer działa; po resecie radia, zmianie urządzenia lub przy firmware bez snifera panel od razu się wyłącza.
 
 Tryb pokazujący ruch w eterze, który normalnie by zniknął — wszystkie pakiety usłyszane przez węzeł, łącznie z ruchem broadcastowym (wiadomości na kanałach, telemetria), są przekazywane surowo do telefonu zamiast po prostu odrzucane. Appka ma dwa źródła snifera — **radiowy** (LoRa) i **MQTT** (ruch na skonfigurowanym brokerze) — pokazywane na jednym, wspólnym ekranie logu.

@@ -174,6 +174,13 @@ fun List<SniffedPacket>.groupedByRelay(): List<GroupedSniffedPacket> {
     return (grouped + singles).sortedByDescending { it.packet.receivedAtMillis }
 }
 
+private data class SnifferQuery(
+    val logs: List<MeshLog>,
+    val policy: SnifferBufferOverflowPolicy,
+    val hideOnDemand: Boolean,
+    val hideOwn: Boolean,
+)
+
 /**
  * Sniffer Log screen ViewModel, reached from Settings → Advanced. Sniffer mode has no distinguishing marker on the wire
  * — firmware's `sendPacketToPhoneRaw()` forwards a sniffed packet through the exact same `FromRadio.packet` channel as
@@ -200,7 +207,11 @@ class SnifferLogViewModel(
      * [SnifferPanelViewModel]'s init, which guarantees this is never left at 0L once a real source has been selected.
      */
     val sniffedPackets: StateFlow<List<SniffedPacket>> =
-        combine(prefs.activeSource, prefs.clearedAtMillis) { source, clearedAtMillis -> source to clearedAtMillis }
+        combine(prefs.activeSource, prefs.lastRealSource, prefs.clearedAtMillis) { active, lastReal, clearedAtMillis ->
+                // Switching the sniffer off must not blank the log: while Off, keep reading the last real source's
+                // history (the display layer freezes it at the moment of switching off). Only the trash icon clears it.
+                (if (active == SnifferSource.OFF) lastReal ?: active else active) to clearedAtMillis
+            }
             .flatMapLatest { (source, clearedAtMillis) ->
                 // Off truly means off: no query, no decoding, nothing buffered -- not just hidden at the display
                 // layer. A stale RADIO selection left over from before a disconnect/reconnect is what used to make
@@ -214,9 +225,20 @@ class SnifferLogViewModel(
             }
             .combine(prefs.bufferOverflowPolicy) { logs, policy -> logs to policy }
             .combine(prefs.hideOnDemandChannel0) { (logs, policy), hideOnDemand -> Triple(logs, policy, hideOnDemand) }
-            .map { (logs, policy, hideOnDemand) ->
+            .combine(prefs.hideOwnFrames) { (logs, policy, hideOnDemand), hideOwn ->
+                SnifferQuery(logs, policy, hideOnDemand, hideOwn)
+            }
+            .map { (logs, policy, hideOnDemand, hideOwn) ->
+                val ownNodeNum = nodeRepository.myNodeInfo.value?.myNodeNum
                 val packets =
-                    logs.mapNotNull(::toSniffedPacket).filterNot { packet ->
+                    logs
+                        .filterNot { log ->
+                            // Frames sent by our own node (from == us, or 0 = normalised local-node log).
+                            val from = log.meshPacket?.from
+                            hideOwn && from != null && (from == 0 || from == ownNodeNum)
+                        }
+                        .mapNotNull(::toSniffedPacket)
+                        .filterNot { packet ->
                         // OnDemand (port 354) on the primary channel is the phone app's own diagnostic/control
                         // chatter with the connected node, not mesh traffic -- see hideOnDemandChannel0's doc.
                         hideOnDemand && packet.channel == 0 && packet.portNum == ON_DEMAND_PORT_NUM
@@ -254,7 +276,8 @@ class SnifferLogViewModel(
 
     private fun toSniffedPacket(log: MeshLog): SniffedPacket? {
         val packet = log.meshPacket ?: return null
-        val myNodeNum = nodeRepository.myNodeInfo.value?.myNodeNum ?: return null
+        // Null while disconnected: saved frames must still be shown after the radio goes away.
+        val myNodeNum = nodeRepository.myNodeInfo.value?.myNodeNum
 
         val nodeMap = nodeRepository.nodeDBbyNum.value
         val channels = knownChannels()

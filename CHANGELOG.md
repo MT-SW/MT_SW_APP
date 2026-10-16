@@ -18,6 +18,10 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Sniffer — zapamiętane ramki i filtr własnego węzła**
+* Sniffer w trybie „Radio”: po wyłączeniu radia (lub rozłączeniu) zapisane ramki już nie znikają — zostają na liście do czasu kliknięcia kosza, tak jak w trybie WiFi/MQTT.
+* Nowa opcja w ustawieniach Snifera: „Ukryj ramki własnego węzła” — ukrywa ramki wysyłane przez podłączony węzeł, który zgłasza je na bieżąco w dużej liczbie.
+
 **Scalenie z oryginałem (16.10)**
 * Scalenie z najnowszym oryginałem: historia węzła zapisuje traceroute (także obserwowane i odebrane od innych węzłów — z opisem „Zaobserwowano” i „Trasę sprawdził”), nieznane przeskoki w traceroute są podpisane jako nieznane, a długie naciśnięcie traceroute ma przerwę między kolejnymi wysłaniami, wykres traceroute używa tych samych kolorów co mapa, wyszukiwarka ustawień po przejściu do opcji ją podświetla i przewija na środek, długa nazwa węzła jest ucinana do 24 bajtów (firmware 2.8) oraz aktualizacje bibliotek (Firebase 35.0.2, fastlane) i tłumaczeń. Dopisane polskie tłumaczenia trzech nowych tekstów. W forku zostają bez zmian: kolory i podpisy SNR w traceroute, ostrzeżenie przy „Nadpisz cykl pracy”, ukryte opcje oraz biblioteka Kable przypięta do 0.44.3.
 
@@ -236,6 +240,10 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Sniffer — kept frames and own-node filter**
+* Sniffer in "Radio" mode: switching the radio off (or disconnecting) no longer makes the saved frames disappear — they stay in the list until the trash icon is pressed, as in WiFi/MQTT mode.
+* New Sniffer setting: "Hide frames from my own node" — hides frames sent by the connected node, which reports them live in large numbers.
 
 **Connections screen — preset and region on two lines**
 * Under the connected radio's name the LoRa preset is now on the first line and the region on the second (smaller, grey text). Long names wrap to two lines instead of being cut off.

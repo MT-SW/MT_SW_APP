@@ -70,6 +70,7 @@ open class SnifferLogPrefs(private val dataStore: CorePreferencesDataStore) {
         val EXPORT_FORMAT = stringPreferencesKey("sniffer-export-format")
         val BUFFER_OVERFLOW_POLICY = stringPreferencesKey("sniffer-buffer-overflow-policy")
         val HIDE_ONDEMAND_CHANNEL0 = booleanPreferencesKey("sniffer-hide-ondemand-channel0")
+        val HIDE_OWN_FRAMES = booleanPreferencesKey("sniffer-hide-own-frames")
     }
 
     companion object {
@@ -180,5 +181,16 @@ open class SnifferLogPrefs(private val dataStore: CorePreferencesDataStore) {
 
     open suspend fun setHideOnDemandChannel0(enabled: Boolean) {
         dataStore.edit { it[PreferencesKeys.HIDE_ONDEMAND_CHANNEL0] = enabled }
+    }
+
+    /**
+     * Hide frames sent by the locally connected node itself from the Radio sniffer. The directly connected node
+     * reports its own traffic live and in large amounts, which can crowd out what other nodes are sending. Defaults to
+     * shown.
+     */
+    open val hideOwnFrames: Flow<Boolean> = dataStore.data.map { it[PreferencesKeys.HIDE_OWN_FRAMES] ?: false }
+
+    open suspend fun setHideOwnFrames(enabled: Boolean) {
+        dataStore.edit { it[PreferencesKeys.HIDE_OWN_FRAMES] = enabled }
     }
 }
