@@ -311,7 +311,7 @@ class SnifferLogViewModel(
     private fun resolveRelayId(relayNode: Int, nodeMap: Map<Int, Node>, ourNodeNum: Int?): String? {
         if (relayNode == 0) return null
         return Node.getRelayNode(relayNode, nodeMap.values.toList(), ourNodeNum)?.let { relay ->
-            val shortName = relay.user?.short_name?.takeIf { it.isNotBlank() }
+            val shortName = relay.user.short_name.takeIf { it.isNotBlank() }
             val id = NodeAddress.numToDefaultId(relay.num)
             shortName?.let { "$id ($it)" } ?: id
         }
