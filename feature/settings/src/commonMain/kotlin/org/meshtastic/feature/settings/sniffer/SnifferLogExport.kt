@@ -16,11 +16,11 @@
  */
 package org.meshtastic.feature.settings.sniffer
 
-import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.meshtastic.core.common.util.DateFormatter
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.datastore.SnifferLogFormat
 import org.meshtastic.feature.settings.debugging.sanitizeForExport
 import org.meshtastic.feature.settings.export.LogExportContent
@@ -116,7 +116,7 @@ private fun List<SnifferExportRow>.toCsvBytes(): ByteArray = buildString {
  * [rows] should already be in the order the file should read (oldest first, matching the old per-type exporters).
  */
 fun buildSnifferExport(rows: List<SnifferExportRow>, format: SnifferLogFormat, sourceLabel: String): LogExportContent {
-    val timestamp = Clock.System.now().toEpochMilliseconds()
+    val timestamp = nowMillis
     return when (format) {
         SnifferLogFormat.TXT ->
             LogExportContent(

@@ -27,11 +27,11 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import okio.ByteString
 import org.koin.core.annotation.KoinViewModel
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.di.ServiceScope
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.datastore.SnifferBufferOverflowPolicy
 import org.meshtastic.core.datastore.SnifferLogPrefs
 import org.meshtastic.core.model.Channel
@@ -317,7 +317,7 @@ class MqttSnifferManager(
     }
 
     private fun decodeMessage(message: MqttClientProxyMessage): MqttSniffedPacket? {
-        val now = Clock.System.now().toEpochMilliseconds()
+        val now = nowMillis
         val jsonText = message.text
         if (jsonText != null) {
             return MqttSniffedPacket(
