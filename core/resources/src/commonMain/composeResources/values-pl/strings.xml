@@ -1206,6 +1206,7 @@
     <string name="logs">Rejestry zdarzeń (logs)</string>
     <string name="long_name">Długa nazwa</string>
     <string name="longitude">Długość geograficzna</string>
+    <!-- LORA -->
     <string name="lora">LoRa</string>
     <string name="lora_config">LoRa</string>
     <string name="lora_config_change_value">%1$s: %2$s → %3$s</string>
@@ -2409,10 +2410,13 @@
     <string name="traceroute_outgoing_route">Wychodząca trasa</string>
     <string name="traceroute_return_hops">Skoki powrotne</string>
     <string name="traceroute_return_route">Trasa zwrotna</string>
+    <string name="traceroute_observed">Zaobserwowano</string>
     <string name="traceroute_round_trip">Trasa w obie strony</string>
     <string name="traceroute_route_back_to_us">Trasa do nas:\n\n</string>
     <string name="traceroute_route_towards_dest">Trasa do miejsca docelowego:\n\n</string>
     <string name="traceroute_showing_nodes">Pokazywanie %1$d/%2$d węzłów</string>
+    <string name="traceroute_traced_by">Trasę sprawdził: %1$s</string>
+    <string name="traceroute_unknown_hop">Nieznany skok</string>
     <string name="track_and_share_locations">Śledź i udostępniaj lokalizacje</string>
     <string name="track_point">punkt trasy</string>
     <!-- TRAFFIC -->
