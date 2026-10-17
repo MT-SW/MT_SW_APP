@@ -70,19 +70,40 @@ interface MeshLogDao {
 
     /**
      * The newest log of [portNum] from every sender — exactly what summaries that only look at each node's latest
-     * report (e.g. Neighbor Info) need, without reading the whole history of that port.
+     * report (e.g. Neighbor Info) need, without reading the whole history of that port. Without the bulky text copy
+     * of the packet (`message`), which these screens never use.
      */
     @Query(
         """
-        SELECT * FROM log
-        WHERE port_num = :portNum
-        AND received_date = (
-            SELECT MAX(l.received_date) FROM log l WHERE l.port_num = :portNum AND l.from_num = log.from_num
+        SELECT uuid, type, received_date, '' AS message, from_num, port_num, from_radio FROM log
+        WHERE rowid IN (
+            SELECT rowid FROM (SELECT rowid, MAX(received_date) FROM log WHERE port_num = :portNum GROUP BY from_num)
         )
         ORDER BY received_date DESC
         """,
     )
     fun getLatestLogsByPortNumPerSender(portNum: Int): Flow<List<MeshLog>>
+
+    /** Like [getAllLogsSince], without the bulky text copy of each packet (`message`) the health screens never use. */
+    @Query(
+        "SELECT uuid, type, received_date, '' AS message, from_num, port_num, from_radio FROM log " +
+            "WHERE received_date >= :sinceTimestamp ORDER BY received_date ASC",
+    )
+    fun getAllLogsSinceSlim(sinceTimestamp: Long): Flow<List<MeshLog>>
+
+    /** Like [getLogsByPortNumSince], without the bulky text copy of each packet (`message`). */
+    @Query(
+        "SELECT uuid, type, received_date, '' AS message, from_num, port_num, from_radio FROM log " +
+            "WHERE port_num = :portNum AND received_date >= :sinceTimestamp ORDER BY received_date DESC",
+    )
+    fun getLogsByPortNumSinceSlim(portNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>>
+
+    /** Like [getLogsFromNodeSince], without the bulky text copy of each packet (`message`). */
+    @Query(
+        "SELECT uuid, type, received_date, '' AS message, from_num, port_num, from_radio FROM log " +
+            "WHERE from_num = :nodeNum AND received_date >= :sinceTimestamp ORDER BY received_date ASC",
+    )
+    fun getLogsFromNodeSinceSlim(nodeNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>>
 
     /**
      * All logs across every sender and every port since [sinceTimestamp] — used to derive SNR/RSSI history, since that

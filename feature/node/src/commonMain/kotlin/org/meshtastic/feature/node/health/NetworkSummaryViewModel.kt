@@ -104,18 +104,10 @@ class NetworkSummaryViewModel(
     val uiState: StateFlow<NetworkSummaryUiState> =
         combine(
             nodeRepository.getNodes(),
+            // One read of the last 24 hours; telemetry, neighbours and positions are filtered out of it below.
+            meshLogRepository.getAllLogsSinceSlim(nowMillis - HISTORY_WINDOW_MILLIS).calmed(),
             meshLogRepository
-                .getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, nowMillis - HISTORY_WINDOW_MILLIS)
-                .calmed(),
-            meshLogRepository
-                .getLogsByPortNumSince(PortNum.NEIGHBORINFO_APP.value, nowMillis - HISTORY_WINDOW_MILLIS)
-                .calmed(),
-            meshLogRepository
-                .getLogsByPortNumSince(PortNum.POSITION_APP.value, nowMillis - HISTORY_WINDOW_MILLIS)
-                .calmed(),
-            meshLogRepository.getAllLogsSince(nowMillis - HISTORY_WINDOW_MILLIS).calmed(),
-            meshLogRepository
-                .getLogsByPortNumSince(PortNum.TEXT_MESSAGE_APP.value, nowMillis - WEEK_WINDOW_MILLIS)
+                .getLogsByPortNumSinceSlim(PortNum.TEXT_MESSAGE_APP.value, nowMillis - WEEK_WINDOW_MILLIS)
                 .calmed(),
             meshLogRepository.getMyNodeInfo(),
         ) { values ->
@@ -123,20 +115,15 @@ class NetworkSummaryViewModel(
             val nodes = values[0] as List<org.meshtastic.core.model.Node>
 
             @Suppress("UNCHECKED_CAST")
-            val telemetryLogs = values[1] as List<org.meshtastic.core.model.MeshLog>
+            val allLogs = values[1] as List<org.meshtastic.core.model.MeshLog>
 
             @Suppress("UNCHECKED_CAST")
-            val neighborLogs = values[2] as List<org.meshtastic.core.model.MeshLog>
-
-            @Suppress("UNCHECKED_CAST")
-            val positionLogs = values[3] as List<org.meshtastic.core.model.MeshLog>
-
-            @Suppress("UNCHECKED_CAST")
-            val allLogs = values[4] as List<org.meshtastic.core.model.MeshLog>
-
-            @Suppress("UNCHECKED_CAST")
-            val messageLogsWeek = values[5] as List<org.meshtastic.core.model.MeshLog>
-            val myNodeInfo = values[6] as org.meshtastic.proto.MyNodeInfo?
+            val messageLogsWeek = values[2] as List<org.meshtastic.core.model.MeshLog>
+            val myNodeInfo = values[3] as org.meshtastic.proto.MyNodeInfo?
+            val telemetryLogs = allLogs.filter { it.portNum == PortNum.TELEMETRY_APP.value }
+            // Newest first: only each node's latest report counts below.
+            val neighborLogs = allLogs.filter { it.portNum == PortNum.NEIGHBORINFO_APP.value }.asReversed()
+            val positionLogs = allLogs.filter { it.portNum == PortNum.POSITION_APP.value }
 
             val myNodeNum = myNodeInfo?.my_node_num
             fun remapLocal(num: Int): Int = if (myNodeNum != null && num == 0) myNodeNum else num

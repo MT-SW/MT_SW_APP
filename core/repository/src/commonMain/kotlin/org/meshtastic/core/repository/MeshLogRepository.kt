@@ -61,6 +61,17 @@ interface MeshLogRepository {
      */
     fun getLatestLogsByPortNumPerSender(portNum: Int): Flow<List<MeshLog>> = getLogsByPortNumSince(portNum, 0L)
 
+    /** Like [getAllLogsSince], but entries carry no text copy of the packet (`raw_message` is empty). */
+    fun getAllLogsSinceSlim(sinceTimestamp: Long): Flow<List<MeshLog>> = getAllLogsSince(sinceTimestamp)
+
+    /** Like [getLogsByPortNumSince], but entries carry no text copy of the packet (`raw_message` is empty). */
+    fun getLogsByPortNumSinceSlim(portNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>> =
+        getLogsByPortNumSince(portNum, sinceTimestamp)
+
+    /** Like [getLogsFromNodeSince], but entries carry no text copy of the packet (`raw_message` is empty). */
+    fun getLogsFromNodeSinceSlim(nodeNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>> =
+        getLogsFromNodeSince(nodeNum, sinceTimestamp)
+
     /** Retrieves all [MeshLog]s across every sender and port since [sinceTimestamp]. */
     fun getAllLogsSince(sinceTimestamp: Long): Flow<List<MeshLog>>
 

@@ -31,6 +31,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 **Zdrowie sieci — stabilność**
 * Zabezpieczenia przed zamknięciem aplikacji w Zdrowiu sieci: błąd przy wczytywaniu danych (zakładki, podsumowanie, szczegóły metryki) jest teraz zapisywany w logu, a ekran zostaje otwarty zamiast zamykać aplikację. Wykresy pomijają błędne wartości (NaN / nieskończoność), a pusty wykres słupkowy, wskaźnik i mapa cieplna nie wywołują już błędu.
 * Zdrowie sieci przy dużej ilości danych (np. zakres „Wszystkie”): szczegóły metryki czytają pełną historię węzła z wybranego zakresu (nic nie jest obcinane), sąsiedzi czytają tylko najnowszy raport każdego węzła (to jedyne, czego używają), ciężkie obliczenia (zakładki, podsumowanie, sąsiedzi) idą w tle, a nie na głównym wątku, i czekają aż seria nowych pakietów ucichnie, zamiast przeliczać wszystko przy każdym pakiecie.
+* Zdrowie sieci — listy lżejsze: ekrany list (zakładki, podsumowanie, sąsiedzi) czytają dane z ostatnich 24 godzin jednym zapytaniem zamiast czterech i bez tekstowej kopii każdego pakietu, której nigdy nie używają; sąsiedzi pobierają z bazy od razu tylko najnowszy raport każdego węzła. Pełny wybrany zakres (także „Wszystkie”) jest czytany dopiero po wejściu w konkretny węzeł i statystykę.
 
 **Pasek przewijania — stały rozmiar suwaka**
 * Suwak paska przewijania (desktop) ma teraz stały rozmiar zależny od ilości treści i tylko się przesuwa. Wcześniej na listach o różnej wysokości wierszy (np. szczegóły urządzenia) zmieniał rozmiar w zależności od położenia.
@@ -297,6 +298,7 @@ The entries below describe only what this fork adds on top of the original, from
 **Network health — stability**
 * Crash guards in Network health: an error while loading the data (tabs, summary, metric detail) is now logged and the screen stays open instead of closing the app. Charts skip invalid values (NaN / infinity), and an empty bar chart, gauge or heatmap no longer throws.
 * Network health with a lot of data (e.g. the "All" range): metric detail reads the node's full history for the chosen range (nothing is cut off), neighbours read only each node's newest report (the only thing they use), the heavy calculations (tabs, summary, neighbours) run in the background instead of on the main thread, and wait for a burst of new packets to settle instead of recalculating on every packet.
+* Network health — lighter lists: the list screens (tabs, summary, neighbours) read the last 24 hours with one query instead of four and without the text copy of every packet that they never use; neighbours fetch only each node's newest report straight from the database. The full chosen range ("All" included) is read only once you open a specific node and statistic.
 
 **Scrollbar — constant thumb size**
 * The desktop scrollbar thumb now keeps one size based on the amount of content and only moves. Previously, on lists with rows of different heights (e.g. device details) it changed size depending on the scroll position.
