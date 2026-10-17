@@ -85,6 +85,12 @@ class PacketRepositoryImpl(private val dbManager: DatabaseProvider, private val 
         it.packetDao().getUnreadCount(contact)
     }
 
+    override suspend fun getMessageCounts(): Map<String, Int> =
+        dbManager.withReadDb { it.packetDao().getMessageCounts() }
+
+    override suspend fun getUnreadCounts(): Map<String, Int> =
+        dbManager.withReadDb { it.packetDao().getUnreadCounts() }
+
     override fun getUnreadCountFlow(contact: String): Flow<Int> = dbManager.observeCurrentDb { db ->
         db.packetDao().getUnreadCountFlow(contact)
     }

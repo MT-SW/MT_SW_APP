@@ -113,6 +113,12 @@ class ContactsViewModel(
                     contactKey to data
                 }
 
+            // One query each for all conversations (not two per conversation), and one pass over the node list (not one
+            // per conversation): both used to grow with every conversation on every recalculation.
+            val unreadCounts = packetRepository.getUnreadCounts()
+            val messageCounts = packetRepository.getMessageCounts()
+            val nodesById = nodeRepository.nodeDBbyNum.value.values.associateBy { it.user.id }
+
             (contacts + (placeholder - contacts.keys)).entries.collectionsMap { entry ->
                 val contactKey = entry.key
                 val packetData = entry.value
@@ -125,8 +131,12 @@ class ContactsViewModel(
 
                 // grab usernames from NodeInfo
                 val userId = if (fromLocal) packetData.to else packetData.from
-                val user = nodeRepository.getUser(userId ?: NodeAddress.ID_BROADCAST)
-                val node = nodeRepository.getNode(userId ?: NodeAddress.ID_BROADCAST)
+                val lookupId = userId ?: NodeAddress.ID_BROADCAST
+                val known = nodesById[lookupId]
+                val user =
+                    known?.user?.takeIf { it.long_name.isNotBlank() && it.short_name.isNotBlank() }
+                        ?: nodeRepository.getUser(lookupId)
+                val node = known ?: nodeRepository.getNode(lookupId)
 
                 val shortName = user.short_name
                 val longName =
@@ -155,8 +165,8 @@ class ContactsViewModel(
                     } else {
                         "$shortName: ${splitPreviewOf(packetData.text.orEmpty())}"
                     },
-                    unreadCount = packetRepository.getUnreadCount(contactKey),
-                    messageCount = packetRepository.getMessageCount(contactKey),
+                    unreadCount = unreadCounts[contactKey] ?: 0,
+                    messageCount = messageCounts[contactKey] ?: 0,
                     isMuted = settings[contactKey]?.isMuted == true,
                     draft = settings[contactKey]?.draft.orEmpty(),
                     isPinned = settings[contactKey]?.pinned == true,

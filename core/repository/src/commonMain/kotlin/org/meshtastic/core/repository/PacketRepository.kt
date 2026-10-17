@@ -61,6 +61,12 @@ interface PacketRepository {
     /** Returns the count of unread messages in a conversation. */
     suspend fun getUnreadCount(contact: String): Int
 
+    /** Message counts of every conversation in one query (conversations without messages are absent). */
+    suspend fun getMessageCounts(): Map<String, Int>
+
+    /** Unread counts of every conversation in one query (conversations without unread messages are absent). */
+    suspend fun getUnreadCounts(): Map<String, Int>
+
     /** Reactive flow of the unread message count in a conversation. */
     fun getUnreadCountFlow(contact: String): Flow<Int>
 
