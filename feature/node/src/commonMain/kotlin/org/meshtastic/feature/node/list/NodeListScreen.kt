@@ -147,11 +147,7 @@ fun NodeListScreen(
     val onlineNodeCount by viewModel.onlineNodeCount.collectAsStateWithLifecycle(0)
     val totalNodeCount by viewModel.totalNodeCount.collectAsStateWithLifecycle(0)
     val unfilteredNodes by viewModel.unfilteredNodeList.collectAsStateWithLifecycle()
-    // Favorites and our own node are never offered for removal: a favorite is an explicit keep, and the connected
-    // radio is not something the node list may delete. ourNode and unfilteredNodes come from independent flows, so
-    // the list can already contain the local node while ourNode is still null. Offer nothing until it is known,
-    // rather than risk removing the user's own node from the radio.
-    val unheardNodes = remember(unfilteredNodes, ourNode) { selectRemovableUnheardNodes(unfilteredNodes, ourNode?.num) }
+    val unheardNodes by viewModel.unheardBannerNodes.collectAsStateWithLifecycle()
     val deviceImageUrls by viewModel.deviceImageUrls.collectAsStateWithLifecycle()
     val relayNodeIds by viewModel.relayNodeIds.collectAsStateWithLifecycle()
     val ignoredNodeCount = unfilteredNodes.count { it.isIgnored }
@@ -170,10 +166,6 @@ fun NodeListScreen(
     }
 
     val connectionState by viewModel.connectionState.collectAsStateWithLifecycle()
-    // A new connection starts fresh: the banner may offer again.
-    LaunchedEffect(connectionState) {
-        if (connectionState !is ConnectionState.Connected) UnheardBannerState.dismissedAt = UnheardBannerState.NONE
-    }
     val deviceType by viewModel.deviceType.collectAsStateWithLifecycle()
 
     val density by viewModel.nodeListDensity.collectAsStateWithLifecycle()
@@ -362,6 +354,7 @@ fun NodeListScreen(
                         )
                         UnheardNodesBanner(
                             unheardNodes = unheardNodes,
+                            onKeep = { viewModel.keepUnheardNodes(unheardNodes) },
                             onRemoveAll = { unheardNodes.forEach(viewModel::removeNode) },
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
                         )
@@ -562,28 +555,32 @@ private fun NodeListEmptyState(
     )
 }
 
-/** Remembers the "Keep" choice for the whole app run, so leaving and re-entering the list does not bring it back. */
-internal object UnheardBannerState {
-    const val NONE = -1
-    var dismissedAt by mutableIntStateOf(NONE)
-}
-
 /**
  * Offers to remove the nodes the radio has not heard since its LoRa settings changed.
  *
  * Shown as an offer, never an automatic removal: the app's node DB is deliberately a superset of the radio's, and a
  * node may simply be out of range rather than on another channel — it comes back on its own when next heard.
  *
- * Dismissal is remembered while the app runs (also across screens), and re-arms when the count rises or the radio
- * reconnects, so a later config change offers again instead of staying silent.
+ * Keep is saved per node, so the banner stays away across launches and returns only for nodes not yet kept. Remove
+ * hides it for this composition, since each removal still waits on its own confirmation.
  */
 @Composable
-private fun UnheardNodesBanner(unheardNodes: List<Node>, onRemoveAll: () -> Unit, modifier: Modifier = Modifier) {
+private fun UnheardNodesBanner(
+    unheardNodes: List<Node>,
+    onKeep: () -> Unit,
+    onRemoveAll: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var removing by remember { mutableStateOf(false) }
+    var previousCount by remember { mutableIntStateOf(0) }
     val count = unheardNodes.size
-    val dismissedAt = UnheardBannerState.dismissedAt
 
-    // Hidden after "Keep" until the count rises (a new LoRa change), the radio reconnects or the app restarts.
-    if (count == 0 || (dismissedAt != UnheardBannerState.NONE && count <= dismissedAt)) return
+    LaunchedEffect(count) {
+        if (count > previousCount) removing = false
+        previousCount = count
+    }
+
+    if (count == 0 || removing) return
 
     Card(
         modifier = modifier,
@@ -608,13 +605,11 @@ private fun UnheardNodesBanner(unheardNodes: List<Node>, onRemoveAll: () -> Unit
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.align(Alignment.End)) {
-                TextButton(onClick = { UnheardBannerState.dismissedAt = count }) {
-                    Text(stringResource(Res.string.nodes_unheard_keep))
-                }
+                TextButton(onClick = onKeep) { Text(stringResource(Res.string.nodes_unheard_keep)) }
                 TextButton(
                     onClick = {
                         onRemoveAll()
-                        UnheardBannerState.dismissedAt = count
+                        removing = true
                     },
                 ) {
                     Text(stringResource(Res.string.nodes_unheard_remove))

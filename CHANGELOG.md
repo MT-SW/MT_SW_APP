@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Scalenie z oryginałem (17.10)**
+* Scalenie z najnowszym oryginałem: przycisk „Zachowaj” przy ostrzeżeniu o niesłyszanych węzłach jest teraz zapamiętywany trwale dla każdego węzła osobno (wersja oryginału zastąpiła naszą, która pamiętała tylko do restartu), z aplikacji usunięto deklarację obsługi Android Auto oraz zaktualizowano opisy wydań i profile przyspieszające start. Bez zmian zostały nasze zmiany w forku.
+
 **Trasa — kanał wysyłania i napis czasu**
 * Zapytanie o trasę idzie teraz kanałem, na którym ostatnio faktycznie usłyszeliśmy dany węzeł (z ostatnich 3 dni), a nie kanałem zapisanym z jego ostatniego NodeInfo — naprawia brak wysyłania do węzłów pracujących na drugim kanale. Gdy nic nie wiadomo, zostaje dotychczasowy kanał.
 * Okno wyniku trasy zamiast angielskiego „Duration” pokazuje „Czas trasy”.
@@ -47,7 +50,6 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Opcja ma teraz opis i wyraźne ostrzeżenie wielkimi literami pod nim: włączenie jej łamie przepisy w większości regionów i wolno to robić tylko tam, gdzie pozwalają na to przepisy.
 
 **Niesłyszane węzły i częstotliwość**
-* Przycisk „Zachowaj” przy ostrzeżeniu o niesłyszanych węzłach jest teraz zapamiętywany, dopóki nie zmieni się liczba takich węzłów, nie połączysz radia od nowa lub nie uruchomisz aplikacji ponownie — samo przejście na inny ekran nie przywraca ostrzeżenia.
 * Węzeł, od którego właśnie odebrano pakiet przez radio (LoRa, nie MQTT), przestaje być oznaczany jako niesłyszany. Wcześniej radio podawało tę ocenę tylko przy łączeniu, więc ikona przekreślonego zasięgu zostawała mimo odświeżającego się czasu.
 * Pole „Częstotliwość nadpisana” znów pokazuje pełną rozdzielczość (do 5 miejsc po przecinku, np. 869,44165), zamiast zaokrąglać do 3.
 * Szczegóły węzła w „Zdrowiu sieci”: przy 30 dniach i „Wszystko” aplikacja wczytuje już tylko dane wybranego węzła, a nie telemetrię całej sieci, co mogło ją wywalać (brak pamięci).
@@ -248,6 +250,9 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### October 2026
 
+**Merge with the original (17.10)**
+* Merge with the latest original: "Keep" on the unheard-nodes warning is now remembered permanently per node (the original's version replaced ours, which only remembered until a restart), the Android Auto declaration was removed from the app, and release notes and start-up profiles were updated. The fork's own changes are untouched.
+
 **Traceroute — sending channel and time label**
 * A traceroute request now goes out on the channel on which the node was actually last heard (within the last 3 days) instead of the channel stored from its last NodeInfo — fixes requests not leaving for nodes that work on a secondary channel. With nothing known, the previous channel is kept.
 * The traceroute result window shows a localised "Route time" instead of the English "Duration".
@@ -271,7 +276,6 @@ The entries below describe only what this fork adds on top of the original, from
 * The option now has a description and a clear warning in capital letters below it: enabling it breaks the regulations in most regions and may be done only where the regulations allow it.
 
 **Unheard nodes and frequency**
-* "Keep" on the unheard-nodes warning is now remembered until the number of such nodes changes, the radio reconnects or the app restarts — just switching screens no longer brings the warning back.
 * A node from which a packet was just received over the radio (LoRa, not MQTT) is no longer marked as unheard. Before, the radio reported that rating only at connection time, so the crossed-out signal icon stayed while the time kept refreshing.
 * The "Override frequency" field shows full resolution again (up to 5 decimals, e.g. 869.44165) instead of rounding to 3.
 * Node details in "Network Health": for 30 days and "All" the app now loads only the chosen node's data, not the whole network's telemetry, which could crash it (out of memory).
