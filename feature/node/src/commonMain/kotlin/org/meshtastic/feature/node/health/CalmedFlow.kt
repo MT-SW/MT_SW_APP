@@ -16,17 +16,29 @@
  */
 package org.meshtastic.feature.node.health
 
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.transformLatest
 
-/** How long a burst of database changes is allowed to settle before the heavy health calculations run again. */
+/** How long a burst of database changes is allowed to settle before the heavy calculations run again. */
 private const val CALM_MILLIS = 750L
 
 /**
- * Waits for a burst of database emissions to settle. Every packet the radio receives changes the log table, and the
- * health screens re-read thousands of rows each time, so without this a busy mesh keeps them recalculating (and
- * allocating) continuously.
+ * Lets the first value through at once, then waits for a burst of further values to settle and passes on only the
+ * newest. Every packet the radio receives changes the log table, and the health and detail screens re-read thousands of
+ * rows each time, so without this a busy mesh keeps them recalculating (and allocating) continuously -- while the first
+ * screen still opens without waiting.
  */
-@OptIn(FlowPreview::class)
-internal fun <T> Flow<T>.calmed(): Flow<T> = debounce(CALM_MILLIS)
+@OptIn(ExperimentalCoroutinesApi::class)
+internal fun <T> Flow<T>.calmed(): Flow<T> = flow {
+    var first = true
+    emitAll(
+        transformLatest { value ->
+            if (first) first = false else delay(CALM_MILLIS)
+            emit(value)
+        },
+    )
+}

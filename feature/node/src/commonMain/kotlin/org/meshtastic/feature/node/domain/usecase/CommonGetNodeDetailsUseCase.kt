@@ -16,11 +16,13 @@
  */
 package org.meshtastic.feature.node.domain.usecase
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onStart
@@ -49,6 +51,7 @@ import org.meshtastic.core.resources.fallback_node_name
 import org.meshtastic.core.ui.util.toPosition
 import org.meshtastic.feature.node.detail.NodeDetailUiState
 import org.meshtastic.feature.node.detail.NodeRequestActions
+import org.meshtastic.feature.node.health.calmed
 import org.meshtastic.feature.node.metrics.EnvironmentMetricsState
 import org.meshtastic.feature.node.metrics.observedTracerouteResponses
 import org.meshtastic.feature.node.metrics.tracedByTracerouteRequests
@@ -88,18 +91,18 @@ constructor(
         // 1. Logs & Metrics Data
         val metricsLogsFlow =
             combine(
-                meshLogRepository.getTelemetryFrom(effectiveNodeId).onStart { emit(emptyList()) },
-                meshLogRepository.getMeshPacketsFrom(effectiveNodeId).onStart { emit(emptyList()) },
-                meshLogRepository.getMeshPacketsFrom(effectiveNodeId, PortNum.POSITION_APP.value).onStart {
+                meshLogRepository.getTelemetryFrom(effectiveNodeId).calmed().onStart { emit(emptyList()) },
+                meshLogRepository.getMeshPacketsFrom(effectiveNodeId).calmed().onStart { emit(emptyList()) },
+                meshLogRepository.getMeshPacketsFrom(effectiveNodeId, PortNum.POSITION_APP.value).calmed().onStart {
                     emit(emptyList())
                 },
-                meshLogRepository.getLogsFrom(effectiveNodeId, PortNum.PAXCOUNTER_APP.value).onStart {
+                meshLogRepository.getLogsFrom(effectiveNodeId, PortNum.PAXCOUNTER_APP.value).calmed().onStart {
                     emit(emptyList())
                 },
-                meshLogRepository.getLogsFrom(effectiveNodeId, PortNum.TRACEROUTE_APP.value).onStart {
+                meshLogRepository.getLogsFrom(effectiveNodeId, PortNum.TRACEROUTE_APP.value).calmed().onStart {
                     emit(emptyList())
                 },
-                meshLogRepository.getLogsFrom(effectiveNodeId, PortNum.NEIGHBORINFO_APP.value).onStart {
+                meshLogRepository.getLogsFrom(effectiveNodeId, PortNum.NEIGHBORINFO_APP.value).calmed().onStart {
                     emit(emptyList())
                 },
             ) { args: Array<List<Any?>> ->
@@ -285,6 +288,8 @@ constructor(
                 relayNodeName = relayNodeName,
             )
         }
+            // Filtering and decoding thousands of log entries must not happen on the main thread.
+            .flowOn(Dispatchers.Default)
     }
 
     private data class HardwareKey(val hwModel: Int, val target: String?)
