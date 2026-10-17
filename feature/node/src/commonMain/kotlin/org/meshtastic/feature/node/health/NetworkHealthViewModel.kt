@@ -215,7 +215,7 @@ class NetworkHealthViewModel(
                     batteryInverted = batteryInvertedNodes,
                 )
             },
-            meshLogRepository.getLogsByPortNum(PortNum.NEIGHBORINFO_APP.value, NEIGHBOR_LOG_LIMIT).calmed(),
+            meshLogRepository.getLatestLogsByPortNumPerSender(PortNum.NEIGHBORINFO_APP.value).calmed(),
             _activeMetric,
             combine(
                 sortFieldFlow,
@@ -404,7 +404,6 @@ class NetworkHealthViewModel(
     companion object {
         private const val BATTERY_POWERED_THRESHOLD = 100
         private const val HISTORY_WINDOW_MILLIS = 24 * 60 * 60 * 1000L
-        private const val NEIGHBOR_LOG_LIMIT = 2000
     }
 }
 

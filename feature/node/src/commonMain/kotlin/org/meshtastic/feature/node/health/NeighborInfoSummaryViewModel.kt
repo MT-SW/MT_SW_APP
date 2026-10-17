@@ -44,7 +44,7 @@ class NeighborInfoSummaryViewModel(
 
     val uiState: StateFlow<NeighborInfoSummaryUiState> =
         combine(
-            meshLogRepository.getLogsByPortNum(PortNum.NEIGHBORINFO_APP.value, MAX_LOGS),
+            meshLogRepository.getLatestLogsByPortNumPerSender(PortNum.NEIGHBORINFO_APP.value),
             nodeRepository.getNodes(),
         ) { logs, nodes ->
             logs to nodes
@@ -71,8 +71,4 @@ class NeighborInfoSummaryViewModel(
             .flowOn(Dispatchers.Default)
             .catch { Logger.e(it) { "Neighbor summary failed" } }
             .stateInWhileSubscribed(initialValue = NeighborInfoSummaryUiState())
-
-    companion object {
-        private const val MAX_LOGS = 2000
-    }
 }
