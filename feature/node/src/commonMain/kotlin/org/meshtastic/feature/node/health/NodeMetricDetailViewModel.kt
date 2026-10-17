@@ -109,11 +109,11 @@ class NodeMetricDetailViewModel(
                 // Only this node's own logs are read (never every node's telemetry): over 30 days the network-wide
                 // query held far too much in memory and could crash the app.
                 combine(
-                    meshLogRepository.getLogsFromNodeSince(nodeNum, since).calmed(),
+                    meshLogRepository.getLogsFromNodeSinceSlim(nodeNum, since).calmed(),
                     meshLogRepository.getMyNodeInfo().flatMapLatest { myNodeInfo ->
                         // MeshLog normalizes the locally-connected device's own logs to node number 0.
                         if (myNodeInfo?.my_node_num == nodeNum) {
-                            meshLogRepository.getLogsFromNodeSince(0, since).calmed()
+                            meshLogRepository.getLogsFromNodeSinceSlim(0, since).calmed()
                         } else {
                             flowOf(emptyList())
                         }

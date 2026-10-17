@@ -180,12 +180,13 @@ class NetworkHealthViewModel(
         combine(
             nodeRepository.getNodes(),
             combine(
-                meshLogRepository.getAllLogsSince(historySince).calmed(),
-                meshLogRepository.getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, historySince).calmed(),
+                meshLogRepository.getAllLogsSinceSlim(historySince).calmed(),
                 meshLogRepository.getMyNodeInfo(),
                 uiPrefs.currentInverted,
                 combine(uiPrefs.batteryInverted, uiPrefs.lnaGains, ::Pair),
-            ) { allLogs, telemetryLogs, myNodeInfo, invertedNodes, batteryAndLna ->
+            ) { allLogs, myNodeInfo, invertedNodes, batteryAndLna ->
+                // Telemetry is part of the same 24 hours of logs: read once instead of querying it a second time.
+                val telemetryLogs = allLogs.filter { it.portNum == PortNum.TELEMETRY_APP.value }
                 val (batteryInvertedNodes, lnaGains) = batteryAndLna
                 // MeshLog normalizes the locally-connected device's own logs to node number 0 (so log continuity
                 // survives a hardware swap) — remap those back to whichever node is actually connected right now.
