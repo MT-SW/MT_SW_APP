@@ -99,6 +99,41 @@ fun tracerouteHopName(nodeNum: Int, user: User, unknownHopLabel: String): String
 
 private const val PLACEHOLDER_SUFFIX_LENGTH = 4
 
+/** A route for display, and the known node that stands in for its last relay when that hop was unknown. */
+class LikelyRelay(val route: RouteDiscovery, val node: Node?)
+
+/**
+ * The firmware leaves the broadcast address where a relay could not add itself (typically one on another channel). The
+ * last relay before us is the one exception that can still be identified: the response carries its low address byte.
+ * The returned route has that one hop replaced by the single known node that matches; it is unchanged, with a null
+ * node, when the byte is missing, nothing or several nodes match, or the node is already on the route.
+ */
+fun RouteDiscovery.withLikelyLastRelay(relayNode: Int, nodes: Collection<Node>, ourNodeNum: Int?): LikelyRelay {
+    val back = route_back
+    val lastRelayIndex = back.size - 2
+    if (relayNode == 0 || back.size < MIN_BACK_ROUTE || back[lastRelayIndex] != NodeAddress.NODENUM_BROADCAST) {
+        return LikelyRelay(this, null)
+    }
+    val node =
+        nodes
+            .filter {
+                it.num != ourNodeNum &&
+                    it.lastHeard != 0 &&
+                    (it.num and RELAY_BYTE_MASK) == (relayNode and RELAY_BYTE_MASK) &&
+                    it.num !in back &&
+                    it.num !in route
+            }
+            .singleOrNull() ?: return LikelyRelay(this, null)
+    val shown =
+        newBuilder()
+            .also { wb -> wb.route_back = back.mapIndexed { i, num -> if (i == lastRelayIndex) node.num else num } }
+            .build()
+    return LikelyRelay(shown, node)
+}
+
+private const val RELAY_BYTE_MASK = 0xFF
+private const val MIN_BACK_ROUTE = 3
+
 @Suppress("MagicNumber")
 internal fun formatTraceroutePath(nodesList: List<String>, snrList: List<Int>): String {
     // nodesList should include both origin and destination nodes

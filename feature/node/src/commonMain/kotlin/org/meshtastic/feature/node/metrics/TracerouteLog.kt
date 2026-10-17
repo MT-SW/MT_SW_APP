@@ -75,6 +75,7 @@ import org.meshtastic.core.resources.traceroute_hops
 import org.meshtastic.core.resources.traceroute_log
 import org.meshtastic.core.resources.traceroute_no_response
 import org.meshtastic.core.resources.traceroute_observed
+import org.meshtastic.core.resources.traceroute_probably_hop
 import org.meshtastic.core.resources.traceroute_return_hops
 import org.meshtastic.core.resources.traceroute_round_trip
 import org.meshtastic.core.resources.traceroute_route_back_to_us
@@ -131,6 +132,7 @@ fun TracerouteLogScreen(
 
     val headerTowardsStr = stringResource(Res.string.traceroute_route_towards_dest)
     val headerBackStr = stringResource(Res.string.traceroute_route_back_to_us)
+    val probablyPrefix = stringResource(Res.string.traceroute_probably_hop, "")
     val durationFormatStr = stringResource(Res.string.traceroute_duration)
 
     val threshold = timeFrame.timeThreshold()
@@ -219,6 +221,7 @@ fun TracerouteLogScreen(
                                     getUsername = ::getUsername,
                                     headerTowards = headerTowardsStr,
                                     headerBack = headerBackStr,
+                                    probablyPrefix = probablyPrefix,
                                     durationTemplate = durationFormatStr,
                                     statusGreen = statusGreen,
                                     statusYellow = statusYellow,
@@ -409,6 +412,7 @@ private fun showTracerouteDetail(
     getUsername: (Int) -> String,
     headerTowards: String,
     headerBack: String,
+    probablyPrefix: String,
     durationTemplate: String,
     statusGreen: Color,
     statusYellow: Color,
@@ -418,17 +422,19 @@ private fun showTracerouteDetail(
     onViewOnMap: (requestId: Int, responseLogUuid: String) -> Unit,
 ) {
     val result = point.result ?: return
-    val route = result.fromRadio.packet?.fullRouteDiscovery
+    val packet = result.fromRadio.packet
+    val route = packet?.fullRouteDiscovery
+    // The last relay is named from the node database when the firmware left it unknown, as in the live alert.
+    val likely = route?.let { viewModel.likelyLastRelay(it, packet?.relay_node ?: 0) }
+    val usernameWithGuess: (Int) -> String = { num ->
+        if (likely?.node?.num == num) probablyPrefix + getUsername(num) else getUsername(num)
+    }
 
     val annotated: AnnotatedString =
         if (route != null && route.route.isNotEmpty() && route.route_back.isNotEmpty()) {
             val annotatedBase =
                 annotateTraceroute(
-                    result.fromRadio.packet?.getTracerouteResponse(
-                        getUsername,
-                        headerTowards = headerTowards,
-                        headerBack = headerBack,
-                    ),
+                    likely?.route?.getTracerouteResponse(usernameWithGuess, headerTowards, headerBack),
                     statusGreen = statusGreen,
                     statusYellow = statusYellow,
                     statusOrange = statusOrange,

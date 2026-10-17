@@ -207,8 +207,8 @@ private fun InlineSearchField(
         shape = RoundedCornerShape(SEARCH_FIELD_CORNER_DP.dp),
         colors =
         TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceBright,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceBright,
+            focusedContainerColor = MaterialTheme.colorScheme.background,
+            unfocusedContainerColor = MaterialTheme.colorScheme.background,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
