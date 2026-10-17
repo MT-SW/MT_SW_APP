@@ -51,11 +51,13 @@ interface FirmwareUpdateManager {
      * DFU mode.
      *
      * @param address The device's normal mesh BLE address (transport prefix stripped).
+     * @param firmwareUri Optional user-selected DFU package; when set, nothing is downloaded (own-file recovery).
      */
     suspend fun recoverDfuDevice(
         release: FirmwareRelease,
         hardware: DeviceHardware,
         address: String,
         updateState: (FirmwareUpdateState) -> Unit,
+        firmwareUri: CommonUri? = null,
     ): FirmwareArtifact?
 }

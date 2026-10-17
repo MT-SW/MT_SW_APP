@@ -38,4 +38,6 @@ data class FirmwareUpdateActions(
     val onPlayChirpyHop: () -> Unit,
     val onDone: () -> Unit,
     val onDismissBootloaderWarning: () -> Unit,
+    /** Turns the own-file mode (file name not compared with the device model) on or off. */
+    val onCustomFileModeChange: (Boolean) -> Unit = {},
 )

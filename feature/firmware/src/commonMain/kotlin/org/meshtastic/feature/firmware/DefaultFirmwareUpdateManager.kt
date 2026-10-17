@@ -66,6 +66,7 @@ class DefaultFirmwareUpdateManager(
         hardware: DeviceHardware,
         address: String,
         updateState: (FirmwareUpdateState) -> Unit,
+        firmwareUri: CommonUri?,
     ): FirmwareArtifact? = radioOperationLock.withOperation(RadioOperation.FirmwareUpdate) {
         // Recovery is inherently a BLE DFU operation — route straight to the DFU handler rather than the
         // connection-type dispatch in getHandler(), which would fail with no live connection. The handler derives
@@ -75,7 +76,7 @@ class DefaultFirmwareUpdateManager(
             hardware = hardware,
             target = address,
             updateState = updateState,
-            firmwareUri = null,
+            firmwareUri = firmwareUri,
         )
     }
 

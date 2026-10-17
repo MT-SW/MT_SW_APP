@@ -874,6 +874,13 @@
     <string name="firmware_update_invalid_local_file_detail">Wybrany plik "%1$s" nie pasuje do %2$s (%3$s). Wybierz plik firmware dla tego urządzenia.</string>
     <string name="firmware_update_keep_device_close">Trzymaj urządzenie blisko telefonu.</string>
     <string name="firmware_update_latest">Aktualizuj do: %1$s</string>
+    <string name="firmware_update_custom_file_summary">Wgraj własny plik bez sprawdzania jego nazwy względem modelu urządzenia. Używaj tylko firmware zbudowanego dla tego urządzenia.</string>
+    <string name="firmware_update_custom_file_title">Własny plik (bez sprawdzania nazwy)</string>
+    <string name="firmware_update_unidentified_device">Nieznane urządzenie</string>
+    <string name="firmware_update_unidentified_summary">Tego urządzenia nie ma na liście sprzętu, więc można wgrać tylko własny plik firmware (.zip dla nRF52, .bin dla ESP32). Używaj tylko firmware zbudowanego dla tego urządzenia.</string>
+    <string name="firmware_update_unidentified_title">Nieznane urządzenie</string>
+    <string name="firmware_update_own_file_warning_body">Wgrywanie własnego pliku lub firmware na urządzenie spoza listy jest ryzykowne i odbywa się na Twoją odpowiedzialność. Aplikacja nie jest w stanie sprawdzić, czy plik pasuje do tego urządzenia. Firmware zbudowane dla innej płytki lub innego układu może sprawić, że urządzenie przestanie się uruchamiać, a jego naprawa może wymagać kabla i specjalnych narzędzi. Zanim kontynuujesz: upewnij się, że plik jest zbudowany dokładnie dla tego urządzenia, naładuj je powyżej połowy, trzymaj je blisko i nie rozłączaj ani nie zamykaj aplikacji do końca aktualizacji.</string>
+    <string name="firmware_update_own_file_warning_title">Ryzyko: plik niesprawdzony</string>
     <string name="firmware_update_local_file">Plik lokalny</string>
     <string name="firmware_update_method_ble">BLE OTA</string>
     <string name="firmware_update_method_detail">Aktualizuj przez %1$s</string>

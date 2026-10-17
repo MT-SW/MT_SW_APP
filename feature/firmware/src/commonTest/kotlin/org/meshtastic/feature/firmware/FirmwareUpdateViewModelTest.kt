@@ -60,7 +60,6 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.UiText
 import org.meshtastic.core.resources.firmware_update_battery_low
 import org.meshtastic.core.resources.firmware_update_no_device
-import org.meshtastic.core.resources.firmware_update_unknown_hardware
 import org.meshtastic.core.testing.FakeBluetoothRepository
 import org.meshtastic.core.testing.FakeNodeRepository
 import org.meshtastic.core.testing.FakeRadioController
@@ -470,7 +469,7 @@ class FirmwareUpdateViewModelTest {
     }
 
     @Test
-    fun `checkForUpdates sets error when hardware lookup fails`() = runTest {
+    fun `checkForUpdates falls back to own-file mode when hardware lookup fails`() = runTest {
         advanceUntilIdle()
         assertIs<FirmwareUpdateState.Ready>(viewModel.state.value)
         assertEquals("1.0.0", viewModel.selectedRelease.value?.title)
@@ -484,12 +483,12 @@ class FirmwareUpdateViewModelTest {
         viewModel.checkForUpdates()
         advanceUntilIdle()
 
+        // An unlisted device is not an error: it can still take the user's own firmware file.
         assertEquals(null, viewModel.selectedRelease.value)
-        assertEquals(null, viewModel.deviceHardware.value)
-        assertEquals(null, viewModel.currentFirmwareVersion.value)
-        val errorState = assertIs<FirmwareUpdateState.Error>(viewModel.state.value)
-        val error = assertIs<UiText.Resource>(errorState.error)
-        assertEquals(Res.string.firmware_update_unknown_hardware, error.res)
+        assertEquals(FirmwareReleaseType.LOCAL, viewModel.selectedReleaseType.value)
+        assertEquals(true, viewModel.deviceHardware.value?.isUnidentified)
+        val ready = assertIs<FirmwareUpdateState.Ready>(viewModel.state.value)
+        assertEquals(true, ready.lenientLocalFile)
     }
 
     @Test
@@ -671,7 +670,7 @@ class FirmwareUpdateViewModelTest {
     }
 
     @Test
-    fun `recovery hardware lookup failure clears stale device metadata`() = runTest {
+    fun `recovery of an unlisted device falls back to own-file mode`() = runTest {
         advanceUntilIdle()
         assertIs<FirmwareUpdateState.Ready>(viewModel.state.value)
         assertEquals("1.0.0", viewModel.selectedRelease.value?.title)
@@ -695,12 +694,11 @@ class FirmwareUpdateViewModelTest {
         viewModel.checkForUpdates()
         advanceUntilIdle()
 
-        assertEquals(null, viewModel.selectedRelease.value)
-        assertEquals(null, viewModel.deviceHardware.value)
+        // An unlisted device can still be recovered with the user's own file.
         assertEquals(null, viewModel.currentFirmwareVersion.value)
-        val errorState = assertIs<FirmwareUpdateState.Error>(viewModel.state.value)
-        val error = assertIs<UiText.Resource>(errorState.error)
-        assertEquals(Res.string.firmware_update_unknown_hardware, error.res)
+        assertEquals(true, viewModel.deviceHardware.value?.isUnidentified)
+        val ready = assertIs<FirmwareUpdateState.Ready>(viewModel.state.value)
+        assertEquals(true, ready.isRecovery)
     }
 
     @Test
