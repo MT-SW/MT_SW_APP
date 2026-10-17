@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Wyszukiwanie węzłów — bez nakładającej się listy**
+* Pole wyszukiwania na liście węzłów jest teraz zwykłym polem tekstowym nad listą: wpisany tekst od razu filtruje tę samą listę, bez otwierania drugiego okna z drugą kopią listy. Naprawia to nakładanie się list i bardzo wolne przewijanie na desktopie po przewinięciu listy i kliknięciu w wyszukiwarkę.
+
 **Wgrywanie firmware — własne pliki i nieznane urządzenia**
 * Urządzenie, którego nie ma na liście sprzętu, nie kończy się już błędem ani nie wisi na „Sprawdzanie”: ekran wgrywania przełącza się na „Plik lokalny” i pozwala wgrać własny plik (.zip dla nRF52, .bin dla ESP32) — przydatne dla własnych buildów.
 * Przy własnym pliku i nieznanym urządzeniu ekran oraz okno potwierdzenia pokazują wyraźne ostrzeżenie o ryzyku (możliwe uszkodzenie urządzenia, odpowiedzialność użytkownika, co sprawdzić przed wgraniem).
@@ -259,6 +262,9 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Node search — no more overlapping list**
+* The node list search is now a plain text field above the list: typing filters that same list in place instead of opening a second window with a duplicate list. This fixes the overlapping lists and very slow scrolling on desktop after scrolling the list and clicking the search field.
 
 **Firmware update — own files and unknown devices**
 * A device that is not in the hardware list no longer ends in an error or hangs on "Checking": the update screen switches to "Local file" and lets you flash your own file (.zip for nRF52, .bin for ESP32) — useful for self-built firmware.

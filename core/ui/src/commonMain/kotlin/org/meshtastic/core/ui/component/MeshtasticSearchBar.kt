@@ -20,6 +20,9 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.placeCursorAtEnd
@@ -35,6 +38,8 @@ import androidx.compose.material3.SearchBarScrollBehavior
 import androidx.compose.material3.SearchBarState
 import androidx.compose.material3.SearchBarValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
@@ -47,9 +52,11 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
@@ -81,6 +88,8 @@ const val SEARCH_BAR_EXPANDED_TAG_SUFFIX = "Expanded"
  *   [SearchBarDefaults.enterAlwaysSearchBarScrollBehavior].
  * @param trailingActions extra icons after the clear button, for controls that belong to the search itself (a sort
  *   menu, a filter menu). They render in the collapsed and expanded field alike.
+ * @param inline when true the bar is a plain always-visible text field and never expands: whatever the caller filters
+ *   (the list under it) is the result, so no second list is drawn over the first. [expandedContent] is ignored.
  * @param expandedContent the results shown under the field once expanded.
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3AdaptiveApi::class)
@@ -94,6 +103,7 @@ fun MeshtasticSearchBar(
     resetKey: Any? = Unit,
     inputFieldTag: String = SEARCH_BAR_INPUT_FIELD_TAG,
     scrollBehavior: SearchBarScrollBehavior? = null,
+    inline: Boolean = false,
     trailingActions: @Composable RowScope.() -> Unit = {},
     expandedContent: @Composable ColumnScope.() -> Unit = {},
 ) {
@@ -118,6 +128,18 @@ fun MeshtasticSearchBar(
     // Edits made through the field are reported back to the caller.
     LaunchedEffect(textFieldState) {
         snapshotFlow { textFieldState.text.toString() }.collect { latestOnQueryChange(it) }
+    }
+
+    if (inline) {
+        InlineSearchField(
+            textFieldState = textFieldState,
+            placeholder = placeholder,
+            clearDescription = clearDescription,
+            testTag = inputFieldTag,
+            trailingActions = trailingActions,
+            modifier = modifier,
+        )
+        return
     }
 
     val inputField: @Composable (String) -> Unit = { tag ->
@@ -155,6 +177,50 @@ fun MeshtasticSearchBar(
         )
     }
 }
+
+/** A plain text field in the search bar's look, for lists that filter in place instead of opening a results surface. */
+@Composable
+private fun InlineSearchField(
+    textFieldState: TextFieldState,
+    placeholder: String,
+    clearDescription: String,
+    testTag: String,
+    trailingActions: @Composable RowScope.() -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    TextField(
+        state = textFieldState,
+        lineLimits = TextFieldLineLimits.SingleLine,
+        placeholder = { Text(placeholder) },
+        leadingIcon = { Icon(imageVector = MeshtasticIcons.Search, contentDescription = null) },
+        trailingIcon = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (textFieldState.text.isNotEmpty()) {
+                    IconButton(onClick = { textFieldState.clearText() }) {
+                        Icon(imageVector = MeshtasticIcons.Close, contentDescription = clearDescription)
+                    }
+                }
+                trailingActions()
+            }
+        },
+        shape = RoundedCornerShape(SEARCH_FIELD_CORNER_DP.dp),
+        colors =
+        TextFieldDefaults.colors(
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+            errorIndicatorColor = Color.Transparent,
+        ),
+        modifier =
+        modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .testTag(testTag)
+            .semantics { contentDescription = placeholder },
+    )
+}
+
+private const val SEARCH_FIELD_CORNER_DP = 28
 
 /** Default tag for the collapsed field, for callers with only one search bar on screen. */
 const val SEARCH_BAR_INPUT_FIELD_TAG = "SearchBarInputField"
