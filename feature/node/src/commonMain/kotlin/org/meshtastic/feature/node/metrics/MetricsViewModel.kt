@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -33,6 +34,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.datetime.TimeZone
@@ -79,6 +81,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.ui.viewmodel.safeLaunch
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
+import org.meshtastic.feature.node.detail.NodeDetailUiState
 import org.meshtastic.feature.node.detail.NodeRequestActions
 import org.meshtastic.feature.node.domain.usecase.GetNodeDetailsUseCase
 import org.meshtastic.feature.node.model.MetricsState
@@ -117,20 +120,24 @@ open class MetricsViewModel(
 
     private val tracerouteOverlayCache = MutableStateFlow<Map<Int, TracerouteOverlay>>(emptyMap())
 
-    val state: StateFlow<MetricsState> =
+    // One shared pipeline for everything on this screen: it used to be built twice (metrics and environment), which
+    // doubled the database reads and the decoding.
+    private val nodeDetails: StateFlow<NodeDetailUiState?> =
         activeNodeId
             .flatMapLatest { nodeId ->
-                if (nodeId == null) return@flatMapLatest flowOf(MetricsState.Empty)
-                getNodeDetailsUseCase(nodeId).map { it.metricsState }
+                if (nodeId == null) return@flatMapLatest flowOf(null)
+                getNodeDetailsUseCase(nodeId)
             }
+            .stateInWhileSubscribed(initialValue = null)
+
+    val state: StateFlow<MetricsState> =
+        nodeDetails
+            .map { it?.metricsState ?: MetricsState.Empty }
             .stateInWhileSubscribed(initialValue = MetricsState.Empty)
 
     private val environmentState: StateFlow<EnvironmentMetricsState> =
-        activeNodeId
-            .flatMapLatest { nodeId ->
-                if (nodeId == null) return@flatMapLatest flowOf(EnvironmentMetricsState())
-                getNodeDetailsUseCase(nodeId).map { it.environmentState }
-            }
+        nodeDetails
+            .map { it?.environmentState ?: EnvironmentMetricsState() }
             .stateInWhileSubscribed(initialValue = EnvironmentMetricsState())
 
     private val _timeFrame = MutableStateFlow(TimeFrame.TWENTY_FOUR_HOURS)
@@ -182,6 +189,7 @@ open class MetricsViewModel(
                 data
             }
         }
+            .flowOn(Dispatchers.Default)
             .stateInWhileSubscribed(emptyList())
 
     /** Exposes graphing data specifically for the filtered environment metrics. */
@@ -198,6 +206,7 @@ open class MetricsViewModel(
                 .filter { (it.received_date / 1000) >= threshold }
                 .mapNotNull { log -> decodePaxFromLog(log)?.let { log to it } }
         }
+            .flowOn(Dispatchers.Default)
             .stateInWhileSubscribed(emptyList())
 
     val lastTraceRouteTime: StateFlow<Long?> = nodeRequestActions.lastTracerouteTime
