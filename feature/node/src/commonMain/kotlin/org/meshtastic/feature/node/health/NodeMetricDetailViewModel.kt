@@ -18,10 +18,12 @@ package org.meshtastic.feature.node.health
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -51,6 +53,9 @@ enum class NodeMetricRange(val label: String, val millis: Long?) {
     /** Start of the window in epoch millis; 0 means "from the very beginning". */
     fun since(now: Long): Long = millis?.let { (now - it).coerceAtLeast(0L) } ?: 0L
 }
+
+/** The most recent logs of one node the charts read; older ones are beyond what a phone screen could show anyway. */
+private const val MAX_NODE_LOGS = 20_000
 
 /** More points than this make no visible difference on a phone screen, but make long ranges slow. */
 private const val MAX_POINTS_PER_SERIES = 1200
@@ -107,11 +112,11 @@ class NodeMetricDetailViewModel(
                 // Only this node's own logs are read (never every node's telemetry): over 30 days the network-wide
                 // query held far too much in memory and could crash the app.
                 combine(
-                    meshLogRepository.getLogsFromNodeSince(nodeNum, since),
+                    meshLogRepository.getRecentLogsFromNode(nodeNum, since, MAX_NODE_LOGS).calmed(),
                     meshLogRepository.getMyNodeInfo().flatMapLatest { myNodeInfo ->
                         // MeshLog normalizes the locally-connected device's own logs to node number 0.
                         if (myNodeInfo?.my_node_num == nodeNum) {
-                            meshLogRepository.getLogsFromNodeSince(0, since)
+                            meshLogRepository.getRecentLogsFromNode(0, since, MAX_NODE_LOGS).calmed()
                         } else {
                             flowOf(emptyList())
                         }
@@ -142,7 +147,8 @@ class NodeMetricDetailViewModel(
                         metric.seriesLabels().map { seriesLabel ->
                             val points =
                                 sortedHistory.mapNotNull { entry ->
-                                    metric.historySeriesValue(seriesLabel, entry)?.let {
+                                    // A NaN / infinite reading would poison the chart's min, max and path maths.
+                                    metric.historySeriesValue(seriesLabel, entry)?.takeIf { it.isFinite() }?.let {
                                         MetricPoint(entry.timestamp, it)
                                     }
                                 }
@@ -199,6 +205,7 @@ class NodeMetricDetailViewModel(
                 }
             }
             .flowOn(Dispatchers.Default)
+            .catch { Logger.e(it) { "Metric detail failed" } }
             .onEach { _uiState.value = it }
             .launchIn(viewModelScope)
     }

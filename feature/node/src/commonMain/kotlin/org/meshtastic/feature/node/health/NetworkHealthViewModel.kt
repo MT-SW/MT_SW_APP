@@ -17,10 +17,14 @@
 package org.meshtastic.feature.node.health
 
 import androidx.lifecycle.ViewModel
+import co.touchlab.kermit.Logger
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.swapBatteryPolarity
@@ -176,8 +180,8 @@ class NetworkHealthViewModel(
         combine(
             nodeRepository.getNodes(),
             combine(
-                meshLogRepository.getAllLogsSince(historySince),
-                meshLogRepository.getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, historySince),
+                meshLogRepository.getAllLogsSince(historySince).calmed(),
+                meshLogRepository.getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, historySince).calmed(),
                 meshLogRepository.getMyNodeInfo(),
                 uiPrefs.currentInverted,
                 combine(uiPrefs.batteryInverted, uiPrefs.lnaGains, ::Pair),
@@ -211,7 +215,7 @@ class NetworkHealthViewModel(
                     batteryInverted = batteryInvertedNodes,
                 )
             },
-            meshLogRepository.getLogsByPortNum(PortNum.NEIGHBORINFO_APP.value, NEIGHBOR_LOG_LIMIT),
+            meshLogRepository.getLogsByPortNum(PortNum.NEIGHBORINFO_APP.value, NEIGHBOR_LOG_LIMIT).calmed(),
             _activeMetric,
             combine(
                 sortFieldFlow,
@@ -357,6 +361,9 @@ class NetworkHealthViewModel(
                 worstLevelByMetric = worstByMetric,
             )
         }
+            // The calculations are heavy; never on the main thread.
+            .flowOn(Dispatchers.Default)
+            .catch { Logger.e(it) { "Network health failed" } }
             .stateInWhileSubscribed(initialValue = NetworkHealthUiState())
 
     fun setActiveMetric(metric: NetworkHealthMetric) {

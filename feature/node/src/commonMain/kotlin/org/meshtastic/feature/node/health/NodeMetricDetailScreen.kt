@@ -174,7 +174,7 @@ fun NodeMetricDetailScreen(
 
 /** Which series the top card shows: the noise floor on the signal tab (the colour still comes from the SNR). */
 private fun headlineLabelFor(uiState: NodeMetricDetailUiState): String {
-    val first = uiState.metric.seriesLabels().first()
+    val first = uiState.metric.seriesLabels().firstOrNull().orEmpty()
     val preferred = if (uiState.metric == NetworkHealthMetric.SIGNAL) "Noise Floor" else first
     return if (uiState.series.any { it.label == preferred && it.points.isNotEmpty() }) {
         preferred

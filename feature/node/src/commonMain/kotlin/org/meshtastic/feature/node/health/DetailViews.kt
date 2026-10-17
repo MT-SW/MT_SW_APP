@@ -235,8 +235,8 @@ internal fun GaugeView(
 ) {
     val values = remember(series.points) { series.points.sortedBy { it.timestampMillis }.map { it.value } }
     val latest = series.latestValue ?: values.lastOrNull() ?: return
-    val minV = series.minValue ?: values.min()
-    val maxV = series.maxValue ?: values.max()
+    val minV = series.minValue ?: values.minOrNull() ?: return
+    val maxV = series.maxValue ?: values.maxOrNull() ?: return
     val pad = ((maxV - minV).takeIf { it > 0f } ?: 1f) * 0.1f
     val gMin = scale?.min ?: (minV - pad)
     val gMax = scale?.max ?: (maxV + pad)
@@ -347,7 +347,8 @@ internal fun BucketBarsView(
     onSelect: (MetricPoint?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val sorted = remember(points) { points.sortedBy { it.timestampMillis } }
+    val sorted = remember(points) { points.filter { it.value.isFinite() }.sortedBy { it.timestampMillis } }
+    if (sorted.isEmpty()) return
     val t0 = sorted.first().timestampMillis
     val span = (sorted.last().timestampMillis - t0).coerceAtLeast(1L)
     val buckets =

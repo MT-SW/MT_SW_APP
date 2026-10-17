@@ -91,7 +91,7 @@ internal fun LineAreaChart(
     scale: LevelScale? = null,
     palette: Map<HealthLevel, Color> = emptyMap(),
 ) {
-    val sorted = remember(points) { points.sortedBy { it.timestampMillis } }
+    val sorted = remember(points) { points.filter { it.value.isFinite() }.sortedBy { it.timestampMillis } }
     if (sorted.size < 2) return
     val minV = sorted.minOf { it.value }
     val maxV = sorted.maxOf { it.value }
