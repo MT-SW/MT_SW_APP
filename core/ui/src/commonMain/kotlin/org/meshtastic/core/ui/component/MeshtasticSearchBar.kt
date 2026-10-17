@@ -32,6 +32,7 @@ import androidx.compose.material3.ExpandedFullScreenSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SearchBarScrollBehavior
@@ -206,6 +207,8 @@ private fun InlineSearchField(
         shape = RoundedCornerShape(SEARCH_FIELD_CORNER_DP.dp),
         colors =
         TextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceBright,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceBright,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
@@ -220,7 +223,7 @@ private fun InlineSearchField(
     )
 }
 
-private const val SEARCH_FIELD_CORNER_DP = 28
+private const val SEARCH_FIELD_CORNER_DP = 12
 
 /** Default tag for the collapsed field, for callers with only one search bar on screen. */
 const val SEARCH_BAR_INPUT_FIELD_TAG = "SearchBarInputField"

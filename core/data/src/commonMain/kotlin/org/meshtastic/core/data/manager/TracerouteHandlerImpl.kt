@@ -71,7 +71,9 @@ class TracerouteHandlerImpl(
                 routeDiscovery
                     .newBuilder()
                     .also { wb ->
-                        wb.route_back = routeDiscovery.route_back.map { if (it == BROADCAST) guess.num else it }
+                        val back = routeDiscovery.route_back
+                        val lastRelayIndex = back.size - 2
+                        wb.route_back = back.mapIndexed { i, num -> if (i == lastRelayIndex) guess.num else num }
                     }
                     .build()
             }
