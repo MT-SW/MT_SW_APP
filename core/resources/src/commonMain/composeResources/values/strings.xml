@@ -2262,6 +2262,7 @@
     <string name="traceroute_traced_by">Traced by %1$s</string>
     <string name="traceroute_time_label">Route time</string>
     <string name="traceroute_unknown_hop">Unknown hop</string>
+    <string name="traceroute_probably_hop">Probably: %1$s</string>
     <string name="track_and_share_locations">Track and Share Locations</string>
     <string name="track_point">track point</string>
     <!-- TRAFFIC -->

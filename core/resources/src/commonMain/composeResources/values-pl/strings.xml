@@ -2427,6 +2427,7 @@
     <string name="traceroute_traced_by">Trasę sprawdził: %1$s</string>
     <string name="traceroute_time_label">Czas trasy</string>
     <string name="traceroute_unknown_hop">Nieznany skok</string>
+    <string name="traceroute_probably_hop">Prawdopodobnie: %1$s</string>
     <string name="track_and_share_locations">Śledź i udostępniaj lokalizacje</string>
     <string name="track_point">punkt trasy</string>
     <!-- TRAFFIC -->
