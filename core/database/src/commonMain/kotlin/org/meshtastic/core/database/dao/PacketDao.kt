@@ -56,12 +56,22 @@ interface PacketDao {
     )
     fun getAllPackets(portNum: Int): Flow<List<Packet>>
 
+    // Only the newest message of each conversation is read (one row per contact, via the contact_key / port_num /
+    // received_time index) instead of every text message ever received, which made the conversation list slower
+    // with every message.
     @Query(
         """
-    SELECT * FROM packet
-    WHERE (myNodeNum = 0 OR myNodeNum = (SELECT myNodeNum FROM my_node))
-        AND port_num = 1 AND filtered = 0
-    ORDER BY received_time DESC
+    SELECT p.* FROM packet p
+    INNER JOIN (
+        SELECT contact_key, MAX(received_time) as max_time
+        FROM packet
+        WHERE (myNodeNum = 0 OR myNodeNum = (SELECT myNodeNum FROM my_node))
+            AND port_num = 1 AND filtered = 0
+        GROUP BY contact_key
+    ) latest ON p.contact_key = latest.contact_key AND p.received_time = latest.max_time
+    WHERE (p.myNodeNum = 0 OR p.myNodeNum = (SELECT myNodeNum FROM my_node))
+        AND p.port_num = 1 AND p.filtered = 0
+    ORDER BY p.received_time DESC
     """,
     )
     fun getContactKeys(): Flow<
@@ -98,6 +108,38 @@ interface PacketDao {
     """,
     )
     suspend fun getMessageCount(contact: String): Int
+
+    /** The message count of every conversation in one query, instead of one query per conversation. */
+    @Query(
+        """
+    SELECT contact_key, COUNT(*) AS message_total FROM packet
+    WHERE (myNodeNum = 0 OR myNodeNum = (SELECT myNodeNum FROM my_node))
+        AND port_num = 1
+    GROUP BY contact_key
+    """,
+    )
+    suspend fun getMessageCounts(): Map<
+        @MapColumn(columnName = "contact_key")
+        String,
+        @MapColumn(columnName = "message_total")
+        Int,
+        >
+
+    /** The unread count of every conversation that has unread messages, in one query. */
+    @Query(
+        """
+    SELECT contact_key, COUNT(*) AS unread_total FROM packet
+    WHERE (myNodeNum = 0 OR myNodeNum = (SELECT myNodeNum FROM my_node))
+        AND port_num = 1 AND read = 0 AND filtered = 0
+    GROUP BY contact_key
+    """,
+    )
+    suspend fun getUnreadCounts(): Map<
+        @MapColumn(columnName = "contact_key")
+        String,
+        @MapColumn(columnName = "unread_total")
+        Int,
+        >
 
     @Query(
         """

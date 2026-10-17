@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Wiadomości — szybsza lista rozmów**
+* Lista kanałów i wiadomości prywatnych czyta z bazy tylko najnowszą wiadomość każdej rozmowy zamiast wszystkich wiadomości, a liczniki nieprzeczytanych i wiadomości pobiera jednym zapytaniem dla wszystkich rozmów (wcześniej dwa zapytania na każdą rozmowę) i szuka węzłów jednym przebiegiem. Karta wiadomości otwiera się szybciej i nie zwalnia wraz z historią.
+
 **Szczegóły węzła — płynniejsze wejście w historię**
 * Wejście w sekcje i historię w szczegółach węzła nie zamula już tak bardzo: dane są budowane raz zamiast dwa razy, filtrowanie i dekodowanie wpisów idzie w tle zamiast na głównym wątku, a nowe pakiety nie przeliczają wszystkiego od razu, tylko po chwili spokoju (pierwsze dane pojawiają się bez opóźnienia).
 * Lista węzłów i lista rozmów: filtrowanie i budowanie list idzie w tle zamiast na głównym wątku, więc przewijanie i wpisywanie są płynniejsze przy dużej liczbie węzłów i rozmów.
@@ -277,6 +280,9 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Messages — faster conversation list**
+* The channels and direct messages list reads only the newest message of each conversation from the database instead of all messages, fetches the unread and message counters for all conversations in one query (previously two queries per conversation) and looks nodes up in a single pass. The messages tab opens faster and no longer slows down as history grows.
 
 **Node details — smoother history screens**
 * Opening the sections and history in node details no longer lags as much: the data is built once instead of twice, filtering and decoding of log entries runs in the background instead of on the main thread, and new packets no longer trigger an immediate full recalculation, only after a short quiet moment (the first data still shows without delay).
