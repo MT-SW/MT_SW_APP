@@ -82,6 +82,7 @@ fun FastScrollSidebar(
     if (!isDesktopPlatform) return
     val thumbColor = MaterialTheme.colorScheme.outline
     val coroutineScope = rememberCoroutineScope()
+    val sizeCache = remember(listState) { LazyItemSizeCache() }
     // Everything that changes while scrolling is read inside the draw / pointer lambdas below (never in composition),
     // so scrolling only redraws the 4dp thumb instead of recomposing this function (and its caller) on every frame.
     val hasItems by remember(listState, itemCount) {
@@ -98,50 +99,43 @@ fun FastScrollSidebar(
                 awaitEachGesture {
                     val down = awaitFirstDown(requireUnconsumed = false)
                     val total = itemCount ?: listState.layoutInfo.totalItemsCount
-                    val visible = listState.layoutInfo.visibleItemsInfo
                     val trackPx = size.height.toFloat()
-                    if (trackPx <= 0f || total <= 1 || visible.isEmpty()) return@awaitEachGesture
+                    val metrics = lazyScrollMetrics(listState, total, reverseLayout, sizeCache)
+                    if (trackPx <= 0f || total <= 1 || metrics == null) return@awaitEachGesture
                     down.consume()
 
-                    val thumbFraction = (visible.size.toFloat() / total).coerceIn(MIN_THUMB_HEIGHT_FRACTION, 1f)
                     val minThumbPx = MIN_THUMB_DP.dp.toPx().coerceAtMost(trackPx)
-                    val thumbPx = (trackPx * thumbFraction).coerceIn(minThumbPx, trackPx)
-                    val thumbTop = (trackPx - thumbPx) * lazyScrollFraction(listState, total, reverseLayout)
+                    val thumbPx = (trackPx * metrics.thumbFraction).coerceIn(minThumbPx, trackPx)
+                    val movable = (trackPx - thumbPx).coerceAtLeast(1f)
+                    val thumbTop = movable * metrics.scrollFraction
                     val onThumb = down.position.y in thumbTop..(thumbTop + thumbPx)
 
                     if (!onThumb) {
                         // Click on the bare track: jump so the thumb is centred under the pointer (ends hit the ends).
-                        val movable = (trackPx - thumbPx).coerceAtLeast(1f)
                         val along = ((down.position.y - thumbPx / 2f) / movable).coerceIn(0f, 1f)
                         val raw = if (reverseLayout) 1f - along else along
-                        val maxFirstIndex = (total - visible.size).coerceAtLeast(1)
-                        val target = raw * maxFirstIndex
-                        val index = if (raw >= 1f) total - 1 else target.toInt().coerceIn(0, total - 1)
-                        val offset = if (raw >= 1f) 0 else ((target - index) * visible.first().size).toInt()
+                        val targetPx = raw * metrics.maxScrollPx
+                        val (index, offset) =
+                            if (raw >= 1f) (total - 1) to 0 else sizeCache.itemAt(targetPx, total)
                         coroutineScope.launch { listState.scrollToItem(index, offset) }
                     }
 
-                    // Relative drag in real pixels: moving the thumb by N px scrolls the list by N * (content / track)
-                    // px. That is continuous (no item-by-item jumps) and non-suspending, so it never queues up.
+                    // Relative drag in real pixels: moving the thumb by N px scrolls the list by
+                    // N * (scrollable content / free track) px. Continuous (no item-by-item jumps) and
+                    // non-suspending, so it never queues up.
                     drag(down.id) { change ->
                         change.consume()
-                        val now = listState.layoutInfo.visibleItemsInfo
-                        if (now.isNotEmpty()) {
-                            val avgItemPx = now.sumOf { it.size }.toFloat() / now.size
-                            val ratio = avgItemPx * total / trackPx
-                            val delta = (change.position.y - change.previousPosition.y) * ratio
-                            listState.dispatchRawDelta(if (reverseLayout) -delta else delta)
-                        }
+                        val delta = (change.position.y - change.previousPosition.y) * metrics.maxScrollPx / movable
+                        listState.dispatchRawDelta(if (reverseLayout) -delta else delta)
                     }
                 }
             }
             .drawBehind {
                 val total = itemCount ?: listState.layoutInfo.totalItemsCount
                 if (total <= 1 || size.height <= 0f) return@drawBehind
-                val visibleCount = listState.layoutInfo.visibleItemsInfo.size.coerceAtLeast(1)
-                val thumbFraction = (visibleCount.toFloat() / total.toFloat()).coerceIn(MIN_THUMB_HEIGHT_FRACTION, 1f)
+                val metrics = lazyScrollMetrics(listState, total, reverseLayout, sizeCache) ?: return@drawBehind
                 drawTrack(thumbColor)
-                drawThumb(thumbColor, lazyScrollFraction(listState, total, reverseLayout), thumbFraction)
+                drawThumb(thumbColor, metrics.scrollFraction, metrics.thumbFraction)
             },
     )
 }
@@ -149,23 +143,65 @@ fun FastScrollSidebar(
 private const val MIN_THUMB_DP = 24
 
 /**
- * Where the thumb sits along its track (0 = top, 1 = bottom) for [listState]: a fractional item position (item index +
- * how far into the first item we are) so the thumb glides instead of stepping one whole item at a time -- matters for
- * tall rows such as chat messages.
+ * Remembers the pixel height of every row of a lazy list that has been on screen. A lazy list only measures what it
+ * shows, so counting visible rows (as this used to) made the thumb grow and shrink with the height of the rows
+ * in view. With the sizes remembered, the content height is estimated as known rows plus the average for unseen ones,
+ * which settles quickly and is exact once the whole list has been seen -- so the thumb keeps one size and only moves.
  */
-private fun lazyScrollFraction(listState: LazyListState, total: Int, reverseLayout: Boolean): Float {
-    val visible = listState.layoutInfo.visibleItemsInfo
-    val visibleCount = visible.size.coerceAtLeast(1)
-    val maxFirstIndex = (total - visibleCount).coerceAtLeast(1)
-    val first = visible.firstOrNull()
-    val partial =
-        if (first != null && first.size > 0) {
-            (listState.firstVisibleItemScrollOffset.toFloat() / first.size).coerceIn(0f, 1f)
-        } else {
-            0f
+private class LazyItemSizeCache {
+    private val sizes = HashMap<Int, Int>()
+
+    fun record(listState: LazyListState) {
+        listState.layoutInfo.visibleItemsInfo.forEach { sizes[it.index] = it.size }
+    }
+
+    private fun average(): Float = if (sizes.isEmpty()) 0f else sizes.values.sum().toFloat() / sizes.size
+
+    private fun sizeOf(index: Int, average: Float): Float = sizes[index]?.toFloat() ?: average
+
+    /** Pixels before the row at [index]: remembered sizes, with the average standing in for rows not yet seen. */
+    fun offsetOf(index: Int): Float {
+        val avg = average()
+        var sum = 0f
+        for (i in 0 until index) sum += sizeOf(i, avg)
+        return sum
+    }
+
+    /** The row [px] pixels down the content and how far into it that is, for jumping to a place on the track. */
+    fun itemAt(px: Float, total: Int): Pair<Int, Int> {
+        val avg = average()
+        var acc = 0f
+        for (i in 0 until total) {
+            val size = sizeOf(i, avg)
+            if (acc + size > px) return i to (px - acc).toInt().coerceAtLeast(0)
+            acc += size
         }
-    val raw = ((listState.firstVisibleItemIndex + partial) / maxFirstIndex.toFloat()).coerceIn(0f, 1f)
-    return if (reverseLayout) 1f - raw else raw
+        return (total - 1).coerceAtLeast(0) to 0
+    }
+}
+
+private class LazyScrollMetrics(val thumbFraction: Float, val scrollFraction: Float, val maxScrollPx: Float)
+
+/** Thumb size and position (0 = top, 1 = bottom) for [listState], from remembered row sizes; null before any layout. */
+private fun lazyScrollMetrics(
+    listState: LazyListState,
+    total: Int,
+    reverseLayout: Boolean,
+    cache: LazyItemSizeCache,
+): LazyScrollMetrics? {
+    cache.record(listState)
+    val info = listState.layoutInfo
+    val viewport = (info.viewportEndOffset - info.viewportStartOffset).toFloat()
+    val content = cache.offsetOf(total)
+    if (viewport <= 0f || content <= 0f) return null
+    val maxScroll = (content - viewport).coerceAtLeast(1f)
+    val scrolled = cache.offsetOf(listState.firstVisibleItemIndex) + listState.firstVisibleItemScrollOffset
+    val raw = (scrolled / maxScroll).coerceIn(0f, 1f)
+    return LazyScrollMetrics(
+        thumbFraction = (viewport / content).coerceIn(MIN_THUMB_HEIGHT_FRACTION, 1f),
+        scrollFraction = if (reverseLayout) 1f - raw else raw,
+        maxScrollPx = maxScroll,
+    )
 }
 
 /**
