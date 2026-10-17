@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Pasek przewijania — stały rozmiar suwaka**
+* Suwak paska przewijania (desktop) ma teraz stały rozmiar zależny od ilości treści i tylko się przesuwa. Wcześniej na listach o różnej wysokości wierszy (np. szczegóły urządzenia) zmieniał rozmiar w zależności od położenia.
+
 **Trasa — ostatni przekaźnik zamiast „Nieznany skok”**
 * Naprawa: w historii tras zamiast liczby skoków pokazywało się „%d skoki” — teraz „2 skoki” itd.
 * Gdy ostatni węzeł przed nami nie wpisał się do trasy (np. jest na innym kanale), a znamy go z bazy po końcówce adresu, okno wyniku (także przy otwarciu z historii tras) pokazuje go jako „Prawdopodobnie: Nazwa” zamiast „Nieznany skok”. Dotyczy tylko ostatniego skoku trasy powrotnej i tylko gdy pasuje dokładnie jeden węzeł.
@@ -266,6 +269,9 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Scrollbar — constant thumb size**
+* The desktop scrollbar thumb now keeps one size based on the amount of content and only moves. Previously, on lists with rows of different heights (e.g. device details) it changed size depending on the scroll position.
 
 **Traceroute — last relay instead of "Unknown hop"**
 * Fix: the route history showed a raw "%d skoki" placeholder instead of the hop count (Polish plural).
