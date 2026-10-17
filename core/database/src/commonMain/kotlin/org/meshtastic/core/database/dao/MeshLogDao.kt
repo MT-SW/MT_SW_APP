@@ -69,14 +69,20 @@ interface MeshLogDao {
     fun getLogsFromNodeSince(nodeNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>>
 
     /**
-     * The newest [maxItem] logs from a single node since [sinceTimestamp], newest first. Bounded, so a node with years
-     * of history cannot pull its whole log into memory at once (the "all" range of the health charts).
+     * The newest log of [portNum] from every sender — exactly what summaries that only look at each node's latest
+     * report (e.g. Neighbor Info) need, without reading the whole history of that port.
      */
     @Query(
-        "SELECT * FROM log WHERE from_num = :nodeNum AND received_date >= :sinceTimestamp " +
-            "ORDER BY received_date DESC LIMIT :maxItem",
+        """
+        SELECT * FROM log
+        WHERE port_num = :portNum
+        AND received_date = (
+            SELECT MAX(l.received_date) FROM log l WHERE l.port_num = :portNum AND l.from_num = log.from_num
+        )
+        ORDER BY received_date DESC
+        """,
     )
-    fun getRecentLogsFromNode(nodeNum: Int, sinceTimestamp: Long, maxItem: Int): Flow<List<MeshLog>>
+    fun getLatestLogsByPortNumPerSender(portNum: Int): Flow<List<MeshLog>>
 
     /**
      * All logs across every sender and every port since [sinceTimestamp] — used to derive SNR/RSSI history, since that

@@ -112,12 +112,11 @@ open class MeshLogRepositoryImpl(
         .map { list -> list.map { it.asExternalModel() } }
         .flowOn(dispatchers.io)
 
-    /** The newest [maxItem] [MeshLog]s from a single [nodeNum] since [sinceTimestamp], oldest first. */
-    override fun getRecentLogsFromNode(nodeNum: Int, sinceTimestamp: Long, maxItem: Int): Flow<List<MeshLog>> =
-        dbManager.currentDb
-            .flatMapLatest { it.meshLogDao().getRecentLogsFromNode(nodeNum, sinceTimestamp, maxItem) }
-            .map { list -> list.asReversed().map { it.asExternalModel() } }
-            .flowOn(dispatchers.io)
+    /** The newest [MeshLog] of [portNum] from every sender. */
+    override fun getLatestLogsByPortNumPerSender(portNum: Int): Flow<List<MeshLog>> = dbManager.currentDb
+        .flatMapLatest { it.meshLogDao().getLatestLogsByPortNumPerSender(portNum) }
+        .map { list -> list.map { it.asExternalModel() } }
+        .flowOn(dispatchers.io)
 
     /** Retrieves all [MeshLog]s across every sender and port since [sinceTimestamp]. */
     override fun getAllLogsSince(sinceTimestamp: Long): Flow<List<MeshLog>> = dbManager.currentDb

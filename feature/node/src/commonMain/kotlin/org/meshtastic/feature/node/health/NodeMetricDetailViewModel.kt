@@ -54,9 +54,6 @@ enum class NodeMetricRange(val label: String, val millis: Long?) {
     fun since(now: Long): Long = millis?.let { (now - it).coerceAtLeast(0L) } ?: 0L
 }
 
-/** The most recent logs of one node the charts read; older ones are beyond what a phone screen could show anyway. */
-private const val MAX_NODE_LOGS = 20_000
-
 /** More points than this make no visible difference on a phone screen, but make long ranges slow. */
 private const val MAX_POINTS_PER_SERIES = 1200
 
@@ -112,11 +109,11 @@ class NodeMetricDetailViewModel(
                 // Only this node's own logs are read (never every node's telemetry): over 30 days the network-wide
                 // query held far too much in memory and could crash the app.
                 combine(
-                    meshLogRepository.getRecentLogsFromNode(nodeNum, since, MAX_NODE_LOGS).calmed(),
+                    meshLogRepository.getLogsFromNodeSince(nodeNum, since).calmed(),
                     meshLogRepository.getMyNodeInfo().flatMapLatest { myNodeInfo ->
                         // MeshLog normalizes the locally-connected device's own logs to node number 0.
                         if (myNodeInfo?.my_node_num == nodeNum) {
-                            meshLogRepository.getRecentLogsFromNode(0, since, MAX_NODE_LOGS).calmed()
+                            meshLogRepository.getLogsFromNodeSince(0, since).calmed()
                         } else {
                             flowOf(emptyList())
                         }

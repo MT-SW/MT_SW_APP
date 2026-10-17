@@ -56,11 +56,10 @@ interface MeshLogRepository {
     fun getLogsFromNodeSince(nodeNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>>
 
     /**
-     * The newest [maxItem] [MeshLog]s from a single [nodeNum] since [sinceTimestamp], oldest first. Bounded, for charts
-     * over long ranges.
+     * The newest [MeshLog] of [portNum] from every sender (nothing is cut off: older reports of the same sender are
+     * simply not needed by callers that only look at each node's latest report).
      */
-    fun getRecentLogsFromNode(nodeNum: Int, sinceTimestamp: Long, maxItem: Int): Flow<List<MeshLog>> =
-        getLogsFromNodeSince(nodeNum, sinceTimestamp).map { it.takeLast(maxItem) }
+    fun getLatestLogsByPortNumPerSender(portNum: Int): Flow<List<MeshLog>> = getLogsByPortNumSince(portNum, 0L)
 
     /** Retrieves all [MeshLog]s across every sender and port since [sinceTimestamp]. */
     fun getAllLogsSince(sinceTimestamp: Long): Flow<List<MeshLog>>
