@@ -20,6 +20,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 **Szczegóły węzła — płynniejsze wejście w historię**
 * Wejście w sekcje i historię w szczegółach węzła nie zamula już tak bardzo: dane są budowane raz zamiast dwa razy, filtrowanie i dekodowanie wpisów idzie w tle zamiast na głównym wątku, a nowe pakiety nie przeliczają wszystkiego od razu, tylko po chwili spokoju (pierwsze dane pojawiają się bez opóźnienia).
+* Lista węzłów i lista rozmów: filtrowanie i budowanie list idzie w tle zamiast na głównym wątku, więc przewijanie i wpisywanie są płynniejsze przy dużej liczbie węzłów i rozmów.
 
 **Zdrowie sieci — stabilność**
 * Zabezpieczenia przed zamknięciem aplikacji w Zdrowiu sieci: błąd przy wczytywaniu danych (zakładki, podsumowanie, szczegóły metryki) jest teraz zapisywany w logu, a ekran zostaje otwarty zamiast zamykać aplikację. Wykresy pomijają błędne wartości (NaN / nieskończoność), a pusty wykres słupkowy, wskaźnik i mapa cieplna nie wywołują już błędu.
@@ -279,6 +280,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 **Node details — smoother history screens**
 * Opening the sections and history in node details no longer lags as much: the data is built once instead of twice, filtering and decoding of log entries runs in the background instead of on the main thread, and new packets no longer trigger an immediate full recalculation, only after a short quiet moment (the first data still shows without delay).
+* Node list and conversation list: filtering and building the lists runs in the background instead of on the main thread, so scrolling and typing stay smoother with many nodes and conversations.
 
 **Network health — stability**
 * Crash guards in Network health: an error while loading the data (tabs, summary, metric detail) is now logged and the screen stays open instead of closing the app. Charts skip invalid values (NaN / infinity), and an empty bar chart, gauge or heatmap no longer throws.
