@@ -17,8 +17,10 @@
 package org.meshtastic.feature.map
 
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import org.jetbrains.compose.resources.StringResource
@@ -48,6 +50,7 @@ import org.meshtastic.core.resources.one_day
 import org.meshtastic.core.resources.one_hour
 import org.meshtastic.core.resources.two_days
 import org.meshtastic.core.ui.viewmodel.safeLaunch
+import org.meshtastic.core.ui.viewmodel.settleBursts
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
 import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.Config
@@ -133,6 +136,7 @@ open class BaseMapViewModel(
             // Shared with GeofenceMonitor via activeWaypointPackets — dedup by waypoint id + drop expired,
             // so the map and the geofence engine can't drift (getWaypoints is a row-per-transmission firehose).
             .mapLatest { list -> list.activeWaypointPackets(nowSeconds) }
+            .flowOn(Dispatchers.Default)
             .stateInWhileSubscribed(initialValue = emptyMap())
 
     /** Waypoint ids of foreign geofences the user opted in to crossing alerts for (see [NotificationPrefs]). */
@@ -182,7 +186,9 @@ open class BaseMapViewModel(
      * one declared below it.
      */
     val nodesWithPosition: StateFlow<List<Node>> =
-        combine(nodeRepository.getNodes(), storedFilters) { all, filters ->
+        // Every received packet changes the node list, and each new list rebuilds all the map's node layers; only the
+        // node source is settled, so toggling a filter still applies at once.
+        combine(nodeRepository.getNodes().settleBursts(MAP_NODES_QUIET_MILLIS), storedFilters) { all, filters ->
             all.filter { node -> node.validPosition != null && (filters.showIgnored || !node.isIgnored) }
         }
             .stateInWhileSubscribed(initialValue = emptyList())
@@ -370,3 +376,6 @@ enum class LastHeardFilter(val label: StringResource, val seconds: Long) {
         fun fromSeconds(seconds: Long): LastHeardFilter = entries.find { it.seconds == seconds } ?: Any
     }
 }
+
+/** How long a burst of node updates may settle before the map's node layers are rebuilt. */
+private const val MAP_NODES_QUIET_MILLIS = 500L

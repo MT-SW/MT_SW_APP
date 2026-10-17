@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Mapa — płynniejsze ładowanie**
+* Węzły na mapie odświeżają się dopiero po chwili spokoju (0,5 s), zamiast przebudowywać warstwy przy każdym odebranym pakiecie; pierwszy widok i zmiana filtrów działają od razu. Przetwarzanie punktów (waypointów) idzie w tle.
+
 **Wiadomości — szybsza lista rozmów**
 * Lista kanałów i wiadomości prywatnych czyta z bazy tylko najnowszą wiadomość każdej rozmowy zamiast wszystkich wiadomości, a liczniki nieprzeczytanych i wiadomości pobiera jednym zapytaniem dla wszystkich rozmów (wcześniej dwa zapytania na każdą rozmowę) i szuka węzłów jednym przebiegiem. Karta wiadomości otwiera się szybciej i nie zwalnia wraz z historią.
 
@@ -280,6 +283,9 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Map — smoother loading**
+* Nodes on the map refresh only after a short quiet moment (0.5 s) instead of rebuilding the layers on every received packet; the first view and filter changes still apply at once. Waypoint processing runs in the background.
 
 **Messages — faster conversation list**
 * The channels and direct messages list reads only the newest message of each conversation from the database instead of all messages, fetches the unread and message counters for all conversations in one query (previously two queries per conversation) and looks nodes up in a single pass. The messages tab opens faster and no longer slows down as history grows.
