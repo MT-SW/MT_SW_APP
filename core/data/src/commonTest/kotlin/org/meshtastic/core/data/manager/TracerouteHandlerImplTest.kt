@@ -74,7 +74,7 @@ class TracerouteHandlerImplTest {
         meshLogRepository = lazy { meshLogRepository },
         scope = scope.asServiceScope(),
     )
-        .apply { renderResponse = { "route" } }
+        .apply { renderResponse = { _, _ -> "route" } }
 
     private suspend fun TracerouteHandlerImpl.handleAndSettle(packet: MeshPacket) {
         handleTraceroute(packet, logUuid = "response-log", logInsertJob = null, session = session)

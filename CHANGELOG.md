@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Trasa — ostatni przekaźnik zamiast „Nieznany skok”**
+* Gdy ostatni węzeł przed nami nie wpisał się do trasy (np. jest na innym kanale), a znamy go z bazy po końcówce adresu, okno wyniku pokazuje go jako „Prawdopodobnie: Nazwa” zamiast „Nieznany skok”. Dotyczy tylko ostatniego skoku trasy powrotnej i tylko gdy pasuje dokładnie jeden węzeł.
+
 **Wyszukiwanie węzłów — bez nakładającej się listy**
 * Pole wyszukiwania na liście węzłów jest teraz zwykłym polem tekstowym nad listą: wpisany tekst od razu filtruje tę samą listę, bez otwierania drugiego okna z drugą kopią listy. Naprawia to nakładanie się list i bardzo wolne przewijanie na desktopie po przewinięciu listy i kliknięciu w wyszukiwarkę.
 
@@ -262,6 +265,9 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Traceroute — last relay instead of "Unknown hop"**
+* When the last node before us did not add itself to the route (e.g. it is on another channel) but we know it from the node database by its address ending, the result window shows it as "Probably: Name" instead of "Unknown hop". Only the last hop of the return route is resolved, and only when exactly one node matches.
 
 **Node search — no more overlapping list**
 * The node list search is now a plain text field above the list: typing filters that same list in place instead of opening a second window with a duplicate list. This fixes the overlapping lists and very slow scrolling on desktop after scrolling the list and clicking the search field.

@@ -21,6 +21,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import org.koin.core.annotation.Single
 import org.meshtastic.core.common.di.ServiceScope
+import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.fullRouteDiscovery
 import org.meshtastic.core.model.getTracerouteResponse
 import org.meshtastic.core.model.service.TracerouteResponse
@@ -34,6 +36,7 @@ import org.meshtastic.core.repository.TracerouteHandler
 import org.meshtastic.core.repository.TracerouteSnapshotRepository
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.traceroute_probably_hop
 import org.meshtastic.core.resources.traceroute_route_back_to_us
 import org.meshtastic.core.resources.traceroute_route_towards_dest
 import org.meshtastic.core.resources.traceroute_time_label
@@ -54,14 +57,53 @@ class TracerouteHandlerImpl(
 
     private val requestTimer = RequestTimer()
 
-    /** Renders the alert text. Replaced in unit tests, where Compose resources cannot load. */
-    internal var renderResponse: suspend (RouteDiscovery) -> String = { routeDiscovery ->
+    /**
+     * Renders the alert text. The second argument is the relay byte the response arrived through (0 when unknown).
+     * Replaced in unit tests, where Compose resources cannot load.
+     */
+    internal var renderResponse: suspend (RouteDiscovery, Int) -> String = { routeDiscovery, relayNode ->
         val unknownHopLabel = getStringSuspend(Res.string.traceroute_unknown_hop)
-        routeDiscovery.getTracerouteResponse(
-            getUser = { num -> tracerouteHopName(num, nodeRepository.getUser(num), unknownHopLabel) },
+        val guess = likelyLastRelay(routeDiscovery, relayNode)
+        val shown =
+            if (guess == null) {
+                routeDiscovery
+            } else {
+                routeDiscovery
+                    .newBuilder()
+                    .also { wb ->
+                        wb.route_back = routeDiscovery.route_back.map { if (it == BROADCAST) guess.num else it }
+                    }
+                    .build()
+            }
+        val probablyLabel = guess?.let { getStringSuspend(Res.string.traceroute_probably_hop, "") }.orEmpty()
+        shown.getTracerouteResponse(
+            getUser = { num ->
+                val name = tracerouteHopName(num, nodeRepository.getUser(num), unknownHopLabel)
+                if (guess != null && num == guess.num) probablyLabel + name else name
+            },
             headerTowards = getStringSuspend(Res.string.traceroute_route_towards_dest),
             headerBack = getStringSuspend(Res.string.traceroute_route_back_to_us),
         )
+    }
+
+    /**
+     * The firmware leaves the broadcast address where a relay could not add itself (typically one on another channel).
+     * The last relay before us is the one exception we can still identify: the response carries its low address byte.
+     * Returns the one known node that matches, or null when it is missing, ambiguous or already on the route.
+     */
+    private fun likelyLastRelay(routeDiscovery: RouteDiscovery, relayNode: Int): Node? {
+        val back = routeDiscovery.route_back
+        if (relayNode == 0 || back.size < MIN_BACK_ROUTE || back[back.size - 2] != BROADCAST) return null
+        val ourNum = nodeRepository.myNodeInfo.value?.myNodeNum
+        val candidates =
+            nodeRepository.nodeDBbyNum.value.values.filter {
+                it.num != ourNum &&
+                    it.lastHeard != 0 &&
+                    (it.num and RELAY_BYTE_MASK) == (relayNode and RELAY_BYTE_MASK) &&
+                    it.num !in back &&
+                    it.num !in routeDiscovery.route
+            }
+        return candidates.singleOrNull()
     }
 
     override fun recordStartTime(requestId: Int, destination: Int) = requestTimer.start(requestId, destination)
@@ -111,7 +153,7 @@ class TracerouteHandlerImpl(
             val responseText =
                 requestTimer.appendDuration(
                     requestId,
-                    renderResponse(routeDiscovery),
+                    renderResponse(routeDiscovery, packet.relay_node),
                     "Traceroute",
                     packet.from,
                     timeLabel,
@@ -144,3 +186,7 @@ class TracerouteHandlerImpl(
                 }
             )
 }
+
+private const val BROADCAST = NodeAddress.NODENUM_BROADCAST
+private const val RELAY_BYTE_MASK = 0xFF
+private const val MIN_BACK_ROUTE = 3

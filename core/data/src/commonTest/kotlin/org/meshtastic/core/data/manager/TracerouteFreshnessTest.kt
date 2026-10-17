@@ -140,7 +140,7 @@ class TracerouteFreshnessTest {
                 meshLogRepository = lazy { FakeMeshLogRepository() },
                 scope = handlerScope.asServiceScope(),
             )
-                .apply { renderResponse = { "route" } }
+                .apply { renderResponse = { _, _ -> "route" } }
         val dataHandler = mock<MeshDataHandler>(MockMode.autofill)
         every { dataHandler.handleReceivedData(any(), any(), any(), any(), any()) } calls
             { args ->
