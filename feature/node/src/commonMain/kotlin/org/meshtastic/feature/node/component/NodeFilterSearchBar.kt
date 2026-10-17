@@ -20,7 +20,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -73,8 +72,8 @@ import org.meshtastic.core.ui.icon.Sort
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 
 /**
- * The node list's search field: a Material 3 [MeshtasticSearchBar] whose expanded surface shows the matching nodes,
- * with the sort and filter menu as its trailing action.
+ * The node list's search field: an inline [MeshtasticSearchBar] that filters the node list in place, with the sort
+ * and filter menu as its trailing action.
  *
  * The "showing ignored nodes" banner sits under the collapsed bar rather than inside it: it reports a filter that is
  * already applied to the list below, not a search result.
@@ -88,7 +87,6 @@ fun NodeFilterSearchBar(
     onSortSelect: (NodeSortOption) -> Unit,
     toggles: NodeFilterToggles,
     modifier: Modifier = Modifier,
-    searchResults: @Composable ColumnScope.() -> Unit = {},
 ) {
     Column(modifier = modifier) {
         MeshtasticSearchBar(
@@ -99,7 +97,7 @@ fun NodeFilterSearchBar(
             trailingActions = {
                 NodeSortButton(currentSortOption = currentSortOption, onSortSelect = onSortSelect, toggles = toggles)
             },
-            expandedContent = searchResults,
+            inline = true,
         )
         if (toggles.showIgnored) {
             Box(
