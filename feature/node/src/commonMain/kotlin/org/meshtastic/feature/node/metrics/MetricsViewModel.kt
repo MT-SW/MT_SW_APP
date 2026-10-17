@@ -45,6 +45,7 @@ import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.di.CoroutineDispatchers
+import org.meshtastic.core.model.LikelyRelay
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.TelemetryType
@@ -60,6 +61,7 @@ import org.meshtastic.core.model.util.oneWireTemperature
 import org.meshtastic.core.model.util.rxTimeOrNull
 import org.meshtastic.core.model.util.snrOrNull
 import org.meshtastic.core.model.util.withOneWireTemperature
+import org.meshtastic.core.model.withLikelyLastRelay
 import org.meshtastic.core.repository.FileService
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
@@ -83,6 +85,7 @@ import org.meshtastic.feature.node.model.MetricsState
 import org.meshtastic.feature.node.model.TimeFrame
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.PortNum
+import org.meshtastic.proto.RouteDiscovery
 import org.meshtastic.proto.Telemetry
 import kotlin.time.Instant
 import org.meshtastic.proto.Paxcount as ProtoPaxcount
@@ -204,6 +207,13 @@ open class MetricsViewModel(
             .stateInWhileSubscribed(null)
 
     fun getUser(nodeNum: Int) = nodeRepository.getUser(nodeNum)
+
+    /** The route with its unknown last relay replaced by the one known node that matches, see [withLikelyLastRelay]. */
+    fun likelyLastRelay(route: RouteDiscovery, relayNode: Int): LikelyRelay = route.withLikelyLastRelay(
+        relayNode = relayNode,
+        nodes = nodeRepository.nodeDBbyNum.value.values,
+        ourNodeNum = nodeRepository.myNodeInfo.value?.myNodeNum,
+    )
 
     /** Persists a user-editable label (e.g. "Solar", "Battery") for a power-metrics channel (0-based index). */
     fun setPowerChannelLabel(nodeNum: Int, channelIndex: Int, label: String) =

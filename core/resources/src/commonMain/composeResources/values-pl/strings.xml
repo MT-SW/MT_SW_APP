@@ -2409,9 +2409,9 @@
     <string name="traceroute_forward_hops">Skoki w przód</string>
     <plurals name="traceroute_hops">
         <item quantity="one">1 skok</item>
-        <item quantity="few">%d skoki</item>
-        <item quantity="many">%d skoków</item>
-        <item quantity="other">%d skoków</item>
+        <item quantity="few">%1$d skoki</item>
+        <item quantity="many">%1$d skoków</item>
+        <item quantity="other">%1$d skoków</item>
     </plurals>
     <string name="traceroute_log">Pokaż trasę</string>
     <string name="traceroute_map_no_data">Ta trasa nie ma jeszcze węzłów możliwych do naniesienia na mapę.</string>
