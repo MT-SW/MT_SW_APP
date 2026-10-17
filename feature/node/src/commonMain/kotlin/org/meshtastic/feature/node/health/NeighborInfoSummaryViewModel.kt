@@ -17,8 +17,12 @@
 package org.meshtastic.feature.node.health
 
 import androidx.lifecycle.ViewModel
+import co.touchlab.kermit.Logger
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.repository.MeshLogRepository
@@ -64,6 +68,8 @@ class NeighborInfoSummaryViewModel(
                         .sortedByDescending { it.neighborCount }
                 NeighborInfoSummaryUiState(rows = rows, reportingNodeCount = rows.size)
             }
+            .flowOn(Dispatchers.Default)
+            .catch { Logger.e(it) { "Neighbor summary failed" } }
             .stateInWhileSubscribed(initialValue = NeighborInfoSummaryUiState())
 
     companion object {

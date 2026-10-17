@@ -17,8 +17,12 @@
 package org.meshtastic.feature.node.health
 
 import androidx.lifecycle.ViewModel
+import co.touchlab.kermit.Logger
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.nowMillis
@@ -100,14 +104,19 @@ class NetworkSummaryViewModel(
     val uiState: StateFlow<NetworkSummaryUiState> =
         combine(
             nodeRepository.getNodes(),
-            meshLogRepository.getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, nowMillis - HISTORY_WINDOW_MILLIS),
-            meshLogRepository.getLogsByPortNumSince(
-                PortNum.NEIGHBORINFO_APP.value,
-                nowMillis - HISTORY_WINDOW_MILLIS,
-            ),
-            meshLogRepository.getLogsByPortNumSince(PortNum.POSITION_APP.value, nowMillis - HISTORY_WINDOW_MILLIS),
-            meshLogRepository.getAllLogsSince(nowMillis - HISTORY_WINDOW_MILLIS),
-            meshLogRepository.getLogsByPortNumSince(PortNum.TEXT_MESSAGE_APP.value, nowMillis - WEEK_WINDOW_MILLIS),
+            meshLogRepository
+                .getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, nowMillis - HISTORY_WINDOW_MILLIS)
+                .calmed(),
+            meshLogRepository
+                .getLogsByPortNumSince(PortNum.NEIGHBORINFO_APP.value, nowMillis - HISTORY_WINDOW_MILLIS)
+                .calmed(),
+            meshLogRepository
+                .getLogsByPortNumSince(PortNum.POSITION_APP.value, nowMillis - HISTORY_WINDOW_MILLIS)
+                .calmed(),
+            meshLogRepository.getAllLogsSince(nowMillis - HISTORY_WINDOW_MILLIS).calmed(),
+            meshLogRepository
+                .getLogsByPortNumSince(PortNum.TEXT_MESSAGE_APP.value, nowMillis - WEEK_WINDOW_MILLIS)
+                .calmed(),
             meshLogRepository.getMyNodeInfo(),
         ) { values ->
             @Suppress("UNCHECKED_CAST")
@@ -195,7 +204,8 @@ class NetworkSummaryViewModel(
                         entries
                             .filter { it.uptimeSeconds != null }
                             .maxByOrNull { it.timestamp }
-                            ?.let { latest -> num to latest.uptimeSeconds!! }
+                            ?.uptimeSeconds
+                            ?.let { uptime -> num to uptime }
                     }
                     .sortedByDescending { it.second }
                     .take(TOP_LIST_COUNT)
@@ -365,6 +375,9 @@ class NetworkSummaryViewModel(
                 messagesPerDay = messagesPerDay,
             )
         }
+            // The calculations are heavy; never on the main thread.
+            .flowOn(Dispatchers.Default)
+            .catch { Logger.e(it) { "Network summary failed" } }
             .stateInWhileSubscribed(initialValue = NetworkSummaryUiState())
 
     /** Counts values per verdict: at or above [good], [medium], [bad], or below all three. */

@@ -17,6 +17,7 @@
 package org.meshtastic.core.repository
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.MyNodeInfo
@@ -53,6 +54,13 @@ interface MeshLogRepository {
 
     /** Retrieves all [MeshLog]s from a single [nodeNum] since [sinceTimestamp], across every port. */
     fun getLogsFromNodeSince(nodeNum: Int, sinceTimestamp: Long): Flow<List<MeshLog>>
+
+    /**
+     * The newest [maxItem] [MeshLog]s from a single [nodeNum] since [sinceTimestamp], oldest first. Bounded, for charts
+     * over long ranges.
+     */
+    fun getRecentLogsFromNode(nodeNum: Int, sinceTimestamp: Long, maxItem: Int): Flow<List<MeshLog>> =
+        getLogsFromNodeSince(nodeNum, sinceTimestamp).map { it.takeLast(maxItem) }
 
     /** Retrieves all [MeshLog]s across every sender and port since [sinceTimestamp]. */
     fun getAllLogsSince(sinceTimestamp: Long): Flow<List<MeshLog>>
