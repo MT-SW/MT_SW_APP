@@ -258,7 +258,7 @@ fun NodeListScreen(
                         modifier =
                         Modifier.fillMaxWidth()
                             .graphicsLayer(alpha = animatedAlpha)
-                            .background(MaterialTheme.colorScheme.surfaceDim)
+                            .background(MaterialTheme.colorScheme.background)
                             .padding(8.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
