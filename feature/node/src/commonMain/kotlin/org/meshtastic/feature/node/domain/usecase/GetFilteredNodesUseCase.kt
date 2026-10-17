@@ -16,8 +16,10 @@
  */
 package org.meshtastic.feature.node.domain.usecase
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.Single
 import org.meshtastic.core.model.Node
@@ -69,4 +71,6 @@ open class GetFilteredNodesUseCase constructor(private val nodeRepository: NodeR
                     if (filter.excludeUnheard) !node.isUnheardOnCurrentLora || node.num == ourNum else true
                 }
         }
+        // Filtering a long node list on every node update must not run on the main thread.
+        .flowOn(Dispatchers.Default)
 }

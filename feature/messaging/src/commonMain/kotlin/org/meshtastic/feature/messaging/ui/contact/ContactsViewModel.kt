@@ -18,10 +18,12 @@ package org.meshtastic.feature.messaging.ui.contact
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.ioDispatcher
@@ -173,6 +175,8 @@ class ContactsViewModel(
                 )
             }
         }
+            // Building the contact list is the heavy part; keep it off the main thread.
+            .flowOn(Dispatchers.Default)
             .stateInWhileSubscribed(initialValue = emptyList())
 
     /**
