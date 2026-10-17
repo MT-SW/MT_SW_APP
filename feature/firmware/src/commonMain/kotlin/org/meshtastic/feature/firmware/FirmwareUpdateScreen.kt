@@ -130,9 +130,15 @@ import org.meshtastic.core.resources.firmware_update_rak4631_bootloader_hint
 import org.meshtastic.core.resources.firmware_update_release_notes
 import org.meshtastic.core.resources.firmware_update_retry
 import org.meshtastic.core.resources.firmware_update_save_dfu_file
+import org.meshtastic.core.resources.firmware_update_custom_file_summary
+import org.meshtastic.core.resources.firmware_update_custom_file_title
+import org.meshtastic.core.resources.firmware_update_own_file_warning_body
+import org.meshtastic.core.resources.firmware_update_own_file_warning_title
 import org.meshtastic.core.resources.firmware_update_select_file
 import org.meshtastic.core.resources.firmware_update_slow_bootloader_hint
 import org.meshtastic.core.resources.firmware_update_source_local
+import org.meshtastic.core.resources.firmware_update_unidentified_summary
+import org.meshtastic.core.resources.firmware_update_unidentified_title
 import org.meshtastic.core.resources.firmware_update_stable
 import org.meshtastic.core.resources.firmware_update_success
 import org.meshtastic.core.resources.firmware_update_success_wiped
@@ -241,6 +247,7 @@ fun FirmwareUpdateScreen(onNavigateUp: () -> Unit, viewModel: FirmwareUpdateView
                 onPlayChirpyHop = { showChirpyHop = true },
                 onDone = { onNavigateUp() },
                 onDismissBootloaderWarning = viewModel::dismissBootloaderWarningForCurrentDevice,
+                onCustomFileModeChange = viewModel::setCustomFileMode,
             )
         }
 
@@ -321,6 +328,10 @@ private fun LocalFirmwareFileConfirmationDialog(
                     text = stringResource(Res.string.firmware_update_confirm_file_message),
                     style = MaterialTheme.typography.bodyMedium,
                 )
+                if (pendingFile.ownFile) {
+                    Spacer(Modifier.height(12.dp))
+                    OwnFileWarning()
+                }
                 Spacer(Modifier.height(12.dp))
                 SelectionContainer {
                     Text(
@@ -601,11 +612,94 @@ private fun ReadyState(
         Spacer(Modifier.height(16.dp))
     }
 
+    if (selectedReleaseType == FirmwareReleaseType.LOCAL && state.updateMethod !is FirmwareUpdateMethod.Unknown) {
+        OwnFileCard(
+            unidentified = device.isUnidentified,
+            customFile = state.customFile,
+            onCustomFileChange = actions.onCustomFileModeChange,
+        )
+        Spacer(Modifier.height(16.dp))
+    }
+
     Spacer(Modifier.height(16.dp))
 
     ReadyActionButton(state, selectedReleaseType) {
         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         showDisclaimer = true
+    }
+}
+
+/** Clear risk notice for flashing a file whose name was not checked against the device (own file / unlisted device). */
+@Composable
+private fun OwnFileWarning(modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors =
+        CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        ),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(MeshtasticIcons.Warning, contentDescription = null, modifier = Modifier.size(24.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = stringResource(Res.string.firmware_update_own_file_warning_title),
+                    style = MaterialTheme.typography.titleSmall,
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = stringResource(Res.string.firmware_update_own_file_warning_body),
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+    }
+}
+
+/**
+ * Own-file options for the local-file source: a device the catalogue does not know can only take the user's own file
+ * (name unchecked); for a known one the name check can be switched off, e.g. for self-built firmware.
+ */
+@Composable
+private fun OwnFileCard(unidentified: Boolean, customFile: Boolean, onCustomFileChange: (Boolean) -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text =
+                    stringResource(
+                        if (unidentified) {
+                            Res.string.firmware_update_unidentified_title
+                        } else {
+                            Res.string.firmware_update_custom_file_title
+                        },
+                    ),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+                Text(
+                    text =
+                    stringResource(
+                        if (unidentified) {
+                            Res.string.firmware_update_unidentified_summary
+                        } else {
+                            Res.string.firmware_update_custom_file_summary
+                        },
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (!unidentified) {
+                Spacer(Modifier.width(8.dp))
+                Switch(checked = customFile, onCheckedChange = onCustomFileChange)
+            }
+        }
+    }
+    if (unidentified || customFile) {
+        Spacer(Modifier.height(12.dp))
+        OwnFileWarning()
     }
 }
 

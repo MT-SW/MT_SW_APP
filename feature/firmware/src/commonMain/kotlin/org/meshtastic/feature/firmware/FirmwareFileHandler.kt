@@ -187,7 +187,20 @@ data class PendingLocalFirmwareFile(
     val platformioTarget: String,
     val updateMethod: FirmwareUpdateMethod,
     val address: String,
+    /** The name was not checked against the device model (own-file mode or an unlisted device): show the warning. */
+    val ownFile: Boolean = false,
 )
+
+/**
+ * True for a device the hardware catalogue could not identify -- a placeholder with no architecture. Such a device can
+ * still be flashed with the user's own file, which is how self-built firmware for unlisted boards is installed.
+ */
+internal val DeviceHardware.isUnidentified: Boolean
+    get() = architecture.isBlank()
+
+/** Local files are accepted by extension alone when the user asked for it or the device is not in the catalogue. */
+internal val FirmwareUpdateState.Ready.lenientLocalFile: Boolean
+    get() = customFile || deviceHardware.isUnidentified
 
 /** pioEnv-aware target: falls back to [DeviceHardware.hwModelSlug] when [DeviceHardware.platformioTarget] is unset. */
 internal val DeviceHardware.effectiveTarget: String
@@ -209,7 +222,12 @@ internal fun validatePendingLocalFirmwareFile(
 
         // Context matches — revalidate the filename against the current method before flashing.
         else ->
-            validateLocalFirmwareFileName(pendingFile.fileName, currentState.deviceHardware, currentState.updateMethod)
+            validateLocalFirmwareFileName(
+                pendingFile.fileName,
+                currentState.deviceHardware,
+                currentState.updateMethod,
+                lenient = currentState.lenientLocalFile,
+            )
     }
 }
 
@@ -265,8 +283,10 @@ internal fun validateLocalFirmwareFileName(
     fileName: String,
     hardware: DeviceHardware,
     updateMethod: FirmwareUpdateMethod,
+    lenient: Boolean = false,
 ): LocalFirmwareFileValidation {
     val normalizedFileName = fileName.substringAfterLast('/').substringAfterLast('\\').lowercase()
+    if (lenient) return validateExtensionOnly(normalizedFileName, hardware, updateMethod)
     val target = hardware.effectiveTarget.lowercase()
     if (target.isBlank()) {
         return LocalFirmwareFileValidation.Invalid(LocalFirmwareFileValidationReason.MissingTarget)
@@ -303,6 +323,38 @@ internal fun localFirmwarePayloadExtension(hardware: DeviceHardware, updateMetho
         FirmwareUpdateMethod.Usb -> ".uf2"
         FirmwareUpdateMethod.Unknown -> null
     }
+
+/**
+ * Own-file check: only the file type must fit the connection (Nordic DFU `.zip`, ESP32 `.bin`, USB `.uf2`); the name
+ * is not compared with the device's model, so self-generated firmware can be flashed under any name. A device of
+ * unknown architecture accepts either `.zip` (nRF52) or `.bin` (ESP32) over Bluetooth.
+ */
+private fun validateExtensionOnly(
+    fileName: String,
+    hardware: DeviceHardware,
+    updateMethod: FirmwareUpdateMethod,
+): LocalFirmwareFileValidation {
+    fun require(extension: String, reason: LocalFirmwareFileValidationReason) = if (fileName.endsWith(extension)) {
+        LocalFirmwareFileValidation.Valid
+    } else {
+        LocalFirmwareFileValidation.Invalid(reason)
+    }
+    return when (updateMethod) {
+        FirmwareUpdateMethod.Ble ->
+            when {
+                hardware.isEsp32Arc -> require(".bin", LocalFirmwareFileValidationReason.RequiresBin)
+                hardware.isUnidentified && fileName.endsWith(".bin") -> LocalFirmwareFileValidation.Valid
+                else -> require(".zip", LocalFirmwareFileValidationReason.RequiresOtaZip)
+            }
+
+        FirmwareUpdateMethod.Wifi -> require(".bin", LocalFirmwareFileValidationReason.RequiresBin)
+
+        FirmwareUpdateMethod.Usb -> require(".uf2", LocalFirmwareFileValidationReason.RequiresUf2)
+
+        FirmwareUpdateMethod.Unknown ->
+            LocalFirmwareFileValidation.Invalid(LocalFirmwareFileValidationReason.UnsupportedUpdateMethod)
+    }
+}
 
 private fun validateNrf52LocalFirmware(fileName: String, target: String): LocalFirmwareFileValidation =
     validateSuffixedLocalFirmware(

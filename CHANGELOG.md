@@ -18,6 +18,13 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Wgrywanie firmware — własne pliki i nieznane urządzenia**
+* Urządzenie, którego nie ma na liście sprzętu, nie kończy się już błędem ani nie wisi na „Sprawdzanie”: ekran wgrywania przełącza się na „Plik lokalny” i pozwala wgrać własny plik (.zip dla nRF52, .bin dla ESP32) — przydatne dla własnych buildów.
+* Przy własnym pliku i nieznanym urządzeniu ekran oraz okno potwierdzenia pokazują wyraźne ostrzeżenie o ryzyku (możliwe uszkodzenie urządzenia, odpowiedzialność użytkownika, co sprawdzić przed wgraniem).
+* Nowy przełącznik „Własny plik (bez sprawdzania nazwy)”: plik jest sprawdzany tylko pod kątem typu, a jego nazwa nie musi zawierać nazwy modelu ani kończyć się „-ota.zip”.
+* Odzyskiwanie urządzenia zablokowanego w trybie DFU działa teraz także po wgraniu własnego pliku i dla urządzeń spoza listy: aplikacja zapamiętuje próbę, a po przerwaniu pozwala wgrać własny plik bez połączenia z urządzeniem (wcześniej odzyskiwanie było tylko dla wersji z listy i kończyło się błędem przy nieznanym modelu).
+* Naprawa desktopu: sprawdzanie dostępności aktualizacji nie czeka już na serwer (pobieranie listy plików konserwacyjnych idzie w tle), więc przy słabym połączeniu ekran nie wisi.
+
 **Pasek przewijania na desktopie jak w Windowsie**
 * Pasek przewijania (desktop) ma teraz widoczny, delikatny tor. Kliknięcie w tor przewija od razu w to miejsce — kliknięcie na samym dole przewija na koniec, na samej górze na początek — a przeciąganie suwaka nadal przewija płynnie.
 
@@ -252,6 +259,13 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Firmware update — own files and unknown devices**
+* A device that is not in the hardware list no longer ends in an error or hangs on "Checking": the update screen switches to "Local file" and lets you flash your own file (.zip for nRF52, .bin for ESP32) — useful for self-built firmware.
+* For an own file and an unknown device, both the screen and the confirmation dialog show a clear risk warning (possible damage to the device, user responsibility, what to check before flashing).
+* New switch "Own file (skip name check)": the file is checked for its type only; its name does not have to contain the model name or end with "-ota.zip".
+* Recovery of a device stuck in DFU mode now also works after flashing an own file and for devices outside the list: the app remembers the attempt and, after an interruption, lets you flash an own file without a connection to the device (before, recovery covered listed releases only and failed with an unknown model).
+* Desktop fix: the update check no longer waits for the server (the maintenance-file list is fetched in the background), so a poor connection no longer leaves the screen hanging.
 
 **Desktop scrollbar like in Windows**
 * The desktop scrollbar now shows a faint track. Clicking the track scrolls straight to that spot — clicking the very bottom scrolls to the end, the very top to the start — and dragging the thumb still scrolls smoothly.

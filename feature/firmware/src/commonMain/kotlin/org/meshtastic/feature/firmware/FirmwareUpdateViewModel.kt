@@ -93,14 +93,14 @@ import org.meshtastic.core.resources.firmware_update_method_usb
 import org.meshtastic.core.resources.firmware_update_method_wifi
 import org.meshtastic.core.resources.firmware_update_missing_target
 import org.meshtastic.core.resources.firmware_update_no_device
-import org.meshtastic.core.resources.firmware_update_node_info_missing
 import org.meshtastic.core.resources.firmware_update_requires_bin
 import org.meshtastic.core.resources.firmware_update_requires_ota_zip
 import org.meshtastic.core.resources.firmware_update_requires_uf2
 import org.meshtastic.core.resources.firmware_update_retrieval_failed
+import org.meshtastic.core.resources.firmware_update_unidentified_device
 import org.meshtastic.core.resources.firmware_update_unknown_error
-import org.meshtastic.core.resources.firmware_update_unknown_hardware
 import org.meshtastic.core.resources.firmware_update_unsupported_update_method
+import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.unknown
 
 // Bench measurement (Wio Tracker L1, 2 MB UF2): consume + reboot can outlast 30 s by a hair.
@@ -305,13 +305,18 @@ class FirmwareUpdateViewModel(
                     enterRecoveryModeOrError()
                     return@launch
                 }
-                val deviceHardware = getDeviceHardware(ourNode) ?: return@launch
+                val deviceHardware = getDeviceHardware(ourNode)
                 _deviceHardware.value = deviceHardware
+                // A device the catalogue does not know has no online releases: it can only take the user's own file.
+                if (deviceHardware.isUnidentified) _selectedReleaseType.value = FirmwareReleaseType.LOCAL
                 _currentFirmwareVersion.value = ourNode.firmwareVersion
                 // Best-effort, once per check — not per release-flow emission below. A failed fetch, or one
                 // carrying no images at all, leaves the cache/seed untouched, so this never regresses the
                 // maintenance gate.
-                maintenanceUf2Repository.reconcile()
+                // Never awaited: with a poor connection (common on desktop) it can take minutes, and the screen
+                // would sit on "Checking" even though a local file needs no server. The cached/bundled snapshot
+                // below is what the maintenance gate uses; a fresh fetch applies on the next check.
+                viewModelScope.launch { maintenanceUf2Repository.reconcile() }
                 val maintenanceUf2Manifest = maintenanceUf2Repository.getSnapshot()
 
                 val releaseFlow =
@@ -346,7 +351,7 @@ class FirmwareUpdateViewModel(
 
                             radioPrefs.isTcp() -> {
                                 // WiFi OTA is ESP32-only; nRF52/RP2040 have no TCP update path.
-                                if (deviceHardware.isEsp32Arc) {
+                                if (deviceHardware.isEsp32Arc || deviceHardware.isUnidentified) {
                                     FirmwareUpdateMethod.Wifi
                                 } else {
                                     FirmwareUpdateMethod.Unknown
@@ -400,15 +405,18 @@ class FirmwareUpdateViewModel(
             return
         }
         pendingRecovery = recovery
+        // A model the catalogue lacks (self-built firmware on an unlisted board) is not a dead end: the placeholder
+        // still lets the user re-flash the stranded device with their own file.
         val hardware =
-            deviceHardwareRepository.getDeviceHardwareByModel(recovery.hwModel, recovery.pioEnv).getOrElse {
-                clearDeviceMetadata()
-                _state.value =
-                    FirmwareUpdateState.Error(
-                        UiText.Resource(Res.string.firmware_update_unknown_hardware, recovery.hwModel),
-                    )
-                null
-            } ?: return
+            safeCatching {
+                deviceHardwareRepository.getDeviceHardwareByModel(recovery.hwModel, recovery.pioEnv).getOrNull()
+            }
+                .getOrNull()
+                ?: DeviceHardware(
+                    displayName = recovery.deviceName,
+                    hwModel = recovery.hwModel,
+                    platformioTarget = recovery.pioEnv,
+                )
 
         _deviceHardware.value = hardware
         _currentFirmwareVersion.value = null
@@ -550,14 +558,12 @@ class FirmwareUpdateViewModel(
      */
     private suspend fun maybeRecordRecovery(state: FirmwareUpdateState.Ready) {
         val type = _selectedReleaseType.value
-        val recoverable =
-            state.updateMethod is FirmwareUpdateMethod.Ble &&
-                !state.deviceHardware.isEsp32Arc &&
-                type != FirmwareReleaseType.LOCAL
+        val recoverable = state.updateMethod is FirmwareUpdateMethod.Ble && !state.deviceHardware.isEsp32Arc
         if (!recoverable) return
         val fullAddress = radioPrefs.devAddr.value
-        val pioEnv = nodeRepository.myNodeInfo.value?.pioEnv
-        if (fullAddress == null || pioEnv == null) return
+        // An unlisted device may report no environment name; recovery then runs on the model number alone.
+        val pioEnv = nodeRepository.myNodeInfo.value?.pioEnv.orEmpty()
+        if (fullAddress == null) return
         firmwareRecoveryDataSource.set(
             PendingFirmwareRecovery(
                 fullAddress = fullAddress,
@@ -947,7 +953,7 @@ class FirmwareUpdateViewModel(
                     )
                 cleanupPendingLocalFirmwareArtifact(pendingArtifact)
             } else {
-                startUpdateFromFile(pendingSelection.uri, pendingArtifact)
+                startUpdateFromFile(pendingSelection.uri, pendingArtifact, pendingSelection.fileName)
             }
         } else {
             cleanupPendingLocalFirmwareArtifact(pendingArtifact)
@@ -963,12 +969,14 @@ class FirmwareUpdateViewModel(
         fileName: String,
         state: FirmwareUpdateState.Ready,
     ): LocalFirmwareResolution {
-        val validation = validateLocalFirmwareFileName(fileName, state.deviceHardware, state.updateMethod)
+        val lenient = state.lenientLocalFile
+        val validation = validateLocalFirmwareFileName(fileName, state.deviceHardware, state.updateMethod, lenient)
         return when (validation) {
             LocalFirmwareFileValidation.Valid -> LocalFirmwareResolution.Resolved(uri = uri, fileName = fileName)
 
             is LocalFirmwareFileValidation.Invalid ->
-                if (shouldTryLocalFirmwareBundle(fileName, validation.reason)) {
+                // An own file is taken as it is; only a named, catalogue-matched file may be unpacked from a bundle.
+                if (!lenient && shouldTryLocalFirmwareBundle(fileName, validation.reason)) {
                     resolveLocalFirmwareBundle(uri, fileName, state, validation.reason)
                 } else {
                     LocalFirmwareResolution.Invalid(reason = validation.reason, fileName = fileName)
@@ -1075,6 +1083,7 @@ class FirmwareUpdateViewModel(
                         platformioTarget = state.deviceHardware.effectiveTarget,
                         updateMethod = state.updateMethod,
                         address = state.address,
+                        ownFile = state.lenientLocalFile,
                     )
             }
         }
@@ -1106,7 +1115,11 @@ class FirmwareUpdateViewModel(
             }
     }
 
-    private fun startUpdateFromFile(uri: CommonUri, pendingArtifact: FirmwareArtifact? = null) {
+    private fun startUpdateFromFile(
+        uri: CommonUri,
+        pendingArtifact: FirmwareArtifact? = null,
+        fileName: String? = null,
+    ) {
         val currentState = _state.value as? FirmwareUpdateState.Ready ?: return
         // Local-file installs never wipe; drop any opt-in left over from an earlier, failed attempt.
         pendingFactoryResetAfterUpdate = false
@@ -1116,19 +1129,36 @@ class FirmwareUpdateViewModel(
             return
         }
         trackUpdateStart(currentState, LOCAL_RELEASE_ID)
-        originalDeviceAddress = radioPrefs.devAddr.value
+        originalDeviceAddress =
+            if (currentState.isRecovery) pendingRecovery?.fullAddress else radioPrefs.devAddr.value
+        val hardware = currentState.deviceHardware.forOwnFile(fileName)
+        val localRelease = FirmwareRelease(id = LOCAL_RELEASE_ID, zipUrl = "", releaseNotes = "")
 
         updateJob?.cancel()
         updateJob = viewModelScope.launch {
             try {
+                // Remember the attempt, so a flash that strands the device in bootloader mode can be re-done later
+                // with the same kind of own file while disconnected -- see enterRecoveryModeOrError.
+                if (!currentState.isRecovery) maybeRecordRecovery(currentState.copy(deviceHardware = hardware))
                 val updateArtifact =
-                    firmwareUpdateManager.startUpdate(
-                        release = FirmwareRelease(id = LOCAL_RELEASE_ID, zipUrl = "", releaseNotes = ""),
-                        hardware = currentState.deviceHardware,
-                        address = currentState.address,
-                        updateState = { _state.value = it },
-                        firmwareUri = uri,
-                    )
+                    if (currentState.isRecovery) {
+                        // Disconnected: there is no live connection to route by, so go straight to BLE DFU.
+                        firmwareUpdateManager.recoverDfuDevice(
+                            release = localRelease,
+                            hardware = hardware,
+                            address = currentState.address,
+                            updateState = { _state.value = it },
+                            firmwareUri = uri,
+                        )
+                    } else {
+                        firmwareUpdateManager.startUpdate(
+                            release = localRelease,
+                            hardware = hardware,
+                            address = currentState.address,
+                            updateState = { _state.value = it },
+                            firmwareUri = uri,
+                        )
+                    }
                 tempFirmwareFile = updateArtifact?.takeIf { it.isTemporary } ?: pendingArtifact
                 // If the handler created its own temp copy (e.g. ESP32 importFromUri),
                 // clean up the extracted bundle artifact to prevent a leak.
@@ -1337,23 +1367,36 @@ class FirmwareUpdateViewModel(
         return !isBatteryLow
     }
 
-    private suspend fun getDeviceHardware(ourNode: MyNodeInfo): DeviceHardware? {
+    /**
+     * Never null: a model the catalogue lacks (or a lookup that failed offline) yields a placeholder with no
+     * architecture, which the screen treats as "own file only" -- see [isUnidentified]. This is what lets self-built
+     * firmware for unlisted boards be flashed, and it no longer leaves the screen hanging on "Checking" when the
+     * lookup comes back empty.
+     */
+    private suspend fun getDeviceHardware(ourNode: MyNodeInfo): DeviceHardware {
         val nodeInfo = nodeRepository.ourNodeInfo.value
         val hwModelInt = nodeInfo?.user?.hw_model?.value
         val target = ourNode.pioEnv
 
-        return if (hwModelInt != null) {
-            deviceHardwareRepository.getDeviceHardwareByModel(hwModelInt, target).getOrElse {
-                clearDeviceMetadata()
-                _state.value =
-                    FirmwareUpdateState.Error(UiText.Resource(Res.string.firmware_update_unknown_hardware, hwModelInt))
-                null
+        val known =
+            hwModelInt?.let {
+                safeCatching { deviceHardwareRepository.getDeviceHardwareByModel(it, target).getOrNull() }.getOrNull()
             }
-        } else {
-            clearDeviceMetadata()
-            _state.value = FirmwareUpdateState.Error(UiText.Resource(Res.string.firmware_update_node_info_missing))
-            null
-        }
+        return known
+            ?: DeviceHardware(
+                displayName =
+                nodeInfo?.user?.long_name?.takeIf { it.isNotBlank() }
+                    ?: safeCatching { getStringSuspend(Res.string.firmware_update_unidentified_device) }
+                        .getOrDefault("Unknown device"),
+                hwModel = hwModelInt ?: 0,
+                platformioTarget = target.orEmpty(),
+            )
+    }
+
+    /** Lets a self-built file be flashed under any name; unlisted devices are always in this mode. */
+    fun setCustomFileMode(enabled: Boolean) {
+        val current = _state.value as? FirmwareUpdateState.Ready ?: return
+        _state.value = current.copy(customFile = enabled)
     }
 
     private fun clearDeviceMetadata() {
@@ -1368,6 +1411,16 @@ private sealed interface LocalFirmwareResolution {
         LocalFirmwareResolution
 
     data class Invalid(val reason: LocalFirmwareFileValidationReason, val fileName: String) : LocalFirmwareResolution
+}
+
+/**
+ * For a device the catalogue could not identify, the file type decides the update path: `.bin` is an ESP32 image, any
+ * other own file is treated as an nRF52 DFU package. Known hardware is left as it is.
+ */
+private fun DeviceHardware.forOwnFile(fileName: String?): DeviceHardware = when {
+    !isUnidentified -> this
+    fileName?.lowercase()?.endsWith(".bin") == true -> copy(architecture = "esp32")
+    else -> copy(architecture = "nrf52")
 }
 
 private fun shouldTryLocalFirmwareBundle(fileName: String, reason: LocalFirmwareFileValidationReason): Boolean {

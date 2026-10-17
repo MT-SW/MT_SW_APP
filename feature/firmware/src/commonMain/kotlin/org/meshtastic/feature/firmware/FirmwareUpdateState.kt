@@ -66,6 +66,11 @@ sealed interface FirmwareUpdateState {
          * decision stays unit-testable — the same shape as [showBootloaderWarning].
          */
         val maintenance: UsbMaintenanceGate = UsbMaintenanceGate(),
+        /**
+         * The user's own firmware file is flashed without checking its name against the device's model (see
+         * [lenientLocalFile]). Always effectively on for a device the catalogue does not know.
+         */
+        val customFile: Boolean = false,
     ) : FirmwareUpdateState
 
     /** Firmware file is being downloaded from the release server. */
