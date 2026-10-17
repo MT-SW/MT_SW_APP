@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Pasek przewijania na desktopie jak w Windowsie**
+* Pasek przewijania (desktop) ma teraz widoczny, delikatny tor. Kliknięcie w tor przewija od razu w to miejsce — kliknięcie na samym dole przewija na koniec, na samej górze na początek — a przeciąganie suwaka nadal przewija płynnie.
+
 **Scalenie z oryginałem (17.10)**
 * Scalenie z najnowszym oryginałem: przycisk „Zachowaj” przy ostrzeżeniu o niesłyszanych węzłach jest teraz zapamiętywany trwale dla każdego węzła osobno (wersja oryginału zastąpiła naszą, która pamiętała tylko do restartu), z aplikacji usunięto deklarację obsługi Android Auto oraz zaktualizowano opisy wydań i profile przyspieszające start. Bez zmian zostały nasze zmiany w forku.
 
@@ -249,6 +252,9 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Desktop scrollbar like in Windows**
+* The desktop scrollbar now shows a faint track. Clicking the track scrolls straight to that spot — clicking the very bottom scrolls to the end, the very top to the start — and dragging the thumb still scrolls smoothly.
 
 **Merge with the original (17.10)**
 * Merge with the latest original: "Keep" on the unheard-nodes warning is now remembered permanently per node (the original's version replaced ours, which only remembered until a restart), the Android Auto declaration was removed from the app, and release notes and start-up profiles were updated. The fork's own changes are untouched.
