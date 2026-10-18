@@ -161,6 +161,8 @@ open class BaseMapViewModel(
         it.copy(showPrecisionCircle = !it.showPrecisionCircle)
     }
 
+    fun toggleShowLinksOnMap() = mapPrefs.updateMapFilters { it.copy(showLinks = !it.showLinks) }
+
     fun toggleOnlyOnline() = mapPrefs.updateMapFilters { it.copy(onlyOnline = !it.onlyOnline) }
 
     fun toggleOnlyDirect() = mapPrefs.updateMapFilters { it.copy(onlyDirect = !it.onlyDirect) }
@@ -257,6 +259,8 @@ open class BaseMapViewModel(
         val excludeMqtt: Boolean = false,
         val showIgnored: Boolean = false,
         val includeUnknown: Boolean = true,
+        /** Draw lines between nodes that exchange packets. */
+        val showLinks: Boolean = true,
     ) {
         /** True when anything here is narrowing the node set, so the filter button can show it. */
         val isNarrowing: Boolean
@@ -280,6 +284,7 @@ open class BaseMapViewModel(
         onlyFavorites = prefs.onlyFavorites,
         showWaypoints = prefs.showWaypoints,
         showPrecisionCircle = prefs.showPrecisionCircle,
+        showLinks = prefs.showLinks,
         lastHeardFilter = LastHeardFilter.fromSeconds(prefs.lastHeardSeconds),
         lastHeardTrackFilter = LastHeardFilter.fromSeconds(prefs.lastHeardTrackSeconds),
         excludedRoles = decodeExcludedRoles(prefs.excludedRoles),

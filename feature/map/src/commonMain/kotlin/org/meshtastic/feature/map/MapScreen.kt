@@ -37,6 +37,7 @@ fun MapScreen(
     viewModel: SharedMapViewModel,
     waypointId: Int? = null,
     plannerNodeNum: Int? = null,
+    focusNodeNum: Int? = null,
 ) {
     val ourNodeInfo by viewModel.ourNodeInfo.collectAsStateWithLifecycle()
     val isConnected by viewModel.isConnected.collectAsStateWithLifecycle()
@@ -61,6 +62,7 @@ fun MapScreen(
             navigateToNodeDetails = navigateToNodeDetails,
             waypointId = waypointId,
             plannerNodeNum = plannerNodeNum,
+            focusNodeNum = focusNodeNum,
         )
     }
 }

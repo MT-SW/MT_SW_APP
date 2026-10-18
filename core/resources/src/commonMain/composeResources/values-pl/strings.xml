@@ -1289,6 +1289,7 @@
     <string name="map_offline_downloading_progress">Pobieranie… %1$d / %2$d kafelków</string>
     <string name="map_offline_region_label">%1$s, %2$s  %3$s</string>
     <string name="map_offline_show_on_map">Pokaż na mapie</string>
+    <string name="node_show_on_map">Pokaż na mapie</string>
     <string name="map_offline_terrain_contours">Warstwice</string>
     <string name="map_offline_terrain_download_complete">Pobieranie terenu zakończone</string>
     <string name="map_offline_terrain_download_failed_io">Pobieranie terenu nieudane — sprawdź połączenie i spróbuj ponownie</string>
@@ -2204,6 +2205,7 @@
     <string name="show_precision_circle">Pokaż okręgi precyzji</string>
     <string name="show_translation">Pokaż tłumaczenie</string>
     <string name="show_waypoints">Pokaż punkty trasy</string>
+    <string name="show_node_links">Pokaż połączenia między węzłami</string>
     <string name="shutdown">Wyłącz</string>
     <string name="shutdown_node_name">Węzeł: %1$s</string>
     <string name="shutdown_on_power_loss">Wyłącz przy utracie zasilania</string>

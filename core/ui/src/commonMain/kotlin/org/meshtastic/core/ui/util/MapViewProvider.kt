@@ -31,6 +31,7 @@ interface MapViewProvider {
         navigateToNodeDetails: (Int) -> Unit,
         waypointId: Int? = null,
         plannerNodeNum: Int? = null,
+        focusNodeNum: Int? = null,
     )
 }
 

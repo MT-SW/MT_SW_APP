@@ -32,7 +32,8 @@ val LocalMapMainScreenProvider =
             navigateToNodeDetails: (Int) -> Unit,
             waypointId: Int?,
             plannerNodeNum: Int?,
+            focusNodeNum: Int?,
         ) -> Unit,
         > {
-        { _, _, _, _ -> PlaceholderScreen("Map") }
+        { _, _, _, _, _ -> PlaceholderScreen("Map") }
     }

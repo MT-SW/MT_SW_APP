@@ -43,6 +43,7 @@ class MapFilterActions(
     val onToggleExcludeMqtt: () -> Unit,
     val onToggleShowIgnored: () -> Unit,
     val onToggleIncludeUnknown: () -> Unit,
+    val onToggleShowLinks: () -> Unit = {},
 )
 
 /**
@@ -66,4 +67,5 @@ fun BaseMapViewModel.mapFilterActions(): MapFilterActions = MapFilterActions(
     onToggleExcludeMqtt = ::toggleExcludeMqtt,
     onToggleShowIgnored = ::toggleShowIgnored,
     onToggleIncludeUnknown = ::toggleIncludeUnknown,
+    onToggleShowLinks = ::toggleShowLinksOnMap,
 )

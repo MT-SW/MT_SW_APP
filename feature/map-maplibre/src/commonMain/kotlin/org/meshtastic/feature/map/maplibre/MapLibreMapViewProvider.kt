@@ -49,6 +49,7 @@ import org.maplibre.compose.map.MapState
 import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.ui.util.KeepScreenOn
 import org.meshtastic.core.ui.util.MapViewProvider
+import org.meshtastic.feature.map.MapLinksViewModel
 import org.meshtastic.feature.map.SharedMapViewModel
 import org.meshtastic.feature.map.component.ClusterMemberEntry
 import org.meshtastic.feature.map.component.ClusterMembersDialog
@@ -133,6 +134,7 @@ class MapLibreMapViewProvider(
         navigateToNodeDetails: (Int) -> Unit,
         waypointId: Int?,
         plannerNodeNum: Int?,
+        focusNodeNum: Int?,
     ) {
         // Guarded here too, or the toolbar and zoom controls float over an empty screen driving a missing map.
         if (!LocalMapLibreRuntimeProbe.current()) return MapEngineUnavailable(modifier)
@@ -147,7 +149,12 @@ class MapLibreMapViewProvider(
 
         val location = rememberLocationControls()
         val waypoints = rememberWaypointEditing()
-        val screen = rememberMapScreenState(waypointId = waypointId, plannerNodeNum = plannerNodeNum)
+        val screen =
+            rememberMapScreenState(
+                waypointId = waypointId,
+                plannerNodeNum = plannerNodeNum,
+                focusNodeNum = focusNodeNum,
+            )
 
         val mapState =
             rememberMapScreenMapState(
@@ -253,6 +260,8 @@ private fun rememberMapScreenMapState(
     navigateToNodeDetails: (Int) -> Unit,
 ): MapState {
     val viewModel: SharedMapViewModel = koinViewModel()
+    val linksViewModel: MapLinksViewModel = koinViewModel()
+    val links by linksViewModel.links.collectAsStateWithLifecycle()
     return rememberMeshMapState(
         viewModel = viewModel,
         navigateToNodeDetails = navigateToNodeDetails,
@@ -268,7 +277,9 @@ private fun rememberMapScreenMapState(
         followLocation = location.following,
         bearingUpdate = location.bearingUpdate,
         // Only when there was nothing stored: a remembered view is the user's own and is not yanked away.
-        frameOnNodes = restored.position == null,
+        focusNodeNum = screen.focusNodeNum,
+        links = links,
+        frameOnNodes = restored.position == null && screen.focusNodeNum == null,
     )
 }
 
@@ -292,15 +303,20 @@ private class MapScreenState {
     /** The node a deep link asked the Planner to start from; cleared whenever the sheet closes or is opened by hand. */
     var plannerNodeNum by mutableStateOf<Int?>(null)
     var overlays by mutableStateOf(MapOverlays.all)
+
+    /** The node "Show on map" asked to centre on and draw above the others; null for a plain visit to the map. */
+    var focusNodeNum by mutableStateOf<Int?>(null)
 }
 
 /** Holds the screen's open-thing state, and opens whatever the incoming deep link named. */
 @Composable
-private fun rememberMapScreenState(waypointId: Int?, plannerNodeNum: Int?): MapScreenState {
-    val state = remember { MapScreenState() }
+private fun rememberMapScreenState(waypointId: Int?, plannerNodeNum: Int?, focusNodeNum: Int?): MapScreenState {
+    // Set before the first frame, so the map does not first frame the whole mesh and only then fly to the node.
+    val state = remember { MapScreenState().also { it.focusNodeNum = focusNodeNum } }
 
     // Both of these this provider used to drop on the floor.
-    LaunchedEffect(waypointId, plannerNodeNum) {
+    LaunchedEffect(waypointId, plannerNodeNum, focusNodeNum) {
+        state.focusNodeNum = focusNodeNum
         waypointId?.let { state.infoWaypointId = it }
         if (plannerNodeNum != null) {
             state.plannerNodeNum = plannerNodeNum

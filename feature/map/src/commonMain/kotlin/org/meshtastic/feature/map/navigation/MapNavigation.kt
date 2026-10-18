@@ -30,6 +30,7 @@ fun EntryProviderScope<NavKey>.mapGraph(backStack: NavBackStack<NavKey>) {
             { id -> backStack.add(NodesRoute.NodeDetail(id)) }, // navigateToNodeDetails
             args.waypointId,
             args.plannerNodeNum,
+            args.focusNodeNum,
         )
     }
 }

@@ -41,11 +41,13 @@ import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.util.toDistanceString
 import org.meshtastic.core.navigation.MapRoute
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.node_show_on_map
 import org.meshtastic.core.resources.open_compass
 import org.meshtastic.core.resources.planner_title
 import org.meshtastic.core.ui.icon.CellTower
 import org.meshtastic.core.ui.icon.Compass
 import org.meshtastic.core.ui.icon.Distance
+import org.meshtastic.core.ui.icon.Map
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.LocalInlineMapProvider
 import org.meshtastic.core.ui.util.LocalPlannerAvailable
@@ -82,6 +84,24 @@ internal fun PositionInlineContent(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
+    }
+    // Centre the main map on this node and draw it above any others standing on the same spot.
+    if (node.validPosition != null) {
+        Spacer(Modifier.height(8.dp))
+        FilledTonalButton(
+            onClick = { onAction(NodeDetailAction.Navigate(MapRoute.Map(focusNodeNum = node.num))) },
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+        ) {
+            Icon(MeshtasticIcons.Map, null, Modifier.size(18.dp))
+            Spacer(Modifier.width(6.dp))
+            Text(
+                text = stringResource(Res.string.node_show_on_map),
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
     // Open the native MT_SW Planner for this node (position-gated).
     if (LocalPlannerAvailable.current && node.validPosition != null) {

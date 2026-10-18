@@ -70,6 +70,7 @@ import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.model.Node
 import org.meshtastic.feature.map.BaseMapViewModel
+import org.meshtastic.feature.map.MapLink
 import org.meshtastic.feature.map.MapNodePolicy
 import org.meshtastic.feature.map.component.MapEngineUnavailable
 import org.meshtastic.feature.map.component.MeshMapFitPadding
@@ -80,6 +81,7 @@ import org.meshtastic.feature.map.maplibre.layers.CustomLayer
 import org.meshtastic.feature.map.maplibre.layers.CustomLayers
 import org.meshtastic.feature.map.maplibre.layers.MapOverlayLayers
 import org.meshtastic.feature.map.maplibre.layers.NodeLayers
+import org.meshtastic.feature.map.maplibre.layers.NodeLinkLayers
 import org.meshtastic.feature.map.maplibre.layers.RasterBasemapLayer
 import org.meshtastic.feature.map.maplibre.layers.TerrainLayers
 import org.meshtastic.feature.map.maplibre.layers.WaypointLayers
@@ -138,6 +140,13 @@ fun rememberMeshMapState(
      * user's own view is not yanked away from them.
      */
     frameOnNodes: Boolean = true,
+    /**
+     * A node to fly to and draw above every other ("Show on map"). It stays visible whatever the map filters say, and
+     * is drawn on its own, outside the clusters, so several nodes on one spot cannot bury it.
+     */
+    focusNodeNum: Int? = null,
+    /** Radio links between nodes, drawn under the node chips while the "links" filter is on. */
+    links: List<MapLink> = emptyList(),
 ): MapState {
     val nodes by viewModel.nodesWithPosition.collectAsStateWithLifecycle()
     val waypoints by viewModel.waypoints.collectAsStateWithLifecycle()
@@ -146,6 +155,7 @@ fun rememberMeshMapState(
     val displayUnits by viewModel.displayUnits.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
+    val focusedNode = remember(nodes, focusNodeNum) { focusNodeNum?.let { num -> nodes.firstOrNull { it.num == num } } }
     // The style block recomposes on every camera frame (it reads the viewport below); the mesh-wide filter should not.
     // `nowSeconds` is deliberately not a key: a packet arriving already changes the node list.
     val visibleNodes =
@@ -175,12 +185,17 @@ fun rememberMeshMapState(
                 WaypointLayers(waypoints = waypoints.values, onWaypointClick = onWaypointClick)
             }
 
+            if (filterState.showLinks) {
+                NodeLinkLayers(links = links, nodes = nodes)
+            }
+
             MeshMapNodeLayers(
                 visibleNodes = visibleNodes,
                 mapState = state,
                 viewportBounds = viewportBounds,
                 filterState = filterState,
                 myNodeNum = myNodeInfo?.myNodeNum,
+                focusedNode = focusedNode,
                 navigateToNodeDetails = navigateToNodeDetails,
                 onClusterMembers = onClusterMembers,
                 scope = scope,
@@ -196,6 +211,7 @@ fun rememberMeshMapState(
     // `remember` in there is lost whenever the user changes basemap — which would reset FrameOnce's latch and
     // re-frame the mesh over wherever they had panned to.
     FrameOnce(enabled = frameOnNodes, nodes = visibleNodes, mapState = mapState)
+    FlyToFocusedNode(focusNodeNum = focusNodeNum, focusedNode = focusedNode, mapState = mapState)
 
     // Follows position whenever tracking is on; touches bearing only when the caller asks for it, so a user who
     // has rotated the map is not straightened out behind their back.
@@ -311,12 +327,14 @@ private fun MeshMapNodeLayers(
     viewportBounds: BoundingBox?,
     filterState: BaseMapViewModel.MapFilterState,
     myNodeNum: Int?,
+    focusedNode: Node?,
     navigateToNodeDetails: (Int) -> Unit,
     onClusterMembers: (List<ClusterMember>) -> Unit,
     scope: CoroutineScope,
 ) {
     NodeLayers(
         nodes = visibleNodes,
+        focusedNode = focusedNode,
         // Padded so a modest pan keeps the same nodes in view, and the chips are not redrawn for every frame of a
         // drag. Without a viewport at all — the first composition — every node is a candidate, as before.
         visibleBounds = rememberStickyBounds(viewportBounds),
@@ -371,6 +389,32 @@ private fun FrameOnce(enabled: Boolean, nodes: List<Node>, mapState: MapState) {
         mapState.frameBounds(box, padding = fitPadding)
     }
 }
+
+/**
+ * Flies to the node "Show on map" asked for, once per request.
+ *
+ * Waits for the map to report a viewport and for the node to be in the list (a node list still filling in has none
+ * yet). The node is read through a snapshot, so an arriving packet cannot restart the flight half way; once the camera
+ * has moved, the user is free to pan away and nothing pulls them back.
+ */
+@Composable
+private fun FlyToFocusedNode(focusNodeNum: Int?, focusedNode: Node?, mapState: MapState) {
+    if (focusNodeNum == null) return
+
+    val hasViewport = mapState.viewport != null
+    val currentNode by rememberUpdatedState(focusedNode)
+    LaunchedEffect(focusNodeNum, hasViewport) {
+        if (!hasViewport) return@LaunchedEffect
+        val node = snapshotFlow { currentNode }.filterNotNull().first()
+        mapState.animateCamera(
+            CameraUpdate(center = Position(longitude = node.longitude, latitude = node.latitude), zoom = FOCUS_ZOOM),
+            CameraAnimation.Ease.Standard,
+        )
+    }
+}
+
+/** Close enough to tell apart nodes standing on the same site; the basemap's own maximum still caps it. */
+private const val FOCUS_ZOOM = 16.0
 
 /** Keeps the camera on the user while tracking is on. No-op without a location source. */
 @Composable

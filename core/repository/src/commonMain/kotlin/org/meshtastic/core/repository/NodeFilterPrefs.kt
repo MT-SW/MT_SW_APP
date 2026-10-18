@@ -67,4 +67,6 @@ data class MapFilterPrefs(
      * slot.
      */
     val excludedRoles: Set<String> = emptySet(),
+    /** Draw lines between nodes that exchange packets (neighbour reports, traceroutes, direct receptions). */
+    val showLinks: Boolean = true,
 )

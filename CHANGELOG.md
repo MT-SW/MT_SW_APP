@@ -18,6 +18,12 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Mapa — połączenia między węzłami**
+* Nowe linie na mapie między węzłami, które wymieniają pakiety, w kolorze jakości sygnału (SNR). Źródła: raporty sąsiadów (NeighborInfo), traceroute z ostatniej doby i bezpośrednie odbiory podłączonego radia (cieńsze, bledsze). Ta sama para z kilku źródeł jest pokazana raz, według najpewniejszego. Przełącznik „Pokaż połączenia między węzłami” w filtrach mapy, domyślnie włączony. Dane są czytane w tle i odświeżane po 2 s spokoju. Na razie na mapie MapLibre (Android F-Droid i desktop), bez mapy Google.
+
+**Mapa — „Pokaż na mapie” w szczegółach węzła**
+* Nowy przycisk „Pokaż na mapie” pod pozycją węzła: przenosi na główną mapę, przybliża do węzła i rysuje go na wierzchu, ponad innymi węzłami w tym samym miejscu (z obrączką wokół dokładnej pozycji). Węzeł jest widoczny także wtedy, gdy filtry mapy by go ukryły. Działa na mapie MapLibre (Android F-Droid i desktop) oraz na mapie Google.
+
 **Mapa — płynniejsze ładowanie**
 * Węzły na mapie odświeżają się dopiero po chwili spokoju (0,5 s), zamiast przebudowywać warstwy przy każdym odebranym pakiecie; pierwszy widok i zmiana filtrów działają od razu. Przetwarzanie punktów (waypointów) idzie w tle.
 
@@ -285,6 +291,12 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Map — links between nodes**
+* New lines on the map between nodes that exchange packets, coloured by signal quality (SNR). Sources: neighbour reports (NeighborInfo), traceroutes of the last day and the connected radio's direct receptions (thinner, fainter). The same pair known from several sources is drawn once, by the most certain one. A “Show links between nodes” switch in the map filters, on by default. The data is read in the background and refreshed after 2 s of quiet. For now on the MapLibre map (Android F-Droid and desktop), not on the Google map.
+
+**Map — “Show on map” in the node details**
+* A new “Show on map” button under the node's position: opens the main map, zooms to the node and draws it on top of any other nodes on the same spot (with a ring around its exact position). The node is visible even when the map filters would hide it. Works on the MapLibre map (Android F-Droid and desktop) and on the Google map.
 
 **Map — smoother loading**
 * Nodes on the map refresh only after a short quiet moment (0.5 s) instead of rebuilding the layers on every received packet; the first view and filter changes still apply at once. Waypoint processing runs in the background.

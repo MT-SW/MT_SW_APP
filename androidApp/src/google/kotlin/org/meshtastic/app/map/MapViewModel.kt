@@ -146,6 +146,15 @@ class MapViewModel(
     private val _selectedWaypointId = MutableStateFlow(savedStateHandle.get<Int>("waypointId"))
     val selectedWaypointId: StateFlow<Int?> = _selectedWaypointId.asStateFlow()
 
+    private val _focusNodeNum = MutableStateFlow<Int?>(null)
+
+    /** The node "Show on map" asked to centre on and draw above the others; null for a plain visit to the map. */
+    val focusNodeNum: StateFlow<Int?> = _focusNodeNum.asStateFlow()
+
+    fun setFocusNodeNum(nodeNum: Int?) {
+        _focusNodeNum.value = nodeNum
+    }
+
     fun setWaypointId(id: Int?) {
         if (_selectedWaypointId.value != id) {
             _selectedWaypointId.value = id

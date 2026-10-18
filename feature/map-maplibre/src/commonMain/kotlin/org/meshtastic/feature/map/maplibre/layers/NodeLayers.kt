@@ -98,6 +98,8 @@ fun NodeLayers(
     onClusterMembers: (List<ClusterMember>) -> Unit,
     visibleBounds: BoundingBox? = null,
     zoom: Int = 0,
+    /** Drawn last, outside the clusters, so it sits above every other node however many share its spot. */
+    focusedNode: Node? = null,
 ) {
     // What clustering will leave standing on its own. Both the precision circles and the chips are only wanted for
     // these: a node folded into a cluster is not drawn, so decorating it paints something nobody asked about — at
@@ -249,7 +251,33 @@ fun NodeLayers(
         onNodeClick = onNodeClick,
         chipFilter = !feature.has("point_count"),
     )
+
+    focusedNode?.let { FocusedNodeLayer(node = it, myNodeNum = myNodeNum, onNodeClick = onNodeClick) }
 }
+
+/**
+ * The node "Show on map" asked for, drawn on top of everything else.
+ *
+ * Its own source, with no clustering: in the shared source it can fold into a bubble with the nodes beside it, or lose
+ * the draw order to a neighbour on the very same coordinates. A ring around the node's exact spot (the chip's tail
+ * lands there) says which one was asked for.
+ */
+@Composable
+private fun FocusedNodeLayer(node: Node, myNodeNum: Int?, onNodeClick: (Int) -> Unit) {
+    val source = rememberFeatureSource(node, myNodeNum) { nodesToFeatureCollection(listOf(node), myNodeNum) }
+    CircleLayer(
+        id = "node-focus-ring",
+        source = source,
+        color = const(Color.Transparent),
+        radius = const(FOCUS_RING_RADIUS.dp),
+        strokeColor = const(MapColors.Highlight),
+        strokeWidth = const(FOCUS_RING_STROKE.dp),
+    )
+    NodeChipLayer(id = "node-focus-chip", source = source, nodes = listOf(node), onNodeClick = onNodeClick)
+}
+
+private const val FOCUS_RING_RADIUS = 16
+private const val FOCUS_RING_STROKE = 3
 
 /**
  * What decides how a node is drawn: where it is, what it is called, and the flags that change its chip. Everything
