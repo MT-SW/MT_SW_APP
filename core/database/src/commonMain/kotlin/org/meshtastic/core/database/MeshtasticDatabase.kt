@@ -152,8 +152,9 @@ import org.meshtastic.core.database.entity.TracerouteNodePositionEntity
         AutoMigration(from = 61, to = 62),
         AutoMigration(from = 62, to = 63),
         // 63 -> 64 is the manual MIGRATION_63_64 (log index added in place), applied via configureCommon().
+        // 64 -> 65 is the manual MIGRATION_64_65 (three more log indices added in place), applied the same way.
     ],
-    version = 64,
+    version = 65,
     exportSchema = true,
 )
 @androidx.room3.ConstructedBy(MeshtasticDatabaseConstructor::class)
@@ -260,6 +261,31 @@ abstract class MeshtasticDatabase : RoomDatabase() {
             }
 
         /**
+         * Adds three composite indices on `log`, in place (the table is never copied). They serve the health screens'
+         * queries: everything of one port since a time (`port_num, received_date`), everything of one node since a time
+         * (`from_num, received_date`) and the newest report of each node on a port
+         * (`port_num, from_num, received_date`, answered from the index alone). Without them those queries read
+         * and sort a large part of the log table.
+         */
+        internal val MIGRATION_64_65: Migration =
+            object : Migration(64, 65) {
+                override suspend fun migrate(connection: SQLiteConnection) {
+                    connection.execSQL(
+                        "CREATE INDEX IF NOT EXISTS `index_log_port_num_received_date` " +
+                            "ON `log` (`port_num`, `received_date`)",
+                    )
+                    connection.execSQL(
+                        "CREATE INDEX IF NOT EXISTS `index_log_from_num_received_date` " +
+                            "ON `log` (`from_num`, `received_date`)",
+                    )
+                    connection.execSQL(
+                        "CREATE INDEX IF NOT EXISTS `index_log_port_num_from_num_received_date` " +
+                            "ON `log` (`port_num`, `from_num`, `received_date`)",
+                    )
+                }
+            }
+
+        /**
          * Configures a [RoomDatabase.Builder] with standard settings for this project.
          *
          * All platforms force [setSingleConnectionPool]. Without it, Room defaults to a 4-reader pool for named
@@ -275,7 +301,7 @@ abstract class MeshtasticDatabase : RoomDatabase() {
         @OptIn(ExperimentalCoroutinesApi::class)
         fun <T : RoomDatabase> RoomDatabase.Builder<T>.configureCommon(): RoomDatabase.Builder<T> =
             this.fallbackToDestructiveMigration(dropAllTables = false)
-                .addMigrations(MIGRATION_52_53, MIGRATION_63_64)
+                .addMigrations(MIGRATION_52_53, MIGRATION_63_64, MIGRATION_64_65)
                 .setSingleConnectionPool()
                 .setQueryCoroutineContext(
                     // limitedParallelism(1) has the same throughput ceiling as the single-connection pool
