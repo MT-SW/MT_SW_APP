@@ -70,6 +70,8 @@ fun NetworkHealthScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     var showInfo by remember { mutableStateOf(false) }
+    val heroLocked by viewModel.heroLocked.collectAsStateWithLifecycle()
+    val heroLockedNow by rememberUpdatedState(heroLocked)
 
     // Scrolling the list up first folds away the summary card (search, tabs, sorting and list stay), scrolling back
     // down to the top unfolds it again.
@@ -96,8 +98,6 @@ fun NetworkHealthScreen(
                 }
             }
         }
-    val heroLocked by viewModel.heroLocked.collectAsStateWithLifecycle()
-    val heroLockedNow by rememberUpdatedState(heroLocked)
     if (showInfo) {
         NetworkHealthInfoDialog(
             metric = uiState.activeMetric,
