@@ -426,7 +426,7 @@ fun PositionConfigScreenCommon(viewModel: RadioConfigViewModel, onBack: () -> Un
                     wb.gps_en_gpio = pin
                 },
             )
-                .filter { it.metadata.offeredOn(state.isDiyHardware, holdsValue = it.value != 0) }
+                .filter { it.metadata.offeredOn(state.isOemFixedGps, holdsValue = it.value != 0) }
         if (pinRows.isNotEmpty()) {
             fieldItem(cards.removeFirst()) {
                 TitledCard(title = stringResource(Res.string.advanced_device_gps)) {
