@@ -22,7 +22,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Przesunięcie listy palcem w górę najpierw zwija kartę „Kondycja sieci”, zostawiając wyszukiwanie, zakładki, sortowanie i listę węzłów; przesunięcie w dół do samej góry rozwija ją z powrotem. Domyślnie ukrywanie jest zablokowane; przełącznik „Blokuj ukrywanie kondycji sieci przy przesuwaniu listy” jest w oknie informacji („i” u góry). Więcej miejsca na listę, szczególnie przy powiększonym skalowaniu.
 
 **Wygląd — skalowanie aplikacji**
-* Nowe ustawienie „Skalowanie aplikacji” (Ustawienia → Wygląd): rozmiar tekstu i elementów tylko w tej aplikacji, niezależnie od czcionki i rozmiaru ekranu w telefonie (50–200%). Domyślnie „Zgodnie z telefonem” — wygląd się nie zmienia. Pomaga, gdy telefon ma powiększone elementy i ekrany (np. Zdrowie sieci) wyglądają za duże.
+* Nowe ustawienie „Skalowanie aplikacji” (Ustawienia → Wygląd): rozmiar tekstu i elementów tylko w tej aplikacji, niezależnie od czcionki i rozmiaru ekranu w telefonie (50–200%). Działa też w wersji na komputer. Domyślnie „Zgodnie z telefonem” — wygląd się nie zmienia. Pomaga, gdy telefon ma powiększone elementy i ekrany (np. Zdrowie sieci) wyglądają za duże.
 
 **Mapa — połączenia między węzłami**
 * Nowe linie na mapie między węzłami, które wymieniają pakiety, w kolorze jakości sygnału (SNR). Źródła: raporty sąsiadów (NeighborInfo), traceroute z ostatniej doby i bezpośrednie odbiory podłączonego radia (cieńsze, bledsze). Ta sama para z kilku źródeł jest pokazana raz, według najpewniejszego. Przełącznik „Pokaż połączenia między węzłami” w filtrach mapy, domyślnie włączony. Dane są czytane w tle i odświeżane po 2 s spokoju. Na razie na mapie MapLibre (Android F-Droid i desktop), bez mapy Google.
@@ -305,7 +305,7 @@ The entries below describe only what this fork adds on top of the original, from
 * Scrolling the list up first folds away the "Network health" card, leaving search, tabs, sorting and the node list; scrolling back down to the top unfolds it again. Folding is locked by default; the lock switch is in the info window ("i" at the top). More room for the list, especially at larger scales.
 
 **Appearance — app scale**
-* New "App scale" setting (Settings → Appearance): size of text and elements in this app only, independent of the phone's font and display size (50–200%). Default is "Follow the phone", so nothing changes. Helps when the phone has enlarged items and screens (e.g. Network health) look too big.
+* New "App scale" setting (Settings → Appearance): size of text and elements in this app only, independent of the phone's font and display size (50–200%). Also on desktop. Default is "Follow the phone", so nothing changes. Helps when the phone has enlarged items and screens (e.g. Network health) look too big.
 
 **Map — links between nodes**
 * New lines on the map between nodes that exchange packets, coloured by signal quality (SNR). Sources: neighbour reports (NeighborInfo), traceroutes of the last day and the connected radio's direct receptions (thinner, fainter). The same pair known from several sources is drawn once, by the most certain one. A “Show links between nodes” switch in the map filters, on by default. The data is read in the background and refreshed after 2 s of quiet. For now on the MapLibre map (Android F-Droid and desktop), not on the Google map.

@@ -99,6 +99,7 @@ import org.meshtastic.core.resources.desktop_tray_tooltip
 import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.ui.theme.AppTheme
+import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.util.LocalDiscoveryMapProvider
 import org.meshtastic.core.ui.util.LocalEventBranding
 import org.meshtastic.core.ui.util.LocalInlineMapProvider
@@ -516,9 +517,12 @@ private fun ApplicationScope.MeshtasticWindow(
                 LocalTracerouteMapOverlayInsetsProvider provides
                     TracerouteMapOverlayInsets(overlayPadding = PaddingValues(bottom = 48.dp)),
             ) {
-                AppTheme(darkTheme = isDarkTheme) {
-                    DesktopMainScreen(uiViewModel, multiBackstack)
-                    AppUpdateDialog()
+                val uiScale by uiPrefs.uiScale.collectAsState(initial = 0)
+                CompositionLocalProvider(LocalDensity provides rememberScaledDensity(percent = uiScale)) {
+                    AppTheme(darkTheme = isDarkTheme) {
+                        DesktopMainScreen(uiViewModel, multiBackstack)
+                        AppUpdateDialog()
+                    }
                 }
             }
         }

@@ -66,6 +66,7 @@ import org.meshtastic.core.resources.preferences_system_default
 import org.meshtastic.core.resources.pt_BR
 import org.meshtastic.core.resources.supportedLocaleTags
 import org.meshtastic.core.resources.theme
+import org.meshtastic.core.resources.ui_scale
 import org.meshtastic.core.resources.units
 import org.meshtastic.core.resources.wifi_devices
 import org.meshtastic.core.ui.component.FastScrollSidebar
@@ -98,7 +99,9 @@ import org.meshtastic.feature.settings.component.NotificationSection
 import org.meshtastic.feature.settings.component.RadioAdminAppBar
 import org.meshtastic.feature.settings.component.ThemePickerDialog
 import org.meshtastic.feature.settings.component.UnitsOption
+import org.meshtastic.feature.settings.component.UiScalePickerDialog
 import org.meshtastic.feature.settings.component.UnitsPickerDialog
+import org.meshtastic.feature.settings.component.uiScaleLabel
 import org.meshtastic.feature.settings.navigation.ConfigRoute
 import org.meshtastic.feature.settings.navigation.ModuleRoute
 import org.meshtastic.feature.settings.radio.RadioConfigItemList
@@ -138,6 +141,15 @@ fun DesktopSettingsScreen(
 
     var showThemePickerDialog by remember { mutableStateOf(false) }
     var showLanguagePickerDialog by remember { mutableStateOf(false) }
+    var showUiScalePickerDialog by remember { mutableStateOf(false) }
+    val uiScale by settingsViewModel.uiScale.collectAsStateWithLifecycle()
+    if (showUiScalePickerDialog) {
+        UiScalePickerDialog(
+            current = uiScale,
+            onClickScale = { settingsViewModel.setUiScale(it) },
+            onDismiss = { showUiScalePickerDialog = false },
+        )
+    }
     var showUnitsPickerDialog by remember { mutableStateOf(false) }
     val unitsOverride = UnitsOverride.fromValue(settingsViewModel.unitsOverride.collectAsStateWithLifecycle().value)
     if (showUnitsPickerDialog) {
@@ -288,6 +300,15 @@ fun DesktopSettingsScreen(
                             trailingIcon = null,
                         ) {
                             showLanguagePickerDialog = true
+                        }
+
+                        ListItem(
+                            text = stringResource(Res.string.ui_scale),
+                            supportingText = uiScaleLabel(uiScale),
+                            leadingIcon = MeshtasticIcons.FormatPaint,
+                            trailingIcon = null,
+                        ) {
+                            showUiScalePickerDialog = true
                         }
 
                         ListItem(
