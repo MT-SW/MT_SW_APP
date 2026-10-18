@@ -977,6 +977,12 @@
     <string name="intro_mtsw_diag_subtitle">On-demand diagnostics and the Sniffer show what is really going on in the network.</string>
     <string name="intro_mtsw_scale_title">Adjust it to yourself</string>
     <string name="intro_mtsw_scale_subtitle">Set the app scale independently of the phone in Settings, and read about every feature in Help and documentation.</string>
+    <string name="intro_mtsw_planner_title">Mesh Link Planner</string>
+    <string name="intro_mtsw_planner_subtitle">Simulates the range of a radio link between two points, with terrain and link budget, entirely inside the app.</string>
+    <string name="intro_mtsw_messages_title">Messages</string>
+    <string name="intro_mtsw_messages_subtitle">Pictures by link, long messages split into parts and ready-made Quick chat templates.</string>
+    <string name="intro_mtsw_signal_title">Signal quality</string>
+    <string name="intro_mtsw_signal_subtitle">LNA gain correction and a coloured SNR rating, so you see at once which links are good.</string>
     <string name="intro_welcome">Welcome to</string>
     <string name="ip">IP</string>
     <string name="ip_address">IP Address:</string>

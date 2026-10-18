@@ -26,7 +26,7 @@ class IntroViewModel : ViewModel() {
 
     /**
      * Determines the next navigation key based on the current key and the state of permissions. The flow hierarchy is:
-     * Core Connection -> Shared Location -> Notifications -> Done.
+     * Welcome -> MT_SW features -> Core Connection -> Shared Location -> Notifications -> Done.
      *
      * @param bluetoothRequiresLocation true on API < 31, where BLE scanning is gated by ACCESS_FINE_LOCATION rather
      *   than the Android 12 "Nearby devices" permissions. There the Bluetooth screen has *already asked for the
@@ -42,7 +42,8 @@ class IntroViewModel : ViewModel() {
         bluetoothRequiresLocation: Boolean = false,
         bluetoothSupported: Boolean = true,
     ): NavKey? = when (currentKey) {
-        is Welcome -> if (bluetoothSupported) Bluetooth else Location
+        is Welcome -> MtSwFeatures
+        is MtSwFeatures -> if (bluetoothSupported) Bluetooth else Location
         is Bluetooth -> if (bluetoothRequiresLocation) Notifications else Location
         is Location -> Notifications
         is Notifications -> if (allPermissionsGranted) CriticalAlerts else null
