@@ -1072,6 +1072,12 @@
     <string name="intro_mtsw_diag_subtitle">Diagnostyka na żądanie i Sniffer pokazują, co naprawdę dzieje się w sieci.</string>
     <string name="intro_mtsw_scale_title">Dopasuj do siebie</string>
     <string name="intro_mtsw_scale_subtitle">Ustaw skalowanie aplikacji niezależnie od telefonu w Ustawieniach, a opis każdej funkcji znajdziesz w Pomocy i dokumentacji.</string>
+    <string name="intro_mtsw_planner_title">Mesh Link Planer</string>
+    <string name="intro_mtsw_planner_subtitle">Symuluje zasięg łącza radiowego między dwoma punktami, z terenem i bilansem łącza, w całości w aplikacji.</string>
+    <string name="intro_mtsw_messages_title">Wiadomości</string>
+    <string name="intro_mtsw_messages_subtitle">Zdjęcia przez link, długie wiadomości dzielone na części i gotowe szablony Szybkiego czatu.</string>
+    <string name="intro_mtsw_signal_title">Jakość sygnału</string>
+    <string name="intro_mtsw_signal_subtitle">Korekta wzmocnienia LNA i kolorowa ocena SNR, żeby od razu widzieć, które łącza są dobre.</string>
     <string name="intro_welcome">Witaj</string>
     <string name="ip">IP</string>
     <string name="ip_address">Adres IP:</string>

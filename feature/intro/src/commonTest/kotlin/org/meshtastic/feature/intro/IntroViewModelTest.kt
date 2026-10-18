@@ -36,14 +36,20 @@ class IntroViewModelTest {
     }
 
     @Test
-    fun testWelcomeNavigatesNextToBluetooth() {
+    fun testWelcomeNavigatesNextToMtSwFeatures() {
         val next = viewModel.getNextKey(Welcome, allPermissionsGranted = false)
+        assertEquals(MtSwFeatures, next)
+    }
+
+    @Test
+    fun testMtSwFeaturesNavigatesNextToBluetooth() {
+        val next = viewModel.getNextKey(MtSwFeatures, allPermissionsGranted = false)
         assertEquals(Bluetooth, next)
     }
 
     @Test
-    fun testWelcomeSkipsBluetoothOnHardwareWithoutIt() {
-        val next = viewModel.getNextKey(Welcome, allPermissionsGranted = false, bluetoothSupported = false)
+    fun testMtSwFeaturesSkipsBluetoothOnHardwareWithoutIt() {
+        val next = viewModel.getNextKey(MtSwFeatures, allPermissionsGranted = false, bluetoothSupported = false)
         assertEquals(Location, next)
     }
 

@@ -20,6 +20,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -27,13 +31,20 @@ import androidx.compose.ui.unit.dp
 private val MAX_WIDTH = 640.dp
 
 /**
- * Desktop welcome screen shown on the first start: the same welcome content as on Android (what the app does and what
- * this fork adds), without the permission screens, because the desktop needs no Bluetooth, location or notification
+ * Desktop welcome screen shown on the first start: the same two cards as on Android (what the app does, then what this
+ * fork adds), without the permission screens, because the desktop needs no Bluetooth, location or notification
  * onboarding. The content is kept to a readable width on large windows.
  */
 @Composable
 fun DesktopWelcomeScreen(onDone: () -> Unit) {
+    var page by rememberSaveable { mutableIntStateOf(0) }
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-        Box(modifier = Modifier.widthIn(max = MAX_WIDTH).fillMaxSize()) { WelcomeScreen(onGetStarted = onDone) }
+        Box(modifier = Modifier.widthIn(max = MAX_WIDTH).fillMaxSize()) {
+            if (page == 0) {
+                WelcomeScreen(onGetStarted = { page = 1 })
+            } else {
+                MtSwFeaturesScreen(onContinue = onDone)
+            }
+        }
     }
 }
