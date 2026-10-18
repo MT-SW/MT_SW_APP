@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Szczegóły węzła — ikony statystyk pojawiają się szybciej**
+* Przy pierwszym wejściu w szczegóły węzła ikony wejścia w statystyki nie czekają już na wczytanie całej historii (do 5000 wpisów): najpierw pojawiają się z najnowszych ~300 wpisów prawie od razu, a pełna historia dociąga się w tle.
+
 **Dokumentacja „Funkcje MT_SW” uzupełniona**
 * Strona zawiera teraz wszystkie funkcje forka: zdalne zarządzanie, Zdrowie sieci, jakość sygnału i LNA, mapę, Mesh Link Planer, diagnostykę, Sniffer, komunikator, listę węzłów i bazę, ustawienia oraz nową sekcję o panelu debugowania z zakładką „Logi urządzenia”. Strona „Logi debugowania” też opisuje trzecią zakładkę.
 
@@ -308,6 +311,9 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Node details — statistics icons appear faster**
+* On first opening a node's details, the icons that open its statistics no longer wait for the whole history (up to 5000 entries) to load: they first appear from the newest ~300 entries almost at once, and the full history loads in the background.
 
 **“MT_SW features” documentation completed**
 * The page now covers all fork features: remote management, Network health, signal quality and LNA, map, Mesh Link Planner, diagnostics, Sniffer, messaging, node list and database, settings, and a new section about the debug panel with the “Device logs” tab. The “Debug logs” page also describes the third tab.

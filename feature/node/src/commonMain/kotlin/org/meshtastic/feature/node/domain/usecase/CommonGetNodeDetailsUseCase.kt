@@ -21,7 +21,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -89,22 +92,51 @@ constructor(
             nodeRepository.nodeDBbyNum.map { it[nodeId] ?: Node.createFallback(nodeId, "") }.distinctUntilChanged()
 
         // 1. Logs & Metrics Data
+        // Reading and decoding thousands of entries takes a while on a big database, and the icons that open the
+        // statistics wait for it. So each source first answers from its newest few hundred entries (almost at once)
+        // and then from the full history.
         val metricsLogsFlow =
             combine(
-                meshLogRepository.getTelemetryFrom(effectiveNodeId).calmed().onStart { emit(emptyList()) },
-                meshLogRepository.getMeshPacketsFrom(effectiveNodeId).calmed().onStart { emit(emptyList()) },
-                meshLogRepository.getMeshPacketsFrom(effectiveNodeId, PortNum.POSITION_APP.value).calmed().onStart {
-                    emit(emptyList())
-                },
-                meshLogRepository.getLogsFrom(effectiveNodeId, PortNum.PAXCOUNTER_APP.value).calmed().onStart {
-                    emit(emptyList())
-                },
-                meshLogRepository.getLogsFrom(effectiveNodeId, PortNum.TRACEROUTE_APP.value).calmed().onStart {
-                    emit(emptyList())
-                },
-                meshLogRepository.getLogsFrom(effectiveNodeId, PortNum.NEIGHBORINFO_APP.value).calmed().onStart {
-                    emit(emptyList())
-                },
+                quickThenFull(
+                    meshLogRepository.getTelemetryFromLimited(effectiveNodeId, QUICK_LOG_ITEMS),
+                    meshLogRepository.getTelemetryFrom(effectiveNodeId),
+                ),
+                quickThenFull(
+                    meshLogRepository.getMeshPacketsFromLimited(effectiveNodeId, maxItem = QUICK_LOG_ITEMS),
+                    meshLogRepository.getMeshPacketsFrom(effectiveNodeId),
+                ),
+                quickThenFull(
+                    meshLogRepository.getMeshPacketsFromLimited(
+                        effectiveNodeId,
+                        PortNum.POSITION_APP.value,
+                        QUICK_LOG_ITEMS,
+                    ),
+                    meshLogRepository.getMeshPacketsFrom(effectiveNodeId, PortNum.POSITION_APP.value),
+                ),
+                quickThenFull(
+                    meshLogRepository.getLogsFromLimited(
+                        effectiveNodeId,
+                        PortNum.PAXCOUNTER_APP.value,
+                        QUICK_LOG_ITEMS,
+                    ),
+                    meshLogRepository.getLogsFrom(effectiveNodeId, PortNum.PAXCOUNTER_APP.value),
+                ),
+                quickThenFull(
+                    meshLogRepository.getLogsFromLimited(
+                        effectiveNodeId,
+                        PortNum.TRACEROUTE_APP.value,
+                        QUICK_LOG_ITEMS,
+                    ),
+                    meshLogRepository.getLogsFrom(effectiveNodeId, PortNum.TRACEROUTE_APP.value),
+                ),
+                quickThenFull(
+                    meshLogRepository.getLogsFromLimited(
+                        effectiveNodeId,
+                        PortNum.NEIGHBORINFO_APP.value,
+                        QUICK_LOG_ITEMS,
+                    ),
+                    meshLogRepository.getLogsFrom(effectiveNodeId, PortNum.NEIGHBORINFO_APP.value),
+                ),
             ) { args: Array<List<Any?>> ->
                 @Suppress("UNCHECKED_CAST")
                 LogsGroup(
@@ -292,6 +324,13 @@ constructor(
             .flowOn(Dispatchers.Default)
     }
 
+    /** The newest entries answer at once; the full history follows (and keeps updating) behind it. */
+    private fun <T> quickThenFull(quick: Flow<List<T>>, full: Flow<List<T>>): Flow<List<T>> = flow {
+        emit(emptyList())
+        emit(quick.first())
+        emitAll(full.calmed())
+    }
+
     private data class HardwareKey(val hwModel: Int, val target: String?)
 
     private data class LogsGroup(
@@ -314,6 +353,9 @@ constructor(
     )
 
     private companion object {
+        /** How many of the newest entries the quick first look reads. */
+        const val QUICK_LOG_ITEMS = 300
+
         const val NODE_INDEX = 0
         const val LOGS_INDEX = 1
         const val IDENTITY_INDEX = 2

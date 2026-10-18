@@ -78,6 +78,10 @@ interface MeshLogRepository {
     /** Retrieves all [MeshLog]s associated with a specific [nodeNum] and [portNum]. */
     fun getLogsFrom(nodeNum: Int, portNum: Int): Flow<List<MeshLog>>
 
+    /** Like [getLogsFrom], but reads only the newest [maxItem] entries -- a quick first look at a large history. */
+    fun getLogsFromLimited(nodeNum: Int, portNum: Int, maxItem: Int): Flow<List<MeshLog>> =
+        getLogsFrom(nodeNum, portNum)
+
     /**
      * The single most recent [MeshLog] per distinct sender, across every port — used for live per-node reads (e.g.
      * relay) without a persisted column.
@@ -89,6 +93,13 @@ interface MeshLogRepository {
 
     /** Retrieves telemetry history for a specific node, automatically handling local node redirection. */
     fun getTelemetryFrom(nodeNum: Int): Flow<List<Telemetry>>
+
+    /** Like [getTelemetryFrom], but reads only the newest [maxItem] entries. */
+    fun getTelemetryFromLimited(nodeNum: Int, maxItem: Int): Flow<List<Telemetry>> = getTelemetryFrom(nodeNum)
+
+    /** Like [getMeshPacketsFrom], but reads only the newest [maxItem] entries. */
+    fun getMeshPacketsFromLimited(nodeNum: Int, portNum: Int = -1, maxItem: Int): Flow<List<MeshPacket>> =
+        getMeshPacketsFrom(nodeNum, portNum)
 
     /**
      * Retrieves all outgoing request logs for a specific [targetNodeNum] and [portNum].
