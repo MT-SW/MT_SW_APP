@@ -19,6 +19,8 @@ package org.meshtastic.feature.intro
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -38,12 +40,14 @@ private val MAX_WIDTH = 640.dp
 @Composable
 fun DesktopWelcomeScreen(onDone: () -> Unit) {
     var page by rememberSaveable { mutableIntStateOf(0) }
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-        Box(modifier = Modifier.widthIn(max = MAX_WIDTH).fillMaxSize()) {
-            if (page == 0) {
-                WelcomeScreen(onGetStarted = { page = 1 })
-            } else {
-                MtSwFeaturesScreen(onContinue = onDone)
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+            Box(modifier = Modifier.widthIn(max = MAX_WIDTH).fillMaxSize()) {
+                if (page == 0) {
+                    WelcomeScreen(onGetStarted = { page = 1 })
+                } else {
+                    MtSwFeaturesScreen(onContinue = onDone)
+                }
             }
         }
     }
