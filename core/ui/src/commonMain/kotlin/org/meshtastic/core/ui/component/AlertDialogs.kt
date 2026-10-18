@@ -16,23 +16,33 @@
  */
 package org.meshtastic.core.ui.component
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.font.FontStyle
@@ -68,6 +78,7 @@ import org.meshtastic.core.ui.util.annotatedStringFromHtml
  * @param choices If provided, displays a list of buttons instead of the standard confirm/dismiss actions.
  * @param dismissable Whether the dialog can be dismissed by clicking outside or pressing back.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Suppress("LongMethod", "CyclomaticComplexMethod")
 fun MeshtasticDialog(
@@ -110,69 +121,95 @@ fun MeshtasticDialog(
             )
         }
 
-    AlertDialog(
-        onDismissRequest = { if (dismissable) onDismiss?.invoke() },
-        modifier = modifier,
-        icon = { icon?.let { Icon(it, contentDescription = null) } },
-        dismissButton = {
-            if (choices.isEmpty() && onDismiss != null) {
-                TextButton(
-                    onClick = onDismiss,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
-                ) {
-                    Text(text = dismissButtonText ?: stringResource(Res.string.cancel))
-                }
-            }
-        },
-        confirmButton = {
-            if (choices.isEmpty() && onConfirm != null) {
-                TextButton(
-                    onClick = onConfirm,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
-                ) {
-                    Text(text = confirmButtonText ?: stringResource(Res.string.okay))
-                }
-            }
-        },
-        title = {
-            Text(
-                text = titleText,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.headlineSmallEmphasized,
-            )
-        },
-        text = {
-            Column(modifier = if (choices.isNotEmpty()) Modifier.verticalScroll(rememberScrollState()) else Modifier) {
-                if (text != null) {
-                    text()
-                } else if (htmlAnnotated != null) {
-                    Text(text = htmlAnnotated)
-                } else if (messageText != null) {
-                    Text(text = messageText, color = messageColor)
-                }
+    // A dialog opens in its own window whose composition resets LocalDensity to the system value, which would
+    // ignore the in-app scale setting. The density is captured here and provided again inside the dialog.
+    val appDensity = LocalDensity.current
+    val scrollState = rememberScrollState()
+    val bodyScroll = if (choices.isNotEmpty()) Modifier.verticalScroll(scrollState) else Modifier
 
-                if (choices.isNotEmpty()) {
-                    Column(modifier = Modifier.padding(top = 16.dp)) {
-                        choices.forEach { (choice, action) ->
-                            Button(
-                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                                onClick = {
-                                    action()
-                                    onDismiss?.invoke()
-                                },
-                            ) {
-                                Text(text = choice)
+    BasicAlertDialog(onDismissRequest = { if (dismissable) onDismiss?.invoke() }, modifier = modifier) {
+        CompositionLocalProvider(LocalDensity provides appDensity) {
+            Surface(
+                modifier = Modifier.widthIn(min = 280.dp, max = 560.dp),
+                shape = RoundedCornerShape(28.dp),
+                color = AlertDialogDefaults.containerColor,
+                tonalElevation = AlertDialogDefaults.TonalElevation,
+            ) {
+                Column(modifier = Modifier.padding(24.dp)) {
+                    if (icon != null) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 16.dp),
+                        )
+                    }
+                    Text(
+                        text = titleText,
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.headlineSmallEmphasized,
+                    )
+                    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                        Column(
+                            modifier =
+                            Modifier.weight(1f, fill = false).then(bodyScroll),
+                        ) {
+                            if (text != null) {
+                                text()
+                            } else if (htmlAnnotated != null) {
+                                Text(text = htmlAnnotated)
+                            } else if (messageText != null) {
+                                Text(text = messageText, color = messageColor)
+                            }
+
+                            if (choices.isNotEmpty()) {
+                                Column(modifier = Modifier.padding(top = 16.dp)) {
+                                    choices.forEach { (choice, action) ->
+                                        Button(
+                                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                            onClick = {
+                                                action()
+                                                onDismiss?.invoke()
+                                            },
+                                        ) {
+                                            Text(text = choice)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (choices.isEmpty() && (onDismiss != null || onConfirm != null)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+                            horizontalArrangement = Arrangement.End,
+                        ) {
+                            if (onDismiss != null) {
+                                TextButton(
+                                    onClick = onDismiss,
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    colors =
+                                    ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
+                                ) {
+                                    Text(text = dismissButtonText ?: stringResource(Res.string.cancel))
+                                }
+                            }
+                            if (onConfirm != null) {
+                                TextButton(
+                                    onClick = onConfirm,
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    colors =
+                                    ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
+                                ) {
+                                    Text(text = confirmButtonText ?: stringResource(Res.string.okay))
+                                }
                             }
                         }
                     }
                 }
             }
-        },
-        shape = RoundedCornerShape(28.dp),
-    )
+        }
+    }
 }
 
 /** A simplified [MeshtasticDialog] using only string resources. */
