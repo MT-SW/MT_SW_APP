@@ -16,6 +16,8 @@
  */
 package org.meshtastic.feature.node.health
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -40,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -52,6 +55,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.ui.component.FastScrollSidebar
@@ -60,6 +64,9 @@ import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.util.isDesktopPlatform
+
+private const val FOLD_MILLIS = 250
+private const val FOLD_DRAG_SLOP_PX = 1f
 
 @Suppress("LongMethod")
 @Composable
@@ -76,28 +83,44 @@ fun NetworkHealthScreen(
     val heroLocked by viewModel.heroLocked.collectAsStateWithLifecycle()
     val heroLockedNow by rememberUpdatedState(heroLocked)
 
-    // Scrolling the list up first folds away the summary card (search, tabs, sorting and list stay), scrolling back
-    // down to the top unfolds it again.
+    // One swipe up folds the whole summary card away (search, tabs, sorting and list stay); one swipe down at the top of
+    // the list unfolds it. The card animates fully open or fully closed, it never stops half way.
     var heroHeightPx by remember { mutableFloatStateOf(0f) }
     var heroFoldedPx by remember { mutableFloatStateOf(0f) }
-    LaunchedEffect(heroLocked) { if (heroLocked) heroFoldedPx = 0f }
+    var foldTargetPx by remember { mutableFloatStateOf(0f) }
+    val foldAnim = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
+    val foldTo: (Boolean) -> Unit = { folded ->
+        val target = if (folded) heroHeightPx else 0f
+        if (foldTargetPx != target) {
+            foldTargetPx = target
+            scope.launch {
+                foldAnim.snapTo(heroFoldedPx)
+                foldAnim.animateTo(target, tween(FOLD_MILLIS)) { heroFoldedPx = value }
+            }
+        }
+    }
+    val foldToNow by rememberUpdatedState(foldTo)
+    LaunchedEffect(heroLocked) {
+        if (heroLocked) {
+            foldTargetPx = 0f
+            heroFoldedPx = 0f
+            foldAnim.snapTo(0f)
+        }
+    }
     val foldConnection =
         remember {
             object : NestedScrollConnection {
                 override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                     if (heroLockedNow || available.y >= 0f || heroFoldedPx >= heroHeightPx) return Offset.Zero
-                    val folded = (heroFoldedPx - available.y).coerceAtMost(heroHeightPx)
-                    val used = folded - heroFoldedPx
-                    heroFoldedPx = folded
-                    return Offset(0f, -used)
+                    foldToNow(true)
+                    return Offset(0f, available.y)
                 }
 
                 override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
                     if (heroLockedNow || available.y <= 0f || heroFoldedPx <= 0f) return Offset.Zero
-                    val folded = (heroFoldedPx - available.y).coerceAtLeast(0f)
-                    val used = heroFoldedPx - folded
-                    heroFoldedPx = folded
-                    return Offset(0f, used)
+                    foldToNow(false)
+                    return Offset(0f, available.y)
                 }
             }
         }
@@ -107,7 +130,9 @@ fun NetworkHealthScreen(
             orientation = Orientation.Vertical,
             state =
             rememberDraggableState { delta ->
-                if (!heroLockedNow) heroFoldedPx = (heroFoldedPx - delta).coerceIn(0f, heroHeightPx)
+                if (!heroLockedNow) {
+                    if (delta < -FOLD_DRAG_SLOP_PX) foldToNow(true) else if (delta > FOLD_DRAG_SLOP_PX) foldToNow(false)
+                }
             },
         )
     if (showInfo) {
