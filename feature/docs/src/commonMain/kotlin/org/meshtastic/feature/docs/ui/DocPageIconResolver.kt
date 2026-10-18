@@ -30,6 +30,7 @@ import org.meshtastic.core.ui.icon.Edit
 import org.meshtastic.core.ui.icon.ForkLeft
 import org.meshtastic.core.ui.icon.Group
 import org.meshtastic.core.ui.icon.Language
+import org.meshtastic.core.ui.icon.MeshHub
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Message
 import org.meshtastic.core.ui.icon.Nodes
@@ -92,6 +93,8 @@ internal fun DocPage.resolveIcon(): ImageVector = when (iconId) {
     "help" -> MeshtasticIcons.Notes
 
     "debug-logs" -> MeshtasticIcons.BugReport
+
+    "mt-sw" -> MeshtasticIcons.MeshHub
 
     // Developer Guide
     "architecture" -> MeshtasticIcons.ForkLeft

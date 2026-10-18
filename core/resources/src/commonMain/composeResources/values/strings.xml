@@ -326,7 +326,7 @@
     <string name="config_lora_coding_rate_override_summary">Adds error correction on top of the preset. A higher coding rate makes every packet longer on air and uses more of the duty cycle and channel utilization budget.</string>
     <string name="config_lora_coding_rate_preset_default">Preset default (%1$s)</string>
     <string name="config_lora_frequency_offset">Frequency offset (kHz)</string>
-    <string name="config_lora_frequency_offset_summary">Shifts the operating frequency by this many kHz, for example to correct a radio\'s crystal error. 0 means no offset.</string>
+    <string name="config_lora_frequency_offset_summary">Shifts the operating frequency by this many kHz, for example to correct a radio&#39;s crystal error. 0 means no offset.</string>
     <string name="config_lora_modem_preset_licensed_summary">This region's presets are for licensed (amateur radio) operators only. Enable Licensed amateur radio (Ham) in User Config to select them.</string>
     <string name="config_lora_modem_preset_summary">Available modem presets. The default preset for MT_SW_FIRMWARE is Narrow Fast.</string>
     <string name="config_lora_region_summary">The region where you will be using your radios.</string>
@@ -589,6 +589,7 @@
     <string name="doc_keywords_telemetry">telemetry,sensor,temperature,humidity,pressure,power</string>
     <string name="doc_keywords_translate">translate,crowdin,localization,language,i18n,contribute</string>
     <string name="doc_keywords_units">units,locale,metric,imperial,temperature,distance</string>
+    <string name="doc_keywords_mt_sw">mt_sw,fork,features,network health,planner,map links,sniffer,ondemand,app scale,gpio,remote control,favourites,ignore</string>
     <string name="doc_keywords_widget">widget,home screen,local stats,glance,battery,utilization</string>
     <string name="doc_loading">Loading documentation…</string>
     <string name="doc_no_content">No content available.</string>
@@ -632,6 +633,7 @@
     <string name="doc_title_telemetry">Telemetry &amp; Sensors</string>
     <string name="doc_title_translate">Translate the App</string>
     <string name="doc_title_units">Units &amp; Locale</string>
+    <string name="doc_title_mt_sw">MT_SW features</string>
     <string name="doc_title_widget">Home Screen Widget</string>
     <string name="documentation">Documentation</string>
     <string name="done">Done</string>
@@ -964,6 +966,17 @@
     <string name="interval_always_on">Always On</string>
     <string name="interval_unset">Unset</string>
     <string name="intro_show">Show Introduction</string>
+    <string name="intro_mtsw_remote_title">Remote control</string>
+    <string name="intro_mtsw_remote_subtitle">Control other nodes over the mesh: switch GPIO pins on and off, add new devices to a node&#39;s database, and set favourites or ignore nodes remotely.</string>
+    <string name="intro_mtsw_header">What MT_SW adds</string>
+    <string name="intro_mtsw_health_title">Network health</string>
+    <string name="intro_mtsw_health_subtitle">See at a glance how every node is doing: power, signal, airtime and more, in colours.</string>
+    <string name="intro_mtsw_map_title">A smarter map</string>
+    <string name="intro_mtsw_map_subtitle">Links between nodes, Show on map in node details and the Mesh Link Planner to simulate range.</string>
+    <string name="intro_mtsw_diag_title">Diagnostics</string>
+    <string name="intro_mtsw_diag_subtitle">On-demand diagnostics and the Sniffer show what is really going on in the network.</string>
+    <string name="intro_mtsw_scale_title">Adjust it to yourself</string>
+    <string name="intro_mtsw_scale_subtitle">Set the app scale independently of the phone in Settings, and read about every feature in Help and documentation.</string>
     <string name="intro_welcome">Welcome to</string>
     <string name="ip">IP</string>
     <string name="ip_address">IP Address:</string>
@@ -1367,11 +1380,11 @@
     <string name="mqtt_probe_tls_failure">TLS handshake failed: %1$s</string>
     <string name="mqtt_proxy_local">MQTT proxy in this app</string>
     <string name="mqtt_proxy_local_summary">This app relays MQTT traffic for the connected device. Turn off to cut the relay immediately without changing the device's MQTT setting, which helps when MQTT traffic is overwhelming the connection. Turn back on to resume relaying.</string>
-    <string name="mqtt_sniffer_enabled_summary">Watch mesh traffic seen on the broker this node is configured to use, using this phone\'s own MQTT connection -- not limited to what the connected node overhears over LoRa.</string>
+    <string name="mqtt_sniffer_enabled_summary">Watch mesh traffic seen on the broker this node is configured to use, using this phone&#39;s own MQTT connection -- not limited to what the connected node overhears over LoRa.</string>
     <string name="mqtt_sniffer_enabled_title">MQTT Sniffer</string>
     <string name="mqtt_sniffer_log_empty">No MQTT packets yet -- turn on MQTT Sniffer above to start watching broker traffic</string>
     <string name="mqtt_sniffer_log_title">MQTT Sniffer Log</string>
-    <string name="mqtt_sniffer_warning_message">This opens its own connection to the configured MQTT broker. This app\'s MQTT client allows only one active connection at a time, so if "MQTT proxy on this phone" is currently relaying traffic for the connected node, enabling this will interrupt it for as long as the sniffer stays on.</string>
+    <string name="mqtt_sniffer_warning_message">This opens its own connection to the configured MQTT broker. This app&#39;s MQTT client allows only one active connection at a time, so if "MQTT proxy on this phone" is currently relaying traffic for the connected node, enabling this will interrupt it for as long as the sniffer stays on.</string>
     <string name="mqtt_sniffer_warning_title">Enable MQTT Sniffer?</string>
     <string name="mqtt_status_connected">Connected</string>
     <string name="mqtt_status_connecting">Connecting…</string>
@@ -1711,7 +1724,7 @@
     <string name="port_desc_detection_sensor">detection sensor module</string>
     <string name="port_desc_map_report">node data for the public map (MQTT)</string>
     <string name="port_desc_mesh_beacon">invitations broadcast to another mesh</string>
-    <string name="port_desc_neighborinfo">node\'s neighbor list</string>
+    <string name="port_desc_neighborinfo">node&#39;s neighbor list</string>
     <string name="port_desc_node_status">custom node status text</string>
     <string name="port_desc_nodeinfo">node user info (name, key)</string>
     <string name="port_desc_on_demand">on-demand diagnostics (this protocol)</string>
@@ -1727,7 +1740,7 @@
     <string name="port_desc_telemetry">telemetry (battery, environment, resources)</string>
     <string name="port_desc_text_message">chat text messages</string>
     <string name="port_desc_text_message_compressed">compressed chat text messages</string>
-    <string name="port_desc_traceroute">traces a packet\'s route through the mesh</string>
+    <string name="port_desc_traceroute">traces a packet&#39;s route through the mesh</string>
     <string name="port_desc_unknown">other packet type</string>
     <string name="port_desc_waypoint">map waypoints</string>
     <string name="port_desc_zps">experimental GPS-free positioning</string>
@@ -2017,7 +2030,7 @@
     <string name="security_local_node">This device</string>
     <string name="security_local_node_help">This is the radio your phone is currently connected to.</string>
     <string name="security_node_info_pending">Awaiting node info</string>
-    <string name="security_node_info_pending_help">This node hasn\'t sent its info yet, so it\'s not yet known whether it has a public key.</string>
+    <string name="security_node_info_pending_help">This node hasn&#39;t sent its info yet, so it&#39;s not yet known whether it has a public key.</string>
     <string name="security_signed_message_info">Verified with the sender's key.</string>
     <string name="security_signed_node">Signed node</string>
     <string name="security_signed_node_desc">Verified automatically</string>
@@ -2106,7 +2119,7 @@
     <string name="sniffer_chip_source_count">%1$s ×%2$d</string>
     <string name="sniffer_clear_log">Clear displayed logs</string>
     <string name="sniffer_content_title">CONTENT</string>
-    <string name="sniffer_decrypt_payloads_summary">Try to decode encrypted payloads using this app\'s known channel keys</string>
+    <string name="sniffer_decrypt_payloads_summary">Try to decode encrypted payloads using this app&#39;s known channel keys</string>
     <string name="sniffer_decrypt_payloads_title">Attempt decryption</string>
     <string name="sniffer_dismiss_loaded_file">Return to live view</string>
     <string name="sniffer_enable_failed">Couldn't enable the sniffer — the device didn't respond (it may not support this feature)</string>
@@ -2119,11 +2132,11 @@
     <string name="sniffer_gear_menu">Sniffer settings</string>
     <string name="sniffer_group_by_gateway_summary">Combine the same packet seen more than once (multiple MQTT gateways, or relayed through different nodes) into one row</string>
     <string name="sniffer_group_by_gateway_title">Group duplicates</string>
-    <string name="sniffer_hide_ondemand_ch0_summary">On-demand diagnostics (port 354) traffic on the primary channel is the app\'s own diagnostic/control chatter with the connected node, not mesh traffic</string>
+    <string name="sniffer_hide_ondemand_ch0_summary">On-demand diagnostics (port 354) traffic on the primary channel is the app&#39;s own diagnostic/control chatter with the connected node, not mesh traffic</string>
     <string name="sniffer_hide_own_frames_title">Hide frames from my own node</string>
     <string name="sniffer_hide_own_frames_summary">The directly connected node reports its own traffic constantly, which can flood the list</string>
     <string name="sniffer_hide_ondemand_ch0_title">Hide on-demand diagnostics on channel 0</string>
-    <string name="sniffer_load_failed">Couldn\'t read that file as a sniffer log</string>
+    <string name="sniffer_load_failed">Couldn&#39;t read that file as a sniffer log</string>
     <string name="sniffer_load_log_summary">View a previously exported JSON log</string>
     <string name="sniffer_load_log_title">Load saved log…</string>
     <string name="sniffer_log_empty">No sniffed packets yet — packets not addressed to this node will appear here once heard</string>
@@ -2231,7 +2244,7 @@
     <string name="theme">Theme</string>
     <string name="ui_scale">App scale</string>
     <string name="ui_scale_follow_system">Follow the phone</string>
-    <string name="ui_scale_summary">Size of text and elements in this app only, independent of the phone\'s font and display size.</string>
+    <string name="ui_scale_summary">Size of text and elements in this app only, independent of the phone&#39;s font and display size.</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_light">Light</string>
     <string name="theme_system">System default</string>

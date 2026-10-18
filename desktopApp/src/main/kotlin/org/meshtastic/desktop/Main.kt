@@ -125,6 +125,7 @@ import org.meshtastic.desktop.tray.TrayMenuItem
 import org.meshtastic.desktop.tray.canHideToTray
 import org.meshtastic.desktop.ui.DesktopMainScreen
 import org.meshtastic.desktop.worker.DesktopNodeCleanupScheduler
+import org.meshtastic.feature.intro.DesktopWelcomeScreen
 import org.meshtastic.feature.map.MapScreen
 import org.meshtastic.feature.map.SharedMapViewModel
 import org.meshtastic.feature.map.maplibre.MapLibreDiscoveryMap
@@ -520,8 +521,14 @@ private fun ApplicationScope.MeshtasticWindow(
                 val uiScale by uiViewModel.uiScale.collectAsState()
                 CompositionLocalProvider(LocalDensity provides rememberScaledDensity(percent = uiScale)) {
                     AppTheme(darkTheme = isDarkTheme) {
-                        DesktopMainScreen(uiViewModel, multiBackstack)
-                        AppUpdateDialog()
+                        // First start: show the welcome screen once, then the app.
+                        val introCompleted by uiViewModel.appIntroCompleted.collectAsState()
+                        if (introCompleted) {
+                            DesktopMainScreen(uiViewModel, multiBackstack)
+                            AppUpdateDialog()
+                        } else {
+                            DesktopWelcomeScreen(onDone = { uiViewModel.onAppIntroCompleted() })
+                        }
                     }
                 }
             }

@@ -40,15 +40,31 @@ import org.meshtastic.core.resources.communicate_off_the_grid
 import org.meshtastic.core.resources.create_your_own_networks
 import org.meshtastic.core.resources.easily_set_up_private_mesh_networks
 import org.meshtastic.core.resources.get_started
+import org.meshtastic.core.resources.intro_mtsw_diag_subtitle
+import org.meshtastic.core.resources.intro_mtsw_diag_title
+import org.meshtastic.core.resources.intro_mtsw_header
+import org.meshtastic.core.resources.intro_mtsw_health_subtitle
+import org.meshtastic.core.resources.intro_mtsw_health_title
+import org.meshtastic.core.resources.intro_mtsw_map_subtitle
+import org.meshtastic.core.resources.intro_mtsw_map_title
+import org.meshtastic.core.resources.intro_mtsw_remote_subtitle
+import org.meshtastic.core.resources.intro_mtsw_remote_title
+import org.meshtastic.core.resources.intro_mtsw_scale_subtitle
+import org.meshtastic.core.resources.intro_mtsw_scale_title
 import org.meshtastic.core.resources.intro_welcome
 import org.meshtastic.core.resources.meshtastic
 import org.meshtastic.core.resources.share_your_location_in_real_time
 import org.meshtastic.core.resources.stay_connected_anywhere
 import org.meshtastic.core.resources.track_and_share_locations
 import org.meshtastic.core.ui.icon.Antenna
+import org.meshtastic.core.ui.icon.BugReport
+import org.meshtastic.core.ui.icon.Chart
+import org.meshtastic.core.ui.icon.Device
 import org.meshtastic.core.ui.icon.MeshHub
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.NearMe
+import org.meshtastic.core.ui.icon.PinDrop
+import org.meshtastic.core.ui.icon.Settings
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.util.LocalAnalyticsIntroProvider
 
@@ -57,6 +73,7 @@ import org.meshtastic.core.ui.util.LocalAnalyticsIntroProvider
  *
  * @param onGetStarted Callback invoked when the user proceeds from the welcome screen.
  */
+@Suppress("LongMethod")
 @Composable
 internal fun WelcomeScreen(onGetStarted: () -> Unit) {
     val analyticsIntro = LocalAnalyticsIntroProvider.current
@@ -76,6 +93,35 @@ internal fun WelcomeScreen(onGetStarted: () -> Unit) {
                 icon = MeshtasticIcons.NearMe,
                 titleRes = Res.string.track_and_share_locations,
                 subtitleRes = Res.string.share_your_location_in_real_time,
+            ),
+        )
+    // What this app adds on top of the original Meshtastic app.
+    val mtSwFeatures =
+        listOf(
+            FeatureUIData(
+                icon = MeshtasticIcons.Device,
+                titleRes = Res.string.intro_mtsw_remote_title,
+                subtitleRes = Res.string.intro_mtsw_remote_subtitle,
+            ),
+            FeatureUIData(
+                icon = MeshtasticIcons.Chart,
+                titleRes = Res.string.intro_mtsw_health_title,
+                subtitleRes = Res.string.intro_mtsw_health_subtitle,
+            ),
+            FeatureUIData(
+                icon = MeshtasticIcons.PinDrop,
+                titleRes = Res.string.intro_mtsw_map_title,
+                subtitleRes = Res.string.intro_mtsw_map_subtitle,
+            ),
+            FeatureUIData(
+                icon = MeshtasticIcons.BugReport,
+                titleRes = Res.string.intro_mtsw_diag_title,
+                subtitleRes = Res.string.intro_mtsw_diag_subtitle,
+            ),
+            FeatureUIData(
+                icon = MeshtasticIcons.Settings,
+                titleRes = Res.string.intro_mtsw_scale_title,
+                subtitleRes = Res.string.intro_mtsw_scale_subtitle,
             ),
         )
 
@@ -107,6 +153,18 @@ internal fun WelcomeScreen(onGetStarted: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(32.dp))
             features.forEach { feature ->
+                FeatureRow(feature = feature)
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(Res.string.intro_mtsw_header),
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            mtSwFeatures.forEach { feature ->
                 FeatureRow(feature = feature)
                 Spacer(modifier = Modifier.height(16.dp))
             }
