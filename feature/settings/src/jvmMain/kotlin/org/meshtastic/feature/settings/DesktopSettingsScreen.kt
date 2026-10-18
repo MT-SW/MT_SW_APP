@@ -60,6 +60,7 @@ import org.meshtastic.core.resources.fr_HT
 import org.meshtastic.core.resources.help_and_documentation
 import org.meshtastic.core.resources.import_configuration
 import org.meshtastic.core.resources.info
+import org.meshtastic.core.resources.intro_show
 import org.meshtastic.core.resources.node_layout_section_title
 import org.meshtastic.core.resources.preferences_language
 import org.meshtastic.core.resources.preferences_system_default
@@ -85,6 +86,7 @@ import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PermScanWifi
+import org.meshtastic.core.ui.icon.WavingHand
 import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.core.ui.util.rememberOpenFileLauncher
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
@@ -404,6 +406,7 @@ fun DesktopSettingsScreen(
                         appVersionName = settingsViewModel.appVersionName,
                         hiddenFeaturesUnlocked = hiddenFeaturesUnlocked,
                         onUnlockHiddenFeatures = { settingsViewModel.unlockHiddenFeatures() },
+                        onShowAppIntro = { settingsViewModel.showAppIntro() },
                         onNavigateToAbout = { onNavigate(SettingsRoute.About) },
                         onPlayChirpyHop = { onNavigate(FirmwareRoute.ChirpyHop) },
                     )
@@ -423,10 +426,19 @@ private fun DesktopAppInfoSection(
     appVersionName: String,
     hiddenFeaturesUnlocked: Boolean,
     onUnlockHiddenFeatures: () -> Unit,
+    onShowAppIntro: () -> Unit,
     onNavigateToAbout: () -> Unit,
     onPlayChirpyHop: () -> Unit,
 ) {
     ExpressiveSection(title = stringResource(Res.string.info)) {
+        ListItem(
+            text = stringResource(Res.string.intro_show),
+            leadingIcon = MeshtasticIcons.WavingHand,
+            trailingIcon = null,
+        ) {
+            onShowAppIntro()
+        }
+
         ListItem(
             text = stringResource(Res.string.about),
             leadingIcon = MeshtasticIcons.Info,

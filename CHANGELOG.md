@@ -20,7 +20,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 **Ekran powitalny i dokumentacja o funkcjach MT_SW**
 * Ekran powitalny przy pierwszym uruchomieniu pokazuje teraz także funkcje tego forka (zdalne sterowanie GPIO, zdalne dodawanie urządzeń do bazy, ulubione i ignorowanie, Zdrowie sieci, mapa z połączeniami i planerem, diagnostyka i Sniffer, skalowanie aplikacji).
-* Wersja na komputer też ma ekran powitalny przy pierwszym uruchomieniu (bez ekranów uprawnień); pokazuje się raz.
+* Wersja na komputer też ma ekran powitalny przy pierwszym uruchomieniu (bez ekranów uprawnień); pokazuje się raz, a w Ustawienia → Informacja jest pozycja „Wprowadzenie”, która pokazuje go ponownie.
 * Nowa strona „Funkcje MT_SW” w Pomocy i dokumentacji, po polsku i po angielsku.
 
 **Zdrowie sieci — chowająca się karta podsumowania**
@@ -308,7 +308,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 **Welcome screen and documentation about MT_SW features**
 * The welcome screen on first launch now also shows this fork's features (remote GPIO control, adding devices to a node's database remotely, favourites and ignore, Network health, the map with links and the planner, diagnostics and Sniffer, app scale).
-* The desktop version also has a welcome screen on first launch (without the permission screens); it is shown once.
+* The desktop version also has a welcome screen on first launch (without the permission screens); it is shown once, and Settings → Info has a "Show Introduction" item that shows it again.
 * New "MT_SW features" page in Help and documentation, in Polish and English.
 
 **Network health — collapsing summary card**
