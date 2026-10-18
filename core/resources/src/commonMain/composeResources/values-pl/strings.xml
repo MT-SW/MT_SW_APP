@@ -673,6 +673,7 @@
     <string name="doc_keywords_telemetry">telemetria,czujnik,temperatura,wilgotność,ciśnienie,zasilanie</string>
     <string name="doc_keywords_translate">tłumaczenie,crowdin,lokalizacja,język,i18n,współtworzenie</string>
     <string name="doc_keywords_units">jednostki,lokalizacja,metryczne,imperialne,temperatura,odległość</string>
+    <string name="doc_keywords_mt_sw">mt_sw,fork,funkcje,zdrowie sieci,planer,połączenia,sniffer,diagnostyka,skalowanie,gpio,zdalne sterowanie,ulubione,ignorowanie</string>
     <string name="doc_keywords_widget">widget,ekran główny,statystyki lokalne,podgląd,bateria,wykorzystanie</string>
     <string name="doc_loading">Ładowanie dokumentacji…</string>
     <string name="doc_no_content">Brak dostępnej treści.</string>
@@ -716,6 +717,7 @@
     <string name="doc_title_telemetry">Telemetria i czujniki</string>
     <string name="doc_title_translate">Przetłumacz aplikację</string>
     <string name="doc_title_units">Jednostki i lokalizacja</string>
+    <string name="doc_title_mt_sw">Funkcje MT_SW</string>
     <string name="doc_title_widget">Widżet ekranu głównego</string>
     <string name="documentation">Dokumentacja</string>
     <string name="done">Wykonano</string>
@@ -1059,6 +1061,17 @@
     <string name="interval_always_on">Zawsze włączone</string>
     <string name="interval_unset">Nieustawiony</string>
     <string name="intro_show">Wprowadzenie</string>
+    <string name="intro_mtsw_remote_title">Zdalne sterowanie</string>
+    <string name="intro_mtsw_remote_subtitle">Steruj innymi węzłami przez sieć mesh: włączaj i wyłączaj piny GPIO, dodawaj nowe urządzenia do bazy węzła oraz zdalnie ustawiaj ulubione lub ignoruj węzły.</string>
+    <string name="intro_mtsw_header">Co dodaje MT_SW</string>
+    <string name="intro_mtsw_health_title">Zdrowie sieci</string>
+    <string name="intro_mtsw_health_subtitle">Zobacz na jednym ekranie, jak się mają wszystkie węzły: zasilanie, sygnał, eter i więcej, w kolorach.</string>
+    <string name="intro_mtsw_map_title">Mapa z połączeniami</string>
+    <string name="intro_mtsw_map_subtitle">Połączenia między węzłami, „Pokaż na mapie” w szczegółach węzła i Mesh Link Planer do symulacji zasięgu.</string>
+    <string name="intro_mtsw_diag_title">Diagnostyka</string>
+    <string name="intro_mtsw_diag_subtitle">Diagnostyka na żądanie i Sniffer pokazują, co naprawdę dzieje się w sieci.</string>
+    <string name="intro_mtsw_scale_title">Dopasuj do siebie</string>
+    <string name="intro_mtsw_scale_subtitle">Ustaw skalowanie aplikacji niezależnie od telefonu w Ustawieniach, a opis każdej funkcji znajdziesz w Pomocy i dokumentacji.</string>
     <string name="intro_welcome">Witaj</string>
     <string name="ip">IP</string>
     <string name="ip_address">Adres IP:</string>

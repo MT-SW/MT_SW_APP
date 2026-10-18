@@ -482,6 +482,25 @@ class DefaultDocBundleLoader : DocBundleLoader {
                 3200,
                 "debug-logs",
             ),
+            UserPageDef(
+                "mt-sw-features",
+                CoreRes.string.doc_title_mt_sw,
+                CoreRes.string.doc_keywords_mt_sw,
+                "en/user/mt-sw-features.html",
+                23,
+                listOf(
+                    "mt-sw",
+                    "mt-sw-features",
+                    "fork",
+                    "features",
+                    "network-health",
+                    "planner",
+                    "gpio",
+                    "remote-control",
+                ),
+                5600,
+                "mt-sw",
+            ),
         )
 
     private suspend fun buildUserGuideIndex(): List<KeywordIndexEntry> = userPages.map { def ->
