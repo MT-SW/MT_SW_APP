@@ -3,7 +3,7 @@ title: MT_SW features
 parent: User Guide
 nav_order: 23
 last_updated: 2026-10-18
-description: An overview of what MT_SW_APP adds to the original Meshtastic app — remote GPIO control, network health, links on the map, Mesh Link Planner, on-demand diagnostics, Sniffer, app scale and more.
+description: An overview of what MT_SW_APP adds to the original Meshtastic app — remote GPIO control, network health, links on the map, Mesh Link Planner, on-demand diagnostics, Sniffer, debug panel with device logs, app scale and more.
 aliases:
   - mt-sw
   - gpio
@@ -17,85 +17,135 @@ aliases:
 
 # MT_SW features
 
-MT_SW_APP is built on the original Meshtastic app. On top of everything the original does, it has a few features of its own that make life in a mesh easier, especially in the Świętokrzyskie network. This page describes them briefly and tells you where to find them.
+MT_SW_APP is built on the original Meshtastic app. On top of everything the original does, it has many features of its own that make life in a mesh easier, especially in the Świętokrzyskie network. This page describes them one by one and tells you where to find them.
 
-> ℹ️ **Note:** Some features (On-demand diagnostics, node resources) need firmware with the OnDemand module. On regular firmware the app works normally, but these features get no reply.
+> ℹ️ **Note:** Some features (On-demand diagnostics, radio Sniffer, node resources, device logs over Wi-Fi and USB) need MT_SW firmware. On regular firmware the app works normally, but these features get no answer.
 
-## Remote control
+## Remote management
 
-The app lets you control other nodes over the mesh without touching the device in the field. Everything is in node details.
+The app lets you control other nodes over the mesh, without touching the device in the field. Everything is in the node details.
 
-- **Remote GPIO control** — in node details (the Remote Hardware module) you enter a pin number, and the app calculates the bit mask itself and sends the remote node a command to switch the pin on, off or read it. This way you can remotely switch relays or lighting, or restart equipment connected to the node. The buttons work only after keys have been exchanged with the node, because the commands are encrypted. The GPIO card header has an information icon with a description.
-- **Remote favourites and ignore** — you can add a node to favourites or ignore it not only on your own phone but also in the remote node, over LoRa. The app waits for a real confirmation from the network (routing ACK), so you know the change arrived.
-- **Quick commands** — the `/ping`, `/hello` and `/test` buttons send a direct message even to nodes whose role normally blocks manual messages. They are handy for a quick check of a node in the field.
-- **Adding new devices to the database** — you can add a new node by hand by entering its ID (for example `!a1b2c3d4`), to the database of your own node or remotely, to the database of another node over the mesh. The ID format is the same everywhere in the app.
+- **Remote GPIO control** — in the node details (Remote Hardware module) you type a pin number, and the app computes the bit mask and sends the remote node a command to switch the pin on ("On (1)"), off ("Off (0)") or read it. You can use it to switch relays or lights, or to restart equipment attached to the node. The buttons work only after keys have been exchanged with the node, because commands are encrypted. The GPIO card header has an info icon with a step-by-step description of the setup.
+- **Remote favorite and ignore** — you can favorite or ignore a node not only on your phone but also in the remote node, over LoRa. The app waits for a real confirmation from the network (routing ACK), so you know the change arrived.
+- **Adding new devices to the database** — you can add a new node manually by typing its ID (e.g. `!a1b2c3d4`), to your own node's database or remotely to another node's database over the mesh. The ID format is the same across the app, and the app validates what you type.
+- **Quick commands** — the `/ping`, `/hello` and `/test` buttons send a direct message even to nodes whose role normally blocks manual messages. Handy for a quick check of a node in the field. They work from firmware 2.8.0.
+- **Neighbors** — the neighbor log also shows overheard broadcasts from other nodes, not only replies to your own requests. In the Neighbor Info module settings you pick the interval from a list of hours (6, 8, 10, 12, 18 and 24).
+- **Relay names** — the "Delivery status" window shows the full list of names of nodes that relayed the message. The relay name is also visible directly in the node list and in the node details.
+- **Traceroute** — when the last node before us did not write itself into the route and exactly one known node matches it, the route window shows it as "Probably: Name" instead of "Unknown hop".
 
-> ⚠️ **Important:** Remote commands change real hardware. Make sure you are controlling the right node before you send a GPIO command.
+> ⚠️ **Important:** Remote commands change real hardware. Make sure you are controlling the right node before sending a GPIO command.
 
 ## Network health
 
-The **Network health** tab is in the bottom navigation, between Nodes and Map. It shows how all your nodes are doing in one place.
+The **Network health** tab is in the bottom navigation, between Nodes and Map. It shows in one place how all nodes are doing.
 
-- **"Network health" card** — a ring with the percentage of nodes in good shape and the number of nodes in each rating. Tapping a rating (for example "2 Bad") shows only the nodes with that rating.
-- **Metric tabs** — power, signal, airtime, environment, traffic, resources and neighbors. Each node has a coloured bar, a value and a small trend chart.
-- **Colours** — gold is good, red is fair, purple is bad, white is very bad, blue is no data. The **(i)** button at the top describes every colour and threshold.
-- **Search and sorting** — a "Search node…" field, sorting by value or by activity, a "Problems only" filter, favourites on top and hiding nodes without data.
-- **Folding the summary card** — dragging up folds the whole "Network health" card away to leave more room for the list; dragging down unfolds it. Folding is locked by default. The "Lock hiding of network health when scrolling" switch is in the **(i)** window.
-- **Summary** — the list icon at the top opens a ranking of nodes (best signal, quietest, most messages and more) with charts. You can save the result as PDF, HTML, Markdown, text or CSV.
-- **Widget** — on Android you can add the "Local Stats" widget to the home screen. See [Home Screen Widget](widget).
+- **"Network condition" card** — a ring with the percentage of nodes in good condition, the number of nodes in each rating and how many are online. Tapping a rating (e.g. "2 Bad") shows only nodes with that rating; every tab remembers its own filter.
+- **Metric tabs** — power, signal, airtime, environment, resources, traffic and neighbors. Each node has a coloured bar, a value and a small trend chart. In Signal the main value is the noise floor after LNA correction.
+- **Colours** — gold is good, red is fair, purple is bad, white is very bad, blue is no data. The **(i)** button at the top describes all colours and thresholds. The battery level in the node list uses the same colours.
+- **Search and sorting** — the "Search node…" field, sorting "By value" or "By activity", the "Problems only" filter, favorites on top and hiding nodes without data.
+- **Collapsing the summary card** — dragging up folds the whole "Network condition" card so more room is left for the list; dragging down expands it. You can also drag by grabbing the card itself. It works on desktop too. By default folding is locked; the switch "Lock hiding network health when scrolling the list" is in the **(i)** window.
+- **Node details** — charts in several views to choose from: line (with coloured zones), clock, bars and heat map; ranges of 1 h, 24 h, 7 days, 2 weeks, 30 days and "All"; a "Time in each state" bar.
+- **Network summary** — the list icon at the top opens node rankings (best signal, quietest, nearest, most messages and more), pie and bar charts, and battery and signal distribution. You can share the result or save it as PDF, HTML, Markdown, text or CSV.
+- **Device WiFi signal** — when the firmware sends it, you see the WiFi strength, the number of link drops and the reason of the last drop (in Signal quality and in Network health).
+- **Widget** — on Android you can add the "Local Stats" widget to the home screen. See [Home screen widget](widget).
+
+## Signal quality and LNA correction
+
+- **LNA correction** — in Settings → LoRa you enter your device's LNA gain, and the app reduces the displayed noise and RSSI by that value. In a foreign node's details there is a separate field that corrects only that node's noise. The correction is applied at display time, so raw data stays unchanged.
+- **Signal rating** — colours as in connection statuses (gold, red, purple, white). The help screen shows the actual thresholds for the selected preset.
+- **Reversing power and current** — two switches for a sensor connected the other way round: swapping "power" with battery percent, and reversing the sign of the current. You set them per node in the info window ("i" icon). They change only the display.
+- **Device WiFi** — a separate line on the chart, cards with signal strength and drops, and CSV export with the "Save WiFi" button.
 
 ## Map
 
-- **Links between nodes** — thin lines connect nodes that exchange packets, coloured by signal quality (SNR). The lines come from neighbor reports, from traceroutes of the last day and from nodes heard directly. You turn them on or off in the map filters ("Show links between nodes"); they are on by default.
-- **Show on map** — in node details, under the position, there is a **Show on map** button. It takes you to the main map, zooms to the node and draws it on top of other nodes standing in the same place.
+- **Links between nodes** — thin lines join nodes that exchange packets, coloured by signal quality (SNR). Lines come from neighbor reports, traceroutes from the last day and directly heard nodes. They are switched in the map filters ("Show links between nodes"); on by default.
+- **Show on map** — in the node details, under its position, there is a **Show on map** button. It switches to the main map, zooms to the node and draws it on top of other nodes standing at the same place.
 - **Traceroute on the map** — every hop is a separate line coloured by signal quality, with an arrow and the SNR value.
-- **Offline maps** — they also work for OpenStreetMap. Download small areas, because the OSM server does not like bulk downloads.
+- **Nodes at the same place** — they are subtly offset, so after zooming in you can tap each one. Badges are small, with a tail pointing at the exact position.
+- **Offline maps** — work for OpenStreetMap too, which is the default map. Download small areas, because the OSM server does not like bulk downloads.
 - **Terrain and weather overlays** — hillshade and the weather radar are on by default.
+- **Smoothness** — with many nodes the map pans and zooms more smoothly, and it always opens fitted to all nodes.
+- **Desktop** — the map also works in the desktop version, with the same layers and filters as on the phone.
 
 More about the map: [Map and waypoints](map-and-waypoints).
 
 ## Mesh Link Planner
 
-The planner simulates the range of a radio link between two points, **A** and **B**, entirely inside the app, on the phone and on the desktop.
+The planner simulates the range of a radio link between two points, **A** and **B**, entirely inside the app, on phone and desktop.
 
-- You can set each point from the node list, by tapping the map, with coordinates or from the connected station.
+- You set each point from the node list, by tapping the map, by coordinates or from the connected station.
 - Terrain height comes from the Mapterhorn DEM model.
-- For each side you set power, antenna gain, antenna height and feeder loss (by hand or with a wizard that has a database of cables and connectors).
+- For each side separately you set power, antenna gain, mounting height and feeder loss (manually or with a wizard that has a database of cables and connectors).
 - It supports amateur bands from 169 MHz to 2.4 GHz and any frequency from 20 MHz to 20 GHz.
-- It calculates the ITM (Longley-Rice) model, Earth curvature and the first Fresnel zone, draws the terrain profile and gives the link budget.
+- It computes the ITM (Longley-Rice) model, Earth curvature and the first Fresnel zone, draws a terrain profile and gives the link budget plus antenna bearings and angles.
+- **Exact terrain** — optionally downloads real buildings and forests from OpenStreetMap and takes their height into account.
+- **Live weather** — optionally includes propagation conditions from the current weather (Open-Meteo).
+- **Range all around** — draws the coverage as a coloured raster on the map, with an opacity slider.
+- **Comparison with a measurement** — the result can be compared with the last measured SNR and RSSI.
+- **Export** to PDF, CSV, KML, GeoJSON and PNG.
 
-Open the planner with the **Planner** button in node details, next to the compass.
+The planner is opened with the **Planner** button in the node details, next to the compass.
 
 ## On-demand diagnostics
 
-In node details (Administration → "On-demand diagnostics") you can ask any node in range for its current statistics instead of waiting for periodic broadcasts. There are 10 kinds of queries, including node statistics (battery, uptime, CPU and memory), ping with RSSI and SNR, the list of online nodes, the routing error history and airtime activity. You can save and share the results. This feature needs firmware with the OnDemand module.
+In the node details (Administration → "On-demand diagnostics") you can ask any node in range for its current statistics instead of waiting for periodic broadcasts. There are 10 kinds of queries, including node stats (battery, uptime, CPU, memory, WiFi), ping with RSSI and SNR, the list of online nodes, routing error history, port counters, airtime activity and the MT_SW firmware version. The screen has an overview of capabilities with a counter of checked queries, and results are coloured (tiles, gauges, charts). All answers can be shared or saved as PDF, HTML, Markdown, text or CSV. This feature needs firmware with the OnDemand module.
 
 ## Sniffer
 
-The **Sniffer** screen (Settings → Advanced) shows network traffic live, including packets the phone cannot decrypt. It remembers frames after the radio is turned off, groups duplicates, has auto-scroll and decryption attempt, and saves and loads the log.
+The **Sniffer** screen (Settings → Advanced) shows network traffic live, including packets the phone cannot decrypt.
+
+- **Two sources in one screen** — Off, Radio or MQTT (one at a time). Each switch-on asks for confirmation and warns what may change. The MQTT sniffer works on desktop too.
+- **Radio** — shows everything the connected node heard, including your own traffic. Needs MT_SW firmware with the sniffer module; without it the switch is greyed out.
+- **The log stays** after the sniffer is switched off, until you clear it with the bin. A counter in the bar shows buffer fill (e.g. "1530/5000").
+- **Duplicate grouping** — the same packet heard many times is one row with a list of gateways or relays. Copying a packet copies all copies.
+- **Auto-scroll** and **decryption attempt** with known channel keys — separate switches.
+- **Saving and loading the log** (txt, JSON, CSV), and tapping a packet shows its full content.
+- Position and telemetry cards show the time written by the sender; an impossible time is marked as wrong.
+
+## Debug panel
+
+The debug panel (Settings → Advanced → Debug Panel) has an extra tab in this app. See also [Debug logs](debug-logs).
+
+- **Device logs** — the third tab shows live the logs sent by the radio, the same ones you see on the serial port. It has search, log-level colours and export. For logs to appear, enable "Debug logs" in the device security settings. Over Bluetooth this works with any firmware; over Wi-Fi and USB only with MT_SW firmware.
+- The panel also shows packets the phone could not decrypt, and the raw content is available as hex.
 
 ## Messaging
 
-- **Pictures by link** — the app does not send a picture over LoRa, it sends a link instead; the receiver sees a preview. Previews of images from links are off by default and are turned on in Settings → Privacy.
-- **Long messages** — text that does not fit in one packet is split into parts and put together on the other side.
-- **Quick chat** — it comes with a ready set of templates on first launch.
+- **Photos via link** — the app does not send a photo over LoRa; it sends a link, and the recipient sees a preview. Before sending there is a warning that the server is public. Previews of images from links are off by default and are enabled in Settings → Privacy. A photo opened full screen can be saved to the device.
+- **Long messages** — text that does not fit in one packet is split into parts with a marker such as `[k9 2/4]` and assembled on the other side.
+- **Quick chat** — comes with a ready set of templates on first launch.
+- **Status colours** — delivered to the network and receipt confirmation are gold, just "delivered to the network" on a direct message is red, and a send error is purple.
+- **Conversation list** — opens faster and more smoothly even with many messages.
 - **Desktop** — Enter is a new line, Ctrl+Enter sends the message.
+
+## Node list and database
+
+- **Search** — the field above the list filters the same list at once, with no second window.
+- **Node list help** — sections about roles, security, connection and battery level with a legend of icons and colours.
+- **Node roles in Polish** — device role names and descriptions are translated, and obsolete roles are hidden from the choice list.
+- **Current contact time** — nodes with a fixed position show the real time of the last contact.
+- **Clearing the node database** — on the "Clear node database" screen you can switch on automatic removal of inactive nodes (threshold 1–90 days, check every 1–30 days); it also works on desktop. There are the "Ignore date" and "Only nodes with a mismatched key" switches.
+- **Unheard nodes** — a node from which a packet was just received over the radio is no longer marked as unheard.
 
 ## Settings and appearance
 
-- **App scale** — in the app settings you choose the size of text and elements from 50% to 200%, independent of the phone's settings. The default is "Follow the phone". It helps when the phone has an enlarged font or display size and screens look too big. It works on the desktop too.
-- **LNA correction** — in Settings → LoRa you can enter the LNA gain, and the app corrects the displayed noise and RSSI. The raw data stays unchanged.
-- **Inverted current and battery** — for a power sensor connected the other way round.
-- **Device roles** — role names and descriptions are translated.
+- **App scale** — in the app settings you choose the size of text and elements from 50% to 200%, independently of the phone settings. The default is "Same as phone". It works on desktop too.
+- **LoRa settings** — a "Frequency offset (kHz)" field, coding rate 4/5 for Narrow presets, full resolution of the overridden frequency, a warning description for "Override duty cycle" and the restored Traffic Management screen.
+- **Security** — key backup on desktop too, and a node colour choice when generating a key.
+- **Firmware update** — a custom file can be flashed to a device not on the list too, with risk warnings; recovery of a device in DFU mode also works after a custom file.
+- **Bluetooth** — improved reconnecting to an already paired device, node detection on Windows, and the recent network devices list remembers 20 entries.
+- **New version notifications** — the app checks GitHub for a newer release and shows a notification with a link.
 - **Reporting bugs and ideas** — the "Report a bug or idea" item in settings leads to our Discord and groups.
+- **Look and brand** — own name, icon and colours (gold and navy), a coloured connection status icon, installation next to the original Meshtastic app. On Windows a new version installs over the old one without uninstalling.
+- **Desktop** — a draggable scroll bar with a visible track on long lists, the third column follows the selected node, and an "Introduction" item in settings.
 
 ## Help and documentation
 
-All help and documentation in the app is available in Polish and in English. You change the text size on the help pages with the "A−" and "A+" buttons at the top. See [Help and documentation](help-and-docs).
+All help and documentation in the app are available in Polish. You can change the text size on help pages with the "A−" and "A+" buttons at the top. On first launch, after the welcome screen, there is a second card with a short description of MT_SW features; you can see it again in settings under "Introduction". See [Help and documentation](help-and-docs).
 
-## Related Topics
+## Related topics
 
 - [Nodes](nodes) — the node list and node details
 - [Map and waypoints](map-and-waypoints) — the map, layers and waypoints
-- [Node metrics](node-metrics) — the telemetry charts that Network health is built on
-- [Help and documentation](help-and-docs) — how to use the in-app help
+- [Node metrics](node-metrics) — telemetry charts that Network health is based on
+- [Help and documentation](help-and-docs) — how to use in-app help

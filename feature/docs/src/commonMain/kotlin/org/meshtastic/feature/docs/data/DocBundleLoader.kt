@@ -500,7 +500,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
                     "gpio",
                     "remote-control",
                 ),
-                5600,
+                15000,
                 "mt-sw",
             ),
         )

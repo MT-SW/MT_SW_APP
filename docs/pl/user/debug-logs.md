@@ -21,10 +21,11 @@ Jeśli zgłaszasz problem, wyeksportuj dzienniki (zobacz [Eksportowanie](#export
 
 ## Dwie zakładki
 
-Panel debugowania ma dwie zakładki:
+Panel debugowania ma trzy zakładki (trzecia, **Logi urządzenia**, to dodatek MT_SW):
 
 - **Pakiety** — zdekodowany ruch sieci mesh, który Twoje radio wysłało i odebrało (wiadomości na poziomie protokołu). Przydatne do diagnozowania zachowania sieci mesh i routingu.
 - **Dzienniki aplikacji** — własny dziennik diagnostyczny aplikacji (Android *logcat*), w tym ostrzeżenia, błędy i ślady stosu z samej aplikacji. Zwykle to właśnie tego potrzebuje zgłoszenie błędu.
+- **Logi urządzenia** — logi wysyłane na żywo przez samo radio (te same, co na jego porcie szeregowym), z wyszukiwaniem, kolorami poziomów i eksportem. Najpierw włącz „Logi debugowania” w ustawieniach zabezpieczeń urządzenia. Przez Bluetooth działa z każdym firmware, a przez Wi-Fi i USB tylko z firmware MT_SW.
 
 Każda zakładka ma własny przycisk **eksportu** i tworzy własny plik, więc możesz zabrać ten, który jest istotny — albo oba.
 

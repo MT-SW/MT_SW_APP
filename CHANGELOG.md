@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Dokumentacja „Funkcje MT_SW” uzupełniona**
+* Strona zawiera teraz wszystkie funkcje forka: zdalne zarządzanie, Zdrowie sieci, jakość sygnału i LNA, mapę, Mesh Link Planer, diagnostykę, Sniffer, komunikator, listę węzłów i bazę, ustawienia oraz nową sekcję o panelu debugowania z zakładką „Logi urządzenia”. Strona „Logi debugowania” też opisuje trzecią zakładkę.
+
 **Ekran powitalny i dokumentacja o funkcjach MT_SW**
 * Po ekranie powitalnym przy pierwszym uruchomieniu jest teraz druga karta z funkcjami tego forka (zdalne sterowanie GPIO, zdalne dodawanie urządzeń do bazy, ulubione i ignorowanie, Zdrowie sieci, mapa z połączeniami i planerem, diagnostyka i Sniffer, skalowanie aplikacji).
 * Wersja na komputer też ma ekran powitalny przy pierwszym uruchomieniu (bez ekranów uprawnień); pokazuje się raz, a w Ustawienia → Informacja jest pozycja „Wprowadzenie”, która pokazuje go ponownie.
@@ -305,6 +308,9 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**“MT_SW features” documentation completed**
+* The page now covers all fork features: remote management, Network health, signal quality and LNA, map, Mesh Link Planner, diagnostics, Sniffer, messaging, node list and database, settings, and a new section about the debug panel with the “Device logs” tab. The “Debug logs” page also describes the third tab.
 
 **Welcome screen and documentation about MT_SW features**
 * After the welcome screen on first launch there is now a second card with this fork's features (remote GPIO control, adding devices to a node's database remotely, favourites and ignore, Network health, the map with links and the planner, diagnostics and Sniffer, app scale).
