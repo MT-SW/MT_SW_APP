@@ -21,10 +21,11 @@ If you're filing an issue, export your logs (see [Exporting](#exporting)) and at
 
 ## The two tabs
 
-The Debug Panel has two tabs:
+The Debug Panel has three tabs (the third, **Device logs**, is an MT_SW addition):
 
 - **Packets** — the decoded mesh traffic your radio has sent and received (protocol-level messages). Useful for diagnosing mesh and routing behavior.
 - **App logs** — the app's own diagnostic log (Android *logcat*), including warnings, errors, and stack traces from the app itself. This is usually what a bug report needs.
+- **Device logs** — live logs sent by the radio itself (the same as on its serial port), with search, level colours and export. Enable "Debug logs" in the device security settings first. Over Bluetooth it works with any firmware; over Wi-Fi and USB only with MT_SW firmware.
 
 Each tab has its own **export** button and produces its own file, so you can grab whichever is relevant — or both.
 
