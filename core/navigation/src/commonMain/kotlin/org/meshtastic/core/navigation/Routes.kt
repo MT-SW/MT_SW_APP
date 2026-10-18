@@ -54,7 +54,13 @@ sealed interface ContactsRoute : Route {
 
 @Serializable
 sealed interface MapRoute : Route {
-    @Serializable data class Map(val waypointId: Int? = null, val plannerNodeNum: Int? = null) : MapRoute
+    @Serializable
+    data class Map(
+        val waypointId: Int? = null,
+        val plannerNodeNum: Int? = null,
+        /** A node to centre the map on and draw above the others ("Show on map" in the node details). */
+        val focusNodeNum: Int? = null,
+    ) : MapRoute
 }
 
 @Serializable

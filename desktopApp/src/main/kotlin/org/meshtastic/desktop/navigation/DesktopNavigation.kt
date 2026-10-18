@@ -72,7 +72,7 @@ fun EntryProviderScope<NavKey>.desktopNavGraph(
             multiBackstack.navigateTopLevel(TopLevelDestination.Nodes.route)
             multiBackstack.backStacks[TopLevelDestination.Nodes.route]?.add(NodesRoute.NodeDetail(id))
         }
-        mapScreen(openNodeInNodesTab, openNodeInNodesTab, args.waypointId, args.plannerNodeNum)
+        mapScreen(openNodeInNodesTab, openNodeInNodesTab, args.waypointId, args.plannerNodeNum, args.focusNodeNum)
     }
     firmwareGraph(backStack)
     settingsGraph(backStack, settingsRadioConfigViewModel)

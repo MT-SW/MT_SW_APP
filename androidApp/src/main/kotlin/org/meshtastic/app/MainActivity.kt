@@ -325,7 +325,7 @@ class MainActivity : AppCompatActivity() {
                     org.meshtastic.app.map.discovery.DiscoveryMap(userLat, userLon, nodes, modifier)
                 },
             LocalMapMainScreenProvider provides
-                { onClickNodeChip, navigateToNodeDetails, waypointId, plannerNodeNum ->
+                { onClickNodeChip, navigateToNodeDetails, waypointId, plannerNodeNum, focusNodeNum ->
                     val viewModel = koinViewModel<SharedMapViewModel>()
                     MapScreen(
                         viewModel = viewModel,
@@ -333,6 +333,7 @@ class MainActivity : AppCompatActivity() {
                         navigateToNodeDetails = navigateToNodeDetails,
                         waypointId = waypointId,
                         plannerNodeNum = plannerNodeNum,
+                        focusNodeNum = focusNodeNum,
                     )
                 },
             content = content,

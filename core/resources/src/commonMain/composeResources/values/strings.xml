@@ -1181,6 +1181,7 @@
     <string name="map_offline_manager">Offline Manager</string>
     <string name="map_offline_region_label">%1$s, %2$s  %3$s</string>
     <string name="map_offline_show_on_map">Show on map</string>
+    <string name="node_show_on_map">Show on map</string>
     <string name="map_offline_terrain_contours">Contours</string>
     <string name="map_offline_terrain_download_complete">Terrain download complete</string>
     <string name="map_offline_terrain_download_failed_io">Terrain download failed — check your connection and try again</string>
@@ -2066,6 +2067,7 @@
     <string name="show_original">Show original</string>
     <string name="show_password">Show password</string>
     <string name="show_precision_circle">Show Precision Circles</string>
+    <string name="show_node_links">Show links between nodes</string>
     <string name="show_translation">Show translation</string>
     <string name="show_waypoints">Show Waypoints</string>
     <string name="shutdown">Shutdown</string>

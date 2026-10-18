@@ -496,12 +496,38 @@ fun MapView(
 
     val myNodeNum = mapViewModel.myNodeNum
     val relativeTimeBucket = rememberRelativeTimeBucket()
+    val focusNodeNum by mapViewModel.focusNodeNum.collectAsStateWithLifecycle()
+    // The focused node is shown whatever the map filters say.
+    val focusedNode = focusNodeNum?.let { num -> allNodes.firstOrNull { it.num == num } }
     val nodeClusterItems =
         rememberNodeClusterItems(
-            nodes = if (mode is GoogleMapMode.Main) filteredNodes else emptyList(),
+            nodes =
+            if (mode is GoogleMapMode.Main) {
+                if (focusedNode != null && filteredNodes.none { it.num == focusedNode.num }) {
+                    filteredNodes + focusedNode
+                } else {
+                    filteredNodes
+                }
+            } else {
+                emptyList()
+            },
             myNodeNum = myNodeNum,
             relativeTimeBucket = relativeTimeBucket,
+            focusNodeNum = focusNodeNum,
         )
+    // Flies to the node once per request, after the map has loaded; the user may pan away afterwards.
+    LaunchedEffect(focusNodeNum, isMapLoaded, focusedNode != null) {
+        val node = focusedNode ?: return@LaunchedEffect
+        if (mode !is GoogleMapMode.Main || !isMapLoaded) return@LaunchedEffect
+        // The first-fit of the whole mesh must not run over this flight.
+        mapViewModel.onInitialNodeBoundsApplied()
+        try {
+            cameraPositionState.animate(CameraUpdateFactory.newLatLngZoom(node.position.toLatLng(), FOCUS_ZOOM))
+        } catch (e: IllegalStateException) {
+            if (e is CancellationException) currentCoroutineContext().ensureActive()
+            Logger.d { "Error flying to focused node: ${e.message}" }
+        }
+    }
     val isConnected by mapViewModel.isConnected.collectAsStateWithLifecycle()
     val theme by mapViewModel.theme.collectAsStateWithLifecycle()
     val dark =
@@ -1298,10 +1324,11 @@ internal fun rememberNodeClusterItems(
     nodes: List<Node>,
     myNodeNum: Int?,
     relativeTimeBucket: Long,
+    focusNodeNum: Int? = null,
 ): List<NodeClusterItem> {
     val unknownText = stringResource(Res.string.unknown)
     val nowText = stringResource(Res.string.now)
-    return remember(nodes, myNodeNum, relativeTimeBucket, unknownText, nowText) {
+    return remember(nodes, myNodeNum, relativeTimeBucket, unknownText, nowText, focusNodeNum) {
         nodes.map { node ->
             val latLng = LatLng((node.position.latitude_i ?: 0) * DEG_D, (node.position.longitude_i ?: 0) * DEG_D)
             NodeClusterItem(
@@ -1320,6 +1347,7 @@ internal fun rememberNodeClusterItems(
                     ),
                 nodeSnippet = node.user.long_name,
                 myNodeNum = myNodeNum,
+                focused = node.num == focusNodeNum,
             )
         }
     }
@@ -2005,3 +2033,6 @@ private fun boundingBoxFromCorners(a: LatLng, b: LatLng): BoundingBox = Bounding
 
 /** A shared [MapBounds] as the box the Google map wants. */
 private fun MapBounds.toLatLngBounds(): LatLngBounds = LatLngBounds(LatLng(south, west), LatLng(north, east))
+
+/** Close enough to tell apart nodes standing on the same site. */
+private const val FOCUS_ZOOM = 16f

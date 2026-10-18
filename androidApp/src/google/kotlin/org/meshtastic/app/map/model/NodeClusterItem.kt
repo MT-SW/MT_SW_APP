@@ -28,6 +28,8 @@ data class NodeClusterItem(
     val nodeTitle: String,
     val nodeSnippet: String,
     val myNodeNum: Int? = null,
+    /** The node "Show on map" asked for: drawn above everything else. */
+    val focused: Boolean = false,
 ) : ClusterItem {
     override val position: LatLng
         get() = nodePosition
@@ -39,7 +41,10 @@ data class NodeClusterItem(
         get() = nodeSnippet
 
     override val zIndex: Float
-        get() = MapNodePolicy.priorityOf(node, myNodeNum).toFloat()
+        get() = if (focused) FOCUSED_Z_INDEX else MapNodePolicy.priorityOf(node, myNodeNum).toFloat()
 
     fun getPrecisionMeters(): Double? = precisionRadiusMetersOrNull(node.position.precision_bits)
 }
+
+/** Above [MapNodePolicy.PRIORITY_PROMINENT], so a focused node wins even over this node and favorites. */
+private const val FOCUSED_Z_INDEX = 6f

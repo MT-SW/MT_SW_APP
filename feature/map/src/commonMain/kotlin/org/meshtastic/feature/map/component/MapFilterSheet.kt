@@ -55,9 +55,11 @@ import org.meshtastic.core.resources.node_filter_only_encrypted
 import org.meshtastic.core.resources.node_filter_only_online
 import org.meshtastic.core.resources.node_filter_only_signed
 import org.meshtastic.core.resources.only_favorites
+import org.meshtastic.core.resources.show_node_links
 import org.meshtastic.core.resources.show_precision_circle
 import org.meshtastic.core.resources.show_waypoints
 import org.meshtastic.core.ui.component.label
+import org.meshtastic.core.ui.icon.Distance
 import org.meshtastic.core.ui.icon.Favorite
 import org.meshtastic.core.ui.icon.Lens
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -117,6 +119,12 @@ internal fun MapFilterSheetContent(filterState: BaseMapViewModel.MapFilterState,
             icon = MeshtasticIcons.Lens,
             checked = filterState.showPrecisionCircle,
             onToggle = actions.onToggleShowPrecisionCircle,
+        )
+        FilterToggle(
+            label = stringResource(Res.string.show_node_links),
+            icon = MeshtasticIcons.Distance,
+            checked = filterState.showLinks,
+            onToggle = actions.onToggleShowLinks,
         )
         LastHeardSlider(selected = filterState.lastHeardFilter, onSelect = actions.onSelectLastHeard)
 
