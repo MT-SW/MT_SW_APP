@@ -16,11 +16,13 @@
  */
 package org.meshtastic.feature.intro
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
@@ -72,7 +75,7 @@ import org.meshtastic.core.ui.theme.AppTheme
  * @param onContinue Callback invoked when the user proceeds to the next screen.
  */
 @Composable
-internal fun MtSwFeaturesScreen(onContinue: () -> Unit) {
+internal fun MtSwFeaturesScreen(onContinue: () -> Unit, maxContentWidth: Dp = Dp.Unspecified) {
     val features =
         listOf(
             FeatureUIData(
@@ -122,27 +125,34 @@ internal fun MtSwFeaturesScreen(onContinue: () -> Unit) {
             IntroBottomBar(
                 onSkip = {},
                 onConfigure = onContinue,
+                maxContentWidth = maxContentWidth,
                 skipButtonText = "",
                 configureButtonText = stringResource(Res.string.next),
                 showSkipButton = false,
             )
         },
     ) { innerPadding ->
-        Column(
-            modifier =
-            Modifier.fillMaxSize().padding(innerPadding).padding(16.dp).verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = stringResource(Res.string.intro_mtsw_header),
-                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.Center,
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            features.forEach { feature ->
-                FeatureRow(feature = feature)
-                Spacer(modifier = Modifier.height(16.dp))
+        Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.TopCenter) {
+            Column(
+                modifier =
+                Modifier
+                        .widthIn(max = maxContentWidth)
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(Res.string.intro_mtsw_header),
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                features.forEach { feature ->
+                    FeatureRow(feature = feature)
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
         }
     }

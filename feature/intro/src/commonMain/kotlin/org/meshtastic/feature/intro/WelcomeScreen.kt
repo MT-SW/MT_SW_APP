@@ -16,11 +16,13 @@
  */
 package org.meshtastic.feature.intro
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
@@ -58,7 +61,7 @@ import org.meshtastic.core.ui.util.LocalAnalyticsIntroProvider
  * @param onGetStarted Callback invoked when the user proceeds from the welcome screen.
  */
 @Composable
-internal fun WelcomeScreen(onGetStarted: () -> Unit) {
+internal fun WelcomeScreen(onGetStarted: () -> Unit, maxContentWidth: Dp = Dp.Unspecified) {
     val analyticsIntro = LocalAnalyticsIntroProvider.current
     val features =
         listOf(
@@ -84,34 +87,41 @@ internal fun WelcomeScreen(onGetStarted: () -> Unit) {
             IntroBottomBar(
                 onSkip = {},
                 onConfigure = onGetStarted,
+                maxContentWidth = maxContentWidth,
                 skipButtonText = "",
                 configureButtonText = stringResource(Res.string.get_started),
                 showSkipButton = false,
             )
         },
     ) { innerPadding ->
-        Column(
-            modifier =
-            Modifier.fillMaxSize().padding(innerPadding).padding(16.dp).verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = stringResource(Res.string.intro_welcome),
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                textAlign = TextAlign.Center,
-            )
-            Text(
-                text = stringResource(Res.string.meshtastic),
-                style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
-                textAlign = TextAlign.Center,
-            )
-            Spacer(modifier = Modifier.height(32.dp))
-            features.forEach { feature ->
-                FeatureRow(feature = feature)
-                Spacer(modifier = Modifier.height(16.dp))
+        Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.TopCenter) {
+            Column(
+                modifier =
+                Modifier
+                    .widthIn(max = maxContentWidth)
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(Res.string.intro_welcome),
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    text = stringResource(Res.string.meshtastic),
+                    style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(modifier = Modifier.height(32.dp))
+                features.forEach { feature ->
+                    FeatureRow(feature = feature)
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                analyticsIntro()
             }
-            Spacer(modifier = Modifier.weight(1f))
-            analyticsIntro()
         }
     }
 }
