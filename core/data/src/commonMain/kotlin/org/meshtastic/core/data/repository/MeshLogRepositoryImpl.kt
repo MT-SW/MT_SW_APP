@@ -145,13 +145,17 @@ open class MeshLogRepositoryImpl(
      * Retrieves all [MeshLog]s associated with a specific [nodeNum] and [portNum], automatically remapping the locally
      * connected node's number to [MeshLog.NODE_NUM_LOCAL] — see [effectiveLogId].
      */
-    override fun getLogsFrom(nodeNum: Int, portNum: Int): Flow<List<MeshLog>> = effectiveLogId(nodeNum)
-        .flatMapLatest { logId ->
-            dbManager.observeCurrentDb { it.meshLogDao().getLogsFrom(logId, portNum, DEFAULT_MAX_LOGS) }
-        }
-        .map { list -> list.map { it.asExternalModel() } }
-        .distinctUntilChanged()
-        .flowOn(dispatchers.io)
+    override fun getLogsFrom(nodeNum: Int, portNum: Int): Flow<List<MeshLog>> =
+        getLogsFromLimited(nodeNum, portNum, DEFAULT_MAX_LOGS)
+
+    override fun getLogsFromLimited(nodeNum: Int, portNum: Int, maxItem: Int): Flow<List<MeshLog>> =
+        effectiveLogId(nodeNum)
+            .flatMapLatest { logId ->
+                dbManager.observeCurrentDb { it.meshLogDao().getLogsFrom(logId, portNum, maxItem) }
+            }
+            .map { list -> list.map { it.asExternalModel() } }
+            .distinctUntilChanged()
+            .flowOn(dispatchers.io)
 
     /** The single most recent [MeshLog] per distinct sender, across every port. */
     override fun getLatestLogPerNode(): Flow<List<MeshLog>> = dbManager
@@ -161,14 +165,22 @@ open class MeshLogRepositoryImpl(
 
     /** Retrieves all [MeshLog]s containing [MeshPacket]s for a specific [nodeNum]. */
     override fun getMeshPacketsFrom(nodeNum: Int, portNum: Int): Flow<List<MeshPacket>> =
-        getLogsFrom(nodeNum, portNum).map { list -> list.mapNotNull { it.fromRadio.packet } }.flowOn(dispatchers.io)
+        getMeshPacketsFromLimited(nodeNum, portNum, DEFAULT_MAX_LOGS)
+
+    override fun getMeshPacketsFromLimited(nodeNum: Int, portNum: Int, maxItem: Int): Flow<List<MeshPacket>> =
+        getLogsFromLimited(nodeNum, portNum, maxItem)
+            .map { list -> list.mapNotNull { it.fromRadio.packet } }
+            .flowOn(dispatchers.io)
 
     /** Retrieves telemetry history for a specific node, automatically handling local node redirection. */
-    override fun getTelemetryFrom(nodeNum: Int): Flow<List<Telemetry>> = effectiveLogId(nodeNum)
+    override fun getTelemetryFrom(nodeNum: Int): Flow<List<Telemetry>> =
+        getTelemetryFromLimited(nodeNum, DEFAULT_MAX_LOGS)
+
+    override fun getTelemetryFromLimited(nodeNum: Int, maxItem: Int): Flow<List<Telemetry>> = effectiveLogId(nodeNum)
         .flatMapLatest { logId ->
             dbManager
                 .observeCurrentDb {
-                    it.meshLogDao().getLogsFrom(logId, PortNum.TELEMETRY_APP.value, DEFAULT_MAX_LOGS)
+                    it.meshLogDao().getLogsFrom(logId, PortNum.TELEMETRY_APP.value, maxItem)
                 }
                 .distinctUntilChanged()
                 .mapLatest { list -> list.map { it.asExternalModel() }.mapNotNull(::parseTelemetryLog) }
