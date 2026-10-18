@@ -31,6 +31,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.app_settings
 import org.meshtastic.core.resources.preferences_language
 import org.meshtastic.core.resources.theme
+import org.meshtastic.core.resources.ui_scale
 import org.meshtastic.core.resources.units
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.icon.ChevronRight
@@ -49,6 +50,8 @@ internal fun ColumnScope.AppearanceSettingsContent(
     onShowThemePicker: () -> Unit,
     unitsSummary: String,
     onShowUnitsPicker: () -> Unit,
+    uiScaleSummary: String,
+    onShowUiScalePicker: () -> Unit,
 ) {
     val context = LocalContext.current
     val settingsLauncher =
@@ -81,6 +84,15 @@ internal fun ColumnScope.AppearanceSettingsContent(
     }
 
     ListItem(
+        text = stringResource(Res.string.ui_scale),
+        supportingText = uiScaleSummary,
+        leadingIcon = MeshtasticIcons.FormatPaint,
+        trailingIcon = null,
+    ) {
+        onShowUiScalePicker()
+    }
+
+    ListItem(
         text = stringResource(Res.string.units),
         supportingText = unitsSummary,
         leadingIcon = MeshtasticIcons.Distance,
@@ -107,6 +119,8 @@ fun AppearanceSectionPreview() {
                 onShowThemePicker = {},
                 unitsSummary = "System default",
                 onShowUnitsPicker = {},
+                uiScaleSummary = "System default",
+                onShowUiScalePicker = {},
             )
         }
     }

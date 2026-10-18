@@ -164,6 +164,12 @@ class SettingsViewModel(
         uiPrefs.setTheme(theme)
     }
 
+    val uiScale = uiPrefs.uiScale
+
+    fun setUiScale(percent: Int) {
+        uiPrefs.setUiScale(percent)
+    }
+
     val unitsOverride = uiPrefs.unitsOverride
 
     fun setUnitsOverride(override: UnitsOverride) {

@@ -65,6 +65,14 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_THEME] = value } }
     }
 
+    // Eagerly: the first frame already needs the scale, otherwise the UI would jump once after start.
+    override val uiScale: StateFlow<Int> =
+        dataStore.data.map { it[KEY_UI_SCALE] ?: 0 }.stateIn(scope, SharingStarted.Eagerly, 0)
+
+    override fun setUiScale(value: Int) {
+        scope.launch { dataStore.edit { it[KEY_UI_SCALE] = value } }
+    }
+
     // Eagerly, unlike most prefs here: LocaleUnitsProvider folds this into every unit the app renders, so the window
     // in which a fresh process shows OS units to a user who overrode them should close as early as possible.
     override val unitsOverride: StateFlow<Int> =
@@ -576,6 +584,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
 
         val KEY_APP_INTRO_COMPLETED = booleanPreferencesKey("app_intro_completed")
         val KEY_THEME = intPreferencesKey("theme")
+        val KEY_UI_SCALE = intPreferencesKey("ui-scale")
         private val KEY_UNITS_OVERRIDE = intPreferencesKey("units_override")
         val KEY_LOCALE = stringPreferencesKey("locale")
         val KEY_NODE_SORT = intPreferencesKey("node-sort-option")

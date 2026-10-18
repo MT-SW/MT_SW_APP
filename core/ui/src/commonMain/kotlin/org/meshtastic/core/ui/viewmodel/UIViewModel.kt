@@ -189,6 +189,8 @@ class UIViewModel(
 
     val theme: StateFlow<Int> = uiPrefs.theme
 
+    val uiScale: StateFlow<Int> = uiPrefs.uiScale
+
     /** Opt-out for applying an event edition's ambient theme (accent + typeface) app-wide. */
     val eventThemeEnabled: StateFlow<Boolean> = uiPrefs.eventThemeEnabled
 

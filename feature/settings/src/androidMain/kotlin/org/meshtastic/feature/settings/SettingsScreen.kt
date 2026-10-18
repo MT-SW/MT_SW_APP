@@ -85,7 +85,9 @@ import org.meshtastic.feature.settings.component.PrivacySettingsContent
 import org.meshtastic.feature.settings.component.RadioAdminAppBar
 import org.meshtastic.feature.settings.component.ThemePickerDialog
 import org.meshtastic.feature.settings.component.UnitsOption
+import org.meshtastic.feature.settings.component.UiScalePickerDialog
 import org.meshtastic.feature.settings.component.UnitsPickerDialog
+import org.meshtastic.feature.settings.component.uiScaleLabel
 import org.meshtastic.feature.settings.navigation.ConfigRoute
 import org.meshtastic.feature.settings.navigation.ModuleRoute
 import org.meshtastic.feature.settings.radio.RadioConfigItemList
@@ -193,6 +195,15 @@ fun SettingsScreen(
     }
 
     var showThemePickerDialog by rememberSaveable { mutableStateOf(false) }
+    var showUiScalePickerDialog by rememberSaveable { mutableStateOf(false) }
+    val uiScale by settingsViewModel.uiScale.collectAsStateWithLifecycle()
+    if (showUiScalePickerDialog) {
+        UiScalePickerDialog(
+            current = uiScale,
+            onClickScale = { settingsViewModel.setUiScale(it) },
+            onDismiss = { showUiScalePickerDialog = false },
+        )
+    }
     var showUnitsPickerDialog by rememberSaveable { mutableStateOf(false) }
     val unitsOverride = UnitsOverride.fromValue(settingsViewModel.unitsOverride.collectAsStateWithLifecycle().value)
     if (showUnitsPickerDialog) {
@@ -302,6 +313,8 @@ fun SettingsScreen(
                         onShowThemePicker = { showThemePickerDialog = true },
                         unitsSummary = stringResource(UnitsOption.entries.first { it.override == unitsOverride }.label),
                         onShowUnitsPicker = { showUnitsPickerDialog = true },
+                        uiScaleSummary = uiScaleLabel(uiScale),
+                        onShowUiScalePicker = { showUiScalePickerDialog = true },
                     )
                     PersistenceSettingsContent(
                         cacheLimit = settingsViewModel.dbCacheLimit.collectAsStateWithLifecycle().value,
