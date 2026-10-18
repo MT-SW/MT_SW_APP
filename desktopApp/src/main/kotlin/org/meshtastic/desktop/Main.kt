@@ -517,7 +517,7 @@ private fun ApplicationScope.MeshtasticWindow(
                 LocalTracerouteMapOverlayInsetsProvider provides
                     TracerouteMapOverlayInsets(overlayPadding = PaddingValues(bottom = 48.dp)),
             ) {
-                val uiScale by uiPrefs.uiScale.collectAsState(initial = 0)
+                val uiScale by uiViewModel.uiScale.collectAsState()
                 CompositionLocalProvider(LocalDensity provides rememberScaledDensity(percent = uiScale)) {
                     AppTheme(darkTheme = isDarkTheme) {
                         DesktopMainScreen(uiViewModel, multiBackstack)
