@@ -19,7 +19,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 ### Październik 2026
 
 **Zdrowie sieci — chowająca się karta podsumowania**
-* Przesunięcie listy palcem w górę najpierw zwija kartę „Kondycja sieci”, zostawiając wyszukiwanie, zakładki, sortowanie i listę węzłów; przesunięcie w dół do samej góry rozwija ją z powrotem. Domyślnie ukrywanie jest zablokowane; przełącznik „Blokuj ukrywanie kondycji sieci przy przesuwaniu listy” jest w oknie informacji („i” u góry). Więcej miejsca na listę, szczególnie przy powiększonym skalowaniu.
+* Przesunięcie listy palcem w górę najpierw zwija kartę „Kondycja sieci”, zostawiając wyszukiwanie, zakładki, sortowanie i listę węzłów; przesunięcie w dół do samej góry rozwija ją z powrotem. Można też chwycić samą kartę lub wiersz sortowania. Domyślnie ukrywanie jest zablokowane; przełącznik „Blokuj ukrywanie kondycji sieci przy przesuwaniu listy” jest w oknie informacji („i” u góry). Więcej miejsca na listę, szczególnie przy powiększonym skalowaniu.
 
 **Wygląd — skalowanie aplikacji**
 * Nowe ustawienie „Skalowanie aplikacji” (Ustawienia → Wygląd): rozmiar tekstu i elementów tylko w tej aplikacji, niezależnie od czcionki i rozmiaru ekranu w telefonie (50–200%). Działa też w wersji na komputer. Domyślnie „Zgodnie z telefonem” — wygląd się nie zmienia. Pomaga, gdy telefon ma powiększone elementy i ekrany (np. Zdrowie sieci) wyglądają za duże.
@@ -302,7 +302,7 @@ The entries below describe only what this fork adds on top of the original, from
 ### October 2026
 
 **Network health — collapsing summary card**
-* Scrolling the list up first folds away the "Network health" card, leaving search, tabs, sorting and the node list; scrolling back down to the top unfolds it again. Folding is locked by default; the lock switch is in the info window ("i" at the top). More room for the list, especially at larger scales.
+* Scrolling the list up first folds away the "Network health" card, leaving search, tabs, sorting and the node list; scrolling back down to the top unfolds it again. You can also grab the card itself or the sorting row. Folding is locked by default; the lock switch is in the info window ("i" at the top). More room for the list, especially at larger scales.
 
 **Appearance — app scale**
 * New "App scale" setting (Settings → Appearance): size of text and elements in this app only, independent of the phone's font and display size (50–200%). Also on desktop. Default is "Follow the phone", so nothing changes. Helps when the phone has enlarged items and screens (e.g. Network health) look too big.

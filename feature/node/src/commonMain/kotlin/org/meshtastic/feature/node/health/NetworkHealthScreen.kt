@@ -16,6 +16,9 @@
  */
 package org.meshtastic.feature.node.health
 
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -98,6 +101,15 @@ fun NetworkHealthScreen(
                 }
             }
         }
+    // Dragging the summary card (or the sorting row) itself folds and unfolds it too, not only dragging the list.
+    val foldDrag =
+        Modifier.draggable(
+            orientation = Orientation.Vertical,
+            state =
+            rememberDraggableState { delta ->
+                if (!heroLockedNow) heroFoldedPx = (heroFoldedPx - delta).coerceIn(0f, heroHeightPx)
+            },
+        )
     if (showInfo) {
         NetworkHealthInfoDialog(
             metric = uiState.activeMetric,
@@ -147,7 +159,7 @@ fun NetworkHealthScreen(
 
             Box(
                 modifier =
-                Modifier.fillMaxWidth().clipToBounds().layout { measurable, constraints ->
+                foldDrag.fillMaxWidth().clipToBounds().layout { measurable, constraints ->
                     val placeable = measurable.measure(constraints)
                     if (heroHeightPx != placeable.height.toFloat()) heroHeightPx = placeable.height.toFloat()
                     val folded = heroFoldedPx.coerceIn(0f, placeable.height.toFloat()).toInt()
@@ -183,7 +195,7 @@ fun NetworkHealthScreen(
                 onToggleFavoritesFirst = viewModel::toggleFavoritesFirst,
                 onToggleHideWithoutData = viewModel::toggleHideWithoutData,
                 onToggleProblemsOnly = viewModel::toggleProblemsOnly,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                modifier = foldDrag.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
             )
 
             Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
