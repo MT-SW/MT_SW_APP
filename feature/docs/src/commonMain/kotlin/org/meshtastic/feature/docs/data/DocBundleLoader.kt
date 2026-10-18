@@ -32,6 +32,7 @@ import org.meshtastic.core.resources.doc_keywords_help
 import org.meshtastic.core.resources.doc_keywords_map
 import org.meshtastic.core.resources.doc_keywords_messages
 import org.meshtastic.core.resources.doc_keywords_mqtt
+import org.meshtastic.core.resources.doc_keywords_mt_sw
 import org.meshtastic.core.resources.doc_keywords_node_metrics
 import org.meshtastic.core.resources.doc_keywords_nodes
 import org.meshtastic.core.resources.doc_keywords_notifications
@@ -65,6 +66,7 @@ import org.meshtastic.core.resources.doc_title_map
 import org.meshtastic.core.resources.doc_title_measurement
 import org.meshtastic.core.resources.doc_title_messages
 import org.meshtastic.core.resources.doc_title_mqtt
+import org.meshtastic.core.resources.doc_title_mt_sw
 import org.meshtastic.core.resources.doc_title_node_metrics
 import org.meshtastic.core.resources.doc_title_nodes
 import org.meshtastic.core.resources.doc_title_notifications
