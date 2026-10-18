@@ -108,6 +108,11 @@ interface UiPrefs {
 
     fun setTheme(value: Int)
 
+    /** In-app scale in percent (text and elements together); 0 follows the phone's own size settings. */
+    val uiScale: StateFlow<Int>
+
+    fun setUiScale(value: Int)
+
     /** The in-app units choice as a [org.meshtastic.core.common.util.UnitsOverride] value; 0 follows the OS locale. */
     val unitsOverride: StateFlow<Int>
 

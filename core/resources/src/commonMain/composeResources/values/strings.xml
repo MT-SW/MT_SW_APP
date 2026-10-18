@@ -2229,6 +2229,9 @@
     <string name="terminate_app">Force stop the app</string>
     <string name="terminate_app_message">The app will disconnect from the device, stop its background service and end the whole process, like "Force stop" in the system settings. Start it again to resume.</string>
     <string name="theme">Theme</string>
+    <string name="ui_scale">App scale</string>
+    <string name="ui_scale_follow_system">Follow the phone</string>
+    <string name="ui_scale_summary">Size of text and elements in this app only, independent of the phone\'s font and display size.</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_light">Light</string>
     <string name="theme_system">System default</string>

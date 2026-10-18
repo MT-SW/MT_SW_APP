@@ -98,6 +98,12 @@ class FakeUiPrefs : UiPrefs {
         theme.value = value
     }
 
+    override val uiScale = MutableStateFlow(0)
+
+    override fun setUiScale(value: Int) {
+        uiScale.value = value
+    }
+
     override val unitsOverride = MutableStateFlow(0)
 
     override fun setUnitsOverride(value: Int) {

@@ -42,6 +42,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalDensity
 import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -88,6 +89,7 @@ import org.meshtastic.core.ui.theme.EventThemeToggle
 import org.meshtastic.core.ui.theme.LocalEventTheme
 import org.meshtastic.core.ui.theme.LocalEventThemeToggle
 import org.meshtastic.core.ui.theme.MODE_DYNAMIC
+import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.util.LocalAnalyticsIntroProvider
 import org.meshtastic.core.ui.util.LocalBarcodeScannerProvider
 import org.meshtastic.core.ui.util.LocalBarcodeScannerSupported
@@ -261,7 +263,13 @@ class MainActivity : AppCompatActivity() {
         val eventPalette = remember(eventEdition) { eventEdition?.brandPalette().orEmpty() }
         val resolvedEventFonts =
             remember(eventEdition, eventFontResolver) { eventFontResolver.resolve(eventEdition?.theme?.fonts) }
+        val uiScale by model.uiScale.collectAsStateWithLifecycle()
+        // The phone's own default density (before "display size" was enlarged), so 100% looks the same everywhere.
+        val stableDensity =
+            android.util.DisplayMetrics.DENSITY_DEVICE_STABLE.toFloat() / android.util.DisplayMetrics.DENSITY_DEFAULT
+        val scaledDensity = rememberScaledDensity(percent = uiScale, baseDensity = stableDensity)
         CompositionLocalProvider(
+            LocalDensity provides scaledDensity,
             LocalEventBranding provides eventEdition,
             LocalEventTheme provides
                 if (eventThemeEnabled && eventEdition != null) {
