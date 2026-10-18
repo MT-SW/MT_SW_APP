@@ -73,6 +73,13 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_UI_SCALE] = value } }
     }
 
+    override val healthHeroLocked: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_HEALTH_HERO_LOCKED] ?: true }.stateIn(scope, SharingStarted.Lazily, true)
+
+    override fun setHealthHeroLocked(value: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_HEALTH_HERO_LOCKED] = value } }
+    }
+
     // Eagerly, unlike most prefs here: LocaleUnitsProvider folds this into every unit the app renders, so the window
     // in which a fresh process shows OS units to a user who overrode them should close as early as possible.
     override val unitsOverride: StateFlow<Int> =
@@ -585,6 +592,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_APP_INTRO_COMPLETED = booleanPreferencesKey("app_intro_completed")
         val KEY_THEME = intPreferencesKey("theme")
         val KEY_UI_SCALE = intPreferencesKey("ui-scale")
+        val KEY_HEALTH_HERO_LOCKED = booleanPreferencesKey("health-hero-locked")
         private val KEY_UNITS_OVERRIDE = intPreferencesKey("units_override")
         val KEY_LOCALE = stringPreferencesKey("locale")
         val KEY_NODE_SORT = intPreferencesKey("node-sort-option")

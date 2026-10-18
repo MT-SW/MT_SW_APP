@@ -398,6 +398,12 @@ class NetworkHealthViewModel(
         problemsOnlyFlow.value = !problemsOnlyFlow.value
     }
 
+    val heroLocked: StateFlow<Boolean> = uiPrefs.healthHeroLocked
+
+    fun setHeroLocked(locked: Boolean) {
+        uiPrefs.setHealthHeroLocked(locked)
+    }
+
     fun setSearchText(text: String) {
         searchTextFlow.value = text
     }

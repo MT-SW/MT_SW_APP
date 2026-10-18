@@ -113,6 +113,11 @@ interface UiPrefs {
 
     fun setUiScale(value: Int)
 
+    /** Network health: when true (default) the summary card stays put instead of folding away on scroll. */
+    val healthHeroLocked: StateFlow<Boolean>
+
+    fun setHealthHeroLocked(value: Boolean)
+
     /** The in-app units choice as a [org.meshtastic.core.common.util.UnitsOverride] value; 0 follows the OS locale. */
     val unitsOverride: StateFlow<Int>
 

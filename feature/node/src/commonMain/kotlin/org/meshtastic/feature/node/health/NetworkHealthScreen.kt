@@ -32,12 +32,21 @@ import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.meshtastic.core.common.util.MetricFormatter
@@ -61,7 +70,42 @@ fun NetworkHealthScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     var showInfo by remember { mutableStateOf(false) }
-    if (showInfo) NetworkHealthInfoDialog(metric = uiState.activeMetric, onDismiss = { showInfo = false })
+
+    // Scrolling the list up first folds away the summary card (search, tabs, sorting and list stay), scrolling back
+    // down to the top unfolds it again.
+    var heroHeightPx by remember { mutableFloatStateOf(0f) }
+    var heroFoldedPx by remember { mutableFloatStateOf(0f) }
+    LaunchedEffect(heroLocked) { if (heroLocked) heroFoldedPx = 0f }
+    val foldConnection =
+        remember {
+            object : NestedScrollConnection {
+                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                    if (heroLockedNow || available.y >= 0f || heroFoldedPx >= heroHeightPx) return Offset.Zero
+                    val folded = (heroFoldedPx - available.y).coerceAtMost(heroHeightPx)
+                    val used = folded - heroFoldedPx
+                    heroFoldedPx = folded
+                    return Offset(0f, -used)
+                }
+
+                override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
+                    if (heroLockedNow || available.y <= 0f || heroFoldedPx <= 0f) return Offset.Zero
+                    val folded = (heroFoldedPx - available.y).coerceAtLeast(0f)
+                    val used = heroFoldedPx - folded
+                    heroFoldedPx = folded
+                    return Offset(0f, used)
+                }
+            }
+        }
+    val heroLocked by viewModel.heroLocked.collectAsStateWithLifecycle()
+    val heroLockedNow by rememberUpdatedState(heroLocked)
+    if (showInfo) {
+        NetworkHealthInfoDialog(
+            metric = uiState.activeMetric,
+            heroLocked = heroLocked,
+            onHeroLockedChange = viewModel::setHeroLocked,
+            onDismiss = { showInfo = false },
+        )
+    }
 
     Scaffold(
         modifier = modifier,
@@ -92,7 +136,7 @@ fun NetworkHealthScreen(
             )
         },
     ) { contentPadding ->
-        Column(modifier = Modifier.fillMaxWidth().padding(contentPadding)) {
+        Column(modifier = Modifier.fillMaxWidth().padding(contentPadding).nestedScroll(foldConnection)) {
             androidx.compose.material3.OutlinedTextField(
                 value = uiState.searchText,
                 onValueChange = viewModel::setSearchText,
@@ -101,11 +145,21 @@ fun NetworkHealthScreen(
                 singleLine = true,
             )
 
-            NetworkHealthHero(
-                uiState = uiState,
-                onLevelClick = viewModel::toggleLevelFilter,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-            )
+            Box(
+                modifier =
+                Modifier.fillMaxWidth().clipToBounds().layout { measurable, constraints ->
+                    val placeable = measurable.measure(constraints)
+                    if (heroHeightPx != placeable.height.toFloat()) heroHeightPx = placeable.height.toFloat()
+                    val folded = heroFoldedPx.coerceIn(0f, placeable.height.toFloat()).toInt()
+                    layout(placeable.width, placeable.height - folded) { placeable.placeRelative(0, -folded) }
+                },
+            ) {
+                NetworkHealthHero(
+                    uiState = uiState,
+                    onLevelClick = viewModel::toggleLevelFilter,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                )
+            }
 
             ScrollableTabRow(selectedTabIndex = uiState.activeMetric.ordinal) {
                 NetworkHealthMetric.entries.forEach { metric ->

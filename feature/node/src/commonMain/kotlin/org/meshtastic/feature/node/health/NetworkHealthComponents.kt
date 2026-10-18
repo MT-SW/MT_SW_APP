@@ -48,6 +48,7 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -593,7 +594,12 @@ internal fun MetricSparkline(values: List<Float>, color: Color, modifier: Modifi
 
 /** Explains the colours: the legend, and this tab's limits. */
 @Composable
-internal fun NetworkHealthInfoDialog(metric: NetworkHealthMetric, onDismiss: () -> Unit) {
+internal fun NetworkHealthInfoDialog(
+    metric: NetworkHealthMetric,
+    heroLocked: Boolean,
+    onHeroLockedChange: (Boolean) -> Unit,
+    onDismiss: () -> Unit,
+) {
     MeshtasticDialog(
         title = stringResource(Res.string.network_health_info_title),
         text = {
@@ -615,6 +621,14 @@ internal fun NetworkHealthInfoDialog(metric: NetworkHealthMetric, onDismiss: () 
                     }
                 }
                 Text(text = stringResource(metric.infoRes), style = MaterialTheme.typography.bodyMedium)
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = "Blokuj ukrywanie kondycji sieci przy przesuwaniu listy",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Switch(checked = heroLocked, onCheckedChange = onHeroLockedChange)
+                }
             }
         },
         confirmTextRes = Res.string.okay,

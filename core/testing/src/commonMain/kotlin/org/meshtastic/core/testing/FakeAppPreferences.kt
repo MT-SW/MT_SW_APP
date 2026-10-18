@@ -104,6 +104,12 @@ class FakeUiPrefs : UiPrefs {
         uiScale.value = value
     }
 
+    override val healthHeroLocked = MutableStateFlow(true)
+
+    override fun setHealthHeroLocked(value: Boolean) {
+        healthHeroLocked.value = value
+    }
+
     override val unitsOverride = MutableStateFlow(0)
 
     override fun setUnitsOverride(value: Int) {
