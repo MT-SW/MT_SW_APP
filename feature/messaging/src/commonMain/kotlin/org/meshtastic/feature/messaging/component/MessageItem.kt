@@ -153,7 +153,7 @@ private fun firstUrl(text: String): String? = FIRST_URL_REGEX.find(text)?.value
 internal fun formatMessageTimestamp(
     message: Message,
     showFullMessageTimestamp: Boolean,
-    fullDateTimeFormatter: (Long) -> String = DateFormatter::formatDateTime,
+    fullDateTimeFormatter: (Long) -> String = DateFormatter::formatDateTimeShort,
 ): String = if (showFullMessageTimestamp) {
     fullDateTimeFormatter(message.displayTime)
 } else {
