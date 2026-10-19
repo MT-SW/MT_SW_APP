@@ -37,6 +37,7 @@ import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -110,15 +111,19 @@ internal fun TelemetricActionsSection(
                 feature.isVisible(node) || (feature.logsType != null && availableLogs.contains(feature.logsType))
             }
             .forEachIndexed { index, feature ->
-                if (index > 0) {
-                    SectionDivider()
+                // Keyed by the row's own title: rows appear above the position row as the logs are found, and without
+                // a key they shift it down a slot, which tears down and rebuilds its map each time.
+                key(feature.titleRes) {
+                    if (index > 0) {
+                        SectionDivider()
+                    }
+                    FeatureRow(
+                        node = node,
+                        feature = feature,
+                        hasLogs = feature.logsType != null && availableLogs.contains(feature.logsType),
+                        onAction = onAction,
+                    )
                 }
-                FeatureRow(
-                    node = node,
-                    feature = feature,
-                    hasLogs = feature.logsType != null && availableLogs.contains(feature.logsType),
-                    onAction = onAction,
-                )
             }
     }
 }

@@ -31,10 +31,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.model.Node
@@ -54,6 +60,7 @@ import org.meshtastic.core.ui.util.LocalPlannerAvailable
 import org.meshtastic.feature.node.model.NodeDetailAction
 
 private const val MAP_HEIGHT_DP = 200
+private const val MAP_START_DELAY_MILLIS = 350L
 
 /**
  * Inline position content shown beneath the Position row in the Telemetry section. Displays the inline map with
@@ -126,8 +133,18 @@ internal fun PositionInlineContent(
 @Composable
 private fun PositionMap(node: Node, distance: String?) {
     Box(modifier = Modifier.padding(vertical = 4.dp)) {
-        Surface(shape = MaterialTheme.shapes.large, modifier = Modifier.fillMaxWidth().height(MAP_HEIGHT_DP.dp)) {
-            LocalInlineMapProvider.current(node, Modifier.fillMaxSize())
+        // The map engine is heavy to start; letting the rest of the details appear first keeps opening them smooth.
+        var mapReady by remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) {
+            delay(MAP_START_DELAY_MILLIS)
+            mapReady = true
+        }
+        Surface(
+            shape = MaterialTheme.shapes.large,
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            modifier = Modifier.fillMaxWidth().height(MAP_HEIGHT_DP.dp),
+        ) {
+            if (mapReady) LocalInlineMapProvider.current(node, Modifier.fillMaxSize())
         }
         if (distance != null && distance.isNotEmpty()) {
             Surface(
