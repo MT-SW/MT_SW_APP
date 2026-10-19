@@ -163,6 +163,11 @@ compose.desktop {
 
         val desktopJvmArgs = buildList {
             add("-Xmx2G")
+            // Starts with a bigger heap and compact object headers, so the first seconds spend less time growing the
+            // heap and collecting garbage. The ignore flag keeps an older JVM from refusing to start over them.
+            add("-XX:+IgnoreUnrecognizedVMOptions")
+            add("-Xms256m")
+            add("-XX:+UseCompactObjectHeaders")
             // maplibre-compose's desktop renderer reaches native code through the FFM API,
             // which refuses to load without this. Omitting it fails at first map composition,
             // not at startup, so the map tab would simply be blank.
