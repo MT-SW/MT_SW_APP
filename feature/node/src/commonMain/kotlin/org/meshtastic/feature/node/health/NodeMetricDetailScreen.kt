@@ -112,87 +112,92 @@ fun NodeMetricDetailScreen(
             FullScreenLoading(modifier = Modifier.padding(contentPadding))
             return@Scaffold
         }
-        Column(
-            modifier =
-            Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(contentPadding).padding(16.dp),
-        ) {
-            NodeMetricHero(uiState = uiState)
-            Spacer(modifier = Modifier.height(12.dp))
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier =
+                Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(contentPadding).padding(16.dp),
             ) {
-                NodeMetricRange.entries.forEach { range ->
-                    FilterChip(
-                        selected = uiState.range == range,
-                        onClick = { viewModel.setRange(range) },
-                        label = { Text(range.label) },
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-            ) {
-                DetailViewMode.entries.forEach { mode ->
-                    FilterChip(
-                        selected = DetailViewModeState.value == mode,
-                        onClick = { DetailViewModeState.value = mode },
-                        label = { Text(mode.label) },
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // The old charts stay while the new range is worked out. They dim only if it takes a moment and the
-            // spinner comes after a longer wait, so a quick switch never flashes anything.
-            val dim by
-                animateFloatAsState(
-                    targetValue = if (uiState.isRefreshing) DIMMED_ALPHA else 1f,
-                    animationSpec =
-                    tween(
-                        durationMillis = DIM_FADE_MILLIS,
-                        delayMillis = if (uiState.isRefreshing) DIM_DELAY_MILLIS else 0,
-                    ),
-                    label = "rangeDim",
-                )
-            Box {
-                Column(modifier = Modifier.alpha(dim)) {
-                    val seriesByLabel = uiState.series.associateBy { it.label }
-                    // Series not covered by seriesGroups() (e.g. the SIGNAL tab's "Przeskoki") still show last.
-                    val knownLabels = uiState.metric.seriesGroups().flatten().toSet()
-                    val ordered =
-                        uiState.metric.seriesGroups().flatten().mapNotNull { seriesByLabel[it] } +
-                            uiState.series.filter { it.label !in knownLabels }
-                    val headlineLabel = headlineLabelFor(uiState)
-                    val shown =
-                        ordered.filter { it.points.isNotEmpty() }.sortedBy { if (it.label == headlineLabel) 0 else 1 }
-
-                    if (shown.isEmpty()) {
-                        Text(
-                            text = "Brak danych w tym zakresie — wróć za jakiś czas.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                NodeMetricHero(uiState = uiState)
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                ) {
+                    NodeMetricRange.entries.forEach { range ->
+                        FilterChip(
+                            selected = uiState.range == range,
+                            onClick = { viewModel.setRange(range) },
+                            label = { Text(range.label) },
                         )
                     }
-                    shown.forEachIndexed { index, s ->
-                        // Traffic counters (except RX itself) also show their share of all received packets.
-                        val rx = seriesByLabel["RX"].takeIf { s.label in RX_SHARE_LABELS }
-                        SeriesCard(
-                            series = s,
-                            color = SERIES_COLORS.getOrElse(index) { Color.Gray },
-                            rx = rx,
-                            scale = scaleFor(uiState.metric, s.label),
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                ) {
+                    DetailViewMode.entries.forEach { mode ->
+                        FilterChip(
+                            selected = DetailViewModeState.value == mode,
+                            onClick = { DetailViewModeState.value = mode },
+                            label = { Text(mode.label) },
                         )
-                        Spacer(modifier = Modifier.height(12.dp))
                     }
                 }
-                if (uiState.isRefreshing) {
-                    LoadingIndicator(modifier = Modifier.matchParentSize())
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // The old charts stay while the new range is worked out. They dim only if it takes a moment and the
+                // spinner comes after a longer wait, so a quick switch never flashes anything.
+                val dim by
+                    animateFloatAsState(
+                        targetValue = if (uiState.isRefreshing) DIMMED_ALPHA else 1f,
+                        animationSpec =
+                        tween(
+                            durationMillis = DIM_FADE_MILLIS,
+                            delayMillis = if (uiState.isRefreshing) DIM_DELAY_MILLIS else 0,
+                        ),
+                        label = "rangeDim",
+                    )
+                Box {
+                    Column(modifier = Modifier.alpha(dim)) {
+                        val seriesByLabel = uiState.series.associateBy { it.label }
+                        // Series not covered by seriesGroups() (e.g. the SIGNAL tab's "Przeskoki") still show last.
+                        val knownLabels = uiState.metric.seriesGroups().flatten().toSet()
+                        val ordered =
+                            uiState.metric.seriesGroups().flatten().mapNotNull { seriesByLabel[it] } +
+                                uiState.series.filter { it.label !in knownLabels }
+                        val headlineLabel = headlineLabelFor(uiState)
+                        val shown =
+                            ordered
+                                .filter { it.points.isNotEmpty() }
+                                .sortedBy { if (it.label == headlineLabel) 0 else 1 }
+
+                        if (shown.isEmpty()) {
+                            Text(
+                                text = "Brak danych w tym zakresie — wróć za jakiś czas.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        shown.forEachIndexed { index, s ->
+                            // Traffic counters (except RX itself) also show their share of all received packets.
+                            val rx = seriesByLabel["RX"].takeIf { s.label in RX_SHARE_LABELS }
+                            SeriesCard(
+                                series = s,
+                                color = SERIES_COLORS.getOrElse(index) { Color.Gray },
+                                rx = rx,
+                                scale = scaleFor(uiState.metric, s.label),
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                        }
+                    }
                 }
+            }
+            // Over the whole screen, not over the charts: the charts can reach far below the visible part.
+            if (uiState.isRefreshing) {
+                LoadingIndicator(modifier = Modifier.fillMaxSize().padding(contentPadding))
             }
         }
     }
