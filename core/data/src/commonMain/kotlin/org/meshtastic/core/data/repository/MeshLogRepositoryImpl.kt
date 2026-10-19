@@ -151,7 +151,14 @@ open class MeshLogRepositoryImpl(
     override fun getLogsFromLimited(nodeNum: Int, portNum: Int, maxItem: Int): Flow<List<MeshLog>> =
         effectiveLogId(nodeNum)
             .flatMapLatest { logId ->
-                dbManager.observeCurrentDb { it.meshLogDao().getLogsFrom(logId, portNum, maxItem) }
+                dbManager.observeCurrentDb {
+                    // A specific port has its own query so the database can seek instead of walking all of the rows.
+                    if (portNum == -1) {
+                        it.meshLogDao().getLogsFrom(logId, portNum, maxItem)
+                    } else {
+                        it.meshLogDao().getLogsFromPort(logId, portNum, maxItem)
+                    }
+                }
             }
             .map { list -> list.map { it.asExternalModel() } }
             .distinctUntilChanged()
@@ -180,7 +187,7 @@ open class MeshLogRepositoryImpl(
         .flatMapLatest { logId ->
             dbManager
                 .observeCurrentDb {
-                    it.meshLogDao().getLogsFrom(logId, PortNum.TELEMETRY_APP.value, maxItem)
+                    it.meshLogDao().getLogsFromPort(logId, PortNum.TELEMETRY_APP.value, maxItem)
                 }
                 .distinctUntilChanged()
                 .mapLatest { list -> list.map { it.asExternalModel() }.mapNotNull(::parseTelemetryLog) }
@@ -200,7 +207,7 @@ open class MeshLogRepositoryImpl(
         portNum: PortNum,
         maxItem: Int,
     ): Flow<List<MeshLog>> = dbManager
-        .observeCurrentDb { it.meshLogDao().getLogsFrom(MeshLog.NODE_NUM_LOCAL, portNum.value, maxItem) }
+        .observeCurrentDb { it.meshLogDao().getLogsFromPort(MeshLog.NODE_NUM_LOCAL, portNum.value, maxItem) }
         .map { list ->
             list
                 .map { it.asExternalModel() }
@@ -241,8 +248,11 @@ open class MeshLogRepositoryImpl(
 
     /** Returns the cached [MyNodeInfo] from the system logs. */
     override fun getMyNodeInfo(): Flow<MyNodeInfo?> = dbManager
-        .observeCurrentDb { db -> db.meshLogDao().getLogsFrom(MeshLog.NODE_NUM_LOCAL, 0, DEFAULT_MAX_LOGS) }
-        .mapLatest { list -> list.map { it.asExternalModel() }.firstOrNull { it.myNodeInfo != null }?.myNodeInfo }
+        .observeCurrentDb { db -> db.meshLogDao().getLogsFromPort(MeshLog.NODE_NUM_LOCAL, 0, DEFAULT_MAX_LOGS) }
+        // Newest first, and decoding stops at the first hit instead of reading every one of up to thousands of rows.
+        .mapLatest { list ->
+            list.asSequence().map { it.asExternalModel() }.firstOrNull { it.myNodeInfo != null }?.myNodeInfo
+        }
         .flowOn(dispatchers.io)
 
     // Writes go through withDb so they register with the cross-transport merge drain barrier (see DatabaseProvider).

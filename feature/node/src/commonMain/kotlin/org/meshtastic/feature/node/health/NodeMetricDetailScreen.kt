@@ -52,6 +52,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -146,38 +147,52 @@ fun NodeMetricDetailScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (uiState.isRefreshing) {
-                LoadingIndicator(modifier = Modifier.fillMaxWidth().height(240.dp))
-                return@Column
-            }
-
-            val seriesByLabel = uiState.series.associateBy { it.label }
-            // Series not covered by seriesGroups() (e.g. the SIGNAL tab's "Przeskoki") are still shown, after the rest.
-            val knownLabels = uiState.metric.seriesGroups().flatten().toSet()
-            val ordered =
-                uiState.metric.seriesGroups().flatten().mapNotNull { seriesByLabel[it] } +
-                    uiState.series.filter { it.label !in knownLabels }
-            val headlineLabel = headlineLabelFor(uiState)
-            val shown =
-                ordered.filter { it.points.isNotEmpty() }.sortedBy { if (it.label == headlineLabel) 0 else 1 }
-
-            if (shown.isEmpty()) {
-                Text(
-                    text = "Brak danych w tym zakresie — wróć za jakiś czas.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+            // The old charts stay while the new range is worked out. They dim only if it takes a moment and the
+            // spinner comes after a longer wait, so a quick switch never flashes anything.
+            val dim by
+                animateFloatAsState(
+                    targetValue = if (uiState.isRefreshing) DIMMED_ALPHA else 1f,
+                    animationSpec =
+                    tween(
+                        durationMillis = DIM_FADE_MILLIS,
+                        delayMillis = if (uiState.isRefreshing) DIM_DELAY_MILLIS else 0,
+                    ),
+                    label = "rangeDim",
                 )
-            }
-            shown.forEachIndexed { index, s ->
-                // Traffic counters (except RX itself) also show their share of all received packets.
-                val rx = seriesByLabel["RX"].takeIf { s.label in RX_SHARE_LABELS }
-                SeriesCard(
-                    series = s,
-                    color = SERIES_COLORS.getOrElse(index) { Color.Gray },
-                    rx = rx,
-                    scale = scaleFor(uiState.metric, s.label),
-                )
-                Spacer(modifier = Modifier.height(12.dp))
+            Box {
+                Column(modifier = Modifier.alpha(dim)) {
+                    val seriesByLabel = uiState.series.associateBy { it.label }
+                    // Series not covered by seriesGroups() (e.g. the SIGNAL tab's "Przeskoki") still show last.
+                    val knownLabels = uiState.metric.seriesGroups().flatten().toSet()
+                    val ordered =
+                        uiState.metric.seriesGroups().flatten().mapNotNull { seriesByLabel[it] } +
+                            uiState.series.filter { it.label !in knownLabels }
+                    val headlineLabel = headlineLabelFor(uiState)
+                    val shown =
+                        ordered.filter { it.points.isNotEmpty() }.sortedBy { if (it.label == headlineLabel) 0 else 1 }
+
+                    if (shown.isEmpty()) {
+                        Text(
+                            text = "Brak danych w tym zakresie — wróć za jakiś czas.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    shown.forEachIndexed { index, s ->
+                        // Traffic counters (except RX itself) also show their share of all received packets.
+                        val rx = seriesByLabel["RX"].takeIf { s.label in RX_SHARE_LABELS }
+                        SeriesCard(
+                            series = s,
+                            color = SERIES_COLORS.getOrElse(index) { Color.Gray },
+                            rx = rx,
+                            scale = scaleFor(uiState.metric, s.label),
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                }
+                if (uiState.isRefreshing) {
+                    LoadingIndicator(modifier = Modifier.matchParentSize())
+                }
             }
         }
     }
@@ -286,6 +301,11 @@ private fun SeriesCard(series: MetricSeries, color: Color, rx: MetricSeries?, sc
 }
 
 private const val CHART_HEIGHT_DP = 170
+
+/** While another range is worked out the old charts dim, but only after a short wait, so quick switches stay calm. */
+private const val DIMMED_ALPHA = 0.4f
+private const val DIM_DELAY_MILLIS = 200
+private const val DIM_FADE_MILLIS = 250
 
 /** RSSI is corrected by our own LNA gain, "Noise Floor" by the viewed node's gain; other series are untouched. */
 private fun MetricSeries.withLnaCorrection(lna: LnaCorrection, nodeNum: Int): MetricSeries {
