@@ -96,6 +96,14 @@ constructor(
     private fun <T> logSource(fullHistory: Boolean, newest: Flow<List<T>>, all: Flow<List<T>>): Flow<List<T>> =
         if (fullHistory) all.calmed() else newest.calmed().onStart { emit(emptyList()) }
 
+    /** The summary only needs to know whether a request exists, so it decodes far fewer entries than the full read. */
+    private fun requestLogs(nodeId: Int, port: PortNum, fullHistory: Boolean): Flow<List<MeshLog>> =
+        if (fullHistory) {
+            meshLogRepository.getRequestLogs(nodeId, port)
+        } else {
+            meshLogRepository.getRequestLogsLimited(nodeId, port, QUICK_REQUEST_ITEMS)
+        }
+
     @Suppress("LongMethod", "CyclomaticComplexMethod")
     private fun buildFlow(nodeId: Int, effectiveNodeId: Int, fullHistory: Boolean): Flow<NodeDetailUiState> {
         val nodeFlow =
@@ -213,8 +221,8 @@ constructor(
         // 5. Requests History (we still query request logs by the target nodeId)
         val requestsFlow =
             combine(
-                meshLogRepository.getRequestLogs(nodeId, PortNum.TRACEROUTE_APP).onStart { emit(emptyList()) },
-                meshLogRepository.getRequestLogs(nodeId, PortNum.NEIGHBORINFO_APP).onStart { emit(emptyList()) },
+                requestLogs(nodeId, PortNum.TRACEROUTE_APP, fullHistory).onStart { emit(emptyList()) },
+                requestLogs(nodeId, PortNum.NEIGHBORINFO_APP, fullHistory).onStart { emit(emptyList()) },
             ) { trReqs, niReqs ->
                 trReqs to niReqs
             }
@@ -363,6 +371,9 @@ constructor(
     private companion object {
         /** How many of the newest entries of each kind the detail screen reads. */
         const val QUICK_LOG_ITEMS = 50
+
+        /** Requests are all sent by this phone and filtered by target afterwards, so look a little further back. */
+        const val QUICK_REQUEST_ITEMS = 400
 
         /** Telemetry has many kinds in one stream, so a longer look is needed to find the rarer ones. */
         const val TELEMETRY_ITEMS = 150

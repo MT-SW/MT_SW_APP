@@ -33,7 +33,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Wszędzie, gdzie wybiera się zakres danych (wykresy statystyk węzła, szczegóły metryk), jest teraz „2 dni” między 24 h a 7 dni.
 
 **Wczytywanie danych — „Wczytuję dane…”**
-* Ekrany statystyk i zdrowia sieci pokazują kółko z napisem „Wczytuję dane…” zamiast sprawiać wrażenie zawieszenia.
+* Ekrany statystyk i zdrowia sieci pokazują kółko z napisem „Wczytuję dane…” zamiast sprawiać wrażenie zawieszenia; zmiana zakresu w szczegółach metryki też pokazuje kółko w miejscu wykresów, a przyciski zakresu działają od razu.
+* Szczegóły węzła: ikony statystyk pojawiają się szybciej (lżejsze wczytywanie na starcie).
 
 **Wgrywanie ESP32 przez aplikację (OTA) — ostrzeżenie o pliku -full.bin**
 * Na ekranie aktualizacji, przy wyborze własnego pliku dla urządzeń ESP32, jest ostrzeżenie: wcześniej trzeba wgrać plik `-full.bin` (kasuje wszystkie ustawienia) przez stronę internetową (oryginalną lub inną) — wgranie go przez aplikację nie zadziała. Kto już wgrywał firmware oryginalnym flasherem z wymazaniem, ma to załatwione.
@@ -351,7 +352,8 @@ The entries below describe only what this fork adds on top of the original, from
 * Everywhere a data range is chosen (node statistics charts, metric details) there is now "2 days" between 24 h and 7 days.
 
 **Loading data — "Loading data…"**
-* Statistics and network-health screens show a spinner with "Loading data…" instead of looking frozen.
+* Statistics and network-health screens show a spinner with "Loading data…" instead of looking frozen; changing the range in a metric detail also shows the spinner in place of the charts, and the range buttons respond at once.
+* Node details: the statistics icons appear faster (lighter loading at start).
 
 **ESP32 flashing from the app (OTA) — -full.bin notice**
 * On the update screen, when choosing your own file for ESP32 devices, a notice explains that the `-full.bin` file (which erases all settings) must first be flashed through a web page (the original or another one) — flashing it through the app will not work. Anyone who already flashed with the original flasher including an erase is set.

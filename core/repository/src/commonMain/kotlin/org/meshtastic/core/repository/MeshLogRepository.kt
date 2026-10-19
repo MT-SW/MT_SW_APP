@@ -108,6 +108,10 @@ interface MeshLogRepository {
      */
     fun getRequestLogs(targetNodeNum: Int, portNum: PortNum): Flow<List<MeshLog>>
 
+    /** Like [getRequestLogs], but looks only through the newest [maxItem] outgoing entries of that port. */
+    fun getRequestLogsLimited(targetNodeNum: Int, portNum: PortNum, maxItem: Int): Flow<List<MeshLog>> =
+        getRequestLogs(targetNodeNum, portNum)
+
     /** Returns the cached [MyNodeInfo] from the system logs. */
     fun getMyNodeInfo(): Flow<MyNodeInfo?>
 

@@ -68,6 +68,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.ui.component.FullScreenLoading
+import org.meshtastic.core.ui.component.LoadingIndicator
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.theme.GraphColors.Blue
@@ -144,6 +145,11 @@ fun NodeMetricDetailScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            if (uiState.isRefreshing) {
+                LoadingIndicator(modifier = Modifier.fillMaxWidth().height(240.dp))
+                return@Column
+            }
 
             val seriesByLabel = uiState.series.associateBy { it.label }
             // Series not covered by seriesGroups() (e.g. the SIGNAL tab's "Przeskoki") are still shown, after the rest.
