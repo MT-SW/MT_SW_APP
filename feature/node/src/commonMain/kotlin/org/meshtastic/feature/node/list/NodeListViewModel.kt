@@ -266,7 +266,7 @@ class NodeListViewModel(
 
     fun muteNode(node: Node) = nodeManagementActions.requestMuteNode(viewModelScope, node)
 
-    fun removeNode(node: Node) = nodeManagementActions.requestRemoveNode(viewModelScope, node)
+    fun removeNodes(nodes: List<Node>) = nodeManagementActions.requestRemoveNodes(viewModelScope, nodes)
 
     /** Manually adds a contact by node number and name to the locally-connected radio's node DB. */
     fun addManualContact(nodeNum: Int, longName: String, shortName: String) {

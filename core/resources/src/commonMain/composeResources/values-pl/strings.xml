@@ -2031,6 +2031,12 @@
     <string name="remove_ignored">Usuń z listy ignorowanych</string>
     <string name="remove_layer">Usuń warstwę</string>
     <string name="remove_node_text">Węzeł będzie usunięty z listy dopóki nie otrzymasz ponownie danych od niego.</string>
+    <plurals name="remove_nodes_text">
+        <item quantity="one">%1$d węzeł zostanie usunięty z listy, dopóki Twój węzeł nie otrzyma od niego ponownie danych.</item>
+        <item quantity="few">%1$d węzły zostaną usunięte z listy, dopóki Twój węzeł nie otrzyma od nich ponownie danych.</item>
+        <item quantity="many">%1$d węzłów zostanie usuniętych z listy, dopóki Twój węzeł nie otrzyma od nich ponownie danych.</item>
+        <item quantity="other">%1$d węzła zostanie usuniętych z listy, dopóki Twój węzeł nie otrzyma od nich ponownie danych.</item>
+    </plurals>
     <string name="replace">Zastąp</string>
     <string name="replace_channels_and_settings_description">Ten kod QR zawiera pełną konfigurację. To ZASTĄPI Twoje obecne kanały i ustawienia radia. Wszystkie istniejące kanały zostaną usunięte.</string>
     <string name="reply">Odpowiedz</string>

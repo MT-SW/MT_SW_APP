@@ -271,7 +271,7 @@ fun NodeListScreen(
                         UnheardNodesBanner(
                             unheardNodes = unheardNodes,
                             onKeep = { viewModel.keepUnheardNodes(unheardNodes) },
-                            onRemoveAll = { unheardNodes.forEach(viewModel::removeNode) },
+                            onRemoveAll = { viewModel.removeNodes(unheardNodes) },
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
                         )
                         val filterPrefs = viewModel.nodeFilterPreferences
@@ -390,7 +390,7 @@ fun NodeListScreen(
                                 lastTracerouteTime = lastTracerouteTime,
                                 onTraceRoute = { viewModel.traceRoute(node) },
                                 onIgnore = { viewModel.ignoreNode(node) },
-                                onRemove = { viewModel.removeNode(node) },
+                                onRemove = { viewModel.removeNodes(listOf(node)) },
                                 onDismiss = { expanded = false },
                             )
                         }
@@ -463,7 +463,7 @@ private fun NodeListEmptyState(
  * node may simply be out of range rather than on another channel — it comes back on its own when next heard.
  *
  * Keep is saved per node, so the banner stays away across launches and returns only for nodes not yet kept. Remove
- * hides it for this composition, since each removal still waits on its own confirmation.
+ * hides it for this composition, since the removal still waits on its confirmation.
  */
 @Composable
 private fun UnheardNodesBanner(
