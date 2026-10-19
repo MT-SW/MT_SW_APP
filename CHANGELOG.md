@@ -43,6 +43,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Ekran powitalny na komputerze ma pasek na dole na całą szerokość, bez jaśniejszych pól po bokach.
 * Lżejszy start aplikacji na komputerze: większa pamięć na starcie, a sprzątanie węzłów rusza dopiero po minucie, żeby nie spowalniało otwierania.
 * Lista węzłów nie pyta już w kółko bazy o ikony urządzeń przy każdym nowym pakiecie (dotyczy telefonu i komputera), przez co mniej się przycina po połączeniu z radiem.
+* Mała mapka w szczegółach węzła nie buduje się już od nowa za każdym razem, gdy w szczegółach pojawiają się kolejne wiersze statystyk (telefon i komputer).
+* Szczegóły węzła otwierają się płynniej: mała mapka startuje chwilę po reszcie ekranu.
 * Okna dialogowe (np. trasy) uwzględniają „Skalowanie aplikacji”.
 
 **Szczegóły węzła — ikony statystyk pojawiają się szybciej**
@@ -364,6 +366,8 @@ The entries below describe only what this fork adds on top of the original, from
 * The desktop welcome screen's bottom bar now spans the full width, without lighter margins at the sides.
 * Lighter desktop start: a bigger starting memory, and the node cleanup begins only after a minute so it does not slow down opening.
 * The node list no longer asks the database for device icons again on every new packet (phone and desktop), so it stutters less after connecting to the radio.
+* The small map in node details is no longer rebuilt each time further statistics rows appear in the details (phone and desktop).
+* Node details open more smoothly: the small map starts a moment after the rest of the screen.
 * Dialog windows (e.g. routes) now follow the "App scale" setting.
 
 **Node details — statistics icons appear faster**
