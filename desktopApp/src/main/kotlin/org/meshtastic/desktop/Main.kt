@@ -260,6 +260,7 @@ private fun MeshServiceLifecycle() {
 }
 
 private val NODE_CLEANUP_CHECK_INTERVAL = 1.hours
+private val NODE_CLEANUP_START_DELAY = 1.minutes
 
 /**
  * Runs the periodic node-database auto-clean check for the lifetime of the composition. There is no WorkManager on the
@@ -269,6 +270,8 @@ private val NODE_CLEANUP_CHECK_INTERVAL = 1.hours
 private fun NodeCleanupLifecycle() {
     val scheduler = koinInject<DesktopNodeCleanupScheduler>()
     LaunchedEffect(Unit) {
+        // Not while the app is still opening: it reads every node, and the database serves one query at a time.
+        delay(NODE_CLEANUP_START_DELAY)
         while (isActive) {
             scheduler.runIfDue()
             delay(NODE_CLEANUP_CHECK_INTERVAL)
