@@ -44,7 +44,7 @@ The **Network health** tab is in the bottom navigation, between Nodes and Map. I
 - **Colours** — gold is good, red is fair, purple is bad, white is very bad, blue is no data. The **(i)** button at the top describes all colours and thresholds. The battery level in the node list uses the same colours.
 - **Search and sorting** — the "Search node…" field, sorting "By value" or "By activity", the "Problems only" filter, favorites on top and hiding nodes without data.
 - **Collapsing the summary card** — dragging up folds the whole "Network condition" card so more room is left for the list; dragging down expands it. You can also drag by grabbing the card itself. It works on desktop too. By default folding is locked; the switch "Lock hiding network health when scrolling the list" is in the **(i)** window.
-- **Node details** — charts in several views to choose from: line (with coloured zones), clock, bars and heat map; ranges of 1 h, 24 h, 7 days, 2 weeks, 30 days and "All"; a "Time in each state" bar.
+- **Node details** — charts in several views to choose from: line (with coloured zones), clock, bars and heat map; ranges of 1 h, 24 h, 2 days, 7 days, 2 weeks, 30 days and "All"; a "Time in each state" bar.
 - **Network summary** — the list icon at the top opens node rankings (best signal, quietest, nearest, most messages and more), pie and bar charts, and battery and signal distribution. You can share the result or save it as PDF, HTML, Markdown, text or CSV.
 - **Device WiFi signal** — when the firmware sends it, you see the WiFi strength, the number of link drops and the reason of the last drop (in Signal quality and in Network health).
 - **Widget** — on Android you can add the "Local Stats" widget to the home screen. See [Home screen widget](widget).

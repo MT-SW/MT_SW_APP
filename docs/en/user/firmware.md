@@ -2,7 +2,7 @@
 title: Firmware Updates
 parent: User Guide
 nav_order: 13
-last_updated: 2026-10-05
+last_updated: 2026-10-19
 description: Update your radio firmware over Bluetooth or USB — OTA process, version channels, pre-flight checks, and recovery.
 aliases:
   - firmware
@@ -59,6 +59,18 @@ When an ESP32 radio is connected over the network rather than Bluetooth, the app
 3. Tap **Update**. Keep the radio and phone on the same network for the whole transfer.
 
 Wi-Fi OTA takes the ESP32 `-update.bin` image rather than the `.uf2` a USB update uses; the app selects the right artifact for you.
+
+#### First time on an ESP32 with MT_SW firmware: the full file (`-full.bin`)
+
+Updating over the air (OTA) from this app works on an ESP32 only after you have flashed a special full file (`-full.bin`) once.
+
+- Flash that file from a web page: the original Meshtastic web flasher or another one. Flashing it from this app will not work.
+- **Warning:** the file erases all settings of the device. First make a backup of the settings, then flash the file, then restore the settings.
+- After that, every next update over Wi-Fi works from this app.
+- If you have already flashed the original firmware with the web flasher and used the erase option, you have this covered and can update right away.
+- If you need a `-full.bin` for your device, ask the MT_SW team and tell them which hardware you have.
+
+The same information is shown on the Firmware Update screen when you choose **Local File** for an ESP32.
 
 ### In-App USB Update
 

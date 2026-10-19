@@ -74,7 +74,7 @@ class NodeDetailViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        every { getNodeDetailsUseCase(any()) } returns emptyFlow()
+        every { getNodeDetailsUseCase.summary(any()) } returns emptyFlow()
         every { packetRepository.getContacts() } returns flowOf(emptyMap())
         every { observeRemoteAdminSessionStatus(any()) } returns flowOf(SessionStatus.NoSession)
         snackbarManager.messages.clear()
@@ -108,7 +108,7 @@ class NodeDetailViewModelTest {
     fun `uiState emits updates from useCase`() = runTest(testDispatcher) {
         val node = Node(num = 1234, user = User.Builder().also { wb -> wb.id = "!1234" }.build())
         val stateFlow = MutableStateFlow(NodeDetailUiState(node = node))
-        every { getNodeDetailsUseCase(1234) } returns stateFlow
+        every { getNodeDetailsUseCase.summary(1234) } returns stateFlow
 
         val vm = createViewModel(1234)
 

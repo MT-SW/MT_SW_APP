@@ -115,6 +115,7 @@ private val LEGEND_DATA =
 @Composable
 fun DeviceMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val timeFrame by viewModel.timeFrame.collectAsStateWithLifecycle()
     val availableTimeFrames by viewModel.availableTimeFrames.collectAsStateWithLifecycle()
     val swapBattery = LocalLnaCorrection.current.invertsBattery(state.node?.num)
@@ -166,6 +167,7 @@ fun DeviceMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
         }
 
     BaseMetricScreen(
+        isLoading = isLoading,
         onNavigateUp = onNavigateUp,
         telemetryType = TelemetryType.DEVICE,
         titleRes = Res.string.device_metrics_log,

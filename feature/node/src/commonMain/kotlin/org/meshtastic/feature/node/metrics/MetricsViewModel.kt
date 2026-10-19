@@ -130,6 +130,10 @@ open class MetricsViewModel(
             }
             .stateInWhileSubscribed(initialValue = null)
 
+    /** True until the node's history has been read -- the statistics screens show a loading indicator meanwhile. */
+    val isLoading: StateFlow<Boolean> =
+        nodeDetails.map { it == null }.stateInWhileSubscribed(initialValue = true)
+
     val state: StateFlow<MetricsState> =
         nodeDetails
             .map { it?.metricsState ?: MetricsState.Empty }

@@ -59,11 +59,13 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import org.meshtastic.core.common.util.isSameLocalDay
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.ContactKey
 import org.meshtastic.core.model.Message
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.Reaction
+import org.meshtastic.core.repository.isSenderMuted
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.feature.messaging.component.DateSeparator
@@ -129,6 +131,8 @@ internal data class MessageListHandlers(
     val onReply: (Message?) -> Unit,
     val onTranslate: (Message) -> Unit = {},
     val onToggleTranslation: (Message) -> Unit = {},
+    /** Mutes the message's sender on this conversation until the given time; 0 removes the mute. */
+    val onMuteSender: (Message, Long) -> Unit = { _, _ -> },
 )
 
 internal data class MessageListPagedState(
@@ -149,6 +153,8 @@ internal data class MessageListPagedState(
     val canReact: Boolean = true,
     /** False for an archived conversation: its channel is gone, so nothing can be sent or resent into it. */
     val canSend: Boolean = true,
+    /** Active per-sender mutes (see SenderMutePrefs); keyed by conversation and sender. */
+    val senderMutes: Map<String, Long> = emptyMap(),
 )
 
 private fun MutableState<Set<Long>>.toggle(uuid: Long) {
@@ -523,6 +529,14 @@ private fun RenderPagedChatMessageRow(
         isDirectMessage = isDirectMessageConversation,
         onTranslate = { handlers.onTranslate(message) },
         onToggleTranslation = { handlers.onToggleTranslation(message) },
+        // Muting a device on a channel only makes sense for other people's channel messages.
+        onMuteSender =
+        if (!message.fromLocal && !isDirectMessageConversation) {
+            { until -> handlers.onMuteSender(message, until) }
+        } else {
+            null
+        },
+        senderMuted = state.senderMutes.isSenderMuted(state.contactKey, node.num, nowMillis),
     )
 }
 

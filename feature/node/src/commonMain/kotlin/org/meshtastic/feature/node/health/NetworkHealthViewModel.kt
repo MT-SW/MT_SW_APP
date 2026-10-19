@@ -152,6 +152,8 @@ data class NetworkHealthUiState(
     val levelCounts: Map<HealthLevel, Int> = emptyMap(),
     /** The worst verdict of every tab, used to tint the tab icons. */
     val worstLevelByMetric: Map<NetworkHealthMetric, HealthLevel> = emptyMap(),
+    /** False until the first calculation has finished; the screen shows a loading indicator meanwhile. */
+    val isLoaded: Boolean = false,
 )
 
 @KoinViewModel
@@ -360,6 +362,7 @@ class NetworkHealthViewModel(
                 healthInfos.count { it.valueFor(metric) != null || it.metricHistory.isNotEmpty() },
                 levelCounts = levelCounts,
                 worstLevelByMetric = worstByMetric,
+                isLoaded = true,
             )
         }
             // The calculations are heavy; never on the main thread.

@@ -94,21 +94,34 @@ import kotlinx.datetime.Clock
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.DateFormatter
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.Message
 import org.meshtastic.core.model.MessageStatus
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.Reaction
 import org.meshtastic.core.model.isAckProofForged
+import org.meshtastic.core.repository.MuteDurations
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.a11y_message_from
 import org.meshtastic.core.resources.action_show_message_status
 import org.meshtastic.core.resources.filter_message_label
 import org.meshtastic.core.resources.message_translated_label
+import org.meshtastic.core.resources.mute_1_hour
+import org.meshtastic.core.resources.mute_1_month
+import org.meshtastic.core.resources.mute_1_week
+import org.meshtastic.core.resources.mute_24_hours
+import org.meshtastic.core.resources.mute_2_days
+import org.meshtastic.core.resources.mute_2_weeks
+import org.meshtastic.core.resources.mute_always
+import org.meshtastic.core.resources.mute_sender_info
+import org.meshtastic.core.resources.mute_sender_marker
+import org.meshtastic.core.resources.mute_sender_title
 import org.meshtastic.core.resources.reply
 import org.meshtastic.core.resources.security_signed_verified
 import org.meshtastic.core.ui.component.AutoLinkText
 import org.meshtastic.core.ui.component.HighlightedText
+import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.NODE_TINT_EMPHASIZED
 import org.meshtastic.core.ui.component.NODE_TINT_MUTED
 import org.meshtastic.core.ui.component.NODE_TINT_NORMAL
@@ -126,6 +139,7 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Reply
 import org.meshtastic.core.ui.icon.Save
 import org.meshtastic.core.ui.icon.ShieldCheck
+import org.meshtastic.core.ui.icon.VolumeOff
 import org.meshtastic.core.ui.theme.MessageItemColors
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.util.LocalLnaCorrection
@@ -204,6 +218,9 @@ fun MessageItem(
     isDirectMessage: Boolean = false,
     onTranslate: () -> Unit = {},
     onToggleTranslation: () -> Unit = {},
+    /** Null when muting this sender makes no sense (own messages, private chats). */
+    onMuteSender: ((untilMillis: Long) -> Unit)? = null,
+    senderMuted: Boolean = false,
 ) = Column(
     modifier =
     modifier
@@ -236,7 +253,7 @@ fun MessageItem(
     // While searching, always show the original text — FTS matches and highlights apply to it, not the translation.
     val showsTranslation = message.showTranslated && message.translatedText != null && searchQuery.isEmpty()
     val bodyText = message.displayedText(searching = searchQuery.isNotEmpty())
-    if (activeSheet != null) {
+    if (activeSheet != null && activeSheet != ActiveSheet.MuteSender) {
         ModalBottomSheet(onDismissRequest = { activeSheet = null }, sheetState = sheetState) {
             when (activeSheet) {
                 ActiveSheet.Actions -> {
@@ -288,8 +305,22 @@ fun MessageItem(
                             activeSheet = null
                             onToggleTranslation()
                         },
+                        senderMuted = senderMuted,
+                        onMuteSender =
+                        onMuteSender?.let { mute ->
+                            {
+                                if (senderMuted) {
+                                    activeSheet = null
+                                    mute(0L)
+                                } else {
+                                    activeSheet = ActiveSheet.MuteSender
+                                }
+                            }
+                        },
                     )
                 }
+
+                ActiveSheet.MuteSender -> Unit
 
                 ActiveSheet.Emoji -> {
                     EmojiPickerDialog(
@@ -341,6 +372,33 @@ fun MessageItem(
                     Modifier
                 },
             )
+    if (activeSheet == ActiveSheet.MuteSender && onMuteSender != null) {
+        val muteLabels =
+            listOf(
+                Res.string.mute_1_hour,
+                Res.string.mute_24_hours,
+                Res.string.mute_2_days,
+                Res.string.mute_1_week,
+                Res.string.mute_2_weeks,
+                Res.string.mute_1_month,
+                Res.string.mute_always,
+            )
+        MeshtasticDialog(
+            title = stringResource(Res.string.mute_sender_title, node.user.long_name),
+            messageRes = Res.string.mute_sender_info,
+            choices =
+            muteLabels
+                .mapIndexed { index, label ->
+                    stringResource(label) to
+                        {
+                            activeSheet = null
+                            onMuteSender(MuteDurations.millis[index].toUntilMillis())
+                        }
+                }
+                .toMap(),
+            onDismiss = { activeSheet = null },
+        )
+    }
     val senderName = if (message.fromLocal) ourNode.user.long_name else node.user.long_name
     val messageA11yText = stringResource(Res.string.a11y_message_from, senderName, bodyText)
     // Timestamp lives in the group header (Google Chat pattern) rather than inside every bubble; grouping is
@@ -369,6 +427,14 @@ fun MessageItem(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(text = timestamp, style = metadataStyle, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (senderMuted) {
+                    Icon(
+                        imageVector = MeshtasticIcons.VolumeOff,
+                        contentDescription = stringResource(Res.string.mute_sender_marker),
+                        modifier = Modifier.size(14.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
     }
@@ -659,6 +725,7 @@ private fun ReplySwipeAffordance(progress: Float, modifier: Modifier = Modifier)
 private enum class ActiveSheet {
     Actions,
     Emoji,
+    MuteSender,
 }
 
 internal val MessageStatusColorKey = SemanticsPropertyKey<Color>("MessageStatusColor")
@@ -862,3 +929,6 @@ private fun SaveImageButton(imageUrl: String, modifier: Modifier = Modifier) {
         }
     }
 }
+
+/** Turns a mute length into an end time; "always" stays [Long.MAX_VALUE] instead of overflowing. */
+private fun Long.toUntilMillis(): Long = if (this == Long.MAX_VALUE) this else nowMillis + this

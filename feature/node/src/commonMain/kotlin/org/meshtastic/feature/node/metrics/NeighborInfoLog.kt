@@ -43,6 +43,7 @@ import org.meshtastic.core.model.getNeighborInfoResponse
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.neighbor_info
 import org.meshtastic.core.resources.routing_error_no_response
+import org.meshtastic.core.ui.component.FullScreenLoading
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.icon.Groups
@@ -84,6 +85,7 @@ private sealed interface NeighborInfoLogItem {
 @Composable
 fun NeighborInfoLogScreen(modifier: Modifier = Modifier, viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     fun getUsername(nodeNum: Int): String = with(viewModel.getUser(nodeNum)) { "$long_name ($short_name)" }
 
@@ -139,6 +141,10 @@ fun NeighborInfoLogScreen(modifier: Modifier = Modifier, viewModel: MetricsViewM
             )
         },
     ) { innerPadding ->
+        if (isLoading) {
+            FullScreenLoading(modifier = Modifier.padding(innerPadding))
+            return@Scaffold
+        }
         LazyColumn(
             modifier = modifier.fillMaxSize().padding(innerPadding),
             contentPadding = PaddingValues(horizontal = 16.dp),

@@ -90,6 +90,8 @@ data class NetworkSummaryUiState(
     val snrDistribution: List<Int> = listOf(0, 0, 0, 0, 0),
     /** Text messages per day over the last 7 days, oldest first; the last one is the last 24 hours. */
     val messagesPerDay: List<Int> = List(DAYS_IN_WEEK) { 0 },
+    /** False until the first calculation has finished; the screen shows a loading indicator meanwhile. */
+    val isLoaded: Boolean = false,
 )
 
 const val DAYS_IN_WEEK = 7
@@ -326,6 +328,7 @@ class NetworkSummaryViewModel(
                 }
 
             NetworkSummaryUiState(
+                isLoaded = true,
                 onlineCount = nodes.count { it.isOnline },
                 totalCount = nodes.size,
                 quietestNodes = quietestNodes,

@@ -356,6 +356,8 @@
     <string name="contrast_high">High</string>
     <string name="contrast_medium">Medium</string>
     <string name="contrast_standard">Standard</string>
+    <string name="chat_info_title">How conversations work</string>
+    <string name="chat_info_body">Chat list\n• Tap a conversation to open it.\n• Long-press a conversation to select it. Then you can mute it, pin it, mark it as unread or delete it. Swiping a row also mutes or deletes it.\n• Mute lengths are the same everywhere: 1 hour, 24 hours, 2 days, 1 week, 2 weeks, 1 month or always. Muted messages are still saved; only notifications and sound are off.\n\nInside a conversation\n• Long-press a message to react, reply, copy, select or delete it.\n• On a channel the same menu also lets you mute messages from that one device on that one channel (and unmute it later). A small speaker icon next to the name shows who is muted.\n• Under your own messages a small delivery label shows the state. Tap it to see how many devices relayed the message and which ones. This relay detail is available only in this app.</string>
     <string name="conversations">Conversations</string>
     <string name="copy">Copy</string>
     <string name="copyright_notice">Meshtastic® Copyright Meshtastic LLC</string>
@@ -404,6 +406,9 @@
     <string name="debug_sniffer_title">Sniffer mode</string>
     <string name="debug_store_logs_summary">Disable to skip writing mesh logs to disk</string>
     <string name="debug_store_logs_title">Store mesh logs</string>
+    <string name="debug_info_title">About this screen</string>
+    <string name="debug_info_body">Packets\nEvery packet the radio passed to the app. Use the gear to filter and the bin to delete the list.\n\nApp logs\nMessages written by this app itself. Useful when something in the app does not work.\n\nDevice logs\nThe text the radio prints on its serial port. Turn on "Debug Logs" in the device security settings first. Over Bluetooth this works with any firmware; over Wi-Fi and USB only with MT_SW firmware.</string>
+    <string name="show_node_links_summary">Draws lines between nodes that exchange packets: neighbour reports, traceroutes and direct receptions.</string>
     <string name="debug_tab_app_logs">App logs</string>
     <string name="debug_tab_device_logs">Device logs</string>
     <string name="debug_tab_packets">Packets</string>
@@ -801,6 +806,8 @@
     <string name="firmware_update_unidentified_device">Unknown device</string>
     <string name="firmware_update_unidentified_summary">This device is not in the hardware list, so only your own firmware file can be flashed (.zip for nRF52, .bin for ESP32). Use only firmware built for this device.</string>
     <string name="firmware_update_unidentified_title">Unknown device</string>
+    <string name="firmware_update_esp_full_bin_title">ESP32: first flash the full file (-full.bin)</string>
+    <string name="firmware_update_esp_full_bin_body">Updating over the air (OTA) from this app works on an ESP32 only after you have flashed the special full file (-full.bin) once. That file must be flashed from a web page (the original Meshtastic web flasher or another one); flashing it from this app will not work. WARNING: it erases all settings of the device, so first make a backup of the settings, then flash the file and restore the settings. After that, every next update over Wi-Fi works from this app. If you have already flashed the original firmware with the web flasher and used the erase option, you have this covered and can update right away. If you need a -full.bin for your device, ask the MT_SW team and say which hardware you have.</string>
     <string name="firmware_update_own_file_warning_body">Flashing your own file or an unlisted device is risky and done at your own responsibility. The app cannot verify that the file fits this device. Firmware built for a different board or chip can leave the device unable to start, and recovery may need a cable and special tools. Before you continue: make sure the file is built exactly for this device, charge the device more than half, keep it close, and do not disconnect or close the app until the update finishes.</string>
     <string name="firmware_update_own_file_warning_title">Risky: file not verified</string>
     <string name="firmware_update_local_file">Local File</string>
@@ -1063,6 +1070,7 @@
     <string name="load_5_min">Load 5m</string>
     <string name="load_5_min_description">Five-minute system load average</string>
     <string name="load_indexed">Load %1$d</string>
+    <string name="loading_data">Loading data…</string>
     <string name="loading">Loading</string>
     <!-- LOCAL -->
     <string name="local_mbtiles_file">Local MBTiles File</string>
@@ -1405,6 +1413,16 @@
     <string name="must_set_region">You must set a region!</string>
     <string name="must_update">You must update this application on the app store (or Github). It is too old to talk to this radio firmware.  Please read our <a href="https://meshtastic.org/docs/software/android/installation">docs</a> on this topic.</string>
     <!-- MUTE -->
+    <string name="mute_1_hour">1 hour</string>
+    <string name="mute_24_hours">24 hours</string>
+    <string name="mute_2_days">2 days</string>
+    <string name="mute_2_weeks">2 weeks</string>
+    <string name="mute_1_month">1 month</string>
+    <string name="mute_sender_action">Mute messages from this device on this channel</string>
+    <string name="unmute_sender_action">Unmute this device on this channel</string>
+    <string name="mute_sender_title">Mute %1$s on this channel</string>
+    <string name="mute_sender_info">Messages are still saved and visible. Only notifications and sound are switched off, and only on this channel.</string>
+    <string name="mute_sender_marker">Muted on this channel</string>
     <string name="mute_1_week">1 week</string>
     <string name="mute_8_hours">8 hours</string>
     <string name="mute_add">Mute notifications for '%1$s'?</string>

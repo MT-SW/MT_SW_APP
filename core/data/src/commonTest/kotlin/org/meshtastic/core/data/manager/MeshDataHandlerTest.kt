@@ -183,6 +183,7 @@ class MeshDataHandlerTest {
                 meshBeaconRepository = meshBeaconRepository,
                 radioInterfaceService = radioInterfaceService,
                 activeConversationTracker = activeConversationTracker,
+                senderMutePrefs = FakeSenderMutePrefs(),
                 scope = testScope.asServiceScope(),
             )
 
@@ -2096,4 +2097,11 @@ class MeshDataHandlerTest {
 
         verifySuspend(exactly(0)) { packetRepository.insert(any(), any(), any(), any(), any(), any()) }
     }
+}
+
+private class FakeSenderMutePrefs : org.meshtastic.core.repository.SenderMutePrefs {
+    override val mutes: kotlinx.coroutines.flow.StateFlow<Map<String, Long>> =
+        kotlinx.coroutines.flow.MutableStateFlow(emptyMap())
+
+    override fun setMuteUntil(contactKey: String, senderNum: Int, untilMillis: Long) = Unit
 }

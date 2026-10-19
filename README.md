@@ -94,7 +94,7 @@ Nowa, szósta zakładka w dolnej nawigacji (między Węzłami a Mapą), której 
 - **7 kategorii metryk** per węzeł: zasilanie (bateria/napięcie/prąd), sygnał (SNR/RSSI/poziom szumu, z fallbackiem na liczbę przeskoków gdy brak bezpośrednich odczytów), sieć (kanał/eter), środowisko (temperatura/wilgotność/ciśnienie), **zasoby** (CPU/pamięć/flash/PSRAM hosta węzła — wymaga customowego firmware z rozszerzoną telemetrią), ruch (TX/RX/duplikaty/przekazane/uszkodzone) i sąsiedzi.
 - **Filtr po ocenie** — kliknięcie w liczbę w karcie „Kondycja sieci” (np. „3 Źle”) pokazuje tylko węzły z tą oceną; każda zakładka pamięta swój filtr osobno, a ponowne kliknięcie go zdejmuje.
 - **Widżet na pulpit Androida "Local Stats"** — pokazuje na żywo CPU/Flash/PSRAM hosta, z zachowaniem wartości między restartami appki.
-- Lista węzłów z sortowaniem, przypinaniem ulubionych na górze, ukrywaniem pustych wpisów i wyszukiwarką; szczegóły każdej metryki jako wykres w oknie 1 h / 24 h / 7 dni / 2 tygodnie / 30 dni / wszystko.
+- Lista węzłów z sortowaniem, przypinaniem ulubionych na górze, ukrywaniem pustych wpisów i wyszukiwarką; szczegóły każdej metryki jako wykres w oknie 1 h / 24 h / 2 dni / 7 dni / 2 tygodnie / 30 dni / wszystko.
 - **Ekran "Podsumowanie"** — karty z rankingami top-3: najcichsze węzły, najlepszy sygnał, najwięcej wysłanych pozycji, fizycznie najbliższe węzły, najwięcej danych telemetrii, najwięcej wiadomości (tydzień/dziś) i inne — wszystkie poprawnie wykluczają lokalnie podłączone urządzenie z rankingów, żeby nie zaburzało wyników.
 - Architektura danych: wszystko dekodowane na żywo z istniejącego logu zdarzeń mesh przy każdym odczycie ekranu — żadne dane nie są duplikowane w osobnej tabeli, więc statystyki są zawsze aktualne i nie zajmują dodatkowego miejsca w bazie.
 
@@ -148,6 +148,9 @@ Tryb pokazujący ruch w eterze, który normalnie by zniknął — wszystkie paki
 - **Desktop: Enter = nowa linijka, Ctrl+Enter = wyślij** — zamiast wymuszonego wysyłania samym Enterem, zachowanie typowe dla komunikatorów na komputerze; na telefonie wysyłanie zostaje osobnym przyciskiem obok pola tekstowego.
 - **Domyślne szablony w Szybkim Czacie (Quick Chat)** — appka wcześniej startowała z pustą listą szablonów wiadomości; teraz przy pierwszym uruchomieniu automatycznie wypełnia ją zestawem własnych komend sieciowych (np. `scyzoryk pomoc`, `scyzoryk test`, `scyzoryk range`, `scyzoryk pogoda`, `scyzoryk info`, `scyzoryk aktualnosci`).
 - **Długie wiadomości dzielone na części i składane na bieżąco** — tekst, który nie mieści się w jednym pakiecie, jest dzielony po słowach na kilka pakietów, a każdy dostaje na początku widoczny znacznik w rodzaju `[k9 2/4] ` (dwuznakowy identyfikator grupy, numer części i liczba części). Odbiorca z tym forkiem widzi jedną, złożoną wiadomość z informacją, ile części już dotarło; po 3 minutach bez brakujących części appka przestaje czekać i pokazuje to, co przyszło. Inni klienci Meshtastic widzą kolejne części jako osobne wiadomości ze znacznikiem. Podgląd na liście kontaktów i status wysyłania/odbierania uwzględniają kierunek.
+- **Wyciszanie urządzenia na kanale** — przytrzymaj wiadomość, otwórz „Więcej działań” i wybierz „Wycisz wiadomości od tego urządzenia na tym kanale”. Wiadomości nadal się zapisują; wyłączone są tylko powiadomienia i dźwięk, tylko na tym jednym kanale, a przy nazwie pojawia się mała ikona głośnika. Wyciszenie przetrwa restart i można je cofnąć tym samym menu.
+- **Jednolite czasy wyciszenia** — wszędzie (rozmowy prywatne, kanały, urządzenie na kanale) te same: 1 godzina, 24 godziny, 2 dni, 1 tydzień, 2 tygodnie, 1 miesiąc, na zawsze.
+- **Ikona (i) na liście rozmów** — opisuje przytrzymanie, wyciszanie i klikalne etykiety dostarczenia (ile urządzeń przekazało wiadomość i które; ten szczegół jest tylko w tej aplikacji).
 
 ## Jakość sygnału i korekta LNA
 
@@ -336,7 +339,7 @@ A new, sixth tab in the bottom navigation (between Nodes and Map) that doesn't e
 - **7 metric categories** per node: power (battery/voltage/current), signal (SNR/RSSI/noise floor, with a hop-count fallback when there are no direct readings), network (channel/air utilization), environment (temperature/humidity/pressure), **resources** (node host CPU/memory/flash/PSRAM — requires custom firmware with extended telemetry), traffic (TX/RX/duplicates/relayed/corrupted), and neighbors.
 - **Filter by rating** — tapping a count in the "Network condition" card (e.g. "3 Bad") lists only the nodes with that rating; every tab keeps its own filter, and a second tap clears it.
 - **Android home-screen "Local Stats" widget** — shows live host CPU/Flash/PSRAM, persisted across app restarts.
-- Node list with sorting, pinning favorites to the top, hiding empty entries, and search; each metric's detail view is a chart over a 1 h / 24 h / 7 days / 2 weeks / 30 days / all window.
+- Node list with sorting, pinning favorites to the top, hiding empty entries, and search; each metric's detail view is a chart over a 1 h / 24 h / 2 days / 7 days / 2 weeks / 30 days / all window.
 - **"Summary" screen** — cards with top-3 rankings: quietest nodes, best signal, most positions sent, physically closest nodes, most telemetry data, most messages (week/today), and more — all correctly exclude the locally connected device from the rankings so it doesn't skew results.
 - Data architecture: everything is decoded live from the existing mesh event log every time the screen is read — nothing is duplicated into a separate table, so the stats are always current and take no extra database space.
 
@@ -389,6 +392,9 @@ A mode that surfaces air traffic that would normally just vanish — every packe
 - **Desktop: Enter = new line, Ctrl+Enter = send** — instead of forcing a send on plain Enter, matching the behavior people expect from desktop chat apps; on the phone, sending stays a separate button next to the text field.
 - **Default Quick Chat templates** — the app's Quick Chat template list used to start out empty; now on first launch it's automatically seeded with a set of custom network commands (e.g. `scyzoryk pomoc`, `scyzoryk test`, `scyzoryk range`, `scyzoryk pogoda`, `scyzoryk info`, `scyzoryk aktualnosci`).
 - **Long messages are split into parts and reassembled live** — text that does not fit in one packet is split on word boundaries into several packets, each starting with a visible tag such as `[k9 2/4] ` (a two-character group id, the part number and the part count). A receiver running this fork sees one merged message with a note on how many parts have arrived; after 3 minutes with parts still missing the app stops waiting and shows what came. Other Meshtastic clients see the parts as separate messages with the tag. The contact list preview and the sending/receiving status are direction-aware.
+- **Muting a device on a channel** — long-press a message, open "More actions" and choose "Mute messages from this device on this channel". Messages are still saved; only notifications and sound are off, only on that one channel, and a small speaker icon appears by the name. The mute survives a restart and can be undone from the same menu.
+- **One set of mute lengths** — the same everywhere (private chats, channels, a device on a channel): 1 hour, 24 hours, 2 days, 1 week, 2 weeks, 1 month, always.
+- **(i) icon on the conversation list** — explains touch & hold, muting and the tappable delivery labels (how many devices relayed the message and which; this detail exists only in this app).
 
 ## Signal quality and LNA correction
 

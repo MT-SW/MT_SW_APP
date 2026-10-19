@@ -65,10 +65,12 @@ import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.RadioSessionContext
 import org.meshtastic.core.repository.RemoteShellHandler
+import org.meshtastic.core.repository.SenderMutePrefs
 import org.meshtastic.core.repository.ServiceStateWriter
 import org.meshtastic.core.repository.StoreForwardPacketHandler
 import org.meshtastic.core.repository.TelemetryPacketHandler
 import org.meshtastic.core.repository.TracerouteHandler
+import org.meshtastic.core.repository.isSenderMuted
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.critical_alert
 import org.meshtastic.core.resources.error_duty_cycle
@@ -117,6 +119,7 @@ class MeshDataHandlerImpl(
     private val meshBeaconRepository: MeshBeaconRepository,
     private val radioInterfaceService: RadioInterfaceService,
     private val activeConversationTracker: ActiveConversationTracker,
+    private val senderMutePrefs: SenderMutePrefs,
     private val scope: ServiceScope,
 ) : MeshDataHandler {
 
@@ -545,7 +548,11 @@ class MeshDataHandlerImpl(
         updateNotification: Boolean,
     ) {
         val conversationMuted = packetRepository.value.getContactSettings(contactKey).isMuted
-        val nodeMuted = nodeManager.getNodeById(dataPacket.from.orEmpty())?.isMuted == true
+        val sender = nodeManager.getNodeById(dataPacket.from.orEmpty())
+        // Muted for this one channel/conversation only (long-press a message); messages are still stored.
+        val senderMuted =
+            sender != null && senderMutePrefs.mutes.value.isSenderMuted(contactKey, sender.num, nowMillis)
+        val nodeMuted = senderMuted || sender?.isMuted == true
         // A mention of our own id is a targeted ping, so it breaks through a muted channel/conversation
         // (per meshtastic/design#21). Node mute is a stronger, per-sender signal and stays authoritative:
         // a muted node cannot force a notification by spamming @-mentions.
@@ -688,7 +695,9 @@ class MeshDataHandlerImpl(
                 ?.let { originalPacket ->
                     // Skip notification if the original message was filtered
                     val conversationMuted = packetRepository.value.getContactSettings(contactKey).isMuted
-                    val nodeMuted = nodeManager.getNodeById(fromId)?.isMuted == true
+                    val nodeMuted =
+                        nodeManager.getNodeById(fromId)?.isMuted == true ||
+                            senderMutePrefs.mutes.value.isSenderMuted(contactKey, packet.from, nowMillis)
                     val muted = conversationMuted || nodeMuted
                     val announcement = activeConversationTracker.announcementFor(contactKey)
 

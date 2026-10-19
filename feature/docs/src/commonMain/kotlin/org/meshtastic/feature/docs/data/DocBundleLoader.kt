@@ -283,7 +283,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
                 "en/user/messages-and-channels.html",
                 3,
                 listOf("channels", "direct-messages", "messaging", "conversations"),
-                4500,
+                5300,
                 "messages",
             ),
             UserPageDef(
@@ -391,7 +391,7 @@ class DefaultDocBundleLoader : DocBundleLoader {
                 "en/user/firmware.html",
                 13,
                 listOf("firmware", "update", "ota", "flash"),
-                3400,
+                4200,
                 "firmware",
             ),
             UserPageDef(

@@ -2,7 +2,7 @@
 title: Aktualizacje firmware
 parent: Przewodnik użytkownika
 nav_order: 13
-last_updated: 2026-10-05
+last_updated: 2026-10-19
 description: Aktualizuj firmware radia przez Bluetooth lub USB — proces OTA, kanały wersji, kontrole przed aktualizacją i odzyskiwanie.
 aliases:
   - firmware
@@ -59,6 +59,18 @@ Gdy radio ESP32 jest połączone przez sieć, a nie przez Bluetooth, aplikacja o
 3. Dotknij **Aktualizuj**. Trzymaj radio i telefon w tej samej sieci przez cały czas transferu.
 
 WiFi OTA używa obrazu ESP32 `-update.bin`, a nie pliku `.uf2` używanego przy aktualizacji przez USB; aplikacja sama wybiera właściwy plik.
+
+#### Pierwszy raz na ESP32 z firmware MT_SW: pełny plik (`-full.bin`)
+
+Aktualizacja przez OTA z tej aplikacji działa na ESP32 dopiero po jednorazowym wgraniu specjalnego pełnego pliku (`-full.bin`).
+
+- Wgraj ten plik przez stronę internetową: oryginalny flasher Meshtastic albo inny. Wgranie go przez tę aplikację nie zadziała.
+- **Uwaga:** ten plik kasuje wszystkie ustawienia urządzenia. Najpierw zrób kopię ustawień, potem wgraj plik, potem przywróć ustawienia.
+- Po tym każda kolejna aktualizacja przez Wi-Fi działa z tej aplikacji.
+- Jeśli wcześniej wgrywałeś oryginalne oprogramowanie przez stronę flashera i użyłeś wymazywania, to masz to już załatwione i możesz od razu aktualizować.
+- Jeśli potrzebujesz pliku `-full.bin` dla swojego urządzenia, napisz do zespołu MT_SW i podaj, jaki masz sprzęt.
+
+Ta sama informacja pojawia się na ekranie aktualizacji, gdy wybierzesz **Plik lokalny** dla ESP32.
 
 ### Aktualizacja USB w aplikacji
 

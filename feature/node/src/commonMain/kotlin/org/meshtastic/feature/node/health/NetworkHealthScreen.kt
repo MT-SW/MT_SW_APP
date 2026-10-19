@@ -59,6 +59,7 @@ import kotlinx.coroutines.launch
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.FullScreenLoading
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.List
@@ -247,6 +248,7 @@ fun NetworkHealthScreen(
                     listState = listState,
                     modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
                 )
+                if (!uiState.isLoaded) FullScreenLoading()
             }
         }
     }

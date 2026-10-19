@@ -93,6 +93,8 @@ can act on it directly:
 - **Touch & hold to select** one or more conversations, then use the action bar to **Pin**,
   **Mark unread**, mute or delete them together. Pinned conversations carry a pin marker and rise
   to the top of **their own section**.
+- **The (i) icon at the top of the list** opens a short guide: what tap, touch & hold and swipe do, how to mute, and what the delivery labels mean.
+- **Mute lengths are the same everywhere:** 1 hour, 24 hours, 2 days, 1 week, 2 weeks, 1 month or always (private chats, channels and a device on a channel). Older 8-hour mutes keep working until they expire. Muted messages are still saved; only notifications and sound are off.
 - **The list is split into Channels and Direct Messages**, each with a collapsible header and each
   sorted independently — so a pinned direct message rises within its own section, not above the
   Channels one.
@@ -239,6 +241,7 @@ delivery status, are:
 - **Copy** — copy the message text to the clipboard
 - **Translate** — translate a received message into your device language, and toggle between the original and translated text (Google Play build only; uses on-device translation). The first translation into a language asks to download a one-time language model and tells you its size, then translates once the download finishes. If the download fails, or the message is already in your language, the app says so instead of translating
 - **Select** — start multi-select, so you can act on several messages at once
+- **Mute messages from this device on this channel** — (channels only, not on your own messages) pick a mute length from the list. Messages are still saved and visible; only notifications and sound are off, and only on that one channel. A small speaker icon appears next to the muted device's name, and the same menu entry turns into **Unmute this device on this channel**. The mute survives an app restart
 - **Delete** — remove the message from this phone. It works on any message in the conversation, yours or not, and does not remove it from anyone else's radio or phone
 
 ### Message Priority

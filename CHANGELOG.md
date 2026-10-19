@@ -18,6 +18,27 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Wyciszanie urządzenia na kanale i jednolite czasy wyciszenia**
+* Przytrzymaj wiadomość → „Więcej działań” → „Wycisz wiadomości od tego urządzenia na tym kanale”. Wiadomości nadal się zapisują i są widoczne; wyłączone są tylko powiadomienia i dźwięk, tylko na tym kanale. Obok nazwy jest mała ikona głośnika, wyciszenie przetrwa restart i można je cofnąć w tym samym menu.
+* Czasy wyciszenia są teraz wszędzie takie same (rozmowy prywatne, kanały, urządzenie na kanale): 1 godzina, 24 godziny, 2 dni, 1 tydzień, 2 tygodnie, 1 miesiąc, na zawsze. Dawne wyciszenia (np. na 8 godzin) działają, aż wygasną.
+
+**Ikona (i) na liście rozmów i nowe opisy**
+* Na liście rozmów jest ikona (i) z opisem: dotknięcie, przytrzymanie, przesunięcie, wyciszanie i klikalne etykiety dostarczenia (ile urządzeń przekazało wiadomość i które — tylko w tej aplikacji).
+* Panel debugowania ma ikonę (i) opisującą zakładki Pakiety, Logi aplikacji i Logi urządzenia; przełącznik połączeń na mapie ma krótki opis.
+
+**Nowa opcja zakresu „2 dni”**
+* Wszędzie, gdzie wybiera się zakres danych (wykresy statystyk węzła, szczegóły metryk), jest teraz „2 dni” między 24 h a 7 dni.
+
+**Wczytywanie danych — „Wczytuję dane…”**
+* Ekrany statystyk i zdrowia sieci pokazują kółko z napisem „Wczytuję dane…” zamiast sprawiać wrażenie zawieszenia.
+
+**Wgrywanie ESP32 przez aplikację (OTA) — ostrzeżenie o pliku -full.bin**
+* Na ekranie aktualizacji, przy wyborze własnego pliku dla urządzeń ESP32, jest ostrzeżenie: wcześniej trzeba wgrać plik `-full.bin` (kasuje wszystkie ustawienia) przez stronę internetową (oryginalną lub inną) — wgranie go przez aplikację nie zadziała. Kto już wgrywał firmware oryginalnym flasherem z wymazaniem, ma to załatwione.
+
+**Wygląd na komputerze i okna dialogowe**
+* Ekran powitalny na komputerze ma pasek na dole na całą szerokość, bez jaśniejszych pól po bokach.
+* Okna dialogowe (np. trasy) uwzględniają „Skalowanie aplikacji”.
+
 **Szczegóły węzła — ikony statystyk pojawiają się szybciej**
 * Przy pierwszym wejściu w szczegóły węzła ikony wejścia w statystyki nie czekają już na wczytanie całej historii (do 5000 wpisów): najpierw pojawiają się z najnowszych ~300 wpisów prawie od razu, a pełna historia dociąga się w tle.
 
@@ -311,6 +332,27 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Muting a device on a channel and one set of mute lengths**
+* Long-press a message → "More actions" → "Mute messages from this device on this channel". Messages are still saved and visible; only notifications and sound are off, only on that channel. A small speaker icon appears by the name, the mute survives a restart and can be undone from the same menu.
+* Mute lengths are now the same everywhere (private chats, channels, a device on a channel): 1 hour, 24 hours, 2 days, 1 week, 2 weeks, 1 month, always. Older mutes (e.g. 8 hours) keep working until they expire.
+
+**(i) icon on the conversation list and new descriptions**
+* The conversation list has an (i) icon explaining touch, touch & hold, swipe, muting and the tappable delivery labels (how many devices relayed the message and which — only in this app).
+* The debug panel has an (i) icon describing the Packets, App logs and Device logs tabs; the map's node-links toggle has a short description.
+
+**New "2 days" range option**
+* Everywhere a data range is chosen (node statistics charts, metric details) there is now "2 days" between 24 h and 7 days.
+
+**Loading data — "Loading data…"**
+* Statistics and network-health screens show a spinner with "Loading data…" instead of looking frozen.
+
+**ESP32 flashing from the app (OTA) — -full.bin notice**
+* On the update screen, when choosing your own file for ESP32 devices, a notice explains that the `-full.bin` file (which erases all settings) must first be flashed through a web page (the original or another one) — flashing it through the app will not work. Anyone who already flashed with the original flasher including an erase is set.
+
+**Desktop look and dialogs**
+* The desktop welcome screen's bottom bar now spans the full width, without lighter margins at the sides.
+* Dialog windows (e.g. routes) now follow the "App scale" setting.
 
 **Node details — statistics icons appear faster**
 * On first opening a node's details, the icons that open its statistics no longer wait for the whole history (up to 5000 entries) to load: they first appear from the newest ~300 entries almost at once, and the full history loads in the background.
