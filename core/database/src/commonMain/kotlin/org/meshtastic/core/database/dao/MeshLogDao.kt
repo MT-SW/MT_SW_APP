@@ -136,6 +136,16 @@ interface MeshLogDao {
     fun getLogsFrom(fromNum: Int, portNum: Int, maxItem: Int): Flow<List<MeshLog>>
 
     /**
+     * Same as [getLogsFrom] for one specific port. Without the `OR` on the port, the database can seek straight to the
+     * newest rows through the (port, sender, date) index instead of walking every row of the sender.
+     */
+    @Query(
+        "SELECT * FROM log WHERE port_num = :portNum AND from_num = :fromNum " +
+            "ORDER BY received_date DESC LIMIT :maxItem",
+    )
+    fun getLogsFromPort(fromNum: Int, portNum: Int, maxItem: Int): Flow<List<MeshLog>>
+
+    /**
      * The single most recent [MeshLog] per distinct sender, across every port — used for live per-node reads (e.g.
      * relay-node display) without a persisted column.
      */
