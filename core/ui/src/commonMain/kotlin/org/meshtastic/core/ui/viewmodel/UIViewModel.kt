@@ -438,8 +438,9 @@ class UIViewModel(
      *
      * Shown at random, not on a clock: a due time is stored, and each time the notice is shown (and on the very first
      * run after install, when nothing is stored yet) the next one is set a random
-     * [NARROW_BAND_WARNING_MIN_GAP_MILLIS]..[NARROW_BAND_WARNING_MAX_GAP_MILLIS] ahead, so it comes up every one to two
-     * weeks at an unpredictable hour. The due time lives in storage, so killing the app neither resets nor repeats it.
+     * [NARROW_BAND_WARNING_MIN_GAP_MILLIS]..[NARROW_BAND_WARNING_MAX_GAP_MILLIS] ahead, so it comes up at an
+     * unpredictable hour. The next time is stored only when the dialog is closed, so if the due time passes while the
+     * app is closed (or the dialog is still open when it is killed), it appears on the next launch.
      * Foreground-only by design — no background/WorkManager check. Unrelated to the separate notice shown when remote
      * admin is opened from Node Details.
      */
@@ -449,7 +450,7 @@ class UIViewModel(
 
     private val narrowBandScheduleLock = Mutex()
 
-    /** Stores when the general notice may next appear: a random one to two weeks from [now]. */
+    /** Stores when the general notice may next appear: a random gap from [now]. */
     private suspend fun scheduleNextNarrowBandWarning(now: Long) {
         val gap = Random.nextLong(NARROW_BAND_WARNING_MIN_GAP_MILLIS, NARROW_BAND_WARNING_MAX_GAP_MILLIS + 1)
         uiPrefs.setNextNarrowBandWarningMillis(now + gap)
@@ -483,7 +484,7 @@ class UIViewModel(
                 }
         if (!isInPoland) return
 
-        scheduleNextNarrowBandWarning(now)
+        // The next time is scheduled when the dialog is closed (see [dismissNarrowBandWarning]), not here.
         uiPrefs.setLastNarrowBandWarningShownMillis(now)
         narrowBandWarningFlow.value = true
     }
@@ -491,6 +492,7 @@ class UIViewModel(
     /** Dismisses the narrow-band warning dialog after its close button becomes enabled. */
     fun dismissNarrowBandWarning() {
         narrowBandWarningFlow.value = false
+        viewModelScope.launch { narrowBandScheduleLock.withLock { scheduleNextNarrowBandWarning(nowMillis) } }
     }
 
     private val regionWarningFlow = MutableStateFlow(false)
@@ -501,7 +503,7 @@ class UIViewModel(
     /**
      * Checks (on a foreground app-open/resume) whether the phone is physically within the Świętokrzyskie region while
      * the locally-connected radio's LoRa channel is wide (>200 kHz). Fires immediately, unthrottled, the moment a
-     * border crossing is detected (was outside, now inside); otherwise repeats about every two days at a random hour,
+     * border crossing is detected (was outside, now inside); otherwise repeats at a random hour,
      * offset by [REGION_WARNING_OFFSET_FROM_NARROW_BAND_MILLIS] from the NarrowFast dialog's own schedule so the two
      * don't show back-to-back. On trigger, navigates to the LoRa settings screen first so the preset picker is already
      * on screen when the dialog appears.
@@ -512,7 +514,7 @@ class UIViewModel(
 
     private val regionWarningLock = Mutex()
 
-    /** Stores when the repeat reminder may next appear: about every two days, at an unpredictable hour. */
+    /** Stores when the repeat reminder may next appear, at an unpredictable hour. */
     private suspend fun scheduleNextRegionWarning(now: Long) {
         val gap = Random.nextLong(REGION_WARNING_MIN_GAP_MILLIS, REGION_WARNING_MAX_GAP_MILLIS + 1)
         uiPrefs.setNextRegionWarningMillis(now + gap)
@@ -536,7 +538,9 @@ class UIViewModel(
             now - uiPrefs.lastNarrowBandWarningShownMillis.value >= REGION_WARNING_OFFSET_FROM_NARROW_BAND_MILLIS
 
         if (justCrossed || (periodicDue && clearOfNarrowBand)) {
-            scheduleNextRegionWarning(now)
+            // Stays due until the dialog is closed, so a crossing or a due reminder is not lost if the app is killed
+            // while the dialog is open; [dismissRegionWarning] schedules the next one.
+            uiPrefs.setNextRegionWarningMillis(now)
             uiPrefs.setLastRegionWarningShownMillis(now)
             handleDeepLink(CommonUri.parse("$DEEP_LINK_BASE_URI/lora"))
             regionWarningFlow.value = true
@@ -546,6 +550,7 @@ class UIViewModel(
     /** Dismisses the region warning dialog after its close button becomes enabled. */
     fun dismissRegionWarning() {
         regionWarningFlow.value = false
+        viewModelScope.launch { regionWarningLock.withLock { scheduleNextRegionWarning(nowMillis) } }
     }
 
     private var periodicRegionCheckJob: Job? = null
@@ -577,11 +582,11 @@ class UIViewModel(
         private const val DEFAULT_BOOT_TTL = LockdownPassphraseStore.DEFAULT_BOOTS
         private const val NARROW_BAND_WARNING_THRESHOLD_KHZ = 200f
 
-        /** The general notice never comes back sooner than a week after the last one... */
-        private const val NARROW_BAND_WARNING_MIN_GAP_MILLIS = 7 * 24 * 60 * 60 * 1000L
+        /** Shortest gap before the general notice comes back... */
+        private const val NARROW_BAND_WARNING_MIN_GAP_MILLIS = 14 * 24 * 60 * 60 * 1000L
 
-        /** ...and is never left longer than two weeks. */
-        private const val NARROW_BAND_WARNING_MAX_GAP_MILLIS = 14 * 24 * 60 * 60 * 1000L
+        /** ...and the longest. */
+        private const val NARROW_BAND_WARNING_MAX_GAP_MILLIS = 30 * 24 * 60 * 60 * 1000L
 
         /**
          * Simplified national border for Poland (214 vertices, simplified union of all 16 voivodeship polygons from the
@@ -809,9 +814,9 @@ class UIViewModel(
                 ),
             )
 
-        /** The repeat region reminder comes back after a random 36–60 h, i.e. about every two days at any hour. */
-        private const val REGION_WARNING_MIN_GAP_MILLIS = 36 * 60 * 60 * 1000L
-        private const val REGION_WARNING_MAX_GAP_MILLIS = 60 * 60 * 60 * 1000L
+        /** Gap range for the repeat region reminder. */
+        private const val REGION_WARNING_MIN_GAP_MILLIS = 5 * 24 * 60 * 60 * 1000L
+        private const val REGION_WARNING_MAX_GAP_MILLIS = 7 * 24 * 60 * 60 * 1000L
 
         /** Minimum gap kept between the NarrowFast dialog and the periodic region reminder (not the crossing one). */
         private const val REGION_WARNING_OFFSET_FROM_NARROW_BAND_MILLIS = 90 * 60 * 1000L // 1.5h

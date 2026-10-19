@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Okresowe komunikaty**
+* Drobne zmiany w czasie pojawiania się okresowych komunikatów w aplikacji.
+
 **Wyciszanie urządzenia na kanale i jednolite czasy wyciszenia**
 * Przytrzymaj wiadomość → „Więcej działań” → „Wycisz wiadomości od tego urządzenia na tym kanale”. Wiadomości nadal się zapisują i są widoczne; wyłączone są tylko powiadomienia i dźwięk, tylko na tym kanale. Obok nazwy jest mała ikona głośnika, wyciszenie przetrwa restart i można je cofnąć w tym samym menu.
 * Czasy wyciszenia są teraz wszędzie takie same (rozmowy prywatne, kanały, urządzenie na kanale): 1 godzina, 24 godziny, 2 dni, 1 tydzień, 2 tygodnie, 1 miesiąc, na zawsze. Dawne wyciszenia (np. na 8 godzin) działają, aż wygasną.
@@ -332,6 +335,9 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Periodic notices**
+* Minor changes to when periodic notices appear in the app.
 
 **Muting a device on a channel and one set of mute lengths**
 * Long-press a message → "More actions" → "Mute messages from this device on this channel". Messages are still saved and visible; only notifications and sound are off, only on that channel. A small speaker icon appears by the name, the mute survives a restart and can be undone from the same menu.
