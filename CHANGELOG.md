@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Gierka przy aktualizacji firmware**
+* Ludzik w grze (też ten ogłuszony oraz ten na ekranie aktualizacji i w pomocy) jest teraz cały żółty i ma na brzuchu logo MT_SW takie jak w ikonie aplikacji, zamiast zielonego koloru i oryginalnego znaczka.
+
 **Okresowe komunikaty**
 * Drobne zmiany w czasie pojawiania się okresowych komunikatów w aplikacji.
 
@@ -340,6 +343,9 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Firmware-update mini-game**
+* The character in the game (also the dazed one, and the one on the update and help screens) is now fully yellow and wears the MT_SW logo from the app icon instead of the green colour and the original mark.
 
 **Periodic notices**
 * Minor changes to when periodic notices appear in the app.
