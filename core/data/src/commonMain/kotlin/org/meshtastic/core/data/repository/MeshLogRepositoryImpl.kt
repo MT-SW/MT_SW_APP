@@ -192,8 +192,15 @@ open class MeshLogRepositoryImpl(
      *
      * A request log is defined as an outgoing packet (`fromNum = 0`) where `want_response` is true.
      */
-    override fun getRequestLogs(targetNodeNum: Int, portNum: PortNum): Flow<List<MeshLog>> = dbManager
-        .observeCurrentDb { it.meshLogDao().getLogsFrom(MeshLog.NODE_NUM_LOCAL, portNum.value, DEFAULT_MAX_LOGS) }
+    override fun getRequestLogs(targetNodeNum: Int, portNum: PortNum): Flow<List<MeshLog>> =
+        getRequestLogsLimited(targetNodeNum, portNum, DEFAULT_MAX_LOGS)
+
+    override fun getRequestLogsLimited(
+        targetNodeNum: Int,
+        portNum: PortNum,
+        maxItem: Int,
+    ): Flow<List<MeshLog>> = dbManager
+        .observeCurrentDb { it.meshLogDao().getLogsFrom(MeshLog.NODE_NUM_LOCAL, portNum.value, maxItem) }
         .map { list ->
             list
                 .map { it.asExternalModel() }

@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.nowMillis
@@ -86,6 +87,8 @@ data class NodeMetricDetailUiState(
     val series: List<MetricSeries> = emptyList(),
     /** False until the first calculation has finished; the screen shows a loading indicator meanwhile. */
     val isLoaded: Boolean = false,
+    /** True from the moment another range is picked until its numbers are ready; the chips stay usable. */
+    val isRefreshing: Boolean = false,
 )
 
 @KoinViewModel
@@ -207,11 +210,14 @@ class NodeMetricDetailViewModel(
             }
             .flowOn(Dispatchers.Default)
             .catch { Logger.e(it) { "Metric detail failed" } }
-            .onEach { _uiState.value = it }
+            // A result for a range that is no longer selected must not end the loading of the newly picked one.
+            .onEach { if (it.range == rangeFlow.value) _uiState.value = it }
             .launchIn(viewModelScope)
     }
 
     fun setRange(range: NodeMetricRange) {
+        if (rangeFlow.value == range) return
+        _uiState.update { it.copy(range = range, isRefreshing = true) }
         rangeFlow.value = range
     }
 }

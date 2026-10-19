@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -188,7 +189,8 @@ class NodeDetailViewModel(
                         sessionStatusFlow,
                         isEnsuringSession,
                         narrowBandWarningFlow,
-                        existingContactKeyFlow(nodeId),
+                        // The contact list is a heavy read; the screen must not wait for it before showing anything.
+                        existingContactKeyFlow(nodeId).onStart { emit(null) },
                     ) { base, sessionStatus, ensuring, showNarrowBandWarning, existingContactKey ->
                         base.copy(
                             sessionStatus = sessionStatus,

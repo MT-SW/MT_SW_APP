@@ -583,10 +583,10 @@ class UIViewModel(
         private const val NARROW_BAND_WARNING_THRESHOLD_KHZ = 200f
 
         /** Shortest gap before the general notice comes back... */
-        private const val NARROW_BAND_WARNING_MIN_GAP_MILLIS = 14 * 24 * 60 * 60 * 1000L
+        private const val NARROW_BAND_WARNING_MIN_GAP_MILLIS = 21 * 24 * 60 * 60 * 1000L
 
         /** ...and the longest. */
-        private const val NARROW_BAND_WARNING_MAX_GAP_MILLIS = 30 * 24 * 60 * 60 * 1000L
+        private const val NARROW_BAND_WARNING_MAX_GAP_MILLIS = 35 * 24 * 60 * 60 * 1000L
 
         /**
          * Simplified national border for Poland (214 vertices, simplified union of all 16 voivodeship polygons from the
