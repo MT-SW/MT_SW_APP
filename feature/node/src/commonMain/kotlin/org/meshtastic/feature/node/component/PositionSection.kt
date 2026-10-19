@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.MeasurementSystem
+import org.meshtastic.core.common.util.isDesktopPlatform
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.util.toDistanceString
 import org.meshtastic.core.navigation.MapRoute
@@ -134,14 +135,18 @@ internal fun PositionInlineContent(
 private fun PositionMap(node: Node, distance: String?) {
     Box(modifier = Modifier.padding(vertical = 4.dp)) {
         // The map engine is heavy to start; letting the rest of the details appear first keeps opening them smooth.
-        var mapReady by remember { mutableStateOf(false) }
+        // Only on the desktop: the phone opens the map with the rest of the screen, as it always did.
+        var mapReady by remember { mutableStateOf(!isDesktopPlatform) }
         LaunchedEffect(Unit) {
-            delay(MAP_START_DELAY_MILLIS)
-            mapReady = true
+            if (!mapReady) {
+                delay(MAP_START_DELAY_MILLIS)
+                mapReady = true
+            }
         }
         Surface(
             shape = MaterialTheme.shapes.large,
-            color = MaterialTheme.colorScheme.surfaceVariant,
+            color =
+            if (isDesktopPlatform) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface,
             modifier = Modifier.fillMaxWidth().height(MAP_HEIGHT_DP.dp),
         ) {
             if (mapReady) LocalInlineMapProvider.current(node, Modifier.fillMaxSize())
