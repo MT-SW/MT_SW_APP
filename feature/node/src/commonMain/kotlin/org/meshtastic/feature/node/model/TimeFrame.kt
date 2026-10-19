@@ -24,12 +24,14 @@ import org.meshtastic.core.resources.one_hour_short
 import org.meshtastic.core.resources.one_month
 import org.meshtastic.core.resources.one_week
 import org.meshtastic.core.resources.twenty_four_hours
+import org.meshtastic.core.resources.two_days
 import org.meshtastic.core.resources.two_weeks
 
 @Suppress("MagicNumber")
 enum class TimeFrame(val strRes: StringResource, val seconds: Long) {
     ONE_HOUR(Res.string.one_hour_short, 3600),
     TWENTY_FOUR_HOURS(Res.string.twenty_four_hours, 86400),
+    TWO_DAYS(Res.string.two_days, 172800),
     SEVEN_DAYS(Res.string.one_week, 604800),
     TWO_WEEKS(Res.string.two_weeks, 1209600),
     ONE_MONTH(Res.string.one_month, 2592000),

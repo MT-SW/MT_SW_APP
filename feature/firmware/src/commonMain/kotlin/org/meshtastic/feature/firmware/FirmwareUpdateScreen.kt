@@ -132,6 +132,8 @@ import org.meshtastic.core.resources.firmware_update_retry
 import org.meshtastic.core.resources.firmware_update_save_dfu_file
 import org.meshtastic.core.resources.firmware_update_custom_file_summary
 import org.meshtastic.core.resources.firmware_update_custom_file_title
+import org.meshtastic.core.resources.firmware_update_esp_full_bin_body
+import org.meshtastic.core.resources.firmware_update_esp_full_bin_title
 import org.meshtastic.core.resources.firmware_update_own_file_warning_body
 import org.meshtastic.core.resources.firmware_update_own_file_warning_title
 import org.meshtastic.core.resources.firmware_update_select_file
@@ -176,6 +178,7 @@ import org.meshtastic.core.ui.icon.Folder
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Refresh
 import org.meshtastic.core.ui.icon.Usb
+import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Warning
 import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.core.ui.util.KeepScreenOn
@@ -612,6 +615,11 @@ private fun ReadyState(
         Spacer(Modifier.height(16.dp))
     }
 
+    if (selectedReleaseType == FirmwareReleaseType.LOCAL && device.isEsp32Arc) {
+        EspFullBinNotice()
+        Spacer(Modifier.height(16.dp))
+    }
+
     if (selectedReleaseType == FirmwareReleaseType.LOCAL && state.updateMethod !is FirmwareUpdateMethod.Unknown) {
         OwnFileCard(
             unidentified = device.isUnidentified,
@@ -626,6 +634,38 @@ private fun ReadyState(
     ReadyActionButton(state, selectedReleaseType) {
         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         showDisclaimer = true
+    }
+}
+
+/**
+ * Explains how OTA works on an ESP32 running MT_SW firmware: the first flash has to be a full image (`-full.bin`) put
+ * on with a web flasher, because that is what makes later updates from this app possible. It erases the settings.
+ */
+@Composable
+private fun EspFullBinNotice(modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors =
+        CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(MeshtasticIcons.Info, contentDescription = null, modifier = Modifier.size(24.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = stringResource(Res.string.firmware_update_esp_full_bin_title),
+                    style = MaterialTheme.typography.titleSmall,
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = stringResource(Res.string.firmware_update_esp_full_bin_body),
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
     }
 }
 

@@ -48,6 +48,7 @@ import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 @Composable
 fun PositionLogScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val positions = state.positionLogs
 
     val exportPositionLauncher = rememberSaveFileLauncher { uri -> viewModel.savePositionCSV(uri, positions) }
@@ -59,6 +60,7 @@ fun PositionLogScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
     val destNum = state.node?.num ?: 0
 
     BaseMetricScreen(
+        isLoading = isLoading,
         onNavigateUp = onNavigateUp,
         telemetryType = null,
         titleRes = Res.string.position_log,

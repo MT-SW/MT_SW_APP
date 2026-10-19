@@ -115,6 +115,7 @@ fun TracerouteLogScreen(
     onViewOnMap: (requestId: Int, responseLogUuid: String) -> Unit = { _, _ -> },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val timeFrame by viewModel.timeFrame.collectAsStateWithLifecycle()
     val availableTimeFrames by viewModel.availableTimeFrames.collectAsStateWithLifecycle()
     val lastTracerouteTime by viewModel.lastTraceRouteTime.collectAsStateWithLifecycle()
@@ -154,6 +155,7 @@ fun TracerouteLogScreen(
         }
 
     BaseMetricScreen(
+        isLoading = isLoading,
         onNavigateUp = onNavigateUp,
         telemetryType = null,
         titleRes = Res.string.traceroute_log,

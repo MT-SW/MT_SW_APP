@@ -67,6 +67,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.NumberFormatter
+import org.meshtastic.core.ui.component.FullScreenLoading
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.theme.GraphColors.Blue
@@ -105,6 +106,10 @@ fun NodeMetricDetailScreen(
             )
         },
     ) { contentPadding ->
+        if (!uiState.isLoaded) {
+            FullScreenLoading(modifier = Modifier.padding(contentPadding))
+            return@Scaffold
+        }
         Column(
             modifier =
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(contentPadding).padding(16.dp),

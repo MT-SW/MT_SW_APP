@@ -75,6 +75,7 @@ import org.meshtastic.core.resources.info
 import org.meshtastic.core.resources.logs
 import org.meshtastic.core.resources.save
 import org.meshtastic.core.ui.component.FastScrollSidebar
+import org.meshtastic.core.ui.component.FullScreenLoading
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.icon.BarChart
 import org.meshtastic.core.ui.icon.Info
@@ -263,6 +264,7 @@ fun <T> BaseMetricScreen(
     controlPart: @Composable () -> Unit = {},
     bottomContent: @Composable () -> Unit = {},
     modifier: Modifier = Modifier,
+    isLoading: Boolean = false,
 ) {
     var displayInfoDialog by rememberSaveable { mutableStateOf(false) }
     var isChartExpanded by rememberSaveable { mutableStateOf(false) }
@@ -338,6 +340,11 @@ fun <T> BaseMetricScreen(
                     onDismiss = { displayInfoDialog = false },
                     extraContent = infoExtraContent,
                 )
+            }
+
+            if (isLoading) {
+                FullScreenLoading(modifier = Modifier.weight(1f))
+                return@Column
             }
 
             controlPart()

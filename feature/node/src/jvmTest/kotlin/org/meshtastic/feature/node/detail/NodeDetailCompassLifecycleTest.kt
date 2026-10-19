@@ -168,7 +168,7 @@ class NodeDetailCompassLifecycleTest {
         val observeSessionStatus: ObserveRemoteAdminSessionStatusUseCase = mock()
         val packetRepository: PacketRepository = mock()
         every { packetRepository.getContacts() } returns flowOf(emptyMap())
-        every { getNodeDetailsUseCase(any()) } returns
+        every { getNodeDetailsUseCase.summary(any()) } returns
             flowOf(
                 NodeDetailUiState(
                     node = node,

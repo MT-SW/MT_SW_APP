@@ -191,6 +191,7 @@ internal sealed interface SignalLogEntry {
 @Composable
 fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, modifier: Modifier = Modifier) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val timeFrame by viewModel.timeFrame.collectAsStateWithLifecycle()
     val availableTimeFrames by viewModel.availableTimeFrames.collectAsStateWithLifecycle()
     val threshold = timeFrame.timeThreshold()
@@ -221,6 +222,7 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
     val isLocalNode = lnaNodeNum != null && lnaNodeNum == myNodeNum
 
     BaseMetricScreen(
+        isLoading = isLoading,
         onNavigateUp = onNavigateUp,
         telemetryType = null,
         titleRes = Res.string.signal_quality,

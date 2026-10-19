@@ -66,7 +66,7 @@ class HandleNodeActionTest {
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        every { getNodeDetailsUseCase(any()) } returns emptyFlow()
+        every { getNodeDetailsUseCase.summary(any()) } returns emptyFlow()
         every { packetRepository.getContacts() } returns flowOf(emptyMap())
         every { observeRemoteAdminSessionStatus(any()) } returns flowOf(SessionStatus.NoSession)
     }

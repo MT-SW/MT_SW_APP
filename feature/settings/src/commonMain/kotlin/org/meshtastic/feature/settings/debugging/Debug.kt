@@ -72,6 +72,8 @@ import org.meshtastic.core.repository.MeshLogRetention
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.debug_clear
 import org.meshtastic.core.resources.debug_decoded_payload
+import org.meshtastic.core.resources.debug_info_body
+import org.meshtastic.core.resources.debug_info_title
 import org.meshtastic.core.resources.debug_logs_export
 import org.meshtastic.core.resources.debug_logs_export_warning
 import org.meshtastic.core.resources.debug_panel
@@ -85,13 +87,16 @@ import org.meshtastic.core.resources.log_retention_days_quantity
 import org.meshtastic.core.resources.log_retention_days_summary
 import org.meshtastic.core.resources.log_retention_hours
 import org.meshtastic.core.resources.log_retention_never
+import org.meshtastic.core.resources.okay
 import org.meshtastic.core.ui.component.CopyIconButton
 import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.MeshtasticResourceDialog
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.core.ui.icon.Delete
+import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Settings
 import org.meshtastic.core.ui.theme.AnnotationColor
@@ -154,6 +159,7 @@ fun DebugScreen(onNavigateUp: () -> Unit, viewModel: DebugViewModel) {
     }
 
     var showSettings by remember { mutableStateOf(false) }
+    var showInfo by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableIntStateOf(0) }
 
     Scaffold(
@@ -165,6 +171,12 @@ fun DebugScreen(onNavigateUp: () -> Unit, viewModel: DebugViewModel) {
                 canNavigateUp = true,
                 onNavigateUp = onNavigateUp,
                 actions = {
+                    IconButton(onClick = { showInfo = true }) {
+                        Icon(
+                            imageVector = MeshtasticIcons.Info,
+                            contentDescription = stringResource(Res.string.debug_info_title),
+                        )
+                    }
                     // The settings and delete actions apply to the Packets (MeshLog) list only.
                     if (selectedTab == 0) {
                         IconToggleButton(checked = showSettings, onCheckedChange = { showSettings = it }) {
@@ -177,6 +189,15 @@ fun DebugScreen(onNavigateUp: () -> Unit, viewModel: DebugViewModel) {
             )
         },
     ) { paddingValues ->
+        if (showInfo) {
+            MeshtasticDialog(
+                titleRes = Res.string.debug_info_title,
+                messageRes = Res.string.debug_info_body,
+                confirmTextRes = Res.string.okay,
+                onConfirm = { showInfo = false },
+                onDismiss = { showInfo = false },
+            )
+        }
         Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
             PrimaryTabRow(selectedTabIndex = selectedTab) {
                 Tab(

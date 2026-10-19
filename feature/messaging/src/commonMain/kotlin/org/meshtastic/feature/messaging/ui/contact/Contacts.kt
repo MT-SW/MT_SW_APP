@@ -84,13 +84,15 @@ import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.Contact
 import org.meshtastic.core.model.ContactKey
 import org.meshtastic.core.model.ContactSettings
-import org.meshtastic.core.model.util.TimeConstants
 import org.meshtastic.core.model.util.formatMuteRemainingTime
+import org.meshtastic.core.repository.MuteDurations
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.are_you_sure
 import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.channel_invalid
 import org.meshtastic.core.resources.channels
+import org.meshtastic.core.resources.chat_info_body
+import org.meshtastic.core.resources.chat_info_title
 import org.meshtastic.core.resources.close_selection
 import org.meshtastic.core.resources.collapsed
 import org.meshtastic.core.resources.contact_muted_snackbar
@@ -104,8 +106,12 @@ import org.meshtastic.core.resources.expanded
 import org.meshtastic.core.resources.filter_settings
 import org.meshtastic.core.resources.mark_as_read
 import org.meshtastic.core.resources.mark_unread_selected
+import org.meshtastic.core.resources.mute_1_hour
+import org.meshtastic.core.resources.mute_1_month
 import org.meshtastic.core.resources.mute_1_week
-import org.meshtastic.core.resources.mute_8_hours
+import org.meshtastic.core.resources.mute_24_hours
+import org.meshtastic.core.resources.mute_2_days
+import org.meshtastic.core.resources.mute_2_weeks
 import org.meshtastic.core.resources.mute_always
 import org.meshtastic.core.resources.mute_notifications
 import org.meshtastic.core.resources.mute_selected
@@ -135,6 +141,7 @@ import org.meshtastic.core.ui.icon.Delete
 import org.meshtastic.core.ui.icon.ExpandLess
 import org.meshtastic.core.ui.icon.ExpandMore
 import org.meshtastic.core.ui.icon.FilterList
+import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Keep
 import org.meshtastic.core.ui.icon.MarkChatRead
 import org.meshtastic.core.ui.icon.MarkChatUnread
@@ -146,7 +153,6 @@ import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.core.ui.util.parseDeepLinkOrInvalid
 import org.meshtastic.core.ui.util.rememberShowToastResource
 import org.meshtastic.proto.ChannelSet
-import kotlin.time.Duration.Companion.days
 
 @Suppress("LongMethod", "CyclomaticComplexMethod", "LongParameterList")
 @Composable
@@ -249,6 +255,17 @@ fun ContactsScreen(
         }
     }
 
+    var showChatInfo by remember { mutableStateOf(false) }
+    if (showChatInfo) {
+        MeshtasticDialog(
+            titleRes = Res.string.chat_info_title,
+            messageRes = Res.string.chat_info_body,
+            confirmTextRes = Res.string.okay,
+            onConfirm = { showChatInfo = false },
+            onDismiss = { showChatInfo = false },
+        )
+    }
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -258,6 +275,9 @@ fun ContactsScreen(
                 canNavigateUp = false,
                 onNavigateUp = {},
                 actions = {
+                    IconButton(onClick = { showChatInfo = true }) {
+                        Icon(MeshtasticIcons.Info, contentDescription = stringResource(Res.string.chat_info_title))
+                    }
                     IconButton(onClick = onNavigateToFilterSettings) {
                         Icon(
                             MeshtasticIcons.FilterList,
@@ -391,14 +411,18 @@ private fun MuteNotificationsDialog(
     val muteOptions = remember {
         listOf(
             Res.string.unmute to 0L,
-            Res.string.mute_8_hours to TimeConstants.EIGHT_HOURS.inWholeMilliseconds,
-            Res.string.mute_1_week to 7.days.inWholeMilliseconds,
-            Res.string.mute_always to Long.MAX_VALUE,
+            Res.string.mute_1_hour to MuteDurations.millis[0],
+            Res.string.mute_24_hours to MuteDurations.millis[1],
+            Res.string.mute_2_days to MuteDurations.millis[2],
+            Res.string.mute_1_week to MuteDurations.millis[3],
+            Res.string.mute_2_weeks to MuteDurations.millis[4],
+            Res.string.mute_1_month to MuteDurations.millis[5],
+            Res.string.mute_always to MuteDurations.millis[6],
         )
     }
 
     // State to hold the selected mute duration index
-    var selectedOptionIndex by remember { mutableIntStateOf(2) } // Default to "Always"
+    var selectedOptionIndex by remember { mutableIntStateOf(7) } // Default to "Always"
 
     MeshtasticDialog(
         onDismiss = onDismiss, // Dismiss the dialog when clicked outside

@@ -111,6 +111,7 @@ private val LEGEND_DATA =
 @Composable
 fun PowerMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val timeFrame by viewModel.timeFrame.collectAsStateWithLifecycle()
     val availableTimeFrames by viewModel.availableTimeFrames.collectAsStateWithLifecycle()
     val invertCurrent = LocalLnaCorrection.current.invertsCurrent(state.node?.num)
@@ -129,6 +130,7 @@ fun PowerMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
     val channelLabels = state.node?.powerChannelLabels.orEmpty()
 
     BaseMetricScreen(
+        isLoading = isLoading,
         onNavigateUp = onNavigateUp,
         telemetryType = TelemetryType.POWER,
         titleRes = Res.string.power_metrics_log,

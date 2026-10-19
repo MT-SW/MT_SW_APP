@@ -82,6 +82,7 @@ import org.meshtastic.proto.Telemetry
 @Composable
 fun HostMetricsLogScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val timeFrame by viewModel.timeFrame.collectAsStateWithLifecycle()
     val availableTimeFrames by viewModel.availableTimeFrames.collectAsStateWithLifecycle()
 
@@ -90,6 +91,7 @@ fun HostMetricsLogScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) 
         remember(state.hostMetrics, threshold) { state.hostMetrics.filter { it.time.toLong() >= threshold } }
 
     BaseMetricScreen(
+        isLoading = isLoading,
         onNavigateUp = onNavigateUp,
         telemetryType = TelemetryType.HOST,
         titleRes = Res.string.host_metrics_log,

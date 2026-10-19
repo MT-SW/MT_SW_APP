@@ -21,10 +21,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -83,29 +80,44 @@ constructor(
     @Suppress("LongMethod", "CyclomaticComplexMethod")
     override operator fun invoke(nodeId: Int): Flow<NodeDetailUiState> =
         nodeRepository.effectiveLogNodeId(nodeId).flatMapLatest { effectiveNodeId ->
-            buildFlow(nodeId, effectiveNodeId)
+            buildFlow(nodeId, effectiveNodeId, fullHistory = true)
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun summary(nodeId: Int): Flow<NodeDetailUiState> =
+        nodeRepository.effectiveLogNodeId(nodeId).flatMapLatest { effectiveNodeId ->
+            buildFlow(nodeId, effectiveNodeId, fullHistory = false)
+        }
+
+    /**
+     * One source of log entries. The summary reads only the newest entries and answers at once (with an empty list
+     * first); the full history waits for the whole read, so a screen can show a loading indicator until it arrives.
+     */
+    private fun <T> logSource(fullHistory: Boolean, newest: Flow<List<T>>, all: Flow<List<T>>): Flow<List<T>> =
+        if (fullHistory) all.calmed() else newest.calmed().onStart { emit(emptyList()) }
+
     @Suppress("LongMethod", "CyclomaticComplexMethod")
-    private fun buildFlow(nodeId: Int, effectiveNodeId: Int): Flow<NodeDetailUiState> {
+    private fun buildFlow(nodeId: Int, effectiveNodeId: Int, fullHistory: Boolean): Flow<NodeDetailUiState> {
         val nodeFlow =
             nodeRepository.nodeDBbyNum.map { it[nodeId] ?: Node.createFallback(nodeId, "") }.distinctUntilChanged()
 
         // 1. Logs & Metrics Data
-        // Reading and decoding thousands of entries takes a while on a big database, and the icons that open the
-        // statistics wait for it. So each source first answers from its newest few hundred entries (almost at once)
-        // and then from the full history.
+        // The summary (the node detail screen) only needs to know which statistics exist, so it reads just the newest
+        // entries and opens at once. The statistics screens read the full history.
         val metricsLogsFlow =
             combine(
-                quickThenFull(
-                    meshLogRepository.getTelemetryFromLimited(effectiveNodeId, QUICK_LOG_ITEMS),
+                logSource(
+                    fullHistory,
+                    meshLogRepository.getTelemetryFromLimited(effectiveNodeId, TELEMETRY_ITEMS),
                     meshLogRepository.getTelemetryFrom(effectiveNodeId),
                 ),
-                quickThenFull(
+                logSource(
+                    fullHistory,
                     meshLogRepository.getMeshPacketsFromLimited(effectiveNodeId, maxItem = QUICK_LOG_ITEMS),
                     meshLogRepository.getMeshPacketsFrom(effectiveNodeId),
                 ),
-                quickThenFull(
+                logSource(
+                    fullHistory,
                     meshLogRepository.getMeshPacketsFromLimited(
                         effectiveNodeId,
                         PortNum.POSITION_APP.value,
@@ -113,7 +125,8 @@ constructor(
                     ),
                     meshLogRepository.getMeshPacketsFrom(effectiveNodeId, PortNum.POSITION_APP.value),
                 ),
-                quickThenFull(
+                logSource(
+                    fullHistory,
                     meshLogRepository.getLogsFromLimited(
                         effectiveNodeId,
                         PortNum.PAXCOUNTER_APP.value,
@@ -121,7 +134,8 @@ constructor(
                     ),
                     meshLogRepository.getLogsFrom(effectiveNodeId, PortNum.PAXCOUNTER_APP.value),
                 ),
-                quickThenFull(
+                logSource(
+                    fullHistory,
                     meshLogRepository.getLogsFromLimited(
                         effectiveNodeId,
                         PortNum.TRACEROUTE_APP.value,
@@ -129,7 +143,8 @@ constructor(
                     ),
                     meshLogRepository.getLogsFrom(effectiveNodeId, PortNum.TRACEROUTE_APP.value),
                 ),
-                quickThenFull(
+                logSource(
+                    fullHistory,
                     meshLogRepository.getLogsFromLimited(
                         effectiveNodeId,
                         PortNum.NEIGHBORINFO_APP.value,
@@ -324,13 +339,6 @@ constructor(
             .flowOn(Dispatchers.Default)
     }
 
-    /** The newest entries answer at once; the full history follows (and keeps updating) behind it. */
-    private fun <T> quickThenFull(quick: Flow<List<T>>, full: Flow<List<T>>): Flow<List<T>> = flow {
-        emit(emptyList())
-        emit(quick.first())
-        emitAll(full.calmed())
-    }
-
     private data class HardwareKey(val hwModel: Int, val target: String?)
 
     private data class LogsGroup(
@@ -353,8 +361,11 @@ constructor(
     )
 
     private companion object {
-        /** How many of the newest entries the quick first look reads. */
-        const val QUICK_LOG_ITEMS = 300
+        /** How many of the newest entries of each kind the detail screen reads. */
+        const val QUICK_LOG_ITEMS = 50
+
+        /** Telemetry has many kinds in one stream, so a longer look is needed to find the rarer ones. */
+        const val TELEMETRY_ITEMS = 150
 
         const val NODE_INDEX = 0
         const val LOGS_INDEX = 1

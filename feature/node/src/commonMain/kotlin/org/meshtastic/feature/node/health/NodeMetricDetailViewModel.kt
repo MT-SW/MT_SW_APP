@@ -44,6 +44,7 @@ import org.meshtastic.proto.PortNum
 enum class NodeMetricRange(val label: String, val millis: Long?) {
     HOUR("1 h", 60 * 60 * 1000L),
     DAY("24 h", 24 * 60 * 60 * 1000L),
+    TWO_DAYS("2 dni", 2 * 24 * 60 * 60 * 1000L),
     WEEK("7 dni", 7 * 24 * 60 * 60 * 1000L),
     TWO_WEEKS("2 tyg.", 14L * 24 * 60 * 60 * 1000L),
     MONTH("30 dni", 30L * 24 * 60 * 60 * 1000L),
@@ -83,6 +84,8 @@ data class NodeMetricDetailUiState(
     val metric: NetworkHealthMetric = NetworkHealthMetric.POWER,
     val range: NodeMetricRange = NodeMetricRange.DAY,
     val series: List<MetricSeries> = emptyList(),
+    /** False until the first calculation has finished; the screen shows a loading indicator meanwhile. */
+    val isLoaded: Boolean = false,
 )
 
 @KoinViewModel
@@ -198,6 +201,7 @@ class NodeMetricDetailViewModel(
                         metric = metric,
                         range = range,
                         series = finalSeries,
+                        isLoaded = true,
                     )
                 }
             }

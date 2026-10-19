@@ -395,6 +395,8 @@
     <string name="contrast_high">Wysoki</string>
     <string name="contrast_medium">Średni</string>
     <string name="contrast_standard">Standardowy</string>
+    <string name="chat_info_title">Jak działają rozmowy</string>
+    <string name="chat_info_body">Lista rozmów\n• Dotknij rozmowy, żeby ją otworzyć.\n• Przytrzymaj rozmowę, żeby ją zaznaczyć. Potem możesz ją wyciszyć, przypiąć, oznaczyć jako nieprzeczytaną albo usunąć. Przesunięcie wiersza też wycisza lub usuwa rozmowę.\n• Czasy wyciszenia są wszędzie takie same: 1 godzina, 24 godziny, 2 dni, 1 tydzień, 2 tygodnie, 1 miesiąc albo na zawsze. Wyciszone wiadomości nadal się zapisują; wyłączone są tylko powiadomienia i dźwięk.\n\nWewnątrz rozmowy\n• Przytrzymaj wiadomość, żeby zareagować, odpowiedzieć, skopiować, zaznaczyć lub usunąć.\n• Na kanale to samo menu pozwala też wyciszyć wiadomości od jednego urządzenia na tym jednym kanale (i później to cofnąć). Mała ikona głośnika obok nazwy pokazuje, kto jest wyciszony.\n• Pod Twoimi wiadomościami jest mała etykieta dostarczenia. Dotknij jej, żeby zobaczyć, ile urządzeń przekazało wiadomość dalej i które. Ten szczegół o przekaźnikach jest tylko w tej aplikacji.</string>
     <string name="conversations">Czaty</string>
     <string name="copy">Kopiuj</string>
     <string name="copyright_notice">Meshtastic® Copyright Meshtastic LLC</string>
@@ -474,6 +476,9 @@
     <string name="sniffer_warning_compatibility">UWAGA: Wymaga brandowanej aplikacji i firmware MT_SW. Inne kombinacje mogą zawiesić węzeł.</string>
     <string name="debug_store_logs_summary">Wyłącz, aby pominąć zapisywanie logów na dysku</string>
     <string name="debug_store_logs_title">Przechowuj logi sieci</string>
+    <string name="debug_info_title">O tym ekranie</string>
+    <string name="debug_info_body">Pakiety\nKażdy pakiet, który radio przekazało do aplikacji. Zębatka służy do filtrowania, a kosz do usunięcia listy.\n\nLogi aplikacji\nKomunikaty zapisywane przez samą aplikację. Przydają się, gdy coś w aplikacji nie działa.\n\nLogi urządzenia\nTekst, który radio wypisuje na swoim porcie szeregowym. Najpierw włącz „Debug Logs” w ustawieniach bezpieczeństwa urządzenia. Przez Bluetooth działa to z każdym firmware; przez Wi-Fi i USB tylko z firmware MT_SW.</string>
+    <string name="show_node_links_summary">Rysuje linie między węzłami, które wymieniają pakiety: raporty sąsiadów, traceroute i bezpośrednie odbiory.</string>
     <string name="debug_tab_app_logs">Dzienniki aplikacji</string>
     <string name="debug_tab_device_logs">Logi urządzenia</string>
     <string name="debug_device_logs_empty">Brak logów urządzenia. Włącz „Logi debugowania” w ustawieniach zabezpieczeń urządzenia, aby radio wysyłało do aplikacji te same logi, które widać na porcie szeregowym. Przez Bluetooth działa to z każdym firmware, a przez Wi-Fi i USB tylko z firmware MT_SW.</string>
@@ -881,6 +886,8 @@
     <string name="firmware_update_unidentified_device">Nieznane urządzenie</string>
     <string name="firmware_update_unidentified_summary">Tego urządzenia nie ma na liście sprzętu, więc można wgrać tylko własny plik firmware (.zip dla nRF52, .bin dla ESP32). Używaj tylko firmware zbudowanego dla tego urządzenia.</string>
     <string name="firmware_update_unidentified_title">Nieznane urządzenie</string>
+    <string name="firmware_update_esp_full_bin_title">ESP32: najpierw wgraj pełny plik (-full.bin)</string>
+    <string name="firmware_update_esp_full_bin_body">Aktualizacja przez OTA z tej aplikacji działa na ESP32 dopiero po jednorazowym wgraniu specjalnego pełnego pliku (-full.bin). Ten plik trzeba wgrać przez stronę internetową (oryginalny flasher Meshtastic albo inny); wgranie go przez tę aplikację nie zadziała. UWAGA: ten plik kasuje wszystkie ustawienia urządzenia, więc najpierw zrób kopię ustawień, potem wgraj plik i przywróć ustawienia. Po tym każda kolejna aktualizacja przez Wi-Fi zadziała z tej aplikacji. Jeśli wcześniej wgrywałeś oryginalne oprogramowanie przez stronę flashera i użyłeś wymazywania, to masz to już załatwione i możesz od razu aktualizować. Jeśli potrzebujesz pliku -full.bin dla swojego urządzenia, napisz do zespołu MT_SW i podaj, jaki masz sprzęt.</string>
     <string name="firmware_update_own_file_warning_body">Wgrywanie własnego pliku lub firmware na urządzenie spoza listy jest ryzykowne i odbywa się na Twoją odpowiedzialność. Aplikacja nie jest w stanie sprawdzić, czy plik pasuje do tego urządzenia. Firmware zbudowane dla innej płytki lub innego układu może sprawić, że urządzenie przestanie się uruchamiać, a jego naprawa może wymagać kabla i specjalnych narzędzi. Zanim kontynuujesz: upewnij się, że plik jest zbudowany dokładnie dla tego urządzenia, naładuj je powyżej połowy, trzymaj je blisko i nie rozłączaj ani nie zamykaj aplikacji do końca aktualizacji.</string>
     <string name="firmware_update_own_file_warning_title">Ryzyko: plik niesprawdzony</string>
     <string name="firmware_update_local_file">Plik lokalny</string>
@@ -1147,6 +1154,7 @@
     <string name="load_5_min">Obc. 5m</string>
     <string name="load_5_min_description">Pięciominutowa średnia obciążenia systemu</string>
     <string name="load_indexed">Obciążenie %1$d</string>
+    <string name="loading_data">Wczytuję dane…</string>
     <string name="loading">Ładowanie</string>
     <!-- LOCAL -->
     <string name="local_mbtiles_file">Lokalny plik MBTiles</string>
@@ -1483,6 +1491,16 @@
     <string name="must_set_region">Musisz ustawić region!</string>
     <string name="must_update">Należy zaktualizować aplikację za pomocą Sklepu Play lub z GitHub, ponieważ aplikacja jest zbyt stara, by skomunikować się z oprogramowaniem zainstalowanym na tym urządzeniu. <a href="https://meshtastic.org/docs/software/android/installation">Więcej informacji (ang.)</a>.</string>
     <!-- MUTE -->
+    <string name="mute_1_hour">1 godzina</string>
+    <string name="mute_24_hours">24 godziny</string>
+    <string name="mute_2_days">2 dni</string>
+    <string name="mute_2_weeks">2 tygodnie</string>
+    <string name="mute_1_month">1 miesiąc</string>
+    <string name="mute_sender_action">Wycisz wiadomości od tego urządzenia na tym kanale</string>
+    <string name="unmute_sender_action">Włącz powiadomienia od tego urządzenia na tym kanale</string>
+    <string name="mute_sender_title">Wycisz %1$s na tym kanale</string>
+    <string name="mute_sender_info">Wiadomości nadal się zapisują i są widoczne. Wyłączone są tylko powiadomienia i dźwięk, i to tylko na tym kanale.</string>
+    <string name="mute_sender_marker">Wyciszony na tym kanale</string>
     <string name="mute_1_week">1 tydzień</string>
     <string name="mute_8_hours">8 godzin</string>
     <string name="mute_add">Wyciszyć powiadomienia dla '%1$s'?</string>
@@ -2494,7 +2512,7 @@
     <string name="triple_click_adhoc_ping">Potrójne kliknięcie: Ping adhoc</string>
     <string name="turbidity">Mętność</string>
     <string name="twenty_four_hours">24H</string>
-    <string name="two_days">48 Godzin</string>
+    <string name="two_days">2 dni</string>
     <string name="two_weeks">2W</string>
     <string name="type">Typ</string>
     <string name="type_a_message">Napisz wiadomość</string>

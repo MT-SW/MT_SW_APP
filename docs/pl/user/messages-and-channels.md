@@ -93,6 +93,8 @@ można na nim działać bezpośrednio:
 - **Dotknij i przytrzymaj, aby zaznaczyć** jedną lub więcej rozmów, a następnie użyj paska działań, aby je **Przypiąć**,
   **Oznaczyć jako nieprzeczytane**, wyciszyć lub usunąć razem. Przypięte rozmowy mają znacznik pinezki i wędrują
   na górę **własnej sekcji**.
+- **Ikona (i) u góry listy** otwiera krótki opis: co robi dotknięcie, przytrzymanie i przesunięcie, jak wyciszać oraz co znaczą etykiety dostarczenia.
+- **Czasy wyciszenia są wszędzie takie same:** 1 godzina, 24 godziny, 2 dni, 1 tydzień, 2 tygodnie, 1 miesiąc albo na zawsze (rozmowy prywatne, kanały i urządzenie na kanale). Starsze wyciszenia na 8 godzin działają, aż wygasną. Wyciszone wiadomości nadal się zapisują; wyłączone są tylko powiadomienia i dźwięk.
 - **Lista jest podzielona na Kanały i Wiadomości bezpośrednie**, każda z zwijanym nagłówkiem i każda
   sortowana niezależnie — dzięki temu przypięta wiadomość bezpośrednia wędruje na górę swojej sekcji, a nie ponad sekcję
   Kanałów.
@@ -239,6 +241,7 @@ dostarczenia, znajdują się:
 - **Kopiuj** — skopiuj tekst wiadomości do schowka
 - **Przetłumacz** — przetłumacz odebraną wiadomość na język urządzenia i przełączaj się między oryginałem a tłumaczeniem (tylko wersja Google Play; używa tłumaczenia na urządzeniu). Pierwsze tłumaczenie na dany język prosi o pobranie jednorazowego modelu językowego i podaje jego rozmiar, a po zakończeniu pobierania tłumaczy. Jeśli pobieranie się nie powiedzie albo wiadomość jest już w Twoim języku, aplikacja informuje o tym zamiast tłumaczyć
 - **Wybierz** — włącz zaznaczanie wielu, aby działać na kilku wiadomościach naraz
+- **Wycisz wiadomości od tego urządzenia na tym kanale** — (tylko na kanałach, nie przy Twoich wiadomościach) wybierz czas wyciszenia z listy. Wiadomości nadal się zapisują i są widoczne; wyłączone są tylko powiadomienia i dźwięk, i tylko na tym jednym kanale. Obok nazwy wyciszonego urządzenia pojawia się mała ikona głośnika, a ta sama pozycja menu zmienia się w **Włącz powiadomienia od tego urządzenia na tym kanale**. Wyciszenie przetrwa restart aplikacji
 - **Usuń** — usuń wiadomość z tego telefonu. Działa na każdej wiadomości w rozmowie, Twojej lub cudzej, i nie usuwa jej z niczyjego radia ani telefonu
 
 ### Priorytet wiadomości

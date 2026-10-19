@@ -60,6 +60,7 @@ import org.meshtastic.core.resources.delete
 import org.meshtastic.core.resources.device_metrics_label_value
 import org.meshtastic.core.resources.message_delivery_status
 import org.meshtastic.core.resources.more_reactions
+import org.meshtastic.core.resources.mute_sender_action
 import org.meshtastic.core.resources.reply
 import org.meshtastic.core.resources.security_signed_message_info
 import org.meshtastic.core.resources.security_signed_verified
@@ -68,6 +69,7 @@ import org.meshtastic.core.resources.show_original
 import org.meshtastic.core.resources.show_translation
 import org.meshtastic.core.resources.timestamp
 import org.meshtastic.core.resources.translate
+import org.meshtastic.core.resources.unmute_sender_action
 import org.meshtastic.core.ui.icon.AddReaction
 import org.meshtastic.core.ui.icon.Copy
 import org.meshtastic.core.ui.icon.Dangerous
@@ -80,6 +82,8 @@ import org.meshtastic.core.ui.icon.Reply
 import org.meshtastic.core.ui.icon.SelectAll
 import org.meshtastic.core.ui.icon.ShieldCheck
 import org.meshtastic.core.ui.icon.Translate
+import org.meshtastic.core.ui.icon.VolumeOff
+import org.meshtastic.core.ui.icon.VolumeUp
 import org.meshtastic.proto.MeshPacket
 
 @Suppress("LongMethod")
@@ -103,6 +107,9 @@ fun MessageActionsContent(
     translationRowState: TranslationRowState? = null,
     onTranslate: () -> Unit = {},
     onToggleTranslation: () -> Unit = {},
+    /** Null hides the row (own messages and private chats have nothing to mute per channel). */
+    onMuteSender: (() -> Unit)? = null,
+    senderMuted: Boolean = false,
 ) {
     Column {
         // An archived conversation shows no reaction affordances: the send path refuses them, so offering the row
@@ -203,6 +210,21 @@ fun MessageActionsContent(
                         onToggleTranslation
                     },
                 ),
+            )
+        }
+
+        if (onMuteSender != null) {
+            val muteLabel =
+                stringResource(if (senderMuted) Res.string.unmute_sender_action else Res.string.mute_sender_action)
+            ListItem(
+                headlineContent = { Text(muteLabel) },
+                leadingContent = {
+                    Icon(
+                        if (senderMuted) MeshtasticIcons.VolumeUp else MeshtasticIcons.VolumeOff,
+                        contentDescription = muteLabel,
+                    )
+                },
+                modifier = Modifier.clickable(role = Role.Button, onClick = onMuteSender),
             )
         }
 

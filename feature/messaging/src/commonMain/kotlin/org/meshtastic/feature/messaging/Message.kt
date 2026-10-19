@@ -97,15 +97,17 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.HomoglyphCharacterStringTransformer
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.ContactKey
 import org.meshtastic.core.model.MENTION_TOKEN_REGEX
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
-import org.meshtastic.core.model.util.MessageSplitter
 import org.meshtastic.core.model.QuickChatAction
+import org.meshtastic.core.model.util.MessageSplitter
 import org.meshtastic.core.model.util.getChannel
+import org.meshtastic.core.repository.SenderMutePrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.archived_channel_read_only
 import org.meshtastic.core.resources.message_split_pending
@@ -211,6 +213,8 @@ fun MessageScreen(
     val channels by viewModel.channels.collectAsStateWithLifecycle()
     val quickChatActions by viewModel.quickChatActions.collectAsStateWithLifecycle(initialValue = emptyList())
     val pagedMessages = viewModel.getMessagesFromPaged(contactKey).collectAsLazyPagingItems()
+    val senderMutePrefs = koinInject<SenderMutePrefs>()
+    val senderMutes by senderMutePrefs.mutes.collectAsStateWithLifecycle()
     val contactSettings by viewModel.contactSettings.collectAsStateWithLifecycle(initialValue = emptyMap())
     val homoglyphEncodingEnabled by viewModel.homoglyphEncodingEnabled.collectAsStateWithLifecycle(initialValue = false)
 
@@ -576,6 +580,7 @@ fun MessageScreen(
                     showFullMessageTimestamps = showFullMessageTimestamps,
                     canReact = !isRetiredChannel,
                     canSend = !isRetiredChannel,
+                    senderMutes = senderMutes,
                 ),
                 handlers =
                 MessageListHandlers(
@@ -598,6 +603,9 @@ fun MessageScreen(
                     onReply = { message -> if (!isRetiredChannel) replyingToPacketId = message?.packetId },
                     onTranslate = { onEvent(MessageScreenEvent.TranslateMessage(it)) },
                     onToggleTranslation = { onEvent(MessageScreenEvent.ToggleShowTranslated(it)) },
+                    onMuteSender = { message, until ->
+                        senderMutePrefs.setMuteUntil(contactKey, message.node.num, until)
+                    },
                 ),
                 quickEmojis = viewModel.frequentEmojis,
             )

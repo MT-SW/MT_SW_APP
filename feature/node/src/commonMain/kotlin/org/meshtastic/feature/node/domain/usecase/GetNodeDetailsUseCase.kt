@@ -21,5 +21,9 @@ import org.meshtastic.feature.node.detail.NodeDetailUiState
 
 /** Use case for retrieving comprehensive details for a specific node. */
 interface GetNodeDetailsUseCase {
+    /** The full history of the node. Used by the statistics screens; it arrives only when everything is read. */
     operator fun invoke(nodeId: Int): Flow<NodeDetailUiState>
+
+    /** Only the newest entries: enough to know which statistics exist, and ready at once. For the detail screen. */
+    fun summary(nodeId: Int): Flow<NodeDetailUiState>
 }

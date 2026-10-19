@@ -107,6 +107,7 @@ private fun degreeUnit(isFahrenheit: Boolean) = MetricFormatter.degreeSymbol(isF
 @Composable
 fun EnvironmentMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val graphData by viewModel.environmentGraphingData.collectAsStateWithLifecycle()
     val rawTelemetries by viewModel.filteredEnvironmentMetrics.collectAsStateWithLifecycle()
     val invertCurrent = LocalLnaCorrection.current.invertsCurrent(state.node?.num)
@@ -126,6 +127,7 @@ fun EnvironmentMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Un
     val showPowerChart = hasPower && (showPower || !hasWeather)
 
     BaseMetricScreen(
+        isLoading = isLoading,
         onNavigateUp = onNavigateUp,
         telemetryType = TelemetryType.ENVIRONMENT,
         titleRes = Res.string.env_metrics_log,

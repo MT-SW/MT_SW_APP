@@ -55,6 +55,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.ui.component.FullScreenLoading
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.BatteryEmpty
 import org.meshtastic.core.ui.icon.ChannelUtilization
@@ -202,6 +203,10 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
             )
         },
     ) { contentPadding ->
+        if (!uiState.isLoaded) {
+            FullScreenLoading(modifier = Modifier.padding(contentPadding))
+            return@Scaffold
+        }
         LazyColumn(
             modifier = Modifier.fillMaxWidth().padding(contentPadding),
             contentPadding = PaddingValues(16.dp),

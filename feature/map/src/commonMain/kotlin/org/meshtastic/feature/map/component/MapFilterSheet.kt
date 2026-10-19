@@ -56,6 +56,7 @@ import org.meshtastic.core.resources.node_filter_only_online
 import org.meshtastic.core.resources.node_filter_only_signed
 import org.meshtastic.core.resources.only_favorites
 import org.meshtastic.core.resources.show_node_links
+import org.meshtastic.core.resources.show_node_links_summary
 import org.meshtastic.core.resources.show_precision_circle
 import org.meshtastic.core.resources.show_waypoints
 import org.meshtastic.core.ui.component.label
@@ -125,6 +126,7 @@ internal fun MapFilterSheetContent(filterState: BaseMapViewModel.MapFilterState,
             icon = MeshtasticIcons.Distance,
             checked = filterState.showLinks,
             onToggle = actions.onToggleShowLinks,
+            supporting = stringResource(Res.string.show_node_links_summary),
         )
         LastHeardSlider(selected = filterState.lastHeardFilter, onSelect = actions.onSelectLastHeard)
 
@@ -235,9 +237,16 @@ private fun SectionTitle(text: String) {
 }
 
 @Composable
-private fun FilterToggle(label: String, checked: Boolean, onToggle: () -> Unit, icon: ImageVector? = null) {
+private fun FilterToggle(
+    label: String,
+    checked: Boolean,
+    onToggle: () -> Unit,
+    icon: ImageVector? = null,
+    supporting: String? = null,
+) {
     ListItem(
         headlineContent = { Text(label) },
+        supportingContent = supporting?.let { { Text(it) } },
         leadingContent = icon?.let { { Icon(imageVector = it, contentDescription = null) } },
         trailingContent = { Checkbox(checked = checked, onCheckedChange = { onToggle() }) },
     )

@@ -184,7 +184,7 @@ class NodeDetailViewModel(
                     flowOf(NodeDetailUiState())
                 } else {
                     combine(
-                        getNodeDetailsUseCase(nodeId),
+                        getNodeDetailsUseCase.summary(nodeId),
                         sessionStatusFlow,
                         isEnsuringSession,
                         narrowBandWarningFlow,

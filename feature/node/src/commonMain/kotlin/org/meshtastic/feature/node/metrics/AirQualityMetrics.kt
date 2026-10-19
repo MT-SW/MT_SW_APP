@@ -162,6 +162,7 @@ private val LEGEND_DATA =
 @Composable
 fun AirQualityMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, modifier: Modifier = Modifier) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val timeFrame by viewModel.timeFrame.collectAsStateWithLifecycle()
     val availableTimeFrames by viewModel.availableTimeFrames.collectAsStateWithLifecycle()
     val data = state.airQualityMetrics.filter { it.time.toLong() >= timeFrame.timeThreshold() }
@@ -179,6 +180,7 @@ fun AirQualityMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Uni
     var selectedMetrics by rememberSaveable { mutableStateOf(setOf(AirQuality.PM2_5, AirQuality.CO2)) }
 
     BaseMetricScreen(
+        isLoading = isLoading,
         onNavigateUp = onNavigateUp,
         telemetryType = TelemetryType.AIR_QUALITY,
         titleRes = Res.string.air_quality_metrics_log,

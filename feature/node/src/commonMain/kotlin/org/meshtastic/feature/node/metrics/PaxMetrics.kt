@@ -168,6 +168,7 @@ private fun PaxMetricsChart(
 @Suppress("MagicNumber", "LongMethod")
 fun PaxMetricsScreen(metricsViewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
     val state by metricsViewModel.state.collectAsStateWithLifecycle()
+    val isLoading by metricsViewModel.isLoading.collectAsStateWithLifecycle()
     val paxMetrics by metricsViewModel.filteredPaxMetrics.collectAsStateWithLifecycle()
     val timeFrame by metricsViewModel.timeFrame.collectAsStateWithLifecycle()
     val availableTimeFrames by metricsViewModel.availableTimeFrames.collectAsStateWithLifecycle()
@@ -187,6 +188,7 @@ fun PaxMetricsScreen(metricsViewModel: MetricsViewModel, onNavigateUp: () -> Uni
     val wifiSeries = remember(graphData) { graphData.map { it.first to it.third } }
 
     BaseMetricScreen(
+        isLoading = isLoading,
         onNavigateUp = onNavigateUp,
         telemetryType = TelemetryType.PAX,
         titleRes = Res.string.pax_metrics_log,
