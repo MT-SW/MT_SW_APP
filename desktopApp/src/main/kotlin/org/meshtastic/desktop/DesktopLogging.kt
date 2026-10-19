@@ -23,11 +23,13 @@ import org.meshtastic.core.common.log.InMemoryLogBuffer
 import org.meshtastic.feature.map.maplibre.installMapLibreLogging
 
 /**
- * Sends Kermit output to the console and to [InMemoryLogBuffer], which the Debug screen views and exports. Release
- * builds keep Info and above, as Android release does; debug builds keep every level.
+ * Sends Kermit output to the console and to [InMemoryLogBuffer], which the Debug screen views and exports. Every build
+ * keeps Info and above, as Android release does: the per-packet Debug and Verbose radio lines flooded the console and
+ * hid the warnings and errors that matter. [isDebug] is kept so a build can raise the level again for a hunt.
  */
+@Suppress("UNUSED_PARAMETER")
 internal fun installDesktopLogging(isDebug: Boolean) {
-    Logger.setMinSeverity(if (isDebug) Severity.Verbose else Severity.Info)
+    Logger.setMinSeverity(Severity.Info)
     Logger.setLogWriters(listOf(platformLogWriter(), InMemoryLogBuffer))
     installMapLibreLogging()
 }

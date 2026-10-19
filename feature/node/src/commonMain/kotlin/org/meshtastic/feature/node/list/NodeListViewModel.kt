@@ -201,6 +201,7 @@ class NodeListViewModel(
     fun keepUnheardNodes(nodes: List<Node>) = nodeFilterPreferences.keepUnheardNodes(nodes.mapTo(HashSet()) { it.num })
 
     private val _deviceImageUrls = MutableStateFlow<Map<Int, String>>(emptyMap())
+    private val resolvedModels = HashSet<Int>()
 
     /** Maps hw_model int value → device image URL from the flasher CDN. */
     val deviceImageUrls: StateFlow<Map<Int, String>> = _deviceImageUrls.asStateFlow()
@@ -209,7 +210,9 @@ class NodeListViewModel(
         // Resolve device image URLs as nodes arrive
         viewModelScope.launch {
             nodeList.collect { nodes ->
-                val newModels = nodes.map { it.user.hw_model.value }.distinct().filter { it !in _deviceImageUrls.value }
+                // Each model is asked for once, whether or not it has an image: models without one (unset, unknown)
+                // were asked for again on every node update, which kept the database busy for nothing.
+                val newModels = nodes.map { it.user.hw_model.value }.distinct().filter { resolvedModels.add(it) }
                 for (hwModel in newModels) {
                     resolveDeviceImageUrl(hwModel)
                 }
