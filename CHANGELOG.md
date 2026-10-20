@@ -18,6 +18,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+**Scalenie z oryginałem — wersja 2.8.4 (początek)**
+* Scalenie z oryginałem po wydaniu 2.8.3: numer wersji aplikacji 2.8.4, nowsze protobufy (2.8.1.18), odświeżone dane o sprzęcie i firmware, tłumaczenia i zrzuty ekranu sklepów. Biblioteka Bluetooth Kable zostaje przypięta do 0.44.3, a nasze tłumaczenia PL bez zmian.
+
 **Gierka przy aktualizacji firmware**
 * Ludzik w grze (też ten ogłuszony oraz ten na ekranie aktualizacji i w pomocy) jest teraz cały żółty i ma na brzuchu logo MT_SW takie jak w ikonie aplikacji, zamiast zielonego koloru i oryginalnego znaczka.
 
@@ -343,6 +346,9 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+**Merge with the original — version 2.8.4 (start)**
+* Merged the original after the 2.8.3 release: app version number 2.8.4, newer protobufs (2.8.1.18), refreshed hardware and firmware data, translations and store screenshots. The Kable Bluetooth library stays pinned to 0.44.3, and our Polish translations are unchanged.
 
 **Firmware-update mini-game**
 * The character in the game (also the dazed one, and the one on the update and help screens) is now fully yellow and wears the MT_SW logo from the app icon instead of the green colour and the original mark.
