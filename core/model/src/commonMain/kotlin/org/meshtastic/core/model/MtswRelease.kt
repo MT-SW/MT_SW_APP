@@ -26,6 +26,6 @@ package org.meshtastic.core.model
  * actually published on GitHub.
  */
 object MtswRelease {
-    const val RELEASE = 3
-    const val TEST = 0
+    const val RELEASE = 4
+    const val TEST = 1
 }
