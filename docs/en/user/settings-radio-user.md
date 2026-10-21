@@ -210,7 +210,7 @@ On **Settings → Device configuration → Network**, on nodes with Wi-Fi or Eth
 | Setting | Description |
 |---------|-------------|
 | Wi-Fi enabled | Enable the Wi-Fi node (ESP32 nodes) |
-| SSID | Network name to connect to. Appears only once **Wi-Fi enabled** is on, along with **Password**. **Pick a Wi-Fi network from the list** shows the 2.4 GHz networks around the phone or computer (the current network is on top) and fills in only the name — you type the password by hand, the app never reads it. **Scan Wi-Fi QR code** fills both from a standard Wi-Fi QR code; on Android, holding the phone against a Wi-Fi NFC tag while this screen is open fills them the same way, and the app offers to open system settings if NFC is turned off |
+| SSID | Network name to connect to. Appears only once **Wi-Fi enabled** is on, along with **Password**. **Pick a Wi-Fi network from the list** shows the 2.4 GHz networks around the phone or computer (the current network is on top, a padlock marks networks with a password). After you pick a network with a password, a separate window asks for it, and after **Connect** the radio gets the network and password at once and joins it (like **Send**); a network without a password connects at once. The app never reads the phone's saved passwords. **Scan Wi-Fi QR code** fills both from a standard Wi-Fi QR code; on Android, holding the phone against a Wi-Fi NFC tag while this screen is open fills them the same way, and the app offers to open system settings if NFC is turned off |
 | Password | Network password |
 | Ethernet enabled | Use a wired connection on hardware that has one |
 | IPv4 mode | DHCP, or a static address configured with the four fields that follow |

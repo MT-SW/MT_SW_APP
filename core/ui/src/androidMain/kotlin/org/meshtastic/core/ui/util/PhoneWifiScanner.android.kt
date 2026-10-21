@@ -82,7 +82,11 @@ private class AndroidPhoneWifiScanner(
         delay(SCAN_WAIT_MILLIS)
         val results = runCatching { wifi.scanResults }.getOrNull().orEmpty()
         return results
-            .map { PhoneWifiNetwork(it.SSID.orEmpty(), it.level, it.frequency in BAND_24_MIN_MHZ..BAND_24_MAX_MHZ) }
+            .map {
+                val caps = it.capabilities.orEmpty()
+                val secured = listOf("WPA", "WEP", "SAE", "PSK", "EAP").any { tag -> caps.contains(tag) }
+                PhoneWifiNetwork(it.SSID.orEmpty(), it.level, it.frequency in BAND_24_MIN_MHZ..BAND_24_MAX_MHZ, secured)
+            }
             .tidy()
     }
 }

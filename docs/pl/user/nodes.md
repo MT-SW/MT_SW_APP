@@ -31,15 +31,17 @@ Lista węzłów pokazuje każdy węzeł, który Twój węzeł usłyszał, w tym:
 
 Lista ma dwa poziomy szczegółowości, ustawiane w **Ustawienia → Układ węzła** (Node Layout). Układ **Pełny** pokazuje każde pole, które węzeł zgłosił, i ukrywa te, których nie zgłosił. Układ **Kompaktowy** mieści więcej węzłów na ekranie i pozwala samodzielnie wybrać pola — **Zasilanie**, **Czas ostatniej aktywności**, **Względny czas ostatniej aktywności**, **Odległość i kierunek**, **Skoków**, **Sygnał (tylko bezpośredni)**, **Kanał** oraz **Urządzenie i rola**. Przełącznik **Metryki środowiskowe** dotyczy obu układów. Podgląd nad przełącznikami pokazuje efekt, zanim opuścisz ekran.
 
-### Siła sygnału połączenia
-
-Pod ikoną połączenia przy Twoim węźle widać siłę sygnału łącza z radiem w dBm: dla Bluetooth odczyt telefonu (odświeżany co kilka sekund), dla połączenia przez sieć — siłę Wi-Fi zgłaszaną przez samo radio. Przy USB nic nie jest pokazywane. Wartość nie jest nigdzie zapisywana.
-
 ### Dodatkowe dane przy węźle
 
-W **Ustawienia → Układ węzła → Dodatkowe dane przy węźle** możesz włączyć dodatkową linię pod każdym węzłem: pogoda (temperatura, wilgotność, ciśnienie, wiatr, deszcz, światło, UV i inne czujniki), zasilanie, ruch (pakiety wysłane, odebrane, uszkodzone, zajętość kanału) oraz zasoby (procesor, pamięć, czas pracy). Pokazywane są tylko najnowsze odczyty, bez historii. Węzeł bez czujników pogody pokazuje ruch i zasoby.
+Dodatkowa linia pod każdym węzłem składa się z trzech części, włączanych w **Ustawienia → Układ węzła**:
 
-Trzy tryby: **Wyłączone**, **Strony** (jedna strona naraz; strony zmieniają się same, a przesunięcie palcem w lewo lub w prawo zmienia je ręcznie i na chwilę wstrzymuje automat) oraz **Wszystko naraz**. Przełącznik **Same ikony (bez podpisów)** działa niezależnie od układu; przycisk (i) obok niego pokazuje znaczenie ikon. Gdy dodatkowa linia jest włączona, zastępuje starszą siatkę czujników.
+- **Metryki środowiskowe** — na górze napięcie i prąd, a pod nimi wszystkie czujniki pogody (temperatura, wilgotność, ciśnienie, wiatr, deszcz, światło, UV i inne). Zajmuje tyle linii, ile trzeba.
+- **Dodatkowe statystyki → Pakiety** — osobna linia przy prawej krawędzi: zajętość kanału i czas nadawania (dla węzłów innych niż Twój), TX, RX, B (błędne), D (duplikaty) i Przek. (przekazane dalej).
+- **Dodatkowe statystyki → Sprzęt** — osobna linia przy prawej krawędzi: procesor, wolna pamięć, pamięć flash i PSRAM oraz siła sygnału Wi-Fi węzła.
+
+Pokazywane są tylko najnowsze dane z pakietów węzła, bez historii i bez pomiarów na bieżąco; jeśli ostatni pakiet nie miał jakiejś wartości, brana jest ona z wcześniejszego. Pola, których węzeł nie wysyła, są ukryte.
+
+Sposób pokazywania: **Strony** (jedna strona naraz; strony zmieniają się same, a przesunięcie palcem w lewo lub w prawo zmienia je ręcznie i na chwilę wstrzymuje automat) albo **Wszystko naraz**. Przełącznik **Same ikony (bez podpisów)** działa niezależnie od układu; przycisk (i) obok niego pokazuje znaczenie ikon. Podgląd w ustawieniach od razu odzwierciedla wszystkie przełączniki.
 
 ### Wskaźniki stanu węzła
 

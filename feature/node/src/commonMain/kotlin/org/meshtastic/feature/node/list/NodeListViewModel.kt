@@ -20,14 +20,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.flatMapLatest
@@ -38,14 +36,13 @@ import org.meshtastic.core.common.util.LocaleUnitsProvider
 import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.TemperatureUnit
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.model.util.LocalStatsExtended
 import org.meshtastic.core.model.util.decodeLocalStatsExtended
+import org.meshtastic.proto.LocalStats
 import org.meshtastic.feature.node.health.calmed
 import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.Telemetry
-import org.meshtastic.core.ble.readActiveBleRssi
-import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
-import org.meshtastic.core.model.LinkSignal
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.NodeExtraMode
@@ -102,36 +99,6 @@ class NodeListViewModel(
             .map { address -> address?.let { DeviceType.fromAddress(it) } }
             .stateInWhileSubscribed(initialValue = null)
 
-    /**
-     * Strength of the link to the connected radio, shown under the connection icon: Bluetooth signal read every few
-     * seconds, or the Wi-Fi strength the device itself reports for a network connection. Nothing for USB. Read only
-     * while the list is on screen and never stored.
-     */
-    val linkSignal: StateFlow<LinkSignal?> =
-        combine(connectionState, deviceType, ::Pair)
-            .flatMapLatest<Pair<ConnectionState, DeviceType?>, LinkSignal?> { (state, type) ->
-                when {
-                    state != ConnectionState.Connected -> flowOf<LinkSignal?>(null)
-
-                    type == DeviceType.BLE ->
-                        flow<LinkSignal?> {
-                            while (true) {
-                                emit(readActiveBleRssi()?.let { LinkSignal("Bluetooth", it) })
-                                delay(LINK_SIGNAL_POLL_MILLIS)
-                            }
-                        }
-
-                    type == DeviceType.TCP ->
-                        nodeRepository.localStatsExtended.map { ext ->
-                            ext.wifiRssi.takeIf { it != 0 }?.let { LinkSignal("Wi-Fi", it) }
-                        }
-
-                    else -> flowOf<LinkSignal?>(null)
-                }
-            }
-            .catch { co.touchlab.kermit.Logger.e(it) { "Link signal failed" } }
-            .stateInWhileSubscribed(initialValue = null)
-
     val nodeListDensity: StateFlow<NodeListDensity> =
         nodeFilterPreferences.nodeListDensity
             .map { name -> NodeListDensity.fromName(name) }
@@ -147,23 +114,31 @@ class NodeListViewModel(
     val shouldShowRole = nodeFilterPreferences.shouldShowRole
     val shouldShowTelemetry = nodeFilterPreferences.shouldShowTelemetry
 
-    /** The extra line of data under each node: off / paged / all at once. */
+    /** How the extra line of data under each node is shown: paged or all at once. */
     val nodeExtraMode: StateFlow<NodeExtraMode> =
         nodeFilterPreferences.nodeExtraMode
             .map { NodeExtraMode.fromName(it) }
-            .stateInWhileSubscribed(initialValue = NodeExtraMode.OFF)
+            .stateInWhileSubscribed(initialValue = NodeExtraMode.ALL)
 
     /** The extra line shows only icons and values, no text labels. */
     val nodeExtraIconsOnly = nodeFilterPreferences.nodeExtraIconsOnly
 
+    /** The extra line shows packet counters. */
+    val nodeExtraPackets = nodeFilterPreferences.nodeExtraPackets
+
+    /** The extra line shows hardware data (CPU, memory, Wi-Fi signal). */
+    val nodeExtraHardware = nodeFilterPreferences.nodeExtraHardware
+
     /**
-     * The newest traffic and resource readings of every node (latest only, no history), decoded from its recent local
-     * stats telemetry. Not read at all while the extra line is off. A broken or foreign packet is skipped.
+     * The newest traffic and hardware readings of every node, exactly as the node sent them in its packets (nothing is
+     * measured by the phone). Every reading comes from the newest packet that carried it, so a packet without the
+     * hardware part does not blank it. Not read at all while both options are off. A broken or foreign packet is
+     * skipped.
      */
     val nodeExtraStats: StateFlow<Map<Int, NodeExtraStats>> =
-        nodeExtraMode
-            .flatMapLatest { mode ->
-                if (mode == NodeExtraMode.OFF) {
+        combine(nodeExtraPackets, nodeExtraHardware, ::Pair)
+            .flatMapLatest<Pair<Boolean, Boolean>, Map<Int, NodeExtraStats>> { (packets, hardware) ->
+                if (!packets && !hardware) {
                     flowOf<Map<Int, NodeExtraStats>>(emptyMap())
                 } else {
                     combine(
@@ -171,33 +146,26 @@ class NodeListViewModel(
                             .getLogsByPortNumSinceSlim(PortNum.TELEMETRY_APP.value, nowMillis - EXTRA_STATS_WINDOW_MILLIS)
                             .calmed(),
                         nodeRepository.ourNodeInfo,
-                    ) { logs, ourNode ->
+                        nodeRepository.localStatsExtended,
+                    ) { logs, ourNode, localExt ->
                         val myNum = ourNode?.num
                         val result = HashMap<Int, NodeExtraStats>()
-                        // Newest first: the first local stats found for a node are its latest.
+                        val decoded = HashMap<Int, Int>()
+                        // Newest first: the first reading found for a node is its latest.
                         for (log in logs) {
                             val num = if (log.fromNum == 0 && myNum != null) myNum else log.fromNum
-                            if (num in result) continue
+                            if ((decoded[num] ?: 0) >= MAX_PACKETS_PER_NODE) continue
                             val payload = runCatching { log.fromRadio.packet?.decoded?.payload }.getOrNull() ?: continue
                             val telemetry = runCatching { Telemetry.ADAPTER.decode(payload) }.getOrNull() ?: continue
                             val stats = telemetry.local_stats ?: continue
                             val ext = runCatching { telemetry.decodeLocalStatsExtended() }.getOrNull()
-                            val heapTotal = stats.heap_total_bytes ?: 0
-                            val heapFree = stats.heap_free_bytes ?: 0
-                            result[num] =
-                                NodeExtraStats(
-                                    packetsTx = stats.num_packets_tx,
-                                    packetsRx = stats.num_packets_rx,
-                                    packetsRxBad = stats.num_packets_rx_bad,
-                                    rxDupe = stats.num_rx_dupe,
-                                    txRelay = stats.num_tx_relay,
-                                    cpuPercent = ext?.cpuUsagePercent,
-                                    heapFreePercent = if (heapTotal > 0) heapFree * PERCENT / heapTotal else null,
-                                    flashUsedPercent =
-                                    ext?.takeIf { it.flashTotalBytes > 0 }?.let { it.flashUsedBytes * PERCENT / it.flashTotalBytes },
-                                    psramFreePercent =
-                                    ext?.takeIf { it.memoryPsramTotal > 0 }?.let { it.memoryPsramFree * PERCENT / it.memoryPsramTotal },
-                                )
+                            decoded[num] = (decoded[num] ?: 0) + 1
+                            val fresh = extraStatsOf(stats, ext)
+                            result[num] = result[num]?.orElse(fresh) ?: fresh
+                        }
+                        // Our own radio: its newest hardware data is also kept apart from the log.
+                        if (myNum != null) {
+                            result[myNum] = (result[myNum] ?: NodeExtraStats()).withHardware(localExt)
                         }
                         result as Map<Int, NodeExtraStats>
                     }
@@ -400,9 +368,8 @@ class NodeListViewModel(
 
     companion object {
         private const val KEY_FILTER_TEXT = "filter_text"
-        private const val EXTRA_STATS_WINDOW_MILLIS = 6 * 60 * 60 * 1000L
-        private const val PERCENT = 100f
-        private const val LINK_SIGNAL_POLL_MILLIS = 5_000L
+        private const val EXTRA_STATS_WINDOW_MILLIS = 24 * 60 * 60 * 1000L
+        private const val MAX_PACKETS_PER_NODE = 6
         private const val FLASHER_DEVICE_IMAGE_BASE_URL = "https://flasher.meshtastic.org/img/devices/"
     }
 }
@@ -441,4 +408,36 @@ data class NodeFilterState(
                 onlyEncrypted ||
                 excludeMqtt ||
                 excludeUnheard
+}
+
+private const val PERCENT = 100f
+
+private fun extraStatsOf(stats: LocalStats, ext: LocalStatsExtended?): NodeExtraStats {
+    val heapTotal = stats.heap_total_bytes ?: 0
+    val heapFree = stats.heap_free_bytes ?: 0
+    return NodeExtraStats(
+        packetsTx = stats.num_packets_tx,
+        packetsRx = stats.num_packets_rx,
+        packetsRxBad = stats.num_packets_rx_bad,
+        rxDupe = stats.num_rx_dupe,
+        txRelay = stats.num_tx_relay,
+        heapFreePercent = if (heapTotal > 0) heapFree * PERCENT / heapTotal else null,
+    )
+        .withHardware(ext)
+}
+
+/** Fills in the hardware part from a packet's extended stats; whatever the packet did not report stays as it was. */
+private fun NodeExtraStats.withHardware(ext: LocalStatsExtended?): NodeExtraStats {
+    if (ext == null) return this
+    val reportsCpu = ext.cpuUsagePercent > 0 || ext.memoryTotal > 0 || ext.flashTotalBytes > 0
+    return copy(
+        cpuPercent = if (reportsCpu) ext.cpuUsagePercent else cpuPercent,
+        flashUsedPercent =
+        ext.takeIf { it.flashTotalBytes > 0 }?.let { it.flashUsedBytes * PERCENT / it.flashTotalBytes }
+            ?: flashUsedPercent,
+        psramFreePercent =
+        ext.takeIf { it.memoryPsramTotal > 0 }?.let { it.memoryPsramFree * PERCENT / it.memoryPsramTotal }
+            ?: psramFreePercent,
+        wifiRssi = ext.wifiRssi.takeIf { it != 0 } ?: wifiRssi,
+    )
 }

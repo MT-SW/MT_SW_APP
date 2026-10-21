@@ -287,10 +287,22 @@ class FakeUiPrefs : UiPrefs {
         shouldShowTelemetry.value = value
     }
 
-    override val nodeExtraMode = MutableStateFlow("OFF")
+    override val nodeExtraMode = MutableStateFlow("ALL")
 
     override fun setNodeExtraMode(value: String) {
         nodeExtraMode.value = value
+    }
+
+    override val nodeExtraPackets = MutableStateFlow(false)
+
+    override fun setNodeExtraPackets(value: Boolean) {
+        nodeExtraPackets.value = value
+    }
+
+    override val nodeExtraHardware = MutableStateFlow(false)
+
+    override fun setNodeExtraHardware(value: Boolean) {
+        nodeExtraHardware.value = value
     }
 
     override val nodeExtraIconsOnly = MutableStateFlow(false)

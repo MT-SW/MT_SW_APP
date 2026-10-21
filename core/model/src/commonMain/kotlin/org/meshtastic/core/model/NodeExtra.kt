@@ -29,7 +29,8 @@ enum class NodeExtraMode {
     ;
 
     companion object {
-        fun fromName(name: String): NodeExtraMode = entries.firstOrNull { it.name == name } ?: OFF
+        // The line is no longer switched on by this mode (that is done by the separate options); OFF now means "all at once".
+        fun fromName(name: String): NodeExtraMode = if (name == PAGED.name) PAGED else ALL
     }
 }
 
@@ -47,10 +48,26 @@ data class NodeExtraStats(
     val heapFreePercent: Float? = null,
     val flashUsedPercent: Float? = null,
     val psramFreePercent: Float? = null,
+    /** Wi-Fi signal of the node in dBm, exactly as the node sent it in its last packet. */
+    val wifiRssi: Int? = null,
 ) {
     val hasTraffic: Boolean
         get() = packetsTx != null || packetsRx != null || packetsRxBad != null || rxDupe != null || txRelay != null
 
     val hasResources: Boolean
-        get() = cpuPercent != null || heapFreePercent != null || flashUsedPercent != null || psramFreePercent != null
+        get() = cpuPercent != null || heapFreePercent != null || flashUsedPercent != null || psramFreePercent != null || wifiRssi != null
+
+    /** This reading, with every gap filled from an [older] one. */
+    fun orElse(older: NodeExtraStats): NodeExtraStats = NodeExtraStats(
+        packetsTx = packetsTx ?: older.packetsTx,
+        packetsRx = packetsRx ?: older.packetsRx,
+        packetsRxBad = packetsRxBad ?: older.packetsRxBad,
+        rxDupe = rxDupe ?: older.rxDupe,
+        txRelay = txRelay ?: older.txRelay,
+        cpuPercent = cpuPercent ?: older.cpuPercent,
+        heapFreePercent = heapFreePercent ?: older.heapFreePercent,
+        flashUsedPercent = flashUsedPercent ?: older.flashUsedPercent,
+        psramFreePercent = psramFreePercent ?: older.psramFreePercent,
+        wifiRssi = wifiRssi ?: older.wifiRssi,
+    )
 }

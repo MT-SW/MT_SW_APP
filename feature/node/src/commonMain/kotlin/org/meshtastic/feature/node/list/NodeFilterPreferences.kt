@@ -40,6 +40,8 @@ open class NodeFilterPreferences constructor(private val uiPrefs: UiPrefs) {
     open val shouldShowTelemetry = uiPrefs.shouldShowTelemetry
     open val nodeExtraMode = uiPrefs.nodeExtraMode
     open val nodeExtraIconsOnly = uiPrefs.nodeExtraIconsOnly
+    open val nodeExtraPackets = uiPrefs.nodeExtraPackets
+    open val nodeExtraHardware = uiPrefs.nodeExtraHardware
 
     open val keptUnheardNodes = uiPrefs.keptUnheardNodes
 

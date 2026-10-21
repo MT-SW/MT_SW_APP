@@ -199,7 +199,7 @@ W **Ustawienia → Konfiguracja urządzenia → Sieć**, w węzłach z Wi-Fi lub
 | Ustawienie | Opis |
 |---------|-------------|
 | WiFi włączone | Włącza Wi-Fi węzła (węzły ESP32) |
-| SSID | Nazwa sieci, z którą ma się połączyć. Pojawia się dopiero po włączeniu **WiFi włączone**, razem z **Hasło**. **Wybierz sieć Wi-Fi z listy** pokazuje sieci 2,4 GHz w pobliżu telefonu lub komputera (obecna sieć jest na górze) i wpisuje samą nazwę — hasło wpisujesz ręcznie, aplikacja nigdy go nie odczytuje. **Skanuj kod QR Wi-Fi** wypełnia oba pola ze standardowego kodu QR Wi-Fi; na Androidzie przyłożenie telefonu do tagu NFC z danymi Wi-Fi przy otwartym tym ekranie wypełnia je w ten sam sposób, a aplikacja proponuje otwarcie ustawień systemowych, jeśli NFC jest wyłączone |
+| SSID | Nazwa sieci, z którą ma się połączyć. Pojawia się dopiero po włączeniu **WiFi włączone**, razem z **Hasło**. **Wybierz sieć Wi-Fi z listy** pokazuje sieci 2,4 GHz w pobliżu telefonu lub komputera (obecna sieć jest na górze, przy sieciach z hasłem jest kłódka). Po wybraniu sieci z hasłem pojawia się osobne okienko na hasło, a po **Połącz** radio od razu dostaje sieć i hasło i łączy się z nią (jak po **Wyślij**); sieć bez hasła łączy się od razu. Aplikacja nigdy nie odczytuje zapisanych haseł telefonu. **Skanuj kod QR Wi-Fi** wypełnia oba pola ze standardowego kodu QR Wi-Fi; na Androidzie przyłożenie telefonu do tagu NFC z danymi Wi-Fi przy otwartym tym ekranie wypełnia je w ten sam sposób, a aplikacja proponuje otwarcie ustawień systemowych, jeśli NFC jest wyłączone |
 | Hasło | Hasło sieci |
 | Ethernet włączony | Używa połączenia przewodowego na sprzęcie, który je ma |
 | Tryb IPv4 | DHCP lub adres statyczny konfigurowany czterema następnymi polami |

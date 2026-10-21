@@ -412,11 +412,29 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
 
     override val nodeExtraMode: StateFlow<String> =
         dataStore.data
-            .map { it[NodeListLayoutPreferences.KEY_EXTRA_MODE] ?: "OFF" }
-            .stateIn(scope, SharingStarted.Eagerly, "OFF")
+            .map { it[NodeListLayoutPreferences.KEY_EXTRA_MODE] ?: "ALL" }
+            .stateIn(scope, SharingStarted.Eagerly, "ALL")
 
     override fun setNodeExtraMode(value: String) {
         scope.launch { dataStore.edit { it[NodeListLayoutPreferences.KEY_EXTRA_MODE] = value } }
+    }
+
+    override val nodeExtraPackets: StateFlow<Boolean> =
+        dataStore.data
+            .map { it[NodeListLayoutPreferences.KEY_EXTRA_PACKETS] ?: false }
+            .stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setNodeExtraPackets(value: Boolean) {
+        scope.launch { dataStore.edit { it[NodeListLayoutPreferences.KEY_EXTRA_PACKETS] = value } }
+    }
+
+    override val nodeExtraHardware: StateFlow<Boolean> =
+        dataStore.data
+            .map { it[NodeListLayoutPreferences.KEY_EXTRA_HARDWARE] ?: false }
+            .stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setNodeExtraHardware(value: Boolean) {
+        scope.launch { dataStore.edit { it[NodeListLayoutPreferences.KEY_EXTRA_HARDWARE] = value } }
     }
 
     override val nodeExtraIconsOnly: StateFlow<Boolean> =
