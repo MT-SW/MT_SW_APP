@@ -84,10 +84,13 @@ interface MeshLogDao {
     )
     fun getLatestLogsByPortNumPerSender(portNum: Int): Flow<List<MeshLog>>
 
-    /** Like [getAllLogsSince], without the bulky text copy of each packet (`message`) the health screens never use. */
+    /**
+     * Like [getAllLogsSince], without the bulky text copy of each packet (`message`) the health screens never use, and
+     * without the on-demand / sniffer port (354): its payloads are not telemetry and are not needed for health.
+     */
     @Query(
         "SELECT uuid, type, received_date, '' AS message, from_num, port_num, from_radio FROM log " +
-            "WHERE received_date >= :sinceTimestamp ORDER BY received_date ASC",
+            "WHERE received_date >= :sinceTimestamp AND port_num != 354 ORDER BY received_date ASC",
     )
     fun getAllLogsSinceSlim(sinceTimestamp: Long): Flow<List<MeshLog>>
 
