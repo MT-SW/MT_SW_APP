@@ -31,6 +31,12 @@ The node list shows every node your node has heard, including:
 
 The list has two densities, set at **Settings → Node Layout**. **Complete** shows every field a node has reported and hides the ones it hasn't. **Compact** fits more nodes on screen and lets you pick the fields yourself — **Power**, **Last Heard Time**, **Relative Last Heard Time**, **Distance and Bearing**, **Hops Away**, **Signal (Direct Only)**, **Channel**, and **Device & Role**. The **Environment Metrics** toggle applies to both densities. A preview above the toggles shows the effect before you leave the screen.
 
+### Extra data under a node
+
+In **Settings → Node layout → Extra data under a node** you can switch on an extra line under every node: weather (temperature, humidity, pressure, wind, rain, light, UV and other sensors), power, traffic (packets sent, received, bad, channel utilization) and resources (CPU, memory, uptime). Only the newest readings are shown, no history. A node with no weather sensors shows traffic and resources.
+
+Three modes: **Off**, **Pages** (one page at a time; pages change by themselves, and swiping left or right changes them by hand and pauses the automatic change for a moment) and **All at once**. The **Icons only (no labels)** switch works independently of the layout; the (i) button next to it explains the icons. When the extra line is on, it replaces the older sensor grid.
+
 ### Node Status indicators
 
 | Indicator | Meaning |

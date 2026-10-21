@@ -22,6 +22,10 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Scalenie z oryginałem po wydaniu 2.8.3: numer wersji aplikacji 2.8.4, nowsze protobufy (2.8.1.18), odświeżone dane o sprzęcie i firmware, tłumaczenia i zrzuty ekranu sklepów. Biblioteka Bluetooth Kable zostaje przypięta do 0.44.3, a nasze tłumaczenia PL bez zmian.
 * Drugie scalenie z oryginałem: nowy **widok AR sieci** (węzły i punkty trasy na obrazie z aparatu telefonu), **podgląd 3D urządzenia**, szybkie akcje „Otwórz kompas” i „Otwórz widok sieci” w menu węzła, protobufy 2.8.1.20 i nowsze narzędzia budowania. Nowe napisy przetłumaczone na polski, a nasze funkcje (np. nazwy planera, Zdrowie sieci) zostały zachowane.
 
+**Dodatkowe dane przy węźle i odporność Zdrowia sieci**
+* Nowa dodatkowa linia pod każdym węzłem na liście: wszystkie czujniki pogody, zasilanie, ruch i zasoby (procesor, pamięć). Trzy tryby (wyłączone / strony / wszystko naraz), strony zmieniają się same i przesuwa się je palcem, opcja „same ikony” z legendą (i). Pokazywane są tylko najnowsze odczyty.
+* Zdrowie sieci: obce lub zepsute pakiety (np. z innego firmware) nie mogą już zawiesić ani wywrócić ekranu; ekran sam próbuje się podnieść po błędzie i nie czyta już pakietów trybu na żądanie.
+
 **Gierka przy aktualizacji firmware**
 * Ludzik w grze (też ten ogłuszony oraz ten na ekranie aktualizacji i w pomocy) jest teraz cały żółty i ma na brzuchu logo MT_SW takie jak w ikonie aplikacji, zamiast zielonego koloru i oryginalnego znaczka.
 
@@ -351,6 +355,10 @@ The entries below describe only what this fork adds on top of the original, from
 **Merge with the original — version 2.8.4 (start)**
 * Merged the original after the 2.8.3 release: app version number 2.8.4, newer protobufs (2.8.1.18), refreshed hardware and firmware data, translations and store screenshots. The Kable Bluetooth library stays pinned to 0.44.3, and our Polish translations are unchanged.
 * Second merge with the original: the new **AR mesh view** (nodes and waypoints over the phone camera), the **3D device model viewer**, the quick actions "Open compass" and "Open mesh view" in the node menu, protobufs 2.8.1.20 and newer build tooling. New strings are translated to Polish, and our features (e.g. the planner naming, Network Health) are kept.
+
+**Extra data under a node, and a sturdier Network Health**
+* A new extra line under every node in the list: all weather sensors, power, traffic and resources (CPU, memory). Three modes (off / pages / all at once), pages change by themselves and by swiping, an "icons only" option with an (i) legend. Only the newest readings are shown.
+* Network Health: foreign or broken packets (e.g. from other firmware) can no longer freeze or crash the screen; it now tries to recover after an error and no longer reads on-demand mode packets.
 
 **Firmware-update mini-game**
 * The character in the game (also the dazed one, and the one on the update and help screens) is now fully yellow and wears the MT_SW logo from the app icon instead of the green colour and the original mark.
