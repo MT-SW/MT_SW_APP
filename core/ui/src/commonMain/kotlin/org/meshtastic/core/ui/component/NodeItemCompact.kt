@@ -240,7 +240,12 @@ fun NodeItemCompact(
 
                 // Row 3: Environment metrics — temp · humidity · pressure (icon + value only)
                 if (LocalNodeExtraConfig.current.mode != NodeExtraMode.OFF) {
-                    NodeExtraLine(node = thatNode, tempInFahrenheit = tempInFahrenheit, distanceUnits = distanceUnits)
+                    NodeExtraLine(
+                        node = thatNode,
+                        tempInFahrenheit = tempInFahrenheit,
+                        distanceUnits = distanceUnits,
+                        isThisNode = isThisNode,
+                    )
                 } else if (showTelemetry) {
                     CompactMetricsRow(
                         thatNode = thatNode,

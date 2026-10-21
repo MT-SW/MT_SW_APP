@@ -49,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.common.util.MeasurementSystem
@@ -57,6 +58,28 @@ import org.meshtastic.core.model.LinkSignal
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeExtraMode
 import org.meshtastic.core.model.NodeExtraStats
+import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.AirQuality
+import org.meshtastic.core.ui.icon.AirUtilization
+import org.meshtastic.core.ui.icon.ChannelUtilization
+import org.meshtastic.core.ui.icon.DataUsage
+import org.meshtastic.core.ui.icon.DetectionSensor
+import org.meshtastic.core.ui.icon.Distance
+import org.meshtastic.core.ui.icon.ElectricPower
+import org.meshtastic.core.ui.icon.Humidity
+import org.meshtastic.core.ui.icon.LightMode
+import org.meshtastic.core.ui.icon.Memory
+import org.meshtastic.core.ui.icon.PeopleCount
+import org.meshtastic.core.ui.icon.Pressure
+import org.meshtastic.core.ui.icon.SoilMoisture
+import org.meshtastic.core.ui.icon.SoilTemperature
+import org.meshtastic.core.ui.icon.Speed
+import org.meshtastic.core.ui.icon.Storage
+import org.meshtastic.core.ui.icon.Temperature
+import org.meshtastic.core.ui.icon.Tsunami
+import org.meshtastic.core.ui.icon.Voltage
+import org.meshtastic.core.ui.icon.Weight
+import org.meshtastic.core.ui.icon.WindDirection
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
@@ -81,68 +104,67 @@ const val NODE_EXTRA_PAGE_MILLIS = 4_000L
 /** After a manual swipe the row stays put for this many ticks. */
 private const val MANUAL_PAUSE_TICKS = 3
 
-/** One reading: a symbol, a short label (shown unless icons only) and the value. */
-data class ExtraChip(val glyph: String, val label: String, val value: String)
+/** One reading: an icon in the app's own grey style, a short label (hidden when icons only) and the value. */
+data class ExtraChip(val icon: ImageVector?, val label: String, val value: String)
 
 private data class ExtraGroup(val chips: List<ExtraChip>)
 
-/** Symbol -> meaning, for the (i) legend in the settings. */
-val nodeExtraLegend: List<Pair<String, String>> =
-    listOf(
-        "🌡" to "Temperatura",
-        "💧" to "Wilgotność",
-        "🧭" to "Ciśnienie",
-        "🌬" to "Wiatr (prędkość, kierunek)",
-        "💨" to "Poryw wiatru",
-        "🌧" to "Deszcz (1 godz. / 24 godz.)",
-        "☀" to "Światło",
-        "😎" to "Promieniowanie UV",
-        "☢" to "Promieniowanie",
-        "📏" to "Odległość / poziom",
-        "⚖" to "Waga",
-        "🌱" to "Gleba (temperatura, wilgotność)",
-        "🫧" to "Jakość powietrza",
-        "👥" to "Licznik osób (BLE / Wi-Fi)",
-        "🔋" to "Bateria",
-        "🔌" to "Napięcie",
-        "⚡" to "Prąd / kanały zasilania",
-        "📶" to "Zajętość kanału",
-        "📡" to "Czas nadawania",
-        "⬆" to "Pakiety wysłane",
-        "⬇" to "Pakiety odebrane",
-        "⚠" to "Pakiety uszkodzone",
-        "♻" to "Duplikaty",
-        "🔁" to "Przekazane dalej",
-        "🧠" to "Procesor (CPU)",
-        "🧮" to "Wolna pamięć",
-        "💾" to "Zajęta pamięć flash",
-        "🗄" to "Wolna pamięć PSRAM",
-        "⏱" to "Czas pracy",
-    )
+/** Icon -> meaning, for the (i) legend in the settings. */
+val nodeExtraLegend: List<Pair<ImageVector?, String>>
+    get() =
+        listOf(
+            MeshtasticIcons.Temperature to "Temperatura",
+            MeshtasticIcons.Humidity to "Wilgotność",
+            MeshtasticIcons.Pressure to "Ciśnienie",
+            MeshtasticIcons.WindDirection to "Wiatr (prędkość, kierunek)",
+            MeshtasticIcons.Speed to "Poryw wiatru",
+            MeshtasticIcons.Tsunami to "Deszcz (1 godz. / 24 godz.)",
+            MeshtasticIcons.LightMode to "Światło / promieniowanie UV",
+            MeshtasticIcons.DetectionSensor to "Promieniowanie",
+            MeshtasticIcons.Distance to "Odległość / poziom",
+            MeshtasticIcons.Weight to "Waga",
+            MeshtasticIcons.SoilTemperature to "Gleba (temperatura)",
+            MeshtasticIcons.SoilMoisture to "Gleba (wilgotność)",
+            MeshtasticIcons.AirQuality to "Jakość powietrza",
+            MeshtasticIcons.PeopleCount to "Licznik osób (BLE / Wi-Fi)",
+            MeshtasticIcons.Voltage to "Napięcie",
+            MeshtasticIcons.ElectricPower to "Prąd / kanały zasilania",
+            MeshtasticIcons.ChannelUtilization to "Zajętość kanału",
+            MeshtasticIcons.AirUtilization to "Czas nadawania",
+            null to "TX: pakiety wysłane",
+            null to "RX: pakiety odebrane",
+            null to "B: pakiety błędne (uszkodzone)",
+            null to "D: duplikaty",
+            null to "Przek.: pakiety przekazane dalej",
+            MeshtasticIcons.Memory to "Procesor (CPU)",
+            MeshtasticIcons.DataUsage to "Wolna pamięć",
+            MeshtasticIcons.Storage to "Zajęta pamięć flash / PSRAM",
+        )
 
 private fun Float?.ok(): Float? = this?.takeIf { !it.isNaN() && !it.isInfinite() }
 
-private fun fmt(value: Float, decimals: Int = 1): String = org.meshtastic.core.common.util.NumberFormatter.format(value, decimals)
+private fun fmt(value: Float, decimals: Int = 1): String =
+    org.meshtastic.core.common.util.NumberFormatter.format(value, decimals)
 
 private fun weatherChips(node: Node, tempF: Boolean, imperial: Boolean): List<ExtraChip> = buildList {
     val env = node.environmentMetrics
     val aq = node.airQualityMetrics
     val pax = node.paxcounter
     (env.temperature ?: aq.co2_temperature).ok()?.let {
-        add(ExtraChip("🌡", "Temperatura", MetricFormatter.temperature(it, tempF)))
+        add(ExtraChip(MeshtasticIcons.Temperature, "Temp.", MetricFormatter.temperature(it, tempF)))
     }
     (env.relative_humidity.ok()?.takeIf { it != 0f } ?: aq.co2_humidity.ok()?.takeIf { it != 0f })?.let {
-        add(ExtraChip("💧", "Wilgotność", MetricFormatter.humidity(it)))
+        add(ExtraChip(MeshtasticIcons.Humidity, "Wilg.", MetricFormatter.humidity(it)))
     }
     env.barometric_pressure.ok()?.takeIf { it != 0f }?.let {
-        add(ExtraChip("🧭", "Ciśnienie", MetricFormatter.pressure(it)))
+        add(ExtraChip(MeshtasticIcons.Pressure, "Baro", MetricFormatter.pressure(it)))
     }
     env.wind_speed.ok()?.let { speed ->
         val dir = env.wind_direction?.let { " ${it}°" } ?: ""
-        add(ExtraChip("🌬", "Wiatr", MetricFormatter.windSpeed(speed, imperial) + dir))
+        add(ExtraChip(MeshtasticIcons.WindDirection, "Wiatr", MetricFormatter.windSpeed(speed, imperial) + dir))
     }
     env.wind_gust.ok()?.takeIf { it != 0f }?.let {
-        add(ExtraChip("💨", "Poryw", MetricFormatter.windSpeed(it, imperial)))
+        add(ExtraChip(MeshtasticIcons.Speed, "Poryw", MetricFormatter.windSpeed(it, imperial)))
     }
     val rain1 = env.rainfall_1h.ok()
     val rain24 = env.rainfall_24h.ok()
@@ -153,31 +175,37 @@ private fun weatherChips(node: Node, tempF: Boolean, imperial: Boolean): List<Ex
                 rain24?.let { MetricFormatter.rainfall(it, imperial) },
             )
                 .joinToString(" / ")
-        add(ExtraChip("🌧", "Deszcz", text))
+        add(ExtraChip(MeshtasticIcons.Tsunami, "Deszcz", text))
     }
-    env.lux.ok()?.let { add(ExtraChip("☀", "Światło", "${fmt(it, 0)} lx")) }
-    env.uv_lux.ok()?.let { add(ExtraChip("😎", "UV", fmt(it, 1))) }
-    env.radiation.ok()?.let { add(ExtraChip("☢", "Promieniowanie", "${fmt(it, 1)} µR/h")) }
-    env.distance.ok()?.let { add(ExtraChip("📏", "Odległość", "${fmt(it, 0)} mm")) }
-    env.weight.ok()?.let { add(ExtraChip("⚖", "Waga", MetricFormatter.weight(it, imperial))) }
+    env.lux.ok()?.let { add(ExtraChip(MeshtasticIcons.LightMode, "Światło", "${fmt(it, 0)} lx")) }
+    env.uv_lux.ok()?.let { add(ExtraChip(MeshtasticIcons.LightMode, "UV", fmt(it, 1))) }
+    env.radiation.ok()?.let { add(ExtraChip(MeshtasticIcons.DetectionSensor, "Promien.", "${fmt(it, 1)} µR/h")) }
+    env.distance.ok()?.let { add(ExtraChip(MeshtasticIcons.Distance, "Odl.", "${fmt(it, 0)} mm")) }
+    env.weight.ok()?.let { add(ExtraChip(MeshtasticIcons.Weight, "Waga", MetricFormatter.weight(it, imperial))) }
     env.soil_temperature.ok()?.let {
-        add(ExtraChip("🌱", "Gleba", MetricFormatter.temperature(it, tempF)))
+        add(ExtraChip(MeshtasticIcons.SoilTemperature, "Gleba", MetricFormatter.temperature(it, tempF)))
     }
-    env.soil_moisture?.takeIf { it in 0..100 }?.let { add(ExtraChip("🌱", "Wilg. gleby", MetricFormatter.percent(it))) }
-    env.iaq?.takeIf { it != 0 }?.let { add(ExtraChip("🫧", "Jakość powietrza", "$it")) }
-    if (pax.ble != 0 || pax.wifi != 0) add(ExtraChip("👥", "Osoby", "B:${pax.ble} W:${pax.wifi}"))
+    env.soil_moisture?.takeIf { it in 0..100 }?.let {
+        add(ExtraChip(MeshtasticIcons.SoilMoisture, "Wilg. gl.", MetricFormatter.percent(it)))
+    }
+    env.iaq?.takeIf { it != 0 }?.let { add(ExtraChip(MeshtasticIcons.AirQuality, "IAQ", "$it")) }
+    if (pax.ble != 0 || pax.wifi != 0) {
+        add(ExtraChip(MeshtasticIcons.PeopleCount, "Osoby", "B:${pax.ble} W:${pax.wifi}"))
+    }
 }
 
+// The card already shows battery / "powered", its voltage, uptime and (for our own node) channel and air
+// utilization, so none of those are repeated here.
 private fun powerChips(node: Node): List<ExtraChip> = buildList {
     val env = node.environmentMetrics
     val power = node.powerMetrics
-    node.batteryLevel?.takeIf { it > 0 }?.let { level ->
-        add(ExtraChip("🔋", "Bateria", if (level > 100) "zasilany" else "$level%"))
+    val batteryShown = (node.batteryLevel ?: 0) in 1..100
+    if (!batteryShown) {
+        (node.voltage ?: env.voltage).ok()?.takeIf { it != 0f }?.let {
+            add(ExtraChip(MeshtasticIcons.Voltage, "Nap.", MetricFormatter.voltage(it)))
+        }
     }
-    (node.voltage ?: env.voltage).ok()?.takeIf { it != 0f }?.let {
-        add(ExtraChip("🔌", "Napięcie", MetricFormatter.voltage(it)))
-    }
-    env.current.ok()?.let { add(ExtraChip("⚡", "Prąd", MetricFormatter.current(it))) }
+    env.current.ok()?.let { add(ExtraChip(MeshtasticIcons.ElectricPower, "Prąd", MetricFormatter.current(it))) }
     listOf(
         Triple(1, power.ch1_voltage.ok(), power.ch1_current.ok()),
         Triple(2, power.ch2_voltage.ok(), power.ch2_current.ok()),
@@ -188,40 +216,57 @@ private fun powerChips(node: Node): List<ExtraChip> = buildList {
                 val text =
                     listOfNotNull(v?.let { MetricFormatter.voltage(it) }, c?.let { MetricFormatter.current(it) })
                         .joinToString(" ")
-                add(ExtraChip("⚡", "Kanał $ch", "$ch: $text"))
+                add(ExtraChip(MeshtasticIcons.ElectricPower, "Kan. $ch", text))
             }
         }
 }
 
-private fun trafficChips(node: Node, stats: NodeExtraStats?): List<ExtraChip> = buildList {
-    val dm = node.deviceMetrics
-    dm.channel_utilization.ok()?.let { add(ExtraChip("📶", "Zajętość kanału", MetricFormatter.percent(it))) }
-    dm.air_util_tx.ok()?.let { add(ExtraChip("📡", "Czas nadawania", MetricFormatter.percent(it))) }
-    stats?.packetsTx?.let { add(ExtraChip("⬆", "Wysłane", "$it")) }
-    stats?.packetsRx?.let { add(ExtraChip("⬇", "Odebrane", "$it")) }
-    stats?.packetsRxBad?.let { add(ExtraChip("⚠", "Uszkodzone", "$it")) }
-    stats?.rxDupe?.let { add(ExtraChip("♻", "Duplikaty", "$it")) }
-    stats?.txRelay?.let { add(ExtraChip("🔁", "Przekazane", "$it")) }
+private fun trafficChips(node: Node, stats: NodeExtraStats?, isThisNode: Boolean): List<ExtraChip> = buildList {
+    // Our own node already shows ChUtil and AirUtil in its signal row.
+    if (!isThisNode) {
+        val dm = node.deviceMetrics
+        dm.channel_utilization.ok()?.let {
+            add(ExtraChip(MeshtasticIcons.ChannelUtilization, "ChUtil", MetricFormatter.percent(it)))
+        }
+        dm.air_util_tx.ok()?.let {
+            add(ExtraChip(MeshtasticIcons.AirUtilization, "AirUtil", MetricFormatter.percent(it)))
+        }
+    }
+    stats?.packetsTx?.let { add(ExtraChip(null, "TX", "$it")) }
+    stats?.packetsRx?.let { add(ExtraChip(null, "RX", "$it")) }
+    stats?.packetsRxBad?.let { add(ExtraChip(null, "B", "$it")) }
+    stats?.rxDupe?.let { add(ExtraChip(null, "D", "$it")) }
+    stats?.txRelay?.let { add(ExtraChip(null, "Przek.", "$it")) }
 }
 
-private fun resourceChips(uptimeText: String?, stats: NodeExtraStats?): List<ExtraChip> = buildList {
-    stats?.cpuPercent?.let { add(ExtraChip("🧠", "CPU", "$it%")) }
-    stats?.heapFreePercent?.ok()?.let { add(ExtraChip("🧮", "Wolna pamięć", MetricFormatter.percent(it, 0))) }
-    stats?.flashUsedPercent?.ok()?.let { add(ExtraChip("💾", "Flash", MetricFormatter.percent(it, 0))) }
-    stats?.psramFreePercent?.ok()?.let { add(ExtraChip("🗄", "PSRAM", MetricFormatter.percent(it, 0))) }
-    uptimeText?.let { add(ExtraChip("⏱", "Czas pracy", it)) }
+private fun resourceChips(stats: NodeExtraStats?): List<ExtraChip> = buildList {
+    stats?.cpuPercent?.let { add(ExtraChip(MeshtasticIcons.Memory, "CPU", "$it%")) }
+    stats?.heapFreePercent?.ok()?.let {
+        add(ExtraChip(MeshtasticIcons.DataUsage, "RAM", MetricFormatter.percent(it, 0)))
+    }
+    stats?.flashUsedPercent?.ok()?.let {
+        add(ExtraChip(MeshtasticIcons.Storage, "Flash", MetricFormatter.percent(it, 0)))
+    }
+    stats?.psramFreePercent?.ok()?.let {
+        add(ExtraChip(MeshtasticIcons.Storage, "PSRAM", MetricFormatter.percent(it, 0)))
+    }
 }
 
 /** The groups that have anything to show, in the order weather, power, traffic, resources. */
-private fun buildGroups(node: Node, stats: NodeExtraStats?, tempF: Boolean, imperial: Boolean, uptimeText: String?): List<ExtraGroup> =
-    listOf(
-        weatherChips(node, tempF, imperial),
-        powerChips(node),
-        trafficChips(node, stats),
-        resourceChips(uptimeText, stats),
-    )
-        .filter { it.isNotEmpty() }
-        .map { ExtraGroup(it) }
+private fun buildGroups(
+    node: Node,
+    stats: NodeExtraStats?,
+    tempF: Boolean,
+    imperial: Boolean,
+    isThisNode: Boolean,
+): List<ExtraGroup> = listOf(
+    weatherChips(node, tempF, imperial),
+    powerChips(node),
+    trafficChips(node, stats, isThisNode),
+    resourceChips(stats),
+)
+    .filter { it.isNotEmpty() }
+    .map { ExtraGroup(it) }
 
 /**
  * The extra line of data under a node: weather sensors, power, traffic and resources. Only the newest readings are
@@ -231,24 +276,28 @@ private fun buildGroups(node: Node, stats: NodeExtraStats?, tempF: Boolean, impe
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun NodeExtraLine(node: Node, tempInFahrenheit: Boolean, distanceUnits: MeasurementSystem, modifier: Modifier = Modifier) {
+fun NodeExtraLine(
+    node: Node,
+    tempInFahrenheit: Boolean,
+    distanceUnits: MeasurementSystem,
+    isThisNode: Boolean,
+    modifier: Modifier = Modifier,
+) {
     val config = LocalNodeExtraConfig.current
     if (config.mode == NodeExtraMode.OFF) return
     val stats = LocalNodeExtraStats.current[node.num]
     val imperial = distanceUnits != MeasurementSystem.METRIC
-    val uptimeText =
-        node.deviceMetrics.uptime_seconds?.takeIf { it > 0 }?.let { org.meshtastic.core.resources.formatDuration(it.toLong()) }
     val groups =
-        remember(node, stats, tempInFahrenheit, imperial, uptimeText) {
-            buildGroups(node, stats, tempInFahrenheit, imperial, uptimeText)
+        remember(node, stats, tempInFahrenheit, imperial, isThisNode) {
+            buildGroups(node, stats, tempInFahrenheit, imperial, isThisNode)
         }
     if (groups.isEmpty()) return
 
     if (config.mode == NodeExtraMode.ALL) {
         FlowRow(
             modifier = modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             groups.forEach { g -> g.chips.forEach { ExtraChipView(it, config.iconsOnly) } }
         }
@@ -263,7 +312,7 @@ fun NodeExtraLine(node: Node, tempInFahrenheit: Boolean, distanceUnits: Measurem
 }
 
 private fun pageCapacity(width: Dp, iconsOnly: Boolean): Int {
-    val perChip = if (iconsOnly) 78.dp else 140.dp
+    val perChip = if (iconsOnly) 78.dp else 112.dp
     return (width.value / perChip.value).toInt().coerceIn(1, 8)
 }
 
@@ -319,20 +368,28 @@ private fun PagedRow(pages: List<List<ExtraChip>>, iconsOnly: Boolean) {
 
 @Composable
 private fun ExtraChipView(chip: ExtraChip, iconsOnly: Boolean) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(text = chip.glyph, style = MaterialTheme.typography.labelMedium)
-        Text(
+    if (chip.icon != null) {
+        // The same grey icon + small label + value as the rest of the card.
+        IconInfo(
+            icon = chip.icon,
+            contentDescription = chip.label,
+            label = if (iconsOnly) null else chip.label,
             text = chip.value,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
         )
-        if (!iconsOnly) {
+    } else {
+        // Counters have no icon: a short "RX:" in front of the number, in the same style.
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(3.dp)) {
             Text(
-                text = chip.label,
+                text = "${chip.label}:",
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.55f),
+                maxLines = 1,
+                softWrap = false,
+            )
+            Text(
+                text = chip.value,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.95f),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
