@@ -40,6 +40,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.common.util.extractWifiCredentials
+import org.meshtastic.core.ui.util.rememberPhoneWifiScanner
 import org.meshtastic.core.model.Capabilities
 import org.meshtastic.core.model.util.handleMeshtasticUri
 import org.meshtastic.core.resources.Res
@@ -261,6 +262,30 @@ fun NetworkConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit, onO
                     )
                     HorizontalDivider()
                     val mediumHeight = ButtonDefaults.MediumContainerHeight
+                    // Pick the network name from the networks around this phone or computer (none where unsupported).
+                    val wifiScanner = rememberPhoneWifiScanner()
+                    var showWifiPicker by remember { mutableStateOf(false) }
+                    if (wifiScanner != null) {
+                        Button(
+                            onClick = { showWifiPicker = true },
+                            shapes = ButtonDefaults.shapesFor(mediumHeight),
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).height(mediumHeight),
+                            enabled = state.connected,
+                        ) {
+                            Text(text = "Wybierz sieć Wi-Fi z listy", style = ButtonDefaults.textStyleFor(mediumHeight))
+                        }
+                        if (showWifiPicker) {
+                            WifiNetworkPickerDialog(
+                                scanner = wifiScanner,
+                                onPick = { name ->
+                                    formState.value =
+                                        formState.value.newBuilder().also { wb -> wb.wifi_ssid = name.take(32) }.build()
+                                    showWifiPicker = false
+                                },
+                                onDismiss = { showWifiPicker = false },
+                            )
+                        }
+                    }
                     Button(
                         onClick = { barcodeScanner.startScan() },
                         shapes = ButtonDefaults.shapesFor(mediumHeight),

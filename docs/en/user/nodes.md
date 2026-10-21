@@ -31,6 +31,10 @@ The node list shows every node your node has heard, including:
 
 The list has two densities, set at **Settings → Node Layout**. **Complete** shows every field a node has reported and hides the ones it hasn't. **Compact** fits more nodes on screen and lets you pick the fields yourself — **Power**, **Last Heard Time**, **Relative Last Heard Time**, **Distance and Bearing**, **Hops Away**, **Signal (Direct Only)**, **Channel**, and **Device & Role**. The **Environment Metrics** toggle applies to both densities. A preview above the toggles shows the effect before you leave the screen.
 
+### Link signal strength
+
+Under the connection icon on your own node you can see the strength of the link to the radio in dBm: for Bluetooth, the phone's reading (refreshed every few seconds); for a network connection, the Wi-Fi strength the radio itself reports. Nothing is shown for USB. The value is not stored anywhere.
+
 ### Extra data under a node
 
 In **Settings → Node layout → Extra data under a node** you can switch on an extra line under every node: weather (temperature, humidity, pressure, wind, rain, light, UV and other sensors), power, traffic (packets sent, received, bad, channel utilization) and resources (CPU, memory, uptime). Only the newest readings are shown, no history. A node with no weather sensors shows traffic and resources.
