@@ -215,14 +215,9 @@ private fun weatherChips(node: Node, tempF: Boolean, imperial: Boolean): List<Ex
 private fun powerChips(node: Node): List<ExtraChip> = buildList {
     val env = node.environmentMetrics
     val power = node.powerMetrics
-    val batteryShown = (node.batteryLevel ?: 0) in 1..100
-    // The battery row of the card already shows the device voltage when there is a battery level.
-    val deviceVoltage = node.voltage.ok()?.takeIf { it != 0f }
-    if (!batteryShown && deviceVoltage != null) {
-        add(ExtraChip({ MeshtasticIcons.Voltage }, "Nap.", MetricFormatter.voltage(deviceVoltage)))
-    }
-    // The voltage from the environment telemetry packet is always shown (unless it is the very same reading).
-    env.voltage.ok()?.takeIf { it != 0f && (deviceVoltage == null || kotlin.math.abs(it - deviceVoltage) > 0.005f) }?.let {
+    // Only the voltage of an external sensor (environment or power telemetry) is shown here. The basic device
+    // voltage belongs to the battery percentage and is not repeated.
+    env.voltage.ok()?.takeIf { it != 0f }?.let {
         add(ExtraChip({ MeshtasticIcons.Voltage }, "Nap.", MetricFormatter.voltage(it)))
     }
     env.current.ok()?.let { add(ExtraChip({ MeshtasticIcons.ElectricPower }, "Prąd", MetricFormatter.current(it))) }
