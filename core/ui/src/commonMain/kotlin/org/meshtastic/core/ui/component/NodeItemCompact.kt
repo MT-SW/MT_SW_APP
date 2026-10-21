@@ -427,6 +427,7 @@ private fun CompactFooterRow(
     relayNodeName: String? = null,
 ) {
     val tertiaryColor = MaterialTheme.colorScheme.outline
+    val etherItems = etherInlineItems(thatNode, isThisNode)
     val segments =
         buildList<@Composable () -> Unit> {
             if (showRole) {
@@ -464,6 +465,7 @@ private fun CompactFooterRow(
                     add { Text(text = "via $name", style = MaterialTheme.typography.labelSmall, color = tertiaryColor) }
                 }
             }
+            addAll(etherItems)
             if (showChannel && thatNode.channel > 0) {
                 add {
                     Icon(

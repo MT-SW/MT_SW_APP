@@ -338,6 +338,8 @@ private fun NodeSignalRow(thatNode: Node, isThisNode: Boolean, contentColor: Col
     // The signal pill bundles SNR + RSSI + quality into one row. It's wider than a 1/3 grid cell, so it renders on
     // its own line at natural width; the short metrics flow in the grid.
     var signalChip: (@Composable () -> Unit)? = null
+    // Ether readings (channel use, air time, noise) share the hops line when that option is on.
+    val etherItems = etherInlineItems(thatNode, isThisNode)
     val items =
         buildList<@Composable () -> Unit> {
             if (isThisNode) {
@@ -397,12 +399,15 @@ private fun NodeSignalRow(thatNode: Node, isThisNode: Boolean, contentColor: Col
                     add { ChannelInfo(channel = thatNode.channel, contentColor = contentColor) }
                 }
             }
+            addAll(etherItems)
         }
 
     if (signalChip != null || items.isNotEmpty()) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             signalChip?.invoke()
-            if (items.isNotEmpty()) MetricsGrid(items)
+            if (items.isNotEmpty()) {
+                if (!isThisNode && etherItems.isNotEmpty()) MetricsFlow(items) else MetricsGrid(items)
+            }
         }
     }
 }
@@ -481,6 +486,19 @@ private fun gatherSensors(node: Node, tempInFahrenheit: Boolean, contentColor: C
     }
 
     return items
+}
+
+/** Like [MetricsGrid], but the items sit side by side as tightly as they fit (used for the hops line with ether data). */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun MetricsFlow(items: List<@Composable () -> Unit>) {
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        items.forEach { item -> item() }
+    }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
