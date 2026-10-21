@@ -36,6 +36,9 @@ data class LocalStatsExtendedPrefs(
     val flashTotalBytes: Int = 0,
     val memoryPsramFree: Int = 0,
     val memoryPsramTotal: Int = 0,
+    val wifiRssi: Int = 0,
+    val wifiDrops: Int = 0,
+    val wifiDropReason: Int = 0,
 )
 
 /**
@@ -53,6 +56,9 @@ open class LocalStatsExtendedDataSource(private val dataStore: CorePreferencesDa
         val FLASH_TOTAL_BYTES = intPreferencesKey("local-stats-extended-flash-total-bytes")
         val MEMORY_PSRAM_FREE = intPreferencesKey("local-stats-extended-memory-psram-free")
         val MEMORY_PSRAM_TOTAL = intPreferencesKey("local-stats-extended-memory-psram-total")
+        val WIFI_RSSI = intPreferencesKey("local-stats-extended-wifi-rssi")
+        val WIFI_DROPS = intPreferencesKey("local-stats-extended-wifi-drops")
+        val WIFI_DROP_REASON = intPreferencesKey("local-stats-extended-wifi-drop-reason")
     }
 
     open val localStatsExtendedFlow: Flow<LocalStatsExtendedPrefs> =
@@ -65,6 +71,9 @@ open class LocalStatsExtendedDataSource(private val dataStore: CorePreferencesDa
                 flashTotalBytes = prefs[PreferencesKeys.FLASH_TOTAL_BYTES] ?: 0,
                 memoryPsramFree = prefs[PreferencesKeys.MEMORY_PSRAM_FREE] ?: 0,
                 memoryPsramTotal = prefs[PreferencesKeys.MEMORY_PSRAM_TOTAL] ?: 0,
+                wifiRssi = prefs[PreferencesKeys.WIFI_RSSI] ?: 0,
+                wifiDrops = prefs[PreferencesKeys.WIFI_DROPS] ?: 0,
+                wifiDropReason = prefs[PreferencesKeys.WIFI_DROP_REASON] ?: 0,
             )
         }
 
@@ -77,6 +86,9 @@ open class LocalStatsExtendedDataSource(private val dataStore: CorePreferencesDa
             prefs[PreferencesKeys.FLASH_TOTAL_BYTES] = stats.flashTotalBytes
             prefs[PreferencesKeys.MEMORY_PSRAM_FREE] = stats.memoryPsramFree
             prefs[PreferencesKeys.MEMORY_PSRAM_TOTAL] = stats.memoryPsramTotal
+            prefs[PreferencesKeys.WIFI_RSSI] = stats.wifiRssi
+            prefs[PreferencesKeys.WIFI_DROPS] = stats.wifiDrops
+            prefs[PreferencesKeys.WIFI_DROP_REASON] = stats.wifiDropReason
         }
     }
 }
