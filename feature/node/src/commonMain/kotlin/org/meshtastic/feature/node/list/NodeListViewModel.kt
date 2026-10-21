@@ -160,7 +160,9 @@ class NodeListViewModel(
                         // Newest first: the first reading found for a node is its latest.
                         for (log in logs) {
                             val num = if (log.fromNum == 0 && myNum != null) myNum else log.fromNum
-                            if ((decoded[num] ?: 0) >= MAX_PACKETS_PER_NODE) continue
+                            // Stop reading a node once it has everything, or after a generous number of packets: the Wi-Fi signal
+                            // arrives rarely (about every few hours), far apart from the many packets in between.
+                            if ((decoded[num] ?: 0) >= MAX_PACKETS_PER_NODE || result[num]?.isComplete == true) continue
                             val payload = runCatching { log.fromRadio.packet?.decoded?.payload }.getOrNull() ?: continue
                             val telemetry = runCatching { Telemetry.ADAPTER.decode(payload) }.getOrNull() ?: continue
                             // The extended stats (CPU, flash, Wi-Fi) come in a telemetry packet of their own, apart
@@ -377,8 +379,8 @@ class NodeListViewModel(
 
     companion object {
         private const val KEY_FILTER_TEXT = "filter_text"
-        private const val EXTRA_STATS_WINDOW_MILLIS = 24 * 60 * 60 * 1000L
-        private const val MAX_PACKETS_PER_NODE = 12
+        private const val EXTRA_STATS_WINDOW_MILLIS = 3 * 24 * 60 * 60 * 1000L
+        private const val MAX_PACKETS_PER_NODE = 200
         private const val FLASHER_DEVICE_IMAGE_BASE_URL = "https://flasher.meshtastic.org/img/devices/"
     }
 }
