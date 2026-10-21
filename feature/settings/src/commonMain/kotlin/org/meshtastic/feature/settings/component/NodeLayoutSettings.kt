@@ -443,7 +443,7 @@ private fun NodeExtraSettings(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (icon != null) {
                                 Icon(
-                                    imageVector = icon,
+                                    imageVector = icon.invoke(),
                                     contentDescription = null,
                                     modifier = Modifier.size(18.dp).padding(end = 6.dp),
                                 )

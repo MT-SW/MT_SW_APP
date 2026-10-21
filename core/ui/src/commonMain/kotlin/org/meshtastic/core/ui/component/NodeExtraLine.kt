@@ -105,40 +105,41 @@ const val NODE_EXTRA_PAGE_MILLIS = 4_000L
 private const val MANUAL_PAUSE_TICKS = 3
 
 /** One reading: an icon in the app's own grey style, a short label (hidden when icons only) and the value. */
-data class ExtraChip(val icon: ImageVector?, val label: String, val value: String)
+data class ExtraChip(val icon: (@Composable () -> ImageVector)?, val label: String, val value: String)
 
 private data class ExtraGroup(val chips: List<ExtraChip>)
 
+private fun legend(icon: (@Composable () -> ImageVector)?, text: String) = icon to text
+
 /** Icon -> meaning, for the (i) legend in the settings. */
-val nodeExtraLegend: List<Pair<ImageVector?, String>>
-    get() =
+val nodeExtraLegend: List<Pair<(@Composable () -> ImageVector)?, String>> =
         listOf(
-            MeshtasticIcons.Temperature to "Temperatura",
-            MeshtasticIcons.Humidity to "Wilgotność",
-            MeshtasticIcons.Pressure to "Ciśnienie",
-            MeshtasticIcons.WindDirection to "Wiatr (prędkość, kierunek)",
-            MeshtasticIcons.Speed to "Poryw wiatru",
-            MeshtasticIcons.Tsunami to "Deszcz (1 godz. / 24 godz.)",
-            MeshtasticIcons.LightMode to "Światło / promieniowanie UV",
-            MeshtasticIcons.DetectionSensor to "Promieniowanie",
-            MeshtasticIcons.Distance to "Odległość / poziom",
-            MeshtasticIcons.Weight to "Waga",
-            MeshtasticIcons.SoilTemperature to "Gleba (temperatura)",
-            MeshtasticIcons.SoilMoisture to "Gleba (wilgotność)",
-            MeshtasticIcons.AirQuality to "Jakość powietrza",
-            MeshtasticIcons.PeopleCount to "Licznik osób (BLE / Wi-Fi)",
-            MeshtasticIcons.Voltage to "Napięcie",
-            MeshtasticIcons.ElectricPower to "Prąd / kanały zasilania",
-            MeshtasticIcons.ChannelUtilization to "Zajętość kanału",
-            MeshtasticIcons.AirUtilization to "Czas nadawania",
-            null to "TX: pakiety wysłane",
-            null to "RX: pakiety odebrane",
-            null to "B: pakiety błędne (uszkodzone)",
-            null to "D: duplikaty",
-            null to "Przek.: pakiety przekazane dalej",
-            MeshtasticIcons.Memory to "Procesor (CPU)",
-            MeshtasticIcons.DataUsage to "Wolna pamięć",
-            MeshtasticIcons.Storage to "Zajęta pamięć flash / PSRAM",
+            legend({ MeshtasticIcons.Temperature }, "Temperatura"),
+            legend({ MeshtasticIcons.Humidity }, "Wilgotność"),
+            legend({ MeshtasticIcons.Pressure }, "Ciśnienie"),
+            legend({ MeshtasticIcons.WindDirection }, "Wiatr (prędkość, kierunek)"),
+            legend({ MeshtasticIcons.Speed }, "Poryw wiatru"),
+            legend({ MeshtasticIcons.Tsunami }, "Deszcz (1 godz. / 24 godz.)"),
+            legend({ MeshtasticIcons.LightMode }, "Światło / promieniowanie UV"),
+            legend({ MeshtasticIcons.DetectionSensor }, "Promieniowanie"),
+            legend({ MeshtasticIcons.Distance }, "Odległość / poziom"),
+            legend({ MeshtasticIcons.Weight }, "Waga"),
+            legend({ MeshtasticIcons.SoilTemperature }, "Gleba (temperatura)"),
+            legend({ MeshtasticIcons.SoilMoisture }, "Gleba (wilgotność)"),
+            legend({ MeshtasticIcons.AirQuality }, "Jakość powietrza"),
+            legend({ MeshtasticIcons.PeopleCount }, "Licznik osób (BLE / Wi-Fi)"),
+            legend({ MeshtasticIcons.Voltage }, "Napięcie"),
+            legend({ MeshtasticIcons.ElectricPower }, "Prąd / kanały zasilania"),
+            legend({ MeshtasticIcons.ChannelUtilization }, "Zajętość kanału"),
+            legend({ MeshtasticIcons.AirUtilization }, "Czas nadawania"),
+            legend(null, "TX: pakiety wysłane"),
+            legend(null, "RX: pakiety odebrane"),
+            legend(null, "B: pakiety błędne (uszkodzone)"),
+            legend(null, "D: duplikaty"),
+            legend(null, "Przek.: pakiety przekazane dalej"),
+            legend({ MeshtasticIcons.Memory }, "Procesor (CPU)"),
+            legend({ MeshtasticIcons.DataUsage }, "Wolna pamięć"),
+            legend({ MeshtasticIcons.Storage }, "Zajęta pamięć flash / PSRAM"),
         )
 
 private fun Float?.ok(): Float? = this?.takeIf { !it.isNaN() && !it.isInfinite() }
@@ -151,20 +152,20 @@ private fun weatherChips(node: Node, tempF: Boolean, imperial: Boolean): List<Ex
     val aq = node.airQualityMetrics
     val pax = node.paxcounter
     (env.temperature ?: aq.co2_temperature).ok()?.let {
-        add(ExtraChip(MeshtasticIcons.Temperature, "Temp.", MetricFormatter.temperature(it, tempF)))
+        add(ExtraChip({ MeshtasticIcons.Temperature }, "Temp.", MetricFormatter.temperature(it, tempF)))
     }
     (env.relative_humidity.ok()?.takeIf { it != 0f } ?: aq.co2_humidity.ok()?.takeIf { it != 0f })?.let {
-        add(ExtraChip(MeshtasticIcons.Humidity, "Wilg.", MetricFormatter.humidity(it)))
+        add(ExtraChip({ MeshtasticIcons.Humidity }, "Wilg.", MetricFormatter.humidity(it)))
     }
     env.barometric_pressure.ok()?.takeIf { it != 0f }?.let {
-        add(ExtraChip(MeshtasticIcons.Pressure, "Baro", MetricFormatter.pressure(it)))
+        add(ExtraChip({ MeshtasticIcons.Pressure }, "Baro", MetricFormatter.pressure(it)))
     }
     env.wind_speed.ok()?.let { speed ->
         val dir = env.wind_direction?.let { " ${it}°" } ?: ""
-        add(ExtraChip(MeshtasticIcons.WindDirection, "Wiatr", MetricFormatter.windSpeed(speed, imperial) + dir))
+        add(ExtraChip({ MeshtasticIcons.WindDirection }, "Wiatr", MetricFormatter.windSpeed(speed, imperial) + dir))
     }
     env.wind_gust.ok()?.takeIf { it != 0f }?.let {
-        add(ExtraChip(MeshtasticIcons.Speed, "Poryw", MetricFormatter.windSpeed(it, imperial)))
+        add(ExtraChip({ MeshtasticIcons.Speed }, "Poryw", MetricFormatter.windSpeed(it, imperial)))
     }
     val rain1 = env.rainfall_1h.ok()
     val rain24 = env.rainfall_24h.ok()
@@ -175,22 +176,22 @@ private fun weatherChips(node: Node, tempF: Boolean, imperial: Boolean): List<Ex
                 rain24?.let { MetricFormatter.rainfall(it, imperial) },
             )
                 .joinToString(" / ")
-        add(ExtraChip(MeshtasticIcons.Tsunami, "Deszcz", text))
+        add(ExtraChip({ MeshtasticIcons.Tsunami }, "Deszcz", text))
     }
-    env.lux.ok()?.let { add(ExtraChip(MeshtasticIcons.LightMode, "Światło", "${fmt(it, 0)} lx")) }
-    env.uv_lux.ok()?.let { add(ExtraChip(MeshtasticIcons.LightMode, "UV", fmt(it, 1))) }
-    env.radiation.ok()?.let { add(ExtraChip(MeshtasticIcons.DetectionSensor, "Promien.", "${fmt(it, 1)} µR/h")) }
-    env.distance.ok()?.let { add(ExtraChip(MeshtasticIcons.Distance, "Odl.", "${fmt(it, 0)} mm")) }
-    env.weight.ok()?.let { add(ExtraChip(MeshtasticIcons.Weight, "Waga", MetricFormatter.weight(it, imperial))) }
+    env.lux.ok()?.let { add(ExtraChip({ MeshtasticIcons.LightMode }, "Światło", "${fmt(it, 0)} lx")) }
+    env.uv_lux.ok()?.let { add(ExtraChip({ MeshtasticIcons.LightMode }, "UV", fmt(it, 1))) }
+    env.radiation.ok()?.let { add(ExtraChip({ MeshtasticIcons.DetectionSensor }, "Promien.", "${fmt(it, 1)} µR/h")) }
+    env.distance.ok()?.let { add(ExtraChip({ MeshtasticIcons.Distance }, "Odl.", "${fmt(it, 0)} mm")) }
+    env.weight.ok()?.let { add(ExtraChip({ MeshtasticIcons.Weight }, "Waga", MetricFormatter.weight(it, imperial))) }
     env.soil_temperature.ok()?.let {
-        add(ExtraChip(MeshtasticIcons.SoilTemperature, "Gleba", MetricFormatter.temperature(it, tempF)))
+        add(ExtraChip({ MeshtasticIcons.SoilTemperature }, "Gleba", MetricFormatter.temperature(it, tempF)))
     }
     env.soil_moisture?.takeIf { it in 0..100 }?.let {
-        add(ExtraChip(MeshtasticIcons.SoilMoisture, "Wilg. gl.", MetricFormatter.percent(it)))
+        add(ExtraChip({ MeshtasticIcons.SoilMoisture }, "Wilg. gl.", MetricFormatter.percent(it)))
     }
-    env.iaq?.takeIf { it != 0 }?.let { add(ExtraChip(MeshtasticIcons.AirQuality, "IAQ", "$it")) }
+    env.iaq?.takeIf { it != 0 }?.let { add(ExtraChip({ MeshtasticIcons.AirQuality }, "IAQ", "$it")) }
     if (pax.ble != 0 || pax.wifi != 0) {
-        add(ExtraChip(MeshtasticIcons.PeopleCount, "Osoby", "B:${pax.ble} W:${pax.wifi}"))
+        add(ExtraChip({ MeshtasticIcons.PeopleCount }, "Osoby", "B:${pax.ble} W:${pax.wifi}"))
     }
 }
 
@@ -202,10 +203,10 @@ private fun powerChips(node: Node): List<ExtraChip> = buildList {
     val batteryShown = (node.batteryLevel ?: 0) in 1..100
     if (!batteryShown) {
         (node.voltage ?: env.voltage).ok()?.takeIf { it != 0f }?.let {
-            add(ExtraChip(MeshtasticIcons.Voltage, "Nap.", MetricFormatter.voltage(it)))
+            add(ExtraChip({ MeshtasticIcons.Voltage }, "Nap.", MetricFormatter.voltage(it)))
         }
     }
-    env.current.ok()?.let { add(ExtraChip(MeshtasticIcons.ElectricPower, "Prąd", MetricFormatter.current(it))) }
+    env.current.ok()?.let { add(ExtraChip({ MeshtasticIcons.ElectricPower }, "Prąd", MetricFormatter.current(it))) }
     listOf(
         Triple(1, power.ch1_voltage.ok(), power.ch1_current.ok()),
         Triple(2, power.ch2_voltage.ok(), power.ch2_current.ok()),
@@ -216,7 +217,7 @@ private fun powerChips(node: Node): List<ExtraChip> = buildList {
                 val text =
                     listOfNotNull(v?.let { MetricFormatter.voltage(it) }, c?.let { MetricFormatter.current(it) })
                         .joinToString(" ")
-                add(ExtraChip(MeshtasticIcons.ElectricPower, "Kan. $ch", text))
+                add(ExtraChip({ MeshtasticIcons.ElectricPower }, "Kan. $ch", text))
             }
         }
 }
@@ -226,10 +227,10 @@ private fun trafficChips(node: Node, stats: NodeExtraStats?, isThisNode: Boolean
     if (!isThisNode) {
         val dm = node.deviceMetrics
         dm.channel_utilization.ok()?.let {
-            add(ExtraChip(MeshtasticIcons.ChannelUtilization, "ChUtil", MetricFormatter.percent(it)))
+            add(ExtraChip({ MeshtasticIcons.ChannelUtilization }, "ChUtil", MetricFormatter.percent(it)))
         }
         dm.air_util_tx.ok()?.let {
-            add(ExtraChip(MeshtasticIcons.AirUtilization, "AirUtil", MetricFormatter.percent(it)))
+            add(ExtraChip({ MeshtasticIcons.AirUtilization }, "AirUtil", MetricFormatter.percent(it)))
         }
     }
     stats?.packetsTx?.let { add(ExtraChip(null, "TX", "$it")) }
@@ -240,15 +241,15 @@ private fun trafficChips(node: Node, stats: NodeExtraStats?, isThisNode: Boolean
 }
 
 private fun resourceChips(stats: NodeExtraStats?): List<ExtraChip> = buildList {
-    stats?.cpuPercent?.let { add(ExtraChip(MeshtasticIcons.Memory, "CPU", "$it%")) }
+    stats?.cpuPercent?.let { add(ExtraChip({ MeshtasticIcons.Memory }, "CPU", "$it%")) }
     stats?.heapFreePercent?.ok()?.let {
-        add(ExtraChip(MeshtasticIcons.DataUsage, "RAM", MetricFormatter.percent(it, 0)))
+        add(ExtraChip({ MeshtasticIcons.DataUsage }, "RAM", MetricFormatter.percent(it, 0)))
     }
     stats?.flashUsedPercent?.ok()?.let {
-        add(ExtraChip(MeshtasticIcons.Storage, "Flash", MetricFormatter.percent(it, 0)))
+        add(ExtraChip({ MeshtasticIcons.Storage }, "Flash", MetricFormatter.percent(it, 0)))
     }
     stats?.psramFreePercent?.ok()?.let {
-        add(ExtraChip(MeshtasticIcons.Storage, "PSRAM", MetricFormatter.percent(it, 0)))
+        add(ExtraChip({ MeshtasticIcons.Storage }, "PSRAM", MetricFormatter.percent(it, 0)))
     }
 }
 
@@ -371,7 +372,7 @@ private fun ExtraChipView(chip: ExtraChip, iconsOnly: Boolean) {
     if (chip.icon != null) {
         // The same grey icon + small label + value as the rest of the card.
         IconInfo(
-            icon = chip.icon,
+            icon = chip.icon.invoke(),
             contentDescription = chip.label,
             label = if (iconsOnly) null else chip.label,
             text = chip.value,
