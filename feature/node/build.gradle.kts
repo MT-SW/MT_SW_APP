@@ -26,6 +26,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.coil)
+            implementation(projects.core.ble)
             implementation(projects.core.common)
             implementation(projects.core.domain)
             implementation(projects.core.model)

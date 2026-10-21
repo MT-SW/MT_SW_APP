@@ -30,6 +30,7 @@ import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -112,6 +113,16 @@ fun NodeStatusIcons(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ThisNodeStatusBadge(connectionState: ConnectionState, deviceType: DeviceType?) {
+    androidx.compose.foundation.layout.Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        ThisNodeConnectionIcon(connectionState, deviceType)
+        // Signal strength under the connection icon (Bluetooth, or the device's Wi-Fi); empty when not known.
+        LinkSignalLabel()
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ThisNodeConnectionIcon(connectionState: ConnectionState, deviceType: DeviceType?) {
     TooltipBox(
         positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
         tooltip = {

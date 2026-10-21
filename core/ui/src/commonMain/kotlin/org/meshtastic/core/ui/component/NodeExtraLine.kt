@@ -53,9 +53,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.MetricFormatter
+import org.meshtastic.core.model.LinkSignal
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeExtraMode
 import org.meshtastic.core.model.NodeExtraStats
+import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
+import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
+import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 
 /** How the extra line of data under each node is shown; provided by the node list. */
 data class NodeExtraConfig(val mode: NodeExtraMode = NodeExtraMode.OFF, val iconsOnly: Boolean = false)
@@ -64,6 +68,9 @@ val LocalNodeExtraConfig = staticCompositionLocalOf { NodeExtraConfig() }
 
 /** Newest traffic / resource readings per node number; provided by the node list. */
 val LocalNodeExtraStats = compositionLocalOf<Map<Int, NodeExtraStats>> { emptyMap() }
+
+/** Strength of the link to the connected radio (Bluetooth or the device's Wi-Fi); null = nothing to show. */
+val LocalLinkSignal = compositionLocalOf<LinkSignal?> { null }
 
 /** One shared ticker for the whole list: every few seconds all visible paged rows move to their next page. */
 val LocalNodeExtraTick = compositionLocalOf<State<Int>> { mutableIntStateOf(0) }
@@ -329,4 +336,23 @@ private fun ExtraChipView(chip: ExtraChip, iconsOnly: Boolean) {
             )
         }
     }
+}
+
+/** The link strength in dBm, in a colour that follows how good it is; shows nothing when there is no reading. */
+@Composable
+fun LinkSignalLabel(modifier: Modifier = Modifier) {
+    val signal = LocalLinkSignal.current ?: return
+    val color =
+        when {
+            signal.dbm >= -70 -> MaterialTheme.colorScheme.StatusOnline
+            signal.dbm >= -85 -> MaterialTheme.colorScheme.StatusYellow
+            else -> MaterialTheme.colorScheme.StatusOrange
+        }
+    Text(
+        text = "${signal.dbm} dBm",
+        style = MaterialTheme.typography.labelSmall,
+        color = color,
+        maxLines = 1,
+        modifier = modifier,
+    )
 }

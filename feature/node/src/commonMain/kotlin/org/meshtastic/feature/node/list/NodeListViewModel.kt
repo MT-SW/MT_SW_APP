@@ -20,12 +20,14 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.flatMapLatest
@@ -40,7 +42,10 @@ import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.feature.node.health.calmed
 import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.Telemetry
+import org.meshtastic.core.ble.readActiveBleRssi
+import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
+import org.meshtastic.core.model.LinkSignal
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.NodeExtraMode
@@ -95,6 +100,36 @@ class NodeListViewModel(
     val deviceType: StateFlow<DeviceType?> =
         radioInterfaceService.currentDeviceAddressFlow
             .map { address -> address?.let { DeviceType.fromAddress(it) } }
+            .stateInWhileSubscribed(initialValue = null)
+
+    /**
+     * Strength of the link to the connected radio, shown under the connection icon: Bluetooth signal read every few
+     * seconds, or the Wi-Fi strength the device itself reports for a network connection. Nothing for USB. Read only
+     * while the list is on screen and never stored.
+     */
+    val linkSignal: StateFlow<LinkSignal?> =
+        combine(connectionState, deviceType, ::Pair)
+            .flatMapLatest { (state, type) ->
+                when {
+                    state != ConnectionState.Connected -> flowOf(null)
+
+                    type == DeviceType.BLE ->
+                        flow {
+                            while (true) {
+                                emit(readActiveBleRssi()?.let { LinkSignal("Bluetooth", it) })
+                                delay(LINK_SIGNAL_POLL_MILLIS)
+                            }
+                        }
+
+                    type == DeviceType.TCP ->
+                        nodeRepository.localStatsExtended.map { ext ->
+                            ext.wifiRssi.takeIf { it != 0 }?.let { LinkSignal("Wi-Fi", it) }
+                        }
+
+                    else -> flowOf(null)
+                }
+            }
+            .catch { co.touchlab.kermit.Logger.e(it) { "Link signal failed" } }
             .stateInWhileSubscribed(initialValue = null)
 
     val nodeListDensity: StateFlow<NodeListDensity> =
@@ -367,6 +402,7 @@ class NodeListViewModel(
         private const val KEY_FILTER_TEXT = "filter_text"
         private const val EXTRA_STATS_WINDOW_MILLIS = 6 * 60 * 60 * 1000L
         private const val PERCENT = 100f
+        private const val LINK_SIGNAL_POLL_MILLIS = 5_000L
         private const val FLASHER_DEVICE_IMAGE_BASE_URL = "https://flasher.meshtastic.org/img/devices/"
     }
 }
