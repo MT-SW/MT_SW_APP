@@ -81,7 +81,7 @@ class NavigationAssemblyTest {
             val backStack = rememberNavBackStack(route)
             CompositionLocalProvider(
                 LocalMapMainScreenProvider provides
-                    { _, _, waypointId, plannerNodeNum, _ ->
+                    { _, _, waypointId, plannerNodeNum, _, _ ->
                         SideEffect {
                             receivedWaypointId = waypointId
                             receivedPlannerNodeNum = plannerNodeNum
@@ -113,7 +113,7 @@ class NavigationAssemblyTest {
             backStack = rememberNavBackStack(route)
             CompositionLocalProvider(
                 LocalMapMainScreenProvider provides
-                    { _, _, _, plannerNodeNum, _ ->
+                    { _, _, _, plannerNodeNum, _, _ ->
                         LaunchedEffect(plannerNodeNum) { effectStarts += 1 }
                         DisposableEffect(Unit) { onDispose { disposals += 1 } }
                     },

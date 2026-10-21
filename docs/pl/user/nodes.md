@@ -2,7 +2,7 @@
 title: Węzły
 parent: Przewodnik użytkownika
 nav_order: 4
-last_updated: 2026-10-02
+last_updated: 2026-10-21
 description: Przeglądaj, filtruj i sortuj węzły sieci mesh — szczegóły, jakość sygnału, role i szybkie akcje.
 aliases:
   - node-list
@@ -142,6 +142,8 @@ Z listy węzłów możesz:
   - Wycisz/wyłącz wyciszenie powiadomień
   - Wyślij wiadomość bezpośrednią
   - Pokaż trasę
+  - Otwórz kompas (dla węzła z pozycją)
+  - Otwórz widok AR sieci (dla węzła z pozycją, na telefonie, który go obsługuje) — zobacz [widok AR sieci](map-and-waypoints#widok-ar-sieci)
   - Zignoruj/przestań ignorować
   - Usuń
 

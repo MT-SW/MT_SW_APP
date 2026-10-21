@@ -33,7 +33,8 @@ val LocalMapMainScreenProvider =
             waypointId: Int?,
             plannerNodeNum: Int?,
             focusNodeNum: Int?,
+            onOpenMeshHud: () -> Unit,
         ) -> Unit,
         > {
-        { _, _, _, _, _ -> PlaceholderScreen("Map") }
+        { _, _, _, _, _, _ -> PlaceholderScreen("Map") }
     }

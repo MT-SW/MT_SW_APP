@@ -115,6 +115,8 @@ fun NodeDetailList(
                     onRequestUserInfo = {
                         onAction(NodeDetailAction.HandleNodeMenuAction(NodeMenuAction.RequestUserInfo(node)))
                     },
+                    hasDeviceModel = uiState.metricsState.hasDeviceModel,
+                    onOpenDeviceModel = { onAction(NodeDetailAction.OpenDeviceModel(it)) },
                 )
             }
             if (uiState.metricsState.deviceLinks.isNotEmpty()) {
