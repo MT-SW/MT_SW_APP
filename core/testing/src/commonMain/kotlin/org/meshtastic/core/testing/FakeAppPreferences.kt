@@ -293,13 +293,19 @@ class FakeUiPrefs : UiPrefs {
         nodeExtraMode.value = value
     }
 
-    override val nodeExtraPackets = MutableStateFlow(false)
+    override val nodeExtraPackets = MutableStateFlow(true)
 
     override fun setNodeExtraPackets(value: Boolean) {
         nodeExtraPackets.value = value
     }
 
-    override val nodeExtraHardware = MutableStateFlow(false)
+    override val nodeExtraEther = MutableStateFlow(true)
+
+    override fun setNodeExtraEther(value: Boolean) {
+        nodeExtraEther.value = value
+    }
+
+    override val nodeExtraHardware = MutableStateFlow(true)
 
     override fun setNodeExtraHardware(value: Boolean) {
         nodeExtraHardware.value = value

@@ -42,6 +42,7 @@ open class NodeFilterPreferences constructor(private val uiPrefs: UiPrefs) {
     open val nodeExtraIconsOnly = uiPrefs.nodeExtraIconsOnly
     open val nodeExtraPackets = uiPrefs.nodeExtraPackets
     open val nodeExtraHardware = uiPrefs.nodeExtraHardware
+    open val nodeExtraEther = uiPrefs.nodeExtraEther
 
     open val keptUnheardNodes = uiPrefs.keptUnheardNodes
 

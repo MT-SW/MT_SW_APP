@@ -114,6 +114,7 @@ fun NodeLayoutSettings(
     onExtraIconsOnlyChange: (Boolean) -> Unit = {},
     onExtraPacketsChange: (Boolean) -> Unit = {},
     onExtraHardwareChange: (Boolean) -> Unit = {},
+    onExtraEtherChange: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     ExpressiveSection(modifier = modifier, title = stringResource(Res.string.node_layout_section_title)) {
@@ -159,7 +160,13 @@ fun NodeLayoutSettings(
         }
         val previewStats = remember { mapOf(previewNode.num to previewSampleExtraStats()) }
         CompositionLocalProvider(
-            LocalNodeExtraConfig provides NodeExtraConfig(state.extraMode, state.extraIconsOnly, state.extraPackets, state.extraHardware),
+            LocalNodeExtraConfig provides NodeExtraConfig(
+                state.extraMode,
+                state.extraIconsOnly,
+                state.extraPackets,
+                state.extraHardware,
+                state.extraEther,
+            ),
             LocalNodeExtraStats provides previewStats,
             LocalNodeExtraTick provides previewTick,
         ) {
@@ -210,10 +217,12 @@ fun NodeLayoutSettings(
             iconsOnly = state.extraIconsOnly,
             packets = state.extraPackets,
             hardware = state.extraHardware,
+            ether = state.extraEther,
             onModeChange = onExtraModeChange,
             onIconsOnlyChange = onExtraIconsOnlyChange,
             onPacketsChange = onExtraPacketsChange,
             onHardwareChange = onExtraHardwareChange,
+            onEtherChange = onExtraEtherChange,
         )
 
         if (state.density == NodeListDensity.COMPLETE) {
@@ -301,6 +310,7 @@ private fun previewSampleExtraStats(): NodeExtraStats = NodeExtraStats(
     heapFreePercent = 41f,
     flashUsedPercent = 63f,
     wifiRssi = -67,
+    noiseFloor = -112,
 )
 
 @Suppress("MagicNumber")
@@ -389,10 +399,12 @@ private fun NodeExtraSettings(
     iconsOnly: Boolean,
     packets: Boolean,
     hardware: Boolean,
+    ether: Boolean,
     onModeChange: (NodeExtraMode) -> Unit,
     onIconsOnlyChange: (Boolean) -> Unit,
     onPacketsChange: (Boolean) -> Unit,
     onHardwareChange: (Boolean) -> Unit,
+    onEtherChange: (Boolean) -> Unit,
 ) {
     var showLegend by remember { mutableStateOf(false) }
     HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
@@ -413,6 +425,12 @@ private fun NodeExtraSettings(
         checked = packets,
         enabled = true,
         onCheckedChange = onPacketsChange,
+    )
+    SwitchPreference(
+        title = "Eter (zajętość kanału, czas nadawania, szum tła)",
+        checked = ether,
+        enabled = true,
+        onCheckedChange = onEtherChange,
     )
     SwitchPreference(
         title = "Sprzęt (procesor, pamięć, Wi-Fi)",

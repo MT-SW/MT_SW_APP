@@ -192,6 +192,7 @@ fun NodeListScreen(
     val extraStats by viewModel.nodeExtraStats.collectAsStateWithLifecycle()
     val extraPackets by viewModel.nodeExtraPackets.collectAsStateWithLifecycle()
     val extraHardware by viewModel.nodeExtraHardware.collectAsStateWithLifecycle()
+    val extraEther by viewModel.nodeExtraEther.collectAsStateWithLifecycle()
     // One ticker for the whole list: visible paged rows change page together; nothing runs when paging is off.
     val extraTick = remember { mutableIntStateOf(0) }
     if (extraMode == NodeExtraMode.PAGED) {
@@ -223,7 +224,7 @@ fun NodeListScreen(
     }
 
     CompositionLocalProvider(
-        LocalNodeExtraConfig provides NodeExtraConfig(extraMode, extraIconsOnly, extraPackets, extraHardware),
+        LocalNodeExtraConfig provides NodeExtraConfig(extraMode, extraIconsOnly, extraPackets, extraHardware, extraEther),
         LocalNodeExtraStats provides extraStats,
         LocalNodeExtraTick provides extraTick,
     ) {
