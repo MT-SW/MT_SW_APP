@@ -2,7 +2,7 @@
 title: Powiadomienia
 parent: Przewodnik użytkownika
 nav_order: 18
-last_updated: 2026-09-28
+last_updated: 2026-10-21
 description: Do czego służy każde powiadomienie MT_SW, jak wyciszyć jeden rodzaj bez pozostałych oraz co możesz zrobić z powiadomienia o wiadomości lub na zegarku.
 aliases:
   - notifications
@@ -23,6 +23,7 @@ Aby zobaczyć kategorie, dotknij **Powiadomienia aplikacji** w sekcji **Informac
 |---|---|---|---|
 | Wiadomości | Powiadomienia o bezpośredniej wiadomości | Wiadomość wysłana bezpośrednio do Ciebie | Rozmowę |
 | Wiadomości | Powiadomienia o wiadomościach rozgłoszeniowych | Wiadomość na jednym z Twoich kanałów | Kanał |
+| Wiadomości | Powiadomienia o reakcjach | Reakcja emoji na wiadomość w jednej z Twoich rozmów | Rozmowę |
 | Wiadomości | Powiadomienia punktów orientacyjnych | Punkt trasy udostępniony w sieci mesh lub przekroczenie geofence | Punkt trasy na mapie |
 | Wiadomości | Powiadomienia alertowe | Krytyczny alert z węzła | Rozmowę |
 | Mesh | Powiadomienia o nowych węzłach | Węzeł usłyszany po raz pierwszy | Szczegóły węzła |
@@ -33,7 +34,7 @@ Aby zobaczyć kategorie, dotknij **Powiadomienia aplikacji** w sekcji **Informac
 | Urządzenie | Powiadomienia z radia | Komunikaty z Twojego węzła, takie jak prośby o weryfikację kluczy i ostrzeżenia bezpieczeństwa | Aplikację |
 | Urządzenie | Powiadomienia o aktualizacjach i połączeniu | Aktualizacja firmware dla Twojego węzła lub problem z ponownym połączeniem | Aktualizację firmware lub Połączenia |
 
-Domyślnie wiadomości bezpośrednie, alerty i komunikaty z radia wyskakują na ekranie, zaproszenia do sieci mesh i powiadomienie usługi przychodzą bez dźwięku, a pozostałe wydają dźwięk. Android zachowuje wszystko, co zmienisz w kategorii, a aplikacja nie może tego cofnąć.
+Domyślnie wiadomości bezpośrednie, alerty i komunikaty z Twojego węzła wyskakują na ekranie, zaproszenia do sieci mesh i powiadomienie usługi przychodzą bez dźwięku, a pozostałe wydają dźwięk. Android zachowuje wszystko, co zmienisz w kategorii, a aplikacja nie może tego cofnąć.
 
 Powiadomienia alertowe odtwarzają dźwięk alarmu. Aby przepuszczać je także przez tryb Nie przeszkadzać, otwórz kategorię i zezwól jej na pomijanie trybu Nie przeszkadzać — to krok, który [Pierwsze kroki](onboarding#critical-alerts-permission) oferuje podczas konfiguracji.
 

@@ -2,7 +2,7 @@
 title: MQTT
 parent: Przewodnik użytkownika
 nav_order: 11
-last_updated: 2026-09-19
+last_updated: 2026-10-21
 description: Połącz swoją sieć mesh z internetem — konfiguracja brokera MQTT, warstwy szyfrowania i raportowanie na mapę.
 aliases:
   - mqtt
@@ -35,20 +35,20 @@ Węzeł-brama z dostępem do internetu (Wi-Fi lub Ethernet) publikuje wiadomośc
 ### Włączanie MQTT
 
 1. Przejdź do **Ustawienia → Ustawienia modułu → MQTT**.
-2. Włącz moduł MQTT.
+2. Włącz **MQTT włączone** (MQTT Enabled).
 3. Skonfiguruj połączenie z brokerem:
 
 | Ustawienie | Opis | Domyślnie |
 |---------|-------------|---------|
-| **Adres** | Nazwa hosta brokera MQTT | mqtt.meshtastic.org |
+| **Adres** | Nazwa hosta brokera MQTT. Puste oznacza broker publiczny | mqtt.meshtastic.org |
 | **Nazwa użytkownika** | Uwierzytelnianie w brokerze | meshdev |
 | **Hasło** | Uwierzytelnianie w brokerze | large4cats |
-| **Główny temat** (Root topic) | Podstawowy temat wiadomości | `msh`, który radio zamienia na `msh/<REGION>` po ustawieniu regionu |
-| **Szyfrowanie włączone** (Encryption enabled) | Szyfruj dane MQTT | Włączone |
-| **Włącz wyjście JSON** | Publikuj i odbieraj także temat `/2/json/`. Oznaczone jako przestarzałe w schemacie protobuf, ale nadal jedyny przełącznik tego zachowania — i własne proxy aplikacji go respektuje | Wyłączone |
-| **Włącz TLS** | Bezpieczne połączenie z brokerem | Wyłączone |
-| **Raportowanie mapy** (Map reporting) | Raportuj pozycję na publiczną mapę | Wyłączone |
-| **Proxy do klienta włączone** | Przekazuj MQTT przez połączoną aplikację | Wyłączone |
+| **Szyfrowanie włączone** (Encryption Enabled) | Publikuj pakiety nadal zaszyfrowane kluczem kanału | Włączone |
+| **Włącz wyjście JSON** | Pokazywane tylko dla radia z firmware starszym niż 2.8 albo dopóki ustawienie jest jeszcze włączone. Zobacz [Formaty wiadomości](#formaty-wiadomości) | Wyłączone |
+| **Włącz TLS** (TLS Enabled) | Bezpieczne połączenie z brokerem | Wyłączone |
+| **Główny temat** (Root Topic) | Podstawowy temat wiadomości | `msh`, który radio zamienia na `msh/<REGION>`, gdy ustawisz region, a radio używa brokera publicznego |
+| **Proxy do klienta włączone** (MQTT Client Proxy) | Przekazuj MQTT przez połączoną aplikację | Wyłączone |
+| **Raportowanie mapy** (Map Reporting) | Raportuj pozycję na publiczną mapę | Wyłączone |
 
 ### Stan połączenia i test połączenia
 
@@ -58,13 +58,15 @@ Góra ekranu ustawień MQTT pokazuje stan przekaźnika, który uruchamia ta apli
 łączącego się z brokerem przez własne Wi-Fi lub Ethernet. Własne połączenie radia z brokerem
 nie jest tu raportowane.
 
+Gdy broker przyjmuje połączenie, ale odrzuca subskrypcję, stan podaje odrzucone tematy i powód brokera: *Połączono, ale broker odrzucił wszystkie tematy*, gdy nic nie zostało przyznane, albo *Połączono, ale broker odrzucił* i lista tematów, gdy tylko część. Zwykle przyczyną jest lista dostępu (ACL) brokera.
+
 **Testuj połączenie** sprawdza broker, zanim zapiszesz ustawienia w radiu, i rozróżnia rodzaje
 niepowodzeń: nierozpoznana nazwa hosta, odrzucone połączenie TCP, błąd TLS, przekroczenie czasu
 oczekiwania albo odrzucenie Twoich danych logowania przez broker wraz z podaniem powodu.
 
 ### Proxy MQTT w tej aplikacji
 
-Jeśli radio nie ma własnego dostępu do internetu, może użyć aplikacji jako bramy MQTT: włącz **MQTT** i **Proxy do klienta włączone** w konfiguracji modułu, a aplikacja będzie przekazywać ruch MQTT między radiem a brokerem przez internet Twojego telefonu lub komputera.
+Jeśli radio nie ma własnego dostępu do internetu, może użyć aplikacji jako bramy MQTT: włącz **MQTT włączone** i **Proxy do klienta włączone** w konfiguracji modułu. Aplikacja będzie przekazywać ruch MQTT między radiem a brokerem przez internet Twojego telefonu lub komputera.
 
 Przełącznik **Proxy MQTT w tej aplikacji** na górze ekranu ustawień MQTT pokazuje, czy to przekazywanie działa, i pozwala je natychmiast odciąć (lub uruchomić ponownie), bez edytowania i ponownego zapisywania konfiguracji MQTT radia.
 
@@ -72,7 +74,7 @@ Przełącznik **Proxy MQTT w tej aplikacji** na górze ekranu ustawień MQTT pok
 
 Społeczność utrzymuje publiczny broker pod adresem `mqtt.meshtastic.org`. Jest przeznaczony do ogólnego użytku i testów.
 
-Gdy ta aplikacja przekazuje MQTT dla radia, połączenia z tym brokerem zawsze używają TLS na porcie 8883, nawet jeśli **Włącz TLS** jest wyłączone. To podniesienie zabezpieczeń robi sama aplikacja i przełącznik o tym informuje. Radio łączące się z brokerem przez własne Wi-Fi lub Ethernet niczego nie wymusza: używa **Włącz TLS** tak, jak zapisano, więc włącz je sam, bo inaczej radio połączy się jawnie na porcie 1883. Dla każdego innego brokera decyduje przełącznik w obu przypadkach (port 8883 z TLS, 1883 bez).
+Gdy ta aplikacja przekazuje MQTT dla radia, połączenia z tym brokerem zawsze używają TLS na porcie 8883, nawet jeśli **Włącz TLS** jest wyłączone. To podniesienie zabezpieczeń robi sama aplikacja i przełącznik o tym informuje. Radio łączące się z brokerem przez własne Wi-Fi lub Ethernet niczego nie wymusza: używa **Włącz TLS** tak, jak zapisano, więc włącz je sam, bo inaczej radio połączy się jawnie na porcie 1883. Dla każdego innego brokera decyduje przełącznik w obu przypadkach. Port wpisany w adresie, na przykład `broker.example.com:8884`, jest zachowywany; bez niego TLS używa portu 8883, a połączenie zwykłe 1883.
 
 > 🔒 **Prywatność:** Wiadomości na publicznym brokerze może odczytać każdy, kto je subskrybuje. Do prywatnej komunikacji zawsze używaj szyfrowania kanału.
 
@@ -106,16 +108,9 @@ Uplink i downlink to ustawienia poszczególnych kanałów, a nie ustawienia modu
 
 ## Formaty wiadomości
 
-MQTT przenosi dwa formaty danych:
+Bramy publikują pakiety jako binarne protobufy Meshtastic w temacie `/2/e/`, którego używa mostkowanie sieci mesh między węzłami.
 
-| Format | Opis | Zastosowanie |
-|--------|-------------|----------|
-| **Protobuf** | Binarne kodowanie protobuf Meshtastic | Mostkowanie sieci mesh między węzłami |
-| **JSON** | Czytelny dla człowieka JSON w temacie `/2/json/` | Odbiorcy spoza sieci mesh (pulpity, automatyka domowa) |
-
-> ℹ️ **Uwaga:** `json_enabled` jest oznaczone jako przestarzałe w schemacie protobuf, ale nie zostało
-> zastąpione i nie jest ignorowane. Gdy jest włączone, własne proxy MQTT aplikacji subskrybuje
-> temat `/2/json/` i dekoduje te dane.
+Firmware 2.7 i starsze może też publikować czytelny dla człowieka JSON w temacie `/2/json/` dla odbiorców spoza sieci mesh, takich jak pulpity i automatyka domowa, gdy `json_enabled` jest włączone. Firmware 2.8 usunęło obsługę JSON i ignoruje to pole. Aplikacja pokazuje **Włącz wyjście JSON** tylko dla radia ze starszym firmware albo dopóki ustawienie jest jeszcze włączone, a gdy jest włączone, własne proxy MQTT aplikacji także subskrybuje temat `/2/json/` i dekoduje te dane.
 
 ## Szyfrowanie i prywatność
 
@@ -130,7 +125,7 @@ Zrozumienie warstwowego modelu szyfrowania:
 ## Dobre praktyki
 
 - Używaj szyfrowania na poziomie kanału (PSK) na kanałach mostkowanych do MQTT
-- Nie włączaj MQTT na węzłach bez dostępu do internetu (radio buforuje wiadomości, których nie może wysłać, i marnuje pamięć)
+- Nie włączaj MQTT na węźle bez własnego dostępu do internetu, chyba że włączone jest **Proxy do klienta włączone** (węzeł kolejkuje wiadomości, których nie może wysłać, i marnuje pamięć)
 - Do wrażliwych wdrożeń używaj prywatnego brokera
 - Pamiętaj o czasie antenowym przy downlinku z ruchliwych tematów MQTT — każda wiadomość odebrana z downlinku zużywa czas antenowy w Twojej lokalnej sieci mesh
 - Rozważ włączenie samego uplinku, jeśli chcesz tylko zdalnie monitorować sieć, bez wstrzykiwania wiadomości z powrotem
@@ -148,7 +143,7 @@ Zrozumienie warstwowego modelu szyfrowania:
 
 - **Sprawdź ustawienia uplink/downlink** — jeśli włączony jest tylko uplink, wiadomości płyną z sieci mesh do MQTT, ale nie z powrotem. Włącz downlink na bramie odbiorczej.
 - **Niezgodność kanałów** — obie bramy muszą mieć ten sam kanał z tym samym PSK. Niezgodność oznacza, że wiadomości są szyfrowane różnymi kluczami i wyglądają jak śmieci.
-- **Niezgodność tematów** — obie bramy muszą używać dokładnie tego samego głównego tematu. Ustawienie regionu zamienia domyślny temat główny na `msh/<REGION>` (na przykład `msh/US`), więc bramy w różnych regionach nie spotkają się, dopóki obu nie nadasz tego samego jawnego tematu głównego.
+- **Niezgodność tematów** — obie bramy muszą używać dokładnie tego samego głównego tematu. Na brokerze publicznym ustawienie regionu zamienia domyślny temat główny na `msh/<REGION>` (na przykład `msh/US`), więc bramy w różnych regionach nie spotkają się, dopóki obu nie nadasz tego samego jawnego tematu głównego. Firmware 2.8.0 i starsze zamienia też temat główny zaczynający się od `msh` na brokerze prywatnym.
 - **Włączone Ignoruj MQTT** — w regionie z limitem czasu nadawania (duty cycle) radio włącza **Ignoruj MQTT** (Ignore MQTT) (konfiguracja LoRa, **Zaawansowane**) po ustawieniu regionu i wtedy odrzuca każdy pakiet, który dotarł do niego przez MQTT. Wyłącz to na węzłach odbierających, nie tylko na bramie.
 - **Wyłączone Ok dla MQTT** — na publicznym brokerze brama wysyła pakiety innych węzłów tylko wtedy, gdy węzeł nadający ma włączone **Ok dla MQTT** (konfiguracja LoRa, **Zaawansowane**). Twój własny ruch jest mostkowany tak czy inaczej; ruch sąsiadów nie, dopóki się nie zgodzą.
 

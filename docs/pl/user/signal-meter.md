@@ -2,7 +2,7 @@
 title: Jak działa miernik sygnału
 parent: Przewodnik użytkownika
 nav_order: 15
-last_updated: 2026-09-09
+last_updated: 2026-10-21
 description: Jak miernik sygnału ocenia jakość na podstawie SNR względem presetu modemu LoRa — widmo rozproszone, presety i co naprawdę oznaczają paski.
 aliases:
   - signal
@@ -55,7 +55,7 @@ Ikona nigdy nie robi się pusta, więc licz paski uważnie: pojedynczy pasek ozn
 
 W aplikacji dane o sygnale pojawiają się w kilku miejscach:
 
-- **Lista węzłów** — ikona pasków sygnału, pokazywana tylko dla węzłów, które Twoje radio usłyszało bezpośrednio. Węzeł osiągany przez przekaźnik pokazuje zamiast tego liczbę skoków, ponieważ SNR zmierzony przez Twoje radio opisuje ostatni skok, a nie całą ścieżkę
+- **Lista węzłów** — ikona pasków sygnału, pokazywana tylko dla węzłów, które Twój węzeł usłyszał bezpośrednio przez LoRa. Węzeł osiągany przez przekaźnik pokazuje zamiast tego liczbę skoków, ponieważ SNR zmierzony przez Twój węzeł opisuje ostatni skok, a nie całą ścieżkę
 - **Szczegóły węzła** — SNR, RSSI i określenie jakości na karcie **Szczegóły** u góry ekranu
 - **Traceroute** — jakość sygnału na każdym skoku dla każdego węzła przekaźnikowego
 - **Jakość sygnału** — historyczne dane SNR i RSSI na wykresach metryk

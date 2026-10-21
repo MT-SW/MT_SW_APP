@@ -20,7 +20,7 @@ Rzeczy, na których potykają się nowi współtwórcy — sprawdź je, zanim po
 - **Protobufy to zewnętrzna zależność** — modele protobuf pochodzą z artefaktu Maven `org.meshtastic:protobufs` (przypiętego w `gradle/libs.versions.toml`); zmieniaj protobufy upstream i podbij wersję, nigdy nie edytuj wygenerowanego kodu lokalnie
 - **Dokumentacja zaktualizowana** — jeśli zmieniłeś/aś widoczne dla użytkownika UI, zaktualizuj odpowiednią stronę w `docs/en/user/`
 - **Podglądy zaktualizowane** — jeśli zmieniłeś/aś kompozyty UI, zaktualizuj odpowiedni plik `*Previews.kt` oraz wzorce testów zrzutów ekranu
-- **Nazewnictwo gałęzi** — nazwy gałęzi muszą zaczynać się od `feat/`, `fix/`, `chore/`, `docs/`, `build/`, `ci/`, `refactor/`, `test/` lub `deps/`
+- **Nazewnictwo gałęzi** — zacznij nazwę gałęzi od `feat/`, `fix/`, `chore/`, `docs/`, `build/`, `ci/`, `refactor/`, `test/` lub `deps/` albo użyj nazwy gałęzi ze specyfikacji; pełna reguła jest w [Współtworzenie](developer/contributing)
 
 ## Co nowego dla deweloperów
 
@@ -30,7 +30,13 @@ Rzeczy, na których potykają się nowi współtwórcy — sprawdź je, zanim po
 Keep the last 5–8 entries and trim older ones from the bottom.
 -->
 
-**Wrzesień 2026** — [Nawigacja i deep linki](developer/navigation-and-deep-links) — Deep linki są kierowane przez `UriDeepLinkMatcher` z Navigation 3 zamiast ręcznie pisanego bloku `when`, a wzorce są zakotwiczone, więc nieopisana końcówka ścieżki nie otwiera już korzenia danej rodziny.
+**Październik 2026** — [Nawigacja i deep linki](developer/navigation-and-deep-links) — Tabela tras obejmuje każdy wzorzec, który router przyjmuje, w tym rozwiązania zapasowe, które dla nieznanej podścieżki otwierają najbliższą trasę węzłów, mapy lub ustawień.
+
+**Październik 2026** — [Trwałe przechowywanie danych](developer/persistence) — Każdy podłączony węzeł ma własną bazę danych, opisano kopię zapasową i przywracanie danych aplikacji, a telemetria jest czytana z `MeshLog`, a nie z `Packet`.
+
+**Październik 2026** — [Kompilacje testowe i Obtainium](developer/test-builds) — Promocja przenosi jedno wydanie z tagu na tag, a sprzątanie po wydaniu usuwa wersje wstępne.
+
+**Wrzesień 2026** — [Nawigacja i deep linki](developer/navigation-and-deep-links) — Deep linki są kierowane przez `UriDeepLinkMatcher` z Navigation 3 zamiast ręcznie pisanego bloku `when`.
 
 **Wrzesień 2026** — [Pomiary i formatowanie](developer/measurement) — `NumberFormatter.format` stosuje ustawienia regionalne systemu; `formatInvariant` to wersja ze stałą kropką, przeznaczona dla danych, które parsuje inny system.
 

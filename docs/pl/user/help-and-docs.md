@@ -2,7 +2,7 @@
 title: Pomoc i dokumentacja w aplikacji
 parent: Przewodnik użytkownika
 nav_order: 21
-last_updated: 2026-09-11
+last_updated: 2026-10-21
 description: Przeglądaj tę dokumentację w aplikacji, przeszukuj ją i zadawaj pytania o MT_SW asystentowi AI działającemu na urządzeniu — Chirpy.
 aliases:
   - help
@@ -17,7 +17,7 @@ Ta sama dokumentacja użytkownika jest dołączona **do aplikacji**, więc może
 
 ## Przeglądanie
 
-Przeglądarka dokumentacji wyświetla listę wszystkich stron podręcznika użytkownika. Dotknij strony, aby ją przeczytać; obrazy i odnośniki między stronami działają tak samo jak tutaj.
+Przeglądarka dokumentacji wyświetla listę wszystkich stron podręcznika użytkownika. Dotknij strony, aby ją przeczytać; obrazy i odnośniki między stronami działają jak tutaj.
 
 ![Spis treści przeglądarki dokumentacji w aplikacji](../../assets/screenshots/docs-browser_toc.png)
 
@@ -31,13 +31,17 @@ Strona otwarta w przeglądarce:
 
 ![Strona dokumentacji wyświetlona w aplikacji](../../assets/screenshots/docs-browser_page.png)
 
+### Strony w Twoim języku
+
+Gdy aplikacja jest ustawiona na język inny niż angielski, strona mająca tłumaczenie społeczności otwiera się w tym języku i ma pod tytułem podpis **Tłumaczenie społeczności**. W wersji Google na Androida strona bez takiego tłumaczenia otwiera się po angielsku, a potem jest tłumaczona maszynowo na telefonie i ma podpis **Tłumaczenie automatyczne**. W wersjach F-Droid i na komputer taka strona jest po angielsku.
+
 ## Chirpy — asystent AI
 
 **Chirpy** odpowiada na pytania o MT_SW zadawane zwykłym językiem, korzystając jako źródła z tej dołączonej dokumentacji. Dotknij przycisku Chirpy w przeglądarce dokumentacji, wpisz pytanie, a asystent odpowie i poda odnośniki do odpowiednich stron.
 
 ![Asystent AI Chirpy odpowiadający na pytanie z odnośnikami do stron](../../assets/screenshots/docs-browser_chirpy.png)
 
-Chirpy jest dostępny tylko na Androidzie w wersji Google. W kompilacjach F-Droid, na komputery i iOS przycisk asystenta w ogóle się nie pojawia — tak samo jest na telefonie, którego sprzęt nie potrafi uruchomić modelu działającego na urządzeniu. Przeglądanie dokumentacji i jej własne wyszukiwanie działają normalnie na każdej platformie.
+Chirpy jest dostępny tylko na Androidzie w wersji Google. W kompilacjach F-Droid i na komputery przycisk asystenta w ogóle się nie pojawia — tak samo jest na telefonie, którego sprzęt nie potrafi uruchomić modelu działającego na urządzeniu. Przeglądanie dokumentacji i jej własne wyszukiwanie działają normalnie na każdej platformie.
 
 > 🔒 **Prywatność:** Na obsługiwanych telefonach z kompilacją w wersji Google Chirpy działa **na urządzeniu** z użyciem Gemini Nano — Twoje pytania nigdy nie opuszczają telefonu. Przy pierwszym użyciu pobierany jest niewielki model.
 

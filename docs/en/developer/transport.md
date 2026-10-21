@@ -101,9 +101,8 @@ interface RadioTransportFactory {
 }
 ```
 
-`mockTransportEnabled` is a flow, not a one-shot check: the Android Demo Mode gesture (five taps
-on the Settings app-version row) unlocks the demo transports mid-session, and the device list has
-to notice. Every consumer must read that one flow — the visibility path and the `isAddressValid`
+`mockTransportEnabled` is a flow, not a one-shot check: Demo Mode on Android can be switched on
+mid-session, and the device list has to notice. Every consumer must read that one flow — the visibility path and the `isAddressValid`
 admission path have to agree, or the demo entry appears and then refuses to connect.
 
 `BaseRadioTransportFactory` (`core:network`, `commonMain`) holds the shared half: it creates
@@ -113,7 +112,7 @@ addresses, and the Android factory refuses serial addresses on hardware with no 
 address restored onto such a device is kept but never armed.
 
 Platform-specific implementations:
-- **Android:** `AndroidRadioTransportFactory` (`core:network`, `androidMain`) supports BLE + USB + TCP; Demo Mode is on in debug builds and Firebase Test Lab, and in release builds once hidden features are unlocked
+- **Android:** `AndroidRadioTransportFactory` (`core:network`, `androidMain`) supports BLE + USB + TCP; Demo Mode is on in debug builds and Firebase Test Lab
 - **Desktop:** `DesktopRadioTransportFactory` (`desktopApp`) supports BLE (Kable) + USB + TCP; Demo Mode is a debug-build feature, and the replay transport isn't wired
 - **iOS:** Code compiles for BLE and TCP, but no `RadioTransportFactory` implementation exists and no iOS app ships
 

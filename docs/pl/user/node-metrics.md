@@ -2,7 +2,7 @@
 title: Metryki węzła
 parent: Przewodnik użytkownika
 nav_order: 5
-last_updated: 2026-09-28
+last_updated: 2026-10-21
 description: Panele telemetrii każdego węzła sieci mesh — stan urządzenia, czujniki środowiskowe, jakość powietrza, jakość sygnału, zasilanie, traceroute i historia pozycji.
 aliases:
   - metrics
@@ -92,14 +92,14 @@ Odczyty CO₂ są oznaczone kolorami według dotkliwości, aby jakość powietrz
 
 ![Odczyty jakości powietrza z kolorowym oznaczeniem dotkliwości CO₂](../../assets/screenshots/node-metrics_air_quality.png)
 
-Przycisk dziennika/metryk jakości powietrza pojawia się na ekranie szczegółów węzła **tylko wtedy, gdy węzeł zgłosił telemetrię jakości powietrza**. W widoku Jakości powietrza możesz:
+Wiersz **Metryki jakości powietrza** jest zawsze widoczny na ekranie szczegółów węzła; jego przycisk wykresu pojawia się, gdy węzeł zgłosi telemetrię jakości powietrza. W widoku Jakości powietrza możesz:
 
 - Wybrać **przedział czasu** dla wykresów.
 - Filtrować za pomocą **chipów metryk** — pokazywane są tylko metryki, które mają dane.
 - **Odświeżyć / zażądać** najnowszej telemetrii jakości powietrza.
 - **Wyeksportować do CSV** do analizy w arkuszu kalkulacyjnym.
 
-> 💡 **Wskazówka:** Metryki jakości powietrza wymagają zgodnego czujnika jakości powietrza w zdalnym węźle. Obsługiwany sprzęt znajdziesz w [Telemetria i czujniki](telemetry-and-sensors).
+Obsługiwany sprzęt do pomiaru jakości powietrza znajdziesz w [Telemetria i czujniki](telemetry-and-sensors).
 
 ## Jakość sygnału
 
@@ -110,11 +110,10 @@ Informacje o jakości sygnału radiowego:
 | SNR | Stosunek sygnału do szumu (im wyższy, tym lepiej) |
 | RSSI | Wskaźnik siły odbieranego sygnału (im bliżej 0, tym lepiej) |
 | Poziom szumu | Lokalny szum tła RF w dBm (im bardziej ujemny, tym ciszej) |
-| Liczba skoków | Liczba skoków w sieci mesh dla ostatniej wiadomości |
 
 ### Opis jakości sygnału
 
-Jakość sygnału jest oceniana na podstawie **SNR względem progu demodulacji aktywnego presetu modemu LoRa**, a nie stałych progów — ten sam SNR znaczy co innego na różnych presetach (np. −15 dB jest w porządku na LongSlow, ale bezużyteczne na ShortFast). Gdy dostępne są zarówno RSSI, jak i odczyt poziomu szumu, aplikacja ocenia też ich różnicę względem limitu presetu i używa gorszej oceny. W przeciwnym razie RSSI służy wyłącznie do wyświetlania. W tabeli *limit* to limit SNR presetu.
+Jakość sygnału jest oceniana na podstawie **SNR względem progu demodulacji aktywnego presetu modemu LoRa**, a nie stałych progów — ten sam SNR znaczy co innego na różnych presetach (na przykład −16 dB to ocena Dobry na Long Fast, ale Brak na Short Fast). Gdy dostępne są zarówno RSSI, jak i odczyt poziomu szumu, aplikacja ocenia też ich różnicę względem limitu presetu i używa gorszej oceny. W przeciwnym razie RSSI służy wyłącznie do wyświetlania. W tabeli *limit* to limit SNR presetu.
 
 | Jakość | Kryteria |
 |---------|----------|
@@ -125,9 +124,9 @@ Jakość sygnału jest oceniana na podstawie **SNR względem progu demodulacji a
 
 Pełne wyjaśnienie znajdziesz w [Jak działa miernik sygnału](signal-meter).
 
-Statystyki lokalne z połączonego radia są również pokazywane w Jakości sygnału, gdy są dostępne. Te logi zawierają poziom szumu, liczniki ruchu, liczniki przekazań, liczbę węzłów online i czas pracy radia. Wykres poziomu szumu używa przerywanej linii odniesienia przy -85 dBm, aby pomóc rozpoznać zajęte środowisko RF.
+Statystyki lokalne z połączonego węzła są również pokazywane w Jakości sygnału, gdy są dostępne. Te logi zawierają poziom szumu, liczniki ruchu, liczniki przekazań, liczbę węzłów online i czas pracy. Wykres poziomu szumu używa przerywanej linii odniesienia przy −85 dBm, aby pomóc rozpoznać zajęte środowisko RF.
 
-- **Zażądaj** — poproś połączone radio o świeży raport telemetrii Statystyk lokalnych
+- **Zażądaj** — poproś połączony węzeł o świeży raport telemetrii Statystyk lokalnych
 - **Wyczyść** — usuń logi Statystyk lokalnych tego węzła
 - **Zapisz** — wyeksportuj widoczną historię Statystyk lokalnych do CSV
 
@@ -146,7 +145,7 @@ Ekran szczegółów węzła pokazuje karty dla kanałów od 1 do 3. Użyj przyci
 
 Traceroute pokazuje ścieżkę, którą wiadomość pokonuje w sieci mesh:
 
-1. W sekcji **Telemetria** na ekranie szczegółów węzła dotknij przycisku odświeżania w wierszu **Śledzenie trasy**. Nie możesz wykonać traceroute do własnego węzła, a przycisk przyjmuje jedno żądanie na 30 sekund.
+1. W sekcji **Telemetria** na ekranie szczegółów węzła dotknij przycisku odświeżania w wierszu **Śledzenie trasy**. Nie możesz wykonać traceroute do własnego węzła, Aplikacja wysyła najwyżej jeden traceroute na 30 sekund, do dowolnego węzła, a **Śledzenie trasy** w menu po dotknięciu i przytrzymaniu na liście węzłów dzieli tę samą blokadę.
 2. Aplikacja wysyła żądanie traceroute do docelowego węzła.
 3. Wyniki pokazują każdy skok wraz z jego SNR.
 
@@ -154,19 +153,27 @@ Traceroute pokazuje ścieżkę, którą wiadomość pokonuje w sieci mesh:
 
 Traceroute to podróż w obie strony, więc każdy zapisany wynik zawiera liczbę skoków w każdym kierunku, **Skoki w przód** i **Skoki powrotne**, oraz czas **Trasa w obie strony** w sekundach. Wynik oznaczony **Bezpośrednio** dotarł do celu bez żadnego przekaźnika po drodze. Dotknij wyniku, aby zobaczyć trasę wyznaczoną do celu i trasę wyznaczoną z powrotem do Ciebie, wraz z SNR każdego skoku. Ten widok oferuje **Pokaż na mapie**, który rysuje tę samą ścieżkę, o ile węzeł początkowy i docelowy udostępniły pozycję.
 
+Przekaźnik, który nie zapisał się w trasie, jest pokazany jako **Nieznany skok**, a przekaźnik, którego Twój węzeł nie zna, jako jego identyfikator węzła, na przykład `!a1b2c3d4`.
+
+Historia zawiera też traceroute, których ta aplikacja nie zlecała:
+
+- **Zaobserwowany** oznacza odpowiedź tego węzła na żądanie wysłane gdzie indziej, na przykład z ekranu Twojego węzła. Ma liczby skoków, ale nie ma czasu podróży w obie strony, a jego punkty na wykresie są pustymi kółkami.
+- **Śledzone przez** *węzeł* oznacza traceroute, który ten węzeł wykonał do Twojego. Pokazuje trasę przychodzącą z SNR każdego skoku, ale bez trasy powrotnej, bez czasu podróży w obie strony i bez mapy, i nie pojawia się na wykresie.
+
 Wynik oznaczony **Brak odpowiedzi** oznacza, że cel nigdy nie odpowiedział. Może być poza zasięgiem, uśpiony lub skonfigurowany tak, by nie odpowiadać. Poczekaj, aż minie 30-sekundowa blokada, i spróbuj ponownie; jeśli nadal się nie udaje, najpierw wyślij wiadomość bezpośrednią, aby sprawdzić, czy węzeł jest w ogóle osiągalny.
 
 ## Dziennik pozycji
 
-Historyczne dane o pozycji dla węzłów, które udostępniają swoją lokalizację:
-- Współrzędne GPS
-- Wysokość
-- Prędkość (w ruchu)
-- Znacznik czasu każdego raportu pozycji
+Przycisk wykresu w wierszu **Pozycja** otwiera historię pozycji węzła: jego ślad na mapie oraz listę każdego raportu pozycji z szerokością i długością geograficzną, liczbą widocznych satelitów, wysokością, prędkością, kierunkiem i znacznikiem czasu. Na pasku aplikacji możesz:
+
+- **Eksportuj GPX**, aby zapisać ślad jako plik GPX. Raporty bez namiaru GPS są pomijane.
+- Zapisać listę jako CSV.
+- **Wyczyść** zapisany ślad, po potwierdzeniu. Tego nie da się cofnąć.
+- Poprosić zdalny węzeł o świeżą pozycję.
 
 ## Informacje o sąsiadach
 
-Pokazuje, które węzły dany węzeł słyszy bezpośrednio — przydatne do zrozumienia topologii sieci mesh.
+Pokazuje, które węzły dany węzeł słyszy bezpośrednio — przydatne do zrozumienia topologii sieci mesh. Wiersz **Informacje o sąsiadach** pojawia się, gdy lista sąsiadów tego węzła dotrze do aplikacji. Jak włączyć moduł, opisuje [Lokalne wykrywanie sieci mesh](discovery#neighbor-info).
 
 ## Statystyki hosta
 

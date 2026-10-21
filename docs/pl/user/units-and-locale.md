@@ -2,7 +2,7 @@
 title: Jednostki i lokalizacja
 parent: Przewodnik użytkownika
 nav_order: 16
-last_updated: 2026-08-30
+last_updated: 2026-10-21
 description: Jak aplikacja formatuje temperaturę, odległość, prędkość i inne pomiary na podstawie ustawień regionalnych urządzenia.
 aliases:
   - measurement
@@ -18,7 +18,7 @@ Aplikacja automatycznie wyświetla temperatury, odległości, prędkości i czas
 
 ## Jak to działa
 
-Radia zawsze przesyłają dane w **jednostkach metrycznych** (metry, °C, m/s, hPa itd.). Gdy aplikacja odbierze te dane, przelicza je i wyświetla w systemie jednostek wynikającym z ustawień regionalnych urządzenia.
+Węzły zawsze przesyłają dane w **jednostkach metrycznych** (metry, °C, m/s, hPa itd.). Gdy aplikacja odbierze te dane, przelicza je i wyświetla w systemie jednostek wynikającym z ustawień regionalnych urządzenia.
 
 Na Androidzie preferencje pomiarów wynikają z systemowych ustawień **Język i region**. Na komputerze (JVM) aplikacja używa domyślnego `Locale` JVM.
 
@@ -26,11 +26,11 @@ Jednostki zależą od **regionu** urządzenia, a nie od języka wyświetlania. Z
 
 > 💡 **Wskazówka:** Domyślnie nie ma nic do konfigurowania — zmień systemowe preferencje pomiarów, a każdy ekran aplikacji zaktualizuje się automatycznie. Jeśli urządzenie nie oferuje działającego ustawienia regionu ani miar (niektóre wersje producentów go nie mają), ustaw zamiast tego **Ustawienia → Jednostki** w aplikacji.
 
-## Ekran radia jest osobny
+## Ekran węzła jest osobny
 
-**Ustawienia → Konfiguracja urządzenia → Wyświetlacz → Wyświetlana jednostka** konfiguruje ekran na radiu, a nie aplikację. Ustawienia **Użyj formatu 12-godzinnego** i **Zawsze wskazuj północ** także dotyczą tylko wyświetlacza radia — wszystkie trzy. Temperatura na tym ekranie ma własne ustawienie, **Metryki środowiskowe w Fahrenheitach**, w module Telemetria radia — zobacz [opis modułu telemetrii](https://meshtastic.org/docs/configuration/module/telemetry#display-fahrenheit) na meshtastic.org.
+**Ustawienia → Konfiguracja urządzenia → Wyświetlacz → Wyświetlane jednostki** konfiguruje ekran na węźle, a nie aplikację. Ustawienia **Zegar 12-godzinny** i **Zawsze wskazuj północ** także dotyczą tylko wyświetlacza węzła, wszystkie trzy. Temperatura na tym ekranie ma własne ustawienie, **Wyświetlaj w Fahrenheitach**, w module Telemetria węzła. Zobacz [opis modułu telemetrii](https://meshtastic.org/docs/configuration/module/telemetry#display-fahrenheit) na meshtastic.org.
 
-Jeśli lista węzłów pokazuje mile, a ekran radia kilometry, to właśnie dlatego: oba ustawia się w różnych miejscach. Zmiana ustawienia radia nigdy nie zmienia tego, co wyświetla aplikacja. Opcje po stronie urządzenia opisuje przewodnik [Konfiguracja wyświetlacza](https://meshtastic.org/docs/configuration/radio/display) na meshtastic.org.
+Jeśli lista węzłów pokazuje mile, a ekran węzła kilometry, to właśnie dlatego: oba ustawia się w różnych miejscach. Zmiana ustawienia węzła nigdy nie zmienia tego, co wyświetla aplikacja. Opcje po stronie urządzenia opisuje przewodnik [Konfiguracja wyświetlacza](https://meshtastic.org/docs/configuration/radio/display) na meshtastic.org.
 
 ## Temperatura
 
@@ -116,6 +116,7 @@ Niektóre jednostki są międzynarodowymi standardami i wyświetlają się tak s
 | Promieniowanie | µR/h | Standardowa jednostka dozymetryczna |
 | Współrzędne GPS | stopnie dziesiętne | Powszechny standard geograficzny |
 | Wilgotność, bateria, wilgotność gleby | % | Powszechne |
+| Rozmiary danych i szybkości transferu | B, kB, MB, GB (dziesiętnie: 1 MB to 1 000 000 bajtów) | Zgadza się z wielkościami pamięci pokazywanymi przez Androida; sama liczba jest formatowana według Twojego regionu |
 
 ## Data i czas
 
@@ -148,7 +149,7 @@ Nie każde urządzenie potrafi wyrazić każdą preferencję — niektóre wersj
 inne oferują tylko jeden wariant angielskiego, a regiony brytyjskie są imperialne dla odległości, nawet jeśli wolisz czytać wysokość
 w metrach. Na takie przypadki aplikacja ma własny przełącznik:
 
-1. Otwórz **Ustawienia → Jednostki** w aplikacji
+1. W aplikacji otwórz **Ustawienia → Jednostki**
 2. Wybierz **Domyślny systemu**, **Metryczne** lub **Imperialne**
 3. Każdy ekran aktualizuje się natychmiast — bez restartu
 
@@ -161,5 +162,5 @@ co innego. To ustawienie istnieje zarówno na Androidzie, jak i na komputerze.
 - [Metryki węzła](node-metrics) — gdzie wyświetlane są temperatura, odległość i wartości z czujników
 - [Telemetria i czujniki](telemetry-and-sensors) — czujniki, które wytwarzają te pomiary
 - [Pomiary i formatowanie](../developer/measurement) — opis dla programistów narzędzi formatowania
-- [Ustawienia — Radio i użytkownik](settings-radio-user) — ustawienie regionu, od którego zależy wybór jednostek
-- [Konfiguracja wyświetlacza](https://meshtastic.org/docs/configuration/radio/display) — jednostki, zegar i kompas na własnym ekranie radia, na meshtastic.org
+- [Ustawienia — Radio i użytkownik](settings-radio-user) — konfiguracja wyświetlacza, która ustawia jednostki na własnym ekranie węzła
+- [Konfiguracja wyświetlacza](https://meshtastic.org/docs/configuration/radio/display) — jednostki, zegar i kompas na własnym ekranie węzła, na meshtastic.org

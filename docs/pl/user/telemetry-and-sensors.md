@@ -2,7 +2,7 @@
 title: Telemetria i czujniki
 parent: Przewodnik użytkownika
 nav_order: 9
-last_updated: 2026-09-18
+last_updated: 2026-10-21
 description: Dane z czujników w sieci mesh — obsługiwane czujniki środowiska, jakości powietrza i zasilania oraz poradniki konfiguracji i podglądu.
 aliases:
   - sensors
@@ -59,7 +59,7 @@ Obsługiwane czujniki środowiskowe:
 
 Obie wartości pojawiają się jako karty informacyjne na ekranie szczegółów węzła, obok pozostałych odczytów środowiska.
 
-Chemia z sond glebowych i sond jakości wody (pH, przewodność, zasolenie, NPK, tlen rozpuszczony, ORP, mętność, azotany, amon, zapotrzebowanie na tlen, natężenie promieniowania słonecznego) pojawia się w wierszu kart informacyjnych **Gleba i woda** (Soil & Water) na ekranie szczegółów węzła, gdy tylko węzeł zgłosi którąkolwiek z tych wartości, i jest dołączana do eksportu bazy węzłów. Nie ma dla nich jeszcze wykresu ani ekranu dziennika.
+Chemia z sond glebowych i sond jakości wody (pH, przewodność, zasolenie, NPK, tlen rozpuszczony, ORP, mętność, azotany, amon, zapotrzebowanie na tlen, natężenie promieniowania słonecznego) pojawia się w wierszu kart informacyjnych **Gleba i woda** (Soil & Water) na ekranie szczegółów węzła, gdy tylko węzeł zgłosi którąkolwiek z tych wartości, i jest dołączana do eksportu bazy węzłów. Nie ma dla nich wykresu ani ekranu dziennika, a wiersz nie ma przycisku żądania.
 
 ### Światło i UV
 
@@ -101,13 +101,14 @@ Przydatne do monitorowania ładowania słonecznego lub stanu baterii w odległyc
 
 1. Przejdź do **Ustawienia → Ustawienia modułu → Telemetria**.
 2. Każda grupa wartości ma własny przełącznik włączenia i własny interwał:
-   - **Metryka urządzenia** — bateria, napięcie, czas pracy, ChUtil i AirUtil. Jej przełącznik, **Wysyłaj telemetrię urządzenia**, pojawia się tylko w firmware 2.7.12 i nowszym; w starszym firmware możesz zmienić interwał, ale nie wyłączysz grupy
+   - **Metryka urządzenia** — bateria, napięcie, czas pracy, ChUtil i AirUtil. Jej przełącznik, **Rozgłaszaj metryki urządzenia**, pojawia się tylko w firmware 2.7.13 i nowszym. Po wyłączeniu węzeł przestaje rozgłaszać te metryki w sieci mesh, ale nadal wysyła je do połączonej aplikacji; w starszym firmware możesz zmienić interwał, ale nie zatrzymasz rozgłaszania
    - **Metryki środowiskowe** — temperatura, wilgotność, ciśnienie i inne odczyty z czujników
    - **Metryki jakości powietrza** — odczyty pyłów i CO₂
    - **Metryki zasilania** — odczyty napięcia i prądu dla każdego kanału
 
-   Środowisko i zasilanie mają dodatkowy przełącznik pokazywania odczytów na własnym
-   ekranie radia, a środowisko ma jeszcze jeden, który pokazuje tam temperatury w Fahrenheitach.
+   Środowisko ma dodatkowy przełącznik **Pokaż na ekranie urządzenia**, który pokazuje odczyty na własnym
+   ekranie węzła, oraz **Wyświetlaj w Fahrenheitach**, który pokazuje tam temperatury w Fahrenheitach. Zasilanie ma
+   w tym samym celu **Ekran zasilania**.
 
 ### Wybór interwału
 
@@ -136,8 +137,8 @@ Dane o jakości powietrza można oglądać jako karty informacyjne na ekranie sz
 ## Podgląd telemetrii
 
 1. Przejdź do **Węzły** i wybierz węzeł.
-2. Sekcja **Telemetria** pokazuje wiersz dla każdego rodzaju wartości — urządzenie, środowisko, jakość powietrza, zasilanie i pozostałe — niezależnie od tego, czy węzeł już je zgłosił. Wiersz wypełnia się odczytami i zyskuje przycisk wykresu, gdy węzeł faktycznie wyśle ten rodzaj telemetrii. Pusty wiersz oznacza, że nic jeszcze nie dotarło, a nie że brakuje czujnika.
-3. Przyciskiem wykresu w wierszu otwierasz historię danej wartości, gdzie możesz wybrać przedział czasu i wyeksportować odczyty do CSV.
+2. Sekcja **Telemetria** pokazuje wiersz dla każdego rodzaju wartości — urządzenie, środowisko, jakość powietrza, zasilanie, host, PAX i pozostałe — niezależnie od tego, czy węzeł już je zgłosił. Wiersz wypełnia się odczytami i zyskuje przycisk wykresu, gdy węzeł wyśle ten rodzaj telemetrii. Pusty wiersz oznacza, że nic nie dotarło, a nie że brakuje czujnika. Wyjątkiem jest **Gleba i woda**: jej wiersz pojawia się dopiero, gdy węzeł zgłosi odczyty gleby lub wody.
+3. Przyciskiem wykresu w wierszu otwierasz historię danej wartości, gdzie możesz wybrać przedział czasu. Ekrany Urządzenie, Środowisko, Jakość powietrza, Zasilanie, Jakość sygnału i Pozycja pozwalają też wyeksportować odczyty do CSV.
 
 ![Ekran szczegółów węzła z otwartym menu działań wykresu telemetrii](../../assets/screenshots/node-metrics_telemetric_actions.png)
 
@@ -145,7 +146,7 @@ Dane o jakości powietrza można oglądać jako karty informacyjne na ekranie sz
 
 - **Brak danych środowiskowych?** Zdalny węzeł musi mieć podłączony fizyczny czujnik (np. BME280 na I2C). Telemetria urządzenia (bateria, czas pracy) jest zawsze dostępna, ale metryki środowiskowe wymagają sprzętu.
 - **Nieaktualne odczyty?** Sprawdź interwał raportowania — bardzo długie interwały (7200 s i więcej) oznaczają rzadkie odświeżanie danych. Sprawdź też, czy zdalny węzeł nadal jest online.
-- **Konflikt czujników na magistrali I2C?** Niektóre czujniki mają te same adresy I2C. Jeśli na jednej magistrali jest kilka czujników, sprawdź kolizje adresów w szeregowym wyjściu debugowania radia.
+- **Konflikt czujników na magistrali I2C?** Niektóre czujniki mają te same adresy I2C. Jeśli na jednej magistrali jest kilka czujników, sprawdź kolizje adresów w szeregowym wyjściu debugowania węzła.
 
 ## Powiązane tematy
 

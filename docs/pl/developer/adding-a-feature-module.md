@@ -2,7 +2,7 @@
 title: Dodawanie modułu funkcji
 parent: Przewodnik dewelopera
 nav_order: 3
-last_updated: 2026-09-29
+last_updated: 2026-10-21
 description: Przewodnik krok po kroku tworzenia nowego modułu funkcji KMP — katalog modułu, skrypt budowania, DI, trasy, wpisy nawigacji i lista kontrolna.
 aliases:
   - new-module
@@ -28,7 +28,11 @@ plugins {
 }
 
 kotlin {
-    android { withHostTest { isIncludeAndroidResources = true } }
+    @Suppress("UnstableApiUsage")
+    android {
+        namespace = "org.meshtastic.feature.myfeature"
+        withHostTest { isIncludeAndroidResources = true }
+    }
 
     sourceSets {
         commonMain.dependencies {
@@ -49,6 +53,11 @@ kotlin {
     }
 }
 ```
+
+`meshtastic.kmp.feature` deklaruje cel `jvm()` oraz `iosSimulatorArm64()` na komputerach, które potrafią uruchomić
+Kotlin/Native. Dodaje zależności Compose, Navigation 3, Lifecycle i Koin oraz umieszcza `core:testing` w `commonTest`.
+Jeśli nie ustawisz przestrzeni nazw, wyprowadza też przestrzeń nazw Androida ze ścieżki modułu, a dla ścieżki z myślnikiem,
+takiej jak `:feature:my-feature`, nie jest to poprawna nazwa pakietu, więc ustaw `namespace` samodzielnie.
 
 ## Zarejestruj w `settings.gradle.kts`
 
@@ -94,6 +103,11 @@ sealed interface MyFeatureRoute : Route {
 }
 ```
 
+Nowy zapieczętowany interfejs tras trzeba też zarejestrować w `MeshtasticNavSavedStateConfig`
+(`core/navigation/.../NavigationConfig.kt`) przez `subclassesOfSealed<MyFeatureRoute>()`, bo inaczej zapisanie
+stosu wstecz nie zserializuje jego tras. Dodaj egzemplarz każdej nowej trasy do `allRouteInstances` w
+`NavigationConfigTest`, który sprawdza każdą trasę w obie strony przez zapisany stan.
+
 ## Utwórz wpisy nawigacji
 
 `src/commonMain/kotlin/org/meshtastic/feature/myfeature/navigation/MyFeatureNavigation.kt`:
@@ -120,8 +134,8 @@ Zarówno wartownik grafu (`MyFeatureRoute.MyFeatureGraph`), jak i główny ekran
 prowadzą do tego samego kompozytu, więc funkcja jest osiągalna zarówno przez wypchnięcie na najwyższym poziomie, jak i przez
 wypchnięcie grafu deep linka — według tego samego wzorca, którego używają `feature:wifi-provision` i `feature:firmware`.
 
-Następnie podepnij ją: wywołaj `myFeatureGraph(backStack)` ze współdzielonego bloku `entryProvider<NavKey> { }` w
-`Main.kt` aplikacji `androidApp` i w `DesktopNavigation.kt` aplikacji `desktopApp`, obok funkcji wpisów
+Następnie podepnij ją: wywołaj `myFeatureGraph(backStack)` z bloku `entryProvider<NavKey> { }` w
+`Main.kt` aplikacji `androidApp` oraz z `desktopNavGraph` w `DesktopNavigation.kt` aplikacji `desktopApp`, obok funkcji wpisów
 innych modułów funkcji. Zobacz [Rejestracja wpisów nawigacji](navigation-and-deep-links#navigation-entry-registration).
 
 ## Wytyczne dotyczące zestawów źródeł
@@ -151,7 +165,7 @@ Każdy moduł funkcji powinien mieć:
 - [ ] Jeśli moduł jest widoczny dla użytkownika: strona w `docs/en/user/` oraz wpis `MODULE_TO_DOCS` dla niego w `scripts/check-doc-coverage.js`; sprawdzenie kończy się błędem, gdy brakuje strony wymienionego modułu, a moduł bez wpisu nie wymaga strony
 - [ ] Moduł DI utworzony z `@ComponentScan`
 - [ ] Moduł DI zarejestrowany w korzeniach aplikacji i desktopu
-- [ ] Trasy dodane do `Routes.kt`
+- [ ] Trasy dodane do `Routes.kt`, zapieczętowany interfejs zarejestrowany w `NavigationConfig.kt`, a egzemplarz każdej trasy dodany w `NavigationConfigTest`
 - [ ] Wpisy nawigacji zarejestrowane
 - [ ] `./gradlew kmpSmokeCompile` przechodzi
 - [ ] `./gradlew :feature:my-feature:allTests` przechodzi

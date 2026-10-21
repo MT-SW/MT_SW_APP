@@ -2,7 +2,7 @@
 title: Nawigacja i deep linki
 parent: Przewodnik dewelopera
 nav_order: 4
-last_updated: 2026-09-19
+last_updated: 2026-10-21
 description: Jak współpracują typowane trasy Navigation 3 i DeepLinkRouter, obsługiwane URI deep linków oraz jak dodać nowy.
 aliases:
   - deeplinks
@@ -41,6 +41,7 @@ sealed interface SettingsRoute : Route {
 - Używaj `data class` dla tras z parametrami
 - Grupuj powiązane trasy w `sealed interface`
 - Punkty wejścia grafów implementują zarówno interfejs trasy, jak i `Graph`
+- Zarejestruj każdy zapieczętowany interfejs w `MeshtasticNavSavedStateConfig` (`NavigationConfig.kt`); `NavigationConfigTest` sprawdza w obie strony egzemplarz każdej trasy przez zapisany stan
 
 ## Router deep linków
 
@@ -48,16 +49,19 @@ sealed interface SettingsRoute : Route {
 wzorzec `UriDeepLinkMatcher` z Navigation 3, którego symbole zastępcze dekodują się do pól docelowej trasy, opakowany w
 `withBackStack`, aby zsyntetyzować rodziców.
 
-Wzorce są zakotwiczone, więc ścieżka, której wzorce nie modelują, zwraca null zamiast wracać do korzenia
-rodziny: `/firmware/anything-else` nie otwiera już ekranu firmware.
+Wzorce są zakotwiczone, więc ścieżka, której żaden wzorzec nie modeluje, zwraca null: `/firmware/anything-else` nie otwiera
+ekranu firmware. Tam, gdzie rodzina ma rozwiązanie zapasowe, jest to osobny wzorzec: nieznana metryka węzła otwiera
+szczegóły węzła, nienumeryczny identyfikator węzła lub waypointu otwiera listę węzłów albo mapę, a nieznana strona ustawień
+otwiera korzeń ustawień. Literały ścieżek są dopasowywane bez rozróżniania wielkości liter.
 
 ### Format URI
 
-Obie formy są rozwiązywane przez ten sam `DeepLinkRouter`, więc dowolna ścieżka deep linka działa z każdym schematem:
+Każda forma jest rozwiązywana przez ten sam `DeepLinkRouter`, więc dowolna ścieżka deep linka działa z każdą z nich:
 
 ```text
 meshtastic://meshtastic/{path}
 https://meshtastic.org/{path}       # App Link, android:autoVerify — also opens in-app on a real device/adb
+http://meshtastic.org/{path}        # declared in the same intent filter
 ```
 
 `adb shell am start -a android.intent.action.VIEW -d "meshtastic://meshtastic/{path}"` to najszybszy sposób
@@ -70,6 +74,9 @@ segment do `DeepLinkRouter.topLevelPathSegments` (router odmawia obsługi segmen
 dodaj jego matcher do `DeepLinkRouter.matchers` i dodaj odpowiedni `pathPrefix` do manifestu.
 `DeepLinkManifestConsistencyTest` (testy jednostkowe androidApp) sprawdza manifest względem tego zbioru, więc brakujący
 wpis w manifeście powoduje błąd CI.
+
+Linki importu zestawu kanałów i kontaktu (`/e/` i `/v/`) nie są trasami. `DeepLinkRouter.route` zwraca dla nich
+null, a wywołujący przekazuje je do swojego mechanizmu importu.
 
 **Źródło prawdy:**
 
@@ -92,25 +99,29 @@ wpis w manifeście powoduje błąd CI.
 | `/wifi-provision` | `WifiProvisionRoute.WifiProvision(null)` | Ekran provisioningu Wi-Fi |
 | `/wifi-provision?address={mac}` | `WifiProvisionRoute.WifiProvision(mac)` | Provisioning dla konkretnego MAC węzła |
 | `/settings` | `SettingsRoute.Settings(null)` | Korzeń ustawień |
+| `/settings/{page}` | np. `SettingsRoute.LoRa` | Ekran ustawień według sluga (`lora`, `mqtt`, `security`, `about`, ...); pełna lista to `settingsSubRoutes` |
+| `/settings/{destNum}` | `SettingsRoute.Settings(destNum)` | Ustawienia zdalnego węzła. Ścieżka ustawień może zaczynać się od `{destNum}`, aby wskazać zdalny węzeł, jak w `/settings/{destNum}/{page}`; bez niego ścieżka otwiera ustawienia podłączonego węzła |
 | `/settings/helpDocs` | `SettingsRoute.HelpDocs` | Przeglądarka dokumentacji |
 | `/settings/helpDocs/{pageId}` | `SettingsRoute.HelpDocPage(pageId)` | Konkretna strona dokumentacji |
 | `/settings/help-docs` | `SettingsRoute.HelpDocs` | Alias zgodności |
 | `/discovery` | `DiscoveryRoute.DiscoveryGraph` | Punkt wejścia Local Mesh Discovery |
+| `/settings/local-mesh-discovery` | `DiscoveryRoute.DiscoveryGraph` | Local Mesh Discovery pod korzeniem ustawień |
 | `/settings/local-mesh-discovery/session/{sessionId}` | `DiscoveryRoute.DiscoverySummary(sessionId)` | Wynik sesji discovery |
 | `/nodes` | `NodesRoute.Nodes` | Lista węzłów |
-| `/nodes/{destNum}` | `NodesRoute.NodeDetail(destNum)` | Szczegóły węzła |
-| `/nodes/{destNum}/{metric}` | np. `NodeDetailRoute.DeviceMetrics(destNum)` | Konkretna karta metryki węzła (`device-metrics`, `signal`, `power`, `traceroute`, `pax`, `neighbors`, ...) |
+| `/nodes/{destNum}` | `NodesRoute.NodeDetail(destNum)` | Szczegóły węzła; działa też `/nodes?destNum={destNum}` |
+| `/nodes/{destNum}/{metric}` | np. `NodeDetailRoute.DeviceMetrics(destNum)` | Konkretna karta metryki węzła (`device-metrics`, `map` lub `position`, `environment`, `signal`, `power`, `traceroute`, `host-metrics`, `pax`, `neighbors`), z `nodeDetailSubRoutes` |
 | `/messages` | `ContactsRoute.Contacts` | Lista rozmów |
-| `/messages/{contactKey}` | `ContactsRoute.Messages(contactKey)` | Konkretna rozmowa |
+| `/messages/{contactKey}` | `ContactsRoute.Messages(contactKey)` | Konkretna rozmowa; `?message={text}` wstępnie wypełnia pole wiadomości, działa też `/messages?contactKey={contactKey}` |
+| `/share` | `ContactsRoute.Share("")` | Kompozytor udostępniania do kontaktu, pusty |
 | `/share?message={text}` | `ContactsRoute.Share(message)` | Kompozytor udostępniania do kontaktu |
 | `/quickchat` | `ContactsRoute.QuickChat` | Wybór szybkiego czatu |
 | `/map` | `MapRoute.Map(null)` | Widok mapy |
-| `/map/{waypointId}` | `MapRoute.Map(waypointId)` | Mapa wycentrowana na waypoincie |
+| `/map/{waypointId}` | `MapRoute.Map(waypointId)` | Mapa wycentrowana na waypoincie; działa też `/map?waypointId={waypointId}` |
 | `/channels` | `ChannelsRoute.Channels` | Lista kanałów |
 | `/firmware` | `FirmwareRoute.FirmwareGraph` | Ekran firmware |
 | `/firmware/update` | `FirmwareRoute.FirmwareUpdate` | Przepływ aktualizacji firmware |
 
-Adresy trybu Demo zaczynają się od `m`. W kompilacji debug, albo po odblokowaniu ukrytych funkcji, `/connections?address=m` łączy z demonstracyjną siecią mesh, a `/connections?address=mshowcase` z siecią do zrzutów ekranu sklepu, której selektor urządzeń nigdy nie wyświetla. `MockScenario` w `:core:network` zawiera oba.
+Adresy trybu Demo zaczynają się od `m`. W kompilacji debug `/connections?address=m` łączy z demonstracyjną siecią mesh, a `/connections?address=mshowcase` z siecią do zrzutów ekranu sklepu, której selektor urządzeń nigdy nie wyświetla. `MockScenario` w `:core:network` zawiera oba.
 
 ### Synteza stosu wstecznego
 
@@ -130,24 +141,34 @@ Dzięki temu użytkownik może poprawnie nawigować „w górę”.
 ## Dodawanie deep linka
 
 1. Zdefiniuj typowaną trasę w `Routes.kt`.
-2. Dodaj mapowanie w `DeepLinkRouter.settingsSubRoutes` (lub odpowiedniku dla innych grafów) oraz matcher w
+2. Dodaj mapowanie w `DeepLinkRouter.settingsSubRoutes` (lub `nodeDetailSubRoutes` dla metryki węzła) oraz matcher w
    `DeepLinkRouter.matchers`, jeśli kształt ścieżki jest nowy.
-3. Dodaj test w `DeepLinkRouterTest.kt`.
-4. Zarejestruj wpis nawigacji w odpowiednim module funkcji.
-5. Zaktualizuj ilustracyjną listę KDoc w obiekcie `DeepLinkRouter` (komentarz dokumentacyjny na poziomie klasy, a nie własny KDoc metody `route()`) oraz poprzedzającą tabelę — obie są migawkami do szybkiego wglądu, a nie źródłem prawdy. Autorytatywne miejsca znajdziesz na liście Źródło prawdy wcześniej na tej stronie.
+3. Dla nowego segmentu najwyższego poziomu dodaj go do `topLevelPathSegments`, a jego `android:pathPrefix` do manifestu.
+4. Dodaj test w `DeepLinkRouterTest.kt`.
+5. Zarejestruj wpis nawigacji w odpowiednim module funkcji.
+6. Zaktualizuj ilustracyjną listę KDoc w obiekcie `DeepLinkRouter` (komentarz dokumentacyjny na poziomie klasy, a nie własny KDoc metody `route()`) oraz poprzedzającą tabelę — obie są migawkami do szybkiego wglądu, a nie źródłem prawdy. Autorytatywne miejsca znajdziesz na liście Źródło prawdy wcześniej na tej stronie.
 
 ## Rejestracja wpisów nawigacji
 
-Każdy moduł funkcji dostarcza wpisy przez funkcję rozszerzającą:
+Każdy moduł funkcji dostarcza wpisy przez funkcję rozszerzającą, tak jak robi to `feature:docs`:
 
 ```kotlin
 fun EntryProviderScope<NavKey>.docsEntries(backStack: NavBackStack<NavKey>) {
-    entry<SettingsRoute.HelpDocs> { DocsBrowserScreen(backStack) }
-    entry<SettingsRoute.HelpDocPage> { route -> DocsPageRouteScreen(route.pageId, backStack) }
+    entry<SettingsRoute.HelpDocs>(metadata = { ListDetailSceneStrategy.listPane() }) {
+        val hasDetailSelected = remember(backStack) { backStack.any { it is SettingsRoute.HelpDocPage } }
+        val chirpy = rememberChirpyState(backStack = backStack, currentPageId = null, showFab = !hasDetailSelected)
+        DocsHelpScreen(backStack = backStack, chirpy = chirpy)
+    }
+
+    entry<SettingsRoute.HelpDocPage>(metadata = { ListDetailSceneStrategy.detailPane() }) { route ->
+        val chirpy = rememberChirpyState(backStack = backStack, currentPageId = route.pageId, showFab = true)
+        DocsPageScreen(pageId = route.pageId, backStack = backStack, chirpy = chirpy)
+    }
 }
 ```
 
-Są one wywoływane z kompozycji nawigacji ustawień.
+Aplikacje wywołują funkcje wpisów wszystkich modułów funkcji z jednego miejsca: z bloku `entryProvider<NavKey> { }` w
+`Main.kt` aplikacji `androidApp` oraz z `desktopNavGraph` w `DesktopNavigation.kt` aplikacji `desktopApp`.
 
 ## Testowanie
 

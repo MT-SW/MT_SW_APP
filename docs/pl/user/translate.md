@@ -2,7 +2,7 @@
 title: Przetłumacz aplikację
 parent: Przewodnik użytkownika
 nav_order: 17
-last_updated: 2026-09-11
+last_updated: 2026-10-21
 description: Jak aplikacja i jej dokumentacja są tłumaczone przez Crowdin oraz wskazówki dla osób dodających tłumaczenia.
 aliases:
   - translate
@@ -19,6 +19,7 @@ Aplikacja i jej dokumentacja w aplikacji są tłumaczone na Crowdin — ta stron
 | Zasób | Lokalizacja źródła | Uwagi |
 |---|---|---|
 | Teksty interfejsu | `core/resources/src/commonMain/composeResources/values/strings.xml` | Przyciski, etykiety, komunikaty i cały tekst widoczny dla użytkownika |
+| Nazwy ustawień | `core/resources/src/commonMain/composeResources/values/schema_strings.xml` | Nazwy i opisy ustawień węzła, generowane z protobufów Meshtastic |
 | Strony Przewodnika użytkownika | `docs/en/user/*.md` | Dokumentacja w aplikacji, pokazywana w Pomoc i dokumentacja |
 | Metadane Fastlane | `fastlane/metadata/android/en-US/` | Tytuł, opis i dzienniki zmian w Google Play |
 
@@ -29,17 +30,17 @@ Aplikacja i jej dokumentacja w aplikacji są tłumaczone na Crowdin — ta stron
 1. **Wejdź do projektu Crowdin.** Otwórz [projekt Meshtastic Android na Crowdin](https://crowdin.com/project/meshtastic-android) i zaloguj się lub załóż darmowe konto.
 2. **Wybierz język.** Wybierz istniejący język albo poproś o nowy, zakładając [zgłoszenie na GitHubie](https://github.com/meshtastic/Meshtastic-Android/issues/new).
 3. **Tłumacz teksty.** Crowdin pokazuje angielski oryginał po lewej, a Twoje tłumaczenie po prawej. Przetłumacz każdy tekst i zapisz.
-4. **Sprawdź kontekst.** Wiele tekstów ma zrzuty ekranu lub komentarze z kontekstem — zajrzyj do nich, aby zrozumieć, gdzie tekst pojawia się w aplikacji. Zaplanowane zadanie pobiera zatwierdzone tłumaczenia z Crowdin i otwiera pull request; trafiają do aplikacji, gdy opiekun go zatwierdzi i wyjdzie nowa wersja.
+4. **Sprawdź kontekst.** Wiele tekstów ma zrzuty ekranu lub komentarze z kontekstem — zajrzyj do nich, aby zrozumieć, gdzie tekst pojawia się w aplikacji. Zaplanowane zadanie pobiera tłumaczenia z Crowdin i otwiera pull request; trafiają do aplikacji, gdy opiekun go zatwierdzi i wyjdzie nowa wersja.
 
 > 💡 **Wskazówka:** Pisz krótko. Teksty interfejsu często trafiają na przyciski, chipy lub wąskie kolumny. Jeśli tłumaczenie jest znacznie dłuższe niż angielski oryginał, rozważ skrócenie tam, gdzie sens pozostaje jasny.
 
 ## Dodawanie nowego języka
 
-Jeśli Twojego języka nie ma jeszcze na Crowdin:
+Jeśli Twojego języka nie ma na Crowdin:
 
 1. Otwórz zgłoszenie na [GitHubie](https://github.com/meshtastic/Meshtastic-Android/issues/new) z prośbą o nowy język.
-2. Opiekun doda język do Crowdin i skonfiguruje `crowdin.yml`.
-3. Po dodaniu możesz od razu zacząć tłumaczyć.
+2. Opiekun dodaje język do projektu Crowdin.
+3. Po dodaniu możesz zacząć tłumaczyć. Aplikacja oferuje każdy język, który ma folder z tekstami, więc pierwsza synchronizacja, która wprowadzi Twój język, doda go do aplikacji.
 
 ## Jak zorganizowane są tłumaczenia
 
@@ -63,19 +64,19 @@ docs/
 ├── en/user/             ← English source (default)
 │   ├── onboarding.md
 │   └── ...
-├── fr-rFR/user/         ← French (France)
+├── fr/user/             ← French
 │   ├── onboarding.md
 │   └── ...
-├── de-rDE/user/         ← German (Germany)
+├── de/user/             ← German
 │   └── ...
 └── ...
 ```
 
-Foldery lokalizacji dokumentacji używają kwalifikatorów lokalizacji Androida, w postaci `{lang}` lub `{lang}-r{REGION}` (na przykład `fr`, `fr-rFR`, `de-rDE`, `ja-rJP`). Foldery `values-*` dla tekstów aplikacji używają zamiast tego samych kodów języka (`values-fr`, `values-de`, `values-ja`), ponieważ `crowdin.yml` zapisuje teksty z `%two_letters_code%`, a strony dokumentacji z `%android_code%`. Te dwa zestawy nie pokrywają się jeden do jednego.
+Teksty aplikacji i strony dokumentacji używają tych samych nazw języków, więc `values-de` i `docs/de` zawierają ten sam język. Większość nazw to sam kod języka, który obejmuje wszystkie regiony tego języka. Kilka nazw wskazuje region lub pismo, gdy język tego wymaga: `pt-rBR` (portugalski, Brazylia), `fr-rCA` (francuski, Kanada), `zh-rCN` i `zh-rTW` (chiński) oraz `b+sr+Latn` dla serbskiego w piśmie łacińskim, gdzie zwykłe `sr` to cyrylica. Norweski bokmål to `nb`.
 
-Aplikacja automatycznie wybiera właściwy język na podstawie ustawień **Język i region** w telefonie.
+Aplikacja podąża za językiem telefonu, chyba że wybierzesz inny w **Język** w ustawieniach aplikacji.
 
-Strona pochodząca z Crowdin jest oznaczona **Tłumaczenie społeczności** pod tytułem w aplikacji. Jeśli strona nie ma jeszcze tłumaczenia z Crowdin dla Twojego języka, wersja Android z Google tłumaczy maszynowo angielski oryginał na bieżąco i oznacza go jako **Tłumaczenie automatyczne**; wersje F-Droid i na komputer pokazują stronę po angielsku. Twoje tłumaczenie z Crowdin zastępuje maszynowe, gdy tylko się pojawi.
+Strona pochodząca z Crowdin jest oznaczona **Tłumaczenie społeczności** pod tytułem w aplikacji. Jeśli strona nie ma tłumaczenia z Crowdin dla Twojego języka, wersja Android z Google tłumaczy maszynowo angielski oryginał na bieżąco i oznacza go jako **Tłumaczenie automatyczne**; wersje F-Droid i na komputer pokazują stronę po angielsku. Twoje tłumaczenie z Crowdin zastępuje maszynowe, gdy tylko się pojawi.
 
 ## Wskazówki dla tłumaczy
 
