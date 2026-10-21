@@ -2,8 +2,8 @@
 title: Funkcje aplikacji
 parent: Przewodnik użytkownika
 nav_order: 19
-last_updated: 2026-08-30
-description: Udostępnianie możliwości sieci mesh systemowi Android i asystentom AI działającym na urządzeniu (np. Gemini), aby mogły uruchamiać procesy sieci mesh bez otwierania aplikacji.
+last_updated: 2026-10-21
+description: Udostępnianie możliwości sieci mesh systemowi Android i asystentom AI działającym na urządzeniu, takim jak Gemini, aby mogły uruchamiać procesy sieci mesh bez otwierania aplikacji.
 aliases:
   - app-functions
   - system-ai
@@ -36,16 +36,16 @@ Na zrzucie ekranu **Wyślij wiadomość** i **Pobierz ostatnie wiadomości** są
 
 | Funkcja | Co robi |
 |----------|--------------|
-| **Wyślij wiadomość** | Wysyła wiadomość tekstową do kontaktu (wiadomość bezpośrednia) lub na kanał. Sieć mesh przenosi najwyżej 233 bajty tekstu, więc wiadomości tworzone przez asystenta powinny być krótkie. |
+| **Wyślij wiadomość** | Wysyła wiadomość tekstową do kontaktu (wiadomość bezpośrednia) lub na kanał. Odrzuci tekst dłuższy niż 228 bajtów i wyśle najwyżej pięć wiadomości na minutę, więc wiadomości tworzone przez asystenta powinny być krótkie. |
 
 ### Funkcje odczytu
 
 | Funkcja | Co zwraca |
 |----------|-----------------|
-| **Pobierz status sieci mesh** | Informację, czy jesteś połączony z radiem, i ile węzłów jest online. |
+| **Pobierz status sieci mesh** | Informację, czy jesteś połączony z węzłem, i ile węzłów jest online. |
 | **Pobierz listę węzłów** | Listę węzłów w Twojej sieci mesh. |
 | **Pobierz informacje o kanale** | Informacje o Twoich kanałach. |
-| **Pobierz status urządzenia** | Stan połączonego radia. |
+| **Pobierz status urządzenia** | Stan połączonego węzła. |
 | **Pobierz szczegóły węzła** | Szczegółowe informacje o wybranym węźle. |
 | **Pobierz metryki sieci mesh** | Telemetrię i metryki z Twojej sieci mesh. |
 | **Pobierz ostatnie wiadomości** | Ostatnie wiadomości z Twoich rozmów. |

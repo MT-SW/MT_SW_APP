@@ -2,7 +2,7 @@
 title: Kompilacje testowe i Obtainium
 parent: Przewodnik dewelopera
 nav_order: 10
-last_updated: 2026-08-29
+last_updated: 2026-10-21
 description: Instalacja i automatyczna aktualizacja kompilacji testowych Meshtastic z wydań GitHub za pomocą Obtainium — konfiguracje kanałów, wybór APK i format konfiguracji do udostępniania.
 aliases:
   - test-builds
@@ -19,11 +19,9 @@ Kompilacje z GitHuba są podpisane kluczem wydaniowym projektu (`CN=Kevin Hester
 
 > ⚠️ **Ostrzeżenie:** Odinstalowanie wersji Meshtastic ze Sklepu Play czyści dane aplikacji — historia wiadomości i ustawienia na tym telefonie przepadają. Odinstaluj ją przed instalacją przez Obtainium, a potem pozostań przy Obtainium w aktualizacjach.
 
----
-
 ## Do jakich kanałów sięga Obtainium?
 
-Meshtastic dla Androida promuje kompilacje po drabince: `closed → open → production`. Każdy stopień odpowiada ścieżce Google Play, a wydanie na GitHubie jest publikowane (wychodzi z wersji roboczej), gdy kompilacja jest promowana do closed lub wyżej.
+Meshtastic dla Androida promuje kompilacje po drabince: `internal → closed → open → production`. Każdy stopień odpowiada ścieżce Google Play. Wydanie na GitHubie dla kompilacji internal jest wersją roboczą (draft), której Obtainium nie widzi; jest publikowane, gdy kompilacja jest promowana do closed lub wyżej.
 
 | Kanał | Ścieżka Play | Na GitHubie | Czy Obtainium może to zainstalować? |
 |---|---|---|---|
@@ -32,15 +30,13 @@ Meshtastic dla Androida promuje kompilacje po drabince: `closed → open → pro
 | **closed** beta | Alpha (Closed) | opublikowane wydanie wstępne, tag `vX.Y.Z-closed.N` | ✅ Tak |
 | **snapshot** | — (nie ma na Play) | ciągle aktualizowane wydanie wstępne, tag `snapshot` | ✅ Tak |
 
-Każda promocja tworzy **własny** tag, a starsze pozostają opublikowane — w trakcie cyklu wersji gromadzi się cała seria tagów `vX.Y.Z-open.N`, każdy nadal możliwy do zainstalowania z dołączonymi APK. Kanał zbiera więc wydania, a nie przesuwa jednego naprzód, i konfiguracje kanałów w [Konfiguracji jednym dotknięciem](#one-tap-setup) wybierają **najnowsze** wydanie, którego tytuł pasuje do kanału.
+Każda promocja przenosi wydanie kompilacji na GitHubie na **nowy** tag dla jej kanału (`vX.Y.Z-closed.N`, potem `vX.Y.Z-open.N`, potem `vX.Y.Z`) i zmienia jego tytuł, aby pasował. Kompilacja, która nie jest promowana dalej, zachowuje swoje wydanie, więc w trakcie cyklu wersji kanał może zawierać kilka wydań, a konfiguracje kanałów w [Konfiguracji jednym dotknięciem](#one-tap-setup) wybierają **najnowsze** wydanie, którego tytuł pasuje do kanału. Gdy wydanie produkcyjne trafi do użytkowników, a jego dokumentacja zostanie opublikowana, `post-release-cleanup.yml` usuwa każde wydanie i tag internal, closed i open o tej wersji lub niższej.
 
-Do którego wydania każdy kanał aktualnie się rozwiązuje, celowo **nie** jest tu wymienione: jest archiwizowane dla każdego tagu wydania i dołączane do aplikacji, więc numer wersji na żywo byłby tu zamrożony w chwili budowania i błędny w ciągu tygodni. [README projektu](https://github.com/meshtastic/Meshtastic-Android#get-meshtastic) zawiera aktualny stan, odświeżany automatycznie.
+Do którego wydania rozwiązuje się każdy kanał, celowo **nie** jest tu wymienione: jest archiwizowane dla każdego tagu wydania i dołączane do aplikacji, więc numer wersji na żywo byłby tu zamrożony w chwili budowania i błędny w ciągu tygodni. [README projektu](https://github.com/meshtastic/Meshtastic-Android#get-meshtastic) zawiera aktualny stan, odświeżany automatycznie.
 
-Kanał może być zasadnie pusty — najczęściej `-closed`, na początku cyklu, zanim zostanie do niego wycięta jakakolwiek kompilacja. Liczba opublikowanych podziałów ABI `fdroid` zmieniała się między wydaniami, dlatego filtr dopasowuje każdy podział.
+Kanał może być zasadnie pusty: `-open` i `-closed` są puste między wydaniem produkcyjnym a następną promocją, a `-closed` bywa pusty często na początku cyklu, zanim zostanie do niego wycięta jakakolwiek kompilacja. Liczba opublikowanych podziałów ABI `fdroid` zmieniała się między wydaniami, dlatego filtr dopasowuje każdy podział.
 
 **Snapshot** jest inny: to zautomatyzowana kompilacja debug najnowszego commita na `main`, przebudowywana i ponownie publikowana pod jednym ruchomym tagiem `snapshot` przy każdym pushu. Nigdy nie trafia do Play. Ponieważ kompilacje debug używają sufiksu identyfikatora aplikacji `.debug` (`com.geeksville.mesh.fdroid.debug` / `com.geeksville.mesh.google.debug`) i klucza podpisu debug, snapshot instaluje się jako **własna, osobna aplikacja** — działa obok instalacji Play/stable/beta, więc ostrzeżenie o konieczności wcześniejszego odinstalowania z początku tej strony **nie** dotyczy go.
-
----
 
 ## Konfiguracja jednym dotknięciem
 
@@ -77,8 +73,6 @@ Co najwyżej jeden wpis wydaniowy plus dwa wpisy snapshot. Dotknięcie drugiego 
 
 Aby skonfigurować wszystko ręcznie, postępuj zgodnie z resztą tej strony.
 
----
-
 ## Konfiguracja ręczna
 
 1. Zainstaluj Obtainium ([wydania na GitHubie](https://github.com/ImranR98/Obtainium/releases) lub [F-Droid / IzzyOnDroid](https://apt.izzysoft.de/fdroid/index/apk/dev.imranr.obtainium)).
@@ -111,7 +105,7 @@ Aby skonfigurować wszystko ręcznie, postępuj zgodnie z resztą tej strony.
 - **Filter release titles by regular expression:** `-(closed|open)`
 - **Filter APKs by regular expression:** zobacz [Wybór APK](#picking-the-apk)
 
-Obtainium instaluje najnowsze wypromowane wydanie wstępne — cokolwiek jest aktualnie w open lub closed. Filtr tytułów jest wymagany, aby pominąć zawsze nowsze wydanie wstępne `snapshot`; bez niego Obtainium podążałoby za snapshotem.
+Obtainium instaluje najnowsze wypromowane wydanie wstępne, niezależnie od tego, czy jest to open, czy closed. Filtr tytułów jest wymagany, aby pominąć zawsze nowsze wydanie wstępne `snapshot`; bez niego Obtainium podążałoby za snapshotem.
 
 ### Snapshot (najnowszy commit na `main`)
 
@@ -131,20 +125,18 @@ APK nazywają się `…-debug-<versionCode>.apk` (nie `-release.apk`), więc uż
 | wariant `fdroid`, większość telefonów (arm64) | `fdroid-arm64-v8a-debug-\d+\.apk` |
 | wariant `fdroid`, uniwersalny | `fdroid-universal-debug-\d+\.apk` |
 
-Wydania snapshot dołączają tylko APK debug — bez `.aab` ani instalatorów desktopowych.
+Wydania snapshot dołączają APK debug oraz, dla każdej platformy, której kompilacja się udała, niepodpisane instalatory desktopowe z tego samego commita, każdy oznaczony versionCode. Nie ma `.aab`.
 
-> ℹ️ **Uwaga:** Lokalne kompilacje debug i snapshoty z CI są ze sobą zgodne przy aktualizacji: repozytorium zawiera wspólny
-> keystore debug (`config/debug.keystore`), którym podpisują się oba, więc Obtainium może aktualizować na wierzchu twojej własnej
-> instalacji debug. `INSTALL_FAILED_UPDATE_INCOMPATIBLE` oznacza, że zainstalowana kompilacja powstała przed wspólnym keystore
-> (lub została podpisana domyślnym kluczem innej maszyny) — odinstaluj tę jedną kompilację i zainstaluj ponownie.
+Lokalne kompilacje debug i snapshoty z CI są ze sobą zgodne przy aktualizacji: repozytorium zawiera wspólny
+keystore debug (`config/debug.keystore`), którym podpisują się oba, więc Obtainium może aktualizować na wierzchu twojej własnej
+instalacji debug. `INSTALL_FAILED_UPDATE_INCOMPATIBLE` oznacza, że zainstalowana kompilacja powstała przed wspólnym keystore
+(lub została podpisana domyślnym kluczem innej maszyny) — odinstaluj tę jedną kompilację i zainstaluj ponownie.
 
 Jeszcze dwie rzeczy dotyczące wyboru wydania odnoszą się do każdego opisanego wcześniej kanału, nie tylko do snapshot:
 
-> **Zostaw "Fallback to older releases" WŁĄCZONE.** To nie jest ustawienie ścisłości kanału, a jego wyłączenie psuje każdą konfigurację z tej strony. Pętla wydań Obtainium przerywa po pierwszym kandydacie, gdy fallback jest wyłączony, więc filtr tytułów nigdy nie ma szansy pominąć niepasujących wydań. Konfiguracja przypięta do `-open` lub `^Snapshot` kończy się wtedy błędem "Could not find a suitable release", gdy na czele listy leży nowsze wydanie produkcyjne. To filtr tytułów przypina kanał; fallback pozwala Obtainium zejść w dół do najnowszego wydania, które do niego pasuje.
->
-> ℹ️ **Uwaga:** Jeśli filtr kanału nadal nic nie znajduje, ten kanał nie ma opublikowanego wydania — częste na początku cyklu wersji. Sprawdź [README projektu](https://github.com/meshtastic/Meshtastic-Android#get-meshtastic), co jest aktualnie dostępne, lub użyj formy *Najnowsze*, aby śledzić to z open/closed, co jest nowsze.
+> ⚠️ **Ważne:** Zostaw **Fallback to older releases** włączone. To nie jest ustawienie ścisłości kanału, a jego wyłączenie psuje konfiguracje beta i snapshot. Pętla wydań Obtainium przerywa po pierwszym kandydacie, gdy fallback jest wyłączony, więc filtr tytułów nigdy nie ma szansy pominąć niepasujących wydań. Konfiguracja przypięta do `-open` lub `^Snapshot` kończy się wtedy błędem "Could not find a suitable release", gdy na czele listy leży nowsze wydanie produkcyjne. To filtr tytułów przypina kanał; fallback pozwala Obtainium zejść w dół do najnowszego wydania, które do niego pasuje.
 
----
+Jeśli filtr kanału nadal nic nie znajduje, ten kanał nie ma opublikowanego wydania, co jest częste na początku cyklu wersji oraz między wydaniem produkcyjnym a następną promocją. Sprawdź [README projektu](https://github.com/meshtastic/Meshtastic-Android#get-meshtastic), co jest aktualnie dostępne, lub użyj formy *Najnowsze*, aby śledzić to z open/closed, co jest nowsze.
 
 ## Wybór APK
 
@@ -157,9 +149,7 @@ Każde wydanie dołącza APK wariantu `google`, kilka APK wariantu `fdroid`, plu
 | wariant `fdroid`, uniwersalny | `fdroid-universal-release\.apk` |
 | wariant `fdroid`, Obtainium wybiera ABI | `fdroid-.*-release\.apk` z włączonym **Auto-select by architecture** |
 
-**Podczas testów używaj wariantu `google`.** Zawiera Firebase Crashlytics i Datadog RUM, więc awarie i błędy, na które trafisz, są raportowane do zespołu — a to jest cały sens fazy testów. Ma też Google push (FCM) i Google Maps. Wariant `fdroid` wybierz tylko wtedy, gdy wolisz nie wysyłać tej telemetrii. Możesz później zmienić zdanie: oba warianty mają ten sam klucz wydaniowy, więc Obtainium aktualizuje przez granicę wariantów bez odinstalowywania. Spodziewaj się, że wariant `google` przy pierwszym uruchomieniu pokaże ekran zgody na analitykę.
-
----
+**Podczas testów używaj wariantu `google`.** Zawiera Firebase Crashlytics i Datadog RUM, więc awarie i błędy, na które trafisz, są raportowane do zespołu — a to jest cały sens fazy testów. Ma też Google Maps. Wariant `fdroid` wybierz tylko wtedy, gdy wolisz nie wysyłać tej telemetrii. Możesz później zmienić zdanie: oba warianty mają ten sam klucz wydaniowy, więc Obtainium aktualizuje przez granicę wariantów bez odinstalowywania. Spodziewaj się, że wariant `google` przy pierwszym uruchomieniu pokaże ekran zgody na analitykę.
 
 ## Wykrywanie wersji wyłącza się samo — to oczekiwane
 
@@ -170,8 +160,6 @@ Tagi wydań mają postać `vX.Y.Z`, natomiast nasz zainstalowany `versionName` m
 W szczególności **nie ustawiaj "Trim the version string"** na `\d+\.\d+\.\d+` w nadziei, że to naprawi. To ustawienie przepisuje tylko wersję parsowaną z *wydania*; nieparsowalna strona to zainstalowany `versionName`, którego nigdy nie dotyka — więc uzgadnianie zawodzi dokładnie jak wcześniej. Dodaje też nowy sposób awarii: jeśli regex kiedykolwiek nic nie dopasuje (tag bez trzyczęściowej wersji), sprawdzanie aktualizacji kończy się wprost błędem "no version found" zamiast cicho się degradować.
 
 Snapshot to osobny przypadek: jego tag to dosłowny ciąg `snapshot` i nigdy się nie zmienia, więc porównywanie tagów też nie może działać. Te konfiguracje używają zamiast tego pseudo-wersjonowania opartego na dacie (**Release date as version** plus **Use the latest asset date as the release date**).
-
----
 
 ## Format konfiguracji
 
@@ -188,8 +176,6 @@ Ten sam obiekt występuje w trzech kształtach:
 `obtainium://add/<url>` tylko wstępnie wypełnia stronę Add-App; `obtainium://app/…` jest tym, co niesie ustawienia. Opakowanie linku jako `https://apps.obtainium.imranr.dev/redirect.html?r=obtainium://app/…` utrzymuje go klikalnym tam, gdzie niestandardowy schemat nie zostałby zamieniony na link.
 
 Obtainium identyfikuje aplikacje po nazwie pakietu, więc dwa warianty stable nie mogą współistnieć jako osobne wpisy — zgłoszenie do witryny konfiguracji wyraża je jako alternatywne `configs`, każdy z `altLabel`. Pełny opis kluczy i listę kontrolną zgłoszenia znajdziesz w [`obtainium/README.md`](https://github.com/meshtastic/Meshtastic-Android/blob/main/obtainium/README.md).
-
----
 
 ## Uwagi
 

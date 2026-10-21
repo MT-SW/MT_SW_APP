@@ -2,7 +2,7 @@
 title: Odkrywanie lokalnej sieci mesh
 parent: Przewodnik użytkownika
 nav_order: 12
-last_updated: 2026-10-12
+last_updated: 2026-10-21
 description: Poznaj swoją sieć mesh — skaner Odkrywania lokalnej sieci mesh, trasy traceroute, mapy sąsiadów i narzędzia do odkrywania węzłów.
 aliases:
   - discovery
@@ -29,9 +29,9 @@ Odkrywanie lokalnej sieci mesh to dedykowany tryb skanowania, który pomaga znal
 
 Podłącz węzeł, a następnie otwórz **Ustawienia → Zaawansowane → Odkrywanie lokalnej sieci mesh**. W Androidzie sekcja **Zaawansowane** pojawia się tylko dla lokalnie połączonego węzła, nigdy przez zdalne zarządzanie, i pozostaje wyszarzona, dopóki aplikacja nie skończy odczytywać konfiguracji węzła. Na urządzeniu zarządzanym jej pozycje są wyłączone, z wyjątkiem **Panelu debugowania**, który czyta lokalne dzienniki aplikacji i pozostaje dostępny. Na komputerze Odkrywanie lokalnej sieci mesh ma własną pozycję na ekranie Ustawień, bez takiego ograniczenia.
 
-> ℹ️ **Uwaga:** Odkrywanie tymczasowo zmienia ustawienia LoRa Twojego węzła na czas skanowania, a po zakończeniu przywraca Twoją oryginalną konfigurację.
+Odkrywanie zmienia ustawienia LoRa Twojego węzła na czas skanowania, a po zakończeniu przywraca Twoją oryginalną konfigurację.
 
-Każdy preset jest skanowany w sieci publicznej: domyślny slot częstotliwości dla tego presetu, dekodowany domyślnym kanałem publicznym. Jeśli Twój węzeł używa własnego slotu częstotliwości, skan używa slotu domyślnego i przywraca Twój slot po zakończeniu. Jeśli Twój kanał główny ma własną nazwę lub klucz, skan przełącza go na domyślny kanał publiczny przed pierwszą zmianą presetu i przywraca Twój kanał po zakończeniu skanu — niezależnie od tego, czy skan się zakończy, zatrzymasz go, czy się nie powiedzie. Zmiany kanału nie restartują węzła, więc dzieje się to od razu na początku i na końcu skanu. Nie musisz już ustawiać na kanale głównym domyślnego klucza przed skanowaniem.
+Każdy preset jest skanowany w sieci publicznej: domyślny slot częstotliwości dla tego presetu, dekodowany domyślnym kanałem publicznym. Jeśli Twój węzeł używa własnego slotu częstotliwości, skan używa slotu domyślnego i przywraca Twój slot po zakończeniu. Jeśli Twój kanał główny ma własną nazwę lub klucz, skan przełącza go na domyślny kanał publiczny przed pierwszą zmianą presetu i przywraca Twój kanał po zakończeniu skanu — niezależnie od tego, czy skan się zakończy, zatrzymasz go, czy się nie powiedzie. Zmiany kanału nie restartują węzła, więc dzieje się to od razu na początku i na końcu skanu.
 
 ### Przygotowanie skanu
 
@@ -39,7 +39,7 @@ Przed rozpoczęciem skonfiguruj te elementy:
 
 | Element | Opis |
 |---------|-------------|
-| **Wybór presetów LoRa** | Wybierz jeden lub więcej presetów do przeskanowania. Odkrywanie zatrzymuje się po kolei na każdym wybranym presecie. |
+| **Presety LoRa** | Wybierz jeden lub więcej presetów do przeskanowania. Odkrywanie zatrzymuje się po kolei na każdym wybranym presecie. |
 | **Czas nasłuchu** | Czas nasłuchu na każdym presecie. Wybierz spośród 1, 5, 15, 30, 45, 60, 90, 120 lub 180 minut. Dłuższy czas nasłuchu zbiera więcej pakietów i daje wyraźniejszy obraz, ale trwa dłużej. |
 | **Nie wygaszaj ekranu** | Utrzymuje włączony wyświetlacz podczas skanu. Sam skan trzyma blokadę wybudzenia procesora przez cały czas działania i publikuje powiadomienie **Skanowanie presetów LoRa…**, więc zbiera dane dalej przy wyłączonym ekranie lub aplikacji w tle. |
 
@@ -90,7 +90,7 @@ Dodatkowe funkcje dostępne z poziomu wyników:
 - **Mapa odkrywania** — mapa węzłów znalezionych podczas skanu.
 - **Eksport raportu** — wyeksportuj raport jako PDF w Androidzie lub jako tekst na innych platformach.
 
-> 💡 **Wskazówka:** W wersjach z **Google Play** Odkrywanie może wygenerować podsumowanie wyników przez AI na urządzeniu (Gemini Nano). Wersje z F-Droid zawsze używają podsumowania algorytmicznego — zastrzeżona zależność ML Kit jest z tej wersji celowo wyłączona — więc w obu przypadkach dostajesz czytelną interpretację skanu.
+W wersjach z **Google Play** Odkrywanie może wygenerować podsumowanie wyników przez AI na urządzeniu (Gemini Nano). Wersje z F-Droid zawsze używają podsumowania algorytmicznego, bo ta wersja nie zawiera zastrzeżonego składnika ML Kit, więc każda wersja daje czytelną interpretację skanu.
 
 ## Meshbeacon
 
@@ -99,7 +99,7 @@ Meshbeacon pozwala węzłom zapraszać innych do dołączenia do ich sieci mesh.
 Skonfiguruj go w **Ustawienia → Ustawienia modułu → Meshbeacon**. Pozycja pojawia się tylko na węzłach z firmware 2.8.0 lub nowszym. Wiersz **Region** tylko do odczytu na górze ekranu pokazuje region ogłaszany przez beacon: ten region i preset są zawsze tymi, których używa sam węzeł, więc beacon nie może zapraszać nikogo do ustawień, na których Twój węzeł nie działa.
 
 - **Nasłuchuj pakietów meshbeacon** — odbieraj zaproszenia rozgłaszane przez inne węzły.
-- **Nadawaj pakiety meshbeacon** — okresowo ogłaszaj tę sieć mesh pobliskim węzłom, z opcjonalną **Wiadomością meshbeacon** do 100 bajtów, **Interwałem nadawania** wybieranym ze stałych interwałów od 1 godziny do 72 godzin oraz **Oferowanym kanałem** wybranym spośród kanałów Twojego węzła. Oferowany kanał jest wymagany i domyślnie jest nim Twój kanał główny. Przez zdalne zarządzanie selektor oferuje tylko kanał główny.
+- **Nadawaj pakiety meshbeacon** — okresowo ogłaszaj tę sieć mesh pobliskim węzłom, z opcjonalną **Wiadomością** do 60 bajtów, **Interwałem nadawania** wybieranym ze stałych interwałów od 1 godziny do 72 godzin oraz **Oferowanym kanałem** wybranym spośród kanałów Twojego węzła. Oferowany kanał jest wymagany i domyślnie jest nim Twój kanał główny. Przez zdalne zarządzanie selektor oferuje tylko kanał główny.
 - **Cele nadawania** — gdzie beacon faktycznie nadaje. Lista zawsze zawiera co najmniej jeden wiersz: pierwszy to własna transmisja beacona, a nie dodatkowa. Każdy wiersz wybiera **Kanał** i **Preset nadawania**. **Dodaj cel** dopisuje wiersz, a **Usuń cel** usuwa jeden — usunięcie ostatniego wiersza zastępuje go nowym domyślnym zamiast opróżniać listę.
 
 Dwa warunki blokują konfigurację beacona:
@@ -123,7 +123,7 @@ Poniższe narzędzia są dostępne w dowolnej chwili z listy węzłów i ekranó
 
 ### Traceroute
 
-Traceroute pokazuje dokładną ścieżkę, jaką wiadomość pokonuje od Twojego węzła do dowolnego innego węzła w sieci mesh. To najprzydatniejsze narzędzie do diagnozowania problemów z łącznością.
+Traceroute pokazuje dokładną ścieżkę, jaką wiadomość pokonuje od Twojego węzła do dowolnego innego węzła w sieci mesh. Dlatego to pierwsze narzędzie, po które warto sięgnąć przy problemach z łącznością.
 
 #### Uruchamianie traceroute
 
@@ -151,9 +151,9 @@ Każdy wiersz `⇊` między dwoma węzłami to jeden skok przez przekaźnik, a S
 | Wszystkie skoki mają dobry SNR (zielony) | Zdrowa ścieżka — wiadomości płyną niezawodnie |
 | Jeden skok ma słaby SNR (pomarańczowy lub czerwony) | Słabe łącze — ten odcinek przez przekaźnik jest wrażliwy |
 | Wiele skoków (4+) | Długa ścieżka — rozważ przestawienie węzła, aby ją skrócić |
-| Inna ścieżka przy ponownej próbie | Sieć mesh dostosowuje się — istnieje wiele tras (to dobrze!) |
+| Inna ścieżka przy ponownej próbie | Sieć mesh dostosowuje się — istnieje wiele tras (to znak, że są trasy zapasowe) |
 
-> 💡 **Wskazówka:** Uruchom traceroute kilka razy w ciągu kilku minut. Jeśli ścieżka się zmienia, Twoja sieć mesh ma nadmiarowe trasy — to znak dobrze połączonej sieci.
+Uruchom traceroute kilka razy w ciągu kilku minut, czekając 30 sekund przerwy między żądaniami. Jeśli ścieżka się zmienia, Twoja sieć mesh ma nadmiarowe trasy — to znak dobrze połączonej sieci. Przekaźnik, który nie zapisał się w trasie, jest pokazany jako **Nieznany skok**.
 
 #### Rozwiązywanie problemów za pomocą traceroute
 
@@ -177,7 +177,7 @@ Po włączeniu i nadawaniu przez LoRa Twój węzeł okresowo rozgłasza listę s
 
 #### Przeglądanie danych o sąsiadach
 
-- Otwórz ekran szczegółów węzła i znajdź **Informacje o sąsiadach** w sekcji **Telemetria**. Przycisk żądania prosi węzeł o jego bieżącą listę sąsiadów; gdy aplikacja ją otrzyma, drugi przycisk w tym samym wierszu otwiera dziennik wszystkiego, co ten węzeł zgłosił. Wiersz pojawia się tylko na węzłach, które mogą odpowiedzieć na żądanie o sąsiadów albo które już zgłosiły sąsiadów.
+- Otwórz ekran szczegółów węzła i znajdź **Informacje o sąsiadach** w sekcji **Telemetria**. Wiersz pojawia się, gdy aplikacja odbierze listę sąsiadów tego węzła. Jego przycisk dziennika otwiera wszystko, co ten węzeł zgłosił, a przycisk żądania prosi węzeł o nową listę.
 - Każdy wpis sąsiada pokazuje węzeł, który został usłyszany bezpośrednio, i jakość jego sygnału.
 - Połącz dane o sąsiadach z wielu węzłów, aby zrozumieć pełną topologię sieci mesh.
 
@@ -185,7 +185,7 @@ Po włączeniu i nadawaniu przez LoRa Twój węzeł okresowo rozgłasza listę s
 
 ### Lista węzłów jako narzędzie odkrywania
 
-Sama lista węzłów jest potężnym narzędziem odkrywania, gdy skutecznie używasz jej filtrowania i sortowania.
+Filtrowanie i sortowanie sprawiają, że sama lista węzłów jest osobnym narzędziem odkrywania.
 
 #### Znajdowanie nowych węzłów
 
@@ -208,7 +208,7 @@ Pełne informacje o opcjach filtrowania i sortowania znajdziesz w [Węzły](node
 ## Wskazówki do badania sieci mesh
 
 - **Zacznij od traceroute** — daje natychmiastowe, praktyczne informacje o konkretnej ścieżce.
-- **Włącz Informacje o sąsiadach na kluczowych węzłach** — zwłaszcza routerach i repeaterach, aby zbudować obraz szkieletu sieci.
+- **Włącz Informacje o sąsiadach na kluczowych węzłach** — zwłaszcza routerach, aby zbudować obraz szkieletu sieci.
 - **Sprawdź mapę** — pozycje węzłów na [Mapie](map-and-waypoints) w połączeniu z danymi o sygnale pomagają zrozumieć, dlaczego niektóre łącza są silne, a inne słabe.
 - **Porównuj sygnał w czasie** — użyj przewodnika [Miernik sygnału](signal-meter), aby poprawnie interpretować wartości SNR i RSSI.
 

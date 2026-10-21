@@ -2,7 +2,7 @@
 title: Styl dokumentacji
 parent: Przewodnik dewelopera
 nav_order: 11
-last_updated: 2026-09-14
+last_updated: 2026-10-21
 description: Jak działa dokumentacja tego repozytorium oraz jedna zasada prozy, którą standardy projektowe Meshtastic pozostawiają nam.
 aliases:
   - style
@@ -17,7 +17,7 @@ Sekcja 11 [Meshtastic Client Design Standards](https://github.com/meshtastic/des
 
 Ta strona zawiera to, czego Sekcja 11 nie obejmuje: jak dokumentacja działa w tym repozytorium, dwie formy, które tu się różnią, oraz jedną zasadę prozy, którą standardy pozostawiają otwartą. Gdy obie kiedykolwiek się rozchodzą w sprawie, która tu nie jest wymieniona, wygrywa Sekcja 11, a ta strona jest błędna.
 
-Strony w `docs/en/` trafiają w trzy miejsca — do przeglądarki dokumentacji w aplikacji, na witrynę GitHub Pages i na meshtastic.org — więc jedna strona musi dobrze się czytać we wszystkich, a jej angielski źródłowy tekst jest bazą tłumaczeń na ponad 40 języków w Crowdin. Sekcja 11.1 opisuje synchronizację: strony użytkownika trafiają co tydzień do `docs/software/android/` w witrynie dokumentacji, pobrane z najnowszego wydania, a pull requesty do tych ścieżek tam są wycofywane.
+Strony w `docs/en/` trafiają w trzy miejsca — do przeglądarki dokumentacji w aplikacji, na witrynę GitHub Pages i na meshtastic.org — więc jedna strona musi dobrze się czytać we wszystkich, a jej angielski źródłowy tekst jest bazą tłumaczeń na ponad 40 języków w Crowdin. Sekcja 11.1 opisuje synchronizację: strony użytkownika i dewelopera trafiają co tydzień do `docs/software/android/` w witrynie dokumentacji, pobrane z najnowszego wydania. Strażnik CI w tamtym repozytorium odrzuca pull requesty, które dotykają tych ścieżek, a następna synchronizacja wycofuje każdą zmianę, która mimo to przejdzie.
 
 Reguły zachowują dotychczasowe identyfikatory, aby uwagi z recenzji i ustalenia audytów nadal mogły się do nich odwoływać. Reguły, które Sekcja 11 obejmuje teraz, są wycofane, a ich identyfikatory nie są używane ponownie.
 
@@ -26,13 +26,13 @@ Reguły zachowują dotychczasowe identyfikatory, aby uwagi z recenzji i ustaleni
 Dwie reguły zmieniły się, gdy pojawiła się Sekcja 11. Żadna nie wymaga masowej zmiany.
 
 - **Nagłówki piszemy z wielkiej litery tylko na początku (sentence case)** (11.5, i szybka kontrola w 11.16). Istniejące nagłówki w Title Case zostają, dopóki strona nie będzie edytowana z innego powodu. Zmiana wielkości liter w nagłówku unieważnia pamięć tłumaczeń w ponad 40 językach, więc dzieje się to przy okazji edycji stron, a nigdy jako osobny przebieg. Wartości `title` we frontmatter to etykiety nawigacji współdzielone przez przeglądarkę w aplikacji i witrynę, więc zmieniają się razem z resztą nawigacji, a nie pojedynczo dla każdej strony.
-- **Sprzęt to węzeł** (11.4). To repozytorium używało słowa *radio*, aby odróżnić sprzęt od telefonu, i pozostało około 300 jego użyć. W nowych tekstach preferuj *węzeł* (node), a *radio* usuwaj przy edycji strony. *Telefon* (phone) nadal oznacza uchwyt z Androidem, na którym działa aplikacja, na co Sekcja 11 nie ma słowa.
+- **Sprzęt to węzeł** (11.4). To repozytorium używało słowa *radio*, aby odróżnić sprzęt od telefonu, i pozostało wiele jego użyć. W nowych tekstach preferuj *węzeł* (node), a *radio* usuwaj przy edycji strony. *Telefon* (phone) nadal oznacza uchwyt z Androidem, na którym działa aplikacja, na co Sekcja 11 nie ma słowa.
 
 ## Mechanika repozytorium
 
-- **STRUCT-1** — Kompletny frontmatter na każdej stronie, użytkownika *i* dewelopera: `title`, `parent`, `nav_order`, `last_updated` (aktualizuj przy każdej zmianie treści — CI sprawdza świeżość), `description` (jedno zdanie, ok. 160 znaków, używane przez wyszukiwanie i podglądy linków) oraz `aliases` (frazy wyszukiwania, które przeglądarka w aplikacji rozwiązuje).
+- **STRUCT-1** — Kompletny frontmatter na każdej stronie, użytkownika *i* dewelopera: `title`, `parent`, `nav_order`, `last_updated` (aktualizuj przy każdej zmianie treści; CI zgłasza stronę starszą niż 180 dni jako ostrzeżenie, które nigdy nie psuje budowania), `description` (jedno zdanie, ok. 160 znaków, używane przez wyszukiwanie i podglądy linków) oraz `aliases` (frazy wyszukiwania, które przeglądarka w aplikacji rozwiązuje).
 - **HEAD-2** — Jeden `#` H1 na stronę, dokładnie zgodny z `title` we frontmatter. Indeks w aplikacji jest budowany z frontmatter, więc niezgodność pokazuje czytelnikowi dwa różne tytuły jednej strony.
-- **STRUCT-3** — Strony użytkownika kończą się sekcją `## Related Topics`: lista linków, każdy z członem po półpauzie wyjaśniającym, po co tam przejść. Nagłówek jest stałą nazwą sekcji współdzieloną przez 22 strony, więc podobnie jak `title` we frontmatter pozostaje w Title Case, dopóki wszystkie nie zmienią się razem.
+- **STRUCT-3** — Strony użytkownika kończą się sekcją `## Related Topics`: lista linków, każdy z członem po półpauzie wyjaśniającym, po co tam przejść. Nagłówek jest stałą nazwą sekcji współdzieloną przez każdą stronę użytkownika, więc podobnie jak `title` we frontmatter pozostaje w Title Case, dopóki wszystkie nie zmienią się razem.
 - **STRUCT-4** — Żadnych poziomych linii (`---`) w treści stron, a zwłaszcza na końcu pliku — układ witryny dodaje własną linię stopki, więc końcowe `---` renderuje się jako podwójna linia.
 - **STRUCT-5** — Nowe strony muszą być zarejestrowane w `DocBundleLoader.kt` (indeks w aplikacji) — CI zawodzi w obu kierunkach, jeśli strona i indeks się nie zgadzają.
 - **STRUCT-6** — Istotne zmiany stron dostają wpis *What's New* na górze `user.md` lub `developer.md`, w formacie określonym przez komentarz HTML w tych plikach.

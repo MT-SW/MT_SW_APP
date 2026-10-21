@@ -2,7 +2,7 @@
 title: Testowanie
 parent: Przewodnik dewelopera
 nav_order: 7
-last_updated: 2026-09-29
+last_updated: 2026-10-21
 description: Strategia testowania projektu Meshtastic KMP — kategorie testów, potok zrzutów ekranu, profile bazowe i integracja z CI.
 aliases:
   - tests
@@ -70,7 +70,7 @@ Wykorzystują natywny framework testów zrzutów ekranu (layoutlib) z Android Gr
 ./gradlew :screenshot-tests:copyDocsScreenshots          # copy doc images from BOTH modules into docs/assets
 ```
 
-Renderowanie jest tu deterministyczne względem hosta (layoutlib): lokalne `update` tworzy wzorce identyczne bajt w bajt z tymi z CI, więc lokalnie nagrane wzorce przechodzą `validate`. W `docs/assets/screenshots/README.md` opisano, do którego modułu należy nowy zrzut ekranu.
+Renderowanie odbywa się na hoście przez layoutlib, więc wzorce nagrane lokalnie są tymi, względem których waliduje CI. `validate` dopuszcza próg różnicy obrazu 0.0005, ustawiony w `AndroidScreenshotConventionPlugin`, ponieważ porównanie co do piksela zawodzi dla niektórych wzorców. W `docs/assets/screenshots/README.md` opisano, do którego modułu należy nowy zrzut ekranu.
 
 #### Zrzuty ekranu do sklepów
 
@@ -106,11 +106,11 @@ Generator Macrobenchmark (`BaselineProfileGenerator`) oraz benchmark przed/po (`
 ./gradlew :baselineprofile:connectedGoogleBenchmarkReleaseAndroidTest  # Quantify the cold-start win
 ```
 
-Wygenerowany profil jest scalany do `androidApp/src/main/generated/baselineProfiles/` (`mergeIntoMain` w `androidApp/build.gradle.kts`), więc kompilacje wydaniowe fdroid i google pakują go przez `androidx.profileinstaller`.
+Wygenerowany profil jest scalany do `androidApp/src/main/generated/baselineProfiles/` (`mergeIntoMain` w `androidApp/build.gradle.kts`), więc kompilacje wydaniowe fdroid i google pakują go przez `androidx.profileinstaller`. `scheduled-baseline.yml` generuje go ponownie codziennie na emulatorze i otwiera pull request, gdy się zmieni.
 
-> ℹ️ **Uwaga:** Ścieżka obejmuje tylko zimny start (uruchomienie → pierwsza klatka), ponieważ CI nie ma sparowanego węzła. Ekrany po połączeniu (lista węzłów, mapa, wątek wiadomości) nie są jeszcze kompilowane AOT.
+> ℹ️ **Uwaga:** Ścieżka obejmuje tylko zimny start (uruchomienie → pierwsza klatka), ponieważ uprząż testowa nie łączy się z żadnym węzłem. Ekrany po połączeniu (lista węzłów, mapa, wątek wiadomości) nie są kompilowane AOT.
 
-Rozszerzenie ścieżki poza zimny start wymaga sztucznego transportu lub podłączonego węzła wpiętego w uprząż testową.
+Rozszerzenie ścieżki poza zimny start wymaga, aby uprząż testowa łączyła się z węzłem, tak jak `:store-screenshots` łączy się z siecią pokazową trybu demo.
 
 ## Organizacja testów
 
@@ -154,14 +154,17 @@ feature/my-feature/src/
 ./gradlew spotlessCheck detekt detektTypeResolved
 
 # Full verification
-./gradlew spotlessCheck detekt detektTypeResolved kmpSmokeCompile test allTests
+./gradlew spotlessCheck detekt detektTypeResolved assembleDebug kmpSmokeCompile test allTests
 ```
 
 ## Integracja z CI
 
 Testy uruchamiają się automatycznie przy:
-- Utworzeniu/aktualizacji pull requesta
-- Pushu do `main`
-- Walidacji przed wydaniem
+- Pull requestach, których zmiany pasują do filtra ścieżek `android` lub `desktop` (`pull-request.yml`)
+- Kolejce scalania (`merge-queue.yml`)
+- Pushach do `main` (`main-check.yml`)
+
+Każdy z nich wywołuje `reusable-check.yml`. Shardy testów kompilują się z `-PwarningsAsErrors=true`, więc
+ostrzeżenie Kotlina, które przechodzi w lokalnej kompilacji, psuje CI, jeśli nie podasz tej samej flagi.
 
 Zadania jednorunnerowe w `reusable-check.yml` działają na przypiętej etykiecie Ubuntu LTS x64 z JDK 25 i cache'owaniem Gradle. Dwa zadania używają macierzy: `test-shards` dzieli się na `shard-core`, `shard-feature` i `shard-app`, a `build-desktop` działa na macOS, Windows i Linux x64 oraz arm64, na etykietach wymienionych w jego własnej macierzy. Weryfikacja Flatpak to osobny workflow, nie zadanie tutaj. Przypięta etykieta arm Ubuntu LTS oraz runnery `ubuntu-slim` oparte na kontenerach obsługują lekkie zadania. Reguła czterech poziomów jest w `.skills/testing-ci/SKILL.md`.

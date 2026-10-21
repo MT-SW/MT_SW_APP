@@ -2,7 +2,7 @@
 title: Dzienniki debugowania
 parent: Przewodnik użytkownika
 nav_order: 22
-last_updated: 2026-09-28
+last_updated: 2026-10-21
 description: Przeglądaj i eksportuj własne dzienniki debugowania aplikacji z wnętrza aplikacji oraz dołącz zrzut do zgłoszenia na GitHubie, aby pomóc w diagnozie błędów — bez adb.
 aliases:
   - debug-logs
@@ -23,11 +23,20 @@ Jeśli zgłaszasz problem, wyeksportuj dzienniki (zobacz [Eksportowanie](#export
 
 Panel debugowania ma trzy zakładki (trzecia, **Logi urządzenia**, to dodatek MT_SW):
 
-- **Pakiety** — zdekodowany ruch sieci mesh, który Twoje radio wysłało i odebrało (wiadomości na poziomie protokołu). Przydatne do diagnozowania zachowania sieci mesh i routingu.
+- **Pakiety** — zdekodowany ruch sieci mesh, który Twój węzeł wysłał i odebrał (wiadomości na poziomie protokołu). Przydatne do diagnozowania zachowania sieci mesh i routingu.
 - **Dzienniki aplikacji** — własny dziennik diagnostyczny aplikacji (Android *logcat*), w tym ostrzeżenia, błędy i ślady stosu z samej aplikacji. Zwykle to właśnie tego potrzebuje zgłoszenie błędu.
 - **Logi urządzenia** — logi wysyłane na żywo przez samo radio (te same, co na jego porcie szeregowym), z wyszukiwaniem, kolorami poziomów i eksportem. Najpierw włącz „Logi debugowania” w ustawieniach zabezpieczeń urządzenia. Przez Bluetooth działa z każdym firmware, a przez Wi-Fi i USB tylko z firmware MT_SW.
 
 Każda zakładka ma własny przycisk **eksportu** i tworzy własny plik, więc możesz zabrać ten, który jest istotny — albo oba.
+
+## Przeglądanie pakietów
+
+Zakładka **Pakiety** pokazuje listę zapisanych pakietów; dotknij jednego, aby go rozwinąć — razem ze zdekodowaną zawartością, jeśli jest.
+
+- **Szukaj** — wpisz tekst w polu **Szukaj w logach…**, aby podświetlić trafienia, i przechodź między nimi strzałkami.
+- **Filtry** — dodaj własne filtry tekstowe albo wybierz z **Gotowych filtrów**: identyfikator Twojego węzła, adres rozgłoszeniowy `!ffffffff`, `decoded`, dzisiejsza data i nazwa każdego portu. Przełącznik dopasowania wybiera, czy pakiet ma pasować do dowolnego filtra, czy do wszystkich naraz.
+- **Ustawienia** — ikona koła zębatego pokazuje **Zapisuj logi sieci mesh**, który włącza lub wyłącza zapisywanie pakietów do dziennika, oraz **Czas przechowywania logów**, od jednej godziny do roku, albo **Nigdy nie usuwaj logów**.
+- **Wyczyść logi** — ikona kosza usuwa wszystkie zapisane pakiety, po Twoim potwierdzeniu.
 
 ## Przeglądanie dzienników aplikacji
 
@@ -54,4 +63,4 @@ Aplikacja na komputer nie ma systemowego logcata, więc zakładka **Dzienniki ap
 ## Powiązane tematy
 
 - [Pomoc i dokumentacja w aplikacji](help-and-docs) — czytanie tej dokumentacji offline w aplikacji
-- [Połączenia](connections) — jeśli problem polega na samym połączeniu się z radiem
+- [Połączenia](connections) — jeśli problem polega na samym połączeniu się z węzłem

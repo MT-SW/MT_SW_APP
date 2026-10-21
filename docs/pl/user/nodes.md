@@ -56,7 +56,7 @@ Sposób pokazywania: **Strony** (jedna strona naraz; strony zmieniają się same
 
 Nie ma osobnego poziomu „nieobecny”, ale pomarańczowy stan niedostępności ma pierwszeństwo przed
 zielonym: węzeł może być online i mimo to niedostępny przy Twoich obecnych ustawieniach. Węzły znane
-wyłącznie przez MQTT nigdy nie są pokazywane jako niedostępne.
+wyłącznie przez MQTT nigdy nie są pokazywane jako niedostępne. Pomarańczowy stan wymaga, aby Twój węzeł miał firmware 2.8.1 lub nowsze, czyli pierwsze wydanie, które zgłasza, jakie węzły usłyszał przy swoich obecnych ustawieniach LoRa.
 
 ### Kolory baterii na liście
 
@@ -136,9 +136,9 @@ Każdy węzeł ma jedną ikonę bezpieczeństwa obok nazwy na liście węzłów.
 |------|---------|-----------|
 | Osoba z tarczą z ptaszkiem (zielona) | **Zweryfikowany kontakt** — zweryfikowałeś klucz tego węzła osobiście, wymieniając się kodami QR kontaktu, więc jego tożsamość jest potwierdzona. Najsilniejsze zaufanie, jakie pokazuje lista. Twój własny podłączony węzeł też ją ma | Dowolna wersja firmware |
 | Ikona węzłów z tarczą z ptaszkiem (zielona) | **Podpisany węzeł** — ten węzeł podpisuje swoje transmisje kluczem tożsamości, więc jego tożsamość jest spójna w czasie, ale nie zweryfikowałeś go osobiście. W firmware 2.8 ikona pojawia się już na podstawie samej wersji, zanim usłyszysz jakąkolwiek podpisaną transmisję | Firmware 2.8 lub nowsze oraz każdy węzeł, którego podpisaną transmisję Twój węzeł zweryfikował |
-| 🔒 Zamknięta kłódka | Klucz publiczny jest zapisany i zgadza się, więc wiadomości bezpośrednie do tego węzła są szyfrowane | Firmware starsze niż 2.8 lub brak zgłoszonej wersji |
-| 🔓 Otwarta kłódka | Nie otrzymano klucza publicznego tego węzła, więc nie można wysyłać mu wiadomości bezpośrednich — użyj **Poproś o informacje użytkownika** na stronie szczegółów węzła, aby o niego poprosić | Firmware starsze niż 2.8 lub brak zgłoszonej wersji |
-| ⚠️ Niezgodność | **Niezgodność klucza publicznego** — po zapisaniu klucza dla tego węzła nadszedł inny klucz. Zbadaj sprawę, zanim zaufasz | Dowolna wersja firmware |
+| 🔒 Zamknięta kłódka (zielona) | **Szyfrowanie kluczem publicznym**: klucz publiczny jest zapisany i zgadza się, więc wiadomości bezpośrednie do tego węzła są szyfrowane | Firmware starsze niż 2.8 lub brak zgłoszonej wersji |
+| 🔓 Otwarta kłódka (żółta) | **Brak klucza publicznego**: nie otrzymano klucza publicznego tego węzła, więc nie można wysyłać mu wiadomości bezpośrednich. Użyj **Poproś o informacje użytkownika** na stronie szczegółów węzła, aby o niego poprosić | Firmware starsze niż 2.8 lub brak zgłoszonej wersji |
+| Przekreślony klucz (czerwony) | **Niezgodność klucza publicznego** — po zapisaniu klucza dla tego węzła nadszedł inny klucz. Zbadaj sprawę, zanim zaufasz | Dowolna wersja firmware |
 
 Każdy węzeł z firmware 2.8 lub nowszym podpisuje swoje transmisje, więc w tym firmware stan podpisany jest stanem podstawowym, a kłódki nie są pokazywane.
 
@@ -151,19 +151,21 @@ Niezgodność nigdy nie zastępuje klucza, który już masz. Aplikacja zachowuje
 Z listy węzłów możesz:
 - **Dotknąć** węzła, aby zobaczyć jego stronę szczegółów
 - **Dotknąć i przytrzymać**, aby wywołać szybkie akcje:
-  - Oznacz/usuń z ulubionych
-  - Wycisz/wyłącz wyciszenie powiadomień
-  - Wyślij wiadomość bezpośrednią
-  - Pokaż trasę
-  - Otwórz kompas (dla węzła z pozycją)
-  - Otwórz widok AR sieci (dla węzła z pozycją, na telefonie, który go obsługuje) — zobacz [widok AR sieci](map-and-waypoints#widok-ar-sieci)
-  - Zignoruj/przestań ignorować
-  - Usuń
+  - **Dodaj do ulubionych** lub **Usuń z ulubionych**
+  - **Wycisz powiadomienia** lub **Włącz powiadomienia**, pokazywane dopiero wtedy, gdy ten węzeł zgłosi firmware 2.7.18 lub nowsze
+  - **Wiadomość**, aby otworzyć wiadomość bezpośrednią
+  - **Śledzenie trasy**, wyłączone na 30 sekund po każdym żądaniu traceroute
+  - **Otwórz kompas** (dla węzła z pozycją)
+  - **Otwórz widok sieci** (dla węzła z pozycją, na telefonie, który go obsługuje) — zobacz [widok AR sieci](map-and-waypoints#widok-ar-sieci)
+  - **Ignoruj** lub **Usuń z ignorowanych**
+  - **Usuń**
+
+Gdy węzeł jest ignorowany, jego akcje ulubionych, wiadomości, śledzenia trasy i usuwania są wyłączone.
 
 Jeśli dotkniesz i przytrzymasz **własny węzeł**, dostaniesz jedną akcję, **Status aktualizacji**, która otwiera
 ekran ustawień Użytkownika z kursorem już w polu Status Message. Pojawia się tylko wtedy, gdy
-węzeł jest połączony i ma firmware 2.8 lub nowsze — samo pole opisano w
-[Ustawienia — Radio i użytkownik](settings-radio-user.md).
+węzeł jest połączony i ma firmware 2.7.20 lub nowsze z dołączonym modułem Status Message. Samo pole opisano w
+[Ustawienia — Radio i użytkownik](settings-radio-user).
 
 ## Udostępnianie kontaktu
 
@@ -177,18 +179,20 @@ Aby dodać cudzy kontakt, użyj przycisku importu na liście węzłów i wybierz
 
 ### Wyszukiwanie tekstowe
 
-Wpisz tekst w polu wyszukiwania, aby filtrować węzły według nazwy lub nazwy skróconej. Filtr aktualizuje się na bieżąco w trakcie pisania.
+Wpisz tekst w polu **Filtr**, aby filtrować węzły według nazwy długiej, nazwy skróconej, identyfikatora węzła (szesnastkowo lub dziesiętnie) albo statusu. Lista aktualizuje się w trakcie pisania, a linia nad polem podaje liczbę węzłów online, pokazanych i wszystkich.
 
 ### Przełączniki filtrów
+
+Przycisk sortowania na końcu pola wyszukiwania otwiera menu z opcjami sortowania pod **Sortuj według** i z tymi przełącznikami pod **Filtruj według**.
 
 | Filtr | Opis |
 |--------|-------------|
 | **Schowaj nieaktywne węzły** | Pokazuje tylko węzły usłyszane w ciągu ostatnich 2 godzin |
-| **Pokaż tylko bezpośrednie węzły** | Pokazuje tylko węzły, które Twój węzeł usłyszał bezpośrednio, bez przekaźnika pomiędzy |
+| **Pokaż tylko bezpośrednie węzły** | Pokazuje tylko węzły, które Twój węzeł usłyszał bezpośrednio przez LoRa, bez przekaźnika pomiędzy. Węzły słyszane przez MQTT są pominięte |
 | **Pokaż nierozpoznane** | Pokazuje węzły, które nie wysłały jeszcze informacji o użytkowniku. **Domyślnie włączone**, więc węzeł usłyszany przed nadejściem jego informacji pozostaje widoczny; takie węzły mają plakietkę oznaczającą niekompletność i nie można wysyłać im wiadomości bezpośrednich, dopóki ich informacje o użytkowniku nie przyniosą klucza publicznego |
 | **Wyklucz infrastrukturę** | Ukrywa węzły o rolach infrastrukturalnych (Router, Router pomocniczy, Klient bazowy i dawne węzły Repeater) oraz każdy węzeł, któremu nie można wysłać wiadomości, niezależnie od roli |
 | **Wyklucz MQTT** | Ukrywa węzły słyszane wyłącznie przez most internetowy MQTT |
-| **Wyklucz nieusłyszane węzły** | Ukrywa węzły, których Twój węzeł nie słyszał od zmiany swoich ustawień LoRa. Domyślnie wyłączone i nie robi nic w firmware, które nie zgłasza, czy węzeł został usłyszany przy obecnych ustawieniach |
+| **Wyklucz nieusłyszane węzły** | Ukrywa węzły, których Twój węzeł nie słyszał od zmiany swoich ustawień LoRa. Domyślnie wyłączone i nie robi nic, dopóki Twój węzeł nie ma firmware 2.8.1 lub nowszego |
 | **Pokaż tylko podpisane węzły** | Pokazuje tylko węzły, których podpisane transmisje Twój węzeł faktycznie usłyszał i zweryfikował. Bardziej rygorystyczne niż ikona: węzeł z firmware 2.8 jest pokazywany jako podpisany na podstawie wersji firmware, zanim nadejdzie jakakolwiek podpisana transmisja, a kontakt zweryfikowany osobiście na starszym firmware nie jest w ogóle podpisany |
 | **Pokaż tylko szyfrowane węzły** | Pokazuje węzły z pasującym kluczem publicznym, którego potrzebuje zaszyfrowana wiadomość bezpośrednia. Węzeł z niezgodnością klucza jest wykluczony |
 | **Pokaż tylko ignorowane węzły** | Zastępuje listę węzłami, które zignorowałeś. Wszystkie pozostałe węzły są ukryte, gdy to jest włączone, a u góry listy pojawia się baner umożliwiający powrót |
@@ -196,14 +200,14 @@ Wpisz tekst w polu wyszukiwania, aby filtrować węzły według nazwy lub nazwy 
 ### Węzły nie słyszane przy Twoich obecnych ustawieniach
 
 Gdy ustawienia LoRa Twojego węzła się zmieniają — inny preset, region lub slot częstotliwości — węzły
-słyszane przy starych ustawieniach nadal są na liście, ale nie można się już z nimi połączyć. Aplikacja oznacza je
+słyszane przy starych ustawieniach nadal są na liście, ale nie można się już z nimi połączyć. Przy firmware 2.8.1 lub nowszym aplikacja oznacza je
 pomarańczowym czasem ostatniej aktywności i przekreśloną ikoną sygnału oraz pokazuje u góry listy baner:
-**N węzłów nie słyszanych od zmiany ustawień**.
+**N węzłów nie słyszanych od zmiany ustawień**. Licznik pomija Twoje ulubione, Twój własny węzeł i węzły słyszane tylko przez MQTT.
 
 Baner oferuje dwie akcje:
 
-- **Zachowaj** zamyka baner i zostawia wszystkie węzły na miejscu.
-- **Usuń** kasuje te węzły z listy. Twoje ulubione i Twój własny węzeł nigdy nie są usuwane.
+- **Zachowaj** zamyka baner i zostawia wszystkie węzły na miejscu. Aplikacja pamięta ten wybór dla każdego z tych węzłów, więc baner wraca tylko dla węzłów, których nie zachowałeś. Zachowany węzeł, który Twój węzeł znów usłyszy, jest zapominany i po późniejszej zmianie ustawień jest liczony od nowa.
+- **Usuń** prosi o potwierdzenie, a potem kasuje każdy węzeł policzony przez baner.
 
 **Usuń** to masowe usuwanie bez możliwości cofnięcia, więc użyj **Zachowaj**, jeśli spodziewasz się powrotu
 do starych ustawień. Usunięte węzły pojawiają się ponownie, jeśli Twój węzeł znów je usłyszy.
@@ -224,7 +228,7 @@ Filtr **Wyklucz nieusłyszane węzły** ukrywa je w ten sam sposób, ale niczego
 
 ## Węzły na skok
 
-Dotknij ikony histogramu skoków na pasku aplikacji listy węzłów, aby otworzyć wykres słupkowy pokazujący, ile węzłów znajduje się na każdej odległości w skokach (0 = bezpośrednio, 1 = jeden przekaźnik dalej itd.). Przefiltruj wykres do okna **ostatnio słyszane** — **Wszystkie**, **1 godzina**, **8 godzin** lub **24H** — aby zobaczyć, jak sieć mesh wygląda teraz, a jak w dłuższym okresie. To szybki sposób na ocenę, jak ruchliwa i rozległa jest Twoja lokalna sieć mesh.
+Dotknij ikony histogramu skoków na pasku aplikacji listy węzłów, aby otworzyć **Węzły na skok**, wykres słupkowy pokazujący, ile węzłów znajduje się na każdej odległości w skokach (0 = bezpośrednio, 1 = jeden przekaźnik dalej itd.). Przefiltruj wykres do okna ostatnio słyszanych — **Wszystkie**, **1 godzina**, **8 godzin** lub **24H** — aby porównać ostatnią godzinę z dłuższym okresem i ocenić, jak ruchliwa i rozległa jest Twoja lokalna sieć mesh.
 
 ## Szczegóły węzła
 
@@ -232,7 +236,7 @@ Dotknięcie węzła otwiera widok szczegółów z pełnymi informacjami. Pełne 
 
 Jakość sygnału jest oceniana względem Twojego presetu modemu. Ten sam SNR może być dobry na presecie dalekiego zasięgu, a słaby na szybszym. Kolory SNR w traceroute i informacjach o sąsiadach również używają tego presetu. Tekst RSSI ma własne kolory siły sygnału; wpływa na ocenę jakości tylko wtedy, gdy dostępny jest też odczyt poziomu szumu.
 
-Karta Szczegóły zawiera nazwę skróconą węzła, rolę, identyfikatory, czas ostatniej aktywności, liczbę skoków, czas pracy oraz jego SNR i RSSI:
+Karta Szczegóły zawiera nazwę skróconą węzła, rolę, status, identyfikatory, czas ostatniej aktywności, liczbę skoków, czas pracy, SNR i RSSI, rodzaj łącza, którym był ostatnio słyszany, stan **Bezpieczeństwo** oraz klucz publiczny:
 
 ![Sekcja szczegółów węzła](../../assets/screenshots/nodes_detail_section.png)
 
@@ -258,6 +262,10 @@ Gdy sprzęt węzła zostanie rozpoznany, widok szczegółów podaje nazwę urzą
 
 Etykieta zawsze towarzyszy oznaczeniu, więc status nigdy nie jest przekazywany samym kolorem.
 
+### Model 3D urządzenia
+
+Gdy internetowy flasher Meshtastic ma model 3D sprzętu węzła, obrazek urządzenia na ekranie szczegółów ma plakietkę 3D. Dotknij jej, aby otworzyć model na pełnym ekranie, gdzie przeciągnięcie go obraca. W wersjach Google Play **Zobacz w swojej przestrzeni** stawia model na prawdziwej powierzchni w prawdziwym rozmiarze przez ARCore, a na Androidzie 10 i nowszym przycisk migawki zapisuje widok w Pictures/Meshtastic. Wersje F-Droid i na komputer pokazują model bez widoku AR.
+
 ### Linki do urządzeń („Chcę taki”)
 
 Gdy sprzęt węzła zostanie rozpoznany, widok szczegółów pokazuje zwijaną sekcję **„Chcę taki”** z linkami do miejsc, gdzie można kupić to urządzenie lub dowiedzieć się o nim więcej: strona produktu producenta, warianty produktu i oferty regionalnych sklepów (takich jak AliExpress, Amazon i wspierani sprzedawcy), przefiltrowane do Twojego kraju. Każdy link otwiera się przez usługę przekierowań `msh.to`. Urządzenia bez pasujących linków nie pokazują tej sekcji.
@@ -268,7 +276,7 @@ Niektóre z tych linków są linkami afiliacyjnymi. Oba miejsca informują o tym
 
 ### Zdalny terminal
 
-**Otwórz terminal**, w karcie **Zarządzanie** węzła, otwiera powłokę na węźle z Linuksem uruchamiającym `meshtasticd` 2.8.2 lub nowszy, przesyłaną przez sieć mesh. Węzeł akceptuje ją tylko od radia, którego klucz publiczny jest na jego liście **Bezpieczeństwo → Klucz administratora**, tej samej, której używa zdalne zarządzanie; aplikacja najpierw rozpoczyna tę sesję administracyjną, jeśli jej nie ma, a tytuł karty pokazuje, czy jest aktywna. Terminal zajmuje całe okno. Jeśli węzeł nigdy nie odpowie, ekran informuje o tym po minucie.
+**Otwórz terminal**, w karcie **Zarządzanie** węzła, otwiera powłokę na węźle z Linuksem uruchamiającym `meshtasticd` 2.8.2 lub nowszy, przesyłaną przez sieć mesh. Węzeł akceptuje ją tylko od węzła, którego klucz publiczny jest na jego liście **Bezpieczeństwo → Klucz administratora**, tej samej, której używa zdalne zarządzanie. Aplikacja najpierw rozpoczyna tę sesję administracyjną, jeśli jej nie ma, a tytuł karty pokazuje, czy jest aktywna. Wiersz może się pojawić na każdym węźle `meshtasticd`, zanim aplikacja pozna jego wersję firmware; starszy węzeł odrzuca powłokę przy otwieraniu. Terminal zajmuje całe okno. Jeśli węzeł nigdy nie odpowie, ekran informuje o tym po minucie.
 
 Sieć mesh przenosi kilkaset bajtów na sekundę i terminal jest zbudowany z myślą o tym:
 
@@ -278,7 +286,7 @@ Sieć mesh przenosi kilkaset bajtów na sekundę i terminal jest zbudowany z my�
 - **Tryb liniowy** (Line mode), w menu **⋮**, daje pole poleceń: każde polecenie jest wysyłane jedną transmisją, **↑** i **↓** przywołują wcześniejsze polecenia bez pytania węzła, a podpowiedzi oferują typowe polecenia dla hosta `meshtasticd`. To najtańszy sposób użycia powłoki w zajętej sieci mesh.
 - Menu **⋮** pozwala też wklejać ze schowka i zmieniać rozmiar tekstu.
 
-Kolory, wiersze postępu i `clear` wyświetlają się tak jak w terminalu na komputerze. Programy pełnoekranowe, takie jak `vi` czy `top`, przerysowują cały ekran przy każdym klawiszu, czego sieć mesh nie uniesie; terminal pokazuje wtedy komunikat.
+Kolory, wiersze postępu i `clear` wyświetlają się tak jak w terminalu na komputerze. Programy pełnoekranowe, takie jak `vi` czy `top`, przerysowują cały ekran przy każdym klawiszu, czego sieć mesh nie uniesie, więc terminal pokazuje wtedy komunikat.
 
 ## Gdy nie widać żadnych węzłów
 

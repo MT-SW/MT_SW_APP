@@ -2,7 +2,7 @@
 title: Połączenia
 parent: Przewodnik użytkownika
 nav_order: 2
-last_updated: 2026-09-29
+last_updated: 2026-10-21
 description: Połącz telefon lub komputer z radiem przez Bluetooth, USB lub TCP/IP.
 aliases:
   - bluetooth
@@ -35,6 +35,8 @@ Użyj selektora transportu — rzędu przycisków segmentowych pod kartą połą
 
 ![Ekran połączeń z selektorem transportu pokazującym Bluetooth, Sieć i USB](../../assets/screenshots/connections_transport_filters.png)
 
+Na sprzęcie bez Bluetooth LE w selektorze nie ma **Bluetooth**, a na sprzęcie bez hosta USB nie ma **USB**. Gdy zostaje tylko **Sieć**, selektor jest ukryty.
+
 > 💡 **Wskazówka:** Jeśli Twoje radio się nie pojawia, sprawdź, czy nie jest już połączone z innym telefonem lub czy nie jest poza zasięgiem.
 
 Ekran nazywa wszystko, co po stronie aplikacji blokuje skanowanie, i podaje sposób naprawy:
@@ -50,18 +52,22 @@ Wyjaśnienie znajduje się na tej karcie, a nie w kontrolce skanowania: dotknię
 
 ### Stan połączenia
 
+Ikona zakładki **Połącz** na pasku nawigacji pokazuje stan połączenia kolorem:
+
 | Ikona | Stan | Opis |
 |------|-------|-------------|
-| 🟢 | Połączony | Aktywne łącze z radiem nawiązane |
-| 🟡 | Łączenie | Trwa uzgadnianie połączenia |
+| 🟢 | Połączony | Aktywne łącze z radiem. Znaczek pokazuje używany transport: Bluetooth, Wi-Fi lub USB |
+| 🟠 | Łączenie | Trwa uzgadnianie połączenia |
 | 🔴 | Rozłączono | Brak aktywnego połączenia. Aplikacja ponawia próby automatycznie, z rosnącym odstępem między próbami |
-| ⚪ | Urządzenie śpi | Radio jest w lekkim uśpieniu — aplikacja czeka, aż się obudzi i połączy ponownie, a nie zawodzi |
+| 🟡 | Urządzenie śpi | Radio jest w lekkim uśpieniu — aplikacja czeka, aż się obudzi i połączy ponownie, a nie zawodzi |
 
 To cztery stany, które modeluje aplikacja. „Urządzenie śpi” jest normalne w konfiguracjach oszczędzających energię i nie wymaga żadnego działania.
 
 Podczas łączenia wskaźnik stanu pokazuje bieżący stan połączenia — dotknij **Zatrzymaj łączenie**, aby przerwać próbę:
 
 ![Stan łączenia](../../assets/screenshots/connections_connecting.png)
+
+Gdy radio jest połączone, karta połączenia pokazuje jego nazwę i wersję oprogramowania, siłę sygnału przez Bluetooth oraz ustawienie modemu LoRa i region, na przykład „Long Range - Fast · United States”. Radio z własnymi ustawieniami modemu pokazuje **Własne** zamiast ustawienia. Dotknij wiersza z ustawieniem, aby otworzyć ekran LoRa.
 
 Gdy nie wybrano jeszcze radia, karta połączenia pokazuje **Nie wybrano urządzenia**. Panel, w którym nie ma czego wyświetlić, mówi o tym pod swoim nagłówkiem, z podpowiedzią:
 

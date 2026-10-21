@@ -2,7 +2,7 @@
 title: Integracja TAK
 parent: Przewodnik użytkownika
 nav_order: 10
-last_updated: 2026-09-28
+last_updated: 2026-10-21
 description: Współpraca z ATAK i WinTAK — udostępnianie pozycji CoT, role TAK i konfiguracja wtyczki.
 aliases:
   - tak
@@ -34,41 +34,40 @@ Moduł TAK pozwala węzłom MT_SW:
 
 > ⚠️ **Ostrzeżenie:** Stara **wtyczka Meshtastic ATAK** nie jest już częścią tej ścieżki i nie może
 > działać. Łączyła się przez międzyprocesowe API AIDL, które zostało usunięte w aplikacji 2.8.0; usługa
-> mesh działa teraz wyłącznie w obrębie procesu aplikacji. Nie instaluj jej. Współpraca działa dziś przez własny lokalny
+> mesh działa wyłącznie w obrębie procesu aplikacji. Nie instaluj jej. Współpraca działa przez własny lokalny
 > serwer TAK aplikacji oraz Konwerter Mesh na CoT, opisane w następnych sekcjach, ze zwykłymi ATAK/iTAK/WinTAK.
 
 ### Konfiguracja
 
-Przejdź do **Ustawienia → Konfiguracja modułów → TAK** (Konfiguracja TAK). Własne ustawienia modułu to Twoja tożsamość TAK —
+Przejdź do **Ustawienia → Konfiguracja modułów → TAK (ATAK)**. Własne ustawienia modułu to Twoja tożsamość TAK —
 nie ma tu osobnego przełącznika włączania, ponieważ to ustawienie **Rola urządzenia** w Konfiguracji urządzenia
 włącza TAK. Twój węzeł rozgłasza tę tożsamość, która pojawia się na mapach TAK.
 
-| Ustawienie | Opis |
-|---------|-------------|
-| Kolor zespołu | Twój kolor zespołu na mapie TAK (np. Niebieski, Czerwony, Cyjan, Zielony) |
-| Rola członka | Twoja rola operacyjna w tym zespole (Członek zespołu, Lider zespołu, Kwatera główna, Medyk, Operator radiotelefonu itd.) |
+| Ustawienie | Opis | Domyślnie |
+|---------|-------------|---------|
+| Rola | Twoja rola operacyjna w zespole: Członek zespołu, Lider zespołu, Kwatera główna, Snajper, Medyk, Obserwator wysunięty, Operator radiotelefonu lub K9 | Domyślna (Członek zespołu) |
+| Zespół | Twój kolor zespołu na mapie TAK, jeden z 14 standardowych kolorów zespołów TAK, np. Niebieski, Czerwony, Cyjan lub Zielony | Domyślny (Cyjan) |
 
-Twój znak wywoławczy TAK nie jest osobnym ustawieniem — jest wyprowadzany automatycznie z nazwy Twojego
-węzła MT_SW.
+Twój znak wywoławczy TAK nie jest osobnym ustawieniem. Firmware używa długiej nazwy Twojego węzła.
 
-> 💡 **Wskazówka:** Kolory zespołów/ról to standardowe kolory przynależności TAK. Uzgodnij ze swoim zespołem TAK
-> spójne przydziały do zespołów.
+Kolory zespołów to standardowe kolory zespołów TAK, więc uzgodnij ze swoim zespołem TAK spójne przydziały do zespołów.
 
 ### Lokalny serwer TAK
 
-Aplikacja może też uruchomić **lokalny serwer TAK**, aby ATAK/iTAK na **tym samym telefonie** mogły łączyć się bezpośrednio, bez zdalnego serwera TAK. Serwer nasłuchuje wyłącznie na localhost (`127.0.0.1:8089`) i używa TLS z wzajemnym uwierzytelnianiem certyfikatami (mTLS), więc nie jest osiągalny z innych urządzeń w sieci.
+Aplikacja może też uruchomić **lokalny serwer TAK**, aby ATAK na **tym samym telefonie** albo WinTAK na tym samym komputerze, na którym działa aplikacja na komputer, mogły łączyć się bezpośrednio, bez zdalnego serwera TAK. Serwer nasłuchuje wyłącznie na localhost (`127.0.0.1:8089`) i używa TLS z wzajemnym uwierzytelnianiem certyfikatami (mTLS), więc nie jest osiągalny z innych urządzeń w sieci.
 
-Otwórz **Ustawienia → Zaawansowane → Serwer TAK**. To ustawienia aplikacji przechowywane na tym telefonie, dlatego są obok **Aktualizacja oprogramowania** i **Panel debugowania**, a nie w konfiguracji modułu TAK — i dlatego nie potrzebują ani roli TAK, ani firmware 2.8.0:
+Otwórz **Ustawienia → Zaawansowane → Serwer TAK**. To ustawienia aplikacji przechowywane na tym telefonie, dlatego są obok **Aktualizacja oprogramowania** i **Panel debugowania**, a nie w konfiguracji modułu TAK — i dlatego nie potrzebują ani roli TAK, ani firmware 2.8.0. W Androidzie 17 i nowszych włączenie serwera prosi o uprawnienie do sieci lokalnej, którego potrzebuje do otwarcia gniazda. Jeśli to uprawnienie zostanie odmówione na stałe, aplikacja wyłącza serwer z powrotem i proponuje otwarcie ustawień aplikacji:
 
 ![Ustawienia lokalnego serwera TAK z przełącznikiem włączania i opcją eksportu](../../assets/screenshots/tak_server_enabled.png)
 
-- **Włącz lokalny serwer TAK** — uruchamia serwer mTLS tylko na pętli zwrotnej, na porcie **8089**, dla połączeń ATAK/iTAK z tego samego telefonu.
+- **Włącz lokalny serwer TAK** — uruchamia serwer mTLS tylko na pętli zwrotnej, na porcie **8089**, dla połączeń ATAK z tego samego urządzenia.
+- **Stan** — pod przełącznikiem: *Wyłączony*, *Uruchamianie serwera TAK*, *Nasłuchuje na 127.0.0.1:8089 — czeka na ATAK*, liczba lokalnych połączeń klientów albo *Nie udało się uruchomić serwera TAK. Wyłącz go i włącz ponownie, aby spróbować jeszcze raz.*
 - **Kanał sieci TAK** — wybiera, na którym kanale MT_SW wysyłany jest wychodzący ruch TAK (domyślnie: kanał podstawowy, indeks 0). Przychodzący ruch TAK jest przyjmowany z dowolnego kanału. Odpowiada analogicznemu ustawieniu w iOS i w starszej wtyczce ATAK.
 - **Konwerter Mesh na CoT** — domyślnie wyłączony, pokazywany pod przełącznikiem serwera. Przy uruchomionym serwerze
   tworzy kontakt CoT dla każdego węzła w Twojej bazie węzłów, więc zwykłe
   węzły MT_SW pojawiają się na mapie ATAK jako kontakty. **To właśnie zastąpiło widoczność
-  węzłów starej wtyczki** — bez tego pokazują się tylko węzły z rolą TAK.
-- **Eksportuj pakiet danych TAK** — generuje pakiet danych `.zip`, który ATAK/iTAK mogą zaimportować, aby połączyć się z tym serwerem.
+  węzłów starej wtyczki** — bez tego pokazują się tylko węzły z rolą TAK. Gdy połączony węzeł ma firmware starsze niż 2.8.0, uwaga pod przełącznikiem mówi, że do ATAK przechodzą tylko pozycje i wiadomości czatu.
+- **Eksportuj pakiet danych TAK** — generuje pakiet danych `.zip`, który ATAK może zaimportować, aby połączyć się z tym serwerem. To samo robi ikona udostępniania na górnym pasku.
 
 ## Role TAK
 
@@ -76,8 +75,8 @@ Węzły skonfigurowane z rolami związanymi z TAK zachowują się inaczej niż s
 
 | Rola | Opis |
 |------|-------------|
-| **TAK** | Pełna współpraca z TAK — wysyła i odbiera dane CoT, wiadomości czatu i aktualizacje PLI. Działa jako standardowy klient plus most TAK. |
-| **TAK Tracker** | Wyjście TAK tylko z pozycją — automatycznie rozsyła PLI w regularnych odstępach bez udziału użytkownika. Zoptymalizowany do bezobsługowych beaconów pozycji (pojazdy, sprzęt, punkty trasy). Nie przekazuje wiadomości czatu. |
+| **TAK** | Dla węzła sparowanego z urządzeniem z ATAK. Wyłącza wiele zwykłych rozgłoszeń, aby dać pierwszeństwo strumieniowi pakietów CoT. |
+| **TAK Tracker** | Automatycznie rozsyła TAK PLI w odstępach ustawionych w konfiguracji pozycji i wyłącza wiele zwykłych rozgłoszeń. Nadaje się do bezobsługowych beaconów pozycji, takich jak pojazdy i sprzęt. |
 
 > 💡 **Wskazówka:** Użyj **TAK Tracker** dla urządzeń, które mają tylko raportować pozycję (np. radio zamontowane w pojeździe). Użyj **TAK** dla urządzeń, w których użytkownicy aktywnie uczestniczą w operacjach TAK.
 
@@ -103,7 +102,7 @@ Po skonfigurowaniu:
 - Wiadomości czatu mogą być mostkowane między siecią mesh a sieciami TAK
 - Aktualizacje pozycji płyną dwukierunkowo między MT_SW a TAK
 - Węzły TAK Tracker automatycznie rozsyłają PLI — ich pozycje pojawiają się na mapach ATAK bez żadnej konfiguracji po stronie ATAK
-- Trasy odebrane z sieci mesh są też zapisywane jako pakiet danych (`.zip`) w **Pobrane**; zaimportuj go w ATAK, aby dodać trasę. W Androidzie 9 i starszych plik trafia zamiast tego do własnego folderu aplikacji w `Android/data`
+- Na Androidzie trasy odebrane z sieci mesh są też zapisywane jako pakiet danych (`.zip`) w **Pobrane**; zaimportuj go w ATAK, aby dodać trasę. Aktualizacja tej samej trasy nadpisuje jej plik, a nie dodaje kopii. Po ponownej instalacji aplikacji pierwsza aktualizacja trasy zapisuje jedną kopię ze zmienioną nazwą, a kolejne ją nadpisują. W Androidzie 9 i starszych plik trafia zamiast tego do własnego folderu aplikacji w `Android/data`. Aplikacja na komputer nie zapisuje plików tras
 
 > ℹ️ **Uwaga:** Integracja TAK wymaga określonych ról węzłów. Standardowe węzły klienckie nie uczestniczą automatycznie w operacjach TAK — choć przy włączonym **Konwerter Mesh na CoT** nadal pojawiają się na mapie ATAK jako kontakty.
 

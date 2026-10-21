@@ -14,7 +14,7 @@ Użyj nawigacji w panelu bocznym, aby przeglądać **Przewodnik użytkownika** (
 
 | Przewodnik | Opis |
 |-------|-------------|
-| [Pierwsze kroki](user/onboarding) | Połącz pierwsze radio i wyślij wiadomość |
+| [Pierwsze kroki](user/onboarding) | Połącz pierwszy węzeł i wyślij wiadomość |
 | [Wiadomości i kanały](user/messages-and-channels) | Rozgłoszenia na kanałach, wiadomości bezpośrednie, reakcje i szyfrowanie |
 | [Węzły](user/nodes) | Jak działa lista węzłów sieci mesh |
 | [Miernik sygnału](user/signal-meter) | Jak działa miernik jakości sygnału LoRa |
@@ -23,4 +23,4 @@ Użyj nawigacji w panelu bocznym, aby przeglądać **Przewodnik użytkownika** (
 | [Architektura](developer/architecture) | Przegląd architektury aplikacji dla współtwórców |
 | [Współtworzenie](developer/contributing) | Nazewnictwo gałęzi, przebieg PR i polecenia weryfikacyjne |
 
-> Ta dokumentacja jest udostępniana z tego samego źródła markdown, które zasila przeglądarkę **Pomoc i dokumentacja** w aplikacji.
+Ta dokumentacja jest udostępniana z tego samego źródła markdown, które zasila przeglądarkę **Pomoc i dokumentacja** w aplikacji.

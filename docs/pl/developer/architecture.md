@@ -2,7 +2,7 @@
 title: Architektura
 parent: Przewodnik dewelopera
 nav_order: 1
-last_updated: 2026-09-29
+last_updated: 2026-10-21
 description: Jak aplikacje na Androida i komputery dzielą się na androidApp/desktopApp, moduły funkcji i moduły core oraz jak sterowanie radiem i nawigacja są w nich warstwowane.
 aliases:
   - layers
@@ -45,7 +45,7 @@ Punkt wejścia aplikacji desktopowej (Linux/macOS/Windows):
 - Zarządzanie oknami Compose Desktop
 - DI specyficzne dla desktopu (`DesktopKoinModule`)
 - Zaślepki platformy dla możliwości dostępnych tylko na Androidzie
-- `DesktopRadioTransportFactory` i transport szeregowy oparty na jSerialComm; implementacje transportu BLE i TCP, które ta fabryka podpina, to kod współdzielony — znajdują się w `core:network`, zbudowane na prymitywach BLE z `core:ble` — a nie należą do desktopApp
+- `DesktopRadioTransportFactory`, która podpina transporty. Same transporty to kod współdzielony w `core:network`: BLE zbudowane na prymitywach z `core:ble`, TCP oraz oparty na jSerialComm `SerialTransport` w `jvmMain` modułu `core:network`
 
 ### `feature/*` — moduły funkcji
 
@@ -59,17 +59,18 @@ Każdy moduł `feature/` odpowiada za pionowy wycinek funkcjonalności:
 | `feature:map` | Wyświetlanie mapy, waypointy — współdzielony stan, polityki i edytor waypointów |
 | `feature:map-maplibre` | Powierzchnie map MapLibre — używane przez flavor `fdroid` i Desktop; flavor `google` używa zamiast tego Google Maps. Definicje źródeł kafelków i edytor własnych źródeł są w `feature:map`, więc oba renderery je współdzielą |
 | `feature:map-terrain` | Teren offline: dekodowanie wysokości, cieniowanie wzniesień i warstwice, współdzielone przez oba flavory map |
+| `feature:coverage` | Zasięg Site Plannera liczony na urządzeniu przez `kp1812` (ITU-R P.1812) na terenie Mapterhorn, zwracany jako GeoJSON do listy warstw mapy |
 | `feature:node` | Lista węzłów, szczegóły węzła, metryki |
 | `feature:settings` | Wszystkie ekrany konfiguracji |
 | `feature:firmware` | Przepływ aktualizacji firmware |
 | `feature:docs` | Przeglądarka dokumentacji w aplikacji |
 | `feature:wifi-provision` | Provisioning Wi-Fi |
-| `feature:widget` | Widżety ekranu głównego Androida |
+| `feature:widget` | Widżety ekranu głównego Androida (biblioteka Androida, nie KMP) |
 | `feature:discovery` | Wykrywanie sieci mesh |
 
 Moduły funkcji:
-- Używają wtyczki konwencji `meshtastic.kmp.feature`
-- Zależą od modułów `core`, a nie od innych modułów `feature`; jedyny wyjątek to `feature:map-maplibre`, który bazuje na `feature:map` i `feature:map-terrain`
+- Używają wtyczki konwencji `meshtastic.kmp.feature`, oprócz `feature:widget`, który stosuje `meshtastic.android.library`
+- Zależą od modułów `core`, a nie od innych modułów `feature`. Dwa wyjątki to `feature:map-maplibre` i `feature:coverage`, które oba bazują na `feature:map` i `feature:map-terrain`
 - Posiadają własne wpisy nawigacji i rejestracje DI
 - Zawierają implementacje specyficzne dla platform w `androidMain`/`jvmMain`/`iosMain`
 
@@ -84,7 +85,7 @@ Współdzielona infrastruktura używana przez wszystkie funkcje:
 | `core:ui` | Współdzielone komponenty Compose, ikony, motyw |
 | `core:resources` | Współdzielone zasoby tekstowe |
 | `core:model` | Modele domeny |
-| `core:data` | Abstrakcje warstwy danych |
+| `core:data` | Implementacje repozytoriów, źródła danych i menedżery |
 | `core:domain` | Przypadki użycia / logika biznesowa |
 | `core:database` | Baza danych Room KMP |
 | `core:datastore` | Preferencje DataStore |
@@ -94,13 +95,28 @@ Współdzielona infrastruktura używana przez wszystkie funkcje:
 | `core:di` | Narzędzia DI |
 | `core:network` | HTTP/port szeregowy/transport |
 | `core:ble` | Abstrakcje Bluetooth LE |
-| `core:barcode` | Skanowanie kodów QR / kreskowych (kody QR udostępniania kanałów) |
-| `core:nfc` | Obsługa odczytu/zapisu NFC |
+| `core:barcode` | Skanowanie kodów QR / kreskowych (kody QR udostępniania kanałów); biblioteka Androida |
+| `core:nfc` | Obsługa odczytu/zapisu NFC; biblioteka Androida |
 | `core:takserver` | Integracja z wbudowanym serwerem TAK |
 | `core:testing` | Narzędzia testowe |
 | `core:konsist` | Testy architektury/konwencji Konsist |
 
 Modele protobuf pochodzą z zewnętrznego artefaktu Maven `org.meshtastic:protobufs` (przypiętego w `gradle/libs.versions.toml`).
+
+### Moduły budowania i testów
+
+Nie zawierają kodu aplikacji. Są pomijane w agregacji Dokka i Kover oraz w `kmpSmokeCompile`, a
+`scripts/check-module-list.py` je wyłącza ze sprawdzania.
+
+| Moduł | Odpowiedzialność |
+|--------|---------------|
+| `screenshot-tests` | Testy zrzutów ekranu z podglądów Compose, bramka regresji wizualnej |
+| `docs-screenshots` | Zrzuty ekranu w ramce do dokumentacji, tylko generowane |
+| `store-screenshots` | Zrzuty ekranu do wpisu w sklepie, robione w prawdziwej aplikacji przez UiAutomator |
+| `baselineprofile` | Generator Baseline Profile i benchmark uruchamiania dla `androidApp` |
+| `schema-strings` | Generuje `schema_strings.xml` z metadanych pól protobufów |
+
+`core:konsist` też jest wyłączony z agregacji.
 
 ## Zestawy źródeł KMP
 
@@ -140,7 +156,7 @@ Projekt używa **Koin** z przetwarzaniem adnotacji:
 
 ## Sterowanie radiem
 
-Funkcje wydają polecenia radiu przez `RadioController` (`core:repository`), złożenie czterech
+Funkcje wysyłają polecenia do węzła przez `RadioController` (`core:repository`), złożenie czterech
 wyspecjalizowanych pod-interfejsów, dzięki czemu wywołujący mogą zależeć tylko od potrzebnego im wycinka:
 
 | Pod-interfejs | Odpowiedzialność |
@@ -165,7 +181,7 @@ Jest rozłożone na wyspecjalizowane interfejsy dostawców zgodnie z zasadą seg
 
 | Interfejs | Odpowiedzialność |
 |-----------|---------------|
-| `ConnectionStateProvider` | Tylko do odczytu `connectionState: StateFlow<ConnectionState>` |
+| `ConnectionStateProvider` | Tylko do odczytu `connectionState`, a także `connectionLifecycle` i `connectionEpochs` dla kodu, który musi powiązać stan z rozłączeniami i zakończonymi uzgodnieniami połączenia |
 | `TracerouteResponseProvider` | Stan odpowiedzi traceroute + czyszczenie |
 | `NeighborInfoResponseProvider` | Stan odpowiedzi neighbor info + czyszczenie |
 | `ServiceStateWriter` | Strona zapisu dla handlerów (set*, emit*, clear*) |
@@ -180,7 +196,7 @@ wstrzykują pod-interfejs kontrolera, mogą odczytywać stan połączenia bez os
 
 Nawigacja używa **Navigation 3** z typowanymi trasami:
 - Wszystkie trasy są zdefiniowane w `core/navigation/Routes.kt`
-- Trasy to klasy/obiekty danych z adnotacją `@Serializable`
+- Trasy to klasy/obiekty danych z adnotacją `@Serializable`, a każdy zapieczętowany interfejs tras jest zarejestrowany w `MeshtasticNavSavedStateConfig` (`NavigationConfig.kt`), aby można było przywrócić zapisany stan
 - Deep linki są rozwiązywane przez `DeepLinkRouter`
 - Każda funkcja rejestruje własne wpisy nawigacji
 
