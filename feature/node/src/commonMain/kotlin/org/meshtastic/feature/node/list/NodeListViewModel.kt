@@ -36,6 +36,7 @@ import org.meshtastic.core.common.util.LocaleUnitsProvider
 import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.TemperatureUnit
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.model.noiseFloorOrNull
 import org.meshtastic.core.model.util.LocalStatsExtended
 import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.proto.LocalStats
@@ -126,6 +127,9 @@ class NodeListViewModel(
     /** The extra line shows packet counters. */
     val nodeExtraPackets = nodeFilterPreferences.nodeExtraPackets
 
+    /** The extra line shows the ether (channel utilization, air time, noise floor). */
+    val nodeExtraEther = nodeFilterPreferences.nodeExtraEther
+
     /** The extra line shows hardware data (CPU, memory, Wi-Fi signal). */
     val nodeExtraHardware = nodeFilterPreferences.nodeExtraHardware
 
@@ -136,9 +140,11 @@ class NodeListViewModel(
      * skipped.
      */
     val nodeExtraStats: StateFlow<Map<Int, NodeExtraStats>> =
-        combine(nodeExtraPackets, nodeExtraHardware, ::Pair)
-            .flatMapLatest<Pair<Boolean, Boolean>, Map<Int, NodeExtraStats>> { (packets, hardware) ->
-                if (!packets && !hardware) {
+        combine(nodeExtraPackets, nodeExtraHardware, nodeExtraEther) { packets, hardware, ether ->
+            packets || hardware || ether
+        }
+            .flatMapLatest<Boolean, Map<Int, NodeExtraStats>> { anyOn ->
+                if (!anyOn) {
                     flowOf<Map<Int, NodeExtraStats>>(emptyMap())
                 } else {
                     combine(
@@ -422,6 +428,7 @@ private fun extraStatsOf(stats: LocalStats, ext: LocalStatsExtended?): NodeExtra
         rxDupe = stats.num_rx_dupe,
         txRelay = stats.num_tx_relay,
         heapFreePercent = if (heapTotal > 0) heapFree * PERCENT / heapTotal else null,
+        noiseFloor = stats.noiseFloorOrNull,
     )
         .withHardware(ext)
 }

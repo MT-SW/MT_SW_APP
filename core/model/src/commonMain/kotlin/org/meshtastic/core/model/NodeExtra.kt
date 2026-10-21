@@ -50,6 +50,8 @@ data class NodeExtraStats(
     val psramFreePercent: Float? = null,
     /** Wi-Fi signal of the node in dBm, exactly as the node sent it in its last packet. */
     val wifiRssi: Int? = null,
+    /** Noise floor in dBm as the node reported it (before any LNA correction). */
+    val noiseFloor: Int? = null,
 ) {
     val hasTraffic: Boolean
         get() = packetsTx != null || packetsRx != null || packetsRxBad != null || rxDupe != null || txRelay != null
@@ -69,5 +71,6 @@ data class NodeExtraStats(
         flashUsedPercent = flashUsedPercent ?: older.flashUsedPercent,
         psramFreePercent = psramFreePercent ?: older.psramFreePercent,
         wifiRssi = wifiRssi ?: older.wifiRssi,
+        noiseFloor = noiseFloor ?: older.noiseFloor,
     )
 }

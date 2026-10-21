@@ -289,6 +289,11 @@ interface UiPrefs {
 
     fun setNodeExtraPackets(value: Boolean)
 
+    /** Extra line shows the ether: channel utilization, air time and noise floor. */
+    val nodeExtraEther: StateFlow<Boolean>
+
+    fun setNodeExtraEther(value: Boolean)
+
     /** Extra line shows hardware data (CPU, memory, Wi-Fi signal). */
     val nodeExtraHardware: StateFlow<Boolean>
 

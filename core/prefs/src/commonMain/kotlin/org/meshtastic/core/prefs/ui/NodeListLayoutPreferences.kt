@@ -43,6 +43,7 @@ enum class NodeListLayoutPreferences(val key: String, val defaultBoolean: Boolea
         val KEY_DENSITY = stringPreferencesKey(DENSITY_KEY)
         val KEY_EXTRA_MODE = stringPreferencesKey("node-layout-extra-mode")
         val KEY_EXTRA_PACKETS = booleanPreferencesKey("node-layout-extra-packets")
+        val KEY_EXTRA_ETHER = booleanPreferencesKey("node-layout-extra-ether")
         val KEY_EXTRA_HARDWARE = booleanPreferencesKey("node-layout-extra-hardware")
         val KEY_EXTRA_ICONS_ONLY = booleanPreferencesKey("node-layout-extra-icons-only")
         val KEY_SHOW_POWER = booleanPreferencesKey(SHOULD_SHOW_POWER.key)

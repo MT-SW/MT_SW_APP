@@ -421,17 +421,26 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
 
     override val nodeExtraPackets: StateFlow<Boolean> =
         dataStore.data
-            .map { it[NodeListLayoutPreferences.KEY_EXTRA_PACKETS] ?: false }
-            .stateIn(scope, SharingStarted.Eagerly, false)
+            .map { it[NodeListLayoutPreferences.KEY_EXTRA_PACKETS] ?: true }
+            .stateIn(scope, SharingStarted.Eagerly, true)
 
     override fun setNodeExtraPackets(value: Boolean) {
         scope.launch { dataStore.edit { it[NodeListLayoutPreferences.KEY_EXTRA_PACKETS] = value } }
     }
 
+    override val nodeExtraEther: StateFlow<Boolean> =
+        dataStore.data
+            .map { it[NodeListLayoutPreferences.KEY_EXTRA_ETHER] ?: true }
+            .stateIn(scope, SharingStarted.Eagerly, true)
+
+    override fun setNodeExtraEther(value: Boolean) {
+        scope.launch { dataStore.edit { it[NodeListLayoutPreferences.KEY_EXTRA_ETHER] = value } }
+    }
+
     override val nodeExtraHardware: StateFlow<Boolean> =
         dataStore.data
-            .map { it[NodeListLayoutPreferences.KEY_EXTRA_HARDWARE] ?: false }
-            .stateIn(scope, SharingStarted.Eagerly, false)
+            .map { it[NodeListLayoutPreferences.KEY_EXTRA_HARDWARE] ?: true }
+            .stateIn(scope, SharingStarted.Eagerly, true)
 
     override fun setNodeExtraHardware(value: Boolean) {
         scope.launch { dataStore.edit { it[NodeListLayoutPreferences.KEY_EXTRA_HARDWARE] = value } }

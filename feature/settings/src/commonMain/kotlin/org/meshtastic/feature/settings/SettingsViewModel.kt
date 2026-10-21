@@ -239,6 +239,7 @@ class SettingsViewModel(
     val nodeExtraIconsOnly = uiPrefs.nodeExtraIconsOnly
     val nodeExtraPackets = uiPrefs.nodeExtraPackets
     val nodeExtraHardware = uiPrefs.nodeExtraHardware
+    val nodeExtraEther = uiPrefs.nodeExtraEther
 
     fun setNodeListDensity(value: String) = uiPrefs.setNodeListDensity(value)
 
@@ -267,6 +268,8 @@ class SettingsViewModel(
     fun setNodeExtraPackets(value: Boolean) = uiPrefs.setNodeExtraPackets(value)
 
     fun setNodeExtraHardware(value: Boolean) = uiPrefs.setNodeExtraHardware(value)
+
+    fun setNodeExtraEther(value: Boolean) = uiPrefs.setNodeExtraEther(value)
 
     // Aggregated node list settings — nested combines because typed overloads max at 5 args
     val nodeListSettings =
@@ -314,6 +317,7 @@ class SettingsViewModel(
             .combine(nodeExtraIconsOnly) { state, iconsOnly -> state.copy(extraIconsOnly = iconsOnly) }
             .combine(nodeExtraPackets) { state, on -> state.copy(extraPackets = on) }
             .combine(nodeExtraHardware) { state, on -> state.copy(extraHardware = on) }
+            .combine(nodeExtraEther) { state, on -> state.copy(extraEther = on) }
             .stateInWhileSubscribed(initialValue = NodeListSettingsState())
 }
 
@@ -331,6 +335,7 @@ data class NodeListSettingsState(
     val showTelemetry: Boolean = false,
     val extraMode: NodeExtraMode = NodeExtraMode.ALL,
     val extraIconsOnly: Boolean = false,
-    val extraPackets: Boolean = false,
-    val extraHardware: Boolean = false,
+    val extraPackets: Boolean = true,
+    val extraHardware: Boolean = true,
+    val extraEther: Boolean = true,
 )

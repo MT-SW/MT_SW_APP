@@ -36,10 +36,11 @@ Lista ma dwa poziomy szczegółowości, ustawiane w **Ustawienia → Układ węz
 Dodatkowa linia pod każdym węzłem składa się z trzech części, włączanych w **Ustawienia → Układ węzła**:
 
 - **Metryki środowiskowe** — na górze napięcie i prąd, a pod nimi wszystkie czujniki pogody (temperatura, wilgotność, ciśnienie, wiatr, deszcz, światło, UV i inne). Zajmuje tyle linii, ile trzeba.
-- **Dodatkowe statystyki → Pakiety** — osobna linia przy prawej krawędzi: zajętość kanału i czas nadawania (dla węzłów innych niż Twój), TX, RX, B (błędne), D (duplikaty) i Przek. (przekazane dalej).
+- **Dodatkowe statystyki → Eter** — osobna linia przy prawej krawędzi: zajętość kanału i czas nadawania (dla węzłów innych niż Twój, bo Twój pokazuje je już wyżej) oraz szum tła (z korektą LNA, jeśli jest ustawiona).
+- **Dodatkowe statystyki → Pakiety** — osobna linia przy prawej krawędzi: TX, RX, B (błędne), D (duplikaty) i Przek. (przekazane dalej).
 - **Dodatkowe statystyki → Sprzęt** — osobna linia przy prawej krawędzi: procesor, wolna pamięć, pamięć flash i PSRAM oraz siła sygnału Wi-Fi węzła.
 
-Pokazywane są tylko najnowsze dane z pakietów węzła, bez historii i bez pomiarów na bieżąco; jeśli ostatni pakiet nie miał jakiejś wartości, brana jest ona z wcześniejszego. Pola, których węzeł nie wysyła, są ukryte.
+Domyślnie wszystkie trzy opcje statystyk są włączone. Pokazywane są tylko najnowsze dane z pakietów węzła, bez historii i bez pomiarów na bieżąco; jeśli ostatni pakiet nie miał jakiejś wartości, brana jest ona z wcześniejszego. Pola, których węzeł nie wysyła, są ukryte.
 
 Sposób pokazywania: **Strony** (jedna strona naraz; strony zmieniają się same, a przesunięcie palcem w lewo lub w prawo zmienia je ręcznie i na chwilę wstrzymuje automat) albo **Wszystko naraz**. Przełącznik **Same ikony (bez podpisów)** działa niezależnie od układu; przycisk (i) obok niego pokazuje znaczenie ikon. Podgląd w ustawieniach od razu odzwierciedla wszystkie przełączniki.
 

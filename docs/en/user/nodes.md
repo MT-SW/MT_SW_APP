@@ -36,10 +36,11 @@ The list has two densities, set at **Settings → Node Layout**. **Complete** sh
 The extra line under every node has three parts, switched on in **Settings → Node layout**:
 
 - **Environment metrics** — voltage and current at the top, and all weather sensors under them (temperature, humidity, pressure, wind, rain, light, UV and others). It takes as many lines as needed.
-- **Extra statistics → Packets** — a separate line at the right edge: channel utilization and air time (for nodes other than yours), TX, RX, B (bad), D (duplicates) and Przek. (relayed).
+- **Extra statistics → Ether** — a separate line at the right edge: channel utilization and air time (for nodes other than yours, as yours already shows them higher up) and the noise floor (with LNA correction, if set).
+- **Extra statistics → Packets** — a separate line at the right edge: TX, RX, B (bad), D (duplicates) and Przek. (relayed).
 - **Extra statistics → Hardware** — a separate line at the right edge: CPU, free memory, flash and PSRAM, and the node's Wi-Fi signal strength.
 
-Only the newest data from the node's packets is shown, with no history and no live measurements; if the last packet lacked a value, it is taken from an earlier one. Fields a node does not send are hidden.
+All three statistics options are on by default. Only the newest data from the node's packets is shown, with no history and no live measurements; if the last packet lacked a value, it is taken from an earlier one. Fields a node does not send are hidden.
 
 Display: **Pages** (one page at a time; pages change by themselves, and swiping left or right changes them by hand and pauses the automatic change for a moment) or **All at once**. The **Icons only (no labels)** switch works independently of the layout; the (i) button next to it explains the icons. The preview in the settings reflects every switch at once.
 

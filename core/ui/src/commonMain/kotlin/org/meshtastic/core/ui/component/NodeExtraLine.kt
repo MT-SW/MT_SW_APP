@@ -73,12 +73,14 @@ import org.meshtastic.core.ui.icon.PeopleCount
 import org.meshtastic.core.ui.icon.Pressure
 import org.meshtastic.core.ui.icon.SoilMoisture
 import org.meshtastic.core.ui.icon.SoilTemperature
+import org.meshtastic.core.ui.icon.Snr
 import org.meshtastic.core.ui.icon.Speed
 import org.meshtastic.core.ui.icon.Storage
 import org.meshtastic.core.ui.icon.Temperature
 import org.meshtastic.core.ui.icon.Tsunami
 import org.meshtastic.core.ui.icon.Voltage
 import org.meshtastic.core.ui.icon.Wifi
+import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.icon.Weight
 import org.meshtastic.core.ui.icon.WindDirection
 
@@ -91,10 +93,11 @@ data class NodeExtraConfig(
     val iconsOnly: Boolean = false,
     val packets: Boolean = false,
     val hardware: Boolean = false,
+    val ether: Boolean = false,
 ) {
     /** True when the extra statistics (beyond the sensors) are switched on. */
     val anyStats: Boolean
-        get() = packets || hardware
+        get() = packets || hardware || ether
 }
 
 val LocalNodeExtraConfig = staticCompositionLocalOf { NodeExtraConfig() }
@@ -142,6 +145,7 @@ val nodeExtraLegend: List<Pair<(@Composable () -> ImageVector)?, String>> =
             legend({ MeshtasticIcons.ElectricPower }, "Prąd / kanały zasilania"),
             legend({ MeshtasticIcons.ChannelUtilization }, "Zajętość kanału"),
             legend({ MeshtasticIcons.AirUtilization }, "Czas nadawania"),
+            legend({ MeshtasticIcons.Snr }, "Szum tła (poziom szumu na kanale)"),
             legend(null, "TX: pakiety wysłane"),
             legend(null, "RX: pakiety odebrane"),
             legend(null, "B: pakiety błędne (uszkodzone)"),
@@ -233,7 +237,7 @@ private fun powerChips(node: Node): List<ExtraChip> = buildList {
         }
 }
 
-private fun trafficChips(node: Node, stats: NodeExtraStats?, isThisNode: Boolean): List<ExtraChip> = buildList {
+private fun etherChips(node: Node, noiseFloor: Int?, isThisNode: Boolean): List<ExtraChip> = buildList {
     // Our own node already shows ChUtil and AirUtil in its signal row.
     if (!isThisNode) {
         val dm = node.deviceMetrics
@@ -244,6 +248,10 @@ private fun trafficChips(node: Node, stats: NodeExtraStats?, isThisNode: Boolean
             add(ExtraChip({ MeshtasticIcons.AirUtilization }, "AirUtil", MetricFormatter.percent(it)))
         }
     }
+    noiseFloor?.let { add(ExtraChip({ MeshtasticIcons.Snr }, "Szum", "$it dBm")) }
+}
+
+private fun trafficChips(stats: NodeExtraStats?): List<ExtraChip> = buildList {
     stats?.packetsTx?.let { add(ExtraChip(null, "TX", "$it")) }
     stats?.packetsRx?.let { add(ExtraChip(null, "RX", "$it")) }
     stats?.packetsRxBad?.let { add(ExtraChip(null, "B", "$it")) }
@@ -275,12 +283,14 @@ private fun buildGroups(
     stats: NodeExtraStats?,
     config: NodeExtraConfig,
     showEnvironment: Boolean,
+    noiseFloor: Int?,
     tempF: Boolean,
     imperial: Boolean,
     isThisNode: Boolean,
 ): List<ExtraGroup> = buildList {
     if (showEnvironment) add(ExtraGroup(powerChips(node) + weatherChips(node, tempF, imperial), rightAligned = false))
-    if (config.packets) add(ExtraGroup(trafficChips(node, stats, isThisNode), rightAligned = true))
+    if (config.ether) add(ExtraGroup(etherChips(node, noiseFloor, isThisNode), rightAligned = true))
+    if (config.packets) add(ExtraGroup(trafficChips(stats), rightAligned = true))
     if (config.hardware) add(ExtraGroup(resourceChips(stats), rightAligned = true))
 }
     .filter { it.chips.isNotEmpty() }
@@ -304,9 +314,12 @@ fun NodeExtraLine(
     val config = LocalNodeExtraConfig.current
     val stats = LocalNodeExtraStats.current[node.num]
     val imperial = distanceUnits != MeasurementSystem.METRIC
+    // The noise floor is shown with the node's LNA correction, like everywhere else in the app.
+    val lna = LocalLnaCorrection.current
+    val noiseFloor = stats?.noiseFloor?.let { lna.noiseFloor(node.num, it) }
     val groups =
-        remember(node, stats, config, showEnvironment, tempInFahrenheit, imperial, isThisNode) {
-            buildGroups(node, stats, config, showEnvironment, tempInFahrenheit, imperial, isThisNode)
+        remember(node, stats, config, showEnvironment, noiseFloor, tempInFahrenheit, imperial, isThisNode) {
+            buildGroups(node, stats, config, showEnvironment, noiseFloor, tempInFahrenheit, imperial, isThisNode)
         }
     if (groups.isEmpty()) return
 
