@@ -204,23 +204,21 @@ private fun trafficChips(node: Node, stats: NodeExtraStats?): List<ExtraChip> = 
     stats?.txRelay?.let { add(ExtraChip("🔁", "Przekazane", "$it")) }
 }
 
-private fun resourceChips(node: Node, stats: NodeExtraStats?): List<ExtraChip> = buildList {
+private fun resourceChips(uptimeText: String?, stats: NodeExtraStats?): List<ExtraChip> = buildList {
     stats?.cpuPercent?.let { add(ExtraChip("🧠", "CPU", "$it%")) }
     stats?.heapFreePercent?.ok()?.let { add(ExtraChip("🧮", "Wolna pamięć", MetricFormatter.percent(it, 0))) }
     stats?.flashUsedPercent?.ok()?.let { add(ExtraChip("💾", "Flash", MetricFormatter.percent(it, 0))) }
     stats?.psramFreePercent?.ok()?.let { add(ExtraChip("🗄", "PSRAM", MetricFormatter.percent(it, 0))) }
-    node.deviceMetrics.uptime_seconds?.takeIf { it > 0 }?.let {
-        add(ExtraChip("⏱", "Czas pracy", org.meshtastic.core.resources.formatDuration(it.toLong())))
-    }
+    uptimeText?.let { add(ExtraChip("⏱", "Czas pracy", it)) }
 }
 
 /** The groups that have anything to show, in the order weather, power, traffic, resources. */
-private fun buildGroups(node: Node, stats: NodeExtraStats?, tempF: Boolean, imperial: Boolean): List<ExtraGroup> =
+private fun buildGroups(node: Node, stats: NodeExtraStats?, tempF: Boolean, imperial: Boolean, uptimeText: String?): List<ExtraGroup> =
     listOf(
         weatherChips(node, tempF, imperial),
         powerChips(node),
         trafficChips(node, stats),
-        resourceChips(node, stats),
+        resourceChips(uptimeText, stats),
     )
         .filter { it.isNotEmpty() }
         .map { ExtraGroup(it) }
@@ -238,8 +236,12 @@ fun NodeExtraLine(node: Node, tempInFahrenheit: Boolean, distanceUnits: Measurem
     if (config.mode == NodeExtraMode.OFF) return
     val stats = LocalNodeExtraStats.current[node.num]
     val imperial = distanceUnits != MeasurementSystem.METRIC
+    val uptimeText =
+        node.deviceMetrics.uptime_seconds?.takeIf { it > 0 }?.let { org.meshtastic.core.resources.formatDuration(it.toLong()) }
     val groups =
-        remember(node, stats, tempInFahrenheit, imperial) { buildGroups(node, stats, tempInFahrenheit, imperial) }
+        remember(node, stats, tempInFahrenheit, imperial, uptimeText) {
+            buildGroups(node, stats, tempInFahrenheit, imperial, uptimeText)
+        }
     if (groups.isEmpty()) return
 
     if (config.mode == NodeExtraMode.ALL) {
