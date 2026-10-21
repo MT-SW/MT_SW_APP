@@ -26,6 +26,10 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Nowa dodatkowa linia pod każdym węzłem na liście: wszystkie czujniki pogody, zasilanie, ruch i zasoby (procesor, pamięć). Trzy tryby (wyłączone / strony / wszystko naraz), strony zmieniają się same i przesuwa się je palcem, opcja „same ikony” z legendą (i). Pokazywane są tylko najnowsze odczyty.
 * Zdrowie sieci: obce lub zepsute pakiety (np. z innego firmware) nie mogą już zawiesić ani wywrócić ekranu; ekran sam próbuje się podnieść po błędzie i nie czyta już pakietów trybu na żądanie.
 
+**Siła sygnału łącza i wybór sieci Wi-Fi z listy**
+* Pod ikoną połączenia przy Twoim węźle widać siłę sygnału łącza z radiem (Bluetooth z telefonu, Wi-Fi zgłaszane przez radio; przy USB nic). Nic nie jest zapisywane.
+* W ustawieniach sieci radia nowy przycisk „Wybierz sieć Wi-Fi z listy”: pokazuje sieci 2,4 GHz w pobliżu telefonu lub komputera (obecna sieć na górze) i wpisuje samą nazwę. Hasło wpisujesz ręcznie albo ze skanu kodu QR — aplikacja nigdy go nie odczytuje.
+
 **Gierka przy aktualizacji firmware**
 * Ludzik w grze (też ten ogłuszony oraz ten na ekranie aktualizacji i w pomocy) jest teraz cały żółty i ma na brzuchu logo MT_SW takie jak w ikonie aplikacji, zamiast zielonego koloru i oryginalnego znaczka.
 
@@ -359,6 +363,10 @@ The entries below describe only what this fork adds on top of the original, from
 **Extra data under a node, and a sturdier Network Health**
 * A new extra line under every node in the list: all weather sensors, power, traffic and resources (CPU, memory). Three modes (off / pages / all at once), pages change by themselves and by swiping, an "icons only" option with an (i) legend. Only the newest readings are shown.
 * Network Health: foreign or broken packets (e.g. from other firmware) can no longer freeze or crash the screen; it now tries to recover after an error and no longer reads on-demand mode packets.
+
+**Link signal strength and picking a Wi-Fi network from a list**
+* Under the connection icon on your own node you can see the strength of the link to the radio (Bluetooth from the phone, Wi-Fi as reported by the radio; nothing for USB). Nothing is stored.
+* In the radio's network settings there is a new "Pick a Wi-Fi network from the list" button: it shows the 2.4 GHz networks around the phone or computer (current network on top) and fills in only the name. You type the password by hand or scan a QR code -- the app never reads it.
 
 **Firmware-update mini-game**
 * The character in the game (also the dazed one, and the one on the update and help screens) is now fully yellow and wears the MT_SW logo from the app icon instead of the green colour and the original mark.
