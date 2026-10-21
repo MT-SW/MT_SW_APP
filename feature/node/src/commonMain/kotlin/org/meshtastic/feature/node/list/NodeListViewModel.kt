@@ -163,8 +163,11 @@ class NodeListViewModel(
                             if ((decoded[num] ?: 0) >= MAX_PACKETS_PER_NODE) continue
                             val payload = runCatching { log.fromRadio.packet?.decoded?.payload }.getOrNull() ?: continue
                             val telemetry = runCatching { Telemetry.ADAPTER.decode(payload) }.getOrNull() ?: continue
-                            val stats = telemetry.local_stats ?: continue
+                            // The extended stats (CPU, flash, Wi-Fi) come in a telemetry packet of their own, apart
+                            // from the normal local stats, so a packet may carry either one or both.
+                            val stats = telemetry.local_stats
                             val ext = runCatching { telemetry.decodeLocalStatsExtended() }.getOrNull()
+                            if (stats == null && ext == null) continue
                             decoded[num] = (decoded[num] ?: 0) + 1
                             val fresh = extraStatsOf(stats, ext)
                             result[num] = result[num]?.orElse(fresh) ?: fresh
@@ -375,7 +378,7 @@ class NodeListViewModel(
     companion object {
         private const val KEY_FILTER_TEXT = "filter_text"
         private const val EXTRA_STATS_WINDOW_MILLIS = 24 * 60 * 60 * 1000L
-        private const val MAX_PACKETS_PER_NODE = 6
+        private const val MAX_PACKETS_PER_NODE = 12
         private const val FLASHER_DEVICE_IMAGE_BASE_URL = "https://flasher.meshtastic.org/img/devices/"
     }
 }
@@ -418,19 +421,24 @@ data class NodeFilterState(
 
 private const val PERCENT = 100f
 
-private fun extraStatsOf(stats: LocalStats, ext: LocalStatsExtended?): NodeExtraStats {
-    val heapTotal = stats.heap_total_bytes ?: 0
-    val heapFree = stats.heap_free_bytes ?: 0
-    return NodeExtraStats(
-        packetsTx = stats.num_packets_tx,
-        packetsRx = stats.num_packets_rx,
-        packetsRxBad = stats.num_packets_rx_bad,
-        rxDupe = stats.num_rx_dupe,
-        txRelay = stats.num_tx_relay,
-        heapFreePercent = if (heapTotal > 0) heapFree * PERCENT / heapTotal else null,
-        noiseFloor = stats.noiseFloorOrNull,
-    )
-        .withHardware(ext)
+private fun extraStatsOf(stats: LocalStats?, ext: LocalStatsExtended?): NodeExtraStats {
+    val base =
+        if (stats == null) {
+            NodeExtraStats()
+        } else {
+            val heapTotal = stats.heap_total_bytes ?: 0
+            val heapFree = stats.heap_free_bytes ?: 0
+            NodeExtraStats(
+                packetsTx = stats.num_packets_tx,
+                packetsRx = stats.num_packets_rx,
+                packetsRxBad = stats.num_packets_rx_bad,
+                rxDupe = stats.num_rx_dupe,
+                txRelay = stats.num_tx_relay,
+                heapFreePercent = if (heapTotal > 0) heapFree * PERCENT / heapTotal else null,
+                noiseFloor = stats.noiseFloorOrNull,
+            )
+        }
+    return base.withHardware(ext)
 }
 
 /** Fills in the hardware part from a packet's extended stats; whatever the packet did not report stays as it was. */

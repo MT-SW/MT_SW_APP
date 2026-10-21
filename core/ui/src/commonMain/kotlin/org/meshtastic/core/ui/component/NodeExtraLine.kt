@@ -441,19 +441,20 @@ private fun ExtraChipView(chip: ExtraChip, iconsOnly: Boolean) {
     }
 }
 
-private fun chipItem(chip: ExtraChip): @Composable () -> Unit = { ExtraChipView(chip, iconsOnly = true) }
+private fun chipItem(chip: ExtraChip, iconsOnly: Boolean): @Composable () -> Unit = { ExtraChipView(chip, iconsOnly) }
 
 /**
- * Compact ether readings (channel utilization, air time, noise floor; icon and value only) for the hops row of a node
- * card, so they share its line instead of adding one. Empty when the "Ether" option is off. Our own node already shows
- * channel utilization and air time in its signal row, so it gets only the noise floor here.
+ * Ether readings (channel utilization, air time, noise floor) for a node card. They carry a short label, unless the
+ * "same icons" option is on or [forceIconsOnly] is set (when they share the hops line). Empty when the "Ether" option is
+ * off. Our own node already shows channel utilization and air time in its signal row, so it gets only the noise floor.
  */
 @Composable
-fun etherInlineItems(node: Node, isThisNode: Boolean): List<@Composable () -> Unit> {
+fun etherInlineItems(node: Node, isThisNode: Boolean, forceIconsOnly: Boolean): List<@Composable () -> Unit> {
     if (!LocalNodeExtraConfig.current.ether) return emptyList()
     val stats = LocalNodeExtraStats.current[node.num]
     // The noise floor is shown with the node's LNA correction, like everywhere else in the app.
     val lna = LocalLnaCorrection.current
     val noise = stats?.noiseFloor?.let { lna.noiseFloor(node.num, it) }
-    return etherChips(node, noise, isThisNode).map { chipItem(it) }
+    val iconsOnly = forceIconsOnly || LocalNodeExtraConfig.current.iconsOnly
+    return etherChips(node, noise, isThisNode).map { chipItem(it, iconsOnly) }
 }

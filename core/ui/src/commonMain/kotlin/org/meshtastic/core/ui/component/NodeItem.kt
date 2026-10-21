@@ -338,8 +338,10 @@ private fun NodeSignalRow(thatNode: Node, isThisNode: Boolean, contentColor: Col
     // The signal pill bundles SNR + RSSI + quality into one row. It's wider than a 1/3 grid cell, so it renders on
     // its own line at natural width; the short metrics flow in the grid.
     var signalChip: (@Composable () -> Unit)? = null
-    // Ether readings (channel use, air time, noise) share the hops line when that option is on.
-    val etherItems = etherInlineItems(thatNode, isThisNode)
+    // Ether readings (channel use, air time, noise): icons only on the right of the hops line when there is one,
+    // otherwise with short labels (on our own node in the grid, on a direct node on a line of their own).
+    val inHopsLine = !isThisNode && thatNode.hopsAway > 0
+    val etherItems = etherInlineItems(thatNode, isThisNode, forceIconsOnly = inHopsLine)
     val items =
         buildList<@Composable () -> Unit> {
             if (isThisNode) {
@@ -399,14 +401,17 @@ private fun NodeSignalRow(thatNode: Node, isThisNode: Boolean, contentColor: Col
                     add { ChannelInfo(channel = thatNode.channel, contentColor = contentColor) }
                 }
             }
-            addAll(etherItems)
+            if (isThisNode) addAll(etherItems)
         }
 
-    if (signalChip != null || items.isNotEmpty()) {
+    if (signalChip != null || items.isNotEmpty() || etherItems.isNotEmpty()) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             signalChip?.invoke()
-            if (items.isNotEmpty()) {
-                if (!isThisNode && etherItems.isNotEmpty()) MetricsFlow(items) else MetricsGrid(items)
+            if (inHopsLine && etherItems.isNotEmpty()) {
+                HopsEtherRow(left = items, right = etherItems)
+            } else {
+                if (items.isNotEmpty()) MetricsGrid(items)
+                if (!isThisNode && etherItems.isNotEmpty()) EtherLine(etherItems)
             }
         }
     }
@@ -488,13 +493,31 @@ private fun gatherSensors(node: Node, tempInFahrenheit: Boolean, contentColor: C
     return items
 }
 
-/** Like [MetricsGrid], but the items sit side by side as tightly as they fit (used for the hops line with ether data). */
+/** The hops line: hops (and the relay) from the left, the ether icons from the right; wraps only if they do not fit. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun MetricsFlow(items: List<@Composable () -> Unit>) {
+private fun HopsEtherRow(left: List<@Composable () -> Unit>, right: List<@Composable () -> Unit>) {
     FlowRow(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
+            left.forEach { item -> item() }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            right.forEach { item -> item() }
+        }
+    }
+}
+
+/** The ether readings of a direct node on a line of their own, from the right edge like the other statistics. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun EtherLine(items: List<@Composable () -> Unit>) {
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         items.forEach { item -> item() }

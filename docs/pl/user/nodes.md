@@ -36,7 +36,7 @@ Lista ma dwa poziomy szczegółowości, ustawiane w **Ustawienia → Układ węz
 Dodatkowa linia pod każdym węzłem składa się z trzech części, włączanych w **Ustawienia → Układ węzła**:
 
 - **Metryki środowiskowe** — na górze napięcie (także to z pakietu telemetrii środowiskowej) i prąd, a pod nimi wszystkie czujniki pogody (temperatura, wilgotność, ciśnienie, wiatr, deszcz, światło, UV i inne). Zajmuje tyle linii, ile trzeba.
-- **Dodatkowe statystyki → Eter** — małe ikony z wartościami w tej samej linii co „Skoków”, bez dodatkowej linii: zajętość kanału i czas nadawania (dla węzłów innych niż Twój, bo Twój pokazuje je już wyżej) oraz szum tła (z korektą LNA, jeśli jest ustawiona).
+- **Dodatkowe statystyki → Eter** — z krótkimi podpisami (przy włączonym „Same ikony” bez podpisów). Węzeł z liczbą skoków pokazuje je jako same ikony od prawej strony w linii „Skoków”, bez dodatkowej linii: zajętość kanału i czas nadawania (dla węzłów innych niż Twój, bo Twój pokazuje je już wyżej) oraz szum tła (z korektą LNA, jeśli jest ustawiona).
 - **Dodatkowe statystyki → Pakiety** — osobna linia przy prawej krawędzi: TX, RX, B (błędne), D (duplikaty) i Przek. (przekazane dalej).
 - **Dodatkowe statystyki → Sprzęt** — osobna linia przy prawej krawędzi: procesor, wolna pamięć, pamięć flash i PSRAM oraz siła sygnału Wi-Fi węzła.
 
