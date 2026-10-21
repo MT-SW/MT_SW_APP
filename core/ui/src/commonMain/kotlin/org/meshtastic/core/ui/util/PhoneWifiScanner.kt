@@ -18,8 +18,16 @@ package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.Composable
 
-/** One Wi-Fi network seen by this phone or computer. [is24Ghz] is null when the band is not known. */
-data class PhoneWifiNetwork(val ssid: String, val rssi: Int?, val is24Ghz: Boolean? = null)
+/**
+ * One Wi-Fi network seen by this phone or computer. [is24Ghz] is null when the band is not known, [secured] is null
+ * when it is not known whether the network needs a password.
+ */
+data class PhoneWifiNetwork(
+    val ssid: String,
+    val rssi: Int?,
+    val is24Ghz: Boolean? = null,
+    val secured: Boolean? = null,
+)
 
 /**
  * Looks at the Wi-Fi networks around this phone or computer, so the radio's network name can be picked from a list

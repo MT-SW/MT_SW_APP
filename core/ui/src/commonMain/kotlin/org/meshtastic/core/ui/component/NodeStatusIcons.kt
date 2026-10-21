@@ -115,8 +115,6 @@ fun NodeStatusIcons(
 private fun ThisNodeStatusBadge(connectionState: ConnectionState, deviceType: DeviceType?) {
     androidx.compose.foundation.layout.Column(horizontalAlignment = Alignment.CenterHorizontally) {
         ThisNodeConnectionIcon(connectionState, deviceType)
-        // Signal strength under the connection icon (Bluetooth, or the device's Wi-Fi); empty when not known.
-        LinkSignalLabel()
     }
 }
 

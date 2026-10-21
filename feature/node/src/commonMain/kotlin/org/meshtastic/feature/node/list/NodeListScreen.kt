@@ -87,7 +87,6 @@ import org.meshtastic.core.ui.component.EmptyState
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticImportFAB
-import org.meshtastic.core.ui.component.LocalLinkSignal
 import org.meshtastic.core.ui.component.LocalNodeExtraConfig
 import org.meshtastic.core.ui.component.LocalNodeExtraStats
 import org.meshtastic.core.ui.component.LocalNodeExtraTick
@@ -191,7 +190,8 @@ fun NodeListScreen(
     val extraMode by viewModel.nodeExtraMode.collectAsStateWithLifecycle()
     val extraIconsOnly by viewModel.nodeExtraIconsOnly.collectAsStateWithLifecycle()
     val extraStats by viewModel.nodeExtraStats.collectAsStateWithLifecycle()
-    val linkSignal by viewModel.linkSignal.collectAsStateWithLifecycle()
+    val extraPackets by viewModel.nodeExtraPackets.collectAsStateWithLifecycle()
+    val extraHardware by viewModel.nodeExtraHardware.collectAsStateWithLifecycle()
     // One ticker for the whole list: visible paged rows change page together; nothing runs when paging is off.
     val extraTick = remember { mutableIntStateOf(0) }
     if (extraMode == NodeExtraMode.PAGED) {
@@ -223,10 +223,9 @@ fun NodeListScreen(
     }
 
     CompositionLocalProvider(
-        LocalNodeExtraConfig provides NodeExtraConfig(extraMode, extraIconsOnly),
+        LocalNodeExtraConfig provides NodeExtraConfig(extraMode, extraIconsOnly, extraPackets, extraHardware),
         LocalNodeExtraStats provides extraStats,
         LocalNodeExtraTick provides extraTick,
-        LocalLinkSignal provides linkSignal,
     ) {
     Scaffold(
         modifier = modifier,

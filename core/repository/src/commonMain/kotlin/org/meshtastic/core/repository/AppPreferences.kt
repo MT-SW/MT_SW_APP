@@ -279,10 +279,20 @@ interface UiPrefs {
 
     fun setShouldShowTelemetry(value: Boolean)
 
-    /** Extra line of data on the node list: the [org.meshtastic.core.model.NodeExtraMode] name (OFF / PAGED / ALL). */
+    /** Extra line of data on the node list: the [org.meshtastic.core.model.NodeExtraMode] name (PAGED / ALL). */
     val nodeExtraMode: StateFlow<String>
 
     fun setNodeExtraMode(value: String)
+
+    /** Extra line shows packet counters (TX, RX, ...). */
+    val nodeExtraPackets: StateFlow<Boolean>
+
+    fun setNodeExtraPackets(value: Boolean)
+
+    /** Extra line shows hardware data (CPU, memory, Wi-Fi signal). */
+    val nodeExtraHardware: StateFlow<Boolean>
+
+    fun setNodeExtraHardware(value: Boolean)
 
     /** Extra line shows only icons and values, without text labels. */
     val nodeExtraIconsOnly: StateFlow<Boolean>

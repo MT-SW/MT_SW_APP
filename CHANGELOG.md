@@ -23,12 +23,11 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Drugie scalenie z oryginałem: nowy **widok AR sieci** (węzły i punkty trasy na obrazie z aparatu telefonu), **podgląd 3D urządzenia**, szybkie akcje „Otwórz kompas” i „Otwórz widok sieci” w menu węzła, protobufy 2.8.1.20 i nowsze narzędzia budowania. Nowe napisy przetłumaczone na polski, a nasze funkcje (np. nazwy planera, Zdrowie sieci) zostały zachowane.
 
 **Dodatkowe dane przy węźle i odporność Zdrowia sieci**
-* Nowa dodatkowa linia pod każdym węzłem na liście: wszystkie czujniki pogody, zasilanie, ruch i zasoby (procesor, pamięć). Trzy tryby (wyłączone / strony / wszystko naraz), strony zmieniają się same i przesuwa się je palcem, opcja „same ikony” z legendą (i). Pokazywane są tylko najnowsze odczyty.
+* Nowa dodatkowa linia pod każdym węzłem na liście. Przełącznik „Metryki środowiskowe” pokazuje w niej na górze napięcie i prąd, a pod nimi wszystkie czujniki pogody. Pod spodem, w ustawieniach „Dodatkowe statystyki”, osobne przełączniki: pakiety (TX, RX, błędne, duplikaty — w osobnej linii, przy prawej krawędzi) oraz sprzęt (procesor, pamięć, siła Wi-Fi węzła — też osobna linia przy prawej krawędzi). Wszystko to ostatnie dane z pakietów węzła, nic nie jest mierzone na bieżąco. Strony albo wszystko naraz, opcja „same ikony” z legendą (i), a podgląd w ustawieniach od razu pokazuje zmiany.
 * Zdrowie sieci: obce lub zepsute pakiety (np. z innego firmware) nie mogą już zawiesić ani wywrócić ekranu; ekran sam próbuje się podnieść po błędzie i nie czyta już pakietów trybu na żądanie.
 
-**Siła sygnału łącza i wybór sieci Wi-Fi z listy**
-* Pod ikoną połączenia przy Twoim węźle widać siłę sygnału łącza z radiem (Bluetooth z telefonu, Wi-Fi zgłaszane przez radio; przy USB nic). Nic nie jest zapisywane.
-* W ustawieniach sieci radia nowy przycisk „Wybierz sieć Wi-Fi z listy”: pokazuje sieci 2,4 GHz w pobliżu telefonu lub komputera (obecna sieć na górze) i wpisuje samą nazwę. Hasło wpisujesz ręcznie albo ze skanu kodu QR — aplikacja nigdy go nie odczytuje.
+**Wybór sieci Wi-Fi z listy**
+* W ustawieniach sieci radia nowy przycisk „Wybierz sieć Wi-Fi z listy”: pokazuje sieci 2,4 GHz w pobliżu telefonu lub komputera (obecna sieć na górze, siła sygnału, kłódka przy sieciach z hasłem). Po wybraniu sieci z hasłem pojawia się osobne okienko na hasło, a po „Połącz” radio od razu dostaje sieć i hasło (jak „Wyślij”) i łączy się z nią; sieć bez hasła łączy się od razu. Aplikacja nigdy nie odczytuje zapisanych haseł telefonu.
 
 **Gierka przy aktualizacji firmware**
 * Ludzik w grze (też ten ogłuszony oraz ten na ekranie aktualizacji i w pomocy) jest teraz cały żółty i ma na brzuchu logo MT_SW takie jak w ikonie aplikacji, zamiast zielonego koloru i oryginalnego znaczka.
@@ -361,12 +360,11 @@ The entries below describe only what this fork adds on top of the original, from
 * Second merge with the original: the new **AR mesh view** (nodes and waypoints over the phone camera), the **3D device model viewer**, the quick actions "Open compass" and "Open mesh view" in the node menu, protobufs 2.8.1.20 and newer build tooling. New strings are translated to Polish, and our features (e.g. the planner naming, Network Health) are kept.
 
 **Extra data under a node, and a sturdier Network Health**
-* A new extra line under every node in the list: all weather sensors, power, traffic and resources (CPU, memory). Three modes (off / pages / all at once), pages change by themselves and by swiping, an "icons only" option with an (i) legend. Only the newest readings are shown.
+* A new extra line under every node in the list. The "Environment metrics" switch shows voltage and current at the top and all weather sensors under them. Below, in the "Extra statistics" settings, separate switches: packets (TX, RX, bad, duplicates -- on their own line, at the right edge) and hardware (CPU, memory, the node's Wi-Fi strength -- also its own line at the right edge). All of it is the latest data from the node's packets; nothing is measured live. Pages or all at once, an "icons only" option with an (i) legend, and the preview in the settings shows changes at once.
 * Network Health: foreign or broken packets (e.g. from other firmware) can no longer freeze or crash the screen; it now tries to recover after an error and no longer reads on-demand mode packets.
 
-**Link signal strength and picking a Wi-Fi network from a list**
-* Under the connection icon on your own node you can see the strength of the link to the radio (Bluetooth from the phone, Wi-Fi as reported by the radio; nothing for USB). Nothing is stored.
-* In the radio's network settings there is a new "Pick a Wi-Fi network from the list" button: it shows the 2.4 GHz networks around the phone or computer (current network on top) and fills in only the name. You type the password by hand or scan a QR code -- the app never reads it.
+**Picking a Wi-Fi network from a list**
+* In the radio's network settings there is a new "Pick a Wi-Fi network from the list" button: it shows the 2.4 GHz networks around the phone or computer (current network on top, signal strength, a padlock on networks with a password). After you pick a network with a password, a separate window asks for the password, and after "Connect" the radio gets the network and the password at once (like "Send") and joins it; a network without a password connects at once. The app never reads the phone's saved passwords.
 
 **Firmware-update mini-game**
 * The character in the game (also the dazed one, and the one on the update and help screens) is now fully yellow and wears the MT_SW logo from the app icon instead of the green colour and the original mark.

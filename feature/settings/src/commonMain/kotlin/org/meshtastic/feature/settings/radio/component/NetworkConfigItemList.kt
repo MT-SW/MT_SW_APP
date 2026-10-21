@@ -265,6 +265,22 @@ fun NetworkConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit, onO
                     // Pick the network name from the networks around this phone or computer (none where unsupported).
                     val wifiScanner = rememberPhoneWifiScanner()
                     var showWifiPicker by remember { mutableStateOf(false) }
+                    var passwordFor by remember { mutableStateOf<String?>(null) }
+                    // Network and password go to the radio at once (the same as pressing "Wyślij"), like joining a
+                    // network on a phone.
+                    val connectNow: (String, String) -> Unit = { ssid, psk ->
+                        val updated =
+                            formState.value
+                                .newBuilder()
+                                .also { wb ->
+                                    wb.wifi_enabled = true
+                                    wb.wifi_ssid = ssid.take(32)
+                                    wb.wifi_psk = psk
+                                }
+                                .build()
+                        formState.value = updated
+                        viewModel.setConfig(Config.Builder().also { wb -> wb.network = updated }.build())
+                    }
                     if (wifiScanner != null) {
                         Button(
                             onClick = { showWifiPicker = true },
@@ -277,12 +293,21 @@ fun NetworkConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit, onO
                         if (showWifiPicker) {
                             WifiNetworkPickerDialog(
                                 scanner = wifiScanner,
-                                onPick = { name ->
-                                    formState.value =
-                                        formState.value.newBuilder().also { wb -> wb.wifi_ssid = name.take(32) }.build()
+                                onPick = { network ->
                                     showWifiPicker = false
+                                    if (network.secured == false) connectNow(network.ssid, "") else passwordFor = network.ssid
                                 },
                                 onDismiss = { showWifiPicker = false },
+                            )
+                        }
+                        passwordFor?.let { ssid ->
+                            WifiPasswordDialog(
+                                ssid = ssid,
+                                onConnect = { password ->
+                                    passwordFor = null
+                                    connectNow(ssid, password)
+                                },
+                                onDismiss = { passwordFor = null },
                             )
                         }
                     }

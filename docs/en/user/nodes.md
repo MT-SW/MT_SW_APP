@@ -31,15 +31,17 @@ The node list shows every node your node has heard, including:
 
 The list has two densities, set at **Settings → Node Layout**. **Complete** shows every field a node has reported and hides the ones it hasn't. **Compact** fits more nodes on screen and lets you pick the fields yourself — **Power**, **Last Heard Time**, **Relative Last Heard Time**, **Distance and Bearing**, **Hops Away**, **Signal (Direct Only)**, **Channel**, and **Device & Role**. The **Environment Metrics** toggle applies to both densities. A preview above the toggles shows the effect before you leave the screen.
 
-### Link signal strength
-
-Under the connection icon on your own node you can see the strength of the link to the radio in dBm: for Bluetooth, the phone's reading (refreshed every few seconds); for a network connection, the Wi-Fi strength the radio itself reports. Nothing is shown for USB. The value is not stored anywhere.
-
 ### Extra data under a node
 
-In **Settings → Node layout → Extra data under a node** you can switch on an extra line under every node: weather (temperature, humidity, pressure, wind, rain, light, UV and other sensors), power, traffic (packets sent, received, bad, channel utilization) and resources (CPU, memory, uptime). Only the newest readings are shown, no history. A node with no weather sensors shows traffic and resources.
+The extra line under every node has three parts, switched on in **Settings → Node layout**:
 
-Three modes: **Off**, **Pages** (one page at a time; pages change by themselves, and swiping left or right changes them by hand and pauses the automatic change for a moment) and **All at once**. The **Icons only (no labels)** switch works independently of the layout; the (i) button next to it explains the icons. When the extra line is on, it replaces the older sensor grid.
+- **Environment metrics** — voltage and current at the top, and all weather sensors under them (temperature, humidity, pressure, wind, rain, light, UV and others). It takes as many lines as needed.
+- **Extra statistics → Packets** — a separate line at the right edge: channel utilization and air time (for nodes other than yours), TX, RX, B (bad), D (duplicates) and Przek. (relayed).
+- **Extra statistics → Hardware** — a separate line at the right edge: CPU, free memory, flash and PSRAM, and the node's Wi-Fi signal strength.
+
+Only the newest data from the node's packets is shown, with no history and no live measurements; if the last packet lacked a value, it is taken from an earlier one. Fields a node does not send are hidden.
+
+Display: **Pages** (one page at a time; pages change by themselves, and swiping left or right changes them by hand and pauses the automatic change for a moment) or **All at once**. The **Icons only (no labels)** switch works independently of the layout; the (i) button next to it explains the icons. The preview in the settings reflects every switch at once.
 
 ### Node Status indicators
 

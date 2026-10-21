@@ -21,6 +21,7 @@ package org.meshtastic.core.ui.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -54,7 +55,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.MetricFormatter
-import org.meshtastic.core.model.LinkSignal
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeExtraMode
 import org.meshtastic.core.model.NodeExtraStats
@@ -78,22 +78,29 @@ import org.meshtastic.core.ui.icon.Storage
 import org.meshtastic.core.ui.icon.Temperature
 import org.meshtastic.core.ui.icon.Tsunami
 import org.meshtastic.core.ui.icon.Voltage
+import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.core.ui.icon.Weight
 import org.meshtastic.core.ui.icon.WindDirection
-import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
-import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
-import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
 
-/** How the extra line of data under each node is shown; provided by the node list. */
-data class NodeExtraConfig(val mode: NodeExtraMode = NodeExtraMode.OFF, val iconsOnly: Boolean = false)
+/**
+ * How the extra line of data under each node is shown; provided by the node list. [packets] and [hardware] switch the
+ * packet counters and the hardware data on; sensors (power and weather) follow the environment metrics switch.
+ */
+data class NodeExtraConfig(
+    val mode: NodeExtraMode = NodeExtraMode.ALL,
+    val iconsOnly: Boolean = false,
+    val packets: Boolean = false,
+    val hardware: Boolean = false,
+) {
+    /** True when the extra statistics (beyond the sensors) are switched on. */
+    val anyStats: Boolean
+        get() = packets || hardware
+}
 
 val LocalNodeExtraConfig = staticCompositionLocalOf { NodeExtraConfig() }
 
-/** Newest traffic / resource readings per node number; provided by the node list. */
+/** Newest traffic / hardware readings per node number; provided by the node list. */
 val LocalNodeExtraStats = compositionLocalOf<Map<Int, NodeExtraStats>> { emptyMap() }
-
-/** Strength of the link to the connected radio (Bluetooth or the device's Wi-Fi); null = nothing to show. */
-val LocalLinkSignal = compositionLocalOf<LinkSignal?> { null }
 
 /** One shared ticker for the whole list: every few seconds all visible paged rows move to their next page. */
 val LocalNodeExtraTick = compositionLocalOf<State<Int>> { mutableIntStateOf(0) }
@@ -107,7 +114,10 @@ private const val MANUAL_PAUSE_TICKS = 3
 /** One reading: an icon in the app's own grey style, a short label (hidden when icons only) and the value. */
 data class ExtraChip(val icon: (@Composable () -> ImageVector)?, val label: String, val value: String)
 
-private data class ExtraGroup(val chips: List<ExtraChip>)
+/** A themed run of readings; packet and hardware groups are pushed to the right edge of the card. */
+private data class ExtraGroup(val chips: List<ExtraChip>, val rightAligned: Boolean)
+
+private data class ExtraPage(val chips: List<ExtraChip>, val rightAligned: Boolean)
 
 private fun legend(icon: (@Composable () -> ImageVector)?, text: String) = icon to text
 
@@ -137,6 +147,7 @@ val nodeExtraLegend: List<Pair<(@Composable () -> ImageVector)?, String>> =
             legend(null, "B: pakiety błędne (uszkodzone)"),
             legend(null, "D: duplikaty"),
             legend(null, "Przek.: pakiety przekazane dalej"),
+            legend({ MeshtasticIcons.Wifi }, "Siła sygnału Wi-Fi węzła (z jego pakietu)"),
             legend({ MeshtasticIcons.Memory }, "Procesor (CPU)"),
             legend({ MeshtasticIcons.DataUsage }, "Wolna pamięć"),
             legend({ MeshtasticIcons.Storage }, "Zajęta pamięć flash / PSRAM"),
@@ -251,23 +262,28 @@ private fun resourceChips(stats: NodeExtraStats?): List<ExtraChip> = buildList {
     stats?.psramFreePercent?.ok()?.let {
         add(ExtraChip({ MeshtasticIcons.Storage }, "PSRAM", MetricFormatter.percent(it, 0)))
     }
+    // Shown exactly as the node sent it in its last packet.
+    stats?.wifiRssi?.let { add(ExtraChip({ MeshtasticIcons.Wifi }, "Wi-Fi", "$it dBm")) }
 }
 
-/** The groups that have anything to show, in the order weather, power, traffic, resources. */
+/**
+ * The groups that have anything to show, top to bottom: sensors (power first, then weather), packets, hardware. The
+ * sensors follow the environment metrics switch, the other two have their own switches.
+ */
 private fun buildGroups(
     node: Node,
     stats: NodeExtraStats?,
+    config: NodeExtraConfig,
+    showEnvironment: Boolean,
     tempF: Boolean,
     imperial: Boolean,
     isThisNode: Boolean,
-): List<ExtraGroup> = listOf(
-    weatherChips(node, tempF, imperial),
-    powerChips(node),
-    trafficChips(node, stats, isThisNode),
-    resourceChips(stats),
-)
-    .filter { it.isNotEmpty() }
-    .map { ExtraGroup(it) }
+): List<ExtraGroup> = buildList {
+    if (showEnvironment) add(ExtraGroup(powerChips(node) + weatherChips(node, tempF, imperial), rightAligned = false))
+    if (config.packets) add(ExtraGroup(trafficChips(node, stats, isThisNode), rightAligned = true))
+    if (config.hardware) add(ExtraGroup(resourceChips(stats), rightAligned = true))
+}
+    .filter { it.chips.isNotEmpty() }
 
 /**
  * The extra line of data under a node: weather sensors, power, traffic and resources. Only the newest readings are
@@ -282,32 +298,40 @@ fun NodeExtraLine(
     tempInFahrenheit: Boolean,
     distanceUnits: MeasurementSystem,
     isThisNode: Boolean,
+    showEnvironment: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val config = LocalNodeExtraConfig.current
-    if (config.mode == NodeExtraMode.OFF) return
     val stats = LocalNodeExtraStats.current[node.num]
     val imperial = distanceUnits != MeasurementSystem.METRIC
     val groups =
-        remember(node, stats, tempInFahrenheit, imperial, isThisNode) {
-            buildGroups(node, stats, tempInFahrenheit, imperial, isThisNode)
+        remember(node, stats, config, showEnvironment, tempInFahrenheit, imperial, isThisNode) {
+            buildGroups(node, stats, config, showEnvironment, tempInFahrenheit, imperial, isThisNode)
         }
     if (groups.isEmpty()) return
 
     if (config.mode == NodeExtraMode.ALL) {
-        FlowRow(
-            modifier = modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            groups.forEach { g -> g.chips.forEach { ExtraChipView(it, config.iconsOnly) } }
+        Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            groups.forEach { g ->
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement =
+                    if (g.rightAligned) Arrangement.spacedBy(10.dp, Alignment.End) else Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    g.chips.forEach { ExtraChipView(it, config.iconsOnly) }
+                }
+            }
         }
         return
     }
 
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
         val perPage = pageCapacity(maxWidth, config.iconsOnly)
-        val pages = remember(groups, perPage) { groups.flatMap { it.chips.chunked(perPage) } }
+        val pages =
+            remember(groups, perPage) {
+                groups.flatMap { g -> g.chips.chunked(perPage).map { ExtraPage(it, g.rightAligned) } }
+            }
         PagedRow(pages = pages, iconsOnly = config.iconsOnly)
     }
 }
@@ -318,7 +342,7 @@ private fun pageCapacity(width: Dp, iconsOnly: Boolean): Int {
 }
 
 @Composable
-private fun PagedRow(pages: List<List<ExtraChip>>, iconsOnly: Boolean) {
+private fun PagedRow(pages: List<ExtraPage>, iconsOnly: Boolean) {
     val tickState = LocalNodeExtraTick.current
     val tick by tickState
     val pagerState = rememberPagerState { pages.size }
@@ -342,8 +366,14 @@ private fun PagedRow(pages: List<List<ExtraChip>>, iconsOnly: Boolean) {
 
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
         HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { index ->
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                pages.getOrNull(index)?.forEach { ExtraChipView(it, iconsOnly) }
+            val page = pages.getOrNull(index)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement =
+                if (page?.rightAligned == true) Arrangement.spacedBy(12.dp, Alignment.End) else Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                page?.chips?.forEach { ExtraChipView(it, iconsOnly) }
             }
         }
         if (pages.size > 1) {
@@ -396,23 +426,4 @@ private fun ExtraChipView(chip: ExtraChip, iconsOnly: Boolean) {
             )
         }
     }
-}
-
-/** The link strength in dBm, in a colour that follows how good it is; shows nothing when there is no reading. */
-@Composable
-fun LinkSignalLabel(modifier: Modifier = Modifier) {
-    val signal = LocalLinkSignal.current ?: return
-    val color =
-        when {
-            signal.dbm >= -70 -> MaterialTheme.colorScheme.StatusOnline
-            signal.dbm >= -85 -> MaterialTheme.colorScheme.StatusYellow
-            else -> MaterialTheme.colorScheme.StatusOrange
-        }
-    Text(
-        text = "${signal.dbm} dBm",
-        style = MaterialTheme.typography.labelSmall,
-        color = color,
-        maxLines = 1,
-        modifier = modifier,
-    )
 }

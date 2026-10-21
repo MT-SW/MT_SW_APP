@@ -112,6 +112,8 @@ fun NodeLayoutSettings(
     onShowTelemetryChange: (Boolean) -> Unit,
     onExtraModeChange: (NodeExtraMode) -> Unit = {},
     onExtraIconsOnlyChange: (Boolean) -> Unit = {},
+    onExtraPacketsChange: (Boolean) -> Unit = {},
+    onExtraHardwareChange: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     ExpressiveSection(modifier = modifier, title = stringResource(Res.string.node_layout_section_title)) {
@@ -157,7 +159,7 @@ fun NodeLayoutSettings(
         }
         val previewStats = remember { mapOf(previewNode.num to previewSampleExtraStats()) }
         CompositionLocalProvider(
-            LocalNodeExtraConfig provides NodeExtraConfig(state.extraMode, state.extraIconsOnly),
+            LocalNodeExtraConfig provides NodeExtraConfig(state.extraMode, state.extraIconsOnly, state.extraPackets, state.extraHardware),
             LocalNodeExtraStats provides previewStats,
             LocalNodeExtraTick provides previewTick,
         ) {
@@ -206,8 +208,12 @@ fun NodeLayoutSettings(
         NodeExtraSettings(
             mode = state.extraMode,
             iconsOnly = state.extraIconsOnly,
+            packets = state.extraPackets,
+            hardware = state.extraHardware,
             onModeChange = onExtraModeChange,
             onIconsOnlyChange = onExtraIconsOnlyChange,
+            onPacketsChange = onExtraPacketsChange,
+            onHardwareChange = onExtraHardwareChange,
         )
 
         if (state.density == NodeListDensity.COMPLETE) {
@@ -294,6 +300,7 @@ private fun previewSampleExtraStats(): NodeExtraStats = NodeExtraStats(
     cpuPercent = 12,
     heapFreePercent = 41f,
     flashUsedPercent = 63f,
+    wifiRssi = -67,
 )
 
 @Suppress("MagicNumber")
@@ -339,6 +346,7 @@ internal fun previewSampleNode(hopsAway: Int = 1): Node = Node(
             wb.temperature = 24.5F
             wb.relative_humidity = 45.0F
             wb.barometric_pressure = 1013.25F
+            wb.current = -11.5F
         }
         .build(),
     isFavorite = true,
@@ -371,38 +379,58 @@ internal fun previewLocalNode(): Node = Node(
     lastHeard = (nowSeconds - 30).toInt(),
 )
 
-/** Extra line of data under each node: off / pages / all at once, plus "same icons" (no labels) with a legend. */
+/**
+ * Extra line of data under each node. The sensors (power, weather) follow the environment metrics switch above; here
+ * come the optional statistics (packets, hardware), how the line is shown and "same icons" with a legend.
+ */
 @Composable
 private fun NodeExtraSettings(
     mode: NodeExtraMode,
     iconsOnly: Boolean,
+    packets: Boolean,
+    hardware: Boolean,
     onModeChange: (NodeExtraMode) -> Unit,
     onIconsOnlyChange: (Boolean) -> Unit,
+    onPacketsChange: (Boolean) -> Unit,
+    onHardwareChange: (Boolean) -> Unit,
 ) {
     var showLegend by remember { mutableStateOf(false) }
     HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
     Text(
-        text = "Dodatkowe dane przy węźle",
+        text = "Dodatkowe statystyki",
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp),
     )
     Text(
-        text = "Pogoda, zasilanie, ruch i zasoby. Pokazywane są tylko najnowsze odczyty.",
+        text = "Dane z ostatniego pakietu węzła. Metryki środowiskowe pokazują napięcie, prąd i pogodę.",
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
     )
+    SwitchPreference(
+        title = "Pakiety (TX, RX, błędne, duplikaty)",
+        checked = packets,
+        enabled = true,
+        onCheckedChange = onPacketsChange,
+    )
+    SwitchPreference(
+        title = "Sprzęt (procesor, pamięć, Wi-Fi)",
+        checked = hardware,
+        enabled = true,
+        onCheckedChange = onHardwareChange,
+    )
+    Text(
+        text = "Sposób pokazywania",
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp),
+    )
+    val modes = listOf(NodeExtraMode.PAGED to "Strony", NodeExtraMode.ALL to "Wszystko naraz")
     SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        NodeExtraMode.entries.forEachIndexed { index, option ->
-            val label =
-                when (option) {
-                    NodeExtraMode.OFF -> "Wyłączone"
-                    NodeExtraMode.PAGED -> "Strony"
-                    NodeExtraMode.ALL -> "Wszystko naraz"
-                }
+        modes.forEachIndexed { index, (option, label) ->
             SegmentedButton(
-                shape = SegmentedButtonDefaults.itemShape(index, NodeExtraMode.entries.size),
+                shape = SegmentedButtonDefaults.itemShape(index, modes.size),
                 onClick = { onModeChange(option) },
                 selected = mode == option,
                 label = { Text(label) },
@@ -417,19 +445,17 @@ private fun NodeExtraSettings(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
         )
     }
-    if (mode != NodeExtraMode.OFF) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier.weight(1f)) {
-                SwitchPreference(
-                    title = "Same ikony (bez podpisów)",
-                    checked = iconsOnly,
-                    enabled = true,
-                    onCheckedChange = onIconsOnlyChange,
-                )
-            }
-            IconButton(onClick = { showLegend = true }) {
-                Icon(imageVector = MeshtasticIcons.Info, contentDescription = "Znaczenie ikon")
-            }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(modifier = Modifier.weight(1f)) {
+            SwitchPreference(
+                title = "Same ikony (bez podpisów)",
+                checked = iconsOnly,
+                enabled = true,
+                onCheckedChange = onIconsOnlyChange,
+            )
+        }
+        IconButton(onClick = { showLegend = true }) {
+            Icon(imageVector = MeshtasticIcons.Info, contentDescription = "Znaczenie ikon")
         }
     }
     if (showLegend) {
