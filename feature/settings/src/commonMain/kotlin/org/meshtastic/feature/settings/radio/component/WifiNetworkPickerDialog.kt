@@ -57,6 +57,7 @@ private const val GOOD_DBM = -60
 private const val OK_DBM = -70
 private const val FAIR_DBM = -80
 
+@Composable
 private fun strengthIcon(rssi: Int?): ImageVector = when {
     rssi == null -> MeshtasticIcons.Wifi
     rssi >= GOOD_DBM -> MeshtasticIcons.SignalCellular4Bar
