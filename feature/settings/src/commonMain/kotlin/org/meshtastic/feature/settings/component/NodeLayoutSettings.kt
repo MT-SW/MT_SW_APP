@@ -29,9 +29,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import okio.ByteString.Companion.toByteString
@@ -40,6 +52,7 @@ import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.NodeExtraMode
 import org.meshtastic.core.model.NodeListDensity
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.node_layout_channel
@@ -58,6 +71,9 @@ import org.meshtastic.core.resources.node_layout_relative_last_heard
 import org.meshtastic.core.resources.node_layout_section_title
 import org.meshtastic.core.resources.node_layout_signal_direct_only
 import org.meshtastic.core.ui.component.NodeItem
+import org.meshtastic.core.ui.icon.Info
+import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.component.nodeExtraLegend
 import org.meshtastic.core.ui.component.NodeItemCompact
 import org.meshtastic.core.ui.component.SwitchPreference
 import org.meshtastic.feature.settings.NodeListSettingsState
@@ -83,6 +99,8 @@ fun NodeLayoutSettings(
     onShowChannelChange: (Boolean) -> Unit,
     onShowRoleChange: (Boolean) -> Unit,
     onShowTelemetryChange: (Boolean) -> Unit,
+    onExtraModeChange: (NodeExtraMode) -> Unit = {},
+    onExtraIconsOnlyChange: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     ExpressiveSection(modifier = modifier, title = stringResource(Res.string.node_layout_section_title)) {
@@ -155,6 +173,13 @@ fun NodeLayoutSettings(
             checked = state.showTelemetry,
             enabled = true,
             onCheckedChange = onShowTelemetryChange,
+        )
+
+        NodeExtraSettings(
+            mode = state.extraMode,
+            iconsOnly = state.extraIconsOnly,
+            onModeChange = onExtraModeChange,
+            onIconsOnlyChange = onExtraIconsOnlyChange,
         )
 
         if (state.density == NodeListDensity.COMPLETE) {
@@ -305,3 +330,78 @@ internal fun previewLocalNode(): Node = Node(
         .build(),
     lastHeard = (nowSeconds - 30).toInt(),
 )
+
+/** Extra line of data under each node: off / pages / all at once, plus "same icons" (no labels) with a legend. */
+@Composable
+private fun NodeExtraSettings(
+    mode: NodeExtraMode,
+    iconsOnly: Boolean,
+    onModeChange: (NodeExtraMode) -> Unit,
+    onIconsOnlyChange: (Boolean) -> Unit,
+) {
+    var showLegend by remember { mutableStateOf(false) }
+    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
+    Text(
+        text = "Dodatkowe dane przy węźle",
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp),
+    )
+    Text(
+        text = "Pogoda, zasilanie, ruch i zasoby. Pokazywane są tylko najnowsze odczyty.",
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+    )
+    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        NodeExtraMode.entries.forEachIndexed { index, option ->
+            val label =
+                when (option) {
+                    NodeExtraMode.OFF -> "Wyłączone"
+                    NodeExtraMode.PAGED -> "Strony"
+                    NodeExtraMode.ALL -> "Wszystko naraz"
+                }
+            SegmentedButton(
+                shape = SegmentedButtonDefaults.itemShape(index, NodeExtraMode.entries.size),
+                onClick = { onModeChange(option) },
+                selected = mode == option,
+                label = { Text(label) },
+            )
+        }
+    }
+    if (mode == NodeExtraMode.PAGED) {
+        Text(
+            text = "Strony zmieniają się same. Możesz je też przesuwać palcem w lewo i w prawo.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+        )
+    }
+    if (mode != NodeExtraMode.OFF) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(modifier = Modifier.weight(1f)) {
+                SwitchPreference(
+                    title = "Same ikony (bez podpisów)",
+                    checked = iconsOnly,
+                    enabled = true,
+                    onCheckedChange = onIconsOnlyChange,
+                )
+            }
+            IconButton(onClick = { showLegend = true }) {
+                Icon(imageVector = MeshtasticIcons.Info, contentDescription = "Znaczenie ikon")
+            }
+        }
+    }
+    if (showLegend) {
+        AlertDialog(
+            onDismissRequest = { showLegend = false },
+            confirmButton = { TextButton(onClick = { showLegend = false }) { Text("OK") } },
+            title = { Text("Znaczenie ikon") },
+            text = {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    nodeExtraLegend.forEach { (glyph, meaning) -> Text("$glyph  $meaning") }
+                }
+            },
+        )
+    }
+}

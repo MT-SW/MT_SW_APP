@@ -44,10 +44,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.animateFloatingActionButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -58,12 +59,14 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.NodeExtraMode
 import org.meshtastic.core.model.NodeListDensity
 import org.meshtastic.core.model.excludes
 import org.meshtastic.core.resources.Res
@@ -84,6 +87,11 @@ import org.meshtastic.core.ui.component.EmptyState
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticImportFAB
+import org.meshtastic.core.ui.component.LocalNodeExtraConfig
+import org.meshtastic.core.ui.component.LocalNodeExtraStats
+import org.meshtastic.core.ui.component.LocalNodeExtraTick
+import org.meshtastic.core.ui.component.NODE_EXTRA_PAGE_MILLIS
+import org.meshtastic.core.ui.component.NodeExtraConfig
 import org.meshtastic.core.ui.component.NodeItem
 import org.meshtastic.core.ui.component.NodeItemCompact
 import org.meshtastic.core.ui.component.ScrollToTopEvent
@@ -179,6 +187,19 @@ fun NodeListScreen(
     val showChannel by viewModel.shouldShowChannel.collectAsStateWithLifecycle()
     val showRole by viewModel.shouldShowRole.collectAsStateWithLifecycle()
     val showTelemetry by viewModel.shouldShowTelemetry.collectAsStateWithLifecycle()
+    val extraMode by viewModel.nodeExtraMode.collectAsStateWithLifecycle()
+    val extraIconsOnly by viewModel.nodeExtraIconsOnly.collectAsStateWithLifecycle()
+    val extraStats by viewModel.nodeExtraStats.collectAsStateWithLifecycle()
+    // One ticker for the whole list: visible paged rows change page together; nothing runs when paging is off.
+    val extraTick = remember { mutableIntStateOf(0) }
+    if (extraMode == NodeExtraMode.PAGED) {
+        LaunchedEffect(Unit) {
+            while (true) {
+                delay(NODE_EXTRA_PAGE_MILLIS)
+                extraTick.intValue++
+            }
+        }
+    }
 
     val isScrollInProgress by remember {
         derivedStateOf { listState.isScrollInProgress && (listState.canScrollForward || listState.canScrollBackward) }
@@ -199,6 +220,11 @@ fun NodeListScreen(
         ShareContactDialog(contact = ourNode, onDismiss = { showShareContact = false }, isOwnContact = true)
     }
 
+    CompositionLocalProvider(
+        LocalNodeExtraConfig provides NodeExtraConfig(extraMode, extraIconsOnly),
+        LocalNodeExtraStats provides extraStats,
+        LocalNodeExtraTick provides extraTick,
+    ) {
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -417,6 +443,7 @@ fun NodeListScreen(
                 modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
             )
         }
+    }
     }
 }
 

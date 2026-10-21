@@ -81,6 +81,8 @@ fun NodeListScreen(settingsViewModel: SettingsViewModel, onNavigateUp: () -> Uni
                 onShowChannelChange = { settingsViewModel.setShouldShowChannel(it) },
                 onShowRoleChange = { settingsViewModel.setShouldShowRole(it) },
                 onShowTelemetryChange = { settingsViewModel.setShouldShowTelemetry(it) },
+                onExtraModeChange = { settingsViewModel.setNodeExtraMode(it.name) },
+                onExtraIconsOnlyChange = { settingsViewModel.setNodeExtraIconsOnly(it) },
             )
         }
     }

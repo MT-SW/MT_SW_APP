@@ -19,11 +19,15 @@ package org.meshtastic.feature.node.list
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -31,9 +35,16 @@ import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.LocaleUnitsProvider
 import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.TemperatureUnit
+import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.model.util.decodeLocalStatsExtended
+import org.meshtastic.feature.node.health.calmed
+import org.meshtastic.proto.PortNum
+import org.meshtastic.proto.Telemetry
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
+import org.meshtastic.core.model.NodeExtraMode
+import org.meshtastic.core.model.NodeExtraStats
 import org.meshtastic.core.model.NodeListDensity
 import org.meshtastic.core.model.NodeSortOption
 import org.meshtastic.core.repository.AdminController
@@ -100,6 +111,66 @@ class NodeListViewModel(
     val shouldShowChannel = nodeFilterPreferences.shouldShowChannel
     val shouldShowRole = nodeFilterPreferences.shouldShowRole
     val shouldShowTelemetry = nodeFilterPreferences.shouldShowTelemetry
+
+    /** The extra line of data under each node: off / paged / all at once. */
+    val nodeExtraMode: StateFlow<NodeExtraMode> =
+        nodeFilterPreferences.nodeExtraMode
+            .map { NodeExtraMode.fromName(it) }
+            .stateInWhileSubscribed(initialValue = NodeExtraMode.OFF)
+
+    /** The extra line shows only icons and values, no text labels. */
+    val nodeExtraIconsOnly = nodeFilterPreferences.nodeExtraIconsOnly
+
+    /**
+     * The newest traffic and resource readings of every node (latest only, no history), decoded from its recent local
+     * stats telemetry. Not read at all while the extra line is off. A broken or foreign packet is skipped.
+     */
+    val nodeExtraStats: StateFlow<Map<Int, NodeExtraStats>> =
+        nodeExtraMode
+            .flatMapLatest { mode ->
+                if (mode == NodeExtraMode.OFF) {
+                    flowOf(emptyMap())
+                } else {
+                    combine(
+                        meshLogRepository
+                            .getLogsByPortNumSinceSlim(PortNum.TELEMETRY_APP.value, nowMillis - EXTRA_STATS_WINDOW_MILLIS)
+                            .calmed(),
+                        nodeRepository.ourNodeInfo,
+                    ) { logs, ourNode ->
+                        val myNum = ourNode?.num
+                        val result = HashMap<Int, NodeExtraStats>()
+                        // Newest first: the first local stats found for a node are its latest.
+                        for (log in logs) {
+                            val num = if (log.fromNum == 0 && myNum != null) myNum else log.fromNum
+                            if (num in result) continue
+                            val payload = runCatching { log.fromRadio.packet?.decoded?.payload }.getOrNull() ?: continue
+                            val telemetry = runCatching { Telemetry.ADAPTER.decode(payload) }.getOrNull() ?: continue
+                            val stats = telemetry.local_stats ?: continue
+                            val ext = runCatching { telemetry.decodeLocalStatsExtended() }.getOrNull()
+                            val heapTotal = stats.heap_total_bytes ?: 0
+                            val heapFree = stats.heap_free_bytes ?: 0
+                            result[num] =
+                                NodeExtraStats(
+                                    packetsTx = stats.num_packets_tx,
+                                    packetsRx = stats.num_packets_rx,
+                                    packetsRxBad = stats.num_packets_rx_bad,
+                                    rxDupe = stats.num_rx_dupe,
+                                    txRelay = stats.num_tx_relay,
+                                    cpuPercent = ext?.cpuUsagePercent,
+                                    heapFreePercent = if (heapTotal > 0) heapFree * PERCENT / heapTotal else null,
+                                    flashUsedPercent =
+                                    ext?.takeIf { it.flashTotalBytes > 0 }?.let { it.flashUsedBytes * PERCENT / it.flashTotalBytes },
+                                    psramFreePercent =
+                                    ext?.takeIf { it.memoryPsramTotal > 0 }?.let { it.memoryPsramFree * PERCENT / it.memoryPsramTotal },
+                                )
+                        }
+                        result as Map<Int, NodeExtraStats>
+                    }
+                        .flowOn(Dispatchers.Default)
+                }
+            }
+            .catch { co.touchlab.kermit.Logger.e(it) { "Node extra stats failed" } }
+            .stateInWhileSubscribed(initialValue = emptyMap())
 
     private val nodeSortOption = nodeFilterPreferences.nodeSortOption
 
@@ -294,6 +365,8 @@ class NodeListViewModel(
 
     companion object {
         private const val KEY_FILTER_TEXT = "filter_text"
+        private const val EXTRA_STATS_WINDOW_MILLIS = 6 * 60 * 60 * 1000L
+        private const val PERCENT = 100f
         private const val FLASHER_DEVICE_IMAGE_BASE_URL = "https://flasher.meshtastic.org/img/devices/"
     }
 }

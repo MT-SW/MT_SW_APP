@@ -279,6 +279,16 @@ interface UiPrefs {
 
     fun setShouldShowTelemetry(value: Boolean)
 
+    /** Extra line of data on the node list: the [org.meshtastic.core.model.NodeExtraMode] name (OFF / PAGED / ALL). */
+    val nodeExtraMode: StateFlow<String>
+
+    fun setNodeExtraMode(value: String)
+
+    /** Extra line shows only icons and values, without text labels. */
+    val nodeExtraIconsOnly: StateFlow<Boolean>
+
+    fun setNodeExtraIconsOnly(value: Boolean)
+
     /**
      * Epoch millis of the last time the narrow-band (>200 kHz) LoRa channel warning was shown from a foreground
      * app-open/resume check. Used to throttle that check to a couple of times per day; does not affect the unthrottled
