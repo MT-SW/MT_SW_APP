@@ -427,7 +427,7 @@ private fun NodeExtraSettings(
         onCheckedChange = onPacketsChange,
     )
     SwitchPreference(
-        title = "Eter (zajętość kanału, czas nadawania, szum tła)",
+        title = "Eter (zajętość kanału, czas nadawania, szum — w linii ze skokami)",
         checked = ether,
         enabled = true,
         onCheckedChange = onEtherChange,

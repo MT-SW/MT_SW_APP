@@ -95,9 +95,9 @@ data class NodeExtraConfig(
     val hardware: Boolean = false,
     val ether: Boolean = false,
 ) {
-    /** True when the extra statistics (beyond the sensors) are switched on. */
+    /** True when the statistics shown in the extra line itself (beyond the sensors) are switched on. */
     val anyStats: Boolean
-        get() = packets || hardware || ether
+        get() = packets || hardware
 }
 
 val LocalNodeExtraConfig = staticCompositionLocalOf { NodeExtraConfig() }
@@ -216,10 +216,14 @@ private fun powerChips(node: Node): List<ExtraChip> = buildList {
     val env = node.environmentMetrics
     val power = node.powerMetrics
     val batteryShown = (node.batteryLevel ?: 0) in 1..100
-    if (!batteryShown) {
-        (node.voltage ?: env.voltage).ok()?.takeIf { it != 0f }?.let {
-            add(ExtraChip({ MeshtasticIcons.Voltage }, "Nap.", MetricFormatter.voltage(it)))
-        }
+    // The battery row of the card already shows the device voltage when there is a battery level.
+    val deviceVoltage = node.voltage.ok()?.takeIf { it != 0f }
+    if (!batteryShown && deviceVoltage != null) {
+        add(ExtraChip({ MeshtasticIcons.Voltage }, "Nap.", MetricFormatter.voltage(deviceVoltage)))
+    }
+    // The voltage from the environment telemetry packet is always shown (unless it is the very same reading).
+    env.voltage.ok()?.takeIf { it != 0f && (deviceVoltage == null || kotlin.math.abs(it - deviceVoltage) > 0.005f) }?.let {
+        add(ExtraChip({ MeshtasticIcons.Voltage }, "Nap.", MetricFormatter.voltage(it)))
     }
     env.current.ok()?.let { add(ExtraChip({ MeshtasticIcons.ElectricPower }, "Prąd", MetricFormatter.current(it))) }
     listOf(
@@ -276,20 +280,19 @@ private fun resourceChips(stats: NodeExtraStats?): List<ExtraChip> = buildList {
 
 /**
  * The groups that have anything to show, top to bottom: sensors (power first, then weather), packets, hardware. The
- * sensors follow the environment metrics switch, the other two have their own switches.
+ * sensors follow the environment metrics switch, the other two have their own switches. The ether readings are not
+ * here: they go into the hops row of the card ([etherInlineItems]).
  */
 private fun buildGroups(
     node: Node,
     stats: NodeExtraStats?,
     config: NodeExtraConfig,
     showEnvironment: Boolean,
-    noiseFloor: Int?,
     tempF: Boolean,
     imperial: Boolean,
     isThisNode: Boolean,
 ): List<ExtraGroup> = buildList {
     if (showEnvironment) add(ExtraGroup(powerChips(node) + weatherChips(node, tempF, imperial), rightAligned = false))
-    if (config.ether) add(ExtraGroup(etherChips(node, noiseFloor, isThisNode), rightAligned = true))
     if (config.packets) add(ExtraGroup(trafficChips(stats), rightAligned = true))
     if (config.hardware) add(ExtraGroup(resourceChips(stats), rightAligned = true))
 }
@@ -314,12 +317,9 @@ fun NodeExtraLine(
     val config = LocalNodeExtraConfig.current
     val stats = LocalNodeExtraStats.current[node.num]
     val imperial = distanceUnits != MeasurementSystem.METRIC
-    // The noise floor is shown with the node's LNA correction, like everywhere else in the app.
-    val lna = LocalLnaCorrection.current
-    val noiseFloor = stats?.noiseFloor?.let { lna.noiseFloor(node.num, it) }
     val groups =
-        remember(node, stats, config, showEnvironment, noiseFloor, tempInFahrenheit, imperial, isThisNode) {
-            buildGroups(node, stats, config, showEnvironment, noiseFloor, tempInFahrenheit, imperial, isThisNode)
+        remember(node, stats, config, showEnvironment, tempInFahrenheit, imperial, isThisNode) {
+            buildGroups(node, stats, config, showEnvironment, tempInFahrenheit, imperial, isThisNode)
         }
     if (groups.isEmpty()) return
 
@@ -439,4 +439,21 @@ private fun ExtraChipView(chip: ExtraChip, iconsOnly: Boolean) {
             )
         }
     }
+}
+
+private fun chipItem(chip: ExtraChip): @Composable () -> Unit = { ExtraChipView(chip, iconsOnly = true) }
+
+/**
+ * Compact ether readings (channel utilization, air time, noise floor; icon and value only) for the hops row of a node
+ * card, so they share its line instead of adding one. Empty when the "Ether" option is off. Our own node already shows
+ * channel utilization and air time in its signal row, so it gets only the noise floor here.
+ */
+@Composable
+fun etherInlineItems(node: Node, isThisNode: Boolean): List<@Composable () -> Unit> {
+    if (!LocalNodeExtraConfig.current.ether) return emptyList()
+    val stats = LocalNodeExtraStats.current[node.num]
+    // The noise floor is shown with the node's LNA correction, like everywhere else in the app.
+    val lna = LocalLnaCorrection.current
+    val noise = stats?.noiseFloor?.let { lna.noiseFloor(node.num, it) }
+    return etherChips(node, noise, isThisNode).map { chipItem(it) }
 }
