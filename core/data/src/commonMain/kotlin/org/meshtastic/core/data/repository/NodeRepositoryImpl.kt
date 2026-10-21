@@ -310,6 +310,9 @@ class NodeRepositoryImpl(
         flashTotalBytes = flashTotalBytes,
         memoryPsramFree = memoryPsramFree,
         memoryPsramTotal = memoryPsramTotal,
+        wifiRssi = wifiRssi,
+        wifiDrops = wifiDrops,
+        wifiDropReason = wifiDropReason,
     )
 
     private fun LocalStatsExtended.toPrefs() = LocalStatsExtendedPrefs(
@@ -320,5 +323,8 @@ class NodeRepositoryImpl(
         flashTotalBytes = flashTotalBytes,
         memoryPsramFree = memoryPsramFree,
         memoryPsramTotal = memoryPsramTotal,
+        wifiRssi = wifiRssi,
+        wifiDrops = wifiDrops,
+        wifiDropReason = wifiDropReason,
     )
 }
