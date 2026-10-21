@@ -34,5 +34,6 @@ actual fun SettingsMainScreen(
         settingsViewModel = settingsViewModel,
         radioConfigViewModel = radioConfigViewModel,
         onNavigate = onNavigate,
+        onBack = onBack,
     )
 }
