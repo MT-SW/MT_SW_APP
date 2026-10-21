@@ -61,6 +61,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.meshtastic.app.intro.AnalyticsIntro
 import org.meshtastic.app.map.getMapViewProvider
 import org.meshtastic.app.node.component.InlineMap
+import org.meshtastic.app.node.deviceModelArViewer
 import org.meshtastic.app.node.metrics.getTracerouteMapOverlayInsets
 import org.meshtastic.app.ui.MainScreen
 import org.meshtastic.core.barcode.rememberBarcodeScanner
@@ -93,6 +94,7 @@ import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.util.LocalAnalyticsIntroProvider
 import org.meshtastic.core.ui.util.LocalBarcodeScannerProvider
 import org.meshtastic.core.ui.util.LocalBarcodeScannerSupported
+import org.meshtastic.core.ui.util.LocalDeviceModelArViewer
 import org.meshtastic.core.ui.util.LocalDiscoveryMapProvider
 import org.meshtastic.core.ui.util.LocalEventBranding
 import org.meshtastic.core.ui.util.LocalInlineMapProvider
@@ -111,6 +113,7 @@ import org.meshtastic.core.ui.util.LocalTracerouteMapProvider
 import org.meshtastic.core.ui.util.accentColorOrNull
 import org.meshtastic.core.ui.util.brandHighlightOrNull
 import org.meshtastic.core.ui.util.brandPalette
+import org.meshtastic.core.ui.util.rememberMeshHudSupported
 import org.meshtastic.core.ui.util.showToast
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.feature.intro.AppIntroductionScreen
@@ -306,6 +309,7 @@ class MainActivity : AppCompatActivity() {
             LocalAnalyticsIntroProvider provides { AnalyticsIntro() },
             LocalMapViewProvider provides getMapViewProvider(),
             LocalPlannerAvailable provides true,
+            LocalDeviceModelArViewer provides deviceModelArViewer,
             LocalInlineMapProvider provides { node, modifier -> InlineMap(node, modifier) },
             LocalNodeTrackMapProvider provides
                 { destNum, positions, modifier, selectedPositionTime, onPositionSelected, showAttribution ->
@@ -333,7 +337,7 @@ class MainActivity : AppCompatActivity() {
                     org.meshtastic.app.map.discovery.DiscoveryMap(userLat, userLon, nodes, modifier)
                 },
             LocalMapMainScreenProvider provides
-                { onClickNodeChip, navigateToNodeDetails, waypointId, plannerNodeNum, focusNodeNum ->
+                { onClickNodeChip, navigateToNodeDetails, waypointId, plannerNodeNum, focusNodeNum, onOpenMeshHud ->
                     val viewModel = koinViewModel<SharedMapViewModel>()
                     MapScreen(
                         viewModel = viewModel,
@@ -342,6 +346,7 @@ class MainActivity : AppCompatActivity() {
                         waypointId = waypointId,
                         plannerNodeNum = plannerNodeNum,
                         focusNodeNum = focusNodeNum,
+                        onOpenMeshHud = onOpenMeshHud.takeIf { rememberMeshHudSupported() },
                     )
                 },
             content = content,

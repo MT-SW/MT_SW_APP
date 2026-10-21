@@ -19,6 +19,8 @@ Keep the last 5–8 entries and archive older ones by removing them.
 
 **October 2026** — [MT_SW features](user/mt-sw-features) — A new page describes what MT_SW_APP adds to the original app, such as Network health, links on the map, the Mesh Link Planner, diagnostics, the Sniffer and app scale, and where to find each one.
 
+**October 2026** — [Map & Waypoints](user/map-and-waypoints) — The AR mesh view draws nodes and waypoints over the phone's camera and turns you toward the one you are finding.
+
 **September 2026** — [Notifications](user/notifications) — A new page lists every notification category, what each opens when tapped, when a message stays quiet, and what a message notification lets you do from the shade or a watch.
 
 **September 2026** — [Nodes](user/nodes) — Nodes your node has not heard since its LoRa settings changed now carry an orange marker, a **Hide unheard nodes** filter, and a banner whose **Remove** action deletes them in bulk.

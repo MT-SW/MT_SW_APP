@@ -14,15 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package org.meshtastic.feature.node.compass
+package org.meshtastic.core.repository
 
-import android.hardware.GeomagneticField
-import org.koin.core.annotation.Single
+/**
+ * The flasher's real-size 3D device models (`/models/devices/<name>.glb`), one per device illustration. A hardware
+ * entry's image file names its model by extension swap, and only some illustrations have one.
+ */
+interface DeviceModelRepository {
+    /** Whether a model exists for [imageFile] (an entry of `DeviceHardware.images`). False on any network failure. */
+    suspend fun hasModel(imageFile: String): Boolean
 
-@Single
-class AndroidMagneticFieldProvider : MagneticFieldProvider {
-    override fun getDeclination(latitude: Double, longitude: Double, altitude: Double, timeMillis: Long): Float {
-        val geomagneticField = GeomagneticField(latitude.toFloat(), longitude.toFloat(), altitude.toFloat(), timeMillis)
-        return geomagneticField.declination
-    }
+    /** The GLB bytes for [imageFile], or null when there is no model or it could not be fetched. */
+    suspend fun getModel(imageFile: String): ByteArray?
 }

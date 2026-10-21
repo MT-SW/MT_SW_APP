@@ -125,6 +125,8 @@ fun NodeDetailsSection(
     relayNodeName: String? = null,
     isLocal: Boolean = false,
     onRequestUserInfo: (() -> Unit)? = null,
+    hasDeviceModel: Boolean = false,
+    onOpenDeviceModel: ((DeviceHardware) -> Unit)? = null,
 ) {
     SectionCard(title = Res.string.details, modifier = modifier) {
         Column(modifier = Modifier.animateContentSize()) {
@@ -137,6 +139,8 @@ fun NodeDetailsSection(
                     bgColor = node.colors.second.toLong(),
                     deviceHardware = deviceHardware,
                     reportedTarget = reportedTarget,
+                    onOpenDeviceModel =
+                    onOpenDeviceModel?.takeIf { hasDeviceModel }?.let { open -> { open(deviceHardware) } },
                 )
                 SectionDivider()
             }

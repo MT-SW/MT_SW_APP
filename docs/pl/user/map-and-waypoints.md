@@ -2,7 +2,7 @@
 title: Mapa i punkty trasy
 parent: Przewodnik użytkownika
 nav_order: 6
-last_updated: 2026-10-07
+last_updated: 2026-10-21
 description: Podgląd pozycji węzłów na mapie, tworzenie i udostępnianie punktów trasy, zarządzanie warstwami mapy i Site Planner oraz kontrola udostępniania pozycji i prywatności.
 aliases:
   - map
@@ -46,6 +46,19 @@ Pływający pasek narzędzi daje szybki dostęp do kompasu, wyboru typu mapy i w
 Dotknij przycisku filtra na pływającym pasku narzędzi, aby otworzyć **Filtruj mapę**. Sekcja **Wyświetlacz** określa, co jest rysowane: **Tylko ulubione**, **Pokaż punkty trasy**, **Pokaż okręgi precyzji** oraz suwak, który ukrywa węzły niesłyszane od dłuższego czasu. **Role węzłów** to chip dla każdej roli urządzenia oraz **Wszystkie**, aby pokazać każdą rolę; zaznaczony chip oznacza, że ta rola jest widoczna. Sekcja **Węzeł** zawęża zestaw dalej opcjami **Schowaj nieaktywne węzły**, **Pokaż tylko bezpośrednie węzły**, **Pokaż tylko podpisane węzły**, **Pokaż tylko szyfrowane węzły**, **Wyklucz MQTT**, **Pokaż ignorowane węzły** i **Pokaż nierozpoznane** — to te same zasady co w [przełącznikach filtrów](nodes) listy węzłów.
 
 Kropka na przycisku filtra oznacza, że co najmniej jeden filtr coś ukrywa — sprawdź to, zanim uznasz, że w sieci jest cicho. Wyłączenie **Pokaż punkty trasy** ukrywa wszystkie punkty trasy, także Twoje własne. **Pokaż ignorowane węzły** dodaje je do mapy, a nie pokazuje wyłącznie ich — inaczej niż **Pokaż tylko ignorowane węzły** na liście węzłów.
+
+## Widok AR sieci
+
+Widok AR rysuje węzły i punkty trasy na obrazie z aparatu telefonu — każdy w kierunku i na wysokości, na której się znajduje, z odległością i wiekiem jego pozycji. Potrzebuje tylnego aparatu i czujnika orientacji, więc pojawia się tylko na telefonach z Androidem, które mają oba.
+
+Dotknij **Otwórz widok sieci** na górnym pasku mapy, aby zobaczyć całą sieć, filtrowaną tymi samymi ustawieniami **Filtruj mapę** co mapa. Widok otwierają też: strona szczegółów węzła, jego arkusz kompasu, dziennik pozycji i mapa traceroute. Otwarty z węzła pokazuje tylko ten węzeł oraz ślad lub trasę, z której przyszedłeś.
+
+- **Dotknij** węzła, aby otworzyć jego szczegóły, albo punktu trasy, aby otworzyć jego informacje.
+- **Przytrzymaj** węzeł lub punkt trasy, aby go znaleźć. Widok podpowiada, o ile obrócić i pochylić telefon, telefon tyka coraz szybciej w miarę zbliżania się, a gdy trafisz w cel, raz pulsuje.
+- Węzeł, którego niepewność pozycji obejmuje Twoje miejsce, nie ma sensownego kierunku, więc trafia na radar na dole. Skieruj telefon w dół, aby powiększyć radar.
+- Strefy punktów trasy są obrysowane, a widok informuje, gdy jesteś w jednej z nich.
+
+Gdy pozycja telefonu nie ma wysokości, cele są na Twoim poziomie, a widok informuje, że wysokość jest przybliżona. Bez dostępu do aparatu lub gdy telefon jest zbyt gorący, widok działa dalej jako kompas.
 
 ## Punkty trasy
 

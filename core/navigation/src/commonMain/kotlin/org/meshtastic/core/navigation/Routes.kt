@@ -61,13 +61,28 @@ sealed interface MapRoute : Route {
         /** A node to centre the map on and draw above the others ("Show on map" in the node details). */
         val focusNodeNum: Int? = null,
     ) : MapRoute
+
+    /**
+     * The camera mesh view. [focusNodeNum] points the finder at one node. A traceroute ([tracerouteDestNum] with
+     * [tracerouteRequestId], and [tracerouteLogUuid] when it was logged) draws that route in the air, and
+     * [trackNodeNum] draws that node's position track.
+     */
+    @Serializable
+    data class MeshHud(
+        val focusNodeNum: Int? = null,
+        val tracerouteDestNum: Int? = null,
+        val tracerouteRequestId: Int? = null,
+        val tracerouteLogUuid: String? = null,
+        val trackNodeNum: Int? = null,
+    ) : MapRoute
 }
 
 @Serializable
 sealed interface NodesRoute : Route {
     @Serializable data object Nodes : NodesRoute, Graph
 
-    @Serializable data class NodeDetail(val destNum: Int? = null) : NodesRoute
+    /** [openCompass] opens the compass sheet on arrival, for entry points that offer the compass directly. */
+    @Serializable data class NodeDetail(val destNum: Int? = null, val openCompass: Boolean = false) : NodesRoute
 }
 
 @Serializable

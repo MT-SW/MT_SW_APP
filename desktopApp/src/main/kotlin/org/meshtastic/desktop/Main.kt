@@ -487,7 +487,7 @@ private fun ApplicationScope.MeshtasticWindow(
                 // mapGraph renders the Map tab through this seam, not through LocalMapViewProvider
                 // directly; without it the tab falls back to the "Map" placeholder.
                 LocalMapMainScreenProvider provides
-                    { onClickNodeChip, navigateToNodeDetails, waypointId, plannerNodeNum, focusNodeNum ->
+                    { onClickNodeChip, navigateToNodeDetails, waypointId, plannerNodeNum, focusNodeNum, _ ->
                         MapScreen(
                             viewModel = koinViewModel<SharedMapViewModel>(),
                             onClickNodeChip = onClickNodeChip,

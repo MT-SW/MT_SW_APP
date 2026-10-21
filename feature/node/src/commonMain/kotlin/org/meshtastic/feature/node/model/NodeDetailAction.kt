@@ -17,6 +17,7 @@
 package org.meshtastic.feature.node.model
 
 import org.meshtastic.core.common.util.MeasurementSystem
+import org.meshtastic.core.model.DeviceHardware
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.feature.node.component.NodeMenuAction
@@ -71,6 +72,9 @@ sealed interface NodeDetailAction {
     data class SendQuickMessage(val node: Node, val text: String) : NodeDetailAction
 
     data object ShareContact : NodeDetailAction
+
+    /** Open the real-size 3D model of the node's hardware. */
+    data class OpenDeviceModel(val deviceHardware: DeviceHardware) : NodeDetailAction
 
     // Opens the compass sheet scoped to a target node and the user’s preferred units.
     data class OpenCompass(val node: Node, val displayUnits: MeasurementSystem) : NodeDetailAction
