@@ -100,6 +100,7 @@ private fun parseVarintFields(bytes: ByteArray): Map<Int, Long> {
     val result = mutableMapOf<Int, Long>()
     var i = 0
     while (i < bytes.size) {
+        val before = i
         val (key, afterKey) = readVarint(bytes, i) ?: break
         val tag = (key shr 3).toInt()
         when ((key and 0x7).toInt()) {
@@ -111,6 +112,8 @@ private fun parseVarintFields(bytes: ByteArray): Map<Int, Long> {
 
             WIRE_TYPE_LENGTH_DELIMITED -> {
                 val (len, afterLen) = readVarint(bytes, afterKey) ?: break
+                // Zabezpieczenie: obca/zepsuta długość nie może wyjść poza dane ani cofnąć pozycji.
+                if (len < 0 || len > bytes.size - afterLen) break
                 i = afterLen + len.toInt()
             }
 
@@ -120,7 +123,7 @@ private fun parseVarintFields(bytes: ByteArray): Map<Int, Long> {
 
             else -> break
         }
-        if (i > bytes.size) break
+        if (i > bytes.size || i <= before) break
     }
     return result
 }
@@ -128,6 +131,7 @@ private fun parseVarintFields(bytes: ByteArray): Map<Int, Long> {
 private fun findLengthDelimitedField(bytes: ByteArray, tag: Int): ByteArray? {
     var i = 0
     while (i < bytes.size) {
+        val before = i
         val (key, afterKey) = readVarint(bytes, i) ?: return null
         val fieldTag = (key shr 3).toInt()
         when ((key and 0x7).toInt()) {
@@ -138,8 +142,8 @@ private fun findLengthDelimitedField(bytes: ByteArray, tag: Int): ByteArray? {
 
             WIRE_TYPE_LENGTH_DELIMITED -> {
                 val (len, afterLen) = readVarint(bytes, afterKey) ?: return null
+                if (len < 0 || len > bytes.size - afterLen) return null
                 val end = afterLen + len.toInt()
-                if (end > bytes.size) return null
                 if (fieldTag == tag) return bytes.copyOfRange(afterLen, end)
                 i = end
             }
@@ -150,6 +154,7 @@ private fun findLengthDelimitedField(bytes: ByteArray, tag: Int): ByteArray? {
 
             else -> return null
         }
+        if (i > bytes.size || i <= before) return null
     }
     return null
 }

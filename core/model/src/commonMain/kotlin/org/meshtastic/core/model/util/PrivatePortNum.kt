@@ -84,6 +84,7 @@ private fun ByteString.readTopLevelVarintField(tag: Int): Long? {
     val bytes = toByteArray()
     var i = 0
     while (i < bytes.size) {
+        val before = i
         val (key, afterKey) = readVarint(bytes, i) ?: return null
         val fieldTag = (key shr 3).toInt()
         when ((key and 0x7).toInt()) {
@@ -98,6 +99,8 @@ private fun ByteString.readTopLevelVarintField(tag: Int): Long? {
             // fixed64
             2 -> { // length-delimited
                 val (len, afterLen) = readVarint(bytes, afterKey) ?: return null
+                // Zabezpieczenie przed obcymi/zepsutymi pakietami (np. innego firmware).
+                if (len < 0 || len > bytes.size - afterLen) return null
                 i = afterLen + len.toInt()
             }
 
@@ -106,6 +109,7 @@ private fun ByteString.readTopLevelVarintField(tag: Int): Long? {
             // fixed32
             else -> return null
         }
+        if (i > bytes.size || i <= before) return null
     }
     return null
 }

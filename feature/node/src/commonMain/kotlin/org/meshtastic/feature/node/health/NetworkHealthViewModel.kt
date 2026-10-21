@@ -19,12 +19,14 @@ package org.meshtastic.feature.node.health
 import androidx.lifecycle.ViewModel
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.retryWhen
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.swapBatteryPolarity
@@ -211,9 +213,10 @@ class NetworkHealthViewModel(
                             }
                     }
                 HistoryBundle(
+                    // One broken or foreign packet (e.g. from other firmware) must never take the screen down.
                     entries =
-                    allLogs.mapNotNull { it.toSignalHistoryEntry()?.let(remap) } +
-                        telemetryLogs.mapNotNull { it.toHistoryEntry()?.let(remap) },
+                    allLogs.mapNotNull { log -> runCatching { log.toSignalHistoryEntry()?.let(remap) }.getOrNull() } +
+                        telemetryLogs.mapNotNull { log -> runCatching { log.toHistoryEntry()?.let(remap) }.getOrNull() },
                     myNodeNum = myNodeNum,
                     batteryInverted = batteryInvertedNodes,
                 )
@@ -236,7 +239,9 @@ class NetworkHealthViewModel(
                     // The connected device's own reports are stored under node 0 (see above).
                     .distinctBy { remapLocal(it.fromNum, historyBundle.myNodeNum) }
                     .mapNotNull { log ->
-                        val payload = log.fromRadio.packet?.decoded?.payload ?: return@mapNotNull null
+                        val payload =
+                            runCatching { log.fromRadio.packet?.decoded?.payload }.getOrNull()
+                                ?: return@mapNotNull null
                         val info =
                             runCatching { NeighborInfo.ADAPTER.decode(payload) }.getOrNull()
                                 ?: return@mapNotNull null
@@ -367,7 +372,18 @@ class NetworkHealthViewModel(
         }
             // The calculations are heavy; never on the main thread.
             .flowOn(Dispatchers.Default)
-            .catch { Logger.e(it) { "Network health failed" } }
+            // After an error the flow is started again (a few times, with a pause) instead of ending for good,
+            // so one bad moment does not leave the screen empty until the app is restarted.
+            .retryWhen { cause, attempt ->
+                Logger.e(cause) { "Network health failed (attempt $attempt)" }
+                if (cause is kotlinx.coroutines.CancellationException) {
+                    false
+                } else {
+                    delay(RETRY_DELAY_MILLIS * (attempt + 1))
+                    attempt < MAX_RETRIES
+                }
+            }
+            .catch { Logger.e(it) { "Network health gave up" } }
             .stateInWhileSubscribed(initialValue = NetworkHealthUiState())
 
     fun setActiveMetric(metric: NetworkHealthMetric) {
@@ -413,6 +429,8 @@ class NetworkHealthViewModel(
 
     companion object {
         private const val BATTERY_POWERED_THRESHOLD = 100
+        private const val RETRY_DELAY_MILLIS = 1_000L
+        private const val MAX_RETRIES = 5L
         private const val HISTORY_WINDOW_MILLIS = 24 * 60 * 60 * 1000L
     }
 }
@@ -492,6 +510,9 @@ internal fun org.meshtastic.core.model.MeshLog.toSignalHistoryEntry():
 
 /** Extracts this metric's value from a raw history entry, for sparkline plotting. */
 internal fun NetworkHealthMetric.historyValue(entry: org.meshtastic.core.model.NodeMetricsHistoryEntry): Float? =
+    rawHistoryValue(entry)?.takeIf { it.isFinite() }
+
+private fun NetworkHealthMetric.rawHistoryValue(entry: org.meshtastic.core.model.NodeMetricsHistoryEntry): Float? =
     when (this) {
         NetworkHealthMetric.POWER -> entry.batteryLevel?.toFloat()
 
