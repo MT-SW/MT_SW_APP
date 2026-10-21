@@ -34,6 +34,7 @@ import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneSt
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import org.meshtastic.core.ui.util.isDesktopPlatform
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -151,10 +152,12 @@ private fun MeshtasticNavDisplayHost(
 
     val entries = decorateEntries()
 
-    // On a wide window (the desktop app) the list and the detail start at half of the width each; the divider can still
-    // be dragged. A single-pane window ignores this.
+    // In the desktop app the list and the detail start at half of the width each (the divider can still be dragged);
+    // other devices keep the original proportions.
     val paneExpansionState = rememberPaneExpansionState()
-    LaunchedEffect(paneExpansionState) { paneExpansionState.setFirstPaneProportion(INITIAL_LIST_PANE_PROPORTION) }
+    if (isDesktopPlatform) {
+        LaunchedEffect(paneExpansionState) { paneExpansionState.setFirstPaneProportion(INITIAL_LIST_PANE_PROPORTION) }
+    }
     val listDetailSceneStrategy =
         rememberListDetailSceneStrategy<NavKey>(
             paneExpansionState = paneExpansionState,
