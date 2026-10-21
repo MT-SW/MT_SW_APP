@@ -59,6 +59,17 @@ data class NodeExtraStats(
     val hasResources: Boolean
         get() = cpuPercent != null || heapFreePercent != null || flashUsedPercent != null || psramFreePercent != null || wifiRssi != null
 
+    /** Every reading a node can send is present, so older packets cannot add anything. */
+    val isComplete: Boolean
+        get() =
+            packetsTx != null &&
+                cpuPercent != null &&
+                heapFreePercent != null &&
+                flashUsedPercent != null &&
+                psramFreePercent != null &&
+                wifiRssi != null &&
+                noiseFloor != null
+
     /** This reading, with every gap filled from an [older] one. */
     fun orElse(older: NodeExtraStats): NodeExtraStats = NodeExtraStats(
         packetsTx = packetsTx ?: older.packetsTx,
