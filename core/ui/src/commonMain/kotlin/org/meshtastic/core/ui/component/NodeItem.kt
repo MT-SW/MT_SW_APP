@@ -511,14 +511,13 @@ private fun HopsEtherRow(left: List<@Composable () -> Unit>, right: List<@Compos
     }
 }
 
-/** The ether readings of a direct node on a line of their own, from the right edge like the other statistics. */
-@OptIn(ExperimentalLayoutApi::class)
+/** The ether readings of a direct node on a line of their own, spread over the full width like the signal row above. */
 @Composable
 private fun EtherLine(items: List<@Composable () -> Unit>) {
-    FlowRow(
+    Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         items.forEach { item -> item() }
     }
