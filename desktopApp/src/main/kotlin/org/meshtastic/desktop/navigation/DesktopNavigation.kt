@@ -72,7 +72,9 @@ fun EntryProviderScope<NavKey>.desktopNavGraph(
             multiBackstack.navigateTopLevel(TopLevelDestination.Nodes.route)
             multiBackstack.backStacks[TopLevelDestination.Nodes.route]?.add(NodesRoute.NodeDetail(id))
         }
-        mapScreen(openNodeInNodesTab, openNodeInNodesTab, args.waypointId, args.plannerNodeNum, args.focusNodeNum)
+        mapScreen(openNodeInNodesTab, openNodeInNodesTab, args.waypointId, args.plannerNodeNum, args.focusNodeNum) {
+            // Widok AR sieci istnieje tylko na telefonach z Androidem — na komputerze nic nie robi.
+        }
     }
     firmwareGraph(backStack)
     settingsGraph(backStack, settingsRadioConfigViewModel)
