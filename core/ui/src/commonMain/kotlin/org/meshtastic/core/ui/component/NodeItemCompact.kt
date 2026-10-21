@@ -427,7 +427,7 @@ private fun CompactFooterRow(
     relayNodeName: String? = null,
 ) {
     val tertiaryColor = MaterialTheme.colorScheme.outline
-    val etherItems = etherInlineItems(thatNode, isThisNode, forceIconsOnly = true)
+    val etherItems = etherInlineItems(thatNode, isThisNode, forceIconsOnly = true, compactCard = true)
     val segments =
         buildList<@Composable () -> Unit> {
             if (showRole) {
