@@ -109,12 +109,12 @@ class NodeListViewModel(
      */
     val linkSignal: StateFlow<LinkSignal?> =
         combine(connectionState, deviceType, ::Pair)
-            .flatMapLatest { (state, type) ->
+            .flatMapLatest<Pair<ConnectionState, DeviceType?>, LinkSignal?> { (state, type) ->
                 when {
-                    state != ConnectionState.Connected -> flowOf(null)
+                    state != ConnectionState.Connected -> flowOf<LinkSignal?>(null)
 
                     type == DeviceType.BLE ->
-                        flow {
+                        flow<LinkSignal?> {
                             while (true) {
                                 emit(readActiveBleRssi()?.let { LinkSignal("Bluetooth", it) })
                                 delay(LINK_SIGNAL_POLL_MILLIS)
@@ -126,7 +126,7 @@ class NodeListViewModel(
                             ext.wifiRssi.takeIf { it != 0 }?.let { LinkSignal("Wi-Fi", it) }
                         }
 
-                    else -> flowOf(null)
+                    else -> flowOf<LinkSignal?>(null)
                 }
             }
             .catch { co.touchlab.kermit.Logger.e(it) { "Link signal failed" } }
@@ -164,7 +164,7 @@ class NodeListViewModel(
         nodeExtraMode
             .flatMapLatest { mode ->
                 if (mode == NodeExtraMode.OFF) {
-                    flowOf(emptyMap())
+                    flowOf<Map<Int, NodeExtraStats>>(emptyMap())
                 } else {
                     combine(
                         meshLogRepository
