@@ -151,9 +151,13 @@ private fun MeshtasticNavDisplayHost(
 
     val entries = decorateEntries()
 
+    // On a wide window (the desktop app) the list and the detail start at half of the width each; the divider can still
+    // be dragged. A single-pane window ignores this.
+    val paneExpansionState = rememberPaneExpansionState()
+    LaunchedEffect(paneExpansionState) { paneExpansionState.setFirstPaneProportion(INITIAL_LIST_PANE_PROPORTION) }
     val listDetailSceneStrategy =
         rememberListDetailSceneStrategy<NavKey>(
-            paneExpansionState = rememberPaneExpansionState(),
+            paneExpansionState = paneExpansionState,
             paneExpansionDragHandle = { state -> PaneExpansionDragHandle(state) },
         )
 
@@ -176,6 +180,8 @@ private fun MeshtasticNavDisplayHost(
         )
     }
 }
+
+private const val INITIAL_LIST_PANE_PROPORTION = 0.5f
 
 /** Drag handle for the list-detail scene strategy, with a 48.dp touch-target floor. */
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)

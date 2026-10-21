@@ -2435,8 +2435,8 @@
     <string name="temperature">Temp.°</string>
     <string name="theme">Motyw</string>
     <string name="ui_scale">Skalowanie aplikacji</string>
-    <string name="ui_scale_follow_system">Zgodnie z telefonem</string>
-    <string name="ui_scale_summary">Rozmiar tekstu i elementów tylko w tej aplikacji, niezależnie od ustawień czcionki i rozmiaru ekranu w telefonie.</string>
+    <string name="ui_scale_follow_system">Zgodnie z systemem</string>
+    <string name="ui_scale_summary">Rozmiar tekstu i elementów tylko w tej aplikacji, niezależnie od ustawień czcionki i rozmiaru ekranu w systemie.</string>
     <string name="theme_dark">Ciemny</string>
     <string name="theme_light">Jasny</string>
     <string name="theme_system">Domyślne ustawienie systemowe</string>

@@ -129,7 +129,7 @@ Panel debugowania (Ustawienia → Zaawansowane → Panel debugowania) ma w tej a
 
 ## Ustawienia i wygląd
 
-- **Skalowanie aplikacji** — w ustawieniach aplikacji wybierasz rozmiar tekstu i elementów od 50% do 200%, niezależnie od ustawień telefonu. Domyślnie „Zgodnie z telefonem”. Działa też na komputerze.
+- **Skalowanie aplikacji** — w ustawieniach aplikacji wybierasz rozmiar tekstu i elementów od 50% do 200%, niezależnie od ustawień telefonu. Domyślnie „Zgodnie z systemem”. Działa też na komputerze.
 - **Ustawienia LoRa** — pole „Przesunięcie częstotliwości (kHz)”, coding rate 4/5 dla presetów Narrow, pełna rozdzielczość częstotliwości nadpisanej, opis ostrzegawczy przy „Nadpisz cykl pracy” oraz przywrócony ekran Traffic Management.
 - **Bezpieczeństwo** — kopia kluczy także na komputerze oraz wybór koloru węzła przy generowaniu klucza.
 - **Wgrywanie firmware** — własny plik można wgrać także na urządzenie spoza listy, z ostrzeżeniami o ryzyku; odzyskiwanie urządzenia w trybie DFU działa też po własnym pliku.
