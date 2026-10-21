@@ -38,6 +38,7 @@ import org.meshtastic.core.domain.usecase.settings.SetMeshLogSettingsUseCase
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.MyNodeInfo
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.NodeExtraMode
 import org.meshtastic.core.model.NodeListDensity
 import org.meshtastic.core.repository.FileService
 import org.meshtastic.core.repository.MeshLogPrefs
@@ -234,6 +235,8 @@ class SettingsViewModel(
     val shouldShowChannel = uiPrefs.shouldShowChannel
     val shouldShowRole = uiPrefs.shouldShowRole
     val shouldShowTelemetry = uiPrefs.shouldShowTelemetry
+    val nodeExtraMode = uiPrefs.nodeExtraMode
+    val nodeExtraIconsOnly = uiPrefs.nodeExtraIconsOnly
 
     fun setNodeListDensity(value: String) = uiPrefs.setNodeListDensity(value)
 
@@ -254,6 +257,10 @@ class SettingsViewModel(
     fun setShouldShowRole(value: Boolean) = uiPrefs.setShouldShowRole(value)
 
     fun setShouldShowTelemetry(value: Boolean) = uiPrefs.setShouldShowTelemetry(value)
+
+    fun setNodeExtraMode(value: String) = uiPrefs.setNodeExtraMode(value)
+
+    fun setNodeExtraIconsOnly(value: Boolean) = uiPrefs.setNodeExtraIconsOnly(value)
 
     // Aggregated node list settings — nested combines because typed overloads max at 5 args
     val nodeListSettings =
@@ -297,6 +304,8 @@ class SettingsViewModel(
                 showTelemetry = second.showTelemetry,
             )
         }
+            .combine(nodeExtraMode) { state, mode -> state.copy(extraMode = NodeExtraMode.fromName(mode)) }
+            .combine(nodeExtraIconsOnly) { state, iconsOnly -> state.copy(extraIconsOnly = iconsOnly) }
             .stateInWhileSubscribed(initialValue = NodeListSettingsState())
 }
 
@@ -312,4 +321,6 @@ data class NodeListSettingsState(
     val showChannel: Boolean = false,
     val showRole: Boolean = false,
     val showTelemetry: Boolean = false,
+    val extraMode: NodeExtraMode = NodeExtraMode.OFF,
+    val extraIconsOnly: Boolean = false,
 )

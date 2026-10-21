@@ -410,6 +410,24 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[NodeListLayoutPreferences.KEY_SHOW_TELEMETRY] = value } }
     }
 
+    override val nodeExtraMode: StateFlow<String> =
+        dataStore.data
+            .map { it[NodeListLayoutPreferences.KEY_EXTRA_MODE] ?: "OFF" }
+            .stateIn(scope, SharingStarted.Eagerly, "OFF")
+
+    override fun setNodeExtraMode(value: String) {
+        scope.launch { dataStore.edit { it[NodeListLayoutPreferences.KEY_EXTRA_MODE] = value } }
+    }
+
+    override val nodeExtraIconsOnly: StateFlow<Boolean> =
+        dataStore.data
+            .map { it[NodeListLayoutPreferences.KEY_EXTRA_ICONS_ONLY] ?: false }
+            .stateIn(scope, SharingStarted.Eagerly, false)
+
+    override fun setNodeExtraIconsOnly(value: Boolean) {
+        scope.launch { dataStore.edit { it[NodeListLayoutPreferences.KEY_EXTRA_ICONS_ONLY] = value } }
+    }
+
     override val lastNarrowBandWarningShownMillis: StateFlow<Long> =
         dataStore.data.map { it[KEY_LAST_NARROW_BAND_WARNING_SHOWN] ?: 0L }.stateIn(scope, SharingStarted.Eagerly, 0L)
 

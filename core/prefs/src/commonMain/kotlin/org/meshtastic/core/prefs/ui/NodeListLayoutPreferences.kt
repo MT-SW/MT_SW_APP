@@ -41,6 +41,8 @@ enum class NodeListLayoutPreferences(val key: String, val defaultBoolean: Boolea
         val DEFAULT_DENSITY = NodeListDensity.COMPLETE.name
 
         val KEY_DENSITY = stringPreferencesKey(DENSITY_KEY)
+        val KEY_EXTRA_MODE = stringPreferencesKey("node-layout-extra-mode")
+        val KEY_EXTRA_ICONS_ONLY = booleanPreferencesKey("node-layout-extra-icons-only")
         val KEY_SHOW_POWER = booleanPreferencesKey(SHOULD_SHOW_POWER.key)
         val KEY_SHOW_LAST_HEARD = booleanPreferencesKey(SHOULD_SHOW_LAST_HEARD.key)
         val KEY_LAST_HEARD_RELATIVE = booleanPreferencesKey(LAST_HEARD_IS_RELATIVE.key)

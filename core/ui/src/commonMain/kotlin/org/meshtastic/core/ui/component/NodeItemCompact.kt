@@ -57,6 +57,7 @@ import org.jetbrains.compose.resources.vectorResource
 import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.NodeExtraMode
 import org.meshtastic.core.model.isUnmessageableRole
 import org.meshtastic.core.model.util.toDistanceString
 import org.meshtastic.core.resources.Res
@@ -238,7 +239,9 @@ fun NodeItemCompact(
                 )
 
                 // Row 3: Environment metrics — temp · humidity · pressure (icon + value only)
-                if (showTelemetry) {
+                if (LocalNodeExtraConfig.current.mode != NodeExtraMode.OFF) {
+                    NodeExtraLine(node = thatNode, tempInFahrenheit = tempInFahrenheit, distanceUnits = distanceUnits)
+                } else if (showTelemetry) {
                     CompactMetricsRow(
                         thatNode = thatNode,
                         tempInFahrenheit = tempInFahrenheit,

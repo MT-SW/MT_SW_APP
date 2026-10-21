@@ -60,6 +60,7 @@ import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.NodeExtraMode
 import org.meshtastic.core.model.isUnmessageableRole
 import org.meshtastic.core.model.util.toDistanceString
 import org.meshtastic.core.resources.Res
@@ -266,7 +267,11 @@ fun NodeItem(
                 relayNodeName = relayNodeName,
             )
 
-            if (showTelemetry) {
+            // The extra line (when switched on in the settings) carries every sensor, so it replaces the grid below.
+            val extraOn = LocalNodeExtraConfig.current.mode != NodeExtraMode.OFF
+            if (extraOn) {
+                NodeExtraLine(node = thatNode, tempInFahrenheit = tempInFahrenheit, distanceUnits = system)
+            } else if (showTelemetry) {
                 val sensorItems = gatherSensors(thatNode, tempInFahrenheit, contentColor)
                 if (sensorItems.isNotEmpty()) {
                     MetricsGrid(sensorItems)
