@@ -18,6 +18,7 @@ package org.meshtastic.feature.settings.component
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -47,6 +48,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import okio.ByteString.Companion.toByteString
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
+import kotlinx.coroutines.delay
+import org.meshtastic.core.model.NodeExtraStats
+import org.meshtastic.core.ui.component.LocalNodeExtraConfig
+import org.meshtastic.core.ui.component.LocalNodeExtraStats
+import org.meshtastic.core.ui.component.LocalNodeExtraTick
+import org.meshtastic.core.ui.component.NODE_EXTRA_PAGE_MILLIS
+import org.meshtastic.core.ui.component.NodeExtraConfig
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.nowSeconds
@@ -134,6 +145,22 @@ fun NodeLayoutSettings(
         val previewNode = remember { previewSampleNode() }
         val localNode = remember { previewLocalNode() }
 
+        // The preview shows the extra line too, with sample readings, and pages turn by themselves here as well.
+        val previewTick = remember { mutableIntStateOf(0) }
+        if (state.extraMode == NodeExtraMode.PAGED) {
+            LaunchedEffect(Unit) {
+                while (true) {
+                    delay(NODE_EXTRA_PAGE_MILLIS)
+                    previewTick.intValue++
+                }
+            }
+        }
+        val previewStats = remember { mapOf(previewNode.num to previewSampleExtraStats()) }
+        CompositionLocalProvider(
+            LocalNodeExtraConfig provides NodeExtraConfig(state.extraMode, state.extraIconsOnly),
+            LocalNodeExtraStats provides previewStats,
+            LocalNodeExtraTick provides previewTick,
+        ) {
         Box(modifier = Modifier.animateContentSize().padding(bottom = 8.dp)) {
             when (state.density) {
                 NodeListDensity.COMPLETE ->
@@ -162,6 +189,7 @@ fun NodeLayoutSettings(
                         showTelemetry = state.showTelemetry,
                     )
             }
+        }
         }
 
         HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
@@ -255,6 +283,18 @@ fun NodeLayoutSettings(
         }
     }
 }
+
+@Suppress("MagicNumber")
+private fun previewSampleExtraStats(): NodeExtraStats = NodeExtraStats(
+    packetsTx = 1280,
+    packetsRx = 20418,
+    packetsRxBad = 311,
+    rxDupe = 5302,
+    txRelay = 904,
+    cpuPercent = 12,
+    heapFreePercent = 41f,
+    flashUsedPercent = 63f,
+)
 
 @Suppress("MagicNumber")
 internal fun previewSampleNode(hopsAway: Int = 1): Node = Node(
@@ -399,7 +439,18 @@ private fun NodeExtraSettings(
             title = { Text("Znaczenie ikon") },
             text = {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    nodeExtraLegend.forEach { (glyph, meaning) -> Text("$glyph  $meaning") }
+                    nodeExtraLegend.forEach { (icon, meaning) ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (icon != null) {
+                                Icon(
+                                    imageVector = icon,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp).padding(end = 6.dp),
+                                )
+                            }
+                            Text(meaning, style = MaterialTheme.typography.bodyMedium)
+                        }
+                    }
                 }
             },
         )

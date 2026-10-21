@@ -270,7 +270,12 @@ fun NodeItem(
             // The extra line (when switched on in the settings) carries every sensor, so it replaces the grid below.
             val extraOn = LocalNodeExtraConfig.current.mode != NodeExtraMode.OFF
             if (extraOn) {
-                NodeExtraLine(node = thatNode, tempInFahrenheit = tempInFahrenheit, distanceUnits = system)
+                NodeExtraLine(
+                    node = thatNode,
+                    tempInFahrenheit = tempInFahrenheit,
+                    distanceUnits = system,
+                    isThisNode = isThisNode,
+                )
             } else if (showTelemetry) {
                 val sensorItems = gatherSensors(thatNode, tempInFahrenheit, contentColor)
                 if (sensorItems.isNotEmpty()) {
