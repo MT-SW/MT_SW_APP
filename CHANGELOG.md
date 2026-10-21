@@ -24,6 +24,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 **Dodatkowe dane przy węźle i odporność Zdrowia sieci**
 * W aplikacji na komputer lista węzłów i szczegóły węzła zaczynają po pół szerokości (dzielnik można przesunąć). Ustawienie „Skalowanie aplikacji” nazywa się teraz „Zgodnie z systemem”, a nie „z telefonem”.
+* W aplikacji na komputer ekran Ustawień ma teraz strzałkę cofania podczas zdalnego zarządzania innym węzłem (tak jak w telefonie); wcześniej nie było jak z niego wrócić.
 * Nowa dodatkowa linia pod każdym węzłem na liście. Przełącznik „Metryki środowiskowe” pokazuje w niej na górze napięcie i prąd, a pod nimi wszystkie czujniki pogody. Pod spodem, w ustawieniach „Dodatkowe statystyki”, osobne przełączniki (domyślnie wszystkie włączone): eter (zajętość kanału, czas nadawania, szum tła — z krótkimi podpisami; w linii ze „Skoków” same ikony od prawej strony), pakiety (TX, RX, błędne, duplikaty) oraz sprzęt (procesor, pamięć, siła Wi-Fi węzła); pakiety i sprzęt mają osobne linie przy prawej krawędzi. Napięcie i prąd w dodatkowej linii pochodzą z czujnika (telemetria środowiskowa lub zasilania), nie z podstawowej telemetrii przy baterii. Wszystko to ostatnie dane z pakietów węzła, nic nie jest mierzone na bieżąco. Strony albo wszystko naraz, opcja „same ikony” z legendą (i), a podgląd w ustawieniach od razu pokazuje zmiany.
 * Zdrowie sieci: obce lub zepsute pakiety (np. z innego firmware) nie mogą już zawiesić ani wywrócić ekranu; ekran sam próbuje się podnieść po błędzie i nie czyta już pakietów trybu na żądanie.
 
@@ -362,6 +363,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 **Extra data under a node, and a sturdier Network Health**
 * In the desktop app the node list and the node detail start at half the width each (the divider can be dragged). The "App scale" setting is now called "Follow the system", not "the phone".
+* In the desktop app the Settings screen now has a back arrow while remotely administering another node (as on the phone); before, there was no way back from it.
 * A new extra line under every node in the list. The "Environment metrics" switch shows voltage and current at the top and all weather sensors under them. Below, in the "Extra statistics" settings, separate switches (all on by default): ether (channel utilization, air time, noise floor -- with short labels; on the "Hops" line, icons only from the right, packets (TX, RX, bad, duplicates) and hardware (CPU, memory, the node's Wi-Fi strength); packets and hardware have their own lines at the right edge. Voltage and current in the extra line come from the sensor (environment or power telemetry), not from the basic telemetry next to the battery. All of it is the latest data from the node's packets; nothing is measured live. Pages or all at once, an "icons only" option with an (i) legend, and the preview in the settings shows changes at once.
 * Network Health: foreign or broken packets (e.g. from other firmware) can no longer freeze or crash the screen; it now tries to recover after an error and no longer reads on-demand mode packets.
 

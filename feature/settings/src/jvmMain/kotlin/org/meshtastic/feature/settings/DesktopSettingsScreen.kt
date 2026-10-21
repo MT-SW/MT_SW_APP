@@ -129,6 +129,7 @@ fun DesktopSettingsScreen(
     radioConfigViewModel: RadioConfigViewModel,
     settingsViewModel: SettingsViewModel,
     onNavigate: (Route) -> Unit,
+    onBack: (() -> Unit)? = null,
 ) {
     val state by radioConfigViewModel.radioConfigState.collectAsStateWithLifecycle()
     val databaseBackup = rememberDatabaseBackupActions()
@@ -234,9 +235,10 @@ fun DesktopSettingsScreen(
                 title = stringResource(Res.string.bottom_nav_settings),
                 isLocal = state.isLocal,
                 destNode = destNode,
-                onNavigateUp = {},
+                onNavigateUp = { onBack?.invoke() },
                 localSubtitle = null,
-                canNavigateUp = false,
+                // Back arrow when administering another node remotely (same as on the phone).
+                canNavigateUp = onBack != null && !state.isLocal,
             )
         },
     ) { paddingValues ->
