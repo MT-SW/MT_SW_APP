@@ -45,10 +45,27 @@ class LlamaAssistantService(
     override suspend fun reply(history: List<AssistantTurn>, onPiece: (String) -> Unit): String {
         val modelId = activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
         val question = history.lastOrNull { it.fromUser }?.text.orEmpty()
-        val context = runCatching { data.contextFor(question) }.getOrDefault("")
+        return try {
+            ask(modelId, trimmed(history, MAX_HISTORY_CHARS), data.contextFor(question), onPiece)
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            // The model only takes about 4000 tokens at once: try again with a much shorter prompt.
+            if (e.message?.contains("too long", ignoreCase = true) != true) throw e
+            val short = history.takeLast(1)
+            ask(modelId, short, data.contextFor(question, SHORT_CONTEXT_CHARS), onPiece)
+        }
+    }
+
+    private suspend fun ask(
+        modelId: String,
+        turns: List<AssistantTurn>,
+        context: String,
+        onPiece: (String) -> Unit,
+    ): String {
         val messages = buildList {
             add("system" to if (context.isBlank()) SYSTEM_PROMPT else "$SYSTEM_PROMPT\n\n$DATA_INTRO\n$context")
-            trimmed(history).forEach { add((if (it.fromUser) "user" else "assistant") to it.text) }
+            turns.forEach { add((if (it.fromUser) "user" else "assistant") to it.text) }
         }
         return engine.chat(
             modelId = modelId,
@@ -60,8 +77,8 @@ class LlamaAssistantService(
     }
 
     /** Keeps the newest turns that fit the model's memory of the conversation (the oldest are dropped). */
-    private fun trimmed(history: List<AssistantTurn>): List<AssistantTurn> {
-        var budget = MAX_HISTORY_CHARS
+    private fun trimmed(history: List<AssistantTurn>, limit: Int): List<AssistantTurn> {
+        var budget = limit
         val kept = ArrayList<AssistantTurn>()
         for (turn in history.asReversed()) {
             if (turn.text.isBlank() && !turn.fromUser) continue
@@ -81,9 +98,10 @@ class LlamaAssistantService(
     }
 
     private companion object {
-        const val MAX_ANSWER_TOKENS = 700
+        const val MAX_ANSWER_TOKENS = 600
         const val TEMPERATURE = 0.3f
-        const val MAX_HISTORY_CHARS = 3000
+        const val MAX_HISTORY_CHARS = 2000
+        const val SHORT_CONTEXT_CHARS = 1500
         const val DATA_INTRO =
             "Below is live read-only data from the user's app and radio. Use it to answer questions about their " +
                 "own network and device; quote the real values and say whether a value is rising, falling or stable. " +

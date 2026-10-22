@@ -33,11 +33,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalClipboard
+import kotlinx.coroutines.launch
+import org.meshtastic.core.resources.copy
+import org.meshtastic.core.resources.resend
+import org.meshtastic.core.ui.util.createClipEntry
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -155,12 +167,17 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                     )
                 }
             }
-            items(state.lines) { line ->
-                Bubble(fromUser = line.fromUser) {
+            itemsIndexed(state.lines) { index, line ->
+                Bubble(
+                    fromUser = line.fromUser,
+                    text = line.text,
+                    canRetry = !state.busy && line.text.isNotEmpty(),
+                    onRetry = { viewModel.retry(index) },
+                ) {
                     if (line.text.isEmpty()) {
                         TypingDots()
                     } else {
-                        SelectionContainer { Text(text = line.text, style = MaterialTheme.typography.bodyLarge) }
+                        Text(text = line.text, style = MaterialTheme.typography.bodyLarge)
                     }
                 }
             }
@@ -201,17 +218,48 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
     }
 }
 
-/** A chat bubble: yours on the right, the assistant's on the left. */
+/** A chat bubble: yours on the right, the assistant's on the left. Press and hold for copy and ask-again. */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun Bubble(fromUser: Boolean, content: @Composable () -> Unit) {
+private fun Bubble(
+    fromUser: Boolean,
+    text: String,
+    canRetry: Boolean,
+    onRetry: () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    var menuOpen by remember { mutableStateOf(false) }
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = if (fromUser) Arrangement.End else Arrangement.Start) {
-        Surface(
-            shape = if (fromUser) UserBubbleShape else AssistantBubbleShape,
-            color =
-            if (fromUser) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-            modifier = Modifier.widthIn(max = 560.dp).fillMaxWidth(if (fromUser) 0.85f else 0.92f),
-        ) {
-            Box(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) { content() }
+        Box(modifier = Modifier.widthIn(max = 560.dp).fillMaxWidth(if (fromUser) 0.85f else 0.92f)) {
+            Surface(
+                shape = if (fromUser) UserBubbleShape else AssistantBubbleShape,
+                color =
+                if (fromUser) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                modifier =
+                Modifier.fillMaxWidth().combinedClickable(onClick = {}, onLongClick = { if (text.isNotEmpty()) menuOpen = true }),
+            ) {
+                Box(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) { content() }
+            }
+            DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(Res.string.copy)) },
+                    onClick = {
+                        menuOpen = false
+                        scope.launch { clipboard.setClipEntry(createClipEntry(text, "")) }
+                    },
+                )
+                if (canRetry) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.resend)) },
+                        onClick = {
+                            menuOpen = false
+                            onRetry()
+                        },
+                    )
+                }
+            }
         }
     }
 }
