@@ -24,6 +24,8 @@ import com.google.ai.edge.litertlm.Engine
 import com.google.ai.edge.litertlm.EngineConfig
 import com.google.ai.edge.litertlm.Message
 import com.google.ai.edge.litertlm.SamplerConfig
+import com.google.ai.edge.litertlm.ToolSet
+import com.google.ai.edge.litertlm.tool
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -66,10 +68,11 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         maxTokens: Int,
         temperature: Float,
         onPiece: (String) -> Unit = {},
+        tools: List<ToolSet> = emptyList(),
     ): String = runMutex.withLock {
         unloadJob?.cancel()
         try {
-            withContext(Dispatchers.Default) { generate(modelId, messages, maxTokens, temperature, onPiece) }
+            withContext(Dispatchers.Default) { generate(modelId, messages, maxTokens, temperature, onPiece, tools) }
         } finally {
             scheduleUnload()
         }
@@ -86,6 +89,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         maxTokens: Int,
         temperature: Float,
         onPiece: (String) -> Unit,
+        tools: List<ToolSet>,
     ): String {
         val started = nowMillis
         val wasLoaded = loadedId == modelId
@@ -106,6 +110,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
             ConversationConfig(
                 systemInstruction = if (system.isBlank()) null else Contents.of(system),
                 initialMessages = history,
+                tools = tools.map { tool(it) },
                 samplerConfig = SamplerConfig(topK = TOP_K, topP = TOP_P, temperature = temperature.toDouble()),
             )
 
