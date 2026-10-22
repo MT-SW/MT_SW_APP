@@ -2936,6 +2936,10 @@
     <string name="assistant_delete">Usuń rozmowę</string>
     <string name="assistant_you">Ty</string>
     <string name="assistant_name">Asystent</string>
+    <string name="assistant_suggest_1">Jak ustawić kanał?</string>
+    <string name="assistant_suggest_2">Co to jest zasięg LoRa?</string>
+    <string name="assistant_suggest_3">Jak poprawić zasięg anteny?</string>
+    <string name="assistant_suggest_4">Czym jest węzeł w sieci mesh?</string>
     <string name="ai_tab_ai">AI</string>
     <string name="ai_tab_translator">Tłumacz</string>
     <string name="ai_tab_assistant">Asystent</string>

@@ -2712,6 +2712,10 @@
     <string name="assistant_delete">Delete conversation</string>
     <string name="assistant_you">You</string>
     <string name="assistant_name">Assistant</string>
+    <string name="assistant_suggest_1">How do I set up a channel?</string>
+    <string name="assistant_suggest_2">What is LoRa range?</string>
+    <string name="assistant_suggest_3">How can I improve antenna range?</string>
+    <string name="assistant_suggest_4">What is a node in a mesh network?</string>
     <string name="ai_tab_ai">AI</string>
     <string name="ai_tab_translator">Translator</string>
     <string name="ai_tab_assistant">Assistant</string>
