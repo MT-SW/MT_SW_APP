@@ -21,12 +21,15 @@ import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.repository.UiPrefs
 
 /** One bubble of the conversation. */
@@ -40,7 +43,11 @@ data class AssistantUiState(
 )
 
 @KoinViewModel
-class AssistantViewModel(private val service: AssistantService, uiPrefs: UiPrefs) : ViewModel() {
+class AssistantViewModel(
+    private val service: AssistantService,
+    private val history: AssistantHistoryStore,
+    uiPrefs: UiPrefs,
+) : ViewModel() {
 
     val enabled: StateFlow<Boolean> = uiPrefs.assistantEnabled
     val modelReady: StateFlow<Boolean> = service.ready
@@ -48,7 +55,21 @@ class AssistantViewModel(private val service: AssistantService, uiPrefs: UiPrefs
     private val _state = MutableStateFlow(AssistantUiState())
     val state: StateFlow<AssistantUiState> = _state.asStateFlow()
 
+    private val _saved = MutableStateFlow<List<StoredChat>>(emptyList())
+
+    /** Saved conversations, newest first. */
+    val saved: StateFlow<List<StoredChat>> = _saved.asStateFlow()
+
     private var job: Job? = null
+    private var chatId: String? = null
+
+    init {
+        refreshSaved()
+    }
+
+    fun refreshSaved() {
+        viewModelScope.launch { _saved.value = runCatching { history.list() }.getOrDefault(emptyList()) }
+    }
 
     fun setInput(value: String) = _state.update { it.copy(input = value) }
 
@@ -78,6 +99,7 @@ class AssistantViewModel(private val service: AssistantService, uiPrefs: UiPrefs
                     _state.update { it.copy(failed = true) }
                 } finally {
                     _state.update { it.copy(busy = false) }
+                    withContext(NonCancellable) { persist() }
                 }
             }
     }
@@ -86,9 +108,36 @@ class AssistantViewModel(private val service: AssistantService, uiPrefs: UiPrefs
         job?.cancel()
     }
 
-    fun clear() {
+    /** Starts a fresh conversation; the previous one stays in the saved list. */
+    fun startNew() {
         job?.cancel()
+        chatId = null
         _state.update { AssistantUiState() }
+    }
+
+    fun open(chat: StoredChat) {
+        job?.cancel()
+        chatId = chat.id
+        _state.update { AssistantUiState(lines = chat.lines.map { AssistantLine(it.fromUser, it.text) }) }
+    }
+
+    fun deleteSaved(id: String) {
+        if (id == chatId) startNew()
+        viewModelScope.launch {
+            runCatching { history.delete(id) }
+            refreshSaved()
+        }
+    }
+
+    private suspend fun persist() {
+        val lines = _state.value.lines.filter { it.text.isNotBlank() }
+        if (lines.none { it.fromUser }) return
+        val id = chatId ?: nowMillis.toString().also { chatId = it }
+        val title = lines.first { it.fromUser }.text.lines().first().take(TITLE_LENGTH)
+        runCatching {
+            history.save(StoredChat(id, title, nowMillis, lines.map { StoredLine(it.fromUser, it.text) }))
+        }
+        refreshSaved()
     }
 
     private fun appendToAnswer(piece: String) = _state.update { s ->
@@ -99,5 +148,9 @@ class AssistantViewModel(private val service: AssistantService, uiPrefs: UiPrefs
     private fun setAnswer(answer: String) = _state.update { s ->
         if (s.lines.isEmpty() || s.lines.last().fromUser || answer.isBlank()) return@update s
         s.copy(lines = s.lines.dropLast(1) + AssistantLine(false, answer))
+    }
+
+    private companion object {
+        const val TITLE_LENGTH = 48
     }
 }

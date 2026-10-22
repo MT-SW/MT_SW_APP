@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.assistant_clear
 import org.meshtastic.core.resources.assistant_disclaimer
 import org.meshtastic.core.resources.assistant_empty_hint
 import org.meshtastic.core.resources.assistant_error
@@ -49,6 +48,7 @@ import org.meshtastic.core.resources.assistant_greeting
 import org.meshtastic.core.resources.assistant_input_hint
 import org.meshtastic.core.resources.assistant_model_missing
 import org.meshtastic.core.resources.assistant_name
+import org.meshtastic.core.resources.assistant_new
 import org.meshtastic.core.resources.assistant_off
 import org.meshtastic.core.resources.assistant_send
 import org.meshtastic.core.resources.assistant_stop
@@ -172,7 +172,7 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                 }
             }
             if (state.lines.isNotEmpty() && !state.busy) {
-                TextButton(onClick = viewModel::clear) { Text(stringResource(Res.string.assistant_clear)) }
+                TextButton(onClick = viewModel::startNew) { Text(stringResource(Res.string.assistant_new)) }
             }
         }
     }

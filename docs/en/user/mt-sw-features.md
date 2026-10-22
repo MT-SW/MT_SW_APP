@@ -134,7 +134,7 @@ On weaker devices large models can slow the app down or close it, which is why e
 
 **Tab in the bottom bar.** When either mode is on, a "Translator" tab appears in the bottom bar. When the assistant is on too, the tab is called "AI" and has a sparkles icon, with two separate tabs inside: translator and assistant. The assistant works only on this tab; channels and private messages only have the translator. The assistant needs the Standard or Strong model; the Light model only translates.
 
-**How the assistant works.** You type a question and the answer appears as it is written; the "Stop" button interrupts it at any time and "Clear conversation" starts over. The first answer (and the first translation) takes longer because the model is loaded into memory. Answers may be wrong — check important things. The conversation is not saved or sent anywhere.
+**How the assistant works.** You type a question and the answer appears as it is written; the "Stop" button interrupts it at any time and "New conversation" starts over. The first answer (and the first translation) takes longer because the model is loaded into memory. Answers may be wrong — check important things. Conversations are saved **only on this device** and are never sent anywhere. The clock icon in the corner opens the history: tap a conversation to continue it, or delete it. "New conversation" starts from scratch and the previous one stays in the history.
 
 **Translator:**
 

@@ -29,7 +29,9 @@ import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.TranslatorModelManager
 import org.meshtastic.feature.messaging.translation.AiModelStoreImpl
 import org.meshtastic.feature.messaging.translation.AiTranslationRouter
+import org.meshtastic.feature.messaging.translation.AssistantHistoryStore
 import org.meshtastic.feature.messaging.translation.AssistantService
+import org.meshtastic.feature.messaging.translation.FileAssistantHistoryStore
 import org.meshtastic.feature.messaging.translation.GemmaTranslator
 import org.meshtastic.feature.messaging.translation.LlamaAssistantService
 import org.meshtastic.feature.messaging.translation.LlamaEngine
@@ -91,6 +93,10 @@ class GoogleAiModule {
         store: AiModelStoreImpl,
         uiPrefs: UiPrefs,
     ): AiTranslationRouter = AiTranslationRouter(translator, GemmaTranslator(engine), store, uiPrefs)
+
+    @Single
+    fun assistantHistoryStore(context: Context): AssistantHistoryStore =
+        FileAssistantHistoryStore(File(context.filesDir, "assistant"))
 
     @Single
     fun assistantService(engine: LlamaEngine, store: AiModelStoreImpl, uiPrefs: UiPrefs): AssistantService =
