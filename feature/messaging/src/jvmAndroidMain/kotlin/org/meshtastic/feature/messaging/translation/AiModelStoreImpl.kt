@@ -53,6 +53,9 @@ class AiModelStoreImpl(private val nllb: NllbTranslator, private val ggufDir: Fi
     private val gguf = MutableStateFlow(initialGgufStates())
     private val jobs = HashMap<String, Job>()
 
+    /** Called before a GGUF model is deleted so the engine can release its file first. */
+    @Volatile var beforeGgufDelete: (suspend () -> Unit)? = null
+
     override val states: StateFlow<Map<String, TranslatorModelState>> =
         combine(nllb.state, gguf) { n, g -> g + (AiModels.NLLB_600M_ID to n) }
             .stateIn(scope, SharingStarted.Eagerly, gguf.value + (AiModels.NLLB_600M_ID to nllb.state.value))
@@ -114,6 +117,7 @@ class AiModelStoreImpl(private val nllb: NllbTranslator, private val ggufDir: Fi
             return
         }
         cancelDownload(id)
+        beforeGgufDelete?.invoke()
         withContext(Dispatchers.IO) { modelDir(model).deleteRecursively() }
         setGguf(id, TranslatorModelState.NotDownloaded)
     }

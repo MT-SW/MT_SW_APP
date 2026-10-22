@@ -29,6 +29,9 @@ import org.meshtastic.feature.docs.translation.NoOpDocTranslator
 import org.meshtastic.feature.messaging.translation.MessageTranslationService
 import org.meshtastic.core.repository.TranslatorModelManager
 import org.meshtastic.feature.messaging.translation.AiModelStoreImpl
+import org.meshtastic.feature.messaging.translation.AiTranslationRouter
+import org.meshtastic.feature.messaging.translation.GemmaTranslator
+import org.meshtastic.feature.messaging.translation.LlamaEngine
 import org.meshtastic.core.repository.AiModelStore
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.feature.messaging.translation.NllbTranslator
@@ -48,11 +51,24 @@ class FdroidAiModule {
     fun nllbTranslator(context: Context, uiPrefs: UiPrefs): NllbTranslator =
         NllbTranslator(File(context.filesDir, "translator"), uiPrefs)
 
-    @Single fun messageTranslationService(translator: NllbTranslator): MessageTranslationService = translator
-
-    @Single fun translatorModelManager(translator: NllbTranslator): TranslatorModelManager = translator
 
     @Single
-    fun aiModelStore(context: Context, translator: NllbTranslator): AiModelStore =
+    fun aiModelStoreImpl(context: Context, translator: NllbTranslator): AiModelStoreImpl =
         AiModelStoreImpl(translator, File(context.filesDir, "models"))
+
+    @Single fun aiModelStore(impl: AiModelStoreImpl): AiModelStore = impl
+
+    @Single fun llamaEngine(store: AiModelStoreImpl): LlamaEngine = LlamaEngine(store)
+
+    @Single
+    fun aiTranslationRouter(
+        translator: NllbTranslator,
+        engine: LlamaEngine,
+        store: AiModelStoreImpl,
+        uiPrefs: UiPrefs,
+    ): AiTranslationRouter = AiTranslationRouter(translator, GemmaTranslator(engine), store, uiPrefs)
+
+    @Single fun messageTranslationService(router: AiTranslationRouter): MessageTranslationService = router
+
+    @Single fun translatorModelManager(router: AiTranslationRouter): TranslatorModelManager = router
 }

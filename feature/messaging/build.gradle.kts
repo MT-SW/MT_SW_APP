@@ -52,6 +52,8 @@ kotlin {
             dependencies {
                 implementation(libs.kotlinx.serialization.json)
                 compileOnly(libs.onnxruntime)
+                // llama.cpp for the Gemma models (MIT); one dependency, the right native build is picked per platform.
+                implementation(libs.llamatik.core)
             }
         }
 
