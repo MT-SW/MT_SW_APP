@@ -91,3 +91,8 @@
 -keep class com.google.ai.edge.litertlm.** { *; }
 -keep interface com.google.ai.edge.litertlm.** { *; }
 -dontwarn com.google.ai.edge.litertlm.**
+
+# The assistant's tools are found through their annotations and parameter names, so they must stay as written.
+-keep class org.meshtastic.feature.messaging.translation.AssistantTools { *; }
+-keepattributes RuntimeVisibleAnnotations,RuntimeVisibleParameterAnnotations,Signature,*Annotation*
+-keep class kotlin.Metadata { *; }

@@ -34,7 +34,10 @@ class LlamaAssistantService(
     private val store: AiModelStoreImpl,
     private val uiPrefs: UiPrefs,
     private val data: AssistantDataProvider,
+    tools: AssistantTools = AssistantTools(data),
 ) : AssistantService {
+
+    private val toolSets = listOf(tools)
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
@@ -53,7 +56,7 @@ class LlamaAssistantService(
         val question = history.lastOrNull { it.fromUser }?.text.orEmpty()
         val recent = fit(modelId, history)
         return try {
-            ask(modelId, recent, memory, data.contextFor(question), onPiece)
+            ask(modelId, recent, memory, data.contextFor(question, AUTO_CONTEXT_CHARS), onPiece)
         } catch (e: kotlinx.coroutines.CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -122,7 +125,7 @@ class LlamaAssistantService(
         onPiece: (String) -> Unit,
     ): String {
         val system = buildString {
-            append(SYSTEM_PROMPT)
+            append(SYSTEM_PROMPT).append("\n\n").append(TOOLS_RULE)
             if (summary.isNotBlank()) append("\n\nSummary of the earlier part of this conversation: ").append(summary)
             if (context.isNotBlank()) append("\n\n").append(DATA_INTRO).append('\n').append(context)
         }
@@ -136,6 +139,7 @@ class LlamaAssistantService(
             maxTokens = MAX_ANSWER_TOKENS,
             temperature = TEMPERATURE,
             onPiece = onPiece,
+            tools = toolSets,
         )
     }
 
@@ -157,15 +161,21 @@ class LlamaAssistantService(
         const val MAX_SUMMARY_CHARS = 700
         const val SUMMARY_TOKENS = 250
         const val SUMMARY_TEMPERATURE = 0.2f
-        const val SHORT_CONTEXT_CHARS = 1500
+        const val SHORT_CONTEXT_CHARS = 800
+        const val AUTO_CONTEXT_CHARS = 1200
         const val DATA_INTRO =
             "Below is live read-only data from the user's app and radio. Use it to answer questions about their " +
-                "own network and device; quote the real values and say whether a value is rising, falling or stable. " +
-                "heap is the free internal RAM of the radio node (not the phone). You can only read; you cannot change " +
-                "settings or send messages, so if the user wants that, explain what to do or draft the text for them. " +
-                "For questions like \"which node has the most ...\" read the NODE RANKING table and name the node(s) " +
-                "with the real numbers. Copy every number and unit exactly as it appears in the data (keep the decimal point, " +
-                "keep the minus sign, never combine or change digits); if a value is unknown say so. Write plain text only: no markdown, no asterisks, no backticks."
+                "own network and device. heap is the free internal RAM of the radio node (not the phone). " +
+                "Copy every number and unit exactly as it appears in the data (keep the decimal point and the minus " +
+                "sign, never combine or change digits); if a value is unknown say so. Write plain text only: no " +
+                "markdown, no asterisks, no backticks."
+        const val TOOLS_RULE =
+            "You have read-only tools that look up the app's data: network overview, node names, details and " +
+                "history of any node, ranked node tables (packets, memory, battery, signal, distance), sensor and " +
+                "weather data, radio settings and messages. For ANY question about the user's network, nodes, " +
+                "statistics, history, settings, sensors or messages, call the matching tool first and answer from " +
+                "its result; never say you have no data before you have tried the tools. You cannot change " +
+                "settings or send messages; if the user wants that, explain what to do or draft the text for them."
         const val SYSTEM_PROMPT =
             "You are the offline assistant built into MT_SW, an Android and desktop app for Meshtastic, " +
                 "an open-source LoRa mesh radio network that works without internet. " +

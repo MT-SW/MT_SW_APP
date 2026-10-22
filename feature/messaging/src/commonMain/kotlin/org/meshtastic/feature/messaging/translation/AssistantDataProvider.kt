@@ -144,7 +144,7 @@ class AssistantDataProvider(
         }
     }
 
-    private suspend fun nodeDetail(n: org.meshtastic.core.model.Node): String {
+    private suspend fun nodeDetail(n: org.meshtastic.core.model.Node, sinceMs: Long = 0L): String {
         val now = nowMillis / MILLIS_PER_SECOND
         val heard = if (n.lastHeard == 0) "never" else "${((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)} min ago"
         val head = buildString {
@@ -155,7 +155,7 @@ class AssistantDataProvider(
             appendLine("Environment: ${n.environmentMetrics}")
             if (n.notes.isNotBlank()) appendLine("Notes: ${n.notes}")
         }
-        return head + safe("node trends") { trends(n.num, n.user.long_name, 0L) }
+        return head + safe("node trends") { trends(n.num, n.user.long_name, sinceMs) }
     }
 
     /** Which nodes report weather, air quality, power or other sensor data, and the values they last sent. */
@@ -185,7 +185,7 @@ class AssistantDataProvider(
     }
 
     /** Link quality to every node we hear: SNR, RSSI, hops and the distance from our own node. */
-    private fun signalRanking(q: String): String {
+    private fun signalRanking(q: String, top: Int = SIGNAL_TOP): String {
         val me = nodeRepository.ourNodeInfo.value
         val now = nowMillis / MILLIS_PER_SECOND
         class Row(val n: org.meshtastic.core.model.Node, val meters: Int?)
@@ -216,7 +216,7 @@ class AssistantDataProvider(
                     "Higher SNR is better; RSSI closer to 0 is better; hops 0 means heard directly. " +
                     if (closest || byDistance) "Sorted by distance:" else "Best range = direct nodes (hops 0) with the highest SNR first:",
             )
-            sorted.take(SIGNAL_TOP).forEach { appendLine(line(it)) }
+            sorted.take(top).forEach { appendLine(line(it)) }
         }
     }
 
@@ -235,7 +235,7 @@ class AssistantDataProvider(
     }
 
     /** The latest telemetry every node reported (last 3 days), ranked by what the question is about. */
-    private suspend fun ranking(q: String): String {
+    private suspend fun ranking(q: String, top: Int = RANK_TOP): String {
         val logs = meshLogRepository.getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, nowMillis - RANK_WINDOW_MS).first()
         val rows = HashMap<Int, NodeRow>()
         for (log in logs) {
@@ -292,8 +292,8 @@ class AssistantDataProvider(
                 "NODE RANKING by ${key.label}: ${sorted.size} of ${rows.size} nodes reported. Counters are the node's own totals since " +
                     "it started. Best first:",
             )
-            sorted.take(RANK_TOP).forEach { appendLine(line(it)) }
-            if (sorted.size > RANK_TOP + RANK_BOTTOM) {
+            sorted.take(top).forEach { appendLine(line(it)) }
+            if (sorted.size > top + RANK_BOTTOM) {
                 appendLine("... Last ones:")
                 sorted.takeLast(RANK_BOTTOM).forEach { appendLine(line(it)) }
             }
@@ -379,6 +379,83 @@ class AssistantDataProvider(
         )
     }
 
+    // ---- Entry points for the assistant's tools (all read-only) ----
+
+    suspend fun toolOverview(): String = overview() + "\n" + networkSummary()
+
+    /** Details and recorded history of one node found by (part of) its name; [hours] 0 means the whole history. */
+    suspend fun toolNode(name: String, hours: Int): String {
+        val node = findNode(name) ?: return "No node found for \"$name\". Use the node list tool to see the names."
+        val since = if (hours > 0) nowMillis - hours * MILLIS_PER_HOUR else 0L
+        return nodeDetail(node, since)
+    }
+
+    /** All known nodes with short and long name. */
+    fun toolNodeNames(): String {
+        val nodes = nodeRepository.nodeDBbyNum.value.values.sortedByDescending { it.lastHeard }
+        return "ALL KNOWN NODES (${nodes.size}, short=long name): " + nodes.joinToString("; ") { "${it.user.short_name}=${it.user.long_name}" }
+    }
+
+    /**
+     * A ranked table of nodes. [sortBy]: rx, tx, dupe, bad, heap, battery, channel_util, uptime (telemetry); snr, rssi,
+     * distance, closest, hops (link quality).
+     */
+    suspend fun toolList(sortBy: String, limit: Int): String {
+        val top = limit.coerceIn(1, MAX_TOOL_LIST)
+        return when (sortBy.trim().lowercase()) {
+            "snr", "rssi", "signal", "range", "hops" -> signalRanking("snr", top)
+            "distance", "far", "farthest" -> signalRanking("odległ", top)
+            "closest", "nearest", "near" -> signalRanking("najbliż", top)
+            "tx" -> ranking("wysł", top)
+            "dupe", "duplicates" -> ranking("dupe", top)
+            "bad" -> ranking("bad ", top)
+            "heap", "ram" -> ranking("heap", top)
+            "battery" -> ranking("battery", top)
+            "channel_util", "channel", "utilization" -> ranking("channel", top)
+            "uptime" -> ranking("uptime", top)
+            else -> ranking("odebran", top)
+        }
+    }
+
+    suspend fun toolSensors(): String = sensors()
+
+    suspend fun toolSettings(): String = settings()
+
+    /** Messages containing [query] (all conversations); an empty [query] gives the newest ones. */
+    suspend fun toolMessages(query: String, limit: Int): String {
+        val top = limit.coerceIn(1, MAX_TOOL_LIST)
+        val needle = query.trim().lowercase()
+        val keys = packetRepository.getContacts().first().keys
+        val found = ArrayList<Triple<Long, String, String>>()
+        for (key in keys) {
+            val list = packetRepository.getMessagesFrom(key, SEARCH_PER_CHAT) { id -> nodeRepository.getNode(id.orEmpty()) }.first()
+            for (m in list) {
+                val text = m.text
+                if (needle.isNotEmpty() && !text.lowercase().contains(needle)) continue
+                val who = if (m.fromLocal) "me" else m.node.user.short_name
+                found += Triple(m.receivedTime, key, "$who: ${text.take(MESSAGE_CHARS)}")
+            }
+        }
+        if (found.isEmpty()) return "No messages found."
+        val now = nowMillis
+        return "MESSAGES (newest first):\n" +
+            found.sortedByDescending { it.first }.take(top).joinToString("\n") {
+                "- [${it.second}] ${((now - it.first) / MILLIS_PER_MINUTE).coerceAtLeast(0)} min ago, ${it.third}"
+            }
+    }
+
+    private fun findNode(name: String): org.meshtastic.core.model.Node? {
+        val q = name.trim().lowercase()
+        if (q.isEmpty()) return null
+        val all = nodeRepository.nodeDBbyNum.value.values
+        if (q in OWN_WORDS) return nodeRepository.ourNodeInfo.value
+        return all.firstOrNull { it.user.short_name.lowercase() == q }
+            ?: all.firstOrNull { it.user.long_name.lowercase() == q }
+            ?: all.firstOrNull { it.user.long_name.lowercase().contains(q) }
+            ?: all.firstOrNull { it.user.short_name.lowercase().contains(q) }
+            ?: all.firstOrNull { it.user.id.lowercase() == q }
+    }
+
     private fun String.hasAny(words: List<String>) = words.any { contains(it) }
 
     private fun String.redacted(): String = replace(SECRET, "$1=<hidden>")
@@ -394,6 +471,10 @@ class AssistantDataProvider(
         const val RANK_TOP = 8
         const val SIGNAL_TOP = 8
         const val SENSOR_LIMIT = 12
+        const val MAX_TOOL_LIST = 40
+        const val SEARCH_PER_CHAT = 60
+        const val MILLIS_PER_HOUR = 3_600_000L
+        const val MILLIS_PER_MINUTE = 60_000L
         const val METERS_PER_KM = 1000f
         const val RANK_BOTTOM = 3
         const val HEX = 16
