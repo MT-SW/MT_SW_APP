@@ -1259,7 +1259,10 @@ internal fun nodeStatsRows(stats: NodeStats): List<Pair<StringResource, String>>
         add(Res.string.on_demand_flash to "$used / $total")
     }
     if (stats.memory_psram_free != null || stats.memory_psram_total != null) {
-        val free = stats.memory_psram_free?.let { formatByteSize(it.toLong()) } ?: "?"
+        val free =
+            stats.memory_psram_free
+                ?.let { f -> stats.memory_psram_total?.let { t -> formatByteSize((t - f).coerceAtLeast(0).toLong()) } }
+                ?: "?"
         val total = stats.memory_psram_total?.let { formatByteSize(it.toLong()) } ?: "?"
         add(Res.string.on_demand_psram to "$free / $total")
     }

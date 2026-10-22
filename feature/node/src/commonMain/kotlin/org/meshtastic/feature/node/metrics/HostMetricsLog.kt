@@ -241,7 +241,7 @@ internal fun HostMetricsCardContent(
                 LogLine(
                     label = stringResource(Res.string.local_stats_psram),
                     value =
-                    "${formatByteSize(ext.memoryPsramFree.toLong())} / ${formatByteSize(ext.memoryPsramTotal.toLong())}",
+                    "${formatByteSize((ext.memoryPsramTotal - ext.memoryPsramFree).coerceAtLeast(0).toLong())} / ${formatByteSize(ext.memoryPsramTotal.toLong())}",
                 )
             }
         }

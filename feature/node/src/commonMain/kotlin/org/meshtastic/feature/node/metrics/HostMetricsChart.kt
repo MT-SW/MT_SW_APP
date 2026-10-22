@@ -133,7 +133,7 @@ internal data class HostMetricsChartData(
     val cpuPercent: List<HostMetricsChartPoint> = emptyList(),
     val heapUsedPercent: List<HostMetricsChartPoint> = emptyList(),
     val flashUsedPercent: List<HostMetricsChartPoint> = emptyList(),
-    val psramFreePercent: List<HostMetricsChartPoint> = emptyList(),
+    val psramUsedPercent: List<HostMetricsChartPoint> = emptyList(),
 ) {
     val hasLoad: Boolean
         get() = load1.isNotEmpty() || load5.isNotEmpty() || load15.isNotEmpty()
@@ -197,13 +197,13 @@ internal fun buildHostMetricsChartData(data: List<Telemetry>): HostMetricsChartD
             }
         }
     },
-    psramFreePercent =
+    psramUsedPercent =
     data.mapNotNull { telemetry ->
         telemetry.decodeLocalStatsExtended()?.let { ext ->
             if (ext.memoryPsramTotal > 0) {
                 HostMetricsChartPoint(
                     time = telemetry.time,
-                    value = ext.memoryPsramFree.toDouble() / ext.memoryPsramTotal * PERCENT_MULTIPLIER,
+                    value = (ext.memoryPsramTotal - ext.memoryPsramFree).coerceAtLeast(0).toDouble() / ext.memoryPsramTotal * PERCENT_MULTIPLIER,
                 )
             } else {
                 null
@@ -244,7 +244,7 @@ internal fun HostMetricsChart(
         val cpuData = chartData.cpuPercent
         val heapData = chartData.heapUsedPercent
         val flashData = chartData.flashUsedPercent
-        val psramData = chartData.psramFreePercent
+        val psramData = chartData.psramUsedPercent
         val hasResources =
             cpuData.isNotEmpty() || heapData.isNotEmpty() || flashData.isNotEmpty() || psramData.isNotEmpty()
 

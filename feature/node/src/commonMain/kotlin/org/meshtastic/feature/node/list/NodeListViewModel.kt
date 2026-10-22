@@ -452,9 +452,9 @@ private fun NodeExtraStats.withHardware(ext: LocalStatsExtended?): NodeExtraStat
         flashUsedPercent =
         ext.takeIf { it.flashTotalBytes > 0 }?.let { it.flashUsedBytes * PERCENT / it.flashTotalBytes }
             ?: flashUsedPercent,
-        psramFreePercent =
-        ext.takeIf { it.memoryPsramTotal > 0 }?.let { it.memoryPsramFree * PERCENT / it.memoryPsramTotal }
-            ?: psramFreePercent,
+        psramUsedPercent =
+        ext.takeIf { it.memoryPsramTotal > 0 }?.let { (it.memoryPsramTotal - it.memoryPsramFree).coerceAtLeast(0) * PERCENT / it.memoryPsramTotal }
+            ?: psramUsedPercent,
         wifiRssi = ext.wifiRssi.takeIf { it != 0 } ?: wifiRssi,
     )
 }

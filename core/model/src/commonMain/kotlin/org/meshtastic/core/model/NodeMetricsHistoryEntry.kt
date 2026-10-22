@@ -45,7 +45,7 @@ data class NodeMetricsHistoryEntry(
     val cpuUsagePercent: Int? = null,
     val heapUsedPercent: Float? = null,
     val flashUsedPercent: Float? = null,
-    val psramFreePercent: Float? = null,
+    val psramUsedPercent: Float? = null,
     /** Battery voltage from the device metrics; only used to estimate a percentage when the indication is swapped. */
     val deviceVoltage: Float? = null,
     /** WiFi signal strength of the node itself in dBm (fw+ extended stats); not persisted, read from the logs. */
