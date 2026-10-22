@@ -108,9 +108,9 @@ class AssistantDataProvider(
         val extended = nodeRepository.localStatsExtended.value
         return buildString {
             appendLine("OWN NODE: ${me?.user?.long_name ?: "unknown"} (${me?.user?.short_name ?: "?"}), hardware ${me?.user?.hw_model}")
-            if (me != null) appendLine("Device metrics: ${me.deviceMetrics}")
+            if (me != null) appendLine("Device metrics: ${me.deviceMetrics.toString().pretty()}")
             appendLine("Nodes online/total: ${nodeRepository.onlineNodeCount.first()}/${nodeRepository.totalNodeCount.first()}")
-            appendLine("Radio statistics: $stats")
+            appendLine("Radio statistics: ${stats.toString().pretty()}")
             appendLine("Extended statistics (cpu, flash, psram, wifi): $extended")
         }
     }
@@ -157,8 +157,8 @@ class AssistantDataProvider(
             appendLine("NODE ${n.user.long_name} (${n.user.short_name}), id ${n.user.id}, hardware ${n.user.hw_model}, role ${n.user.role}")
             appendLine("Heard $heard; hops=${n.hopsAway}; SNR=${if (n.snr == Float.MAX_VALUE) "unknown" else fmt(n.snr) + " dB"}; RSSI=${if (n.rssi == Int.MAX_VALUE) "unknown" else n.rssi.toString() + " dBm"}; favourite=${n.isFavorite}; via MQTT=${n.viaMqtt}")
             appendLine("Position: ${n.position}")
-            appendLine("Device metrics: ${n.deviceMetrics}")
-            appendLine("Environment: ${n.environmentMetrics}")
+            appendLine("Device metrics: ${n.deviceMetrics.toString().pretty()}")
+            appendLine("Environment: ${n.environmentMetrics.toString().pretty()}")
             if (n.notes.isNotBlank()) appendLine("Notes: ${n.notes}")
         }
         return head + safe("node trends") { trends(n.num, n.user.long_name, sinceMs) }
@@ -206,7 +206,7 @@ class AssistantDataProvider(
                     "- $name: " +
                         kinds.entries.joinToString("; ") { (kind, v) ->
                             val ago = ((nowS - v.first / MILLIS_PER_SECOND) / SECONDS_PER_MINUTE).coerceAtLeast(0)
-                            "$kind (${ago} min ago) ${v.second.substringAfter('{').removeSuffix("}")}"
+                            "$kind (${ago} min ago) ${v.second.substringAfter('{').removeSuffix("}").pretty()}"
                         }
                 }
         return "SENSOR DATA from ${lines.size} nodes (weather, air quality, power; latest values):\n" +
@@ -521,6 +521,41 @@ class AssistantDataProvider(
             ?: all.firstOrNull { it.user.id.lowercase() == q }
     }
 
+    /**
+     * Turns raw field dumps such as `temperature=21.43876, relative_humidity=55.1234` into readable values with units and
+     * at most one or two decimals (`temperature=21.4 °C`), so the model does not have to guess units or copy long numbers.
+     */
+    private fun String.pretty(): String {
+        val withFloats =
+            FLOAT_FIELD.replace(this) { m ->
+                val key = m.groupValues[1]
+                val decimals = if (key in TWO_DECIMALS) 2 else 1
+                val value = roundTo(m.groupValues[2].toDoubleOrNull() ?: return@replace m.value, decimals)
+                "$key=$value${UNITS[key].orEmpty()}"
+            }
+        return INT_FIELD.replace(withFloats) { m ->
+            val key = m.groupValues[1]
+            val number = m.groupValues[2]
+            when {
+                key.endsWith("uptime_seconds") -> number.toLongOrNull()?.let { "$key=$number (${duration(it)})" } ?: m.value
+                key.endsWith("_bytes") -> number.toLongOrNull()?.let { "$key=$number (${it / BYTES_PER_KB} kB)" } ?: m.value
+                else -> UNITS[key]?.let { "$key=$number$it" } ?: m.value
+            }
+        }
+    }
+
+    private fun duration(seconds: Long): String {
+        val days = seconds / SECONDS_PER_DAY
+        val hours = seconds % SECONDS_PER_DAY / SECONDS_PER_HOUR
+        val minutes = seconds % SECONDS_PER_HOUR / SECONDS_PER_MINUTE
+        return if (days > 0) "${days} d ${hours} h" else if (hours > 0) "${hours} h ${minutes} min" else "${minutes} min"
+    }
+
+    private fun roundTo(value: Double, decimals: Int): String {
+        val factor = if (decimals == 2) 100.0 else 10.0
+        return (kotlin.math.round(value * factor) / factor).toString()
+    }
+
     private fun String.hasAny(words: List<String>) = words.any { contains(it) }
 
     private fun String.redacted(): String = replace(SECRET, "$1=<hidden>")
@@ -531,6 +566,24 @@ class AssistantDataProvider(
         const val TAG = "AssistantData"
         const val MAX_CONTEXT_CHARS = 3000
         const val MIN_PART = 250
+        const val BYTES_PER_KB = 1024
+        const val SECONDS_PER_DAY = 86_400L
+        val FLOAT_FIELD = Regex("([a-z_0-9]+)=(-?\\d+\\.\\d+(?:E-?\\d+)?)")
+        val INT_FIELD = Regex("([a-z_0-9]+)=(-?\\d+)(?![\\d.])")
+        val TWO_DECIMALS = setOf("voltage", "current", "ch1_voltage", "ch2_voltage", "ch3_voltage", "ch1_current", "ch2_current", "ch3_current")
+        val UNITS =
+            mapOf(
+                "temperature" to " °C", "soil_temperature" to " °C", "relative_humidity" to " %", "soil_moisture" to " %",
+                "barometric_pressure" to " hPa", "voltage" to " V", "ch1_voltage" to " V", "ch2_voltage" to " V",
+                "ch3_voltage" to " V", "current" to " mA", "ch1_current" to " mA", "ch2_current" to " mA",
+                "ch3_current" to " mA", "lux" to " lx", "white_lux" to " lx", "ir_lux" to " lx", "uv_lux" to " lx",
+                "wind_speed" to " m/s", "wind_gust" to " m/s", "wind_lull" to " m/s", "wind_direction" to " °",
+                "gas_resistance" to " MOhm", "distance" to " mm", "weight" to " kg", "rainfall_1h" to " mm",
+                "rainfall_24h" to " mm", "battery_level" to " %", "channel_utilization" to " %", "air_util_tx" to " %",
+                "noise_floor" to " dBm", "pm10_standard" to " ug/m3", "pm25_standard" to " ug/m3",
+                "pm100_standard" to " ug/m3", "pm10_environmental" to " ug/m3", "pm25_environmental" to " ug/m3",
+                "pm100_environmental" to " ug/m3", "radiation" to " uR/h",
+            )
         const val SUMMARY_MESSAGES = 20
         const val OVERVIEW_SHORT = 380
         const val MIN_NAME = 3

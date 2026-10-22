@@ -94,12 +94,15 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
                 Logger.w(tag = TAG, throwable = e) { "Tool $name failed" }
                 "The data is not available right now."
             }
-        return text.take(MAX_RESULT_CHARS).stripUnsafeChars()
+        val result = text.take(MAX_RESULT_CHARS).stripUnsafeChars()
+        Logger.i(tag = TAG) { "Tool $name result: ${result.take(LOG_CHARS).replace('\n', ' | ')}" }
+        return result
     }
 
     private companion object {
         const val TAG = "AssistantTools"
         const val MAX_RESULT_CHARS = 2200
+        const val LOG_CHARS = 1500
     }
 }
 
