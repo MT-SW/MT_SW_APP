@@ -125,7 +125,7 @@ class AssistantDataProvider(
         val series =
             listOf(
                 Triple("heap_used_percent (used internal RAM of the radio, lower is better)", "%", { s: Sample -> s.heapUsed }),
-                Triple("psram_free_percent (free external PSRAM of the radio)", "%", { s: Sample -> s.psramFree }),
+                Triple("psram_used_percent (used external PSRAM of the radio)", "%", { s: Sample -> s.psramUsed }),
                 Triple("cpu_usage_percent (radio)", "%", { s: Sample -> s.cpu }),
                 Triple("flash_used_percent (radio)", "%", { s: Sample -> s.flashUsed }),
                 Triple("battery_level", "%", { s: Sample -> s.battery }),
@@ -465,7 +465,7 @@ class AssistantDataProvider(
     private class Sample(
         val time: Long,
         val heapUsed: Float?,
-        val psramFree: Float?,
+        val psramUsed: Float?,
         val cpu: Float?,
         val flashUsed: Float?,
         val battery: Float?,
@@ -483,7 +483,7 @@ class AssistantDataProvider(
         return Sample(
             time = received_date,
             heapUsed = if (heapTotal > 0) (heapTotal - heapFree).coerceAtLeast(0).toFloat() / heapTotal * PERCENT else null,
-            psramFree = ext?.takeIf { it.memoryPsramTotal > 0 }?.let { it.memoryPsramFree.toFloat() / it.memoryPsramTotal * PERCENT },
+            psramUsed = ext?.takeIf { it.memoryPsramTotal > 0 }?.let { (it.memoryPsramTotal - it.memoryPsramFree).coerceAtLeast(0).toFloat() / it.memoryPsramTotal * PERCENT },
             cpu = ext?.cpuUsagePercent?.toFloat(),
             flashUsed = ext?.takeIf { it.flashTotalBytes > 0 }?.let { it.flashUsedBytes.toFloat() / it.flashTotalBytes * PERCENT },
             battery = t.device_metrics?.battery_level?.toFloat(),

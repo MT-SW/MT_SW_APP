@@ -1186,7 +1186,7 @@
     <string name="local_stats_nodes">Węzły: %1$d online / %2$d łącznie</string>
     <string name="local_stats_noise">Szum %1$d dBm</string>
     <string name="local_stats_psram">PSRAM</string>
-    <string name="local_stats_psram_description">Procent wolnej pamięci PSRAM</string>
+    <string name="local_stats_psram_description">Procent zajętej pamięci PSRAM</string>
     <string name="local_stats_relays">Przekazano: %1$d (Anulowane: %2$d)</string>
     <string name="local_stats_traffic">Ruch: TX %1$d / RX %2$d (D: %3$d)</string>
     <string name="local_stats_updated_at">%1$s</string>

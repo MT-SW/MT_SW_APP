@@ -266,7 +266,7 @@ private fun resourceChips(stats: NodeExtraStats?): List<ExtraChip> = buildList {
     stats?.flashUsedPercent?.ok()?.let {
         add(ExtraChip({ MeshtasticIcons.Storage }, "Flash", MetricFormatter.percent(it, 0)))
     }
-    stats?.psramFreePercent?.ok()?.let {
+    stats?.psramUsedPercent?.ok()?.let {
         add(ExtraChip({ MeshtasticIcons.Storage }, "PSRAM", MetricFormatter.percent(it, 0)))
     }
     // Shown exactly as the node sent it in its last packet.

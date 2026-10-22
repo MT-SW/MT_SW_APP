@@ -304,13 +304,13 @@ class LocalStatsWidget :
                                     modifier = GlanceModifier.defaultWeight().padding(end = 4.dp),
                                 )
                                 if (state.memoryPsramTotal > 0) {
-                                    val psramProgress = state.memoryPsramFree.toFloat() / state.memoryPsramTotal
+                                    val psramProgress = (state.memoryPsramTotal - state.memoryPsramFree).coerceAtLeast(0).toFloat() / state.memoryPsramTotal
                                     StatRow(
                                         label = stringResource(Res.string.local_stats_psram),
                                         value =
                                         stringResource(
                                             Res.string.local_stats_heap_value,
-                                            state.memoryPsramFree,
+                                            (state.memoryPsramTotal - state.memoryPsramFree).coerceAtLeast(0),
                                             state.memoryPsramTotal,
                                         ),
                                         progress = psramProgress,

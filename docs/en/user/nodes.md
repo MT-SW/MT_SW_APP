@@ -38,7 +38,7 @@ The extra line under every node has three parts, switched on in **Settings → N
 - **Environment metrics** — voltage and current from the sensor (from the environment or power telemetry packet; the voltage next to the battery percentage is not repeated) at the top, and all weather sensors under them (temperature, humidity, pressure, wind, rain, light, UV and others). It takes as many lines as needed.
 - **Extra statistics → Ether** — with short labels (without them when "Icons only" is on). A node with a hop count shows them as icons only, from the right side of the "Hops" line, with no extra line: channel utilization and air time (for nodes other than yours, as yours already shows them higher up) and the noise floor (with LNA correction, if set).
 - **Extra statistics → Packets** — a separate line at the right edge: TX, RX, B (bad), D (duplicates) and Przek. (relayed).
-- **Extra statistics → Hardware** — a separate line at the right edge: CPU, free memory, flash and PSRAM, and the node's Wi-Fi signal strength.
+- **Extra statistics → Hardware** — a separate line at the right edge: CPU, used memory (RAM), flash and PSRAM, and the node's Wi-Fi signal strength.
 
 All three statistics options are on by default. Only the newest data from the node's packets is shown, with no history and no live measurements; if the last packet lacked a value, it is taken from an earlier one. Fields a node does not send are hidden.
 

@@ -474,10 +474,10 @@ internal fun org.meshtastic.core.model.MeshLog.toHistoryEntry(): org.meshtastic.
         localStatsExtended
             ?.takeIf { it.flashTotalBytes > 0 }
             ?.let { it.flashUsedBytes.toFloat() / it.flashTotalBytes * PERCENT_MULTIPLIER },
-        psramFreePercent =
+        psramUsedPercent =
         localStatsExtended
             ?.takeIf { it.memoryPsramTotal > 0 }
-            ?.let { it.memoryPsramFree.toFloat() / it.memoryPsramTotal * PERCENT_MULTIPLIER },
+            ?.let { (it.memoryPsramTotal - it.memoryPsramFree).coerceAtLeast(0).toFloat() / it.memoryPsramTotal * PERCENT_MULTIPLIER },
         // The device's own WiFi link: the strength only while connected, the drop counter whenever WiFi is reported.
         wifiRssi = localStatsExtended?.wifiRssi?.takeIf { it != 0 },
         wifiDrops = localStatsExtended?.takeIf { it.hasWifi }?.wifiDrops,
@@ -611,7 +611,7 @@ internal fun NetworkHealthMetric.historySeriesValue(
             "CPU" -> entry.cpuUsagePercent?.toFloat()
             "Heap" -> entry.heapUsedPercent
             "Flash" -> entry.flashUsedPercent
-            "PSRAM" -> entry.psramFreePercent
+            "PSRAM" -> entry.psramUsedPercent
             else -> null
         }
 
