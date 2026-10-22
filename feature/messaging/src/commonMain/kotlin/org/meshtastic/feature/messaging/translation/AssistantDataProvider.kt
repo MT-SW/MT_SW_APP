@@ -100,7 +100,8 @@ class AssistantDataProvider(
     }
 
     private suspend fun trends(num: Int, title: String, sinceMs: Long): String {
-        val myNum = num
+        // The own node's logs are stored under a special id, so ask the repository which id holds them.
+        val myNum = nodeRepository.effectiveLogNodeId(num).first()
         val since = sinceMs
         val entries =
             meshLogRepository.getLogsFromNodeSince(myNum, since).first().mapNotNull { it.toSample() }.sortedBy { it.time }
@@ -197,14 +198,16 @@ class AssistantDataProvider(
         var airUtil: Float? = null
     }
 
-    /** The latest telemetry every node reported (last 12 hours), ranked by what the question is about. */
+    /** The latest telemetry every node reported (last 3 days), ranked by what the question is about. */
     private suspend fun ranking(q: String): String {
         val logs = meshLogRepository.getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, nowMillis - RANK_WINDOW_MS).first()
         val rows = HashMap<Int, NodeRow>()
         for (log in logs) {
             val payload = log.fromRadio.packet?.decoded?.payload ?: continue
             val t = runCatching { Telemetry.ADAPTER.decode(payload) }.getOrNull() ?: continue
-            val row = rows.getOrPut(log.fromNum) { NodeRow(log.fromNum) }
+            // Logs of the own node carry the id 0.
+            val owner = if (log.fromNum == 0) (nodeRepository.ourNodeInfo.value?.num ?: 0) else log.fromNum
+            val row = rows.getOrPut(owner) { NodeRow(owner) }
             t.local_stats?.let { ls ->
                 if (log.received_date >= row.statsTime) {
                     row.statsTime = log.received_date
@@ -226,7 +229,7 @@ class AssistantDataProvider(
                 }
             }
         }
-        if (rows.isEmpty()) return "NODE RANKING: no telemetry from nodes in the last 12 hours."
+        if (rows.isEmpty()) return "NODE RANKING: no telemetry from nodes in the last 3 days."
         data class Key(val label: String, val descending: Boolean, val pick: (NodeRow) -> Float?)
         val key =
             when {
@@ -350,7 +353,7 @@ class AssistantDataProvider(
         const val TAG = "AssistantData"
         const val MAX_CONTEXT_CHARS = 8000
         const val MIN_NAME = 3
-        const val RANK_WINDOW_MS = 12 * 60 * 60 * 1000L
+        const val RANK_WINDOW_MS = 3 * 24 * 60 * 60 * 1000L
         const val RANK_TOP = 12
         const val SIGNAL_TOP = 12
         const val METERS_PER_KM = 1000f
