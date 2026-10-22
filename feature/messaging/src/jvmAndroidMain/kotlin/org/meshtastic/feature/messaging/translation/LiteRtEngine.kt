@@ -58,7 +58,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
     /**
      * Sends [messages] (role to text pairs, roles `system`, `user`, `assistant`; the last one must be a `user`
      * message) to model [modelId] and returns the reply. [onPiece] receives the text as it is produced. Cancelling the
-     * coroutine stops the generation. [maxTokens] is a rough limit on the length of the answer.
+     * coroutine stops the generation. [maxTokens] is a rough limit on the length of the answer, 0 means no limit (the model stops by itself).
      */
     suspend fun chat(
         modelId: String,
@@ -111,18 +111,26 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
 
         val reply = StringBuilder()
         val restorer = SymbolRestorer(symbols)
-        val limit = maxTokens * CHARS_PER_TOKEN
-        loaded.createConversation(config).use { conversation ->
-            conversation
-                .sendMessageAsync(dialogue.last().second)
-                .takeWhile { reply.length < limit }
-                .collect { message ->
-                    val piece = message.toString()
-                    if (piece.isNotEmpty()) {
-                        reply.append(piece)
-                        restorer.push(piece).takeIf { it.isNotEmpty() }?.let { runCatching { onPiece(it) } }
+        val limit = if (maxTokens > 0) maxTokens * CHARS_PER_TOKEN else Int.MAX_VALUE
+        try {
+            loaded.createConversation(config).use { conversation ->
+                conversation
+                    .sendMessageAsync(dialogue.last().second)
+                    .takeWhile { reply.length < limit }
+                    .collect { message ->
+                        val piece = message.toString()
+                        if (piece.isNotEmpty()) {
+                            reply.append(piece)
+                            restorer.push(piece).takeIf { it.isNotEmpty() }?.let { runCatching { onPiece(it) } }
+                        }
                     }
-                }
+            }
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            // The model's window is full: keep what was written instead of failing the whole answer.
+            if (reply.isEmpty()) throw e
+            Logger.w(tag = TAG, throwable = e) { "Answer ended early: ${e.message}" }
         }
         restorer.finish().takeIf { it.isNotEmpty() }?.let { runCatching { onPiece(it) } }
         Logger.i(tag = TAG) {
