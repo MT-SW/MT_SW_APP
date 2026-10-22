@@ -99,6 +99,8 @@ import org.meshtastic.core.resources.desktop_tray_tooltip
 import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.ui.theme.AppTheme
+import org.meshtastic.core.ui.theme.MODE_MONO_DARK
+import org.meshtastic.core.ui.theme.isMonochromeMode
 import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.util.LocalDiscoveryMapProvider
 import org.meshtastic.core.ui.util.LocalEventBranding
@@ -295,11 +297,11 @@ private fun ApplicationScope.ThemeAndLocaleProvider(uiViewModel: UIViewModel) {
     val isDarkTheme =
         when (themePref) {
             1 -> false
-            2 -> true
+            2, MODE_MONO_DARK -> true
             else -> isSystemInDarkTheme()
         }
 
-    MeshtasticDesktopApp(uiViewModel, isDarkTheme)
+    MeshtasticDesktopApp(uiViewModel, isDarkTheme, isMonochromeMode(themePref))
 }
 
 // ----- Application chrome (tray, window, navigation) -----
@@ -308,7 +310,11 @@ private fun ApplicationScope.ThemeAndLocaleProvider(uiViewModel: UIViewModel) {
 @Suppress("ViewModelForwarding")
 @Composable
 @OptIn(ExperimentalCoilApi::class)
-private fun ApplicationScope.MeshtasticDesktopApp(uiViewModel: UIViewModel, isDarkTheme: Boolean) {
+private fun ApplicationScope.MeshtasticDesktopApp(
+    uiViewModel: UIViewModel,
+    isDarkTheme: Boolean,
+    monochrome: Boolean,
+) {
     var isAppVisible by remember { mutableStateOf(true) }
     var isWindowReady by remember { mutableStateOf(false) }
     val trayState = rememberTrayState()
@@ -367,7 +373,7 @@ private fun ApplicationScope.MeshtasticDesktopApp(uiViewModel: UIViewModel, isDa
     if (isWindowReady) {
         // Hide via `visible` rather than dropping the Window from composition so the UI tree
         // (navigation backstack, scroll positions) survives a hide-to-tray round trip.
-        MeshtasticWindow(uiViewModel, isDarkTheme, appIcon, windowState, visible = isAppVisible) {
+        MeshtasticWindow(uiViewModel, isDarkTheme, monochrome, appIcon, windowState, visible = isAppVisible) {
             // Minimize to the tray on close — but only where the tray icon can actually be clicked
             // back. Where it cannot, there is nowhere to minimize to, so quit instead; otherwise the
             // process is stranded with no window, no reachable tray menu and no key handler either.
@@ -451,6 +457,7 @@ private fun WindowBoundsManager(
 private fun ApplicationScope.MeshtasticWindow(
     uiViewModel: UIViewModel,
     isDarkTheme: Boolean,
+    monochrome: Boolean,
     appIcon: Painter,
     windowState: WindowState,
     visible: Boolean,
@@ -523,7 +530,7 @@ private fun ApplicationScope.MeshtasticWindow(
             ) {
                 val uiScale by uiViewModel.uiScale.collectAsState()
                 CompositionLocalProvider(LocalDensity provides rememberScaledDensity(percent = uiScale)) {
-                    AppTheme(darkTheme = isDarkTheme) {
+                    AppTheme(darkTheme = isDarkTheme, monochrome = monochrome) {
                         // First start: show the welcome screen once, then the app.
                         val introCompleted by uiViewModel.appIntroCompleted.collectAsState()
                         if (introCompleted) {

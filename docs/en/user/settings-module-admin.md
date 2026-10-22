@@ -345,7 +345,7 @@ appears only when your own node is selected. It holds, in order:
 - **Provide phone location to mesh** — share this phone's position when the node has no GPS fix.
   It needs precise location: with approximate location allowed, turning it on asks for precise.
 - **Compact encoding for Cyrillic** — how look-alike characters in names are handled.
-- **Language**, **Theme**, and **Units**. **Units** is metric, imperial, or follow the system, and
+- **Language**, **Theme**, and **Units**. Besides light, dark and dynamic, **Theme** has two **black and white** themes (light: white background and dark text, dark: black background and light text). In them the whole inside of the app is in shades of grey, including signal, charts, node colours and the map. Dialogs and menus may still show a few colours. **Units** is metric, imperial, or follow the system, and
   is the entry [Units & Locale](units-and-locale) sends you to.
 - **Show full message timestamps**.
 - **Device DB cache limit**, which sets how much history is kept.

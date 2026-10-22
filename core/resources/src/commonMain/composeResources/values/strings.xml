@@ -2350,6 +2350,8 @@
     <string name="ui_scale_summary">Size of text and elements in this app only, independent of the system&#39;s font and display size.</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_light">Light</string>
+    <string name="theme_mono_dark">Black and white (dark)</string>
+    <string name="theme_mono_light">Black and white (light)</string>
     <string name="theme_system">System default</string>
     <string name="time">Time</string>
     <string name="timeout">Timeout</string>

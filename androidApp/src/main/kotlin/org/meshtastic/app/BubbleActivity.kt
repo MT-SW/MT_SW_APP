@@ -39,6 +39,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.MODE_DYNAMIC
+import org.meshtastic.core.ui.theme.MODE_MONO_DARK
+import org.meshtastic.core.ui.theme.isMonochromeMode
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.feature.messaging.MessageScreen
 import org.meshtastic.feature.messaging.MessageViewModel
@@ -78,7 +80,7 @@ class BubbleActivity : AppCompatActivity() {
             val theme by model.theme.collectAsStateWithLifecycle()
             val dark =
                 when (theme) {
-                    AppCompatDelegate.MODE_NIGHT_YES -> true
+                    AppCompatDelegate.MODE_NIGHT_YES, MODE_MONO_DARK -> true
                     AppCompatDelegate.MODE_NIGHT_NO -> false
                     else -> isSystemInDarkTheme()
                 }
@@ -88,7 +90,7 @@ class BubbleActivity : AppCompatActivity() {
                     navigationBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { dark },
                 )
             }
-            AppTheme(dynamicColor = theme == MODE_DYNAMIC, darkTheme = dark) {
+            AppTheme(dynamicColor = theme == MODE_DYNAMIC, darkTheme = dark, monochrome = isMonochromeMode(theme)) {
                 // Edge to edge, only this padding keeps the composer clear of the keyboard and the navigation bar.
                 Box(Modifier.fillMaxSize().recalculateWindowInsets().safeDrawingPadding()) {
                     MessageScreen(

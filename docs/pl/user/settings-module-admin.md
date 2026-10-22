@@ -319,7 +319,7 @@ Sekcja **Aplikacja** na ekranie **Ustawienia** konfiguruje aplikację, a nie wę
 - **Zezwalaj na analizę i raportowanie awarii.** — zgoda lub rezygnacja z diagnostyki. Tylko w wersji z Google Play.
 - **Podaj lokalizację telefonu do sieci** — udostępnia pozycję tego telefonu, gdy węzeł nie ma ustalonej pozycji GPS. Wymaga dokładnej lokalizacji: jeśli dozwolona jest tylko przybliżona, jej włączenie poprosi o dokładną.
 - **Kompaktowe kodowanie cyrylicy** — jak traktowane są podobnie wyglądające znaki w nazwach.
-- **Język**, **Motyw** i **Jednostki**. **Jednostki** to metryczne, imperialne lub zgodne z systemem; to pozycja, do której odsyła [Jednostki i lokalizacja](units-and-locale).
+- **Język**, **Motyw** i **Jednostki**. **Motyw** poza jasnym, ciemnym i dynamicznym ma dwa motywy **czarno-białe** (jasny: białe tło i ciemne napisy, ciemny: czarne tło i jasne napisy). W nich całe wnętrze aplikacji jest w odcieniach szarości, także sygnał, wykresy, kolory węzłów i mapa. Okienka i menu mogą pokazać pojedyncze kolory. **Jednostki** to metryczne, imperialne lub zgodne z systemem; to pozycja, do której odsyła [Jednostki i lokalizacja](units-and-locale).
 - **Wyświetlaj pełne znaczniki czasu**.
 - **Limit pamięci podręcznej bazy urządzenia**, który określa, ile historii jest przechowywane.
 - **Eksportuj pakiety zasięgu**, **Eksportuj wszystkie pakiety** i **Eksportuj bazę danych węzłów**.

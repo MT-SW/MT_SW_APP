@@ -64,6 +64,7 @@ import org.maplibre.compose.util.PreparedImage
 import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.common.util.ioDispatcher
 import org.meshtastic.core.common.util.safeCatching
+import org.meshtastic.core.ui.theme.LocalMonochrome
 import org.meshtastic.feature.map.kml.ICON_URL_PROPERTY
 import org.meshtastic.feature.map.layers.mapLayerFileSystem
 import org.meshtastic.feature.map.layers.opacityOf
@@ -242,7 +243,12 @@ private fun GroundOverlayLayer(layerId: String, index: Int, overlay: LayerGround
         }
 
     val source = rememberImageSource(quad, decoded)
-    RasterLayer(id = "custom-$layerId-ground-$index", source = source, opacity = const(opacity))
+    RasterLayer(
+        id = "custom-$layerId-ground-$index",
+        source = source,
+        opacity = const(opacity),
+        saturation = const(if (LocalMonochrome.current) -1f else 0f),
+    )
 }
 
 /** What an import with no colours of its own is drawn in. */

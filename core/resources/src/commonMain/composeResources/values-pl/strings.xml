@@ -2449,6 +2449,8 @@
     <string name="ui_scale_summary">Rozmiar tekstu i elementów tylko w tej aplikacji, niezależnie od ustawień czcionki i rozmiaru ekranu w systemie.</string>
     <string name="theme_dark">Ciemny</string>
     <string name="theme_light">Jasny</string>
+    <string name="theme_mono_dark">Czarno-biały (ciemny)</string>
+    <string name="theme_mono_light">Czarno-biały (jasny)</string>
     <string name="theme_system">Domyślne ustawienie systemowe</string>
     <string name="time">Czas</string>
     <string name="timeout">Limit czasu</string>
