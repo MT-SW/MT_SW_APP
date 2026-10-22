@@ -124,28 +124,6 @@ class LlamaAssistantService(
         context: String,
         onPiece: (String) -> Unit,
     ): String {
-        val last = turns.lastOrNull { it.fromUser }?.text.orEmpty().lowercase()
-        if (SENSOR_ASK.any { last.contains(it) } && RANK_ASK.none { last.contains(it) }) {
-            val report = runCatching { data.sensorReport() }.getOrNull()
-            if (!report.isNullOrBlank()) {
-                onPiece(report)
-                return report
-            }
-        }
-        if (COUNT_ASK.any { last.contains(it) } && last.contains("kana")) {
-            val report = runCatching { data.channelReport() }.getOrNull()
-            if (!report.isNullOrBlank()) {
-                onPiece(report)
-                return report
-            }
-        }
-        if (SIGNAL_ASK.any { last.contains(it) } && SIGNAL_NOT.none { last.contains(it) }) {
-            val report = runCatching { data.signalReport(last) }.getOrNull()
-            if (!report.isNullOrBlank()) {
-                onPiece(report)
-                return report
-            }
-        }
         val system = buildString {
             append(SYSTEM_PROMPT).append("\n\n").append(TOOLS_RULE)
             if (summary.isNotBlank()) append("\n\nSummary of the earlier part of this conversation: ").append(summary)
@@ -174,11 +152,6 @@ class LlamaAssistantService(
     }
 
     private companion object {
-        val SENSOR_ASK = listOf("pogod", "temperatur", "wilgot", "ciśnien", "cisnien", "czujnik", "weather")
-        val RANK_ASK = listOf("sygnał", "sygnal", "snr", "rssi", "zasięg", "zasieg", "ramek", "bateri", "wiadomo")
-        val COUNT_ASK = listOf("najwięcej", "najwiecej", "ile wiadomo", "liczba wiadomo", "ilość wiadomo", "ilosc wiadomo")
-        val SIGNAL_ASK = listOf("zasięg", "zasieg", "snr", "rssi", "najbliższ", "najblizsz", "najdalsz", "bezpośredn", "bezposredn", "jakość sygnał", "jakosc sygnal")
-        val SIGNAL_NOT = listOf("ramek", "pogod", "temperatur", "wiadomo", "bateri", "ustawien", "streść", "stresc")
         const val MAX_ANSWER_TOKENS = 0 // no limit: the model finishes by itself
         const val TEMPERATURE = 0.5f
         const val RECENT_CHARS = 1500
@@ -204,7 +177,7 @@ class LlamaAssistantService(
                 "user for keywords when asked to summarise a channel: read the latest messages and summarise them), radio settings and messages. For ANY question about the user's network, nodes, " +
                 "statistics, history, settings, sensors or messages, call the matching tool first and answer from " +
                 "its result; never say you have no data before you have tried the tools. You cannot change " +
-                "settings or send messages; if the user wants that, explain what to do or draft the text for them."
+                "settings or send messages; tool results are already formatted with units: show them to the user as a clear list (one line per node), copying the numbers exactly, and add your own short comment only if asked; if the user wants that, explain what to do or draft the text for them."
         const val SYSTEM_PROMPT =
             "You are the offline assistant built into MT_SW, an Android and desktop app for Meshtastic, " +
                 "an open-source LoRa mesh radio network that works without internet. " +

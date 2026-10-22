@@ -517,9 +517,9 @@ class AssistantDataProvider(
     suspend fun toolList(sortBy: String, limit: Int): String {
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
         return when (sortBy.trim().lowercase()) {
-            "snr", "rssi", "signal", "range", "hops" -> signalRanking("snr", top)
-            "distance", "far", "farthest" -> signalRanking("odległ", top)
-            "closest", "nearest", "near" -> signalRanking("najbliż", top)
+            "snr", "rssi", "signal", "range", "hops" -> signalReport("snr")
+            "distance", "far", "farthest" -> signalReport("odległ")
+            "closest", "nearest", "near" -> signalReport("najbliż")
             "tx" -> ranking("wysł", top)
             "dupe", "duplicates" -> ranking("dupe", top)
             "bad" -> ranking("bad ", top)
@@ -531,7 +531,7 @@ class AssistantDataProvider(
         }
     }
 
-    suspend fun toolSensors(): String = sensors()
+    suspend fun toolSensors(): String = sensorReport()
 
     suspend fun toolSettings(): String = settings()
 
