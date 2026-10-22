@@ -152,6 +152,17 @@ Aby się rozłączyć, dotknij przycisku rozłączania w zakładce **Połącz**:
 
 ![Rozłączanie od radia](../../assets/screenshots/connections_disconnect.png)
 
+## Kafelek w szybkich ustawieniach
+
+Na Androidzie możesz dodać kafelek **MT_SW_APP** do szybkich ustawień: rozwiń panel powiadomień, dotknij przycisku edycji (ołówek) i przeciągnij kafelek na miejsce.
+
+- **Połączono** — kafelek jest włączony i pokazuje krótką nazwę Twojego węzła. Dotknięcie rozłącza, tak samo jak przycisk rozłączania w zakładce **Połącz**.
+- **Łączenie** — kafelek jest włączony i pokazuje „Łączenie”. Dotknięcie anuluje.
+- **Rozłączono** lub **Urządzenie śpi** — kafelek jest wyłączony. Dotknięcie łączy ponownie z ostatnio wybranym radiem.
+- **Nie wybrano urządzenia** — dotknięcie kafelka otwiera zakładkę **Połącz**, gdzie wybierasz radio.
+
+Rozłączenie zapomina wybrane radio, więc po rozłączeniu kafelek otwiera zakładkę **Połącz**. Jeśli Android nie pozwala aplikacji połączyć się w tle, kafelek otwiera aplikację i połączenie zaczyna się stamtąd. Na zablokowanym telefonie kafelek najpierw prosi o odblokowanie.
+
 ## Połączenia na komputerze
 
 Na komputerze (Linux/macOS/Windows) aplikacja obsługuje:

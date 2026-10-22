@@ -282,6 +282,19 @@ Ta sama sekcja tworzy też kopię danych samej aplikacji dla węzła: jego wiado
 
 Obie akcje najpierw (po zapytaniu) rozłączają węzeł i działają na danych węzła, który był połączony. Gdy żaden węzeł nie jest połączony, działają na ostatnio połączonym węźle. Pozostają wyłączone, z napisem *Connect to a radio first. There is no app data to back up or restore yet.*, dopóki aplikacja nie zapisze danych jakiegoś węzła.
 
+The same section backs up the app's own data for a node: its messages and nodes as stored in the
+app, not the node's settings.
+
+- **Back up app data** saves that data to a file named after the node and the date.
+- **Restore app data** replaces the app's messages and nodes for that node with a backup, after a
+  confirmation. It accepts only an undamaged backup made by an app with the same database version.
+  The restore takes effect after you restart the app and reconnect to that node.
+
+Both disconnect the node first, after asking, and act on the data of the node that was connected.
+With no node connected they act on the most recently connected node. They stay disabled, with
+the line _Connect to a radio first. There is no app data to back up or restore yet._, until the
+app has stored data for some node.
+
 ### Zaawansowane
 
 **Ustawienia → Zaawansowane** zbiera narzędzia, które odczytują lub przepisują stan lokalny, i również jest widoczne tylko dla Twojego własnego węzła: **Aktualizacja oprogramowania** (Firmware Update) na sprzęcie obsługującym OTA, **Wyczyść bazę węzłów**, **Serwer TAK**, **Odkrywanie lokalnej sieci mesh** oraz **Panel debugowania**.

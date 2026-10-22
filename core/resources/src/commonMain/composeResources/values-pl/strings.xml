@@ -1040,6 +1040,16 @@
     <string name="i2s_word_select">I2S wybór słowa</string>
     <string name="iaq">IAQ</string>
     <string name="iaq_definition">Jakość powietrza w pomieszczeniach (Indoor Air Quality) - wartość względna w skali IAQ mierzona czujnikiem BME680. Zakres wartości: 0–500.</string>
+    <string name="iaq_level_dangerously_polluted">Niebezpiecznie zanieczyszczone</string>
+    <string name="iaq_level_excellent">Doskonałe</string>
+    <string name="iaq_level_extremely_polluted">Ekstremalnie zanieczyszczone</string>
+    <string name="iaq_level_good">Dobre</string>
+    <string name="iaq_level_heavily_polluted">Mocno zanieczyszczone</string>
+    <string name="iaq_level_lightly_polluted">Lekko zanieczyszczone</string>
+    <string name="iaq_level_moderately_polluted">Umiarkowanie zanieczyszczone</string>
+    <string name="iaq_level_range">%1$s (%2$d-%3$d)</string>
+    <string name="iaq_level_range_open">%1$s (%2$d+)</string>
+    <string name="iaq_level_severely_polluted">Poważnie zanieczyszczone</string>
     <string name="iaq_value">IAQ %1$d</string>
     <string name="icon_meanings">Znaczenia ikon</string>
     <string name="ignore">Zignoruj</string>
@@ -2818,6 +2828,15 @@
     <string name="mesh_hud_thermal_hot">Telefon jest gorący. Odświeżanie rzadsze.</string>
     <string name="mesh_hud_tilt_down">Pochyl w dół %1$d°</string>
     <string name="mesh_hud_tilt_up">Pochyl w górę %1$d°</string>
+    <string name="mesh_hud_track_empty">Brak pozycji w oknie śladu</string>
+    <string name="mesh_hud_track_newest">%1$s · najnowsza %2$s</string>
+    <plurals name="mesh_hud_track_points">
+        <item quantity="one">%1$d punkt</item>
+        <item quantity="few">%1$d punkty</item>
+        <item quantity="many">%1$d punktów</item>
+        <item quantity="other">%1$d punktu</item>
+    </plurals>
+    <string name="mesh_hud_track_summary">%1$s w ciągu %2$s · najnowsza %3$s</string>
     <string name="mesh_hud_turn_left">Obróć w lewo %1$d°</string>
     <string name="mesh_hud_turn_right">Obróć w prawo %1$d°</string>
     <string name="mesh_hud_waiting_sensor">Czekam na czujnik orientacji</string>
