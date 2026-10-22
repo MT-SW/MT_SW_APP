@@ -82,7 +82,7 @@ class LlamaAssistantService(
 
     private companion object {
         const val MAX_ANSWER_TOKENS = 700
-        const val TEMPERATURE = 0.6f
+        const val TEMPERATURE = 0.3f
         const val MAX_HISTORY_CHARS = 3000
         const val DATA_INTRO =
             "Below is live read-only data from the user's app and radio. Use it to answer questions about their " +
@@ -90,7 +90,8 @@ class LlamaAssistantService(
                 "heap is the free internal RAM of the radio node (not the phone). You can only read; you cannot change " +
                 "settings or send messages, so if the user wants that, explain what to do or draft the text for them. " +
                 "For questions like \"which node has the most ...\" read the NODE RANKING table and name the node(s) " +
-                "with the real numbers. Write plain text only: no markdown, no asterisks, no backticks."
+                "with the real numbers. Copy every number and unit exactly as it appears in the data (keep the decimal point, " +
+                "keep the minus sign, never combine or change digits); if a value is unknown say so. Write plain text only: no markdown, no asterisks, no backticks."
         const val SYSTEM_PROMPT =
             "You are the offline assistant built into MT_SW, an Android and desktop app for Meshtastic, " +
                 "an open-source LoRa mesh radio network that works without internet. " +

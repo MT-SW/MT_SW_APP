@@ -138,7 +138,7 @@ class AssistantDataProvider(
         val heard = if (n.lastHeard == 0) "never" else "${((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)} min ago"
         val head = buildString {
             appendLine("NODE ${n.user.long_name} (${n.user.short_name}), id ${n.user.id}, hardware ${n.user.hw_model}, role ${n.user.role}")
-            appendLine("Heard $heard, hops ${n.hopsAway}, snr ${if (n.snr == Float.MAX_VALUE) "?" else fmt(n.snr)}, rssi ${if (n.rssi == Int.MAX_VALUE) "?" else n.rssi}, favourite ${n.isFavorite}, via MQTT ${n.viaMqtt}")
+            appendLine("Heard $heard; hops=${n.hopsAway}; SNR=${if (n.snr == Float.MAX_VALUE) "unknown" else fmt(n.snr) + " dB"}; RSSI=${if (n.rssi == Int.MAX_VALUE) "unknown" else n.rssi.toString() + " dBm"}; favourite=${n.isFavorite}; via MQTT=${n.viaMqtt}")
             appendLine("Position: ${n.position}")
             appendLine("Device metrics: ${n.deviceMetrics}")
             appendLine("Environment: ${n.environmentMetrics}")
@@ -168,9 +168,10 @@ class AssistantDataProvider(
         fun line(r: Row): String {
             val n = r.n
             val ago = if (n.lastHeard == 0) "never" else "${((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)} min ago"
-            return "- ${n.user.short_name} (${n.user.long_name}): hops ${n.hopsAway}, " +
-                "snr ${if (n.snr == Float.MAX_VALUE) "?" else fmt(n.snr)} dB, rssi ${if (n.rssi == Int.MAX_VALUE) "?" else n.rssi} dBm, " +
-                "distance ${r.meters?.let { m -> fmt(m / METERS_PER_KM) } ?: "?"} km, heard $ago"
+            return "- ${n.user.short_name} (${n.user.long_name}): hops=${n.hopsAway}; " +
+                "SNR=${if (n.snr == Float.MAX_VALUE) "unknown" else fmt(n.snr) + " dB"}; " +
+                "RSSI=${if (n.rssi == Int.MAX_VALUE) "unknown" else n.rssi.toString() + " dBm"}; " +
+                "distance=${r.meters?.let { m -> fmt(m / METERS_PER_KM) + " km" } ?: "unknown"}; heard $ago"
         }
         return buildString {
             appendLine(
