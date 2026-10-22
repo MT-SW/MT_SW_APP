@@ -43,13 +43,33 @@ class AssistantDataProvider(
     /** A text with the data that is useful for answering [question], or an empty text when nothing matches. */
     suspend fun contextFor(question: String): String {
         val q = question.lowercase()
+        val mentioned = mentionedNodes(q)
         val parts = ArrayList<String>()
         parts += safe("overview") { overview() }
-        if (q.hasAny(TREND_WORDS)) parts += safe("trend") { trends() }
+        for (node in mentioned) parts += safe("node") { nodeDetail(node) }
+        if (mentioned.isEmpty() && q.hasAny(TREND_WORDS)) {
+            val myNum = nodeRepository.ourNodeInfo.value?.num
+            if (myNum != null) parts += safe("trend") { trends(myNum, "own node", 0L) }
+        }
         if (q.hasAny(SETTINGS_WORDS)) parts += safe("settings") { settings() }
-        if (q.hasAny(NODE_WORDS)) parts += safe("nodes") { nodes() }
+        if (q.hasAny(NODE_WORDS) || q.hasAny(TREND_WORDS)) parts += safe("network") { networkSummary() }
+        parts += safe("index") { nodeIndex() }
         if (q.hasAny(MESSAGE_WORDS)) parts += safe("messages") { messages() }
         return parts.filter { it.isNotBlank() }.joinToString("\n\n").take(MAX_CONTEXT_CHARS)
+    }
+
+    /** Nodes whose long or short name appears in the question (the own node counts for words like "mój"). */
+    private fun mentionedNodes(q: String): List<org.meshtastic.core.model.Node> {
+        val all = nodeRepository.nodeDBbyNum.value.values
+        val byName =
+            all.filter { n ->
+                val long = n.user.long_name.lowercase()
+                val short = n.user.short_name.lowercase()
+                (long.length >= MIN_NAME && q.contains(long)) || (short.length >= MIN_NAME && Regex("\\b${Regex.escape(short)}\\b").containsMatchIn(q))
+            }
+        val own = nodeRepository.ourNodeInfo.value
+        val mine = if (own != null && q.hasAny(OWN_WORDS)) listOf(own) else emptyList()
+        return (byName + mine).distinctBy { it.num }.take(MAX_NODES_DETAIL)
     }
 
     private suspend fun safe(what: String, block: suspend () -> String): String = try {
@@ -74,12 +94,12 @@ class AssistantDataProvider(
         }
     }
 
-    private suspend fun trends(): String {
-        val myNum = nodeRepository.ourNodeInfo.value?.num ?: return ""
-        val since = nowMillis - WINDOW_MS
+    private suspend fun trends(num: Int, title: String, sinceMs: Long): String {
+        val myNum = num
+        val since = sinceMs
         val entries =
             meshLogRepository.getLogsFromNodeSince(myNum, since).first().mapNotNull { it.toSample() }.sortedBy { it.time }
-        if (entries.isEmpty()) return "TRENDS: no history recorded for the last 24 hours."
+        if (entries.isEmpty()) return "TRENDS of $title: no history recorded."
         val series =
             listOf(
                 Triple("heap_free_percent (free internal RAM of the radio, higher is better)", "%", { s: Sample -> s.heapFree }),
@@ -92,7 +112,7 @@ class AssistantDataProvider(
                 Triple("noise_floor", " dBm", { s: Sample -> s.noise }),
             )
         return buildString {
-            appendLine("TRENDS of the own node, last 24 hours (${entries.size} samples):")
+            appendLine("TRENDS of $title, whole recorded history (${entries.size} samples, from ${spanText(entries.first().time)} ago until ${spanText(entries.last().time)} ago):")
             for ((name, unit, pick) in series) {
                 val values = entries.mapNotNull { e -> pick(e)?.let { e.time to it } }
                 if (values.size < 2) continue
@@ -101,11 +121,50 @@ class AssistantDataProvider(
                 val change = last - first
                 val direction = if (kotlin.math.abs(change) < STABLE_DELTA) "stable" else if (change > 0) "rising" else "falling"
                 appendLine(
-                    "- $name: now ${fmt(last)}$unit, 24h ago ${fmt(first)}$unit, min ${fmt(values.minOf { it.second })}, " +
+                    "- $name: now ${fmt(last)}$unit, at start ${fmt(first)}$unit, min ${fmt(values.minOf { it.second })}, " +
                         "max ${fmt(values.maxOf { it.second })}, change ${fmt(change)} ($direction), samples ${values.size}",
                 )
             }
         }
+    }
+
+    private suspend fun nodeDetail(n: org.meshtastic.core.model.Node): String {
+        val now = nowMillis / MILLIS_PER_SECOND
+        val heard = if (n.lastHeard == 0) "never" else "${((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)} min ago"
+        val head = buildString {
+            appendLine("NODE ${n.user.long_name} (${n.user.short_name}), id ${n.user.id}, hardware ${n.user.hw_model}, role ${n.user.role}")
+            appendLine("Heard $heard, hops ${n.hopsAway}, snr ${if (n.snr == Float.MAX_VALUE) "?" else fmt(n.snr)}, rssi ${if (n.rssi == Int.MAX_VALUE) "?" else n.rssi}, favourite ${n.isFavorite}, via MQTT ${n.viaMqtt}")
+            appendLine("Position: ${n.position}")
+            appendLine("Device metrics: ${n.deviceMetrics}")
+            appendLine("Environment: ${n.environmentMetrics}")
+            if (n.notes.isNotBlank()) appendLine("Notes: ${n.notes}")
+        }
+        return head + safe("node trends") { trends(n.num, n.user.long_name, 0L) }
+    }
+
+    private fun networkSummary(): String {
+        val nodes = nodeRepository.nodeDBbyNum.value.values
+        if (nodes.isEmpty()) return ""
+        val now = nowMillis / MILLIS_PER_SECOND
+        val recent = nodes.count { it.lastHeard != 0 && now - it.lastHeard < ONE_DAY_S }
+        val byHops = nodes.groupingBy { it.hopsAway }.eachCount().toSortedMap().entries.joinToString { "${it.key}:${it.value}" }
+        val low = nodes.filter { (it.deviceMetrics.battery_level ?: 100) in 1..LOW_BATTERY }.joinToString { it.user.short_name }
+        val hardware = nodes.groupingBy { it.user.hw_model.toString() }.eachCount().entries.sortedByDescending { it.value }.take(HW_LIMIT).joinToString { "${it.key}:${it.value}" }
+        return "NETWORK SUMMARY: ${nodes.size} nodes known, $recent heard in the last 24 h. Nodes by hops away (hops:count): $byHops. " +
+            "Low battery (<= $LOW_BATTERY%): ${low.ifBlank { "none" }}. Hardware: $hardware."
+    }
+
+    /** Every known node in a few characters, so the assistant knows the whole network and can ask for details. */
+    private fun nodeIndex(): String {
+        val nodes = nodeRepository.nodeDBbyNum.value.values.sortedByDescending { it.lastHeard }
+        return "ALL KNOWN NODES (${nodes.size}, short=long name): " +
+            nodes.joinToString("; ") { "${it.user.short_name}=${it.user.long_name}" }.take(INDEX_CHARS) +
+            ". Ask the user to name a node to see its details and full history."
+    }
+
+    private fun spanText(timeMs: Long): String {
+        val minutes = ((nowMillis - timeMs) / MILLIS_PER_SECOND / SECONDS_PER_MINUTE).coerceAtLeast(0)
+        return if (minutes >= MINUTES_PER_DAY) "${minutes / MINUTES_PER_DAY} d" else if (minutes >= MINUTES_PER_HOUR) "${minutes / MINUTES_PER_HOUR} h" else "$minutes min"
     }
 
     private suspend fun settings(): String {
@@ -118,21 +177,6 @@ class AssistantDataProvider(
             appendLine("Modules: " + module.take(SETTINGS_CHARS))
             appendLine("Channels: " + channels.settings.joinToString { it.name.ifBlank { "(default)" } })
             appendLine("LoRa: " + channels.lora_config.toString())
-        }
-    }
-
-    private fun nodes(): String {
-        val now = nowMillis / MILLIS_PER_SECOND
-        val list = nodeRepository.nodeDBbyNum.value.values.sortedByDescending { it.lastHeard }.take(NODE_LIMIT)
-        return buildString {
-            appendLine("NODES (most recently heard first):")
-            for (n in list) {
-                val ago = if (n.lastHeard == 0) "never" else "${((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)} min ago"
-                appendLine(
-                    "- ${n.user.long_name} (${n.user.short_name}), heard $ago, hops ${n.hopsAway}, " +
-                        "snr ${if (n.snr == Float.MAX_VALUE) "?" else fmt(n.snr)}, battery ${n.deviceMetrics.battery_level}",
-                )
-            }
         }
     }
 
@@ -185,10 +229,16 @@ class AssistantDataProvider(
 
     private companion object {
         const val TAG = "AssistantData"
-        const val WINDOW_MS = 24 * 60 * 60 * 1000L
-        const val MAX_CONTEXT_CHARS = 5000
+        const val MAX_CONTEXT_CHARS = 7000
+        const val MIN_NAME = 3
+        const val MAX_NODES_DETAIL = 2
+        const val ONE_DAY_S = 86_400L
+        const val LOW_BATTERY = 20
+        const val HW_LIMIT = 6
+        const val INDEX_CHARS = 2200
+        const val MINUTES_PER_HOUR = 60L
+        const val MINUTES_PER_DAY = 1440L
         const val SETTINGS_CHARS = 1800
-        const val NODE_LIMIT = 15
         const val CHAT_LIMIT = 8
         const val MESSAGE_CHARS = 120
         const val PERCENT = 100f
@@ -204,6 +254,7 @@ class AssistantDataProvider(
             listOf("ustawien", "konfig", "setting", "config", "region", "preset", "kanał", "kanal", "channel", "lora",
                 "rola", "role", "moc", "power", "wifi", "bluetooth", "mqtt", "hop")
         val NODE_WORDS = listOf("węz", "wez", "node", "sąsiad", "sasiad", "zasięg", "zasieg", "sieć", "siec", "mesh", "snr", "rssi", "kto")
+        val OWN_WORDS = listOf("mój", "moj", "mojego", "mojej", "mojemu", "my node", "own node", "mój węz", "moim")
         val MESSAGE_WORDS = listOf("wiadomo", "message", "czat", "chat", "napisa", "pisa", "rozmow", "odpowied")
     }
 }

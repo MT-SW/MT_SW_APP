@@ -83,7 +83,7 @@ class LlamaAssistantService(
     private companion object {
         const val MAX_ANSWER_TOKENS = 700
         const val TEMPERATURE = 0.6f
-        const val MAX_HISTORY_CHARS = 3500
+        const val MAX_HISTORY_CHARS = 3000
         const val DATA_INTRO =
             "Below is live read-only data from the user's app and radio. Use it to answer questions about their " +
                 "own network and device; quote the real values and say whether a value is rising, falling or stable. " +
