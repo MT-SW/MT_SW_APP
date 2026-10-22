@@ -158,30 +158,53 @@ class AssistantDataProvider(
         return head + safe("node trends") { trends(n.num, n.user.long_name, sinceMs) }
     }
 
-    /** Which nodes report weather, air quality, power or other sensor data, and the values they last sent. */
-    private fun sensors(): String {
-        val now = nowMillis / MILLIS_PER_SECOND
-        val lines = ArrayList<String>()
-        for (n in nodeRepository.nodeDBbyNum.value.values.sortedByDescending { it.lastHeard }) {
-            val sections =
-                listOf(
-                    "environment" to n.environmentMetrics.toString(),
-                    "air quality" to n.airQualityMetrics.toString(),
-                    "power" to n.powerMetrics.toString(),
-                    "soil/water" to n.soilWaterMetrics.toString(),
-                    "pax counter" to n.paxcounter.toString(),
-                ).filter { (_, text) -> !text.endsWith("{}") }
-            if (sections.isEmpty()) continue
-            val ago = if (n.lastHeard == 0) "never" else "${((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)} min ago"
-            lines += "- ${n.user.short_name} (${n.user.long_name}), heard $ago: " +
-                sections.joinToString("; ") { (name, text) -> "$name ${text.substringAfter('{').removeSuffix("}")}" }
+    /**
+     * Which nodes report weather, air quality, power or other sensor data, and the values they last sent. Values come
+     * from the node list and from the telemetry logs of the last 3 days (the newest reading of each kind wins).
+     */
+    private suspend fun sensors(): String {
+        val nowS = nowMillis / MILLIS_PER_SECOND
+        // node number -> kind -> (time in ms, values text)
+        val found = HashMap<Int, MutableMap<String, Pair<Long, String>>>()
+        fun put(num: Int, kind: String, time: Long, text: String) {
+            if (text.endsWith("{}")) return
+            val map = found.getOrPut(num) { HashMap() }
+            val old = map[kind]
+            if (old == null || time >= old.first) map[kind] = time to text
         }
-        return if (lines.isEmpty()) {
-            "SENSOR DATA: no node has reported weather, air quality or other sensor data."
-        } else {
-            "SENSOR DATA from ${lines.size} nodes (weather, air quality, power, ...; latest values):\n" +
-                lines.take(SENSOR_LIMIT).joinToString("\n")
+        val own = nodeRepository.ourNodeInfo.value?.num ?: 0
+        for (n in nodeRepository.nodeDBbyNum.value.values) {
+            val time = n.lastHeard * MILLIS_PER_SECOND
+            put(n.num, "weather/environment", time, n.environmentMetrics.toString())
+            put(n.num, "air quality", time, n.airQualityMetrics.toString())
+            put(n.num, "power", time, n.powerMetrics.toString())
+            put(n.num, "soil/water", time, n.soilWaterMetrics.toString())
+            put(n.num, "pax counter", time, n.paxcounter.toString())
         }
+        val logs = meshLogRepository.getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, nowMillis - RANK_WINDOW_MS).first()
+        for (log in logs) {
+            val payload = log.fromRadio.packet?.decoded?.payload ?: continue
+            val t = runCatching { Telemetry.ADAPTER.decode(payload) }.getOrNull() ?: continue
+            val num = if (log.fromNum == 0) own else log.fromNum
+            t.environment_metrics?.let { put(num, "weather/environment", log.received_date, it.toString()) }
+            t.air_quality_metrics?.let { put(num, "air quality", log.received_date, it.toString()) }
+            t.power_metrics?.let { put(num, "power", log.received_date, it.toString()) }
+        }
+        if (found.isEmpty()) return "SENSOR DATA: no node has reported weather, air quality, power or other sensor data."
+        val lines =
+            found.entries
+                .sortedByDescending { e -> e.value.values.maxOf { it.first } }
+                .map { (num, kinds) ->
+                    val n = nodeRepository.nodeDBbyNum.value[num]
+                    val name = n?.let { "${it.user.short_name} (${it.user.long_name})" } ?: "!${num.toUInt().toString(HEX)}"
+                    "- $name: " +
+                        kinds.entries.joinToString("; ") { (kind, v) ->
+                            val ago = ((nowS - v.first / MILLIS_PER_SECOND) / SECONDS_PER_MINUTE).coerceAtLeast(0)
+                            "$kind (${ago} min ago) ${v.second.substringAfter('{').removeSuffix("}")}"
+                        }
+                }
+        return "SENSOR DATA from ${lines.size} nodes (weather, air quality, power; latest values):\n" +
+            lines.take(SENSOR_LIMIT).joinToString("\n")
     }
 
     /** Link quality to every node we hear: SNR, RSSI, hops and the distance from our own node. */
