@@ -16,27 +16,42 @@
  */
 package org.meshtastic.feature.messaging.ui.translator
 
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
@@ -47,15 +62,23 @@ import org.meshtastic.core.resources.assistant_error
 import org.meshtastic.core.resources.assistant_greeting
 import org.meshtastic.core.resources.assistant_input_hint
 import org.meshtastic.core.resources.assistant_model_missing
-import org.meshtastic.core.resources.assistant_name
 import org.meshtastic.core.resources.assistant_new
 import org.meshtastic.core.resources.assistant_off
 import org.meshtastic.core.resources.assistant_send
 import org.meshtastic.core.resources.assistant_stop
-import org.meshtastic.core.resources.assistant_you
+import org.meshtastic.core.resources.assistant_suggest_1
+import org.meshtastic.core.resources.assistant_suggest_2
+import org.meshtastic.core.resources.assistant_suggest_3
+import org.meshtastic.core.resources.assistant_suggest_4
 import org.meshtastic.feature.messaging.translation.AssistantViewModel
 
+private val BubbleShape = RoundedCornerShape(20.dp)
+private val UserBubbleShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomStart = 20.dp, bottomEnd = 4.dp)
+private val AssistantBubbleShape =
+    RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomStart = 4.dp, bottomEnd = 20.dp)
+
 /** Chat with the offline assistant. Everything runs on this device. */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifier) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -88,23 +111,37 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
         LazyColumn(
             state = listState,
             modifier = Modifier.weight(1f).fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             if (state.lines.isEmpty()) {
                 item {
-                    Card(
+                    Bubble(fromUser = false) {
+                        Text(
+                            text = stringResource(Res.string.assistant_greeting),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
+                }
+                item {
+                    val suggestions =
+                        listOf(
+                            stringResource(Res.string.assistant_suggest_1),
+                            stringResource(Res.string.assistant_suggest_2),
+                            stringResource(Res.string.assistant_suggest_3),
+                            stringResource(Res.string.assistant_suggest_4),
+                        )
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(0.dp),
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                     ) {
-                        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(
-                                text = stringResource(Res.string.assistant_name),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.primary,
-                            )
-                            Text(
-                                text = stringResource(Res.string.assistant_greeting),
-                                style = MaterialTheme.typography.bodyLarge,
+                        suggestions.forEach { text ->
+                            SuggestionChip(
+                                onClick = {
+                                    viewModel.setInput(text)
+                                    viewModel.send()
+                                },
+                                label = { Text(text) },
                             )
                         }
                     }
@@ -112,38 +149,23 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                 item {
                     Text(
                         text = stringResource(Res.string.assistant_empty_hint),
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 16.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(vertical = 8.dp),
                     )
                 }
             }
             items(state.lines) { line ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors =
-                    CardDefaults.cardColors(
-                        containerColor =
-                        if (line.fromUser) {
-                            MaterialTheme.colorScheme.secondaryContainer
-                        } else {
-                            MaterialTheme.colorScheme.surfaceVariant
-                        },
-                    ),
-                ) {
-                    Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(
-                            text =
-                            stringResource(if (line.fromUser) Res.string.assistant_you else Res.string.assistant_name),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
-                        Text(text = line.text.ifEmpty { "…" }, style = MaterialTheme.typography.bodyLarge)
+                Bubble(fromUser = line.fromUser) {
+                    if (line.text.isEmpty()) {
+                        TypingDots()
+                    } else {
+                        SelectionContainer { Text(text = line.text, style = MaterialTheme.typography.bodyLarge) }
                     }
                 }
             }
         }
 
-        if (state.busy) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         if (state.failed) {
             Text(
                 text = stringResource(Res.string.assistant_error),
@@ -158,6 +180,7 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
             label = { Text(stringResource(Res.string.assistant_input_hint)) },
             minLines = 1,
             maxLines = 4,
+            shape = BubbleShape,
             modifier = Modifier.fillMaxWidth(),
         )
         Row(
@@ -174,6 +197,56 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
             if (state.lines.isNotEmpty() && !state.busy) {
                 TextButton(onClick = viewModel::startNew) { Text(stringResource(Res.string.assistant_new)) }
             }
+        }
+    }
+}
+
+/** A chat bubble: yours on the right, the assistant's on the left. */
+@Composable
+private fun Bubble(fromUser: Boolean, content: @Composable () -> Unit) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = if (fromUser) Arrangement.End else Arrangement.Start) {
+        Surface(
+            shape = if (fromUser) UserBubbleShape else AssistantBubbleShape,
+            color =
+            if (fromUser) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+            modifier = Modifier.widthIn(max = 560.dp).fillMaxWidth(if (fromUser) 0.85f else 0.92f),
+        ) {
+            Box(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) { content() }
+        }
+    }
+}
+
+/** Three softly pulsing dots shown while the assistant is still thinking. */
+@Composable
+private fun TypingDots() {
+    val transition = rememberInfiniteTransition()
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(vertical = 6.dp),
+    ) {
+        repeat(3) { index ->
+            val alpha by
+                transition.animateFloat(
+                    initialValue = 0.25f,
+                    targetValue = 0.25f,
+                    animationSpec =
+                    infiniteRepeatable(
+                        animation =
+                        keyframes {
+                            durationMillis = 1200
+                            0.25f at 0
+                            1f at 300
+                            0.25f at 600
+                        },
+                        repeatMode = RepeatMode.Restart,
+                        initialStartOffset = androidx.compose.animation.core.StartOffset(index * 200),
+                    ),
+                )
+            Box(
+                modifier =
+                Modifier.size(9.dp).alpha(alpha).background(MaterialTheme.colorScheme.onSurfaceVariant, CircleShape),
+            )
         }
     }
 }

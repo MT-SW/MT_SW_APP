@@ -33,6 +33,7 @@ class LlamaAssistantService(
     private val engine: LiteRtEngine,
     private val store: AiModelStoreImpl,
     private val uiPrefs: UiPrefs,
+    private val data: AssistantDataProvider,
 ) : AssistantService {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -43,8 +44,10 @@ class LlamaAssistantService(
 
     override suspend fun reply(history: List<AssistantTurn>, onPiece: (String) -> Unit): String {
         val modelId = activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
+        val question = history.lastOrNull { it.fromUser }?.text.orEmpty()
+        val context = runCatching { data.contextFor(question) }.getOrDefault("")
         val messages = buildList {
-            add("system" to SYSTEM_PROMPT)
+            add("system" to if (context.isBlank()) SYSTEM_PROMPT else "$SYSTEM_PROMPT\n\n$DATA_INTRO\n$context")
             trimmed(history).forEach { add((if (it.fromUser) "user" else "assistant") to it.text) }
         }
         return engine.chat(
@@ -80,7 +83,12 @@ class LlamaAssistantService(
     private companion object {
         const val MAX_ANSWER_TOKENS = 700
         const val TEMPERATURE = 0.6f
-        const val MAX_HISTORY_CHARS = 6000
+        const val MAX_HISTORY_CHARS = 3500
+        const val DATA_INTRO =
+            "Below is live read-only data from the user's app and radio. Use it to answer questions about their " +
+                "own network and device; quote the real values and say whether a value is rising, falling or stable. " +
+                "heap is the free internal RAM of the radio node (not the phone). You can only read; you cannot change " +
+                "settings or send messages, so if the user wants that, explain what to do or draft the text for them."
         const val SYSTEM_PROMPT =
             "You are the offline assistant built into MT_SW, an Android and desktop app for Meshtastic, " +
                 "an open-source LoRa mesh radio network that works without internet. " +
