@@ -25,6 +25,7 @@ import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioConfigRepository
+import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.Telemetry
 import kotlin.math.roundToInt
 
@@ -52,7 +53,10 @@ class AssistantDataProvider(
             if (myNum != null) parts += safe("trend") { trends(myNum, "own node", 0L) }
         }
         if (q.hasAny(SETTINGS_WORDS)) parts += safe("settings") { settings() }
-        if (q.hasAny(NODE_WORDS) || q.hasAny(TREND_WORDS)) parts += safe("network") { networkSummary() }
+        if (q.hasAny(NODE_WORDS) || q.hasAny(TREND_WORDS) || q.hasAny(RANK_WORDS)) {
+            parts += safe("ranking") { ranking(q) }
+            parts += safe("network") { networkSummary() }
+        }
         parts += safe("index") { nodeIndex() }
         if (q.hasAny(MESSAGE_WORDS)) parts += safe("messages") { messages() }
         return parts.filter { it.isNotBlank() }.joinToString("\n\n").take(MAX_CONTEXT_CHARS)
@@ -142,6 +146,84 @@ class AssistantDataProvider(
         return head + safe("node trends") { trends(n.num, n.user.long_name, 0L) }
     }
 
+    private class NodeRow(val num: Int) {
+        var statsTime = 0L
+        var rx: Int? = null
+        var tx: Int? = null
+        var bad: Int? = null
+        var dupe: Int? = null
+        var uptime: Int? = null
+        var heapFree: Float? = null
+        var devTime = 0L
+        var battery: Int? = null
+        var chUtil: Float? = null
+        var airUtil: Float? = null
+    }
+
+    /** The latest telemetry every node reported (last 12 hours), ranked by what the question is about. */
+    private suspend fun ranking(q: String): String {
+        val logs = meshLogRepository.getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, nowMillis - RANK_WINDOW_MS).first()
+        val rows = HashMap<Int, NodeRow>()
+        for (log in logs) {
+            val payload = log.fromRadio.packet?.decoded?.payload ?: continue
+            val t = runCatching { Telemetry.ADAPTER.decode(payload) }.getOrNull() ?: continue
+            val row = rows.getOrPut(log.fromNum) { NodeRow(log.fromNum) }
+            t.local_stats?.let { ls ->
+                if (log.received_date >= row.statsTime) {
+                    row.statsTime = log.received_date
+                    row.rx = ls.num_packets_rx
+                    row.tx = ls.num_packets_tx
+                    row.bad = ls.num_packets_rx_bad
+                    row.dupe = ls.num_rx_dupe
+                    row.uptime = ls.uptime_seconds
+                    row.heapFree = if ((ls.heap_total_bytes ?: 0) > 0) (ls.heap_free_bytes ?: 0).toFloat() / ls.heap_total_bytes!! * PERCENT else null
+                }
+            }
+            t.device_metrics?.let { dm ->
+                if (log.received_date >= row.devTime) {
+                    row.devTime = log.received_date
+                    row.battery = dm.battery_level
+                    row.chUtil = dm.channel_utilization
+                    row.airUtil = dm.air_util_tx
+                    if (row.uptime == null) row.uptime = dm.uptime_seconds
+                }
+            }
+        }
+        if (rows.isEmpty()) return "NODE RANKING: no telemetry from nodes in the last 12 hours."
+        data class Key(val label: String, val descending: Boolean, val pick: (NodeRow) -> Float?)
+        val key =
+            when {
+                q.hasAny(listOf("wysł", "wysl", "nadan", " tx", "transmit", "sent")) -> Key("packets sent (tx)", true) { it.tx?.toFloat() }
+                q.hasAny(listOf("duplik", "dupe")) -> Key("duplicate packets received", true) { it.dupe?.toFloat() }
+                q.hasAny(listOf("błęd", "bled", "uszkodz", "bad ")) -> Key("bad packets received", true) { it.bad?.toFloat() }
+                q.hasAny(listOf("heap", "pamię", "pamie", " ram")) -> Key("free heap percent (lowest first)", false) { it.heapFree }
+                q.hasAny(listOf("bateri", "battery")) -> Key("battery percent (lowest first)", false) { it.battery?.toFloat() }
+                q.hasAny(listOf("zajęt", "zajet", "kanał", "kanal", "channel", "utiliz")) -> Key("channel utilization percent", true) { it.chUtil }
+                q.hasAny(listOf("uptime", "działa od", "dziala od", "restart")) -> Key("uptime", true) { it.uptime?.toFloat() }
+                else -> Key("packets received (rx)", true) { it.rx?.toFloat() }
+            }
+        val withValue = rows.values.filter { key.pick(it) != null }
+        val sorted = if (key.descending) withValue.sortedByDescending { key.pick(it) } else withValue.sortedBy { key.pick(it) }
+        fun line(r: NodeRow): String {
+            val n = nodeRepository.nodeDBbyNum.value[r.num]
+            val name = n?.let { "${it.user.short_name} (${it.user.long_name}), id ${it.user.id}" } ?: "!${r.num.toUInt().toString(HEX)}"
+            return "- $name: rx=${r.rx ?: "?"}, tx=${r.tx ?: "?"}, bad=${r.bad ?: "?"}, dupe=${r.dupe ?: "?"}, " +
+                "heap_free=${r.heapFree?.let { fmt(it) } ?: "?"}%, battery=${r.battery ?: "?"}%, ch_util=${r.chUtil?.let { fmt(it) } ?: "?"}%, " +
+                "air_tx=${r.airUtil?.let { fmt(it) } ?: "?"}%, uptime=${r.uptime?.let { it / SECONDS_PER_HOUR } ?: "?"} h"
+        }
+        return buildString {
+            appendLine(
+                "NODE RANKING by ${key.label}: ${sorted.size} of ${rows.size} nodes reported. Counters are the node's own totals since " +
+                    "it started. Best first:",
+            )
+            sorted.take(RANK_TOP).forEach { appendLine(line(it)) }
+            if (sorted.size > RANK_TOP + RANK_BOTTOM) {
+                appendLine("... Last ones:")
+                sorted.takeLast(RANK_BOTTOM).forEach { appendLine(line(it)) }
+            }
+        }
+    }
+
     private fun networkSummary(): String {
         val nodes = nodeRepository.nodeDBbyNum.value.values
         if (nodes.isEmpty()) return ""
@@ -229,8 +311,13 @@ class AssistantDataProvider(
 
     private companion object {
         const val TAG = "AssistantData"
-        const val MAX_CONTEXT_CHARS = 7000
+        const val MAX_CONTEXT_CHARS = 8000
         const val MIN_NAME = 3
+        const val RANK_WINDOW_MS = 12 * 60 * 60 * 1000L
+        const val RANK_TOP = 12
+        const val RANK_BOTTOM = 4
+        const val HEX = 16
+        const val SECONDS_PER_HOUR = 3600
         const val MAX_NODES_DETAIL = 2
         const val ONE_DAY_S = 86_400L
         const val LOW_BATTERY = 20
@@ -254,6 +341,7 @@ class AssistantDataProvider(
             listOf("ustawien", "konfig", "setting", "config", "region", "preset", "kanał", "kanal", "channel", "lora",
                 "rola", "role", "moc", "power", "wifi", "bluetooth", "mqtt", "hop")
         val NODE_WORDS = listOf("węz", "wez", "node", "sąsiad", "sasiad", "zasięg", "zasieg", "sieć", "siec", "mesh", "snr", "rssi", "kto")
+        val RANK_WORDS = listOf("ramek", "ramki", "pakiet", "odebran", "raportuj", "najwięc", "najwiec", "najmniej", "ranking", "który", "ktory", "najlep", "najgorz")
         val OWN_WORDS = listOf("mój", "moj", "mojego", "mojej", "mojemu", "my node", "own node", "mój węz", "moim")
         val MESSAGE_WORDS = listOf("wiadomo", "message", "czat", "chat", "napisa", "pisa", "rozmow", "odpowied")
     }
