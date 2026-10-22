@@ -19,6 +19,7 @@ package org.meshtastic.core.navigation
 import androidx.navigation3.runtime.NavKey
 import org.jetbrains.compose.resources.StringResource
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.ai_tab_translator
 import org.meshtastic.core.resources.bottom_nav_settings
 import org.meshtastic.core.resources.connect
 import org.meshtastic.core.resources.map
@@ -36,6 +37,7 @@ enum class TopLevelDestination(val label: StringResource, val route: Route) {
     Messages(Res.string.messages, ContactsRoute.Contacts),
     Nodes(Res.string.nodes, NodesRoute.Nodes),
     NetworkHealth(Res.string.network_health, NetworkHealthRoute.NetworkHealth),
+    Translator(Res.string.ai_tab_translator, ContactsRoute.Translator),
     Map(Res.string.map, MapRoute.Map()),
     Settings(Res.string.bottom_nav_settings, SettingsRoute.Settings()),
     Connect(Res.string.connect, ConnectionsRoute.Connections()),

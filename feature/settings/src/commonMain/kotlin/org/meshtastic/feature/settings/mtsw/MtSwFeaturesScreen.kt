@@ -39,6 +39,7 @@ import org.meshtastic.core.navigation.ContactsRoute
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.ai_section_title
 import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.clean_node_database_title
 import org.meshtastic.core.resources.lora
@@ -75,9 +76,9 @@ import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Tune
 import org.meshtastic.feature.settings.SettingsViewModel
+import org.meshtastic.feature.settings.component.AiSettings
 import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
-import org.meshtastic.feature.settings.component.TranslatorSettings
 import org.meshtastic.feature.settings.component.UiScalePickerDialog
 import org.meshtastic.feature.settings.component.uiScaleLabel
 
@@ -124,7 +125,6 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     onClick = { settingsViewModel.setAutoLoadChatImages(!autoLoadChatImages) },
                 )
                 AppUpdateSettings()
-                TranslatorSettings()
                 ListItem(
                     text = stringResource(Res.string.node_layout_section_title),
                     leadingIcon = MeshtasticIcons.List,
@@ -142,6 +142,8 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     onNavigate(ContactsRoute.Translator)
                 }
             }
+
+            ExpressiveSection(title = stringResource(Res.string.ai_section_title)) { AiSettings() }
 
             ExpressiveSection(title = stringResource(Res.string.mt_sw_features_links)) {
                 Text(

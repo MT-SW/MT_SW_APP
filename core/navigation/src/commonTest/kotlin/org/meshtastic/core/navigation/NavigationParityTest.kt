@@ -24,7 +24,7 @@ class NavigationParityTest {
 
     @Test
     fun `all top level destinations are defined`() {
-        assertEquals(5, TopLevelDestination.entries.size)
+        assertEquals(7, TopLevelDestination.entries.size)
     }
 
     @Test

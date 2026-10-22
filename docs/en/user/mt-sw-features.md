@@ -118,15 +118,35 @@ The debug panel (Settings → Advanced → Debug Panel) has an extra tab in this
 - **Conversation list** — opens faster and more smoothly even with many messages.
 - **Desktop** — Enter is a new line, Ctrl+Enter sends the message.
 
-## Offline translator
+## Offline translator and assistant
 
-The optional translator runs entirely inside the app, without internet, on phone and desktop. It is **off by default**. Switch it on in Settings → MT_SW features → "Offline translator". When you switch it on, the app warns that the model needs a one-time download (about 870 MB) and uses about 2.3 GB of RAM while translating, so on weaker phones it can slow the app down or close it. Once downloaded it translates without internet, and you can delete the model from the device at any time in the same place.
+The app has two optional AI features that run **entirely on your device, without internet**: a translator and an assistant. Both are **off by default** and are switched on separately in Settings → MT_SW features → "Offline translator and assistant". You can have only the translator, only the assistant, or both.
+
+**Privacy.** Everything is processed locally. Once a model is downloaded, no texts or conversations are sent to the internet. The internet is only needed for the one-time model download.
+
+**Models.** There are three levels. You can keep several downloaded at once, download and delete each one separately, and in separate lists choose which downloaded model the translator uses and which one the assistant uses. Only one model is in memory at a time.
+
+- **Light — NLLB-200 600M.** Translator only. Download about 870 MB, RAM about 2.3 GB, a phone with at least 4 GB of RAM is recommended.
+- **Standard — Gemma 3 4B.** Translator and assistant. Download about 2.5 GB, RAM about 5 GB, a phone with at least 8 GB of RAM. *(Coming soon — the engine for this model arrives in the next version.)*
+- **Strong — Gemma 3 12B.** Translator and assistant, best quality. Download about 7.3 GB, RAM about 10 GB, a device with at least 16 GB of RAM. *(Coming soon.)*
+
+On weaker devices large models can slow the app down or close it, which is why every model lists its sizes and recommended memory.
+
+**Tab in the bottom bar.** When either mode is on, a "Translator" tab appears in the bottom bar. When the assistant is on too, the tab is called "AI" and has a sparkles icon, with two separate tabs inside: translator and assistant. The assistant works only on this tab; channels and private messages only have the translator. The assistant needs the Standard or Strong model; the Light model only translates.
+
+**Translator:**
 
 - **Received messages** — the message menu has "Translate message". The original stays, and you can switch between it and the translation.
 - **Outgoing messages** — when the field has text, a "Translate before sending" button appears next to it. It shows the original and the translation side by side; you can send the translation, put it in the field to edit, or cancel.
-- **Separate screen** — Settings → MT_SW features → "Translator": type a text, choose the languages (or "Detect automatically"), translate and copy the result.
+- **Separate screen** — the "Translator" tab: type a text, choose the languages (or "Detect automatically"), translate and copy the result.
 - One model covers many languages and any pair between them, including Polish, English, German, Czech, Slovak, Ukrainian, Russian, French and Spanish.
 - Translations can be inaccurate, especially names and jargon, so treat them as a hint. Text is translated sentence by sentence. If a translation is over 200 characters, the app warns that it will be sent in several parts over the radio.
+
+**Model licences.** The models are not part of the app: you download them from the internet and use them at your own responsibility, under their licences.
+
+- NLLB-200 (Meta) is released under **CC BY-NC 4.0**, which means **non-commercial use only**.
+- Gemma 3 (Google) is released under the **Gemma Terms of Use** with the Prohibited Use Policy (ai.google.dev/gemma/terms). By using it you accept those terms.
+- Model answers can be wrong or invented. Do not base safety decisions on them.
 
 ## Node list and database
 

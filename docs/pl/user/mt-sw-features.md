@@ -118,15 +118,35 @@ Panel debugowania (Ustawienia → Zaawansowane → Panel debugowania) ma w tej a
 - **Lista rozmów** — otwiera się szybciej i płynniej także przy dużej liczbie wiadomości.
 - **Komputer** — Enter to nowa linia, Ctrl+Enter wysyła wiadomość.
 
-## Tłumacz offline
+## Tłumacz i asystent offline
 
-Opcjonalny tłumacz działa w całości w aplikacji, bez internetu, na telefonie i na komputerze. Jest **domyślnie wyłączony**. Włączasz go w Ustawienia → Funkcje MT_SW → „Tłumacz offline”. Przy włączaniu aplikacja ostrzega, że model trzeba jednorazowo pobrać (ok. 870 MB) i że podczas tłumaczenia zajmuje ok. 2,3 GB pamięci RAM, więc na słabszych telefonach może to spowalniać aplikację albo ją zamykać. Po pobraniu tłumaczy bez internetu, a model możesz w każdej chwili usunąć z urządzenia w tym samym miejscu.
+Aplikacja ma dwie opcjonalne funkcje AI, które działają **w całości na Twoim urządzeniu, bez internetu**: tłumacz i asystent. Obie są **domyślnie wyłączone** i włączasz je osobno, w Ustawienia → Funkcje MT_SW → „Tłumacz i asystent offline”. Możesz mieć włączonego tylko tłumacza, tylko asystenta albo oba.
+
+**Prywatność.** Wszystko jest przetwarzane lokalnie. Po pobraniu modelu żadne teksty ani rozmowy nie są wysyłane do internetu. Internet jest potrzebny tylko do jednorazowego pobrania modelu.
+
+**Modele.** Na liście są trzy poziomy. Możesz mieć pobranych kilka naraz, każdy pobierasz i usuwasz osobno, a w osobnych listach wybierasz, który z pobranych modeli jest używany przez tłumacza i który przez asystenta. W pamięci jest zawsze tylko jeden model naraz.
+
+- **Lekki — NLLB-200 600M.** Tylko tłumacz. Pobranie ok. 870 MB, pamięć RAM ok. 2,3 GB, zalecany telefon od 4 GB RAM.
+- **Standardowy — Gemma 3 4B.** Tłumacz i asystent. Pobranie ok. 2,5 GB, RAM ok. 5 GB, telefon od 8 GB RAM. *(Wkrótce — silnik tego modelu dojdzie w następnej wersji.)*
+- **Mocny — Gemma 3 12B.** Tłumacz i asystent, najlepsza jakość. Pobranie ok. 7,3 GB, RAM ok. 10 GB, urządzenie od 16 GB RAM. *(Wkrótce.)*
+
+Na słabszych urządzeniach duże modele mogą spowalniać aplikację albo ją zamykać, dlatego przy każdym modelu są podane rozmiary i zalecana ilość pamięci.
+
+**Karta na dolnym pasku.** Gdy włączony jest którykolwiek tryb, na dolnym pasku pojawia się karta „Tłumacz”. Gdy włączysz też asystenta, karta nazywa się „AI” i ma ikonę iskierek, a w środku są dwie osobne zakładki: tłumacz i asystent. Asystent działa tylko na tej karcie, a w kanałach i wiadomościach prywatnych jest wyłącznie tłumacz. Asystent wymaga modelu Standardowego albo Mocnego; sam model Lekki tylko tłumaczy.
+
+**Tłumacz:**
 
 - **Odebrane wiadomości** — w menu wiadomości jest „Przetłumacz wiadomość”. Oryginał zostaje, a tłumaczenie można przełączać z oryginałem.
 - **Wysyłane wiadomości** — gdy w polu jest tekst, obok pola pojawia się przycisk „Przetłumacz przed wysłaniem”. Pokazuje oryginał i tłumaczenie obok siebie; możesz wysłać tłumaczenie, wstawić je do pola i poprawić albo anulować.
-- **Osobny ekran** — Ustawienia → Funkcje MT_SW → „Tłumacz”: wpisujesz tekst, wybierasz języki (albo „Wykryj automatycznie”), tłumaczysz i kopiujesz wynik.
+- **Osobny ekran** — karta „Tłumacz”: wpisujesz tekst, wybierasz języki (albo „Wykryj automatycznie”), tłumaczysz i kopiujesz wynik.
 - Jeden model obsługuje wiele języków i dowolne pary między nimi, m.in. polski, angielski, niemiecki, czeski, słowacki, ukraiński, rosyjski, francuski i hiszpański.
 - Tłumaczenie bywa niedokładne, zwłaszcza nazwy własne i żargon, więc zawsze traktuj je jako podpowiedź. Tekst jest tłumaczony zdanie po zdaniu. Jeśli tłumaczenie ma ponad 200 znaków, aplikacja ostrzega, że przez radio pójdzie w kilku częściach.
+
+**Licencje modeli.** Modele nie są częścią aplikacji: pobierasz je z internetu i używasz na własną odpowiedzialność, zgodnie z ich licencjami.
+
+- NLLB-200 (Meta) jest udostępniony na licencji **CC BY-NC 4.0**, czyli **wyłącznie do użytku niekomercyjnego**.
+- Gemma 3 (Google) jest udostępniona na warunkach **Gemma Terms of Use** wraz z Prohibited Use Policy (ai.google.dev/gemma/terms). Korzystając z niej, zgadzasz się na te warunki.
+- Odpowiedzi modeli mogą być błędne lub zmyślone. Nie opieraj na nich decyzji dotyczących bezpieczeństwa.
 
 ## Lista węzłów i baza
 

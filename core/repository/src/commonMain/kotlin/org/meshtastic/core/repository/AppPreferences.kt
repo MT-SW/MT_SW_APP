@@ -155,6 +155,21 @@ interface UiPrefs {
 
     fun setTranslatorEnabled(value: Boolean)
 
+    /** Whether the optional offline assistant is switched on. Off by default: it needs a large model and lots of RAM. */
+    val assistantEnabled: StateFlow<Boolean>
+
+    fun setAssistantEnabled(value: Boolean)
+
+    /** Id of the downloaded model the translator uses (see AiModels). */
+    val translatorModelId: StateFlow<String>
+
+    fun setTranslatorModelId(value: String)
+
+    /** Id of the downloaded model the assistant uses (see AiModels). */
+    val assistantModelId: StateFlow<String>
+
+    fun setAssistantModelId(value: String)
+
     val hasShownNotPairedWarning: StateFlow<Boolean>
 
     fun setHasShownNotPairedWarning(shown: Boolean)

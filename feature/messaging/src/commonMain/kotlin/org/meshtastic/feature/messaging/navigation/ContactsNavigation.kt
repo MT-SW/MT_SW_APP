@@ -93,6 +93,8 @@ fun EntryProviderScope<NavKey>.contactsGraph(
         TranslatorScreen(
             viewModel = koinViewModel(),
             onBack = dropUnlessResumed { backStack.removeLastOrNull() },
+            // As the root of its own bottom-bar tab there is nothing to go back to.
+            canNavigateUp = backStack.size > 1,
         )
     }
 

@@ -24,6 +24,7 @@ import org.meshtastic.core.resources.ic_map
 import org.meshtastic.core.resources.ic_nodes
 import org.meshtastic.core.resources.ic_settings
 import org.meshtastic.core.resources.ic_ssid_chart
+import org.meshtastic.core.resources.ic_translate
 import org.meshtastic.core.resources.ic_wifi
 
 /** Maps a shared [TopLevelDestination] to its corresponding icon [DrawableResource]. */
@@ -33,6 +34,7 @@ val TopLevelDestination.icon: DrawableResource
             TopLevelDestination.Messages -> Res.drawable.ic_forum
             TopLevelDestination.Nodes -> Res.drawable.ic_nodes
             TopLevelDestination.NetworkHealth -> Res.drawable.ic_ssid_chart
+            TopLevelDestination.Translator -> Res.drawable.ic_translate
             TopLevelDestination.Map -> Res.drawable.ic_map
             TopLevelDestination.Settings -> Res.drawable.ic_settings
             TopLevelDestination.Connect -> Res.drawable.ic_wifi

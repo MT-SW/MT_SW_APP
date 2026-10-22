@@ -27,6 +27,8 @@ import org.meshtastic.app.discovery.GeminiNanoSummaryProvider
 import org.meshtastic.app.translation.MlKitDocTranslator
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.TranslatorModelManager
+import org.meshtastic.feature.messaging.translation.AiModelStoreImpl
+import org.meshtastic.core.repository.AiModelStore
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.feature.discovery.DiscoverySummaryGenerator
 import org.meshtastic.feature.discovery.ai.DiscoverySummaryAiProvider
@@ -71,4 +73,8 @@ class GoogleAiModule {
     @Single fun messageTranslationService(translator: NllbTranslator): MessageTranslationService = translator
 
     @Single fun translatorModelManager(translator: NllbTranslator): TranslatorModelManager = translator
+
+    @Single
+    fun aiModelStore(context: Context, translator: NllbTranslator): AiModelStore =
+        AiModelStoreImpl(translator, File(context.filesDir, "models"))
 }

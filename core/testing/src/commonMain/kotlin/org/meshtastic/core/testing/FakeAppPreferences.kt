@@ -365,6 +365,24 @@ class FakeUiPrefs : UiPrefs {
         translatorEnabled.value = value
     }
 
+    override val assistantEnabled = MutableStateFlow(false)
+
+    override fun setAssistantEnabled(value: Boolean) {
+        assistantEnabled.value = value
+    }
+
+    override val translatorModelId = MutableStateFlow("nllb-600m")
+
+    override fun setTranslatorModelId(value: String) {
+        translatorModelId.value = value
+    }
+
+    override val assistantModelId = MutableStateFlow("gemma3-4b")
+
+    override fun setAssistantModelId(value: String) {
+        assistantModelId.value = value
+    }
+
     override val lastNarrowBandWarningShownMillis = MutableStateFlow(0L)
 
     override fun setLastNarrowBandWarningShownMillis(millis: Long) {

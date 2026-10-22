@@ -20,6 +20,7 @@ import org.meshtastic.core.navigation.ConnectionsRoute
 import org.meshtastic.core.navigation.ContactsRoute
 import org.meshtastic.core.navigation.FirmwareRoute
 import org.meshtastic.core.navigation.MapRoute
+import org.meshtastic.core.navigation.NetworkHealthRoute
 import org.meshtastic.core.navigation.NodesRoute
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
@@ -43,6 +44,8 @@ class DesktopTopLevelDestinationParityTest {
             setOf(
                 ContactsRoute.Contacts::class,
                 NodesRoute.Nodes::class,
+                NetworkHealthRoute.NetworkHealth::class,
+                ContactsRoute.Translator::class,
                 MapRoute.Map::class,
                 SettingsRoute.Settings::class,
                 ConnectionsRoute.Connections::class,
