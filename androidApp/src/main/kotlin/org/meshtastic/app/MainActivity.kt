@@ -90,6 +90,8 @@ import org.meshtastic.core.ui.theme.EventThemeToggle
 import org.meshtastic.core.ui.theme.LocalEventTheme
 import org.meshtastic.core.ui.theme.LocalEventThemeToggle
 import org.meshtastic.core.ui.theme.MODE_DYNAMIC
+import org.meshtastic.core.ui.theme.MODE_MONO_DARK
+import org.meshtastic.core.ui.theme.isMonochromeMode
 import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.util.LocalAnalyticsIntroProvider
 import org.meshtastic.core.ui.util.LocalBarcodeScannerProvider
@@ -170,9 +172,10 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val theme by model.theme.collectAsStateWithLifecycle()
             val dynamic = theme == MODE_DYNAMIC
+            val monochrome = isMonochromeMode(theme)
             val dark =
                 when (theme) {
-                    AppCompatDelegate.MODE_NIGHT_YES -> true
+                    AppCompatDelegate.MODE_NIGHT_YES, MODE_MONO_DARK -> true
                     AppCompatDelegate.MODE_NIGHT_NO -> false
                     else -> isSystemInDarkTheme()
                 }
@@ -186,7 +189,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             AppCompositionLocals {
-                AppTheme(dynamicColor = dynamic, darkTheme = dark) {
+                AppTheme(dynamicColor = dynamic, darkTheme = dark, monochrome = monochrome) {
                     val appIntroCompleted by model.appIntroCompleted.collectAsStateWithLifecycle()
 
                     // Signal to the system that the initial UI is "fully drawn"

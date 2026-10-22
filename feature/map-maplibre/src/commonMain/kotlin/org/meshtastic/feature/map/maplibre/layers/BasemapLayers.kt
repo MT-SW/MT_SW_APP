@@ -25,6 +25,7 @@ import org.maplibre.compose.sources.RasterDemEncoding
 import org.maplibre.compose.sources.TileSetOptions
 import org.maplibre.compose.sources.rememberRasterDemTileSource
 import org.maplibre.compose.sources.rememberRasterTileSource
+import org.meshtastic.core.ui.theme.LocalMonochrome
 import org.meshtastic.feature.map.layers.opacityOf
 import org.meshtastic.feature.map.maplibre.style.Basemap
 import org.meshtastic.feature.map.maplibre.style.MapOverlay
@@ -57,7 +58,8 @@ internal fun RasterBasemapLayer(basemap: Basemap.Raster) {
             // and blurry without this.
             tileSize = basemap.spec.tileSize,
         )
-    RasterLayer(id = "basemap-${basemap.id}", source = source)
+    // In the black-and-white themes the map tiles lose their colour too (-1 = fully desaturated).
+    RasterLayer(id = "basemap-${basemap.id}", source = source, saturation = const(if (LocalMonochrome.current) -1f else 0f))
 }
 
 /**
@@ -80,7 +82,12 @@ internal fun MapOverlayLayers(overlays: List<MapOverlay>, opacity: Map<String, F
                         from = overlay.spec.toTileSetOptions(),
                         tileSize = overlay.spec.tileSize,
                     )
-                RasterLayer(id = "overlay-${overlay.id}", source = source, opacity = const(layerOpacity))
+                RasterLayer(
+                    id = "overlay-${overlay.id}",
+                    source = source,
+                    opacity = const(layerOpacity),
+                    saturation = const(if (LocalMonochrome.current) -1f else 0f),
+                )
             }
         }
     }

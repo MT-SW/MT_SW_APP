@@ -533,7 +533,7 @@ fun MapView(
     val theme by mapViewModel.theme.collectAsStateWithLifecycle()
     val dark =
         when (theme) {
-            AppCompatDelegate.MODE_NIGHT_YES -> true
+            AppCompatDelegate.MODE_NIGHT_YES, org.meshtastic.core.ui.theme.MODE_MONO_DARK -> true
             AppCompatDelegate.MODE_NIGHT_NO -> false
             AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM -> isSystemInDarkTheme()
             else -> isSystemInDarkTheme()
