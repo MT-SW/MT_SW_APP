@@ -57,10 +57,13 @@ import org.meshtastic.core.navigation.MultiBackstack
 import org.meshtastic.core.navigation.NodesRoute
 import org.meshtastic.core.navigation.TopLevelDestination
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.ai_tab_ai
+import org.meshtastic.core.resources.ai_tab_assistant
 import org.meshtastic.core.resources.connected
 import org.meshtastic.core.resources.connecting
 import org.meshtastic.core.resources.device_sleeping
 import org.meshtastic.core.resources.disconnected
+import org.meshtastic.core.resources.ic_auto_awesome
 import org.meshtastic.core.resources.node_restarting
 import org.meshtastic.core.resources.reconnecting
 import org.meshtastic.core.ui.navigation.icon
@@ -86,6 +89,11 @@ fun MeshtasticNavigationSuite(
     val unreadMessageCount by uiViewModel.unreadMessageCount.collectAsStateWithLifecycle()
     val selectedDevice by uiViewModel.currentDeviceAddressFlow.collectAsStateWithLifecycle()
 
+    val translatorEnabled by uiViewModel.translatorEnabled.collectAsStateWithLifecycle()
+    val assistantEnabled by uiViewModel.assistantEnabled.collectAsStateWithLifecycle()
+    val showAiTab = translatorEnabled || assistantEnabled
+    val visibleDestinations = TopLevelDestination.entries.filter { it != TopLevelDestination.Translator || showAiTab }
+
     val adaptiveInfo = currentWindowAdaptiveInfoV2()
 
     val currentTabRoute = multiBackstack.currentTabRoute
@@ -98,7 +106,7 @@ fun MeshtasticNavigationSuite(
         modifier = modifier,
         layoutType = layoutType,
         navigationSuiteItems = {
-            TopLevelDestination.entries.forEach { destination ->
+            visibleDestinations.forEach { destination ->
                 val isSelected = destination == topLevelDestination
                 item(
                     selected = isSelected,
@@ -113,11 +121,23 @@ fun MeshtasticNavigationSuite(
                             unreadMessageCount = unreadMessageCount,
                             selectedDevice = selectedDevice,
                             meshActivityFlow = uiViewModel.meshActivity,
+                            useAiIcon = assistantEnabled,
                         )
                     },
                     label =
                     if (showLabels) {
-                        { Text(stringResource(destination.label)) }
+                        {
+                            Text(
+                                stringResource(
+                                    when {
+                                        destination != TopLevelDestination.Translator -> destination.label
+                                        translatorEnabled && assistantEnabled -> Res.string.ai_tab_ai
+                                        assistantEnabled -> Res.string.ai_tab_assistant
+                                        else -> destination.label
+                                    },
+                                ),
+                            )
+                        }
                     } else {
                         null
                     },
@@ -188,6 +208,7 @@ private fun NavigationIconContent(
     meshActivityFlow: Flow<MeshActivity>,
     nodeRestartExpected: Boolean = false,
     watchdogReconnectInFlight: Boolean = false,
+    useAiIcon: Boolean = false,
 ) {
     val isConnectionsRoute = destination == TopLevelDestination.Connect
     // An expected node restart (reboot-applying config save) presents as an in-progress state, not a scary
@@ -243,7 +264,14 @@ private fun NavigationIconContent(
             ) {
                 Crossfade(isSelected, label = "BottomBarIcon") { isSelectedState ->
                     Icon(
-                        imageVector = vectorResource(destination.icon),
+                        imageVector =
+                        vectorResource(
+                            if (destination == TopLevelDestination.Translator && useAiIcon) {
+                                Res.drawable.ic_auto_awesome
+                            } else {
+                                destination.icon
+                            },
+                        ),
                         contentDescription = stringResource(destination.label),
                         tint = if (isSelectedState) colorScheme.primary else LocalContentColor.current,
                     )

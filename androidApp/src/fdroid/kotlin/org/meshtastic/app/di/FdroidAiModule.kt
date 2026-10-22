@@ -28,6 +28,8 @@ import org.meshtastic.feature.docs.translation.DocTranslationService
 import org.meshtastic.feature.docs.translation.NoOpDocTranslator
 import org.meshtastic.feature.messaging.translation.MessageTranslationService
 import org.meshtastic.core.repository.TranslatorModelManager
+import org.meshtastic.feature.messaging.translation.AiModelStoreImpl
+import org.meshtastic.core.repository.AiModelStore
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.feature.messaging.translation.NllbTranslator
 import java.io.File
@@ -49,4 +51,8 @@ class FdroidAiModule {
     @Single fun messageTranslationService(translator: NllbTranslator): MessageTranslationService = translator
 
     @Single fun translatorModelManager(translator: NllbTranslator): TranslatorModelManager = translator
+
+    @Single
+    fun aiModelStore(context: Context, translator: NllbTranslator): AiModelStore =
+        AiModelStoreImpl(translator, File(context.filesDir, "models"))
 }

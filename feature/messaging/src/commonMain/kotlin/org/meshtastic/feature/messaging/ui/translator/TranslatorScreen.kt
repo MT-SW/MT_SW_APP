@@ -67,7 +67,7 @@ import org.meshtastic.feature.messaging.translation.TranslatorViewModel
 
 /** Stand-alone translator: type a text, pick the languages, translate and copy. Works fully offline. */
 @Composable
-fun TranslatorScreen(viewModel: TranslatorViewModel, onBack: () -> Unit) {
+fun TranslatorScreen(viewModel: TranslatorViewModel, onBack: () -> Unit, canNavigateUp: Boolean = true) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val enabled by viewModel.enabled.collectAsStateWithLifecycle()
     val modelState by viewModel.modelState.collectAsStateWithLifecycle()
@@ -76,7 +76,7 @@ fun TranslatorScreen(viewModel: TranslatorViewModel, onBack: () -> Unit) {
         topBar = {
             MainAppBar(
                 title = stringResource(Res.string.translator_open),
-                canNavigateUp = true,
+                canNavigateUp = canNavigateUp,
                 onNavigateUp = onBack,
                 ourNode = null,
                 showNodeChip = false,

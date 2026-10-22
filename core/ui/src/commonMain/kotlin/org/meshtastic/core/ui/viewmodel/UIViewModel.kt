@@ -191,6 +191,11 @@ class UIViewModel(
 
     val uiScale: StateFlow<Int> = uiPrefs.uiScale
 
+    /** Whether the offline translator is on; with [assistantEnabled] it decides whether the AI tab is shown. */
+    val translatorEnabled: StateFlow<Boolean> = uiPrefs.translatorEnabled
+
+    val assistantEnabled: StateFlow<Boolean> = uiPrefs.assistantEnabled
+
     /** Opt-out for applying an event edition's ambient theme (accent + typeface) app-wide. */
     val eventThemeEnabled: StateFlow<Boolean> = uiPrefs.eventThemeEnabled
 

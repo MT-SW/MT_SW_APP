@@ -2669,5 +2669,32 @@
     <string name="wifi_reason_self">disconnected by the device (%1$d)</string>
     <string name="wifi_reason_other">code %1$d</string>
     <string name="wifi_export">Save WiFi</string>
+    <string name="ai_section_title">Offline translator and assistant</string>
+    <string name="ai_assistant_title">Offline assistant</string>
+    <string name="ai_assistant_summary">Chat with an AI assistant without internet. Off by default.</string>
+    <string name="ai_assistant_unavailable">The assistant will be available once the Gemma model engine is added in an upcoming version.</string>
+    <string name="ai_assistant_warning_title">Turn on the offline assistant?</string>
+    <string name="ai_warning_body">The model needs a one-time download (about %1$d MB) and uses about %2$d MB of RAM while running. A device with at least %3$d GB of RAM is recommended. On weaker devices it may slow down or close the app. Once downloaded it works without internet.</string>
+    <string name="ai_models_title">Models</string>
+    <string name="ai_model_translator_title">Model used for translation</string>
+    <string name="ai_model_assistant_title">Model used by the assistant</string>
+    <string name="ai_model_none_ready">No model downloaded. Download one of the models above.</string>
+    <string name="ai_level_light">Light</string>
+    <string name="ai_level_standard">Standard</string>
+    <string name="ai_level_strong">Strong</string>
+    <string name="ai_model_roles_translator">Translator only</string>
+    <string name="ai_model_roles_both">Translator and assistant</string>
+    <string name="ai_model_specs">Download about %1$d MB · RAM about %2$d MB · recommended device from %3$d GB of RAM</string>
+    <string name="ai_model_soon">Coming soon</string>
+    <string name="ai_model_download">Download</string>
+    <string name="ai_model_cancel">Cancel download</string>
+    <string name="ai_model_delete">Remove from device</string>
+    <string name="ai_model_failed">Download failed. Try again.</string>
+    <string name="ai_license_cc">Model licence: CC BY-NC 4.0 (non-commercial use only)</string>
+    <string name="ai_license_gemma">Model licence: Gemma Terms of Use (Google)</string>
+    <string name="ai_privacy">Everything is processed locally on this device. Once a model is downloaded, no texts or conversations are sent to the internet. The internet is only needed for the one-time model download.</string>
+    <string name="ai_tab_ai">AI</string>
+    <string name="ai_tab_translator">Translator</string>
+    <string name="ai_tab_assistant">Assistant</string>
 </resources>
 
