@@ -167,7 +167,8 @@ class LlamaAssistantService(
             "Below is live read-only data from the user's app and radio. Use it to answer questions about their " +
                 "own network and device. heap is the free internal RAM of the radio node (not the phone). " +
                 "Copy every number and unit exactly as it appears in the data (keep the decimal point and the minus " +
-                "sign, never combine or change digits); if a value is unknown say so. Write plain text only: no " +
+                "sign, never combine or change digits); keep the units that stand next to the values (for example °C, %, hPa, V) " +
+                "and never add more decimals than the data has; if a value is unknown say so. Write plain text only: no " +
                 "markdown, no asterisks, no backticks."
         const val TOOLS_RULE =
             "You have read-only tools that look up the app's data: network overview, node names, details and " +
