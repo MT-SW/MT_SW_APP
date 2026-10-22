@@ -18,6 +18,7 @@ package org.meshtastic.feature.messaging.translation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.currentLocaleCode
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.repository.TranslatorModelManager
 import org.meshtastic.core.repository.TranslatorModelState
 import org.meshtastic.core.repository.UiPrefs
@@ -85,7 +87,9 @@ class TranslatorViewModel(
         if (current.input.isBlank() || current.busy) return
         viewModelScope.launch {
             _state.update { it.copy(busy = true, error = null, output = "") }
+            val started = nowMillis
             val result = service.translateBetween(current.input, current.sourceNllb, current.targetNllb)
+            Logger.i(tag = "TranslatorViewModel") { "Translation finished in ${nowMillis - started} ms: ${result::class.simpleName}" }
             _state.update {
                 when (result) {
                     is TranslationResult.Success -> it.copy(busy = false, output = result.translatedText)

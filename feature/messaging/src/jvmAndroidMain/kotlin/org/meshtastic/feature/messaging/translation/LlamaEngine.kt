@@ -20,6 +20,7 @@ import co.touchlab.kermit.Logger
 import com.llamatik.core.platform.GenStream
 import com.llamatik.core.platform.LlamaBridge
 import kotlinx.coroutines.CancellationException
+import org.meshtastic.core.common.util.nowMillis
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -80,7 +81,10 @@ class LlamaEngine(private val store: AiModelStoreImpl) {
         temperature: Float,
         onPiece: (String) -> Unit,
     ): String = coroutineScope {
+        val started = nowMillis
+        val wasLoaded = loadedId == modelId
         ensureLoaded(modelId, maxTokens, temperature)
+        val loadedAt = nowMillis
         val prompt = LlamaBridge.applyChatTemplate(messages, true) ?: fallbackPrompt(messages)
         val reply = StringBuilder()
         var failure: String? = null
@@ -115,6 +119,10 @@ class LlamaEngine(private val store: AiModelStoreImpl) {
             finished.set(true)
             watcher.cancel()
         }
+        Logger.i(tag = TAG) {
+            "Answer from $modelId: loaded=${!wasLoaded} in ${loadedAt - started} ms, generated ${reply.length} chars " +
+                "in ${nowMillis - loadedAt} ms"
+        }
         failure?.let { error(it) }
         reply.toString().replace(END_OF_TURN, "").trim()
     }
@@ -135,7 +143,7 @@ class LlamaEngine(private val store: AiModelStoreImpl) {
             useMmap = true,
             flashAttention = false,
             batchSize = BATCH_SIZE,
-            gpuLayers = 0,
+            gpuLayers = gpuLayers(),
         )
         if (loadedId == modelId) return
         val file = store.fileOf(modelId) ?: error("Model $modelId is not downloaded")
@@ -159,6 +167,10 @@ class LlamaEngine(private val store: AiModelStoreImpl) {
         runCatching { LlamaBridge.shutdown() }.onFailure { Logger.w(tag = TAG, throwable = it) { "Unload failed" } }
         loadedId = null
     }
+
+    /** On a Mac the graphics chip does the heavy work (much faster); elsewhere the processor does it. */
+    private fun gpuLayers(): Int =
+        if (System.getProperty("os.name").orEmpty().contains("Mac", ignoreCase = true)) ALL_LAYERS else 0
 
     private fun threadCount(): Int = (Runtime.getRuntime().availableProcessors() / 2).coerceIn(2, MAX_THREADS)
 
@@ -185,6 +197,7 @@ class LlamaEngine(private val store: AiModelStoreImpl) {
         const val TOP_K = 40
         const val REPEAT_PENALTY = 1.0f
         const val MAX_THREADS = 6
+        const val ALL_LAYERS = 99
         const val IDLE_UNLOAD_MS = 120_000L
     }
 }
