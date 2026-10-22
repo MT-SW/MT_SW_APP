@@ -265,6 +265,39 @@ class AssistantDataProvider(
             lines.take(SENSOR_LIMIT).joinToString("\n")
     }
 
+    /** Exact signal list written in code, in Polish, so the model never copies the numbers wrong. */
+    fun signalReport(q: String): String {
+        val me = nodeRepository.ourNodeInfo.value
+        val now = nowMillis / MILLIS_PER_SECOND
+        class Row(val n: org.meshtastic.core.model.Node, val meters: Int?)
+        val rows = nodeRepository.nodeDBbyNum.value.values.filter { it.num != me?.num }.map { Row(it, me?.let { m -> it.distance(m) }) }
+        val byDistance = q.hasAny(listOf("odległ", "odleg", "daleko", "dystans", "distance", "far"))
+        val closest = q.hasAny(listOf("najbliż", "najbliz", "blisk", "closest", "nearest"))
+        val withSignal = rows.filter { it.n.snr != Float.MAX_VALUE }
+        val sorted =
+            when {
+                closest -> rows.filter { it.meters != null }.sortedBy { it.meters }
+                byDistance -> rows.filter { it.meters != null }.sortedByDescending { it.meters }
+                else -> withSignal.sortedWith(compareBy<Row> { it.n.hopsAway.let { h -> if (h < 0) Int.MAX_VALUE else h } }.thenByDescending { it.n.snr })
+            }
+        val title =
+            when {
+                closest -> "Najbliższe węzły (z ${rows.size}):"
+                byDistance -> "Najdalsze węzły (z ${rows.size}):"
+                else -> "Najlepszy zasięg — węzły słyszane bezpośrednio najpierw, od najwyższego SNR (${withSignal.size} z odczytem z ${rows.size}):"
+            }
+        val sb = StringBuilder(title).append('\n')
+        for (r in sorted.take(REPORT_SIGNAL)) {
+            val n = r.n
+            val ago = if (n.lastHeard == 0) "nigdy" else "${((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)} min temu"
+            val snr = if (n.snr == Float.MAX_VALUE) "brak" else fmt(n.snr) + " dB"
+            val rssi = if (n.rssi == Int.MAX_VALUE) "brak" else n.rssi.toString() + " dBm"
+            val dist = r.meters?.let { m -> fmt(m / METERS_PER_KM) + " km" } ?: "brak"
+            sb.append("• ${n.user.short_name} (${n.user.long_name}): skoki ${n.hopsAway}, SNR $snr, RSSI $rssi, odległość $dist, słyszany $ago\n")
+        }
+        return sb.toString().trim()
+    }
+
     /** Link quality to every node we hear: SNR, RSSI, hops and the distance from our own node. */
     private fun signalRanking(q: String, top: Int = SIGNAL_TOP): String {
         val me = nodeRepository.ourNodeInfo.value
@@ -665,6 +698,7 @@ class AssistantDataProvider(
         const val RANK_WINDOW_MS = 3 * 24 * 60 * 60 * 1000L
         const val RANK_TOP = 8
         const val SIGNAL_TOP = 8
+        const val REPORT_SIGNAL = 15
         const val SENSOR_LIMIT = 12
         const val REPORT_LIMIT = 40
         const val MAX_TOOL_LIST = 40
