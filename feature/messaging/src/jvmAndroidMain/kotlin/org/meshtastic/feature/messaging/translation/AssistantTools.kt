@@ -95,7 +95,7 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
                 "The data is not available right now."
             }
         val result = text.take(MAX_RESULT_CHARS).stripUnsafeChars()
-        Logger.i(tag = TAG) { "Tool $name result: ${result.take(LOG_CHARS).replace('\n', ' | ')}" }
+        Logger.i(tag = TAG) { "Tool $name result: ${result.take(LOG_CHARS).replace("\n", " | ")}" }
         return result
     }
 
