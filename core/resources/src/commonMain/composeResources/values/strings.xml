@@ -954,8 +954,19 @@
     <string name="i_agree">I agree.</string>
     <string name="i_agree_to_share_my_location">I have read and understand the above. I voluntarily consent to the unencrypted transmission of my node data via MQTT</string>
     <string name="i_know_what_i_m_doing">I know what I'm doing.</string>
+    <!-- IAQ -->
     <string name="iaq">IAQ</string>
     <string name="iaq_definition">(Indoor Air Quality) relative scale IAQ value as measured by Bosch BME680. Value Range 0–500.</string>
+    <string name="iaq_level_dangerously_polluted">Dangerously Polluted</string>
+    <string name="iaq_level_excellent">Excellent</string>
+    <string name="iaq_level_extremely_polluted">Extremely Polluted</string>
+    <string name="iaq_level_good">Good</string>
+    <string name="iaq_level_heavily_polluted">Heavily Polluted</string>
+    <string name="iaq_level_lightly_polluted">Lightly Polluted</string>
+    <string name="iaq_level_moderately_polluted">Moderately Polluted</string>
+    <string name="iaq_level_range">%1$s (%2$d-%3$d)</string>
+    <string name="iaq_level_range_open">%1$s (%2$d+)</string>
+    <string name="iaq_level_severely_polluted">Severely Polluted</string>
     <string name="iaq_value">IAQ %1$d</string>
     <string name="icon_meanings">Icon Meanings</string>
     <string name="ignore">Ignore</string>
@@ -1288,7 +1299,7 @@
     <string name="mesh_beacon_preset_indicator">Advertised by a nearby beacon</string>
     <string name="mesh_beacon_preset_none">None</string>
     <string name="mesh_beacon_region_label">Region</string>
-    <string name="mesh_beacon_region_required">Set your radio's region before setting up a beacon.</string>
+    <string name="mesh_beacon_region_required">Set your node's region before setting up a beacon.</string>
     <string name="mesh_beacon_send_as_node">Transmit as node number (0 = this node)</string>
     <string name="mesh_beacon_target">Target %1$d</string>
     <string name="mesh_beacon_target_add">Add target</string>
@@ -1338,6 +1349,13 @@
     <string name="mesh_hud_thermal_hot">Phone is hot. Updating less often.</string>
     <string name="mesh_hud_tilt_down">Tilt down %1$d°</string>
     <string name="mesh_hud_tilt_up">Tilt up %1$d°</string>
+    <string name="mesh_hud_track_empty">No positions in the track window</string>
+    <string name="mesh_hud_track_newest">%1$s · newest %2$s</string>
+    <plurals name="mesh_hud_track_points">
+        <item quantity="one">%1$d point</item>
+        <item quantity="other">%1$d points</item>
+    </plurals>
+    <string name="mesh_hud_track_summary">%1$s over %2$s · newest %3$s</string>
     <string name="mesh_hud_turn_left">Turn left %1$d°</string>
     <string name="mesh_hud_turn_right">Turn right %1$d°</string>
     <string name="mesh_hud_waiting_sensor">Waiting for the orientation sensor</string>

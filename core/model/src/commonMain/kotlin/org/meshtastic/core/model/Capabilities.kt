@@ -152,10 +152,15 @@ data class Capabilities(val firmwareVersion: String?, internal val forceEnableAl
     fun supportsRegion(region: RegionInfo): Boolean = region.minFirmware?.let { atLeast(it) } ?: true
 
     /**
-     * Whether this firmware's preset table contains [preset] ([ChannelOption.minFirmware]); older firmware silently
-     * falls back to LONG_FAST when sent an unknown preset, so the picker hides it.
+     * Whether this firmware's preset table contains [preset], from [ChannelOption.minFirmware] and
+     * [ChannelOption.removedInFirmware]. Firmware silently falls back to LONG_FAST when sent a preset its table lacks,
+     * so the picker hides it.
      */
-    fun supportsPreset(preset: ChannelOption): Boolean = preset.minFirmware?.let { atLeast(it) } ?: true
+    fun supportsPreset(preset: ChannelOption): Boolean {
+        val arrived = preset.minFirmware?.let { atLeast(it) } ?: true
+        val removed = preset.removedInFirmware?.let { !forceEnableAll && version != null && version >= it } ?: false
+        return arrived && !removed
+    }
 
     /**
      * Support for deriving nodeNum from the X25519 public key (nodeNum = crc32(public_key)). This is what makes a
