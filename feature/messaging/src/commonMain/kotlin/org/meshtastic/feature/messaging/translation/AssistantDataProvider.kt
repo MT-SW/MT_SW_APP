@@ -360,7 +360,7 @@ class AssistantDataProvider(
 
     private companion object {
         const val TAG = "AssistantData"
-        const val MAX_CONTEXT_CHARS = 3800
+        const val MAX_CONTEXT_CHARS = 3000
         const val MIN_PART = 250
         const val MIN_NAME = 3
         const val RANK_WINDOW_MS = 3 * 24 * 60 * 60 * 1000L

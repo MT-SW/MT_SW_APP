@@ -42,29 +42,92 @@ class LlamaAssistantService(
         combine(store.states, uiPrefs.assistantModelId) { states, selected -> activeId(states, selected) != null }
             .stateIn(scope, SharingStarted.Eagerly, false)
 
+    // Rolling memory: older turns are folded into a short summary so a conversation can go on without end while the
+    // prompt stays inside the model's window.
+    private var memoryKey = ""
+    private var memory = ""
+    private var memorized = 0
+
     override suspend fun reply(history: List<AssistantTurn>, onPiece: (String) -> Unit): String {
         val modelId = activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
         val question = history.lastOrNull { it.fromUser }?.text.orEmpty()
+        val recent = fit(modelId, history)
         return try {
-            ask(modelId, trimmed(history, MAX_HISTORY_CHARS), data.contextFor(question), onPiece)
+            ask(modelId, recent, memory, data.contextFor(question), onPiece)
         } catch (e: kotlinx.coroutines.CancellationException) {
             throw e
         } catch (e: Exception) {
             // The model only takes about 4000 tokens at once: try again with a much shorter prompt.
             if (e.message?.contains("too long", ignoreCase = true) != true) throw e
-            val short = history.takeLast(1)
-            ask(modelId, short, data.contextFor(question, SHORT_CONTEXT_CHARS), onPiece)
+            ask(modelId, recent.takeLast(1), "", data.contextFor(question, SHORT_CONTEXT_CHARS), onPiece)
         }
+    }
+
+    /** Returns the newest turns that fit and, when older ones were dropped, updates [memory] with their summary. */
+    private suspend fun fit(modelId: String, history: List<AssistantTurn>): List<AssistantTurn> {
+        val turns = history.filterNot { it.text.isBlank() && !it.fromUser }.map { it.copy(text = it.text.take(MAX_TURN_CHARS)) }
+        val key = turns.firstOrNull()?.text.orEmpty()
+        if (key != memoryKey) {
+            memoryKey = key
+            memory = ""
+            memorized = 0
+        }
+        var budget = RECENT_CHARS
+        var start = turns.size
+        while (start > 0) {
+            val len = turns[start - 1].text.length
+            if (start < turns.size && budget - len < 0) break
+            budget -= len
+            start--
+        }
+        // A conversation window starts with a question, never with an answer.
+        if (start in 1 until turns.size - 1 && !turns[start].fromUser) start++
+        if (memorized > start) {
+            memory = ""
+            memorized = 0
+        }
+        if (start > memorized) {
+            val added = turns.subList(memorized, start)
+            val summary = summarize(modelId, memory, added)
+            if (summary != null) {
+                memory = summary
+                memorized = start
+            }
+        }
+        return turns.subList(start, turns.size)
+    }
+
+    private suspend fun summarize(modelId: String, previous: String, added: List<AssistantTurn>): String? = try {
+        val text =
+            added.joinToString("\n") { (if (it.fromUser) "User: " else "Assistant: ") + it.text.take(SUMMARY_TURN_CHARS) }
+                .takeLast(SUMMARY_INPUT_CHARS)
+        val prompt =
+            "Below are the summary of an earlier conversation and new messages. Write one updated summary of the " +
+                "whole conversation in at most 6 short sentences, in the language of the conversation. Keep names, " +
+                "numbers, node names and what the user wants. Output only the summary.\n\n" +
+                "Earlier summary: ${previous.ifBlank { "(none)" }}\n\nNew messages:\n$text"
+        engine.chat(modelId, listOf("user" to prompt), SUMMARY_TOKENS, SUMMARY_TEMPERATURE).trim().take(MAX_SUMMARY_CHARS)
+            .takeIf { it.isNotBlank() }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        null
     }
 
     private suspend fun ask(
         modelId: String,
         turns: List<AssistantTurn>,
+        summary: String,
         context: String,
         onPiece: (String) -> Unit,
     ): String {
+        val system = buildString {
+            append(SYSTEM_PROMPT)
+            if (summary.isNotBlank()) append("\n\nSummary of the earlier part of this conversation: ").append(summary)
+            if (context.isNotBlank()) append("\n\n").append(DATA_INTRO).append('\n').append(context)
+        }
         val messages = buildList {
-            add("system" to if (context.isBlank()) SYSTEM_PROMPT else "$SYSTEM_PROMPT\n\n$DATA_INTRO\n$context")
+            add("system" to system)
             turns.forEach { add((if (it.fromUser) "user" else "assistant") to it.text) }
         }
         return engine.chat(
@@ -76,19 +139,6 @@ class LlamaAssistantService(
         )
     }
 
-    /** Keeps the newest turns that fit the model's memory of the conversation (the oldest are dropped). */
-    private fun trimmed(history: List<AssistantTurn>, limit: Int): List<AssistantTurn> {
-        var budget = limit
-        val kept = ArrayList<AssistantTurn>()
-        for (turn in history.asReversed()) {
-            if (turn.text.isBlank() && !turn.fromUser) continue
-            budget -= turn.text.length
-            if (budget < 0 && kept.isNotEmpty()) break
-            kept.add(turn)
-        }
-        return kept.asReversed()
-    }
-
     private fun activeId(states: Map<String, TranslatorModelState>, selected: String): String? {
         val chosen = AiModels.byId(selected)?.takeIf { it.canDo(AiRole.ASSISTANT) && it.engineReady }
         if (chosen != null && states[chosen.id] == TranslatorModelState.Ready) return chosen.id
@@ -98,9 +148,15 @@ class LlamaAssistantService(
     }
 
     private companion object {
-        const val MAX_ANSWER_TOKENS = 600
+        const val MAX_ANSWER_TOKENS = 0 // no limit: the model finishes by itself
         const val TEMPERATURE = 0.3f
-        const val MAX_HISTORY_CHARS = 2000
+        const val RECENT_CHARS = 1500
+        const val MAX_TURN_CHARS = 1500
+        const val SUMMARY_TURN_CHARS = 500
+        const val SUMMARY_INPUT_CHARS = 2500
+        const val MAX_SUMMARY_CHARS = 700
+        const val SUMMARY_TOKENS = 250
+        const val SUMMARY_TEMPERATURE = 0.2f
         const val SHORT_CONTEXT_CHARS = 1500
         const val DATA_INTRO =
             "Below is live read-only data from the user's app and radio. Use it to answer questions about their " +
