@@ -61,7 +61,11 @@ class AssistantDataProvider(
         }
         if (network) parts += safe("network") { networkSummary() }
         if (q.hasAny(SETTINGS_WORDS)) parts += safe("settings") { settings() }
-        if (q.hasAny(MESSAGE_WORDS)) parts += safe("messages") { messages() }
+        if (q.hasAny(SUMMARY_WORDS)) {
+            parts += safe("channel") { toolChannelMessages(channelFromQuestion(q), SUMMARY_MESSAGES) }
+        } else if (q.hasAny(MESSAGE_WORDS)) {
+            parts += safe("messages") { messages() }
+        }
         parts += safe("index") { nodeIndex() }
         // When the question has its own topic, the general overview shrinks so the topic data fits in the small window.
         if (parts.size > 2) parts[0] = parts[0].take(OVERVIEW_SHORT)
@@ -469,6 +473,42 @@ class AssistantDataProvider(
             }
     }
 
+    /**
+     * The latest messages of one channel in the order they were written, ready to be summarised. [channel] is the
+     * channel name (or its number); empty means every channel. Direct messages are not included.
+     */
+    suspend fun toolChannelMessages(channel: String, limit: Int): String {
+        val top = limit.coerceIn(1, MAX_TOOL_LIST)
+        val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
+        val wanted = channel.trim().lowercase()
+        val index = wanted.toIntOrNull() ?: names.indexOfFirst { it.lowercase() == wanted }.takeIf { it >= 0 }
+            ?: names.indexOfFirst { wanted.isNotEmpty() && it.lowercase().contains(wanted) }.takeIf { it >= 0 }
+        val keys = packetRepository.getContacts().first().keys.filter { it.endsWith("^all") && (wanted.isEmpty() || index == null || it.startsWith(index.toString() + "^")) }
+        if (keys.isEmpty()) {
+            return "No channel conversation found for \"$channel\". Channels: " +
+                names.mapIndexed { i, n -> "$i=${n.ifBlank { "(default)" }}" }.joinToString()
+        }
+        val all = ArrayList<Triple<Long, String, String>>()
+        for (key in keys) {
+            val chName = key.substringBefore('^').toIntOrNull()?.let { names.getOrNull(it)?.ifBlank { "(default)" } } ?: key
+            val list = packetRepository.getMessagesFrom(key, top) { id -> nodeRepository.getNode(id.orEmpty()) }.first()
+            for (m in list) {
+                val who = if (m.fromLocal) "me" else m.node.user.long_name.ifBlank { m.node.user.short_name }
+                all += Triple(m.receivedTime, chName, "$who: ${m.text.take(MESSAGE_CHARS)}")
+            }
+        }
+        if (all.isEmpty()) return "No messages in this channel yet."
+        val now = nowMillis
+        return "CHANNEL MESSAGES (oldest first, last ${minOf(top, all.size)}):\n" +
+            all.sortedByDescending { it.first }.take(top).sortedBy { it.first }.joinToString("\n") {
+                "- [${it.second}] ${((now - it.first) / MILLIS_PER_MINUTE).coerceAtLeast(0)} min ago, ${it.third}"
+            }
+    }
+
+    /** A channel name mentioned in the question, or empty (then all channels are read). */
+    private suspend fun channelFromQuestion(q: String): String =
+        radioConfigRepository.channelSetFlow.first().settings.map { it.name }.firstOrNull { it.length >= MIN_NAME && q.contains(it.lowercase()) }.orEmpty()
+
     private fun findNode(name: String): org.meshtastic.core.model.Node? {
         val q = name.trim().lowercase()
         if (q.isEmpty()) return null
@@ -491,6 +531,7 @@ class AssistantDataProvider(
         const val TAG = "AssistantData"
         const val MAX_CONTEXT_CHARS = 3000
         const val MIN_PART = 250
+        const val SUMMARY_MESSAGES = 20
         const val OVERVIEW_SHORT = 380
         const val MIN_NAME = 3
         const val RANK_WINDOW_MS = 3 * 24 * 60 * 60 * 1000L
@@ -532,6 +573,7 @@ class AssistantDataProvider(
         val SIGNAL_WORDS = listOf("zasięg", "zasieg", "sygnał", "sygnal", "snr", "rssi", "odległ", "odleg", "daleko", "dystans", "blisk", "najbliż", "najbliz", "jakość", "jakosc", "range", "signal", "distance", "linku", "łącz", "polacz")
         val RANK_WORDS = listOf("ramek", "ramki", "pakiet", "odebran", "raportuj", "najwięc", "najwiec", "najmniej", "ranking", "który", "ktory", "najlep", "najgorz")
         val OWN_WORDS = listOf("mój", "moj", "mojego", "mojej", "mojemu", "my node", "own node", "mój węz", "moim")
+        val SUMMARY_WORDS = listOf("streść", "streszcz", "podsumuj", "podsumowa", "summar", "o czym", "co pisz", "co się dzieje na", "co sie dzieje na")
         val MESSAGE_WORDS = listOf("wiadomo", "message", "czat", "chat", "napisa", "pisa", "rozmow", "odpowied")
     }
 }
