@@ -150,6 +150,11 @@ interface UiPrefs {
 
     fun setAutoLoadChatImages(value: Boolean)
 
+    /** Whether the optional offline translator is switched on. Off by default: it needs a large model and lots of RAM. */
+    val translatorEnabled: StateFlow<Boolean>
+
+    fun setTranslatorEnabled(value: Boolean)
+
     val hasShownNotPairedWarning: StateFlow<Boolean>
 
     fun setHasShownNotPairedWarning(shown: Boolean)

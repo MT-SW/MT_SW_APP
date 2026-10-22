@@ -15,7 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-plugins { alias(libs.plugins.meshtastic.kmp.feature) }
+plugins {
+    alias(libs.plugins.meshtastic.kmp.feature)
+    alias(libs.plugins.meshtastic.kotlinx.serialization)
+    alias(libs.plugins.meshtastic.kmp.jvm.android)
+}
 
 kotlin {
     // No withHostTest: commonTest holds Compose UI tests, which NPE on the host-test stubs' null Build.FINGERPRINT.
@@ -42,13 +46,24 @@ kotlin {
             implementation(libs.jetbrains.compose.material3.adaptive.navigation3)
         }
 
+        // The offline translator runs the same ONNX Runtime API on Android and on desktop; only the native build differs.
+        // compileOnly here lets the shared code compile; each platform brings its own runtime below.
+        getByName("jvmAndroidMain") {
+            dependencies {
+                implementation(libs.kotlinx.serialization.json)
+                compileOnly(libs.onnxruntime)
+            }
+        }
+
         androidMain.dependencies {
+            implementation(libs.onnxruntime.android)
             implementation(libs.androidx.work.runtime.ktx)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.okhttp)
         }
 
         jvmMain.dependencies {
+            implementation(libs.onnxruntime)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.okhttp)
         }

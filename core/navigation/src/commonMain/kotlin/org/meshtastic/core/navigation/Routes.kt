@@ -50,6 +50,8 @@ sealed interface ContactsRoute : Route {
     @Serializable data class Share(val message: String) : ContactsRoute
 
     @Serializable data object QuickChat : ContactsRoute
+
+    @Serializable data object Translator : ContactsRoute
 }
 
 @Serializable

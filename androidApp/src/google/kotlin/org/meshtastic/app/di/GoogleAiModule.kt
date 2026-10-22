@@ -25,8 +25,9 @@ import org.koin.core.annotation.Single
 import org.meshtastic.app.ai.GeminiNanoDocAssistant
 import org.meshtastic.app.discovery.GeminiNanoSummaryProvider
 import org.meshtastic.app.translation.MlKitDocTranslator
-import org.meshtastic.app.translation.MlKitMessageTranslator
 import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.repository.TranslatorModelManager
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.feature.discovery.DiscoverySummaryGenerator
 import org.meshtastic.feature.discovery.ai.DiscoverySummaryAiProvider
 import org.meshtastic.feature.docs.ai.AIDocAssistant
@@ -35,6 +36,8 @@ import org.meshtastic.feature.docs.data.KeywordSearchEngine
 import org.meshtastic.feature.docs.translation.DocTranslationCache
 import org.meshtastic.feature.docs.translation.DocTranslationService
 import org.meshtastic.feature.messaging.translation.MessageTranslationService
+import org.meshtastic.feature.messaging.translation.NllbTranslator
+import java.io.File
 
 // TODO: Enable Firebase App Check (with Play Integrity provider) if hybrid/cloud
 //  fallback is ever adopted. App Check only gates cloud proxy requests — on-device
@@ -61,5 +64,11 @@ class GoogleAiModule {
 
     @Single fun docTranslationService(cache: DocTranslationCache): DocTranslationService = MlKitDocTranslator(cache)
 
-    @Single fun messageTranslationService(): MessageTranslationService = MlKitMessageTranslator()
+    @Single
+    fun nllbTranslator(context: Context, uiPrefs: UiPrefs): NllbTranslator =
+        NllbTranslator(File(context.filesDir, "translator"), uiPrefs)
+
+    @Single fun messageTranslationService(translator: NllbTranslator): MessageTranslationService = translator
+
+    @Single fun translatorModelManager(translator: NllbTranslator): TranslatorModelManager = translator
 }
