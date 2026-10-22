@@ -131,7 +131,7 @@ internal data class HostMetricsChartData(
     val load15: List<HostMetricsChartPoint> = emptyList(),
     val freeMemoryMb: List<HostMetricsChartPoint> = emptyList(),
     val cpuPercent: List<HostMetricsChartPoint> = emptyList(),
-    val heapFreePercent: List<HostMetricsChartPoint> = emptyList(),
+    val heapUsedPercent: List<HostMetricsChartPoint> = emptyList(),
     val flashUsedPercent: List<HostMetricsChartPoint> = emptyList(),
     val psramFreePercent: List<HostMetricsChartPoint> = emptyList(),
 ) {
@@ -174,12 +174,12 @@ internal fun buildHostMetricsChartData(data: List<Telemetry>): HostMetricsChartD
             HostMetricsChartPoint(time = telemetry.time, value = it.toDouble())
         }
     },
-    heapFreePercent =
+    heapUsedPercent =
     data.mapNotNull { telemetry ->
         val total = telemetry.local_stats?.heap_total_bytes ?: 0
         val free = telemetry.local_stats?.heap_free_bytes ?: 0
         if (total > 0) {
-            HostMetricsChartPoint(time = telemetry.time, value = free.toDouble() / total * PERCENT_MULTIPLIER)
+            HostMetricsChartPoint(time = telemetry.time, value = (total - free).coerceAtLeast(0).toDouble() / total * PERCENT_MULTIPLIER)
         } else {
             null
         }
@@ -242,7 +242,7 @@ internal fun HostMetricsChart(
         val load15Data = chartData.load15
         val memData = chartData.freeMemoryMb
         val cpuData = chartData.cpuPercent
-        val heapData = chartData.heapFreePercent
+        val heapData = chartData.heapUsedPercent
         val flashData = chartData.flashUsedPercent
         val psramData = chartData.psramFreePercent
         val hasResources =

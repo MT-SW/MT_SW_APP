@@ -1252,7 +1252,7 @@ class MeshNotificationManagerImpl(
                     ": " +
                     getStringSuspend(
                         Res.string.local_stats_heap_value_kb,
-                        NumberFormatter.format(heap_free_bytes / BYTES_PER_KB, 2),
+                        NumberFormatter.format((heap_total_bytes - heap_free_bytes).coerceAtLeast(0) / BYTES_PER_KB, 2),
                         NumberFormatter.format(heap_total_bytes / BYTES_PER_KB, 2),
                     ),
             )

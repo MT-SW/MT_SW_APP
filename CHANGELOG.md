@@ -19,6 +19,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 ### Październik 2026
 
 * Asystent: kanał rozpoznawany też po numerze („kanał 1”, „kanał jeden”), więc streszczenie dotyczy właściwego kanału; liczba wiadomości na kanałach jest dostępna dla modelu jako narzędzie.
+* Pamięć heap jest wszędzie pokazywana jako **zajęta** (a nie wolna): lista węzłów, wykresy zasobów, zdrowie sieci, widżet, powiadomienie, podgląd pakietów, zapis zdalny i asystent. Np. 10% wolnego to teraz 90% zajętego.
 * Asystent: dane z czujników i zasięgu trafiają do modelu w czytelnej, ułożonej postaci (z jednostkami, pominięte niemożliwe wartości); zawsze odpowiada model, nic nie jest odpowiadane na sztywno.
 * Asystent: odczyty czujników, które nie mogą być prawdziwe (np. temperatura 25252 °C), są oznaczane jako „prawdopodobnie uszkodzony czujnik”, a odpowiedź, która zaczyna się powtarzać w kółko, jest przerywana po pierwszym razie.
 **Scalenie z oryginałem — wersja 2.8.4 (początek)**
@@ -367,6 +368,7 @@ The entries below describe only what this fork adds on top of the original, from
 ### October 2026
 
 * Assistant: channels are also recognised by number ("channel 1", "channel one"), so a summary covers the right channel; message counts per channel are available to the model as a tool.
+* Heap memory is now shown as **used** (not free) everywhere: node list, resource charts, network health, widget, notification, packet view, on-demand log and the assistant. E.g. 10% free now shows as 90% used.
 * Assistant: sensor and range data reach the model in a clean, laid-out form (with units, impossible values left out); the model always answers, nothing is answered by fixed code.
 * Assistant: sensor readings that cannot be real (e.g. 25252 °C) are marked as "probably a faulty sensor", and an answer that starts repeating itself is cut after the first occurrence.
 

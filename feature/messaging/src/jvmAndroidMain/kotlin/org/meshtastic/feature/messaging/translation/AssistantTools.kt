@@ -49,7 +49,7 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
     @Tool(
         description =
         "Ranked table of nodes. sort_by is one of: rx (packets received), tx (packets sent), dupe (duplicates), bad " +
-            "(bad packets), heap (free memory, lowest first), battery (lowest first), channel_util, uptime, snr " +
+            "(bad packets), heap (used memory in percent, highest first), battery (lowest first), channel_util, uptime, snr " +
             "(best link first), rssi, distance (farthest first), closest (nearest first), hops.",
     )
     fun rank_nodes(

@@ -89,7 +89,6 @@ import org.meshtastic.core.resources.on_demand_flash
 import org.meshtastic.core.resources.on_demand_flood_counter
 import org.meshtastic.core.resources.on_demand_fw_plus_version
 import org.meshtastic.core.resources.on_demand_fw_plus_version_desc
-import org.meshtastic.core.resources.on_demand_heap_free
 import org.meshtastic.core.resources.on_demand_heap_total
 import org.meshtastic.core.resources.on_demand_heap_used
 import org.meshtastic.core.resources.on_demand_hero_hint
@@ -1249,7 +1248,9 @@ internal fun nodeStatsRows(stats: NodeStats): List<Pair<StringResource, String>>
     stats.num_online_nodes?.let { add(Res.string.on_demand_stat_nodes_online to "$it") }
     stats.num_total_nodes?.let { add(Res.string.on_demand_stat_nodes_total to "$it") }
     stats.reboots?.let { add(Res.string.on_demand_reboots to "$it") }
-    stats.memory_free_cheap?.let { add(Res.string.on_demand_heap_free to formatByteSize(it.toLong())) }
+    stats.memory_free_cheap?.let { free ->
+        stats.memory_total?.let { total -> add(Res.string.on_demand_heap_used to formatByteSize((total - free).coerceAtLeast(0).toLong())) }
+    }
     stats.memory_total?.let { add(Res.string.on_demand_heap_total to formatByteSize(it.toLong())) }
     stats.cpu_usage_percent?.let { add(Res.string.on_demand_cpu_usage to "$it%") }
     if (stats.flash_used_bytes != null || stats.flash_total_bytes != null) {

@@ -260,7 +260,7 @@ private fun trafficChips(stats: NodeExtraStats?): List<ExtraChip> = buildList {
 
 private fun resourceChips(stats: NodeExtraStats?): List<ExtraChip> = buildList {
     stats?.cpuPercent?.let { add(ExtraChip({ MeshtasticIcons.Memory }, "CPU", "$it%")) }
-    stats?.heapFreePercent?.ok()?.let {
+    stats?.heapUsedPercent?.ok()?.let {
         add(ExtraChip({ MeshtasticIcons.DataUsage }, "RAM", MetricFormatter.percent(it, 0)))
     }
     stats?.flashUsedPercent?.ok()?.let {

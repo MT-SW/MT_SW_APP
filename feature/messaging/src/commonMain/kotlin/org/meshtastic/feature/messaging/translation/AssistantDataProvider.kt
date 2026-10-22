@@ -124,7 +124,7 @@ class AssistantDataProvider(
         if (entries.isEmpty()) return "TRENDS of $title: no history recorded."
         val series =
             listOf(
-                Triple("heap_free_percent (free internal RAM of the radio, higher is better)", "%", { s: Sample -> s.heapFree }),
+                Triple("heap_used_percent (used internal RAM of the radio, lower is better)", "%", { s: Sample -> s.heapUsed }),
                 Triple("psram_free_percent (free external PSRAM of the radio)", "%", { s: Sample -> s.psramFree }),
                 Triple("cpu_usage_percent (radio)", "%", { s: Sample -> s.cpu }),
                 Triple("flash_used_percent (radio)", "%", { s: Sample -> s.flashUsed }),
@@ -341,7 +341,7 @@ class AssistantDataProvider(
         var bad: Int? = null
         var dupe: Int? = null
         var uptime: Int? = null
-        var heapFree: Float? = null
+        var heapUsed: Float? = null
         var devTime = 0L
         var battery: Int? = null
         var chUtil: Float? = null
@@ -366,7 +366,7 @@ class AssistantDataProvider(
                     row.bad = ls.num_packets_rx_bad
                     row.dupe = ls.num_rx_dupe
                     row.uptime = ls.uptime_seconds
-                    row.heapFree = if ((ls.heap_total_bytes ?: 0) > 0) (ls.heap_free_bytes ?: 0).toFloat() / ls.heap_total_bytes!! * PERCENT else null
+                    row.heapUsed = if ((ls.heap_total_bytes ?: 0) > 0) ((ls.heap_total_bytes!! - (ls.heap_free_bytes ?: 0)).coerceAtLeast(0)).toFloat() / ls.heap_total_bytes!! * PERCENT else null
                 }
             }
             t.device_metrics?.let { dm ->
@@ -386,7 +386,7 @@ class AssistantDataProvider(
                 q.hasAny(listOf("wysł", "wysl", "nadan", " tx", "transmit", "sent")) -> Key("packets sent (tx)", true) { it.tx?.toFloat() }
                 q.hasAny(listOf("duplik", "dupe")) -> Key("duplicate packets received", true) { it.dupe?.toFloat() }
                 q.hasAny(listOf("błęd", "bled", "uszkodz", "bad ")) -> Key("bad packets received", true) { it.bad?.toFloat() }
-                q.hasAny(listOf("heap", "pamię", "pamie", " ram")) -> Key("free heap percent (lowest first)", false) { it.heapFree }
+                q.hasAny(listOf("heap", "pamię", "pamie", " ram")) -> Key("used heap percent (highest first)", true) { it.heapUsed }
                 q.hasAny(listOf("bateri", "battery")) -> Key("battery percent (lowest first)", false) { it.battery?.toFloat() }
                 q.hasAny(listOf("zajęt", "zajet", "kanał", "kanal", "channel", "utiliz")) -> Key("channel utilization percent", true) { it.chUtil }
                 q.hasAny(listOf("uptime", "działa od", "dziala od", "restart")) -> Key("uptime", true) { it.uptime?.toFloat() }
@@ -398,7 +398,7 @@ class AssistantDataProvider(
             val n = nodeRepository.nodeDBbyNum.value[r.num]
             val name = n?.let { "${it.user.short_name} (${it.user.long_name}), id ${it.user.id}" } ?: "!${r.num.toUInt().toString(HEX)}"
             return "- $name: rx=${r.rx ?: "?"}, tx=${r.tx ?: "?"}, bad=${r.bad ?: "?"}, dupe=${r.dupe ?: "?"}, " +
-                "heap_free=${r.heapFree?.let { fmt(it) } ?: "?"}%, battery=${r.battery ?: "?"}%, ch_util=${r.chUtil?.let { fmt(it) } ?: "?"}%, " +
+                "heap_used=${r.heapUsed?.let { fmt(it) } ?: "?"}%, battery=${r.battery ?: "?"}%, ch_util=${r.chUtil?.let { fmt(it) } ?: "?"}%, " +
                 "air_tx=${r.airUtil?.let { fmt(it) } ?: "?"}%, uptime=${r.uptime?.let { it / SECONDS_PER_HOUR } ?: "?"} h"
         }
         return buildString {
@@ -464,7 +464,7 @@ class AssistantDataProvider(
 
     private class Sample(
         val time: Long,
-        val heapFree: Float?,
+        val heapUsed: Float?,
         val psramFree: Float?,
         val cpu: Float?,
         val flashUsed: Float?,
@@ -482,7 +482,7 @@ class AssistantDataProvider(
         val heapFree = t.local_stats?.heap_free_bytes ?: 0
         return Sample(
             time = received_date,
-            heapFree = if (heapTotal > 0) heapFree.toFloat() / heapTotal * PERCENT else null,
+            heapUsed = if (heapTotal > 0) (heapTotal - heapFree).coerceAtLeast(0).toFloat() / heapTotal * PERCENT else null,
             psramFree = ext?.takeIf { it.memoryPsramTotal > 0 }?.let { it.memoryPsramFree.toFloat() / it.memoryPsramTotal * PERCENT },
             cpu = ext?.cpuUsagePercent?.toFloat(),
             flashUsed = ext?.takeIf { it.flashTotalBytes > 0 }?.let { it.flashUsedBytes.toFloat() / it.flashTotalBytes * PERCENT },

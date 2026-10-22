@@ -45,7 +45,7 @@ data class NodeExtraStats(
     val rxDupe: Int? = null,
     val txRelay: Int? = null,
     val cpuPercent: Int? = null,
-    val heapFreePercent: Float? = null,
+    val heapUsedPercent: Float? = null,
     val flashUsedPercent: Float? = null,
     val psramFreePercent: Float? = null,
     /** Wi-Fi signal of the node in dBm, exactly as the node sent it in its last packet. */
@@ -57,14 +57,14 @@ data class NodeExtraStats(
         get() = packetsTx != null || packetsRx != null || packetsRxBad != null || rxDupe != null || txRelay != null
 
     val hasResources: Boolean
-        get() = cpuPercent != null || heapFreePercent != null || flashUsedPercent != null || psramFreePercent != null || wifiRssi != null
+        get() = cpuPercent != null || heapUsedPercent != null || flashUsedPercent != null || psramFreePercent != null || wifiRssi != null
 
     /** Every reading a node can send is present, so older packets cannot add anything. */
     val isComplete: Boolean
         get() =
             packetsTx != null &&
                 cpuPercent != null &&
-                heapFreePercent != null &&
+                heapUsedPercent != null &&
                 flashUsedPercent != null &&
                 psramFreePercent != null &&
                 wifiRssi != null &&
@@ -78,7 +78,7 @@ data class NodeExtraStats(
         rxDupe = rxDupe ?: older.rxDupe,
         txRelay = txRelay ?: older.txRelay,
         cpuPercent = cpuPercent ?: older.cpuPercent,
-        heapFreePercent = heapFreePercent ?: older.heapFreePercent,
+        heapUsedPercent = heapUsedPercent ?: older.heapUsedPercent,
         flashUsedPercent = flashUsedPercent ?: older.flashUsedPercent,
         psramFreePercent = psramFreePercent ?: older.psramFreePercent,
         wifiRssi = wifiRssi ?: older.wifiRssi,
