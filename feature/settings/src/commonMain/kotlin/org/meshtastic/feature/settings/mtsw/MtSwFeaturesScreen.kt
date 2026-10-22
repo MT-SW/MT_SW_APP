@@ -58,6 +58,8 @@ import org.meshtastic.core.resources.mt_sw_other_lna_body
 import org.meshtastic.core.resources.mt_sw_other_lna_title
 import org.meshtastic.core.resources.mt_sw_other_polarity_body
 import org.meshtastic.core.resources.mt_sw_other_polarity_title
+import org.meshtastic.core.resources.mt_sw_other_remote_lists_body
+import org.meshtastic.core.resources.mt_sw_other_remote_lists_title
 import org.meshtastic.core.resources.mt_sw_other_summary
 import org.meshtastic.core.resources.mt_sw_other_title
 import org.meshtastic.core.resources.node_layout_section_title
@@ -214,6 +216,7 @@ fun MtSwOtherFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
             OtherFeature(Res.string.mt_sw_other_lna_title, Res.string.mt_sw_other_lna_body)
             OtherFeature(Res.string.mt_sw_other_polarity_title, Res.string.mt_sw_other_polarity_body)
             OtherFeature(Res.string.mt_sw_other_gpio_title, Res.string.mt_sw_other_gpio_body)
+            OtherFeature(Res.string.mt_sw_other_remote_lists_title, Res.string.mt_sw_other_remote_lists_body)
             OtherFeature(Res.string.mt_sw_other_calls_title, Res.string.mt_sw_other_calls_body)
             ExpressiveSection(title = stringResource(Res.string.mt_sw_other_full_doc)) {
                 ListItem(text = stringResource(Res.string.mt_sw_other_full_doc), leadingIcon = MeshtasticIcons.Info) {

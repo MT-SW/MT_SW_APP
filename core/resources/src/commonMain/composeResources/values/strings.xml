@@ -142,6 +142,8 @@
     <string name="mt_sw_other_polarity_body">For a sensor connected the wrong way round. In the node information window (the \"i\" icon) you can swap power with battery percentage and invert the sign of the current, separately for each node. This only changes how values are shown.</string>
     <string name="mt_sw_other_gpio_title">Remote GPIO</string>
     <string name="mt_sw_other_gpio_body">In the node details (Remote Hardware) you enter a pin number and switch it on, off or read it on a remote node over the mesh.</string>
+    <string name="mt_sw_other_remote_lists_title">Remote favorites and ignored</string>
+    <string name="mt_sw_other_remote_lists_body">In the node details (Administration → Lists and contacts on the remote device) you enter a node ID and add it to the favorites or ignored list on the remote device over the mesh. The app waits for a confirmation from the network, so you know the change arrived.</string>
     <string name="mt_sw_other_calls_title">On-demand diagnostics</string>
     <string name="mt_sw_other_calls_body">In the node details (Administration → On-demand diagnostics) you can ask any node in range for its current statistics instead of waiting for periodic broadcasts.</string>
     <string name="mt_sw_other_full_doc">Full description of MT_SW features</string>
