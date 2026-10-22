@@ -96,12 +96,34 @@ class AssistantViewModel(
                     throw e
                 } catch (e: Throwable) {
                     Logger.w(tag = "AssistantViewModel", throwable = e) { "Assistant failed: ${e.message}" }
-                    _state.update { it.copy(failed = true) }
+                    _state.update { st ->
+                        val last = st.lines.lastOrNull()
+                        if (last != null && !last.fromUser && last.text.isBlank() && st.lines.size >= 2) {
+                            // Nothing came back: take the question back so it can be sent again.
+                            st.copy(
+                                lines = st.lines.dropLast(2),
+                                input = if (st.input.isBlank()) question else st.input,
+                                failed = true,
+                            )
+                        } else {
+                            st.copy(failed = true)
+                        }
+                    }
                 } finally {
                     _state.update { it.copy(busy = false) }
                     withContext(NonCancellable) { persist() }
                 }
             }
+    }
+
+    /** Asks the same question again: [index] is a question or the answer under it; the answer is replaced. */
+    fun retry(index: Int) {
+        val st = _state.value
+        if (st.busy) return
+        val questionIndex = if (st.lines.getOrNull(index)?.fromUser == true) index else index - 1
+        val question = st.lines.getOrNull(questionIndex)?.takeIf { it.fromUser } ?: return
+        _state.update { it.copy(lines = it.lines.take(questionIndex), input = question.text, failed = false) }
+        send()
     }
 
     fun stop() {

@@ -42,25 +42,34 @@ class AssistantDataProvider(
 ) {
 
     /** A text with the data that is useful for answering [question], or an empty text when nothing matches. */
-    suspend fun contextFor(question: String): String {
+    suspend fun contextFor(question: String, maxChars: Int = MAX_CONTEXT_CHARS): String {
         val q = question.lowercase()
         val mentioned = mentionedNodes(q)
+        // Most useful parts first: the model only fits about 4000 tokens, so later parts are cut when space runs out.
         val parts = ArrayList<String>()
         parts += safe("overview") { overview() }
         for (node in mentioned) parts += safe("node") { nodeDetail(node) }
+        if (q.hasAny(SIGNAL_WORDS)) parts += safe("signal") { signalRanking(q) }
+        val network = q.hasAny(NODE_WORDS) || q.hasAny(TREND_WORDS) || q.hasAny(RANK_WORDS) || q.hasAny(SIGNAL_WORDS)
+        if (network && (q.hasAny(RANK_WORDS) || q.hasAny(TREND_WORDS) || !q.hasAny(SIGNAL_WORDS))) {
+            parts += safe("ranking") { ranking(q) }
+        }
         if (mentioned.isEmpty() && q.hasAny(TREND_WORDS)) {
             val myNum = nodeRepository.ourNodeInfo.value?.num
             if (myNum != null) parts += safe("trend") { trends(myNum, "own node", 0L) }
         }
+        if (network) parts += safe("network") { networkSummary() }
         if (q.hasAny(SETTINGS_WORDS)) parts += safe("settings") { settings() }
-        if (q.hasAny(SIGNAL_WORDS)) parts += safe("signal") { signalRanking(q) }
-        if (q.hasAny(NODE_WORDS) || q.hasAny(TREND_WORDS) || q.hasAny(RANK_WORDS) || q.hasAny(SIGNAL_WORDS)) {
-            parts += safe("ranking") { ranking(q) }
-            parts += safe("network") { networkSummary() }
-        }
-        parts += safe("index") { nodeIndex() }
         if (q.hasAny(MESSAGE_WORDS)) parts += safe("messages") { messages() }
-        return parts.filter { it.isNotBlank() }.joinToString("\n\n").take(MAX_CONTEXT_CHARS)
+        parts += safe("index") { nodeIndex() }
+        val out = StringBuilder()
+        for (part in parts.filter { it.isNotBlank() }) {
+            val room = maxChars - out.length
+            if (room < MIN_PART) break
+            if (out.isNotEmpty()) out.append("\n\n")
+            out.append(part.take(room - 2))
+        }
+        return out.toString()
     }
 
     /** Nodes whose long or short name appears in the question (the own node counts for words like "mój"). */
@@ -351,23 +360,24 @@ class AssistantDataProvider(
 
     private companion object {
         const val TAG = "AssistantData"
-        const val MAX_CONTEXT_CHARS = 8000
+        const val MAX_CONTEXT_CHARS = 3800
+        const val MIN_PART = 250
         const val MIN_NAME = 3
         const val RANK_WINDOW_MS = 3 * 24 * 60 * 60 * 1000L
-        const val RANK_TOP = 12
-        const val SIGNAL_TOP = 12
+        const val RANK_TOP = 8
+        const val SIGNAL_TOP = 8
         const val METERS_PER_KM = 1000f
-        const val RANK_BOTTOM = 4
+        const val RANK_BOTTOM = 3
         const val HEX = 16
         const val SECONDS_PER_HOUR = 3600
         const val MAX_NODES_DETAIL = 2
         const val ONE_DAY_S = 86_400L
         const val LOW_BATTERY = 20
         const val HW_LIMIT = 6
-        const val INDEX_CHARS = 2200
+        const val INDEX_CHARS = 700
         const val MINUTES_PER_HOUR = 60L
         const val MINUTES_PER_DAY = 1440L
-        const val SETTINGS_CHARS = 1800
+        const val SETTINGS_CHARS = 1000
         const val CHAT_LIMIT = 8
         const val MESSAGE_CHARS = 120
         const val PERCENT = 100f
