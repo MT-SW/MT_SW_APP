@@ -100,6 +100,7 @@ import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
+import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
 import org.meshtastic.core.ui.theme.isMonochromeMode
 import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.util.LocalDiscoveryMapProvider
@@ -296,7 +297,7 @@ private fun ApplicationScope.ThemeAndLocaleProvider(uiViewModel: UIViewModel) {
 
     val isDarkTheme =
         when (themePref) {
-            1 -> false
+            1, MODE_MONO_LIGHT -> false
             2, MODE_MONO_DARK -> true
             else -> isSystemInDarkTheme()
         }

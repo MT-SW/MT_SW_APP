@@ -120,19 +120,20 @@ The debug panel (Settings → Advanced → Debug Panel) has an extra tab in this
 
 ## Offline translator and assistant
 
-The app has two optional AI features that run **entirely on your device, without internet**: a translator and an assistant. Both are **off by default** and are switched on separately in Settings → MT_SW features → "Offline translator and assistant". You can have only the translator, only the assistant, or both.
+The app has two optional AI features that run **entirely on your device, without internet**: a translator and an assistant. Both are **off by default** and are switched on separately in Settings → Advanced → MT_SW features (at the very top, above the firmware update) → "Offline translator and assistant". You can have only the translator, only the assistant, or both.
 
 **Privacy.** Everything is processed locally. Once a model is downloaded, no texts or conversations are sent to the internet. The internet is only needed for the one-time model download.
 
-**Models.** There are three levels. You can keep several downloaded at once, download and delete each one separately, and in separate lists choose which downloaded model the translator uses and which one the assistant uses. Only one model is in memory at a time.
+**Models.** There are four models in three levels. Gemma 4 runs on Google's LiteRT-LM engine and uses the graphics chip (GPU) when the device supports it; otherwise the processor does the work. You can keep several downloaded at once, download and delete each one separately, and in separate lists choose which downloaded model the translator uses and which one the assistant uses. Only one model is in memory at a time.
 
 - **Light — NLLB-200 600M.** Translator only. Download about 870 MB, RAM about 2.3 GB, a phone with at least 4 GB of RAM is recommended.
-- **Standard — Gemma 3 4B.** Translator and assistant. Download about 2.5 GB, RAM about 5 GB, a phone with at least 8 GB of RAM. It translates with a plain instruction and leaves proper names, numbers and addresses as they are.
-- **Strong — Gemma 3 12B.** Translator and assistant, best quality. Download about 7.3 GB, RAM about 10 GB, a device with at least 16 GB of RAM.
+- **Light — Gemma 4 E2B.** Translator and assistant in one file. Download about 2.6 GB, RAM about 3.5 GB, a phone with at least 6 GB of RAM.
+- **Standard — Gemma 4 E4B.** Translator and assistant, better quality. Download about 3.7 GB, RAM about 5 GB, a device with at least 8 GB of RAM. It leaves proper names, numbers and addresses as they are.
+- **Strong — Gemma 4 12B.** Translator and assistant, the best assistant answers. Download about 6.9 GB, RAM about 9.5 GB, a device with at least 16 GB of RAM.
 
 On weaker devices large models can slow the app down or close it, which is why every model lists its sizes and recommended memory.
 
-**Tab in the bottom bar.** When either mode is on, a "Translator" tab appears in the bottom bar. When the assistant is on too, the tab is called "AI" and has a sparkles icon, with two separate tabs inside: translator and assistant. The assistant works only on this tab; channels and private messages only have the translator. The assistant needs the Standard or Strong model; the Light model only translates.
+**Tab in the bottom bar.** When either mode is on, a "Translator" tab appears in the bottom bar. When the assistant is on too, the tab is called "AI" and has a sparkles icon, with two separate tabs inside: translator and assistant. The assistant works only on this tab; channels and private messages only have the translator. The assistant needs a Gemma 4 model; NLLB only translates.
 
 **How the assistant works.** You type a question and the answer appears as it is written; the "Stop" button interrupts it at any time and "New conversation" starts over. The first answer (and the first translation) takes longer because the model is loaded into memory. Answers may be wrong — check important things. Conversations are saved **only on this device** and are never sent anywhere. The clock icon in the corner opens the history: tap a conversation to continue it, or delete it. "New conversation" starts from scratch and the previous one stays in the history.
 
@@ -147,7 +148,7 @@ On weaker devices large models can slow the app down or close it, which is why e
 **Model licences.** The models are not part of the app: you download them from the internet and use them at your own responsibility, under their licences.
 
 - NLLB-200 (Meta) is released under **CC BY-NC 4.0**, which means **non-commercial use only**.
-- Gemma 3 (Google) is released under the **Gemma Terms of Use** with the Prohibited Use Policy (ai.google.dev/gemma/terms). By using it you accept those terms.
+- Gemma 4 (Google) is released under the **Apache 2.0** licence.
 - Model answers can be wrong or invented. Do not base safety decisions on them.
 
 ## Node list and database

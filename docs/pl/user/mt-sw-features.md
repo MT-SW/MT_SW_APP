@@ -120,19 +120,20 @@ Panel debugowania (Ustawienia → Zaawansowane → Panel debugowania) ma w tej a
 
 ## Tłumacz i asystent offline
 
-Aplikacja ma dwie opcjonalne funkcje AI, które działają **w całości na Twoim urządzeniu, bez internetu**: tłumacz i asystent. Obie są **domyślnie wyłączone** i włączasz je osobno, w Ustawienia → Funkcje MT_SW → „Tłumacz i asystent offline”. Możesz mieć włączonego tylko tłumacza, tylko asystenta albo oba.
+Aplikacja ma dwie opcjonalne funkcje AI, które działają **w całości na Twoim urządzeniu, bez internetu**: tłumacz i asystent. Obie są **domyślnie wyłączone** i włączasz je osobno, w Ustawienia → Zaawansowane → Funkcje MT_SW (na samej górze, nad aktualizacją oprogramowania) → „Tłumacz i asystent offline”. Możesz mieć włączonego tylko tłumacza, tylko asystenta albo oba.
 
 **Prywatność.** Wszystko jest przetwarzane lokalnie. Po pobraniu modelu żadne teksty ani rozmowy nie są wysyłane do internetu. Internet jest potrzebny tylko do jednorazowego pobrania modelu.
 
-**Modele.** Na liście są trzy poziomy. Możesz mieć pobranych kilka naraz, każdy pobierasz i usuwasz osobno, a w osobnych listach wybierasz, który z pobranych modeli jest używany przez tłumacza i który przez asystenta. W pamięci jest zawsze tylko jeden model naraz.
+**Modele.** Na liście są cztery modele w trzech poziomach. Gemma 4 działa na silniku Google LiteRT-LM i używa układu graficznego (GPU), gdy urządzenie go obsługuje; w przeciwnym razie liczy procesor. Możesz mieć pobranych kilka naraz, każdy pobierasz i usuwasz osobno, a w osobnych listach wybierasz, który z pobranych modeli jest używany przez tłumacza i który przez asystenta. W pamięci jest zawsze tylko jeden model naraz.
 
 - **Lekki — NLLB-200 600M.** Tylko tłumacz. Pobranie ok. 870 MB, pamięć RAM ok. 2,3 GB, zalecany telefon od 4 GB RAM.
-- **Standardowy — Gemma 3 4B.** Tłumacz i asystent. Pobranie ok. 2,5 GB, RAM ok. 5 GB, telefon od 8 GB RAM. Tłumaczy zwykłą instrukcją i nie tłumaczy nazw własnych, numerów ani adresów.
-- **Mocny — Gemma 3 12B.** Tłumacz i asystent, najlepsza jakość. Pobranie ok. 7,3 GB, RAM ok. 10 GB, urządzenie od 16 GB RAM.
+- **Lekki — Gemma 4 E2B.** Tłumacz i asystent w jednym pliku. Pobranie ok. 2,6 GB, RAM ok. 3,5 GB, telefon od 6 GB RAM.
+- **Standardowy — Gemma 4 E4B.** Tłumacz i asystent, lepsza jakość. Pobranie ok. 3,7 GB, RAM ok. 5 GB, urządzenie od 8 GB RAM. Nie tłumaczy nazw własnych, numerów ani adresów.
+- **Mocny — Gemma 4 12B.** Tłumacz i asystent, najlepsze odpowiedzi asystenta. Pobranie ok. 6,9 GB, RAM ok. 9,5 GB, urządzenie od 16 GB RAM.
 
 Na słabszych urządzeniach duże modele mogą spowalniać aplikację albo ją zamykać, dlatego przy każdym modelu są podane rozmiary i zalecana ilość pamięci.
 
-**Karta na dolnym pasku.** Gdy włączony jest którykolwiek tryb, na dolnym pasku pojawia się karta „Tłumacz”. Gdy włączysz też asystenta, karta nazywa się „AI” i ma ikonę iskierek, a w środku są dwie osobne zakładki: tłumacz i asystent. Asystent działa tylko na tej karcie, a w kanałach i wiadomościach prywatnych jest wyłącznie tłumacz. Asystent wymaga modelu Standardowego albo Mocnego; sam model Lekki tylko tłumaczy.
+**Karta na dolnym pasku.** Gdy włączony jest którykolwiek tryb, na dolnym pasku pojawia się karta „Tłumacz”. Gdy włączysz też asystenta, karta nazywa się „AI” i ma ikonę iskierek, a w środku są dwie osobne zakładki: tłumacz i asystent. Asystent działa tylko na tej karcie, a w kanałach i wiadomościach prywatnych jest wyłącznie tłumacz. Asystent wymaga modelu Gemma 4; sam NLLB tylko tłumaczy.
 
 **Jak działa asystent.** Piszesz pytanie, a odpowiedź pojawia się na bieżąco; przyciskiem „Zatrzymaj” przerwiesz ją w każdej chwili, a „Nowa rozmowa” zaczyna od nowa. Pierwsza odpowiedź (i pierwsze tłumaczenie) trwa dłużej, bo model jest wczytywany do pamięci. Odpowiedzi mogą być błędne — ważne rzeczy sprawdzaj. Rozmowy zapisują się **tylko na tym urządzeniu** i nigdzie nie są wysyłane. Ikona zegara w rogu otwiera historię: stuknij rozmowę, by ją kontynuować, albo ją usuń. „Nowa rozmowa” zaczyna od zera, a poprzednia zostaje w historii.
 
@@ -147,7 +148,7 @@ Na słabszych urządzeniach duże modele mogą spowalniać aplikację albo ją z
 **Licencje modeli.** Modele nie są częścią aplikacji: pobierasz je z internetu i używasz na własną odpowiedzialność, zgodnie z ich licencjami.
 
 - NLLB-200 (Meta) jest udostępniony na licencji **CC BY-NC 4.0**, czyli **wyłącznie do użytku niekomercyjnego**.
-- Gemma 3 (Google) jest udostępniona na warunkach **Gemma Terms of Use** wraz z Prohibited Use Policy (ai.google.dev/gemma/terms). Korzystając z niej, zgadzasz się na te warunki.
+- Gemma 4 (Google) jest udostępniona na licencji **Apache 2.0**.
 - Odpowiedzi modeli mogą być błędne lub zmyślone. Nie opieraj na nich decyzji dotyczących bezpieczeństwa.
 
 ## Lista węzłów i baza

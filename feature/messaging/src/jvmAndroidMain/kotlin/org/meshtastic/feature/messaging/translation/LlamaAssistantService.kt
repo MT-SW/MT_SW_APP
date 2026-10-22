@@ -28,9 +28,9 @@ import org.meshtastic.core.repository.AiRole
 import org.meshtastic.core.repository.TranslatorModelState
 import org.meshtastic.core.repository.UiPrefs
 
-/** The assistant on top of [LlamaEngine]; it shares the loaded model with the translator. */
+/** The assistant on top of [LiteRtEngine]; it shares the loaded model with the translator. */
 class LlamaAssistantService(
-    private val engine: LlamaEngine,
+    private val engine: LiteRtEngine,
     private val store: AiModelStoreImpl,
     private val uiPrefs: UiPrefs,
 ) : AssistantService {

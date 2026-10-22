@@ -1,0 +1,182 @@
+/*
+ * Copyright (c) 2026 Meshtastic LLC
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package org.meshtastic.feature.messaging.translation
+
+import co.touchlab.kermit.Logger
+import com.google.ai.edge.litertlm.Backend
+import com.google.ai.edge.litertlm.Contents
+import com.google.ai.edge.litertlm.ConversationConfig
+import com.google.ai.edge.litertlm.Engine
+import com.google.ai.edge.litertlm.EngineConfig
+import com.google.ai.edge.litertlm.Message
+import com.google.ai.edge.litertlm.SamplerConfig
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import org.meshtastic.core.common.util.nowMillis
+import java.io.File
+
+/**
+ * Runs the Gemma 4 language models (`.litertlm` files) with Google's LiteRT-LM, on Android and on desktop. The graphics
+ * chip does the work when it can (Metal on a Mac, OpenCL/Vulkan elsewhere); if it cannot be started the processor is
+ * used. Only one model is in memory at a time and requests run one after another, so translation and the assistant
+ * can safely share it. The model is loaded on first use and freed again after a short idle time.
+ */
+class LiteRtEngine(private val store: AiModelStoreImpl) {
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val runMutex = Mutex()
+    private var unloadJob: Job? = null
+    private var engine: Engine? = null
+    private var loadedId: String? = null
+
+    init {
+        store.beforeModelDelete = { unloadNow() }
+    }
+
+    /**
+     * Sends [messages] (role to text pairs, roles `system`, `user`, `assistant`; the last one must be a `user`
+     * message) to model [modelId] and returns the reply. [onPiece] receives the text as it is produced. Cancelling the
+     * coroutine stops the generation. [maxTokens] is a rough limit on the length of the answer.
+     */
+    suspend fun chat(
+        modelId: String,
+        messages: List<Pair<String, String>>,
+        maxTokens: Int,
+        temperature: Float,
+        onPiece: (String) -> Unit = {},
+    ): String = runMutex.withLock {
+        unloadJob?.cancel()
+        try {
+            withContext(Dispatchers.Default) { generate(modelId, messages, maxTokens, temperature, onPiece) }
+        } finally {
+            scheduleUnload()
+        }
+    }
+
+    /** Frees the model from memory right away (for example when it is deleted). */
+    suspend fun unloadNow() {
+        runMutex.withLock { unload() }
+    }
+
+    private suspend fun generate(
+        modelId: String,
+        messages: List<Pair<String, String>>,
+        maxTokens: Int,
+        temperature: Float,
+        onPiece: (String) -> Unit,
+    ): String {
+        val started = nowMillis
+        val wasLoaded = loadedId == modelId
+        val loaded = ensureLoaded(modelId)
+        val loadedAt = nowMillis
+
+        val system = messages.filter { it.first == SYSTEM }.joinToString("\n") { it.second }
+        val dialogue = messages.filter { it.first != SYSTEM }
+        require(dialogue.isNotEmpty() && dialogue.last().first == USER) { "The last message must come from the user" }
+        val history =
+            dialogue.dropLast(1).map { (role, text) -> if (role == ASSISTANT) Message.model(text) else Message.user(text) }
+        val config =
+            ConversationConfig(
+                systemInstruction = if (system.isBlank()) null else Contents.of(system),
+                initialMessages = history,
+                samplerConfig = SamplerConfig(topK = TOP_K, topP = TOP_P, temperature = temperature.toDouble()),
+            )
+
+        val reply = StringBuilder()
+        val limit = maxTokens * CHARS_PER_TOKEN
+        loaded.createConversation(config).use { conversation ->
+            conversation
+                .sendMessageAsync(dialogue.last().second)
+                .takeWhile { reply.length < limit }
+                .collect { message ->
+                    val piece = message.toString()
+                    if (piece.isNotEmpty()) {
+                        reply.append(piece)
+                        runCatching { onPiece(piece) }
+                    }
+                }
+        }
+        Logger.i(tag = TAG) {
+            "Answer from $modelId: loaded=${!wasLoaded} in ${loadedAt - started} ms, generated ${reply.length} chars " +
+                "in ${nowMillis - loadedAt} ms"
+        }
+        return reply.toString().trim()
+    }
+
+    private fun ensureLoaded(modelId: String): Engine {
+        engine?.let { if (loadedId == modelId) return it }
+        unload()
+        val file = store.fileOf(modelId) ?: error("Model $modelId is not downloaded")
+        val cache = File(store.ggufDir, "cache").apply { mkdirs() }
+        val created =
+            try {
+                start(file, Backend.GPU(), cache)
+            } catch (e: Exception) {
+                Logger.w(tag = TAG, throwable = e) { "Graphics chip not usable, falling back to the processor" }
+                start(file, Backend.CPU(), cache)
+            }
+        engine = created
+        loadedId = modelId
+        return created
+    }
+
+    private fun start(file: File, backend: Backend, cache: File): Engine {
+        val created = Engine(EngineConfig(modelPath = file.absolutePath, backend = backend, cacheDir = cache.absolutePath))
+        try {
+            created.initialize()
+        } catch (e: Exception) {
+            runCatching { created.close() }
+            throw e
+        }
+        return created
+    }
+
+    private fun scheduleUnload() {
+        unloadJob?.cancel()
+        unloadJob =
+            scope.launch {
+                delay(IDLE_UNLOAD_MS)
+                runMutex.withLock { unload() }
+            }
+    }
+
+    private fun unload() {
+        val current = engine ?: return
+        runCatching { current.close() }.onFailure { Logger.w(tag = TAG, throwable = it) { "Unload failed" } }
+        engine = null
+        loadedId = null
+    }
+
+    private companion object {
+        const val TAG = "LiteRtEngine"
+        const val SYSTEM = "system"
+        const val USER = "user"
+        const val ASSISTANT = "assistant"
+        const val TOP_P = 0.95
+        const val TOP_K = 40
+        const val CHARS_PER_TOKEN = 4
+        const val IDLE_UNLOAD_MS = 120_000L
+    }
+}

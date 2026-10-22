@@ -237,7 +237,8 @@ private fun SectionLabel(text: String) {
 private fun levelName(model: AiModelInfo): String = stringResource(
     when (model.id) {
         AiModels.NLLB_600M_ID -> Res.string.ai_level_light
-        AiModels.GEMMA_4B_ID -> Res.string.ai_level_standard
+        AiModels.GEMMA_E2B_ID -> Res.string.ai_level_light
+        AiModels.GEMMA_E4B_ID -> Res.string.ai_level_standard
         else -> Res.string.ai_level_strong
     },
 )

@@ -91,6 +91,7 @@ import org.meshtastic.core.ui.theme.LocalEventTheme
 import org.meshtastic.core.ui.theme.LocalEventThemeToggle
 import org.meshtastic.core.ui.theme.MODE_DYNAMIC
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
+import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
 import org.meshtastic.core.ui.theme.isMonochromeMode
 import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.util.LocalAnalyticsIntroProvider
@@ -176,7 +177,7 @@ class MainActivity : AppCompatActivity() {
             val dark =
                 when (theme) {
                     AppCompatDelegate.MODE_NIGHT_YES, MODE_MONO_DARK -> true
-                    AppCompatDelegate.MODE_NIGHT_NO -> false
+                    AppCompatDelegate.MODE_NIGHT_NO, MODE_MONO_LIGHT -> false
                     else -> isSystemInDarkTheme()
                 }
 

@@ -2917,7 +2917,7 @@
     <string name="ai_model_delete">Usuń z urządzenia</string>
     <string name="ai_model_failed">Pobieranie nie udało się. Spróbuj ponownie.</string>
     <string name="ai_license_cc">Licencja modelu: CC BY-NC 4.0 (tylko użytek niekomercyjny)</string>
-    <string name="ai_license_gemma">Licencja modelu: Gemma Terms of Use (Google)</string>
+    <string name="ai_license_gemma">Licencja modelu: Apache 2.0 (Google, Gemma 4)</string>
     <string name="ai_privacy">Wszystko jest przetwarzane lokalnie na tym urządzeniu. Po pobraniu modelu żadne teksty ani rozmowy nie są wysyłane do internetu. Internet jest potrzebny tylko do jednorazowego pobrania modelu.</string>
     <string name="translator_loading_hint">Pierwsze tłumaczenie trwa dłużej, bo model jest wczytywany do pamięci (nawet minutę). Kolejne są szybsze.</string>
     <string name="assistant_input_hint">Zadaj pytanie…</string>

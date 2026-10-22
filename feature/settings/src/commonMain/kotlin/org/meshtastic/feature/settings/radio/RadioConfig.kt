@@ -61,6 +61,7 @@ import org.meshtastic.core.resources.ic_system_update
 import org.meshtastic.core.resources.import_configuration
 import org.meshtastic.core.resources.message_device_managed
 import org.meshtastic.core.resources.module_settings
+import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.nodedb_reset
 import org.meshtastic.core.resources.reboot
 import org.meshtastic.core.resources.reboot_into_dfu
@@ -81,6 +82,7 @@ import org.meshtastic.core.ui.icon.PermScanWifi
 import org.meshtastic.core.ui.icon.Rssi
 import org.meshtastic.core.ui.icon.Settings
 import org.meshtastic.core.ui.icon.SystemUpdate
+import org.meshtastic.core.ui.icon.Tune
 import org.meshtastic.core.ui.icon.Upload
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.navigation.ConfigRoute
@@ -286,6 +288,13 @@ private fun AdvancedSection(
         if (isManaged) {
             ManagedMessage()
         }
+
+        // MT_SW features (translator, assistant, ...) sit at the top so they are quick to find.
+        ListItem(
+            text = stringResource(Res.string.mt_sw_features_title),
+            leadingIcon = MeshtasticIcons.Tune,
+            onClick = { onNavigate(SettingsRoute.MtSwFeatures) },
+        )
 
         if (isOtaCapable) {
             ListItem(

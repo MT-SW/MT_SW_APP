@@ -19,7 +19,7 @@ package org.meshtastic.feature.messaging.translation
 import java.util.Locale
 
 /** Translates with a general Gemma model: a plain instruction, no special translation model needed. */
-class GemmaTranslator(private val engine: LlamaEngine) {
+class GemmaTranslator(private val engine: LiteRtEngine) {
 
     suspend fun translate(modelId: String, text: String, sourceNllb: String, targetNllb: String): String {
         val source = englishName(sourceNllb)
