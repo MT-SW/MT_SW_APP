@@ -92,9 +92,11 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         val loaded = ensureLoaded(modelId)
         val loadedAt = nowMillis
 
-        // The native library turns the texts into JSON and aborts the whole app on broken characters (for example half
-        // an emoji left by cutting a text), so every text is cleaned first.
-        val clean = messages.map { (role, text) -> role to text.cleanForModel() }
+        // The native library turns the texts into JSON and aborts the whole app on characters outside the basic plane
+        // (emoji are passed to it in a form it rejects) or on broken ones, so those are swapped for short markers
+        // like <E1> and put back in the answer.
+        val symbols = LinkedHashMap<String, String>()
+        val clean = messages.map { (role, text) -> role to text.cleanForModel(symbols) }
         val system = clean.filter { it.first == SYSTEM }.joinToString("\n") { it.second }
         val dialogue = clean.filter { it.first != SYSTEM }
         require(dialogue.isNotEmpty() && dialogue.last().first == USER) { "The last message must come from the user" }
@@ -108,6 +110,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
             )
 
         val reply = StringBuilder()
+        val restorer = SymbolRestorer(symbols)
         val limit = maxTokens * CHARS_PER_TOKEN
         loaded.createConversation(config).use { conversation ->
             conversation
@@ -117,15 +120,16 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
                     val piece = message.toString()
                     if (piece.isNotEmpty()) {
                         reply.append(piece)
-                        runCatching { onPiece(piece) }
+                        restorer.push(piece).takeIf { it.isNotEmpty() }?.let { runCatching { onPiece(it) } }
                     }
                 }
         }
+        restorer.finish().takeIf { it.isNotEmpty() }?.let { runCatching { onPiece(it) } }
         Logger.i(tag = TAG) {
             "Answer from $modelId: loaded=${!wasLoaded} in ${loadedAt - started} ms, generated ${reply.length} chars " +
                 "in ${nowMillis - loadedAt} ms"
         }
-        return reply.toString().trim()
+        return restorer.restoreAll(reply.toString()).trim()
     }
 
     private fun ensureLoaded(modelId: String): Engine {
@@ -156,15 +160,21 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         return created
     }
 
-    /** Removes unpaired surrogates, control and non-characters that would make the text invalid UTF-8. */
-    private fun String.cleanForModel(): String {
+    /**
+     * Makes the text safe for the native library: characters outside the basic plane (emoji) become markers recorded
+     * in [symbols], unpaired surrogates, control characters and non-characters are dropped.
+     */
+    private fun String.cleanForModel(symbols: MutableMap<String, String>): String {
         val out = StringBuilder(length)
         var i = 0
         while (i < length) {
             val c = this[i]
             when {
                 c.isHighSurrogate() && i + 1 < length && this[i + 1].isLowSurrogate() -> {
-                    out.append(c).append(this[i + 1])
+                    val symbol = substring(i, i + 2)
+                    val marker = symbols.entries.firstOrNull { it.value == symbol }?.key
+                        ?: "<E${symbols.size + 1}>".also { symbols[it] = symbol }
+                    out.append(marker)
                     i++
                 }
                 c.isSurrogate() -> Unit
@@ -175,6 +185,28 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
             i++
         }
         return out.toString()
+    }
+
+    /** Puts the original symbols back into the streamed answer; a marker split between two pieces is held back. */
+    private class SymbolRestorer(private val symbols: Map<String, String>) {
+        private val pending = StringBuilder()
+
+        fun restoreAll(text: String): String = symbols.entries.fold(text) { acc, (marker, symbol) -> acc.replace(marker, symbol) }
+
+        fun push(piece: String): String {
+            pending.append(piece)
+            val open = pending.lastIndexOf("<")
+            val hold = if (open >= 0 && pending.indexOf(">", open) < 0 && pending.length - open < MAX_MARKER) open else pending.length
+            val ready = pending.substring(0, hold)
+            pending.delete(0, hold)
+            return restoreAll(ready)
+        }
+
+        fun finish(): String = restoreAll(pending.toString()).also { pending.clear() }
+
+        private companion object {
+            const val MAX_MARKER = 8
+        }
     }
 
     private fun scheduleUnload() {
