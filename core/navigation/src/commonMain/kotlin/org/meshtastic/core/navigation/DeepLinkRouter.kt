@@ -263,6 +263,8 @@ object DeepLinkRouter {
             "acknowledgements" to SettingsRoute.Acknowledgements,
             "attributions" to SettingsRoute.Acknowledgements,
             "filter-settings" to SettingsRoute.FilterSettings,
+            "mt-sw-features" to SettingsRoute.MtSwFeatures,
+            "mt-sw-other-features" to SettingsRoute.MtSwOtherFeatures,
             "helpdocs" to SettingsRoute.HelpDocs,
             "help-docs" to SettingsRoute.HelpDocs,
             "local-mesh-discovery" to DiscoveryRoute.DiscoveryGraph,

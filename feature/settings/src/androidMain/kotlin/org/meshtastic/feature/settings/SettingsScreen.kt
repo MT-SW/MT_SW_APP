@@ -61,7 +61,8 @@ import org.meshtastic.core.resources.export_configuration
 import org.meshtastic.core.resources.filter_settings
 import org.meshtastic.core.resources.help_and_documentation
 import org.meshtastic.core.resources.import_configuration
-import org.meshtastic.core.resources.node_layout_section_title
+import org.meshtastic.core.resources.mt_sw_features_summary
+import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.preferences_language
 import org.meshtastic.core.resources.wifi_devices
 import org.meshtastic.core.ui.component.ListItem
@@ -69,14 +70,13 @@ import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.Device
 import org.meshtastic.core.ui.icon.FilterList
 import org.meshtastic.core.ui.icon.HelpOutline
-import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.Tune
 import org.meshtastic.core.ui.icon.SettingsRemote
 import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.core.ui.util.isBluetoothSupported
 import org.meshtastic.feature.settings.component.AppInfoSection
 import org.meshtastic.feature.settings.component.AppearanceSettingsContent
-import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.ReportIssuesSection
 import org.meshtastic.feature.settings.component.PermissionsSettingsContent
@@ -303,8 +303,6 @@ fun SettingsScreen(
                         onToggleHomoglyph = { viewModel.toggleHomoglyphCharactersEncodingEnabled() },
                         startProvideLocation = { settingsViewModel.startProvidingLocation() },
                         stopProvideLocation = { settingsViewModel.stopProvidingLocation() },
-                        autoLoadChatImages = settingsViewModel.autoLoadChatImages.collectAsStateWithLifecycle().value,
-                        onToggleAutoLoadChatImages = { settingsViewModel.setAutoLoadChatImages(it) },
                     )
                     AppearanceSettingsContent(
                         showFullMessageTimestamps = showFullMessageTimestamps,
@@ -324,12 +322,12 @@ fun SettingsScreen(
                         onExportData = { settingsViewModel.saveDataCsv(it.toKmpUri()) },
                         onExportNodeDb = { settingsViewModel.saveNodeDbJson(it) },
                     )
-                    AppUpdateSettings()
                     ListItem(
-                        text = stringResource(Res.string.node_layout_section_title),
-                        leadingIcon = MeshtasticIcons.List,
+                        text = stringResource(Res.string.mt_sw_features_title),
+                        supportingText = stringResource(Res.string.mt_sw_features_summary),
+                        leadingIcon = MeshtasticIcons.Tune,
                     ) {
-                        onNavigate(SettingsRoute.NodeList)
+                        onNavigate(SettingsRoute.MtSwFeatures)
                     }
                     // Wi-Fi provisioning reaches the device over BLE.
                     if (isBluetoothSupported()) {

@@ -221,6 +221,10 @@ sealed interface SettingsRoute : Route {
 
     @Serializable data object AppFunctionsSettings : SettingsRoute
 
+    @Serializable data object MtSwFeatures : SettingsRoute
+
+    @Serializable data object MtSwOtherFeatures : SettingsRoute
+
     // endregion
 
     // region help & documentation routes

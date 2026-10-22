@@ -30,6 +30,11 @@ import org.meshtastic.core.resources.debug_panel
 import org.meshtastic.core.resources.device_links
 import org.meshtastic.core.resources.filter_settings
 import org.meshtastic.core.resources.node_layout_section_title
+import org.meshtastic.core.resources.mt_sw_features_title
+import org.meshtastic.core.resources.mt_sw_other_title
+import org.meshtastic.core.resources.auto_load_chat_images
+import org.meshtastic.core.resources.app_update_check_title
+import org.meshtastic.core.resources.app_update_tests_title
 import org.meshtastic.core.resources.wifi_devices
 import org.meshtastic.feature.settings.navigation.ConfigRoute
 import org.meshtastic.feature.settings.navigation.ModuleRoute
@@ -147,6 +152,11 @@ object SettingsSearchCatalog {
     /** App-level settings, which have no schema behind them and so are listed by hand. */
     private val appSettings: List<Pair<StringResource, Route>> =
         listOf(
+            Res.string.mt_sw_features_title to SettingsRoute.MtSwFeatures,
+            Res.string.mt_sw_other_title to SettingsRoute.MtSwOtherFeatures,
+            Res.string.auto_load_chat_images to SettingsRoute.MtSwFeatures,
+            Res.string.app_update_check_title to SettingsRoute.MtSwFeatures,
+            Res.string.app_update_tests_title to SettingsRoute.MtSwFeatures,
             Res.string.node_layout_section_title to SettingsRoute.NodeList,
             Res.string.wifi_devices to WifiProvisionRoute.WifiProvision(),
             Res.string.filter_settings to SettingsRoute.FilterSettings,

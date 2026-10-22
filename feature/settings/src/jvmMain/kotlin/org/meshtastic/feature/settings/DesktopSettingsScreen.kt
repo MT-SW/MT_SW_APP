@@ -51,7 +51,6 @@ import org.meshtastic.core.navigation.WifiProvisionRoute
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.about
 import org.meshtastic.core.resources.app_settings
-import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.bottom_nav_settings
 import org.meshtastic.core.resources.device_links
 import org.meshtastic.core.resources.discovery_local_mesh
@@ -61,7 +60,8 @@ import org.meshtastic.core.resources.help_and_documentation
 import org.meshtastic.core.resources.import_configuration
 import org.meshtastic.core.resources.info
 import org.meshtastic.core.resources.intro_show
-import org.meshtastic.core.resources.node_layout_section_title
+import org.meshtastic.core.resources.mt_sw_features_summary
+import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.preferences_language
 import org.meshtastic.core.resources.preferences_system_default
 import org.meshtastic.core.resources.pt_BR
@@ -75,7 +75,6 @@ import org.meshtastic.core.resources.zh_CN
 import org.meshtastic.core.resources.zh_TW
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
-import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.ChevronRight
 import org.meshtastic.core.ui.icon.Device
 import org.meshtastic.core.ui.icon.Distance
@@ -83,16 +82,15 @@ import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.HelpOutline
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Language
-import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PermScanWifi
+import org.meshtastic.core.ui.icon.Tune
 import org.meshtastic.core.ui.icon.WavingHand
 import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.core.ui.util.rememberOpenFileLauncher
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.feature.settings.component.AppVersionRows
 import org.meshtastic.feature.settings.component.CacheLimitPreference
-import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.ReportIssuesSection
 import org.meshtastic.feature.settings.component.FullMessageTimestampsSetting
@@ -139,7 +137,6 @@ fun DesktopSettingsScreen(
     val hiddenFeaturesUnlocked by settingsViewModel.hiddenFeaturesUnlocked.collectAsStateWithLifecycle()
     val cacheLimit by settingsViewModel.dbCacheLimit.collectAsStateWithLifecycle()
     val isOtaCapable by settingsViewModel.isOtaCapable.collectAsStateWithLifecycle()
-    val autoLoadChatImages by settingsViewModel.autoLoadChatImages.collectAsStateWithLifecycle()
     val showFullMessageTimestamps by settingsViewModel.showFullMessageTimestamps.collectAsStateWithLifecycle()
 
     var showThemePickerDialog by remember { mutableStateOf(false) }
@@ -341,21 +338,15 @@ fun DesktopSettingsScreen(
                             onSetCacheLimit = { settingsViewModel.setDbCacheLimit(it) },
                         )
 
-                        SwitchListItem(
-                            text = stringResource(Res.string.auto_load_chat_images),
-                            checked = autoLoadChatImages,
-                            onClick = { settingsViewModel.setAutoLoadChatImages(!autoLoadChatImages) },
-                        )
-
-                        AppUpdateSettings()
                     }
 
-                    ExpressiveSection(title = stringResource(Res.string.node_layout_section_title)) {
+                    ExpressiveSection(title = stringResource(Res.string.mt_sw_features_title)) {
                         ListItem(
-                            text = stringResource(Res.string.node_layout_section_title),
-                            leadingIcon = MeshtasticIcons.List,
+                            text = stringResource(Res.string.mt_sw_features_title),
+                            supportingText = stringResource(Res.string.mt_sw_features_summary),
+                            leadingIcon = MeshtasticIcons.Tune,
                         ) {
-                            onNavigate(SettingsRoute.NodeList)
+                            onNavigate(SettingsRoute.MtSwFeatures)
                         }
                     }
 
