@@ -153,7 +153,7 @@ class LlamaAssistantService(
 
     private companion object {
         const val MAX_ANSWER_TOKENS = 0 // no limit: the model finishes by itself
-        const val TEMPERATURE = 0.3f
+        const val TEMPERATURE = 0.5f
         const val RECENT_CHARS = 1500
         const val MAX_TURN_CHARS = 1500
         const val SUMMARY_TURN_CHARS = 500
@@ -168,7 +168,7 @@ class LlamaAssistantService(
                 "own network and device. heap is the free internal RAM of the radio node (not the phone). " +
                 "Copy every number and unit exactly as it appears in the data (keep the decimal point and the minus " +
                 "sign, never combine or change digits); keep the units that stand next to the values (for example °C, %, hPa, V) " +
-                "and never add more decimals than the data has; if a value is unknown say so. Write plain text only: no " +
+                "and never add more decimals than the data has; if a value is marked IMPLAUSIBLE say that the sensor is probably faulty and do not use the value; if a value is unknown say so. Answer briefly, list each device only once and never repeat yourself. Write plain text only: no " +
                 "markdown, no asterisks, no backticks."
         const val TOOLS_RULE =
             "You have read-only tools that look up the app's data: network overview, node names, details and " +
