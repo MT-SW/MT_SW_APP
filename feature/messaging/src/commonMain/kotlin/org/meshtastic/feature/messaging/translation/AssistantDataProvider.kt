@@ -49,6 +49,7 @@ class AssistantDataProvider(
         val parts = ArrayList<String>()
         parts += safe("overview") { overview() }
         for (node in mentioned) parts += safe("node") { nodeDetail(node) }
+        if (q.hasAny(SENSOR_WORDS)) parts += safe("sensors") { sensors() }
         if (q.hasAny(SIGNAL_WORDS)) parts += safe("signal") { signalRanking(q) }
         val network = q.hasAny(NODE_WORDS) || q.hasAny(TREND_WORDS) || q.hasAny(RANK_WORDS) || q.hasAny(SIGNAL_WORDS)
         if (network && (q.hasAny(RANK_WORDS) || q.hasAny(TREND_WORDS) || !q.hasAny(SIGNAL_WORDS))) {
@@ -155,6 +156,32 @@ class AssistantDataProvider(
             if (n.notes.isNotBlank()) appendLine("Notes: ${n.notes}")
         }
         return head + safe("node trends") { trends(n.num, n.user.long_name, 0L) }
+    }
+
+    /** Which nodes report weather, air quality, power or other sensor data, and the values they last sent. */
+    private fun sensors(): String {
+        val now = nowMillis / MILLIS_PER_SECOND
+        val lines = ArrayList<String>()
+        for (n in nodeRepository.nodeDBbyNum.value.values.sortedByDescending { it.lastHeard }) {
+            val sections =
+                listOf(
+                    "environment" to n.environmentMetrics.toString(),
+                    "air quality" to n.airQualityMetrics.toString(),
+                    "power" to n.powerMetrics.toString(),
+                    "soil/water" to n.soilWaterMetrics.toString(),
+                    "pax counter" to n.paxcounter.toString(),
+                ).filter { (_, text) -> !text.endsWith("{}") }
+            if (sections.isEmpty()) continue
+            val ago = if (n.lastHeard == 0) "never" else "${((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)} min ago"
+            lines += "- ${n.user.short_name} (${n.user.long_name}), heard $ago: " +
+                sections.joinToString("; ") { (name, text) -> "$name ${text.substringAfter('{').removeSuffix("}")}" }
+        }
+        return if (lines.isEmpty()) {
+            "SENSOR DATA: no node has reported weather, air quality or other sensor data."
+        } else {
+            "SENSOR DATA from ${lines.size} nodes (weather, air quality, power, ...; latest values):\n" +
+                lines.take(SENSOR_LIMIT).joinToString("\n")
+        }
     }
 
     /** Link quality to every node we hear: SNR, RSSI, hops and the distance from our own node. */
@@ -366,6 +393,7 @@ class AssistantDataProvider(
         const val RANK_WINDOW_MS = 3 * 24 * 60 * 60 * 1000L
         const val RANK_TOP = 8
         const val SIGNAL_TOP = 8
+        const val SENSOR_LIMIT = 12
         const val METERS_PER_KM = 1000f
         const val RANK_BOTTOM = 3
         const val HEX = 16
@@ -393,6 +421,7 @@ class AssistantDataProvider(
             listOf("ustawien", "konfig", "setting", "config", "region", "preset", "kanał", "kanal", "channel", "lora",
                 "rola", "role", "moc", "power", "wifi", "bluetooth", "mqtt", "hop")
         val NODE_WORDS = listOf("węz", "wez", "node", "sąsiad", "sasiad", "zasięg", "zasieg", "sieć", "siec", "mesh", "snr", "rssi", "kto")
+        val SENSOR_WORDS = listOf("pogod", "temperatur", "wilgot", "ciśnien", "cisnien", "weather", "humidity", "pressure", "wiatr", "wind", "deszcz", "rain", "powietrz", "air quality", "pm2", "czujnik", "sensor", "środowisk", "srodowisk", "environment", "natężen", "napięci", "prąd", "prad", "voltage", "current", "gleb", "soil", "pax", "lux", "światł")
         val SIGNAL_WORDS = listOf("zasięg", "zasieg", "sygnał", "sygnal", "snr", "rssi", "odległ", "odleg", "daleko", "dystans", "blisk", "najbliż", "najbliz", "jakość", "jakosc", "range", "signal", "distance", "linku", "łącz", "polacz")
         val RANK_WORDS = listOf("ramek", "ramki", "pakiet", "odebran", "raportuj", "najwięc", "najwiec", "najmniej", "ranking", "który", "ktory", "najlep", "najgorz")
         val OWN_WORDS = listOf("mój", "moj", "mojego", "mojej", "mojemu", "my node", "own node", "mój węz", "moim")
