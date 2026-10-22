@@ -2929,6 +2929,7 @@
     <string name="assistant_off">Asystent jest wyłączony. Włącz go w Ustawienia → Funkcje MT_SW.</string>
     <string name="assistant_model_missing">Brak pobranego modelu dla asystenta. Pobierz go w Ustawienia → Funkcje MT_SW.</string>
     <string name="assistant_error">Nie udało się uzyskać odpowiedzi. Sprawdź, czy urządzenie ma dość wolnej pamięci RAM.</string>
+    <string name="assistant_greeting">Cześć! Jestem Twoim asystentem MT_SW. W czym mogę Ci pomóc?</string>
     <string name="assistant_you">Ty</string>
     <string name="assistant_name">Asystent</string>
     <string name="ai_tab_ai">AI</string>
