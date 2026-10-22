@@ -103,7 +103,7 @@ internal fun AiSettings() {
 
     fun isReady(id: String) = states[id] == TranslatorModelState.Ready
 
-    val assistantPossible = AiModels.all.any { it.engineReady && it.canDo(AiRole.ASSISTANT) }
+    val assistantPossible = AiModels.ASSISTANT_SCREEN_READY && AiModels.all.any { it.engineReady && it.canDo(AiRole.ASSISTANT) }
 
     SwitchPreference(
         title = stringResource(Res.string.translator_title),

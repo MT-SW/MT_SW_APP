@@ -27,6 +27,9 @@ import org.meshtastic.feature.docs.translation.NoOpDocTranslator
 import org.meshtastic.feature.messaging.translation.MessageTranslationService
 import org.meshtastic.core.repository.TranslatorModelManager
 import org.meshtastic.feature.messaging.translation.AiModelStoreImpl
+import org.meshtastic.feature.messaging.translation.AiTranslationRouter
+import org.meshtastic.feature.messaging.translation.GemmaTranslator
+import org.meshtastic.feature.messaging.translation.LlamaEngine
 import org.meshtastic.core.repository.AiModelStore
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.feature.messaging.translation.NllbTranslator
@@ -46,11 +49,23 @@ class DesktopAiModule {
     fun nllbTranslator(uiPrefs: UiPrefs): NllbTranslator =
         NllbTranslator(File(System.getProperty("user.home"), ".meshtastic/translator"), uiPrefs)
 
-    @Single fun messageTranslationService(translator: NllbTranslator): MessageTranslationService = translator
+    @Single
+    fun aiModelStoreImpl(translator: NllbTranslator): AiModelStoreImpl =
+        AiModelStoreImpl(translator, File(System.getProperty("user.home"), ".meshtastic/models"))
 
-    @Single fun translatorModelManager(translator: NllbTranslator): TranslatorModelManager = translator
+    @Single fun aiModelStore(impl: AiModelStoreImpl): AiModelStore = impl
+
+    @Single fun llamaEngine(store: AiModelStoreImpl): LlamaEngine = LlamaEngine(store)
 
     @Single
-    fun aiModelStore(translator: NllbTranslator): AiModelStore =
-        AiModelStoreImpl(translator, File(System.getProperty("user.home"), ".meshtastic/models"))
+    fun aiTranslationRouter(
+        translator: NllbTranslator,
+        engine: LlamaEngine,
+        store: AiModelStoreImpl,
+        uiPrefs: UiPrefs,
+    ): AiTranslationRouter = AiTranslationRouter(translator, GemmaTranslator(engine), store, uiPrefs)
+
+    @Single fun messageTranslationService(router: AiTranslationRouter): MessageTranslationService = router
+
+    @Single fun translatorModelManager(router: AiTranslationRouter): TranslatorModelManager = router
 }

@@ -29,7 +29,7 @@ import org.meshtastic.core.ble.BleLogLevel
 import org.meshtastic.feature.docs.translation.DocTranslationService
 import org.meshtastic.feature.docs.translation.NoOpDocTranslator
 import org.meshtastic.feature.messaging.translation.MessageTranslationService
-import org.meshtastic.feature.messaging.translation.NllbTranslator
+import org.meshtastic.feature.messaging.translation.AiTranslationRouter
 import kotlin.test.Test
 import kotlin.test.assertIs
 
@@ -69,7 +69,7 @@ class DesktopKoinTest {
         val app = koinApplication<DesktopKoinApp>()
         try {
             val koin = app.koin
-            assertIs<NllbTranslator>(koin.get<MessageTranslationService>())
+            assertIs<AiTranslationRouter>(koin.get<MessageTranslationService>())
             assertIs<NoOpDocTranslator>(koin.get<DocTranslationService>())
         } finally {
             app.close()

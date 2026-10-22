@@ -71,6 +71,9 @@ object AiModels {
     const val GEMMA_4B_ID = "gemma3-4b"
     const val GEMMA_12B_ID = "gemma3-12b"
 
+    /** Flipped to true when the assistant screen exists; until then the assistant switch stays off. */
+    const val ASSISTANT_SCREEN_READY = false
+
     private const val GEMMA_4B_REPO = "https://huggingface.co/unsloth/gemma-3-4b-it-GGUF/resolve/main/"
     private const val GEMMA_12B_REPO = "https://huggingface.co/unsloth/gemma-3-12b-it-GGUF/resolve/main/"
 
@@ -101,7 +104,7 @@ object AiModels {
             minDeviceRamGb = 8,
             license = AiLicense.GEMMA_TERMS,
             files = listOf(AiModelFile(GEMMA_4B_REPO + "gemma-3-4b-it-Q4_K_M.gguf", "gemma-3-4b-it-Q4_K_M.gguf")),
-            engineReady = false,
+            engineReady = true,
         )
 
     /** Strong: the best quality, for computers and phones with 16 GB of RAM. */
@@ -116,7 +119,7 @@ object AiModels {
             minDeviceRamGb = 16,
             license = AiLicense.GEMMA_TERMS,
             files = listOf(AiModelFile(GEMMA_12B_REPO + "gemma-3-12b-it-Q4_K_M.gguf", "gemma-3-12b-it-Q4_K_M.gguf")),
-            engineReady = false,
+            engineReady = true,
         )
 
     val all: List<AiModelInfo> = listOf(Nllb600, Gemma4b, Gemma12b)

@@ -127,8 +127,8 @@ The app has two optional AI features that run **entirely on your device, without
 **Models.** There are three levels. You can keep several downloaded at once, download and delete each one separately, and in separate lists choose which downloaded model the translator uses and which one the assistant uses. Only one model is in memory at a time.
 
 - **Light — NLLB-200 600M.** Translator only. Download about 870 MB, RAM about 2.3 GB, a phone with at least 4 GB of RAM is recommended.
-- **Standard — Gemma 3 4B.** Translator and assistant. Download about 2.5 GB, RAM about 5 GB, a phone with at least 8 GB of RAM. *(Coming soon — the engine for this model arrives in the next version.)*
-- **Strong — Gemma 3 12B.** Translator and assistant, best quality. Download about 7.3 GB, RAM about 10 GB, a device with at least 16 GB of RAM. *(Coming soon.)*
+- **Standard — Gemma 3 4B.** Translator and assistant. Download about 2.5 GB, RAM about 5 GB, a phone with at least 8 GB of RAM. It translates with a plain instruction and leaves proper names, numbers and addresses as they are.
+- **Strong — Gemma 3 12B.** Translator and assistant, best quality. Download about 7.3 GB, RAM about 10 GB, a device with at least 16 GB of RAM.
 
 On weaker devices large models can slow the app down or close it, which is why every model lists its sizes and recommended memory.
 

@@ -127,8 +127,8 @@ Aplikacja ma dwie opcjonalne funkcje AI, które działają **w całości na Twoi
 **Modele.** Na liście są trzy poziomy. Możesz mieć pobranych kilka naraz, każdy pobierasz i usuwasz osobno, a w osobnych listach wybierasz, który z pobranych modeli jest używany przez tłumacza i który przez asystenta. W pamięci jest zawsze tylko jeden model naraz.
 
 - **Lekki — NLLB-200 600M.** Tylko tłumacz. Pobranie ok. 870 MB, pamięć RAM ok. 2,3 GB, zalecany telefon od 4 GB RAM.
-- **Standardowy — Gemma 3 4B.** Tłumacz i asystent. Pobranie ok. 2,5 GB, RAM ok. 5 GB, telefon od 8 GB RAM. *(Wkrótce — silnik tego modelu dojdzie w następnej wersji.)*
-- **Mocny — Gemma 3 12B.** Tłumacz i asystent, najlepsza jakość. Pobranie ok. 7,3 GB, RAM ok. 10 GB, urządzenie od 16 GB RAM. *(Wkrótce.)*
+- **Standardowy — Gemma 3 4B.** Tłumacz i asystent. Pobranie ok. 2,5 GB, RAM ok. 5 GB, telefon od 8 GB RAM. Tłumaczy zwykłą instrukcją i nie tłumaczy nazw własnych, numerów ani adresów.
+- **Mocny — Gemma 3 12B.** Tłumacz i asystent, najlepsza jakość. Pobranie ok. 7,3 GB, RAM ok. 10 GB, urządzenie od 16 GB RAM.
 
 Na słabszych urządzeniach duże modele mogą spowalniać aplikację albo ją zamykać, dlatego przy każdym modelu są podane rozmiary i zalecana ilość pamięci.
 
