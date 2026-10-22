@@ -68,7 +68,18 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
     @Tool(description = "The radio settings of the own node (device, LoRa, channels, modules). Keys and passwords are hidden.")
     fun radio_settings(): String = run("radio_settings") { data.toolSettings() }
 
-    @Tool(description = "Search messages in all conversations. An empty query returns the newest messages.")
+    @Tool(
+        description =
+        "The latest messages written on a channel, oldest first. Use it to summarise, describe or answer " +
+            "questions about what is being said on a channel; it needs no keywords. Give the channel name or " +
+            "number, or an empty text for all channels.",
+    )
+    fun channel_messages(
+        @ToolParam(description = "Channel name or number, or empty for all channels") channel: String,
+        @ToolParam(description = "How many of the latest messages to read, 1 to 40") limit: Int,
+    ): String = run("channel_messages") { data.toolChannelMessages(channel, limit) }
+
+    @Tool(description = "Find messages that contain a specific word or phrase in all conversations (only when the user asks for a specific word).")
     fun search_messages(
         @ToolParam(description = "Text to look for, or empty for the newest messages") query: String,
         @ToolParam(description = "How many messages to return, 1 to 40") limit: Int,
