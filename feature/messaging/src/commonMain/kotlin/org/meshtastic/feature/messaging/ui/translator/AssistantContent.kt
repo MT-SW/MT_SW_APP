@@ -45,6 +45,7 @@ import org.meshtastic.core.resources.assistant_clear
 import org.meshtastic.core.resources.assistant_disclaimer
 import org.meshtastic.core.resources.assistant_empty_hint
 import org.meshtastic.core.resources.assistant_error
+import org.meshtastic.core.resources.assistant_greeting
 import org.meshtastic.core.resources.assistant_input_hint
 import org.meshtastic.core.resources.assistant_model_missing
 import org.meshtastic.core.resources.assistant_name
@@ -90,6 +91,24 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             if (state.lines.isEmpty()) {
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text(
+                                text = stringResource(Res.string.assistant_name),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                            Text(
+                                text = stringResource(Res.string.assistant_greeting),
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        }
+                    }
+                }
                 item {
                     Text(
                         text = stringResource(Res.string.assistant_empty_hint),

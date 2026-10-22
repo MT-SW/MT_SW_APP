@@ -2705,6 +2705,7 @@
     <string name="assistant_off">The assistant is off. Turn it on in Settings → MT_SW features.</string>
     <string name="assistant_model_missing">No model is downloaded for the assistant. Download one in Settings → MT_SW features.</string>
     <string name="assistant_error">Could not get an answer. Check that the device has enough free RAM.</string>
+    <string name="assistant_greeting">Hi! I am your MT_SW assistant. How can I help you?</string>
     <string name="assistant_you">You</string>
     <string name="assistant_name">Assistant</string>
     <string name="ai_tab_ai">AI</string>
