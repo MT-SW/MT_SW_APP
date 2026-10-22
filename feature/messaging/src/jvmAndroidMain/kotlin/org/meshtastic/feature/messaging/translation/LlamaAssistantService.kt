@@ -132,6 +132,13 @@ class LlamaAssistantService(
                 return report
             }
         }
+        if (COUNT_ASK.any { last.contains(it) } && last.contains("kana")) {
+            val report = runCatching { data.channelReport() }.getOrNull()
+            if (!report.isNullOrBlank()) {
+                onPiece(report)
+                return report
+            }
+        }
         if (SIGNAL_ASK.any { last.contains(it) } && SIGNAL_NOT.none { last.contains(it) }) {
             val report = runCatching { data.signalReport(last) }.getOrNull()
             if (!report.isNullOrBlank()) {
@@ -169,6 +176,7 @@ class LlamaAssistantService(
     private companion object {
         val SENSOR_ASK = listOf("pogod", "temperatur", "wilgot", "ciśnien", "cisnien", "czujnik", "weather")
         val RANK_ASK = listOf("sygnał", "sygnal", "snr", "rssi", "zasięg", "zasieg", "ramek", "bateri", "wiadomo")
+        val COUNT_ASK = listOf("najwięcej", "najwiecej", "ile wiadomo", "liczba wiadomo", "ilość wiadomo", "ilosc wiadomo")
         val SIGNAL_ASK = listOf("zasięg", "zasieg", "snr", "rssi", "najbliższ", "najblizsz", "najdalsz", "bezpośredn", "bezposredn", "jakość sygnał", "jakosc sygnal")
         val SIGNAL_NOT = listOf("ramek", "pogod", "temperatur", "wiadomo", "bateri", "ustawien", "streść", "stresc")
         const val MAX_ANSWER_TOKENS = 0 // no limit: the model finishes by itself

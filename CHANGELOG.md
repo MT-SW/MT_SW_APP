@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+* Asystent: kanał rozpoznawany też po numerze („kanał 1”, „kanał jeden”), więc streszczenie dotyczy właściwego kanału, a pytanie o liczbę wiadomości na kanałach dostaje dokładną listę z aplikacji.
 * Asystent: pytania o zasięg, SNR/RSSI, najbliższe i najdalsze węzły również dostają gotową, dokładną listę z aplikacji.
 * Asystent: pytania o pogodę i czujniki dostają gotową, dokładną listę policzoną w aplikacji (z najcieplejszym, najzimniejszym węzłem itd.), bo model przekręcał cyfry przy przepisywaniu.
 * Asystent: odczyty czujników, które nie mogą być prawdziwe (np. temperatura 25252 °C), są oznaczane jako „prawdopodobnie uszkodzony czujnik”, a odpowiedź, która zaczyna się powtarzać w kółko, jest przerywana po pierwszym razie.
@@ -366,6 +367,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### October 2026
 
+* Assistant: channels are also recognised by number ("channel 1", "channel one"), so a summary covers the right channel, and questions about message counts per channel get an exact list from the app.
 * Assistant: range, SNR/RSSI, closest/farthest node questions also get a ready, exact list from the app.
 * Assistant: weather and sensor questions get a ready, exact list worked out in the app (with hottest/coldest node etc.), because the model garbled digits when copying.
 * Assistant: sensor readings that cannot be real (e.g. 25252 °C) are marked as "probably a faulty sensor", and an answer that starts repeating itself is cut after the first occurrence.
