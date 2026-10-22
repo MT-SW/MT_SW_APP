@@ -53,7 +53,8 @@ class AssistantDataProvider(
             if (myNum != null) parts += safe("trend") { trends(myNum, "own node", 0L) }
         }
         if (q.hasAny(SETTINGS_WORDS)) parts += safe("settings") { settings() }
-        if (q.hasAny(NODE_WORDS) || q.hasAny(TREND_WORDS) || q.hasAny(RANK_WORDS)) {
+        if (q.hasAny(SIGNAL_WORDS)) parts += safe("signal") { signalRanking(q) }
+        if (q.hasAny(NODE_WORDS) || q.hasAny(TREND_WORDS) || q.hasAny(RANK_WORDS) || q.hasAny(SIGNAL_WORDS)) {
             parts += safe("ranking") { ranking(q) }
             parts += safe("network") { networkSummary() }
         }
@@ -144,6 +145,41 @@ class AssistantDataProvider(
             if (n.notes.isNotBlank()) appendLine("Notes: ${n.notes}")
         }
         return head + safe("node trends") { trends(n.num, n.user.long_name, 0L) }
+    }
+
+    /** Link quality to every node we hear: SNR, RSSI, hops and the distance from our own node. */
+    private fun signalRanking(q: String): String {
+        val me = nodeRepository.ourNodeInfo.value
+        val now = nowMillis / MILLIS_PER_SECOND
+        class Row(val n: org.meshtastic.core.model.Node, val meters: Int?)
+        val rows =
+            nodeRepository.nodeDBbyNum.value.values
+                .filter { it.num != me?.num }
+                .map { Row(it, me?.let { m -> it.distance(m) }) }
+        val heardWithSignal = rows.filter { it.n.snr != Float.MAX_VALUE }
+        val byDistance = q.hasAny(listOf("odległ", "odleg", "daleko", "dystans", "distance", "far"))
+        val closest = q.hasAny(listOf("najbliż", "najbliz", "blisk", "closest", "nearest"))
+        val sorted =
+            when {
+                closest -> rows.filter { it.meters != null }.sortedBy { it.meters }
+                byDistance -> rows.filter { it.meters != null }.sortedByDescending { it.meters }
+                else -> heardWithSignal.sortedWith(compareBy<Row> { it.n.hopsAway.let { h -> if (h < 0) Int.MAX_VALUE else h } }.thenByDescending { it.n.snr })
+            }
+        fun line(r: Row): String {
+            val n = r.n
+            val ago = if (n.lastHeard == 0) "never" else "${((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)} min ago"
+            return "- ${n.user.short_name} (${n.user.long_name}): hops ${n.hopsAway}, " +
+                "snr ${if (n.snr == Float.MAX_VALUE) "?" else fmt(n.snr)} dB, rssi ${if (n.rssi == Int.MAX_VALUE) "?" else n.rssi} dBm, " +
+                "distance ${r.meters?.let { m -> fmt(m / METERS_PER_KM) } ?: "?"} km, heard $ago"
+        }
+        return buildString {
+            appendLine(
+                "SIGNAL / RANGE from the own node (${rows.size} nodes; ${heardWithSignal.size} with a signal reading). " +
+                    "Higher SNR is better; RSSI closer to 0 is better; hops 0 means heard directly. " +
+                    if (closest || byDistance) "Sorted by distance:" else "Best range = direct nodes (hops 0) with the highest SNR first:",
+            )
+            sorted.take(SIGNAL_TOP).forEach { appendLine(line(it)) }
+        }
     }
 
     private class NodeRow(val num: Int) {
@@ -315,6 +351,8 @@ class AssistantDataProvider(
         const val MIN_NAME = 3
         const val RANK_WINDOW_MS = 12 * 60 * 60 * 1000L
         const val RANK_TOP = 12
+        const val SIGNAL_TOP = 12
+        const val METERS_PER_KM = 1000f
         const val RANK_BOTTOM = 4
         const val HEX = 16
         const val SECONDS_PER_HOUR = 3600
@@ -341,6 +379,7 @@ class AssistantDataProvider(
             listOf("ustawien", "konfig", "setting", "config", "region", "preset", "kanał", "kanal", "channel", "lora",
                 "rola", "role", "moc", "power", "wifi", "bluetooth", "mqtt", "hop")
         val NODE_WORDS = listOf("węz", "wez", "node", "sąsiad", "sasiad", "zasięg", "zasieg", "sieć", "siec", "mesh", "snr", "rssi", "kto")
+        val SIGNAL_WORDS = listOf("zasięg", "zasieg", "sygnał", "sygnal", "snr", "rssi", "odległ", "odleg", "daleko", "dystans", "blisk", "najbliż", "najbliz", "jakość", "jakosc", "range", "signal", "distance", "linku", "łącz", "polacz")
         val RANK_WORDS = listOf("ramek", "ramki", "pakiet", "odebran", "raportuj", "najwięc", "najwiec", "najmniej", "ranking", "który", "ktory", "najlep", "najgorz")
         val OWN_WORDS = listOf("mój", "moj", "mojego", "mojej", "mojemu", "my node", "own node", "mój węz", "moim")
         val MESSAGE_WORDS = listOf("wiadomo", "message", "czat", "chat", "napisa", "pisa", "rozmow", "odpowied")
