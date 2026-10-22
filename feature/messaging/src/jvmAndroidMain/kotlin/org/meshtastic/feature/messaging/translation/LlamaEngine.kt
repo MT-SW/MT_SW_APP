@@ -20,7 +20,6 @@ import co.touchlab.kermit.Logger
 import com.llamatik.core.platform.GenStream
 import com.llamatik.core.platform.LlamaBridge
 import kotlinx.coroutines.CancellationException
-import org.meshtastic.core.common.util.nowMillis
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -32,6 +31,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import org.meshtastic.core.common.util.nowMillis
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
