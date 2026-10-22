@@ -185,7 +185,7 @@ class AssistantDataProvider(
             put(n.num, "air quality", time, n.airQualityMetrics.toString())
             put(n.num, "power", time, n.powerMetrics.toString())
             put(n.num, "soil/water", time, n.soilWaterMetrics.toString())
-            put(n.num, "pax counter", time, n.paxcounter.toString())
+            if (n.paxcounter.wifi != 0 || n.paxcounter.ble != 0) put(n.num, "pax counter", time, n.paxcounter.toString())
         }
         val logs = meshLogRepository.getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, nowMillis - RANK_WINDOW_MS).first()
         for (log in logs) {
@@ -199,14 +199,14 @@ class AssistantDataProvider(
         if (found.isEmpty()) return "SENSOR DATA: no node has reported weather, air quality, power or other sensor data."
         val lines =
             found.entries
-                .sortedByDescending { e -> e.value.values.maxOf { it.first } }
+                .sortedWith(compareByDescending<Map.Entry<Int, MutableMap<String, Pair<Long, String>>>> { e -> e.value.values.any { it.second.contains("temperature=") } }.thenByDescending { e -> e.value.values.maxOf { it.first } })
                 .map { (num, kinds) ->
                     val n = nodeRepository.nodeDBbyNum.value[num]
                     val name = n?.let { "${it.user.short_name} (${it.user.long_name})" } ?: "!${num.toUInt().toString(HEX)}"
                     "- $name: " +
                         kinds.entries.joinToString("; ") { (kind, v) ->
                             val ago = ((nowS - v.first / MILLIS_PER_SECOND) / SECONDS_PER_MINUTE).coerceAtLeast(0)
-                            "$kind (${ago} min ago) ${v.second.substringAfter('{').removeSuffix("}").pretty()}"
+                            "$kind (${ago} min ago): ${v.second.substringAfter('{').removeSuffix("}").pretty().replace("gas_resistance", "gas")}"
                         }
                 }
         return "SENSOR DATA from ${lines.size} nodes (weather, air quality, power; latest values):\n" +
@@ -531,7 +531,7 @@ class AssistantDataProvider(
                 val key = m.groupValues[1]
                 val decimals = if (key in TWO_DECIMALS) 2 else 1
                 val value = roundTo(m.groupValues[2].toDoubleOrNull() ?: return@replace m.value, decimals)
-                "$key=$value${UNITS[key].orEmpty()}"
+                "$key=$value${UNITS[key].orEmpty()}${plausibility(key, value.toDoubleOrNull())}"
             }
         return INT_FIELD.replace(withFloats) { m ->
             val key = m.groupValues[1]
@@ -539,8 +539,18 @@ class AssistantDataProvider(
             when {
                 key.endsWith("uptime_seconds") -> number.toLongOrNull()?.let { "$key=$number (${duration(it)})" } ?: m.value
                 key.endsWith("_bytes") -> number.toLongOrNull()?.let { "$key=$number (${it / BYTES_PER_KB} kB)" } ?: m.value
-                else -> UNITS[key]?.let { "$key=$number$it" } ?: m.value
+                else -> UNITS[key]?.let { "$key=$number$it${plausibility(key, number.toDoubleOrNull())}" } ?: m.value
             }
+        }
+    }
+
+    /** Marks readings that cannot be real (a faulty or unplugged sensor) so the model says so instead of believing them. */
+    private fun plausibility(key: String, value: Double?): String {
+        val range = PLAUSIBLE[key] ?: return ""
+        return if (value != null && (value < range.start || value > range.endInclusive)) {
+            " [IMPLAUSIBLE: probably a faulty or missing sensor]"
+        } else {
+            ""
         }
     }
 
@@ -566,6 +576,13 @@ class AssistantDataProvider(
         const val TAG = "AssistantData"
         const val MAX_CONTEXT_CHARS = 3000
         const val MIN_PART = 250
+        val PLAUSIBLE =
+            mapOf(
+                "temperature" to (-60.0..80.0), "soil_temperature" to (-60.0..80.0),
+                "relative_humidity" to (0.0..100.0), "soil_moisture" to (0.0..100.0),
+                "barometric_pressure" to (300.0..1100.0), "battery_level" to (0.0..101.0),
+                "channel_utilization" to (0.0..100.0), "air_util_tx" to (0.0..100.0),
+            )
         const val BYTES_PER_KB = 1024
         const val SECONDS_PER_DAY = 86_400L
         val FLOAT_FIELD = Regex("([a-z_0-9]+)=(-?\\d+\\.\\d+(?:E-?\\d+)?)")

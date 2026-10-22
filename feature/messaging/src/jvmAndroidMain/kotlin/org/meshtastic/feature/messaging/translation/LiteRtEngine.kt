@@ -121,7 +121,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
             loaded.createConversation(config).use { conversation ->
                 conversation
                     .sendMessageAsync(dialogue.last().second)
-                    .takeWhile { reply.length < limit }
+                    .takeWhile { reply.length < limit && !reply.isLooping() }
                     .collect { message ->
                         val piece = message.toString()
                         if (piece.isNotEmpty()) {
@@ -142,7 +142,8 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
             "Answer from $modelId: loaded=${!wasLoaded} in ${loadedAt - started} ms, generated ${reply.length} chars " +
                 "in ${nowMillis - loadedAt} ms"
         }
-        return restorer.restoreAll(reply.toString()).trim()
+        val finalText = reply.withoutLoop()
+        return restorer.restoreAll(finalText).trim()
     }
 
     private fun ensureLoaded(modelId: String): Engine {
@@ -200,6 +201,32 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         return out.toString()
     }
 
+    /** True when the end of the text repeats itself over and over (a small model stuck in a loop). */
+    private fun CharSequence.isLooping(): Boolean {
+        if (length < LOOP_TAIL * 3) return false
+        val text = toString()
+        val tail = text.takeLast(LOOP_TAIL)
+        val window = text.takeLast(LOOP_WINDOW)
+        var count = 0
+        var from = 0
+        while (true) {
+            val at = window.indexOf(tail, from)
+            if (at < 0) break
+            count++
+            from = at + 1
+        }
+        return count >= LOOP_REPEATS
+    }
+
+    /** Cuts a looping ending after its first occurrence. */
+    private fun CharSequence.withoutLoop(): String {
+        val text = toString()
+        if (!isLooping()) return text
+        val tail = text.takeLast(LOOP_TAIL)
+        val first = text.indexOf(tail)
+        return if (first >= 0) text.substring(0, first + LOOP_TAIL).trimEnd() else text
+    }
+
     /** Puts the original symbols back into the streamed answer; a marker split between two pieces is held back. */
     private class SymbolRestorer(private val symbols: Map<String, String>) {
         private val pending = StringBuilder()
@@ -246,6 +273,9 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         const val TOP_P = 0.95
         const val TOP_K = 40
         const val CHARS_PER_TOKEN = 4
+        const val LOOP_TAIL = 40
+        const val LOOP_WINDOW = 800
+        const val LOOP_REPEATS = 3
         const val IDLE_UNLOAD_MS = 120_000L
     }
 }

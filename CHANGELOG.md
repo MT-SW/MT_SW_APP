@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+* Asystent: odczyty czujników, które nie mogą być prawdziwe (np. temperatura 25252 °C), są oznaczane jako „prawdopodobnie uszkodzony czujnik”, a odpowiedź, która zaczyna się powtarzać w kółko, jest przerywana po pierwszym razie.
 **Scalenie z oryginałem — wersja 2.8.4 (początek)**
 * Scalenie z oryginałem po wydaniu 2.8.3: numer wersji aplikacji 2.8.4, nowsze protobufy (2.8.1.18), odświeżone dane o sprzęcie i firmware, tłumaczenia i zrzuty ekranu sklepów. Biblioteka Bluetooth Kable zostaje przypięta do 0.44.3, a nasze tłumaczenia PL bez zmian.
 * Drugie scalenie z oryginałem: nowy **widok AR sieci** (węzły i punkty trasy na obrazie z aparatu telefonu), **podgląd 3D urządzenia**, szybkie akcje „Otwórz kompas” i „Otwórz widok sieci” w menu węzła, protobufy 2.8.1.20 i nowsze narzędzia budowania. Nowe napisy przetłumaczone na polski, a nasze funkcje (np. nazwy planera, Zdrowie sieci) zostały zachowane.
@@ -362,6 +363,8 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+
+* Assistant: sensor readings that cannot be real (e.g. 25252 °C) are marked as "probably a faulty sensor", and an answer that starts repeating itself is cut after the first occurrence.
 
 **Merge with the original — version 2.8.4 (start)**
 * Merged the original after the 2.8.3 release: app version number 2.8.4, newer protobufs (2.8.1.18), refreshed hardware and firmware data, translations and store screenshots. The Kable Bluetooth library stays pinned to 0.44.3, and our Polish translations are unchanged.
