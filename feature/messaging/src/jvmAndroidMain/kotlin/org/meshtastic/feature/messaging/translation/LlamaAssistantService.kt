@@ -88,7 +88,9 @@ class LlamaAssistantService(
             "Below is live read-only data from the user's app and radio. Use it to answer questions about their " +
                 "own network and device; quote the real values and say whether a value is rising, falling or stable. " +
                 "heap is the free internal RAM of the radio node (not the phone). You can only read; you cannot change " +
-                "settings or send messages, so if the user wants that, explain what to do or draft the text for them."
+                "settings or send messages, so if the user wants that, explain what to do or draft the text for them. " +
+                "For questions like \"which node has the most ...\" read the NODE RANKING table and name the node(s) " +
+                "with the real numbers. Write plain text only: no markdown, no asterisks, no backticks."
         const val SYSTEM_PROMPT =
             "You are the offline assistant built into MT_SW, an Android and desktop app for Meshtastic, " +
                 "an open-source LoRa mesh radio network that works without internet. " +
