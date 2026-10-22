@@ -63,6 +63,8 @@ class AssistantDataProvider(
         if (q.hasAny(SETTINGS_WORDS)) parts += safe("settings") { settings() }
         if (q.hasAny(MESSAGE_WORDS)) parts += safe("messages") { messages() }
         parts += safe("index") { nodeIndex() }
+        // When the question has its own topic, the general overview shrinks so the topic data fits in the small window.
+        if (parts.size > 2) parts[0] = parts[0].take(OVERVIEW_SHORT)
         val out = StringBuilder()
         for (part in parts.filter { it.isNotBlank() }) {
             val room = maxChars - out.length
@@ -489,6 +491,7 @@ class AssistantDataProvider(
         const val TAG = "AssistantData"
         const val MAX_CONTEXT_CHARS = 3000
         const val MIN_PART = 250
+        const val OVERVIEW_SHORT = 380
         const val MIN_NAME = 3
         const val RANK_WINDOW_MS = 3 * 24 * 60 * 60 * 1000L
         const val RANK_TOP = 8

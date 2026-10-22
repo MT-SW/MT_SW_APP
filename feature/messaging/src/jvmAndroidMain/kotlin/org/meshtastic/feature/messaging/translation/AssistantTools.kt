@@ -57,8 +57,13 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
         @ToolParam(description = "How many nodes to return, 1 to 40") limit: Int,
     ): String = run("rank_nodes") { data.toolList(sort_by, limit) }
 
-    @Tool(description = "Weather, air quality, power and other sensor values reported by the nodes (temperature, humidity, pressure, voltage, ...).")
-    fun sensor_data(): String = run("sensor_data") { data.toolSensors() }
+    @Tool(
+        description =
+        "WEATHER statistics of the nodes: temperature, humidity, air pressure, wind, rain, light, air quality, " +
+            "voltage and current from the nodes' sensors. Call this for any question about weather, temperature, " +
+            "humidity, pressure or sensors.",
+    )
+    fun weather_and_sensor_data(): String = run("weather_and_sensor_data") { data.toolSensors() }
 
     @Tool(description = "The radio settings of the own node (device, LoRa, channels, modules). Keys and passwords are hidden.")
     fun radio_settings(): String = run("radio_settings") { data.toolSettings() }

@@ -171,8 +171,8 @@ class LlamaAssistantService(
                 "markdown, no asterisks, no backticks."
         const val TOOLS_RULE =
             "You have read-only tools that look up the app's data: network overview, node names, details and " +
-                "history of any node, ranked node tables (packets, memory, battery, signal, distance), sensor and " +
-                "weather data, radio settings and messages. For ANY question about the user's network, nodes, " +
+                "history of any node, ranked node tables (packets, memory, battery, signal, distance), WEATHER " +
+                "and sensor data (temperature, humidity, pressure, ...), radio settings and messages. For ANY question about the user's network, nodes, " +
                 "statistics, history, settings, sensors or messages, call the matching tool first and answer from " +
                 "its result; never say you have no data before you have tried the tools. You cannot change " +
                 "settings or send messages; if the user wants that, explain what to do or draft the text for them."
