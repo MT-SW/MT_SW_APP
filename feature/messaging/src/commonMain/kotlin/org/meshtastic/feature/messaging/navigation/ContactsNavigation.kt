@@ -38,7 +38,7 @@ import org.meshtastic.feature.messaging.QuickChatViewModel
 import org.meshtastic.feature.messaging.ui.contact.AdaptiveContactsScreen
 import org.meshtastic.feature.messaging.ui.contact.ContactsViewModel
 import org.meshtastic.feature.messaging.ui.sharing.ShareScreen
-import org.meshtastic.feature.messaging.ui.translator.TranslatorScreen
+import org.meshtastic.feature.messaging.ui.translator.AiHomeScreen
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Suppress("LongMethod")
@@ -90,8 +90,9 @@ fun EntryProviderScope<NavKey>.contactsGraph(
     }
 
     entry<ContactsRoute.Translator> {
-        TranslatorScreen(
-            viewModel = koinViewModel(),
+        AiHomeScreen(
+            translatorViewModel = koinViewModel(),
+            assistantViewModel = koinViewModel(),
             onBack = dropUnlessResumed { backStack.removeLastOrNull() },
             // As the root of its own bottom-bar tab there is nothing to go back to.
             canNavigateUp = backStack.size > 1,

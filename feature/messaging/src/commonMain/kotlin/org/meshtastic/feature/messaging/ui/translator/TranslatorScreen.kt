@@ -27,10 +27,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -52,121 +52,115 @@ import org.meshtastic.core.resources.translator_error_same
 import org.meshtastic.core.resources.translator_error_unknown
 import org.meshtastic.core.resources.translator_from
 import org.meshtastic.core.resources.translator_input_hint
+import org.meshtastic.core.resources.translator_loading_hint
 import org.meshtastic.core.resources.translator_long_warning
 import org.meshtastic.core.resources.translator_model_missing
 import org.meshtastic.core.resources.translator_off
-import org.meshtastic.core.resources.translator_open
 import org.meshtastic.core.resources.translator_result
 import org.meshtastic.core.resources.translator_swap
 import org.meshtastic.core.resources.translator_to
 import org.meshtastic.core.ui.component.CopyIconButton
-import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.feature.messaging.translation.TranslatorError
 import org.meshtastic.feature.messaging.translation.TranslatorLanguages
 import org.meshtastic.feature.messaging.translation.TranslatorViewModel
 
-/** Stand-alone translator: type a text, pick the languages, translate and copy. Works fully offline. */
+/** The translator itself: type a text, pick the languages, translate and copy. Works fully offline. */
 @Composable
-fun TranslatorScreen(viewModel: TranslatorViewModel, onBack: () -> Unit, canNavigateUp: Boolean = true) {
+fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modifier) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val enabled by viewModel.enabled.collectAsStateWithLifecycle()
     val modelState by viewModel.modelState.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            MainAppBar(
-                title = stringResource(Res.string.translator_open),
-                canNavigateUp = canNavigateUp,
-                onNavigateUp = onBack,
-                ourNode = null,
-                showNodeChip = false,
-                actions = {},
-                onClickChip = {},
+    Column(
+        modifier = modifier.verticalScroll(rememberScrollState()).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        if (!enabled) {
+            Text(stringResource(Res.string.translator_off), style = MaterialTheme.typography.bodyMedium)
+            return@Column
+        }
+        if (modelState != TranslatorModelState.Ready) {
+            Text(stringResource(Res.string.translator_model_missing), style = MaterialTheme.typography.bodyMedium)
+            return@Column
+        }
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            LanguagePicker(
+                label = stringResource(Res.string.translator_from),
+                selected = state.sourceNllb,
+                allowAuto = true,
+                onSelect = viewModel::setSource,
+                modifier = Modifier.weight(1f),
             )
-        },
-    ) { padding ->
-        Column(
-            modifier = Modifier.padding(padding).verticalScroll(rememberScrollState()).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            if (!enabled) {
-                Text(stringResource(Res.string.translator_off), style = MaterialTheme.typography.bodyMedium)
-                return@Column
-            }
-            if (modelState != TranslatorModelState.Ready) {
-                Text(stringResource(Res.string.translator_model_missing), style = MaterialTheme.typography.bodyMedium)
-                return@Column
-            }
-
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                LanguagePicker(
-                    label = stringResource(Res.string.translator_from),
-                    selected = state.sourceNllb,
-                    allowAuto = true,
-                    onSelect = viewModel::setSource,
-                    modifier = Modifier.weight(1f),
-                )
-                LanguagePicker(
-                    label = stringResource(Res.string.translator_to),
-                    selected = state.targetNllb,
-                    allowAuto = false,
-                    onSelect = { it?.let(viewModel::setTarget) },
-                    modifier = Modifier.weight(1f),
-                )
-            }
-            TextButton(onClick = viewModel::swapLanguages) { Text(stringResource(Res.string.translator_swap)) }
-
-            OutlinedTextField(
-                value = state.input,
-                onValueChange = viewModel::setInput,
-                label = { Text(stringResource(Res.string.translator_input_hint)) },
-                minLines = 3,
-                modifier = Modifier.fillMaxWidth(),
+            LanguagePicker(
+                label = stringResource(Res.string.translator_to),
+                selected = state.targetNllb,
+                allowAuto = false,
+                onSelect = { it?.let(viewModel::setTarget) },
+                modifier = Modifier.weight(1f),
             )
-            Button(onClick = viewModel::translate, enabled = !state.busy && state.input.isNotBlank()) {
-                Text(
-                    stringResource(if (state.busy) Res.string.translator_busy else Res.string.translator_action),
-                )
-            }
+        }
+        TextButton(onClick = viewModel::swapLanguages) { Text(stringResource(Res.string.translator_swap)) }
 
-            state.error?.let { error ->
-                Text(
-                    text =
-                    stringResource(
-                        when (error) {
-                            TranslatorError.UnknownLanguage -> Res.string.translator_error_unknown
-                            TranslatorError.SameLanguage -> Res.string.translator_error_same
-                            TranslatorError.ModelMissing -> Res.string.translator_model_missing
-                            TranslatorError.Failed -> Res.string.translator_error_failed
-                        },
-                    ),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
+        OutlinedTextField(
+            value = state.input,
+            onValueChange = viewModel::setInput,
+            label = { Text(stringResource(Res.string.translator_input_hint)) },
+            minLines = 3,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Button(onClick = viewModel::translate, enabled = !state.busy && state.input.isNotBlank()) {
+            Text(
+                stringResource(if (state.busy) Res.string.translator_busy else Res.string.translator_action),
+            )
+        }
 
-            if (state.output.isNotBlank()) {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Text(
-                                text = stringResource(Res.string.translator_result),
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.primary,
-                            )
-                            CopyIconButton(valueToCopy = state.output)
-                        }
-                        Text(text = state.output, style = MaterialTheme.typography.bodyLarge)
-                        if (viewModel.isTooLongForOnePacket(state.output)) {
-                            Text(
-                                text = stringResource(Res.string.translator_long_warning),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
+        if (state.busy) {
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            Text(
+                text = stringResource(Res.string.translator_loading_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
+        state.error?.let { error ->
+            Text(
+                text =
+                stringResource(
+                    when (error) {
+                        TranslatorError.UnknownLanguage -> Res.string.translator_error_unknown
+                        TranslatorError.SameLanguage -> Res.string.translator_error_same
+                        TranslatorError.ModelMissing -> Res.string.translator_model_missing
+                        TranslatorError.Failed -> Res.string.translator_error_failed
+                    },
+                ),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+
+        if (state.output.isNotBlank()) {
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(
+                            text = stringResource(Res.string.translator_result),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        CopyIconButton(valueToCopy = state.output)
+                    }
+                    Text(text = state.output, style = MaterialTheme.typography.bodyLarge)
+                    if (viewModel.isTooLongForOnePacket(state.output)) {
+                        Text(
+                            text = stringResource(Res.string.translator_long_warning),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
                 }
             }

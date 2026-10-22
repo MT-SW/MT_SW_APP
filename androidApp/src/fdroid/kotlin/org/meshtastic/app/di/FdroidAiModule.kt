@@ -30,7 +30,9 @@ import org.meshtastic.feature.messaging.translation.MessageTranslationService
 import org.meshtastic.core.repository.TranslatorModelManager
 import org.meshtastic.feature.messaging.translation.AiModelStoreImpl
 import org.meshtastic.feature.messaging.translation.AiTranslationRouter
+import org.meshtastic.feature.messaging.translation.AssistantService
 import org.meshtastic.feature.messaging.translation.GemmaTranslator
+import org.meshtastic.feature.messaging.translation.LlamaAssistantService
 import org.meshtastic.feature.messaging.translation.LlamaEngine
 import org.meshtastic.core.repository.AiModelStore
 import org.meshtastic.core.repository.UiPrefs
@@ -67,6 +69,10 @@ class FdroidAiModule {
         store: AiModelStoreImpl,
         uiPrefs: UiPrefs,
     ): AiTranslationRouter = AiTranslationRouter(translator, GemmaTranslator(engine), store, uiPrefs)
+
+    @Single
+    fun assistantService(engine: LlamaEngine, store: AiModelStoreImpl, uiPrefs: UiPrefs): AssistantService =
+        LlamaAssistantService(engine, store, uiPrefs)
 
     @Single fun messageTranslationService(router: AiTranslationRouter): MessageTranslationService = router
 

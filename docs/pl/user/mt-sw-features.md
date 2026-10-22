@@ -134,6 +134,8 @@ Na słabszych urządzeniach duże modele mogą spowalniać aplikację albo ją z
 
 **Karta na dolnym pasku.** Gdy włączony jest którykolwiek tryb, na dolnym pasku pojawia się karta „Tłumacz”. Gdy włączysz też asystenta, karta nazywa się „AI” i ma ikonę iskierek, a w środku są dwie osobne zakładki: tłumacz i asystent. Asystent działa tylko na tej karcie, a w kanałach i wiadomościach prywatnych jest wyłącznie tłumacz. Asystent wymaga modelu Standardowego albo Mocnego; sam model Lekki tylko tłumaczy.
 
+**Jak działa asystent.** Piszesz pytanie, a odpowiedź pojawia się na bieżąco; przyciskiem „Zatrzymaj” przerwiesz ją w każdej chwili, a „Wyczyść rozmowę” zaczyna od nowa. Pierwsza odpowiedź (i pierwsze tłumaczenie) trwa dłużej, bo model jest wczytywany do pamięci. Odpowiedzi mogą być błędne — ważne rzeczy sprawdzaj. Rozmowa nie jest nigdzie zapisywana ani wysyłana.
+
 **Tłumacz:**
 
 - **Odebrane wiadomości** — w menu wiadomości jest „Przetłumacz wiadomość”. Oryginał zostaje, a tłumaczenie można przełączać z oryginałem.

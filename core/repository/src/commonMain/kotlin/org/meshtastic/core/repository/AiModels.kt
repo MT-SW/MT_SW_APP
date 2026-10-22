@@ -72,7 +72,7 @@ object AiModels {
     const val GEMMA_12B_ID = "gemma3-12b"
 
     /** Flipped to true when the assistant screen exists; until then the assistant switch stays off. */
-    const val ASSISTANT_SCREEN_READY = false
+    const val ASSISTANT_SCREEN_READY = true
 
     private const val GEMMA_4B_REPO = "https://huggingface.co/unsloth/gemma-3-4b-it-GGUF/resolve/main/"
     private const val GEMMA_12B_REPO = "https://huggingface.co/unsloth/gemma-3-12b-it-GGUF/resolve/main/"
