@@ -124,6 +124,14 @@ class LlamaAssistantService(
         context: String,
         onPiece: (String) -> Unit,
     ): String {
+        val last = turns.lastOrNull { it.fromUser }?.text.orEmpty().lowercase()
+        if (SENSOR_ASK.any { last.contains(it) } && RANK_ASK.none { last.contains(it) }) {
+            val report = runCatching { data.sensorReport() }.getOrNull()
+            if (!report.isNullOrBlank()) {
+                onPiece(report)
+                return report
+            }
+        }
         val system = buildString {
             append(SYSTEM_PROMPT).append("\n\n").append(TOOLS_RULE)
             if (summary.isNotBlank()) append("\n\nSummary of the earlier part of this conversation: ").append(summary)
@@ -152,6 +160,8 @@ class LlamaAssistantService(
     }
 
     private companion object {
+        val SENSOR_ASK = listOf("pogod", "temperatur", "wilgot", "ciśnien", "cisnien", "czujnik", "weather")
+        val RANK_ASK = listOf("sygnał", "sygnal", "snr", "rssi", "zasięg", "zasieg", "ramek", "bateri", "wiadomo")
         const val MAX_ANSWER_TOKENS = 0 // no limit: the model finishes by itself
         const val TEMPERATURE = 0.5f
         const val RECENT_CHARS = 1500

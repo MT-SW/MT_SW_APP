@@ -168,9 +168,7 @@ class AssistantDataProvider(
      * Which nodes report weather, air quality, power or other sensor data, and the values they last sent. Values come
      * from the node list and from the telemetry logs of the last 3 days (the newest reading of each kind wins).
      */
-    private suspend fun sensors(): String {
-        val nowS = nowMillis / MILLIS_PER_SECOND
-        // node number -> kind -> (time in ms, values text)
+    private suspend fun collectSensors(): HashMap<Int, MutableMap<String, Pair<Long, String>>> {
         val found = HashMap<Int, MutableMap<String, Pair<Long, String>>>()
         fun put(num: Int, kind: String, time: Long, text: String) {
             if (text.endsWith("{}")) return
@@ -196,6 +194,60 @@ class AssistantDataProvider(
             t.air_quality_metrics?.let { put(num, "air quality", log.received_date, it.toString()) }
             t.power_metrics?.let { put(num, "power", log.received_date, it.toString()) }
         }
+        return found
+    }
+
+    /**
+     * A ready-made, exact sensor answer written in code (the model garbles digits when it copies long tables), with the
+     * hottest/coldest/most humid nodes worked out here as well.
+     */
+    suspend fun sensorReport(): String {
+        val found = collectSensors()
+        val nowS = nowMillis / MILLIS_PER_SECOND
+        class Row(val name: String, val ago: Long, val values: Map<String, Double>)
+        val field = Regex("(\\w+)=(-?[0-9]+(?:\\.[0-9]+)?(?:E-?[0-9]+)?)")
+        val rows =
+            found.entries.mapNotNull { (num, kinds) ->
+                val values = LinkedHashMap<String, Double>()
+                for ((kind, v) in kinds) {
+                    if (kind == "pax counter") continue
+                    field.findAll(v.second).forEach { m ->
+                        val key = m.groupValues[1]
+                        val d = m.groupValues[2].toDoubleOrNull() ?: return@forEach
+                        val range = PLAUSIBLE[key]
+                        if (range == null || d in range) values[key] = d
+                    }
+                }
+                values.keys.retainAll(REPORT_KEYS.keys)
+                if (values.isEmpty()) return@mapNotNull null
+                val n = nodeRepository.nodeDBbyNum.value[num]
+                val name = n?.let { "${it.user.short_name} (${it.user.long_name})" } ?: "!${num.toUInt().toString(HEX)}"
+                val ago = ((nowS - kinds.values.maxOf { it.first } / MILLIS_PER_SECOND) / SECONDS_PER_MINUTE).coerceAtLeast(0)
+                Row(name, ago, values)
+            }
+        if (rows.isEmpty()) return "Żaden węzeł nie podał danych pogodowych ani z czujników."
+        val sorted = rows.sortedByDescending { it.values.containsKey("temperature") }
+        val sb = StringBuilder("Dane z czujników (${rows.size} węzłów, ostatnie odczyty; niemożliwe wartości pominięte):\n")
+        for (r in sorted.take(REPORT_LIMIT)) {
+            val text = r.values.entries.joinToString(", ") { (k, v) -> REPORT_KEYS.getValue(k).replace("%s", roundTo(v, if (k in TWO_DECIMALS) 2 else 1)) }
+            sb.append("• ${r.name}: $text\n")
+        }
+        fun extreme(key: String, label: String, highest: Boolean) {
+            val best = rows.filter { it.values.containsKey(key) }.let { l -> if (highest) l.maxByOrNull { it.values.getValue(key) } else l.minByOrNull { it.values.getValue(key) } }
+            if (best != null) sb.append("$label: ${best.name} — ${REPORT_KEYS.getValue(key).replace("%s", roundTo(best.values.getValue(key), 1)).substringAfter(' ')}\n")
+        }
+        sb.append('\n')
+        extreme("temperature", "Najcieplej", true)
+        extreme("temperature", "Najzimniej", false)
+        extreme("relative_humidity", "Największa wilgotność", true)
+        extreme("barometric_pressure", "Najwyższe ciśnienie", true)
+        return sb.toString().trim()
+    }
+
+    private suspend fun sensors(): String {
+        val nowS = nowMillis / MILLIS_PER_SECOND
+        val found = collectSensors()
+        // node number -> kind -> (time in ms, values text)
         if (found.isEmpty()) return "SENSOR DATA: no node has reported weather, air quality, power or other sensor data."
         val lines =
             found.entries
@@ -576,6 +628,12 @@ class AssistantDataProvider(
         const val TAG = "AssistantData"
         const val MAX_CONTEXT_CHARS = 3000
         const val MIN_PART = 250
+        val REPORT_KEYS =
+            mapOf(
+                "temperature" to "temperatura %s °C", "relative_humidity" to "wilgotność %s %",
+                "barometric_pressure" to "ciśnienie %s hPa", "voltage" to "napięcie %s V", "current" to "prąd %s mA",
+                "lux" to "światło %s lx", "wind_speed" to "wiatr %s m/s",
+            )
         val PLAUSIBLE =
             mapOf(
                 "temperature" to (-60.0..80.0), "soil_temperature" to (-60.0..80.0),
@@ -608,6 +666,7 @@ class AssistantDataProvider(
         const val RANK_TOP = 8
         const val SIGNAL_TOP = 8
         const val SENSOR_LIMIT = 12
+        const val REPORT_LIMIT = 40
         const val MAX_TOOL_LIST = 40
         const val SEARCH_PER_CHAT = 60
         const val MILLIS_PER_HOUR = 3_600_000L
