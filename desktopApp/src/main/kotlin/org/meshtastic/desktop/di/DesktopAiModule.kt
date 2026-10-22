@@ -33,7 +33,7 @@ import org.meshtastic.feature.messaging.translation.AssistantService
 import org.meshtastic.feature.messaging.translation.FileAssistantHistoryStore
 import org.meshtastic.feature.messaging.translation.GemmaTranslator
 import org.meshtastic.feature.messaging.translation.LlamaAssistantService
-import org.meshtastic.feature.messaging.translation.LlamaEngine
+import org.meshtastic.feature.messaging.translation.LiteRtEngine
 import org.meshtastic.core.repository.AiModelStore
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.feature.messaging.translation.NllbTranslator
@@ -59,12 +59,12 @@ class DesktopAiModule {
 
     @Single fun aiModelStore(impl: AiModelStoreImpl): AiModelStore = impl
 
-    @Single fun llamaEngine(store: AiModelStoreImpl): LlamaEngine = LlamaEngine(store)
+    @Single fun liteRtEngine(store: AiModelStoreImpl): LiteRtEngine = LiteRtEngine(store)
 
     @Single
     fun aiTranslationRouter(
         translator: NllbTranslator,
-        engine: LlamaEngine,
+        engine: LiteRtEngine,
         store: AiModelStoreImpl,
         uiPrefs: UiPrefs,
     ): AiTranslationRouter = AiTranslationRouter(translator, GemmaTranslator(engine), store, uiPrefs)
@@ -74,7 +74,7 @@ class DesktopAiModule {
         FileAssistantHistoryStore(File(System.getProperty("user.home"), ".meshtastic/assistant"))
 
     @Single
-    fun assistantService(engine: LlamaEngine, store: AiModelStoreImpl, uiPrefs: UiPrefs): AssistantService =
+    fun assistantService(engine: LiteRtEngine, store: AiModelStoreImpl, uiPrefs: UiPrefs): AssistantService =
         LlamaAssistantService(engine, store, uiPrefs)
 
     @Single fun messageTranslationService(router: AiTranslationRouter): MessageTranslationService = router

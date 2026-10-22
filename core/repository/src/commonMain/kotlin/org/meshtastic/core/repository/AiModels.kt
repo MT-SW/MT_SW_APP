@@ -23,8 +23,8 @@ enum class AiEngine {
     /** NLLB-200 through ONNX Runtime (translation only). */
     NLLB_ONNX,
 
-    /** GGUF language models through llama.cpp (translation and assistant). */
-    LLAMA_GGUF,
+    /** Gemma 4 language models (`.litertlm`) through Google LiteRT-LM (translation and assistant). */
+    LITERT_LM,
 }
 
 /** What a model can be used for. */
@@ -38,8 +38,8 @@ enum class AiLicense {
     /** NLLB-200 (Meta): Creative Commons BY-NC 4.0, non-commercial use only. */
     CC_BY_NC_4_0,
 
-    /** Gemma 3 (Google): the Gemma Terms of Use and Prohibited Use Policy. */
-    GEMMA_TERMS,
+    /** Gemma 4 (Google): Apache License 2.0. */
+    APACHE_2_0,
 }
 
 /** One file of a model that is downloaded as a whole. */
@@ -68,14 +68,14 @@ data class AiModelInfo(
 /** The fixed list of models offered by the app (light, standard, strong). */
 object AiModels {
     const val NLLB_600M_ID = "nllb-600m"
-    const val GEMMA_4B_ID = "gemma3-4b"
-    const val GEMMA_12B_ID = "gemma3-12b"
+    const val GEMMA_E2B_ID = "gemma4-e2b"
+    const val GEMMA_E4B_ID = "gemma4-e4b"
+    const val GEMMA_12B_ID = "gemma4-12b"
 
     /** Flipped to true when the assistant screen exists; until then the assistant switch stays off. */
     const val ASSISTANT_SCREEN_READY = true
 
-    private const val GEMMA_4B_REPO = "https://huggingface.co/unsloth/gemma-3-4b-it-GGUF/resolve/main/"
-    private const val GEMMA_12B_REPO = "https://huggingface.co/unsloth/gemma-3-12b-it-GGUF/resolve/main/"
+    private const val REPO = "https://huggingface.co/litert-community/"
 
     /** Light: translation only, runs on phones from 4 GB of RAM. Its files are handled by the NLLB engine itself. */
     val Nllb600 =
@@ -92,37 +92,54 @@ object AiModels {
             engineReady = true,
         )
 
-    /** Standard: translation and assistant in one file, for phones from 8 GB of RAM. */
-    val Gemma4b =
+    /** Light Gemma: translation and assistant in one file, for phones from 6 GB of RAM. */
+    val GemmaE2b =
         AiModelInfo(
-            id = GEMMA_4B_ID,
-            name = "Gemma 3 4B",
-            engine = AiEngine.LLAMA_GGUF,
+            id = GEMMA_E2B_ID,
+            name = "Gemma 4 E2B",
+            engine = AiEngine.LITERT_LM,
             roles = setOf(AiRole.TRANSLATOR, AiRole.ASSISTANT),
-            sizeMb = 2490,
-            ramMb = 5000,
-            minDeviceRamGb = 8,
-            license = AiLicense.GEMMA_TERMS,
-            files = listOf(AiModelFile(GEMMA_4B_REPO + "gemma-3-4b-it-Q4_K_M.gguf", "gemma-3-4b-it-Q4_K_M.gguf")),
+            sizeMb = 2590,
+            ramMb = 3500,
+            minDeviceRamGb = 6,
+            license = AiLicense.APACHE_2_0,
+            files = listOf(file("gemma-4-E2B-it-litert-lm", "gemma-4-E2B-it.litertlm")),
             engineReady = true,
         )
 
-    /** Strong: the best quality, for computers and phones with 16 GB of RAM. */
+    /** Standard: better quality, for phones and computers from 8 GB of RAM. */
+    val GemmaE4b =
+        AiModelInfo(
+            id = GEMMA_E4B_ID,
+            name = "Gemma 4 E4B",
+            engine = AiEngine.LITERT_LM,
+            roles = setOf(AiRole.TRANSLATOR, AiRole.ASSISTANT),
+            sizeMb = 3660,
+            ramMb = 5000,
+            minDeviceRamGb = 8,
+            license = AiLicense.APACHE_2_0,
+            files = listOf(file("gemma-4-E4B-it-litert-lm", "gemma-4-E4B-it.litertlm")),
+            engineReady = true,
+        )
+
+    /** Strong: the best answers, for computers and phones with 16 GB of RAM. */
     val Gemma12b =
         AiModelInfo(
             id = GEMMA_12B_ID,
-            name = "Gemma 3 12B",
-            engine = AiEngine.LLAMA_GGUF,
+            name = "Gemma 4 12B",
+            engine = AiEngine.LITERT_LM,
             roles = setOf(AiRole.TRANSLATOR, AiRole.ASSISTANT),
-            sizeMb = 7300,
-            ramMb = 10000,
+            sizeMb = 6880,
+            ramMb = 9500,
             minDeviceRamGb = 16,
-            license = AiLicense.GEMMA_TERMS,
-            files = listOf(AiModelFile(GEMMA_12B_REPO + "gemma-3-12b-it-Q4_K_M.gguf", "gemma-3-12b-it-Q4_K_M.gguf")),
+            license = AiLicense.APACHE_2_0,
+            files = listOf(file("gemma-4-12B-it-litert-lm", "gemma-4-12B-it.litertlm")),
             engineReady = true,
         )
 
-    val all: List<AiModelInfo> = listOf(Nllb600, Gemma4b, Gemma12b)
+    private fun file(repo: String, name: String) = AiModelFile("${REPO}$repo/resolve/main/$name", name)
+
+    val all: List<AiModelInfo> = listOf(Nllb600, GemmaE2b, GemmaE4b, Gemma12b)
 
     fun byId(id: String?): AiModelInfo? = all.firstOrNull { it.id == id }
 }

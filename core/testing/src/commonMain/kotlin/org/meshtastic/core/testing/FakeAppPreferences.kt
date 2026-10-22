@@ -377,7 +377,7 @@ class FakeUiPrefs : UiPrefs {
         translatorModelId.value = value
     }
 
-    override val assistantModelId = MutableStateFlow("gemma3-4b")
+    override val assistantModelId = MutableStateFlow("gemma4-e4b")
 
     override fun setAssistantModelId(value: String) {
         assistantModelId.value = value

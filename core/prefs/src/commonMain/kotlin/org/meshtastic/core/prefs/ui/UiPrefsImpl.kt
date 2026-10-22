@@ -693,7 +693,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_TRANSLATOR_MODEL_ID = stringPreferencesKey("translator-model-id")
         val KEY_ASSISTANT_MODEL_ID = stringPreferencesKey("assistant-model-id")
         const val DEFAULT_TRANSLATOR_MODEL_ID = "nllb-600m"
-        const val DEFAULT_ASSISTANT_MODEL_ID = "gemma3-4b"
+        const val DEFAULT_ASSISTANT_MODEL_ID = "gemma4-e4b"
         val KEY_BLE_AUTO_SCAN = booleanPreferencesKey("ble-auto-scan")
         val KEY_NETWORK_AUTO_SCAN = booleanPreferencesKey("network-auto-scan")
         val KEY_SELECTED_CONNECTION_TRANSPORT = stringPreferencesKey("selected-connection-transport")

@@ -44,17 +44,17 @@ import java.net.URL
 
 /**
  * Keeps the downloaded state of every model in [AiModels.all]. The NLLB model is handled by [NllbTranslator] itself;
- * GGUF models (Gemma) are single files downloaded here into one folder per model under [ggufDir]. Several models can
+ * LiteRT-LM models (Gemma 4) are single files downloaded here into one folder per model under [ggufDir]. Several models can
  * be on the device at once and each is downloaded, cancelled and deleted on its own.
  */
-class AiModelStoreImpl(private val nllb: NllbTranslator, private val ggufDir: File) : AiModelStore {
+class AiModelStoreImpl(private val nllb: NllbTranslator, val ggufDir: File) : AiModelStore {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val gguf = MutableStateFlow(initialGgufStates())
     private val jobs = HashMap<String, Job>()
 
-    /** Called before a GGUF model is deleted so the engine can release its file first. */
-    @Volatile var beforeGgufDelete: (suspend () -> Unit)? = null
+    /** Called before a model is deleted so the engine can release its file first. */
+    @Volatile var beforeModelDelete: (suspend () -> Unit)? = null
 
     override val states: StateFlow<Map<String, TranslatorModelState>> =
         combine(nllb.state, gguf) { n, g -> g + (AiModels.NLLB_600M_ID to n) }
@@ -117,7 +117,7 @@ class AiModelStoreImpl(private val nllb: NllbTranslator, private val ggufDir: Fi
             return
         }
         cancelDownload(id)
-        beforeGgufDelete?.invoke()
+        beforeModelDelete?.invoke()
         withContext(Dispatchers.IO) { modelDir(model).deleteRecursively() }
         setGguf(id, TranslatorModelState.NotDownloaded)
     }
@@ -140,7 +140,7 @@ class AiModelStoreImpl(private val nllb: NllbTranslator, private val ggufDir: Fi
         }
 
     private fun initialGgufStates(): Map<String, TranslatorModelState> = AiModels.all
-        .filter { it.engine == AiEngine.LLAMA_GGUF }
+        .filter { it.engine == AiEngine.LITERT_LM }
         .associate { it.id to (if (isComplete(it)) TranslatorModelState.Ready else TranslatorModelState.NotDownloaded) }
 
     private fun setGguf(id: String, state: TranslatorModelState) {

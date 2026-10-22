@@ -40,6 +40,7 @@ import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.MODE_DYNAMIC
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
+import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
 import org.meshtastic.core.ui.theme.isMonochromeMode
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.feature.messaging.MessageScreen
@@ -81,7 +82,7 @@ class BubbleActivity : AppCompatActivity() {
             val dark =
                 when (theme) {
                     AppCompatDelegate.MODE_NIGHT_YES, MODE_MONO_DARK -> true
-                    AppCompatDelegate.MODE_NIGHT_NO -> false
+                    AppCompatDelegate.MODE_NIGHT_NO, MODE_MONO_LIGHT -> false
                     else -> isSystemInDarkTheme()
                 }
             SideEffect {
