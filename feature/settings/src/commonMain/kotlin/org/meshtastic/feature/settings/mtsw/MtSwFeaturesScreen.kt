@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.navigation.ContactsRoute
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.resources.Res
@@ -60,6 +61,8 @@ import org.meshtastic.core.resources.mt_sw_other_summary
 import org.meshtastic.core.resources.mt_sw_other_title
 import org.meshtastic.core.resources.node_layout_section_title
 import org.meshtastic.core.resources.sniffer_settings_title
+import org.meshtastic.core.resources.translator_open
+import org.meshtastic.core.resources.translator_open_summary
 import org.meshtastic.core.resources.ui_scale
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
@@ -67,12 +70,14 @@ import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.LinkIcon
+import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Tune
 import org.meshtastic.feature.settings.SettingsViewModel
 import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
+import org.meshtastic.feature.settings.component.TranslatorSettings
 import org.meshtastic.feature.settings.component.UiScalePickerDialog
 import org.meshtastic.feature.settings.component.uiScaleLabel
 
@@ -119,11 +124,22 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     onClick = { settingsViewModel.setAutoLoadChatImages(!autoLoadChatImages) },
                 )
                 AppUpdateSettings()
+                TranslatorSettings()
                 ListItem(
                     text = stringResource(Res.string.node_layout_section_title),
                     leadingIcon = MeshtasticIcons.List,
                 ) {
                     onNavigate(SettingsRoute.NodeList)
+                }
+            }
+
+            ExpressiveSection(title = stringResource(Res.string.translator_open)) {
+                ListItem(
+                    text = stringResource(Res.string.translator_open),
+                    supportingText = stringResource(Res.string.translator_open_summary),
+                    leadingIcon = MeshtasticIcons.Language,
+                ) {
+                    onNavigate(ContactsRoute.Translator)
                 }
             }
 

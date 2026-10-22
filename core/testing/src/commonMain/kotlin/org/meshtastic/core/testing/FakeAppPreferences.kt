@@ -359,6 +359,12 @@ class FakeUiPrefs : UiPrefs {
         autoLoadChatImages.value = value
     }
 
+    override val translatorEnabled = MutableStateFlow(false)
+
+    override fun setTranslatorEnabled(value: Boolean) {
+        translatorEnabled.value = value
+    }
+
     override val lastNarrowBandWarningShownMillis = MutableStateFlow(0L)
 
     override fun setLastNarrowBandWarningShownMillis(millis: Long) {

@@ -120,6 +120,13 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_AUTO_LOAD_CHAT_IMAGES] = value } }
     }
 
+    override val translatorEnabled: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_TRANSLATOR_ENABLED] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
+
+    override fun setTranslatorEnabled(value: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_TRANSLATOR_ENABLED] = value } }
+    }
+
     override val hasShownNotPairedWarning: StateFlow<Boolean> =
         dataStore.data
             .map { it[KEY_HAS_SHOWN_NOT_PAIRED_WARNING_PREF] ?: false }
@@ -656,6 +663,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_EXCLUDE_MQTT = booleanPreferencesKey("exclude-mqtt")
         val KEY_EXCLUDE_UNHEARD = booleanPreferencesKey("exclude-unheard")
         val KEY_AUTO_LOAD_CHAT_IMAGES = booleanPreferencesKey("auto-load-chat-images")
+        val KEY_TRANSLATOR_ENABLED = booleanPreferencesKey("translator-enabled")
         val KEY_BLE_AUTO_SCAN = booleanPreferencesKey("ble-auto-scan")
         val KEY_NETWORK_AUTO_SCAN = booleanPreferencesKey("network-auto-scan")
         val KEY_SELECTED_CONNECTION_TRANSPORT = stringPreferencesKey("selected-connection-transport")

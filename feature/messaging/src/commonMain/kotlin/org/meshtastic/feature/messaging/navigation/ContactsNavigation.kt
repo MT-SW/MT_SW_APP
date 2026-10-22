@@ -38,6 +38,7 @@ import org.meshtastic.feature.messaging.QuickChatViewModel
 import org.meshtastic.feature.messaging.ui.contact.AdaptiveContactsScreen
 import org.meshtastic.feature.messaging.ui.contact.ContactsViewModel
 import org.meshtastic.feature.messaging.ui.sharing.ShareScreen
+import org.meshtastic.feature.messaging.ui.translator.TranslatorScreen
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Suppress("LongMethod")
@@ -85,6 +86,13 @@ fun EntryProviderScope<NavKey>.contactsGraph(
             viewModel = viewModel,
             onConfirm = { contactKey -> backStack.replaceLast(ContactsRoute.Messages(contactKey, message)) },
             onNavigateUp = dropUnlessResumed { backStack.removeLastOrNull() },
+        )
+    }
+
+    entry<ContactsRoute.Translator> {
+        TranslatorScreen(
+            viewModel = koinViewModel(),
+            onBack = dropUnlessResumed { backStack.removeLastOrNull() },
         )
     }
 

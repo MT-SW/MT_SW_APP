@@ -16,6 +16,7 @@
  */
 package org.meshtastic.app.di
 
+import android.content.Context
 import org.koin.core.annotation.Configuration
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
@@ -26,7 +27,10 @@ import org.meshtastic.feature.docs.ai.KeywordFallbackAssistant
 import org.meshtastic.feature.docs.translation.DocTranslationService
 import org.meshtastic.feature.docs.translation.NoOpDocTranslator
 import org.meshtastic.feature.messaging.translation.MessageTranslationService
-import org.meshtastic.feature.messaging.translation.NoOpMessageTranslator
+import org.meshtastic.core.repository.TranslatorModelManager
+import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.feature.messaging.translation.NllbTranslator
+import java.io.File
 
 /** Provides keyword-only fallback AI assistant for the F-Droid flavor (no on-device model). */
 @Module
@@ -38,5 +42,11 @@ class FdroidAiModule {
 
     @Single fun docTranslationService(): DocTranslationService = NoOpDocTranslator()
 
-    @Single fun messageTranslationService(): MessageTranslationService = NoOpMessageTranslator()
+    @Single
+    fun nllbTranslator(context: Context, uiPrefs: UiPrefs): NllbTranslator =
+        NllbTranslator(File(context.filesDir, "translator"), uiPrefs)
+
+    @Single fun messageTranslationService(translator: NllbTranslator): MessageTranslationService = translator
+
+    @Single fun translatorModelManager(translator: NllbTranslator): TranslatorModelManager = translator
 }

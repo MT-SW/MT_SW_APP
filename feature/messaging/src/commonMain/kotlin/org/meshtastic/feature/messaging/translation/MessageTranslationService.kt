@@ -35,6 +35,13 @@ interface MessageTranslationService {
 
     /** Download the translation models for the given language tags. Only meaningful on google flavor. */
     suspend fun downloadLanguageModels(languageTags: List<String>): DownloadResult
+
+    /**
+     * Translate between two explicitly chosen languages (model codes such as `pol_Latn`). A null [sourceNllb] means
+     * "guess it". Used by the translator screen and for outgoing messages; engines without support keep the default.
+     */
+    suspend fun translateBetween(text: String, sourceNllb: String?, targetNllb: String): TranslationResult =
+        TranslationResult.Unavailable
 }
 
 /** Result of a message translation attempt. */

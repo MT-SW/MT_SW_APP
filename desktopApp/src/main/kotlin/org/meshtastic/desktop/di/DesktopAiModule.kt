@@ -25,7 +25,10 @@ import org.meshtastic.feature.docs.ai.KeywordFallbackAssistant
 import org.meshtastic.feature.docs.translation.DocTranslationService
 import org.meshtastic.feature.docs.translation.NoOpDocTranslator
 import org.meshtastic.feature.messaging.translation.MessageTranslationService
-import org.meshtastic.feature.messaging.translation.NoOpMessageTranslator
+import org.meshtastic.core.repository.TranslatorModelManager
+import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.feature.messaging.translation.NllbTranslator
+import java.io.File
 
 /** Keyword-only fallback AI assistant and no-op translators for Desktop (no on-device model). */
 @Module
@@ -37,5 +40,11 @@ class DesktopAiModule {
 
     @Single fun docTranslationService(): DocTranslationService = NoOpDocTranslator()
 
-    @Single fun messageTranslationService(): MessageTranslationService = NoOpMessageTranslator()
+    @Single
+    fun nllbTranslator(uiPrefs: UiPrefs): NllbTranslator =
+        NllbTranslator(File(System.getProperty("user.home"), ".meshtastic/translator"), uiPrefs)
+
+    @Single fun messageTranslationService(translator: NllbTranslator): MessageTranslationService = translator
+
+    @Single fun translatorModelManager(translator: NllbTranslator): TranslatorModelManager = translator
 }

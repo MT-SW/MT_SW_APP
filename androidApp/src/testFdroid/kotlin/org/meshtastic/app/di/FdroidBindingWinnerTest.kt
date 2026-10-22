@@ -19,8 +19,6 @@ package org.meshtastic.app.di
 import org.koin.plugin.module.dsl.koinApplication
 import org.meshtastic.feature.docs.translation.DocTranslationService
 import org.meshtastic.feature.docs.translation.NoOpDocTranslator
-import org.meshtastic.feature.messaging.translation.MessageTranslationService
-import org.meshtastic.feature.messaging.translation.NoOpMessageTranslator
 import kotlin.test.Test
 import kotlin.test.assertIs
 
@@ -30,12 +28,10 @@ class FdroidBindingWinnerTest {
     fun `flavor bindings win over the shared graph`() {
         // The flavor modules are @Configuration, which loads them before the ones listed in @KoinApplication, and
         // Koin is last-wins. KoinVerificationTest only checks definitions exist, never which one survives, so a
-        // core-level default added later would silently take these over. Only the Fdroid no-ops are asserted:
-        // the Google flavor's MlKitMessageTranslator builds a RemoteModelManager in a field initializer.
+        // core-level default added later would silently take these over. Only the Fdroid no-ops are asserted.
         val app = koinApplication<AndroidKoinApp>()
         try {
             val koin = app.koin
-            assertIs<NoOpMessageTranslator>(koin.get<MessageTranslationService>())
             assertIs<NoOpDocTranslator>(koin.get<DocTranslationService>())
         } finally {
             app.close()

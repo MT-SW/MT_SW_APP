@@ -118,6 +118,16 @@ The debug panel (Settings → Advanced → Debug Panel) has an extra tab in this
 - **Conversation list** — opens faster and more smoothly even with many messages.
 - **Desktop** — Enter is a new line, Ctrl+Enter sends the message.
 
+## Offline translator
+
+The optional translator runs entirely inside the app, without internet, on phone and desktop. It is **off by default**. Switch it on in Settings → MT_SW features → "Offline translator". When you switch it on, the app warns that the model needs a one-time download (about 870 MB) and uses about 2.3 GB of RAM while translating, so on weaker phones it can slow the app down or close it. Once downloaded it translates without internet, and you can delete the model from the device at any time in the same place.
+
+- **Received messages** — the message menu has "Translate message". The original stays, and you can switch between it and the translation.
+- **Outgoing messages** — when the field has text, a "Translate before sending" button appears next to it. It shows the original and the translation side by side; you can send the translation, put it in the field to edit, or cancel.
+- **Separate screen** — Settings → MT_SW features → "Translator": type a text, choose the languages (or "Detect automatically"), translate and copy the result.
+- One model covers many languages and any pair between them, including Polish, English, German, Czech, Slovak, Ukrainian, Russian, French and Spanish.
+- Translations can be inaccurate, especially names and jargon, so treat them as a hint. Text is translated sentence by sentence. If a translation is over 200 characters, the app warns that it will be sent in several parts over the radio.
+
 ## Node list and database
 
 - **Search** — the field above the list filters the same list at once, with no second window.

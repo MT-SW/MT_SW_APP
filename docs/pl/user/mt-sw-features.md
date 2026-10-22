@@ -118,6 +118,16 @@ Panel debugowania (Ustawienia → Zaawansowane → Panel debugowania) ma w tej a
 - **Lista rozmów** — otwiera się szybciej i płynniej także przy dużej liczbie wiadomości.
 - **Komputer** — Enter to nowa linia, Ctrl+Enter wysyła wiadomość.
 
+## Tłumacz offline
+
+Opcjonalny tłumacz działa w całości w aplikacji, bez internetu, na telefonie i na komputerze. Jest **domyślnie wyłączony**. Włączasz go w Ustawienia → Funkcje MT_SW → „Tłumacz offline”. Przy włączaniu aplikacja ostrzega, że model trzeba jednorazowo pobrać (ok. 870 MB) i że podczas tłumaczenia zajmuje ok. 2,3 GB pamięci RAM, więc na słabszych telefonach może to spowalniać aplikację albo ją zamykać. Po pobraniu tłumaczy bez internetu, a model możesz w każdej chwili usunąć z urządzenia w tym samym miejscu.
+
+- **Odebrane wiadomości** — w menu wiadomości jest „Przetłumacz wiadomość”. Oryginał zostaje, a tłumaczenie można przełączać z oryginałem.
+- **Wysyłane wiadomości** — gdy w polu jest tekst, obok pola pojawia się przycisk „Przetłumacz przed wysłaniem”. Pokazuje oryginał i tłumaczenie obok siebie; możesz wysłać tłumaczenie, wstawić je do pola i poprawić albo anulować.
+- **Osobny ekran** — Ustawienia → Funkcje MT_SW → „Tłumacz”: wpisujesz tekst, wybierasz języki (albo „Wykryj automatycznie”), tłumaczysz i kopiujesz wynik.
+- Jeden model obsługuje wiele języków i dowolne pary między nimi, m.in. polski, angielski, niemiecki, czeski, słowacki, ukraiński, rosyjski, francuski i hiszpański.
+- Tłumaczenie bywa niedokładne, zwłaszcza nazwy własne i żargon, więc zawsze traktuj je jako podpowiedź. Tekst jest tłumaczony zdanie po zdaniu. Jeśli tłumaczenie ma ponad 200 znaków, aplikacja ostrzega, że przez radio pójdzie w kilku częściach.
+
 ## Lista węzłów i baza
 
 - **Wyszukiwanie** — pole nad listą od razu filtruje tę samą listę, bez drugiego okna.
