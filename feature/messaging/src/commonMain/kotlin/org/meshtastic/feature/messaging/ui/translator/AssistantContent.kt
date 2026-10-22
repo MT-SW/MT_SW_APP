@@ -127,7 +127,7 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
         ) {
             if (state.lines.isEmpty()) {
                 item {
-                    Bubble(fromUser = false) {
+                    Bubble(fromUser = false, text = "", canRetry = false, onRetry = {}) {
                         Text(
                             text = stringResource(Res.string.assistant_greeting),
                             style = MaterialTheme.typography.bodyLarge,
