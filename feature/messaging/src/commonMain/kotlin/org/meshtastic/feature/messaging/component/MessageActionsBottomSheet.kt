@@ -284,8 +284,9 @@ private fun AckProofListItem(ackProofStatus: Int) {
 internal const val MAX_EMOJI_ROW_SIZE = 6
 
 /**
- * Six one-tap reactions plus the full picker. [onMoreActions], when supplied, appends an overflow button — the inline
- * bar uses it to reach the actions sheet, which is where the row itself lives when opened the other way round.
+ * The overflow button (when [onMoreActions] is supplied — the inline bar uses it to reach the actions sheet) comes first,
+ * then the full picker, then the six one-tap reactions, so the two controls are always in the same, visible place and the
+ * most used emoji sit right next to the picker.
  */
 @Composable
 internal fun QuickEmojiRow(
@@ -303,6 +304,31 @@ internal fun QuickEmojiRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        if (onMoreActions != null) {
+            IconButton(
+                onClick = onMoreActions,
+                modifier = Modifier.size(44.dp).background(MaterialTheme.colorScheme.surfaceVariant, CircleShape),
+            ) {
+                Icon(
+                    MeshtasticIcons.More,
+                    contentDescription = stringResource(Res.string.action_more_message_actions),
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+        IconButton(
+            onClick = onMoreReactions,
+            modifier = Modifier.size(44.dp).background(MaterialTheme.colorScheme.surfaceVariant, CircleShape),
+        ) {
+            Icon(
+                MeshtasticIcons.AddReaction,
+                contentDescription = stringResource(Res.string.more_reactions),
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
         quickEmojis.take(MAX_EMOJI_ROW_SIZE).forEach { emoji ->
             Box(
                 modifier =
@@ -318,32 +344,6 @@ internal fun QuickEmojiRow(
                 contentAlignment = Alignment.Center,
             ) {
                 Text(text = emoji, style = MaterialTheme.typography.titleMedium)
-            }
-        }
-
-        IconButton(
-            onClick = onMoreReactions,
-            modifier = Modifier.size(44.dp).background(MaterialTheme.colorScheme.surfaceVariant, CircleShape),
-        ) {
-            Icon(
-                MeshtasticIcons.AddReaction,
-                contentDescription = stringResource(Res.string.more_reactions),
-                modifier = Modifier.size(20.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-
-        if (onMoreActions != null) {
-            IconButton(
-                onClick = onMoreActions,
-                modifier = Modifier.size(44.dp).background(MaterialTheme.colorScheme.surfaceVariant, CircleShape),
-            ) {
-                Icon(
-                    MeshtasticIcons.More,
-                    contentDescription = stringResource(Res.string.action_more_message_actions),
-                    modifier = Modifier.size(20.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
             }
         }
     }

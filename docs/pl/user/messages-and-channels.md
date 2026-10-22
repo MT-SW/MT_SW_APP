@@ -211,6 +211,7 @@ Wpisz `@` podczas pisania, aby wspomnieć o węźle — selektor podpowiada pasu
 
 Reaguj na wiadomości za pomocą emoji:
 - **Dotknij i przytrzymaj** wiadomość — albo dotknij jej dwukrotnie — aby wyświetlić nad dymkiem pasek szybkich reakcji. Otwarcie paska niczego nie wysyła.
+- Na pasku od lewej są: **Więcej działań na wiadomości** (trzy kropki), **Więcej reakcji** (dodawanie) i dalej Twoje najczęściej używane emoji, najczęstsze tuż obok dodawania.
 - Dotknij emoji na pasku, aby je wysłać; dotknij **Więcej reakcji**, aby otworzyć pełny selektor, albo dotknij gdziekolwiek poza
   paskiem, aby go zamknąć bez wysyłania. Reakcja to prawdziwy pakiet w sieci mesh, więc jest wysyłana
   dopiero po wybraniu emoji.
