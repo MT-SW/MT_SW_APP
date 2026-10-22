@@ -566,10 +566,10 @@ class AssistantDataProvider(
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
         val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
         val wanted = channel.trim().lowercase()
-        val index = wanted.toIntOrNull() ?: names.indexOfFirst { it.lowercase() == wanted }.takeIf { it >= 0 }
+        val index = wanted.toIntOrNull() ?: numberedChannel(wanted) ?: names.indexOfFirst { it.lowercase() == wanted }.takeIf { it >= 0 }
             ?: names.indexOfFirst { wanted.isNotEmpty() && it.lowercase().contains(wanted) }.takeIf { it >= 0 }
         val keys = packetRepository.getContacts().first().keys.filter { it.endsWith("^all") && (wanted.isEmpty() || index == null || it.startsWith(index.toString() + "^")) }
-        if (keys.isEmpty()) {
+        if (keys.isEmpty() || (wanted.isNotEmpty() && index == null)) {
             return "No channel conversation found for \"$channel\". Channels: " +
                 names.mapIndexed { i, n -> "$i=${n.ifBlank { "(default)" }}" }.joinToString()
         }
@@ -590,9 +590,41 @@ class AssistantDataProvider(
             }
     }
 
-    /** A channel name mentioned in the question, or empty (then all channels are read). */
-    private suspend fun channelFromQuestion(q: String): String =
-        radioConfigRepository.channelSetFlow.first().settings.map { it.name }.firstOrNull { it.length >= MIN_NAME && q.contains(it.lowercase()) }.orEmpty()
+    /** A channel mentioned in the question (by name, or by number such as "kanał 1" / "kanał jeden"), as text, or empty. */
+    private suspend fun channelFromQuestion(q: String): String {
+        val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
+        return numberedChannel(q)?.toString() ?: names.firstOrNull { it.length >= MIN_NAME && q.contains(it.lowercase()) }.orEmpty()
+    }
+
+    private fun numberedChannel(text: String): Int? {
+        val m = CHANNEL_NUMBER.find(text.lowercase()) ?: return null
+        val word = m.groupValues[1]
+        return word.toIntOrNull() ?: NUMBER_WORDS.entries.firstOrNull { word.startsWith(it.key) }?.value
+    }
+
+    /** How many messages every channel (and direct messages together) holds, written in code. */
+    suspend fun channelReport(): String {
+        val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
+        val counts = packetRepository.getMessageCounts()
+        val perChannel = HashMap<Int, Int>()
+        var direct = 0
+        for ((key, count) in counts) {
+            if (key.endsWith("^all")) {
+                val i = key.substringBefore('^').toIntOrNull()
+                if (i != null) perChannel[i] = (perChannel[i] ?: 0) + count else direct += count
+            } else {
+                direct += count
+            }
+        }
+        if (perChannel.isEmpty() && direct == 0) return "Nie ma jeszcze żadnych zapisanych wiadomości."
+        val sb = StringBuilder("Liczba zapisanych wiadomości na kanałach (od największej):\n")
+        for ((i, c) in perChannel.entries.sortedByDescending { it.value }) {
+            val label = names.getOrNull(i)?.ifBlank { null } ?: "domyślny"
+            sb.append("• kanał $i ($label): $c\n")
+        }
+        sb.append("• wiadomości prywatne (razem): $direct")
+        return sb.toString()
+    }
 
     private fun findNode(name: String): org.meshtastic.core.model.Node? {
         val q = name.trim().lowercase()
@@ -701,6 +733,9 @@ class AssistantDataProvider(
         const val REPORT_SIGNAL = 15
         const val SENSOR_LIMIT = 12
         const val REPORT_LIMIT = 40
+        val CHANNEL_NUMBER = Regex("(?:kana[łl]\\w*|channel)\\s*(?:nr\\.?|numer\\w*|#|no\\.?)?\\s*(\\d+|[a-ząćęłńóśźż]+)")
+        val NUMBER_WORDS =
+            mapOf("zer" to 0, "jede" to 1, "jedyn" to 1, "one" to 1, "pierw" to 1, "dw" to 2, "two" to 2, "trz" to 3, "three" to 3, "czter" to 4, "four" to 4, "pię" to 5, "pie" to 5, "five" to 5, "sze" to 6, "six" to 6, "sied" to 7, "seven" to 7)
         const val MAX_TOOL_LIST = 40
         const val SEARCH_PER_CHAT = 60
         const val MILLIS_PER_HOUR = 3_600_000L
