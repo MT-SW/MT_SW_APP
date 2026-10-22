@@ -92,8 +92,11 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         val loaded = ensureLoaded(modelId)
         val loadedAt = nowMillis
 
-        val system = messages.filter { it.first == SYSTEM }.joinToString("\n") { it.second }
-        val dialogue = messages.filter { it.first != SYSTEM }
+        // The native library turns the texts into JSON and aborts the whole app on broken characters (for example half
+        // an emoji left by cutting a text), so every text is cleaned first.
+        val clean = messages.map { (role, text) -> role to text.cleanForModel() }
+        val system = clean.filter { it.first == SYSTEM }.joinToString("\n") { it.second }
+        val dialogue = clean.filter { it.first != SYSTEM }
         require(dialogue.isNotEmpty() && dialogue.last().first == USER) { "The last message must come from the user" }
         val history =
             dialogue.dropLast(1).map { (role, text) -> if (role == ASSISTANT) Message.model(text) else Message.user(text) }
@@ -151,6 +154,27 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
             throw e
         }
         return created
+    }
+
+    /** Removes unpaired surrogates, control and non-characters that would make the text invalid UTF-8. */
+    private fun String.cleanForModel(): String {
+        val out = StringBuilder(length)
+        var i = 0
+        while (i < length) {
+            val c = this[i]
+            when {
+                c.isHighSurrogate() && i + 1 < length && this[i + 1].isLowSurrogate() -> {
+                    out.append(c).append(this[i + 1])
+                    i++
+                }
+                c.isSurrogate() -> Unit
+                c.code < 0x20 && c != '\n' && c != '\t' -> Unit
+                c.code == 0xFFFE || c.code == 0xFFFF -> Unit
+                else -> out.append(c)
+            }
+            i++
+        }
+        return out.toString()
     }
 
     private fun scheduleUnload() {

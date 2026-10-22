@@ -174,8 +174,8 @@ compose.desktop {
             add("--enable-native-access=ALL-UNNAMED")
             // Let the macOS title bar follow the system light/dark theme (ignored on other OSes).
             add("-Dapple.awt.application.appearance=system")
-            add("-Dapple.awt.application.name=Meshtastic Desktop")
-            add("-Dcom.apple.mrj.application.apple.menu.about.name=Meshtastic Desktop")
+            add("-Dapple.awt.application.name=MT_SW_APP")
+            add("-Dcom.apple.mrj.application.apple.menu.about.name=MT_SW_APP")
             add("-Dcom.apple.bundle.identifier=org.meshtastic.MeshtasticDesktop")
         }
         jvmArgs(*desktopJvmArgs.toTypedArray())
