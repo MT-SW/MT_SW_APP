@@ -165,7 +165,7 @@ class LlamaAssistantService(
         const val AUTO_CONTEXT_CHARS = 1200
         const val DATA_INTRO =
             "Below is live read-only data from the user's app and radio. Use it to answer questions about their " +
-                "own network and device. heap is the free internal RAM of the radio node (not the phone). " +
+                "own network and device. heap is the USED internal RAM of the radio node in percent (not the phone); high means the memory is nearly full. " +
                 "Copy every number and unit exactly as it appears in the data (keep the decimal point and the minus " +
                 "sign, never combine or change digits); keep the units that stand next to the values (for example °C, %, hPa, V) " +
                 "and never add more decimals than the data has; if a value is marked IMPLAUSIBLE say that the sensor is probably faulty and do not use the value; if a value is unknown say so. Answer briefly, list each device only once and never repeat yourself. Write plain text only: no " +

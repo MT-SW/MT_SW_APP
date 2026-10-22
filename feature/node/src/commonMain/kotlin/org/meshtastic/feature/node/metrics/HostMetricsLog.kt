@@ -221,7 +221,7 @@ internal fun HostMetricsCardContent(
             Spacer(modifier = Modifier.height(4.dp))
             LogLine(
                 label = stringResource(Res.string.local_stats_heap),
-                value = "${formatByteSize((heapFreeBytes ?: 0).toLong())} / ${formatByteSize(heapTotalBytes.toLong())}",
+                value = "${formatByteSize((heapTotalBytes - (heapFreeBytes ?: 0)).coerceAtLeast(0).toLong())} / ${formatByteSize(heapTotalBytes.toLong())}",
             )
         }
 

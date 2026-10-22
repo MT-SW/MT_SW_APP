@@ -1180,7 +1180,7 @@
     <string name="local_stats_flash">Flash</string>
     <string name="local_stats_flash_description">Procent zajętej pamięci flash</string>
     <string name="local_stats_heap">Heap</string>
-    <string name="local_stats_heap_description">Procent wolnej pamięci sterty urządzenia</string>
+    <string name="local_stats_heap_description">Procent zajętej pamięci sterty urządzenia</string>
     <string name="local_stats_heap_value">%1$d / %2$d</string>
     <string name="local_stats_heap_value_kb">%1$s / %2$s kB</string>
     <string name="local_stats_nodes">Węzły: %1$d online / %2$d łącznie</string>

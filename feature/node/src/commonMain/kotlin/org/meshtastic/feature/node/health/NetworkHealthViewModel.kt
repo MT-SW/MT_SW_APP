@@ -469,7 +469,7 @@ internal fun org.meshtastic.core.model.MeshLog.toHistoryEntry(): org.meshtastic.
         packetsRxBad = telemetry.local_stats?.num_packets_rx_bad,
         uptimeSeconds = telemetry.local_stats?.uptime_seconds,
         cpuUsagePercent = localStatsExtended?.cpuUsagePercent,
-        heapFreePercent = if (heapTotal > 0) heapFree.toFloat() / heapTotal * PERCENT_MULTIPLIER else null,
+        heapUsedPercent = if (heapTotal > 0) (heapTotal - heapFree).coerceAtLeast(0).toFloat() / heapTotal * PERCENT_MULTIPLIER else null,
         flashUsedPercent =
         localStatsExtended
             ?.takeIf { it.flashTotalBytes > 0 }
@@ -609,7 +609,7 @@ internal fun NetworkHealthMetric.historySeriesValue(
     NetworkHealthMetric.RESOURCES ->
         when (seriesLabel) {
             "CPU" -> entry.cpuUsagePercent?.toFloat()
-            "Heap" -> entry.heapFreePercent
+            "Heap" -> entry.heapUsedPercent
             "Flash" -> entry.flashUsedPercent
             "PSRAM" -> entry.psramFreePercent
             else -> null

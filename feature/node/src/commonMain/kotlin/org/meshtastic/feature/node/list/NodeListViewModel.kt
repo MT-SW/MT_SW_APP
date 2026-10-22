@@ -436,7 +436,7 @@ private fun extraStatsOf(stats: LocalStats?, ext: LocalStatsExtended?): NodeExtr
                 packetsRxBad = stats.num_packets_rx_bad,
                 rxDupe = stats.num_rx_dupe,
                 txRelay = stats.num_tx_relay,
-                heapFreePercent = if (heapTotal > 0) heapFree * PERCENT / heapTotal else null,
+                heapUsedPercent = if (heapTotal > 0) (heapTotal - heapFree).coerceAtLeast(0) * PERCENT / heapTotal else null,
                 noiseFloor = stats.noiseFloorOrNull,
             )
         }

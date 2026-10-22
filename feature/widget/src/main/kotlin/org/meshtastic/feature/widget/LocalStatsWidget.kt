@@ -282,12 +282,16 @@ class LocalStatsWidget :
 
                         val heapProgress =
                             if (state.heapTotalBytes > 0) {
-                                state.heapFreeBytes.toFloat() / state.heapTotalBytes
+                                (state.heapTotalBytes - state.heapFreeBytes).coerceAtLeast(0).toFloat() / state.heapTotalBytes
                             } else {
                                 0f
                             }
                         val heapValue =
-                            stringResource(Res.string.local_stats_heap_value, state.heapFreeBytes, state.heapTotalBytes)
+                            stringResource(
+                                Res.string.local_stats_heap_value,
+                                (state.heapTotalBytes - state.heapFreeBytes).coerceAtLeast(0),
+                                state.heapTotalBytes,
+                            )
                         StatRow(stringResource(Res.string.local_stats_heap), heapValue, heapProgress, isSmall)
 
                         if (state.hasStatsExtended) {

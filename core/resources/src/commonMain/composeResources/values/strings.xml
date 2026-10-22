@@ -1160,7 +1160,7 @@
     <string name="local_stats_flash">Flash</string>
     <string name="local_stats_flash_description">Percentage of flash storage used</string>
     <string name="local_stats_heap">Heap</string>
-    <string name="local_stats_heap_description">Percentage of device heap memory free</string>
+    <string name="local_stats_heap_description">Percentage of device heap memory used</string>
     <string name="local_stats_heap_value">%1$d / %2$d</string>
     <string name="local_stats_heap_value_kb">%1$s / %2$s kB</string>
     <string name="local_stats_nodes">Nodes: %1$d online / %2$d total</string>
