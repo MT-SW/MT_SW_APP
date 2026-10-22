@@ -19,6 +19,8 @@ package org.meshtastic.feature.messaging.ui.translator
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -26,6 +28,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -37,8 +41,11 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ai_tab_ai
 import org.meshtastic.core.resources.ai_tab_assistant
 import org.meshtastic.core.resources.ai_tab_translator
+import org.meshtastic.core.resources.assistant_history
 import org.meshtastic.core.resources.translator_open
 import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.icon.History
+import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.messaging.translation.AssistantViewModel
 import org.meshtastic.feature.messaging.translation.TranslatorViewModel
 
@@ -60,6 +67,25 @@ fun AiHomeScreen(
     // With a single mode on there are no sub-tabs; the one that is on is shown.
     val showAssistant = if (both) selected == 1 else assistantOn
 
+    var showHistory by remember { mutableStateOf(false) }
+    val savedChats by assistantViewModel.saved.collectAsStateWithLifecycle()
+    if (showHistory) {
+        AssistantHistoryDialog(
+            chats = savedChats,
+            onOpen = {
+                assistantViewModel.open(it)
+                selected = 1
+                showHistory = false
+            },
+            onDelete = { assistantViewModel.deleteSaved(it.id) },
+            onNew = {
+                assistantViewModel.startNew()
+                showHistory = false
+            },
+            onDismiss = { showHistory = false },
+        )
+    }
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -75,7 +101,21 @@ fun AiHomeScreen(
                 onNavigateUp = onBack,
                 ourNode = null,
                 showNodeChip = false,
-                actions = {},
+                actions = {
+                    if (showAssistant && assistantOn) {
+                        IconButton(
+                            onClick = {
+                                assistantViewModel.refreshSaved()
+                                showHistory = true
+                            },
+                        ) {
+                            Icon(
+                                MeshtasticIcons.History,
+                                contentDescription = stringResource(Res.string.assistant_history),
+                            )
+                        }
+                    }
+                },
                 onClickChip = {},
             )
         },
