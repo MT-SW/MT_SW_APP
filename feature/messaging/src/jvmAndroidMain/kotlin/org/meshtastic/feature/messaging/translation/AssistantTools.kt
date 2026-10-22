@@ -79,6 +79,9 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
         @ToolParam(description = "How many of the latest messages to read, 1 to 40") limit: Int,
     ): String = run("channel_messages") { data.toolChannelMessages(channel, limit) }
 
+    @Tool(description = "How many messages each channel holds (and direct messages). Use it to find which channel has the most messages.")
+    fun channel_message_counts(): String = run("channel_message_counts") { data.channelReport() }
+
     @Tool(description = "Find messages that contain a specific word or phrase in all conversations (only when the user asks for a specific word).")
     fun search_messages(
         @ToolParam(description = "Text to look for, or empty for the newest messages") query: String,
