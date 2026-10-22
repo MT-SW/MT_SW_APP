@@ -2697,6 +2697,8 @@
     <string name="mt_sw_other_polarity_body">Dla czujnika podłączonego odwrotnie. W oknie informacji o węźle (ikona „i”) możesz zamienić zasilanie z procentem baterii i odwrócić znak prądu, osobno dla każdego węzła. Zmienia to tylko sposób wyświetlania.</string>
     <string name="mt_sw_other_gpio_title">Zdalne GPIO</string>
     <string name="mt_sw_other_gpio_body">W szczegółach węzła (Remote Hardware) wpisujesz numer pinu i włączasz go, wyłączasz albo odczytujesz na zdalnym węźle przez sieć mesh.</string>
+    <string name="mt_sw_other_remote_lists_title">Zdalne ulubione i ignorowane</string>
+    <string name="mt_sw_other_remote_lists_body">W szczegółach węzła (Administracja → Listy i kontakty na zdalnym urządzeniu) wpisujesz identyfikator węzła i dodajesz go do ulubionych albo do ignorowanych na zdalnym urządzeniu, przez sieć mesh. Aplikacja czeka na potwierdzenie z sieci, więc wiesz, że zmiana dotarła.</string>
     <string name="mt_sw_other_calls_title">Diagnostyka na żądanie</string>
     <string name="mt_sw_other_calls_body">W szczegółach węzła (Administracja → Diagnostyka na żądanie) możesz zapytać dowolny węzeł w zasięgu o jego bieżące statystyki, zamiast czekać na okresowe rozgłoszenia.</string>
     <string name="mt_sw_other_full_doc">Pełny opis funkcji MT_SW</string>
