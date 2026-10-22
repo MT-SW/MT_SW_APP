@@ -129,6 +129,7 @@ The debug panel (Settings → Advanced → Debug Panel) has an extra tab in this
 
 ## Settings and appearance
 
+- **MT_SW features group** — Settings has one entry, "MT_SW features", that opens a separate screen with our settings: the switch for previewing images from links in chat, update notifications (two switches) and the node list layout. Below are shortcuts to settings that have a natural home elsewhere: app scaling, LoRa (LNA correction and frequency offset), node database cleaning and Sniffer. The last entry, "Other features", describes the features that live next to a node (node LNA correction, inverted current and power, remote GPIO, on-demand diagnostics) and where to find them. Every item is also found by the settings search.
 - **App scale** — in the app settings you choose the size of text and elements from 50% to 200%, independently of the phone settings. The default is "Same as phone". It works on desktop too.
 - **LoRa settings** — a "Frequency offset (kHz)" field, coding rate 4/5 for Narrow presets, full resolution of the overridden frequency, a warning description for "Override duty cycle" and the restored Traffic Management screen.
 - **Security** — key backup on desktop too, and a node colour choice when generating a key.

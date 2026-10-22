@@ -129,6 +129,7 @@ Panel debugowania (Ustawienia → Zaawansowane → Panel debugowania) ma w tej a
 
 ## Ustawienia i wygląd
 
+- **Grupa „Funkcje MT_SW”** — w Ustawieniach jest jeden wpis „Funkcje MT_SW”, który otwiera osobny ekran z naszymi ustawieniami: przełącznik podglądu obrazków z linków w czacie, powiadomienia o nowych wersjach (dwa przełączniki) i układ listy węzłów. Niżej są skróty do ustawień, które mają swoje naturalne miejsce gdzie indziej: skalowanie aplikacji, LoRa (korekta LNA i przesunięcie częstotliwości), czyszczenie bazy węzłów i Sniffer. Na końcu wpis „Pozostałe funkcje” opisuje funkcje przy węźle (korekta LNA węzła, odwrócony prąd i zasilanie, zdalne GPIO, diagnostyka na żądanie) i mówi, gdzie ich szukać. Wszystkie pozycje znajdzie też wyszukiwarka ustawień.
 - **Skalowanie aplikacji** — w ustawieniach aplikacji wybierasz rozmiar tekstu i elementów od 50% do 200%, niezależnie od ustawień telefonu. Domyślnie „Zgodnie z systemem”. Działa też na komputerze.
 - **Ustawienia LoRa** — pole „Przesunięcie częstotliwości (kHz)”, coding rate 4/5 dla presetów Narrow, pełna rozdzielczość częstotliwości nadpisanej, opis ostrzegawczy przy „Nadpisz cykl pracy” oraz przywrócony ekran Traffic Management.
 - **Bezpieczeństwo** — kopia kluczy także na komputerze oraz wybór koloru węzła przy generowaniu klucza.
