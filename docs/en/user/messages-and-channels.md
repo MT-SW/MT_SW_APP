@@ -211,6 +211,7 @@ Type `@` while composing to mention a node — a picker suggests matching contac
 
 React to messages with emoji:
 - **Touch & hold** a message — or double-tap it — to raise a quick reaction bar above the bubble. Opening the bar sends nothing.
+- The bar reads, from the left: **More message actions** (the three dots), **More reactions** (add), then your most used emoji, the most used right next to the add button.
 - Tap an emoji in the bar to send it; tap **More reactions** to open the full picker, or anywhere outside
   the bar to dismiss it without sending. A reaction is a real mesh packet, so it only goes out
   when you pick an emoji.
