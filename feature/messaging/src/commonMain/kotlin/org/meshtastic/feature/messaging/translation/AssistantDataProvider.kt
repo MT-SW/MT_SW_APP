@@ -1227,6 +1227,17 @@ class AssistantDataProvider(
 
     // ---- Entry points for the question router: the model only says WHAT is asked, the code finds and counts ----
 
+    /** A real node name for the test questions: the most recently heard other node with a position. */
+    fun sampleNodeName(): String {
+        val me = nodeRepository.ourNodeInfo.value?.num
+        val others = nodeRepository.nodeDBbyNum.value.values.filter { it.num != me && it.user.long_name.isNotBlank() }
+        return (others.filter { it.validPosition != null }.maxByOrNull { it.lastHeard } ?: others.maxByOrNull { it.lastHeard })
+            ?.user?.long_name.orEmpty().ifBlank { "?" }
+    }
+
+    /** A real channel name for the test questions. */
+    suspend fun sampleChannelName(): String = channelNames().firstOrNull { it.isNotBlank() } ?: "0"
+
     /** The names of the channels in their order (an empty name is the default channel). */
     suspend fun channelNames(): List<String> = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
 

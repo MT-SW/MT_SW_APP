@@ -1,6 +1,8 @@
 # Pytania testowe asystenta (E2B i E4B)
 
-Zadaj każde pytanie w asystencie, najpierw na modelu E2B, potem na E4B. Przy każdym zapisz: OK / źle / uwagi.
+**Automatycznie:** wpisz w asystencie `/test` i wyślij. Asystent sam zada sobie pytania po kolei (z prawdziwą nazwą węzła i kanału z Twojej sieci), a pytania i odpowiedzi pokaże w rozmowie, wypisze w terminalu i zapisze w pliku `assistant-test-results.md` (na komputerze, w folderze `desktopApp`). Przerwiesz przyciskiem „Zatrzymaj”. W trakcie testu nic nie otwiera się samo.
+
+**Ręcznie:** zadaj każde pytanie w asystencie, najpierw na modelu E2B, potem na E4B. Przy każdym zapisz: OK / źle / uwagi.
 Internet dla asystenta ma być WYŁĄCZONY (poza punktem 40).
 
 ## Dane z sieci (narzędzia danych)

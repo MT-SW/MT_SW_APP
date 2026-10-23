@@ -81,6 +81,10 @@ class AssistantViewModel(
         val current = _state.value
         val question = current.input.trim()
         if (question.isEmpty() || current.busy) return
+        if (question.equals(SELF_TEST, ignoreCase = true)) {
+            runSelfTest()
+            return
+        }
         val history =
             current.lines.map { AssistantTurn(it.fromUser, AssistantActions.strip(it.text)) } +
                 AssistantTurn(true, question)
@@ -132,6 +136,30 @@ class AssistantViewModel(
                 } finally {
                     pump.cancel()
                     flushPieces()
+                    _state.update { it.copy(busy = false) }
+                    withContext(NonCancellable) { persist() }
+                }
+            }
+    }
+
+    /**
+     * Typed "/test": the assistant asks itself all the test questions one after another; each question and answer
+     * appears in the chat (and in the terminal and a results file on a computer). Nothing opens by itself meanwhile.
+     */
+    private fun runSelfTest() {
+        _state.update { it.copy(input = "", busy = true, failed = false) }
+        job =
+            viewModelScope.launch {
+                try {
+                    service.selfTest { q, a ->
+                        _state.update { it.copy(lines = it.lines + AssistantLine(true, q) + AssistantLine(false, a)) }
+                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Throwable) {
+                    Logger.w(tag = "AssistantViewModel", throwable = e) { "Self test failed: ${e.message}" }
+                    _state.update { it.copy(failed = true) }
+                } finally {
                     _state.update { it.copy(busy = false) }
                     withContext(NonCancellable) { persist() }
                 }
@@ -207,5 +235,6 @@ class AssistantViewModel(
     private companion object {
         const val TITLE_LENGTH = 48
         const val FLUSH_MS = 120L
+        const val SELF_TEST = "/test"
     }
 }
