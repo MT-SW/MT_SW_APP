@@ -34,6 +34,7 @@ import org.meshtastic.core.resources.log_retention_days
 import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.mt_sw_other_title
 import org.meshtastic.core.resources.auto_load_chat_images
+import org.meshtastic.core.resources.import_menu_in_top_bar
 import org.meshtastic.core.resources.app_update_check_title
 import org.meshtastic.core.resources.app_update_tests_title
 import org.meshtastic.core.resources.wifi_devices
@@ -156,6 +157,7 @@ object SettingsSearchCatalog {
             Res.string.mt_sw_features_title to SettingsRoute.MtSwFeatures,
             Res.string.mt_sw_other_title to SettingsRoute.MtSwOtherFeatures,
             Res.string.auto_load_chat_images to SettingsRoute.MtSwFeatures,
+            Res.string.import_menu_in_top_bar to SettingsRoute.MtSwFeatures,
             Res.string.app_update_check_title to SettingsRoute.MtSwFeatures,
             Res.string.app_update_tests_title to SettingsRoute.MtSwFeatures,
             Res.string.node_layout_section_title to SettingsRoute.NodeList,

@@ -20,6 +20,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,6 +59,7 @@ import org.meshtastic.core.resources.share_channels
 import org.meshtastic.core.resources.share_connected_node
 import org.meshtastic.core.resources.short_name
 import org.meshtastic.core.resources.url
+import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.LinkIcon
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Nfc
@@ -95,6 +100,7 @@ fun MeshtasticImportFAB(
     onShareContact: (() -> Unit)? = null,
     onAddManualContact: ((nodeNum: Int, longName: String, shortName: String) -> Unit)? = null,
     isContactContext: Boolean = true,
+    asTopBarMenu: Boolean = false,
     testTag: String? = null,
     importDialog: @Composable (SharedContact, () -> Unit) -> Unit = { contact, dismiss ->
         SharedContactImportDialog(sharedContact = contact, onDismiss = dismiss)
@@ -234,14 +240,36 @@ fun MeshtasticImportFAB(
         )
     }
 
-    MenuFAB(
-        expanded = expanded,
-        onExpandedChange = { expanded = it },
-        items = items,
-        modifier = modifier.padding(bottom = 16.dp),
-        contentDescription = stringResource(importFabContentDescriptionRes(onShareChannels, onShareContact)),
-        testTag = testTag,
-    )
+    val description = stringResource(importFabContentDescriptionRes(onShareChannels, onShareContact))
+    if (asTopBarMenu) {
+        // MT_SW option: the same actions as a menu in the top bar, so nothing floats over the list.
+        Box {
+            IconButton(onClick = { expanded = true }) {
+                Icon(imageVector = MeshtasticIcons.Add, contentDescription = description)
+            }
+            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                items.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(item.label) },
+                        leadingIcon = { Icon(imageVector = item.icon, contentDescription = null) },
+                        onClick = {
+                            expanded = false
+                            item.onClick()
+                        },
+                    )
+                }
+            }
+        }
+    } else {
+        MenuFAB(
+            expanded = expanded,
+            onExpandedChange = { expanded = it },
+            items = items,
+            modifier = modifier.padding(bottom = 16.dp),
+            contentDescription = description,
+            testTag = testTag,
+        )
+    }
 }
 
 internal fun normalizeImportContents(contents: String?): String? = contents?.trim()?.takeIf { it.isNotEmpty() }

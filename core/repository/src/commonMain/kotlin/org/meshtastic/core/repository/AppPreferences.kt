@@ -148,6 +148,11 @@ interface UiPrefs {
      */
     val autoLoadChatImages: StateFlow<Boolean>
 
+    /** MT_SW: the import / share / add-contact button sits in the top bar instead of floating over the list. */
+    val importMenuInTopBar: StateFlow<Boolean>
+
+    fun setImportMenuInTopBar(value: Boolean)
+
     fun setAutoLoadChatImages(value: Boolean)
 
     /** Whether the optional offline translator is switched on. Off by default: it needs a large model and lots of RAM. */

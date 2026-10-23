@@ -27,6 +27,7 @@ import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.about
 import org.meshtastic.core.resources.auto_load_chat_images
+import org.meshtastic.core.resources.import_menu_in_top_bar
 import org.meshtastic.core.resources.bottom_nav_settings
 import org.meshtastic.core.resources.bluetooth
 import org.meshtastic.core.resources.channels
@@ -308,6 +309,7 @@ class AssistantGuideTools(
                 Target("telemetry_env_interval", "settings/telemetry", Res.string.schema_telemetry_environment_update_interval, listOf("interwał środowisk", "environment interval")),
                 Target("ui_scale", "settings/mt-sw-features", Res.string.ui_scale, listOf("skalowan", "skala", "rozmiar interfejsu", "scale", "zoom", "powiększ")),
                 Target("chat_images", "settings/mt-sw-features", Res.string.auto_load_chat_images, listOf("zdjęci", "obrazk", "images", "podgląd link")),
+                Target("import_menu", "settings/mt-sw-features", Res.string.import_menu_in_top_bar, listOf("przycisk", "plus", "dodaj kontakt", "górn", "belk", "zasłania", "button", "top bar", "udostępnij węzeł")),
                 Target("theme", "settings", Res.string.theme, listOf("motyw", "theme", "ciemny", "jasny", "dark", "light", "tryb ciemny")),
                 Target("language", "settings", Res.string.preferences_language, listOf("język", "language", "jezyk")),
                 Target("log_retention", "settings/mt-sw-features", Res.string.log_retention_days, listOf("ramk", "logi", "statystyk", "pamięt", "czas", "baz", "dni", "retention", "historia", "ile czasu")),

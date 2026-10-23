@@ -190,6 +190,12 @@ class SettingsViewModel(
 
     val autoLoadChatImages = uiPrefs.autoLoadChatImages
 
+    val importMenuInTopBar = uiPrefs.importMenuInTopBar
+
+    fun setImportMenuInTopBar(value: Boolean) {
+        uiPrefs.setImportMenuInTopBar(value)
+    }
+
     fun setAutoLoadChatImages(value: Boolean) {
         uiPrefs.setAutoLoadChatImages(value)
     }

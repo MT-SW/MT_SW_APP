@@ -120,6 +120,13 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_AUTO_LOAD_CHAT_IMAGES] = value } }
     }
 
+    override val importMenuInTopBar: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_IMPORT_MENU_IN_TOP_BAR] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
+
+    override fun setImportMenuInTopBar(value: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_IMPORT_MENU_IN_TOP_BAR] = value } }
+    }
+
     override val translatorEnabled: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_TRANSLATOR_ENABLED] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
 
@@ -695,6 +702,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_EXCLUDE_MQTT = booleanPreferencesKey("exclude-mqtt")
         val KEY_EXCLUDE_UNHEARD = booleanPreferencesKey("exclude-unheard")
         val KEY_AUTO_LOAD_CHAT_IMAGES = booleanPreferencesKey("auto-load-chat-images")
+        val KEY_IMPORT_MENU_IN_TOP_BAR = booleanPreferencesKey("import-menu-in-top-bar")
         val KEY_TRANSLATOR_ENABLED = booleanPreferencesKey("translator-enabled")
         val KEY_ASSISTANT_ENABLED = booleanPreferencesKey("assistant-enabled")
         val KEY_ASSISTANT_INTERNET_ENABLED = booleanPreferencesKey("assistant-internet-enabled")

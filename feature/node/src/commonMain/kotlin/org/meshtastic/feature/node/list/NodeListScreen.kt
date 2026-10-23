@@ -223,6 +223,24 @@ fun NodeListScreen(
         ShareContactDialog(contact = ourNode, onDismiss = { showShareContact = false }, isOwnContact = true)
     }
 
+    // MT_SW option: the add / share menu in the top bar instead of the floating button.
+    val importInTopBar by org.koin.compose.koinInject<org.meshtastic.core.repository.UiPrefs>().importMenuInTopBar.collectAsStateWithLifecycle()
+    val importMenu: @Composable (Boolean, Modifier) -> Unit = { inBar, menuModifier ->
+        MeshtasticImportFAB(
+            modifier = menuModifier,
+            asTopBarMenu = inBar,
+            onImport = { uriString ->
+                val onInvalid: () -> Unit = { scope.launch { showToast(Res.string.channel_invalid) } }
+                parseDeepLinkOrInvalid(uriString, onHandleDeepLink, onInvalid)
+            },
+            onShareContact = { showShareContact = true },
+            onAddManualContact = { nodeNum, longName, shortName ->
+                viewModel.addManualContact(nodeNum, longName, shortName)
+            },
+            isContactContext = true,
+        )
+    }
+
     CompositionLocalProvider(
         LocalNodeExtraConfig provides NodeExtraConfig(extraMode, extraIconsOnly, extraPackets, extraHardware, extraEther),
         LocalNodeExtraStats provides extraStats,
@@ -241,6 +259,11 @@ fun NodeListScreen(
                 canNavigateUp = false,
                 onNavigateUp = {},
                 actions = {
+                    if (importInTopBar && connectionState == ConnectionState.Connected &&
+                        (ourNode?.capabilities?.supportsQrCodeSharing ?: false)
+                    ) {
+                        importMenu(true, Modifier)
+                    }
                     IconButton(onClick = { showHopHistogram = true }) {
                         Icon(
                             imageVector = MeshtasticIcons.BarChart,
@@ -259,22 +282,15 @@ fun NodeListScreen(
         },
         floatingActionButton = {
             val shareCapable = ourNode?.capabilities?.supportsQrCodeSharing ?: false
-            MeshtasticImportFAB(
-                modifier =
-                Modifier.animateFloatingActionButton(
-                    visible = !isScrollInProgress && connectionState == ConnectionState.Connected && shareCapable,
-                    alignment = androidx.compose.ui.Alignment.BottomEnd,
-                ),
-                onImport = { uriString ->
-                    val onInvalid: () -> Unit = { scope.launch { showToast(Res.string.channel_invalid) } }
-                    parseDeepLinkOrInvalid(uriString, onHandleDeepLink, onInvalid)
-                },
-                onShareContact = { showShareContact = true },
-                onAddManualContact = { nodeNum, longName, shortName ->
-                    viewModel.addManualContact(nodeNum, longName, shortName)
-                },
-                isContactContext = true,
-            )
+            if (!importInTopBar) {
+                importMenu(
+                    false,
+                    Modifier.animateFloatingActionButton(
+                        visible = !isScrollInProgress && connectionState == ConnectionState.Connected && shareCapable,
+                        alignment = androidx.compose.ui.Alignment.BottomEnd,
+                    ),
+                )
+            }
         },
     ) { contentPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(contentPadding).focusable()) {
