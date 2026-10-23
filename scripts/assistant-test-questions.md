@@ -1,7 +1,7 @@
 # Pytania testowe asystenta (E2B i E4B)
 
 Zadaj każde pytanie w asystencie, najpierw na modelu E2B, potem na E4B. Przy każdym zapisz: OK / źle / uwagi.
-Internet dla asystenta ma być WYŁĄCZONY (poza punktem 30).
+Internet dla asystenta ma być WYŁĄCZONY (poza punktem 40).
 
 ## Dane z sieci (narzędzia danych)
 1. Ile mam teraz węzłów w sieci?
@@ -27,24 +27,39 @@ Internet dla asystenta ma być WYŁĄCZONY (poza punktem 30).
 19. Jak zaktualizować firmware?
 20. Jak połączyć się z urządzeniem przez Bluetooth?
 
-## Przyciski akcji (nic nie ma się wysłać samo)
-21. Pokaż mi, gdzie jest ustawienie regionu. (ma być przycisk + żółte mruganie)
-22. Pokaż węzeł [nazwa] na mapie.
-23. Otwórz planer łącza do węzła [nazwa].
-24. Napisz szkic wiadomości „Jestem na miejscu” do [nazwa]. (szkic ma się pojawić w polu, bez wysyłania)
-25. Otwórz ustawienia wyświetlania.
+## Przejścia (aplikacja ma SAMA otworzyć miejsce; nic nie może się wysłać ani zmienić)
+21. Pokaż mi ustawienie regionu. (otwiera się strona LoRa, region mruga na żółto)
+22. Pokaż węzeł [nazwa] na mapie. (mapa z zaznaczonym węzłem)
+23. Pokaż najbliższy router. (mapa z najbliższym routerem, w odpowiedzi odległość)
+24. Czy mam zasięg do [nazwa]? (otwiera się planer łącza)
+25. Napisz na kanale [nazwa kanału], że jestem na miejscu. (rozmowa z tekstem w polu, BEZ wysyłania)
+26. Otwórz ustawienia wyświetlania.
+
+## Liczby i wyszukiwanie (odpowiada program, liczby muszą się zgadzać z aplikacją)
+27. Ile wiadomości było wczoraj na kanale [nazwa]?
+28. Kto pisał najwięcej w ostatnim tygodniu?
+29. Czy ktoś pisał o [słowo]?
+30. Ile węzłów było aktywnych przez ostatnie 3 godziny?
+31. Które węzły mają słabą baterię?
+32. A wczoraj? (zadaj zaraz po pytaniu 27: ma policzyć wczoraj dla tego samego kanału)
+
+## Swobodna rozmowa
+33. Cześć, jak się masz?
+34. Jak zrobić prostą antenę dipol na 868 MHz?
+35. Opowiedz krótko, czym różni się LoRa od Wi-Fi.
 
 ## Mieszane i trudne
-26. Mam słaby zasięg — co sprawdzić i pokaż mi odpowiednie ustawienie.
-27. Ile węzłów jest w sieci i jak to zmienić w ustawieniach rolę mojego urządzenia?
-28. Pytanie po angielsku: How do I change the LoRa region?
-29. Pytanie spoza tematu: Jaka jest stolica Francji? (powinien powiedzieć, że offline nie sprawdza / odpowiedzieć z wiedzy)
+36. Mam słaby zasięg — co sprawdzić i pokaż mi odpowiednie ustawienie.
+37. Ile węzłów jest w sieci i jak to zmienić w ustawieniach rolę mojego urządzenia?
+38. Pytanie po angielsku: How do I change the LoRa region?
+39. Pytanie spoza tematu: Jaka jest stolica Francji? (powinien powiedzieć, że offline nie sprawdza / odpowiedzieć z wiedzy)
 
 ## Internet (włącz przełącznik dopiero tutaj)
-30. Co to jest pasmo 868 MHz i kto może na nim nadawać? (odpowiedź ma pokazać „Użyto internetu”, co wyszukano i źródła)
+40. Co to jest pasmo 868 MHz i kto może na nim nadawać? (odpowiedź ma pokazać „Użyto internetu”, co wyszukano i źródła)
 
 ## Na co patrzeć
 - Czy odpowiedź jest po polsku i krótka.
 - Czy liczby się zgadzają z aplikacją.
 - Czy przyciski prowadzą we właściwe miejsce.
 - Czy w logach (Logcat / konsola) jest linia „Model … runs on <CPU/GPU>”.
+- Przy złej odpowiedzi skopiuj z logów linię „Router: … -> {…}”: pokazuje, jak model zrozumiał pytanie. Z tych linii najłatwiej poprawić błąd.
