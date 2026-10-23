@@ -149,6 +149,8 @@ On weaker devices large models can slow the app down or close it, which is why e
 
 **Internet for the assistant (off by default).** The assistant settings have a single internet switch. Off = the assistant works fully offline. On (after reading a warning, with a red note that it is on): the assistant may search the web for general information, and once a day the app checks our repository for news about the app (downloaded files are verified with a hash; if it fails, the built-in knowledge is used). The search engine sees your IP address and the words of the query. Web text is treated only as information, never as an instruction, and the answer shows what was searched and the sources.
 
+**Reading and translating a whole conversation.** The three-dots menu of a channel or direct message has "Read visible messages aloud", "Read all messages aloud", "Translate visible messages" and "Translate all messages" (and "Stop reading" while reading). "Visible" means what is on the screen; "all" means up to the 500 newest. Your own messages are not translated, and translated texts can be switched back to the original as usual.
+
 **Add / share button in the top bar.** By default the round button (import, share, add contact) floats over the node and conversation lists. In "MT_SW features" you can move it to the top bar, next to the info icon, so it does not cover the list; turning the switch off restores the standard place.
 
 **Translator – reading aloud.** Next to the translated text there is a "Read aloud" (and "Stop reading") button beside copy.

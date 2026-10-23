@@ -1534,6 +1534,12 @@
     <string name="message_status_unknown">Unknown</string>
     <string name="message_translated_label">Translated</string>
     <string name="messages">Messages</string>
+    <string name="messages_read_all">Read all messages aloud</string>
+    <string name="messages_read_visible">Read visible messages aloud</string>
+    <string name="messages_translate_all">Translate all messages</string>
+    <string name="messages_translate_visible">Translate visible messages</string>
+    <string name="messages_translated_done">Translation of messages finished</string>
+    <string name="messages_translating">Translating messages…</string>
     <string name="metric_channel_label">%1$s %2$d</string>
     <string name="micrograms_per_cubic_meter">µg/m³</string>
     <string name="min">Min</string>

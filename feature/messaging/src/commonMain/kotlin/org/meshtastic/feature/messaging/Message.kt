@@ -110,6 +110,7 @@ import org.meshtastic.core.common.util.HomoglyphCharacterStringTransformer
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.ContactKey
 import org.meshtastic.core.model.MENTION_TOKEN_REGEX
+import org.meshtastic.core.model.Message
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.QuickChatAction
@@ -137,6 +138,7 @@ import org.meshtastic.feature.messaging.component.FormattingToolbar
 import org.meshtastic.feature.messaging.component.MESSAGE_COMPOSER_MAX_BYTES
 import org.meshtastic.feature.messaging.component.MessageMenuAction
 import org.meshtastic.feature.messaging.component.MessageSearchBar
+import org.meshtastic.feature.messaging.component.BulkActions
 import org.meshtastic.feature.messaging.component.MessageTopBar
 import org.meshtastic.feature.messaging.component.OutgoingTranslateAction
 import org.meshtastic.feature.messaging.component.QuickChatRow
@@ -308,6 +310,27 @@ fun MessageScreen(
     // No cache window here: this pane renders inside ThreePaneScaffold's LookaheadScope, where a
     // prefetched item can reach the main placement pass before the lookahead pass has measured it.
     val listState = rememberLazyListState()
+
+    // Read aloud / translate a whole conversation, from the menu with the three dots: what is on the screen or all.
+    val speaker = rememberSpeaker()
+    var readingAloud by remember { mutableStateOf(false) }
+    val visibleMessages: () -> List<Message> = {
+        val byId = pagedMessages.itemSnapshotList.items.associateBy { it.uuid }
+        listState.layoutInfo.visibleItemsInfo.mapNotNull { byId[it.key] }.sortedBy { it.receivedTime }
+    }
+    val readAloud: (List<Message>) -> Unit = { list ->
+        val text =
+            list.filter { it.text.isNotBlank() }
+                .joinToString("\n") { m ->
+                    val shown = if (m.showTranslated) m.translatedText ?: m.text else m.text
+                    val who = m.node.user.long_name.ifBlank { m.node.user.short_name }
+                    if (who.isBlank()) shown else "$who: $shown"
+                }
+        if (text.isNotBlank()) {
+            speaker.speak(text)
+            readingAloud = true
+        }
+    }
 
     // Track unread messages using lightweight metadata queries
     val hasUnreadMessages by viewModel.hasUnreadMessages.collectAsStateWithLifecycle()
@@ -524,6 +547,21 @@ fun MessageScreen(
                     onToggleShowFiltered = viewModel::toggleShowFiltered,
                     onNavigateToFilterSettings = navigateToFilterSettings,
                     onSearchClick = viewModel::toggleSearch,
+                    bulk =
+                    BulkActions(
+                        reading = readingAloud,
+                        translationAvailable = translationAvailable,
+                        onReadVisible = { readAloud(visibleMessages()) },
+                        onReadAll = { coroutineScope.launch { readAloud(viewModel.allMessages(contactKey)) } },
+                        onStopReading = {
+                            speaker.stop()
+                            readingAloud = false
+                        },
+                        onTranslateVisible = { viewModel.translateMessages(visibleMessages()) },
+                        onTranslateAll = {
+                            coroutineScope.launch { viewModel.translateMessages(viewModel.allMessages(contactKey)) }
+                        },
+                    ),
                 )
             }
         },
