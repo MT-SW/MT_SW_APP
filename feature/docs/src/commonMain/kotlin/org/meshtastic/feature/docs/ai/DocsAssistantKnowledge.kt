@@ -89,6 +89,7 @@ class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : Assis
         val PROJECT_FILES =
             listOf(
                 "project.md" to "MT_SW project",
+                "achievements.md" to "MT_SW achievements",
                 "firmware.md" to "MT_SW firmware",
                 "integration.md" to "MT_SW Home Assistant integration",
                 "integration-web-client.md" to "MT_SW integration web client",
