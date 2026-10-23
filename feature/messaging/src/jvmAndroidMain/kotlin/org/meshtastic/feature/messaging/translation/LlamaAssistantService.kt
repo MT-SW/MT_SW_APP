@@ -216,7 +216,8 @@ class LlamaAssistantService(
                     when {
                         intent.topic == "radio" -> exact(data.radioStats())
                         // Battery questions are answered from the node's own reading, never retold by the model.
-                        intent.metric == "battery" || BATTERY_WORDS.containsMatchIn(question.lowercase()) -> exact(data.nodeBattery(nodeNum))
+                        (intent.metric == "battery" || BATTERY_WORDS.containsMatchIn(question.lowercase())) &&
+                            intent.topic != "ranking" && !MANY_WORDS.containsMatchIn(question.lowercase()) -> exact(data.nodeBattery(nodeNum))
                         else -> null
                     }
                 "messages_to_me" -> exact(data.recentToMe(LIST_SHOWN))
@@ -600,6 +601,9 @@ class LlamaAssistantService(
         const val FACT_TEMPERATURE = 0.25f
         const val WEB_QUERY_CHARS = 120
         val BATTERY_WORDS = Regex("bateri|akumulator|battery")
+
+        /** Words of a question about many nodes ("which nodes have the weakest battery"), not about one. */
+        val MANY_WORDS = Regex("któr|ktor|najs|najm|najn|wszystk|which|lowest|all nodes")
         const val MANUAL_CHARS = 1000
         const val NEWS_CHARS = 1600
         const val HELP_LINES = 3
