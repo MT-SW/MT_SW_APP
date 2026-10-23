@@ -1052,6 +1052,7 @@
     <string name="import_export_label">Import/Export</string>
     <string name="import_known_shared_contact_text">Warning: This contact is known, importing will overwrite the previous contact information.</string>
     <string name="import_label">Import</string>
+    <string name="import_menu_in_top_bar">Move the add / share button to the top bar</string>
     <string name="import_pending_channels_connect">Channel settings received. Connect to a device to import them.</string>
     <string name="import_pending_contact_connect">Contact received. Connect to a device to import it.</string>
     <string name="import_shared_contact">Import Shared Contact?</string>

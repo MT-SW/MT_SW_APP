@@ -266,6 +266,20 @@ fun ContactsScreen(
         )
     }
 
+    // MT_SW option: the import / share menu in the top bar instead of the floating button.
+    val importInTopBar by org.koin.compose.koinInject<org.meshtastic.core.repository.UiPrefs>().importMenuInTopBar.collectAsStateWithLifecycle()
+    val importMenu: @Composable (Boolean) -> Unit = { inBar ->
+        MeshtasticImportFAB(
+            asTopBarMenu = inBar,
+            onImport = { uriString ->
+                val onInvalid: () -> Unit = { scope.launch { showToast(Res.string.channel_invalid) } }
+                parseDeepLinkOrInvalid(uriString, onHandleDeepLink, onInvalid)
+            },
+            onShareChannels = onNavigateToShare,
+            isContactContext = false,
+        )
+    }
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -275,6 +289,7 @@ fun ContactsScreen(
                 canNavigateUp = false,
                 onNavigateUp = {},
                 actions = {
+                    if (importInTopBar && connectionState is ConnectionState.Connected) importMenu(true)
                     IconButton(onClick = { showChatInfo = true }) {
                         Icon(MeshtasticIcons.Info, contentDescription = stringResource(Res.string.chat_info_title))
                     }
@@ -298,16 +313,7 @@ fun ContactsScreen(
             )
         },
         floatingActionButton = {
-            if (connectionState is ConnectionState.Connected) {
-                MeshtasticImportFAB(
-                    onImport = { uriString ->
-                        val onInvalid: () -> Unit = { scope.launch { showToast(Res.string.channel_invalid) } }
-                        parseDeepLinkOrInvalid(uriString, onHandleDeepLink, onInvalid)
-                    },
-                    onShareChannels = onNavigateToShare,
-                    isContactContext = false,
-                )
-            }
+            if (!importInTopBar && connectionState is ConnectionState.Connected) importMenu(false)
         },
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {

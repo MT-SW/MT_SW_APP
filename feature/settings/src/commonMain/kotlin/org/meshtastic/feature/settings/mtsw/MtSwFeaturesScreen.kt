@@ -41,6 +41,7 @@ import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ai_section_title
 import org.meshtastic.core.resources.auto_load_chat_images
+import org.meshtastic.core.resources.import_menu_in_top_bar
 import org.meshtastic.core.resources.clean_node_database_title
 import org.meshtastic.core.resources.lora
 import org.meshtastic.core.resources.mt_sw_features_links
@@ -99,6 +100,7 @@ import org.meshtastic.feature.settings.component.uiScaleLabel
 @Composable
 fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, onNavigate: (Route) -> Unit) {
     val autoLoadChatImages by settingsViewModel.autoLoadChatImages.collectAsStateWithLifecycle()
+    val importMenuInTopBar by settingsViewModel.importMenuInTopBar.collectAsStateWithLifecycle()
     val uiScale by settingsViewModel.uiScale.collectAsStateWithLifecycle()
     val retentionDays by settingsViewModel.meshLogRetentionDays.collectAsStateWithLifecycle()
     var showUiScalePicker by remember { mutableStateOf(false) }
@@ -140,6 +142,12 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     leadingIcon = MeshtasticIcons.LinkIcon,
                     checked = autoLoadChatImages,
                     onClick = { settingsViewModel.setAutoLoadChatImages(!autoLoadChatImages) },
+                )
+                SwitchListItem(
+                    text = stringResource(Res.string.import_menu_in_top_bar),
+                    leadingIcon = MeshtasticIcons.Add,
+                    checked = importMenuInTopBar,
+                    onClick = { settingsViewModel.setImportMenuInTopBar(!importMenuInTopBar) },
                 )
                 AppUpdateSettings()
                 ListItem(

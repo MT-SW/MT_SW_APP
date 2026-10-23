@@ -353,6 +353,12 @@ class FakeUiPrefs : UiPrefs {
         chirpyHopBestScore.update { maxOf(it, score) }
     }
 
+    override val importMenuInTopBar = MutableStateFlow(false)
+
+    override fun setImportMenuInTopBar(value: Boolean) {
+        importMenuInTopBar.value = value
+    }
+
     override val autoLoadChatImages = MutableStateFlow(false)
 
     override fun setAutoLoadChatImages(value: Boolean) {
