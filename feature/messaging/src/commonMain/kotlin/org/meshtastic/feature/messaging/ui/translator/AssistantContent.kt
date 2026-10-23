@@ -66,12 +66,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.koin.compose.koinInject
+import org.meshtastic.core.repository.UiPrefs
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.assistant_dictate
 import org.meshtastic.core.resources.assistant_dictate_stop
 import org.meshtastic.core.resources.assistant_dictate_working
 import org.meshtastic.core.resources.assistant_disclaimer
+import org.meshtastic.core.resources.assistant_disclaimer_web
 import org.meshtastic.core.resources.read_aloud
 import org.meshtastic.core.resources.stop_reading
 import org.meshtastic.feature.messaging.DictationPhase
@@ -124,13 +127,17 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
         }
 
         val listState = rememberLazyListState()
+        val internetOn by koinInject<UiPrefs>().assistantInternetEnabled.collectAsStateWithLifecycle()
         val lastLength = state.lines.lastOrNull()?.text?.length ?: 0
         LaunchedEffect(state.lines.size, lastLength) {
             if (state.lines.isNotEmpty()) listState.scrollToItem(state.lines.lastIndex)
         }
 
         Text(
-            text = stringResource(Res.string.assistant_disclaimer),
+            text =
+                stringResource(
+                    if (internetOn) Res.string.assistant_disclaimer_web else Res.string.assistant_disclaimer,
+                ),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 8.dp),

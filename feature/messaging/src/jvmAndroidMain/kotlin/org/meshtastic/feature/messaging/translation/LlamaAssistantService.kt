@@ -66,7 +66,7 @@ class LlamaAssistantService(
         collector.drain()
         webTools.reset()
         val recent = fit(modelId, history, room)
-        val answer =
+        val rawAnswer =
             try {
                 ask(modelId, recent, memory, topic, question, AUTO_CONTEXT_CHARS * room, room, onPiece)
             } catch (e: kotlinx.coroutines.CancellationException) {
@@ -77,6 +77,7 @@ class LlamaAssistantService(
                 ask(modelId, recent.takeLast(1), "", topic, question, SHORT_CONTEXT_CHARS, 1, onPiece)
             }
         // Buttons asked for by the tools go under the answer; they are only shown, the user decides to tap them.
+        val answer = rescueWrittenToolCalls(rawAnswer, question)
         val polish = question.any { it in "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ" }
         return answer + webTools.footer(polish) + collector.drain().joinToString("") { AssistantActions.encode(it) }
     }
@@ -167,6 +168,43 @@ class LlamaAssistantService(
             onPiece = onPiece,
             tools = toolsFor(topic) + if (webOn) listOf(webTools) else emptyList(),
         )
+    }
+
+    /**
+     * Small models sometimes write a tool call as plain text ("[show_setting x]") instead of really calling it. Such
+     * text is turned into the button it was meant to be and removed from the answer; when the model's own words do
+     * not name anything known, the user's question is used to find the place.
+     */
+    private fun rescueWrittenToolCalls(text: String, question: String): String {
+        val names = "show_setting|open_screen|show_node_on_map|open_link_planner"
+        val patterns =
+            listOf(
+                Regex("\\[\\s*($names)\\s*[(:\\s]\\s*([^\\]]*?)\\s*\\)?\\s*\\]"),
+                Regex("\\b($names)\\(\\s*\"?([^\")\\n]*)\"?\\s*\\)"),
+            )
+        var result = text
+        for (pattern in patterns) {
+            for (match in pattern.findAll(result).toList()) {
+                val name = match.groupValues[1]
+                val arg = match.groupValues[2].trim().trim('"')
+                val before = collector.size()
+                invokeGuide(name, arg)
+                if (collector.size() == before && (name == "show_setting" || name == "open_screen")) {
+                    invokeGuide(name, question)
+                }
+            }
+            result = result.replace(pattern, "")
+        }
+        return result.replace(Regex("\\n{3,}"), "\n\n").trim()
+    }
+
+    private fun invokeGuide(name: String, arg: String) {
+        when (name) {
+            "show_setting" -> guideTools.show_setting(arg)
+            "open_screen" -> guideTools.open_screen(arg)
+            "show_node_on_map" -> guideTools.show_node_on_map(arg)
+            "open_link_planner" -> guideTools.open_link_planner(arg)
+        }
     }
 
     /** Only the tools that fit the topic are offered, which keeps the prompt short and the small models focused. */

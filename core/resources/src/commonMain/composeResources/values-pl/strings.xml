@@ -3034,4 +3034,5 @@
     <string name="assistant_go_to">Przejdź do: %1$s</string>
     <string name="assistant_dictate_stop">Zatrzymaj i wstaw</string>
     <string name="assistant_dictate_working">Zamieniam mowę na tekst…</string>
+    <string name="assistant_disclaimer_web">Asystent działa na tym urządzeniu, ale internet jest WŁĄCZONY: wyszukiwane słowa są wysyłane do wyszukiwarki. Odpowiedzi mogą być błędne — sprawdzaj ważne informacje.</string>
 </resources>
