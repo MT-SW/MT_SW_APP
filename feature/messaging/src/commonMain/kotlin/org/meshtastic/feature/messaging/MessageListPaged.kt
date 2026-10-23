@@ -328,8 +328,27 @@ private fun MessageListPagedContent(
                     } else {
                         rawMessage
                     }
-                val visuallyPrevMessage = if (index < state.messages.itemCount - 1) state.messages[index + 1] else null
-                val visuallyNextMessage = if (index > 0) state.messages[index - 1] else null
+                // The neighbours are the rows that really show a bubble: the other chunks of a split message draw
+                // nothing, and taking one of them as the neighbour made the merged bubble look like a continuation of
+                // the previous sender's block (no name, joined corners, wrong colour).
+                fun visibleNeighbour(from: Int, step: Int): Message? {
+                    var i = from
+                    while (i in 0 until state.messages.itemCount) {
+                        val candidate = state.messages[i] ?: return null
+                        if (!splitReassembly.suppressed.contains(candidate.uuid)) {
+                            val info = splitReassembly.groups[candidate.uuid]
+                            return if (info != null) {
+                                candidate.copy(text = info.displayText(), packetId = info.packetId)
+                            } else {
+                                candidate
+                            }
+                        }
+                        i += step
+                    }
+                    return null
+                }
+                val visuallyPrevMessage = visibleNeighbour(index + 1, 1)
+                val visuallyNextMessage = visibleNeighbour(index - 1, -1)
 
                 val hasSamePrev =
                     message != null && visuallyPrevMessage != null && isSameGroup(visuallyPrevMessage, message)
