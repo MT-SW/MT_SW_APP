@@ -78,8 +78,8 @@ class AssistantDataProvider(
             parts += safe("channel") { toolChannelMessages(channelFromQuestion(q), SUMMARY_MESSAGES) }
         } else if (q.hasAny(MESSAGE_WORDS)) {
             if (q.hasAny(COUNT_WORDS)) {
-                val hours = if (q.hasAny(TODAY_WORDS)) 0 else if (q.contains("godzin")) 1 else 24
-                priority += safe("count") { toolMessageCount(channelFromQuestion(q), hours) }
+                val w = timeWindow(q) ?: Triple(todayStart(nowMillis), Long.MAX_VALUE, "dzisiaj (od północy)")
+                priority += safe("count") { messageCountReport(channelFromQuestion(q), w.first, w.second, w.third) }
             }
             QUOTED.find(question)?.groupValues?.get(1)?.takeIf { it.isNotBlank() }?.let { phrase ->
                 priority += safe("search") { toolMessages(phrase, SEARCH_SHOWN, channelFromQuestion(q)) }
@@ -107,9 +107,10 @@ class AssistantDataProvider(
     suspend fun directAnswer(question: String): String? {
         val q = question.lowercase()
         if (q.hasAny(SUMMARY_WORDS) || !q.hasAny(MESSAGE_WORDS) || !q.hasAny(COUNT_WORDS)) return null
-        if (!q.hasAny(TODAY_WORDS) && !q.contains("godzin") && !q.contains("najwięcej") && !q.contains("najwiecej")) return null
-        val hours = if (q.hasAny(TODAY_WORDS)) 0 else if (q.contains("godzin")) Regex("(\\d+)\\s*godz").find(q)?.groupValues?.get(1)?.toIntOrNull() ?: HOURS_WORD_DEFAULT else -1
-        return safe("count") { toolMessageCount(channelFromQuestion(q), hours) }.takeIf { it.isNotBlank() }
+        val window = timeWindow(q)
+        if (window == null && !q.contains("najwięcej") && !q.contains("najwiecej") && !q.contains("kto napisa") && !q.contains("kto pisze")) return null
+        val (since, until, label) = window ?: Triple(0L, Long.MAX_VALUE, "wszystkie zapisane")
+        return safe("count") { messageCountReport(channelFromQuestion(q), since, until, label) }.takeIf { it.isNotBlank() }
     }
 
     /** True when the question names a topic the data parts know; a bare follow-up ("a jakie to wartości?") does not. */
@@ -777,6 +778,52 @@ class AssistantDataProvider(
      * counted in code. [hours] 0 means "today" (since local midnight); 1 to 720 means the last that many hours; -1 means all saved messages.
      */
     suspend fun toolMessageCount(channel: String, hours: Int): String {
+        val now = nowMillis
+        val since =
+            if (hours < 0) 0L
+            else if (hours > 0) now - hours.toLong().coerceAtMost(MAX_COUNT_HOURS) * MILLIS_PER_HOUR
+            else todayStart(now)
+        val window = if (hours < 0) "wszystkie zapisane" else if (hours > 0) "ostatnie $hours h" else "dzisiaj (od północy)"
+        return messageCountReport(channel, since, Long.MAX_VALUE, window)
+    }
+
+    /** Start of the local day that contains [now], in epoch milliseconds. */
+    private fun todayStart(now: Long): Long {
+        val offsetMs = systemTimeZone.offsetAt(kotlin.time.Instant.fromEpochMilliseconds(now)).totalSeconds * MILLIS_PER_SECOND
+        return ((now + offsetMs) / MILLIS_PER_DAY) * MILLIS_PER_DAY - offsetMs
+    }
+
+    /** A time window written in a question: since, until (epoch ms) and a label, or null when none is named. */
+    private fun timeWindow(q: String): Triple<Long, Long, String>? {
+        val now = nowMillis
+        val today = todayStart(now)
+        if (q.contains("wczoraj")) return Triple(today - MILLIS_PER_DAY, today, "wczoraj")
+        val unit = Regex("(\\d+)\\s*(minut|min\\b|godz|h\\b|dni|dzie|dob|tydz|tygod|miesi|rok|lat)").find(q)
+        if (unit != null) {
+            val n = unit.groupValues[1].toLongOrNull() ?: return null
+            val (ms, name) =
+                when (unit.groupValues[2]) {
+                    "minut", "min" -> MILLIS_PER_MINUTE to "min"
+                    "godz", "h" -> MILLIS_PER_HOUR to "h"
+                    "dni", "dzie", "dob" -> MILLIS_PER_DAY to "dni"
+                    "tydz", "tygod" -> 7 * MILLIS_PER_DAY to "tyg."
+                    "miesi" -> 30 * MILLIS_PER_DAY to "mies."
+                    else -> 365 * MILLIS_PER_DAY to "lat"
+                }
+            return Triple(now - n * ms, Long.MAX_VALUE, "ostatnie $n $name")
+        }
+        return when {
+            q.hasAny(TODAY_WORDS) -> Triple(today, Long.MAX_VALUE, "dzisiaj (od północy)")
+            q.contains("godzin") -> Triple(now - MILLIS_PER_HOUR, Long.MAX_VALUE, "ostatnia godzina")
+            q.contains("tydzie") || q.contains("tygodn") -> Triple(now - 7 * MILLIS_PER_DAY, Long.MAX_VALUE, "ostatni tydzień")
+            q.contains("miesi") -> Triple(now - 30 * MILLIS_PER_DAY, Long.MAX_VALUE, "ostatni miesiąc")
+            q.contains("rok") || q.contains("roku") -> Triple(now - 365 * MILLIS_PER_DAY, Long.MAX_VALUE, "ostatni rok")
+            q.contains("dobę") || q.contains("doba") || q.contains("dobe") -> Triple(now - MILLIS_PER_DAY, Long.MAX_VALUE, "ostatnia doba")
+            else -> null
+        }
+    }
+
+    private suspend fun messageCountReport(channel: String, since: Long, until: Long, window: String): String {
         val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
         val wanted = channel.anyToEmpty()
         val index = wanted.toIntOrNull() ?: numberedChannel(wanted) ?: names.indexOfFirst { it.lowercase() == wanted }.takeIf { it >= 0 }
@@ -784,12 +831,6 @@ class AssistantDataProvider(
         if (wanted.isNotEmpty() && index == null) {
             return "No channel found for \"$channel\". Channels: " + names.mapIndexed { i, n -> "$i=${n.ifBlank { "(default)" }}" }.joinToString()
         }
-        val now = nowMillis
-        val offsetMs = systemTimeZone.offsetAt(kotlin.time.Instant.fromEpochMilliseconds(now)).totalSeconds * MILLIS_PER_SECOND
-        val since =
-            if (hours < 0) 0L
-            else if (hours > 0) now - hours.toLong().coerceAtMost(MAX_COUNT_HOURS) * MILLIS_PER_HOUR
-            else ((now + offsetMs) / MILLIS_PER_DAY) * MILLIS_PER_DAY - offsetMs
         val keys = packetRepository.getContacts().first().keys.filter { key ->
             if (index == null) true else key.endsWith("^all") && key.startsWith("$index^")
         }
@@ -799,7 +840,7 @@ class AssistantDataProvider(
         for (key in keys) {
             val list = packetRepository.getMessagesFrom(key, COUNT_PER_CHAT) { id -> nodeRepository.getNode(id.orEmpty()) }.first()
             for (m in list) {
-                if (m.receivedTime < since) continue
+                if (m.receivedTime < since || m.receivedTime >= until) continue
                 total++
                 val ownName = nodeRepository.ourNodeInfo.value?.user?.let { it.long_name.ifBlank { it.short_name } }.orEmpty()
                 val who = if (m.fromLocal) ownName.ifBlank { "ja" } else m.node.user.long_name.ifBlank { m.node.user.short_name }
@@ -808,7 +849,6 @@ class AssistantDataProvider(
             }
         }
         val label = if (index == null) "wszystkie rozmowy" else "kanał $index (${names.getOrNull(index)?.ifBlank { null } ?: "domyślny"})"
-        val window = if (hours < 0) "wszystkie zapisane" else if (hours > 0) "ostatnie $hours h" else "dzisiaj (od północy)"
         val sb = StringBuilder("Liczba wiadomości, $label, $window: $total (w tym moje: $mine)")
         if (perSender.isNotEmpty()) {
             sb.append("\nKto napisał najwięcej (łącznie z moimi): ")
@@ -1062,7 +1102,7 @@ class AssistantDataProvider(
         val QUOTED = Regex("[\"„”«]([^\"„”»]{2,60})[\"”»]")
         const val HOURS_WORD_DEFAULT = 1
         const val COUNT_PER_CHAT = 3000
-        const val MAX_COUNT_HOURS = 720L
+        const val MAX_COUNT_HOURS = 8784L
         const val MILLIS_PER_DAY = 86_400_000L
         const val TOP_SENDERS = 8
         const val MILLIS_PER_HOUR = 3_600_000L
