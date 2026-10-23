@@ -40,6 +40,7 @@ import org.meshtastic.core.resources.filter_settings
 import org.meshtastic.core.resources.firmware
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.help_and_documentation
+import org.meshtastic.core.resources.log_retention_days
 import org.meshtastic.core.resources.lora
 import org.meshtastic.core.resources.map
 import org.meshtastic.core.resources.messages
@@ -307,6 +308,7 @@ class AssistantGuideTools(
                 Target("chat_images", "settings/mt-sw-features", Res.string.auto_load_chat_images, listOf("zdjęci", "obrazk", "images", "podgląd link")),
                 Target("theme", "settings", Res.string.theme, listOf("motyw", "theme", "ciemny", "jasny", "dark", "light", "tryb ciemny")),
                 Target("language", "settings", Res.string.preferences_language, listOf("język", "language", "jezyk")),
+                Target("log_retention", "settings", Res.string.log_retention_days, listOf("ramk", "logi", "log", "statystyk", "jak długo pamięta", "retention", "historia")),
             )
     }
 }
