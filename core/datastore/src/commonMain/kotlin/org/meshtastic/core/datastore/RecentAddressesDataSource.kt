@@ -113,4 +113,4 @@ open class RecentAddressesDataSource(private val dataStore: CorePreferencesDataS
 }
 
 /** How many recently used network (WiFi/TCP) devices are remembered; the oldest is dropped beyond this. */
-internal const val CACHE_CAPACITY = 20
+internal const val CACHE_CAPACITY = 30

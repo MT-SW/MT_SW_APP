@@ -31,7 +31,7 @@ object DatabaseConstants {
     // eviction in DatabaseManager.enforceCacheLimit() silently deletes a device's local chat history once
     // it falls out of the cache. 5 gives more headroom while still bounding on-disk growth; MAX_CACHE_LIMIT
     // remains the escape hatch for users who need more (github.com/meshtastic/Meshtastic-Android/issues/6186).
-    const val DEFAULT_CACHE_LIMIT: Int = 10
+    const val DEFAULT_CACHE_LIMIT: Int = 5
     const val MIN_CACHE_LIMIT: Int = 1
     const val MAX_CACHE_LIMIT: Int = 30
 
