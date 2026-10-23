@@ -113,6 +113,9 @@
     <string name="ai_go_setting">Opening the page with the setting %1$s. It blinks so it is easy to find; changing it is up to you.</string>
     <string name="ai_go_unknown_place">That place was not found in the app. Try other words, for example: open LoRa settings.</string>
     <string name="ai_heard">heard %1$s</string>
+    <string name="ai_help_from_manual">From the app manual:</string>
+    <string name="ai_help_news">Latest changes in MT_SW:</string>
+    <string name="ai_help_where">“%1$s” is in: %2$s.</string>
     <string name="ai_internet_enable">Turn on</string>
     <string name="ai_internet_on_indicator">Internet is ON for the assistant</string>
     <string name="ai_internet_summary">Off by default. When on, the assistant can search the web, and the app downloads updates about our work automatically.</string>
@@ -338,6 +341,9 @@
     <string name="assistant_suggest_2">What is LoRa range?</string>
     <string name="assistant_suggest_3">How can I improve antenna range?</string>
     <string name="assistant_suggest_4">What is a node in a mesh network?</string>
+    <string name="assistant_web_searched">searched: %1$s</string>
+    <string name="assistant_web_sources">sources: %1$s</string>
+    <string name="assistant_web_used">Answered with help from the internet</string>
     <string name="assistant_you">You</string>
     <string name="audio">Audio</string>
     <string name="audio_config">Audio Config</string>
@@ -2962,8 +2968,5 @@
     <string name="zh_TW" translatable="false">繁體中文</string>
     <string name="zoom_in">Zoom in</string>
     <string name="zoom_out">Zoom out</string>
-    <string name="assistant_web_used">Answered with help from the internet</string>
-    <string name="assistant_web_searched">searched: %1$s</string>
-    <string name="assistant_web_sources">sources: %1$s</string>
 </resources>
 

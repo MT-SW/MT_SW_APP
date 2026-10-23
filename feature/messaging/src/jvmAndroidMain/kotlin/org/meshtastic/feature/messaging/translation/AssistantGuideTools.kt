@@ -233,6 +233,18 @@ class AssistantGuideTools(
         return false
     }
 
+    /** Where a button leads, written as a path of screens, for example "Settings → LoRa". */
+    suspend fun pathOf(action: AssistantAction): String {
+        val path = action.uri.removePrefix("$DEEP_LINK_BASE_URI/").substringBefore('?')
+        val settings = getStringSuspend(Res.string.bottom_nav_settings)
+        val screen = placeOf(action)
+        return when {
+            path == "settings" -> settings
+            path.startsWith("settings/") -> if (screen.isBlank()) settings else "$settings → $screen"
+            else -> screen
+        }
+    }
+
     /** The name of the screen a button leads to (for example "MT_SW features"), or empty. */
     suspend fun placeOf(action: AssistantAction): String {
         val path = action.uri.removePrefix("$DEEP_LINK_BASE_URI/").substringBefore('?')

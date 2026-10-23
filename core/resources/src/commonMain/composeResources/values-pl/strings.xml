@@ -3181,4 +3181,7 @@
     <string name="assistant_web_used">Odpowiedź z pomocą internetu</string>
     <string name="assistant_web_searched">wyszukano: %1$s</string>
     <string name="assistant_web_sources">źródła: %1$s</string>
+    <string name="ai_help_where">„%1$s” jest w: %2$s.</string>
+    <string name="ai_help_from_manual">Z instrukcji aplikacji:</string>
+    <string name="ai_help_news">Najnowsze zmiany w MT_SW:</string>
 </resources>

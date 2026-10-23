@@ -26,4 +26,7 @@ interface AssistantKnowledge {
      * as one plain text of at most [maxChars] characters, or an empty text when nothing fits.
      */
     suspend fun lookup(question: String, maxChars: Int): String
+
+    /** The newest entries of the change list, as plain text of at most [maxChars] characters, or empty. */
+    suspend fun latestNews(maxChars: Int): String = ""
 }

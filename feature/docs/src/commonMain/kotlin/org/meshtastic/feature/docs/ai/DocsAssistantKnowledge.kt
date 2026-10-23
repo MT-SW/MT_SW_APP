@@ -43,6 +43,8 @@ class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : Assis
         return indexFor(languageOf(question)).lookup(question, maxChars)
     }
 
+    override suspend fun latestNews(maxChars: Int): String = indexFor(languageOf("")).latestNews(maxChars)
+
     private suspend fun indexFor(language: String): KnowledgeIndex = mutex.withLock {
         cache?.let { if (language == cachedLanguage) return@withLock it }
         val documents = ArrayList<KnowledgeIndex.Document>()
