@@ -20,6 +20,8 @@ import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.StringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.ai_dm_title
+import org.meshtastic.core.resources.ai_dm_none
 import org.meshtastic.core.resources.ai_radio_title
 import org.meshtastic.core.resources.ai_radio_uptime
 import org.meshtastic.core.resources.ai_radio_util
@@ -1338,6 +1340,25 @@ class AssistantDataProvider(
         return sb.toString()
     }
 
+    /** Who wrote to the user privately lately: the newest message from each person, newest first, in code. */
+    suspend fun recentToMe(limit: Int): String {
+        val keys = packetRepository.getContacts().first().keys.filter { !it.endsWith("^all") }
+        val found = ArrayList<Triple<Long, String, String>>()
+        for (key in keys) {
+            val list = packetRepository.getMessagesFrom(key, RECENT_PER_CHAT) { id -> nodeRepository.getNode(id.orEmpty()) }.first()
+            val newest = list.filter { !it.fromLocal }.maxByOrNull { it.receivedTime } ?: continue
+            val who = newest.node.user.long_name.ifBlank { newest.node.user.short_name }
+            found += Triple(newest.receivedTime, who, newest.text.take(MESSAGE_CHARS))
+        }
+        if (found.isEmpty()) return getStringSuspend(Res.string.ai_dm_none)
+        val now = nowMillis
+        val sb = StringBuilder(getStringSuspend(Res.string.ai_dm_title))
+        for ((time, who, text) in found.sortedByDescending { it.first }.take(limit)) {
+            sb.append("\n• ").append(who).append(", ").append(ago(((now - time) / MILLIS_PER_MINUTE).coerceAtLeast(0))).append(": ").append(text)
+        }
+        return sb.toString()
+    }
+
     /** How many nodes are known, heard lately and heard directly: a short count instead of a long list. */
     suspend fun networkCount(): String {
         val all = nodeRepository.nodeDBbyNum.value.values
@@ -1595,6 +1616,7 @@ class AssistantDataProvider(
     private companion object {
         const val TAG = "AssistantData"
         const val MAX_PERIOD_AMOUNT = 1000
+        const val RECENT_PER_CHAT = 20
         const val SIGNAL_WINDOW_MS = 3L * 86_400_000L
         val SELF_WORDS = setOf("me", "ja", "mnie", "mój", "moj", "mój węzeł", "moj wezel", "mine", "my node", "own", "own node", "self")
         const val MAX_CONTEXT_CHARS = 3000

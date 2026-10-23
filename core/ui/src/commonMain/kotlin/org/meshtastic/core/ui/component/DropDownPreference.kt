@@ -46,6 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.schemaLabelRes
+import org.meshtastic.core.ui.assistant.assistantHighlight
 import org.meshtastic.core.ui.theme.AppTheme
 import kotlin.jvm.JvmName
 
@@ -138,7 +139,8 @@ fun <T> DropDownPreference(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Column(modifier = modifier.fillMaxWidth().padding(8.dp)) {
+    // The assistant can point at a drop-down setting too (for example the LoRa region): the row then blinks.
+    Column(modifier = modifier.assistantHighlight(title).fillMaxWidth().padding(8.dp)) {
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = {

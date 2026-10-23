@@ -3176,4 +3176,6 @@
     <string name="ai_radio_noise">poziom szumu %1$s dBm</string>
     <string name="ai_radio_ext">procesor %1$s %, flash zajęty %2$s %</string>
     <string name="ai_radio_none">Brak jeszcze statystyk z Twojego radia.</string>
+    <string name="ai_dm_title">Ostatnie wiadomości prywatne do Ciebie (najnowsze na górze):</string>
+    <string name="ai_dm_none">Nikt jeszcze nie napisał do Ciebie prywatnie.</string>
 </resources>

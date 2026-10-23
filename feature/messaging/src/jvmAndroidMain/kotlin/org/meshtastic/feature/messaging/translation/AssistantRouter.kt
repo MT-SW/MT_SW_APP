@@ -61,7 +61,9 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
                     messages = listOf("system" to RULES, "user" to ask),
                     maxTokens = MAX_TOKENS,
                     temperature = TEMPERATURE,
-                    jsonSchema = SCHEMA,
+                    // The forced JSON format of the library is not used: on the graphics chip it left the model's memory
+                    // locked and the next answers failed. The model writes the JSON well from the examples, and the
+                    // code below accepts only known kinds, so a wrong answer only falls back to the old way.
                 )
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
@@ -82,15 +84,16 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
         fun text(key: String): String = runCatching { obj[key]?.jsonPrimitive?.contentOrNull }.getOrNull().orEmpty().trim()
         val kind = text("intent")
         if (kind !in INTENTS) return null
+        fun known(key: String, allowed: List<String>): String = text(key).lowercase().takeIf { it in allowed }.orEmpty()
         return AssistantIntent(
             intent = kind,
             node = text("node"),
             channel = text("channel"),
             text = text("text"),
-            role = text("role"),
-            metric = text("metric"),
-            topic = text("topic"),
-            period = text("period"),
+            role = known("role", ROLES),
+            metric = known("metric", METRICS),
+            topic = known("topic", TOPICS),
+            period = known("period", PERIODS),
             amount = runCatching { obj["amount"]?.jsonPrimitive?.intOrNull }.getOrNull() ?: 0,
         )
     }
@@ -107,8 +110,13 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
             listOf(
                 "chat", "app_help", "open_screen", "show_setting", "show_node_on_map", "nearest_node", "open_link_planner",
                 "draft_message", "count_messages", "search_messages", "summarize", "list_nodes", "signal_list",
-                "traceroute", "neighbors", "app_status", "waypoints", "weather", "network_question",
+                "traceroute", "neighbors", "app_status", "waypoints", "weather", "network_question", "messages_to_me",
             )
+        val ROLES = listOf("any", "router", "repeater", "sensor", "tracker")
+        val METRICS =
+            listOf("nearest", "farthest", "snr", "rx", "tx", "dupe", "bad", "heap", "battery", "channel_util", "uptime", "per_channel", "favorites")
+        val TOPICS = listOf("node", "radio", "ranking", "settings", "activity", "overview", "other")
+        val PERIODS = listOf("none", "today", "yesterday", "minutes", "hours", "days", "weeks", "months", "years", "all")
 
         private fun enumOf(values: List<String>) = values.joinToString(",", "[", "]") { "\"$it\"" }
 
@@ -121,16 +129,16 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
                 """"node":${str(40)},""" +
                 """"channel":${str(40)},""" +
                 """"text":${str(200)},""" +
-                """"role":{"type":"string","enum":["any","router","repeater","sensor","tracker"]},""" +
-                """"metric":{"type":"string","enum":["nearest","farthest","snr","rx","tx","dupe","bad","heap","battery","channel_util","uptime","per_channel","favorites"]},""" +
-                """"topic":{"type":"string","enum":["node","radio","ranking","settings","activity","overview","other"]},""" +
-                """"period":{"type":"string","enum":["none","today","yesterday","minutes","hours","days","weeks","months","years","all"]},""" +
+                """"role":{"type":"string","enum":${enumOf(ROLES)}},""" +
+                """"metric":{"type":"string","enum":${enumOf(METRICS)}},""" +
+                """"topic":{"type":"string","enum":${enumOf(TOPICS)}},""" +
+                """"period":{"type":"string","enum":${enumOf(PERIODS)}},""" +
                 """"amount":{"type":"integer","minimum":0,"maximum":1000}""" +
                 """},"required":["intent"],"additionalProperties":false}"""
 
         private const val RULES =
             "You sort questions for the assistant of MT_SW, an app for Meshtastic LoRa mesh radios. The question is " +
-                "usually in Polish. Answer ONLY with one JSON object: the kind of question in \"intent\" and only the " +
+                "usually in Polish. Answer ONLY with one JSON object on one line, nothing else: the kind of question in \"intent\" and only the " +
                 "fields that the question really gives. Copy node and channel names exactly as the user wrote them. " +
                 "Use the previous question only for a short follow-up like \"a wczoraj?\".\n" +
                 "Kinds:\n" +
@@ -144,7 +152,8 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
                 "draft_message: write, send or prepare a message. channel = channel name or number, or a node name for a private message (leave out for the main channel); text = the message itself, ready to send.\n" +
                 "count_messages: how many messages, who writes most. channel, period, amount; metric = per_channel for which channel has most messages.\n" +
                 "search_messages: did someone write about something, who wrote a word, find a message. text = the word (its stem), channel.\n" +
-                "summarize: what is being said, summary of a channel or of a private chat with a node. channel = channel or node name.\n" +
+                "summarize: what is being said in MESSAGES, summary of a channel or of a private chat with a node. channel = channel or node name. A summary of the network itself is network_question with topic overview.\n" +
+                "messages_to_me: who wrote to me, the latest private messages to me.\n" +
                 "list_nodes: how many nodes there are, which or how many were heard or active in a time, nodes with low battery (metric = battery), favourite nodes (metric = favorites). period, amount.\n" +
                 "signal_list: which nodes are nearest, farthest or have the best signal, or the signal (SNR, RSSI) of one node. role, metric = nearest, farthest or snr; node = the node when the question is about one node.\n" +
                 "traceroute: the route packets take to a node. node.\n" +
@@ -172,6 +181,8 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
                 "ile wiadomości było wczoraj na kanale 1? -> {\"intent\":\"count_messages\",\"channel\":\"1\",\"period\":\"yesterday\"}\n" +
                 "kto pisał najwięcej przez ostatni tydzień? -> {\"intent\":\"count_messages\",\"period\":\"weeks\",\"amount\":1}\n" +
                 "czy ktoś pisał o burzy? -> {\"intent\":\"search_messages\",\"text\":\"burz\"}\n" +
+                "podsumuj mi całą sieć -> {\"intent\":\"network_question\",\"topic\":\"overview\"}\n" +
+                "kto pisał do mnie ostatnio? -> {\"intent\":\"messages_to_me\"}\n" +
                 "o czym rozmawiali na kanale MT_SW? -> {\"intent\":\"summarize\",\"channel\":\"MT_SW\"}\n" +
                 "ile węzłów było aktywnych przez 3 godziny? -> {\"intent\":\"list_nodes\",\"period\":\"hours\",\"amount\":3}\n" +
                 "które węzły mają słabą baterię? -> {\"intent\":\"list_nodes\",\"metric\":\"battery\"}\n" +

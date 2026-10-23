@@ -167,6 +167,7 @@ class LlamaAssistantService(
                 "traceroute" -> exact(routeOrUnknown(intent, nodeNum) { data.toolTraceroutes(it, LIST_SHOWN) })
                 "neighbors" -> exact(routeOrUnknown(intent, nodeNum) { data.toolNeighbors(it, LIST_SHOWN) })
                 "network_question" -> if (intent.topic == "radio") exact(data.radioStats()) else null
+                "messages_to_me" -> exact(data.recentToMe(LIST_SHOWN))
                 "app_status" -> exact(data.toolAppStatus())
                 "waypoints" -> exact(data.toolWaypoints(LIST_SHOWN))
                 "weather" -> exact(data.sensorReport())
@@ -332,10 +333,11 @@ class LlamaAssistantService(
                     // A broken web search call: once more without the web.
                     msg.contains("parse tool calls", ignoreCase = true) ->
                         engine.chat(modelId, messages, MAX_ANSWER_TOKENS, TEMPERATURE, onPiece, thinking = think)
-                    // The model file may not support quiet thinking: once more without it, and no more tries later.
+                    // Once more without quiet thinking; it stays off only when the model file says it cannot think.
                     think -> {
                         Logger.w(tag = TAG, throwable = e) { "Answer with thinking failed, trying without: $msg" }
-                        engine.chat(modelId, messages, MAX_ANSWER_TOKENS, TEMPERATURE, onPiece, tools).also { thinkingWorks = false }
+                        if (msg.contains("think", ignoreCase = true)) thinkingWorks = false
+                        engine.chat(modelId, messages, MAX_ANSWER_TOKENS, TEMPERATURE, onPiece, tools)
                     }
                     else -> throw e
                 }
