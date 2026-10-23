@@ -28,6 +28,7 @@ import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.Telemetry
 import kotlin.math.roundToInt
+import kotlinx.coroutines.sync.withLock
 
 /**
  * Gives the assistant READ-ONLY access to what the app knows: the own node, the radio statistics and their trend, the
@@ -86,6 +87,32 @@ class AssistantDataProvider(
         return mentionedNodes(q).isNotEmpty() ||
             listOf(SENSOR_WORDS, SIGNAL_WORDS, NODE_WORDS, TREND_WORDS, RANK_WORDS, SETTINGS_WORDS, SUMMARY_WORDS, MESSAGE_WORDS, ACTIVITY_WORDS)
                 .any { q.hasAny(it) }
+    }
+
+    private class TelemetryEntry(val owner: Int, val time: Long, val telemetry: Telemetry)
+
+    private val telemetryLock = kotlinx.coroutines.sync.Mutex()
+    private var telemetryCache: Pair<Long, List<TelemetryEntry>>? = null
+
+    /**
+     * The telemetry packets of the last 3 days, decoded once and kept for a short time. A single question can need them
+     * several times (data parts, then a tool), and reading and decoding them is what used the most memory.
+     */
+    private suspend fun telemetry(): List<TelemetryEntry> = telemetryLock.withLock {
+        telemetryCache?.takeIf { nowMillis - it.first < TELEMETRY_CACHE_MS }?.second
+            ?: run {
+                val ownNum = nodeRepository.ourNodeInfo.value?.num ?: 0
+                val logs = meshLogRepository.getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, nowMillis - RANK_WINDOW_MS).first()
+                val entries =
+                    logs.mapNotNull { log ->
+                        val payload = log.fromRadio.packet?.decoded?.payload ?: return@mapNotNull null
+                        val t = runCatching { Telemetry.ADAPTER.decode(payload) }.getOrNull() ?: return@mapNotNull null
+                        // Logs of the own node carry the id 0.
+                        TelemetryEntry(if (log.fromNum == 0) ownNum else log.fromNum, log.received_date, t)
+                    }
+                telemetryCache = nowMillis to entries
+                entries
+            }
     }
 
     /** Who was heard most recently, or longest ago, written with exact ages. */
@@ -212,14 +239,12 @@ class AssistantDataProvider(
             put(n.num, "soil/water", time, n.soilWaterMetrics.toString())
             if (n.paxcounter.wifi != 0 || n.paxcounter.ble != 0) put(n.num, "pax counter", time, n.paxcounter.toString())
         }
-        val logs = meshLogRepository.getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, nowMillis - RANK_WINDOW_MS).first()
-        for (log in logs) {
-            val payload = log.fromRadio.packet?.decoded?.payload ?: continue
-            val t = runCatching { Telemetry.ADAPTER.decode(payload) }.getOrNull() ?: continue
-            val num = if (log.fromNum == 0) own else log.fromNum
-            t.environment_metrics?.let { put(num, "weather/environment", log.received_date, it.toString()) }
-            t.air_quality_metrics?.let { put(num, "air quality", log.received_date, it.toString()) }
-            t.power_metrics?.let { put(num, "power", log.received_date, it.toString()) }
+        for (entry in telemetry()) {
+            val t = entry.telemetry
+            val num = if (entry.owner == 0) own else entry.owner
+            t.environment_metrics?.let { put(num, "weather/environment", entry.time, it.toString()) }
+            t.air_quality_metrics?.let { put(num, "air quality", entry.time, it.toString()) }
+            t.power_metrics?.let { put(num, "power", entry.time, it.toString()) }
         }
         return found
     }
@@ -377,17 +402,14 @@ class AssistantDataProvider(
 
     /** The latest telemetry every node reported (last 3 days), ranked by what the question is about. */
     private suspend fun ranking(q: String, top: Int = RANK_TOP): String {
-        val logs = meshLogRepository.getLogsByPortNumSince(PortNum.TELEMETRY_APP.value, nowMillis - RANK_WINDOW_MS).first()
         val rows = HashMap<Int, NodeRow>()
-        for (log in logs) {
-            val payload = log.fromRadio.packet?.decoded?.payload ?: continue
-            val t = runCatching { Telemetry.ADAPTER.decode(payload) }.getOrNull() ?: continue
-            // Logs of the own node carry the id 0.
-            val owner = if (log.fromNum == 0) (nodeRepository.ourNodeInfo.value?.num ?: 0) else log.fromNum
+        for (entry in telemetry()) {
+            val t = entry.telemetry
+            val owner = entry.owner
             val row = rows.getOrPut(owner) { NodeRow(owner) }
             t.local_stats?.let { ls ->
-                if (log.received_date >= row.statsTime) {
-                    row.statsTime = log.received_date
+                if (entry.time >= row.statsTime) {
+                    row.statsTime = entry.time
                     row.rx = ls.num_packets_rx
                     row.tx = ls.num_packets_tx
                     row.bad = ls.num_packets_rx_bad
@@ -397,8 +419,8 @@ class AssistantDataProvider(
                 }
             }
             t.device_metrics?.let { dm ->
-                if (log.received_date >= row.devTime) {
-                    row.devTime = log.received_date
+                if (entry.time >= row.devTime) {
+                    row.devTime = entry.time
                     row.battery = dm.battery_level
                     row.chUtil = dm.channel_utilization
                     row.airUtil = dm.air_util_tx
@@ -851,6 +873,7 @@ class AssistantDataProvider(
         val SIGNAL_WORDS = listOf("zasięg", "zasieg", "sygnał", "sygnal", "snr", "rssi", "odległ", "odleg", "daleko", "dystans", "blisk", "najbliż", "najbliz", "jakość", "jakosc", "range", "signal", "distance", "linku", "łącz", "polacz")
         val ACTIVITY_WORDS = listOf("ostatnio słysz", "ostatnio slysz", "kto ostatnio", "ostatnio odezw", "offline", "nieaktyw", "dawno", "milcz", "ostatni raz", "kiedy ostatnio", "najświeżs", "last heard", "zniknęł", "zniknel")
         const val ACTIVITY_TOP = 10
+        const val TELEMETRY_CACHE_MS = 60_000L
         val RANK_WORDS = listOf("ramek", "ramki", "pakiet", "odebran", "raportuj", "najwięc", "najwiec", "najmniej", "ranking", "który", "ktory", "najlep", "najgorz")
         val MAIN_CHANNEL_WORDS = setOf("all", "wszyscy", "wszystkich", "główny", "glowny", "primary", "main", "kanał główny")
         val OWN_WORDS = listOf("mój", "moj", "mojego", "mojej", "mojemu", "my node", "own node", "mój węz", "moim")
