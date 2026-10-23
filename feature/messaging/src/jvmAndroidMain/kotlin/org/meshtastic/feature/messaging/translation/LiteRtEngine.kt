@@ -26,7 +26,9 @@ import com.google.ai.edge.litertlm.Engine
 import com.google.ai.edge.litertlm.EngineConfig
 import com.google.ai.edge.litertlm.Message
 import com.google.ai.edge.litertlm.MessageCallback
+import com.google.ai.edge.litertlm.ResponseFormat
 import com.google.ai.edge.litertlm.SamplerConfig
+import com.google.ai.edge.litertlm.ThinkingConfig
 import com.google.ai.edge.litertlm.ToolSet
 import com.google.ai.edge.litertlm.tool
 import kotlinx.coroutines.CompletableDeferred
@@ -80,6 +82,9 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
      * Sends [messages] (role to text pairs, roles `system`, `user`, `assistant`; the last one must be a `user`
      * message) to model [modelId] and returns the reply. [onPiece] receives the text as it is produced. Cancelling the
      * coroutine stops the generation. [maxTokens] is a rough limit on the length of the answer, 0 means no limit (the model stops by itself).
+     * [jsonSchema] forces the answer into that JSON shape: the library lets the model write nothing else, so the result
+     * can always be read by code. [thinking] lets the model think quietly before it answers (the thoughts are not
+     * shown); it makes answers better but slower.
      */
     suspend fun chat(
         modelId: String,
@@ -88,10 +93,14 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         temperature: Float,
         onPiece: (String) -> Unit = {},
         tools: List<ToolSet> = emptyList(),
+        jsonSchema: String? = null,
+        thinking: Boolean = false,
     ): String = runMutex.withLock {
         unloadJob?.cancel()
         try {
-            withContext(Dispatchers.Default) { generate(modelId, messages, maxTokens, temperature, onPiece, tools) }
+            withContext(Dispatchers.Default) {
+                generate(modelId, messages, maxTokens, temperature, onPiece, tools, jsonSchema, thinking)
+            }
         } finally {
             scheduleUnload()
         }
@@ -141,6 +150,8 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         temperature: Float,
         onPiece: (String) -> Unit,
         tools: List<ToolSet>,
+        jsonSchema: String?,
+        thinking: Boolean,
     ): String {
         val started = nowMillis
         val wasLoaded = loadedId == modelId
@@ -163,20 +174,31 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
                 initialMessages = history,
                 tools = tools.map { tool(it) },
                 samplerConfig = SamplerConfig(topK = TOP_K, topP = TOP_P, temperature = temperature.toDouble()),
+                enableResponseFormat = jsonSchema != null,
             )
+        val format = jsonSchema?.let { ResponseFormat.json(it) }
+        val think = if (thinking) ThinkingConfig(enableThinking = true, thinkingTokenBudget = THINKING_BUDGET) else null
 
         val reply = StringBuilder()
         val restorer = SymbolRestorer(symbols)
+        val thoughts = ThoughtFilter()
         val limit = if (maxTokens > 0) maxTokens * CHARS_PER_TOKEN else Int.MAX_VALUE
         try {
             loaded.createConversation(config).use { conversation ->
                 conversation.stream(
-                    send = { callback -> conversation.sendMessageAsync(dialogue.last().second, callback) },
+                    send = { callback ->
+                        conversation.sendMessageAsync(
+                            dialogue.last().second,
+                            callback,
+                            thinkingConfig = think,
+                            responseFormat = format,
+                        )
+                    },
                     wantMore = { reply.length < limit && !reply.isLooping() },
                     onPiece = { piece ->
                         if (piece.isNotEmpty()) {
                             reply.append(piece)
-                            restorer.push(piece).takeIf { it.isNotEmpty() }?.let { runCatching { onPiece(it) } }
+                            thoughts.push(restorer.push(piece)).takeIf { it.isNotEmpty() }?.let { runCatching { onPiece(it) } }
                         }
                     },
                 )
@@ -188,13 +210,13 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
             if (reply.isEmpty()) throw e
             Logger.w(tag = TAG, throwable = e) { "Answer ended early: ${e.message}" }
         }
-        restorer.finish().takeIf { it.isNotEmpty() }?.let { runCatching { onPiece(it) } }
+        thoughts.push(restorer.finish()).plus(thoughts.finish()).takeIf { it.isNotEmpty() }?.let { runCatching { onPiece(it) } }
         Logger.i(tag = TAG) {
             "Answer from $modelId on $activeBackend: loaded=${!wasLoaded} in ${loadedAt - started} ms, generated ${reply.length} chars " +
-                "in ${nowMillis - loadedAt} ms"
+                "in ${nowMillis - loadedAt} ms (thinking=$thinking, json=${jsonSchema != null})"
         }
         val finalText = reply.withoutLoop()
-        return restorer.restoreAll(finalText).trim()
+        return ThoughtFilter.strip(restorer.restoreAll(finalText)).trim()
     }
 
     /**
@@ -382,6 +404,65 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         }
     }
 
+    /**
+     * Hides the model's quiet thinking if it ever comes inside the answer text instead of in its own channel: a block
+     * between the thinking markers is dropped, and a marker split between two pieces is held back.
+     */
+    private class ThoughtFilter {
+        private val pending = StringBuilder()
+        private var inside = false
+
+        fun push(piece: String): String {
+            pending.append(piece)
+            val out = StringBuilder()
+            while (true) {
+                if (inside) {
+                    val end = pending.indexOf(END)
+                    if (end < 0) {
+                        val keep = minOf(pending.length, END.length - 1)
+                        pending.delete(0, pending.length - keep)
+                        return out.toString()
+                    }
+                    pending.delete(0, end + END.length)
+                    inside = false
+                    continue
+                }
+                val start = pending.indexOf(START)
+                if (start >= 0) {
+                    out.append(pending.substring(0, start))
+                    pending.delete(0, start + START.length)
+                    inside = true
+                    continue
+                }
+                var hold = 0
+                for (k in START.length - 1 downTo 1) {
+                    if (pending.length >= k && pending.endsWith(START.substring(0, k))) {
+                        hold = k
+                        break
+                    }
+                }
+                out.append(pending.substring(0, pending.length - hold))
+                pending.delete(0, pending.length - hold)
+                return out.toString()
+            }
+        }
+
+        fun finish(): String {
+            val rest = if (inside) "" else pending.toString()
+            pending.clear()
+            inside = false
+            return rest
+        }
+
+        companion object {
+            const val START = "<|channel>"
+            const val END = "<channel|>"
+            private val BLOCK = Regex("(?s)<\\|channel>.*?(<channel\\|>|$)")
+
+            fun strip(text: String): String = text.replace(BLOCK, "")
+        }
+    }
+
     private fun scheduleUnload() {
         unloadJob?.cancel()
         unloadJob =
@@ -420,5 +501,8 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         const val IDLE_UNLOAD_MS = 120_000L
         const val CONTEXT_SMALL = 8192
         const val CONTEXT_LARGE = 16384
+
+        /** At most this many tokens of quiet thinking before an answer; keeps the wait short on phones. */
+        const val THINKING_BUDGET = 384
     }
 }
