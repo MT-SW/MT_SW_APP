@@ -36,16 +36,18 @@ class LiteRtDictationService(
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
-    /** The model used for dictation: the assistant's when it is on and can hear, else the translator's. */
-    private fun pick(states: Map<String, TranslatorModelState>): String? {
-        val assistant = uiPrefs.assistantModelId.value
-        if (uiPrefs.assistantEnabled.value && ready(states, assistant)) return assistant
-        val translator = uiPrefs.translatorModelId.value
-        if (uiPrefs.translatorEnabled.value && ready(states, translator)) return translator
-        return null
+    /** Chats and the assistant use the model chosen for the assistant (when it is on); the translator its own. */
+    private fun pick(states: Map<String, TranslatorModelState>, translator: Boolean): String? {
+        val id = if (translator) uiPrefs.translatorModelId.value else uiPrefs.assistantModelId.value
+        val on = if (translator) uiPrefs.translatorEnabled.value else uiPrefs.assistantEnabled.value
+        return id.takeIf { on && ready(states, it) }
     }
 
-    override val available: StateFlow<Boolean> =
+    override val available: StateFlow<Boolean> = flowFor(translator = false)
+
+    override val translatorAvailable: StateFlow<Boolean> = flowFor(translator = true)
+
+    private fun flowFor(translator: Boolean): StateFlow<Boolean> =
         combine(
             store.states,
             uiPrefs.assistantEnabled,
@@ -53,12 +55,12 @@ class LiteRtDictationService(
             uiPrefs.translatorEnabled,
             uiPrefs.translatorModelId,
         ) { states, _, _, _, _ ->
-            pick(states) != null
+            pick(states, translator) != null
         }
             .stateIn(scope, SharingStarted.Eagerly, false)
 
-    override suspend fun transcribe(wav: ByteArray): String {
-        val id = checkNotNull(pick(store.states.value)) { "Dictation is not available" }
+    override suspend fun transcribe(wav: ByteArray, translator: Boolean): String {
+        val id = checkNotNull(pick(store.states.value, translator)) { "Dictation is not available" }
         return engine.transcribe(id, wav)
     }
 

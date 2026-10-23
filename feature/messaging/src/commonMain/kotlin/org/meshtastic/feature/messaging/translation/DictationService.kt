@@ -23,6 +23,9 @@ interface DictationService {
     /** True while a model that can hear (Gemma E2B or E4B) is downloaded; the dictation button is shown only then. */
     val available: StateFlow<Boolean>
 
+    /** Same for the translator: only when the model chosen for the translator itself can hear. */
+    val translatorAvailable: StateFlow<Boolean>
+
     /** [wav] is a 16 kHz, mono, 16 bit recording of at most about 30 seconds. Returns the spoken text. */
-    suspend fun transcribe(wav: ByteArray): String
+    suspend fun transcribe(wav: ByteArray, translator: Boolean = false): String
 }

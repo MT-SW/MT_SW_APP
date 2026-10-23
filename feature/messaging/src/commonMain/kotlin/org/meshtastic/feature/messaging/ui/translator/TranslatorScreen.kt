@@ -75,7 +75,7 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
     val state by viewModel.state.collectAsStateWithLifecycle()
     val enabled by viewModel.enabled.collectAsStateWithLifecycle()
     val modelState by viewModel.modelState.collectAsStateWithLifecycle()
-    val dictation = rememberDictation { text -> viewModel.setInput((viewModel.state.value.input + " " + text).trim()) }
+    val dictation = rememberDictation(translator = true) { text -> viewModel.setInput((viewModel.state.value.input + " " + text).trim()) }
 
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()).padding(16.dp),
