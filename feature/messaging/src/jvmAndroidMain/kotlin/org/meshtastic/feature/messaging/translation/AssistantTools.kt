@@ -115,11 +115,18 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
         @ToolParam(description = "How many of the latest messages, 1 to 40") limit: Int,
     ): String = run("direct_messages") { data.toolDirectMessages(node, limit) }
 
-    @Tool(description = "Find messages that contain a specific word or phrase in all conversations (only when the user asks for a specific word).")
+    @Tool(
+        description =
+        "SEARCHES the saved messages for a word or phrase (accents and case ignored) in all channels and private " +
+            "conversations, or only in one channel or one node's private chat. Returns how many were found and the " +
+            "newest ones with the channel they were written on. Use it whenever the user asks who wrote something, " +
+            "whether a word appeared, or to find a message.",
+    )
     fun search_messages(
-        @ToolParam(description = "Text to look for, or empty for the newest messages") query: String,
-        @ToolParam(description = "How many messages to return, 1 to 40") limit: Int,
-    ): String = run("search_messages") { data.toolMessages(query, limit) }
+        @ToolParam(description = "Word or phrase to look for, or empty for the newest messages") query: String,
+        @ToolParam(description = "How many messages to show, 1 to 40") limit: Int,
+        @ToolParam(description = "Channel name or number, or a node name for its private chat; empty = everywhere") channel: String,
+    ): String = run("search_messages") { data.toolMessages(query, limit, channel) }
 
     /** Longest result a tool may return; the assistant raises it for models with a bigger window. */
     @Volatile var resultLimit: Int = DEFAULT_RESULT_CHARS
