@@ -64,6 +64,15 @@ class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : Assis
         } catch (_: Exception) {
             // No change list in this build.
         }
+        for ((file, title) in PROJECT_FILES) {
+            try {
+                documents += KnowledgeIndex.Document(title, Res.readBytes("files/knowledge/$file").decodeToString())
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                // A missing file only makes the knowledge smaller.
+            }
+        }
         val built = KnowledgeIndex(documents)
         cachedLanguage = language
         cache = built
@@ -76,6 +85,16 @@ class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : Assis
     }
 
     private companion object {
+        /** The other parts of the MT_SW project; kept apart from the user guide, so only the assistant sees them. */
+        val PROJECT_FILES =
+            listOf(
+                "project.md" to "MT_SW project",
+                "firmware.md" to "MT_SW firmware",
+                "integration.md" to "MT_SW Home Assistant integration",
+                "integration-web-client.md" to "MT_SW integration web client",
+                "integration-planner-api.md" to "MT_SW integration planner API",
+                "protobufs.md" to "MT_SW protobufs",
+            )
         const val CHANGELOG_PATH = "files/knowledge/CHANGELOG.md"
         const val POLISH_LETTERS = "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ"
     }
