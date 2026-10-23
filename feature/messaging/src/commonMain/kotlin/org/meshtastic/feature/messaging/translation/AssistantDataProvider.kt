@@ -58,6 +58,7 @@ class AssistantDataProvider(
         val mentioned = mentionedNodes(q)
         // Most useful parts first: the model only fits about 4000 tokens, so later parts are cut when space runs out.
         val parts = ArrayList<String>()
+        val priority = ArrayList<String>()
         parts += safe("overview") { overview() }
         for (node in mentioned) parts += safe("node") { nodeDetail(node) }
         if (q.hasAny(SENSOR_WORDS)) parts += safe("sensors") { sensors() }
@@ -78,16 +79,17 @@ class AssistantDataProvider(
         } else if (q.hasAny(MESSAGE_WORDS)) {
             if (q.hasAny(COUNT_WORDS)) {
                 val hours = if (q.hasAny(TODAY_WORDS)) 0 else if (q.contains("godzin")) 1 else 24
-                parts.add(0, safe("count") { toolMessageCount(channelFromQuestion(q), hours) })
+                priority += safe("count") { toolMessageCount(channelFromQuestion(q), hours) }
             }
             QUOTED.find(question)?.groupValues?.get(1)?.takeIf { it.isNotBlank() }?.let { phrase ->
-                parts.add(0, safe("search") { toolMessages(phrase, SEARCH_SHOWN, channelFromQuestion(q)) })
+                priority += safe("search") { toolMessages(phrase, SEARCH_SHOWN, channelFromQuestion(q)) }
             }
             parts += safe("messages") { messages() }
         }
         parts += safe("index") { nodeIndex() }
         // When the question has its own topic, the general overview shrinks so the topic data fits in the small window.
-        if (parts.size > 2) parts[0] = parts[0].take(OVERVIEW_SHORT)
+        if (parts.size > 2 || priority.isNotEmpty()) parts[0] = parts[0].take(OVERVIEW_SHORT)
+        parts.addAll(0, priority)
         val out = StringBuilder()
         for (part in parts.filter { it.isNotBlank() }) {
             val room = maxChars - out.length
@@ -96,6 +98,18 @@ class AssistantDataProvider(
             out.append(part.take(room - 2))
         }
         return out.toString()
+    }
+
+    /**
+     * Questions whose answer is a number the model tends to garble (how many messages today / last hours, who writes
+     * most) are answered by code alone. Null when the question is not of that kind.
+     */
+    suspend fun directAnswer(question: String): String? {
+        val q = question.lowercase()
+        if (q.hasAny(SUMMARY_WORDS) || !q.hasAny(MESSAGE_WORDS) || !q.hasAny(COUNT_WORDS)) return null
+        if (!q.hasAny(TODAY_WORDS) && !q.contains("godzin") && !q.contains("najwięcej") && !q.contains("najwiecej")) return null
+        val hours = if (q.hasAny(TODAY_WORDS)) 0 else if (q.contains("godzin")) Regex("(\\d+)\\s*godz").find(q)?.groupValues?.get(1)?.toIntOrNull() ?: HOURS_WORD_DEFAULT else 0
+        return safe("count") { toolMessageCount(channelFromQuestion(q), hours) }.takeIf { it.isNotBlank() }
     }
 
     /** True when the question names a topic the data parts know; a bare follow-up ("a jakie to wartości?") does not. */
@@ -1042,6 +1056,7 @@ class AssistantDataProvider(
         const val SEARCH_PER_CHAT = 3000
         const val SEARCH_SHOWN = 15
         val QUOTED = Regex("[\"„”«]([^\"„”»]{2,60})[\"”»]")
+        const val HOURS_WORD_DEFAULT = 1
         const val COUNT_PER_CHAT = 3000
         const val MAX_COUNT_HOURS = 720L
         const val MILLIS_PER_DAY = 86_400_000L

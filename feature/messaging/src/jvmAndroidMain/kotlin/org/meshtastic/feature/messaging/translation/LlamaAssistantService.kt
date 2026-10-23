@@ -78,6 +78,10 @@ class LlamaAssistantService(
         collector.drain()
         webTools.reset()
         dataTools.lastResult = null
+        data.directAnswer(question)?.let { exact ->
+            onPiece(exact)
+            return exact
+        }
         val recent = fit(modelId, history, room)
         val rawAnswer =
             try {
