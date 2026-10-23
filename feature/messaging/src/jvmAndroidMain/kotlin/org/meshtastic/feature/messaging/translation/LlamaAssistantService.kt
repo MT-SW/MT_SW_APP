@@ -63,6 +63,7 @@ class LlamaAssistantService(
         val room = (engine.contextTokens(modelId) / BASE_TOKENS).coerceAtLeast(1)
         dataTools.resultLimit = DEFAULT_TOOL_CHARS * room
         val topic = AssistantTopics.of(question)
+        data.polish = question.any { it in "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ" } || history.any { it.fromUser && it.text.any { c -> c in "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ" } }
         collector.drain()
         webTools.reset()
         val recent = fit(modelId, history, room)
@@ -248,6 +249,8 @@ class LlamaAssistantService(
         const val DATA_INTRO =
             "Below is live read-only data from the user's app and radio. Use it ONLY when the question asks about their " +
                 "own network or device; otherwise ignore it completely and never dump it. " +
+                "Write the answer in the language of the user's question (usually Polish), as a short readable description in your own words, never as a copy of the data lines. " +
+                "A pair like 2:12 in the data is written in words (for example: 12 nodes are 2 hops away). " +
                 "own network and device. heap is the USED internal RAM of the radio node in percent (not the phone); high means the memory is nearly full. " +
                 "Copy every number and unit exactly as it appears in the data (keep the decimal point and the minus " +
                 "sign, never combine or change digits); keep the units that stand next to the values (for example °C, %, hPa, V) " +
