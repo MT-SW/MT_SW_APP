@@ -74,24 +74,14 @@ class AssistantWebTools : ToolSet {
         sources.clear()
     }
 
-    /** What was searched and read, as a short footer for the answer; empty when the web was not used. */
-    fun footer(polish: Boolean): String = synchronized(this) {
+    /**
+     * What was searched and read, as a hidden marker the chat shows as a small note under the answer ("answered with
+     * help from the internet"); empty when the web was not used.
+     */
+    fun footer(): String = synchronized(this) {
         if (queries.isEmpty() && sources.isEmpty()) return ""
-        buildString {
-            append("\n\n")
-            append(if (polish) "Użyto internetu." else "The internet was used.")
-            if (queries.isNotEmpty()) {
-                append(if (polish) " Wyszukano: " else " Searched: ")
-                append(queries.distinct().joinToString("; ") { "\"$it\"" })
-                append('.')
-            }
-            val hosts = sources.map { WebAccess.hostOf(it).ifEmpty { it } }.distinct().take(MAX_SOURCES)
-            if (hosts.isNotEmpty()) {
-                append(if (polish) " Źródła: " else " Sources: ")
-                append(hosts.joinToString(", "))
-                append('.')
-            }
-        }
+        val hosts = sources.map { WebAccess.hostOf(it).ifEmpty { it } }.distinct().take(MAX_SOURCES)
+        AssistantActions.encodeWeb(queries.distinct().joinToString("; ") { "\"$it\"" }, hosts.joinToString(", "))
     }
 
     private companion object {

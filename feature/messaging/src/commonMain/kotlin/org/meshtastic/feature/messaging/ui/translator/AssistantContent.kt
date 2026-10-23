@@ -91,6 +91,9 @@ import org.meshtastic.feature.messaging.rememberSpeaker
 import org.meshtastic.core.resources.assistant_empty_hint
 import org.meshtastic.core.resources.assistant_error
 import org.meshtastic.core.resources.assistant_go_to
+import org.meshtastic.core.resources.assistant_web_searched
+import org.meshtastic.core.resources.assistant_web_sources
+import org.meshtastic.core.resources.assistant_web_used
 import org.meshtastic.core.resources.assistant_greeting
 import org.meshtastic.core.resources.assistant_input_hint
 import org.meshtastic.core.resources.assistant_model_missing
@@ -211,6 +214,7 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
             }
             itemsIndexed(state.lines) { index, line ->
                 val (shown, actions) = remember(line.text) { AssistantActions.parse(line.text) }
+                val web = remember(line.text) { AssistantActions.web(line.text) }
                 Bubble(
                     fromUser = line.fromUser,
                     text = shown,
@@ -224,6 +228,19 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                     } else {
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             if (shown.isNotBlank()) Text(text = shown, style = MaterialTheme.typography.bodyLarge)
+                            if (web != null) {
+                                // A small note in the app's main colour: this answer used the internet.
+                                val details =
+                                    listOfNotNull(
+                                        web.queries.takeIf { it.isNotBlank() }?.let { stringResource(Res.string.assistant_web_searched, it) },
+                                        web.sources.takeIf { it.isNotBlank() }?.let { stringResource(Res.string.assistant_web_sources, it) },
+                                    )
+                                Text(
+                                    text = (listOf(stringResource(Res.string.assistant_web_used)) + details).joinToString(" · "),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                            }
                             if (actions.isNotEmpty()) {
                                 FlowRow(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),

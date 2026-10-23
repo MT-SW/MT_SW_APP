@@ -82,7 +82,7 @@
     <string name="ai_assistant_unavailable">The assistant will be available once the Gemma model engine is added in an upcoming version.</string>
     <string name="ai_assistant_warning_title">Turn on the offline assistant?</string>
     <string name="ai_battery_ext">external power</string>
-    <string name="ai_battery_pct">battery %1$d%%</string>
+    <string name="ai_battery_pct">battery %1$d%</string>
     <string name="ai_battery_unknown">battery unknown</string>
     <string name="ai_chan_line">channel %1$d (%2$s): %3$d</string>
     <string name="ai_chan_none">There are no saved messages yet.</string>
@@ -124,7 +124,7 @@
     <string name="ai_level_strong">Strong</string>
     <string name="ai_license_cc">Model licence: CC BY-NC 4.0 (non-commercial use only)</string>
     <string name="ai_license_gemma">Model licence: Apache 2.0 (Google, Gemma 4)</string>
-    <string name="ai_low_battery_title">Nodes with low battery (up to %1$d%%):</string>
+    <string name="ai_low_battery_title">Nodes with low battery (up to %1$d%):</string>
     <string name="ai_memory_clear">Delete all assistant notes</string>
     <string name="ai_memory_close">Close</string>
     <string name="ai_memory_delete">Delete</string>
@@ -2962,5 +2962,8 @@
     <string name="zh_TW" translatable="false">繁體中文</string>
     <string name="zoom_in">Zoom in</string>
     <string name="zoom_out">Zoom out</string>
+    <string name="assistant_web_used">Answered with help from the internet</string>
+    <string name="assistant_web_searched">searched: %1$s</string>
+    <string name="assistant_web_sources">sources: %1$s</string>
 </resources>
 
