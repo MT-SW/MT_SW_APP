@@ -32,6 +32,7 @@ kotlin {
             implementation(projects.core.common)
             implementation(projects.core.navigation)
             implementation(projects.core.resources)
+            implementation(projects.core.repository)
             implementation(projects.core.ui)
             implementation(projects.core.di)
 
