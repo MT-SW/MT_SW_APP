@@ -101,6 +101,8 @@ class AssistantActionCollector {
         }
     }
 
+    @Synchronized fun size(): Int = actions.size
+
     /** Returns the collected buttons and forgets them. */
     @Synchronized
     fun drain(): List<AssistantAction> = actions.toList().also { actions.clear() }
@@ -308,7 +310,7 @@ class AssistantGuideTools(
                 Target("chat_images", "settings/mt-sw-features", Res.string.auto_load_chat_images, listOf("zdjęci", "obrazk", "images", "podgląd link")),
                 Target("theme", "settings", Res.string.theme, listOf("motyw", "theme", "ciemny", "jasny", "dark", "light", "tryb ciemny")),
                 Target("language", "settings", Res.string.preferences_language, listOf("język", "language", "jezyk")),
-                Target("log_retention", "settings", Res.string.log_retention_days, listOf("ramk", "logi", "log", "statystyk", "jak długo pamięta", "retention", "historia")),
+                Target("log_retention", "settings", Res.string.log_retention_days, listOf("ramk", "logi", "statystyk", "pamięt", "czas", "baz", "dni", "retention", "historia", "ile czasu")),
             )
     }
 }
