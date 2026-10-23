@@ -158,10 +158,22 @@ class AssistantDataProvider(
         ""
     }
 
+    /** True when the user writes Polish: the fixed labels of the reports are then Polish too, so the model copies Polish. */
+    @Volatile var polish: Boolean = false
+
     private suspend fun overview(): String {
         val me = nodeRepository.ourNodeInfo.value
         val stats = nodeRepository.localStats.value
         val extended = nodeRepository.localStatsExtended.value
+        if (polish) {
+            return buildString {
+                appendLine("MÓJ WĘZEŁ: ${me?.user?.long_name ?: "nieznany"} (${me?.user?.short_name ?: "?"}), sprzęt ${me?.user?.hw_model}")
+                if (me != null) appendLine("Parametry urządzenia: ${me.deviceMetrics.toString().pretty()}")
+                appendLine("Węzły aktywne/wszystkie: ${nodeRepository.onlineNodeCount.first()}/${nodeRepository.totalNodeCount.first()}")
+                appendLine("Statystyki radia: ${stats.toString().pretty()}")
+                appendLine("Statystyki rozszerzone (cpu, flash, psram, wifi): $extended")
+            }
+        }
         return buildString {
             appendLine("OWN NODE: ${me?.user?.long_name ?: "unknown"} (${me?.user?.short_name ?: "?"}), hardware ${me?.user?.hw_model}")
             if (me != null) appendLine("Device metrics: ${me.deviceMetrics.toString().pretty()}")
@@ -497,6 +509,22 @@ class AssistantDataProvider(
         val roles = nodes.groupingBy { it.user.role.toString() }.eachCount().entries.sortedByDescending { it.value }.joinToString { "${it.key}:${it.value}" }
         val favourites = nodes.filter { it.isFavorite }.joinToString { it.user.short_name }
         val mqtt = nodes.count { it.viaMqtt }
+        if (polish) {
+            val hops =
+                nodes.groupingBy { it.hopsAway }.eachCount().toSortedMap().entries.joinToString("; ") {
+                    val where = when (it.key) {
+                        -1 -> "odległość nieznana"
+                        0 -> "bezpośrednio"
+                        else -> "${it.key} przeskoków"
+                    }
+                    "$where – ${it.value} węzłów"
+                }
+            val hw = nodes.groupingBy { it.user.hw_model.toString() }.eachCount().entries.sortedByDescending { it.value }.take(HW_LIMIT).filter { it.value > 0 }.joinToString("; ") { "${it.key} – ${it.value}" }
+            val rl = nodes.groupingBy { it.user.role.toString() }.eachCount().entries.sortedByDescending { it.value }.joinToString("; ") { "${it.key} – ${it.value}" }
+            return "PODSUMOWANIE SIECI: znanych węzłów ${nodes.size}, słyszanych w ostatnich 24 h $recent. Węzły według odległości: $hops. " +
+                "Słaba bateria (do $LOW_BATTERY%): ${low.ifBlank { "brak" }}. Sprzęt: $hw. Role: $rl. " +
+                "Ulubione: ${favourites.ifBlank { "brak" }}. Słyszane przez MQTT: $mqtt."
+        }
         return "NETWORK SUMMARY: ${nodes.size} nodes known, $recent heard in the last 24 h. Nodes by hops away (hops:count): $byHops. " +
             "Low battery (<= $LOW_BATTERY%): ${low.ifBlank { "none" }}. Hardware: $hardware. Roles: $roles. Favourites: ${favourites.ifBlank { "none" }}. Heard via MQTT: $mqtt."
     }
