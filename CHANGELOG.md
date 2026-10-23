@@ -26,6 +26,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Funkcje MT_SW: skróty do motywu i panelu debugowania.
 * Wybór koloru węzła: dowolny kolor (kod, odcień/nasycenie/jasność), ostatnio użyte kolory, tryby „Szybko” i „Dokładnie” zamiast tolerancji, licznik czasu i przerwanie szukania.
 * Tłumacz: przetłumaczony tekst można przeczytać na głos.
+* Asystent: pewniejsze odpowiedzi o sieci: pytania uzupełniające korzystają z poprzedniego tematu, rankingi odebranych i wysłanych ramek (największe lub najmniejsze), kto był słyszany ostatnio lub milczy najdłużej, role i ulubione.
 * **Dyktowanie** w asystencie działa tak samo na telefonie i komputerze, bez usług systemu: mikrofon + model Gemma E2B/E4B, w całości na urządzeniu. Mikrofon także w rozmowach (kanały, wiadomości prywatne) i w tłumaczu; widoczny tylko przy włączonym asystencie i wybranym modelu, który słyszy.
 * Okres pamiętania odebranych ramek (logów): wybór w dniach od 1 do 60 (1, 2, 3, 7, 14, 30, 60) zamiast od godziny do roku, także w zwykłych Ustawieniach; wcześniejszy wybór jest zachowany, dopóki nie wybierzesz nowego.
 * Domyślnie aplikacja pamięta odebrane ramki z **60 dni**, a lista ostatnich adresów Wi-Fi mieści do **30** pozycji.
@@ -388,6 +389,7 @@ The entries below describe only what this fork adds on top of the original, from
 * MT_SW features: shortcuts to the theme and the debug panel.
 * Node colour picker: any colour (code, hue/saturation/brightness), recently used colours, "Fast" and "Precise" modes instead of tolerance, a timer and cancelling of the search.
 * Translator: the translated text can be read aloud.
+* Assistant: more reliable answers about the network: follow-up questions reuse the previous topic, rankings of received and sent packets (highest or lowest), who was heard last or is silent for longest, roles and favourites.
 * **Dictation** in the assistant works the same on phone and computer, without system services: microphone + Gemma E2B/E4B model, entirely on the device. Microphone also in chats (channels, direct messages) and in the translator; shown only with the assistant on and a hearing model chosen.
 * How long received packets (logs) are remembered: a choice in days from 1 to 60 (1, 2, 3, 7, 14, 30, 60) instead of one hour to one year, also in the regular Settings; an earlier choice is kept until you pick a new one.
 * By default the app now remembers received packets for **60 days**, and the list of recent Wi-Fi addresses holds up to **30** entries.
