@@ -64,7 +64,7 @@ class MeshtasticDatabaseMigrationTest {
     @Test
     fun migrateAll() = runTest {
         helper.createDatabase(EARLIEST_SCHEMA_VERSION).close()
-        // Every bump is an @AutoMigration except the manual 52→53 (FTS rebuild) and 63→64, 64→65 (no log rebuild).
+        // Every bump is an @AutoMigration except the manual 52→53 (FTS rebuild) and 63→64, 65→66 (no log rebuild).
         helper.runMigrationsAndValidate(latestSchemaVersion(), MANUAL_MIGRATIONS).close()
     }
 
@@ -676,12 +676,12 @@ class MeshtasticDatabaseMigrationTest {
     }
 
     /**
-     * [MeshtasticDatabase.MIGRATION_64_65] adds three composite indices on `log` in place: no row is copied or
+     * [MeshtasticDatabase.MIGRATION_65_66] adds three composite indices on `log` in place: no row is copied or
      * renumbered, and the newest-report-per-node query is answered from the index alone.
      */
     @Test
     fun logGainsCompositeIndicesWithoutRebuildingLog() = runTest {
-        helper.createDatabase(SCHEMA_65_FROM_VERSION).use { connection ->
+        helper.createDatabase(SCHEMA_66_FROM_VERSION).use { connection ->
             connection.execSQL(
                 "INSERT INTO log (rowid, uuid, type, received_date, message, from_num, port_num) " +
                     "VALUES (40, 'log-a', 'Packet', 1000, 'first', 42, 71)",
@@ -692,7 +692,7 @@ class MeshtasticDatabaseMigrationTest {
             )
         }
 
-        helper.runMigrationsAndValidate(SCHEMA_65_TO_VERSION, listOf(MeshtasticDatabase.MIGRATION_64_65)).use {
+        helper.runMigrationsAndValidate(SCHEMA_66_TO_VERSION, listOf(MeshtasticDatabase.MIGRATION_65_66)).use {
             connection ->
             val logs = "FROM log ORDER BY received_date"
             assertEquals(listOf("40", "7"), queryColumn(connection, "SELECT rowid $logs"))
@@ -761,16 +761,16 @@ class MeshtasticDatabaseMigrationTest {
         const val REACTION_AUTH_TO_VERSION = 63
         const val SCHEMA_64_FROM_VERSION = 63
         const val SCHEMA_64_TO_VERSION = 64
-        const val SCHEMA_65_FROM_VERSION = 64
-        const val SCHEMA_65_TO_VERSION = 65
+        const val SCHEMA_66_FROM_VERSION = 65
+        const val SCHEMA_66_TO_VERSION = 66
         const val QUERY_PLAN_DETAIL_COLUMN = 3
 
-        /** Every hand-written migration, which a walk across 52→53, 63→64 or 64→65 must be given. */
+        /** Every hand-written migration, which a walk across 52→53, 63→64 or 65→66 must be given. */
         val MANUAL_MIGRATIONS =
             listOf(
                 MeshtasticDatabase.MIGRATION_52_53,
                 MeshtasticDatabase.MIGRATION_63_64,
-                MeshtasticDatabase.MIGRATION_64_65,
+                MeshtasticDatabase.MIGRATION_65_66,
             )
         const val PUBLIC_KEY_BYTES = 32
         const val STORED_CHANNEL_SET_HEX = "0A0612044D657368"

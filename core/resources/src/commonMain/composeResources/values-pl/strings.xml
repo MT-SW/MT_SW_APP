@@ -114,6 +114,9 @@
     <string name="config_lora_coding_rate_preset_default">Domyślny dla presetu (%1$s)</string>
     <string name="config_lora_frequency_offset">Przesunięcie częstotliwości (kHz)</string>
     <string name="config_lora_frequency_offset_summary">Przesuwa częstotliwość pracy o podaną liczbę kHz, np. aby skorygować błąd kwarcu radia. 0 oznacza brak przesunięcia.</string>
+    <string name="device_model_ar_camera_unavailable">Inna aplikacja używa aparatu. Zamknij ją i wróć.</string>
+    <string name="device_model_ar_failed">Nie udało się uruchomić AR</string>
+    <string name="device_model_ar_restart_phone">Uruchom telefon ponownie. Jego czujnik ruchu nie odpowiada, a bez niego AR nie może się uruchomić.</string>
     <string name="discovery_scan_in_progress">Skanowanie presetów LoRa…</string>
     <string name="doc_keywords_notifications">powiadomienie,alert,dźwięk,wyciszenie,odpowiedź,zegarek,wear os</string>
     <string name="doc_title_notifications">Powiadomienia</string>
@@ -440,6 +443,27 @@
     <string name="debug_search_prev">Poprzednie dopasowanie</string>
     <string name="debug_sniffer_summary">Przekazuj do aplikacji lokalnie odsłuchane pakiety nieadresowane do tego węzła</string>
     <string name="debug_sniffer_title">Tryb sniffera</string>
+    <string name="live_update">Live Update</string>
+    <string name="live_update_distance">%1$s stąd</string>
+    <string name="live_update_heard">Słyszany %1$s</string>
+    <string name="live_update_heard_now">Słyszany przed chwilą</string>
+    <string name="live_update_hops">Skoków: %1$d</string>
+    <string name="live_update_mesh_status">Stan sieci</string>
+    <string name="live_update_mesh_status_summary">Połączenie, węzły online, nieprzeczytane wiadomości i bateria Twojego węzła</string>
+    <string name="live_update_no_nodes">Brak węzłów do śledzenia</string>
+    <string name="live_update_nodes_online">%1$d z %2$d węzłów online</string>
+    <string name="live_update_off_summary">Pokaż sieć lub jeden węzeł w pasku stanu</string>
+    <string name="live_update_promotion_off">Live Update jest wyłączone dla MT_SW_APP w ustawieniach systemu</string>
+    <string name="live_update_search_nodes">Szukaj węzłów</string>
+    <string name="live_update_signal">SNR %1$s, RSSI %2$s</string>
+    <string name="live_update_start">Start</string>
+    <string name="live_update_stop">Zatrzymaj</string>
+    <string name="live_update_switch">Przełącz</string>
+    <string name="live_update_track_in">Śledź w Live Update</string>
+    <string name="live_update_track_node">Śledź węzeł</string>
+    <string name="live_update_track_node_summary">Bateria jednego węzła, sygnał, ostatnio słyszany, skoki i odległość</string>
+    <string name="live_update_tracking">Śledzenie: %1$s</string>
+    <string name="live_update_unread">%1$d nieprzeczytanych</string>
     <string name="lna_gain_correction">Korekta wzmocnienia LNA</string>
     <string name="lna_gain_correction_description">Wpisz wzmocnienie LNA tego urządzenia w dB. Wyświetlany poziom szumu i RSSI zostaną pomniejszone o tę wartość (np. 20 dB: -98 dBm wyświetli się jako -118 dBm). Wartość jest zapamiętana tylko w telefonie – konfiguracja urządzenia nie jest zmieniana.</string>
     <string name="lna_gain_db">Wzmocnienie LNA (dB)</string>
@@ -466,6 +490,47 @@
     <string name="meshtastic_new_nodes_notifications_description">Węzły usłyszane po raz pierwszy.</string>
     <string name="meshtastic_service_notifications_description">Pokazuje połączenie z radiem, gdy MT_SW_APP działa w tle.</string>
     <string name="meshtastic_waypoints_notifications_description">Punkty trasy udostępnione w sieci mesh oraz przekroczenia stref geofence.</string>
+    <string name="mqtt_root_problem_empty">Wpisz temat.</string>
+    <string name="mqtt_root_problem_empty_segment">Temat nie może zawierać dwóch ukośników z rzędu.</string>
+    <string name="mqtt_root_problem_ends_with_version">Temat nie może kończyć się na /2.</string>
+    <string name="mqtt_root_problem_leading_slash">Temat nie może zaczynać się od ukośnika.</string>
+    <string name="mqtt_root_problem_non_ascii">Temat musi składać się ze znaków ASCII.</string>
+    <string name="mqtt_root_problem_too_long">Temat może mieć najwyżej 31 znaków.</string>
+    <string name="mqtt_root_problem_trailing_slash">Temat nie może kończyć się ukośnikiem.</string>
+    <string name="mqtt_root_problem_whitespace">Temat nie może zawierać spacji ani znaków sterujących.</string>
+    <string name="mqtt_root_problem_wildcard">Temat nie może zawierać + ani #.</string>
+    <string name="mqtt_topic_finder">Znajdź tematy w pobliżu</string>
+    <string name="mqtt_topic_finder_active">Aktywne tematy</string>
+    <string name="mqtt_topic_finder_connecting">Łączenie…</string>
+    <string name="mqtt_topic_finder_counts">Liczby to węzły usłyszane podczas próbki. Ruchliwe tematy wypełniają się w kilka sekund; ciche mogą zostać na zerze.</string>
+    <string name="mqtt_topic_finder_custom">Własny temat</string>
+    <string name="mqtt_topic_finder_custom_example">msh/US/WA/seattle</string>
+    <string name="mqtt_topic_finder_custom_hint">Do 31 znaków ASCII, bez ukośnika na początku i na końcu, bez + i #.</string>
+    <string name="mqtt_topic_finder_failed_closed">Broker zamknął połączenie.</string>
+    <string name="mqtt_topic_finder_failed_connect">Nie udało się połączyć z brokerem.</string>
+    <string name="mqtt_topic_finder_failed_error">Próbka zatrzymała się z powodu nieoczekiwanego błędu.</string>
+    <string name="mqtt_topic_finder_failed_filters">Broker nie zezwala na te filtry tematów.</string>
+    <string name="mqtt_topic_finder_finished">Usłyszano %1$d wiadomości w %2$d tematach</string>
+    <string name="mqtt_topic_finder_footer">Nasłuchuje %1$s przez minutę i niczego nie publikuje. Broker widzi Twój adres IP i losowy identyfikator klienta, a nie Twój węzeł. Twoja lokalizacja nigdy nie trafia do brokera; geokoder telefonu zamienia ją na nazwy kraju, województwa i miasta w wierszach. Wybranie tematu wypełnia pole tematu głównego, a do radia nic nie trafia, dopóki nie zapiszesz.</string>
+    <string name="mqtt_topic_finder_geocode_failed">Nie udało się ustalić nazwy miejsca dla Twojej lokalizacji.</string>
+    <string name="mqtt_topic_finder_level_city">Miasto</string>
+    <string name="mqtt_topic_finder_level_community">Sieć społeczności</string>
+    <string name="mqtt_topic_finder_level_country">Kraj</string>
+    <string name="mqtt_topic_finder_level_subdivision">Województwo lub stan</string>
+    <string name="mqtt_topic_finder_listening">Nasłuchiwanie…</string>
+    <string name="mqtt_topic_finder_near_you">W pobliżu</string>
+    <string name="mqtt_topic_finder_nearby">Blisko</string>
+    <string name="mqtt_topic_finder_nearest">najbliżej %1$s</string>
+    <string name="mqtt_topic_finder_no_location">Brak lokalizacji. Połącz radio z ustaloną pozycją lub zezwól na dokładną lokalizację, aby zobaczyć tematy kraju, województwa i miasta.</string>
+    <string name="mqtt_topic_finder_no_region">Najpierw ustaw region LoRa.</string>
+    <string name="mqtt_topic_finder_nodes">węzłów</string>
+    <string name="mqtt_topic_finder_nothing_heard">Podczas próbki nic nie usłyszano.</string>
+    <string name="mqtt_topic_finder_nothing_yet">Jeszcze nic nie usłyszano</string>
+    <string name="mqtt_topic_finder_only_above">Podczas próbki aktywne były tylko tematy powyżej.</string>
+    <string name="mqtt_topic_finder_sample_again">Próbkuj ponownie</string>
+    <string name="mqtt_topic_finder_subscribing">Subskrybowanie…</string>
+    <string name="mqtt_topic_finder_summary">Nasłuchuj brokera przez minutę i wyświetl tematy główne używane w Twojej okolicy.</string>
+    <string name="mqtt_topic_finder_use">Użyj tego tematu</string>
     <string name="notification_group_mesh">Mesh</string>
     <string name="notification_reaction_to">%1$s do „%2$s”</string>
     <string name="permission_state_approximate_only">Tylko przybliżona. Udostępnianie pozycji w sieci mesh wymaga dokładnej lokalizacji.</string>
@@ -551,6 +616,14 @@
     <string name="disabled">Wyłączony</string>
     <string name="discard_changes">Odrzuć</string>
     <string name="disconnect">Rozłącz</string>
+    <string name="tak_server_certs_notice">Certyfikaty w pakiecie są unikalne dla tej instalacji. Po ponownej instalacji aplikacji lub ich wygenerowaniu ponownie wyeksportuj pakiet i zaimportuj go w ATAK.</string>
+    <string name="tak_server_client_rejected">Klient TAK został odrzucony, bo jego certyfikat nie należy do tej instalacji. W ATAK usuń stare połączenie z serwerem MT_SW_APP, a potem wyeksportuj pakiet danych ponownie i zaimportuj go.</string>
+    <string name="tak_server_export_failed">Nie udało się wyeksportować pakietu danych TAK: certyfikaty serwera są niedostępne.</string>
+    <string name="tak_server_regenerate_certs">Wygeneruj certyfikaty ponownie</string>
+    <string name="tak_server_regenerate_certs_desc">Wydaj nową tożsamość serwera i klienta dla tej instalacji</string>
+    <string name="tak_server_regenerate_certs_done">Wydano nowe certyfikaty. Wyeksportuj pakiet danych ponownie i zaimportuj go w ATAK.</string>
+    <string name="tak_server_regenerate_certs_failed">Nie udało się ponownie wygenerować certyfikatów TAK.</string>
+    <string name="tak_server_regenerate_certs_message">ATAK nie połączy się, dopóki nie wyeksportujesz pakietu danych ponownie i nie zaimportujesz go. Każdy wcześniej wyeksportowany pakiet przestaje działać.</string>
     <string name="terminate_app">Wymuś zatrzymanie aplikacji</string>
     <string name="terminate_app_message">Aplikacja rozłączy się z urządzeniem, zatrzyma usługę działającą w tle i zamknie cały proces, tak jak „Wymuś zatrzymanie” w ustawieniach systemu. Aby wrócić do pracy, uruchom ją ponownie.</string>
     <string name="disconnected">Rozłączono</string>
@@ -1155,6 +1228,8 @@
     <string name="licensed_mode_enable_warning_signed">Tryb licencjonowany usuwa klucze szyfrowania kanałów i wyłącza kanał administracyjny, więc cały ruch jest wysyłany jako czysty tekst, który każdy może odczytać — ale jest cyfrowo podpisany, co pozwala innym węzłom zweryfikować, że pochodzi od Ciebie. Numer Twojego węzła może się raz zmienić, aby dopasować się do klucza tożsamości, więc ulubione, historia wiadomości, zdalne zarządzanie i inne węzły mogą początkowo traktować go jako nowy; pozostajesz odpowiedzialny za spełnienie wymagań swojej licencji radioamatorskiej i lokalnych przepisów.</string>
     <string name="lightning_distance">Odległość do burzy</string>
     <string name="lightning_strikes_1h">Wyładowania (1h)</string>
+    <!-- LIVE -->
+    <string name="live_update_direct">Bezpośrednio</string>
     <!-- LOAD -->
     <string name="load">Wczytaj</string>
     <string name="load_15_min">Obc. 15m</string>
@@ -1498,6 +1573,7 @@
     <string name="mqtt_status_topics_refused_all">Połączono, ale broker odrzucił każdy temat: %1$s</string>
     <string name="mqtt_status_topics_refused_some">Połączono, ale broker odrzucił %1$s</string>
     <string name="mqtt_test_connection">Testuj połączenie</string>
+    <string name="mqtt_topic_finder_level_region">Region</string>
     <string name="must_set_region">Musisz ustawić region!</string>
     <string name="must_update">Należy zaktualizować aplikację za pomocą Sklepu Play lub z GitHub, ponieważ aplikacja jest zbyt stara, by skomunikować się z oprogramowaniem zainstalowanym na tym urządzeniu. <a href="https://meshtastic.org/docs/software/android/installation">Więcej informacji (ang.)</a>.</string>
     <!-- MUTE -->
@@ -2398,6 +2474,7 @@
     <string name="tak_server_mesh_to_cot">Konwerter Mesh na CoT</string>
     <string name="tak_server_mesh_to_cot_desc">Pokazuj węzły MT_SW na mapie ATAK jako kontakty</string>
     <string name="tak_server_permission_blocked">Serwer TAK potrzebuje dostępu do sieci lokalnej, aby akceptować połączenia, a Android nie zapyta ponownie. Został na razie wyłączony — włącz uprawnienie w ustawieniach aplikacji i włącz go ponownie.</string>
+    <string name="tak_server_regenerate_certs_confirm">Wygeneruj ponownie</string>
     <string name="tak_server_section">Serwer</string>
     <string name="tak_server_status">Status</string>
     <plurals name="tak_server_status_connected">
@@ -2612,6 +2689,8 @@
     <string name="what_is_meshtastic">Czym jest MT_SW?</string>
     <string name="what_is_meshtastic_description">Otwarta, zdecentralizowana sieć mesh działająca bez infrastruktury, na niedrogich radiach o niskim poborze mocy.</string>
     <!-- WIFI -->
+    <string name="widget_node_tracker_choose">Wybierz węzeł do śledzenia</string>
+    <string name="widget_node_tracker_not_found">Nie znaleziono węzła. Dotknij, aby wybrać węzeł.</string>
     <string name="wifi_config">Ustawienia WiFi</string>
     <string name="wifi_devices">Konfiguracja Wi-Fi dla mPWRD-OS</string>
     <string name="wifi_enabled">WiFi włączone</string>

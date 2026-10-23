@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 65,
-    "identityHash": "b0014e9a25a13adfc70f2432861844af",
+    "identityHash": "39e2e089cce3fb07d5e659b49f585553",
     "entities": [
       {
         "tableName": "my_node",
@@ -735,37 +735,6 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_log_received_date` ON `${TABLE_NAME}` (`received_date`)"
-          },
-          {
-            "name": "index_log_port_num_received_date",
-            "unique": false,
-            "columnNames": [
-              "port_num",
-              "received_date"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_log_port_num_received_date` ON `${TABLE_NAME}` (`port_num`, `received_date`)"
-          },
-          {
-            "name": "index_log_from_num_received_date",
-            "unique": false,
-            "columnNames": [
-              "from_num",
-              "received_date"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_log_from_num_received_date` ON `${TABLE_NAME}` (`from_num`, `received_date`)"
-          },
-          {
-            "name": "index_log_port_num_from_num_received_date",
-            "unique": false,
-            "columnNames": [
-              "port_num",
-              "from_num",
-              "received_date"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_log_port_num_from_num_received_date` ON `${TABLE_NAME}` (`port_num`, `from_num`, `received_date`)"
           }
         ]
       },
@@ -1901,11 +1870,35 @@
             "id"
           ]
         }
+      },
+      {
+        "tableName": "mqtt_roots_cache",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `roots_json` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rootsJson",
+            "columnName": "roots_json",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b0014e9a25a13adfc70f2432861844af')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '39e2e089cce3fb07d5e659b49f585553')"
     ]
   }
 }
