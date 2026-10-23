@@ -3195,7 +3195,7 @@
     <string name="node_color_summary">Wybór koloru Twojego węzła (jego klucza) w ustawieniach bezpieczeństwa.</string>
     <string name="node_color_pick">Wybierz kolor</string>
     <string name="ai_model_one_title">Model AI (asystent, tłumacz i dyktowanie)</string>
-    <string name="ai_model_one_note">Jeden model robi wszystko i tylko on jest w pamięci. Lekki model NLLB umie tylko tłumaczyć, więc można go wybrać tylko przy wyłączonym asystencie.</string>
+    <string name="ai_model_one_note">Jeden model robi wszystko i tylko on jest w pamięci. Lekki model NLLB umie tylko tłumaczyć: jego wybranie wyłączy asystenta (najpierw zapytamy).</string>
     <string name="ai_mtsw_setup">Sieć MT_SW w województwie świętokrzyskim używa oficjalnego presetu Narrow Fast w regionie EU_N_868, na częstotliwości 869,44165 MHz. MT_SW nie ma własnego presetu i pozostaje zgodny z główną siecią.</string>
     <string name="dictation_external_mic_title">Mikrofon słuchawki przy dyktowaniu</string>
     <string name="dictation_external_mic_summary">Gdy podłączona jest słuchawka (Bluetooth, przewodowa lub USB), dyktowanie w całej aplikacji nagrywa z jej mikrofonu zamiast z mikrofonu telefonu lub komputera.</string>
@@ -3209,4 +3209,7 @@
 • Dipol półfalowy: ok. %4$s cm całości, dwa ramiona po ok. %5$s cm
 Długości są już skrócone o ok. 5% dla elementu z drutu; dostrój je miernikiem SWR.</string>
     <string name="ai_test_done">Test zakończony: %1$d pytań, model %2$s, średni czas %3$s s. Pełny raport jest niżej (przytrzymaj, aby skopiować).</string>
+    <string name="ai_model_translate_only_title">Wyłączyć asystenta?</string>
+    <string name="ai_model_translate_only_body">%1$s umie tylko tłumaczyć. Wybranie go wyłączy asystenta i dyktowanie; działać będzie tylko tłumacz. Żeby znów używać asystenta, wybierz model Gemma i włącz asystenta.</string>
+    <string name="ai_model_translate_only_confirm">Wybierz i wyłącz asystenta</string>
 </resources>

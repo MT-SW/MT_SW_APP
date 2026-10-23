@@ -612,16 +612,17 @@ class LlamaAssistantService(
             val strongHits = words.count { it in strongTerms }
             val weakHits = words.count { it in weakTerms }
             val exact = wanted.length >= MIN_STEM && line.lowercase().contains(wanted)
-            // Only a paragraph that is surely about the setting: it names the setting (a name long enough to be
-            // telling), its heading has every word of the setting's name, or it shares many words with it.
-            val headed = labelStems.isNotEmpty() && stems(title).containsAll(labelStems)
-            val telling = exact && wanted.length >= MIN_TELLING_LABEL
-            if (!telling && !headed && strongHits < MIN_STRONG_HITS) continue
+            // Only a part of the manual that is surely about this setting: its heading has every word of a name of two
+            // or more words, or the paragraph starts with the setting's name the way a definition does
+            // ("• App scaling — ..."). Anything looser quoted the wrong things on small models.
+            val headed = labelStems.size >= 2 && stems(title).containsAll(labelStems)
+            val defines = wanted.length >= MIN_TELLING_LABEL && line.lowercase().trimStart('•', ' ').startsWith(wanted)
+            if (!headed && !defines) continue
             val score = strongHits * 2 + weakHits + (if (exact) LABEL_SCORE else 0) + (if (headed) LABEL_SCORE else 0)
             found += Line(title, line, score)
         }
         // A part of the manual whose heading names the setting is the right place; others only when there is none.
-        val titled = found.filter { line -> labelStems.isNotEmpty() && stems(line.title).containsAll(labelStems) }
+        val titled = found.filter { line -> labelStems.size >= 2 && stems(line.title).containsAll(labelStems) }
         val pool = titled.ifEmpty { found }
         val best = pool.maxByOrNull { it.score } ?: return ""
         // The best paragraph and, from the same part of the manual, the next best one, in the order of the manual.
@@ -826,7 +827,6 @@ class LlamaAssistantService(
         const val LABEL_SCORE = 4
         const val MIN_HELP_SCORE = 4
         const val MIN_TELLING_LABEL = 8
-        const val MIN_STRONG_HITS = 3
         const val HELP_CHARS = 1100
         const val MIN_STEM = 4
         const val STEM_LENGTH = 5
