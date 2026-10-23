@@ -21,6 +21,14 @@ package org.meshtastic.feature.messaging
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import org.meshtastic.core.resources.assistant_dictate_working
+import org.meshtastic.core.resources.assistant_dictate_stop
+import org.meshtastic.core.resources.assistant_dictate
+import org.meshtastic.core.ui.icon.Mic
+import androidx.compose.ui.draw.clip
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -923,6 +931,15 @@ internal fun MessageInput(
             selection = TextRange(q.start + insert.length)
         }
     }
+    // Dictation: the recognized text is added at the cursor (or replaces the selection), then a space follows.
+    val dictation =
+        rememberDictation { spoken ->
+            textFieldState.edit {
+                val start = selection.min
+                val before = if (start > 0 && !this[start - 1].isWhitespace()) " " else ""
+                replace(selection.min, selection.max, before + spoken.trim() + " ")
+            }
+        }
     val onSendAction: () -> Unit = {
         if (mentionActive) {
             insertMention(suggestions.first())
@@ -1050,23 +1067,67 @@ internal fun MessageInput(
                 // Colour, not just enablement, carries "this will send" — a greyed-out icon reads as broken rather
                 // than as waiting for input.
                 val sendEnabled = isEnabled && (canSend || mentionActive)
-                IconButton(onClick = onSendAction, enabled = sendEnabled) {
-                    Icon(
-                        imageVector = MeshtasticIcons.Send,
-                        contentDescription = stringResource(Res.string.send),
-                        tint =
-                        if (sendEnabled) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        },
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (dictation.available) DictationButton(dictation = dictation, enabled = isEnabled)
+                    IconButton(onClick = onSendAction, enabled = sendEnabled) {
+                        Icon(
+                            imageVector = MeshtasticIcons.Send,
+                            contentDescription = stringResource(Res.string.send),
+                            tint =
+                            if (sendEnabled) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
+                        )
+                    }
                 }
             },
         )
         // Markdown formatting toolbar — shown once the field is focused and holds enough text to format (iOS parity).
         if (isEnabled && isFocused && currentText.length >= FORMATTING_TOOLBAR_MIN_CHARS) {
             FormattingToolbar(state = textFieldState, modifier = Modifier.padding(horizontal = 8.dp))
+        }
+    }
+}
+
+/**
+ * A small round button with a microphone: tap to start speaking, tap again to put the spoken text into the field. The
+ * circle is filled while recording and shows a small progress ring while the speech is turned into text.
+ */
+@Composable
+private fun DictationButton(dictation: Dictation, enabled: Boolean) {
+    val listening = dictation.phase == DictationPhase.LISTENING
+    val working = dictation.phase == DictationPhase.WORKING
+    val label =
+        stringResource(
+            when (dictation.phase) {
+                DictationPhase.IDLE -> Res.string.assistant_dictate
+                DictationPhase.LISTENING -> Res.string.assistant_dictate_stop
+                DictationPhase.WORKING -> Res.string.assistant_dictate_working
+            },
+        )
+    Box(
+        modifier =
+        Modifier.padding(end = 4.dp)
+            .size(32.dp)
+            .clip(CircleShape)
+            .background(
+                if (listening) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.18f),
+            )
+            .clickable(enabled = enabled && !working, onClick = dictation.toggle),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (working) {
+            CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+        } else {
+            Icon(
+                imageVector = MeshtasticIcons.Mic,
+                contentDescription = label,
+                modifier = Modifier.size(18.dp),
+                tint =
+                if (listening) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
+            )
         }
     }
 }

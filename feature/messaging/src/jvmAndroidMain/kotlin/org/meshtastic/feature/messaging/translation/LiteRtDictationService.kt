@@ -21,7 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import org.meshtastic.core.repository.AiModels
 import org.meshtastic.core.repository.TranslatorModelState
@@ -36,20 +36,34 @@ class LiteRtDictationService(
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
+    /** The model used for dictation: the assistant's when it is on and can hear, else the translator's. */
+    private fun pick(states: Map<String, TranslatorModelState>): String? {
+        val assistant = uiPrefs.assistantModelId.value
+        if (uiPrefs.assistantEnabled.value && ready(states, assistant)) return assistant
+        val translator = uiPrefs.translatorModelId.value
+        if (uiPrefs.translatorEnabled.value && ready(states, translator)) return translator
+        return null
+    }
+
     override val available: StateFlow<Boolean> =
-        store.states.map { pick(it) != null }.stateIn(scope, SharingStarted.Eagerly, false)
+        combine(
+            store.states,
+            uiPrefs.assistantEnabled,
+            uiPrefs.assistantModelId,
+            uiPrefs.translatorEnabled,
+            uiPrefs.translatorModelId,
+        ) { states, _, _, _, _ ->
+            pick(states) != null
+        }
+            .stateIn(scope, SharingStarted.Eagerly, false)
 
     override suspend fun transcribe(wav: ByteArray): String {
-        val id = pick(store.states.value) ?: error("No model that can hear is downloaded")
+        val id = checkNotNull(pick(store.states.value)) { "Dictation is not available" }
         return engine.transcribe(id, wav)
     }
 
-    /** The model chosen for the assistant (or translator) if it can hear, otherwise any downloaded one that can. */
-    private fun pick(states: Map<String, TranslatorModelState>): String? {
-        fun ok(id: String) = id in HEARING && states[id] == TranslatorModelState.Ready
-        return listOf(uiPrefs.assistantModelId.value, uiPrefs.translatorModelId.value).firstOrNull { ok(it) }
-            ?: HEARING.firstOrNull { ok(it) }
-    }
+    private fun ready(states: Map<String, TranslatorModelState>, id: String) =
+        id in HEARING && states[id] == TranslatorModelState.Ready
 
     private companion object {
         val HEARING = listOf(AiModels.GEMMA_E2B_ID, AiModels.GEMMA_E4B_ID)

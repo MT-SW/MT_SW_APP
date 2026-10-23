@@ -63,6 +63,7 @@ import org.meshtastic.core.resources.ai_license_gemma
 import org.meshtastic.core.resources.ai_level_light
 import org.meshtastic.core.resources.ai_level_standard
 import org.meshtastic.core.resources.ai_level_strong
+import org.meshtastic.core.resources.ai_dictation_note
 import org.meshtastic.core.resources.ai_model_assistant_title
 import org.meshtastic.core.resources.ai_model_cancel
 import org.meshtastic.core.resources.ai_model_delete
@@ -215,6 +216,14 @@ internal fun AiSettings() {
                 models = AiModels.all.filter { it.canDo(AiRole.ASSISTANT) && isReady(it.id) },
                 selectedId = assistantModelId,
                 onSelect = { uiPrefs.setAssistantModelId(it) },
+            )
+        }
+        if (assistantOn || translatorOn) {
+            Text(
+                text = stringResource(Res.string.ai_dictation_note),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
             )
         }
     }
