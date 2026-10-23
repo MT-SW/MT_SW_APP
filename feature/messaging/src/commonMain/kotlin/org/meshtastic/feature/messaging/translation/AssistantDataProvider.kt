@@ -359,7 +359,8 @@ class AssistantDataProvider(
         val me = nodeRepository.ourNodeInfo.value
         val now = nowMillis / MILLIS_PER_SECOND
         class Row(val n: org.meshtastic.core.model.Node, val meters: Int?)
-        val rows = nodeRepository.nodeDBbyNum.value.values.filter { it.num != me?.num }.map { Row(it, me?.let { m -> it.distance(m) }) }
+        val roleOnly = roleFilter(q)
+        val rows = nodeRepository.nodeDBbyNum.value.values.filter { it.num != me?.num && (roleOnly?.invoke(it) ?: true) }.map { Row(it, me?.let { m -> it.distance(m) }) }
         val byDistance = q.hasAny(listOf("odległ", "odleg", "daleko", "dystans", "distance", "far"))
         val closest = q.hasAny(listOf("najbliż", "najbliz", "blisk", "closest", "nearest"))
         val withSignal = rows.filter { it.n.snr != Float.MAX_VALUE }
@@ -382,7 +383,8 @@ class AssistantDataProvider(
             val snr = if (n.snr == Float.MAX_VALUE) "brak" else fmt(n.snr) + " dB"
             val rssi = if (n.rssi == Int.MAX_VALUE) "brak" else n.rssi.toString() + " dBm"
             val dist = r.meters?.let { m -> fmt(m / METERS_PER_KM) + " km" } ?: "brak"
-            sb.append("• ${n.user.short_name} (${n.user.long_name}): skoki ${n.hopsAway}, SNR $snr, RSSI $rssi, odległość $dist, słyszany $ago\n")
+            val where = position(n)?.let { ", pozycja $it" }.orEmpty()
+            sb.append("• ${n.user.short_name} (${n.user.long_name}), rola ${n.user.role}: skoki ${n.hopsAway}, SNR $snr, RSSI $rssi, odległość $dist$where, słyszany $ago\n")
         }
         return sb.toString().trim()
     }
@@ -392,9 +394,10 @@ class AssistantDataProvider(
         val me = nodeRepository.ourNodeInfo.value
         val now = nowMillis / MILLIS_PER_SECOND
         class Row(val n: org.meshtastic.core.model.Node, val meters: Int?)
+        val roleOnly = roleFilter(q)
         val rows =
             nodeRepository.nodeDBbyNum.value.values
-                .filter { it.num != me?.num }
+                .filter { it.num != me?.num && (roleOnly?.invoke(it) ?: true) }
                 .map { Row(it, me?.let { m -> it.distance(m) }) }
         val heardWithSignal = rows.filter { it.n.snr != Float.MAX_VALUE }
         val byDistance = q.hasAny(listOf("odległ", "odleg", "daleko", "dystans", "distance", "far"))
@@ -408,10 +411,10 @@ class AssistantDataProvider(
         fun line(r: Row): String {
             val n = r.n
             val ago = if (n.lastHeard == 0) "never" else "${((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)} min ago"
-            return "- ${n.user.short_name} (${n.user.long_name}): hops=${n.hopsAway}; " +
+            return "- ${n.user.short_name} (${n.user.long_name}), role ${n.user.role}: hops=${n.hopsAway}; " +
                 "SNR=${if (n.snr == Float.MAX_VALUE) "unknown" else fmt(n.snr) + " dB"}; " +
                 "RSSI=${if (n.rssi == Int.MAX_VALUE) "unknown" else n.rssi.toString() + " dBm"}; " +
-                "distance=${r.meters?.let { m -> fmt(m / METERS_PER_KM) + " km" } ?: "unknown"}; heard $ago"
+                "distance=${r.meters?.let { m -> fmt(m / METERS_PER_KM) + " km" } ?: "unknown"}; position=${position(n) ?: "unknown"}; heard $ago"
         }
         return buildString {
             appendLine(
@@ -640,12 +643,12 @@ class AssistantDataProvider(
      * A ranked table of nodes. [sortBy]: rx, tx, dupe, bad, heap, battery, channel_util, uptime (telemetry); snr, rssi,
      * distance, closest, hops (link quality).
      */
-    suspend fun toolList(sortBy: String, limit: Int): String {
+    suspend fun toolList(sortBy: String, limit: Int, role: String = ""): String {
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
         return when (sortBy.trim().lowercase()) {
-            "snr", "rssi", "signal", "range", "hops" -> signalReport("snr")
-            "distance", "far", "farthest" -> signalReport("odległ")
-            "closest", "nearest", "near" -> signalReport("najbliż")
+            "snr", "rssi", "signal", "range", "hops" -> signalReport("snr $role")
+            "distance", "far", "farthest" -> signalReport("odległ $role")
+            "closest", "nearest", "near" -> signalReport("najbliż $role")
             "tx" -> ranking("wysł", top)
             "dupe", "duplicates" -> ranking("dupe", top)
             "bad" -> ranking("bad ", top)
@@ -841,6 +844,22 @@ class AssistantDataProvider(
 
     private fun String.hasAny(words: List<String>) = words.any { contains(it) }
 
+    /** "najbliższy router", "najbliższy czujnik": keeps only the nodes whose role fits the word in the question. */
+    private fun roleFilter(q: String): ((org.meshtastic.core.model.Node) -> Boolean)? {
+        val roles =
+            when {
+                q.hasAny(listOf("router", "ruter")) -> listOf("ROUTER")
+                q.hasAny(listOf("repeater", "przekaźnik", "przekaznik", "retransmit")) -> listOf("REPEATER", "ROUTER")
+                q.hasAny(listOf("czujnik", "sensor")) -> listOf("SENSOR")
+                q.hasAny(listOf("tracker")) -> listOf("TRACKER")
+                else -> return null
+            }
+        return { n -> roles.any { n.user.role.toString().uppercase().contains(it) } }
+    }
+
+    private fun position(n: org.meshtastic.core.model.Node): String? =
+        n.validPosition?.let { "${(kotlin.math.round(n.latitude * COORD_SCALE) / COORD_SCALE)}, ${(kotlin.math.round(n.longitude * COORD_SCALE) / COORD_SCALE)}" }
+
     private fun String.redacted(): String = replace(SECRET, "$1=<hidden>")
 
     private fun fmt(value: Float): String = ((value * 10).roundToInt() / 10f).toString()
@@ -922,6 +941,7 @@ class AssistantDataProvider(
         val SETTINGS_WORDS =
             listOf("ustawien", "konfig", "setting", "config", "region", "preset", "kanał", "kanal", "channel", "lora",
                 "rola", "role", "moc", "power", "wifi", "bluetooth", "mqtt", "hop")
+        const val COORD_SCALE = 100000.0
         const val MIN_STEM_WORD = 5
         const val MAX_STEM_HITS = 3
         val GENERIC_WORDS = setOf("router", "routera", "node", "gdzie", "mapie", "znajde", "podac", "lokalizacje", "wezel", "wezla", "wezly", "siec", "sieci", "ktory", "ktora", "jakie", "jakis", "mozesz", "pokaz", "pokazac", "powiedz")

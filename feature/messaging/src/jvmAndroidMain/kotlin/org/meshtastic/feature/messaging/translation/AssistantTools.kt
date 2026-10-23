@@ -50,12 +50,14 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
         description =
         "Ranked table of nodes. sort_by is one of: rx (packets received), tx (packets sent), dupe (duplicates), bad " +
             "(bad packets), heap (used memory in percent, highest first), battery (lowest first), channel_util, uptime, snr " +
-            "(best link first), rssi, distance (farthest first), closest (nearest first), hops.",
+            "(best link first), rssi, distance (farthest first), closest (nearest first, with position), hops. " +
+            "Use role = router, repeater, sensor or tracker to list only nodes of that role (for example the nearest router).",
     )
     fun rank_nodes(
         @ToolParam(description = "Metric to sort by") sort_by: String,
         @ToolParam(description = "How many nodes to return, 1 to 40") limit: Int,
-    ): String = run("rank_nodes") { data.toolList(sort_by, limit) }
+        @ToolParam(description = "Only nodes of this role: router, repeater, sensor, tracker, or empty for all") role: String,
+    ): String = run("rank_nodes") { data.toolList(sort_by, limit, role) }
 
     @Tool(
         description =

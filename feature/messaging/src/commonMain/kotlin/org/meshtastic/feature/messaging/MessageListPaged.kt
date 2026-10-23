@@ -331,6 +331,7 @@ private fun MessageListPagedContent(
                 // The neighbours are the rows that really show a bubble: the other chunks of a split message draw
                 // nothing, and taking one of them as the neighbour made the merged bubble look like a continuation of
                 // the previous sender's block (no name, joined corners, wrong colour).
+                @Composable
                 fun visibleNeighbour(from: Int, step: Int): Message? {
                     var i = from
                     while (i in 0 until state.messages.itemCount) {
