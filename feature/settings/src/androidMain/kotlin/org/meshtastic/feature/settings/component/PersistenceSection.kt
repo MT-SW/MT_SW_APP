@@ -59,6 +59,8 @@ internal fun ColumnScope.PersistenceSettingsContent(
     cacheLimit: Int,
     onCheckCacheLimitEvictionCount: suspend (Int) -> Int,
     onSetCacheLimit: (Int) -> Unit,
+    retentionDays: Int,
+    onSetRetentionDays: (Int) -> Unit,
     nodeShortName: String,
     onExportData: (android.net.Uri) -> Unit,
     onExportNodeDb: (CommonUri) -> Unit,
@@ -86,6 +88,8 @@ internal fun ColumnScope.PersistenceSettingsContent(
         cacheLimit = cacheLimit,
         onCheckEvictionCount = onCheckCacheLimitEvictionCount,
         onSetCacheLimit = onSetCacheLimit,
+        retentionDays = retentionDays,
+        onSetRetentionDays = onSetRetentionDays,
     )
 
     ListItem(
@@ -140,6 +144,8 @@ fun PersistenceSectionPreview() {
                 cacheLimit = 100,
                 onCheckCacheLimitEvictionCount = { 0 },
                 onSetCacheLimit = {},
+                retentionDays = 30,
+                onSetRetentionDays = {},
                 nodeShortName = "TEST",
                 onExportData = {},
                 onExportNodeDb = {},

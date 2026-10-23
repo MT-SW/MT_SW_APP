@@ -45,7 +45,13 @@ import org.meshtastic.core.ui.component.MeshtasticTextDialog
  * leaving the limit unchanged never evicts anything and applies immediately.
  */
 @Composable
-fun CacheLimitPreference(cacheLimit: Int, onCheckEvictionCount: suspend (Int) -> Int, onSetCacheLimit: (Int) -> Unit) {
+fun CacheLimitPreference(
+    cacheLimit: Int,
+    onCheckEvictionCount: suspend (Int) -> Int,
+    onSetCacheLimit: (Int) -> Unit,
+    retentionDays: Int? = null,
+    onSetRetentionDays: ((Int) -> Unit)? = null,
+) {
     val cacheItems = remember {
         (DatabaseConstants.MIN_CACHE_LIMIT..DatabaseConstants.MAX_CACHE_LIMIT).map { it.toLong() to it.toString() }
     }
@@ -79,6 +85,10 @@ fun CacheLimitPreference(cacheLimit: Int, onCheckEvictionCount: suspend (Int) ->
         },
         summary = stringResource(Res.string.device_db_cache_limit_summary),
     )
+
+    if (retentionDays != null && onSetRetentionDays != null) {
+        LogRetentionPreference(retentionDays = retentionDays, onSelected = onSetRetentionDays)
+    }
 
     pendingLimit?.let { limit ->
         MeshtasticTextDialog(

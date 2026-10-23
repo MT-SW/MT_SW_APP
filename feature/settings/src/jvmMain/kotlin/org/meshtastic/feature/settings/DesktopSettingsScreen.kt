@@ -136,6 +136,7 @@ fun DesktopSettingsScreen(
     val homoglyphEnabled by radioConfigViewModel.homoglyphEncodingEnabledFlow.collectAsStateWithLifecycle(false)
     val hiddenFeaturesUnlocked by settingsViewModel.hiddenFeaturesUnlocked.collectAsStateWithLifecycle()
     val cacheLimit by settingsViewModel.dbCacheLimit.collectAsStateWithLifecycle()
+    val retentionDays by settingsViewModel.meshLogRetentionDays.collectAsStateWithLifecycle()
     val isOtaCapable by settingsViewModel.isOtaCapable.collectAsStateWithLifecycle()
     val showFullMessageTimestamps by settingsViewModel.showFullMessageTimestamps.collectAsStateWithLifecycle()
 
@@ -336,6 +337,8 @@ fun DesktopSettingsScreen(
                             cacheLimit = cacheLimit,
                             onCheckEvictionCount = { settingsViewModel.cachedDeviceCountExceeding(it) },
                             onSetCacheLimit = { settingsViewModel.setDbCacheLimit(it) },
+                            retentionDays = retentionDays,
+                            onSetRetentionDays = { settingsViewModel.setMeshLogRetentionDays(it) },
                         )
 
                     }
