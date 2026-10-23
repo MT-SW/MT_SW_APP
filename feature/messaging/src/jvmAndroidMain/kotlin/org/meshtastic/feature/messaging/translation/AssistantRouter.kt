@@ -123,7 +123,7 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
                 """"text":${str(200)},""" +
                 """"role":{"type":"string","enum":["any","router","repeater","sensor","tracker"]},""" +
                 """"metric":{"type":"string","enum":["nearest","farthest","snr","rx","tx","dupe","bad","heap","battery","channel_util","uptime","per_channel","favorites"]},""" +
-                """"topic":{"type":"string","enum":["node","ranking","settings","activity","overview","other"]},""" +
+                """"topic":{"type":"string","enum":["node","radio","ranking","settings","activity","overview","other"]},""" +
                 """"period":{"type":"string","enum":["none","today","yesterday","minutes","hours","days","weeks","months","years","all"]},""" +
                 """"amount":{"type":"integer","minimum":0,"maximum":1000}""" +
                 """},"required":["intent"],"additionalProperties":false}"""
@@ -152,7 +152,7 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
                 "app_status: connection to the radio, unread messages, whether my message was delivered.\n" +
                 "waypoints: waypoints, map pins.\n" +
                 "weather: weather, temperature, humidity, pressure, sensors of the nodes.\n" +
-                "network_question: any other question about the user's own network, nodes, radio, statistics or settings. topic = node (one node, node = its name, \"me\" for the user's own), ranking (metric), settings, activity (who was heard recently or is silent), overview, other.\n" +
+                "network_question: any other question about the user's own network, nodes, radio, statistics or settings. topic = node (one node, node = its name, \"me\" for the user's own), radio (statistics of the user's own radio: packets, memory, uptime, channel use), ranking (metric), settings, activity (who was heard recently or is silent), overview, other.\n" +
                 "period: today, yesterday, or minutes/hours/days/weeks/months/years with amount (\"ostatnie 3 dni\" = days, 3); all = everything saved.\n" +
                 "Examples:\n" +
                 "cześć, co tam? -> {\"intent\":\"chat\"}\n" +
@@ -178,6 +178,7 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
                 "jaka jest teraz temperatura? -> {\"intent\":\"weather\"}\n" +
                 "przez które węzły idą pakiety do Łysicy? -> {\"intent\":\"traceroute\",\"node\":\"Łysica\"}\n" +
                 "czy jestem połączony z radiem? -> {\"intent\":\"app_status\"}\n" +
+                "pokaż statystyki mojego radia -> {\"intent\":\"network_question\",\"topic\":\"radio\"}\n" +
                 "jak się czuje mój węzeł? -> {\"intent\":\"network_question\",\"node\":\"me\",\"topic\":\"node\"}\n" +
                 "który węzeł odebrał najwięcej pakietów? -> {\"intent\":\"network_question\",\"metric\":\"rx\",\"topic\":\"ranking\"}\n" +
                 "show me the nearest node -> {\"intent\":\"nearest_node\",\"metric\":\"nearest\"}"

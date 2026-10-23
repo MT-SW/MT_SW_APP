@@ -20,6 +20,16 @@ import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.StringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.ai_radio_title
+import org.meshtastic.core.resources.ai_radio_uptime
+import org.meshtastic.core.resources.ai_radio_util
+import org.meshtastic.core.resources.ai_radio_packets
+import org.meshtastic.core.resources.ai_radio_relay
+import org.meshtastic.core.resources.ai_radio_nodes
+import org.meshtastic.core.resources.ai_radio_heap
+import org.meshtastic.core.resources.ai_radio_noise
+import org.meshtastic.core.resources.ai_radio_ext
+import org.meshtastic.core.resources.ai_radio_none
 import org.meshtastic.core.resources.ai_snr_title
 import org.meshtastic.core.resources.ai_snr_last
 import org.meshtastic.core.resources.ai_snr_avg
@@ -1291,6 +1301,41 @@ class AssistantDataProvider(
     } catch (e: Exception) {
         Logger.w(tag = TAG, throwable = e) { "Assistant list unavailable" }
         emptyList()
+    }
+
+    /**
+     * The statistics of the user's own radio, written in code with plain labels (the model mixed up the raw field
+     * names and digits): uptime, channel use, packets, relaying, nodes online, memory, noise, processor and flash.
+     */
+    suspend fun radioStats(): String {
+        val ls = nodeRepository.localStats.value
+        val ext = nodeRepository.localStatsExtended.value
+        val uptime = (ls.uptime_seconds ?: 0).toLong()
+        val rx = (ls.num_packets_rx ?: 0)
+        val tx = (ls.num_packets_tx ?: 0)
+        if (uptime == 0L && rx == 0 && tx == 0) return getStringSuspend(Res.string.ai_radio_none)
+        val me = nodeRepository.ourNodeInfo.value?.user
+        val name = me?.let { it.long_name.ifBlank { it.short_name } }.orEmpty()
+        val sb = StringBuilder(getStringSuspend(Res.string.ai_radio_title, name).trim())
+        fun line(text: String) = sb.append("\n• ").append(text)
+        line(getStringSuspend(Res.string.ai_radio_uptime, duration(uptime)))
+        line(getStringSuspend(Res.string.ai_radio_util, fmt(ls.channel_utilization ?: 0f), fmt(ls.air_util_tx ?: 0f)))
+        line(getStringSuspend(Res.string.ai_radio_packets, tx.toString(), rx.toString(), (ls.num_packets_rx_bad ?: 0).toString(), (ls.num_rx_dupe ?: 0).toString()))
+        line(getStringSuspend(Res.string.ai_radio_relay, (ls.num_tx_relay ?: 0).toString(), (ls.num_tx_relay_canceled ?: 0).toString(), (ls.num_tx_dropped ?: 0).toString()))
+        line(getStringSuspend(Res.string.ai_radio_nodes, (ls.num_online_nodes ?: 0).toString(), (ls.num_total_nodes ?: 0).toString()))
+        val heapTotal = ls.heap_total_bytes ?: 0
+        val heapFree = ls.heap_free_bytes ?: 0
+        if (heapTotal > 0) {
+            val used = (heapTotal - heapFree).coerceAtLeast(0)
+            line(getStringSuspend(Res.string.ai_radio_heap, fmt(used.toFloat() / heapTotal * PERCENT), (used / BYTES_PER_KB).toString(), (heapTotal / BYTES_PER_KB).toString()))
+        }
+        val noise = ls.noise_floor ?: 0
+        if (noise != 0) line(getStringSuspend(Res.string.ai_radio_noise, noise.toString()))
+        if (ext.flashTotalBytes > 0 || ext.cpuUsagePercent > 0) {
+            val flash = if (ext.flashTotalBytes > 0) fmt(ext.flashUsedBytes.toFloat() / ext.flashTotalBytes * PERCENT) else getStringSuspend(Res.string.ai_none_value)
+            line(getStringSuspend(Res.string.ai_radio_ext, ext.cpuUsagePercent.toString(), flash))
+        }
+        return sb.toString()
     }
 
     /** How many nodes are known, heard lately and heard directly: a short count instead of a long list. */

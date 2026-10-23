@@ -166,6 +166,7 @@ class LlamaAssistantService(
                     }
                 "traceroute" -> exact(routeOrUnknown(intent, nodeNum) { data.toolTraceroutes(it, LIST_SHOWN) })
                 "neighbors" -> exact(routeOrUnknown(intent, nodeNum) { data.toolNeighbors(it, LIST_SHOWN) })
+                "network_question" -> if (intent.topic == "radio") exact(data.radioStats()) else null
                 "app_status" -> exact(data.toolAppStatus())
                 "waypoints" -> exact(data.toolWaypoints(LIST_SHOWN))
                 "weather" -> exact(data.sensorReport())

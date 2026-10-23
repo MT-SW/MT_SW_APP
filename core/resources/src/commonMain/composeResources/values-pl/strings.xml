@@ -3166,4 +3166,14 @@
     <string name="ai_snr_avg">odbierany bezpośrednio przez ostatnie %1$d dni: średni SNR %2$s dB (od %3$s do %4$s dB), średni RSSI %5$s dBm, pakietów: %6$d</string>
     <string name="ai_snr_no_direct">przez ostatnie %1$d dni brak pakietów odebranych od niego bezpośrednio (dociera przez inne węzły), więc nie ma średniej</string>
     <string name="ai_net_count">Znanych węzłów: %1$d. Słyszanych w ostatnich 24 godz.: %2$d, w ostatniej godzinie: %3$d. Słyszanych bezpośrednio (0 skoków): %4$d.</string>
+    <string name="ai_radio_title">Statystyki Twojego radia %1$s:</string>
+    <string name="ai_radio_uptime">działa od %1$s</string>
+    <string name="ai_radio_util">zajętość kanału %1$s %, własne nadawanie %2$s %</string>
+    <string name="ai_radio_packets">pakiety wysłane %1$s, odebrane %2$s, błędne %3$s, duplikaty %4$s</string>
+    <string name="ai_radio_relay">przekazane dalej %1$s, przekazanie anulowane %2$s, odrzucone przy wysyłaniu %3$s</string>
+    <string name="ai_radio_nodes">węzły online %1$s z %2$s</string>
+    <string name="ai_radio_heap">pamięć (heap) zajęta %1$s % (%2$s z %3$s kB)</string>
+    <string name="ai_radio_noise">poziom szumu %1$s dBm</string>
+    <string name="ai_radio_ext">procesor %1$s %, flash zajęty %2$s %</string>
+    <string name="ai_radio_none">Brak jeszcze statystyk z Twojego radia.</string>
 </resources>
