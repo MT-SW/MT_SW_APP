@@ -136,6 +136,7 @@ ai_neigh_nobody
 ai_neigh_none
 ai_neigh_none_node
 ai_neigh_title
+ai_net_count
 ai_never
 ai_no_channel
 ai_nodes_heard_title
@@ -166,6 +167,10 @@ ai_sig_closest
 ai_sig_farthest
 ai_sig_line
 ai_sig_position
+ai_snr_avg
+ai_snr_last
+ai_snr_no_direct
+ai_snr_title
 ai_status_conn
 ai_status_own_title
 ai_status_title

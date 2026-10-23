@@ -20,6 +20,11 @@ import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.StringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.ai_snr_title
+import org.meshtastic.core.resources.ai_snr_last
+import org.meshtastic.core.resources.ai_snr_avg
+import org.meshtastic.core.resources.ai_snr_no_direct
+import org.meshtastic.core.resources.ai_net_count
 import org.meshtastic.core.resources.ai_sensor_none
 import org.meshtastic.core.resources.ai_sensor_title
 import org.meshtastic.core.resources.ai_sensor_temperature
@@ -1243,6 +1248,61 @@ class AssistantDataProvider(
     /** A distance in metres written in kilometres with one decimal. */
     fun kilometres(meters: Int): String = fmt(meters / METERS_PER_KM)
 
+    /**
+     * The signal of one node, worked out in code: its last packet and, from the saved packets of the last days that
+     * came straight from it (not through other nodes), the average, lowest and highest SNR and the average RSSI.
+     */
+    suspend fun nodeSignal(num: Int): String {
+        val n = nodeRepository.nodeDBbyNum.value[num] ?: return getStringSuspend(Res.string.ai_unknown_node, num.toString())
+        val none = getStringSuspend(Res.string.ai_none_value)
+        val nowS = nowMillis / MILLIS_PER_SECOND
+        val heard = if (n.lastHeard == 0) getStringSuspend(Res.string.ai_never) else ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+        val snr = if (n.snr == Float.MAX_VALUE) none else fmt(n.snr) + " dB"
+        val rssi = if (n.rssi == Int.MAX_VALUE) none else n.rssi.toString() + " dBm"
+        val sb = StringBuilder(getStringSuspend(Res.string.ai_snr_title, n.user.long_name.ifBlank { n.user.short_name }, n.user.short_name))
+        sb.append("\n• ").append(getStringSuspend(Res.string.ai_snr_last, snr, rssi, n.hopsAway.toString(), heard))
+        val days = (SIGNAL_WINDOW_MS / MILLIS_PER_DAY).toInt()
+        val direct =
+            safeList {
+                meshLogRepository.getLogsFromNodeSince(num, nowMillis - SIGNAL_WINDOW_MS).first().mapNotNull { log ->
+                    val p = log.fromRadio.packet ?: return@mapNotNull null
+                    if (p.hop_start == 0 || p.hop_start != p.hop_limit || p.rx_snr == 0f) null else p.rx_snr to p.rx_rssi
+                }
+            }
+        if (direct.isEmpty()) {
+            sb.append("\n• ").append(getStringSuspend(Res.string.ai_snr_no_direct, days))
+        } else {
+            val snrs = direct.map { it.first }
+            val rssis = direct.map { it.second }.filter { it != 0 }
+            sb.append("\n• ").append(
+                getStringSuspend(
+                    Res.string.ai_snr_avg, days, fmt(snrs.average().toFloat()), fmt(snrs.min()), fmt(snrs.max()),
+                    if (rssis.isEmpty()) none else rssis.average().roundToInt().toString(), direct.size,
+                ),
+            )
+        }
+        return sb.toString()
+    }
+
+    private suspend fun <T> safeList(block: suspend () -> List<T>): List<T> = try {
+        block()
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        Logger.w(tag = TAG, throwable = e) { "Assistant list unavailable" }
+        emptyList()
+    }
+
+    /** How many nodes are known, heard lately and heard directly: a short count instead of a long list. */
+    suspend fun networkCount(): String {
+        val all = nodeRepository.nodeDBbyNum.value.values
+        val nowS = nowMillis / MILLIS_PER_SECOND
+        val day = all.count { it.lastHeard != 0 && nowS - it.lastHeard < ONE_DAY_S }
+        val hour = all.count { it.lastHeard != 0 && nowS - it.lastHeard < SECONDS_PER_HOUR }
+        val direct = all.count { it.hopsAway == 0 }
+        return getStringSuspend(Res.string.ai_net_count, all.size, day, hour, direct)
+    }
+
     /** The list of nodes by distance ([order] nearest / farthest) or by signal (anything else), for one role or all. */
     suspend fun signalListFor(role: String, order: String): String {
         val words =
@@ -1490,6 +1550,7 @@ class AssistantDataProvider(
     private companion object {
         const val TAG = "AssistantData"
         const val MAX_PERIOD_AMOUNT = 1000
+        const val SIGNAL_WINDOW_MS = 3L * 86_400_000L
         val SELF_WORDS = setOf("me", "ja", "mnie", "mój", "moj", "mój węzeł", "moj wezel", "mine", "my node", "own", "own node", "self")
         const val MAX_CONTEXT_CHARS = 3000
         const val MIN_PART = 250

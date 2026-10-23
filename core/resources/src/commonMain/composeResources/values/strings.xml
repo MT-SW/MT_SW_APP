@@ -157,6 +157,7 @@
     <string name="ai_neigh_none">No neighbour information saved.</string>
     <string name="ai_neigh_none_node">No neighbour information for this node.</string>
     <string name="ai_neigh_title">Who hears whom directly:</string>
+    <string name="ai_net_count">Known nodes: %1$d. Heard in the last 24 h: %2$d, in the last hour: %3$d. Heard directly (0 hops): %4$d.</string>
     <string name="ai_never">never</string>
     <string name="ai_no_channel">No such channel: %1$s. Channels: %2$s</string>
     <string name="ai_nodes_heard_title">%1$s: heard %2$d of %3$d known nodes</string>
@@ -187,6 +188,10 @@
     <string name="ai_sig_farthest">Farthest nodes (of %1$d):</string>
     <string name="ai_sig_line">• %1$s (%2$s), %3$s: hops %4$s, SNR %5$s, RSSI %6$s, distance %7$s%8$s, heard %9$s</string>
     <string name="ai_sig_position">, position %1$s</string>
+    <string name="ai_snr_avg">heard directly in the last %1$d days: average SNR %2$s dB (from %3$s to %4$s dB), average RSSI %5$s dBm, packets: %6$d</string>
+    <string name="ai_snr_last">last packet: SNR %1$s, RSSI %2$s, hops %3$s, heard %4$s</string>
+    <string name="ai_snr_no_direct">no packets heard directly from this node in the last %1$d days (it reaches you through other nodes), so there is no average</string>
+    <string name="ai_snr_title">Signal of %1$s (%2$s):</string>
     <string name="ai_status_conn">Connection to the radio: %1$s</string>
     <string name="ai_status_own_title">My newest messages:</string>
     <string name="ai_status_title">App status</string>
