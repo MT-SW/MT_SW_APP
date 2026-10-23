@@ -22,24 +22,32 @@ package org.meshtastic.feature.messaging.translation
  * the user asked for exactly that ("show node X on the map"); the button stays to come back later. An action only ever
  * opens a place in the app: it never changes a setting and never sends a message.
  */
-data class AssistantAction(val label: String, val uri: String, val highlight: String = "", val auto: Boolean = false)
+data class AssistantAction(
+    val label: String,
+    val uri: String,
+    val highlight: String = "",
+    val auto: Boolean = false,
+    /** The whole caption of the button, already in the language of the answer; empty for older saved answers. */
+    val caption: String = "",
+)
 
 /**
  * The actions travel inside the text of the answer as short marker lines, so they are saved with the conversation and
  * need no extra storage. [parse] cuts them out for display, [strip] removes them before the text goes back to the model.
  */
 object AssistantActions {
-    private val marker = Regex("""\n?\[\[akcja\|([^|\]]*)\|([^|\]]*)\|([^|\]]*)(\|auto)?]]""")
+    private val marker = Regex("""\n?\[\[akcja\|([^|\]]*)\|([^|\]]*)\|([^|\]]*)(\|auto)?(?:\|t=([^|\]]*))?]]""")
 
     fun encode(action: AssistantAction): String =
-        "\n[[akcja|${clean(action.label)}|${clean(action.uri)}|${clean(action.highlight)}${if (action.auto) "|auto" else ""}]]"
+        "\n[[akcja|${clean(action.label)}|${clean(action.uri)}|${clean(action.highlight)}${if (action.auto) "|auto" else ""}" +
+            "${if (action.caption.isNotBlank()) "|t=" + clean(action.caption) else ""}]]"
 
     /** The text without the markers and the actions found in it (no duplicates, in order). */
     fun parse(text: String): Pair<String, List<AssistantAction>> {
         val actions =
             marker
                 .findAll(text)
-                .map { AssistantAction(it.groupValues[1], it.groupValues[2], it.groupValues[3], it.groupValues[4].isNotEmpty()) }
+                .map { AssistantAction(it.groupValues[1], it.groupValues[2], it.groupValues[3], it.groupValues[4].isNotEmpty(), it.groupValues[5]) }
                 .distinct()
                 .toList()
         return strip(text) to actions
@@ -48,14 +56,17 @@ object AssistantActions {
     fun strip(text: String): String = webMarker.replace(marker.replace(text, ""), "").trimEnd()
 
     // The answer used the internet: what was searched and where it came from, shown as a small note under the answer.
-    private val webMarker = Regex("""\n?\[\[internet\|([^|\]]*)\|([^|\]]*)]]""")
+    // Older answers: [[internet|searches|sources]]; newer: [[internet|whole note]] already in the answer's language.
+    private val webMarker = Regex("""\n?\[\[internet\|([^|\]]*)(?:\|([^|\]]*))?]]""")
 
-    /** The searches and sources of an answer that used the internet, or null. */
-    data class WebInfo(val queries: String, val sources: String)
+    /** The note of an answer that used the internet: the whole [note], or the [queries] and [sources] of older ones. */
+    data class WebInfo(val note: String, val queries: String, val sources: String)
 
-    fun encodeWeb(queries: String, sources: String): String = "\n[[internet|${clean(queries)}|${clean(sources)}]]"
+    fun encodeWeb(note: String): String = "\n[[internet|${clean(note)}]]"
 
-    fun web(text: String): WebInfo? = webMarker.find(text)?.let { WebInfo(it.groupValues[1].trim(), it.groupValues[2].trim()) }
+    fun web(text: String): WebInfo? = webMarker.find(text)?.let {
+        if (it.groups[2] == null) WebInfo(it.groupValues[1].trim(), "", "") else WebInfo("", it.groupValues[1].trim(), it.groupValues[2].trim())
+    }
 
     private fun clean(value: String) = value.replace('|', ' ').replace("[[", "(").replace("]]", ")").replace('\n', ' ')
 }

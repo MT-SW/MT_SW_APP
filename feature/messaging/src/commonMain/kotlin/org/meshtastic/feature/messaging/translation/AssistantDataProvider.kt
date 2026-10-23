@@ -263,7 +263,7 @@ class AssistantDataProvider(
         if (aboutNodes && q.hasAny(DISTANCE_WORDS)) return ok(safe("signal") { signalReport(q) })
         // 6. Low battery.
         if (q.hasAny(listOf("bateri", "battery")) && q.hasAny(LOW_WORDS)) {
-            return ok(safe("battery") { getStringSuspend(Res.string.ai_low_battery_title, LOW_BATTERY) + "\n" + toolFindNodes(0, "", 0, LOW_BATTERY, 0, REPORT_SIGNAL) })
+            return ok(safe("battery") { aiString(Res.string.ai_low_battery_title, LOW_BATTERY) + "\n" + toolFindNodes(0, "", 0, LOW_BATTERY, 0, REPORT_SIGNAL) })
         }
         // 7. How many nodes were heard in a time window.
         if (q.hasAny(listOf("ile ", "how many", "liczb")) && q.hasAny(listOf("węzł", "wezl", "node"))) {
@@ -272,7 +272,7 @@ class AssistantDataProvider(
                 safe("nodecount") {
                     val all = nodeRepository.nodeDBbyNum.value.values
                     val heard = all.count { it.lastHeard != 0 && it.lastHeard * MILLIS_PER_SECOND >= w.since && it.lastHeard * MILLIS_PER_SECOND < w.until }
-                    getStringSuspend(Res.string.ai_nodes_heard_title, w.title(), heard, all.size)
+                    aiString(Res.string.ai_nodes_heard_title, w.title(), heard, all.size)
                 },
             )
         }
@@ -514,19 +514,19 @@ class AssistantDataProvider(
                 val ago = ((nowS - kinds.values.maxOf { it.first } / MILLIS_PER_SECOND) / SECONDS_PER_MINUTE).coerceAtLeast(0)
                 Row(name, ago, values)
             }
-        if (rows.isEmpty()) return getStringSuspend(Res.string.ai_sensor_none)
+        if (rows.isEmpty()) return aiString(Res.string.ai_sensor_none)
         val sorted = rows.sortedByDescending { it.values.containsKey("temperature") }
-        val sb = StringBuilder(getStringSuspend(Res.string.ai_sensor_title, rows.size)).append('\n')
+        val sb = StringBuilder(aiString(Res.string.ai_sensor_title, rows.size)).append('\n')
         for (r in sorted.take(REPORT_LIMIT)) {
             val parts = ArrayList<String>()
-            for ((k, v) in r.values) parts += getStringSuspend(REPORT_KEYS.getValue(k), roundTo(v, if (k in TWO_DECIMALS) 2 else 1))
+            for ((k, v) in r.values) parts += aiString(REPORT_KEYS.getValue(k), roundTo(v, if (k in TWO_DECIMALS) 2 else 1))
             sb.append("• ${r.name}: ${parts.joinToString(", ")}\n")
         }
         suspend fun extreme(key: String, label: StringResource, highest: Boolean) {
             val best = rows.filter { it.values.containsKey(key) }.let { l -> if (highest) l.maxByOrNull { it.values.getValue(key) } else l.minByOrNull { it.values.getValue(key) } }
             if (best != null) {
-                val value = getStringSuspend(REPORT_KEYS.getValue(key), roundTo(best.values.getValue(key), 1)).substringAfter(' ')
-                sb.append("${getStringSuspend(label)}: ${best.name} — $value\n")
+                val value = aiString(REPORT_KEYS.getValue(key), roundTo(best.values.getValue(key), 1)).substringAfter(' ')
+                sb.append("${aiString(label)}: ${best.name} — $value\n")
             }
         }
         sb.append('\n')
@@ -576,20 +576,20 @@ class AssistantDataProvider(
             }
         val title =
             when {
-                closest -> getStringSuspend(Res.string.ai_sig_closest, rows.size)
-                byDistance -> getStringSuspend(Res.string.ai_sig_farthest, rows.size)
-                else -> getStringSuspend(Res.string.ai_sig_best, withSignal.size, rows.size)
+                closest -> aiString(Res.string.ai_sig_closest, rows.size)
+                byDistance -> aiString(Res.string.ai_sig_farthest, rows.size)
+                else -> aiString(Res.string.ai_sig_best, withSignal.size, rows.size)
             }
-        val none = getStringSuspend(Res.string.ai_none_value)
+        val none = aiString(Res.string.ai_none_value)
         val sb = StringBuilder(title).append('\n')
         for (r in sorted.take(SIGNAL_SHOWN)) {
             val n = r.n
-            val heard = if (n.lastHeard == 0) getStringSuspend(Res.string.ai_never) else ago(((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+            val heard = if (n.lastHeard == 0) aiString(Res.string.ai_never) else ago(((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
             val snr = if (n.snr == Float.MAX_VALUE) none else fmt(n.snr) + " dB"
             val rssi = if (n.rssi == Int.MAX_VALUE) none else n.rssi.toString() + " dBm"
             val dist = r.meters?.let { m -> fmt(m / METERS_PER_KM) + " km" } ?: none
-            val where = position(n)?.let { getStringSuspend(Res.string.ai_sig_position, it) }.orEmpty()
-            sb.append(getStringSuspend(Res.string.ai_sig_line, n.user.short_name, n.user.long_name, n.user.role.toString(), n.hopsAway.toString(), snr, rssi, dist, where, heard)).append('\n')
+            val where = position(n)?.let { aiString(Res.string.ai_sig_position, it) }.orEmpty()
+            sb.append(aiString(Res.string.ai_sig_line, n.user.short_name, n.user.long_name, n.user.role.toString(), n.hopsAway.toString(), snr, rssi, dist, where, heard)).append('\n')
         }
         return sb.toString().trim()
     }
@@ -900,11 +900,11 @@ class AssistantDataProvider(
                 }
         }
         val found = ArrayList<Triple<Long, String, String>>()
-        val defaultName = getStringSuspend(Res.string.ai_scope_default)
+        val defaultName = aiString(Res.string.ai_scope_default)
         for (key in keys) {
             val label =
                 if (key.endsWith("^all")) key.substringBefore('^').toIntOrNull()?.let { names.getOrNull(it)?.ifBlank { defaultName } } ?: key
-                else getStringSuspend(Res.string.ai_private_chat)
+                else aiString(Res.string.ai_private_chat)
             val list = packetRepository.getMessagesFrom(key, SEARCH_PER_CHAT) { id -> nodeRepository.getNode(id.orEmpty()) }.first()
             for (m in list) {
                 val text = m.text
@@ -914,10 +914,10 @@ class AssistantDataProvider(
             }
         }
         if (found.isEmpty()) {
-            return if (needle.isNotEmpty()) getStringSuspend(Res.string.ai_found_none_for, query.trim()) else getStringSuspend(Res.string.ai_found_none)
+            return if (needle.isNotEmpty()) aiString(Res.string.ai_found_none_for, query.trim()) else aiString(Res.string.ai_found_none)
         }
         val now = nowMillis
-        return getStringSuspend(Res.string.ai_found_n, found.size) + "\n" +
+        return aiString(Res.string.ai_found_n, found.size) + "\n" +
             found.sortedByDescending { it.first }.take(top).map {
                 "• ${it.second}, ${ago(((now - it.first) / MILLIS_PER_MINUTE).coerceAtLeast(0))}, ${it.third}"
             }.joinToString("\n")
@@ -958,7 +958,7 @@ class AssistantDataProvider(
     /** A time window: [since, until) in epoch milliseconds and the text that names it (with [n] when it has a number). */
     private class Win(val since: Long, val until: Long, val label: StringResource, val n: Int = 0)
 
-    private suspend fun Win.title(): String = if (n > 0) getStringSuspend(label, n) else getStringSuspend(label)
+    private suspend fun Win.title(): String = if (n > 0) aiString(label, n) else aiString(label)
 
     /**
      * How many messages were received on a channel (the word all = every channel and direct messages) in a time
@@ -1020,7 +1020,7 @@ class AssistantDataProvider(
             else wanted.toIntOrNull() ?: numberedChannel(wanted) ?: names.indexOfFirst { it.lowercase() == wanted }.takeIf { it >= 0 }
                 ?: names.indexOfFirst { it.lowercase().contains(wanted) }.takeIf { it >= 0 }
         if (wanted.isNotEmpty() && index == null) {
-            return getStringSuspend(Res.string.ai_no_channel, channel, names.mapIndexed { i, n -> "$i = ${n.ifBlank { "-" }}" }.joinToString())
+            return aiString(Res.string.ai_no_channel, channel, names.mapIndexed { i, n -> "$i = ${n.ifBlank { "-" }}" }.joinToString())
         }
         val keys = packetRepository.getContacts().first().keys.filter { key ->
             if (index == null) true else key.endsWith("^all") && key.startsWith("$index^")
@@ -1040,11 +1040,11 @@ class AssistantDataProvider(
             }
         }
         val scope =
-            if (index == null) getStringSuspend(Res.string.ai_scope_all)
-            else getStringSuspend(Res.string.ai_scope_channel, names.getOrNull(index)?.ifBlank { null } ?: getStringSuspend(Res.string.ai_scope_default), index)
-        val sb = StringBuilder(getStringSuspend(Res.string.ai_cnt_line, window.title(), scope, total, mine))
+            if (index == null) aiString(Res.string.ai_scope_all)
+            else aiString(Res.string.ai_scope_channel, names.getOrNull(index)?.ifBlank { null } ?: aiString(Res.string.ai_scope_default), index)
+        val sb = StringBuilder(aiString(Res.string.ai_cnt_line, window.title(), scope, total, mine))
         if (perSender.isNotEmpty()) {
-            sb.append('\n').append(getStringSuspend(Res.string.ai_cnt_top))
+            sb.append('\n').append(aiString(Res.string.ai_cnt_top))
             perSender.entries.sortedByDescending { it.value }.take(TOP_SENDERS).forEach { sb.append("\n• ${it.key} — ${it.value}") }
         }
         return sb.toString()
@@ -1068,16 +1068,16 @@ class AssistantDataProvider(
                     (maxBattery !in 1..100 || (n.deviceMetrics.battery_level ?: Int.MAX_VALUE) <= maxBattery) &&
                     (withPosition != 1 || n.validPosition != null)
             }.sortedByDescending { it.lastHeard }
-        if (found.isEmpty()) return getStringSuspend(Res.string.ai_nodes_none, all.size)
-        val sb = StringBuilder(getStringSuspend(Res.string.ai_nodes_match, found.size, all.size))
+        if (found.isEmpty()) return aiString(Res.string.ai_nodes_none, all.size)
+        val sb = StringBuilder(aiString(Res.string.ai_nodes_match, found.size, all.size))
         for (n in found.take(top)) {
-            val heard = if (n.lastHeard == 0) getStringSuspend(Res.string.ai_never) else ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+            val heard = if (n.lastHeard == 0) aiString(Res.string.ai_never) else ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
             val bat =
-                n.deviceMetrics.battery_level?.let { if (it > 100) getStringSuspend(Res.string.ai_battery_ext) else getStringSuspend(Res.string.ai_battery_pct, it) }
-                    ?: getStringSuspend(Res.string.ai_battery_unknown)
-            sb.append("\n• ${n.user.long_name} (${n.user.short_name}), ${n.user.hw_model}, ${n.user.role}, ${getStringSuspend(Res.string.ai_heard, heard)}, $bat")
+                n.deviceMetrics.battery_level?.let { if (it > 100) aiString(Res.string.ai_battery_ext) else aiString(Res.string.ai_battery_pct, it) }
+                    ?: aiString(Res.string.ai_battery_unknown)
+            sb.append("\n• ${n.user.long_name} (${n.user.short_name}), ${n.user.hw_model}, ${n.user.role}, ${aiString(Res.string.ai_heard, heard)}, $bat")
         }
-        if (found.size > top) sb.append("\n").append(getStringSuspend(Res.string.ai_more, found.size - top))
+        if (found.size > top) sb.append("\n").append(aiString(Res.string.ai_more, found.size - top))
         return sb.toString()
     }
 
@@ -1103,10 +1103,10 @@ class AssistantDataProvider(
 
     private suspend fun ago(minutes: Long): String =
         when {
-            minutes < 1 -> getStringSuspend(Res.string.ai_ago_now)
-            minutes < MINUTES_PER_HOUR -> getStringSuspend(Res.string.ai_ago_min, minutes.toInt())
-            minutes < MINUTES_PER_DAY -> getStringSuspend(Res.string.ai_ago_h, (minutes / MINUTES_PER_HOUR).toInt())
-            else -> getStringSuspend(Res.string.ai_ago_d, (minutes / MINUTES_PER_DAY).toInt())
+            minutes < 1 -> aiString(Res.string.ai_ago_now)
+            minutes < MINUTES_PER_HOUR -> aiString(Res.string.ai_ago_min, minutes.toInt())
+            minutes < MINUTES_PER_DAY -> aiString(Res.string.ai_ago_h, (minutes / MINUTES_PER_HOUR).toInt())
+            else -> aiString(Res.string.ai_ago_d, (minutes / MINUTES_PER_DAY).toInt())
         }
 
     private fun nameOf(num: Int): String = nodeNameFor(num).ifBlank { "!" + num.toUInt().toString(16) }
@@ -1115,11 +1115,11 @@ class AssistantDataProvider(
     suspend fun toolTraceroutes(node: String, limit: Int): String {
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
         val wanted = node.anyToEmpty()
-        val num = if (wanted.isEmpty()) null else (findNode(node)?.num ?: return getStringSuspend(Res.string.ai_unknown_node, node))
+        val num = if (wanted.isEmpty()) null else (findNode(node)?.num ?: return aiString(Res.string.ai_unknown_node, node))
         val logs = meshLogRepository.getLogsByPortNumSince(PortNum.TRACEROUTE_APP.value, nowMillis - TRACE_WINDOW_MS).first()
         val now = nowMillis
-        val there = getStringSuspend(Res.string.ai_trace_there)
-        val back = getStringSuspend(Res.string.ai_trace_back)
+        val there = aiString(Res.string.ai_trace_there)
+        val back = aiString(Res.string.ai_trace_back)
         val lines = ArrayList<String>()
         for (log in logs.sortedByDescending { it.received_date }) {
             val rd = log.fromRadio.packet?.fullRouteDiscovery ?: continue
@@ -1129,22 +1129,22 @@ class AssistantDataProvider(
                     val q = snr.getOrNull(i - 1)?.takeIf { it != Int.MIN_VALUE }
                     nameOf(n) + (if (q != null && i > 0) " (${fmt(q / 4f)} dB)" else "")
                 }.joinToString(" → ")
-            val hops = getStringSuspend(Res.string.ai_trace_hops, (rd.route.size - 2).coerceAtLeast(0))
+            val hops = aiString(Res.string.ai_trace_hops, (rd.route.size - 2).coerceAtLeast(0))
             lines += buildString {
                 append("• ${ago(((now - log.received_date) / MILLIS_PER_MINUTE).coerceAtLeast(0))}, $hops\n   $there: ${path(rd.route, rd.snr_towards)}")
                 if (rd.route_back.isNotEmpty()) append("\n   $back: ${path(rd.route_back, rd.snr_back)}")
             }
             if (lines.size >= top) break
         }
-        if (lines.isEmpty()) return getStringSuspend(if (num != null) Res.string.ai_trace_none_node else Res.string.ai_trace_none)
-        return getStringSuspend(Res.string.ai_trace_title) + "\n" + lines.joinToString("\n")
+        if (lines.isEmpty()) return aiString(if (num != null) Res.string.ai_trace_none_node else Res.string.ai_trace_none)
+        return aiString(Res.string.ai_trace_title) + "\n" + lines.joinToString("\n")
     }
 
     /** Who each node reported hearing directly (neighbour info), newest report per node; one [node] or all. */
     suspend fun toolNeighbors(node: String, limit: Int): String {
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
         val wanted = node.anyToEmpty()
-        val num = if (wanted.isEmpty()) null else (findNode(node)?.num ?: return getStringSuspend(Res.string.ai_unknown_node, node))
+        val num = if (wanted.isEmpty()) null else (findNode(node)?.num ?: return aiString(Res.string.ai_unknown_node, node))
         val logs = meshLogRepository.getLogsByPortNumSince(PortNum.NEIGHBORINFO_APP.value, nowMillis - TRACE_WINDOW_MS).first()
         val now = nowMillis
         val newest = HashMap<Int, Pair<Long, org.meshtastic.proto.NeighborInfo>>()
@@ -1155,12 +1155,12 @@ class AssistantDataProvider(
             if (num != null && owner != num && info.neighbors.none { it.node_id == num }) continue
             if ((newest[owner]?.first ?: -1L) < log.received_date) newest[owner] = log.received_date to info
         }
-        if (newest.isEmpty()) return getStringSuspend(if (num != null) Res.string.ai_neigh_none_node else Res.string.ai_neigh_none)
-        val nobody = getStringSuspend(Res.string.ai_neigh_nobody)
-        return getStringSuspend(Res.string.ai_neigh_title) + "\n" +
+        if (newest.isEmpty()) return aiString(if (num != null) Res.string.ai_neigh_none_node else Res.string.ai_neigh_none)
+        val nobody = aiString(Res.string.ai_neigh_nobody)
+        return aiString(Res.string.ai_neigh_title) + "\n" +
             newest.entries.sortedByDescending { it.value.first }.take(top).map { (owner, v) ->
                 val whenText = ago(((now - v.first) / MILLIS_PER_MINUTE).coerceAtLeast(0))
-                "• ${getStringSuspend(Res.string.ai_neigh_hears, nameOf(owner), whenText)} " +
+                "• ${aiString(Res.string.ai_neigh_hears, nameOf(owner), whenText)} " +
                     v.second.neighbors.joinToString { "${nameOf(it.node_id)} (${fmt(it.snr)} dB)" }.ifBlank { nobody }
             }.joinToString("\n")
     }
@@ -1168,7 +1168,7 @@ class AssistantDataProvider(
     /** Connection to the radio, unread messages per conversation and the state of the newest own messages. */
     suspend fun toolAppStatus(): String {
         val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
-        val sb = StringBuilder(getStringSuspend(Res.string.ai_status_title)).append('\n')
+        val sb = StringBuilder(aiString(Res.string.ai_status_title)).append('\n')
         val conn =
             when (connection?.connectionState?.value) {
                 org.meshtastic.core.model.ConnectionState.Connected -> Res.string.ai_conn_connected
@@ -1177,16 +1177,16 @@ class AssistantDataProvider(
                 org.meshtastic.core.model.ConnectionState.DeviceSleep -> Res.string.ai_conn_sleep
                 else -> Res.string.ai_conn_unknown
             }
-        sb.append(getStringSuspend(Res.string.ai_status_conn, getStringSuspend(conn))).append('\n')
+        sb.append(aiString(Res.string.ai_status_conn, aiString(conn))).append('\n')
         val unread = packetRepository.getUnreadCounts().filterValues { it > 0 }
         if (unread.isEmpty()) {
-            sb.append(getStringSuspend(Res.string.ai_status_unread_none)).append('\n')
+            sb.append(aiString(Res.string.ai_status_unread_none)).append('\n')
         } else {
-            sb.append(getStringSuspend(Res.string.ai_status_unread, unread.values.sum())).append('\n')
+            sb.append(aiString(Res.string.ai_status_unread, unread.values.sum())).append('\n')
             unread.entries.sortedByDescending { it.value }.take(UNREAD_SHOWN).forEach { (key, n) ->
                 val label =
                     if (key.endsWith("^all")) key.substringBefore('^').toIntOrNull()?.let { "${names.getOrNull(it).orEmpty().ifBlank { "#$it" }}" } ?: key
-                    else findNode("!" + key.substringAfter('!', ""))?.user?.long_name ?: getStringSuspend(Res.string.ai_private_chat)
+                    else findNode("!" + key.substringAfter('!', ""))?.user?.long_name ?: aiString(Res.string.ai_private_chat)
                 sb.append("• $label: $n\n")
             }
         }
@@ -1197,7 +1197,7 @@ class AssistantDataProvider(
         }
         if (own.isNotEmpty()) {
             val now = nowMillis
-            sb.append(getStringSuspend(Res.string.ai_status_own_title)).append('\n')
+            sb.append(aiString(Res.string.ai_status_own_title)).append('\n')
             own.sortedByDescending { it.first }.take(OWN_STATUS_SHOWN).forEach {
                 val state =
                     when (it.second) {
@@ -1207,7 +1207,7 @@ class AssistantDataProvider(
                         org.meshtastic.core.model.MessageStatus.ERROR -> Res.string.ai_msg_error
                         else -> Res.string.ai_msg_other
                     }
-                sb.append("• ${ago(((now - it.first) / MILLIS_PER_MINUTE).coerceAtLeast(0))}: ${getStringSuspend(state)} — ${it.third}\n")
+                sb.append("• ${ago(((now - it.first) / MILLIS_PER_MINUTE).coerceAtLeast(0))}: ${aiString(state)} — ${it.third}\n")
             }
         }
         return sb.toString().trim()
@@ -1217,17 +1217,17 @@ class AssistantDataProvider(
     suspend fun toolWaypoints(limit: Int): String {
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
         val list = packetRepository.getWaypoints().first().sortedByDescending { it.time }
-        if (list.isEmpty()) return getStringSuspend(Res.string.ai_wp_none)
+        if (list.isEmpty()) return aiString(Res.string.ai_wp_none)
         val now = nowMillis
-        val noName = getStringSuspend(Res.string.ai_wp_noname)
-        return getStringSuspend(Res.string.ai_wp_title, list.size) + "\n" +
+        val noName = aiString(Res.string.ai_wp_noname)
+        return aiString(Res.string.ai_wp_title, list.size) + "\n" +
             list.take(top).map { p ->
                 val w = p.waypoint
                 val sender = findNode(p.from.orEmpty())?.let { it.user.long_name.ifBlank { it.user.short_name } } ?: p.from.orEmpty()
                 val lat = (w?.latitude_i ?: 0) / WAYPOINT_SCALE
                 val lon = (w?.longitude_i ?: 0) / WAYPOINT_SCALE
                 "• ${w?.name.orEmpty().ifBlank { noName }}${w?.description.orEmpty().take(MESSAGE_CHARS).let { d -> if (d.isBlank()) "" else " — $d" }} " +
-                    "(${fmt(lat.toFloat())}, ${fmt(lon.toFloat())}), ${getStringSuspend(Res.string.ai_wp_from, sender)}, ${ago(((now - p.time) / MILLIS_PER_MINUTE).coerceAtLeast(0))}"
+                    "(${fmt(lat.toFloat())}, ${fmt(lon.toFloat())}), ${aiString(Res.string.ai_wp_from, sender)}, ${ago(((now - p.time) / MILLIS_PER_MINUTE).coerceAtLeast(0))}"
             }.joinToString("\n")
     }
 
@@ -1288,17 +1288,17 @@ class AssistantDataProvider(
                 .let { list -> if (farthest) list.sortedByDescending { it.second } else list.sortedBy { it.second } }
         val (first, meters) = rows.firstOrNull() ?: return null
         val nowS = nowMillis / MILLIS_PER_SECOND
-        val heard = if (first.lastHeard == 0) getStringSuspend(Res.string.ai_never) else ago(((nowS - first.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+        val heard = if (first.lastHeard == 0) aiString(Res.string.ai_never) else ago(((nowS - first.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
         val sb =
             StringBuilder(
-                getStringSuspend(
+                aiString(
                     if (farthest) Res.string.ai_far_one else Res.string.ai_near_one,
                     first.user.long_name.ifBlank { first.user.short_name }, first.user.short_name, kilometres(meters), heard,
                 ),
             )
         val next = rows.drop(1).take(NEXT_SHOWN)
         if (next.isNotEmpty()) {
-            sb.append("\n\n").append(getStringSuspend(Res.string.ai_dist_next, "").trim())
+            sb.append("\n\n").append(aiString(Res.string.ai_dist_next, "").trim())
             for ((n, m) in next) sb.append("\n• ").append(n.user.long_name.ifBlank { n.user.short_name }).append(" — ").append(kilometres(m)).append(" km")
         }
         return sb.toString()
@@ -1312,14 +1312,14 @@ class AssistantDataProvider(
      * came straight from it (not through other nodes), the average, lowest and highest SNR and the average RSSI.
      */
     suspend fun nodeSignal(num: Int): String {
-        val n = nodeRepository.nodeDBbyNum.value[num] ?: return getStringSuspend(Res.string.ai_unknown_node, num.toString())
-        val none = getStringSuspend(Res.string.ai_none_value)
+        val n = nodeRepository.nodeDBbyNum.value[num] ?: return aiString(Res.string.ai_unknown_node, num.toString())
+        val none = aiString(Res.string.ai_none_value)
         val nowS = nowMillis / MILLIS_PER_SECOND
-        val heard = if (n.lastHeard == 0) getStringSuspend(Res.string.ai_never) else ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+        val heard = if (n.lastHeard == 0) aiString(Res.string.ai_never) else ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
         val snr = if (n.snr == Float.MAX_VALUE) none else fmt(n.snr) + " dB"
         val rssi = if (n.rssi == Int.MAX_VALUE) none else n.rssi.toString() + " dBm"
-        val sb = StringBuilder(getStringSuspend(Res.string.ai_snr_title, n.user.long_name.ifBlank { n.user.short_name }, n.user.short_name))
-        sb.append("\n• ").append(getStringSuspend(Res.string.ai_snr_last, snr, rssi, n.hopsAway.toString(), heard))
+        val sb = StringBuilder(aiString(Res.string.ai_snr_title, n.user.long_name.ifBlank { n.user.short_name }, n.user.short_name))
+        sb.append("\n• ").append(aiString(Res.string.ai_snr_last, snr, rssi, n.hopsAway.toString(), heard))
         val days = (SIGNAL_WINDOW_MS / MILLIS_PER_DAY).toInt()
         val direct =
             safeList {
@@ -1331,12 +1331,12 @@ class AssistantDataProvider(
                 }
             }
         if (direct.isEmpty()) {
-            sb.append("\n• ").append(getStringSuspend(Res.string.ai_snr_no_direct, days))
+            sb.append("\n• ").append(aiString(Res.string.ai_snr_no_direct, days))
         } else {
             val snrs: List<Float> = direct.map { it.first }
             val rssis: List<Int> = direct.map { it.second }.filter { it != 0 }
             sb.append("\n• ").append(
-                getStringSuspend(
+                aiString(
                     Res.string.ai_snr_avg, days, fmt(snrs.average().toFloat()), fmt(snrs.min()), fmt(snrs.max()),
                     if (rssis.isEmpty()) none else rssis.average().roundToInt().toString(), direct.size,
                 ),
@@ -1364,27 +1364,27 @@ class AssistantDataProvider(
         val uptime = (ls.uptime_seconds ?: 0).toLong()
         val rx = (ls.num_packets_rx ?: 0)
         val tx = (ls.num_packets_tx ?: 0)
-        if (uptime == 0L && rx == 0 && tx == 0) return getStringSuspend(Res.string.ai_radio_none)
+        if (uptime == 0L && rx == 0 && tx == 0) return aiString(Res.string.ai_radio_none)
         val me = nodeRepository.ourNodeInfo.value?.user
         val name = me?.let { it.long_name.ifBlank { it.short_name } }.orEmpty()
-        val sb = StringBuilder(getStringSuspend(Res.string.ai_radio_title, name).trim())
+        val sb = StringBuilder(aiString(Res.string.ai_radio_title, name).trim())
         fun line(text: String) = sb.append("\n• ").append(text)
-        line(getStringSuspend(Res.string.ai_radio_uptime, duration(uptime)))
-        line(getStringSuspend(Res.string.ai_radio_util, fmt(ls.channel_utilization ?: 0f), fmt(ls.air_util_tx ?: 0f)))
-        line(getStringSuspend(Res.string.ai_radio_packets, tx.toString(), rx.toString(), (ls.num_packets_rx_bad ?: 0).toString(), (ls.num_rx_dupe ?: 0).toString()))
-        line(getStringSuspend(Res.string.ai_radio_relay, (ls.num_tx_relay ?: 0).toString(), (ls.num_tx_relay_canceled ?: 0).toString(), (ls.num_tx_dropped ?: 0).toString()))
-        line(getStringSuspend(Res.string.ai_radio_nodes, (ls.num_online_nodes ?: 0).toString(), (ls.num_total_nodes ?: 0).toString()))
+        line(aiString(Res.string.ai_radio_uptime, duration(uptime)))
+        line(aiString(Res.string.ai_radio_util, fmt(ls.channel_utilization ?: 0f), fmt(ls.air_util_tx ?: 0f)))
+        line(aiString(Res.string.ai_radio_packets, tx.toString(), rx.toString(), (ls.num_packets_rx_bad ?: 0).toString(), (ls.num_rx_dupe ?: 0).toString()))
+        line(aiString(Res.string.ai_radio_relay, (ls.num_tx_relay ?: 0).toString(), (ls.num_tx_relay_canceled ?: 0).toString(), (ls.num_tx_dropped ?: 0).toString()))
+        line(aiString(Res.string.ai_radio_nodes, (ls.num_online_nodes ?: 0).toString(), (ls.num_total_nodes ?: 0).toString()))
         val heapTotal = ls.heap_total_bytes ?: 0
         val heapFree = ls.heap_free_bytes ?: 0
         if (heapTotal > 0) {
             val used = (heapTotal - heapFree).coerceAtLeast(0)
-            line(getStringSuspend(Res.string.ai_radio_heap, fmt(used.toFloat() / heapTotal * PERCENT), (used / BYTES_PER_KB).toString(), (heapTotal / BYTES_PER_KB).toString()))
+            line(aiString(Res.string.ai_radio_heap, fmt(used.toFloat() / heapTotal * PERCENT), (used / BYTES_PER_KB).toString(), (heapTotal / BYTES_PER_KB).toString()))
         }
         val noise = ls.noise_floor ?: 0
-        if (noise != 0) line(getStringSuspend(Res.string.ai_radio_noise, noise.toString()))
+        if (noise != 0) line(aiString(Res.string.ai_radio_noise, noise.toString()))
         if (ext.flashTotalBytes > 0 || ext.cpuUsagePercent > 0) {
-            val flash = if (ext.flashTotalBytes > 0) fmt(ext.flashUsedBytes.toFloat() / ext.flashTotalBytes * PERCENT) else getStringSuspend(Res.string.ai_none_value)
-            line(getStringSuspend(Res.string.ai_radio_ext, ext.cpuUsagePercent.toString(), flash))
+            val flash = if (ext.flashTotalBytes > 0) fmt(ext.flashUsedBytes.toFloat() / ext.flashTotalBytes * PERCENT) else aiString(Res.string.ai_none_value)
+            line(aiString(Res.string.ai_radio_ext, ext.cpuUsagePercent.toString(), flash))
         }
         return sb.toString()
     }
@@ -1399,9 +1399,9 @@ class AssistantDataProvider(
             val who = newest.node.user.long_name.ifBlank { newest.node.user.short_name }
             found += Triple(newest.receivedTime, who, newest.text.take(MESSAGE_CHARS))
         }
-        if (found.isEmpty()) return getStringSuspend(Res.string.ai_dm_none)
+        if (found.isEmpty()) return aiString(Res.string.ai_dm_none)
         val now = nowMillis
-        val sb = StringBuilder(getStringSuspend(Res.string.ai_dm_title))
+        val sb = StringBuilder(aiString(Res.string.ai_dm_title))
         for ((time, who, text) in found.sortedByDescending { it.first }.take(limit)) {
             sb.append("\n• ").append(who).append(", ").append(ago(((now - time) / MILLIS_PER_MINUTE).coerceAtLeast(0))).append(": ").append(text)
         }
@@ -1411,17 +1411,17 @@ class AssistantDataProvider(
     /** The battery of one node (the own one when [num] is null), exactly as the node reported it. */
     suspend fun nodeBattery(num: Int?): String {
         val own = nodeRepository.ourNodeInfo.value
-        val n = (num?.let { nodeRepository.nodeDBbyNum.value[it] } ?: own) ?: return getStringSuspend(Res.string.ai_radio_none)
+        val n = (num?.let { nodeRepository.nodeDBbyNum.value[it] } ?: own) ?: return aiString(Res.string.ai_radio_none)
         // The own node's newest values live in its own record, which the app refreshes first.
         val node = if (own != null && n.num == own.num) own else n
         val name = node.user.long_name.ifBlank { node.user.short_name }
         val level = node.deviceMetrics.battery_level ?: 0
         val voltage = node.deviceMetrics.voltage ?: 0f
-        if (level <= 0 && voltage <= 0f) return getStringSuspend(Res.string.ai_bat_unknown, name)
-        val state = if (level > 100) getStringSuspend(Res.string.ai_battery_ext) else getStringSuspend(Res.string.ai_battery_pct, level)
+        if (level <= 0 && voltage <= 0f) return aiString(Res.string.ai_bat_unknown, name)
+        val state = if (level > 100) aiString(Res.string.ai_battery_ext) else aiString(Res.string.ai_battery_pct, level)
         val nowS = nowMillis / MILLIS_PER_SECOND
-        val heard = if (node.lastHeard == 0) getStringSuspend(Res.string.ai_never) else ago(((nowS - node.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
-        return getStringSuspend(Res.string.ai_bat_line, name, state, if (voltage > 0f) roundTo(voltage.toDouble(), 2) else getStringSuspend(Res.string.ai_none_value), heard)
+        val heard = if (node.lastHeard == 0) aiString(Res.string.ai_never) else ago(((nowS - node.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+        return aiString(Res.string.ai_bat_line, name, state, if (voltage > 0f) roundTo(voltage.toDouble(), 2) else aiString(Res.string.ai_none_value), heard)
     }
 
     /** How many nodes are known, heard lately and heard directly: a short count instead of a long list. */
@@ -1431,7 +1431,7 @@ class AssistantDataProvider(
         val day = all.count { it.lastHeard != 0 && nowS - it.lastHeard < ONE_DAY_S }
         val hour = all.count { it.lastHeard != 0 && nowS - it.lastHeard < SECONDS_PER_HOUR }
         val direct = all.count { it.hopsAway == 0 }
-        return getStringSuspend(Res.string.ai_net_count, all.size, day, hour, direct)
+        return aiString(Res.string.ai_net_count, all.size, day, hour, direct)
     }
 
     /** The list of nodes by distance ([order] nearest / farthest) or by signal (anything else), for one role or all. */
@@ -1487,22 +1487,22 @@ class AssistantDataProvider(
             val heard =
                 all.filter { it.lastHeard != 0 && it.lastHeard * MILLIS_PER_SECOND >= window.since && it.lastHeard * MILLIS_PER_SECOND < window.until }
                     .sortedByDescending { it.lastHeard }
-            val sb = StringBuilder(getStringSuspend(Res.string.ai_nodes_heard_title, window.title(), heard.size, all.size))
+            val sb = StringBuilder(aiString(Res.string.ai_nodes_heard_title, window.title(), heard.size, all.size))
             if (heard.isNotEmpty()) {
                 // A short list, one node per line, newest first; the rest only as a number.
                 val nowS = nowMillis / MILLIS_PER_SECOND
-                sb.append("\n\n").append(getStringSuspend(Res.string.ai_nodes_recent, "").trim())
+                sb.append("\n\n").append(aiString(Res.string.ai_nodes_recent, "").trim())
                 for (n in heard.take(NAMES_SHOWN)) {
                     val heardAgo = ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
                     sb.append("\n• ").append(n.user.long_name.ifBlank { n.user.short_name }).append(" — ").append(heardAgo)
                 }
-                if (heard.size > NAMES_SHOWN) sb.append('\n').append(getStringSuspend(Res.string.ai_more, heard.size - NAMES_SHOWN))
+                if (heard.size > NAMES_SHOWN) sb.append('\n').append(aiString(Res.string.ai_more, heard.size - NAMES_SHOWN))
             }
             return sb.toString()
         }
         val hours = window?.takeIf { it.since > 0 }?.let { ((nowMillis - it.since + MILLIS_PER_HOUR - 1) / MILLIS_PER_HOUR).toInt() } ?: 0
         val list = toolFindNodes(hours, "", if (favorites) 1 else 0, if (lowBattery) LOW_BATTERY else 0, 0, MAX_TOOL_LIST)
-        return if (lowBattery) getStringSuspend(Res.string.ai_low_battery_title, LOW_BATTERY) + "\n" + list else list
+        return if (lowBattery) aiString(Res.string.ai_low_battery_title, LOW_BATTERY) + "\n" + list else list
     }
 
     /**
@@ -1563,14 +1563,14 @@ class AssistantDataProvider(
                 direct += count
             }
         }
-        if (perChannel.isEmpty() && direct == 0) return getStringSuspend(Res.string.ai_chan_none)
-        val sb = StringBuilder(getStringSuspend(Res.string.ai_chan_title)).append('\n')
-        val fallback = getStringSuspend(Res.string.ai_scope_default)
+        if (perChannel.isEmpty() && direct == 0) return aiString(Res.string.ai_chan_none)
+        val sb = StringBuilder(aiString(Res.string.ai_chan_title)).append('\n')
+        val fallback = aiString(Res.string.ai_scope_default)
         for ((i, c) in perChannel.entries.sortedByDescending { it.value }) {
             val label = names.getOrNull(i)?.ifBlank { null } ?: fallback
-            sb.append("• ").append(getStringSuspend(Res.string.ai_chan_line, i, label, c)).append('\n')
+            sb.append("• ").append(aiString(Res.string.ai_chan_line, i, label, c)).append('\n')
         }
-        sb.append("• ").append(getStringSuspend(Res.string.ai_chan_private, direct))
+        sb.append("• ").append(aiString(Res.string.ai_chan_private, direct))
         return sb.toString()
     }
 

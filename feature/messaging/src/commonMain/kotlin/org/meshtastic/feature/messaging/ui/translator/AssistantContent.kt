@@ -236,7 +236,7 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                                         web.sources.takeIf { it.isNotBlank() }?.let { stringResource(Res.string.assistant_web_sources, it) },
                                     )
                                 Text(
-                                    text = (listOf(stringResource(Res.string.assistant_web_used)) + details).joinToString(" · "),
+                                    text = web.note.ifBlank { (listOf(stringResource(Res.string.assistant_web_used)) + details).joinToString(" · ") },
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.primary,
                                 )
@@ -253,7 +253,7 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                                                 AssistantLinks.open(action.uri)
                                             },
                                         ) {
-                                            Text(stringResource(Res.string.assistant_go_to, action.label))
+                                            Text(action.caption.ifBlank { stringResource(Res.string.assistant_go_to, action.label) })
                                         }
                                     }
                                 }

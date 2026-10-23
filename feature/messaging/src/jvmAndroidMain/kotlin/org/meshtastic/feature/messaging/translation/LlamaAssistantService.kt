@@ -35,6 +35,10 @@ import org.meshtastic.core.repository.TranslatorModelState
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ai_go_draft
+import org.meshtastic.core.resources.assistant_web_sources
+import org.meshtastic.core.resources.assistant_web_searched
+import org.meshtastic.core.resources.assistant_web_used
+import org.meshtastic.core.resources.assistant_go_to
 import org.meshtastic.core.resources.ai_help_from_manual
 import org.meshtastic.core.resources.ai_help_news
 import org.meshtastic.core.resources.ai_help_open
@@ -89,6 +93,24 @@ class LlamaAssistantService(
     private var memoryKey = ""
     private var memory = ""
     private var memorized = 0
+
+    // The language of the answer being written ("pl", "en", ...).
+    @Volatile private var answerLang = "pl"
+
+    /**
+     * The language to answer in: Polish for Polish letters or plain Polish words, English for plain English words;
+     * when the question says nothing (a name, a number), the language of the question before it, else the app's.
+     */
+    private fun answerLanguage(question: String, history: List<AssistantTurn>): String {
+        val q = " " + question.lowercase() + " "
+        if (isPolish(question) || POLISH_PLAIN.containsMatchIn(q)) return "pl"
+        if (ENGLISH_PLAIN.findAll(q).count() >= 2) return "en"
+        val earlier = history.dropLast(1).lastOrNull { it.fromUser }?.text.orEmpty()
+        return if (earlier.isNotBlank() && earlier != question) answerLanguage(earlier, emptyList()) else appLanguage()
+    }
+
+    private fun appLanguage(): String =
+        org.meshtastic.core.common.util.currentLocaleTag().substringBefore('-').substringBefore('_').lowercase().ifEmpty { "en" }
 
     // How the router understood the newest question, for the test report.
     @Volatile private var lastRoute = ""
@@ -146,7 +168,11 @@ class LlamaAssistantService(
         val modelId = activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
         val question = history.lastOrNull { it.fromUser }?.text.orEmpty()
         val previous = history.dropLast(1).lastOrNull { it.fromUser }?.text.orEmpty()
-        val polish = isPolish(question) || history.any { it.fromUser && isPolish(it.text) }
+        // The whole answer is in the language of this question: the model's words, the app's own texts and the buttons.
+        val language = answerLanguage(question, history)
+        val polish = language == "pl"
+        answerLang = language
+        AnswerLanguage.texts = if (language == appLanguage()) null else knowledge?.answerStrings(language)?.takeIf { it.isNotEmpty() }
         data.polish = polish
         collector.drain()
         webTools.reset()
@@ -165,7 +191,18 @@ class LlamaAssistantService(
                 answerOne(modelId, history, question, previous, polish, onPiece)
             }
         scheduleNotesUpdate(modelId, history, question, answer)
-        return answer + webTools.footer() + collector.drain().joinToString("") { AssistantActions.encode(it) }
+        val web =
+            webTools.usage()?.let { (queries, sources) ->
+                val parts =
+                    listOfNotNull(
+                        aiString(Res.string.assistant_web_used),
+                        queries.takeIf { it.isNotBlank() }?.let { aiString(Res.string.assistant_web_searched, it) },
+                        sources.takeIf { it.isNotBlank() }?.let { aiString(Res.string.assistant_web_sources, it) },
+                    )
+                AssistantActions.encodeWeb(parts.joinToString(" · "))
+            }.orEmpty()
+        val buttons = collector.drain().map { it.copy(caption = aiString(Res.string.assistant_go_to, it.label)) }
+        return answer + web + buttons.joinToString("") { AssistantActions.encode(it) }
     }
 
     /** Understands one question and answers it. */
@@ -236,7 +273,7 @@ class LlamaAssistantService(
         val lower = question.lowercase()
         if (SETUP_WORDS.containsMatchIn(lower) && OUR_NETWORK_WORDS.containsMatchIn(lower)) {
             guideTools.show_setting("preset")
-            return getStringSuspend(Res.string.ai_mtsw_setup).also(onPiece)
+            return aiString(Res.string.ai_mtsw_setup).also(onPiece)
         }
         val nodeNum = data.resolveNodeNum(intent.node, question)
         val answer: String? =
@@ -307,7 +344,7 @@ class LlamaAssistantService(
             }
             "network_question", "count_messages", "search_messages", "list_nodes" -> {
                 if (intent.topic == "node" && intent.node.isNotBlank() && nodeNum == null) {
-                    return getStringSuspend(Res.string.ai_unknown_node, intent.node).also(onPiece)
+                    return aiString(Res.string.ai_unknown_node, intent.node).also(onPiece)
                 }
                 val text = data.dataFor(intent.topic, nodeNum, intent.metric, question, DATA_CHARS * room)
                 val extra = if (text.isBlank()) rule(polish, NO_DATA_PL, NO_DATA_EN) else rule(polish, DATA_PL, DATA_EN) + "\n" + text
@@ -332,26 +369,26 @@ class LlamaAssistantService(
                     if (wantsNews) {
                         knowledge?.latestNews(NEWS_CHARS).orEmpty()
                     } else {
-                        knowledge?.lookup(listOf(question, intent.text, button?.label.orEmpty()).joinToString(" ").trim(), MANUAL_CHARS).orEmpty()
+                        knowledge?.lookup(listOf(question, intent.text, button?.label.orEmpty()).joinToString(" ").trim(), MANUAL_CHARS, answerLang).orEmpty()
                     }
                 val excerpt =
                     if (wantsNews) wholeLines(manual) else bestLines(manual, button?.label.orEmpty(), "${intent.text} ${button?.label.orEmpty()}", question, polish)
                 if (excerpt.isNotBlank() || button != null) {
                     val text = buildString {
                         if (wantsNews) {
-                            append(getStringSuspend(Res.string.ai_help_news)).append('\n')
+                            append(aiString(Res.string.ai_help_news)).append('\n')
                         } else if (button != null) {
                             val path = guideTools.pathOf(button)
                             // "Firmware is in: Firmware" says nothing: the button alone is enough then.
                             if (path.isNotBlank() && !path.equals(button.label, ignoreCase = true)) {
-                                append(getStringSuspend(Res.string.ai_help_where, button.label, path))
+                                append(aiString(Res.string.ai_help_where, button.label, path))
                             } else {
-                                append(getStringSuspend(Res.string.ai_help_open, button.label))
+                                append(aiString(Res.string.ai_help_open, button.label))
                             }
                         }
                         if (excerpt.isNotBlank() && !wantsNews) {
                             if (isNotEmpty()) append("\n\n")
-                            append(getStringSuspend(Res.string.ai_help_from_manual)).append('\n')
+                            append(aiString(Res.string.ai_help_from_manual)).append('\n')
                         }
                         append(excerpt)
                     }.trim()
@@ -402,20 +439,20 @@ class LlamaAssistantService(
     }
 
     private suspend fun goToNode(num: Int?, asked: String, planner: Boolean): String {
-        if (num == null) return getStringSuspend(Res.string.ai_unknown_node, asked.ifBlank { "?" })
+        if (num == null) return aiString(Res.string.ai_unknown_node, asked.ifBlank { "?" })
         val name = data.nodeNameFor(num).ifBlank { asked }
         val path = if (planner) "map/planner/$num" else "map/focus/$num"
         collector.add(AssistantAction(name, "$DEEP_LINK_BASE_URI/$path"))
         collector.autoOpenLast()
-        return getStringSuspend(if (planner) Res.string.ai_go_planner else Res.string.ai_go_map, name)
+        return aiString(if (planner) Res.string.ai_go_planner else Res.string.ai_go_map, name)
     }
 
     private suspend fun goToNearest(role: String, farthest: Boolean): String {
-        val (num, meters) = data.nearestNode(role, farthest) ?: return getStringSuspend(Res.string.ai_go_no_position)
+        val (num, meters) = data.nearestNode(role, farthest) ?: return aiString(Res.string.ai_go_no_position)
         val name = data.nodeNameFor(num)
         collector.add(AssistantAction(name, "$DEEP_LINK_BASE_URI/map/focus/$num"))
         collector.autoOpenLast()
-        return getStringSuspend(if (farthest) Res.string.ai_go_farthest else Res.string.ai_go_nearest, name, data.kilometres(meters))
+        return aiString(if (farthest) Res.string.ai_go_farthest else Res.string.ai_go_nearest, name, data.kilometres(meters))
     }
 
     /** A button (not opened by itself) to the first node of a nearest / farthest list. */
@@ -439,26 +476,26 @@ class LlamaAssistantService(
                 if (collector.size() > before) break@loop
             }
         }
-        val action = collector.last()?.takeIf { collector.size() > before } ?: return getStringSuspend(Res.string.ai_go_unknown_place)
+        val action = collector.last()?.takeIf { collector.size() > before } ?: return aiString(Res.string.ai_go_unknown_place)
         collector.autoOpenLast()
-        return if (action.highlight.isNotBlank()) getStringSuspend(Res.string.ai_go_setting, action.label)
-        else getStringSuspend(Res.string.ai_go_open, action.label)
+        return if (action.highlight.isNotBlank()) aiString(Res.string.ai_go_setting, action.label)
+        else aiString(Res.string.ai_go_open, action.label)
     }
 
     /** Puts a message in the message box of the conversation; the user checks it and sends it himself. */
     private suspend fun draft(to: String, text: String): String {
         val message = text.trim()
-        if (message.isEmpty()) return getStringSuspend(Res.string.ai_go_draft_empty)
+        if (message.isEmpty()) return aiString(Res.string.ai_go_draft_empty)
         val before = collector.size()
         guideTools.draft_message(message, to.ifBlank { "main" })
-        val action = collector.last()?.takeIf { collector.size() > before } ?: return getStringSuspend(Res.string.ai_go_draft_no_target)
+        val action = collector.last()?.takeIf { collector.size() > before } ?: return aiString(Res.string.ai_go_draft_no_target)
         collector.autoOpenLast()
-        return getStringSuspend(Res.string.ai_go_draft, action.label, message.take(MAX_DRAFT))
+        return aiString(Res.string.ai_go_draft, action.label, message.take(MAX_DRAFT))
     }
 
     /** Runs [block] for the node the router named, for every node when none was named, or says the node is unknown. */
     private suspend fun routeOrUnknown(intent: AssistantIntent, num: Int?, block: suspend (String) -> String): String {
-        if (intent.node.isNotBlank() && num == null) return getStringSuspend(Res.string.ai_unknown_node, intent.node)
+        if (intent.node.isNotBlank() && num == null) return aiString(Res.string.ai_unknown_node, intent.node)
         return block(num?.let { data.nodeNameFor(it) }.orEmpty().ifBlank { "all" })
     }
 
@@ -477,8 +514,11 @@ class LlamaAssistantService(
         temperature: Float = TEMPERATURE,
     ): String {
         val recent = fit(modelId, history, room)
+        val core = knowledge?.coreFacts(if (polish) "pl" else "en").orEmpty()
         val system = buildString {
             append(if (polish) SYSTEM_PL else SYSTEM_EN)
+            // The core facts about MT_SW are always given, so the model never answers against them.
+            if (core.isNotBlank()) append("\n\n").append(rule(polish, CORE_PL, CORE_EN)).append('\n').append(core)
             if (uiPrefs.assistantMemoryEnabled.value) {
                 val notes = memoryStore?.promptText(MEMORY_CHARS * room).orEmpty()
                 if (notes.isNotBlank()) append("\n\n").append(rule(polish, MEMORY_PL, MEMORY_EN)).append('\n').append(notes)
@@ -545,7 +585,10 @@ class LlamaAssistantService(
             val score = strongHits * 2 + weakHits + (if (exact) LABEL_SCORE else 0) + (if (stems(title).any { it in labelStems }) 1 else 0)
             found += Line(title, line, score)
         }
-        val best = found.maxByOrNull { it.score } ?: return ""
+        // A part of the manual whose heading names the setting is the right place; others only when there is none.
+        val titled = found.filter { line -> stems(line.title).any { it in labelStems } }
+        val pool = titled.ifEmpty { found }
+        val best = pool.maxByOrNull { it.score } ?: return ""
         // The best paragraph and, from the same part of the manual, the next best one, in the order of the manual.
         val chosen = found.filter { it.title == best.title }.sortedByDescending { it.score }.take(HELP_LINES)
         val ordered = found.filter { it in chosen }
@@ -557,7 +600,7 @@ class LlamaAssistantService(
     /** Cuts an unfinished last sentence (a fragment can end in the middle of one). */
     private fun endAtSentence(text: String): String {
         val t = text.trim()
-        if (t.isEmpty() || t.last() in ".!?:)”\"»") return t
+        if (t.isEmpty() || t.last() in ".!?:)”\"»…") return t
         val end = maxOf(t.lastIndexOf(". "), t.lastIndexOf(".\n"), t.lastIndexOf("! "), t.lastIndexOf("? "))
         return if (end > t.length * 2 / 5) t.substring(0, end + 1) else "$t…"
     }
@@ -815,6 +858,12 @@ class LlamaAssistantService(
         const val MEMORY_EN =
             "NOTES about the user from earlier conversations (their own instructions always win). Use them naturally, " +
                 "without saying you read notes; ignore them when they do not fit the question."
+        const val CORE_PL = "PODSTAWOWE FAKTY O MT_SW (zawsze prawdziwe, używaj ich, gdy pytanie ich dotyczy):"
+        const val CORE_EN = "CORE FACTS ABOUT MT_SW (always true, use them when the question is about them):"
+        val POLISH_PLAIN =
+            Regex("\\s(jak|gdzie|czy|ile|kto|jest|mam|moj|moje|wezel|wezly|wezla|siec|sieci|pokaz|otworz|zmienic|ustawienia|prosze|dzieki|czesc|jaki|jaka|jakie)\\s")
+        val ENGLISH_PLAIN =
+            Regex("\\s(the|how|what|where|which|who|is|are|do|does|can|my|me|to|of|in|on|show|open|change|set|please|hello|hi|thanks|i)(?=[\\s?.!,])")
         const val EARLIER_PL = "Streszczenie wcześniejszej części tej rozmowy:"
         const val EARLIER_EN = "Summary of the earlier part of this conversation:"
     }

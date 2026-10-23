@@ -148,7 +148,7 @@ class AssistantGuideTools(
     ): String = run("open_screen") {
         val target = bestMatch(SCREENS, screen)
             ?: return@run "No such screen. Available: " + SCREENS.joinToString { it.key }
-        val title = getStringSuspend(target.title)
+        val title = aiString(target.title)
         collector.add(AssistantAction(title, "$DEEP_LINK_BASE_URI/${target.path}"))
         "A button \"$title\" was added under the answer. Tell the user to tap it."
     }
@@ -164,8 +164,9 @@ class AssistantGuideTools(
     ): String = run("show_setting") {
         val target = bestMatch(SETTINGS, setting)
             ?: return@run "No such setting in the list. Explain where it is from the guide instead."
-        val title = getStringSuspend(target.title)
-        collector.add(AssistantAction(title, "$DEEP_LINK_BASE_URI/${target.path}", highlight = title))
+        // The caption is in the language of the answer; the blinking row is found by its title in the app's language.
+        val title = aiString(target.title)
+        collector.add(AssistantAction(title, "$DEEP_LINK_BASE_URI/${target.path}", highlight = getStringSuspend(target.title)))
         "A button \"$title\" was added under the answer; it opens the page and makes the setting blink. Tell the user to tap it."
     }
 
@@ -238,7 +239,7 @@ class AssistantGuideTools(
     /** Where a button leads, written as a path of screens, for example "Settings → LoRa". */
     suspend fun pathOf(action: AssistantAction): String {
         val path = action.uri.removePrefix("$DEEP_LINK_BASE_URI/").substringBefore('?')
-        val settings = getStringSuspend(Res.string.bottom_nav_settings)
+        val settings = aiString(Res.string.bottom_nav_settings)
         val screen = placeOf(action)
         return when {
             path == "settings" -> settings
@@ -250,7 +251,7 @@ class AssistantGuideTools(
     /** The name of the screen a button leads to (for example "MT_SW features"), or empty. */
     suspend fun placeOf(action: AssistantAction): String {
         val path = action.uri.removePrefix("$DEEP_LINK_BASE_URI/").substringBefore('?')
-        return SCREENS.firstOrNull { it.path == path }?.let { getStringSuspend(it.title) }.orEmpty()
+        return SCREENS.firstOrNull { it.path == path }?.let { aiString(it.title) }.orEmpty()
     }
 
     private fun run(name: String, block: suspend () -> String): String {
