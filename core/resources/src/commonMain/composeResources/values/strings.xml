@@ -96,6 +96,8 @@
     <string name="ai_conn_sleep">radio asleep</string>
     <string name="ai_conn_unknown">unknown</string>
     <string name="ai_dictation_note">Dictation in chats and the assistant uses the model chosen for the assistant. Dictation in the translator works only if the translator\'s own model can hear. Only the Gemma E2B and E4B models can hear; the smallest translator model (NLLB) cannot, so there is no dictation there.</string>
+    <string name="ai_dm_none">Nobody has written to you privately yet.</string>
+    <string name="ai_dm_title">Latest private messages to you (newest first):</string>
     <string name="ai_found_n">Found: %1$d (newest first)</string>
     <string name="ai_found_none">No messages found.</string>
     <string name="ai_found_none_for">No messages found for: %1$s</string>

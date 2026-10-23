@@ -75,6 +75,8 @@ ai_conn_disconnected
 ai_conn_sleep
 ai_conn_unknown
 ai_dictation_note
+ai_dm_none
+ai_dm_title
 ai_found_n
 ai_found_none
 ai_found_none_for

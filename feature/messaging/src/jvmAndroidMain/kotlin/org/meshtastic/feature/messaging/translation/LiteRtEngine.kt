@@ -207,7 +207,13 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
             throw e
         } catch (e: Exception) {
             // The model's window is full: keep what was written instead of failing the whole answer.
-            if (reply.isEmpty()) throw e
+            if (reply.isEmpty()) {
+                // A failure of the native part can leave the model's memory locked, and every next answer would fail
+                // too ("tensor buffer is already locked"): the model is freed and loaded fresh for the next try.
+                Logger.w(tag = TAG) { "Generation failed, the model is reloaded for the next answer: ${e.message?.lineSequence()?.firstOrNull()}" }
+                unload()
+                throw e
+            }
             Logger.w(tag = TAG, throwable = e) { "Answer ended early: ${e.message}" }
         }
         thoughts.push(restorer.finish()).plus(thoughts.finish()).takeIf { it.isNotEmpty() }?.let { runCatching { onPiece(it) } }
