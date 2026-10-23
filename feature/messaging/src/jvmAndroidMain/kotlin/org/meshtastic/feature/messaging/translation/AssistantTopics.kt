@@ -48,7 +48,7 @@ internal object AssistantTopics {
         listOf(
             "projekt", "założeni", "zalozeni", "osiągni", "osiagni", "bazuje", "mt_sw", "mt sw", "mtsw", "fork",
             "czym się różni", "czym sie rozni", "co dodaliśmy", "co dodalismy", "nasz cel", "nasze cele", "our project",
-            "achievement", "nasz firmware", "naszym firmware", "naszego firmware", "integracj", "home assistant", "protobuf", "spontaniczne", "cheaterenator", "mt-sw",
+            "achievement", "nasz firmware", "naszym firmware", "naszego firmware", "integracj", "home assistant", "spontaniczne", "cheaterenator", "mt-sw",
         )
 
     private val DATA_WORDS =

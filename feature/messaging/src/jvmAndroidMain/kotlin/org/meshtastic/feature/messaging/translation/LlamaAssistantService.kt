@@ -286,7 +286,7 @@ class LlamaAssistantService(
                 "If you are not sure of something, say so instead of guessing. Never invent settings or menu names. " +
                 "When the user says \"our project\", \"nasz projekt\" or asks about goals, assumptions or achievements, they mean the MT_SW fork, " +
                 "not the main Meshtastic project: answer only from the manual and change list about MT_SW features. " +
-                "Mention the main Meshtastic project only briefly and rarely, unless the user asks about it directly. " +
+                "MT_SW stays compatible with the main Meshtastic network and uses the original protobufs; mention the main project only briefly and rarely, unless the user asks about it directly. " +
                 "Never list network data (nodes, packets) unless the question asks for it."
     }
 }
