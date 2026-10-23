@@ -145,6 +145,16 @@ ai_nodes_none
 ai_none_value
 ai_privacy
 ai_private_chat
+ai_radio_ext
+ai_radio_heap
+ai_radio_nodes
+ai_radio_noise
+ai_radio_none
+ai_radio_packets
+ai_radio_relay
+ai_radio_title
+ai_radio_uptime
+ai_radio_util
 ai_scope_all
 ai_scope_channel
 ai_scope_default

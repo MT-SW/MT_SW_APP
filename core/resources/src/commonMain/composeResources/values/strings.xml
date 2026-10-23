@@ -166,6 +166,16 @@
     <string name="ai_none_value">n/a</string>
     <string name="ai_privacy">Everything is processed locally on this device. Once a model is downloaded, no texts or conversations are sent to the internet. The internet is only needed for the one-time model download.</string>
     <string name="ai_private_chat">private chat</string>
+    <string name="ai_radio_ext">processor %1$s %, flash used %2$s %</string>
+    <string name="ai_radio_heap">memory (heap) used %1$s % (%2$s of %3$s kB)</string>
+    <string name="ai_radio_nodes">nodes online %1$s of %2$s</string>
+    <string name="ai_radio_noise">noise floor %1$s dBm</string>
+    <string name="ai_radio_none">There are no statistics from your radio yet.</string>
+    <string name="ai_radio_packets">packets sent %1$s, received %2$s, bad %3$s, duplicates %4$s</string>
+    <string name="ai_radio_relay">relayed %1$s, relaying cancelled %2$s, dropped when sending %3$s</string>
+    <string name="ai_radio_title">Statistics of your radio %1$s:</string>
+    <string name="ai_radio_uptime">running for %1$s</string>
+    <string name="ai_radio_util">channel use %1$s %, own transmitting %2$s %</string>
     <string name="ai_scope_all">all conversations (channels and private)</string>
     <string name="ai_scope_channel">channel %1$s (%2$d)</string>
     <string name="ai_scope_default">default</string>
