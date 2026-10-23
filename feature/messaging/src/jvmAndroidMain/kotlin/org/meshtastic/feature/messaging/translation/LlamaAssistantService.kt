@@ -86,6 +86,9 @@ class LlamaAssistantService(
     private var memory = ""
     private var memorized = 0
 
+    // Turned off for this run of the app when the model file cannot think quietly.
+    @Volatile private var thinkingWorks = true
+
     // The model works on one thing at a time: an answer waits for a running notes update and the other way round.
     private val engineLock = kotlinx.coroutines.sync.Mutex()
 
@@ -128,7 +131,8 @@ class LlamaAssistantService(
         val answer: String? =
             when (intent.intent) {
                 "show_node_on_map" -> exact(goToNode(nodeNum, intent.node, planner = false))
-                "open_link_planner" -> exact(goToNode(nodeNum ?: data.resolveNodeNum("me", ""), intent.node, planner = true))
+                "open_link_planner" ->
+                    exact(goToNode(if (intent.node.isBlank()) nodeNum ?: data.resolveNodeNum("me", "") else nodeNum, intent.node, planner = true))
                 "nearest_node" -> exact(goToNearest(intent.role, intent.metric == "farthest"))
                 "open_screen" -> exact(goToPlace(intent.text, question, settingFirst = false))
                 "show_setting" -> exact(goToPlace(intent.text, question, settingFirst = true))
@@ -289,9 +293,10 @@ class LlamaAssistantService(
             recent.forEach { add((if (it.fromUser) "user" else "assistant") to it.text) }
         }
         val tools: List<ToolSet> = if (webOn) listOf(webTools) else emptyList()
+        val think = THINKING && thinkingWorks
         val text =
             try {
-                engine.chat(modelId, messages, MAX_ANSWER_TOKENS, TEMPERATURE, onPiece, tools, thinking = THINKING)
+                engine.chat(modelId, messages, MAX_ANSWER_TOKENS, TEMPERATURE, onPiece, tools, thinking = think)
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -302,7 +307,12 @@ class LlamaAssistantService(
                         engine.chat(modelId, listOf("system" to system.take(SHORT_SYSTEM_CHARS), messages.last()), MAX_ANSWER_TOKENS, TEMPERATURE, onPiece)
                     // A broken web search call: once more without the web.
                     msg.contains("parse tool calls", ignoreCase = true) ->
-                        engine.chat(modelId, messages, MAX_ANSWER_TOKENS, TEMPERATURE, onPiece, thinking = THINKING)
+                        engine.chat(modelId, messages, MAX_ANSWER_TOKENS, TEMPERATURE, onPiece, thinking = think)
+                    // The model file may not support quiet thinking: once more without it, and no more tries later.
+                    think -> {
+                        Logger.w(tag = TAG, throwable = e) { "Answer with thinking failed, trying without: $msg" }
+                        engine.chat(modelId, messages, MAX_ANSWER_TOKENS, TEMPERATURE, onPiece, tools).also { thinkingWorks = false }
+                    }
                     else -> throw e
                 }
             }
