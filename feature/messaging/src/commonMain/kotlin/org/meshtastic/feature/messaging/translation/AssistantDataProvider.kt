@@ -18,6 +18,7 @@ package org.meshtastic.feature.messaging.translation
 
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.offsetAt
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.common.util.systemTimeZone
 import org.meshtastic.core.model.MeshLog
