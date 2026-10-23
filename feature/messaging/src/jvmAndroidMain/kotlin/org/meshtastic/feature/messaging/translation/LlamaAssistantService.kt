@@ -196,7 +196,8 @@ class LlamaAssistantService(
                 val button = collector.last()?.label
                 val guide = knowledge?.lookup("$question ${intent.text}".trim(), KNOWLEDGE_CHARS * room).orEmpty()
                 val extra = buildString {
-                    if (guide.isNotBlank()) append(rule(polish, GUIDE_PL, GUIDE_EN)).append('\n').append(guide)
+                    append(rule(polish, GUIDE_PL, GUIDE_EN))
+                    if (guide.isNotBlank()) append('\n').append(guide)
                     if (button != null) append("\n\n").append(rule(polish, BUTTON_PL, BUTTON_EN).replace("%s", button))
                 }
                 speak(modelId, history, polish, onPiece, room, extra = extra)
@@ -524,11 +525,13 @@ class LlamaAssistantService(
             "Summarise the messages below in a few sentences: what was talked about and who wrote what. Do not copy them " +
                 "all and add nothing that is not in them."
         const val GUIDE_PL =
-            "FRAGMENTY INSTRUKCJI APLIKACJI (pewniejsze niż Twoja pamięć). Odpowiedz na ich podstawie i używaj ich nazw " +
-                "menu i ustawień. Jeśli nie opisują pytania, powiedz to."
+            "Pytanie dotyczy aplikacji MT_SW i jej funkcji (także Twoich: tłumacza, asystenta, dyktowania): wyjaśnij krok " +
+                "po kroku, gdzie to jest w aplikacji i jak to zrobić. Poniżej FRAGMENTY INSTRUKCJI APLIKACJI (pewniejsze niż " +
+                "Twoja pamięć). Odpowiedz na ich podstawie i używaj ich nazw menu i ustawień. Jeśli nie opisują pytania, powiedz to."
         const val GUIDE_EN =
-            "PAGES OF THE APP'S MANUAL (more reliable than your memory). Answer from them and use their names of menus " +
-                "and settings. If they do not cover the question, say so."
+            "The question is about the MT_SW app and its features (also yours: translator, assistant, dictation): explain " +
+                "step by step where it is in the app and how to do it. Below are PAGES OF THE APP'S MANUAL (more reliable than " +
+                "your memory). Answer from them and use their names of menus and settings. If they do not cover the question, say so."
         const val BUTTON_PL = "Pod Twoją odpowiedzią pojawi się przycisk \"Przejdź do: %s\", który otwiera to miejsce; możesz o nim wspomnieć."
         const val BUTTON_EN = "Under your answer there will be a button \"Go to: %s\" that opens that place; you may mention it."
         const val MEMORY_PL =
