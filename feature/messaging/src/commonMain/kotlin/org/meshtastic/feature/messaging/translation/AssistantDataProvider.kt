@@ -20,6 +20,10 @@ import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.StringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.ai_far_one
+import org.meshtastic.core.resources.ai_near_one
+import org.meshtastic.core.resources.ai_dist_next
+import org.meshtastic.core.resources.ai_nodes_recent
 import org.meshtastic.core.resources.ai_dm_title
 import org.meshtastic.core.resources.ai_dm_none
 import org.meshtastic.core.resources.ai_radio_title
@@ -576,7 +580,7 @@ class AssistantDataProvider(
             }
         val none = getStringSuspend(Res.string.ai_none_value)
         val sb = StringBuilder(title).append('\n')
-        for (r in sorted.take(REPORT_SIGNAL)) {
+        for (r in sorted.take(SIGNAL_SHOWN)) {
             val n = r.n
             val heard = if (n.lastHeard == 0) getStringSuspend(Res.string.ai_never) else ago(((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
             val snr = if (n.snr == Float.MAX_VALUE) none else fmt(n.snr) + " dB"
@@ -904,7 +908,7 @@ class AssistantDataProvider(
                 val text = m.text
                 if (needle.isNotEmpty() && !text.lowercase().fold().contains(needle)) continue
                 val who = if (m.fromLocal) "me" else m.node.user.short_name
-                found += Triple(m.receivedTime, label, "$who: ${text.take(MESSAGE_CHARS)}")
+                found += Triple(m.receivedTime, label, "$who: ${text.replace(Regex("\\s*\\n\\s*"), " ").take(MESSAGE_CHARS)}")
             }
         }
         if (found.isEmpty()) {
@@ -1268,6 +1272,33 @@ class AssistantDataProvider(
         return if (farthest) rows.maxByOrNull { it.second } else rows.minByOrNull { it.second }
     }
 
+    /**
+     * The nearest or farthest node as one short sentence, and the next few after it with only their distance: a long
+     * table with every value of every node was too much for such a simple question.
+     */
+    private suspend fun distanceAnswer(role: String, farthest: Boolean): String? {
+        val me = nodeRepository.ourNodeInfo.value ?: return null
+        val roleOnly = roleFilter(role.lowercase())
+        val rows =
+            nodeRepository.nodeDBbyNum.value.values
+                .filter { it.num != me.num && (roleOnly?.invoke(it) ?: true) }
+                .mapNotNull { n -> n.distance(me)?.let { n to it } }
+                .let { list -> if (farthest) list.sortedByDescending { it.second } else list.sortedBy { it.second } }
+        val (first, meters) = rows.firstOrNull() ?: return null
+        val nowS = nowMillis / MILLIS_PER_SECOND
+        val heard = if (first.lastHeard == 0) getStringSuspend(Res.string.ai_never) else ago(((nowS - first.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+        val sb =
+            StringBuilder(
+                getStringSuspend(
+                    if (farthest) Res.string.ai_far_one else Res.string.ai_near_one,
+                    first.user.long_name.ifBlank { first.user.short_name }, first.user.short_name, kilometres(meters), heard,
+                ),
+            )
+        val next = rows.drop(1).take(NEXT_SHOWN).joinToString(", ") { (n, m) -> "${n.user.long_name.ifBlank { n.user.short_name }} ${kilometres(m)} km" }
+        if (next.isNotBlank()) sb.append('\n').append(getStringSuspend(Res.string.ai_dist_next, next))
+        return sb.toString()
+    }
+
     /** A distance in metres written in kilometres with one decimal. */
     fun kilometres(meters: Int): String = fmt(meters / METERS_PER_KM)
 
@@ -1384,6 +1415,7 @@ class AssistantDataProvider(
 
     /** The list of nodes by distance ([order] nearest / farthest) or by signal (anything else), for one role or all. */
     suspend fun signalListFor(role: String, order: String): String {
+        if (order == "nearest" || order == "farthest") distanceAnswer(role, order == "farthest")?.let { return it }
         val words =
             when (order) {
                 "farthest" -> "najdal"
@@ -1434,13 +1466,12 @@ class AssistantDataProvider(
             val heard =
                 all.filter { it.lastHeard != 0 && it.lastHeard * MILLIS_PER_SECOND >= window.since && it.lastHeard * MILLIS_PER_SECOND < window.until }
                     .sortedByDescending { it.lastHeard }
-            val nowS = nowMillis / MILLIS_PER_SECOND
             val sb = StringBuilder(getStringSuspend(Res.string.ai_nodes_heard_title, window.title(), heard.size, all.size))
-            for (n in heard.take(MAX_TOOL_LIST)) {
-                val heardAgo = ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
-                sb.append("\n• ${n.user.long_name} (${n.user.short_name}), ${getStringSuspend(Res.string.ai_heard, heardAgo)}")
+            if (heard.isNotEmpty()) {
+                val names = heard.take(NAMES_SHOWN).joinToString(", ") { it.user.long_name.ifBlank { it.user.short_name } }
+                sb.append('\n').append(getStringSuspend(Res.string.ai_nodes_recent, names))
+                if (heard.size > NAMES_SHOWN) sb.append(' ').append(getStringSuspend(Res.string.ai_more, heard.size - NAMES_SHOWN))
             }
-            if (heard.size > MAX_TOOL_LIST) sb.append('\n').append(getStringSuspend(Res.string.ai_more, heard.size - MAX_TOOL_LIST))
             return sb.toString()
         }
         val hours = window?.takeIf { it.since > 0 }?.let { ((nowMillis - it.since + MILLIS_PER_HOUR - 1) / MILLIS_PER_HOUR).toInt() } ?: 0
@@ -1674,7 +1705,10 @@ class AssistantDataProvider(
         const val SIGNAL_TOP = 8
         const val REPORT_SIGNAL = 15
         const val SENSOR_LIMIT = 12
-        const val REPORT_LIMIT = 40
+        const val REPORT_LIMIT = 12
+        const val SIGNAL_SHOWN = 6
+        const val NEXT_SHOWN = 3
+        const val NAMES_SHOWN = 12
         val CHANNEL_NUMBER = Regex("(?:kana[łl]\\w*|channel)\\s*(?:nr\\.?|numer\\w*|#|no\\.?)?\\s*(\\d+|[a-ząćęłńóśźż]+)")
         val NUMBER_WORDS =
             mapOf("zer" to 0, "jede" to 1, "jedyn" to 1, "one" to 1, "pierw" to 1, "dw" to 2, "two" to 2, "trz" to 3, "three" to 3, "czter" to 4, "four" to 4, "pię" to 5, "pie" to 5, "five" to 5, "sze" to 6, "six" to 6, "sied" to 7, "seven" to 7)

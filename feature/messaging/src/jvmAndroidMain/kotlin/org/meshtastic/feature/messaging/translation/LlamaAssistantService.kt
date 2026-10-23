@@ -617,7 +617,7 @@ class LlamaAssistantService(
         const val SUMMARY_TOKENS = 250
         const val SUMMARY_TEMPERATURE = 0.2f
         const val SUMMARY_MESSAGES = 25
-        const val SEARCH_SHOWN = 15
+        const val SEARCH_SHOWN = 5
         const val LIST_SHOWN = 10
         const val MAX_DRAFT = 200
         const val MIN_NOTE_QUESTION = 25

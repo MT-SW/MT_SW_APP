@@ -3184,4 +3184,8 @@
     <string name="ai_help_where">„%1$s” jest w: %2$s.</string>
     <string name="ai_help_from_manual">Z instrukcji aplikacji:</string>
     <string name="ai_help_news">Najnowsze zmiany w MT_SW:</string>
+    <string name="ai_far_one">Najdalej jest %1$s (%2$s): %3$s km, słyszany %4$s.</string>
+    <string name="ai_near_one">Najbliżej jest %1$s (%2$s): %3$s km, słyszany %4$s.</string>
+    <string name="ai_dist_next">Następne: %1$s</string>
+    <string name="ai_nodes_recent">Ostatnio słyszane: %1$s</string>
 </resources>
