@@ -381,19 +381,22 @@ class AssistantDataProvider(
         }
         if (rows.isEmpty()) return "NODE RANKING: no telemetry from nodes in the last 3 days."
         data class Key(val label: String, val descending: Boolean, val pick: (NodeRow) -> Float?)
-        val key =
+        val rxKey = Key("packets received (rx)", true) { it.rx?.toFloat() }
+        val txKey = Key("packets sent (tx)", true) { it.tx?.toFloat() }
+        val wantsTx = q.hasAny(listOf("wysł", "wysl", "nadan", " tx", "transmit", "sent"))
+        val wantsRx = q.hasAny(listOf("odebr", "otrzym", "przyjęt", "przyjet", " rx", "receiv"))
+        val keys =
             when {
-                q.hasAny(listOf("wysł", "wysl", "nadan", " tx", "transmit", "sent")) -> Key("packets sent (tx)", true) { it.tx?.toFloat() }
-                q.hasAny(listOf("duplik", "dupe")) -> Key("duplicate packets received", true) { it.dupe?.toFloat() }
-                q.hasAny(listOf("błęd", "bled", "uszkodz", "bad ")) -> Key("bad packets received", true) { it.bad?.toFloat() }
-                q.hasAny(listOf("heap", "pamię", "pamie", " ram")) -> Key("used heap percent (highest first)", true) { it.heapUsed }
-                q.hasAny(listOf("bateri", "battery")) -> Key("battery percent (lowest first)", false) { it.battery?.toFloat() }
-                q.hasAny(listOf("zajęt", "zajet", "kanał", "kanal", "channel", "utiliz")) -> Key("channel utilization percent", true) { it.chUtil }
-                q.hasAny(listOf("uptime", "działa od", "dziala od", "restart")) -> Key("uptime", true) { it.uptime?.toFloat() }
-                else -> Key("packets received (rx)", true) { it.rx?.toFloat() }
+                wantsTx && wantsRx -> listOf(rxKey, txKey)
+                wantsTx -> listOf(txKey)
+                q.hasAny(listOf("duplik", "dupe")) -> listOf(Key("duplicate packets received", true) { it.dupe?.toFloat() })
+                q.hasAny(listOf("błęd", "bled", "uszkodz", "bad ")) -> listOf(Key("bad packets received", true) { it.bad?.toFloat() })
+                q.hasAny(listOf("heap", "pamię", "pamie", " ram")) -> listOf(Key("used heap percent (highest first)", true) { it.heapUsed })
+                q.hasAny(listOf("bateri", "battery")) -> listOf(Key("battery percent (lowest first)", false) { it.battery?.toFloat() })
+                q.hasAny(listOf("zajęt", "zajet", "kanał", "kanal", "channel", "utiliz")) -> listOf(Key("channel utilization percent", true) { it.chUtil })
+                q.hasAny(listOf("uptime", "działa od", "dziala od", "restart")) -> listOf(Key("uptime", true) { it.uptime?.toFloat() })
+                else -> listOf(rxKey)
             }
-        val withValue = rows.values.filter { key.pick(it) != null }
-        val sorted = if (key.descending) withValue.sortedByDescending { key.pick(it) } else withValue.sortedBy { key.pick(it) }
         fun line(r: NodeRow): String {
             val n = nodeRepository.nodeDBbyNum.value[r.num]
             val name = n?.let { "${it.user.short_name} (${it.user.long_name}), id ${it.user.id}" } ?: "!${r.num.toUInt().toString(HEX)}"
@@ -401,15 +404,21 @@ class AssistantDataProvider(
                 "heap_used=${r.heapUsed?.let { fmt(it) } ?: "?"}%, battery=${r.battery ?: "?"}%, ch_util=${r.chUtil?.let { fmt(it) } ?: "?"}%, " +
                 "air_tx=${r.airUtil?.let { fmt(it) } ?: "?"}%, uptime=${r.uptime?.let { it / SECONDS_PER_HOUR } ?: "?"} h"
         }
-        return buildString {
-            appendLine(
-                "NODE RANKING by ${key.label}: ${sorted.size} of ${rows.size} nodes reported. Counters are the node's own totals since " +
-                    "it started. Best first:",
-            )
-            sorted.take(top).forEach { appendLine(line(it)) }
-            if (sorted.size > top + RANK_BOTTOM) {
-                appendLine("... Last ones:")
-                sorted.takeLast(RANK_BOTTOM).forEach { appendLine(line(it)) }
+        // With two keys (received AND sent) each list is shorter, so both fit in the small window.
+        val limit = if (keys.size > 1) maxOf(top / 2, 3) else top
+        return keys.joinToString("\n") { key ->
+            val withValue = rows.values.filter { key.pick(it) != null }
+            val sorted = if (key.descending) withValue.sortedByDescending { key.pick(it) } else withValue.sortedBy { key.pick(it) }
+            buildString {
+                appendLine(
+                    "NODE RANKING by ${key.label}: ${sorted.size} of ${rows.size} nodes reported. Counters are the node's own totals " +
+                        "since it started. Every value in a line belongs to THAT node only. Best first:",
+                )
+                sorted.take(limit).forEach { appendLine(line(it)) }
+                if (sorted.size > limit + RANK_BOTTOM) {
+                    appendLine("... Last ones:")
+                    sorted.takeLast(RANK_BOTTOM).forEach { appendLine(line(it)) }
+                }
             }
         }
     }
