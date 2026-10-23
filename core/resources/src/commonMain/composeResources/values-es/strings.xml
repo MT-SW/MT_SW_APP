@@ -329,6 +329,8 @@ Rango de Valores 0 - 500.</string>
     <string name="legacy_admin_channel">Canal de administración antiguo</string>
     <!-- LICENSED -->
     <string name="licensed_amateur_radio_text">Activando esta opción se desactiva la encriptación y deja de ser compatible con la red de Meshtastic normal.</string>
+    <!-- LIVE -->
+    <string name="live_update_direct">Directo</string>
     <!-- LOAD -->
     <string name="load">Carga</string>
     <string name="load_indexed">Carga %1$d</string>
@@ -426,6 +428,7 @@ Estos datos de ubicación pueden ser utilizados para fines como aparecer en un m
     <string name="mqtt_config">Configuración MQTT</string>
     <string name="mqtt_status_connected">Conectado</string>
     <string name="mqtt_status_disconnected">Desconectado</string>
+    <string name="mqtt_topic_finder_level_region">Región</string>
     <string name="must_set_region">¡Debe establecer una región!</string>
     <string name="must_update">Debe actualizar esta aplicación en la tienda de aplicaciones (o en Github). Es demasiado vieja para comunicarse con este firmware de radio. Por favor, lea nuestra <a href="https://meshtastic.org/docs/software/android/installation">documentación</a> sobre este tema.</string>
     <!-- MUTE -->
@@ -684,6 +687,7 @@ Estos datos de ubicación pueden ser utilizados para fines como aparecer en un m
     <string name="swipe_action_unmute">Desilenciar</string>
     <string name="system_settings">Ajustes del sistema</string>
     <!-- TAK -->
+    <string name="tak_server_regenerate_certs_confirm">Regenerar</string>
     <string name="tak_server_section">Servidor</string>
     <string name="telemetry">Telemetría</string>
     <string name="telemetry_config">Configuración de la telemetría</string>

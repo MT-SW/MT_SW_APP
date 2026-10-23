@@ -2,7 +2,7 @@
 title: Połączenia
 parent: Przewodnik użytkownika
 nav_order: 2
-last_updated: 2026-10-21
+last_updated: 2026-10-22
 description: Połącz telefon lub komputer z radiem przez Bluetooth, USB lub TCP/IP.
 aliases:
   - bluetooth
@@ -144,6 +144,17 @@ Po ustawieniu regionu zakładka ostrzega, jeśli radio jest tylko do odbioru: ka
 
 Więcej informacji znajdziesz w [Ustawienia — Radio i użytkownik](settings-radio-user#lora-config).
 
+## Live Update
+
+Na Androidzie 16 i nowszym zakładka **Połącz** ma wiersz **Live Update**, gdy jesteś połączony. Umieszcza w pasku stanu i w powiadomieniu usługi jedną wybraną przez Ciebie rzecz:
+
+- **Stan sieci:** połączenie, ile węzłów jest online, Twoje nieprzeczytane wiadomości i bateria Twojego węzła. Pasek stanu pokazuje węzły online, na przykład `5/12`.
+- **Śledzenie węzła:** bateria jednego węzła, sygnał, kiedy był ostatnio słyszany, liczba skoków i odległość od Twojego węzła. Pasek stanu pokazuje jego baterię albo, gdy węzeł nie podaje baterii, jak dawno był słyszany. Węzeł wybierasz z listy (najpierw ulubione, potem ostatnio słyszane) albo wyszukujesz po nazwie.
+
+Dotknij wiersza, aby uruchomić jedną z tych funkcji, przełączyć się na drugą albo ją zatrzymać. Działa tylko jedna naraz i jest wyłączona, dopóki jej nie uruchomisz. W szczegółach węzła przycisk **Śledź w Live Update** od razu zaczyna śledzić ten węzeł.
+
+Zerwane połączenie nie zatrzymuje funkcji i pokazuje stan połączenia, dopóki węzeł nie wróci. Rozłączenie, zmiana węzła albo usunięcie lub zignorowanie śledzonego węzła ją zatrzymuje. Jeśli wiersz informuje, że Live Update jest wyłączone dla MT_SW_APP, Android pokazuje je jako zwykłe powiadomienie, dopóki nie zezwolisz na nie w ustawieniach systemu.
+
 ## Ponowne łączenie
 
 Aplikacja łączy się ponownie z ostatnio wybranym radiem przy uruchomieniu. Transporty możesz przełączać w zakładce **Połącz** w dowolnym momencie.
@@ -158,10 +169,10 @@ Na Androidzie możesz dodać kafelek **MT_SW_APP** do szybkich ustawień: rozwi�
 
 - **Połączono** — kafelek jest włączony i pokazuje krótką nazwę Twojego węzła. Dotknięcie rozłącza, tak samo jak przycisk rozłączania w zakładce **Połącz**.
 - **Łączenie** — kafelek jest włączony i pokazuje „Łączenie”. Dotknięcie anuluje.
-- **Rozłączono** lub **Urządzenie śpi** — kafelek jest wyłączony. Dotknięcie łączy ponownie z ostatnio wybranym radiem.
-- **Nie wybrano urządzenia** — dotknięcie kafelka otwiera zakładkę **Połącz**, gdzie wybierasz radio.
+- **Rozłączono** lub **Urządzenie śpi** — kafelek jest wyłączony. Dotknięcie łączy ponownie z ostatnio wybranym węzłem.
+- **Nie wybrano urządzenia** — dotknięcie kafelka otwiera zakładkę **Połącz**, gdzie wybierasz węzeł.
 
-Rozłączenie zapomina wybrane radio, więc po rozłączeniu kafelek otwiera zakładkę **Połącz**. Jeśli Android nie pozwala aplikacji połączyć się w tle, kafelek otwiera aplikację i połączenie zaczyna się stamtąd. Na zablokowanym telefonie kafelek najpierw prosi o odblokowanie.
+Rozłączenie zapomina wybrany węzeł, więc po rozłączeniu kafelek otwiera zakładkę **Połącz**. Jeśli Android nie pozwala aplikacji połączyć się w tle, kafelek otwiera aplikację i połączenie zaczyna się stamtąd. Na zablokowanym telefonie kafelek najpierw prosi o odblokowanie.
 
 ## Połączenia na komputerze
 

@@ -38,6 +38,7 @@ import org.meshtastic.core.database.dao.FirmwareReleaseDao
 import org.meshtastic.core.database.dao.MaintenanceUf2Dao
 import org.meshtastic.core.database.dao.MergeMarkerDao
 import org.meshtastic.core.database.dao.MeshLogDao
+import org.meshtastic.core.database.dao.MqttRootsDao
 import org.meshtastic.core.database.dao.NodeInfoDao
 import org.meshtastic.core.database.dao.PacketDao
 import org.meshtastic.core.database.dao.QuickChatActionDao
@@ -56,6 +57,7 @@ import org.meshtastic.core.database.entity.MaintenanceUf2CacheEntity
 import org.meshtastic.core.database.entity.MergeMarkerEntity
 import org.meshtastic.core.database.entity.MeshLog
 import org.meshtastic.core.database.entity.MetadataEntity
+import org.meshtastic.core.database.entity.MqttRootsCacheEntity
 import org.meshtastic.core.database.entity.MyNodeEntity
 import org.meshtastic.core.database.entity.NodeEntity
 import org.meshtastic.core.database.entity.Packet
@@ -88,6 +90,7 @@ import org.meshtastic.core.database.entity.TracerouteNodePositionEntity
         ChannelSetEntity::class,
         BootloaderOtaQuirksCacheEntity::class,
         MaintenanceUf2CacheEntity::class,
+        MqttRootsCacheEntity::class,
     ],
     autoMigrations =
     [
@@ -152,9 +155,10 @@ import org.meshtastic.core.database.entity.TracerouteNodePositionEntity
         AutoMigration(from = 61, to = 62),
         AutoMigration(from = 62, to = 63),
         // 63 -> 64 is the manual MIGRATION_63_64 (log index added in place), applied via configureCommon().
-        // 64 -> 65 is the manual MIGRATION_64_65 (three more log indices added in place), applied the same way.
+        AutoMigration(from = 64, to = 65),
+        // 65 -> 66 is the manual MIGRATION_65_66 (three more log indices added in place), applied via configureCommon().
     ],
-    version = 65,
+    version = 66,
     exportSchema = true,
 )
 @androidx.room3.ConstructedBy(MeshtasticDatabaseConstructor::class)
@@ -189,6 +193,8 @@ abstract class MeshtasticDatabase : RoomDatabase() {
     abstract fun bootloaderOtaQuirksDao(): BootloaderOtaQuirksDao
 
     abstract fun maintenanceUf2Dao(): MaintenanceUf2Dao
+
+    abstract fun mqttRootsDao(): MqttRootsDao
 
     companion object {
         /**
@@ -267,8 +273,8 @@ abstract class MeshtasticDatabase : RoomDatabase() {
          * (`port_num, from_num, received_date`, answered from the index alone). Without them those queries read
          * and sort a large part of the log table.
          */
-        internal val MIGRATION_64_65: Migration =
-            object : Migration(64, 65) {
+        internal val MIGRATION_65_66: Migration =
+            object : Migration(65, 66) {
                 override suspend fun migrate(connection: SQLiteConnection) {
                     connection.execSQL(
                         "CREATE INDEX IF NOT EXISTS `index_log_port_num_received_date` " +
@@ -301,8 +307,9 @@ abstract class MeshtasticDatabase : RoomDatabase() {
         @OptIn(ExperimentalCoroutinesApi::class)
         fun <T : RoomDatabase> RoomDatabase.Builder<T>.configureCommon(): RoomDatabase.Builder<T> =
             this.fallbackToDestructiveMigration(dropAllTables = false)
-                .addMigrations(MIGRATION_52_53, MIGRATION_63_64, MIGRATION_64_65)
+                .addMigrations(MIGRATION_52_53, MIGRATION_63_64, MIGRATION_65_66)
                 .setSingleConnectionPool()
+                .setConnectionPoolTimeout(ROOM_POOL_ACQUIRE_TIMEOUT)
                 .setQueryCoroutineContext(
                     // limitedParallelism(1) has the same throughput ceiling as the single-connection pool
                     // (already serialized), so this only blocks the cancellation pileup — not real I/O concurrency.
@@ -313,19 +320,19 @@ abstract class MeshtasticDatabase : RoomDatabase() {
 
 @DeleteTable(tableName = "NodeInfo")
 @DeleteTable(tableName = "MyNodeInfo")
-class AutoMigration12to13 : AutoMigrationSpec
+object AutoMigration12to13 : AutoMigrationSpec
 
 @DeleteColumn(tableName = "packet", columnName = "reply_id")
-class AutoMigration29to30 : AutoMigrationSpec
+object AutoMigration29to30 : AutoMigrationSpec
 
 @DeleteColumn(tableName = "packet", columnName = "retry_count")
 @DeleteColumn(tableName = "reactions", columnName = "retry_count")
-class AutoMigration33to34 : AutoMigrationSpec
+object AutoMigration33to34 : AutoMigrationSpec
 
 @DeleteColumn(tableName = "packet", columnName = "retry_count")
 @DeleteColumn(tableName = "reactions", columnName = "retry_count")
-class AutoMigration34to35 : AutoMigrationSpec
+object AutoMigration34to35 : AutoMigrationSpec
 
 /** Device links moved from the bundled `urls.json` to the resolved API; `original_url` is no longer stored. */
 @DeleteColumn(tableName = "device_link", columnName = "original_url")
-class AutoMigration42to43 : AutoMigrationSpec
+object AutoMigration42to43 : AutoMigrationSpec
