@@ -156,7 +156,7 @@ import org.meshtastic.core.database.entity.TracerouteNodePositionEntity
         AutoMigration(from = 62, to = 63),
         // 63 -> 64 is the manual MIGRATION_63_64 (log index added in place), applied via configureCommon().
         AutoMigration(from = 64, to = 65),
-        // 65 -> 66 is the manual MIGRATION_65_66 (three more log indices added in place), applied via configureCommon().
+        // 65 -> 66 is the manual MIGRATION_65_66 (the MQTT root cache table and three more log indices, added in place), applied via configureCommon().
     ],
     version = 66,
     exportSchema = true,
@@ -276,6 +276,12 @@ abstract class MeshtasticDatabase : RoomDatabase() {
         internal val MIGRATION_65_66: Migration =
             object : Migration(65, 66) {
                 override suspend fun migrate(connection: SQLiteConnection) {
+                    // Our own version 65 (log indices) differs from the original's 65 (MQTT root cache table), so a
+                    // database that was at our 65 never got that table. IF NOT EXISTS keeps this safe for both.
+                    connection.execSQL(
+                        "CREATE TABLE IF NOT EXISTS `mqtt_roots_cache` " +
+                            "(`id` INTEGER NOT NULL, `roots_json` TEXT NOT NULL, PRIMARY KEY(`id`))",
+                    )
                     connection.execSQL(
                         "CREATE INDEX IF NOT EXISTS `index_log_port_num_received_date` " +
                             "ON `log` (`port_num`, `received_date`)",
