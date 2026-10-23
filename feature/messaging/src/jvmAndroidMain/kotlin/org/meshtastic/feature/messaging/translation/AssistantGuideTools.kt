@@ -310,7 +310,7 @@ class AssistantGuideTools(
                 Target("chat_images", "settings/mt-sw-features", Res.string.auto_load_chat_images, listOf("zdjęci", "obrazk", "images", "podgląd link")),
                 Target("theme", "settings", Res.string.theme, listOf("motyw", "theme", "ciemny", "jasny", "dark", "light", "tryb ciemny")),
                 Target("language", "settings", Res.string.preferences_language, listOf("język", "language", "jezyk")),
-                Target("log_retention", "settings", Res.string.log_retention_days, listOf("ramk", "logi", "statystyk", "pamięt", "czas", "baz", "dni", "retention", "historia", "ile czasu")),
+                Target("log_retention", "settings/mt-sw-features", Res.string.log_retention_days, listOf("ramk", "logi", "statystyk", "pamięt", "czas", "baz", "dni", "retention", "historia", "ile czasu")),
             )
     }
 }
