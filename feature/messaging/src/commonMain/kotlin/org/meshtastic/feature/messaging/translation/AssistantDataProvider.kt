@@ -108,7 +108,7 @@ class AssistantDataProvider(
         val q = question.lowercase()
         if (q.hasAny(SUMMARY_WORDS) || !q.hasAny(MESSAGE_WORDS) || !q.hasAny(COUNT_WORDS)) return null
         if (!q.hasAny(TODAY_WORDS) && !q.contains("godzin") && !q.contains("najwięcej") && !q.contains("najwiecej")) return null
-        val hours = if (q.hasAny(TODAY_WORDS)) 0 else if (q.contains("godzin")) Regex("(\\d+)\\s*godz").find(q)?.groupValues?.get(1)?.toIntOrNull() ?: HOURS_WORD_DEFAULT else 0
+        val hours = if (q.hasAny(TODAY_WORDS)) 0 else if (q.contains("godzin")) Regex("(\\d+)\\s*godz").find(q)?.groupValues?.get(1)?.toIntOrNull() ?: HOURS_WORD_DEFAULT else -1
         return safe("count") { toolMessageCount(channelFromQuestion(q), hours) }.takeIf { it.isNotBlank() }
     }
 
@@ -774,7 +774,7 @@ class AssistantDataProvider(
 
     /**
      * How many messages were received on a channel (empty = every channel and direct messages) in a time window,
-     * counted in code. [hours] 0 means "today" (since local midnight); 1 to 720 means the last that many hours.
+     * counted in code. [hours] 0 means "today" (since local midnight); 1 to 720 means the last that many hours; -1 means all saved messages.
      */
     suspend fun toolMessageCount(channel: String, hours: Int): String {
         val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
@@ -787,7 +787,8 @@ class AssistantDataProvider(
         val now = nowMillis
         val offsetMs = systemTimeZone.offsetAt(kotlin.time.Instant.fromEpochMilliseconds(now)).totalSeconds * MILLIS_PER_SECOND
         val since =
-            if (hours > 0) now - hours.toLong().coerceAtMost(MAX_COUNT_HOURS) * MILLIS_PER_HOUR
+            if (hours < 0) 0L
+            else if (hours > 0) now - hours.toLong().coerceAtMost(MAX_COUNT_HOURS) * MILLIS_PER_HOUR
             else ((now + offsetMs) / MILLIS_PER_DAY) * MILLIS_PER_DAY - offsetMs
         val keys = packetRepository.getContacts().first().keys.filter { key ->
             if (index == null) true else key.endsWith("^all") && key.startsWith("$index^")
@@ -800,14 +801,17 @@ class AssistantDataProvider(
             for (m in list) {
                 if (m.receivedTime < since) continue
                 total++
-                if (m.fromLocal) mine++ else perSender.merge(m.node.user.long_name.ifBlank { m.node.user.short_name }, 1, Int::plus)
+                val ownName = nodeRepository.ourNodeInfo.value?.user?.let { it.long_name.ifBlank { it.short_name } }.orEmpty()
+                val who = if (m.fromLocal) ownName.ifBlank { "ja" } else m.node.user.long_name.ifBlank { m.node.user.short_name }
+                if (m.fromLocal) mine++
+                perSender.merge(who, 1, Int::plus)
             }
         }
         val label = if (index == null) "wszystkie rozmowy" else "kanał $index (${names.getOrNull(index)?.ifBlank { null } ?: "domyślny"})"
-        val window = if (hours > 0) "ostatnie $hours h" else "dzisiaj (od północy)"
+        val window = if (hours < 0) "wszystkie zapisane" else if (hours > 0) "ostatnie $hours h" else "dzisiaj (od północy)"
         val sb = StringBuilder("Liczba wiadomości, $label, $window: $total (w tym moje: $mine)")
         if (perSender.isNotEmpty()) {
-            sb.append("\nNajwięcej piszą: ")
+            sb.append("\nKto napisał najwięcej (łącznie z moimi): ")
             sb.append(perSender.entries.sortedByDescending { it.value }.take(TOP_SENDERS).joinToString { "${it.key} ${it.value}" })
         }
         return sb.toString()
@@ -1060,7 +1064,7 @@ class AssistantDataProvider(
         const val COUNT_PER_CHAT = 3000
         const val MAX_COUNT_HOURS = 720L
         const val MILLIS_PER_DAY = 86_400_000L
-        const val TOP_SENDERS = 5
+        const val TOP_SENDERS = 8
         const val MILLIS_PER_HOUR = 3_600_000L
         const val MILLIS_PER_MINUTE = 60_000L
         const val METERS_PER_KM = 1000f

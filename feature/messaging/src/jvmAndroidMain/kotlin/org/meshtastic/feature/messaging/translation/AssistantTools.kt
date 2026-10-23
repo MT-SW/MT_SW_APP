@@ -91,7 +91,7 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
     )
     fun count_messages(
         @ToolParam(description = "Channel name or number, or the word all for all conversations") channel: String,
-        @ToolParam(description = "0 = today since midnight, otherwise the last N hours (1 to 720)") hours: Int,
+        @ToolParam(description = "0 = today since midnight, -1 = all saved messages, otherwise the last N hours (1 to 720)") hours: Int,
     ): String = run("count_messages") { data.toolMessageCount(channel, hours) }
 
     @Tool(
