@@ -127,14 +127,13 @@ class LlamaAssistantService(
         val current = store.notes.value.filter { !it.byUser }.joinToString("\n") { "### ${it.name}\n${it.text}" }
         val prompt =
             "You keep short notes about the user in a few files so you can remember them in later conversations. " +
-                "Below are the current notes and the newest exchange. Write only durable facts worth remembering: who " +
+                "Below are the current notes and the newest message of the user. Write only durable facts the USER stated worth remembering: who " +
                 "the user is, their devices and network, how they like to be answered, what they work on. Never store " +
                 "passwords, exact positions, current sensor values, one-time questions, or anything only you guessed. " +
                 "Write the notes in the language of the user. Output every file that changes as a line '### file-name' " +
                 "followed by its full new text (at most 4 short sentences). Good file names: o-uzytkowniku, " +
                 "siec-i-sprzet, styl-rozmowy, projekty. If nothing is worth saving, output exactly: NOTHING.\n\n" +
-                "Current notes:\n${current.ifBlank { "(none)" }}\n\nNewest exchange:\nUser: ${question.take(NOTE_TURN_CHARS)}\n" +
-                "Assistant: ${answer.take(NOTE_TURN_CHARS)}"
+                "Current notes:\n${current.ifBlank { "(none)" }}\n\nNewest message of the user:\n${question.take(NOTE_TURN_CHARS)}"
         val out = engine.chat(modelId, listOf("user" to prompt), NOTE_TOKENS, SUMMARY_TEMPERATURE)
         if (out.contains("NOTHING") && !out.contains("###")) return
         for (block in out.split(Regex("(?m)^###\\s*")).drop(1)) {
@@ -228,6 +227,9 @@ class LlamaAssistantService(
             if (dataText.isNotBlank()) append("\n\n").append(DATA_INTRO).append('\n').append(dataText)
             if (guideText.isNotBlank()) append("\n\n").append(GUIDE_INTRO).append('\n').append(guideText)
         }
+        Logger.i(tag = "AssistantPrompt") {
+            "Prompt: system ${system.length} chars (data ${dataText.length}, guide ${guideText.length}, summary ${summary.length}), topic $topic"
+        }
         val messages = buildList {
             add("system" to system)
             turns.forEach { add((if (it.fromUser) "user" else "assistant") to it.text) }
@@ -312,7 +314,7 @@ class LlamaAssistantService(
         const val BASE_TOKENS = 4096
         const val DEFAULT_TOOL_CHARS = 2200
         const val KNOWLEDGE_CHARS = 1500
-        const val TEMPERATURE = 0.5f
+        const val TEMPERATURE = 0.3f
         const val RECENT_CHARS = 1500
         const val MAX_TURN_CHARS = 1500
         const val SUMMARY_TURN_CHARS = 500
@@ -365,7 +367,9 @@ class LlamaAssistantService(
                 "language of the user (usually Polish), short sentences, your own words. Do not sound like a manual or a " +
                 "form: no stiff phrases, no repeating the question, no closing offers such as \"if you want, I can...\", " +
                 "no bullet lists unless the user needs a list. Small talk, jokes and opinions are fine; answer them " +
-                "briefly and naturally, and when a topic is unclear, just ask one short question. " +
+                "briefly and naturally. When the question can be answered from the data, the tools or the manual, look it up and answer " +
+                "right away; never ask the user for permission or what they mean when you can find it yourself, and never answer " +
+                "with only a question. Write correct, simple Polish and check every word. " +
                 "Help with Meshtastic, radio settings, antennas, range, nodes, channels and the app. " +
                 "If you are not sure of something, say so instead of guessing. Never invent settings or menu names. " +
                 "When the user says \"our project\", \"nasz projekt\" or asks about goals, assumptions or achievements, they mean the MT_SW fork, " +
