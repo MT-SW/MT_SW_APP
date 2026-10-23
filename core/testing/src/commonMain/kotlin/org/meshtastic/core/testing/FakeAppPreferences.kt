@@ -383,7 +383,7 @@ class FakeUiPrefs : UiPrefs {
         assistantInternetEnabled.value = value
     }
 
-    override val assistantMemoryEnabled = MutableStateFlow(true)
+    override val assistantMemoryEnabled = MutableStateFlow(false)
 
     override fun setAssistantMemoryEnabled(value: Boolean) {
         assistantMemoryEnabled.value = value

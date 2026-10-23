@@ -228,7 +228,7 @@ class LlamaAssistantService(
             if (guideText.isNotBlank()) append("\n\n").append(GUIDE_INTRO).append('\n').append(guideText)
         }
         Logger.i(tag = "AssistantPrompt") {
-            "Prompt: system ${system.length} chars (data ${dataText.length}, guide ${guideText.length}, summary ${summary.length}), topic $topic"
+            "Prompt: system ${system.length} chars (data ${dataText.length}, guide ${guideText.length}, summary ${summary.length}, notes ${memoryStore?.promptText(MEMORY_CHARS * room)?.length ?: 0}), topic $topic"
         }
         val messages = buildList {
             add("system" to system)
@@ -314,7 +314,7 @@ class LlamaAssistantService(
         const val BASE_TOKENS = 4096
         const val DEFAULT_TOOL_CHARS = 2200
         const val KNOWLEDGE_CHARS = 1500
-        const val TEMPERATURE = 0.3f
+        const val TEMPERATURE = 0.5f
         const val RECENT_CHARS = 1500
         const val MAX_TURN_CHARS = 1500
         const val SUMMARY_TURN_CHARS = 500
@@ -369,7 +369,7 @@ class LlamaAssistantService(
                 "no bullet lists unless the user needs a list. Small talk, jokes and opinions are fine; answer them " +
                 "briefly and naturally. When the question can be answered from the data, the tools or the manual, look it up and answer " +
                 "right away; never ask the user for permission or what they mean when you can find it yourself, and never answer " +
-                "with only a question. Write correct, simple Polish and check every word. " +
+                "with only a question. " +
                 "Help with Meshtastic, radio settings, antennas, range, nodes, channels and the app. " +
                 "If you are not sure of something, say so instead of guessing. Never invent settings or menu names. " +
                 "When the user says \"our project\", \"nasz projekt\" or asks about goals, assumptions or achievements, they mean the MT_SW fork, " +
