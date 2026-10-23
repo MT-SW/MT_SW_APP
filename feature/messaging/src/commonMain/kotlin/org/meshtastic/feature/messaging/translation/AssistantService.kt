@@ -31,4 +31,10 @@ interface AssistantService {
      * cancelling the coroutine stops the answer.
      */
     suspend fun reply(history: List<AssistantTurn>, onPiece: (String) -> Unit): String
+
+    /**
+     * Asks all test questions one after another and reports each one to [onResult] (question, answer); also prints them
+     * and writes a results file where the platform can. Typed in the chat as /test. Does nothing where not supported.
+     */
+    suspend fun selfTest(onResult: (question: String, answer: String) -> Unit) {}
 }

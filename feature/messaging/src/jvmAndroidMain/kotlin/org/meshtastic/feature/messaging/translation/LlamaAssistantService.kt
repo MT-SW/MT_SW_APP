@@ -86,6 +86,49 @@ class LlamaAssistantService(
     private var memory = ""
     private var memorized = 0
 
+    // How the router understood the newest question, for the test report.
+    @Volatile private var lastRoute = ""
+
+    override suspend fun selfTest(onResult: (question: String, answer: String) -> Unit) {
+        withContext(Dispatchers.IO) {
+            val modelId = activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
+            val questions = AssistantSelfTest.questions(data.sampleNodeName(), data.sampleChannelName())
+            val file = runCatching { java.io.File(System.getProperty("user.dir").orEmpty(), AssistantSelfTest.RESULT_FILE) }.getOrNull()
+            val report = StringBuilder("# Assistant test\n\nModel: $modelId, backend: ${engine.activeBackend.ifBlank { "?" }}, questions: ${questions.size}\n")
+            var previous: List<AssistantTurn> = emptyList()
+            for ((i, q) in questions.withIndex()) {
+                val history = (if (q.followUp) previous else emptyList()) + AssistantTurn(true, q.text)
+                val started = org.meshtastic.core.common.util.nowMillis
+                val answer =
+                    try {
+                        reply(history) {}
+                    } catch (e: kotlinx.coroutines.CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        "ERROR: ${e.message?.lineSequence()?.firstOrNull()}"
+                    }
+                val seconds = (org.meshtastic.core.common.util.nowMillis - started) / MILLIS_PER_SECOND
+                val (text, actions) = AssistantActions.parse(answer)
+                val block = buildString {
+                    append("\n## ").append(i + 1).append(". ").append(q.text).append('\n')
+                    append("Router: ").append(lastRoute).append('\n')
+                    append("Time: ").append(seconds).append(" s\n")
+                    append("Answer:\n").append(text.trim()).append('\n')
+                    if (actions.isNotEmpty()) {
+                        append("Buttons: ").append(actions.joinToString { "${it.label} -> ${it.uri}${if (it.highlight.isNotBlank()) " (blinks: ${it.highlight})" else ""}${if (it.auto) " [opens by itself]" else ""}" }).append('\n')
+                    }
+                }
+                println("===== ASSISTANT TEST ${i + 1}/${questions.size} =====$block")
+                report.append(block)
+                file?.let { f -> runCatching { f.writeText(report.toString()) } }
+                onResult(q.text, answer)
+                previous = history + AssistantTurn(false, text)
+            }
+            val where = file?.takeIf { it.exists() }?.absolutePath ?: "(not saved)"
+            println("===== ASSISTANT TEST DONE: $where =====")
+        }
+    }
+
     // Turned off for this run of the app when the model file cannot think quietly.
     @Volatile private var thinkingWorks = true
 
@@ -105,6 +148,7 @@ class LlamaAssistantService(
         webTools.reset()
 
         val intent = router.understand(modelId, question, previous)
+        lastRoute = intent?.toString() ?: "router failed: old word rules used"
         val answer =
             if (intent != null) {
                 handle(intent, modelId, history, question, polish, onPiece)
@@ -464,6 +508,7 @@ class LlamaAssistantService(
 
     private companion object {
         const val TAG = "AssistantPrompt"
+        const val MILLIS_PER_SECOND = 1000L
         const val POLISH_LETTERS = "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ"
         const val MAX_ANSWER_TOKENS = 0 // no limit: the model finishes by itself
         const val TEMPERATURE = 0.5f

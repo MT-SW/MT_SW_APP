@@ -111,3 +111,6 @@ build-scan-*.scan
 # Python bytecode from scripts/
 __pycache__/
 *.pyc
+
+# Results of the assistant self test (/test in the assistant chat)
+assistant-test-results.md
