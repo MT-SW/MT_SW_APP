@@ -66,9 +66,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.toImmutableList
-import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
-import org.meshtastic.core.repository.MeshLogRetention
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.debug_clear
 import org.meshtastic.core.resources.debug_decoded_payload
@@ -82,14 +80,10 @@ import org.meshtastic.core.resources.debug_store_logs_title
 import org.meshtastic.core.resources.debug_tab_app_logs
 import org.meshtastic.core.resources.debug_tab_device_logs
 import org.meshtastic.core.resources.debug_tab_packets
-import org.meshtastic.core.resources.log_retention_days
-import org.meshtastic.core.resources.log_retention_days_quantity
-import org.meshtastic.core.resources.log_retention_days_summary
-import org.meshtastic.core.resources.log_retention_hours
-import org.meshtastic.core.resources.log_retention_never
 import org.meshtastic.core.resources.okay
 import org.meshtastic.core.ui.component.CopyIconButton
 import org.meshtastic.core.ui.component.DropDownPreference
+import org.meshtastic.feature.settings.component.LogRetentionPreference
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticDialog
@@ -284,33 +278,10 @@ private fun DebugLogSettings(viewModel: DebugViewModel) {
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        // From one day up to two months. A value chosen in an earlier version (an hour, "never", more than 60 days)
-        // is still shown and kept until the user picks one of these.
-        @Suppress("MagicNumber")
-        val retentionDaysChoices = listOf(1, 2, 3, 7, 14, 30, 60)
-        val retentionItems =
-            retentionDaysChoices.map { days ->
-                days.toLong() to pluralStringResource(Res.plurals.log_retention_days_quantity, days, days)
-            } +
-                if (retentionDays in retentionDaysChoices) {
-                    emptyList()
-                } else if (retentionDays == MeshLogRetention.ONE_HOUR) {
-                    listOf(retentionDays.toLong() to pluralStringResource(Res.plurals.log_retention_hours, 1, 1))
-                } else if (retentionDays == MeshLogRetention.KEEP_FOREVER) {
-                    listOf(retentionDays.toLong() to stringResource(Res.string.log_retention_never))
-                } else {
-                    listOf(
-                        retentionDays.toLong() to
-                            pluralStringResource(Res.plurals.log_retention_days_quantity, retentionDays, retentionDays),
-                    )
-                }
-        DropDownPreference(
-            title = stringResource(Res.string.log_retention_days),
+        LogRetentionPreference(
+            retentionDays = retentionDays,
             enabled = loggingEnabled,
-            items = retentionItems,
-            selectedItem = retentionDays.toLong(),
-            onItemSelected = { selected: Long -> viewModel.setRetentionDays(selected.toInt()) },
-            summary = stringResource(Res.string.log_retention_days_summary),
+            onSelected = { viewModel.setRetentionDays(it) },
         )
 
         SwitchPreference(
