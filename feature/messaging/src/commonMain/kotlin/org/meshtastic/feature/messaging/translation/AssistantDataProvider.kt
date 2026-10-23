@@ -1294,8 +1294,11 @@ class AssistantDataProvider(
                     first.user.long_name.ifBlank { first.user.short_name }, first.user.short_name, kilometres(meters), heard,
                 ),
             )
-        val next = rows.drop(1).take(NEXT_SHOWN).joinToString(", ") { (n, m) -> "${n.user.long_name.ifBlank { n.user.short_name }} ${kilometres(m)} km" }
-        if (next.isNotBlank()) sb.append('\n').append(getStringSuspend(Res.string.ai_dist_next, next))
+        val next = rows.drop(1).take(NEXT_SHOWN)
+        if (next.isNotEmpty()) {
+            sb.append("\n\n").append(getStringSuspend(Res.string.ai_dist_next, "").trim())
+            for ((n, m) in next) sb.append("\n• ").append(n.user.long_name.ifBlank { n.user.short_name }).append(" — ").append(kilometres(m)).append(" km")
+        }
         return sb.toString()
     }
 
@@ -1468,9 +1471,14 @@ class AssistantDataProvider(
                     .sortedByDescending { it.lastHeard }
             val sb = StringBuilder(getStringSuspend(Res.string.ai_nodes_heard_title, window.title(), heard.size, all.size))
             if (heard.isNotEmpty()) {
-                val names = heard.take(NAMES_SHOWN).joinToString(", ") { it.user.long_name.ifBlank { it.user.short_name } }
-                sb.append('\n').append(getStringSuspend(Res.string.ai_nodes_recent, names))
-                if (heard.size > NAMES_SHOWN) sb.append(' ').append(getStringSuspend(Res.string.ai_more, heard.size - NAMES_SHOWN))
+                // A short list, one node per line, newest first; the rest only as a number.
+                val nowS = nowMillis / MILLIS_PER_SECOND
+                sb.append("\n\n").append(getStringSuspend(Res.string.ai_nodes_recent, "").trim())
+                for (n in heard.take(NAMES_SHOWN)) {
+                    val heardAgo = ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+                    sb.append("\n• ").append(n.user.long_name.ifBlank { n.user.short_name }).append(" — ").append(heardAgo)
+                }
+                if (heard.size > NAMES_SHOWN) sb.append('\n').append(getStringSuspend(Res.string.ai_more, heard.size - NAMES_SHOWN))
             }
             return sb.toString()
         }
@@ -1708,7 +1716,7 @@ class AssistantDataProvider(
         const val REPORT_LIMIT = 12
         const val SIGNAL_SHOWN = 6
         const val NEXT_SHOWN = 3
-        const val NAMES_SHOWN = 12
+        const val NAMES_SHOWN = 8
         val CHANNEL_NUMBER = Regex("(?:kana[łl]\\w*|channel)\\s*(?:nr\\.?|numer\\w*|#|no\\.?)?\\s*(\\d+|[a-ząćęłńóśźż]+)")
         val NUMBER_WORDS =
             mapOf("zer" to 0, "jede" to 1, "jedyn" to 1, "one" to 1, "pierw" to 1, "dw" to 2, "two" to 2, "trz" to 3, "three" to 3, "czter" to 4, "four" to 4, "pię" to 5, "pie" to 5, "five" to 5, "sze" to 6, "six" to 6, "sied" to 7, "seven" to 7)
