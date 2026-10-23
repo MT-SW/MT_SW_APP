@@ -67,7 +67,7 @@ interface MeshLogPrefs {
     suspend fun awaitCleanupPolicy(): MeshLogCleanupPolicy
 
     companion object {
-        const val DEFAULT_RETENTION_DAYS = 30
+        const val DEFAULT_RETENTION_DAYS = 60
 
         /** The lowest selectable setting is the one-hour sentinel, not a day count. */
         const val MIN_RETENTION_DAYS = MeshLogRetention.ONE_HOUR
