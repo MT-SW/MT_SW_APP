@@ -364,7 +364,7 @@ class LlamaAssistantService(
                 val button = collector.last()
                 // The answer is the app's own manual, shown as it is written, with where the setting is: the small
                 // model garbled words and invented menu paths when it retold the manual in its own words.
-                val wantsNews = NEWS_WORDS.containsMatchIn("${intent.text} $question".lowercase())
+                val wantsNews = NEWS_WORDS.containsMatchIn(question.lowercase())
                 val manual =
                     if (wantsNews) {
                         knowledge?.latestNews(NEWS_CHARS).orEmpty()
@@ -414,7 +414,7 @@ class LlamaAssistantService(
                 val extra = if (found.isBlank()) "" else rule(polish, WEB_PL, WEB_EN) + "\n" + found
                 speak(modelId, history, polish, onPiece, room, extra = extra, temperature = FACT_TEMPERATURE)
             }
-            else -> speak(modelId, history, polish, onPiece, room, extra = antennaMath(question, polish))
+            else -> speak(modelId, history, polish, onPiece, room, extra = "")
         }
     }
 
@@ -515,6 +515,9 @@ class LlamaAssistantService(
     ): String {
         val recent = fit(modelId, history, room)
         val core = knowledge?.coreFacts(if (polish) "pl" else "en").orEmpty()
+        val question = history.lastOrNull { it.fromUser }?.text.orEmpty()
+        // Antenna lengths are worked out in code for every written answer that asks about them (also web questions).
+        val math = antennaMath(question, polish)
         val system = buildString {
             append(if (polish) SYSTEM_PL else SYSTEM_EN)
             // The core facts about MT_SW are always given, so the model never answers against them.
@@ -525,6 +528,7 @@ class LlamaAssistantService(
             }
             if (memory.isNotBlank()) append("\n\n").append(rule(polish, EARLIER_PL, EARLIER_EN)).append(' ').append(memory)
             if (extra.isNotBlank()) append("\n\n").append(extra)
+            if (math.isNotBlank()) append("\n\n").append(math)
         }
         Logger.i(tag = TAG) { "Prompt: system ${system.length} chars, turns ${recent.size}, temperature $temperature" }
         val messages = buildList {
@@ -581,12 +585,16 @@ class LlamaAssistantService(
             val strongHits = words.count { it in strongTerms }
             val weakHits = words.count { it in weakTerms }
             val exact = wanted.length >= MIN_STEM && line.lowercase().contains(wanted)
-            if (!exact && strongHits < 2 && !(strongHits >= 1 && weakHits >= 2)) continue
-            val score = strongHits * 2 + weakHits + (if (exact) LABEL_SCORE else 0) + (if (stems(title).any { it in labelStems }) 1 else 0)
+            // Only a paragraph that is surely about the setting: it names the setting (a name long enough to be
+            // telling), its heading has every word of the setting's name, or it shares many words with it.
+            val headed = labelStems.isNotEmpty() && stems(title).containsAll(labelStems)
+            val telling = exact && wanted.length >= MIN_TELLING_LABEL
+            if (!telling && !headed && strongHits < MIN_STRONG_HITS) continue
+            val score = strongHits * 2 + weakHits + (if (exact) LABEL_SCORE else 0) + (if (headed) LABEL_SCORE else 0)
             found += Line(title, line, score)
         }
         // A part of the manual whose heading names the setting is the right place; others only when there is none.
-        val titled = found.filter { line -> stems(line.title).any { it in labelStems } }
+        val titled = found.filter { line -> labelStems.isNotEmpty() && stems(line.title).containsAll(labelStems) }
         val pool = titled.ifEmpty { found }
         val best = pool.maxByOrNull { it.score } ?: return ""
         // The best paragraph and, from the same part of the manual, the next best one, in the order of the manual.
@@ -768,10 +776,12 @@ class LlamaAssistantService(
         const val MIN_HELP_LINE = 25
         const val LABEL_SCORE = 4
         const val MIN_HELP_SCORE = 4
+        const val MIN_TELLING_LABEL = 8
+        const val MIN_STRONG_HITS = 3
         const val HELP_CHARS = 1100
         const val MIN_STEM = 4
         const val STEM_LENGTH = 5
-        val NEWS_WORDS = Regex("nowo|nowe |zmian|what's new|new in|changelog")
+        val NEWS_WORDS = Regex("co nowego|nowości|nowosci|nowego w|lista zmian|ostatnie zmiany|ostatniej wersji|nowej wersji|what's new|new in|changelog")
         val APP_WORDS = Regex("mt[_ -]?sw|aplikacj|funkcj|ustawie|tłumacz|tlumacz|asystent|dyktowan|app\\b|setting")
 
         /** Quiet thinking before written answers: better answers, a few seconds more. */
