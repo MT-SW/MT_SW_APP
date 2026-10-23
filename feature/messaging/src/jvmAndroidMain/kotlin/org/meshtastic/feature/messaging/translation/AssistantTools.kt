@@ -84,6 +84,37 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
     @Tool(description = "How many messages each channel holds (and direct messages). Use it to find which channel has the most messages.")
     fun channel_message_counts(): String = run("channel_message_counts") { data.channelReport() }
 
+    @Tool(
+        description =
+        "COUNTS the messages received on a channel today or in the last hours, and who wrote most. Use it for " +
+            "questions like how many messages today / this hour on a channel.",
+    )
+    fun count_messages(
+        @ToolParam(description = "Channel name or number, or empty for all conversations") channel: String,
+        @ToolParam(description = "0 = today since midnight, otherwise the last N hours (1 to 720)") hours: Int,
+    ): String = run("count_messages") { data.toolMessageCount(channel, hours) }
+
+    @Tool(
+        description =
+        "FINDS and COUNTS nodes by filters (all optional, 0 or empty = ignore): heard in the last N hours, " +
+            "hardware name, favourites only, battery at or below a percent, only nodes with a position. Use it for " +
+            "questions like how many nodes were active today, which nodes are favourites, which are low on battery.",
+    )
+    fun find_nodes(
+        @ToolParam(description = "Heard in the last N hours, 0 = any time") active_hours: Int,
+        @ToolParam(description = "Part of the hardware name, or empty") hardware: String,
+        @ToolParam(description = "1 = favourites only, 0 = all") only_favorites: Int,
+        @ToolParam(description = "Battery percent at or below, 0 = any") max_battery: Int,
+        @ToolParam(description = "1 = only nodes with a position, 0 = all") with_position: Int,
+        @ToolParam(description = "How many to list, 1 to 40") limit: Int,
+    ): String = run("find_nodes") { data.toolFindNodes(active_hours, hardware, only_favorites, max_battery, with_position, limit) }
+
+    @Tool(description = "The latest direct (private) messages exchanged with one node, oldest first.")
+    fun direct_messages(
+        @ToolParam(description = "Node short or long name") node: String,
+        @ToolParam(description = "How many of the latest messages, 1 to 40") limit: Int,
+    ): String = run("direct_messages") { data.toolDirectMessages(node, limit) }
+
     @Tool(description = "Find messages that contain a specific word or phrase in all conversations (only when the user asks for a specific word).")
     fun search_messages(
         @ToolParam(description = "Text to look for, or empty for the newest messages") query: String,
