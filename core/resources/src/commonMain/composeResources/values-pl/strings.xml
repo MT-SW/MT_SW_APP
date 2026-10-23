@@ -591,8 +591,8 @@
     <!-- DEVICE -->
     <string name="device">Urządzenie</string>
     <string name="device_configuration">Konfiguracja urządzenia</string>
-    <string name="device_db_cache_limit">Limit pamięci podręcznej urządzenia</string>
-    <string name="device_db_cache_limit_summary">Maksymalna ilość danych urządzenia do utrzymania w tej aplikacji</string>
+    <string name="device_db_cache_limit">Ile radiów pamiętać</string>
+    <string name="device_db_cache_limit_summary">Dane ilu różnych radiów aplikacja trzyma w tym telefonie. Gdy przybędzie kolejne, dane najdawniej używanego są usuwane.</string>
     <string name="device_gps">Ustawienia GPS</string>
     <string name="device_links">Linki urządzenia</string>
     <string name="device_links_affiliate_disclosure">Linki do produktów mogą być linkami afiliacyjnymi — zakupy mogą przynosić Meshtastic prowizję.</string>
@@ -1307,14 +1307,14 @@
     <string name="lockdown_submit">Prześlij</string>
     <string name="locked">Zablokowany</string>
     <!-- LOG -->
-    <string name="log_retention_days">Okres przechowywania logów</string>
+    <string name="log_retention_days">Jak długo pamiętać odebrane ramki</string>
     <plurals name="log_retention_days_quantity">
         <item quantity="one">%1$d dni</item>
         <item quantity="few">%1$d dni</item>
         <item quantity="many">%1$d dni</item>
         <item quantity="other">%1$d dni</item>
     </plurals>
-    <string name="log_retention_days_summary">Wybierz jak długo przechowywać dzienniki. Wybierz Nigdy, aby zachować wszystkie dzienniki.</string>
+    <string name="log_retention_days_summary">Przez ile dni aplikacja zachowuje odebrane ramki, z których liczone są statystyki i wykresy. Starsze są usuwane.</string>
     <plurals name="log_retention_hours">
         <item quantity="one">%1$d godzina</item>
         <item quantity="few">%1$d godzin</item>

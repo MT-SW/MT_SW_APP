@@ -26,6 +26,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Funkcje MT_SW: skróty do motywu i panelu debugowania.
 * Wybór koloru węzła: dowolny kolor (kod, odcień/nasycenie/jasność), ostatnio użyte kolory, tryby „Szybko” i „Dokładnie” zamiast tolerancji, licznik czasu i przerwanie szukania.
 * **Dyktowanie** w asystencie działa tak samo na telefonie i komputerze, bez usług systemu: mikrofon + model Gemma E2B/E4B, w całości na urządzeniu.
+* Okres pamiętania odebranych ramek (logów): wybór w dniach od 1 do 60 (1, 2, 3, 7, 14, 30, 60) zamiast od godziny do roku; wcześniejszy wybór jest zachowany, dopóki nie wybierzesz nowego. Ustawienie z liczbą 1–10 ma teraz jasną nazwę „Ile radiów pamiętać”.
 * Asystent: kanał rozpoznawany też po numerze („kanał 1”, „kanał jeden”), więc streszczenie dotyczy właściwego kanału; liczba wiadomości na kanałach jest dostępna dla modelu jako narzędzie.
 * Pamięć heap i PSRAM są wszędzie pokazywane jako **zajęte** (a nie wolna): lista węzłów, wykresy zasobów, zdrowie sieci, widżet, powiadomienie, podgląd pakietów, zapis zdalny i asystent. Np. 10% wolnego to teraz 90% zajętego.
 * Naprawa zamykania się aplikacji na telefonie przy użyciu tłumacza (po optymalizacji wersji release brakowało klas biblioteki ONNX).
@@ -384,6 +385,7 @@ The entries below describe only what this fork adds on top of the original, from
 * MT_SW features: shortcuts to the theme and the debug panel.
 * Node colour picker: any colour (code, hue/saturation/brightness), recently used colours, "Fast" and "Precise" modes instead of tolerance, a timer and cancelling of the search.
 * **Dictation** in the assistant works the same on phone and computer, without system services: microphone + Gemma E2B/E4B model, entirely on the device.
+* How long received packets (logs) are remembered: a choice in days from 1 to 60 (1, 2, 3, 7, 14, 30, 60) instead of one hour to one year; an earlier choice is kept until you pick a new one. The 1–10 setting is now clearly named "How many radios to remember".
 * Assistant: channels are also recognised by number ("channel 1", "channel one"), so a summary covers the right channel; message counts per channel are available to the model as a tool.
 * Heap and PSRAM memory are now shown as **used** (not free) everywhere: node list, resource charts, network health, widget, notification, packet view, on-demand log and the assistant. E.g. 10% free now shows as 90% used.
 * Fixed the app closing on the phone when using the translator (after release optimisation, ONNX library classes were missing).

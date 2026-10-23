@@ -284,13 +284,26 @@ private fun DebugLogSettings(viewModel: DebugViewModel) {
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
+        // From one day up to two months. A value chosen in an earlier version (an hour, "never", more than 60 days)
+        // is still shown and kept until the user picks one of these.
         @Suppress("MagicNumber")
+        val retentionDaysChoices = listOf(1, 2, 3, 7, 14, 30, 60)
         val retentionItems =
-            listOf(MeshLogRetention.ONE_HOUR.toLong() to pluralStringResource(Res.plurals.log_retention_hours, 1, 1)) +
-                listOf(1, 3, 7, 14, 30, 60, 90, 180, 365).map { days ->
-                    days.toLong() to pluralStringResource(Res.plurals.log_retention_days_quantity, days, days)
-                } +
-                listOf(MeshLogRetention.KEEP_FOREVER.toLong() to stringResource(Res.string.log_retention_never))
+            retentionDaysChoices.map { days ->
+                days.toLong() to pluralStringResource(Res.plurals.log_retention_days_quantity, days, days)
+            } +
+                if (retentionDays in retentionDaysChoices) {
+                    emptyList()
+                } else if (retentionDays == MeshLogRetention.ONE_HOUR) {
+                    listOf(retentionDays.toLong() to pluralStringResource(Res.plurals.log_retention_hours, 1, 1))
+                } else if (retentionDays == MeshLogRetention.KEEP_FOREVER) {
+                    listOf(retentionDays.toLong() to stringResource(Res.string.log_retention_never))
+                } else {
+                    listOf(
+                        retentionDays.toLong() to
+                            pluralStringResource(Res.plurals.log_retention_days_quantity, retentionDays, retentionDays),
+                    )
+                }
         DropDownPreference(
             title = stringResource(Res.string.log_retention_days),
             enabled = loggingEnabled,
