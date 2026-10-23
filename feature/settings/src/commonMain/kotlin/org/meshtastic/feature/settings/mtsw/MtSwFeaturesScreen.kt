@@ -84,6 +84,7 @@ import org.meshtastic.feature.settings.SettingsViewModel
 import org.meshtastic.feature.settings.component.AiSettings
 import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
+import org.meshtastic.feature.settings.component.LogRetentionPreference
 import org.meshtastic.feature.settings.component.ThemePickerDialog
 import org.meshtastic.feature.settings.component.UiScalePickerDialog
 import org.meshtastic.feature.settings.component.uiScaleLabel
@@ -97,6 +98,7 @@ import org.meshtastic.feature.settings.component.uiScaleLabel
 fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, onNavigate: (Route) -> Unit) {
     val autoLoadChatImages by settingsViewModel.autoLoadChatImages.collectAsStateWithLifecycle()
     val uiScale by settingsViewModel.uiScale.collectAsStateWithLifecycle()
+    val retentionDays by settingsViewModel.meshLogRetentionDays.collectAsStateWithLifecycle()
     var showUiScalePicker by remember { mutableStateOf(false) }
     var showThemePicker by remember { mutableStateOf(false) }
     if (showThemePicker) {
@@ -144,6 +146,10 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 ) {
                     onNavigate(SettingsRoute.NodeList)
                 }
+                LogRetentionPreference(
+                    retentionDays = retentionDays,
+                    onSelected = { settingsViewModel.setMeshLogRetentionDays(it) },
+                )
             }
 
             ExpressiveSection(title = stringResource(Res.string.translator_open)) {

@@ -163,7 +163,7 @@ object SettingsSearchCatalog {
             Res.string.filter_settings to SettingsRoute.FilterSettings,
             Res.string.device_links to SettingsRoute.DeviceLinks,
             Res.string.debug_panel to SettingsRoute.DebugPanel,
-            Res.string.log_retention_days to SettingsRoute.Settings(),
+            Res.string.log_retention_days to SettingsRoute.MtSwFeatures,
             Res.string.about to SettingsRoute.About,
             Res.string.acknowledgements to SettingsRoute.Acknowledgements,
         )

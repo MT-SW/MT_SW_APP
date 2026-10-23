@@ -151,7 +151,7 @@ Na słabszych urządzeniach duże modele mogą spowalniać aplikację albo ją z
 
 **Dyktowanie.** Przycisk „Dyktuj” w asystencie działa tak samo na telefonie i na komputerze, bez usług systemu: nagrywa mikrofon, a pobrany model Gemma (E2B lub E4B) zamienia mowę na tekst w całości na urządzeniu. Dotknij „Dyktuj”, mów (do około 30 sekund) i dotknij „Zatrzymaj i wstaw”. Telefon zapyta o zgodę na mikrofon przy pierwszym użyciu. Przycisk pojawia się dopiero, gdy pobrany jest model E2B lub E4B.
 
-**Jak długo pamiętać odebrane ramki.** W Ustawieniach jest pole z liczbą dni (1, 2, 3, 7, 14, 30 lub 60), przez które aplikacja zachowuje odebrane ramki, z których liczone są statystyki i wykresy. Domyślnie jest to 60 dni. Starsze ramki są usuwane. Historia każdego urządzenia jest trzymana osobno.
+**Jak długo pamiętać odebrane ramki.** W Ustawieniach (także w „Funkcjach MT_SW”) jest pole z liczbą dni (1, 2, 3, 7, 14, 30 lub 60), przez które aplikacja zachowuje odebrane ramki, z których liczone są statystyki i wykresy. Domyślnie jest to 60 dni. Starsze ramki są usuwane. Historia każdego urządzenia jest trzymana osobno.
 
 **Wybór koloru węzła.** Okno wyboru koloru klucza pozwala wybrać dowolny kolor (kod, suwaki odcienia, nasycenia i jasności albo gotowe kolory oraz ostatnio użyte), wybrać tryb „Szybko” (do 20 s, kolor podobny) lub „Dokładnie” (do 3 min, kolor bardzo bliski), widzieć czas szukania, przerwać szukanie i porównać wybrany kolor z wynikiem. Klucz nie jest zapisywany automatycznie.
 
