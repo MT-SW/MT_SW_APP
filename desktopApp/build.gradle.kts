@@ -254,6 +254,8 @@ compose.desktop {
                         """
                         <key>NSBluetoothAlwaysUsageDescription</key>
                         <string>Meshtastic uses Bluetooth to communicate with your Meshtastic radio device.</string>
+                        <key>NSMicrophoneUsageDescription</key>
+                        <string>MT_SW uses the microphone for dictation in the assistant. Speech is converted to text on this computer.</string>
                         <key>NSLocalNetworkUsageDescription</key>
                         <string>Meshtastic uses your local network to discover Meshtastic devices connected via WiFi.</string>
                         <key>NSUserNotificationAlertStyle</key>

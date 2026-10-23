@@ -29,12 +29,3 @@ interface Speaker {
 
 /** A speaker tied to the screen: it stops and is released when the screen goes away. */
 @Composable expect fun rememberSpeaker(): Speaker
-
-/**
- * Dictation of a text with the speech recognizer of the system. [available] is false where the platform has none; then
- * the button for it is not shown.
- */
-class Dictation(val available: Boolean, val start: () -> Unit)
-
-/** [onText] receives the recognized text once the user has finished speaking. */
-@Composable expect fun rememberDictation(onText: (String) -> Unit): Dictation

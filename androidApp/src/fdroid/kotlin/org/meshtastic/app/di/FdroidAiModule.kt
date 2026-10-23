@@ -36,6 +36,8 @@ import org.meshtastic.feature.messaging.translation.FileAssistantHistoryStore
 import org.meshtastic.feature.messaging.translation.GemmaTranslator
 import org.meshtastic.feature.messaging.translation.LlamaAssistantService
 import org.meshtastic.feature.messaging.translation.LiteRtEngine
+import org.meshtastic.feature.messaging.translation.LiteRtDictationService
+import org.meshtastic.feature.messaging.translation.DictationService
 import org.meshtastic.feature.messaging.translation.UpdatableKnowledge
 import org.meshtastic.core.repository.AiModelStore
 import org.meshtastic.feature.messaging.translation.AssistantDataProvider
@@ -104,6 +106,10 @@ class FdroidAiModule {
             engine, store, uiPrefs, data,
             UpdatableKnowledge(knowledge, File(context.filesDir, "knowledge"), uiPrefs),
         )
+
+    @Single
+    fun dictationService(engine: LiteRtEngine, store: AiModelStoreImpl, uiPrefs: UiPrefs): DictationService =
+        LiteRtDictationService(engine, store, uiPrefs)
 
     @Single fun messageTranslationService(router: AiTranslationRouter): MessageTranslationService = router
 

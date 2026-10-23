@@ -40,6 +40,10 @@
         android:name="android.permission.VIBRATE"
         tools:node="remove" />
 
+    <!-- Dictation in the assistant records speech from the microphone; the permission is asked only when it is used -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+
     <!-- Request legacy Bluetooth permissions on older devices -->
     <uses-permission android:name="android.permission.BLUETOOTH"
         android:maxSdkVersion="30" />

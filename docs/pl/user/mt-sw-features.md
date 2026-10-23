@@ -149,6 +149,8 @@ Na słabszych urządzeniach duże modele mogą spowalniać aplikację albo ją z
 
 **Internet dla asystenta (domyślnie wyłączony).** W ustawieniach asystenta jest jeden przełącznik internetu. Wyłączony = asystent działa w pełni offline. Włączony (po przeczytaniu ostrzeżenia, z czerwonym napisem, że jest włączony): asystent może wyszukać ogólne informacje w internecie, a aplikacja raz na dobę sprawdza w naszym repozytorium nowości o aplikacji (pobrane pliki są weryfikowane skrótem; gdy się nie uda, działa wiedza wbudowana). Wyszukiwarka widzi Twój adres IP i słowa zapytania. Tekst z internetu jest traktowany tylko jako informacja, nigdy jako polecenie, a odpowiedź pokazuje, co wyszukano i jakie były źródła.
 
+**Dyktowanie.** Przycisk „Dyktuj” w asystencie działa tak samo na telefonie i na komputerze, bez usług systemu: nagrywa mikrofon, a pobrany model Gemma (E2B lub E4B) zamienia mowę na tekst w całości na urządzeniu. Dotknij „Dyktuj”, mów (do około 30 sekund) i dotknij „Zatrzymaj i wstaw”. Telefon zapyta o zgodę na mikrofon przy pierwszym użyciu. Przycisk pojawia się dopiero, gdy pobrany jest model E2B lub E4B.
+
 **Wybór koloru węzła.** Okno wyboru koloru klucza pozwala wybrać dowolny kolor (kod, suwaki odcienia, nasycenia i jasności albo gotowe kolory oraz ostatnio użyte), wybrać tryb „Szybko” (do 20 s, kolor podobny) lub „Dokładnie” (do 3 min, kolor bardzo bliski), widzieć czas szukania, przerwać szukanie i porównać wybrany kolor z wynikiem. Klucz nie jest zapisywany automatycznie.
 
 **Licencje modeli.** Modele nie są częścią aplikacji: pobierasz je z internetu i używasz na własną odpowiedzialność, zgodnie z ich licencjami.

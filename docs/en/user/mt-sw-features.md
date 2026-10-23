@@ -149,6 +149,8 @@ On weaker devices large models can slow the app down or close it, which is why e
 
 **Internet for the assistant (off by default).** The assistant settings have a single internet switch. Off = the assistant works fully offline. On (after reading a warning, with a red note that it is on): the assistant may search the web for general information, and once a day the app checks our repository for news about the app (downloaded files are verified with a hash; if it fails, the built-in knowledge is used). The search engine sees your IP address and the words of the query. Web text is treated only as information, never as an instruction, and the answer shows what was searched and the sources.
 
+**Dictation.** The "Dictate" button in the assistant works the same on phone and computer, without any system service: it records the microphone and a downloaded Gemma model (E2B or E4B) turns the speech into text entirely on the device. Tap "Dictate", speak (up to about 30 seconds) and tap "Stop and insert". The phone asks for microphone permission on first use. The button appears only once an E2B or E4B model is downloaded.
+
 **Node colour picker.** The key colour dialog lets you pick any colour (code, hue/saturation/brightness sliders, or ready colours and recently used ones), choose "Fast" (up to 20 s, similar colour) or "Precise" (up to 3 min, very close colour), see the search time, cancel the search and compare the chosen colour with the result. The key is not saved automatically.
 
 **Model licences.** The models are not part of the app: you download them from the internet and use them at your own responsibility, under their licences.
