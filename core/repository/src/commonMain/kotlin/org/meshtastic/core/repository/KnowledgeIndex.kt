@@ -91,7 +91,12 @@ class KnowledgeIndex(documents: List<Document>) {
             while (rest.isNotEmpty()) {
                 var cut = rest.length
                 if (rest.length > MAX_CHUNK) {
-                    cut = rest.lastIndexOf("\n\n", MAX_CHUNK).takeIf { it > MIN_CHUNK } ?: MAX_CHUNK
+                    // At a blank line, else at a line end, so a fragment never stops in the middle of a word.
+                    cut =
+                        rest.lastIndexOf("\n\n", MAX_CHUNK).takeIf { it > MIN_CHUNK }
+                            ?: rest.lastIndexOf('\n', MAX_CHUNK).takeIf { it > MIN_CHUNK }
+                            ?: rest.lastIndexOf(". ", MAX_CHUNK).takeIf { it > MIN_CHUNK }?.plus(1)
+                            ?: MAX_CHUNK
                 }
                 val piece = rest.substring(0, cut).trim()
                 if (piece.isNotEmpty()) {

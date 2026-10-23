@@ -98,6 +98,7 @@ ai_go_unknown_place
 ai_heard
 ai_help_from_manual
 ai_help_news
+ai_help_open
 ai_help_where
 ai_internet_enable
 ai_internet_on_indicator

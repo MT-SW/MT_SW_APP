@@ -342,7 +342,8 @@ private fun Bubble(
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = if (fromUser) Arrangement.End else Arrangement.Start) {
-        Box(modifier = Modifier.widthIn(max = 560.dp).fillMaxWidth(if (fromUser) 0.85f else 0.92f)) {
+        // Wide bubbles: a long answer takes less height; yours and the assistant's may overlap in width.
+        Box(modifier = Modifier.widthIn(max = 900.dp).fillMaxWidth(if (fromUser) 0.9f else 0.97f)) {
             Surface(
                 shape = if (fromUser) UserBubbleShape else AssistantBubbleShape,
                 color =

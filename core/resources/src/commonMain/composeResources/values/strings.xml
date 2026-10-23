@@ -119,6 +119,7 @@
     <string name="ai_heard">heard %1$s</string>
     <string name="ai_help_from_manual">From the app manual:</string>
     <string name="ai_help_news">Latest changes in MT_SW:</string>
+    <string name="ai_help_open">It is on the screen “%1$s”: the button below opens it.</string>
     <string name="ai_help_where">“%1$s” is in: %2$s.</string>
     <string name="ai_internet_enable">Turn on</string>
     <string name="ai_internet_on_indicator">Internet is ON for the assistant</string>

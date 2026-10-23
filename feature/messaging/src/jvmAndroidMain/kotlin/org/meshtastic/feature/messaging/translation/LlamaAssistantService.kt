@@ -37,6 +37,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ai_go_draft
 import org.meshtastic.core.resources.ai_help_from_manual
 import org.meshtastic.core.resources.ai_help_news
+import org.meshtastic.core.resources.ai_help_open
 import org.meshtastic.core.resources.ai_help_where
 import org.meshtastic.core.resources.ai_go_draft_empty
 import org.meshtastic.core.resources.ai_go_draft_no_target
@@ -149,17 +150,74 @@ class LlamaAssistantService(
         collector.drain()
         webTools.reset()
 
-        val intent = router.understand(modelId, question, previous)
-        lastRoute = intent?.toString() ?: "router failed: old word rules used"
+        // Two questions in one ("how many nodes are there and how do I change my role?"): each is answered on its own.
+        val parts = splitQuestion(question)
         val answer =
-            if (intent != null) {
-                handle(intent, modelId, history, question, polish, onPiece)
+            if (parts != null) {
+                val first = answerOne(modelId, history, parts.first, previous, polish, onPiece)
+                onPiece("\n\n")
+                val firstRoute = lastRoute
+                val second = answerOne(modelId, history, parts.second, parts.first, polish, onPiece)
+                lastRoute = "$firstRoute + $lastRoute"
+                first + "\n\n" + second
             } else {
-                // The router could not run (for example an older model file): the old word rules decide.
-                fallback(modelId, history, question, polish, onPiece)
+                answerOne(modelId, history, question, previous, polish, onPiece)
             }
         scheduleNotesUpdate(modelId, history, question, answer)
         return answer + webTools.footer() + collector.drain().joinToString("") { AssistantActions.encode(it) }
+    }
+
+    /** Understands one question and answers it. */
+    @Suppress("LongParameterList")
+    private suspend fun answerOne(
+        modelId: String,
+        history: List<AssistantTurn>,
+        question: String,
+        previous: String,
+        polish: Boolean,
+        onPiece: (String) -> Unit,
+    ): String {
+        // The conversation as the model sees it ends with this one question.
+        val turns = history.dropLast(1) + AssistantTurn(true, question)
+        val intent = router.understand(modelId, question, previous)
+        lastRoute = intent?.toString() ?: "router failed: old word rules used"
+        return if (intent != null) {
+            handle(intent, modelId, turns, question, polish, onPiece)
+        } else {
+            // The router could not run (for example an older model file): the old word rules decide.
+            fallback(modelId, turns, question, polish, onPiece)
+        }
+    }
+
+    /** The two questions of a question like "how many nodes ... and how do I ...", or null for a single question. */
+    private fun splitQuestion(question: String): Pair<String, String>? {
+        val m = SECOND_QUESTION.find(question) ?: return null
+        val first = question.substring(0, m.range.first).trim().trimEnd(',', ';')
+        val second = question.substring(m.range.first).replaceFirst(JOINER, "").trim()
+        return if (first.length >= MIN_PART && second.length >= MIN_PART) first to second.replaceFirstChar { it.uppercase() } else null
+    }
+
+    /**
+     * Antenna lengths worked out in code for a frequency in the question (the model guessed them): wavelength from the
+     * speed of light, quarter-wave and half-wave dipole, shortened by the usual 5 % for a wire element.
+     */
+    private fun antennaMath(question: String, polish: Boolean): String {
+        val q = question.lowercase()
+        if (!ANTENNA_WORDS.containsMatchIn(q)) return ""
+        val mhz = FREQUENCY.find(q)?.groupValues?.get(1)?.replace(',', '.')?.toDoubleOrNull()?.takeIf { it > 0 } ?: return ""
+        val wavelengthCm = SPEED_OF_LIGHT / (mhz * 1_000_000) * 100
+        fun cm(v: Double) = (kotlin.math.round(v * 10) / 10).toString()
+        val quarter = wavelengthCm / 4 * VELOCITY_FACTOR
+        val half = wavelengthCm / 2 * VELOCITY_FACTOR
+        return if (polish) {
+            "OBLICZENIA (pewne, podaj właśnie te liczby): dla ${cm(mhz)} MHz długość fali λ = c / f = ${cm(wavelengthCm)} cm. " +
+                "Antena ćwierćfalowa: ok. ${cm(quarter)} cm. Dipol półfalowy: ok. ${cm(half)} cm całości, czyli dwa ramiona po ok. ${cm(half / 2)} cm. " +
+                "Długości są już skrócone o ok. 5 % (współczynnik 0,95), jak dla elementu z drutu; dokładnie dostraja się je miernikiem SWR."
+        } else {
+            "CALCULATION (exact, give these numbers): for ${cm(mhz)} MHz the wavelength λ = c / f = ${cm(wavelengthCm)} cm. " +
+                "Quarter-wave antenna: about ${cm(quarter)} cm. Half-wave dipole: about ${cm(half)} cm in total, two arms of about ${cm(half / 2)} cm each. " +
+                "The lengths are already shortened by about 5 % (factor 0.95) for a wire element; fine tuning is done with an SWR meter."
+        }
     }
 
     /** Does what [intent] asks: code for exact things and for going somewhere, the model for words. */
@@ -251,7 +309,9 @@ class LlamaAssistantService(
             "app_help" -> {
                 // A button to the setting (or else the screen) the question is about: the router's words first, then the
                 // user's own. The words must start a word, so a stray match inside another word is no longer possible.
-                loop@ for (words in listOf(intent.text, question).filter { it.isNotBlank() }) {
+                // "How do I connect to my radio" is about the connections screen, not about the radio's Bluetooth settings.
+                if (CONNECT_WORDS.containsMatchIn(question.lowercase())) guideTools.open_screen("połączenia")
+                loop@ for (words in listOf(intent.text, question).filter { it.isNotBlank() && collector.size() == 0 }) {
                     for (find in listOf<(String) -> Unit>({ guideTools.show_setting(it) }, { guideTools.open_screen(it) })) {
                         find(words)
                         if (collector.size() > 0) break@loop
@@ -268,7 +328,7 @@ class LlamaAssistantService(
                         knowledge?.lookup(listOf(question, intent.text, button?.label.orEmpty()).joinToString(" ").trim(), MANUAL_CHARS).orEmpty()
                     }
                 val excerpt =
-                    if (wantsNews) wholeLines(manual) else bestLines(manual, button?.label.orEmpty(), "${intent.text} ${button?.label.orEmpty()}".ifBlank { question }, polish)
+                    if (wantsNews) wholeLines(manual) else bestLines(manual, button?.label.orEmpty(), "${intent.text} ${button?.label.orEmpty()}", question, polish)
                 if (excerpt.isNotBlank() || button != null) {
                     val text = buildString {
                         if (wantsNews) {
@@ -278,6 +338,8 @@ class LlamaAssistantService(
                             // "Firmware is in: Firmware" says nothing: the button alone is enough then.
                             if (path.isNotBlank() && !path.equals(button.label, ignoreCase = true)) {
                                 append(getStringSuspend(Res.string.ai_help_where, button.label, path))
+                            } else {
+                                append(getStringSuspend(Res.string.ai_help_open, button.label))
                             }
                         }
                         if (excerpt.isNotBlank() && !wantsNews) {
@@ -308,7 +370,7 @@ class LlamaAssistantService(
                 val extra = if (found.isBlank()) "" else rule(polish, WEB_PL, WEB_EN) + "\n" + found
                 speak(modelId, history, polish, onPiece, room, extra = extra, temperature = FACT_TEMPERATURE)
             }
-            else -> speak(modelId, history, polish, onPiece, room, extra = "")
+            else -> speak(modelId, history, polish, onPiece, room, extra = antennaMath(question, polish))
         }
     }
 
@@ -447,15 +509,16 @@ class LlamaAssistantService(
     }
 
     /**
-     * The one or two paragraphs of the app's manual that are really about the found setting: a paragraph scores most
-     * when it names the setting ([label]) exactly, then for the words of [focus]. Pages of other MT_SW parts (the Home
-     * Assistant integration, firmware), the change list, untranslated pages and tables are skipped. When nothing scores
-     * well enough the result is empty: no quote is better than a wrong one.
+     * The one or two paragraphs of the app's manual that are really about the found setting. Words of the setting's
+     * name and of the router's words ([strong]) count double, the other words of the [question] once; a paragraph that
+     * names the setting exactly ([label]) wins. Pages of other MT_SW parts, the change list, untranslated pages and
+     * tables are skipped. When nothing fits well enough the result is empty: no quote is better than a wrong one.
      */
-    private fun bestLines(fragment: String, label: String, focus: String, polish: Boolean): String {
+    private fun bestLines(fragment: String, label: String, strong: String, question: String, polish: Boolean): String {
         class Line(val title: String, val text: String, val score: Int)
         val wanted = label.lowercase().trim()
-        val terms = stems(focus)
+        val strongTerms = stems(strong)
+        val weakTerms = stems(question) - strongTerms
         val labelStems = stems(label)
         val found = ArrayList<Line>()
         var title = ""
@@ -467,18 +530,29 @@ class LlamaAssistantService(
             }
             if (line.length < MIN_HELP_LINE || line.startsWith("|") || line.startsWith(">") || line.startsWith("description:")) continue
             if (title.startsWith("MT_SW ") || title == "CHANGELOG" || (polish && title.startsWith("en-"))) continue
-            val lower = line.lowercase()
-            var score = stems(line).count { it in terms }
-            if (wanted.length >= MIN_STEM && lower.contains(wanted)) score += LABEL_SCORE
-            if (stems(title).any { it in labelStems }) score += 1
-            if (score >= MIN_HELP_SCORE) found += Line(title, line, score)
+            val words = stems(line)
+            val strongHits = words.count { it in strongTerms }
+            val weakHits = words.count { it in weakTerms }
+            val exact = wanted.length >= MIN_STEM && line.lowercase().contains(wanted)
+            if (!exact && strongHits < 2 && !(strongHits >= 1 && weakHits >= 2)) continue
+            val score = strongHits * 2 + weakHits + (if (exact) LABEL_SCORE else 0) + (if (stems(title).any { it in labelStems }) 1 else 0)
+            found += Line(title, line, score)
         }
         val best = found.maxByOrNull { it.score } ?: return ""
         // The best paragraph and, from the same part of the manual, the next best one, in the order of the manual.
         val chosen = found.filter { it.title == best.title }.sortedByDescending { it.score }.take(HELP_LINES)
         val ordered = found.filter { it in chosen }
         val heading = best.title.substringAfter(": ", "").trim()
-        return (if (heading.isNotBlank()) "($heading)\n" else "") + ordered.joinToString("\n") { it.text }.take(HELP_CHARS)
+        val body = ordered.joinToString("\n") { endAtSentence(it.text) }
+        return (if (heading.isNotBlank()) "($heading)\n" else "") + endAtSentence(body.take(HELP_CHARS))
+    }
+
+    /** Cuts an unfinished last sentence (a fragment can end in the middle of one). */
+    private fun endAtSentence(text: String): String {
+        val t = text.trim()
+        if (t.isEmpty() || t.last() in ".!?:)”\"»") return t
+        val end = maxOf(t.lastIndexOf(". "), t.lastIndexOf(".\n"), t.lastIndexOf("! "), t.lastIndexOf("? "))
+        return if (end > t.length * 2 / 5) t.substring(0, end + 1) else "$t…"
     }
 
     /** A fragment without its title line, cut at a whole line. */
@@ -489,7 +563,9 @@ class LlamaAssistantService(
             if (out.length + line.length > HELP_CHARS) break
             out.append(line.trim()).append('\n')
         }
-        return out.toString().trim()
+        // The last entry may be cut where the fragment ended: it is left out rather than shown half.
+        val kept = out.toString().trim().lines()
+        return (if (kept.size > 1 && kept.last().trim().lastOrNull()?.let { it in ".!?)" } != true) kept.dropLast(1) else kept).joinToString("\n")
     }
 
     private fun stems(text: String): Set<String> =
@@ -622,7 +698,19 @@ class LlamaAssistantService(
 
         /** Words of a question about many nodes ("which nodes have the weakest battery"), not about one. */
         val MANY_WORDS = Regex("któr|ktor|najs|najm|najn|wszystk|which|lowest|all nodes")
-        const val MANUAL_CHARS = 5000
+        const val MANUAL_CHARS = 9000
+        const val MIN_PART = 8
+        const val SPEED_OF_LIGHT = 299_792_458.0
+        const val VELOCITY_FACTOR = 0.95
+        val ANTENNA_WORDS = Regex("anten|dipol|ćwierćfal|cwiercfal|półfal|polfal|antenna|ground ?plane|yagi")
+        val FREQUENCY = Regex("(\\d{2,4}(?:[.,]\\d+)?)\\s*mhz")
+        val CONNECT_WORDS = Regex("połącz|polacz|sparow|parowa|connect|pair")
+        val JOINER = Regex("^[\\s,.;?]*(?:i|a|oraz|and)?\\s*", RegexOption.IGNORE_CASE)
+        val SECOND_QUESTION =
+            Regex(
+                "(?:[,;]?\\s+(?:i|a|oraz|and)\\s+|[?.]\\s+)(?=(?:jak|gdzie|co|czy|ile|kto|któr|ktor|jaki|jaka|jakie|how|where|what|which)[^\\p{L}])",
+                RegexOption.IGNORE_CASE,
+            )
         const val NEWS_CHARS = 1600
         const val HELP_LINES = 2
         const val MIN_HELP_LINE = 25
