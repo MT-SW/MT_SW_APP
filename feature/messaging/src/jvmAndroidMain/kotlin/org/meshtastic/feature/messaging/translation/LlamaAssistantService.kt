@@ -72,7 +72,8 @@ class LlamaAssistantService(
         // Models with a bigger window get proportionally more room for data and conversation.
         val room = (engine.contextTokens(modelId) / BASE_TOKENS).coerceAtLeast(1)
         dataTools.resultLimit = DEFAULT_TOOL_CHARS * room
-        val topic = AssistantTopics.of(question)
+        // A question that names a node needs its data even when the words say "where / how" (for example "gdzie jest ...").
+        val topic = AssistantTopics.of(question).let { if (it == AssistantTopic.GUIDE && data.mentionsNode(question)) AssistantTopic.MIXED else it }
         data.polish = question.any { it in "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ" } || history.any { it.fromUser && it.text.any { c -> c in "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ" } }
         collector.drain()
         webTools.reset()
@@ -253,7 +254,7 @@ class LlamaAssistantService(
                 Regex("\\[\\s*($names)\\s*[(:\\s]\\s*([^\\]]*?)\\s*\\)?\\s*\\]"),
                 Regex("\\b($names)\\(\\s*\"?([^\")\\n]*)\"?\\s*\\)"),
                 // Written without brackets, on its own line: "show_setting Ustawienia aplikacji".
-                Regex("(?m)^[ \\t]*($names)[ \\t:]+([^\\n]*)$"),
+                Regex("(?m)^[ \\t]*($names)[ \\t:]*([^\\n]*)$"),
             )
         var result = text
         for (pattern in patterns) {
@@ -267,6 +268,10 @@ class LlamaAssistantService(
                     if (collector.size() == before) invokeGuide(name, arg)
                 } else {
                     invokeGuide(name, arg)
+                    // The model wrote the tool without a (known) node: take the node the user's question points at.
+                    if (name == "show_node_on_map" && collector.size() == before) {
+                        data.mentionedNodeName(question)?.let { invokeGuide(name, it) }
+                    }
                 }
             }
             result = result.replace(pattern, "")

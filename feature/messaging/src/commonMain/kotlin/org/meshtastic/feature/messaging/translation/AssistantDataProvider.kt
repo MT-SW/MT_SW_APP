@@ -144,10 +144,33 @@ class AssistantDataProvider(
                 val short = n.user.short_name.lowercase()
                 (long.length >= MIN_NAME && q.contains(long)) || (short.length >= MIN_NAME && Regex("\\b${Regex.escape(short)}\\b").containsMatchIn(q))
             }
+        // A place or name in another Polish case ("na Łysicy" for a node called "Łysica"): the word without its ending
+        // is looked up in the names; a word that fits many nodes (router, node) says nothing and is skipped.
+        val byStem =
+            if (byName.isNotEmpty()) {
+                emptyList()
+            } else {
+                q.split(Regex("[^\\p{L}\\p{N}]+")).map { it.fold() }.filter { it.length >= MIN_STEM_WORD && it !in GENERIC_WORDS }
+                    .distinct().flatMap { word ->
+                        val stem = if (word.length >= MIN_STEM_WORD + 1) word.dropLast(1) else word
+                        val hits = all.filter { it.user.long_name.fold().contains(stem) || it.user.short_name.fold() == word }
+                        if (hits.size in 1..MAX_STEM_HITS) hits else emptyList()
+                    }
+            }
         val own = nodeRepository.ourNodeInfo.value
         val mine = if (own != null && q.hasAny(OWN_WORDS)) listOf(own) else emptyList()
-        return (byName + mine).distinctBy { it.num }.take(MAX_NODES_DETAIL)
+        return (byName + byStem + mine).distinctBy { it.num }.take(MAX_NODES_DETAIL)
     }
+
+    /** True when the text names (or clearly points at) a known node. */
+    fun mentionsNode(text: String): Boolean = mentionedNodes(text.lowercase()).any { it.num != nodeRepository.ourNodeInfo.value?.num }
+
+    /** The long name of the first node the text points at, or null. */
+    fun mentionedNodeName(text: String): String? =
+        mentionedNodes(text.lowercase()).firstOrNull()?.let { it.user.long_name.ifBlank { it.user.short_name } }
+
+    private fun String.fold(): String =
+        lowercase().map { c -> FOLD[c] ?: c }.joinToString("")
 
     private suspend fun safe(what: String, block: suspend () -> String): String = try {
         block()
@@ -768,6 +791,7 @@ class AssistantDataProvider(
             ?: all.firstOrNull { it.user.long_name.lowercase().contains(q) }
             ?: all.firstOrNull { it.user.short_name.lowercase().contains(q) }
             ?: all.firstOrNull { it.user.id.lowercase() == q }
+            ?: all.firstOrNull { it.user.long_name.fold().contains(q.fold()) }
     }
 
     /**
@@ -898,6 +922,10 @@ class AssistantDataProvider(
         val SETTINGS_WORDS =
             listOf("ustawien", "konfig", "setting", "config", "region", "preset", "kanał", "kanal", "channel", "lora",
                 "rola", "role", "moc", "power", "wifi", "bluetooth", "mqtt", "hop")
+        const val MIN_STEM_WORD = 5
+        const val MAX_STEM_HITS = 3
+        val GENERIC_WORDS = setOf("router", "routera", "node", "gdzie", "mapie", "znajde", "podac", "lokalizacje", "wezel", "wezla", "wezly", "siec", "sieci", "ktory", "ktora", "jakie", "jakis", "mozesz", "pokaz", "pokazac", "powiedz")
+        val FOLD = mapOf('ą' to 'a', 'ć' to 'c', 'ę' to 'e', 'ł' to 'l', 'ń' to 'n', 'ó' to 'o', 'ś' to 's', 'ź' to 'z', 'ż' to 'z')
         val NODE_WORDS = listOf("węz", "wez", "node", "sąsiad", "sasiad", "zasięg", "zasieg", "sieć", "mesh", "snr", "rssi")
         val SENSOR_WORDS = listOf("pogod", "temperatur", "wilgot", "ciśnien", "cisnien", "weather", "humidity", "pressure", "wiatr", "wind", "deszcz", "rain", "powietrz", "air quality", "pm2", "czujnik", "sensor", "środowisk", "srodowisk", "environment", "natężen", "napięci", "prąd", "prad", "voltage", "current", "gleb", "soil", "pax", "lux", "światł")
         val SIGNAL_WORDS = listOf("zasięg", "zasieg", "sygnał", "sygnal", "snr", "rssi", "odległ", "odleg", "daleko", "dystans", "blisk", "najbliż", "najbliz", "jakość", "jakosc", "range", "signal", "distance", "linku", "łącz", "polacz")
