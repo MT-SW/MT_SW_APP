@@ -267,20 +267,26 @@ class LlamaAssistantService(
                     } else {
                         knowledge?.lookup(listOf(question, intent.text, button?.label.orEmpty()).joinToString(" ").trim(), MANUAL_CHARS).orEmpty()
                     }
-                val excerpt = if (wantsNews) wholeLines(manual) else bestLines(manual, "${intent.text} ${button?.label.orEmpty()}".ifBlank { question })
-                if (excerpt.isNotBlank()) {
+                val excerpt =
+                    if (wantsNews) wholeLines(manual) else bestLines(manual, button?.label.orEmpty(), "${intent.text} ${button?.label.orEmpty()}".ifBlank { question }, polish)
+                if (excerpt.isNotBlank() || button != null) {
                     val text = buildString {
                         if (wantsNews) {
                             append(getStringSuspend(Res.string.ai_help_news)).append('\n')
-                        } else {
-                            if (button != null) {
-                                append(getStringSuspend(Res.string.ai_help_where, button.label, guideTools.pathOf(button))).append("\n\n")
+                        } else if (button != null) {
+                            val path = guideTools.pathOf(button)
+                            // "Firmware is in: Firmware" says nothing: the button alone is enough then.
+                            if (path.isNotBlank() && !path.equals(button.label, ignoreCase = true)) {
+                                append(getStringSuspend(Res.string.ai_help_where, button.label, path))
                             }
+                        }
+                        if (excerpt.isNotBlank() && !wantsNews) {
+                            if (isNotEmpty()) append("\n\n")
                             append(getStringSuspend(Res.string.ai_help_from_manual)).append('\n')
                         }
                         append(excerpt)
-                    }
-                    return text.also(onPiece)
+                    }.trim()
+                    if (text.isNotBlank()) return text.also(onPiece)
                 }
                 val place = button?.let { guideTools.placeOf(it) }.orEmpty()
                 // The manual pages are looked up with the name of the found setting too, so they are about that setting.
@@ -441,26 +447,38 @@ class LlamaAssistantService(
     }
 
     /**
-     * The lines of a manual fragment that are about [focus] (at most a few, in their order), under the fragment's title.
-     * Lines in the manual are whole paragraphs, so the result reads well as it is.
+     * The one or two paragraphs of the app's manual that are really about the found setting: a paragraph scores most
+     * when it names the setting ([label]) exactly, then for the words of [focus]. Pages of other MT_SW parts (the Home
+     * Assistant integration, firmware), the change list, untranslated pages and tables are skipped. When nothing scores
+     * well enough the result is empty: no quote is better than a wrong one.
      */
-    private fun bestLines(fragment: String, focus: String): String {
-        val lines = fragment.lines().map { it.trim() }.filter { it.isNotBlank() }
-        if (lines.isEmpty()) return ""
-        fun isTitle(line: String) = line.startsWith("[") && line.endsWith("]")
-        val title = lines.firstOrNull { isTitle(it) }?.removeSurrounding("[", "]")
-        val body = lines.filterNot { isTitle(it) }
+    private fun bestLines(fragment: String, label: String, focus: String, polish: Boolean): String {
+        class Line(val title: String, val text: String, val score: Int)
+        val wanted = label.lowercase().trim()
         val terms = stems(focus)
-        val chosen =
-            body.withIndex()
-                .map { (i, line) -> Triple(i, line, stems(line).count { it in terms }) }
-                .filter { it.third > 0 }
-                .sortedByDescending { it.third }
-                .take(HELP_LINES)
-                .sortedBy { it.first }
-                .map { it.second }
-                .ifEmpty { body.take(HELP_LINES) }
-        return (title?.let { "($it)\n" }.orEmpty() + chosen.joinToString("\n")).take(HELP_CHARS)
+        val labelStems = stems(label)
+        val found = ArrayList<Line>()
+        var title = ""
+        for (raw in fragment.lines()) {
+            val line = raw.trim()
+            if (line.startsWith("[") && line.endsWith("]")) {
+                title = line.removeSurrounding("[", "]")
+                continue
+            }
+            if (line.length < MIN_HELP_LINE || line.startsWith("|") || line.startsWith(">") || line.startsWith("description:")) continue
+            if (title.startsWith("MT_SW ") || title == "CHANGELOG" || (polish && title.startsWith("en-"))) continue
+            val lower = line.lowercase()
+            var score = stems(line).count { it in terms }
+            if (wanted.length >= MIN_STEM && lower.contains(wanted)) score += LABEL_SCORE
+            if (stems(title).any { it in labelStems }) score += 1
+            if (score >= MIN_HELP_SCORE) found += Line(title, line, score)
+        }
+        val best = found.maxByOrNull { it.score } ?: return ""
+        // The best paragraph and, from the same part of the manual, the next best one, in the order of the manual.
+        val chosen = found.filter { it.title == best.title }.sortedByDescending { it.score }.take(HELP_LINES)
+        val ordered = found.filter { it in chosen }
+        val heading = best.title.substringAfter(": ", "").trim()
+        return (if (heading.isNotBlank()) "($heading)\n" else "") + ordered.joinToString("\n") { it.text }.take(HELP_CHARS)
     }
 
     /** A fragment without its title line, cut at a whole line. */
@@ -604,9 +622,12 @@ class LlamaAssistantService(
 
         /** Words of a question about many nodes ("which nodes have the weakest battery"), not about one. */
         val MANY_WORDS = Regex("któr|ktor|najs|najm|najn|wszystk|which|lowest|all nodes")
-        const val MANUAL_CHARS = 1000
+        const val MANUAL_CHARS = 5000
         const val NEWS_CHARS = 1600
-        const val HELP_LINES = 3
+        const val HELP_LINES = 2
+        const val MIN_HELP_LINE = 25
+        const val LABEL_SCORE = 4
+        const val MIN_HELP_SCORE = 4
         const val HELP_CHARS = 1100
         const val MIN_STEM = 4
         const val STEM_LENGTH = 5
