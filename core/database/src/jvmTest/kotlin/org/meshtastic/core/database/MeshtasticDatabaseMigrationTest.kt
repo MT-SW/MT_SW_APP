@@ -64,7 +64,7 @@ class MeshtasticDatabaseMigrationTest {
     @Test
     fun migrateAll() = runTest {
         helper.createDatabase(EARLIEST_SCHEMA_VERSION).close()
-        // Every bump is an @AutoMigration except the manual 52→53 (FTS rebuild) and 63→64, 65→66 (no log rebuild).
+        // Every bump is an @AutoMigration except the manual 52→53 (FTS rebuild) and 63→64 (no log table rebuild).
         helper.runMigrationsAndValidate(latestSchemaVersion(), MANUAL_MIGRATIONS).close()
     }
 
@@ -675,42 +675,6 @@ class MeshtasticDatabaseMigrationTest {
         }
     }
 
-    /**
-     * [MeshtasticDatabase.MIGRATION_65_66] adds three composite indices on `log` in place: no row is copied or
-     * renumbered, and the newest-report-per-node query is answered from the index alone.
-     */
-    @Test
-    fun logGainsCompositeIndicesWithoutRebuildingLog() = runTest {
-        helper.createDatabase(SCHEMA_66_FROM_VERSION).use { connection ->
-            connection.execSQL(
-                "INSERT INTO log (rowid, uuid, type, received_date, message, from_num, port_num) " +
-                    "VALUES (40, 'log-a', 'Packet', 1000, 'first', 42, 71)",
-            )
-            connection.execSQL(
-                "INSERT INTO log (rowid, uuid, type, received_date, message, from_num, port_num) " +
-                    "VALUES (7, 'log-b', 'Packet', 2000, 'second', 42, 71)",
-            )
-        }
-
-        helper.runMigrationsAndValidate(SCHEMA_66_TO_VERSION, listOf(MeshtasticDatabase.MIGRATION_65_66)).use {
-            connection ->
-            val logs = "FROM log ORDER BY received_date"
-            assertEquals(listOf("40", "7"), queryColumn(connection, "SELECT rowid $logs"))
-            assertEquals(listOf("log-a", "log-b"), queryColumn(connection, "SELECT uuid $logs"))
-            val indices = queryColumn(connection, "SELECT name FROM pragma_index_list('log')")
-            assertTrue("index_log_port_num_received_date" in indices, indices.toString())
-            assertTrue("index_log_from_num_received_date" in indices, indices.toString())
-            assertTrue("index_log_port_num_from_num_received_date" in indices, indices.toString())
-            assertEquals(
-                listOf("port_num", "from_num", "received_date"),
-                queryColumn(
-                    connection,
-                    "SELECT name FROM pragma_index_info('index_log_port_num_from_num_received_date')",
-                ),
-            )
-        }
-    }
-
     /** The `detail` column of `EXPLAIN QUERY PLAN` for [sql], one entry per plan step. */
     private fun queryPlan(connection: SQLiteConnection, sql: String): List<String> =
         connection.prepare("EXPLAIN QUERY PLAN $sql").use { statement ->
@@ -761,17 +725,10 @@ class MeshtasticDatabaseMigrationTest {
         const val REACTION_AUTH_TO_VERSION = 63
         const val SCHEMA_64_FROM_VERSION = 63
         const val SCHEMA_64_TO_VERSION = 64
-        const val SCHEMA_66_FROM_VERSION = 65
-        const val SCHEMA_66_TO_VERSION = 66
         const val QUERY_PLAN_DETAIL_COLUMN = 3
 
-        /** Every hand-written migration, which a walk across 52→53, 63→64 or 65→66 must be given. */
-        val MANUAL_MIGRATIONS =
-            listOf(
-                MeshtasticDatabase.MIGRATION_52_53,
-                MeshtasticDatabase.MIGRATION_63_64,
-                MeshtasticDatabase.MIGRATION_65_66,
-            )
+        /** Every hand-written migration, which a walk across 52→53 or 63→64 must be given. */
+        val MANUAL_MIGRATIONS = listOf(MeshtasticDatabase.MIGRATION_52_53, MeshtasticDatabase.MIGRATION_63_64)
         const val PUBLIC_KEY_BYTES = 32
         const val STORED_CHANNEL_SET_HEX = "0A0612044D657368"
 
