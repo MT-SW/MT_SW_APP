@@ -51,6 +51,11 @@ class UpdatableKnowledge(
         return fromDownloaded.ifBlank { builtIn.lookup(question, maxChars) }
     }
 
+    override suspend fun latestNews(maxChars: Int): String {
+        val downloaded = withContext(Dispatchers.IO) { loadIndex() }
+        return downloaded?.latestNews(maxChars).orEmpty().ifBlank { builtIn.latestNews(maxChars) }
+    }
+
     private fun loadIndex(): KnowledgeIndex? {
         val stamp = File(directory, STAMP).lastModified()
         if (stamp == 0L) return null

@@ -92,6 +92,9 @@ ai_go_planner
 ai_go_setting
 ai_go_unknown_place
 ai_heard
+ai_help_from_manual
+ai_help_news
+ai_help_where
 ai_internet_enable
 ai_internet_on_indicator
 ai_internet_summary
@@ -317,6 +320,9 @@ assistant_suggest_1
 assistant_suggest_2
 assistant_suggest_3
 assistant_suggest_4
+assistant_web_searched
+assistant_web_sources
+assistant_web_used
 assistant_you
 audio
 audio_config

@@ -87,7 +87,7 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
         fun known(key: String, allowed: List<String>): String = text(key).lowercase().takeIf { it in allowed }.orEmpty()
         // A summary of "the network" is about the nodes, not about messages; a kind written into a name field is a slip.
         val channel = text("channel").takeUnless { it in INTENTS }.orEmpty()
-        if (kind == "summarize" && (text("topic").isNotBlank() || text("channel") in INTENTS)) {
+        if (kind == "summarize" && (text("topic").isNotBlank() || text("channel") in INTENTS || text("channel").lowercase() in NETWORK_WORDS)) {
             return AssistantIntent(intent = "network_question", topic = "overview")
         }
         return AssistantIntent(
@@ -117,6 +117,7 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
                 "draft_message", "count_messages", "search_messages", "summarize", "list_nodes", "signal_list",
                 "traceroute", "neighbors", "app_status", "waypoints", "weather", "network_question", "messages_to_me", "web_question",
             )
+        val NETWORK_WORDS = setOf("network", "sieć", "siec", "sieci", "mesh", "całą sieć", "cała sieć")
         val ROLES = listOf("any", "router", "repeater", "sensor", "tracker")
         val METRICS =
             listOf("nearest", "farthest", "snr", "rx", "tx", "dupe", "bad", "heap", "battery", "channel_util", "uptime", "per_channel", "favorites")

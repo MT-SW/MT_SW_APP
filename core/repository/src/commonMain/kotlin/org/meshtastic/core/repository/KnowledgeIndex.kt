@@ -72,6 +72,12 @@ class KnowledgeIndex(documents: List<Document>) {
         return out.toString()
     }
 
+    /** The newest entries of the change list (its first part with a list), or empty. */
+    fun latestNews(maxChars: Int): String {
+        val first = chunks.firstOrNull { it.news && it.text.startsWith("•") } ?: return ""
+        return "[${first.title}]\n${first.text}".take(maxChars)
+    }
+
     /** Cuts a markdown text into fragments at headings and, when a part is long, at blank lines. */
     private fun split(pageTitle: String, markdown: String, news: Boolean): List<Chunk> {
         val result = ArrayList<Chunk>()

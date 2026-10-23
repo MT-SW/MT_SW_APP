@@ -35,6 +35,9 @@ import org.meshtastic.core.repository.TranslatorModelState
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ai_go_draft
+import org.meshtastic.core.resources.ai_help_from_manual
+import org.meshtastic.core.resources.ai_help_news
+import org.meshtastic.core.resources.ai_help_where
 import org.meshtastic.core.resources.ai_go_draft_empty
 import org.meshtastic.core.resources.ai_go_draft_no_target
 import org.meshtastic.core.resources.ai_go_farthest
@@ -248,6 +251,30 @@ class LlamaAssistantService(
                     }
                 }
                 val button = collector.last()
+                // The answer is the app's own manual, shown as it is written, with where the setting is: the small
+                // model garbled words and invented menu paths when it retold the manual in its own words.
+                val wantsNews = NEWS_WORDS.containsMatchIn("${intent.text} $question".lowercase())
+                val manual =
+                    if (wantsNews) {
+                        knowledge?.latestNews(NEWS_CHARS).orEmpty()
+                    } else {
+                        knowledge?.lookup(listOf(question, intent.text, button?.label.orEmpty()).joinToString(" ").trim(), MANUAL_CHARS).orEmpty()
+                    }
+                val excerpt = if (wantsNews) wholeLines(manual) else bestLines(manual, "${intent.text} ${button?.label.orEmpty()}".ifBlank { question })
+                if (excerpt.isNotBlank()) {
+                    val text = buildString {
+                        if (wantsNews) {
+                            append(getStringSuspend(Res.string.ai_help_news)).append('\n')
+                        } else {
+                            if (button != null) {
+                                append(getStringSuspend(Res.string.ai_help_where, button.label, guideTools.pathOf(button))).append("\n\n")
+                            }
+                            append(getStringSuspend(Res.string.ai_help_from_manual)).append('\n')
+                        }
+                        append(excerpt)
+                    }
+                    return text.also(onPiece)
+                }
                 val place = button?.let { guideTools.placeOf(it) }.orEmpty()
                 // The manual pages are looked up with the name of the found setting too, so they are about that setting.
                 val guide = knowledge?.lookup(listOf(question, intent.text, button?.label.orEmpty()).joinToString(" ").trim(), KNOWLEDGE_CHARS * room).orEmpty()
@@ -406,6 +433,43 @@ class LlamaAssistantService(
         return cleanUp(text)
     }
 
+    /**
+     * The lines of a manual fragment that are about [focus] (at most a few, in their order), under the fragment's title.
+     * Lines in the manual are whole paragraphs, so the result reads well as it is.
+     */
+    private fun bestLines(fragment: String, focus: String): String {
+        val lines = fragment.lines().map { it.trim() }.filter { it.isNotBlank() }
+        if (lines.isEmpty()) return ""
+        fun isTitle(line: String) = line.startsWith("[") && line.endsWith("]")
+        val title = lines.firstOrNull { isTitle(it) }?.removeSurrounding("[", "]")
+        val body = lines.filterNot { isTitle(it) }
+        val terms = stems(focus)
+        val chosen =
+            body.withIndex()
+                .map { (i, line) -> Triple(i, line, stems(line).count { it in terms }) }
+                .filter { it.third > 0 }
+                .sortedByDescending { it.third }
+                .take(HELP_LINES)
+                .sortedBy { it.first }
+                .map { it.second }
+                .ifEmpty { body.take(HELP_LINES) }
+        return (title?.let { "($it)\n" }.orEmpty() + chosen.joinToString("\n")).take(HELP_CHARS)
+    }
+
+    /** A fragment without its title line, cut at a whole line. */
+    private fun wholeLines(fragment: String): String {
+        val lines = fragment.lines().filterNot { it.startsWith("[") && it.trim().endsWith("]") }.filter { it.isNotBlank() }
+        val out = StringBuilder()
+        for (line in lines) {
+            if (out.length + line.length > HELP_CHARS) break
+            out.append(line.trim()).append('\n')
+        }
+        return out.toString().trim()
+    }
+
+    private fun stems(text: String): Set<String> =
+        text.lowercase().split(Regex("[^\\p{L}\\p{N}]+")).filter { it.length >= MIN_STEM }.map { it.take(STEM_LENGTH) }.toSet()
+
     /** Plain text for the chat bubble: no markdown stars or backticks the small model likes to add. */
     private fun cleanUp(text: String): String =
         text.replace(Regex("\\*\\*([^*\\n]+)\\*\\*"), "$1").replace("`", "").replace(Regex("(?m)^\\s*[*-] "), "• ")
@@ -529,6 +593,13 @@ class LlamaAssistantService(
         /** Answers about the app, the user's data or the web stick closer to the given text with a lower randomness. */
         const val FACT_TEMPERATURE = 0.25f
         const val WEB_QUERY_CHARS = 120
+        const val MANUAL_CHARS = 1000
+        const val NEWS_CHARS = 1600
+        const val HELP_LINES = 3
+        const val HELP_CHARS = 1100
+        const val MIN_STEM = 4
+        const val STEM_LENGTH = 5
+        val NEWS_WORDS = Regex("nowo|nowe |zmian|what's new|new in|changelog")
         val APP_WORDS = Regex("mt[_ -]?sw|aplikacj|funkcj|ustawie|tłumacz|tlumacz|asystent|dyktowan|app\\b|setting")
 
         /** Quiet thinking before written answers: better answers, a few seconds more. */
