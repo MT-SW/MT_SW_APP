@@ -141,6 +141,8 @@ class UpdatableKnowledge(
         const val DAY_MS = 24L * 60 * 60 * 1000
         val PROJECT_SOURCES =
             listOf(
+                Triple("MT-SW/MT_SW_APP", "knowledge/project.md", "project"),
+                Triple("MT-SW/MT_SW_APP", "knowledge/achievements.md", "achievements"),
                 Triple("MT-SW/MT_SW_FIRMWARE", "README.md", "firmware"),
                 Triple("MT-SW/MT_SW_INTEGRATION", "README.md", "integration"),
                 Triple("MT-SW/MT_SW_INTEGRATION", "custom_components/meshtastic/meshtastic_web/MTSW_WEB_CLIENT.md", "integration-web-client"),
