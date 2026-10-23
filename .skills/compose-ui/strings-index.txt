@@ -75,8 +75,10 @@ ai_conn_disconnected
 ai_conn_sleep
 ai_conn_unknown
 ai_dictation_note
+ai_dist_next
 ai_dm_none
 ai_dm_title
+ai_far_one
 ai_found_n
 ai_found_none
 ai_found_none_for
@@ -136,6 +138,7 @@ ai_msg_enroute
 ai_msg_error
 ai_msg_other
 ai_msg_queued
+ai_near_one
 ai_neigh_hears
 ai_neigh_nobody
 ai_neigh_none
@@ -147,6 +150,7 @@ ai_no_channel
 ai_nodes_heard_title
 ai_nodes_match
 ai_nodes_none
+ai_nodes_recent
 ai_none_value
 ai_privacy
 ai_private_chat

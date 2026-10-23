@@ -96,8 +96,10 @@
     <string name="ai_conn_sleep">radio asleep</string>
     <string name="ai_conn_unknown">unknown</string>
     <string name="ai_dictation_note">Dictation in chats and the assistant uses the model chosen for the assistant. Dictation in the translator works only if the translator\'s own model can hear. Only the Gemma E2B and E4B models can hear; the smallest translator model (NLLB) cannot, so there is no dictation there.</string>
+    <string name="ai_dist_next">Next: %1$s</string>
     <string name="ai_dm_none">Nobody has written to you privately yet.</string>
     <string name="ai_dm_title">Latest private messages to you (newest first):</string>
+    <string name="ai_far_one">The farthest is %1$s (%2$s): %3$s km, heard %4$s.</string>
     <string name="ai_found_n">Found: %1$d (newest first)</string>
     <string name="ai_found_none">No messages found.</string>
     <string name="ai_found_none_for">No messages found for: %1$s</string>
@@ -157,6 +159,7 @@
     <string name="ai_msg_error">NOT delivered</string>
     <string name="ai_msg_other">no delivery information</string>
     <string name="ai_msg_queued">waiting in the queue</string>
+    <string name="ai_near_one">The nearest is %1$s (%2$s): %3$s km, heard %4$s.</string>
     <string name="ai_neigh_hears">%1$s (%2$s) hears:</string>
     <string name="ai_neigh_nobody">nobody</string>
     <string name="ai_neigh_none">No neighbour information saved.</string>
@@ -168,6 +171,7 @@
     <string name="ai_nodes_heard_title">%1$s: heard %2$d of %3$d known nodes</string>
     <string name="ai_nodes_match">Matching nodes: %1$d of %2$d known</string>
     <string name="ai_nodes_none">No node matches (known: %1$d).</string>
+    <string name="ai_nodes_recent">Heard most recently: %1$s</string>
     <string name="ai_none_value">n/a</string>
     <string name="ai_privacy">Everything is processed locally on this device. Once a model is downloaded, no texts or conversations are sent to the internet. The internet is only needed for the one-time model download.</string>
     <string name="ai_private_chat">private chat</string>
