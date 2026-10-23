@@ -43,6 +43,7 @@ class AssistantDataProvider(
     private val radioConfigRepository: RadioConfigRepository,
     private val meshLogRepository: MeshLogRepository,
     private val packetRepository: PacketRepository,
+    private val connection: org.meshtastic.core.repository.ConnectionStateProvider? = null,
 ) {
 
     /** A text with the data that is useful for answering [question], or an empty text when nothing matches. */
@@ -65,6 +66,8 @@ class AssistantDataProvider(
         if (q.hasAny(SENSOR_WORDS)) parts += safe("sensors") { sensors() }
         if (q.hasAny(SIGNAL_WORDS)) parts += safe("signal") { signalRanking(q) }
         if (q.hasAny(ACTIVITY_WORDS)) parts += safe("activity") { activity(q) }
+        if (q.hasAny(STATUS_WORDS)) priority += safe("status") { toolAppStatus() }
+        if (q.hasAny(WAYPOINT_WORDS)) priority += safe("waypoints") { toolWaypoints(TRACE_SHOWN) }
         if (q.hasAny(ROUTE_WORDS)) {
             val who = mentioned.firstOrNull()?.user?.long_name.orEmpty()
             priority += safe("traceroute") { toolTraceroutes(who, TRACE_SHOWN) }
@@ -123,7 +126,7 @@ class AssistantDataProvider(
     fun hasTopic(question: String): Boolean {
         val q = question.lowercase()
         return mentionedNodes(q).isNotEmpty() ||
-            listOf(SENSOR_WORDS, SIGNAL_WORDS, NODE_WORDS, TREND_WORDS, RANK_WORDS, SETTINGS_WORDS, SUMMARY_WORDS, MESSAGE_WORDS, ACTIVITY_WORDS, ROUTE_WORDS)
+            listOf(SENSOR_WORDS, SIGNAL_WORDS, NODE_WORDS, TREND_WORDS, RANK_WORDS, SETTINGS_WORDS, SUMMARY_WORDS, MESSAGE_WORDS, ACTIVITY_WORDS, ROUTE_WORDS, STATUS_WORDS, WAYPOINT_WORDS)
                 .any { q.hasAny(it) }
     }
 
@@ -972,6 +975,57 @@ class AssistantDataProvider(
             }
     }
 
+    /** Connection to the radio, unread messages per conversation and the state of the newest own messages. */
+    suspend fun toolAppStatus(): String {
+        val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
+        val sb = StringBuilder("APP STATUS:\n")
+        sb.append("Connection to the radio: ").append(connection?.connectionState?.value?.toString() ?: "unknown").append('\n')
+        val unread = packetRepository.getUnreadCounts().filterValues { it > 0 }
+        if (unread.isEmpty()) {
+            sb.append("Unread messages: none\n")
+        } else {
+            sb.append("Unread messages: ${unread.values.sum()} (")
+            sb.append(
+                unread.entries.sortedByDescending { it.value }.take(UNREAD_SHOWN).joinToString { (key, n) ->
+                    val label =
+                        if (key.endsWith("^all")) key.substringBefore('^').toIntOrNull()?.let { "channel $it ${names.getOrNull(it).orEmpty()}".trim() } ?: key
+                        else "private chat with " + (findNode(key.substringAfter('!', "").let { "!$it" })?.user?.long_name ?: key)
+                    "$label: $n"
+                },
+            )
+            sb.append(")\n")
+        }
+        val own = ArrayList<Pair<Long, String>>()
+        for (key in packetRepository.getContacts().first().keys) {
+            val list = packetRepository.getMessagesFrom(key, OWN_STATUS_PER_CHAT) { id -> nodeRepository.getNode(id.orEmpty()) }.first()
+            for (m in list) if (m.fromLocal) own += m.receivedTime to "${m.status ?: "UNKNOWN"}: ${m.text.take(MESSAGE_CHARS)}"
+        }
+        if (own.isNotEmpty()) {
+            val now = nowMillis
+            sb.append("My newest messages (delivery state):\n")
+            own.sortedByDescending { it.first }.take(OWN_STATUS_SHOWN).forEach {
+                sb.append("- ${((now - it.first) / MILLIS_PER_MINUTE).coerceAtLeast(0)} min ago, ${it.second}\n")
+            }
+        }
+        return sb.toString().trim()
+    }
+
+    /** The waypoints (map pins) the app has received or created, newest first. */
+    suspend fun toolWaypoints(limit: Int): String {
+        val top = limit.coerceIn(1, MAX_TOOL_LIST)
+        val list = packetRepository.getWaypoints().first().sortedByDescending { it.time }
+        if (list.isEmpty()) return "No waypoints saved."
+        val now = nowMillis
+        return "WAYPOINTS (${list.size}, newest first):\n" +
+            list.take(top).joinToString("\n") { p ->
+                val w = p.waypoint
+                val sender = findNode(p.from.orEmpty())?.let { it.user.long_name.ifBlank { it.user.short_name } } ?: p.from
+                val lat = (w?.latitude_i ?: 0) / WAYPOINT_SCALE
+                val lon = (w?.longitude_i ?: 0) / WAYPOINT_SCALE
+                "- ${w?.name.orEmpty().ifBlank { "(no name)" }}: ${w?.description.orEmpty().take(MESSAGE_CHARS)} at ${fmt(lat.toFloat())}, ${fmt(lon.toFloat())}, from $sender, ${((now - p.time) / MILLIS_PER_MINUTE).coerceAtLeast(0)} min ago"
+            }
+    }
+
     /** A channel mentioned in the question (by name, or by number such as "kanał 1" / "kanał jeden"), as text, or empty. */
     private suspend fun channelFromQuestion(q: String): String {
         val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
@@ -1171,6 +1225,10 @@ class AssistantDataProvider(
         const val HOURS_WORD_DEFAULT = 1
         const val TRACE_WINDOW_MS = 30L * 86_400_000L
         const val TRACE_SHOWN = 6
+        const val UNREAD_SHOWN = 6
+        const val OWN_STATUS_PER_CHAT = 5
+        const val OWN_STATUS_SHOWN = 6
+        const val WAYPOINT_SCALE = 1e7
         const val COUNT_PER_CHAT = 3000
         const val MAX_COUNT_HOURS = 8784L
         const val MILLIS_PER_DAY = 86_400_000L
@@ -1221,6 +1279,8 @@ class AssistantDataProvider(
         val ANY_WORDS = setOf("all", "any", "wszystkie", "wszystko", "everything", "null", "none", "*")
         val COUNT_WORDS = listOf("najwięcej", "najwiecej", "kto napisa", "kto pisze", "ile ", "ilo", "liczb", "how many", "count", "licz")
         val TODAY_WORDS = listOf("dzisiaj", "dziś", "dzis", "today", "od rana")
+        val STATUS_WORDS = listOf("nieprzeczyta", "unread", "połączon", "polaczon", "connected", "dostarczon", "doszła", "doszla", "delivered", "niewysłan", "nie wysłan", "nie wyslan")
+        val WAYPOINT_WORDS = listOf("waypoint", "punkt na mapie", "punkty na mapie", "znacznik", "pinezk")
         val ROUTE_WORDS = listOf("traceroute", "trasa", "trasy", "trasę", "trase", "route", "neighbo", "słyszy", "slyszy", "przez jakie", "przez które")
         val MESSAGE_WORDS = listOf("wiadomo", "message", "czat", "chat", "napisa", "pisa", "rozmow", "odpowied")
     }
