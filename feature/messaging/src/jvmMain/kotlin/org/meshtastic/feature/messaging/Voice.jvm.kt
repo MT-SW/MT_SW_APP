@@ -77,7 +77,7 @@ actual fun rememberSpeaker(): Speaker {
 }
 
 /** Records the default microphone with javax.sound as 16 kHz mono PCM; the recording is capped at 30 seconds. */
-private class DesktopMic {
+private class DesktopMic(private val useHeadset: () -> Boolean) {
     private var line: javax.sound.sampled.TargetDataLine? = null
     private var thread: Thread? = null
     private val buffer = java.io.ByteArrayOutputStream()
@@ -86,7 +86,7 @@ private class DesktopMic {
 
     fun start() {
         val format = javax.sound.sampled.AudioFormat(RATE, 16, 1, true, false)
-        val opened = javax.sound.sampled.AudioSystem.getTargetDataLine(format)
+        val opened = openLine(format)
         opened.open(format)
         buffer.reset()
         line = opened
@@ -116,13 +116,41 @@ private class DesktopMic {
         return synchronized(buffer) { buffer.toByteArray() }
     }
 
+    /**
+     * The microphone line: with the headset setting on, a connected headset (Bluetooth, USB) is looked for among the
+     * computer's sound inputs; otherwise, or when none is found, the system's default microphone.
+     */
+    private fun openLine(format: javax.sound.sampled.AudioFormat): javax.sound.sampled.TargetDataLine {
+        if (useHeadset()) {
+            val info = javax.sound.sampled.DataLine.Info(javax.sound.sampled.TargetDataLine::class.java, format)
+            val inputs =
+                javax.sound.sampled.AudioSystem.getMixerInfo().filter { mixer ->
+                    runCatching { javax.sound.sampled.AudioSystem.getMixer(mixer).isLineSupported(info) }.getOrDefault(false)
+                }
+            val text = { m: javax.sound.sampled.Mixer.Info -> (m.name + " " + m.description).lowercase() }
+            val pick =
+                inputs.firstOrNull { HEADSET.containsMatchIn(text(it)) }
+                    ?: inputs.firstOrNull { !BUILT_IN.containsMatchIn(text(it)) }
+            if (pick != null) {
+                runCatching {
+                    Logger.i(tag = "DesktopMic") { "Dictation records from ${pick.name}" }
+                    return javax.sound.sampled.AudioSystem.getMixer(pick).getLine(info) as javax.sound.sampled.TargetDataLine
+                }
+            }
+        }
+        return javax.sound.sampled.AudioSystem.getTargetDataLine(format)
+    }
+
     private companion object {
         const val RATE = 16_000f
+        val HEADSET = Regex("headset|bluetooth|hands-?free|usb|airpods|buds|słuchawk|jabra|plantronics|poly|bose|sony|jbl")
+        val BUILT_IN = Regex("built-?in|wbudowan|internal|macbook|default|primary|stereo mix|port |line in")
     }
 }
 
 @Composable
 actual fun rememberMicRecorder(): MicRecorder {
-    val mic = remember { DesktopMic() }
+    val prefs = org.koin.compose.koinInject<org.meshtastic.core.repository.UiPrefs>()
+    val mic = remember { DesktopMic(useHeadset = { prefs.dictationExternalMic.value }) }
     return remember(mic) { MicRecorder(permission = { true }, start = mic::start, stop = mic::stop) }
 }

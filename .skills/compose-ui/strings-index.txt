@@ -662,6 +662,8 @@ device_sleeping
 device_storage_ui_title
 device_theme_language
 dew_point
+dictation_external_mic_summary
+dictation_external_mic_title
 direct_message
 direct_message_key
 direct_messages

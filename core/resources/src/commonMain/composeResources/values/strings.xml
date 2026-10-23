@@ -695,6 +695,8 @@
     <string name="device_storage_ui_title">Device Storage &amp; UI (Read-Only)</string>
     <string name="device_theme_language">Theme: %1$s, Language: %2$s</string>
     <string name="dew_point">Dew Point</string>
+    <string name="dictation_external_mic_summary">When a headset is connected (Bluetooth, wired or USB), dictation everywhere in the app records from its microphone instead of the phone's or computer's own.</string>
+    <string name="dictation_external_mic_title">Headset microphone for dictation</string>
     <string name="direct_message">Direct Message</string>
     <string name="direct_message_key">Direct Message Key</string>
     <string name="direct_messages">Direct Messages</string>

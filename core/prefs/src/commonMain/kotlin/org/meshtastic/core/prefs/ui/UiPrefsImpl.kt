@@ -148,6 +148,13 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_ASSISTANT_INTERNET_ENABLED] = value } }
     }
 
+    override val dictationExternalMic: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_DICTATION_EXTERNAL_MIC] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
+
+    override fun setDictationExternalMic(value: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_DICTATION_EXTERNAL_MIC] = value } }
+    }
+
     override val assistantMemoryEnabled: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_ASSISTANT_MEMORY_ENABLED] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
 
@@ -714,6 +721,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_ASSISTANT_ENABLED = booleanPreferencesKey("assistant-enabled")
         val KEY_ASSISTANT_INTERNET_ENABLED = booleanPreferencesKey("assistant-internet-enabled")
         val KEY_ASSISTANT_MEMORY_ENABLED = booleanPreferencesKey("assistant-memory-enabled")
+        val KEY_DICTATION_EXTERNAL_MIC = booleanPreferencesKey("dictation-external-mic")
         val KEY_TRANSLATOR_MODEL_ID = stringPreferencesKey("translator-model-id")
         val KEY_ASSISTANT_MODEL_ID = stringPreferencesKey("assistant-model-id")
         const val DEFAULT_TRANSLATOR_MODEL_ID = "nllb-600m"

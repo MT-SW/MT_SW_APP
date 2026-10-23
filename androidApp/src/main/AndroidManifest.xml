@@ -43,6 +43,8 @@
     <!-- Dictation in the assistant records speech from the microphone; the permission is asked only when it is used -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
+    <!-- Dictation can record from a Bluetooth headset's microphone: switching the audio route needs this (no prompt) -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <!-- Request legacy Bluetooth permissions on older devices -->
     <uses-permission android:name="android.permission.BLUETOOTH"
