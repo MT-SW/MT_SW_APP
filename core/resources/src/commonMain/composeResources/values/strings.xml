@@ -84,6 +84,10 @@
     <string name="ai_battery_ext">external power</string>
     <string name="ai_battery_pct">battery %1$d%%</string>
     <string name="ai_battery_unknown">battery unknown</string>
+    <string name="ai_chan_line">channel %1$d (%2$s): %3$d</string>
+    <string name="ai_chan_none">There are no saved messages yet.</string>
+    <string name="ai_chan_private">private messages (together): %1$d</string>
+    <string name="ai_chan_title">Saved messages per channel (most first):</string>
     <string name="ai_cnt_line">Messages — %1$s, %2$s: %3$d (mine: %4$d)</string>
     <string name="ai_cnt_top">Who wrote the most:</string>
     <string name="ai_conn_connected">connected</string>
@@ -95,6 +99,17 @@
     <string name="ai_found_n">Found: %1$d (newest first)</string>
     <string name="ai_found_none">No messages found.</string>
     <string name="ai_found_none_for">No messages found for: %1$s</string>
+    <string name="ai_go_draft">The message is ready in the conversation with %1$s: “%2$s”. Nothing was sent: check it and send it yourself.</string>
+    <string name="ai_go_draft_empty">What should the message say?</string>
+    <string name="ai_go_draft_no_target">Where should the message go? Name a channel or a node.</string>
+    <string name="ai_go_farthest">The farthest node with a known position is %1$s, %2$s km away. Showing it on the map.</string>
+    <string name="ai_go_map">Showing %1$s on the map.</string>
+    <string name="ai_go_nearest">The nearest node is %1$s, %2$s km away. Showing it on the map.</string>
+    <string name="ai_go_no_position">The position of your node or of the matching nodes is not known, so the nearest one cannot be found.</string>
+    <string name="ai_go_open">Opening: %1$s.</string>
+    <string name="ai_go_planner">Opening the link planner for %1$s.</string>
+    <string name="ai_go_setting">Opening the page with the setting %1$s. It blinks so it is easy to find; changing it is up to you.</string>
+    <string name="ai_go_unknown_place">That place was not found in the app. Try other words, for example: open LoRa settings.</string>
     <string name="ai_heard">heard %1$s</string>
     <string name="ai_internet_enable">Turn on</string>
     <string name="ai_internet_on_indicator">Internet is ON for the assistant</string>
@@ -154,6 +169,19 @@
     <string name="ai_scope_channel">channel %1$s (%2$d)</string>
     <string name="ai_scope_default">default</string>
     <string name="ai_section_title">Offline translator and assistant</string>
+    <string name="ai_sensor_coldest">Coldest</string>
+    <string name="ai_sensor_current">current %1$s mA</string>
+    <string name="ai_sensor_highest_pressure">Highest pressure</string>
+    <string name="ai_sensor_humidity">humidity %1$s %</string>
+    <string name="ai_sensor_light">light %1$s lx</string>
+    <string name="ai_sensor_most_humid">Highest humidity</string>
+    <string name="ai_sensor_none">No node has reported weather or sensor data.</string>
+    <string name="ai_sensor_pressure">pressure %1$s hPa</string>
+    <string name="ai_sensor_temperature">temperature %1$s °C</string>
+    <string name="ai_sensor_title">Sensor data (%1$d nodes, latest readings; impossible values skipped):</string>
+    <string name="ai_sensor_voltage">voltage %1$s V</string>
+    <string name="ai_sensor_warmest">Warmest</string>
+    <string name="ai_sensor_wind">wind %1$s m/s</string>
     <string name="ai_sig_best">Best range — directly heard nodes first, highest SNR first (%1$d with a reading, of %2$d):</string>
     <string name="ai_sig_closest">Closest nodes (of %1$d):</string>
     <string name="ai_sig_farthest">Farthest nodes (of %1$d):</string>
@@ -175,7 +203,6 @@
     <string name="ai_trace_title">Packet routes (newest first):</string>
     <string name="ai_unknown_node">Unknown node: %1$s</string>
     <string name="ai_warning_body">The model needs a one-time download (about %1$d MB) and uses about %2$d MB of RAM while running. A device with at least %3$d GB of RAM is recommended. On weaker devices it may slow down or close the app. Once downloaded it works without internet.</string>
-    <!-- AIR -->
     <string name="ai_win_all">All saved</string>
     <string name="ai_win_last_day">Last 24 hours</string>
     <string name="ai_win_last_hour">Last hour</string>
@@ -194,6 +221,7 @@
     <string name="ai_wp_noname">(no name)</string>
     <string name="ai_wp_none">No waypoints saved.</string>
     <string name="ai_wp_title">Waypoints: %1$d (newest first)</string>
+    <!-- AIR -->
     <string name="air_quality">Air Quality</string>
     <string name="air_quality_icon">Air quality icon</string>
     <string name="air_quality_metrics_log">Air Quality Metrics Log</string>
@@ -1621,6 +1649,7 @@
     <string name="message_status_sfpp_routing">Routing via SF++ chain…</string>
     <string name="message_status_unknown">Unknown</string>
     <string name="message_translated_label">Translated</string>
+    <!-- MESSAGES -->
     <string name="messages">Messages</string>
     <string name="messages_read_all">Read all messages aloud</string>
     <string name="messages_read_visible">Read visible messages aloud</string>
