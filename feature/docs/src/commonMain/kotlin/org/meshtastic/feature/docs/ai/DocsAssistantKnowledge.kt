@@ -93,7 +93,6 @@ class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : Assis
                 "integration.md" to "MT_SW Home Assistant integration",
                 "integration-web-client.md" to "MT_SW integration web client",
                 "integration-planner-api.md" to "MT_SW integration planner API",
-                "protobufs.md" to "MT_SW protobufs",
             )
         const val CHANGELOG_PATH = "files/knowledge/CHANGELOG.md"
         const val POLISH_LETTERS = "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ"

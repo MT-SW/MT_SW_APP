@@ -89,7 +89,7 @@ class UpdatableKnowledge(
                     download("docs/$lang/user/$name", target, null, sha)
                 }
             }
-            // The other parts of the project (firmware, integration, protobufs) come from their own repositories.
+            // The other parts of the project (firmware, integration) come from their own repositories.
             File(directory, "project").mkdirs()
             for ((repo, path, name) in PROJECT_SOURCES) {
                 try {
@@ -145,7 +145,6 @@ class UpdatableKnowledge(
                 Triple("MT-SW/MT_SW_INTEGRATION", "README.md", "integration"),
                 Triple("MT-SW/MT_SW_INTEGRATION", "custom_components/meshtastic/meshtastic_web/MTSW_WEB_CLIENT.md", "integration-web-client"),
                 Triple("MT-SW/MT_SW_INTEGRATION", "custom_components/meshtastic/ha_frontend/planner/API.md", "integration-planner-api"),
-                Triple("MT-SW/MT_SW_PROTOBUFS", "README.md", "protobufs"),
             )
         val ENTRY = Regex("\"name\"\\s*:\\s*\"([^\"]+)\"[^{}]*?\"sha\"\\s*:\\s*\"([0-9a-f]{40})\"")
         val ENTRY_SHA = Regex("\"sha\"\\s*:\\s*\"([0-9a-f]{40})\"")
