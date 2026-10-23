@@ -105,7 +105,7 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
 
     companion object {
         private const val TAG = "AssistantRouter"
-        private const val MAX_TOKENS = 120
+        private const val MAX_TOKENS = 70
         private const val TEMPERATURE = 0.05f
         private const val PREVIOUS_CHARS = 300
         private const val QUESTION_CHARS = 600
