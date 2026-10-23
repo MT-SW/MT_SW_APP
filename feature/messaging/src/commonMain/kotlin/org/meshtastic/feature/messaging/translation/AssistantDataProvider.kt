@@ -79,6 +79,9 @@ class AssistantDataProvider(
                 val hours = if (q.hasAny(TODAY_WORDS)) 0 else if (q.contains("godzin")) 1 else 24
                 parts.add(0, safe("count") { toolMessageCount(channelFromQuestion(q), hours) })
             }
+            QUOTED.find(question)?.groupValues?.get(1)?.takeIf { it.isNotBlank() }?.let { phrase ->
+                parts.add(0, safe("search") { toolMessages(phrase, SEARCH_SHOWN, channelFromQuestion(q)) })
+            }
             parts += safe("messages") { messages() }
         }
         parts += safe("index") { nodeIndex() }
@@ -675,24 +678,44 @@ class AssistantDataProvider(
 
     suspend fun toolSettings(): String = settings()
 
-    /** Messages containing [query] (all conversations); an empty [query] gives the newest ones. */
-    suspend fun toolMessages(query: String, limit: Int): String {
+    /**
+     * Messages containing [query] (case and Polish accents ignored) in all conversations, or only in [channel] (name or
+     * number) or in the direct messages with a node called [channel]; an empty [query] gives the newest ones.
+     */
+    suspend fun toolMessages(query: String, limit: Int, channel: String = ""): String {
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
-        val needle = query.trim().lowercase()
-        val keys = packetRepository.getContacts().first().keys
+        val needle = query.trim().lowercase().fold()
+        val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
+        val wanted = channel.trim().lowercase()
+        var keys = packetRepository.getContacts().first().keys.toList()
+        if (wanted.isNotEmpty()) {
+            val index = wanted.toIntOrNull() ?: numberedChannel(wanted) ?: names.indexOfFirst { it.lowercase() == wanted }.takeIf { it >= 0 }
+                ?: names.indexOfFirst { it.lowercase().contains(wanted) }.takeIf { it >= 0 }
+            keys =
+                if (index != null) {
+                    keys.filter { it.endsWith("^all") && it.startsWith("$index^") }
+                } else {
+                    val id = findNode(channel)?.user?.id.orEmpty()
+                    if (id.isBlank()) return "No channel or node found for \"$channel\"."
+                    keys.filter { it.endsWith(id) }
+                }
+        }
         val found = ArrayList<Triple<Long, String, String>>()
         for (key in keys) {
+            val label =
+                if (key.endsWith("^all")) key.substringBefore('^').toIntOrNull()?.let { names.getOrNull(it)?.ifBlank { "(default)" } } ?: key
+                else "private"
             val list = packetRepository.getMessagesFrom(key, SEARCH_PER_CHAT) { id -> nodeRepository.getNode(id.orEmpty()) }.first()
             for (m in list) {
                 val text = m.text
-                if (needle.isNotEmpty() && !text.lowercase().contains(needle)) continue
+                if (needle.isNotEmpty() && !text.lowercase().fold().contains(needle)) continue
                 val who = if (m.fromLocal) "me" else m.node.user.short_name
-                found += Triple(m.receivedTime, key, "$who: ${text.take(MESSAGE_CHARS)}")
+                found += Triple(m.receivedTime, label, "$who: ${text.take(MESSAGE_CHARS)}")
             }
         }
-        if (found.isEmpty()) return "No messages found."
+        if (found.isEmpty()) return "No messages found for \"$query\"."
         val now = nowMillis
-        return "MESSAGES (newest first):\n" +
+        return "MESSAGES with \"$query\": ${found.size} found, newest first (showing ${minOf(top, found.size)}):\n" +
             found.sortedByDescending { it.first }.take(top).joinToString("\n") {
                 "- [${it.second}] ${((now - it.first) / MILLIS_PER_MINUTE).coerceAtLeast(0)} min ago, ${it.third}"
             }
@@ -1011,7 +1034,9 @@ class AssistantDataProvider(
         val NUMBER_WORDS =
             mapOf("zer" to 0, "jede" to 1, "jedyn" to 1, "one" to 1, "pierw" to 1, "dw" to 2, "two" to 2, "trz" to 3, "three" to 3, "czter" to 4, "four" to 4, "pię" to 5, "pie" to 5, "five" to 5, "sze" to 6, "six" to 6, "sied" to 7, "seven" to 7)
         const val MAX_TOOL_LIST = 40
-        const val SEARCH_PER_CHAT = 60
+        const val SEARCH_PER_CHAT = 3000
+        const val SEARCH_SHOWN = 15
+        val QUOTED = Regex("[\"„”«]([^\"„”»]{2,60})[\"”»]")
         const val COUNT_PER_CHAT = 3000
         const val MAX_COUNT_HOURS = 720L
         const val MILLIS_PER_DAY = 86_400_000L

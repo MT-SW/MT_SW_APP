@@ -151,6 +151,8 @@ On weaker devices large models can slow the app down or close it, which is why e
 
 **Counts and filters (assistant).** The assistant can count messages on a channel (today since midnight or the last hours, with who writes most), filter nodes (active in the last hours, favourites, by hardware, low battery, with position) and read direct messages with a chosen node. The program computes the numbers, not the model, so they stay correct.
 
+**Searching messages (assistant).** The assistant finds a word or phrase (for example in quotes) in the messages of all channels, of one channel or of the private chat with a chosen node; case and Polish accents do not matter. It gives the number of hits and the channel they were on.
+
 **Assistant memory (off by default).** The assistant saves short notes about you (a few small files: who you are, your devices and network, how you like to talk, what you work on) and remembers them between conversations, so the conversation feels more natural. The notes stay on this device only. In the assistant settings you can view, edit and delete them, switch the memory off, and write **your own instructions** (for example how it should talk to you) that the assistant always follows. Above the conversation the assistant reminds you that it saves notes.
 
 **Reading and translating a whole conversation.** The three-dots menu of a channel or direct message has "Read visible messages aloud", "Read all messages aloud", "Translate visible messages" and "Translate all messages" (and "Stop reading" while reading). "Visible" means what is on the screen; "all" means up to the 500 newest. Your own messages are not translated, and translated texts can be switched back to the original as usual.
