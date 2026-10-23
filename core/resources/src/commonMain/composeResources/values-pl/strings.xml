@@ -2133,6 +2133,7 @@
     <string name="request_air_quality_metrics">Metryki jakości powietrza</string>
     <string name="request_device_metrics">Metryka urządzenia</string>
     <string name="request_environment_metrics">Metryki środowiskowe</string>
+    <string name="request_failed_from">Żądanie „%1$s” do %2$s nie powiodło się: %3$s</string>
     <string name="request_host_metrics">Statystyki hosta</string>
     <string name="request_local_stats">Statystyki lokalne</string>
     <string name="request_metadata">Metadane</string>

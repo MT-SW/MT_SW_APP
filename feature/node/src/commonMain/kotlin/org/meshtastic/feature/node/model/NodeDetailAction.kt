@@ -34,7 +34,7 @@ sealed interface NodeDetailAction {
     data class OpenRemoteShell(val nodeNum: Int) : NodeDetailAction
 
     /** Force-refresh device metadata (firmware version, edition, role) for the given node. */
-    data class RefreshMetadata(val nodeNum: Int) : NodeDetailAction
+    data class RefreshMetadata(val nodeNum: Int, val longName: String) : NodeDetailAction
 
     /**
      * Sets favorite status for [targetNodeNum] on the remote radio [destNum] over an active admin session — not the

@@ -16,6 +16,8 @@
  */
 package org.meshtastic.feature.node.detail
 
+import org.meshtastic.core.testing.FakeRadioConfigRepository
+import org.meshtastic.core.repository.LocationService
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.semantics.SemanticsActions
@@ -188,6 +190,11 @@ class NodeDetailCompassLifecycleTest {
             ensureRemoteAdminSession = mock<EnsureRemoteAdminSessionUseCase>(),
             observeRemoteAdminSessionStatus = observeSessionStatus,
             snackbarManager = SnackbarManager(),
+            radioConfigRepository = FakeRadioConfigRepository(),
+            locationService = object : LocationService {
+                override suspend fun getCurrentLocation() = null
+            },
+            nakWatcher = testNakWatcher(),
         )
     }
 

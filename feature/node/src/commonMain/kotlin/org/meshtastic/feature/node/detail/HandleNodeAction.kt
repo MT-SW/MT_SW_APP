@@ -42,7 +42,7 @@ internal fun handleNodeAction(
 
         is NodeDetailAction.OpenRemoteShell -> viewModel.openRemoteShell(action.nodeNum)
 
-        is NodeDetailAction.RefreshMetadata -> viewModel.refreshMetadata(action.nodeNum)
+        is NodeDetailAction.RefreshMetadata -> viewModel.refreshMetadata(action.nodeNum, action.longName)
 
         is NodeDetailAction.SetRemoteFavorite ->
             viewModel.setRemoteFavorite(action.destNum, action.targetNodeNum, action.favorite)

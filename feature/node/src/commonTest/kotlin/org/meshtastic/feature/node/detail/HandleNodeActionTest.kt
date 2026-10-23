@@ -16,6 +16,8 @@
  */
 package org.meshtastic.feature.node.detail
 
+import org.meshtastic.core.testing.FakeRadioConfigRepository
+import org.meshtastic.core.repository.LocationService
 import androidx.lifecycle.SavedStateHandle
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -165,5 +167,10 @@ class HandleNodeActionTest {
         ensureRemoteAdminSession = ensureRemoteAdminSession,
         observeRemoteAdminSessionStatus = observeRemoteAdminSessionStatus,
         snackbarManager = snackbarManager,
+        radioConfigRepository = FakeRadioConfigRepository(),
+        locationService = object : LocationService {
+            override suspend fun getCurrentLocation() = null
+        },
+        nakWatcher = testNakWatcher(),
     )
 }
