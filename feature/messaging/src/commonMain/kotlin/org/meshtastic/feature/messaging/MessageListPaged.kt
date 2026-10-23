@@ -334,7 +334,7 @@ private fun MessageListPagedContent(
                 fun visibleNeighbour(from: Int, step: Int): Message? {
                     var i = from
                     while (i in 0 until state.messages.itemCount) {
-                        val candidate = state.messages[i] ?: return null
+                        val candidate = state.messages.peek(i) ?: return null
                         if (!splitReassembly.suppressed.contains(candidate.uuid)) {
                             val info = splitReassembly.groups[candidate.uuid]
                             return if (info != null) {
