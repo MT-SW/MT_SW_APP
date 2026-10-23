@@ -21,6 +21,7 @@ import androidx.compose.material3.VerticalFloatingToolbar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
+import org.meshtastic.core.ui.theme.monochromeLayer
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.zoom_in
 import org.meshtastic.core.resources.zoom_out
@@ -43,7 +44,8 @@ import org.meshtastic.core.ui.icon.Remove
 fun MapZoomControls(onZoomIn: () -> Unit, onZoomOut: () -> Unit, modifier: Modifier = Modifier) {
     VerticalFloatingToolbar(
         expanded = true,
-        modifier = modifier,
+        // Grey in the black-and-white themes, like the other buttons over the map.
+        modifier = modifier.monochromeLayer(),
         colors = FloatingToolbarDefaults.standardFloatingToolbarColors(),
     ) {
         MapButton(

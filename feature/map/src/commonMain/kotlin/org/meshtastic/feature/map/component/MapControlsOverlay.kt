@@ -44,6 +44,8 @@ import org.meshtastic.core.ui.icon.MyLocation
 import org.meshtastic.core.ui.icon.Refresh
 import org.meshtastic.core.ui.icon.Tune
 import org.meshtastic.core.ui.theme.StatusColors.StatusBlue
+import org.meshtastic.core.ui.theme.monoSafe
+import org.meshtastic.core.ui.theme.monochromeLayer
 import org.meshtastic.core.ui.theme.StatusColors.StatusRed
 
 /**
@@ -89,7 +91,9 @@ fun MapControlsOverlay(
 ) {
     HorizontalFloatingToolbar(
         expanded = true,
-        modifier = modifier,
+        // The black-and-white themes: the map pauses the app-wide grey layer, so the buttons over it (the compass
+        // with its red north) are turned grey here.
+        modifier = modifier.monochromeLayer(),
         colors = FloatingToolbarDefaults.standardFloatingToolbarColors(),
     ) {
         // Compass
@@ -156,8 +160,8 @@ private fun CompassButton(onClick: () -> Unit, bearing: Float, isFollowing: Bool
     // button background, making the compass disappear while following.
     val iconTint =
         when {
-            isFollowing -> MaterialTheme.colorScheme.StatusBlue
-            bearing == 0f -> MaterialTheme.colorScheme.StatusRed
+            isFollowing -> MaterialTheme.colorScheme.StatusBlue.monoSafe()
+            bearing == 0f -> MaterialTheme.colorScheme.StatusRed.monoSafe()
             else -> null
         }
     MapButton(

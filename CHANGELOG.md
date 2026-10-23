@@ -25,7 +25,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Dyktowanie: przełącznik **„Mikrofon słuchawki przy dyktowaniu”** — z podłączoną słuchawką (Bluetooth, przewodową, USB) dyktowanie wszędzie w aplikacji nagrywa z jej mikrofonu.
 * **Jeden model AI** dla asystenta, tłumacza i dyktowania, wybierany w jednym miejscu (wybór NLLB, który tylko tłumaczy, po ostrzeżeniu i potwierdzeniu wyłącza asystenta).
 * Funkcje MT_SW: skrót do **wyboru koloru węzła** (przycisk w ustawieniach bezpieczeństwa mruga); przycisk ma nazwę w języku aplikacji.
-* Motywy czarno-białe: znaczniki węzłów na mapie (dymki z nazwami) też są szare.
+* Motywy czarno-białe: znaczniki węzłów na mapie (dymki z nazwami) i przyciski nad mapą (kompas z czerwoną strzałką, powiększanie) też są szare.
 * Asystent zna ustawienia naszej sieci (preset Narrow Fast, region EU_N_868, 869,44165 MHz), odpowiada na dwa pytania w jednym, liczy długości anten z częstotliwości.
 * Asystent: przy włączonym internecie wyszukiwanie wykonuje aplikacja (gdy pytanie dotyczy faktów do sprawdzenia), a pod odpowiedzią pojawia się mała notka w kolorze aplikacji z tym, co wyszukano i skąd są źródła. Komenda `/test` w asystencie sama zadaje pytania testowe i zapisuje wyniki.
 * Asystent wyszukuje słowa i frazy w wiadomościach: na wszystkich kanałach, na jednym kanale albo w rozmowie prywatnej z wybranym węzłem (bez względu na wielkość liter i polskie znaki), z liczbą trafień i nazwą kanału.
@@ -415,7 +415,7 @@ The entries below describe only what this fork adds on top of the original, from
 * Dictation: a **"Headset microphone for dictation"** switch — with a headset connected (Bluetooth, wired, USB) dictation everywhere in the app records from its microphone.
 * **One AI model** for the assistant, the translator and dictation, chosen in one place (choosing NLLB, which only translates, turns the assistant off after a warning and confirmation).
 * MT_SW features: a shortcut to **picking the node colour** (the button in the security settings blinks); the button is named in the app's language.
-* Black-and-white themes: node markers on the map (the name bubbles) are grey too.
+* Black-and-white themes: node markers on the map (the name bubbles) and the buttons over the map (the compass with its red arrow, zoom) are grey too.
 * The assistant knows our network's settings (Narrow Fast preset, EU_N_868 region, 869.44165 MHz), answers two questions asked in one, works out antenna lengths from the frequency.
 * Assistant: with the internet switched on the app runs the web search itself (when the question is about facts to look up), and a small note in the app's colour under the answer shows what was searched and the sources. The `/test` command in the assistant asks the test questions by itself and saves the results.
 * The assistant searches words and phrases in messages: on all channels, on one channel or in the private chat with a chosen node (ignoring case and Polish accents), with the number of hits and the channel name.
