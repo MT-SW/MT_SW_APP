@@ -3039,4 +3039,10 @@
     <string name="mt_sw_other_contacts_title">Ręczne dodawanie kontaktu po ID</string>
     <string name="mt_sw_other_contacts_body">Na liście węzłów przycisk w rogu ma pozycję „Dodaj kontakt”: wpisujesz identyfikator węzła (np. !a1b2c3d4) i nazwę, a węzeł zapisuje się w Twoim urządzeniu. W szczegółach węzła (Administracja → Dodaj kontakt zdalnie) to samo zrobisz na zdalnym urządzeniu, przez sieć mesh.</string>
     <string name="import_menu_in_top_bar">Przenieś przycisk dodawania i udostępniania do górnej belki</string>
+    <string name="messages_read_visible">Czytaj widoczne wiadomości</string>
+    <string name="messages_read_all">Czytaj wszystkie wiadomości</string>
+    <string name="messages_translate_visible">Przetłumacz widoczne wiadomości</string>
+    <string name="messages_translate_all">Przetłumacz wszystkie wiadomości</string>
+    <string name="messages_translating">Tłumaczę wiadomości…</string>
+    <string name="messages_translated_done">Tłumaczenie wiadomości zakończone</string>
 </resources>

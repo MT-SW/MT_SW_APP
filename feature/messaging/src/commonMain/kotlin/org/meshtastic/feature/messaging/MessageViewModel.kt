@@ -26,6 +26,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -60,6 +61,8 @@ import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.repository.usecase.SendMessageUseCase
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.UiText
+import org.meshtastic.core.resources.messages_translated_done
+import org.meshtastic.core.resources.messages_translating
 import org.meshtastic.core.resources.translation_failed
 import org.meshtastic.core.resources.translation_model_download_failed
 import org.meshtastic.core.resources.translation_not_required
@@ -453,6 +456,41 @@ class MessageViewModel(
         }
     }
 
+    /** All messages of a conversation, oldest first, at most [BULK_LIMIT] of the newest ones. */
+    suspend fun allMessages(contactKey: String): List<Message> =
+        getMessagesFlow(contactKey, limit = BULK_LIMIT).first().sortedBy { it.receivedTime }
+
+    /**
+     * Translates every message of [messages] that is not translated yet (own messages and empty ones are skipped), one
+     * after another. Messages already in the device language are skipped without a notice.
+     */
+    fun translateMessages(messages: List<Message>) = safeLaunch(tag = "translateMessages") {
+        val todo = messages.filter { it.text.isNotBlank() && !it.fromLocal }
+        snackbarManager.showSnackbar(MessagingUiTextResolver.resolve(UiText.Resource(Res.string.messages_translating)))
+        for (message in todo) {
+            if (message.translatedText != null) {
+                if (!message.showTranslated) packetRepository.setShowTranslated(message.uuid, true)
+                continue
+            }
+            when (val result = messageTranslationService.translate(message.text, currentLocaleCode())) {
+                is TranslationResult.Success -> packetRepository.setMessageTranslation(message.uuid, result.translatedText)
+                is TranslationResult.NotRequired -> Unit
+                is TranslationResult.ModelDownloadRequired -> {
+                    _translationDialogState.value =
+                        TranslationDialogState.DownloadPrompt(message, result.languageTags, result.estimatedSizeMb)
+                    return@safeLaunch
+                }
+                is TranslationResult.Unavailable -> {
+                    snackbarManager.showSnackbar(
+                        MessagingUiTextResolver.resolve(UiText.Resource(Res.string.translation_failed)),
+                    )
+                    return@safeLaunch
+                }
+            }
+        }
+        snackbarManager.showSnackbar(MessagingUiTextResolver.resolve(UiText.Resource(Res.string.messages_translated_done)))
+    }
+
     fun toggleShowTranslated(message: Message) = safeLaunch(tag = "toggleShowTranslated") {
         packetRepository.setShowTranslated(message.uuid, !message.showTranslated)
     }
@@ -510,6 +548,9 @@ class MessageViewModel(
 
     companion object {
         private const val SEARCH_DEBOUNCE_MS = 300L
+
+        /** "All messages" (read aloud, translate) means the newest ones up to this many. */
+        const val BULK_LIMIT = 500
         private const val MIN_SEARCH_LENGTH = 2
         private const val DRAFT_PERSISTENCE_DELAY_MS = 300L
         private const val KEY_DRAFT_MESSAGE_PREFIX = "draftMessage:"

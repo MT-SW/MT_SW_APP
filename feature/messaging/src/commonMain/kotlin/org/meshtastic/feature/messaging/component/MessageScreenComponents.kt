@@ -67,6 +67,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import androidx.compose.ui.graphics.vector.ImageVector
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.Message
@@ -110,6 +112,13 @@ import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.component.MeshtasticTextDialog
 import org.meshtastic.core.ui.component.NodeKeyStatusIcon
 import org.meshtastic.core.ui.component.SecurityIcon
+import org.meshtastic.core.resources.messages_read_all
+import org.meshtastic.core.resources.messages_read_visible
+import org.meshtastic.core.resources.messages_translate_all
+import org.meshtastic.core.resources.messages_translate_visible
+import org.meshtastic.core.resources.stop_reading
+import org.meshtastic.core.ui.icon.Translate
+import org.meshtastic.core.ui.icon.VolumeUp
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.ArrowDownward
 import org.meshtastic.core.ui.icon.ChatBubbleOutline
@@ -402,6 +411,7 @@ fun MessageTopBar(
     onToggleShowFiltered: () -> Unit = {},
     onNavigateToFilterSettings: () -> Unit = {},
     onSearchClick: () -> Unit = {},
+    bulk: BulkActions? = null,
 ) = TopAppBar(
     title = {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -441,8 +451,20 @@ fun MessageTopBar(
             showFiltered = showFiltered,
             onToggleShowFiltered = onToggleShowFiltered,
             onNavigateToFilterSettings = onNavigateToFilterSettings,
+            bulk = bulk,
         )
     },
+)
+
+/** Read-aloud and translate for a whole conversation: what is on the screen, or everything. */
+class BulkActions(
+    val reading: Boolean,
+    val translationAvailable: Boolean,
+    val onReadVisible: () -> Unit,
+    val onReadAll: () -> Unit,
+    val onStopReading: () -> Unit,
+    val onTranslateVisible: () -> Unit,
+    val onTranslateAll: () -> Unit,
 )
 
 @Composable
@@ -459,6 +481,7 @@ private fun MessageTopBarActions(
     showFiltered: Boolean,
     onToggleShowFiltered: () -> Unit,
     onNavigateToFilterSettings: () -> Unit,
+    bulk: BulkActions?,
 ) {
     if (channelIndex == NodeAddress.PKC_CHANNEL_INDEX) {
         NodeKeyStatusIcon(hasPKC = true, mismatchKey = mismatchKey)
@@ -481,6 +504,7 @@ private fun MessageTopBarActions(
             showFiltered = showFiltered,
             onToggleShowFiltered = onToggleShowFiltered,
             onNavigateToFilterSettings = onNavigateToFilterSettings,
+            bulk = bulk,
         )
     }
 }
@@ -499,9 +523,11 @@ private fun OverFlowMenu(
     showFiltered: Boolean,
     onToggleShowFiltered: () -> Unit,
     onNavigateToFilterSettings: () -> Unit,
+    bulk: BulkActions?,
 ) {
     if (expanded) {
         DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) {
+            if (bulk != null) BulkMenuGroup(bulk, onDismiss)
             DropdownMenuGroup(shapes = MenuDefaults.groupShapes()) {
                 QuickChatToggleMenuItem(showQuickChat, onDismiss, onToggleQuickChat)
                 QuickChatOptionsMenuItem(onDismiss, onNavigateToQuickChatOptions)
@@ -515,6 +541,33 @@ private fun OverFlowMenu(
                 }
                 FilterSettingsMenuItem(onDismiss, onNavigateToFilterSettings)
             }
+        }
+    }
+}
+
+@Composable
+private fun BulkMenuGroup(bulk: BulkActions, onDismiss: () -> Unit) {
+    @Composable
+    fun item(text: StringResource, icon: ImageVector, action: () -> Unit) {
+        val label = stringResource(text)
+        DropdownMenuItem(
+            text = { Text(label) },
+            onClick = {
+                onDismiss()
+                action()
+            },
+            leadingIcon = { Icon(imageVector = icon, contentDescription = label) },
+        )
+    }
+    DropdownMenuGroup(shapes = MenuDefaults.groupShapes()) {
+        if (bulk.reading) {
+            item(Res.string.stop_reading, MeshtasticIcons.VolumeUp, bulk.onStopReading)
+        }
+        item(Res.string.messages_read_visible, MeshtasticIcons.VolumeUp, bulk.onReadVisible)
+        item(Res.string.messages_read_all, MeshtasticIcons.VolumeUp, bulk.onReadAll)
+        if (bulk.translationAvailable) {
+            item(Res.string.messages_translate_visible, MeshtasticIcons.Translate, bulk.onTranslateVisible)
+            item(Res.string.messages_translate_all, MeshtasticIcons.Translate, bulk.onTranslateAll)
         }
     }
 }
