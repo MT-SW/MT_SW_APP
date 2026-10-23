@@ -124,7 +124,7 @@ The app has two optional AI features that run **entirely on your device, without
 
 **Privacy.** Everything is processed locally. Once a model is downloaded, no texts or conversations are sent to the internet. The internet is only needed for the one-time model download.
 
-**Models.** There are four models in three levels. Gemma 4 runs on Google's LiteRT-LM engine and uses the graphics chip (GPU) when the device supports it; otherwise the processor does the work. You can keep several downloaded at once, download and delete each one separately, and in separate lists choose which downloaded model the translator uses and which one the assistant uses. Only one model is in memory at a time.
+**Models.** There are four models in three levels. Gemma 4 runs on Google's LiteRT-LM engine and uses the graphics chip (GPU) when the device supports it; otherwise the processor does the work. You can keep several downloaded at once, download and delete each one separately, and in one place, "AI model (assistant, translator and dictation)", choose one model for everything. Only that one model is in memory. The light NLLB model can only translate, so it can be chosen only while the assistant is off.
 
 - **Light — NLLB-200 600M.** Translator only. Download about 870 MB, RAM about 2.3 GB, a phone with at least 4 GB of RAM is recommended.
 - **Light — Gemma 4 E2B.** Translator and assistant in one file. Download about 2.6 GB, RAM about 3.5 GB, a phone with at least 6 GB of RAM.
@@ -190,7 +190,7 @@ On weaker devices large models can slow the app down or close it, which is why e
 
 ## Settings and appearance
 
-- **MT_SW features group** — Settings has one entry, "MT_SW features", that opens a separate screen with our settings: the switch for previewing images from links in chat, update notifications (two switches) and the node list layout. Below are shortcuts to settings that have a natural home elsewhere: app scaling, LoRa (LNA correction and frequency offset), node database cleaning and Sniffer. The last entry, "Other features", describes the features that live next to a node (node LNA correction, inverted current and power, remote GPIO, on-demand diagnostics) and where to find them. Every item is also found by the settings search.
+- **MT_SW features group** — Settings has one entry, "MT_SW features", that opens a separate screen with our settings: the switch for previewing images from links in chat, update notifications (two switches) and the node list layout. Below are shortcuts to settings that have a natural home elsewhere: app scaling, theme, node colour (opens the security settings with the "Pick colour" button blinking), LoRa (LNA correction and frequency offset), node database cleaning, Sniffer and the debug panel. The last entry, "Other features", describes the features that live next to a node (node LNA correction, inverted current and power, remote GPIO, on-demand diagnostics) and where to find them. Every item is also found by the settings search.
 - **App scale** — in the app settings you choose the size of text and elements from 50% to 200%, independently of the phone settings. The default is "Same as phone". It works on desktop too.
 - **LoRa settings** — a "Frequency offset (kHz)" field, coding rate 4/5 for Narrow presets, full resolution of the overridden frequency, a warning description for "Override duty cycle" and the restored Traffic Management screen.
 - **Security** — key backup on desktop too, and a node colour choice when generating a key.

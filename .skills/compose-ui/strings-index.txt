@@ -129,6 +129,8 @@ ai_model_delete
 ai_model_download
 ai_model_failed
 ai_model_none_ready
+ai_model_one_note
+ai_model_one_title
 ai_model_roles_both
 ai_model_roles_translator
 ai_model_soon
@@ -141,6 +143,7 @@ ai_msg_enroute
 ai_msg_error
 ai_msg_other
 ai_msg_queued
+ai_mtsw_setup
 ai_near_one
 ai_neigh_hears
 ai_neigh_nobody
@@ -1831,6 +1834,9 @@ no_usb_devices_found
 no_usb_devices_hint
 no_usb_devices_seen
 ### NODE ###
+node_color_pick
+node_color_summary
+node_color_title
 node_count_online
 node_count_shown
 node_count_template

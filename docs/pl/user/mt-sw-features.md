@@ -124,7 +124,7 @@ Aplikacja ma dwie opcjonalne funkcje AI, które działają **w całości na Twoi
 
 **Prywatność.** Wszystko jest przetwarzane lokalnie. Po pobraniu modelu żadne teksty ani rozmowy nie są wysyłane do internetu. Internet jest potrzebny tylko do jednorazowego pobrania modelu.
 
-**Modele.** Na liście są cztery modele w trzech poziomach. Gemma 4 działa na silniku Google LiteRT-LM i używa układu graficznego (GPU), gdy urządzenie go obsługuje; w przeciwnym razie liczy procesor. Możesz mieć pobranych kilka naraz, każdy pobierasz i usuwasz osobno, a w osobnych listach wybierasz, który z pobranych modeli jest używany przez tłumacza i który przez asystenta. W pamięci jest zawsze tylko jeden model naraz.
+**Modele.** Na liście są cztery modele w trzech poziomach. Gemma 4 działa na silniku Google LiteRT-LM i używa układu graficznego (GPU), gdy urządzenie go obsługuje; w przeciwnym razie liczy procesor. Możesz mieć pobranych kilka naraz, każdy pobierasz i usuwasz osobno, a w jednym miejscu, „Model AI (asystent, tłumacz i dyktowanie)”, wybierasz jeden model do wszystkiego. W pamięci jest zawsze tylko ten jeden model. Lekki NLLB umie tylko tłumaczyć, więc można go wybrać tylko przy wyłączonym asystencie.
 
 - **Lekki — NLLB-200 600M.** Tylko tłumacz. Pobranie ok. 870 MB, pamięć RAM ok. 2,3 GB, zalecany telefon od 4 GB RAM.
 - **Lekki — Gemma 4 E2B.** Tłumacz i asystent w jednym pliku. Pobranie ok. 2,6 GB, RAM ok. 3,5 GB, telefon od 6 GB RAM.
@@ -190,7 +190,7 @@ Na słabszych urządzeniach duże modele mogą spowalniać aplikację albo ją z
 
 ## Ustawienia i wygląd
 
-- **Grupa „Funkcje MT_SW”** — w Ustawieniach jest jeden wpis „Funkcje MT_SW”, który otwiera osobny ekran z naszymi ustawieniami: przełącznik podglądu obrazków z linków w czacie, powiadomienia o nowych wersjach (dwa przełączniki) i układ listy węzłów. Niżej są skróty do ustawień, które mają swoje naturalne miejsce gdzie indziej: skalowanie aplikacji, LoRa (korekta LNA i przesunięcie częstotliwości), czyszczenie bazy węzłów i Sniffer. Na końcu wpis „Pozostałe funkcje” opisuje funkcje przy węźle (korekta LNA węzła, odwrócony prąd i zasilanie, zdalne GPIO, diagnostyka na żądanie) i mówi, gdzie ich szukać. Wszystkie pozycje znajdzie też wyszukiwarka ustawień.
+- **Grupa „Funkcje MT_SW”** — w Ustawieniach jest jeden wpis „Funkcje MT_SW”, który otwiera osobny ekran z naszymi ustawieniami: przełącznik podglądu obrazków z linków w czacie, powiadomienia o nowych wersjach (dwa przełączniki) i układ listy węzłów. Niżej są skróty do ustawień, które mają swoje naturalne miejsce gdzie indziej: skalowanie aplikacji, motyw, kolor węzła (otwiera ustawienia bezpieczeństwa, a przycisk „Wybierz kolor” mruga), LoRa (korekta LNA i przesunięcie częstotliwości), czyszczenie bazy węzłów, Sniffer i panel debugowania. Na końcu wpis „Pozostałe funkcje” opisuje funkcje przy węźle (korekta LNA węzła, odwrócony prąd i zasilanie, zdalne GPIO, diagnostyka na żądanie) i mówi, gdzie ich szukać. Wszystkie pozycje znajdzie też wyszukiwarka ustawień.
 - **Skalowanie aplikacji** — w ustawieniach aplikacji wybierasz rozmiar tekstu i elementów od 50% do 200%, niezależnie od ustawień telefonu. Domyślnie „Zgodnie z systemem”. Działa też na komputerze.
 - **Ustawienia LoRa** — pole „Przesunięcie częstotliwości (kHz)”, coding rate 4/5 dla presetów Narrow, pełna rozdzielczość częstotliwości nadpisanej, opis ostrzegawczy przy „Nadpisz cykl pracy” oraz przywrócony ekran Traffic Management.
 - **Bezpieczeństwo** — kopia kluczy także na komputerze oraz wybór koloru węzła przy generowaniu klucza.

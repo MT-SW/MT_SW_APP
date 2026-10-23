@@ -97,7 +97,7 @@
     <string name="ai_conn_disconnected">disconnected</string>
     <string name="ai_conn_sleep">radio asleep</string>
     <string name="ai_conn_unknown">unknown</string>
-    <string name="ai_dictation_note">Dictation in chats and the assistant uses the model chosen for the assistant. Dictation in the translator works only if the translator\'s own model can hear. Only the Gemma E2B and E4B models can hear; the smallest translator model (NLLB) cannot, so there is no dictation there.</string>
+    <string name="ai_dictation_note">Dictation in chats, the translator and the assistant uses the chosen AI model. Only the Gemma E2B and E4B models can hear; with the other models there is no dictation.</string>
     <string name="ai_dist_next">Next ones: %1$s</string>
     <string name="ai_dm_none">Nobody has written to you privately yet.</string>
     <string name="ai_dm_title">Latest private messages to you (newest first):</string>
@@ -150,6 +150,8 @@
     <string name="ai_model_download">Download</string>
     <string name="ai_model_failed">Download failed. Try again.</string>
     <string name="ai_model_none_ready">No model downloaded. Download one of the models above.</string>
+    <string name="ai_model_one_note">One model does everything and only it is kept in memory. The light NLLB model can only translate, so it can be chosen only while the assistant is off.</string>
+    <string name="ai_model_one_title">AI model (assistant, translator and dictation)</string>
     <string name="ai_model_roles_both">Translator and assistant</string>
     <string name="ai_model_roles_translator">Translator only</string>
     <string name="ai_model_soon">Coming soon</string>
@@ -162,6 +164,7 @@
     <string name="ai_msg_error">NOT delivered</string>
     <string name="ai_msg_other">no delivery information</string>
     <string name="ai_msg_queued">waiting in the queue</string>
+    <string name="ai_mtsw_setup">The MT_SW network in the Świętokrzyskie region uses the official Narrow Fast preset in the EU_N_868 region, on 869.44165 MHz. MT_SW has no preset of its own and stays compatible with the main network.</string>
     <string name="ai_near_one">The nearest is %1$s (%2$s): %3$s km, heard %4$s.</string>
     <string name="ai_neigh_hears">%1$s (%2$s) hears:</string>
     <string name="ai_neigh_nobody">nobody</string>
@@ -1876,6 +1879,9 @@
     <string name="no_usb_devices_hint">Connect a device with a USB data cable to use serial.</string>
     <string name="no_usb_devices_seen">No USB devices detected</string>
     <!-- NODE -->
+    <string name="node_color_pick">Pick colour</string>
+    <string name="node_color_summary">Pick the colour of your node (its key) in the security settings.</string>
+    <string name="node_color_title">Node colour</string>
     <string name="node_count_online">%1$d online</string>
     <string name="node_count_shown">%1$d shown</string>
     <string name="node_count_template">(%1$d online / %2$d shown / %3$d total)</string>

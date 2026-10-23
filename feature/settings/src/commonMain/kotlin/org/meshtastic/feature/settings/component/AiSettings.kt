@@ -28,6 +28,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,7 +65,6 @@ import org.meshtastic.core.resources.ai_level_light
 import org.meshtastic.core.resources.ai_level_standard
 import org.meshtastic.core.resources.ai_level_strong
 import org.meshtastic.core.resources.ai_dictation_note
-import org.meshtastic.core.resources.ai_model_assistant_title
 import org.meshtastic.core.resources.ai_model_cancel
 import org.meshtastic.core.resources.ai_model_delete
 import org.meshtastic.core.resources.ai_model_download
@@ -74,8 +74,9 @@ import org.meshtastic.core.resources.ai_model_roles_both
 import org.meshtastic.core.resources.ai_model_roles_translator
 import org.meshtastic.core.resources.ai_model_soon
 import org.meshtastic.core.resources.ai_model_specs
-import org.meshtastic.core.resources.ai_model_translator_title
 import org.meshtastic.core.resources.ai_models_title
+import org.meshtastic.core.resources.ai_model_one_note
+import org.meshtastic.core.resources.ai_model_one_title
 import org.meshtastic.core.resources.ai_privacy
 import org.meshtastic.core.resources.ai_warning_body
 import org.meshtastic.core.resources.translator_cancel
@@ -204,22 +205,33 @@ internal fun AiSettings() {
             )
         }
 
-        if (translatorOn) {
-            ModelChoice(
-                title = stringResource(Res.string.ai_model_translator_title),
-                models = AiModels.all.filter { it.canDo(AiRole.TRANSLATOR) && isReady(it.id) },
-                selectedId = translatorModelId,
-                onSelect = { uiPrefs.setTranslatorModelId(it) },
-            )
+        // One model for everything (assistant, translator, dictation): only one is ever in memory. While the assistant
+        // is on, only models that can also be the assistant are offered; NLLB (translation only) needs it off.
+        val choices =
+            AiModels.all.filter { isReady(it.id) && (it.canDo(AiRole.ASSISTANT) || (!assistantOn && it.canDo(AiRole.TRANSLATOR))) }
+        val chosenId = if (assistantOn) assistantModelId else translatorModelId
+        ModelChoice(
+            title = stringResource(Res.string.ai_model_one_title),
+            models = choices,
+            selectedId = chosenId,
+            onSelect = { id ->
+                uiPrefs.setTranslatorModelId(id)
+                if (AiModels.byId(id)?.canDo(AiRole.ASSISTANT) == true) uiPrefs.setAssistantModelId(id)
+            },
+        )
+        // Keeps the two stored choices equal, also for choices made before there was one list.
+        val effective = choices.firstOrNull { it.id == chosenId } ?: choices.firstOrNull()
+        LaunchedEffect(effective?.id, assistantOn) {
+            val model = effective ?: return@LaunchedEffect
+            if (translatorModelId != model.id) uiPrefs.setTranslatorModelId(model.id)
+            if (assistantModelId != model.id && model.canDo(AiRole.ASSISTANT)) uiPrefs.setAssistantModelId(model.id)
         }
-        if (assistantOn) {
-            ModelChoice(
-                title = stringResource(Res.string.ai_model_assistant_title),
-                models = AiModels.all.filter { it.canDo(AiRole.ASSISTANT) && isReady(it.id) },
-                selectedId = assistantModelId,
-                onSelect = { uiPrefs.setAssistantModelId(it) },
-            )
-        }
+        Text(
+            text = stringResource(Res.string.ai_model_one_note),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+        )
         if (assistantOn || translatorOn) {
             Text(
                 text = stringResource(Res.string.ai_dictation_note),
@@ -263,10 +275,12 @@ internal fun AiSettings() {
                         pending = null
                         if (which == PendingSwitch.TRANSLATOR) {
                             uiPrefs.setTranslatorEnabled(true)
-                            uiPrefs.setTranslatorModelId(model.id)
+                            // With the assistant on, the translator keeps using the assistant's model (one model).
+                            if (!assistantOn) uiPrefs.setTranslatorModelId(model.id)
                         } else {
                             uiPrefs.setAssistantEnabled(true)
                             uiPrefs.setAssistantModelId(model.id)
+                            uiPrefs.setTranslatorModelId(model.id)
                         }
                         if (!isReady(model.id)) appScope.launch { store.download(model.id) }
                     },

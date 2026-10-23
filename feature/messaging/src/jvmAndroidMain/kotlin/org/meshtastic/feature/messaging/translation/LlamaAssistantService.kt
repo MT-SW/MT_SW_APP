@@ -38,6 +38,7 @@ import org.meshtastic.core.resources.ai_go_draft
 import org.meshtastic.core.resources.ai_help_from_manual
 import org.meshtastic.core.resources.ai_help_news
 import org.meshtastic.core.resources.ai_help_open
+import org.meshtastic.core.resources.ai_mtsw_setup
 import org.meshtastic.core.resources.ai_help_where
 import org.meshtastic.core.resources.ai_go_draft_empty
 import org.meshtastic.core.resources.ai_go_draft_no_target
@@ -231,6 +232,12 @@ class LlamaAssistantService(
         onPiece: (String) -> Unit,
     ): String {
         fun exact(text: String): String? = text.trim().takeIf { it.isNotEmpty() }?.also(onPiece)
+        // Which preset, region or frequency our network uses: a known fact, given by the app, with a button to the preset.
+        val lower = question.lowercase()
+        if (SETUP_WORDS.containsMatchIn(lower) && OUR_NETWORK_WORDS.containsMatchIn(lower)) {
+            guideTools.show_setting("preset")
+            return getStringSuspend(Res.string.ai_mtsw_setup).also(onPiece)
+        }
         val nodeNum = data.resolveNodeNum(intent.node, question)
         val answer: String? =
             when (intent.intent) {
@@ -695,6 +702,8 @@ class LlamaAssistantService(
         const val FACT_TEMPERATURE = 0.25f
         const val WEB_QUERY_CHARS = 120
         val BATTERY_WORDS = Regex("bateri|akumulator|battery")
+        val SETUP_WORDS = Regex("preset|region|częstotliw|czestotliw|frequen|slot|jakie ustawienia|jakich ustawień|jakich ustawien")
+        val OUR_NETWORK_WORDS = Regex("nasz|wojew|świętokrzysk|swietokrzysk|kielc|mt[_ -]?sw|u nas|w okolic|our network|our region")
 
         /** Words of a question about many nodes ("which nodes have the weakest battery"), not about one. */
         val MANY_WORDS = Regex("któr|ktor|najs|najm|najn|wszystk|which|lowest|all nodes")
@@ -752,7 +761,7 @@ class LlamaAssistantService(
                 "Możesz swobodnie rozmawiać na każdy temat. Jeśli czegoś nie wiesz na pewno, powiedz to zamiast zgadywać; " +
                 "nie wymyślaj liczb, ustawień ani nazw menu. \"Nasz projekt\" to MT_SW (fork aplikacji, firmware i integracji " +
                 "z Home Assistant), nie główny projekt Meshtastic; MT_SW jest zgodny z główną siecią i nie ma własnego " +
-                "presetu ani regionu. Sam nie zmieniasz ustawień i nie wysyłasz wiadomości: to robi użytkownik."
+                "presetu: w województwie świętokrzyskim sieć używa oficjalnego presetu Narrow Fast w regionie EU_N_868 (869,44165 MHz). Sam nie zmieniasz ustawień i nie wysyłasz wiadomości: to robi użytkownik."
         const val SYSTEM_EN =
             "You are the assistant built into MT_SW (phone and desktop), an app for Meshtastic, a LoRa mesh radio network " +
                 "that works without internet. You run entirely on the user's device. Answer in the language the user " +
@@ -760,7 +769,7 @@ class LlamaAssistantService(
                 "freely about any topic. If you are not sure of something, say so instead of guessing; never invent " +
                 "numbers, settings or menu names. \"Our project\" means MT_SW (the fork of the app, firmware and Home " +
                 "Assistant integration), not the main Meshtastic project; MT_SW stays compatible with the main network and " +
-                "has no preset or region of its own. You never change settings or send messages yourself: the user does."
+                "has no preset of its own: in the Świętokrzyskie region it uses the official Narrow Fast preset in EU_N_868 (869.44165 MHz). You never change settings or send messages yourself: the user does."
         const val DATA_PL =
             "DANE z aplikacji użytkownika (tylko do odczytu), dobrane do tego pytania. Odpowiedz na ich podstawie, krótko i " +
                 "własnymi słowami, nie przepisuj całych linijek. Liczby i jednostki podawaj dokładnie tak jak w danych. Nie " +

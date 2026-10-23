@@ -19,6 +19,7 @@ package org.meshtastic.feature.map.maplibre.layers
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import org.meshtastic.core.ui.theme.LocalMonochrome
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -104,7 +105,7 @@ internal fun NodeChipLayer(
     source = source,
     // Already ordered by how likely each node is to be drawn on its own; MapChipLayer keeps as many as it can
     // afford.
-    chips = remember(nodes) { nodes.map { it.toNodeChip() } },
+    chips = remember(nodes, LocalMonochrome.current) { nodes.map { it.toNodeChip() } },
     filter = chipFilter,
     onClick =
     onNodeClick?.let { click ->

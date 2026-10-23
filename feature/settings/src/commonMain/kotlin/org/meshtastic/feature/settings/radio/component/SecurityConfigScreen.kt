@@ -39,6 +39,8 @@ import org.meshtastic.core.model.util.TimeConstants
 import org.meshtastic.core.model.util.encodeToString
 import org.meshtastic.core.model.util.platformRandomBytes
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.node_color_pick
+import org.meshtastic.core.ui.assistant.assistantHighlight
 import org.meshtastic.core.resources.admin_keys
 import org.meshtastic.core.resources.administration
 import org.meshtastic.core.resources.config_security_private_key
@@ -173,9 +175,11 @@ fun SecurityConfigScreenCommon(viewModel: RadioConfigViewModel, onBack: () -> Un
                     icon = MeshtasticIcons.Warning,
                     onClick = { showKeyGenerationDialog = true },
                 )
+                val pickColor = stringResource(Res.string.node_color_pick)
                 NodeActionButton(
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                    title = "Wybierz kolor",
+                    // The shortcut in "MT_SW features" makes this button blink, so it is easy to find.
+                    modifier = Modifier.padding(horizontal = 8.dp).assistantHighlight(pickColor),
+                    title = pickColor,
                     enabled = state.connected,
                     onClick = { showColorPicker = true },
                 )

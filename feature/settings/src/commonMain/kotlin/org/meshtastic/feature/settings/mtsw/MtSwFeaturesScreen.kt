@@ -39,6 +39,10 @@ import org.meshtastic.core.navigation.ContactsRoute
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.node_color_pick
+import org.meshtastic.core.resources.node_color_summary
+import org.meshtastic.core.resources.node_color_title
+import org.meshtastic.core.ui.assistant.SettingHighlight
 import org.meshtastic.core.resources.ai_section_title
 import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.import_menu_in_top_bar
@@ -191,6 +195,15 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 }
                 ListItem(text = stringResource(Res.string.theme), leadingIcon = MeshtasticIcons.FormatPaint) {
                     showThemePicker = true
+                }
+                val pickColor = stringResource(Res.string.node_color_pick)
+                ListItem(
+                    text = stringResource(Res.string.node_color_title),
+                    supportingText = stringResource(Res.string.node_color_summary),
+                    leadingIcon = MeshtasticIcons.FormatPaint,
+                ) {
+                    SettingHighlight.show(pickColor)
+                    onNavigate(SettingsRoute.Security)
                 }
                 ListItem(
                     text = stringResource(Res.string.lora),
