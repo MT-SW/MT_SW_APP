@@ -591,8 +591,8 @@
     <!-- DEVICE -->
     <string name="device">Urządzenie</string>
     <string name="device_configuration">Konfiguracja urządzenia</string>
-    <string name="device_db_cache_limit">Ile radiów pamiętać</string>
-    <string name="device_db_cache_limit_summary">Dane ilu różnych radiów aplikacja trzyma w tym telefonie. Gdy przybędzie kolejne, dane najdawniej używanego są usuwane.</string>
+    <string name="device_db_cache_limit">Ile zapamiętanych urządzeń</string>
+    <string name="device_db_cache_limit_summary">Dane ilu urządzeń telefon trzyma naraz, bez względu na to, czy łączysz się przez Bluetooth, Wi-Fi czy USB. Gdy przybędzie kolejne, dane najdawniej używanego są usuwane.</string>
     <string name="device_gps">Ustawienia GPS</string>
     <string name="device_links">Linki urządzenia</string>
     <string name="device_links_affiliate_disclosure">Linki do produktów mogą być linkami afiliacyjnymi — zakupy mogą przynosić Meshtastic prowizję.</string>
