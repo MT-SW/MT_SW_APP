@@ -36,13 +36,17 @@ internal object AssistantTopics {
         val data = DATA_WORDS.any { q.contains(it) }
         val guide = GUIDE_WORDS.any { q.contains(it) }
         // A question about the project itself is answered from the manual and change list, never from live data.
-        if (PROJECT_WORDS.any { q.contains(it) }) return AssistantTopic.GUIDE
+        // A channel called MT_SW is not the project: questions about messages, channels, counts or nodes keep their data.
+        if (PROJECT_WORDS.any { q.contains(it) } && DATA_ONLY_WORDS.none { q.contains(it) }) return AssistantTopic.GUIDE
         return when {
             data && !guide -> AssistantTopic.DATA
             guide && !data -> AssistantTopic.GUIDE
             else -> AssistantTopic.MIXED
         }
     }
+
+    private val DATA_ONLY_WORDS =
+        listOf("kanał", "kanal", "kanale", "wiadomo", "streść", "streszcz", "podsumuj", "napisa", "ile ", "kto ", "węz", "wezl", "message", "channel")
 
     private val PROJECT_WORDS =
         listOf(

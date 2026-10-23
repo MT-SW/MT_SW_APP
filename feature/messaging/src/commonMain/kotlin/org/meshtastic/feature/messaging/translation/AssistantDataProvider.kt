@@ -17,6 +17,84 @@
 package org.meshtastic.feature.messaging.translation
 
 import co.touchlab.kermit.Logger
+import org.jetbrains.compose.resources.StringResource
+import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.ai_ago_d
+import org.meshtastic.core.resources.ai_ago_h
+import org.meshtastic.core.resources.ai_ago_min
+import org.meshtastic.core.resources.ai_ago_now
+import org.meshtastic.core.resources.ai_battery_ext
+import org.meshtastic.core.resources.ai_battery_pct
+import org.meshtastic.core.resources.ai_battery_unknown
+import org.meshtastic.core.resources.ai_cnt_line
+import org.meshtastic.core.resources.ai_cnt_top
+import org.meshtastic.core.resources.ai_conn_connected
+import org.meshtastic.core.resources.ai_conn_connecting
+import org.meshtastic.core.resources.ai_conn_disconnected
+import org.meshtastic.core.resources.ai_conn_sleep
+import org.meshtastic.core.resources.ai_conn_unknown
+import org.meshtastic.core.resources.ai_found_n
+import org.meshtastic.core.resources.ai_found_none
+import org.meshtastic.core.resources.ai_found_none_for
+import org.meshtastic.core.resources.ai_heard
+import org.meshtastic.core.resources.ai_low_battery_title
+import org.meshtastic.core.resources.ai_more
+import org.meshtastic.core.resources.ai_msg_delivered
+import org.meshtastic.core.resources.ai_msg_enroute
+import org.meshtastic.core.resources.ai_msg_error
+import org.meshtastic.core.resources.ai_msg_other
+import org.meshtastic.core.resources.ai_msg_queued
+import org.meshtastic.core.resources.ai_neigh_hears
+import org.meshtastic.core.resources.ai_neigh_nobody
+import org.meshtastic.core.resources.ai_neigh_none
+import org.meshtastic.core.resources.ai_neigh_none_node
+import org.meshtastic.core.resources.ai_neigh_title
+import org.meshtastic.core.resources.ai_never
+import org.meshtastic.core.resources.ai_no_channel
+import org.meshtastic.core.resources.ai_nodes_heard_title
+import org.meshtastic.core.resources.ai_nodes_match
+import org.meshtastic.core.resources.ai_nodes_none
+import org.meshtastic.core.resources.ai_none_value
+import org.meshtastic.core.resources.ai_private_chat
+import org.meshtastic.core.resources.ai_scope_all
+import org.meshtastic.core.resources.ai_scope_channel
+import org.meshtastic.core.resources.ai_scope_default
+import org.meshtastic.core.resources.ai_sig_best
+import org.meshtastic.core.resources.ai_sig_closest
+import org.meshtastic.core.resources.ai_sig_farthest
+import org.meshtastic.core.resources.ai_sig_line
+import org.meshtastic.core.resources.ai_sig_position
+import org.meshtastic.core.resources.ai_status_conn
+import org.meshtastic.core.resources.ai_status_own_title
+import org.meshtastic.core.resources.ai_status_title
+import org.meshtastic.core.resources.ai_status_unread
+import org.meshtastic.core.resources.ai_status_unread_none
+import org.meshtastic.core.resources.ai_trace_back
+import org.meshtastic.core.resources.ai_trace_hops
+import org.meshtastic.core.resources.ai_trace_none
+import org.meshtastic.core.resources.ai_trace_none_node
+import org.meshtastic.core.resources.ai_trace_there
+import org.meshtastic.core.resources.ai_trace_title
+import org.meshtastic.core.resources.ai_unknown_node
+import org.meshtastic.core.resources.ai_win_all
+import org.meshtastic.core.resources.ai_win_last_day
+import org.meshtastic.core.resources.ai_win_last_hour
+import org.meshtastic.core.resources.ai_win_last_month
+import org.meshtastic.core.resources.ai_win_last_n_d
+import org.meshtastic.core.resources.ai_win_last_n_h
+import org.meshtastic.core.resources.ai_win_last_n_m
+import org.meshtastic.core.resources.ai_win_last_n_min
+import org.meshtastic.core.resources.ai_win_last_n_w
+import org.meshtastic.core.resources.ai_win_last_n_y
+import org.meshtastic.core.resources.ai_win_last_week
+import org.meshtastic.core.resources.ai_win_last_year
+import org.meshtastic.core.resources.ai_win_today
+import org.meshtastic.core.resources.ai_win_yesterday
+import org.meshtastic.core.resources.ai_wp_from
+import org.meshtastic.core.resources.ai_wp_noname
+import org.meshtastic.core.resources.ai_wp_none
+import org.meshtastic.core.resources.ai_wp_title
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.offsetAt
 import org.meshtastic.core.common.util.nowMillis
@@ -87,8 +165,8 @@ class AssistantDataProvider(
             parts += safe("channel") { toolChannelMessages(channelFromQuestion(q), SUMMARY_MESSAGES) }
         } else if (q.hasAny(MESSAGE_WORDS)) {
             if (q.hasAny(COUNT_WORDS)) {
-                val w = timeWindow(q) ?: Triple(todayStart(nowMillis), Long.MAX_VALUE, "dzisiaj (od północy)")
-                priority += safe("count") { messageCountReport(channelFromQuestion(q), w.first, w.second, w.third) }
+                val w = timeWindow(q) ?: Win(todayStart(nowMillis), Long.MAX_VALUE, Res.string.ai_win_today)
+                priority += safe("count") { messageCountReport(channelFromQuestion(q), w) }
             }
             QUOTED.find(question)?.groupValues?.get(1)?.takeIf { it.isNotBlank() }?.let { phrase ->
                 priority += safe("search") { toolMessages(phrase, SEARCH_SHOWN, channelFromQuestion(q)) }
@@ -110,16 +188,55 @@ class AssistantDataProvider(
     }
 
     /**
-     * Questions whose answer is a number the model tends to garble (how many messages today / last hours, who writes
-     * most) are answered by code alone. Null when the question is not of that kind.
+     * Questions whose answer is exact data (counts, searches, lists of nodes, routes, status) are answered by code alone,
+     * in the language of the app: the small model only garbles such answers. Null for every other question.
      */
     suspend fun directAnswer(question: String): String? {
         val q = question.lowercase()
-        if (q.hasAny(SUMMARY_WORDS) || !q.hasAny(MESSAGE_WORDS) || !q.hasAny(COUNT_WORDS)) return null
-        val window = timeWindow(q)
-        if (window == null && !q.contains("najwięcej") && !q.contains("najwiecej") && !q.contains("kto napisa") && !q.contains("kto pisze")) return null
-        val (since, until, label) = window ?: Triple(0L, Long.MAX_VALUE, "wszystkie zapisane")
-        return safe("count") { messageCountReport(channelFromQuestion(q), since, until, label) }.takeIf { it.isNotBlank() }
+        if (q.hasAny(SUMMARY_WORDS)) return null
+        val channel = channelFromQuestion(q)
+        val mentionedName = mentionedNodes(q).firstOrNull()?.user?.long_name.orEmpty()
+        fun ok(text: String): String? = text.takeIf { it.isNotBlank() }
+        // 1. Word or phrase search in messages.
+        val phrase = QUOTED.find(question)?.groupValues?.get(1) ?: WORD_AFTER.find(q)?.groupValues?.get(1)
+        if (phrase != null && phrase.isNotBlank() && (q.hasAny(MESSAGE_WORDS) || q.hasAny(SEARCH_WORDS))) {
+            return ok(safe("search") { toolMessages(phrase, SEARCH_SHOWN, channel) })
+        }
+        // 2. Message counts and who writes most.
+        if (q.hasAny(MESSAGE_WORDS) && q.hasAny(COUNT_WORDS)) {
+            val window = timeWindow(q)
+            if (window != null || q.hasAny(TOP_WORDS)) {
+                return ok(safe("count") { messageCountReport(channel, window ?: Win(0L, Long.MAX_VALUE, Res.string.ai_win_all)) })
+            }
+        }
+        // 3. Waypoints, connection, unread and delivery.
+        if (q.hasAny(WAYPOINT_WORDS)) return ok(safe("waypoints") { toolWaypoints(WAYPOINTS_SHOWN) })
+        if (q.hasAny(STATUS_WORDS)) return ok(safe("status") { toolAppStatus() })
+        // 4. Routes and neighbours.
+        if (q.hasAny(ROUTE_WORDS)) {
+            val who = mentionedName
+            return if (q.hasAny(NEIGHBOUR_WORDS)) ok(safe("neighbors") { toolNeighbors(who, TRACE_SHOWN) })
+            else ok(safe("traceroute") { toolTraceroutes(who, TRACE_SHOWN) })
+        }
+        val aboutNodes = q.hasAny(NODE_WORDS) || q.hasAny(ROLE_WORDS)
+        // 5. Nearest / farthest nodes (also of one role, for example the nearest router).
+        if (aboutNodes && q.hasAny(DISTANCE_WORDS)) return ok(safe("signal") { signalReport(q) })
+        // 6. Low battery.
+        if (q.hasAny(listOf("bateri", "battery")) && q.hasAny(LOW_WORDS)) {
+            return ok(safe("battery") { getStringSuspend(Res.string.ai_low_battery_title, LOW_BATTERY) + "\n" + toolFindNodes(0, "", 0, LOW_BATTERY, 0, REPORT_SIGNAL) })
+        }
+        // 7. How many nodes were heard in a time window.
+        if (q.hasAny(listOf("ile ", "how many", "liczb")) && q.hasAny(listOf("węzł", "wezl", "node"))) {
+            val w = timeWindow(q) ?: Win(nowMillis - MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_day)
+            return ok(
+                safe("nodecount") {
+                    val all = nodeRepository.nodeDBbyNum.value.values
+                    val heard = all.count { it.lastHeard != 0 && it.lastHeard * MILLIS_PER_SECOND >= w.since && it.lastHeard * MILLIS_PER_SECOND < w.until }
+                    getStringSuspend(Res.string.ai_nodes_heard_title, w.title(), heard, all.size)
+                },
+            )
+        }
+        return null
     }
 
     /** True when the question names a topic the data parts know; a bare follow-up ("a jakie to wartości?") does not. */
@@ -397,14 +514,14 @@ class AssistantDataProvider(
             lines.take(SENSOR_LIMIT).joinToString("\n")
     }
 
-    /** Exact signal list written in code, in Polish, so the model never copies the numbers wrong. */
-    fun signalReport(q: String): String {
+    /** Exact signal list written in code, in the language of the app, so the model never copies the numbers wrong. */
+    suspend fun signalReport(q: String): String {
         val me = nodeRepository.ourNodeInfo.value
         val now = nowMillis / MILLIS_PER_SECOND
         class Row(val n: org.meshtastic.core.model.Node, val meters: Int?)
         val roleOnly = roleFilter(q)
         val rows = nodeRepository.nodeDBbyNum.value.values.filter { it.num != me?.num && (roleOnly?.invoke(it) ?: true) }.map { Row(it, me?.let { m -> it.distance(m) }) }
-        val byDistance = q.hasAny(listOf("odległ", "odleg", "daleko", "dystans", "distance", "far"))
+        val byDistance = q.hasAny(listOf("odległ", "odleg", "daleko", "dystans", "distance", "far", "najdal"))
         val closest = q.hasAny(listOf("najbliż", "najbliz", "blisk", "closest", "nearest"))
         val withSignal = rows.filter { it.n.snr != Float.MAX_VALUE }
         val sorted =
@@ -415,19 +532,20 @@ class AssistantDataProvider(
             }
         val title =
             when {
-                closest -> "Najbliższe węzły (z ${rows.size}):"
-                byDistance -> "Najdalsze węzły (z ${rows.size}):"
-                else -> "Najlepszy zasięg — węzły słyszane bezpośrednio najpierw, od najwyższego SNR (${withSignal.size} z odczytem z ${rows.size}):"
+                closest -> getStringSuspend(Res.string.ai_sig_closest, rows.size)
+                byDistance -> getStringSuspend(Res.string.ai_sig_farthest, rows.size)
+                else -> getStringSuspend(Res.string.ai_sig_best, withSignal.size, rows.size)
             }
+        val none = getStringSuspend(Res.string.ai_none_value)
         val sb = StringBuilder(title).append('\n')
         for (r in sorted.take(REPORT_SIGNAL)) {
             val n = r.n
-            val ago = if (n.lastHeard == 0) "nigdy" else "${((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)} min temu"
-            val snr = if (n.snr == Float.MAX_VALUE) "brak" else fmt(n.snr) + " dB"
-            val rssi = if (n.rssi == Int.MAX_VALUE) "brak" else n.rssi.toString() + " dBm"
-            val dist = r.meters?.let { m -> fmt(m / METERS_PER_KM) + " km" } ?: "brak"
-            val where = position(n)?.let { ", pozycja $it" }.orEmpty()
-            sb.append("• ${n.user.short_name} (${n.user.long_name}), rola ${n.user.role}: skoki ${n.hopsAway}, SNR $snr, RSSI $rssi, odległość $dist$where, słyszany $ago\n")
+            val heard = if (n.lastHeard == 0) getStringSuspend(Res.string.ai_never) else ago(((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+            val snr = if (n.snr == Float.MAX_VALUE) none else fmt(n.snr) + " dB"
+            val rssi = if (n.rssi == Int.MAX_VALUE) none else n.rssi.toString() + " dBm"
+            val dist = r.meters?.let { m -> fmt(m / METERS_PER_KM) + " km" } ?: none
+            val where = position(n)?.let { getStringSuspend(Res.string.ai_sig_position, it) }.orEmpty()
+            sb.append(getStringSuspend(Res.string.ai_sig_line, n.user.short_name, n.user.long_name, n.user.role.toString(), n.hopsAway.toString(), snr, rssi, dist, where, heard)).append('\n')
         }
         return sb.toString().trim()
     }
@@ -740,8 +858,8 @@ class AssistantDataProvider(
         val found = ArrayList<Triple<Long, String, String>>()
         for (key in keys) {
             val label =
-                if (key.endsWith("^all")) key.substringBefore('^').toIntOrNull()?.let { names.getOrNull(it)?.ifBlank { "(default)" } } ?: key
-                else "private"
+                if (key.endsWith("^all")) key.substringBefore('^').toIntOrNull()?.let { names.getOrNull(it)?.ifBlank { "domyślny" } } ?: key
+                else getStringSuspend(Res.string.ai_private_chat)
             val list = packetRepository.getMessagesFrom(key, SEARCH_PER_CHAT) { id -> nodeRepository.getNode(id.orEmpty()) }.first()
             for (m in list) {
                 val text = m.text
@@ -750,12 +868,14 @@ class AssistantDataProvider(
                 found += Triple(m.receivedTime, label, "$who: ${text.take(MESSAGE_CHARS)}")
             }
         }
-        if (found.isEmpty()) return "No messages found for \"$query\"."
+        if (found.isEmpty()) {
+            return if (needle.isNotEmpty()) getStringSuspend(Res.string.ai_found_none_for, query.trim()) else getStringSuspend(Res.string.ai_found_none)
+        }
         val now = nowMillis
-        return "MESSAGES with \"$query\": ${found.size} found, newest first (showing ${minOf(top, found.size)}):\n" +
-            found.sortedByDescending { it.first }.take(top).joinToString("\n") {
-                "- [${it.second}] ${((now - it.first) / MILLIS_PER_MINUTE).coerceAtLeast(0)} min ago, ${it.third}"
-            }
+        return getStringSuspend(Res.string.ai_found_n, found.size) + "\n" +
+            found.sortedByDescending { it.first }.take(top).map {
+                "• ${it.second}, ${ago(((now - it.first) / MILLIS_PER_MINUTE).coerceAtLeast(0))}, ${it.third}"
+            }.joinToString("\n")
     }
 
     /**
@@ -790,18 +910,25 @@ class AssistantDataProvider(
             }
     }
 
+    /** A time window: [since, until) in epoch milliseconds and the text that names it (with [n] when it has a number). */
+    private class Win(val since: Long, val until: Long, val label: StringResource, val n: Int = 0)
+
+    private suspend fun Win.title(): String = if (n > 0) getStringSuspend(label, n) else getStringSuspend(label)
+
     /**
-     * How many messages were received on a channel (empty = every channel and direct messages) in a time window,
-     * counted in code. [hours] 0 means "today" (since local midnight); 1 to 720 means the last that many hours; -1 means all saved messages.
+     * How many messages were received on a channel (the word all = every channel and direct messages) in a time
+     * window, counted in code. [hours] 0 means "today" (since local midnight); 1 to 8784 means the last that many hours;
+     * -1 means all saved messages.
      */
     suspend fun toolMessageCount(channel: String, hours: Int): String {
         val now = nowMillis
-        val since =
-            if (hours < 0) 0L
-            else if (hours > 0) now - hours.toLong().coerceAtMost(MAX_COUNT_HOURS) * MILLIS_PER_HOUR
-            else todayStart(now)
-        val window = if (hours < 0) "wszystkie zapisane" else if (hours > 0) "ostatnie $hours h" else "dzisiaj (od północy)"
-        return messageCountReport(channel, since, Long.MAX_VALUE, window)
+        val w =
+            when {
+                hours < 0 -> Win(0L, Long.MAX_VALUE, Res.string.ai_win_all)
+                hours > 0 -> Win(now - hours.toLong().coerceAtMost(MAX_COUNT_HOURS) * MILLIS_PER_HOUR, Long.MAX_VALUE, Res.string.ai_win_last_n_h, hours)
+                else -> Win(todayStart(now), Long.MAX_VALUE, Res.string.ai_win_today)
+            }
+        return messageCountReport(channel, w)
     }
 
     /** Start of the local day that contains [now], in epoch milliseconds. */
@@ -810,66 +937,70 @@ class AssistantDataProvider(
         return ((now + offsetMs) / MILLIS_PER_DAY) * MILLIS_PER_DAY - offsetMs
     }
 
-    /** A time window written in a question: since, until (epoch ms) and a label, or null when none is named. */
-    private fun timeWindow(q: String): Triple<Long, Long, String>? {
+    /** A time window written in a question (minutes, hours, days, week, month, year, today, yesterday), or null. */
+    private fun timeWindow(q: String): Win? {
         val now = nowMillis
         val today = todayStart(now)
-        if (q.contains("wczoraj")) return Triple(today - MILLIS_PER_DAY, today, "wczoraj")
-        val unit = Regex("(\\d+)\\s*(minut|min\\b|godz|h\\b|dni|dzie|dob|tydz|tygod|miesi|rok|lat)").find(q)
+        if (q.contains("wczoraj") || q.contains("yesterday")) return Win(today - MILLIS_PER_DAY, today, Res.string.ai_win_yesterday)
+        val unit = Regex("(\\d+)\\s*(minut|min\\b|godz|h\\b|hour|dni|dzie|dob|day|tydz|tygod|week|miesi|month|rok|lat|year)").find(q)
         if (unit != null) {
-            val n = unit.groupValues[1].toLongOrNull() ?: return null
-            val (ms, name) =
+            val n = unit.groupValues[1].toIntOrNull()?.takeIf { it > 0 } ?: return null
+            val (ms, res) =
                 when (unit.groupValues[2]) {
-                    "minut", "min" -> MILLIS_PER_MINUTE to "min"
-                    "godz", "h" -> MILLIS_PER_HOUR to "h"
-                    "dni", "dzie", "dob" -> MILLIS_PER_DAY to "dni"
-                    "tydz", "tygod" -> 7 * MILLIS_PER_DAY to "tyg."
-                    "miesi" -> 30 * MILLIS_PER_DAY to "mies."
-                    else -> 365 * MILLIS_PER_DAY to "lat"
+                    "minut", "min" -> MILLIS_PER_MINUTE to Res.string.ai_win_last_n_min
+                    "godz", "h", "hour" -> MILLIS_PER_HOUR to Res.string.ai_win_last_n_h
+                    "dni", "dzie", "dob", "day" -> MILLIS_PER_DAY to Res.string.ai_win_last_n_d
+                    "tydz", "tygod", "week" -> 7 * MILLIS_PER_DAY to Res.string.ai_win_last_n_w
+                    "miesi", "month" -> 30 * MILLIS_PER_DAY to Res.string.ai_win_last_n_m
+                    else -> 365 * MILLIS_PER_DAY to Res.string.ai_win_last_n_y
                 }
-            return Triple(now - n * ms, Long.MAX_VALUE, "ostatnie $n $name")
+            return Win(now - n * ms, Long.MAX_VALUE, res, n)
         }
         return when {
-            q.hasAny(TODAY_WORDS) -> Triple(today, Long.MAX_VALUE, "dzisiaj (od północy)")
-            q.contains("godzin") -> Triple(now - MILLIS_PER_HOUR, Long.MAX_VALUE, "ostatnia godzina")
-            q.contains("tydzie") || q.contains("tygodn") -> Triple(now - 7 * MILLIS_PER_DAY, Long.MAX_VALUE, "ostatni tydzień")
-            q.contains("miesi") -> Triple(now - 30 * MILLIS_PER_DAY, Long.MAX_VALUE, "ostatni miesiąc")
-            q.contains("rok") || q.contains("roku") -> Triple(now - 365 * MILLIS_PER_DAY, Long.MAX_VALUE, "ostatni rok")
-            q.contains("dobę") || q.contains("doba") || q.contains("dobe") -> Triple(now - MILLIS_PER_DAY, Long.MAX_VALUE, "ostatnia doba")
+            q.hasAny(TODAY_WORDS) -> Win(today, Long.MAX_VALUE, Res.string.ai_win_today)
+            q.contains("godzin") || q.contains("hour") -> Win(now - MILLIS_PER_HOUR, Long.MAX_VALUE, Res.string.ai_win_last_hour)
+            q.contains("tydzie") || q.contains("tygodn") || q.contains("week") -> Win(now - 7 * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_week)
+            q.contains("miesi") || q.contains("month") -> Win(now - 30 * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_month)
+            q.contains("rok") || q.contains("year") -> Win(now - 365 * MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_year)
+            q.contains("dobę") || q.contains("doba") || q.contains("dobe") -> Win(now - MILLIS_PER_DAY, Long.MAX_VALUE, Res.string.ai_win_last_day)
             else -> null
         }
     }
 
-    private suspend fun messageCountReport(channel: String, since: Long, until: Long, window: String): String {
+    private suspend fun messageCountReport(channel: String, window: Win): String {
         val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
         val wanted = channel.anyToEmpty()
-        val index = wanted.toIntOrNull() ?: numberedChannel(wanted) ?: names.indexOfFirst { it.lowercase() == wanted }.takeIf { it >= 0 }
-            ?: names.indexOfFirst { wanted.isNotEmpty() && it.lowercase().contains(wanted) }.takeIf { it >= 0 }
+        val index =
+            if (wanted.isEmpty()) null
+            else wanted.toIntOrNull() ?: numberedChannel(wanted) ?: names.indexOfFirst { it.lowercase() == wanted }.takeIf { it >= 0 }
+                ?: names.indexOfFirst { it.lowercase().contains(wanted) }.takeIf { it >= 0 }
         if (wanted.isNotEmpty() && index == null) {
-            return "No channel found for \"$channel\". Channels: " + names.mapIndexed { i, n -> "$i=${n.ifBlank { "(default)" }}" }.joinToString()
+            return getStringSuspend(Res.string.ai_no_channel, channel, names.mapIndexed { i, n -> "$i = ${n.ifBlank { "-" }}" }.joinToString())
         }
         val keys = packetRepository.getContacts().first().keys.filter { key ->
             if (index == null) true else key.endsWith("^all") && key.startsWith("$index^")
         }
+        val ownName = nodeRepository.ourNodeInfo.value?.user?.let { it.long_name.ifBlank { it.short_name } }.orEmpty()
         var total = 0
         var mine = 0
         val perSender = HashMap<String, Int>()
         for (key in keys) {
             val list = packetRepository.getMessagesFrom(key, COUNT_PER_CHAT) { id -> nodeRepository.getNode(id.orEmpty()) }.first()
             for (m in list) {
-                if (m.receivedTime < since || m.receivedTime >= until) continue
+                if (m.receivedTime < window.since || m.receivedTime >= window.until) continue
                 total++
-                val ownName = nodeRepository.ourNodeInfo.value?.user?.let { it.long_name.ifBlank { it.short_name } }.orEmpty()
-                val who = if (m.fromLocal) ownName.ifBlank { "ja" } else m.node.user.long_name.ifBlank { m.node.user.short_name }
+                val who = if (m.fromLocal) ownName.ifBlank { "me" } else m.node.user.long_name.ifBlank { m.node.user.short_name }
                 if (m.fromLocal) mine++
                 perSender.merge(who, 1, Int::plus)
             }
         }
-        val label = if (index == null) "wszystkie rozmowy" else "kanał $index (${names.getOrNull(index)?.ifBlank { null } ?: "domyślny"})"
-        val sb = StringBuilder("Liczba wiadomości, $label, $window: $total (w tym moje: $mine)")
+        val scope =
+            if (index == null) getStringSuspend(Res.string.ai_scope_all)
+            else getStringSuspend(Res.string.ai_scope_channel, names.getOrNull(index)?.ifBlank { null } ?: getStringSuspend(Res.string.ai_scope_default), index)
+        val sb = StringBuilder(getStringSuspend(Res.string.ai_cnt_line, window.title(), scope, total, mine))
         if (perSender.isNotEmpty()) {
-            sb.append("\nKto napisał najwięcej (łącznie z moimi): ")
-            sb.append(perSender.entries.sortedByDescending { it.value }.take(TOP_SENDERS).joinToString { "${it.key} ${it.value}" })
+            sb.append('\n').append(getStringSuspend(Res.string.ai_cnt_top))
+            perSender.entries.sortedByDescending { it.value }.take(TOP_SENDERS).forEach { sb.append("\n• ${it.key} — ${it.value}") }
         }
         return sb.toString()
     }
@@ -879,7 +1010,7 @@ class AssistantDataProvider(
      * hours; [hardware] is part of the hardware name; [onlyFavorites] 1 keeps favourites; [maxBattery] in 1..100 keeps
      * nodes with that battery level or less; [withPosition] 1 keeps nodes that have a position.
      */
-    fun toolFindNodes(activeHours: Int, hardware: String, onlyFavorites: Int, maxBattery: Int, withPosition: Int, limit: Int): String {
+    suspend fun toolFindNodes(activeHours: Int, hardware: String, onlyFavorites: Int, maxBattery: Int, withPosition: Int, limit: Int): String {
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
         val nowS = nowMillis / MILLIS_PER_SECOND
         val hw = hardware.anyToEmpty()
@@ -892,12 +1023,16 @@ class AssistantDataProvider(
                     (maxBattery !in 1..100 || (n.deviceMetrics.battery_level ?: Int.MAX_VALUE) <= maxBattery) &&
                     (withPosition != 1 || n.validPosition != null)
             }.sortedByDescending { it.lastHeard }
-        val sb = StringBuilder("MATCHING NODES: ${found.size} of ${all.size} known")
+        if (found.isEmpty()) return getStringSuspend(Res.string.ai_nodes_none, all.size)
+        val sb = StringBuilder(getStringSuspend(Res.string.ai_nodes_match, found.size, all.size))
         for (n in found.take(top)) {
-            val heard = if (n.lastHeard == 0) "never" else "${((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)} min ago"
-            sb.append("\n- ${n.user.long_name} (${n.user.short_name}), ${n.user.hw_model}, role ${n.user.role}, heard $heard, battery ${n.deviceMetrics.battery_level ?: "?"}")
+            val heard = if (n.lastHeard == 0) getStringSuspend(Res.string.ai_never) else ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+            val bat =
+                n.deviceMetrics.battery_level?.let { if (it > 100) getStringSuspend(Res.string.ai_battery_ext) else getStringSuspend(Res.string.ai_battery_pct, it) }
+                    ?: getStringSuspend(Res.string.ai_battery_unknown)
+            sb.append("\n• ${n.user.long_name} (${n.user.short_name}), ${n.user.hw_model}, ${n.user.role}, ${getStringSuspend(Res.string.ai_heard, heard)}, $bat")
         }
-        if (found.size > top) sb.append("\n(and ${found.size - top} more)")
+        if (found.size > top) sb.append("\n").append(getStringSuspend(Res.string.ai_more, found.size - top))
         return sb.toString()
     }
 
@@ -921,41 +1056,50 @@ class AssistantDataProvider(
             }
     }
 
+    private suspend fun ago(minutes: Long): String =
+        when {
+            minutes < 1 -> getStringSuspend(Res.string.ai_ago_now)
+            minutes < MINUTES_PER_HOUR -> getStringSuspend(Res.string.ai_ago_min, minutes.toInt())
+            minutes < MINUTES_PER_DAY -> getStringSuspend(Res.string.ai_ago_h, (minutes / MINUTES_PER_HOUR).toInt())
+            else -> getStringSuspend(Res.string.ai_ago_d, (minutes / MINUTES_PER_DAY).toInt())
+        }
+
     private fun nameOf(num: Int): String = nodeNameFor(num).ifBlank { "!" + num.toUInt().toString(16) }
 
     /** The newest traceroute results (path there and back, signal of each hop), for all nodes or one [node]. */
     suspend fun toolTraceroutes(node: String, limit: Int): String {
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
         val wanted = node.anyToEmpty()
-        val num = if (wanted.isEmpty()) null else (findNode(node)?.num ?: return "No node found for \"$node\".")
+        val num = if (wanted.isEmpty()) null else (findNode(node)?.num ?: return getStringSuspend(Res.string.ai_unknown_node, node))
         val logs = meshLogRepository.getLogsByPortNumSince(PortNum.TRACEROUTE_APP.value, nowMillis - TRACE_WINDOW_MS).first()
         val now = nowMillis
-        val lines =
-            logs.sortedByDescending { it.received_date }.mapNotNull { log ->
-                val packet = log.fromRadio.packet ?: return@mapNotNull null
-                val rd = packet.fullRouteDiscovery ?: return@mapNotNull null
-                if (num != null && num !in rd.route && num !in rd.route_back) return@mapNotNull null
-                val ago = ((now - log.received_date) / MILLIS_PER_MINUTE).coerceAtLeast(0)
-                fun path(route: List<Int>, snr: List<Int>) =
-                    route.mapIndexed { i, n ->
-                        val q = snr.getOrNull(i)?.takeIf { it != Int.MIN_VALUE }
-                        nameOf(n) + (if (q != null && i > 0) " (${fmt(q / 4f)} dB)" else "")
-                    }.joinToString(" -> ")
-                buildString {
-                    append("- $ago min ago: there ${path(rd.route, rd.snr_towards)}")
-                    if (rd.route_back.isNotEmpty()) append("; back ${path(rd.route_back, rd.snr_back)}")
-                    append("; hops there ${(rd.route.size - 2).coerceAtLeast(0)}")
-                }
-            }.take(top)
-        if (lines.isEmpty()) return "No traceroute results saved" + (if (num != null) " for this node." else ".")
-        return "TRACEROUTES (newest first):\n" + lines.joinToString("\n")
+        val there = getStringSuspend(Res.string.ai_trace_there)
+        val back = getStringSuspend(Res.string.ai_trace_back)
+        val lines = ArrayList<String>()
+        for (log in logs.sortedByDescending { it.received_date }) {
+            val rd = log.fromRadio.packet?.fullRouteDiscovery ?: continue
+            if (num != null && num !in rd.route && num !in rd.route_back) continue
+            fun path(route: List<Int>, snr: List<Int>) =
+                route.mapIndexed { i, n ->
+                    val q = snr.getOrNull(i - 1)?.takeIf { it != Int.MIN_VALUE }
+                    nameOf(n) + (if (q != null && i > 0) " (${fmt(q / 4f)} dB)" else "")
+                }.joinToString(" → ")
+            val hops = getStringSuspend(Res.string.ai_trace_hops, (rd.route.size - 2).coerceAtLeast(0))
+            lines += buildString {
+                append("• ${ago(((now - log.received_date) / MILLIS_PER_MINUTE).coerceAtLeast(0))}, $hops\n   $there: ${path(rd.route, rd.snr_towards)}")
+                if (rd.route_back.isNotEmpty()) append("\n   $back: ${path(rd.route_back, rd.snr_back)}")
+            }
+            if (lines.size >= top) break
+        }
+        if (lines.isEmpty()) return getStringSuspend(if (num != null) Res.string.ai_trace_none_node else Res.string.ai_trace_none)
+        return getStringSuspend(Res.string.ai_trace_title) + "\n" + lines.joinToString("\n")
     }
 
     /** Who each node reported hearing directly (neighbour info), newest report per node; one [node] or all. */
     suspend fun toolNeighbors(node: String, limit: Int): String {
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
         val wanted = node.anyToEmpty()
-        val num = if (wanted.isEmpty()) null else (findNode(node)?.num ?: return "No node found for \"$node\".")
+        val num = if (wanted.isEmpty()) null else (findNode(node)?.num ?: return getStringSuspend(Res.string.ai_unknown_node, node))
         val logs = meshLogRepository.getLogsByPortNumSince(PortNum.NEIGHBORINFO_APP.value, nowMillis - TRACE_WINDOW_MS).first()
         val now = nowMillis
         val newest = HashMap<Int, Pair<Long, org.meshtastic.proto.NeighborInfo>>()
@@ -966,45 +1110,59 @@ class AssistantDataProvider(
             if (num != null && owner != num && info.neighbors.none { it.node_id == num }) continue
             if ((newest[owner]?.first ?: -1L) < log.received_date) newest[owner] = log.received_date to info
         }
-        if (newest.isEmpty()) return "No neighbour information saved" + (if (num != null) " for this node." else ".")
-        return "NEIGHBOURS (who hears whom):\n" +
-            newest.entries.sortedByDescending { it.value.first }.take(top).joinToString("\n") { (owner, v) ->
-                val ago = ((now - v.first) / MILLIS_PER_MINUTE).coerceAtLeast(0)
-                "- ${nameOf(owner)} ($ago min ago) hears: " +
-                    v.second.neighbors.joinToString { "${nameOf(it.node_id)} (${fmt(it.snr)} dB)" }.ifBlank { "nobody" }
-            }
+        if (newest.isEmpty()) return getStringSuspend(if (num != null) Res.string.ai_neigh_none_node else Res.string.ai_neigh_none)
+        val nobody = getStringSuspend(Res.string.ai_neigh_nobody)
+        return getStringSuspend(Res.string.ai_neigh_title) + "\n" +
+            newest.entries.sortedByDescending { it.value.first }.take(top).map { (owner, v) ->
+                val whenText = ago(((now - v.first) / MILLIS_PER_MINUTE).coerceAtLeast(0))
+                "• ${getStringSuspend(Res.string.ai_neigh_hears, nameOf(owner), whenText)} " +
+                    v.second.neighbors.joinToString { "${nameOf(it.node_id)} (${fmt(it.snr)} dB)" }.ifBlank { nobody }
+            }.joinToString("\n")
     }
 
     /** Connection to the radio, unread messages per conversation and the state of the newest own messages. */
     suspend fun toolAppStatus(): String {
         val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
-        val sb = StringBuilder("APP STATUS:\n")
-        sb.append("Connection to the radio: ").append(connection?.connectionState?.value?.toString() ?: "unknown").append('\n')
+        val sb = StringBuilder(getStringSuspend(Res.string.ai_status_title)).append('\n')
+        val conn =
+            when (connection?.connectionState?.value) {
+                org.meshtastic.core.model.ConnectionState.Connected -> Res.string.ai_conn_connected
+                org.meshtastic.core.model.ConnectionState.Disconnected -> Res.string.ai_conn_disconnected
+                org.meshtastic.core.model.ConnectionState.Connecting -> Res.string.ai_conn_connecting
+                org.meshtastic.core.model.ConnectionState.DeviceSleep -> Res.string.ai_conn_sleep
+                else -> Res.string.ai_conn_unknown
+            }
+        sb.append(getStringSuspend(Res.string.ai_status_conn, getStringSuspend(conn))).append('\n')
         val unread = packetRepository.getUnreadCounts().filterValues { it > 0 }
         if (unread.isEmpty()) {
-            sb.append("Unread messages: none\n")
+            sb.append(getStringSuspend(Res.string.ai_status_unread_none)).append('\n')
         } else {
-            sb.append("Unread messages: ${unread.values.sum()} (")
-            sb.append(
-                unread.entries.sortedByDescending { it.value }.take(UNREAD_SHOWN).joinToString { (key, n) ->
-                    val label =
-                        if (key.endsWith("^all")) key.substringBefore('^').toIntOrNull()?.let { "channel $it ${names.getOrNull(it).orEmpty()}".trim() } ?: key
-                        else "private chat with " + (findNode(key.substringAfter('!', "").let { "!$it" })?.user?.long_name ?: key)
-                    "$label: $n"
-                },
-            )
-            sb.append(")\n")
+            sb.append(getStringSuspend(Res.string.ai_status_unread, unread.values.sum())).append('\n')
+            unread.entries.sortedByDescending { it.value }.take(UNREAD_SHOWN).forEach { (key, n) ->
+                val label =
+                    if (key.endsWith("^all")) key.substringBefore('^').toIntOrNull()?.let { "${names.getOrNull(it).orEmpty().ifBlank { "#$it" }}" } ?: key
+                    else findNode("!" + key.substringAfter('!', ""))?.user?.long_name ?: getStringSuspend(Res.string.ai_private_chat)
+                sb.append("• $label: $n\n")
+            }
         }
-        val own = ArrayList<Pair<Long, String>>()
+        val own = ArrayList<Triple<Long, org.meshtastic.core.model.MessageStatus?, String>>()
         for (key in packetRepository.getContacts().first().keys) {
             val list = packetRepository.getMessagesFrom(key, OWN_STATUS_PER_CHAT) { id -> nodeRepository.getNode(id.orEmpty()) }.first()
-            for (m in list) if (m.fromLocal) own += m.receivedTime to "${m.status ?: "UNKNOWN"}: ${m.text.take(MESSAGE_CHARS)}"
+            for (m in list) if (m.fromLocal) own += Triple(m.receivedTime, m.status, m.text.take(MESSAGE_CHARS))
         }
         if (own.isNotEmpty()) {
             val now = nowMillis
-            sb.append("My newest messages (delivery state):\n")
+            sb.append(getStringSuspend(Res.string.ai_status_own_title)).append('\n')
             own.sortedByDescending { it.first }.take(OWN_STATUS_SHOWN).forEach {
-                sb.append("- ${((now - it.first) / MILLIS_PER_MINUTE).coerceAtLeast(0)} min ago, ${it.second}\n")
+                val state =
+                    when (it.second) {
+                        org.meshtastic.core.model.MessageStatus.DELIVERED, org.meshtastic.core.model.MessageStatus.SFPP_CONFIRMED -> Res.string.ai_msg_delivered
+                        org.meshtastic.core.model.MessageStatus.ENROUTE, org.meshtastic.core.model.MessageStatus.SFPP_ROUTING -> Res.string.ai_msg_enroute
+                        org.meshtastic.core.model.MessageStatus.QUEUED -> Res.string.ai_msg_queued
+                        org.meshtastic.core.model.MessageStatus.ERROR -> Res.string.ai_msg_error
+                        else -> Res.string.ai_msg_other
+                    }
+                sb.append("• ${ago(((now - it.first) / MILLIS_PER_MINUTE).coerceAtLeast(0))}: ${getStringSuspend(state)} — ${it.third}\n")
             }
         }
         return sb.toString().trim()
@@ -1014,16 +1172,18 @@ class AssistantDataProvider(
     suspend fun toolWaypoints(limit: Int): String {
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
         val list = packetRepository.getWaypoints().first().sortedByDescending { it.time }
-        if (list.isEmpty()) return "No waypoints saved."
+        if (list.isEmpty()) return getStringSuspend(Res.string.ai_wp_none)
         val now = nowMillis
-        return "WAYPOINTS (${list.size}, newest first):\n" +
-            list.take(top).joinToString("\n") { p ->
+        val noName = getStringSuspend(Res.string.ai_wp_noname)
+        return getStringSuspend(Res.string.ai_wp_title, list.size) + "\n" +
+            list.take(top).map { p ->
                 val w = p.waypoint
-                val sender = findNode(p.from.orEmpty())?.let { it.user.long_name.ifBlank { it.user.short_name } } ?: p.from
+                val sender = findNode(p.from.orEmpty())?.let { it.user.long_name.ifBlank { it.user.short_name } } ?: p.from.orEmpty()
                 val lat = (w?.latitude_i ?: 0) / WAYPOINT_SCALE
                 val lon = (w?.longitude_i ?: 0) / WAYPOINT_SCALE
-                "- ${w?.name.orEmpty().ifBlank { "(no name)" }}: ${w?.description.orEmpty().take(MESSAGE_CHARS)} at ${fmt(lat.toFloat())}, ${fmt(lon.toFloat())}, from $sender, ${((now - p.time) / MILLIS_PER_MINUTE).coerceAtLeast(0)} min ago"
-            }
+                "• ${w?.name.orEmpty().ifBlank { noName }}${w?.description.orEmpty().take(MESSAGE_CHARS).let { d -> if (d.isBlank()) "" else " — $d" }} " +
+                    "(${fmt(lat.toFloat())}, ${fmt(lon.toFloat())}), ${getStringSuspend(Res.string.ai_wp_from, sender)}, ${ago(((now - p.time) / MILLIS_PER_MINUTE).coerceAtLeast(0))}"
+            }.joinToString("\n")
     }
 
     /** A channel mentioned in the question (by name, or by number such as "kanał 1" / "kanał jeden"), as text, or empty. */
@@ -1281,7 +1441,15 @@ class AssistantDataProvider(
         val TODAY_WORDS = listOf("dzisiaj", "dziś", "dzis", "today", "od rana")
         val STATUS_WORDS = listOf("nieprzeczyta", "unread", "połączon", "polaczon", "connected", "dostarczon", "doszła", "doszla", "delivered", "niewysłan", "nie wysłan", "nie wyslan")
         val WAYPOINT_WORDS = listOf("waypoint", "punkt na mapie", "punkty na mapie", "znacznik", "pinezk")
-        val ROUTE_WORDS = listOf("traceroute", "trasa", "trasy", "trasę", "trase", "route", "neighbo", "słyszy", "slyszy", "przez jakie", "przez które")
+        val SEARCH_WORDS = listOf("szuk", "znajd", "wyszuk", "pojaw", "wspomin", "search", "find", "mention", "czy ktoś pisał", "czy ktos pisal")
+        val WORD_AFTER = Regex("(?:słowem|słowo|słowie|słowa|frazą|frazę|fraza|frazie|word|phrase)\\s+[\"„”]?([\\p{L}\\p{N}_-]{2,})")
+        val TOP_WORDS = listOf("najwięcej", "najwiecej", "kto napisa", "kto pisze", "who wrote", "most messages")
+        val NEIGHBOUR_WORDS = listOf("sąsiad", "sasiad", "neighbo", "słyszy", "slyszy")
+        val ROLE_WORDS = listOf("router", "ruter", "repeater", "przekaźnik", "przekaznik", "czujnik", "sensor", "tracker")
+        val DISTANCE_WORDS = listOf("najbliż", "najbliz", "najdal", "najlepszy zasięg", "najlepszy zasieg", "closest", "nearest", "farthest")
+        val LOW_WORDS = listOf("mało", "malo", "niski", "niską", "nisk", "słab", "slab", "rozładow", "rozladow", "low", "najniż", "najniz")
+        const val WAYPOINTS_SHOWN = 10
+        val ROUTE_WORDS = listOf("traceroute", "trasa", "trasy", "trasę", "trase", "neighbo", "słyszy", "slyszy", "przez jakie", "przez które")
         val MESSAGE_WORDS = listOf("wiadomo", "message", "czat", "chat", "napisa", "pisa", "rozmow", "odpowied")
     }
 }
