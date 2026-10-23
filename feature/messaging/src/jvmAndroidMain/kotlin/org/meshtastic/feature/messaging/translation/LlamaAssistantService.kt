@@ -616,7 +616,11 @@ class LlamaAssistantService(
             // or more words, or the paragraph starts with the setting's name the way a definition does
             // ("• App scaling — ..."). Anything looser quoted the wrong things on small models.
             val headed = labelStems.size >= 2 && stems(title).containsAll(labelStems)
-            val defines = wanted.length >= MIN_TELLING_LABEL && line.lowercase().trimStart('•', ' ').startsWith(wanted)
+            // A definition: the name, then a dash or a colon ("• App scaling — ..."), not just a sentence that starts with it.
+            val body = line.lowercase().trimStart('•', ' ')
+            val defines =
+                wanted.length >= MIN_TELLING_LABEL && body.startsWith(wanted) &&
+                    body.removePrefix(wanted).trimStart().firstOrNull()?.let { it == '—' || it == '–' || it == '-' || it == ':' } == true
             if (!headed && !defines) continue
             val score = strongHits * 2 + weakHits + (if (exact) LABEL_SCORE else 0) + (if (headed) LABEL_SCORE else 0)
             found += Line(title, line, score)
