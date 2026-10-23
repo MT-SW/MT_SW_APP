@@ -139,14 +139,14 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
                 "open_screen: the user tells you to open or go to a screen (settings page, map, nodes, messages, channels, firmware, ...). text = the screen.\n" +
                 "show_setting: the user tells you to open or show one setting. text = the setting.\n" +
                 "show_node_on_map: show, find or locate one node on the map, where a node is. node = its name.\n" +
-                "nearest_node: show the nearest or farthest node on the map. role, metric = nearest or farthest.\n" +
+                "nearest_node: the user tells you to SHOW the nearest or farthest node (on the map). role, metric = nearest or farthest. A question like which node is farthest is signal_list.\n" +
                 "open_link_planner: range, radio link or terrain between the user and a node. node.\n" +
                 "draft_message: write, send or prepare a message. channel = channel name or number, or a node name for a private message (leave out for the main channel); text = the message itself, ready to send.\n" +
                 "count_messages: how many messages, who writes most. channel, period, amount; metric = per_channel for which channel has most messages.\n" +
                 "search_messages: did someone write about something, who wrote a word, find a message. text = the word (its stem), channel.\n" +
                 "summarize: what is being said, summary of a channel or of a private chat with a node. channel = channel or node name.\n" +
-                "list_nodes: which or how many nodes were heard or active in a time, nodes with low battery (metric = battery), favourite nodes (metric = favorites). period, amount.\n" +
-                "signal_list: list of nodes by distance or signal. role, metric = nearest, farthest or snr.\n" +
+                "list_nodes: how many nodes there are, which or how many were heard or active in a time, nodes with low battery (metric = battery), favourite nodes (metric = favorites). period, amount.\n" +
+                "signal_list: which nodes are nearest, farthest or have the best signal, or the signal (SNR, RSSI) of one node. role, metric = nearest, farthest or snr; node = the node when the question is about one node.\n" +
                 "traceroute: the route packets take to a node. node.\n" +
                 "neighbors: who hears whom, the neighbours of a node. node.\n" +
                 "app_status: connection to the radio, unread messages, whether my message was delivered.\n" +
@@ -164,6 +164,9 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
                 "pokaż węzeł Łysica na mapie -> {\"intent\":\"show_node_on_map\",\"node\":\"Łysica\"}\n" +
                 "gdzie jest SW-Kielce? -> {\"intent\":\"show_node_on_map\",\"node\":\"SW-Kielce\"}\n" +
                 "pokaż najbliższy router -> {\"intent\":\"nearest_node\",\"role\":\"router\",\"metric\":\"nearest\"}\n" +
+                "który węzeł jest najdalej ode mnie? -> {\"intent\":\"signal_list\",\"metric\":\"farthest\"}\n" +
+                "jaki jest średni SNR węzła Telegraf? -> {\"intent\":\"signal_list\",\"node\":\"Telegraf\",\"metric\":\"snr\"}\n" +
+                "ile mam węzłów w sieci? -> {\"intent\":\"list_nodes\"}\n" +
                 "czy mam zasięg do Chełmowej? -> {\"intent\":\"open_link_planner\",\"node\":\"Chełmowa\"}\n" +
                 "napisz na kanale MT_SW, że spotkanie jest o 18 -> {\"intent\":\"draft_message\",\"channel\":\"MT_SW\",\"text\":\"Spotkanie jest o 18.\"}\n" +
                 "ile wiadomości było wczoraj na kanale 1? -> {\"intent\":\"count_messages\",\"channel\":\"1\",\"period\":\"yesterday\"}\n" +

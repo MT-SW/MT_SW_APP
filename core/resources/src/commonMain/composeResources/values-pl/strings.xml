@@ -3161,4 +3161,9 @@
     <string name="ai_go_draft">Wpisałem wiadomość do rozmowy z %1$s: „%2$s”. Nic nie zostało wysłane: sprawdź ją i wyślij sam.</string>
     <string name="ai_go_draft_no_target">Dokąd ma iść wiadomość? Podaj kanał albo węzeł.</string>
     <string name="ai_go_draft_empty">Co ma być w wiadomości?</string>
+    <string name="ai_snr_title">Sygnał węzła %1$s (%2$s):</string>
+    <string name="ai_snr_last">ostatni pakiet: SNR %1$s, RSSI %2$s, skoki %3$s, słyszany %4$s</string>
+    <string name="ai_snr_avg">odbierany bezpośrednio przez ostatnie %1$d dni: średni SNR %2$s dB (od %3$s do %4$s dB), średni RSSI %5$s dBm, pakietów: %6$d</string>
+    <string name="ai_snr_no_direct">przez ostatnie %1$d dni brak pakietów odebranych od niego bezpośrednio (dociera przez inne węzły), więc nie ma średniej</string>
+    <string name="ai_net_count">Znanych węzłów: %1$d. Słyszanych w ostatnich 24 godz.: %2$d, w ostatniej godzinie: %3$d. Słyszanych bezpośrednio (0 skoków): %4$d.</string>
 </resources>

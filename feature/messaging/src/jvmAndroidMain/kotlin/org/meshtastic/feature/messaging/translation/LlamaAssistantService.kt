@@ -145,8 +145,25 @@ class LlamaAssistantService(
                 "search_messages" ->
                     intent.text.takeIf { it.isNotBlank() }?.let { exact(data.toolMessages(it, SEARCH_SHOWN, intent.channel)) }
                 "list_nodes" ->
-                    exact(data.findNodesFor(intent.period, intent.amount, intent.metric == "battery", intent.metric == "favorites"))
-                "signal_list" -> exact(data.signalListFor(intent.role, intent.metric))
+                    exact(
+                        if (intent.period.isBlank() || intent.period == "none") {
+                            if (intent.metric == "battery" || intent.metric == "favorites") {
+                                data.findNodesFor("", 0, intent.metric == "battery", intent.metric == "favorites")
+                            } else {
+                                data.networkCount()
+                            }
+                        } else {
+                            data.findNodesFor(intent.period, intent.amount, intent.metric == "battery", intent.metric == "favorites")
+                        },
+                    )
+                "signal_list" ->
+                    // A question about one named node is about that node's signal, not about the whole list.
+                    if (nodeNum != null && intent.node.isNotBlank()) {
+                        exact(data.nodeSignal(nodeNum))
+                    } else {
+                        if (intent.metric == "nearest" || intent.metric == "farthest") addNearestButton(intent.role, intent.metric == "farthest")
+                        exact(data.signalListFor(intent.role, intent.metric))
+                    }
                 "traceroute" -> exact(routeOrUnknown(intent, nodeNum) { data.toolTraceroutes(it, LIST_SHOWN) })
                 "neighbors" -> exact(routeOrUnknown(intent, nodeNum) { data.toolNeighbors(it, LIST_SHOWN) })
                 "app_status" -> exact(data.toolAppStatus())
@@ -221,6 +238,12 @@ class LlamaAssistantService(
         collector.add(AssistantAction(name, "$DEEP_LINK_BASE_URI/map/focus/$num"))
         collector.autoOpenLast()
         return getStringSuspend(if (farthest) Res.string.ai_go_farthest else Res.string.ai_go_nearest, name, data.kilometres(meters))
+    }
+
+    /** A button (not opened by itself) to the first node of a nearest / farthest list. */
+    private fun addNearestButton(role: String, farthest: Boolean) {
+        val (num, _) = data.nearestNode(role, farthest) ?: return
+        collector.add(AssistantAction(data.nodeNameFor(num), "$DEEP_LINK_BASE_URI/map/focus/$num"))
     }
 
     /** Opens a screen or one setting (which then blinks); the user's own words are tried when the router's are not enough. */
