@@ -3035,5 +3035,5 @@
     <string name="assistant_dictate_stop">Zatrzymaj i wstaw</string>
     <string name="assistant_dictate_working">Zamieniam mowę na tekst…</string>
     <string name="assistant_disclaimer_web">Asystent działa na tym urządzeniu, ale internet jest WŁĄCZONY: wyszukiwane słowa są wysyłane do wyszukiwarki. Odpowiedzi mogą być błędne — sprawdzaj ważne informacje.</string>
-    <string name="ai_dictation_note">Dyktowanie (mikrofon przy przycisku wysyłania i w tłumaczu) używa modelu wybranego dla asystenta. Gdy asystent jest wyłączony albo jego model nie słyszy, używany jest model tłumacza. Słyszą tylko modele Gemma E2B i E4B – najmniejszy model tłumacza (NLLB) nie słyszy.</string>
+    <string name="ai_dictation_note">Dyktowanie w rozmowach i w asystencie używa modelu wybranego dla asystenta. Dyktowanie w tłumaczu działa tylko wtedy, gdy model wybrany dla tłumacza sam słyszy. Słyszą tylko modele Gemma E2B i E4B – najmniejszy model tłumacza (NLLB) nie słyszy, więc przy nim dyktowania nie ma.</string>
 </resources>

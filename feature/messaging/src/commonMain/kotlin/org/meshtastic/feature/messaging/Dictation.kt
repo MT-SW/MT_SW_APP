@@ -56,9 +56,9 @@ class MicRecorder(val permission: suspend () -> Boolean, val start: () -> Unit, 
 
 /** [onText] receives the recognized text once the user has finished speaking. */
 @Composable
-fun rememberDictation(onText: (String) -> Unit): Dictation {
+fun rememberDictation(translator: Boolean = false, onText: (String) -> Unit): Dictation {
     val service = koinInject<DictationService>()
-    val available by service.available.collectAsState()
+    val available by (if (translator) service.translatorAvailable else service.available).collectAsState()
     val mic = rememberMicRecorder()
     val scope = rememberCoroutineScope()
     val current = rememberUpdatedState(onText)
@@ -78,7 +78,7 @@ fun rememberDictation(onText: (String) -> Unit): Dictation {
             phase = DictationPhase.WORKING
             val text =
                 try {
-                    service.transcribe(wavOf(pcm))
+                    service.transcribe(wavOf(pcm), translator)
                 } catch (e: kotlinx.coroutines.CancellationException) {
                     throw e
                 } catch (e: Exception) {
