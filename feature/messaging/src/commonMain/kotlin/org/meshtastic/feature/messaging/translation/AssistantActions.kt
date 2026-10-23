@@ -17,27 +17,29 @@
 package org.meshtastic.feature.messaging.translation
 
 /**
- * A button shown under an answer of the assistant. It never does anything by itself: the user taps it. [uri] is a deep
- * link of the app, [highlight] (optional) the title of a setting that blinks when the screen opens.
+ * A button shown under an answer of the assistant. [uri] is a deep link of the app, [highlight] (optional) the title of
+ * a setting that blinks when the screen opens. With [auto] the app goes there by itself right after the answer, because
+ * the user asked for exactly that ("show node X on the map"); the button stays to come back later. An action only ever
+ * opens a place in the app: it never changes a setting and never sends a message.
  */
-data class AssistantAction(val label: String, val uri: String, val highlight: String = "")
+data class AssistantAction(val label: String, val uri: String, val highlight: String = "", val auto: Boolean = false)
 
 /**
  * The actions travel inside the text of the answer as short marker lines, so they are saved with the conversation and
  * need no extra storage. [parse] cuts them out for display, [strip] removes them before the text goes back to the model.
  */
 object AssistantActions {
-    private val marker = Regex("""\n?\[\[akcja\|([^|\]]*)\|([^|\]]*)\|([^|\]]*)]]""")
+    private val marker = Regex("""\n?\[\[akcja\|([^|\]]*)\|([^|\]]*)\|([^|\]]*)(\|auto)?]]""")
 
     fun encode(action: AssistantAction): String =
-        "\n[[akcja|${clean(action.label)}|${clean(action.uri)}|${clean(action.highlight)}]]"
+        "\n[[akcja|${clean(action.label)}|${clean(action.uri)}|${clean(action.highlight)}${if (action.auto) "|auto" else ""}]]"
 
     /** The text without the markers and the actions found in it (no duplicates, in order). */
     fun parse(text: String): Pair<String, List<AssistantAction>> {
         val actions =
             marker
                 .findAll(text)
-                .map { AssistantAction(it.groupValues[1], it.groupValues[2], it.groupValues[3]) }
+                .map { AssistantAction(it.groupValues[1], it.groupValues[2], it.groupValues[3], it.groupValues[4].isNotEmpty()) }
                 .distinct()
                 .toList()
         return strip(text) to actions

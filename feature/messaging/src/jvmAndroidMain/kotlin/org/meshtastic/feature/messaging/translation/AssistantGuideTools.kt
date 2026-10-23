@@ -104,6 +104,15 @@ class AssistantActionCollector {
 
     @Synchronized fun size(): Int = actions.size
 
+    /** The newest button, or null. */
+    @Synchronized fun last(): AssistantAction? = actions.lastOrNull()
+
+    /** The newest button opens by itself right after the answer (the user asked to go there). */
+    @Synchronized
+    fun autoOpenLast() {
+        if (actions.isNotEmpty()) actions[actions.lastIndex] = actions.last().copy(auto = true)
+    }
+
     /** Returns the collected buttons and forgets them. */
     @Synchronized
     fun drain(): List<AssistantAction> = actions.toList().also { actions.clear() }
@@ -114,8 +123,9 @@ class AssistantActionCollector {
 }
 
 /**
- * Tools that only point the user somewhere: they add a button under the answer, and the user decides to tap it. None of
- * them changes a setting or sends a message; a drafted message only lands in the message box of the conversation.
+ * Places in the app the assistant can point at: each adds a button under the answer (and, when the user asked to go
+ * there, the app opens it by itself). None of them changes a setting or sends a message; a drafted message only lands
+ * in the message box of the conversation and the user sends it.
  */
 @Suppress("FunctionName", "LargeClass")
 class AssistantGuideTools(
