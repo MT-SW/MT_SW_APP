@@ -16,6 +16,7 @@
  */
 package org.meshtastic.feature.map.maplibre
 
+import org.meshtastic.core.ui.theme.PauseGrayscaleLayer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -255,6 +256,7 @@ fun MeshMap(
         Logger.withTag("MapDrawn").d { "tiles drawn" }
     }
 
+    PauseGrayscaleLayer()
     val zoomRange = basemap.zoomRange()
     MaplibreMap(
         modifier = modifier,

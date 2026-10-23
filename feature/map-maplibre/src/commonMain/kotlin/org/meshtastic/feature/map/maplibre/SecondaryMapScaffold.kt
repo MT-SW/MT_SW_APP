@@ -16,6 +16,7 @@
  */
 package org.meshtastic.feature.map.maplibre
 
+import org.meshtastic.core.ui.theme.PauseGrayscaleLayer
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -103,6 +104,7 @@ internal fun SecondaryMapSurface(
     // it stops here too. Like MeshMap's, it covers the view and not the state.
     if (!LocalMapLibreRuntimeProbe.current()) return MapEngineUnavailable(modifier)
 
+    PauseGrayscaleLayer()
     val zoomRange = basemaps.current.zoomRange()
     MaplibreMap(
         modifier = modifier,
