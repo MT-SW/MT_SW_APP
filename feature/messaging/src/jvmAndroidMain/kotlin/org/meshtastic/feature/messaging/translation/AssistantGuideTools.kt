@@ -214,13 +214,29 @@ class AssistantGuideTools(
         var best: Target? = null
         var bestScore = 0
         for (t in list) {
-            val score = t.words.count { q.contains(it) } * 2 + (if (t.key.contains(q) || q.contains(t.key)) 1 else 0)
+            // A word counts only where a word of the question starts ("dni" must not match inside "odpowiednie").
+            val score = t.words.count { startsWord(q, it) } * 2 + (if (t.key == q || startsWord(q, t.key)) 1 else 0)
             if (score > bestScore) {
                 best = t
                 bestScore = score
             }
         }
         return best
+    }
+
+    private fun startsWord(text: String, word: String): Boolean {
+        var at = text.indexOf(word)
+        while (at >= 0) {
+            if (at == 0 || !text[at - 1].isLetterOrDigit()) return true
+            at = text.indexOf(word, at + 1)
+        }
+        return false
+    }
+
+    /** The name of the screen a button leads to (for example "MT_SW features"), or empty. */
+    suspend fun placeOf(action: AssistantAction): String {
+        val path = action.uri.removePrefix("$DEEP_LINK_BASE_URI/").substringBefore('?')
+        return SCREENS.firstOrNull { it.path == path }?.let { getStringSuspend(it.title) }.orEmpty()
     }
 
     private fun run(name: String, block: suspend () -> String): String {
@@ -286,7 +302,7 @@ class AssistantGuideTools(
         val SETTINGS =
             listOf(
                 Target("region", "settings/lora", Res.string.schema_lora_region, listOf("region", "kraj", "częstotliw")),
-                Target("modem_preset", "settings/lora", Res.string.schema_lora_modem_preset, listOf("preset", "modem", "prędkość", "narrow", "long fast", "predkosc")),
+                Target("modem_preset", "settings/lora", Res.string.schema_lora_modem_preset, listOf("preset", "modem", "prędkość", "narrow", "long fast", "predkosc", "zasięg", "zasieg")),
                 Target("hop_limit", "settings/lora", Res.string.schema_lora_hop_limit, listOf("hop", "skok", "przeskok", "limit")),
                 Target("tx_enabled", "settings/lora", Res.string.schema_lora_tx_enabled, listOf("nadawan", "transmit", "tx enabled")),
                 Target("bandwidth", "settings/lora", Res.string.schema_lora_bandwidth, listOf("bandwidth", "szerokość pasma", "pasmo")),

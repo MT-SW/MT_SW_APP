@@ -3088,7 +3088,7 @@
     <string name="ai_nodes_match">Pasujące węzły: %1$d z %2$d znanych</string>
     <string name="ai_nodes_none">Żaden węzeł nie pasuje (znanych: %1$d).</string>
     <string name="ai_never">nigdy</string>
-    <string name="ai_battery_pct">bateria %1$d%%</string>
+    <string name="ai_battery_pct">bateria %1$d%</string>
     <string name="ai_battery_ext">zasilanie zewnętrzne</string>
     <string name="ai_battery_unknown">bateria nieznana</string>
     <string name="ai_heard">słyszany %1$s</string>
@@ -3125,7 +3125,7 @@
     <string name="ai_wp_noname">(bez nazwy)</string>
     <string name="ai_wp_from">od: %1$s</string>
     <string name="ai_nodes_heard_title">%1$s: słyszanych węzłów %2$d z %3$d znanych</string>
-    <string name="ai_low_battery_title">Węzły z niską baterią (do %1$d%%):</string>
+    <string name="ai_low_battery_title">Węzły z niską baterią (do %1$d%):</string>
     <string name="ai_active_window_h">ostatnie %1$d godz.</string>
     <string name="ai_sig_closest">Najbliższe węzły (z %1$d):</string>
     <string name="ai_sig_farthest">Najdalsze węzły (z %1$d):</string>
@@ -3178,4 +3178,7 @@
     <string name="ai_radio_none">Brak jeszcze statystyk z Twojego radia.</string>
     <string name="ai_dm_title">Ostatnie wiadomości prywatne do Ciebie (najnowsze na górze):</string>
     <string name="ai_dm_none">Nikt jeszcze nie napisał do Ciebie prywatnie.</string>
+    <string name="assistant_web_used">Odpowiedź z pomocą internetu</string>
+    <string name="assistant_web_searched">wyszukano: %1$s</string>
+    <string name="assistant_web_sources">źródła: %1$s</string>
 </resources>

@@ -85,10 +85,15 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
         val kind = text("intent")
         if (kind !in INTENTS) return null
         fun known(key: String, allowed: List<String>): String = text(key).lowercase().takeIf { it in allowed }.orEmpty()
+        // A summary of "the network" is about the nodes, not about messages; a kind written into a name field is a slip.
+        val channel = text("channel").takeUnless { it in INTENTS }.orEmpty()
+        if (kind == "summarize" && (text("topic").isNotBlank() || text("channel") in INTENTS)) {
+            return AssistantIntent(intent = "network_question", topic = "overview")
+        }
         return AssistantIntent(
             intent = kind,
             node = text("node"),
-            channel = text("channel"),
+            channel = channel,
             text = text("text"),
             role = known("role", ROLES),
             metric = known("metric", METRICS),
@@ -110,7 +115,7 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
             listOf(
                 "chat", "app_help", "open_screen", "show_setting", "show_node_on_map", "nearest_node", "open_link_planner",
                 "draft_message", "count_messages", "search_messages", "summarize", "list_nodes", "signal_list",
-                "traceroute", "neighbors", "app_status", "waypoints", "weather", "network_question", "messages_to_me",
+                "traceroute", "neighbors", "app_status", "waypoints", "weather", "network_question", "messages_to_me", "web_question",
             )
         val ROLES = listOf("any", "router", "repeater", "sensor", "tracker")
         val METRICS =
@@ -142,8 +147,9 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
                 "fields that the question really gives. Copy node and channel names exactly as the user wrote them. " +
                 "Use the previous question only for a short follow-up like \"a wczoraj?\".\n" +
                 "Kinds:\n" +
-                "chat: talk, greetings, opinions, general knowledge, radio, antennas, LoRa or Meshtastic in general; anything not about this app or the user's own data.\n" +
-                "app_help: how to use the app, where something is, how to change something, what a feature or setting does, what is new, questions about the MT_SW project. text = the setting or feature.\n" +
+                "chat: talk, greetings, opinions, advice, radio, antennas, LoRa or Meshtastic in general; anything not about this app or the user's own data.\n" +
+                "web_question: a question about facts that can be looked up: rules and laws, frequencies allowed, prices, news, dates, products. text = short search words.\n" +
+                "app_help: how to use the app, where something is, how to change something, what a feature, screen or setting of the app is or does (also MT_SW features, the translator, the assistant), what is new, questions about the MT_SW project. text = the setting or feature.\n" +
                 "open_screen: the user tells you to open or go to a screen (settings page, map, nodes, messages, channels, firmware, ...). text = the screen.\n" +
                 "show_setting: the user tells you to open or show one setting. text = the setting.\n" +
                 "show_node_on_map: show, find or locate one node on the map, where a node is. node = its name.\n" +
@@ -167,6 +173,8 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
                 "cześć, co tam? -> {\"intent\":\"chat\"}\n" +
                 "jak zrobić antenę dipol na 868 MHz? -> {\"intent\":\"chat\"}\n" +
                 "gdzie zmienię region? -> {\"intent\":\"app_help\",\"text\":\"region\"}\n" +
+                "co to jest Funkcje MT_SW? -> {\"intent\":\"app_help\",\"text\":\"Funkcje MT_SW\"}\n" +
+                "kto może nadawać na 868 MHz w Polsce? -> {\"intent\":\"web_question\",\"text\":\"868 MHz kto może nadawać Polska\"}\n" +
                 "co nowego w aplikacji? -> {\"intent\":\"app_help\",\"text\":\"nowości\"}\n" +
                 "otwórz ustawienia LoRa -> {\"intent\":\"open_screen\",\"text\":\"lora\"}\n" +
                 "pokaż mi limit przeskoków -> {\"intent\":\"show_setting\",\"text\":\"hop limit\"}\n" +

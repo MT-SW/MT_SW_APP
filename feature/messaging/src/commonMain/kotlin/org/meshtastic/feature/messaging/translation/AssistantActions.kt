@@ -45,7 +45,17 @@ object AssistantActions {
         return strip(text) to actions
     }
 
-    fun strip(text: String): String = marker.replace(text, "").trimEnd()
+    fun strip(text: String): String = webMarker.replace(marker.replace(text, ""), "").trimEnd()
+
+    // The answer used the internet: what was searched and where it came from, shown as a small note under the answer.
+    private val webMarker = Regex("""\n?\[\[internet\|([^|\]]*)\|([^|\]]*)]]""")
+
+    /** The searches and sources of an answer that used the internet, or null. */
+    data class WebInfo(val queries: String, val sources: String)
+
+    fun encodeWeb(queries: String, sources: String): String = "\n[[internet|${clean(queries)}|${clean(sources)}]]"
+
+    fun web(text: String): WebInfo? = webMarker.find(text)?.let { WebInfo(it.groupValues[1].trim(), it.groupValues[2].trim()) }
 
     private fun clean(value: String) = value.replace('|', ' ').replace("[[", "(").replace("]]", ")").replace('\n', ' ')
 }
