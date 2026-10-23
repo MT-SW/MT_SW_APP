@@ -169,6 +169,8 @@ internal fun AiSettings() {
         }
     }
 
+    if (assistantOn && assistantPossible) AssistantMemorySettings()
+
     if (askInternet) {
         AlertDialog(
             onDismissRequest = { askInternet = false },

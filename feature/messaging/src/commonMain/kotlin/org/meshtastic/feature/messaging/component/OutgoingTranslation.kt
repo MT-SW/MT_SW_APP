@@ -113,7 +113,7 @@ internal fun OutgoingTranslateAction(
 
     // A small grey chip above the field, only while there is text to translate: no extra row sits under the field.
     if (textFieldState.text.isNotBlank()) {
-        Row(modifier = modifier.fillMaxWidth().padding(horizontal = 12.dp), horizontalArrangement = Arrangement.Start) {
+        Row(modifier = modifier.padding(horizontal = 12.dp), horizontalArrangement = Arrangement.Start) {
             AssistChip(
                 onClick = {
                     original = textFieldState.text.toString().trim()

@@ -148,6 +148,13 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_ASSISTANT_INTERNET_ENABLED] = value } }
     }
 
+    override val assistantMemoryEnabled: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_ASSISTANT_MEMORY_ENABLED] ?: true }.stateIn(scope, SharingStarted.Lazily, true)
+
+    override fun setAssistantMemoryEnabled(value: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_ASSISTANT_MEMORY_ENABLED] = value } }
+    }
+
     override val translatorModelId: StateFlow<String> =
         dataStore.data
             .map { it[KEY_TRANSLATOR_MODEL_ID] ?: DEFAULT_TRANSLATOR_MODEL_ID }
@@ -706,6 +713,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_TRANSLATOR_ENABLED = booleanPreferencesKey("translator-enabled")
         val KEY_ASSISTANT_ENABLED = booleanPreferencesKey("assistant-enabled")
         val KEY_ASSISTANT_INTERNET_ENABLED = booleanPreferencesKey("assistant-internet-enabled")
+        val KEY_ASSISTANT_MEMORY_ENABLED = booleanPreferencesKey("assistant-memory-enabled")
         val KEY_TRANSLATOR_MODEL_ID = stringPreferencesKey("translator-model-id")
         val KEY_ASSISTANT_MODEL_ID = stringPreferencesKey("assistant-model-id")
         const val DEFAULT_TRANSLATOR_MODEL_ID = "nllb-600m"

@@ -42,6 +42,9 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Asystent zna cały projekt MT_SW (firmware, integrację z Home Assistant, zgodność z główną siecią), jego autorów i osiągnięcia; ta wiedza jest zapisana w aplikacji, odświeżana przy każdym budowaniu (oraz przez internet, gdy asystent ma go włączony) i widoczna tylko dla asystenta.
 * Asystent: opis sieci i własnego węzła po polsku, gdy użytkownik pisze po polsku (odległości w słowach zamiast par liczb, których model nie mieszał).
 * Asystent: zapis narzędzia wpisany tekstem bez nawiasów (np. „show_setting …”) też zmienia się w przycisk, a miejsce jest szukane najpierw po słowach użytkownika.
+* Asystent: **pamięć między rozmowami**: sam zapisuje krótkie notatki w kilku plikach (o Tobie, sprzęcie i sieci, stylu rozmowy, projektach), a Ty możesz je zobaczyć, poprawić, usunąć i wpisać własne instrukcje; przełącznik w ustawieniach asystenta, ostrzeżenie nad rozmową, wszystko tylko na urządzeniu.
+* Asystent odpowiada bardziej naturalnie, jak w zwykłej rozmowie, bez sztywnych zwrotów.
+* Czat: przyciski formatowania są w jednej linii z przyciskiem „Przetłumacz”, przy prawej krawędzi.
 * Asystent: odczyty czujników, które nie mogą być prawdziwe (np. temperatura 25252 °C), są oznaczane jako „prawdopodobnie uszkodzony czujnik”, a odpowiedź, która zaczyna się powtarzać w kółko, jest przerywana po pierwszym razie.
 **Scalenie z oryginałem — wersja 2.8.4 (początek)**
 * Scalenie z oryginałem po wydaniu 2.8.3: numer wersji aplikacji 2.8.4, nowsze protobufy (2.8.1.18), odświeżone dane o sprzęcie i firmware, tłumaczenia i zrzuty ekranu sklepów. Biblioteka Bluetooth Kable zostaje przypięta do 0.44.3, a nasze tłumaczenia PL bez zmian.
@@ -405,6 +408,9 @@ The entries below describe only what this fork adds on top of the original, from
 * The assistant knows the whole MT_SW project (firmware, Home Assistant integration, compatibility with the main network), its authors and achievements; this knowledge is packaged in the app, refreshed on every build (and from the internet, when the assistant's internet access is on) and visible only to the assistant.
 * Assistant: the network and own-node description is written in Polish when the user writes Polish (distances in words instead of number pairs).
 * Assistant: a tool call written as plain text without brackets (e.g. "show_setting ...") also becomes a button, and the place is looked up from the user's own words first.
+* Assistant: **memory between conversations**: it saves short notes in several files (about you, devices and network, conversation style, projects) on its own, and you can view, edit and delete them and write your own instructions; a switch in the assistant settings, a notice above the conversation, everything stays on the device.
+* The assistant answers more naturally, like in a normal conversation, without stiff phrases.
+* Chat: the formatting buttons sit in the same line as the "Translate" button, at the right edge.
 * How long received packets (logs) are remembered: a choice in days from 1 to 60 (1, 2, 3, 7, 14, 30, 60) instead of one hour to one year, also in the regular Settings; an earlier choice is kept until you pick a new one.
 * By default the app now remembers received packets for **60 days**, and the list of recent Wi-Fi addresses holds up to **30** entries.
 * Assistant: when a small model writes a tool call as plain text instead of using the tool, it is turned into a real "Go to" button; the note above the chat tells the truth about whether internet access for the assistant is on.

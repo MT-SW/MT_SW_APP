@@ -42,6 +42,8 @@ import org.meshtastic.feature.messaging.translation.UpdatableKnowledge
 import org.meshtastic.core.repository.AiModelStore
 import org.meshtastic.feature.messaging.translation.AssistantDataProvider
 import org.meshtastic.core.repository.AssistantKnowledge
+import org.meshtastic.core.repository.AssistantMemory
+import org.meshtastic.feature.messaging.translation.FileAssistantMemory
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioConfigRepository
@@ -95,6 +97,9 @@ class FdroidAiModule {
         AssistantDataProvider(nodeRepository, radioConfigRepository, meshLogRepository, packetRepository)
 
     @Single
+    fun assistantMemory(context: Context): AssistantMemory = FileAssistantMemory(File(context.filesDir, "assistant-memory"))
+
+    @Single
     fun assistantService(
         context: Context,
         engine: LiteRtEngine,
@@ -102,9 +107,11 @@ class FdroidAiModule {
         uiPrefs: UiPrefs,
         data: AssistantDataProvider,
         knowledge: AssistantKnowledge,
+        memory: AssistantMemory,
     ): AssistantService = LlamaAssistantService(
             engine, store, uiPrefs, data,
-            UpdatableKnowledge(knowledge, File(context.filesDir, "knowledge"), uiPrefs),
+            memoryStore = memory,
+            knowledge = UpdatableKnowledge(knowledge, File(context.filesDir, "knowledge"), uiPrefs),
         )
 
     @Single
