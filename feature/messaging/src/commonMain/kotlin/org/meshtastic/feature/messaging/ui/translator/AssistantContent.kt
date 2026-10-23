@@ -76,6 +76,7 @@ import org.meshtastic.feature.messaging.rememberDictation
 import org.meshtastic.feature.messaging.rememberSpeaker
 import org.meshtastic.core.resources.assistant_empty_hint
 import org.meshtastic.core.resources.assistant_error
+import org.meshtastic.core.resources.assistant_go_to
 import org.meshtastic.core.resources.assistant_greeting
 import org.meshtastic.core.resources.assistant_input_hint
 import org.meshtastic.core.resources.assistant_model_missing
@@ -200,13 +201,13 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                                     modifier = Modifier.fillMaxWidth(),
                                 ) {
                                     actions.forEach { action ->
-                                        OutlinedButton(
+                                        TextButton(
                                             onClick = {
                                                 SettingHighlight.show(action.highlight)
                                                 AssistantLinks.open(action.uri)
                                             },
                                         ) {
-                                            Text(action.label)
+                                            Text(stringResource(Res.string.assistant_go_to, action.label))
                                         }
                                     }
                                 }
