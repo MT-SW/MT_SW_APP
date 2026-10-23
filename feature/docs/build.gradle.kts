@@ -69,6 +69,10 @@ val syncDocsToComposeResources =
             into("files/docs")
         }
 
+        // The assistant's knowledge base: the change list of the fork (Polish first, English second) is packaged
+        // next to the guide, so the offline assistant can answer "what is new" without internet.
+        from(isolated.rootProject.projectDirectory.file("CHANGELOG.md")) { into("files/knowledge") }
+
         // FR-038: docs/assets/screenshots/ is the tracked screenshot set shared with the Jekyll site, refreshed from
         // the CST references by copyDocsScreenshots, so the site and the in-app reader serve identical images.
         from(docsDir.dir("assets/screenshots")) {

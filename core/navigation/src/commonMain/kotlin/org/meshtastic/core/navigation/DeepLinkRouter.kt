@@ -48,6 +48,8 @@ private typealias DeepLinkArgs = Map<String, List<String>>
  * - `/nodes/{destNum}/mesh-view` -> Camera mesh view finding that node
  * - `/nodes/{destNum}/position/mesh-view` -> Camera mesh view of that node's position track
  * - `/map/mesh-view` -> Camera mesh view of the whole mesh
+ * - `/map/planner/{plannerNodeNum}` -> Map with the link planner open for that node
+ * - `/map/focus/{focusNodeNum}` -> Map centred on that node
  * - `/messages` -> Conversation list
  * - `/messages/{contactKey}` -> Specific conversation
  * - `/settings` -> Settings root
@@ -148,6 +150,8 @@ object DeepLinkRouter {
             },
             pattern("discovery", DiscoveryRoute.DiscoveryGraph.serializer()) { key, _ -> listOf(key) },
             pattern("map/mesh-view", MapRoute.Map.serializer()) { key, _ -> listOf(key, MapRoute.MeshHud()) },
+            pattern("map/planner/{plannerNodeNum}", MapRoute.Map.serializer()) { key, _ -> listOf(key) },
+            pattern("map/focus/{focusNodeNum}", MapRoute.Map.serializer()) { key, _ -> listOf(key) },
             pattern("map/{waypointId}", MapRoute.Map.serializer()) { key, _ -> listOf(key) },
             pattern("map?waypointId={waypointId}", MapRoute.Map.serializer()) { key, _ -> listOf(key) },
             // A non-numeric waypointId fails to decode above and opens the plain map.

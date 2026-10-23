@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.meshtastic.core.ui.assistant.assistantHighlight
 import org.meshtastic.core.ui.theme.AppTheme
 
 @Composable
@@ -53,7 +54,7 @@ fun SwitchPreference(
     ListItem(
         checked = checked,
         onCheckedChange = onCheckedChange,
-        modifier = padding?.let { Modifier.padding(it) } ?: modifier,
+        modifier = (padding?.let { Modifier.padding(it) } ?: modifier).assistantHighlight(title),
         enabled = enabled,
         shapes = ListItemDefaults.shapes(shape = RectangleShape),
         colors = currentColors,

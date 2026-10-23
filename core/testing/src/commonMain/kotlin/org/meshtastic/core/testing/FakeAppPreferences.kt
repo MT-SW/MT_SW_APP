@@ -371,6 +371,12 @@ class FakeUiPrefs : UiPrefs {
         assistantEnabled.value = value
     }
 
+    override val assistantInternetEnabled = MutableStateFlow(false)
+
+    override fun setAssistantInternetEnabled(value: Boolean) {
+        assistantInternetEnabled.value = value
+    }
+
     override val translatorModelId = MutableStateFlow("nllb-600m")
 
     override fun setTranslatorModelId(value: String) {

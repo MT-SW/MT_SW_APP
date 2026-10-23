@@ -88,6 +88,9 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
         @ToolParam(description = "How many messages to return, 1 to 40") limit: Int,
     ): String = run("search_messages") { data.toolMessages(query, limit) }
 
+    /** Longest result a tool may return; the assistant raises it for models with a bigger window. */
+    @Volatile var resultLimit: Int = DEFAULT_RESULT_CHARS
+
     private fun run(name: String, block: suspend () -> String): String {
         Logger.i(tag = TAG) { "Tool $name" }
         val text =
@@ -97,14 +100,14 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
                 Logger.w(tag = TAG, throwable = e) { "Tool $name failed" }
                 "The data is not available right now."
             }
-        val result = text.take(MAX_RESULT_CHARS).stripUnsafeChars()
+        val result = text.take(resultLimit).stripUnsafeChars()
         Logger.i(tag = TAG) { "Tool $name result: ${result.take(LOG_CHARS).replace("\n", " | ")}" }
         return result
     }
 
     private companion object {
         const val TAG = "AssistantTools"
-        const val MAX_RESULT_CHARS = 2200
+        const val DEFAULT_RESULT_CHARS = 2200
         const val LOG_CHARS = 1500
     }
 }

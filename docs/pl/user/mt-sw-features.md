@@ -145,6 +145,12 @@ Na słabszych urządzeniach duże modele mogą spowalniać aplikację albo ją z
 - Jeden model obsługuje wiele języków i dowolne pary między nimi, m.in. polski, angielski, niemiecki, czeski, słowacki, ukraiński, rosyjski, francuski i hiszpański.
 - Tłumaczenie bywa niedokładne, zwłaszcza nazwy własne i żargon, więc zawsze traktuj je jako podpowiedź. Tekst jest tłumaczony zdanie po zdaniu. Jeśli tłumaczenie ma ponad 200 znaków, aplikacja ostrzega, że przez radio pójdzie w kilku częściach.
 
+**Przyciski, wiedza o aplikacji i głos (asystent).** Asystent zna aplikację: ma wbudowaną wiedzę z tej dokumentacji i listy zmian i do każdego pytania dobiera tylko pasujący fragment. Pod odpowiedzią może pokazać **przyciski**: otwarcie ekranu, pokazanie ustawienia (żółte mruganie przez kilka sekund), pokazanie węzła na mapie, otwarcie planera łącza albo szkic wiadomości wpisany do pola. Przyciski nic nie robią same: dopiero Twoje dotknięcie otwiera ekran, a szkic wiadomości **nigdy nie jest wysyłany automatycznie**. Przytrzymaj odpowiedź, aby ją **odczytać na głos**; na telefonie przy polu pytania jest też przycisk „Dyktuj”. Nad polem czatu, gdy jest tekst do przetłumaczenia, pojawia się mały szary przycisk „Przetłumacz”.
+
+**Internet dla asystenta (domyślnie wyłączony).** W ustawieniach asystenta jest jeden przełącznik internetu. Wyłączony = asystent działa w pełni offline. Włączony (po przeczytaniu ostrzeżenia, z czerwonym napisem, że jest włączony): asystent może wyszukać ogólne informacje w internecie, a aplikacja raz na dobę sprawdza w naszym repozytorium nowości o aplikacji (pobrane pliki są weryfikowane skrótem; gdy się nie uda, działa wiedza wbudowana). Wyszukiwarka widzi Twój adres IP i słowa zapytania. Tekst z internetu jest traktowany tylko jako informacja, nigdy jako polecenie, a odpowiedź pokazuje, co wyszukano i jakie były źródła.
+
+**Wybór koloru węzła.** Okno wyboru koloru klucza pozwala wybrać dowolny kolor (kod, suwaki odcienia, nasycenia i jasności albo gotowe kolory oraz ostatnio użyte), wybrać tryb „Szybko” (do 20 s, kolor podobny) lub „Dokładnie” (do 3 min, kolor bardzo bliski), widzieć czas szukania, przerwać szukanie i porównać wybrany kolor z wynikiem. Klucz nie jest zapisywany automatycznie.
+
 **Licencje modeli.** Modele nie są częścią aplikacji: pobierasz je z internetu i używasz na własną odpowiedzialność, zgodnie z ich licencjami.
 
 - NLLB-200 (Meta) jest udostępniony na licencji **CC BY-NC 4.0**, czyli **wyłącznie do użytku niekomercyjnego**.

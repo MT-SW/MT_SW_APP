@@ -68,7 +68,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.assistant_dictate
 import org.meshtastic.core.resources.assistant_disclaimer
+import org.meshtastic.core.resources.read_aloud
+import org.meshtastic.core.resources.stop_reading
+import org.meshtastic.feature.messaging.rememberDictation
+import org.meshtastic.feature.messaging.rememberSpeaker
 import org.meshtastic.core.resources.assistant_empty_hint
 import org.meshtastic.core.resources.assistant_error
 import org.meshtastic.core.resources.assistant_greeting
@@ -82,6 +87,9 @@ import org.meshtastic.core.resources.assistant_suggest_1
 import org.meshtastic.core.resources.assistant_suggest_2
 import org.meshtastic.core.resources.assistant_suggest_3
 import org.meshtastic.core.resources.assistant_suggest_4
+import org.meshtastic.core.ui.assistant.AssistantLinks
+import org.meshtastic.core.ui.assistant.SettingHighlight
+import org.meshtastic.feature.messaging.translation.AssistantActions
 import org.meshtastic.feature.messaging.translation.AssistantViewModel
 
 private val BubbleShape = RoundedCornerShape(20.dp)
@@ -96,6 +104,10 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
     val state by viewModel.state.collectAsStateWithLifecycle()
     val enabled by viewModel.enabled.collectAsStateWithLifecycle()
     val modelReady by viewModel.modelReady.collectAsStateWithLifecycle()
+    val speaker = rememberSpeaker()
+    val dictation = rememberDictation { text ->
+        viewModel.setInput((viewModel.state.value.input + " " + text).trim())
+    }
 
     Column(modifier = modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         if (!enabled || !modelReady) {
@@ -168,16 +180,38 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                 }
             }
             itemsIndexed(state.lines) { index, line ->
+                val (shown, actions) = remember(line.text) { AssistantActions.parse(line.text) }
                 Bubble(
                     fromUser = line.fromUser,
-                    text = line.text,
+                    text = shown,
                     canRetry = !state.busy && line.text.isNotEmpty(),
                     onRetry = { viewModel.retry(index) },
+                    onReadAloud = if (!line.fromUser && shown.isNotBlank()) ({ speaker.speak(shown) }) else null,
+                    onStopReading = if (!line.fromUser && shown.isNotBlank()) ({ speaker.stop() }) else null,
                 ) {
                     if (line.text.isEmpty()) {
                         TypingDots()
                     } else {
-                        Text(text = line.text, style = MaterialTheme.typography.bodyLarge)
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            if (shown.isNotBlank()) Text(text = shown, style = MaterialTheme.typography.bodyLarge)
+                            if (actions.isNotEmpty()) {
+                                FlowRow(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    modifier = Modifier.fillMaxWidth(),
+                                ) {
+                                    actions.forEach { action ->
+                                        OutlinedButton(
+                                            onClick = {
+                                                SettingHighlight.show(action.highlight)
+                                                AssistantLinks.open(action.uri)
+                                            },
+                                        ) {
+                                            Text(action.label)
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -211,6 +245,9 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                     Text(stringResource(Res.string.assistant_send))
                 }
             }
+            if (dictation.available && !state.busy) {
+                TextButton(onClick = dictation.start) { Text(stringResource(Res.string.assistant_dictate)) }
+            }
             if (state.lines.isNotEmpty() && !state.busy) {
                 TextButton(onClick = viewModel::startNew) { Text(stringResource(Res.string.assistant_new)) }
             }
@@ -226,6 +263,8 @@ private fun Bubble(
     text: String,
     canRetry: Boolean,
     onRetry: () -> Unit,
+    onReadAloud: (() -> Unit)? = null,
+    onStopReading: (() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     var menuOpen by remember { mutableStateOf(false) }
@@ -250,6 +289,24 @@ private fun Bubble(
                         scope.launch { clipboard.setClipEntry(createClipEntry(text, "")) }
                     },
                 )
+                if (onReadAloud != null) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.read_aloud)) },
+                        onClick = {
+                            menuOpen = false
+                            onReadAloud()
+                        },
+                    )
+                }
+                if (onStopReading != null) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.stop_reading)) },
+                        onClick = {
+                            menuOpen = false
+                            onStopReading()
+                        },
+                    )
+                }
                 if (canRetry) {
                     DropdownMenuItem(
                         text = { Text(stringResource(Res.string.resend)) },

@@ -76,6 +76,12 @@
     <string name="ai_assistant_title">Offline assistant</string>
     <string name="ai_assistant_unavailable">The assistant will be available once the Gemma model engine is added in an upcoming version.</string>
     <string name="ai_assistant_warning_title">Turn on the offline assistant?</string>
+    <string name="ai_internet_enable">Turn on</string>
+    <string name="ai_internet_on_indicator">Internet is ON for the assistant</string>
+    <string name="ai_internet_summary">Off by default. When on, the assistant can search the web, and the app downloads updates about our work automatically.</string>
+    <string name="ai_internet_title">Internet for the assistant</string>
+    <string name="ai_internet_warning_body">Words the assistant searches for leave your device and go to a search engine, which can see your IP address. The assistant is told not to put your names, positions or messages in a search, but a small model can make mistakes. Text from the web can be wrong or can try to trick the assistant, so it is treated only as information. Every answer that used the internet shows what was searched and the sources. Nothing from the app is sent unless you ask for it. Updates about the app are downloaded only from our repository and checked before use. Turn this off and the assistant works fully offline again.</string>
+    <string name="ai_internet_warning_title">Turn on internet for the assistant?</string>
     <string name="ai_level_light">Light</string>
     <string name="ai_level_standard">Standard</string>
     <string name="ai_level_strong">Strong</string>
@@ -176,6 +182,7 @@
     <!-- ASSISTANT -->
     <string name="assistant_close">Close</string>
     <string name="assistant_delete">Delete conversation</string>
+    <string name="assistant_dictate">Dictate</string>
     <string name="assistant_disclaimer">The assistant runs entirely on this device, without internet. Answers may be wrong — check important information.</string>
     <string name="assistant_empty_hint">The first answer takes longer because the model is loaded into memory.</string>
     <string name="assistant_error">Could not get an answer. Check that the device has enough free RAM.</string>
@@ -2104,6 +2111,7 @@
     <string name="range_test">Range Test</string>
     <string name="range_test_config">Range Test Config</string>
     <string name="react">React</string>
+    <string name="read_aloud">Read aloud</string>
     <string name="reboot">Reboot</string>
     <string name="reboot_into_dfu">Reboot into DFU mode</string>
     <string name="reboot_into_dfu_warning">The node stays in its bootloader and off the mesh until new firmware is flashed or it is reset.</string>
@@ -2480,6 +2488,7 @@
     <string name="status_message_summary">A public status message that is broadcast to the mesh on change and every 12 hours.</string>
     <string name="stay_connected_anywhere">Stay Connected Anywhere</string>
     <string name="stop_connecting">Stop Connecting</string>
+    <string name="stop_reading">Stop reading</string>
     <string name="store_forward">Store &amp; Forward</string>
     <string name="store_forward_config">Store &amp; Forward Config</string>
     <string name="success">Success</string>

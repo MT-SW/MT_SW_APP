@@ -145,6 +145,12 @@ On weaker devices large models can slow the app down or close it, which is why e
 - One model covers many languages and any pair between them, including Polish, English, German, Czech, Slovak, Ukrainian, Russian, French and Spanish.
 - Translations can be inaccurate, especially names and jargon, so treat them as a hint. Text is translated sentence by sentence. If a translation is over 200 characters, the app warns that it will be sent in several parts over the radio.
 
+**Buttons, app knowledge and voice (assistant).** The assistant knows the app: it has built-in knowledge from this documentation and the changelog and picks only the fitting part for each question. Under an answer it can show **buttons**: open a screen, show a setting (it blinks yellow for a few seconds), show a node on the map, open the link planner, or a message draft placed in the input field. Buttons never act by themselves: only your tap opens the screen, and a message draft is **never sent automatically**. Long-press an answer to have it **read aloud**; on a phone there is also a "Dictate" button next to the question field. Above the chat field, when there is text to translate, a small grey "Translate" button appears.
+
+**Internet for the assistant (off by default).** The assistant settings have a single internet switch. Off = the assistant works fully offline. On (after reading a warning, with a red note that it is on): the assistant may search the web for general information, and once a day the app checks our repository for news about the app (downloaded files are verified with a hash; if it fails, the built-in knowledge is used). The search engine sees your IP address and the words of the query. Web text is treated only as information, never as an instruction, and the answer shows what was searched and the sources.
+
+**Node colour picker.** The key colour dialog lets you pick any colour (code, hue/saturation/brightness sliders, or ready colours and recently used ones), choose "Fast" (up to 20 s, similar colour) or "Precise" (up to 3 min, very close colour), see the search time, cancel the search and compare the chosen colour with the result. The key is not saved automatically.
+
 **Model licences.** The models are not part of the app: you download them from the internet and use them at your own responsibility, under their licences.
 
 - NLLB-200 (Meta) is released under **CC BY-NC 4.0**, which means **non-commercial use only**.

@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.meshtastic.core.ui.assistant.assistantHighlight
 import org.meshtastic.core.ui.theme.AppTheme
 
 @Composable
@@ -75,7 +76,7 @@ fun RegularPreference(
 ) {
     ListItem(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.assistantHighlight(title),
         enabled = enabled,
         shapes = ListItemDefaults.shapes(shape = RectangleShape),
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),

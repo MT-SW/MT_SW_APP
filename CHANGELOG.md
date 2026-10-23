@@ -18,6 +18,13 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+* Asystent zna aplikację: wbudowana wiedza z dokumentacji i listy zmian (dobierana do każdego pytania), mała liczba narzędzi dobierana do tematu pytania, większe okno kontekstu dla większych modeli oraz w logach informacja, na jakim układzie (NPU/GPU/CPU) działa model.
+* Asystent pokazuje pod odpowiedzią **przyciski** (otwórz ekran, pokaż ustawienie z żółtym mruganiem, węzeł na mapie, planer łącza, szkic wiadomości); nic nie dzieje się samo, wiadomość nigdy nie jest wysyłana automatycznie.
+* **Czytanie na głos** odpowiedzi asystenta i wiadomości z czatu (menu po przytrzymaniu) oraz dyktowanie pytania (Android).
+* **Internet dla asystenta**: jeden przełącznik, domyślnie wyłączony, z ostrzeżeniem i widocznym wskaźnikiem. Włączony pozwala na wyszukiwanie w sieci (z pokazaniem zapytania i źródeł, tekst z sieci tylko jako informacja) i na automatyczne, weryfikowane pobieranie nowości o aplikacji z naszego repozytorium; wyłączony = pełny tryb offline.
+* Czat: przycisk tłumaczenia przed wysłaniem to teraz mały szary przycisk „Przetłumacz” nad polem tekstu.
+* Funkcje MT_SW: skróty do motywu i panelu debugowania.
+* Wybór koloru węzła: dowolny kolor (kod, odcień/nasycenie/jasność), ostatnio użyte kolory, tryby „Szybko” i „Dokładnie” zamiast tolerancji, licznik czasu i przerwanie szukania.
 * Asystent: kanał rozpoznawany też po numerze („kanał 1”, „kanał jeden”), więc streszczenie dotyczy właściwego kanału; liczba wiadomości na kanałach jest dostępna dla modelu jako narzędzie.
 * Pamięć heap i PSRAM są wszędzie pokazywane jako **zajęte** (a nie wolna): lista węzłów, wykresy zasobów, zdrowie sieci, widżet, powiadomienie, podgląd pakietów, zapis zdalny i asystent. Np. 10% wolnego to teraz 90% zajętego.
 * Naprawa zamykania się aplikacji na telefonie przy użyciu tłumacza (po optymalizacji wersji release brakowało klas biblioteki ONNX).
@@ -368,6 +375,13 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### October 2026
 
+* The assistant knows the app: built-in knowledge from the documentation and changelog (picked per question), a small set of tools chosen by the topic of the question, a larger context window for larger models, and a log line showing which backend (NPU/GPU/CPU) the model runs on.
+* The assistant shows **buttons** under an answer (open a screen, show a setting with a yellow blink, node on the map, link planner, message draft); nothing happens by itself and a message is never sent automatically.
+* **Read aloud** for assistant answers and chat messages (long-press menu) and dictation of the question (Android).
+* **Internet for the assistant**: a single switch, off by default, with a warning and a visible indicator. On, it allows web search (the query and sources are shown, web text is information only) and automatic, verified download of news about the app from our repository; off = fully offline.
+* Chat: the translate-before-sending button is now a small grey "Translate" button above the text field.
+* MT_SW features: shortcuts to the theme and the debug panel.
+* Node colour picker: any colour (code, hue/saturation/brightness), recently used colours, "Fast" and "Precise" modes instead of tolerance, a timer and cancelling of the search.
 * Assistant: channels are also recognised by number ("channel 1", "channel one"), so a summary covers the right channel; message counts per channel are available to the model as a tool.
 * Heap and PSRAM memory are now shown as **used** (not free) everywhere: node list, resource charts, network health, widget, notification, packet view, on-demand log and the assistant. E.g. 10% free now shows as 90% used.
 * Fixed the app closing on the phone when using the translator (after release optimisation, ONNX library classes were missing).

@@ -26,6 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
+import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.model.noiseFloorOrNull
 import org.meshtastic.core.navigation.FirmwareRoute
 import org.meshtastic.core.navigation.MultiBackstack
@@ -34,6 +35,7 @@ import org.meshtastic.core.navigation.NodesRoute
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.util.LnaCorrection
 import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.LocalMeshActivity
@@ -70,6 +72,10 @@ fun MeshtasticAppShell(
     hostModifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
+    // Buttons under the assistant's answers ask for a screen through [AssistantLinks]; it is opened like any link.
+    LaunchedEffect(uiViewModel) {
+        AssistantLinks.links.collect { uri -> uiViewModel.handleDeepLink(CommonUri.parse(uri)) }
+    }
     LaunchedEffect(uiViewModel) {
         uiViewModel.navigationDeepLink.collect { navKeys ->
             multiBackstack.handleDeepLink(navKeys)
