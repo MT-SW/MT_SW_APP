@@ -977,6 +977,7 @@ internal fun MessageInput(
         if (mentionActive) {
             MentionSuggestions(suggestions = suggestions, onPick = ::insertMention)
         }
+        OutgoingTranslateAction(textFieldState = textFieldState, isEnabled = isEnabled, onSendMessage = onSendMessage)
         OutlinedTextField(
             modifier =
             Modifier.fillMaxWidth()
@@ -1063,7 +1064,6 @@ internal fun MessageInput(
                 }
             },
         )
-        OutgoingTranslateAction(textFieldState = textFieldState, isEnabled = isEnabled, onSendMessage = onSendMessage)
         // Markdown formatting toolbar — shown once the field is focused and holds enough text to format (iOS parity).
         if (isEnabled && isFocused && currentText.length >= FORMATTING_TOOLBAR_MIN_CHARS) {
             FormattingToolbar(state = textFieldState, modifier = Modifier.padding(horizontal = 8.dp))
