@@ -59,6 +59,12 @@ Internet dla asystenta ma być WYŁĄCZONY (poza punktem 40).
 ## Internet (włącz przełącznik dopiero tutaj)
 40. Co to jest pasmo 868 MHz i kto może na nim nadawać? (odpowiedź ma pokazać „Użyto internetu”, co wyszukano i źródła)
 
+## Dodatkowe (w /test na końcu)
+41. Jaka jest teraz temperatura?
+42. Jaki preset wybrać w naszym województwie?
+43. Jaka antena ćwierćfalowa na 869 MHz, ile ma mieć centymetrów?
+44. Kto może nadawać na 868 MHz w Polsce? (przy włączonym internecie: notka „Odpowiedź z pomocą internetu”)
+
 ## Na co patrzeć
 - Czy odpowiedź jest po polsku i krótka.
 - Czy liczby się zgadzają z aplikacją.

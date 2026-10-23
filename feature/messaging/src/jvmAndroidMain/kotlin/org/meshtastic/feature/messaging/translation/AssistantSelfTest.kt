@@ -73,5 +73,8 @@ internal object AssistantSelfTest {
             Question("How do I change the LoRa region?"),
             Question("Jaka jest stolica Francji?"),
             Question("Jaka jest teraz temperatura?"),
+            Question("Jaki preset wybrać w naszym województwie?"),
+            Question("Jaka antena ćwierćfalowa na 869 MHz, ile ma mieć centymetrów?"),
+            Question("Kto może nadawać na 868 MHz w Polsce?"),
         )
 }
