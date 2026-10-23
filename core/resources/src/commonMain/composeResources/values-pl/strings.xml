@@ -3036,4 +3036,6 @@
     <string name="assistant_dictate_working">Zamieniam mowę na tekst…</string>
     <string name="assistant_disclaimer_web">Asystent działa na tym urządzeniu, ale internet jest WŁĄCZONY: wyszukiwane słowa są wysyłane do wyszukiwarki. Odpowiedzi mogą być błędne — sprawdzaj ważne informacje.</string>
     <string name="ai_dictation_note">Dyktowanie w rozmowach i w asystencie używa modelu wybranego dla asystenta. Dyktowanie w tłumaczu działa tylko wtedy, gdy model wybrany dla tłumacza sam słyszy. Słyszą tylko modele Gemma E2B i E4B – najmniejszy model tłumacza (NLLB) nie słyszy, więc przy nim dyktowania nie ma.</string>
+    <string name="mt_sw_other_contacts_title">Ręczne dodawanie kontaktu po ID</string>
+    <string name="mt_sw_other_contacts_body">Na liście węzłów przycisk w rogu ma pozycję „Dodaj kontakt”: wpisujesz identyfikator węzła (np. !a1b2c3d4) i nazwę, a węzeł zapisuje się w Twoim urządzeniu. W szczegółach węzła (Administracja → Dodaj kontakt zdalnie) to samo zrobisz na zdalnym urządzeniu, przez sieć mesh.</string>
 </resources>
