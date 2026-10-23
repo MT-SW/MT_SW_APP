@@ -182,7 +182,7 @@ class AssistantGuideTools(
     )
     fun draft_message(
         @ToolParam(description = "The text of the message") text: String,
-        @ToolParam(description = "Channel name or number, or a node name for a direct message; empty for the main channel") to: String,
+        @ToolParam(description = "Channel name or number, or a node name for a direct message; the word main for the main channel") to: String,
     ): String = run("draft_message") {
         val message = text.trim().take(MAX_DRAFT)
         if (message.isEmpty()) return@run "The message is empty."
