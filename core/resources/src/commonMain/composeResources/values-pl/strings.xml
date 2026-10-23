@@ -3188,4 +3188,6 @@
     <string name="ai_near_one">Najbliżej jest %1$s (%2$s): %3$s km, słyszany %4$s.</string>
     <string name="ai_dist_next">Kolejne: %1$s</string>
     <string name="ai_nodes_recent">Ostatnio słyszane: %1$s</string>
+    <string name="ai_bat_line">Bateria węzła %1$s: %2$s, napięcie %3$s V (odczyt sprzed: %4$s).</string>
+    <string name="ai_bat_unknown">Węzeł %1$s nie podał jeszcze stanu baterii.</string>
 </resources>
