@@ -65,7 +65,7 @@ class MeshLogPrefsImpl(private val dataStore: MeshLogDataStore, dispatchers: Cor
     companion object {
         const val RETENTION_DAYS_KEY = "meshlog_retention_days"
         const val LOGGING_ENABLED_KEY = "meshlog_logging_enabled"
-        const val DEFAULT_RETENTION_DAYS = 30
+        const val DEFAULT_RETENTION_DAYS = 60
         const val DEFAULT_LOGGING_ENABLED = true
 
         val KEY_RETENTION_DAYS_PREF = intPreferencesKey(RETENTION_DAYS_KEY)
