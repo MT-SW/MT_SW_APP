@@ -231,6 +231,38 @@ fun PauseGrayscaleLayer() {
     }
 }
 
+/**
+ * Whether the black-and-white theme is active, readable outside composition (map layers build their colours as text
+ * in plain functions). Set by [AppTheme].
+ */
+object MonochromeState {
+    @Volatile var on: Boolean = false
+}
+
+/** [this] as a grey of the same brightness while a black-and-white theme is active; unchanged otherwise. */
+fun Color.monoSafe(): Color {
+    if (!MonochromeState.on) return this
+    val grey = 0.299f * red + 0.587f * green + 0.114f * blue
+    return Color(grey, grey, grey, alpha)
+}
+
+/**
+ * Drains the colour out of this element (and what it contains) in the black-and-white themes. Used for the bars while
+ * a map is on screen, because the global grayscale layer is paused then. Never put a native view (map, camera) inside.
+ */
+@Composable
+fun Modifier.monochromeLayer(): Modifier {
+    if (!LocalMonochrome.current) return this
+    val paint = remember { Paint().apply { colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) }) } }
+    return this.drawWithContent {
+        drawIntoCanvas { canvas ->
+            canvas.saveLayer(Rect(0f, 0f, size.width, size.height), paint)
+            drawContent()
+            canvas.restore()
+        }
+    }
+}
+
 /** Draws [content] with all colour drained out of it (saturation 0), including pictures and hard-coded colours. */
 @Composable
 private fun GrayscaleLayer(content: @Composable () -> Unit) {
@@ -306,6 +338,7 @@ fun AppTheme(
         }
     }
 
+    MonochromeState.on = monochrome
     MaterialExpressiveTheme(colorScheme = colorScheme, typography = typography, motionScheme = expressive()) {
         CompositionLocalProvider(LocalMonochrome provides monochrome) {
             if (monochrome) GrayscaleLayer(content) else content()

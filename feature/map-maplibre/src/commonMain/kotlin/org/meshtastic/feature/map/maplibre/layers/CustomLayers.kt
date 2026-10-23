@@ -22,6 +22,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import org.meshtastic.core.ui.theme.monoSafe
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -252,7 +253,7 @@ private fun GroundOverlayLayer(layerId: String, index: Int, overlay: LayerGround
 }
 
 /** What an import with no colours of its own is drawn in. */
-private val CustomLayerBlue = Color(0xFF3F51B5)
+private val CustomLayerBlue: Color get() = Color(0xFF3F51B5).monoSafe()
 
 /** True for a feature whose geometry is any of [types]. */
 private fun geometryIsOneOf(types: List<GeometryType>): Expression<BooleanValue> =
