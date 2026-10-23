@@ -174,6 +174,12 @@ interface UiPrefs {
 
     fun setAssistantInternetEnabled(value: Boolean)
 
+    /** Whether dictation records from a connected headset's microphone (Bluetooth, wired, USB) instead of the built-in one. */
+    val dictationExternalMic: StateFlow<Boolean>
+        get() = kotlinx.coroutines.flow.MutableStateFlow(false)
+
+    fun setDictationExternalMic(value: Boolean) {}
+
     /** Whether the assistant keeps short notes and remembers some information between conversations (off by default until the user switches it on). */
     val assistantMemoryEnabled: StateFlow<Boolean>
 

@@ -65,6 +65,8 @@ import org.meshtastic.core.resources.ai_level_light
 import org.meshtastic.core.resources.ai_level_standard
 import org.meshtastic.core.resources.ai_level_strong
 import org.meshtastic.core.resources.ai_dictation_note
+import org.meshtastic.core.resources.dictation_external_mic_summary
+import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.ai_model_cancel
 import org.meshtastic.core.resources.ai_model_delete
 import org.meshtastic.core.resources.ai_model_download
@@ -233,6 +235,14 @@ internal fun AiSettings() {
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
         )
         if (assistantOn || translatorOn) {
+            val externalMic by uiPrefs.dictationExternalMic.collectAsStateWithLifecycle()
+            SwitchPreference(
+                title = stringResource(Res.string.dictation_external_mic_title),
+                summary = stringResource(Res.string.dictation_external_mic_summary),
+                checked = externalMic,
+                enabled = true,
+                onCheckedChange = { uiPrefs.setDictationExternalMic(it) },
+            )
             Text(
                 text = stringResource(Res.string.ai_dictation_note),
                 style = MaterialTheme.typography.bodySmall,
