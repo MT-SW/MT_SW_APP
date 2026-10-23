@@ -77,6 +77,7 @@ class LlamaAssistantService(
         data.polish = question.any { it in "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ" } || history.any { it.fromUser && it.text.any { c -> c in "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ" } }
         collector.drain()
         webTools.reset()
+        dataTools.lastResult = null
         val recent = fit(modelId, history, room)
         val rawAnswer =
             try {
@@ -84,10 +85,17 @@ class LlamaAssistantService(
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: Exception) {
-                // The window is full: try again with a much shorter prompt.
-                if (e.message?.contains("too long", ignoreCase = true) != true) throw e
-                ask(modelId, recent.takeLast(1), "", topic, question, SHORT_CONTEXT_CHARS, 1, onPiece)
-            }
+                val msg = e.message.orEmpty()
+                when {
+                    // The window is full: try again with a much shorter prompt.
+                    msg.contains("too long", ignoreCase = true) ->
+                        ask(modelId, recent.takeLast(1), "", topic, question, SHORT_CONTEXT_CHARS, 1, onPiece)
+                    // The model wrote a broken tool call: answer again from the data in the prompt, without tools.
+                    msg.contains("parse tool calls", ignoreCase = true) ->
+                        ask(modelId, recent, memory, topic, question, AUTO_CONTEXT_CHARS * room, room, onPiece, useTools = false)
+                    else -> throw e
+                }
+            }.ifBlank { dataTools.lastResult.orEmpty() }
         // Buttons asked for by the tools go under the answer; they are only shown, the user decides to tap them.
         val answer = rescueWrittenToolCalls(rawAnswer, question)
         val polish = question.any { it in "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ" }
@@ -205,6 +213,7 @@ class LlamaAssistantService(
         dataChars: Int,
         room: Int,
         onPiece: (String) -> Unit,
+        useTools: Boolean = true,
     ): String {
         val webOn = uiPrefs.assistantInternetEnabled.value
         // A short follow-up ("a jakie to są wartości?") has no topic words of its own, so the data is chosen from the
@@ -216,7 +225,7 @@ class LlamaAssistantService(
             if (topic == AssistantTopic.DATA || knowledge == null) "" else knowledge.lookup(question, KNOWLEDGE_CHARS * room)
         val system = buildString {
             append(SYSTEM_PROMPT)
-            if (topic != AssistantTopic.GUIDE) append("\n\n").append(TOOLS_RULE)
+            if (topic != AssistantTopic.GUIDE && useTools) append("\n\n").append(TOOLS_RULE)
             if (topic != AssistantTopic.DATA) append("\n\n").append(GUIDE_RULE)
             if (webOn) append("\n\n").append(WEB_RULE)
             if (uiPrefs.assistantMemoryEnabled.value) {
@@ -240,7 +249,7 @@ class LlamaAssistantService(
             maxTokens = MAX_ANSWER_TOKENS,
             temperature = TEMPERATURE,
             onPiece = onPiece,
-            tools = toolsFor(topic) + if (webOn) listOf(webTools) else emptyList(),
+            tools = if (useTools) toolsFor(topic) + if (webOn) listOf(webTools) else emptyList() else emptyList(),
         )
     }
 

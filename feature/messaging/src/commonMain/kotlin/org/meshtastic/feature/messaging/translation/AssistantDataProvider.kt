@@ -184,6 +184,10 @@ class AssistantDataProvider(
     fun mentionedNodeName(text: String): String? =
         mentionedNodes(text.lowercase()).firstOrNull()?.let { it.user.long_name.ifBlank { it.user.short_name } }
 
+    /** The tools take "all" for "no filter" (the model cannot write an empty text); this turns it back into empty. */
+    private fun String.anyToEmpty(): String =
+        trim().lowercase().takeUnless { it in ANY_WORDS || it.all { c -> !c.isLetterOrDigit() } }.orEmpty()
+
     private fun String.fold(): String =
         lowercase().map { c -> FOLD[c] ?: c }.joinToString("")
 
@@ -685,9 +689,9 @@ class AssistantDataProvider(
      */
     suspend fun toolMessages(query: String, limit: Int, channel: String = ""): String {
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
-        val needle = query.trim().lowercase().fold()
+        val needle = query.anyToEmpty().fold()
         val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
-        val wanted = channel.trim().lowercase()
+        val wanted = channel.anyToEmpty()
         var keys = packetRepository.getContacts().first().keys.toList()
         if (wanted.isNotEmpty()) {
             val index = wanted.toIntOrNull() ?: numberedChannel(wanted) ?: names.indexOfFirst { it.lowercase() == wanted }.takeIf { it >= 0 }
@@ -729,7 +733,7 @@ class AssistantDataProvider(
     suspend fun toolChannelMessages(channel: String, limit: Int): String {
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
         val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
-        val wanted = channel.trim().lowercase()
+        val wanted = channel.anyToEmpty()
         val index = wanted.toIntOrNull() ?: numberedChannel(wanted) ?: names.indexOfFirst { it.lowercase() == wanted }.takeIf { it >= 0 }
             ?: names.indexOfFirst { wanted.isNotEmpty() && it.lowercase().contains(wanted) }.takeIf { it >= 0 }
         val keys = packetRepository.getContacts().first().keys.filter { it.endsWith("^all") && (wanted.isEmpty() || index == null || it.startsWith(index.toString() + "^")) }
@@ -760,7 +764,7 @@ class AssistantDataProvider(
      */
     suspend fun toolMessageCount(channel: String, hours: Int): String {
         val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
-        val wanted = channel.trim().lowercase()
+        val wanted = channel.anyToEmpty()
         val index = wanted.toIntOrNull() ?: numberedChannel(wanted) ?: names.indexOfFirst { it.lowercase() == wanted }.takeIf { it >= 0 }
             ?: names.indexOfFirst { wanted.isNotEmpty() && it.lowercase().contains(wanted) }.takeIf { it >= 0 }
         if (wanted.isNotEmpty() && index == null) {
@@ -803,7 +807,7 @@ class AssistantDataProvider(
     fun toolFindNodes(activeHours: Int, hardware: String, onlyFavorites: Int, maxBattery: Int, withPosition: Int, limit: Int): String {
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
         val nowS = nowMillis / MILLIS_PER_SECOND
-        val hw = hardware.trim().lowercase()
+        val hw = hardware.anyToEmpty()
         val all = nodeRepository.nodeDBbyNum.value.values
         val found =
             all.filter { n ->
@@ -1085,7 +1089,8 @@ class AssistantDataProvider(
         val MAIN_CHANNEL_WORDS = setOf("all", "wszyscy", "wszystkich", "główny", "glowny", "primary", "main", "kanał główny")
         val OWN_WORDS = listOf("mój", "moj", "mojego", "mojej", "mojemu", "my node", "own node", "mój węz", "moim")
         val SUMMARY_WORDS = listOf("streść", "streszcz", "podsumuj", "podsumowa", "summar", "o czym", "co pisz", "co się dzieje na", "co sie dzieje na")
-        val COUNT_WORDS = listOf("ile ", "ilo", "liczb", "how many", "count", "licz")
+        val ANY_WORDS = setOf("all", "any", "wszystkie", "wszystko", "everything", "null", "none", "*")
+        val COUNT_WORDS = listOf("najwięcej", "najwiecej", "kto napisa", "kto pisze", "ile ", "ilo", "liczb", "how many", "count", "licz")
         val TODAY_WORDS = listOf("dzisiaj", "dziś", "dzis", "today", "od rana")
         val MESSAGE_WORDS = listOf("wiadomo", "message", "czat", "chat", "napisa", "pisa", "rozmow", "odpowied")
     }

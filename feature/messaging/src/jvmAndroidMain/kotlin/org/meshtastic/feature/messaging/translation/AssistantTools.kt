@@ -77,7 +77,7 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
             "number, or an empty text for all channels.",
     )
     fun channel_messages(
-        @ToolParam(description = "Channel name or number, or empty for all channels") channel: String,
+        @ToolParam(description = "Channel name or number, or the word all for all channels") channel: String,
         @ToolParam(description = "How many of the latest messages to read, 1 to 40") limit: Int,
     ): String = run("channel_messages") { data.toolChannelMessages(channel, limit) }
 
@@ -90,7 +90,7 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
             "questions like how many messages today / this hour on a channel.",
     )
     fun count_messages(
-        @ToolParam(description = "Channel name or number, or empty for all conversations") channel: String,
+        @ToolParam(description = "Channel name or number, or the word all for all conversations") channel: String,
         @ToolParam(description = "0 = today since midnight, otherwise the last N hours (1 to 720)") hours: Int,
     ): String = run("count_messages") { data.toolMessageCount(channel, hours) }
 
@@ -102,7 +102,7 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
     )
     fun find_nodes(
         @ToolParam(description = "Heard in the last N hours, 0 = any time") active_hours: Int,
-        @ToolParam(description = "Part of the hardware name, or empty") hardware: String,
+        @ToolParam(description = "Part of the hardware name, or the word all") hardware: String,
         @ToolParam(description = "1 = favourites only, 0 = all") only_favorites: Int,
         @ToolParam(description = "Battery percent at or below, 0 = any") max_battery: Int,
         @ToolParam(description = "1 = only nodes with a position, 0 = all") with_position: Int,
@@ -123,12 +123,15 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
             "whether a word appeared, or to find a message.",
     )
     fun search_messages(
-        @ToolParam(description = "Word or phrase to look for, or empty for the newest messages") query: String,
+        @ToolParam(description = "Word or phrase to look for, or the word all for the newest messages") query: String,
         @ToolParam(description = "How many messages to show, 1 to 40") limit: Int,
-        @ToolParam(description = "Channel name or number, or a node name for its private chat; empty = everywhere") channel: String,
+        @ToolParam(description = "Channel name or number, or a node name for its private chat; the word all = everywhere") channel: String,
     ): String = run("search_messages") { data.toolMessages(query, limit, channel) }
 
     /** Longest result a tool may return; the assistant raises it for models with a bigger window. */
+    /** The newest tool result of the current question; shown as the answer when the model says nothing. */
+    @Volatile var lastResult: String? = null
+
     @Volatile var resultLimit: Int = DEFAULT_RESULT_CHARS
 
     private fun run(name: String, block: suspend () -> String): String {
@@ -141,6 +144,7 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
                 "The data is not available right now."
             }
         val result = text.take(resultLimit).stripUnsafeChars()
+        lastResult = result
         Logger.i(tag = TAG) { "Tool $name result: ${result.take(LOG_CHARS).replace("\n", " | ")}" }
         return result
     }
