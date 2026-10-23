@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import org.meshtastic.core.ui.theme.monoSafe
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
@@ -233,4 +234,4 @@ private const val MAX_CONTOUR_TILES = 16
  * [loadContourFeatureCollection]), so this is never actually drawn. Matches
  * [org.meshtastic.feature.map.terrain.ContourStyling]'s own topo-map-conventional brown.
  */
-private val ContourFallbackColor = Color(0xFF8B5A2B)
+private val ContourFallbackColor: Color get() = Color(0xFF8B5A2B).monoSafe()

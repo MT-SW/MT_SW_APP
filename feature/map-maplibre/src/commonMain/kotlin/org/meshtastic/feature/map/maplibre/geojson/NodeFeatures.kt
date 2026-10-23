@@ -25,6 +25,8 @@ import org.maplibre.spatialk.geojson.Point
 import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.util.precisionRadiusMetersOrNull
+import androidx.compose.ui.graphics.toArgb
+import org.meshtastic.core.ui.theme.monoSafe
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.roundToLong
@@ -33,7 +35,8 @@ import kotlin.math.sin
 /** Formats an `@ColorInt` ARGB value as the `#rrggbb` string MapLibre expressions parse. */
 @Suppress("MagicNumber")
 internal fun Int.toCssHex(): String {
-    val hex = (this and 0xFFFFFF).toString(16).padStart(6, '0')
+    val argb = androidx.compose.ui.graphics.Color(this or 0xFF000000.toInt()).monoSafe()
+    val hex = (argb.toArgb() and 0xFFFFFF).toString(16).padStart(6, '0')
     return "#$hex"
 }
 

@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import org.meshtastic.core.ui.theme.monoSafe
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -195,7 +196,7 @@ private fun edgesToLabels(
 
 /** "#RRGGBB"; the colours of the signal palette are opaque, and MapLibre reads this form. */
 private fun Color.toCssHex(): String {
-    val rgb = toArgb() and RGB_MASK
+    val rgb = monoSafe().toArgb() and RGB_MASK
     return "#" + rgb.toString(HEX_RADIX).padStart(HEX_DIGITS, '0')
 }
 

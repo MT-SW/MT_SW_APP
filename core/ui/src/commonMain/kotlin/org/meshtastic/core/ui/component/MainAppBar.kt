@@ -22,6 +22,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import org.meshtastic.core.ui.theme.monochromeLayer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -78,7 +79,7 @@ fun MainAppBar(
         } else {
             TopAppBarDefaults.topAppBarColors()
         }
-    Column(modifier = modifier) {
+    Column(modifier = modifier.monochromeLayer()) {
         TopAppBar(
             colors = colors,
             title = {

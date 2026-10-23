@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import org.meshtastic.core.ui.theme.monoSafe
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.serialization.json.JsonObject
@@ -121,7 +122,7 @@ fun MapLibreNodeTrackMap(
 
     // The colour the rest of the app draws this node in. The track used to be a flat blue, which said nothing about
     // whose track it was — the Google flavor fades the node's own colour along it, and so does this now.
-    val trackColor = node?.let { Color(it.colors.second) } ?: MapColors.Slate
+    val trackColor = node?.let { Color(it.colors.second).monoSafe() } ?: MapColors.Slate
 
     val mapState =
         rememberSecondaryMapState(basemaps) {

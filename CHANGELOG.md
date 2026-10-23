@@ -25,6 +25,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Czat: przycisk tłumaczenia przed wysłaniem to teraz mały szary przycisk „Przetłumacz” nad polem tekstu.
 * Funkcje MT_SW: skróty do motywu i panelu debugowania.
 * Wybór koloru węzła: dowolny kolor (kod, odcień/nasycenie/jasność), ostatnio użyte kolory, tryby „Szybko” i „Dokładnie” zamiast tolerancji, licznik czasu i przerwanie szukania.
+* Motywy czarno-białe: na mapie linie, znaczniki węzłów i ślady są też szare, a górna belka i dolna nawigacja (ikona połączenia, tytuły, trójkąt ostrzeżenia) pozostają czarno-białe.
 * Tłumacz: przetłumaczony tekst można przeczytać na głos.
 * Opcja przeniesienia przycisku dodawania i udostępniania znad listy węzłów i rozmów do górnej belki (domyślnie wyłączona).
 * Asystent: pewniejsze odpowiedzi o sieci: pytania uzupełniające korzystają z poprzedniego tematu, rankingi odebranych i wysłanych ramek (największe lub najmniejsze), kto był słyszany ostatnio lub milczy najdłużej, role i ulubione.
@@ -389,6 +390,7 @@ The entries below describe only what this fork adds on top of the original, from
 * Chat: the translate-before-sending button is now a small grey "Translate" button above the text field.
 * MT_SW features: shortcuts to the theme and the debug panel.
 * Node colour picker: any colour (code, hue/saturation/brightness), recently used colours, "Fast" and "Precise" modes instead of tolerance, a timer and cancelling of the search.
+* Black-and-white themes: on the map the lines, node markers and tracks are grey too, and the top bar and the bottom navigation (connection icon, titles, warning triangle) stay black and white.
 * Translator: the translated text can be read aloud.
 * Option to move the add / share button from over the node and conversation lists to the top bar (off by default).
 * Assistant: more reliable answers about the network: follow-up questions reuse the previous topic, rankings of received and sent packets (highest or lowest), who was heard last or is silent for longest, roles and favourites.

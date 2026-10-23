@@ -22,6 +22,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -36,6 +37,7 @@ import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import org.meshtastic.core.ui.theme.monochromeLayer
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.rememberTooltipState
@@ -112,6 +114,7 @@ fun MeshtasticNavigationSuite(
                     selected = isSelected,
                     onClick = { handleNavigation(destination, topLevelDestination, multiBackstack, uiViewModel) },
                     icon = {
+                      Box(modifier = Modifier.monochromeLayer()) {
                         NavigationIconContent(
                             destination = destination,
                             isSelected = isSelected,
@@ -123,6 +126,7 @@ fun MeshtasticNavigationSuite(
                             meshActivityFlow = uiViewModel.meshActivity,
                             useAiIcon = assistantEnabled,
                         )
+                      }
                     },
                     label =
                     if (showLabels) {
