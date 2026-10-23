@@ -774,7 +774,7 @@ class MeshDataHandlerTest {
         handler.handleReceivedData(routingPacket(Routing.Error.NONE), 123)
         advanceUntilIdle()
 
-        verifySuspend { packetHandler.completeDispatchedResponse(99, complete = true) }
+        verifySuspend { packetHandler.completeDispatchedResponse(99, complete = true, from = 456) }
     }
 
     private fun sentPacket(ackProofStatus: Int = 0) = DataPacket(
@@ -916,7 +916,7 @@ class MeshDataHandlerTest {
         handler.handleReceivedData(routingPacket(Routing.Error.NO_ROUTE), 123)
         advanceUntilIdle()
 
-        verifySuspend { packetHandler.completeDispatchedResponse(99, complete = false) }
+        verifySuspend { packetHandler.completeDispatchedResponse(99, complete = false, from = 456) }
     }
 
     @Test
@@ -953,7 +953,7 @@ class MeshDataHandlerTest {
         verifySuspend(exactly(0)) { packetRepository.findPacketsWithId(any()) }
         verifySuspend(exactly(0)) { packetRepository.findReactionsWithId(any()) }
         verifySuspend(exactly(0)) { packetRepository.update(any(), any()) }
-        verifySuspend(exactly(0)) { packetHandler.completeDispatchedResponse(any(), any()) }
+        verifySuspend(exactly(0)) { packetHandler.completeDispatchedResponse(any(), any(), any()) }
     }
 
     // --- Telemetry handling ---

@@ -16,6 +16,8 @@
  */
 package org.meshtastic.feature.node.detail
 
+import org.meshtastic.core.testing.FakeRadioConfigRepository
+import org.meshtastic.core.repository.LocationService
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import dev.mokkery.answering.returns
@@ -41,6 +43,7 @@ import org.meshtastic.core.domain.usecase.session.EnsureRemoteAdminSessionUseCas
 import org.meshtastic.core.domain.usecase.session.EnsureSessionResult
 import org.meshtastic.core.domain.usecase.session.ObserveRemoteAdminSessionStatusUseCase
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.RoutingNak
 import org.meshtastic.core.model.SessionStatus
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.repository.LocalNodeUnavailableException
@@ -49,6 +52,7 @@ import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.QueryController
 import org.meshtastic.feature.node.component.NodeMenuAction
 import org.meshtastic.feature.node.domain.usecase.GetNodeDetailsUseCase
+import org.meshtastic.proto.Routing
 import org.meshtastic.proto.User
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -91,6 +95,11 @@ class NodeDetailViewModelTest {
         ensureRemoteAdminSession = ensureRemoteAdminSession,
         observeRemoteAdminSessionStatus = observeRemoteAdminSessionStatus,
         snackbarManager = snackbarManager,
+        radioConfigRepository = FakeRadioConfigRepository(),
+        locationService = object : LocationService {
+            override suspend fun getCurrentLocation() = null
+        },
+        nakWatcher = testNakWatcher(),
         resolveUiText = resolveNodeDetailUiTextForTest,
     )
 
@@ -189,11 +198,33 @@ class NodeDetailViewModelTest {
     }
 
     @Test
+    fun `openRemoteAdmin shows the refusal when the node rejects our admin key`() = runTest(testDispatcher) {
+        everySuspend { ensureRemoteAdminSession(1234) } returns
+            EnsureSessionResult.Rejected(RoutingNak(7, 1234, Routing.Error.ADMIN_PUBLIC_KEY_UNAUTHORIZED.value))
+
+        viewModel.openRemoteAdmin(1234)
+        runCurrent()
+
+        assertEquals(listOf(ADMIN_KEY_UNAUTHORIZED_TEXT), snackbarManager.messages)
+    }
+
+    @Test
+    fun `openRemoteAdmin treats a nak from another node as unreachable`() = runTest(testDispatcher) {
+        everySuspend { ensureRemoteAdminSession(1234) } returns
+            EnsureSessionResult.Rejected(RoutingNak(7, 99, Routing.Error.MAX_RETRANSMIT.value))
+
+        viewModel.openRemoteAdmin(1234)
+        runCurrent()
+
+        assertEquals(listOf("Could not reach node — try again or move closer."), snackbarManager.messages)
+    }
+
+    @Test
     fun `refreshMetadata surfaces queue rejection without throwing from view model scope`() = runTest(testDispatcher) {
         everySuspend { queryController.refreshMetadata(1234) } throws
             PacketQueueRejectedException("Metadata request")
 
-        viewModel.refreshMetadata(1234)
+        viewModel.refreshMetadata(1234, "Test Node")
         runCurrent()
 
         assertEquals(listOf(NODE_REQUEST_SEND_FAILED_TEXT), snackbarManager.messages)
