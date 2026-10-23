@@ -137,8 +137,9 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
         val listState = rememberLazyListState()
         val internetOn by koinInject<UiPrefs>().assistantInternetEnabled.collectAsStateWithLifecycle()
         val lastLength = state.lines.lastOrNull()?.text?.length ?: 0
+        // Follows the end of the answer while it is written (a long answer is taller than the screen).
         LaunchedEffect(state.lines.size, lastLength) {
-            if (state.lines.isNotEmpty()) listState.scrollToItem(state.lines.lastIndex)
+            if (state.lines.isNotEmpty()) listState.scrollToItem(state.lines.lastIndex, FOLLOW_END_OFFSET)
         }
 
         Text(
@@ -304,6 +305,9 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
         }
     }
 }
+
+/** Scroll offset larger than any bubble: the list stops at its real end, so the newest words stay in view. */
+private const val FOLLOW_END_OFFSET = 100_000
 
 /** A chat bubble: yours on the right, the assistant's on the left. Press and hold for copy and ask-again. */
 @OptIn(ExperimentalFoundationApi::class)
