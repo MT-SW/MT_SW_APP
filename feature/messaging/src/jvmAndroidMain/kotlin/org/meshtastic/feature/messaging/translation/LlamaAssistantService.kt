@@ -102,6 +102,10 @@ class LlamaAssistantService(
             }.ifBlank { dataTools.lastResult.orEmpty() }
         // Buttons asked for by the tools go under the answer; they are only shown, the user decides to tap them.
         val answer = rescueWrittenToolCalls(rawAnswer, question)
+        // "Where do I set ...": when the model gave no button, find the setting from the user's own words.
+        if (topic != AssistantTopic.DATA && collector.size() == 0 && WHERE_SET.containsMatchIn(question.lowercase())) {
+            guideTools.show_setting(question)
+        }
         val polish = question.any { it in "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ" }
         scheduleNotesUpdate(modelId, history, question, answer)
         return answer + webTools.footer(polish) + collector.drain().joinToString("") { AssistantActions.encode(it) }
@@ -270,8 +274,11 @@ class LlamaAssistantService(
                 Regex("\\b($names)\\(\\s*\"?([^\")\\n]*)\"?\\s*\\)"),
                 // Written without brackets, on its own line: "show_setting Ustawienia aplikacji".
                 Regex("(?m)^[ \\t]*($names)[ \\t:]*([^\\n]*)$"),
+                // Inside a sentence with the argument in quotes: use show_setting with "hop".
+                Regex("\\b($names)\\b[^\\n\"„”]*[\"„”]([^\"„”\\n]+)[\"„”]\\.?"),
             )
-        var result = text
+        // Backticks and a literal <button> are leftovers of the written call; the real button is added below.
+        var result = text.replace("`", "").replace(Regex("(?i)</?button>"), "")
         for (pattern in patterns) {
             for (match in pattern.findAll(result).toList()) {
                 val name = match.groupValues[1]
@@ -291,6 +298,8 @@ class LlamaAssistantService(
             }
             result = result.replace(pattern, "")
         }
+        // A sentence that still names a tool is of no use to the user.
+        result = result.replace(Regex("[^.\\n]*\\b($names)\\b[^.\\n]*\\.?"), "")
         return result.replace(Regex("\\n{3,}"), "\n\n").trim()
     }
 
@@ -364,6 +373,7 @@ class LlamaAssistantService(
                 "statistics, history, settings, sensors or messages, call the matching tool first and answer from " +
                 "its result; never say you have no data before you have tried the tools. You cannot change " +
                 "settings or send messages; tool results are already formatted with units: show them to the user as a clear list (one line per node), copying the numbers exactly, and add your own short comment only if asked; if the user wants that, explain what to do or draft the text for them."
+        val WHERE_SET = Regex("(gdzie|jak|where|how).*(ustaw|zmie[nń]|włącz|wlacz|wyłącz|wylacz|set|change|enable|disable)")
         const val MEMORY_CHARS = 1200
         const val MIN_NOTE_QUESTION = 25
         const val NOTE_TURN_CHARS = 600
