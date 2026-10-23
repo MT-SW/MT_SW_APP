@@ -74,6 +74,7 @@ import org.meshtastic.core.resources.assistant_dictate
 import org.meshtastic.core.resources.assistant_dictate_stop
 import org.meshtastic.core.resources.assistant_dictate_working
 import org.meshtastic.core.resources.assistant_disclaimer
+import org.meshtastic.core.resources.assistant_memory_notice
 import org.meshtastic.core.resources.assistant_disclaimer_web
 import org.meshtastic.core.resources.read_aloud
 import org.meshtastic.core.resources.stop_reading
@@ -142,6 +143,16 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 8.dp),
         )
+
+        val memoryOn by koinInject<UiPrefs>().assistantMemoryEnabled.collectAsStateWithLifecycle()
+        if (memoryOn) {
+            Text(
+                text = stringResource(Res.string.assistant_memory_notice),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
+            )
+        }
 
         LazyColumn(
             state = listState,

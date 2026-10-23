@@ -40,6 +40,8 @@ import org.meshtastic.feature.messaging.translation.UpdatableKnowledge
 import org.meshtastic.core.repository.AiModelStore
 import org.meshtastic.feature.messaging.translation.AssistantDataProvider
 import org.meshtastic.core.repository.AssistantKnowledge
+import org.meshtastic.core.repository.AssistantMemory
+import org.meshtastic.feature.messaging.translation.FileAssistantMemory
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioConfigRepository
@@ -92,15 +94,20 @@ class DesktopAiModule {
         AssistantDataProvider(nodeRepository, radioConfigRepository, meshLogRepository, packetRepository)
 
     @Single
+    fun assistantMemory(): AssistantMemory = FileAssistantMemory(File(System.getProperty("user.home"), ".meshtastic/assistant-memory"))
+
+    @Single
     fun assistantService(
         engine: LiteRtEngine,
         store: AiModelStoreImpl,
         uiPrefs: UiPrefs,
         data: AssistantDataProvider,
         knowledge: AssistantKnowledge,
+        memory: AssistantMemory,
     ): AssistantService = LlamaAssistantService(
             engine, store, uiPrefs, data,
-            UpdatableKnowledge(knowledge, File(System.getProperty("user.home"), ".meshtastic/knowledge"), uiPrefs),
+            memoryStore = memory,
+            knowledge = UpdatableKnowledge(knowledge, File(System.getProperty("user.home"), ".meshtastic/knowledge"), uiPrefs),
         )
 
     @Single

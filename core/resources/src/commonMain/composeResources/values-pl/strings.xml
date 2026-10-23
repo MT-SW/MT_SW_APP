@@ -3045,4 +3045,16 @@
     <string name="messages_translate_all">Przetłumacz wszystkie wiadomości</string>
     <string name="messages_translating">Tłumaczę wiadomości…</string>
     <string name="messages_translated_done">Tłumaczenie wiadomości zakończone</string>
+    <string name="ai_memory_title">Pamięć asystenta</string>
+    <string name="ai_memory_summary">Asystent zapisuje krótkie notatki o Tobie i pamięta niektóre informacje między rozmowami. Notatki zostają tylko na tym urządzeniu.</string>
+    <string name="ai_memory_open">Notatki i instrukcje</string>
+    <string name="ai_memory_instructions_label">Moje instrukcje dla asystenta</string>
+    <string name="ai_memory_instructions_hint">Np. kim jesteś, jak ma Ci odpowiadać, co ma pamiętać.</string>
+    <string name="ai_memory_learned_title">Notatki zapisane przez asystenta</string>
+    <string name="ai_memory_none">Na razie brak notatek.</string>
+    <string name="ai_memory_delete">Usuń</string>
+    <string name="ai_memory_clear">Usuń wszystkie notatki asystenta</string>
+    <string name="ai_memory_save">Zapisz</string>
+    <string name="ai_memory_close">Zamknij</string>
+    <string name="assistant_memory_notice">Asystent zapisuje krótkie notatki i pamięta niektóre informacje między rozmowami. Możesz je zobaczyć, poprawić i usunąć w ustawieniach asystenta.</string>
 </resources>

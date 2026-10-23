@@ -174,6 +174,11 @@ interface UiPrefs {
 
     fun setAssistantInternetEnabled(value: Boolean)
 
+    /** Whether the assistant keeps short notes and remembers some information between conversations (on by default). */
+    val assistantMemoryEnabled: StateFlow<Boolean>
+
+    fun setAssistantMemoryEnabled(value: Boolean)
+
     /** Id of the downloaded model the translator uses (see AiModels). */
     val translatorModelId: StateFlow<String>
 

@@ -1033,7 +1033,15 @@ internal fun MessageInput(
         if (mentionActive) {
             MentionSuggestions(suggestions = suggestions, onPick = ::insertMention)
         }
-        OutgoingTranslateAction(textFieldState = textFieldState, isEnabled = isEnabled, onSendMessage = onSendMessage)
+        // One row above the field: the translate chip on the left, the formatting buttons on the right edge.
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            OutgoingTranslateAction(textFieldState = textFieldState, isEnabled = isEnabled, onSendMessage = onSendMessage)
+            Spacer(modifier = Modifier.weight(1f))
+            // Markdown formatting toolbar — shown once the field is focused and holds enough text to format.
+            if (isEnabled && isFocused && currentText.length >= FORMATTING_TOOLBAR_MIN_CHARS) {
+                FormattingToolbar(state = textFieldState, modifier = Modifier.padding(horizontal = 8.dp))
+            }
+        }
         OutlinedTextField(
             modifier =
             Modifier.fillMaxWidth()
@@ -1123,10 +1131,6 @@ internal fun MessageInput(
                 }
             },
         )
-        // Markdown formatting toolbar — shown once the field is focused and holds enough text to format (iOS parity).
-        if (isEnabled && isFocused && currentText.length >= FORMATTING_TOOLBAR_MIN_CHARS) {
-            FormattingToolbar(state = textFieldState, modifier = Modifier.padding(horizontal = 8.dp))
-        }
     }
 }
 

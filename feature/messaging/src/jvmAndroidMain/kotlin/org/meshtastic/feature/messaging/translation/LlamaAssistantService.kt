@@ -18,7 +18,10 @@ package org.meshtastic.feature.messaging.translation
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -37,6 +40,7 @@ class LlamaAssistantService(
     private val uiPrefs: UiPrefs,
     private val data: AssistantDataProvider,
     private val knowledge: AssistantKnowledge? = null,
+    private val memoryStore: org.meshtastic.core.repository.AssistantMemory? = null,
     private val dataTools: AssistantTools = AssistantTools(data),
 ) : AssistantService {
 
@@ -56,7 +60,13 @@ class LlamaAssistantService(
     private var memory = ""
     private var memorized = 0
 
-    override suspend fun reply(history: List<AssistantTurn>, onPiece: (String) -> Unit): String {
+    // The model works on one thing at a time: an answer waits for a running notes update and the other way round.
+    private val engineLock = kotlinx.coroutines.sync.Mutex()
+
+    override suspend fun reply(history: List<AssistantTurn>, onPiece: (String) -> Unit): String =
+        engineLock.withLock { replyLocked(history, onPiece) }
+
+    private suspend fun replyLocked(history: List<AssistantTurn>, onPiece: (String) -> Unit): String {
         val modelId = activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
         val question = history.lastOrNull { it.fromUser }?.text.orEmpty()
         // Models with a bigger window get proportionally more room for data and conversation.
@@ -80,7 +90,59 @@ class LlamaAssistantService(
         // Buttons asked for by the tools go under the answer; they are only shown, the user decides to tap them.
         val answer = rescueWrittenToolCalls(rawAnswer, question)
         val polish = question.any { it in "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ" }
+        scheduleNotesUpdate(modelId, history, question, answer)
         return answer + webTools.footer(polish) + collector.drain().joinToString("") { AssistantActions.encode(it) }
+    }
+
+    /**
+     * Lets the model update its notes about the user after some answers (every second question, or when the user asks
+     * to remember something). It runs in the background, after the answer is already shown.
+     */
+    private fun scheduleNotesUpdate(modelId: String, history: List<AssistantTurn>, question: String, answer: String) {
+        val store = memoryStore ?: return
+        if (!uiPrefs.assistantMemoryEnabled.value) return
+        val userTurns = history.count { it.fromUser }
+        val asked = REMEMBER_WORDS.any { question.lowercase().contains(it) }
+        if (!asked && (userTurns % 2 == 0 || question.length < MIN_NOTE_QUESTION)) return
+        scope.launch {
+            engineLock.withLock {
+                try {
+                    updateNotes(store, modelId, question, answer)
+                } catch (e: kotlinx.coroutines.CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Logger.w(tag = "AssistantMemory", throwable = e) { "Notes update skipped" }
+                }
+            }
+        }
+    }
+
+    private suspend fun updateNotes(
+        store: org.meshtastic.core.repository.AssistantMemory,
+        modelId: String,
+        question: String,
+        answer: String,
+    ) {
+        val current = store.notes.value.filter { !it.byUser }.joinToString("\n") { "### ${it.name}\n${it.text}" }
+        val prompt =
+            "You keep short notes about the user in a few files so you can remember them in later conversations. " +
+                "Below are the current notes and the newest exchange. Write only durable facts worth remembering: who " +
+                "the user is, their devices and network, how they like to be answered, what they work on. Never store " +
+                "passwords, exact positions, current sensor values, one-time questions, or anything only you guessed. " +
+                "Write the notes in the language of the user. Output every file that changes as a line '### file-name' " +
+                "followed by its full new text (at most 4 short sentences). Good file names: o-uzytkowniku, " +
+                "siec-i-sprzet, styl-rozmowy, projekty. If nothing is worth saving, output exactly: NOTHING.\n\n" +
+                "Current notes:\n${current.ifBlank { "(none)" }}\n\nNewest exchange:\nUser: ${question.take(NOTE_TURN_CHARS)}\n" +
+                "Assistant: ${answer.take(NOTE_TURN_CHARS)}"
+        val out = engine.chat(modelId, listOf("user" to prompt), NOTE_TOKENS, SUMMARY_TEMPERATURE)
+        if (out.contains("NOTHING") && !out.contains("###")) return
+        for (block in out.split(Regex("(?m)^###\\s*")).drop(1)) {
+            val name = block.lineSequence().first().trim()
+            val text = block.lines().drop(1).joinToString("\n").trim()
+            val safe = FileAssistantMemory.safeName(name)
+            if (safe.isEmpty() || safe == org.meshtastic.core.repository.AssistantMemory.USER_NOTE) continue
+            if (text.isNotEmpty()) store.save(safe, text)
+        }
     }
 
     /** Returns the newest turns that fit and, when older ones were dropped, updates [memory] with their summary. */
@@ -157,6 +219,10 @@ class LlamaAssistantService(
             if (topic != AssistantTopic.GUIDE) append("\n\n").append(TOOLS_RULE)
             if (topic != AssistantTopic.DATA) append("\n\n").append(GUIDE_RULE)
             if (webOn) append("\n\n").append(WEB_RULE)
+            if (uiPrefs.assistantMemoryEnabled.value) {
+                val notes = memoryStore?.promptText(MEMORY_CHARS * room).orEmpty()
+                if (notes.isNotBlank()) append("\n\n").append(MEMORY_INTRO).append('\n').append(notes)
+            }
             if (summary.isNotBlank()) append("\n\nSummary of the earlier part of this conversation: ").append(summary)
             if (dataText.isNotBlank()) append("\n\n").append(DATA_INTRO).append('\n').append(dataText)
             if (guideText.isNotBlank()) append("\n\n").append(GUIDE_INTRO).append('\n').append(guideText)
@@ -278,10 +344,23 @@ class LlamaAssistantService(
                 "statistics, history, settings, sensors or messages, call the matching tool first and answer from " +
                 "its result; never say you have no data before you have tried the tools. You cannot change " +
                 "settings or send messages; tool results are already formatted with units: show them to the user as a clear list (one line per node), copying the numbers exactly, and add your own short comment only if asked; if the user wants that, explain what to do or draft the text for them."
+        const val MEMORY_CHARS = 1200
+        const val MIN_NOTE_QUESTION = 25
+        const val NOTE_TURN_CHARS = 600
+        const val NOTE_TOKENS = 400
+        val REMEMBER_WORDS = listOf("zapamiętaj", "zapamietaj", "pamiętaj", "pamietaj", "remember")
+        const val MEMORY_INTRO =
+            "NOTES: what you remember about the user from earlier conversations (their own instructions always win). " +
+                "Use them naturally, without announcing that you read notes; if they are not relevant, ignore them. " +
+                "If the user asks what you remember, tell it from these notes; if they ask you to remember something, say you will."
         const val SYSTEM_PROMPT =
-            "You are the offline assistant built into MT_SW, an Android and desktop app for Meshtastic, " +
+            "You are the assistant built into MT_SW, an Android and desktop app for Meshtastic, " +
                 "an open-source LoRa mesh radio network that works without internet. " +
-                "Answer in the language the user writes in (usually Polish), briefly and in simple words. " +
+                "Talk like a friendly, knowledgeable person in a normal conversation: natural everyday language in the " +
+                "language of the user (usually Polish), short sentences, your own words. Do not sound like a manual or a " +
+                "form: no stiff phrases, no repeating the question, no closing offers such as \"if you want, I can...\", " +
+                "no bullet lists unless the user needs a list. Small talk, jokes and opinions are fine; answer them " +
+                "briefly and naturally, and when a topic is unclear, just ask one short question. " +
                 "Help with Meshtastic, radio settings, antennas, range, nodes, channels and the app. " +
                 "If you are not sure of something, say so instead of guessing. Never invent settings or menu names. " +
                 "When the user says \"our project\", \"nasz projekt\" or asks about goals, assumptions or achievements, they mean the MT_SW fork, " +

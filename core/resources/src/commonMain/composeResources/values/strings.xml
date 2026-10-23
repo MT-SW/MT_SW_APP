@@ -88,6 +88,17 @@
     <string name="ai_level_strong">Strong</string>
     <string name="ai_license_cc">Model licence: CC BY-NC 4.0 (non-commercial use only)</string>
     <string name="ai_license_gemma">Model licence: Apache 2.0 (Google, Gemma 4)</string>
+    <string name="ai_memory_clear">Delete all assistant notes</string>
+    <string name="ai_memory_close">Close</string>
+    <string name="ai_memory_delete">Delete</string>
+    <string name="ai_memory_instructions_hint">For example: who you are, how you want to be answered, what to remember.</string>
+    <string name="ai_memory_instructions_label">My instructions for the assistant</string>
+    <string name="ai_memory_learned_title">Notes written by the assistant</string>
+    <string name="ai_memory_none">No notes yet.</string>
+    <string name="ai_memory_open">Notes and instructions</string>
+    <string name="ai_memory_save">Save</string>
+    <string name="ai_memory_summary">The assistant saves short notes about you and remembers some information between conversations. Notes stay on this device only.</string>
+    <string name="ai_memory_title">Assistant memory</string>
     <string name="ai_model_assistant_title">Model used by the assistant</string>
     <string name="ai_model_cancel">Cancel download</string>
     <string name="ai_model_delete">Remove from device</string>
@@ -195,6 +206,7 @@
     <string name="assistant_history">Conversation history</string>
     <string name="assistant_history_empty">No saved conversations. Conversations are saved only on this device.</string>
     <string name="assistant_input_hint">Ask a question…</string>
+    <string name="assistant_memory_notice">The assistant saves short notes and remembers some information between conversations. You can view, edit and delete them in the assistant settings.</string>
     <string name="assistant_model_missing">No model is downloaded for the assistant. Download one in Settings → MT_SW features.</string>
     <string name="assistant_name">Assistant</string>
     <string name="assistant_new">New conversation</string>
