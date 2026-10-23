@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import org.meshtastic.core.ui.assistant.assistantHighlight
 import org.meshtastic.core.ui.icon.Android
 import org.meshtastic.core.ui.icon.ChevronRight
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -134,10 +135,12 @@ fun BasicListItem(
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
 ) {
+    // The assistant can point at a setting by its title: the row then blinks (see [assistantHighlight]).
+    val marked = modifier.assistantHighlight(text)
     if (onClick != null) {
         ListItem(
             onClick = onClick,
-            modifier = modifier,
+            modifier = marked,
             enabled = enabled,
             onLongClick = onLongClick,
             shapes = ListItemDefaults.shapes(shape = RectangleShape),
@@ -149,7 +152,7 @@ fun BasicListItem(
         )
     } else {
         ListItem(
-            modifier = modifier,
+            modifier = marked,
             colors = ListItemDefaults.colors(containerColor = Color.Transparent),
             headlineContent = { Text(text = text, color = textColor) },
             supportingContent = supportingText?.let { { Text(text = it, color = supportingTextColor) } },

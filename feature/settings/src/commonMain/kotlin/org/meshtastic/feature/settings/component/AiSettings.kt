@@ -52,6 +52,12 @@ import org.meshtastic.core.resources.ai_assistant_summary
 import org.meshtastic.core.resources.ai_assistant_title
 import org.meshtastic.core.resources.ai_assistant_unavailable
 import org.meshtastic.core.resources.ai_assistant_warning_title
+import org.meshtastic.core.resources.ai_internet_enable
+import org.meshtastic.core.resources.ai_internet_on_indicator
+import org.meshtastic.core.resources.ai_internet_summary
+import org.meshtastic.core.resources.ai_internet_title
+import org.meshtastic.core.resources.ai_internet_warning_body
+import org.meshtastic.core.resources.ai_internet_warning_title
 import org.meshtastic.core.resources.ai_license_cc
 import org.meshtastic.core.resources.ai_license_gemma
 import org.meshtastic.core.resources.ai_level_light
@@ -99,6 +105,8 @@ internal fun AiSettings() {
     val translatorModelId by uiPrefs.translatorModelId.collectAsStateWithLifecycle()
     val assistantModelId by uiPrefs.assistantModelId.collectAsStateWithLifecycle()
     val states by store.states.collectAsStateWithLifecycle()
+    val internetOn by uiPrefs.assistantInternetEnabled.collectAsStateWithLifecycle()
+    var askInternet by remember { mutableStateOf(false) }
     var pending by remember { mutableStateOf<PendingSwitch?>(null) }
 
     fun isReady(id: String) = states[id] == TranslatorModelState.Ready
@@ -141,6 +149,45 @@ internal fun AiSettings() {
             }
         },
     )
+
+    if (assistantOn && assistantPossible) {
+        SwitchPreference(
+            title = stringResource(Res.string.ai_internet_title),
+            summary = stringResource(Res.string.ai_internet_summary),
+            checked = internetOn,
+            enabled = true,
+            onCheckedChange = { on -> if (on) askInternet = true else uiPrefs.setAssistantInternetEnabled(false) },
+        )
+        if (internetOn) {
+            Text(
+                text = stringResource(Res.string.ai_internet_on_indicator),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+            )
+        }
+    }
+
+    if (askInternet) {
+        AlertDialog(
+            onDismissRequest = { askInternet = false },
+            title = { Text(stringResource(Res.string.ai_internet_warning_title)) },
+            text = { Text(stringResource(Res.string.ai_internet_warning_body)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        askInternet = false
+                        uiPrefs.setAssistantInternetEnabled(true)
+                    },
+                ) {
+                    Text(stringResource(Res.string.ai_internet_enable))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { askInternet = false }) { Text(stringResource(Res.string.translator_cancel)) }
+            },
+        )
+    }
 
     if (translatorOn || assistantOn) {
         SectionLabel(stringResource(Res.string.ai_models_title))

@@ -34,8 +34,10 @@ import org.meshtastic.feature.messaging.translation.FileAssistantHistoryStore
 import org.meshtastic.feature.messaging.translation.GemmaTranslator
 import org.meshtastic.feature.messaging.translation.LlamaAssistantService
 import org.meshtastic.feature.messaging.translation.LiteRtEngine
+import org.meshtastic.feature.messaging.translation.UpdatableKnowledge
 import org.meshtastic.core.repository.AiModelStore
 import org.meshtastic.feature.messaging.translation.AssistantDataProvider
+import org.meshtastic.core.repository.AssistantKnowledge
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioConfigRepository
@@ -93,7 +95,11 @@ class DesktopAiModule {
         store: AiModelStoreImpl,
         uiPrefs: UiPrefs,
         data: AssistantDataProvider,
-    ): AssistantService = LlamaAssistantService(engine, store, uiPrefs, data)
+        knowledge: AssistantKnowledge,
+    ): AssistantService = LlamaAssistantService(
+            engine, store, uiPrefs, data,
+            UpdatableKnowledge(knowledge, File(System.getProperty("user.home"), ".meshtastic/knowledge"), uiPrefs),
+        )
 
     @Single fun messageTranslationService(router: AiTranslationRouter): MessageTranslationService = router
 

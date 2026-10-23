@@ -46,6 +46,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.error
+import org.meshtastic.core.ui.assistant.assistantHighlight
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.theme.AppTheme
@@ -225,7 +226,7 @@ fun EditTextPreference(
 ) {
     var isFocused by remember { mutableStateOf(false) }
 
-    Column(modifier = modifier.fillMaxWidth().padding(8.dp)) {
+    Column(modifier = modifier.assistantHighlight(title).fillMaxWidth().padding(8.dp)) {
         OutlinedTextField(
             modifier =
             Modifier.fillMaxWidth()

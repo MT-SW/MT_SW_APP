@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.meshtastic.core.ui.assistant.assistantHighlight
 import org.meshtastic.core.ui.theme.AppTheme
 import kotlin.math.roundToInt
 
@@ -60,7 +61,7 @@ fun <T> SliderPreference(
         )
 
     ListItem(
-        modifier = modifier,
+        modifier = modifier.assistantHighlight(title),
         headlineContent = {
             Text(
                 modifier = Modifier.fillMaxWidth(),

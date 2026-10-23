@@ -37,12 +37,13 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.repository.AiModels
 import java.io.File
 
 /**
- * Runs the Gemma 4 language models (`.litertlm` files) with Google's LiteRT-LM, on Android and on desktop. The graphics
- * chip does the work when it can (Metal on a Mac, OpenCL/Vulkan elsewhere); if it cannot be started the processor is
- * used. Only one model is in memory at a time and requests run one after another, so translation and the assistant
+ * Runs the Gemma 4 language models (`.litertlm` files) with Google's LiteRT-LM, on Android and on desktop. The neural
+ * chip is tried first (when the platform provides it), then the graphics chip (Metal on a Mac, OpenCL/Vulkan
+ * elsewhere), and the processor last. Only one model is in memory at a time and requests run one after another, so translation and the assistant
  * can safely share it. The model is loaded on first use and freed again after a short idle time.
  */
 class LiteRtEngine(private val store: AiModelStoreImpl) {
@@ -52,6 +53,17 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
     private var unloadJob: Job? = null
     private var engine: Engine? = null
     private var loadedId: String? = null
+
+    /**
+     * Folder with the neural chip libraries, set by the platform when it has them (Android passes its native library
+     * folder). Without it the neural chip is skipped.
+     */
+    @Volatile var npuLibraryDir: String? = null
+
+    /** Name of the backend of the loaded model (NPU, GPU or CPU); empty while nothing is loaded. */
+    @Volatile
+    var activeBackend: String = ""
+        private set
 
     init {
         store.beforeModelDelete = { unloadNow() }
@@ -139,7 +151,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         }
         restorer.finish().takeIf { it.isNotEmpty() }?.let { runCatching { onPiece(it) } }
         Logger.i(tag = TAG) {
-            "Answer from $modelId: loaded=${!wasLoaded} in ${loadedAt - started} ms, generated ${reply.length} chars " +
+            "Answer from $modelId on $activeBackend: loaded=${!wasLoaded} in ${loadedAt - started} ms, generated ${reply.length} chars " +
                 "in ${nowMillis - loadedAt} ms"
         }
         val finalText = reply.withoutLoop()
@@ -151,20 +163,50 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         unload()
         val file = store.fileOf(modelId) ?: error("Model $modelId is not downloaded")
         val cache = File(store.ggufDir, "cache").apply { mkdirs() }
-        val created =
+        val window = contextTokens(modelId)
+        // Order of preference: neural chip (only when the platform gave us its library folder), graphics chip,
+        // processor. The first one that starts is used, and the choice is written to the log.
+        val attempts = buildList<Pair<String, () -> Backend>> {
+            npuLibraryDir?.let { dir -> add("NPU" to { Backend.NPU(dir) }) }
+            add("GPU" to { Backend.GPU() })
+            add("CPU" to { Backend.CPU() })
+        }
+        var created: Engine? = null
+        var failure: Exception? = null
+        for ((name, backend) in attempts) {
             try {
-                start(file, Backend.GPU(), cache)
+                created = start(file, backend(), cache, window)
+                activeBackend = name
+                Logger.i(tag = TAG) { "Model $modelId runs on $name (context $window tokens)" }
+                break
             } catch (e: Exception) {
-                Logger.w(tag = TAG, throwable = e) { "Graphics chip not usable, falling back to the processor" }
-                start(file, Backend.CPU(), cache)
+                failure = e
+                Logger.w(tag = TAG, throwable = e) { "Backend $name not usable for $modelId: ${e.message}" }
             }
-        engine = created
+        }
+        val ready = created ?: throw (failure ?: IllegalStateException("No backend could start"))
+        engine = ready
         loadedId = modelId
-        return created
+        return ready
     }
 
-    private fun start(file: File, backend: Backend, cache: File): Engine {
-        val created = Engine(EngineConfig(modelPath = file.absolutePath, backend = backend, cacheDir = cache.absolutePath))
+    /** How many tokens (question, data and answer together) the model keeps in its window; bigger models get more. */
+    fun contextTokens(modelId: String): Int =
+        when (modelId) {
+            AiModels.GEMMA_E2B_ID -> CONTEXT_SMALL
+            else -> CONTEXT_LARGE
+        }
+
+    private fun start(file: File, backend: Backend, cache: File, window: Int): Engine {
+        val created =
+            Engine(
+                EngineConfig(
+                    modelPath = file.absolutePath,
+                    backend = backend,
+                    maxNumTokens = window,
+                    cacheDir = cache.absolutePath,
+                ),
+            )
         try {
             created.initialize()
         } catch (e: Exception) {
@@ -263,6 +305,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         runCatching { current.close() }.onFailure { Logger.w(tag = TAG, throwable = it) { "Unload failed" } }
         engine = null
         loadedId = null
+        activeBackend = ""
     }
 
     private companion object {
@@ -277,5 +320,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         const val LOOP_WINDOW = 800
         const val LOOP_REPEATS = 3
         const val IDLE_UNLOAD_MS = 120_000L
+        const val CONTEXT_SMALL = 8192
+        const val CONTEXT_LARGE = 16384
     }
 }

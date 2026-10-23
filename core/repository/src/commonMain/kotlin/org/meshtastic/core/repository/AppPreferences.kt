@@ -160,6 +160,15 @@ interface UiPrefs {
 
     fun setAssistantEnabled(value: Boolean)
 
+    /**
+     * Whether the assistant may use the internet (web search, reading a page, and keeping its knowledge about the app
+     * up to date). Off by default: with it off the assistant is fully offline and only model downloads started by
+     * the user touch the network.
+     */
+    val assistantInternetEnabled: StateFlow<Boolean>
+
+    fun setAssistantInternetEnabled(value: Boolean)
+
     /** Id of the downloaded model the translator uses (see AiModels). */
     val translatorModelId: StateFlow<String>
 

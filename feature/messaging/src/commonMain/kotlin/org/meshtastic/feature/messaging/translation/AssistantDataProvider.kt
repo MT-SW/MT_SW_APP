@@ -626,6 +626,35 @@ class AssistantDataProvider(
         return sb.toString()
     }
 
+    /** The number of the node called [name] (short name, long name, id or "me"), or null. */
+    fun nodeNumFor(name: String): Int? = findNode(name)?.num
+
+    /** A readable name of node [num]. */
+    fun nodeNameFor(num: Int): String =
+        nodeRepository.nodeDBbyNum.value[num]?.let { it.user.long_name.ifBlank { it.user.short_name } }.orEmpty()
+
+    /**
+     * Where a message to [target] goes, as the key of the conversation and its readable name: a channel (by name or
+     * number, "all" or empty means the main channel) or a node (direct message). Null when nothing fits.
+     */
+    suspend fun contactFor(target: String): Pair<String, String>? {
+        val wanted = target.trim().lowercase()
+        val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
+        if (wanted.isEmpty() || wanted in MAIN_CHANNEL_WORDS) {
+            return "0${org.meshtastic.core.model.NodeAddress.ID_BROADCAST}" to names.firstOrNull().orEmpty().ifBlank { "0" }
+        }
+        val index =
+            numberedChannel(wanted)?.takeIf { it in names.indices }
+                ?: names.indexOfFirst { it.isNotBlank() && it.lowercase() == wanted }.takeIf { it >= 0 }
+        if (index != null) {
+            return "$index${org.meshtastic.core.model.NodeAddress.ID_BROADCAST}" to names[index].ifBlank { "$index" }
+        }
+        val node = findNode(target) ?: return null
+        if (node.user.id.isBlank()) return null
+        return "${org.meshtastic.core.model.NodeAddress.PKC_CHANNEL_INDEX}${node.user.id}" to
+            node.user.long_name.ifBlank { node.user.short_name }
+    }
+
     private fun findNode(name: String): org.meshtastic.core.model.Node? {
         val q = name.trim().lowercase()
         if (q.isEmpty()) return null
@@ -770,6 +799,7 @@ class AssistantDataProvider(
         val SENSOR_WORDS = listOf("pogod", "temperatur", "wilgot", "ciśnien", "cisnien", "weather", "humidity", "pressure", "wiatr", "wind", "deszcz", "rain", "powietrz", "air quality", "pm2", "czujnik", "sensor", "środowisk", "srodowisk", "environment", "natężen", "napięci", "prąd", "prad", "voltage", "current", "gleb", "soil", "pax", "lux", "światł")
         val SIGNAL_WORDS = listOf("zasięg", "zasieg", "sygnał", "sygnal", "snr", "rssi", "odległ", "odleg", "daleko", "dystans", "blisk", "najbliż", "najbliz", "jakość", "jakosc", "range", "signal", "distance", "linku", "łącz", "polacz")
         val RANK_WORDS = listOf("ramek", "ramki", "pakiet", "odebran", "raportuj", "najwięc", "najwiec", "najmniej", "ranking", "który", "ktory", "najlep", "najgorz")
+        val MAIN_CHANNEL_WORDS = setOf("all", "wszyscy", "wszystkich", "główny", "glowny", "primary", "main", "kanał główny")
         val OWN_WORDS = listOf("mój", "moj", "mojego", "mojej", "mojemu", "my node", "own node", "mój węz", "moim")
         val SUMMARY_WORDS = listOf("streść", "streszcz", "podsumuj", "podsumowa", "summar", "o czym", "co pisz", "co się dzieje na", "co sie dzieje na")
         val MESSAGE_WORDS = listOf("wiadomo", "message", "czat", "chat", "napisa", "pisa", "rozmow", "odpowied")

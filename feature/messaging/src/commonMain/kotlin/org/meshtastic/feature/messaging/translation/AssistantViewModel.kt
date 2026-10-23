@@ -77,7 +77,9 @@ class AssistantViewModel(
         val current = _state.value
         val question = current.input.trim()
         if (question.isEmpty() || current.busy) return
-        val history = current.lines.map { AssistantTurn(it.fromUser, it.text) } + AssistantTurn(true, question)
+        val history =
+            current.lines.map { AssistantTurn(it.fromUser, AssistantActions.strip(it.text)) } +
+                AssistantTurn(true, question)
         _state.update {
             it.copy(
                 lines = it.lines + AssistantLine(true, question) + AssistantLine(false, ""),
