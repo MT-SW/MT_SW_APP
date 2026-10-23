@@ -35,13 +35,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -58,6 +62,9 @@ import org.koin.compose.koinInject
 import org.meshtastic.core.domain.usecase.settings.GenerateVanityKeyUseCase
 import org.meshtastic.core.domain.usecase.settings.VanityKeyResult
 import org.meshtastic.core.ui.component.MeshtasticDialog
+import kotlinx.coroutines.delay
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 private data class VanityColorOption(val name: String, val rgb: Int)
@@ -86,8 +93,38 @@ private val VANITY_COLOR_PALETTE =
         VanityColorOption("SteelBlue", 0x4682b4),
     )
 
-private const val DEFAULT_TOLERANCE = 8
-private const val MAX_TOLERANCE = 24
+/** Fast: any colour close enough, about 20 s at most. Precise: much closer match, but may take a few minutes. */
+private const val FAST_TOLERANCE = 12
+private const val PRECISE_TOLERANCE = 4
+private const val FAST_TIMEOUT_MS = 20_000L
+private const val PRECISE_TIMEOUT_MS = 180_000L
+private const val MAX_RECENT = 8
+
+/** Colours used earlier in this session (newest first), so they can be picked again quickly. */
+private val recentColors = mutableStateListOf<Int>()
+
+private fun rgbToHsv(rgb: Int): FloatArray {
+    val r = ((rgb shr 16) and 0xFF) / 255f
+    val g = ((rgb shr 8) and 0xFF) / 255f
+    val b = (rgb and 0xFF) / 255f
+    val hi = max(r, max(g, b))
+    val lo = min(r, min(g, b))
+    val d = hi - lo
+    val h =
+        when {
+            d == 0f -> 0f
+            hi == r -> 60f * (((g - b) / d) % 6f)
+            hi == g -> 60f * ((b - r) / d + 2f)
+            else -> 60f * ((r - g) / d + 4f)
+        }
+    return floatArrayOf(if (h < 0f) h + 360f else h, if (hi == 0f) 0f else d / hi, hi)
+}
+
+private fun hsvToRgb(h: Float, s: Float, v: Float): Int = Color.hsv(h, s, v).let {
+    ((it.red * 255f).roundToInt() shl 16) or ((it.green * 255f).roundToInt() shl 8) or (it.blue * 255f).roundToInt()
+}
+
+private fun hexOf(rgb: Int): String = (rgb and 0xFFFFFF).toString(16).padStart(6, '0').uppercase()
 
 private sealed interface VanityGrindStatus {
     data object Idle : VanityGrindStatus
@@ -128,9 +165,25 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
     val scope = rememberCoroutineScope()
 
     var selectedColor by remember { mutableStateOf(VANITY_COLOR_PALETTE.first().rgb) }
-    var tolerance by remember { mutableFloatStateOf(DEFAULT_TOLERANCE.toFloat()) }
+    var precise by remember { mutableStateOf(false) }
+    var hexText by remember { mutableStateOf(hexOf(VANITY_COLOR_PALETTE.first().rgb)) }
+    var seconds by remember { mutableIntStateOf(0) }
     var grindJob by remember { mutableStateOf<Job?>(null) }
     var status by remember { mutableStateOf<VanityGrindStatus>(VanityGrindStatus.Idle) }
+
+    LaunchedEffect(status) {
+        seconds = 0
+        while (status is VanityGrindStatus.Grinding) {
+            delay(1000)
+            seconds++
+        }
+    }
+
+    fun choose(rgb: Int) {
+        selectedColor = rgb and 0xFFFFFF
+        hexText = hexOf(selectedColor)
+        status = VanityGrindStatus.Idle
+    }
 
     if (status is VanityGrindStatus.FirmwareTooOld) {
         MeshtasticDialog(
@@ -173,21 +226,102 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
                                     },
                                     shape = CircleShape,
                                 )
-                                .clickable(enabled = status !is VanityGrindStatus.Grinding) {
-                                    selectedColor = option.rgb
-                                    status = VanityGrindStatus.Idle
-                                },
+                                .clickable(enabled = status !is VanityGrindStatus.Grinding) { choose(option.rgb) },
                         )
                     }
                 }
 
-                Text(text = "Tolerancja: ${tolerance.roundToInt()}", modifier = Modifier.padding(top = 16.dp))
+                val editable = status !is VanityGrindStatus.Grinding
+                val hsv = rgbToHsv(selectedColor)
+                Text(text = "Dowolny kolor", modifier = Modifier.padding(top = 16.dp))
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Box(
+                        modifier =
+                        Modifier.size(48.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF000000.toInt() or selectedColor))
+                            .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape),
+                    )
+                    OutlinedTextField(
+                        value = hexText,
+                        onValueChange = { input ->
+                            val clean = input.removePrefix("#").filter { it.isLetterOrDigit() }.take(6).uppercase()
+                            hexText = clean
+                            if (clean.length == 6) {
+                                clean.toIntOrNull(16)?.let {
+                                    selectedColor = it
+                                    status = VanityGrindStatus.Idle
+                                }
+                            }
+                        },
+                        label = { Text("Kod koloru (np. FF8800)") },
+                        singleLine = true,
+                        enabled = editable,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                Text(text = "Odcień")
                 Slider(
-                    value = tolerance,
-                    onValueChange = { tolerance = it },
-                    enabled = status !is VanityGrindStatus.Grinding,
-                    valueRange = 0f..MAX_TOLERANCE.toFloat(),
-                    steps = MAX_TOLERANCE - 1,
+                    value = hsv[0],
+                    onValueChange = { choose(hsvToRgb(it, hsv[1], hsv[2])) },
+                    enabled = editable,
+                    valueRange = 0f..359f,
+                )
+                Text(text = "Nasycenie")
+                Slider(
+                    value = hsv[1],
+                    onValueChange = { choose(hsvToRgb(hsv[0], it, hsv[2])) },
+                    enabled = editable,
+                    valueRange = 0f..1f,
+                )
+                Text(text = "Jasność")
+                Slider(
+                    value = hsv[2],
+                    onValueChange = { choose(hsvToRgb(hsv[0], hsv[1], it)) },
+                    enabled = editable,
+                    valueRange = 0f..1f,
+                )
+
+                if (recentColors.isNotEmpty()) {
+                    Text(text = "Ostatnio użyte", modifier = Modifier.padding(top = 8.dp))
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        recentColors.forEach { rgb ->
+                            Box(
+                                modifier =
+                                Modifier.size(32.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF000000.toInt() or rgb))
+                                    .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
+                                    .clickable(enabled = editable) { choose(rgb) },
+                            )
+                        }
+                    }
+                }
+
+                Text(text = "Tryb szukania", modifier = Modifier.padding(top = 16.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(
+                        selected = !precise,
+                        onClick = { precise = false },
+                        enabled = editable,
+                        label = { Text("Szybko (do 20 s)") },
+                    )
+                    FilterChip(
+                        selected = precise,
+                        onClick = { precise = true },
+                        enabled = editable,
+                        label = { Text("Dokładnie (do 3 min)") },
+                    )
+                }
+                Text(
+                    text =
+                    if (precise) {
+                        "Kolor wyjdzie bardzo blisko wybranego, ale szukanie może trwać kilka minut."
+                    } else {
+                        "Kolor będzie podobny do wybranego, szukanie zwykle trwa kilka sekund."
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 4.dp),
                 )
 
                 when (val current = status) {
@@ -195,7 +329,16 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
                         Row(modifier = Modifier.padding(top = 16.dp)) {
                             CircularProgressIndicator(modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = "Szukam klucza...")
+                            Text(text = "Szukam klucza... ${seconds} s")
+                        }
+                        TextButton(
+                            onClick = {
+                                grindJob?.cancel()
+                                status = VanityGrindStatus.Idle
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(text = "Przerwij szukanie")
                         }
                     }
 
@@ -222,7 +365,7 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
 
                     is VanityGrindStatus.TimedOut -> {
                         Text(
-                            text = "Nie znaleziono w rozsądnym czasie — spróbuj zwiększyć tolerancję.",
+                            text = "Nie znaleziono w tym czasie — spróbuj trybu „Szybko” albo innego koloru.",
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(top = 16.dp),
                         )
@@ -241,9 +384,17 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
                             status = VanityGrindStatus.Grinding
                             grindJob =
                                 scope.launch {
-                                    val result = grinder(selectedColor, tolerance.roundToInt())
+                                    val result =
+                                        grinder(
+                                            selectedColor,
+                                            if (precise) PRECISE_TOLERANCE else FAST_TOLERANCE,
+                                            if (precise) PRECISE_TIMEOUT_MS else FAST_TIMEOUT_MS,
+                                        )
                                     status =
                                         if (result != null) {
+                                            recentColors.remove(selectedColor)
+                                            recentColors.add(0, selectedColor)
+                                            while (recentColors.size > MAX_RECENT) recentColors.removeAt(recentColors.lastIndex)
                                             VanityGrindStatus.Found(result)
                                         } else {
                                             VanityGrindStatus.TimedOut
