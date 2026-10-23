@@ -47,6 +47,12 @@ class AssistantDataProvider(
         val q = question.lowercase()
         // No data topic in the question: no data at all, so the model has nothing to dump into an unrelated answer.
         if (!hasTopic(question)) return ""
+        // A summary of a channel needs the messages and nothing else: they go first and alone, so the small window of
+        // the model is filled with the conversation, not with the network overview.
+        if (q.hasAny(SUMMARY_WORDS)) {
+            val messages = safe("channel") { toolChannelMessages(channelFromQuestion(q), SUMMARY_MESSAGES) }
+            if (messages.isNotBlank()) return messages.take(maxChars)
+        }
         val mentioned = mentionedNodes(q)
         // Most useful parts first: the model only fits about 4000 tokens, so later parts are cut when space runs out.
         val parts = ArrayList<String>()

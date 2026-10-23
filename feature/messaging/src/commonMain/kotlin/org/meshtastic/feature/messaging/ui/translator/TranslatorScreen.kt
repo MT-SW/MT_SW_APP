@@ -121,23 +121,28 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
             minLines = 3,
             modifier = Modifier.fillMaxWidth(),
         )
-        if (dictation.available && !state.busy) {
-            TextButton(onClick = dictation.toggle, enabled = dictation.phase != DictationPhase.WORKING) {
-                Text(
-                    stringResource(
-                        when (dictation.phase) {
-                            DictationPhase.IDLE -> Res.string.assistant_dictate
-                            DictationPhase.LISTENING -> Res.string.assistant_dictate_stop
-                            DictationPhase.WORKING -> Res.string.assistant_dictate_working
-                        },
-                    ),
-                )
+        // Buttons from the right edge: the main action is last, right under the thumb.
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            if (dictation.available && !state.busy) {
+                TextButton(onClick = dictation.toggle, enabled = dictation.phase != DictationPhase.WORKING) {
+                    Text(
+                        stringResource(
+                            when (dictation.phase) {
+                                DictationPhase.IDLE -> Res.string.assistant_dictate
+                                DictationPhase.LISTENING -> Res.string.assistant_dictate_stop
+                                DictationPhase.WORKING -> Res.string.assistant_dictate_working
+                            },
+                        ),
+                    )
+                }
             }
-        }
-        Button(onClick = viewModel::translate, enabled = !state.busy && state.input.isNotBlank()) {
-            Text(
-                stringResource(if (state.busy) Res.string.translator_busy else Res.string.translator_action),
-            )
+            Button(onClick = viewModel::translate, enabled = !state.busy && state.input.isNotBlank()) {
+                Text(stringResource(if (state.busy) Res.string.translator_busy else Res.string.translator_action))
+            }
         }
 
         if (state.busy) {

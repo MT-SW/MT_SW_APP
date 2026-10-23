@@ -59,6 +59,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import org.meshtastic.core.ui.util.isDesktopPlatform
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.Key
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -254,18 +261,25 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
             minLines = 1,
             maxLines = 4,
             shape = BubbleShape,
-            modifier = Modifier.fillMaxWidth(),
+            modifier =
+            Modifier.fillMaxWidth().onPreviewKeyEvent { event ->
+                // Computers: Enter sends, Shift+Enter makes a new line. The phone keeps its normal behaviour.
+                if (isDesktopPlatform && event.key == Key.Enter && !event.isShiftPressed) {
+                    if (event.type == KeyEventType.KeyUp && !state.busy && state.input.isNotBlank()) viewModel.send()
+                    true
+                } else {
+                    false
+                }
+            },
         )
+        // The buttons start from the right edge: "send" is the last one, right under the thumb.
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
         ) {
-            if (state.busy) {
-                OutlinedButton(onClick = viewModel::stop) { Text(stringResource(Res.string.assistant_stop)) }
-            } else {
-                Button(onClick = viewModel::send, enabled = state.input.isNotBlank()) {
-                    Text(stringResource(Res.string.assistant_send))
-                }
+            if (state.lines.isNotEmpty() && !state.busy) {
+                TextButton(onClick = viewModel::startNew) { Text(stringResource(Res.string.assistant_new)) }
             }
             if (dictation.available && !state.busy) {
                 TextButton(onClick = dictation.toggle, enabled = dictation.phase != DictationPhase.WORKING) {
@@ -280,8 +294,12 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                     )
                 }
             }
-            if (state.lines.isNotEmpty() && !state.busy) {
-                TextButton(onClick = viewModel::startNew) { Text(stringResource(Res.string.assistant_new)) }
+            if (state.busy) {
+                OutlinedButton(onClick = viewModel::stop) { Text(stringResource(Res.string.assistant_stop)) }
+            } else {
+                Button(onClick = viewModel::send, enabled = state.input.isNotBlank()) {
+                    Text(stringResource(Res.string.assistant_send))
+                }
             }
         }
     }

@@ -47,6 +47,8 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Czat: wiadomość podzielona na kilka części nie „podczepia się” już pod poprzedniego nadawcę (brak nazwy, połączone rogi, zły kolor); sąsiedzi wiadomości są liczeni tylko z widocznych dymków.
 * Asystent: węzeł rozpoznawany też po nazwie miejsca w innej odmianie („router na Łysicy”), pytanie o węzeł zawsze dostaje jego dane, a zapis „show_node_on_map” bez nazwy zmienia się w przycisk dla węzła z pytania.
 * Asystent: pytania „gdzie jest najbliższy router / czujnik / przekaźnik” dostają listę najbliższych węzłów danej roli razem z pozycją i odległością.
+* Aplikacja na komputer: w asystencie Enter wysyła pytanie, a Shift+Enter daje nową linię (telefon bez zmian); w tłumaczu i asystencie przyciski są ułożone od prawej, z „Wyślij/Tłumacz” przy prawej krawędzi.
+* Asystent: streszczenie kanału dostaje same wiadomości z tego kanału, bez przeglądu sieci.
 * Asystent: pewniejszy język odpowiedzi (niższa „kreatywność” modelu), zamiast dopytywać sam szuka danych, a notatki pamięci powstają tylko z tego, co napisał użytkownik.
 * Asystent: odczyty czujników, które nie mogą być prawdziwe (np. temperatura 25252 °C), są oznaczane jako „prawdopodobnie uszkodzony czujnik”, a odpowiedź, która zaczyna się powtarzać w kółko, jest przerywana po pierwszym razie.
 **Scalenie z oryginałem — wersja 2.8.4 (początek)**
@@ -416,6 +418,8 @@ The entries below describe only what this fork adds on top of the original, from
 * Chat: a message split into several parts no longer attaches itself to the previous sender (missing name, joined corners, wrong colour); neighbours are counted from the visible bubbles only.
 * Assistant: a node is also recognised by a place name in another Polish case ("router na Łysicy"), a question naming a node always gets its data, and a written "show_node_on_map" without a name becomes a button for the node in the question.
 * Assistant: questions like "where is the nearest router / sensor / repeater" get a list of the nearest nodes of that role with position and distance.
+* Desktop app: in the assistant Enter sends the question and Shift+Enter makes a new line (the phone is unchanged); in the translator and the assistant the buttons start from the right, with "Send/Translate" at the right edge.
+* Assistant: the summary of a channel gets only the messages of that channel, without the network overview.
 * Assistant: more reliable wording (lower model randomness), it looks things up instead of asking back, and the memory notes are written only from what the user wrote.
 * How long received packets (logs) are remembered: a choice in days from 1 to 60 (1, 2, 3, 7, 14, 30, 60) instead of one hour to one year, also in the regular Settings; an earlier choice is kept until you pick a new one.
 * By default the app now remembers received packets for **60 days**, and the list of recent Wi-Fi addresses holds up to **30** entries.
