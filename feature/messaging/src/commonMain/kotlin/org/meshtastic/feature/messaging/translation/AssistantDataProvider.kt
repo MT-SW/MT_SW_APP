@@ -19,6 +19,7 @@ package org.meshtastic.feature.messaging.translation
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.first
 import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.common.util.systemTimeZone
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.repository.MeshLogRepository
@@ -74,6 +75,10 @@ class AssistantDataProvider(
         if (q.hasAny(SUMMARY_WORDS)) {
             parts += safe("channel") { toolChannelMessages(channelFromQuestion(q), SUMMARY_MESSAGES) }
         } else if (q.hasAny(MESSAGE_WORDS)) {
+            if (q.hasAny(COUNT_WORDS)) {
+                val hours = if (q.hasAny(TODAY_WORDS)) 0 else if (q.contains("godzin")) 1 else 24
+                parts.add(0, safe("count") { toolMessageCount(channelFromQuestion(q), hours) })
+            }
             parts += safe("messages") { messages() }
         }
         parts += safe("index") { nodeIndex() }
@@ -725,6 +730,94 @@ class AssistantDataProvider(
             }
     }
 
+    /**
+     * How many messages were received on a channel (empty = every channel and direct messages) in a time window,
+     * counted in code. [hours] 0 means "today" (since local midnight); 1 to 720 means the last that many hours.
+     */
+    suspend fun toolMessageCount(channel: String, hours: Int): String {
+        val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
+        val wanted = channel.trim().lowercase()
+        val index = wanted.toIntOrNull() ?: numberedChannel(wanted) ?: names.indexOfFirst { it.lowercase() == wanted }.takeIf { it >= 0 }
+            ?: names.indexOfFirst { wanted.isNotEmpty() && it.lowercase().contains(wanted) }.takeIf { it >= 0 }
+        if (wanted.isNotEmpty() && index == null) {
+            return "No channel found for \"$channel\". Channels: " + names.mapIndexed { i, n -> "$i=${n.ifBlank { "(default)" }}" }.joinToString()
+        }
+        val now = nowMillis
+        val offsetMs = systemTimeZone.offsetAt(kotlin.time.Instant.fromEpochMilliseconds(now)).totalSeconds * MILLIS_PER_SECOND
+        val since =
+            if (hours > 0) now - hours.toLong().coerceAtMost(MAX_COUNT_HOURS) * MILLIS_PER_HOUR
+            else ((now + offsetMs) / MILLIS_PER_DAY) * MILLIS_PER_DAY - offsetMs
+        val keys = packetRepository.getContacts().first().keys.filter { key ->
+            if (index == null) true else key.endsWith("^all") && key.startsWith("$index^")
+        }
+        var total = 0
+        var mine = 0
+        val perSender = HashMap<String, Int>()
+        for (key in keys) {
+            val list = packetRepository.getMessagesFrom(key, COUNT_PER_CHAT) { id -> nodeRepository.getNode(id.orEmpty()) }.first()
+            for (m in list) {
+                if (m.receivedTime < since) continue
+                total++
+                if (m.fromLocal) mine++ else perSender.merge(m.node.user.long_name.ifBlank { m.node.user.short_name }, 1, Int::plus)
+            }
+        }
+        val label = if (index == null) "wszystkie rozmowy" else "kanał $index (${names.getOrNull(index)?.ifBlank { null } ?: "domyślny"})"
+        val window = if (hours > 0) "ostatnie $hours h" else "dzisiaj (od północy)"
+        val sb = StringBuilder("Liczba wiadomości, $label, $window: $total (w tym moje: $mine)")
+        if (perSender.isNotEmpty()) {
+            sb.append("\nNajwięcej piszą: ")
+            sb.append(perSender.entries.sortedByDescending { it.value }.take(TOP_SENDERS).joinToString { "${it.key} ${it.value}" })
+        }
+        return sb.toString()
+    }
+
+    /**
+     * Nodes that match all given filters, counted and listed in code. [activeHours] > 0 keeps nodes heard in that many
+     * hours; [hardware] is part of the hardware name; [onlyFavorites] 1 keeps favourites; [maxBattery] in 1..100 keeps
+     * nodes with that battery level or less; [withPosition] 1 keeps nodes that have a position.
+     */
+    fun toolFindNodes(activeHours: Int, hardware: String, onlyFavorites: Int, maxBattery: Int, withPosition: Int, limit: Int): String {
+        val top = limit.coerceIn(1, MAX_TOOL_LIST)
+        val nowS = nowMillis / MILLIS_PER_SECOND
+        val hw = hardware.trim().lowercase()
+        val all = nodeRepository.nodeDBbyNum.value.values
+        val found =
+            all.filter { n ->
+                (activeHours <= 0 || (n.lastHeard != 0 && nowS - n.lastHeard <= activeHours * SECONDS_PER_MINUTE * 60L)) &&
+                    (hw.isEmpty() || n.user.hw_model.toString().lowercase().contains(hw)) &&
+                    (onlyFavorites != 1 || n.isFavorite) &&
+                    (maxBattery !in 1..100 || (n.deviceMetrics.battery_level ?: Int.MAX_VALUE) <= maxBattery) &&
+                    (withPosition != 1 || n.validPosition != null)
+            }.sortedByDescending { it.lastHeard }
+        val sb = StringBuilder("MATCHING NODES: ${found.size} of ${all.size} known")
+        for (n in found.take(top)) {
+            val heard = if (n.lastHeard == 0) "never" else "${((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)} min ago"
+            sb.append("\n- ${n.user.long_name} (${n.user.short_name}), ${n.user.hw_model}, role ${n.user.role}, heard $heard, battery ${n.deviceMetrics.battery_level ?: "?"}")
+        }
+        if (found.size > top) sb.append("\n(and ${found.size - top} more)")
+        return sb.toString()
+    }
+
+    /** The latest direct messages with one node (both directions), oldest first. */
+    suspend fun toolDirectMessages(node: String, limit: Int): String {
+        val n = findNode(node) ?: return "No node found for \"$node\"."
+        val top = limit.coerceIn(1, MAX_TOOL_LIST)
+        val id = n.user.id
+        val keys = packetRepository.getContacts().first().keys.filter { id.isNotBlank() && it.endsWith(id) }
+        if (keys.isEmpty()) return "No direct messages with ${n.user.long_name}."
+        val all = ArrayList<Pair<Long, String>>()
+        for (key in keys) {
+            val list = packetRepository.getMessagesFrom(key, top) { nid -> nodeRepository.getNode(nid.orEmpty()) }.first()
+            for (m in list) all += m.receivedTime to "${if (m.fromLocal) "me" else n.user.long_name}: ${m.text.take(MESSAGE_CHARS)}"
+        }
+        if (all.isEmpty()) return "No direct messages with ${n.user.long_name}."
+        val now = nowMillis
+        return "DIRECT MESSAGES with ${n.user.long_name} (oldest first):\n" +
+            all.sortedByDescending { it.first }.take(top).sortedBy { it.first }.joinToString("\n") {
+                "- ${((now - it.first) / MILLIS_PER_MINUTE).coerceAtLeast(0)} min ago, ${it.second}"
+            }
+    }
+
     /** A channel mentioned in the question (by name, or by number such as "kanał 1" / "kanał jeden"), as text, or empty. */
     private suspend fun channelFromQuestion(q: String): String {
         val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
@@ -919,6 +1012,10 @@ class AssistantDataProvider(
             mapOf("zer" to 0, "jede" to 1, "jedyn" to 1, "one" to 1, "pierw" to 1, "dw" to 2, "two" to 2, "trz" to 3, "three" to 3, "czter" to 4, "four" to 4, "pię" to 5, "pie" to 5, "five" to 5, "sze" to 6, "six" to 6, "sied" to 7, "seven" to 7)
         const val MAX_TOOL_LIST = 40
         const val SEARCH_PER_CHAT = 60
+        const val COUNT_PER_CHAT = 3000
+        const val MAX_COUNT_HOURS = 720L
+        const val MILLIS_PER_DAY = 86_400_000L
+        const val TOP_SENDERS = 5
         const val MILLIS_PER_HOUR = 3_600_000L
         const val MILLIS_PER_MINUTE = 60_000L
         const val METERS_PER_KM = 1000f
@@ -962,6 +1059,8 @@ class AssistantDataProvider(
         val MAIN_CHANNEL_WORDS = setOf("all", "wszyscy", "wszystkich", "główny", "glowny", "primary", "main", "kanał główny")
         val OWN_WORDS = listOf("mój", "moj", "mojego", "mojej", "mojemu", "my node", "own node", "mój węz", "moim")
         val SUMMARY_WORDS = listOf("streść", "streszcz", "podsumuj", "podsumowa", "summar", "o czym", "co pisz", "co się dzieje na", "co sie dzieje na")
+        val COUNT_WORDS = listOf("ile ", "ilo", "liczb", "how many", "count", "licz")
+        val TODAY_WORDS = listOf("dzisiaj", "dziś", "dzis", "today", "od rana")
         val MESSAGE_WORDS = listOf("wiadomo", "message", "czat", "chat", "napisa", "pisa", "rozmow", "odpowied")
     }
 }
