@@ -69,9 +69,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.assistant_dictate
+import org.meshtastic.core.resources.assistant_dictate_stop
+import org.meshtastic.core.resources.assistant_dictate_working
 import org.meshtastic.core.resources.assistant_disclaimer
 import org.meshtastic.core.resources.read_aloud
 import org.meshtastic.core.resources.stop_reading
+import org.meshtastic.feature.messaging.DictationPhase
 import org.meshtastic.feature.messaging.rememberDictation
 import org.meshtastic.feature.messaging.rememberSpeaker
 import org.meshtastic.core.resources.assistant_empty_hint
@@ -247,7 +250,17 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                 }
             }
             if (dictation.available && !state.busy) {
-                TextButton(onClick = dictation.start) { Text(stringResource(Res.string.assistant_dictate)) }
+                TextButton(onClick = dictation.toggle, enabled = dictation.phase != DictationPhase.WORKING) {
+                    Text(
+                        stringResource(
+                            when (dictation.phase) {
+                                DictationPhase.IDLE -> Res.string.assistant_dictate
+                                DictationPhase.LISTENING -> Res.string.assistant_dictate_stop
+                                DictationPhase.WORKING -> Res.string.assistant_dictate_working
+                            },
+                        ),
+                    )
+                }
             }
             if (state.lines.isNotEmpty() && !state.busy) {
                 TextButton(onClick = viewModel::startNew) { Text(stringResource(Res.string.assistant_new)) }

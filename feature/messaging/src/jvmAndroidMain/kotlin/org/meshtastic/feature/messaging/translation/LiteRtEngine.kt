@@ -18,6 +18,7 @@ package org.meshtastic.feature.messaging.translation
 
 import co.touchlab.kermit.Logger
 import com.google.ai.edge.litertlm.Backend
+import com.google.ai.edge.litertlm.Content
 import com.google.ai.edge.litertlm.Contents
 import com.google.ai.edge.litertlm.ConversationConfig
 import com.google.ai.edge.litertlm.Engine
@@ -53,6 +54,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
     private var unloadJob: Job? = null
     private var engine: Engine? = null
     private var loadedId: String? = null
+    private var loadedWithAudio = false
 
     /**
      * Folder with the neural chip libraries, set by the platform when it has them (Android passes its native library
@@ -85,6 +87,35 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         unloadJob?.cancel()
         try {
             withContext(Dispatchers.Default) { generate(modelId, messages, maxTokens, temperature, onPiece, tools) }
+        } finally {
+            scheduleUnload()
+        }
+    }
+
+    /**
+     * Turns a recording ([wav]: 16 kHz, mono, 16 bit, at most about 30 seconds) into text with the model's own hearing,
+     * fully on the device. Only the Gemma models of the E2B and E4B size can hear. The first call after the model was
+     * loaded without audio reloads it with the audio part switched on.
+     */
+    suspend fun transcribe(modelId: String, wav: ByteArray): String = runMutex.withLock {
+        unloadJob?.cancel()
+        try {
+            withContext(Dispatchers.Default) {
+                val loaded = ensureLoaded(modelId, audio = true)
+                val config =
+                    ConversationConfig(
+                        systemInstruction = Contents.of(TRANSCRIBE_RULE),
+                        samplerConfig = SamplerConfig(topK = TOP_K, topP = TOP_P, temperature = 0.0),
+                    )
+                val text = StringBuilder()
+                loaded.createConversation(config).use { conversation ->
+                    conversation
+                        .sendMessageAsync(Contents.of(Content.AudioBytes(wav), Content.Text(TRANSCRIBE_ASK)))
+                        .takeWhile { text.length < MAX_TRANSCRIPT_CHARS && !text.isLooping() }
+                        .collect { message -> text.append(message.toString()) }
+                }
+                text.withoutLoop().trim().trim('"', '\u201E', '\u201D').trim()
+            }
         } finally {
             scheduleUnload()
         }
@@ -158,8 +189,9 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         return restorer.restoreAll(finalText).trim()
     }
 
-    private fun ensureLoaded(modelId: String): Engine {
-        engine?.let { if (loadedId == modelId) return it }
+    private fun ensureLoaded(modelId: String, audio: Boolean = false): Engine {
+        // An engine started with hearing can do everything a plain one can, so it is kept for text too.
+        engine?.let { if (loadedId == modelId && (loadedWithAudio || !audio)) return it }
         unload()
         val file = store.fileOf(modelId) ?: error("Model $modelId is not downloaded")
         val cache = File(store.ggufDir, "cache").apply { mkdirs() }
@@ -175,7 +207,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         var failure: Exception? = null
         for ((name, backend) in attempts) {
             try {
-                created = start(file, backend(), cache, window)
+                created = start(file, backend(), cache, window, audio)
                 activeBackend = name
                 Logger.i(tag = TAG) { "Model $modelId runs on $name (context $window tokens)" }
                 break
@@ -187,6 +219,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         val ready = created ?: throw (failure ?: IllegalStateException("No backend could start"))
         engine = ready
         loadedId = modelId
+        loadedWithAudio = audio
         return ready
     }
 
@@ -197,12 +230,13 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
             else -> CONTEXT_LARGE
         }
 
-    private fun start(file: File, backend: Backend, cache: File, window: Int): Engine {
+    private fun start(file: File, backend: Backend, cache: File, window: Int, audio: Boolean): Engine {
         val created =
             Engine(
                 EngineConfig(
                     modelPath = file.absolutePath,
                     backend = backend,
+                    audioBackend = if (audio) Backend.CPU() else null,
                     maxNumTokens = window,
                     cacheDir = cache.absolutePath,
                 ),
@@ -305,6 +339,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         runCatching { current.close() }.onFailure { Logger.w(tag = TAG, throwable = it) { "Unload failed" } }
         engine = null
         loadedId = null
+        loadedWithAudio = false
         activeBackend = ""
     }
 
@@ -319,6 +354,11 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         const val LOOP_TAIL = 40
         const val LOOP_WINDOW = 800
         const val LOOP_REPEATS = 3
+        const val MAX_TRANSCRIPT_CHARS = 2000
+        const val TRANSCRIBE_RULE =
+            "You are a speech-to-text engine. You write down exactly what is said in the recording, in the language " +
+                "that is spoken, with normal punctuation. You never answer, translate, explain or add anything."
+        const val TRANSCRIBE_ASK = "Write down exactly what is said in this recording. Reply with the text only."
         const val IDLE_UNLOAD_MS = 120_000L
         const val CONTEXT_SMALL = 8192
         const val CONTEXT_LARGE = 16384

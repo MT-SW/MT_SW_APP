@@ -16,18 +16,20 @@
  */
 package org.meshtastic.feature.messaging
 
-import android.app.Activity
-import android.content.ActivityNotFoundException
+import android.Manifest
 import android.content.Context
-import android.content.Intent
-import android.speech.RecognizerIntent
+import android.content.pm.PackageManager
+import android.media.AudioFormat
+import android.media.AudioRecord
+import android.media.MediaRecorder
+import androidx.core.content.ContextCompat
+import kotlinx.coroutines.CompletableDeferred
 import android.speech.tts.TextToSpeech
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
 import co.touchlab.kermit.Logger
 import java.util.Locale
@@ -101,29 +103,83 @@ actual fun rememberSpeaker(): Speaker {
     return speaker
 }
 
-@Composable
-actual fun rememberDictation(onText: (String) -> Unit): Dictation {
-    val current = rememberUpdatedState(onText)
-    val launcher =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val text = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()
-                if (!text.isNullOrBlank()) current.value(text)
-            }
+/** Records the microphone with [AudioRecord] as 16 kHz mono PCM; the recording is capped at 30 seconds. */
+private class AndroidMic(private val context: Context, private val ask: suspend () -> Boolean) {
+    private var record: AudioRecord? = null
+    private var thread: Thread? = null
+    private val buffer = java.io.ByteArrayOutputStream()
+
+    @Volatile private var running = false
+
+    suspend fun permission(): Boolean {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            return true
         }
-    return remember(launcher) {
-        Dictation(available = true) {
-            val intent =
-                Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                    putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                    putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault().toLanguageTag())
-                    putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
-                }
-            try {
-                launcher.launch(intent)
-            } catch (_: ActivityNotFoundException) {
-                Logger.w(tag = "Dictation") { "No speech recognizer is installed" }
-            }
-        }
+        return ask()
     }
+
+    @android.annotation.SuppressLint("MissingPermission")
+    fun start() {
+        val minimum = AudioRecord.getMinBufferSize(RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
+        val recorder =
+            AudioRecord(
+                MediaRecorder.AudioSource.MIC,
+                RATE,
+                AudioFormat.CHANNEL_IN_MONO,
+                AudioFormat.ENCODING_PCM_16BIT,
+                maxOf(minimum, RATE),
+            )
+        check(recorder.state == AudioRecord.STATE_INITIALIZED) { "Microphone is not available" }
+        buffer.reset()
+        record = recorder
+        running = true
+        recorder.startRecording()
+        thread =
+            Thread {
+                    val chunk = ByteArray(4096)
+                    while (running && buffer.size() < RATE * 2 * 30) {
+                        val read = recorder.read(chunk, 0, chunk.size)
+                        if (read > 0) synchronized(buffer) { buffer.write(chunk, 0, read) }
+                    }
+                }
+                .apply {
+                    isDaemon = true
+                    start()
+                }
+    }
+
+    fun stop(): ByteArray {
+        running = false
+        runCatching { thread?.join(1000) }
+        runCatching { record?.stop() }
+        runCatching { record?.release() }
+        record = null
+        thread = null
+        return synchronized(buffer) { buffer.toByteArray() }
+    }
+
+    private companion object {
+        const val RATE = 16_000
+    }
+}
+
+@Composable
+actual fun rememberMicRecorder(): MicRecorder {
+    val context = LocalContext.current.applicationContext
+    val waiting = remember { arrayOfNulls<CompletableDeferred<Boolean>>(1) }
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            waiting[0]?.complete(granted)
+            waiting[0] = null
+        }
+    val mic =
+        remember(launcher) {
+            AndroidMic(context) {
+                val answer = CompletableDeferred<Boolean>()
+                waiting[0] = answer
+                launcher.launch(Manifest.permission.RECORD_AUDIO)
+                answer.await()
+            }
+        }
+    return remember(mic) { MicRecorder(permission = mic::permission, start = mic::start, stop = mic::stop) }
 }

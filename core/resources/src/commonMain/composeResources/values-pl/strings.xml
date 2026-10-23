@@ -3032,4 +3032,6 @@
     <string name="ai_internet_warning_body">Słowa, których asystent szuka, wychodzą z urządzenia do wyszukiwarki, która widzi Twój adres IP. Asystent ma zakaz wpisywania Twoich nazw, pozycji i wiadomości, ale mały model może się pomylić. Tekst z internetu może być błędny albo próbować oszukać asystenta, dlatego jest traktowany tylko jako informacja. Każda odpowiedź, która użyła internetu, pokazuje co wyszukano i skąd są źródła. Nic z aplikacji nie jest wysyłane, dopóki o to nie poprosisz. Nowości o aplikacji są pobierane tylko z naszego repozytorium i sprawdzane przed użyciem. Wyłącz to, a asystent znów działa w pełni offline.</string>
     <string name="ai_internet_enable">Włącz</string>
     <string name="assistant_go_to">Przejdź do: %1$s</string>
+    <string name="assistant_dictate_stop">Zatrzymaj i wstaw</string>
+    <string name="assistant_dictate_working">Zamieniam mowę na tekst…</string>
 </resources>

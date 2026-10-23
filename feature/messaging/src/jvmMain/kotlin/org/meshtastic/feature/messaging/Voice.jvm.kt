@@ -76,5 +76,53 @@ actual fun rememberSpeaker(): Speaker {
     return speaker
 }
 
-/** The computer has no common speech recognizer to call, so there is no dictation button on desktop. */
-@Composable actual fun rememberDictation(onText: (String) -> Unit): Dictation = Dictation(available = false) {}
+/** Records the default microphone with javax.sound as 16 kHz mono PCM; the recording is capped at 30 seconds. */
+private class DesktopMic {
+    private var line: javax.sound.sampled.TargetDataLine? = null
+    private var thread: Thread? = null
+    private val buffer = java.io.ByteArrayOutputStream()
+
+    @Volatile private var running = false
+
+    fun start() {
+        val format = javax.sound.sampled.AudioFormat(RATE, 16, 1, true, false)
+        val opened = javax.sound.sampled.AudioSystem.getTargetDataLine(format)
+        opened.open(format)
+        buffer.reset()
+        line = opened
+        running = true
+        opened.start()
+        thread =
+            Thread {
+                    val chunk = ByteArray(4096)
+                    while (running && buffer.size() < RATE * 2 * 30) {
+                        val read = opened.read(chunk, 0, chunk.size)
+                        if (read > 0) synchronized(buffer) { buffer.write(chunk, 0, read) }
+                    }
+                }
+                .apply {
+                    isDaemon = true
+                    start()
+                }
+    }
+
+    fun stop(): ByteArray {
+        running = false
+        runCatching { line?.stop() }
+        runCatching { thread?.join(1000) }
+        runCatching { line?.close() }
+        line = null
+        thread = null
+        return synchronized(buffer) { buffer.toByteArray() }
+    }
+
+    private companion object {
+        const val RATE = 16_000f
+    }
+}
+
+@Composable
+actual fun rememberMicRecorder(): MicRecorder {
+    val mic = remember { DesktopMic() }
+    return remember(mic) { MicRecorder(permission = { true }, start = mic::start, stop = mic::stop) }
+}

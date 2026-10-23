@@ -183,6 +183,8 @@
     <string name="assistant_close">Close</string>
     <string name="assistant_delete">Delete conversation</string>
     <string name="assistant_dictate">Dictate</string>
+    <string name="assistant_dictate_stop">Stop and insert</string>
+    <string name="assistant_dictate_working">Turning speech into text…</string>
     <string name="assistant_disclaimer">The assistant runs entirely on this device, without internet. Answers may be wrong — check important information.</string>
     <string name="assistant_empty_hint">The first answer takes longer because the model is loaded into memory.</string>
     <string name="assistant_error">Could not get an answer. Check that the device has enough free RAM.</string>
