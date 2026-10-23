@@ -934,9 +934,10 @@ internal fun MessageInput(
     // Dictation: the recognized text is added at the cursor (or replaces the selection), then a space follows.
     val dictation =
         rememberDictation { spoken ->
+            val current = textFieldState.text
+            val start = textFieldState.selection.min
+            val before = if (start > 0 && !current[start - 1].isWhitespace()) " " else ""
             textFieldState.edit {
-                val start = selection.min
-                val before = if (start > 0 && !this[start - 1].isWhitespace()) " " else ""
                 replace(selection.min, selection.max, before + spoken.trim() + " ")
             }
         }
