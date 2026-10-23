@@ -146,6 +146,7 @@ import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.feature.messaging.downloadImageBytes
 import org.meshtastic.feature.messaging.rememberImageSaver
+import org.meshtastic.feature.messaging.rememberSpeaker
 import org.meshtastic.feature.messaging.toImageFileExtension
 
 internal const val MESSAGE_STATUS_LABEL_TEST_TAG = "message_status_label"
@@ -239,6 +240,7 @@ fun MessageItem(
     var fullScreenImageUrl by remember { mutableStateOf<String?>(null) }
     val clipboardManager = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
+    val speaker = rememberSpeaker()
     val sheetState =
         rememberBottomSheetState(
             initialValue = SheetValue.Hidden,
@@ -306,6 +308,10 @@ fun MessageItem(
                             onToggleTranslation()
                         },
                         senderMuted = senderMuted,
+                        onReadAloud = {
+                            activeSheet = null
+                            speaker.speak(bodyText)
+                        },
                         onMuteSender =
                         onMuteSender?.let { mute ->
                             {
