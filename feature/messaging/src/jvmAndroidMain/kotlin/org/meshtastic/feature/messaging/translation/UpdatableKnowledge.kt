@@ -59,6 +59,9 @@ class UpdatableKnowledge(
             File(directory, "docs").listFiles { f -> f.extension == "md" }?.sortedBy { it.name }?.forEach { f ->
                 add(KnowledgeIndex.Document(f.nameWithoutExtension, f.readText()))
             }
+            File(directory, "project").listFiles { f -> f.extension == "md" }?.sortedBy { it.name }?.forEach { f ->
+                add(KnowledgeIndex.Document("MT_SW ${f.nameWithoutExtension}", f.readText()))
+            }
             File(directory, "CHANGELOG.md").takeIf { it.exists() }?.let {
                 add(KnowledgeIndex.Document("CHANGELOG", it.readText(), news = true))
             }
@@ -86,6 +89,15 @@ class UpdatableKnowledge(
                     download("docs/$lang/user/$name", target, null, sha)
                 }
             }
+            // The other parts of the project (firmware, integration, protobufs) come from their own repositories.
+            File(directory, "project").mkdirs()
+            for ((repo, path, name) in PROJECT_SOURCES) {
+                try {
+                    download(repo, path, File(directory, "project/$name.md"), path)
+                } catch (e: Exception) {
+                    Logger.w { "Assistant knowledge: $repo/$path skipped: ${e.message}" }
+                }
+            }
             stamp.writeText(System.currentTimeMillis().toString())
             stamp.setLastModified(System.currentTimeMillis())
             Logger.i { "Assistant knowledge updated from the repository" }
@@ -95,12 +107,21 @@ class UpdatableKnowledge(
     }
 
     /** Downloads one file and keeps it only if its git blob hash matches [expectedSha] (looked up when null). */
-    private fun download(path: String, target: File, apiPath: String?, expectedSha: String? = null) {
+    private fun download(repo: String, path: String, target: File, apiPath: String?) =
+        download(path, target, apiPath, null, repo)
+
+    private fun download(
+        path: String,
+        target: File,
+        apiPath: String?,
+        expectedSha: String? = null,
+        repo: String = REPO,
+    ) {
         val sha =
             expectedSha
-                ?: ENTRY_SHA.find(WebAccess.fetch("$API/${apiPath ?: path}", "application/json"))?.groupValues?.get(1)
+                ?: ENTRY_SHA.find(WebAccess.fetch("https://api.github.com/repos/$repo/contents/${apiPath ?: path}", "application/json"))?.groupValues?.get(1)
                 ?: error("No hash for $path")
-        val bytes = WebAccess.fetchBytes("$RAW/$path")
+        val bytes = WebAccess.fetchBytes("https://raw.githubusercontent.com/$repo/main/$path")
         check(gitSha(bytes) == sha) { "Hash mismatch for $path" }
         target.writeBytes(bytes)
     }
@@ -118,6 +139,14 @@ class UpdatableKnowledge(
         const val RAW = "https://raw.githubusercontent.com/$REPO/main"
         const val STAMP = "updated.stamp"
         const val DAY_MS = 24L * 60 * 60 * 1000
+        val PROJECT_SOURCES =
+            listOf(
+                Triple("MT-SW/MT_SW_FIRMWARE", "README.md", "firmware"),
+                Triple("MT-SW/MT_SW_INTEGRATION", "README.md", "integration"),
+                Triple("MT-SW/MT_SW_INTEGRATION", "custom_components/meshtastic/meshtastic_web/MTSW_WEB_CLIENT.md", "integration-web-client"),
+                Triple("MT-SW/MT_SW_INTEGRATION", "custom_components/meshtastic/ha_frontend/planner/API.md", "integration-planner-api"),
+                Triple("MT-SW/MT_SW_PROTOBUFS", "README.md", "protobufs"),
+            )
         val ENTRY = Regex("\"name\"\\s*:\\s*\"([^\"]+)\"[^{}]*?\"sha\"\\s*:\\s*\"([0-9a-f]{40})\"")
         val ENTRY_SHA = Regex("\"sha\"\\s*:\\s*\"([0-9a-f]{40})\"")
     }
