@@ -26,11 +26,15 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.ui.assistant.AssistantLinks
+import org.meshtastic.core.ui.assistant.SettingHighlight
 
 /** One bubble of the conversation. */
 data class AssistantLine(val fromUser: Boolean, val text: String)
@@ -88,11 +92,25 @@ class AssistantViewModel(
                 failed = false,
             )
         }
+        pending.value = ""
+        val pump =
+            viewModelScope.launch {
+                while (true) {
+                    delay(FLUSH_MS)
+                    flushPieces()
+                }
+            }
         job =
             viewModelScope.launch {
                 try {
                     val answer = service.reply(history) { piece -> appendToAnswer(piece) }
+                    flushPieces()
                     setAnswer(answer)
+                    // The user asked to go somewhere ("show node X on the map"): the app opens it right away.
+                    AssistantActions.parse(answer).second.firstOrNull { it.auto }?.let { action ->
+                        SettingHighlight.show(action.highlight)
+                        AssistantLinks.open(action.uri)
+                    }
                 } catch (e: CancellationException) {
                     // Stopped by the user: keep what was written so far.
                     throw e
@@ -112,6 +130,8 @@ class AssistantViewModel(
                         }
                     }
                 } finally {
+                    pump.cancel()
+                    flushPieces()
                     _state.update { it.copy(busy = false) }
                     withContext(NonCancellable) { persist() }
                 }
@@ -164,9 +184,19 @@ class AssistantViewModel(
         refreshSaved()
     }
 
-    private fun appendToAnswer(piece: String) = _state.update { s ->
-        if (s.lines.isEmpty() || s.lines.last().fromUser) return@update s
-        s.copy(lines = s.lines.dropLast(1) + AssistantLine(false, s.lines.last().text + piece))
+    // The model gives the answer word by word; showing every word redraws the chat that often and makes it stutter.
+    // The words are collected here and shown together a few times a second instead.
+    private val pending = MutableStateFlow("")
+
+    private fun appendToAnswer(piece: String) = pending.update { it + piece }
+
+    private fun flushPieces() {
+        val text = pending.getAndUpdate { "" }
+        if (text.isEmpty()) return
+        _state.update { s ->
+            if (s.lines.isEmpty() || s.lines.last().fromUser) return@update s
+            s.copy(lines = s.lines.dropLast(1) + AssistantLine(false, s.lines.last().text + text))
+        }
     }
 
     private fun setAnswer(answer: String) = _state.update { s ->
@@ -176,5 +206,6 @@ class AssistantViewModel(
 
     private companion object {
         const val TITLE_LENGTH = 48
+        const val FLUSH_MS = 120L
     }
 }
