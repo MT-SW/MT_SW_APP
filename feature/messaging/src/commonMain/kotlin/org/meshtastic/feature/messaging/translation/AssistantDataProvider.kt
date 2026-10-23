@@ -1278,14 +1278,16 @@ class AssistantDataProvider(
             safeList {
                 meshLogRepository.getLogsFromNodeSince(num, nowMillis - SIGNAL_WINDOW_MS).first().mapNotNull { log ->
                     val p = log.fromRadio.packet ?: return@mapNotNull null
-                    if (p.hop_start == 0 || p.hop_start != p.hop_limit || p.rx_snr == 0f) null else p.rx_snr to p.rx_rssi
+                    val snr: Float = p.rx_snr ?: 0f
+                    val rssi: Int = p.rx_rssi ?: 0
+                    if (p.hop_start == 0 || p.hop_start != p.hop_limit || snr == 0f) null else snr to rssi
                 }
             }
         if (direct.isEmpty()) {
             sb.append("\n• ").append(getStringSuspend(Res.string.ai_snr_no_direct, days))
         } else {
-            val snrs = direct.map { it.first }
-            val rssis = direct.map { it.second }.filter { it != 0 }
+            val snrs: List<Float> = direct.map { it.first }
+            val rssis: List<Int> = direct.map { it.second }.filter { it != 0 }
             sb.append("\n• ").append(
                 getStringSuspend(
                     Res.string.ai_snr_avg, days, fmt(snrs.average().toFloat()), fmt(snrs.min()), fmt(snrs.max()),
