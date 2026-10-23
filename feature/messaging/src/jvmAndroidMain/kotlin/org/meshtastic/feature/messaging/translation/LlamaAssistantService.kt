@@ -144,7 +144,11 @@ class LlamaAssistantService(
         onPiece: (String) -> Unit,
     ): String {
         val webOn = uiPrefs.assistantInternetEnabled.value
-        val dataText = if (topic == AssistantTopic.GUIDE) "" else data.contextFor(question, dataChars)
+        // A short follow-up ("a jakie to są wartości?") has no topic words of its own, so the data is chosen from the
+        // previous question as well.
+        val earlier = turns.filter { it.fromUser && it.text != question }.lastOrNull()?.text.orEmpty()
+        val dataQuestion = if (earlier.isBlank()) question else "$earlier $question"
+        val dataText = if (topic == AssistantTopic.GUIDE) "" else data.contextFor(dataQuestion, dataChars)
         val guideText =
             if (topic == AssistantTopic.DATA || knowledge == null) "" else knowledge.lookup(question, KNOWLEDGE_CHARS * room)
         val system = buildString {
