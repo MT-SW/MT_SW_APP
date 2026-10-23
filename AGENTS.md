@@ -53,6 +53,10 @@ Forking, rebranding, and selling this app are allowed by its GPL-3.0-or-later li
 - **Your own identity:** Change `APPLICATION_ID` in `config.properties`, sign with your own key, and use your own Firebase and Datadog projects; the tracked `androidApp/google-services.json` is a placeholder.
 </forks_and_rebrands>
 
+<mtsw_assistant_knowledge>
+The offline assistant gets `knowledge/core.md` (core facts about MT_SW: network settings, parts of the project, main features) with every answer. Whenever something about MT_SW changes (network settings, a new feature, a new part of the project), update `knowledge/core.md` (PL and EN parts) in the same change. It is bundled at every build and also fetched from the repository when the assistant's internet access is on.
+</mtsw_assistant_knowledge>
+
 <documentation_sync>
 `AGENTS.md` is the source of truth for rules and principles. `.github/copilot-instructions.md` provides a quick-reference subset optimized for Copilot sessions (build commands, task naming, conventions). `CLAUDE.md` and `GEMINI.md` redirect here.
 </documentation_sync>
