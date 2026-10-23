@@ -21,13 +21,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -49,6 +51,7 @@ import org.meshtastic.core.repository.TranslatorModelManager
 import org.meshtastic.core.repository.TranslatorModelState
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.translate
 import org.meshtastic.core.resources.translator_busy
 import org.meshtastic.core.resources.translator_cancel
 import org.meshtastic.core.resources.translator_error_failed
@@ -108,21 +111,29 @@ internal fun OutgoingTranslateAction(
         busy = false
     }
 
+    // A small grey chip above the field, only while there is text to translate: no extra row sits under the field.
     if (textFieldState.text.isNotBlank()) {
-        Row(modifier = modifier.fillMaxWidth().padding(horizontal = 8.dp), horizontalArrangement = Arrangement.End) {
-            IconButton(
+        Row(modifier = modifier.fillMaxWidth().padding(horizontal = 12.dp), horizontalArrangement = Arrangement.Start) {
+            AssistChip(
                 onClick = {
                     original = textFieldState.text.toString().trim()
                     open = true
                 },
                 enabled = isEnabled,
-            ) {
-                Icon(
-                    imageVector = MeshtasticIcons.Language,
-                    contentDescription = stringResource(Res.string.translator_outgoing_title),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+                label = { Text(stringResource(Res.string.translate), style = MaterialTheme.typography.labelMedium) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = MeshtasticIcons.Language,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                    )
+                },
+                colors =
+                AssistChipDefaults.assistChipColors(
+                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    leadingIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
+            )
         }
     }
 
