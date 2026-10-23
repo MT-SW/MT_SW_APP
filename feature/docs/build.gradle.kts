@@ -56,10 +56,24 @@ kotlin {
  */
 val docsComposeResources = layout.buildDirectory.dir("generated/docsComposeResources")
 
+// Refreshes the assistant's knowledge about the firmware, integration and protobufs from GitHub; offline it changes nothing.
+val refreshAssistantKnowledge =
+    tasks.register<Exec>("refreshAssistantKnowledge") {
+        description = "Downloads the newest README files of the other MT_SW repositories for the assistant."
+        group = "docs"
+        val script = isolated.rootProject.projectDirectory.file("scripts/update-knowledge.sh").asFile
+        commandLine("sh", script.absolutePath)
+        isIgnoreExitValue = true
+        // Windows has no sh: the saved copies are used.
+        onlyIf { !System.getProperty("os.name").lowercase().contains("windows") && script.exists() }
+        outputs.upToDateWhen { false }
+    }
+
 val syncDocsToComposeResources =
     tasks.register<Sync>("syncDocsToComposeResources") {
         description = "Bundles docs/ markdown, screenshots and translations as compose resources for the in-app reader."
         group = "docs"
+        dependsOn(refreshAssistantKnowledge)
 
         // isolated.rootProject: Isolated Projects forbids reaching through rootProject.layout.
         val docsDir = isolated.rootProject.projectDirectory.dir("docs")
@@ -73,6 +87,8 @@ val syncDocsToComposeResources =
         // The assistant's knowledge base: the change list of the fork (Polish first, English second) is packaged
         // next to the guide, so the offline assistant can answer "what is new" without internet.
         from(isolated.rootProject.projectDirectory.file("CHANGELOG.md")) { into("files/knowledge") }
+        // Short copies of the READMEs of the firmware, integration and protobufs: only the assistant reads them.
+        from(isolated.rootProject.projectDirectory.dir("knowledge")) { include("*.md"); into("files/knowledge") }
 
         // FR-038: docs/assets/screenshots/ is the tracked screenshot set shared with the Jekyll site, refreshed from
         // the CST references by copyDocsScreenshots, so the site and the in-app reader serve identical images.
