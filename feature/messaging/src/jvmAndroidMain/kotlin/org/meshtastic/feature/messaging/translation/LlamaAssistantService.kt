@@ -186,6 +186,8 @@ class LlamaAssistantService(
             listOf(
                 Regex("\\[\\s*($names)\\s*[(:\\s]\\s*([^\\]]*?)\\s*\\)?\\s*\\]"),
                 Regex("\\b($names)\\(\\s*\"?([^\")\\n]*)\"?\\s*\\)"),
+                // Written without brackets, on its own line: "show_setting Ustawienia aplikacji".
+                Regex("(?m)^[ \\t]*($names)[ \\t:]+([^\\n]*)$"),
             )
         var result = text
         for (pattern in patterns) {
@@ -193,9 +195,12 @@ class LlamaAssistantService(
                 val name = match.groupValues[1]
                 val arg = match.groupValues[2].trim().trim('"')
                 val before = collector.size()
-                invokeGuide(name, arg)
-                if (collector.size() == before && (name == "show_setting" || name == "open_screen")) {
+                // The user's own words find the place more reliably than the small model's guess, so they go first.
+                if (name == "show_setting" || name == "open_screen") {
                     invokeGuide(name, question)
+                    if (collector.size() == before) invokeGuide(name, arg)
+                } else {
+                    invokeGuide(name, arg)
                 }
             }
             result = result.replace(pattern, "")
