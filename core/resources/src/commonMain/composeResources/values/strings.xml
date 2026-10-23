@@ -77,6 +77,10 @@
     <string name="ai_ago_h">%1$d h ago</string>
     <string name="ai_ago_min">%1$d min ago</string>
     <string name="ai_ago_now">just now</string>
+    <string name="ai_antenna">For %1$s MHz the wavelength is %2$s cm.
+• Quarter-wave antenna: about %3$s cm
+• Half-wave dipole: about %4$s cm in total, two arms of about %5$s cm
+The lengths are already shortened by about 5% for a wire element; fine-tune them with an SWR meter.</string>
     <string name="ai_assistant_summary">Chat with an AI assistant without internet. Experimental, off by default.</string>
     <string name="ai_assistant_title">Offline assistant</string>
     <string name="ai_assistant_unavailable">The assistant will be available once the Gemma model engine is added in an upcoming version.</string>
@@ -121,6 +125,7 @@
     <string name="ai_help_news">Latest changes in MT_SW:</string>
     <string name="ai_help_open">It is on the screen “%1$s”: the button below opens it.</string>
     <string name="ai_help_where">“%1$s” is in: %2$s.</string>
+    <string name="ai_hops_direct">direct</string>
     <string name="ai_internet_enable">Turn on</string>
     <string name="ai_internet_on_indicator">Internet is ON for the assistant</string>
     <string name="ai_internet_summary">Off by default. When on, the assistant can search the web, and the app downloads updates about our work automatically.</string>
@@ -172,6 +177,10 @@
     <string name="ai_neigh_none_node">No neighbour information for this node.</string>
     <string name="ai_neigh_title">Who hears whom directly:</string>
     <string name="ai_net_count">Known nodes: %1$d. Heard in the last 24 h: %2$d, in the last hour: %3$d. Heard directly (0 hops): %4$d.</string>
+    <string name="ai_net_hops">Distance in hops: %1$s</string>
+    <string name="ai_net_low_battery">Low battery (up to %1$d%): %2$s</string>
+    <string name="ai_net_none">none</string>
+    <string name="ai_net_roles">Roles: %1$s</string>
     <string name="ai_never">never</string>
     <string name="ai_no_channel">No such channel: %1$s. Channels: %2$s</string>
     <string name="ai_nodes_heard_title">%1$s: heard %2$d of %3$d known nodes</string>
@@ -225,6 +234,7 @@
     <string name="ai_tab_ai">AI</string>
     <string name="ai_tab_assistant">Assistant</string>
     <string name="ai_tab_translator">Translator</string>
+    <string name="ai_test_done">Test finished: %1$d questions, model %2$s, average time %3$s s. The full report is below (press and hold to copy).</string>
     <string name="ai_trace_back">back</string>
     <string name="ai_trace_hops">hops: %1$d</string>
     <string name="ai_trace_none">No traceroutes saved.</string>

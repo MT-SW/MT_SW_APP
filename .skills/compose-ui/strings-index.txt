@@ -56,6 +56,7 @@ ai_ago_d
 ai_ago_h
 ai_ago_min
 ai_ago_now
+ai_antenna
 ai_assistant_summary
 ai_assistant_title
 ai_assistant_unavailable
@@ -100,6 +101,7 @@ ai_help_from_manual
 ai_help_news
 ai_help_open
 ai_help_where
+ai_hops_direct
 ai_internet_enable
 ai_internet_on_indicator
 ai_internet_summary
@@ -151,6 +153,10 @@ ai_neigh_none
 ai_neigh_none_node
 ai_neigh_title
 ai_net_count
+ai_net_hops
+ai_net_low_battery
+ai_net_none
+ai_net_roles
 ai_never
 ai_no_channel
 ai_nodes_heard_title
@@ -204,6 +210,7 @@ ai_status_unread_none
 ai_tab_ai
 ai_tab_assistant
 ai_tab_translator
+ai_test_done
 ai_trace_back
 ai_trace_hops
 ai_trace_none

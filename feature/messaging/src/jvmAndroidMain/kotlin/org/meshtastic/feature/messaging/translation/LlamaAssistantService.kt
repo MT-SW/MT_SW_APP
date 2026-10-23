@@ -35,6 +35,8 @@ import org.meshtastic.core.repository.TranslatorModelState
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ai_go_draft
+import org.meshtastic.core.resources.ai_antenna
+import org.meshtastic.core.resources.ai_test_done
 import org.meshtastic.core.resources.assistant_web_sources
 import org.meshtastic.core.resources.assistant_web_searched
 import org.meshtastic.core.resources.assistant_web_used
@@ -120,7 +122,8 @@ class LlamaAssistantService(
             val modelId = activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
             val questions = AssistantSelfTest.questions(data.sampleNodeName(), data.sampleChannelName())
             val file = runCatching { java.io.File(System.getProperty("user.dir").orEmpty(), AssistantSelfTest.RESULT_FILE) }.getOrNull()
-            val report = StringBuilder("# Assistant test\n\nModel: $modelId, backend: ${engine.activeBackend.ifBlank { "?" }}, questions: ${questions.size}\n")
+            val report = StringBuilder("# Assistant test\n\nModel: $modelId, questions: ${questions.size}\n")
+            var totalSeconds = 0L
             var previous: List<AssistantTurn> = emptyList()
             for ((i, q) in questions.withIndex()) {
                 val history = (if (q.followUp) previous else emptyList()) + AssistantTurn(true, q.text)
@@ -134,6 +137,7 @@ class LlamaAssistantService(
                         "ERROR: ${e.message?.lineSequence()?.firstOrNull()}"
                     }
                 val seconds = (org.meshtastic.core.common.util.nowMillis - started) / MILLIS_PER_SECOND
+                totalSeconds += seconds
                 val (text, actions) = AssistantActions.parse(answer)
                 val block = buildString {
                     append("\n## ").append(i + 1).append(". ").append(q.text).append('\n')
@@ -150,8 +154,14 @@ class LlamaAssistantService(
                 onResult(q.text, answer)
                 previous = history + AssistantTurn(false, text)
             }
+            report.append("\nBackend: ${engine.activeBackend.ifBlank { "?" }}, total ${totalSeconds} s\n")
+            file?.let { f -> runCatching { f.writeText(report.toString()) } }
             val where = file?.takeIf { it.exists() }?.absolutePath ?: "(not saved)"
             println("===== ASSISTANT TEST DONE: $where =====")
+            // The whole report also lands in the chat as the last answer, so it can be copied on any device (a phone
+            // has no project folder to save it to).
+            val average = if (questions.isEmpty()) "0" else (kotlin.math.round(totalSeconds * 10.0 / questions.size) / 10).toString()
+            onResult(AssistantSelfTest.COMMAND, aiString(Res.string.ai_test_done, questions.size, modelId, average) + "\n\n" + report.toString())
         }
     }
 
@@ -276,12 +286,16 @@ class LlamaAssistantService(
             return aiString(Res.string.ai_mtsw_setup).also(onPiece)
         }
         val nodeNum = data.resolveNodeNum(intent.node, question)
+        // "the nearest router": the role is taken from the question when the small model left it out.
+        val role = intent.role.takeUnless { it.isBlank() || it == "any" } ?: ROLE_WORDS.find(question.lowercase())?.groupValues?.get(1)?.let { ROLE_NAMES[it] }.orEmpty()
+        // Antenna lengths: a question about how long an antenna should be is answered by the app's own calculation.
+        antennaAnswer(question)?.let { return it.also(onPiece) }
         val answer: String? =
             when (intent.intent) {
                 "show_node_on_map" -> exact(goToNode(nodeNum, intent.node, planner = false))
                 "open_link_planner" ->
                     exact(goToNode(if (intent.node.isBlank()) nodeNum ?: data.resolveNodeNum("me", "") else nodeNum, intent.node, planner = true))
-                "nearest_node" -> exact(goToNearest(intent.role, intent.metric == "farthest"))
+                "nearest_node" -> exact(goToNearest(role, intent.metric == "farthest"))
                 "open_screen" -> exact(goToPlace(intent.text, question, settingFirst = false))
                 "show_setting" -> exact(goToPlace(intent.text, question, settingFirst = true))
                 "draft_message" -> exact(draft(intent.channel.ifBlank { intent.node }, intent.text))
@@ -309,14 +323,16 @@ class LlamaAssistantService(
                     if (nodeNum != null && intent.node.isNotBlank()) {
                         exact(data.nodeSignal(nodeNum))
                     } else {
-                        if (intent.metric == "nearest" || intent.metric == "farthest") addNearestButton(intent.role, intent.metric == "farthest")
-                        exact(data.signalListFor(intent.role, intent.metric))
+                        if (intent.metric == "nearest" || intent.metric == "farthest") addNearestButton(role, intent.metric == "farthest")
+                        exact(data.signalListFor(role, intent.metric))
                     }
                 "traceroute" -> exact(routeOrUnknown(intent, nodeNum) { data.toolTraceroutes(it, LIST_SHOWN) })
                 "neighbors" -> exact(routeOrUnknown(intent, nodeNum) { data.toolNeighbors(it, LIST_SHOWN) })
                 "network_question" ->
                     when {
                         intent.topic == "radio" -> exact(data.radioStats())
+                        // A summary of the whole network is counted by the app (the model mixed up the numbers).
+                        intent.topic == "overview" -> exact(data.networkOverview())
                         // Battery questions are answered from the node's own reading, never retold by the model.
                         (intent.metric == "battery" || BATTERY_WORDS.containsMatchIn(question.lowercase())) &&
                             intent.topic != "ranking" && !MANY_WORDS.containsMatchIn(question.lowercase()) -> exact(data.nodeBattery(nodeNum))
@@ -362,6 +378,14 @@ class LlamaAssistantService(
                     }
                 }
                 val button = collector.last()
+                // "Open the display settings" taken for a help question: it is a command, so the place opens.
+                if (button != null && OPEN_COMMAND.containsMatchIn(question.trim().lowercase())) {
+                    collector.autoOpenLast()
+                    return (
+                        if (button.highlight.isNotBlank()) aiString(Res.string.ai_go_setting, button.label)
+                        else aiString(Res.string.ai_go_open, button.label)
+                        ).also(onPiece)
+                }
                 // The answer is the app's own manual, shown as it is written, with where the setting is: the small
                 // model garbled words and invented menu paths when it retold the manual in its own words.
                 val wantsNews = NEWS_WORDS.containsMatchIn(question.lowercase())
@@ -581,6 +605,9 @@ class LlamaAssistantService(
             }
             if (line.length < MIN_HELP_LINE || line.startsWith("|") || line.startsWith(">") || line.startsWith("description:")) continue
             if (title.startsWith("MT_SW ") || title == "CHANGELOG" || (polish && title.startsWith("en-"))) continue
+            // The part of the manual about the assistant itself quotes example commands ("show the hop limit"): it is
+            // not the answer to a question about that setting.
+            if (ABOUT_ASSISTANT.containsMatchIn(title.lowercase()) && !ABOUT_ASSISTANT.containsMatchIn(focus(question, strong))) continue
             val words = stems(line)
             val strongHits = words.count { it in strongTerms }
             val weakHits = words.count { it in weakTerms }
@@ -603,6 +630,19 @@ class LlamaAssistantService(
         val heading = best.title.substringAfter(": ", "").trim()
         val body = ordered.joinToString("\n") { endAtSentence(it.text) }
         return (if (heading.isNotBlank()) "($heading)\n" else "") + endAtSentence(body.take(HELP_CHARS))
+    }
+
+    private fun focus(question: String, strong: String) = "$question $strong".lowercase()
+
+    /** A code answer for "how long should an antenna for N MHz be", or null when the question is not that. */
+    private suspend fun antennaAnswer(question: String): String? {
+        val q = question.lowercase()
+        if (!ANTENNA_WORDS.containsMatchIn(q) || !LENGTH_WORDS.containsMatchIn(q)) return null
+        val mhz = FREQUENCY.find(q)?.groupValues?.get(1)?.replace(',', '.')?.toDoubleOrNull()?.takeIf { it > 0 } ?: return null
+        val wavelength = SPEED_OF_LIGHT / (mhz * 1_000_000) * 100
+        fun cm(v: Double) = (kotlin.math.round(v * 10) / 10).toString()
+        val half = wavelength / 2 * VELOCITY_FACTOR
+        return aiString(Res.string.ai_antenna, cm(mhz), cm(wavelength), cm(wavelength / 4 * VELOCITY_FACTOR), cm(half), cm(half / 2))
     }
 
     /** Cuts an unfinished last sentence (a fragment can end in the middle of one). */
@@ -765,6 +805,15 @@ class LlamaAssistantService(
         val ANTENNA_WORDS = Regex("anten|dipol|ćwierćfal|cwiercfal|półfal|polfal|antenna|ground ?plane|yagi")
         val FREQUENCY = Regex("(\\d{2,4}(?:[.,]\\d+)?)\\s*mhz")
         val CONNECT_WORDS = Regex("połącz|polacz|sparow|parowa|connect|pair")
+        val OPEN_COMMAND = Regex("^(otwórz|otworz|pokaż|pokaz|przejdź|przejdz|open|show|go to)(?=\\s|$)")
+        val ABOUT_ASSISTANT = Regex("asystent|assistant|tłumacz|tlumacz|translator")
+        val LENGTH_WORDS = Regex("ile|dług|dlug|cm|centymetr|metr|wymiar|length|how long|size")
+        val ROLE_WORDS = Regex("(router|ruter|repeater|przekaźnik|przekaznik|czujnik|sensor|tracker)")
+        val ROLE_NAMES =
+            mapOf(
+                "router" to "router", "ruter" to "router", "repeater" to "repeater", "przekaźnik" to "repeater",
+                "przekaznik" to "repeater", "czujnik" to "sensor", "sensor" to "sensor", "tracker" to "tracker",
+            )
         val JOINER = Regex("^[\\s,.;?]*(?:i|a|oraz|and)?\\s*", RegexOption.IGNORE_CASE)
         val SECOND_QUESTION =
             Regex(
