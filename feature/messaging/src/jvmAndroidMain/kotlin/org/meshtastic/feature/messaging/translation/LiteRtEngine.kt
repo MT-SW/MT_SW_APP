@@ -20,19 +20,24 @@ import co.touchlab.kermit.Logger
 import com.google.ai.edge.litertlm.Backend
 import com.google.ai.edge.litertlm.Content
 import com.google.ai.edge.litertlm.Contents
+import com.google.ai.edge.litertlm.Conversation
 import com.google.ai.edge.litertlm.ConversationConfig
 import com.google.ai.edge.litertlm.Engine
 import com.google.ai.edge.litertlm.EngineConfig
 import com.google.ai.edge.litertlm.Message
+import com.google.ai.edge.litertlm.MessageCallback
 import com.google.ai.edge.litertlm.SamplerConfig
 import com.google.ai.edge.litertlm.ToolSet
 import com.google.ai.edge.litertlm.tool
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withTimeoutOrNull
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -109,10 +114,13 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
                     )
                 val text = StringBuilder()
                 loaded.createConversation(config).use { conversation ->
-                    conversation
-                        .sendMessageAsync(Contents.of(Content.AudioBytes(wav), Content.Text(TRANSCRIBE_ASK)))
-                        .takeWhile { text.length < MAX_TRANSCRIPT_CHARS && !text.isLooping() }
-                        .collect { message -> text.append(message.toString()) }
+                    conversation.stream(
+                        send = { callback ->
+                            conversation.sendMessageAsync(Contents.of(Content.AudioBytes(wav), Content.Text(TRANSCRIBE_ASK)), callback)
+                        },
+                        wantMore = { text.length < MAX_TRANSCRIPT_CHARS && !text.isLooping() },
+                        onPiece = { piece -> text.append(piece) },
+                    )
                 }
                 text.withoutLoop().trim().trim('"', '\u201E', '\u201D').trim()
             }
@@ -162,16 +170,16 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         val limit = if (maxTokens > 0) maxTokens * CHARS_PER_TOKEN else Int.MAX_VALUE
         try {
             loaded.createConversation(config).use { conversation ->
-                conversation
-                    .sendMessageAsync(dialogue.last().second)
-                    .takeWhile { reply.length < limit && !reply.isLooping() }
-                    .collect { message ->
-                        val piece = message.toString()
+                conversation.stream(
+                    send = { callback -> conversation.sendMessageAsync(dialogue.last().second, callback) },
+                    wantMore = { reply.length < limit && !reply.isLooping() },
+                    onPiece = { piece ->
                         if (piece.isNotEmpty()) {
                             reply.append(piece)
                             restorer.push(piece).takeIf { it.isNotEmpty() }?.let { runCatching { onPiece(it) } }
                         }
-                    }
+                    },
+                )
             }
         } catch (e: kotlinx.coroutines.CancellationException) {
             throw e
@@ -187,6 +195,55 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         }
         val finalText = reply.withoutLoop()
         return restorer.restoreAll(finalText).trim()
+    }
+
+    /**
+     * Streams a reply and returns only when the native side has really finished. Stopping early (length limit, a loop,
+     * the user cancelling) asks the library to cancel and WAITS for its end before the conversation may be closed:
+     * closing it while it still decodes makes the native library write to freed memory and kills the whole app.
+     */
+    private suspend fun Conversation.stream(
+        send: (MessageCallback) -> Unit,
+        wantMore: () -> Boolean,
+        onPiece: (String) -> Unit,
+    ) {
+        val finished = CompletableDeferred<Throwable?>()
+        val stopping = AtomicBoolean(false)
+        val callback =
+            object : MessageCallback {
+                override fun onMessage(message: Message) {
+                    if (stopping.get()) return
+                    if (!wantMore()) {
+                        stopping.set(true)
+                        return
+                    }
+                    runCatching { onPiece(message.toString()) }
+                }
+
+                override fun onDone() {
+                    finished.complete(null)
+                }
+
+                override fun onError(throwable: Throwable) {
+                    finished.complete(throwable)
+                }
+            }
+        send(callback)
+        suspend fun waitForEnd() {
+            while (!finished.isCompleted) {
+                if (stopping.get()) runCatching { cancelProcess() }
+                withTimeoutOrNull(CANCEL_POLL_MS) { finished.await() }
+            }
+        }
+        try {
+            waitForEnd()
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            stopping.set(true)
+            withContext(NonCancellable) { waitForEnd() }
+            throw e
+        }
+        // After our own cancel the library may report the cancel as an error: that is not a failure.
+        finished.await()?.let { if (!stopping.get()) throw it }
     }
 
     private fun ensureLoaded(modelId: String, audio: Boolean = false): Engine {
@@ -359,6 +416,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
             "You are a speech-to-text engine. You write down exactly what is said in the recording, in the language " +
                 "that is spoken, with normal punctuation. You never answer, translate, explain or add anything."
         const val TRANSCRIBE_ASK = "Write down exactly what is said in this recording. Reply with the text only."
+        const val CANCEL_POLL_MS = 200L
         const val IDLE_UNLOAD_MS = 120_000L
         const val CONTEXT_SMALL = 8192
         const val CONTEXT_LARGE = 16384
