@@ -77,7 +77,7 @@
     <string name="ai_ago_h">%1$d h ago</string>
     <string name="ai_ago_min">%1$d min ago</string>
     <string name="ai_ago_now">just now</string>
-    <string name="ai_assistant_summary">Chat with an AI assistant without internet. Off by default.</string>
+    <string name="ai_assistant_summary">Chat with an AI assistant without internet. Experimental, off by default.</string>
     <string name="ai_assistant_title">Offline assistant</string>
     <string name="ai_assistant_unavailable">The assistant will be available once the Gemma model engine is added in an upcoming version.</string>
     <string name="ai_assistant_warning_title">Turn on the offline assistant?</string>
@@ -301,8 +301,8 @@
     <string name="assistant_dictate">Dictate</string>
     <string name="assistant_dictate_stop">Stop and insert</string>
     <string name="assistant_dictate_working">Turning speech into text…</string>
-    <string name="assistant_disclaimer">The assistant runs entirely on this device, without internet. Answers may be wrong — check important information.</string>
-    <string name="assistant_disclaimer_web">The assistant runs on this device, but internet access is ON: words it searches for are sent to a search engine. Answers may be wrong, so check important information.</string>
+    <string name="assistant_disclaimer">Experimental feature: correct answers are not guaranteed. The assistant runs entirely on this device, without internet; check important information.</string>
+    <string name="assistant_disclaimer_web">Experimental feature: correct answers are not guaranteed. The assistant runs on this device, but internet access is ON: words it searches for are sent to a search engine. Check important information.</string>
     <string name="assistant_empty_hint">The first answer takes longer because the model is loaded into memory.</string>
     <string name="assistant_error">Could not get an answer. Check that the device has enough free RAM.</string>
     <string name="assistant_go_to">Go to: %1$s</string>

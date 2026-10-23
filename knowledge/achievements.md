@@ -5,7 +5,7 @@ PL: Najważniejsze osiągnięcia projektu MT_SW (szczegóły: lista zmian aplika
 Aplikacja MT_SW_APP (Android i komputer), start forka w lipcu 2026:
 - Zdrowie sieci: zakładka z metrykami zasilania, sygnału, eteru, środowiska, ruchu i sąsiadów, z rankingami i danymi dekodowanymi na żywo z logu.
 - Mesh Link Planer: planer łącza i zasięgu (punkty A i B, model terenu, propagacja ITM, bilans łącza, profil terenu), także w integracji z Home Assistant.
-- Offline tłumacz i asystent AI, w całości na urządzeniu, bez internetu: tłumaczenie wiadomości, dyktowanie, czytanie na głos, przyciski pod odpowiedziami asystenta; internet dla asystenta tylko za zgodą użytkownika.
+- Offline tłumacz i asystent AI, w całości na urządzeniu, bez internetu: tłumaczenie wiadomości, dyktowanie, czytanie na głos, asystent sam otwiera mapę z węzłem, ustawienia, ekrany i planer łącza, gdy o to prosisz (nigdy nie zmienia ustawień i nie wysyła wiadomości); funkcja eksperymentalna; internet dla asystenta tylko za zgodą użytkownika.
 - Funkcje MT_SW: osobna grupa ustawień z rzeczami, których nie ma w oryginale, m.in. dodatkowe dane przy węzłach (czujniki, sygnał), dwa motywy czarno-białe, ręczne dodawanie kontaktu po ID, zdalne ulubione i ignorowanie, zdalne sterowanie GPIO, ostrzeżenia o paśmie wąskim.
 - Własna marka: MT_SW_APP, autorska ikona z konturem województwa, instaluje się obok oryginału, wersja na komputer.
 - Regularne scalanie z oryginalną aplikacją Meshtastic (np. widok AR sieci, podgląd 3D, kafelek szybkich ustawień), przy zachowaniu zgodności z główną siecią.
