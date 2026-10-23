@@ -48,7 +48,8 @@ internal object AssistantTopics {
             "węzł", "wezl", "node", "bateri", "najwięcej", "najwiecej", "ranking", "najbliż", "najdalej", "uptime",
             "pamięć", "pamiec", "heap", "cpu", "flash", "statystyk", "streść", "streszcz", "podsumuj", "hops", "przeskok",
             "ile ", "kto ", "który ", "ktory ", "jaka jest", "jaki jest", "jakie są", "how many", "which node", "weather",
-            "humidity", "pressure", "battery", "summar",
+            "humidity", "pressure", "battery", "summar", "ramek", "ramki", "najmniej", "najwyż", "najniż", "ostatnio słysz",
+            "offline", "nieaktyw", "wysłał", "wyslal", "odebrał", "odebral", "duplik", "kanał", "kanal",
         )
 
     private val GUIDE_WORDS =

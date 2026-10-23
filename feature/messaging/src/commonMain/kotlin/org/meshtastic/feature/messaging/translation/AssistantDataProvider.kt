@@ -51,6 +51,7 @@ class AssistantDataProvider(
         for (node in mentioned) parts += safe("node") { nodeDetail(node) }
         if (q.hasAny(SENSOR_WORDS)) parts += safe("sensors") { sensors() }
         if (q.hasAny(SIGNAL_WORDS)) parts += safe("signal") { signalRanking(q) }
+        if (q.hasAny(ACTIVITY_WORDS)) parts += safe("activity") { activity(q) }
         val network = q.hasAny(NODE_WORDS) || q.hasAny(TREND_WORDS) || q.hasAny(RANK_WORDS) || q.hasAny(SIGNAL_WORDS)
         if (network && (q.hasAny(RANK_WORDS) || q.hasAny(TREND_WORDS) || !q.hasAny(SIGNAL_WORDS))) {
             parts += safe("ranking") { ranking(q) }
@@ -77,6 +78,32 @@ class AssistantDataProvider(
             out.append(part.take(room - 2))
         }
         return out.toString()
+    }
+
+    /** True when the question names a topic the data parts know; a bare follow-up ("a jakie to wartości?") does not. */
+    fun hasTopic(question: String): Boolean {
+        val q = question.lowercase()
+        return mentionedNodes(q).isNotEmpty() ||
+            listOf(SENSOR_WORDS, SIGNAL_WORDS, NODE_WORDS, TREND_WORDS, RANK_WORDS, SETTINGS_WORDS, SUMMARY_WORDS, MESSAGE_WORDS, ACTIVITY_WORDS)
+                .any { q.hasAny(it) }
+    }
+
+    /** Who was heard most recently, or longest ago, written with exact ages. */
+    private fun activity(q: String): String {
+        val now = nowMillis / MILLIS_PER_SECOND
+        val me = nodeRepository.ourNodeInfo.value?.num
+        val nodes = nodeRepository.nodeDBbyNum.value.values.filter { it.num != me }
+        val oldFirst = q.hasAny(listOf("offline", "nieaktyw", "dawno", "najdłuż", "najduz", "milcz", "cisz", "zniknęł", "zniknel"))
+        val sorted = if (oldFirst) nodes.filter { it.lastHeard != 0 }.sortedBy { it.lastHeard } else nodes.sortedByDescending { it.lastHeard }
+        fun age(n: org.meshtastic.core.model.Node): String {
+            if (n.lastHeard == 0) return "never"
+            val min = ((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)
+            return if (min >= MINUTES_PER_DAY) "${min / MINUTES_PER_DAY} d ${(min % MINUTES_PER_DAY) / MINUTES_PER_HOUR} h ago" else if (min >= MINUTES_PER_HOUR) "${min / MINUTES_PER_HOUR} h ${min % MINUTES_PER_HOUR} min ago" else "$min min ago"
+        }
+        return buildString {
+            appendLine(if (oldFirst) "NODES NOT HEARD FOR THE LONGEST TIME (longest silence first):" else "NODES HEARD MOST RECENTLY (newest first):")
+            sorted.take(ACTIVITY_TOP).forEach { appendLine("- ${it.user.short_name} (${it.user.long_name}): heard ${age(it)}") }
+        }
     }
 
     /** Nodes whose long or short name appears in the question (the own node counts for words like "mój"). */
@@ -385,6 +412,9 @@ class AssistantDataProvider(
         val txKey = Key("packets sent (tx)", true) { it.tx?.toFloat() }
         val wantsTx = q.hasAny(listOf("wysł", "wysl", "nadan", " tx", "transmit", "sent"))
         val wantsRx = q.hasAny(listOf("odebr", "otrzym", "przyjęt", "przyjet", " rx", "receiv"))
+        // "najmniej / najniższy / najsłabszy" asks for the other end of the list.
+        val wantsLow = q.hasAny(listOf("najmniej", "najniż", "najniz", "najsłab", "najslab", "najgorz", "lowest", "least", "fewest", "worst"))
+        val wantsHigh = q.hasAny(listOf("najwięc", "najwiec", "najwyż", "najwyz", "najlepsz", "highest", "most ", "best"))
         val keys =
             when {
                 wantsTx && wantsRx -> listOf(rxKey, txKey)
@@ -396,6 +426,10 @@ class AssistantDataProvider(
                 q.hasAny(listOf("zajęt", "zajet", "kanał", "kanal", "channel", "utiliz")) -> listOf(Key("channel utilization percent", true) { it.chUtil })
                 q.hasAny(listOf("uptime", "działa od", "dziala od", "restart")) -> listOf(Key("uptime", true) { it.uptime?.toFloat() })
                 else -> listOf(rxKey)
+            }.map { k ->
+                // Battery is listed lowest first by default; everything else highest first.
+                val high = if (k.label.startsWith("battery")) wantsHigh && !wantsLow else !wantsLow
+                if (high == k.descending) k else k.copy(descending = high, label = k.label.replace(" (lowest first)", "").replace(" (highest first)", ""))
             }
         fun line(r: NodeRow): String {
             val n = nodeRepository.nodeDBbyNum.value[r.num]
@@ -412,8 +446,13 @@ class AssistantDataProvider(
             buildString {
                 appendLine(
                     "NODE RANKING by ${key.label}: ${sorted.size} of ${rows.size} nodes reported. Counters are the node's own totals " +
-                        "since it started. Every value in a line belongs to THAT node only. Best first:",
+                        "since it started. Every value in a line belongs to THAT node only. In this order:",
                 )
+                sorted.firstOrNull()?.let { top1 ->
+                    val n = nodeRepository.nodeDBbyNum.value[top1.num]
+                    val who = n?.let { "${it.user.short_name} (${it.user.long_name})" } ?: "!${top1.num.toUInt().toString(HEX)}"
+                    appendLine("FIRST IN THIS LIST: $who = ${fmt(key.pick(top1) ?: 0f)}")
+                }
                 sorted.take(limit).forEach { appendLine(line(it)) }
                 if (sorted.size > limit + RANK_BOTTOM) {
                     appendLine("... Last ones:")
@@ -431,8 +470,11 @@ class AssistantDataProvider(
         val byHops = nodes.groupingBy { it.hopsAway }.eachCount().toSortedMap().entries.joinToString { "${it.key}:${it.value}" }
         val low = nodes.filter { (it.deviceMetrics.battery_level ?: 100) in 1..LOW_BATTERY }.joinToString { it.user.short_name }
         val hardware = nodes.groupingBy { it.user.hw_model.toString() }.eachCount().entries.sortedByDescending { it.value }.take(HW_LIMIT).joinToString { "${it.key}:${it.value}" }
+        val roles = nodes.groupingBy { it.user.role.toString() }.eachCount().entries.sortedByDescending { it.value }.joinToString { "${it.key}:${it.value}" }
+        val favourites = nodes.filter { it.isFavorite }.joinToString { it.user.short_name }
+        val mqtt = nodes.count { it.viaMqtt }
         return "NETWORK SUMMARY: ${nodes.size} nodes known, $recent heard in the last 24 h. Nodes by hops away (hops:count): $byHops. " +
-            "Low battery (<= $LOW_BATTERY%): ${low.ifBlank { "none" }}. Hardware: $hardware."
+            "Low battery (<= $LOW_BATTERY%): ${low.ifBlank { "none" }}. Hardware: $hardware. Roles: $roles. Favourites: ${favourites.ifBlank { "none" }}. Heard via MQTT: $mqtt."
     }
 
     /** Every known node in a few characters, so the assistant knows the whole network and can ask for details. */
@@ -807,6 +849,8 @@ class AssistantDataProvider(
         val NODE_WORDS = listOf("węz", "wez", "node", "sąsiad", "sasiad", "zasięg", "zasieg", "sieć", "siec", "mesh", "snr", "rssi", "kto")
         val SENSOR_WORDS = listOf("pogod", "temperatur", "wilgot", "ciśnien", "cisnien", "weather", "humidity", "pressure", "wiatr", "wind", "deszcz", "rain", "powietrz", "air quality", "pm2", "czujnik", "sensor", "środowisk", "srodowisk", "environment", "natężen", "napięci", "prąd", "prad", "voltage", "current", "gleb", "soil", "pax", "lux", "światł")
         val SIGNAL_WORDS = listOf("zasięg", "zasieg", "sygnał", "sygnal", "snr", "rssi", "odległ", "odleg", "daleko", "dystans", "blisk", "najbliż", "najbliz", "jakość", "jakosc", "range", "signal", "distance", "linku", "łącz", "polacz")
+        val ACTIVITY_WORDS = listOf("ostatnio słysz", "ostatnio slysz", "kto ostatnio", "ostatnio odezw", "offline", "nieaktyw", "dawno", "milcz", "ostatni raz", "kiedy ostatnio", "najświeżs", "last heard", "zniknęł", "zniknel")
+        const val ACTIVITY_TOP = 10
         val RANK_WORDS = listOf("ramek", "ramki", "pakiet", "odebran", "raportuj", "najwięc", "najwiec", "najmniej", "ranking", "który", "ktory", "najlep", "najgorz")
         val MAIN_CHANNEL_WORDS = setOf("all", "wszyscy", "wszystkich", "główny", "glowny", "primary", "main", "kanał główny")
         val OWN_WORDS = listOf("mój", "moj", "mojego", "mojej", "mojemu", "my node", "own node", "mój węz", "moim")
