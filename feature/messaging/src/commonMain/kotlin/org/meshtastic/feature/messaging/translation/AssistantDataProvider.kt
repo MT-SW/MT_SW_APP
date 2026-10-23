@@ -20,6 +20,11 @@ import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.StringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.ai_net_roles
+import org.meshtastic.core.resources.ai_net_hops
+import org.meshtastic.core.resources.ai_net_low_battery
+import org.meshtastic.core.resources.ai_net_none
+import org.meshtastic.core.resources.ai_hops_direct
 import org.meshtastic.core.resources.ai_bat_line
 import org.meshtastic.core.resources.ai_bat_unknown
 import org.meshtastic.core.resources.ai_far_one
@@ -1422,6 +1427,26 @@ class AssistantDataProvider(
         val nowS = nowMillis / MILLIS_PER_SECOND
         val heard = if (node.lastHeard == 0) aiString(Res.string.ai_never) else ago(((nowS - node.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
         return aiString(Res.string.ai_bat_line, name, state, if (voltage > 0f) roundTo(voltage.toDouble(), 2) else aiString(Res.string.ai_none_value), heard)
+    }
+
+    /**
+     * A summary of the whole network written in code (a small model garbled the numbers when it retold them): the
+     * counts, how far the nodes are in hops, their roles and who is low on battery.
+     */
+    suspend fun networkOverview(): String {
+        val nodes = nodeRepository.nodeDBbyNum.value.values
+        val sb = StringBuilder(networkCount())
+        if (nodes.isEmpty()) return sb.toString()
+        val direct = aiString(Res.string.ai_hops_direct)
+        val hops =
+            nodes.filter { it.hopsAway >= 0 }.groupingBy { it.hopsAway }.eachCount().toSortedMap().entries
+                .joinToString(", ") { (h, c) -> "${if (h == 0) direct else h.toString()}: $c" }
+        val roles = nodes.groupingBy { it.user.role.toString() }.eachCount().entries.sortedByDescending { it.value }.joinToString(", ") { "${it.key}: ${it.value}" }
+        val low = nodes.filter { (it.deviceMetrics.battery_level ?: 100) in 1..LOW_BATTERY }.joinToString(", ") { it.user.long_name.ifBlank { it.user.short_name } }
+        if (hops.isNotBlank()) sb.append("\n• ").append(aiString(Res.string.ai_net_hops, hops))
+        sb.append("\n• ").append(aiString(Res.string.ai_net_roles, roles))
+        sb.append("\n• ").append(aiString(Res.string.ai_net_low_battery, LOW_BATTERY, low.ifBlank { aiString(Res.string.ai_net_none) }))
+        return sb.toString()
     }
 
     /** How many nodes are known, heard lately and heard directly: a short count instead of a long list. */

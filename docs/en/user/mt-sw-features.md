@@ -143,6 +143,8 @@ On weaker devices large models can slow the app down or close it, which is why e
 
 **The assistant goes where you ask.** When you write for example "show node Łysica on the map", "show the nearest router", "open the LoRa settings", "show the hop limit" or "do I have range to …", the app opens the map with the node marked, the right screen (the setting blinks yellow) or the link planner right away. "Write on channel … that …" opens the conversation with the text ready in the message box, and **you send it yourself**. The assistant never changes a setting and never sends a message. A button stays under the answer to go back there later.
 
+**Assistant test.** Type `/test` in the assistant and send it: the assistant asks itself about 40 test questions (with a real node and channel name from your network) and shows the questions and answers in the chat, and at the end a full report with answer times and the model used, which can be copied (press and hold the bubble). On a computer the report is also saved to `assistant-test-results.md`. This way answer quality can be compared across devices and models. Nothing opens by itself during the test; the "Stop" button ends it.
+
 **Translator:**
 
 - **Received messages** — the message menu has "Translate message". The original stays, and you can switch between it and the translation.
