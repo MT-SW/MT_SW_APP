@@ -38,9 +38,28 @@ class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : Assis
     private var cachedLanguage = ""
     private var cache: KnowledgeIndex? = null
 
-    override suspend fun lookup(question: String, maxChars: Int): String {
+    override suspend fun lookup(question: String, maxChars: Int): String = lookup(question, maxChars, null)
+
+    override suspend fun lookup(question: String, maxChars: Int, language: String?): String {
         if (question.isBlank()) return ""
-        return indexFor(languageOf(question)).lookup(question, maxChars)
+        return indexFor(language ?: languageOf(question)).lookup(question, maxChars)
+    }
+
+    override suspend fun coreFacts(language: String): String =
+        org.meshtastic.core.repository.knowledgeSection(readText("files/knowledge/core.md"), language)
+
+    private val stringsCache = HashMap<String, Map<String, String>>()
+
+    override suspend fun answerStrings(language: String): Map<String, String> = mutex.withLock {
+        stringsCache.getOrPut(language) { parseStrings(readText("files/assistant/strings-$language.xml")) }
+    }
+
+    private suspend fun readText(path: String): String = try {
+        Res.readBytes(path).decodeToString()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (_: Exception) {
+        ""
     }
 
     override suspend fun latestNews(maxChars: Int): String = indexFor(languageOf("")).latestNews(maxChars)
@@ -86,7 +105,17 @@ class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : Assis
         return currentLocaleTag().substringBefore('-').substringBefore('_').ifEmpty { "en" }
     }
 
-    private companion object {
+    companion object {
+        /** Reads `<string name="key">text</string>` lines of a strings file into a map of plain texts. */
+        fun parseStrings(xml: String): Map<String, String> =
+            STRING_LINE.findAll(xml).associate { m ->
+                m.groupValues[1] to
+                    m.groupValues[2].replace("\\'", "'").replace("\\\"", "\"").replace("&lt;", "<").replace("&gt;", ">")
+                        .replace("&amp;", "&").replace("\\n", "\n")
+            }
+
+        private val STRING_LINE = Regex("<string name=\"([^\"]+)\">(.*?)</string>")
+
         /** The other parts of the MT_SW project; kept apart from the user guide, so only the assistant sees them. */
         val PROJECT_FILES =
             listOf(

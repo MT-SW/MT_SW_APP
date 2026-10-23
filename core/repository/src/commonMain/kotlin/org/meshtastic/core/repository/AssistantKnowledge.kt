@@ -29,4 +29,23 @@ interface AssistantKnowledge {
 
     /** The newest entries of the change list, as plain text of at most [maxChars] characters, or empty. */
     suspend fun latestNews(maxChars: Int): String = ""
+
+    /** Like [lookup], but in the manual of [language] ("pl", "en"); null picks the language from the question. */
+    suspend fun lookup(question: String, maxChars: Int, language: String?): String = lookup(question, maxChars)
+
+    /** The short core facts about MT_SW (network settings, parts of the project) in [language], given with every answer. */
+    suspend fun coreFacts(language: String): String = ""
+
+    /** The assistant's own texts in [language] ("pl", "en") by resource key, or empty when not bundled. */
+    suspend fun answerStrings(language: String): Map<String, String> = emptyMap()
+}
+
+/** The "## PL" or "## EN" part of a two-language knowledge file (the whole text when it has no such parts). */
+fun knowledgeSection(text: String, language: String): String {
+    val marker = "## " + (if (language == "pl") "PL" else "EN")
+    val start = text.indexOf(marker)
+    if (start < 0) return text.trim()
+    val rest = text.substring(start + marker.length)
+    val end = rest.indexOf("\n## ")
+    return (if (end >= 0) rest.substring(0, end) else rest).trim()
 }

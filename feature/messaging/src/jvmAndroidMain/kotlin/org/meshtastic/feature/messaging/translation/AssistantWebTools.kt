@@ -78,10 +78,10 @@ class AssistantWebTools : ToolSet {
      * What was searched and read, as a hidden marker the chat shows as a small note under the answer ("answered with
      * help from the internet"); empty when the web was not used.
      */
-    fun footer(): String = synchronized(this) {
-        if (queries.isEmpty() && sources.isEmpty()) return ""
+    fun usage(): Pair<String, String>? = synchronized(this) {
+        if (queries.isEmpty() && sources.isEmpty()) return null
         val hosts = sources.map { WebAccess.hostOf(it).ifEmpty { it } }.distinct().take(MAX_SOURCES)
-        AssistantActions.encodeWeb(queries.distinct().joinToString("; ") { "\"$it\"" }, hosts.joinToString(", "))
+        queries.distinct().joinToString("; ") { "\"$it\"" } to hosts.joinToString(", ")
     }
 
     private companion object {

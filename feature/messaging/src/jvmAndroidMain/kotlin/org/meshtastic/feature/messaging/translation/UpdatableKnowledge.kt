@@ -51,6 +51,25 @@ class UpdatableKnowledge(
         return fromDownloaded.ifBlank { builtIn.lookup(question, maxChars) }
     }
 
+    override suspend fun lookup(question: String, maxChars: Int, language: String?): String {
+        if (uiPrefs.assistantInternetEnabled.value) withContext(Dispatchers.IO) { refreshIfDue() }
+        val downloaded = withContext(Dispatchers.IO) { loadIndex() }
+        return downloaded?.lookup(question, maxChars).orEmpty().ifBlank { builtIn.lookup(question, maxChars, language) }
+    }
+
+    /** The core facts: the copy downloaded from our repository when there is one (newer), else the built-in one. */
+    override suspend fun coreFacts(language: String): String {
+        val file = File(directory, "project/core.md")
+        val downloaded = withContext(Dispatchers.IO) { runCatching { if (file.exists()) file.readText() else "" }.getOrDefault("") }
+        return if (downloaded.isNotBlank()) {
+            org.meshtastic.core.repository.knowledgeSection(downloaded, language)
+        } else {
+            builtIn.coreFacts(language)
+        }
+    }
+
+    override suspend fun answerStrings(language: String): Map<String, String> = builtIn.answerStrings(language)
+
     override suspend fun latestNews(maxChars: Int): String {
         val downloaded = withContext(Dispatchers.IO) { loadIndex() }
         return downloaded?.latestNews(maxChars).orEmpty().ifBlank { builtIn.latestNews(maxChars) }
@@ -146,6 +165,7 @@ class UpdatableKnowledge(
         const val DAY_MS = 24L * 60 * 60 * 1000
         val PROJECT_SOURCES =
             listOf(
+                Triple("MT-SW/MT_SW_APP", "knowledge/core.md", "core"),
                 Triple("MT-SW/MT_SW_APP", "knowledge/project.md", "project"),
                 Triple("MT-SW/MT_SW_APP", "knowledge/achievements.md", "achievements"),
                 Triple("MT-SW/MT_SW_FIRMWARE", "README.md", "firmware"),
