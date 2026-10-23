@@ -45,7 +45,6 @@ class BusyTimeoutSQLiteDriver(
         val connection = delegate.open(fileName)
         try {
             connection.execSQL("PRAGMA busy_timeout = $busyTimeoutMs")
-            repairForkDatabase(connection)
         } catch (@Suppress("TooGenericExceptionCaught") setupFailure: Throwable) {
             // The platforms throw different exception types here (android.database.SQLException on
             // Android, androidx.sqlite.SQLiteException elsewhere); close the live native connection
@@ -56,42 +55,7 @@ class BusyTimeoutSQLiteDriver(
         return connection
     }
 
-    /**
-     * One-time repair of databases written by earlier builds of this fork, which used the original's version number
-     * 65 for their own schema (three extra indices on `log`, no `mqtt_roots_cache` table), and for a short time 66.
-     * Room would refuse such a file, so it is turned into exactly the original's version 65 before Room looks at it:
-     * the table is added, our indices are dropped and a 66 is put back to 65. Nothing else is touched, no data is lost,
-     * and a database that is already the original's 65 (or any other version) is left alone.
-     */
-    private fun repairForkDatabase(connection: SQLiteConnection) {
-        val version = connection.firstText("PRAGMA user_version")?.toIntOrNull() ?: return
-        if (version != 65 && version != 66) return
-        if (connection.firstText("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'log'") == null) return
-        connection.execSQL(
-            "CREATE TABLE IF NOT EXISTS `mqtt_roots_cache` " +
-                "(`id` INTEGER NOT NULL, `roots_json` TEXT NOT NULL, PRIMARY KEY(`id`))",
-        )
-        FORK_LOG_INDICES.forEach { connection.execSQL("DROP INDEX IF EXISTS `$it`") }
-        if (version == 66) {
-            connection.execSQL("UPDATE room_master_table SET identity_hash = '$HASH_V65' WHERE id = 42")
-            connection.execSQL("PRAGMA user_version = 65")
-        }
-    }
-
-    private fun SQLiteConnection.firstText(sql: String): String? =
-        prepare(sql).use { statement -> if (statement.step()) statement.getText(0) else null }
-
     companion object {
-        private val FORK_LOG_INDICES =
-            listOf(
-                "index_log_port_num_received_date",
-                "index_log_from_num_received_date",
-                "index_log_port_num_from_num_received_date",
-            )
-
-        /** Identity hash of the original's schema 65 (see `schemas/.../65.json`). */
-        private const val HASH_V65 = "39e2e089cce3fb07d5e659b49f585553"
-
         /**
          * Long enough to ride out a short write on another connection, short enough that a truly stuck holder still
          * surfaces as an error rather than an ANR-adjacent stall. Waiting happens on Room's I/O dispatcher, never the
