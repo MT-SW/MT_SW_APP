@@ -43,7 +43,6 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Asystent: opis sieci i własnego węzła po polsku, gdy użytkownik pisze po polsku (odległości w słowach zamiast par liczb, których model nie mieszał).
 * Asystent: zapis narzędzia wpisany tekstem bez nawiasów (np. „show_setting …”) też zmienia się w przycisk, a miejsce jest szukane najpierw po słowach użytkownika.
 * Asystent: **pamięć między rozmowami**: sam zapisuje krótkie notatki w kilku plikach (o Tobie, sprzęcie i sieci, stylu rozmowy, projektach), a Ty możesz je zobaczyć, poprawić, usunąć i wpisać własne instrukcje; przełącznik w ustawieniach asystenta, ostrzeżenie nad rozmową, wszystko tylko na urządzeniu.
-* Asystent odpowiada bardziej naturalnie, jak w zwykłej rozmowie, bez sztywnych zwrotów.
 * Czat: przyciski formatowania są w jednej linii z przyciskiem „Przetłumacz”, przy prawej krawędzi.
 * Czat: wiadomość podzielona na kilka części nie „podczepia się” już pod poprzedniego nadawcę (brak nazwy, połączone rogi, zły kolor); sąsiedzi wiadomości są liczeni tylko z widocznych dymków.
 * Asystent: węzeł rozpoznawany też po nazwie miejsca w innej odmianie („router na Łysicy”), pytanie o węzeł zawsze dostaje jego dane, a zapis „show_node_on_map” bez nazwy zmienia się w przycisk dla węzła z pytania.
@@ -413,7 +412,6 @@ The entries below describe only what this fork adds on top of the original, from
 * Assistant: the network and own-node description is written in Polish when the user writes Polish (distances in words instead of number pairs).
 * Assistant: a tool call written as plain text without brackets (e.g. "show_setting ...") also becomes a button, and the place is looked up from the user's own words first.
 * Assistant: **memory between conversations**: it saves short notes in several files (about you, devices and network, conversation style, projects) on its own, and you can view, edit and delete them and write your own instructions; a switch in the assistant settings, a notice above the conversation, everything stays on the device.
-* The assistant answers more naturally, like in a normal conversation, without stiff phrases.
 * Chat: the formatting buttons sit in the same line as the "Translate" button, at the right edge.
 * Chat: a message split into several parts no longer attaches itself to the previous sender (missing name, joined corners, wrong colour); neighbours are counted from the visible bubbles only.
 * Assistant: a node is also recognised by a place name in another Polish case ("router na Łysicy"), a question naming a node always gets its data, and a written "show_node_on_map" without a name becomes a button for the node in the question.
