@@ -56,7 +56,7 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
     fun rank_nodes(
         @ToolParam(description = "Metric to sort by") sort_by: String,
         @ToolParam(description = "How many nodes to return, 1 to 40") limit: Int,
-        @ToolParam(description = "Only nodes of this role: router, repeater, sensor, tracker, or empty for all") role: String,
+        @ToolParam(description = "Only nodes of this role: router, repeater, sensor, tracker, or the word all") role: String,
     ): String = run("rank_nodes") { data.toolList(sort_by, limit, role) }
 
     @Tool(
@@ -74,7 +74,7 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
         description =
         "The latest messages written on a channel, oldest first. Use it to summarise, describe or answer " +
             "questions about what is being said on a channel; it needs no keywords. Give the channel name or " +
-            "number, or an empty text for all channels.",
+            "number, or the word all for all channels.",
     )
     fun channel_messages(
         @ToolParam(description = "Channel name or number, or the word all for all channels") channel: String,
@@ -96,7 +96,7 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
 
     @Tool(
         description =
-        "FINDS and COUNTS nodes by filters (all optional, 0 or empty = ignore): heard in the last N hours, " +
+        "FINDS and COUNTS nodes by filters (all optional, 0 or the word all = ignore): heard in the last N hours, " +
             "hardware name, favourites only, battery at or below a percent, only nodes with a position. Use it for " +
             "questions like how many nodes were active today, which nodes are favourites, which are low on battery.",
     )
