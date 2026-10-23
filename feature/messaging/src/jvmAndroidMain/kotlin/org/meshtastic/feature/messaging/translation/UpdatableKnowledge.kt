@@ -53,8 +53,12 @@ class UpdatableKnowledge(
 
     override suspend fun lookup(question: String, maxChars: Int, language: String?): String {
         if (uiPrefs.assistantInternetEnabled.value) withContext(Dispatchers.IO) { refreshIfDue() }
+        // The manual built into this app first (a test build is newer than the repository); the downloaded copy
+        // fills in what the built-in one does not have.
+        val builtInText = builtIn.lookup(question, maxChars, language)
+        if (builtInText.isNotBlank()) return builtInText
         val downloaded = withContext(Dispatchers.IO) { loadIndex() }
-        return downloaded?.lookup(question, maxChars).orEmpty().ifBlank { builtIn.lookup(question, maxChars, language) }
+        return downloaded?.lookup(question, maxChars).orEmpty()
     }
 
     /** The core facts: the copy downloaded from our repository when there is one (newer), else the built-in one. */
@@ -71,8 +75,11 @@ class UpdatableKnowledge(
     override suspend fun answerStrings(language: String): Map<String, String> = builtIn.answerStrings(language)
 
     override suspend fun latestNews(maxChars: Int): String {
-        val downloaded = withContext(Dispatchers.IO) { loadIndex() }
-        return downloaded?.latestNews(maxChars).orEmpty().ifBlank { builtIn.latestNews(maxChars) }
+        val built = builtIn.latestNews(maxChars)
+        val downloaded = withContext(Dispatchers.IO) { loadIndex() }?.latestNews(maxChars).orEmpty()
+        // The downloaded list is used only when it already has the newest entry of the built-in one (so it is not older).
+        val newestBuilt = built.lines().firstOrNull { it.trim().startsWith("•") }?.trim().orEmpty()
+        return if (downloaded.isNotBlank() && (built.isBlank() || (newestBuilt.isNotEmpty() && downloaded.contains(newestBuilt)))) downloaded else built
     }
 
     private fun loadIndex(): KnowledgeIndex? {
