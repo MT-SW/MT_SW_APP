@@ -26,6 +26,8 @@ import org.jetbrains.compose.resources.StringResource
 import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.about
+import org.meshtastic.core.resources.ai_model_one_title
+import org.meshtastic.core.resources.node_color_pick
 import org.meshtastic.core.resources.ai_assistant_title
 import org.meshtastic.core.resources.translator_title
 import org.meshtastic.core.resources.auto_load_chat_images
@@ -352,6 +354,8 @@ class AssistantGuideTools(
                 Target("import_menu", "settings/mt-sw-features", Res.string.import_menu_in_top_bar, listOf("przycisk", "plus", "dodaj kontakt", "górn", "belk", "zasłania", "button", "top bar", "udostępnij węzeł")),
                 Target("theme", "settings", Res.string.theme, listOf("motyw", "theme", "ciemny", "jasny", "dark", "light", "tryb ciemny")),
                 Target("language", "settings", Res.string.preferences_language, listOf("język", "language", "jezyk")),
+                Target("node_color", "settings/security", Res.string.node_color_pick, listOf("kolor", "color", "colour", "barw")),
+                Target("ai_model", "settings/mt-sw-features", Res.string.ai_model_one_title, listOf("model ai", "wybór modelu", "wybor modelu", "model", "gemma", "nllb")),
                 Target("translator", "settings/mt-sw-features", Res.string.translator_title, listOf("tłumacz", "tlumacz", "translator", "tłumaczen", "tlumaczen", "translat")),
                 Target("assistant", "settings/mt-sw-features", Res.string.ai_assistant_title, listOf("asystent", "assistant", "model ai", "gemma", "sztuczn")),
                 Target("log_retention", "settings/mt-sw-features", Res.string.log_retention_days, listOf("ramk", "logi", "statystyk", "pamięt", "czas", "baz", "dni", "retention", "historia", "ile czasu")),

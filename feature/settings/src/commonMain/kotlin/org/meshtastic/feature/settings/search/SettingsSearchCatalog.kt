@@ -22,6 +22,8 @@ import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.navigation.WifiProvisionRoute
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.ai_model_one_title
+import org.meshtastic.core.resources.node_color_title
 import org.meshtastic.core.resources.about
 import org.meshtastic.core.resources.acknowledgements
 import org.meshtastic.core.resources.allStringResources
@@ -166,6 +168,8 @@ object SettingsSearchCatalog {
             Res.string.device_links to SettingsRoute.DeviceLinks,
             Res.string.debug_panel to SettingsRoute.DebugPanel,
             Res.string.log_retention_days to SettingsRoute.MtSwFeatures,
+            Res.string.node_color_title to SettingsRoute.Security,
+            Res.string.ai_model_one_title to SettingsRoute.MtSwFeatures,
             Res.string.about to SettingsRoute.About,
             Res.string.acknowledgements to SettingsRoute.Acknowledgements,
         )

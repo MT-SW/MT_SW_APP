@@ -175,8 +175,9 @@ internal fun Node.toNodeChip(): MapChipKey {
     return MapChipKey(
         // Matches NodeChip, which shows "???" rather than an empty badge for a node that has not sent a name yet.
         label = user.short_name.ifEmpty { UNNAMED_LABEL },
-        background = background,
-        foreground = foreground,
+        // The chip is drawn as a picture, so the black-and-white themes have to turn its colours grey here.
+        background = androidx.compose.ui.graphics.Color(background).monoSafe().toArgb(),
+        foreground = androidx.compose.ui.graphics.Color(foreground).monoSafe().toArgb(),
         struckThrough = isIgnored,
     )
 }
