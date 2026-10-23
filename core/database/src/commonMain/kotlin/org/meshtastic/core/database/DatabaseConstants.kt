@@ -33,7 +33,7 @@ object DatabaseConstants {
     // remains the escape hatch for users who need more (github.com/meshtastic/Meshtastic-Android/issues/6186).
     const val DEFAULT_CACHE_LIMIT: Int = 5
     const val MIN_CACHE_LIMIT: Int = 1
-    const val MAX_CACHE_LIMIT: Int = 30
+    const val MAX_CACHE_LIMIT: Int = 10
 
     const val LEGACY_DB_CLEANED_KEY: String = "legacy_db_cleaned"
 

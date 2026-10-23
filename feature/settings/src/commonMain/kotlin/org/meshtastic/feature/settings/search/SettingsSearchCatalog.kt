@@ -30,6 +30,7 @@ import org.meshtastic.core.resources.debug_panel
 import org.meshtastic.core.resources.device_links
 import org.meshtastic.core.resources.filter_settings
 import org.meshtastic.core.resources.node_layout_section_title
+import org.meshtastic.core.resources.log_retention_days
 import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.mt_sw_other_title
 import org.meshtastic.core.resources.auto_load_chat_images
@@ -162,6 +163,7 @@ object SettingsSearchCatalog {
             Res.string.filter_settings to SettingsRoute.FilterSettings,
             Res.string.device_links to SettingsRoute.DeviceLinks,
             Res.string.debug_panel to SettingsRoute.DebugPanel,
+            Res.string.log_retention_days to SettingsRoute.Settings(),
             Res.string.about to SettingsRoute.About,
             Res.string.acknowledgements to SettingsRoute.Acknowledgements,
         )

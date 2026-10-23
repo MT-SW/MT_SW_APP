@@ -151,6 +151,8 @@ On weaker devices large models can slow the app down or close it, which is why e
 
 **Dictation.** The "Dictate" button in the assistant works the same on phone and computer, without any system service: it records the microphone and a downloaded Gemma model (E2B or E4B) turns the speech into text entirely on the device. Tap "Dictate", speak (up to about 30 seconds) and tap "Stop and insert". The phone asks for microphone permission on first use. The button appears only once an E2B or E4B model is downloaded.
 
+**How long to remember received packets.** The Settings have a field with a number of days (1, 2, 3, 7, 14, 30 or 60) for which the app keeps the received packets that statistics and charts are built from. The default is 60 days. Older packets are deleted. The history of each device is kept separately.
+
 **Node colour picker.** The key colour dialog lets you pick any colour (code, hue/saturation/brightness sliders, or ready colours and recently used ones), choose "Fast" (up to 20 s, similar colour) or "Precise" (up to 3 min, very close colour), see the search time, cancel the search and compare the chosen colour with the result. The key is not saved automatically.
 
 **Model licences.** The models are not part of the app: you download them from the internet and use them at your own responsibility, under their licences.
