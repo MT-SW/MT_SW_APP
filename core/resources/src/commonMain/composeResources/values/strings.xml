@@ -1628,6 +1628,8 @@
     <string name="mt_sw_features_title">MT_SW features</string>
     <string name="mt_sw_other_calls_body">In the node details (Administration → On-demand diagnostics) you can ask any node in range for its current statistics instead of waiting for periodic broadcasts.</string>
     <string name="mt_sw_other_calls_title">On-demand diagnostics</string>
+    <string name="mt_sw_other_contacts_body">On the node list, the button in the corner has "Add contact": you type a node ID (for example !a1b2c3d4) and a name, and the node is saved in your own device. In the node details (Administration → Add a contact remotely) the same can be done on a remote device over the mesh.</string>
+    <string name="mt_sw_other_contacts_title">Adding a contact by ID</string>
     <string name="mt_sw_other_full_doc">Full description of MT_SW features</string>
     <string name="mt_sw_other_gpio_body">In the node details (Remote Hardware) you enter a pin number and switch it on, off or read it on a remote node over the mesh.</string>
     <string name="mt_sw_other_gpio_title">Remote GPIO</string>
