@@ -212,7 +212,13 @@ class LlamaAssistantService(
                     }
                 "traceroute" -> exact(routeOrUnknown(intent, nodeNum) { data.toolTraceroutes(it, LIST_SHOWN) })
                 "neighbors" -> exact(routeOrUnknown(intent, nodeNum) { data.toolNeighbors(it, LIST_SHOWN) })
-                "network_question" -> if (intent.topic == "radio") exact(data.radioStats()) else null
+                "network_question" ->
+                    when {
+                        intent.topic == "radio" -> exact(data.radioStats())
+                        // Battery questions are answered from the node's own reading, never retold by the model.
+                        intent.metric == "battery" || BATTERY_WORDS.containsMatchIn(question.lowercase()) -> exact(data.nodeBattery(nodeNum))
+                        else -> null
+                    }
                 "messages_to_me" -> exact(data.recentToMe(LIST_SHOWN))
                 "app_status" -> exact(data.toolAppStatus())
                 "waypoints" -> exact(data.toolWaypoints(LIST_SHOWN))
@@ -593,6 +599,7 @@ class LlamaAssistantService(
         /** Answers about the app, the user's data or the web stick closer to the given text with a lower randomness. */
         const val FACT_TEMPERATURE = 0.25f
         const val WEB_QUERY_CHARS = 120
+        val BATTERY_WORDS = Regex("bateri|akumulator|battery")
         const val MANUAL_CHARS = 1000
         const val NEWS_CHARS = 1600
         const val HELP_LINES = 3

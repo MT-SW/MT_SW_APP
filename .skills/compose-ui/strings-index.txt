@@ -60,6 +60,8 @@ ai_assistant_summary
 ai_assistant_title
 ai_assistant_unavailable
 ai_assistant_warning_title
+ai_bat_line
+ai_bat_unknown
 ai_battery_ext
 ai_battery_pct
 ai_battery_unknown

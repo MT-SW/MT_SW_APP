@@ -199,6 +199,7 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
                 "przez które węzły idą pakiety do Łysicy? -> {\"intent\":\"traceroute\",\"node\":\"Łysica\"}\n" +
                 "czy jestem połączony z radiem? -> {\"intent\":\"app_status\"}\n" +
                 "pokaż statystyki mojego radia -> {\"intent\":\"network_question\",\"topic\":\"radio\"}\n" +
+                "jaki jest poziom baterii mojego węzła? -> {\"intent\":\"network_question\",\"node\":\"me\",\"metric\":\"battery\",\"topic\":\"node\"}\n" +
                 "jak się czuje mój węzeł? -> {\"intent\":\"network_question\",\"node\":\"me\",\"topic\":\"node\"}\n" +
                 "który węzeł odebrał najwięcej pakietów? -> {\"intent\":\"network_question\",\"metric\":\"rx\",\"topic\":\"ranking\"}\n" +
                 "show me the nearest node -> {\"intent\":\"nearest_node\",\"metric\":\"nearest\"}"

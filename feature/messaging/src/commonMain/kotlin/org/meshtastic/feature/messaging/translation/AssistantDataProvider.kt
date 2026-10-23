@@ -20,6 +20,8 @@ import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.StringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
+import org.meshtastic.core.resources.ai_bat_line
+import org.meshtastic.core.resources.ai_bat_unknown
 import org.meshtastic.core.resources.ai_far_one
 import org.meshtastic.core.resources.ai_near_one
 import org.meshtastic.core.resources.ai_dist_next
@@ -1404,6 +1406,22 @@ class AssistantDataProvider(
             sb.append("\n• ").append(who).append(", ").append(ago(((now - time) / MILLIS_PER_MINUTE).coerceAtLeast(0))).append(": ").append(text)
         }
         return sb.toString()
+    }
+
+    /** The battery of one node (the own one when [num] is null), exactly as the node reported it. */
+    suspend fun nodeBattery(num: Int?): String {
+        val own = nodeRepository.ourNodeInfo.value
+        val n = (num?.let { nodeRepository.nodeDBbyNum.value[it] } ?: own) ?: return getStringSuspend(Res.string.ai_radio_none)
+        // The own node's newest values live in its own record, which the app refreshes first.
+        val node = if (own != null && n.num == own.num) own else n
+        val name = node.user.long_name.ifBlank { node.user.short_name }
+        val level = node.deviceMetrics.battery_level ?: 0
+        val voltage = node.deviceMetrics.voltage ?: 0f
+        if (level <= 0 && voltage <= 0f) return getStringSuspend(Res.string.ai_bat_unknown, name)
+        val state = if (level > 100) getStringSuspend(Res.string.ai_battery_ext) else getStringSuspend(Res.string.ai_battery_pct, level)
+        val nowS = nowMillis / MILLIS_PER_SECOND
+        val heard = if (node.lastHeard == 0) getStringSuspend(Res.string.ai_never) else ago(((nowS - node.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+        return getStringSuspend(Res.string.ai_bat_line, name, state, if (voltage > 0f) roundTo(voltage.toDouble(), 2) else getStringSuspend(Res.string.ai_none_value), heard)
     }
 
     /** How many nodes are known, heard lately and heard directly: a short count instead of a long list. */
