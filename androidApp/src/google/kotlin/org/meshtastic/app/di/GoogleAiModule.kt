@@ -114,8 +114,9 @@ class GoogleAiModule {
         radioConfigRepository: RadioConfigRepository,
         meshLogRepository: MeshLogRepository,
         packetRepository: PacketRepository,
+        connection: org.meshtastic.core.repository.ConnectionStateProvider,
     ): AssistantDataProvider =
-        AssistantDataProvider(nodeRepository, radioConfigRepository, meshLogRepository, packetRepository)
+        AssistantDataProvider(nodeRepository, radioConfigRepository, meshLogRepository, packetRepository, connection)
 
     @Single
     fun assistantMemory(context: Context): AssistantMemory = FileAssistantMemory(File(context.filesDir, "assistant-memory"))

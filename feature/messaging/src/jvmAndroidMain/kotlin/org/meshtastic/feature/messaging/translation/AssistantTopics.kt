@@ -60,7 +60,7 @@ internal object AssistantTopics {
             "humidity", "pressure", "battery", "summar", "ramek", "ramki", "najmniej", "najwyż", "najniż", "ostatnio słysz",
             "offline", "nieaktyw", "wysłał", "wyslal", "odebrał", "odebral", "duplik", "kanał", "kanal", "wiadomo", "message",
             "napisa", "pisał", "pisal", "czat", "rozmow", "ulubion", "aktywn", "dzisiaj", "wczoraj", "traceroute", "trasa", "trasy",
-            "sąsiad", "sasiad", "neighbo", "route", "kogo słyszy", "kogo slyszy",
+            "nieprzeczyta", "unread", "połączon", "dostarczon", "doszła", "waypoint", "znacznik", "pinezk", "sąsiad", "sasiad", "neighbo", "route", "kogo słyszy", "kogo slyszy",
         )
 
     private val GUIDE_WORDS =

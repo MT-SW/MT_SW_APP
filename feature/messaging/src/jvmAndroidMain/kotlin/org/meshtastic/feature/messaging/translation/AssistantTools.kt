@@ -129,6 +129,17 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
         @ToolParam(description = "How many nodes, 1 to 40") limit: Int,
     ): String = run("neighbors") { data.toolNeighbors(node, limit) }
 
+    @Tool(
+        description =
+        "App status: connection to the radio, UNREAD messages per conversation and whether the user's newest " +
+            "own messages were delivered, are waiting or failed.",
+    )
+    fun app_status(): String = run("app_status") { data.toolAppStatus() }
+
+    @Tool(description = "The waypoints (map pins with a name and place) the app has saved.")
+    fun waypoints(@ToolParam(description = "How many, 1 to 40") limit: Int): String =
+        run("waypoints") { data.toolWaypoints(limit) }
+
     @Tool(description = "The latest direct (private) messages exchanged with one node, oldest first.")
     fun direct_messages(
         @ToolParam(description = "Node short or long name") node: String,
