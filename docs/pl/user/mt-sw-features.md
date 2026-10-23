@@ -124,7 +124,7 @@ Aplikacja ma dwie opcjonalne funkcje AI, które działają **w całości na Twoi
 
 **Prywatność.** Wszystko jest przetwarzane lokalnie. Po pobraniu modelu żadne teksty ani rozmowy nie są wysyłane do internetu. Internet jest potrzebny tylko do jednorazowego pobrania modelu.
 
-**Modele.** Na liście są cztery modele w trzech poziomach. Gemma 4 działa na silniku Google LiteRT-LM i używa układu graficznego (GPU), gdy urządzenie go obsługuje; w przeciwnym razie liczy procesor. Możesz mieć pobranych kilka naraz, każdy pobierasz i usuwasz osobno, a w jednym miejscu, „Model AI (asystent, tłumacz i dyktowanie)”, wybierasz jeden model do wszystkiego. W pamięci jest zawsze tylko ten jeden model. Lekki NLLB umie tylko tłumaczyć, więc można go wybrać tylko przy wyłączonym asystencie.
+**Modele.** Na liście są cztery modele w trzech poziomach. Gemma 4 działa na silniku Google LiteRT-LM i używa układu graficznego (GPU), gdy urządzenie go obsługuje; w przeciwnym razie liczy procesor. Możesz mieć pobranych kilka naraz, każdy pobierasz i usuwasz osobno, a w jednym miejscu, „Model AI (asystent, tłumacz i dyktowanie)”, wybierasz jeden model do wszystkiego. W pamięci jest zawsze tylko ten jeden model. Lekki NLLB umie tylko tłumaczyć: gdy wybierzesz go przy włączonym asystencie, aplikacja ostrzeże, że to wyłączy asystenta i dyktowanie, i dopiero po potwierdzeniu wyłączy asystenta.
 
 - **Lekki — NLLB-200 600M.** Tylko tłumacz. Pobranie ok. 870 MB, pamięć RAM ok. 2,3 GB, zalecany telefon od 4 GB RAM.
 - **Lekki — Gemma 4 E2B.** Tłumacz i asystent w jednym pliku. Pobranie ok. 2,6 GB, RAM ok. 3,5 GB, telefon od 6 GB RAM.

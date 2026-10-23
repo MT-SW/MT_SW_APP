@@ -137,6 +137,9 @@ ai_model_roles_both
 ai_model_roles_translator
 ai_model_soon
 ai_model_specs
+ai_model_translate_only_body
+ai_model_translate_only_confirm
+ai_model_translate_only_title
 ai_model_translator_title
 ai_models_title
 ai_more

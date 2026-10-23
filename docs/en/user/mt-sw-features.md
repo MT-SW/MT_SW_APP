@@ -124,7 +124,7 @@ The app has two optional AI features that run **entirely on your device, without
 
 **Privacy.** Everything is processed locally. Once a model is downloaded, no texts or conversations are sent to the internet. The internet is only needed for the one-time model download.
 
-**Models.** There are four models in three levels. Gemma 4 runs on Google's LiteRT-LM engine and uses the graphics chip (GPU) when the device supports it; otherwise the processor does the work. You can keep several downloaded at once, download and delete each one separately, and in one place, "AI model (assistant, translator and dictation)", choose one model for everything. Only that one model is in memory. The light NLLB model can only translate, so it can be chosen only while the assistant is off.
+**Models.** There are four models in three levels. Gemma 4 runs on Google's LiteRT-LM engine and uses the graphics chip (GPU) when the device supports it; otherwise the processor does the work. You can keep several downloaded at once, download and delete each one separately, and in one place, "AI model (assistant, translator and dictation)", choose one model for everything. Only that one model is in memory. The light NLLB model can only translate: choosing it while the assistant is on shows a warning that this turns off the assistant and dictation, and the assistant is turned off only after you confirm.
 
 - **Light — NLLB-200 600M.** Translator only. Download about 870 MB, RAM about 2.3 GB, a phone with at least 4 GB of RAM is recommended.
 - **Light — Gemma 4 E2B.** Translator and assistant in one file. Download about 2.6 GB, RAM about 3.5 GB, a phone with at least 6 GB of RAM.

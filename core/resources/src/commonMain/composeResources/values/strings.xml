@@ -155,12 +155,15 @@ The lengths are already shortened by about 5% for a wire element; fine-tune them
     <string name="ai_model_download">Download</string>
     <string name="ai_model_failed">Download failed. Try again.</string>
     <string name="ai_model_none_ready">No model downloaded. Download one of the models above.</string>
-    <string name="ai_model_one_note">One model does everything and only it is kept in memory. The light NLLB model can only translate, so it can be chosen only while the assistant is off.</string>
+    <string name="ai_model_one_note">One model does everything and only it is kept in memory. The light NLLB model can only translate: choosing it turns off the assistant (you will be asked first).</string>
     <string name="ai_model_one_title">AI model (assistant, translator and dictation)</string>
     <string name="ai_model_roles_both">Translator and assistant</string>
     <string name="ai_model_roles_translator">Translator only</string>
     <string name="ai_model_soon">Coming soon</string>
     <string name="ai_model_specs">Download about %1$d MB · RAM about %2$d MB · recommended device from %3$d GB of RAM</string>
+    <string name="ai_model_translate_only_body">%1$s can only translate. Choosing it turns off the assistant and dictation; only the translator keeps working. To use the assistant again, choose a Gemma model and switch the assistant on.</string>
+    <string name="ai_model_translate_only_confirm">Choose and turn off the assistant</string>
+    <string name="ai_model_translate_only_title">Turn off the assistant?</string>
     <string name="ai_model_translator_title">Model used for translation</string>
     <string name="ai_models_title">Models</string>
     <string name="ai_more">… and %1$d more</string>

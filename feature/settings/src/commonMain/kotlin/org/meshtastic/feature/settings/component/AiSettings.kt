@@ -78,6 +78,9 @@ import org.meshtastic.core.resources.ai_model_soon
 import org.meshtastic.core.resources.ai_model_specs
 import org.meshtastic.core.resources.ai_models_title
 import org.meshtastic.core.resources.ai_model_one_note
+import org.meshtastic.core.resources.ai_model_translate_only_body
+import org.meshtastic.core.resources.ai_model_translate_only_confirm
+import org.meshtastic.core.resources.ai_model_translate_only_title
 import org.meshtastic.core.resources.ai_model_one_title
 import org.meshtastic.core.resources.ai_privacy
 import org.meshtastic.core.resources.ai_warning_body
@@ -112,6 +115,8 @@ internal fun AiSettings() {
     val internetOn by uiPrefs.assistantInternetEnabled.collectAsStateWithLifecycle()
     var askInternet by remember { mutableStateOf(false) }
     var pending by remember { mutableStateOf<PendingSwitch?>(null) }
+    // A translation-only model picked while the assistant is on: asked first, because it turns the assistant off.
+    var translateOnlyPick by remember { mutableStateOf<AiModelInfo?>(null) }
 
     fun isReady(id: String) = states[id] == TranslatorModelState.Ready
 
@@ -174,6 +179,29 @@ internal fun AiSettings() {
 
     if (assistantOn && assistantPossible) AssistantMemorySettings()
 
+    translateOnlyPick?.let { model ->
+        AlertDialog(
+            onDismissRequest = { translateOnlyPick = null },
+            title = { Text(stringResource(Res.string.ai_model_translate_only_title)) },
+            text = { Text(stringResource(Res.string.ai_model_translate_only_body, model.name)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        translateOnlyPick = null
+                        // Really off: the assistant switch goes off and the translator uses the chosen model.
+                        uiPrefs.setAssistantEnabled(false)
+                        uiPrefs.setTranslatorModelId(model.id)
+                    },
+                ) {
+                    Text(stringResource(Res.string.ai_model_translate_only_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { translateOnlyPick = null }) { Text(stringResource(Res.string.translator_cancel)) }
+            },
+        )
+    }
+
     if (askInternet) {
         AlertDialog(
             onDismissRequest = { askInternet = false },
@@ -210,15 +238,20 @@ internal fun AiSettings() {
         // One model for everything (assistant, translator, dictation): only one is ever in memory. While the assistant
         // is on, only models that can also be the assistant are offered; NLLB (translation only) needs it off.
         val choices =
-            AiModels.all.filter { isReady(it.id) && (it.canDo(AiRole.ASSISTANT) || (!assistantOn && it.canDo(AiRole.TRANSLATOR))) }
+            AiModels.all.filter { isReady(it.id) && (it.canDo(AiRole.ASSISTANT) || (translatorOn && it.canDo(AiRole.TRANSLATOR))) }
         val chosenId = if (assistantOn) assistantModelId else translatorModelId
         ModelChoice(
             title = stringResource(Res.string.ai_model_one_title),
             models = choices,
             selectedId = chosenId,
             onSelect = { id ->
-                uiPrefs.setTranslatorModelId(id)
-                if (AiModels.byId(id)?.canDo(AiRole.ASSISTANT) == true) uiPrefs.setAssistantModelId(id)
+                val model = AiModels.byId(id)
+                if (assistantOn && model != null && !model.canDo(AiRole.ASSISTANT)) {
+                    translateOnlyPick = model
+                } else {
+                    uiPrefs.setTranslatorModelId(id)
+                    if (model?.canDo(AiRole.ASSISTANT) == true) uiPrefs.setAssistantModelId(id)
+                }
             },
         )
         // Keeps the two stored choices equal, also for choices made before there was one list.

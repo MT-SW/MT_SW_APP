@@ -23,7 +23,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Tłumacz i asystent są oznaczone jako **funkcja eksperymentalna**: nie gwarantujemy poprawności działania.
 * Asystent: komenda **`/test`** na stałe — sama zadaje pytania testowe i daje raport do skopiowania (na komputerze także plik), żeby porównać odpowiedzi na różnych urządzeniach i modelach. Podsumowanie sieci i długości anten liczy program.
 * Dyktowanie: przełącznik **„Mikrofon słuchawki przy dyktowaniu”** — z podłączoną słuchawką (Bluetooth, przewodową, USB) dyktowanie wszędzie w aplikacji nagrywa z jej mikrofonu.
-* **Jeden model AI** dla asystenta, tłumacza i dyktowania, wybierany w jednym miejscu (NLLB tylko przy wyłączonym asystencie).
+* **Jeden model AI** dla asystenta, tłumacza i dyktowania, wybierany w jednym miejscu (wybór NLLB, który tylko tłumaczy, po ostrzeżeniu i potwierdzeniu wyłącza asystenta).
 * Funkcje MT_SW: skrót do **wyboru koloru węzła** (przycisk w ustawieniach bezpieczeństwa mruga); przycisk ma nazwę w języku aplikacji.
 * Motywy czarno-białe: znaczniki węzłów na mapie (dymki z nazwami) też są szare.
 * Asystent zna ustawienia naszej sieci (preset Narrow Fast, region EU_N_868, 869,44165 MHz), odpowiada na dwa pytania w jednym, liczy długości anten z częstotliwości.
@@ -413,7 +413,7 @@ The entries below describe only what this fork adds on top of the original, from
 * The translator and the assistant are marked as an **experimental feature**: correct operation is not guaranteed.
 * Assistant: a permanent **`/test`** command — it asks the test questions by itself and gives a report to copy (on a computer also a file), to compare answers across devices and models. The network summary and antenna lengths are worked out by the app.
 * Dictation: a **"Headset microphone for dictation"** switch — with a headset connected (Bluetooth, wired, USB) dictation everywhere in the app records from its microphone.
-* **One AI model** for the assistant, the translator and dictation, chosen in one place (NLLB only while the assistant is off).
+* **One AI model** for the assistant, the translator and dictation, chosen in one place (choosing NLLB, which only translates, turns the assistant off after a warning and confirmation).
 * MT_SW features: a shortcut to **picking the node colour** (the button in the security settings blinks); the button is named in the app's language.
 * Black-and-white themes: node markers on the map (the name bubbles) are grey too.
 * The assistant knows our network's settings (Narrow Fast preset, EU_N_868 region, 869.44165 MHz), answers two questions asked in one, works out antenna lengths from the frequency.
