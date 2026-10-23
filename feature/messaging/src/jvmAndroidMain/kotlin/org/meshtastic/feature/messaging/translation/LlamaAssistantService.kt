@@ -246,7 +246,8 @@ class LlamaAssistantService(
         const val SHORT_CONTEXT_CHARS = 800
         const val AUTO_CONTEXT_CHARS = 1200
         const val DATA_INTRO =
-            "Below is live read-only data from the user's app and radio. Use it to answer questions about their " +
+            "Below is live read-only data from the user's app and radio. Use it ONLY when the question asks about their " +
+                "own network or device; otherwise ignore it completely and never dump it. " +
                 "own network and device. heap is the USED internal RAM of the radio node in percent (not the phone); high means the memory is nearly full. " +
                 "Copy every number and unit exactly as it appears in the data (keep the decimal point and the minus " +
                 "sign, never combine or change digits); keep the units that stand next to the values (for example °C, %, hPa, V) " +
@@ -274,6 +275,10 @@ class LlamaAssistantService(
                 "an open-source LoRa mesh radio network that works without internet. " +
                 "Answer in the language the user writes in (usually Polish), briefly and in simple words. " +
                 "Help with Meshtastic, radio settings, antennas, range, nodes, channels and the app. " +
-                "If you are not sure of something, say so instead of guessing. Never invent settings or menu names."
+                "If you are not sure of something, say so instead of guessing. Never invent settings or menu names. " +
+                "When the user says \"our project\", \"nasz projekt\" or asks about goals, assumptions or achievements, they mean the MT_SW fork, " +
+                "not the main Meshtastic project: answer only from the manual and change list about MT_SW features. " +
+                "Mention the main Meshtastic project only briefly and rarely, unless the user asks about it directly. " +
+                "Never list network data (nodes, packets) unless the question asks for it."
     }
 }

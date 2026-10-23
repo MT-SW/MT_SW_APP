@@ -38,6 +38,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Pamięć heap i PSRAM są wszędzie pokazywane jako **zajęte** (a nie wolna): lista węzłów, wykresy zasobów, zdrowie sieci, widżet, powiadomienie, podgląd pakietów, zapis zdalny i asystent. Np. 10% wolnego to teraz 90% zajętego.
 * Naprawa zamykania się aplikacji na telefonie przy użyciu tłumacza (po optymalizacji wersji release brakowało klas biblioteki ONNX).
 * Asystent: dane z czujników i zasięgu trafiają do modelu w czytelnej, ułożonej postaci (z jednostkami, pominięte niemożliwe wartości); zawsze odpowiada model, nic nie jest odpowiadane na sztywno.
+* Asystent: pytania o „nasz projekt”, założenia i osiągnięcia dotyczą MT_SW (z dokumentacji i listy zmian), a główny Meshtastic wspomina tylko krótko, chyba że ktoś o niego zapyta; dane o sieci są dołączane tylko wtedy, gdy pytanie ich dotyczy.
 * Asystent: odczyty czujników, które nie mogą być prawdziwe (np. temperatura 25252 °C), są oznaczane jako „prawdopodobnie uszkodzony czujnik”, a odpowiedź, która zaczyna się powtarzać w kółko, jest przerywana po pierwszym razie.
 **Scalenie z oryginałem — wersja 2.8.4 (początek)**
 * Scalenie z oryginałem po wydaniu 2.8.3: numer wersji aplikacji 2.8.4, nowsze protobufy (2.8.1.18), odświeżone dane o sprzęcie i firmware, tłumaczenia i zrzuty ekranu sklepów. Biblioteka Bluetooth Kable zostaje przypięta do 0.44.3, a nasze tłumaczenia PL bez zmian.
@@ -397,6 +398,7 @@ The entries below describe only what this fork adds on top of the original, from
 * Option to move the add / share button from over the node and conversation lists to the top bar (off by default).
 * Assistant: more reliable answers about the network: follow-up questions reuse the previous topic, rankings of received and sent packets (highest or lowest), who was heard last or is silent for longest, roles and favourites.
 * **Dictation** in the assistant works the same on phone and computer, without system services: microphone + Gemma E2B/E4B model, entirely on the device. Microphone also in chats (channels, direct messages) and in the translator; shown only with the assistant on and a hearing model chosen.
+* Assistant: questions about "our project", goals and achievements are answered about MT_SW (from the manual and change list); the main Meshtastic is mentioned only briefly unless asked; network data is attached only when the question is about it.
 * How long received packets (logs) are remembered: a choice in days from 1 to 60 (1, 2, 3, 7, 14, 30, 60) instead of one hour to one year, also in the regular Settings; an earlier choice is kept until you pick a new one.
 * By default the app now remembers received packets for **60 days**, and the list of recent Wi-Fi addresses holds up to **30** entries.
 * Assistant: when a small model writes a tool call as plain text instead of using the tool, it is turned into a real "Go to" button; the note above the chat tells the truth about whether internet access for the assistant is on.

@@ -35,12 +35,21 @@ internal object AssistantTopics {
         val q = " " + question.lowercase() + " "
         val data = DATA_WORDS.any { q.contains(it) }
         val guide = GUIDE_WORDS.any { q.contains(it) }
+        // A question about the project itself is answered from the manual and change list, never from live data.
+        if (PROJECT_WORDS.any { q.contains(it) }) return AssistantTopic.GUIDE
         return when {
             data && !guide -> AssistantTopic.DATA
             guide && !data -> AssistantTopic.GUIDE
             else -> AssistantTopic.MIXED
         }
     }
+
+    private val PROJECT_WORDS =
+        listOf(
+            "projekt", "założeni", "zalozeni", "osiągni", "osiagni", "bazuje", "mt_sw", "mt sw", "mtsw", "fork",
+            "czym się różni", "czym sie rozni", "co dodaliśmy", "co dodalismy", "nasz cel", "nasze cele", "our project",
+            "achievement",
+        )
 
     private val DATA_WORDS =
         listOf(

@@ -45,6 +45,8 @@ class AssistantDataProvider(
     /** A text with the data that is useful for answering [question], or an empty text when nothing matches. */
     suspend fun contextFor(question: String, maxChars: Int = MAX_CONTEXT_CHARS): String {
         val q = question.lowercase()
+        // No data topic in the question: no data at all, so the model has nothing to dump into an unrelated answer.
+        if (!hasTopic(question)) return ""
         val mentioned = mentionedNodes(q)
         // Most useful parts first: the model only fits about 4000 tokens, so later parts are cut when space runs out.
         val parts = ArrayList<String>()
@@ -868,7 +870,7 @@ class AssistantDataProvider(
         val SETTINGS_WORDS =
             listOf("ustawien", "konfig", "setting", "config", "region", "preset", "kanał", "kanal", "channel", "lora",
                 "rola", "role", "moc", "power", "wifi", "bluetooth", "mqtt", "hop")
-        val NODE_WORDS = listOf("węz", "wez", "node", "sąsiad", "sasiad", "zasięg", "zasieg", "sieć", "siec", "mesh", "snr", "rssi", "kto")
+        val NODE_WORDS = listOf("węz", "wez", "node", "sąsiad", "sasiad", "zasięg", "zasieg", "sieć", "mesh", "snr", "rssi")
         val SENSOR_WORDS = listOf("pogod", "temperatur", "wilgot", "ciśnien", "cisnien", "weather", "humidity", "pressure", "wiatr", "wind", "deszcz", "rain", "powietrz", "air quality", "pm2", "czujnik", "sensor", "środowisk", "srodowisk", "environment", "natężen", "napięci", "prąd", "prad", "voltage", "current", "gleb", "soil", "pax", "lux", "światł")
         val SIGNAL_WORDS = listOf("zasięg", "zasieg", "sygnał", "sygnal", "snr", "rssi", "odległ", "odleg", "daleko", "dystans", "blisk", "najbliż", "najbliz", "jakość", "jakosc", "range", "signal", "distance", "linku", "łącz", "polacz")
         val ACTIVITY_WORDS = listOf("ostatnio słysz", "ostatnio slysz", "kto ostatnio", "ostatnio odezw", "offline", "nieaktyw", "dawno", "milcz", "ostatni raz", "kiedy ostatnio", "najświeżs", "last heard", "zniknęł", "zniknel")
