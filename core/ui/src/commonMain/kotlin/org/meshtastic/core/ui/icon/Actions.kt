@@ -38,6 +38,7 @@ import org.meshtastic.core.resources.ic_folder_open
 import org.meshtastic.core.resources.ic_keep
 import org.meshtastic.core.resources.ic_list
 import org.meshtastic.core.resources.ic_mark_chat_read
+import org.meshtastic.core.resources.ic_mic
 import org.meshtastic.core.resources.ic_mark_chat_unread
 import org.meshtastic.core.resources.ic_more_vert
 import org.meshtastic.core.resources.ic_offline_share
@@ -87,6 +88,8 @@ val MeshtasticIcons.Save: ImageVector
     @Composable get() = vectorResource(Res.drawable.ic_save)
 val MeshtasticIcons.Search: ImageVector
     @Composable get() = vectorResource(Res.drawable.ic_search)
+val MeshtasticIcons.Mic: ImageVector
+    @Composable get() = vectorResource(Res.drawable.ic_mic)
 val MeshtasticIcons.Send: ImageVector
     @Composable get() = vectorResource(Res.drawable.ic_send)
 val MeshtasticIcons.Share: ImageVector

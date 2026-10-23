@@ -76,6 +76,7 @@
     <string name="ai_assistant_title">Offline assistant</string>
     <string name="ai_assistant_unavailable">The assistant will be available once the Gemma model engine is added in an upcoming version.</string>
     <string name="ai_assistant_warning_title">Turn on the offline assistant?</string>
+    <string name="ai_dictation_note">Dictation (the microphone next to Send and in the translator) uses the model chosen for the assistant. If the assistant is off or its model cannot hear, the translator\'s model is used. Only the Gemma E2B and E4B models can hear; the smallest translator model (NLLB) cannot.</string>
     <string name="ai_internet_enable">Turn on</string>
     <string name="ai_internet_on_indicator">Internet is ON for the assistant</string>
     <string name="ai_internet_summary">Off by default. When on, the assistant can search the web, and the app downloads updates about our work automatically.</string>

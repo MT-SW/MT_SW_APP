@@ -60,6 +60,11 @@ import org.meshtastic.core.resources.translator_result
 import org.meshtastic.core.resources.translator_swap
 import org.meshtastic.core.resources.translator_to
 import org.meshtastic.core.ui.component.CopyIconButton
+import org.meshtastic.core.resources.assistant_dictate
+import org.meshtastic.core.resources.assistant_dictate_stop
+import org.meshtastic.core.resources.assistant_dictate_working
+import org.meshtastic.feature.messaging.DictationPhase
+import org.meshtastic.feature.messaging.rememberDictation
 import org.meshtastic.feature.messaging.translation.TranslatorError
 import org.meshtastic.feature.messaging.translation.TranslatorLanguages
 import org.meshtastic.feature.messaging.translation.TranslatorViewModel
@@ -70,6 +75,7 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
     val state by viewModel.state.collectAsStateWithLifecycle()
     val enabled by viewModel.enabled.collectAsStateWithLifecycle()
     val modelState by viewModel.modelState.collectAsStateWithLifecycle()
+    val dictation = rememberDictation { text -> viewModel.setInput((viewModel.state.value.input + " " + text).trim()) }
 
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()).padding(16.dp),
@@ -109,6 +115,19 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
             minLines = 3,
             modifier = Modifier.fillMaxWidth(),
         )
+        if (dictation.available && !state.busy) {
+            TextButton(onClick = dictation.toggle, enabled = dictation.phase != DictationPhase.WORKING) {
+                Text(
+                    stringResource(
+                        when (dictation.phase) {
+                            DictationPhase.IDLE -> Res.string.assistant_dictate
+                            DictationPhase.LISTENING -> Res.string.assistant_dictate_stop
+                            DictationPhase.WORKING -> Res.string.assistant_dictate_working
+                        },
+                    ),
+                )
+            }
+        }
         Button(onClick = viewModel::translate, enabled = !state.busy && state.input.isNotBlank()) {
             Text(
                 stringResource(if (state.busy) Res.string.translator_busy else Res.string.translator_action),
