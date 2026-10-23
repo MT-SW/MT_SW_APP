@@ -61,6 +61,7 @@ import org.meshtastic.core.resources.device_metrics_label_value
 import org.meshtastic.core.resources.message_delivery_status
 import org.meshtastic.core.resources.more_reactions
 import org.meshtastic.core.resources.mute_sender_action
+import org.meshtastic.core.resources.read_aloud
 import org.meshtastic.core.resources.reply
 import org.meshtastic.core.resources.security_signed_message_info
 import org.meshtastic.core.resources.security_signed_verified
@@ -110,6 +111,8 @@ fun MessageActionsContent(
     /** Null hides the row (own messages and private chats have nothing to mute per channel). */
     onMuteSender: (() -> Unit)? = null,
     senderMuted: Boolean = false,
+    /** Null hides the row; otherwise it reads the message aloud. */
+    onReadAloud: (() -> Unit)? = null,
 ) {
     Column {
         // An archived conversation shows no reaction affordances: the send path refuses them, so offering the row
@@ -210,6 +213,15 @@ fun MessageActionsContent(
                         onToggleTranslation
                     },
                 ),
+            )
+        }
+
+        if (onReadAloud != null) {
+            val readLabel = stringResource(Res.string.read_aloud)
+            ListItem(
+                headlineContent = { Text(readLabel) },
+                leadingContent = { Icon(MeshtasticIcons.VolumeUp, contentDescription = readLabel) },
+                modifier = Modifier.clickable(role = Role.Button, onClick = onReadAloud),
             )
         }
 
