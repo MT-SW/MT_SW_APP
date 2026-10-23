@@ -75,6 +75,7 @@ import org.meshtastic.core.resources.ui_scale
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SwitchListItem
+import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.BugReport
 import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.Info
