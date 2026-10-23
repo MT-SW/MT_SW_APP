@@ -149,7 +149,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
     }
 
     override val assistantMemoryEnabled: StateFlow<Boolean> =
-        dataStore.data.map { it[KEY_ASSISTANT_MEMORY_ENABLED] ?: true }.stateIn(scope, SharingStarted.Lazily, true)
+        dataStore.data.map { it[KEY_ASSISTANT_MEMORY_ENABLED] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
 
     override fun setAssistantMemoryEnabled(value: Boolean) {
         scope.launch { dataStore.edit { it[KEY_ASSISTANT_MEMORY_ENABLED] = value } }

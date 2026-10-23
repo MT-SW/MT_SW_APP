@@ -174,7 +174,7 @@ interface UiPrefs {
 
     fun setAssistantInternetEnabled(value: Boolean)
 
-    /** Whether the assistant keeps short notes and remembers some information between conversations (on by default). */
+    /** Whether the assistant keeps short notes and remembers some information between conversations (off by default until the user switches it on). */
     val assistantMemoryEnabled: StateFlow<Boolean>
 
     fun setAssistantMemoryEnabled(value: Boolean)
