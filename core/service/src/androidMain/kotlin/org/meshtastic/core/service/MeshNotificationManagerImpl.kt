@@ -142,7 +142,6 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
-import org.meshtastic.core.repository.Notification as MeshNotification
 
 /**
  * Manages the creation and display of all app notifications.
