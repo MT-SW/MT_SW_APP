@@ -27,7 +27,11 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -206,24 +210,51 @@ private val monoDarkScheme =
 /** True while one of the two black-and-white themes is active; maps and charts can read it to drop their colour too. */
 val LocalMonochrome = compositionLocalOf { false }
 
+/**
+ * Counts the native views (maps, camera) that are on screen. They draw on a surface of their own, which the grayscale
+ * layer would turn into a black hole, so while one is shown the layer is paused. Those views take care of their own
+ * colours (the map is switched to grayscale through [LocalMonochrome]).
+ */
+private class GrayscaleGate {
+    var nativeViews by mutableIntStateOf(0)
+}
+
+private val LocalGrayscaleGate = compositionLocalOf<GrayscaleGate?> { null }
+
+/** Call from a composable that shows a native surface (map, camera): pauses the grayscale layer while it is shown. */
+@Composable
+fun PauseGrayscaleLayer() {
+    val gate = LocalGrayscaleGate.current ?: return
+    DisposableEffect(gate) {
+        gate.nativeViews++
+        onDispose { gate.nativeViews-- }
+    }
+}
+
 /** Draws [content] with all colour drained out of it (saturation 0), including pictures and hard-coded colours. */
 @Composable
 private fun GrayscaleLayer(content: @Composable () -> Unit) {
+    val gate = remember { GrayscaleGate() }
     val paint =
         remember {
             Paint().apply { colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) }) }
         }
+    val paused = gate.nativeViews > 0
     Box(
         modifier =
-        Modifier.drawWithContent {
-            drawIntoCanvas { canvas ->
-                canvas.saveLayer(Rect(0f, 0f, size.width, size.height), paint)
-                drawContent()
-                canvas.restore()
+        if (paused) {
+            Modifier
+        } else {
+            Modifier.drawWithContent {
+                drawIntoCanvas { canvas ->
+                    canvas.saveLayer(Rect(0f, 0f, size.width, size.height), paint)
+                    drawContent()
+                    canvas.restore()
+                }
             }
         },
     ) {
-        content()
+        CompositionLocalProvider(LocalGrayscaleGate provides gate) { content() }
     }
 }
 
