@@ -38,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -64,7 +65,10 @@ import org.meshtastic.core.resources.assistant_dictate
 import org.meshtastic.core.resources.assistant_dictate_stop
 import org.meshtastic.core.resources.assistant_dictate_working
 import org.meshtastic.feature.messaging.DictationPhase
+import org.meshtastic.core.resources.read_aloud
+import org.meshtastic.core.resources.stop_reading
 import org.meshtastic.feature.messaging.rememberDictation
+import org.meshtastic.feature.messaging.rememberSpeaker
 import org.meshtastic.feature.messaging.translation.TranslatorError
 import org.meshtastic.feature.messaging.translation.TranslatorLanguages
 import org.meshtastic.feature.messaging.translation.TranslatorViewModel
@@ -75,6 +79,8 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
     val state by viewModel.state.collectAsStateWithLifecycle()
     val enabled by viewModel.enabled.collectAsStateWithLifecycle()
     val modelState by viewModel.modelState.collectAsStateWithLifecycle()
+    val speaker = rememberSpeaker()
+    var reading by remember(state.output) { mutableStateOf(false) }
     val dictation = rememberDictation(translator = true) { text -> viewModel.setInput((viewModel.state.value.input + " " + text).trim()) }
 
     Column(
@@ -171,7 +177,17 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.primary,
                         )
-                        CopyIconButton(valueToCopy = state.output)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            TextButton(
+                                onClick = {
+                                    if (reading) speaker.stop() else speaker.speak(state.output)
+                                    reading = !reading
+                                },
+                            ) {
+                                Text(stringResource(if (reading) Res.string.stop_reading else Res.string.read_aloud))
+                            }
+                            CopyIconButton(valueToCopy = state.output)
+                        }
                     }
                     Text(text = state.output, style = MaterialTheme.typography.bodyLarge)
                     if (viewModel.isTooLongForOnePacket(state.output)) {
