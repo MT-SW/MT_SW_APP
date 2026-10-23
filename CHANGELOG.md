@@ -19,7 +19,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 ### Październik 2026
 
 * Asystent wyszukuje słowa i frazy w wiadomościach: na wszystkich kanałach, na jednym kanale albo w rozmowie prywatnej z wybranym węzłem (bez względu na wielkość liter i polskie znaki), z liczbą trafień i nazwą kanału.
-* Asystent liczy wiadomości na kanale (dzisiaj od północy albo z ostatnich godzin, z podaniem kto pisze najwięcej), filtruje węzły (aktywne w ostatnich godzinach, ulubione, po sprzęcie, z niską baterią, z pozycją) i czyta wiadomości prywatne z wybranym węzłem; liczby wylicza kod, nie model.
+* Asystent liczy wiadomości na kanale (dzisiaj od północy albo z ostatnich godzin, z podaniem kto pisze najwięcej), filtruje węzły (aktywne w ostatnich godzinach, ulubione, po sprzęcie, z niską baterią, z pozycją) czyta wiadomości prywatne z wybranym węzłem oraz pokazuje trasy pakietów (traceroute) i sąsiadów (kto kogo słyszy); okres w pytaniu (minuty, godziny, dni, tydzień, miesiąc, rok, dzisiaj, wczoraj) i liczby wylicza kod, nie model.
 * Asystent zna aplikację: wbudowana wiedza z dokumentacji i listy zmian (dobierana do każdego pytania), mała liczba narzędzi dobierana do tematu pytania, większe okno kontekstu dla większych modeli oraz w logach informacja, na jakim układzie (NPU/GPU/CPU) działa model.
 * Asystent pokazuje pod odpowiedzią **przyciski** (otwórz ekran, pokaż ustawienie z żółtym mruganiem, węzeł na mapie, planer łącza, szkic wiadomości); nic nie dzieje się samo, wiadomość nigdy nie jest wysyłana automatycznie.
 * **Czytanie na głos** odpowiedzi asystenta i wiadomości z czatu (menu po przytrzymaniu) oraz dyktowanie pytania (Android).
@@ -399,7 +399,7 @@ The entries below describe only what this fork adds on top of the original, from
 ### October 2026
 
 * The assistant searches words and phrases in messages: on all channels, on one channel or in the private chat with a chosen node (ignoring case and Polish accents), with the number of hits and the channel name.
-* The assistant counts messages on a channel (today since midnight or the last hours, with who writes most), filters nodes (active in the last hours, favourites, by hardware, low battery, with position) and reads direct messages with a chosen node; the numbers are computed by code, not by the model.
+* The assistant counts messages on a channel (today since midnight or the last hours, with who writes most), filters nodes (active in the last hours, favourites, by hardware, low battery, with position) reads direct messages with a chosen node, and shows packet routes (traceroute) and neighbours (who hears whom); the time span in the question (minutes, hours, days, week, month, year, today, yesterday) and the numbers are computed by code, not by the model.
 * The assistant knows the app: built-in knowledge from the documentation and changelog (picked per question), a small set of tools chosen by the topic of the question, a larger context window for larger models, and a log line showing which backend (NPU/GPU/CPU) the model runs on.
 * The assistant shows **buttons** under an answer (open a screen, show a setting with a yellow blink, node on the map, link planner, message draft); nothing happens by itself and a message is never sent automatically.
 * **Read aloud** for assistant answers and chat messages (long-press menu) and dictation of the question (Android).

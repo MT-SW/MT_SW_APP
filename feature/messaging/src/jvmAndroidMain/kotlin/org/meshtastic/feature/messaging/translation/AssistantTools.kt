@@ -109,6 +109,26 @@ class AssistantTools(private val data: AssistantDataProvider) : ToolSet {
         @ToolParam(description = "How many to list, 1 to 40") limit: Int,
     ): String = run("find_nodes") { data.toolFindNodes(active_hours, hardware, only_favorites, max_battery, with_position, limit) }
 
+    @Tool(
+        description =
+        "TRACEROUTE results: the path packets took through the mesh to a node and back, with the signal of each hop. " +
+            "Use it for questions about routes, how a packet gets somewhere, or through which nodes.",
+    )
+    fun traceroutes(
+        @ToolParam(description = "Node name, or the word all for every node") node: String,
+        @ToolParam(description = "How many results, 1 to 40") limit: Int,
+    ): String = run("traceroutes") { data.toolTraceroutes(node, limit) }
+
+    @Tool(
+        description =
+        "NEIGHBOUR information: which nodes each node hears directly and with what signal. Use it for questions about " +
+            "who hears whom or which nodes are next to a node.",
+    )
+    fun neighbors(
+        @ToolParam(description = "Node name, or the word all for every node") node: String,
+        @ToolParam(description = "How many nodes, 1 to 40") limit: Int,
+    ): String = run("neighbors") { data.toolNeighbors(node, limit) }
+
     @Tool(description = "The latest direct (private) messages exchanged with one node, oldest first.")
     fun direct_messages(
         @ToolParam(description = "Node short or long name") node: String,

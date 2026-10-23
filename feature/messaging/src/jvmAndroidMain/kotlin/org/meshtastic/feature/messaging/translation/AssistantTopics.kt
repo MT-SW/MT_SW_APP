@@ -58,7 +58,9 @@ internal object AssistantTopics {
             "pamięć", "pamiec", "heap", "cpu", "flash", "statystyk", "streść", "streszcz", "podsumuj", "hops", "przeskok",
             "ile ", "kto ", "który ", "ktory ", "jaka jest", "jaki jest", "jakie są", "how many", "which node", "weather",
             "humidity", "pressure", "battery", "summar", "ramek", "ramki", "najmniej", "najwyż", "najniż", "ostatnio słysz",
-            "offline", "nieaktyw", "wysłał", "wyslal", "odebrał", "odebral", "duplik", "kanał", "kanal",
+            "offline", "nieaktyw", "wysłał", "wyslal", "odebrał", "odebral", "duplik", "kanał", "kanal", "wiadomo", "message",
+            "napisa", "pisał", "pisal", "czat", "rozmow", "ulubion", "aktywn", "dzisiaj", "wczoraj", "traceroute", "trasa", "trasy",
+            "sąsiad", "sasiad", "neighbo", "route", "kogo słyszy", "kogo slyszy",
         )
 
     private val GUIDE_WORDS =

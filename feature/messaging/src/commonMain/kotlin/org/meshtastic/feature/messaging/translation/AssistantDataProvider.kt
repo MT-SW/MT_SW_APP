@@ -22,6 +22,7 @@ import kotlinx.datetime.offsetAt
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.common.util.systemTimeZone
 import org.meshtastic.core.model.MeshLog
+import org.meshtastic.core.model.fullRouteDiscovery
 import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.NodeRepository
@@ -64,6 +65,11 @@ class AssistantDataProvider(
         if (q.hasAny(SENSOR_WORDS)) parts += safe("sensors") { sensors() }
         if (q.hasAny(SIGNAL_WORDS)) parts += safe("signal") { signalRanking(q) }
         if (q.hasAny(ACTIVITY_WORDS)) parts += safe("activity") { activity(q) }
+        if (q.hasAny(ROUTE_WORDS)) {
+            val who = mentioned.firstOrNull()?.user?.long_name.orEmpty()
+            priority += safe("traceroute") { toolTraceroutes(who, TRACE_SHOWN) }
+            priority += safe("neighbors") { toolNeighbors(who, TRACE_SHOWN) }
+        }
         val network = q.hasAny(NODE_WORDS) || q.hasAny(TREND_WORDS) || q.hasAny(RANK_WORDS) || q.hasAny(SIGNAL_WORDS)
         if (network && (q.hasAny(RANK_WORDS) || q.hasAny(TREND_WORDS) || !q.hasAny(SIGNAL_WORDS))) {
             parts += safe("ranking") { ranking(q) }
@@ -117,7 +123,7 @@ class AssistantDataProvider(
     fun hasTopic(question: String): Boolean {
         val q = question.lowercase()
         return mentionedNodes(q).isNotEmpty() ||
-            listOf(SENSOR_WORDS, SIGNAL_WORDS, NODE_WORDS, TREND_WORDS, RANK_WORDS, SETTINGS_WORDS, SUMMARY_WORDS, MESSAGE_WORDS, ACTIVITY_WORDS)
+            listOf(SENSOR_WORDS, SIGNAL_WORDS, NODE_WORDS, TREND_WORDS, RANK_WORDS, SETTINGS_WORDS, SUMMARY_WORDS, MESSAGE_WORDS, ACTIVITY_WORDS, ROUTE_WORDS)
                 .any { q.hasAny(it) }
     }
 
@@ -619,8 +625,16 @@ class AssistantDataProvider(
         val contacts = packetRepository.getContacts().first().entries.sortedByDescending { it.value.time }.take(CHAT_LIMIT)
         return buildString {
             appendLine("LATEST MESSAGES (one per conversation):")
+            val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
             for ((key, packet) in contacts) {
-                appendLine("- [$key] from ${packet.from}: ${packet.text.orEmpty().take(MESSAGE_CHARS)}")
+                val where =
+                    if (key.endsWith("^all")) {
+                        key.substringBefore('^').toIntOrNull()?.let { "channel $it (${names.getOrNull(it)?.ifBlank { null } ?: "default"})" } ?: key
+                    } else {
+                        "private chat"
+                    }
+                val sender = findNode(packet.from.orEmpty())?.let { it.user.long_name.ifBlank { it.user.short_name } } ?: packet.from
+                appendLine("- [$where] $sender: ${packet.text.orEmpty().take(MESSAGE_CHARS)}")
             }
         }
     }
@@ -904,6 +918,60 @@ class AssistantDataProvider(
             }
     }
 
+    private fun nameOf(num: Int): String = nodeNameFor(num).ifBlank { "!" + num.toUInt().toString(16) }
+
+    /** The newest traceroute results (path there and back, signal of each hop), for all nodes or one [node]. */
+    suspend fun toolTraceroutes(node: String, limit: Int): String {
+        val top = limit.coerceIn(1, MAX_TOOL_LIST)
+        val wanted = node.anyToEmpty()
+        val num = if (wanted.isEmpty()) null else (findNode(node)?.num ?: return "No node found for \"$node\".")
+        val logs = meshLogRepository.getLogsByPortNumSince(PortNum.TRACEROUTE_APP.value, nowMillis - TRACE_WINDOW_MS).first()
+        val now = nowMillis
+        val lines =
+            logs.sortedByDescending { it.received_date }.mapNotNull { log ->
+                val packet = log.fromRadio.packet ?: return@mapNotNull null
+                val rd = packet.fullRouteDiscovery ?: return@mapNotNull null
+                if (num != null && num !in rd.route && num !in rd.route_back) return@mapNotNull null
+                val ago = ((now - log.received_date) / MILLIS_PER_MINUTE).coerceAtLeast(0)
+                fun path(route: List<Int>, snr: List<Int>) =
+                    route.mapIndexed { i, n ->
+                        val q = snr.getOrNull(i)?.takeIf { it != Int.MIN_VALUE }
+                        nameOf(n) + (if (q != null && i > 0) " (${fmt(q / 4f)} dB)" else "")
+                    }.joinToString(" -> ")
+                buildString {
+                    append("- $ago min ago: there ${path(rd.route, rd.snr_towards)}")
+                    if (rd.route_back.isNotEmpty()) append("; back ${path(rd.route_back, rd.snr_back)}")
+                    append("; hops there ${(rd.route.size - 2).coerceAtLeast(0)}")
+                }
+            }.take(top)
+        if (lines.isEmpty()) return "No traceroute results saved" + (if (num != null) " for this node." else ".")
+        return "TRACEROUTES (newest first):\n" + lines.joinToString("\n")
+    }
+
+    /** Who each node reported hearing directly (neighbour info), newest report per node; one [node] or all. */
+    suspend fun toolNeighbors(node: String, limit: Int): String {
+        val top = limit.coerceIn(1, MAX_TOOL_LIST)
+        val wanted = node.anyToEmpty()
+        val num = if (wanted.isEmpty()) null else (findNode(node)?.num ?: return "No node found for \"$node\".")
+        val logs = meshLogRepository.getLogsByPortNumSince(PortNum.NEIGHBORINFO_APP.value, nowMillis - TRACE_WINDOW_MS).first()
+        val now = nowMillis
+        val newest = HashMap<Int, Pair<Long, org.meshtastic.proto.NeighborInfo>>()
+        for (log in logs) {
+            val payload = log.fromRadio.packet?.decoded?.payload ?: continue
+            val info = runCatching { org.meshtastic.proto.NeighborInfo.ADAPTER.decode(payload) }.getOrNull() ?: continue
+            val owner = info.node_id.takeIf { it != 0 } ?: log.fromNum
+            if (num != null && owner != num && info.neighbors.none { it.node_id == num }) continue
+            if ((newest[owner]?.first ?: -1L) < log.received_date) newest[owner] = log.received_date to info
+        }
+        if (newest.isEmpty()) return "No neighbour information saved" + (if (num != null) " for this node." else ".")
+        return "NEIGHBOURS (who hears whom):\n" +
+            newest.entries.sortedByDescending { it.value.first }.take(top).joinToString("\n") { (owner, v) ->
+                val ago = ((now - v.first) / MILLIS_PER_MINUTE).coerceAtLeast(0)
+                "- ${nameOf(owner)} ($ago min ago) hears: " +
+                    v.second.neighbors.joinToString { "${nameOf(it.node_id)} (${fmt(it.snr)} dB)" }.ifBlank { "nobody" }
+            }
+    }
+
     /** A channel mentioned in the question (by name, or by number such as "kanał 1" / "kanał jeden"), as text, or empty. */
     private suspend fun channelFromQuestion(q: String): String {
         val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
@@ -1101,6 +1169,8 @@ class AssistantDataProvider(
         const val SEARCH_SHOWN = 15
         val QUOTED = Regex("[\"„”«]([^\"„”»]{2,60})[\"”»]")
         const val HOURS_WORD_DEFAULT = 1
+        const val TRACE_WINDOW_MS = 30L * 86_400_000L
+        const val TRACE_SHOWN = 6
         const val COUNT_PER_CHAT = 3000
         const val MAX_COUNT_HOURS = 8784L
         const val MILLIS_PER_DAY = 86_400_000L
@@ -1151,6 +1221,7 @@ class AssistantDataProvider(
         val ANY_WORDS = setOf("all", "any", "wszystkie", "wszystko", "everything", "null", "none", "*")
         val COUNT_WORDS = listOf("najwięcej", "najwiecej", "kto napisa", "kto pisze", "ile ", "ilo", "liczb", "how many", "count", "licz")
         val TODAY_WORDS = listOf("dzisiaj", "dziś", "dzis", "today", "od rana")
+        val ROUTE_WORDS = listOf("traceroute", "trasa", "trasy", "trasę", "trase", "route", "neighbo", "słyszy", "slyszy", "przez jakie", "przez które")
         val MESSAGE_WORDS = listOf("wiadomo", "message", "czat", "chat", "napisa", "pisa", "rozmow", "odpowied")
     }
 }
