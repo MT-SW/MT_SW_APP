@@ -191,8 +191,11 @@ class LlamaAssistantService(
                 speak(modelId, history, polish, onPiece, room, extra = extra)
             }
             "app_help" -> {
-                val target = intent.text.ifBlank { if (WHERE_SET.containsMatchIn(question.lowercase())) question else "" }
-                if (target.isNotBlank()) guideTools.show_setting(target)
+                // A button to the setting the question is about: the router's words first, then the user's own.
+                for (words in listOf(intent.text, question).filter { it.isNotBlank() }) {
+                    guideTools.show_setting(words)
+                    if (collector.size() > 0) break
+                }
                 val button = collector.last()?.label
                 val guide = knowledge?.lookup("$question ${intent.text}".trim(), KNOWLEDGE_CHARS * room).orEmpty()
                 val extra = buildString {
@@ -487,7 +490,6 @@ class LlamaAssistantService(
         const val NOTE_TURN_CHARS = 600
         const val NOTE_TOKENS = 400
         val REMEMBER_WORDS = listOf("zapamiętaj", "zapamietaj", "pamiętaj", "pamietaj", "remember")
-        val WHERE_SET = Regex("(gdzie|jak|where|how).*(ustaw|zmie[nń]|włącz|wlacz|wyłącz|wylacz|set|change|enable|disable)")
 
         const val SYSTEM_PL =
             "Jesteś asystentem wbudowanym w aplikację MT_SW (na telefon i komputer) do sieci Meshtastic, czyli radiowej " +
