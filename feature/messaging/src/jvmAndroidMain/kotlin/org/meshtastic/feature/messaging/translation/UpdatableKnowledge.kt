@@ -65,11 +65,13 @@ class UpdatableKnowledge(
     override suspend fun coreFacts(language: String): String {
         val file = File(directory, "project/core.md")
         val downloaded = withContext(Dispatchers.IO) { runCatching { if (file.exists()) file.readText() else "" }.getOrDefault("") }
-        return if (downloaded.isNotBlank()) {
-            org.meshtastic.core.repository.knowledgeSection(downloaded, language)
-        } else {
-            builtIn.coreFacts(language)
-        }
+        val built = builtIn.coreFacts(language)
+        if (downloaded.isBlank()) return built
+        val fresh = org.meshtastic.core.repository.knowledgeSection(downloaded, language)
+        // A test build is newer than the repository: the downloaded copy is used only when it has every line of the
+        // built-in one (so it is the same or newer), otherwise the built-in facts win.
+        val have = fresh.lines().map { it.trim() }.toSet()
+        return if (built.lines().map { it.trim() }.filter { it.isNotEmpty() }.all { it in have }) fresh else built
     }
 
     override suspend fun answerStrings(language: String): Map<String, String> = builtIn.answerStrings(language)

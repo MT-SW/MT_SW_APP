@@ -81,7 +81,8 @@
     <string name="ai_assistant_title">Offline assistant</string>
     <string name="ai_assistant_unavailable">The assistant will be available once the Gemma model engine is added in an upcoming version.</string>
     <string name="ai_assistant_warning_title">Turn on the offline assistant?</string>
-    <string name="ai_bat_line">Battery of %1$s: %2$s, voltage %3$s V (reading from %4$s).</string>
+    <string name="ai_bat_line">Battery of %1$s: %2$s, voltage %3$s V (reading: %4$s).</string>
+    <string name="ai_bat_line_no_voltage">Battery of %1$s: %2$s (reading: %3$s).</string>
     <string name="ai_bat_unknown">%1$s has not reported its battery yet.</string>
     <string name="ai_battery_ext">external power</string>
     <string name="ai_battery_pct">battery %1$d%</string>
