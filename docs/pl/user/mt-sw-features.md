@@ -119,11 +119,11 @@ Ekran **Sniffer** (Ustawienia → Advanced) pokazuje na żywo ruch w sieci, tak�
 
 ## Dodatkowa telemetria (statystyki lokalne)
 
-W **Ustawienia → Moduły → Telemetria** pojawia się karta **Statystyki lokalne (FW+ v3)**, gdy podłączony węzeł ma firmware MT_SW w wersji 3 lub nowszej. Ma dwa przełączniki — **Dodatkowa telemetria** i **Rozszerzona dodatkowa telemetria** — i osobny interwał dla każdego. Węzeł regularnie wysyła do sieci własne statystyki.
+W **Ustawienia → Moduły → Telemetria** jest karta **Statystyki lokalne**. Działa od wersji 3 firmware MT_SW; na starszej karta jest widoczna, ale jej przełączniki są wyszarzone i opis mówi, od której wersji to działa. Ma dwa przełączniki — **Dodatkowa telemetria** i **Rozszerzona dodatkowa telemetria** — i osobny interwał dla każdego. Węzeł regularnie wysyła do sieci własne statystyki.
 
 - **Najkrótszy interwał to 2 godziny.** Krótsze (od 5 minut) pojawiają się dopiero po odblokowaniu ukrytych opcji.
 - **Obie opcje zapisują się razem** przyciskiem **Zapisz w węźle**. Aplikacja najpierw odczytuje obecny stan z węzła, więc zmiana jednej opcji nie rusza drugiej. Po zapisie pokazuje to, co węzeł naprawdę zapisał (może poprawić interwały); jeśli nie potwierdzi, dostajesz komunikat.
-- Na starszym firmware karta w ogóle się nie pokazuje. Zapis nie wymaga restartu węzła.
+- Zapis nie wymaga restartu węzła.
 
 ## Panel debugowania
 

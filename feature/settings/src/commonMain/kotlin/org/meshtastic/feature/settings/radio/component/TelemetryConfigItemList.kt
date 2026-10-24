@@ -267,20 +267,20 @@ fun TelemetryConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                 )
             }
         }
-        // Extra telemetry (the node's own statistics) exists only on fw+ version 3 and newer; it is saved separately.
+        // Extra telemetry (the node's own statistics) works only on fw+ version 3 and newer; on older firmware the card is
+        // shown switched off. It is saved separately.
         val localStatsSupported =
             state.localStatsConfig != null ||
                 (state.fwPlusVersion ?: 0) >= SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_LOCAL_STATS
-        if (localStatsSupported) {
-            item {
-                LocalStatsCard(
-                    config = state.localStatsConfig,
-                    loading = state.localStatsLoading,
-                    connected = state.connected,
-                    unlocked = unlocked,
-                    onSave = viewModel::setLocalStatsConfig,
-                )
-            }
+        item {
+            LocalStatsCard(
+                config = state.localStatsConfig,
+                supported = localStatsSupported,
+                loading = state.localStatsLoading,
+                connected = state.connected,
+                unlocked = unlocked,
+                onSave = viewModel::setLocalStatsConfig,
+            )
         }
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,6 +37,7 @@ import org.meshtastic.core.resources.local_stats_basic_interval
 import org.meshtastic.core.resources.local_stats_ext_enabled
 import org.meshtastic.core.resources.local_stats_ext_enabled_desc
 import org.meshtastic.core.resources.local_stats_ext_interval
+import org.meshtastic.core.resources.local_stats_needs_v3
 import org.meshtastic.core.resources.local_stats_reading
 import org.meshtastic.core.resources.local_stats_save
 import org.meshtastic.core.resources.local_stats_title
@@ -55,26 +57,34 @@ import org.meshtastic.proto.LocalStatsBroadcastConfig
  * intervals the radio corrected after a save show up right away.
  *
  * Intervals shorter than [MIN_DEVICE_METRICS_INTERVAL_SECS] (2 hours) are offered only after the hidden options are
- * unlocked ([unlocked]).
+ * unlocked ([unlocked]). On older firmware ([supported] false) the card stays visible with everything switched off and
+ * says it works from fw+ version 3.
  */
 @Composable
 internal fun LocalStatsCard(
     config: LocalStatsBroadcastConfig?,
+    supported: Boolean,
     loading: Boolean,
     connected: Boolean,
     unlocked: Boolean,
     onSave: (LocalStatsBroadcastConfig) -> Unit,
 ) {
     var form by remember(config) { mutableStateOf(config ?: LocalStatsBroadcastConfig()) }
-    val editable = connected && config != null && !loading
+    val editable = supported && connected && config != null && !loading
 
     TitledCard(title = stringResource(Res.string.local_stats_title)) {
-        if (config == null) {
+        if (!supported) {
+            Text(
+                text = stringResource(Res.string.local_stats_needs_v3),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(16.dp),
+            )
+        } else if (config == null) {
             Text(
                 text = stringResource(Res.string.local_stats_reading),
                 modifier = Modifier.padding(16.dp),
             )
-            return@TitledCard
         }
         SwitchPreference(
             title = stringResource(Res.string.local_stats_basic_enabled),

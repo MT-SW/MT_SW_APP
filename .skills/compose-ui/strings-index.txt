@@ -1475,6 +1475,7 @@ local_stats_heap
 local_stats_heap_description
 local_stats_heap_value
 local_stats_heap_value_kb
+local_stats_needs_v3
 local_stats_nodes
 local_stats_noise
 local_stats_psram
