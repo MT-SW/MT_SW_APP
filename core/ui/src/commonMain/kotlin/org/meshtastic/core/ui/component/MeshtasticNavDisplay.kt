@@ -27,10 +27,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.VerticalDragHandle
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.layout.PaneExpansionState
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldScope
-import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.layout.rememberPaneExpansionState
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
@@ -160,17 +158,8 @@ private fun MeshtasticNavDisplayHost(
     if (isDesktopPlatform) {
         LaunchedEffect(paneExpansionState) { paneExpansionState.setFirstPaneProportion(INITIAL_LIST_PANE_PROPORTION) }
     }
-    // The drag handle is drawn only between two panes. On a wide desktop window the scaffold would show three columns
-    // (list, detail and the extra pane) and the handle would disappear, so the desktop app is limited to two columns:
-    // the extra pane then opens in place of the detail, and the divider stays draggable at every window size.
-    val adaptiveInfo = currentWindowAdaptiveInfoV2()
-    val directive =
-        calculatePaneScaffoldDirective(adaptiveInfo).let {
-            if (isDesktopPlatform) it.copy(maxHorizontalPartitions = 2) else it
-        }
     val listDetailSceneStrategy =
         rememberListDetailSceneStrategy<NavKey>(
-            directive = directive,
             paneExpansionState = paneExpansionState,
             paneExpansionDragHandle = { state -> PaneExpansionDragHandle(state) },
         )
