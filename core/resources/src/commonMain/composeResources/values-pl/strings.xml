@@ -3321,12 +3321,12 @@
     <string name="antenna_setup_name">Nazwa tej anteny</string>
     <string name="antenna_setup_save">Zapisz antenę</string>
     <string name="antenna_setup_saved">Zapisano</string>
-    <string name="antenna_hint_worst">Najwięcej tracisz na: %1$s (%2$s dB, %3$s% wszystkich strat).</string>
+    <string name="antenna_hint_worst">Najwięcej tracisz na: %1$s (%2$s dB, %3$s % wszystkich strat).</string>
     <string name="antenna_hint_cable">Ten kabel traci około %1$s dB na metr: krótszy o %3$s m dałby około %2$s dB zysku.</string>
     <string name="antenna_cmp_pick">Porównaj z zapisaną anteną</string>
     <string name="antenna_cmp_loss">Straty: teraz %1$s dB, zapisana %2$s dB (różnica %3$s dB)</string>
     <string name="antenna_cmp_eirp">EIRP: teraz %1$s dBm, zapisana %2$s dBm (różnica %3$s dB)</string>
-    <string name="antenna_cmp_range">Zasięg względny: teraz %1$s%, zapisana %2$s%</string>
+    <string name="antenna_cmp_range">Zasięg względny: teraz %1$s %, zapisana %2$s %</string>
     <string name="antenna_report_title">MT_SW – kalkulator anten</string>
     <string name="antenna_save">Zapisz wynik…</string>
     <string name="antenna_tx_radio">Z radia: %1$s dBm</string>
