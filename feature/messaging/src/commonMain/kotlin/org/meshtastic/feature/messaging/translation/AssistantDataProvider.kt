@@ -521,15 +521,16 @@ class AssistantDataProvider(
                 Row(name, ago, values)
             }
         if (rows.isEmpty()) return aiString(Res.string.ai_sensor_none)
-        val sorted = rows.sortedByDescending { it.values.containsKey("temperature") }
+        // The same sensor saved twice under one name: only its newest reading.
+        val sorted = rows.sortedBy { it.ago }.distinctBy { it.name }.sortedWith(compareByDescending<Row> { it.values.containsKey("temperature") }.thenBy { it.ago })
         val sb = StringBuilder(aiString(Res.string.ai_sensor_title, rows.size)).append('\n')
         for (r in sorted.take(REPORT_LIMIT)) {
             val parts = ArrayList<String>()
             for ((k, v) in r.values) parts += aiString(REPORT_KEYS.getValue(k), roundTo(v, if (k in TWO_DECIMALS) 2 else 1))
-            sb.append("• ${r.name}: ${parts.joinToString(", ")}\n")
+            sb.append("• ${r.name} (${ago(r.ago)}): ${parts.joinToString(", ")}\n")
         }
         suspend fun extreme(key: String, label: StringResource, highest: Boolean) {
-            val best = rows.filter { it.values.containsKey(key) }.let { l -> if (highest) l.maxByOrNull { it.values.getValue(key) } else l.minByOrNull { it.values.getValue(key) } }
+            val best = sorted.filter { it.values.containsKey(key) }.let { l -> if (highest) l.maxByOrNull { it.values.getValue(key) } else l.minByOrNull { it.values.getValue(key) } }
             if (best != null) {
                 val value = aiString(REPORT_KEYS.getValue(key), roundTo(best.values.getValue(key), 1)).substringAfter(' ')
                 sb.append("${aiString(label)}: ${best.name} — $value\n")
@@ -1291,6 +1292,9 @@ class AssistantDataProvider(
             nodeRepository.nodeDBbyNum.value.values
                 .filter { it.num != me.num && (roleOnly?.invoke(it) ?: true) }
                 .mapNotNull { n -> n.distance(me)?.let { n to it } }
+                // The same radio saved twice (new number after a reflash): the same names at the same place, shown once.
+                .sortedByDescending { it.first.lastHeard }
+                .distinctBy { (n, m) -> Triple(n.user.long_name, n.user.short_name, m / SAME_PLACE_M) }
                 .let { list -> if (farthest) list.sortedByDescending { it.second } else list.sortedBy { it.second } }
         val (first, meters) = rows.firstOrNull() ?: return null
         val nowS = nowMillis / MILLIS_PER_SECOND
@@ -1305,7 +1309,11 @@ class AssistantDataProvider(
         val next = rows.drop(1).take(NEXT_SHOWN)
         if (next.isNotEmpty()) {
             sb.append("\n\n").append(aiString(Res.string.ai_dist_next, "").trim())
-            for ((n, m) in next) sb.append("\n• ").append(n.user.long_name.ifBlank { n.user.short_name }).append(" — ").append(kilometres(m)).append(" km")
+            for ((n, m) in next) {
+                sb.append("\n• ").append(n.user.long_name.ifBlank { n.user.short_name })
+                if (n.user.short_name.isNotBlank() && n.user.short_name != n.user.long_name) sb.append(" (").append(n.user.short_name).append(")")
+                sb.append(" — ").append(kilometres(m)).append(" km")
+            }
         }
         return sb.toString()
     }
@@ -1679,6 +1687,8 @@ class AssistantDataProvider(
     fun nodeNumFor(name: String): Int? = findNode(name)?.num
 
     /** A readable name of node [num]. */
+    fun nodeRoleFor(num: Int): String = nodeRepository.nodeDBbyNum.value[num]?.user?.role?.toString().orEmpty()
+
     fun nodeNameFor(num: Int): String =
         nodeRepository.nodeDBbyNum.value[num]?.let { it.user.long_name.ifBlank { it.user.short_name } }.orEmpty()
 
@@ -1833,6 +1843,7 @@ class AssistantDataProvider(
         const val REPORT_SIGNAL = 15
         const val SENSOR_LIMIT = 12
         const val REPORT_LIMIT = 12
+        const val SAME_PLACE_M = 200
         const val SIGNAL_SHOWN = 6
         const val NEXT_SHOWN = 3
         const val NAMES_SHOWN = 8

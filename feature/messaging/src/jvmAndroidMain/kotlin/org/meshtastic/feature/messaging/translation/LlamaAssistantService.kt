@@ -107,6 +107,8 @@ class LlamaAssistantService(
         val q = " " + question.lowercase() + " "
         if (isPolish(question) || POLISH_PLAIN.containsMatchIn(q)) return "pl"
         if (ENGLISH_PLAIN.findAll(q).count() >= 2) return "en"
+        // Plain letters only, an English word and no Polish one: English, even when the question is short.
+        if (ENGLISH_ONLY.containsMatchIn(q) && question.all { it.code < 128 }) return "en"
         val earlier = history.dropLast(1).lastOrNull { it.fromUser }?.text.orEmpty()
         return if (earlier.isNotBlank() && earlier != question) answerLanguage(earlier, emptyList()) else appLanguage()
     }
@@ -434,7 +436,8 @@ class LlamaAssistantService(
                 // A number the model wrote that is in neither the results nor the facts was garbled or made up:
                 // then the most fitting sentences of the results are quoted instead of the model's words.
                 val core = knowledge?.coreFacts(if (polish) "pl" else "en").orEmpty()
-                if (found.isBlank() || numbersBacked(said, found + "\n" + core + "\n" + question)) said else quoteWeb(found, question, polish)
+                if (found.isBlank() || numbersBacked(said, found + "\n" + core + "\n" + question)) said
+                else coreFact(core, question) ?: quoteWeb(found, question, polish)
             }
             else -> speak(modelId, history, polish, onPiece, room, extra = "")
         }
@@ -474,7 +477,9 @@ class LlamaAssistantService(
         val name = data.nodeNameFor(num)
         collector.add(AssistantAction(name, "$DEEP_LINK_BASE_URI/map/focus/$num"))
         collector.autoOpenLast()
-        return aiString(if (farthest) Res.string.ai_go_farthest else Res.string.ai_go_nearest, name, data.kilometres(meters))
+        // "The nearest router": the answer says the found node's role, so it is clear the role was taken into account.
+        val shown = if (role.isNotBlank()) "$name (${data.nodeRoleFor(num)})" else name
+        return aiString(if (farthest) Res.string.ai_go_farthest else Res.string.ai_go_nearest, shown, data.kilometres(meters))
     }
 
     /** A button (not opened by itself) to the first node of a nearest / farthest list. */
@@ -620,6 +625,7 @@ class LlamaAssistantService(
             val score = strongHits * 2 + weakHits + (if (exact) LABEL_SCORE else 0) + (if (headed) LABEL_SCORE else 0)
             found += Line(title, line, score)
         }
+        if (found.isEmpty()) return sectionStart(fragment, stems("$strong $question"), question, strong, polish)
         // A part of the manual whose heading names the setting is the right place; others only when there is none.
         val titled = found.filter { line -> labelStems.size >= 2 && stems(line.title).containsAll(labelStems) }
         val pool = titled.ifEmpty { found }
@@ -632,6 +638,35 @@ class LlamaAssistantService(
         return (if (heading.isNotBlank()) "($heading)\n" else "") + endAtSentence(body.take(HELP_CHARS))
     }
 
+    /**
+     * "What is MT_SW features", "how do I update the firmware": no paragraph names a setting, so the opening lines of the
+     * part of the manual whose heading shares a word with the question are shown (the most relevant part on a tie).
+     */
+    private fun sectionStart(fragment: String, want: Set<String>, question: String, strong: String, polish: Boolean): String {
+        class Part(val title: String, val lines: MutableList<String> = ArrayList())
+        val parts = ArrayList<Part>()
+        for (raw in fragment.lines()) {
+            val line = raw.trim()
+            if (line.startsWith("[") && line.endsWith("]")) {
+                parts += Part(line.removeSurrounding("[", "]"))
+                continue
+            }
+            if (line.length < MIN_HELP_LINE || line.startsWith("|") || line.startsWith(">") || line.startsWith("#") || line.startsWith("description:")) continue
+            parts.lastOrNull()?.lines?.add(line)
+        }
+        val usable =
+            parts.filter { p ->
+                p.lines.isNotEmpty() && !p.title.startsWith("MT_SW ") && p.title != "CHANGELOG" && !(polish && p.title.startsWith("en-")) &&
+                    (!ABOUT_ASSISTANT.containsMatchIn(p.title.lowercase()) || ABOUT_ASSISTANT.containsMatchIn(focus(question, strong)))
+            }
+        val scored = usable.map { it to stems(it.title.substringAfter(": ")).count { s -> s in want } }.filter { it.second > 0 }
+        val top = scored.maxOfOrNull { it.second } ?: return ""
+        val best = scored.first { it.second == top }.first
+        val heading = best.title.substringAfter(": ", "").trim()
+        val body = best.lines.take(HELP_LINES).joinToString("\n") { endAtSentence(it) }
+        return (if (heading.isNotBlank()) "($heading)\n" else "") + endAtSentence(body.take(HELP_CHARS))
+    }
+
     private fun focus(question: String, strong: String) = "$question $strong".lowercase()
 
     /** True when every number of 2+ digits in [answer] also stands in [source] (written with a dot or a comma). */
@@ -641,14 +676,23 @@ class LlamaAssistantService(
         return numbers(answer).filter { it.replace(".", "").length >= 2 }.all { it in known }
     }
 
+    /** The line of our own verified facts that fits the question best (two or more shared words or numbers), or null. */
+    private fun coreFact(core: String, question: String): String? {
+        fun terms(text: String) = stems(text) + Regex("\\d{3,}").findAll(text).map { it.value }.toSet()
+        val want = terms(question)
+        val best = core.lines().map { it.trim().removePrefix("- ").trim() }.filter { it.length >= MIN_QUOTE }
+            .map { it to terms(it).count { s -> s in want } }.maxByOrNull { it.second } ?: return null
+        return best.first.takeIf { best.second >= 2 }
+    }
+
     /** The two sentences of the web results that share most words with the question, quoted as they are. */
     private fun quoteWeb(found: String, question: String, polish: Boolean): String {
         val want = stems(question)
         val sentences =
             found.lines().filterNot { it.startsWith("UNTRUSTED") || it.startsWith("END OF") }
                 .flatMap { it.split(Regex("(?<=[.!?])\\s+")) }
-                .map { it.trim() }.filter { it.length in MIN_QUOTE..MAX_QUOTE }.distinct()
-        val best = sentences.map { it to stems(it).count { s -> s in want } }.filter { it.second > 0 }.sortedByDescending { it.second }.take(2).map { it.first }
+                .map { it.trim() }.filter { it.length in MIN_QUOTE..MAX_QUOTE && !it.endsWith("?") && it.count { c -> c == ' ' } >= QUOTE_WORDS }.distinct()
+        val best = sentences.map { it to stems(it).count { s -> s in want } }.filter { it.second >= 2 }.sortedByDescending { it.second }.take(2).map { it.first }
         return if (best.isEmpty()) {
             rule(polish, "W wynikach z internetu nie ma jasnej odpowiedzi na to pytanie.", "The web results do not answer this question clearly.")
         } else {
@@ -809,6 +853,7 @@ class LlamaAssistantService(
         val NUMBER = Regex("\\d+(?:[.,]\\d+)?")
         const val MIN_QUOTE = 25
         const val MAX_QUOTE = 400
+        const val QUOTE_WORDS = 6
         val ADVICE_INTENTS = setOf("app_help", "chat", "network_question", "signal_list", "web_question")
         val RANGE_PROBLEM = Regex("słab|slab|kiepsk|mały zasięg|maly zasieg|krótki zasięg|krotki zasieg|poprawi|zwiększ|zwieksz|lepsz|nie słysz|nie slysz|nie docier|nikogo nie|weak|poor|improve|bad|short range")
         val RANGE_TOPIC = Regex("zasięg|zasieg|sygnał|sygnal|odbiór|odbior|słysz|slysz|docier|range|signal|reception|hear")
@@ -941,6 +986,9 @@ class LlamaAssistantService(
         const val CORE_EN = "CORE FACTS ABOUT MT_SW (always true, use them when the question is about them):"
         val POLISH_PLAIN =
             Regex("\\s(jak|gdzie|czy|ile|kto|jest|mam|moj|moje|wezel|wezly|wezla|siec|sieci|pokaz|otworz|zmienic|ustawienia|prosze|dzieki|czesc|jaki|jaka|jakie)\\s")
+        // English words that are not also Polish ones ("to", "do", "on", "i", "a" are), for a short question.
+        val ENGLISH_ONLY =
+            Regex("\\s(the|how|what|where|which|who|is|are|does|can|my|show|open|change|please|hello|thanks|should|would|could|be|for|with|and|this|that|you|your|much|many|long|length|need|calculate)(?=[\\s?.!,])")
         val ENGLISH_PLAIN =
             Regex("\\s(the|how|what|where|which|who|is|are|do|does|can|my|me|to|of|in|on|show|open|change|set|please|hello|hi|thanks|i)(?=[\\s?.!,])")
         const val EARLIER_PL = "Streszczenie wcześniejszej części tej rozmowy:"

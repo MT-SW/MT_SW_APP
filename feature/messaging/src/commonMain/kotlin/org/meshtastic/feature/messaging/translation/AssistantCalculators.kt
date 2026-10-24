@@ -451,14 +451,27 @@ object AssistantCalculators {
                 "• czułość odbiornika ok. ${t.n(sens)} dBm (granica SNR ${t.n(snrLimit(o.spreadingFactor))} dB)\n" +
                 "• dopuszczalne tłumienie ok. ${t.n(budget)} dB\n" +
                 "• zasięg teoretyczny w wolnej przestrzeni: ok. ${t.n(dKm, 0)} km\n" +
-                "To górna granica przy pełnej widoczności anten. W praktyce decydują wysokość anten i przeszkody: na płaskim terenie przy ziemi to zwykle kilka km, z wysokich punktów kilkadziesiąt i więcej. Konkretne łącze sprawdzisz w planerze łącza.",
+                "To górna granica przy pełnej widoczności anten. Na Ziemi zasięg ogranicza horyzont radiowy: ${horizonList(q, t)}. Do tego przeszkody (budynki, las, wzgórza). Konkretne łącze sprawdzisz w planerze łącza.",
             "Link budget for the ${presetName(o)} preset$presetNote (SF${o.spreadingFactor}, ${t.n(o.bandwidth * 1000.0, 2)} kHz) at ${t.n(f, 2)} MHz:\n" +
                 "• power ${t.n(p)} dBm$powerNote, antennas ${t.n(gt)} dBi and ${t.n(gr)} dBi\n" +
                 "• receiver sensitivity about ${t.n(sens)} dBm (SNR limit ${t.n(snrLimit(o.spreadingFactor))} dB)\n" +
                 "• allowed path loss about ${t.n(budget)} dB\n" +
                 "• theoretical free-space range: about ${t.n(dKm, 0)} km\n" +
-                "That is the upper limit with the antennas in full view of each other. In practice antenna height and obstacles decide: near the ground on flat land usually a few km, from high places tens of km and more. Check a real link in the link planner.",
+                "That is the upper limit with the antennas in full view of each other. On Earth the radio horizon limits it: ${horizonList(q, t)}. Obstacles (buildings, forest, hills) come on top. Check a real link in the link planner.",
         )
+    }
+
+    /** The radio horizon for the heights in the question, or for both antennas at 2, 10 and 30 m. */
+    private fun horizonList(q: String, t: Texts): String {
+        val h = metres(q)
+        if (h.isNotEmpty()) {
+            val h1 = h[0]
+            val h2 = h.getOrNull(1) ?: h1
+            return t.s("anteny na ${t.n(h1)} m i ${t.n(h2)} m — ok. ${t.n(4.12 * (sqrt(h1) + sqrt(h2)))} km", "antennas at ${t.n(h1)} m and ${t.n(h2)} m — about ${t.n(4.12 * (sqrt(h1) + sqrt(h2)))} km")
+        }
+        return listOf(2.0, 10.0, 30.0).joinToString(", ") { m ->
+            t.s("obie anteny na ${t.n(m)} m — ok. ${t.n(4.12 * 2 * sqrt(m))} km", "both antennas at ${t.n(m)} m — about ${t.n(4.12 * 2 * sqrt(m))} km")
+        }
     }
 
     /** LoRa time on air (Semtech formula, 16-symbol preamble, explicit header, CRC on). */
