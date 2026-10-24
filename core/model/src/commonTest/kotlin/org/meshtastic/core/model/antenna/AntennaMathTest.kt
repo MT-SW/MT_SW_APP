@@ -18,6 +18,7 @@ package org.meshtastic.core.model.antenna
 
 import kotlin.math.abs
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class AntennaMathTest {
