@@ -266,6 +266,10 @@ antenna_cable_for
 antenna_calc_open
 antenna_calc_summary
 antenna_calc_title
+antenna_cmp_eirp
+antenna_cmp_loss
+antenna_cmp_pick
+antenna_cmp_range
 antenna_decimal
 antenna_diameter
 antenna_dim_arm
@@ -310,6 +314,8 @@ antenna_freq_ours
 antenna_frequency
 antenna_gain
 antenna_gain_override
+antenna_hint_cable
+antenna_hint_worst
 antenna_impedance
 antenna_insulation
 antenna_insulation_none

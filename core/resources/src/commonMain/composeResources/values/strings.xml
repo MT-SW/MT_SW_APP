@@ -287,6 +287,10 @@
     <string name="antenna_calc_open">Open the antenna calculator</string>
     <string name="antenna_calc_summary">Sizes of many antenna types for any frequency, with a drawing, and the losses of cable and connectors</string>
     <string name="antenna_calc_title">Antenna calculator</string>
+    <string name="antenna_cmp_eirp">EIRP: %1$s dBm now, %2$s dBm saved (difference %3$s dB)</string>
+    <string name="antenna_cmp_loss">Losses: %1$s dB now, %2$s dB saved (difference %3$s dB)</string>
+    <string name="antenna_cmp_pick">Compare with a saved antenna</string>
+    <string name="antenna_cmp_range">Relative range: %1$s% now, %2$s% saved</string>
     <string name="antenna_decimal">.</string>
     <string name="antenna_diameter">Element diameter (mm)</string>
     <string name="antenna_dim_arm">each arm</string>
@@ -331,6 +335,8 @@
     <string name="antenna_frequency">Frequency (MHz)</string>
     <string name="antenna_gain">Gain: about %1$s dBi</string>
     <string name="antenna_gain_override">Antenna gain (dBi, empty = from the design)</string>
+    <string name="antenna_hint_cable">This cable loses about %1$s dB per metre: %3$s m shorter would save about %2$s dB.</string>
+    <string name="antenna_hint_worst">Biggest loss: %1$s (%2$s dB, %3$s% of all losses).</string>
     <string name="antenna_impedance">Impedance: about %1$s Ω</string>
     <string name="antenna_insulation">Insulation of the wire</string>
     <string name="antenna_insulation_none">Bare wire or tube</string>

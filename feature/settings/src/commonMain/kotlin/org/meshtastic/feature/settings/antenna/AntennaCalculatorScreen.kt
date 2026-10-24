@@ -249,6 +249,12 @@ import org.meshtastic.core.model.antenna.AntennaSetup
 import org.meshtastic.core.model.antenna.AntennaSetups
 import org.meshtastic.core.repository.UiPrefs
 import androidx.compose.runtime.key
+import org.meshtastic.core.resources.antenna_hint_worst
+import org.meshtastic.core.resources.antenna_hint_cable
+import org.meshtastic.core.resources.antenna_cmp_pick
+import org.meshtastic.core.resources.antenna_cmp_loss
+import org.meshtastic.core.resources.antenna_cmp_eirp
+import org.meshtastic.core.resources.antenna_cmp_range
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -518,7 +524,7 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
                 }
             }
 
-            if (type != AntennaType.COAX_STUB) key(loadCount) { FeedSection(mhz, design, sep, prefill.third, loaded) { feedData = it } }
+            if (type != AntennaType.COAX_STUB) key(loadCount) { FeedSection(mhz, design, sep, prefill.third, loaded, setups) { feedData = it } }
 
             Text(
                 text = stringResource(Res.string.antenna_accuracy),
@@ -648,7 +654,7 @@ private const val MAX_SECTION_M = 1000.0
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: Double?, initial: AntennaSetup?, onData: (AntennaFeedData) -> Unit) {
+private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: Double?, initial: AntennaSetup?, setups: List<AntennaSetup>, onData: (AntennaFeedData) -> Unit) {
     val radioConfig: RadioConfigRepository = koinInject()
     val lora = radioConfig.localConfigFlow.collectAsState(null).value?.lora
     // Radio output power; 0 means "the region's maximum", which is known here only for the EU 868 regions.
@@ -695,6 +701,42 @@ private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: 
                 append(CableDb.connector(id)?.name ?: id)
             }
         }.ifBlank { stringResource(Res.string.planner_feeder_preset_direct) }
+
+    // What loses the most, in words, and how the line compares with a saved antenna.
+    val mismatchName = stringResource(Res.string.antenna_swr)
+    val sectionDb =
+        feeder.sections.map { sct ->
+            when (sct.cableId) {
+                FeederBuilder.NONE_ID -> 0.0
+                FeederBuilder.CUSTOM_ID -> (sct.customDbPerM ?: 0.0) * sct.lengthM
+                else -> (CableDb.cable(sct.cableId)?.lossDbPerM(mhz) ?: 0.0) * sct.lengthM
+            }
+        }
+    val worstPart = (partLines + (mismatchName to res.mismatchDb)).maxByOrNull { it.second }
+    val hintLines =
+        buildList {
+            if (worstPart != null && worstPart.second >= 0.05 && res.totalDb > 0.0) {
+                add(stringResource(Res.string.antenna_hint_worst, worstPart.first, fmt(worstPart.second, 2, sep), fmt(worstPart.second / res.totalDb * 100, 0, sep)))
+                val i = sectionDb.indices.maxByOrNull { sectionDb[it] }
+                val sct = i?.let { feeder.sections[it] }
+                if (i != null && sct != null && sct.lengthM >= 1.0 && sectionDb[i] >= worstPart.second - 1e-9) {
+                    val perM = sectionDb[i] / sct.lengthM
+                    add(stringResource(Res.string.antenna_hint_cable, fmt(perM, 3, sep), fmt(perM * minOf(5.0, sct.lengthM), 2, sep), fmt(minOf(5.0, sct.lengthM), 0, sep)))
+                }
+            }
+        }
+    var compareId by remember { mutableStateOf("") }
+    val other = setups.firstOrNull { it.id == compareId }
+    val compareLines =
+        buildList {
+            if (other != null) {
+                val of = FeederBuilder.compute(other.feeder, other.input.mhz)
+                val o = AntennaMath.feedLoss(other.input.mhz, other.txDbm, of.totalDb, of.connectorsDb, other.swr, other.gainDbi)
+                add(stringResource(Res.string.antenna_cmp_loss, fmt(res.totalDb, 2, sep), fmt(o.totalDb, 2, sep), fmt(res.totalDb - o.totalDb, 2, sep)))
+                add(stringResource(Res.string.antenna_cmp_eirp, fmt(res.eirpDbm, 1, sep), fmt(o.eirpDbm, 1, sep), fmt(res.eirpDbm - o.eirpDbm, 1, sep)))
+                add(stringResource(Res.string.antenna_cmp_range, fmt(res.rangeFactor * 100, 0, sep), fmt(o.rangeFactor * 100, 0, sep)))
+            }
+        }
 
     val resultLines =
         buildList {
@@ -785,6 +827,17 @@ private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: 
                 Text(feederWarning(code), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
             }
             resultLines.forEach { Line(it) }
+            hintLines.forEach { Line(it) }
+            if (setups.isNotEmpty()) {
+                DropDownPreference(
+                    title = stringResource(Res.string.antenna_cmp_pick),
+                    enabled = true,
+                    items = listOf("" to "—") + setups.map { it.id to it.name },
+                    selectedItem = compareId,
+                    onItemSelected = { compareId = it },
+                )
+                compareLines.forEach { Line(it) }
+            }
         }
     }
 }
