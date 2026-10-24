@@ -145,6 +145,8 @@ On weaker devices large models can slow the app down or close it, which is why e
 
 **Assistant test.** Type `/test` in the assistant and send it: the assistant asks itself about 40 test questions (with a real node and channel name from your network) and shows the questions and answers in the chat, and at the end a full report with answer times and the model used, which can be copied (press and hold the bubble). On a computer the report is also saved to `assistant-test-results.md`. This way answer quality can be compared across devices and models. Nothing opens by itself during the test; the "Stop" button ends it.
 
+**Copying the conversation.** Above the chat there is a "Copy whole conversation" button: it copies all questions and answers (including the names of the redirect buttons) to the clipboard, e.g. to paste into a message when reporting a problem. A single bubble is copied by pressing and holding it.
+
 **Translator:**
 
 - **Received messages** — the message menu has "Translate message". The original stays, and you can switch between it and the translation.
