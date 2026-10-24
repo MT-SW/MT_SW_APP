@@ -924,7 +924,9 @@ class AssistantDataProvider(
         }
         // The word as asked, then without its ending (the Polish "pogodzie" finds "pogoda", "pogody"): the same message
         // text is searched, only the needle gets shorter.
-        for (n in listOfNotNull(needle, needle.takeIf { it.length >= STEM_MIN_SEARCH }?.dropLast(2)).distinct()) {
+        // "pogodzie" -> "pogod" needs three letters off (d -> dz), so the longer words are also tried shorter by three.
+        val shortened = listOfNotNull(needle.takeIf { it.length >= STEM_MIN_SEARCH }?.dropLast(2), needle.takeIf { it.length > STEM_MIN_SEARCH }?.dropLast(3))
+        for (n in (listOf(needle) + shortened).distinct()) {
             found += seen.filter { n.isEmpty() || it.second.contains(n) }.map { it.first }
             if (found.isNotEmpty()) break
         }
