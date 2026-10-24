@@ -64,6 +64,7 @@ import org.meshtastic.core.resources.ai_license_gemma
 import org.meshtastic.core.resources.ai_level_light
 import org.meshtastic.core.resources.ai_level_standard
 import org.meshtastic.core.resources.ai_level_strong
+import org.meshtastic.core.resources.ai_level_translator
 import org.meshtastic.core.resources.ai_dictation_note
 import org.meshtastic.core.resources.dictation_external_mic_summary
 import org.meshtastic.core.resources.dictation_external_mic_title
@@ -351,7 +352,7 @@ private fun SectionLabel(text: String) {
 @Composable
 private fun levelName(model: AiModelInfo): String = stringResource(
     when (model.id) {
-        AiModels.NLLB_600M_ID -> Res.string.ai_level_light
+        AiModels.NLLB_600M_ID -> Res.string.ai_level_translator
         AiModels.GEMMA_E2B_ID -> Res.string.ai_level_light
         AiModels.GEMMA_E4B_ID -> Res.string.ai_level_standard
         else -> Res.string.ai_level_strong
