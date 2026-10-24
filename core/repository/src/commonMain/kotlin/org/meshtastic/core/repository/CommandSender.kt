@@ -20,6 +20,7 @@ import org.meshtastic.core.model.DataPacket
 import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.LocalConfig
+import org.meshtastic.proto.LocalStatsBroadcastConfig
 import org.meshtastic.proto.OnDemandType
 import org.meshtastic.core.model.Position as ModelPosition
 import org.meshtastic.proto.Position as ProtoPosition
@@ -162,6 +163,9 @@ interface CommandSender {
      * Sends an OnDemand diagnostics query (e.g. node stats) to [destNum], or throws if the outbound queue rejects it.
      */
     suspend fun requestOnDemand(destNum: Int, requestType: OnDemandType)
+
+    /** Sets both local stats broadcast options on [destNum] at once (OnDemand request 32). */
+    suspend fun setLocalStatsBroadcastConfig(destNum: Int, config: LocalStatsBroadcastConfig)
 
     /**
      * Sends a Remote Hardware WRITE_GPIOS command to [destNum], setting the pins selected in [gpioMask] to the

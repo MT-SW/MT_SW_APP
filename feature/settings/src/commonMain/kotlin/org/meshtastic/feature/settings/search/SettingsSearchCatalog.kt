@@ -34,6 +34,7 @@ import org.meshtastic.core.resources.debug_panel
 import org.meshtastic.core.resources.device_links
 import org.meshtastic.core.resources.filter_settings
 import org.meshtastic.core.resources.node_layout_section_title
+import org.meshtastic.core.resources.local_stats_title
 import org.meshtastic.core.resources.log_retention_days
 import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.mt_sw_other_title
@@ -174,6 +175,7 @@ object SettingsSearchCatalog {
             Res.string.node_color_title to SettingsRoute.Security,
             Res.string.dictation_external_mic_title to SettingsRoute.MtSwFeatures,
             Res.string.ai_model_one_title to SettingsRoute.MtSwFeatures,
+            Res.string.local_stats_title to SettingsRoute.Telemetry,
             Res.string.about to SettingsRoute.About,
             Res.string.acknowledgements to SettingsRoute.Acknowledgements,
         )

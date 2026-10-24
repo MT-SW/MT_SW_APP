@@ -27,6 +27,7 @@ import org.meshtastic.core.repository.PacketQueueRejectedException
 import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.LocalConfig
+import org.meshtastic.proto.LocalStatsBroadcastConfig
 import org.meshtastic.proto.OnDemandType
 
 /** Shared recording [CommandSender] fake for tests that do not need transport behavior. */
@@ -178,6 +179,10 @@ class FakeCommandSender :
     }
 
     override suspend fun requestOnDemand(destNum: Int, requestType: OnDemandType) {
+        failCommandIfConfigured()
+    }
+
+    override suspend fun setLocalStatsBroadcastConfig(destNum: Int, config: LocalStatsBroadcastConfig) {
         failCommandIfConfigured()
     }
 

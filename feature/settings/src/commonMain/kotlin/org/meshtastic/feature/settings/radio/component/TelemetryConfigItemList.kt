@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.state.HiddenFeaturesUnlock
+import org.meshtastic.core.domain.usecase.settings.SnifferControlUseCase
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.Capabilities
 import org.meshtastic.core.resources.Res
@@ -263,6 +264,21 @@ fun TelemetryConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                             formState.value.newBuilder().also { wb -> wb.power_screen_enabled = it }.build()
                     },
                     containerColor = CardDefaults.cardColors().containerColor,
+                )
+            }
+        }
+        // Extra telemetry (the node's own statistics) exists only on fw+ version 3 and newer; it is saved separately.
+        val localStatsSupported =
+            state.localStatsConfig != null ||
+                (state.fwPlusVersion ?: 0) >= SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_LOCAL_STATS
+        if (localStatsSupported) {
+            item {
+                LocalStatsCard(
+                    config = state.localStatsConfig,
+                    loading = state.localStatsLoading,
+                    connected = state.connected,
+                    unlocked = unlocked,
+                    onSave = viewModel::setLocalStatsConfig,
                 )
             }
         }

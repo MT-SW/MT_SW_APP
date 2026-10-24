@@ -2520,6 +2520,16 @@
     <string name="tak_team_yellow">Żółty</string>
     <string name="telemetry">Telemetria</string>
     <string name="telemetry_config">Konfiguracja telemetrii</string>
+    <string name="local_stats_title">Statystyki lokalne (FW+ v3)</string>
+    <string name="local_stats_basic_enabled">Dodatkowa telemetria</string>
+    <string name="local_stats_basic_enabled_desc">Węzeł regularnie wysyła do sieci własne statystyki.</string>
+    <string name="local_stats_basic_interval">Interwał dodatkowej telemetrii</string>
+    <string name="local_stats_ext_enabled">Rozszerzona dodatkowa telemetria</string>
+    <string name="local_stats_ext_enabled_desc">Dodaje bardziej szczegółowe dane o pracy węzła.</string>
+    <string name="local_stats_ext_interval">Interwał rozszerzonej telemetrii</string>
+    <string name="local_stats_save">Zapisz w węźle</string>
+    <string name="local_stats_reading">Odczytuję ustawienia z węzła…</string>
+    <string name="local_stats_save_failed">Węzeł nie potwierdził ustawień statystyk lokalnych.</string>
     <string name="temperature">Temp.°</string>
     <string name="theme">Motyw</string>
     <string name="ui_scale">Skalowanie aplikacji</string>

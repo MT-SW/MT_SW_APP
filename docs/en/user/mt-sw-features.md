@@ -3,7 +3,7 @@ title: MT_SW features
 parent: User Guide
 nav_order: 23
 last_updated: 2026-10-24
-description: An overview of what MT_SW_APP adds to the original Meshtastic app — remote GPIO control, network health, links on the map, Mesh Link Planner, antenna calculator, on-demand diagnostics, Sniffer, debug panel with device logs, app scale and more.
+description: An overview of what MT_SW_APP adds to the original Meshtastic app — remote GPIO control, network health, links on the map, Mesh Link Planner, antenna calculator, on-demand diagnostics, Sniffer, extra telemetry, debug panel with device logs, app scale and more.
 aliases:
   - mt-sw
   - gpio
@@ -19,7 +19,7 @@ aliases:
 
 MT_SW_APP is built on the original Meshtastic app. On top of everything the original does, it has many features of its own that make life in a mesh easier, especially in the Świętokrzyskie network. This page describes them one by one and tells you where to find them.
 
-> ℹ️ **Note:** Some features (On-demand diagnostics, radio Sniffer, node resources, device logs over Wi-Fi and USB) need MT_SW firmware. On regular firmware the app works normally, but these features get no answer.
+> ℹ️ **Note:** Some features (On-demand diagnostics, radio Sniffer, extra telemetry, node resources, device logs over Wi-Fi and USB) need MT_SW firmware. On regular firmware the app works normally, but these features get no answer.
 
 ## Remote management
 
@@ -117,6 +117,14 @@ The **Sniffer** screen (Settings → Advanced) shows network traffic live, inclu
 - **Saving and loading the log** (txt, JSON, CSV), and tapping a packet shows its full content.
 - Position and telemetry cards show the time written by the sender; an impossible time is marked as wrong.
 
+## Extra telemetry (local statistics)
+
+In **Settings → Modules → Telemetry** a **Local statistics (FW+ v3)** card appears when the connected node runs MT_SW firmware version 3 or newer. It has two switches — **Extra telemetry** and **Extended extra telemetry** — and a separate interval for each. The node regularly broadcasts its own statistics over the mesh.
+
+- **The shortest interval is 2 hours.** Shorter ones (from 5 minutes) appear only after the hidden options are unlocked.
+- **Both options are saved together** with the **Save to the node** button. The app first reads the current state from the node, so changing one option leaves the other as it was. After saving it shows what the node really stored (it may correct the intervals); if the node does not confirm, you get a message.
+- On older firmware the card is not shown at all. Saving does not restart the node.
+
 ## Debug panel
 
 The debug panel (Settings → Advanced → Debug Panel) has an extra tab in this app. See also [Debug logs](debug-logs).
@@ -213,7 +221,7 @@ On weaker devices large models can slow the app down or close it, which is why e
 
 ## Settings and appearance
 
-- **MT_SW features group** — Settings has one entry, "MT_SW features", that opens a separate screen with our settings: the switch for previewing images from links in chat, update notifications (two switches) and the node list layout. Below are shortcuts to settings that have a natural home elsewhere: app scaling, theme, node colour (opens the security settings with the "Pick colour" button blinking), LoRa (LNA correction and frequency offset), node database cleaning, Sniffer and the debug panel. The last entry, "Other features", describes the features that live next to a node (node LNA correction, inverted current and power, remote GPIO, on-demand diagnostics) and where to find them. Every item is also found by the settings search.
+- **MT_SW features group** — Settings has one entry, "MT_SW features", that opens a separate screen with our settings: the switch for previewing images from links in chat, update notifications (two switches) and the node list layout. Below are shortcuts to settings that have a natural home elsewhere: app scaling, theme, node colour (opens the security settings with the "Pick colour" button blinking), LoRa (LNA correction and frequency offset), node database cleaning, Sniffer, local statistics (extra telemetry) and the debug panel. The last entry, "Other features", describes the features that live next to a node (node LNA correction, inverted current and power, remote GPIO, on-demand diagnostics) and where to find them. Every item is also found by the settings search.
 - **App scale** — in the app settings you choose the size of text and elements from 50% to 200%, independently of the phone settings. The default is "Same as phone". It works on desktop too.
 - **LoRa settings** — a "Frequency offset (kHz)" field, coding rate 4/5 for Narrow presets, full resolution of the overridden frequency, a warning description for "Override duty cycle" and the restored Traffic Management screen.
 - **Security** — key backup on desktop too, and a node colour choice when generating a key.

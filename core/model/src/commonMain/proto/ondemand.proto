@@ -147,10 +147,24 @@ enum OnDemandType {
     REQUEST_SNIFFER_DISABLE = 24;
     REQUEST_SNIFFER_STATE = 25;
     RESPONSE_SNIFFER_STATE = 26;
+    // Local stats broadcast settings (fw+ version 3 and newer): read, answer, and set both options at once.
+    REQUEST_LOCAL_STATS_BROADCAST_CONFIG = 30;
+    RESPONSE_LOCAL_STATS_BROADCAST_CONFIG = 31;
+    REQUEST_SET_LOCAL_STATS_BROADCAST_CONFIG = 32;
+}
+
+// Periodic broadcast of the node's own statistics: the basic ones and the extended ones, each with its own interval.
+message LocalStatsBroadcastConfig {
+    bool local_stats_enabled = 1;
+    uint32 local_stats_interval_secs = 2;
+    bool local_stats_extended_enabled = 3;
+    uint32 local_stats_extended_interval_secs = 4;
 }
 
 message OnDemandRequest {
     OnDemandType request_type = 1;
+    // Only used with REQUEST_SET_LOCAL_STATS_BROADCAST_CONFIG; it sets both options at once.
+    LocalStatsBroadcastConfig local_stats_broadcast_config = 3;
 }
 
 message SnifferState {
@@ -171,6 +185,7 @@ message OnDemandResponse {
         FwPlusVersion fw_plus_version = 10;
         RoutingErrorsHistory routing_errors = 11;
         SnifferState sniffer_state = 12;
+        LocalStatsBroadcastConfig local_stats_broadcast_config = 14;
     }
 }
 

@@ -456,6 +456,7 @@ class RadioConfigViewModelTest {
         every { deviceHardwareRepository.observeDeviceHardware(any(), any()) } returns flowOf(null)
 
         every { snifferControlUseCase.snifferEnabledFlow(any(), any()) } returns MutableStateFlow(null)
+        every { snifferControlUseCase.localStatsConfigFlow(any(), any()) } returns MutableStateFlow(null)
 
         viewModel = createViewModel()
     }

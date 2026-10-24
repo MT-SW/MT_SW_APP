@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+* **Dodatkowa telemetria** (FW+ v3): w ustawieniach telemetrii karta „Statystyki lokalne” z przełącznikami dodatkowej i rozszerzonej dodatkowej telemetrii oraz osobnym interwałem każdej (najkrócej 2 godziny, krócej po odblokowaniu ukrytych opcji). Obie opcje zapisują się razem; aplikacja najpierw odczytuje stan z węzła i pokazuje to, co węzeł zapisał. Karta jest tylko przy firmware MT_SW w wersji 3 lub nowszej. Skrót też w Funkcjach MT_SW.
 * **Asystent przebudowany od nowa.** Model najpierw rozpoznaje, o co pytasz, w stałym formacie (wybiera tylko jedną ze znanych kategorii, więc nie psuje już wywołań narzędzi), a potem: dokładne odpowiedzi (liczby, wyszukiwanie, listy węzłów, trasy, stan, czujniki) układa program w języku aplikacji, pytania o aplikację model odpowiada z dokumentacji, o sieć z dobranych danych, a na inne tematy można swobodnie rozmawiać. Krótkie polecenia dla modelu w języku rozmowy, ciche myślenie modelu przed odpowiedzią i płynniejsze wyświetlanie odpowiedzi.
 * Asystent **sam przechodzi** tam, gdzie prosisz: węzeł na mapie (także najbliższy lub najdalszy, np. najbliższy router), ekran, ustawienie (mruga na żółto), planer łącza, rozmowa z gotowym tekstem wiadomości. Nigdy nie zmienia ustawień i nigdy nie wysyła wiadomości.
 * Tłumacz i asystent są oznaczone jako **funkcja eksperymentalna**: nie gwarantujemy poprawności działania.
@@ -412,6 +413,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### October 2026
 
+* **Extra telemetry** (FW+ v3): a “Local statistics” card in the telemetry settings with switches for extra and extended extra telemetry and a separate interval for each (2 hours at least, shorter after unlocking the hidden options). Both options are saved together; the app first reads the state from the node and shows what the node stored. The card appears only on MT_SW firmware version 3 or newer. A shortcut is also in MT_SW features.
 * **The assistant rebuilt from scratch.** The model first recognises what you ask in a fixed format (it can only pick one of the known kinds, so it no longer breaks tool calls), then: exact answers (counts, searches, node lists, routes, status, sensors) are written by the app's code in the app's language, questions about the app are answered by the model from the documentation, questions about the network from data chosen for them, and any other topic can be talked about freely. Short instructions for the model in the language of the conversation, quiet thinking before the answer and smoother display of the answer.
 * The assistant **goes there by itself** when you ask: a node on the map (also the nearest or farthest one, for example the nearest router), a screen, a setting (it blinks yellow), the link planner, a conversation with the message text ready. It never changes a setting and never sends a message.
 * The translator and the assistant are marked as an **experimental feature**: correct operation is not guaranteed.

@@ -3,7 +3,7 @@ title: Funkcje MT_SW
 parent: Przewodnik użytkownika
 nav_order: 23
 last_updated: 2026-10-24
-description: Przegląd tego, co MT_SW_APP dodaje do oryginalnej aplikacji Meshtastic — zdalne sterowanie GPIO, zdrowie sieci, połączenia na mapie, Mesh Link Planer, kalkulator anten, diagnostyka na żądanie, Sniffer, panel debugowania z logami urządzenia, skalowanie aplikacji i więcej.
+description: Przegląd tego, co MT_SW_APP dodaje do oryginalnej aplikacji Meshtastic — zdalne sterowanie GPIO, zdrowie sieci, połączenia na mapie, Mesh Link Planer, kalkulator anten, diagnostyka na żądanie, Sniffer, dodatkowa telemetria, panel debugowania z logami urządzenia, skalowanie aplikacji i więcej.
 aliases:
   - mt-sw
   - gpio
@@ -19,7 +19,7 @@ aliases:
 
 MT_SW_APP to aplikacja oparta na oryginalnej aplikacji Meshtastic. Poza wszystkim, co robi oryginał, ma wiele własnych funkcji, które ułatwiają życie w sieci mesh — zwłaszcza w sieci świętokrzyskiej. Ta strona opisuje je po kolei i mówi, gdzie ich szukać.
 
-> ℹ️ **Uwaga:** Część funkcji (Diagnostyka na żądanie, Sniffer radiowy, zasoby węzła, logi urządzenia przez Wi-Fi i USB) wymaga firmware MT_SW. Na zwykłym firmware aplikacja działa normalnie, ale te funkcje nie dostaną odpowiedzi.
+> ℹ️ **Uwaga:** Część funkcji (Diagnostyka na żądanie, Sniffer radiowy, dodatkowa telemetria, zasoby węzła, logi urządzenia przez Wi-Fi i USB) wymaga firmware MT_SW. Na zwykłym firmware aplikacja działa normalnie, ale te funkcje nie dostaną odpowiedzi.
 
 ## Zdalne zarządzanie
 
@@ -117,6 +117,14 @@ Ekran **Sniffer** (Ustawienia → Advanced) pokazuje na żywo ruch w sieci, tak�
 - **Zapis i wczytywanie logu** (txt, JSON, CSV), a po kliknięciu pakietu pełny podgląd jego treści.
 - Karty pozycji i telemetrii pokazują czas zapisany przez nadawcę; niemożliwy czas jest oznaczony jako błędny.
 
+## Dodatkowa telemetria (statystyki lokalne)
+
+W **Ustawienia → Moduły → Telemetria** pojawia się karta **Statystyki lokalne (FW+ v3)**, gdy podłączony węzeł ma firmware MT_SW w wersji 3 lub nowszej. Ma dwa przełączniki — **Dodatkowa telemetria** i **Rozszerzona dodatkowa telemetria** — i osobny interwał dla każdego. Węzeł regularnie wysyła do sieci własne statystyki.
+
+- **Najkrótszy interwał to 2 godziny.** Krótsze (od 5 minut) pojawiają się dopiero po odblokowaniu ukrytych opcji.
+- **Obie opcje zapisują się razem** przyciskiem **Zapisz w węźle**. Aplikacja najpierw odczytuje obecny stan z węzła, więc zmiana jednej opcji nie rusza drugiej. Po zapisie pokazuje to, co węzeł naprawdę zapisał (może poprawić interwały); jeśli nie potwierdzi, dostajesz komunikat.
+- Na starszym firmware karta w ogóle się nie pokazuje. Zapis nie wymaga restartu węzła.
+
 ## Panel debugowania
 
 Panel debugowania (Ustawienia → Zaawansowane → Panel debugowania) ma w tej aplikacji dodatkową zakładkę. Zobacz też [Logi debugowania](debug-logs).
@@ -213,7 +221,7 @@ Na słabszych urządzeniach duże modele mogą spowalniać aplikację albo ją z
 
 ## Ustawienia i wygląd
 
-- **Grupa „Funkcje MT_SW”** — w Ustawieniach jest jeden wpis „Funkcje MT_SW”, który otwiera osobny ekran z naszymi ustawieniami: przełącznik podglądu obrazków z linków w czacie, powiadomienia o nowych wersjach (dwa przełączniki) i układ listy węzłów. Niżej są skróty do ustawień, które mają swoje naturalne miejsce gdzie indziej: skalowanie aplikacji, motyw, kolor węzła (otwiera ustawienia bezpieczeństwa, a przycisk „Wybierz kolor” mruga), LoRa (korekta LNA i przesunięcie częstotliwości), czyszczenie bazy węzłów, Sniffer i panel debugowania. Na końcu wpis „Pozostałe funkcje” opisuje funkcje przy węźle (korekta LNA węzła, odwrócony prąd i zasilanie, zdalne GPIO, diagnostyka na żądanie) i mówi, gdzie ich szukać. Wszystkie pozycje znajdzie też wyszukiwarka ustawień.
+- **Grupa „Funkcje MT_SW”** — w Ustawieniach jest jeden wpis „Funkcje MT_SW”, który otwiera osobny ekran z naszymi ustawieniami: przełącznik podglądu obrazków z linków w czacie, powiadomienia o nowych wersjach (dwa przełączniki) i układ listy węzłów. Niżej są skróty do ustawień, które mają swoje naturalne miejsce gdzie indziej: skalowanie aplikacji, motyw, kolor węzła (otwiera ustawienia bezpieczeństwa, a przycisk „Wybierz kolor” mruga), LoRa (korekta LNA i przesunięcie częstotliwości), czyszczenie bazy węzłów, Sniffer, statystyki lokalne (dodatkowa telemetria) i panel debugowania. Na końcu wpis „Pozostałe funkcje” opisuje funkcje przy węźle (korekta LNA węzła, odwrócony prąd i zasilanie, zdalne GPIO, diagnostyka na żądanie) i mówi, gdzie ich szukać. Wszystkie pozycje znajdzie też wyszukiwarka ustawień.
 - **Skalowanie aplikacji** — w ustawieniach aplikacji wybierasz rozmiar tekstu i elementów od 50% do 200%, niezależnie od ustawień telefonu. Domyślnie „Zgodnie z systemem”. Działa też na komputerze.
 - **Ustawienia LoRa** — pole „Przesunięcie częstotliwości (kHz)”, coding rate 4/5 dla presetów Narrow, pełna rozdzielczość częstotliwości nadpisanej, opis ostrzegawczy przy „Nadpisz cykl pracy” oraz przywrócony ekran Traffic Management.
 - **Bezpieczeństwo** — kopia kluczy także na komputerze oraz wybór koloru węzła przy generowaniu klucza.

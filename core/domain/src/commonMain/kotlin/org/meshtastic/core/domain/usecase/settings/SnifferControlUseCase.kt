@@ -23,6 +23,7 @@ import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.util.ON_DEMAND_PORT_NUM
 import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.RadioController
+import org.meshtastic.proto.LocalStatsBroadcastConfig
 import org.meshtastic.proto.OnDemand
 import org.meshtastic.proto.OnDemandType
 
@@ -119,7 +120,48 @@ open class SnifferControlUseCase(
         .maxByOrNull { it.second }
         ?.first
 
+    /** Sends REQUEST_LOCAL_STATS_BROADCAST_CONFIG to [destNum]; the answer arrives via [localStatsConfigFlow]. */
+    open suspend fun requestLocalStatsConfig(destNum: Int) {
+        radioController.requestOnDemand(destNum, OnDemandType.REQUEST_LOCAL_STATS_BROADCAST_CONFIG)
+    }
+
+    /**
+     * Sets both local stats broadcast options (basic and extended, with intervals) on [destNum] at once. The radio
+     * answers with the state it ended up with, after it corrected the intervals -- see [localStatsConfigFlow]. To change
+     * one option only, the caller sends the other one's current value unchanged.
+     */
+    open suspend fun setLocalStatsConfig(destNum: Int, config: LocalStatsBroadcastConfig) {
+        radioController.setLocalStatsBroadcastConfig(destNum, config)
+    }
+
+    /**
+     * The most recent RESPONSE_LOCAL_STATS_BROADCAST_CONFIG logged for [destNum] at or after [sinceMillis], or `null`
+     * when none has arrived (not asked yet, or the firmware is older than fw+ version
+     * [MIN_FW_PLUS_VERSION_FOR_LOCAL_STATS]).
+     */
+    open fun localStatsConfigFlow(destNum: Int, sinceMillis: Long): Flow<LocalStatsBroadcastConfig?> =
+        meshLogRepository.getLogsFrom(destNum, ON_DEMAND_PORT_NUM).map { decodeLatestLocalStats(it, sinceMillis) }
+
+    private fun decodeLatestLocalStats(logs: List<MeshLog>, sinceMillis: Long): LocalStatsBroadcastConfig? = logs
+        .filter { it.received_date >= sinceMillis }
+        .mapNotNull { log ->
+            log.fromRadio
+                ?.packet
+                ?.decoded
+                ?.payload
+                ?.let { payload -> runCatching { OnDemand.ADAPTER.decode(payload) }.getOrNull() }
+                ?.response
+                ?.takeIf { it.response_type == OnDemandType.RESPONSE_LOCAL_STATS_BROADCAST_CONFIG }
+                ?.local_stats_broadcast_config
+                ?.let { config -> config to log.received_date }
+        }
+        .maxByOrNull { it.second }
+        ?.first
+
     companion object {
+        /** Minimum fw+ `version_number` that has the local stats broadcast settings (OnDemand requests 30-32). */
+        const val MIN_FW_PLUS_VERSION_FOR_LOCAL_STATS = 3
+
         /**
          * Minimum fw+ `version_number` (see [requestFwPlusVersion]/[fwPlusVersionFlow]) at which Sniffer is considered
          * supported -- agreed with firmware at 2 (not the originally-discussed 3), to preserve release-numbering

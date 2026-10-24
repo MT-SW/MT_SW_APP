@@ -32,6 +32,7 @@ import org.meshtastic.proto.Channel
 import org.meshtastic.proto.ClientNotification
 import org.meshtastic.proto.Config
 import org.meshtastic.proto.HamParameters
+import org.meshtastic.proto.LocalStatsBroadcastConfig
 import org.meshtastic.proto.ModuleConfig
 import org.meshtastic.proto.OnDemandType
 import org.meshtastic.proto.User
@@ -274,6 +275,8 @@ class FakeRadioController :
         true
 
     override suspend fun requestOnDemand(destNum: Int, requestType: OnDemandType) {}
+
+    override suspend fun setLocalStatsBroadcastConfig(destNum: Int, config: LocalStatsBroadcastConfig) {}
 
     override suspend fun writeGpio(destNum: Int, gpioMask: Long, gpioValue: Long) {}
 

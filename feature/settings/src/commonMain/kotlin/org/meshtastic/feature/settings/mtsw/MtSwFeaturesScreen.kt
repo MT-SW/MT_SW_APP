@@ -50,6 +50,7 @@ import org.meshtastic.core.resources.antenna_tools_section
 import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.import_menu_in_top_bar
 import org.meshtastic.core.resources.clean_node_database_title
+import org.meshtastic.core.resources.local_stats_title
 import org.meshtastic.core.resources.lora
 import org.meshtastic.core.resources.mt_sw_features_links
 import org.meshtastic.core.resources.mt_sw_features_links_hint
@@ -234,6 +235,9 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 }
                 ListItem(text = stringResource(Res.string.sniffer_settings_title), leadingIcon = MeshtasticIcons.Tune) {
                     onNavigate(SettingsRoute.Sniffer)
+                }
+                ListItem(text = stringResource(Res.string.local_stats_title), leadingIcon = MeshtasticIcons.Tune) {
+                    onNavigate(SettingsRoute.Telemetry)
                 }
                 ListItem(text = stringResource(Res.string.debug_panel), leadingIcon = MeshtasticIcons.BugReport) {
                     onNavigate(SettingsRoute.DebugPanel)

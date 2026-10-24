@@ -62,6 +62,7 @@ import org.meshtastic.proto.HardwareMessage
 import org.meshtastic.proto.HostMetrics
 import org.meshtastic.proto.LocalConfig
 import org.meshtastic.proto.LocalStats
+import org.meshtastic.proto.LocalStatsBroadcastConfig
 import org.meshtastic.proto.LockdownAuth
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.Neighbor
@@ -383,7 +384,23 @@ class CommandSenderImpl(
     }
 
     override suspend fun requestOnDemand(destNum: Int, requestType: OnDemandType) {
-        val onDemand = OnDemand(request = OnDemandRequest(request_type = requestType))
+        sendOnDemand(destNum, OnDemand(request = OnDemandRequest(request_type = requestType)))
+    }
+
+    override suspend fun setLocalStatsBroadcastConfig(destNum: Int, config: LocalStatsBroadcastConfig) {
+        sendOnDemand(
+            destNum,
+            OnDemand(
+                request =
+                OnDemandRequest(
+                    request_type = OnDemandType.REQUEST_SET_LOCAL_STATS_BROADCAST_CONFIG,
+                    local_stats_broadcast_config = config,
+                ),
+            ),
+        )
+    }
+
+    private fun sendOnDemand(destNum: Int, onDemand: OnDemand) {
         enqueueOrThrow(
             buildMeshPacket(
                 to = destNum,

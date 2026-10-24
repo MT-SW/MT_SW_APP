@@ -102,6 +102,7 @@ import org.meshtastic.core.resources.key_backup_not_found
 import org.meshtastic.core.resources.key_backup_restore_failed
 import org.meshtastic.core.resources.key_backup_restored
 import org.meshtastic.core.resources.key_backup_saved
+import org.meshtastic.core.resources.local_stats_save_failed
 import org.meshtastic.core.resources.timeout
 import org.meshtastic.core.resources.unknown_error
 import org.meshtastic.core.ui.util.SnackbarManager
@@ -124,6 +125,7 @@ import org.meshtastic.proto.HardwareModel
 import org.meshtastic.proto.LoRaRegionPresetMap
 import org.meshtastic.proto.LocalConfig
 import org.meshtastic.proto.LocalModuleConfig
+import org.meshtastic.proto.LocalStatsBroadcastConfig
 import org.meshtastic.proto.MeshPacket
 import org.meshtastic.proto.ModuleConfig
 import org.meshtastic.proto.Routing
@@ -143,6 +145,12 @@ private val LIVE_SAVE_REBOOT_WINDOW: Duration = 8.seconds
  * answers at all).
  */
 private val SNIFFER_STATE_TIMEOUT: Duration = 5.seconds
+
+/** How long to wait for the radio to report its fw+ version before the local stats settings are given up on. */
+private val LOCAL_STATS_VERSION_WAIT: Duration = 20.seconds
+
+/** How long a save of the local stats settings waits for the radio's confirmation. */
+private val LOCAL_STATS_SAVE_TIMEOUT: Duration = 6.seconds
 
 /** How many times, and how far apart, the Sniffer state is asked after a (re)connect until the radio answers. */
 private const val SNIFFER_STATE_ASK_ATTEMPTS = 4
@@ -204,6 +212,13 @@ data class RadioConfigState(
      * connection -- see [SnifferControlUseCase.fwPlusVersionFlow].
      */
     val fwPlusVersion: Int? = null,
+    /**
+     * Latest RESPONSE_LOCAL_STATS_BROADCAST_CONFIG for the local node (fw+ version 3 and newer), or null until the
+     * radio has answered this connection.
+     */
+    val localStatsConfig: LocalStatsBroadcastConfig? = null,
+    /** True while a read or save of the local stats broadcast settings is waiting for the radio's answer. */
+    val localStatsLoading: Boolean = false,
     val analyticsAvailable: Boolean = true,
     val analyticsEnabled: Boolean = true,
     val nodeDbResetPreserveFavorites: Boolean = false,
@@ -513,6 +528,29 @@ open class RadioConfigViewModel(
                 // An empty answer must not cancel the spinner of a request that is still being asked.
                 _radioConfigState.update {
                     it.copy(snifferEnabled = enabled, snifferLoading = if (enabled != null) false else it.snifferLoading)
+                }
+            }
+            .launchIn(viewModelScope)
+
+        // Local stats broadcast settings (fw+ version 3 and newer): read on every (re)connect once the radio has said
+        // it is new enough, and shown only from answers logged after that connect, like the Sniffer state above.
+        localNumIfConnected
+            .flatMapLatest { localNum ->
+                if (localNum == null) {
+                    _radioConfigState.update { it.copy(localStatsConfig = null, localStatsLoading = false) }
+                    flowOf(null)
+                } else {
+                    val since = nowMillis
+                    requestLocalStatsConfig(localNum)
+                    snifferControlUseCase.localStatsConfigFlow(localNum, since)
+                }
+            }
+            .onEach { config ->
+                _radioConfigState.update {
+                    it.copy(
+                        localStatsConfig = config,
+                        localStatsLoading = if (config != null) false else it.localStatsLoading,
+                    )
                 }
             }
             .launchIn(viewModelScope)
@@ -849,6 +887,50 @@ open class RadioConfigViewModel(
             requestWithQueueRetry("requestFwPlusVersion", localNum) {
                 snifferControlUseCase.requestFwPlusVersion(localNum)
             }
+        }
+    }
+
+    /**
+     * Asks the radio for its local stats broadcast settings, but only after it reported fw+ version
+     * [SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_LOCAL_STATS] or newer, so older firmware is not sent a request it
+     * cannot answer. Gives up quietly when the radio never reports a version.
+     */
+    private fun requestLocalStatsConfig(localNum: Int) {
+        safeLaunch(tag = "requestLocalStatsConfig") {
+            val supported =
+                withTimeoutOrNull(LOCAL_STATS_VERSION_WAIT) {
+                    radioConfigState.first {
+                        (it.fwPlusVersion ?: 0) >= SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_LOCAL_STATS
+                    }
+                }
+            if (supported == null) return@safeLaunch
+            _radioConfigState.update { it.copy(localStatsLoading = true) }
+            repeat(SNIFFER_STATE_ASK_ATTEMPTS) {
+                if (myNodeNum != localNum || _radioConfigState.value.localStatsConfig != null) return@repeat
+                requestWithQueueRetry("requestLocalStatsConfig", localNum) {
+                    snifferControlUseCase.requestLocalStatsConfig(localNum)
+                }
+                delay(SNIFFER_STATE_ASK_INTERVAL)
+            }
+            _radioConfigState.update { if (it.localStatsConfig == null) it.copy(localStatsLoading = false) else it }
+        }
+    }
+
+    /**
+     * Saves both local stats broadcast options on the connected node in one request. The radio's answer replaces
+     * [RadioConfigState.localStatsConfig] with what it really stored (it may have corrected an interval); when no
+     * answer comes, the user is told the save did not arrive.
+     */
+    fun setLocalStatsConfig(config: LocalStatsBroadcastConfig) {
+        val destNum = destNum ?: destNode.value?.num ?: return
+        safeLaunch(tag = "setLocalStatsConfig") {
+            val before = _radioConfigState.value.localStatsConfig
+            _radioConfigState.update { it.copy(localStatsLoading = true) }
+            snifferControlUseCase.setLocalStatsConfig(destNum, config)
+            delay(LOCAL_STATS_SAVE_TIMEOUT)
+            val stillWaiting = _radioConfigState.value.localStatsConfig == before
+            _radioConfigState.update { it.copy(localStatsLoading = false) }
+            if (stillWaiting) sendError(Res.string.local_stats_save_failed)
         }
     }
 
