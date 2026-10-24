@@ -717,7 +717,7 @@ class LlamaAssistantService(
 
     /** The line of our own verified facts that fits the question best (two or more shared words or numbers), or null. */
     private fun coreFact(core: String, question: String): String? {
-        fun terms(text: String) = stems(text) + Regex("\\d{3,}").findAll(text).map { it.value }.toSet()
+        fun terms(text: String) = stems(text) - STOP_STEMS + Regex("\\d{3,}").findAll(text).map { it.value }.toSet()
         val want = terms(question)
         val best = core.lines().map { it.trim().removePrefix("- ").trim() }.filter { it.length >= MIN_QUOTE }
             .map { it to terms(it).count { s -> s in want } }.maxByOrNull { it.second } ?: return null
@@ -900,7 +900,7 @@ class LlamaAssistantService(
         val STEP = Regex("^\\d+[.)]\\s")
         val VERB_PREFIXES = listOf("prze", "po", "wy", "za", "z", "s", "u", "na", "od", "do")
         // Common words that say nothing about which part of the manual a question is about.
-        val STOP_STEMS = setOf("przez", "jest", "gdzie", "jaki", "jakie", "jaka", "można", "mozna", "zrobi", "mojeg", "moje", "swoje", "swoim", "czym", "tego", "with", "what", "from", "have", "about", "does", "where", "which")
+        val STOP_STEMS = setOf("przez", "jest", "gdzie", "jaki", "jakie", "jaka", "można", "mozna", "zrobi", "mojeg", "moje", "swoje", "swoim", "czym", "tego", "jako", "oraz", "albo", "który", "która", "które", "with", "what", "from", "have", "about", "does", "where", "which")
         val ADVICE_INTENTS = setOf("app_help", "chat", "network_question", "signal_list", "web_question")
         val RANGE_PROBLEM = Regex("słab|slab|kiepsk|mały zasięg|maly zasieg|krótki zasięg|krotki zasieg|poprawi|zwiększ|zwieksz|lepsz|nie słysz|nie slysz|nie docier|nikogo nie|weak|poor|improve|bad|short range")
         val RANGE_TOPIC = Regex("zasięg|zasieg|sygnał|sygnal|odbiór|odbior|słysz|slysz|docier|range|signal|reception|hear")
