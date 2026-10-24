@@ -381,7 +381,10 @@
     <string name="antenna_swr">SWR (1 = perfect)</string>
     <string name="antenna_tools_section">Tools</string>
     <string name="antenna_turns">Number of turns</string>
+    <string name="antenna_tx_ours">Band ERP limit: %1$s dBm</string>
     <string name="antenna_tx_power">Transmit power (dBm)</string>
+    <string name="antenna_tx_radio">Radio output: %1$s dBm</string>
+    <string name="antenna_tx_radio_region">Radio: region maximum (%1$s dBm)</string>
     <string name="antenna_type">Antenna type</string>
     <string name="antenna_type_biquad">Biquad</string>
     <string name="antenna_type_coax_stub">Coax section λ/4, λ/2</string>

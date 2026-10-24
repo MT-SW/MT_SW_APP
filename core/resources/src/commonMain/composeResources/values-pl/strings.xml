@@ -3311,6 +3311,9 @@
     <string name="antenna_note_coax_vf">Długości z kabla zależą od współczynnika skrócenia kabla: sprawdź go w karcie katalogowej albo zmierz kabel.</string>
     <string name="antenna_feed_title">Tor antenowy i moc</string>
     <string name="antenna_tx_power">Moc nadajnika (dBm)</string>
+    <string name="antenna_tx_radio">Z radia: %1$s dBm</string>
+    <string name="antenna_tx_radio_region">Radio: maksimum regionu (%1$s dBm)</string>
+    <string name="antenna_tx_ours">Limit ERP pasma: %1$s dBm</string>
     <string name="antenna_cable">Kabel do anteny</string>
     <string name="antenna_cable_none">Bez kabla</string>
     <string name="antenna_cable_custom">Własny kabel (wpisz tłumienie)</string>

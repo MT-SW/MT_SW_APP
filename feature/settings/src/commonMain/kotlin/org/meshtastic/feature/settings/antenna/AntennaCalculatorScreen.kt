@@ -38,6 +38,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -171,7 +173,13 @@ import org.meshtastic.core.resources.antenna_spacing_mm
 import org.meshtastic.core.resources.antenna_substrate
 import org.meshtastic.core.resources.antenna_swr
 import org.meshtastic.core.resources.antenna_turns
+import org.meshtastic.core.resources.antenna_tx_ours
 import org.meshtastic.core.resources.antenna_tx_power
+import org.meshtastic.core.resources.antenna_tx_radio
+import org.meshtastic.core.resources.antenna_tx_radio_region
+import org.koin.compose.koinInject
+import org.meshtastic.core.repository.RadioConfigRepository
+import androidx.compose.material3.FilterChip
 import org.meshtastic.core.resources.antenna_type
 import org.meshtastic.core.resources.antenna_type_biquad
 import org.meshtastic.core.resources.antenna_type_coax_stub
@@ -383,9 +391,24 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
 
 // ------------------------------------------------------------------ feed line
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: Double?) {
-    var powerText by remember { mutableStateOf(numberText(txDbm ?: 22.0)) }
+    val radioConfig: RadioConfigRepository = koinInject()
+    val lora = radioConfig.localConfigFlow.collectAsState(null).value?.lora
+    // Radio output power; 0 means "the region's maximum", which is known here only for the EU 868 regions.
+    val radioDbm: Double? =
+        when {
+            lora == null -> null
+            lora.tx_power > 0 -> lora.tx_power.toDouble()
+            lora.region.name.startsWith("EU_") -> 27.0
+            else -> null
+        }
+    var powerText by remember { mutableStateOf(numberText(txDbm ?: radioDbm ?: 22.0)) }
+    var powerTouched by remember { mutableStateOf(txDbm != null) }
+    LaunchedEffect(radioDbm) {
+        if (!powerTouched && radioDbm != null) powerText = numberText(radioDbm)
+    }
     var cableChoice by remember { mutableStateOf<Int>(Cable.H155.ordinal) }
     var lengthText by remember { mutableStateOf("5") }
     var customLossText by remember { mutableStateOf("20") }
@@ -414,7 +437,36 @@ private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: 
 
     ExpressiveSection(title = stringResource(Res.string.antenna_feed_title)) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            NumberField(stringResource(Res.string.antenna_tx_power), powerText, signed = true) { powerText = it }
+            NumberField(stringResource(Res.string.antenna_tx_power), powerText, signed = true) {
+                powerText = it
+                powerTouched = true
+            }
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (radioDbm != null) {
+                    val label =
+                        if (lora != null && lora.tx_power > 0) {
+                            stringResource(Res.string.antenna_tx_radio, numberText(radioDbm))
+                        } else {
+                            stringResource(Res.string.antenna_tx_radio_region, numberText(radioDbm))
+                        }
+                    FilterChip(
+                        selected = parse(powerText) == radioDbm,
+                        onClick = {
+                            powerText = numberText(radioDbm)
+                            powerTouched = true
+                        },
+                        label = { Text(label) },
+                    )
+                }
+                FilterChip(
+                    selected = parse(powerText) == 27.0,
+                    onClick = {
+                        powerText = numberText(27.0)
+                        powerTouched = true
+                    },
+                    label = { Text(stringResource(Res.string.antenna_tx_ours, numberText(27.0))) },
+                )
+            }
             Text(power(tx, sep), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         DropDownPreference(
