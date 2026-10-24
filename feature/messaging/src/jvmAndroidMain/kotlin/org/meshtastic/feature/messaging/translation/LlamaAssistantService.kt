@@ -685,10 +685,18 @@ class LlamaAssistantService(
                 .firstOrNull()?.part ?: return ""
         val heading = best.title.substringAfter(": ", "").trim()
         val numbered = steps(best)
-        val body =
-            if (howTo && numbered.size >= 2) numbered.take(MAX_STEPS).joinToString("\n")
-            else best.lines.take(HELP_LINES).joinToString("\n") { endAtSentence(it) }
-        return (if (heading.isNotBlank()) "($heading)\n" else "") + endAtSentence(body.take(HELP_CHARS))
+        val title = if (heading.isNotBlank()) "($heading)\n" else ""
+        if (howTo && numbered.size >= 2) {
+            // Whole steps only: cutting a step at "3. " left a bare number.
+            val kept = ArrayList<String>()
+            for (step in numbered.take(MAX_STEPS)) {
+                if (kept.sumOf { it.length + 1 } + step.length > HELP_CHARS) break
+                kept += step
+            }
+            return title + kept.joinToString("\n")
+        }
+        val body = best.lines.take(HELP_LINES).joinToString("\n") { endAtSentence(it) }
+        return title + endAtSentence(body.take(HELP_CHARS))
     }
 
     /** Word stems, also without a Polish verb prefix ("zaktualizować" matches "aktualizacja"). */
