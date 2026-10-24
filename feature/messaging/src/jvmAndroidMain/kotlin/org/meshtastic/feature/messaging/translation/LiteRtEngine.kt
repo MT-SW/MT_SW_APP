@@ -62,6 +62,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
     private var engine: Engine? = null
     private var loadedId: String? = null
     private var loadedWithAudio = false
+    private val failedBackends = mutableSetOf<String>()
 
     /**
      * Folder with the neural chip libraries, set by the platform when it has them (Android passes its native library
@@ -291,6 +292,8 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         var created: Engine? = null
         var failure: Exception? = null
         for ((name, backend) in attempts) {
+            // A chip that failed once is not tried again until the app restarts (every try costs seconds).
+            if (name in failedBackends && name != "CPU") continue
             try {
                 created = start(file, backend(), cache, window, audio)
                 activeBackend = name
@@ -298,7 +301,10 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
                 break
             } catch (e: Exception) {
                 failure = e
-                Logger.w(tag = TAG, throwable = e) { "Backend $name not usable for $modelId: ${e.message}" }
+                failedBackends += name
+                Logger.w(tag = TAG, throwable = e) {
+                    "Backend $name not usable for $modelId: ${e.message}" + (e.cause?.let { " (cause: ${it.message})" } ?: "")
+                }
             }
         }
         val ready = created ?: throw (failure ?: IllegalStateException("No backend could start"))
