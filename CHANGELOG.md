@@ -22,6 +22,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 * Asystent **sam przechodzi** tam, gdzie prosisz: węzeł na mapie (także najbliższy lub najdalszy, np. najbliższy router), ekran, ustawienie (mruga na żółto), planer łącza, rozmowa z gotowym tekstem wiadomości. Nigdy nie zmienia ustawień i nigdy nie wysyła wiadomości.
 * Tłumacz i asystent są oznaczone jako **funkcja eksperymentalna**: nie gwarantujemy poprawności działania.
 * Asystent: komenda **`/test`** na stałe — sama zadaje pytania testowe i daje raport do skopiowania (na komputerze także plik), żeby porównać odpowiedzi na różnych urządzeniach i modelach. Podsumowanie sieci i długości anten liczy program.
+* Asystent: przycisk **„Kopiuj całą rozmowę”** nad rozmową — kopiuje wszystkie pytania i odpowiedzi (z przyciskami przekierowań), np. do wysłania z telefonu przy testach.
 * Dyktowanie: przełącznik **„Mikrofon słuchawki przy dyktowaniu”** — z podłączoną słuchawką (Bluetooth, przewodową, USB) dyktowanie wszędzie w aplikacji nagrywa z jej mikrofonu.
 * **Jeden model AI** dla asystenta, tłumacza i dyktowania, wybierany w jednym miejscu (wybór NLLB, który tylko tłumaczy, po ostrzeżeniu i potwierdzeniu wyłącza asystenta).
 * Funkcje MT_SW: skrót do **wyboru koloru węzła** (przycisk w ustawieniach bezpieczeństwa mruga); przycisk ma nazwę w języku aplikacji.
@@ -412,6 +413,7 @@ The entries below describe only what this fork adds on top of the original, from
 * The assistant **goes there by itself** when you ask: a node on the map (also the nearest or farthest one, for example the nearest router), a screen, a setting (it blinks yellow), the link planner, a conversation with the message text ready. It never changes a setting and never sends a message.
 * The translator and the assistant are marked as an **experimental feature**: correct operation is not guaranteed.
 * Assistant: a permanent **`/test`** command — it asks the test questions by itself and gives a report to copy (on a computer also a file), to compare answers across devices and models. The network summary and antenna lengths are worked out by the app.
+* Assistant: a **"Copy whole conversation"** button above the chat — copies all questions and answers (with the redirect buttons), e.g. to send from a phone when testing.
 * Dictation: a **"Headset microphone for dictation"** switch — with a headset connected (Bluetooth, wired, USB) dictation everywhere in the app records from its microphone.
 * **One AI model** for the assistant, the translator and dictation, chosen in one place (choosing NLLB, which only translates, turns the assistant off after a warning and confirmation).
 * MT_SW features: a shortcut to **picking the node colour** (the button in the security settings blinks); the button is named in the app's language.

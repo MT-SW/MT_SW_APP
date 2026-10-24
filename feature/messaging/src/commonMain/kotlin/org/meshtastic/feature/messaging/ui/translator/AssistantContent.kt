@@ -88,6 +88,9 @@ import org.meshtastic.core.resources.stop_reading
 import org.meshtastic.feature.messaging.DictationPhase
 import org.meshtastic.feature.messaging.rememberDictation
 import org.meshtastic.feature.messaging.rememberSpeaker
+import org.meshtastic.core.resources.assistant_copy_all
+import org.meshtastic.core.resources.assistant_copy_assistant
+import org.meshtastic.core.resources.assistant_copy_you
 import org.meshtastic.core.resources.assistant_empty_hint
 import org.meshtastic.core.resources.assistant_error
 import org.meshtastic.core.resources.assistant_go_to
@@ -163,6 +166,32 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
             )
+        }
+
+        if (state.lines.isNotEmpty()) {
+            val clipboard = LocalClipboard.current
+            val copyScope = rememberCoroutineScope()
+            val you = stringResource(Res.string.assistant_copy_you)
+            val assistant = stringResource(Res.string.assistant_copy_assistant)
+            TextButton(
+                onClick = {
+                    val whole =
+                        state.lines
+                            .filter { it.text.isNotBlank() }
+                            .joinToString("\n\n") { line ->
+                                val (shown, actions) = AssistantActions.parse(line.text)
+                                val web = AssistantActions.web(line.text)
+                                buildString {
+                                    append(if (line.fromUser) you else assistant).append(": ").append(shown)
+                                    web?.let { append("\n(").append(it.note.ifBlank { it.queries }).append(")") }
+                                    actions.forEach { append("\n[").append(it.caption.ifBlank { it.label }).append("]") }
+                                }
+                            }
+                    copyScope.launch { clipboard.setClipEntry(createClipEntry(whole, "")) }
+                },
+            ) {
+                Text(stringResource(Res.string.assistant_copy_all))
+            }
         }
 
         LazyColumn(

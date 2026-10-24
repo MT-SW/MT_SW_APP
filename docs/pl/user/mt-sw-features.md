@@ -145,6 +145,8 @@ Na słabszych urządzeniach duże modele mogą spowalniać aplikację albo ją z
 
 **Test asystenta.** Wpisz w asystencie `/test` i wyślij: asystent sam zada sobie około 40 pytań testowych (z prawdziwą nazwą węzła i kanału z Twojej sieci) i pokaże pytania z odpowiedziami w rozmowie, a na końcu pełny raport z czasem odpowiedzi i użytym modelem, który można skopiować (przytrzymaj dymek). Na komputerze raport zapisuje się też w pliku `assistant-test-results.md`. Dzięki temu można porównać jakość odpowiedzi na różnych urządzeniach i modelach. W trakcie testu nic nie otwiera się samo; przerwiesz go przyciskiem „Zatrzymaj”.
 
+**Kopiowanie rozmowy.** Nad rozmową z asystentem jest przycisk „Kopiuj całą rozmowę”: kopiuje wszystkie pytania i odpowiedzi (także nazwy przycisków przekierowań) do schowka, np. żeby wkleić je w wiadomości przy zgłaszaniu błędu. Pojedynczy dymek kopiujesz, przytrzymując go.
+
 **Tłumacz:**
 
 - **Odebrane wiadomości** — w menu wiadomości jest „Przetłumacz wiadomość”. Oryginał zostaje, a tłumaczenie można przełączać z oryginałem.

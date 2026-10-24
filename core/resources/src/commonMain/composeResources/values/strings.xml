@@ -340,6 +340,9 @@ The lengths are already shortened by about 5% for a wire element; fine-tune them
     <string name="are_you_sure_change_default">Are you sure you want to change to the default channel?</string>
     <!-- ASSISTANT -->
     <string name="assistant_close">Close</string>
+    <string name="assistant_copy_all">Copy whole conversation</string>
+    <string name="assistant_copy_assistant">Assistant</string>
+    <string name="assistant_copy_you">You</string>
     <string name="assistant_delete">Delete conversation</string>
     <string name="assistant_dictate">Dictate</string>
     <string name="assistant_dictate_stop">Stop and insert</string>
