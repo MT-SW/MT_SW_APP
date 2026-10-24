@@ -400,7 +400,7 @@ class CommandSenderImpl(
         )
     }
 
-    private fun sendOnDemand(destNum: Int, onDemand: OnDemand) {
+    private suspend fun sendOnDemand(destNum: Int, onDemand: OnDemand) {
         enqueueOrThrow(
             buildMeshPacket(
                 to = destNum,
