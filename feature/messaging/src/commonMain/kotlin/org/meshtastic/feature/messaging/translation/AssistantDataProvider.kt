@@ -1792,7 +1792,7 @@ class AssistantDataProvider(
     }
 
     /** "I do not know node X", with the names it may have been when some are close ("Did you mean: ..."). */
-    fun unknownNode(name: String): String {
+    suspend fun unknownNode(name: String): String {
         val q = name.trim().lowercase()
         val close = if (q.isEmpty()) emptyList() else nearNodes(q, loose = true).take(SUGGESTED_NODES).map { it.user.long_name.ifBlank { it.user.short_name } }.distinct()
         val base = aiString(Res.string.ai_unknown_node, name)
