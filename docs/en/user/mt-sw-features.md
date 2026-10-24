@@ -99,6 +99,8 @@ The formulas come from established sources (Stutzman & Thiele, Rothammel/DL6WU, 
 
 The **Save result…** button at the bottom saves the input, dimensions, properties and feed-line results as PDF (a text report, without the drawing), Markdown, TXT, CSV (just the dimension table) or JSON.
 
+The feed line is worked out just like in the Mesh Link Planner: any number of connectors joined by cable sections, with a cable database from datasheets (loss at your frequency), ready-made sets and a breakdown of the loss of each part. In **My antennas** you save the antenna together with its feed line, power, SWR and gain under your own name, and later load or delete it. In the Mesh Link Planner, in the transmitter and antenna section, you can pick a saved antenna (it sets the power, gain and feed line in one tap) or use the **Work it out in the calculator** button, which opens the calculator on the planner's frequency and power.
+
 ## On-demand diagnostics
 
 In the node details (Administration → "On-demand diagnostics") you can ask any node in range for its current statistics instead of waiting for periodic broadcasts. There are 10 kinds of queries, including node stats (battery, uptime, CPU, memory, WiFi), ping with RSSI and SNR, the list of online nodes, routing error history, port counters, airtime activity and the MT_SW firmware version. The screen has an overview of capabilities with a counter of checked queries, and results are coloured (tiles, gauges, charts). All answers can be shared or saved as PDF, HTML, Markdown, text or CSV. This feature needs firmware with the OnDemand module.

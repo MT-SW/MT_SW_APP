@@ -19,15 +19,18 @@
 package org.meshtastic.feature.map.planner.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -46,7 +49,17 @@ import org.meshtastic.core.resources.planner_tx_power_dbm
 import org.meshtastic.core.resources.planner_tx_power_title
 import org.meshtastic.core.resources.planner_tx_power_w
 import org.meshtastic.core.resources.planner_unit_dbi
+import org.koin.compose.koinInject
+import org.meshtastic.core.model.antenna.AntennaPrefill
+import org.meshtastic.core.model.antenna.AntennaSetups
+import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.resources.planner_calc_open
+import org.meshtastic.core.resources.planner_calc_pick
+import org.meshtastic.core.resources.planner_calc_pick_hint
+import org.meshtastic.core.resources.planner_calc_title
+import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.feature.map.planner.state.PlannerEnd
+import org.meshtastic.feature.map.planner.state.PlannerSide
 import org.meshtastic.feature.map.planner.state.PlannerUiState
 import org.meshtastic.feature.map.planner.state.PlannerViewModel
 
@@ -65,6 +78,7 @@ internal fun StationSection(state: PlannerUiState, vm: PlannerViewModel) {
     val end = state.end(side)
     PlannerCard(title = stringResource(Res.string.planner_section_station, sideName(side))) {
         key(side) {
+            AntennaFromCalculator(state = state, side = side, end = end, vm = vm)
             TxPowerFields(side = side, end = end, vm = vm)
             PlannerSubheading(
                 text = stringResource(Res.string.planner_antenna_gain_title),
@@ -91,6 +105,34 @@ internal fun StationSection(state: PlannerUiState, vm: PlannerViewModel) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary,
             )
+        }
+    }
+}
+
+/** Takes the antenna, the feed line and the power from an antenna saved in the calculator, or opens the calculator. */
+@Composable
+private fun AntennaFromCalculator(state: PlannerUiState, side: PlannerSide, end: PlannerEnd, vm: PlannerViewModel) {
+    val uiPrefs = koinInject<UiPrefs>()
+    val text by uiPrefs.antennaSetups.collectAsState()
+    val setups = remember(text) { AntennaSetups.decode(text) }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        PlannerSubheading(text = stringResource(Res.string.planner_calc_title))
+        if (setups.isNotEmpty()) {
+            PlannerDropdown(
+                label = stringResource(Res.string.planner_calc_pick),
+                selectedLabel = stringResource(Res.string.planner_calc_pick_hint),
+                options = setups.map { it.id to it.name },
+                onSelect = { id -> setups.firstOrNull { it.id == id }?.let { vm.applyAntennaSetup(side, it) } },
+            )
+        }
+        OutlinedButton(
+            onClick = {
+                AntennaPrefill.mhz = state.frequencyMHz
+                AntennaPrefill.txDbm = end.txPowerDbm
+                AssistantLinks.open("meshtastic://meshtastic/settings/antenna-calculator")
+            },
+        ) {
+            Text(stringResource(Res.string.planner_calc_open))
         }
     }
 }

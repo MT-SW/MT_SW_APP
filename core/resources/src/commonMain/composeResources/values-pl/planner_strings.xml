@@ -27,6 +27,10 @@
     <string name="planner_bearing_ba">Azymut B→A (północ prawdziwa)</string>
     <string name="planner_bearing_note">Azymuty liczone są względem północy prawdziwej (geograficznej). Deklinacja magnetyczna nie jest uwzględniona, więc kompas wymaga poprawki (w Polsce kilka stopni na wschód).</string>
     <string name="planner_bearing_title">Azymuty i kąty</string>
+    <string name="planner_calc_open">Policz dokładnie w kalkulatorze</string>
+    <string name="planner_calc_pick">Zapisana antena</string>
+    <string name="planner_calc_pick_hint">Wybierz…</string>
+    <string name="planner_calc_title">Antena z kalkulatora</string>
     <string name="planner_cancel">Anuluj</string>
     <string name="planner_chart_label_a">A</string>
     <string name="planner_chart_label_b">B</string>

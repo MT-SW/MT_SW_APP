@@ -99,6 +99,8 @@ Wzory pochodzą ze sprawdzonych źródeł (Stutzman i Thiele, Rothammel/DL6WU, L
 
 Przycisk **Zapisz wynik…** na dole zapisuje dane wejściowe, wymiary, właściwości i wyniki toru antenowego jako PDF (raport tekstowy, bez rysunku), Markdown, TXT, CSV (sama tabela wymiarów) albo JSON.
 
+Tor antenowy liczy się tak samo jak w Mesh Link Planerze: dowolna liczba złączy połączonych odcinkami kabla, z bazą kabli z kart katalogowych (tłumienie dla Twojej częstotliwości), gotowe zestawy i zestawienie strat każdej części. W sekcji **Moje anteny** zapisujesz policzoną antenę razem z torem, mocą, SWR i zyskiem pod własną nazwą, a później ją wczytujesz albo usuwasz. W Mesh Link Planerze, w sekcji nadajnika i anteny, możesz wybrać zapisaną antenę (ustawia moc, zysk i tor jednym dotknięciem) albo przycisk **Policz dokładnie w kalkulatorze**, który otwiera kalkulator na częstotliwości i mocy z planera.
+
 ## Diagnostyka na żądanie
 
 W szczegółach węzła (Administracja → „Diagnostyka na żądanie”) możesz zapytać dowolny węzeł w zasięgu o jego bieżące statystyki, zamiast czekać na okresowe rozgłoszenia. Jest 10 rodzajów zapytań, m.in. statystyki węzła (bateria, czas pracy, procesor, pamięć, WiFi), ping z RSSI i SNR, lista węzłów online, historia błędów routingu, liczniki portów, aktywność eteru i wersja firmware MT_SW. Ekran ma przegląd możliwości z licznikiem sprawdzonych zapytań, a wyniki są kolorowe (kafelki, wskaźniki, wykresy). Wszystkie odpowiedzi można udostępnić albo zapisać jako PDF, HTML, Markdown, tekst lub CSV. Ta funkcja wymaga firmware z modułem OnDemand.

@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.feature.map.planner.CoverageLayer
+import org.meshtastic.core.model.antenna.AntennaSetup
 import org.meshtastic.core.model.antenna.FeederBuilder
 import org.meshtastic.core.model.antenna.FeederConfig
 import org.meshtastic.feature.map.planner.PlannerBands
@@ -194,6 +195,20 @@ class PlannerViewModel(
         mutate { st ->
             val e = st.end(side)
             st.withEnd(side, e.copy(feederConfig = FeederBuilder.resize(e.feederConfig, connectorCount), feederPrecise = true))
+        }
+
+    /** Takes power, gain and the whole feed line of an antenna saved in the calculator (the antenna height is not touched). */
+    fun applyAntennaSetup(side: PlannerSide, setup: AntennaSetup) =
+        mutate { st ->
+            st.withEnd(
+                side,
+                st.end(side).copy(
+                    txPowerDbm = setup.txDbm.coerceIn(-10.0, 50.0),
+                    antennaGainDbi = setup.gainDbi.coerceIn(-10.0, 60.0),
+                    feederConfig = setup.feeder,
+                    feederPrecise = true,
+                ),
+            )
         }
 
     /** Copies power, gain, height and the whole feeder (manual and precise) from A to B. Points are untouched. */
