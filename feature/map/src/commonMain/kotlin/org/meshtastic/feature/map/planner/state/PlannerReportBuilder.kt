@@ -346,7 +346,7 @@ object PlannerReportBuilder {
         rows += kv(s.lblAntennaGain, Num.fmtTrim(e.antennaGainDbi, 2) + " " + s.unitDbi)
         rows += kv(s.lblFeederLoss, db(e.feederLossDb, s))
         if (e.feederPrecise) {
-            val res = org.meshtastic.feature.map.planner.FeederBuilder.compute(e.feederConfig, fMHz)
+            val res = org.meshtastic.core.model.antenna.FeederBuilder.compute(e.feederConfig, fMHz)
             for (line in res.lines) rows += kv(line.label, db(line.lossDb, s))
             if (res.approximate) rows += kv(s.lblFeederApprox, s.yes)
         }
