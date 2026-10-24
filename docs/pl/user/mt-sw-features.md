@@ -2,8 +2,8 @@
 title: Funkcje MT_SW
 parent: Przewodnik użytkownika
 nav_order: 23
-last_updated: 2026-10-18
-description: Przegląd tego, co MT_SW_APP dodaje do oryginalnej aplikacji Meshtastic — zdalne sterowanie GPIO, zdrowie sieci, połączenia na mapie, Mesh Link Planer, diagnostyka na żądanie, Sniffer, panel debugowania z logami urządzenia, skalowanie aplikacji i więcej.
+last_updated: 2026-10-24
+description: Przegląd tego, co MT_SW_APP dodaje do oryginalnej aplikacji Meshtastic — zdalne sterowanie GPIO, zdrowie sieci, połączenia na mapie, Mesh Link Planer, kalkulator anten, diagnostyka na żądanie, Sniffer, panel debugowania z logami urządzenia, skalowanie aplikacji i więcej.
 aliases:
   - mt-sw
   - gpio
@@ -85,6 +85,17 @@ Planer symuluje zasięg łącza radiowego między dwoma punktami **A** i **B**, 
 - **Eksport** do PDF, CSV, KML, GeoJSON i PNG.
 
 Planer otwiera przycisk **Planer** w szczegółach węzła, obok kompasu.
+
+## Kalkulator anten
+
+**Ustawienia → Zaawansowane → Funkcje MT_SW → Narzędzia → Kalkulator anten.** Liczy wymiary anteny dla dowolnej częstotliwości i od razu pokazuje jej rysunek z odcinkami A, B, C… i ich wartościami.
+
+- **Typy anten:** ćwierćfalowa ground plane, dipol półfalowy, dipol pętlowy (z balunem λ/2 z kabla), pionowa 5/8 fali, J-pole, Slim Jim, kolinearna z kabla (COCO), Yagi-Uda (3–20 elementów, z poprawką na metalowy nośnik), Moxon, Biquad, helisa osiowa, antena płaska (patch na płytce) i odcinki kabla λ/4 i λ/2.
+- **Materiał:** średnica drutu lub rurki i izolacja zmieniają długość elementów; przy antenach z kabla liczy się współczynnik skrócenia wybranego kabla, przy patchu przenikalność i grubość płytki.
+- **Właściwości:** długość fali, użyty współczynnik skrócenia, impedancja, zysk, polaryzacja i wskazówki wykonania.
+- **Tor antenowy:** moc nadajnika, kabel z listy (tłumienie liczone dla wybranej częstotliwości) albo własny, długość kabla, złącza i inne elementy, SWR i zysk anteny. Wynik: straty każdego elementu i razem, moc na antenie, EIRP i ERP, porównanie z limitem pasma (np. 500 mW ERP w 869,4–869,65 MHz) i wpływ strat na zasięg.
+
+Wzory pochodzą ze sprawdzonych źródeł (Stutzman i Thiele, Rothammel/DL6WU, L. B. Cebik, J. D. Kraus, Balanis, Hammerstad, tabele producentów kabli). Wynik to bardzo dobry punkt wyjścia, ale każdą antenę i tak dostraja się miernikiem SWR albo NanoVNA. Asystent pod swoimi wyliczeniami anten daje przycisk do kalkulatora z tą samą częstotliwością i typem anteny.
 
 ## Diagnostyka na żądanie
 

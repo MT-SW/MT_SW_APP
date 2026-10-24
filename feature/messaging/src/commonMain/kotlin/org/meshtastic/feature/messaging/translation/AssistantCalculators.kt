@@ -19,6 +19,11 @@
 package org.meshtastic.feature.messaging.translation
 
 import org.meshtastic.core.model.ChannelOption
+import org.meshtastic.core.model.antenna.AntennaInput
+import org.meshtastic.core.model.antenna.AntennaMath
+import org.meshtastic.core.model.antenna.AntennaType
+import org.meshtastic.core.model.antenna.Dim
+import org.meshtastic.core.model.antenna.DimKind
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.log10
@@ -39,10 +44,10 @@ object AssistantCalculators {
     /** The frequency of our network, used when a question gives none. */
     const val OUR_MHZ = 869.44165
     private const val C = 299_792_458.0
-    private const val WIRE = 0.95
     private const val OUR_ERP_LIMIT_DBM = 27.0
 
     fun answer(question: String, polish: Boolean, defaults: Defaults = Defaults()): String? {
+        lastAntenna = null
         val q = question.lowercase().replace(' ', ' ')
         val t = Texts(polish)
         return arithmetic(q, t) ?: airtime(q, t, defaults) ?: range(q, t, defaults) ?: fresnel(q, t) ?: horizon(q, t) ?:
@@ -186,10 +191,100 @@ object AssistantCalculators {
 
     // ---------------------------------------------------------------- antennas
 
-    private const val ANT = "anten|dipol|ćwierćfal|cwiercfal|półfal|polfal|antenna|ground ?plane|groundplane|\\bgp\\b|yagi|5/8|1/4|1/2|bat\\b|whip|radial|przeciwwag"
+    private const val ANT = "anten|dipol|ćwierćfal|cwiercfal|półfal|polfal|antenna|ground ?plane|groundplane|\\bgp\\b|yagi|5/8|1/4|1/2|bat\\b|whip|radial|przeciwwag|j-?pole|slim ?jim|kolinear|collinear|\\bcoco\\b|moxon|biquad|heli[sx]|helic|patch"
     private const val LENGTH = "\\bile\\b|dług|dlug|\\bcm\\b|centymetr|\\bmm\\b|wymiar|length|how long|size|oblicz|policz|wylicz|calculate"
     private const val BUILD = "zrob|zrób|zbud|wykona|zrobić|zrobic|zmajstr|domow|samemu|samodziel|make|build|diy|homemade|construct"
     private const val ADVICE = "najlepsz|polec|kupi|wybra|jaką kupić|best|recommend|buy|which antenna"
+
+    /** The antenna the question is about, or null for "any antenna" (then the three simple ones are shown). */
+    private fun antennaType(q: String): AntennaType? = when {
+        has(q, "yagi") -> AntennaType.YAGI
+        has(q, "moxon") -> AntennaType.MOXON
+        has(q, "biquad") -> AntennaType.BIQUAD
+        has(q, "heli[sx]|helic") -> AntennaType.HELIX
+        has(q, "patch|płask|plask|mikropask|microstrip") -> AntennaType.PATCH
+        has(q, "slim ?jim") -> AntennaType.SLIM_JIM
+        has(q, "j-?pole") -> AntennaType.J_POLE
+        has(q, "kolinear|collinear|\\bcoco\\b") -> AntennaType.COLLINEAR
+        has(q, "pętlow|petlow|folded") -> AntennaType.FOLDED_DIPOLE
+        has(q, "5/8|pięć ósmych|piec osmych|five.eighth") -> AntennaType.FIVE_EIGHTHS
+        has(q, "dipol|półfal|polfal|1/2|half") -> AntennaType.DIPOLE
+        has(q, "ćwierćfal|cwiercfal|ground ?plane|groundplane|\\bgp\\b|1/4|quarter|radial|przeciwwag|whip|bat\\b") -> AntennaType.GROUND_PLANE
+        else -> null
+    }
+
+    private fun Texts.dimName(d: Dim): String = when (d.kind) {
+        DimKind.TOTAL -> s("długość całkowita", "total length")
+        DimKind.RADIATOR -> s("promiennik", "radiator")
+        DimKind.RADIAL -> s("każda przeciwwaga", "each radial")
+        DimKind.ARM -> s("każde ramię", "each arm")
+        DimKind.GAP -> s("przerwa", "gap")
+        DimKind.SPACING -> s("odstęp", "spacing")
+        DimKind.STUB -> s("odcinek dopasowujący", "matching stub")
+        DimKind.FEED -> s("punkt zasilania od dołu", "feed point from the bottom")
+        DimKind.SECTION -> s("każdy odcinek kabla", "each coax section")
+        DimKind.WHIP -> s("bat na szczycie", "top whip")
+        DimKind.REFLECTOR -> s("reflektor", "reflector")
+        DimKind.DRIVEN -> s("element zasilany", "driven element")
+        DimKind.DIRECTOR -> s("direktor ${d.index}", "director ${d.index}")
+        DimKind.BOOM -> s("długość nośnika", "boom length")
+        DimKind.POSITION -> s("pozycja", "position")
+        DimKind.WIDTH -> s("szerokość", "width")
+        DimKind.DEPTH -> s("głębokość", "depth")
+        DimKind.TAIL_DRIVER -> s("zagięcie elementu zasilanego", "driver tail")
+        DimKind.TAIL_REFLECTOR -> s("zagięcie reflektora", "reflector tail")
+        DimKind.SIDE -> s("bok kwadratu", "side of a square")
+        DimKind.REFLECTOR_PLATE -> s("płyta reflektora", "reflector plate")
+        DimKind.DIAMETER -> s("średnica zwojów", "coil diameter")
+        DimKind.PITCH -> s("skok zwoju", "turn spacing")
+        DimKind.TURN_WIRE -> s("drut na zwój", "wire per turn")
+        DimKind.LENGTH -> s("długość helisy", "helix length")
+        DimKind.GROUND -> s("płaszczyzna masy", "ground plane")
+        DimKind.PATCH_W -> s("szerokość łaty", "patch width")
+        DimKind.PATCH_L -> s("długość łaty", "patch length")
+        DimKind.INSET -> s("wcięcie dla 50 Ω", "inset for 50 Ω")
+        DimKind.FEED_WIDTH -> s("ścieżka 50 Ω", "50 Ω track")
+        DimKind.QUARTER -> s("odcinek λ/4", "λ/4 piece")
+        DimKind.HALF -> s("odcinek λ/2", "λ/2 piece")
+        DimKind.WAVELENGTH -> s("długość fali", "wavelength")
+    }
+
+    private fun Texts.len(m: Double): String = when {
+        m >= 1.0 -> n(m, 3) + " m"
+        m < 0.02 -> n(m * 1000, 1) + " mm"
+        else -> n(m * 100, 1) + " cm"
+    }
+
+    private fun Texts.typeName(t: AntennaType): String = when (t) {
+        AntennaType.GROUND_PLANE -> s("Ćwierćfalowa (ground plane)", "Quarter-wave (ground plane)")
+        AntennaType.DIPOLE -> s("Dipol półfalowy", "Half-wave dipole")
+        AntennaType.FOLDED_DIPOLE -> s("Dipol pętlowy", "Folded dipole")
+        AntennaType.FIVE_EIGHTHS -> s("5/8 fali", "5/8 wave")
+        AntennaType.J_POLE -> "J-pole"
+        AntennaType.SLIM_JIM -> "Slim Jim"
+        AntennaType.COLLINEAR -> s("Kolinearna z kabla", "Coaxial collinear")
+        AntennaType.YAGI -> s("Yagi ${YAGI_ELEMENTS}-elementowa", "${YAGI_ELEMENTS}-element Yagi")
+        AntennaType.MOXON -> "Moxon"
+        AntennaType.BIQUAD -> "Biquad"
+        AntennaType.HELIX -> s("Helisa osiowa", "Axial helix")
+        AntennaType.PATCH -> s("Płaska (patch, FR4 1,6 mm)", "Patch (FR4 1.6 mm)")
+        AntennaType.COAX_STUB -> s("Odcinek kabla", "Coax section")
+    }
+
+    private const val YAGI_ELEMENTS = 5
+
+    private fun Texts.describe(input: AntennaInput): String {
+        val d = AntennaMath.design(input)
+        val sb = StringBuilder("• ").append(typeName(input.type)).append(':')
+        d.dims.filter { it.kind != DimKind.POSITION }.forEach { dim -> sb.append("\n   ").append(dim.letter).append(" — ").append(dimName(dim)).append(": ").append(len(dim.meters)) }
+        if (input.type != AntennaType.COAX_STUB) sb.append("\n   ").append(s("zysk ok. ${n(d.gainDbi)} dBi", "gain about ${n(d.gainDbi)} dBi"))
+        d.impedanceOhm?.let { sb.append(s(", impedancja ok. ${n(it, 0)} Ω", ", impedance about ${n(it, 0)} Ω")) }
+        return sb.toString()
+    }
+
+    /** The antenna of the last answer, so the assistant can add a button to the calculator with the same values. */
+    var lastAntenna: Pair<AntennaType, Double>? = null
+        private set
 
     private fun antenna(q: String, t: Texts): String? {
         if (!has(q, ANT)) return null
@@ -198,61 +293,27 @@ object AssistantCalculators {
         if (!asked && freq == null) return null
         if (!asked && has(q, ADVICE)) return null
         val f = freq ?: OUR_MHZ
+        val wire = first(q, "mm")?.takeIf { it in 0.1..60.0 } ?: 1.5
+        val type = antennaType(q)
         val lambda = C / (f * 1e6) * 100
-        val quarter = lambda / 4 * WIRE
-        val half = lambda / 2 * WIRE
-        val fiveEighths = lambda * 0.625 * WIRE
-        val dipole = has(q, "dipol|półfal|polfal|1/2|half")
-        val gp = has(q, "ćwierćfal|cwiercfal|ground ?plane|groundplane|\\bgp\\b|1/4|quarter|radial|przeciwwag|whip|bat\\b")
-        val five = has(q, "5/8|pięć ósmych|piec osmych|five.eighth")
-        val yagi = has(q, "yagi")
-        val build = has(q, BUILD)
+        val base = AntennaInput(mhz = f, diameterMm = wire, elements = YAGI_ELEMENTS)
+        val k = AntennaMath.thicknessFactor(lambda / 100, wire / 1000)
+        lastAntenna = (type ?: AntennaType.GROUND_PLANE) to f
         val sb = StringBuilder()
         sb.append(
             t.s(
-                "Obliczenia dla ${t.n(f, 2)} MHz${if (freq == null) " (częstotliwość naszej sieci)" else ""}: długość fali λ = c / f = ${t.n(lambda)} cm. Długości anten są skrócone o 5 % (współczynnik 0,95), jak dla elementu z drutu.",
-                "Calculation for ${t.n(f, 2)} MHz${if (freq == null) " (our network's frequency)" else ""}: wavelength λ = c / f = ${t.n(lambda)} cm. Antenna lengths are shortened by 5 % (factor 0.95), as for a wire element.",
+                "Obliczenia dla ${t.n(f, 2)} MHz${if (freq == null) " (częstotliwość naszej sieci)" else ""}: długość fali λ = c / f = ${t.n(lambda)} cm. Elementy z drutu ${t.n(wire)} mm, współczynnik skrócenia ${t.n(k, 3)} (z grubości przewodu).",
+                "Calculation for ${t.n(f, 2)} MHz${if (freq == null) " (our network's frequency)" else ""}: wavelength λ = c / f = ${t.n(lambda)} cm. Elements of ${t.n(wire)} mm wire, shortening factor ${t.n(k, 3)} (from the conductor thickness).",
             ),
         )
-        val all = !dipole && !gp && !five && !yagi
-        if (gp || all) {
-            sb.append("\n• ").append(
-                t.s(
-                    "Ćwierćfalowa (ground plane): promiennik ok. ${t.n(quarter)} cm, do tego 3–4 przeciwwagi po ok. ${t.n(lambda / 4)} cm, odchylone w dół o ok. 45°.",
-                    "Quarter-wave (ground plane): radiator about ${t.n(quarter)} cm, plus 3–4 radials of about ${t.n(lambda / 4)} cm, bent down by about 45°.",
-                ),
-            )
-        }
-        if (dipole || all) {
-            sb.append("\n• ").append(
-                t.s(
-                    "Dipol półfalowy: całość ok. ${t.n(half)} cm, czyli dwa ramiona po ok. ${t.n(half / 2)} cm.",
-                    "Half-wave dipole: about ${t.n(half)} cm in total, two arms of about ${t.n(half / 2)} cm each.",
-                ),
-            )
-        }
-        if (five || all) {
-            sb.append("\n• ").append(
-                t.s(
-                    "5/8 fali: promiennik ok. ${t.n(fiveEighths)} cm; potrzebuje cewki dopasowującej u podstawy.",
-                    "5/8 wave: radiator about ${t.n(fiveEighths)} cm; it needs a matching coil at the base.",
-                ),
-            )
-        }
-        if (yagi) {
-            sb.append("\n• ").append(
-                t.s(
-                    "Yagi 3-elementowa (punkt wyjścia): reflektor ok. ${t.n(lambda * 0.495)} cm, element zasilany ok. ${t.n(lambda * 0.473)} cm, direktor ok. ${t.n(lambda * 0.44)} cm; odstęp reflektor–element ok. ${t.n(lambda * 0.2)} cm, element–direktor ok. ${t.n(lambda * 0.15)} cm. Dokładne wymiary daje kalkulator Yagi dla konkretnej średnicy pręta.",
-                    "3-element Yagi (a starting point): reflector about ${t.n(lambda * 0.495)} cm, driven element about ${t.n(lambda * 0.473)} cm, director about ${t.n(lambda * 0.44)} cm; spacing reflector–driven about ${t.n(lambda * 0.2)} cm, driven–director about ${t.n(lambda * 0.15)} cm. Exact sizes come from a Yagi calculator for the rod diameter.",
-                ),
-            )
-        }
-        if (build) {
+        val types = if (type != null) listOf(type) else listOf(AntennaType.GROUND_PLANE, AntennaType.DIPOLE, AntennaType.FIVE_EIGHTHS)
+        types.forEach { sb.append("\n").append(t.describe(base.copy(type = it))) }
+        if (has(q, BUILD)) {
             sb.append("\n\n").append(
-                if (dipole && !gp) {
+                if (type == AntennaType.DIPOLE || type == AntennaType.FOLDED_DIPOLE) {
                     t.s(
-                        "Jak zrobić dipol: utnij dwa kawałki drutu (np. miedzianego 1–2 mm) na długość ramienia, przylutuj jeden do żyły środkowej kabla koncentrycznego, drugi do oplotu, i ustaw je w jednej linii, z małą przerwą pośrodku. Kabel prowadź prostopadle do anteny, a na końcu przylutuj złącze pasujące do radia (zwykle SMA).",
-                        "How to make a dipole: cut two pieces of wire (e.g. 1–2 mm copper) to the arm length, solder one to the centre conductor of the coax and the other to the braid, and set them in one line with a small gap in the middle. Run the cable away at a right angle and fit a connector that matches the radio (usually SMA).",
+                        "Jak zrobić dipol: utnij dwa kawałki drutu na długość ramienia, przylutuj jeden do żyły środkowej kabla koncentrycznego, drugi do oplotu, i ustaw je w jednej linii, z małą przerwą pośrodku. Kabel prowadź prostopadle do anteny, a na końcu przylutuj złącze pasujące do radia (zwykle SMA).",
+                        "How to make a dipole: cut two pieces of wire to the arm length, solder one to the centre conductor of the coax and the other to the braid, and set them in one line with a small gap in the middle. Run the cable away at a right angle and fit a connector that matches the radio (usually SMA).",
                     )
                 } else {
                     t.s(
@@ -264,8 +325,8 @@ object AssistantCalculators {
         }
         sb.append("\n").append(
             t.s(
-                "Na koniec dostrój miernikiem SWR albo NanoVNA: gdy rezonans wypada za nisko, skracaj po 1–2 mm.",
-                "Finally tune it with an SWR meter or a NanoVNA: if the resonance is too low, shorten it 1–2 mm at a time.",
+                "Na koniec dostrój miernikiem SWR albo NanoVNA: gdy rezonans wypada za nisko, skracaj po 1–2 mm. Inne typy anten, inną grubość przewodu i straty kabla policzysz w kalkulatorze anten.",
+                "Finally tune it with an SWR meter or a NanoVNA: if the resonance is too low, shorten it 1–2 mm at a time. Other antenna types, other wire thickness and cable losses are in the antenna calculator.",
             ),
         )
         return sb.toString()

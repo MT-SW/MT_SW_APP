@@ -227,6 +227,8 @@ sealed interface SettingsRoute : Route {
 
     @Serializable data object MtSwOtherFeatures : SettingsRoute
 
+    @Serializable data object AntennaCalculator : SettingsRoute
+
     // endregion
 
     // region help & documentation routes

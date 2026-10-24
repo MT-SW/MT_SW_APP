@@ -2,8 +2,8 @@
 title: MT_SW features
 parent: User Guide
 nav_order: 23
-last_updated: 2026-10-18
-description: An overview of what MT_SW_APP adds to the original Meshtastic app — remote GPIO control, network health, links on the map, Mesh Link Planner, on-demand diagnostics, Sniffer, debug panel with device logs, app scale and more.
+last_updated: 2026-10-24
+description: An overview of what MT_SW_APP adds to the original Meshtastic app — remote GPIO control, network health, links on the map, Mesh Link Planner, antenna calculator, on-demand diagnostics, Sniffer, debug panel with device logs, app scale and more.
 aliases:
   - mt-sw
   - gpio
@@ -85,6 +85,17 @@ The planner simulates the range of a radio link between two points, **A** and **
 - **Export** to PDF, CSV, KML, GeoJSON and PNG.
 
 The planner is opened with the **Planner** button in the node details, next to the compass.
+
+## Antenna calculator
+
+**Settings → Advanced → MT_SW features → Tools → Antenna calculator.** It works out antenna sizes for any frequency and draws the antenna with its parts A, B, C… and their values.
+
+- **Antenna types:** quarter-wave ground plane, half-wave dipole, folded dipole (with a λ/2 coax balun), 5/8-wave vertical, J-pole, Slim Jim, coaxial collinear (COCO), Yagi-Uda (3–20 elements, corrected for a metal boom), Moxon, Biquad, axial-mode helix, patch on a PCB and coax sections λ/4 and λ/2.
+- **Material:** the wire or tube diameter and insulation change the element lengths; antennas made of coax use the chosen cable's velocity factor, the patch the board's permittivity and thickness.
+- **Properties:** wavelength, the shortening factor used, impedance, gain, polarisation and building tips.
+- **Feed line:** transmit power, a cable from the list (loss worked out for the chosen frequency) or your own, cable length, connectors and other parts, SWR and antenna gain. Result: the loss of each part and in total, power at the antenna, EIRP and ERP, comparison with the band limit (e.g. 500 mW ERP in 869.4–869.65 MHz) and how the losses affect range.
+
+The formulas come from established sources (Stutzman & Thiele, Rothammel/DL6WU, L. B. Cebik, J. D. Kraus, Balanis, Hammerstad, cable makers' tables). The result is a very good starting point, but every antenna is still tuned with an SWR meter or NanoVNA. Under its antenna calculations the assistant gives a button to the calculator with the same frequency and antenna type.
 
 ## On-demand diagnostics
 
