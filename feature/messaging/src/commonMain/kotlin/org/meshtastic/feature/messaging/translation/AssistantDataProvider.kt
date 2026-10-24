@@ -522,8 +522,10 @@ class AssistantDataProvider(
             }
         if (rows.isEmpty()) return aiString(Res.string.ai_sensor_none)
         // The same sensor saved twice under one name: only its newest reading.
-        val sorted = rows.sortedBy { it.ago }.distinctBy { it.name }.sortedWith(compareByDescending<Row> { it.values.containsKey("temperature") }.thenBy { it.ago })
-        val sb = StringBuilder(aiString(Res.string.ai_sensor_title, rows.size)).append('\n')
+        val fresh = rows.filter { it.ago <= STALE_SENSOR_MIN }
+        // Old readings (a sensor silent for days) only when there is nothing fresh.
+        val sorted = fresh.ifEmpty { rows }.sortedBy { it.ago }.distinctBy { it.name }.sortedWith(compareByDescending<Row> { it.values.containsKey("temperature") }.thenBy { it.ago })
+        val sb = StringBuilder(aiString(Res.string.ai_sensor_title, sorted.size)).append('\n')
         for (r in sorted.take(REPORT_LIMIT)) {
             val parts = ArrayList<String>()
             for ((k, v) in r.values) parts += aiString(REPORT_KEYS.getValue(k), roundTo(v, if (k in TWO_DECIMALS) 2 else 1))
@@ -1844,6 +1846,7 @@ class AssistantDataProvider(
         const val SENSOR_LIMIT = 12
         const val REPORT_LIMIT = 12
         const val SAME_PLACE_M = 200
+        const val STALE_SENSOR_MIN = 24 * 60L
         const val SIGNAL_SHOWN = 6
         const val NEXT_SHOWN = 3
         const val NAMES_SHOWN = 8

@@ -625,7 +625,7 @@ class LlamaAssistantService(
             val score = strongHits * 2 + weakHits + (if (exact) LABEL_SCORE else 0) + (if (headed) LABEL_SCORE else 0)
             found += Line(title, line, score)
         }
-        if (found.isEmpty()) return sectionStart(fragment, stems("$strong $question"), question, strong, polish)
+        if (found.isEmpty()) return sectionStart(fragment, stems(label), stems("$strong $question") - STOP_STEMS, question, strong, polish)
         // A part of the manual whose heading names the setting is the right place; others only when there is none.
         val titled = found.filter { line -> labelStems.size >= 2 && stems(line.title).containsAll(labelStems) }
         val pool = titled.ifEmpty { found }
@@ -642,7 +642,7 @@ class LlamaAssistantService(
      * "What is MT_SW features", "how do I update the firmware": no paragraph names a setting, so the opening lines of the
      * part of the manual whose heading shares a word with the question are shown (the most relevant part on a tie).
      */
-    private fun sectionStart(fragment: String, want: Set<String>, question: String, strong: String, polish: Boolean): String {
+    private fun sectionStart(fragment: String, labelStems: Set<String>, want: Set<String>, question: String, strong: String, polish: Boolean): String {
         class Part(val title: String, val lines: MutableList<String> = ArrayList())
         val parts = ArrayList<Part>()
         for (raw in fragment.lines()) {
@@ -659,9 +659,14 @@ class LlamaAssistantService(
                 p.lines.isNotEmpty() && !p.title.startsWith("MT_SW ") && p.title != "CHANGELOG" && !(polish && p.title.startsWith("en-")) &&
                     (!ABOUT_ASSISTANT.containsMatchIn(p.title.lowercase()) || ABOUT_ASSISTANT.containsMatchIn(focus(question, strong)))
             }
-        val scored = usable.map { it to stems(it.title.substringAfter(": ")).count { s -> s in want } }.filter { it.second > 0 }
-        val top = scored.maxOfOrNull { it.second } ?: return ""
-        val best = scored.first { it.second == top }.first
+        // The name of the found screen counts most; then the question's words; a short heading (a whole chapter) wins a tie.
+        class Scored(val part: Part, val score: Int, val size: Int)
+        val scored =
+            usable.map { p ->
+                val words = stems(p.title.substringAfter(": "))
+                Scored(p, words.count { it in labelStems } * LABEL_SCORE + words.count { it in want }, words.size)
+            }.filter { it.score > 0 }
+        val best = scored.sortedWith(compareByDescending<Scored> { it.score }.thenBy { it.size }).firstOrNull()?.part ?: return ""
         val heading = best.title.substringAfter(": ", "").trim()
         val body = best.lines.take(HELP_LINES).joinToString("\n") { endAtSentence(it) }
         return (if (heading.isNotBlank()) "($heading)\n" else "") + endAtSentence(body.take(HELP_CHARS))
@@ -854,6 +859,8 @@ class LlamaAssistantService(
         const val MIN_QUOTE = 25
         const val MAX_QUOTE = 400
         const val QUOTE_WORDS = 6
+        // Common words that say nothing about which part of the manual a question is about.
+        val STOP_STEMS = setOf("przez", "jest", "gdzie", "jaki", "jakie", "jaka", "można", "mozna", "zrobi", "mojeg", "moje", "swoje", "swoim", "czym", "tego", "with", "what", "from", "have", "about", "does", "where", "which")
         val ADVICE_INTENTS = setOf("app_help", "chat", "network_question", "signal_list", "web_question")
         val RANGE_PROBLEM = Regex("słab|slab|kiepsk|mały zasięg|maly zasieg|krótki zasięg|krotki zasieg|poprawi|zwiększ|zwieksz|lepsz|nie słysz|nie slysz|nie docier|nikogo nie|weak|poor|improve|bad|short range")
         val RANGE_TOPIC = Regex("zasięg|zasieg|sygnał|sygnal|odbiór|odbior|słysz|slysz|docier|range|signal|reception|hear")
