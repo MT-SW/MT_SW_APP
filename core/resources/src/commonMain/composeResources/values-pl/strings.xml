@@ -3114,6 +3114,7 @@
     <string name="ai_neigh_none_node">Brak informacji o sąsiadach tego węzła.</string>
     <string name="ai_neigh_none">Brak zapisanych informacji o sąsiadach.</string>
     <string name="ai_unknown_node">Nie znam węzła: %1$s</string>
+    <string name="ai_unknown_node_maybe">Czy chodziło o: %1$s?</string>
     <string name="ai_status_title">Stan aplikacji</string>
     <string name="ai_status_conn">Połączenie z radiem: %1$s</string>
     <string name="ai_conn_connected">połączono</string>

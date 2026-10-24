@@ -123,6 +123,7 @@ import org.meshtastic.core.resources.ai_trace_none_node
 import org.meshtastic.core.resources.ai_trace_there
 import org.meshtastic.core.resources.ai_trace_title
 import org.meshtastic.core.resources.ai_unknown_node
+import org.meshtastic.core.resources.ai_unknown_node_maybe
 import org.meshtastic.core.resources.ai_win_all
 import org.meshtastic.core.resources.ai_win_last_day
 import org.meshtastic.core.resources.ai_win_last_hour
@@ -1132,7 +1133,7 @@ class AssistantDataProvider(
     suspend fun toolTraceroutes(node: String, limit: Int): String {
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
         val wanted = node.anyToEmpty()
-        val num = if (wanted.isEmpty()) null else (findNode(node)?.num ?: return aiString(Res.string.ai_unknown_node, node))
+        val num = if (wanted.isEmpty()) null else (findNode(node)?.num ?: return unknownNode(node))
         val logs = meshLogRepository.getLogsByPortNumSince(PortNum.TRACEROUTE_APP.value, nowMillis - TRACE_WINDOW_MS).first()
         val now = nowMillis
         val there = aiString(Res.string.ai_trace_there)
@@ -1161,7 +1162,7 @@ class AssistantDataProvider(
     suspend fun toolNeighbors(node: String, limit: Int): String {
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
         val wanted = node.anyToEmpty()
-        val num = if (wanted.isEmpty()) null else (findNode(node)?.num ?: return aiString(Res.string.ai_unknown_node, node))
+        val num = if (wanted.isEmpty()) null else (findNode(node)?.num ?: return unknownNode(node))
         val logs = meshLogRepository.getLogsByPortNumSince(PortNum.NEIGHBORINFO_APP.value, nowMillis - TRACE_WINDOW_MS).first()
         val now = nowMillis
         val newest = HashMap<Int, Pair<Long, org.meshtastic.proto.NeighborInfo>>()
@@ -1739,6 +1740,63 @@ class AssistantDataProvider(
             ?: all.firstOrNull { it.user.short_name.lowercase().contains(q) }
             ?: all.firstOrNull { it.user.id.lowercase() == q }
             ?: all.firstOrNull { it.user.long_name.fold().contains(q.fold()) }
+            ?: nearNodes(q, loose = false).firstOrNull()
+    }
+
+    /** Words of a node's names that a spoken name can be compared with (the whole names and the words inside them). */
+    private fun nameWords(n: org.meshtastic.core.model.Node): List<String> =
+        (listOf(n.user.long_name, n.user.short_name) + n.user.long_name.split(' ', '_', '-', '/', '.').filter { it.length >= NEAR_MIN_WORD })
+            .map { it.fold().trim() }
+            .filter { it.isNotEmpty() }
+            .distinct()
+
+    /**
+     * Nodes whose name is close to [q] although it is not written the same way: another Polish ending ("Karczówce" for
+     * "Karczowka", "Starachowicach" for "Starachowice") or a small slip. Closest first; [loose] allows more difference
+     * (used only to suggest names).
+     */
+    private fun nearNodes(q: String, loose: Boolean): List<org.meshtastic.core.model.Node> {
+        val asked = (listOf(q) + q.split(' ', '-', '_').filter { it.length >= NEAR_MIN_WORD }).map { it.fold().trim() }.filter { it.length >= NEAR_MIN_WORD }.distinct()
+        if (asked.isEmpty()) return emptyList()
+        return nodeRepository.nodeDBbyNum.value.values
+            .mapNotNull { n ->
+                val best = nameWords(n).flatMap { w -> asked.map { a -> nameDistance(a, w, loose) } }.filterNotNull().minOrNull()
+                best?.let { n to it }
+            }
+            .sortedBy { it.second }
+            .map { it.first }
+    }
+
+    /** How far two names are apart (0 = same), or null when they are too different to be the same name. */
+    private fun nameDistance(a: String, b: String, loose: Boolean): Int? {
+        val shortest = minOf(a.length, b.length)
+        if (shortest < NEAR_MIN_WORD) return null
+        // The same beginning with only an ending different: "starachowicach" / "starachowice".
+        if (shortest >= NEAR_STEM_MIN && (a.startsWith(b.dropLast(2)) || b.startsWith(a.dropLast(2)))) return 1
+        val allowed = if (loose) maxOf(2, shortest / 3) else maxOf(1, shortest / 4)
+        val d = editDistance(a, b)
+        return d.takeIf { it <= allowed }
+    }
+
+    private fun editDistance(a: String, b: String): Int {
+        var previous = IntArray(b.length + 1) { it }
+        for (i in 1..a.length) {
+            val current = IntArray(b.length + 1)
+            current[0] = i
+            for (j in 1..b.length) {
+                current[j] = minOf(previous[j] + 1, current[j - 1] + 1, previous[j - 1] + if (a[i - 1] == b[j - 1]) 0 else 1)
+            }
+            previous = current
+        }
+        return previous[b.length]
+    }
+
+    /** "I do not know node X", with the names it may have been when some are close ("Did you mean: ..."). */
+    fun unknownNode(name: String): String {
+        val q = name.trim().lowercase()
+        val close = if (q.isEmpty()) emptyList() else nearNodes(q, loose = true).take(SUGGESTED_NODES).map { it.user.long_name.ifBlank { it.user.short_name } }.distinct()
+        val base = aiString(Res.string.ai_unknown_node, name)
+        return if (close.isEmpty()) base else base + "\n" + aiString(Res.string.ai_unknown_node_maybe, close.joinToString(", "))
     }
 
     /**
@@ -1859,6 +1917,9 @@ class AssistantDataProvider(
         const val REPORT_LIMIT = 12
         const val SAME_PLACE_M = 200
         const val STEM_MIN_SEARCH = 6
+        const val NEAR_MIN_WORD = 4
+        const val NEAR_STEM_MIN = 6
+        const val SUGGESTED_NODES = 3
         const val STALE_SENSOR_MIN = 24 * 60L
         const val SIGNAL_SHOWN = 6
         const val NEXT_SHOWN = 3

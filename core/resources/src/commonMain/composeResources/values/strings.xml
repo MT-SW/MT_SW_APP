@@ -243,6 +243,7 @@
     <string name="ai_trace_there">there</string>
     <string name="ai_trace_title">Packet routes (newest first):</string>
     <string name="ai_unknown_node">Unknown node: %1$s</string>
+    <string name="ai_unknown_node_maybe">Maybe you meant: %1$s?</string>
     <string name="ai_warning_body">The model needs a one-time download (about %1$d MB) and uses about %2$d MB of RAM while running. A device with at least %3$d GB of RAM is recommended. On weaker devices it may slow down or close the app. Once downloaded it works without internet.</string>
     <string name="ai_win_all">All saved</string>
     <string name="ai_win_last_day">Last 24 hours</string>

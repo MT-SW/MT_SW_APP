@@ -56,7 +56,6 @@ import org.meshtastic.core.resources.ai_go_open
 import org.meshtastic.core.resources.ai_go_planner
 import org.meshtastic.core.resources.ai_go_setting
 import org.meshtastic.core.resources.ai_go_unknown_place
-import org.meshtastic.core.resources.ai_unknown_node
 import org.meshtastic.core.resources.getStringSuspend
 
 /**
@@ -118,6 +117,7 @@ class LlamaAssistantService(
 
     // How the router understood the newest question, for the test report.
     @Volatile private var lastRoute = ""
+    @Volatile private var previousAnswer = ""
 
     override suspend fun selfTest(onResult: (question: String, answer: String) -> Unit) {
         withContext(Dispatchers.IO) {
@@ -180,6 +180,7 @@ class LlamaAssistantService(
         val modelId = activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
         val question = history.lastOrNull { it.fromUser }?.text.orEmpty()
         val previous = history.dropLast(1).lastOrNull { it.fromUser }?.text.orEmpty()
+        previousAnswer = history.dropLast(1).lastOrNull { !it.fromUser && it.text.isNotBlank() }?.text.orEmpty()
         // The whole answer is in the language of this question: the model's words, the app's own texts and the buttons.
         val language = answerLanguage(question, history)
         val polish = language == "pl"
@@ -229,7 +230,7 @@ class LlamaAssistantService(
     ): String {
         // The conversation as the model sees it ends with this one question.
         val turns = history.dropLast(1) + AssistantTurn(true, question)
-        val routed = router.understand(modelId, question, previous)
+        val routed = router.understand(modelId, question, previous, previousAnswer)
         val intent =
             if (routed != null && routed.intent in COMMAND_INTENTS && WHERE_QUESTION.containsMatchIn(question.trim().lowercase()) &&
                 !OPEN_COMMAND.containsMatchIn(question.trim().lowercase())
@@ -363,7 +364,7 @@ class LlamaAssistantService(
             }
             "network_question", "count_messages", "search_messages", "list_nodes" -> {
                 if (intent.topic == "node" && intent.node.isNotBlank() && nodeNum == null) {
-                    return aiString(Res.string.ai_unknown_node, intent.node).also(onPiece)
+                    return data.unknownNode(intent.node).also(onPiece)
                 }
                 val text = data.dataFor(intent.topic, nodeNum, intent.metric, question, DATA_CHARS * room)
                 val extra = if (text.isBlank()) rule(polish, NO_DATA_PL, NO_DATA_EN) else rule(polish, DATA_PL, DATA_EN) + "\n" + text
@@ -478,7 +479,7 @@ class LlamaAssistantService(
     }
 
     private suspend fun goToNode(num: Int?, asked: String, planner: Boolean): String {
-        if (num == null) return aiString(Res.string.ai_unknown_node, asked.ifBlank { "?" })
+        if (num == null) return data.unknownNode(asked.ifBlank { "?" })
         val name = data.nodeNameFor(num).ifBlank { asked }
         val path = if (planner) "map/planner/$num" else "map/focus/$num"
         collector.add(AssistantAction(name, "$DEEP_LINK_BASE_URI/$path"))
@@ -536,7 +537,7 @@ class LlamaAssistantService(
 
     /** Runs [block] for the node the router named, for every node when none was named, or says the node is unknown. */
     private suspend fun routeOrUnknown(intent: AssistantIntent, num: Int?, block: suspend (String) -> String): String {
-        if (intent.node.isNotBlank() && num == null) return aiString(Res.string.ai_unknown_node, intent.node)
+        if (intent.node.isNotBlank() && num == null) return data.unknownNode(intent.node)
         return block(num?.let { data.nodeNameFor(it) }.orEmpty().ifBlank { "all" })
     }
 
