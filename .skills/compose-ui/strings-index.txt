@@ -110,6 +110,7 @@ ai_internet_warning_title
 ai_level_light
 ai_level_standard
 ai_level_strong
+ai_level_translator
 ai_license_cc
 ai_license_gemma
 ai_low_battery_title

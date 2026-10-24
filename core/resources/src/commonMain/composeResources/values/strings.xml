@@ -131,6 +131,7 @@
     <string name="ai_level_light">Light</string>
     <string name="ai_level_standard">Standard</string>
     <string name="ai_level_strong">Strong</string>
+    <string name="ai_level_translator">Translator only</string>
     <string name="ai_license_cc">Model licence: CC BY-NC 4.0 (non-commercial use only)</string>
     <string name="ai_license_gemma">Model licence: Apache 2.0 (Google, Gemma 4)</string>
     <string name="ai_low_battery_title">Nodes with low battery (up to %1$d%):</string>
@@ -151,7 +152,7 @@
     <string name="ai_model_download">Download</string>
     <string name="ai_model_failed">Download failed. Try again.</string>
     <string name="ai_model_none_ready">No model downloaded. Download one of the models above.</string>
-    <string name="ai_model_one_note">One model does everything and only it is kept in memory. The light NLLB model can only translate: choosing it turns off the assistant (you will be asked first).</string>
+    <string name="ai_model_one_note">One model does everything and only it is kept in memory. The translator-only NLLB model can only translate: choosing it turns off the assistant (you will be asked first).</string>
     <string name="ai_model_one_title">AI model (assistant, translator and dictation)</string>
     <string name="ai_model_roles_both">Translator and assistant</string>
     <string name="ai_model_roles_translator">Translator only</string>

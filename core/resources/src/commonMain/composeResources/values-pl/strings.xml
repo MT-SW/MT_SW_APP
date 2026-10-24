@@ -2986,6 +2986,7 @@
     <string name="ai_model_assistant_title">Model używany przez asystenta</string>
     <string name="ai_model_none_ready">Brak pobranego modelu. Pobierz jeden z modeli powyżej.</string>
     <string name="ai_level_light">Lekki</string>
+    <string name="ai_level_translator">Tylko tłumacz</string>
     <string name="ai_level_standard">Standardowy</string>
     <string name="ai_level_strong">Mocny</string>
     <string name="ai_model_roles_translator">Tylko tłumacz</string>
@@ -3203,7 +3204,7 @@
     <string name="node_color_summary">Wybór koloru Twojego węzła (jego klucza) w ustawieniach bezpieczeństwa.</string>
     <string name="node_color_pick">Wybierz kolor</string>
     <string name="ai_model_one_title">Model AI (asystent, tłumacz i dyktowanie)</string>
-    <string name="ai_model_one_note">Jeden model robi wszystko i tylko on jest w pamięci. Lekki model NLLB umie tylko tłumaczyć: jego wybranie wyłączy asystenta (najpierw zapytamy).</string>
+    <string name="ai_model_one_note">Jeden model robi wszystko i tylko on jest w pamięci. Model NLLB „Tylko tłumacz” umie tylko tłumaczyć: jego wybranie wyłączy asystenta (najpierw zapytamy).</string>
     <string name="ai_mtsw_setup">Sieć MT_SW w województwie świętokrzyskim używa oficjalnego presetu Narrow Fast w regionie EU_N_868, na częstotliwości 869,44165 MHz. MT_SW nie ma własnego presetu i pozostaje zgodny z główną siecią.</string>
     <string name="dictation_external_mic_title">Mikrofon słuchawki przy dyktowaniu</string>
     <string name="dictation_external_mic_summary">Gdy podłączona jest słuchawka (Bluetooth, przewodowa lub USB), dyktowanie w całej aplikacji nagrywa z jej mikrofonu zamiast z mikrofonu telefonu lub komputera.</string>
