@@ -3212,10 +3212,6 @@
     <string name="ai_net_low_battery">Słaba bateria (do %1$d%): %2$s</string>
     <string name="ai_net_none">brak</string>
     <string name="ai_hops_direct">bezpośrednio</string>
-    <string name="ai_antenna">Dla %1$s MHz długość fali to %2$s cm.
-• Antena ćwierćfalowa: ok. %3$s cm
-• Dipol półfalowy: ok. %4$s cm całości, dwa ramiona po ok. %5$s cm
-Długości są już skrócone o ok. 5% dla elementu z drutu; dostrój je miernikiem SWR.</string>
     <string name="ai_test_done">Test zakończony: %1$d pytań, model %2$s, średni czas %3$s s. Pełny raport jest niżej (przytrzymaj, aby skopiować).</string>
     <string name="ai_model_translate_only_title">Wyłączyć asystenta?</string>
     <string name="ai_model_translate_only_body">%1$s umie tylko tłumaczyć. Wybranie go wyłączy asystenta i dyktowanie; działać będzie tylko tłumacz. Żeby znów używać asystenta, wybierz model Gemma i włącz asystenta.</string>

@@ -141,6 +141,7 @@ import org.meshtastic.core.resources.ai_wp_noname
 import org.meshtastic.core.resources.ai_wp_none
 import org.meshtastic.core.resources.ai_wp_title
 import kotlinx.coroutines.flow.first
+import org.meshtastic.core.model.ChannelOption
 import kotlinx.datetime.offsetAt
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.common.util.systemTimeZone
@@ -1446,6 +1447,81 @@ class AssistantDataProvider(
         if (hops.isNotBlank()) sb.append("\n• ").append(aiString(Res.string.ai_net_hops, hops))
         sb.append("\n• ").append(aiString(Res.string.ai_net_roles, roles))
         sb.append("\n• ").append(aiString(Res.string.ai_net_low_battery, LOW_BATTERY, low.ifBlank { aiString(Res.string.ai_net_none) }))
+        return sb.toString()
+    }
+
+    /** The radio's preset and transmit power, for calculations whose question does not give them. */
+    suspend fun calcDefaults(): AssistantCalculators.Defaults {
+        val lora = radioConfigRepository.localConfigFlow.first().lora ?: return AssistantCalculators.Defaults()
+        val preset = if (lora.use_preset) ChannelOption.from(lora.modem_preset) else null
+        return AssistantCalculators.Defaults(preset, lora.tx_power)
+    }
+
+    /**
+     * "My range is weak, what should I check": the user's own radio checked in code — region, preset, power, hop limit,
+     * transmitting on, the nodes heard directly and their best signal against the preset's limit, noise and channel use —
+     * then the usual things to check by hand.
+     */
+    suspend fun rangeCheck(): String {
+        fun s(pl: String, en: String) = if (polish) pl else en
+        val lora = radioConfigRepository.localConfigFlow.first().lora
+        val ls = nodeRepository.localStats.value
+        val sb = StringBuilder(s("Sprawdziłem Twoje radio:", "I checked your radio:"))
+        fun line(text: String) = sb.append("\n• ").append(text)
+        if (lora == null) {
+            line(s("brak ustawień LoRa — połącz się z radiem.", "no LoRa settings — connect to the radio."))
+        } else {
+            val option = if (lora.use_preset) ChannelOption.from(lora.modem_preset) else null
+            val region = lora.region.name
+            val presetName = option?.name ?: s("własne ustawienia", "custom settings")
+            val ours = region == "EU_N_868" && option == ChannelOption.NARROW_FAST
+            line(
+                s("region $region, preset $presetName", "region $region, preset $presetName") +
+                    if (ours) s(" — tak jak w naszej sieci", " — the same as our network")
+                    else s(" — inne niż w naszej sieci (Narrow Fast, EU_N_868): inne radia Cię nie usłyszą", " — not what our network uses (Narrow Fast, EU_N_868): other radios will not hear you"),
+            )
+            if (!lora.tx_enabled) line(s("nadawanie jest WYŁĄCZONE — radio tylko słucha", "transmitting is OFF — the radio only listens"))
+            line(
+                if (lora.tx_power == 0) s("moc nadawania: maksymalna dozwolona w regionie", "transmit power: the maximum the region allows")
+                else s("moc nadawania: ${lora.tx_power} dBm", "transmit power: ${lora.tx_power} dBm") +
+                    if (lora.tx_power in 1..16) s(" — dość mało, możesz ją zwiększyć", " — fairly low, you can raise it") else "",
+            )
+            line(s("limit przeskoków: ${lora.hop_limit}", "hop limit: ${lora.hop_limit}") + if (lora.hop_limit in 1..2) s(" — mało, wiadomości nie dojdą daleko", " — low, messages will not travel far") else "")
+            val nowS = nowMillis / MILLIS_PER_SECOND
+            val me = nodeRepository.ourNodeInfo.value?.num
+            val direct =
+                nodeRepository.nodeDBbyNum.value.values.filter {
+                    it.num != me && it.hopsAway == 0 && it.lastHeard != 0 && nowS - it.lastHeard < ONE_DAY_S
+                }
+            val limit = option?.let { -7.5f - 2.5f * (it.spreadingFactor - 7) }
+            val best = direct.mapNotNull { n -> n.snr.takeIf { it != Float.MAX_VALUE }?.let { n to it } }.maxByOrNull { it.second }
+            if (direct.isEmpty()) {
+                line(s("przez ostatnią dobę radio nie słyszało bezpośrednio żadnego węzła — antena, położenie albo ustawienia", "in the last day the radio heard no node directly — antenna, location or settings"))
+            } else {
+                line(s("węzły słyszane bezpośrednio przez ostatnią dobę: ${direct.size}", "nodes heard directly in the last day: ${direct.size}"))
+                if (best != null) {
+                    val name = best.first.user.long_name.ifBlank { best.first.user.short_name }
+                    val extra =
+                        limit?.let { l ->
+                            val margin = best.second - l
+                            s(" (zapas ${fmt(margin)} dB nad granicą odbioru ${fmt(l)} dB)", " (${fmt(margin)} dB above the reception limit of ${fmt(l)} dB)")
+                        }.orEmpty()
+                    line(s("najlepszy sygnał: $name, SNR ${fmt(best.second)} dB", "best signal: $name, SNR ${fmt(best.second)} dB") + extra)
+                }
+            }
+            val noise = ls.noise_floor ?: 0
+            if (noise != 0) {
+                line(s("szum: $noise dBm", "noise: $noise dBm") + if (noise > -100) s(" — wysoki, coś w pobliżu zakłóca (zasilacz, komputer, inne radio)", " — high, something nearby interferes (power supply, computer, another radio)") else s(" — w normie", " — normal"))
+            }
+            val util = ls.channel_utilization ?: 0f
+            if (util > 0f) line(s("zajętość kanału: ${fmt(util)} %", "channel use: ${fmt(util)} %") + if (util > 25f) s(" — kanał jest zatłoczony", " — the channel is crowded") else "")
+        }
+        sb.append("\n\n").append(
+            s(
+                "Sprawdź też sam: antena na właściwe pasmo (868 MHz), dobrze dokręcona, pionowo, jak najwyżej i z dala od metalu; krótki i dobry kabel; wyżej położone radio słyszy dużo dalej. Konkretne łącze do węzła sprawdzisz w planerze łącza.",
+                "Also check yourself: an antenna for the right band (868 MHz), screwed on firmly, vertical, as high as possible and away from metal; a short, good cable; a radio placed higher hears much further. Check a link to a node in the link planner.",
+            ),
+        )
         return sb.toString()
     }
 

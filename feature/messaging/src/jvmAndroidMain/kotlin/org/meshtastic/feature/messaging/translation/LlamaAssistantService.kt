@@ -35,7 +35,6 @@ import org.meshtastic.core.repository.TranslatorModelState
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ai_go_draft
-import org.meshtastic.core.resources.ai_antenna
 import org.meshtastic.core.resources.ai_test_done
 import org.meshtastic.core.resources.assistant_web_sources
 import org.meshtastic.core.resources.assistant_web_searched
@@ -245,29 +244,6 @@ class LlamaAssistantService(
         return if (first.length >= MIN_PART && second.length >= MIN_PART) first to second.replaceFirstChar { it.uppercase() } else null
     }
 
-    /**
-     * Antenna lengths worked out in code for a frequency in the question (the model guessed them): wavelength from the
-     * speed of light, quarter-wave and half-wave dipole, shortened by the usual 5 % for a wire element.
-     */
-    private fun antennaMath(question: String, polish: Boolean): String {
-        val q = question.lowercase()
-        if (!ANTENNA_WORDS.containsMatchIn(q)) return ""
-        val mhz = FREQUENCY.find(q)?.groupValues?.get(1)?.replace(',', '.')?.toDoubleOrNull()?.takeIf { it > 0 } ?: return ""
-        val wavelengthCm = SPEED_OF_LIGHT / (mhz * 1_000_000) * 100
-        fun cm(v: Double) = (kotlin.math.round(v * 10) / 10).toString()
-        val quarter = wavelengthCm / 4 * VELOCITY_FACTOR
-        val half = wavelengthCm / 2 * VELOCITY_FACTOR
-        return if (polish) {
-            "OBLICZENIA (pewne, podaj właśnie te liczby): dla ${cm(mhz)} MHz długość fali λ = c / f = ${cm(wavelengthCm)} cm. " +
-                "Antena ćwierćfalowa: ok. ${cm(quarter)} cm. Dipol półfalowy: ok. ${cm(half)} cm całości, czyli dwa ramiona po ok. ${cm(half / 2)} cm. " +
-                "Długości są już skrócone o ok. 5 % (współczynnik 0,95), jak dla elementu z drutu; dokładnie dostraja się je miernikiem SWR."
-        } else {
-            "CALCULATION (exact, give these numbers): for ${cm(mhz)} MHz the wavelength λ = c / f = ${cm(wavelengthCm)} cm. " +
-                "Quarter-wave antenna: about ${cm(quarter)} cm. Half-wave dipole: about ${cm(half)} cm in total, two arms of about ${cm(half / 2)} cm each. " +
-                "The lengths are already shortened by about 5 % (factor 0.95) for a wire element; fine tuning is done with an SWR meter."
-        }
-    }
-
     /** Does what [intent] asks: code for exact things and for going somewhere, the model for words. */
     @Suppress("CyclomaticComplexMethod", "LongMethod")
     private suspend fun handle(
@@ -288,8 +264,15 @@ class LlamaAssistantService(
         val nodeNum = data.resolveNodeNum(intent.node, question)
         // "the nearest router": the role is taken from the question when the small model left it out.
         val role = intent.role.takeUnless { it.isBlank() || it == "any" } ?: ROLE_WORDS.find(question.lowercase())?.groupValues?.get(1)?.let { ROLE_NAMES[it] }.orEmpty()
-        // Antenna lengths: a question about how long an antenna should be is answered by the app's own calculation.
-        antennaAnswer(question)?.let { return it.also(onPiece) }
+        // Calculations (antennas, power, range, airtime, Fresnel zone, horizon, sums) are done by the app, never guessed.
+        if (intent.intent != "draft_message") {
+            AssistantCalculators.answer(question, polish, data.calcDefaults())?.let { return it.also(onPiece) }
+        }
+        // "My range is weak, what should I check": the user's own radio is checked in code, with a button to the preset.
+        if (intent.intent in ADVICE_INTENTS && RANGE_PROBLEM.containsMatchIn(lower) && RANGE_TOPIC.containsMatchIn(lower)) {
+            guideTools.show_setting("preset")
+            return data.rangeCheck().also(onPiece)
+        }
         val answer: String? =
             when (intent.intent) {
                 "show_node_on_map" -> exact(goToNode(nodeNum, intent.node, planner = false))
@@ -436,7 +419,11 @@ class LlamaAssistantService(
                 val found =
                     if (uiPrefs.assistantInternetEnabled.value) webTools.web_search(intent.text.ifBlank { question }.take(WEB_QUERY_CHARS)) else ""
                 val extra = if (found.isBlank()) "" else rule(polish, WEB_PL, WEB_EN) + "\n" + found
-                speak(modelId, history, polish, onPiece, room, extra = extra, temperature = FACT_TEMPERATURE)
+                val said = speak(modelId, history, polish, onPiece, room, extra = extra, temperature = WEB_TEMPERATURE)
+                // A number the model wrote that is in neither the results nor the facts was garbled or made up:
+                // then the most fitting sentences of the results are quoted instead of the model's words.
+                val core = knowledge?.coreFacts(if (polish) "pl" else "en").orEmpty()
+                if (found.isBlank() || numbersBacked(said, found + "\n" + core + "\n" + question)) said else quoteWeb(found, question, polish)
             }
             else -> speak(modelId, history, polish, onPiece, room, extra = "")
         }
@@ -540,8 +527,6 @@ class LlamaAssistantService(
         val recent = fit(modelId, history, room)
         val core = knowledge?.coreFacts(if (polish) "pl" else "en").orEmpty()
         val question = history.lastOrNull { it.fromUser }?.text.orEmpty()
-        // Antenna lengths are worked out in code for every written answer that asks about them (also web questions).
-        val math = antennaMath(question, polish)
         val system = buildString {
             append(if (polish) SYSTEM_PL else SYSTEM_EN)
             // The core facts about MT_SW are always given, so the model never answers against them.
@@ -552,7 +537,6 @@ class LlamaAssistantService(
             }
             if (memory.isNotBlank()) append("\n\n").append(rule(polish, EARLIER_PL, EARLIER_EN)).append(' ').append(memory)
             if (extra.isNotBlank()) append("\n\n").append(extra)
-            if (math.isNotBlank()) append("\n\n").append(math)
         }
         Logger.i(tag = TAG) { "Prompt: system ${system.length} chars, turns ${recent.size}, temperature $temperature" }
         val messages = buildList {
@@ -639,15 +623,26 @@ class LlamaAssistantService(
 
     private fun focus(question: String, strong: String) = "$question $strong".lowercase()
 
-    /** A code answer for "how long should an antenna for N MHz be", or null when the question is not that. */
-    private suspend fun antennaAnswer(question: String): String? {
-        val q = question.lowercase()
-        if (!ANTENNA_WORDS.containsMatchIn(q) || !LENGTH_WORDS.containsMatchIn(q)) return null
-        val mhz = FREQUENCY.find(q)?.groupValues?.get(1)?.replace(',', '.')?.toDoubleOrNull()?.takeIf { it > 0 } ?: return null
-        val wavelength = SPEED_OF_LIGHT / (mhz * 1_000_000) * 100
-        fun cm(v: Double) = (kotlin.math.round(v * 10) / 10).toString()
-        val half = wavelength / 2 * VELOCITY_FACTOR
-        return aiString(Res.string.ai_antenna, cm(mhz), cm(wavelength), cm(wavelength / 4 * VELOCITY_FACTOR), cm(half), cm(half / 2))
+    /** True when every number of 2+ digits in [answer] also stands in [source] (written with a dot or a comma). */
+    private fun numbersBacked(answer: String, source: String): Boolean {
+        fun numbers(text: String) = NUMBER.findAll(text).map { it.value.replace(',', '.').trimEnd('0').trimEnd('.') }.toSet()
+        val known = numbers(source)
+        return numbers(answer).filter { it.replace(".", "").length >= 2 }.all { it in known }
+    }
+
+    /** The two sentences of the web results that share most words with the question, quoted as they are. */
+    private fun quoteWeb(found: String, question: String, polish: Boolean): String {
+        val want = stems(question)
+        val sentences =
+            found.lines().filterNot { it.startsWith("UNTRUSTED") || it.startsWith("END OF") }
+                .flatMap { it.split(Regex("(?<=[.!?])\\s+")) }
+                .map { it.trim() }.filter { it.length in MIN_QUOTE..MAX_QUOTE }.distinct()
+        val best = sentences.map { it to stems(it).count { s -> s in want } }.filter { it.second > 0 }.sortedByDescending { it.second }.take(2).map { it.first }
+        return if (best.isEmpty()) {
+            rule(polish, "W wynikach z internetu nie ma jasnej odpowiedzi na to pytanie.", "The web results do not answer this question clearly.")
+        } else {
+            rule(polish, "Z internetu (cytat):", "From the internet (quoted):") + best.joinToString("") { "\n• $it" }
+        }
     }
 
     /** Cuts an unfinished last sentence (a fragment can end in the middle of one). */
@@ -797,6 +792,15 @@ class LlamaAssistantService(
         /** Answers about the app, the user's data or the web stick closer to the given text with a lower randomness. */
         const val FACT_TEMPERATURE = 0.25f
         const val WEB_QUERY_CHARS = 120
+
+        /** Web answers keep closest to the results: the small model garbled numbers at higher randomness. */
+        const val WEB_TEMPERATURE = 0.1f
+        val NUMBER = Regex("\\d+(?:[.,]\\d+)?")
+        const val MIN_QUOTE = 25
+        const val MAX_QUOTE = 400
+        val ADVICE_INTENTS = setOf("app_help", "chat", "network_question", "signal_list", "web_question")
+        val RANGE_PROBLEM = Regex("słab|slab|kiepsk|mały zasięg|maly zasieg|krótki zasięg|krotki zasieg|poprawi|zwiększ|zwieksz|lepsz|nie słysz|nie slysz|nie docier|nikogo nie|weak|poor|improve|bad|short range")
+        val RANGE_TOPIC = Regex("zasięg|zasieg|sygnał|sygnal|odbiór|odbior|słysz|slysz|docier|range|signal|reception|hear")
         val BATTERY_WORDS = Regex("bateri|akumulator|battery")
         val SETUP_WORDS = Regex("preset|region|częstotliw|czestotliw|frequen|slot|jakie ustawienia|jakich ustawień|jakich ustawien")
         val OUR_NETWORK_WORDS = Regex("nasz|wojew|świętokrzysk|swietokrzysk|kielc|mt[_ -]?sw|u nas|w okolic|our network|our region")
@@ -805,14 +809,9 @@ class LlamaAssistantService(
         val MANY_WORDS = Regex("któr|ktor|najs|najm|najn|wszystk|which|lowest|all nodes")
         const val MANUAL_CHARS = 9000
         const val MIN_PART = 8
-        const val SPEED_OF_LIGHT = 299_792_458.0
-        const val VELOCITY_FACTOR = 0.95
-        val ANTENNA_WORDS = Regex("anten|dipol|ćwierćfal|cwiercfal|półfal|polfal|antenna|ground ?plane|yagi")
-        val FREQUENCY = Regex("(\\d{2,4}(?:[.,]\\d+)?)\\s*mhz")
         val CONNECT_WORDS = Regex("połącz|polacz|sparow|parowa|connect|pair")
         val OPEN_COMMAND = Regex("^(otwórz|otworz|pokaż|pokaz|przejdź|przejdz|open|show|go to)(?=\\s|$)")
         val ABOUT_ASSISTANT = Regex("asystent|assistant|tłumacz|tlumacz|translator")
-        val LENGTH_WORDS = Regex("ile|dług|dlug|cm|centymetr|metr|wymiar|length|how long|size")
         val ROLE_WORDS = Regex("(router|ruter|repeater|przekaźnik|przekaznik|czujnik|sensor|tracker)")
         val ROLE_NAMES =
             mapOf(
