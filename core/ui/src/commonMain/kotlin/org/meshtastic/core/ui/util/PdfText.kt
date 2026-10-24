@@ -55,11 +55,18 @@ object PdfText {
         }
     }
 
+    private const val SYMBOLS = "\u2265\u2264\u2248\u2192\u2260\u03BB\u03A9\u2126\u221A\u2212\u03BC"
+
     /** Replaces a few common symbols that WinAnsi lacks by ASCII look-alikes. */
     private fun expand(s: String): String {
-        if (s.none { it == '\u2265' || it == '\u2264' || it == '\u2248' || it == '\u2192' || it == '\u2260' }) return s
-        val sb = StringBuilder(s.length + 4)
+        if (s.none { it in SYMBOLS }) return s
+        val sb = StringBuilder(s.length + 8)
         for (c in s) when (c) {
+            '\u03BB' -> sb.append("lambda")
+            '\u03A9', '\u2126' -> sb.append("ohm")
+            '\u221A' -> sb.append("sqrt ")
+            '\u2212' -> sb.append('-')
+            '\u03BC' -> sb.append('\u00B5')
             '\u2265' -> sb.append(">=")
             '\u2264' -> sb.append("<=")
             '\u2248' -> sb.append('~')

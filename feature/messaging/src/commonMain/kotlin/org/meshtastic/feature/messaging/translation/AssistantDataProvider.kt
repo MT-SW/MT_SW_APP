@@ -26,6 +26,7 @@ import org.meshtastic.core.resources.ai_net_low_battery
 import org.meshtastic.core.resources.ai_net_none
 import org.meshtastic.core.resources.ai_hops_direct
 import org.meshtastic.core.resources.ai_bat_line
+import org.meshtastic.core.resources.ai_bat_line_no_voltage
 import org.meshtastic.core.resources.ai_bat_unknown
 import org.meshtastic.core.resources.ai_far_one
 import org.meshtastic.core.resources.ai_near_one
@@ -909,6 +910,7 @@ class AssistantDataProvider(
                 }
         }
         val found = ArrayList<Triple<Long, String, String>>()
+        val seen = ArrayList<Pair<Triple<Long, String, String>, String>>()
         val defaultName = aiString(Res.string.ai_scope_default)
         for (key in keys) {
             val label =
@@ -916,11 +918,15 @@ class AssistantDataProvider(
                 else aiString(Res.string.ai_private_chat)
             val list = packetRepository.getMessagesFrom(key, SEARCH_PER_CHAT) { id -> nodeRepository.getNode(id.orEmpty()) }.first()
             for (m in list) {
-                val text = m.text
-                if (needle.isNotEmpty() && !text.lowercase().fold().contains(needle)) continue
                 val who = if (m.fromLocal) "me" else m.node.user.short_name
-                found += Triple(m.receivedTime, label, "$who: ${text.replace(Regex("\\s*\\n\\s*"), " ").take(MESSAGE_CHARS)}")
+                seen += Triple(m.receivedTime, label, "$who: ${m.text.replace(Regex("\\s*\\n\\s*"), " ").take(MESSAGE_CHARS)}") to m.text.lowercase().fold()
             }
+        }
+        // The word as asked, then without its ending (the Polish "pogodzie" finds "pogoda", "pogody"): the same message
+        // text is searched, only the needle gets shorter.
+        for (n in listOfNotNull(needle, needle.takeIf { it.length >= STEM_MIN_SEARCH }?.dropLast(2)).distinct()) {
+            found += seen.filter { n.isEmpty() || it.second.contains(n) }.map { it.first }
+            if (found.isNotEmpty()) break
         }
         if (found.isEmpty()) {
             return if (needle.isNotEmpty()) aiString(Res.string.ai_found_none_for, query.trim()) else aiString(Res.string.ai_found_none)
@@ -1437,7 +1443,11 @@ class AssistantDataProvider(
         val state = if (level > 100) aiString(Res.string.ai_battery_ext) else aiString(Res.string.ai_battery_pct, level)
         val nowS = nowMillis / MILLIS_PER_SECOND
         val heard = if (node.lastHeard == 0) aiString(Res.string.ai_never) else ago(((nowS - node.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
-        return aiString(Res.string.ai_bat_line, name, state, if (voltage > 0f) roundTo(voltage.toDouble(), 2) else aiString(Res.string.ai_none_value), heard)
+        return if (voltage > 0f) {
+            aiString(Res.string.ai_bat_line, name, state, roundTo(voltage.toDouble(), 2), heard)
+        } else {
+            aiString(Res.string.ai_bat_line_no_voltage, name, state, heard)
+        }
     }
 
     /**
@@ -1846,6 +1856,7 @@ class AssistantDataProvider(
         const val SENSOR_LIMIT = 12
         const val REPORT_LIMIT = 12
         const val SAME_PLACE_M = 200
+        const val STEM_MIN_SEARCH = 6
         const val STALE_SENSOR_MIN = 24 * 60L
         const val SIGNAL_SHOWN = 6
         const val NEXT_SHOWN = 3

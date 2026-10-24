@@ -229,7 +229,11 @@ class LlamaAssistantService(
     ): String {
         // The conversation as the model sees it ends with this one question.
         val turns = history.dropLast(1) + AssistantTurn(true, question)
-        val intent = router.understand(modelId, question, previous)
+        val routed = router.understand(modelId, question, previous)
+        val intent =
+            if (routed != null && routed.intent in COMMAND_INTENTS && WHERE_QUESTION.containsMatchIn(question.trim().lowercase()) &&
+                !OPEN_COMMAND.containsMatchIn(question.trim().lowercase())
+            ) routed.copy(intent = "app_help") else routed
         lastRoute = intent?.toString() ?: "router failed: old word rules used"
         return if (intent != null) {
             handle(intent, modelId, turns, question, polish, onPiece)
@@ -319,8 +323,11 @@ class LlamaAssistantService(
                     if (nodeNum != null && intent.node.isNotBlank()) {
                         exact(data.nodeSignal(nodeNum))
                     } else {
-                        if (intent.metric == "nearest" || intent.metric == "farthest") addNearestButton(role, intent.metric == "farthest")
-                        exact(data.signalListFor(role, intent.metric))
+                        val metric =
+                            intent.metric.takeIf { it == "nearest" || it == "farthest" }
+                                ?: if (FARTHEST_WORDS.containsMatchIn(lower)) "farthest" else if (NEAREST_WORDS.containsMatchIn(lower)) "nearest" else intent.metric
+                        if (metric == "nearest" || metric == "farthest") addNearestButton(role, metric == "farthest")
+                        exact(data.signalListFor(role, metric))
                     }
                 "traceroute" -> exact(routeOrUnknown(intent, nodeNum) { data.toolTraceroutes(it, LIST_SHOWN) })
                 "neighbors" -> exact(routeOrUnknown(intent, nodeNum) { data.toolNeighbors(it, LIST_SHOWN) })
@@ -454,6 +461,10 @@ class LlamaAssistantService(
         polish: Boolean,
         onPiece: (String) -> Unit,
     ): String {
+        val flat = question.lowercase()
+        if (RANGE_PROBLEM.containsMatchIn(flat) && RANGE_TOPIC.containsMatchIn(flat)) {
+            return handle(AssistantIntent("app_help", topic = "other"), modelId, history, question, polish, onPiece)
+        }
         data.directAnswer(question)?.let { exact ->
             onPiece(exact)
             return exact
@@ -921,6 +932,11 @@ class LlamaAssistantService(
         const val MANUAL_CHARS = 9000
         const val MIN_PART = 8
         val CONNECT_WORDS = Regex("połącz|polacz|sparow|parowa|connect|pair")
+        val COMMAND_INTENTS = setOf("show_setting", "open_screen")
+        val FARTHEST_WORDS = Regex("najdalej|najdalsz|farthest|furthest")
+        val NEAREST_WORDS = Regex("najbliż|najbliz|nearest|closest")
+        // "Where is the hop limit" / "how do I change X" asks where a thing is; it does not ask to open it.
+        val WHERE_QUESTION = Regex("^(gdzie|jak|w jaki sposób|w jaki sposob|where|how)(?=\\s)")
         val OPEN_COMMAND = Regex("^(otwórz|otworz|pokaż|pokaz|przejdź|przejdz|open|show|go to)(?=\\s|$)")
         val ABOUT_ASSISTANT = Regex("asystent|assistant|tłumacz|tlumacz|translator")
         val ROLE_WORDS = Regex("(router|ruter|repeater|przekaźnik|przekaznik|czujnik|sensor|tracker)")
