@@ -17,7 +17,6 @@
 package org.meshtastic.feature.messaging.navigation
 
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.lifecycle.compose.dropUnlessResumed
@@ -32,6 +31,7 @@ import org.meshtastic.core.navigation.ContactsRoute
 import org.meshtastic.core.navigation.NodesRoute
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.navigation.replaceLast
+import org.meshtastic.core.ui.component.MeshtasticPanes
 import org.meshtastic.core.ui.component.ScrollToTopEvent
 import org.meshtastic.feature.messaging.QuickChatScreen
 import org.meshtastic.feature.messaging.QuickChatViewModel
@@ -53,7 +53,7 @@ fun EntryProviderScope<NavKey>.contactsGraph(
     // missing wiring at a call site. Callers must wire the app-shell handler explicitly.
     onHandleDeepLink: (CommonUri, onInvalid: () -> Unit) -> Unit,
 ) {
-    entry<ContactsRoute.Contacts>(metadata = { ListDetailSceneStrategy.listPane() }) {
+    entry<ContactsRoute.Contacts>(metadata = { MeshtasticPanes.list() }) {
         ContactsEntryContent(
             backStack = backStack,
             scrollToTopEvents = scrollToTopEvents,
@@ -61,7 +61,7 @@ fun EntryProviderScope<NavKey>.contactsGraph(
         )
     }
 
-    entry<ContactsRoute.Messages>(metadata = { ListDetailSceneStrategy.detailPane() }) { args ->
+    entry<ContactsRoute.Messages>(metadata = { MeshtasticPanes.detail() }) { args ->
         val contactKey = args.contactKey
         val messageViewModel: org.meshtastic.feature.messaging.MessageViewModel =
             koinViewModel(key = "messages-$contactKey")
@@ -79,7 +79,7 @@ fun EntryProviderScope<NavKey>.contactsGraph(
         )
     }
 
-    entry<ContactsRoute.Share>(metadata = { ListDetailSceneStrategy.extraPane() }) { args ->
+    entry<ContactsRoute.Share>(metadata = { MeshtasticPanes.extra() }) { args ->
         val message = args.message
         val viewModel = koinViewModel<ContactsViewModel>()
         ShareScreen(
@@ -99,7 +99,7 @@ fun EntryProviderScope<NavKey>.contactsGraph(
         )
     }
 
-    entry<ContactsRoute.QuickChat>(metadata = { ListDetailSceneStrategy.extraPane() }) {
+    entry<ContactsRoute.QuickChat>(metadata = { MeshtasticPanes.extra() }) {
         val viewModel = koinViewModel<QuickChatViewModel>()
         QuickChatScreen(viewModel = viewModel, onNavigateUp = dropUnlessResumed { backStack.removeLastOrNull() })
     }

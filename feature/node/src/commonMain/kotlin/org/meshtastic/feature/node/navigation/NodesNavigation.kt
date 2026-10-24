@@ -17,7 +17,6 @@
 package org.meshtastic.feature.node.navigation
 
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.navigation3.runtime.EntryProviderScope
@@ -58,6 +57,7 @@ import org.meshtastic.core.resources.power
 import org.meshtastic.core.resources.remote_shell
 import org.meshtastic.core.resources.signal
 import org.meshtastic.core.resources.traceroute
+import org.meshtastic.core.ui.component.MeshtasticPanes
 import org.meshtastic.core.ui.component.ScrollToTopEvent
 import org.meshtastic.core.ui.util.rememberMeshHudSupported
 import org.meshtastic.feature.node.compass.CompassViewModel
@@ -89,7 +89,7 @@ fun EntryProviderScope<NavKey>.nodesGraph(
     onHandleDeepLink: (org.meshtastic.core.common.util.CommonUri, onInvalid: () -> Unit) -> Unit = { _, _ -> },
     onNavigateToConnections: () -> Unit = {},
 ) {
-    entry<NodesRoute.Nodes>(metadata = { ListDetailSceneStrategy.listPane() }) {
+    entry<NodesRoute.Nodes>(metadata = { MeshtasticPanes.list() }) {
         AdaptiveNodeListScreen(
             backStack = backStack,
             scrollToTopEvents = scrollToTopEvents,
@@ -138,7 +138,7 @@ fun EntryProviderScope<NavKey>.networkHealthGraph(backStack: NavBackStack<NavKey
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Suppress("LongMethod")
 fun EntryProviderScope<NavKey>.nodeDetailGraph(backStack: NavBackStack<NavKey>) {
-    entry<NodesRoute.NodeDetail>(metadata = { ListDetailSceneStrategy.detailPane() }) { args ->
+    entry<NodesRoute.NodeDetail>(metadata = { MeshtasticPanes.detail() }) { args ->
         val nodeDetailViewModel: NodeDetailViewModel = koinViewModel()
         val compassViewModel: CompassViewModel = koinViewModel()
         val destNum = args.destNum ?: 0
@@ -154,7 +154,7 @@ fun EntryProviderScope<NavKey>.nodeDetailGraph(backStack: NavBackStack<NavKey>) 
         )
     }
 
-    entry<NodeDetailRoute.TracerouteLog>(metadata = { ListDetailSceneStrategy.extraPane() }) { args ->
+    entry<NodeDetailRoute.TracerouteLog>(metadata = { MeshtasticPanes.extra() }) { args ->
         val metricsViewModel = koinViewModel<MetricsViewModel> { parametersOf(args.destNum) }
         metricsViewModel.setNodeId(args.destNum)
 
@@ -173,7 +173,7 @@ fun EntryProviderScope<NavKey>.nodeDetailGraph(backStack: NavBackStack<NavKey>) 
         )
     }
 
-    entry<NodeDetailRoute.TracerouteMap>(metadata = { ListDetailSceneStrategy.extraPane() }) { args ->
+    entry<NodeDetailRoute.TracerouteMap>(metadata = { MeshtasticPanes.extra() }) { args ->
         val metricsViewModel = koinViewModel<MetricsViewModel> { parametersOf(args.destNum) }
         metricsViewModel.setNodeId(args.destNum)
 
@@ -200,7 +200,7 @@ fun EntryProviderScope<NavKey>.nodeDetailGraph(backStack: NavBackStack<NavKey>) 
         )
     }
 
-    entry<NodeDetailRoute.OnDemandLog>(metadata = { ListDetailSceneStrategy.extraPane() }) { args ->
+    entry<NodeDetailRoute.OnDemandLog>(metadata = { MeshtasticPanes.extra() }) { args ->
         val viewModel = koinViewModel<OnDemandLogViewModel> { parametersOf(args.destNum) }
         OnDemandLogScreen(viewModel = viewModel, onNavigateUp = dropUnlessResumed { backStack.removeLastOrNull() })
     }
@@ -215,7 +215,7 @@ fun EntryProviderScope<NavKey>.nodeDetailGraph(backStack: NavBackStack<NavKey>) 
         )
     }
 
-    entry<NodeDetailRoute.PositionLog>(metadata = { ListDetailSceneStrategy.extraPane() }) { args ->
+    entry<NodeDetailRoute.PositionLog>(metadata = { MeshtasticPanes.extra() }) { args ->
         val metricsViewModel = koinViewModel<MetricsViewModel> { parametersOf(args.destNum) }
         metricsViewModel.setNodeId(args.destNum)
         PositionLogScreen(
@@ -297,7 +297,7 @@ private inline fun <reified R : Route> EntryProviderScope<NavKey>.addNodeDetailS
     routeInfo: NodeDetailScreen,
     crossinline getDestNum: (R) -> Int,
 ) {
-    entry<R>(metadata = { ListDetailSceneStrategy.extraPane() }) { args ->
+    entry<R>(metadata = { MeshtasticPanes.extra() }) { args ->
         val destNum = getDestNum(args)
         val metricsViewModel = koinViewModel<MetricsViewModel> { parametersOf(destNum) }
         metricsViewModel.setNodeId(destNum)

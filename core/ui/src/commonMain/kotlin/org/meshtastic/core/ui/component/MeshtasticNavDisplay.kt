@@ -27,8 +27,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.VerticalDragHandle
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.layout.PaneExpansionState
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldScope
+import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.layout.rememberPaneExpansionState
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
@@ -164,6 +166,14 @@ private fun MeshtasticNavDisplayHost(
             paneExpansionDragHandle = { state -> PaneExpansionDragHandle(state) },
         )
 
+    // The library draws the width slider only between two columns. On a wide desktop window (three columns) our own
+    // layout takes over, with a slider at both dividers; everything else stays with the library's layout.
+    val threeColumnWidths = remember { ThreeColumnWidths() }
+    val threeColumnsFit =
+        isDesktopPlatform && calculatePaneScaffoldDirective(currentWindowAdaptiveInfoV2()).maxHorizontalPartitions >= 3
+    val threeColumnSceneStrategy =
+        remember(threeColumnWidths, threeColumnsFit) { DesktopThreeColumnSceneStrategy(threeColumnWidths, threeColumnsFit) }
+
     // Fades are alpha, not movement, so they follow the theme's effects spec rather than a spatial one.
     val fadeSpec = MaterialTheme.motionScheme.defaultEffectsSpec<Float>()
 
@@ -174,7 +184,7 @@ private fun MeshtasticNavDisplayHost(
             entries = entries,
             onBack = onBack,
             // NavDisplay falls back to SinglePaneSceneStrategy automatically when this computes no Scene.
-            sceneStrategies = listOf(listDetailSceneStrategy),
+            sceneStrategies = listOf(threeColumnSceneStrategy, listDetailSceneStrategy),
             sharedTransitionScope = this@SharedTransitionLayout,
             transitionSpec = meshtasticTransitionSpec(fadeSpec),
             popTransitionSpec = meshtasticTransitionSpec(fadeSpec),

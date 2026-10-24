@@ -17,7 +17,6 @@
 package org.meshtastic.feature.docs.navigation
 
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,6 +36,7 @@ import org.meshtastic.core.common.util.currentLocaleCode
 import org.meshtastic.core.common.util.ioDispatcher
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.navigation.popUnlessRoot
+import org.meshtastic.core.ui.component.MeshtasticPanes
 import org.meshtastic.feature.docs.ai.AIDocAssistant
 import org.meshtastic.feature.docs.ai.ChirpySessionHolder
 import org.meshtastic.feature.docs.data.DefaultDocBundleLoader
@@ -55,13 +55,13 @@ import org.meshtastic.feature.docs.ui.DocsPageRouteScreen
 /** Registers docs navigation entries into the Settings navigation graph. */
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 fun EntryProviderScope<NavKey>.docsEntries(backStack: NavBackStack<NavKey>) {
-    entry<SettingsRoute.HelpDocs>(metadata = { ListDetailSceneStrategy.listPane() }) {
+    entry<SettingsRoute.HelpDocs>(metadata = { MeshtasticPanes.list() }) {
         val hasDetailSelected = remember(backStack) { backStack.any { it is SettingsRoute.HelpDocPage } }
         val chirpy = rememberChirpyState(backStack = backStack, currentPageId = null, showFab = !hasDetailSelected)
         DocsHelpScreen(backStack = backStack, chirpy = chirpy)
     }
 
-    entry<SettingsRoute.HelpDocPage>(metadata = { ListDetailSceneStrategy.detailPane() }) { route ->
+    entry<SettingsRoute.HelpDocPage>(metadata = { MeshtasticPanes.detail() }) { route ->
         val chirpy = rememberChirpyState(backStack = backStack, currentPageId = route.pageId, showFab = true)
         DocsPageScreen(pageId = route.pageId, backStack = backStack, chirpy = chirpy)
     }
