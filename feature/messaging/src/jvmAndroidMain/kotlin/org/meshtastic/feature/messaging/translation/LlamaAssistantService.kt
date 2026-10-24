@@ -659,18 +659,41 @@ class LlamaAssistantService(
                 p.lines.isNotEmpty() && !p.title.startsWith("MT_SW ") && p.title != "CHANGELOG" && !(polish && p.title.startsWith("en-")) &&
                     (!ABOUT_ASSISTANT.containsMatchIn(p.title.lowercase()) || ABOUT_ASSISTANT.containsMatchIn(focus(question, strong)))
             }
-        // The name of the found screen counts most; then the question's words; a short title (a chapter's start) wins a tie.
-        class Scored(val part: Part, val score: Int, val size: Int)
-        val scored =
-            usable.map { p ->
-                // The whole title, "Page: heading", so a part is matched by its chapter too ("Connections: Bluetooth").
-                val words = stems(p.title)
-                Scored(p, words.count { it in labelStems } * LABEL_SCORE + words.count { it in want }, words.size)
+        // Scoring: the name of the found screen in the title counts most, then the question's words in the title
+        // ("Page: heading", so the chapter counts too) and in the text. A "how do I" question prefers a part with
+        // numbered steps. On a tie the shorter title (closer to a chapter's start) wins, then the one the search ranked higher.
+        val howTo = HOW_TO.containsMatchIn(question.lowercase())
+        val wanted = want + looseStems(question) - STOP_STEMS
+        fun steps(p: Part) = p.lines.filter { STEP.containsMatchIn(it) }
+        class Scored(val part: Part, val score: Int, val size: Int, val rank: Int)
+        val best =
+            usable.withIndex().map { (i, p) ->
+                val title = looseStems(p.title)
+                val text = looseStems(p.lines.joinToString(" "))
+                val score =
+                    title.count { it in labelStems } * LABEL_SCORE + title.count { it in wanted } * 2 + text.count { it in wanted } +
+                        (if (howTo && steps(p).size >= 2) STEPS_SCORE else 0)
+                Scored(p, score, title.size, i)
             }.filter { it.score > 0 }
-        val best = scored.sortedWith(compareByDescending<Scored> { it.score }.thenBy { it.size }).firstOrNull()?.part ?: return ""
+                .sortedWith(compareByDescending<Scored> { it.score }.thenBy { it.size }.thenBy { it.rank })
+                .firstOrNull()?.part ?: return ""
         val heading = best.title.substringAfter(": ", "").trim()
-        val body = best.lines.take(HELP_LINES).joinToString("\n") { endAtSentence(it) }
+        val numbered = steps(best)
+        val body =
+            if (howTo && numbered.size >= 2) numbered.take(MAX_STEPS).joinToString("\n")
+            else best.lines.take(HELP_LINES).joinToString("\n") { endAtSentence(it) }
         return (if (heading.isNotBlank()) "($heading)\n" else "") + endAtSentence(body.take(HELP_CHARS))
+    }
+
+    /** Word stems, also without a Polish verb prefix ("zaktualizować" matches "aktualizacja"). */
+    private fun looseStems(text: String): Set<String> {
+        val out = HashSet<String>()
+        for (w in text.lowercase().split(Regex("[^\\p{L}\\p{N}]+"))) {
+            if (w.length < MIN_STEM) continue
+            out += w.take(STEM_LENGTH)
+            for (prefix in VERB_PREFIXES) if (w.startsWith(prefix) && w.length - prefix.length >= STEM_LENGTH) out += w.substring(prefix.length).take(STEM_LENGTH)
+        }
+        return out
     }
 
     private fun focus(question: String, strong: String) = "$question $strong".lowercase()
@@ -860,6 +883,11 @@ class LlamaAssistantService(
         const val MIN_QUOTE = 25
         const val MAX_QUOTE = 400
         const val QUOTE_WORDS = 6
+        const val STEPS_SCORE = 4
+        const val MAX_STEPS = 6
+        val HOW_TO = Regex("^\\s*(jak|w jaki sposób|w jaki sposob|how)\\b")
+        val STEP = Regex("^\\d+[.)]\\s")
+        val VERB_PREFIXES = listOf("prze", "po", "wy", "za", "z", "s", "u", "na", "od", "do")
         // Common words that say nothing about which part of the manual a question is about.
         val STOP_STEMS = setOf("przez", "jest", "gdzie", "jaki", "jakie", "jaka", "można", "mozna", "zrobi", "mojeg", "moje", "swoje", "swoim", "czym", "tego", "with", "what", "from", "have", "about", "does", "where", "which")
         val ADVICE_INTENTS = setOf("app_help", "chat", "network_question", "signal_list", "web_question")
