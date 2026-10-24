@@ -86,6 +86,7 @@
     <string name="planner_export_csv_summary">CSV (podsumowanie)</string>
     <string name="planner_export_failed">Nie udało się zapisać pliku.</string>
     <string name="planner_export_geojson">GeoJSON</string>
+    <string name="planner_export_json">Dane (JSON)</string>
     <string name="planner_export_kml">KML</string>
     <string name="planner_export_nothing">Brak danych do wyeksportowania.</string>
     <string name="planner_export_pdf">PDF</string>

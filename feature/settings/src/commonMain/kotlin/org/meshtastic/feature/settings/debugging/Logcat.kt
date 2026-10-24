@@ -117,7 +117,12 @@ fun LogcatContent(modifier: Modifier = Modifier) {
     var levels by remember { mutableStateOf(LogLevel.entries.toSet()) }
     val listState = rememberLazyListState()
 
-    val export = rememberLogExporter { buildString { appendLogcat(this, raw.orEmpty()) } }
+    val export =
+        rememberLogExporters(
+            text = { buildString { appendLogcat(this, raw.orEmpty()) } },
+            json = { linesToJson("app_logcat", raw.orEmpty().lines().map { sanitizeForExport(it) }) },
+        )
+    var showExportFormat by rememberSaveable { mutableStateOf(false) }
     // Same warning as the packet-log export: this file is meant to be attached to public issue trackers.
     var showExportWarning by rememberSaveable { mutableStateOf(false) }
     if (showExportWarning) {
@@ -126,9 +131,22 @@ fun LogcatContent(modifier: Modifier = Modifier) {
             messageRes = Res.string.debug_logs_export_warning,
             onConfirm = {
                 showExportWarning = false
-                export(timestampedExportName("meshtastic_logcat"))
+                showExportFormat = true
             },
             onDismiss = { showExportWarning = false },
+        )
+    }
+    if (showExportFormat) {
+        LogFormatDialog(
+            onText = {
+                showExportFormat = false
+                export.text(timestampedExportName("meshtastic_logcat"))
+            },
+            onJson = {
+                showExportFormat = false
+                export.json(timestampedExportName("meshtastic_logcat", ".json"))
+            },
+            onDismiss = { showExportFormat = false },
         )
     }
 

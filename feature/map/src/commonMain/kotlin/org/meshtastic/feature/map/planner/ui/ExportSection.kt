@@ -45,6 +45,7 @@ import org.meshtastic.core.resources.planner_export_csv_profile
 import org.meshtastic.core.resources.planner_export_csv_summary
 import org.meshtastic.core.resources.planner_export_failed
 import org.meshtastic.core.resources.planner_export_geojson
+import org.meshtastic.core.resources.planner_export_json
 import org.meshtastic.core.resources.planner_export_kml
 import org.meshtastic.core.resources.planner_export_nothing
 import org.meshtastic.core.resources.planner_export_pdf
@@ -69,6 +70,7 @@ private const val MIME_PDF = "application/pdf"
 private const val MIME_CSV = "text/csv"
 private const val MIME_KML = "application/vnd.google-earth.kml+xml"
 private const val MIME_GEOJSON = "application/geo+json"
+private const val MIME_JSON = "application/json"
 private const val MIME_PNG = "image/png"
 
 /** UTF-8 byte order mark, so that spreadsheet programs show the Polish letters of CSV files correctly. */
@@ -154,6 +156,12 @@ internal fun ExportSection(
                 enabled = hasAnything,
             ) {
                 Text(stringResource(Res.string.planner_export_geojson))
+            }
+            OutlinedButton(
+                onClick = { export(".json", MIME_JSON) { vm.exportJson(it).encodeToByteArray() } },
+                enabled = hasAnything,
+            ) {
+                Text(stringResource(Res.string.planner_export_json))
             }
             OutlinedButton(onClick = { export("_profile.png", MIME_PNG) { vm.exportPng(it) } }, enabled = hasProfile) {
                 Text(stringResource(Res.string.planner_export_png))

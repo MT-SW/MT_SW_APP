@@ -93,7 +93,12 @@ fun DeviceLogsContent(logs: List<UiMeshLog>, modifier: Modifier = Modifier) {
     val listState = rememberLazyListState()
     val lines = remember(logs, query) { deviceLogLines(logs, query) }
 
-    val export = rememberLogExporter { redactText(deviceLogLines(logs, "").reversed().joinToString("\n")) }
+    val export =
+        rememberLogExporters(
+            text = { redactText(deviceLogLines(logs, "").reversed().joinToString("\n")) },
+            json = { linesToJson("device_log", redactText(deviceLogLines(logs, "").reversed().joinToString("\n")).lines()) },
+        )
+    var showExportFormat by rememberSaveable { mutableStateOf(false) }
     var showExportWarning by rememberSaveable { mutableStateOf(false) }
     if (showExportWarning) {
         MeshtasticResourceDialog(
@@ -101,9 +106,22 @@ fun DeviceLogsContent(logs: List<UiMeshLog>, modifier: Modifier = Modifier) {
             messageRes = Res.string.debug_logs_export_warning,
             onConfirm = {
                 showExportWarning = false
-                export(timestampedExportName("meshtastic_device_log"))
+                showExportFormat = true
             },
             onDismiss = { showExportWarning = false },
+        )
+    }
+    if (showExportFormat) {
+        LogFormatDialog(
+            onText = {
+                showExportFormat = false
+                export.text(timestampedExportName("meshtastic_device_log"))
+            },
+            onJson = {
+                showExportFormat = false
+                export.json(timestampedExportName("meshtastic_device_log", ".json"))
+            },
+            onDismiss = { showExportFormat = false },
         )
     }
 
