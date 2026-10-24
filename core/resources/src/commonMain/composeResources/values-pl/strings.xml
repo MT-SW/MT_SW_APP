@@ -3007,6 +3007,10 @@
     <string name="assistant_copy_all">Kopiuj całą rozmowę</string>
     <string name="assistant_copy_you">Ty</string>
     <string name="assistant_copy_assistant">Asystent</string>
+    <string name="assistant_save">Zapisz rozmowę…</string>
+    <string name="assistant_save_done">Zapisano.</string>
+    <string name="assistant_save_failed">Nie udało się zapisać pliku.</string>
+    <string name="assistant_export_title">MT_SW – rozmowa z asystentem</string>
     <string name="assistant_empty_hint">Pierwsza odpowiedź trwa dłużej, bo model jest wczytywany do pamięci.</string>
     <string name="assistant_off">Asystent jest wyłączony. Włącz go w Ustawienia → Funkcje MT_SW.</string>
     <string name="assistant_model_missing">Brak pobranego modelu dla asystenta. Pobierz go w Ustawienia → Funkcje MT_SW.</string>

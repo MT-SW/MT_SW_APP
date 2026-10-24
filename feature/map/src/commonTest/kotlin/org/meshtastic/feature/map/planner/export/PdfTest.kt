@@ -17,6 +17,7 @@
 package org.meshtastic.feature.map.planner.export
 
 import kotlin.test.Test
+import org.meshtastic.core.ui.util.PdfText
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
