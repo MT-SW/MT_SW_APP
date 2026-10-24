@@ -119,7 +119,7 @@ The **Sniffer** screen (Settings → Advanced) shows network traffic live, inclu
 
 ## Extra telemetry (local statistics)
 
-In **Settings → Modules → Telemetry** there is a **Local statistics** card. It works from MT_SW firmware version 3; on an older one the card is visible but its switches are greyed out and a note says from which version it works. It has two switches — **Extra telemetry** and **Extended extra telemetry** — and a separate interval for each. The node regularly broadcasts its own statistics over the mesh.
+In **Settings → Modules → Telemetry** there is a **Local statistics** card. It works from MT_SW_FIRMWARE v3; on an older one the card is visible but its switches are greyed out and a note says from which version it works. It has two switches — **Extra telemetry** and **Extended extra telemetry** — and a separate interval for each. The node regularly broadcasts its own statistics over the mesh.
 
 - **The shortest interval is 2 hours.**
 - **Both options are saved together** with the **Save to the node** button. The app first reads the current state from the node, so changing one option leaves the other as it was. After saving it shows what the node really stored (it may correct the intervals); if the node does not confirm, you get a message.

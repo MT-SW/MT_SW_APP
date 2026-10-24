@@ -1511,7 +1511,7 @@
     <string name="local_stats_heap_description">Percentage of device heap memory used</string>
     <string name="local_stats_heap_value">%1$d / %2$d</string>
     <string name="local_stats_heap_value_kb">%1$s / %2$s kB</string>
-    <string name="local_stats_needs_v3">This works from MT_SW firmware version 3. The connected node has an older version or has not reported one, so the settings are switched off.</string>
+    <string name="local_stats_needs_v3">This works from MT_SW_FIRMWARE v3. The connected node has an older version or has not reported one, so the settings are switched off.</string>
     <string name="local_stats_nodes">Nodes: %1$d online / %2$d total</string>
     <string name="local_stats_noise">Noise %1$d dBm</string>
     <string name="local_stats_psram">PSRAM</string>
