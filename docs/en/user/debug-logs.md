@@ -50,7 +50,7 @@ Error and warning lines are tinted so problems stand out.
 
 ## Exporting
 
-Tap the **download** icon to save the current logs to a file. The app first shows a warning about what the file contains — confirm it, then choose where the file goes through the system file picker. The file is named with a timestamp (for example `meshtastic_logcat_20260701_143312.txt`) so repeated exports never overwrite each other. The same warning guards the **Packets** tab export.
+Tap the **download** icon to save the current logs to a file. The app first shows a warning about what the file contains — confirm it, then choose where the file goes through the system file picker. The file is named with a timestamp (for example `meshtastic_logcat_20260701_143312.txt`) so repeated exports never overwrite each other. The same warning guards the **Packets** tab export. After the warning the app asks for the format: text or JSON (the same data, without keys and passwords, in a structured form), for the packet logs, the device logs and the logcat.
 
 Attach that file to your GitHub issue.
 
