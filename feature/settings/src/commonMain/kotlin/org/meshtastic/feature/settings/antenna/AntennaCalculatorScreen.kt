@@ -41,7 +41,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -68,7 +67,6 @@ import org.meshtastic.core.model.antenna.AntennaMath
 import org.meshtastic.core.model.antenna.AntennaPrefill
 import org.meshtastic.core.model.antenna.AntennaType
 import org.meshtastic.core.model.antenna.Cable
-import org.meshtastic.core.model.antenna.Connector
 import org.meshtastic.core.model.antenna.Dim
 import org.meshtastic.core.model.antenna.DimKind
 import org.meshtastic.core.model.antenna.Insulation
@@ -77,14 +75,8 @@ import org.meshtastic.core.model.antenna.Polarization
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.antenna_accuracy
 import org.meshtastic.core.resources.antenna_boom
-import org.meshtastic.core.resources.antenna_cable
-import org.meshtastic.core.resources.antenna_cable_custom
 import org.meshtastic.core.resources.antenna_cable_for
-import org.meshtastic.core.resources.antenna_cable_length
-import org.meshtastic.core.resources.antenna_cable_loss_custom
-import org.meshtastic.core.resources.antenna_cable_none
 import org.meshtastic.core.resources.antenna_calc_title
-import org.meshtastic.core.resources.antenna_connectors
 import org.meshtastic.core.resources.antenna_decimal
 import org.meshtastic.core.resources.antenna_diameter
 import org.meshtastic.core.resources.antenna_dim_arm
@@ -160,8 +152,6 @@ import org.meshtastic.core.resources.antenna_res_at_antenna
 import org.meshtastic.core.resources.antenna_res_band_none
 import org.meshtastic.core.resources.antenna_res_band_ok
 import org.meshtastic.core.resources.antenna_res_band_over
-import org.meshtastic.core.resources.antenna_res_cable
-import org.meshtastic.core.resources.antenna_res_connectors
 import org.meshtastic.core.resources.antenna_res_duty
 import org.meshtastic.core.resources.antenna_res_eirp
 import org.meshtastic.core.resources.antenna_res_mismatch
@@ -214,6 +204,39 @@ import org.meshtastic.core.resources.antenna_report_title
 import org.meshtastic.core.resources.antenna_save
 import org.meshtastic.core.resources.assistant_save_done
 import org.meshtastic.core.resources.assistant_save_failed
+import org.meshtastic.core.resources.planner_feeder_custom_cable
+import org.meshtastic.core.resources.planner_feeder_no_cable
+import org.meshtastic.core.resources.planner_feeder_preset
+import org.meshtastic.core.resources.planner_feeder_preset_custom
+import org.meshtastic.core.resources.planner_feeder_preset_direct
+import org.meshtastic.core.resources.planner_feeder_preset_adapter_sma_n
+import org.meshtastic.core.resources.planner_feeder_preset_adapter_n_n
+import org.meshtastic.core.resources.planner_feeder_preset_pigtail
+import org.meshtastic.core.resources.planner_feeder_preset_pigtail_cable
+import org.meshtastic.core.resources.planner_feeder_preset_long_lmr400
+import org.meshtastic.core.resources.planner_feeder_preset_ecoflex_roof
+import org.meshtastic.core.resources.planner_feeder_preset_heliax_mast
+import org.meshtastic.core.resources.planner_feeder_connector_count
+import org.meshtastic.core.resources.planner_feeder_connector_n
+import org.meshtastic.core.resources.planner_feeder_cable_n
+import org.meshtastic.core.resources.planner_feeder_length
+import org.meshtastic.core.resources.planner_feeder_custom_loss
+import org.meshtastic.core.resources.planner_feeder_approximate
+import org.meshtastic.core.resources.planner_feeder_title
+import org.meshtastic.core.resources.planner_feeder_warn_sections
+import org.meshtastic.core.resources.planner_feeder_warn_too_many
+import org.meshtastic.core.resources.planner_feeder_warn_unknown
+import org.meshtastic.core.resources.planner_feeder_warn_custom_loss
+import org.meshtastic.core.resources.planner_feeder_warn_length
+import org.meshtastic.core.resources.planner_feeder_warn_frequency
+import org.meshtastic.core.resources.planner_feeder_warn_other
+import org.meshtastic.core.resources.planner_unit_m
+import org.meshtastic.core.resources.planner_unit_db_per_m
+import org.meshtastic.core.resources.antenna_res_feeder
+import org.meshtastic.core.model.antenna.CableDb
+import org.meshtastic.core.model.antenna.FeederBuilder
+import org.meshtastic.core.model.antenna.FeederConfig
+import org.meshtastic.core.model.antenna.FeederSection as FeederSectionData
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -496,6 +519,12 @@ private fun SaveBar(makeReport: (stamp: String) -> AntennaReport) {
 
 // ------------------------------------------------------------------ feed line
 
+private const val DEFAULT_CABLE_ID = "h155"
+private const val DEFAULT_SECTION_M = 5.0
+private const val DEFAULT_CUSTOM_DB_PER_M = 0.2
+private const val APPROX_MARK = " ~"
+private const val MAX_SECTION_M = 1000.0
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: Double?, onData: (AntennaFeedData) -> Unit) {
@@ -514,36 +543,42 @@ private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: 
     LaunchedEffect(radioDbm) {
         if (!powerTouched && radioDbm != null) powerText = numberText(radioDbm)
     }
-    var cableChoice by remember { mutableStateOf<Int>(Cable.H155.ordinal) }
-    var lengthText by remember { mutableStateOf("5") }
-    var customLossText by remember { mutableStateOf("20") }
+    // The same feed line as in the link planner: any number of connectors joined by cable sections.
+    var feeder by remember {
+        mutableStateOf(FeederConfig(listOf("sma", "sma"), listOf(FeederSectionData(DEFAULT_CABLE_ID, DEFAULT_SECTION_M))))
+    }
     var swrText by remember { mutableStateOf("1.5") }
     var gainText by remember { mutableStateOf("") }
-    val counts = remember { mutableStateMapOf(Connector.SMA to 2) }
 
-    val none = -1
-    val custom = -2
-    val cable = Cable.entries.getOrNull(cableChoice)
     val gain = parse(gainText) ?: design.gainDbi
     val tx = parse(powerText) ?: 22.0
-    val lengthM = if (cableChoice == none) 0.0 else parse(lengthText)?.coerceAtLeast(0.0) ?: 0.0
-    val res =
-        AntennaMath.feed(
-            mhz = mhz,
-            txDbm = tx,
-            cable = cable,
-            cableM = lengthM,
-            connectors = counts.toMap(),
-            swr = parse(swrText)?.coerceAtLeast(1.0) ?: 1.0,
-            gainDbi = gain,
-            customLossPer100m = if (cableChoice == custom) parse(customLossText) else null,
-        )
-    val per100 = if (cableChoice == custom) parse(customLossText) ?: 0.0 else cable?.lossPer100m(mhz) ?: 0.0
+    val swr = parse(swrText)?.coerceAtLeast(1.0) ?: 1.0
+    val feederResult = FeederBuilder.compute(feeder, mhz)
+    val res = AntennaMath.feedLoss(mhz, tx, feederResult.totalDb, feederResult.connectorsDb, swr, gain)
+    val customLabel = stringResource(Res.string.planner_feeder_custom_cable)
+    val partLines = feederResult.lines.map { localizeFeederPart(it.label, customLabel) to it.lossDb }
+    val feederText =
+        buildString {
+            feeder.connectorIds.forEachIndexed { i, id ->
+                if (i > 0) {
+                    val section = feeder.sections.getOrNull(i - 1)
+                    if (section != null && section.cableId != FeederBuilder.NONE_ID) {
+                        append(" — ")
+                        append(
+                            if (section.cableId == FeederBuilder.CUSTOM_ID) customLabel else CableDb.cable(section.cableId)?.name ?: section.cableId,
+                        )
+                        append(" ").append(fmt(section.lengthM, 2, sep)).append(" m")
+                    }
+                    append(" — ")
+                }
+                append(CableDb.connector(id)?.name ?: id)
+            }
+        }.ifBlank { stringResource(Res.string.planner_feeder_preset_direct) }
 
     val resultLines =
         buildList {
-            if (cableChoice != none) add(stringResource(Res.string.antenna_res_cable, fmt(per100, 1, sep), fmt(res.cableDb, 2, sep)))
-            add(stringResource(Res.string.antenna_res_connectors, fmt(res.connectorsDb, 2, sep)))
+            partLines.forEach { (part, db) -> add("• $part: ${fmt(db, 2, sep)} dB") }
+            add(stringResource(Res.string.antenna_res_feeder, fmt(feederResult.totalDb, 2, sep), fmt(res.cableDb, 2, sep), fmt(res.connectorsDb, 2, sep)))
             add(stringResource(Res.string.antenna_res_mismatch, fmt(res.mismatchDb, 2, sep)))
             add(stringResource(Res.string.antenna_res_total, fmt(res.totalDb, 2, sep), fmt((1 - 10.0.pow(-res.totalDb / 10)) * 100, 0, sep)))
             add(stringResource(Res.string.antenna_res_at_antenna, fmt(res.atAntennaDbm, 1, sep), milli(res.atAntennaDbm, sep)))
@@ -558,32 +593,21 @@ private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: 
             }
             add(stringResource(Res.string.antenna_res_range, fmt(res.rangeFactor * 100, 0, sep)))
         }
-    val customName = stringResource(Res.string.antenna_cable_custom)
-    val cableLabel = if (cableChoice == none) null else if (cableChoice == custom) customName else cable?.label
-    val usedConnectors = Connector.entries.filter { (counts[it] ?: 0) > 0 }
     val feedInputLines =
-        buildList {
-            add(stringResource(Res.string.antenna_tx_power) + ": " + power(tx, sep))
-            if (cableLabel != null) {
-                add(stringResource(Res.string.antenna_cable) + ": " + cableLabel)
-                add(stringResource(Res.string.antenna_cable_length) + ": " + fmt(lengthM, 2, sep))
-            }
-            if (usedConnectors.isNotEmpty()) {
-                add(stringResource(Res.string.antenna_connectors) + ": " + usedConnectors.joinToString(", ") { "${it.label} × ${counts[it]}" })
-            }
-            add(stringResource(Res.string.antenna_swr) + ": " + fmt(parse(swrText)?.coerceAtLeast(1.0) ?: 1.0, 2, sep))
-            add(stringResource(Res.string.antenna_gain_override) + ": " + fmt(gain, 1, sep))
-        }
+        listOf(
+            stringResource(Res.string.antenna_tx_power) + ": " + power(tx, sep),
+            stringResource(Res.string.planner_feeder_title) + ": " + feederText,
+            stringResource(Res.string.antenna_swr) + ": " + fmt(swr, 2, sep),
+            stringResource(Res.string.antenna_gain_override) + ": " + fmt(gain, 1, sep),
+        )
     val feedData =
         AntennaFeedData(
             inputLines = feedInputLines,
             resultLines = resultLines,
             txDbm = tx,
-            cable = cableLabel,
-            cableM = lengthM,
-            cableLossPer100m = per100,
-            connectors = usedConnectors.associate { it.label to (counts[it] ?: 0) },
-            swr = parse(swrText)?.coerceAtLeast(1.0) ?: 1.0,
+            feederText = feederText,
+            feederLines = partLines,
+            swr = swr,
             gainDbi = gain,
             result = res,
         )
@@ -623,36 +647,142 @@ private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: 
             }
             Text(power(tx, sep), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        DropDownPreference(
-            title = stringResource(Res.string.antenna_cable),
-            enabled = true,
-            items =
-                listOf(none to stringResource(Res.string.antenna_cable_none)) +
-                    Cable.entries.map { it.ordinal to "${it.label} — ${fmt(it.lossPer100m(mhz), 1, sep)} dB/100 m" } +
-                    listOf(custom to stringResource(Res.string.antenna_cable_custom)),
-            selectedItem = cableChoice,
-            onItemSelected = { cableChoice = it },
-        )
+        FeederEditor(feeder, mhz, sep) { feeder = it }
         Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (cableChoice != none) NumberField(stringResource(Res.string.antenna_cable_length), lengthText) { lengthText = it }
-            if (cableChoice == custom) NumberField(stringResource(Res.string.antenna_cable_loss_custom), customLossText) { customLossText = it }
-            Text(stringResource(Res.string.antenna_connectors), style = MaterialTheme.typography.titleSmall)
-            Connector.entries.forEach { c ->
-                val n = counts[c] ?: 0
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    Text("${c.label} (${fmt(c.lossDb, 2, sep)} dB)", modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-                    TextButton(onClick = { counts[c] = max(0, n - 1) }) { Text("−") }
-                    Text(n.toString(), style = MaterialTheme.typography.bodyLarge)
-                    TextButton(onClick = { counts[c] = min(20, n + 1) }) { Text("+") }
-                }
-            }
             NumberField(stringResource(Res.string.antenna_swr), swrText) { swrText = it }
             NumberField(stringResource(Res.string.antenna_gain_override), gainText, signed = true) { gainText = it }
-
+            if (feederResult.approximate) {
+                Text(
+                    stringResource(Res.string.planner_feeder_approximate),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.tertiary,
+                )
+            }
+            feederResult.warnings.distinct().forEach { code ->
+                Text(feederWarning(code), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
+            }
             resultLines.forEach { Line(it) }
         }
     }
 }
+
+/** Gives a loss line of the database its display name; only the neutral word "custom" is localized. */
+private fun localizeFeederPart(label: String, customLabel: String): String =
+    if (label.startsWith(FeederBuilder.CUSTOM_ID + " ")) customLabel + label.substring(FeederBuilder.CUSTOM_ID.length) else label
+
+/** The line from the antenna to the radio: a ready-made set or your own connectors and cable sections. */
+@Composable
+private fun FeederEditor(cfg: FeederConfig, mhz: Double, sep: String, onChange: (FeederConfig) -> Unit) {
+    val count = cfg.connectorIds.size
+    val customLabel = stringResource(Res.string.planner_feeder_custom_cable)
+    val noneLabel = stringResource(Res.string.planner_feeder_no_cable)
+    val presetId = FeederBuilder.presets.firstOrNull { it.config == cfg }?.id
+    DropDownPreference(
+        title = stringResource(Res.string.planner_feeder_preset),
+        enabled = true,
+        items = FeederBuilder.presets.map { it.id to feederPresetName(it.id) } + listOf("custom" to stringResource(Res.string.planner_feeder_preset_custom)),
+        selectedItem = presetId ?: "custom",
+        onItemSelected = { id -> FeederBuilder.presets.firstOrNull { it.id == id }?.let { onChange(it.config) } },
+    )
+    Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(Res.string.planner_feeder_connector_count), modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+            TextButton(onClick = { onChange(FeederBuilder.resize(cfg, count - 1)) }, enabled = count > 0) { Text("−") }
+            Text(count.toString(), style = MaterialTheme.typography.bodyLarge)
+            TextButton(onClick = { onChange(FeederBuilder.resize(cfg, count + 1)) }, enabled = count < FeederBuilder.MAX_CONNECTORS) { Text("+") }
+        }
+    }
+    for (i in 0 until count) {
+        DropDownPreference(
+            title = stringResource(Res.string.planner_feeder_connector_n, (i + 1).toString()),
+            enabled = true,
+            items = CableDb.connectors.map { it.id to (if (it.approximate) it.name + APPROX_MARK else it.name) },
+            selectedItem = cfg.connectorIds[i],
+            onItemSelected = { id -> onChange(cfg.copy(connectorIds = cfg.connectorIds.toMutableList().also { it[i] = id })) },
+        )
+        if (i < count - 1) {
+            val section = cfg.sections.getOrNull(i) ?: FeederSectionData(DEFAULT_CABLE_ID, DEFAULT_SECTION_M)
+            fun update(new: FeederSectionData) {
+                val list = cfg.sections.toMutableList()
+                while (list.size <= i) list.add(FeederSectionData(DEFAULT_CABLE_ID, DEFAULT_SECTION_M))
+                list[i] = new
+                onChange(cfg.copy(sections = list))
+            }
+            val isNone = section.cableId == FeederBuilder.NONE_ID
+            val isCustom = section.cableId == FeederBuilder.CUSTOM_ID
+            DropDownPreference(
+                title = stringResource(Res.string.planner_feeder_cable_n, (i + 1).toString()),
+                enabled = true,
+                items =
+                    listOf(FeederBuilder.NONE_ID to noneLabel) +
+                        CableDb.cables.map { it.id to "${it.name}${if (it.approximate) APPROX_MARK else ""} — ${fmt(it.lossDbPerM(mhz) * 100, 1, sep)} dB/100 m" } +
+                        listOf(FeederBuilder.CUSTOM_ID to customLabel),
+                selectedItem = section.cableId,
+                onItemSelected = { id ->
+                    update(
+                        section.copy(
+                            cableId = id,
+                            customDbPerM = if (id == FeederBuilder.CUSTOM_ID) section.customDbPerM ?: DEFAULT_CUSTOM_DB_PER_M else section.customDbPerM,
+                        ),
+                    )
+                },
+            )
+            if (!isNone) {
+                Column(Modifier.padding(horizontal = 16.dp, vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    DoubleField(
+                        stringResource(Res.string.planner_feeder_length) + " (" + stringResource(Res.string.planner_unit_m) + ")",
+                        section.lengthM,
+                    ) { v -> update(section.copy(lengthM = v.coerceIn(0.0, MAX_SECTION_M))) }
+                    if (isCustom) {
+                        DoubleField(
+                            stringResource(Res.string.planner_feeder_custom_loss) + " (" + stringResource(Res.string.planner_unit_db_per_m) + ")",
+                            section.customDbPerM ?: DEFAULT_CUSTOM_DB_PER_M,
+                        ) { v -> update(section.copy(customDbPerM = v.coerceIn(0.0, 10.0))) }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** A number field for a value kept as a number: what is typed stays as typed until the value is changed from outside. */
+@Composable
+private fun DoubleField(label: String, value: Double, onValue: (Double) -> Unit) {
+    var text by remember { mutableStateOf(numberText(value)) }
+    if (text.isNotBlank() && parse(text) != value) text = numberText(value)
+    NumberField(label, text) {
+        text = it
+        parse(it)?.let(onValue)
+    }
+}
+
+@Composable
+private fun feederPresetName(id: String): String = stringResource(
+    when (id) {
+        "direct" -> Res.string.planner_feeder_preset_direct
+        "adapter_sma_n" -> Res.string.planner_feeder_preset_adapter_sma_n
+        "adapter_n_n" -> Res.string.planner_feeder_preset_adapter_n_n
+        "pigtail" -> Res.string.planner_feeder_preset_pigtail
+        "pigtail_cable" -> Res.string.planner_feeder_preset_pigtail_cable
+        "long_lmr400" -> Res.string.planner_feeder_preset_long_lmr400
+        "ecoflex_roof" -> Res.string.planner_feeder_preset_ecoflex_roof
+        "heliax_mast" -> Res.string.planner_feeder_preset_heliax_mast
+        else -> Res.string.planner_feeder_preset_custom
+    },
+)
+
+@Composable
+private fun feederWarning(code: String): String = stringResource(
+    when {
+        code == "SECTION_COUNT_MISMATCH" -> Res.string.planner_feeder_warn_sections
+        code == "CONNECTOR_COUNT_EXCEEDS_MAX" -> Res.string.planner_feeder_warn_too_many
+        code.startsWith("UNKNOWN_") -> Res.string.planner_feeder_warn_unknown
+        code == "CUSTOM_LOSS_MISSING" -> Res.string.planner_feeder_warn_custom_loss
+        code == "INVALID_LENGTH" -> Res.string.planner_feeder_warn_length
+        code == "FREQUENCY_CLAMPED" -> Res.string.planner_feeder_warn_frequency
+        else -> Res.string.planner_feeder_warn_other
+    },
+)
 
 // ------------------------------------------------------------------ table
 

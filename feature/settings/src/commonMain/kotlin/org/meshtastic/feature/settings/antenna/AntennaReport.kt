@@ -39,10 +39,10 @@ internal data class AntennaFeedData(
     val inputLines: List<String>,
     val resultLines: List<String>,
     val txDbm: Double,
-    val cable: String?,
-    val cableM: Double,
-    val cableLossPer100m: Double,
-    val connectors: Map<String, Int>,
+    /** The feed line in words, e.g. "SMA — H155 5 m — SMA". */
+    val feederText: String,
+    /** Each connector and cable section with its loss in dB, in the order they are in the line. */
+    val feederLines: List<Pair<String, Double>>,
     val swr: Double,
     val gainDbi: Double,
     val result: AntennaMath.FeedResult,
@@ -135,9 +135,9 @@ internal class AntennaReport(
                 } else {
                     val r = feed.result
                     append("{\"txDbm\": ").append(feed.txDbm)
-                    append(", \"cable\": ").append(feed.cable?.let(q) ?: "null").append(", \"cableMeters\": ").append(feed.cableM)
-                    append(", \"cableLossDbPer100m\": ").append(feed.cableLossPer100m)
-                    append(", \"connectors\": {").append(feed.connectors.entries.joinToString(", ") { q(it.key) + ": " + it.value }).append("}")
+                    append(", \"feeder\": {\"description\": ").append(q(feed.feederText)).append(", \"parts\": [")
+                    append(feed.feederLines.joinToString(", ") { "{\"part\": " + q(it.first) + ", \"lossDb\": " + it.second + "}" })
+                    append("]}")
                     append(", \"swr\": ").append(feed.swr).append(", \"antennaGainDbi\": ").append(feed.gainDbi)
                     append(",\n    \"result\": {\"cableDb\": ").append(r.cableDb).append(", \"connectorsDb\": ").append(r.connectorsDb)
                     append(", \"mismatchDb\": ").append(r.mismatchDb).append(", \"totalDb\": ").append(r.totalDb)

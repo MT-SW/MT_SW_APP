@@ -68,6 +68,18 @@ class AntennaMathTest {
     }
 
     @Test
+    fun feedLossUsesAnyFeederLine() {
+        val cfg = FeederConfig(listOf("sma", "n"), listOf(FeederSection("lmr400", 10.0)))
+        val f = FeederBuilder.compute(cfg, 869.5)
+        val r = AntennaMath.feedLoss(869.5, 27.0, f.totalDb, f.connectorsDb, 1.0, 2.15)
+        near(r.totalDb, f.totalDb, 1e-9)
+        near(r.connectorsDb, f.connectorsDb, 1e-9)
+        near(r.cableDb + r.connectorsDb, f.totalDb, 1e-9)
+        near(r.atAntennaDbm, 27.0 - f.totalDb, 1e-9)
+        assertTrue(f.connectorsDb > 0.0 && f.totalDb > f.connectorsDb)
+    }
+
+    @Test
     fun yagiHasAllElements() {
         val y = AntennaMath.design(AntennaInput(type = AntennaType.YAGI, elements = 7))
         assertTrue(y.dims.count { it.kind == DimKind.DIRECTOR } == 5)

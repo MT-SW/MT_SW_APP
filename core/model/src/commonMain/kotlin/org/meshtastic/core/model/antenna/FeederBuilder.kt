@@ -37,6 +37,8 @@ data class FeederResult(
     val lines: List<FeederBreakdownLine>,
     val approximate: Boolean,
     val warnings: List<String>,
+    /** The part of [totalDb] that comes from connectors (the rest is cable). */
+    val connectorsDb: Double = 0.0,
 )
 
 data class FeederPreset(val id: String, val config: FeederConfig)
@@ -99,6 +101,7 @@ object FeederBuilder {
         val lines = mutableListOf<FeederBreakdownLine>()
         var approx = false
         var total = 0.0
+        var connectorsTotal = 0.0
 
         if (fMHz.isNaN() || fMHz < CableType.MIN_F || fMHz > CableType.MAX_F) warnings += "FREQUENCY_CLAMPED"
 
@@ -120,6 +123,7 @@ object FeederBuilder {
             } else {
                 val l = c.lossDb(fMHz)
                 total += l
+                connectorsTotal += l
                 if (c.approximate) approx = true
                 lines += FeederBreakdownLine(c.name, l)
             }
@@ -158,7 +162,7 @@ object FeederBuilder {
                 }
             }
         }
-        return FeederResult(total, lines, approx, warnings)
+        return FeederResult(total, lines, approx, warnings, connectorsTotal)
     }
 
     /**

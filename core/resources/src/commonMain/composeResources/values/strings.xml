@@ -283,16 +283,10 @@
     <!-- ANTENNA -->
     <string name="antenna_accuracy">Formulas: thickness Stutzman &amp; Thiele, Yagi Rothammel/DL6WU, Moxon L. B. Cebik, helix J. D. Kraus, patch Balanis and Hammerstad, cables from manufacturers\' tables. Results are a very good starting point; every antenna still needs tuning with a meter.</string>
     <string name="antenna_boom">Boom diameter (mm)</string>
-    <string name="antenna_cable">Cable to the antenna</string>
-    <string name="antenna_cable_custom">Own cable (enter the loss)</string>
     <string name="antenna_cable_for">Coax used for the antenna</string>
-    <string name="antenna_cable_length">Cable length (m)</string>
-    <string name="antenna_cable_loss_custom">Cable loss (dB per 100 m)</string>
-    <string name="antenna_cable_none">No cable</string>
     <string name="antenna_calc_open">Open the antenna calculator</string>
     <string name="antenna_calc_summary">Sizes of many antenna types for any frequency, with a drawing, and the losses of cable and connectors</string>
     <string name="antenna_calc_title">Antenna calculator</string>
-    <string name="antenna_connectors">Connectors and parts (typical loss each)</string>
     <string name="antenna_decimal">.</string>
     <string name="antenna_diameter">Element diameter (mm)</string>
     <string name="antenna_dim_arm">each arm</string>
@@ -370,10 +364,9 @@
     <string name="antenna_res_band_none">No licence-free band limit is known for this frequency.</string>
     <string name="antenna_res_band_ok">Band %1$s: limit %2$s — you are within it.</string>
     <string name="antenna_res_band_over">Band %1$s: limit %2$s — too much, lower the power.</string>
-    <string name="antenna_res_cable">Cable: %1$s dB per 100 m at this frequency → %2$s dB</string>
-    <string name="antenna_res_connectors">Connectors: %1$s dB</string>
     <string name="antenna_res_duty">Allowed airtime: %1$s % of the time.</string>
     <string name="antenna_res_eirp">EIRP: %1$s dBm (%2$s), ERP: %3$s dBm (%4$s)</string>
+    <string name="antenna_res_feeder">Feed line: %1$s dB (cables %2$s dB, connectors %3$s dB)</string>
     <string name="antenna_res_mismatch">Mismatch (SWR): %1$s dB</string>
     <string name="antenna_res_range">Range compared with a lossless dipole (free space): %1$s %</string>
     <string name="antenna_res_total">Losses together: %1$s dB (%2$s % of the power is lost)</string>

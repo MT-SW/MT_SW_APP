@@ -405,6 +405,22 @@ object AntennaMath {
         return FeedResult(cableDb, connDb, mm, total, at, eirp, erp, range, band, over)
     }
 
+    /**
+     * The same power calculation for a feed line whose loss is already known ([feederDb] in total, of which
+     * [connectorsDb] is connectors), for example from [FeederBuilder.compute] with any number of cables and connectors.
+     */
+    fun feedLoss(mhz: Double, txDbm: Double, feederDb: Double, connectorsDb: Double, swr: Double, gainDbi: Double): FeedResult {
+        val mm = mismatchLossDb(swr)
+        val total = feederDb + mm
+        val at = txDbm - total
+        val eirp = at + gainDbi
+        val erp = eirp - DIPOLE_GAIN
+        val band = bandFor(mhz)
+        val over = band?.let { b -> (b.erpDbm?.let { erp > it + 0.05 }) ?: (b.eirpDbm?.let { eirp > it + 0.05 }) }
+        val range = 10.0.pow((gainDbi - DIPOLE_GAIN - total) / 20)
+        return FeedResult(feederDb - connectorsDb, connectorsDb, mm, total, at, eirp, erp, range, band, over)
+    }
+
     fun mw(dbm: Double) = 10.0.pow(dbm / 10)
 }
 

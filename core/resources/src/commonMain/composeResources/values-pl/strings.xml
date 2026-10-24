@@ -3313,21 +3313,14 @@
     <string name="antenna_note_coax_vf">Długości z kabla zależą od współczynnika skrócenia kabla: sprawdź go w karcie katalogowej albo zmierz kabel.</string>
     <string name="antenna_feed_title">Tor antenowy i moc</string>
     <string name="antenna_tx_power">Moc nadajnika (dBm)</string>
+    <string name="antenna_res_feeder">Tor antenowy: %1$s dB (kable %2$s dB, złącza %3$s dB)</string>
     <string name="antenna_report_title">MT_SW – kalkulator anten</string>
     <string name="antenna_save">Zapisz wynik…</string>
     <string name="antenna_tx_radio">Z radia: %1$s dBm</string>
     <string name="antenna_tx_radio_region">Radio: maksimum regionu (%1$s dBm)</string>
     <string name="antenna_tx_ours">Limit ERP pasma: %1$s dBm</string>
-    <string name="antenna_cable">Kabel do anteny</string>
-    <string name="antenna_cable_none">Bez kabla</string>
-    <string name="antenna_cable_custom">Własny kabel (wpisz tłumienie)</string>
-    <string name="antenna_cable_length">Długość kabla (m)</string>
-    <string name="antenna_cable_loss_custom">Tłumienie kabla (dB na 100 m)</string>
-    <string name="antenna_connectors">Złącza i elementy (typowa strata każdego)</string>
     <string name="antenna_swr">SWR (1 = idealny)</string>
     <string name="antenna_gain_override">Zysk anteny (dBi, puste = z konstrukcji)</string>
-    <string name="antenna_res_cable">Kabel: %1$s dB na 100 m przy tej częstotliwości → %2$s dB</string>
-    <string name="antenna_res_connectors">Złącza: %1$s dB</string>
     <string name="antenna_res_mismatch">Niedopasowanie (SWR): %1$s dB</string>
     <string name="antenna_res_total">Straty razem: %1$s dB (traci się %2$s % mocy)</string>
     <string name="antenna_res_at_antenna">Moc na antenie: %1$s dBm (%2$s)</string>

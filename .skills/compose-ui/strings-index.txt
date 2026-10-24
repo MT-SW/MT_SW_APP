@@ -262,16 +262,10 @@ analytics_platforms
 ### ANTENNA ###
 antenna_accuracy
 antenna_boom
-antenna_cable
-antenna_cable_custom
 antenna_cable_for
-antenna_cable_length
-antenna_cable_loss_custom
-antenna_cable_none
 antenna_calc_open
 antenna_calc_summary
 antenna_calc_title
-antenna_connectors
 antenna_decimal
 antenna_diameter
 antenna_dim_arm
@@ -349,10 +343,9 @@ antenna_res_at_antenna
 antenna_res_band_none
 antenna_res_band_ok
 antenna_res_band_over
-antenna_res_cable
-antenna_res_connectors
 antenna_res_duty
 antenna_res_eirp
+antenna_res_feeder
 antenna_res_mismatch
 antenna_res_range
 antenna_res_total
