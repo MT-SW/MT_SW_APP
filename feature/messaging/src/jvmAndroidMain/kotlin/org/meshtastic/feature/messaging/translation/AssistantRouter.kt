@@ -47,14 +47,23 @@ internal data class AssistantIntent(
  */
 internal class AssistantRouter(private val engine: LiteRtEngine) {
 
-    /** The kind of [question] (with [previous], the user's question before it, for short follow-ups), or null on failure. */
-    suspend fun understand(modelId: String, question: String, previous: String, previousAnswer: String = ""): AssistantIntent? {
+    /**
+     * The kind of [question], or null on failure. [conversation] is the recent exchange (oldest first), [notes] what is
+     * remembered about the user from earlier conversations (empty when memory is off) and [lastNode] the node talked
+     * about last, so short follow-ups like "a jaka jest tam bateria?" can be understood.
+     */
+    suspend fun understand(
+        modelId: String,
+        question: String,
+        conversation: String = "",
+        notes: String = "",
+        lastNode: String = "",
+    ): AssistantIntent? {
         val ask =
             buildString {
-                if (previous.isNotBlank()) append("Previous question: ").append(previous.take(PREVIOUS_CHARS)).append('\n')
-                if (previous.isNotBlank() && previousAnswer.isNotBlank()) {
-                    append("Previous answer: ").append(previousAnswer.take(PREVIOUS_ANSWER_CHARS).replace('\n', ' ')).append('\n')
-                }
+                if (notes.isNotBlank()) append("Notes about the user: ").append(notes.take(NOTES_CHARS).replace('\n', ' ')).append('\n')
+                if (lastNode.isNotBlank()) append("Last node talked about: ").append(lastNode.take(LAST_NODE_CHARS)).append('\n')
+                if (conversation.isNotBlank()) append("Conversation so far:\n").append(conversation)
                 append("Question: ").append(question.take(QUESTION_CHARS))
             }
         val raw =
@@ -110,8 +119,8 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
         private const val TAG = "AssistantRouter"
         private const val MAX_TOKENS = 70
         private const val TEMPERATURE = 0.05f
-        private const val PREVIOUS_CHARS = 300
-        private const val PREVIOUS_ANSWER_CHARS = 160
+        private const val NOTES_CHARS = 500
+        private const val LAST_NODE_CHARS = 60
         private const val QUESTION_CHARS = 600
         private const val LOG_CHARS = 300
 
@@ -150,9 +159,10 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
             "You sort questions for the assistant of MT_SW, an app for Meshtastic LoRa mesh radios. The question is " +
                 "usually in Polish. Answer ONLY with one JSON object on one line, nothing else: the kind of question in \"intent\" and only the " +
                 "fields that the question really gives. Copy node and channel names exactly as the user wrote them. " +
-                "Use the previous question only for a short follow-up like \"a wczoraj?\" or when the user only gives a name, a place, a time or a number: then " +
-                "keep the kind of the previous question and fill in the new information. When the previous answer says a node is unknown and the user now gives its name, " +
-                "ask the previous question again with that name.\n" +
+                "Use the conversation so far only for a short follow-up like \"a wczoraj?\" or \"a jaka jest tam bateria?\", or when the user only gives a name, a place, a time or a number: then " +
+                "keep the kind of the earlier question and fill in the new information. When the user says \"there\", \"it\", \"that node\" (\"tam\", \"ten węzeł\") without a name, node = the Last node talked about. " +
+                "When the last answer says a node is unknown and the user now gives its name, ask the earlier question again with that name. " +
+                "The notes about the user may name the user's own nodes, places or channels: when the question says \"my node at home\" or similar and the notes name it, use that name.\n" +
                 "Kinds:\n" +
                 "chat: talk, greetings, opinions, advice, radio, antennas, LoRa or Meshtastic in general; anything not about this app or the user's own data.\n" +
                 "web_question: a question about facts that can be looked up: rules and laws, frequencies allowed, prices, news, dates, products. text = short search words.\n" +
@@ -209,7 +219,7 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
                 "jak się czuje mój węzeł? -> {\"intent\":\"network_question\",\"node\":\"me\",\"topic\":\"node\"}\n" +
                 "który węzeł odebrał najwięcej pakietów? -> {\"intent\":\"network_question\",\"metric\":\"rx\",\"topic\":\"ranking\"}\n" +
                 "show me the nearest node -> {\"intent\":\"nearest_node\",\"metric\":\"nearest\"}\n" +
-                "Previous question: sprawdź napięcie węzła na Karczówce / Previous answer: Nie znam węzła: Karczówce / Question: nazywa się Karczowka -> " +
+                "Conversation so far: User: sprawdź napięcie węzła na Karczówce / Assistant: Nie znam węzła: Karczówce / Question: nazywa się Karczowka -> " +
                 "{\"intent\":\"network_question\",\"node\":\"Karczowka\",\"metric\":\"voltage\",\"topic\":\"node\"}"
     }
 }

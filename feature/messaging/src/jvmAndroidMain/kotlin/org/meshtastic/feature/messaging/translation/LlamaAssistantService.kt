@@ -117,7 +117,8 @@ class LlamaAssistantService(
 
     // How the router understood the newest question, for the test report.
     @Volatile private var lastRoute = ""
-    @Volatile private var previousAnswer = ""
+    // The node talked about last in this conversation, so "a jaka jest tam bateria?" knows which node "tam" is.
+    @Volatile private var lastNode = ""
 
     override suspend fun selfTest(onResult: (question: String, answer: String) -> Unit) {
         withContext(Dispatchers.IO) {
@@ -180,7 +181,8 @@ class LlamaAssistantService(
         val modelId = activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
         val question = history.lastOrNull { it.fromUser }?.text.orEmpty()
         val previous = history.dropLast(1).lastOrNull { it.fromUser }?.text.orEmpty()
-        previousAnswer = history.dropLast(1).lastOrNull { !it.fromUser && it.text.isNotBlank() }?.text.orEmpty()
+        // A new conversation starts without a node talked about.
+        if (history.size <= 1) lastNode = ""
         // The whole answer is in the language of this question: the model's words, the app's own texts and the buttons.
         val language = answerLanguage(question, history)
         val polish = language == "pl"
@@ -230,7 +232,14 @@ class LlamaAssistantService(
     ): String {
         // The conversation as the model sees it ends with this one question.
         val turns = history.dropLast(1) + AssistantTurn(true, question)
-        val routed = router.understand(modelId, question, previous, previousAnswer)
+        val notes = if (uiPrefs.assistantMemoryEnabled.value) memoryStore?.promptText(ROUTER_NOTES_CHARS).orEmpty() else ""
+        val routed =
+            router.understand(modelId, question, conversationDigest(history.dropLast(1), previous), notes, lastNode)
+                ?.let { withLastNode(it, question) }
+        routed?.node?.takeIf { it.isNotBlank() && !it.equals("me", ignoreCase = true) }?.let { name ->
+            // Only a node the app really knows becomes "the node talked about"; a misspelt one is not remembered.
+            data.nodeNumFor(name)?.let { num -> data.nodeNameFor(num).takeIf { it.isNotBlank() }?.let { lastNode = it } }
+        }
         val intent =
             if (routed != null && routed.intent in COMMAND_INTENTS && WHERE_QUESTION.containsMatchIn(question.trim().lowercase()) &&
                 !OPEN_COMMAND.containsMatchIn(question.trim().lowercase())
@@ -242,6 +251,35 @@ class LlamaAssistantService(
             // The router could not run (for example an older model file): the old word rules decide.
             fallback(modelId, turns, question, polish, onPiece)
         }
+    }
+
+    /**
+     * The last few exchanges as short lines for the router, oldest first, without the buttons and internet notes the
+     * answers carry. [extraUser] is a question asked just before the current one that is not in [turns] (the first half
+     * of a two-part question).
+     */
+    private fun conversationDigest(turns: List<AssistantTurn>, extraUser: String): String {
+        val lines = ArrayList<String>()
+        turns.filter { it.text.isNotBlank() }.takeLast(DIGEST_TURNS).forEach {
+            val text = AssistantActions.strip(it.text).replace('\n', ' ').trim()
+            if (text.isNotEmpty()) {
+                lines += (if (it.fromUser) "User: " else "Assistant: ") + text.take(if (it.fromUser) DIGEST_USER_CHARS else DIGEST_ANSWER_CHARS)
+            }
+        }
+        val lastUser = turns.lastOrNull { it.fromUser }?.text.orEmpty()
+        if (extraUser.isNotBlank() && extraUser != lastUser) lines += "User: " + extraUser.take(DIGEST_USER_CHARS)
+        return lines.joinToString("\n", postfix = if (lines.isEmpty()) "" else "\n")
+    }
+
+    /**
+     * Fills in the node of a follow-up that only points at it ("tam", "ten węzeł", "it"), in case the router left it
+     * out: the node talked about last.
+     */
+    private fun withLastNode(intent: AssistantIntent, question: String): AssistantIntent {
+        if (intent.node.isNotBlank() || lastNode.isBlank()) return intent
+        val aboutOneNode =
+            intent.intent in NODE_INTENTS || (intent.intent == "network_question" && intent.topic in setOf("node", ""))
+        return if (aboutOneNode && POINTS_AT_NODE.containsMatchIn(question.lowercase())) intent.copy(node = lastNode) else intent
     }
 
     /** The two questions of a question like "how many nodes ... and how do I ...", or null for a single question. */
@@ -796,7 +834,7 @@ class LlamaAssistantService(
         val store = memoryStore ?: return
         if (!uiPrefs.assistantMemoryEnabled.value) return
         val userTurns = history.count { it.fromUser }
-        val asked = REMEMBER_WORDS.any { question.lowercase().contains(it) }
+        val asked = REMEMBER_WORDS.any { question.lowercase().contains(it) } || PERSONAL_WORDS.any { question.lowercase().contains(it) }
         if (!asked && (userTurns % 2 == 0 || question.length < MIN_NOTE_QUESTION)) return
         scope.launch {
             engineLock.withLock {
@@ -934,6 +972,12 @@ class LlamaAssistantService(
         const val MIN_PART = 8
         val CONNECT_WORDS = Regex("połącz|polacz|sparow|parowa|connect|pair")
         val COMMAND_INTENTS = setOf("show_setting", "open_screen")
+        val NODE_INTENTS = setOf("show_node_on_map", "open_link_planner", "traceroute", "neighbors")
+        val POINTS_AT_NODE = Regex("(?<![\\p{L}])(tam|tego|ten|tym|jego|jej|nim|niego|it|there|that|its)(?![\\p{L}])")
+        const val DIGEST_TURNS = 6
+        const val DIGEST_USER_CHARS = 140
+        const val DIGEST_ANSWER_CHARS = 110
+        const val ROUTER_NOTES_CHARS = 500
         val FARTHEST_WORDS = Regex("najdalej|najdalsz|farthest|furthest")
         val NEAREST_WORDS = Regex("najbliż|najbliz|nearest|closest")
         // "Where is the hop limit" / "how do I change X" asks where a thing is; it does not ask to open it.
@@ -986,6 +1030,10 @@ class LlamaAssistantService(
         const val NOTE_TURN_CHARS = 600
         const val NOTE_TOKENS = 400
         val REMEMBER_WORDS = listOf("zapamiętaj", "zapamietaj", "pamiętaj", "pamietaj", "remember")
+
+        // The user telling something about themselves is worth a note even on an even-numbered question.
+        val PERSONAL_WORDS =
+            listOf("mój węzeł", "moj wezel", "mojego węzła", "moja sieć", "moja siec", "nazywam się", "nazywam sie", "mieszkam", "my node", "my name is", "i live")
 
         const val SYSTEM_PL =
             "Jesteś asystentem wbudowanym w aplikację MT_SW (na telefon i komputer) do sieci Meshtastic, czyli radiowej " +
