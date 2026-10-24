@@ -28,6 +28,7 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.about
 import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.ai_model_one_title
+import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.node_color_pick
 import org.meshtastic.core.resources.ai_assistant_title
 import org.meshtastic.core.resources.translator_title
@@ -299,6 +300,7 @@ class AssistantGuideTools(
                 Target("power", "settings/power", Res.string.power, listOf("zasilan", "power", "oszczędz", "bateri")),
                 Target("mqtt", "settings/mqtt", Res.string.mqtt, listOf("mqtt")),
                 Target("telemetry", "settings/telemetry", Res.string.telemetry, listOf("telemetri", "telemetry", "czujnik")),
+                Target("antenna_calculator", "settings/antenna-calculator", Res.string.antenna_calc_title, listOf("kalkulator anten", "kalkulator", "calculator", "przelicz anten", "wymiary anten")),
                 Target("mt_sw", "settings/mt-sw-features", Res.string.mt_sw_features_title, listOf("mt_sw", "mt-sw", "funkcje", "features", "skalowan", "motyw")),
                 Target("clean_nodes", "settings/clean-node-db", Res.string.clean_node_database_title, listOf("wyczyść", "clean", "baz", "usuń węz")),
                 Target("filter", "settings/filter-settings", Res.string.filter_settings, listOf("filtr", "filter")),

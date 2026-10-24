@@ -17,6 +17,7 @@
 package org.meshtastic.feature.messaging.translation
 
 import org.meshtastic.core.model.ChannelOption
+import org.meshtastic.core.model.antenna.AntennaType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -30,16 +31,17 @@ class AssistantCalculatorsTest {
     fun antennaLengthsAreComputed() {
         val a = assertNotNull(pl("Jak zrobić prostą antenę dipol na 868 MHz?"))
         assertTrue("34,5 cm" in a, a)
-        assertTrue("16,4 cm" in a && "8,2 cm" in a, a)
+        assertTrue("Dipol półfalowy" in a && "każde ramię" in a, a)
         assertTrue("Jak zrobić dipol" in a, a)
         val q = assertNotNull(pl("Jaka antena ćwierćfalowa na 433 MHz, ile cm?"))
-        assertTrue("16,4 cm" in q, q)
+        assertTrue("16,6 cm" in q, q)
     }
 
     @Test
     fun antennaWithoutFrequencyUsesOurNetwork() {
         val a = assertNotNull(pl("Ile ma mieć centymetrów antena 5/8?"))
         assertTrue("naszej sieci" in a && "20,5 cm" in a, a)
+        assertEquals(AntennaType.FIVE_EIGHTHS, AssistantCalculators.lastAntenna?.first)
     }
 
     @Test

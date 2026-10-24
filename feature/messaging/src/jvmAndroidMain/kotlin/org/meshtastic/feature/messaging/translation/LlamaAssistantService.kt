@@ -33,6 +33,7 @@ import org.meshtastic.core.repository.AiRole
 import org.meshtastic.core.repository.AssistantKnowledge
 import org.meshtastic.core.repository.TranslatorModelState
 import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.core.model.antenna.AntennaPrefill
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ai_go_draft
 import org.meshtastic.core.resources.ai_test_done
@@ -266,7 +267,17 @@ class LlamaAssistantService(
         val role = intent.role.takeUnless { it.isBlank() || it == "any" } ?: ROLE_WORDS.find(question.lowercase())?.groupValues?.get(1)?.let { ROLE_NAMES[it] }.orEmpty()
         // Calculations (antennas, power, range, airtime, Fresnel zone, horizon, sums) are done by the app, never guessed.
         if (intent.intent != "draft_message") {
-            AssistantCalculators.answer(question, polish, data.calcDefaults())?.let { return it.also(onPiece) }
+            val defaults = data.calcDefaults()
+            AssistantCalculators.answer(question, polish, defaults)?.let { text ->
+                // An antenna answer gets a button to the antenna calculator, opened on the same antenna and frequency.
+                AssistantCalculators.lastAntenna?.let { (type, mhz) ->
+                    AntennaPrefill.type = type
+                    AntennaPrefill.mhz = mhz
+                    AntennaPrefill.txDbm = defaults.txDbm.takeIf { it > 0 }?.toDouble()
+                    guideTools.open_screen("antenna_calculator")
+                }
+                return text.also(onPiece)
+            }
         }
         // "My range is weak, what should I check": the user's own radio is checked in code, with a button to the preset.
         if (intent.intent in ADVICE_INTENTS && RANGE_PROBLEM.containsMatchIn(lower) && RANGE_TOPIC.containsMatchIn(lower)) {

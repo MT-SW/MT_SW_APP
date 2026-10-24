@@ -52,6 +52,7 @@ import org.meshtastic.feature.settings.SettingsViewModel
 import org.meshtastic.feature.settings.appfunctions.AppFunctionsSettingsScreen
 import org.meshtastic.feature.settings.appfunctions.AppFunctionsSettingsViewModel
 import org.meshtastic.feature.settings.mtsw.MtSwFeaturesScreen
+import org.meshtastic.feature.settings.antenna.AntennaCalculatorScreen
 import org.meshtastic.feature.settings.mtsw.MtSwOtherFeaturesScreen
 import org.meshtastic.feature.settings.debugging.DebugScreen
 import org.meshtastic.feature.settings.debugging.DebugViewModel
@@ -492,6 +493,9 @@ fun EntryProviderScope<NavKey>.settingsGraph(
             onBack = dropUnlessResumed { backStack.removeLastOrNull() },
             onNavigate = { backStack.add(it) },
         )
+    }
+    entry<SettingsRoute.AntennaCalculator> {
+        AntennaCalculatorScreen(onBack = dropUnlessResumed { backStack.removeLastOrNull() })
     }
     entry<SettingsRoute.MtSwOtherFeatures> {
         MtSwOtherFeaturesScreen(

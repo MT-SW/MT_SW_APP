@@ -44,6 +44,9 @@ import org.meshtastic.core.resources.node_color_summary
 import org.meshtastic.core.resources.node_color_title
 import org.meshtastic.core.ui.assistant.SettingHighlight
 import org.meshtastic.core.resources.ai_section_title
+import org.meshtastic.core.resources.antenna_calc_summary
+import org.meshtastic.core.resources.antenna_calc_title
+import org.meshtastic.core.resources.antenna_tools_section
 import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.import_menu_in_top_bar
 import org.meshtastic.core.resources.clean_node_database_title
@@ -80,6 +83,7 @@ import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.Add
+import org.meshtastic.core.ui.icon.Antenna
 import org.meshtastic.core.ui.icon.BugReport
 import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.Info
@@ -178,6 +182,16 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
             }
 
             ExpressiveSection(title = stringResource(Res.string.ai_section_title)) { AiSettings() }
+
+            ExpressiveSection(title = stringResource(Res.string.antenna_tools_section)) {
+                ListItem(
+                    text = stringResource(Res.string.antenna_calc_title),
+                    supportingText = stringResource(Res.string.antenna_calc_summary),
+                    leadingIcon = MeshtasticIcons.Antenna,
+                ) {
+                    onNavigate(SettingsRoute.AntennaCalculator)
+                }
+            }
 
             ExpressiveSection(title = stringResource(Res.string.mt_sw_features_links)) {
                 Text(
