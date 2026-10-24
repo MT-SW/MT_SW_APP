@@ -97,6 +97,8 @@ Planer otwiera przycisk **Planer** w szczegółach węzła, obok kompasu.
 
 Wzory pochodzą ze sprawdzonych źródeł (Stutzman i Thiele, Rothammel/DL6WU, L. B. Cebik, J. D. Kraus, Balanis, Hammerstad, tabele producentów kabli). Wynik to bardzo dobry punkt wyjścia, ale każdą antenę i tak dostraja się miernikiem SWR albo NanoVNA. Asystent pod swoimi wyliczeniami anten daje przycisk do kalkulatora z tą samą częstotliwością i typem anteny.
 
+Przycisk **Zapisz wynik…** na dole zapisuje dane wejściowe, wymiary, właściwości i wyniki toru antenowego jako PDF (raport tekstowy, bez rysunku), Markdown, TXT, CSV (sama tabela wymiarów) albo JSON.
+
 ## Diagnostyka na żądanie
 
 W szczegółach węzła (Administracja → „Diagnostyka na żądanie”) możesz zapytać dowolny węzeł w zasięgu o jego bieżące statystyki, zamiast czekać na okresowe rozgłoszenia. Jest 10 rodzajów zapytań, m.in. statystyki węzła (bateria, czas pracy, procesor, pamięć, WiFi), ping z RSSI i SNR, lista węzłów online, historia błędów routingu, liczniki portów, aktywność eteru i wersja firmware MT_SW. Ekran ma przegląd możliwości z licznikiem sprawdzonych zapytań, a wyniki są kolorowe (kafelki, wskaźniki, wykresy). Wszystkie odpowiedzi można udostępnić albo zapisać jako PDF, HTML, Markdown, tekst lub CSV. Ta funkcja wymaga firmware z modułem OnDemand.

@@ -344,6 +344,7 @@ antenna_pol_linear
 antenna_pol_vertical
 antenna_properties
 antenna_radial_angle
+antenna_report_title
 antenna_res_at_antenna
 antenna_res_band_none
 antenna_res_band_ok
@@ -355,6 +356,7 @@ antenna_res_eirp
 antenna_res_mismatch
 antenna_res_range
 antenna_res_total
+antenna_save
 antenna_sections
 antenna_shortening
 antenna_spacing_mm
