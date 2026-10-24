@@ -121,6 +121,8 @@ Ekran **Sniffer** (Ustawienia → Advanced) pokazuje na żywo ruch w sieci, tak�
 
 Panel debugowania (Ustawienia → Zaawansowane → Panel debugowania) ma w tej aplikacji dodatkową zakładkę. Zobacz też [Logi debugowania](debug-logs).
 
+- **Plik z logami na komputerze** — wersja na komputer sama zapisuje logi aplikacji (od poziomu informacji wzwyż) i ewentualne awarie do pliku `mt_sw_desktop.log` w folderze `.meshtastic/logs` w Twoim katalogu domowym, więc po zamknięciu albo awarii aplikacji można go odczytać i wysłać. Największy plik ma 5 MB, zostają trzy starsze.
+
 - **Logi urządzenia** — trzecia zakładka pokazuje na żywo logi wysyłane przez radio, te same, które widać na porcie szeregowym. Jest wyszukiwanie, kolory poziomów logów i eksport. Żeby logi się pojawiły, włącz „Logi debugowania” w ustawieniach zabezpieczeń urządzenia. Przez Bluetooth działa to z każdym firmware, a przez Wi-Fi i USB tylko z firmware MT_SW.
 - Panel pokazuje też pakiety, których telefon nie potrafił rozszyfrować, a surowa treść jest dostępna jako hex.
 

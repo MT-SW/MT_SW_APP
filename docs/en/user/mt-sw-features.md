@@ -121,6 +121,8 @@ The **Sniffer** screen (Settings → Advanced) shows network traffic live, inclu
 
 The debug panel (Settings → Advanced → Debug Panel) has an extra tab in this app. See also [Debug logs](debug-logs).
 
+- **Log file on the computer** — the desktop version writes the app log (information level and above) and any crash to the file `mt_sw_desktop.log` in the `.meshtastic/logs` folder of your home directory, so it can be read and sent after the app has closed or crashed. A file is at most 5 MB, three older ones are kept.
+
 - **Device logs** — the third tab shows live the logs sent by the radio, the same ones you see on the serial port. It has search, log-level colours and export. For logs to appear, enable "Debug logs" in the device security settings. Over Bluetooth this works with any firmware; over Wi-Fi and USB only with MT_SW firmware.
 - The panel also shows packets the phone could not decrypt, and the raw content is available as hex.
 
