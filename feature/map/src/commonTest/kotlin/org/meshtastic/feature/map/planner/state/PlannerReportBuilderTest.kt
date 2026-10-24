@@ -18,7 +18,7 @@ package org.meshtastic.feature.map.planner.state
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
-import org.meshtastic.feature.map.planner.FeederBuilder
+import org.meshtastic.core.model.antenna.FeederBuilder
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

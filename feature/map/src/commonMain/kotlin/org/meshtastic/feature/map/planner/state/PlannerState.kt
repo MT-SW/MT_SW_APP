@@ -17,9 +17,9 @@
 package org.meshtastic.feature.map.planner.state
 
 import org.meshtastic.feature.map.planner.CoverageResult
-import org.meshtastic.feature.map.planner.FeederBuilder
-import org.meshtastic.feature.map.planner.FeederConfig
-import org.meshtastic.feature.map.planner.FeederResult
+import org.meshtastic.core.model.antenna.FeederBuilder
+import org.meshtastic.core.model.antenna.FeederConfig
+import org.meshtastic.core.model.antenna.FeederResult
 import org.meshtastic.feature.map.planner.GeoPoint
 import org.meshtastic.feature.map.planner.LinkResult
 import org.meshtastic.feature.map.planner.PlannerBands

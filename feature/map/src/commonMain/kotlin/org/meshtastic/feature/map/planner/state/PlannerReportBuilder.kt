@@ -16,6 +16,7 @@
  */
 package org.meshtastic.feature.map.planner.state
 
+import org.meshtastic.core.model.antenna.FeederBuilder
 import org.meshtastic.feature.map.planner.DuctingLevel
 import org.meshtastic.feature.map.planner.Geodesy
 import org.meshtastic.feature.map.planner.LinkVerdict

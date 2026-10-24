@@ -32,8 +32,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.feature.map.planner.CoverageLayer
-import org.meshtastic.feature.map.planner.FeederBuilder
-import org.meshtastic.feature.map.planner.FeederConfig
+import org.meshtastic.core.model.antenna.FeederBuilder
+import org.meshtastic.core.model.antenna.FeederConfig
 import org.meshtastic.feature.map.planner.PlannerBands
 import org.meshtastic.feature.map.planner.data.ClutterHeights
 import org.meshtastic.feature.map.planner.data.PlannerClutter

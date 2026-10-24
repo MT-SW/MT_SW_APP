@@ -75,12 +75,12 @@ import org.meshtastic.core.resources.planner_unit_m
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Remove
-import org.meshtastic.feature.map.planner.CableDb
-import org.meshtastic.feature.map.planner.FeederBuilder
+import org.meshtastic.core.model.antenna.CableDb
+import org.meshtastic.core.model.antenna.FeederBuilder
 import org.meshtastic.feature.map.planner.state.PlannerEnd
 import org.meshtastic.feature.map.planner.state.PlannerSide
 import org.meshtastic.feature.map.planner.state.PlannerViewModel
-import org.meshtastic.feature.map.planner.FeederSection as FeederSectionData
+import org.meshtastic.core.model.antenna.FeederSection as FeederSectionData
 
 private const val MAX_FEEDER_DB = 100.0
 private const val MAX_SECTION_LENGTH_M = 1000.0

@@ -22,7 +22,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.meshtastic.feature.map.planner.FeederBuilder
+import org.meshtastic.core.model.antenna.FeederBuilder
 import org.meshtastic.proto.Config.LoRaConfig.ModemPreset
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest

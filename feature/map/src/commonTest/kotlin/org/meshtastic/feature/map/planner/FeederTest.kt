@@ -16,6 +16,11 @@
  */
 package org.meshtastic.feature.map.planner
 
+import org.meshtastic.core.model.antenna.ConnectorType
+import org.meshtastic.core.model.antenna.CableDb
+import org.meshtastic.core.model.antenna.FeederSection
+import org.meshtastic.core.model.antenna.FeederConfig
+import org.meshtastic.core.model.antenna.FeederBuilder
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
