@@ -327,6 +327,7 @@ assistant_disclaimer
 assistant_disclaimer_web
 assistant_empty_hint
 assistant_error
+assistant_export_title
 assistant_go_to
 assistant_greeting
 assistant_history
@@ -337,6 +338,9 @@ assistant_model_missing
 assistant_name
 assistant_new
 assistant_off
+assistant_save
+assistant_save_done
+assistant_save_failed
 assistant_send
 assistant_stop
 assistant_suggest_1

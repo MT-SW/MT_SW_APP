@@ -16,6 +16,15 @@
  */
 package org.meshtastic.feature.messaging.ui.translator
 
+import org.meshtastic.core.resources.assistant_save_failed
+import org.meshtastic.core.resources.assistant_save_done
+import org.meshtastic.core.resources.assistant_save
+import org.meshtastic.core.resources.assistant_export_title
+import org.meshtastic.core.ui.util.rememberSaveFileLauncher
+import org.meshtastic.core.repository.FileService
+import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.common.util.DateFormatter
+import kotlinx.coroutines.CancellationException
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -170,28 +179,73 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
 
         if (state.lines.isNotEmpty()) {
             val clipboard = LocalClipboard.current
-            val copyScope = rememberCoroutineScope()
+            val exportScope = rememberCoroutineScope()
+            val fileService = koinInject<FileService>()
             val you = stringResource(Res.string.assistant_copy_you)
             val assistant = stringResource(Res.string.assistant_copy_assistant)
-            TextButton(
-                onClick = {
-                    val whole =
-                        state.lines
-                            .filter { it.text.isNotBlank() }
-                            .joinToString("\n\n") { line ->
-                                val (shown, actions) = AssistantActions.parse(line.text)
-                                val web = AssistantActions.web(line.text)
-                                buildString {
-                                    append(if (line.fromUser) you else assistant).append(": ").append(shown)
-                                    web?.let { append("\n(").append(it.note.ifBlank { it.queries }).append(")") }
-                                    actions.forEach { append("\n[").append(it.caption.ifBlank { it.label }).append("]") }
+            val title = stringResource(Res.string.assistant_export_title)
+            val savedText = stringResource(Res.string.assistant_save_done)
+            val failedText = stringResource(Res.string.assistant_save_failed)
+            var saveMenu by remember { mutableStateOf(false) }
+            var saveResult by remember { mutableStateOf<String?>(null) }
+            var pendingBytes by remember { mutableStateOf<ByteArray?>(null) }
+            val saveLauncher =
+                rememberSaveFileLauncher { uri ->
+                    val bytes = pendingBytes
+                    if (bytes != null) {
+                        exportScope.launch {
+                            val ok =
+                                try {
+                                    fileService.write(uri) { sink -> sink.write(bytes) }
+                                } catch (e: CancellationException) {
+                                    throw e
+                                } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+                                    false
                                 }
-                            }
-                    copyScope.launch { clipboard.setClipEntry(createClipEntry(whole, "")) }
-                },
-            ) {
-                Text(stringResource(Res.string.assistant_copy_all))
+                            saveResult = if (ok) savedText else failedText
+                            pendingBytes = null
+                        }
+                    }
+                }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                TextButton(
+                    onClick = {
+                        val whole = AssistantExport.text(AssistantExport.entries(state.lines), you, assistant)
+                        exportScope.launch { clipboard.setClipEntry(createClipEntry(whole, "")) }
+                    },
+                ) {
+                    Text(stringResource(Res.string.assistant_copy_all))
+                }
+                Box {
+                    TextButton(onClick = { saveMenu = true }) { Text(stringResource(Res.string.assistant_save)) }
+                    DropdownMenu(expanded = saveMenu, onDismissRequest = { saveMenu = false }) {
+                        ExportFormat.entries.forEach { format ->
+                            DropdownMenuItem(
+                                text = { Text(format.label) },
+                                onClick = {
+                                    saveMenu = false
+                                    val entries = AssistantExport.entries(state.lines)
+                                    val stamp = DateFormatter.formatDateTime(nowMillis)
+                                    val bytes =
+                                        when (format) {
+                                            ExportFormat.PDF -> AssistantExport.pdf(entries, title, stamp, you, assistant)
+                                            ExportFormat.MARKDOWN ->
+                                                AssistantExport.markdown(entries, title, stamp, you, assistant).encodeToByteArray()
+                                            ExportFormat.TEXT ->
+                                                AssistantExport.text(entries, you, assistant).encodeToByteArray()
+                                            ExportFormat.HTML ->
+                                                AssistantExport.html(entries, title, stamp, you, assistant).encodeToByteArray()
+                                        }
+                                    pendingBytes = bytes
+                                    saveResult = null
+                                    saveLauncher("mt_sw_assistant_" + nowMillis / 1000 + format.extension, format.mime)
+                                },
+                            )
+                        }
+                    }
+                }
             }
+            saveResult?.let { Text(text = it, style = MaterialTheme.typography.bodySmall) }
         }
 
         LazyColumn(
