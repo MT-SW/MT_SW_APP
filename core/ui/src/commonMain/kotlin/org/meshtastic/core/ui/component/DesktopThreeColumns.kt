@@ -23,8 +23,6 @@ import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
@@ -34,10 +32,14 @@ import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -148,20 +150,47 @@ private fun ThreeColumns(
     extra: NavEntry<NavKey>,
     widths: ThreeColumnWidths,
 ) {
-    BoxWithConstraints(Modifier.fillMaxSize()) {
-        val total = maxWidth
-        val density = LocalDensity.current
-        val dividerWidth = DIVIDER_WIDTH
-        // The columns may not leave the detail narrower than its minimum, whatever the window width.
-        val usable = total - dividerWidth * 2
-        val listWidth = (usable * widths.listShare).coerceAtLeast(ThreeColumnWidths.MIN_PANE_DP.dp)
-        val extraWidth = (usable * widths.extraShare).coerceAtLeast(ThreeColumnWidths.MIN_PANE_DP.dp)
-        Row(Modifier.fillMaxSize()) {
-            Box(Modifier.width(listWidth).fillMaxHeight()) { list.Content() }
-            ColumnDivider { deltaPx -> widths.moveListDivider(deltaPx / density.density, usable.value) }
-            Box(Modifier.weight(1f).fillMaxHeight()) { detail.Content() }
-            ColumnDivider { deltaPx -> widths.moveExtraDivider(deltaPx / density.density, usable.value) }
-            Box(Modifier.width(extraWidth).fillMaxHeight()) { extra.Content() }
+    val density = LocalDensity.current
+    var totalPx by remember { mutableIntStateOf(0) }
+    val dividerPx = with(density) { DIVIDER_WIDTH.roundToPx() }
+    val minPanePx = with(density) { ThreeColumnWidths.MIN_PANE_DP.dp.roundToPx() }
+    // The usable width (without the two dividers) in dp, for the dividers' drag maths.
+    val usableDp = ((totalPx - dividerPx * 2).coerceAtLeast(0)) / density.density
+    // A plain Layout, not BoxWithConstraints: that one composes its content late (during layout), and while the window
+    // switches between two and three columns the same screen would then briefly exist in both layouts at once
+    // ("Key ... was used multiple times"). A plain Layout composes with the rest of the screen, as the library's does.
+    Layout(
+        modifier = Modifier.fillMaxSize().onSizeChanged { totalPx = it.width },
+        content = {
+            Box(Modifier.fillMaxHeight()) { list.Content() }
+            ColumnDivider { deltaPx -> widths.moveListDivider(deltaPx / density.density, usableDp) }
+            Box(Modifier.fillMaxHeight()) { detail.Content() }
+            ColumnDivider { deltaPx -> widths.moveExtraDivider(deltaPx / density.density, usableDp) }
+            Box(Modifier.fillMaxHeight()) { extra.Content() }
+        },
+    ) { measurables, constraints ->
+        val width = constraints.maxWidth
+        val height = constraints.maxHeight
+        val usable = (width - dividerPx * 2).coerceAtLeast(0)
+        val listW = (usable * widths.listShare).toInt().coerceAtLeast(minPanePx).coerceAtMost(usable)
+        val extraW = (usable * widths.extraShare).toInt().coerceAtLeast(minPanePx).coerceAtMost((usable - listW).coerceAtLeast(0))
+        val detailW = (usable - listW - extraW).coerceAtLeast(0)
+        fun measure(index: Int, w: Int) =
+            measurables[index].measure(Constraints(minWidth = w, maxWidth = w, minHeight = height, maxHeight = height))
+        val placeables =
+            listOf(
+                measure(0, listW),
+                measure(1, dividerPx),
+                measure(2, detailW),
+                measure(3, dividerPx),
+                measure(4, extraW),
+            )
+        layout(width, height) {
+            var x = 0
+            placeables.forEach {
+                it.placeRelative(x, 0)
+                x += it.width
+            }
         }
     }
 }
