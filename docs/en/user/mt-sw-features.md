@@ -97,6 +97,8 @@ The planner is opened with the **Planner** button in the node details, next to t
 
 The formulas come from established sources (Stutzman & Thiele, Rothammel/DL6WU, L. B. Cebik, J. D. Kraus, Balanis, Hammerstad, cable makers' tables). The result is a very good starting point, but every antenna is still tuned with an SWR meter or NanoVNA. Under its antenna calculations the assistant gives a button to the calculator with the same frequency and antenna type.
 
+The **Save result…** button at the bottom saves the input, dimensions, properties and feed-line results as PDF (a text report, without the drawing), Markdown, TXT, CSV (just the dimension table) or JSON.
+
 ## On-demand diagnostics
 
 In the node details (Administration → "On-demand diagnostics") you can ask any node in range for its current statistics instead of waiting for periodic broadcasts. There are 10 kinds of queries, including node stats (battery, uptime, CPU, memory, WiFi), ping with RSSI and SNR, the list of online nodes, routing error history, port counters, airtime activity and the MT_SW firmware version. The screen has an overview of capabilities with a counter of checked queries, and results are coloured (tiles, gauges, charts). All answers can be shared or saved as PDF, HTML, Markdown, text or CSV. This feature needs firmware with the OnDemand module.

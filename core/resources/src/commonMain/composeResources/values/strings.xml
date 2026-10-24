@@ -365,6 +365,7 @@
     <string name="antenna_pol_vertical">Polarisation: vertical</string>
     <string name="antenna_properties">Properties</string>
     <string name="antenna_radial_angle">Radial angle down (°)</string>
+    <string name="antenna_report_title">MT_SW – antenna calculator</string>
     <string name="antenna_res_at_antenna">Power at the antenna: %1$s dBm (%2$s)</string>
     <string name="antenna_res_band_none">No licence-free band limit is known for this frequency.</string>
     <string name="antenna_res_band_ok">Band %1$s: limit %2$s — you are within it.</string>
@@ -376,6 +377,7 @@
     <string name="antenna_res_mismatch">Mismatch (SWR): %1$s dB</string>
     <string name="antenna_res_range">Range compared with a lossless dipole (free space): %1$s %</string>
     <string name="antenna_res_total">Losses together: %1$s dB (%2$s % of the power is lost)</string>
+    <string name="antenna_save">Save result…</string>
     <string name="antenna_sections">Number of sections</string>
     <string name="antenna_shortening">Shortening factor used: %1$s (thickness and insulation)</string>
     <string name="antenna_spacing_mm">Wire spacing (mm, 0 = automatic)</string>
