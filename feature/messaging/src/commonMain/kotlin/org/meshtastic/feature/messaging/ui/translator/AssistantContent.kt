@@ -163,7 +163,8 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                     if (internetOn) Res.string.assistant_disclaimer_web else Res.string.assistant_disclaimer,
                 ),
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            // With the internet switched on the line warns about it, so it is red like a warning.
+            color = if (internetOn) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 8.dp),
         )
 
@@ -314,7 +315,7 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             if (shown.isNotBlank()) Text(text = shown, style = MaterialTheme.typography.bodyLarge)
                             if (web != null) {
-                                // A small note in the app's main colour: this answer used the internet.
+                                // A small red note, like a warning: this answer used the internet.
                                 val details =
                                     listOfNotNull(
                                         web.queries.takeIf { it.isNotBlank() }?.let { stringResource(Res.string.assistant_web_searched, it) },
@@ -323,7 +324,7 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                                 Text(
                                     text = web.note.ifBlank { (listOf(stringResource(Res.string.assistant_web_used)) + details).joinToString(" · ") },
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.primary,
+                                    color = MaterialTheme.colorScheme.error,
                                 )
                             }
                             if (actions.isNotEmpty()) {
