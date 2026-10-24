@@ -659,11 +659,12 @@ class LlamaAssistantService(
                 p.lines.isNotEmpty() && !p.title.startsWith("MT_SW ") && p.title != "CHANGELOG" && !(polish && p.title.startsWith("en-")) &&
                     (!ABOUT_ASSISTANT.containsMatchIn(p.title.lowercase()) || ABOUT_ASSISTANT.containsMatchIn(focus(question, strong)))
             }
-        // The name of the found screen counts most; then the question's words; a short heading (a whole chapter) wins a tie.
+        // The name of the found screen counts most; then the question's words; a short title (a chapter's start) wins a tie.
         class Scored(val part: Part, val score: Int, val size: Int)
         val scored =
             usable.map { p ->
-                val words = stems(p.title.substringAfter(": "))
+                // The whole title, "Page: heading", so a part is matched by its chapter too ("Connections: Bluetooth").
+                val words = stems(p.title)
                 Scored(p, words.count { it in labelStems } * LABEL_SCORE + words.count { it in want }, words.size)
             }.filter { it.score > 0 }
         val best = scored.sortedWith(compareByDescending<Scored> { it.score }.thenBy { it.size }).firstOrNull()?.part ?: return ""
