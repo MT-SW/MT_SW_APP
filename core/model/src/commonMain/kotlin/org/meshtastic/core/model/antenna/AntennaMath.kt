@@ -18,6 +18,7 @@
 
 package org.meshtastic.core.model.antenna
 
+import kotlinx.serialization.Serializable
 import kotlin.math.PI
 import kotlin.math.acos
 import kotlin.math.exp
@@ -113,6 +114,7 @@ data class AntennaDesign(
 enum class Polarization { VERTICAL, HORIZONTAL_OR_VERTICAL, CIRCULAR, LINEAR }
 
 /** Everything the calculator needs; the defaults are a 1.5 mm copper wire on our network's frequency. */
+@Serializable
 data class AntennaInput(
     val type: AntennaType = AntennaType.GROUND_PLANE,
     val mhz: Double = AntennaMath.OUR_MHZ,

@@ -237,6 +237,18 @@ import org.meshtastic.core.model.antenna.CableDb
 import org.meshtastic.core.model.antenna.FeederBuilder
 import org.meshtastic.core.model.antenna.FeederConfig
 import org.meshtastic.core.model.antenna.FeederSection as FeederSectionData
+import org.meshtastic.core.resources.antenna_setups_title
+import org.meshtastic.core.resources.antenna_setups_empty
+import org.meshtastic.core.resources.antenna_setup_load
+import org.meshtastic.core.resources.antenna_setup_delete
+import org.meshtastic.core.resources.antenna_setup_name
+import org.meshtastic.core.resources.antenna_setup_save
+import org.meshtastic.core.resources.antenna_setup_saved
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.meshtastic.core.model.antenna.AntennaSetup
+import org.meshtastic.core.model.antenna.AntennaSetups
+import org.meshtastic.core.repository.UiPrefs
+import androidx.compose.runtime.key
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -269,6 +281,12 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
     var epsText by remember { mutableStateOf("4.4") }
     var substrateText by remember { mutableStateOf("1.6") }
     var foldedText by remember { mutableStateOf("0") }
+
+    val uiPrefs = koinInject<UiPrefs>()
+    val setupsText by uiPrefs.antennaSetups.collectAsStateWithLifecycle()
+    val setups = remember(setupsText) { AntennaSetups.decode(setupsText) }
+    var loaded by remember { mutableStateOf<AntennaSetup?>(null) }
+    var loadCount by remember { mutableStateOf(0) }
 
     val mhz = parse(freqText)?.takeIf { it in 1.0..100_000.0 } ?: AntennaMath.OUR_MHZ
     val input =
@@ -342,6 +360,39 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
         )
     }
 
+    val currentSetup: (String) -> AntennaSetup? = { name ->
+        feed?.let {
+            AntennaSetup(
+                id = setups.firstOrNull { s -> s.name == name }?.id ?: ("a" + nowMillis),
+                name = name,
+                input = input,
+                txDbm = it.txDbm,
+                swr = it.swr,
+                gainOverrideDbi = it.gainOverrideDbi,
+                feeder = it.feeder,
+            )
+        }
+    }
+    val applySetup: (AntennaSetup) -> Unit = { setup ->
+        val i = setup.input
+        freqText = numberText(i.mhz)
+        type = i.type
+        diameterText = numberText(i.diameterMm)
+        insulation = i.insulation
+        angleText = numberText(i.radialAngleDeg)
+        elementsText = i.elements.toString()
+        boomText = numberText(i.boomMm)
+        metalBoom = i.metalBoom
+        antennaCable = i.cable
+        sectionsText = i.sections.toString()
+        turnsText = i.turns.toString()
+        epsText = numberText(i.epsR)
+        substrateText = numberText(i.substrateMm)
+        foldedText = numberText(i.foldedSpacingMm)
+        loaded = setup
+        loadCount++
+    }
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -359,6 +410,17 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
             modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            SetupsSection(
+                setups = setups,
+                canSave = feed != null,
+                loadedName = loaded?.name.orEmpty(),
+                onSave = { name ->
+                    currentSetup(name)?.let { uiPrefs.setAntennaSetups(AntennaSetups.encode(AntennaSetups.upsert(setups, it))) }
+                },
+                onLoad = applySetup,
+                onDelete = { uiPrefs.setAntennaSetups(AntennaSetups.encode(AntennaSetups.remove(setups, it.id))) },
+            )
+
             ExpressiveSection(title = stringResource(Res.string.antenna_type)) {
                 Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     NumberField(stringResource(Res.string.antenna_frequency), freqText) { freqText = it }
@@ -456,7 +518,7 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
                 }
             }
 
-            if (type != AntennaType.COAX_STUB) FeedSection(mhz, design, sep, prefill.third) { feedData = it }
+            if (type != AntennaType.COAX_STUB) key(loadCount) { FeedSection(mhz, design, sep, prefill.third, loaded) { feedData = it } }
 
             Text(
                 text = stringResource(Res.string.antenna_accuracy),
@@ -464,6 +526,65 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             SaveBar(makeReport)
+        }
+    }
+}
+
+/** "My antennas": antennas saved with their feed line, power and gain; the link planner can use them too. */
+@Composable
+private fun SetupsSection(
+    setups: List<AntennaSetup>,
+    canSave: Boolean,
+    loadedName: String,
+    onSave: (String) -> Unit,
+    onLoad: (AntennaSetup) -> Unit,
+    onDelete: (AntennaSetup) -> Unit,
+) {
+    var name by remember(loadedName) { mutableStateOf(loadedName) }
+    var saved by remember { mutableStateOf(false) }
+    ExpressiveSection(title = stringResource(Res.string.antenna_setups_title)) {
+        Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (setups.isEmpty()) {
+                Text(
+                    stringResource(Res.string.antenna_setups_empty),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            setups.forEach { setup ->
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Column(Modifier.weight(1f)) {
+                        Text(setup.name, style = MaterialTheme.typography.bodyLarge)
+                        Text(
+                            "${numberText(setup.input.mhz)} MHz, ${fmt(setup.gainDbi, 1, ".")} dBi, ${fmt(setup.feederLossDb, 2, ".")} dB",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    TextButton(onClick = { onLoad(setup) }) { Text(stringResource(Res.string.antenna_setup_load)) }
+                    TextButton(onClick = { onDelete(setup) }) { Text(stringResource(Res.string.antenna_setup_delete)) }
+                }
+            }
+            OutlinedTextField(
+                value = name,
+                onValueChange = {
+                    name = it.take(40)
+                    saved = false
+                },
+                label = { Text(stringResource(Res.string.antenna_setup_name)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                TextButton(
+                    enabled = canSave && name.isNotBlank(),
+                    onClick = {
+                        onSave(name.trim())
+                        saved = true
+                    },
+                ) { Text(stringResource(Res.string.antenna_setup_save)) }
+                if (saved) Text(stringResource(Res.string.antenna_setup_saved), style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }
@@ -527,7 +648,7 @@ private const val MAX_SECTION_M = 1000.0
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: Double?, onData: (AntennaFeedData) -> Unit) {
+private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: Double?, initial: AntennaSetup?, onData: (AntennaFeedData) -> Unit) {
     val radioConfig: RadioConfigRepository = koinInject()
     val lora = radioConfig.localConfigFlow.collectAsState(null).value?.lora
     // Radio output power; 0 means "the region's maximum", which is known here only for the EU 868 regions.
@@ -538,17 +659,17 @@ private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: 
             lora.region.name.startsWith("EU_") -> 27.0
             else -> null
         }
-    var powerText by remember { mutableStateOf(numberText(txDbm ?: radioDbm ?: 22.0)) }
-    var powerTouched by remember { mutableStateOf(txDbm != null) }
+    var powerText by remember { mutableStateOf(numberText(initial?.txDbm ?: txDbm ?: radioDbm ?: 22.0)) }
+    var powerTouched by remember { mutableStateOf(initial != null || txDbm != null) }
     LaunchedEffect(radioDbm) {
         if (!powerTouched && radioDbm != null) powerText = numberText(radioDbm)
     }
     // The same feed line as in the link planner: any number of connectors joined by cable sections.
     var feeder by remember {
-        mutableStateOf(FeederConfig(listOf("sma", "sma"), listOf(FeederSectionData(DEFAULT_CABLE_ID, DEFAULT_SECTION_M))))
+        mutableStateOf(initial?.feeder ?: FeederConfig(listOf("sma", "sma"), listOf(FeederSectionData(DEFAULT_CABLE_ID, DEFAULT_SECTION_M))))
     }
-    var swrText by remember { mutableStateOf("1.5") }
-    var gainText by remember { mutableStateOf("") }
+    var swrText by remember { mutableStateOf(initial?.swr?.let { numberText(it) } ?: "1.5") }
+    var gainText by remember { mutableStateOf(initial?.gainOverrideDbi?.let { numberText(it) } ?: "") }
 
     val gain = parse(gainText) ?: design.gainDbi
     val tx = parse(powerText) ?: 22.0
@@ -610,6 +731,8 @@ private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: 
             swr = swr,
             gainDbi = gain,
             result = res,
+            feeder = feeder,
+            gainOverrideDbi = parse(gainText),
         )
     LaunchedEffect(feedData) { onData(feedData) }
 

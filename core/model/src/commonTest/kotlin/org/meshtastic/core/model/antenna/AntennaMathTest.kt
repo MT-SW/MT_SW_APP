@@ -80,6 +80,24 @@ class AntennaMathTest {
     }
 
     @Test
+    fun savedAntennasSurviveTheRoundTrip() {
+        val setup = AntennaSetup(
+            id = "a1",
+            name = "Dach",
+            input = AntennaInput(type = AntennaType.YAGI, elements = 7),
+            txDbm = 22.0,
+            swr = 1.3,
+            gainOverrideDbi = 9.5,
+            feeder = FeederConfig(listOf("sma", "n"), listOf(FeederSection("lmr400", 10.0))),
+        )
+        val back = AntennaSetups.decode(AntennaSetups.encode(AntennaSetups.upsert(emptyList(), setup)))
+        assertEquals(listOf(setup), back)
+        near(back.first().gainDbi, 9.5, 1e-9)
+        assertTrue(AntennaSetups.decode("not json").isEmpty())
+        assertTrue(AntennaSetups.remove(back, "a1").isEmpty())
+    }
+
+    @Test
     fun yagiHasAllElements() {
         val y = AntennaMath.design(AntennaInput(type = AntennaType.YAGI, elements = 7))
         assertTrue(y.dims.count { it.kind == DimKind.DIRECTOR } == 5)

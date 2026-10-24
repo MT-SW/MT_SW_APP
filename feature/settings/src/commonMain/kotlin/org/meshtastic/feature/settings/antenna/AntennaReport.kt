@@ -19,6 +19,7 @@ package org.meshtastic.feature.settings.antenna
 import org.meshtastic.core.model.antenna.AntennaDesign
 import org.meshtastic.core.model.antenna.AntennaInput
 import org.meshtastic.core.model.antenna.AntennaMath
+import org.meshtastic.core.model.antenna.FeederConfig
 import org.meshtastic.core.ui.util.JsonText
 import org.meshtastic.core.ui.util.SimplePdf
 
@@ -46,6 +47,10 @@ internal data class AntennaFeedData(
     val swr: Double,
     val gainDbi: Double,
     val result: AntennaMath.FeedResult,
+    /** The feed line as it can be saved with the antenna. */
+    val feeder: FeederConfig,
+    /** The gain typed by the user, null when the calculated one is used. */
+    val gainOverrideDbi: Double?,
 )
 
 /** Everything on the calculator's screen, ready to be written to a file. */

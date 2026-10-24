@@ -185,6 +185,12 @@ interface UiPrefs {
 
     fun setAssistantMemoryEnabled(value: Boolean)
 
+    /** The saved antennas of the antenna calculator as JSON (see AntennaSetups); empty when none. */
+    val antennaSetups: StateFlow<String>
+        get() = kotlinx.coroutines.flow.MutableStateFlow("")
+
+    fun setAntennaSetups(value: String) {}
+
     /** Id of the downloaded model the translator uses (see AiModels). */
     val translatorModelId: StateFlow<String>
 

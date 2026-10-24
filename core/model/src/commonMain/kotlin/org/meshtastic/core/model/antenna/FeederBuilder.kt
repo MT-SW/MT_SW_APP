@@ -16,12 +16,15 @@
  */
 package org.meshtastic.core.model.antenna
 
+import kotlinx.serialization.Serializable
 import kotlin.math.roundToLong
 
 /** A cable run between two connectors. [cableId] is a [CableDb] id or [FeederBuilder.CUSTOM_ID]. */
+@Serializable
 data class FeederSection(val cableId: String, val lengthM: Double, val customDbPerM: Double? = null)
 
 /** Feeder description: N connectors joined by N-1 cable sections (see [FeederBuilder.resize]). */
+@Serializable
 data class FeederConfig(val connectorIds: List<String>, val sections: List<FeederSection>)
 
 /** One line of the loss breakdown; [label] is a neutral identifier (e.g. "SMA", "RG316 · 0.5 m"). */

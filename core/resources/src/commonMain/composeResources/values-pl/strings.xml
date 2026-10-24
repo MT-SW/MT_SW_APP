@@ -3314,6 +3314,13 @@
     <string name="antenna_feed_title">Tor antenowy i moc</string>
     <string name="antenna_tx_power">Moc nadajnika (dBm)</string>
     <string name="antenna_res_feeder">Tor antenowy: %1$s dB (kable %2$s dB, złącza %3$s dB)</string>
+    <string name="antenna_setups_title">Moje anteny</string>
+    <string name="antenna_setups_empty">Nie masz jeszcze zapisanych anten. Policz antenę i tor niżej, wpisz nazwę i zapisz.</string>
+    <string name="antenna_setup_load">Wczytaj</string>
+    <string name="antenna_setup_delete">Usuń</string>
+    <string name="antenna_setup_name">Nazwa tej anteny</string>
+    <string name="antenna_setup_save">Zapisz antenę</string>
+    <string name="antenna_setup_saved">Zapisano</string>
     <string name="antenna_report_title">MT_SW – kalkulator anten</string>
     <string name="antenna_save">Zapisz wynik…</string>
     <string name="antenna_tx_radio">Z radia: %1$s dBm</string>

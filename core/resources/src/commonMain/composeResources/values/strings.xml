@@ -372,6 +372,13 @@
     <string name="antenna_res_total">Losses together: %1$s dB (%2$s % of the power is lost)</string>
     <string name="antenna_save">Save result…</string>
     <string name="antenna_sections">Number of sections</string>
+    <string name="antenna_setup_delete">Delete</string>
+    <string name="antenna_setup_load">Load</string>
+    <string name="antenna_setup_name">Name of this antenna</string>
+    <string name="antenna_setup_save">Save antenna</string>
+    <string name="antenna_setup_saved">Saved</string>
+    <string name="antenna_setups_empty">No saved antennas yet. Work out the antenna and the feed line below, type a name and save.</string>
+    <string name="antenna_setups_title">My antennas</string>
     <string name="antenna_shortening">Shortening factor used: %1$s (thickness and insulation)</string>
     <string name="antenna_spacing_mm">Wire spacing (mm, 0 = automatic)</string>
     <string name="antenna_substrate">Substrate thickness (mm)</string>

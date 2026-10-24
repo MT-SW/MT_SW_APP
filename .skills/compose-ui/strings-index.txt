@@ -351,6 +351,13 @@ antenna_res_range
 antenna_res_total
 antenna_save
 antenna_sections
+antenna_setup_delete
+antenna_setup_load
+antenna_setup_name
+antenna_setup_save
+antenna_setup_saved
+antenna_setups_empty
+antenna_setups_title
 antenna_shortening
 antenna_spacing_mm
 antenna_substrate
