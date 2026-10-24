@@ -64,6 +64,15 @@ Internet dla asystenta ma być WYŁĄCZONY (poza punktem 40).
 42. Jaki preset wybrać w naszym województwie?
 43. Jaka antena ćwierćfalowa na 869 MHz, ile ma mieć centymetrów?
 44. Kto może nadawać na 868 MHz w Polsce? (przy włączonym internecie: notka „Odpowiedź z pomocą internetu”)
+45. Ile to 20 dBm w miliwatach?
+46. Jaki teoretyczny zasięg mam przy antenach 5 dBi?
+47. Ile trwa wysłanie wiadomości 100 znaków?
+48. Jaka jest strefa Fresnela na 15 km?
+49. Jak daleko sięga radio z masztu 40 m?
+50. Jakie EIRP przy 22 dBm i antenie 6 dBi?
+51. Policz 12*7+3
+52. What length should a 433 MHz dipole be?
+53. Ktoś mnie słabo słyszy, jak poprawić zasięg?
 
 ## Na co patrzeć
 - Czy odpowiedź jest po polsku i krótka.

@@ -76,5 +76,14 @@ internal object AssistantSelfTest {
             Question("Jaki preset wybrać w naszym województwie?"),
             Question("Jaka antena ćwierćfalowa na 869 MHz, ile ma mieć centymetrów?"),
             Question("Kto może nadawać na 868 MHz w Polsce?"),
+            Question("Ile to 20 dBm w miliwatach?"),
+            Question("Jaki teoretyczny zasięg mam przy antenach 5 dBi?"),
+            Question("Ile trwa wysłanie wiadomości 100 znaków?"),
+            Question("Jaka jest strefa Fresnela na 15 km?"),
+            Question("Jak daleko sięga radio z masztu 40 m?"),
+            Question("Jakie EIRP przy 22 dBm i antenie 6 dBi?"),
+            Question("Policz 12*7+3"),
+            Question("What length should a 433 MHz dipole be?"),
+            Question("Ktoś mnie słabo słyszy, jak poprawić zasięg?"),
         )
 }

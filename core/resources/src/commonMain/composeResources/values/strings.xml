@@ -77,10 +77,6 @@
     <string name="ai_ago_h">%1$d h ago</string>
     <string name="ai_ago_min">%1$d min ago</string>
     <string name="ai_ago_now">just now</string>
-    <string name="ai_antenna">For %1$s MHz the wavelength is %2$s cm.
-• Quarter-wave antenna: about %3$s cm
-• Half-wave dipole: about %4$s cm in total, two arms of about %5$s cm
-The lengths are already shortened by about 5% for a wire element; fine-tune them with an SWR meter.</string>
     <string name="ai_assistant_summary">Chat with an AI assistant without internet. Experimental, off by default.</string>
     <string name="ai_assistant_title">Offline assistant</string>
     <string name="ai_assistant_unavailable">The assistant will be available once the Gemma model engine is added in an upcoming version.</string>
