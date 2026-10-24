@@ -360,7 +360,10 @@ antenna_substrate
 antenna_swr
 antenna_tools_section
 antenna_turns
+antenna_tx_ours
 antenna_tx_power
+antenna_tx_radio
+antenna_tx_radio_region
 antenna_type
 antenna_type_biquad
 antenna_type_coax_stub
