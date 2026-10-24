@@ -235,6 +235,8 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                                                 AssistantExport.text(entries, you, assistant).encodeToByteArray()
                                             ExportFormat.HTML ->
                                                 AssistantExport.html(entries, title, stamp, you, assistant).encodeToByteArray()
+                                            ExportFormat.JSON ->
+                                                AssistantExport.json(entries, title, stamp).encodeToByteArray()
                                         }
                                     pendingBytes = bytes
                                     saveResult = null

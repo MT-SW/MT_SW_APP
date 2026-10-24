@@ -137,7 +137,12 @@ fun DebugScreen(onNavigateUp: () -> Unit, viewModel: DebugViewModel) {
         }
     }
     // Prepare a document creator for exporting logs
-    val exportLogsLauncher = rememberLogExporter { buildString { formatLogsTo(this, viewModel.loadLogsForExport()) } }
+    val exportLogsLauncher =
+        rememberLogExporters(
+            text = { buildString { formatLogsTo(this, viewModel.loadLogsForExport()) } },
+            json = { logsToJson(viewModel.loadLogsForExport()) },
+        )
+    var showExportFormat by rememberSaveable { mutableStateOf(false) }
     // The export exists so users can attach it to a public issue, so state what it contains before writing it.
     var showExportWarning by rememberSaveable { mutableStateOf(false) }
     if (showExportWarning) {
@@ -146,9 +151,22 @@ fun DebugScreen(onNavigateUp: () -> Unit, viewModel: DebugViewModel) {
             messageRes = Res.string.debug_logs_export_warning,
             onConfirm = {
                 showExportWarning = false
-                exportLogsLauncher(timestampedExportName("meshtastic_debug"))
+                showExportFormat = true
             },
             onDismiss = { showExportWarning = false },
+        )
+    }
+    if (showExportFormat) {
+        LogFormatDialog(
+            onText = {
+                showExportFormat = false
+                exportLogsLauncher.text(timestampedExportName("meshtastic_debug"))
+            },
+            onJson = {
+                showExportFormat = false
+                exportLogsLauncher.json(timestampedExportName("meshtastic_debug", ".json"))
+            },
+            onDismiss = { showExportFormat = false },
         )
     }
 

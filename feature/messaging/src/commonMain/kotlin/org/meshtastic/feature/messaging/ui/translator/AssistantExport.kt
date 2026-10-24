@@ -17,6 +17,7 @@
 package org.meshtastic.feature.messaging.ui.translator
 
 import kotlin.math.roundToLong
+import org.meshtastic.core.ui.util.JsonText
 import org.meshtastic.core.ui.util.PdfFile
 import org.meshtastic.core.ui.util.PdfText
 import org.meshtastic.feature.messaging.translation.AssistantActions
@@ -31,6 +32,7 @@ enum class ExportFormat(val label: String, val extension: String, val mime: Stri
     MARKDOWN("Markdown", ".md", "text/markdown"),
     TEXT("TXT", ".txt", "text/plain"),
     HTML("HTML", ".html", "text/html"),
+    JSON("JSON", ".json", "application/json"),
 }
 
 /** Turns the conversation into plain text, Markdown, HTML or a PDF that looks like the chat. */
@@ -53,6 +55,27 @@ object AssistantExport {
             e.buttons.forEach { append("\n[").append(it).append("]") }
         }
     }
+
+    /**
+     * The conversation as structured data, the easiest form for a program (or a reviewer) to read: who said what, in
+     * order, with the web note and the buttons of each answer, and the whole text exactly as written.
+     */
+    fun json(entries: List<ExportEntry>, title: String, stamp: String): String =
+        buildString {
+            append("{\n  \"title\": ").append(q(title)).append(",\n  \"saved\": ").append(q(stamp))
+            append(",\n  \"messages\": [")
+            entries.forEachIndexed { i, e ->
+                append(if (i == 0) "\n" else ",\n")
+                append("    {\"n\": ").append(i + 1).append(", \"role\": ").append(q(if (e.fromUser) "user" else "assistant"))
+                append(", \"text\": ").append(q(e.text))
+                e.note?.let { append(", \"web\": ").append(q(it)) }
+                if (e.buttons.isNotEmpty()) append(", \"buttons\": [").append(e.buttons.joinToString(", ") { q(it) }).append("]")
+                append("}")
+            }
+            append(if (entries.isEmpty()) "]\n}\n" else "\n  ]\n}\n")
+        }
+
+    private fun q(s: String): String = JsonText.quote(s)
 
     fun markdown(entries: List<ExportEntry>, title: String, stamp: String, you: String, assistant: String): String =
         buildString {

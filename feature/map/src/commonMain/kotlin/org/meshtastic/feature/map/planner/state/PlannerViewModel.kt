@@ -44,6 +44,7 @@ import org.meshtastic.feature.map.planner.data.PlannerElevationSource
 import org.meshtastic.feature.map.planner.data.PlannerWeatherSource
 import org.meshtastic.feature.map.planner.export.PlannerCsv
 import org.meshtastic.feature.map.planner.export.PlannerGeoJson
+import org.meshtastic.feature.map.planner.export.PlannerJson
 import org.meshtastic.feature.map.planner.export.PlannerKml
 import org.meshtastic.feature.map.planner.export.PlannerPdf
 import org.meshtastic.feature.map.planner.export.PlannerProfileImage
@@ -436,6 +437,12 @@ class PlannerViewModel(
     suspend fun exportKml(strings: PlannerReportStrings): String {
         val report = buildReport(strings)
         return withContext(Dispatchers.Default) { PlannerKml.render(report) }
+    }
+
+    /** Everything of the report as plain data (sections, profile columns, points, coverage cells). */
+    suspend fun exportJson(strings: PlannerReportStrings): String {
+        val report = buildReport(strings)
+        return withContext(Dispatchers.Default) { PlannerJson.render(report) }
     }
 
     suspend fun exportGeoJson(strings: PlannerReportStrings): String {

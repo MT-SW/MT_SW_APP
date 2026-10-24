@@ -57,3 +57,41 @@ fun rememberLogExporter(contentProvider: suspend () -> String): (fileName: Strin
         }
     }
 }
+
+/** Saves the same logs as text or as JSON; see [rememberLogExporters]. */
+class LogExporters(val text: (fileName: String) -> Unit, val json: (fileName: String) -> Unit)
+
+/** Like [rememberLogExporter], with a second provider for a JSON file (the form a program reads most easily). */
+@Composable
+fun rememberLogExporters(text: suspend () -> String, json: suspend () -> String): LogExporters {
+    val showToast = rememberShowToast()
+    var requestedFileName by rememberSaveable { mutableStateOf("") }
+    var asJson by remember { mutableStateOf(false) }
+    val export =
+        rememberFileExporter(
+            content = { (if (asJson) json() else text()).takeIf { it.isNotBlank() }?.encodeToByteArray() },
+            onResult = { exported ->
+                showToast(
+                    if (exported) {
+                        getStringSuspend(Res.string.debug_logs_exported)
+                    } else {
+                        getStringSuspend(Res.string.debug_export_failed, requestedFileName)
+                    },
+                )
+            },
+        )
+    return remember(export) {
+        LogExporters(
+            text = { fileName ->
+                requestedFileName = fileName
+                asJson = false
+                export(fileName, "text/plain")
+            },
+            json = { fileName ->
+                requestedFileName = fileName
+                asJson = true
+                export(fileName, "application/json")
+            },
+        )
+    }
+}
