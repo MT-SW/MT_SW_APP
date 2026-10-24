@@ -50,7 +50,7 @@ Linie błędów i ostrzeżeń są podkolorowane, aby problemy rzucały się w oc
 
 ## Eksportowanie
 
-Dotknij ikony **pobierania**, aby zapisać bieżące dzienniki do pliku. Aplikacja najpierw pokazuje ostrzeżenie o zawartości pliku — potwierdź je, a następnie wybierz miejsce zapisu w systemowym selektorze plików. Plik ma w nazwie znacznik czasu (na przykład `meshtastic_logcat_20260701_143312.txt`), więc kolejne eksporty nigdy się nie nadpisują. To samo ostrzeżenie chroni eksport z zakładki **Pakiety**.
+Dotknij ikony **pobierania**, aby zapisać bieżące dzienniki do pliku. Aplikacja najpierw pokazuje ostrzeżenie o zawartości pliku — potwierdź je, a następnie wybierz miejsce zapisu w systemowym selektorze plików. Plik ma w nazwie znacznik czasu (na przykład `meshtastic_logcat_20260701_143312.txt`), więc kolejne eksporty nigdy się nie nadpisują. To samo ostrzeżenie chroni eksport z zakładki **Pakiety**. Po ostrzeżeniu aplikacja pyta o format: tekst albo JSON (te same dane, bez kluczy i haseł, w uporządkowanej formie), dla logów pakietów, logów urządzenia i logcata.
 
 Dołącz ten plik do zgłoszenia na GitHubie.
 

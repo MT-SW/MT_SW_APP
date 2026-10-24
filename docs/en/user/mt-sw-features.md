@@ -82,7 +82,7 @@ The planner simulates the range of a radio link between two points, **A** and **
 - **Live weather** — optionally includes propagation conditions from the current weather (Open-Meteo).
 - **Range all around** — draws the coverage as a coloured raster on the map, with an opacity slider.
 - **Comparison with a measurement** — the result can be compared with the last measured SNR and RSSI.
-- **Export** to PDF, CSV, KML, GeoJSON and PNG.
+- **Export** to PDF, CSV, KML, GeoJSON, JSON (all the data of the report: sections, terrain profile, points and coverage cells) and PNG.
 
 The planner is opened with the **Planner** button in the node details, next to the compass.
 
@@ -156,7 +156,7 @@ On weaker devices large models can slow the app down or close it, which is why e
 
 **Assistant test.** Type `/test` in the assistant and send it: the assistant asks itself about 50 test questions (with a real node and channel name from your network) and shows the questions and answers in the chat, and at the end a full report with answer times and the model used, which can be copied (press and hold the bubble). On a computer the report is also saved to `assistant-test-results.md`. This way answer quality can be compared across devices and models. Nothing opens by itself during the test; the "Stop" button ends it.
 
-**Copying the conversation.** Above the chat there is a "Copy whole conversation" button: it copies all questions and answers (including the names of the redirect buttons) to the clipboard, e.g. to paste into a message when reporting a problem. Next to it is "Save conversation…": it saves the conversation to a file in the format you choose — PDF (looks like the chat, best for showing someone the whole thing), Markdown, TXT or HTML. A single bubble is copied by pressing and holding it.
+**Copying the conversation.** Above the chat there is a "Copy whole conversation" button: it copies all questions and answers (including the names of the redirect buttons) to the clipboard, e.g. to paste into a message when reporting a problem. Next to it is "Save conversation…": it saves the conversation to a file in the format you choose — PDF (looks like the chat, best for showing someone the whole thing), Markdown, TXT, HTML or JSON (the data in a structured form, the easiest for a program to read). A single bubble is copied by pressing and holding it.
 
 **Calculations.** The assistant does not guess numbers: the app works them out. Ask in any words, e.g. "how long is a 433 MHz dipole", "27 dBm in mW", "EIRP at 22 dBm with a 6 dBi antenna", "Fresnel zone for 15 km", "how far does a radio on a 40 m mast reach", "theoretical range on Narrow Fast", "how long does sending a 100-character message take" or "calculate 12*7+3". When you give no frequency, preset or power, it takes them from your radio or our network and says so. For weak range it checks your radio's settings and reception and suggests what to improve.
 
