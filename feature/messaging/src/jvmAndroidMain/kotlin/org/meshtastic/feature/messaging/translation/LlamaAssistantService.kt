@@ -392,7 +392,7 @@ class LlamaAssistantService(
                         knowledge?.lookup(listOf(question, intent.text, button?.label.orEmpty()).joinToString(" ").trim(), MANUAL_CHARS, answerLang).orEmpty()
                     }
                 val excerpt =
-                    if (wantsNews) wholeLines(manual) else bestLines(manual, button?.label.orEmpty(), "${intent.text} ${button?.label.orEmpty()}", question, polish)
+                    if (wantsNews) wholeLines(manual) else bestLines(manual, button?.label.orEmpty(), "${intent.text} ${button?.label.orEmpty()}", question, polish, oneSetting = button?.highlight?.isNotBlank() == true)
                 if (excerpt.isNotBlank() || button != null) {
                     val text = buildString {
                         if (wantsNews) {
@@ -429,6 +429,9 @@ class LlamaAssistantService(
                 speak(modelId, history, polish, onPiece, room, extra = extra, temperature = FACT_TEMPERATURE)
             }
             "web_question" -> {
+                // A question our own verified facts answer (the 868 MHz rules, our network's settings) gets that fact,
+                // word for word: the small model retold it with wrong numbers.
+                knowledge?.coreFacts(if (polish) "pl" else "en")?.let { coreFact(it, question) }?.let { return it.also(onPiece) }
                 val found =
                     if (uiPrefs.assistantInternetEnabled.value) webTools.web_search(intent.text.ifBlank { question }.take(WEB_QUERY_CHARS)) else ""
                 val extra = if (found.isBlank()) "" else rule(polish, WEB_PL, WEB_EN) + "\n" + found
@@ -589,7 +592,7 @@ class LlamaAssistantService(
      * names the setting exactly ([label]) wins. Pages of other MT_SW parts, the change list, untranslated pages and
      * tables are skipped. When nothing fits well enough the result is empty: no quote is better than a wrong one.
      */
-    private fun bestLines(fragment: String, label: String, strong: String, question: String, polish: Boolean): String {
+    private fun bestLines(fragment: String, label: String, strong: String, question: String, polish: Boolean, oneSetting: Boolean = false): String {
         class Line(val title: String, val text: String, val score: Int)
         val wanted = label.lowercase().trim()
         val strongTerms = stems(strong)
@@ -625,6 +628,9 @@ class LlamaAssistantService(
             val score = strongHits * 2 + weakHits + (if (exact) LABEL_SCORE else 0) + (if (headed) LABEL_SCORE else 0)
             found += Line(title, line, score)
         }
+        // A single setting ("change the region") is answered by where it is and the blinking; a whole chapter is guessed
+        // only for a screen or a topic ("what is MT_SW features", "how do I update the firmware").
+        if (found.isEmpty() && oneSetting) return ""
         if (found.isEmpty()) return sectionStart(fragment, stems(label), stems("$strong $question") - STOP_STEMS, question, strong, polish)
         // A part of the manual whose heading names the setting is the right place; others only when there is none.
         val titled = found.filter { line -> labelStems.size >= 2 && stems(line.title).containsAll(labelStems) }
@@ -700,9 +706,13 @@ class LlamaAssistantService(
 
     /** True when every number of 2+ digits in [answer] also stands in [source] (written with a dot or a comma). */
     private fun numbersBacked(answer: String, source: String): Boolean {
-        fun numbers(text: String) = NUMBER.findAll(text).map { it.value.replace(',', '.').trimEnd('0').trimEnd('.') }.toSet()
+        fun clean(v: String) = v.replace(',', '.').let { if ('.' in it) it.trimEnd('0').trimEnd('.') else it }
+        fun numbers(text: String) = NUMBER.findAll(text).map { clean(it.value) }.toSet()
+        fun withUnits(text: String) = NUMBER_UNIT.findAll(text).map { clean(it.groupValues[1]) + it.groupValues[2].lowercase() }.toSet()
         val known = numbers(source)
-        return numbers(answer).filter { it.replace(".", "").length >= 2 }.all { it in known }
+        val knownUnits = withUnits(source)
+        return numbers(answer).filter { it.replace(".", "").length >= 2 }.all { it in known } &&
+            withUnits(answer).filter { it.takeWhile { c -> c.isDigit() || c == '.' }.replace(".", "").length >= 2 }.all { it in knownUnits }
     }
 
     /** The line of our own verified facts that fits the question best (two or more shared words or numbers), or null. */
@@ -880,6 +890,7 @@ class LlamaAssistantService(
         /** Web answers keep closest to the results: the small model garbled numbers at higher randomness. */
         const val WEB_TEMPERATURE = 0.1f
         val NUMBER = Regex("\\d+(?:[.,]\\d+)?")
+        val NUMBER_UNIT = Regex("(\\d+(?:[.,]\\d+)?)\\s?(mw|w|dbm|dbi|db|mhz|ghz|khz|km|m|%)(?![\\p{L}])", RegexOption.IGNORE_CASE)
         const val MIN_QUOTE = 25
         const val MAX_QUOTE = 400
         const val QUOTE_WORDS = 6
