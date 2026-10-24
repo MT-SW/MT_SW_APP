@@ -63,7 +63,7 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
             buildString {
                 if (notes.isNotBlank()) append("Notes about the user: ").append(notes.take(NOTES_CHARS).replace('\n', ' ')).append('\n')
                 if (lastNode.isNotBlank()) append("Last node talked about: ").append(lastNode.take(LAST_NODE_CHARS)).append('\n')
-                if (conversation.isNotBlank()) append("Conversation so far:\n").append(conversation)
+                if (conversation.isNotBlank()) append("Conversation so far:\n").append(conversation.takeLast(CONVERSATION_CHARS))
                 append("Question: ").append(question.take(QUESTION_CHARS))
             }
         val raw =
@@ -120,6 +120,7 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
         private const val MAX_TOKENS = 70
         private const val TEMPERATURE = 0.05f
         private const val NOTES_CHARS = 500
+        private const val CONVERSATION_CHARS = 3500
         private const val LAST_NODE_CHARS = 60
         private const val QUESTION_CHARS = 600
         private const val LOG_CHARS = 300

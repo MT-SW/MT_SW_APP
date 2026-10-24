@@ -117,6 +117,13 @@ class LlamaAssistantService(
 
     // How the router understood the newest question, for the test report.
     @Volatile private var lastRoute = ""
+    // The whole conversation as the router sees it: older turns are folded into a short summary (a few at a time), the
+    // newest ones stay as short lines, so the assistant keeps the thread of a long conversation, not only the last
+    // sentences.
+    private var convKey = ""
+    private var convSummary = ""
+    private var convFolded = 0
+
     // The node talked about last in this conversation, so "a jaka jest tam bateria?" knows which node "tam" is.
     @Volatile private var lastNode = ""
 
@@ -192,6 +199,8 @@ class LlamaAssistantService(
         collector.drain()
         webTools.reset()
 
+        foldConversation(modelId, history.dropLast(1))
+
         // Two questions in one ("how many nodes are there and how do I change my role?"): each is answered on its own.
         val parts = splitQuestion(question)
         val answer =
@@ -260,15 +269,43 @@ class LlamaAssistantService(
      */
     private fun conversationDigest(turns: List<AssistantTurn>, extraUser: String): String {
         val lines = ArrayList<String>()
-        turns.filter { it.text.isNotBlank() }.takeLast(DIGEST_TURNS).forEach {
-            val text = AssistantActions.strip(it.text).replace('\n', ' ').trim()
-            if (text.isNotEmpty()) {
-                lines += (if (it.fromUser) "User: " else "Assistant: ") + text.take(if (it.fromUser) DIGEST_USER_CHARS else DIGEST_ANSWER_CHARS)
-            }
+        if (convSummary.isNotBlank()) lines += "Earlier in this conversation: " + convSummary.replace('\n', ' ')
+        cleanTurns(turns).drop(convFolded).takeLast(DIGEST_MAX_TURNS).forEach {
+            val text = it.text.replace('\n', ' ').trim()
+            lines += (if (it.fromUser) "User: " else "Assistant: ") + text.take(if (it.fromUser) DIGEST_USER_CHARS else DIGEST_ANSWER_CHARS)
         }
         val lastUser = turns.lastOrNull { it.fromUser }?.text.orEmpty()
         if (extraUser.isNotBlank() && extraUser != lastUser) lines += "User: " + extraUser.take(DIGEST_USER_CHARS)
         return lines.joinToString("\n", postfix = if (lines.isEmpty()) "" else "\n")
+    }
+
+    /** The turns with text, without the buttons and internet notes the answers carry. */
+    private fun cleanTurns(turns: List<AssistantTurn>): List<AssistantTurn> =
+        turns.map { it.copy(text = AssistantActions.strip(it.text)) }.filter { it.text.isNotBlank() }
+
+    /**
+     * Keeps [convSummary] up to date: when enough turns have fallen out of the newest [DIGEST_TURNS], they are folded
+     * into the summary by the model. Without a summary (the model failed) the turns simply stay in the digest.
+     */
+    private suspend fun foldConversation(modelId: String, prior: List<AssistantTurn>) {
+        val turns = cleanTurns(prior)
+        val key = turns.firstOrNull()?.text.orEmpty()
+        if (key != convKey) {
+            convKey = key
+            convSummary = ""
+            convFolded = 0
+        }
+        val older = (turns.size - DIGEST_TURNS).coerceAtLeast(0)
+        if (convFolded > older) {
+            convSummary = ""
+            convFolded = 0
+        }
+        if (older - convFolded >= FOLD_BATCH) {
+            summarize(modelId, convSummary, turns.subList(convFolded, older))?.let {
+                convSummary = it
+                convFolded = older
+            }
+        }
     }
 
     /**
@@ -974,7 +1011,9 @@ class LlamaAssistantService(
         val COMMAND_INTENTS = setOf("show_setting", "open_screen")
         val NODE_INTENTS = setOf("show_node_on_map", "open_link_planner", "traceroute", "neighbors")
         val POINTS_AT_NODE = Regex("(?<![\\p{L}])(tam|tego|ten|tym|jego|jej|nim|niego|it|there|that|its)(?![\\p{L}])")
-        const val DIGEST_TURNS = 6
+        const val DIGEST_TURNS = 10
+        const val DIGEST_MAX_TURNS = 30
+        const val FOLD_BATCH = 4
         const val DIGEST_USER_CHARS = 140
         const val DIGEST_ANSWER_CHARS = 110
         const val ROUTER_NOTES_CHARS = 500
