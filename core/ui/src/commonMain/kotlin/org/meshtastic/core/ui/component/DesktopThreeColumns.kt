@@ -128,7 +128,10 @@ private class ThreeColumnScene(
     override val previousEntries: List<NavEntry<NavKey>>,
     private val widths: ThreeColumnWidths,
 ) : Scene<NavKey> {
-    override val key: Any = Triple(list.contentKey, detail.contentKey, extra.contentKey)
+    // The same key as the library's own list-detail scene (its default scene key): when the window changes between two
+    // and three columns the navigation host then swaps the content in place. A different key would show both scenes
+    // for a moment, and the same screen cannot be shown twice ("Key ... was used multiple times").
+    override val key: Any = Unit
     override val entries: List<NavEntry<NavKey>> = listOf(list, detail, extra)
     override val content: @Composable () -> Unit = { ThreeColumns(list, detail, extra, widths) }
 
