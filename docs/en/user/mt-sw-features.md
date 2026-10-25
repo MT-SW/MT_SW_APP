@@ -119,7 +119,7 @@ The **Sniffer** screen (Settings → Advanced) shows network traffic live, inclu
 
 ## Extra telemetry (local statistics)
 
-In **Settings → Modules → Telemetry** there is a **Local statistics** card. It works from MT_SW_FIRMWARE v3; on an older one the card is visible but nothing in it reacts, and a note says from which version it works. It has two switches — **Extra telemetry** and **Extended extra telemetry** — and a separate interval for each. Under each switch a note says what goes into the packet: extra telemetry carries the node counts, traffic, channel load, uptime and noise level, extended extra telemetry the processor and memory use (heap, flash, PSRAM).
+In **Settings → Modules → Telemetry** there is a **Local statistics** card. It works from MT_SW_FIRMWARE v3; on an older one the card is visible but nothing in it reacts, and a note says from which version it works. It has two switches — **Extra telemetry** and **Extended extra telemetry** — and a separate interval for each. Under each switch a note says what goes into the packet: extra telemetry carries the node counts, traffic, channel load, uptime and noise level, extended extra telemetry the processor and memory use (RAM — heap, flash, PSRAM, shown as percent) and the Wi-Fi signal strength.
 
 - **The shortest interval is 2 hours.**
 - **Both options are saved together** with the usual bottom save bar, together with the other telemetry settings. The app first reads the current state from the node, so changing one option leaves the other as it was. After saving it shows what the node really stored (it may correct the intervals); if the node does not confirm, you get a message.

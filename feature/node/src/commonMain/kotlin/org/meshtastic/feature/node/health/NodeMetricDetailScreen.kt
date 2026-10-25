@@ -396,7 +396,7 @@ private fun formatSeriesValue(seriesLabel: String, value: Float): String = when 
 
     "CPU" -> MetricFormatter.percent(value, decimalPlaces = 0)
 
-    "Heap",
+    "RAM",
     "Flash",
     "PSRAM",
     -> MetricFormatter.percent(value, decimalPlaces = 1)

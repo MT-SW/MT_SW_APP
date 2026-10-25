@@ -537,7 +537,7 @@ internal fun NetworkHealthMetric.seriesLabels(): List<String> = when (this) {
     NetworkHealthMetric.ETHER -> listOf("Ch. Util", "Air Util")
     NetworkHealthMetric.ENVIRONMENT -> listOf("Temperatura", "Wilgotność", "Ciśnienie")
     NetworkHealthMetric.TRAFFIC -> listOf("TX", "RX", "Duplikaty", "Przekazane", "Uszkodzone")
-    NetworkHealthMetric.RESOURCES -> listOf("CPU", "Heap", "Flash", "PSRAM")
+    NetworkHealthMetric.RESOURCES -> listOf("CPU", "RAM", "Flash", "PSRAM")
     else -> listOf(label)
 }
 
@@ -554,7 +554,7 @@ internal fun NetworkHealthMetric.seriesGroups(): List<List<String>> = when (this
     NetworkHealthMetric.ETHER -> listOf(listOf("Ch. Util", "Air Util"))
     NetworkHealthMetric.ENVIRONMENT -> listOf(listOf("Temperatura", "Wilgotność"), listOf("Ciśnienie"))
     NetworkHealthMetric.TRAFFIC -> listOf(listOf("TX", "RX"), listOf("Duplikaty", "Przekazane", "Uszkodzone"))
-    NetworkHealthMetric.RESOURCES -> listOf(listOf("CPU", "Heap"), listOf("Flash", "PSRAM"))
+    NetworkHealthMetric.RESOURCES -> listOf(listOf("CPU", "RAM"), listOf("Flash", "PSRAM"))
     else -> listOf(listOf(label))
 }
 
@@ -609,7 +609,7 @@ internal fun NetworkHealthMetric.historySeriesValue(
     NetworkHealthMetric.RESOURCES ->
         when (seriesLabel) {
             "CPU" -> entry.cpuUsagePercent?.toFloat()
-            "Heap" -> entry.heapUsedPercent
+            "RAM" -> entry.heapUsedPercent
             "Flash" -> entry.flashUsedPercent
             "PSRAM" -> entry.psramUsedPercent
             else -> null

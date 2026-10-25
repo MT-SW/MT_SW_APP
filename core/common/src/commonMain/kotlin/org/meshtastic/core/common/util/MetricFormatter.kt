@@ -53,6 +53,10 @@ object MetricFormatter {
 
     fun percent(value: Int): String = "$value%"
 
+    /** How much of [total] is taken by [used], as a whole percent ("45%"); empty when [total] is not positive. */
+    fun usedPercent(used: Long, total: Long): String =
+        if (total > 0) percent((used.coerceIn(0L, total) * PERCENT_SCALE / total).toFloat(), 0) else ""
+
     fun humidity(value: Float): String = percent(value, 0)
 
     fun pressure(hPa: Float, decimalPlaces: Int = 1): String = "${NumberFormatter.format(hPa, decimalPlaces)} hPa"
@@ -109,3 +113,4 @@ private const val MPH_PER_MPS = 2.23694f
 private const val KPH_PER_MPS = 3.6f
 private const val MM_PER_INCH = 25.4f
 private const val LBS_PER_KG = 2.20462f
+private const val PERCENT_SCALE = 100f

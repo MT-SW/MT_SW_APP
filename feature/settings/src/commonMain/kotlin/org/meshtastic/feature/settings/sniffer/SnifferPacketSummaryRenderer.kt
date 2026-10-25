@@ -155,7 +155,7 @@ private fun renderLocalStatsSummary(summary: PacketSummary.LocalStatsSummary): S
         val heapFree = summary.heapFreeBytes
         val heapTotal = summary.heapTotalBytes
         if (heapFree != null && heapTotal != null) {
-            add("$heapLabel ${formatBytesShort((heapTotal - heapFree).coerceAtLeast(0).toLong())}/${formatBytesShort(heapTotal.toLong())}")
+            add("$heapLabel ${formatBytesShort((heapTotal - heapFree).coerceAtLeast(0).toLong())}/${formatBytesShort(heapTotal.toLong())} (${MetricFormatter.usedPercent((heapTotal - heapFree).toLong(), heapTotal.toLong())})")
         }
         summary.channelUtilizationPercent?.let { add("$chUtilLabel ${MetricFormatter.percent(it)}") }
         summary.airUtilTxPercent?.let { add("$airUtilLabel ${MetricFormatter.percent(it)}") }

@@ -192,7 +192,7 @@
     <string name="ai_privacy">Everything is processed locally on this device. Once a model is downloaded, no texts or conversations are sent to the internet. The internet is only needed for the one-time model download.</string>
     <string name="ai_private_chat">private chat</string>
     <string name="ai_radio_ext">processor %1$s %, flash used %2$s %</string>
-    <string name="ai_radio_heap">memory (heap) used %1$s % (%2$s of %3$s kB)</string>
+    <string name="ai_radio_heap">RAM used %1$s % (%2$s of %3$s kB)</string>
     <string name="ai_radio_nodes">nodes online %1$s of %2$s</string>
     <string name="ai_radio_noise">noise floor %1$s dBm</string>
     <string name="ai_radio_none">There are no statistics from your radio yet.</string>
@@ -1505,12 +1505,12 @@
     <string name="local_stats_diagnostics_prefix">Diagnostics: %1$s</string>
     <string name="local_stats_dropped">Dropped %1$d</string>
     <string name="local_stats_ext_enabled">Extended extra telemetry</string>
-    <string name="local_stats_ext_enabled_desc">In the packet: processor (CPU) load and memory use — heap, flash and PSRAM.</string>
+    <string name="local_stats_ext_enabled_desc">In the packet: processor (CPU) load, memory use — RAM (heap), flash and PSRAM — and Wi-Fi signal strength.</string>
     <string name="local_stats_ext_interval">Extended extra telemetry interval</string>
     <string name="local_stats_flash">Flash</string>
     <string name="local_stats_flash_description">Percentage of flash storage used</string>
-    <string name="local_stats_heap">Heap</string>
-    <string name="local_stats_heap_description">Percentage of device heap memory used</string>
+    <string name="local_stats_heap">RAM</string>
+    <string name="local_stats_heap_description">Percentage of device RAM (heap) used</string>
     <string name="local_stats_heap_value">%1$d / %2$d</string>
     <string name="local_stats_heap_value_kb">%1$s / %2$s kB</string>
     <string name="local_stats_needs_v3">This works from MT_SW_FIRMWARE v3. The connected node has an older version or has not reported one, so these settings cannot be changed.</string>
@@ -2184,9 +2184,9 @@
     <string name="on_demand_flood_counter">Flood Counter</string>
     <string name="on_demand_fw_plus_version">MT_SW Firmware Version</string>
     <string name="on_demand_fw_plus_version_desc">Version of the on-demand diagnostics protocol running on this node.</string>
-    <string name="on_demand_heap_free">Heap Free</string>
-    <string name="on_demand_heap_total">Heap Total</string>
-    <string name="on_demand_heap_used">Heap Used</string>
+    <string name="on_demand_heap_free">RAM free</string>
+    <string name="on_demand_heap_total">RAM total</string>
+    <string name="on_demand_heap_used">RAM used</string>
     <string name="on_demand_hero_hint">Ask the node how it is doing. Answers arrive after a moment, and the last ones stay on screen.</string>
     <string name="on_demand_hero_progress">%1$d of %2$d checked</string>
     <string name="on_demand_hops">Hops</string>

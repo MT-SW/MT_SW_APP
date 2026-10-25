@@ -1254,8 +1254,8 @@
     <string name="local_stats_dropped">Odrzucone %1$d</string>
     <string name="local_stats_flash">Flash</string>
     <string name="local_stats_flash_description">Procent zajętej pamięci flash</string>
-    <string name="local_stats_heap">Heap</string>
-    <string name="local_stats_heap_description">Procent zajętej pamięci sterty urządzenia</string>
+    <string name="local_stats_heap">RAM</string>
+    <string name="local_stats_heap_description">Procent zajętej pamięci RAM (heap) urządzenia</string>
     <string name="local_stats_heap_value">%1$d / %2$d</string>
     <string name="local_stats_heap_value_kb">%1$s / %2$s kB</string>
     <string name="local_stats_nodes">Węzły: %1$d online / %2$d łącznie</string>
@@ -1634,10 +1634,10 @@
     <string name="on_demand_stat_nodes_online">Węzły online</string>
     <string name="on_demand_stat_nodes_total">Węzły łącznie</string>
     <string name="on_demand_reboots">Restarty</string>
-    <string name="on_demand_heap_free">Wolny heap</string>
-    <string name="on_demand_heap_used">Zajęty heap</string>
+    <string name="on_demand_heap_free">Wolny RAM</string>
+    <string name="on_demand_heap_used">Zajęty RAM</string>
     <string name="lora_override_duty_cycle_summary">Ignoruje limit czasu nadawania obowiązujący w regionie (cykl pracy, duty cycle). Radio nadaje wtedy tyle, ile chce, co obciąża kanał wszystkim wokół.\n\nUWAGA!!! WŁĄCZENIE TEJ OPCJI ŁAMIE PRZEPISY W WIĘKSZOŚCI REGIONÓW!!! WŁĄCZAJ JĄ TYLKO TAM, GDZIE PRZEPISY NA TO POZWALAJĄ!!!</string>
-    <string name="on_demand_heap_total">Heap łącznie</string>
+    <string name="on_demand_heap_total">RAM łącznie</string>
     <string name="on_demand_cpu_usage">Użycie CPU</string>
     <string name="on_demand_flash">Flash</string>
     <string name="on_demand_psram">PSRAM</string>
@@ -2526,7 +2526,7 @@
     <string name="local_stats_basic_enabled_desc">W pakiecie: liczba węzłów online i łącznie, ruch (wysłane, odebrane, błędne, duplikaty, przekazane, odrzucone), obciążenie kanału i czas nadawania, czas pracy oraz poziom szumu.</string>
     <string name="local_stats_basic_interval">Interwał dodatkowej telemetrii</string>
     <string name="local_stats_ext_enabled">Rozszerzona dodatkowa telemetria</string>
-    <string name="local_stats_ext_enabled_desc">W pakiecie: zajęcie procesora (CPU) oraz pamięci — sterty (heap), flash i PSRAM.</string>
+    <string name="local_stats_ext_enabled_desc">W pakiecie: zajęcie procesora (CPU), pamięci — RAM (heap), flash i PSRAM — oraz siła sygnału Wi‑Fi.</string>
     <string name="local_stats_ext_interval">Interwał rozszerzonej telemetrii</string>
     <string name="local_stats_reading">Odczytuję ustawienia z węzła…</string>
     <string name="local_stats_save_failed">Węzeł nie potwierdził ustawień statystyk lokalnych.</string>
@@ -3192,7 +3192,7 @@
     <string name="ai_radio_packets">pakiety wysłane %1$s, odebrane %2$s, błędne %3$s, duplikaty %4$s</string>
     <string name="ai_radio_relay">przekazane dalej %1$s, przekazanie anulowane %2$s, odrzucone przy wysyłaniu %3$s</string>
     <string name="ai_radio_nodes">węzły online %1$s z %2$s</string>
-    <string name="ai_radio_heap">pamięć (heap) zajęta %1$s % (%2$s z %3$s kB)</string>
+    <string name="ai_radio_heap">RAM zajęty %1$s % (%2$s z %3$s kB)</string>
     <string name="ai_radio_noise">poziom szumu %1$s dBm</string>
     <string name="ai_radio_ext">procesor %1$s %, flash zajęty %2$s %</string>
     <string name="ai_radio_none">Brak jeszcze statystyk z Twojego radia.</string>

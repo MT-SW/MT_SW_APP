@@ -866,7 +866,7 @@ private fun UsageGauge(label: String, free: Int?, total: Int?) {
     val usedPercent = (total - free).coerceAtLeast(0) * PERCENT / total
     GaugeRow(
         label = label,
-        percentText = "${formatByteSize((total - free).toLong().coerceAtLeast(0))} / ${formatByteSize(total.toLong())}",
+        percentText = "${formatByteSize((total - free).toLong().coerceAtLeast(0))} / ${formatByteSize(total.toLong())} (${MetricFormatter.usedPercent((total - free).toLong(), total.toLong())})",
         fraction = usedPercent / PERCENT,
         color = usageLevelOf(usedPercent).color(),
     )
@@ -1249,14 +1249,15 @@ internal fun nodeStatsRows(stats: NodeStats): List<Pair<StringResource, String>>
     stats.num_total_nodes?.let { add(Res.string.on_demand_stat_nodes_total to "$it") }
     stats.reboots?.let { add(Res.string.on_demand_reboots to "$it") }
     stats.memory_free_cheap?.let { free ->
-        stats.memory_total?.let { total -> add(Res.string.on_demand_heap_used to formatByteSize((total - free).coerceAtLeast(0).toLong())) }
+        stats.memory_total?.let { total -> add(Res.string.on_demand_heap_used to (formatByteSize((total - free).coerceAtLeast(0).toLong()) + " (" + MetricFormatter.usedPercent((total - free).toLong(), total.toLong()) + ")")) }
     }
     stats.memory_total?.let { add(Res.string.on_demand_heap_total to formatByteSize(it.toLong())) }
     stats.cpu_usage_percent?.let { add(Res.string.on_demand_cpu_usage to "$it%") }
     if (stats.flash_used_bytes != null || stats.flash_total_bytes != null) {
         val used = stats.flash_used_bytes?.let { formatByteSize(it.toLong()) } ?: "?"
         val total = stats.flash_total_bytes?.let { formatByteSize(it.toLong()) } ?: "?"
-        add(Res.string.on_demand_flash to "$used / $total")
+        val share = MetricFormatter.usedPercent((stats.flash_used_bytes ?: 0).toLong(), (stats.flash_total_bytes ?: 0).toLong())
+        add(Res.string.on_demand_flash to "$used / $total" + if (share.isNotEmpty()) " ($share)" else "")
     }
     if (stats.memory_psram_free != null || stats.memory_psram_total != null) {
         val free =
@@ -1264,7 +1265,9 @@ internal fun nodeStatsRows(stats: NodeStats): List<Pair<StringResource, String>>
                 ?.let { f -> stats.memory_psram_total?.let { t -> formatByteSize((t - f).coerceAtLeast(0).toLong()) } }
                 ?: "?"
         val total = stats.memory_psram_total?.let { formatByteSize(it.toLong()) } ?: "?"
-        add(Res.string.on_demand_psram to "$free / $total")
+        val psramTotal = (stats.memory_psram_total ?: 0).toLong()
+        val share = MetricFormatter.usedPercent(psramTotal - (stats.memory_psram_free ?: 0), psramTotal)
+        add(Res.string.on_demand_psram to "$free / $total" + if (share.isNotEmpty()) " ($share)" else "")
     }
     stats.flood_counter?.let { add(Res.string.on_demand_flood_counter to "$it") }
     stats.nexthop_counter?.let { add(Res.string.on_demand_nexthop_counter to "$it") }

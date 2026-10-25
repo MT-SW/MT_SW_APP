@@ -287,7 +287,7 @@ class LocalStatsWidget :
                                 Res.string.local_stats_heap_value,
                                 (state.heapTotalBytes - state.heapFreeBytes).coerceAtLeast(0),
                                 state.heapTotalBytes,
-                            )
+                            ) + " (" + MetricFormatter.usedPercent((state.heapTotalBytes - state.heapFreeBytes).toLong(), state.heapTotalBytes.toLong()) + ")"
                         StatRow(stringResource(Res.string.local_stats_heap), heapValue, heapProgress, isSmall)
 
                         if (state.hasStatsExtended) {
@@ -308,7 +308,7 @@ class LocalStatsWidget :
                                             Res.string.local_stats_heap_value,
                                             (state.memoryPsramTotal - state.memoryPsramFree).coerceAtLeast(0),
                                             state.memoryPsramTotal,
-                                        ),
+                                        ) + " (" + MetricFormatter.usedPercent((state.memoryPsramTotal - state.memoryPsramFree).toLong(), state.memoryPsramTotal.toLong()) + ")",
                                         progress = psramProgress,
                                         isSmall = isSmall,
                                         modifier = GlanceModifier.defaultWeight().padding(start = 4.dp),
@@ -324,7 +324,7 @@ class LocalStatsWidget :
                                         Res.string.local_stats_heap_value,
                                         state.flashUsedBytes,
                                         state.flashTotalBytes,
-                                    ),
+                                    ) + " (" + MetricFormatter.usedPercent(state.flashUsedBytes.toLong(), state.flashTotalBytes.toLong()) + ")",
                                     progress = flashProgress,
                                     isSmall = isSmall,
                                 )

@@ -31,7 +31,7 @@ The **Meshtastic** widget displays the **connected node's** current local stats:
 - **Traffic** — packets transmitted / received, and duplicates seen
 - **Relays** — packets relayed and relay cancellations (shown when the node is relaying)
 - **Diagnostics** — a combined line carrying **Noise** (the background noise level in dBm), **Bad** (corrupt packets received), and **Dropped** (packets the node discarded). Bad and Dropped appear only once they are above zero, so a quiet node may show the noise reading alone
-- **Heap** — free versus total memory on the node, drawn as a bar
+- **RAM** — free versus total memory on the node, drawn as a bar
 - **Nodes** — how many nodes are online, out of the total known
 - **Uptime** — how long the node has been running since its last reboot, shown beside Nodes
 - **Updated** — the time the stats last refreshed, along the foot of the widget
