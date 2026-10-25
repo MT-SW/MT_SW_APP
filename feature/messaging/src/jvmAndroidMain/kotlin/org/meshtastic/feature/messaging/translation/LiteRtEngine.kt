@@ -305,6 +305,8 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
                 Logger.w(tag = TAG, throwable = e) {
                     "Backend $name not usable for $modelId: ${e.message}" + (e.cause?.let { " (cause: ${it.message})" } ?: "")
                 }
+                // The library's own message names no reason, so the log carries what is known about this computer.
+                if (name == "GPU") Logger.w(tag = TAG) { gpuFailureReport(file, cache, window, audio, e) }
             }
         }
         val ready = created ?: throw (failure ?: IllegalStateException("No backend could start"))
@@ -312,6 +314,60 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         loadedId = modelId
         loadedWithAudio = audio
         return ready
+    }
+
+    /** What the log gets when the graphics chip could not be used: the system, the model, the cache and the graphics cards. */
+    private fun gpuFailureReport(file: File, cache: File, window: Int, audio: Boolean, error: Exception): String =
+        buildString {
+            fun prop(key: String) = System.getProperty(key).orEmpty()
+            val runtime = Runtime.getRuntime()
+            val megabyte = 1024L * 1024L
+            appendLine("GPU could not be used; system report:")
+            appendLine("  System: ${prop("os.name")} ${prop("os.version")} ${prop("os.arch")}")
+            appendLine("  Java: ${prop("java.version")} (${prop("java.vendor")}), ${prop("java.vm.name")}")
+            appendLine(
+                "  Processors: ${runtime.availableProcessors()}, memory limit ${runtime.maxMemory() / megabyte} MB, " +
+                    "free ${runtime.freeMemory() / megabyte} MB",
+            )
+            appendLine("  Model: ${file.name}, ${file.length() / megabyte} MB, context $window tokens, hearing $audio")
+            val cached = runCatching { cache.walkTopDown().filter { it.isFile }.toList() }.getOrDefault(emptyList())
+            appendLine("  Cache folder: ${cached.size} files, ${cached.sumOf { it.length() } / megabyte} MB")
+            var cause: Throwable? = error
+            var depth = 0
+            while (cause != null && depth < MAX_CAUSE_DEPTH) {
+                appendLine("  Error ${depth + 1}: ${cause::class.simpleName}: ${cause.message?.lineSequence()?.firstOrNull().orEmpty()}")
+                cause = cause.cause
+                depth++
+            }
+            val cards = graphicsCards()
+            appendLine("  Graphics: " + (cards ?: "not available"))
+        }
+
+    /** The graphics cards the computer reports (desktop only), or null; the question to the system gives up after a few seconds. */
+    private fun graphicsCards(): String? {
+        if (System.getProperty("java.vendor").orEmpty().contains("Android")) return null
+        val os = System.getProperty("os.name").orEmpty().lowercase()
+        val command =
+            when {
+                os.contains("win") ->
+                    listOf(
+                        "powershell",
+                        "-NoProfile",
+                        "-Command",
+                        "Get-CimInstance Win32_VideoController | ForEach-Object { \$_.Name + ' | driver ' + \$_.DriverVersion + ' | ' + [math]::Round(\$_.AdapterRAM / 1MB) + ' MB' }",
+                    )
+                os.contains("mac") -> listOf("system_profiler", "SPDisplaysDataType")
+                else -> listOf("sh", "-c", "lspci 2>/dev/null | grep -iE 'vga|3d|display'")
+            }
+        return runCatching {
+            val process = ProcessBuilder(command).redirectErrorStream(true).start()
+            if (!process.waitFor(GRAPHICS_QUERY_SECONDS, java.util.concurrent.TimeUnit.SECONDS)) {
+                process.destroyForcibly()
+                return@runCatching null
+            }
+            process.inputStream.bufferedReader().readText().lines().map { it.trim() }.filter { it.isNotEmpty() }
+                .take(MAX_GRAPHICS_LINES).joinToString("; ")
+        }.getOrNull()?.ifBlank { null }
     }
 
     /** How many tokens (question, data and answer together) the model keeps in its window; bigger models get more. */
@@ -495,6 +551,9 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
 
     private companion object {
         const val TAG = "LiteRtEngine"
+        const val MAX_CAUSE_DEPTH = 5
+        const val GRAPHICS_QUERY_SECONDS = 5L
+        const val MAX_GRAPHICS_LINES = 12
         const val SYSTEM = "system"
         const val USER = "user"
         const val ASSISTANT = "assistant"
