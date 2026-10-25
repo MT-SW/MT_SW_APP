@@ -71,7 +71,13 @@ import org.meshtastic.core.model.antenna.Dim
 import org.meshtastic.core.model.antenna.DimKind
 import org.meshtastic.core.model.antenna.Insulation
 import org.meshtastic.core.model.antenna.Note
+import org.meshtastic.core.model.antenna.PlannerHandoff
 import org.meshtastic.core.model.antenna.Polarization
+import org.meshtastic.core.resources.antenna_planner_name
+import org.meshtastic.core.resources.antenna_use_in_planner
+import org.meshtastic.core.resources.planner_point_a
+import org.meshtastic.core.resources.planner_point_b
+import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.antenna_accuracy
 import org.meshtastic.core.resources.antenna_boom
@@ -379,6 +385,7 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
             )
         }
     }
+    val plannerName = stringResource(Res.string.antenna_planner_name)
     val applySetup: (AntennaSetup) -> Unit = { setup ->
         val i = setup.input
         freqText = numberText(i.mhz)
@@ -532,6 +539,15 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             SaveBar(makeReport)
+            UseInPlannerButton(
+                enabled = feed != null,
+                onUse = { toB ->
+                    currentSetup(loaded?.name ?: plannerName)?.let {
+                        PlannerHandoff.offer(it, toB)
+                        AssistantLinks.open("meshtastic://meshtastic/map")
+                    }
+                },
+            )
         }
     }
 }
@@ -591,6 +607,34 @@ private fun SetupsSection(
                 ) { Text(stringResource(Res.string.antenna_setup_save)) }
                 if (saved) Text(stringResource(Res.string.antenna_setup_saved), style = MaterialTheme.typography.bodySmall)
             }
+        }
+    }
+}
+
+/**
+ * "Use in the planner": the antenna with its feed line, power and gain goes to the chosen end of the link planner. It
+ * happens only when the user asks for it here; the planner opens with the antenna already filled in.
+ */
+@Composable
+private fun UseInPlannerButton(enabled: Boolean, onUse: (toB: Boolean) -> Unit) {
+    var menu by remember { mutableStateOf(false) }
+    Box {
+        TextButton(enabled = enabled, onClick = { menu = true }) { Text(stringResource(Res.string.antenna_use_in_planner)) }
+        DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(Res.string.planner_point_a)) },
+                onClick = {
+                    menu = false
+                    onUse(false)
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(Res.string.planner_point_b)) },
+                onClick = {
+                    menu = false
+                    onUse(true)
+                },
+            )
         }
     }
 }

@@ -61,3 +61,23 @@ object AntennaSetups {
 
     fun remove(list: List<AntennaSetup>, id: String): List<AntennaSetup> = list.filterNot { it.id == id }
 }
+
+/**
+ * An antenna the user chose in the calculator to use in the link planner ("Use in the planner"). It is taken once, when
+ * the planner opens, and applied to the chosen end ([sideIsB] false for A, true for B).
+ */
+object PlannerHandoff {
+    private var setup: AntennaSetup? = null
+    private var sideIsB: Boolean = false
+
+    /** True while an antenna waits for the planner. */
+    val pending: Boolean get() = setup != null
+
+    fun offer(value: AntennaSetup, toB: Boolean) {
+        setup = value
+        sideIsB = toB
+    }
+
+    /** The waiting antenna and whether it is for end B; it is forgotten once taken. */
+    fun consume(): Pair<AntennaSetup, Boolean>? = setup?.let { it to sideIsB }.also { setup = null }
+}

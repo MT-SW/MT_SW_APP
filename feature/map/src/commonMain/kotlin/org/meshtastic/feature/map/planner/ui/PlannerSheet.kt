@@ -57,6 +57,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import org.meshtastic.core.model.antenna.PlannerHandoff
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.planner_cancel
 import org.meshtastic.core.resources.planner_close
@@ -165,6 +166,17 @@ fun PlannerSheet(visible: Boolean, nodeNum: Int?, bridge: PlannerMapBridge, onDi
         onDispose {
             bridge.registerPickHandler(null)
             bridge.cancelPick()
+        }
+    }
+
+    // An antenna the user sent from the calculator ("Use in the planner") goes to the end the user chose.
+    LaunchedEffect(visible) {
+        if (visible) {
+            PlannerHandoff.consume()?.let { (setup, toB) ->
+                val side = if (toB) PlannerSide.B else PlannerSide.A
+                vm.selectSide(side)
+                vm.applyAntennaSetup(side, setup)
+            }
         }
     }
 

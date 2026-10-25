@@ -339,6 +339,7 @@ antenna_note_tune_swr
 antenna_note_yagi_boom
 antenna_note_yagi_driven
 antenna_open_calculator
+antenna_planner_name
 antenna_pol_circular
 antenna_pol_either
 antenna_pol_linear
@@ -389,6 +390,7 @@ antenna_type_moxon
 antenna_type_patch
 antenna_type_slim_jim
 antenna_type_yagi
+antenna_use_in_planner
 antenna_wavelength
 antenna_yagi_row
 any

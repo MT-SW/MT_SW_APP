@@ -360,6 +360,7 @@
     <string name="antenna_note_yagi_boom">Lengths of elements through a metal boom are lengthened; with elements insulated from the boom switch that off.</string>
     <string name="antenna_note_yagi_driven">The driven element is given as a plain dipole; in a Yagi its impedance drops, so a folded dipole or gamma match is usually used and tuned.</string>
     <string name="antenna_open_calculator">Antenna calculator</string>
+    <string name="antenna_planner_name">Antenna from the calculator</string>
     <string name="antenna_pol_circular">Polarisation: circular</string>
     <string name="antenna_pol_either">Polarisation: as mounted (vertical for our network)</string>
     <string name="antenna_pol_linear">Polarisation: linear (as mounted)</string>
@@ -410,6 +411,7 @@
     <string name="antenna_type_patch">Patch (on a PCB)</string>
     <string name="antenna_type_slim_jim">Slim Jim</string>
     <string name="antenna_type_yagi">Yagi-Uda</string>
+    <string name="antenna_use_in_planner">Use in the planner</string>
     <string name="antenna_wavelength">Wavelength λ: %1$s</string>
     <string name="antenna_yagi_row">%1$s: %2$s, at %3$s from the reflector</string>
     <string name="any">Any</string>

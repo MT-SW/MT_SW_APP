@@ -35,6 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import org.meshtastic.core.model.antenna.PlannerHandoff
 import org.maplibre.compose.camera.CameraAnimation
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.CameraUpdate
@@ -211,6 +212,14 @@ class MapLibreMapViewProvider(
             )
 
             ClusterMembersSlot(screen.clusterMembers, navigateToNodeDetails) { screen.clusterMembers = emptyList() }
+
+            // An antenna sent from the calculator ("Use in the planner") opens the planner right away.
+            LaunchedEffect(Unit) {
+                if (PlannerHandoff.pending) {
+                    screen.plannerNodeNum = null
+                    screen.plannerOpen = true
+                }
+            }
 
             PlannerSheet(
                 visible = screen.plannerOpen,
