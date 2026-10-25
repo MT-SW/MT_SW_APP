@@ -61,6 +61,7 @@ import org.meshtastic.core.resources.live_update_nodes_online
 import org.meshtastic.core.resources.live_update_unread
 import org.meshtastic.core.resources.local_stats_nodes
 import org.meshtastic.core.testing.FakeLiveUpdatePrefs
+import org.meshtastic.core.testing.FakeMeshLogRepository
 import org.meshtastic.core.testing.FakeLocaleUnitsProvider
 import org.meshtastic.core.testing.FakeMeshPrefs
 import org.meshtastic.core.testing.runUntilSettled
@@ -440,6 +441,7 @@ class MeshNotificationManagerImplTest {
         context = context,
         packetRepository = lazy { packetRepository },
         nodeRepository = lazy { nodeRepository },
+        meshLogRepository = lazy { FakeMeshLogRepository() },
         conversationShortcutPublisher = lazy { error("Not used in this test") },
         radioConfigRepository = lazy { error("Not used in this test") },
         radioOperationLock = RadioOperationLock(),

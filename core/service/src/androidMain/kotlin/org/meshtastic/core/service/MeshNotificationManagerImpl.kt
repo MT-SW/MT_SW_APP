@@ -70,12 +70,15 @@ import org.meshtastic.core.model.Message
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.noiseFloorOrNull
+import org.meshtastic.core.model.util.LocalStatsExtended
+import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.model.util.toDistanceString
 import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.repository.FirmwareUpdateProgress
 import org.meshtastic.core.repository.FirmwareUpdateStatusRepository
 import org.meshtastic.core.repository.LiveUpdateMode
 import org.meshtastic.core.repository.LiveUpdatePrefs
+import org.meshtastic.core.repository.MeshLogRepository
 import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.MeshPrefs
 import org.meshtastic.core.repository.NodeRepository
@@ -106,7 +109,13 @@ import org.meshtastic.core.resources.live_update_distance
 import org.meshtastic.core.resources.live_update_heard
 import org.meshtastic.core.resources.live_update_heard_now
 import org.meshtastic.core.resources.live_update_hops
+import org.meshtastic.core.resources.live_update_cpu
+import org.meshtastic.core.resources.live_update_flash
 import org.meshtastic.core.resources.live_update_nodes_online
+import org.meshtastic.core.resources.live_update_psram
+import org.meshtastic.core.resources.live_update_ram
+import org.meshtastic.core.resources.live_update_role
+import org.meshtastic.core.resources.live_update_wifi
 import org.meshtastic.core.resources.live_update_signal
 import org.meshtastic.core.resources.live_update_unread
 import org.meshtastic.core.resources.local_stats_bad
@@ -134,6 +143,7 @@ import org.meshtastic.core.resources.reply
 import org.meshtastic.core.resources.unknown_username
 import org.meshtastic.core.resources.you
 import org.meshtastic.proto.ClientNotification
+import org.meshtastic.proto.Config
 import org.meshtastic.proto.DeviceMetrics
 import org.meshtastic.proto.LocalStats
 import org.meshtastic.proto.Telemetry
@@ -156,6 +166,7 @@ class MeshNotificationManagerImpl(
     private val context: Context,
     private val packetRepository: Lazy<PacketRepository>,
     private val nodeRepository: Lazy<NodeRepository>,
+    private val meshLogRepository: Lazy<MeshLogRepository>,
     private val conversationShortcutPublisher: Lazy<ConversationShortcutPublisher>,
     private val radioConfigRepository: Lazy<RadioConfigRepository>,
     private val radioOperationLock: RadioOperationLock,
@@ -215,6 +226,7 @@ class MeshNotificationManagerImpl(
         private const val CONNECTIONS_REQUEST_CODE = 0x4C55
         private const val LIVE_UPDATE_SEPARATOR = " · "
         private val LIVE_UPDATE_MIN_INTERVAL = 2.seconds
+        private const val TRACK_NODE_TELEMETRY_WINDOW = 60
         private val TRACK_NODE_TICK = 1.minutes
         private const val SECONDS_PER_MINUTE = 60L
         private const val SECONDS_PER_HOUR = 3_600L
@@ -235,11 +247,23 @@ class MeshNotificationManagerImpl(
 
     /** What a running Live Update shows; null while it is off. */
     private sealed interface LiveUpdateReading {
-        data class MeshStatus(val nodesOnline: Int, val nodesTotal: Int, val unread: Int, val radioBattery: Int?) :
-            LiveUpdateReading
+        data class MeshStatus(
+            val nodesOnline: Int,
+            val nodesTotal: Int,
+            val unread: Int,
+            val radioBattery: Int?,
+            val localStats: LocalStats? = null,
+            val extended: LocalStatsExtended? = null,
+        ) : LiveUpdateReading
 
         /** [tick] changes once a minute so the elapsed "heard" text and chip age without a node update. */
-        data class TrackNode(val node: Node, val ourNode: Node?, val tick: Int) : LiveUpdateReading
+        data class TrackNode(
+            val node: Node,
+            val ourNode: Node?,
+            val tick: Int,
+            val localStats: LocalStats? = null,
+            val extended: LocalStatsExtended? = null,
+        ) : LiveUpdateReading
     }
 
     /** [message] is the stats text to fall back on later; a firmware-progress render keeps the previous one. */
@@ -402,25 +426,47 @@ class MeshNotificationManagerImpl(
 
         LiveUpdateMode.MeshStatus -> {
             val nodes = nodeRepository.value
-            combine(
-                nodes.onlineNodeCount,
-                nodes.totalNodeCount,
-                packetRepository.value.getUnreadCountTotal(),
-                nodes.ourNodeInfo.map { it?.deviceMetrics?.battery_level }.distinctUntilChanged(),
-            ) { online, total, unread, battery ->
-                LiveUpdateReading.MeshStatus(online, total, unread, battery)
+            val basics =
+                combine(
+                    nodes.onlineNodeCount,
+                    nodes.totalNodeCount,
+                    packetRepository.value.getUnreadCountTotal(),
+                    nodes.ourNodeInfo.map { it?.deviceMetrics?.battery_level }.distinctUntilChanged(),
+                ) { online, total, unread, battery ->
+                    LiveUpdateReading.MeshStatus(online, total, unread, battery)
+                }
+            combine(basics, nodes.localStats, nodes.localStatsExtended) { reading, stats, extended ->
+                reading.copy(
+                    localStats = stats.takeIf { it.uptime_seconds != 0 },
+                    extended = extended.takeIf { it != LocalStatsExtended() },
+                )
             }
                 .throttleLatest(LIVE_UPDATE_MIN_INTERVAL)
         }
 
         is LiveUpdateMode.TrackNode -> {
             val nodes = nodeRepository.value
+            // Traffic and hardware load of another node come from the telemetry it last sent (kept in the log).
+            val remoteStats =
+                meshLogRepository.value
+                    .getTelemetryFromLimited(mode.nodeNum, TRACK_NODE_TELEMETRY_WINDOW)
+                    .map { list ->
+                        val stats = list.filter { it.local_stats != null }.maxByOrNull { it.time }?.local_stats
+                        val extended =
+                            list
+                                .mapNotNull { t -> t.decodeLocalStatsExtended()?.let { t.time to it } }
+                                .maxByOrNull { it.first }
+                                ?.second
+                        stats to extended
+                    }
+                    .distinctUntilChanged()
             combine(
                 nodes.nodeDBbyNum.map { it[mode.nodeNum] }.distinctUntilChanged(),
                 nodes.ourNodeInfo,
                 ticks(TRACK_NODE_TICK),
-            ) { node, ourNode, tick ->
-                node?.let { LiveUpdateReading.TrackNode(it, ourNode, tick) }
+                remoteStats,
+            ) { node, ourNode, tick, (stats, extended) ->
+                node?.let { LiveUpdateReading.TrackNode(it, ourNode, tick, stats, extended) }
             }
                 .throttleLatest(LIVE_UPDATE_MIN_INTERVAL)
         }
@@ -976,7 +1022,18 @@ class MeshNotificationManagerImpl(
         val lines = buildList {
             add(getStringSuspend(Res.string.live_update_nodes_online, reading.nodesOnline, reading.nodesTotal))
             add(getStringSuspend(Res.string.live_update_unread, reading.unread))
-            reading.radioBattery?.let { add(batteryText(it)) }
+            val stats = reading.localStats
+            if (stats != null) {
+                // Everything our own node reports: battery, uptime, channel load, RAM, traffic, relays, diagnostics.
+                addAll(
+                    stats.formatToStringSuspend(reading.radioBattery, includeNodes = false).lines().map {
+                        it.removePrefix(BULLET)
+                    },
+                )
+            } else {
+                reading.radioBattery?.let { add(batteryText(it)) }
+            }
+            addAll(extendedLines(reading.extended, ramAlreadyShown = stats != null && stats.heap_total_bytes > 0))
         }
         val chip = "${reading.nodesOnline}/${reading.nodesTotal}".takeIf { state is ConnectionState.Connected }
         return createLiveUpdateNotification(
@@ -1008,6 +1065,35 @@ class MeshNotificationManagerImpl(
                 )
             }
             heardSecondsAgo?.let { add(heardText(node.lastHeard, it)) }
+            if (node.user.role != Config.DeviceConfig.Role.CLIENT) {
+                add(getStringSuspend(Res.string.live_update_role, node.user.role.name))
+            }
+            val metrics = node.deviceMetrics
+            metrics.uptime_seconds?.let {
+                add(getStringSuspend(Res.string.local_stats_uptime, formatDurationSuspend(it.toLong())))
+            }
+            if (metrics.channel_utilization != null || metrics.air_util_tx != null) {
+                add(
+                    getStringSuspend(
+                        Res.string.local_stats_utilization,
+                        NumberFormatter.format((metrics.channel_utilization ?: 0f).toDouble(), 2),
+                        NumberFormatter.format((metrics.air_util_tx ?: 0f).toDouble(), 2),
+                    ),
+                )
+            }
+            reading.localStats?.let { stats ->
+                addAll(
+                    stats.formatToStringSuspend(null, includeNodes = false, includeBasics = false).lines().filter {
+                        it.isNotBlank()
+                    }.map { it.removePrefix(BULLET) },
+                )
+            }
+            addAll(
+                extendedLines(
+                    reading.extended,
+                    ramAlreadyShown = (reading.localStats?.heap_total_bytes ?: 0) > 0,
+                ),
+            )
             when {
                 node.hopsAway == 0 -> add(getStringSuspend(Res.string.live_update_direct))
                 node.hopsAway > 0 -> add(getStringSuspend(Res.string.live_update_hops, node.hopsAway))
@@ -1060,6 +1146,33 @@ class MeshNotificationManagerImpl(
         subText?.let { builder.setSubText(it) }
         chip?.let { builder.setShortCriticalText(it) }
         return builder.build()
+    }
+
+    /** CPU, RAM, flash, PSRAM (all as percent used) and Wi-Fi signal from the extended local statistics. */
+    private suspend fun extendedLines(ext: LocalStatsExtended?, ramAlreadyShown: Boolean): List<String> {
+        if (ext == null) return emptyList()
+        return buildList {
+            if (ext.cpuUsagePercent > 0) {
+                add(getStringSuspend(Res.string.live_update_cpu, MetricFormatter.percent(ext.cpuUsagePercent.toFloat(), 0)))
+            }
+            if (!ramAlreadyShown && ext.memoryTotal > 0) {
+                val used = (ext.memoryTotal - ext.memoryFreeCheap).toLong()
+                add(getStringSuspend(Res.string.live_update_ram, MetricFormatter.usedPercent(used, ext.memoryTotal.toLong())))
+            }
+            if (ext.flashTotalBytes > 0) {
+                add(
+                    getStringSuspend(
+                        Res.string.live_update_flash,
+                        MetricFormatter.usedPercent(ext.flashUsedBytes.toLong(), ext.flashTotalBytes.toLong()),
+                    ),
+                )
+            }
+            if (ext.memoryPsramTotal > 0) {
+                val used = (ext.memoryPsramTotal - ext.memoryPsramFree).toLong()
+                add(getStringSuspend(Res.string.live_update_psram, MetricFormatter.usedPercent(used, ext.memoryPsramTotal.toLong())))
+            }
+            if (ext.wifiRssi != 0) add(getStringSuspend(Res.string.live_update_wifi, ext.wifiRssi))
+        }
     }
 
     private suspend fun batteryText(level: Int): String = if (level > MAX_BATTERY_LEVEL) {
@@ -1456,7 +1569,11 @@ class MeshNotificationManagerImpl(
 
     // region Extension Functions (Localized)
 
-    private suspend fun LocalStats.formatToStringSuspend(batteryLevel: Int? = null): String {
+    private suspend fun LocalStats.formatToStringSuspend(
+        batteryLevel: Int? = null,
+        includeNodes: Boolean = true,
+        includeBasics: Boolean = true,
+    ): String {
         val parts = mutableListOf<String>()
         batteryLevel?.let {
             if (it > MAX_BATTERY_LEVEL) {
@@ -1465,17 +1582,22 @@ class MeshNotificationManagerImpl(
                 parts.add(BULLET + getStringSuspend(Res.string.local_stats_battery, it))
             }
         }
-        parts.add(BULLET + getStringSuspend(Res.string.local_stats_nodes, num_online_nodes, num_total_nodes))
-        val uptime = formatDurationSuspend(uptime_seconds.toLong())
-        parts.add(BULLET + getStringSuspend(Res.string.local_stats_uptime, uptime))
-        parts.add(
-            BULLET +
-                getStringSuspend(
-                    Res.string.local_stats_utilization,
-                    NumberFormatter.format(channel_utilization.toDouble(), 2),
-                    NumberFormatter.format(air_util_tx.toDouble(), 2),
-                ),
-        )
+        if (includeNodes) {
+            parts.add(BULLET + getStringSuspend(Res.string.local_stats_nodes, num_online_nodes, num_total_nodes))
+        }
+        // Uptime and channel load of a tracked node are already printed from its device metrics.
+        if (includeBasics) {
+            val uptime = formatDurationSuspend(uptime_seconds.toLong())
+            parts.add(BULLET + getStringSuspend(Res.string.local_stats_uptime, uptime))
+            parts.add(
+                BULLET +
+                    getStringSuspend(
+                        Res.string.local_stats_utilization,
+                        NumberFormatter.format(channel_utilization.toDouble(), 2),
+                        NumberFormatter.format(air_util_tx.toDouble(), 2),
+                    ),
+            )
+        }
 
         if (heap_free_bytes > 0 || heap_total_bytes > 0) {
             parts.add(

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package org.meshtastic.feature.connections
+package org.meshtastic.feature.settings.liveupdate
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +26,7 @@ import org.meshtastic.core.repository.LiveUpdatePrefs
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
 
-/** Starts, switches and stops the Live Update from the Connections screen. */
+/** Starts, switches and stops the adaptive notifications from Settings. */
 @KoinViewModel
 class LiveUpdateViewModel(private val prefs: LiveUpdatePrefs, nodeRepository: NodeRepository) : ViewModel() {
     val mode: StateFlow<LiveUpdateMode> = prefs.mode

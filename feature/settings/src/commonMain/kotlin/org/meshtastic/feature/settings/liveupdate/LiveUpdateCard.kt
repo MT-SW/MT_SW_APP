@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package org.meshtastic.feature.connections.ui.components
+package org.meshtastic.feature.settings.liveupdate
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -74,15 +74,10 @@ import org.meshtastic.core.ui.icon.Notifications
 import org.meshtastic.core.ui.icon.Search
 import org.meshtastic.core.ui.util.formatAgo
 import org.meshtastic.core.ui.util.rememberLiveUpdateSupport
-import org.meshtastic.feature.connections.LiveUpdateViewModel
-import org.meshtastic.feature.connections.filterLiveUpdateCandidates
 
-/**
- * The Live Update row and its chooser, on platforms that have Live Updates. Shown while connected, and while one runs
- * whatever the connection, so a running Live Update can always be stopped.
- */
+/** The adaptive notifications row and its chooser (Settings), on platforms that have Live Updates. */
 @Composable
-fun LiveUpdateSection(connected: Boolean, modifier: Modifier = Modifier) {
+fun LiveUpdateSection(modifier: Modifier = Modifier) {
     val support = rememberLiveUpdateSupport()
     if (!support.available) return
     val viewModel: LiveUpdateViewModel = koinViewModel()
@@ -91,7 +86,6 @@ fun LiveUpdateSection(connected: Boolean, modifier: Modifier = Modifier) {
     val candidates by viewModel.candidates.collectAsStateWithLifecycle()
     var showChooser by rememberSaveable { mutableStateOf(false) }
 
-    if (!connected && mode == LiveUpdateMode.Off) return
     LiveUpdateCard(
         mode = mode,
         trackedNode = trackedNode,

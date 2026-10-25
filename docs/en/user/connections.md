@@ -144,16 +144,16 @@ Once the region is set, the tab warns you if the node is receive-only: a **Trans
 
 For more information, see [Settings — Radio & User](settings-radio-user#lora-config).
 
-## Live Update
+## Adaptive notifications
 
-On Android 16 and newer, the **Connect** tab has a **Live Update** row while you are connected. It puts one thing you choose in the status bar and the service notification:
+On Android 16 and newer, **Settings** has an **Adaptive notifications** row just above the info section (next to the app's notification management). It puts one thing you choose in the status bar and the service notification:
 
-- **Mesh status:** the connection, how many nodes are online, your unread messages and your node's battery. The status bar shows the nodes online, such as `5/12`.
-- **Track a node:** one node's battery, signal, when it was last heard, its hops and its distance from your node. The status bar shows its battery, or how long ago it was heard when it reports no battery. Pick the node from a list with favorites first, then the most recently heard, or search it by name.
+- **Mesh status:** everything about your node — the connection, how many nodes are online, unread messages, battery, uptime, channel load and airtime, traffic (sent, received, bad, duplicates, relayed), noise level and the hardware load: processor (CPU), RAM, flash, PSRAM and Wi-Fi signal strength (whatever the node reports). The status bar shows the nodes online, such as `5/12`.
+- **Track a node:** the chosen node's battery, signal, role, channel load and airtime, traffic and processor and memory load (what that node last sent), when it was last heard, its hops and its distance from your node. The status bar shows its battery, or how long ago it was heard when it reports no battery. Pick the node from a list with favorites first, then the most recently heard, or search it by name.
 
-Tap the row to start one, switch to the other, or stop it. Only one runs at a time, and it is off until you start it. On a node's details, **Track in Live Update** starts tracking that node directly.
+Tap the row to start one, switch to the other, or stop it. Only one runs at a time, and it is off until you start it. On a node's details, **Track in adaptive notifications** starts tracking that node directly.
 
-A dropped link keeps it running and shows the connection state until the node is back. Disconnecting, switching nodes, or deleting or ignoring the tracked node stops it. If the row says Live Updates are turned off for Meshtastic, Android shows it as an ordinary notification until you allow them in system settings.
+A dropped link keeps it running and shows the connection state until the node is back. Disconnecting, switching nodes, or deleting or ignoring the tracked node stops it. If the row says adaptive notifications are turned off for the app, Android shows it as an ordinary notification until you allow them in system settings.
 
 ## Reconnection Behavior
 

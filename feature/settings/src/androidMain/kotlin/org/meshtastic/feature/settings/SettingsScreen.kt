@@ -73,6 +73,7 @@ import org.meshtastic.core.ui.icon.SettingsRemote
 import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.core.ui.util.isBluetoothSupported
 import org.meshtastic.feature.settings.component.AppInfoSection
+import org.meshtastic.feature.settings.liveupdate.LiveUpdateSection
 import org.meshtastic.feature.settings.component.AppearanceSettingsContent
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.ReportIssuesSection
@@ -343,6 +344,8 @@ fun SettingsScreen(
                         }
                     }
                 }
+
+                LiveUpdateSection()
 
                 AppInfoSection(
                     appVersionName = settingsViewModel.appVersionName,

@@ -1418,8 +1418,10 @@ lightning_distance
 lightning_strikes_1h
 ### LIVE ###
 live_update
+live_update_cpu
 live_update_direct
 live_update_distance
+live_update_flash
 live_update_heard
 live_update_heard_now
 live_update_hops
@@ -1429,6 +1431,9 @@ live_update_no_nodes
 live_update_nodes_online
 live_update_off_summary
 live_update_promotion_off
+live_update_psram
+live_update_ram
+live_update_role
 live_update_search_nodes
 live_update_signal
 live_update_start
@@ -1439,6 +1444,7 @@ live_update_track_node
 live_update_track_node_summary
 live_update_tracking
 live_update_unread
+live_update_wifi
 lna_gain_correction
 lna_gain_correction_description
 lna_gain_db

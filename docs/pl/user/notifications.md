@@ -38,7 +38,7 @@ Domyślnie wiadomości bezpośrednie, alerty i komunikaty z Twojego węzła wysk
 
 Powiadomienia alertowe odtwarzają dźwięk alarmu. Aby przepuszczać je także przez tryb Nie przeszkadzać, otwórz kategorię i zezwól jej na pomijanie trybu Nie przeszkadzać — to krok, który [Pierwsze kroki](onboarding#critical-alerts-permission) oferuje podczas konfiguracji.
 
-Powiadomienie usługi pozostaje w panelu powiadomień, dopóki MT_SW jest połączone w tle. Pokazuje stan połączenia, a także postęp, gdy trwa aktualizacja firmware lub skan presetów. Na Androidzie 16 i nowszym możesz zamienić je w [Live Update](connections#live-update), które pokazuje w pasku stanu Twoją sieć lub jeden węzeł.
+Powiadomienie usługi pozostaje w panelu powiadomień, dopóki MT_SW jest połączone w tle. Pokazuje stan połączenia, a także postęp, gdy trwa aktualizacja firmware lub skan presetów. Na Androidzie 16 i nowszym możesz zamienić je w [powiadomienia adaptacyjne](connections#powiadomienia-adaptacyjne), które pokazuje w pasku stanu Twoją sieć lub jeden węzeł.
 
 > ℹ️ **Uwaga:** Aplikacja na komputer nie ma kategorii powiadomień. Zamiast tego włącza powiadomienia we własnych ustawieniach, opisanych w [Preferencje powiadomień](desktop#notification-preferences).
 

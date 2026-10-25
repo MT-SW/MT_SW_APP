@@ -142,7 +142,6 @@ import org.meshtastic.feature.connections.ui.components.CurrentlyConnectedInfo
 import org.meshtastic.feature.connections.ui.components.CurrentlyConnectedText
 import org.meshtastic.feature.connections.ui.components.DeviceList
 import org.meshtastic.feature.connections.ui.components.EventFirmwareCard
-import org.meshtastic.feature.connections.ui.components.LiveUpdateSection
 import org.meshtastic.feature.connections.ui.components.TerminateApplicationButton
 import org.meshtastic.feature.connections.ui.components.TransportSelector
 import org.meshtastic.feature.connections.ui.components.loraSummary
@@ -607,11 +606,6 @@ fun ConnectionsScreen(
                             regionUnset = regionUnset,
                             txDisabled = txDisabled,
                             onConfigNavigate = onConfigNavigate,
-                        )
-
-                        LiveUpdateSection(
-                            connected = uiState == ConnectionUiState.CONNECTED_WITH_NODE,
-                            modifier = Modifier.padding(top = 8.dp),
                         )
 
                         // Transport selector sits between the connection card and device list; it controls only the

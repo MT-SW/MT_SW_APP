@@ -380,6 +380,7 @@ class MeshNotificationManagerImplRoutingTest {
         context = context,
         packetRepository = lazy { error("Not used in this test") },
         nodeRepository = lazy { error("Not used in this test") },
+        meshLogRepository = lazy { error("Not used in this test") },
         conversationShortcutPublisher = lazy { error("Not used in this test") },
         radioConfigRepository = lazy { error("Not used in this test") },
         radioOperationLock = RadioOperationLock(),
