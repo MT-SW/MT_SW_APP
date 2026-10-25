@@ -20,7 +20,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.koinInject
@@ -65,6 +67,7 @@ import org.meshtastic.feature.settings.util.MIN_BROADCAST_INTERVAL_SECS
 import org.meshtastic.feature.settings.util.MIN_DEVICE_METRICS_INTERVAL_SECS
 import org.meshtastic.feature.settings.util.intervals
 import org.meshtastic.feature.settings.util.toDisplayString
+import org.meshtastic.proto.LocalStatsBroadcastConfig
 import org.meshtastic.proto.ModuleConfig
 import org.meshtastic.proto.device_telemetry_enabled
 
@@ -78,8 +81,18 @@ fun TelemetryConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
     val firmwareVersion = state.metadata?.firmware_version
     val capabilities = remember(firmwareVersion) { Capabilities(firmwareVersion) }
 
+    // Extra telemetry (the node's own statistics) works only from MT_SW_FIRMWARE v3; on older firmware the card is shown
+    // but does not react. It is not part of the module config, but it is saved with the same save bar.
+    val localStatsConfig = state.localStatsConfig
+    val localStatsSupported =
+        localStatsConfig != null ||
+            (state.fwPlusVersion ?: 0) >= SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_LOCAL_STATS
+    var localStatsForm by remember(localStatsConfig) { mutableStateOf(localStatsConfig ?: LocalStatsBroadcastConfig()) }
+    val localStatsDirty = localStatsSupported && localStatsConfig != null && localStatsForm != localStatsConfig
+
     RadioConfigScreenList(
-        rebootBehavior = RebootBehavior.ALWAYS,
+        // Only the node's own statistics changed: they are applied without a restart.
+        rebootBehavior = if (localStatsDirty && !formState.isDirty) RebootBehavior.MAY_RESTART else RebootBehavior.ALWAYS,
         title = stringResource(Res.string.telemetry),
         onBack = onBack,
         configState = formState,
@@ -87,9 +100,15 @@ fun TelemetryConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
         responseState = state.responseState,
         showConnectPrompt = state.connectPromptVisible,
         onDismissPacketResponse = viewModel::clearPacketResponse,
+        saveEnabled = state.connected && !state.localStatsLoading,
+        additionalDirtyCheck = { localStatsDirty },
+        onDiscard = { localStatsForm = localStatsConfig ?: LocalStatsBroadcastConfig() },
         onSave = {
-            val config = ModuleConfig.Builder().also { wb -> wb.telemetry = it }.build()
-            viewModel.setModuleConfig(config)
+            if (formState.isDirty) {
+                val config = ModuleConfig.Builder().also { wb -> wb.telemetry = it }.build()
+                viewModel.setModuleConfig(config)
+            }
+            if (localStatsDirty) viewModel.setLocalStatsConfig(localStatsForm)
         },
     ) {
         fieldItem(SettingsSearchCatalog.fieldKeys(ModuleRoute.TELEMETRY.route)) {
@@ -267,19 +286,15 @@ fun TelemetryConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
                 )
             }
         }
-        // Extra telemetry (the node's own statistics) works only on fw+ version 3 and newer; on older firmware the card is
-        // shown switched off. It is saved separately.
-        val localStatsSupported =
-            state.localStatsConfig != null ||
-                (state.fwPlusVersion ?: 0) >= SnifferControlUseCase.MIN_FW_PLUS_VERSION_FOR_LOCAL_STATS
         item {
             LocalStatsCard(
-                config = state.localStatsConfig,
+                config = localStatsConfig,
+                form = localStatsForm,
                 supported = localStatsSupported,
                 loading = state.localStatsLoading,
                 connected = state.connected,
                 unlocked = unlocked,
-                onSave = viewModel::setLocalStatsConfig,
+                onFormChange = { localStatsForm = it },
             )
         }
     }

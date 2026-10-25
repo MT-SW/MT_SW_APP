@@ -1496,14 +1496,14 @@
     <string name="local_network_permission_rationale">Meshtastic needs local network access to find and reach radios on your Wi-Fi. It only looks on the network you are already connected to. Without it, a radio on your Wi-Fi cannot be reached even by typing its address; a radio on a public address or over a VPN is unaffected.</string>
     <string name="local_stats_bad">Bad %1$d</string>
     <string name="local_stats_basic_enabled">Extra telemetry</string>
-    <string name="local_stats_basic_enabled_desc">The node regularly broadcasts its own statistics over the mesh.</string>
+    <string name="local_stats_basic_enabled_desc">In the packet: number of nodes online and in total, traffic (sent, received, bad, duplicates, relayed, dropped), channel load and airtime, uptime and noise level.</string>
     <string name="local_stats_basic_interval">Extra telemetry interval</string>
     <string name="local_stats_battery">Battery: %1$d%</string>
     <string name="local_stats_cpu">CPU</string>
     <string name="local_stats_diagnostics_prefix">Diagnostics: %1$s</string>
     <string name="local_stats_dropped">Dropped %1$d</string>
     <string name="local_stats_ext_enabled">Extended extra telemetry</string>
-    <string name="local_stats_ext_enabled_desc">Adds more detailed data about how the node is working.</string>
+    <string name="local_stats_ext_enabled_desc">In the packet: processor (CPU) load and memory use — heap, flash and PSRAM.</string>
     <string name="local_stats_ext_interval">Extended extra telemetry interval</string>
     <string name="local_stats_flash">Flash</string>
     <string name="local_stats_flash_description">Percentage of flash storage used</string>
@@ -1511,7 +1511,7 @@
     <string name="local_stats_heap_description">Percentage of device heap memory used</string>
     <string name="local_stats_heap_value">%1$d / %2$d</string>
     <string name="local_stats_heap_value_kb">%1$s / %2$s kB</string>
-    <string name="local_stats_needs_v3">This works from MT_SW_FIRMWARE v3. The connected node has an older version or has not reported one, so the settings are switched off.</string>
+    <string name="local_stats_needs_v3">This works from MT_SW_FIRMWARE v3. The connected node has an older version or has not reported one, so these settings cannot be changed.</string>
     <string name="local_stats_nodes">Nodes: %1$d online / %2$d total</string>
     <string name="local_stats_noise">Noise %1$d dBm</string>
     <string name="local_stats_psram">PSRAM</string>
@@ -1519,7 +1519,6 @@
     <string name="local_stats_reading">Reading the settings from the node…</string>
     <string name="local_stats_relays">Relays: %1$d (Canceled: %2$d)</string>
     <string name="local_stats_rx_share">Share of received: dupes %1$s, bad %2$s, relayed %3$s</string>
-    <string name="local_stats_save">Save to the node</string>
     <string name="local_stats_save_failed">The node did not confirm the local statistics settings.</string>
     <string name="local_stats_title">Local statistics</string>
     <string name="local_stats_traffic">Traffic: TX %1$d / RX %2$d (D: %3$d)</string>

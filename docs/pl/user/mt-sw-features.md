@@ -119,10 +119,10 @@ Ekran **Sniffer** (Ustawienia → Advanced) pokazuje na żywo ruch w sieci, tak�
 
 ## Dodatkowa telemetria (statystyki lokalne)
 
-W **Ustawienia → Moduły → Telemetria** jest karta **Statystyki lokalne**. Działa od MT_SW_FIRMWARE v3; na starszej karta jest widoczna, ale jej przełączniki są wyszarzone i opis mówi, od której wersji to działa. Ma dwa przełączniki — **Dodatkowa telemetria** i **Rozszerzona dodatkowa telemetria** — i osobny interwał dla każdego. Węzeł regularnie wysyła do sieci własne statystyki.
+W **Ustawienia → Moduły → Telemetria** jest karta **Statystyki lokalne**. Działa od MT_SW_FIRMWARE v3; na starszej karta jest widoczna, ale nic w niej nie reaguje, a opis mówi, od której wersji to działa. Ma dwa przełączniki — **Dodatkowa telemetria** i **Rozszerzona dodatkowa telemetria** — i osobny interwał dla każdego. Pod każdym przełącznikiem jest opis, co trafia do pakietu: w dodatkowej telemetrii liczba węzłów, ruch, obciążenie kanału, czas pracy i poziom szumu, a w rozszerzonej zajęcie procesora i pamięci (heap, flash, PSRAM).
 
 - **Najkrótszy interwał to 2 godziny.**
-- **Obie opcje zapisują się razem** przyciskiem **Zapisz w węźle**. Aplikacja najpierw odczytuje obecny stan z węzła, więc zmiana jednej opcji nie rusza drugiej. Po zapisie pokazuje to, co węzeł naprawdę zapisał (może poprawić interwały); jeśli nie potwierdzi, dostajesz komunikat.
+- **Obie opcje zapisują się razem** zwykłym dolnym paskiem zapisu, razem z pozostałymi ustawieniami telemetrii. Aplikacja najpierw odczytuje obecny stan z węzła, więc zmiana jednej opcji nie rusza drugiej. Po zapisie pokazuje to, co węzeł naprawdę zapisał (może poprawić interwały); jeśli nie potwierdzi, dostajesz komunikat.
 - Zapis nie wymaga restartu węzła.
 
 ## Panel debugowania

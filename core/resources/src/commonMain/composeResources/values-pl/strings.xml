@@ -2521,14 +2521,13 @@
     <string name="telemetry">Telemetria</string>
     <string name="telemetry_config">Konfiguracja telemetrii</string>
     <string name="local_stats_title">Statystyki lokalne</string>
-    <string name="local_stats_needs_v3">To działa od MT_SW_FIRMWARE v3. Podłączony węzeł ma starszą wersję albo jej nie zgłosił, więc ustawienia są wyłączone.</string>
+    <string name="local_stats_needs_v3">To działa od MT_SW_FIRMWARE v3. Podłączony węzeł ma starszą wersję albo jej nie zgłosił, więc tych ustawień nie można zmienić.</string>
     <string name="local_stats_basic_enabled">Dodatkowa telemetria</string>
-    <string name="local_stats_basic_enabled_desc">Węzeł regularnie wysyła do sieci własne statystyki.</string>
+    <string name="local_stats_basic_enabled_desc">W pakiecie: liczba węzłów online i łącznie, ruch (wysłane, odebrane, błędne, duplikaty, przekazane, odrzucone), obciążenie kanału i czas nadawania, czas pracy oraz poziom szumu.</string>
     <string name="local_stats_basic_interval">Interwał dodatkowej telemetrii</string>
     <string name="local_stats_ext_enabled">Rozszerzona dodatkowa telemetria</string>
-    <string name="local_stats_ext_enabled_desc">Dodaje bardziej szczegółowe dane o pracy węzła.</string>
+    <string name="local_stats_ext_enabled_desc">W pakiecie: zajęcie procesora (CPU) oraz pamięci — sterty (heap), flash i PSRAM.</string>
     <string name="local_stats_ext_interval">Interwał rozszerzonej telemetrii</string>
-    <string name="local_stats_save">Zapisz w węźle</string>
     <string name="local_stats_reading">Odczytuję ustawienia z węzła…</string>
     <string name="local_stats_save_failed">Węzeł nie potwierdził ustawień statystyk lokalnych.</string>
     <string name="temperature">Temp.°</string>

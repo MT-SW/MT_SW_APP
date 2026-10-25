@@ -1483,7 +1483,6 @@ local_stats_psram_description
 local_stats_reading
 local_stats_relays
 local_stats_rx_share
-local_stats_save
 local_stats_save_failed
 local_stats_title
 local_stats_traffic
