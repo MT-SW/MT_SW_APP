@@ -660,10 +660,13 @@ class AssistantDataProvider(
         var flashUsed: Float? = null
         var psramUsed: Float? = null
         var wifi: Int? = null
+        var relayed: Int? = null
+        var dropped: Int? = null
     }
 
     /** The latest telemetry every node reported (last 3 days), ranked by what the question is about. */
-    private suspend fun ranking(q: String, top: Int = RANK_TOP): String {
+    /** The latest telemetry values every node reported in the last 3 days. */
+    private suspend fun latestNodeRows(): HashMap<Int, NodeRow> {
         val rows = HashMap<Int, NodeRow>()
         for (entry in telemetry()) {
             val t = entry.telemetry
@@ -676,6 +679,8 @@ class AssistantDataProvider(
                     row.tx = ls.num_packets_tx
                     row.bad = ls.num_packets_rx_bad
                     row.dupe = ls.num_rx_dupe
+                    row.relayed = ls.num_tx_relay
+                    row.dropped = ls.num_tx_dropped
                     row.uptime = ls.uptime_seconds
                     row.heapUsed = if ((ls.heap_total_bytes ?: 0) > 0) ((ls.heap_total_bytes!! - (ls.heap_free_bytes ?: 0)).coerceAtLeast(0)).toFloat() / ls.heap_total_bytes!! * PERCENT else null
                 }
@@ -701,6 +706,11 @@ class AssistantDataProvider(
                 }
             }
         }
+        return rows
+    }
+
+    private suspend fun ranking(q: String, top: Int = RANK_TOP): String {
+        val rows = latestNodeRows()
         if (rows.isEmpty()) return "NODE RANKING: no telemetry from nodes in the last 3 days."
         data class Key(val label: String, val descending: Boolean, val pick: (NodeRow) -> Float?)
         val rxKey = Key("packets received (rx)", true) { it.rx?.toFloat() }
@@ -878,6 +888,58 @@ class AssistantDataProvider(
         val node = findNode(name) ?: return "No node found for \"$name\". Use the node list tool to see the names."
         val since = if (hours > 0) nowMillis - hours * MILLIS_PER_HOUR else 0L
         return nodeDetail(node, since)
+    }
+
+    /**
+     * Answers "which node has the lowest voltage / the longest uptime / the most traffic ..." and averages or a quick
+     * summary, computed by the program from every value the app holds. Null when the question is not that kind.
+     */
+    suspend fun metricAnswer(question: String): String? {
+        if (!NodeMetrics.asksAcrossNodes(question)) return null
+        if (NodeMetrics.match(question).isEmpty() && !question.lowercase().contains("podsumowan") && !question.lowercase().contains("summary")) return null
+        val telemetryRows = latestNodeRows()
+        val me = nodeRepository.ourNodeInfo.value
+        val now = nowMillis / MILLIS_PER_SECOND
+        val rows =
+            nodeRepository.nodeDBbyNum.value.values.filter { !it.isIgnored }.map { node ->
+                val t = telemetryRows[node.num]
+                val v = HashMap<String, Float>()
+                fun put(id: String, value: Float?) {
+                    if (value != null && !value.isNaN()) v[id] = value
+                }
+                val dm = node.deviceMetrics
+                put("voltage", dm.voltage?.takeIf { it > 0f })
+                put("battery", dm.battery_level?.takeIf { it in 0..BATTERY_FULL }?.toFloat())
+                put("uptime", dm.uptime_seconds?.takeIf { it > 0 }?.let { it / SECONDS_PER_HOUR.toFloat() })
+                put("chutil", dm.channel_utilization)
+                put("airtx", dm.air_util_tx)
+                put("snr", node.snrOrNull)
+                put("rssi", node.rssiOrNull?.toFloat())
+                put("hops", node.hopsAway.takeIf { it >= 0 }?.toFloat())
+                put("distance", me?.takeIf { it.num != node.num }?.let { node.distance(it) }?.toFloat())
+                put("lastheard", node.lastHeard.takeIf { it > 0 }?.let { ((now - it) / SECONDS_PER_MINUTE).coerceAtLeast(0).toFloat() })
+                put("temperature", node.environmentMetrics.temperature)
+                put("humidity", node.environmentMetrics.relative_humidity?.takeIf { it > 0f })
+                put("pressure", node.environmentMetrics.barometric_pressure?.takeIf { it > 0f })
+                put("altitude", node.position.altitude?.toFloat())
+                if (t != null) {
+                    put("cpu", t.cpu?.toFloat())
+                    put("ram", t.heapUsed)
+                    put("flash", t.flashUsed)
+                    put("psram", t.psramUsed)
+                    put("wifi", t.wifi?.toFloat())
+                    put("rx", t.rx?.toFloat())
+                    put("tx", t.tx?.toFloat())
+                    put("bad", t.bad?.toFloat())
+                    put("dupe", t.dupe?.toFloat())
+                    put("relayed", t.relayed?.toFloat())
+                    put("dropped", t.dropped?.toFloat())
+                    if (!v.containsKey("uptime")) put("uptime", t.uptime?.takeIf { it > 0 }?.let { it / SECONDS_PER_HOUR.toFloat() })
+                }
+                val name = node.user.long_name.ifBlank { node.user.short_name }.ifBlank { node.user.id }
+                MetricRow(name, v)
+            }
+        return NodeMetrics.answer(question, rows, polish)
     }
 
     /** The known nodes in plain words for the user, most recently heard first; long lists are cut with a count of the rest. */
@@ -1995,6 +2057,7 @@ class AssistantDataProvider(
         const val METERS_PER_KM = 1000f
         const val RANK_BOTTOM = 3
         const val NODE_LIST_SHOWN = 60
+        const val BATTERY_FULL = 100
         const val HEX = 16
         const val SECONDS_PER_HOUR = 3600
         const val MAX_NODES_DETAIL = 2

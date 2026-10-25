@@ -417,6 +417,8 @@ class LlamaAssistantService(
                         // Battery questions are answered from the node's own reading, never retold by the model.
                         (intent.metric == "battery" || BATTERY_WORDS.containsMatchIn(question.lowercase())) &&
                             intent.topic != "ranking" && !MANY_WORDS.containsMatchIn(question.lowercase()) -> exact(data.nodeBattery(nodeNum))
+                        // Ranking, extremes, averages and summaries of any node value are counted by the app.
+                        intent.topic != "node" -> data.metricAnswer(question)?.let { exact(it) }
                         else -> null
                     }
                 "messages_to_me" -> exact(data.recentToMe(LIST_SHOWN))
@@ -426,6 +428,11 @@ class LlamaAssistantService(
                 else -> null
             }
         if (answer != null) return answer
+
+        // A ranking of nodes that the router took for a chat or a list ("which node works the longest").
+        if ((intent.intent == "chat" || intent.intent == "list_nodes") && intent.metric != "list") {
+            data.metricAnswer(question)?.let { return it.also(onPiece) }
+        }
 
         // A question about the app that the router took for a chat (for example "what is MT_SW features").
         if (intent.intent == "chat" && APP_WORDS.containsMatchIn(question.lowercase())) {
