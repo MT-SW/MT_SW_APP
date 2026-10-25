@@ -41,7 +41,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
@@ -162,7 +161,7 @@ fun MeshtasticSearchBar(
     val expandedTag = inputFieldTag + SEARCH_BAR_EXPANDED_TAG_SUFFIX
     // Material docks the expanded bar on medium and larger windows and only goes full-screen on compact ones. The
     // pane directive is the width test the rest of the app already adapts on, so search agrees with the panes.
-    val splitsHorizontally = calculatePaneScaffoldDirective(currentWindowAdaptiveInfoV2()).maxHorizontalPartitions > 1
+    val splitsHorizontally = calculatePaneScaffoldDirective(currentWindowAdaptiveInfoSafe()).maxHorizontalPartitions > 1
     if (splitsHorizontally) {
         ExpandedDockedSearchBar(
             state = searchBarState,

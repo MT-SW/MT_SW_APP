@@ -27,7 +27,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.VerticalDragHandle
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.layout.PaneExpansionState
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldScope
 import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
@@ -170,7 +169,7 @@ private fun MeshtasticNavDisplayHost(
     // layout takes over, with a slider at both dividers; everything else stays with the library's layout.
     val threeColumnWidths = remember { ThreeColumnWidths() }
     val threeColumnsFit =
-        isDesktopPlatform && calculatePaneScaffoldDirective(currentWindowAdaptiveInfoV2()).maxHorizontalPartitions >= 3
+        isDesktopPlatform && calculatePaneScaffoldDirective(currentWindowAdaptiveInfoSafe()).maxHorizontalPartitions >= 3
     val threeColumnSceneStrategy =
         remember(threeColumnWidths, threeColumnsFit) { DesktopThreeColumnSceneStrategy(threeColumnWidths, threeColumnsFit) }
 

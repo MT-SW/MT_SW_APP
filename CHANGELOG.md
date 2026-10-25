@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+* Komputer: aplikacja nie wyłącza się już błędem, gdy okno zostanie zminimalizowane, schowane lub przywracane (błąd rozmiaru okna); do czasu przywrócenia rozmiaru zostaje poprzedni układ.
 * „Heap” nazywa się teraz w całej aplikacji **RAM**, a zajęta pamięć (RAM, flash, PSRAM) jest wszędzie pokazywana także w procentach (lista węzłów, powiadomienie, widżet, sniffer, diagnostyka na żądanie). Opis rozszerzonej dodatkowej telemetrii wymienia też siłę sygnału Wi‑Fi.
 * Komputer: przy trzech kolumnach (lista, szczegóły i dodatkowy ekran, np. diagnostyka na żądanie) są teraz dwa suwaki do zmiany szerokości; wcześniej przy trzech kolumnach nie było żadnego. Szerokości działają do zamknięcia aplikacji.
 * **Dodatkowa telemetria** (MT_SW_FIRMWARE v3): w ustawieniach telemetrii karta „Statystyki lokalne” z przełącznikami dodatkowej i rozszerzonej dodatkowej telemetrii oraz osobnym interwałem każdej (najkrócej 2 godziny). Obie opcje zapisują się razem; aplikacja najpierw odczytuje stan z węzła i pokazuje to, co węzeł zapisał. Działa od MT_SW_FIRMWARE v3; na starszym karta jest widoczna, ale nic w niej nie reaguje, z opisem. Skrót też w Funkcjach MT_SW.
@@ -415,6 +416,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### October 2026
 
+* Desktop: the app no longer crashes when the window is minimised, hidden or being restored (window size error); the previous layout is kept until the size is valid again.
 * "Heap" is now called **RAM** across the whole app, and used memory (RAM, flash, PSRAM) is shown as a percentage everywhere too (node list, notification, widget, sniffer, on-demand diagnostics). The note for extended extra telemetry now also mentions the Wi-Fi signal strength.
 * Desktop: with three columns (list, details and an extra screen, for example on-demand diagnostics) there are now two sliders for changing the width; before, three columns had none. The widths last until the app is closed.
 * **Extra telemetry** (MT_SW_FIRMWARE v3): a “Local statistics” card in the telemetry settings with switches for extra and extended extra telemetry and a separate interval for each (2 hours at least). Both options are saved together; the app first reads the state from the node and shows what the node stored. It works from MT_SW_FIRMWARE v3; on an older one the card is visible but nothing in it reacts, with a note. A shortcut is also in MT_SW features.

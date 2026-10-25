@@ -35,7 +35,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import org.meshtastic.core.ui.theme.monochromeLayer
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
@@ -96,7 +95,7 @@ fun MeshtasticNavigationSuite(
     val showAiTab = translatorEnabled || assistantEnabled
     val visibleDestinations = TopLevelDestination.entries.filter { it != TopLevelDestination.Translator || showAiTab }
 
-    val adaptiveInfo = currentWindowAdaptiveInfoV2()
+    val adaptiveInfo = currentWindowAdaptiveInfoSafe()
 
     val currentTabRoute = multiBackstack.currentTabRoute
     val topLevelDestination = TopLevelDestination.fromNavKey(currentTabRoute)

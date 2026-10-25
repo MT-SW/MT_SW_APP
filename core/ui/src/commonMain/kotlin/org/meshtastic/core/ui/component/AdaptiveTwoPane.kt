@@ -30,7 +30,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDragHandle
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
 import androidx.compose.material3.adaptive.layout.PaneExpansionState
@@ -73,7 +72,7 @@ fun AdaptiveTwoPane(
     second: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val directive = calculatePaneScaffoldDirective(currentWindowAdaptiveInfoV2())
+    val directive = calculatePaneScaffoldDirective(currentWindowAdaptiveInfoSafe())
 
     // Wrap the slots in movable content so their internal state survives when the layout flips between the stacked
     // column and the two-pane scaffold (e.g. on resize / fold), and so neither slot is emitted directly from two
