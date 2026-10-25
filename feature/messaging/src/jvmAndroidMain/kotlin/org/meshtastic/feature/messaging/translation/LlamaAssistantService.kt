@@ -385,7 +385,9 @@ class LlamaAssistantService(
                 "list_nodes" ->
                     exact(
                         if (intent.period.isBlank() || intent.period == "none") {
-                            if (intent.metric == "battery" || intent.metric == "favorites") {
+                            if (intent.metric == "list") {
+                                data.nodeListText()
+                            } else if (intent.metric == "battery" || intent.metric == "favorites") {
                                 data.findNodesFor("", 0, intent.metric == "battery", intent.metric == "favorites")
                             } else {
                                 data.networkCount()

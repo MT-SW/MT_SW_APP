@@ -178,14 +178,14 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
                 "search_messages: did someone write about something, who wrote a word, find a message. text = the word (its stem), channel.\n" +
                 "summarize: what is being said in MESSAGES, summary of a channel or of a private chat with a node. channel = channel or node name. A summary of the network itself is network_question with topic overview.\n" +
                 "messages_to_me: who wrote to me, the latest private messages to me.\n" +
-                "list_nodes: how many nodes there are, which or how many were heard or active in a time, nodes with low battery (metric = battery), favourite nodes (metric = favorites). period, amount.\n" +
+                "list_nodes: how many nodes there are, a list of the nodes (metric = list), which or how many were heard or active in a time, nodes with low battery (metric = battery), favourite nodes (metric = favorites). period, amount.\n" +
                 "signal_list: which nodes are nearest, farthest or have the best signal, or the signal (SNR, RSSI) of one node. role, metric = nearest, farthest or snr; node = the node when the question is about one node.\n" +
                 "traceroute: the route packets take to a node. node.\n" +
                 "neighbors: who hears whom, the neighbours of a node. node.\n" +
                 "app_status: connection to the radio, unread messages, whether my message was delivered.\n" +
                 "waypoints: waypoints, map pins.\n" +
                 "weather: weather, temperature, humidity, pressure, sensors of the nodes.\n" +
-                "network_question: any other question about the user's own network, nodes, radio, statistics or settings. topic = node (one node, node = its name, \"me\" for the user's own), radio (statistics of the user's own radio: packets, memory, uptime, channel use), ranking (metric), settings, activity (who was heard recently or is silent), overview, other.\n" +
+                "network_question: any other question about the user's own network, nodes, radio, statistics or settings. topic = node (one node, node = its name, \"me\" for the user's own), radio (statistics of the user's own radio: packets, memory, uptime, channel use), ranking (which node has the most, the least, the highest or the lowest of something: metric = rx, tx, dupe, bad, battery, voltage, cpu, ram, flash, psram, wifi, channel_util or uptime; add _low for the lowest, for example voltage_low), settings, activity (who was heard recently or is silent), overview, other.\n" +
                 "period: today, yesterday, or minutes/hours/days/weeks/months/years with amount (\"ostatnie 3 dni\" = days, 3); all = everything saved.\n" +
                 "Examples:\n" +
                 "cześć, co tam? -> {\"intent\":\"chat\"}\n" +
@@ -202,6 +202,9 @@ internal class AssistantRouter(private val engine: LiteRtEngine) {
                 "który węzeł jest najdalej ode mnie? -> {\"intent\":\"signal_list\",\"metric\":\"farthest\"}\n" +
                 "jaki jest średni SNR węzła Telegraf? -> {\"intent\":\"signal_list\",\"node\":\"Telegraf\",\"metric\":\"snr\"}\n" +
                 "ile mam węzłów w sieci? -> {\"intent\":\"list_nodes\"}\n" +
+                "pokaż listę węzłów -> {\"intent\":\"list_nodes\",\"metric\":\"list\"}\n" +
+                "który węzeł ma najniższe napięcie? -> {\"intent\":\"network_question\",\"metric\":\"voltage_low\",\"topic\":\"ranking\"}\n" +
+                "który węzeł ma największe obciążenie procesora? -> {\"intent\":\"network_question\",\"metric\":\"cpu\",\"topic\":\"ranking\"}\n" +
                 "czy mam zasięg do Chełmowej? -> {\"intent\":\"open_link_planner\",\"node\":\"Chełmowa\"}\n" +
                 "napisz na kanale MT_SW, że spotkanie jest o 18 -> {\"intent\":\"draft_message\",\"channel\":\"MT_SW\",\"text\":\"Spotkanie jest o 18.\"}\n" +
                 "ile wiadomości było wczoraj na kanale 1? -> {\"intent\":\"count_messages\",\"channel\":\"1\",\"period\":\"yesterday\"}\n" +

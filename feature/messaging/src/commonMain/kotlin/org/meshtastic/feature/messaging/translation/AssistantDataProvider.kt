@@ -651,9 +651,15 @@ class AssistantDataProvider(
         var uptime: Int? = null
         var heapUsed: Float? = null
         var devTime = 0L
+        var extTime = 0L
         var battery: Int? = null
         var chUtil: Float? = null
         var airUtil: Float? = null
+        var voltage: Float? = null
+        var cpu: Int? = null
+        var flashUsed: Float? = null
+        var psramUsed: Float? = null
+        var wifi: Int? = null
     }
 
     /** The latest telemetry every node reported (last 3 days), ranked by what the question is about. */
@@ -674,9 +680,20 @@ class AssistantDataProvider(
                     row.heapUsed = if ((ls.heap_total_bytes ?: 0) > 0) ((ls.heap_total_bytes!! - (ls.heap_free_bytes ?: 0)).coerceAtLeast(0)).toFloat() / ls.heap_total_bytes!! * PERCENT else null
                 }
             }
+            t.decodeLocalStatsExtended()?.let { ext ->
+                if (entry.time >= row.extTime) {
+                    row.extTime = entry.time
+                    row.cpu = ext.cpuUsagePercent.takeIf { it > 0 }
+                    row.flashUsed = if (ext.flashTotalBytes > 0) ext.flashUsedBytes.toFloat() / ext.flashTotalBytes * PERCENT else null
+                    row.psramUsed =
+                        if (ext.memoryPsramTotal > 0) (ext.memoryPsramTotal - ext.memoryPsramFree).coerceAtLeast(0).toFloat() / ext.memoryPsramTotal * PERCENT else null
+                    row.wifi = ext.wifiRssi.takeIf { it != 0 }
+                }
+            }
             t.device_metrics?.let { dm ->
                 if (entry.time >= row.devTime) {
                     row.devTime = entry.time
+                    row.voltage = dm.voltage
                     row.battery = dm.battery_level
                     row.chUtil = dm.channel_utilization
                     row.airUtil = dm.air_util_tx
@@ -699,7 +716,12 @@ class AssistantDataProvider(
                 wantsTx -> listOf(txKey)
                 q.hasAny(listOf("duplik", "dupe")) -> listOf(Key("duplicate packets received", true) { it.dupe?.toFloat() })
                 q.hasAny(listOf("błęd", "bled", "uszkodz", "bad ")) -> listOf(Key("bad packets received", true) { it.bad?.toFloat() })
-                q.hasAny(listOf("heap", "pamię", "pamie", " ram")) -> listOf(Key("used heap percent (highest first)", true) { it.heapUsed })
+                q.hasAny(listOf("napię", "napie", "volt")) -> listOf(Key("battery voltage in volts (highest first)", true) { it.voltage })
+                q.hasAny(listOf("cpu", "procesor", "obciążeni", "obciazeni")) -> listOf(Key("CPU load percent (highest first)", true) { it.cpu?.toFloat() })
+                q.hasAny(listOf("psram")) -> listOf(Key("used PSRAM percent (highest first)", true) { it.psramUsed })
+                q.hasAny(listOf("flash")) -> listOf(Key("used flash percent (highest first)", true) { it.flashUsed })
+                q.hasAny(listOf("wifi", "wi-fi")) -> listOf(Key("Wi-Fi signal dBm (strongest first)", true) { it.wifi?.toFloat() })
+                q.hasAny(listOf("heap", "pamię", "pamie", " ram")) -> listOf(Key("used RAM (heap) percent (highest first)", true) { it.heapUsed })
                 q.hasAny(listOf("bateri", "battery")) -> listOf(Key("battery percent (lowest first)", false) { it.battery?.toFloat() })
                 q.hasAny(listOf("zajęt", "zajet", "kanał", "kanal", "channel", "utiliz")) -> listOf(Key("channel utilization percent", true) { it.chUtil })
                 q.hasAny(listOf("uptime", "działa od", "dziala od", "restart")) -> listOf(Key("uptime", true) { it.uptime?.toFloat() })
@@ -713,7 +735,8 @@ class AssistantDataProvider(
             val n = nodeRepository.nodeDBbyNum.value[r.num]
             val name = n?.let { "${it.user.short_name} (${it.user.long_name}), id ${it.user.id}" } ?: "!${r.num.toUInt().toString(HEX)}"
             return "- $name: rx=${r.rx ?: "?"}, tx=${r.tx ?: "?"}, bad=${r.bad ?: "?"}, dupe=${r.dupe ?: "?"}, " +
-                "heap_used=${r.heapUsed?.let { fmt(it) } ?: "?"}%, battery=${r.battery ?: "?"}%, ch_util=${r.chUtil?.let { fmt(it) } ?: "?"}%, " +
+                "ram_used=${r.heapUsed?.let { fmt(it) } ?: "?"}%, cpu=${r.cpu ?: "?"}%, flash_used=${r.flashUsed?.let { fmt(it) } ?: "?"}%, " +
+                "psram_used=${r.psramUsed?.let { fmt(it) } ?: "?"}%, wifi=${r.wifi ?: "?"} dBm, voltage=${r.voltage?.let { fmt(it) } ?: "?"} V, battery=${r.battery ?: "?"}%, ch_util=${r.chUtil?.let { fmt(it) } ?: "?"}%, " +
                 "air_tx=${r.airUtil?.let { fmt(it) } ?: "?"}%, uptime=${r.uptime?.let { it / SECONDS_PER_HOUR } ?: "?"} h"
         }
         // With two keys (received AND sent) each list is shorter, so both fit in the small window.
@@ -857,6 +880,22 @@ class AssistantDataProvider(
         return nodeDetail(node, since)
     }
 
+    /** The known nodes in plain words for the user, most recently heard first; long lists are cut with a count of the rest. */
+    fun nodeListText(limit: Int = NODE_LIST_SHOWN): String {
+        val nodes = nodeRepository.nodeDBbyNum.value.values.sortedByDescending { it.lastHeard }
+        if (nodes.isEmpty()) return if (polish) "Nie znam jeszcze żadnych węzłów." else "No nodes are known yet."
+        val listed = nodes.take(limit).joinToString("\n") { n ->
+            val long = n.user.long_name.takeIf { it.isNotBlank() && it != n.user.short_name }
+            "- ${n.user.short_name.ifBlank { n.user.id }}" + (long?.let { " ($it)" } ?: "")
+        }
+        val rest = nodes.size - limit
+        return if (polish) {
+            "Znane węzły (${nodes.size}), od ostatnio słyszanych:\n$listed" + if (rest > 0) "\n… i $rest innych." else ""
+        } else {
+            "Known nodes (${nodes.size}), most recently heard first:\n$listed" + if (rest > 0) "\n… and $rest more." else ""
+        }
+    }
+
     /** All known nodes with short and long name. */
     fun toolNodeNames(): String {
         val nodes = nodeRepository.nodeDBbyNum.value.values.sortedByDescending { it.lastHeard }
@@ -877,6 +916,15 @@ class AssistantDataProvider(
             "dupe", "duplicates" -> ranking("dupe", top)
             "bad" -> ranking("bad ", top)
             "heap", "ram" -> ranking("heap", top)
+            "heap_low", "ram_low" -> ranking("heap najniż", top)
+            "voltage" -> ranking("napięcie", top)
+            "voltage_low" -> ranking("napięcie najniż", top)
+            "cpu" -> ranking("cpu", top)
+            "cpu_low" -> ranking("cpu najniż", top)
+            "flash" -> ranking("flash", top)
+            "psram" -> ranking("psram", top)
+            "wifi" -> ranking("wifi", top)
+            "battery_high" -> ranking("battery najwyż", top)
             "battery" -> ranking("battery", top)
             "channel_util", "channel", "utilization" -> ranking("channel", top)
             "uptime" -> ranking("uptime", top)
@@ -1946,6 +1994,7 @@ class AssistantDataProvider(
         const val MILLIS_PER_MINUTE = 60_000L
         const val METERS_PER_KM = 1000f
         const val RANK_BOTTOM = 3
+        const val NODE_LIST_SHOWN = 60
         const val HEX = 16
         const val SECONDS_PER_HOUR = 3600
         const val MAX_NODES_DETAIL = 2

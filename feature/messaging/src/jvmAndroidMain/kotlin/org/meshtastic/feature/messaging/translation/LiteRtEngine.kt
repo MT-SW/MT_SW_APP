@@ -354,7 +354,12 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
                         "powershell",
                         "-NoProfile",
                         "-Command",
-                        "Get-CimInstance Win32_VideoController | ForEach-Object { \$_.Name + ' | driver ' + \$_.DriverVersion + ' | ' + [math]::Round(\$_.AdapterRAM / 1MB) + ' MB' }",
+                        // Windows keeps the card's memory in a 32-bit field that stops at 4 GB, so the real size is read from the registry.
+                        "\$reg = Get-ItemProperty 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\0*' -ErrorAction SilentlyContinue; " +
+                            "Get-CimInstance Win32_VideoController | ForEach-Object { \$n = \$_.Name; \$m = [math]::Round(\$_.AdapterRAM / 1MB); " +
+                            "\$r = \$reg | Where-Object { \$_.DriverDesc -eq \$n } | Select-Object -First 1; " +
+                            "if (\$r -and \$r.'HardwareInformation.qwMemorySize') { \$m = [math]::Round([uint64]\$r.'HardwareInformation.qwMemorySize' / 1MB) }; " +
+                            "\$n + ' | driver ' + \$_.DriverVersion + ' | ' + \$m + ' MB' }",
                     )
                 os.contains("mac") -> listOf("system_profiler", "SPDisplaysDataType")
                 else -> listOf("sh", "-c", "lspci 2>/dev/null | grep -iE 'vga|3d|display'")
@@ -573,7 +578,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         const val CONTEXT_SMALL = 8192
         const val CONTEXT_LARGE = 16384
 
-        /** At most this many tokens of quiet thinking before an answer; keeps the wait short on phones. */
-        const val THINKING_BUDGET = 384
+        /** At most this many tokens of quiet thinking before an answer; the same on a phone and a computer. */
+        const val THINKING_BUDGET = 1536
     }
 }
