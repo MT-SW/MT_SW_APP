@@ -39,6 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.model.MeshLog
+import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.model.getNeighborInfoResponse
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.neighbor_info
@@ -121,7 +122,7 @@ fun NeighborInfoLogScreen(modifier: Modifier = Modifier, viewModel: MetricsViewM
         topBar = {
             val lastRequestNeighborsTime by viewModel.lastRequestNeighborsTime.collectAsStateWithLifecycle()
             MainAppBar(
-                title = state.node?.user?.long_name ?: "",
+                title = state.node?.effectiveLongName.orEmpty(),
                 subtitle = stringResource(Res.string.neighbor_info),
                 ourNode = null,
                 showNodeChip = false,

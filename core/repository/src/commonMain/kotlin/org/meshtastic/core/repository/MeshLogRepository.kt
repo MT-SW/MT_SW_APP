@@ -112,6 +112,9 @@ interface MeshLogRepository {
     fun getRequestLogsLimited(targetNodeNum: Int, portNum: PortNum, maxItem: Int): Flow<List<MeshLog>> =
         getRequestLogs(targetNodeNum, portNum)
 
+    /** Retrieves the request logs other nodes sent on [portNum], where `want_response` is true. */
+    fun getInboundRequestLogs(portNum: PortNum): Flow<List<MeshLog>>
+
     /** Returns the cached [MyNodeInfo] from the system logs. */
     fun getMyNodeInfo(): Flow<MyNodeInfo?>
 

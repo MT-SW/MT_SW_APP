@@ -63,14 +63,14 @@ class MeshtasticDatabaseTest {
     @Throws(IOException::class)
     fun migrateAll(): Unit = runBlocking {
         helper.createDatabase(EARLIEST_SCHEMA_VERSION).close()
-        // Every bump is an @AutoMigration except 52→53, 63→64 and 65→66, which are hand-written and must be passed in.
+        // Every bump is an @AutoMigration except 52→53, 63→64 and 66→67, which are hand-written and must be passed in.
         helper
             .runMigrationsAndValidate(
                 latestSchemaVersion(),
                 listOf(
                     MeshtasticDatabase.MIGRATION_52_53,
                     MeshtasticDatabase.MIGRATION_63_64,
-                    MeshtasticDatabase.MIGRATION_65_66,
+                    MeshtasticDatabase.MIGRATION_66_67,
                 ),
             )
             .close()

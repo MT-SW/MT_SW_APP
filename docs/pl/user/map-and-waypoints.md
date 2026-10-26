@@ -2,7 +2,7 @@
 title: Mapa i punkty trasy
 parent: Przewodnik użytkownika
 nav_order: 6
-last_updated: 2026-10-21
+last_updated: 2026-10-26
 description: Podgląd pozycji węzłów na mapie, tworzenie i udostępnianie punktów trasy, zarządzanie warstwami mapy i Site Planner oraz kontrola udostępniania pozycji i prywatności.
 aliases:
   - map

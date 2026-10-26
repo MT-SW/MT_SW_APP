@@ -164,6 +164,16 @@ interface MeshLogDao {
     )
     fun getLatestLogPerNode(): Flow<List<MeshLog>>
 
+    /** Retrieves [MeshLog]s on 'port_num' (PortNum) from any node except [excludeFromNum]. */
+    @Query(
+        """
+        SELECT * FROM log
+        WHERE port_num = :portNum AND from_num != :excludeFromNum
+        ORDER BY received_date DESC LIMIT :maxItem
+        """,
+    )
+    fun getLogsOnPort(portNum: Int, excludeFromNum: Int, maxItem: Int): Flow<List<MeshLog>>
+
     @Insert suspend fun insert(log: MeshLog)
 
     /**

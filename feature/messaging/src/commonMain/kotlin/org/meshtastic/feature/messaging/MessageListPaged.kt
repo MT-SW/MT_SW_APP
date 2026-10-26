@@ -68,6 +68,7 @@ import org.meshtastic.core.model.Reaction
 import org.meshtastic.core.repository.isSenderMuted
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.util.isDesktopPlatform
+import org.meshtastic.core.model.hasDisplayName
 import org.meshtastic.feature.messaging.component.DateSeparator
 import org.meshtastic.feature.messaging.component.MessageItem
 import org.meshtastic.feature.messaging.component.MessageStatusDialog
@@ -199,11 +200,15 @@ internal fun MessageListPaged(
         )
     }
 
+    val reactorNames =
+        remember(state.nodes) { state.nodes.filter { it.hasDisplayName }.associate { it.user.id to it.displayName } }
+
     var showReactionDialog by remember { mutableStateOf<List<Reaction>?>(null) }
     showReactionDialog?.let { reactions ->
         ReactionDialog(
             reactions = reactions,
             myId = state.ourNode?.user?.id,
+            reactorNames = reactorNames,
             canReact = state.canReact,
             onDismiss = { showReactionDialog = null },
             onResend = { reaction ->

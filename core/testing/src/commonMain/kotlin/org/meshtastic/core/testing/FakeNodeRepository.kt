@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.map
 import org.meshtastic.core.model.MyNodeInfo
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeSortOption
+import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.model.mergePowerChannelLabel
 import org.meshtastic.core.model.util.LocalStatsExtended
 import org.meshtastic.core.repository.NodeRepository
@@ -99,7 +100,7 @@ class FakeNodeRepository :
             .toList()
             .let { nodes ->
                 when (sort) {
-                    NodeSortOption.ALPHABETICAL -> nodes.sortedBy { it.user.long_name.lowercase() }
+                    NodeSortOption.ALPHABETICAL -> nodes.sortedBy { it.effectiveLongName.lowercase() }
 
                     NodeSortOption.LAST_HEARD -> nodes.sortedByDescending { it.lastHeard }
 
@@ -169,6 +170,11 @@ class FakeNodeRepository :
     override suspend fun setNodeNotes(num: Int, notes: String) {
         val node = _nodeDBbyNum.value[num] ?: return
         _nodeDBbyNum.value = _nodeDBbyNum.value + (num to node.copy(notes = notes))
+    }
+
+    override suspend fun setNodeDisplayName(num: Int, displayName: String) {
+        val node = _nodeDBbyNum.value[num] ?: return
+        _nodeDBbyNum.value = _nodeDBbyNum.value + (num to node.copy(displayName = displayName))
     }
 
     override suspend fun updatePowerChannelLabel(num: Int, channelIndex: Int, label: String) {

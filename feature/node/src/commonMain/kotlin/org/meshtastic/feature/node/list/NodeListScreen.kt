@@ -106,6 +106,7 @@ import org.meshtastic.core.ui.icon.SignalOff
 import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
 import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.core.ui.util.parseDeepLinkOrInvalid
+import org.meshtastic.feature.node.component.DisplayNameDialog
 import org.meshtastic.feature.node.component.LocalNodeContextMenu
 import org.meshtastic.feature.node.component.NodeContextMenu
 import org.meshtastic.feature.node.component.NodeCountSummary
@@ -114,6 +115,15 @@ import org.meshtastic.feature.node.component.NodeFilterToggles
 import org.meshtastic.feature.node.component.NodeHopHistogramSheet
 import org.meshtastic.feature.node.component.NodeListHelp
 import org.meshtastic.proto.ExcludedModules
+
+internal fun ownNodeMenuItems(node: Node, ourNode: Node?, connectionState: ConnectionState): OwnNodeMenuItems {
+    val connected = node.num == ourNode?.num && connectionState == ConnectionState.Connected
+    return OwnNodeMenuItems(
+        updateStatus = canEditStatusMessage(node, ourNode, connectionState),
+        editName = connected,
+        shareContact = connected && ourNode.capabilities.supportsQrCodeSharing,
+    )
+}
 
 /**
  * design#115: status message editing is offered on the connected local node only, and only where the firmware has the
@@ -124,6 +134,12 @@ internal fun canEditStatusMessage(node: Node, ourNode: Node?, connectionState: C
         connectionState == ConnectionState.Connected &&
         node.capabilities.supportsStatusMessage &&
         !node.metadata.excludes(ExcludedModules.STATUSMESSAGE_CONFIG)
+
+/** Which actions our own node's long-press menu offers; the menu opens only when [any] is true. */
+internal data class OwnNodeMenuItems(val updateStatus: Boolean, val editName: Boolean, val shareContact: Boolean) {
+    val any: Boolean
+        get() = updateStatus || editName || shareContact
+}
 
 @Suppress("LongMethod", "CyclomaticComplexMethod")
 @OptIn(ExperimentalFoundationApi::class)
@@ -140,6 +156,7 @@ fun NodeListScreen(
     onEditStatusMessage: () -> Unit = {},
     navigateToMeshView: (Int) -> Unit = {},
     navigateToCompass: (Int) -> Unit = {},
+    onEditName: () -> Unit = {},
 ) {
     val showToast = org.meshtastic.core.ui.util.rememberShowToastResource()
     val scope = rememberCoroutineScope()
@@ -356,6 +373,15 @@ fun NodeListScreen(
 
                 items(nodes, key = { it.num }) { node ->
                     var expanded by remember { mutableStateOf(false) }
+                    var showDisplayNameDialog by remember { mutableStateOf(false) }
+
+                    if (showDisplayNameDialog) {
+                        DisplayNameDialog(
+                            node = node,
+                            onSave = viewModel::setNodeDisplayName,
+                            onDismiss = { showDisplayNameDialog = false },
+                        )
+                    }
 
                     Box(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
                         val isThisNode = node.num == ourNode?.num
@@ -442,6 +468,7 @@ fun NodeListScreen(
                                 onDismiss = { expanded = false },
                                 onOpenMeshView = { navigateToMeshView(node.num) },
                                 onOpenCompass = { navigateToCompass(node.num) },
+                                onSetDisplayName = { showDisplayNameDialog = true },
                             )
                         }
                     }

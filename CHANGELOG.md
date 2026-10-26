@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Październik 2026
 
+* Migracja z oryginałem: lokalne nazwy własne węzłów (lista, szczegóły, wiadomości, mapy, widżet), trasy traceroute wykonane przez inne węzły do nas na własnym węźle i nowa wersja bazy 67 (nasza, bo oryginał zajął 66); węzły w jednym punkcie dalej rozsuwamy w kółko, bez grupowania z licznikiem.
 * Asystent AI: nowsza wersja biblioteki modelu (0.18.1, taka jak w narzędziu Google, na którym ten sam model działa na karcie graficznej) i trzy próby uruchomienia na karcie graficznej (od razu, po wyczyszczeniu pamięci podręcznej, z mniejszym oknem); każda próba jest w logu.
 * Asystent liczy sam, bez zgadywania: „który węzeł ma najniższe napięcie / najdłużej pracuje / największe obciążenie procesora…”, średnie i szybkie podsumowanie węzłów dla ponad 20 wielkości (napięcie, bateria, czas pracy, kanał, CPU, RAM, flash, PSRAM, Wi‑Fi, ruch, sygnał, skoki, odległość, temperatura i inne). Nowa wielkość to jeden wiersz w katalogu, a nie nowa obsługa.
 * Asystent: myśli dłużej przed odpowiedzią (większy zapas „cichego myślenia”, taki sam na telefonie i komputerze), rozpoznaje prośbę o listę węzłów (pokazuje je, a nie tylko liczbę) oraz pytania o największe i najmniejsze napięcie, obciążenie procesora, RAM, flash, PSRAM i sygnał Wi‑Fi węzłów. W raporcie o komputerze karta graficzna ma prawdziwą ilość pamięci (Windows podawał najwyżej 4 GB).
@@ -420,6 +421,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### October 2026
 
+* Merge with the original: local node display names (list, details, messages, maps, widget), traceroutes other nodes ran to us on our own node and a new database version 67 (ours, because the original took 66); nodes at one spot are still spread in a circle, without the counted grouping.
 * AI assistant: a newer version of the model library (0.18.1, the same as in Google's own tool, where this model runs on the graphics card) and three attempts to start on the graphics card (as is, after clearing the cache, with a smaller window); each attempt is in the log.
 * The assistant counts by itself, without guessing: "which node has the lowest voltage / the longest uptime / the highest CPU load…", averages and a quick summary of the nodes for over 20 values (voltage, battery, uptime, channel, CPU, RAM, flash, PSRAM, Wi-Fi, traffic, signal, hops, distance, temperature and more). A new value is one row in a catalogue, not new handling.
 * Assistant: it thinks longer before answering (a larger quiet-thinking budget, the same on a phone and a computer), understands a request for the list of nodes (shows them, not just the count) and questions about the highest and lowest voltage, CPU load, RAM, flash, PSRAM and Wi-Fi signal of the nodes. In the computer report the graphics card shows its real memory (Windows reported 4 GB at most).

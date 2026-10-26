@@ -2,7 +2,7 @@
 title: Węzły
 parent: Przewodnik użytkownika
 nav_order: 4
-last_updated: 2026-10-21
+last_updated: 2026-10-26
 description: Przeglądaj, filtruj i sortuj węzły sieci mesh — szczegóły, jakość sygnału, role i szybkie akcje.
 aliases:
   - node-list
@@ -20,7 +20,7 @@ Ekran Węzły wyświetla listę wszystkich węzłów widocznych w Twojej sieci m
 ## Lista węzłów
 
 Lista węzłów pokazuje każdy węzeł, który Twój węzeł usłyszał, w tym:
-- **Nazwa węzła** — długa nazwa ustawiona przez użytkownika
+- **Nazwa węzła** — długa nazwa węzła albo nadana przez Ciebie nazwa własna (zobacz [Nazwy własne węzłów](#nazwy-własne-węzłów))
 - **Nazwa skrócona** — 4-znakowy identyfikator
 - **Jakość sygnału** — SNR, RSSI i określenie jakości, pokazywane tylko dla węzłów, które Twój węzeł usłyszał bezpośrednio. W układzie Pełnym węzeł osiągany przez przekaźnik pokazuje tutaj zamiast tego liczbę skoków; węzeł słyszany wyłącznie przez MQTT nie pokazuje żadnej z tych informacji
 - **Ostatnio słyszany** — czas od ostatniej komunikacji
@@ -127,6 +127,16 @@ Większość użytkowników powinna zostawić domyślną rolę **Klient**. Rozwa
 - **TAK / TAK Tracker** — Potrzebne tylko przy współpracy z systemami ATAK/WinTAK. Szczegóły w [Integracja TAK](tak).
 
 > 💡 **Wskazówka:** Sieć mesh działa najlepiej, gdy większość węzłów to **Klient** lub **Router**. Zbyt wiele węzłów Klient pasywny zmniejsza odporność sieci; zbyt wiele Routerów w gęstym obszarze może powodować zatłoczenie. Dobra zasada: jeden Router na 5–10 Klientów w Twojej okolicy.
+
+## Nazwy własne węzłów
+
+Każdemu węzłowi możesz nadać lokalną nazwę własną, która zastępuje jego długą nazwę na liście węzłów, w szczegółach węzła, w wiadomościach, powiadomieniach, na mapach i w widżecie śledzenia węzła. Ustawisz ją z menu długiego dotknięcia węzła (**Ustaw nazwę własną**) albo z karty **Nazwa własna** w szczegółach węzła. Zapisanie pustej nazwy ją usuwa. Nazwa może mieć do 36 bajtów UTF-8, tyle samo co w aplikacji na iPhone'a.
+
+Awatar zawsze pokazuje krótką nazwę rozgłaszaną przez węzeł. Gdy nazwa własna jest ustawiona, szczegóły węzła pokazują rozgłaszaną długą nazwę w wierszu **Długa nazwa** pod nazwą, więc prawdziwa nazwa nadal jest widoczna.
+
+Nazwy własne są zapisane tylko na tym urządzeniu. Nigdy nie są wysyłane przez sieć mesh ani przekazywane innej aplikacji, więc kody QR, udostępnianie kontaktu, otwieranie pozycji w aplikacji map oraz eksporty wiadomości, bazy węzłów i GPX używają prawdziwej nazwy węzła. Kopie zapasowe aplikacji zawierają nazwy własne, tak samo jak notatki. Usunięcie węzła usuwa też jego nazwę własną.
+
+Własny węzeł też może mieć nazwę własną, z jego karty **Nazwa własna**. Pozycja **Edytuj nazwę** w menu długiego dotknięcia własnego węzła robi coś innego: otwiera [Ustawienia - Radio i użytkownik](settings-radio-user), gdzie zmieniasz nazwę, którą węzeł rozgłasza wszystkim.
 
 ### Wskaźniki bezpieczeństwa
 

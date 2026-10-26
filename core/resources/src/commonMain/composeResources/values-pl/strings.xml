@@ -3367,4 +3367,8 @@
     <string name="antenna_drawing_note">Rysunek nie w skali; wartości są na nim i w tabeli poniżej.</string>
     <string name="antenna_yagi_row">%1$s: %2$s, w odległości %3$s od reflektora</string>
     <string name="antenna_open_calculator">Kalkulator anten</string>
+    <string name="edit_name">Edytuj nazwę</string>
+    <string name="set_display_name">Ustaw nazwę własną</string>
+    <string name="display_name_hint">Widoczna tylko na tym urządzeniu. Udostępnianie i eksport używają prawdziwej nazwy węzła.</string>
+    <string name="display_name">Nazwa własna</string>
 </resources>

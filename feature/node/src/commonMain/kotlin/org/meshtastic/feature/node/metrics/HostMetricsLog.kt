@@ -57,6 +57,7 @@ import org.meshtastic.core.common.util.formatByteSize
 import org.meshtastic.core.common.util.formatString
 import org.meshtastic.core.model.TelemetryType
 import org.meshtastic.core.model.util.LocalStatsExtended
+import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.model.util.TimeConstants.MS_PER_SEC
 import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.resources.Res
@@ -96,7 +97,7 @@ fun HostMetricsLogScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) 
         onNavigateUp = onNavigateUp,
         telemetryType = TelemetryType.HOST,
         titleRes = Res.string.host_metrics_log,
-        nodeName = state.node?.user?.long_name ?: "",
+        nodeName = state.node?.effectiveLongName.orEmpty(),
         data = filteredData,
         timeProvider = { it.time.toDouble() },
         infoData = HOST_METRICS_INFO_DATA,

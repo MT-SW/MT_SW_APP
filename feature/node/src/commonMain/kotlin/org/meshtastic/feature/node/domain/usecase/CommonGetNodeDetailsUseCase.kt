@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -36,6 +37,7 @@ import org.meshtastic.core.model.FirmwareRelease
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.MyNodeInfo
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.model.heroImageFile
 import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.model.util.hasValidEnvironmentMetrics
@@ -163,6 +165,12 @@ constructor(
                     ),
                     meshLogRepository.getLogsFrom(effectiveNodeId, PortNum.NEIGHBORINFO_APP.value),
                 ),
+                // Traceroutes other nodes ran to us are logged under each tracer, so our own page gathers them all.
+                if (effectiveNodeId == MeshLog.NODE_NUM_LOCAL) {
+                    meshLogRepository.getInboundRequestLogs(PortNum.TRACEROUTE_APP).onStart { emit(emptyList()) }
+                } else {
+                    flowOf(emptyList())
+                },
             ) { args: Array<List<Any?>> ->
                 @Suppress("UNCHECKED_CAST")
                 LogsGroup(
@@ -172,6 +180,7 @@ constructor(
                     pax = args[3] as List<MeshLog>,
                     trRes = args[4] as List<MeshLog>,
                     niRes = args[5] as List<MeshLog>,
+                    trInbound = args[6] as List<MeshLog>,
                 )
             }
 
@@ -306,7 +315,8 @@ constructor(
                     tracerouteRequests = trReqs,
                     tracerouteResults = logs.trRes,
                     tracerouteObserved = observedTracerouteResponses(trReqs, logs.trRes),
-                    tracerouteTracedBy = tracedByTracerouteRequests(logs.trRes, identity.ourNode?.num),
+                    tracerouteTracedBy =
+                    tracedByTracerouteRequests(if (isLocal) logs.trInbound else logs.trRes, identity.ourNode?.num),
                     neighborInfoRequests = niReqs,
                     neighborInfoResults = logs.niRes,
                     firmwareEdition = metadata.edition,
@@ -334,7 +344,7 @@ constructor(
 
             @Suppress("MagicNumber")
             val nodeName =
-                node.user.long_name.takeIf { it.isNotBlank() }?.let { UiText.DynamicString(it) }
+                node.effectiveLongName.takeIf { it.isNotBlank() }?.let { UiText.DynamicString(it) }
                     ?: UiText.Resource(Res.string.fallback_node_name, node.user.id.takeLast(4))
 
             NodeDetailUiState(
@@ -364,6 +374,7 @@ constructor(
         val pax: List<MeshLog>,
         val trRes: List<MeshLog>,
         val niRes: List<MeshLog>,
+        val trInbound: List<MeshLog>,
     )
 
     private data class IdentityGroup(val ourNode: Node?, val myInfo: MyNodeInfo?, val profile: DeviceProfile)

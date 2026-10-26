@@ -2,7 +2,7 @@
 title: Ustawienia — Radio i użytkownik
 parent: Przewodnik użytkownika
 nav_order: 7
-last_updated: 2026-10-21
+last_updated: 2026-10-26
 description: Konfiguracja sprzętu węzła, presetów LoRa, profilu użytkownika, udostępniania pozycji, zarządzania energią i bezpieczeństwa.
 aliases:
   - settings
@@ -40,7 +40,7 @@ W **Ustawienia → Użytkownik**. Ekran pokazuje też (tylko do odczytu) **ID w�
 | Ustawienie | Opis | Domyślnie |
 |---------|-------------|---------|
 | Radioamator licencjonowany (Ham) | Włącz, jeśli posiadasz licencję radioamatorską. Włączenie wymaga potwierdzenia w oknie dialogowym, bo tryb licencjonowany usuwa klucze szyfrowania kanałów i wysyła cały ruch jawnym tekstem. We własnym węźle zmienia wtedy etykietę **Długa nazwa** na **Znak wywoławczy** (do 7 znaków) i dodaje osobną, nieobowiązkową **Długą nazwę**, która jest dopisywana do znaku wywoławczego. Przez zdalne zarządzanie pole pozostaje **Długa nazwa** | Wyłączone |
-| Długa nazwa | Twoja wyświetlana nazwa. Do 24 bajtów w firmware 2.8 lub nowszym, a w starszym do 39 | Ustawia firmware |
+| Długa nazwa | Twoja wyświetlana nazwa. Do 24 bajtów w firmware 2.8 lub nowszym, a w starszym do 39. Aby zmienić nazwę innego węzła tylko na tym urządzeniu, zobacz [Nazwy własne węzłów](nodes) | Ustawia firmware |
 | Krótka nazwa | Do czterech znaków | Ustawia firmware |
 | Wiadomość statusu | Krótki, publiczny, dowolny status wyświetlany przez inne węzły obok Twojego węzła, do 80 bajtów, usuwany za pomocą **✕** w polu. Węzeł rozgłasza go w sieci mesh po zmianie i ponownie co 12 godzin. Wymaga firmware 2.7.20 lub nowszego, w innym przypadku jest niedostępny | Pusta |
 | Nie przyjmuje wiadomości | Oznacza węzeł jako nienadzorowany lub infrastrukturalny, taki, do którego nikt nie powinien próbować pisać. Aplikacja pokazuje go ikoną na liście węzłów. Do zmiany potrzebne jest firmware 2.6.9 lub nowsze | Wyłączone |

@@ -143,6 +143,7 @@ import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.NumberFormatter
 import org.meshtastic.core.common.util.ioDispatcher
 import org.meshtastic.core.common.util.nowSeconds
+import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.TracerouteOverlay
 import org.meshtastic.core.model.geofence.toGeofence
@@ -1346,7 +1347,7 @@ internal fun rememberNodeClusterItems(
                         unknownText,
                         nowText,
                     ),
-                nodeSnippet = node.user.long_name,
+                nodeSnippet = node.effectiveLongName,
                 myNodeNum = myNodeNum,
                 focused = node.num == focusNodeNum,
             )

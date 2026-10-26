@@ -73,7 +73,13 @@ class TracerouteHandlerImpl(
         val probablyLabel = guess?.let { getStringSuspend(Res.string.traceroute_probably_hop, "") }.orEmpty()
         shown.getTracerouteResponse(
             getUser = { num ->
-                val name = tracerouteHopName(num, nodeRepository.getUser(num), unknownHopLabel)
+                val name =
+                    tracerouteHopName(
+                        num,
+                        nodeRepository.getUser(num),
+                        unknownHopLabel,
+                        nodeRepository.nodeDBbyNum.value[num]?.displayName.orEmpty(),
+                    )
                 if (guess != null && num == guess.num) probablyLabel + name else name
             },
             headerTowards = getStringSuspend(Res.string.traceroute_route_towards_dest),
