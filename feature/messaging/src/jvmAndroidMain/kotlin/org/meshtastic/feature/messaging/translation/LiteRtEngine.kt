@@ -295,7 +295,9 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
             // A chip that failed once is not tried again until the app restarts (every try costs seconds).
             if (name in failedBackends && name != "CPU") continue
             try {
-                created = start(file, backend(), cache, window, audio)
+                created =
+                    if (name == "GPU") startOnGpu(file, backend, cache, window, audio)
+                    else start(file, backend(), cache, window, audio)
                 activeBackend = name
                 Logger.i(tag = TAG) { "Model $modelId runs on $name (context $window tokens)" }
                 break
@@ -381,6 +383,27 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
             AiModels.GEMMA_E2B_ID -> CONTEXT_SMALL
             else -> CONTEXT_LARGE
         }
+
+    /**
+     * The graphics chip gets more than one chance, because the same model starts on it in Google's own command-line
+     * tool: first as it is, then after the cache folder is cleared (an old cache can be the reason), then with a
+     * smaller context window. The library's own message names no reason, so each step is written to the log.
+     */
+    private fun startOnGpu(file: File, backend: () -> Backend, cache: File, window: Int, audio: Boolean): Engine {
+        try {
+            return start(file, backend(), cache, window, audio)
+        } catch (e: Exception) {
+            Logger.w(tag = TAG) { "GPU did not start; clearing the cache folder and trying once more" }
+            cache.listFiles()?.forEach { runCatching { it.deleteRecursively() } }
+        }
+        try {
+            return start(file, backend(), cache, window, audio)
+        } catch (e: Exception) {
+            if (window <= GPU_SMALL_WINDOW) throw e
+            Logger.w(tag = TAG) { "GPU did not start again; trying a context of $GPU_SMALL_WINDOW tokens" }
+        }
+        return start(file, backend(), cache, GPU_SMALL_WINDOW, audio)
+    }
 
     private fun start(file: File, backend: Backend, cache: File, window: Int, audio: Boolean): Engine {
         val created =
@@ -580,5 +603,8 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
 
         /** At most this many tokens of quiet thinking before an answer; the same on a phone and a computer. */
         const val THINKING_BUDGET = 1536
+
+        /** The context a second GPU attempt uses when the full window did not start. */
+        const val GPU_SMALL_WINDOW = 4096
     }
 }
