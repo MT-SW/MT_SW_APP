@@ -77,6 +77,7 @@ import org.meshtastic.core.di.CoroutineDispatchers
 import kotlin.concurrent.Volatile
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
 import org.meshtastic.core.common.database.DatabaseManager as SharedDatabaseManager
 
 internal const val MAX_CONSECUTIVE_FLOW_POOL_RECOVERIES = 3
@@ -143,7 +144,6 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
     }
 
     private enum class ReopenOrigin {
-        BOUNDED_OPERATION,
         WEDGED_OPERATION,
         FLOW_OBSERVER,
     }
@@ -345,7 +345,7 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
             return it
         }
         checkOpen()
-        val database = buildDatabase(DatabaseConstants.DEFAULT_DB_NAME)
+        val database = newDatabase(DatabaseConstants.DEFAULT_DB_NAME)
         if (lifecycleState != LifecycleState.OPEN) {
             runCatching { closeDatabase(database) }
                 .onFailure {
@@ -391,8 +391,8 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
         get() = _currentDb
 
     /**
-     * Re-latches long-lived DAO flows on database switches and recovers the active Room pool after a reader/writer
-     * acquisition timeout. A failed query is never replayed on the same pool; publishing the replacement causes
+     * Re-latches long-lived DAO flows on database switches and recovers the active Room pool when a latch stalls
+     * ([DbFlowStalledException]). A failed query is never replayed on the same pool; publishing the replacement causes
      * [flatMapLatest] to start a fresh DAO flow. Concurrent failing collectors converge on the same replacement.
      *
      * Each collector stops after [MAX_CONSECUTIVE_FLOW_POOL_RECOVERIES] replacements without a successful emission,
@@ -401,9 +401,10 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
      * detached Room instances without ever becoming a permanent refusal; a collector that fails while the window is
      * full can retry after backoff (see `retryOnDbPoolFailure`) and recover once the window clears.
      *
-     * A leaked pool permit does not surface as an exception at all: Room's pool logs the acquire timeout and retries
-     * forever (see [requireFirstEmissionWithin]), so the DAO flow simply never emits. Every latch is therefore also
-     * bounded by [FLOW_FIRST_EMISSION_TIMEOUT_MS], which converts that silent stall into the same recovery path.
+     * A leaked pool permit does not surface as an exception: Room's pool logs the acquire timeout and retries forever
+     * (see [requireFirstEmissionWithin]), so the DAO flow simply never emits. Every latch is therefore bounded by
+     * [FLOW_FIRST_EMISSION_TIMEOUT_MS], and the resulting [DbFlowStalledException] is the only failure that triggers
+     * recovery; every other failure propagates.
      */
     override fun <T> observeCurrentDb(query: (MeshtasticDatabase) -> Flow<T>): Flow<T> = flow {
         val consecutivePoolRecoveries = atomic(0)
@@ -419,9 +420,7 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
                     .catch { failure ->
                         if (failure is CancellationException) throw failure
                         val exception = failure as? Exception ?: throw failure
-                        if (!isDbPoolAcquireTimeoutException(exception) && exception !is DbFlowStalledException) {
-                            throw failure
-                        }
+                        if (exception !is DbFlowStalledException) throw failure
                         if (
                             consecutivePoolRecoveries.value >= MAX_CONSECUTIVE_FLOW_POOL_RECOVERIES &&
                             shouldRethrowFlowFailure(database)
@@ -432,18 +431,18 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
 
                         val reopened =
                             try {
-                                // Once a timeout is classified, finish or reject the manager-level ownership transfer
+                                // Once a stall is classified, finish or reject the manager-level ownership transfer
                                 // atomically even if this collector is cancelled. A cancellable reopen could otherwise
                                 // build a replacement and abandon the cache/publication handoff halfway through.
                                 withContext(NonCancellable) { reopenFlowDatabaseIfStillCurrent(database) }
                             } catch (@Suppress("TooGenericExceptionCaught") recoveryFailure: Exception) {
                                 if (recoveryFailure is CancellationException) currentCoroutineContext().ensureActive()
                                 exception.addSuppressed(recoveryFailure)
-                                Logger.w(recoveryFailure) { "Failed to recover active DB after a Flow pool timeout" }
+                                Logger.w(recoveryFailure) { "Failed to recover active DB after a stalled Flow" }
                                 throw exception
                             }
                         if (reopened != null) {
-                            Logger.w { "Reopened active DB after a Room Flow connection-pool timeout" }
+                            Logger.w { "Reopened active DB after a stalled Room Flow" }
                         } else if (shouldRethrowFlowFailure(database)) {
                             throw exception
                         }
@@ -511,7 +510,7 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
 
     /** Returns a cached database or builds one. Every caller must hold [mutex]. */
     private fun getOrOpenDatabase(dbName: String): MeshtasticDatabase = dbCache.getOrPut(dbName) {
-        if (dbName == DatabaseConstants.DEFAULT_DB_NAME) getOrCreateDefaultDatabase() else buildDatabase(dbName)
+        if (dbName == DatabaseConstants.DEFAULT_DB_NAME) getOrCreateDefaultDatabase() else newDatabase(dbName)
     }
 
     /**
@@ -620,9 +619,27 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
      * Builds a new [MeshtasticDatabase] for [dbName]. Tests override this to control file placement (temp directory
      * instead of the platform data dir). Production delegates to the platform-specific [getDatabaseBuilder].
      */
-    protected open fun buildDatabase(dbName: String): MeshtasticDatabase {
+    protected open fun buildDatabase(dbName: String): MeshtasticDatabase = getDatabaseBuilder(dbName).build()
+
+    /** Guarded by [builtDbNamesLock]. Every database name this manager has built a pool for. */
+    private val builtDbNames = mutableSetOf<String>()
+    private val builtDbNamesLock = SynchronizedObject()
+
+    /**
+     * Builds a pool for [dbName], first applying a staged restore if this is the first pool for that name in the
+     * process. A later build (wedge recovery, a rebuild after eviction) may run while an older pool still holds the
+     * files, and swapping files under an open connection corrupts the database; the restore waits for the restart the
+     * user is told to do.
+     */
+    private fun newDatabase(dbName: String): MeshtasticDatabase {
+        val isFirstBuild = synchronized(builtDbNamesLock) { builtDbNames.add(dbName) }
+        if (isFirstBuild) applyPendingRestore(dbName)
+        return buildDatabase(dbName)
+    }
+
+    /** Swaps a staged restore into place for [dbName]. Tests override it: in-memory databases have no files. */
+    protected open fun applyPendingRestore(dbName: String) {
         applyStagedRestore(dbName, getDatabaseFile(dbName), getFileSystem())
-        return getDatabaseBuilder(dbName).build()
     }
 
     /**
@@ -1128,14 +1145,10 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
         return (result as? ReopenResult.Replaced)?.database
     }
 
-    /** Per-window budget for [origin], or null when [origin] needs no budget of its own. */
-    private fun recoveryLimitFor(origin: ReopenOrigin): Int? = when (origin) {
+    /** Per-window budget for [origin]. */
+    private fun recoveryLimitFor(origin: ReopenOrigin): Int = when (origin) {
         ReopenOrigin.FLOW_OBSERVER -> MAX_FLOW_POOL_RECOVERIES_PER_WINDOW
-
         ReopenOrigin.WEDGED_OPERATION -> MAX_WEDGE_POOL_RECOVERIES_PER_WINDOW
-
-        // Failure-triggered recovery is already bounded by the failing call itself.
-        ReopenOrigin.BOUNDED_OPERATION -> null
     }
 
     /** Drops [origin]'s recoveries that have aged out of the window and returns what remains. Caller holds [mutex]. */
@@ -1155,7 +1168,7 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
      * hold [mutex].
      */
     private fun hasReachedRecoveryLimit(origin: ReopenOrigin): Boolean {
-        val limit = recoveryLimitFor(origin) ?: return false
+        val limit = recoveryLimitFor(origin)
         val count = recoveriesInWindow(origin).size
         return (count >= limit).also { reached ->
             if (reached) {
@@ -1169,7 +1182,6 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
 
     /** Counts one successful automatic replacement against [origin]'s window budget. Caller must hold [mutex]. */
     private fun recordRecovery(origin: ReopenOrigin) {
-        if (recoveryLimitFor(origin) == null) return
         recoveriesInWindow(origin).addLast(recoveryNowMillis())
     }
 
@@ -1200,7 +1212,7 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
 
             // Build a fresh instance directly (not through getOrPut) before touching the cache,
             // so a failed or cancelled build leaves the existing cache entry and _currentDb consistent.
-            val reopened = withContext(dispatchers.io) { buildDatabase(expectedDbName) }
+            val reopened = withContext(dispatchers.io) { newDatabase(expectedDbName) }
             if (!isPublishableReplacement(expectedDbName, reopened)) {
                 return@withManagerOperation ReopenResult.WriteLockHeld
             }
@@ -1319,8 +1331,8 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
      * [withDbTimeoutMillis].
      *
      * A callback is never replayed after it starts: an arbitrary block can perform one side effect and then fail, so
-     * transparently invoking it again against another pool could duplicate or split a logical write. Pool-timeout
-     * recovery may reopen the active database for future calls, but the original failure is still propagated.
+     * transparently invoking it again against another pool could duplicate or split a logical write. A block abandoned
+     * after its deadline may reopen the active database for future calls, but the original failure is still propagated.
      *
      * Containment is per pool, not process-wide: the callback runs on the pool's containment lane ([poolLanes]) in a
      * manager-scoped child coroutine that owns the writer registration and releases it in its own `finally`. Only the
@@ -1335,28 +1347,39 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
      */
     @Suppress("ReturnCount")
     override suspend fun <T> withDb(block: suspend (MeshtasticDatabase) -> T): T? {
-        val queuedAt = nowMillis
+        val timing = DbCallTiming()
         currentCoroutineContext().ensureActive()
         val admission = beginWrite()
         val blockStarted = CompletableDeferred<Unit>()
-        val execution = launchDbBlock(admission, blockStarted, block)
+        val execution = launchDbBlock(admission, blockStarted, timing, block)
         val timeoutMillis = withDbTimeoutMillis
         val completed =
             if (timeoutMillis <= 0) execution.join() else withTimeoutOrNull(timeoutMillis) { execution.join() }
-        if (completed == null) abandonWedgedDbBlock(admission, blockStarted, execution, timeoutMillis)
+        if (completed == null) abandonWedgedDbBlock(admission, blockStarted, execution, timeoutMillis, callerOf(block))
 
         // Re-check cancellation so a stale caller does not continue after the DB releases.
         currentCoroutineContext().ensureActive()
-        val elapsedMillis = nowMillis - queuedAt
-        if (elapsedMillis >= WITH_DB_SLOW_OPERATION_MS) {
+        val elapsed = timing.queued.elapsedNow()
+        if (elapsed.inWholeMilliseconds >= WITH_DB_SLOW_OPERATION_MS) {
+            val started = timing.started
+            val finished = timing.finished
+            val waited = started?.let { it - timing.queued } ?: elapsed
+            val held = if (started != null && finished != null) finished - started else Duration.ZERO
             Logger.w {
-                "withDb took ${elapsedMillis}ms including lane wait; persistent slow logs indicate the DB access " +
-                    "path should be revisited"
+                "withDb took ${elapsed.inWholeMilliseconds}ms (waited ${waited.inWholeMilliseconds}ms, held " +
+                    "${held.inWholeMilliseconds}ms) in ${callerOf(block)}"
             }
         }
         val failure = execution.getCompletionExceptionOrNull() ?: return execution.getCompleted()
         handleDbBlockFailure(admission, failure)
     }
+
+    /**
+     * Names the code that passed [block], from its compiled lambda class (`Owner$method$N`). R8 keeps these names (see
+     * `proguard-rules.pro`); a platform without class names reports `unnamed`.
+     */
+    private fun callerOf(block: Any): String =
+        block::class.toString().removePrefix("class ").takeUnless { it.isBlank() || it == "null" } ?: "unnamed"
 
     /**
      * Starts [block] on the admitted pool's lane.
@@ -1371,13 +1394,19 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
     private fun <T> launchDbBlock(
         admission: AdmittedDatabase,
         blockStarted: CompletableDeferred<Unit>,
+        timing: DbCallTiming,
         block: suspend (MeshtasticDatabase) -> T,
     ): Deferred<T> = managerScope.async(admission.lane, start = CoroutineStart.ATOMIC) {
         val db = admission.database
         try {
             currentCoroutineContext().ensureActive()
+            timing.started = TimeSource.Monotonic.markNow()
             blockStarted.complete(Unit)
-            withContext(NonCancellable) { block(db) }
+            try {
+                withContext(NonCancellable) { block(db) }
+            } finally {
+                timing.finished = TimeSource.Monotonic.markNow()
+            }
         } finally {
             withContext(NonCancellable) { endWrite(db) }
         }
@@ -1426,15 +1455,17 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
         blockStarted: CompletableDeferred<Unit>,
         execution: Deferred<*>,
         timeoutMillis: Long,
+        caller: String,
     ): Nothing {
         if (!blockStarted.isCompleted) {
             execution.cancel()
             // Re-check: the block may have acquired the lane between the timeout and the cancellation, in which case it
             // is inside NonCancellable and must be abandoned instead of reported as never started.
             if (!blockStarted.isCompleted) {
-                Logger.w { "withDb waited ${timeoutMillis}ms for the DB lane; its callback never started" }
+                Logger.w { "withDb waited ${timeoutMillis}ms for the DB lane; its callback never started in $caller" }
                 throw DatabaseOperationTimeoutException(
-                    "withDb did not start within ${timeoutMillis}ms; an earlier block is wedged on this database",
+                    "withDb did not start within ${timeoutMillis}ms in $caller; an earlier block is wedged on this " +
+                        "database",
                 )
             }
         }
@@ -1451,19 +1482,21 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
         Logger.w {
             when (reopened) {
                 is ReopenResult.Replaced ->
-                    "withDb callback exceeded ${timeoutMillis}ms; abandoned it and reopened the active DB so later " +
-                        "calls run on a fresh connection pool"
+                    "withDb callback exceeded ${timeoutMillis}ms in $caller; abandoned it and reopened the active DB " +
+                        "so later calls run on a fresh connection pool"
 
                 ReopenResult.WriteLockHeld ->
-                    "withDb callback exceeded ${timeoutMillis}ms; abandoned it and kept the active DB because " +
-                        "another connection still holds its write lock"
+                    "withDb callback exceeded ${timeoutMillis}ms in $caller; abandoned it and kept the active DB " +
+                        "because another connection still holds its write lock"
 
                 ReopenResult.NotReplaced ->
-                    "withDb callback exceeded ${timeoutMillis}ms; abandoned it but the active DB was not reopened"
+                    "withDb callback exceeded ${timeoutMillis}ms in $caller; abandoned it but the active DB was not " +
+                        "reopened"
             }
         }
         throw DatabaseOperationTimeoutException(
-            "withDb callback did not finish within ${timeoutMillis}ms and was abandoned without being replayed",
+            "withDb callback did not finish within ${timeoutMillis}ms in $caller and was abandoned without being " +
+                "replayed",
         )
     }
 
@@ -1693,14 +1726,12 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
     }
 
     /**
-     * Maps a failed [withDb] execution onto the existing recovery policy and rethrows.
-     *
-     * The failed callback is never replayed; recovery only reopens the pool so *future* calls succeed.
+     * Rethrows a failed [withDb] execution without replaying the callback. Pool replacement happens only when a block
+     * is abandoned after its deadline (see [abandonWedgedDbBlock]), never because of the failure's message.
      */
     @Suppress("ReturnCount", "ThrowsCount", "TooGenericExceptionCaught", "CyclomaticComplexMethod")
-    private suspend fun handleDbBlockFailure(admission: AdmittedDatabase, failure: Throwable): Nothing {
+    private fun handleDbBlockFailure(admission: AdmittedDatabase, failure: Throwable): Nothing {
         val db = admission.database
-        val active = admission.name
         if (failure is CancellationException) {
             // The execution coroutine was cancelled from outside this call — only manager shutdown does that. The
             // caller itself is still active (its own cancellation surfaces from join), so do not impersonate it.
@@ -1714,31 +1745,6 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
         if (currentDb !== db && isDbClosedException(e)) {
             Logger.w {
                 "withDb: database closed during switch (${e.message}); callback will not be replayed automatically"
-            }
-            throw e
-        }
-
-        // Same active DB but Room's connection pool is wedged. Reopen for future calls, but do not replay this
-        // callback: it may already have completed an earlier side effect before the timeout surfaced.
-        if (currentDb === db && isDbPoolAcquireTimeoutException(e)) {
-            val reopened =
-                try {
-                    val result = reopenActiveDatabaseIfStillCurrent(db, active, ReopenOrigin.BOUNDED_OPERATION)
-                    (result as? ReopenResult.Replaced)?.database
-                } catch (recoveryCancel: CancellationException) {
-                    throw recoveryCancel
-                } catch (recoveryFailure: Exception) {
-                    e.addSuppressed(recoveryFailure)
-                    Logger.w(recoveryFailure) { "withDb: failed to reopen active DB after a connection-pool timeout" }
-                    null
-                }
-            Logger.w {
-                if (reopened != null) {
-                    "withDb: reopened active DB after transient Room connection-pool timeout; " +
-                        "failed callback was not replayed"
-                } else {
-                    "withDb: active DB was not reopened during timeout recovery; failed callback was not replayed"
-                }
             }
             throw e
         }
@@ -1778,32 +1784,14 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
         private const val WRITER_GATE_TIMEOUT_MS = 30_000L
         val DB_TERMS = listOf("pool", "database", "connection", "sqlite")
 
-        private const val ROOM_POOL_ACQUIRE_TIMEOUT_PHRASE = "timed out attempting to acquire"
-        private const val ROOM_READER_CONNECTION_PHRASE = "reader connection"
-        private const val ROOM_WRITER_CONNECTION_PHRASE = "writer connection"
         private const val SQLITE_BUSY_PHRASE = "database is locked"
 
-        /**
-         * Room KMP currently exposes pool-acquire timeouts as exception message text instead of a stable common typed
-         * signal. Keep this fallback narrow so BLE/GATT/transport connection errors do not trigger DB reopen recovery.
-         */
-        private fun isRoomPoolAcquireTimeoutMessage(message: String): Boolean =
-            ROOM_POOL_ACQUIRE_TIMEOUT_PHRASE in message &&
-                (ROOM_READER_CONNECTION_PHRASE in message || ROOM_WRITER_CONNECTION_PHRASE in message)
-
-        fun isDbPoolAcquireTimeoutException(e: Exception): Boolean = generateSequence<Throwable>(e) { it.cause }
+        fun isDbClosedException(e: Exception): Boolean = generateSequence<Throwable>(e) { it.cause }
             .any { throwable ->
                 val msg = throwable.message?.lowercase() ?: return@any false
-                isRoomPoolAcquireTimeoutMessage(msg)
+                val hasDbContext = DB_TERMS.any { it in msg }
+                ("closed" in msg && hasDbContext) || SQLITE_BUSY_PHRASE in msg || "sqlite_busy" in msg
             }
-
-        fun isDbClosedException(e: Exception): Boolean = isDbPoolAcquireTimeoutException(e) ||
-            generateSequence<Throwable>(e) { it.cause }
-                .any { throwable ->
-                    val msg = throwable.message?.lowercase() ?: return@any false
-                    val hasDbContext = DB_TERMS.any { it in msg }
-                    ("closed" in msg && hasDbContext) || SQLITE_BUSY_PHRASE in msg || "sqlite_busy" in msg
-                }
 
         private val SQLITE_ERROR_CODE = Regex("""error code: (\d+)\b""")
         private const val SQLITE_CORRUPT = 11
@@ -2236,3 +2224,12 @@ open class DatabaseManager(private val datastore: DatabaseDataStore, private val
  * to; the active pool is reopened so subsequent operations proceed.
  */
 class DatabaseOperationTimeoutException(message: String) : IllegalStateException(message)
+
+/** Monotonic marks for one [DatabaseManager.withDb] call; the lane coroutine writes them, the caller reads them. */
+private class DbCallTiming {
+    val queued: TimeSource.Monotonic.ValueTimeMark = TimeSource.Monotonic.markNow()
+
+    @Volatile var started: TimeSource.Monotonic.ValueTimeMark? = null
+
+    @Volatile var finished: TimeSource.Monotonic.ValueTimeMark? = null
+}
