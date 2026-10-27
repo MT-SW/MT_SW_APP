@@ -86,6 +86,7 @@ fun NodeListScreen(settingsViewModel: SettingsViewModel, onNavigateUp: () -> Uni
                 onExtraPacketsChange = { settingsViewModel.setNodeExtraPackets(it) },
                 onExtraHardwareChange = { settingsViewModel.setNodeExtraHardware(it) },
                 onExtraEtherChange = { settingsViewModel.setNodeExtraEther(it) },
+                onExtraNeighborsChange = { settingsViewModel.setNodeExtraNeighbors(it) },
             )
         }
     }

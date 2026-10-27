@@ -126,7 +126,6 @@ fun NodeItemCompact(
     deviceImageUrl: String? = null,
     relayNodeName: String? = null,
     neighborCount: Int? = null,
-    onNeighborsClick: (() -> Unit)? = null,
 ) {
     val longName = thatNode.effectiveLongName.ifEmpty { stringResource(Res.string.unknown_username) }
     val isFavorite = thatNode.isFavorite
@@ -226,7 +225,6 @@ fun NodeItemCompact(
                     isFavorite = isFavorite,
                     unmessageable = unmessageable,
                     neighborCount = neighborCount,
-                    onNeighborsClick = onNeighborsClick,
                 )
 
                 // Row 2: Glanceable health — online + last heard + distance + signal
@@ -278,7 +276,6 @@ private fun CompactNameRow(
     isFavorite: Boolean,
     unmessageable: Boolean,
     neighborCount: Int?,
-    onNeighborsClick: (() -> Unit)?,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -286,7 +283,6 @@ private fun CompactNameRow(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         NodeSecurityIcons(thatNode, iconSize = 18.dp, isThisNode = isThisNode)
-        if (neighborCount != null) NeighborCountBadge(count = neighborCount, onClick = onNeighborsClick)
         Text(
             text = longName,
             style = MaterialTheme.typography.titleMediumEmphasized.copy(fontStyle = style),
@@ -295,6 +291,7 @@ private fun CompactNameRow(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f),
         )
+        if (neighborCount != null && LocalNodeExtraConfig.current.neighbors) NeighborCountBadge(count = neighborCount, iconSize = 18.dp)
         if (thatNode.isUnknownUser) {
             Icon(
                 imageVector = MeshtasticIcons.PersonQuestion,

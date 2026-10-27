@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.Flow
 import org.koin.compose.viewmodel.koinViewModel
 import org.meshtastic.core.navigation.ContactsRoute
 import org.meshtastic.core.navigation.MapRoute
-import org.meshtastic.core.navigation.NodeDetailRoute
 import org.meshtastic.core.navigation.NodesRoute
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.ui.component.ScrollToTopEvent
@@ -63,13 +62,6 @@ fun AdaptiveNodeListScreen(
         onEditStatusMessage = { backStack.add(SettingsRoute.UserStatusMessage) },
         navigateToMeshView = { num -> backStack.add(MapRoute.MeshHud(focusNodeNum = num)) },
         onEditName = { backStack.add(SettingsRoute.User) },
-        navigateToNeighbors = { num ->
-            while (backStack.lastOrNull() != NodesRoute.Nodes && backStack.size > 1) {
-                backStack.removeLastOrNull()
-            }
-            backStack.add(NodesRoute.NodeDetail(num))
-            backStack.add(NodeDetailRoute.NeighborInfoLog(num))
-        },
         navigateToCompass = { num -> backStack.add(NodesRoute.NodeDetail(num, openCompass = true)) },
     )
 }

@@ -94,6 +94,8 @@ data class NodeExtraConfig(
     val packets: Boolean = false,
     val hardware: Boolean = false,
     val ether: Boolean = false,
+    /** Shows the neighbours icon with the count from the last saved neighbour list. */
+    val neighbors: Boolean = true,
 ) {
     /** True when the statistics shown in the extra line itself (beyond the sensors) are switched on. */
     val anyStats: Boolean

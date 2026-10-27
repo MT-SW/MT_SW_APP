@@ -156,7 +156,6 @@ fun NodeListScreen(
     onEditStatusMessage: () -> Unit = {},
     navigateToMeshView: (Int) -> Unit = {},
     navigateToCompass: (Int) -> Unit = {},
-    navigateToNeighbors: (Int) -> Unit = {},
     onEditName: () -> Unit = {},
 ) {
     val showToast = org.meshtastic.core.ui.util.rememberShowToastResource()
@@ -177,6 +176,13 @@ fun NodeListScreen(
     val unheardNodes by viewModel.unheardBannerNodes.collectAsStateWithLifecycle()
     val deviceImageUrls by viewModel.deviceImageUrls.collectAsStateWithLifecycle()
     val neighborCounts by viewModel.neighborCounts.collectAsStateWithLifecycle()
+    // Our own node sends no saved neighbour list to the phone, so its count is the nodes heard directly (no relay, not
+    // through the internet), which is what a neighbour list of our node would hold.
+    val ownDirectNeighbors =
+        remember(allNodes, ourNode) {
+            val ours = ourNode?.num
+            ours?.let { allNodes.count { n -> n.num != it && n.hopsAway == 0 && !n.viaMqtt && n.isOnline } }
+        }
     val relayNodeIds by viewModel.relayNodeIds.collectAsStateWithLifecycle()
     val ignoredNodeCount = unfilteredNodes.count { it.isIgnored }
 
@@ -212,6 +218,7 @@ fun NodeListScreen(
     val extraPackets by viewModel.nodeExtraPackets.collectAsStateWithLifecycle()
     val extraHardware by viewModel.nodeExtraHardware.collectAsStateWithLifecycle()
     val extraEther by viewModel.nodeExtraEther.collectAsStateWithLifecycle()
+    val extraNeighbors by viewModel.nodeExtraNeighbors.collectAsStateWithLifecycle()
     // One ticker for the whole list: visible paged rows change page together; nothing runs when paging is off.
     val extraTick = remember { mutableIntStateOf(0) }
     if (extraMode == NodeExtraMode.PAGED) {
@@ -261,7 +268,7 @@ fun NodeListScreen(
     }
 
     CompositionLocalProvider(
-        LocalNodeExtraConfig provides NodeExtraConfig(extraMode, extraIconsOnly, extraPackets, extraHardware, extraEther),
+        LocalNodeExtraConfig provides NodeExtraConfig(extraMode, extraIconsOnly, extraPackets, extraHardware, extraEther, extraNeighbors),
         LocalNodeExtraStats provides extraStats,
         LocalNodeExtraTick provides extraTick,
     ) {
@@ -421,8 +428,7 @@ fun NodeListScreen(
                                     showTelemetry = showTelemetry,
                                     deviceImageUrl = deviceImageUrls[node.user.hw_model.value],
                                     relayNodeName = relayNodeName,
-                                    neighborCount = neighborCounts[node.num],
-                                    onNeighborsClick = { navigateToNeighbors(node.num) },
+                                    neighborCount = neighborCounts[node.num] ?: ownDirectNeighbors.takeIf { node.num == ourNode?.num },
                                 )
 
                             NodeListDensity.COMPACT ->
@@ -446,8 +452,7 @@ fun NodeListScreen(
                                     tempInFahrenheit = state.tempInFahrenheit,
                                     deviceImageUrl = deviceImageUrls[node.user.hw_model.value],
                                     relayNodeName = relayNodeName,
-                                    neighborCount = neighborCounts[node.num],
-                                    onNeighborsClick = { navigateToNeighbors(node.num) },
+                                    neighborCount = neighborCounts[node.num] ?: ownDirectNeighbors.takeIf { node.num == ourNode?.num },
                                 )
                         }
                         if (canEditStatus) {

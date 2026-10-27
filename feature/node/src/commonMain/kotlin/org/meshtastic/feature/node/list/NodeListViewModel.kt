@@ -131,6 +131,7 @@ class NodeListViewModel(
 
     /** The extra line shows the ether (channel utilization, air time, noise floor). */
     val nodeExtraEther = nodeFilterPreferences.nodeExtraEther
+    val nodeExtraNeighbors = nodeFilterPreferences.nodeExtraNeighbors
 
     /** The extra line shows hardware data (CPU, memory, Wi-Fi signal). */
     val nodeExtraHardware = nodeFilterPreferences.nodeExtraHardware

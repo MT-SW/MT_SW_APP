@@ -3389,4 +3389,5 @@
     <string name="kb_empty">Nic nie znaleziono</string>
     <string name="kb_loading">Wczytywanie…</string>
     <string name="kb_source">Źródło: %1$s</string>
+    <string name="node_layout_neighbors">Sąsiedzi przy nazwie węzła (ikona z liczbą)</string>
 </resources>

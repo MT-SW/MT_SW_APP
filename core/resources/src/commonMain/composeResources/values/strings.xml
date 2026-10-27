@@ -3174,5 +3174,6 @@
     <string name="kb_empty">Nothing found</string>
     <string name="kb_loading">Loading…</string>
     <string name="kb_source">Source: %1$s</string>
+    <string name="node_layout_neighbors">Neighbours next to the node name (icon with a count)</string>
 </resources>
 

@@ -35,6 +35,7 @@ import org.meshtastic.core.resources.app_settings
 import org.meshtastic.core.resources.debug_panel
 import org.meshtastic.core.resources.device_links
 import org.meshtastic.core.resources.filter_settings
+import org.meshtastic.core.resources.node_layout_neighbors
 import org.meshtastic.core.resources.node_layout_section_title
 import org.meshtastic.core.resources.local_stats_title
 import org.meshtastic.core.resources.app_log_level
@@ -171,6 +172,7 @@ object SettingsSearchCatalog {
             Res.string.app_update_check_title to SettingsRoute.MtSwFeatures,
             Res.string.app_update_tests_title to SettingsRoute.MtSwFeatures,
             Res.string.node_layout_section_title to SettingsRoute.NodeList,
+            Res.string.node_layout_neighbors to SettingsRoute.NodeList,
             Res.string.wifi_devices to WifiProvisionRoute.WifiProvision(),
             Res.string.filter_settings to SettingsRoute.FilterSettings,
             Res.string.device_links to SettingsRoute.DeviceLinks,

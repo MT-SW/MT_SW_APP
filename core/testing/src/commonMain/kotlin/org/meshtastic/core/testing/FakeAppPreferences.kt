@@ -311,6 +311,12 @@ class FakeUiPrefs : UiPrefs {
         nodeExtraHardware.value = value
     }
 
+    override val nodeExtraNeighbors = MutableStateFlow(true)
+
+    override fun setNodeExtraNeighbors(value: Boolean) {
+        nodeExtraNeighbors.value = value
+    }
+
     override val nodeExtraIconsOnly = MutableStateFlow(false)
 
     override fun setNodeExtraIconsOnly(value: Boolean) {

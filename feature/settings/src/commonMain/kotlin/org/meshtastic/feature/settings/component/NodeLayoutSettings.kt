@@ -76,6 +76,7 @@ import org.meshtastic.core.resources.node_layout_distance_and_bearing
 import org.meshtastic.core.resources.node_layout_hops_away
 import org.meshtastic.core.resources.node_layout_last_heard_time
 import org.meshtastic.core.resources.node_layout_log_icons
+import org.meshtastic.core.resources.node_layout_neighbors
 import org.meshtastic.core.resources.node_layout_power
 import org.meshtastic.core.resources.node_layout_preview
 import org.meshtastic.core.resources.node_layout_relative_last_heard
@@ -115,6 +116,7 @@ fun NodeLayoutSettings(
     onExtraPacketsChange: (Boolean) -> Unit = {},
     onExtraHardwareChange: (Boolean) -> Unit = {},
     onExtraEtherChange: (Boolean) -> Unit = {},
+    onExtraNeighborsChange: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     ExpressiveSection(modifier = modifier, title = stringResource(Res.string.node_layout_section_title)) {
@@ -166,6 +168,7 @@ fun NodeLayoutSettings(
                 state.extraPackets,
                 state.extraHardware,
                 state.extraEther,
+                state.extraNeighbors,
             ),
             LocalNodeExtraStats provides previewStats,
             LocalNodeExtraTick provides previewTick,
@@ -180,6 +183,7 @@ fun NodeLayoutSettings(
                         tempInFahrenheit = false,
                         connectionState = ConnectionState.Connected,
                         showTelemetry = state.showTelemetry,
+                        neighborCount = 4,
                     )
 
                 NodeListDensity.COMPACT ->
@@ -196,6 +200,7 @@ fun NodeLayoutSettings(
                         showChannel = state.showChannel,
                         showRole = state.showRole,
                         showTelemetry = state.showTelemetry,
+                        neighborCount = 4,
                     )
             }
         }
@@ -210,6 +215,13 @@ fun NodeLayoutSettings(
             checked = state.showTelemetry,
             enabled = true,
             onCheckedChange = onShowTelemetryChange,
+        )
+
+        SwitchPreference(
+            title = stringResource(Res.string.node_layout_neighbors),
+            checked = state.extraNeighbors,
+            enabled = true,
+            onCheckedChange = onExtraNeighborsChange,
         )
 
         NodeExtraSettings(

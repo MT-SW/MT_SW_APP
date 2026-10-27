@@ -243,6 +243,7 @@ class SettingsViewModel(
     val shouldShowTelemetry = uiPrefs.shouldShowTelemetry
     val nodeExtraMode = uiPrefs.nodeExtraMode
     val nodeExtraIconsOnly = uiPrefs.nodeExtraIconsOnly
+    val nodeExtraNeighbors = uiPrefs.nodeExtraNeighbors
     val nodeExtraPackets = uiPrefs.nodeExtraPackets
     val nodeExtraHardware = uiPrefs.nodeExtraHardware
     val nodeExtraEther = uiPrefs.nodeExtraEther
@@ -270,6 +271,8 @@ class SettingsViewModel(
     fun setNodeExtraMode(value: String) = uiPrefs.setNodeExtraMode(value)
 
     fun setNodeExtraIconsOnly(value: Boolean) = uiPrefs.setNodeExtraIconsOnly(value)
+
+    fun setNodeExtraNeighbors(value: Boolean) = uiPrefs.setNodeExtraNeighbors(value)
 
     fun setNodeExtraPackets(value: Boolean) = uiPrefs.setNodeExtraPackets(value)
 
@@ -321,6 +324,7 @@ class SettingsViewModel(
         }
             .combine(nodeExtraMode) { state, mode -> state.copy(extraMode = NodeExtraMode.fromName(mode)) }
             .combine(nodeExtraIconsOnly) { state, iconsOnly -> state.copy(extraIconsOnly = iconsOnly) }
+            .combine(nodeExtraNeighbors) { state, on -> state.copy(extraNeighbors = on) }
             .combine(nodeExtraPackets) { state, on -> state.copy(extraPackets = on) }
             .combine(nodeExtraHardware) { state, on -> state.copy(extraHardware = on) }
             .combine(nodeExtraEther) { state, on -> state.copy(extraEther = on) }
@@ -344,4 +348,5 @@ data class NodeListSettingsState(
     val extraPackets: Boolean = true,
     val extraHardware: Boolean = true,
     val extraEther: Boolean = true,
+    val extraNeighbors: Boolean = true,
 )

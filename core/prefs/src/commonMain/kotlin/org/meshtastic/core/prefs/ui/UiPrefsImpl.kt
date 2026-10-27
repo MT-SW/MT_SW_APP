@@ -513,6 +513,15 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[NodeListLayoutPreferences.KEY_EXTRA_HARDWARE] = value } }
     }
 
+    override val nodeExtraNeighbors: StateFlow<Boolean> =
+        dataStore.data
+            .map { it[NodeListLayoutPreferences.KEY_EXTRA_NEIGHBORS] ?: true }
+            .stateIn(scope, SharingStarted.Eagerly, true)
+
+    override fun setNodeExtraNeighbors(value: Boolean) {
+        scope.launch { dataStore.edit { it[NodeListLayoutPreferences.KEY_EXTRA_NEIGHBORS] = value } }
+    }
+
     override val nodeExtraIconsOnly: StateFlow<Boolean> =
         dataStore.data
             .map { it[NodeListLayoutPreferences.KEY_EXTRA_ICONS_ONLY] ?: false }

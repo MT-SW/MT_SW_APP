@@ -140,7 +140,6 @@ fun NodeItem(
     deviceImageUrl: String? = null,
     relayNodeName: String? = null,
     neighborCount: Int? = null,
-    onNeighborsClick: (() -> Unit)? = null,
 ) {
     val originalLongName = thatNode.effectiveLongName.ifEmpty { stringResource(Res.string.unknown_username) }
     val isMuted = remember(thatNode) { thatNode.isMuted }
@@ -231,7 +230,6 @@ fun NodeItem(
                 deviceType = deviceType,
                 contentColor = contentColor,
                 neighborCount = neighborCount,
-                onNeighborsClick = onNeighborsClick,
             )
 
             thatNode.nodeStatus?.let { status ->
@@ -625,7 +623,6 @@ private fun NodeItemHeader(
     deviceType: DeviceType?,
     contentColor: Color,
     neighborCount: Int?,
-    onNeighborsClick: (() -> Unit)?,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -641,7 +638,6 @@ private fun NodeItemHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                if (neighborCount != null) NeighborCountBadge(count = neighborCount, onClick = onNeighborsClick)
                 Text(
                     text = longName,
                     style = MaterialTheme.typography.titleMediumEmphasized.copy(fontStyle = style),
@@ -686,6 +682,7 @@ private fun NodeItemHeader(
             }
         }
 
+        if (neighborCount != null && LocalNodeExtraConfig.current.neighbors) NeighborCountBadge(count = neighborCount)
         NodeStatusIcons(
             isThisNode = isThisNode,
             isFavorite = isFavorite,

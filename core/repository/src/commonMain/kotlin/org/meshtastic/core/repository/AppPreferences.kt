@@ -350,6 +350,11 @@ interface UiPrefs {
 
     fun setNodeExtraHardware(value: Boolean)
 
+    /** The node card shows the neighbours icon with the count from the last saved list. */
+    val nodeExtraNeighbors: StateFlow<Boolean>
+
+    fun setNodeExtraNeighbors(value: Boolean)
+
     /** Extra line shows only icons and values, without text labels. */
     val nodeExtraIconsOnly: StateFlow<Boolean>
 
