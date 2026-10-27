@@ -21,7 +21,7 @@ Przy budowaniu aplikacji pliki z `base/`, `base/pokrewne/` i `base/offtop/` są 
 
 ## In English
 
-This folder is the **offline knowledge base of the built-in assistant** in the MT_SW app. The assistant uses these files to answer questions about the network, radio, hardware and related topics without internet. That is the only reason it exists: it is not documentation to read cover to cover, but material the assistant searches for matching fragments and answers from in its own words, citing the source.
+This folder is the **offline knowledge base of the built-in assistant** in the MT_SW app. The assistant uses these files to answer questions about the network, radio, hardware and related topics without internet. It exists mainly to **help the assistant do its job**: it lets it answer factually with a source instead of guessing. It is not documentation to read cover to cover, but material the assistant searches for matching fragments and answers from in its own words.
 
 Layout: `base/` (main topic: our network and Meshtastic), `base/pokrewne/` (related: IT, electronics, Wi-Fi, ham radio, mains power, imports, and alternative networks such as MeshCore and Reticulum, given for information only), `base/offtop/` (further afield: health, first aid, hiking, daily life).
 
