@@ -1,0 +1,11 @@
+# Offtop: liny i węzły (uzupełnienie)
+
+### Węzły praktyczne: ósemka, wyblinka, knagowy, flagowy, płaski
+Wyblinka (bowline) robi pętlę na końcu liny, bywa pętlą ratunkową i węzłem kotwiczącym. Ósemka to węzeł zatrzymujący, który nie pozwala końcowi liny przejść przez oczko; jej wytrzymałość spada, jeśli pasma się krzyżują przy zaciąganiu. Węzeł knagowy (clove hitch) przywiązuje linę do słupka, jest prosty i się nie zacina, ale niezbyt pewny i słabo trzyma na kształtach prostokątnych. Węzeł flagowy (sheet bend) łączy końce dwóch lin, także o różnych średnicach (podwójny dla bardzo różnych). Węzeł płaski (reef) jest popularny, ale zawodny w wiązaniu pod obciążeniem. Węzły osłabiają linę: pęka zwykle przy węźle, a typowe węzły zachowują około 40 do 80% wytrzymałości liny. Zostaw długi koniec, zaciągnij dokładnie przed obciążeniem, a w zastosowaniach krytycznych dodaj węzeł zabezpieczający.
+Słowa: węzły, wyblinka, ósemka, knagowy, flagowy, węzeł płaski, wytrzymałość węzła, lina, maszt
+Źródło: https://en.wikipedia.org/wiki/Knot (sprawdzono 2026-10)
+
+### Liny: materiały, UV, statyczne i dynamiczne, kiedy wymienić
+Nylon jest mocny i sprężysty, ale chłonie wodę i jest o 10 do 15% słabszy mokry. Poliester ma około 90% wytrzymałości nylonu, mniej się rozciąga, nie traci na wodzie, lepiej znosi UV i ścieranie. Polipropylen jest tani, lekki, pływa, ale słabo znosi UV, tarcie i ciepło. Liny dynamiczne rozciągają się i pochłaniają energię upadku (wspinaczka); statyczne prawie nie rozciągają się i nie służą do asekuracji upadku (jaskinie, zjazdy, ratownictwo). Lina powinna pracować pod obciążeniem roboczym znacznie niższym niż zrywające; unikaj obciążeń udarowych. Przeciętna żywotność liny to około 5 lat, po czym zalecana jest poważna kontrola; liny krytyczne (wspinaczka) sprawdza się przed każdym użyciem. Rozpuszczalniki, żrące ciecze i wysoka temperatura osłabiają włókna niekiedy niewidocznie. Lina po ostrym szarpnięciu lub ze śladami zużycia powinna być wymieniona albo używana tylko do zadań bez obciążenia.
+Słowa: lina, nylon, poliester, polipropylen, UV, lina statyczna, lina dynamiczna, wymiana liny, obciążenie robocze
+Źródło: https://en.wikipedia.org/wiki/Rope (sprawdzono 2026-10)
