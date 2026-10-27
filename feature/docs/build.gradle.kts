@@ -91,7 +91,7 @@ val syncDocsToComposeResources =
         from(isolated.rootProject.projectDirectory.dir("knowledge")) { include("*.md"); into("files/knowledge") }
         // The technical knowledge base (knowledge/base/*.md, plain text edited by hand); the build adds base/index.txt
         // with the file names, because the app cannot list a resource folder.
-        from(isolated.rootProject.projectDirectory.dir("knowledge/base")) { include("*.md"); into("files/knowledge/base") }
+        from(isolated.rootProject.projectDirectory.dir("knowledge/base")) { include("*.md", "offtop/*.md"); into("files/knowledge/base") }
         // The assistant's own texts in English and Polish: an answer is written in the language of the question even
         // when the app is set to the other one. Only the lines the assistant uses are kept.
         val resourcesDir = isolated.rootProject.projectDirectory.dir("core/resources/src/commonMain/composeResources")
@@ -138,7 +138,10 @@ val syncDocsToComposeResources =
         val baseSource = isolated.rootProject.projectDirectory.dir("knowledge/base").asFile
         val baseTarget = docsComposeResources.get().asFile.resolve("files/knowledge/base")
         doLast {
-            val names = baseSource.listFiles { f -> f.extension == "md" }?.map { it.name }?.sorted().orEmpty()
+            // Topics outside the network and radio live in knowledge/base/offtop/ and are listed as "offtop/name.md".
+            val names =
+                baseSource.walkTopDown().filter { it.isFile && it.extension == "md" }
+                    .map { it.relativeTo(baseSource).path.replace('\\', '/') }.sorted().toList()
             baseTarget.mkdirs()
             baseTarget.resolve("index.txt").writeText(names.joinToString("\n"))
         }

@@ -25,7 +25,3 @@ SSH to zaszyfrowany protokół zdalnego logowania i uruchamiania poleceń, domy�
 Słowa: SSH, ssh-keygen, klucz publiczny, scp, sftp, rsync, port 22, tunel, authorized_keys, OpenSSH, zdalny dostęp, Terrapin
 Źródło: https://en.wikipedia.org/wiki/Secure_Shell (sprawdzono 2026-10)
 
-### Krem z filtrem: SPF, UVA i UVB, jak stosować w terenie
-SPF mierzy ochronę przed UVB (oparzenia): SPF 15 przepuszcza ok. 1/15 tych promieni przy nałożeniu 2 mg/cm². Wyższy SPF nie wydłuża czasu trwania, więc nadal trzeba smarować ponownie, zwykle co dwie godziny i po kąpieli. UVA wnika głębiej i zwiększa ryzyko czerniaka, a zwykły SPF mówi o nim mało, więc wybieraj produkt "broad spectrum" (w UE ochrona UVA co najmniej 1/3 SPF). Większość ludzi nakłada za mało, 1/4–1/2 zalecanej ilości. Pełne ciało to ilość zbliżona do piłki golfowej, twarz ok. 1/4–1/3 łyżeczki. Zalecany jest SPF co najmniej 30, a do tego kapelusz, okulary i odzież z filtrem UPF 30+.
-Słowa: krem z filtrem, SPF, UVA, UVB, opalanie, oparzenie słoneczne, UPF, kapelusz, wycieczka, słońce w górach
-Źródło: https://en.wikipedia.org/wiki/Sunscreen (sprawdzono 2026-10)
