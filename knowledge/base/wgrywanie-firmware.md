@@ -24,3 +24,13 @@ Słowa: web client, meshtastic.local, aktualizacja, wipe, Wi-Fi
 Podłącz urządzenie ESP32, otwórz flasher.meshtastic.org w Chrome lub Edge (inne przeglądarki nie są wymienione jako wspierane) i postępuj według komunikatów na ekranie. Po wgraniu przejdź do konfiguracji początkowej. Web Flasher potrafi też pobrać i skopiować firmware za Ciebie dla urządzeń UF2.
 Słowa: web flasher, flasher.meshtastic.org, Chrome, Edge, przeglądarka, WebSerial, konfiguracja początkowa
 Źródło: https://meshtastic.org/docs/getting-started/flashing-firmware/esp32/web-flasher/ (sprawdzono 2026-10)
+
+### Jak wgrać lub zaktualizować ESP32 skryptem (esptool, device-install)?
+Potrzebne: Python 3 i pip3 (na Windows Python z dodaniem do PATH i Git Bash), pakiet esptool (pip3 install --upgrade esptool), pobrany firmware pasujący do Twojej płytki (z zakładki Assets na GitHubie, np. firmware-esp32s3-X.X.X.xxxxxxx). Sprawdź połączenie: esptool chip-id (Windows: esptool.py chip_id). W folderze firmware: instalacja ./device-install.sh -f firmware-PŁYTKA-WERSJA.bin (Windows device-install.bat), aktualizacja plikiem -update.bin skryptem device-update.sh/bat; opcja --web dołącza wbudowanego klienta WWW. Zrestartuj komputer po instalacji sterowników; na Linux/macOS czasem trzeba wywołać esptool.py jawnie.
+Słowa: esptool, device-install.sh, device-update.sh, chip-id, skrypt, bin, update.bin, pip, Python, --web, CLI flashing
+Źródło: https://meshtastic.org/docs/getting-started/flashing-firmware/esp32/cli-script/ (sprawdzono 2026-10)
+
+### Na co uważać przy wgrywaniu firmware na ESP32 skryptem?
+Podłącz antenę przed włączeniem zasilania: bez niej można uszkodzić układ radiowy. Użyj dokładnie firmware dla swojej płytki: zły wsad może zakończyć się bez błędu, a urządzenie będzie nie odpowiadać (np. pusty ekran), możliwe są też uszkodzenia związane z GPIO. T-Beam 0.7 wymaga firmware-tbeam0.7, zwykły firmware-tbeam jest niekompatybilny. Dokumentacja tej strony nie opisuje polecenia kasowania pamięci.
+Słowa: zły firmware, pusty ekran, T-Beam 0.7, cegła, antena, uszkodzenie, nie odpowiada po flashowaniu, dobór pliku
+Źródło: https://meshtastic.org/docs/getting-started/flashing-firmware/esp32/cli-script/ (sprawdzono 2026-10)

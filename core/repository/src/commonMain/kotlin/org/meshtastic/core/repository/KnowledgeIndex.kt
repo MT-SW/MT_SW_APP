@@ -116,8 +116,18 @@ class KnowledgeIndex(documents: List<Document>) {
                 rest = rest.substring(cut).trim()
             }
         }
+        var inComment = false
         for (rawLine in markdown.lines()) {
             val line = rawLine.trimEnd()
+            // A multi-line <!-- comment --> is for the editors of the file, not for the answers.
+            if (inComment) {
+                if (line.contains("-->")) inComment = false
+                continue
+            }
+            if (line.trimStart().startsWith("<!--") && !line.contains("-->")) {
+                inComment = true
+                continue
+            }
             if (line.startsWith("#")) {
                 flush()
                 heading = line.trimStart('#').trim().ifEmpty { pageTitle }

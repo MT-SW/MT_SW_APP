@@ -19,3 +19,8 @@ Słowa: hop limit, skoki, moc, tx power, spreading factor, SF, coding rate, CR, 
 SHORT_TURBO, MEDIUM_TURBO i LONG_TURBO używają szerokości 500 kHz: są najszybsze, ale mają najkrótszy zasięg i nie są dozwolone we wszystkich regionach.
 Słowa: turbo, 500 kHz, szybki, zasięg
 Źródło: https://meshtastic.org/docs/configuration/radio/lora/ (sprawdzono 2026-10)
+
+### Co trzeba ustawić przed rozpoczęciem pracy w sieci i jakie są ostrzeżenia dla regionów?
+Aby nawiązać łączność, trzeba ustawić region (w CLI: pip3 install --upgrade meshtastic, potem meshtastic --set lora.region KOD_REGIONU; w aplikacji na iOS Ustawienia > Radio Configuration > LoRa). Po ustawieniu regionu węzeł zostaje na domyślnym presecie, który może nie pasować do lokalnej sieci: węzły muszą mieć zgodne ustawienia, żeby się słyszeć. EU_433 i EU_868 mają duty cycle 10 %, EU_866 2,5 % (10 % dla ROUTER i ROUTER_LATE). Regiony ITU są pasmami amatorskimi: tylko w trybie licencjonowanym i nie używać bez licencji krótkofalarskiej. Podana moc to sufit firmware, nie krajowy limit prawny: sprawdź krajowy plan pasm.
+Słowa: ustawienie regionu, lora.region, pierwsza konfiguracja, region unset, duty cycle, limit prawny, ITU, plan pasm
+Źródło: https://meshtastic.org/docs/getting-started/initial-config/ (sprawdzono 2026-10)
