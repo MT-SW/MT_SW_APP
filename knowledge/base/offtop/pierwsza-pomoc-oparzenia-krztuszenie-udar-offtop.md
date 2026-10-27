@@ -36,6 +36,6 @@ Słowa: ciśnienie w oponach, opony, TPMS, samochód, paliwo, zimne opony, bezpi
 Źródło: https://en.wikipedia.org/wiki/Tire-pressure_monitoring_system (sprawdzono 2026-10; ostatnie zdanie: wiedza ogólna)
 
 ### Opony zimowe: kiedy i jakie wymagania?
-Opony zimowe są zoptymalizowane na temperatury poniżej ok. 7 °C. Minimalna głębokość bieżnika to według artykułu 4 mm w Europie (dla opon zimowych często taki limit), a w USA ok. 4,75 mm. W Europie opony zimowe są obowiązkowe w wielu krajach (np. Austria, Czechy, Niemcy, Finlandia, Szwecja, Norwegia) w określonych terminach lub przy śniegu. Artykuł nie wymienia Polski wśród krajów z obowiązkiem opon zimowych, za to wymienia Polskę wśród krajów zakazujących opon kolcowanych. Przed wyjazdem za granicę sprawdź lokalne przepisy.
+Opony zimowe są zoptymalizowane na temperatury poniżej ok. 7 °C. Minimalna głębokość bieżnika bywa ustalana przez władze niezależnie od rodzaju opony; artykuł podaje 4 mm w Europie i ok. 4,75 mm w USA (przepisy krajowe mogą być inne). W Europie opony zimowe są obowiązkowe w wielu krajach (np. Austria, Czechy, Niemcy, Finlandia, Szwecja, Norwegia) w określonych terminach lub przy śniegu. Artykuł nie wymienia Polski wśród krajów z obowiązkiem opon zimowych, za to wymienia Polskę wśród krajów zakazujących opon kolcowanych. Przed wyjazdem za granicę sprawdź lokalne przepisy.
 Słowa: opony zimowe, 7 stopni, bieżnik, obowiązek opon zimowych, opony kolcowane, Polska, Czechy, Niemcy, zima, samochód
 Źródło: https://en.wikipedia.org/wiki/Winter_tire (sprawdzono 2026-10)
