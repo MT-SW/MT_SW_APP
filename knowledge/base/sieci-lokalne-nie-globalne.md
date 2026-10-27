@@ -1,48 +1,48 @@
 # Dlaczego sieci LoRa (Meshtastic, MeshCore) są lokalne, a nie globalne
 
-<!-- Artykuł: bikeman (SQ6B, Wrocław), forum "Projekty LoRa MeshCore oraz Meshtastic dla każdego", 28.01.2026. Tylko artykuł główny, bez komentarzy. Dodany na prośbę użytkownika projektu MT_SW (warto potwierdzić zgodę autora, bikeman/SQ6B). To opinia i analiza autora, nie dokumentacja producenta. -->
+<!-- Treść opracowana własnymi słowami na podstawie artykułu użytkownika bikeman (SQ6B, Wrocław) z forum "Projekty LoRa MeshCore oraz Meshtastic dla każdego" (28.01.2026), bez komentarzy pod nim. To analiza i opinia autora, nie dokumentacja producenta. -->
 
-### Dlaczego mesh LoRa nie nadaje się na wielkie obszary (od morza po góry)?
-Autor artykułu (bikeman, SQ6B) twierdzi, że zbudować sprzęt jest łatwo, ale zbudować sprawnie działającą sieć wymaga minimum wiedzy o jej działaniu; ostrzega przed wiarą w modele łączności "mesh od morza po góry", opartych na złudnych podobieństwach do Internetu. Jego zdaniem w kontekście wielkoobszarowym mesh nie ma szansy działać poprawnie, a próby zwiększania przepustowości bez zrozumienia podstaw przesuwają tylko w czasie moment degradacji i zapaści sieci. Powody są techniczne, nie programowe.
-Słowa: sieć globalna, od morza po góry, duża sieć mesh, lokalna sieć, skalowalność, zapaść sieci, wielkoobszarowa, bikeman
-Źródło: https://meshtastic.pop.pl/viewtopic.php?t=290 (artykuł z forum, sprawdzono 2026-10; opinia autora)
+### Czy da się zbudować jedną wielką sieć mesh LoRa na cały kraj?
+Autor artykułu uważa, że nie. Postawić węzeł jest łatwo, ale żeby sieć naprawdę działała, trzeba rozumieć, jak działa radio i sieć, a nie wierzyć w obietnice "mesh od morza po góry", które wzięły się z naiwnego porównywania do Internetu. Jego zdaniem przy dużym obszarze kłopoty są nieuniknione, a kolejne sztuczki zwiększające przepustowość tylko odsuwają w czasie moment, gdy sieć się załamie. Przyczyny leżą w fizyce i konstrukcji technologii, a nie w tym, że oprogramowanie jest za mało dopracowane.
+Słowa: sieć globalna, od morza po góry, duża sieć mesh, lokalna sieć, skalowalność, zapaść sieci, wielkoobszarowa, cała Polska
+Źródło: https://meshtastic.pop.pl/viewtopic.php?t=290 (artykuł bikeman, sprawdzono 2026-10; opinia autora, opracowanie własnymi słowami)
 
-### Czego brakuje sieci mesh w porównaniu z Internetem (model OSI)?
-Internet ma pełny stos: warstwa 3 (IP) to globalne adresowanie i hierarchiczny routing między milionami podsieci, warstwa 4 kontroluje przeciążenie i gubienie danych, warstwy 5–7 to usługi. W sieci mesh pełne są tylko warstwy 1 i 2, a warstwa 3 jest tak prymitywna, że nie spełnia funkcji IP. Brak warstwy 4 oznacza brak portów i brak kontroli przeciążenia; brak inteligentnego wyboru trasy; brak usług znanych z Internetu. Mesh ma proste ACK albo nic, a retransmisje przy dużym ruchu pogłębiają zator.
+### Czym sieć mesh LoRa różni się od Internetu w warstwach sieci?
+Internet ma pełny zestaw warstw: adresowanie i trasowanie między ogromną liczbą podsieci (IP), mechanizmy panujące nad ruchem i retransmisjami (TCP), a nad nimi usługi. Mesh LoRa ma dobrze zrobione tylko dwie dolne warstwy, czyli radio i dostęp do łącza. Warstwa sieciowa jest tak uboga, że nie pełni roli IP: nie ma hierarchii adresów, nie ma mądrego wybierania tras. Nie ma też odpowiednika warstwy transportowej, czyli portów i kontroli przeciążenia; zostaje proste potwierdzenie albo nic. Usług w rodzaju WWW czy poczty też nie ma, tylko krótkie komunikaty i telemetria.
 Słowa: model OSI, warstwy, IP, TCP, kontrola przeciążenia, routing, brak warstwy transportowej, porty, ACK, internet a mesh
-Źródło: https://meshtastic.pop.pl/viewtopic.php?t=290 (sprawdzono 2026-10; opinia autora)
+Źródło: https://meshtastic.pop.pl/viewtopic.php?t=290 (sprawdzono 2026-10; opinia autora, opracowanie własnymi słowami)
 
-### Jak duże różnice w szybkości są między LoRa a innymi łączami?
-Wg artykułu: światłowód terabity na sekundę, Ethernet setki Gb/s, Wi-Fi setki Mb/s, LTE/5G dziesiątki–setki Mb/s, LoRa mesh tylko 0,3–50 kb/s. Brak skalowalnego routingu (brak hierarchii adresów, często flooding zamiast routingu) działa dla dziesiątek lub setek węzłów, nie dla tysięcy.
+### Jak bardzo LoRa jest wolniejsza od innych łączy?
+Światłowód osiąga terabity na sekundę, Ethernet setki gigabitów, Wi-Fi setki megabitów, LTE i 5G dziesiątki do setek megabitów. Mesh LoRa daje od 0,3 do ok. 50 kilobitów na sekundę. Do tego brakuje skalowalnego trasowania: bez hierarchii każdy w praktyce musi radzić sobie ze wszystkimi innymi, a najczęściej zamiast tras stosuje się zalewanie pakietami. Takie podejście znosi dziesiątki lub setki węzłów, ale nie tysiące.
 Słowa: prędkość, kb/s, przepustowość LoRa, porównanie z wifi, 0.3 kb/s, 50 kb/s, setki węzłów, tysiące węzłów
-Źródło: https://meshtastic.pop.pl/viewtopic.php?t=290 (sprawdzono 2026-10; opinia autora)
+Źródło: https://meshtastic.pop.pl/viewtopic.php?t=290 (sprawdzono 2026-10; opinia autora, opracowanie własnymi słowami)
 
-### Jakie są trzy twarde bariery wielkiej sieci LoRa?
-Bariera 1, prawo radiowe: pasma ISM mają limit czasu nadawania (duty cycle), nie wolno nadawać bez przerwy. Bariera 2, przepustowość: globalna sieć wymaga równoległych milionów strumieni, a w mesh LoRa jedna transmisja blokuje eter w okolicy dla wszystkich. Bariera 3, routing: w Internecie ruch idzie wybranymi trasami, w mesh flooding wysyła go wszędzie, a ruch trasowany jest pomijalny wobec ruchu zalewającego. Oprogramowanie może tylko zmniejszyć dokuczliwość ograniczeń, nigdy ich nie wyeliminuje.
+### Jakie są trzy główne bariery dużej sieci LoRa?
+Pierwsza to przepisy: pasma ISM mają ograniczenie czasu nadawania, więc nie wolno nadawać bez przerwy. Druga to przepustowość: w sieci globalnej równolegle płyną miliony strumieni, a w mesh LoRa jedno nadawanie zajmuje eter w całej okolicy, więc inni muszą czekać. Trzecia to trasowanie: w Internecie dane idą wybranymi drogami, a w mesh zalewanie rozsyła je wszędzie; ruch kierowany po konkretnej trasie jest znikomy w porównaniu z zalewającym. Oprogramowanie może te ograniczenia łagodzić, ale ich nie usunie.
 Słowa: bariery, duty cycle, przepustowość, flooding, prawo radiowe, granica sieci, ograniczenia fundamentalne
-Źródło: https://meshtastic.pop.pl/viewtopic.php?t=290 (sprawdzono 2026-10; opinia autora)
+Źródło: https://meshtastic.pop.pl/viewtopic.php?t=290 (sprawdzono 2026-10; opinia autora, opracowanie własnymi słowami)
 
-### Co to jest burza rozgłoszeniowa (broadcast storm) i dlaczego jest największym problemem?
-Mesh LoRa działa zasadą "nie wiem, gdzie jest odbiorca, więc wyślę do wszystkich". Przykład autora: wiadomość prywatna z Gdańska do Zgorzelca; węzeł wysyła pakiet do najbliższego przekaźnika, ten rozsyła dalej we wszystkich kierunkach, kolejne robią to samo; przy limicie 64 przeskoków (tak podaje autor) fala obejmuje całą Polskę, a każde przyjęcie danych blokuje przekaźnik dla innych transmisji. Nawet jeśli odbiorca stoi 1–2 przeskoki dalej i trasa szybko się znajdzie, burza i tak rozchodzi się szeroko. Ratunkiem jest odpowiednik TTL: limit przeskoków. Uwaga: w Meshtastic maksymalny hop limit to 7 (domyślnie 3); 64 dotyczy innego protokołu lub założenia autora.
+### Czym jest burza rozgłoszeniowa i dlaczego psuje dużą sieć?
+Sieć mesh nie wie, gdzie jest odbiorca, więc pierwszy pakiet po prostu wysyła do wszystkich. Przykład autora: wiadomość prywatna z Gdańska do Zgorzelca. Węzeł podaje pakiet najbliższemu przekaźnikowi, ten powtarza go we wszystkie strony, następne robią to samo i fala (przy limicie 64 przeskoków, jaki założył autor) obejmuje cały kraj. Każdy przekaźnik, który ją odbiera, na chwilę blokuje eter dla innych. Nawet jeśli adresat jest dwa przeskoki dalej i trasa znajdzie się szybko, burza i tak rozlewa się szeroko. Odpowiednikiem TTL z Internetu jest tu limit przeskoków. Uwaga: w Meshtastic maksimum to 7 (domyślnie 3), więc 64 dotyczy założeń autora lub innego protokołu.
 Słowa: burza rozgłoszeniowa, broadcast storm, zbieżność, 64 hop, TTL, limit przeskoków, flood, zator
-Źródło: https://meshtastic.pop.pl/viewtopic.php?t=290 (sprawdzono 2026-10; opinia autora; liczba 64 niezgodna z limitem 7 w Meshtastic)
+Źródło: https://meshtastic.pop.pl/viewtopic.php?t=290 (sprawdzono 2026-10; opinia autora, opracowanie własnymi słowami; liczba 64 niezgodna z limitem 7 w Meshtastic)
 
-### Dlaczego w sieci mesh jest tłok i giną pakiety (zatkanie)?
-Węzeł nie ma portów ani wielu niezależnych kanałów odbioru, nie buforuje dużo ruchu, w obszarze bezpośredniego zasięgu słyszy tylko jednego nadawcę naraz. Gdy dwie osoby nadają jednocześnie w zasięgu bezpośrednim, pakiety się nakładają, następuje kolizja i dane przepadają ("jak nie weszło, przepadło"). Kilkadziesiąt węzłów nadających naraz: kolizje, utrata pakietów, retransmisje, jeszcze większy tłok, sieć praktycznie przestaje działać (congestion collapse). Moment krytyczny pojawia się prędzej czy później przy powiększaniu sieci bez umiaru.
+### Dlaczego w sieci jest tłok i giną wiadomości?
+Węzeł nie rozróżnia osobnych rozmów, nie ma wielu torów odbioru i prawie nie buforuje ruchu. W zasięgu bezpośrednim słyszy jednego nadawcę naraz. Gdy dwie stacje nadadzą w tej samej chwili, sygnały się nakładają i oba pakiety przepadają. Przy kilkudziesięciu węzłach chcących nadawać jednocześnie rośnie liczba kolizji, więc rośnie liczba powtórek, a te dodatkowo zapychają kanał. W końcu sieć prawie przestaje przekazywać dane (załamanie z przeciążenia). Moment krytyczny nadchodzi prędzej czy później, jeśli sieć rozbudowuje się bez umiaru.
 Słowa: kolizje, tłok, zatkanie, congestion collapse, giną pakiety, nakładanie, retransmisje, gubienie wiadomości
-Źródło: https://meshtastic.pop.pl/viewtopic.php?t=290 (sprawdzono 2026-10; opinia autora)
+Źródło: https://meshtastic.pop.pl/viewtopic.php?t=290 (sprawdzono 2026-10; opinia autora, opracowanie własnymi słowami)
 
-### Co to są "pokemony" i "głuchy telefon" na liście węzłów?
-Pokemony to węzły widoczne na liście tylko dlatego, że ich ogłoszenia dotarły burzą rozgłoszeniową z dalekich miejsc (szczególnie przy wzmożonej propagacji, gdy pakiety z ogromnych obszarów docierają setki kilometrów); nie da się z nimi nawiązać łączności. Głuchy telefon to wiadomości bez kontekstu z odległych miejsc, na które trudno odpowiedzieć. Wg autora nie mają wartości poza emocjonalną "butelką z wiadomością z końca świata", a ich ceną jest zablokowanie lokalnego ruchu (przestają latać wiadomości lokalne przez 1–2 przeskoki).
+### Co to są "pokemony" na liście węzłów i dlaczego szkodzą?
+To węzły, które pojawiają się na liście tylko dlatego, że ich ogłoszenia przypłynęły z daleka falą zalewania, zwłaszcza w czasie dobrej propagacji, gdy sygnały niosą się na setki kilometrów. Nie da się z nimi porozmawiać. Podobnie bywa z wiadomościami przychodzącymi z dalekich miejsc bez żadnego kontekstu, na które trudno odpowiedzieć. Według autora nie dają niczego poza ciekawostką, a płacimy za nie lokalnym ruchem: zapchany eter sprawia, że przestają dochodzić nawet zwykłe wiadomości z odległości jednego czy dwóch przeskoków.
 Słowa: pokemony, pokemon, głuchy telefon, nody z daleka, propagacja, lista węzłów, duch, widmo, daleki węzeł
-Źródło: https://meshtastic.pop.pl/viewtopic.php?t=290 (sprawdzono 2026-10; opinia autora)
+Źródło: https://meshtastic.pop.pl/viewtopic.php?t=290 (sprawdzono 2026-10; opinia autora, opracowanie własnymi słowami)
 
-### Jak według autora radzić sobie z wielkością sieci lokalnej?
-Ustawienie właściwego presetu zwiększa pojemność i szybkość sieci na danym obszarze, ale nie zasięg przy danej gęstości węzłów, i zawsze jest granica nie do przekroczenia. Zmiana presetu pomaga tylko na jakiś czas (większa pojemność lokalna i prędkość, mniejszy dystans bezpośredni). Rozsądnym mechanizmem jest ustawienie maksymalnej liczby przeskoków: zabija ruch śmieciowy z odległych węzłów, a pozwala na sprawną łączność na założonym lokalnym obszarze. Autor proponuje "polski preset" w całym kraju z ograniczonym obszarowo hop limit, tak by osoby podróżujące zawsze były w zasięgu lokalnej sieci bez zmiany presetów.
+### Jak według autora radzić sobie z rozmiarem sieci lokalnej?
+Wybór odpowiedniego presetu zwiększa pojemność i szybkość sieci na danym terenie, ale nie wydłuża zasięgu przy tej samej gęstości węzłów, i zawsze istnieje granica, której nie da się przekroczyć. Zmiana presetu pomaga tylko na jakiś czas: rośnie pojemność lokalna i prędkość, a maleje odległość łączności bezpośredniej. Sensownym narzędziem jest ograniczenie liczby przeskoków: odcina ruch z odległych węzłów, a nie przeszkadza w łączności na własnym obszarze. Autor podsuwa pomysł jednego "polskiego presetu" w całym kraju z hop limitem dopasowanym tak, żeby osoba w podróży zawsze trafiała na sieć lokalną bez zmiany ustawień.
 Słowa: hop limit, preset, polski preset, obszar lokalny, ograniczenie przeskoków, pojemność sieci, rozwiązanie, lokalna sieć
-Źródło: https://meshtastic.pop.pl/viewtopic.php?t=290 (sprawdzono 2026-10; opinia autora)
+Źródło: https://meshtastic.pop.pl/viewtopic.php?t=290 (sprawdzono 2026-10; opinia autora, opracowanie własnymi słowami)
 
-### Co pokazują rysunki w artykule o sieciach lokalnych?
-Rysunek z mapą Polski: cztery przekaźniki w rogach kraju, a między nimi strzałki z czerwonymi krzyżykami, czyli bezpośrednia łączność między odległymi końcami kraju nie działa. Tabela stosu Internetu: 7 aplikacja (HTTP, SMTP, DNS), 6 prezentacja (TLS, kompresja), 5 sesja, 4 transport (TCP/UDP: kontrola błędów, retransmisje, porty, przepływ), 3 sieciowa (globalne adresowanie i routing), 2 łącza danych (Ethernet, Wi-Fi, MAC, LAN), 1 fizyczna (praktycznie nieograniczona przepustowość). Tabela mesh LoRa: 7–5 praktycznie brak (proste komunikaty: tekst, telemetria), 4 brak TCP (brak portów i kontroli przepływu, zwykle proste ACK), 3 uproszczona (brak IP, globalnego routingu i hierarchii; flooding lub proste tablice sąsiedztwa), 2 LoRa MAC i identyfikatory węzłów, 1 radio LoRa (bardzo mała, sztywno ograniczona przepustowość). Zrzuty map z aplikacji pokazują setki węzłów (np. 307 w polu "Search 307 Nodes") rozsianych po Polsce i sąsiednich krajach, mimo że realnie z większością nie ma łączności ("pokemony").
+### Co pokazują rysunki w tym artykule?
+Mapa Polski z czterema przekaźnikami w rogach kraju i przekreślonymi strzałkami między nimi: bezpośrednia łączność między dalekimi końcami nie działa. Tabela stosu Internetu: aplikacja, prezentacja, sesja, transport (TCP/UDP: błędy, retransmisje, porty, przepływ), sieć (adresowanie i trasowanie), łącze danych (Ethernet, Wi-Fi), warstwa fizyczna. Tabela mesh LoRa: warstwy aplikacyjne praktycznie nie istnieją, brak TCP, warstwa sieciowa uproszczona (flooding lub proste tablice sąsiadów, bez IP i hierarchii), łącze z identyfikatorami węzłów, radio LoRa o bardzo małej, sztywno ograniczonej przepustowości. Zrzuty mapy z aplikacji pokazują setki węzłów rozsianych po Polsce i sąsiednich krajach, z którymi w praktyce nie da się rozmawiać.
 Słowa: rysunek, tabela OSI, stos, mapa Polski, krzyżyki, mapa węzłów, zrzut ekranu, ilustracje, pokemony na mapie
-Źródło: https://meshtastic.pop.pl/viewtopic.php?t=290 (sprawdzono 2026-10; opis rysunków artykułu)
+Źródło: https://meshtastic.pop.pl/viewtopic.php?t=290 (sprawdzono 2026-10; opis rysunków, opracowanie własnymi słowami)
