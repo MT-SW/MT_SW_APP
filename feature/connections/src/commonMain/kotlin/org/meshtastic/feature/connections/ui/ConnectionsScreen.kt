@@ -146,6 +146,7 @@ import org.meshtastic.feature.connections.ui.components.CurrentlyConnectedInfo
 import org.meshtastic.feature.connections.ui.components.CurrentlyConnectedText
 import org.meshtastic.feature.connections.ui.components.DeviceList
 import org.meshtastic.feature.connections.ui.components.EventFirmwareCard
+import org.meshtastic.feature.connections.ui.components.LoraSummary
 import org.meshtastic.feature.connections.ui.components.TerminateApplicationButton
 import org.meshtastic.feature.connections.ui.components.TransportSelector
 import org.meshtastic.feature.connections.ui.components.loraSummary
@@ -425,7 +426,7 @@ fun ConnectionsScreen(
         }
     val lora = localConfig.lora
     val loraSummaryText by
-        produceState<String?>(null, lora, resourceEnvironment) {
+        produceState<LoraSummary?>(null, lora, resourceEnvironment) {
             value = lora?.let { loraSummaryText(resourceEnvironment, it) }
         }
     val currentlyConnectedText =
@@ -968,13 +969,10 @@ private enum class ConnectionUiState {
     CONNECTED_WITH_NODE,
 }
 
-private suspend fun loraSummaryText(environment: ResourceEnvironment, lora: Config.LoRaConfig): String? {
-    val parts =
-        loraSummary(
-            lora = lora,
-            presetLabel = lora.modem_preset.schemaLabelRes()?.let { getString(environment, it) },
-            regionLabel = lora.region.schemaLabelRes()?.let { getString(environment, it) },
-            customLabel = getString(environment, Res.string.lora_preset_custom),
-        ) ?: return null
-    return parts.region?.let { getString(environment, Res.string.lora_preset_region, parts.preset, it) } ?: parts.preset
-}
+private suspend fun loraSummaryText(environment: ResourceEnvironment, lora: Config.LoRaConfig): LoraSummary? =
+    loraSummary(
+        lora = lora,
+        presetLabel = lora.modem_preset.schemaLabelRes()?.let { getString(environment, it) },
+        regionLabel = lora.region.schemaLabelRes()?.let { getString(environment, it) },
+        customLabel = getString(environment, Res.string.lora_preset_custom),
+    )
