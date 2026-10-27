@@ -1,6 +1,5 @@
 # Dlaczego sieć LoRa nie może być zbyt duża: eter, czas antenowy, kolizje
 
-<!-- Uzupełnić o polski artykuł z grupy (meshtastic.pop.pl, "Dlaczego sieci radiowe oparte na protokole LoRa... to sieci lokalne, a nie globalne"), gdy będzie dostępny tekst. -->
 
 ### Dlaczego sieć mesh LoRa ma twardy limit wielkości?
 Eter jest wspólny i bardzo wąski: LoRa daje pojedyncze kilobity na sekundę. Każdy węzeł w zasięgu słyszy każdy pakiet, nawet gdy nie jest jego adresatem, a każde powtórzenie zajmuje kanał dla wszystkich naraz. Dokumentacja Meshtastic przyznaje, że transmisja radiowa narzuca twardy limit pojemności sieci, który kontrola ruchu tylko łagodzi, a nawet doskonały protokół routingu nie uniknie faktu, że wszyscy w zasięgu słyszą pakiet. Dlatego sieć LoRa jest siecią lokalną, a nie globalną.

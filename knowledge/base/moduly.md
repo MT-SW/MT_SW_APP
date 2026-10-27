@@ -44,3 +44,13 @@ Słowa: neighbor info, sąsiedzi, topologia, interwał 4 godziny, 21600
 Zdalne ustawianie i odczyt pinów GPIO (obecnie funkcje set/read tylko przez Python CLI). Dostęp jest groźny: błędne opcje mogą fizycznie uszkodzić sprzęt. Piny wybiera się maskami bitowymi (GPIO 1 = 0x2, GPIO 4 = 0x10, każdy kolejny pin podwaja wartość). Aby zablokować niepowołanych, utwórz kanał o nazwie gpio na obu węzłach i włącz moduł na obu. Wyniki lecą przez sieć i, przy włączonym MQTT, także przez MQTT. Szybkie zmiany (przyciski) mogą umknąć: użyj modułu Detection Sensor. W firmware powyżej 2.5.3 trzeba zbudować własny firmware, usuwając flagę -DMESHTASTIC_EXCLUDE_REMOTEHARDWARE=1 z platformio.ini.
 Słowa: remote hardware, zdalne GPIO, gpio, maska, kanał gpio, platformio.ini, bezpieczeństwo, przekaźnik
 Źródło: https://meshtastic.org/docs/configuration/module/remote-hardware/ (sprawdzono 2026-10)
+
+### Jak działa Detection Sensor (czujnik zdarzeń na GPIO)?
+Monitoruje pin GPIO pod kątem stanu wysokiego lub niskiego i wysyła alerty tekstowe; do czujników ruchu, kontaktronów i układów otwarty/zamknięty. Wymaga firmware i aplikacji 2.2.2+. Ustawienia: Minimum Broadcast Interval (odstęp między alertami przy zmianie stanu), State Broadcast Interval (cykliczny raport stanu; 0 = tylko przy zmianie), Send Bell, Friendly Name (do 20 znaków, "Motion" daje "Motion detected"), Monitor Pin, Detection Triggered High, Use Pull-up (INPUT_PULLUP, ma sens, gdy płytka ma rezystory podciągające). Klucze CLI: detection_sensor.enabled, minimum_broadcast_secs, state_broadcast_secs, send_bell, name, monitor_pin, detection_triggered_high, use_pullup.
+Słowa: detection sensor, czujnik ruchu, kontaktron, PIR, GPIO, alert, drzwi, monitor_pin, pull-up
+Źródło: https://meshtastic.org/docs/configuration/module/detection-sensor/ (sprawdzono 2026-10)
+
+### Do czego służy PAX counter i jakie ma wymagania?
+Liczy pobliskie osoby lub urządzenia, skanując sygnały Wi-Fi i BLE (sklepy, muzea, miejsca publiczne). Wymaga firmware 2.2.17+, urządzenia na ESP32 i wyłączonych Wi-Fi oraz Bluetooth w ustawieniach. Update Interval to minimalny odstęp między wiadomościami o zmianie liczby (przykład CLI: 900 s). CLI: meshtastic --set paxcounter.enabled true.
+Słowa: paxcounter, pax counter, liczenie ludzi, wifi ble, ESP32, licznik, ruch pieszy
+Źródło: https://meshtastic.org/docs/configuration/module/paxcounter/ (sprawdzono 2026-10)

@@ -34,3 +34,13 @@ Słowa: publiczny serwer, mqtt.meshtastic.org, zero hop, filtr, pozycja, domyśl
 Nie. Dokumentacja ostrzega, że domyślny PSK na prywatnym brokerze może stworzyć luki bezpieczeństwa i zalać sieć, bo prywatne brokery nie wymuszają polityki zero-hop. Prywatne brokery są do kanałów prywatnych z własnym PSK.
 Słowa: prywatny broker, mosquitto, własny serwer, bezpieczeństwo, zalanie sieci
 Źródło: https://meshtastic.org/docs/software/mqtt/ (sprawdzono 2026-10)
+
+### Jakie są ustawienia modułu MQTT w węźle i ich wartości domyślne?
+Enabled (mqtt.enabled) domyślnie wyłączone. Server Address domyślnie mqtt.meshtastic.org (login meshdev, hasło large4cats, używane na serwerze publicznym tylko, gdy nie podasz własnych). Na własnym serwerze login i hasło są używane zawsze, nawet puste. Encryption Enabled wyłączone: do brokera idą wtedy pakiety niezaszyfrowane, nawet gdy kanały mają klucze. JSON Enabled (nie na nRF52) i TLS Enabled domyślnie wyłączone. Root Topic pozwala rozdzielić kilka sieci na jednym serwerze przez ACL. Client Proxy Enabled: używa połączenia telefonu zamiast sieci urządzenia.
+Słowa: mqtt.enabled, mqtt.address, mqtt.username, mqtt.password, large4cats, meshdev, TLS, root topic, proxy to client, ustawienia mqtt
+Źródło: https://meshtastic.org/docs/configuration/module/mqtt/ (sprawdzono 2026-10)
+
+### Czym jest Map Reporting i Client Proxy w MQTT?
+Map Reporting (od firmware 2.3.2, domyślnie wyłączone) okresowo wysyła niezaszyfrowany raport na mapy online; domyślna precyzja pozycji daje odchylenie do ok. 1459 m, minimalny i domyślny odstęp publikacji to 3600 s. Co najmniej jeden kanał musi mieć włączony uplink lub downlink. Urządzenia nRF52 i RP2040 nie mają sekcji Network, więc użyj Client Proxy. W kliencie WWW Client Proxy jeszcze nie działa. Domyślny kanał LongFast na publicznym serwerze ma duży ruch, który może przeciążyć urządzenie: użyj innego kanału lub własnego serwera.
+Słowa: map reporting, mapa online, client proxy, 3600, 1459 m, nRF52 mqtt, przeciążenie, LongFast publiczny
+Źródło: https://meshtastic.org/docs/configuration/module/mqtt/ (sprawdzono 2026-10)
