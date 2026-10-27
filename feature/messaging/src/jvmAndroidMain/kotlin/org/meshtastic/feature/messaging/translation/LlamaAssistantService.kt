@@ -1166,15 +1166,19 @@ class LlamaAssistantService(
                 "change it. The app itself shows a button to that place under your answer: do not write the button or tool names."
         const val BASE_CHARS = 3400
         const val BASE_PL =
-            "BAZA WIEDZY MT_SW (fragmenty, każdy kończy się wierszem Źródło). To jest Twoje główne źródło: pomyśl, wybierz " +
-                "z niego to, co dotyczy pytania, i odpowiedz własnymi słowami, krótko i po polsku. Nie dodawaj liczb ani " +
-                "faktów, których w fragmentach nie ma. Jeśli fragmenty nie odpowiadają na pytanie, powiedz wprost, że tego " +
-                "nie wiesz, zamiast zgadywać. Na końcu podaj źródła użytych fragmentów (z ich wierszy Źródło)."
+            "BAZA WIEDZY MT_SW (fragmenty, każdy kończy się wierszem Źródło). To Twoje główne źródło wiedzy technicznej. " +
+                "Pomyśl samodzielnie: zrozum pytanie, połącz ze sobą potrzebne fakty z kilku fragmentów, wyciągnij wniosek " +
+                "i odpowiedz naturalnie, jak doświadczony kolega z sieci, własnymi słowami, nie jak wyuczona regułka i nie " +
+                "przepisując fragmentów. Jeśli trzeba, krótko wyjaśnij dlaczego. Trzymaj się faktów z fragmentów: nie " +
+                "dodawaj liczb ani twierdzeń, których w nich nie ma. Jeśli fragmenty nie wystarczają, powiedz uczciwie, co " +
+                "wiesz, a czego nie, zamiast zgadywać. Na końcu wymień źródła użytych fragmentów (z wierszy Źródło)."
         const val BASE_EN =
-            "MT_SW KNOWLEDGE BASE (fragments, each ends with a Source line). This is your main source: think, pick from it " +
-                "what concerns the question and answer in your own words, briefly. Add no numbers or facts that are not in " +
-                "the fragments. If the fragments do not answer the question, say plainly that you do not know instead of " +
-                "guessing. At the end give the sources of the fragments you used (from their Source lines)."
+            "MT_SW KNOWLEDGE BASE (fragments, each ends with a Source line). This is your main technical source. Think for " +
+                "yourself: understand the question, combine the needed facts from several fragments, draw the conclusion and " +
+                "answer naturally, like an experienced friend from the network, in your own words, not like a memorised rule " +
+                "and not by copying the fragments. Briefly explain why when it helps. Stay with the facts in the fragments: " +
+                "add no numbers or claims that are not in them. If the fragments are not enough, say honestly what you know " +
+                "and what you do not instead of guessing. At the end list the sources of the fragments you used (from their Source lines)."
         const val BASE_WEB_PL =
             "WYNIKI Z INTERNETU (niepewne, tylko informacja). Pokaż je OSOBNO, po odpowiedzi z bazy, jako \"Z internetu:\". " +
                 "Jeśli któryś wynik jest sprzeczny z bazą, napisz to wyraźnie i nie rozstrzygaj na siłę."

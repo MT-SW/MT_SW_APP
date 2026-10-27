@@ -19,3 +19,8 @@ Słowa: erase, wyczyszczenie, reset fabryczny, factory reset, kopia konfiguracji
 Tylko przez pełne wyczyszczenie i ponowną instalację. Aby zachować ustawienia, wyeksportuj konfigurację przed instalacją i wczytaj po niej.
 Słowa: web client, meshtastic.local, aktualizacja, wipe, Wi-Fi
 Źródło: https://meshtastic.org/docs/getting-started/flashing-firmware/esp32/ (sprawdzono 2026-10)
+
+### Jak użyć Web Flashera?
+Podłącz urządzenie ESP32, otwórz flasher.meshtastic.org w Chrome lub Edge (inne przeglądarki nie są wymienione jako wspierane) i postępuj według komunikatów na ekranie. Po wgraniu przejdź do konfiguracji początkowej. Web Flasher potrafi też pobrać i skopiować firmware za Ciebie dla urządzeń UF2.
+Słowa: web flasher, flasher.meshtastic.org, Chrome, Edge, przeglądarka, WebSerial, konfiguracja początkowa
+Źródło: https://meshtastic.org/docs/getting-started/flashing-firmware/esp32/web-flasher/ (sprawdzono 2026-10)

@@ -27,3 +27,18 @@ Słowa: wybór anteny, 868, 915, 433, pasmo, kompaktowa, stacjonarna, samochodow
 RP-SMA to wersja z odwróconą polaryzacją i nie jest wymienna ze zwykłym SMA. Przed zakupem anteny lub kabla sprawdź, jakiego złącza używa Twoje urządzenie.
 Słowa: złącze, SMA, RP-SMA, gniazdo, wtyk, pigtail, kabel, adapter
 Źródło: https://meshtastic.org/docs/hardware/antennas/ (sprawdzono 2026-10)
+
+### Jaki rodzaj anteny: pół fali, ćwierć fali czy kierunkowa?
+Półfalowy bat może mieć większy zasięg dookólny niż ćwierćfalowa krótka antena, ale rzuca się w oczy w kieszeni. Ćwierćfalowa krótka często potrzebuje płaszczyzny masy, by pracować najlepiej. Duża antena kierunkowa sięga znacznie dalej niż dookólna, ale trzeba ją skierować na cel, więc nie nadaje się do ruchu. Nie nadają się antena zbliżeniowa (PAN) ani wielka antena na długim kablu zaprojektowana pod nadajnik 100 W.
+Słowa: półfalowa, ćwierćfalowa, whip, stubby, kierunkowa, yagi, dookólna, płaszczyzna masy, ground plane, rodzaje anten
+Źródło: https://meshtastic.org/docs/hardware/antennas/lora-antenna/ (sprawdzono 2026-10)
+
+### Gdzie umieścić antenę i czy kabel szkodzi?
+Ściany i budynki tłumią sygnał; antena przy ścianie traci sygnał wysyłany w jej stronę. Często lepiej postawić węzeł na zewnątrz, niż trzymać go w środku z anteną na zewnątrz. Większość kabli znacząco osłabia sygnał na dłuższym odcinku; wyjątkiem są ekstremalne warunki (upał, mróz, wilgoć), gdzie używa się najkrótszego kabla o małych stratach. Węzeł trzymaj w porządnej obudowie chroniącej przed pogodą. Antena powinna mieć impedancję 50 Ω i złącze SMA.
+Słowa: umiejscowienie, montaż anteny, kabel, straty, tłumienie, ściana, obudowa, 50 omów, impedancja, na zewnątrz, maszt
+Źródło: https://meshtastic.org/docs/hardware/antennas/lora-antenna/ (sprawdzono 2026-10)
+
+### Czy antena musi pasować do częstotliwości?
+Tak. Urządzenia na innych częstotliwościach nie porozumieją się z Twoim, a antena strojona na inne pasmo słabo promieniuje. Dokumentacja odsyła do listy częstotliwości The Things Network według krajów. Autor radzi, że warto zapłacić więcej lokalnemu dostawcy z porządnymi kartami katalogowymi.
+Słowa: częstotliwość anteny, pasmo, 868, 915, dostawca, karta katalogowa, datasheet
+Źródło: https://meshtastic.org/docs/hardware/antennas/lora-antenna/ (sprawdzono 2026-10)
