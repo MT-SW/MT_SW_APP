@@ -125,6 +125,8 @@ fun NodeItemCompact(
     tempInFahrenheit: Boolean = false,
     deviceImageUrl: String? = null,
     relayNodeName: String? = null,
+    neighborCount: Int? = null,
+    onNeighborsClick: (() -> Unit)? = null,
 ) {
     val longName = thatNode.effectiveLongName.ifEmpty { stringResource(Res.string.unknown_username) }
     val isFavorite = thatNode.isFavorite
@@ -223,6 +225,8 @@ fun NodeItemCompact(
                     isIgnored = isIgnored,
                     isFavorite = isFavorite,
                     unmessageable = unmessageable,
+                    neighborCount = neighborCount,
+                    onNeighborsClick = onNeighborsClick,
                 )
 
                 // Row 2: Glanceable health — online + last heard + distance + signal
@@ -273,6 +277,8 @@ private fun CompactNameRow(
     isIgnored: Boolean,
     isFavorite: Boolean,
     unmessageable: Boolean,
+    neighborCount: Int?,
+    onNeighborsClick: (() -> Unit)?,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -280,6 +286,7 @@ private fun CompactNameRow(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         NodeSecurityIcons(thatNode, iconSize = 18.dp, isThisNode = isThisNode)
+        if (neighborCount != null) NeighborCountBadge(count = neighborCount, onClick = onNeighborsClick)
         Text(
             text = longName,
             style = MaterialTheme.typography.titleMediumEmphasized.copy(fontStyle = style),

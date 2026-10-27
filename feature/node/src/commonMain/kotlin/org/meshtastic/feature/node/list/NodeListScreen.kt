@@ -156,6 +156,7 @@ fun NodeListScreen(
     onEditStatusMessage: () -> Unit = {},
     navigateToMeshView: (Int) -> Unit = {},
     navigateToCompass: (Int) -> Unit = {},
+    navigateToNeighbors: (Int) -> Unit = {},
     onEditName: () -> Unit = {},
 ) {
     val showToast = org.meshtastic.core.ui.util.rememberShowToastResource()
@@ -175,6 +176,7 @@ fun NodeListScreen(
     val unfilteredNodes by viewModel.unfilteredNodeList.collectAsStateWithLifecycle()
     val unheardNodes by viewModel.unheardBannerNodes.collectAsStateWithLifecycle()
     val deviceImageUrls by viewModel.deviceImageUrls.collectAsStateWithLifecycle()
+    val neighborCounts by viewModel.neighborCounts.collectAsStateWithLifecycle()
     val relayNodeIds by viewModel.relayNodeIds.collectAsStateWithLifecycle()
     val ignoredNodeCount = unfilteredNodes.count { it.isIgnored }
 
@@ -419,6 +421,8 @@ fun NodeListScreen(
                                     showTelemetry = showTelemetry,
                                     deviceImageUrl = deviceImageUrls[node.user.hw_model.value],
                                     relayNodeName = relayNodeName,
+                                    neighborCount = neighborCounts[node.num],
+                                    onNeighborsClick = { navigateToNeighbors(node.num) },
                                 )
 
                             NodeListDensity.COMPACT ->
@@ -442,6 +446,8 @@ fun NodeListScreen(
                                     tempInFahrenheit = state.tempInFahrenheit,
                                     deviceImageUrl = deviceImageUrls[node.user.hw_model.value],
                                     relayNodeName = relayNodeName,
+                                    neighborCount = neighborCounts[node.num],
+                                    onNeighborsClick = { navigateToNeighbors(node.num) },
                                 )
                         }
                         if (canEditStatus) {

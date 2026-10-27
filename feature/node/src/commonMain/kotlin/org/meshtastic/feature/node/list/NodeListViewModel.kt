@@ -41,6 +41,7 @@ import org.meshtastic.core.model.util.LocalStatsExtended
 import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.proto.LocalStats
 import org.meshtastic.feature.node.health.calmed
+import org.meshtastic.proto.NeighborInfo
 import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.Telemetry
 import org.meshtastic.core.model.DeviceType
@@ -275,6 +276,24 @@ class NodeListViewModel(
                     }
                     .toMap()
             }
+            .stateInWhileSubscribed(initialValue = emptyMap())
+
+    /** Each node's number of direct neighbours, from the last NeighborInfo list saved for it (absent when none was saved). */
+    val neighborCounts: StateFlow<Map<Int, Int>> =
+        meshLogRepository
+            .getLatestLogsByPortNumPerSender(PortNum.NEIGHBORINFO_APP.value)
+            .map { logs ->
+                logs
+                    .distinctBy { it.fromNum }
+                    .mapNotNull { log ->
+                        val payload = log.fromRadio.packet?.decoded?.payload ?: return@mapNotNull null
+                        val info =
+                            runCatching { NeighborInfo.ADAPTER.decode(payload) }.getOrNull() ?: return@mapNotNull null
+                        log.fromNum to info.neighbors.size
+                    }
+                    .toMap()
+            }
+            .flowOn(Dispatchers.Default)
             .stateInWhileSubscribed(initialValue = emptyMap())
 
     /** The nodes the unheard banner offers for removal: see [selectRemovableUnheardNodes], less the ones kept. */
