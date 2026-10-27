@@ -1,0 +1,21 @@
+# Polska: podzakresy 868–870 MHz, moc, cykl pracy, PMR446
+
+### Podzakresy 863–870 MHz: moc i cykl pracy według polskiego bloga
+Poniższa tabela pochodzi z bloga sklepu (nie z aktu prawnego), więc traktuj ją jako orientację i zweryfikuj w UKE. 863,0 do 868,0 MHz: 25 mW (14 dBm) ERP, cykl pracy 1%, najczęściej używany. 868,0 do 868,6: 25 mW, 1%, stabilny dla Meshtastic. 868,7 do 869,2: 25 mW, 0,1%, niepolecany. 869,4 do 869,65: 500 mW (27 dBm) ERP, 10%, wymaga warunków i kontroli cyklu pracy. 869,65 do 869,7: 25 mW, 0,1%, rzadko używany. 869,7 do 870,0: 5 mW (7 dBm), 0,1%, niezalecany. Nasza sieć świętokrzyska pracuje na 869,44165 MHz, czyli w podzakresie 869,4 do 869,65, gdzie ta tabela podaje 500 mW ERP i 10% (wniosek z porównania liczb, nie oficjalne potwierdzenie). Blog zaznacza, że nie jest poradą prawną; aktualne limity sprawdź w UKE.
+Słowa: 869.4-869.65, 500 mW, 10% duty cycle, podzakresy 868, ERP, UKE, limity mocy Polska, 25 mW, 1%
+Źródło: https://mikrobot.pl/pl/blog/Meshtastic-Czestotliwosci/15 (sprawdzono 2026-10; blog, nie akt prawny)
+
+### Moc, szerokość pasma i SF w praktyce według tego samego bloga
+Typowa moc to +14 dBm (25 mW), domyślna w Europie; niektóre moduły dają do +20 dBm (100 mW), ale blog każe sprawdzić przepisy. Cykl pracy zwykle 1%, czyli około 36 s nadawania na godzinę, i według bloga LoRa rzadko go przekracza. Szerokość pasma: 125 kHz (dobry kompromis), 250 kHz (szybciej, krócej), 500 kHz (najszybciej, najkrótszy zasięg). Współczynnik SF od 7 (najszybszy, najkrótszy zasięg) do 12 (najdalszy, najwolniejszy). Na dalekie łącza: wyższy SF, BW 125 kHz i wyższa moc; na krótkie szybkie: niższy SF i większe BW. Blog twierdzi też, że typowy kanał w Polsce to 869,525 MHz, a komentarz czytelnika mówi o możliwości użycia 433 MHz; artykuł tego nie rozstrzyga, więc sprawdź w UKE.
+Słowa: moc 14 dBm, 36 s na godzinę, szerokość pasma 125 250 500, SF7 SF12, 869.525, 433 MHz Polska
+Źródło: https://mikrobot.pl/pl/blog/Meshtastic-Czestotliwosci/15 (sprawdzono 2026-10; blog)
+
+### Anteny i zasięg według bloga: co z tego wynika
+Fabryczna antena jest krótka i wystarcza na niewielkie odległości. Zewnętrzna o zysku 3 do 5 dBi może według bloga zwiększyć zasięg „często dwu- lub trzykrotnie”. Dookólne dobre w terenie otwartym i w ruchu, słabsze w górach; kierunkowe (Yagi, panelowe) dają większy zasięg na stałych łączach; ground plane dobre stacjonarnie na płaskim terenie. Wysokość montażu i brak przeszkód są ważniejsze niż sama antena. Zasięg: teoretycznie kilkadziesiąt km, w praktyce od kilkuset metrów do kilkunastu km, kluczowa widoczność liniowa. Zakłócają Wi-Fi, Bluetooth, urządzenia na 433, 868 lub 915 MHz, mikrofalówki i radioamatorzy; burze geomagnetyczne mogą chwilowo pogorszyć łączność VHF/UHF (twierdzenie bloga, nieweryfikowane). Do planowania blog poleca kalkulator tłumienia SCADACore.
+Słowa: antena zewnętrzna, 3-5 dBi, zasięg praktyczny, widoczność liniowa, zakłócenia, Yagi, ground plane, góry zasięg
+Źródło: https://mikrobot.pl/pl/blog/Meshtastic-Czestotliwosci/15 (sprawdzono 2026-10; blog)
+
+### PMR446: kanały, moc, zasięg i warunki prawne w Polsce
+Analogowo 446,0 do 446,2 MHz, 16 kanałów co 12,5 kHz; cyfrowo 446,1 do 446,2 MHz z odstępem 6,25 lub 12,5 kHz (lista 6,25 kHz ma 32 kanały); decyzja ECC (15)05 z 2015 połączyła oba zakresy. Moc maksymalna 500 mW ERP. Zasięg typowy: powyżej 10 km przy widoczności (szczyty, szybowiec), 5 do 6 km nad jeziorem, 4 do 5 km w polu, 2 do 3 km przy rzadkiej niskiej zabudowie, do 0,5 km w mieście. W UE radiotelefony PMR446 to urządzenia klasy 1 niewymagające pozwolenia; w Polsce podstawą jest art. 144 ust. 2 pkt 5 Prawa telekomunikacyjnego. Warunki: urządzenie ręczne ze zintegrowaną anteną, tylko łączność bezpośrednia (bez bazy i przemiennika), limit nadawania 180 sekund, zakaz przeróbek mechanicznych i elektrycznych. System FRS jest w Polsce i Europie zakazany; kanały PMR na 154 MHz wymagają pozwolenia, które uzyska tylko podmiot gospodarczy. dPMR: kanał kontaktowy i EmCOM na kanale 19 (446,115625 MHz).
+Słowa: PMR446, dPMR, 446 MHz, 500 mW, 180 sekund, bez pozwolenia, FRS zakaz, Prawo telekomunikacyjne, krótkofalówka
+Źródło: https://pl.wikipedia.org/wiki/PMR_(radio) (sprawdzono 2026-10)
