@@ -220,7 +220,8 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         thoughts.push(restorer.finish()).plus(thoughts.finish()).takeIf { it.isNotEmpty() }?.let { runCatching { onPiece(it) } }
         Logger.i(tag = TAG) {
             "Answer from $modelId on $activeBackend: loaded=${!wasLoaded} in ${loadedAt - started} ms, generated ${reply.length} chars " +
-                "in ${nowMillis - loadedAt} ms (thinking=$thinking, json=${jsonSchema != null})"
+                "in ${nowMillis - loadedAt} ms, about ${reply.length * MS_PER_SECOND / maxOf(1L, nowMillis - loadedAt)} chars/s " +
+                "(thinking=$thinking, json=${jsonSchema != null})"
         }
         val finalText = reply.withoutLoop()
         return ThoughtFilter.strip(restorer.restoreAll(finalText)).trim()
@@ -406,6 +407,14 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
     }
 
     private fun start(file: File, backend: Backend, cache: File, window: Int, audio: Boolean): Engine {
+        val runtime = Runtime.getRuntime()
+        val megabyte = 1024L * 1024L
+        val began = nowMillis
+        val heapBefore = (runtime.totalMemory() - runtime.freeMemory()) / megabyte
+        Logger.i(tag = TAG) {
+            "Starting engine: backend ${backend::class.simpleName}, context $window, hearing $audio, model ${file.name} " +
+                "(${file.length() / megabyte} MB), heap used $heapBefore of ${runtime.maxMemory() / megabyte} MB"
+        }
         val created =
             Engine(
                 EngineConfig(
@@ -420,7 +429,11 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
             created.initialize()
         } catch (e: Exception) {
             runCatching { created.close() }
+            Logger.w(tag = TAG) { "Engine did not start after ${nowMillis - began} ms: ${e.message?.lineSequence()?.firstOrNull()}" }
             throw e
+        }
+        Logger.i(tag = TAG) {
+            "Engine ready in ${nowMillis - began} ms, heap used ${(runtime.totalMemory() - runtime.freeMemory()) / megabyte} MB"
         }
         return created
     }
@@ -606,5 +619,6 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
 
         /** The context a second GPU attempt uses when the full window did not start. */
         const val GPU_SMALL_WINDOW = 4096
+        const val MS_PER_SECOND = 1000L
     }
 }
