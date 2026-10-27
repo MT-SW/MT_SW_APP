@@ -1,4 +1,4 @@
-# Zasilanie: Li-ion, akumulatory kwasowe, BMS, przetwornica buck, przewody
+# Zasilanie: akumulatory, BMS, przetwornice
 
 ### Li-ion: napięcia, ładowanie i przechowywanie
 Ogniwo NMC ma napięcie nominalne 3,7 V i maksymalne 4,2 V przy ładowaniu; powyżej tego rośnie ryzyko osadzania litu i nieodwracalnej utraty pojemności. Rozładowanie poniżej 2 V może rozpuścić miedziany kolektor i grozi zwarciem przy ładowaniu; układy ochronne zwykle odcinają przy około 3 V. LiFePO₄: 3,2 V nominalnie, ładowanie do 3,6 V. Standardowe ładowanie to CC/CV, kończone, gdy prąd spadnie do około 3% początkowego. Głęboko rozładowane ogniwo ładuj najpierw bardzo małym prądem. Przechowywanie: 60 do 80% naładowania ogranicza utratę pojemności; pełne ogniwo traci szybciej, a ładowanie powyżej 80% przyspiesza degradację. Starzenie: około 20% utraty pojemności w 3 do 5 lat lub 1000 do 2000 cykli w 25 °C; samorozładowanie 1,5 do 2% miesięcznie.
@@ -29,3 +29,4 @@ Słowa: przetwornica buck, step-down, stabilizator liniowy, LM2596, sprawność,
 Prawo Ohma: U = I × R, I = U / R, R = U / I; obowiązuje, gdy R nie zależy od prądu (dioda jest nieohmowa). Wzory na moc P = U × I i P = I² × R są standardowe, ale nie pochodzą z tego źródła. AWG: im wyższy numer, tym cieńszy drut; trzy numery to w przybliżeniu podwojenie przekroju. Tabela źródła (miedź, izolacja plastikowa, 25 °C), rezystancja i obciążalność przy 60 °C: 14 AWG (1,628 mm) 2,525 mΩ/ft, 15 A; 12 AWG 1,588 mΩ/ft, 20 A; 10 AWG 0,9989 mΩ/ft, 30 A; 18 AWG 6,385 mΩ/ft, 10 A. Spadek napięcia liczy się na całej pętli (tam i z powrotem): 5 A na 20 stóp jednokierunkowo drutem 14 AWG daje około 0,5 V, czyli ~4% z 12 V. Przy niskim napięciu zwykle to spadek, a nie obciążalność, decyduje o przekroju. Aluminium ma około 61% przewodności miedzi (przekrój o dwa numery większy).
 Słowa: prawo Ohma, AWG, przekrój przewodu, spadek napięcia, ampacity, obciążalność, miedź, 12V instalacja
 Źródło: https://en.wikipedia.org/wiki/American_wire_gauge (sprawdzono 2026-10)
+

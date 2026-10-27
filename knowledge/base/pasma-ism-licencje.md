@@ -10,12 +10,8 @@ Słowa: ISM, SRD, urządzenia krótkiego zasięgu, bez licencji, zakłócenia, o
 Słowa: 433 MHz, 433,92, LPD433, piloty, 70 cm, krótkofalowcy, 2,4 GHz, Wi-Fi, Bluetooth, Zigbee, zatłoczone pasmo
 Źródło: https://en.wikipedia.org/wiki/ISM_radio_band i https://en.wikipedia.org/wiki/Amateur_radio_licensing (sprawdzono 2026-10)
 
-### Czym jest licencja krótkofalarska i co daje?
-To indywidualne pozwolenie ze znakiem wywoławczym, wydawane po egzaminie z teorii radia, elektroniki, propagacji, zasad pracy i przepisów (czasem też bezpieczeństwa RF i anten). Egzaminy mają poziomy; wyższy daje więcej pasm i większą moc. Licencja daje szerszy dostęp do widma i większą moc niż usługi bezlicencyjne (CB, PMR446). Ważna jest w kraju wydania i w krajach z umowami wzajemnymi. Przykładowe maksymalne moce najwyższych klas: Niemcy 750 W, Włochy 500 W, Wielka Brytania 1 kW. Szczegóły dla Polski (UKE, kategorie) nie są w tym źródle. Ważne dla Meshtastic: w regionach amatorskich szyfrowanie jest zabronione i trzeba nadawać znak.
-Słowa: licencja, krótkofalowiec, radioamator, egzamin, znak wywoławczy, UKE, moc, pasma amatorskie, CB, PMR446, szyfrowanie zabronione
-Źródło: https://en.wikipedia.org/wiki/Amateur_radio_licensing i https://meshtastic.org/docs/configuration/radio/lora/ (sprawdzono 2026-10)
-
 ### Na jakiej podstawie prawnej w Polsce używa się LoRa bez pozwolenia?
 UKE wskazuje art. 145 Prawa komunikacji elektronicznej (wcześniej art. 144 Prawa telekomunikacyjnego): z obowiązku pozwolenia zwolnione są m.in. urządzenia tylko odbiorcze, urządzenia klasy 1 (bez ograniczeń wprowadzania w UE) oraz urządzenia wymienione w rozporządzeniu wykonawczym. Obecnie jest to rozporządzenie Ministra Cyfryzacji z 9 lutego 2022 (Dz.U. 2022 poz. 567) w sprawie urządzeń radiowych nadawczych i nadawczo-odbiorczych używanych bez pozwolenia, zmienione rozporządzeniem z 11 listopada 2023 (Dz.U. 2023 poz. 2567). Strona UKE nie podaje liczb dla 863–870 MHz ani 433 MHz, a treści rozporządzenia nie udało się pobrać, więc konkretne limity (moc, cykl pracy) sprawdzaj w samym akcie. Limity, które stosuje firmware Meshtastic dla EU_868, są w osobnym wpisie.
 Słowa: prawo, UKE, bez pozwolenia, rozporządzenie, Dz.U. 2022 poz. 567, Dz.U. 2023 poz. 2567, art. 145, Prawo komunikacji elektronicznej, legalność LoRa, przepisy Polska
 Źródło: https://bip.uke.gov.pl/pozwolenia-radiowe/urzadzenia-niewymagajace-pozwolenia-/ (sprawdzono 2026-10; treść rozporządzenia niepobrana)
+

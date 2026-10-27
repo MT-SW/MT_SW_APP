@@ -25,16 +25,6 @@ Balun łączy symetryczną antenę (dipol) z niesymetrycznym kablem koncentryczn
 Słowa: balun, dławik ferrytowy, prąd współbieżny, ferryt, koncentryk, dipol zasilanie, choke, symetryzator, ekran kabla
 Źródło: https://en.wikipedia.org/wiki/Balun (sprawdzono 2026-10)
 
-### SDR i tani odbiornik RTL-SDR
-Radio programowe (SDR) wykonuje mieszanie, filtrowanie i demodulację w oprogramowaniu; jedno urządzenie obsłuży wiele protokołów. RTL-SDR to tanie odbiorniki na układzie Realtek RTL2832U, pierwotnie do telewizji DVB-T (w 2010 odkryto surowe dane); sterowniki rozwijał projekt Osmocom. Wersje dedykowane z lepszym ekranowaniem kosztują ok. 30 USD (2025). Zakres to w przybliżeniu 24–1766 MHz przy paśmie do 3,2 MHz. Zastosowania: radio FM, ADS-B i ACARS (samoloty), sondy meteorologiczne, satelity pogodowe, radioastronomia amatorska, tryby krótkofalarskie. Do odbioru 868 MHz nadaje się zakresem, więc można obejrzeć zajętość pasma lub sprawdzić, czy węzeł nadaje; to jednak odbiornik, nie narzędzie do dekodowania szyfrowanych wiadomości Meshtastic.
-Słowa: SDR, RTL-SDR, RTL2832U, odbiornik, widmo, 868 MHz podgląd, ADS-B, Osmocom, dongle USB, analiza pasma
-Źródło: https://en.wikipedia.org/wiki/Software-defined_radio (sprawdzono 2026-10; ostatnie zdanie: wiedza ogólna)
-
-### Analizator wektorowy (VNA, NanoVNA): do czego służy?
-VNA mierzy parametry S urządzeń radiowych (amplitudę i fazę); S11 to odbicie na porcie, z którego wynika SWR i impedancja. Kalibracja SOLT (short, open, load, through) z wzorcami 50 Ω koryguje błędy układu pomiarowego. Tanie, amatorskie VNA poniżej 100 USD mają mniej funkcji, ale wystarczą do nauki i hobby do kilku GHz. Źródło nie opisuje wprost strojenia anten ani nazwy NanoVNA w tekście; w praktyce hobbyści używają takiego urządzenia do sprawdzania rezonansu i SWR własnych anten na 868/869 MHz (wiedza ogólna).
-Słowa: VNA, NanoVNA, S11, SWR pomiar, kalibracja SOLT, strojenie anteny, analizator anten, rezonans, impedancja
-Źródło: https://en.wikipedia.org/wiki/Vector_network_analyzer (sprawdzono 2026-10; ostatnie zdanie: wiedza ogólna)
-
 ### LNA: wzmacniacz niskoszumny i jego miejsce
 Liczy się współczynnik szumów (NF): typowy LNA ma ok. 3 dB, dobry ok. 1 dB, a wzmocnienie typowo ok. 20 dB. Montuje się go przy antenie, bo straty kabla pogarszają stosunek sygnału do szumu (przykład z GPS: 10 stóp RG-174 to ok. 5 dB straty). W łańcuchu odbiorczym o szumach decydują pierwsze stopnie (wzór Friisa). Ryzyka: własny szum LNA, zła polaryzacja, zniekształcenia intermodulacyjne przy silnych sygnałach (zwłaszcza blisko silnych nadajników), niestabilność. Za duże wzmocnienie przy silnym sygnale przekracza zakres dynamiczny. W sieci z wieloma blisko położonymi nadajnikami LNA bez filtra może pogorszyć odbiór (wiedza ogólna).
 Słowa: LNA, wzmacniacz niskoszumny, współczynnik szumów, NF, Friis, wzmacniacz antenowy, intermodulacja, czułość odbiornika, filtr
@@ -44,3 +34,4 @@ Słowa: LNA, wzmacniacz niskoszumny, współczynnik szumów, NF, Friis, wzmacnia
 Filtry z powierzchniową falą akustyczną mają wąskie, dokładnie określone pasma przepustowe i przewyższają filtry kwarcowe, LC i falowodowe wydajnością, ceną i rozmiarem poniżej ok. 1,5–2,5 GHz (powyżej stosuje się rezonatory cienkowarstwowe). Wysoka dobroć pozwala silnie tłumić sygnały zakłócające. Na 868/869 MHz mieszczą się w zakresie, w którym są korzystne, ale źródło nie podaje konkretnych zastosowań ani strat wtrąceniowych. Tłumienie wtrąceniowe jest zwykle zauważalne (kilka dB, wiedza ogólna), więc filtr przed wzmacniaczem kosztuje trochę czułości.
 Słowa: filtr SAW, filtr pasmowy, tłumienie wtrąceniowe, selektywność, 868 MHz, zakłócenia, GSM 900, odbiornik, filtr dla LoRa
 Źródło: https://en.wikipedia.org/wiki/Surface_acoustic_wave (sprawdzono 2026-10; część o stratach: wiedza ogólna)
+

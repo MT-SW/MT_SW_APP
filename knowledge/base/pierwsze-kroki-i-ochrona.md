@@ -15,12 +15,3 @@ Pierwsza cyfra to ochrona przed ciałami stałymi: 5 oznacza ochronę przed pył
 Słowa: IP65, IP67, IP68, szczelność, wodoodporna, obudowa, pyłoszczelna, deszcz, zanurzenie, stopień ochrony, puszka hermetyczna
 Źródło: https://en.wikipedia.org/wiki/IP_code (sprawdzono 2026-10; zalecenie IP65 dla masztu to wniosek ogólny)
 
-### Elektryczność statyczna: jak nie uszkodzić płytki?
-Niektóre układy uszkadza już wyładowanie rzędu 30 V, a skutek bywa widoczny dopiero po czasie. Iskrę czuć dopiero przy kilku tysiącach woltów, więc płytkę można zniszczyć niezauważenie. Zabezpieczenia: opaska uziemiająca na nadgarstek, mata antystatyczna, przechowywanie w woreczkach antystatycznych (działają jak klatka Faradaya), trzymanie materiałów łatwo się elektryzujących (folie, styropian, sweter) co najmniej 30 cm od płytek. Wilgotne powietrze zmniejsza ładunki, a suche zimą je zwiększa. Nie dotykaj pinów anteny i złączy bez potrzeby.
-Słowa: elektryczność statyczna, ESD, wyładowanie, opaska antystatyczna, mata, woreczek antystatyczny, uszkodzenie płytki, zima, suche powietrze
-Źródło: https://en.wikipedia.org/wiki/Electrostatic_discharge (sprawdzono 2026-10; wzmianki o kilku tysiącach woltów i zimie to wiedza ogólna)
-
-### Burza: jak powstaje i ile trwa?
-Burza potrzebuje wilgoci, chwiejnego powietrza i czynnika unoszącego (np. frontu). Ma trzy etapy, każdy średnio ok. 30 minut: rozwój (prądy wstępujące, chmura kłębiasta), dojrzałość (prądy wstępujące i zstępujące, kowadło, grad, silny wiatr, pioruny) i zanik. Pojedyncza komórka trwa zwykle 20–30 minut, superkomórka nawet godzinami; przeciętna burza ma ok. 24 km średnicy. W klimacie umiarkowanym najwięcej burz jest wiosną i latem, a w Europie najczęściej późnym popołudniem i wieczorem. Zagrożenia: pioruny, grad, gwałtowne porywy wiatru (downburst), nagłe powodzie. Jeśli słychać grzmot, piorun może cię trafić.
-Słowa: burza, powstawanie burzy, etapy, grad, downburst, porywy wiatru, superkomórka, kiedy burze, popołudnie, front, pogoda
-Źródło: https://en.wikipedia.org/wiki/Thunderstorm (sprawdzono 2026-10)

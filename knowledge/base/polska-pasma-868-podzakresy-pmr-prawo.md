@@ -15,7 +15,3 @@ Fabryczna antena jest krótka i wystarcza na niewielkie odległości. Zewnętrzn
 Słowa: antena zewnętrzna, 3-5 dBi, zasięg praktyczny, widoczność liniowa, zakłócenia, Yagi, ground plane, góry zasięg
 Źródło: https://mikrobot.pl/pl/blog/Meshtastic-Czestotliwosci/15 (sprawdzono 2026-10; blog)
 
-### PMR446: kanały, moc, zasięg i warunki prawne w Polsce
-Analogowo 446,0 do 446,2 MHz, 16 kanałów co 12,5 kHz; cyfrowo 446,1 do 446,2 MHz z odstępem 6,25 lub 12,5 kHz (lista 6,25 kHz ma 32 kanały); decyzja ECC (15)05 z 2015 połączyła oba zakresy. Moc maksymalna 500 mW ERP. Zasięg typowy: powyżej 10 km przy widoczności (szczyty, szybowiec), 5 do 6 km nad jeziorem, 4 do 5 km w polu, 2 do 3 km przy rzadkiej niskiej zabudowie, do 0,5 km w mieście. W UE radiotelefony PMR446 to urządzenia klasy 1 niewymagające pozwolenia; w Polsce podstawą jest art. 144 ust. 2 pkt 5 Prawa telekomunikacyjnego. Warunki: urządzenie ręczne ze zintegrowaną anteną, tylko łączność bezpośrednia (bez bazy i przemiennika), limit nadawania 180 sekund, zakaz przeróbek mechanicznych i elektrycznych. System FRS jest w Polsce i Europie zakazany; kanały PMR na 154 MHz wymagają pozwolenia, które uzyska tylko podmiot gospodarczy. dPMR: kanał kontaktowy i EmCOM na kanale 19 (446,115625 MHz).
-Słowa: PMR446, dPMR, 446 MHz, 500 mW, 180 sekund, bez pozwolenia, FRS zakaz, Prawo telekomunikacyjne, krótkofalówka
-Źródło: https://pl.wikipedia.org/wiki/PMR_(radio) (sprawdzono 2026-10)

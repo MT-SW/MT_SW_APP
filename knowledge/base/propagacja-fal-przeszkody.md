@@ -29,3 +29,9 @@ Słowa: przeszkody, budynki, drzewa, wzgórza, dyfrakcja, ostrze noża, brak LOS
 Odbicie od powierzchni (ziemia, woda, dach) dociera do odbiornika z innym opóźnieniem niż fala bezpośrednia. Zależnie od fazy sygnały się dodają lub odejmują. Na VHF odbicie od ziemi powoduje interferencje. Dlatego czasem przesunięcie anteny o kilkanaście centymetrów albo zmiana wysokości zmienia odbiór. Modele propagacji są empiryczne i przewidują medianę strat na trasie, a nie dokładne zachowanie w danym punkcie.
 Słowa: odbicie, interferencja, faza, wielodrogowość, zaniki, fading, przesunięcie anteny, model empiryczny
 Źródło: https://en.wikipedia.org/wiki/Radio_propagation (sprawdzono 2026-10; zdanie o przesunięciu anteny to wniosek ogólny)
+
+### Rodzaje propagacji fal radiowych
+Linia widoczności: dominuje od VHF w górę (telefony, FM, TV, satelity); horyzont optyczny wynosi ok. 64 km, a załamanie atmosferyczne może go nieco wydłużyć. Fala przyziemna: pionowa polaryzacja, ok. 30–3000 kHz, podąża za krzywizną Ziemi (AM, nawigacja). Skywave: fale krótkie odbijają się od jonosfery i dochodzą na kontynenty, najlepiej nocą i zimą (krótkofalowcy). Kanały troposferyczne (ducting): inwersja temperatury ugina sygnały VHF, czasem nawet ponad 1000 km, głównie późną wiosną i latem. Strefa Fresnela: częściowe jej zasłonięcie obniża moc. Dyfrakcja pozwala niskim częstotliwościom omijać wzgórza. Pogoda: opady i para wodna tłumią niektóre częstotliwości; UHF jest wrażliwe na zmiany pogody, a duży budynek potrafi zablokować łącze całkowicie.
+Słowa: propagacja, linia widoczności, fala przyziemna, jonosfera, ducting, inwersja, strefa Fresnela, dyfrakcja, pogoda a radio, zasięg
+Źródło: https://en.wikipedia.org/wiki/Radio_propagation (sprawdzono 2026-10)
+

@@ -1,0 +1,37 @@
+# Region świętokrzyski, PMR446 i alert RCB
+
+### Góry Świętokrzyskie: gdzie leżą i jakie są najwyższe szczyty?
+Leżą w środkowej Polsce, w okolicy Kielc, mają ok. 1684 km² i należą do Wyżyny Małopolskiej. Najwyższy szczyt to Łysica (614 m n.p.m.), drugi Łysa Góra (594 m); najwyższe pasmo to Łysogóry. Na Łysej Górze stoi benedyktyński klasztor z relikwią drzewa krzyża, który dał nazwę całym górom. W centralnej części działa Świętokrzyski Park Narodowy (od 1950). Śnieg na najwyższych szczytach zalega od listopada do kwietnia. Inwersje temperatury mogą sprawić, że nasłonecznione stoki są nawet o 5 °C cieplejsze niż doliny. Dla radia: wzniesienia są dobrymi miejscami na węzły przekaźnikowe, ale szczyty chronione parkiem narodowym mają własne zasady zabudowy.
+Słowa: Góry Świętokrzyskie, Łysica, Łysa Góra, Święty Krzyż, Kielce, Łysogóry, park narodowy, szczyty, Świętokrzyskie, przekaźnik na górze
+Źródło: https://en.wikipedia.org/wiki/%C5%9Awi%C4%99tokrzyskie_Mountains (sprawdzono 2026-10; ostatnie zdanie: wniosek ogólny do weryfikacji)
+
+### PMR446: radia bez licencji
+PMR446 to pasmo 446,0–446,2 MHz zwolnione z obowiązku licencji przy używaniu zgodnego sprzętu według przepisów kraju użycia; typowa maksymalna moc to 0,5 W ERP. Zgodne radia mają zwykle stałe, zintegrowane anteny, więc unikaj modeli z odłączaną anteną zewnętrzną. Zasięg jest krótki i mocno spada w gęstej zabudowie, lesie, samochodzie i wśród metalu. Cyfrowe PMR446 zależy bardziej od przepisów kraju, a analogowy jest bezpieczniejszy dla prostego użycia. Źródło to poradnik zakupowy, a nie przepis prawny, i nie podaje liczby kanałów. To odrębna technologia niż Meshtastic (inna częstotliwość, brak sieci kratowej i brak szyfrowania wiadomości tekstowych).
+Słowa: PMR446, krótkofalówka, walkie-talkie, bez licencji, 446 MHz, 0,5 W, ERP, radiotelefon, antena stała, zasięg
+Źródło: https://openelab.io/pl/blogs/learn/pmr446-walkie-talkie-buying-guide-europe (sprawdzono 2026-10; ostatnie zdanie: wiedza ogólna)
+
+### Alert RCB: kto go wysyła i kto go dostaje?
+Alert RCB to SMS ostrzegawczy wysyłany na telefony w razie bezpośredniego zagrożenia życia lub zdrowia na znaczącym obszarze. Decyduje Rządowe Centrum Bezpieczeństwa na podstawie informacji ministerstw, urzędów wojewódzkich, policji, straży pożarnej, Straży Granicznej i IMGW; operatorzy mają bezzwłocznie wysłać wiadomość wszystkim w wyznaczonym obszarze, najmniejszym jest powiat. Dostaje go każdy z włączonym telefonem w zasięgu stacji bazowej obszaru (abonament i prepaid), bez rejestracji i aplikacji, za darmo; RCB nie przetwarza danych osobowych. To nie jest część Regionalnego Systemu Ostrzegania. Źródło nie opisuje, co robić po otrzymaniu alertu, ani związku z numerem 112 i aplikacją RATUNEK.
+Słowa: Alert RCB, RCB, SMS ostrzegawczy, ostrzeżenie, zagrożenie, IMGW, powiat, kryzys, burza, alarm, komunikat
+Źródło: https://www.rp.pl/spoleczenstwo/art44919771-dostales-alert-rcb-oto-co-powinienes-o-nim-wiedziec (sprawdzono 2026-10)
+
+### PMR446: kanały, moc, zasięg i warunki prawne w Polsce
+Analogowo 446,0 do 446,2 MHz, 16 kanałów co 12,5 kHz; cyfrowo 446,1 do 446,2 MHz z odstępem 6,25 lub 12,5 kHz (lista 6,25 kHz ma 32 kanały); decyzja ECC (15)05 z 2015 połączyła oba zakresy. Moc maksymalna 500 mW ERP. Zasięg typowy: powyżej 10 km przy widoczności (szczyty, szybowiec), 5 do 6 km nad jeziorem, 4 do 5 km w polu, 2 do 3 km przy rzadkiej niskiej zabudowie, do 0,5 km w mieście. W UE radiotelefony PMR446 to urządzenia klasy 1 niewymagające pozwolenia; w Polsce podstawą jest art. 144 ust. 2 pkt 5 Prawa telekomunikacyjnego. Warunki: urządzenie ręczne ze zintegrowaną anteną, tylko łączność bezpośrednia (bez bazy i przemiennika), limit nadawania 180 sekund, zakaz przeróbek mechanicznych i elektrycznych. System FRS jest w Polsce i Europie zakazany; kanały PMR na 154 MHz wymagają pozwolenia, które uzyska tylko podmiot gospodarczy. dPMR: kanał kontaktowy i EmCOM na kanale 19 (446,115625 MHz).
+Słowa: PMR446, dPMR, 446 MHz, 500 mW, 180 sekund, bez pozwolenia, FRS zakaz, Prawo telekomunikacyjne, krótkofalówka
+Źródło: https://pl.wikipedia.org/wiki/PMR_(radio) (sprawdzono 2026-10)
+
+### Co zwiedzić w okolicach Kielc i Gór Świętokrzyskich?
+Według National Geographic Traveler góry mają około 500 mln lat (powstały w paleozoiku) i należą do najstarszych w Europie. Atrakcje: jaskinia Raj pod Chęcinami (krasowa, ok. 9 °C, zwiedzanie ok. 45 min), ruiny zamku Krzyżtopór w Ujeździe (XVII w., podobno 365 okien), średniowieczny zamek w Chęcinach z widokiem na Dolinę Chęcińską, Łysica (ok. 614 m) w Koronie Gór Polski. Wikipedia dodaje Świętokrzyski Park Narodowy (od 1950) i dąb Bartek. Aktualne godziny otwarcia i ceny sprawdź przed wyjazdem.
+Słowa: Kielce, Jaskinia Raj, Krzyżtopór, Chęciny, Łysica, Korona Gór Polski, zwiedzanie, atrakcje, Ujazd, turystyka Świętokrzyskie
+Źródło: https://www.national-geographic.pl/traveler/kierunki/najstarsze-gory-w-polsce-240625011532/ (sprawdzono 2026-10)
+
+### Łysica: najwyższy szczyt Gór Świętokrzyskich
+Łysica (Góra Świętej Katarzyny) ma 614 m n.p.m., jest najwyższym punktem województwa świętokrzyskiego i najniższym szczytem Korony Gór Polski. Leży we wschodniej części Łysogór, na terenie parku, gdzie obowiązuje ochrona ścisła i opłata wstępu. Czerwonym szlakiem ze Świętej Katarzyny trasa ma około 2 km i zajmuje około godziny. Po drodze: klasztor bernardynek, drewniana kapliczka z XIX wieku, pomniki powstańców styczniowych i partyzantów AK, źródełko św. Franciszka (według legend woda leczy oczy). Najwyższy punkt to wschodni wierzchołek zwany Agatą, Skałą Agaty lub Zamczyskiem. Na zachodnim szczycie stoi replika krzyża z 1930. Napis z 1882 na kapliczce cmentarnej, podpisany m.in. przez Stefana Żeromskiego, dał nazwę „kapliczka Żeromskiego”. Przy planowaniu węzła na szczycie pamiętaj o statusie ochrony ścisłej i zgodzie dyrekcji parku (wniosek ogólny, nie ze źródła).
+Słowa: Łysica, Korona Gór Polski, 614 m, Święta Katarzyna, czerwony szlak, Żeromski, kapliczka, najwyższy szczyt
+Źródło: https://www.national-geographic.pl/traveler/kierunki/najwyzszy-szczyt-gor-swietokrzyskich-nie-imponuje-wysokoscia-zalicza-sie-go-jednak-do-korony-gor-polski/ (sprawdzono 2026-10)
+
+### Świętokrzyski Park Narodowy: fakty
+Park powstał w 1950, leży w powiecie kieleckim (gmina Bodzentyn), około 50,896° N, 20,915° E. Łysica ma 614 m, Łysa Góra 595 m; oba szczyty należą do Łysogór, najwyższego pasma Gór Świętokrzyskich. Park obejmuje też wschodnią część Pasma Klonowskiego i część Pasma Pokrzywiańskiego z Chełmową Górą. Bilet normalny 15,50 zł, ulgowy 8 zł (stan ze strony); park jest otwarty całą dobę. Atrakcje: poklasztorny zespół benedyktyński na Świętym Krzyżu z pierwszej połowy XII wieku, gdzie powstały Kazania świętokrzyskie, prawdopodobnie najstarszy polski tekst; 674 drzewa uznane za pomniki przyrody; endemiczny jodłowy bór świętokrzyski i modrzew na Chełmowej Górze. Gołoborza to pozbawione roślin kwarcytowe pola głazów z kambru, uważane za ślad lodowców na ziemiach polskich. Fauna i flora: 29 gatunków zwierząt, 82 gatunki roślin chronionych, około 700 roślin naczyniowych. Dyrekcja: Bodzentyn, ul. Suchedniowska 4, tel. +48 41 311 51 06. Zasad zwiedzania strona nie podaje.
+Słowa: Świętokrzyski Park Narodowy, Święty Krzyż, gołoborze, Łysogóry, Bodzentyn, Chełmowa Góra, bilet, Kazania świętokrzyskie
+Źródło: https://swietokrzyskie.travel/en/informator_turystyczny/natura/swietokrzyski_national_park (sprawdzono 2026-10)
+
