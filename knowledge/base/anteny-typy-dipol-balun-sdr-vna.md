@@ -16,7 +16,7 @@ Słowa: kolinearna, antena kolinearna, zysk 5 dBi, 8 dBi, antena bazowa, radom, 
 Źródło: https://en.wikipedia.org/wiki/Collinear_antenna_array (sprawdzono 2026-10; ostatnie zdanie: wiedza ogólna)
 
 ### Antena patch (płaska) i antena PIFA
-Patch to niskoprofilowa antena łatwa do wykonania na płytce drukowanej, długości około połowy fali (skracana przez efekt brzegowy); praktyczna głównie na mikrofalach, gdzie jest wygodnie mała. Wiele patchy tworzy szyk o dużym zysku, a szyk fazowany może sterować wiązką. Wariant PIFA (planarna odwrócona F) jest powszechny w telefonach i ma lepsze dopasowanie. Źródło nie podaje zysku ani szerokości wiązki pojedynczego patcha; dla 869 MHz patch byłby dość duży (rzędu 15–17 cm), więc w urządzeniach LoRa stosuje się go rzadziej niż pręty i antenki helikalne (wniosek ogólny).
+Patch to niskoprofilowa antena łatwa do wykonania na płytce drukowanej, długości około połowy fali (skracana przez efekt brzegowy); praktyczna głównie na mikrofalach, gdzie jest wygodnie mała. Wiele patchy tworzy szyk o dużym zysku, a szyk fazowany może sterować wiązką. Wariant PIFA (planarna odwrócona F) jest powszechny w telefonach i ma lepsze dopasowanie. Źródło nie podaje zysku ani szerokości wiązki pojedynczego patcha; w urządzeniach LoRa 868/869 MHz częściej spotyka się pręty, anteny helikalne i dipole, a patche w antenach kierunkowych panelowych (wiedza ogólna).
 Słowa: patch, antena płaska, PIFA, antena PCB, antena panelowa, mikrofale, szyk anten, antena kierunkowa
 Źródło: https://en.wikipedia.org/wiki/Patch_antenna (sprawdzono 2026-10; ostatnie zdanie: wniosek ogólny)
 
@@ -41,6 +41,6 @@ Słowa: LNA, wzmacniacz niskoszumny, współczynnik szumów, NF, Friis, wzmacnia
 Źródło: https://en.wikipedia.org/wiki/Low-noise_amplifier (sprawdzono 2026-10; ostatnie zdanie: wiedza ogólna)
 
 ### Filtry SAW: po co w odbiorniku radiowym?
-Filtry z powierzchniową falą akustyczną mają wąskie, dokładnie określone pasma przepustowe i przewyższają filtry kwarcowe, LC i falowodowe wydajnością, ceną i rozmiarem poniżej ok. 1,5–2,5 GHz (powyżej stosuje się rezonatory cienkowarstwowe). Wysoka dobroć pozwala silnie tłumić sygnały zakłócające. Na 868/869 MHz mieszczą się w zakresie, w którym są korzystne, ale źródło nie podaje konkretnych zastosowań ani strat wtrąceniowych. Tłumienie wtrąceniowe jest zwykle zauważalne (kilka dB, wiedza ogólna), więc filtr kosztuje czułość, a wejście filtra przed LNA obniża ten efekt.
+Filtry z powierzchniową falą akustyczną mają wąskie, dokładnie określone pasma przepustowe i przewyższają filtry kwarcowe, LC i falowodowe wydajnością, ceną i rozmiarem poniżej ok. 1,5–2,5 GHz (powyżej stosuje się rezonatory cienkowarstwowe). Wysoka dobroć pozwala silnie tłumić sygnały zakłócające. Na 868/869 MHz mieszczą się w zakresie, w którym są korzystne, ale źródło nie podaje konkretnych zastosowań ani strat wtrąceniowych. Tłumienie wtrąceniowe jest zwykle zauważalne (kilka dB, wiedza ogólna), więc filtr przed wzmacniaczem kosztuje trochę czułości.
 Słowa: filtr SAW, filtr pasmowy, tłumienie wtrąceniowe, selektywność, 868 MHz, zakłócenia, GSM 900, odbiornik, filtr dla LoRa
 Źródło: https://en.wikipedia.org/wiki/Surface_acoustic_wave (sprawdzono 2026-10; część o stratach: wiedza ogólna)
