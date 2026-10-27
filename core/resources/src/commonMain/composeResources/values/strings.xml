@@ -77,7 +77,7 @@
     <string name="ai_ago_h">%1$d h ago</string>
     <string name="ai_ago_min">%1$d min ago</string>
     <string name="ai_ago_now">just now</string>
-    <string name="ai_assistant_summary">Chat with an AI assistant without internet. Experimental, off by default.</string>
+    <string name="ai_assistant_summary">Chat with an AI assistant without internet, with a built-in general knowledge base. Experimental, off by default.</string>
     <string name="ai_assistant_title">Offline assistant</string>
     <string name="ai_assistant_unavailable">The assistant will be available once the Gemma model engine is added in an upcoming version.</string>
     <string name="ai_assistant_warning_title">Turn on the offline assistant?</string>
