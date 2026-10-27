@@ -106,7 +106,12 @@ class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : Assis
             val text = readText("$BASE_PATH/$file")
             if (text.isBlank()) continue
             val title = text.lineSequence().firstOrNull { it.startsWith("# ") }?.removePrefix("# ")?.trim() ?: file
-            val label = if (file.startsWith("offtop/")) "Baza wiedzy (offtop)" else "Baza wiedzy"
+            val label =
+                when {
+                    file.startsWith("offtop/") -> "Baza wiedzy (offtop)"
+                    file.startsWith("pokrewne/") -> "Baza wiedzy (pokrewne)"
+                    else -> "Baza wiedzy"
+                }
             documents += KnowledgeIndex.Document("$label: $title", text, base = true)
         }
         val built = KnowledgeIndex(documents)
