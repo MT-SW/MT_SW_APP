@@ -41,12 +41,12 @@ class KnowledgeIndex(documents: List<Document>) {
         get() = chunks.isEmpty()
 
     /** The fragments that best match [question], as one text of at most [maxChars] characters (empty if none fit). */
-    fun lookup(question: String, maxChars: Int, includeBase: Boolean = false): String {
+    fun lookup(question: String, maxChars: Int, includeBase: Boolean = false, baseOnly: Boolean = false): String {
         val terms = stems(question)
         if (terms.isEmpty() || maxChars < MIN_ROOM || chunks.isEmpty()) return ""
         val lower = question.lowercase()
         val wantsNews = NEWS_WORDS.any { lower.contains(it) }
-        val pool = chunks.filter { (wantsNews || !it.news) && (includeBase || !it.base) }
+        val pool = chunks.filter { (wantsNews || !it.news) && (includeBase || !it.base) && (!baseOnly || it.base) }
         val total = pool.size.toDouble()
         val frequency = HashMap<String, Int>()
         for (chunk in pool) for (term in terms) if (term in chunk.stems) frequency[term] = (frequency[term] ?: 0) + 1

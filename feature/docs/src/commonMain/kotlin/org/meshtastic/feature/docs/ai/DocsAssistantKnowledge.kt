@@ -50,6 +50,11 @@ class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : Assis
         return indexFor(language ?: languageOf(question)).lookup(question, maxChars, includeBase = true)
     }
 
+    override suspend fun lookupBaseOnly(question: String, maxChars: Int, language: String?): String {
+        if (question.isBlank()) return ""
+        return indexFor(language ?: languageOf(question)).lookup(question, maxChars, includeBase = true, baseOnly = true)
+    }
+
     override suspend fun coreFacts(language: String): String =
         org.meshtastic.core.repository.knowledgeSection(readText("files/knowledge/core.md"), language)
 

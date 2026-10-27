@@ -62,6 +62,14 @@ class UpdatableKnowledge(
     }
 
     /** The core facts: the copy downloaded from our repository when there is one (newer), else the built-in one. */
+    // The technical knowledge base lives only in the built-in files: without these two lines the interface's empty
+    // default answered, and the assistant never saw a single entry of the base.
+    override suspend fun lookupBase(question: String, maxChars: Int, language: String?): String =
+        builtIn.lookupBase(question, maxChars, language)
+
+    override suspend fun lookupBaseOnly(question: String, maxChars: Int, language: String?): String =
+        builtIn.lookupBaseOnly(question, maxChars, language)
+
     override suspend fun coreFacts(language: String): String {
         val file = File(directory, "project/core.md")
         val downloaded = withContext(Dispatchers.IO) { runCatching { if (file.exists()) file.readText() else "" }.getOrDefault("") }

@@ -62,7 +62,8 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
     private var engine: Engine? = null
     private var loadedId: String? = null
     private var loadedWithAudio = false
-    private val failedBackends = mutableSetOf<String>()
+    /** When (and why) a chip last failed to start: it is skipped only for a short time, and every skip is logged. */
+    private val failedBackends = mutableMapOf<String, Pair<Long, String>>()
 
     /**
      * Folder with the neural chip libraries, set by the platform when it has them (Android passes its native library
@@ -293,8 +294,17 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         var created: Engine? = null
         var failure: Exception? = null
         for ((name, backend) in attempts) {
-            // A chip that failed once is not tried again until the app restarts (every try costs seconds).
-            if (name in failedBackends && name != "CPU") continue
+            // A chip that failed a moment ago is not tried again at once (every try costs seconds), but the skip is
+            // always written to the log with the old reason, so a quiet fall-back to the processor cannot happen.
+            val failedBefore = failedBackends[name]
+            if (failedBefore != null && name != "CPU") {
+                val ago = nowMillis - failedBefore.first
+                if (ago < RETRY_AFTER_MS) {
+                    Logger.w(tag = TAG) { "Backend $name skipped for $modelId: it failed ${ago / MS_PER_SECOND} s ago (${failedBefore.second})" }
+                    continue
+                }
+            }
+            Logger.i(tag = TAG) { "Trying backend $name for $modelId (context $window tokens, hearing $audio)" }
             try {
                 created =
                     if (name == "GPU") startOnGpu(file, backend, cache, window, audio)
@@ -304,7 +314,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
                 break
             } catch (e: Exception) {
                 failure = e
-                failedBackends += name
+                failedBackends[name] = nowMillis to (e.message?.lineSequence()?.firstOrNull() ?: e::class.simpleName.orEmpty())
                 Logger.w(tag = TAG, throwable = e) {
                     "Backend $name not usable for $modelId: ${e.message}" + (e.cause?.let { " (cause: ${it.message})" } ?: "")
                 }
@@ -403,7 +413,19 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
             if (window <= GPU_SMALL_WINDOW) throw e
             Logger.w(tag = TAG) { "GPU did not start again; trying a context of $GPU_SMALL_WINDOW tokens" }
         }
-        return start(file, backend(), cache, GPU_SMALL_WINDOW, audio)
+        try {
+            return start(file, backend(), cache, GPU_SMALL_WINDOW, audio)
+        } catch (e: Exception) {
+            Logger.w(tag = TAG) { "GPU did not start with a small context either; trying a fresh cache folder" }
+        }
+        // Last chance: a new, empty cache folder (a damaged or locked one can make the graphics chip refuse to start).
+        val fresh = File(cache.parentFile, "cache-" + nowMillis).apply { mkdirs() }
+        try {
+            return start(file, backend(), fresh, GPU_SMALL_WINDOW, audio)
+        } catch (e: Exception) {
+            runCatching { fresh.deleteRecursively() }
+            throw e
+        }
     }
 
     private fun start(file: File, backend: Backend, cache: File, window: Int, audio: Boolean): Engine {
@@ -620,5 +642,8 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
         /** The context a second GPU attempt uses when the full window did not start. */
         const val GPU_SMALL_WINDOW = 4096
         const val MS_PER_SECOND = 1000L
+
+        /** A chip that failed is tried again after this long (and always after the app restarts). */
+        const val RETRY_AFTER_MS = 2 * 60 * 1000L
     }
 }

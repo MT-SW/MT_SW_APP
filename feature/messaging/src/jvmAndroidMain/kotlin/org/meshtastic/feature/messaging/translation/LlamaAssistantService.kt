@@ -455,6 +455,11 @@ class LlamaAssistantService(
                 speak(modelId, history, polish, onPiece, room, extra = extra, temperature = FACT_TEMPERATURE)
             }
             "app_help" -> {
+                // "What is a SAW filter?" is a question for the knowledge base, even when a word of it also names a setting
+                // ("filter" -> message filters): when the base has entries on it, the answer comes from them.
+                if (GENERAL_QUESTION.containsMatchIn(question.trim().lowercase())) {
+                    fromBase(modelId, history, question, intent.text, polish, answerLang, onPiece, room, baseOnly = true)?.let { return it }
+                }
                 // A button to the setting (or else the screen) the question is about: the router's words first, then the
                 // user's own. The words must start a word, so a stray match inside another word is no longer possible.
                 // "How do I connect to my radio" is about the connections screen, not about the radio's Bluetooth settings.
@@ -506,6 +511,7 @@ class LlamaAssistantService(
                     }.trim()
                     if (text.isNotBlank()) return text.also(onPiece)
                 }
+                if (button == null) fromBase(modelId, history, question, intent.text, polish, answerLang, onPiece, room)?.let { return it }
                 val place = button?.let { guideTools.placeOf(it) }.orEmpty()
                 // The manual pages are looked up with the name of the found setting too, so they are about that setting.
                 val guide = knowledge?.lookup(listOf(question, intent.text, button?.label.orEmpty()).joinToString(" ").trim(), KNOWLEDGE_CHARS * room).orEmpty()
@@ -556,8 +562,11 @@ class LlamaAssistantService(
         language: String?,
         onPiece: (String) -> Unit,
         room: Int,
+        baseOnly: Boolean = false,
     ): String? {
-        val facts = knowledge?.lookupBase(listOf(question, topic).joinToString(" ").trim(), BASE_CHARS * room, language).orEmpty()
+        val query = listOf(question, topic).joinToString(" ").trim()
+        val facts =
+            (if (baseOnly) knowledge?.lookupBaseOnly(query, BASE_CHARS * room, language) else knowledge?.lookupBase(query, BASE_CHARS * room, language)).orEmpty()
         if (facts.isBlank()) return null
         val web = if (uiPrefs.assistantInternetEnabled.value) webTools.web_search(question.take(WEB_QUERY_CHARS)) else ""
         Logger.i(tag = TAG) { "Knowledge base: ${facts.length} chars, web ${web.length} chars" }
@@ -1060,6 +1069,8 @@ class LlamaAssistantService(
         val NEAREST_WORDS = Regex("najbliż|najbliz|nearest|closest")
         // "Where is the hop limit" / "how do I change X" asks where a thing is; it does not ask to open it.
         val WHERE_QUESTION = Regex("^(gdzie|jak|w jaki sposób|w jaki sposob|where|how)(?=\\s)")
+        val GENERAL_QUESTION =
+            Regex("^(co to (jest|są|sa)|czym (jest|są|sa)|co oznacza|co znaczy|jak działa|jak dziala|dlaczego|po co|what is|what are|what does|how does|why)(?=\\s|$)")
         val OPEN_COMMAND = Regex("^(otwórz|otworz|pokaż|pokaz|przejdź|przejdz|open|show|go to)(?=\\s|$)")
         val ABOUT_ASSISTANT = Regex("asystent|assistant|tłumacz|tlumacz|translator")
         val ROLE_WORDS = Regex("(router|ruter|repeater|przekaźnik|przekaznik|czujnik|sensor|tracker)")

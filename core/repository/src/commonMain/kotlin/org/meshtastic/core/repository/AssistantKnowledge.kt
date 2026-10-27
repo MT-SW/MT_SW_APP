@@ -39,6 +39,9 @@ interface AssistantKnowledge {
      */
     suspend fun lookupBase(question: String, maxChars: Int, language: String?): String = ""
 
+    /** Only entries of the knowledge base (not the app's manual pages): empty when the base has nothing on the question. */
+    suspend fun lookupBaseOnly(question: String, maxChars: Int, language: String?): String = ""
+
     /** The short core facts about MT_SW (network settings, parts of the project) in [language], given with every answer. */
     suspend fun coreFacts(language: String): String = ""
 
