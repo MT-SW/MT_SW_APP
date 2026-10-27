@@ -33,6 +33,12 @@ interface AssistantKnowledge {
     /** Like [lookup], but in the manual of [language] ("pl", "en"); null picks the language from the question. */
     suspend fun lookup(question: String, maxChars: Int, language: String?): String = lookup(question, maxChars)
 
+    /**
+     * Like [lookup], but also searches the technical knowledge base (antennas, filters, flashing, building, settings);
+     * every entry of it ends with a "Źródło:/Source:" line. Empty when nothing fits.
+     */
+    suspend fun lookupBase(question: String, maxChars: Int, language: String?): String = ""
+
     /** The short core facts about MT_SW (network settings, parts of the project) in [language], given with every answer. */
     suspend fun coreFacts(language: String): String = ""
 

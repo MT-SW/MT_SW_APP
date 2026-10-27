@@ -26,23 +26,27 @@ import kotlin.math.ln
  */
 class KnowledgeIndex(documents: List<Document>) {
 
-    /** One text to index: [title] of the page, its [markdown], and [news] for the change list (only searched for news). */
-    class Document(val title: String, val markdown: String, val news: Boolean = false)
+    /**
+     * One text to index: [title] of the page, its [markdown], and [news] for the change list (only searched for news).
+     * [base] marks a page of the technical knowledge base (antennas, flashing...): it is found only by [lookup] with
+     * `includeBase`, so the manual answers never quote it.
+     */
+    class Document(val title: String, val markdown: String, val news: Boolean = false, val base: Boolean = false)
 
-    private class Chunk(val title: String, val text: String, val stems: Set<String>, val news: Boolean)
+    private class Chunk(val title: String, val text: String, val stems: Set<String>, val news: Boolean, val base: Boolean)
 
-    private val chunks: List<Chunk> = documents.flatMap { split(it.title, it.markdown, it.news) }
+    private val chunks: List<Chunk> = documents.flatMap { split(it.title, it.markdown, it.news, it.base) }
 
     val isEmpty: Boolean
         get() = chunks.isEmpty()
 
     /** The fragments that best match [question], as one text of at most [maxChars] characters (empty if none fit). */
-    fun lookup(question: String, maxChars: Int): String {
+    fun lookup(question: String, maxChars: Int, includeBase: Boolean = false): String {
         val terms = stems(question)
         if (terms.isEmpty() || maxChars < MIN_ROOM || chunks.isEmpty()) return ""
         val lower = question.lowercase()
         val wantsNews = NEWS_WORDS.any { lower.contains(it) }
-        val pool = chunks.filter { wantsNews || !it.news }
+        val pool = chunks.filter { (wantsNews || !it.news) && (includeBase || !it.base) }
         val total = pool.size.toDouble()
         val frequency = HashMap<String, Int>()
         for (chunk in pool) for (term in terms) if (term in chunk.stems) frequency[term] = (frequency[term] ?: 0) + 1
@@ -79,29 +83,35 @@ class KnowledgeIndex(documents: List<Document>) {
     }
 
     /** Cuts a markdown text into fragments at headings and, when a part is long, at blank lines. */
-    private fun split(pageTitle: String, markdown: String, news: Boolean): List<Chunk> {
+    private fun split(pageTitle: String, markdown: String, news: Boolean, base: Boolean): List<Chunk> {
         val result = ArrayList<Chunk>()
         var heading = pageTitle
         val body = StringBuilder()
+        // Words from a "Słowa:" / "Keywords:" line of an entry: searched, never shown (synonyms, English and Polish names).
+        val hidden = StringBuilder()
+        // An entry of the knowledge base stays whole (its keywords and source line with it).
+        val limit = if (base) BASE_CHUNK else MAX_CHUNK
         fun flush() {
             val text = body.toString().trim()
+            val extra = hidden.toString()
             body.clear()
+            hidden.clear()
             if (text.length < MIN_CHUNK) return
             var rest = text
             while (rest.isNotEmpty()) {
                 var cut = rest.length
-                if (rest.length > MAX_CHUNK) {
+                if (rest.length > limit) {
                     // At a blank line, else at a line end, so a fragment never stops in the middle of a word.
                     cut =
-                        rest.lastIndexOf("\n\n", MAX_CHUNK).takeIf { it > MIN_CHUNK }
-                            ?: rest.lastIndexOf('\n', MAX_CHUNK).takeIf { it > MIN_CHUNK }
-                            ?: rest.lastIndexOf(". ", MAX_CHUNK).takeIf { it > MIN_CHUNK }?.plus(1)
-                            ?: MAX_CHUNK
+                        rest.lastIndexOf("\n\n", limit).takeIf { it > MIN_CHUNK }
+                            ?: rest.lastIndexOf('\n', limit).takeIf { it > MIN_CHUNK }
+                            ?: rest.lastIndexOf(". ", limit).takeIf { it > MIN_CHUNK }?.plus(1)
+                            ?: limit
                 }
                 val piece = rest.substring(0, cut).trim()
                 if (piece.isNotEmpty()) {
                     val title = if (heading == pageTitle) pageTitle else "$pageTitle: $heading"
-                    result += Chunk(title, piece, stems("$heading $piece"), news)
+                    result += Chunk(title, piece, stems("$heading $piece $extra"), news, base)
                 }
                 rest = rest.substring(cut).trim()
             }
@@ -114,6 +124,11 @@ class KnowledgeIndex(documents: List<Document>) {
                 continue
             }
             if (line.startsWith("![") || line.startsWith("---") || line.startsWith("<")) continue
+            val keywords = KEYWORDS.find(line)
+            if (keywords != null) {
+                hidden.append(' ').append(keywords.groupValues[1])
+                continue
+            }
             body.append(plain(line)).append('\n')
         }
         flush()
@@ -135,12 +150,14 @@ class KnowledgeIndex(documents: List<Document>) {
         const val MIN_ROOM = 200
         const val MIN_CHUNK = 40
         const val MAX_CHUNK = 900
+        const val BASE_CHUNK = 1700
         const val MIN_WORD = 3
         const val STEM_LENGTH = 5
         const val MIN_SCORE = 1.5
         const val TITLE_BONUS = 1.0
         val SPLIT = Regex("[^\\p{L}\\p{N}]+")
         val LINK = Regex("\\[([^\\]]*)]\\([^)]*\\)")
+        val KEYWORDS = Regex("^(?:Słowa|Keywords):\\s*(.*)$", RegexOption.IGNORE_CASE)
         val BULLET = Regex("^\\s*[-*]\\s+")
         val NEWS_WORDS = listOf("nowo", "zmian", "aktualiz", "wersj", "changelog", "what's new", "new in", "changed", "release")
         val STOP_WORDS =

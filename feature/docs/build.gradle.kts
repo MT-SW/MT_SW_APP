@@ -89,6 +89,9 @@ val syncDocsToComposeResources =
         from(isolated.rootProject.projectDirectory.file("CHANGELOG.md")) { into("files/knowledge") }
         // Short copies of the READMEs of the firmware, integration and protobufs: only the assistant reads them.
         from(isolated.rootProject.projectDirectory.dir("knowledge")) { include("*.md"); into("files/knowledge") }
+        // The technical knowledge base (knowledge/base/*.md, plain text edited by hand); the build adds base/index.txt
+        // with the file names, because the app cannot list a resource folder.
+        from(isolated.rootProject.projectDirectory.dir("knowledge/base")) { include("*.md"); into("files/knowledge/base") }
         // The assistant's own texts in English and Polish: an answer is written in the language of the question even
         // when the app is set to the other one. Only the lines the assistant uses are kept.
         val resourcesDir = isolated.rootProject.projectDirectory.dir("core/resources/src/commonMain/composeResources")
@@ -131,6 +134,14 @@ val syncDocsToComposeResources =
 
         includeEmptyDirs = false
         into(docsComposeResources)
+
+        val baseSource = isolated.rootProject.projectDirectory.dir("knowledge/base").asFile
+        val baseTarget = docsComposeResources.get().asFile.resolve("files/knowledge/base")
+        doLast {
+            val names = baseSource.listFiles { f -> f.extension == "md" }?.map { it.name }?.sorted().orEmpty()
+            baseTarget.mkdirs()
+            baseTarget.resolve("index.txt").writeText(names.joinToString("\n"))
+        }
     }
 
 // Mapping the task provider carries the task dependency into every compose-resources task that reads the directory.

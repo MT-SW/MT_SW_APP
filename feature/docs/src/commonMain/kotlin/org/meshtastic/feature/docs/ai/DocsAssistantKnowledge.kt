@@ -45,6 +45,11 @@ class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : Assis
         return indexFor(language ?: languageOf(question)).lookup(question, maxChars)
     }
 
+    override suspend fun lookupBase(question: String, maxChars: Int, language: String?): String {
+        if (question.isBlank()) return ""
+        return indexFor(language ?: languageOf(question)).lookup(question, maxChars, includeBase = true)
+    }
+
     override suspend fun coreFacts(language: String): String =
         org.meshtastic.core.repository.knowledgeSection(readText("files/knowledge/core.md"), language)
 
@@ -94,6 +99,15 @@ class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : Assis
                 // A missing file only makes the knowledge smaller.
             }
         }
+        // The technical knowledge base: the list of its files is in base/index.txt (the build writes it), because
+        // compose resources cannot list a folder. Each file is "# Title" and entries ("### question") with a source.
+        val listing = readText("$BASE_PATH/index.txt").lines().map { it.trim() }.filter { it.endsWith(".md") }
+        for (file in listing) {
+            val text = readText("$BASE_PATH/$file")
+            if (text.isBlank()) continue
+            val title = text.lineSequence().firstOrNull { it.startsWith("# ") }?.removePrefix("# ")?.trim() ?: file
+            documents += KnowledgeIndex.Document("Baza MT_SW: $title", text, base = true)
+        }
         val built = KnowledgeIndex(documents)
         cachedLanguage = language
         cache = built
@@ -126,6 +140,7 @@ class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : Assis
                 "integration-web-client.md" to "MT_SW integration web client",
                 "integration-planner-api.md" to "MT_SW integration planner API",
             )
+        const val BASE_PATH = "files/knowledge/base"
         const val CHANGELOG_PATH = "files/knowledge/CHANGELOG.md"
         const val POLISH_LETTERS = "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ"
     }
