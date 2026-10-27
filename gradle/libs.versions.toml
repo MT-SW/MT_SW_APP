@@ -75,7 +75,7 @@ maps-compose = "9.0.1"
 
 # ML Kit
 mlkit-barcode-scanning = "17.3.0"
-mlkit-genai-prompt = "1.0.0-beta4"
+mlkit-genai-prompt = "1.0.0-beta5"
 mlkit-language-id = "17.0.6"
 mlkit-translate = "17.0.3"
 onnxruntime = "1.22.0"
@@ -346,7 +346,7 @@ screenshot-validation-api = { group = "com.android.tools.screenshot", name = "sc
 
 # Build Logic
 android-gradleApiPlugin = { module = "com.android.tools.build:gradle-api", version.ref = "agp" }
-android-tools-common = { module = "com.android.tools:common", version = "32.5.0-rc01" }
+android-tools-common = { module = "com.android.tools:common", version = "32.5.0-rc02" }
 androidx-room-gradlePlugin = { module = "androidx.room3:room3-gradle-plugin", version.ref = "room" }
 compose-gradlePlugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 compose-multiplatform-gradlePlugin = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose-multiplatform" }
