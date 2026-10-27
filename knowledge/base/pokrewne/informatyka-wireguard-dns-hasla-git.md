@@ -19,3 +19,8 @@ Słowa: hasła, menedżer haseł, 2FA, passkey, phishing, hasło główne, reuż
 Commit to zapis stanu projektu z komunikatem i odnośnikiem do poprzedników: git add dodaje pliki do poczekalni, git commit -m zapisuje. Gałąź to lekki wskaźnik na commit; nazwa master nie jest szczególna, wiele serwisów używa main. Każde repozytorium ma pełną historię, domyślny zdalny nazywa się origin. Gdy scalanie samo nie wyjdzie, Git każe poprawić ręcznie. Wypchnięte commity zwykle się nie nadpisuje, tylko cofa nowym commitem; przepisywanie wspólnej historii (np. force push) jest ryzykowne, bo cudze commity mogą wskazywać na coś, czego serwer już nie ma, a bezpieczniej jest --force-with-lease. Plik .gitignore wyklucza z śledzenia klucze, hasła i duże pliki. Rebase źródło nie opisuje.
 Słowa: Git, commit, branch, merge, origin, push, pull, force push, force-with-lease, gitignore, repozytorium, GitHub
 Źródło: https://en.wikipedia.org/wiki/Git (sprawdzono 2026-10; --force-with-lease: wiedza ogólna)
+
+### WireGuard: prosty VPN do domowego serwera
+WireGuard to darmowy, otwarty protokół VPN, lżejszy i szybszy z założenia niż IPsec i OpenVPN. Każda strona ma parę kluczy (publiczny i prywatny, Curve25519); wymienia się klucze publiczne i nadaje adresy, zwykle prywatne. Działa tylko po UDP, domyślnie port 51820. Jest na Androidzie, iOS, Linuksie (w jądrze od wersji 5.6), macOS i Windows. Narzut na pakiet: 60 bajtów przez IPv4, 80 przez IPv6, co trzeba uwzględnić w MTU. Tailscale to osobna usługa; w artykule występuje tylko jako darczyńca projektu.
+Słowa: WireGuard, VPN, port 51820, UDP, klucz publiczny, dostęp zdalny, serwer domowy, Tailscale, MTU, tunel
+Źródło: https://en.wikipedia.org/wiki/WireGuard (sprawdzono 2026-10)

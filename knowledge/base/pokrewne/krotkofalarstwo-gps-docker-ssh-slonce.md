@@ -1,4 +1,4 @@
-# Krótkofalarstwo, GPS, Docker, SSH i ochrona przed słońcem
+# Krótkofalarstwo, GPS, Docker i SSH
 
 ### Czym jest krótkofalarstwo i czym różni się od radia bez licencji?
 Radio amatorskie to niekomercyjne używanie wydzielonych pasm do łączności, eksperymentów, nauki, zawodów i pomocy w nagłych wypadkach. Ramy ustala ITU, zasady i licencje krajowe: trzeba zdać egzamin (teoria radia, elektronika, praktyka, przepisy), często są klasy licencji o rosnących uprawnieniach i mocy. Licencja zwykle obowiązuje tylko w kraju wydania, chyba że umowa wzajemna mówi inaczej. Znak wywoławczy podaje się co najmniej co dziesięć minut i na koniec rozmowy. W odróżnieniu od CB, FRS czy PMR446 krótkofalowiec ma szersze pasma, więcej emisji i większą moc, może sam budować nadajniki i wybierać dowolną częstotliwość w paśmie. Szyfrowanie jest co do zasady zabronione. Sieć Meshtastic na ISM to inna sprawa, bo nie wymaga licencji.
@@ -24,4 +24,3 @@ Słowa: Docker, kontener, obraz, wolumen, docker compose, docker-compose.yml, Do
 SSH to zaszyfrowany protokół zdalnego logowania i uruchamiania poleceń, domyślnie TCP 22; zastąpił telnet i rsh. Logować można hasłem lub kluczem: parę kluczy tworzy ssh-keygen, klucz publiczny trafia na serwer, prywatny zostaje u Ciebie i nigdy nie jest wysyłany; warto go zabezpieczyć hasłem. Kopiować pliki można przez scp, sftp lub rsync po SSH; tunelowanie portów i serwer proxy SOCKS też są możliwe. Bezpieczeństwo: nie akceptuj nieznanego klucza serwera bez sprawdzenia, ~/.ssh/authorized_keys ma być zapisywalny tylko przez właściciela, używaj SSH-2, unikaj przestarzałych algorytmów (RC4, 3DES, DES, MD5) i aktualizuj OpenSSH (od 9.6 załatana jest luka Terrapin).
 Słowa: SSH, ssh-keygen, klucz publiczny, scp, sftp, rsync, port 22, tunel, authorized_keys, OpenSSH, zdalny dostęp, Terrapin
 Źródło: https://en.wikipedia.org/wiki/Secure_Shell (sprawdzono 2026-10)
-

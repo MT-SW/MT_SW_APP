@@ -1,14 +1,4 @@
-# Alternatywy, CLI, klient www i szyfrowanie
-
-### Czym jest MeshCore i czym różni się od Meshtastic?
-MeshCore to otwartoźródłowy (licencja MIT) protokół i oprogramowanie do sieci kratowych na LoRa, stworzone w 2024 przez Scotta Powella; klienty www i mobilne rozwija Liam Cottle. Urządzenia mają role: Companion (urządzenie użytkownika, łączone z aplikacją), Repeater (jedyny typ węzła, który przekazuje dalej pakiety) i Room Server (serwer pokoju). Kanały publiczne używają rozsyłania lawinowego, a poza tym MeshCore opiera się na wyznaczonych trasach i przechowywaniu wiadomości. Według opisu ogranicza to zużycie pasma i kolizje w gęstym ruchu, ale też zasięg wielu skoków. Meshtastic częściej rozsyła pakiety lawinowo przez wiele węzłów. Chodzi o inną filozofię, nie o „lepsze” i „gorsze”. Minusy według źródła: mała przepustowość, wrażliwość na teren i antenę, rozproszona dokumentacja. Sprzęt: płytki ESP32 z LoRa (np. Heltec, LilyGo), pasmo 868 MHz w Europie. MeshCore i Meshtastic nie rozmawiają ze sobą, to osobne sieci.
-Słowa: MeshCore, Meshtastic różnice, repeater, companion, room server, alternatywa, flooding, routing, Liam Cottle
-Źródło: https://en.wikipedia.org/wiki/MeshCore (sprawdzono 2026-10)
-
-### Czym jest Reticulum i czy to to samo co Meshtastic?
-Reticulum to stos sieciowy działający w Pythonie 3, niezależny od IP (IP może być tylko jednym z nośników). Ma adresy i tożsamości bez centralnej koordynacji, samokonfigurujący się routing wielu skoków przez różne media, anonimowość inicjatora (pakiety nie niosą adresu nadawcy), szyfrowane łącza z utajnieniem w przód i potwierdzenia dostarczenia. Nośniki: LoRa przez radio RNode (do zbudowania samemu lub kupienia), Wi-Fi/Ethernet po TCP i UDP, porty szeregowe i modemy KISS/TNC. Szyfrowanie: Ed25519 i X25519, AES-256-CBC, HMAC-SHA256. Instalacja: pip install rns. Wiadomości niesie protokół LXMF, a aplikacja Sideband (Android, Linux, macOS, Windows) obsługuje pliki, obrazy, głos i mapy. To zupełnie inny system niż Meshtastic i nie jest z nim zgodny; porównania ze źródła nie ma.
-Słowa: Reticulum, RNode, Sideband, LXMF, rnsd, rns, mesh bez IP, alternatywa dla Meshtastic
-Źródło: https://github.com/markqvist/Reticulum (sprawdzono 2026-10)
+# CLI, klient www i szyfrowanie Meshtastic
 
 ### Python CLI: instalacja i podstawowe polecenia
 Instalacja: pip3 install --upgrade "meshtastic[cli]". Jeśli polecenie meshtastic nie jest znalezione, dodaj katalog skryptów Pythona do PATH. Wybór urządzenia: --port (np. /dev/ttyUSB0 albo COM4) przy USB, --host (np. meshtastic.local) przez sieć. Polecenia: --info (odczyt konfiguracji), --get lora.region (odczyt), --set lora.region EU_868 (zapis), --ch-set id 1234 --ch-index 0 (parametr kanału), --sendtext 'Cześć' (wiadomość, opcjonalnie --ch-index lub --dest), --nodes (tabela węzłów), --export-config > plik.yaml (zapis konfiguracji), --configure plik.yaml (wczytanie), --reboot, --factory-reset. Przykład z dokumentacji: meshtastic --port /dev/ttyUSB0 --info. Eksport do YAML to wygodna kopia zapasowa przed eksperymentami.

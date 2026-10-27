@@ -1,4 +1,4 @@
-# Upał, pierwsza pomoc w terenie, miernik, przetwornice i transformatory
+# Multimetr, przetwornice i transformatory
 
 ### Jak używać multimetru?
 Napięcie: ustaw AC lub DC i podłącz sondy równolegle do elementu. Prąd: miernik włącza się szeregowo (przerywasz obwód), a pomiar dodaje niewielki spadek napięcia (burden voltage), który zakłóca obwody niskonapięciowe; cęgi mierzą prąd bez przerywania obwodu. Rezystancja: odłącz element od układu, bo równoległe ścieżki zafałszują wynik, a dla małych oporów odejmij rezystancję przewodów. Ciągłość: brzęczyk przy niskim oporze, próg zależy od miernika; test diody mierzy spadek napięcia na złączu. Błędy: pozostawienie miernika na zakresie prądu lub oporu przy pomiarze napięcia (niezabezpieczony miernik bywa niszczony), niedopasowany zakres i kategoria IEC 61010. Miernik uśredniający mierzy dokładnie tylko sinusoidę, dla innych przebiegów potrzebny true RMS.

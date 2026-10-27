@@ -1,4 +1,4 @@
-# Zakupy części i urządzeń: cło, VAT, gdzie kupować
+# Zakupy z zagranicy: cło, VAT, IOSS
 
 ### Czy małe zamówienia z Chin (spoza UE) są zwolnione z cła?
 Nie, od 1 lipca 2026 zwolnienie z cła dla przesyłek do 150 euro zostało zniesione. Zamiast tego obowiązuje przejściowe ryczałtowe cło 3 euro, naliczane nie od całej paczki, lecz za każdą pozycję towarową, czyli grupę towarów o tej samej klasyfikacji taryfowej, opisie i pochodzeniu. Rozwiązanie ma działać do 1 lipca 2028, potem cło ma być naliczane według zwykłych stawek od pierwszego euro. Dawny próg 150 euro to w przeliczeniu mniej więcej kilkaset złotych, i prawdopodobnie stąd bierze się znana opinia, że "powyżej pewnej kwoty cła nie ma" lub odwrotnie; dziś ta reguła już nie działa tak jak dawniej. Źródła nie wymieniają progu 600 zł.
@@ -24,8 +24,3 @@ Słowa: opłata manipulacyjna, 1 listopada 2026, magazyn w UE, koszt przesyłki,
 Z samych źródeł wynika kilka kroków: sprawdź, kto składa zgłoszenie celne i kto płaci; ustal z dostawcą, kto odpowiada za cło i transport; zamawiaj podobne rzeczy razem; kupuj z magazynów w UE (nie są objęte opłatą manipulacyjną). Dodatkowo (wiedza ogólna, nie ze źródła): porównaj cenę z sumą ceny, VAT, cła i dostawy, bo tani sklep z Chin traci przewagę, a polski lub unijny sprzedawca daje prostszą gwarancję i zwrot.
 Słowa: jak zaoszczędzić, tani zakup, cło, sklep w UE, magazyn w Polsce, gwarancja, zwrot, porównanie cen, dostawa
 Źródło: https://www.polkurier.pl/blog/clo-na-paczki-spoza-ue-2026/ (sprawdzono 2026-10; ostatnie zdanie to wiedza ogólna)
-
-### Gdzie szukać urządzeń i części do Meshtastic?
-Dokumentacja Meshtastic przy większości urządzeń ma link do zakupu; od tego warto zacząć. Wyniki wyszukiwania pokazywały też sklepy wysyłkowe z ofertą urządzeń do Meshtastic (np. openelab.io), ale nie sprawdzaliśmy ich wiarygodności ani cen. Pamiętaj, że sprzedawcy spoza UE podlegają opisanym wyżej opłatom, a wątki forum Meshtastic o miejscach zakupu opierają się na opiniach użytkowników.
-Słowa: gdzie kupić, sklep, urządzenia Meshtastic, LILYGO, Heltec, RAK, openelab, sprzedawca w UE, link zakupu
-Źródło: https://meshtastic.org/docs/hardware/devices/ oraz wyniki wyszukiwania z 2026-10 (sklepy niezweryfikowane)
