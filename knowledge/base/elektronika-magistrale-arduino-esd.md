@@ -16,7 +16,7 @@ Słowa: SPI, MOSI, MISO, SCK, CS, tryb SPI, CPOL, CPHA, magistrala, pełny duple
 Źródło: https://en.wikipedia.org/wiki/Serial_Peripheral_Interface (sprawdzono 2026-10; ostatnie zdanie: wiedza ogólna)
 
 ### UART: baud, ramka 8N1 i poziomy logiczne
-UART wysyła bity szeregowo; prędkość (baud) musi być taka sama po obu stronach. Najczęstsza ramka 8N1: bit startowy, 8 bitów danych, bez parzystości, 1 bit stopu, czyli 10 bitów na znak (sprawność 80%; liczba znaków na sekundę to prędkość/10). Linia w spoczynku ma stan wysoki. Dwa UART-y dobrze współpracują przy tym samym napięciu (3 V do 3 V); przy różnych potrzeba przesuwnika poziomów. Sam UART daje poziomy logiczne, a RS-232 to zewnętrzny standard z innymi napięciami; surowy TTL nadaje się do krótkich łączy diagnostycznych. Krzyżowanie TX z RX opisuje moduł Serial w Meshtastic (TX urządzenia do RX adaptera), stąd to źródło go nie podaje.
+UART wysyła bity szeregowo; prędkość (baud) musi być taka sama po obu stronach. Najczęstsza ramka 8N1: bit startowy, 8 bitów danych, bez parzystości, 1 bit stopu, czyli 10 bitów na znak (sprawność 80%; liczba znaków na sekundę to prędkość/10). Linia w spoczynku ma stan wysoki. Dwa UART-y dobrze współpracują przy tym samym napięciu (3 V do 3 V); przy różnych potrzeba przesuwnika poziomów. Sam UART daje poziomy logiczne, a RS-232 to zewnętrzny standard z innymi napięciami; surowy TTL nadaje się do krótkich łączy diagnostycznych. Przy łączeniu dwóch urządzeń krzyżuj linie: TX jednego do RX drugiego (wiedza ogólna, zgodna z opisem modułu Serial).
 Słowa: UART, baud, 8N1, TX, RX, poziomy logiczne, RS-232, TTL, adapter USB-UART, przesuwnik poziomów
 Źródło: https://en.wikipedia.org/wiki/UART (sprawdzono 2026-10)
 
