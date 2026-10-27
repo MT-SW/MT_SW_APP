@@ -110,6 +110,7 @@ open class MeshUtilApplication :
         super.onCreate()
         if (BuildConfig.DEBUG) enableDebugVmPolicy()
         ContextServices.app = this
+        AndroidLogging.install(this, applicationScope)
         configureFlavorApplication(BuildConfig.APPLICATION_ID)
 
         isSupportedDevice = bundledSqliteLoads(::loadBundledSqlite)

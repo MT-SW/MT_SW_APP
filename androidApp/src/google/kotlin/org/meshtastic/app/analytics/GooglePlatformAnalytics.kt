@@ -58,6 +58,8 @@ import io.opentelemetry.api.GlobalOpenTelemetry
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.koin.core.annotation.Single
+import org.meshtastic.core.common.log.MinSeverityLogWriter
+import org.meshtastic.core.common.log.MtSwLogging
 import org.meshtastic.app.BuildConfig
 import org.meshtastic.core.common.log.ErrorReportThrottle
 import org.meshtastic.core.common.log.shouldDowngradeForDatadog
@@ -123,15 +125,18 @@ class GooglePlatformAnalytics(private val context: Context, private val analytic
 
     init {
         // Setup Kermit log writers immediately, they will handle delayed SDK initialization gracefully.
+        val baseSeverity = if (BuildConfig.DEBUG) Severity.Debug else Severity.Info
         val writers = buildList {
-            add(DatadogLogWriter())
-            add(CrashlyticsLogWriter())
+            // These keep to what the build normally sends, even while the file log lowers Kermit's global severity.
+            add(MinSeverityLogWriter(DatadogLogWriter(), baseSeverity))
+            add(MinSeverityLogWriter(CrashlyticsLogWriter(), baseSeverity))
             if (BuildConfig.DEBUG) {
                 add(co.touchlab.kermit.LogcatWriter())
             }
+            add(MtSwLogging.writer)
         }
         KermitLogger.setLogWriters(writers)
-        KermitLogger.setMinSeverity(if (BuildConfig.DEBUG) Severity.Debug else Severity.Info)
+        KermitLogger.setMinSeverity(MtSwLogging.minSeverityFor(baseSeverity))
 
         // Initial consent state
         updateAnalyticsConsent(analyticsPrefs.analyticsAllowed.value)

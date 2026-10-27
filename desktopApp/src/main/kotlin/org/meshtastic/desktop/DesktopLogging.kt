@@ -16,81 +16,82 @@
  */
 package org.meshtastic.desktop
 
-import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.platformLogWriter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.withContext
+import org.meshtastic.core.common.log.AppLogControl
+import org.meshtastic.core.common.log.AppLogControls
+import org.meshtastic.core.common.log.AppLogLevel
 import org.meshtastic.core.common.log.InMemoryLogBuffer
+import org.meshtastic.core.common.log.MinSeverityLogWriter
+import org.meshtastic.core.common.log.MtSwLogging
 import org.meshtastic.feature.map.maplibre.installMapLibreLogging
 import java.io.File
-import java.io.PrintWriter
-import java.io.StringWriter
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /**
- * Sends Kermit output to the console and to [InMemoryLogBuffer], which the Debug screen views and exports. Every build
- * keeps Info and above, as Android release does: the per-packet Debug and Verbose radio lines flooded the console and
- * hid the warnings and errors that matter. [isDebug] is kept so a build can raise the level again for a hunt.
+ * Sends Kermit output to the console, to [InMemoryLogBuffer] (which the Debug screen views and exports) and to the log
+ * files of [MtSwLogging]. The console and the buffer keep Info and above in every build: the per-packet Debug and
+ * Verbose radio lines flooded them and hid the warnings and errors that matter. The log files are off until the user
+ * switches them on in the MT_SW features, and then go as deep as the chosen level; the cause of a crash is always
+ * written. [isDebug] is kept so a build can raise the level again for a hunt.
  */
 @Suppress("UNUSED_PARAMETER")
 internal fun installDesktopLogging(isDebug: Boolean) {
-    Logger.setMinSeverity(Severity.Info)
     val logDir = File(System.getProperty("user.home"), ".meshtastic/logs")
-    Logger.setLogWriters(listOf(platformLogWriter(), InMemoryLogBuffer, FileLogWriter(logDir)))
+    Logger.setMinSeverity(Severity.Info)
+    Logger.setLogWriters(
+        listOf(
+            MinSeverityLogWriter(platformLogWriter(), Severity.Info),
+            MinSeverityLogWriter(InMemoryLogBuffer, Severity.Info),
+            MtSwLogging.writer,
+        ),
+    )
+    MtSwLogging.init(logDir, headerText = ::desktopHeader) { level ->
+        Logger.setMinSeverity(MtSwLogging.minSeverityFor(Severity.Info, level))
+    }
+    AppLogControls.current = DesktopLogControl(logDir)
     installMapLibreLogging()
-    // A crash of the app is written to the log file too, so it can be read after the window is gone.
-    val previous = Thread.getDefaultUncaughtExceptionHandler()
-    Thread.setDefaultUncaughtExceptionHandler { thread, error ->
-        runCatching { Logger.e(error) { "Uncaught exception in thread ${thread.name}" } }
-        previous?.uncaughtException(thread, error)
-    }
-    Logger.i {
-        "Log file: ${logDir.absolutePath}; Java ${System.getProperty("java.version")}, " +
-            "${System.getProperty("os.name")} ${System.getProperty("os.version")} ${System.getProperty("os.arch")}"
-    }
+    Logger.i { "Log folder: ${logDir.absolutePath}; level ${MtSwLogging.level.value.key}; ${desktopHeader()}" }
 }
 
-/**
- * Writes every log line (Info and above) and every crash to a file on the disk, so it can be read after the app has
- * closed or crashed: `~/.meshtastic/logs/mt_sw_desktop.log`. At 5 MB the file is moved to `.1.log` (and the older ones
- * one step further, three are kept), so the folder never grows beyond about 20 MB. Writing never throws.
- */
-internal class FileLogWriter(private val dir: File) : LogWriter() {
-    private val file = File(dir, NAME)
-    private val lock = Any()
-    private val time = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
+private fun desktopHeader(): String {
+    val rt = Runtime.getRuntime()
+    return "Java ${System.getProperty("java.version")} (${System.getProperty("java.vendor")}), " +
+        "${System.getProperty("os.name")} ${System.getProperty("os.version")} ${System.getProperty("os.arch")}, " +
+        "${rt.availableProcessors()} CPUs, heap max ${rt.maxMemory() / MB} MB, version ${DesktopBuildConfig.VERSION_NAME}"
+}
 
-    init {
-        runCatching { dir.mkdirs() }
-        runCatching { rotate() }
-    }
+private const val MB = 1024 * 1024
 
-    override fun log(severity: Severity, message: String, tag: String, throwable: Throwable?) {
-        val line =
-            buildString {
-                append(LocalDateTime.now().format(time)).append(' ').append(severity.name.first()).append('/').append(tag)
-                append(": ").append(message).append('\n')
-                throwable?.let { append(StringWriter().also { w -> it.printStackTrace(PrintWriter(w)) }).append('\n') }
-            }
-        synchronized(lock) {
-            runCatching {
-                if (file.length() > MAX_BYTES) rotate()
-                file.appendText(line)
-            }
+/** The desktop side of the log switch: same files as on a phone, kept in `~/.meshtastic/logs`. */
+private class DesktopLogControl(private val dir: File) : AppLogControl {
+    override val level: StateFlow<AppLogLevel> get() = MtSwLogging.level
+
+    override fun setLevel(level: AppLogLevel) = MtSwLogging.setLevel(level)
+
+    override suspend fun exportForSending(): String? = withContext(Dispatchers.IO) {
+        runCatching {
+            val folder = File(dir, "export").also { it.mkdirs() }
+            val stamp = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date())
+            val target = File(folder, "mt_sw_logi_$stamp.zip")
+            target.outputStream().use { MtSwLogging.writeZip(it) }
+            target.absolutePath
         }
+            .onFailure { Logger.w(it) { "Log export failed" } }
+            .getOrNull()
     }
 
-    private fun rotate() {
-        if (!file.exists() || file.length() <= MAX_BYTES) return
-        File(dir, "mt_sw_desktop.${KEEP - 1}.log").delete()
-        for (i in KEEP - 2 downTo 1) File(dir, "mt_sw_desktop.$i.log").renameTo(File(dir, "mt_sw_desktop.${i + 1}.log"))
-        file.renameTo(File(dir, "mt_sw_desktop.1.log"))
-    }
+    override val canOpenFolder: Boolean = true
 
-    private companion object {
-        const val NAME = "mt_sw_desktop.log"
-        const val MAX_BYTES = 5L * 1024 * 1024
-        const val KEEP = 4
-    }
+    override fun openFolder(): Boolean = runCatching {
+        dir.mkdirs()
+        java.awt.Desktop.getDesktop().open(dir)
+        true
+    }.getOrDefault(false)
 }

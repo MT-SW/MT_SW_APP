@@ -334,6 +334,16 @@ private fun ApplicationScope.MeshtasticDesktopApp(
 
     WindowBoundsManager(desktopPrefs, windowState) { isWindowReady = true }
 
+    // Window changes go to the log (shown only when the file log is on), so a crash after a minimise or a resize can be
+    // traced.
+    LaunchedEffect(windowState) {
+        snapshotFlow {
+            "minimized=${windowState.isMinimized} placement=${windowState.placement} " +
+                "size=${windowState.size.width}x${windowState.size.height}"
+        }
+            .collect { Logger.d(tag = "Window") { it } }
+    }
+
     // One menu model for both tray backends, so the rows cannot drift apart between platforms.
     val trayTooltip = stringResource(Res.string.desktop_tray_tooltip)
     val showLabel = stringResource(Res.string.desktop_tray_show)

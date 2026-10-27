@@ -46,6 +46,7 @@ import org.meshtastic.core.ui.assistant.SettingHighlight
 import org.meshtastic.core.resources.ai_section_title
 import org.meshtastic.core.resources.antenna_calc_summary
 import org.meshtastic.core.resources.antenna_calc_title
+import org.meshtastic.core.resources.app_log_title
 import org.meshtastic.core.resources.antenna_tools_section
 import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.import_menu_in_top_bar
@@ -97,6 +98,7 @@ import org.meshtastic.feature.settings.SettingsViewModel
 import org.meshtastic.feature.settings.component.AiSettings
 import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
+import org.meshtastic.feature.settings.component.AppLogSettings
 import org.meshtastic.feature.settings.component.LogRetentionPreference
 import org.meshtastic.feature.settings.component.ThemePickerDialog
 import org.meshtastic.feature.settings.component.UiScalePickerDialog
@@ -183,6 +185,8 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
             }
 
             ExpressiveSection(title = stringResource(Res.string.ai_section_title)) { AiSettings() }
+
+            ExpressiveSection(title = stringResource(Res.string.app_log_title)) { AppLogSettings() }
 
             ExpressiveSection(title = stringResource(Res.string.antenna_tools_section)) {
                 ListItem(

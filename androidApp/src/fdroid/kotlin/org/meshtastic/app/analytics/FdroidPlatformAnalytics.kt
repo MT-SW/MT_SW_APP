@@ -17,7 +17,6 @@
 package org.meshtastic.app.analytics
 
 import co.touchlab.kermit.Logger
-import co.touchlab.kermit.Severity
 import org.koin.core.annotation.Single
 import org.meshtastic.app.BuildConfig
 import org.meshtastic.core.repository.DataPair
@@ -32,7 +31,7 @@ class FdroidPlatformAnalytics : PlatformAnalytics {
     init {
         // For F-Droid builds we don't initialize external analytics services.
         // Configure Kermit logging: Debug level for debug builds, Info level for release builds.
-        Logger.setMinSeverity(if (BuildConfig.DEBUG) Severity.Debug else Severity.Info)
+        // Writers and severity are set by AndroidLogging at application start, together with the file log.
         Logger.i {
             "F-Droid platform no-op analytics initialized (${if (BuildConfig.DEBUG) "Debug" else "Info"} logging)."
         }
