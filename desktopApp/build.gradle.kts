@@ -187,9 +187,8 @@ compose.desktop {
             }
 
         val desktopJvmArgs = buildList {
-            // Half of the computer's memory instead of a fixed 2 GB: the assistant's model and the maps need room, and a
-            // computer with little memory still gets a sensible limit. (The JVM only takes what it uses.)
-            add("-XX:MaxRAMPercentage=50")
+            // Back to the fixed limit the app had before: the assistant stopped using the graphics chip after it was changed.
+            add("-Xmx2G")
             // Starts with a bigger heap and compact object headers, so the first seconds spend less time growing the
             // heap and collecting garbage. The ignore flag keeps an older JVM from refusing to start over them.
             add("-XX:+IgnoreUnrecognizedVMOptions")
