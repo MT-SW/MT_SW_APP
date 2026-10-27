@@ -19,7 +19,10 @@ package org.meshtastic.core.common.log
 import co.touchlab.kermit.Severity
 import kotlinx.coroutines.flow.StateFlow
 
-/** How much the app writes to its log files. [OFF] is the default; nothing is written to disk then. */
+/**
+ * How much the app writes to its log files. [OFF] is the default; nothing is written to disk then. The settings switch
+ * uses only [OFF] and [FULL]; the other levels stay for logs saved by earlier versions.
+ */
 enum class AppLogLevel(val severity: Severity?, val key: String) {
     OFF(null, "off"),
     BASIC(Severity.Info, "basic"),
@@ -41,11 +44,8 @@ interface AppLogControl {
 
     fun setLevel(level: AppLogLevel)
 
-    /**
-     * Gathers every log part (and the crash records) into one zip the user can send, and returns a short, readable
-     * place where it was saved, or null when nothing could be written.
-     */
-    suspend fun exportForSending(): String?
+    /** A short, readable place where the logs are kept (a folder path), or null when it is not worth showing. */
+    val folderHint: String? get() = null
 
     /** True where [openFolder] can work (the desktop). */
     val canOpenFolder: Boolean get() = false

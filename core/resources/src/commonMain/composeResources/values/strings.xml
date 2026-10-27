@@ -3157,15 +3157,10 @@
     <string name="zoom_in">Zoom in</string>
     <string name="zoom_out">Zoom out</string>
     <string name="app_log_title">Logs</string>
-    <string name="app_log_level">Saving logs</string>
-    <string name="app_log_level_off">Off</string>
-    <string name="app_log_level_basic">Basic</string>
-    <string name="app_log_level_detailed">Detailed</string>
-    <string name="app_log_level_full">Full</string>
-    <string name="app_log_summary">Off by default. When on, the app writes what it does to files, in parts of about 400 KB, to help find problems; the choice is kept after a restart. Message texts, keys and positions are not saved.</string>
-    <string name="app_log_export">Save logs for sending</string>
+    <string name="app_log_level">Collect logs</string>
+    <string name="app_log_summary">Off by default. When on, the app saves everything it does to files on its own, as it goes (from start to close), in parts of about 400 KB, to help find problems. The choice is kept after a restart. Message texts, keys and positions are not saved.</string>
     <string name="app_log_open_folder">Open log folder</string>
-    <string name="app_log_export_done">Saved: %1$s</string>
-    <string name="app_log_export_failed">Could not save the logs.</string>
+    <string name="app_log_folder">Logs are saved on their own in: %1$s</string>
+    <string name="app_log_open_failed">Could not open the log folder.</string>
 </resources>
 

@@ -3372,14 +3372,9 @@
     <string name="display_name_hint">Widoczna tylko na tym urządzeniu. Udostępnianie i eksport używają prawdziwej nazwy węzła.</string>
     <string name="display_name">Nazwa własna</string>
     <string name="app_log_title">Logi</string>
-    <string name="app_log_level">Zapisywanie logów</string>
-    <string name="app_log_level_off">Wyłączone</string>
-    <string name="app_log_level_basic">Podstawowe</string>
-    <string name="app_log_level_detailed">Szczegółowe</string>
-    <string name="app_log_level_full">Pełne</string>
-    <string name="app_log_summary">Domyślnie wyłączone. Po włączeniu aplikacja zapisuje do plików, co robi, w częściach po ok. 400 KB, żeby łatwiej znajdować problemy; wybór zostaje po ponownym uruchomieniu. Treść wiadomości, klucze i pozycje nie są zapisywane.</string>
-    <string name="app_log_export">Zapisz logi do wysłania</string>
+    <string name="app_log_level">Zbieranie logów</string>
+    <string name="app_log_summary">Domyślnie wyłączone. Po włączeniu aplikacja sama, na bieżąco zapisuje do plików wszystko, co robi (od startu do zamknięcia), w częściach po ok. 400 KB, żeby łatwiej znajdować problemy. Wybór zostaje po ponownym uruchomieniu. Treść wiadomości, klucze i pozycje nie są zapisywane.</string>
     <string name="app_log_open_folder">Otwórz folder z logami</string>
-    <string name="app_log_export_done">Zapisano: %1$s</string>
-    <string name="app_log_export_failed">Nie udało się zapisać logów.</string>
+    <string name="app_log_folder">Logi zapisują się same w: %1$s</string>
+    <string name="app_log_open_failed">Nie udało się otworzyć folderu z logami.</string>
 </resources>

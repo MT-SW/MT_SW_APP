@@ -37,6 +37,7 @@ import co.touchlab.kermit.Severity
 import co.touchlab.kermit.platformLogWriter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -46,14 +47,12 @@ import org.meshtastic.core.common.log.AppLogLevel
 import org.meshtastic.core.common.log.MinSeverityLogWriter
 import org.meshtastic.core.common.log.MtSwLogging
 import java.io.File
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 
 /**
  * The phone side of the log switch. Logs live in the app's private folder; because a crashed app cannot be asked for
- * them, a zip of them is also kept in the Downloads folder (`Pobrane/MT_SW_logi`): refreshed when the app starts and
- * when it goes to the background while logging is on, and on a start that follows a crash even when logging is off
+ * them, a zip of them is also kept in the Downloads folder (`Pobrane/MT_SW_logi`): refreshed on its own when the app
+ * starts, every few minutes while it runs, and when it goes to the background while logging is on, and on a start that follows a crash even when logging is off
  * (only the crash record is in it then).
  */
 internal object AndroidLogging {
@@ -63,6 +62,7 @@ internal object AndroidLogging {
     private const val EXIT_REASONS_SHOWN = 6
     private const val FINGERPRINT_NAME = "last_export.txt"
     private const val MB = 1024 * 1024
+    private const val AUTO_EXPORT_EVERY_MS = 3 * 60 * 1000L
 
     /** Kermit's lowest severity for this build when the file log is off. */
     val baseSeverity: Severity
@@ -80,7 +80,13 @@ internal object AndroidLogging {
         Logger.i(tag = TAG) { "App start: ${header()}; log level ${MtSwLogging.level.value.key}" }
         registerCallbacks(app, control, scope)
         logPreviousExits(app)
-        scope.launch { control.autoExport() }
+        scope.launch {
+            // Logs are saved on their own: at start, while the app runs, and when it goes to the background.
+            while (true) {
+                control.autoExport()
+                delay(AUTO_EXPORT_EVERY_MS)
+            }
+        }
     }
 
     fun header(): String =
@@ -172,8 +178,7 @@ internal object AndroidLogging {
 
         override fun setLevel(level: AppLogLevel) = MtSwLogging.setLevel(level)
 
-        override suspend fun exportForSending(): String? =
-            export("mt_sw_logi_${SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date())}.zip", overwrite = false)
+        override val folderHint: String get() = "Pobrane/$FOLDER"
 
         override fun openFolder(): Boolean = false
 

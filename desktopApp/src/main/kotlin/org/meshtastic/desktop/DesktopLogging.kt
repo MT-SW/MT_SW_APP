@@ -19,9 +19,7 @@ package org.meshtastic.desktop
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.platformLogWriter
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.withContext
 import org.meshtastic.core.common.log.AppLogControl
 import org.meshtastic.core.common.log.AppLogControls
 import org.meshtastic.core.common.log.AppLogLevel
@@ -30,9 +28,6 @@ import org.meshtastic.core.common.log.MinSeverityLogWriter
 import org.meshtastic.core.common.log.MtSwLogging
 import org.meshtastic.feature.map.maplibre.installMapLibreLogging
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 /**
  * Sends Kermit output to the console, to [InMemoryLogBuffer] (which the Debug screen views and exports) and to the log
@@ -75,17 +70,7 @@ private class DesktopLogControl(private val dir: File) : AppLogControl {
 
     override fun setLevel(level: AppLogLevel) = MtSwLogging.setLevel(level)
 
-    override suspend fun exportForSending(): String? = withContext(Dispatchers.IO) {
-        runCatching {
-            val folder = File(dir, "export").also { it.mkdirs() }
-            val stamp = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date())
-            val target = File(folder, "mt_sw_logi_$stamp.zip")
-            target.outputStream().use { MtSwLogging.writeZip(it) }
-            target.absolutePath
-        }
-            .onFailure { Logger.w(it) { "Log export failed" } }
-            .getOrNull()
-    }
+    override val folderHint: String get() = dir.absolutePath
 
     override val canOpenFolder: Boolean = true
 
