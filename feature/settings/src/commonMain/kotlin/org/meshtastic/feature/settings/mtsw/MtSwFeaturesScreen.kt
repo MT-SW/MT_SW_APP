@@ -90,6 +90,7 @@ import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Antenna
 import org.meshtastic.core.ui.icon.BugReport
 import org.meshtastic.core.ui.icon.FormatPaint
+import org.meshtastic.core.ui.icon.HelpOutline
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.LinkIcon
 import org.meshtastic.core.ui.icon.Language
