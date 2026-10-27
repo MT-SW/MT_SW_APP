@@ -292,7 +292,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
             add("CPU" to { Backend.CPU() })
         }
         var created: Engine? = null
-        var failure: Exception? = null
+        var failure: Throwable? = null
         for ((name, backend) in attempts) {
             // A chip that failed a moment ago is not tried again at once (every try costs seconds), but the skip is
             // always written to the log with the old reason, so a quiet fall-back to the processor cannot happen.
@@ -312,7 +312,8 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
                 activeBackend = name
                 Logger.i(tag = TAG) { "Model $modelId runs on $name (context $window tokens)" }
                 break
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
+                if (e is kotlinx.coroutines.CancellationException) throw e
                 failure = e
                 failedBackends[name] = nowMillis to (e.message?.lineSequence()?.firstOrNull() ?: e::class.simpleName.orEmpty())
                 Logger.w(tag = TAG, throwable = e) {
@@ -330,7 +331,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
     }
 
     /** What the log gets when the graphics chip could not be used: the system, the model, the cache and the graphics cards. */
-    private fun gpuFailureReport(file: File, cache: File, window: Int, audio: Boolean, error: Exception): String =
+    private fun gpuFailureReport(file: File, cache: File, window: Int, audio: Boolean, error: Throwable): String =
         buildString {
             fun prop(key: String) = System.getProperty(key).orEmpty()
             val runtime = Runtime.getRuntime()
@@ -403,26 +404,26 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
     private fun startOnGpu(file: File, backend: () -> Backend, cache: File, window: Int, audio: Boolean): Engine {
         try {
             return start(file, backend(), cache, window, audio)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Logger.w(tag = TAG) { "GPU did not start; clearing the cache folder and trying once more" }
             cache.listFiles()?.forEach { runCatching { it.deleteRecursively() } }
         }
         try {
             return start(file, backend(), cache, window, audio)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             if (window <= GPU_SMALL_WINDOW) throw e
             Logger.w(tag = TAG) { "GPU did not start again; trying a context of $GPU_SMALL_WINDOW tokens" }
         }
         try {
             return start(file, backend(), cache, GPU_SMALL_WINDOW, audio)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             Logger.w(tag = TAG) { "GPU did not start with a small context either; trying a fresh cache folder" }
         }
         // Last chance: a new, empty cache folder (a damaged or locked one can make the graphics chip refuse to start).
         val fresh = File(cache.parentFile, "cache-" + nowMillis).apply { mkdirs() }
         try {
             return start(file, backend(), fresh, GPU_SMALL_WINDOW, audio)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             runCatching { fresh.deleteRecursively() }
             throw e
         }
@@ -449,7 +450,7 @@ class LiteRtEngine(private val store: AiModelStoreImpl) {
             )
         try {
             created.initialize()
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             runCatching { created.close() }
             Logger.w(tag = TAG) { "Engine did not start after ${nowMillis - began} ms: ${e.message?.lineSequence()?.firstOrNull()}" }
             throw e
