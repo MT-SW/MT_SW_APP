@@ -51,10 +51,13 @@ import org.meshtastic.feature.docs.translation.DocTranslationService
 import org.meshtastic.feature.docs.translation.TranslationResult
 import org.meshtastic.feature.docs.ui.DocsBrowserScreen
 import org.meshtastic.feature.docs.ui.DocsPageRouteScreen
+import org.meshtastic.feature.docs.ui.KnowledgeBaseScreen
 
 /** Registers docs navigation entries into the Settings navigation graph. */
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 fun EntryProviderScope<NavKey>.docsEntries(backStack: NavBackStack<NavKey>) {
+    entry<SettingsRoute.KnowledgeBase> { KnowledgeBaseScreen(onBack = { backStack.removeLastOrNull() }) }
+
     entry<SettingsRoute.HelpDocs>(metadata = { MeshtasticPanes.list() }) {
         val hasDetailSelected = remember(backStack) { backStack.any { it is SettingsRoute.HelpDocPage } }
         val chirpy = rememberChirpyState(backStack = backStack, currentPageId = null, showFab = !hasDetailSelected)

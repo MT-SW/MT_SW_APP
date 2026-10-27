@@ -26,6 +26,7 @@ import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.ai_assistant_title
 import org.meshtastic.core.resources.ai_model_one_title
 import org.meshtastic.core.resources.antenna_calc_title
+import org.meshtastic.core.resources.kb_title
 import org.meshtastic.core.resources.node_color_title
 import org.meshtastic.core.resources.about
 import org.meshtastic.core.resources.acknowledgements
@@ -163,6 +164,7 @@ object SettingsSearchCatalog {
         listOf(
             Res.string.mt_sw_features_title to SettingsRoute.MtSwFeatures,
             Res.string.antenna_calc_title to SettingsRoute.AntennaCalculator,
+            Res.string.kb_title to SettingsRoute.KnowledgeBase,
             Res.string.mt_sw_other_title to SettingsRoute.MtSwOtherFeatures,
             Res.string.auto_load_chat_images to SettingsRoute.MtSwFeatures,
             Res.string.import_menu_in_top_bar to SettingsRoute.MtSwFeatures,

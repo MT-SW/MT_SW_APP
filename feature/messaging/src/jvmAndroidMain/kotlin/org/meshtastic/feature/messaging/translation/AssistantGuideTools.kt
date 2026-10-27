@@ -48,6 +48,7 @@ import org.meshtastic.core.resources.firmware
 import org.meshtastic.core.resources.getStringSuspend
 import org.meshtastic.core.resources.help_and_documentation
 import org.meshtastic.core.resources.app_log_level
+import org.meshtastic.core.resources.kb_title
 import org.meshtastic.core.resources.log_retention_days
 import org.meshtastic.core.resources.lora
 import org.meshtastic.core.resources.map
@@ -364,6 +365,7 @@ class AssistantGuideTools(
                 Target("ai_model", "settings/mt-sw-features", Res.string.ai_model_one_title, listOf("model ai", "wybór modelu", "wybor modelu", "model", "gemma", "nllb")),
                 Target("translator", "settings/mt-sw-features", Res.string.translator_title, listOf("tłumacz", "tlumacz", "translator", "tłumaczen", "tlumaczen", "translat")),
                 Target("assistant", "settings/mt-sw-features", Res.string.ai_assistant_title, listOf("asystent", "assistant", "model ai", "gemma", "sztuczn")),
+                Target("knowledge_base", "settings/mt-sw-features", Res.string.kb_title, listOf("baza wiedzy", "baza", "wiedza", "wpisy", "przeglądać", "przegladac", "knowledge", "offtop", "pokrewne", "poradnik")),
                 Target("app_log", "settings/mt-sw-features", Res.string.app_log_level, listOf("logi", "log", "dziennik", "zapis logów", "zapisywanie logów", "diagnoz", "awari", "wywala", "błąd", "blad", "crash", "pobrane")),
                 Target("log_retention", "settings/mt-sw-features", Res.string.log_retention_days, listOf("ramk", "logi", "statystyk", "pamięt", "czas", "baz", "dni", "retention", "historia", "ile czasu")),
             )

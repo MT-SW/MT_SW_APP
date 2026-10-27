@@ -233,6 +233,8 @@ sealed interface SettingsRoute : Route {
 
     // region help & documentation routes
 
+    @Serializable data object KnowledgeBase : SettingsRoute
+
     @Serializable data object HelpDocs : SettingsRoute
 
     @Serializable data class HelpDocPage(val pageId: String) : SettingsRoute

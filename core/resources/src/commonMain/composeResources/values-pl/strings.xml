@@ -3377,4 +3377,16 @@
     <string name="app_log_open_folder">Otwórz folder z logami</string>
     <string name="app_log_folder">Logi zapisują się same w: %1$s</string>
     <string name="app_log_open_failed">Nie udało się otworzyć folderu z logami.</string>
+    <string name="kb_title">Baza wiedzy</string>
+    <string name="kb_summary">Przeglądaj offline: sieć, radio, elektronika i życie. Korzysta z niej też asystent</string>
+    <string name="kb_intro">Baza działa bez internetu. Wpisy są w trzech poziomach: główne (nasza sieć), pokrewne (informatyka, elektronika, krótkofalarstwo) i offtop (reszta życia). Z tych samych wpisów korzysta asystent.</string>
+    <string name="kb_search">Szukaj w bazie</string>
+    <string name="kb_all">Wszystkie</string>
+    <string name="kb_tier_main">Główne</string>
+    <string name="kb_tier_related">Pokrewne</string>
+    <string name="kb_tier_offtop">Offtop</string>
+    <string name="kb_count">Wpisów: %1$d</string>
+    <string name="kb_empty">Nic nie znaleziono</string>
+    <string name="kb_loading">Wczytywanie…</string>
+    <string name="kb_source">Źródło: %1$s</string>
 </resources>

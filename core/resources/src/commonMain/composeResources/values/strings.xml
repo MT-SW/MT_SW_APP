@@ -3162,5 +3162,17 @@
     <string name="app_log_open_folder">Open log folder</string>
     <string name="app_log_folder">Logs are saved on their own in: %1$s</string>
     <string name="app_log_open_failed">Could not open the log folder.</string>
+    <string name="kb_title">Knowledge base</string>
+    <string name="kb_summary">Browse offline: the network, radio, electronics and life. The assistant uses it too</string>
+    <string name="kb_intro">The base works without internet. Entries come in three tiers: main (our network), related (IT, electronics, ham radio) and offtop (the rest of life). The assistant uses the same entries.</string>
+    <string name="kb_search">Search the base</string>
+    <string name="kb_all">All</string>
+    <string name="kb_tier_main">Main</string>
+    <string name="kb_tier_related">Related</string>
+    <string name="kb_tier_offtop">Offtopic</string>
+    <string name="kb_count">Entries: %1$d</string>
+    <string name="kb_empty">Nothing found</string>
+    <string name="kb_loading">Loading…</string>
+    <string name="kb_source">Source: %1$s</string>
 </resources>
 

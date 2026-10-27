@@ -76,6 +76,8 @@ import org.meshtastic.core.resources.mt_sw_other_summary
 import org.meshtastic.core.resources.mt_sw_other_title
 import org.meshtastic.core.resources.node_layout_section_title
 import org.meshtastic.core.resources.debug_panel
+import org.meshtastic.core.resources.kb_summary
+import org.meshtastic.core.resources.kb_title
 import org.meshtastic.core.resources.sniffer_settings_title
 import org.meshtastic.core.resources.theme
 import org.meshtastic.core.resources.translator_open
@@ -242,6 +244,13 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 }
                 ListItem(text = stringResource(Res.string.local_stats_title), leadingIcon = MeshtasticIcons.Tune) {
                     onNavigate(SettingsRoute.Telemetry)
+                }
+                ListItem(
+                    text = stringResource(Res.string.kb_title),
+                    supportingText = stringResource(Res.string.kb_summary),
+                    leadingIcon = MeshtasticIcons.HelpOutline,
+                ) {
+                    onNavigate(SettingsRoute.KnowledgeBase)
                 }
                 ListItem(text = stringResource(Res.string.debug_panel), leadingIcon = MeshtasticIcons.BugReport) {
                     onNavigate(SettingsRoute.DebugPanel)
