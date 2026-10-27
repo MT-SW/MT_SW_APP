@@ -2,7 +2,7 @@
 
 ## Po polsku
 
-Ten katalog to **baza wiedzy offline wbudowanego asystenta** aplikacji MT_SW. Asystent korzysta z tych plików, żeby odpowiadać na pytania o sieć, radio, sprzęt i pokrewne tematy bez internetu. To jedyny powód, dla którego baza powstała: nie jest to dokumentacja do czytania od deski do deski, tylko materiał, z którego asystent wyszukuje pasujące fragmenty i odpowiada własnymi słowami, podając źródło.
+Ten katalog to **baza wiedzy offline wbudowanego asystenta** aplikacji MT_SW. Asystent korzysta z tych plików, żeby odpowiadać na pytania o sieć, radio, sprzęt i pokrewne tematy bez internetu. Baza powstała przede wszystkim po to, by **pomagać asystentowi w działaniu**: dzięki niej odpowiada rzeczowo i ze źródłem, zamiast zgadywać. Nie jest to dokumentacja do czytania od deski do deski, tylko materiał, z którego asystent wyszukuje pasujące fragmenty i odpowiada własnymi słowami.
 
 Układ:
 
