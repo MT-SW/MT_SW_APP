@@ -189,3 +189,10 @@ W przypadku większych sieci warto pamiętać o kilku rzeczach: nie ustawiaj zby
 W sieci z dużą liczbą routerów zaleca się ustawienie roli CLIENT_BASE/SENSOR, rebroadcast_mode=KNOWN_ONLY, oraz wyłączanie udp_enabled na nie-routerach, aby uniknąć burzy pakietów. Jeśli sieć jest zapchana, można obniżyć hop limit i dodać ignore_incoming dla hałaśliwych węzłów.
 
 Dla ogólnego zastosowania w innych regionach, Long Fast jest zazwyczaj uważany za zrównoważony, ale w świętokrzyskim regionie Narrow Fast jest oficjalnym presetem.
+
+## 23. Co się stanie, gdy ustawię limit skoków na 7?
+Router: AssistantIntent(intent=app_help, node=, channel=, text=hop limit, role=, metric=, topic=, period=, amount=0)
+Time: 14 s
+Answer:
+„Limit przeskoków” jest w: Ustawienia → LoRa.
+Buttons: Limit przeskoków -> meshtastic://meshtastic/settings/lora (blinks: Limit przeskoków)

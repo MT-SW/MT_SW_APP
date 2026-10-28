@@ -52,7 +52,7 @@ jobs:
           echo "NDK=$NDK" >> "$GITHUB_ENV"
           echo "SYSROOT=$NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot" >> "$GITHUB_ENV"
           sudo apt-get update
-          sudo apt-get install -y ninja-build glslc libvulkan-dev spirv-headers
+          sudo apt-get install -y ninja-build glslc glslang-tools libvulkan-dev
 
       - name: OpenCL headers and loader (only to link)
         if: matrix.kind == 'opencl'
@@ -67,12 +67,20 @@ jobs:
           cmake --build icd-build
           cp icd-build/libOpenCL.so "$SYSROOT/usr/lib/aarch64-linux-android"
 
+      - name: SPIR-V headers (needed by the Vulkan shaders)
+        if: matrix.kind == 'vulkan'
+        run: |
+          git clone --depth 1 https://github.com/KhronosGroup/SPIRV-Headers
+          cmake -S SPIRV-Headers -B spirv-build -G Ninja -DCMAKE_INSTALL_PREFIX="$PWD/spirv-install"
+          cmake --install spirv-build
+          echo "SPIRV_PREFIX=$PWD/spirv-install" >> "$GITHUB_ENV"
+
       - name: Build llama-server
         run: |
           if [ "${{ matrix.kind }}" = "opencl" ]; then
             BACKEND="-DGGML_OPENCL=ON -DGGML_OPENCL_USE_ADRENO_KERNELS=ON"
           else
-            BACKEND="-DGGML_VULKAN=ON -DVulkan_GLSLC_EXECUTABLE=$(which glslc) -DVulkan_INCLUDE_DIR=$SYSROOT/usr/include -DVulkan_LIBRARY=$SYSROOT/usr/lib/aarch64-linux-android/28/libvulkan.so"
+            BACKEND="-DGGML_VULKAN=ON -DVulkan_GLSLC_EXECUTABLE=$(which glslc) -DVulkan_INCLUDE_DIR=$SYSROOT/usr/include -DVulkan_LIBRARY=$SYSROOT/usr/lib/aarch64-linux-android/28/libvulkan.so -DCMAKE_FIND_ROOT_PATH=$SPIRV_PREFIX -DCMAKE_PREFIX_PATH=$SPIRV_PREFIX -DSPIRV-Headers_DIR=$SPIRV_PREFIX/share/cmake/SPIRV-Headers"
           fi
           cmake -S llama.cpp -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_TOOLCHAIN_FILE="$NDK/build/cmake/android.toolchain.cmake" \
