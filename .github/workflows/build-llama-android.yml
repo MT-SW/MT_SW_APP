@@ -79,9 +79,11 @@ jobs:
 
       - name: Build llama-server
         run: |
+          EXTRA_CXX=""
           if [ "${{ matrix.kind }}" = "opencl" ]; then
             BACKEND="-DGGML_OPENCL=ON -DGGML_OPENCL_USE_ADRENO_KERNELS=ON"
           else
+            EXTRA_CXX="-isystem $SPIRV_PREFIX/include"
             BACKEND="-DGGML_VULKAN=ON -DVulkan_GLSLC_EXECUTABLE=$(which glslc) -DVulkan_INCLUDE_DIR=$VULKAN_HEADERS -DVulkan_LIBRARY=$SYSROOT/usr/lib/aarch64-linux-android/28/libvulkan.so -DCMAKE_FIND_ROOT_PATH=$SPIRV_PREFIX -DCMAKE_PREFIX_PATH=$SPIRV_PREFIX -DSPIRV-Headers_DIR=$SPIRV_PREFIX/share/cmake/SPIRV-Headers"
           fi
           cmake -S llama.cpp -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
@@ -89,7 +91,7 @@ jobs:
             -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-28 -DANDROID_STL=c++_static \
             -DBUILD_SHARED_LIBS=OFF $BACKEND \
             -DGGML_NATIVE=OFF -DGGML_OPENMP=OFF \
-            -DCMAKE_C_FLAGS="-march=armv8.2-a+dotprod" -DCMAKE_CXX_FLAGS="-march=armv8.2-a+dotprod" \
+            -DCMAKE_C_FLAGS="-march=armv8.2-a+dotprod" -DCMAKE_CXX_FLAGS="-march=armv8.2-a+dotprod $EXTRA_CXX" \
             -DLLAMA_CURL=OFF -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF
           cmake --build build --target llama-server
 

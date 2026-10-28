@@ -230,3 +230,39 @@ W MT_SW nie ma własnego presetu szyfrowania - używamy oficjalnego presetu Narr
 Źródła:
 • https://meshtastic.org/docs/overview/encryption/ (sprawdzono 2026-10)
 • https://meshtastic.org/docs/overview/encryption/ (sprawdzono 2026-10)
+
+## 26. Jak zrobić test zasięgu?
+Router: AssistantIntent(intent=chat, node=, channel=, text=, role=, metric=, topic=, period=, amount=0)
+Time: 119 s
+Answer:
+Test zasięgu w MT_SW to moduł Range Test, który działa na obu węzłach - nadajniku i odbiorniku. Moduł ten automatycznie wysyła wiadomości testowe z rosnącymi licznikami, które odbierający węzeł zapisuje do pliku CSV. Dzięki temu możesz odejść lub odjechać, a potem przeanalizować, przy jakiej odległości wiadomości przestały docierać.
+
+Aby to zrobić, musisz włączyć moduł na nadajniku i odbiorniku. Na stałym nadajniku ustaw interwał wysyłania - zalecane 30 sekund dla Long Fast, 15 dla Medium i Short Fast. Odbiornik najlepiej ma GPS dla dokładnej pozycji. W CLI polecenie to: meshtastic --set range_test.enabled true --set range_test.sender 60.
+
+Pamiętaj, że zapis do pliku CSV działa tylko na ESP32. Plik pobierzesz przez Wi-Fi z adresu meshtastic.local/rangetest.csv. Ważne: ustaw wysoką precyzję pozycji na kanale, inaczej zapisane położenie będzie przybliżone.
+
+Po teście koniecznie wyłącz moduł - zajmuje dużo eteru, zapycha kanał i sam wyłącza się po 8 godzinach. W aplikacji MT_SW możesz też korzystać z funkcji oceny sygnału i kalkulatora anten do porównania zasięgu z różnymi antenami.
+
+Źródła:
+• https://meshtastic.org/docs/configuration/module/range-test/ (sprawdzono 2026-10)
+• https://meshtastic.org/docs/configuration/module/range-test/ (sprawdzono 2026-10)
+• https://meshtastic.org/docs/hardware/antennas/antenna-testing/ (sprawdzono 2026-10)
+
+## 27. Co to jest MT_SW_FIRMWARE?
+Router: AssistantIntent(intent=app_help, node=, channel=, text=MT_SW_FIRMWARE, role=, metric=, topic=, period=, amount=0)
+Time: 110 s
+Answer:
+MT_SW_FIRMWARE to modyfikowana wersja oficjalnego firmware Meshtastic, przygotowana dla regionalnej sieci mesh MT_SW w województwie świętokrzyskim. Jest to fork projektu, który zawiera zmiany dostosowane do potrzeb lokalnej sieci.
+
+Główne cechy tego firmware to:
+• Rozszerzona telemetria
+• Poprawki prywatności w MQTT
+• Dodatkowe komendy czatu
+• Nowe warianty sprzętowe
+• Poprawki stabilności
+
+Warto wiedzieć, że MT_SW nie ma własnego presetu – używa oficjalnego presetu Narrow Fast z regionem EU_N_868 (częstotliwość 869,44165 MHz). Firmware startuje z tym presetem, ale region trzeba wybrać w aplikacji.
+
+Projekt jest prowadzony przez Spontaniczne Majsterkowanie i cheaterenator. Firmware jest częścią trójkomponentowego projektu MT_SW razem z aplikacją MT_SW_APP i integracją z Home Assistant.
+
+Jeśli potrzebujesz więcej szczegółów o konkretnym urządzeniu, ustawieniu lub funkcji, daj znać.
