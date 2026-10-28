@@ -262,6 +262,11 @@ compose.desktop {
                         <string>Meshtastic uses your local network to discover Meshtastic devices connected via WiFi.</string>
                         <key>NSUserNotificationAlertStyle</key>
                         <string>alert</string>
+                        <key>CFBundleLocalizations</key>
+                        <array>
+                          <string>en</string>
+                          <string>pl</string>
+                        </array>
                         <key>CFBundleURLTypes</key>
                         <array>
                           <dict>

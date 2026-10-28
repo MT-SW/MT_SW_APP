@@ -81,7 +81,7 @@ actual fun rememberOpenUrl(): (url: String) -> Unit = { url ->
 actual fun rememberSaveFileLauncher(
     onUriReceived: (CommonUri) -> Unit,
 ): (defaultFilename: String, mimeType: String) -> Unit = { defaultFilename, _ ->
-    val dialog = FileDialog(null as Frame?, "Save File", FileDialog.SAVE)
+    val dialog = FileDialog(null as Frame?, if (polishUi()) "Zapisz plik" else "Save File", FileDialog.SAVE)
     dialog.file = defaultFilename
     dialog.isVisible = true
     val file = dialog.file
@@ -97,7 +97,7 @@ actual fun rememberSaveFileLauncher(
 actual fun rememberOpenFileLauncher(onUriReceived: (CommonUri?) -> Unit): (mimeType: String) -> Unit = { _ ->
     // Explicit Frame? local disambiguates the FileDialog(Frame, ...) overload from FileDialog(Dialog, ...)
     val parentFrame: Frame? = null
-    val dialog = FileDialog(parentFrame, "Open File", FileDialog.LOAD)
+    val dialog = FileDialog(parentFrame, if (polishUi()) "Otwórz plik" else "Open File", FileDialog.LOAD)
     dialog.isVisible = true
     val file = dialog.file
     val dir = dialog.directory
@@ -174,3 +174,6 @@ actual fun rememberOpenAppSettings(): () -> Unit = { Logger.w { "App settings no
 
 /** JVM — Desktop does not gate the camera behind a runtime permission. */
 @Composable actual fun rememberCameraPermissionState(): PermissionUiState = grantedPermissionUiState()
+
+/** True when the app (and the system) language is Polish, so the titles of the file dialogs match it. */
+private fun polishUi(): Boolean = java.util.Locale.getDefault().language == "pl"
