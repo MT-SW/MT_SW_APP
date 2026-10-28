@@ -51,7 +51,7 @@ Gdy aktualizacja jest pobierana, wgrywana lub weryfikowana, możesz dotknąć **
 
 ![Firmware — sprawdzanie aktualizacji](../../assets/screenshots/firmware_checking.png)
 
-Niektóre płyty mają bootloader, który nie przyjmie aktualizacji przez Bluetooth. Dla nich ekran pokazuje przed startem kartę z ostrzeżeniem, a dla niektórych płyt także podpowiedź. **Nie pokazuj ponownie dla tego urządzenia** ukrywa ją dla tego radia. Gdy zwykły bootloader nRF ogranicza szybkość wysyłania, ekran mówi o tym podczas wysyłania i jeszcze raz na ekranie sukcesu, z linkiem do bootloadera OTAFIX, dzięki któremu aktualizacje przez Bluetooth są dużo szybsze.
+Niektóre płyty mają bootloader, który nie przyjmie aktualizacji przez Bluetooth. Dla nich ekran pokazuje przed startem kartę z ostrzeżeniem, a dla niektórych płyt także podpowiedź. **Nie pokazuj ponownie dla tego urządzenia** ukrywa ją dla tego radia. Gdy zwykły bootloader nRF ogranicza szybkość wysyłania, ekran mówi o tym podczas wysyłania i jeszcze raz na ekranie sukcesu, z linkiem do bootloadera nRF52 (MT_SW), dzięki któremu aktualizacje przez Bluetooth są dużo szybsze.
 
 #### Wykasuj urządzenie podczas aktualizacji
 

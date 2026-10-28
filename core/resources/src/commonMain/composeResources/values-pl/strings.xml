@@ -998,7 +998,7 @@
     <string name="firmware_update_save_dfu_file">Zapisz plik .uf2 na dysku DFU urządzenia.</string>
     <string name="firmware_update_searching_device">Wyszukiwanie urządzenia OTA w sieci...</string>
     <string name="firmware_update_select_file">Wybierz plik lokalny</string>
-    <string name="firmware_update_slow_bootloader_hint">Aktualizacje są wolne przy bootloaderze tego urządzenia. Przeflashowanie bootloadera OTAFIX umożliwia znacznie szybsze aktualizacje BLE.</string>
+    <string name="firmware_update_slow_bootloader_hint">Aktualizacje są wolne przy bootloaderze tego urządzenia. Przeflashowanie bootloadera nRF52 (MT_SW) umożliwia znacznie szybsze aktualizacje BLE.</string>
     <string name="firmware_update_source_local">Źródło: Plik lokalny</string>
     <string name="firmware_update_stable">Stabilna</string>
     <string name="firmware_update_starting_dfu">Uruchamianie DFU...</string>

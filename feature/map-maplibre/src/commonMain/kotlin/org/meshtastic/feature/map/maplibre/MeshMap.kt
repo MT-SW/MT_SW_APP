@@ -92,6 +92,7 @@ import org.meshtastic.feature.map.maplibre.style.MapColors
 import org.meshtastic.feature.map.maplibre.style.MapOverlay
 import org.meshtastic.feature.map.maplibre.style.toBaseStyle
 import org.meshtastic.feature.map.maplibre.style.zoomRange
+import org.meshtastic.feature.map.maplibre.tiles.InstallRadarSmoothing
 import kotlin.math.floor
 import kotlin.time.Duration.Companion.seconds
 import org.maplibre.compose.layers.LocationIndicatorDefaults as CoreLocationIndicatorDefaults
@@ -164,6 +165,7 @@ fun rememberMeshMapState(
             MapNodePolicy.visibleNodes(nodes, filterState, nowSeconds, myNodeInfo?.myNodeNum)
         }
 
+    InstallRadarSmoothing()
     val mapState =
         rememberMapState(baseStyle = basemap.toBaseStyle(), initialCameraPosition = initialCameraPosition) {
             val state = checkNotNull(LocalMapState.current)
