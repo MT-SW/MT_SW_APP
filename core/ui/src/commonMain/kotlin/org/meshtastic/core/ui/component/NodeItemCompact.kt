@@ -283,39 +283,52 @@ private fun CompactNameRow(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         NodeSecurityIcons(thatNode, iconSize = 18.dp, isThisNode = isThisNode)
-        Text(
-            text = longName,
-            style = MaterialTheme.typography.titleMediumEmphasized.copy(fontStyle = style),
-            textDecoration = TextDecoration.LineThrough.takeIf { isIgnored },
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+        NameRowWithCenteredBadge(
             modifier = Modifier.weight(1f),
+            name = {
+                Text(
+                    text = longName,
+                    style = MaterialTheme.typography.titleMediumEmphasized.copy(fontStyle = style),
+                    textDecoration = TextDecoration.LineThrough.takeIf { isIgnored },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            },
+            badge =
+                if (neighborCount != null && LocalNodeExtraConfig.current.neighbors) {
+                    { NeighborCountBadge(count = neighborCount, iconSize = 18.dp) }
+                } else {
+                    null
+                },
+            trailing = {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    if (thatNode.isUnknownUser) {
+                        Icon(
+                            imageVector = MeshtasticIcons.PersonQuestion,
+                            contentDescription = stringResource(Res.string.node_incomplete),
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.outline,
+                        )
+                    }
+                    if (unmessageable) {
+                        Icon(
+                            imageVector = MeshtasticIcons.Unmessageable,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.outline,
+                        )
+                    }
+                    if (isFavorite) {
+                        Icon(
+                            imageVector = MeshtasticIcons.Favorite,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.StatusYellow,
+                        )
+                    }
+                }
+            },
         )
-        if (neighborCount != null && LocalNodeExtraConfig.current.neighbors) NeighborCountBadge(count = neighborCount, iconSize = 18.dp)
-        if (thatNode.isUnknownUser) {
-            Icon(
-                imageVector = MeshtasticIcons.PersonQuestion,
-                contentDescription = stringResource(Res.string.node_incomplete),
-                modifier = Modifier.size(18.dp),
-                tint = MaterialTheme.colorScheme.outline,
-            )
-        }
-        if (unmessageable) {
-            Icon(
-                imageVector = MeshtasticIcons.Unmessageable,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp),
-                tint = MaterialTheme.colorScheme.outline,
-            )
-        }
-        if (isFavorite) {
-            Icon(
-                imageVector = MeshtasticIcons.Favorite,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp),
-                tint = MaterialTheme.colorScheme.StatusYellow,
-            )
-        }
     }
 }
 

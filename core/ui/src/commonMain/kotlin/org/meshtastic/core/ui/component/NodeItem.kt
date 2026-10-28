@@ -638,18 +638,30 @@ private fun NodeItemHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                Text(
-                    text = longName,
-                    style = MaterialTheme.typography.titleMediumEmphasized.copy(fontStyle = style),
-                    textDecoration = TextDecoration.LineThrough.takeIf { isIgnored },
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                NameRowWithCenteredBadge(
                     modifier = Modifier.weight(1f),
-                )
-                TransportIcon(
-                    transport = thatNode.lastTransport,
-                    viaMqtt = thatNode.viaMqtt,
-                    modifier = Modifier.size(16.dp),
+                    name = {
+                        Text(
+                            text = longName,
+                            style = MaterialTheme.typography.titleMediumEmphasized.copy(fontStyle = style),
+                            textDecoration = TextDecoration.LineThrough.takeIf { isIgnored },
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    },
+                    badge =
+                        if (neighborCount != null && LocalNodeExtraConfig.current.neighbors) {
+                            { NeighborCountBadge(count = neighborCount) }
+                        } else {
+                            null
+                        },
+                    trailing = {
+                        TransportIcon(
+                            transport = thatNode.lastTransport,
+                            viaMqtt = thatNode.viaMqtt,
+                            modifier = Modifier.size(16.dp),
+                        )
+                    },
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -682,7 +694,6 @@ private fun NodeItemHeader(
             }
         }
 
-        if (neighborCount != null && LocalNodeExtraConfig.current.neighbors) NeighborCountBadge(count = neighborCount)
         NodeStatusIcons(
             isThisNode = isThisNode,
             isFavorite = isFavorite,

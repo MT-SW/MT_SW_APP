@@ -17,12 +17,16 @@
 package org.meshtastic.core.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.unit.Constraints
+import kotlin.math.max
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
@@ -57,3 +61,50 @@ fun NeighborCountBadge(count: Int, modifier: Modifier = Modifier, iconSize: Dp =
         )
     }
 }
+
+/**
+ * Puts [badge] exactly in the middle of the free space between the end of [name] and the start of [trailing] (the
+ * icons on the right). The name gets all the width it needs (it is shortened only when there is no room), the trailing
+ * icons stay at the right edge, and without a badge the name simply takes the space as before.
+ */
+@Composable
+fun NameRowWithCenteredBadge(
+    name: @Composable () -> Unit,
+    badge: (@Composable () -> Unit)?,
+    trailing: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Layout(
+        content = {
+            Box { name() }
+            Box { badge?.invoke() }
+            Box { trailing() }
+        },
+        modifier = modifier,
+    ) { measurables, constraints ->
+        val loose = constraints.copy(minWidth = 0, minHeight = 0)
+        val trailingPlaceable = measurables[2].measure(loose)
+        val badgePlaceable = measurables[1].measure(loose)
+        val gap = if (badge != null) MIN_BADGE_GAP.roundToPx() else 0
+        val maxWidth = if (constraints.hasBoundedWidth) constraints.maxWidth else Constraints.Infinity
+        val nameRoom =
+            if (maxWidth == Constraints.Infinity) Constraints.Infinity
+            else (maxWidth - trailingPlaceable.width - badgePlaceable.width - 2 * gap).coerceAtLeast(0)
+        val namePlaceable = measurables[0].measure(Constraints(maxWidth = nameRoom))
+        val height = max(namePlaceable.height, max(badgePlaceable.height, trailingPlaceable.height))
+        val width = if (maxWidth == Constraints.Infinity) namePlaceable.width + badgePlaceable.width + trailingPlaceable.width else maxWidth
+        val trailingX = width - trailingPlaceable.width
+        val free = trailingX - namePlaceable.width
+        // With no icons on the right the badge stays at the right edge, as before.
+        val badgeX =
+            if (trailingPlaceable.width == 0) width - badgePlaceable.width
+            else namePlaceable.width + ((free - badgePlaceable.width) / 2).coerceAtLeast(0)
+        layout(width, height) {
+            namePlaceable.placeRelative(0, (height - namePlaceable.height) / 2)
+            badgePlaceable.placeRelative(badgeX, (height - badgePlaceable.height) / 2)
+            trailingPlaceable.placeRelative(trailingX, (height - trailingPlaceable.height) / 2)
+        }
+    }
+}
+
+private val MIN_BADGE_GAP = 4.dp
