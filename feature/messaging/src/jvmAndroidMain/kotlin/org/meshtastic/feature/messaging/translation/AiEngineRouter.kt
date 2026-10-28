@@ -16,8 +16,18 @@
  */
 package org.meshtastic.feature.messaging.translation
 
+import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.meshtastic.core.repository.AiEngine
 import org.meshtastic.core.repository.AiModels
+import org.meshtastic.core.repository.UiPrefs
 
 /**
  * The one engine the rest of the app sees: language models (and Gemma models that hear) go to [llama], Whisper speech
@@ -27,11 +37,33 @@ class AiEngineRouter(
     store: AiModelStoreImpl,
     private val llama: LlamaCppEngine,
     private val whisper: WhisperCppEngine?,
+    uiPrefs: UiPrefs? = null,
 ) : AiTextEngine {
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     init {
         // A model is never deleted while a program still has its file open.
         store.beforeModelDelete = { unloadNow() }
+        store.unloadAll = { unloadNow() }
+        // A function switched off or another model chosen: the model in memory is not needed any more, so it is
+        // stopped at once instead of after the idle time. The next question starts the chosen model.
+        if (uiPrefs != null) {
+            combine(
+                uiPrefs.assistantEnabled,
+                uiPrefs.translatorEnabled,
+                uiPrefs.assistantModelId,
+                uiPrefs.translatorModelId,
+                uiPrefs.dictationModelId,
+            ) { a, t, am, tm, dm -> listOf(a, t, am, tm, dm) }
+                .distinctUntilChanged()
+                .drop(1)
+                .onEach {
+                    Logger.i(tag = "AiEngineRouter") { "AI settings changed, freeing the model memory" }
+                    unloadNow()
+                }
+                .launchIn(scope)
+        }
     }
 
     override val activeBackend: String get() = llama.activeBackend

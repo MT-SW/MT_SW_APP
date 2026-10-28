@@ -29,6 +29,7 @@ import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.node_color_pick
 import org.meshtastic.core.resources.ai_assistant_title
 import org.meshtastic.core.resources.translator_title
+import org.meshtastic.core.resources.ai_unload_title
 import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.import_menu_in_top_bar
 import org.meshtastic.core.resources.bottom_nav_settings
@@ -301,7 +302,9 @@ class AssistantGuideTools(
                 Target("telemetry", "settings/telemetry", Res.string.telemetry, listOf("telemetri", "telemetry", "czujnik")),
                 Target("antenna_calculator", "settings/antenna-calculator", Res.string.antenna_calc_title, listOf("kalkulator anten", "kalkulator", "calculator", "przelicz anten", "wymiary anten")),
                 Target("mt_sw", "settings/mt-sw-features", Res.string.mt_sw_features_title, listOf("mt_sw", "mt-sw", "funkcje", "features", "skalowan", "motyw")),
-                Target("clean_nodes", "settings/clean-node-db", Res.string.clean_node_database_title, listOf("wyczyść", "clean", "baz", "usuń węz")),
+                // Only the node database: "baza wiedzy" (knowledge base) must not land here.
+                Target("clean_nodes", "settings/clean-node-db", Res.string.clean_node_database_title, listOf("wyczyść", "wyczysc", "clean", "baza węzł", "bazę węzł", "bazy węzł", "baza wezl", "baze wezl", "node db", "node database", "usuń węz", "usun wez")),
+                Target("knowledge_base", "settings/mt-sw-features", Res.string.kb_title, listOf("baza wiedzy", "bazę wiedzy", "bazy wiedzy", "baze wiedzy", "wiedz", "knowledge")),
                 Target("filter", "settings/filter-settings", Res.string.filter_settings, listOf("filtr", "filter")),
                 Target("debug", "settings/debug-panel", Res.string.debug_panel, listOf("debug", "logi", "log", "diagnost")),
                 Target("about", "settings/about", Res.string.about, listOf("o aplikacji", "about", "wersj")),
@@ -360,6 +363,7 @@ class AssistantGuideTools(
                 Target("external_mic", "settings/mt-sw-features", Res.string.dictation_external_mic_title, listOf("mikrofon", "słuchawk", "sluchawk", "headset", "microphone", "zestaw głośnomówiący", "bluetooth mikrofon")),
                 Target("node_color", "settings/security", Res.string.node_color_pick, listOf("kolor", "color", "colour", "barw")),
                 Target("ai_model", "settings/mt-sw-features", Res.string.ai_models_title, listOf("model ai", "wybór modelu", "wybor modelu", "model", "gemma", "nllb")),
+                Target("ai_unload", "settings/mt-sw-features", Res.string.ai_unload_title, listOf("zwolnij pamięć", "zwolnij pamiec", "wyłącz model", "wylacz model", "ubij model", "pamięć ai", "pamiec ai", "ram", "free memory", "unload")),
                 Target("translator", "settings/mt-sw-features", Res.string.translator_title, listOf("tłumacz", "tlumacz", "translator", "tłumaczen", "tlumaczen", "translat")),
                 Target("assistant", "settings/mt-sw-features", Res.string.ai_assistant_title, listOf("asystent", "assistant", "model ai", "gemma", "sztuczn")),
                 Target("knowledge_base", "settings/mt-sw-features", Res.string.kb_title, listOf("baza wiedzy", "baza", "wiedza", "wpisy", "przeglądać", "przegladac", "knowledge", "offtop", "pokrewne", "poradnik")),

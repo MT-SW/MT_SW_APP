@@ -78,6 +78,7 @@ internal class ModelServerProcess private constructor(
             process.destroy()
             if (!process.waitFor(STOP_WAIT_SECONDS, TimeUnit.SECONDS)) process.destroyForcibly().waitFor(STOP_WAIT_SECONDS, TimeUnit.SECONDS)
         }
+        live.remove(process)
     }
 
     companion object {
@@ -95,21 +96,61 @@ internal class ModelServerProcess private constructor(
             (field.get(process) as Number).toLong()
         }.getOrNull()
 
+        /** Names of the model programs the app starts; only these are ever stopped as leftovers. */
+        private val PROGRAMS = listOf("llama-server", "whisper-server")
+
+        /** Programs started by this run of the app, all stopped when the app ends (one hook for all of them). */
+        private val live = java.util.concurrent.ConcurrentHashMap.newKeySet<Process>()
+
+        private val hookAdded = java.util.concurrent.atomic.AtomicBoolean(false)
+
         /**
-         * Stops a program left over from an earlier run of the app (the pid file names it). It is stopped only when its
-         * command line still names a model program, so a number reused by something else is never touched.
+         * Stops a program left over from an earlier run of the app (the pid file names it): an app that was killed or
+         * crashed cannot stop its programs, and each one keeps gigabytes of memory. It is stopped only when its command
+         * line still names a model program, so a number reused by something else is never touched. Works on Android,
+         * Linux, macOS and Windows.
          */
         fun stopLeftovers(pidFile: File) {
             runCatching {
                 if (!pidFile.isFile) return
                 val pid = pidFile.readText().trim().substringBefore(' ').toLongOrNull() ?: return
                 pidFile.delete()
-                val cmdline = File("/proc/$pid/cmdline")
-                if (cmdline.isFile && cmdline.readText().contains("llama-server")) {
-                    Logger.w(tag = "ModelServer") { "Stopping a model program left from an earlier run (process $pid)" }
+                val command = commandOf(pid) ?: return
+                if (PROGRAMS.none { command.contains(it) }) return
+                Logger.w(tag = "ModelServer") { "Stopping a model program left from an earlier run (process $pid)" }
+                if (!destroyByHandle(pid)) {
                     ProcessBuilder("kill", "-9", pid.toString()).start().waitFor(STOP_WAIT_SECONDS, TimeUnit.SECONDS)
                 }
             }
+        }
+
+        /** The command line of process [pid]: from /proc on Android and Linux, otherwise from the Java process API. */
+        private fun commandOf(pid: Long): String? {
+            val proc = File("/proc/$pid/cmdline")
+            if (proc.isFile) return runCatching { proc.readText() }.getOrNull()
+            return runCatching {
+                handleOf(pid)?.let { handle ->
+                    val info = Class.forName("java.lang.ProcessHandle").getMethod("info").invoke(handle)
+                    val command = Class.forName("java.lang.ProcessHandle\$Info").getMethod("command").invoke(info) as java.util.Optional<*>
+                    command.orElse(null)?.toString()
+                }
+            }.getOrNull()
+        }
+
+        /** Stops process [pid] through the Java process API (computers); false where that API does not exist (Android). */
+        private fun destroyByHandle(pid: Long): Boolean {
+            val handle = runCatching { handleOf(pid) }.getOrNull() ?: return false
+            return runCatching {
+                Class.forName("java.lang.ProcessHandle").getMethod("destroyForcibly").invoke(handle)
+                true
+            }.getOrDefault(false)
+        }
+
+        /** The Java process API's handle of [pid] (computers only; Android has no such API, then this throws). */
+        private fun handleOf(pid: Long): Any? {
+            val type = Class.forName("java.lang.ProcessHandle")
+            val found = type.getMethod("of", Long::class.javaPrimitiveType).invoke(null, pid) as java.util.Optional<*>
+            return found.orElse(null)
         }
 
         /** A free local port. */
@@ -156,7 +197,10 @@ internal class ModelServerProcess private constructor(
             reader.start()
             val handle = ModelServerProcess(process, port, tail)
             // A program the app started must never outlive the app.
-            Runtime.getRuntime().addShutdownHook(Thread { runCatching { process.destroyForcibly() } })
+            live.add(process)
+            if (hookAdded.compareAndSet(false, true)) {
+                Runtime.getRuntime().addShutdownHook(Thread { live.forEach { runCatching { it.destroyForcibly() } } })
+            }
             return handle
         }
     }

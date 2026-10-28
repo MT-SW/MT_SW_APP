@@ -45,6 +45,8 @@ object AssistantCalculators {
     const val OUR_MHZ = 869.44165
     private const val C = 299_792_458.0
     private const val OUR_ERP_LIMIT_DBM = 27.0
+    /** A link margin of this many dB over free space usually survives some obstacles and fading. */
+    private const val GOOD_MARGIN_DB = 20.0
 
     fun answer(question: String, polish: Boolean, defaults: Defaults = Defaults()): String? {
         lastAntenna = null
@@ -429,8 +431,8 @@ object AssistantCalculators {
     private fun snrLimit(sf: Int) = -7.5 - 2.5 * (sf - 7)
 
     private fun range(q: String, t: Texts, defaults: Defaults): String? {
-        if (!has(q, "zasięg|zasieg|range|link budget|budżet łącza|budzet lacza|budżet mocy")) return null
-        if (!has(q, "teoretycz|maksymal|\\bmax|oblicz|policz|wylicz|ile km|how far|jaki (?:będzie |bedzie |mam |jest )?zasięg|jaki (?:będzie |bedzie |mam |jest )?zasieg|what range|calculate|budżet|budzet|budget")) return null
+        if (!has(q, "zasięg|zasieg|range|link budget|budżet łącza|budzet lacza|budżet mocy|bilans\\p{L}* łącza|bilans\\p{L}* lacza|bilans\\p{L}* mocy|bilans\\p{L}* radiow")) return null
+        if (!has(q, "teoretycz|maksymal|\\bmax|oblicz|policz|wylicz|ile km|how far|jaki (?:będzie |bedzie |mam |jest )?zasięg|jaki (?:będzie |bedzie |mam |jest )?zasieg|what range|calculate|budżet|budzet|budget|bilans")) return null
         if (has(q, "słab|slab|kiepsk|poprawi|zwiększ|zwieksz|sprawdz|sprawdź|weak|poor|improve")) return null
         val (o, named) = preset(q, defaults)
         val pGiven = dbm(q)
@@ -443,6 +445,20 @@ object AssistantCalculators {
         val sens = -174 + 10 * log10(bwHz) + 6 + snrLimit(o.spreadingFactor)
         val budget = p + gt + gr - sens
         val dKm = 10.0.pow((budget - 32.44 - 20 * log10(f)) / 20)
+        // A distance in the question: what is left of the budget over exactly that path.
+        val distance = km(q)?.let { d ->
+            val margin = budget - fspl(d, f)
+            val verdict =
+                when {
+                    margin >= GOOD_MARGIN_DB -> t.s("wystarczy z zapasem", "enough, with room to spare")
+                    margin >= 0 -> t.s("styk — przy przeszkodach może nie działać", "borderline — obstacles may break it")
+                    else -> t.s("za mało nawet w wolnej przestrzeni", "not enough even in free space")
+                }
+            t.s(
+                "• na ${t.n(d, 2)} km: tłumienie w wolnej przestrzeni ${t.n(fspl(d, f))} dB, zapas ${t.n(margin)} dB — $verdict\n",
+                "• over ${t.n(d, 2)} km: free-space path loss ${t.n(fspl(d, f))} dB, margin ${t.n(margin)} dB — $verdict\n",
+            )
+        }.orEmpty()
         val presetNote = if (named) "" else t.s(" (ustawiony w radiu)", " (set in the radio)")
         val powerNote = if (pGiven != null) "" else if (defaults.txDbm > 0) t.s(" (z radia)", " (from the radio)") else t.s(" (typowe radio SX1262)", " (a typical SX1262 radio)")
         return t.s(
@@ -450,13 +466,13 @@ object AssistantCalculators {
                 "• moc ${t.n(p)} dBm$powerNote, anteny ${t.n(gt)} dBi i ${t.n(gr)} dBi\n" +
                 "• czułość odbiornika ok. ${t.n(sens)} dBm (granica SNR ${t.n(snrLimit(o.spreadingFactor))} dB)\n" +
                 "• dopuszczalne tłumienie ok. ${t.n(budget)} dB\n" +
-                "• zasięg teoretyczny w wolnej przestrzeni: ok. ${t.n(dKm, 0)} km\n" +
+                "• zasięg teoretyczny w wolnej przestrzeni: ok. ${t.n(dKm, 0)} km\n" + distance +
                 "To górna granica przy pełnej widoczności anten. Na Ziemi zasięg ogranicza horyzont radiowy: ${horizonList(q, t)}. Do tego przeszkody (budynki, las, wzgórza). Konkretne łącze sprawdzisz w planerze łącza.",
             "Link budget for the ${presetName(o)} preset$presetNote (SF${o.spreadingFactor}, ${t.n(o.bandwidth * 1000.0, 2)} kHz) at ${t.n(f, 2)} MHz:\n" +
                 "• power ${t.n(p)} dBm$powerNote, antennas ${t.n(gt)} dBi and ${t.n(gr)} dBi\n" +
                 "• receiver sensitivity about ${t.n(sens)} dBm (SNR limit ${t.n(snrLimit(o.spreadingFactor))} dB)\n" +
                 "• allowed path loss about ${t.n(budget)} dB\n" +
-                "• theoretical free-space range: about ${t.n(dKm, 0)} km\n" +
+                "• theoretical free-space range: about ${t.n(dKm, 0)} km\n" + distance +
                 "That is the upper limit with the antennas in full view of each other. On Earth the radio horizon limits it: ${horizonList(q, t)}. Obstacles (buildings, forest, hills) come on top. Check a real link in the link planner.",
         )
     }

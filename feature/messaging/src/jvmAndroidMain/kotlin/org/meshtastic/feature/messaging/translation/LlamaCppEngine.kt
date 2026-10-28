@@ -80,6 +80,7 @@ class LlamaCppEngine(
 
     init {
         store.beforeModelDelete = { unloadNow() }
+        store.unloadAll = { unloadNow() }
         // A program left running by an app that was killed would keep gigabytes of memory.
         ModelServerProcess.stopLeftovers(File(logDir, PID_FILE))
     }
@@ -202,6 +203,7 @@ class LlamaCppEngine(
     ): String {
         val started = nowMillis
         val reply = StringBuilder()
+        var thought = 0
         val limit = if (maxTokens > 0) maxTokens * CHARS_PER_TOKEN else Int.MAX_VALUE
         val connection = URL(running.baseUrl + "/v1/chat/completions").openConnection() as HttpURLConnection
         try {
@@ -223,7 +225,12 @@ class LlamaCppEngine(
                     if (!line.startsWith("data:")) continue
                     val data = line.removePrefix("data:").trim()
                     if (data == DONE) break
-                    val piece = runCatching { deltaText(Json.parseToJsonElement(data)) }.getOrNull().orEmpty()
+                    val event = runCatching { Json.parseToJsonElement(data) }.getOrNull() ?: continue
+                    // Quiet thinking that goes on and on (small models) stops here; the assistant then asks once more
+                    // without thinking instead of waiting minutes for an answer.
+                    thought += thinkingLength(event)
+                    if (reply.isEmpty() && thought > MAX_THINKING_CHARS) throw ThinkingTooLongException()
+                    val piece = runCatching { deltaText(event) }.getOrNull().orEmpty()
                     if (piece.isEmpty()) continue
                     reply.append(piece)
                     runCatching { onPiece(piece) }
@@ -232,6 +239,9 @@ class LlamaCppEngine(
                 }
             }
         } catch (e: CancellationException) {
+            throw e
+        } catch (e: ThinkingTooLongException) {
+            Logger.w(tag = TAG) { "Quiet thinking of $modelId went over $MAX_THINKING_CHARS characters, stopped" }
             throw e
         } catch (e: Exception) {
             // The answer so far is kept when the connection broke half-way; an empty answer is a real failure.
@@ -249,6 +259,13 @@ class LlamaCppEngine(
             "Answer from $modelId on $activeBackend: ${reply.length} chars in $elapsed ms, about ${reply.length * MS_PER_SECOND / elapsed} chars/s"
         }
         return reply.withoutLoop().trim()
+    }
+
+    /** The length of the quiet thoughts (`reasoning_content`) in one streamed piece. */
+    private fun thinkingLength(event: JsonElement): Int {
+        val choices = (event as? JsonObject)?.get("choices") as? JsonArray ?: return 0
+        val delta = (choices.firstOrNull() as? JsonObject)?.get("delta") as? JsonObject ?: return 0
+        return (delta["reasoning_content"] as? JsonPrimitive)?.contentOrNull?.length ?: 0
     }
 
     /** The text of one streamed piece; the model's quiet thoughts (`reasoning_content`) are not shown. */
@@ -288,7 +305,8 @@ class LlamaCppEngine(
                     ?: attempt.asset?.let { if (attempt.requireGpu) installer.installGpu(it) else runCatching { installer.install(it) }.getOrNull() }
                     ?: continue
             Logger.i(tag = TAG) { "Starting ${model.name}: ${attempt.name} (context $window tokens, hearing $hearing)" }
-            val started = startServer(program, file, hearingFile, window, attempt.extra)
+            val noThinking = if (model.quietThinking) emptyList() else listOf("--reasoning-budget", "0")
+            val started = startServer(program, file, hearingFile, window, attempt.extra + noThinking)
             try {
                 started.awaitReady("/health", LOAD_TIMEOUT_MS)
             } catch (e: Throwable) {
@@ -312,6 +330,7 @@ class LlamaCppEngine(
             loadedId = modelId
             loadedHearing = hearing
             activeBackend = describeBackend(attempt)
+            store.reportLoaded(TAG, modelId)
             Logger.i(tag = TAG) { "Model ${model.name} runs: $activeBackend" }
             return started
         }
@@ -341,7 +360,10 @@ class LlamaCppEngine(
             if (hearing != null) addAll(listOf("--mmproj", hearing.absolutePath))
             addAll(listOf("--host", "127.0.0.1", "--port", port.toString()))
             addAll(listOf("-c", window.toString()))
-            addAll(listOf("-np", "1", "--jinja", "--no-webui", "--cache-ram", CACHE_RAM_MB.toString()))
+            // Each question asks the model twice (what is asked, then the answer) with two different long instructions; a
+            // big enough prompt cache keeps both read, so neither is read again from the start for every question.
+            val cacheMb = if (installer.android) CACHE_RAM_PHONE_MB else CACHE_RAM_COMPUTER_MB
+            addAll(listOf("-np", "1", "--jinja", "--no-webui", "--cache-ram", cacheMb.toString()))
             addAll(extra)
         }
         synchronized(report) { report.clear() }
@@ -379,6 +401,7 @@ class LlamaCppEngine(
         loadedId = null
         loadedHearing = false
         activeBackend = ""
+        store.reportLoaded(TAG, null)
     }
 
     /** True when the end of the text repeats itself over and over (a small model stuck in a loop). */
@@ -421,7 +444,8 @@ class LlamaCppEngine(
         const val MAX_TRANSCRIPT_TOKENS = 600
         const val CONTEXT_SMALL = 8192
         const val CONTEXT_LARGE = 16384
-        const val CACHE_RAM_MB = 256
+        const val CACHE_RAM_PHONE_MB = 256
+        const val CACHE_RAM_COMPUTER_MB = 1536
         const val LOAD_TIMEOUT_MS = 10 * 60 * 1000L
         const val IDLE_UNLOAD_MS = 120_000L
         const val CONNECT_TIMEOUT_MS = 20_000
@@ -429,6 +453,8 @@ class LlamaCppEngine(
         const val MAX_ERROR = 300
         const val MAX_TAIL = 4000
         const val MAX_REPORT = 4000
+        /** About 600 tokens of quiet thinking: past that the model is stopped and asked again without thinking. */
+        const val MAX_THINKING_CHARS = 2400
         const val MS_PER_SECOND = 1000L
         val BACKEND_LINE = Regex("offloaded|ggml_opencl|ggml_vulkan|ggml_metal|ggml_cuda|using device|Found \\d+ (Vulkan|CUDA|Metal)", RegexOption.IGNORE_CASE)
         val LAYERS = Regex("offloaded (\\d+)/(\\d+) layers to GPU", RegexOption.IGNORE_CASE)
@@ -439,3 +465,6 @@ class LlamaCppEngine(
         const val TRANSCRIBE_ASK = "Write down exactly what is said in this recording. Reply with the text only."
     }
 }
+
+/** The model thought quietly for too long without starting its answer. */
+class ThinkingTooLongException : IllegalStateException("The model kept reasoning without answering")

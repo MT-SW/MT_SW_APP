@@ -91,12 +91,13 @@ class FdroidAiModule {
     @Single fun aiModelStore(impl: AiModelStoreImpl): AiModelStore = impl
 
     @Single
-    fun aiTextEngine(context: Context, store: AiModelStoreImpl, installer: ModelServerInstaller): AiTextEngine =
+    fun aiTextEngine(context: Context, store: AiModelStoreImpl, installer: ModelServerInstaller, uiPrefs: UiPrefs): AiTextEngine =
         File(context.filesDir, "engine-logs").let { logs ->
             AiEngineRouter(
                 store,
                 LlamaCppEngine(store, installer, logs),
                 if (installer.whisperSupported) WhisperCppEngine(store, installer, logs) else null,
+                uiPrefs,
             )
         }
 

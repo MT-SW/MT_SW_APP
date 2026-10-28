@@ -89,10 +89,10 @@ class DesktopAiModule {
     @Single fun aiModelStore(impl: AiModelStoreImpl): AiModelStore = impl
 
     @Single
-    fun aiTextEngine(store: AiModelStoreImpl, installer: ModelServerInstaller): AiTextEngine {
+    fun aiTextEngine(store: AiModelStoreImpl, installer: ModelServerInstaller, uiPrefs: UiPrefs): AiTextEngine {
         val logs = File(System.getProperty("user.home"), ".meshtastic/engine-logs")
         val whisper = if (installer.whisperSupported) WhisperCppEngine(store, installer, logs) else null
-        return AiEngineRouter(store, LlamaCppEngine(store, installer, logs), whisper)
+        return AiEngineRouter(store, LlamaCppEngine(store, installer, logs), whisper, uiPrefs)
     }
 
     @Single

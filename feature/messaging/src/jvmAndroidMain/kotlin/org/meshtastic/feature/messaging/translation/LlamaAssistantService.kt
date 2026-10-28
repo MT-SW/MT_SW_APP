@@ -127,7 +127,19 @@ class LlamaAssistantService(
     // The node talked about last in this conversation, so "a jaka jest tam bateria?" knows which node "tam" is.
     @Volatile private var lastNode = ""
 
+    /** True while a test (/test, /szybki, ...) runs. */
+    @Volatile private var testRunning = false
+
     override suspend fun selfTest(command: String, onResult: (question: String, answer: String) -> Unit) {
+        testRunning = true
+        try {
+            selfTestRun(command, onResult)
+        } finally {
+            testRunning = false
+        }
+    }
+
+    private suspend fun selfTestRun(command: String, onResult: (question: String, answer: String) -> Unit) {
         withContext(Dispatchers.IO) {
             val modelId = activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
             if (command.equals(AssistantSelfTest.HARDWARE, ignoreCase = true)) {
@@ -200,7 +212,11 @@ class LlamaAssistantService(
                         }
                     val seconds = (org.meshtastic.core.common.util.nowMillis - started) / MILLIS_PER_SECOND
                     totalSeconds += seconds
-                    val missing = c.keep.filter { !out.contains(it, ignoreCase = true) }
+                    // A number may change its decimal mark with the language (8,6 in Polish is 8.6 in English): both count.
+                    val missing = c.keep.filter { k ->
+                        !out.contains(k, ignoreCase = true) &&
+                            !(k.any { it.isDigit() } && (out.contains(k.replace(',', '.')) || out.contains(k.replace('.', ','))))
+                    }
                     val verdict = if (missing.isEmpty()) "kept: OK" else "MISSING: ${missing.joinToString()}"
                     val block = "\n## T${i + 1}. ${c.from} -> ${c.to}\nTime: $seconds s\nText: ${c.text}\nTranslation: $out\nCheck: $verdict\n"
                     println("===== TRANSLATION TEST ${i + 1}/${cases.size} =====$block")
@@ -754,7 +770,8 @@ class LlamaAssistantService(
             add("system" to system)
             recent.forEach { add((if (it.fromUser) "user" else "assistant") to it.text) }
         }
-        val think = THINKING && thinkingWorks
+        // Models that think far too long (Qwen 3.5) answer straight away; the others think quietly first.
+        val think = THINKING && thinkingWorks && AiModels.byId(modelId)?.quietThinking != false
         val text =
             try {
                 engine.chat(modelId, messages, MAX_ANSWER_TOKENS, temperature, onPiece, thinking = think)
@@ -766,6 +783,11 @@ class LlamaAssistantService(
                     // The window is full: once more with only the question.
                     msg.contains("too long", ignoreCase = true) ->
                         engine.chat(modelId, listOf("system" to system.take(SHORT_SYSTEM_CHARS), messages.last()), MAX_ANSWER_TOKENS, temperature, onPiece)
+                    // Thought for too long without answering: once more, straight to the answer.
+                    think && e is ThinkingTooLongException -> {
+                        Logger.w(tag = TAG) { "Thinking went on too long, answering without it" }
+                        engine.chat(modelId, messages, MAX_ANSWER_TOKENS, temperature, onPiece)
+                    }
                     // Once more without quiet thinking; it stays off only when the model file says it cannot think.
                     think -> {
                         Logger.w(tag = TAG, throwable = e) { "Answer with thinking failed, trying without: $msg" }
@@ -975,6 +997,8 @@ class LlamaAssistantService(
     private fun scheduleNotesUpdate(modelId: String, history: List<AssistantTurn>, question: String, answer: String) {
         val store = memoryStore ?: return
         if (!uiPrefs.assistantMemoryEnabled.value) return
+        // Test questions are not the user's words: they are never noted, and the test does not wait for notes.
+        if (testRunning) return
         val userTurns = history.count { it.fromUser }
         val asked = REMEMBER_WORDS.any { question.lowercase().contains(it) } || PERSONAL_WORDS.any { question.lowercase().contains(it) }
         if (!asked && (userTurns % 2 == 0 || question.length < MIN_NOTE_QUESTION)) return

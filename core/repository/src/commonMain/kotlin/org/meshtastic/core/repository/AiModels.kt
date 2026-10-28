@@ -99,6 +99,11 @@ data class AiModelInfo(
     val files: List<AiModelFile>,
     val platforms: Set<AiPlatform>,
     val hearing: Boolean = false,
+    /**
+     * True when the model may think quietly before it answers. Off for models that think far too long for their size
+     * (Qwen 3.5): there thinking is switched off in the engine itself, so even simple questions get quick answers.
+     */
+    val quietThinking: Boolean = true,
     val recommendedFor: Set<AiRole> = emptySet(),
     val descriptionPl: String = "",
     val descriptionEn: String = "",
@@ -261,6 +266,7 @@ object AiModels {
     val Qwen2b =
         AiModelInfo(
             id = QWEN_2B,
+            quietThinking = false,
             name = "Qwen 3.5 2B",
             family = "Qwen 3.5",
             engine = AiEngine.LLAMA_CPP,
@@ -279,6 +285,7 @@ object AiModels {
     val Qwen4b =
         AiModelInfo(
             id = QWEN_4B,
+            quietThinking = false,
             name = "Qwen 3.5 4B",
             family = "Qwen 3.5",
             engine = AiEngine.LLAMA_CPP,
@@ -297,6 +304,7 @@ object AiModels {
     val Qwen9b =
         AiModelInfo(
             id = QWEN_9B,
+            quietThinking = false,
             name = "Qwen 3.5 9B",
             family = "Qwen 3.5",
             engine = AiEngine.LLAMA_CPP,
@@ -315,6 +323,7 @@ object AiModels {
     val Qwen35b =
         AiModelInfo(
             id = QWEN_35B,
+            quietThinking = false,
             name = "Qwen 3.5 35B A3B",
             family = "Qwen 3.5",
             engine = AiEngine.LLAMA_CPP,
@@ -526,4 +535,10 @@ interface AiModelStore {
     fun cancelDownload(id: String)
 
     suspend fun delete(id: String)
+
+    /** Ids of the models that are in memory right now (empty when none is running). */
+    val loadedModels: StateFlow<Set<String>> get() = MutableStateFlow(emptySet())
+
+    /** Stops every running model and frees its memory; the next question starts the model again. */
+    suspend fun unloadModels() {}
 }

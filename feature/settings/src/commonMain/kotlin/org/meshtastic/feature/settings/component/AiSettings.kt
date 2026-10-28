@@ -84,6 +84,9 @@ import org.meshtastic.core.resources.ai_model_specs
 import org.meshtastic.core.resources.ai_model_use
 import org.meshtastic.core.resources.ai_models_empty
 import org.meshtastic.core.resources.ai_models_hint
+import org.meshtastic.core.resources.ai_unload_loaded
+import org.meshtastic.core.resources.ai_unload_none
+import org.meshtastic.core.resources.ai_unload_title
 import org.meshtastic.core.resources.ai_models_tab_assistant
 import org.meshtastic.core.resources.ai_models_tab_dictation
 import org.meshtastic.core.resources.ai_models_tab_translator
@@ -96,6 +99,7 @@ import org.meshtastic.core.resources.translator_downloading
 import org.meshtastic.core.resources.translator_ready
 import org.meshtastic.core.resources.translator_summary
 import org.meshtastic.core.resources.translator_title
+import org.meshtastic.core.ui.component.RegularPreference
 import org.meshtastic.core.ui.component.SwitchPreference
 
 /**
@@ -217,6 +221,22 @@ internal fun AiSettings() {
             },
         )
     }
+
+    // The model that is running right now and a way to switch it off at once (otherwise it stops by itself after a
+    // short idle time, or as soon as another model is chosen or the function is switched off).
+    val loaded by store.loadedModels.collectAsStateWithLifecycle()
+    val loadedNames = loaded.map { id -> AiModels.byId(id)?.name ?: id }.sorted().joinToString(", ")
+    RegularPreference(
+        title = stringResource(Res.string.ai_unload_title),
+        subtitle =
+        if (loaded.isEmpty()) {
+            stringResource(Res.string.ai_unload_none)
+        } else {
+            stringResource(Res.string.ai_unload_loaded, loadedNames)
+        },
+        onClick = { appScope.launch { store.unloadModels() } },
+        enabled = loaded.isNotEmpty(),
+    )
 
     SectionLabel(stringResource(Res.string.ai_models_title))
     val tabs =

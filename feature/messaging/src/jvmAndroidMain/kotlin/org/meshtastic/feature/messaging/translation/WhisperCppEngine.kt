@@ -98,6 +98,7 @@ class WhisperCppEngine(
         }
         server = started
         loadedId = modelId
+        store.reportLoaded(TAG, modelId)
         return started
     }
 
@@ -151,6 +152,7 @@ class WhisperCppEngine(
         server?.stop()
         server = null
         loadedId = null
+        store.reportLoaded(TAG, null)
     }
 
     private companion object {

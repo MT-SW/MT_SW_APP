@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -115,6 +116,23 @@ class AiModelStoreImpl(
 
     /** Called before a model is deleted so the engine can release its file first. */
     @Volatile var beforeModelDelete: (suspend () -> Unit)? = null
+
+    /** Set by the engines: stops every running model. */
+    @Volatile var unloadAll: (suspend () -> Unit)? = null
+
+    private val loadedBy = MutableStateFlow<Map<String, String>>(emptyMap())
+
+    override val loadedModels: StateFlow<Set<String>> =
+        loadedBy.map { it.values.toSet() }.stateIn(scope, SharingStarted.Eagerly, emptySet())
+
+    /** An engine ([engine] names it) says which model it now holds in memory; null when it holds none. */
+    fun reportLoaded(engine: String, modelId: String?) {
+        loadedBy.update { if (modelId == null) it - engine else it + (engine to modelId) }
+    }
+
+    override suspend fun unloadModels() {
+        unloadAll?.invoke()
+    }
 
     override val states: StateFlow<Map<String, TranslatorModelState>> =
         combine(nllb.state, gguf) { n, g -> g + (AiModels.NLLB_600M_ID to n) }
