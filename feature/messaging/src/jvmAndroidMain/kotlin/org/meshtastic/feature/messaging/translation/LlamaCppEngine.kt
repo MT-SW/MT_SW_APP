@@ -343,12 +343,32 @@ class LlamaCppEngine(
         }
         var failure: Throwable? = null
         val tried = StringBuilder()
+        if (installer.android) {
+            if (installer.qualcomm) tried.append("- Snapdragon phone detected\n") else tried.append("- not a Snapdragon phone: no NPU program\n")
+            installer.androidNpuAsset()?.takeIf { installer.isBroken(it, modelId) }
+                ?.let { tried.append("- NPU (Hexagon): skipped, failed recently for this model\n") }
+            if (installer.androidGpuAssets().isEmpty()) tried.append("- graphics card programs: skipped, failed recently\n")
+        } else if (!installer.mac) {
+            tried.append(
+                when {
+                    !installer.intelNpu -> "- NPU (Intel): not used, no Intel Core Ultra processor found on this computer\n"
+                    hearing -> "- NPU (Intel): skipped, not used for listening\n"
+                    !model.intelNpu -> "- NPU (Intel): skipped, this model does not run on the Intel NPU\n"
+                    installer.intelNpuAsset()?.let { installer.isBroken(it, modelId) } == true -> "- NPU (Intel): skipped, failed recently for this model\n"
+                    else -> ""
+                },
+            )
+        }
         startReport = ""
         for (attempt in attempts) {
             val program =
                 attempt.program
                     ?: attempt.asset?.let { if (attempt.requireGpu) installer.installGpu(it) else runCatching { installer.install(it) }.getOrNull() }
-                    ?: continue
+            if (program == null) {
+                tried.append("- ${attempt.name}: the program could not be downloaded (${installer.lastInstallError.take(REPORT_TAIL)})\n")
+                startReport = tried.toString()
+                continue
+            }
             Logger.i(tag = TAG) { "Starting ${model.name}: ${attempt.name} (context $window tokens, hearing $hearing)" }
             val noThinking = if (model.quietThinking) emptyList() else listOf("--reasoning-budget", "0")
             val started = startServer(program, file, hearingFile, window, attempt.extra + noThinking, attempt)

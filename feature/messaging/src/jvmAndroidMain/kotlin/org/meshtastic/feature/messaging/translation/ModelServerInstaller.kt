@@ -39,6 +39,19 @@ import java.util.zip.ZipInputStream
  */
 class ModelServerInstaller(private val root: File) : AiEngineInstaller {
 
+    init {
+        // Older versions remembered even a failed download as "broken" for days. Once per reset number, those marks are
+        // cleared so the chips (NPU, graphics card) get a fresh try; raise BROKEN_RESET when that is needed again.
+        runCatching {
+            val done = File(root, ".broken-reset-$BROKEN_RESET")
+            if (!done.exists()) {
+                root.listFiles { f -> f.name.startsWith(".broken-") }?.forEach { it.delete() }
+                root.mkdirs()
+                done.writeText("done")
+            }
+        }
+    }
+
     private val lock = Mutex()
 
     /** One downloadable program: the file on the release page, the name of the program inside, its size in MB. */
@@ -159,6 +172,10 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
     fun cacheDir(name: String): File = File(root, "cache-$name").apply { mkdirs() }
 
     /** Installs a graphics card program; null (and remembered) when it cannot be fetched. */
+    @Volatile
+    var lastInstallError: String = ""
+        private set
+
     suspend fun installGpu(asset: Asset): File? =
         try {
             install(asset)
@@ -166,7 +183,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
             throw e
         } catch (e: Throwable) {
             Logger.w(tag = TAG, throwable = e) { "${asset.folder} is not available" }
-            markBroken(asset)
+            lastInstallError = "${asset.folder}: ${e.message}"
             null
         }
 
@@ -379,6 +396,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
 
         /** The OpenVINO version in the names of the llama.cpp release files (changes together with [LLAMA_TAG]). */
         const val OPENVINO_VERSION = "2026.4.1"
+        private const val BROKEN_RESET = 1
         private const val BROKEN_RETRY_MS = 3L * 24L * 60L * 60L * 1000L
         private val QUALCOMM_PLATFORMS = setOf("kalama", "pineapple", "sun", "taro", "lahaina", "kona", "msmnile", "lito", "bengal", "crow", "parrot", "waipio", "cliffs", "canoe")
         private const val LLAMA_MAC_MB = 16
