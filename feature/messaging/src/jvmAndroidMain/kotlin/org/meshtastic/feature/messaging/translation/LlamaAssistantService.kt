@@ -182,6 +182,32 @@ class LlamaAssistantService(
                 onResult(q.text, answer)
                 previous = history + AssistantTurn(false, text)
             }
+            if (command.equals(AssistantSelfTest.COMMAND, ignoreCase = true) || command.equals(AssistantSelfTest.TRANSLATE, ignoreCase = true)) {
+                // The translator part: the same sentences for every model; names, numbers and links must stay as they are.
+                val tModel = translatorTestModel(modelId)
+                val translator = GemmaTranslator(engine)
+                report.append("\n# Translation test\n\nModel: $tModel, sentences: ${AssistantSelfTest.translations.size}\n")
+                for ((i, c) in AssistantSelfTest.translations.withIndex()) {
+                    val started = org.meshtastic.core.common.util.nowMillis
+                    val out =
+                        try {
+                            translator.translate(tModel, c.text, c.from, c.to).trim()
+                        } catch (e: kotlinx.coroutines.CancellationException) {
+                            throw e
+                        } catch (e: Exception) {
+                            "ERROR: ${e.message?.lineSequence()?.firstOrNull()}"
+                        }
+                    val seconds = (org.meshtastic.core.common.util.nowMillis - started) / MILLIS_PER_SECOND
+                    totalSeconds += seconds
+                    val missing = c.keep.filter { !out.contains(it, ignoreCase = true) }
+                    val verdict = if (missing.isEmpty()) "kept: OK" else "MISSING: ${missing.joinToString()}"
+                    val block = "\n## T${i + 1}. ${c.from} -> ${c.to}\nTime: $seconds s\nText: ${c.text}\nTranslation: $out\nCheck: $verdict\n"
+                    println("===== TRANSLATION TEST ${i + 1}/${AssistantSelfTest.translations.size} =====$block")
+                    report.append(block)
+                    file?.let { f -> runCatching { f.writeText(report.toString()) } }
+                    onResult("${c.from} -> ${c.to}: ${c.text}", "$out\n($verdict)")
+                }
+            }
             report.append("\nBackend: ${engine.activeBackend.ifBlank { "?" }}, total ${totalSeconds} s\n")
             file?.let { f -> runCatching { f.writeText(report.toString()) } }
             val where = file?.takeIf { it.exists() }?.absolutePath ?: "(not saved)"
@@ -190,6 +216,18 @@ class LlamaAssistantService(
             // has no project folder to save it to).
             val average = if (questions.isEmpty()) "0" else (kotlin.math.round(totalSeconds * 10.0 / questions.size) / 10).toString()
             onResult(command, aiString(Res.string.ai_test_done, questions.size, modelId, average) + "\n\n" + report.toString())
+        }
+    }
+
+    /** The model the translator test uses: the chosen translator model when it is a language model, else the assistant's. */
+    private fun translatorTestModel(fallback: String): String {
+        val chosen = AiModels.byId(uiPrefs.translatorModelId.value)
+        return if (chosen != null && chosen.engine == org.meshtastic.core.repository.AiEngine.LLAMA_CPP &&
+            store.states.value[chosen.id] == TranslatorModelState.Ready
+        ) {
+            chosen.id
+        } else {
+            fallback
         }
     }
 

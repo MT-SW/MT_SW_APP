@@ -238,6 +238,6 @@ class AssistantViewModel(
         const val SELF_TEST = "/test"
 
         /** /test runs everything; the others run one group (tools, free chat, knowledge base, hardware report). */
-        val SELF_TEST_COMMANDS = listOf(SELF_TEST, "/narzedzia", "/rozmowa", "/baza", "/sprzet")
+        val SELF_TEST_COMMANDS = listOf(SELF_TEST, "/narzedzia", "/rozmowa", "/baza", "/tlumacz", "/sprzet")
     }
 }

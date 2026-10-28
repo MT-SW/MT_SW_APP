@@ -63,9 +63,10 @@ fun NeighborCountBadge(count: Int, modifier: Modifier = Modifier, iconSize: Dp =
 }
 
 /**
- * Puts [badge] exactly in the middle of the free space between the end of [name] and the start of [trailing] (the
- * icons on the right). The name gets all the width it needs (it is shortened only when there is no room), the trailing
- * icons stay at the right edge, and without a badge the name simply takes the space as before.
+ * Puts [badge] in the same column on every card: a fixed distance from the right edge of the header line, left of the
+ * icons on the right (more icons push it further left). The name gets the width up to the badge (it is shortened only
+ * when there is no room), [trailing] stays at the right edge of this row, and without a badge the name simply takes
+ * the space as before. [extraRight] is the width of the icons that sit to the right of this row on the same line.
  */
 @Composable
 fun NameRowWithCenteredBadge(
@@ -88,23 +89,32 @@ fun NameRowWithCenteredBadge(
         val badgePlaceable = measurables[1].measure(loose)
         val gap = if (badge != null) MIN_BADGE_GAP.roundToPx() else 0
         val maxWidth = if (constraints.hasBoundedWidth) constraints.maxWidth else Constraints.Infinity
+        val extra = extraRight()
+        // The badge sits in the same column on every card: a fixed distance from the right edge of the whole header
+        // line (this row plus the icons to its right), wide enough for the usual icons; with more icons than that it
+        // moves left so it never covers them.
+        val zone = max(BADGE_ZONE.roundToPx(), trailingPlaceable.width + extra + gap)
+        val badgeRightFromEnd = if (maxWidth == Constraints.Infinity) Constraints.Infinity else maxWidth + extra - zone
         val nameRoom =
-            if (maxWidth == Constraints.Infinity) Constraints.Infinity
-            else (maxWidth - trailingPlaceable.width - badgePlaceable.width - 2 * gap).coerceAtLeast(0)
+            when {
+                maxWidth == Constraints.Infinity -> Constraints.Infinity
+                badge == null -> (maxWidth - trailingPlaceable.width - gap).coerceAtLeast(0)
+                else -> (badgeRightFromEnd - badgePlaceable.width - gap).coerceAtLeast(0)
+            }
         val namePlaceable = measurables[0].measure(Constraints(maxWidth = nameRoom))
         val height = max(namePlaceable.height, max(badgePlaceable.height, trailingPlaceable.height))
-        val width = if (maxWidth == Constraints.Infinity) namePlaceable.width + badgePlaceable.width + trailingPlaceable.width else maxWidth
+        val width =
+            if (maxWidth == Constraints.Infinity) {
+                namePlaceable.width + badgePlaceable.width + trailingPlaceable.width
+            } else {
+                maxWidth
+            }
         val trailingX = width - trailingPlaceable.width
-        val free = trailingX - namePlaceable.width
-        // With no icons on the right the badge stays at the right edge, as before.
-        // [extraRight] is the width of the icons that sit to the right of this row (in the same line): the badge is
-        // centred between the end of the name and those icons, but never over the icon of this row.
         val badgeX =
-            if (trailingPlaceable.width == 0) width - badgePlaceable.width
-            else {
-                val regionEnd = width + extraRight()
-                val centred = namePlaceable.width + ((regionEnd - namePlaceable.width - badgePlaceable.width) / 2)
-                centred.coerceAtMost(trailingX - gap - badgePlaceable.width).coerceAtLeast(namePlaceable.width + gap.coerceAtMost(free / 2))
+            when {
+                badge == null -> 0
+                maxWidth == Constraints.Infinity -> namePlaceable.width + gap
+                else -> (badgeRightFromEnd - badgePlaceable.width).coerceAtLeast(namePlaceable.width + gap)
             }
         layout(width, height) {
             namePlaceable.placeRelative(0, (height - namePlaceable.height) / 2)
@@ -115,3 +125,6 @@ fun NameRowWithCenteredBadge(
 }
 
 private val MIN_BADGE_GAP = 4.dp
+
+/** Distance from the right edge of the header line to the right edge of the neighbour badge (room for about four icons). */
+private val BADGE_ZONE = 104.dp

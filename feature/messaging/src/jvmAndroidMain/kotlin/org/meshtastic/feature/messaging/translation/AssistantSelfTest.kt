@@ -32,8 +32,55 @@ internal object AssistantSelfTest {
     const val CHAT = "/rozmowa"
     const val KNOWLEDGE = "/baza"
     const val HARDWARE = "/sprzet"
+    const val TRANSLATE = "/tlumacz"
 
-    val commands: List<String> = listOf(COMMAND, TOOLS, CHAT, KNOWLEDGE, HARDWARE)
+    val commands: List<String> = listOf(COMMAND, TOOLS, CHAT, KNOWLEDGE, TRANSLATE, HARDWARE)
+
+    /** One translation test: [keep] are the things (names, numbers, links) that must stay exactly as they are. */
+    class Translation(val text: String, val from: String, val to: String, val keep: List<String> = emptyList())
+
+    private const val PL = "pol_Latn"
+    private const val EN = "eng_Latn"
+    private const val DE = "deu_Latn"
+    private const val CS = "ces_Latn"
+    private const val UK = "ukr_Cyrl"
+    private const val FR = "fra_Latn"
+    private const val ES = "spa_Latn"
+
+    /** The translator test (the same for every model, so the results can be compared). */
+    val translations: List<Translation> =
+        listOf(
+            Translation("Dzień dobry, jestem na miejscu.", PL, EN),
+            Translation("Wracam za godzinę, nie czekajcie na mnie.", PL, EN),
+            Translation("Węzeł SM_Base ma 56% baterii i słyszy 14 węzłów.", PL, EN, listOf("SM_Base", "56", "14")),
+            Translation("Zasięg do Łysicy wynosi 54 km przy antenie 5 dBi.", PL, EN, listOf("54", "5 dBi")),
+            Translation("Zmień region na EU_868 i ustaw limit skoków na 3.", PL, EN, listOf("EU_868", "3")),
+            Translation("Sprawdź kanał LongFast, bo SNR spadł do -12 dB.", PL, EN, listOf("LongFast", "-12")),
+            Translation("Mapa jest tutaj: https://meshtastic-swietokrzyskie.pl/mapa", PL, EN, listOf("https://meshtastic-swietokrzyskie.pl/mapa")),
+            Translation("Czy ktoś słyszy węzeł SP7UNR_atk-20 w okolicy Kielc?", PL, EN, listOf("SP7UNR_atk-20", "Kielc")),
+            Translation("Antena ćwierćfalowa na 868 MHz ma około 8,6 cm.", PL, EN, listOf("868", "8,6")),
+            Translation("Proszę o pomoc, mam słaby zasięg i rozładowaną baterię.", PL, EN),
+            Translation("Spotkanie sieci w sobotę o 10:30 przy radiostacji.", PL, EN, listOf("10:30")),
+            Translation("Good morning, I am on the hill and can hear three nodes.", EN, PL),
+            Translation("The battery of node SM_Mobile is at 56 percent.", EN, PL, listOf("SM_Mobile", "56")),
+            Translation("Please set the region to EU_868 and restart the device.", EN, PL, listOf("EU_868")),
+            Translation("My signal is weak, can anyone relay my message?", EN, PL),
+            Translation("The range between the two nodes is 12.5 km.", EN, PL, listOf("12.5")),
+            Translation("Meet me at 14:00 near the tower, channel LongFast.", EN, PL, listOf("14:00", "LongFast")),
+            Translation("Do you hear my node, SNR is 8 dB?", EN, PL, listOf("8 dB")),
+            Translation("Dzień dobry, czy ktoś słyszy mój węzeł?", PL, DE),
+            Translation("Bateria ma 40%, wracam do domu.", PL, DE, listOf("40")),
+            Translation("Gdzie jest najbliższy router?", PL, CS),
+            Translation("Węzeł SM_Base działa od 12 dni.", PL, CS, listOf("SM_Base", "12")),
+            Translation("Dobry wieczór, odbieram Was głośno i wyraźnie.", PL, UK),
+            Translation("Zmieniam kanał na LongFast.", PL, UK, listOf("LongFast")),
+            Translation("Je suis arrivé, la batterie est à 80 %.", FR, PL, listOf("80")),
+            Translation("¿Alguien oye mi nodo? Estoy en la montaña.", ES, PL),
+            Translation("Guten Tag, ich höre den Knoten SM_Base mit 12 dB.", DE, PL, listOf("SM_Base", "12")),
+            Translation("Test zasięgu: 3 km, 5 km, 10 km, bez przeszkód.", PL, EN, listOf("3 km", "5 km", "10 km")),
+            Translation("Uwaga: jutro aktualizacja firmware MT_SW_FIRMWARE v3.", PL, EN, listOf("MT_SW_FIRMWARE", "v3")),
+            Translation("Dziękuję za pomoc, do usłyszenia!", PL, EN),
+        )
 
     fun isCommand(text: String): Boolean = commands.any { it.equals(text.trim(), ignoreCase = true) }
 
