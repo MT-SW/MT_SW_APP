@@ -24,6 +24,9 @@ interface AiTextEngine {
     /** Name of the chip the loaded model runs on (for example GPU or CPU); empty while nothing is loaded. */
     val activeBackend: String
 
+    /** What happened at the last start of the model, attempt by attempt (empty before the first start); for `/sprzet`. */
+    val startReport: String get() = ""
+
     /** How many tokens (question, data and answer together) the model keeps in its window. */
     fun contextTokens(modelId: String): Int
 

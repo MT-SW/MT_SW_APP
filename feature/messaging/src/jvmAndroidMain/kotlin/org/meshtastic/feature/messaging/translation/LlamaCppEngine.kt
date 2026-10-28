@@ -77,6 +77,10 @@ class LlamaCppEngine(
     override var activeBackend: String = ""
         private set
 
+    @Volatile
+    override var startReport: String = ""
+        private set
+
     init {
         store.beforeModelDelete = { unloadNow() }
         store.unloadAll = { unloadNow() }
@@ -338,6 +342,8 @@ class LlamaCppEngine(
             }
         }
         var failure: Throwable? = null
+        val tried = StringBuilder()
+        startReport = ""
         for (attempt in attempts) {
             val program =
                 attempt.program
@@ -358,6 +364,8 @@ class LlamaCppEngine(
                     throw e
                 }
                 failure = e
+                tried.append("- ${attempt.name}: failed (${e.message}). ${started.logTail().takeLast(REPORT_TAIL).trim()}\n")
+                startReport = tried.toString()
                 Logger.w(tag = TAG, throwable = e) { "${attempt.name} did not start: ${e.message}\n${started.logTail().takeLast(MAX_TAIL)}" }
                 started.stop()
                 giveUp()
@@ -365,6 +373,8 @@ class LlamaCppEngine(
             }
             if (attempt.requireGpu && !gpuTookPart()) {
                 // The program started, but the chip did nothing (no driver, no support): not worth keeping here.
+                tried.append("- ${attempt.name}: started, but the chip was not used. ${started.logTail().takeLast(REPORT_TAIL).trim()}\n")
+                startReport = tried.toString()
                 Logger.w(tag = TAG) { "${attempt.name}: the chip was not used\n${started.logTail().takeLast(MAX_TAIL)}" }
                 giveUp()
                 started.stop()
@@ -374,6 +384,8 @@ class LlamaCppEngine(
             loadedId = modelId
             loadedHearing = hearing
             activeBackend = describeBackend(attempt)
+            tried.append("- ${attempt.name}: works\n")
+            startReport = tried.toString()
             store.reportLoaded(TAG, modelId)
             Logger.i(tag = TAG) { "Model ${model.name} runs: $activeBackend" }
             return started
@@ -512,6 +524,7 @@ class LlamaCppEngine(
         const val READ_TIMEOUT_MS = 10 * 60 * 1000
         const val MAX_ERROR = 300
         const val MAX_TAIL = 4000
+        const val REPORT_TAIL = 500
         const val MAX_REPORT = 4000
         /** About 600 tokens of quiet thinking: past that the model is stopped and asked again without thinking. */
         const val MAX_THINKING_CHARS = 2400

@@ -149,7 +149,8 @@ class LlamaAssistantService(
                     "Model: ${info?.name ?: modelId} (${info?.family.orEmpty()})\n" +
                         "Size: ${info?.sizeMb ?: 0} MB, memory while running: about ${info?.ramMb ?: 0} MB\n" +
                         "Where it runs: ${engine.activeBackend.ifBlank { "not started yet (ask any question first)" }}\n" +
-                        "Context: ${runCatching { engine.contextTokens(modelId) }.getOrDefault(0)} tokens"
+                        "Context: ${runCatching { engine.contextTokens(modelId) }.getOrDefault(0)} tokens" +
+                        engine.startReport.takeIf { it.isNotBlank() }?.let { "\nLast start:\n$it" }.orEmpty()
                 println("===== ASSISTANT HARDWARE =====\n$report")
                 onResult(command, report)
                 return@withContext

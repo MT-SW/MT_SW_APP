@@ -80,6 +80,8 @@ class AiEngineRouter(
 
     override val activeBackend: String get() = llama.activeBackend
 
+    override val startReport: String get() = llama.startReport
+
     override fun contextTokens(modelId: String): Int = llama.contextTokens(modelId)
 
     override suspend fun chat(
