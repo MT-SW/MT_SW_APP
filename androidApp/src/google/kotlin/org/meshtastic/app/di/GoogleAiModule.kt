@@ -99,11 +99,11 @@ class GoogleAiModule {
 
     @Single
     fun aiModelStoreImpl(context: Context, translator: NllbTranslator, installer: ModelServerInstaller): AiModelStoreImpl {
-        // The language model program exists only for 64-bit phones; there is no speech program for a phone.
+        // The language model and speech programs exist only for 64-bit phones.
         AiModels.platform = AiPlatform.ANDROID
         AiModels.unavailableEngines =
             buildSet {
-                add(AiEngine.WHISPER_CPP)
+                if (!installer.whisperSupported) add(AiEngine.WHISPER_CPP)
                 if (!installer.llamaSupported) add(AiEngine.LLAMA_CPP)
             }
         return AiModelStoreImpl(translator, File(context.filesDir, "models"), installer)
@@ -113,7 +113,13 @@ class GoogleAiModule {
 
     @Single
     fun aiTextEngine(context: Context, store: AiModelStoreImpl, installer: ModelServerInstaller): AiTextEngine =
-        AiEngineRouter(store, LlamaCppEngine(store, installer, File(context.filesDir, "engine-logs")), null)
+        File(context.filesDir, "engine-logs").let { logs ->
+            AiEngineRouter(
+                store,
+                LlamaCppEngine(store, installer, logs),
+                if (installer.whisperSupported) WhisperCppEngine(store, installer, logs) else null,
+            )
+        }
 
     @Single
     fun aiTranslationRouter(

@@ -154,9 +154,19 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
 
     /** The whisper.cpp program (processor only); null where the project publishes none (a Mac). */
     fun whisperAsset(): Asset? {
+        if (android) {
+            // The whisper.cpp project publishes no Android program: our own build (workflow "Build whisper.cpp for Android").
+            if (!llamaSupported) return null
+            return Asset(
+                url = "https://github.com/MT-SW/MT_SW_APP/releases/download/engines-$LLAMA_TAG/whisper-$WHISPER_REF-android-arm64.tar.gz",
+                folder = "whisper-$WHISPER_REF-android-arm64",
+                exeName = "whisper-server",
+                sizeMb = WHISPER_ANDROID_MB,
+            )
+        }
         val file =
             when {
-                android || mac -> return null
+                mac -> return null
                 windows -> if (arm) "whisper-bin-win-cpu-arm64.zip" else "whisper-bin-x64.zip"
                 else -> if (arm) "whisper-bin-ubuntu-arm64.tar.gz" else "whisper-bin-ubuntu-x64.tar.gz"
             }
@@ -232,7 +242,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
 
     /** The Android archive carries many tools the app does not use (benchmarks, quantizers, ...); they only take space. */
     private fun prune(dir: File) {
-        val keep = Regex("llama-server|libllama-server-impl\\.so|libllama\\.so|libllama-common\\.so|libggml.*\\.so|libmtmd\\.so|LICENSE")
+        val keep = Regex("whisper-server|llama-server|libllama-server-impl\\.so|libllama\\.so|libllama-common\\.so|libggml.*\\.so|libmtmd\\.so|LICENSE")
         dir.walkTopDown().filter { it.isFile && !keep.matches(it.name) }.forEach { it.delete() }
         // The remote-procedure backend is not used.
         File(dir, "libggml-rpc.so").delete()
@@ -308,6 +318,9 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
         /** The llama.cpp build the app is tested with. */
         const val LLAMA_TAG = "b11960"
 
+        /** The whisper.cpp source version of the Android build (our own, see the workflow). */
+        const val WHISPER_REF = "v1.9.5"
+
         /** The whisper.cpp build the app is tested with. */
         const val WHISPER_TAG = "b5454"
 
@@ -321,6 +334,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
         private const val LLAMA_LINUX_MB = 35
         private const val LLAMA_CPU_MB = 24
         private const val WHISPER_MB = 10
+        private const val WHISPER_ANDROID_MB = 3
         private const val READY_MARK = ".installed"
         private const val ARCHIVE_PART = ".archive.part"
         private const val DOWNLOAD_SHARE = 0.9f

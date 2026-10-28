@@ -1,14 +1,22 @@
 # Builds the llama.cpp server for Android phones in two variants and puts them on this project's release page, where
 # the app fetches them: "opencl" (Snapdragon / Adreno graphics) and "vulkan" (any phone with a Vulkan driver).
 # The app tries them in that order and falls back to the processor build. Run by hand: Actions -> Run workflow.
-name: Build llama.cpp for Android (graphics card)
+name: Build llama.cpp and whisper.cpp for Android
 
 on:
+  # Runs by itself when this file is pushed to GitHub (so nothing has to be clicked), and by hand when needed.
+  push:
+    paths:
+      - ".github/workflows/build-llama-android.yml"
   workflow_dispatch:
     inputs:
       llama_tag:
         description: "llama.cpp tag (must match LLAMA_TAG in ModelServerInstaller)"
         default: "b11960"
+        required: true
+      whisper_ref:
+        description: "whisper.cpp version (must match WHISPER_REF in ModelServerInstaller)"
+        default: "v1.9.5"
         required: true
 
 permissions:
@@ -22,9 +30,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="engines-${{ inputs.llama_tag }}"
+          TAG="engines-${{ inputs.llama_tag || 'b11960' }}"
           gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
-            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "AI engines ${{ inputs.llama_tag }}" \
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "AI engines ${{ inputs.llama_tag || 'b11960' }}" \
               --notes "Programs the app downloads for its AI models. Do not delete." --prerelease
 
   build:
@@ -36,7 +44,7 @@ jobs:
         kind: [opencl, vulkan]
     steps:
       - name: Get llama.cpp
-        run: git clone --depth 1 --branch "${{ inputs.llama_tag }}" https://github.com/ggml-org/llama.cpp llama.cpp
+        run: git clone --depth 1 --branch "${{ inputs.llama_tag || 'b11960' }}" https://github.com/ggml-org/llama.cpp llama.cpp
 
       - name: Tools
         run: |
@@ -80,11 +88,49 @@ jobs:
           mkdir pack
           cp build/bin/llama-server pack/
           cp llama.cpp/LICENSE pack/
-          tar -czf "llama-${{ inputs.llama_tag }}-android-arm64-${{ matrix.kind }}.tar.gz" -C pack .
+          tar -czf "llama-${{ inputs.llama_tag || 'b11960' }}-android-arm64-${{ matrix.kind }}.tar.gz" -C pack .
           ls -l *.tar.gz
 
       - name: Publish on the release page
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release upload "engines-${{ inputs.llama_tag }}" --repo "$GITHUB_REPOSITORY" --clobber llama-*-android-arm64-${{ matrix.kind }}.tar.gz
+          gh release upload "engines-${{ inputs.llama_tag || 'b11960' }}" --repo "$GITHUB_REPOSITORY" --clobber llama-*-android-arm64-${{ matrix.kind }}.tar.gz
+
+  whisper:
+    needs: release
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Get whisper.cpp
+        run: git clone --depth 1 --branch "${{ inputs.whisper_ref || 'v1.9.5' }}" https://github.com/ggml-org/whisper.cpp whisper.cpp
+
+      - name: Tools
+        run: |
+          NDK="${ANDROID_NDK_LATEST_HOME:-$ANDROID_NDK_HOME}"
+          echo "NDK=$NDK" >> "$GITHUB_ENV"
+          sudo apt-get update
+          sudo apt-get install -y ninja-build
+
+      - name: Build whisper-server (processor only)
+        run: |
+          cmake -S whisper.cpp -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE="$NDK/build/cmake/android.toolchain.cmake" \
+            -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-28 -DANDROID_STL=c++_static \
+            -DBUILD_SHARED_LIBS=OFF -DGGML_NATIVE=OFF -DGGML_OPENMP=OFF \
+            -DCMAKE_C_FLAGS="-march=armv8.2-a+dotprod" -DCMAKE_CXX_FLAGS="-march=armv8.2-a+dotprod" \
+            -DWHISPER_BUILD_TESTS=OFF -DWHISPER_SDL2=OFF -DWHISPER_BUILD_EXAMPLES=ON
+          cmake --build build --target whisper-server
+
+      - name: Pack
+        run: |
+          mkdir pack
+          cp "$(find build -name whisper-server -type f | head -n 1)" pack/
+          cp whisper.cpp/LICENSE pack/
+          tar -czf "whisper-${{ inputs.whisper_ref || 'v1.9.5' }}-android-arm64.tar.gz" -C pack .
+          ls -l *.tar.gz
+
+      - name: Publish on the release page
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "engines-${{ inputs.llama_tag || 'b11960' }}" --repo "$GITHUB_REPOSITORY" --clobber whisper-*-android-arm64.tar.gz
