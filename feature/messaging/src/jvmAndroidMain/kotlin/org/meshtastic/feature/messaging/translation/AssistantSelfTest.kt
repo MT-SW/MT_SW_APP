@@ -34,7 +34,17 @@ internal object AssistantSelfTest {
     const val HARDWARE = "/sprzet"
     const val TRANSLATE = "/tlumacz"
 
-    val commands: List<String> = listOf(COMMAND, TOOLS, CHAT, KNOWLEDGE, TRANSLATE, HARDWARE)
+    /** A short version of /test (about a tenth of everything, evenly picked from each group): a first ranking in minutes. */
+    const val QUICK = "/szybki"
+
+    val commands: List<String> = listOf(COMMAND, QUICK, TOOLS, CHAT, KNOWLEDGE, TRANSLATE, HARDWARE)
+
+    private const val QUICK_STEP = 10
+    private const val QUICK_TRANSLATION_STEP = 4
+
+    /** The translation cases of a command: all of them, or every few of them for /szybki. */
+    fun translationsFor(command: String): List<Translation> =
+        if (command.equals(QUICK, ignoreCase = true)) translations.filterIndexed { i, _ -> i % QUICK_TRANSLATION_STEP == 0 } else translations
 
     /** One translation test: [keep] are the things (names, numbers, links) that must stay exactly as they are. */
     class Translation(val text: String, val from: String, val to: String, val keep: List<String> = emptyList())
@@ -88,8 +98,16 @@ internal object AssistantSelfTest {
     const val RESULT_FILE = "assistant-test-results.md"
 
     /** The questions of one command (/test = all of them). */
-    fun questions(node: String, channel: String, command: String = COMMAND): List<Question> =
-        all(node, channel).filter { command.equals(COMMAND, ignoreCase = true) || it.group.equals(command, ignoreCase = true) }
+    fun questions(node: String, channel: String, command: String = COMMAND): List<Question> {
+        val every = all(node, channel)
+        return when {
+            command.equals(COMMAND, ignoreCase = true) -> every
+            command.equals(QUICK, ignoreCase = true) ->
+                // Evenly spaced picks inside each group, so every kind of question is there.
+                every.groupBy { it.group }.values.flatMap { group -> group.filterIndexed { i, q -> i % QUICK_STEP == 0 && !q.followUp } }
+            else -> every.filter { it.group.equals(command, ignoreCase = true) }
+        }
+    }
 
     private fun all(node: String, channel: String): List<Question> =
         listOf(

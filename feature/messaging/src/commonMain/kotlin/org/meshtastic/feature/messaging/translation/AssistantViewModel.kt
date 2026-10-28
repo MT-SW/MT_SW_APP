@@ -248,6 +248,6 @@ class AssistantViewModel(
             mapOf('ą' to 'a', 'ć' to 'c', 'ę' to 'e', 'ł' to 'l', 'ń' to 'n', 'ó' to 'o', 'ś' to 's', 'ź' to 'z', 'ż' to 'z')
 
         /** /test runs everything; the others run one group (tools, free chat, knowledge base, hardware report). */
-        val SELF_TEST_COMMANDS = listOf(SELF_TEST, "/narzedzia", "/rozmowa", "/baza", "/tlumacz", "/sprzet")
+        val SELF_TEST_COMMANDS = listOf(SELF_TEST, "/szybki", "/narzedzia", "/rozmowa", "/baza", "/tlumacz", "/sprzet")
     }
 }

@@ -182,12 +182,13 @@ class LlamaAssistantService(
                 onResult(q.text, answer)
                 previous = history + AssistantTurn(false, text)
             }
-            if (command.equals(AssistantSelfTest.COMMAND, ignoreCase = true) || command.equals(AssistantSelfTest.TRANSLATE, ignoreCase = true)) {
+            val cases = if (command.equals(AssistantSelfTest.COMMAND, ignoreCase = true) || command.equals(AssistantSelfTest.TRANSLATE, ignoreCase = true) || command.equals(AssistantSelfTest.QUICK, ignoreCase = true)) AssistantSelfTest.translationsFor(command) else emptyList()
+            if (cases.isNotEmpty()) {
                 // The translator part: the same sentences for every model; names, numbers and links must stay as they are.
                 val tModel = translatorTestModel(modelId)
                 val translator = GemmaTranslator(engine)
-                report.append("\n# Translation test\n\nModel: $tModel, sentences: ${AssistantSelfTest.translations.size}\n")
-                for ((i, c) in AssistantSelfTest.translations.withIndex()) {
+                report.append("\n# Translation test\n\nModel: $tModel, sentences: ${cases.size}\n")
+                for ((i, c) in cases.withIndex()) {
                     val started = org.meshtastic.core.common.util.nowMillis
                     val out =
                         try {
@@ -202,7 +203,7 @@ class LlamaAssistantService(
                     val missing = c.keep.filter { !out.contains(it, ignoreCase = true) }
                     val verdict = if (missing.isEmpty()) "kept: OK" else "MISSING: ${missing.joinToString()}"
                     val block = "\n## T${i + 1}. ${c.from} -> ${c.to}\nTime: $seconds s\nText: ${c.text}\nTranslation: $out\nCheck: $verdict\n"
-                    println("===== TRANSLATION TEST ${i + 1}/${AssistantSelfTest.translations.size} =====$block")
+                    println("===== TRANSLATION TEST ${i + 1}/${cases.size} =====$block")
                     report.append(block)
                     file?.let { f -> runCatching { f.writeText(report.toString()) } }
                     onResult("${c.from} -> ${c.to}: ${c.text}", "$out\n($verdict)")
