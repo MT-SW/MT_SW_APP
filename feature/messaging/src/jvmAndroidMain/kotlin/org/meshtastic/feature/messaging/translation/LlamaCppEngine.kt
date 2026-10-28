@@ -292,14 +292,46 @@ class LlamaCppEngine(
         val window = contextTokens(modelId)
         val mainProgram = installer.installLlama()
         val attempts = buildList {
-            // A phone: our graphics card builds first (OpenCL on a Snapdragon, then Vulkan), each only counts when the
-            // log shows that the card really took part of the model.
+            // A phone with a Snapdragon: the NPU (Hexagon) first. Its memory is split into sessions of about 2 GB, so a
+            // bigger model gets more sessions (layers spread over them).
+            installer.androidNpuAsset()?.takeIf { !installer.isBroken(it, modelId) }?.let { asset ->
+                val sessions = ((model.sizeMb + NPU_SESSION_MB - 1) / NPU_SESSION_MB).coerceIn(1, MAX_NPU_SESSIONS)
+                val devices = (0 until sessions).joinToString(",") { "HTP$it" }
+                add(
+                    Attempt(
+                        "NPU (Hexagon, $sessions × 2 GB) and processor", null, listOf("--device", devices), asset,
+                        requireGpu = true, npu = "Hexagon", perModel = true, vendorLibs = true,
+                        env = mapOf("GGML_HEXAGON_DEVICES" to sessions.toString()), dspLibs = true,
+                    ),
+                )
+            }
+            // A phone: our graphics card builds (OpenCL on a Snapdragon, then Vulkan), each only counts when the log
+            // shows that the card really took part of the model.
             for (asset in installer.androidGpuAssets()) {
-                add(Attempt("graphics card (${asset.folder.substringAfterLast('-')}) and processor", null, emptyList(), asset, requireGpu = true))
+                add(Attempt("graphics card (${asset.folder.substringAfterLast('-')}) and processor", null, emptyList(), asset, requireGpu = true, vendorLibs = true))
             }
             if (installer.android) {
                 add(Attempt("processor only", mainProgram, listOf("-ngl", "0")))
             } else {
+                // A computer with an Intel Core Ultra: its NPU through OpenVINO. Models that the NPU cannot run (Qwen 3.5,
+                // the biggest ones, listening) skip it; the first compilation is kept on disk for the next starts.
+                installer.intelNpuAsset()?.takeIf { model.intelNpu && !hearing && !installer.isBroken(it, modelId) }?.let { asset ->
+                    add(
+                        Attempt(
+                            "NPU (Intel) and processor", null, emptyList(), asset, requireGpu = true, npu = "Intel", perModel = true,
+                            env = mapOf("GGML_OPENVINO_DEVICE" to "NPU", "GGML_OPENVINO_CACHE_DIR" to installer.cacheDir("openvino").absolutePath),
+                        ),
+                    )
+                }
+                // A Windows computer with a Snapdragon X: the Adreno graphics card through OpenCL.
+                installer.windowsArmGpuAsset()?.takeIf { !installer.isBroken(it) }?.let { asset ->
+                    add(Attempt("graphics card (OpenCL Adreno) and processor", null, emptyList(), asset, requireGpu = true))
+                }
+                // The graphics card filled as much as possible (only a small safety margin left free), the rest of the
+                // model in the main memory. A Mac shares its memory with the system, so it keeps the normal margin.
+                if (!installer.mac) {
+                    add(Attempt("graphics card full and processor", mainProgram, listOf("--fit-target", TIGHT_GPU_MARGIN_MB.toString())))
+                }
                 add(Attempt("graphics card and processor (automatic split)", mainProgram, emptyList()))
                 add(Attempt("processor only", mainProgram, listOf("-ngl", "0")))
                 installer.llamaCpuAsset()?.let { asset -> add(Attempt("processor program", null, listOf("-ngl", "0"), asset)) }
@@ -313,7 +345,11 @@ class LlamaCppEngine(
                     ?: continue
             Logger.i(tag = TAG) { "Starting ${model.name}: ${attempt.name} (context $window tokens, hearing $hearing)" }
             val noThinking = if (model.quietThinking) emptyList() else listOf("--reasoning-budget", "0")
-            val started = startServer(program, file, hearingFile, window, attempt.extra + noThinking)
+            val started = startServer(program, file, hearingFile, window, attempt.extra + noThinking, attempt)
+            // A chip that fails is not tried again for a while (an NPU only for this model: another may fit).
+            fun giveUp() {
+                if (attempt.requireGpu) attempt.asset?.let { installer.markBroken(it, if (attempt.perModel) modelId else null) }
+            }
             try {
                 started.awaitReady("/health", LOAD_TIMEOUT_MS)
             } catch (e: Throwable) {
@@ -324,12 +360,13 @@ class LlamaCppEngine(
                 failure = e
                 Logger.w(tag = TAG, throwable = e) { "${attempt.name} did not start: ${e.message}\n${started.logTail().takeLast(MAX_TAIL)}" }
                 started.stop()
+                giveUp()
                 continue
             }
             if (attempt.requireGpu && !gpuTookPart()) {
-                // The program started, but the card did nothing (no driver, no support): not worth keeping on this phone.
-                Logger.w(tag = TAG) { "${attempt.name}: the graphics card was not used\n${started.logTail().takeLast(MAX_TAIL)}" }
-                attempt.asset?.let { installer.markBroken(it) }
+                // The program started, but the chip did nothing (no driver, no support): not worth keeping here.
+                Logger.w(tag = TAG) { "${attempt.name}: the chip was not used\n${started.logTail().takeLast(MAX_TAIL)}" }
+                giveUp()
                 started.stop()
                 continue
             }
@@ -344,22 +381,33 @@ class LlamaCppEngine(
         throw failure ?: IllegalStateException("The model program could not be started")
     }
 
+    /**
+     * One way to start the model. [requireGpu]: kept only when the log shows that the chip ([npu] names an NPU) really
+     * took part. [perModel]: a failure skips this way only for this model. [vendorLibs]: the phone's own chip drivers
+     * are needed. [dspLibs]: the NPU programs are found next to the engine. [env]: settings of the chip's driver.
+     */
     private class Attempt(
         val name: String,
         val program: File?,
         val extra: List<String>,
         val asset: ModelServerInstaller.Asset? = null,
         val requireGpu: Boolean = false,
+        val npu: String? = null,
+        val perModel: Boolean = false,
+        val vendorLibs: Boolean = false,
+        val dspLibs: Boolean = false,
+        val env: Map<String, String> = emptyMap(),
     )
 
     /** True when the log of the program that just started says that layers of the model went to the graphics card. */
     private fun gpuTookPart(): Boolean {
         val text = synchronized(report) { report.toString() }
         val layers = LAYERS.find(text)?.groupValues?.get(1)?.toIntOrNull() ?: 0
-        return layers > 0
+        // An NPU may hold the model without "offloaded ... layers" in the log: its own model buffer counts too.
+        return layers > 0 || NPU_BUFFER.containsMatchIn(text)
     }
 
-    private fun startServer(program: File, model: File, hearing: File?, window: Int, extra: List<String>): ModelServerProcess {
+    private fun startServer(program: File, model: File, hearing: File?, window: Int, extra: List<String>, attempt: Attempt): ModelServerProcess {
         val port = ModelServerProcess.freePort()
         val command = buildList {
             addAll(installer.launchPrefix(program))
@@ -374,7 +422,18 @@ class LlamaCppEngine(
             addAll(extra)
         }
         synchronized(report) { report.clear() }
-        return ModelServerProcess.start(command, program.parentFile, port, File(logDir, "llama-server.log"), File(logDir, PID_FILE)) { line ->
+        // The engine's libraries lie next to the program or in a "lib" folder beside it; the phone's chip drivers are in
+        // its vendor folders (searched last, so they never replace the engine's own files).
+        val libDirs = buildList {
+            File(program.parentFile.parentFile, "lib").takeIf { it.isDirectory }?.let { add(it.absolutePath) }
+            if (attempt.vendorLibs) addAll(VENDOR_LIB_DIRS.filter { File(it).isDirectory })
+        }
+        val env = buildMap<String, String> {
+            putAll(attempt.env)
+            // The NPU loads its own small programs from these folders (the engine's first, then the phone's).
+            if (attempt.dspLibs) put("ADSP_LIBRARY_PATH", (libDirs.take(1) + DSP_DIRS).joinToString(";"))
+        }
+        return ModelServerProcess.start(command, program.parentFile, port, File(logDir, "llama-server.log"), File(logDir, PID_FILE), env, libDirs) { line ->
             // Keep only the lines that say where the model went (card, layers), for the status shown to the user.
             if (BACKEND_LINE.containsMatchIn(line)) synchronized(report) { if (report.length < MAX_REPORT) report.appendLine(line.trim()) }
         }
@@ -387,6 +446,7 @@ class LlamaCppEngine(
         val device = DEVICE.find(text)?.groupValues?.get(1)?.trim()
         return when {
             attempt.extra.contains("0") -> "CPU"
+            attempt.npu != null -> "NPU (${attempt.npu})" + (layers?.let { ", " + it.replace("graphics card", "NPU") } ?: "")
             layers != null -> "GPU" + (device?.let { " ($it)" } ?: "") + ", $layers"
             device != null -> "GPU ($device)"
             else -> "automatic"
@@ -454,7 +514,17 @@ class LlamaCppEngine(
         /** About 600 tokens of quiet thinking: past that the model is stopped and asked again without thinking. */
         const val MAX_THINKING_CHARS = 2400
         const val MS_PER_SECOND = 1000L
-        val BACKEND_LINE = Regex("offloaded|ggml_opencl|ggml_vulkan|ggml_metal|ggml_cuda|using device|Found \\d+ (Vulkan|CUDA|Metal)", RegexOption.IGNORE_CASE)
+        val BACKEND_LINE = Regex("offloaded|ggml_opencl|ggml_vulkan|ggml_metal|ggml_cuda|ggml-hex|openvino|model buffer size|using device|Found \\d+ (Vulkan|CUDA|Metal)", RegexOption.IGNORE_CASE)
+        val NPU_BUFFER = Regex("(HTP\\d|OPENVINO|OpenVINO)\\S*\\s+model buffer size", RegexOption.IGNORE_CASE)
+        /** The phone's own driver folders (OpenCL, Vulkan and the NPU's connection library live there). */
+        val VENDOR_LIB_DIRS = listOf("/vendor/lib64", "/system/vendor/lib64", "/odm/lib64")
+        /** Where the phone keeps the NPU's own programs. */
+        val DSP_DIRS = listOf("/vendor/dsp/cdsp", "/vendor/lib/rfsa/adsp", "/vendor/dsp", "/system/lib/rfsa/adsp", "/dsp")
+        /** The NPU of a Snapdragon gives each session about 2 GB. */
+        const val NPU_SESSION_MB = 1800
+        const val MAX_NPU_SESSIONS = 4
+        /** Memory left free on a computer's graphics card when it is filled with the model (the engine's own default is 1024). */
+        const val TIGHT_GPU_MARGIN_MB = 256
         val LAYERS = Regex("offloaded (\\d+)/(\\d+) layers to GPU", RegexOption.IGNORE_CASE)
         val DEVICE = Regex("(?:ggml_vulkan: \\d+ = |using device |Device \\d+: |ggml_opencl: device: \'?)([^\\n(]+)", RegexOption.IGNORE_CASE)
         const val TRANSCRIBE_RULE =

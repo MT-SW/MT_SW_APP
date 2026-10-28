@@ -99,7 +99,6 @@ import org.meshtastic.core.resources.translator_downloading
 import org.meshtastic.core.resources.translator_ready
 import org.meshtastic.core.resources.translator_summary
 import org.meshtastic.core.resources.translator_title
-import org.meshtastic.core.ui.component.RegularPreference
 import org.meshtastic.core.ui.component.SwitchPreference
 
 /**
@@ -226,17 +225,25 @@ internal fun AiSettings() {
     // is swapped as soon as another model is chosen, or freed when its function is switched off).
     val loaded by store.loadedModels.collectAsStateWithLifecycle()
     val loadedNames = loaded.map { id -> AiModels.byId(id)?.name ?: id }.sorted().joinToString(", ")
-    RegularPreference(
-        title = stringResource(Res.string.ai_unload_title),
-        subtitle =
-        if (loaded.isEmpty()) {
-            stringResource(Res.string.ai_unload_none)
-        } else {
-            stringResource(Res.string.ai_unload_loaded, loadedNames)
-        },
-        onClick = { appScope.launch { store.unloadModels() } },
-        enabled = loaded.isNotEmpty(),
-    )
+    // Title on top, grey description below (the shared row component puts them side by side, which squeezed the title).
+    Column(
+        modifier =
+        Modifier.fillMaxWidth()
+            .clickable(enabled = loaded.isNotEmpty()) { appScope.launch { store.unloadModels() } }
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+    ) {
+        Text(text = stringResource(Res.string.ai_unload_title), style = MaterialTheme.typography.bodyLarge)
+        Text(
+            text =
+            if (loaded.isEmpty()) {
+                stringResource(Res.string.ai_unload_none)
+            } else {
+                stringResource(Res.string.ai_unload_loaded, loadedNames)
+            },
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
 
     SectionLabel(stringResource(Res.string.ai_models_title))
     val tabs =

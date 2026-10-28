@@ -166,13 +166,21 @@ internal class ModelServerProcess private constructor(
             port: Int,
             logFile: File,
             pidFile: File,
+            extraEnv: Map<String, String> = emptyMap(),
+            extraLibDirs: List<String> = emptyList(),
             onLine: (String) -> Unit,
         ): ModelServerProcess {
             val builder = ProcessBuilder(command).directory(directory).redirectErrorStream(true)
             val env = builder.environment()
-            val libs = directory.absolutePath
-            env["LD_LIBRARY_PATH"] = listOfNotNull(libs, env["LD_LIBRARY_PATH"]).joinToString(File.pathSeparator)
-            env["DYLD_LIBRARY_PATH"] = listOfNotNull(libs, env["DYLD_LIBRARY_PATH"]).joinToString(File.pathSeparator)
+            val own = listOf(directory.absolutePath) + extraLibDirs
+            env["LD_LIBRARY_PATH"] = (own + listOfNotNull(env["LD_LIBRARY_PATH"])).joinToString(File.pathSeparator)
+            env["DYLD_LIBRARY_PATH"] = (own + listOfNotNull(env["DYLD_LIBRARY_PATH"])).joinToString(File.pathSeparator)
+            // On Windows the libraries are found through PATH.
+            if (System.getProperty("os.name").orEmpty().lowercase().contains("win")) {
+                val key = env.keys.firstOrNull { it.equals("PATH", ignoreCase = true) } ?: "PATH"
+                env[key] = (own + listOfNotNull(env[key])).joinToString(File.pathSeparator)
+            }
+            env.putAll(extraEnv)
             logFile.parentFile?.mkdirs()
             val process = builder.start()
             pidOf(process)?.let { runCatching { pidFile.writeText("$it ${directory.name}") } }

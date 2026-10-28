@@ -49,7 +49,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
     /** True inside the Android app (the Java runtime there reports an Android vendor). */
     val android: Boolean = System.getProperty("java.vendor").orEmpty().contains("Android") ||
         System.getProperty("java.vm.vendor").orEmpty().contains("Android")
-    private val mac = !android && os.contains("mac")
+    val mac = !android && os.contains("mac")
     private val windows = !android && os.contains("win")
     private val arm = arch.contains("aarch64") || arch.contains("arm64")
     private val exe = if (windows) ".exe" else ""
@@ -101,17 +101,62 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
             sizeMb = LLAMA_ANDROID_GPU_MB,
         )
 
-    private fun brokenMark(asset: Asset) = File(root, ".broken-" + asset.folder)
+    private fun brokenMark(asset: Asset, key: String?) =
+        File(root, ".broken-" + asset.folder + (key?.let { "-" + it.replace(Regex("[^A-Za-z0-9._-]"), "_") } ?: ""))
 
-    private fun isBroken(asset: Asset): Boolean {
-        val mark = brokenMark(asset)
+    /** True when [asset] (with [key]: only for that model) failed here recently and is skipped for now. */
+    fun isBroken(asset: Asset, key: String? = null): Boolean {
+        val mark = brokenMark(asset, key)
         return mark.isFile && System.currentTimeMillis() - mark.lastModified() < BROKEN_RETRY_MS
     }
 
-    /** Remembers that [asset] could not be fetched or did not work on this device, so it is not tried again for a few days. */
-    fun markBroken(asset: Asset) {
-        runCatching { brokenMark(asset).apply { parentFile?.mkdirs() }.writeText("broken") }
+    /**
+     * Remembers that [asset] could not be fetched or did not work on this device, so it is not tried again for a few
+     * days. With [key] (a model id) only that model skips it: an NPU may run one model and refuse another.
+     */
+    fun markBroken(asset: Asset, key: String? = null) {
+        runCatching { brokenMark(asset, key).apply { parentFile?.mkdirs() }.writeText("broken") }
     }
+
+    /**
+     * The official llama.cpp build for Snapdragon phones with the Hexagon NPU (and the Adreno graphics card). The NPU
+     * exists on Snapdragon 8 Gen 2 and newer; on other chips the program starts without it and the app goes on.
+     */
+    fun androidNpuAsset(): Asset? {
+        if (!qualcomm) return null
+        return llama("android-arm64-snapdragon.tar.gz", LLAMA_SNAPDRAGON_MB)
+    }
+
+    /**
+     * True on a computer with an Intel Core Ultra processor, which has an NPU (Windows or Linux, 64-bit Intel). Older
+     * Intel processors and AMD ones have none that the engine can use.
+     */
+    val intelNpu: Boolean by lazy { !android && !mac && !arm && isCoreUltra() }
+
+    private fun isCoreUltra(): Boolean = runCatching {
+        val name =
+            if (windows) {
+                ProcessBuilder("reg", "query", "HKLM\\HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0", "/v", "ProcessorNameString")
+                    .redirectErrorStream(true).start().inputStream.bufferedReader().readText()
+            } else {
+                File("/proc/cpuinfo").takeIf { it.isFile }?.readLines()?.firstOrNull { it.startsWith("model name") }.orEmpty()
+            }
+        val ultra = Regex("core\\(tm\\)\\s*ultra|core\\s+ultra", RegexOption.IGNORE_CASE).containsMatchIn(name)
+        // On Linux the NPU also needs its driver (it shows up as an accelerator device).
+        ultra && (windows || File("/dev/accel").isDirectory)
+    }.getOrDefault(false)
+
+    /** The official llama.cpp build with OpenVINO (Intel CPU, graphics and NPU); null where there is no Intel NPU. */
+    fun intelNpuAsset(): Asset? {
+        if (!intelNpu) return null
+        return if (windows) llama("win-openvino-$OPENVINO_VERSION-x64.zip", LLAMA_OPENVINO_WIN_MB) else llama("ubuntu-openvino-$OPENVINO_VERSION-x64.tar.gz", LLAMA_OPENVINO_LINUX_MB)
+    }
+
+    /** On a Windows computer with a Snapdragon X (Adreno graphics): the official OpenCL build, faster there than Vulkan. */
+    fun windowsArmGpuAsset(): Asset? = if (windows && arm) llama("win-opencl-adreno-arm64.zip", LLAMA_WIN_ADRENO_MB) else null
+
+    /** A folder for the NPU's compiled models, so the slow first compilation is done only once per model. */
+    fun cacheDir(name: String): File = File(root, "cache-$name").apply { mkdirs() }
 
     /** Installs a graphics card program; null (and remembered) when it cannot be fetched. */
     suspend fun installGpu(asset: Asset): File? =
@@ -327,6 +372,13 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
         private const val LINKER = "/system/bin/linker64"
         private const val LLAMA_ANDROID_MB = 78
         private const val LLAMA_ANDROID_GPU_MB = 15
+        private const val LLAMA_SNAPDRAGON_MB = 60
+        private const val LLAMA_OPENVINO_WIN_MB = 99
+        private const val LLAMA_OPENVINO_LINUX_MB = 116
+        private const val LLAMA_WIN_ADRENO_MB = 13
+
+        /** The OpenVINO version in the names of the llama.cpp release files (changes together with [LLAMA_TAG]). */
+        const val OPENVINO_VERSION = "2026.4.1"
         private const val BROKEN_RETRY_MS = 3L * 24L * 60L * 60L * 1000L
         private val QUALCOMM_PLATFORMS = setOf("kalama", "pineapple", "sun", "taro", "lahaina", "kona", "msmnile", "lito", "bengal", "crow", "parrot", "waipio", "cliffs", "canoe")
         private const val LLAMA_MAC_MB = 16
