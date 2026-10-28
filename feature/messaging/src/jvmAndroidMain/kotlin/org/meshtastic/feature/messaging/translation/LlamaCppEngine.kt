@@ -296,16 +296,17 @@ class LlamaCppEngine(
         val window = contextTokens(modelId)
         val mainProgram = installer.installLlama()
         val attempts = buildList {
-            // A phone with a Snapdragon: the NPU (Hexagon) first. Its memory is split into sessions of about 2 GB, so a
+            // A phone with a Snapdragon: the NPU (Hexagon) first. "-ngl 99" is required: without it the NPU reports no
+            // memory to the automatic split and the whole model stays on the processor. Its memory is split into sessions of about 2 GB, so a
             // bigger model gets more sessions (layers spread over them).
             installer.androidNpuAsset()?.takeIf { !installer.isBroken(it, modelId) }?.let { asset ->
                 val sessions = ((model.sizeMb + NPU_SESSION_MB - 1) / NPU_SESSION_MB).coerceIn(1, MAX_NPU_SESSIONS)
                 val devices = (0 until sessions).joinToString(",") { "HTP$it" }
                 add(
                     Attempt(
-                        "NPU (Hexagon, $sessions × 2 GB) and processor", null, listOf("--device", devices), asset,
+                        "NPU (Hexagon, $sessions × 2 GB) and processor", null, listOf("--device", devices, "-ngl", "99"), asset,
                         requireGpu = true, npu = "Hexagon", perModel = true, vendorLibs = true,
-                        env = mapOf("GGML_HEXAGON_DEVICES" to sessions.toString()), dspLibs = true,
+                        env = mapOf("GGML_HEXAGON_NDEV" to sessions.toString()), dspLibs = true,
                     ),
                 )
             }
