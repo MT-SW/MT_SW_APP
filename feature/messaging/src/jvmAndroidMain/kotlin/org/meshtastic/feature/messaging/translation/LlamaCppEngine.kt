@@ -351,7 +351,7 @@ class LlamaCppEngine(
                 if (attempt.requireGpu) attempt.asset?.let { installer.markBroken(it, if (attempt.perModel) modelId else null) }
             }
             try {
-                started.awaitReady("/health", LOAD_TIMEOUT_MS)
+                started.awaitReady("/health", if (attempt.requireGpu) CHIP_LOAD_TIMEOUT_MS else LOAD_TIMEOUT_MS)
             } catch (e: Throwable) {
                 if (e is CancellationException) {
                     started.stop()
@@ -506,6 +506,8 @@ class LlamaCppEngine(
         const val CACHE_RAM_PHONE_MB = 256
         const val CACHE_RAM_COMPUTER_MB = 1536
         const val LOAD_TIMEOUT_MS = 10 * 60 * 1000L
+        // A chip (NPU, graphics card) that has not answered in this time is dropped, so a hanging one cannot block the start.
+        const val CHIP_LOAD_TIMEOUT_MS = 4 * 60 * 1000L
         const val CONNECT_TIMEOUT_MS = 20_000
         const val READ_TIMEOUT_MS = 10 * 60 * 1000
         const val MAX_ERROR = 300

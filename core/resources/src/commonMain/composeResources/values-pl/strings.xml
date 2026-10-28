@@ -2805,7 +2805,7 @@
     <string name="translator_warning_enable">Włącz i pobierz</string>
     <string name="translator_cancel">Anuluj</string>
     <string name="translator_download">Pobierz model (ok. %1$d MB)</string>
-    <string name="translator_downloading">Pobieranie modelu: %1$d%%</string>
+    <string name="translator_downloading">Pobieranie modelu: %1$d%</string>
     <string name="translator_cancel_download">Anuluj pobieranie</string>
     <string name="translator_ready">Model pobrany. Tłumacz działa bez internetu.</string>
     <string name="translator_delete">Usuń model z urządzenia</string>
