@@ -81,8 +81,9 @@ class AssistantViewModel(
         val current = _state.value
         val question = current.input.trim()
         if (question.isEmpty() || current.busy) return
-        if (SELF_TEST_COMMANDS.any { it.equals(question, ignoreCase = true) }) {
-            runSelfTest(question.lowercase())
+        val command = testCommand(question)
+        if (command != null) {
+            runSelfTest(command)
             return
         }
         val history =
@@ -140,6 +141,12 @@ class AssistantViewModel(
                     withContext(NonCancellable) { persist() }
                 }
             }
+    }
+
+    /** The test command typed in [text] with or without Polish letters (/tłumacz = /tlumacz), or null when it is none. */
+    private fun testCommand(text: String): String? {
+        val plain = text.trim().lowercase().map { POLISH_TO_PLAIN[it] ?: it }.joinToString("")
+        return SELF_TEST_COMMANDS.firstOrNull { it == plain }
     }
 
     /**
@@ -236,6 +243,9 @@ class AssistantViewModel(
         const val TITLE_LENGTH = 48
         const val FLUSH_MS = 120L
         const val SELF_TEST = "/test"
+
+        private val POLISH_TO_PLAIN =
+            mapOf('ą' to 'a', 'ć' to 'c', 'ę' to 'e', 'ł' to 'l', 'ń' to 'n', 'ó' to 'o', 'ś' to 's', 'ź' to 'z', 'ż' to 'z')
 
         /** /test runs everything; the others run one group (tools, free chat, knowledge base, hardware report). */
         val SELF_TEST_COMMANDS = listOf(SELF_TEST, "/narzedzia", "/rozmowa", "/baza", "/tlumacz", "/sprzet")

@@ -27,6 +27,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SecondaryScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -261,10 +262,21 @@ internal fun AiSettings() {
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
         )
     }
-    // Models grouped by family, in the order of the catalog.
-    models.groupBy { it.family }.forEach { (family, members) ->
-        SectionLabel(family)
-        members.forEach { model ->
+    // A second, smaller row of tabs: one per model family (Gemma, Qwen, Bielik, ...), so only one family is on screen.
+    val families = models.map { it.family }.distinct()
+    var familyIndex by rememberSaveable(role) { mutableIntStateOf(0) }
+    val shownIndex = familyIndex.coerceIn(0, (families.size - 1).coerceAtLeast(0))
+    if (families.size > 1) {
+        SecondaryScrollableTabRow(selectedTabIndex = shownIndex, edgePadding = 0.dp) {
+            families.forEachIndexed { index, family ->
+                // A dot marks the family of the model that is in use.
+                val label = if (current?.family == family) "$family •" else family
+                Tab(selected = shownIndex == index, onClick = { familyIndex = index }, text = { Text(label) })
+            }
+        }
+    }
+    families.getOrNull(shownIndex)?.let { family ->
+        models.filter { it.family == family }.forEach { model ->
             ModelRow(
                 model = model,
                 role = role,
