@@ -34,8 +34,15 @@ import org.meshtastic.feature.messaging.translation.AssistantService
 import org.meshtastic.feature.messaging.translation.FileAssistantHistoryStore
 import org.meshtastic.feature.messaging.translation.GemmaTranslator
 import org.meshtastic.feature.messaging.translation.LlamaAssistantService
-import org.meshtastic.feature.messaging.translation.LiteRtEngine
-import org.meshtastic.feature.messaging.translation.LiteRtDictationService
+import org.meshtastic.feature.messaging.translation.AiEngineRouter
+import org.meshtastic.feature.messaging.translation.AiTextEngine
+import org.meshtastic.feature.messaging.translation.LlamaCppEngine
+import org.meshtastic.feature.messaging.translation.ModelServerInstaller
+import org.meshtastic.feature.messaging.translation.WhisperCppEngine
+import org.meshtastic.core.repository.AiEngine
+import org.meshtastic.core.repository.AiModels
+import org.meshtastic.core.repository.AiPlatform
+import org.meshtastic.feature.messaging.translation.ModelDictationService
 import org.meshtastic.feature.messaging.translation.DictationService
 import org.meshtastic.feature.messaging.translation.UpdatableKnowledge
 import org.meshtastic.core.repository.AiModelStore
@@ -88,18 +95,30 @@ class GoogleAiModule {
         NllbTranslator(File(context.filesDir, "translator"), uiPrefs)
 
 
+    @Single fun modelServerInstaller(context: Context): ModelServerInstaller = ModelServerInstaller(File(context.filesDir, "engines"))
+
     @Single
-    fun aiModelStoreImpl(context: Context, translator: NllbTranslator): AiModelStoreImpl =
-        AiModelStoreImpl(translator, File(context.filesDir, "models"))
+    fun aiModelStoreImpl(context: Context, translator: NllbTranslator, installer: ModelServerInstaller): AiModelStoreImpl {
+        // The language model program exists only for 64-bit phones; there is no speech program for a phone.
+        AiModels.platform = AiPlatform.ANDROID
+        AiModels.unavailableEngines =
+            buildSet {
+                add(AiEngine.WHISPER_CPP)
+                if (!installer.llamaSupported) add(AiEngine.LLAMA_CPP)
+            }
+        return AiModelStoreImpl(translator, File(context.filesDir, "models"), installer)
+    }
 
     @Single fun aiModelStore(impl: AiModelStoreImpl): AiModelStore = impl
 
-    @Single fun liteRtEngine(store: AiModelStoreImpl): LiteRtEngine = LiteRtEngine(store)
+    @Single
+    fun aiTextEngine(context: Context, store: AiModelStoreImpl, installer: ModelServerInstaller): AiTextEngine =
+        AiEngineRouter(store, LlamaCppEngine(store, installer, File(context.filesDir, "engine-logs")), null)
 
     @Single
     fun aiTranslationRouter(
         translator: NllbTranslator,
-        engine: LiteRtEngine,
+        engine: AiTextEngine,
         store: AiModelStoreImpl,
         uiPrefs: UiPrefs,
     ): AiTranslationRouter = AiTranslationRouter(translator, GemmaTranslator(engine), store, uiPrefs)
@@ -124,7 +143,7 @@ class GoogleAiModule {
     @Single
     fun assistantService(
         context: Context,
-        engine: LiteRtEngine,
+        engine: AiTextEngine,
         store: AiModelStoreImpl,
         uiPrefs: UiPrefs,
         data: AssistantDataProvider,
@@ -137,8 +156,8 @@ class GoogleAiModule {
         )
 
     @Single
-    fun dictationService(engine: LiteRtEngine, store: AiModelStoreImpl, uiPrefs: UiPrefs): DictationService =
-        LiteRtDictationService(engine, store, uiPrefs)
+    fun dictationService(engine: AiTextEngine, store: AiModelStoreImpl, uiPrefs: UiPrefs): DictationService =
+        ModelDictationService(engine, store, uiPrefs)
 
     @Single fun messageTranslationService(router: AiTranslationRouter): MessageTranslationService = router
 

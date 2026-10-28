@@ -16,9 +16,6 @@
  */
 package org.meshtastic.feature.messaging.translation
 
-import com.google.ai.edge.litertlm.Tool
-import com.google.ai.edge.litertlm.ToolParam
-import com.google.ai.edge.litertlm.ToolSet
 
 /**
  * Web tools of the assistant. They exist only while the user has switched the assistant's internet access on. Web text
@@ -26,17 +23,17 @@ import com.google.ai.edge.litertlm.ToolSet
  * in a request; only the words the model chose to search for leave the device, and every one of them is remembered here
  * so the answer can show what was asked and where the information came from.
  */
-class AssistantWebTools : ToolSet {
+class AssistantWebTools : AiToolSet {
 
     private val queries = mutableListOf<String>()
     private val sources = mutableListOf<String>()
 
-    @Tool(
+    @AiTool(
         description =
         "Searches the internet. Use it only for general knowledge that is not in the app or in the user's own data. " +
             "Put only general search words in the query, never names, positions or messages of the user.",
     )
-    fun web_search(@ToolParam(description = "General search words") query: String): String {
+    fun web_search(@AiToolParam(name = "query", description = "General search words") query: String): String {
         val clean = query.trim().take(MAX_QUERY)
         if (clean.isEmpty()) return "Empty query."
         synchronized(this) { queries += clean }
@@ -53,8 +50,8 @@ class AssistantWebTools : ToolSet {
         }
     }
 
-    @Tool(description = "Reads the text of one web page (https only), for example a result of web_search.")
-    fun web_page(@ToolParam(description = "Full https address") url: String): String {
+    @AiTool(description = "Reads the text of one web page (https only), for example a result of web_search.")
+    fun web_page(@AiToolParam(name = "url", description = "Full https address") url: String): String {
         val address = url.trim()
         return try {
             WebAccess.checkAllowed(address)

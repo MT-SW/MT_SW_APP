@@ -1,0 +1,270 @@
+/*
+ * Copyright (c) 2026 Meshtastic LLC
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package org.meshtastic.feature.messaging.translation
+
+import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import org.meshtastic.core.repository.AiEngine
+import java.io.File
+import java.io.FileOutputStream
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.concurrent.TimeUnit
+import java.util.zip.ZipInputStream
+
+/**
+ * Fetches the model programs (llama.cpp and whisper.cpp servers) the first time a model needs one, from the official
+ * release pages of those projects, and unpacks them under [root]. Nothing is fetched until the user starts a model
+ * download. The kind of program (graphics card version or plain processor version) is picked from the operating system.
+ */
+class ModelServerInstaller(private val root: File) : AiEngineInstaller {
+
+    private val lock = Mutex()
+
+    /** One downloadable program: the file on the release page, the name of the program inside, its size in MB. */
+    class Asset(val url: String, val folder: String, val exeName: String, val sizeMb: Int)
+
+    private val os: String = System.getProperty("os.name").orEmpty().lowercase()
+    private val arch: String = System.getProperty("os.arch").orEmpty().lowercase()
+    /** True inside the Android app (the Java runtime there reports an Android vendor). */
+    val android: Boolean = System.getProperty("java.vendor").orEmpty().contains("Android") ||
+        System.getProperty("java.vm.vendor").orEmpty().contains("Android")
+    private val mac = !android && os.contains("mac")
+    private val windows = !android && os.contains("win")
+    private val arm = arch.contains("aarch64") || arch.contains("arm64")
+    private val exe = if (windows) ".exe" else ""
+
+    /** True when the llama.cpp program exists for this computer or phone (a 32-bit phone has none). */
+    val llamaSupported: Boolean get() = !android || (arm && arch.contains("64"))
+
+    /** True when a speech program exists for this system (none for a Mac or a phone). */
+    val whisperSupported: Boolean get() = whisperAsset() != null
+
+    /**
+     * The command words that start the program: on Android an app may not start a file from its own folder directly, so
+     * the system's own loader runs it; elsewhere the file itself.
+     */
+    fun launchPrefix(program: File): List<String> =
+        if (android && File(LINKER).isFile) listOf(LINKER, program.absolutePath) else listOf(program.absolutePath)
+
+    /** The llama.cpp program with graphics card support (Metal on a Mac, Vulkan on Windows and Linux). */
+    fun llamaAsset(): Asset {
+        val suffix =
+            when {
+                android -> "android-arm64.tar.gz"
+                mac -> if (arm) "macos-arm64.tar.gz" else "macos-x64.tar.gz"
+                windows -> if (arm) "win-vulkan-arm64.zip" else "win-vulkan-x64.zip"
+                else -> if (arm) "ubuntu-vulkan-arm64.tar.gz" else "ubuntu-vulkan-x64.tar.gz"
+            }
+        val size = if (android) LLAMA_ANDROID_MB else if (mac) LLAMA_MAC_MB else if (windows) LLAMA_WIN_MB else LLAMA_LINUX_MB
+        return llama(suffix, size)
+    }
+
+    /** The llama.cpp program for the processor only, used when the graphics card version does not start (null on a Mac and on Android: their program has both). */
+    fun llamaCpuAsset(): Asset? {
+        val suffix =
+            when {
+                android || mac -> return null
+                windows -> if (arm) "win-cpu-arm64.zip" else "win-cpu-x64.zip"
+                else -> if (arm) "ubuntu-arm64.tar.gz" else "ubuntu-x64.tar.gz"
+            }
+        return llama(suffix, LLAMA_CPU_MB)
+    }
+
+    /** The whisper.cpp program (processor only); null where the project publishes none (a Mac). */
+    fun whisperAsset(): Asset? {
+        val file =
+            when {
+                android || mac -> return null
+                windows -> if (arm) "whisper-bin-win-cpu-arm64.zip" else "whisper-bin-x64.zip"
+                else -> if (arm) "whisper-bin-ubuntu-arm64.tar.gz" else "whisper-bin-ubuntu-x64.tar.gz"
+            }
+        return Asset(
+            url = "https://github.com/ggml-org/whisper.cpp/releases/download/$WHISPER_TAG/$file",
+            folder = "whisper-$WHISPER_TAG-" + file.substringBefore('.'),
+            exeName = "whisper-server$exe",
+            sizeMb = WHISPER_MB,
+        )
+    }
+
+    private fun llama(suffix: String, sizeMb: Int) =
+        Asset(
+            url = "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMA_TAG/llama-$LLAMA_TAG-bin-$suffix",
+            folder = "llama-$LLAMA_TAG-" + suffix.substringBefore('.'),
+            exeName = "llama-server$exe",
+            sizeMb = sizeMb,
+        )
+
+    private fun assetFor(engine: AiEngine): Asset? =
+        when (engine) {
+            AiEngine.LLAMA_CPP -> llamaAsset()
+            AiEngine.WHISPER_CPP -> whisperAsset()
+            else -> null
+        }
+
+    override fun handles(engine: AiEngine): Boolean = assetFor(engine) != null
+
+    override fun missingMb(engine: AiEngine): Int = assetFor(engine)?.let { if (executable(it) == null) it.sizeMb else 0 } ?: 0
+
+    /** The program of [asset] when it is installed, or null. */
+    fun executable(asset: Asset): File? {
+        val dir = File(root, asset.folder)
+        if (!File(dir, READY_MARK).isFile) return null
+        return dir.walkTopDown().firstOrNull { it.isFile && it.name == asset.exeName }
+    }
+
+    override suspend fun ensure(engine: AiEngine, onProgress: (Float) -> Unit) {
+        val asset = assetFor(engine) ?: return
+        install(asset, onProgress)
+    }
+
+    /** Installs [asset] unless it is there already and returns its program file. */
+    suspend fun install(asset: Asset, onProgress: (Float) -> Unit = {}): File = lock.withLock {
+        executable(asset)?.let { return it }
+        withContext(Dispatchers.IO) {
+            val dir = File(root, asset.folder)
+            dir.deleteRecursively()
+            dir.mkdirs()
+            val archive = File(root, asset.folder + ARCHIVE_PART)
+            try {
+                download(asset.url, archive) { onProgress(it * DOWNLOAD_SHARE) }
+                onProgress(DOWNLOAD_SHARE)
+                unpack(archive, dir)
+                val program = dir.walkTopDown().firstOrNull { it.isFile && it.name == asset.exeName }
+                    ?: error("${asset.exeName} is missing in ${asset.url.substringAfterLast('/')}")
+                if (android) prune(dir)
+                program.setExecutable(true)
+                dir.walkTopDown().filter { it.isFile && (it.name.endsWith(".dylib") || it.name.contains(".so")) }.forEach { it.setExecutable(true) }
+                if (mac) runCatching { ProcessBuilder("xattr", "-dr", "com.apple.quarantine", dir.absolutePath).start().waitFor(UNPACK_SECONDS, TimeUnit.SECONDS) }
+                File(dir, READY_MARK).writeText(asset.url)
+                onProgress(1f)
+                Logger.i(tag = TAG) { "Installed ${asset.exeName} from ${asset.url}" }
+                program
+            } catch (e: Throwable) {
+                runCatching { dir.deleteRecursively() }
+                throw e
+            } finally {
+                archive.delete()
+            }
+        }
+    }
+
+    /** The Android archive carries many tools the app does not use (benchmarks, quantizers, ...); they only take space. */
+    private fun prune(dir: File) {
+        val keep = Regex("llama-server|libllama-server-impl\\.so|libllama\\.so|libllama-common\\.so|libggml.*\\.so|libmtmd\\.so|LICENSE")
+        dir.walkTopDown().filter { it.isFile && !keep.matches(it.name) }.forEach { it.delete() }
+        // The remote-procedure backend is not used.
+        File(dir, "libggml-rpc.so").delete()
+    }
+
+    private suspend fun download(url: String, target: File, onProgress: (Float) -> Unit) {
+        target.parentFile?.mkdirs()
+        val connection = URL(url).openConnection() as HttpURLConnection
+        try {
+            connection.connectTimeout = CONNECT_TIMEOUT_MS
+            connection.readTimeout = READ_TIMEOUT_MS
+            connection.instanceFollowRedirects = true
+            if (connection.responseCode != HttpURLConnection.HTTP_OK) error("HTTP ${connection.responseCode} for $url")
+            val total = connection.contentLengthLong
+            var written = 0L
+            FileOutputStream(target).use { out ->
+                connection.inputStream.use { input ->
+                    val buffer = ByteArray(BUFFER)
+                    while (true) {
+                        currentCoroutineContext().ensureActive()
+                        val n = input.read(buffer)
+                        if (n < 0) break
+                        out.write(buffer, 0, n)
+                        written += n
+                        if (total > 0) onProgress(written.toFloat() / total)
+                    }
+                }
+            }
+        } catch (e: CancellationException) {
+            target.delete()
+            throw e
+        } finally {
+            connection.disconnect()
+        }
+    }
+
+    private fun unpack(archive: File, into: File) {
+        if (archive.name.contains(".tar.gz") || archive.name.endsWith(ARCHIVE_PART) && !isZip(archive)) {
+            val process = ProcessBuilder("tar", "-xzf", archive.absolutePath, "-C", into.absolutePath).redirectErrorStream(true).start()
+            val output = process.inputStream.bufferedReader().readText()
+            if (!process.waitFor(UNPACK_SECONDS, TimeUnit.SECONDS) || process.exitValue() != 0) error("Unpacking failed: ${output.take(MAX_ERROR)}")
+            return
+        }
+        ZipInputStream(archive.inputStream().buffered()).use { zip ->
+            val base = into.canonicalFile
+            while (true) {
+                val entry = zip.nextEntry ?: break
+                val target = File(into, entry.name).canonicalFile
+                // An entry that points outside the folder is never written.
+                if (!target.path.startsWith(base.path + File.separator)) continue
+                if (entry.isDirectory) {
+                    target.mkdirs()
+                } else {
+                    target.parentFile?.mkdirs()
+                    FileOutputStream(target).use { zip.copyTo(it) }
+                }
+            }
+        }
+    }
+
+    private fun isZip(file: File): Boolean = file.inputStream().use { it.read() == 'P'.code && it.read() == 'K'.code }
+
+    /** Removes every installed program (they are fetched again when a model needs one). Returns the megabytes freed. */
+    fun deleteAll(): Long {
+        val size = root.walkTopDown().filter { it.isFile }.sumOf { it.length() } / MB
+        root.deleteRecursively()
+        return size
+    }
+
+    companion object {
+        private const val TAG = "ModelServerInstaller"
+
+        /** The llama.cpp build the app is tested with. */
+        const val LLAMA_TAG = "b11960"
+
+        /** The whisper.cpp build the app is tested with. */
+        const val WHISPER_TAG = "b5454"
+
+        private const val LINKER = "/system/bin/linker64"
+        private const val LLAMA_ANDROID_MB = 78
+        private const val LLAMA_MAC_MB = 16
+        private const val LLAMA_WIN_MB = 37
+        private const val LLAMA_LINUX_MB = 35
+        private const val LLAMA_CPU_MB = 24
+        private const val WHISPER_MB = 10
+        private const val READY_MARK = ".installed"
+        private const val ARCHIVE_PART = ".archive.part"
+        private const val DOWNLOAD_SHARE = 0.9f
+        private const val UNPACK_SECONDS = 120L
+        private const val MAX_ERROR = 300
+        private const val CONNECT_TIMEOUT_MS = 20_000
+        private const val READ_TIMEOUT_MS = 30_000
+        private const val BUFFER = 64 * 1024
+        private const val MB = 1024L * 1024L
+    }
+}

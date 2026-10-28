@@ -33,8 +33,15 @@ import org.meshtastic.feature.messaging.translation.AssistantService
 import org.meshtastic.feature.messaging.translation.FileAssistantHistoryStore
 import org.meshtastic.feature.messaging.translation.GemmaTranslator
 import org.meshtastic.feature.messaging.translation.LlamaAssistantService
-import org.meshtastic.feature.messaging.translation.LiteRtEngine
-import org.meshtastic.feature.messaging.translation.LiteRtDictationService
+import org.meshtastic.feature.messaging.translation.AiEngineRouter
+import org.meshtastic.feature.messaging.translation.AiTextEngine
+import org.meshtastic.feature.messaging.translation.LlamaCppEngine
+import org.meshtastic.feature.messaging.translation.ModelServerInstaller
+import org.meshtastic.feature.messaging.translation.WhisperCppEngine
+import org.meshtastic.core.repository.AiEngine
+import org.meshtastic.core.repository.AiModels
+import org.meshtastic.core.repository.AiPlatform
+import org.meshtastic.feature.messaging.translation.ModelDictationService
 import org.meshtastic.feature.messaging.translation.DictationService
 import org.meshtastic.feature.messaging.translation.UpdatableKnowledge
 import org.meshtastic.core.repository.AiModelStore
@@ -65,17 +72,33 @@ class DesktopAiModule {
         NllbTranslator(File(System.getProperty("user.home"), ".meshtastic/translator"), uiPrefs)
 
     @Single
-    fun aiModelStoreImpl(translator: NllbTranslator): AiModelStoreImpl =
-        AiModelStoreImpl(translator, File(System.getProperty("user.home"), ".meshtastic/models"))
+    fun modelServerInstaller(): ModelServerInstaller =
+        ModelServerInstaller(File(System.getProperty("user.home"), ".meshtastic/engines"))
+
+    @Single
+    fun aiModelStoreImpl(translator: NllbTranslator, installer: ModelServerInstaller): AiModelStoreImpl {
+        AiModels.platform = AiPlatform.DESKTOP
+        AiModels.unavailableEngines =
+            buildSet {
+                if (!installer.whisperSupported) add(AiEngine.WHISPER_CPP)
+                if (!installer.llamaSupported) add(AiEngine.LLAMA_CPP)
+            }
+        return AiModelStoreImpl(translator, File(System.getProperty("user.home"), ".meshtastic/models"), installer)
+    }
 
     @Single fun aiModelStore(impl: AiModelStoreImpl): AiModelStore = impl
 
-    @Single fun liteRtEngine(store: AiModelStoreImpl): LiteRtEngine = LiteRtEngine(store)
+    @Single
+    fun aiTextEngine(store: AiModelStoreImpl, installer: ModelServerInstaller): AiTextEngine {
+        val logs = File(System.getProperty("user.home"), ".meshtastic/engine-logs")
+        val whisper = if (installer.whisperSupported) WhisperCppEngine(store, installer, logs) else null
+        return AiEngineRouter(store, LlamaCppEngine(store, installer, logs), whisper)
+    }
 
     @Single
     fun aiTranslationRouter(
         translator: NllbTranslator,
-        engine: LiteRtEngine,
+        engine: AiTextEngine,
         store: AiModelStoreImpl,
         uiPrefs: UiPrefs,
     ): AiTranslationRouter = AiTranslationRouter(translator, GemmaTranslator(engine), store, uiPrefs)
@@ -99,7 +122,7 @@ class DesktopAiModule {
 
     @Single
     fun assistantService(
-        engine: LiteRtEngine,
+        engine: AiTextEngine,
         store: AiModelStoreImpl,
         uiPrefs: UiPrefs,
         data: AssistantDataProvider,
@@ -112,8 +135,8 @@ class DesktopAiModule {
         )
 
     @Single
-    fun dictationService(engine: LiteRtEngine, store: AiModelStoreImpl, uiPrefs: UiPrefs): DictationService =
-        LiteRtDictationService(engine, store, uiPrefs)
+    fun dictationService(engine: AiTextEngine, store: AiModelStoreImpl, uiPrefs: UiPrefs): DictationService =
+        ModelDictationService(engine, store, uiPrefs)
 
     @Single fun messageTranslationService(router: AiTranslationRouter): MessageTranslationService = router
 

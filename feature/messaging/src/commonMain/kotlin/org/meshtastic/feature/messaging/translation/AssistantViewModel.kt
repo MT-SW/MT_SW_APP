@@ -81,8 +81,8 @@ class AssistantViewModel(
         val current = _state.value
         val question = current.input.trim()
         if (question.isEmpty() || current.busy) return
-        if (question.equals(SELF_TEST, ignoreCase = true)) {
-            runSelfTest()
+        if (SELF_TEST_COMMANDS.any { it.equals(question, ignoreCase = true) }) {
+            runSelfTest(question.lowercase())
             return
         }
         val history =
@@ -146,12 +146,12 @@ class AssistantViewModel(
      * Typed "/test": the assistant asks itself all the test questions one after another; each question and answer
      * appears in the chat (and in the terminal and a results file on a computer). Nothing opens by itself meanwhile.
      */
-    private fun runSelfTest() {
+    private fun runSelfTest(command: String) {
         _state.update { it.copy(input = "", busy = true, failed = false) }
         job =
             viewModelScope.launch {
                 try {
-                    service.selfTest { q, a ->
+                    service.selfTest(command) { q, a ->
                         _state.update { it.copy(lines = it.lines + AssistantLine(true, q) + AssistantLine(false, a)) }
                     }
                 } catch (e: CancellationException) {
@@ -236,5 +236,8 @@ class AssistantViewModel(
         const val TITLE_LENGTH = 48
         const val FLUSH_MS = 120L
         const val SELF_TEST = "/test"
+
+        /** /test runs everything; the others run one group (tools, free chat, knowledge base, hardware report). */
+        val SELF_TEST_COMMANDS = listOf(SELF_TEST, "/narzedzia", "/rozmowa", "/baza", "/sprzet")
     }
 }

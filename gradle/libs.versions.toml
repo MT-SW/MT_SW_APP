@@ -79,7 +79,6 @@ mlkit-genai-prompt = "1.0.0-beta5"
 mlkit-language-id = "17.0.6"
 mlkit-translate = "17.0.3"
 onnxruntime = "1.22.0"
-litertlm = "0.18.1"
 
 # CameraX
 camerax = "1.7.0-rc01"
@@ -248,8 +247,6 @@ mlkit-language-id = { module = "com.google.mlkit:language-id", version.ref = "ml
 mlkit-translate = { module = "com.google.mlkit:translate", version.ref = "mlkit-translate" }
 onnxruntime = { module = "com.microsoft.onnxruntime:onnxruntime", version.ref = "onnxruntime" }
 onnxruntime-android = { module = "com.microsoft.onnxruntime:onnxruntime-android", version.ref = "onnxruntime" }
-litertlm-android = { module = "com.google.ai.edge.litertlm:litertlm-android", version.ref = "litertlm" }
-litertlm-jvm = { module = "com.google.ai.edge.litertlm:litertlm-jvm", version.ref = "litertlm" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version = "20.1.0" }
 zxing-core = { module = "com.google.zxing:core", version = "3.5.4" }
 qrcode-kotlin = { module = "io.github.g0dkar:qrcode-kotlin", version.ref = "qrcode-kotlin" }

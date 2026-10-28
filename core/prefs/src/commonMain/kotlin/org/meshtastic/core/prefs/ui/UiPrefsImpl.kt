@@ -187,6 +187,13 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_ASSISTANT_MODEL_ID] = value } }
     }
 
+    override val dictationModelId: StateFlow<String> =
+        dataStore.data.map { it[KEY_DICTATION_MODEL_ID] ?: "" }.stateIn(scope, SharingStarted.Lazily, "")
+
+    override fun setDictationModelId(value: String) {
+        scope.launch { dataStore.edit { it[KEY_DICTATION_MODEL_ID] = value } }
+    }
+
     override val hasShownNotPairedWarning: StateFlow<Boolean> =
         dataStore.data
             .map { it[KEY_HAS_SHOWN_NOT_PAIRED_WARNING_PREF] ?: false }
@@ -741,8 +748,9 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_DICTATION_EXTERNAL_MIC = booleanPreferencesKey("dictation-external-mic")
         val KEY_TRANSLATOR_MODEL_ID = stringPreferencesKey("translator-model-id")
         val KEY_ASSISTANT_MODEL_ID = stringPreferencesKey("assistant-model-id")
-        const val DEFAULT_TRANSLATOR_MODEL_ID = "nllb-600m"
-        const val DEFAULT_ASSISTANT_MODEL_ID = "gemma4-e4b"
+        val KEY_DICTATION_MODEL_ID = stringPreferencesKey("dictation-model-id")
+        const val DEFAULT_TRANSLATOR_MODEL_ID = ""
+        const val DEFAULT_ASSISTANT_MODEL_ID = ""
         val KEY_BLE_AUTO_SCAN = booleanPreferencesKey("ble-auto-scan")
         val KEY_NETWORK_AUTO_SCAN = booleanPreferencesKey("network-auto-scan")
         val KEY_SELECTED_CONNECTION_TRANSPORT = stringPreferencesKey("selected-connection-transport")

@@ -100,12 +100,6 @@
 # config/proguard/shared-rules.pro so both Android (R8) and desktop (ProGuard)
 # get the same defence-in-depth coverage against CMP 1.11 optimizer folding.
 
-# LiteRT-LM (offline Gemma models): its native library calls these classes by name through JNI, so R8 must not
-# rename or remove anything in them.
--keep class com.google.ai.edge.litertlm.** { *; }
--keep interface com.google.ai.edge.litertlm.** { *; }
--dontwarn com.google.ai.edge.litertlm.**
-
 # The assistant's tools are found through their annotations and parameter names, so they must stay as written.
 -keep class org.meshtastic.feature.messaging.translation.AssistantTools { *; }
 -keepattributes RuntimeVisibleAnnotations,RuntimeVisibleParameterAnnotations,Signature,*Annotation*

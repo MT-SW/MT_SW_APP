@@ -31,8 +31,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.meshtastic.core.repository.AiEngine
+import org.meshtastic.core.repository.AiFileKind
+import org.meshtastic.core.repository.AiModelFile
 import org.meshtastic.core.repository.AiModelInfo
 import org.meshtastic.core.repository.AiModelStore
 import org.meshtastic.core.repository.AiModels
@@ -43,15 +46,72 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /**
- * Keeps the downloaded state of every model in [AiModels.all]. The NLLB model is handled by [NllbTranslator] itself;
- * LiteRT-LM models (Gemma 4) are single files downloaded here into one folder per model under [ggufDir]. Several models can
- * be on the device at once and each is downloaded, cancelled and deleted on its own.
+ * A program a model needs besides its own files (the llama.cpp or whisper.cpp program on a computer). It is fetched
+ * together with the first model that needs it, and only when the user starts that download.
  */
-class AiModelStoreImpl(private val nllb: NllbTranslator, val ggufDir: File) : AiModelStore {
+interface AiEngineInstaller {
+    /** True when this installer provides the program for [engine]. */
+    fun handles(engine: AiEngine): Boolean
+
+    /** Size of the download in megabytes while [engine] is not installed yet, 0 when it is ready. */
+    fun missingMb(engine: AiEngine): Int
+
+    /** Downloads and unpacks the program for [engine]; [onProgress] gets 0..1. Throws when it cannot. */
+    suspend fun ensure(engine: AiEngine, onProgress: (Float) -> Unit)
+}
+
+/**
+ * Keeps the downloaded state of every model in [AiModels.all]. The NLLB model is handled by [NllbTranslator] itself;
+ * the other models are files downloaded here into one folder per model under [ggufDir]. A model's engine program (if it
+ * needs one) comes from [installer]. Several models can be on the device at once and each is downloaded, cancelled and
+ * deleted on its own.
+ */
+class AiModelStoreImpl(
+    private val nllb: NllbTranslator,
+    val ggufDir: File,
+    private val installer: AiEngineInstaller? = null,
+) : AiModelStore {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val gguf = MutableStateFlow(initialGgufStates())
     private val jobs = HashMap<String, Job>()
+
+    private val legacyFreed = MutableStateFlow(0)
+
+    /**
+     * Megabytes freed when the files of the old engine (Google LiteRT-LM) were removed at this start of the app; 0 when
+     * nothing was removed. The settings show a short notice for it.
+     */
+    override val legacyFreedMb: StateFlow<Int> = legacyFreed
+
+    init {
+        scope.launch(Dispatchers.IO) { cleanLegacyOnce() }
+    }
+
+    /**
+     * Removes what the old engine left (its model files and its cache) once, the first time the app starts with the new
+     * engine. Only files the app itself downloaded into its own model folder are touched, and never again afterwards,
+     * so a model the user downloads later is never removed by this.
+     */
+    private fun cleanLegacyOnce() {
+        val marker = File(ggufDir.parentFile ?: return, LEGACY_MARKER)
+        if (marker.exists()) return
+        var bytes = 0L
+        fun remove(file: File) {
+            if (!file.exists()) return
+            bytes += file.walkTopDown().filter { it.isFile }.sumOf { it.length() }
+            file.deleteRecursively()
+        }
+        runCatching {
+            AiModels.legacyModelIds.forEach { remove(File(ggufDir, it)) }
+            ggufDir.listFiles()?.filter { it.name == "cache" || it.name.startsWith("cache-") }?.forEach { remove(it) }
+            ggufDir.walkTopDown().filter { it.isFile && it.name.endsWith(".litertlm") }.forEach { remove(it) }
+            marker.writeText("old engine files removed")
+        }.onFailure { Logger.w(tag = TAG, throwable = it) { "Removing the old engine files failed: ${it.message}" } }
+        val mb = (bytes / MB).toInt()
+        if (mb > 0) Logger.i(tag = TAG) { "Removed the files of the old engine: $mb MB" }
+        legacyFreed.value = mb
+    }
 
     /** Called before a model is deleted so the engine can release its file first. */
     @Volatile var beforeModelDelete: (suspend () -> Unit)? = null
@@ -74,8 +134,9 @@ class AiModelStoreImpl(private val nllb: NllbTranslator, val ggufDir: File) : Ai
         }
         val dir = modelDir(model)
         dir.mkdirs()
+        val engineMb = installer?.takeIf { it.handles(model.engine) }?.missingMb(model.engine) ?: 0
         // Leave a little room beyond the model size so a nearly full disk fails early instead of half-way.
-        if (dir.usableSpace < model.sizeMb.toLong() * MB * SPACE_MARGIN) {
+        if (dir.usableSpace < (model.sizeMb + engineMb).toLong() * MB * SPACE_MARGIN) {
             setGguf(id, TranslatorModelState.Failed("not enough free space"))
             return
         }
@@ -84,10 +145,21 @@ class AiModelStoreImpl(private val nllb: NllbTranslator, val ggufDir: File) : Ai
         if (job != null) synchronized(jobs) { jobs[id] = job }
         try {
             withContext(Dispatchers.IO) {
-                for (file in model.files) {
-                    downloadFile(model, file.url, File(dir, file.fileName)) { fraction ->
-                        setGguf(id, TranslatorModelState.Downloading(fraction.coerceIn(0f, 0.99f)))
+                val total = (model.sizeMb + engineMb).toFloat().coerceAtLeast(1f)
+                var done = 0f
+                if (engineMb > 0) {
+                    installer?.ensure(model.engine) { fraction ->
+                        setGguf(id, TranslatorModelState.Downloading((fraction * engineMb / total).coerceIn(0f, 0.99f)))
                     }
+                    done += engineMb
+                }
+                for (file in model.files) {
+                    val size = fileSizeMb(model, file).toFloat()
+                    val before = done
+                    downloadFile(file, File(dir, file.fileName)) { fraction ->
+                        setGguf(id, TranslatorModelState.Downloading(((before + fraction * size) / total).coerceIn(0f, 0.99f)))
+                    }
+                    done += size
                 }
             }
             setGguf(id, TranslatorModelState.Ready)
@@ -122,32 +194,40 @@ class AiModelStoreImpl(private val nllb: NllbTranslator, val ggufDir: File) : Ai
         setGguf(id, TranslatorModelState.NotDownloaded)
     }
 
-    /** Absolute path of a downloaded GGUF model file, or null while it is not complete. */
-    fun fileOf(id: String): File? {
+    /** Absolute path of a downloaded model file (the model itself), or null while the model is not complete. */
+    fun fileOf(id: String): File? = fileOf(id, AiFileKind.MODEL)
+
+    /** Absolute path of the file of the given [kind] (for example the hearing part), or null when there is none or it is not complete. */
+    fun fileOf(id: String, kind: AiFileKind): File? {
         val model = AiModels.byId(id) ?: return null
-        val file = model.files.firstOrNull() ?: return null
+        val file = model.files.firstOrNull { it.kind == kind } ?: return null
         return File(modelDir(model), file.fileName).takeIf { isComplete(model) }
     }
 
     private fun modelDir(model: AiModelInfo) = File(ggufDir, model.id)
 
-    private fun expectedBytes(model: AiModelInfo): Long = model.sizeMb.toLong() * MB * MIN_COMPLETE_FRACTION / 100
+    /** The real size of one file; a model that does not list it falls back to the whole model size. */
+    private fun fileSizeMb(model: AiModelInfo, file: AiModelFile): Int = file.sizeMb.takeIf { it > 0 } ?: model.sizeMb
+
+    private fun expectedBytes(model: AiModelInfo, file: AiModelFile): Long =
+        fileSizeMb(model, file).toLong() * MB * MIN_COMPLETE_FRACTION / 100
 
     private fun isComplete(model: AiModelInfo): Boolean = model.files.isNotEmpty() &&
         model.files.all { f ->
             val file = File(modelDir(model), f.fileName)
-            file.isFile && file.length() >= expectedBytes(model)
+            file.isFile && file.length() >= expectedBytes(model, f)
         }
 
     private fun initialGgufStates(): Map<String, TranslatorModelState> = AiModels.all
-        .filter { it.engine == AiEngine.LITERT_LM }
+        .filter { it.engine != AiEngine.NLLB_ONNX && it.engineReady }
         .associate { it.id to (if (isComplete(it)) TranslatorModelState.Ready else TranslatorModelState.NotDownloaded) }
 
     private fun setGguf(id: String, state: TranslatorModelState) {
         gguf.update { it + (id to state) }
     }
 
-    private suspend fun downloadFile(model: AiModelInfo, url: String, target: File, onProgress: (Float) -> Unit) {
+    private suspend fun downloadFile(spec: AiModelFile, target: File, onProgress: (Float) -> Unit) {
+        val url = spec.url
         val part = File(target.parentFile, target.name + ".part")
         var attempts = 0
         while (true) {
@@ -183,7 +263,7 @@ class AiModelStoreImpl(private val nllb: NllbTranslator, val ggufDir: File) : Ai
                         }
                     }
                 }
-                if (written < expectedBytes(model)) error("Incomplete download")
+                if (written < spec.sizeMb.toLong() * MB * MIN_COMPLETE_FRACTION / 100) error("Incomplete download")
                 if (target.exists()) target.delete()
                 if (!part.renameTo(target)) error("Cannot save ${target.name}")
                 return
@@ -201,6 +281,7 @@ class AiModelStoreImpl(private val nllb: NllbTranslator, val ggufDir: File) : Ai
 
     private companion object {
         const val TAG = "AiModelStore"
+        const val LEGACY_MARKER = ".ai-engine-v2"
         const val MB = 1_000_000L
         const val MIN_COMPLETE_FRACTION = 90L
         const val SPACE_MARGIN = 1.1

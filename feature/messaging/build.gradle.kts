@@ -52,15 +52,11 @@ kotlin {
             dependencies {
                 implementation(libs.kotlinx.serialization.json)
                 compileOnly(libs.onnxruntime)
-                // Google LiteRT-LM runs the Gemma 4 models (Apache 2.0); compile against the JVM API, each platform
-                // brings its own native build below.
-                compileOnly(libs.litertlm.jvm)
             }
         }
 
         androidMain.dependencies {
             implementation(libs.onnxruntime.android)
-            implementation(libs.litertlm.android)
             implementation(libs.androidx.work.runtime.ktx)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.okhttp)
@@ -68,7 +64,6 @@ kotlin {
 
         jvmMain.dependencies {
             implementation(libs.onnxruntime)
-            implementation(libs.litertlm.jvm)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.okhttp)
         }

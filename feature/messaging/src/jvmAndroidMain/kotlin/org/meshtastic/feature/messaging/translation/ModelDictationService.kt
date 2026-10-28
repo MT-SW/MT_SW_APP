@@ -24,50 +24,38 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import org.meshtastic.core.repository.AiModels
+import org.meshtastic.core.repository.AiRole
 import org.meshtastic.core.repository.TranslatorModelState
 import org.meshtastic.core.repository.UiPrefs
 
-/** Dictation through [LiteRtEngine]; the same on every platform, no speech service of the system is needed. */
-class LiteRtDictationService(
-    private val engine: LiteRtEngine,
+/**
+ * Dictation with the model the user chose for it (a Whisper model or a Gemma model that can hear); the same on every
+ * platform, no speech service of the system is needed. Without a chosen and downloaded model, dictation is off.
+ */
+class ModelDictationService(
+    private val engine: AiTextEngine,
     private val store: AiModelStoreImpl,
     private val uiPrefs: UiPrefs,
 ) : DictationService {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
-    /** Chats and the assistant use the model chosen for the assistant (when it is on); the translator its own. */
-    private fun pick(states: Map<String, TranslatorModelState>, translator: Boolean): String? {
-        val id = if (translator) uiPrefs.translatorModelId.value else uiPrefs.assistantModelId.value
-        val on = if (translator) uiPrefs.translatorEnabled.value else uiPrefs.assistantEnabled.value
-        return id.takeIf { on && ready(states, it) }
+    private fun pick(states: Map<String, TranslatorModelState>, id: String): String? {
+        val model = AiModels.byId(id) ?: return null
+        return id.takeIf { model.canDo(AiRole.DICTATION) && model.engineReady && states[id] == TranslatorModelState.Ready }
     }
 
-    override val available: StateFlow<Boolean> = flowFor(translator = false)
+    override val available: StateFlow<Boolean> = flow()
 
-    override val translatorAvailable: StateFlow<Boolean> = flowFor(translator = true)
+    // One model serves both: what is dictated for the chat and what is dictated for the translator.
+    override val translatorAvailable: StateFlow<Boolean> = flow()
 
-    private fun flowFor(translator: Boolean): StateFlow<Boolean> =
-        combine(
-            store.states,
-            uiPrefs.assistantEnabled,
-            uiPrefs.assistantModelId,
-            uiPrefs.translatorEnabled,
-            uiPrefs.translatorModelId,
-        ) { states, _, _, _, _ ->
-            pick(states, translator) != null
-        }
+    private fun flow(): StateFlow<Boolean> =
+        combine(store.states, uiPrefs.dictationModelId) { states, id -> pick(states, id) != null }
             .stateIn(scope, SharingStarted.Eagerly, false)
 
     override suspend fun transcribe(wav: ByteArray, translator: Boolean): String {
-        val id = checkNotNull(pick(store.states.value, translator)) { "Dictation is not available" }
+        val id = checkNotNull(pick(store.states.value, uiPrefs.dictationModelId.value)) { "Dictation is not available" }
         return engine.transcribe(id, wav)
-    }
-
-    private fun ready(states: Map<String, TranslatorModelState>, id: String) =
-        id in HEARING && states[id] == TranslatorModelState.Ready
-
-    private companion object {
-        val HEARING = listOf(AiModels.GEMMA_E2B_ID, AiModels.GEMMA_E4B_ID)
     }
 }

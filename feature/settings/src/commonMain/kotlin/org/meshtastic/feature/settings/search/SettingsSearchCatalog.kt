@@ -24,7 +24,7 @@ import org.meshtastic.core.navigation.WifiProvisionRoute
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.ai_assistant_title
-import org.meshtastic.core.resources.ai_model_one_title
+import org.meshtastic.core.resources.ai_models_title
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.kb_title
 import org.meshtastic.core.resources.node_color_title
@@ -181,7 +181,7 @@ object SettingsSearchCatalog {
             Res.string.app_log_level to SettingsRoute.MtSwFeatures,
             Res.string.node_color_title to SettingsRoute.Security,
             Res.string.dictation_external_mic_title to SettingsRoute.MtSwFeatures,
-            Res.string.ai_model_one_title to SettingsRoute.MtSwFeatures,
+            Res.string.ai_models_title to SettingsRoute.MtSwFeatures,
             Res.string.ai_assistant_title to SettingsRoute.MtSwFeatures,
             Res.string.local_stats_title to SettingsRoute.Telemetry,
             Res.string.about to SettingsRoute.About,

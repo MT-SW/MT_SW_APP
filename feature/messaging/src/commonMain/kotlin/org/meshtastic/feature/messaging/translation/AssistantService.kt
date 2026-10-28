@@ -34,7 +34,7 @@ interface AssistantService {
 
     /**
      * Asks all test questions one after another and reports each one to [onResult] (question, answer); also prints them
-     * and writes a results file where the platform can. Typed in the chat as /test. Does nothing where not supported.
+     * and writes a results file where the platform can. Typed in the chat as /test (everything) or a shorter command (/narzedzia, /rozmowa, /baza, /sprzet); [command] says which. Does nothing where not supported.
      */
-    suspend fun selfTest(onResult: (question: String, answer: String) -> Unit) {}
+    suspend fun selfTest(command: String, onResult: (question: String, answer: String) -> Unit) {}
 }

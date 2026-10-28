@@ -59,7 +59,7 @@ import org.meshtastic.core.resources.ai_go_unknown_place
 import org.meshtastic.core.resources.getStringSuspend
 
 /**
- * The assistant on top of [LiteRtEngine]; it shares the loaded model with the translator.
+ * The assistant on top of [AiTextEngine]; it shares the loaded model with the translator.
  *
  * How an answer is made:
  * 1. [AssistantRouter] lets the model say WHAT is asked, in a fixed JSON shape (it cannot write anything else).
@@ -70,7 +70,7 @@ import org.meshtastic.core.resources.getStringSuspend
  * The assistant can open any place of the app, but it never changes a setting and never sends a message.
  */
 class LlamaAssistantService(
-    private val engine: LiteRtEngine,
+    private val engine: AiTextEngine,
     private val store: AiModelStoreImpl,
     private val uiPrefs: UiPrefs,
     private val data: AssistantDataProvider,
@@ -127,11 +127,29 @@ class LlamaAssistantService(
     // The node talked about last in this conversation, so "a jaka jest tam bateria?" knows which node "tam" is.
     @Volatile private var lastNode = ""
 
-    override suspend fun selfTest(onResult: (question: String, answer: String) -> Unit) {
+    override suspend fun selfTest(command: String, onResult: (question: String, answer: String) -> Unit) {
         withContext(Dispatchers.IO) {
             val modelId = activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
-            val questions = AssistantSelfTest.questions(data.sampleNodeName(), data.sampleChannelName())
-            val file = runCatching { java.io.File(System.getProperty("user.dir").orEmpty(), AssistantSelfTest.RESULT_FILE) }.getOrNull()
+            if (command.equals(AssistantSelfTest.HARDWARE, ignoreCase = true)) {
+                // No questions: only says which model runs where (graphics card or processor) and how big it is.
+                val info = AiModels.byId(modelId)
+                val report =
+                    "Model: ${info?.name ?: modelId} (${info?.family.orEmpty()})\n" +
+                        "Size: ${info?.sizeMb ?: 0} MB, memory while running: about ${info?.ramMb ?: 0} MB\n" +
+                        "Where it runs: ${engine.activeBackend.ifBlank { "not started yet (ask any question first)" }}\n" +
+                        "Context: ${runCatching { engine.contextTokens(modelId) }.getOrDefault(0)} tokens"
+                println("===== ASSISTANT HARDWARE =====\n$report")
+                onResult(command, report)
+                return@withContext
+            }
+            val questions = AssistantSelfTest.questions(data.sampleNodeName(), data.sampleChannelName(), command)
+            val resultName =
+                if (command.equals(AssistantSelfTest.COMMAND, ignoreCase = true)) {
+                    AssistantSelfTest.RESULT_FILE
+                } else {
+                    "assistant-test-${command.trim('/')}-results.md"
+                }
+            val file = runCatching { java.io.File(System.getProperty("user.dir").orEmpty(), resultName) }.getOrNull()
             val report = StringBuilder("# Assistant test\n\nModel: $modelId, questions: ${questions.size}\n")
             var totalSeconds = 0L
             var previous: List<AssistantTurn> = emptyList()
@@ -171,7 +189,7 @@ class LlamaAssistantService(
             // The whole report also lands in the chat as the last answer, so it can be copied on any device (a phone
             // has no project folder to save it to).
             val average = if (questions.isEmpty()) "0" else (kotlin.math.round(totalSeconds * 10.0 / questions.size) / 10).toString()
-            onResult(AssistantSelfTest.COMMAND, aiString(Res.string.ai_test_done, questions.size, modelId, average) + "\n\n" + report.toString())
+            onResult(command, aiString(Res.string.ai_test_done, questions.size, modelId, average) + "\n\n" + report.toString())
         }
     }
 

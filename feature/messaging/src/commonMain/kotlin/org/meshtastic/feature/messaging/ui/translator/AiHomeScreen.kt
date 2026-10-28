@@ -19,7 +19,9 @@ package org.meshtastic.feature.messaging.ui.translator
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
@@ -42,9 +44,12 @@ import org.meshtastic.core.resources.ai_tab_ai
 import org.meshtastic.core.resources.ai_tab_assistant
 import org.meshtastic.core.resources.ai_tab_translator
 import org.meshtastic.core.resources.assistant_history
+import org.meshtastic.core.resources.assistant_info_body
+import org.meshtastic.core.resources.assistant_info_title
 import org.meshtastic.core.resources.translator_open
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.icon.History
+import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.messaging.translation.AssistantViewModel
 import org.meshtastic.feature.messaging.translation.TranslatorViewModel
@@ -68,6 +73,15 @@ fun AiHomeScreen(
     val showAssistant = if (both) selected == 1 else assistantOn
 
     var showHistory by remember { mutableStateOf(false) }
+    var showInfo by remember { mutableStateOf(false) }
+    if (showInfo) {
+        AlertDialog(
+            onDismissRequest = { showInfo = false },
+            title = { Text(stringResource(Res.string.assistant_info_title)) },
+            text = { Text(stringResource(Res.string.assistant_info_body)) },
+            confirmButton = { TextButton(onClick = { showInfo = false }) { Text("OK") } },
+        )
+    }
     val savedChats by assistantViewModel.saved.collectAsStateWithLifecycle()
     if (showHistory) {
         AssistantHistoryDialog(
@@ -103,6 +117,12 @@ fun AiHomeScreen(
                 showNodeChip = false,
                 actions = {
                     if (showAssistant && assistantOn) {
+                        IconButton(onClick = { showInfo = true }) {
+                            Icon(
+                                MeshtasticIcons.Info,
+                                contentDescription = stringResource(Res.string.assistant_info_title),
+                            )
+                        }
                         IconButton(
                             onClick = {
                                 assistantViewModel.refreshSaved()

@@ -201,6 +201,12 @@ interface UiPrefs {
 
     fun setAssistantModelId(value: String)
 
+    /** Id of the downloaded model dictation uses (see AiModels); empty until the user picks one. */
+    val dictationModelId: StateFlow<String>
+        get() = kotlinx.coroutines.flow.MutableStateFlow("")
+
+    fun setDictationModelId(value: String) {}
+
     val hasShownNotPairedWarning: StateFlow<Boolean>
 
     fun setHasShownNotPairedWarning(shown: Boolean)

@@ -3060,7 +3060,7 @@
     <string name="assistant_dictate_stop">Zatrzymaj i wstaw</string>
     <string name="assistant_dictate_working">Zamieniam mowę na tekst…</string>
     <string name="assistant_disclaimer_web">Funkcja eksperymentalna: nie gwarantujemy poprawności odpowiedzi. Asystent działa na tym urządzeniu, ale internet jest WŁĄCZONY: wyszukiwane słowa są wysyłane do wyszukiwarki. Ważne informacje sprawdzaj.</string>
-    <string name="ai_dictation_note">Dyktowanie w rozmowach, tłumaczu i asystencie używa wybranego modelu AI. Słyszą tylko modele Gemma E2B i E4B; przy pozostałych modelach dyktowania nie ma.</string>
+    <string name="ai_dictation_note">Dyktowanie ma własny model, wybierany tutaj. Mowę rozumieją modele Whisper (komputer) oraz Gemma E2B / E4B.</string>
     <string name="mt_sw_other_contacts_title">Ręczne dodawanie kontaktu po ID</string>
     <string name="mt_sw_other_contacts_body">Na liście węzłów przycisk w rogu ma pozycję „Dodaj kontakt”: wpisujesz identyfikator węzła (np. !a1b2c3d4) i nazwę, a węzeł zapisuje się w Twoim urządzeniu. W szczegółach węzła (Administracja → Dodaj kontakt zdalnie) to samo zrobisz na zdalnym urządzeniu, przez sieć mesh.</string>
     <string name="import_menu_in_top_bar">Przenieś przycisk dodawania i udostępniania do górnej belki</string>
@@ -3390,4 +3390,21 @@
     <string name="kb_loading">Wczytywanie…</string>
     <string name="kb_source">Źródło: %1$s</string>
     <string name="node_layout_neighbors">Sąsiedzi przy nazwie węzła (ikona z liczbą)</string>
+    <string name="ai_models_tab_assistant">Asystent</string>
+    <string name="ai_models_tab_translator">Tłumacz</string>
+    <string name="ai_models_tab_dictation">Dyktowanie</string>
+    <string name="ai_model_choose_red">Wybierz model do zainstalowania</string>
+    <string name="ai_model_choose_downloading">Trwa pobieranie modelu…</string>
+    <string name="ai_model_recommended">zalecany</string>
+    <string name="ai_model_alternative">alternatywny</string>
+    <string name="ai_model_in_use">Używany</string>
+    <string name="ai_model_use">Użyj</string>
+    <string name="ai_model_page">Strona modelu</string>
+    <string name="ai_model_license_line">Licencja: %1$s</string>
+    <string name="ai_model_hearing">Rozumie mowę</string>
+    <string name="ai_models_empty">Brak modeli do tej funkcji na tym urządzeniu.</string>
+    <string name="ai_models_hint">Nic nie pobiera się samo. Każdy model to osobne pobranie; pierwszy instaluje też mały program silnika. Usunięcie modelu nie usuwa pozostałych.</string>
+    <string name="ai_legacy_freed">Modele starego silnika zostały usunięte. Zwolniono: %1$d MB.</string>
+    <string name="assistant_info_title">O asystencie</string>
+    <string name="assistant_info_body">Asystent odpowiada o Twojej sieci, ustawieniach aplikacji i podstawach radia. Działa na Twoim urządzeniu, na zainstalowanym modelu AI (Ustawienia → Funkcje MT_SW → Modele AI). Liczby bierze z narzędzi aplikacji, nie z pamięci modelu. Nigdy sam nie zapisuje ustawień ani nie wysyła wiadomości; najwyżej przygotuje szkic albo otworzy właściwy ekran.\n\nKomendy do wpisania w czacie:\n/test – wszystkie testy naraz (na komputerze raport zapisuje się do pliku)\n/narzedzia – jak używa narzędzi aplikacji\n/rozmowa – swobodna rozmowa\n/baza – baza wiedzy i pytania „jak to ustawić”\n/sprzet – który model działa, gdzie (karta graficzna czy procesor) i ile zajmuje</string>
 </resources>

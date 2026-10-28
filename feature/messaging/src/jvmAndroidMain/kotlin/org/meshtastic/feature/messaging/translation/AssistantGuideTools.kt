@@ -17,9 +17,6 @@
 package org.meshtastic.feature.messaging.translation
 
 import co.touchlab.kermit.Logger
-import com.google.ai.edge.litertlm.Tool
-import com.google.ai.edge.litertlm.ToolParam
-import com.google.ai.edge.litertlm.ToolSet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.StringResource
@@ -27,7 +24,7 @@ import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.about
 import org.meshtastic.core.resources.dictation_external_mic_title
-import org.meshtastic.core.resources.ai_model_one_title
+import org.meshtastic.core.resources.ai_models_title
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.node_color_pick
 import org.meshtastic.core.resources.ai_assistant_title
@@ -139,16 +136,16 @@ class AssistantActionCollector {
 class AssistantGuideTools(
     private val data: AssistantDataProvider,
     private val collector: AssistantActionCollector,
-) : ToolSet {
+) : AiToolSet {
 
-    @Tool(
+    @AiTool(
         description =
         "Adds a button that opens a screen of the app (settings pages such as LoRa, device, display, bluetooth, network, " +
             "position, power, MQTT, telemetry, MT_SW features, or the nodes, map, messages, channels, connections, " +
             "firmware and local mesh discovery screens). Use it when the user asks where something is or wants to open a screen.",
     )
     fun open_screen(
-        @ToolParam(description = "Name of the screen, for example \"lora\", \"display\", \"map\", \"nodes\"") screen: String,
+        @AiToolParam(name = "screen", description = "Name of the screen, for example \"lora\", \"display\", \"map\", \"nodes\"") screen: String,
     ): String = run("open_screen") {
         val target = bestMatch(SCREENS, screen)
             ?: return@run "No such screen. Available: " + SCREENS.joinToString { it.key }
@@ -157,14 +154,14 @@ class AssistantGuideTools(
         "A button \"$title\" was added under the answer. Tell the user to tap it."
     }
 
-    @Tool(
+    @AiTool(
         description =
         "Adds a button that opens the page of a radio or app setting and makes that setting blink with a yellow frame. " +
             "Use it for questions like where a setting is or how to change it (region, preset, hop limit, role, " +
             "screen timeout, Wi-Fi, MQTT, telemetry interval, app scale, theme, language, ...). It cannot change the setting.",
     )
     fun show_setting(
-        @ToolParam(description = "What the user wants to find, for example \"hop limit\", \"app scale\", \"region\"") setting: String,
+        @AiToolParam(name = "setting", description = "What the user wants to find, for example \"hop limit\", \"app scale\", \"region\"") setting: String,
     ): String = run("show_setting") {
         val target = bestMatch(SETTINGS, setting)
             ?: return@run "No such setting in the list. Explain where it is from the guide instead."
@@ -174,34 +171,34 @@ class AssistantGuideTools(
         "A button \"$title\" was added under the answer; it opens the page and makes the setting blink. Tell the user to tap it."
     }
 
-    @Tool(description = "Adds a button that shows a node on the map. Give the node's short or long name, or \"me\" for the own node.")
-    fun show_node_on_map(@ToolParam(description = "Node name") node: String): String = run("show_node_on_map") {
+    @AiTool(description = "Adds a button that shows a node on the map. Give the node's short or long name, or \"me\" for the own node.")
+    fun show_node_on_map(@AiToolParam(name = "node", description = "Node name") node: String): String = run("show_node_on_map") {
         val num = data.nodeNumFor(node) ?: return@run "No node called \"$node\" is known."
         val name = data.nodeNameFor(num).ifBlank { node }
         collector.add(AssistantAction(name, "$DEEP_LINK_BASE_URI/map/focus/$num"))
         "A button that shows $name on the map was added. Tell the user to tap it."
     }
 
-    @Tool(
+    @AiTool(
         description =
         "Adds a button that opens the link planner (range and terrain calculation) on the map for a node. Use it when the " +
             "user wants to check range or a radio link to or from a node.",
     )
-    fun open_link_planner(@ToolParam(description = "Node name, or \"me\"") node: String): String = run("open_link_planner") {
+    fun open_link_planner(@AiToolParam(name = "node", description = "Node name, or \"me\"") node: String): String = run("open_link_planner") {
         val num = data.nodeNumFor(node) ?: return@run "No node called \"$node\" is known."
         val name = data.nodeNameFor(num).ifBlank { node }
         collector.add(AssistantAction(name, "$DEEP_LINK_BASE_URI/map/planner/$num"))
         "A button that opens the link planner for $name was added. Tell the user to tap it."
     }
 
-    @Tool(
+    @AiTool(
         description =
         "Prepares a message: adds a button that opens the conversation with the text already in the message box. The " +
             "message is NOT sent; the user checks it and sends it himself. Use it when the user asks to write or send a message.",
     )
     fun draft_message(
-        @ToolParam(description = "The text of the message") text: String,
-        @ToolParam(description = "Channel name or number, or a node name for a direct message; the word main for the main channel") to: String,
+        @AiToolParam(name = "text", description = "The text of the message") text: String,
+        @AiToolParam(name = "to", description = "Channel name or number, or a node name for a direct message; the word main for the main channel") to: String,
     ): String = run("draft_message") {
         val message = text.trim().take(MAX_DRAFT)
         if (message.isEmpty()) return@run "The message is empty."
@@ -362,7 +359,7 @@ class AssistantGuideTools(
                 Target("language", "settings", Res.string.preferences_language, listOf("język", "language", "jezyk")),
                 Target("external_mic", "settings/mt-sw-features", Res.string.dictation_external_mic_title, listOf("mikrofon", "słuchawk", "sluchawk", "headset", "microphone", "zestaw głośnomówiący", "bluetooth mikrofon")),
                 Target("node_color", "settings/security", Res.string.node_color_pick, listOf("kolor", "color", "colour", "barw")),
-                Target("ai_model", "settings/mt-sw-features", Res.string.ai_model_one_title, listOf("model ai", "wybór modelu", "wybor modelu", "model", "gemma", "nllb")),
+                Target("ai_model", "settings/mt-sw-features", Res.string.ai_models_title, listOf("model ai", "wybór modelu", "wybor modelu", "model", "gemma", "nllb")),
                 Target("translator", "settings/mt-sw-features", Res.string.translator_title, listOf("tłumacz", "tlumacz", "translator", "tłumaczen", "tlumaczen", "translat")),
                 Target("assistant", "settings/mt-sw-features", Res.string.ai_assistant_title, listOf("asystent", "assistant", "model ai", "gemma", "sztuczn")),
                 Target("knowledge_base", "settings/mt-sw-features", Res.string.kb_title, listOf("baza wiedzy", "baza", "wiedza", "wpisy", "przeglądać", "przegladac", "knowledge", "offtop", "pokrewne", "poradnik")),

@@ -16,6 +16,7 @@
  */
 package org.meshtastic.feature.settings.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,24 +25,29 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.di.ApplicationCoroutineScope
-import org.meshtastic.core.repository.AiLicense
 import org.meshtastic.core.repository.AiModelInfo
 import org.meshtastic.core.repository.AiModelStore
 import org.meshtastic.core.repository.AiModels
@@ -52,56 +58,49 @@ import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ai_assistant_summary
 import org.meshtastic.core.resources.ai_assistant_title
 import org.meshtastic.core.resources.ai_assistant_unavailable
-import org.meshtastic.core.resources.ai_assistant_warning_title
+import org.meshtastic.core.resources.ai_dictation_note
 import org.meshtastic.core.resources.ai_internet_enable
 import org.meshtastic.core.resources.ai_internet_on_indicator
 import org.meshtastic.core.resources.ai_internet_summary
 import org.meshtastic.core.resources.ai_internet_title
 import org.meshtastic.core.resources.ai_internet_warning_body
 import org.meshtastic.core.resources.ai_internet_warning_title
-import org.meshtastic.core.resources.ai_license_cc
-import org.meshtastic.core.resources.ai_license_gemma
-import org.meshtastic.core.resources.ai_level_light
-import org.meshtastic.core.resources.ai_level_standard
-import org.meshtastic.core.resources.ai_level_strong
-import org.meshtastic.core.resources.ai_level_translator
-import org.meshtastic.core.resources.ai_dictation_note
-import org.meshtastic.core.resources.dictation_external_mic_summary
-import org.meshtastic.core.resources.dictation_external_mic_title
+import org.meshtastic.core.resources.ai_legacy_freed
+import org.meshtastic.core.resources.ai_model_alternative
 import org.meshtastic.core.resources.ai_model_cancel
+import org.meshtastic.core.resources.ai_model_choose_downloading
+import org.meshtastic.core.resources.ai_model_choose_red
 import org.meshtastic.core.resources.ai_model_delete
 import org.meshtastic.core.resources.ai_model_download
 import org.meshtastic.core.resources.ai_model_failed
-import org.meshtastic.core.resources.ai_model_none_ready
-import org.meshtastic.core.resources.ai_model_roles_both
-import org.meshtastic.core.resources.ai_model_roles_translator
+import org.meshtastic.core.resources.ai_model_hearing
+import org.meshtastic.core.resources.ai_model_in_use
+import org.meshtastic.core.resources.ai_model_license_line
+import org.meshtastic.core.resources.ai_model_page
+import org.meshtastic.core.resources.ai_model_recommended
 import org.meshtastic.core.resources.ai_model_soon
 import org.meshtastic.core.resources.ai_model_specs
+import org.meshtastic.core.resources.ai_model_use
+import org.meshtastic.core.resources.ai_models_empty
+import org.meshtastic.core.resources.ai_models_hint
+import org.meshtastic.core.resources.ai_models_tab_assistant
+import org.meshtastic.core.resources.ai_models_tab_dictation
+import org.meshtastic.core.resources.ai_models_tab_translator
 import org.meshtastic.core.resources.ai_models_title
-import org.meshtastic.core.resources.ai_model_one_note
-import org.meshtastic.core.resources.ai_model_translate_only_body
-import org.meshtastic.core.resources.ai_model_translate_only_confirm
-import org.meshtastic.core.resources.ai_model_translate_only_title
-import org.meshtastic.core.resources.ai_model_one_title
 import org.meshtastic.core.resources.ai_privacy
-import org.meshtastic.core.resources.ai_warning_body
+import org.meshtastic.core.resources.dictation_external_mic_summary
+import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.translator_cancel
 import org.meshtastic.core.resources.translator_downloading
 import org.meshtastic.core.resources.translator_ready
 import org.meshtastic.core.resources.translator_summary
 import org.meshtastic.core.resources.translator_title
-import org.meshtastic.core.resources.translator_warning_enable
-import org.meshtastic.core.resources.translator_warning_title
 import org.meshtastic.core.ui.component.SwitchPreference
 
-private enum class PendingSwitch {
-    TRANSLATOR,
-    ASSISTANT,
-}
-
 /**
- * The offline translator and assistant: two independent switches (either one can be on without the other), the list
- * of models with download and delete for each, and the choice of which downloaded model each mode uses.
+ * The offline translator and assistant: two independent switches, and below them the models, one tab per function
+ * (assistant, translator, dictation). Nothing is downloaded by itself: after a function is switched on, a small red
+ * text asks for a model until one is installed.
  */
 @Composable
 internal fun AiSettings() {
@@ -112,32 +111,55 @@ internal fun AiSettings() {
     val assistantOn by uiPrefs.assistantEnabled.collectAsStateWithLifecycle()
     val translatorModelId by uiPrefs.translatorModelId.collectAsStateWithLifecycle()
     val assistantModelId by uiPrefs.assistantModelId.collectAsStateWithLifecycle()
+    val dictationModelId by uiPrefs.dictationModelId.collectAsStateWithLifecycle()
     val states by store.states.collectAsStateWithLifecycle()
+    val freedMb by store.legacyFreedMb.collectAsStateWithLifecycle()
     val internetOn by uiPrefs.assistantInternetEnabled.collectAsStateWithLifecycle()
     var askInternet by remember { mutableStateOf(false) }
-    var pending by remember { mutableStateOf<PendingSwitch?>(null) }
-    // A translation-only model picked while the assistant is on: asked first, because it turns the assistant off.
-    var translateOnlyPick by remember { mutableStateOf<AiModelInfo?>(null) }
+    var tab by rememberSaveable { mutableIntStateOf(0) }
+    var freedNoticeShown by remember { mutableStateOf(true) }
 
     fun isReady(id: String) = states[id] == TranslatorModelState.Ready
 
-    val assistantPossible = AiModels.ASSISTANT_SCREEN_READY && AiModels.all.any { it.engineReady && it.canDo(AiRole.ASSISTANT) }
+    fun readyFor(role: AiRole) = AiModels.forRole(role).filter { isReady(it.id) }
+
+    fun downloadingFor(role: AiRole) =
+        AiModels.forRole(role).any { states[it.id] is TranslatorModelState.Downloading }
+
+    val assistantPossible = AiModels.ASSISTANT_SCREEN_READY && AiModels.forRole(AiRole.ASSISTANT).isNotEmpty()
+
+    // The model in use for a function: the stored choice when it is installed, otherwise the first installed one.
+    fun effectiveFor(role: AiRole, stored: String): AiModelInfo? {
+        val ready = readyFor(role)
+        return ready.firstOrNull { it.id == stored } ?: ready.firstOrNull()
+    }
+
+    val effAssistant = effectiveFor(AiRole.ASSISTANT, assistantModelId)
+    val effTranslator = effectiveFor(AiRole.TRANSLATOR, translatorModelId)
+    val effDictation = effectiveFor(AiRole.DICTATION, dictationModelId)
+    // Keeps the stored choices equal to what is really used (the first model a person installs becomes the chosen one).
+    LaunchedEffect(effAssistant?.id) { effAssistant?.let { if (it.id != assistantModelId) uiPrefs.setAssistantModelId(it.id) } }
+    LaunchedEffect(effTranslator?.id) { effTranslator?.let { if (it.id != translatorModelId) uiPrefs.setTranslatorModelId(it.id) } }
+    LaunchedEffect(effDictation?.id) { effDictation?.let { if (it.id != dictationModelId) uiPrefs.setDictationModelId(it.id) } }
+
+    if (freedMb > 0 && freedNoticeShown) {
+        AlertDialog(
+            onDismissRequest = { freedNoticeShown = false },
+            text = { Text(stringResource(Res.string.ai_legacy_freed, freedMb)) },
+            confirmButton = { TextButton(onClick = { freedNoticeShown = false }) { Text("OK") } },
+        )
+    }
 
     SwitchPreference(
         title = stringResource(Res.string.translator_title),
         summary = stringResource(Res.string.translator_summary),
         checked = translatorOn,
         enabled = true,
-        onCheckedChange = { on ->
-            if (!on) {
-                uiPrefs.setTranslatorEnabled(false)
-            } else if (AiModels.all.any { isReady(it.id) && it.canDo(AiRole.TRANSLATOR) }) {
-                uiPrefs.setTranslatorEnabled(true)
-            } else {
-                pending = PendingSwitch.TRANSLATOR
-            }
-        },
+        onCheckedChange = { uiPrefs.setTranslatorEnabled(it) },
     )
+    if (translatorOn && effTranslator == null) {
+        ChooseModelHint(downloading = downloadingFor(AiRole.TRANSLATOR)) { tab = 1 }
+    }
 
     SwitchPreference(
         title = stringResource(Res.string.ai_assistant_title),
@@ -149,16 +171,11 @@ internal fun AiSettings() {
         },
         checked = assistantOn && assistantPossible,
         enabled = assistantPossible,
-        onCheckedChange = { on ->
-            if (!on) {
-                uiPrefs.setAssistantEnabled(false)
-            } else if (AiModels.all.any { isReady(it.id) && it.canDo(AiRole.ASSISTANT) }) {
-                uiPrefs.setAssistantEnabled(true)
-            } else {
-                pending = PendingSwitch.ASSISTANT
-            }
-        },
+        onCheckedChange = { uiPrefs.setAssistantEnabled(it) },
     )
+    if (assistantOn && assistantPossible && effAssistant == null) {
+        ChooseModelHint(downloading = downloadingFor(AiRole.ASSISTANT)) { tab = 0 }
+    }
 
     if (assistantOn && assistantPossible) {
         SwitchPreference(
@@ -176,31 +193,7 @@ internal fun AiSettings() {
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
             )
         }
-    }
-
-    if (assistantOn && assistantPossible) AssistantMemorySettings()
-
-    translateOnlyPick?.let { model ->
-        AlertDialog(
-            onDismissRequest = { translateOnlyPick = null },
-            title = { Text(stringResource(Res.string.ai_model_translate_only_title)) },
-            text = { Text(stringResource(Res.string.ai_model_translate_only_body, model.name)) },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        translateOnlyPick = null
-                        // Really off: the assistant switch goes off and the translator uses the chosen model.
-                        uiPrefs.setAssistantEnabled(false)
-                        uiPrefs.setTranslatorModelId(model.id)
-                    },
-                ) {
-                    Text(stringResource(Res.string.ai_model_translate_only_confirm))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { translateOnlyPick = null }) { Text(stringResource(Res.string.translator_cancel)) }
-            },
-        )
+        AssistantMemorySettings()
     }
 
     if (askInternet) {
@@ -224,67 +217,76 @@ internal fun AiSettings() {
         )
     }
 
-    if (translatorOn || assistantOn) {
-        SectionLabel(stringResource(Res.string.ai_models_title))
-        AiModels.all.forEach { model ->
-            ModelRow(
-                model = model,
-                state = states[model.id] ?: TranslatorModelState.NotDownloaded,
-                onDownload = { appScope.launch { store.download(model.id) } },
-                onCancel = { store.cancelDownload(model.id) },
-                onDelete = { appScope.launch { store.delete(model.id) } },
-            )
-        }
-
-        // One model for everything (assistant, translator, dictation): only one is ever in memory. While the assistant
-        // is on, only models that can also be the assistant are offered; NLLB (translation only) needs it off.
-        val choices =
-            AiModels.all.filter { isReady(it.id) && (it.canDo(AiRole.ASSISTANT) || (translatorOn && it.canDo(AiRole.TRANSLATOR))) }
-        val chosenId = if (assistantOn) assistantModelId else translatorModelId
-        ModelChoice(
-            title = stringResource(Res.string.ai_model_one_title),
-            models = choices,
-            selectedId = chosenId,
-            onSelect = { id ->
-                val model = AiModels.byId(id)
-                if (assistantOn && model != null && !model.canDo(AiRole.ASSISTANT)) {
-                    translateOnlyPick = model
-                } else {
-                    uiPrefs.setTranslatorModelId(id)
-                    if (model?.canDo(AiRole.ASSISTANT) == true) uiPrefs.setAssistantModelId(id)
-                }
-            },
+    SectionLabel(stringResource(Res.string.ai_models_title))
+    val tabs =
+        listOf(
+            AiRole.ASSISTANT to stringResource(Res.string.ai_models_tab_assistant),
+            AiRole.TRANSLATOR to stringResource(Res.string.ai_models_tab_translator),
+            AiRole.DICTATION to stringResource(Res.string.ai_models_tab_dictation),
         )
-        // Keeps the two stored choices equal, also for choices made before there was one list.
-        val effective = choices.firstOrNull { it.id == chosenId } ?: choices.firstOrNull()
-        LaunchedEffect(effective?.id, assistantOn) {
-            val model = effective ?: return@LaunchedEffect
-            if (translatorModelId != model.id) uiPrefs.setTranslatorModelId(model.id)
-            if (assistantModelId != model.id && model.canDo(AiRole.ASSISTANT)) uiPrefs.setAssistantModelId(model.id)
+    // Tab 0 = assistant, 1 = translator, 2 = dictation.
+    PrimaryTabRow(selectedTabIndex = tab) {
+        tabs.forEachIndexed { index, (_, title) ->
+            Tab(selected = tab == index, onClick = { tab = index }, text = { Text(title) })
         }
+    }
+    val role = tabs[tab].first
+    val (current, onChoose) =
+        when (role) {
+            AiRole.ASSISTANT -> effAssistant to { id: String -> uiPrefs.setAssistantModelId(id) }
+            AiRole.TRANSLATOR -> effTranslator to { id: String -> uiPrefs.setTranslatorModelId(id) }
+            AiRole.DICTATION -> effDictation to { id: String -> uiPrefs.setDictationModelId(id) }
+        }
+    if (role == AiRole.DICTATION) {
         Text(
-            text = stringResource(Res.string.ai_model_one_note),
+            text = stringResource(Res.string.ai_dictation_note),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
         )
-        if (assistantOn || translatorOn) {
-            val externalMic by uiPrefs.dictationExternalMic.collectAsStateWithLifecycle()
-            SwitchPreference(
-                title = stringResource(Res.string.dictation_external_mic_title),
-                summary = stringResource(Res.string.dictation_external_mic_summary),
-                checked = externalMic,
-                enabled = true,
-                onCheckedChange = { uiPrefs.setDictationExternalMic(it) },
-            )
-            Text(
-                text = stringResource(Res.string.ai_dictation_note),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+        val externalMic by uiPrefs.dictationExternalMic.collectAsStateWithLifecycle()
+        SwitchPreference(
+            title = stringResource(Res.string.dictation_external_mic_title),
+            summary = stringResource(Res.string.dictation_external_mic_summary),
+            checked = externalMic,
+            enabled = true,
+            onCheckedChange = { uiPrefs.setDictationExternalMic(it) },
+        )
+    }
+    val models = AiModels.forRole(role)
+    if (models.isEmpty()) {
+        Text(
+            text = stringResource(Res.string.ai_models_empty),
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        )
+    }
+    // Models grouped by family, in the order of the catalog.
+    models.groupBy { it.family }.forEach { (family, members) ->
+        SectionLabel(family)
+        members.forEach { model ->
+            ModelRow(
+                model = model,
+                role = role,
+                state = states[model.id] ?: TranslatorModelState.NotDownloaded,
+                inUse = current?.id == model.id,
+                onUse = { onChoose(model.id) },
+                onDownload = {
+                    // The model a person chooses to download becomes the one in use when none is installed yet.
+                    if (current == null) onChoose(model.id)
+                    appScope.launch { store.download(model.id) }
+                },
+                onCancel = { store.cancelDownload(model.id) },
+                onDelete = { appScope.launch { store.delete(model.id) } },
             )
         }
     }
+    Text(
+        text = stringResource(Res.string.ai_models_hint),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+    )
 
     Text(
         text = stringResource(Res.string.ai_privacy),
@@ -292,51 +294,20 @@ internal fun AiSettings() {
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
     )
+}
 
-    pending?.let { which ->
-        val role = if (which == PendingSwitch.TRANSLATOR) AiRole.TRANSLATOR else AiRole.ASSISTANT
-        // Offer the lightest model that can do the job and whose engine is available.
-        val model = AiModels.all.firstOrNull { it.engineReady && it.canDo(role) } ?: AiModels.Nllb600
-        AlertDialog(
-            onDismissRequest = { pending = null },
-            title = {
-                Text(
-                    stringResource(
-                        if (which == PendingSwitch.TRANSLATOR) {
-                            Res.string.translator_warning_title
-                        } else {
-                            Res.string.ai_assistant_warning_title
-                        },
-                    ),
-                )
-            },
-            text = {
-                Text(stringResource(Res.string.ai_warning_body, model.sizeMb, model.ramMb, model.minDeviceRamGb))
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        pending = null
-                        if (which == PendingSwitch.TRANSLATOR) {
-                            uiPrefs.setTranslatorEnabled(true)
-                            // With the assistant on, the translator keeps using the assistant's model (one model).
-                            if (!assistantOn) uiPrefs.setTranslatorModelId(model.id)
-                        } else {
-                            uiPrefs.setAssistantEnabled(true)
-                            uiPrefs.setAssistantModelId(model.id)
-                            uiPrefs.setTranslatorModelId(model.id)
-                        }
-                        if (!isReady(model.id)) appScope.launch { store.download(model.id) }
-                    },
-                ) {
-                    Text(stringResource(Res.string.translator_warning_enable))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { pending = null }) { Text(stringResource(Res.string.translator_cancel)) }
-            },
-        )
-    }
+/** The small red text under a switch: a function is on, but no model for it is installed yet. */
+@Composable
+private fun ChooseModelHint(downloading: Boolean, onClick: () -> Unit) {
+    Text(
+        text =
+        stringResource(
+            if (downloading) Res.string.ai_model_choose_downloading else Res.string.ai_model_choose_red,
+        ),
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.error,
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 2.dp),
+    )
 }
 
 @Composable
@@ -350,51 +321,55 @@ private fun SectionLabel(text: String) {
 }
 
 @Composable
-private fun levelName(model: AiModelInfo): String = stringResource(
-    when (model.id) {
-        AiModels.NLLB_600M_ID -> Res.string.ai_level_translator
-        AiModels.GEMMA_E2B_ID -> Res.string.ai_level_light
-        AiModels.GEMMA_E4B_ID -> Res.string.ai_level_standard
-        else -> Res.string.ai_level_strong
-    },
-)
-
-@Composable
 private fun ModelRow(
     model: AiModelInfo,
+    role: AiRole,
     state: TranslatorModelState,
+    inUse: Boolean,
+    onUse: () -> Unit,
     onDownload: () -> Unit,
     onCancel: () -> Unit,
     onDelete: () -> Unit,
 ) {
+    val uriHandler = LocalUriHandler.current
+    val polish = Locale.current.language == "pl"
+    val description =
+        (if (polish) model.descriptionPl.ifBlank { model.descriptionEn } else model.descriptionEn.ifBlank { model.descriptionPl })
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)) {
-        Text(text = "${levelName(model)}: ${model.name}", style = MaterialTheme.typography.bodyLarge)
-        Text(
-            text =
-            stringResource(
-                if (model.canDo(AiRole.ASSISTANT)) {
-                    Res.string.ai_model_roles_both
-                } else {
-                    Res.string.ai_model_roles_translator
-                },
-            ),
-            style = MaterialTheme.typography.bodySmall,
-        )
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (state == TranslatorModelState.Ready) RadioButton(selected = inUse, onClick = onUse)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = model.name, style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    text =
+                    stringResource(
+                        if (role in model.recommendedFor) Res.string.ai_model_recommended else Res.string.ai_model_alternative,
+                    ) + if (model.hearing && role == AiRole.DICTATION) " · " + stringResource(Res.string.ai_model_hearing) else "",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+            if (inUse && state == TranslatorModelState.Ready) {
+                Text(stringResource(Res.string.ai_model_in_use), style = MaterialTheme.typography.labelMedium)
+            }
+        }
+        if (description.isNotBlank()) Text(text = description, style = MaterialTheme.typography.bodySmall)
         Text(
             text = stringResource(Res.string.ai_model_specs, model.sizeMb, model.ramMb, model.minDeviceRamGb),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
-            text =
-            stringResource(
-                if (model.license == AiLicense.CC_BY_NC_4_0) Res.string.ai_license_cc else Res.string.ai_license_gemma,
-            ),
+            text = stringResource(Res.string.ai_model_license_line, model.license.label),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        if (model.pageUrl.isNotBlank()) {
+            TextButton(onClick = { uriHandler.openUri(model.pageUrl) }) { Text(stringResource(Res.string.ai_model_page)) }
+        }
         when {
-            !model.engineReady -> Text(stringResource(Res.string.ai_model_soon), style = MaterialTheme.typography.bodySmall)
+            !model.engineReady ->
+                Text(stringResource(Res.string.ai_model_soon), style = MaterialTheme.typography.bodySmall)
 
             else ->
                 when (state) {
@@ -420,33 +395,6 @@ private fun ModelRow(
                         TextButton(onClick = onDownload) { Text(stringResource(Res.string.ai_model_download)) }
                     }
                 }
-        }
-    }
-}
-
-@Composable
-private fun ModelChoice(title: String, models: List<AiModelInfo>, selectedId: String, onSelect: (String) -> Unit) {
-    SectionLabel(title)
-    if (models.isEmpty()) {
-        Text(
-            text = stringResource(Res.string.ai_model_none_ready),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-        )
-        return
-    }
-    // When the stored choice is not among the downloaded models, the first one is the one in use.
-    val effective = models.firstOrNull { it.id == selectedId }?.id ?: models.first().id
-    Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
-        models.forEach { model ->
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                RadioButton(selected = model.id == effective, onClick = { onSelect(model.id) })
-                Text(text = "${levelName(model)}: ${model.name}", style = MaterialTheme.typography.bodyMedium)
-            }
         }
     }
 }

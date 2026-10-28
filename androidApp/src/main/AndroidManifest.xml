@@ -163,9 +163,6 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:enableOnBackInvokedCallback="true"
         android:largeHeap="true">
-        <!-- LiteRT-LM uses the graphics chip (GPU) when the phone offers these system libraries. -->
-        <uses-native-library android:name="libvndksupport.so" android:required="false" />
-        <uses-native-library android:name="libOpenCL.so" android:required="false" />
 
         <!--
           Reproduced live via adversarial mesh-fuzz testing: a 2000-node NodeDB (push_fake_nodedb's own

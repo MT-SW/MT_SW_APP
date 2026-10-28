@@ -45,7 +45,7 @@ internal data class AssistantIntent(
  * model can only pick one of the known kinds of question and fill a few fields, so it cannot write a broken tool call or
  * invent a kind that does not exist. This replaces guessing the topic from fragments of words.
  */
-internal class AssistantRouter(private val engine: LiteRtEngine) {
+internal class AssistantRouter(private val engine: AiTextEngine) {
 
     /**
      * The kind of [question], or null on failure. [conversation] is the recent exchange (oldest first), [notes] what is
