@@ -266,3 +266,46 @@ Warto wiedzieć, że MT_SW nie ma własnego presetu – używa oficjalnego prese
 Projekt jest prowadzony przez Spontaniczne Majsterkowanie i cheaterenator. Firmware jest częścią trójkomponentowego projektu MT_SW razem z aplikacją MT_SW_APP i integracją z Home Assistant.
 
 Jeśli potrzebujesz więcej szczegółów o konkretnym urządzeniu, ustawieniu lub funkcji, daj znać.
+
+## 28. Jak zmniejszyć zużycie baterii?
+Router: AssistantIntent(intent=chat, node=, channel=, text=, role=, metric=, topic=, period=, amount=0)
+Time: 142 s
+Answer:
+Oto kilka praktycznych sposobów na oszczędzanie baterii w węźle MT_SW, oparte na wiedzy z firmware i konfiguracji:
+
+Wybór roli węzła
+Jeśli chcesz tylko odbierać ruch sieci, a nie uczestniczyć w przekazywaniu, ustaw rolę Klient pasywny (Client Mute). Jeśli węzeł ma być bezobsługowy, np. Tracker lub Sensor, między transmisjami śpi, co oszczędza energię.
+
+Zmniejszanie aktywności anteny
+W ustawieniach modułów możesz wyłączyć nieużywane funkcje – każdy włączony moduł zwiększa zajętość eteru i pobór prądu. Zwiększ interwał rozgłaszania listy sąsiadów powyżej domyślnych 21600 sekund (4 godziny), jeśli sieć nie wymaga szybkich aktualizacji.
+
+Zasilanie i akumulator
+Użyj akumulatora LiFePO4 (LFP) do zimnych warunków – rozładowuje się do -20 °C, ale nigdy nie ładowaj poniżej 0 °C. W solarach preferuj regulator MPPT zamiast PWM. Monitoruj zużycie energii przez miernik lub zasilacz sumujący Wh/Ah, bo jeden odczyt prądu nie pokazuje pełnego obrazu.
+
+Konfiguracja firmware
+Włącz tylko te moduły, z których korzystasz. Firmware MT_SW_FIRMWARE ma domyślny Auto-restart co 30 dni pracy (można zmienić w platformio.ini, maksymalnie ~49 dni). Mniejsze zużycie RAM dla ESP32-C3 też pomaga w stabilności.
+
+Zapamiętaj
+Zimno obniża pojemność akumulatora, a przegrzanie może być niebezpieczne. Trzymaj węzeł z dala od źródeł ciepła i uderzeń. Jeśli nie wiesz, jak zmierzyć zużycie baterii, testuj energię przez co najmniej godzinę, najlepiej 2–6 godzin przy ruchu podobnym do docelowego.
+
+Jeśli masz pytania o konkretne ustawienia w MT_SW_APP lub integrację z Home Assistant, daj znać.
+
+## 29. Jak chronić węzeł przed wodą?
+Router: AssistantIntent(intent=chat, node=, channel=, text=, role=, metric=, topic=, period=, amount=0)
+Time: 148 s
+Answer:
+Aby chronić węzeł przed wodą, musisz zadbać o kilka rzeczy. Najważniejsze to użyć dławików kablowych na każdy przewód wchodzący do obudowy. Dławik mocuje kabel w obudowie, odciąża go i uszczelnia przepust. Wersje z uszczelką elastomerową chronią przed kroplami i wodą pod ciśnieniem, osiągając do IP66 lub IP68.
+
+Przy wejściach kabli do obudowy i w miejscach ich przejścia przez ściany ważne jest uszczelnienie wszystkich szczelin. Zagięcie kabla w dół tuż przed wejściem pomoże, żeby kropla spłynie, a nie zalegała. Dopasuj rozmiar uszczelki do średnicy kabla.
+
+Przy masztach na zewnątrz rozsądne minimum to IP65, czyli pyłoszczelność i odporność na strumień wody z dowolnego kierunku. IP67 pozwala na krótkie zanurzenie, ale nie gwarantuje odporności na strumień. Testy robi się czystą wodą.
+
+Nie zapomnij o wentylacji w obudowie, żeby uniknąć skraplania pary wodnej. Jeśli masz węzeł wewnątrz budynku, antena powinna być na zewnątrz, bo ściany tłumią sygnał. Większość kabli znacząco osłabia sygnał na dłuższym odcinku, więc używaj najkrótszych kabli o małych stratach w ekstremalnych warunkach.
+
+Ważne też, żeby wszystkie złącza i styki były zamaskowane, a wokół niskich złączy kapilarność nie wciągnęła wilgoci.
+
+Źródła:
+• https://en.wikipedia.org/wiki/Cable_gland
+• https://en.wikipedia.org/wiki/Weatherproofing
+• https://en.wikipedia.org/wiki/IP_code
+• https://meshtastic.org/docs/hardware/antennas/lora-antenna/

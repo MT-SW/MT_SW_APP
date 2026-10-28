@@ -76,6 +76,9 @@ jobs:
           cmake -S SPIRV-Headers -B spirv-build -G Ninja -DCMAKE_INSTALL_PREFIX="$PWD/spirv-install"
           cmake --install spirv-build
           echo "SPIRV_PREFIX=$PWD/spirv-install" >> "$GITHUB_ENV"
+          # Also next to the Vulkan headers, which the compiler already searches.
+          cp -r "$PWD/spirv-install/include/spirv" "$PWD/Vulkan-Headers/include/"
+          ls "$PWD/Vulkan-Headers/include/spirv/unified1/spirv.hpp"
 
       - name: Build llama-server
         run: |
