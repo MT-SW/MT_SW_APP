@@ -169,3 +169,64 @@ Z instrukcji aplikacji:
 2. Aplikacja sprawdza dostępne wersje firmware.
 3. Dostępne aktualizacje pokazują numer wersji i informacje o wydaniu.
 Buttons: Oprogramowanie -> meshtastic://meshtastic/firmware
+
+## 21. Co to jest region LoRa i po co go ustawiać?
+Router: AssistantIntent(intent=app_help, node=, channel=, text=region LoRa, role=, metric=, topic=, period=, amount=0)
+Time: 185 s
+Answer:
+Region LoRa to zestaw zasad, który określa, w jakim pasmie radiowym i przy jakich limitach mocy i czasu nadawania Twój węzeł ma pracować. Można to porównać do wyboru konkretnego, legalnego "korytarza" radiowego, który jest przeznaczony do użytku w danym kraju lub regionie.
+
+Musisz go ustawić, ponieważ bez tego węzeł po prostu nie nadaje i pozostaje w ciszy.
+
+Główne powody, dla których trzeba ustawić region, to:
+
+Po pierwsze, region wyznacza pasmo, limity mocy i cykl pracy, czyli to, jak często możesz nadawać. Na przykład, w pasmie EU_868 obowiązuje limit 10 procent czasu nadawania. Jeśli nie ustawisz regionu, urządzenie nie wie, na jakich częstotliwościach i z jaką mocą ma działać.
+
+Po drugie, region zapewnia kompatybilność. Aby węzły mogły ze sobą rozmawiać, muszą mieć zgodne ustawienia. Jeśli Twój węzeł ma inny region niż sąsiedzi, nie usłyszy ich.
+
+W kontekście naszego projektu MT_SW, w województwie świętokrzyskim używamy regionu EU_N_868, który jest zgodny z oficjalnym presetem Narrow Fast i pracuje na częstotliwości 869,44165 MHz.
+
+Źródło: https://meshtastic.org/docs/configuration/radio/lora/ (sprawdzono 2026-10); https://meshtastic.org/docs/configuration/radio/lora/ (sprawdzono 2026-10); https://meshtastic.org/docs/getting-started/initial-config/ (sprawdzono 2026-10)
+
+## 22. Jaki preset jest zalecany do dużej sieci?
+Router: AssistantIntent(intent=chat, node=, channel=, text=, role=, metric=, topic=, period=, amount=0)
+Time: 144 s
+Answer:
+Nie ma jednego, uniwersalnego presetu, który byłby zalecany dla "dużej sieci", ponieważ problem z rozrostem sieci LoRa rzadko wynika z samego wyboru preset, a częściej z zarządzania eterem i uniknięcia kolizji.
+
+Zamiast polecać konkretny preset, nasza baza wiedzy skupia się na tym, jak zapobiegać zapchaniu sieci, niezależnie od tego, który preset używasz.
+
+Jeśli chcesz, aby sieć była stabilna i nie cierpiała na kolizje, kluczowe jest:
+•   Ograniczanie zajętości eteru: nie ustawiaj wyższego hop limitu niż jest to konieczne.
+•   Zarządzanie mocą: nie nadawaj na pełnej mocy tam, gdzie wystarczy mniejsza moc.
+•   Optymalizacja ról: nie ustawiaj roli routerów bez realnej potrzeby.
+•   Ograniczanie telemetrii: nie włączaj zbędnych modułów telemetrii o bardzo krótkich interwałach.
+
+Te działania pomagają zmniejszyć zajętość eteru dla wszystkich sąsiadów, co jest najważniejsze w gęstej sieci.
+
+Źródło: https://wiki.mesh.szczecin.pl/routing-meshtastic-od-strony-firmware-0-lora-udp-role-i-strojenie/ oraz https://wehelp.com.pl/poradniki/meshtastic-lacznosc-awaryjna-jak-dziala/ (sprawdzono 2026-10)
+Źródło: wnioski z wpisów bazy o routingu i airtime (sprawdzono 2026-10); zalecenia ogólne, nie przepisy
+
+## 23. Co się stanie, gdy ustawię limit skoków na 7?
+Router: AssistantIntent(intent=app_help, node=, channel=, text=limit skoków, role=, metric=, topic=, period=, amount=0)
+Time: 14 s
+Answer:
+„Limit przeskoków” jest w: Ustawienia → LoRa.
+Buttons: Limit przeskoków -> meshtastic://meshtastic/settings/lora (blinks: Limit przeskoków)
+
+## 24. Co to jest flooding w sieci mesh?
+Router: AssistantIntent(intent=chat, node=, channel=, text=, role=, metric=, topic=, period=, amount=0)
+Time: 153 s
+Answer:
+Flooding w sieci mesh to w zasadzie sposób rozsyłania wiadomości, który opiera się na zasadzie: jeśli węzeł odebrał pakiet, to wysyła go dalej do wszystkich swoich sąsiadów. Sieć nie wie z góry, jaka jest najkrótsza lub najlepsza droga do odbiorcy, więc aby mieć pewność, że wiadomość dotrze, rozsyła ją szeroko.
+
+W kontekście MT_SW i Meshtastic, ten proces jest jednak zarządzany, czyli nie jest chaotyczny. Oto jak to działa:
+
+1.  Brak wiedzy o celu: Ponieważ sieć kratowa nie ma centralnego zarządzania, pierwszy pakiet po prostu wysyła do wszystkich w zasięgu, bo nie wie, gdzie jest adresat.
+2.  Mechanizm zarządzany: Kiedy węzeł odbiera pakiet, zanim go powtórzy, najpierw chwilę nasłuchuje. Jeśli usłyszy, że inny węzeł już ten pakiet przekazał, to on milczy i nie marnuje eteru.
+3.  Ograniczenia: Aby zapobiec nieskończonym pętlom i przeciążeniu, wiadomości mają limit przeskoków (HopLimit). Węzeł zmniejsza ten limit o jeden za każdym razem, gdy retransmituje pakiet.
+
+Podsumowując, flooding to mechanizm, który zapewnia, że wiadomość dotrze do celu, rozsyłając ją szeroko, a zarządzanie tym procesem (limit przeskoków i nasłuchiwanie) zapobiega chaosowi i kolizjom w eterze.
+
+Źródła:
+https://meshtastic.org/docs/overview/mesh
