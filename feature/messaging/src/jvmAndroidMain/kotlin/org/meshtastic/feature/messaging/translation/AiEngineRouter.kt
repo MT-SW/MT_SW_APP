@@ -22,9 +22,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.meshtastic.core.repository.AiEngine
 import org.meshtastic.core.repository.AiModels
 import org.meshtastic.core.repository.UiPrefs
@@ -46,23 +45,36 @@ class AiEngineRouter(
         // A model is never deleted while a program still has its file open.
         store.beforeModelDelete = { unloadNow() }
         store.unloadAll = { unloadNow() }
-        // A function switched off or another model chosen: the model in memory is not needed any more, so it is
-        // stopped at once instead of after the idle time. The next question starts the chosen model.
+        // A model stays in memory while it is used. When another model is chosen, the old one is stopped at once and the
+        // new one is loaded straight away (so the first question does not wait); a function switched off frees its
+        // model. A newer change cancels a loading that is still going on.
         if (uiPrefs != null) {
-            combine(
-                uiPrefs.assistantEnabled,
-                uiPrefs.translatorEnabled,
-                uiPrefs.assistantModelId,
-                uiPrefs.translatorModelId,
-                uiPrefs.dictationModelId,
-            ) { a, t, am, tm, dm -> listOf(a, t, am, tm, dm) }
-                .distinctUntilChanged()
-                .drop(1)
-                .onEach {
-                    Logger.i(tag = "AiEngineRouter") { "AI settings changed, freeing the model memory" }
-                    unloadNow()
-                }
-                .launchIn(scope)
+            scope.launch {
+                var previous: Choice? = null
+                combine(
+                    uiPrefs.assistantEnabled,
+                    uiPrefs.translatorEnabled,
+                    uiPrefs.assistantModelId,
+                    uiPrefs.translatorModelId,
+                    uiPrefs.dictationModelId,
+                ) { a, t, am, tm, dm -> Choice(a, t, am, tm, dm) }
+                    .distinctUntilChanged()
+                    .collectLatest { now ->
+                        val before = previous
+                        previous = now
+                        if (before == null) return@collectLatest
+                        Logger.i(tag = TAG) { "AI settings changed, switching models" }
+                        unloadNow()
+                        val load =
+                            when {
+                                now.assistantOn && (now.assistant != before.assistant || !before.assistantOn) -> now.assistant to false
+                                now.translatorOn && (now.translator != before.translator || !before.translatorOn) -> now.translator to false
+                                now.dictation != before.dictation -> now.dictation to true
+                                else -> null
+                            }
+                        load?.let { (id, hearing) -> preload(id, hearing) }
+                    }
+            }
         }
     }
 
@@ -90,5 +102,26 @@ class AiEngineRouter(
     override suspend fun unloadNow() {
         llama.unloadNow()
         whisper?.unloadNow()
+    }
+
+    /** Loads the model just chosen for a function; models of other engines (the NLLB translator) load on first use. */
+    private suspend fun preload(modelId: String, hearing: Boolean) {
+        when (AiModels.byId(modelId)?.engine) {
+            AiEngine.LLAMA_CPP -> llama.preload(modelId, hearing = hearing && AiModels.byId(modelId)?.hearing == true)
+            AiEngine.WHISPER_CPP -> whisper?.preload(modelId)
+            else -> Unit
+        }
+    }
+
+    private data class Choice(
+        val assistantOn: Boolean,
+        val translatorOn: Boolean,
+        val assistant: String,
+        val translator: String,
+        val dictation: String,
+    )
+
+    private companion object {
+        const val TAG = "AiEngineRouter"
     }
 }

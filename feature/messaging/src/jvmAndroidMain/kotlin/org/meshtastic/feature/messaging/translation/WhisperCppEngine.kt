@@ -40,16 +40,15 @@ import java.util.UUID
 /**
  * Dictation with Whisper models through the official `whisper-server` program of whisper.cpp (started on this computer,
  * reachable only from the computer itself). The recording is sent to it as a WAV file and the text comes back. Like the
- * language model, the speech model is loaded on first use and freed after a short idle time.
+ * language model, the speech model is loaded on first use (or as soon as it is chosen) and stays in memory while it is
+ * used, until another model is chosen or the memory is freed.
  */
 class WhisperCppEngine(
     private val store: AiModelStoreImpl,
     private val installer: ModelServerInstaller,
     private val logDir: File,
 ) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val mutex = Mutex()
-    private var unloadJob: Job? = null
     private var server: ModelServerProcess? = null
     private var loadedId: String? = null
 
@@ -58,8 +57,7 @@ class WhisperCppEngine(
     }
 
     suspend fun transcribe(modelId: String, wav: ByteArray): String = mutex.withLock {
-        unloadJob?.cancel()
-        try {
+        run {
             withContext(Dispatchers.IO) {
                 val running = ensureLoaded(modelId)
                 val started = nowMillis
@@ -67,13 +65,25 @@ class WhisperCppEngine(
                 Logger.i(tag = TAG) { "Dictation with $modelId: ${text.length} chars in ${nowMillis - started} ms" }
                 text
             }
-        } finally {
-            scheduleUnload()
         }
     }
 
     suspend fun unloadNow() {
         mutex.withLock { unload() }
+    }
+
+    /** Loads [modelId] now (it was just chosen), so the first dictation does not wait; failures are only logged. */
+    suspend fun preload(modelId: String) {
+        if (store.fileOf(modelId) == null) return
+        mutex.withLock {
+            try {
+                withContext(Dispatchers.IO) { ensureLoaded(modelId) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.w(tag = TAG, throwable = e) { "Loading $modelId in advance failed: ${e.message}" }
+            }
+        }
     }
 
     private suspend fun ensureLoaded(modelId: String): ModelServerProcess {
@@ -139,14 +149,6 @@ class WhisperCppEngine(
     private fun clean(text: String): String =
         text.replace(Regex("\\[[^\\]]*\\]|\\([^)]*\\)"), " ").replace(Regex("\\s+"), " ").trim()
 
-    private fun scheduleUnload() {
-        unloadJob?.cancel()
-        unloadJob =
-            scope.launch {
-                delay(IDLE_UNLOAD_MS)
-                mutex.withLock { unload() }
-            }
-    }
 
     private fun unload() {
         server?.stop()
@@ -160,7 +162,6 @@ class WhisperCppEngine(
         const val PID_FILE = "whisper-server.pid"
         const val MAX_THREADS = 8
         const val LOAD_TIMEOUT_MS = 120_000L
-        const val IDLE_UNLOAD_MS = 120_000L
         const val CONNECT_TIMEOUT_MS = 20_000
         const val READ_TIMEOUT_MS = 5 * 60 * 1000
         const val MAX_ERROR = 300

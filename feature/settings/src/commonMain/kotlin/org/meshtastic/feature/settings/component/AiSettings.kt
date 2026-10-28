@@ -222,8 +222,8 @@ internal fun AiSettings() {
         )
     }
 
-    // The model that is running right now and a way to switch it off at once (otherwise it stops by itself after a
-    // short idle time, or as soon as another model is chosen or the function is switched off).
+    // The model that is running right now and a way to switch it off at once (otherwise it stays while it is used and
+    // is swapped as soon as another model is chosen, or freed when its function is switched off).
     val loaded by store.loadedModels.collectAsStateWithLifecycle()
     val loadedNames = loaded.map { id -> AiModels.byId(id)?.name ?: id }.sorted().joinToString(", ")
     RegularPreference(

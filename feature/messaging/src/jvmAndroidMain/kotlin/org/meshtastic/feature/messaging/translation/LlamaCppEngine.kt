@@ -57,8 +57,9 @@ import java.util.Base64
  * layers of the model go to the graphics card and how many stay with the processor and the main memory, from the
  * memory that is free at that moment. If it does not start on the graphics card, it is started again on the processor
  * (and, on Windows and Linux, with the plain processor version of the program); every step is written to the log.
- * Only one model is in memory at a time and requests run one after another. The model is loaded on first use and freed
- * after a short idle time.
+ * Only one model is in memory at a time and requests run one after another. The model is loaded on first use (or as soon
+ * as it is chosen) and stays in memory while it is used; it is freed when another model is chosen, its function is
+ * switched off, the user frees the memory in the settings, or the app ends.
  */
 class LlamaCppEngine(
     private val store: AiModelStoreImpl,
@@ -66,9 +67,7 @@ class LlamaCppEngine(
     private val logDir: File,
 ) : AiTextEngine {
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val runMutex = Mutex()
-    private var unloadJob: Job? = null
     private var server: ModelServerProcess? = null
     private var loadedId: String? = null
     private var loadedHearing = false
@@ -100,21 +99,17 @@ class LlamaCppEngine(
         jsonSchema: String?,
         thinking: Boolean,
     ): String = runMutex.withLock {
-        unloadJob?.cancel()
-        try {
+        run {
             withContext(Dispatchers.IO) {
                 val running = ensureLoaded(modelId, hearing = false)
                 val body = chatBody(messages, maxTokens, temperature, jsonSchema, thinking)
                 complete(running, body, maxTokens, onPiece, modelId)
             }
-        } finally {
-            scheduleUnload()
         }
     }
 
     override suspend fun transcribe(modelId: String, wav: ByteArray): String = runMutex.withLock {
-        unloadJob?.cancel()
-        try {
+        run {
             withContext(Dispatchers.IO) {
                 val running = ensureLoaded(modelId, hearing = true)
                 val audio = Base64.getEncoder().encodeToString(wav)
@@ -148,13 +143,25 @@ class LlamaCppEngine(
                 }
                 complete(running, body, MAX_TRANSCRIPT_TOKENS, {}, modelId).trim().trim('"', '„', '”').trim()
             }
-        } finally {
-            scheduleUnload()
         }
     }
 
     override suspend fun unloadNow() {
         runMutex.withLock { unload() }
+    }
+
+    /** Loads [modelId] now (a model was just chosen), so the first question does not wait; failures are only logged. */
+    suspend fun preload(modelId: String, hearing: Boolean) {
+        if (store.fileOf(modelId) == null) return
+        runMutex.withLock {
+            try {
+                withContext(Dispatchers.IO) { ensureLoaded(modelId, hearing) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Logger.w(tag = TAG, throwable = e) { "Loading $modelId in advance failed: ${e.message}" }
+            }
+        }
     }
 
     private fun chatBody(
@@ -386,14 +393,6 @@ class LlamaCppEngine(
         }
     }
 
-    private fun scheduleUnload() {
-        unloadJob?.cancel()
-        unloadJob =
-            scope.launch {
-                delay(IDLE_UNLOAD_MS)
-                runMutex.withLock { unload() }
-            }
-    }
 
     private fun unload() {
         server?.stop()
@@ -447,7 +446,6 @@ class LlamaCppEngine(
         const val CACHE_RAM_PHONE_MB = 256
         const val CACHE_RAM_COMPUTER_MB = 1536
         const val LOAD_TIMEOUT_MS = 10 * 60 * 1000L
-        const val IDLE_UNLOAD_MS = 120_000L
         const val CONNECT_TIMEOUT_MS = 20_000
         const val READ_TIMEOUT_MS = 10 * 60 * 1000
         const val MAX_ERROR = 300
