@@ -196,3 +196,37 @@ Time: 14 s
 Answer:
 „Limit przeskoków” jest w: Ustawienia → LoRa.
 Buttons: Limit przeskoków -> meshtastic://meshtastic/settings/lora (blinks: Limit przeskoków)
+
+## 24. Co to jest flooding w sieci mesh?
+Router: AssistantIntent(intent=chat, node=, channel=, text=, role=, metric=, topic=, period=, amount=0)
+Time: 352 s
+Answer:
+Flooding to sposób rozsyłania wiadomości w sieci mesh, w którym węzeł, który otrzymał pakiet, przekazuje go dalej do swoich sąsiadów. W Meshtastic i MT_SW stosuje się zarządzane zalewanie (managed flooding), aby uniknąć nadmiaru transmisji. Węzły retransmitują odebrany pakiet, dopóki nie skończy się limit przeskoków. Domyślnie jest to 3 przeskoków, a maksymalne 7. Przed nadaniem węzeł chwilę nasłuchuje eteru: jeśli inny węzeł już go przekazał, ten nie powtarza. Czas oczekiwania zależy od jakości sygnału (SNR). Dalsze węzły (słabszy sygnał) mają krótsze okno i zwykle powtarzają pierwsze, a bliższe mogą odpuścić.
+
+Wady tego podejścia leżą w fizyce: eter jest wspólny i wąski. Każdy węzeł w zasięgu słyszy każdy pakiet. Przy dużej liczbie routerów mogą dochodzić do kolizji, gdy wielu nadaje prawie jednocześnie. Dlatego sieć mesh LoRa jest lokalna, a nie globalna.
+
+Z internetu:
+Wiele źródeł opisuje flooding jako wysyłanie wiadomości do wszystkich sąsiadów, którzy ją odbiorą, bez konieczności trasy. Może to prowadzić do wielu kopii tej samej wiadomości. Wikipedia definiuje to jako wielokrotne wysłanie tej samej wiadomości. IEEE Xplore dodaje, że flooding jest proste i odporne, ale powoduje wiele kopii. WDS Media omawia to w kontekście sieci mesh ogólnie.
+
+Źródła:
+[Baza wiedzy: Algorytm sieci, aplikacja Android w użyciu, Heltec V3 i V4, integracje: Zarządzane zalewanie (managed flooding): jak węzły decydują o retransmisji]
+[Baza wiedzy: Jak działa sieć: routing, retransmisje, ACK, szyfrowanie: Jak sieć przekazuje wiadomości (managed flooding)?]
+[Baza wiedzy: Dlaczego sieci LoRa (Mes
+
+## 25. Czy wiadomości w Meshtastic są szyfrowane?
+Router: AssistantIntent(intent=chat, node=, channel=, text=, role=, metric=, topic=, period=, amount=0)
+Time: 120 s
+Answer:
+Tak, wiadomości w Meshtastic są szyfrowane. Istnieją dwa główne rodzaje szyfrowania:
+
+Na kanałach komunikacji (broadcast) wiadomości są szyfrowane za pomocą AES-CTR. Klucz szyfrujący jest wspólny dla wszystkich węzłów na danym kanale. Domyślnie używa się AES-128, ale można włączyć AES-256 dla większej bezpieczeństwa. Od wersji 2.8.1 dostępne jest też szyfrowanie z wykrywaniem modyfikacji (AEAD), które wymaga, by wszystkie węzły na kanale miały to samo ustawienie.
+
+Wiadomości prywatne (Direct Messages) używają szyfrowania na poziomie par kluczy. Każdy węzeł ma własną parę kluczy X25519, z których wywodzi się wspólny klucz do szyfrowania AES-256-CCM. Aby wysłać wiadomość prywatną, nadawca musi najpierw poznać klucz publiczny odbiorcy, który jest dostępny w NodeInfo.
+
+Warto pamiętać, że szyfrowanie nie jest tak zaawansowane jak w Signal czy TLS 1.3. Brakuje tam tzw. forward secrecy, co oznacza, że nagrany ruch można odszyfrować później, jeśli klucz kiedyś wycieknie. Wiadomości nie są domyślnie przechowywane i przesyłane później, więc jeśli odbiorca nie usłyszał wiadomości, ona przepada.
+
+W MT_SW nie ma własnego presetu szyfrowania - używamy oficjalnego presetu Narrow Fast z regionem EU_N_868 dla województwa świętokrzyskiego.
+
+Źródła:
+• https://meshtastic.org/docs/overview/encryption/ (sprawdzono 2026-10)
+• https://meshtastic.org/docs/overview/encryption/ (sprawdzono 2026-10)
