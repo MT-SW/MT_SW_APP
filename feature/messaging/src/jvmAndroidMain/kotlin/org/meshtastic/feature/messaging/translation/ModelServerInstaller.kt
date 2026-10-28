@@ -67,7 +67,68 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
     fun launchPrefix(program: File): List<String> =
         if (android && File(LINKER).isFile) listOf(LINKER, program.absolutePath) else listOf(program.absolutePath)
 
-    /** The llama.cpp program with graphics card support (Metal on a Mac, Vulkan on Windows and Linux). */
+    /** True on a phone with a Qualcomm Snapdragon chip (Adreno graphics), where OpenCL is the first choice. */
+    val qualcomm: Boolean by lazy { android && llamaSupported && isQualcomm() }
+
+    private fun isQualcomm(): Boolean {
+        fun prop(name: String): String =
+            runCatching {
+                ProcessBuilder("getprop", name).redirectErrorStream(true).start().inputStream.bufferedReader().readText().trim().lowercase()
+            }.getOrDefault("")
+        return prop("ro.soc.manufacturer").contains("qualcomm") || prop("ro.hardware") == "qcom" ||
+            prop("ro.board.platform").let { it.startsWith("sm") || it in QUALCOMM_PLATFORMS }
+    }
+
+    /**
+     * The graphics card programs to try on this phone, best first: our own builds of llama.cpp with OpenCL (Snapdragon /
+     * Adreno only) and Vulkan (any phone), published on this project's release page. The official Android build runs on
+     * the processor only. A program that was missing or did not work on this phone is skipped for a while.
+     */
+    fun androidGpuAssets(): List<Asset> {
+        if (!android || !llamaSupported) return emptyList()
+        val all = buildList {
+            if (qualcomm) add(gpuAsset("opencl"))
+            add(gpuAsset("vulkan"))
+        }
+        return all.filterNot { isBroken(it) }
+    }
+
+    private fun gpuAsset(kind: String) =
+        Asset(
+            url = "https://github.com/MT-SW/MT_SW_APP/releases/download/engines-$LLAMA_TAG/llama-$LLAMA_TAG-android-arm64-$kind.tar.gz",
+            folder = "llama-$LLAMA_TAG-android-arm64-$kind",
+            exeName = "llama-server",
+            sizeMb = LLAMA_ANDROID_GPU_MB,
+        )
+
+    private fun brokenMark(asset: Asset) = File(root, ".broken-" + asset.folder)
+
+    private fun isBroken(asset: Asset): Boolean {
+        val mark = brokenMark(asset)
+        return mark.isFile && System.currentTimeMillis() - mark.lastModified() < BROKEN_RETRY_MS
+    }
+
+    /** Remembers that [asset] could not be fetched or did not work on this device, so it is not tried again for a few days. */
+    fun markBroken(asset: Asset) {
+        runCatching { brokenMark(asset).apply { parentFile?.mkdirs() }.writeText("broken") }
+    }
+
+    /** Installs a graphics card program; null (and remembered) when it cannot be fetched. */
+    suspend fun installGpu(asset: Asset): File? =
+        try {
+            install(asset)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Throwable) {
+            Logger.w(tag = TAG, throwable = e) { "${asset.folder} is not available" }
+            markBroken(asset)
+            null
+        }
+
+    /** Installs the official llama.cpp program of this system and returns it. */
+    suspend fun installLlama(onProgress: (Float) -> Unit = {}): File = install(llamaAsset(), onProgress)
+
+    /** The official llama.cpp program of this system: graphics card support on a Mac (Metal), Windows and Linux (Vulkan); on Android it runs on the processor only. */
     fun llamaAsset(): Asset {
         val suffix =
             when {
@@ -252,6 +313,9 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
 
         private const val LINKER = "/system/bin/linker64"
         private const val LLAMA_ANDROID_MB = 78
+        private const val LLAMA_ANDROID_GPU_MB = 15
+        private const val BROKEN_RETRY_MS = 3L * 24L * 60L * 60L * 1000L
+        private val QUALCOMM_PLATFORMS = setOf("kalama", "pineapple", "sun", "taro", "lahaina", "kona", "msmnile", "lito", "bengal", "crow", "parrot", "waipio", "cliffs", "canoe")
         private const val LLAMA_MAC_MB = 16
         private const val LLAMA_WIN_MB = 37
         private const val LLAMA_LINUX_MB = 35

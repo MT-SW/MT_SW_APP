@@ -73,6 +73,7 @@ fun NameRowWithCenteredBadge(
     badge: (@Composable () -> Unit)?,
     trailing: @Composable () -> Unit,
     modifier: Modifier = Modifier,
+    extraRight: () -> Int = { 0 },
 ) {
     Layout(
         content = {
@@ -96,9 +97,15 @@ fun NameRowWithCenteredBadge(
         val trailingX = width - trailingPlaceable.width
         val free = trailingX - namePlaceable.width
         // With no icons on the right the badge stays at the right edge, as before.
+        // [extraRight] is the width of the icons that sit to the right of this row (in the same line): the badge is
+        // centred between the end of the name and those icons, but never over the icon of this row.
         val badgeX =
             if (trailingPlaceable.width == 0) width - badgePlaceable.width
-            else namePlaceable.width + ((free - badgePlaceable.width) / 2).coerceAtLeast(0)
+            else {
+                val regionEnd = width + extraRight()
+                val centred = namePlaceable.width + ((regionEnd - namePlaceable.width - badgePlaceable.width) / 2)
+                centred.coerceAtMost(trailingX - gap - badgePlaceable.width).coerceAtLeast(namePlaceable.width + gap.coerceAtMost(free / 2))
+            }
         layout(width, height) {
             namePlaceable.placeRelative(0, (height - namePlaceable.height) / 2)
             badgePlaceable.placeRelative(badgeX, (height - badgePlaceable.height) / 2)

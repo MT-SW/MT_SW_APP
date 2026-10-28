@@ -36,7 +36,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -51,6 +54,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
@@ -624,6 +629,9 @@ private fun NodeItemHeader(
     contentColor: Color,
     neighborCount: Int?,
 ) {
+    // Width of the status icons at the right edge of the card, so the neighbour badge can centre itself towards them.
+    var statusIconsWidth by remember { mutableIntStateOf(0) }
+    val statusGap = with(LocalDensity.current) { 4.dp.roundToPx() }
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -640,6 +648,7 @@ private fun NodeItemHeader(
             ) {
                 NameRowWithCenteredBadge(
                     modifier = Modifier.weight(1f),
+                    extraRight = { statusIconsWidth + statusGap },
                     name = {
                         Text(
                             text = longName,
@@ -694,16 +703,18 @@ private fun NodeItemHeader(
             }
         }
 
-        NodeStatusIcons(
-            isThisNode = isThisNode,
-            isFavorite = isFavorite,
-            isMuted = isMuted,
-            isUnmessageable = isUnmessageable,
-            connectionState = connectionState,
-            deviceType = deviceType,
-            contentColor = contentColor,
-            isUnknownUser = thatNode.isUnknownUser,
-        )
+        Box(modifier = Modifier.onSizeChanged { statusIconsWidth = it.width }) {
+            NodeStatusIcons(
+                isThisNode = isThisNode,
+                isFavorite = isFavorite,
+                isMuted = isMuted,
+                isUnmessageable = isUnmessageable,
+                connectionState = connectionState,
+                deviceType = deviceType,
+                contentColor = contentColor,
+                isUnknownUser = thatNode.isUnknownUser,
+            )
+        }
     }
 }
 

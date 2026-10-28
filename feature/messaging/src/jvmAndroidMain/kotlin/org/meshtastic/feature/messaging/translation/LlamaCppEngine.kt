@@ -266,15 +266,27 @@ class LlamaCppEngine(
         val file = store.fileOf(modelId) ?: error("Model $modelId is not downloaded")
         val hearingFile = if (hearing) store.fileOf(modelId, AiFileKind.HEARING) ?: error("Model ${model.name} cannot hear") else null
         val window = contextTokens(modelId)
-        val gpuProgram = installer.install(installer.llamaAsset())
+        val mainProgram = installer.installLlama()
         val attempts = buildList {
-            add(Attempt("graphics card and processor (automatic split)", gpuProgram, emptyList()))
-            add(Attempt("processor only", gpuProgram, listOf("-ngl", "0")))
-            installer.llamaCpuAsset()?.let { asset -> add(Attempt("processor program", null, listOf("-ngl", "0"), asset)) }
+            // A phone: our graphics card builds first (OpenCL on a Snapdragon, then Vulkan), each only counts when the
+            // log shows that the card really took part of the model.
+            for (asset in installer.androidGpuAssets()) {
+                add(Attempt("graphics card (${asset.folder.substringAfterLast('-')}) and processor", null, emptyList(), asset, requireGpu = true))
+            }
+            if (installer.android) {
+                add(Attempt("processor only", mainProgram, listOf("-ngl", "0")))
+            } else {
+                add(Attempt("graphics card and processor (automatic split)", mainProgram, emptyList()))
+                add(Attempt("processor only", mainProgram, listOf("-ngl", "0")))
+                installer.llamaCpuAsset()?.let { asset -> add(Attempt("processor program", null, listOf("-ngl", "0"), asset)) }
+            }
         }
         var failure: Throwable? = null
         for (attempt in attempts) {
-            val program = attempt.program ?: attempt.asset?.let { runCatching { installer.install(it) }.getOrNull() } ?: continue
+            val program =
+                attempt.program
+                    ?: attempt.asset?.let { if (attempt.requireGpu) installer.installGpu(it) else runCatching { installer.install(it) }.getOrNull() }
+                    ?: continue
             Logger.i(tag = TAG) { "Starting ${model.name}: ${attempt.name} (context $window tokens, hearing $hearing)" }
             val started = startServer(program, file, hearingFile, window, attempt.extra)
             try {
@@ -286,6 +298,13 @@ class LlamaCppEngine(
                 }
                 failure = e
                 Logger.w(tag = TAG, throwable = e) { "${attempt.name} did not start: ${e.message}\n${started.logTail().takeLast(MAX_TAIL)}" }
+                started.stop()
+                continue
+            }
+            if (attempt.requireGpu && !gpuTookPart()) {
+                // The program started, but the card did nothing (no driver, no support): not worth keeping on this phone.
+                Logger.w(tag = TAG) { "${attempt.name}: the graphics card was not used\n${started.logTail().takeLast(MAX_TAIL)}" }
+                attempt.asset?.let { installer.markBroken(it) }
                 started.stop()
                 continue
             }
@@ -304,7 +323,15 @@ class LlamaCppEngine(
         val program: File?,
         val extra: List<String>,
         val asset: ModelServerInstaller.Asset? = null,
+        val requireGpu: Boolean = false,
     )
+
+    /** True when the log of the program that just started says that layers of the model went to the graphics card. */
+    private fun gpuTookPart(): Boolean {
+        val text = synchronized(report) { report.toString() }
+        val layers = LAYERS.find(text)?.groupValues?.get(1)?.toIntOrNull() ?: 0
+        return layers > 0
+    }
 
     private fun startServer(program: File, model: File, hearing: File?, window: Int, extra: List<String>): ModelServerProcess {
         val port = ModelServerProcess.freePort()
@@ -403,9 +430,9 @@ class LlamaCppEngine(
         const val MAX_TAIL = 4000
         const val MAX_REPORT = 4000
         const val MS_PER_SECOND = 1000L
-        val BACKEND_LINE = Regex("offloaded|ggml_vulkan|ggml_metal|ggml_cuda|using device|Found \\d+ (Vulkan|CUDA|Metal)", RegexOption.IGNORE_CASE)
+        val BACKEND_LINE = Regex("offloaded|ggml_opencl|ggml_vulkan|ggml_metal|ggml_cuda|using device|Found \\d+ (Vulkan|CUDA|Metal)", RegexOption.IGNORE_CASE)
         val LAYERS = Regex("offloaded (\\d+)/(\\d+) layers to GPU", RegexOption.IGNORE_CASE)
-        val DEVICE = Regex("(?:ggml_vulkan: \\d+ = |using device |Device \\d+: )([^\\n(]+)", RegexOption.IGNORE_CASE)
+        val DEVICE = Regex("(?:ggml_vulkan: \\d+ = |using device |Device \\d+: |ggml_opencl: device: \'?)([^\\n(]+)", RegexOption.IGNORE_CASE)
         const val TRANSCRIBE_RULE =
             "You are a speech-to-text engine. You write down exactly what is said in the recording, in the language " +
                 "that is spoken, with normal punctuation. You never answer, translate, explain or add anything."

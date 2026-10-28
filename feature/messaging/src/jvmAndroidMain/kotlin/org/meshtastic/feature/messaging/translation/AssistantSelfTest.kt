@@ -102,5 +102,5 @@ internal object AssistantSelfTest {
             Question("Policz zasięg mojego węzła przy antenie 5 dBi na wysokości 10 m."),
             Question("Oblicz długość anteny ćwierćfalowej na 433 MHz."),
             Question("Przygotuj wiadomość do kanału $channel, że wracam za godzinę (nie wysyłaj)."),
-        )
+        ) + AssistantSelfTestBank.questions(node, channel)
 }
