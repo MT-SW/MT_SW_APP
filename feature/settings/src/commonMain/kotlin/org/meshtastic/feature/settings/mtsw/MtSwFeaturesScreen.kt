@@ -44,6 +44,9 @@ import org.meshtastic.core.resources.node_color_summary
 import org.meshtastic.core.resources.node_color_title
 import org.meshtastic.core.ui.assistant.SettingHighlight
 import org.meshtastic.core.resources.ai_section_title
+import org.meshtastic.core.resources.smart_features_description
+import org.meshtastic.core.resources.smart_features_summary
+import org.meshtastic.core.resources.smart_features_title
 import org.meshtastic.core.resources.antenna_calc_summary
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.app_log_title
@@ -177,17 +180,15 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 )
             }
 
-            ExpressiveSection(title = stringResource(Res.string.translator_open)) {
+            ExpressiveSection(title = stringResource(Res.string.smart_features_title)) {
                 ListItem(
-                    text = stringResource(Res.string.translator_open),
-                    supportingText = stringResource(Res.string.translator_open_summary),
+                    text = stringResource(Res.string.smart_features_title),
+                    supportingText = stringResource(Res.string.smart_features_summary),
                     leadingIcon = MeshtasticIcons.Language,
                 ) {
-                    onNavigate(ContactsRoute.Translator)
+                    onNavigate(SettingsRoute.SmartFeatures)
                 }
             }
-
-            ExpressiveSection(title = stringResource(Res.string.ai_section_title)) { AiSettings() }
 
             ExpressiveSection(title = stringResource(Res.string.app_log_title)) { AppLogSettings() }
 
@@ -267,6 +268,48 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     onNavigate(SettingsRoute.MtSwOtherFeatures)
                 }
             }
+        }
+    }
+}
+
+/**
+ * "Smart features": the assistant, the message and text translator and voice dictation in one place, all of them
+ * working on the device itself.
+ */
+@Composable
+fun SmartFeaturesScreen(onBack: () -> Unit, onNavigate: (Route) -> Unit) {
+    Scaffold(
+        topBar = {
+            MainAppBar(
+                title = stringResource(Res.string.smart_features_title),
+                canNavigateUp = true,
+                onNavigateUp = onBack,
+                ourNode = null,
+                showNodeChip = false,
+                actions = {},
+                onClickChip = {},
+            )
+        },
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState()).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Text(
+                text = stringResource(Res.string.smart_features_description),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            ExpressiveSection(title = stringResource(Res.string.translator_open)) {
+                ListItem(
+                    text = stringResource(Res.string.translator_open),
+                    supportingText = stringResource(Res.string.translator_open_summary),
+                    leadingIcon = MeshtasticIcons.Language,
+                ) {
+                    onNavigate(ContactsRoute.Translator)
+                }
+            }
+            ExpressiveSection(title = stringResource(Res.string.ai_section_title)) { AiSettings() }
         }
     }
 }

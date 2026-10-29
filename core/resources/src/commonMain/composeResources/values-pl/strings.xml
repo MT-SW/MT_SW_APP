@@ -3013,7 +3013,10 @@
     <string name="mesh_hud_turn_right">Obróć w prawo %1$d°</string>
     <string name="mesh_hud_waiting_sensor">Czekam na czujnik orientacji</string>
     <string name="mesh_hud_watch_step">Uważaj, gdzie idziesz</string>
-    <string name="ai_section_title">Tłumacz i asystent offline</string>
+    <string name="ai_section_title">Asystent, tłumacz i dyktowanie</string>
+    <string name="smart_features_title">Inteligentne funkcje</string>
+    <string name="smart_features_summary">Asystent AI, tłumacz i dyktowanie głosem, w całości na urządzeniu</string>
+    <string name="smart_features_description">Asystent AI, tłumacz wiadomości i tekstu oraz dyktowanie głosem. Wszystko działa w całości na urządzeniu i bez internetu (asystent może opcjonalnie dostać internet do wyszukiwania). Każda funkcja ma własny przełącznik; wybór modelu jest widoczny, ale dostępny dopiero po jej włączeniu.</string>
     <string name="ai_assistant_title">Asystent offline</string>
     <string name="ai_assistant_summary">Rozmowa z asystentem AI bez internetu, z wbudowaną ogólną bazą wiedzy. Funkcja eksperymentalna, domyślnie wyłączona.</string>
     <string name="ai_assistant_unavailable">Asystent będzie dostępny po dodaniu silnika modeli Gemma w jednej z następnych wersji.</string>

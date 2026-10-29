@@ -26,8 +26,10 @@ import org.meshtastic.core.resources.dictation_enabled_title
 import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.ai_assistant_title
 import org.meshtastic.core.resources.ai_models_title
+import org.meshtastic.core.resources.smart_features_title
 import org.meshtastic.core.resources.ai_unload_title
 import org.meshtastic.core.resources.antenna_calc_title
+import org.meshtastic.core.resources.translator_title
 import org.meshtastic.core.resources.kb_title
 import org.meshtastic.core.resources.node_color_title
 import org.meshtastic.core.resources.about
@@ -182,11 +184,13 @@ object SettingsSearchCatalog {
             Res.string.log_retention_days to SettingsRoute.MtSwFeatures,
             Res.string.app_log_level to SettingsRoute.MtSwFeatures,
             Res.string.node_color_title to SettingsRoute.Security,
-            Res.string.dictation_enabled_title to SettingsRoute.MtSwFeatures,
-            Res.string.dictation_external_mic_title to SettingsRoute.MtSwFeatures,
-            Res.string.ai_models_title to SettingsRoute.MtSwFeatures,
-            Res.string.ai_unload_title to SettingsRoute.MtSwFeatures,
-            Res.string.ai_assistant_title to SettingsRoute.MtSwFeatures,
+            Res.string.dictation_enabled_title to SettingsRoute.SmartFeatures,
+            Res.string.dictation_external_mic_title to SettingsRoute.SmartFeatures,
+            Res.string.smart_features_title to SettingsRoute.MtSwFeatures,
+            Res.string.ai_models_title to SettingsRoute.SmartFeatures,
+            Res.string.ai_unload_title to SettingsRoute.SmartFeatures,
+            Res.string.ai_assistant_title to SettingsRoute.SmartFeatures,
+            Res.string.translator_title to SettingsRoute.SmartFeatures,
             Res.string.local_stats_title to SettingsRoute.Telemetry,
             Res.string.about to SettingsRoute.About,
             Res.string.acknowledgements to SettingsRoute.Acknowledgements,

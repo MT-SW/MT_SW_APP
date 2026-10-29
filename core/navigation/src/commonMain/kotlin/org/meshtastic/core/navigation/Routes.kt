@@ -225,6 +225,8 @@ sealed interface SettingsRoute : Route {
 
     @Serializable data object MtSwFeatures : SettingsRoute
 
+    @Serializable data object SmartFeatures : SettingsRoute
+
     @Serializable data object MtSwOtherFeatures : SettingsRoute
 
     @Serializable data object AntennaCalculator : SettingsRoute

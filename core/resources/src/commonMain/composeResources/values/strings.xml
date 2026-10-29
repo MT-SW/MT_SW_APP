@@ -204,7 +204,10 @@
     <string name="ai_scope_all">all conversations (channels and private)</string>
     <string name="ai_scope_channel">channel %1$s (%2$d)</string>
     <string name="ai_scope_default">default</string>
-    <string name="ai_section_title">Offline translator and assistant</string>
+    <string name="ai_section_title">Assistant, translator and dictation</string>
+    <string name="smart_features_title">Smart features</string>
+    <string name="smart_features_summary">AI assistant, translator and voice dictation, fully on the device</string>
+    <string name="smart_features_description">AI assistant, message and text translator and voice dictation. Everything runs entirely on the device and offline (the assistant can optionally get internet access for lookups). Each function has its own switch; the model choice is visible but only available once the function is switched on.</string>
     <string name="ai_sensor_coldest">Coldest</string>
     <string name="ai_sensor_current">current %1$s mA</string>
     <string name="ai_sensor_highest_pressure">Highest pressure</string>

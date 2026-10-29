@@ -52,6 +52,7 @@ import org.meshtastic.feature.settings.SettingsViewModel
 import org.meshtastic.feature.settings.appfunctions.AppFunctionsSettingsScreen
 import org.meshtastic.feature.settings.appfunctions.AppFunctionsSettingsViewModel
 import org.meshtastic.feature.settings.mtsw.MtSwFeaturesScreen
+import org.meshtastic.feature.settings.mtsw.SmartFeaturesScreen
 import org.meshtastic.feature.settings.antenna.AntennaCalculatorScreen
 import org.meshtastic.feature.settings.mtsw.MtSwOtherFeaturesScreen
 import org.meshtastic.feature.settings.debugging.DebugScreen
@@ -490,6 +491,12 @@ fun EntryProviderScope<NavKey>.settingsGraph(
         val settingsViewModel: SettingsViewModel = koinViewModel()
         MtSwFeaturesScreen(
             settingsViewModel = settingsViewModel,
+            onBack = dropUnlessResumed { backStack.removeLastOrNull() },
+            onNavigate = { backStack.add(it) },
+        )
+    }
+    entry<SettingsRoute.SmartFeatures> {
+        SmartFeaturesScreen(
             onBack = dropUnlessResumed { backStack.removeLastOrNull() },
             onNavigate = { backStack.add(it) },
         )

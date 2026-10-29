@@ -268,6 +268,7 @@ object DeepLinkRouter {
             "attributions" to SettingsRoute.Acknowledgements,
             "filter-settings" to SettingsRoute.FilterSettings,
             "mt-sw-features" to SettingsRoute.MtSwFeatures,
+            "smart-features" to SettingsRoute.SmartFeatures,
             "mt-sw-other-features" to SettingsRoute.MtSwOtherFeatures,
             "antenna-calculator" to SettingsRoute.AntennaCalculator,
             "knowledge-base" to SettingsRoute.KnowledgeBase,

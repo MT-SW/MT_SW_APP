@@ -24,6 +24,7 @@ import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.about
 import org.meshtastic.core.resources.dictation_enabled_title
+import org.meshtastic.core.resources.smart_features_title
 import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.ai_models_title
 import org.meshtastic.core.resources.antenna_calc_title
@@ -361,13 +362,14 @@ class AssistantGuideTools(
                 Target("import_menu", "settings/mt-sw-features", Res.string.import_menu_in_top_bar, listOf("przycisk", "plus", "dodaj kontakt", "górn", "belk", "zasłania", "button", "top bar", "udostępnij węzeł")),
                 Target("theme", "settings", Res.string.theme, listOf("motyw", "theme", "ciemny", "jasny", "dark", "light", "tryb ciemny")),
                 Target("language", "settings", Res.string.preferences_language, listOf("język", "language", "jezyk")),
-                Target("dictation_switch", "settings/mt-sw-features", Res.string.dictation_enabled_title, listOf("dyktowanie", "dyktuj", "dictation", "dictate", "włącz dyktowanie", "wyłącz dyktowanie", "mikrofon w czacie")),
-                Target("external_mic", "settings/mt-sw-features", Res.string.dictation_external_mic_title, listOf("mikrofon", "słuchawk", "sluchawk", "headset", "microphone", "zestaw głośnomówiący", "bluetooth mikrofon")),
+                Target("smart_features", "settings/mt-sw-features", Res.string.smart_features_title, listOf("inteligentne funkcje", "inteligentne", "smart features", "ai", "sztuczna inteligencja")),
+                Target("dictation_switch", "settings/smart-features", Res.string.dictation_enabled_title, listOf("dyktowanie", "dyktuj", "dictation", "dictate", "włącz dyktowanie", "wyłącz dyktowanie", "mikrofon w czacie")),
+                Target("external_mic", "settings/smart-features", Res.string.dictation_external_mic_title, listOf("mikrofon", "słuchawk", "sluchawk", "headset", "microphone", "zestaw głośnomówiący", "bluetooth mikrofon")),
                 Target("node_color", "settings/security", Res.string.node_color_pick, listOf("kolor", "color", "colour", "barw")),
-                Target("ai_model", "settings/mt-sw-features", Res.string.ai_models_title, listOf("model ai", "wybór modelu", "wybor modelu", "model", "gemma", "nllb")),
-                Target("ai_unload", "settings/mt-sw-features", Res.string.ai_unload_title, listOf("zwolnij pamięć", "zwolnij pamiec", "wyłącz model", "wylacz model", "ubij model", "pamięć ai", "pamiec ai", "ram", "free memory", "unload")),
-                Target("translator", "settings/mt-sw-features", Res.string.translator_title, listOf("tłumacz", "tlumacz", "translator", "tłumaczen", "tlumaczen", "translat")),
-                Target("assistant", "settings/mt-sw-features", Res.string.ai_assistant_title, listOf("asystent", "assistant", "model ai", "gemma", "sztuczn")),
+                Target("ai_model", "settings/smart-features", Res.string.ai_models_title, listOf("model ai", "wybór modelu", "wybor modelu", "model", "gemma", "nllb")),
+                Target("ai_unload", "settings/smart-features", Res.string.ai_unload_title, listOf("zwolnij pamięć", "zwolnij pamiec", "wyłącz model", "wylacz model", "ubij model", "pamięć ai", "pamiec ai", "ram", "free memory", "unload")),
+                Target("translator", "settings/smart-features", Res.string.translator_title, listOf("tłumacz", "tlumacz", "translator", "tłumaczen", "tlumaczen", "translat")),
+                Target("assistant", "settings/smart-features", Res.string.ai_assistant_title, listOf("asystent", "assistant", "model ai", "gemma", "sztuczn")),
                 Target("knowledge_base", "settings/mt-sw-features", Res.string.kb_title, listOf("baza wiedzy", "baza", "wiedza", "wpisy", "przeglądać", "przegladac", "knowledge", "offtop", "pokrewne", "poradnik")),
                 Target("app_log", "settings/mt-sw-features", Res.string.app_log_level, listOf("logi", "log", "dziennik", "zapis logów", "zapisywanie logów", "diagnoz", "awari", "wywala", "błąd", "blad", "crash", "pobrane")),
                 Target("log_retention", "settings/mt-sw-features", Res.string.log_retention_days, listOf("ramk", "logi", "statystyk", "pamięt", "czas", "baz", "dni", "retention", "historia", "ile czasu")),
