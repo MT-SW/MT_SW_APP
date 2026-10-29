@@ -59,7 +59,7 @@ class AiEngineRouter(
             }
             scope.launch {
                 var previous: Choice? = null
-                combine(
+                combine<Any, Choice>(
                     uiPrefs.assistantEnabled,
                     uiPrefs.translatorEnabled,
                     uiPrefs.assistantModelId,
