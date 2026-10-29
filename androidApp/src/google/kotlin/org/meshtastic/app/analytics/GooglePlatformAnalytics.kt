@@ -130,9 +130,8 @@ class GooglePlatformAnalytics(private val context: Context, private val analytic
             // These keep to what the build normally sends, even while the file log lowers Kermit's global severity.
             add(MinSeverityLogWriter(DatadogLogWriter(), baseSeverity))
             add(MinSeverityLogWriter(CrashlyticsLogWriter(), baseSeverity))
-            if (BuildConfig.DEBUG) {
-                add(co.touchlab.kermit.LogcatWriter())
-            }
+            // Logcat in release too: the Debug panel's log export reads this process's logcat, as on F-Droid.
+            add(co.touchlab.kermit.LogcatWriter())
             add(MtSwLogging.writer)
         }
         KermitLogger.setLogWriters(writers)

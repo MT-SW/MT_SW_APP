@@ -122,10 +122,12 @@
     <string name="doc_title_notifications">Powiadomienia</string>
     <string name="firmware_maintenance_bootloader_available">Najnowsza: %1$s</string>
     <string name="firmware_maintenance_bootloader_installed">Zainstalowana: %1$s</string>
+    <string name="firmware_maintenance_bootloader_last_fault">Bootloader zgłosił błąd: %1$s</string>
     <string name="firmware_maintenance_bootloader_latest_hint">Najnowsza wersja: %1$s. Zainstalowana wersja zostanie pokazana po restarcie urządzenia w trybie aktualizacji.</string>
     <string name="firmware_maintenance_bootloader_up_to_date">Bootloader jest aktualny</string>
     <string name="firmware_maintenance_bootloader_up_to_date_hint">Nie ma czego aktualizować. Następnie firmware zostanie zainstalowany ponownie, co zrestartuje urządzenie.</string>
     <string name="firmware_update_in_progress">Aktualizowanie firmware…</string>
+    <string name="firmware_update_start_timed_out">Aktualizacja nie zdążyła się rozpocząć. Spróbuj ją uruchomić ponownie.</string>
     <string name="license">Licencja</string>
     <string name="license_notice">Wolne oprogramowanie na licencji GNU General Public License w wersji 3, bez żadnej gwarancji. Możesz je rozpowszechniać na tej samej licencji.</string>
     <!-- APP -->
@@ -496,6 +498,25 @@
     <string name="meshtastic_new_nodes_notifications_description">Węzły usłyszane po raz pierwszy.</string>
     <string name="meshtastic_service_notifications_description">Pokazuje połączenie z radiem, gdy MT_SW_APP działa w tle.</string>
     <string name="meshtastic_waypoints_notifications_description">Punkty trasy udostępnione w sieci mesh oraz przekroczenia stref geofence.</string>
+    <string name="mirror_active">Podgląd włączony</string>
+    <string name="mirror_back">Wstecz</string>
+    <string name="mirror_device_screen">Ekran urządzenia</string>
+    <string name="mirror_eink_hint">Wyświetlacz e-ink: odświeżanie jest wolne, więc wybierz jednorazowe Odśwież zamiast ciągłego podglądu.</string>
+    <string name="mirror_frame_info">%1$d×%2$d · klatka #%3$d</string>
+    <string name="mirror_hint_keyboard_active">Strzałki · Enter = OK · Esc = wstecz</string>
+    <string name="mirror_hint_tap_keyboard">Kliknij ekran, aby sterować klawiaturą, albo przesuń po nim palcem, aby nawigować</string>
+    <string name="mirror_hint_tap_touch">Dotknij ekranu, aby dotknąć urządzenie, albo przesuń palcem, aby nawigować</string>
+    <string name="mirror_key_down">W Dół</string>
+    <string name="mirror_key_left">W Lewo</string>
+    <string name="mirror_key_ok">OK</string>
+    <string name="mirror_key_right">W Prawo</string>
+    <string name="mirror_key_up">W Górę</string>
+    <string name="mirror_keyboard">Klawiatura</string>
+    <string name="mirror_no_frame">Nie odebrano jeszcze klatki. Włącz podgląd albo dotknij Odśwież.</string>
+    <string name="mirror_not_connected">Brak połączenia z urządzeniem.</string>
+    <string name="mirror_off">Podgląd wyłączony</string>
+    <string name="mirror_unsupported">Podgląd ekranu wymaga nowszego firmware</string>
+    <string name="mirror_unsupported_hint">To urządzenie nie zgłasza ekranu do podglądu. Strzałki nadal wysyłają klawisze.</string>
     <string name="mqtt_root_problem_empty">Wpisz temat.</string>
     <string name="mqtt_root_problem_empty_segment">Temat nie może zawierać dwóch ukośników z rzędu.</string>
     <string name="mqtt_root_problem_ends_with_version">Temat nie może kończyć się na /2.</string>
@@ -552,6 +573,7 @@
     <string name="show_node_links_summary">Rysuje linie między węzłami, które wymieniają pakiety: raporty sąsiadów, traceroute i bezpośrednie odbiory.</string>
     <string name="debug_tab_app_logs">Dzienniki aplikacji</string>
     <string name="debug_tab_device_logs">Logi urządzenia</string>
+    <string name="debug_tab_mirror">Podgląd ekranu</string>
     <string name="debug_device_logs_empty">Brak logów urządzenia. Włącz „Logi debugowania” w ustawieniach zabezpieczeń urządzenia, aby radio wysyłało do aplikacji te same logi, które widać na porcie szeregowym. Przez Bluetooth działa to z każdym firmware, a przez Wi-Fi i USB tylko z firmware MT_SW.</string>
     <string name="debug_tab_packets">Pakiety</string>
     <string name="deep_link_connect_message">Link prosi tę aplikację o połączenie z urządzeniem pod adresem %1$s. Kontynuuj tylko jeśli ufasz źródłu tego linku.</string>

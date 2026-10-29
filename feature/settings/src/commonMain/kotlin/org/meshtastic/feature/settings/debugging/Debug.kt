@@ -79,6 +79,7 @@ import org.meshtastic.core.resources.debug_store_logs_summary
 import org.meshtastic.core.resources.debug_store_logs_title
 import org.meshtastic.core.resources.debug_tab_app_logs
 import org.meshtastic.core.resources.debug_tab_device_logs
+import org.meshtastic.core.resources.debug_tab_mirror
 import org.meshtastic.core.resources.debug_tab_packets
 import org.meshtastic.core.resources.okay
 import org.meshtastic.core.ui.component.CopyIconButton
@@ -227,6 +228,11 @@ fun DebugScreen(onNavigateUp: () -> Unit, viewModel: DebugViewModel) {
                     onClick = { selectedTab = 2 },
                     text = { Text(stringResource(Res.string.debug_tab_device_logs)) },
                 )
+                Tab(
+                    selected = selectedTab == 3,
+                    onClick = { selectedTab = 3 },
+                    text = { Text(stringResource(Res.string.debug_tab_mirror)) },
+                )
             }
             if (selectedTab == 1) {
                 LogcatContent(modifier = Modifier.fillMaxSize())
@@ -234,6 +240,10 @@ fun DebugScreen(onNavigateUp: () -> Unit, viewModel: DebugViewModel) {
             }
             if (selectedTab == 2) {
                 DeviceLogsContent(logs = logs, modifier = Modifier.fillMaxSize())
+                return@Column
+            }
+            if (selectedTab == 3) {
+                DisplayMirrorContent(modifier = Modifier.fillMaxSize())
                 return@Column
             }
             Box(modifier = Modifier.fillMaxSize()) {
