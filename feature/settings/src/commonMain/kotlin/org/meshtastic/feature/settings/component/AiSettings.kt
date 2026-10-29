@@ -17,10 +17,6 @@
 package org.meshtastic.feature.settings.component
 
 import androidx.compose.foundation.clickable
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.draw.alpha
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -113,9 +109,9 @@ import org.meshtastic.core.resources.translator_title
 import org.meshtastic.core.ui.component.SwitchPreference
 
 /**
- * The content of the "Smart features" screen: one block per function (assistant, translator, dictation), each with its
- * own switch and, below it, its models (greyed out until the switch is on). Nothing is downloaded by itself: after a
- * function is switched on, a small red text asks for a model until one is installed.
+ * The offline translator and assistant: two independent switches, and below them the models, one tab per function
+ * (assistant, translator, dictation). Nothing is downloaded by itself: after a function is switched on, a small red
+ * text asks for a model until one is installed.
  */
 @Composable
 internal fun AiSettings() {
@@ -136,6 +132,7 @@ internal fun AiSettings() {
     val freedMb by store.legacyFreedMb.collectAsStateWithLifecycle()
     val internetOn by uiPrefs.assistantInternetEnabled.collectAsStateWithLifecycle()
     var askInternet by remember { mutableStateOf(false) }
+    var tab by rememberSaveable { mutableIntStateOf(0) }
     var freedNoticeShown by remember { mutableStateOf(true) }
 
     fun isReady(id: String) = states[id] == TranslatorModelState.Ready
@@ -164,6 +161,52 @@ internal fun AiSettings() {
         )
     }
 
+    SwitchPreference(
+        title = stringResource(Res.string.translator_title),
+        summary = stringResource(Res.string.translator_summary),
+        checked = translatorOn,
+        enabled = true,
+        onCheckedChange = { uiPrefs.setTranslatorEnabled(it) },
+    )
+    if (translatorOn && effTranslator == null) {
+        ChooseModelHint(downloading = downloadingFor(AiRole.TRANSLATOR)) { tab = 1 }
+    }
+
+    SwitchPreference(
+        title = stringResource(Res.string.ai_assistant_title),
+        summary =
+        if (assistantPossible) {
+            stringResource(Res.string.ai_assistant_summary)
+        } else {
+            stringResource(Res.string.ai_assistant_unavailable)
+        },
+        checked = assistantOn && assistantPossible,
+        enabled = assistantPossible,
+        onCheckedChange = { uiPrefs.setAssistantEnabled(it) },
+    )
+    if (assistantOn && assistantPossible && effAssistant == null) {
+        ChooseModelHint(downloading = downloadingFor(AiRole.ASSISTANT)) { tab = 0 }
+    }
+
+    if (assistantOn && assistantPossible) {
+        SwitchPreference(
+            title = stringResource(Res.string.ai_internet_title),
+            summary = stringResource(Res.string.ai_internet_summary),
+            checked = internetOn,
+            enabled = true,
+            onCheckedChange = { on -> if (on) askInternet = true else uiPrefs.setAssistantInternetEnabled(false) },
+        )
+        if (internetOn) {
+            Text(
+                text = stringResource(Res.string.ai_internet_on_indicator),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+            )
+        }
+        AssistantMemorySettings()
+    }
+
     if (askInternet) {
         AlertDialog(
             onDismissRequest = { askInternet = false },
@@ -184,109 +227,6 @@ internal fun AiSettings() {
             },
         )
     }
-
-    SectionLabel(stringResource(Res.string.ai_models_tab_assistant))
-    SwitchPreference(
-        title = stringResource(Res.string.ai_assistant_title),
-        summary =
-        if (assistantPossible) {
-            stringResource(Res.string.ai_assistant_summary)
-        } else {
-            stringResource(Res.string.ai_assistant_unavailable)
-        },
-        checked = assistantOn && assistantPossible,
-        enabled = assistantPossible,
-        onCheckedChange = { uiPrefs.setAssistantEnabled(it) },
-    )
-    if (assistantOn && assistantPossible && effAssistant == null) {
-        ChooseModelHint(downloading = downloadingFor(AiRole.ASSISTANT))
-    }
-
-    ModelPicker(
-        role = AiRole.ASSISTANT,
-        current = effAssistant,
-        enabled = assistantOn && assistantPossible,
-        onChoose = { id -> uiPrefs.setAssistantModelId(id) },
-        states = states,
-        store = store,
-        scope = appScope,
-    )
-    if (assistantOn && assistantPossible) {
-        SwitchPreference(
-            title = stringResource(Res.string.ai_internet_title),
-            summary = stringResource(Res.string.ai_internet_summary),
-            checked = internetOn,
-            enabled = true,
-            onCheckedChange = { on -> if (on) askInternet = true else uiPrefs.setAssistantInternetEnabled(false) },
-        )
-        if (internetOn) {
-            Text(
-                text = stringResource(Res.string.ai_internet_on_indicator),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-            )
-        }
-        AssistantMemorySettings()
-    }
-
-
-    SectionLabel(stringResource(Res.string.ai_models_tab_translator))
-    SwitchPreference(
-        title = stringResource(Res.string.translator_title),
-        summary = stringResource(Res.string.translator_summary),
-        checked = translatorOn,
-        enabled = true,
-        onCheckedChange = { uiPrefs.setTranslatorEnabled(it) },
-    )
-    if (translatorOn && effTranslator == null) {
-        ChooseModelHint(downloading = downloadingFor(AiRole.TRANSLATOR))
-    }
-
-    ModelPicker(
-        role = AiRole.TRANSLATOR,
-        current = effTranslator,
-        enabled = translatorOn,
-        onChoose = { id -> uiPrefs.setTranslatorModelId(id) },
-        states = states,
-        store = store,
-        scope = appScope,
-    )
-
-    SectionLabel(stringResource(Res.string.ai_models_tab_dictation))
-    Text(
-        text = stringResource(Res.string.ai_dictation_note),
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-    )
-    SwitchPreference(
-        title = stringResource(Res.string.dictation_enabled_title),
-        summary = stringResource(Res.string.dictation_enabled_summary),
-        checked = dictationOn,
-        enabled = true,
-        onCheckedChange = { uiPrefs.setDictationEnabled(it) },
-    )
-    if (dictationOn && effDictation == null) {
-        ChooseModelHint(downloading = downloadingFor(AiRole.DICTATION))
-    }
-    val externalMic by uiPrefs.dictationExternalMic.collectAsStateWithLifecycle()
-    SwitchPreference(
-        title = stringResource(Res.string.dictation_external_mic_title),
-        summary = stringResource(Res.string.dictation_external_mic_summary),
-        checked = externalMic,
-        enabled = dictationOn,
-        onCheckedChange = { uiPrefs.setDictationExternalMic(it) },
-    )
-    ModelPicker(
-        role = AiRole.DICTATION,
-        current = effDictation,
-        enabled = dictationOn,
-        onChoose = { id -> uiPrefs.setDictationModelId(id) },
-        states = states,
-        store = store,
-        scope = appScope,
-    )
 
     // The model that is running right now and a way to switch it off at once (otherwise it stays while it is used and
     // is swapped as soon as another model is chosen, or freed when its function is switched off).
@@ -341,6 +281,88 @@ internal fun AiSettings() {
         }
     }
 
+    SectionLabel(stringResource(Res.string.ai_models_title))
+    val tabs =
+        listOf(
+            AiRole.ASSISTANT to stringResource(Res.string.ai_models_tab_assistant),
+            AiRole.TRANSLATOR to stringResource(Res.string.ai_models_tab_translator),
+            AiRole.DICTATION to stringResource(Res.string.ai_models_tab_dictation),
+        )
+    // Tab 0 = assistant, 1 = translator, 2 = dictation.
+    PrimaryTabRow(selectedTabIndex = tab) {
+        tabs.forEachIndexed { index, (_, title) ->
+            Tab(selected = tab == index, onClick = { tab = index }, text = { Text(title) })
+        }
+    }
+    val role = tabs[tab].first
+    val (current, onChoose) =
+        when (role) {
+            AiRole.ASSISTANT -> effAssistant to { id: String -> uiPrefs.setAssistantModelId(id) }
+            AiRole.TRANSLATOR -> effTranslator to { id: String -> uiPrefs.setTranslatorModelId(id) }
+            AiRole.DICTATION -> effDictation to { id: String -> uiPrefs.setDictationModelId(id) }
+        }
+    if (role == AiRole.DICTATION) {
+        Text(
+            text = stringResource(Res.string.ai_dictation_note),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+        )
+        SwitchPreference(
+            title = stringResource(Res.string.dictation_enabled_title),
+            summary = stringResource(Res.string.dictation_enabled_summary),
+            checked = dictationOn,
+            enabled = true,
+            onCheckedChange = { uiPrefs.setDictationEnabled(it) },
+        )
+        val externalMic by uiPrefs.dictationExternalMic.collectAsStateWithLifecycle()
+        SwitchPreference(
+            title = stringResource(Res.string.dictation_external_mic_title),
+            summary = stringResource(Res.string.dictation_external_mic_summary),
+            checked = externalMic,
+            enabled = true,
+            onCheckedChange = { uiPrefs.setDictationExternalMic(it) },
+        )
+    }
+    val models = AiModels.forRole(role)
+    if (models.isEmpty()) {
+        Text(
+            text = stringResource(Res.string.ai_models_empty),
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        )
+    }
+    // A second, smaller row of tabs: one per model family (Gemma, Qwen, Bielik, ...), so only one family is on screen.
+    val families = models.map { it.family }.distinct()
+    var familyIndex by rememberSaveable(role) { mutableIntStateOf(0) }
+    val shownIndex = familyIndex.coerceIn(0, (families.size - 1).coerceAtLeast(0))
+    if (families.size > 1) {
+        SecondaryScrollableTabRow(selectedTabIndex = shownIndex, edgePadding = 0.dp) {
+            families.forEachIndexed { index, family ->
+                // A dot marks the family of the model that is in use.
+                val label = if (current?.family == family) "$family •" else family
+                Tab(selected = shownIndex == index, onClick = { familyIndex = index }, text = { Text(label) })
+            }
+        }
+    }
+    families.getOrNull(shownIndex)?.let { family ->
+        models.filter { it.family == family }.forEach { model ->
+            ModelRow(
+                model = model,
+                role = role,
+                state = states[model.id] ?: TranslatorModelState.NotDownloaded,
+                inUse = current?.id == model.id,
+                onUse = { onChoose(model.id) },
+                onDownload = {
+                    // The model a person chooses to download becomes the one in use when none is installed yet.
+                    if (current == null) onChoose(model.id)
+                    appScope.launch { store.download(model.id) }
+                },
+                onCancel = { store.cancelDownload(model.id) },
+                onDelete = { appScope.launch { store.delete(model.id) } },
+            )
+        }
+    }
     Text(
         text = stringResource(Res.string.ai_models_hint),
         style = MaterialTheme.typography.bodySmall,
@@ -356,69 +378,9 @@ internal fun AiSettings() {
     )
 }
 
-/** The models of one function (family tabs, one row per model). Greyed out and not clickable until its switch is on. */
-@Composable
-private fun ModelPicker(
-    role: AiRole,
-    current: AiModelInfo?,
-    enabled: Boolean,
-    onChoose: (String) -> Unit,
-    states: Map<String, TranslatorModelState>,
-    store: AiModelStore,
-    scope: kotlinx.coroutines.CoroutineScope,
-) {
-    Box {
-        Column(modifier = Modifier.alpha(if (enabled) 1f else 0.38f)) {
-            val models = AiModels.forRole(role)
-            if (models.isEmpty()) {
-                Text(
-                    text = stringResource(Res.string.ai_models_empty),
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                )
-            }
-            // A second, smaller row of tabs: one per model family (Gemma, Qwen, Bielik, ...), so only one family is on screen.
-            val families = models.map { it.family }.distinct()
-            var familyIndex by rememberSaveable(role) { mutableIntStateOf(0) }
-            val shownIndex = familyIndex.coerceIn(0, (families.size - 1).coerceAtLeast(0))
-            if (families.size > 1) {
-                SecondaryScrollableTabRow(selectedTabIndex = shownIndex, edgePadding = 0.dp) {
-                    families.forEachIndexed { index, family ->
-                        // A dot marks the family of the model that is in use.
-                        val label = if (current?.family == family) "$family •" else family
-                        Tab(selected = shownIndex == index, onClick = { familyIndex = index }, text = { Text(label) })
-                    }
-                }
-            }
-            families.getOrNull(shownIndex)?.let { family ->
-                models.filter { it.family == family }.forEach { model ->
-                    ModelRow(
-                        model = model,
-                        role = role,
-                        state = states[model.id] ?: TranslatorModelState.NotDownloaded,
-                        inUse = current?.id == model.id,
-                        onUse = { onChoose(model.id) },
-                        onDownload = {
-                            // The model a person chooses to download becomes the one in use when none is installed yet.
-                            if (current == null) onChoose(model.id)
-                            scope.launch { store.download(model.id) }
-                        },
-                        onCancel = { store.cancelDownload(model.id) },
-                        onDelete = { scope.launch { store.delete(model.id) } },
-                    )
-                }
-            }
-        }
-        // Switched off: the models stay visible but nothing in them can be tapped.
-        if (!enabled) {
-            Box(modifier = Modifier.matchParentSize().pointerInput(Unit) { detectTapGestures { } })
-        }
-    }
-}
-
 /** The small red text under a switch: a function is on, but no model for it is installed yet. */
 @Composable
-private fun ChooseModelHint(downloading: Boolean) {
+private fun ChooseModelHint(downloading: Boolean, onClick: () -> Unit) {
     Text(
         text =
         stringResource(
@@ -426,7 +388,7 @@ private fun ChooseModelHint(downloading: Boolean) {
         ),
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.error,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 2.dp),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 2.dp),
     )
 }
 

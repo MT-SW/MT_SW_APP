@@ -415,6 +415,15 @@ class LlamaCppEngine(
                 started.stop()
                 continue
             }
+            if (attempt.npu != null && !answersSanely(started, modelId)) {
+                // Some models (the Q4_K_M files) run on the NPU but write nonsense ("##"): this model goes to the next chip.
+                tried.append("- ${attempt.name}: started, but the answers were nonsense, so this chip is not used for this model\n")
+                startReport = tried.toString()
+                Logger.w(tag = TAG) { "${attempt.name}: a test question was answered with nonsense" }
+                giveUp()
+                started.stop()
+                continue
+            }
             server = started
             loadedId = modelId
             loadedHearing = hearing
@@ -445,6 +454,14 @@ class LlamaCppEngine(
         val dspLibs: Boolean = false,
         val env: Map<String, String> = emptyMap(),
     )
+
+    /** Asks one tiny question and checks that the answer makes sense (an NPU can run a model and still write garbage). */
+    private suspend fun answersSanely(running: ModelServerProcess, modelId: String): Boolean {
+        val body = chatBody(listOf(USER to "What is 2 + 2? Answer with one word."), 24, 0f, null, false)
+        val text = runCatching { complete(running, body, 24, {}, modelId) }.getOrDefault("").lowercase()
+        Logger.i(tag = TAG) { "Test question on the chip: \"${text.take(60)}\"" }
+        return text.contains("4") || text.contains("four") || text.contains("cztery")
+    }
 
     /** True when the log of the program that just started says that layers of the model went to the graphics card. */
     private fun gpuTookPart(): Boolean {
