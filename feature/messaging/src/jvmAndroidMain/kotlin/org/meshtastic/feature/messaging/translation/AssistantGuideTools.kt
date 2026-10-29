@@ -23,6 +23,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.meshtastic.core.navigation.DEEP_LINK_BASE_URI
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.about
+import org.meshtastic.core.resources.dictation_enabled_title
 import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.ai_models_title
 import org.meshtastic.core.resources.antenna_calc_title
@@ -360,6 +361,7 @@ class AssistantGuideTools(
                 Target("import_menu", "settings/mt-sw-features", Res.string.import_menu_in_top_bar, listOf("przycisk", "plus", "dodaj kontakt", "górn", "belk", "zasłania", "button", "top bar", "udostępnij węzeł")),
                 Target("theme", "settings", Res.string.theme, listOf("motyw", "theme", "ciemny", "jasny", "dark", "light", "tryb ciemny")),
                 Target("language", "settings", Res.string.preferences_language, listOf("język", "language", "jezyk")),
+                Target("dictation_switch", "settings/mt-sw-features", Res.string.dictation_enabled_title, listOf("dyktowanie", "dyktuj", "dictation", "dictate", "włącz dyktowanie", "wyłącz dyktowanie", "mikrofon w czacie")),
                 Target("external_mic", "settings/mt-sw-features", Res.string.dictation_external_mic_title, listOf("mikrofon", "słuchawk", "sluchawk", "headset", "microphone", "zestaw głośnomówiący", "bluetooth mikrofon")),
                 Target("node_color", "settings/security", Res.string.node_color_pick, listOf("kolor", "color", "colour", "barw")),
                 Target("ai_model", "settings/mt-sw-features", Res.string.ai_models_title, listOf("model ai", "wybór modelu", "wybor modelu", "model", "gemma", "nllb")),

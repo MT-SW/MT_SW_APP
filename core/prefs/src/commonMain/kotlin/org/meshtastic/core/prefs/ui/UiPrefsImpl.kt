@@ -155,6 +155,20 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_DICTATION_EXTERNAL_MIC] = value } }
     }
 
+    override val dictationEnabled: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_DICTATION_ENABLED] ?: true }.stateIn(scope, SharingStarted.Lazily, true)
+
+    override fun setDictationEnabled(value: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_DICTATION_ENABLED] = value } }
+    }
+
+    override val aiSkipNpu: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_AI_SKIP_NPU] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
+
+    override fun setAiSkipNpu(value: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_AI_SKIP_NPU] = value } }
+    }
+
     override val assistantMemoryEnabled: StateFlow<Boolean> =
         dataStore.data.map { it[KEY_ASSISTANT_MEMORY_ENABLED] ?: false }.stateIn(scope, SharingStarted.Lazily, false)
 
@@ -746,6 +760,8 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_ASSISTANT_MEMORY_ENABLED = booleanPreferencesKey("assistant-memory-enabled")
         val KEY_ANTENNA_SETUPS = stringPreferencesKey("antenna-setups")
         val KEY_DICTATION_EXTERNAL_MIC = booleanPreferencesKey("dictation-external-mic")
+        val KEY_DICTATION_ENABLED = booleanPreferencesKey("dictation-enabled")
+        val KEY_AI_SKIP_NPU = booleanPreferencesKey("ai-skip-npu")
         val KEY_TRANSLATOR_MODEL_ID = stringPreferencesKey("translator-model-id")
         val KEY_ASSISTANT_MODEL_ID = stringPreferencesKey("assistant-model-id")
         val KEY_DICTATION_MODEL_ID = stringPreferencesKey("dictation-model-id")

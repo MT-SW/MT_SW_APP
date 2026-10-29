@@ -37,7 +37,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -54,8 +53,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
@@ -629,9 +626,6 @@ private fun NodeItemHeader(
     contentColor: Color,
     neighborCount: Int?,
 ) {
-    // Width of the status icons at the right edge of the card, so the neighbour badge can centre itself towards them.
-    var statusIconsWidth by remember { mutableIntStateOf(0) }
-    val statusGap = with(LocalDensity.current) { 4.dp.roundToPx() }
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -646,34 +640,22 @@ private fun NodeItemHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                NameRowWithCenteredBadge(
-                    modifier = Modifier.weight(1f),
-                    extraRight = { statusIconsWidth + statusGap },
-                    name = {
-                        Text(
-                            text = longName,
-                            style = MaterialTheme.typography.titleMediumEmphasized.copy(fontStyle = style),
-                            textDecoration = TextDecoration.LineThrough.takeIf { isIgnored },
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    },
-                    badge =
-                        if (neighborCount != null && LocalNodeExtraConfig.current.neighbors) {
-                            { NeighborCountBadge(count = neighborCount) }
-                        } else {
-                            null
-                        },
-                    trailing = {
-                        TransportIcon(
-                            transport = thatNode.lastTransport,
-                            viaMqtt = thatNode.viaMqtt,
-                            modifier = Modifier.size(16.dp),
-                        )
-                    },
+                Text(
+                    text = longName,
+                    modifier = Modifier.weight(1f, fill = false),
+                    style = MaterialTheme.typography.titleMediumEmphasized.copy(fontStyle = style),
+                    textDecoration = TextDecoration.LineThrough.takeIf { isIgnored },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                TransportIcon(
+                    transport = thatNode.lastTransport,
+                    viaMqtt = thatNode.viaMqtt,
+                    modifier = Modifier.size(16.dp),
                 )
             }
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 StatusAwareLastHeard(
                     lastHeard = thatNode.lastHeard,
                     online = thatNode.isOnline,
@@ -700,10 +682,16 @@ private fun NodeItemHeader(
                             )
                         }
                     }
+                // The neighbour badge sits in the middle of the free space between the time and the status icons.
+                if (neighborCount != null && LocalNodeExtraConfig.current.neighbors) {
+                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                        NeighborCountBadge(count = neighborCount, iconSize = 18.dp)
+                    }
+                }
             }
         }
 
-        Box(modifier = Modifier.onSizeChanged { statusIconsWidth = it.width }) {
+        Box {
             NodeStatusIcons(
                 isThisNode = isThisNode,
                 isFavorite = isFavorite,

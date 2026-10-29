@@ -120,6 +120,9 @@ class AiModelStoreImpl(
     /** Set by the engines: stops every running model. */
     @Volatile var unloadAll: (suspend () -> Unit)? = null
 
+    /** Set by the engines: forgets the remembered failed chip attempts. */
+    @Volatile var clearAttempts: (suspend () -> Unit)? = null
+
     private val loadedBy = MutableStateFlow<Map<String, String>>(emptyMap())
 
     override val loadedModels: StateFlow<Set<String>> =
@@ -132,6 +135,10 @@ class AiModelStoreImpl(
 
     override suspend fun unloadModels() {
         unloadAll?.invoke()
+    }
+
+    override suspend fun clearFailedAttempts() {
+        clearAttempts?.invoke()
     }
 
     override val states: StateFlow<Map<String, TranslatorModelState>> =

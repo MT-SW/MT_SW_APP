@@ -45,10 +45,18 @@ class AiEngineRouter(
         // A model is never deleted while a program still has its file open.
         store.beforeModelDelete = { unloadNow() }
         store.unloadAll = { unloadNow() }
+        store.clearAttempts = {
+            llama.clearFailedAttempts()
+            unloadNow()
+        }
         // A model stays in memory while it is used. When another model is chosen, the old one is stopped at once and the
         // new one is loaded straight away (so the first question does not wait); a function switched off frees its
         // model. A newer change cancels a loading that is still going on.
         if (uiPrefs != null) {
+            llama.skipNpu = uiPrefs.aiSkipNpu.value
+            scope.launch {
+                uiPrefs.aiSkipNpu.collect { llama.skipNpu = it }
+            }
             scope.launch {
                 var previous: Choice? = null
                 combine(
@@ -57,7 +65,9 @@ class AiEngineRouter(
                     uiPrefs.assistantModelId,
                     uiPrefs.translatorModelId,
                     uiPrefs.dictationModelId,
-                ) { a, t, am, tm, dm -> Choice(a, t, am, tm, dm) }
+                    uiPrefs.dictationEnabled,
+                    uiPrefs.aiSkipNpu,
+                ) { v -> Choice(v[0] as Boolean, v[1] as Boolean, v[2] as String, v[3] as String, v[4] as String, v[5] as Boolean, v[6] as Boolean) }
                     .distinctUntilChanged()
                     .collectLatest { now ->
                         val before = previous
@@ -69,7 +79,7 @@ class AiEngineRouter(
                             when {
                                 now.assistantOn && (now.assistant != before.assistant || !before.assistantOn) -> now.assistant to false
                                 now.translatorOn && (now.translator != before.translator || !before.translatorOn) -> now.translator to false
-                                now.dictation != before.dictation -> now.dictation to true
+                                now.dictationOn && now.dictation != before.dictation -> now.dictation to true
                                 else -> null
                             }
                         load?.let { (id, hearing) -> preload(id, hearing) }
@@ -81,6 +91,8 @@ class AiEngineRouter(
     override val activeBackend: String get() = llama.activeBackend
 
     override val startReport: String get() = llama.startReport
+
+    override val deviceSummary: String get() = llama.deviceSummary
 
     override fun contextTokens(modelId: String): Int = llama.contextTokens(modelId)
 
@@ -121,6 +133,8 @@ class AiEngineRouter(
         val assistant: String,
         val translator: String,
         val dictation: String,
+        val dictationOn: Boolean,
+        val skipNpu: Boolean,
     )
 
     private companion object {

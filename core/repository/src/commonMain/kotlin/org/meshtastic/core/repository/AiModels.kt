@@ -555,4 +555,7 @@ interface AiModelStore {
 
     /** Stops every running model and frees its memory; the next question starts the model again. */
     suspend fun unloadModels() {}
+
+    /** Forgets the remembered failed chip attempts so the next start tries every chip again. */
+    suspend fun clearFailedAttempts() {}
 }

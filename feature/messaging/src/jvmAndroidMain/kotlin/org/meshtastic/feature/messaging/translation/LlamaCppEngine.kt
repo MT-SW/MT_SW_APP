@@ -81,6 +81,18 @@ class LlamaCppEngine(
     override var startReport: String = ""
         private set
 
+    override val deviceSummary: String get() = runCatching { installer.deviceSummary() }.getOrDefault("")
+
+    /** Set from a hidden setting: skip every NPU and go straight to the graphics card (to test that path). */
+    @Volatile
+    var skipNpu: Boolean = false
+
+    /** Forgets the remembered failed attempts (NPU, graphics card), so the next start tries them again. */
+    fun clearFailedAttempts() {
+        installer.clearBrokenMarks()
+        startReport = ""
+    }
+
     init {
         store.beforeModelDelete = { unloadNow() }
         store.unloadAll = { unloadNow() }
@@ -299,7 +311,7 @@ class LlamaCppEngine(
             // A phone with a Snapdragon: the NPU (Hexagon) first. "-ngl 99" is required: without it the NPU reports no
             // memory to the automatic split and the whole model stays on the processor. Its memory is split into sessions of about 2 GB, so a
             // bigger model gets more sessions (layers spread over them).
-            installer.androidNpuAsset()?.takeIf { !installer.isBroken(it, modelId) }?.let { asset ->
+            installer.androidNpuAsset()?.takeIf { !skipNpu && !installer.isBroken(it, modelId) }?.let { asset ->
                 val sessions = ((model.sizeMb + NPU_SESSION_MB - 1) / NPU_SESSION_MB).coerceIn(1, MAX_NPU_SESSIONS)
                 val devices = (0 until sessions).joinToString(",") { "HTP$it" }
                 add(
@@ -320,7 +332,7 @@ class LlamaCppEngine(
             } else {
                 // A computer with an Intel Core Ultra: its NPU through OpenVINO. Models that the NPU cannot run (Qwen 3.5,
                 // the biggest ones, listening) skip it; the first compilation is kept on disk for the next starts.
-                installer.intelNpuAsset()?.takeIf { model.intelNpu && !hearing && !installer.isBroken(it, modelId) }?.let { asset ->
+                installer.intelNpuAsset()?.takeIf { !skipNpu && model.intelNpu && !hearing && !installer.isBroken(it, modelId) }?.let { asset ->
                     add(
                         Attempt(
                             "NPU (Intel) and processor", null, emptyList(), asset, requireGpu = true, npu = "Intel", perModel = true,
@@ -344,14 +356,16 @@ class LlamaCppEngine(
         }
         var failure: Throwable? = null
         val tried = StringBuilder()
+        if (skipNpu) tried.append("- NPU: skipped on request (hidden setting), the graphics card is tried first\n")
         if (installer.android) {
             if (installer.qualcomm) tried.append("- Snapdragon phone detected\n") else tried.append("- not a Snapdragon phone: no NPU program\n")
-            installer.androidNpuAsset()?.takeIf { installer.isBroken(it, modelId) }
+            installer.androidNpuAsset()?.takeIf { !skipNpu && installer.isBroken(it, modelId) }
                 ?.let { tried.append("- NPU (Hexagon): skipped, failed recently for this model\n") }
             if (installer.androidGpuAssets().isEmpty()) tried.append("- graphics card programs: skipped, failed recently\n")
         } else if (!installer.mac) {
             tried.append(
                 when {
+                    skipNpu -> ""
                     !installer.intelNpu -> "- NPU (Intel): not used, no Intel Core Ultra processor found on this computer\n"
                     hearing -> "- NPU (Intel): skipped, not used for listening\n"
                     !model.intelNpu -> "- NPU (Intel): skipped, this model does not run on the Intel NPU\n"

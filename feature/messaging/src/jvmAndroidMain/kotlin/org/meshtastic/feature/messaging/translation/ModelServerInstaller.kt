@@ -114,6 +114,39 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
             sizeMb = LLAMA_ANDROID_GPU_MB,
         )
 
+    /** Forgets every remembered failure (NPU and graphics card programs), so the next start tries them all again. */
+    fun clearBrokenMarks() {
+        runCatching {
+            root.listFiles { f -> f.name.startsWith(".broken-") && !f.name.startsWith(".broken-reset-") }?.forEach { it.delete() }
+        }
+    }
+
+    private fun systemProperty(name: String): String =
+        runCatching {
+            ProcessBuilder("getprop", name).redirectErrorStream(true).start().inputStream.bufferedReader().readText().trim()
+        }.getOrDefault("")
+
+    /**
+     * A few lines about this device for the `/sprzet` report: chip, graphics driver, memory. People send them in, so that
+     * phones where a chip does not work can be found and handled.
+     */
+    fun deviceSummary(): String = buildString {
+        if (android) {
+            val soc = listOf(systemProperty("ro.soc.manufacturer"), systemProperty("ro.soc.model")).filter { it.isNotBlank() }.joinToString(" ")
+            appendLine("Device: ${systemProperty("ro.product.manufacturer")} ${systemProperty("ro.product.model")}, Android ${systemProperty("ro.build.version.release")} (API ${systemProperty("ro.build.version.sdk")})")
+            appendLine("Chip: ${soc.ifBlank { "?" }}, platform ${systemProperty("ro.board.platform").ifBlank { "?" }}, hardware ${systemProperty("ro.hardware").ifBlank { "?" }}")
+            appendLine("Graphics driver: vulkan=${systemProperty("ro.hardware.vulkan").ifBlank { "?" }}, egl=${systemProperty("ro.hardware.egl").ifBlank { "?" }}, Vulkan level ${systemProperty("ro.hardware.vulkan.level").ifBlank { "?" }}")
+        } else {
+            appendLine("Computer: ${System.getProperty("os.name")} $arch, processor: ${cpuName().ifBlank { "?" }}")
+        }
+        val memoryMb = runCatching {
+            File("/proc/meminfo").takeIf { it.isFile }?.readLines()?.firstOrNull { it.startsWith("MemTotal") }
+                ?.filter { it.isDigit() }?.toLong()?.div(1024)
+        }.getOrNull()
+        if (memoryMb != null) appendLine("Memory: $memoryMb MB")
+        append("Snapdragon NPU program: ${if (androidNpuAsset() != null) "available" else "no"}, Intel NPU: ${if (intelNpu) "found" else "no"}")
+    }
+
     private fun brokenMark(asset: Asset, key: String?) =
         File(root, ".broken-" + asset.folder + (key?.let { "-" + it.replace(Regex("[^A-Za-z0-9._-]"), "_") } ?: ""))
 
@@ -146,14 +179,19 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
      */
     val intelNpu: Boolean by lazy { !android && !mac && !arm && isCoreUltra() }
 
+    private fun cpuName(): String = runCatching {
+        if (windows) {
+            ProcessBuilder("reg", "query", "HKLM\\HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0", "/v", "ProcessorNameString")
+                .redirectErrorStream(true).start().inputStream.bufferedReader().readText().trim()
+        } else if (mac) {
+            ProcessBuilder("sysctl", "-n", "machdep.cpu.brand_string").redirectErrorStream(true).start().inputStream.bufferedReader().readText().trim()
+        } else {
+            File("/proc/cpuinfo").takeIf { it.isFile }?.readLines()?.firstOrNull { it.startsWith("model name") }.orEmpty().substringAfter(':').trim()
+        }
+    }.getOrDefault("")
+
     private fun isCoreUltra(): Boolean = runCatching {
-        val name =
-            if (windows) {
-                ProcessBuilder("reg", "query", "HKLM\\HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0", "/v", "ProcessorNameString")
-                    .redirectErrorStream(true).start().inputStream.bufferedReader().readText()
-            } else {
-                File("/proc/cpuinfo").takeIf { it.isFile }?.readLines()?.firstOrNull { it.startsWith("model name") }.orEmpty()
-            }
+        val name = cpuName()
         val ultra = Regex("core\\(tm\\)\\s*ultra|core\\s+ultra", RegexOption.IGNORE_CASE).containsMatchIn(name)
         // On Linux the NPU also needs its driver (it shows up as an accelerator device).
         ultra && (windows || File("/dev/accel").isDirectory)
@@ -396,7 +434,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
 
         /** The OpenVINO version in the names of the llama.cpp release files (changes together with [LLAMA_TAG]). */
         const val OPENVINO_VERSION = "2026.4.1"
-        private const val BROKEN_RESET = 1
+        private const val BROKEN_RESET = 2
         private const val BROKEN_RETRY_MS = 3L * 24L * 60L * 60L * 1000L
         private val QUALCOMM_PLATFORMS = setOf("kalama", "pineapple", "sun", "taro", "lahaina", "kona", "msmnile", "lito", "bengal", "crow", "parrot", "waipio", "cliffs", "canoe")
         private const val LLAMA_MAC_MB = 16

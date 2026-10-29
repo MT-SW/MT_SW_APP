@@ -22,6 +22,7 @@ import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.navigation.WifiProvisionRoute
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.dictation_enabled_title
 import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.ai_assistant_title
 import org.meshtastic.core.resources.ai_models_title
@@ -181,6 +182,7 @@ object SettingsSearchCatalog {
             Res.string.log_retention_days to SettingsRoute.MtSwFeatures,
             Res.string.app_log_level to SettingsRoute.MtSwFeatures,
             Res.string.node_color_title to SettingsRoute.Security,
+            Res.string.dictation_enabled_title to SettingsRoute.MtSwFeatures,
             Res.string.dictation_external_mic_title to SettingsRoute.MtSwFeatures,
             Res.string.ai_models_title to SettingsRoute.MtSwFeatures,
             Res.string.ai_unload_title to SettingsRoute.MtSwFeatures,

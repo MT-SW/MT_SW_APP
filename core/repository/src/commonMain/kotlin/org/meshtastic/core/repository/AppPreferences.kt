@@ -180,6 +180,18 @@ interface UiPrefs {
 
     fun setDictationExternalMic(value: Boolean) {}
 
+    /** Whether dictation is switched on. On by default, so people who already had a dictation model keep it working. */
+    val dictationEnabled: StateFlow<Boolean>
+        get() = kotlinx.coroutines.flow.MutableStateFlow(true)
+
+    fun setDictationEnabled(value: Boolean) {}
+
+    /** Hidden setting for tests: skip every NPU, so the model goes straight to the graphics card. Off by default. */
+    val aiSkipNpu: StateFlow<Boolean>
+        get() = kotlinx.coroutines.flow.MutableStateFlow(false)
+
+    fun setAiSkipNpu(value: Boolean) {}
+
     /** Whether the assistant keeps short notes and remembers some information between conversations (off by default until the user switches it on). */
     val assistantMemoryEnabled: StateFlow<Boolean>
 

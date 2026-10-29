@@ -32,7 +32,6 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +48,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.di.ApplicationCoroutineScope
+import org.meshtastic.core.common.state.HiddenFeaturesUnlock
 import org.meshtastic.core.repository.AiModelInfo
 import org.meshtastic.core.repository.AiModelStore
 import org.meshtastic.core.repository.AiModels
@@ -84,6 +84,13 @@ import org.meshtastic.core.resources.ai_model_specs
 import org.meshtastic.core.resources.ai_model_use
 import org.meshtastic.core.resources.ai_models_empty
 import org.meshtastic.core.resources.ai_models_hint
+import org.meshtastic.core.resources.ai_clear_attempts_done
+import org.meshtastic.core.resources.ai_clear_attempts_summary
+import org.meshtastic.core.resources.ai_clear_attempts_title
+import org.meshtastic.core.resources.ai_skip_npu_summary
+import org.meshtastic.core.resources.ai_skip_npu_title
+import org.meshtastic.core.resources.dictation_enabled_summary
+import org.meshtastic.core.resources.dictation_enabled_title
 import org.meshtastic.core.resources.ai_unload_loaded
 import org.meshtastic.core.resources.ai_unload_none
 import org.meshtastic.core.resources.ai_unload_title
@@ -111,6 +118,11 @@ internal fun AiSettings() {
     val uiPrefs = koinInject<UiPrefs>()
     val store = koinInject<AiModelStore>()
     val appScope = koinInject<ApplicationCoroutineScope>()
+    val hiddenUnlock = koinInject<HiddenFeaturesUnlock>()
+    val hiddenOn by hiddenUnlock.unlocked.collectAsStateWithLifecycle()
+    val dictationOn by uiPrefs.dictationEnabled.collectAsStateWithLifecycle()
+    val skipNpu by uiPrefs.aiSkipNpu.collectAsStateWithLifecycle()
+    var clearedNotice by remember { mutableStateOf(false) }
     val translatorOn by uiPrefs.translatorEnabled.collectAsStateWithLifecycle()
     val assistantOn by uiPrefs.assistantEnabled.collectAsStateWithLifecycle()
     val translatorModelId by uiPrefs.translatorModelId.collectAsStateWithLifecycle()
@@ -141,11 +153,6 @@ internal fun AiSettings() {
     val effAssistant = effectiveFor(AiRole.ASSISTANT, assistantModelId)
     val effTranslator = effectiveFor(AiRole.TRANSLATOR, translatorModelId)
     val effDictation = effectiveFor(AiRole.DICTATION, dictationModelId)
-    // Keeps the stored choices equal to what is really used (the first model a person installs becomes the chosen one).
-    LaunchedEffect(effAssistant?.id) { effAssistant?.let { if (it.id != assistantModelId) uiPrefs.setAssistantModelId(it.id) } }
-    LaunchedEffect(effTranslator?.id) { effTranslator?.let { if (it.id != translatorModelId) uiPrefs.setTranslatorModelId(it.id) } }
-    LaunchedEffect(effDictation?.id) { effDictation?.let { if (it.id != dictationModelId) uiPrefs.setDictationModelId(it.id) } }
-
     if (freedMb > 0 && freedNoticeShown) {
         AlertDialog(
             onDismissRequest = { freedNoticeShown = false },
@@ -245,6 +252,35 @@ internal fun AiSettings() {
         )
     }
 
+    if (hiddenOn) {
+        SwitchPreference(
+            title = stringResource(Res.string.ai_skip_npu_title),
+            summary = stringResource(Res.string.ai_skip_npu_summary),
+            checked = skipNpu,
+            enabled = true,
+            onCheckedChange = { uiPrefs.setAiSkipNpu(it) },
+        )
+        Column(
+            modifier =
+            Modifier.fillMaxWidth()
+                .clickable {
+                    appScope.launch { store.clearFailedAttempts() }
+                    clearedNotice = true
+                }
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+        ) {
+            Text(text = stringResource(Res.string.ai_clear_attempts_title), style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text =
+                stringResource(
+                    if (clearedNotice) Res.string.ai_clear_attempts_done else Res.string.ai_clear_attempts_summary,
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+
     SectionLabel(stringResource(Res.string.ai_models_title))
     val tabs =
         listOf(
@@ -271,6 +307,13 @@ internal fun AiSettings() {
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+        )
+        SwitchPreference(
+            title = stringResource(Res.string.dictation_enabled_title),
+            summary = stringResource(Res.string.dictation_enabled_summary),
+            checked = dictationOn,
+            enabled = true,
+            onCheckedChange = { uiPrefs.setDictationEnabled(it) },
         )
         val externalMic by uiPrefs.dictationExternalMic.collectAsStateWithLifecycle()
         SwitchPreference(

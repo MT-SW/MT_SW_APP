@@ -40,9 +40,12 @@ class ModelDictationService(
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
+    /** The chosen model when it is installed; otherwise the first installed dictation model (the choice is not rewritten). */
     private fun pick(states: Map<String, TranslatorModelState>, id: String): String? {
-        val model = AiModels.byId(id) ?: return null
-        return id.takeIf { model.canDo(AiRole.DICTATION) && model.engineReady && states[id] == TranslatorModelState.Ready }
+        fun usable(model: org.meshtastic.core.repository.AiModelInfo) =
+            model.canDo(AiRole.DICTATION) && model.engineReady && states[model.id] == TranslatorModelState.Ready
+        AiModels.byId(id)?.takeIf { usable(it) }?.let { return it.id }
+        return AiModels.all.firstOrNull { usable(it) }?.id
     }
 
     override val available: StateFlow<Boolean> = flow()
@@ -51,10 +54,11 @@ class ModelDictationService(
     override val translatorAvailable: StateFlow<Boolean> = flow()
 
     private fun flow(): StateFlow<Boolean> =
-        combine(store.states, uiPrefs.dictationModelId) { states, id -> pick(states, id) != null }
+        combine(store.states, uiPrefs.dictationModelId, uiPrefs.dictationEnabled) { states, id, on -> on && pick(states, id) != null }
             .stateIn(scope, SharingStarted.Eagerly, false)
 
     override suspend fun transcribe(wav: ByteArray, translator: Boolean): String {
+        check(uiPrefs.dictationEnabled.value) { "Dictation is switched off" }
         val id = checkNotNull(pick(store.states.value, uiPrefs.dictationModelId.value)) { "Dictation is not available" }
         return engine.transcribe(id, wav)
     }
