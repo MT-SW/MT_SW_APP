@@ -97,6 +97,11 @@ data class AiModelInfo(
     val minDeviceRamGb: Int,
     val license: AiLicense,
     val files: List<AiModelFile>,
+    /**
+     * Other files for phones, when the version used on computers does not suit a phone's graphics card or NPU (the K-quant
+     * files write nonsense or crash on Adreno phones; Q4_0 is handled by those engines). Null: the same files everywhere.
+     */
+    val phoneFiles: List<AiModelFile>? = null,
     val platforms: Set<AiPlatform>,
     val hearing: Boolean = false,
     /**
@@ -116,6 +121,9 @@ data class AiModelInfo(
 ) {
     /** True when the engine of this model exists on the platform the app runs on. */
     val engineReady: Boolean get() = AiModels.platform in platforms && engine !in AiModels.unavailableEngines
+
+    /** The files this system downloads and uses: the phone's own list on a phone when there is one. */
+    val activeFiles: List<AiModelFile> get() = if (AiModels.platform == AiPlatform.ANDROID) phoneFiles ?: files else files
 
     fun canDo(role: AiRole): Boolean = role in roles
 }
@@ -279,11 +287,12 @@ object AiModels {
             family = "Qwen 3.5",
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT,
-            sizeMb = 1215,
+            sizeMb = 1281,
             ramMb = 2200,
             minDeviceRamGb = 4,
             license = AiLicense.APACHE_2_0,
-            files = listOf(hf("unsloth/Qwen3.5-2B-GGUF", "Qwen3.5-2B-Q4_0.gguf", 1215)),
+            files = listOf(hf("unsloth/Qwen3.5-2B-GGUF", "Qwen3.5-2B-Q4_K_M.gguf", 1281)),
+            phoneFiles = listOf(hf("unsloth/Qwen3.5-2B-GGUF", "Qwen3.5-2B-Q4_0.gguf", 1215)),
             platforms = BOTH,
             descriptionPl = "Bardzo mały model do prostych zadań i do słabszych komputerów.",
             descriptionEn = "A very small model for simple tasks and weaker computers.",
@@ -304,6 +313,7 @@ object AiModels {
             minDeviceRamGb = 6,
             license = AiLicense.APACHE_2_0,
             files = listOf(hf("unsloth/Qwen3.5-4B-GGUF", "Qwen3.5-4B-Q4_K_M.gguf", 2741)),
+            phoneFiles = listOf(hf("unsloth/Qwen3.5-4B-GGUF", "Qwen3.5-4B-Q4_0.gguf", 2464)),
             platforms = BOTH,
             descriptionPl = "Mały model dobrze radzący sobie z narzędziami i rozumowaniem; polski słabszy niż w modelach Google i Bielik.",
             descriptionEn = "A small model that handles tools and reasoning well; its Polish is weaker than the Google and Bielik models.",
@@ -324,6 +334,7 @@ object AiModels {
             minDeviceRamGb = 12,
             license = AiLicense.APACHE_2_0,
             files = listOf(hf("unsloth/Qwen3.5-9B-GGUF", "Qwen3.5-9B-Q4_K_M.gguf", 5681)),
+            phoneFiles = listOf(hf("unsloth/Qwen3.5-9B-GGUF", "Qwen3.5-9B-Q4_0.gguf", 5130)),
             platforms = BOTH,
             descriptionPl = "Średni model z dobrym korzystaniem z narzędzi aplikacji.",
             descriptionEn = "A mid-size model that uses the app's tools well.",

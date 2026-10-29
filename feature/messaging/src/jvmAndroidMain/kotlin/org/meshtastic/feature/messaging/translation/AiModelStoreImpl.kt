@@ -86,7 +86,34 @@ class AiModelStoreImpl(
     override val legacyFreedMb: StateFlow<Int> = legacyFreed
 
     init {
-        scope.launch(Dispatchers.IO) { cleanLegacyOnce() }
+        scope.launch(Dispatchers.IO) {
+            cleanLegacyOnce()
+            cleanReplacedFiles()
+        }
+    }
+
+    /**
+     * Removes files of a known model that are no longer the one this system uses (an older kind of the same model, for
+     * example the K-quant file replaced by the Q4_0 one on phones), so they do not take gigabytes for nothing. Only
+     * model files inside the app's own model folders are touched; the files in use and unfinished downloads are kept.
+     */
+    private fun cleanReplacedFiles() {
+        runCatching {
+            var bytes = 0L
+            AiModels.all.filter { it.engine != AiEngine.NLLB_ONNX }.forEach { model ->
+                val dir = modelDir(model)
+                if (!dir.isDirectory) return@forEach
+                val keep = model.activeFiles.map { it.fileName }.toSet()
+                dir.listFiles()?.filter { f ->
+                    f.isFile && (f.name.endsWith(".gguf") || f.name.endsWith(".gguf.part")) && f.name.removeSuffix(".part") !in keep
+                }?.forEach { f ->
+                    bytes += f.length()
+                    f.delete()
+                }
+            }
+            val mb = (bytes / MB).toInt()
+            if (mb > 0) Logger.i(tag = TAG) { "Removed replaced model files: $mb MB" }
+        }.onFailure { Logger.w(tag = TAG, throwable = it) { "Removing replaced model files failed: ${it.message}" } }
     }
 
     /**
@@ -178,7 +205,7 @@ class AiModelStoreImpl(
                     }
                     done += engineMb
                 }
-                for (file in model.files) {
+                for (file in model.activeFiles) {
                     val size = fileSizeMb(model, file).toFloat()
                     val before = done
                     downloadFile(file, File(dir, file.fileName)) { fraction ->
@@ -225,7 +252,7 @@ class AiModelStoreImpl(
     /** Absolute path of the file of the given [kind] (for example the hearing part), or null when there is none or it is not complete. */
     fun fileOf(id: String, kind: AiFileKind): File? {
         val model = AiModels.byId(id) ?: return null
-        val file = model.files.firstOrNull { it.kind == kind } ?: return null
+        val file = model.activeFiles.firstOrNull { it.kind == kind } ?: return null
         return File(modelDir(model), file.fileName).takeIf { isComplete(model) }
     }
 
@@ -237,8 +264,8 @@ class AiModelStoreImpl(
     private fun expectedBytes(model: AiModelInfo, file: AiModelFile): Long =
         fileSizeMb(model, file).toLong() * MB * MIN_COMPLETE_FRACTION / 100
 
-    private fun isComplete(model: AiModelInfo): Boolean = model.files.isNotEmpty() &&
-        model.files.all { f ->
+    private fun isComplete(model: AiModelInfo): Boolean = model.activeFiles.isNotEmpty() &&
+        model.activeFiles.all { f ->
             val file = File(modelDir(model), f.fileName)
             file.isFile && file.length() >= expectedBytes(model, f)
         }
