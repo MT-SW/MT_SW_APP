@@ -415,9 +415,10 @@ class LlamaCppEngine(
                 started.stop()
                 continue
             }
-            if (attempt.npu != null && !answersSanely(started, modelId)) {
-                // Some models (the Q4_K_M files) run on the NPU but write nonsense ("##"): this model goes to the next chip.
-                tried.append("- ${attempt.name}: started, but the answers were nonsense, so this chip is not used for this model\n")
+            if (attempt.requireGpu && !answersSanely(started, modelId)) {
+                // A chip can load the model and still crash while answering or write nonsense ("##", seen with OpenCL on
+                // an Adreno): this chip is not used for this model.
+                tried.append("- ${attempt.name}: started, but the test question was not answered properly (crash or nonsense), so this chip is not used for this model\n")
                 startReport = tried.toString()
                 Logger.w(tag = TAG) { "${attempt.name}: a test question was answered with nonsense" }
                 giveUp()
