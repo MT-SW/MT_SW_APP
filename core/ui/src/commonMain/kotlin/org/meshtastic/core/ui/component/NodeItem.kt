@@ -642,13 +642,12 @@ private fun NodeItemHeader(
             ) {
                 Text(
                     text = longName,
-                    modifier = Modifier.weight(1f, fill = false),
                     style = MaterialTheme.typography.titleMediumEmphasized.copy(fontStyle = style),
                     textDecoration = TextDecoration.LineThrough.takeIf { isIgnored },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
                 )
-                Spacer(modifier = Modifier.weight(1f))
                 TransportIcon(
                     transport = thatNode.lastTransport,
                     viaMqtt = thatNode.viaMqtt,
@@ -685,7 +684,7 @@ private fun NodeItemHeader(
                 // The neighbour badge sits in the middle of the free space between the time and the status icons.
                 if (neighborCount != null && LocalNodeExtraConfig.current.neighbors) {
                     Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                        NeighborCountBadge(count = neighborCount, iconSize = 18.dp)
+                        NeighborCountBadge(count = neighborCount, iconSize = 22.dp)
                     }
                 }
             }

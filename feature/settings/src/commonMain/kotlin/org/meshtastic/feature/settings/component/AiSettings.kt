@@ -356,8 +356,6 @@ internal fun AiSettings() {
     )
 }
 
-}
-
 /** The models of one function (family tabs, one row per model). Greyed out and not clickable until its switch is on. */
 @Composable
 private fun ModelPicker(
