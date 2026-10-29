@@ -318,7 +318,7 @@ class LlamaCppEngine(
                     Attempt(
                         "NPU (Hexagon, $sessions × 2 GB) and processor", null, listOf("--device", devices, "-ngl", "99"), asset,
                         requireGpu = true, npu = "Hexagon", perModel = true, vendorLibs = true,
-                        env = mapOf("GGML_HEXAGON_NDEV" to sessions.toString()), dspLibs = true,
+                        env = mapOf("GGML_HEXAGON_DEVICES" to sessions.toString()), dspLibs = true,
                     ),
                 )
             }
@@ -451,7 +451,9 @@ class LlamaCppEngine(
         val text = synchronized(report) { report.toString() }
         val layers = LAYERS.find(text)?.groupValues?.get(1)?.toIntOrNull() ?: 0
         // An NPU may hold the model without "offloaded ... layers" in the log: its own model buffer counts too.
-        return layers > 0 || NPU_BUFFER.containsMatchIn(text)
+        // The engine does not always print "offloaded ... layers" (newer builds keep it quiet), so a layer placed on a
+        // chip, or a chip's own lines in the log (NPU sessions found), count as well.
+        return layers > 0 || NPU_BUFFER.containsMatchIn(text) || CHIP_LAYER.containsMatchIn(text) || NPU_DEVICE.containsMatchIn(text)
     }
 
     private fun startServer(program: File, model: File, hearing: File?, window: Int, extra: List<String>, attempt: Attempt): ModelServerProcess {
@@ -564,7 +566,9 @@ class LlamaCppEngine(
         /** About 600 tokens of quiet thinking: past that the model is stopped and asked again without thinking. */
         const val MAX_THINKING_CHARS = 2400
         const val MS_PER_SECOND = 1000L
-        val BACKEND_LINE = Regex("offloaded|ggml_opencl|ggml_vulkan|ggml_metal|ggml_cuda|ggml-hex|openvino|model buffer size|using device|Found \\d+ (Vulkan|CUDA|Metal)", RegexOption.IGNORE_CASE)
+        val BACKEND_LINE = Regex("offloaded|assigned to device|HTP\\d|ggml_opencl|ggml_vulkan|ggml_metal|ggml_cuda|ggml-hex|openvino|model buffer size|using device|Found \\d+ (Vulkan|CUDA|Metal)", RegexOption.IGNORE_CASE)
+        val CHIP_LAYER = Regex("assigned to device (GPU|HTP|Vulkan|OpenCL|OpenVINO|CUDA|Metal)", RegexOption.IGNORE_CASE)
+        val NPU_DEVICE = Regex("device HTP\\d", RegexOption.IGNORE_CASE)
         val NPU_BUFFER = Regex("(HTP\\d|OPENVINO|OpenVINO)\\S*\\s+model buffer size", RegexOption.IGNORE_CASE)
         /** The phone's own driver folders (OpenCL, Vulkan and the NPU's connection library live there). */
         val VENDOR_LIB_DIRS = listOf("/vendor/lib64", "/system/vendor/lib64", "/odm/lib64")
