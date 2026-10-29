@@ -97,13 +97,16 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
      * Adreno only) and Vulkan (any phone), published on this project's release page. The official Android build runs on
      * the processor only. A program that was missing or did not work on this phone is skipped for a while.
      */
-    fun androidGpuAssets(): List<Asset> {
+    fun androidGpuAssets(modelId: String? = null): List<Asset> = androidGpuAssetsAll().filterNot { isBroken(it, modelId) }
+
+    /** The graphics card programs this phone can try, whatever failed before. */
+    fun androidGpuAssetsAll(): List<Asset> {
         if (!android || !llamaSupported) return emptyList()
         val all = buildList {
             if (qualcomm) add(gpuAsset("opencl"))
             add(gpuAsset("vulkan"))
         }
-        return all.filterNot { isBroken(it) }
+        return all
     }
 
     private fun gpuAsset(kind: String) =

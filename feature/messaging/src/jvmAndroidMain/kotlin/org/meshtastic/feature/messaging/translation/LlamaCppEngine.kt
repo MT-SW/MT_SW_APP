@@ -324,8 +324,23 @@ class LlamaCppEngine(
             }
             // A phone: our graphics card builds (OpenCL on a Snapdragon, then Vulkan), each only counts when the log
             // shows that the card really took part of the model.
-            for (asset in installer.androidGpuAssets()) {
-                add(Attempt("graphics card (${asset.folder.substringAfterLast('-')}) and processor", null, emptyList(), asset, requireGpu = true, vendorLibs = true))
+            for (asset in installer.androidGpuAssetsAll()) {
+                val kind = asset.folder.substringAfterLast('-')
+                if (!installer.isBroken(asset, modelId)) add(Attempt("graphics card ($kind) and processor", null, emptyList(), asset, requireGpu = true, perModel = true, vendorLibs = true))
+                // Vulkan drivers of some phones (Adreno) fail to build the fast shaders: the same card once more with the
+                // newer driver features switched off (own mark, so a failure here does not hide the normal way).
+                if (kind == "vulkan" && !installer.isBroken(asset, modelId + SAFE_SUFFIX)) {
+                    add(
+                        Attempt(
+                            "graphics card (vulkan, safe mode) and processor", null, emptyList(), asset, requireGpu = true, perModel = true,
+                            vendorLibs = true, markSuffix = SAFE_SUFFIX,
+                            env = mapOf(
+                                "GGML_VK_DISABLE_F16" to "1", "GGML_VK_DISABLE_COOPMAT" to "1",
+                                "GGML_VK_DISABLE_INTEGER_DOT_PRODUCT" to "1", "GGML_VK_DISABLE_FUSION" to "1",
+                            ),
+                        ),
+                    )
+                }
             }
             if (installer.android) {
                 add(Attempt("processor only", mainProgram, listOf("-ngl", "0")))
@@ -361,7 +376,7 @@ class LlamaCppEngine(
             if (installer.qualcomm) tried.append("- Snapdragon phone detected\n") else tried.append("- not a Snapdragon phone: no NPU program\n")
             installer.androidNpuAsset()?.takeIf { !skipNpu && installer.isBroken(it, modelId) }
                 ?.let { tried.append("- NPU (Hexagon): skipped, failed recently for this model\n") }
-            if (installer.androidGpuAssets().isEmpty()) tried.append("- graphics card programs: skipped, failed recently\n")
+            if (installer.androidGpuAssets(modelId).isEmpty()) tried.append("- graphics card programs: skipped, failed recently\n")
         } else if (!installer.mac) {
             tried.append(
                 when {
@@ -389,7 +404,7 @@ class LlamaCppEngine(
             val started = startServer(program, file, hearingFile, window, attempt.extra + noThinking, attempt)
             // A chip that fails is not tried again for a while (an NPU only for this model: another may fit).
             fun giveUp() {
-                if (attempt.requireGpu) attempt.asset?.let { installer.markBroken(it, if (attempt.perModel) modelId else null) }
+                if (attempt.requireGpu) attempt.asset?.let { installer.markBroken(it, if (attempt.perModel) modelId + attempt.markSuffix else null) }
             }
             try {
                 started.awaitReady("/health", if (attempt.requireGpu) CHIP_LOAD_TIMEOUT_MS else LOAD_TIMEOUT_MS)
@@ -418,7 +433,7 @@ class LlamaCppEngine(
             if (attempt.requireGpu && !answersSanely(started, modelId)) {
                 // A chip can load the model and still crash while answering or write nonsense ("##", seen with OpenCL on
                 // an Adreno): this chip is not used for this model.
-                tried.append("- ${attempt.name}: started, but the test question was not answered properly (crash or nonsense), so this chip is not used for this model\n")
+                tried.append("- ${attempt.name}: started, but the test question was not answered properly (crash or nonsense), so this chip is not used for this model. ${started.logTail().takeLast(REPORT_TAIL).trim()}\n")
                 startReport = tried.toString()
                 Logger.w(tag = TAG) { "${attempt.name}: a test question was answered with nonsense" }
                 giveUp()
@@ -454,6 +469,7 @@ class LlamaCppEngine(
         val vendorLibs: Boolean = false,
         val dspLibs: Boolean = false,
         val env: Map<String, String> = emptyMap(),
+        val markSuffix: String = "",
     )
 
     /** Asks one tiny question and checks that the answer makes sense (an NPU can run a model and still write garbage). */
@@ -593,6 +609,7 @@ class LlamaCppEngine(
         /** Where the phone keeps the NPU's own programs. */
         val DSP_DIRS = listOf("/vendor/dsp/cdsp", "/vendor/lib/rfsa/adsp", "/vendor/dsp", "/system/lib/rfsa/adsp", "/dsp")
         /** The NPU of a Snapdragon gives each session about 2 GB. */
+        const val SAFE_SUFFIX = "-safe"
         const val NPU_SESSION_MB = 1800
         const val MAX_NPU_SESSIONS = 4
         /** Memory left free on a computer's graphics card when it is filled with the model (the engine's own default is 1024). */
