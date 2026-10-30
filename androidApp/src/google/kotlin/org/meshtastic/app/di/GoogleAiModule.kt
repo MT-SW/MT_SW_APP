@@ -28,6 +28,7 @@ import org.meshtastic.app.translation.MlKitDocTranslator
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.TranslatorModelManager
 import org.meshtastic.feature.messaging.translation.AiModelStoreImpl
+import org.meshtastic.feature.messaging.translation.AiStorageLocation
 import org.meshtastic.feature.messaging.translation.AiTranslationRouter
 import org.meshtastic.feature.messaging.translation.AssistantHistoryStore
 import org.meshtastic.feature.messaging.translation.AssistantService
@@ -91,14 +92,33 @@ class GoogleAiModule {
     @Single fun docTranslationService(cache: DocTranslationCache): DocTranslationService = MlKitDocTranslator(cache)
 
     @Single
-    fun nllbTranslator(context: Context, uiPrefs: UiPrefs): NllbTranslator =
-        NllbTranslator(File(context.filesDir, "translator"), uiPrefs)
+    fun nllbTranslator(location: AiStorageLocation, uiPrefs: UiPrefs): NllbTranslator =
+        NllbTranslator(location.translatorDir, uiPrefs)
+
+    /**
+     * Where the models are kept: the phone's memory, or an SD card when a person chooses it. The engine programs always
+     * stay in the app's own memory (the system runs programs only from there).
+     */
+    @Single
+    fun aiStorageLocation(context: Context): AiStorageLocation =
+        AiStorageLocation(
+            settingsDir = context.filesDir,
+            defaultBase = context.filesDir,
+            withEngines = false,
+            choicesProvider = {
+                val removable =
+                    context.getExternalFilesDirs(null).filterNotNull().filter {
+                        runCatching { android.os.Environment.isExternalStorageRemovable(it) && android.os.Environment.getExternalStorageState(it) == android.os.Environment.MEDIA_MOUNTED }.getOrDefault(false)
+                    }.map { File(it, "ai") }
+                listOf(context.filesDir) + removable
+            },
+        )
 
 
     @Single fun modelServerInstaller(context: Context): ModelServerInstaller = ModelServerInstaller(File(context.filesDir, "engines"))
 
     @Single
-    fun aiModelStoreImpl(context: Context, translator: NllbTranslator, installer: ModelServerInstaller): AiModelStoreImpl {
+    fun aiModelStoreImpl(location: AiStorageLocation, translator: NllbTranslator, installer: ModelServerInstaller): AiModelStoreImpl {
         // The language model and speech programs exist only for 64-bit phones.
         AiModels.platform = AiPlatform.ANDROID
         AiModels.unavailableEngines =
@@ -106,7 +126,7 @@ class GoogleAiModule {
                 if (!installer.whisperSupported) add(AiEngine.WHISPER_CPP)
                 if (!installer.llamaSupported) add(AiEngine.LLAMA_CPP)
             }
-        return AiModelStoreImpl(translator, File(context.filesDir, "models"), installer)
+        return AiModelStoreImpl(translator, location.modelsDir, installer, location)
     }
 
     @Single fun aiModelStore(impl: AiModelStoreImpl): AiModelStore = impl

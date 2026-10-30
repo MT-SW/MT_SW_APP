@@ -55,6 +55,7 @@ import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.feature.messaging.translation.NllbTranslator
+import org.meshtastic.feature.messaging.translation.AiStorageLocation
 import java.io.File
 
 /** Keyword-only fallback AI assistant and no-op translators for Desktop (no on-device model). */
@@ -67,23 +68,48 @@ class DesktopAiModule {
 
     @Single fun docTranslationService(): DocTranslationService = NoOpDocTranslator()
 
+    /** The models, engine programs and translator files go to the folder a person chose (default: ~/.meshtastic). */
     @Single
-    fun nllbTranslator(uiPrefs: UiPrefs): NllbTranslator =
-        NllbTranslator(File(System.getProperty("user.home"), ".meshtastic/translator"), uiPrefs)
+    fun aiStorageLocation(): AiStorageLocation {
+        val home = File(System.getProperty("user.home"), ".meshtastic")
+        return AiStorageLocation(
+            settingsDir = home,
+            defaultBase = home,
+            withEngines = true,
+            askOnFirstRun = true,
+            folderPicker = {
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                    runCatching {
+                            val chooser =
+                                javax.swing.JFileChooser().apply {
+                                    dialogTitle = "MT_SW"
+                                    fileSelectionMode = javax.swing.JFileChooser.DIRECTORIES_ONLY
+                                }
+                            if (chooser.showOpenDialog(null) == javax.swing.JFileChooser.APPROVE_OPTION) chooser.selectedFile.path else null
+                        }
+                        .getOrNull()
+                }
+            },
+        )
+    }
 
     @Single
-    fun modelServerInstaller(): ModelServerInstaller =
-        ModelServerInstaller(File(System.getProperty("user.home"), ".meshtastic/engines"))
+    fun nllbTranslator(location: AiStorageLocation, uiPrefs: UiPrefs): NllbTranslator =
+        NllbTranslator(location.translatorDir, uiPrefs)
 
     @Single
-    fun aiModelStoreImpl(translator: NllbTranslator, installer: ModelServerInstaller): AiModelStoreImpl {
+    fun modelServerInstaller(location: AiStorageLocation): ModelServerInstaller =
+        ModelServerInstaller(location.enginesDir)
+
+    @Single
+    fun aiModelStoreImpl(location: AiStorageLocation, translator: NllbTranslator, installer: ModelServerInstaller): AiModelStoreImpl {
         AiModels.platform = AiPlatform.DESKTOP
         AiModels.unavailableEngines =
             buildSet {
                 if (!installer.whisperSupported) add(AiEngine.WHISPER_CPP)
                 if (!installer.llamaSupported) add(AiEngine.LLAMA_CPP)
             }
-        return AiModelStoreImpl(translator, File(System.getProperty("user.home"), ".meshtastic/models"), installer)
+        return AiModelStoreImpl(translator, location.modelsDir, installer, location)
     }
 
     @Single fun aiModelStore(impl: AiModelStoreImpl): AiModelStore = impl

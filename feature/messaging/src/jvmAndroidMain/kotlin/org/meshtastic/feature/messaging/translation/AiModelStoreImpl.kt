@@ -40,6 +40,8 @@ import org.meshtastic.core.repository.AiModelFile
 import org.meshtastic.core.repository.AiModelInfo
 import org.meshtastic.core.repository.AiModelStore
 import org.meshtastic.core.repository.AiModels
+import org.meshtastic.core.repository.AiStorageInfo
+import org.meshtastic.core.repository.AiStorageMove
 import org.meshtastic.core.repository.TranslatorModelState
 import java.io.File
 import java.io.FileOutputStream
@@ -71,7 +73,49 @@ class AiModelStoreImpl(
     private val nllb: NllbTranslator,
     val ggufDir: File,
     private val installer: AiEngineInstaller? = null,
+    private val location: AiStorageLocation? = null,
 ) : AiModelStore {
+
+    private val storageState = MutableStateFlow(storageInfoNow())
+    private val storageMoveState = MutableStateFlow<AiStorageMove>(AiStorageMove.Idle)
+    private val askFolderState = MutableStateFlow(location?.needsFirstQuestion() == true)
+
+    override val storage: StateFlow<AiStorageInfo?> = storageState
+    override val storageMove: StateFlow<AiStorageMove> = storageMoveState
+    override val askStorageFolder: StateFlow<Boolean> = askFolderState
+
+    private fun storageInfoNow(): AiStorageInfo? =
+        location?.let { l -> AiStorageInfo(l.base.path, l.freeMb(), l.choices.map { it.path }, l.nextBase?.path) }
+
+    override fun storageFolderAsked() {
+        location?.markAsked()
+        askFolderState.value = false
+    }
+
+    override suspend fun pickStorageFolder(): String? = location?.folderPicker?.invoke()
+
+    override suspend fun moveStorage(folder: String) {
+        val l = location ?: return
+        if (storageMoveState.value is AiStorageMove.Moving) return
+        val busy = gguf.value.values.any { it is TranslatorModelState.Downloading } || nllb.state.value is TranslatorModelState.Downloading
+        if (busy) {
+            storageMoveState.value = AiStorageMove.Failed("a model is being downloaded, wait until it finishes")
+            return
+        }
+        // The files are copied, not moved: the models in memory are switched off first so nothing keeps them open.
+        unloadAll?.invoke()
+        storageMoveState.value = AiStorageMove.Moving(0f)
+        val error = l.move(File(folder)) { storageMoveState.value = AiStorageMove.Moving(it) }
+        storageMoveState.value = if (error == null) AiStorageMove.Done else AiStorageMove.Failed(error)
+        storageState.value = storageInfoNow()
+    }
+
+    override fun freeSpaceAfterMb(id: String): Long? {
+        val l = location ?: return null
+        val model = AiModels.byId(id) ?: return null
+        val engineMb = installer?.takeIf { it.handles(model.engine) }?.missingMb(model.engine) ?: 0
+        return l.freeMb(ggufDir) - model.sizeMb - engineMb
+    }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val gguf = MutableStateFlow(initialGgufStates())
