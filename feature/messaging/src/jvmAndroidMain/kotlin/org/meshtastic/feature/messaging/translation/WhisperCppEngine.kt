@@ -112,6 +112,8 @@ class WhisperCppEngine(
         val dsp: Boolean = false,
         val extra: List<String> = emptyList(),
         val env: Map<String, String> = emptyMap(),
+        /** Added to the model id for the mark that remembers a failure of this way (own mark = other ways stay open). */
+        val markSuffix: String = "",
     )
 
     /** Which way the speech program runs now (for the log and the hardware report). */
@@ -129,18 +131,36 @@ class WhisperCppEngine(
         // not take part or fails a test run is skipped for some days for this model.
         val attempts = buildList {
             for (asset in installer.whisperChipAssets()) {
-                if (installer.isBroken(asset, modelId)) {
-                    Logger.i(tag = TAG) { "Skipping ${asset.folder} for $modelId: it failed here a short time ago" }
-                    continue
-                }
                 val kind = asset.folder.substringAfterLast('-')
                 if (!installer.android) {
+                    if (installer.isBroken(asset, modelId)) continue
                     add(Attempt("graphics card ($kind)", asset, chip = true))
                 } else if (kind == "snapdragon") {
+                    if (installer.isBroken(asset, modelId)) {
+                        Logger.i(tag = TAG) { "Skipping ${asset.folder} for $modelId: it failed here a short time ago" }
+                        continue
+                    }
                     add(Attempt("NPU (Hexagon)", asset, chip = true, dsp = true, extra = listOf("-fa"), env = mapOf("GGML_HEXAGON_DEVICES" to "1")))
                 } else {
                     // Flash attention crashed the OpenCL program and failed in the Adreno Vulkan driver (log 2026-10-30).
-                    add(Attempt("graphics card ($kind)", asset, chip = true, extra = listOf("-nfa")))
+                    if (installer.isBroken(asset, modelId)) {
+                        Logger.i(tag = TAG) { "Skipping ${asset.folder} for $modelId: it failed here a short time ago" }
+                    } else {
+                        add(Attempt("graphics card ($kind)", asset, chip = true, extra = listOf("-nfa")))
+                    }
+                    // Vulkan drivers of some phones (Adreno) fail to build the fast shaders: the same card once more with
+                    // the newer driver features switched off (own mark), as the language model program does.
+                    if (kind == "vulkan" && !installer.isBroken(asset, modelId + SAFE_SUFFIX)) {
+                        add(
+                            Attempt(
+                                "graphics card (vulkan, safe mode)", asset, chip = true, extra = listOf("-nfa"), markSuffix = SAFE_SUFFIX,
+                                env = mapOf(
+                                    "GGML_VK_DISABLE_F16" to "1", "GGML_VK_DISABLE_COOPMAT" to "1",
+                                    "GGML_VK_DISABLE_INTEGER_DOT_PRODUCT" to "1", "GGML_VK_DISABLE_FUSION" to "1",
+                                ),
+                            ),
+                        )
+                    }
                 }
             }
             // The Mac program is the Metal build: without the graphics card it is the processor build.
@@ -198,7 +218,7 @@ class WhisperCppEngine(
                 }
                 Logger.w(tag = TAG, throwable = e) { "${attempt.name} did not work: ${e.message}\n${started.logTail().takeLast(MAX_TAIL)}" }
                 started.stop()
-                if (attempt.chip) installer.markBroken(attempt.asset, modelId)
+                if (attempt.chip) installer.markBroken(attempt.asset, modelId + attempt.markSuffix)
                 failure = e
                 continue
             }
@@ -274,6 +294,7 @@ class WhisperCppEngine(
     private companion object {
         const val TAG = "WhisperCppEngine"
         const val PID_FILE = "whisper-server.pid"
+        const val SAFE_SUFFIX = "-safe"
         const val MAX_THREADS = 8
         const val WAV_HEADER_BYTES = 44
         val VENDOR_LIB_DIRS = listOf("/vendor/lib64", "/system/vendor/lib64", "/odm/lib64")

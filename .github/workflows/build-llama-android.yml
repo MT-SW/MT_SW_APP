@@ -116,7 +116,7 @@ jobs:
       fail-fast: false
       matrix:
         # i8mm: the processor build for newer phones (faster with Q8 models); cpu: the plain build for every phone.
-        kind: [cpu, i8mm, opencl, vulkan]
+        kind: [cpu, i8mm, opencl, openclgen, vulkan]
     steps:
       - name: Get whisper.cpp
         run: git clone --depth 1 --branch "${{ inputs.whisper_ref || 'v1.9.5' }}" https://github.com/ggml-org/whisper.cpp whisper.cpp
@@ -130,7 +130,7 @@ jobs:
           sudo apt-get install -y ninja-build glslc glslang-tools libvulkan-dev
 
       - name: OpenCL headers and loader (only to link)
-        if: matrix.kind == 'opencl'
+        if: startsWith(matrix.kind, 'opencl')
         run: |
           git clone --depth 1 https://github.com/KhronosGroup/OpenCL-Headers
           cp -r OpenCL-Headers/CL "$SYSROOT/usr/include"
@@ -159,6 +159,8 @@ jobs:
           BACKEND=""
           if [ "${{ matrix.kind }}" = "opencl" ]; then
             BACKEND="-DGGML_OPENCL=ON -DGGML_OPENCL_USE_ADRENO_KERNELS=ON"
+          elif [ "${{ matrix.kind }}" = "openclgen" ]; then
+            BACKEND="-DGGML_OPENCL=ON -DGGML_OPENCL_USE_ADRENO_KERNELS=OFF"
           elif [ "${{ matrix.kind }}" = "vulkan" ]; then
             EXTRA_CXX="-isystem $SPIRV_PREFIX/include"
             BACKEND="-DGGML_VULKAN=ON -DVulkan_GLSLC_EXECUTABLE=$(which glslc) -DVulkan_INCLUDE_DIR=$VULKAN_HEADERS -DVulkan_LIBRARY=$SYSROOT/usr/lib/aarch64-linux-android/28/libvulkan.so -DCMAKE_FIND_ROOT_PATH=$SPIRV_PREFIX -DCMAKE_PREFIX_PATH=$SPIRV_PREFIX -DSPIRV-Headers_DIR=$SPIRV_PREFIX/share/cmake/SPIRV-Headers"
@@ -177,7 +179,7 @@ jobs:
         run: |
           BIN="$(find build -name whisper-server -type f | head -n 1)"
           # A chip build must really contain its backend; otherwise it would be a processor build under a false name.
-          if [ "${{ matrix.kind }}" = "opencl" ]; then strings "$BIN" | grep -qi "ggml_opencl" ; fi
+          if [ "${{ matrix.kind }}" = "opencl" ] || [ "${{ matrix.kind }}" = "openclgen" ]; then strings "$BIN" | grep -qi "ggml_opencl" ; fi
           if [ "${{ matrix.kind }}" = "vulkan" ]; then strings "$BIN" | grep -qi "ggml_vulkan" ; fi
           mkdir pack
           cp "$BIN" pack/

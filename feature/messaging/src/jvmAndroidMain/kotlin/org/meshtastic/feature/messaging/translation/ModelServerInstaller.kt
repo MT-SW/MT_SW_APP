@@ -331,6 +331,8 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
         return buildList {
             if (qualcomm) add(whisperChip("snapdragon", WHISPER_SNAPDRAGON_MB))
             if (qualcomm) add(whisperChip("opencl", WHISPER_GPU_MB))
+            // The same card with the general OpenCL code instead of the Adreno-only kernels (the Adreno ones crash at loading).
+            if (qualcomm) add(whisperChip("openclgen", WHISPER_GPU_MB))
             add(whisperChip("vulkan", WHISPER_GPU_MB))
         }
     }
