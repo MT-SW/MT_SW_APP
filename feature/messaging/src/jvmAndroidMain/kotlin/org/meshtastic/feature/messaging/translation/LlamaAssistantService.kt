@@ -369,6 +369,11 @@ class LlamaAssistantService(
             lastRoute = "identity"
             return rule(polish, WHO_PL, WHO_EN).also(onPiece)
         }
+        // "What can you do": a fixed list of what the assistant really does, the same on every model.
+        if (CAPABILITIES_ASK.containsMatchIn(flat) && flat.split(Regex("\\s+")).size <= CAPABILITIES_WORDS) {
+            lastRoute = "capabilities"
+            return rule(polish, CAPABILITIES_PL, CAPABILITIES_EN).also(onPiece)
+        }
         // A greeting or "who are you" needs no sorting: it goes straight to the answer, which saves a whole run of the model.
         if (SMALLTALK.containsMatchIn(flat) && flat.split(Regex("\\s+")).size <= SMALLTALK_WORDS && PURE_SMALLTALK.matches(flat)) {
             // Only a greeting, "how are you" or thanks gets a fixed reply: the smallest models repeated the question back.
@@ -565,6 +570,12 @@ class LlamaAssistantService(
         if (nodeNum != null && SIGNAL_NODE_ASK.containsMatchIn(lower) && data.mentionsNode(lower) && intent.intent in DATA_INTENTS + "chat") {
             return data.nodeSignal(nodeNum).also(onPiece)
         }
+        // The uptime of one named node (or the user's own), whichever intent the small model chose: read from the node's report.
+        if (UPTIME_WORDS.containsMatchIn(lower) && !MANY_WORDS.containsMatchIn(lower) && !NEAR_FAR.containsMatchIn(lower) &&
+            !WHICH_WORDS.containsMatchIn(lower) && nodeNum != null && data.mentionsNode(lower)
+        ) {
+            data.nodeUptime(nodeNum)?.let { return it.also(onPiece) }
+        }
         // "What transmit power do I have set": read from the radio with its unit, whichever intent the small model chose.
         if (TX_POWER_ASK.containsMatchIn(lower) && !CALC_WORDS.containsMatchIn(lower) && !CHANGE_ASK.containsMatchIn(lower) &&
             !Regex("ustaw (mi |na )|zmień|zmien|set my|change").containsMatchIn(lower)
@@ -743,6 +754,10 @@ class LlamaAssistantService(
                 val excerpt =
                     if (wantsNews) wholeLines(manual) else bestLines(manual, button?.label.orEmpty(), "${intent.text} ${button?.label.orEmpty()}", question, polish, oneSetting = button?.highlight?.isNotBlank() == true)
                 if ((wantsNews || locationAsk) && (excerpt.isNotBlank() || button != null)) {
+                    // The manual has nothing on it: an entry of the knowledge base describes the setting (the button stays under it).
+                    if (!wantsNews && excerpt.isBlank()) {
+                        fromBase(modelId, history, question, intent.text, polish, answerLang, onPiece, room, baseOnly = true)?.let { return it }
+                    }
                     val text = buildString {
                         if (wantsNews) {
                             append(aiString(Res.string.ai_help_news)).append('\n')
@@ -841,7 +856,10 @@ class LlamaAssistantService(
         if (answer.isNullOrBlank()) return answer
         val head = BASE_HEAD.find(facts)?.groupValues?.get(1)?.trim().orEmpty()
         val body = answer.replace(MODEL_SOURCE_LINE, "").trimEnd()
-        if (head.isEmpty() || NOT_KNOWN.containsMatchIn(body.lowercase())) return body
+        if (NOT_KNOWN.containsMatchIn(body.lowercase())) {
+            return body + "\n\n" + (if (polish) "Zapytaj mnie „co potrafisz”, a powiem, w czym mogę pomóc." else "Ask me “what can you do” and I will tell you how I can help.")
+        }
+        if (head.isEmpty()) return body
         return body + "\n\n" + (if (polish) "Źródło: " else "Source: ") + head
     }
 
@@ -1198,13 +1216,13 @@ class LlamaAssistantService(
     /** Plain text for the chat bubble: no markdown stars or backticks the small model likes to add. */
     /** Without the internet the model cannot know a web address: the links it writes are made up, so they are removed. */
     private fun String.withoutMadeUpLinks(): String =
-        replace(Regex("(?im)^\\s*(źródło|źródła|zrodlo|source|sources)\\s*:\\s*\\S*https?://.*$\\n?"), "")
+        replace(Regex("(?imu)^\\s*(źródło|źródła|zrodlo|source|sources)\\s*:\\s*\\S*https?://.*$\\n?"), "")
             .replace(Regex("\\s*(?:i\\s+|and\\s+)?https?://[^\\s)]+"), "")
-            .replace(Regex("(?im)^\\s*(źródło|źródła|zrodlo|source|sources)\\s*:\\s*$\\n?"), "")
+            .replace(Regex("(?imu)^\\s*(źródło|źródła|zrodlo|source|sources)\\s*:\\s*$\\n?"), "")
 
     private fun cleanUp(text: String): String =
-        text.replace(Regex("(?im)^\\s*(źródło|źródła|zrodlo|zrodla|source|sources)\\s*:?\\s*(brak|none|n/a|-|—)\\.?\\s*$\\n?"), "")
-            .replace(Regex("(?im)^\\s*(źródło|źródła|source|sources)\\s*:\\s*(brak|none)\\b.*$\\n?"), "")
+        text.replace(Regex("(?imu)^\\s*(źródło|źródła|zrodlo|zrodla|source|sources)\\s*:?\\s*(brak|none|n/a|-|—)\\.?\\s*$\\n?"), "")
+            .replace(Regex("(?imu)^\\s*(źródło|źródła|source|sources)\\s*:\\s*(brak|none)\\b.*$\\n?"), "")
             .replace(PROMPT_ECHO, "")
             .let { if (webTools.usage() == null) it.withoutMadeUpLinks() else it }
             .replace(Regex("\\*\\*([^*\\n]+)\\*\\*"), "$1").replace("`", "").replace(Regex("(?m)^\\s*[*-] "), "• ")
@@ -1424,6 +1442,26 @@ class LlamaAssistantService(
         val PERIOD_NUMBER = Regex("(\\d+)\\s*(min\\p{L}*|godz\\p{L}*|h(?![\\p{L}])|hours?|dni|dzie\\p{L}*|dob\\p{L}*|days?|tydz\\p{L}*|tygod\\p{L}*|weeks?|miesi\\p{L}*|months?|lat(?![\\p{L}])|rok\\p{L}*|years?)")
         val PERIOD_BARE = Regex("ostatni\\p{L}*\\s+(godzin\\p{L}*|dob\\p{L}*|dzie\\p{L}*|tydz\\p{L}*|tygod\\p{L}*|miesi\\p{L}*)|last (hour|day|week|month)")
         val WHO_ARE_YOU = Regex("kim jesteś|kim jestes|kto ty|kim ty jesteś|who are you|what are you")
+        const val CAPABILITIES_WORDS = 10
+        val CAPABILITIES_ASK = Regex("jakie masz możliwości|jakie masz mozliwosci|co potrafisz|co umiesz|co możesz|co mozesz|w czym (możesz|mozesz) (mi )?pomóc|w czym (możesz|mozesz) pomoc|do czego służysz|do czego sluzysz|what can you do|what are you able|how can you help|what do you do")
+        const val CAPABILITIES_PL =
+            "Mogę pomagać w kilku rzeczach, całkowicie na Twoim urządzeniu:\n" +
+                "• Dane z aplikacji: policzę i pokażę węzły, ich sygnał (SNR, RSSI), odległości, czas pracy, baterię, wiadomości i statystyki sieci.\n" +
+                "• Pokażę na mapie węzeł albo otworzę Mesh Link Planer i inne ekrany aplikacji; wskażę, gdzie jest dane ustawienie, i sprawię, że będzie migać.\n" +
+                "• Policzę zasięg, bilans łącza, EIRP, długość anten i porównam presety; przy antenach dam przycisk do kalkulatora anten.\n" +
+                "• Doradzę z bazy wiedzy: anteny, filtry, zasilanie, flashowanie, ustawienia LoRa i Meshtastic, MT_SW_FIRMWARE, a także tematy pokrewne.\n" +
+                "• Przygotuję wiadomość do wysłania (ale jej nie wyślę) i potrafię tłumaczyć.\n" +
+                "• Pogadam też na inne tematy.\n" +
+                "Sam nigdy nie zmieniam ustawień ani nie wysyłam wiadomości: to robisz Ty. Jestem funkcją eksperymentalną i mogę się mylić. Gdy nie znam odpowiedzi, powiem to wprost."
+        const val CAPABILITIES_EN =
+            "I can help with several things, entirely on your device:\n" +
+                "• App data: I count and show nodes, their signal (SNR, RSSI), distances, uptime, battery, messages and network statistics.\n" +
+                "• I show a node on the map or open Mesh Link Planner and other screens; I point to where a setting is and make it blink.\n" +
+                "• I work out range, link budget, EIRP and antenna lengths and compare presets; for antennas I give a button to the antenna calculator.\n" +
+                "• I advise from the knowledge base: antennas, filters, power, flashing, LoRa and Meshtastic settings, MT_SW_FIRMWARE, and related topics.\n" +
+                "• I prepare a message to send (but never send it) and I can translate.\n" +
+                "• I can also chat about other topics.\n" +
+                "I never change settings or send messages myself: you do. I am an experimental feature and can be wrong. When I do not know an answer, I will say so."
         const val WHO_PL =
             "Jestem asystentem wbudowanym w aplikację MT_SW. Działam na Twoim urządzeniu, bez internetu. Pomagam w obsłudze " +
                 "aplikacji, odpowiadam o sieci mesh LoRa i Meshtastic, a także na ogólne pytania."
@@ -1439,7 +1477,7 @@ class LlamaAssistantService(
         val TX_POWER_ASK = Regex("(moc|mocy|moc\\p{L}*) nadawani\\p{L}*.*(ustawion|mam|jaka jest|jaką|jaka)|(ustawion|mam|jaka|jaką).*(moc|mocy) nadawani|(what|which).*(transmit|tx) power.*(set|have)|my (transmit|tx) power")
         val CALC_WORDS = Regex("policz|oblicz|wylicz|calculate|eirp|erp|zasięg|zasieg|bilans|range|budget|maksymaln|\\bmax|limit|dozwolon|legaln|polsce|przepis|zalecan|polecan|optymaln|powinn|allowed|legal|recommend")
         val BASE_HEAD = Regex("^\\[([^\\]\\n]+)\\]", RegexOption.MULTILINE)
-        val MODEL_SOURCE_LINE = Regex("(?im)^\\s*(źródło|źródła|zrodlo|source|sources)\\s*:.*$\\n?")
+        val MODEL_SOURCE_LINE = Regex("(?imu)^\\s*(źródło|źródła|zrodlo|source|sources)\\s*:.*$\\n?")
         val NOT_KNOWN = Regex("nie mam informacji|nie wiem|brak informacji|nie znalazłem|nie znalazlem|i do not know|i don't know|no information")
         val NEW_NODES_ASK = Regex("now(?:ych|e|y|ego) (?:węzł|wezl)|new nodes?")
         val UPTIME_WORDS = Regex("uptime|czas pracy|czasu pracy|jak długo działa|jak dlugo dziala|how long .* running")
