@@ -153,7 +153,10 @@ class WhisperCppEngine(
             for (asset in installer.whisperChipAssets()) {
                 val kind = asset.folder.substringAfterLast('-')
                 if (!installer.android) {
-                    if (installer.isBroken(asset, modelId)) continue
+                    if (installer.isBroken(asset, modelId)) {
+                        Logger.i(tag = TAG) { "Skipping ${asset.folder} for $modelId: it failed here a short time ago" }
+                        continue
+                    }
                     add(Attempt("graphics card ($kind)", asset, chip = true))
                 } else if (kind == "snapdragon") {
                     if (installer.isBroken(asset, modelId)) {

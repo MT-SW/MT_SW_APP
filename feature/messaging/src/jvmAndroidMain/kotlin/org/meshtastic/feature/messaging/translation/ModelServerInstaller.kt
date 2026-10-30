@@ -520,7 +520,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
 
         /** The OpenVINO version in the names of the llama.cpp release files (changes together with [LLAMA_TAG]). */
         const val OPENVINO_VERSION = "2026.4.1"
-        private const val BROKEN_RESET = 5
+        private const val BROKEN_RESET = 6
 
         /** Raise when our speech programs were rebuilt under the same file name (see the init block). */
         private const val WHISPER_REVISION = 1
