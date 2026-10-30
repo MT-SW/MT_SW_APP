@@ -1091,7 +1091,7 @@ class LlamaAssistantService(
                 return smallRefusal(polish).also(onPiece)
             }
             if (uiPrefs.assistantInternetEnabled.value && webWanted(question, "")) {
-                val found = webTools.web_search(question.take(WEB_QUERY_CHARS))
+                val found = webTools.web_search(webQuery(question))
                 // "No results." and connection errors are not findings: they are never quoted.
                 if (found.startsWith("UNTRUSTED")) {
                     quoteWeb(found, question, polish)?.let {
@@ -1106,7 +1106,7 @@ class LlamaAssistantService(
             }
         }
         if (facts.isBlank()) return null
-        val web = if (uiPrefs.assistantInternetEnabled.value && webModel(modelId) && webWanted(question, facts)) webTools.web_search(question.take(WEB_QUERY_CHARS)) else ""
+        val web = if (uiPrefs.assistantInternetEnabled.value && webModel(modelId) && webWanted(question, facts)) webTools.web_search(webQuery(question)) else ""
         Logger.i(tag = TAG) { "Knowledge base: ${facts.length} chars, web ${web.length} chars" }
         // The smallest models retold the entries wrongly (invented steps, swapped numbers): they quote the best entry as it is written.
         if (web.isBlank() && (AiModels.byId(modelId)?.ramMb ?: Int.MAX_VALUE) < QUOTE_BELOW_RAM_MB) {
@@ -1201,6 +1201,12 @@ class LlamaAssistantService(
     /** The internet is a fallback only for the stronger models (the Gemma family); the weaker ones are not given web results. */
     private fun webModel(modelId: String): Boolean = AiModels.byId(modelId)?.name?.startsWith("Gemma 4") == true
 
+    /** Questions about the mesh or the radio are searched with "Meshtastic" in front, so the results are about our subject. */
+    private fun webQuery(question: String): String {
+        val q = question.take(WEB_QUERY_CHARS)
+        return if (MESH_TOPIC.containsMatchIn(q.lowercase()) && !q.contains("meshtastic", ignoreCase = true)) "Meshtastic $q" else q
+    }
+
     /**
      * The internet is searched only when it can really help: not for greetings and questions about the assistant, not for
      * very short questions, and not when the knowledge base already answers. Fresh facts (prices, news, laws, dates)
@@ -1209,6 +1215,8 @@ class LlamaAssistantService(
     private fun webWanted(question: String, facts: String): Boolean {
         val q = question.trim().lowercase()
         if (SMALLTALK.containsMatchIn(q) || q.split(Regex("\\s+")).size < MIN_WEB_WORDS) return false
+        // Questions about this app's own screens and settings get results about other programs (Windows, phones): not searched.
+        if (APP_UI_ASK.containsMatchIn(q)) return false
         if (FRESH_WORDS.containsMatchIn(q)) return true
         return facts.length < THIN_BASE_CHARS
     }
@@ -1928,6 +1936,8 @@ class LlamaAssistantService(
                 "(?iu)(która|ktora|jaka)\\s+(jest\\s+)?(teraz\\s+)?godzin\\p{L}*|(jaki|jaka)\\s+(jest\\s+)?(dzi\\p{L}*|dzisiaj)\\s+(dzień|dzien|data)|jaka\\s+(jest\\s+)?(dzi\\p{L}*\\s+)?data|(jaki|który)\\s+(mamy\\s+)?(dzi\\p{L}*\\s+)?(dzień|dzien)(\\s+tygodnia)?|którego\\s+(dzi\\p{L}*\\s+)?(jest|mamy)|" +
                     "what\\s+time\\s+is\\s+it|what(?:'s| is)\\s+(the\\s+)?(date|time)|what\\s+day\\s+is\\s+(it|today)",
             )
+        val APP_UI_ASK = Regex("(?iu)aplikacj|interfejs|czcionk|motyw|ustawieni|czacie|czat\\b|asystent|mt_sw|app\\b|interface|font size|theme")
+        val MESH_TOPIC = Regex("(?iu)węz|węzł|mesh|kanał|kanal|firmware|lora|preset|meshtastic|nodeinfo|traceroute|hop|skok")
         val BATTERY_LEVEL_ASK = Regex("(?iu)(ile|jaki|jaka)\\s+(procent\\p{L}*\\s+)?(bateri\\p{L}*|naładowa\\p{L}*)|poziom\\p{L}*\\s+bateri|battery\\s+(level|percent)|how much battery")
         val UPTIME_WORDS = Regex("uptime|czas pracy|czasu pracy|jak długo działa|jak dlugo dziala|how long .* running")
         val NEAR_FAR = Regex("najdal|najbliż|najbliz|nearest|farthest|closest")
