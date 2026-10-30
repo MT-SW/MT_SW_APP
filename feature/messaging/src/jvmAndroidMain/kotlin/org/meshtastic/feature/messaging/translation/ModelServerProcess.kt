@@ -48,11 +48,13 @@ internal class ModelServerProcess private constructor(
      * Waits until `GET [path]` answers 200 (with [anyAnswer]: until the program answers at all); fails when the program
      * ends or [timeoutMs] runs out.
      */
-    suspend fun awaitReady(path: String, timeoutMs: Long, anyAnswer: Boolean = false) {
+    suspend fun awaitReady(path: String, timeoutMs: Long, anyAnswer: Boolean = false, abortIf: (() -> String?)? = null) {
         val deadline = System.currentTimeMillis() + timeoutMs
         while (true) {
             coroutineContext.ensureActive()
             if (!process.isAlive) error("The model program stopped (exit code ${process.exitValue()})")
+            // A way to give up at once when the log already says that this start cannot work (instead of loading the whole model).
+            abortIf?.invoke()?.let { error(it) }
             if (System.currentTimeMillis() > deadline) error("The model program did not become ready in ${timeoutMs / 1000} s")
             if (ping(path, anyAnswer)) return
             delay(POLL_MS)

@@ -471,6 +471,8 @@ class LlamaCppEngine(
         }
         startReport = ""
         for (attempt in attempts) {
+            // A way that an earlier attempt of this same start already showed cannot work (e.g. the safe Vulkan mode on a phone without Vulkan 1.2).
+            if (attempt.requireGpu && attempt.asset?.let { installer.isBroken(it, if (attempt.perModel) modelId + attempt.markSuffix else null) } == true) continue
             val program =
                 attempt.program
                     ?: attempt.asset?.let { if (attempt.requireGpu) installer.installGpu(it) else runCatching { installer.install(it) }.getOrNull() }
@@ -488,7 +490,10 @@ class LlamaCppEngine(
                 if (attempt.requireGpu) attempt.asset?.let { installer.markBroken(it, if (attempt.perModel) modelId + attempt.markSuffix else null) }
             }
             try {
-                started.awaitReady("/health", if (attempt.requireGpu) CHIP_LOAD_TIMEOUT_MS else LOAD_TIMEOUT_MS)
+                started.awaitReady(
+                    "/health", if (attempt.requireGpu) CHIP_LOAD_TIMEOUT_MS else LOAD_TIMEOUT_MS,
+                    abortIf = if (attempt.requireGpu) ({ if (started.logTail().contains(NO_VULKAN)) NO_VULKAN_MESSAGE else null }) else null,
+                )
             } catch (e: Throwable) {
                 if (e is CancellationException) {
                     started.stop()
@@ -500,6 +505,8 @@ class LlamaCppEngine(
                 Logger.w(tag = TAG, throwable = e) { "${attempt.name} did not start: ${e.message}\n${started.logTail().takeLast(MAX_TAIL)}" }
                 started.stop()
                 giveUp()
+                // No Vulkan 1.2 on this phone: the safe Vulkan mode would fail the same way, so it is skipped too.
+                if (e.message == NO_VULKAN_MESSAGE) attempt.asset?.let { installer.markBroken(it, modelId + SAFE_SUFFIX) }
                 continue
             }
             if (attempt.requireGpu && !gpuTookPart()) {
@@ -708,6 +715,10 @@ class LlamaCppEngine(
         val DSP_DIRS = listOf("/vendor/dsp/cdsp", "/vendor/lib/rfsa/adsp", "/vendor/dsp", "/system/lib/rfsa/adsp", "/dsp")
         /** The NPU of a Snapdragon gives each session about 2 GB. */
         const val SAFE_SUFFIX = "-safe"
+
+        /** What the Vulkan engine prints at start on a phone whose driver is too old; the model is then not worth loading on it. */
+        private const val NO_VULKAN = "Vulkan 1.2 required"
+        private const val NO_VULKAN_MESSAGE = "The graphics driver of this phone is too old (Vulkan 1.2 is required)"
         const val NPU_SESSION_MB = 1800
         const val MAX_NPU_SESSIONS = 4
         /** Memory left free on a computer's graphics card when it is filled with the model (the engine's own default is 1024). */
