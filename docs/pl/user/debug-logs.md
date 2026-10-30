@@ -17,7 +17,7 @@ Gdy coś działa nieprawidłowo, dzienniki debugowania aplikacji to najbardziej 
 
 Otwórz **Panel debugowania** w **Ustawienia → Zaawansowane → Panel debugowania**.
 
-Jeśli zgłaszasz problem, wyeksportuj dzienniki (zobacz [Eksportowanie](#exporting)) i dołącz plik `.txt` do zgłoszenia w [systemie zgłoszeń Meshtastic-Android](https://github.com/meshtastic/Meshtastic-Android/issues). Zrzut dzienników obejmujący moment wystąpienia problemu zamienia „to nie działa” w coś, co programista faktycznie może wyśledzić.
+Jeśli zgłaszasz problem, wyeksportuj dzienniki (zobacz [Eksportowanie](#exporting)) i dołącz plik `.txt` do zgłoszenia: błędy MT_SW zgłaszaj przez **Ustawienia → Zgłoś błąd lub pomysł** (nasz Discord, grupy i sieć mesh); tylko gdy błąd występuje także w oryginalnej aplikacji Meshtastic, możesz go zgłosić w [systemie zgłoszeń Meshtastic-Android](https://github.com/meshtastic/Meshtastic-Android/issues). Zrzut dzienników obejmujący moment wystąpienia problemu zamienia „to nie działa” w coś, co programista faktycznie może wyśledzić.
 
 ## Dwie zakładki
 

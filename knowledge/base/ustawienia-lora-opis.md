@@ -11,7 +11,7 @@ Słowa: use_preset, LONG_FAST, LONG_TURBO, bandwidth, spreading factor, coding r
 Źródło: https://meshtastic.org/docs/configuration/radio/lora/ (sprawdzono 2026-10)
 
 ### Hop limit, moc nadawania i włączenie nadawania
-Max Hops (hop_limit) ma zakres 1–7, domyślnie 3, i dokumentacja uważa 3 za dobre dla większości. Moc nadawania (tx_power) 0 oznacza maksymalną legalną moc ciągłą dla regionu; zakres 0–30 dBm; zwykle zostaw 0. Opcja tx_enabled (domyślnie włączona) pozwala wyłączyć nadawanie na czas np. wymiany anteny lub testów.
+Max Hops (hop_limit) ma zakres 1–7, domyślnie 3 (tak podaje oficjalna dokumentacja), ale od firmware 2.8.x w MT_SW zalecamy 7: hop limit jest tam zmienny i automatycznie obniżany dla mniej ważnych pakietów, zależnie od ruchu w sieci, a wiadomości zachowują pełny limit. Moc nadawania (tx_power) 0 oznacza maksymalną legalną moc ciągłą dla regionu; zakres 0–30 dBm; zwykle zostaw 0. Opcja tx_enabled (domyślnie włączona) pozwala wyłączyć nadawanie na czas np. wymiany anteny lub testów.
 Słowa: hop_limit, tx_power, moc 0, 30 dBm, tx_enabled, wyłączenie nadawania, wymiana anteny, test
 Źródło: https://meshtastic.org/docs/configuration/radio/lora/ (sprawdzono 2026-10)
 

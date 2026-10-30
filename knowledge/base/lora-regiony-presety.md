@@ -11,7 +11,7 @@ Słowa: Lite, Narrow, Tiny, 62.5, 15.6, 125 kHz, szerokość pasma, bandwidth, I
 Źródło: https://meshtastic.org/docs/configuration/radio/lora/ (sprawdzono 2026-10)
 
 ### Jakie są domyślne wartości ustawień LoRa?
-Hop limit: 1–7, domyślnie 3 (nie może być większy niż 7). Moc nadawania: 0–30 dBm, domyślnie 0, co oznacza maksymalną dozwoloną moc ciągłą dla regionu. Preset: LONG_FAST. Spreading factor 5–12 (domyślnie 11), coding rate 4–8 (domyślnie 5, mianownik ułamka), nadawanie włączone.
+Hop limit: 1–7, domyślnie 3 (nie może być większy niż 7); od firmware 2.8.x w MT_SW zalecamy 7. Moc nadawania: 0–30 dBm, domyślnie 0, co oznacza maksymalną dozwoloną moc ciągłą dla regionu. Preset: LONG_FAST. Spreading factor 5–12 (domyślnie 11), coding rate 4–8 (domyślnie 5, mianownik ułamka), nadawanie włączone.
 Słowa: hop limit, skoki, moc, tx power, spreading factor, SF, coding rate, CR, domyślne, ustawienia lora
 Źródło: https://meshtastic.org/docs/configuration/radio/lora/ (sprawdzono 2026-10)
 

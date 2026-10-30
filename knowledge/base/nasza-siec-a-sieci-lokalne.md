@@ -13,7 +13,7 @@ Słowa: Narrow Fast, 869.44165, 869,44165 MHz, wąskie pasmo, preset sieci, wła
 Źródło: ustalenia administratora sieci MT_SW (sprawdzono 2026-10); wniosek o oddzieleniu ruchu to opracowanie na podstawie artykułu
 
 ### Czym różni się limit przeskoków w artykule od limitu w Meshtastic?
-Artykuł przywołuje limit 64 przeskoków. W Meshtastic maksymalny limit to 7 przeskoków, a domyślny to 3. Dlatego burza rozgłoszeniowa w Meshtastic ma mniejszy zasięg niż w opisie z artykułu, ale idea jest ta sama: im większy hop limit, tym dalej sięga zalewanie i tym więcej eteru zajmuje. W gęstej sieci lokalnej zwykle opłaca się trzymać limit niski.
+Artykuł przywołuje limit 64 przeskoków. W Meshtastic maksymalny limit to 7 przeskoków, a domyślny to 3 (od firmware 2.8.x w MT_SW zalecamy 7, bo limit jest automatycznie obniżany dla mniej ważnych pakietów). Dlatego burza rozgłoszeniowa w Meshtastic ma mniejszy zasięg niż w opisie z artykułu, ale idea jest ta sama: im większy hop limit, tym dalej sięga zalewanie i tym więcej eteru zajmuje. W gęstej sieci lokalnej zwykle opłaca się trzymać limit niski.
 Słowa: hop limit, 64 a 7, domyślnie 3, burza, zasięg zalewania, MeshCore 64, przeskoki w Meshtastic
 Źródło: https://meshtastic.org/docs/configuration/radio/lora/ (limit 7, domyślnie 3) i artykuł bikeman (limit 64); sprawdzono 2026-10
 

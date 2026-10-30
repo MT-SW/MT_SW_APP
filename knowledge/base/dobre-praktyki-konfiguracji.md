@@ -11,9 +11,9 @@ Słowa: router, repeater, nie używać routera, kolizje, zasięg, hop, społeczn
 Źródło: https://meshtastic.org/docs/configuration/tips/ (sprawdzono 2026-10)
 
 ### Ile ustawić hop limit?
-Zostaw 3, chyba że wiesz na pewno, że potrzebujesz więcej lub mniej, by dotrzeć do celu. Jeśli podnosisz, zmieniaj tylko węzły brzegowe, a nie te w środku sieci (większy hop limit to większe zalewanie i obciążenie kanału).
-Słowa: hop limit, max hops, liczba przeskoków, 3, zwiększyć zasięg, węzły brzegowe
-Źródło: https://meshtastic.org/docs/configuration/tips/ (sprawdzono 2026-10)
+Od wersji 2.8.x zalecamy w MT_SW ustawić 7. Firmware 2.8 ma automatyczny, zmienny hop limit: ważne pakiety, jak wiadomości, dostają pełny limit, a mniej ważne (np. telemetria) mają go niższy, zależnie od ruchu w całej sieci. Dlatego 7 nie zalewa już sieci tak jak dawniej. Oficjalna dokumentacja nadal podaje 3 jako domyślne i wystarczające dla większości sieci; na starszym firmware (przed 2.8) zostaw 3 i podnoś tylko na węzłach brzegowych.
+Słowa: hop limit, max hops, liczba przeskoków, 7, 3, zwiększyć zasięg, węzły brzegowe, automatyczny hop limit, 2.8
+Źródło: https://github.com/meshtastic/firmware/releases/tag/v2.8.0.7239fe8 (automatyczny, zmienny hop limit) oraz https://meshtastic.org/docs/configuration/radio/lora/ (sprawdzono 2026-10)
 
 ### Ile jest kanałów i jak działa udostępnianie pozycji (2.7.1+)?
 Jest 8 kanałów: 0 to główny, 1–7 prywatne grupy lub zastosowania specjalne (np. admin). Wszystkie dodatkowe muszą mieć tę samą konfigurację modemu LoRa co główny. Domyślny kanał główny to LongFast z kluczem AQ==, więc Twoja pozycja jest widoczna dla każdego węzła w pobliżu. Od firmware 2.7.1: wyłącz udostępnianie pozycji na kanale 0, włącz je na jednym kanale dodatkowym z wybraną precyzją; automatyczne aktualizacje dostaje tylko kanał dodatkowy o najniższym indeksie z włączoną lokalizacją, pozostałe obsługują ręczne zapytania o pozycję.

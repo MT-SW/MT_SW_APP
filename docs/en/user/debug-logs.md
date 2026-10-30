@@ -3,7 +3,7 @@ title: Debug Logs
 parent: User Guide
 nav_order: 22
 last_updated: 2026-10-21
-description: View and export the app's own debug logs from inside the app, and attach a capture to a GitHub issue to help diagnose bugs — no adb required.
+description: View and export the app's own debug logs from inside the app, and attach a capture to a bug report to help diagnose bugs — no adb required.
 aliases:
   - debug-logs
   - logcat
@@ -17,7 +17,7 @@ When something misbehaves, the app's debug logs are the single most useful thing
 
 Open the **Debug Panel** from **Settings → Advanced → Debug Panel**.
 
-If you're filing an issue, export your logs (see [Exporting](#exporting)) and attach the `.txt` file to your report on the [Meshtastic-Android issue tracker](https://github.com/meshtastic/Meshtastic-Android/issues). A log capture that covers the moment the problem happened turns "it doesn't work" into something a developer can actually track down.
+If you're filing an issue, export your logs (see [Exporting](#exporting)) and attach the `.txt` file to your report: report MT_SW bugs through **Settings → Report a bug or idea** (our Discord, groups and the mesh); only when the bug also happens in the original Meshtastic app can you report it on the [Meshtastic-Android issue tracker](https://github.com/meshtastic/Meshtastic-Android/issues). A log capture that covers the moment the problem happened turns "it doesn't work" into something a developer can actually track down.
 
 ## The two tabs
 
@@ -52,7 +52,7 @@ Error and warning lines are tinted so problems stand out.
 
 Tap the **download** icon to save the current logs to a file. The app first shows a warning about what the file contains — confirm it, then choose where the file goes through the system file picker. The file is named with a timestamp (for example `meshtastic_logcat_20260701_143312.txt`) so repeated exports never overwrite each other. The same warning guards the **Packets** tab export. After the warning the app asks for the format: text or JSON (the same data, without keys and passwords, in a structured form), for the packet logs, the device logs and the logcat.
 
-Attach that file to your GitHub issue.
+Attach that file to your report (see above where to send it).
 
 > 🔒 **Privacy:** Exports automatically **redact** private keys, admin keys, session passkeys, and channel PSKs, and suppress raw packet bytes. Everything else stays — the file can contain your message text, precise locations, and node details. Read it before sharing it publicly, and share privately if you have any doubt.
 

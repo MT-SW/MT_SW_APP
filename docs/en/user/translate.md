@@ -28,7 +28,7 @@ The app and its in-app docs are translated on Crowdin — this page shows how to
 ## How to Contribute
 
 1. **Visit the Crowdin project.** Open the [Meshtastic Android Crowdin project](https://crowdin.com/project/meshtastic-android) and sign in or create a free account.
-2. **Choose your language.** Select an existing language or request a new one by opening a [GitHub issue](https://github.com/meshtastic/Meshtastic-Android/issues/new).
+2. **Choose your language.** Select an existing language or request a new one by opening an issue in the original project on [GitHub](https://github.com/meshtastic/Meshtastic-Android/issues/new) (translations are run in the original app's project; for things about MT_SW itself, report to us: Settings → Report a bug or idea).
 3. **Translate strings.** Crowdin shows the English source on the left and your translation on the right. Translate each string and save.
 4. **Review context.** Many strings include screenshots or context comments — check these to understand where the text appears in the app. A scheduled job pulls translations from Crowdin and opens a pull request; they ship once a maintainer merges it and a new build goes out.
 
@@ -38,7 +38,7 @@ The app and its in-app docs are translated on Crowdin — this page shows how to
 
 If your language is not listed on Crowdin:
 
-1. Open an issue on [GitHub](https://github.com/meshtastic/Meshtastic-Android/issues/new) requesting the new locale.
+1. Open an issue in the original project on [GitHub](https://github.com/meshtastic/Meshtastic-Android/issues/new) requesting the new locale.
 2. A maintainer adds the language to the Crowdin project.
 3. Once added, you can begin translating. The app offers every language that has a strings folder, so the first sync that brings yours in adds it to the app.
 
