@@ -149,9 +149,9 @@ object AiModels {
     const val PLLUM_12B = "pllum-12b-q4"
     const val TG_4B = "translategemma-4b-q4"
     const val TG_12B = "translategemma-12b-q4"
-    const val WHISPER_SMALL = "whisper-small-f16"
-    const val WHISPER_MEDIUM = "whisper-medium-f16"
-    const val WHISPER_TURBO = "whisper-large-v3-turbo-f16"
+    const val WHISPER_SMALL_Q8 = "whisper-small-q8"
+    const val WHISPER_MEDIUM_Q8 = "whisper-medium-q8"
+    const val WHISPER_TURBO_Q8 = "whisper-large-v3-turbo-q8"
 
     /** True when the assistant screen exists. */
     const val ASSISTANT_SCREEN_READY = true
@@ -524,7 +524,7 @@ object AiModels {
             roles = setOf(AiRole.DICTATION),
             sizeMb = mb,
             ramMb = ramMb,
-            minDeviceRamGb = if (ramMb > 2500) 8 else if (ramMb > 1500) 6 else 4,
+            minDeviceRamGb = 4,
             license = AiLicense.MIT,
             files = listOf(hf("ggerganov/whisper.cpp", file, mb)),
             platforms = BOTH,
@@ -533,23 +533,24 @@ object AiModels {
             pageUrl = "${HF}ggerganov/whisper.cpp",
         )
 
-    // Only the full FP16 files are offered, one list for every platform: the quantized files (Q5, Q8) crashed the OpenCL and
-    // Vulkan programs on the Adreno 750 (log 2026-10-30), and the Hexagon NPU does its matrix work in FP16.
-    val WhisperSmall =
+    // Only the Q8_0 files are offered, one list for every platform: best quality, and about 7 times faster on the processor
+    // than the full FP16 files (log 2026-10-30: 2.3 s against 16 s for 3 s of speech). The graphics card and NPU programs of
+    // whisper.cpp still fail on the Adreno 750 with every format (Q5, Q8 and FP16).
+    val WhisperSmallQ8 =
         whisper(
-            WHISPER_SMALL, "Whisper small", "ggml-small.bin", 488, 1100,
+            WHISPER_SMALL_Q8, "Whisper small", "ggml-small-q8_0.bin", 264, 1000,
             "Mały model do dyktowania: dobry kompromis szybkości i dokładności.",
             "A small dictation model: a good balance of speed and accuracy.",
         )
-    val WhisperMedium =
+    val WhisperMediumQ8 =
         whisper(
-            WHISPER_MEDIUM, "Whisper medium", "ggml-medium.bin", 1533, 2800,
+            WHISPER_MEDIUM_Q8, "Whisper medium", "ggml-medium-q8_0.bin", 823, 2200,
             "Dokładniejszy model do dyktowania, także dla polskiego.",
             "A more accurate dictation model, also for Polish.",
         )
-    val WhisperTurbo =
+    val WhisperTurboQ8 =
         whisper(
-            WHISPER_TURBO, "Whisper large v3 turbo", "ggml-large-v3-turbo.bin", 1624, 3200,
+            WHISPER_TURBO_Q8, "Whisper large v3 turbo", "ggml-large-v3-turbo-q8_0.bin", 874, 2500,
             "Najdokładniejszy model do dyktowania, a mimo to dość szybki.",
             "The most accurate dictation model, and still fairly fast.",
         )
@@ -562,7 +563,7 @@ object AiModels {
             Qwen08b, Qwen2b, Qwen4b, Qwen9b, Qwen35b,
             Bielik15b, Bielik45b, Bielik7b, Bielik11b, Pllum12b,
             TranslateGemma4b, TranslateGemma12b,
-            WhisperSmall, WhisperMedium, WhisperTurbo,
+            WhisperSmallQ8, WhisperMediumQ8, WhisperTurboQ8,
         )
 
     /** The models that exist on the platform the app runs on. */
@@ -577,12 +578,55 @@ object AiModels {
     val legacyModelIds: List<String> = listOf("gemma4-e2b", "gemma4-e4b", "gemma4-12b")
 }
 
+/** Where the AI files are kept: [folder], the free space there and, on a phone, the places a person can choose from. */
+data class AiStorageInfo(
+    val folder: String,
+    val freeMb: Long,
+    /** Folders offered in a list (phone: memory and SD card); empty = any folder can be picked (computer). */
+    val choices: List<String> = emptyList(),
+    /** After a move, the folder that will be used from the next start; null = none. */
+    val nextFolder: String? = null,
+)
+
+/** State of moving the AI files to another folder. */
+sealed interface AiStorageMove {
+    data object Idle : AiStorageMove
+
+    data class Moving(val fraction: Float) : AiStorageMove
+
+    /** Finished: the new folder is used from the next start of the app. */
+    data object Done : AiStorageMove
+
+    data class Failed(val reason: String) : AiStorageMove
+}
+
 /**
  * Tracks the downloaded state of every model in [AiModels.all]. Several models can be on the device at once; each one
  * is downloaded, cancelled and deleted on its own. Which downloaded model is used is a preference (see [UiPrefs]).
  */
 interface AiModelStore {
     val states: StateFlow<Map<String, TranslatorModelState>>
+
+    /** Where the models (and on computers the engine programs) are kept, and what can be chosen; null = not known. */
+    val storage: StateFlow<AiStorageInfo?> get() = MutableStateFlow(null)
+
+    /** Progress of moving the files to another folder (see [moveStorage]). */
+    val storageMove: StateFlow<AiStorageMove> get() = MutableStateFlow(AiStorageMove.Idle)
+
+    /** True until the person has seen (and closed) the first-start question about the folder. */
+    val askStorageFolder: StateFlow<Boolean> get() = MutableStateFlow(false)
+
+    /** Marks the first-start question as answered. */
+    fun storageFolderAsked() {}
+
+    /** Opens the system's folder chooser (computers); null when nothing was chosen or the platform has no chooser. */
+    suspend fun pickStorageFolder(): String? = null
+
+    /** Copies the model files to [folder] and uses it from the next start; the old files are removed then. */
+    suspend fun moveStorage(folder: String) {}
+
+    /** Megabytes that would be left free on the disk after downloading [id]; null when it cannot be told. */
+    fun freeSpaceAfterMb(id: String): Long? = null
 
     /** Megabytes freed when the files of the old engine were removed at this start (0 = nothing removed); only the first start after the change. */
     val legacyFreedMb: StateFlow<Int> get() = MutableStateFlow(0)
