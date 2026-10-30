@@ -29,3 +29,24 @@ Słowa: EU_868, EU_433, EU_866, EU_N_868, region, 869 MHz, 433 MHz, slot, wypeł
 Ogólne (SF/CR/pasmo/szybkość): Short Turbo 7, 4/5, 500 kHz, 21,88 kbps; Short Fast 7, 4/5, 250 kHz, 10,94; Short Slow 8, 4/5, 250 kHz, 6,25; Medium Turbo 9, 4/5, 500 kHz, 7,03; Medium Fast 9, 4/5, 250 kHz, 3,52; Medium Slow 10, 4/5, 250 kHz, 1,95; Long Turbo 11, 4/8, 500 kHz, 1,34; Long Fast 11, 4/5, 250 kHz, 1,07; Long Moderate 11, 4/8, 125 kHz, 0,34. Wąskopasmowe: Lite Fast 9, 4/5, 125 kHz, 1,76; Lite Slow 10, 4/5, 125 kHz, 0,98; Narrow Fast 7, 4/6, 62,5 kHz, 2,28; Narrow Slow 8, 4/6, 62,5 kHz, 1,30; Tiny Fast 7, 4/5, 15,6 kHz, 0,68; Tiny Slow 8, 4/6, 15,6 kHz, 0,33. To teoretyczne maksima, bez nagłówków, przeskoków i powtórzeń.
 Słowa: presety, tabela, Long Fast, Narrow Fast, Short Fast, Medium Fast, Lite, Tiny, Turbo, SF, coding rate, szerokość pasma, kbps, prędkość transmisji
 Źródło: https://meshtastic.org/docs/overview/radio-settings/ (sprawdzono 2026-10)
+
+### Czas nadawania i obciążenie sieci dla każdego presetu i korekcji błędów (CR)
+Czas nadawania pakietu 50 B (rząd wielkości typowej wiadomości z nagłówkiem) i to, ile urządzeń mniej więcej mieści sieć, dla każdego presetu i każdej korekcji błędów (CR), którą dany preset może mieć. Obliczone wzorem Semtech na czas w eterze (preambuła 16 symboli, nagłówek jawny, CRC włączone); liczba urządzeń to rząd wielkości przy założeniu, że sieć może zajmować 25% czasu, a każde urządzenie nadaje 4 pakiety na 15 minut, bez przekazywania pakietów dalej (każde przekazanie dokłada kolejne nadanie). Wyższa korekcja to więcej redundancji: pakiet trwa dłużej i sieć szybciej się zapełnia, ale łącze lepiej znosi zakłócenia. Presety Long mogą mieć korekcję tylko wyższą niż własna; Wąski i Mikro-wolny mogą też 4/5. Tabela (preset, własne CR, potem czas pakietu i liczba urządzeń dla każdego CR):
+- Daleki zasięg — Turbo (Long Turbo) — własne CR 4/8; 4/8: 443 ms, ok. 126 urządzeń
+- Daleki zasięg — Szybko (Long Fast) — własne CR 4/5; 4/5: 641 ms, ok. 87 urządzeń; 4/6: 723 ms, ok. 77 urządzeń; 4/7: 805 ms, ok. 69 urządzeń; 4/8: 887 ms, ok. 63 urządzeń
+- Daleki zasięg — Średnio (Long Moderate) — własne CR 4/8; 4/8: 2036 ms, ok. 27 urządzeń
+- Daleki zasięg — Wolno (Long Slow) — własne CR 4/8; 4/8: 3547 ms, ok. 15 urządzeń
+- Średni zasięg — Szybko (Medium Fast) — własne CR 4/5; 4/5: 181 ms, ok. 311 urządzeń; 4/6: 205 ms, ok. 273 urządzeń; 4/7: 230 ms, ok. 244 urządzeń; 4/8: 254 ms, ok. 221 urządzeń
+- Średni zasięg — wolno (Medium Slow) — własne CR 4/5; 4/5: 341 ms, ok. 164 urządzeń; 4/6: 386 ms, ok. 145 urządzeń; 4/7: 431 ms, ok. 130 urządzeń; 4/8: 476 ms, ok. 118 urządzeń
+- Średni zasięg - turbo (Medium Turbo) — własne CR 4/5; 4/5: 90 ms, ok. 622 urządzeń; 4/6: 103 ms, ok. 547 urządzeń; 4/7: 115 ms, ok. 489 urządzeń; 4/8: 127 ms, ok. 442 urządzeń
+- Krótki zasięg — Szybko (Short Fast) — własne CR 4/5; 4/5: 53 ms, ok. 1064 urządzeń; 4/6: 61 ms, ok. 929 urządzeń; 4/7: 68 ms, ok. 824 urządzeń; 4/8: 76 ms, ok. 741 urządzeń
+- Bliski zasięg — Wolno (Short Slow) — własne CR 4/5; 4/5: 95 ms, ok. 589 urządzeń; 4/6: 109 ms, ok. 517 urządzeń; 4/7: 122 ms, ok. 460 urządzeń; 4/8: 135 ms, ok. 415 urządzeń
+- Krótki zasięg — Turbo (Short Turbo) — własne CR 4/5; 4/5: 26 ms, ok. 2128 urządzeń; 4/6: 30 ms, ok. 1858 urządzeń; 4/7: 34 ms, ok. 1648 urządzeń; 4/8: 38 ms, ok. 1482 urządzeń
+- Lite - szybki (Lite Fast) — własne CR 4/5; 4/5: 361 ms, ok. 155 urządzeń; 4/6: 411 ms, ok. 136 urządzeń; 4/7: 460 ms, ok. 122 urządzeń; 4/8: 509 ms, ok. 110 urządzeń
+- Lite - wolny (Lite Slow) — własne CR 4/5; 4/5: 682 ms, ok. 82 urządzeń; 4/6: 772 ms, ok. 72 urządzeń; 4/7: 862 ms, ok. 65 urządzeń; 4/8: 952 ms, ok. 59 urządzeń
+- Wąski - szybki (Narrow Fast) — własne CR 4/6; 4/5: 211 ms, ok. 266 urządzeń; 4/6: 242 ms, ok. 232 urządzeń; 4/7: 273 ms, ok. 206 urządzeń; 4/8: 304 ms, ok. 185 urządzeń
+- Wąski - wolny (Narrow Slow) — własne CR 4/6; 4/5: 382 ms, ok. 147 urządzeń; 4/6: 435 ms, ok. 129 urządzeń; 4/7: 488 ms, ok. 115 urządzeń; 4/8: 542 ms, ok. 103 urządzeń
+- Mikro - szybki (Tiny Fast) — własne CR 4/5; 4/5: 846 ms, ok. 66 urządzeń; 4/6: 969 ms, ok. 58 urządzeń; 4/7: 1092 ms, ok. 51 urządzeń; 4/8: 1214 ms, ok. 46 urządzeń
+- Mikro - wolny (Tiny Slow) — własne CR 4/6; 4/5: 1937 ms, ok. 29 urządzeń; 4/6: 2232 ms, ok. 25 urządzeń; 4/7: 2527 ms, ok. 22 urządzeń; 4/8: 2822 ms, ok. 19 urządzeń
+Słowa: czas nadawania, airtime, time on air, obciążenie sieci, korekcja błędów, coding rate, CR, 4/5, 4/6, 4/7, 4/8, preset, ile urządzeń, tabela, pakiet 50 B
+Źródło: obliczone w aplikacji wzorem Semtech na czas w eterze z parametrów presetów z https://meshtastic.org/docs/overview/radio-settings/ (sprawdzono 2026-10)

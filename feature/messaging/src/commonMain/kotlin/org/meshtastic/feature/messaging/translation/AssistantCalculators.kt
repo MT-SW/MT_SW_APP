@@ -53,7 +53,7 @@ object AssistantCalculators {
         polishLabels = polish
         val q = question.lowercase().replace(' ', ' ')
         val t = Texts(polish)
-        return arithmetic(q, t) ?: airtime(q, t, defaults) ?: presetFacts(q, t) ?: presets(q, t, defaults) ?: range(q, t, defaults) ?: fresnel(q, t) ?: horizon(q, t) ?:
+        return arithmetic(q, t) ?: airtimeTable(q, t) ?: airtime(q, t, defaults) ?: presetFacts(q, t) ?: presets(q, t, defaults) ?: range(q, t, defaults) ?: fresnel(q, t) ?: horizon(q, t) ?:
             pathLoss(q, t) ?: eirp(q, t) ?: power(q, t) ?: antenna(q, t) ?: wavelength(q, t)
     }
 
@@ -651,9 +651,47 @@ object AssistantCalculators {
 
     private const val OVERHEAD = 20
 
+    /** The coding rate written in a question ("4/6", "CR 6", "coding rate 7", "korekcja 4/8"), or null. */
+    private val CR_ASKED =
+        Regex("(?iu)4/([5-8])|(?<![\\p{L}\\d])cr\\s*[:=]?\\s*([5-8])(?!\\d)|coding\\s*rate\\s*[:=]?\\s*(?:4/)?([5-8])|korekcj\\p{L}*(?:\\s+błęd\\p{L}*)?\\s*(?:4/)?([5-8])(?!\\d)")
+
+    private fun askedCr(q: String): Int? = CR_ASKED.find(q)?.groupValues?.drop(1)?.firstOrNull { it.isNotEmpty() }?.toInt()
+
+    /** The coding rates a preset can use: its own and the ones firmware lets it be raised (or lowered) to. */
+    private fun crOptions(o: ChannelOption): List<Int> = (listOf(o.codingRate) + o.codingRateOverrides).distinct().sorted()
+
+    /** Time of a 50-byte packet and about how many devices fit, for every preset and every coding rate it can use. */
+    private fun airtimeTable(q: String, t: Texts): String? {
+        if (!has(q, "tabel|wszystk\\p{L}* preset|każd\\p{L}* preset|kazd\\p{L}* preset|dla każdego|dla kazdego|all presets|each preset|every preset")) return null
+        if (!has(q, "czas|airtime|air time|obciążeni|obciazeni|load|nadawani|ile urządzeń|ile urzadzen|korekcj|coding rate|\\bcr\\b")) return null
+        val sb = StringBuilder(
+            t.s(
+                "Czas nadawania pakietu 50 B i ile urządzeń mieści sieć, dla każdego presetu i korekcji błędów (CR). Pierwsza wartość to ustawienie samego presetu:",
+                "Time on air of a 50 B packet and about how many devices a network fits, for every preset and coding rate (CR). The first value is the preset's own:",
+            ),
+        )
+        for (o in COMPARED) {
+            sb.append("\n• ").append(presetName(o)).append(": ")
+            sb.append(
+                crOptions(o).sortedBy { if (it == o.codingRate) 0 else it }.joinToString("; ") { c ->
+                    "4/$c ${t.n(airtimeMs(o, PRESET_PAYLOAD_BYTES, c), 0)} ms, ${t.s("ok.", "about")} ${nodesFit(o, c)}"
+                },
+            )
+        }
+        sb.append("\n").append(
+            t.s(
+                "Wyższa korekcja to więcej redundancji: pakiet trwa dłużej, sieć zapełnia się szybciej, ale łącze lepiej znosi zakłócenia. Liczba urządzeń to rząd wielkości (25 % czasu, 4 pakiety na 15 minut na urządzenie, bez przekazywania dalej).",
+                "A higher coding rate means more redundancy: a packet takes longer and the network fills up sooner, but the link copes better with interference. The device count is an order of magnitude (25 % of the air time, 4 packets per 15 minutes per device, relaying not counted).",
+            ),
+        )
+        return sb.toString()
+    }
+
     private fun airtime(q: String, t: Texts, defaults: Defaults): String? {
         if (!has(q, "czas (?:nadawania|transmisji|w eterze|wysyłania|wysylania)|czasu (?:nadawania|transmisji)|airtime|air time|time on air|w eterze|ile trwa (?:wysłan|wysylan|nadawan|transmisj|pakiet|wiadomo)|jak długo trwa|jak dlugo trwa|duty.?cycle|ile (?:wiadomości|wiadomosci|pakietów|pakietow) (?:mogę|moge|można|mozna|da się|da sie) (?:wysłać|wyslac|nadać|nadac)")) return null
         val (o, named) = preset(q, defaults)
+        val askedRate = askedCr(q)
+        val cr = crFor(o, askedRate)
         val bytes = first(q, "bajt\\p{L}*|byte\\p{L}*|b")?.toInt()
         val chars = first(q, "znak\\p{L}*|liter\\p{L}*|char\\p{L}*")?.toInt()
         val sizes = when {
@@ -662,9 +700,25 @@ object AssistantCalculators {
             else -> listOf(10 + OVERHEAD, 50 + OVERHEAD, 200 + OVERHEAD)
         }.map { it.coerceIn(1, 255) }
         val presetNote = if (named) "" else t.s(" (ustawiony w radiu)", " (set in the radio)")
-        val sb = StringBuilder(t.s("Czas nadawania dla presetu ${presetName(o)}$presetNote:", "Time on air for the ${presetName(o)} preset$presetNote:"))
+        val sb = StringBuilder(t.s("Czas nadawania dla presetu ${presetName(o)}$presetNote, korekcja 4/$cr:", "Time on air for the ${presetName(o)} preset$presetNote, coding rate 4/$cr:"))
+        if (askedRate == null && has(q, "obciążeni|obciazeni|load|korekcj|coding rate|\\bcr\\b|zależ|zalez|depend")) {
+            sb.setLength(0)
+            sb.append(t.s("Preset ${presetName(o)}$presetNote, pakiet 50 B, w zależności od korekcji błędów (CR):", "Preset ${presetName(o)}$presetNote, a 50 B packet, by coding rate (CR):"))
+            for (c in crOptions(o)) {
+                sb.append("\n• 4/$c: ").append(t.n(airtimeMs(o, PRESET_PAYLOAD_BYTES, c), 0)).append(" ms, ")
+                    .append(t.s("prędkość ", "speed ")).append(t.n(bitRate(o, c) / 1000.0, 2)).append(" kbps, ")
+                    .append(t.s("sieć mieści ok. ", "the network fits about ")).append(nodesFit(o, c)).append(t.s(" urządzeń", " devices"))
+            }
+            sb.append("\n").append(
+                t.s(
+                    "Wyższa korekcja to więcej redundancji: pakiet trwa dłużej, sieć zapełnia się szybciej, ale łącze lepiej znosi zakłócenia.",
+                    "A higher coding rate means more redundancy: a packet takes longer and the network fills up sooner, but the link copes better with interference.",
+                ),
+            )
+            return sb.toString()
+        }
         for (b in sizes) {
-            val ms = airtimeMs(o, b)
+            val ms = airtimeMs(o, b, cr)
             val label = if (bytes != null) t.s("$b B", "$b B") else t.s("wiadomość ${b - OVERHEAD} znaków", "a ${b - OVERHEAD}-character message")
             sb.append("\n• ").append(label).append(": ").append(t.n(ms, 0)).append(" ms")
                 .append(t.s(", przy limicie 10 % czasu ok. ${t.n(360_000 / ms, 0)} takich pakietów na godzinę", ", with the 10 % limit about ${t.n(360_000 / ms, 0)} such packets per hour"))
