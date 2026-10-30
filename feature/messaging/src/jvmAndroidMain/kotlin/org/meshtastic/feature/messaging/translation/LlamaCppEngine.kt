@@ -87,6 +87,30 @@ class LlamaCppEngine(
     @Volatile
     var skipNpu: Boolean = false
 
+    /**
+     * The model chosen for the assistant (set by the router). The Intel NPU needs a small window of text (about 1000
+     * tokens), which is enough for translating a message but too little for the assistant, so that model skips it.
+     */
+    @Volatile
+    var assistantModelId: String = ""
+
+    /** The notes about the last start are written in Polish on a Polish system, otherwise in English. */
+    private fun note(en: String, pl: String): String = if (java.util.Locale.getDefault().language == "pl") pl else en
+
+    /** A short reason taken from the program's log, for the report (the whole log stays in the log file). */
+    private fun reasonFrom(log: String): String {
+        val text = log.takeLast(REPORT_TAIL * 4)
+        return when {
+            text.contains("attention_mask", ignoreCase = true) || text.contains("Attention mask", ignoreCase = true) ->
+                note("the chip cannot handle the attention window of this model", "układ nie radzi sobie z oknem uwagi tego modelu")
+            Regex("out of memory|failed to allocate|cannot allocate|OOM", RegexOption.IGNORE_CASE).containsMatchIn(text) ->
+                note("not enough memory on the chip", "za mało pamięci w układzie")
+            text.contains("device lost", ignoreCase = true) || text.contains("VK_ERROR", ignoreCase = true) ->
+                note("the graphics driver reported an error", "sterownik karty graficznej zgłosił błąd")
+            else -> note("the chip did not work with this model", "układ nie zadziałał z tym modelem")
+        }
+    }
+
     /** Forgets the remembered failed attempts (NPU, graphics card), so the next start tries them again. */
     fun clearFailedAttempts() {
         installer.clearBrokenMarks()
@@ -372,11 +396,14 @@ class LlamaCppEngine(
             } else {
                 // A computer with an Intel Core Ultra: its NPU through OpenVINO. Models that the NPU cannot run (Qwen 3.5,
                 // the biggest ones, listening) skip it; the first compilation is kept on disk for the next starts.
-                installer.intelNpuAsset()?.takeIf { !skipNpu && model.intelNpu && !hearing && !installer.isBroken(it, modelId) }?.let { asset ->
+                installer.intelNpuAsset()?.takeIf { !skipNpu && model.intelNpu && !hearing && modelId != assistantModelId && !installer.isBroken(it, modelId) }?.let { asset ->
                     add(
                         Attempt(
                             "NPU (Intel) and processor", null, emptyList(), asset, requireGpu = true, npu = "Intel", perModel = true,
-                            env = mapOf("GGML_OPENVINO_DEVICE" to "NPU", "GGML_OPENVINO_CACHE_DIR" to installer.cacheDir("openvino").absolutePath),
+                            // The OpenVINO notes ask for a small window on the NPU (512 to 1024 tokens) and say that its
+                            // program cache is not supported there.
+                            window = INTEL_NPU_WINDOW,
+                            env = mapOf("GGML_OPENVINO_DEVICE" to "NPU"),
                         ),
                     )
                 }
@@ -396,20 +423,21 @@ class LlamaCppEngine(
         }
         var failure: Throwable? = null
         val tried = StringBuilder()
-        if (skipNpu) tried.append("- NPU: skipped on request (hidden setting), the graphics card is tried first\n")
+        if (skipNpu) tried.append("- " + note("NPU: skipped on request, the graphics card is tried first", "NPU: pominięte na prośbę, najpierw karta graficzna") + "\n")
         if (installer.android) {
-            if (installer.qualcomm) tried.append("- Snapdragon phone detected\n") else tried.append("- not a Snapdragon phone: no NPU program\n")
+            if (installer.qualcomm) tried.append("- " + note("Snapdragon phone detected", "wykryto telefon ze Snapdragonem") + "\n") else tried.append("- " + note("not a Snapdragon phone: no NPU program", "to nie Snapdragon: brak programu na NPU") + "\n")
             installer.androidNpuAsset()?.takeIf { !skipNpu && installer.isBroken(it, modelId) }
-                ?.let { tried.append("- NPU (Hexagon): skipped, failed recently for this model\n") }
-            if (installer.androidGpuAssets(modelId).isEmpty()) tried.append("- graphics card programs: skipped, failed recently\n")
+                ?.let { tried.append("- " + note("NPU (Hexagon): skipped, failed recently for this model", "NPU (Hexagon): pominięte, niedawno nie zadziałało z tym modelem") + "\n") }
+            if (installer.androidGpuAssets(modelId).isEmpty()) tried.append("- " + note("graphics card programs: skipped, failed recently", "programy na kartę graficzną: pominięte, niedawno nie zadziałały") + "\n")
         } else if (!installer.mac) {
             tried.append(
                 when {
                     skipNpu -> ""
-                    !installer.intelNpu -> "- NPU (Intel): not used, no Intel Core Ultra processor found on this computer\n"
-                    hearing -> "- NPU (Intel): skipped, not used for listening\n"
-                    !model.intelNpu -> "- NPU (Intel): skipped, this model does not run on the Intel NPU\n"
-                    installer.intelNpuAsset()?.let { installer.isBroken(it, modelId) } == true -> "- NPU (Intel): skipped, failed recently for this model\n"
+                    !installer.intelNpu -> "- " + note("NPU (Intel): not used, no Intel Core Ultra processor found on this computer", "NPU (Intel): nieużywane, na tym komputerze nie ma procesora Intel Core Ultra") + "\n"
+                    hearing -> "- " + note("NPU (Intel): skipped, not used for listening", "NPU (Intel): pominięte, nie służy do słuchania") + "\n"
+                    !model.intelNpu -> "- " + note("NPU (Intel): skipped, this model does not run on the Intel NPU", "NPU (Intel): pominięte, ten model nie działa na NPU Intela") + "\n"
+                    modelId == assistantModelId -> "- " + note("NPU (Intel): skipped, this model is the assistant and needs a bigger window of text than the NPU allows", "NPU (Intel): pominięte, ten model jest asystentem i potrzebuje większego okna tekstu, niż pozwala NPU") + "\n"
+                    installer.intelNpuAsset()?.let { installer.isBroken(it, modelId) } == true -> "- " + note("NPU (Intel): skipped, failed recently for this model", "NPU (Intel): pominięte, niedawno nie zadziałało z tym modelem") + "\n"
                     else -> ""
                 },
             )
@@ -420,13 +448,14 @@ class LlamaCppEngine(
                 attempt.program
                     ?: attempt.asset?.let { if (attempt.requireGpu) installer.installGpu(it) else runCatching { installer.install(it) }.getOrNull() }
             if (program == null) {
-                tried.append("- ${attempt.name}: the program could not be downloaded (${installer.lastInstallError.take(REPORT_TAIL)})\n")
+                tried.append("- ${attempt.name}: " + note("the program could not be downloaded", "nie udało się pobrać programu") + " (${installer.lastInstallError.take(REPORT_TAIL)})\n")
                 startReport = tried.toString()
                 continue
             }
-            Logger.i(tag = TAG) { "Starting ${model.name}: ${attempt.name} (context $window tokens, hearing $hearing)" }
+            val attemptWindow = attempt.window ?: window
+            Logger.i(tag = TAG) { "Starting ${model.name}: ${attempt.name} (context $attemptWindow tokens, hearing $hearing)" }
             val noThinking = if (model.quietThinking) emptyList() else listOf("--reasoning-budget", "0")
-            val started = startServer(program, file, hearingFile, window, attempt.extra + noThinking, attempt)
+            val started = startServer(program, file, hearingFile, attemptWindow, attempt.extra + noThinking, attempt)
             // A chip that fails is not tried again for a while (an NPU only for this model: another may fit).
             fun giveUp() {
                 if (attempt.requireGpu) attempt.asset?.let { installer.markBroken(it, if (attempt.perModel) modelId + attempt.markSuffix else null) }
@@ -439,7 +468,7 @@ class LlamaCppEngine(
                     throw e
                 }
                 failure = e
-                tried.append("- ${attempt.name}: failed (${e.message}). ${started.logTail().takeLast(REPORT_TAIL).trim()}\n")
+                tried.append("- ${attempt.name}: " + note("failed", "nie uruchomiło się") + ": ${reasonFrom(started.logTail())}\n")
                 startReport = tried.toString()
                 Logger.w(tag = TAG, throwable = e) { "${attempt.name} did not start: ${e.message}\n${started.logTail().takeLast(MAX_TAIL)}" }
                 started.stop()
@@ -448,7 +477,7 @@ class LlamaCppEngine(
             }
             if (attempt.requireGpu && !gpuTookPart()) {
                 // The program started, but the chip did nothing (no driver, no support): not worth keeping here.
-                tried.append("- ${attempt.name}: started, but the chip was not used. ${started.logTail().takeLast(REPORT_TAIL).trim()}\n")
+                tried.append("- ${attempt.name}: " + note("started, but the chip was not used", "uruchomiło się, ale układ nie został użyty") + ": ${reasonFrom(started.logTail())}\n")
                 startReport = tried.toString()
                 Logger.w(tag = TAG) { "${attempt.name}: the chip was not used\n${started.logTail().takeLast(MAX_TAIL)}" }
                 giveUp()
@@ -458,7 +487,7 @@ class LlamaCppEngine(
             if (attempt.requireGpu && !answersSanely(started, modelId)) {
                 // A chip can load the model and still crash while answering or write nonsense ("##", seen with OpenCL on
                 // an Adreno): this chip is not used for this model.
-                tried.append("- ${attempt.name}: started, but the test question was not answered properly (crash or nonsense), so this chip is not used for this model. ${started.logTail().takeLast(REPORT_TAIL).trim()}\n")
+                tried.append("- ${attempt.name}: " + note("started, but the test question was not answered properly, so this chip is not used for this model", "uruchomiło się, ale pytanie testowe nie dostało sensownej odpowiedzi, więc ten układ nie jest używany z tym modelem") + "\n")
                 startReport = tried.toString()
                 Logger.w(tag = TAG) { "${attempt.name}: a test question was answered with nonsense" }
                 giveUp()
@@ -469,7 +498,7 @@ class LlamaCppEngine(
             loadedId = modelId
             loadedHearing = hearing
             activeBackend = describeBackend(attempt)
-            tried.append("- ${attempt.name}: works\n")
+            tried.append("- ${attempt.name}: " + note("works", "działa") + "\n")
             startReport = tried.toString()
             store.reportLoaded(TAG, modelId)
             Logger.i(tag = TAG) { "Model ${model.name} runs: $activeBackend" }
@@ -495,6 +524,8 @@ class LlamaCppEngine(
         val dspLibs: Boolean = false,
         val env: Map<String, String> = emptyMap(),
         val markSuffix: String = "",
+        /** A smaller window of text for this way (the Intel NPU works with fixed sizes). */
+        val window: Int? = null,
     )
 
     /** Asks one tiny question and checks that the answer makes sense (an NPU can run a model and still write garbage). */
@@ -622,6 +653,8 @@ class LlamaCppEngine(
         const val CACHE_RAM_COMPUTER_MB = 1536
         const val LOAD_TIMEOUT_MS = 10 * 60 * 1000L
         // A chip (NPU, graphics card) that has not answered in this time is dropped, so a hanging one cannot block the start.
+        /** Window of text on the Intel NPU: the notes of the OpenVINO engine say 512 to 1024; it also fits the model's sliding window. */
+        const val INTEL_NPU_WINDOW = 1024
         const val CHIP_LOAD_TIMEOUT_MS = 4 * 60 * 1000L
         const val CONNECT_TIMEOUT_MS = 20_000
         const val READ_TIMEOUT_MS = 10 * 60 * 1000

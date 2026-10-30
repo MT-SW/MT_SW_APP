@@ -57,6 +57,10 @@ class AiEngineRouter(
             scope.launch {
                 uiPrefs.aiSkipNpu.collect { llama.skipNpu = it }
             }
+            llama.assistantModelId = uiPrefs.assistantModelId.value
+            scope.launch {
+                uiPrefs.assistantModelId.collect { llama.assistantModelId = it }
+            }
             scope.launch {
                 var previous: Choice? = null
                 combine<Any, Choice>(
