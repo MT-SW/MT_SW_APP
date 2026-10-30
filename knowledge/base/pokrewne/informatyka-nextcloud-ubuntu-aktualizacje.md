@@ -1,0 +1,12 @@
+<!-- Baza wiedzy MT_SW: aktualizacje Nextcloud i automatyczne aktualizacje Ubuntu na serwerze domowym. Tylko informacyjnie. -->
+# Serwer domowy: aktualizacje Nextcloud i automatyczne poprawki Ubuntu
+
+### Jak bezpiecznie zaktualizować Nextcloud na serwerze domowym?
+Oficjalna dokumentacja Nextcloud zaleca regularne aktualizacje, łącznie z wydaniami poprawkowymi (point releases), i przechodzenie na każdą nową wersję główną, zanim obecna osiągnie koniec wsparcia. Przed każdą aktualizacją trzeba zrobić świeżą kopię zapasową. Wyłącz wszystkie aplikacje zewnętrzne (3rd party) i sprawdź ich zgodność z nową wersją, a po aktualizacji włącz je z powrotem. Włącz tryb konserwacji (maintenance mode), który blokuje logowanie i zablokuje sesje. Nie wolno pomijać wersji głównych. Przykładowa ścieżka to 18.0.5, potem 18.0.11, 19.0.5 i 20.0.2. Instalacje z Dockerem, snapem i gotowymi maszynami wirtualnymi mają własne instrukcje od dystrybucji. Źródło dotyczy aktualizacji wbudowanym aktualizatorem albo ręcznie, z archiwum.
+Słowa: nextcloud, aktualizacja, upgrade, kopia zapasowa, maintenance mode, tryb konserwacji, occ, wersja główna, point release, aplikacje zewnętrzne, docker, snap, serwer domowy
+Źródło: https://docs.nextcloud.com/server/stable/admin_manual/maintenance/upgrade.html (sprawdzono 2026-10)
+
+### Jak włączyć automatyczne poprawki bezpieczeństwa na Ubuntu Server?
+Pakiet to unattended-upgrades. Jeśli go nie ma, instaluje się go poleceniem sudo apt-get install unattended-upgrades. Konfiguracja to sudo dpkg-reconfigure --priority=low unattended-upgrades, a potem odpowiedź w interaktywnym oknie. Dialog tworzy plik /etc/apt/apt.conf.d/20auto-upgrades, który włącza codzienne sprawdzanie list pakietów i automatyczne aktualizacje. Plik /etc/apt/apt.conf.d/50unattended-upgrades określa źródła aktualizacji, czarną listę pakietów, alerty e-mail i automatyczny restart. Aktywne ustawienie sprawdzisz poleceniem apt-config dump APT::Periodic::Unattended-Upgrade, a wartość 0 oznacza wyłączone. Źródło nie podaje nazwy pliku logu dla tego pakietu, więc tego nie wpisuję. Automatyczne restartowanie to decyzja, którą warto włączać świadomie, bo wyłączy usługi na serwerze.
+Słowa: ubuntu, unattended-upgrades, automatyczne aktualizacje, poprawki bezpieczeństwa, dpkg-reconfigure, apt, 20auto-upgrades, 50unattended-upgrades, restart, serwer, apt-config, aktualizacje w tle
+Źródło: https://help.ubuntu.com/community/AutomaticSecurityUpdates (sprawdzono 2026-10; dokumentacja społeczności Ubuntu)
