@@ -4,7 +4,7 @@ Katar sienny daje kichanie, kaszel, katar lub zatkany nos, swędzące lub łzawi
 Słowa: katar sienny, pyłki, kichanie, zatkany nos, swędzące oczy, utrata węchu, marzec, wrzesień
 Źródło: https://www.nhs.uk/conditions/hay-fever/ (sprawdzono 2026-10, źródło brytyjskie)
 
-### Jak ograniczyć kontakt z pyłkami przy kataru sienneym według NHS?
+### Jak ograniczyć kontakt z pyłkami przy kataru siennym według NHS?
 Strona zaleca nakładanie wazeliny wokół nozdrzy, żeby łapać pyłki, noszenie okularów z osłonami bocznymi, maski lub szerokiego kapelusza na dworze i prysznic oraz zmianę ubrań po wyjściu na zewnątrz. Okna i drzwi trzeba trzymać zamknięte, odkurzać regularnie i wycierać kurz wilgotną szmatką. Filtr HEPA w odkurzaczu i filtr pyłkowy w samochodzie pomagają. Nie należy kosić trawy ani po niej chodzić, a świeżych kwiatów nie trzyma się w domu.
 
 Słowa: katar sienny, pyłki, wazelina, okulary, prysznic, HEPA, filtr pyłkowy, kwiaty, zwierzęta

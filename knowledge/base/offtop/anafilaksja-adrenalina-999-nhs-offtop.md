@@ -5,7 +5,7 @@ Słowa: anafilaksja, reakcja alergiczna, zagrożenie życia, pokarmy, leki, uż�
 Źródło: https://www.nhs.uk/conditions/anaphylaxis/ (sprawdzono 2026-10, źródło brytyjskie)
 
 ### Jakie są objawy anafilaksji według NHS?
-Objawy zwykle pojawiają się w ciągu minut od kontaktu z alergenem. Obejmują obrzęk gardła i języka, szybki lub trudny oddech, świszczenie lub kaszel, trudności z przełykaniem lubochrypły głos, uczucie omdlenia, zawroty, zmęczenie lub splątanie, zimną skórę albo sinienie lub bladość skóry i warg, a także opuchniętą, uniesioną lub swędzącą wysypkę.
+Objawy zwykle pojawiają się w ciągu minut od kontaktu z alergenem. Obejmują obrzęk gardła i języka, szybki lub trudny oddech, świszczenie lub kaszel, trudności z przełykaniem lub chrypka głos, uczucie omdlenia, zawroty, zmęczenie lub splątanie, zimną skórę albo sinienie lub bladość skóry i warg, a także opuchniętą, uniesioną lub swędzącą wysypkę.
 
 Słowa: anafilaksja, obrzęk gardła, świszczenie, przełykanie, omdlenie, sinienie, wysypka, minuty
 Źródło: https://www.nhs.uk/conditions/anaphylaxis/ (sprawdzono 2026-10, źródło brytyjskie)
