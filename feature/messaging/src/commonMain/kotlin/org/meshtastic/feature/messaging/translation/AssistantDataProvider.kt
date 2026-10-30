@@ -1700,14 +1700,6 @@ class AssistantDataProvider(
         }
         return sb.toString()
     }
-        if (found.isEmpty()) return aiString(Res.string.ai_dm_none)
-        val now = nowMillis
-        val sb = StringBuilder(aiString(Res.string.ai_dm_title))
-        for ((time, who, text) in found.sortedByDescending { it.first }.take(limit)) {
-            sb.append("\n• ").append(who).append(", ").append(ago(((now - time) / MILLIS_PER_MINUTE).coerceAtLeast(0))).append(": ").append(text)
-        }
-        return sb.toString()
-    }
 
     /** The transmit power set in the radio, always with its unit (dBm) and the same in mW, so a small model cannot swap them. */
     suspend fun txPowerText(): String {
