@@ -224,7 +224,14 @@ class WhisperCppEngine(
             try {
                 started.awaitReady("/", LOAD_TIMEOUT_MS, anyAnswer = true)
                 if (attempt.chip) {
-                    val seen = synchronized(chipLines) { chipLines.toString() }
+                    // The program's log lines reach us a little after the program answers: wait for the chip's own lines.
+                    var seen = synchronized(chipLines) { chipLines.toString() }
+                    var waited = 0
+                    while (!CHIP_USED.containsMatchIn(seen) && waited < CHIP_LOG_WAIT_MS) {
+                        Thread.sleep(CHIP_LOG_STEP_MS)
+                        waited += CHIP_LOG_STEP_MS.toInt()
+                        seen = synchronized(chipLines) { chipLines.toString() }
+                    }
                     check(CHIP_USED.containsMatchIn(seen)) { "the chip took no part: ${seen.takeLast(300)}" }
                     // A software "graphics card" (llvmpipe) is slower than the processor build.
                     check(!seen.contains("llvmpipe", ignoreCase = true)) { "only a software graphics card was found" }
@@ -327,6 +334,8 @@ class WhisperCppEngine(
         const val SAFE_SUFFIX = "-safe"
         const val MAX_THREADS = 8
         const val MAX_SWITCHES = 3
+        const val CHIP_LOG_WAIT_MS = 3_000
+        const val CHIP_LOG_STEP_MS = 100L
         const val MIN_NONSENSE_CHARS = 60
         const val MAX_CHARS_PER_SECOND = 30
         const val MIN_WORDS_FOR_REPEAT_CHECK = 12
@@ -337,7 +346,7 @@ class WhisperCppEngine(
         val VENDOR_LIB_DIRS = listOf("/vendor/lib64", "/system/vendor/lib64", "/odm/lib64")
         val DSP_DIRS = listOf("/vendor/dsp/cdsp", "/vendor/lib/rfsa/adsp", "/vendor/dsp", "/system/lib/rfsa/adsp", "/dsp")
         val CHIP_LINE = Regex("backend|HTP\\d|Hexagon|OpenCL|Vulkan|Metal|Adreno|device", RegexOption.IGNORE_CASE)
-        val CHIP_USED = Regex("using (HTP|Hexagon|OpenCL|Vulkan|GPU)|HTP\\d|ggml_opencl|ggml_vulkan|ggml_metal_init|using Metal|ggml-hex|Adreno|Found \\d+ Vulkan", RegexOption.IGNORE_CASE)
+        val CHIP_USED = Regex("using (HTP|Hexagon|OpenCL|Vulkan|GPU)|HTP\\d|ggml_opencl|ggml_vulkan|ggml_metal|using Metal|using MTL\\d|MTL\\d|ggml-hex|Adreno|Found \\d+ Vulkan", RegexOption.IGNORE_CASE)
         const val BYTES_PER_SECOND = 32_000L
         const val MS_PER_SECOND = 1_000L
         const val LOAD_TIMEOUT_MS = 120_000L
