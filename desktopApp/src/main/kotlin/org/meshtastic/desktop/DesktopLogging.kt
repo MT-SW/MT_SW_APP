@@ -20,6 +20,7 @@ import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.platformLogWriter
 import kotlinx.coroutines.flow.StateFlow
+import org.meshtastic.core.common.AppDataRoot
 import org.meshtastic.core.common.log.AppLogControl
 import org.meshtastic.core.common.log.AppLogControls
 import org.meshtastic.core.common.log.AppLogLevel
@@ -38,7 +39,7 @@ import java.io.File
  */
 @Suppress("UNUSED_PARAMETER")
 internal fun installDesktopLogging(isDebug: Boolean) {
-    val logDir = File(System.getProperty("user.home"), ".meshtastic/logs")
+    val logDir = File(AppDataRoot.dir, "logs")
     Logger.setMinSeverity(Severity.Info)
     Logger.setLogWriters(
         listOf(
@@ -64,7 +65,7 @@ private fun desktopHeader(): String {
 
 private const val MB = 1024 * 1024
 
-/** The desktop side of the log switch: same files as on a phone, kept in `~/.meshtastic/logs`. */
+/** The desktop side of the log switch: same files as on a phone, kept in the logs folder of the data folder. */
 private class DesktopLogControl(private val dir: File) : AppLogControl {
     override val level: StateFlow<AppLogLevel> get() = MtSwLogging.level
 

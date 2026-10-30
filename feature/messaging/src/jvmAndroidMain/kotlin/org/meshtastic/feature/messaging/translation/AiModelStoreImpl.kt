@@ -85,7 +85,9 @@ class AiModelStoreImpl(
     override val askStorageFolder: StateFlow<Boolean> = askFolderState
 
     private fun storageInfoNow(): AiStorageInfo? =
-        location?.let { l -> AiStorageInfo(l.base.path, l.freeMb(), l.choices.map { it.path }, l.nextBase?.path) }
+        location?.let { l ->
+            AiStorageInfo(l.base.path, l.freeMb(), l.choices.map { it.path }, l.nextBase?.path, l.canChange, l.movableMb(), l.previousError())
+        }
 
     override fun storageFolderAsked() {
         location?.markAsked()
@@ -102,8 +104,9 @@ class AiModelStoreImpl(
             storageMoveState.value = AiStorageMove.Failed("a model is being downloaded, wait until it finishes")
             return
         }
-        // The files are copied, not moved: the models in memory are switched off first so nothing keeps them open.
-        unloadAll?.invoke()
+        // Phone: the files are copied now, so the models in memory are switched off first so nothing keeps them open.
+        // Computer: only a request is saved (the copy is made at the next start), nothing needs to be switched off.
+        if (l.movableMb() == null) unloadAll?.invoke()
         storageMoveState.value = AiStorageMove.Moving(0f)
         val error = l.move(File(folder)) { storageMoveState.value = AiStorageMove.Moving(it) }
         storageMoveState.value = if (error == null) AiStorageMove.Done else AiStorageMove.Failed(error)
@@ -218,6 +221,11 @@ class AiModelStoreImpl(
 
     override suspend fun download(id: String) {
         val model = AiModels.byId(id) ?: return
+        // After a move was saved, the files of this run are deleted at the next start: a download now would be lost.
+        if (location?.nextBase != null) {
+            if (model.engine != AiEngine.NLLB_ONNX) setGguf(id, TranslatorModelState.Failed("restart the app first"))
+            return
+        }
         if (model.engine == AiEngine.NLLB_ONNX) {
             nllb.download()
             return

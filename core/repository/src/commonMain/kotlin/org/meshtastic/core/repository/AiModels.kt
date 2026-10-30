@@ -586,6 +586,12 @@ data class AiStorageInfo(
     val choices: List<String> = emptyList(),
     /** After a move, the folder that will be used from the next start; null = none. */
     val nextFolder: String? = null,
+    /** False when the folder is fixed from outside (computers: the MESHTASTIC_DATA_DIR variable). */
+    val canChange: Boolean = true,
+    /** Megabytes a move has to copy (computers: the whole data folder, not only the AI files); null = not known. */
+    val movableMb: Long? = null,
+    /** Why the last move (made at a start of the app) failed; null = no failure to report. */
+    val previousError: String? = null,
 )
 
 /** State of moving the AI files to another folder. */
@@ -622,7 +628,10 @@ interface AiModelStore {
     /** Opens the system's folder chooser (computers); null when nothing was chosen or the platform has no chooser. */
     suspend fun pickStorageFolder(): String? = null
 
-    /** Copies the model files to [folder] and uses it from the next start; the old files are removed then. */
+    /**
+     * Phone: copies the model files to [folder] and uses it from the next start; the old files are removed then.
+     * Computer: saves the request; all the data of the app is moved to [folder] when the app starts the next time.
+     */
     suspend fun moveStorage(folder: String) {}
 
     /** Megabytes that would be left free on the disk after downloading [id]; null when it cannot be told. */

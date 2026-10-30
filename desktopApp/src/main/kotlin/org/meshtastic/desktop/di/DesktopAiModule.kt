@@ -26,7 +26,9 @@ import org.meshtastic.feature.docs.translation.DocTranslationService
 import org.meshtastic.feature.docs.translation.NoOpDocTranslator
 import org.meshtastic.feature.messaging.translation.MessageTranslationService
 import org.meshtastic.core.repository.TranslatorModelManager
+import org.meshtastic.core.common.AppDataRoot
 import org.meshtastic.feature.messaging.translation.AiModelStoreImpl
+import org.meshtastic.feature.messaging.translation.StorageScheduler
 import org.meshtastic.feature.messaging.translation.AiTranslationRouter
 import org.meshtastic.feature.messaging.translation.AssistantHistoryStore
 import org.meshtastic.feature.messaging.translation.AssistantService
@@ -68,15 +70,31 @@ class DesktopAiModule {
 
     @Single fun docTranslationService(): DocTranslationService = NoOpDocTranslator()
 
-    /** The models, engine programs and translator files go to the folder a person chose (default: ~/.meshtastic). */
+    /**
+     * The whole data folder (database, settings, logs, maps, models, engine programs) is the one a person chose
+     * (default: ~/.meshtastic); a change is made at the next start by [AppDataRoot].
+     */
     @Single
     fun aiStorageLocation(): AiStorageLocation {
-        val home = File(System.getProperty("user.home"), ".meshtastic")
         return AiStorageLocation(
-            settingsDir = home,
-            defaultBase = home,
+            settingsDir = AppDataRoot.defaultDir,
+            defaultBase = AppDataRoot.dir,
             withEngines = true,
-            askOnFirstRun = true,
+            askOnFirstRun = AppDataRoot.canChange,
+            scheduler =
+            object : StorageScheduler {
+                override val root: File get() = AppDataRoot.dir
+
+                override fun schedule(target: File): String? = AppDataRoot.schedule(target)
+
+                override fun pending(): File? = AppDataRoot.pendingTarget()
+
+                override fun usedMb(): Long = AppDataRoot.usedMb()
+
+                override val canChange: Boolean get() = AppDataRoot.canChange
+
+                override fun lastError(): String? = AppDataRoot.lastMoveError()
+            },
             folderPicker = {
                 kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
                     runCatching {
@@ -116,7 +134,7 @@ class DesktopAiModule {
 
     @Single
     fun aiTextEngine(store: AiModelStoreImpl, installer: ModelServerInstaller, uiPrefs: UiPrefs): AiTextEngine {
-        val logs = File(System.getProperty("user.home"), ".meshtastic/engine-logs")
+        val logs = File(AppDataRoot.dir, "engine-logs")
         val whisper = if (installer.whisperSupported) WhisperCppEngine(store, installer, logs) else null
         return AiEngineRouter(store, LlamaCppEngine(store, installer, logs), whisper, uiPrefs)
     }
@@ -131,7 +149,7 @@ class DesktopAiModule {
 
     @Single
     fun assistantHistoryStore(): AssistantHistoryStore =
-        FileAssistantHistoryStore(File(System.getProperty("user.home"), ".meshtastic/assistant"))
+        FileAssistantHistoryStore(File(AppDataRoot.dir, "assistant"))
 
     @Single
     fun assistantDataProvider(
@@ -144,7 +162,7 @@ class DesktopAiModule {
         AssistantDataProvider(nodeRepository, radioConfigRepository, meshLogRepository, packetRepository, connection)
 
     @Single
-    fun assistantMemory(): AssistantMemory = FileAssistantMemory(File(System.getProperty("user.home"), ".meshtastic/assistant-memory"))
+    fun assistantMemory(): AssistantMemory = FileAssistantMemory(File(AppDataRoot.dir, "assistant-memory"))
 
     @Single
     fun assistantService(
@@ -157,7 +175,7 @@ class DesktopAiModule {
     ): AssistantService = LlamaAssistantService(
             engine, store, uiPrefs, data,
             memoryStore = memory,
-            knowledge = UpdatableKnowledge(knowledge, File(System.getProperty("user.home"), ".meshtastic/knowledge"), uiPrefs),
+            knowledge = UpdatableKnowledge(knowledge, File(AppDataRoot.dir, "knowledge"), uiPrefs),
         )
 
     @Single

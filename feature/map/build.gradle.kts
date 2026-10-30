@@ -48,6 +48,8 @@ kotlin {
             implementation(libs.ktor.client.core)
         }
 
+        // The desktop data folder (AppDataRoot) decides where the imported map layers are kept.
+        jvmMain.dependencies { implementation(projects.core.common) }
         // The camera mesh view's preview, lens intrinsics and overlaid stills.
         androidMain.dependencies {
             implementation(libs.androidx.camera.camera2)

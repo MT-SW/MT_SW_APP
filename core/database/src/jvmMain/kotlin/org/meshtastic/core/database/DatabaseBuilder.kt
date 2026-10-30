@@ -27,20 +27,18 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
+import org.meshtastic.core.common.AppDataRoot
 import org.meshtastic.core.database.MeshtasticDatabase.Companion.configureCommon
 import java.io.File
 
 /**
  * Resolves the desktop data directory for persistent storage (DataStore files, Room database). Defaults to
- * `~/.meshtastic/`. Override via `MESHTASTIC_DATA_DIR` environment variable.
+ * `~/.meshtastic/`; a person can choose another folder in the settings (see [AppDataRoot]), and the
+ * `MESHTASTIC_DATA_DIR` environment variable always wins.
  *
  * Shared between `core:database` and `desktop` module to ensure all persistent data is co-located.
  */
-fun desktopDataDir(): String {
-    val override = System.getenv("MESHTASTIC_DATA_DIR")
-    if (!override.isNullOrBlank()) return override
-    return System.getProperty("user.home") + "/.meshtastic"
-}
+fun desktopDataDir(): String = AppDataRoot.dir.path
 
 /** Returns a [RoomDatabase.Builder] configured for JVM/Desktop with the given [dbName]. */
 actual fun getDatabaseBuilder(dbName: String): RoomDatabase.Builder<MeshtasticDatabase> {

@@ -24,6 +24,30 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
 /**
+ * On computers the whole data folder of the app (database, settings, logs, maps and the AI files) moves together; that
+ * is done at the next start, before anything is opened, by a [StorageScheduler] (see `AppDataRoot`).
+ */
+interface StorageScheduler {
+    /** The data folder used in this run. */
+    val root: File
+
+    /** Saves a request to move everything to [target]. Null = saved; otherwise a short reason. */
+    fun schedule(target: File): String?
+
+    /** The folder a saved request will switch to at the next start; null = none. */
+    fun pending(): File?
+
+    /** Megabytes the data takes now (what a move has to copy). */
+    fun usedMb(): Long
+
+    /** False when the folder is fixed from outside and cannot be changed in the settings. */
+    val canChange: Boolean get() = true
+
+    /** Why the last move failed (the copy is made at a start of the app); null = no failure to report. */
+    fun lastError(): String? = null
+}
+
+/**
  * Where the big AI files live: the models, the translator files and (on computers) the engine programs. By default that
  * is [defaultBase]; a person can choose another folder (another disk, an SD card). The choice is a small pointer file in
  * [settingsDir], which always stays in the same place, so it is found again at every start.
@@ -43,17 +67,28 @@ class AiStorageLocation(
     private val askOnFirstRun: Boolean = false,
     /** Opens the system folder chooser (computers); null where the choice is a fixed list. */
     val folderPicker: (suspend () -> String?)? = null,
+    /** Computers: the data folder (with the AI files inside) is moved as a whole at the next start. */
+    private val scheduler: StorageScheduler? = null,
 ) {
     private val pointer = File(settingsDir, "data-folder.txt")
     private val oldFolders = File(settingsDir, "old-data-folders.txt")
     private val askedMarker = File(settingsDir, "data-folder-asked")
 
     /** The folder used in this run. */
-    val base: File = resolve()
+    val base: File = scheduler?.root ?: resolve()
 
     /** Set after a successful move: the folder used from the next start. */
-    @Volatile var nextBase: File? = null
+    @Volatile var nextBase: File? = scheduler?.pending()
         private set
+
+    /** Megabytes that a move to another folder has to copy (computers: the whole data folder); null = not known. */
+    fun movableMb(): Long? = scheduler?.usedMb()
+
+    /** False when the folder is fixed from outside (the MESHTASTIC_DATA_DIR variable). */
+    val canChange: Boolean get() = scheduler?.canChange ?: true
+
+    /** Why the last move failed; null = nothing to report. */
+    fun previousError(): String? = scheduler?.lastError()
 
     val modelsDir: File get() = File(base, MODELS)
     val translatorDir: File get() = File(base, TRANSLATOR)
@@ -121,6 +156,15 @@ class AiStorageLocation(
      */
     suspend fun move(target: File, onProgress: (Float) -> Unit): String? =
         withContext(Dispatchers.IO) {
+            if (scheduler != null) {
+                val error = scheduler.schedule(target)
+                if (error == null) {
+                    nextBase = scheduler.pending()
+                    markAsked()
+                    onProgress(1f)
+                }
+                return@withContext error
+            }
             runCatching {
                     val dest = target.absoluteFile.canonicalFile
                     val from = base.canonicalFile

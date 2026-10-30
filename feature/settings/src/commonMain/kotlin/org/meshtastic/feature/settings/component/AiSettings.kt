@@ -153,6 +153,8 @@ internal fun AiSettings() {
     val effAssistant = effectiveFor(AiRole.ASSISTANT, assistantModelId)
     val effTranslator = effectiveFor(AiRole.TRANSLATOR, translatorModelId)
     val effDictation = effectiveFor(AiRole.DICTATION, dictationModelId)
+    // A download on a computer asks first when the disk would be left almost full (and waits while a move is pending).
+    val startDownload = rememberDownloadGuard { id -> appScope.launch { store.download(id) } }
     if (freedMb > 0 && freedNoticeShown) {
         AlertDialog(
             onDismissRequest = { freedNoticeShown = false },
@@ -251,6 +253,8 @@ internal fun AiSettings() {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
+
+    AiStorageRow()
 
     if (hiddenOn) {
         SwitchPreference(
@@ -356,7 +360,7 @@ internal fun AiSettings() {
                 onDownload = {
                     // The model a person chooses to download becomes the one in use when none is installed yet.
                     if (current == null) onChoose(model.id)
-                    appScope.launch { store.download(model.id) }
+                    startDownload(model.id)
                 },
                 onCancel = { store.cancelDownload(model.id) },
                 onDelete = { appScope.launch { store.delete(model.id) } },

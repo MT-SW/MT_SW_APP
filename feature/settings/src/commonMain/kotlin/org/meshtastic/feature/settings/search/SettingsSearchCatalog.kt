@@ -27,6 +27,7 @@ import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.ai_assistant_title
 import org.meshtastic.core.resources.ai_models_title
 import org.meshtastic.core.resources.smart_features_title
+import org.meshtastic.core.resources.ai_storage_title
 import org.meshtastic.core.resources.ai_unload_title
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.translator_title
@@ -42,6 +43,7 @@ import org.meshtastic.core.resources.filter_settings
 import org.meshtastic.core.resources.node_layout_neighbors
 import org.meshtastic.core.resources.node_layout_section_title
 import org.meshtastic.core.resources.local_stats_title
+import org.meshtastic.core.resources.app_data_title
 import org.meshtastic.core.resources.app_log_level
 import org.meshtastic.core.resources.log_retention_days
 import org.meshtastic.core.resources.mt_sw_features_title
@@ -189,6 +191,8 @@ object SettingsSearchCatalog {
             Res.string.smart_features_title to SettingsRoute.MtSwFeatures,
             Res.string.ai_models_title to SettingsRoute.SmartFeatures,
             Res.string.ai_unload_title to SettingsRoute.SmartFeatures,
+            Res.string.ai_storage_title to SettingsRoute.SmartFeatures,
+            Res.string.app_data_title to SettingsRoute.SmartFeatures,
             Res.string.ai_assistant_title to SettingsRoute.SmartFeatures,
             Res.string.translator_title to SettingsRoute.SmartFeatures,
             Res.string.local_stats_title to SettingsRoute.Telemetry,

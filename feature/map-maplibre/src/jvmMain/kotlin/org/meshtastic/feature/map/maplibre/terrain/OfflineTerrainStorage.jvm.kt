@@ -18,6 +18,7 @@ package org.meshtastic.feature.map.maplibre.terrain
 
 import okio.Path
 import okio.Path.Companion.toPath
+import org.meshtastic.core.common.AppDataRoot
 
 /** Alongside the desktop database and imported map layers, which already live in `~/.meshtastic`. */
-actual fun terrainStorageDirectory(): Path = "${System.getProperty("user.home")}/.meshtastic/terrain".toPath()
+actual fun terrainStorageDirectory(): Path = "${AppDataRoot.dir.path}/terrain".toPath()

@@ -128,6 +128,7 @@ import org.meshtastic.desktop.tray.TrayMenuItem
 import org.meshtastic.desktop.tray.canHideToTray
 import org.meshtastic.desktop.ui.DesktopMainScreen
 import org.meshtastic.desktop.worker.DesktopNodeCleanupScheduler
+import org.meshtastic.feature.settings.component.StorageFolderFirstRunDialog
 import org.meshtastic.feature.intro.DesktopWelcomeScreen
 import org.meshtastic.feature.map.MapScreen
 import org.meshtastic.feature.map.SharedMapViewModel
@@ -172,6 +173,8 @@ private fun svgPainterResource(path: String, density: Density): Painter = rememb
 
 @OptIn(ExperimentalCoilApi::class)
 fun main(args: Array<String>) {
+    // Before anything is opened: a requested move of the data folder is made now (with a progress window).
+    prepareDataFolder()
     installQuitHandler()
     // exitProcessOnExit = false is what makes the shutdown block below reachable at all: with the default (true),
     // application() calls System.exit(0) itself as soon as the Compose loop ends, and control never returns here.
@@ -547,6 +550,7 @@ private fun ApplicationScope.MeshtasticWindow(
                         if (introCompleted) {
                             DesktopMainScreen(uiViewModel, multiBackstack)
                             AppUpdateDialog()
+                            StorageFolderFirstRunDialog()
                         } else {
                             DesktopWelcomeScreen(onDone = { uiViewModel.onAppIntroCompleted() })
                         }
