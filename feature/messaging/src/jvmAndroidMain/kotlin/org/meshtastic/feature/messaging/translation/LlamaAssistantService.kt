@@ -1228,7 +1228,7 @@ class LlamaAssistantService(
     /** Is the question about this app's screens or the mesh network (where a guess means a wrong setting)? */
     private fun aboutAppOrMesh(question: String): Boolean {
         val q = question.lowercase()
-        return MESH_TOPIC.containsMatchIn(q) || APP_UI_ASK.containsMatchIn(q) || (HOW_TO.containsMatchIn(question) && MESH_DEVICE_TOPIC.containsMatchIn(q))
+        return MESH_TOPIC.containsMatchIn(q) || APP_UI_ASK.containsMatchIn(q) || HARDWARE_TOPIC.containsMatchIn(q) || (HOW_TO.containsMatchIn(question) && MESH_DEVICE_TOPIC.containsMatchIn(q))
     }
 
     /** The internet is a fallback only for the stronger models (the Gemma family); the weaker ones are not given web results. */
@@ -1975,6 +1975,8 @@ class LlamaAssistantService(
                     "what\\s+time\\s+is\\s+it|what(?:'s| is)\\s+(the\\s+)?(date|time)|what\\s+day\\s+is\\s+(it|today)",
             )
         val APP_UI_ASK = Regex("(?iu)aplikacj|interfejs|czcionk|motyw|ustawieni|czacie|czat\\b|asystent|mt_sw|app\\b|interface|font size|theme")
+        // Device names: a small model made up their features ("Heltec V3 has a better antenna"), so these are never guessed.
+        val HARDWARE_TOPIC = Regex("(?iu)heltec|t-beam|tbeam|t-echo|techo|rak\\s?\\d|lilygo|t1000|xiao|station g|esp32|nrf52|sx12\\d\\d|wio|seeed|elecrow|m5stack")
         val MESH_DEVICE_TOPIC = Regex("(?iu)urządzen|radio|antena|anten|pozycj|bateri|moduł|modul|wyświetlacz|oled|gps|bluetooth|usb|kod qr|klucz|logi|model ai")
         val MESH_TOPIC = Regex("(?iu)węz|węzł|mesh|kanał|kanal|firmware|lora|preset|meshtastic|nodeinfo|traceroute|hop|skok")
         val BATTERY_LEVEL_ASK = Regex("(?iu)(ile|jaki|jaka)\\s+(procent\\p{L}*\\s+)?(bateri\\p{L}*|naładowa\\p{L}*)|poziom\\p{L}*\\s+bateri|battery\\s+(level|percent)|how much battery")
