@@ -125,10 +125,18 @@ jobs:
           "VULKAN_SDK=C:\VulkanSDK\1.4.309.0" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           "C:\VulkanSDK\1.4.309.0\Bin" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
 
+      - name: SPIR-V headers (the Vulkan kit has no CMake package for them)
+        shell: bash
+        run: |
+          git clone --depth 1 https://github.com/KhronosGroup/SPIRV-Headers
+          cmake -S SPIRV-Headers -B spirv-build -DCMAKE_INSTALL_PREFIX="$PWD/spirv-install"
+          cmake --install spirv-build
+          echo "SPIRV_PREFIX=$PWD/spirv-install" >> "$GITHUB_ENV"
+
       - name: Build whisper-server (Vulkan, runtime built in)
         shell: bash
         run: |
-          cmake -S whisper.cpp -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DGGML_VULKAN=ON \
+          cmake -S whisper.cpp -B build -DCMAKE_PREFIX_PATH="$SPIRV_PREFIX" -DSPIRV-Headers_DIR="$SPIRV_PREFIX/share/cmake/SPIRV-Headers" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DGGML_VULKAN=ON \
             -DGGML_NATIVE=OFF -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded \
             -DWHISPER_BUILD_TESTS=OFF -DWHISPER_SDL2=OFF -DWHISPER_BUILD_EXAMPLES=ON
           cmake --build build --config Release --target whisper-server -j
