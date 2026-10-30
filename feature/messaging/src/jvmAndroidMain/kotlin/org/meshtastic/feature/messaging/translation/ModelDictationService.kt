@@ -60,6 +60,8 @@ class ModelDictationService(
     override suspend fun transcribe(wav: ByteArray, translator: Boolean): String {
         check(uiPrefs.dictationEnabled.value) { "Dictation is switched off" }
         val id = checkNotNull(pick(store.states.value, uiPrefs.dictationModelId.value)) { "Dictation is not available" }
+        // The dictation for the chat is in the language of the app; the translator's can be in any language.
+        DictationLanguage.hint = if (translator) "auto" else DictationLanguage.ofApp()
         return engine.transcribe(id, wav)
     }
 }

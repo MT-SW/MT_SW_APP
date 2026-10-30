@@ -38,6 +38,20 @@ import java.net.URL
 import java.util.UUID
 
 /**
+ * The language dictation is expected in. With a fixed language Whisper skips the pass that first guesses the language
+ * (a whole extra run of the model), which makes short dictations clearly faster. "auto" lets Whisper guess.
+ */
+object DictationLanguage {
+    @Volatile var hint: String = "auto"
+
+    private val SUPPORTED =
+        setOf("pl", "en", "de", "fr", "es", "it", "cs", "sk", "uk", "ru", "nl", "pt", "sv", "no", "da", "fi", "hu", "ro", "bg", "hr", "sl", "lt", "lv", "et", "tr")
+
+    /** The language of the app's interface when Whisper knows it, otherwise "auto". */
+    fun ofApp(): String = java.util.Locale.getDefault().language.lowercase().takeIf { it in SUPPORTED } ?: "auto"
+}
+
+/**
  * Dictation with Whisper models through the official `whisper-server` program of whisper.cpp (started on this computer,
  * reachable only from the computer itself). The recording is sent to it as a WAV file and the text comes back. Like the
  * language model, the speech model is loaded on first use (or as soon as it is chosen) and stays in memory while it is
@@ -62,7 +76,9 @@ class WhisperCppEngine(
                 val running = ensureLoaded(modelId)
                 val started = nowMillis
                 val text = send(running, wav)
-                Logger.i(tag = TAG) { "Dictation with $modelId: ${text.length} chars in ${nowMillis - started} ms" }
+                val took = nowMillis - started
+                val audioMs = (wav.size - WAV_HEADER_BYTES).coerceAtLeast(0) * MS_PER_SECOND / BYTES_PER_SECOND
+                Logger.i(tag = TAG) { "Dictation with $modelId: ${text.length} chars from ${audioMs} ms of speech in $took ms (language ${DictationLanguage.hint})" }
                 text
             }
         }
@@ -129,8 +145,12 @@ class WhisperCppEngine(
                 out.write(wav)
                 out.write("\r\n".toByteArray())
                 field("temperature", "0.0")
+                // No repeated attempts at higher temperatures and no beam search: the fastest decoding that stays accurate.
+                field("temperature_inc", "0.0")
+                field("beam_size", "1")
+                field("best_of", "1")
                 field("response_format", "json")
-                field("language", "auto")
+                field("language", DictationLanguage.hint)
                 out.write("--$boundary--\r\n".toByteArray())
             }
             val code = connection.responseCode
@@ -161,6 +181,9 @@ class WhisperCppEngine(
         const val TAG = "WhisperCppEngine"
         const val PID_FILE = "whisper-server.pid"
         const val MAX_THREADS = 8
+        const val WAV_HEADER_BYTES = 44
+        const val BYTES_PER_SECOND = 32_000L
+        const val MS_PER_SECOND = 1_000L
         const val LOAD_TIMEOUT_MS = 120_000L
         const val CONNECT_TIMEOUT_MS = 20_000
         const val READ_TIMEOUT_MS = 5 * 60 * 1000
