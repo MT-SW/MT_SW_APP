@@ -201,6 +201,7 @@ class LlamaCppEngine(
             put("temperature", temperature.toDouble())
             put("top_k", TOP_K)
             put("top_p", TOP_P)
+            if (jsonSchema == null) put("repeat_penalty", REPEAT_PENALTY)
             put("stream", true)
             // Quiet thinking is switched on or off per answer; models whose template has no such switch ignore it.
             putJsonObject("chat_template_kwargs") { put("enable_thinking", thinking) }
@@ -227,6 +228,8 @@ class LlamaCppEngine(
         val started = nowMillis
         val reply = StringBuilder()
         var thought = 0
+        // True when the answer stopped for length (or in a loop), not because the model finished.
+        var cutShort = false
         val limit = if (maxTokens > 0) maxTokens * CHARS_PER_TOKEN else Int.MAX_VALUE
         val connection = URL(running.baseUrl + "/v1/chat/completions").openConnection() as HttpURLConnection
         try {
@@ -253,12 +256,16 @@ class LlamaCppEngine(
                     // without thinking instead of waiting minutes for an answer.
                     thought += thinkingLength(event)
                     if (reply.isEmpty() && thought > MAX_THINKING_CHARS) throw ThinkingTooLongException()
+                    if (finishedForLength(event)) cutShort = true
                     val piece = runCatching { deltaText(event) }.getOrNull().orEmpty()
                     if (piece.isEmpty()) continue
                     reply.append(piece)
                     runCatching { onPiece(piece) }
                     // Enough written, or a small model stuck in a loop: stop and let the connection close cancel the rest.
-                    if (reply.length >= limit || reply.isLooping()) break
+                    if (reply.length >= limit || reply.isLooping()) {
+                        cutShort = true
+                        break
+                    }
                 }
             }
         } catch (e: CancellationException) {
@@ -281,9 +288,27 @@ class LlamaCppEngine(
         Logger.i(tag = TAG) {
             "Answer from $modelId on $activeBackend: ${reply.length} chars in $elapsed ms, about ${reply.length * MS_PER_SECOND / elapsed} chars/s"
         }
-        return reply.withoutLoop().trim()
+        val whole = reply.withoutLoop().trim()
+        // An answer that ran out of length ends at its last whole sentence instead of in the middle of a word.
+        return if (cutShort) whole.toLastSentence() else whole
     }
 
+    /** True when this streamed piece says the model stopped because it reached the length limit. */
+    private fun finishedForLength(event: JsonElement): Boolean {
+        val choices = (event as? JsonObject)?.get("choices") as? JsonArray ?: return false
+        val reason = ((choices.firstOrNull() as? JsonObject)?.get("finish_reason") as? JsonPrimitive)?.contentOrNull
+        return reason == "length"
+    }
+
+    /**
+     * Cuts a text that stopped half-way back to its last whole sentence or line, when that keeps most of it; a text
+     * with no sentence end in its second half is kept as it is, with an ellipsis.
+     */
+    private fun String.toLastSentence(): String {
+        if (isEmpty() || last() in ".!?)…") return this
+        val end = indexOfLast { it in ".!?\n" }
+        return if (end >= length * KEEP_SHARE) substring(0, end + 1).trimEnd() else "$this…"
+    }
     /** The length of the quiet thoughts (`reasoning_content`) in one streamed piece. */
     private fun thinkingLength(event: JsonElement): Int {
         val choices = (event as? JsonObject)?.get("choices") as? JsonArray ?: return 0
@@ -548,6 +573,8 @@ class LlamaCppEngine(
 
     /** True when the end of the text repeats itself over and over (a small model stuck in a loop). */
     private fun CharSequence.isLooping(): Boolean {
+        // The same word over and over ("w zasięgu zasięgu zasięgu zasięgu").
+        if (length > REPEAT_WORD_MIN && SAME_WORD_REPEATED.containsMatchIn(takeLast(REPEAT_WORD_TAIL))) return true
         if (length < LOOP_TAIL * 3) return false
         val text = toString()
         val tail = text.takeLast(LOOP_TAIL)
@@ -565,7 +592,7 @@ class LlamaCppEngine(
 
     /** Cuts a looping ending after its first occurrence. */
     private fun CharSequence.withoutLoop(): String {
-        val text = toString()
+        val text = toString().replace(SAME_WORD_REPEATED, "$1")
         if (!isLooping()) return text
         val tail = text.takeLast(LOOP_TAIL)
         val first = text.indexOf(tail)
@@ -580,6 +607,11 @@ class LlamaCppEngine(
         const val TOP_P = 0.95
         const val TOP_K = 40
         const val CHARS_PER_TOKEN = 4
+        const val KEEP_SHARE = 0.5
+        const val REPEAT_WORD_MIN = 30
+        const val REPEAT_WORD_TAIL = 80
+        const val REPEAT_PENALTY = 1.08
+        val SAME_WORD_REPEATED = Regex("(?<![\\p{L}])(\\p{L}{3,})(\\s+\\1(?![\\p{L}])){3,}\\s*$")
         const val LOOP_TAIL = 40
         const val LOOP_WINDOW = 800
         const val LOOP_REPEATS = 3
