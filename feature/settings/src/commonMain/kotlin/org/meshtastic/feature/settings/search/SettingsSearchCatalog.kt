@@ -27,7 +27,6 @@ import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.ai_assistant_title
 import org.meshtastic.core.resources.ai_models_title
 import org.meshtastic.core.resources.smart_features_title
-import org.meshtastic.core.resources.ai_storage_title
 import org.meshtastic.core.resources.ai_unload_title
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.translator_title
@@ -191,7 +190,6 @@ object SettingsSearchCatalog {
             Res.string.smart_features_title to SettingsRoute.MtSwFeatures,
             Res.string.ai_models_title to SettingsRoute.SmartFeatures,
             Res.string.ai_unload_title to SettingsRoute.SmartFeatures,
-            Res.string.ai_storage_title to SettingsRoute.MtSwFeatures,
             Res.string.app_data_title to SettingsRoute.MtSwFeatures,
             Res.string.ai_assistant_title to SettingsRoute.SmartFeatures,
             Res.string.translator_title to SettingsRoute.SmartFeatures,

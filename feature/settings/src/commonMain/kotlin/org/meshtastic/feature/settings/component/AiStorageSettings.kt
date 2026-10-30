@@ -66,12 +66,12 @@ import org.meshtastic.core.resources.ai_storage_none_body
 import org.meshtastic.core.resources.ai_storage_pick
 import org.meshtastic.core.resources.ai_storage_restart_first
 import org.meshtastic.core.resources.ai_storage_summary
-import org.meshtastic.core.resources.ai_storage_summary_fixed
-import org.meshtastic.core.resources.ai_storage_title
 import org.meshtastic.core.resources.app_data_previous_failed
+import org.meshtastic.core.resources.app_data_phone_single
 import org.meshtastic.core.resources.app_data_scheduled
 import org.meshtastic.core.resources.app_data_summary
 import org.meshtastic.core.resources.app_data_summary_fixed
+import org.meshtastic.core.resources.app_data_summary_phone
 import org.meshtastic.core.resources.app_data_title
 import org.meshtastic.core.resources.translator_cancel
 
@@ -119,9 +119,8 @@ internal fun AiStorageRow() {
     var chooser by remember { mutableStateOf(false) }
     val i = info ?: return
     val computer = i.choices.isEmpty()
-    // A phone with nothing else to choose (no SD card) has nothing to offer: the row only tells where the models are.
-    val phoneFixed = !computer && i.choices.size < 2
-    val canClick = i.canChange && !phoneFixed && move !is AiStorageMove.Moving
+    // Always clickable (a phone without an SD card explains in the dialog why there is only one place to choose).
+    val canClick = i.canChange && move !is AiStorageMove.Moving
     Column(
         modifier =
         Modifier.fillMaxWidth()
@@ -135,7 +134,7 @@ internal fun AiStorageRow() {
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
         Text(
-            text = stringResource(if (computer) Res.string.app_data_title else Res.string.ai_storage_title),
+            text = stringResource(Res.string.app_data_title),
             style = MaterialTheme.typography.bodyLarge,
         )
         val summary =
@@ -143,8 +142,8 @@ internal fun AiStorageRow() {
                 computer && !i.canChange -> stringResource(Res.string.app_data_summary_fixed, i.folder)
                 computer && i.movableMb != null ->
                     stringResource(Res.string.app_data_summary, i.folder, formatMb(i.movableMb ?: 0L), formatMb(i.freeMb))
-                phoneFixed -> stringResource(Res.string.ai_storage_summary_fixed, i.folder, formatMb(i.freeMb))
-                else -> stringResource(Res.string.ai_storage_summary, i.folder, formatMb(i.freeMb))
+                computer -> stringResource(Res.string.ai_storage_summary, i.folder, formatMb(i.freeMb))
+                else -> stringResource(Res.string.app_data_summary_phone, i.folder, formatMb(i.freeMb))
             }
         Text(text = summary, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         when (val m = move) {
@@ -189,6 +188,13 @@ internal fun AiStorageRow() {
             title = { Text(stringResource(Res.string.ai_storage_choose_title)) },
             text = {
                 Column {
+                    if (i.choices.size < 2) {
+                        Text(
+                            text = stringResource(Res.string.app_data_phone_single),
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(bottom = 8.dp),
+                        )
+                    }
                     i.choices.forEach { path ->
                         Row(
                             modifier =

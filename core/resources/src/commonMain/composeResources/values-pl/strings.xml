@@ -3447,6 +3447,8 @@
     <string name="ai_storage_low_body">Po pobraniu tego modelu na dysku zostanie tylko %1$s (pobranie potrzebuje około %2$s). Pobrać mimo to?</string>
     <string name="ai_storage_download_anyway">Pobierz mimo to</string>
     <string name="app_data_title">Folder na dane aplikacji</string>
+    <string name="app_data_summary_phone">Baza wiadomości i ustawienia zostają w pamięci aplikacji (tak wymaga Android). Modele AI są w: %1$s. Wolne miejsce: %2$s.</string>
+    <string name="app_data_phone_single">Na tym telefonie nie ma innej pamięci (np. karty SD). Android pozwala aplikacji trzymać pliki tylko w jej własnej pamięci albo na karcie SD.</string>
     <string name="app_data_summary">Wiadomości, ustawienia, logi, mapy i modele AI są w: %1$s. Zajmują %2$s, wolne miejsce na dysku: %3$s.</string>
     <string name="app_data_summary_fixed">Dane aplikacji są w: %1$s. Folder jest ustawiony zmienną MESHTASTIC_DATA_DIR i nie można go tu zmienić.</string>
     <string name="app_data_scheduled">Zapisano. Wszystkie dane zostaną przeniesione do: %1$s przy następnym uruchomieniu aplikacji. Zamknij ją i uruchom jeszcze raz; przenoszenie może chwilę potrwać.</string>

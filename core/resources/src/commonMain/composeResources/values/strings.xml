@@ -3233,6 +3233,8 @@
     <string name="ai_storage_low_body">After downloading this model only %1$s would be left on the disk (the download needs about %2$s). Download anyway?</string>
     <string name="ai_storage_download_anyway">Download anyway</string>
     <string name="app_data_title">App data folder</string>
+    <string name="app_data_summary_phone">The message database and settings stay in the app's own memory (Android requires this). The AI models are in: %1$s. Free space: %2$s.</string>
+    <string name="app_data_phone_single">This phone has no other storage (for example an SD card). Android lets an app keep files only in its own memory or on an SD card.</string>
     <string name="app_data_summary">Messages, settings, logs, maps and AI models are in: %1$s. They take %2$s, free space on the disk: %3$s.</string>
     <string name="app_data_summary_fixed">The app's data is in: %1$s. The folder is set by the MESHTASTIC_DATA_DIR variable and cannot be changed here.</string>
     <string name="app_data_scheduled">Saved. All the data will be moved to: %1$s the next time the app starts. Close it and start it again; moving can take a while.</string>
