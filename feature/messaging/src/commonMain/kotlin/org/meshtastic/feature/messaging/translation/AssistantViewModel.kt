@@ -162,8 +162,16 @@ class AssistantViewModel(
         job =
             viewModelScope.launch {
                 try {
+                    // Every test answer gets its time and the model and route, like an answer in a normal conversation.
+                    var mark = nowMillis
                     service.selfTest(command) { q, a ->
-                        _state.update { it.copy(lines = it.lines + AssistantLine(true, q, at = nowMillis) + AssistantLine(false, a, at = nowMillis)) }
+                        val now = nowMillis
+                        val took = (now - mark).coerceAtLeast(1L)
+                        mark = now
+                        val info = service.lastInfo
+                        _state.update {
+                            it.copy(lines = it.lines + AssistantLine(true, q, at = now - took) + AssistantLine(false, a, at = now, tookMs = took, info = info))
+                        }
                     }
                 } catch (e: CancellationException) {
                     throw e

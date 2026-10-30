@@ -1460,6 +1460,99 @@ class AssistantDataProvider(
         return sb.toString()
     }
 
+    private fun displayName(n: org.meshtastic.core.model.Node) = n.user.long_name.ifBlank { n.user.short_name }.ifBlank { "!" + n.num.toUInt().toString(16) }
+
+    /**
+     * The nearest or farthest nodes counted from another node (not from the user's radio): "which node is farthest from
+     * Telegraf". Only nodes with a known position can be counted.
+     */
+    fun distancesFrom(num: Int, farthest: Boolean, role: String): String {
+        fun s(pl: String, en: String) = if (polish) pl else en
+        val from = nodeRepository.nodeDBbyNum.value[num] ?: return unknownText(num)
+        val roleOnly = roleFilter(role.lowercase())
+        val rows =
+            nodeRepository.nodeDBbyNum.value.values
+                .filter { it.num != num && (roleOnly?.invoke(it) ?: true) }
+                .mapNotNull { n -> n.distance(from)?.let { n to it } }
+                .sortedByDescending { it.first.lastHeard }
+                .distinctBy { (n, m) -> Triple(n.user.long_name, n.user.short_name, m / SAME_PLACE_M) }
+                .let { list -> if (farthest) list.sortedByDescending { it.second } else list.sortedBy { it.second } }
+        if (rows.isEmpty()) {
+            return s(
+                "Nie mogę tego policzyć: ${displayName(from)} albo inne węzły nie mają zapisanej pozycji.",
+                "I cannot work that out: ${displayName(from)} or the other nodes have no saved position.",
+            )
+        }
+        val sb = StringBuilder(
+            s(
+                if (farthest) "Najdalej od ${displayName(from)} jest ${displayName(rows[0].first)}: ${kilometres(rows[0].second)} km."
+                else "Najbliżej ${displayName(from)} jest ${displayName(rows[0].first)}: ${kilometres(rows[0].second)} km.",
+                if (farthest) "The farthest from ${displayName(from)} is ${displayName(rows[0].first)}: ${kilometres(rows[0].second)} km."
+                else "The nearest to ${displayName(from)} is ${displayName(rows[0].first)}: ${kilometres(rows[0].second)} km.",
+            ),
+        )
+        val next = rows.drop(1).take(NEXT_SHOWN)
+        if (next.isNotEmpty()) {
+            sb.append("\n\n").append(s("Kolejne:", "Next:"))
+            for ((n, m) in next) sb.append("\n• ").append(displayName(n)).append(" — ").append(kilometres(m)).append(" km")
+        }
+        return sb.toString()
+    }
+
+    private fun unknownText(num: Int) = aiString(Res.string.ai_unknown_node, num.toString())
+
+    /**
+     * "Do I have range to X": worked out from what the radio knows — heard straight or through other nodes, the last
+     * signal, how long ago, and the distance when both positions are known. A button to the link planner is added by
+     * the caller.
+     */
+    suspend fun reachReport(num: Int): String {
+        fun s(pl: String, en: String) = if (polish) pl else en
+        val n = nodeRepository.nodeDBbyNum.value[num] ?: return unknownText(num)
+        val me = nodeRepository.ourNodeInfo.value
+        val name = displayName(n)
+        val nowS = nowMillis / MILLIS_PER_SECOND
+        val sb = StringBuilder()
+        val direct = n.hopsAway == 0 && n.lastHeard != 0
+        sb.append(
+            when {
+                n.lastHeard == 0 -> s("$name: radio jeszcze nigdy go nie słyszało.", "$name: the radio has never heard it.")
+                direct -> s("Tak, $name słychać bezpośrednio, bez pośredników.", "Yes, $name is heard directly, with no relays.")
+                else -> s("$name nie jest słyszany bezpośrednio: pakiety dochodzą przez inne węzły (skoki: ${n.hopsAway}).", "$name is not heard directly: packets arrive through other nodes (hops: ${n.hopsAway}).")
+            },
+        )
+        if (n.lastHeard != 0) sb.append("\n• ").append(s("ostatnio słyszany: ", "last heard: ")).append(ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)))
+        if (direct && n.snr != Float.MAX_VALUE) {
+            sb.append("\n• ").append(s("ostatni sygnał: SNR ", "last signal: SNR ")).append(fmt(n.snr)).append(" dB")
+            if (n.rssi != Int.MAX_VALUE) sb.append(", RSSI ").append(n.rssi).append(" dBm")
+        }
+        val meters = me?.let { n.distance(it) }
+        if (meters != null) sb.append("\n• ").append(s("odległość: ", "distance: ")).append(kilometres(meters)).append(" km")
+        if (!direct) {
+            sb.append("\n\n").append(s("Zasięgu do tego węzła nie da się ocenić z samego odbioru; policz łącze w planerze.", "The range to this node cannot be judged from reception alone; work out the link in the planner."))
+        }
+        return sb.toString()
+    }
+
+    /** The nodes of one role (routers, sensors, ...), newest first, with hops and distance; the others only counted. */
+    suspend fun nodesByRole(role: String): String {
+        fun s(pl: String, en: String) = if (polish) pl else en
+        val roleOnly = roleFilter(role.lowercase()) ?: return networkCount()
+        val me = nodeRepository.ourNodeInfo.value
+        val found = nodeRepository.nodeDBbyNum.value.values.filter { roleOnly(it) }.sortedByDescending { it.lastHeard }
+        if (found.isEmpty()) return s("Nie znam żadnego węzła z tą rolą.", "I know no node with this role.")
+        val nowS = nowMillis / MILLIS_PER_SECOND
+        val sb = StringBuilder(s("Węzłów z tą rolą: ${found.size}.", "Nodes with this role: ${found.size}."))
+        for (n in found.take(NAMES_SHOWN)) {
+            sb.append("\n• ").append(displayName(n)).append(" (").append(n.user.role.toString()).append(")")
+            if (n.lastHeard != 0) sb.append(", ").append(ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)))
+            if (n.hopsAway > 0) sb.append(s(", skoki ", ", hops ")).append(n.hopsAway)
+            me?.let { n.distance(it) }?.let { sb.append(", ").append(kilometres(it)).append(" km") }
+        }
+        if (found.size > NAMES_SHOWN) sb.append('\n').append(aiString(Res.string.ai_more, found.size - NAMES_SHOWN))
+        return sb.toString()
+    }
+
     /** A distance in metres written in kilometres with one decimal. */
     fun kilometres(meters: Int): String = fmt(meters / METERS_PER_KM)
 

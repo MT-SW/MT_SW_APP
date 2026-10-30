@@ -365,9 +365,15 @@ class LlamaAssistantService(
             return rule(polish, WHO_PL, WHO_EN).also(onPiece)
         }
         // A greeting or "who are you" needs no sorting: it goes straight to the answer, which saves a whole run of the model.
-        if (SMALLTALK.containsMatchIn(flat) && flat.split(Regex("\\s+")).size <= SMALLTALK_WORDS) {
+        if (SMALLTALK.containsMatchIn(flat) && flat.split(Regex("\\s+")).size <= SMALLTALK_WORDS && PURE_SMALLTALK.matches(flat)) {
+            // Only a greeting, "how are you" or thanks gets a fixed reply: the smallest models repeated the question back.
             lastRoute = "chat (greeting)"
-            return handle(AssistantIntent("chat"), modelId, turns, question, polish, onPiece)
+            val reply =
+                when {
+                    THANKS.containsMatchIn(flat) -> rule(polish, THANKS_PL, THANKS_EN)
+                    else -> rule(polish, GREETING_PL, GREETING_EN)
+                }
+            return reply.also(onPiece)
         }
         val notes = if (uiPrefs.assistantMemoryEnabled.value) memoryStore?.promptText(ROUTER_NOTES_CHARS).orEmpty() else ""
         val routed =
@@ -462,6 +468,26 @@ class LlamaAssistantService(
         }
     }
 
+    /** The period and amount written in the question, in the router's words, or null when it names none. */
+    private fun explicitPeriod(q: String): Pair<String, Int>? {
+        fun unit(word: String): String? =
+            when {
+                word.startsWith("min") -> "minutes"
+                word.startsWith("godz") || word.startsWith("hour") || word == "h" -> "hours"
+                word.startsWith("dni") || word.startsWith("dzie") || word.startsWith("dob") || word.startsWith("day") -> "days"
+                word.startsWith("tydz") || word.startsWith("tygod") || word.startsWith("week") -> "weeks"
+                word.startsWith("miesi") || word.startsWith("month") -> "months"
+                word.startsWith("lat") || word.startsWith("rok") || word.startsWith("year") -> "years"
+                else -> null
+            }
+        PERIOD_NUMBER.find(q)?.let { m ->
+            val amount = m.groupValues[1].toIntOrNull()?.takeIf { it > 0 } ?: return@let
+            unit(m.groupValues[2])?.let { return it to amount }
+        }
+        PERIOD_BARE.find(q)?.let { m -> unit(m.groupValues.drop(1).first { it.isNotEmpty() })?.let { return it to 1 } }
+        return null
+    }
+
     /** "How do I reduce...", "what is...", "what happens if...": a question for the knowledge base, not for the data. */
     private fun asksHow(q: String): Boolean =
         GENERAL_QUESTION.containsMatchIn(q) || ADVICE_ASK.containsMatchIn(q) || WHAT_HAPPENS.containsMatchIn(q)
@@ -509,8 +535,30 @@ class LlamaAssistantService(
             return data.regionAdvice().also(onPiece)
         }
         val nodeNum = data.resolveNodeNum(intent.node, question)
+        // The time the user wrote ("24 godziny") wins over the router's guess: small models mixed up hours and days.
+        @Suppress("NAME_SHADOWING")
+        val intent = explicitPeriod(lower)?.let { (period, amount) -> if (intent.intent in PERIOD_INTENTS) intent.copy(period = period, amount = amount) else intent } ?: intent
         // "the nearest router": the role is taken from the question when the small model left it out.
         val role = intent.role.takeUnless { it.isBlank() || it == "any" } ?: ROLE_WORDS.find(question.lowercase())?.groupValues?.get(1)?.let { ROLE_NAMES[it] }.orEmpty()
+        // "Do I have range to X": answered from what the radio heard, with a button to the link planner.
+        if (nodeNum != null && REACH_ASK.containsMatchIn(lower) && !OPEN_COMMAND.containsMatchIn(lower) && data.mentionsNode(lower)) {
+            collector.add(AssistantAction(data.nodeNameFor(nodeNum), "$DEEP_LINK_BASE_URI/map/planner/$nodeNum"))
+            return data.reachReport(nodeNum).also(onPiece)
+        }
+        // "Which node is farthest from X": counted from that node, not from the user's radio.
+        if (nodeNum != null && NEAR_FAR.containsMatchIn(lower) && FROM_NODE.containsMatchIn(lower) && data.mentionsNode(lower)) {
+            return data.distancesFrom(nodeNum, FARTHEST_WORDS.containsMatchIn(lower), role).also(onPiece)
+        }
+        // "Which nodes are routers": the nodes with that role, not a ranking by signal.
+        if (role.isNotBlank() && ROLE_WORDS.containsMatchIn(lower) && WHICH_WORDS.containsMatchIn(lower) && !NEAR_FAR.containsMatchIn(lower) &&
+            intent.intent in ROLE_LIST_INTENTS && !asksHow(lower)
+        ) {
+            return data.nodesByRole(role).also(onPiece)
+        }
+        // RSSI or SNR of a named node comes from the app's own numbers, never from the model.
+        if (nodeNum != null && SIGNAL_NODE_ASK.containsMatchIn(lower) && data.mentionsNode(lower) && intent.intent in DATA_INTENTS + "chat") {
+            return data.nodeSignal(nodeNum).also(onPiece)
+        }
         // Calculations (antennas, power, range, airtime, Fresnel zone, horizon, sums) are done by the app, never guessed.
         if (intent.intent != "draft_message") {
             val defaults = data.calcDefaults()
@@ -1103,10 +1151,17 @@ class LlamaAssistantService(
         text.lowercase().split(Regex("[^\\p{L}\\p{N}]+")).filter { it.length >= MIN_STEM }.map { it.take(STEM_LENGTH) }.toSet()
 
     /** Plain text for the chat bubble: no markdown stars or backticks the small model likes to add. */
+    /** Without the internet the model cannot know a web address: the links it writes are made up, so they are removed. */
+    private fun String.withoutMadeUpLinks(): String =
+        replace(Regex("(?im)^\\s*(źródło|źródła|zrodlo|source|sources)\\s*:\\s*\\S*https?://.*$\\n?"), "")
+            .replace(Regex("\\s*(?:i\\s+|and\\s+)?https?://[^\\s)]+"), "")
+            .replace(Regex("(?im)^\\s*(źródło|źródła|zrodlo|source|sources)\\s*:\\s*$\\n?"), "")
+
     private fun cleanUp(text: String): String =
         text.replace(Regex("(?im)^\\s*(źródło|źródła|zrodlo|zrodla|source|sources)\\s*:?\\s*(brak|none|n/a|-|—)\\.?\\s*$\\n?"), "")
             .replace(Regex("(?im)^\\s*(źródło|źródła|source|sources)\\s*:\\s*(brak|none)\\b.*$\\n?"), "")
             .replace(PROMPT_ECHO, "")
+            .let { if (webTools.usage() == null) it.withoutMadeUpLinks() else it }
             .replace(Regex("\\*\\*([^*\\n]+)\\*\\*"), "$1").replace("`", "").replace(Regex("(?m)^\\s*[*-] "), "• ")
             .replace(Regex("\\n{3,}"), "\n\n").trim()
 
@@ -1302,6 +1357,25 @@ class LlamaAssistantService(
         val REGION_WORD = Regex("region")
         val REGION_ASK =
             Regex("jaki|jaką|jaka|jakiego|który|ktory|którego|ustaw|zmie[nń]|wybra|powinien|powinnam|dla mnie|u mnie|w mojej|which|what region|set |change|choose|should|for me")
+        val PURE_SMALLTALK =
+            Regex(
+                "^((cześć|czesc|hej|hejka|siema|witaj|witam|dzień dobry|dzien dobry|dobry wieczór|dobry wieczor|dobranoc|hello|hi|hey|good (morning|evening))[\\s,.!]*)?" +
+                    "((jak się masz|jak sie masz|co słychać|co slychac|how are you|dzięki|dziękuję|dziekuje|thanks|thank you)[\\s,.!?]*)?$",
+            )
+        val THANKS = Regex("^(dzięki|dzieki|dziękuję|dziekuje|thanks|thank you)")
+        const val GREETING_PL = "Cześć! Wszystko w porządku. W czym mogę pomóc?"
+        const val GREETING_EN = "Hello! I am fine. How can I help?"
+        const val THANKS_PL = "Proszę! Pytaj dalej, jeśli będziesz czegoś potrzebować."
+        const val THANKS_EN = "You are welcome! Ask on if you need anything else."
+        // "Do I have range to X", "can I reach X": answered from what the radio heard, not by the model.
+        val PERIOD_INTENTS = setOf("list_nodes", "count_messages")
+        val ROLE_LIST_INTENTS = setOf("signal_list", "list_nodes", "network_question", "chat")
+        val SIGNAL_NODE_ASK = Regex("rssi|snr|siła sygnału|sila sygnalu|signal strength")
+        val REACH_ASK = Regex("zasięg do |zasięgu do |zasieg do |czy (?:mam|mamy) (?:zasięg|zasieg)|czy (?:słyszę|slysze|słychać|slychac|dosięgn|dosiegn|dotrze|złapię|zlapie)|range to |can i reach|do i have (?:range|signal)")
+        val FROM_NODE = Regex("(?<![\\p{L}])(od|from)\\s+(?!mnie|mojego|mojej|me\\b|my\\b)")
+        /** "24 godziny", "3 dni", "2 tygodnie": the number and unit the user wrote, which the router sometimes mixed up. */
+        val PERIOD_NUMBER = Regex("(\\d+)\\s*(min\\p{L}*|godz\\p{L}*|h(?![\\p{L}])|hours?|dni|dzie\\p{L}*|dob\\p{L}*|days?|tydz\\p{L}*|tygod\\p{L}*|weeks?|miesi\\p{L}*|months?|lat(?![\\p{L}])|rok\\p{L}*|years?)")
+        val PERIOD_BARE = Regex("ostatni\\p{L}*\\s+(godzin\\p{L}*|dob\\p{L}*|dzie\\p{L}*|tydz\\p{L}*|tygod\\p{L}*|miesi\\p{L}*)|last (hour|day|week|month)")
         val WHO_ARE_YOU = Regex("kim jesteś|kim jestes|kto ty|kim ty jesteś|who are you|what are you")
         const val WHO_PL =
             "Jestem asystentem wbudowanym w aplikację MT_SW. Działam na Twoim urządzeniu, bez internetu. Pomagam w obsłudze " +
