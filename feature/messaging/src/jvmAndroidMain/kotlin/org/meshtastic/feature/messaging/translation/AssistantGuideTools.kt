@@ -82,6 +82,7 @@ import org.meshtastic.core.resources.schema_lora_override_frequency
 import org.meshtastic.core.resources.schema_lora_region
 import org.meshtastic.core.resources.schema_lora_spread_factor
 import org.meshtastic.core.resources.schema_lora_tx_enabled
+import org.meshtastic.core.resources.schema_lora_tx_power
 import org.meshtastic.core.resources.schema_mqtt_address
 import org.meshtastic.core.resources.schema_mqtt_enabled
 import org.meshtastic.core.resources.schema_mqtt_map_reporting_enabled
