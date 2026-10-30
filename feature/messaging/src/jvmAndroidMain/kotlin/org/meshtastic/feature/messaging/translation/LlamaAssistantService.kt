@@ -1788,7 +1788,7 @@ class LlamaAssistantService(
         val BATTERY_LIMIT = Regex("(?iu)(mniej niż|mniej niz|poniżej|ponizej|nie więcej niż|below|under|less than)\\s*(\\d{1,3})\\s*%")
         val GPS_ASK = Regex("(?iu)(mają|maja|z|have|with)\\s+(gps|pozycj\\p{L}*|position)")
         val POWERED_ASK = Regex("(?iu)zasilan\\p{L}*\\s+z zewnątrz|zasilan\\p{L}*\\s+z zewnatrz|zasilanie zewnętrzne|zasilanie zewnetrzne|externally powered|external power|ładuje się|laduje sie")
-        val TOOL_CALL_JSON = Regex("(?s)^\\s*\\{\\s*\\"name\\"\\s*:.*\\"arguments\\"\\s*:.*\\}\\s*$")
+        val TOOL_CALL_JSON = Regex("(?s)^\\s*\\{\\s*\"name\"\\s*:.*\"arguments\"\\s*:.*\\}\\s*$")
         val NEWS_WORDS = Regex("co nowego|nowości|nowosci|nowego w|lista zmian|ostatnie zmiany|ostatniej wersji|nowej wersji|what's new|new in|changelog")
         val APP_WORDS = Regex("mt[_ -]?sw|aplikacj|funkcj|ustawie|tłumacz|tlumacz|asystent|dyktowan|app\\b|setting")
 
