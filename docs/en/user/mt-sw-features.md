@@ -186,7 +186,7 @@ On weaker devices big models can slow the app down or get it closed, so every mo
 
 - **Received messages** — the message menu has "Translate message". The original stays, and you can switch between it and the translation.
 - **Outgoing messages** — when the field has text, a "Translate before sending" button appears next to it. It shows the original and the translation side by side; you can send the translation, put it in the field to edit, or cancel.
-- **Separate screen** — the "Translator" tab: type a text, choose the languages (or "Detect automatically"), translate and copy the result.
+- **Separate screen** — the "Translator" tab: type a text, choose the languages (or "Detect automatically"), translate and copy the result. The translations of this session collect under the result; “Save conversation…” saves them as PDF, Markdown, TXT, HTML or JSON (just like the assistant’s conversation) and “Clear” deletes them. The history is kept only until the screen is closed.
 - One model covers many languages and any pair between them, including Polish, English, German, Czech, Slovak, Ukrainian, Russian, French and Spanish.
 - Translations can be inaccurate, especially names and jargon, so treat them as a hint. Text is translated sentence by sentence. If a translation is over 200 characters, the app warns that it will be sent in several parts over the radio.
 

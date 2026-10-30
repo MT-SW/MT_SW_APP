@@ -2844,6 +2844,10 @@
     <string name="translator_action">Przetłumacz</string>
     <string name="translator_busy">Tłumaczę…</string>
     <string name="translator_result">Tłumaczenie</string>
+    <string name="translator_source_label">Tekst</string>
+    <string name="translator_export_title">MT_SW – rozmowa w tłumaczu</string>
+    <string name="translator_history_title">Tłumaczenia w tej sesji</string>
+    <string name="translator_history_clear">Wyczyść</string>
     <string name="translator_test_title">Test tłumaczeń</string>
     <string name="translator_long_warning">Ten tekst ma ponad 200 znaków, więc przez radio pójdzie w kilku częściach.</string>
     <string name="translator_error_unknown">Nie rozpoznano języka tekstu. Wybierz go na liście „Z języka”.</string>

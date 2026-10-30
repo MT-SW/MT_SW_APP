@@ -3014,6 +3014,10 @@
     <string name="translator_outgoing_title">Translate before sending</string>
     <string name="translator_ready">The model is downloaded. The translator works without internet.</string>
     <string name="translator_result">Translation</string>
+    <string name="translator_source_label">Text</string>
+    <string name="translator_export_title">MT_SW – translator conversation</string>
+    <string name="translator_history_title">Translations in this session</string>
+    <string name="translator_history_clear">Clear</string>
     <string name="translator_test_title">Translation test</string>
     <string name="translator_summary">Translates messages without internet. Off by default.</string>
     <string name="translator_swap">Swap languages</string>

@@ -17,6 +17,22 @@
 package org.meshtastic.feature.messaging.ui.translator
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
+import org.meshtastic.core.common.util.DateFormatter
+import org.meshtastic.core.common.util.nowMillis
+import org.meshtastic.core.repository.FileService
+import org.meshtastic.core.ui.util.rememberSaveFileLauncher
+import org.meshtastic.core.resources.assistant_save
+import org.meshtastic.core.resources.assistant_save_done
+import org.meshtastic.core.resources.assistant_save_failed
+import org.meshtastic.core.resources.translator_export_title
+import org.meshtastic.core.resources.translator_history_clear
+import org.meshtastic.core.resources.translator_history_title
+import org.meshtastic.core.resources.translator_source_label
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -72,6 +88,7 @@ import org.meshtastic.core.resources.stop_reading
 import org.meshtastic.feature.messaging.rememberDictation
 import org.meshtastic.feature.messaging.rememberSpeaker
 import org.meshtastic.feature.messaging.translation.TranslatorError
+import org.meshtastic.feature.messaging.translation.TranslatorHistoryEntry
 import org.meshtastic.feature.messaging.translation.TranslatorLanguages
 import org.meshtastic.feature.messaging.translation.TranslatorViewModel
 
@@ -246,8 +263,99 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
                 }
             }
         }
+
+        if (state.history.isNotEmpty()) {
+            TranslatorHistory(state.history, onClear = viewModel::clearHistory)
+        }
     }
 }
+
+/** The translations of this session with a button that saves them as a file, like the assistant's conversation. */
+@Composable
+private fun TranslatorHistory(history: List<TranslatorHistoryEntry>, onClear: () -> Unit) {
+    val scope = rememberCoroutineScope()
+    val fileService = koinInject<FileService>()
+    val sourceLabel = stringResource(Res.string.translator_source_label)
+    val resultLabel = stringResource(Res.string.translator_result)
+    val title = stringResource(Res.string.translator_export_title)
+    val savedText = stringResource(Res.string.assistant_save_done)
+    val failedText = stringResource(Res.string.assistant_save_failed)
+    var saveMenu by remember { mutableStateOf(false) }
+    var saveResult by remember { mutableStateOf<String?>(null) }
+    var pendingBytes by remember { mutableStateOf<ByteArray?>(null) }
+    val saveLauncher =
+        rememberSaveFileLauncher { uri ->
+            val bytes = pendingBytes
+            if (bytes != null) {
+                scope.launch {
+                    val ok =
+                        try {
+                            fileService.write(uri) { sink -> sink.write(bytes) }
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+                            false
+                        }
+                    saveResult = if (ok) savedText else failedText
+                    pendingBytes = null
+                }
+            }
+        }
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(
+                text = stringResource(Res.string.translator_history_title) + " (${history.size})",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            history.takeLast(HISTORY_SHOWN).forEach { entry ->
+                Column {
+                    Text(text = entry.source, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(text = entry.result, style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box {
+                    TextButton(onClick = { saveMenu = true }) { Text(stringResource(Res.string.assistant_save)) }
+                    DropdownMenu(expanded = saveMenu, onDismissRequest = { saveMenu = false }) {
+                        ExportFormat.entries.forEach { format ->
+                            DropdownMenuItem(
+                                text = { Text(format.label) },
+                                onClick = {
+                                    saveMenu = false
+                                    val entries =
+                                        history.flatMap {
+                                            listOf(
+                                                ExportEntry(fromUser = true, text = it.source, note = null, buttons = emptyList(), at = it.at),
+                                                ExportEntry(fromUser = false, text = it.result, note = null, buttons = emptyList(), at = it.at),
+                                            )
+                                        }
+                                    val stamp = DateFormatter.formatDateTime(nowMillis)
+                                    pendingBytes =
+                                        when (format) {
+                                            ExportFormat.PDF -> AssistantExport.pdf(entries, title, stamp, sourceLabel, resultLabel)
+                                            ExportFormat.MARKDOWN ->
+                                                AssistantExport.markdown(entries, title, stamp, sourceLabel, resultLabel).encodeToByteArray()
+                                            ExportFormat.TEXT -> AssistantExport.text(entries, sourceLabel, resultLabel).encodeToByteArray()
+                                            ExportFormat.HTML ->
+                                                AssistantExport.html(entries, title, stamp, sourceLabel, resultLabel).encodeToByteArray()
+                                            ExportFormat.JSON -> AssistantExport.json(entries, title, stamp).encodeToByteArray()
+                                        }
+                                    saveResult = null
+                                    saveLauncher("mt_sw_translator_" + nowMillis / 1000 + format.extension, format.mime)
+                                },
+                            )
+                        }
+                    }
+                }
+                TextButton(onClick = onClear) { Text(stringResource(Res.string.translator_history_clear)) }
+            }
+            saveResult?.let { Text(text = it, style = MaterialTheme.typography.bodySmall) }
+        }
+    }
+}
+
+private const val HISTORY_SHOWN = 20
 
 @Composable
 private fun LanguagePicker(

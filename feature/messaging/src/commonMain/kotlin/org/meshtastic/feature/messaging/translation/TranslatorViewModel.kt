@@ -44,7 +44,12 @@ data class TranslatorUiState(
     /** Results of the translation test (the /tłumacz command), one line per sentence; empty when no test was run. */
     val testLines: List<TranslatorTestLine> = emptyList(),
     val testing: Boolean = false,
+    /** Translations made on this screen since it was opened (or cleared), oldest first; they can be saved as a file. */
+    val history: List<TranslatorHistoryEntry> = emptyList(),
 )
+
+/** One finished translation: the text as typed, its translation and when it was made. */
+data class TranslatorHistoryEntry(val source: String, val result: String, val at: Long)
 
 /** One sentence of the translation test: what was translated, the result with the check, and how long it took. */
 data class TranslatorTestLine(val source: String, val result: String, val tookMs: Long)
@@ -108,7 +113,12 @@ class TranslatorViewModel(
             Logger.i(tag = "TranslatorViewModel") { "Translation finished in ${nowMillis - started} ms: ${result::class.simpleName}" }
             _state.update {
                 when (result) {
-                    is TranslationResult.Success -> it.copy(busy = false, output = result.translatedText)
+                    is TranslationResult.Success ->
+                        it.copy(
+                            busy = false,
+                            output = result.translatedText,
+                            history = it.history + TranslatorHistoryEntry(current.input.trim(), result.translatedText, nowMillis),
+                        )
                     is TranslationResult.NotRequired -> it.copy(busy = false, error = TranslatorError.SameLanguage)
                     is TranslationResult.ModelDownloadRequired ->
                         it.copy(busy = false, error = TranslatorError.ModelMissing)
@@ -156,6 +166,9 @@ class TranslatorViewModel(
                 }
             }
     }
+
+    /** Forgets the translations kept for saving. */
+    fun clearHistory() = _state.update { it.copy(history = emptyList()) }
 
     /** Stops a running translation test. */
     fun cancelTest() {
