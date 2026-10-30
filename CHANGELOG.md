@@ -17,6 +17,7 @@ Ten plik opisuje wyłącznie zmiany wprowadzone w aplikacji MT_SW_APP **względe
 Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od początku (27 lipca 2026) do dziś, w kolejności chronologicznej. Opis funkcji: [README.md](README.md).
 
 ### Październik 2026
+* Baza wiedzy asystenta: nowy wpis o aktualizacji firmware dla każdego układu osobno (nRF52, ESP32, RP2040, STM32): OTA przez Bluetooth lub Wi-Fi, tryb DFU, plik UF2, USB, Web Flasher, programator SWD, oraz co zrobić, gdy OTA nie działa.
 * Baza wiedzy asystenta: hop limit — od firmware 2.8.x zalecamy 7 (zmienny, automatycznie obniżany dla mniej ważnych pakietów; wiadomości mają pełny limit), dla starszego firmware nadal 3; nowy wpis „Jak zgłosić błąd lub pomysł”: błędy MT_SW zgłasza się u nas (Discord, grupy, sieć mesh), a oryginalnej aplikacji na jej GitHubie. Dokumentacja (Panel debugowania, tłumaczenia) mówi to samo.
 * Asystent AI: zapis rozmowy w JSON ma przy każdej odpowiedzi więcej danych do diagnozy: model, sposób rozpoznania pytania, liczbę słów i znaków, prędkość (słów na sekundę), informację czy użyto internetu, czy odpowiedź tylko wskazuje ustawienie i czy mogła zostać ucięta.
 * Asystent AI: przy każdej wiadomości w czacie widać małym szarym tekstem godzinę: pod pytaniem godzinę wysłania, pod odpowiedzią godzinę odebrania i czas odpowiedzi w sekundach (np. „12:03:17 · 12,3 s”), także w zapisanych rozmowach.
@@ -445,6 +446,7 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### October 2026
+* Assistant knowledge base: a new entry on updating firmware for each chip separately (nRF52, ESP32, RP2040, STM32): OTA over Bluetooth or Wi-Fi, DFU mode, UF2 file, USB, Web Flasher, SWD programmer, and what to do when OTA does not work.
 * Assistant knowledge base: hop limit — from firmware 2.8.x we recommend 7 (variable, lowered automatically for less important packets; messages keep the full limit), 3 for older firmware; a new entry "How to report a bug or idea": MT_SW bugs go to us (Discord, groups, the mesh), bugs of the original app to its GitHub. The documentation (Debug panel, translations) says the same.
 * AI assistant: the JSON save of a conversation carries more data for diagnosis with every answer: the model, how the question was sorted, the number of words and characters, the speed (words per second), whether the internet was used, whether the answer only points to a setting and whether it may have been cut off.
 * AI assistant: every message in the chat shows a small grey time: the time sent under a question, the time received and the answer time in seconds under an answer (for example "12:03:17 · 12.3 s"), also in saved conversations.

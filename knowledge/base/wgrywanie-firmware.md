@@ -1,5 +1,10 @@
 # Wgrywanie i aktualizacja firmware
 
+### Jak zaktualizować firmware: OTA, DFU, UF2 czy USB, zależnie od układu?
+Metoda zależy od układu w radiu. nRF52 (RAK4631, T-Echo, T1000-E): w aplikacji aktualizacja przez Bluetooth (BLE OTA) albo transfer pliku przez USB; ręcznie tryb DFU (bootloader po dwukrotnym resecie) i przeciągnięcie pliku UF2 na dysk, który się pojawi. ESP32 (T-Beam, Heltec, LILYGO): w aplikacji BLE OTA przez Bluetooth albo Wi-Fi OTA, gdy radio jest połączone przez sieć; ręcznie przez USB: Web Flasher w Chrome lub Edge albo skrypt esptool (UF2 tu nie ma). Na firmware MT_SW pierwsza aktualizacja ESP32 przez OTA wymaga jednorazowo pełnego pliku -full.bin. RP2040 (RAK11310, Pico): bez OTA; transfer pliku przez USB w aplikacji albo tryb BOOTSEL i przeciągnięcie pliku UF2. STM32 (np. układy z radiem STM32WL): bez OTA i UF2; firmware wgrywa się programatorem SWD, np. ST-Link. Gdy OTA nie działa (stary bootloader, przerwane wgrywanie, urządzenie się nie uruchamia), użyj DFU/UF2 przez USB albo Web Flashera. Przed każdą aktualizacją wyeksportuj konfigurację i trzymaj oba urządzenia zasilane.
+Słowa: aktualizacja firmware, OTA, DFU, UF2, BLE OTA, Wi-Fi OTA, USB, Web Flasher, esptool, BOOTSEL, ST-Link, SWD, nRF52, ESP32, RP2040, RP2350, STM32, jak zaktualizować, który sposób
+Źródło: Aktualizacje firmware (dokumentacja MT_SW_APP) oraz https://meshtastic.org/docs/getting-started/flashing-firmware/ (sprawdzono 2026-10)
+
 ### Jak wgrać firmware na ESP32?
 Zalecana metoda to Web Flasher (flasher.meshtastic.org), który wymaga Chrome lub Edge i jest najprostszy dla początkujących. Drugi sposób to skrypt wiersza poleceń. Zewnętrzny adapter szeregowy zostaw na koniec, gdy nic innego nie zadziałało. Sterowniki portu szeregowego opisuje osobna strona „Install Serial Drivers”.
 Słowa: ESP32, flasher, web flasher, instalacja, wgranie, flashowanie, Chrome, Edge, sterowniki, esptool, T-Beam, Heltec, LILYGO
