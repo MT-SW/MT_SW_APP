@@ -83,6 +83,13 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
     /** True on a phone with a Qualcomm Snapdragon chip (Adreno graphics), where OpenCL is the first choice. */
     val qualcomm: Boolean by lazy { android && llamaSupported && isQualcomm() }
 
+    /** True on a phone whose processor has the i8mm instructions (newer Snapdragon, Tensor, Dimensity): Q8 models run faster. */
+    val i8mm: Boolean by lazy {
+        android && runCatching {
+            File("/proc/cpuinfo").useLines { lines -> lines.any { it.startsWith("Features") && Regex("\\bi8mm\\b").containsMatchIn(it) } }
+        }.getOrDefault(false)
+    }
+
     private fun isQualcomm(): Boolean {
         fun prop(name: String): String =
             runCatching {
@@ -165,6 +172,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
      */
     fun markBroken(asset: Asset, key: String? = null) {
         runCatching { brokenMark(asset, key).apply { parentFile?.mkdirs() }.writeText("broken") }
+            .onFailure { Logger.w(tag = TAG, throwable = it) { "Could not remember that ${asset.folder} failed: ${it.message}" } }
     }
 
     /**
@@ -259,6 +267,23 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
      * The whisper.cpp program that always works (processor). On a Mac it is our own Metal build, run without the
      * graphics card; null for an Intel Mac, where there is no program.
      */
+    /**
+     * The speech programs for the processor, best first: on a phone with i8mm the faster build, then the plain one (used
+     * when the faster one cannot be fetched or does not start).
+     */
+    fun whisperProcessorAssets(): List<Asset> {
+        val plain = whisperAsset() ?: return emptyList()
+        if (!android || !i8mm) return listOf(plain)
+        val fast =
+            Asset(
+                url = "https://github.com/MT-SW/MT_SW_APP/releases/download/engines-$LLAMA_TAG/whisper-$WHISPER_REF-android-arm64-i8mm.tar.gz",
+                folder = "whisper-$WHISPER_REF-android-arm64-i8mm",
+                exeName = "whisper-server",
+                sizeMb = WHISPER_ANDROID_MB,
+            )
+        return listOf(fast, plain)
+    }
+
     fun whisperAsset(): Asset? {
         if (android) {
             // The whisper.cpp project publishes no Android program: our own build (workflow "Build whisper.cpp for Android").

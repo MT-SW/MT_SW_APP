@@ -124,7 +124,7 @@ class WhisperCppEngine(
         server?.let { if (it.isAlive && loadedId == modelId) return it }
         unload()
         val model = store.fileOf(modelId) ?: error("Model $modelId is not downloaded")
-        val cpu = installer.whisperAsset() ?: error("No speech program exists for this system")
+        val cpuAssets = installer.whisperProcessorAssets().ifEmpty { error("No speech program exists for this system") }
         // A phone first tries its NPU (Hexagon) and graphics card, then the processor. A chip that does not start, does
         // not take part or fails a test run is skipped for some days for this model.
         val attempts = buildList {
@@ -144,7 +144,10 @@ class WhisperCppEngine(
                 }
             }
             // The Mac program is the Metal build: without the graphics card it is the processor build.
-            add(Attempt("processor", cpu, extra = if (installer.mac) listOf("-ng") else emptyList()))
+            for (cpu in cpuAssets) {
+                val name = if (cpu.folder.endsWith("-i8mm")) "processor (i8mm)" else "processor"
+                add(Attempt(name, cpu, extra = if (installer.mac) listOf("-ng") else emptyList()))
+            }
         }
         val threads = (Runtime.getRuntime().availableProcessors() / 2).coerceIn(2, MAX_THREADS)
         var failure: Throwable? = null
