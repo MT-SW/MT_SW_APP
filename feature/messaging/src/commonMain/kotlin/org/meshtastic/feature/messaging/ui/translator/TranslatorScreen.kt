@@ -26,7 +26,7 @@ import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.repository.FileService
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
-import org.meshtastic.core.resources.assistant_save
+import org.meshtastic.core.resources.translator_save
 import org.meshtastic.core.resources.assistant_save_done
 import org.meshtastic.core.resources.assistant_save_failed
 import org.meshtastic.core.resources.translator_export_title
@@ -316,7 +316,7 @@ private fun TranslatorHistory(history: List<TranslatorHistoryEntry>, onClear: ()
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box {
-                    TextButton(onClick = { saveMenu = true }) { Text(stringResource(Res.string.assistant_save)) }
+                    TextButton(onClick = { saveMenu = true }) { Text(stringResource(Res.string.translator_save)) }
                     DropdownMenu(expanded = saveMenu, onDismissRequest = { saveMenu = false }) {
                         ExportFormat.entries.forEach { format ->
                             DropdownMenuItem(

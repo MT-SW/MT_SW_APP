@@ -3017,6 +3017,7 @@
     <string name="translator_source_label">Text</string>
     <string name="translator_export_title">MT_SW – translator conversation</string>
     <string name="translator_history_title">Translations in this session</string>
+    <string name="translator_save">Save translations…</string>
     <string name="translator_history_clear">Clear</string>
     <string name="translator_test_title">Translation test</string>
     <string name="translator_summary">Translates messages without internet. Off by default.</string>

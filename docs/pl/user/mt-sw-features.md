@@ -186,7 +186,7 @@ Na słabszych urządzeniach duże modele mogą spowalniać aplikację albo ją z
 
 - **Odebrane wiadomości** — w menu wiadomości jest „Przetłumacz wiadomość”. Oryginał zostaje, a tłumaczenie można przełączać z oryginałem.
 - **Wysyłane wiadomości** — gdy w polu jest tekst, obok pola pojawia się przycisk „Przetłumacz przed wysłaniem”. Pokazuje oryginał i tłumaczenie obok siebie; możesz wysłać tłumaczenie, wstawić je do pola i poprawić albo anulować.
-- **Osobny ekran** — karta „Tłumacz”: wpisujesz tekst, wybierasz języki (albo „Wykryj automatycznie”), tłumaczysz i kopiujesz wynik. Tłumaczenia z tej sesji zbierają się pod wynikiem; przyciskiem „Zapisz rozmowę…” zapiszesz je jako PDF, Markdown, TXT, HTML lub JSON (tak jak rozmowę z asystentem), a „Wyczyść” je kasuje. Historia trzyma się tylko do zamknięcia ekranu.
+- **Osobny ekran** — karta „Tłumacz”: wpisujesz tekst, wybierasz języki (albo „Wykryj automatycznie”), tłumaczysz i kopiujesz wynik. Tłumaczenia z tej sesji zbierają się pod wynikiem; przyciskiem „Zapisz tłumaczenia…” zapiszesz je jako PDF, Markdown, TXT, HTML lub JSON , a „Wyczyść” je kasuje. Historia trzyma się tylko do zamknięcia ekranu.
 - Jeden model obsługuje wiele języków i dowolne pary między nimi, m.in. polski, angielski, niemiecki, czeski, słowacki, ukraiński, rosyjski, francuski i hiszpański.
 - Tłumaczenie bywa niedokładne, zwłaszcza nazwy własne i żargon, więc zawsze traktuj je jako podpowiedź. Tekst jest tłumaczony zdanie po zdaniu. Jeśli tłumaczenie ma ponad 200 znaków, aplikacja ostrzega, że przez radio pójdzie w kilku częściach.
 
