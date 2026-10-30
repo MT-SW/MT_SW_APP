@@ -1466,7 +1466,7 @@ class AssistantDataProvider(
      * The nearest or farthest nodes counted from another node (not from the user's radio): "which node is farthest from
      * Telegraf". Only nodes with a known position can be counted.
      */
-    fun distancesFrom(num: Int, farthest: Boolean, role: String): String {
+    suspend fun distancesFrom(num: Int, farthest: Boolean, role: String): String {
         fun s(pl: String, en: String) = if (polish) pl else en
         val from = nodeRepository.nodeDBbyNum.value[num] ?: return unknownText(num)
         val roleOnly = roleFilter(role.lowercase())
@@ -1499,7 +1499,7 @@ class AssistantDataProvider(
         return sb.toString()
     }
 
-    private fun unknownText(num: Int) = aiString(Res.string.ai_unknown_node, num.toString())
+    private suspend fun unknownText(num: Int) = aiString(Res.string.ai_unknown_node, num.toString())
 
     /**
      * "Do I have range to X": worked out from what the radio knows — heard straight or through other nodes, the last
