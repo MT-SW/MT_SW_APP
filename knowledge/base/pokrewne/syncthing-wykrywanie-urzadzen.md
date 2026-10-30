@@ -1,0 +1,12 @@
+<!-- Baza wiedzy MT_SW: wykrywanie urządzeń w Syncthing (globalne, lokalne), przekaźniki i sprawdzanie aktualizacji. Tylko informacyjnie. -->
+# Syncthing: wykrywanie urządzeń i przekaźniki
+
+### Jak Syncthing znajduje inne urządzenia: wykrywanie globalne i lokalne?
+Globalne wykrywanie jest domyślnie włączone. Co 30 minut Syncthing wysyła do serwerów wykrywania swój identyfikator urządzenia i porty, a serwery mapują go na zewnętrzny adres IP. Gdy szuka urządzenia, którego nie widać w sieci lokalnej, pyta serwery o jego identyfikator. Zapytania są szyfrowane TLS, ale podglądający w internecie widzi, że działa Syncthing, a operator serwera może wywnioskować, które urządzenia się łączą. Lokalne wykrywanie też jest domyślnie włączone. Co 30 sekund Syncthing rozsyła pakiety broadcast (IPv4) lub multicast (IPv6) z identyfikatorem i portem. Każdy w tej sieci widzi wtedy, że działa Syncthing. Wyłączenie lokalnego wykrywania sprawia, że urządzenia z dynamicznymi adresami w LAN nie znajdą się nawzajem.
+Słowa: syncthing wykrywanie, global discovery, local discovery, identyfikator urządzenia, broadcast, multicast, serwer wykrywania, 30 minut, 30 sekund, adres ip, lan, prywatność, device id
+Źródło: https://docs.syncthing.net/users/security.html (sprawdzono 2026-10; oficjalna dokumentacja bezpieczeństwa Syncthing)
+
+### Co robią przekaźniki (relay) w Syncthing i czy sprawdzanie aktualizacji wysyła dane?
+Gdy bezpośrednie połączenie nie jest możliwe, Syncthing łączy się przez publiczny przekaźnik, który wybiera heurystyka. Przekaźnik poznaje identyfikatory łączących się urządzeń, ale dane są szyfrowane end to end, więc przekaźnik ich nie odczyta. Każdy może uruchomić przekaźnik, a relaying jest domyślnie włączony. Można go wyłączyć albo wskazać konkretne przekaźniki. Sprawdzanie aktualizacji jest domyślnie włączone. Przy starcie i co 12 godzin Syncthing pyta przez HTTPS, a pobierane wersje pochodzą z GitHuba. Według dokumentacji te zapytania nie wysyłają danych identyfikujących. Interfejs sprawdza też aktualizacje przy załadowaniu, nawet gdy automatyczne aktualizacje są wyłączone.
+Słowa: relay syncthing, przekaźnik, relaying, end to end, szyfrowanie, aktualizacje syncthing, 12 godzin, github, upgrade, sprawdzanie wersji, wyłączenie relay, połączenie przez serwer
+Źródło: https://docs.syncthing.net/users/security.html (sprawdzono 2026-10; oficjalna dokumentacja bezpieczeństwa Syncthing)

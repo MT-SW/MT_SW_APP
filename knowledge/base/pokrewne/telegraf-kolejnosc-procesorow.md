@@ -1,0 +1,12 @@
+<!-- Baza wiedzy MT_SW: potok danych w Telegrafie (wejścia, procesory, agregatory, wyjścia) i bufor zapisu. Tylko informacyjnie. -->
+# Telegraf: potok danych, procesory i bufor
+
+### W jakiej kolejności Telegraf przetwarza dane: wejścia, procesory, agregatory i wyjścia?
+Najpierw wejścia zbierają metryki albo odbierają je jako usługa, np. mqtt_consumer. Potem metryki przechodzą przez procesory, następnie przez agregatory, które liczą zagregowane wartości w oknie czasowym, a na końcu wyjścia zapisują dane do miejsca docelowego, np. InfluxDB. Procesory i agregatory są opcjonalne. Domyślnie procesory uruchamiają się dwa razy: przed agregatorami oraz ponownie na wartościach, które wyemitowały agregatory. Oryginalne metryki nie przechodzą drugi raz. Może to dać nieoczekiwane wyniki, np. procesor skalujący wartości skaluje agregaty dwukrotnie. Ustawienia agenta skip_processors_before_aggregators i skip_processors_after_aggregators pozwalają to wyłączyć. Dokumentacja podaje, że domyślna wartość skip_processors_after_aggregators ma się zmienić na true w Telegrafie 1.40.
+Słowa: telegraf potok, pipeline, kolejność procesorów, procesory dwa razy, agregatory, skip_processors, wejście, wyjście, skalowanie dwa razy, okno czasowe, metryki, agent
+Źródło: https://docs.influxdata.com/telegraf/v1/concepts/data-pipeline/index.md (sprawdzono 2026-10; oficjalna dokumentacja Telegraf)
+
+### Co się dzieje z danymi, gdy InfluxDB jest niedostępne: bufor w pamięci czy na dysku?
+Każde wyjście Telegrafa ma własny bufor, który przechowuje metryki czekające na zapis, gdy cel jest nieosiągalny. Zapisy idą partiami do metric_batch_size, co flush_interval albo wcześniej, gdy pełna partia jest gotowa. W domyślnym trybie buffer_strategy = memory bufor jest w pamięci. Gdy się zapełni, najstarsze metryki są porzucane, a przy zatrzymaniu Telegrafa bufor przepada. Tryb disk zapisuje bufor do dziennika w buffer_directory. Wpisy są usuwane po udanym zapisie, a po restarcie najpierw wysyłane są stare. Dysk nie ma limitu, więc trzeba go pilnować. Wybór trybu dla domowego serwera to wniosek z ogólnej wiedzy.
+Słowa: telegraf bufor, buffer_strategy, memory, disk, buffer_directory, metric_buffer_limit, flush_interval, metric_batch_size, utrata danych, dziennik zapisu, influxdb niedostępne, bufor na dysku
+Źródło: https://docs.influxdata.com/telegraf/v1/concepts/data-pipeline/index.md (sprawdzono 2026-10; oficjalna dokumentacja Telegraf; wybór trybu dla domu z ogólnej wiedzy)
