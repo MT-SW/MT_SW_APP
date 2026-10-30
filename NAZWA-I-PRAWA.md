@@ -20,6 +20,8 @@ Nazwa „Meshtastic” oraz jej logo należą do Meshtastic LLC. MT_SW jest nieo
 
 **Nieprawdziwe informacje.** Gdy ktoś rozpowszechnia o projekcie lub jego twórcach informacje nieprawdziwe albo naruszające dobra osobiste, zastrzegamy sobie żądanie sprostowania i usunięcia oraz inne kroki przewidziane prawem.
 
+**Brak odpowiedzialności za cudze treści.** Nie odpowiadamy za informacje, artykuły, filmy, strony ani wypowiedzi tworzone przez osoby i podmioty trzecie, w tym za błędne, nieaktualne lub niezwiązane z nami fakty. Odcinamy się od stron, struktur, grup i osób, które piszą lub mówią o nas bez żadnego kontaktu z nami i bez udziału w naszej społeczności i sieci. Wiarygodne informacje o projekcie znajdziesz tylko w naszych własnych kanałach i repozytoriach (GitHub MT-SW, mt-sw.pl). Nie zapewniamy, że treści osób trzecich o nas są prawdziwe, ani nie uznajemy ich za wypowiedzi w naszym imieniu.
+
 **Kontakt.** Przez nasze kanały (lokalne grupy, Discord/WhatsApp/Signal, sieć mesh). Błędy w programie zgłasza się tymi samymi kanałami.
 
 Ta informacja ma charakter ogólny i nie jest poradą prawną.
@@ -43,6 +45,8 @@ This describes how we protect the name and content of the MT_SW project (the MT_
 **Articles and mentions.** We do not forbid anyone to write about the project. If you want to write about us, please contact us before publishing: we will gladly check the facts and give current information. Please keep it truthful and do not publish private data of the people behind the project (address, phone, family details and the like) without their consent.
 
 **False information.** If someone spreads false information about the project or its authors, or information that violates personal rights, we reserve the right to demand correction and removal and to take other steps provided by law.
+
+**No responsibility for third-party content.** We are not responsible for information, articles, videos, websites or statements made by third parties, including incorrect, outdated or unrelated facts about us. We distance ourselves from websites, groups, structures and persons who write or speak about us without any contact with us and without taking part in our community and network. Reliable information about the project can only be found in our own channels and repositories (GitHub MT-SW, mt-sw.pl). We do not vouch for third-party content about us and do not regard it as speaking on our behalf.
 
 **Contact.** Through our channels (local groups, Discord/WhatsApp/Signal, the mesh network). Bugs are reported through the same channels.
 
