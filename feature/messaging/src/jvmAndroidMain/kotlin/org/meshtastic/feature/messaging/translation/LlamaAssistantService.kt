@@ -530,6 +530,8 @@ class LlamaAssistantService(
         val m = SECOND_QUESTION.find(question) ?: return null
         val first = question.substring(0, m.range.first).trim().trimEnd(',', ';')
         val second = question.substring(m.range.first).replaceFirst(JOINER, "").trim()
+        // "What is SNR and what values are good?": the second half is about the same thing, so it is one question.
+        if (DEFINITION_ASK.containsMatchIn(first) && DEFINITION_FOLLOW.containsMatchIn(second)) return null
         return if (first.length >= MIN_PART && second.length >= MIN_PART) first to second.replaceFirstChar { it.uppercase() } else null
     }
 
@@ -1086,11 +1088,8 @@ class LlamaAssistantService(
                     return it.also(onPiece)
                 }
             }
-            if (CREATIVE_ASK.containsMatchIn(question.lowercase()) && facts.isBlank()) {
-                lastRoute = "refused: too small for this"
-                return smallRefusal(polish).also(onPiece)
-            }
-            if (uiPrefs.assistantInternetEnabled.value && webWanted(question, "")) {
+            // How-to questions are not searched for quotes: encyclopedia sentences are no instructions ("jajecznik" for boiling an egg).
+            if (uiPrefs.assistantInternetEnabled.value && !HOW_TO.containsMatchIn(question) && webWanted(question, "")) {
                 val found = webTools.web_search(webQuery(question))
                 // "No results." and connection errors are not findings: they are never quoted.
                 if (found.startsWith("UNTRUSTED")) {
@@ -1101,8 +1100,21 @@ class LlamaAssistantService(
                 }
             }
             if (small) {
-                lastRoute = "not in the knowledge base"
-                return notInBase(polish, uiPrefs.assistantInternetEnabled.value).also(onPiece)
+                // The closest entry of the base is still better than nothing; it says it may not fit exactly.
+                if (facts.isNotBlank()) {
+                    quotedEntry(question, facts, polish, loose = true)?.let {
+                        lastRoute = "quoted knowledge-base entry (closest)"
+                        return it.also(onPiece)
+                    }
+                }
+                // Only a question about the app or the mesh that the base cannot answer is declined: guessing there gives wrong
+                // settings. Conversation, follow-ups, jokes and general questions are answered by the model in its own words.
+                if (aboutAppOrMesh(question)) {
+                    lastRoute = "not in the knowledge base"
+                    return notInBase(polish, uiPrefs.assistantInternetEnabled.value).also(onPiece)
+                }
+                lastRoute = "model's own words (nothing in the base)"
+                return speak(modelId, history, polish, onPiece, room, extra = "")
             }
         }
         if (facts.isBlank()) return null
@@ -1129,7 +1141,8 @@ class LlamaAssistantService(
     private fun quotedEntry(question: String, facts: String, polish: Boolean = true, loose: Boolean = false): String? {
         val asked = stems(question) - STOP_STEMS
         // One word is enough only for a short technical term (SNR, LNA, SAW): any other lone word fits too many entries.
-        if (asked.isEmpty() || (asked.size == 1 && asked.first() !in SHORT_TERMS && !loose)) return null
+        if (asked.isEmpty()) return null
+        val definition = DEFINITION_ASK.containsMatchIn(question)
         // The best entry is chosen by how much of the question its title and heading cover; entries of the related and
         // off-topic tiers never are quoted, and a table or a half-fitting entry is better left to the model's own words.
         var best: Pair<String, String>? = null
@@ -1143,8 +1156,11 @@ class LlamaAssistantService(
             val bodyStems = stems(block.substringAfter('\n', ""))
             val inHead = asked.count { it in headStems }
             val covered = asked.count { it in headStems || it in bodyStems }
-            val score = (covered + inHead).toDouble() / (2 * asked.size)
-            if (inHead >= 1 && covered >= (if (loose) 1 else QUOTE_MIN_WORDS) && covered.toDouble() / asked.size >= (if (loose) QUOTE_LOOSE_SHARE else QUOTE_MIN_SHARE) && score > bestScore) {
+            // "What is X?" prefers the entry that defines X over one that merely mentions it; then the shorter title wins.
+            val score = (covered + inHead).toDouble() / (2 * asked.size) +
+                (if (definition && DEFINITION_ASK.containsMatchIn(head)) DEFINITION_BONUS else 0.0) - head.length / 10000.0
+            val needed = minOf(if (loose) 1 else QUOTE_MIN_WORDS, asked.size)
+            if (inHead >= 1 && covered >= needed && covered.toDouble() / asked.size >= (if (loose) QUOTE_LOOSE_SHARE else QUOTE_MIN_SHARE) && score > bestScore) {
                 best = block to head
                 bestScore = score
             }
@@ -1197,10 +1213,11 @@ class LlamaAssistantService(
                 "Try a short, specific question (e.g. \"how do I add a channel\") or look it up in the settings search."
         }
 
-    /** A task a very small model does badly (jokes, poems, code, stories): said plainly instead of a made-up answer. */
-    private fun smallRefusal(polish: Boolean) =
-        if (polish) "Ten model jest za mały, żeby zrobić to dobrze (dowcipy, wiersze, kod, opowiadania). Zapytaj o sieć mesh, radio lub aplikację albo wybierz większy model, np. Gemma, w ustawieniach asystenta."
-        else "This model is too small to do that well (jokes, poems, code, stories). Ask about the mesh network, the radio or the app, or pick a larger model such as Gemma in the assistant settings."
+    /** Is the question about this app's screens or the mesh network (where a guess means a wrong setting)? */
+    private fun aboutAppOrMesh(question: String): Boolean {
+        val q = question.lowercase()
+        return MESH_TOPIC.containsMatchIn(q) || APP_UI_ASK.containsMatchIn(q) || (HOW_TO.containsMatchIn(question) && MESH_DEVICE_TOPIC.containsMatchIn(q))
+    }
 
     /** The internet is a fallback only for the stronger models (the Gemma family); the weaker ones are not given web results. */
     private fun webModel(modelId: String): Boolean = AiModels.byId(modelId)?.name?.startsWith("Gemma 4") == true
@@ -1550,7 +1567,7 @@ class LlamaAssistantService(
             found.lines().filterNot { it.startsWith("UNTRUSTED") || it.startsWith("END OF") }
                 .flatMap { it.split(Regex("(?<=[.!?])\\s+")) }
                 .map { it.trim() }.filter { it.length in MIN_QUOTE..MAX_QUOTE && !it.endsWith("?") && it.count { c -> c == ' ' } >= QUOTE_WORDS }.distinct()
-        val best = sentences.map { it to stems(it).count { s -> s in want } }.filter { it.second >= 2 }.sortedByDescending { it.second }.take(2).map { it.first }
+        val best = sentences.map { it to stems(it).count { s -> s in want } }.filter { it.second >= maxOf(2, (want.size + 1) / 2) }.sortedByDescending { it.second }.take(2).map { it.first }
         return if (best.isEmpty()) {
             null
         } else {
@@ -1735,7 +1752,6 @@ class LlamaAssistantService(
         val ADVICE_INTENTS = setOf("app_help", "chat", "network_question", "signal_list", "web_question")
         /** The question is about the user's own radio ("ktoś mnie słabo słyszy", "mam słaby zasięg"), not a general one. */
         val OWN_RANGE = Regex("(?iu)\\b(mam|mój|moj\\p{L}*|mnie|mi|u mnie|moim|my|me|i have)\\b|jak (poprawić|zwiększyć|poprawic|zwiekszyc)|how (can|do) i (improve|increase)")
-        val CREATIVE_ASK = Regex("(?iu)dowcip|żart|zart|wiersz|opowiadani|piosenk|kod w |napisz (mi )?(kod|program|skrypt)|joke|poem|story|python|opowiedz (mi )?(coś|cos|bajk)|nudzę|nudze|poleć mi|polec mi")
         val TO_ME_ASK = Regex("(?iu)(kto|czy ktoś|czy ktos).*(pisał|pisal|napisał|napisal|odezwał|odezwal).*(do mnie|mi)(?![\\p{L}])|wiadomo\\p{L}* do mnie|who wrote to me|messages (sent )?to me")
         val MSG_FROM_NODE = Regex("(?iu)(ile|how many).*(wiadomo|message).*(napisał|napisal|wysłał|wysyłał|wyslal|pisał|pisal|sent|wrote)")
         val CHANNEL_NAMED = Regex("(?iu)(?:na kanale|w kanale|kanał|kanale|channel)\\s+[„\"]?([\\p{L}\\p{N}_-]+)")
@@ -1823,6 +1839,8 @@ class LlamaAssistantService(
                 "router" to "router", "ruter" to "router", "repeater" to "repeater", "przekaźnik" to "repeater",
                 "przekaznik" to "repeater", "czujnik" to "sensor", "sensor" to "sensor", "tracker" to "tracker",
             )
+        val DEFINITION_ASK = Regex("(?iu)^\\s*(co to (jest|są|sa)|czym (jest|są|sa)|what (is|are))\\s")
+        val DEFINITION_FOLLOW = Regex("(?iu)^(jak|jakie|jaki|jaka|co|czy|how|what|which)(?![\\p{L}])")
         val JOINER = Regex("^[\\s,.;?]*(?:i|a|oraz|and)?\\s*", RegexOption.IGNORE_CASE)
         val SECOND_QUESTION =
             Regex(
@@ -1872,10 +1890,11 @@ class LlamaAssistantService(
         const val SOURCE_MIN_WORDS = 1
         const val SOURCE_MIN_RELATED = 2
         const val QUOTE_MIN_SHARE = 0.5
+        const val DEFINITION_BONUS = 0.5
         const val QUOTE_LOOSE_SHARE = 0.34
         const val QUOTE_MAX_CHARS = 1100
         const val CAPABILITIES_WORDS = 10
-        val CAPABILITIES_ASK = Regex("jakie masz możliwości|jakie masz mozliwosci|co potrafisz|co umiesz|co możesz|co mozesz|w czym (możesz|mozesz) (mi )?pomóc|w czym (możesz|mozesz) pomoc|do czego służysz|do czego sluzysz|what can you do|what are you able|how can you help|what do you do")
+        val CAPABILITIES_ASK = Regex("^\\s*(pomocy|pomoc|help)[!.?\\s]*$|jakie masz możliwości|jakie masz mozliwosci|co potrafisz|co umiesz|co możesz|co mozesz|w czym (możesz|mozesz) (mi )?pomóc|w czym (możesz|mozesz) pomoc|do czego służysz|do czego sluzysz|what can you do|what are you able|how can you help|what do you do")
         const val CAPABILITIES_PL =
             "Mogę pomagać w kilku rzeczach, całkowicie na Twoim urządzeniu:\n" +
                 "• Dane z aplikacji: policzę i pokażę węzły, ich sygnał (SNR, RSSI), odległości, czas pracy, baterię, wiadomości i statystyki sieci.\n" +
@@ -1941,6 +1960,7 @@ class LlamaAssistantService(
                     "what\\s+time\\s+is\\s+it|what(?:'s| is)\\s+(the\\s+)?(date|time)|what\\s+day\\s+is\\s+(it|today)",
             )
         val APP_UI_ASK = Regex("(?iu)aplikacj|interfejs|czcionk|motyw|ustawieni|czacie|czat\\b|asystent|mt_sw|app\\b|interface|font size|theme")
+        val MESH_DEVICE_TOPIC = Regex("(?iu)urządzen|radio|antena|anten|pozycj|bateri|moduł|modul|wyświetlacz|oled|gps|bluetooth|usb|kod qr|klucz|logi|model ai")
         val MESH_TOPIC = Regex("(?iu)węz|węzł|mesh|kanał|kanal|firmware|lora|preset|meshtastic|nodeinfo|traceroute|hop|skok")
         val BATTERY_LEVEL_ASK = Regex("(?iu)(ile|jaki|jaka)\\s+(procent\\p{L}*\\s+)?(bateri\\p{L}*|naładowa\\p{L}*)|poziom\\p{L}*\\s+bateri|battery\\s+(level|percent)|how much battery")
         val UPTIME_WORDS = Regex("uptime|czas pracy|czasu pracy|jak długo działa|jak dlugo dziala|how long .* running")
