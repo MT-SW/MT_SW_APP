@@ -292,6 +292,9 @@ class LlamaAssistantService(
     override suspend fun reply(history: List<AssistantTurn>, onPiece: (String) -> Unit): String =
         withContext(Dispatchers.IO) { engineLock.withLock { replyLocked(history, onPiece) } }
 
+    override var lastInfo: String = ""
+        private set
+
     private suspend fun replyLocked(history: List<AssistantTurn>, onPiece: (String) -> Unit): String {
         val modelId = activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
         val question = history.lastOrNull { it.fromUser }?.text.orEmpty()
@@ -334,6 +337,7 @@ class LlamaAssistantService(
                 AssistantActions.encodeWeb(parts.joinToString(" · "))
             }.orEmpty()
         val buttons = collector.drain().map { it.copy(caption = aiString(Res.string.assistant_go_to, it.label)) }
+        lastInfo = "$modelId|$lastRoute"
         return answer + web + buttons.joinToString("") { AssistantActions.encode(it) }
     }
 

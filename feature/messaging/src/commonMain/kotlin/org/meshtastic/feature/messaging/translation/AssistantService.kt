@@ -32,6 +32,9 @@ interface AssistantService {
      */
     suspend fun reply(history: List<AssistantTurn>, onPiece: (String) -> Unit): String
 
+    /** What the last answer was made with, "model|route", saved with the answer for diagnosis. Empty where not known. */
+    val lastInfo: String get() = ""
+
     /**
      * Asks all test questions one after another and reports each one to [onResult] (question, answer); also prints them
      * and writes a results file where the platform can. Typed in the chat as /test (everything) or a shorter command (/narzedzia, /rozmowa, /baza, /sprzet); [command] says which. Does nothing where not supported.

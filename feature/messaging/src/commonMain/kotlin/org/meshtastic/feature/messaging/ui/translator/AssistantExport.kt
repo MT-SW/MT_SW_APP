@@ -32,6 +32,7 @@ data class ExportEntry(
     val buttons: List<String>,
     val at: Long = 0L,
     val tookMs: Long = 0L,
+    val info: String = "",
 )
 
 /** The file kinds the conversation can be saved as. */
@@ -55,6 +56,7 @@ object AssistantExport {
             buttons = actions.map { it.caption.ifBlank { it.label } },
             at = line.at,
             tookMs = line.tookMs,
+            info = line.info,
         )
     }
 
@@ -79,6 +81,7 @@ object AssistantExport {
                 append("    {\"n\": ").append(i + 1).append(", \"role\": ").append(q(if (e.fromUser) "user" else "assistant"))
                 if (e.at > 0L) append(", \"").append(if (e.fromUser) "sent" else "received").append("\": ").append(q(AssistantClock.clock(e.at)))
                 if (!e.fromUser && e.tookMs > 0L) append(", \"answer_seconds\": ").append(AssistantClock.seconds(e.tookMs))
+                if (!e.fromUser) diagnosis(e)
                 append(", \"text\": ").append(q(e.text))
                 e.note?.let { append(", \"web\": ").append(q(it)) }
                 if (e.buttons.isNotEmpty()) append(", \"buttons\": [").append(e.buttons.joinToString(", ") { q(it) }).append("]")
@@ -88,6 +91,23 @@ object AssistantExport {
         }
 
     private fun q(s: String): String = JsonText.quote(s)
+
+    private val POINTER = Regex("^(„[^”]+” jest w:|Otwieram|To jest na ekranie|Opening|\"[^\"]+\" is in:)")
+
+    /** What helps to judge an answer: model, how it was sorted, length, speed, whether it only pointed to a setting. */
+    private fun StringBuilder.diagnosis(e: ExportEntry) {
+        val model = e.info.substringBefore('|', "")
+        val route = e.info.substringAfter('|', "")
+        val words = e.text.trim().split(Regex("\\s+")).count { it.isNotEmpty() }
+        if (model.isNotBlank()) append(", \"model\": ").append(q(model))
+        if (route.isNotBlank()) append(", \"route\": ").append(q(route))
+        append(", \"words\": ").append(words).append(", \"chars\": ").append(e.text.length)
+        if (e.tookMs > 0L) append(", \"words_per_second\": ").append(kotlin.math.round(words * 10_000.0 / e.tookMs) / 10)
+        append(", \"internet\": ").append(e.note != null)
+        append(", \"only_points_to_setting\": ").append(POINTER.containsMatchIn(e.text.trim()))
+        val end = e.text.trim().lastOrNull()
+        append(", \"maybe_cut_off\": ").append(words >= 40 && end != null && end !in ".!?)…\"»")
+    }
 
     /** " (12:03:17)" for a sent question, " (12:03:29, 12.1 s)" for a received answer; empty when the time is not known. */
     private fun stamp(e: ExportEntry): String =

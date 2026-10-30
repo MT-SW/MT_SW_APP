@@ -38,7 +38,7 @@ import org.meshtastic.core.ui.assistant.SettingHighlight
 
 /** One bubble of the conversation. */
 /** [at] is when a question was sent or an answer received (milliseconds, 0 = not known); [tookMs] is how long an answer took. */
-data class AssistantLine(val fromUser: Boolean, val text: String, val at: Long = 0L, val tookMs: Long = 0L)
+data class AssistantLine(val fromUser: Boolean, val text: String, val at: Long = 0L, val tookMs: Long = 0L, val info: String = "")
 
 data class AssistantUiState(
     val lines: List<AssistantLine> = emptyList(),
@@ -201,7 +201,7 @@ class AssistantViewModel(
     fun open(chat: StoredChat) {
         job?.cancel()
         chatId = chat.id
-        _state.update { AssistantUiState(lines = chat.lines.map { AssistantLine(it.fromUser, it.text, it.at, it.tookMs) }) }
+        _state.update { AssistantUiState(lines = chat.lines.map { AssistantLine(it.fromUser, it.text, it.at, it.tookMs, it.info) }) }
     }
 
     fun deleteSaved(id: String) {
@@ -218,7 +218,7 @@ class AssistantViewModel(
         val id = chatId ?: nowMillis.toString().also { chatId = it }
         val title = lines.first { it.fromUser }.text.lines().first().take(TITLE_LENGTH)
         runCatching {
-            history.save(StoredChat(id, title, nowMillis, lines.map { StoredLine(it.fromUser, it.text, it.at, it.tookMs) }))
+            history.save(StoredChat(id, title, nowMillis, lines.map { StoredLine(it.fromUser, it.text, it.at, it.tookMs, it.info) }))
         }
         refreshSaved()
     }
@@ -248,7 +248,7 @@ class AssistantViewModel(
         val last = s.lines.lastOrNull() ?: return@update s
         if (last.fromUser || last.at != 0L || last.text.isBlank()) return@update s
         val now = nowMillis
-        s.copy(lines = s.lines.dropLast(1) + last.copy(at = now, tookMs = now - sentAt))
+        s.copy(lines = s.lines.dropLast(1) + last.copy(at = now, tookMs = now - sentAt, info = service.lastInfo))
     }
 
     private companion object {
