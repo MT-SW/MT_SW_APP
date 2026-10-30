@@ -149,10 +149,6 @@ object AiModels {
     const val PLLUM_12B = "pllum-12b-q4"
     const val TG_4B = "translategemma-4b-q4"
     const val TG_12B = "translategemma-12b-q4"
-    const val WHISPER_BASE = "whisper-base-q5"
-    const val WHISPER_SMALL = "whisper-small-q5"
-    const val WHISPER_MEDIUM = "whisper-medium-q5"
-    const val WHISPER_TURBO = "whisper-large-v3-turbo-q5"
     const val WHISPER_SMALL_Q8 = "whisper-small-q8"
     const val WHISPER_MEDIUM_Q8 = "whisper-medium-q8"
     const val WHISPER_TURBO_Q8 = "whisper-large-v3-turbo-q8"
@@ -537,50 +533,25 @@ object AiModels {
             pageUrl = "${HF}ggerganov/whisper.cpp",
         )
 
-    val WhisperBase =
+    // Only the Q8_0 format is offered: it is the best quality, and it is the one the Hexagon NPU of Snapdragon phones can use
+    // (it does the matrix work only for Q4_0, Q8_0 and FP16). One list for every platform.
+    val WhisperSmallQ8 =
         whisper(
-            WHISPER_BASE, "Whisper base", "ggml-base-q5_1.bin", 60, 400,
-            "Najmniejszy model do dyktowania; szybki, ale myli się częściej.",
-            "The smallest dictation model; fast, but makes more mistakes.",
-        )
-    val WhisperSmall =
-        whisper(
-            WHISPER_SMALL, "Whisper small", "ggml-small-q5_1.bin", 190, 800,
+            WHISPER_SMALL_Q8, "Whisper small", "ggml-small-q8_0.bin", 264, 1000,
             "Mały model do dyktowania: dobry kompromis szybkości i dokładności.",
             "A small dictation model: a good balance of speed and accuracy.",
         )
-    val WhisperMedium =
+    val WhisperMediumQ8 =
         whisper(
-            WHISPER_MEDIUM, "Whisper medium", "ggml-medium-q5_0.bin", 539, 1800,
+            WHISPER_MEDIUM_Q8, "Whisper medium", "ggml-medium-q8_0.bin", 823, 2200,
             "Dokładniejszy model do dyktowania, także dla polskiego.",
             "A more accurate dictation model, also for Polish.",
         )
-    val WhisperTurbo =
-        whisper(
-            WHISPER_TURBO, "Whisper large v3 turbo", "ggml-large-v3-turbo-q5_0.bin", 574, 2200,
-            "Najdokładniejszy z modeli do dyktowania w tej liście, a mimo to dość szybki.",
-            "The most accurate dictation model in this list, and still fairly fast.",
-        )
-
-    // The same models in the Q8_0 format: the Hexagon NPU of Snapdragon phones does the matrix work only for Q4_0, Q8_0
-    // and FP16 (not for Q5), so these are the ones that can run on the NPU. Bigger files, a little slower on the processor.
-    val WhisperSmallQ8 =
-        whisper(
-            WHISPER_SMALL_Q8, "Whisper small (Q8)", "ggml-small-q8_0.bin", 264, 1000,
-            "Mały model do dyktowania w formacie Q8: może działać na NPU telefonu ze Snapdragonem, na procesorze jest nieco większy niż zwykły.",
-            "A small dictation model in the Q8 format: it can run on the NPU of a Snapdragon phone, on the processor it is a little bigger than the normal one.",
-        )
-    val WhisperMediumQ8 =
-        whisper(
-            WHISPER_MEDIUM_Q8, "Whisper medium (Q8)", "ggml-medium-q8_0.bin", 823, 2200,
-            "Dokładny model do dyktowania, także dla polskiego, w formacie Q8: może działać na NPU telefonu ze Snapdragonem.",
-            "An accurate dictation model, also for Polish, in the Q8 format: it can run on the NPU of a Snapdragon phone.",
-        )
     val WhisperTurboQ8 =
         whisper(
-            WHISPER_TURBO_Q8, "Whisper large v3 turbo (Q8)", "ggml-large-v3-turbo-q8_0.bin", 874, 2500,
-            "Najdokładniejszy model do dyktowania w formacie Q8: może działać na NPU telefonu ze Snapdragonem.",
-            "The most accurate dictation model in the Q8 format: it can run on the NPU of a Snapdragon phone.",
+            WHISPER_TURBO_Q8, "Whisper large v3 turbo", "ggml-large-v3-turbo-q8_0.bin", 874, 2500,
+            "Najdokładniejszy model do dyktowania, a mimo to dość szybki.",
+            "The most accurate dictation model, and still fairly fast.",
         )
 
     /** Every model the app knows, for every platform. */
@@ -591,7 +562,6 @@ object AiModels {
             Qwen08b, Qwen2b, Qwen4b, Qwen9b, Qwen35b,
             Bielik15b, Bielik45b, Bielik7b, Bielik11b, Pllum12b,
             TranslateGemma4b, TranslateGemma12b,
-            WhisperBase, WhisperSmall, WhisperMedium, WhisperTurbo,
             WhisperSmallQ8, WhisperMediumQ8, WhisperTurboQ8,
         )
 
