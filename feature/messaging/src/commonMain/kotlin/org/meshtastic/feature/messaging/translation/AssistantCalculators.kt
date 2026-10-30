@@ -583,6 +583,13 @@ object AssistantCalculators {
 
     /** Facts about named presets (sensitivity, speed, difference between two) and "which preset reaches farthest", counted from the preset table. */
     private fun presetFacts(q: String, t: Texts): String? {
+        if (has(q, "który preset jest najszybszy|ktory preset jest najszybszy|najszybszy preset|which preset is the fastest|fastest preset")) {
+            val fastest = COMPARED.minByOrNull { airtimeMs(it, 50) } ?: return null
+            return t.s(
+                "Najszybszy jest preset ${presetName(fastest)}: pakiet 50 B trwa ok. ${t.n(airtimeMs(fastest, 50))} ms, ale kosztem zasięgu i czułości. Preset musi być taki sam u wszystkich w sieci; nasza sieć używa Narrow Fast.",
+                "The fastest is ${presetName(fastest)}: a 50 B packet takes about ${t.n(airtimeMs(fastest, 50))} ms, at the cost of range and sensitivity. The preset must be the same for everyone in the network; ours uses Narrow Fast.",
+            )
+        }
         if (has(q, "który preset ma (?:największy|najwiekszy|najlepszy) zasięg|który preset (?:sięga|siega) najdalej|which preset has the (?:longest|best) range")) {
             val best = COMPARED.maxByOrNull { sensitivityDbm(it) * -1.0 } ?: return null
             return t.s(

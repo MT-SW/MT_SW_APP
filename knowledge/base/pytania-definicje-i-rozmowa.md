@@ -42,10 +42,70 @@ Słowa: grzeje się, gorący, ładowanie, akumulator, Li-ion, puchnięcie, nagrz
 
 ### Jak powiększyć interfejs aplikacji?
 Rozmiar tekstu i elementów zmieniasz w ustawieniach aplikacji przez skalowanie aplikacji: od 50% do 200%, niezależnie od ustawień telefonu. Domyślnie jest „Zgodnie z systemem”. Skrót do skalowania jest też w Ustawienia → Funkcje MT_SW. Działa także w wersji na komputer.
-Słowa: powiększyć interfejs, skalowanie aplikacji, rozmiar tekstu, większa czcionka, zoom, mniejszy interfejs, skala
+Słowa: powiększyć interfejs, skalowanie aplikacji, rozmiar tekstu, rozmiar czcionki, wielkość czcionki, zmienić czcionkę, większa czcionka, zoom, mniejszy interfejs, skala
 Źródło: Dokumentacja aplikacji: skalowanie aplikacji (sprawdzono 2026-10)
 
 ### Jak wyłączyć (lub włączyć) automatyczne ładowanie obrazków w czacie?
 Podgląd obrazków z linków w czacie jest domyślnie wyłączony. Włączasz go i wyłączasz przełącznikiem w Ustawienia → Prywatność, a ten sam przełącznik jest też w Ustawienia → Funkcje MT_SW. Aplikacja nie wysyła zdjęć przez LoRa, tylko link: odbiorca widzi podgląd, jeśli ma tę funkcję włączoną. Przed wysłaniem zdjęcia jest ostrzeżenie, że serwer ze zdjęciem jest publiczny.
 Słowa: obrazki w czacie, podgląd obrazków, automatyczne ładowanie obrazków, zdjęcia przez link, prywatność, wyłączyć podgląd
 Źródło: Dokumentacja aplikacji: zdjęcia przez link, prywatność (sprawdzono 2026-10)
+
+### Jak zmienić język aplikacji?
+Język aplikacji wybierasz w ustawieniach aplikacji w pozycji Język (obok pozycji Motyw i Jednostki). Domyślnie aplikacja podąża za językiem telefonu. Jednostki zależą od regionu radia, a nie od języka wyświetlania.
+Słowa: język aplikacji, zmienić język, język interfejsu, polski, angielski, język wyświetlania, language
+Źródło: Dokumentacja aplikacji: ustawienia aplikacji, język (sprawdzono 2026-10)
+
+### Jak podłączyć się do radia przez Wi-Fi (sieć)?
+Najpierw podłącz radio do swojej sieci: połącz się z nim przez Bluetooth lub USB, otwórz Ustawienia → Konfiguracja urządzenia → Sieć i włącz Wi-Fi. Potem w zakładce Połącz wybierz Sieć. Radio znajdziesz przez skanowanie urządzeń w sieci lokalnej albo przez Dodaj urządzenie ręcznie: wpisz adres IP radia i port (domyślnie 4403). Telefon i radio muszą być w tej samej sieci lokalnej.
+Słowa: Wi-Fi, WiFi, połączenie przez sieć, TCP, adres IP, port 4403, jak podłączyć przez Wi-Fi, sieć lokalna
+Źródło: Dokumentacja aplikacji: połączenia, TCP/IP (sprawdzono 2026-10)
+
+### Jak podłączyć się do radia przez USB?
+Podłącz radio do telefonu kablem USB do transmisji danych: kable tylko do ładowania nie mają linii danych i radio się nie pojawi. Aplikacja poprosi o uprawnienie USB, dotknij Zezwól, a połączenie nawiąże się samo. Telefon musi obsługiwać OTG. Gdy uprawnienie zostało odrzucone, odłącz radio i podłącz je ponownie.
+Słowa: USB, kabel USB, OTG, połączenie przez USB, uprawnienie USB, jak podłączyć przez USB, port szeregowy
+Źródło: Dokumentacja aplikacji: połączenia, USB (sprawdzono 2026-10)
+
+### Co to jest zdrowie sieci (Network Health)?
+Zdrowie sieci to zakładka w dolnej nawigacji, między Węzłami a Mapą. Pokazuje w jednym miejscu, jak się mają wszystkie węzły: kartę Kondycja sieci z procentem węzłów w dobrym stanie, zakładki metryk (zasilanie, sygnał, eter, środowisko, zasoby, ruch, sąsiedzi) i kolory ocen (złoty dobrze, czerwony średnio, fioletowy źle, biały bardzo źle, niebieski brak danych). Jest wyszukiwanie, sortowanie, filtr Tylko problemy oraz podsumowanie sieci z rankingami, które można zapisać jako PDF, HTML, Markdown, tekst lub CSV.
+Słowa: zdrowie sieci, Network Health, kondycja sieci, kolory ocen, ranking węzłów, podsumowanie sieci, zakładka zdrowie
+Źródło: Dokumentacja aplikacji: Zdrowie sieci (sprawdzono 2026-10)
+
+### Czym różni się MT_SW_APP od oryginalnej aplikacji Meshtastic?
+MT_SW_APP to aplikacja oparta na oryginalnej aplikacji Meshtastic: robi wszystko, co oryginał, i ma własne dodatki. Są to m.in. Zdrowie sieci, Mesh Link Planer, kalkulator anten, połączenia na mapie, zdalne sterowanie GPIO, diagnostyka na żądanie, Sniffer, dodatkowa telemetria (statystyki lokalne), panel debugowania z logami urządzenia, skalowanie aplikacji, motywy, wersja na komputer i opcjonalne funkcje AI: asystent, tłumacz i dyktowanie. Jest zgodna z główną siecią Meshtastic.
+Słowa: czym różni się aplikacja, różnice od oryginału, oryginalna aplikacja, MT_SW_APP, nowe funkcje, dodatki, fork
+Źródło: Dokumentacja aplikacji: Funkcje MT_SW (sprawdzono 2026-10)
+
+### Czy Meshtastic działa bez internetu?
+Tak. Meshtastic to sieć radiowa LoRa: węzły przekazują wiadomości między sobą drogą radiową i do tego nie potrzeba internetu ani sieci komórkowej. Internet jest potrzebny tylko do rzeczy dodatkowych, np. mostu MQTT albo pobrania aktualizacji. Telefon łączy się z węzłem przez Bluetooth, USB lub sieć lokalną.
+Słowa: bez internetu, offline, brak zasięgu GSM, działa bez sieci komórkowej, internet nie jest potrzebny, Meshtastic bez internetu
+Źródło: Baza wiedzy: podstawy Meshtastic (opracowanie własne, 2026-10)
+
+### Jak podłączyć wyświetlacz OLED do własnego węzła?
+Typowy wyświetlacz OLED (np. SSD1306 lub SH1106) łączy się po I2C czterema przewodami: zasilanie 3,3 V, masa, SDA i SCL do pinów I2C płytki. Firmware wykrywa wyświetlacz sam, a jego zachowanie ustawiasz w ustawieniach ekranu (czas wygaszania, karuzela, jednostki). W gotowych płytkach (np. Heltec, T-Beam) wyświetlacz jest już wlutowany.
+Słowa: OLED, wyświetlacz, ekran, I2C, SDA, SCL, SSD1306, SH1106, podłączyć wyświetlacz
+Źródło: Baza wiedzy: budowa własnych węzłów (wiedza ogólna, opracowanie własne, 2026-10)
+
+### Czy MQTT jest bezpieczne?
+MQTT w Meshtastic przesyła wiadomości przez internet do brokera, więc ruch przechodzi przez serwer, którego nie kontrolujesz. Dla bezpieczeństwa używaj szyfrowania TLS i własnego, zabezpieczonego hasłem brokera, a na kanałach współdzielonych przez MQTT nie wysyłaj nic poufnego. Publiczny broker społeczności jest przeznaczony do ogólnych zastosowań i testów; połączenie z nim jest szyfrowane TLS (port 8883).
+Słowa: MQTT, bezpieczeństwo MQTT, broker, TLS, publiczny broker, szyfrowanie MQTT, czy MQTT jest bezpieczne
+Źródło: Baza wiedzy: MQTT (sprawdzono 2026-10)
+
+### Jak zrobić kopię zapasową konfiguracji węzła?
+W aplikacji otwórz Ustawienia → Kopia zapasowa i przywracanie. Eksport konfiguracji zapisuje całą konfigurację połączonego węzła do pliku, a Import konfiguracji wczytuje zapisany plik z powrotem. Zrób kopię przed większymi zmianami albo przed aktualizacją firmware.
+Słowa: kopia zapasowa, backup, eksport konfiguracji, import konfiguracji, przywrócić konfigurację, zapisać ustawienia do pliku
+Źródło: Dokumentacja aplikacji: kopia zapasowa i przywracanie (sprawdzono 2026-10)
+
+### Co to jest Meshtastic?
+Meshtastic to otwartoźródłowy projekt łączności radiowej bez internetu. Małe tanie radia LoRa (węzły) przekazują sobie wiadomości tekstowe i pozycje drogą radiową, tworząc sieć kratową (mesh), a telefon łączy się z węzłem przez Bluetooth, USB lub sieć lokalną i służy za klawiaturę oraz ekran. Projekt powstał na początku 2020 roku, a jego twórcą jest Kevin Hester. Zasięg jednego łącza to zwykle od kilkuset metrów w mieście do kilkudziesięciu kilometrów w otwartym terenie.
+Słowa: Meshtastic, co to jest Meshtastic, czym jest Meshtastic, projekt, sieć mesh, LoRa, łączność bez internetu, węzły
+Źródło: Baza wiedzy: podstawy Meshtastic (opracowanie własne, 2026-10)
+
+### Co to jest sieć mesh (kratowa)?
+Sieć mesh (kratowa) to sieć, w której każdy węzeł może przekazać cudzą wiadomość dalej: pakiet przeskakuje z węzła na węzeł, aż dotrze do celu. Żaden pojedynczy węzeł nie jest niezbędny, a sieć sama się konfiguruje. Dzięki temu zasięg całej sieci jest większy niż zasięg jednego radia, ale każdy dodatkowy przeskok zajmuje czas antenowy, dlatego liczbę przeskoków (hop limit) się ogranicza.
+Słowa: sieć mesh, sieć kratowa, mesh, przeskoki, hop limit, przekazywanie pakietów, co to jest mesh
+Źródło: Baza wiedzy: podstawy Meshtastic (opracowanie własne, 2026-10)
+
+### Co to jest LoRa?
+LoRa to technika radiowa dalekiego zasięgu i bardzo małego poboru prądu: sygnał jest rozpraszany w widmie, dzięki czemu odbiornik słyszy go nawet wtedy, gdy jest słabszy od szumu. Kosztem jest mała prędkość (od setek bitów do kilku kilobitów na sekundę), więc nadaje się do krótkich wiadomości i danych z czujników, a nie do zdjęć czy rozmów. Meshtastic używa LoRa w paśmie 868 MHz w Europie.
+Słowa: LoRa, co to jest LoRa, spreading factor, zasięg, małe prędkości, pasmo 868, modulacja LoRa
+Źródło: Baza wiedzy: parametry LoRa (opracowanie własne, 2026-10)

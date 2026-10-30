@@ -1295,7 +1295,7 @@ class AssistantDataProvider(
     }
 
     /** Who each node reported hearing directly (neighbour info), newest report per node; one [node] or all. */
-    suspend fun toolNeighbors(node: String, limit: Int, rankByCount: Boolean = false): String {
+    suspend fun toolNeighbors(node: String, limit: Int, rankByCount: Boolean = false, ownOnly: Boolean = false): String {
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
         val wanted = node.anyToEmpty()
         val num = if (wanted.isEmpty()) null else (findNode(node)?.num ?: return unknownNode(node))
@@ -1306,6 +1306,7 @@ class AssistantDataProvider(
             val payload = log.fromRadio.packet?.decoded?.payload ?: continue
             val info = runCatching { org.meshtastic.proto.NeighborInfo.ADAPTER.decode(payload) }.getOrNull() ?: continue
             val owner = info.node_id.takeIf { it != 0 } ?: log.fromNum
+            if (ownOnly && num != null && owner != num) continue
             if (num != null && owner != num && info.neighbors.none { it.node_id == num }) continue
             if ((newest[owner]?.first ?: -1L) < log.received_date) newest[owner] = log.received_date to info
         }
@@ -1315,7 +1316,7 @@ class AssistantDataProvider(
         return aiString(if (rankByCount) Res.string.ai_neigh_most_title else Res.string.ai_neigh_title) + "\n" +
             ordered.take(top).map { (owner, v) ->
                 val whenText = ago(((now - v.first) / MILLIS_PER_MINUTE).coerceAtLeast(0))
-                "• ${aiString(Res.string.ai_neigh_hears, nameOf(owner), whenText)} " + (if (rankByCount) "[${v.second.neighbors.size}] " else "") +
+                "• ${aiString(Res.string.ai_neigh_hears, nameOf(owner), whenText)} " + (if (rankByCount || ownOnly) "[${v.second.neighbors.size}] " else "") +
                     v.second.neighbors.joinToString { "${nameOf(it.node_id)} (${fmt(it.snr)} dB)" }.ifBlank { nobody }
             }.joinToString("\n")
     }
@@ -1433,7 +1434,7 @@ class AssistantDataProvider(
      * The nearest or farthest node as one short sentence, and the next few after it with only their distance: a long
      * table with every value of every node was too much for such a simple question.
      */
-    private suspend fun distanceAnswer(role: String, farthest: Boolean): String? {
+    private suspend fun distanceAnswer(role: String, farthest: Boolean, shown: Int = NEXT_SHOWN + 1): String? {
         val me = nodeRepository.ourNodeInfo.value ?: return null
         val roleOnly = roleFilter(role.lowercase())
         val rows =
@@ -1454,7 +1455,7 @@ class AssistantDataProvider(
                     first.user.long_name.ifBlank { first.user.short_name }, first.user.short_name, kilometres(meters), heard,
                 ),
             )
-        val next = rows.drop(1).take(NEXT_SHOWN)
+        val next = rows.drop(1).take((shown - 1).coerceAtLeast(1))
         if (next.isNotEmpty()) {
             sb.append("\n\n").append(aiString(Res.string.ai_dist_next, "").trim())
             for ((n, m) in next) {
@@ -1933,8 +1934,8 @@ class AssistantDataProvider(
     }
 
     /** The list of nodes by distance ([order] nearest / farthest) or by signal (anything else), for one role or all. */
-    suspend fun signalListFor(role: String, order: String): String {
-        if (order == "nearest" || order == "farthest") distanceAnswer(role, order == "farthest")?.let { return it }
+    suspend fun signalListFor(role: String, order: String, shown: Int = 0): String {
+        if (order == "nearest" || order == "farthest") distanceAnswer(role, order == "farthest", if (shown > 0) shown.coerceAtMost(MAX_TOOL_LIST) else NEXT_SHOWN + 1)?.let { return it }
         val words =
             when (order) {
                 "farthest" -> "najdal"
