@@ -106,6 +106,10 @@ ai_help_news
 ai_help_open
 ai_help_where
 ai_hops_direct
+ai_idle_unload_minutes
+ai_idle_unload_never
+ai_idle_unload_summary
+ai_idle_unload_title
 ai_internet_enable
 ai_internet_on_indicator
 ai_internet_summary

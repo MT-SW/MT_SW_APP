@@ -20,10 +20,12 @@ import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.repository.AiEngine
 import org.meshtastic.core.repository.AiModels
 import org.meshtastic.core.repository.UiPrefs
@@ -41,7 +43,24 @@ class AiEngineRouter(
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
+    // The model is freed from memory (RAM) after the time chosen in the settings without any use.
+    private val busy = java.util.concurrent.atomic.AtomicInteger(0)
+    @Volatile private var lastUsed = 0L
+
     init {
+        if (uiPrefs != null) {
+            scope.launch {
+                while (true) {
+                    delay(IDLE_CHECK_MS)
+                    val minutes = uiPrefs.aiIdleUnloadMinutes.value
+                    if (minutes > 0 && lastUsed > 0 && busy.get() == 0 && nowMillis - lastUsed >= minutes * MILLIS_PER_MINUTE) {
+                        Logger.i(tag = TAG) { "The model was not used for $minutes min: freed from memory" }
+                        lastUsed = 0
+                        unloadNow()
+                    }
+                }
+            }
+        }
         // A model is never deleted while a program still has its file open.
         store.beforeModelDelete = { unloadNow() }
         store.unloadAll = { unloadNow() }
@@ -111,14 +130,29 @@ class AiEngineRouter(
         onPiece: (String) -> Unit,
         jsonSchema: String?,
         thinking: Boolean,
-    ): String = llama.chat(modelId, messages, maxTokens, temperature, onPiece, jsonSchema, thinking)
-
-    override suspend fun transcribe(modelId: String, wav: ByteArray): String =
-        if (AiModels.byId(modelId)?.engine == AiEngine.WHISPER_CPP) {
-            checkNotNull(whisper) { "Speech models are not available on this system" }.transcribe(modelId, wav)
-        } else {
-            llama.transcribe(modelId, wav)
+    ): String {
+        busy.incrementAndGet()
+        try {
+            return llama.chat(modelId, messages, maxTokens, temperature, onPiece, jsonSchema, thinking)
+        } finally {
+            lastUsed = nowMillis
+            busy.decrementAndGet()
         }
+    }
+
+    override suspend fun transcribe(modelId: String, wav: ByteArray): String {
+        busy.incrementAndGet()
+        try {
+            return if (AiModels.byId(modelId)?.engine == AiEngine.WHISPER_CPP) {
+                checkNotNull(whisper) { "Speech models are not available on this system" }.transcribe(modelId, wav)
+            } else {
+                llama.transcribe(modelId, wav)
+            }
+        } finally {
+            lastUsed = nowMillis
+            busy.decrementAndGet()
+        }
+    }
 
     override suspend fun unloadNow() {
         llama.unloadNow()
@@ -127,6 +161,7 @@ class AiEngineRouter(
 
     /** Loads the model just chosen for a function; models of other engines (the NLLB translator) load on first use. */
     private suspend fun preload(modelId: String, hearing: Boolean) {
+        lastUsed = nowMillis
         when (AiModels.byId(modelId)?.engine) {
             AiEngine.LLAMA_CPP -> llama.preload(modelId, hearing = hearing && AiModels.byId(modelId)?.hearing == true)
             AiEngine.WHISPER_CPP -> whisper?.preload(modelId)
@@ -146,5 +181,7 @@ class AiEngineRouter(
 
     private companion object {
         const val TAG = "AiEngineRouter"
+        const val IDLE_CHECK_MS = 15_000L
+        const val MILLIS_PER_MINUTE = 60_000L
     }
 }

@@ -63,6 +63,10 @@ import org.meshtastic.core.resources.ai_dictation_note
 import org.meshtastic.core.resources.ai_internet_enable
 import org.meshtastic.core.resources.ai_internet_on_indicator
 import org.meshtastic.core.resources.ai_internet_summary
+import org.meshtastic.core.resources.ai_idle_unload_minutes
+import org.meshtastic.core.resources.ai_idle_unload_never
+import org.meshtastic.core.resources.ai_idle_unload_summary
+import org.meshtastic.core.resources.ai_idle_unload_title
 import org.meshtastic.core.resources.ai_internet_title
 import org.meshtastic.core.resources.ai_internet_warning_body
 import org.meshtastic.core.resources.ai_internet_warning_title
@@ -109,6 +113,7 @@ import org.meshtastic.core.resources.translator_downloading
 import org.meshtastic.core.resources.translator_ready
 import org.meshtastic.core.resources.translator_summary
 import org.meshtastic.core.resources.translator_title
+import org.meshtastic.core.ui.component.DropDownPreference
 import org.meshtastic.core.ui.component.SwitchPreference
 
 /**
@@ -210,6 +215,20 @@ internal fun AiSettings() {
             )
         }
         AssistantMemorySettings()
+    }
+
+    // The model leaves the memory after a time without use (any function): the choice is here, 2 minutes by default.
+    val idleMinutes by uiPrefs.aiIdleUnloadMinutes.collectAsStateWithLifecycle()
+    if (assistantOn || translatorOn || dictationOn) {
+        val minutesLabel: (Int) -> String = { stringResource(Res.string.ai_idle_unload_minutes, it) }
+        DropDownPreference(
+            title = stringResource(Res.string.ai_idle_unload_title),
+            enabled = true,
+            items = listOf(0 to stringResource(Res.string.ai_idle_unload_never)) + listOf(1, 2, 5, 10, 30, 60).map { it to minutesLabel(it) },
+            selectedItem = idleMinutes,
+            onItemSelected = { uiPrefs.setAiIdleUnloadMinutes(it) },
+            summary = stringResource(Res.string.ai_idle_unload_summary),
+        )
     }
 
     if (askInternet) {

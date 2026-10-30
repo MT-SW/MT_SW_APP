@@ -203,6 +203,12 @@ interface UiPrefs {
 
     fun setAssistantAutoScroll(value: Boolean) {}
 
+    /** After how many minutes without use a language or speech model is freed from memory; 0 = never (default 2). */
+    val aiIdleUnloadMinutes: StateFlow<Int>
+        get() = kotlinx.coroutines.flow.MutableStateFlow(2)
+
+    fun setAiIdleUnloadMinutes(value: Int) {}
+
     /** The saved antennas of the antenna calculator as JSON (see AntennaSetups); empty when none. */
     val antennaSetups: StateFlow<String>
         get() = kotlinx.coroutines.flow.MutableStateFlow("")

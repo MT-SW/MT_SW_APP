@@ -127,6 +127,10 @@
     <string name="ai_help_open">It is on the screen “%1$s”: the button below opens it.</string>
     <string name="ai_help_where">“%1$s” is in: %2$s.</string>
     <string name="ai_hops_direct">direct</string>
+    <string name="ai_idle_unload_minutes">%1$d min</string>
+    <string name="ai_idle_unload_never">Never</string>
+    <string name="ai_idle_unload_summary">After this time without use the AI model leaves the memory (RAM) and is loaded again on the next question or dictation.</string>
+    <string name="ai_idle_unload_title">Free the model from memory when idle</string>
     <string name="ai_internet_enable">Turn on</string>
     <string name="ai_internet_on_indicator">Internet is ON for the assistant</string>
     <string name="ai_internet_summary">Off by default. When on, the assistant can search the web, and the app downloads updates about our work automatically.</string>
