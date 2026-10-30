@@ -29,3 +29,8 @@ Słowa: ustawienie regionu, lora.region, pierwsza konfiguracja, region unset, du
 Gdy zapytasz o region, asystent opisuje, do czego służy, i sprawdza Twoje położenie: najpierw z pozycji radia, a gdy jej nie ma, z lokalizacji telefonu (tylko w tej chwili, nic nie jest wysyłane ani zapisywane). W Polsce i Europie podpowiada EU_868, a w województwie świętokrzyskim nasz EU_N_868 z presetem Narrow Fast (869,44165 MHz). To przybliżona podpowiedź: blisko granic może się mylić i nie jest poradą prawną.
 Słowa: jaki region ustawić, region dla mnie, lokalizacja, położenie, podpowiedź regionu, EU_868, EU_N_868, świętokrzyskie
 Źródło: Funkcje MT_SW: Inteligentne funkcje: asystent, tłumacz i dyktowanie
+
+### Jaki preset jest zalecany i jak go dobrać (tabela, korekcja błędów)?
+Preset musi być taki sam u wszystkich w sieci. W naszej sieci (EU_N_868) jest to Narrow Fast i nie zmieniamy go, chyba że ktoś zakłada własną, osobną sieć. Dla własnej sieci: mało urządzeń i długie łącza w otwartym terenie — Long Fast lub wolniejszy; średnia sieć — Medium Fast; dużo urządzeń, miasto, krótkie łącza — Short Fast lub Short Slow; las, wzgórza i zabudowa — wolniejszy preset daje zapas, ale zajmuje eter dłużej. Wyższa korekcja błędów (4/6, 4/7, 4/8) ratuje zakłócone pakiety, ale wydłuża pakiet i zmniejsza liczbę urządzeń, zasięg zmienia prawie wcale. Asystent pokazuje tabelę presetów (szybkość, czułość, czas pakietu, orientacyjna liczba urządzeń) policzoną dla wybranej korekcji błędów i dla podanej liczby urządzeń.
+Słowa: jaki preset, zalecany preset, który preset wybrać, tabela presetów, porównanie presetów, korekcja błędów, coding rate, CR, 4/5, 4/8, ile urządzeń, pojemność sieci
+Źródło: Funkcje MT_SW: Inteligentne funkcje: asystent, tłumacz i dyktowanie

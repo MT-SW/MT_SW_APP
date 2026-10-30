@@ -52,7 +52,7 @@ object AssistantCalculators {
         lastAntenna = null
         val q = question.lowercase().replace(' ', ' ')
         val t = Texts(polish)
-        return arithmetic(q, t) ?: airtime(q, t, defaults) ?: range(q, t, defaults) ?: fresnel(q, t) ?: horizon(q, t) ?:
+        return arithmetic(q, t) ?: airtime(q, t, defaults) ?: presets(q, t, defaults) ?: range(q, t, defaults) ?: fresnel(q, t) ?: horizon(q, t) ?:
             pathLoss(q, t) ?: eirp(q, t) ?: power(q, t) ?: antenna(q, t) ?: wavelength(q, t)
     }
 
@@ -490,14 +490,99 @@ object AssistantCalculators {
         }
     }
 
+
+    // ---------------------------------------------------------------- which preset
+
+    private val COMPARED =
+        listOf(
+            ChannelOption.SHORT_FAST, ChannelOption.SHORT_SLOW, ChannelOption.MEDIUM_FAST, ChannelOption.MEDIUM_SLOW,
+            ChannelOption.LONG_FAST, ChannelOption.LONG_MODERATE, ChannelOption.LONG_SLOW, ChannelOption.NARROW_FAST,
+            ChannelOption.NARROW_SLOW,
+        )
+
+    /** Share of the air time a network may use before it clogs (a rule of thumb), and the packets one node sends per 15 minutes. */
+    private const val USABLE_AIR_SHARE = 0.25
+    private const val PACKETS_PER_NODE_15_MIN = 4
+    private const val PRESET_PAYLOAD_BYTES = 50
+
+    private fun sensitivityDbm(o: ChannelOption) = -174 + 10 * log10(o.bandwidth * 1e6) + 6 + snrLimit(o.spreadingFactor)
+
+    private fun bitRate(o: ChannelOption, cr: Int) = o.spreadingFactor * (o.bandwidth * 1e6 / 2.0.pow(o.spreadingFactor)) * 4.0 / cr
+
+    /** About how many nodes a network can have, from the air time of one 50-byte packet (a rough order of magnitude, relaying not counted). */
+    private fun nodesFit(o: ChannelOption, cr: Int) = (USABLE_AIR_SHARE * 900_000 / (airtimeMs(o, PRESET_PAYLOAD_BYTES, cr) * PACKETS_PER_NODE_15_MIN)).toInt()
+
+    /** The coding rate a preset really takes: the asked one when firmware allows it on that preset, else its own. */
+    private fun crFor(o: ChannelOption, asked: Int?) = if (asked != null && (asked == o.codingRate || asked in o.codingRateOverrides)) asked else o.codingRate
+
+    /**
+     * "Which preset do you recommend": a table of the presets with speed, sensitivity, time of a packet and about how
+     * many nodes fit, worked out from the presets themselves, for the coding rate asked (4/5 ... 4/8) and with a pick for
+     * the number of nodes in the question. The model never invents these numbers.
+     */
+    private fun presets(q: String, t: Texts, defaults: Defaults): String? {
+        if (!has(q, "preset")) return null
+        if (!has(q, "zalecan|polec|najlepsz|najlepiej|wybra|dobra[ćc]|dobierz|dobór|tabel|porówn|porown|zestawien|jaki preset|który preset|ktory preset|recommend|best preset|which preset|compare|choose|what preset")) return null
+        if (has(q, "zmień|zmien|ustaw |przełącz|przelacz|change|switch|set the")) return null
+        val asked = Regex("4\\s*[/:]\\s*([5-8])").find(q)?.groupValues?.get(1)?.toInt()
+        val nodes = Regex("(\\d+)\\s*(?:urządz|urzadz|węzł|wezl|nod|device)").find(q)?.groupValues?.get(1)?.toIntOrNull()
+        val sb = StringBuilder()
+        sb.append(
+            t.s(
+                "Preset musi być taki sam u wszystkich w sieci, bo inaczej radia się nie słyszą. W naszej sieci (region EU_N_868) jest to Narrow Fast i tego nie zmieniaj, o ile nie zakładasz własnej, osobnej sieci. Dla własnej sieci dobór zależy od terenu, liczby urządzeń i tego, co ma przesyłać.",
+                "The preset must be the same for everyone in the network, or the radios do not hear each other. In our network (region EU_N_868) it is Narrow Fast and you should not change it unless you build your own separate network. For your own network the choice depends on the terrain, the number of devices and what it has to carry.",
+            ),
+        )
+        defaults.preset?.let { sb.append(" ").append(t.s("Twoje radio używa teraz: ${presetName(it)}.", "Your radio uses now: ${presetName(it)}.")) }
+        sb.append("\n\n").append(
+            t.s(
+                "Porównanie (pakiet ${PRESET_PAYLOAD_BYTES} B, korekcja błędów ${asked?.let { "4/$it" } ?: "własna każdego presetu"}):",
+                "Comparison (${PRESET_PAYLOAD_BYTES} B packet, error correction ${asked?.let { "4/$it" } ?: "each preset's own"}):",
+            ),
+        )
+        val rows = COMPARED.map { o -> o to crFor(o, asked) }
+        for ((o, cr) in rows) {
+            val rate = bitRate(o, cr)
+            val speed = if (rate >= 1000) "${t.n(rate / 1000, 1)} kb/s" else "${t.n(rate, 0)} b/s"
+            sb.append("\n• ").append(presetName(o)).append(" (4/").append(cr).append("): ").append(speed)
+                .append(t.s(", czułość ", ", sensitivity ")).append(t.n(sensitivityDbm(o), 1)).append(" dBm")
+                .append(t.s(", pakiet ", ", packet ")).append(t.n(airtimeMs(o, PRESET_PAYLOAD_BYTES, cr), 0)).append(" ms")
+                .append(t.s(", ok. ", ", about ")).append(nodesFit(o, cr)).append(t.s(" urządzeń", " devices"))
+        }
+        if (nodes != null) {
+            // The slowest (longest range) preset that still leaves room for twice the nodes.
+            val pick = rows.filter { (o, cr) -> nodesFit(o, cr) >= nodes * 2 }.minByOrNull { (o, cr) -> bitRate(o, cr) }
+            sb.append("\n\n").append(
+                if (pick != null) {
+                    t.s("Dla $nodes urządzeń rozsądny jest ${presetName(pick.first)}: największy zasięg, przy którym ruch jeszcze się mieści z zapasem.", "For $nodes devices ${presetName(pick.first)} is a sensible pick: the longest range that still leaves room to spare.")
+                } else {
+                    t.s("Dla $nodes urządzeń w jednej sieci żaden z tych presetów nie ma zapasu: podziel sieć na kanały albo ogranicz ruch (rzadsze pozycje i telemetria).", "For $nodes devices in one network none of these presets has room to spare: split the network into channels or cut the traffic (rarer positions and telemetry).")
+                },
+            )
+        }
+        sb.append("\n\n").append(
+            t.s(
+                "Jak wybierać: mało urządzeń i długie łącza w otwartym terenie — Long Fast lub wolniejszy (większy zasięg, mała przepustowość). Średnia sieć — Medium Fast. Dużo urządzeń, miasto, krótkie łącza — Short Fast lub Short Slow. Las, wzgórza i zabudowa — wolniejszy preset daje zapas, ale zajmuje eter dłużej. Wyższa korekcja błędów (4/6 ... 4/8) ratuje pakiety zakłócone, ale wydłuża pakiet i zmniejsza liczbę urządzeń; zasięgu prawie nie zmienia.",
+                "How to choose: few devices and long links in open country — Long Fast or slower (more range, little capacity). A medium network — Medium Fast. Many devices, a city, short links — Short Fast or Short Slow. Forest, hills and buildings — a slower preset gives margin but uses the air longer. Stronger error correction (4/6 ... 4/8) saves packets that are disturbed, but makes the packet longer and fits fewer devices; it hardly changes the range.",
+            ),
+        )
+        sb.append("\n").append(
+            t.s(
+                "Liczba urządzeń to rząd wielkości (przy ${(USABLE_AIR_SHARE * 100).toInt()} % czasu w eterze i $PACKETS_PER_NODE_15_MIN pakietach na urządzenie co 15 minut, bez przekazywania pakietów dalej; w sieci z przekazywaniem jest mniej).",
+                "The number of devices is an order of magnitude (at ${(USABLE_AIR_SHARE * 100).toInt()} % of the air time and $PACKETS_PER_NODE_15_MIN packets per device every 15 minutes, relaying not counted; a network that relays fits fewer).",
+            ),
+        )
+        return sb.toString()
+    }
+
     /** LoRa time on air (Semtech formula, 16-symbol preamble, explicit header, CRC on). */
-    fun airtimeMs(o: ChannelOption, payloadBytes: Int): Double {
+    fun airtimeMs(o: ChannelOption, payloadBytes: Int, codingRate: Int = o.codingRate): Double {
         val sf = o.spreadingFactor
         val bw = o.bandwidth * 1e6
         val tSym = 2.0.pow(sf) / bw * 1000
         val de = if (tSym > 16) 1 else 0
         val pre = (16 + 4.25) * tSym
-        val n = 8 + max(ceil((8.0 * payloadBytes - 4 * sf + 28 + 16) / (4 * (sf - 2 * de))) * o.codingRate, 0.0)
+        val n = 8 + max(ceil((8.0 * payloadBytes - 4 * sf + 28 + 16) / (4 * (sf - 2 * de))) * codingRate, 0.0)
         return pre + n * tSym
     }
 
