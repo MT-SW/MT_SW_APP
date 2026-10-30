@@ -1727,6 +1727,10 @@ class AssistantDataProvider(
                 val presetName = option?.name ?: s("własne ustawienia (bez presetu)", "custom settings (no preset)")
                 s("Twoje radio ma ustawiony preset $presetName w regionie ${lora.region.name}.", "Your radio is set to preset $presetName in region ${lora.region.name}.")
             }
+            "hops" -> {
+                val lora = radioConfigRepository.localConfigFlow.first().lora ?: return noRadio
+                s("Limit przeskoków w Twoim radiu: ${lora.hop_limit}.", "The hop limit in your radio: ${lora.hop_limit}.")
+            }
             "role" -> {
                 val role = nodeRepository.ourNodeInfo.value?.user?.role?.toString() ?: return noRadio
                 s("Twoje urządzenie ma ustawioną rolę $role.", "Your device is set to the role $role.")
@@ -1736,7 +1740,9 @@ class AssistantDataProvider(
                 if (names.isEmpty()) return noRadio
                 val fallback = aiString(Res.string.ai_scope_default)
                 val list = names.mapIndexed { i, c -> "• $i: ${c.name.ifBlank { fallback }}" + if (i == 0) s(" (główny)", " (primary)") else "" }
-                s("Masz ${names.size} kanałów. Kanał główny to ${names.first().name.ifBlank { fallback }}.\n", "You have ${names.size} channels. The primary channel is ${names.first().name.ifBlank { fallback }}.\n") + list.joinToString("\n")
+                val many = names.size
+                val plural = if (many == 1) "kanał" else if (many % 10 in 2..4 && many % 100 !in 12..14) "kanały" else "kanałów"
+                s("Masz $many $plural. Kanał główny to ${names.first().name.ifBlank { fallback }}.\n", "You have ${names.size} channels. The primary channel is ${names.first().name.ifBlank { fallback }}.\n") + list.joinToString("\n")
             }
             else -> null
         }

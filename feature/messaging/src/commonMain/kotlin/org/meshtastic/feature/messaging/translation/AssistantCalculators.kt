@@ -53,7 +53,7 @@ object AssistantCalculators {
         polishLabels = polish
         val q = question.lowercase().replace(' ', ' ')
         val t = Texts(polish)
-        return arithmetic(q, t) ?: airtimeTable(q, t) ?: airtime(q, t, defaults) ?: presetFacts(q, t) ?: presets(q, t, defaults) ?: range(q, t, defaults) ?: fresnel(q, t) ?: horizon(q, t) ?:
+        return arithmetic(q, t) ?: airtimeTable(q, t) ?: airtime(q, t, defaults) ?: presetFacts(q, t) ?: presets(q, t, defaults) ?: cableLoss(q, t) ?: range(q, t, defaults) ?: fresnel(q, t) ?: horizon(q, t) ?:
             pathLoss(q, t) ?: eirp(q, t) ?: power(q, t) ?: antenna(q, t) ?: wavelength(q, t)
     }
 
@@ -408,6 +408,22 @@ object AssistantCalculators {
         return t.s(
             "Strefa Fresnela dla ${t.n(d, 2)} km przy ${t.n(f, 2)} MHz: w połowie trasy ma promień ok. ${t.n(r)} m. Żeby łącze działało dobrze, co najmniej 60 % (ok. ${t.n(r * 0.6)} m) powinno być wolne od przeszkód.",
             "Fresnel zone for ${t.n(d, 2)} km at ${t.n(f, 2)} MHz: at mid-path its radius is about ${t.n(r)} m. For a good link at least 60 % (about ${t.n(r * 0.6)} m) should be free of obstacles.",
+        )
+    }
+
+    /** Typical loss of coaxial cables in dB per metre near 868 MHz (manufacturers' tables at 1000 MHz, so ours is a little lower). */
+    private val CABLES = listOf("lmr-?400" to ("LMR-400" to 0.13), "rg-?213" to ("RG-213" to 0.23), "rg-?8x" to ("RG-8X" to 0.42), "rg-?58" to ("RG-58" to 0.8))
+
+    /** "How much does 10 m of LMR-400 lose": length times the cable's loss per metre. */
+    private fun cableLoss(q: String, t: Texts): String? {
+        if (!has(q, "tłumieni|tlumieni|strat|traci|loss|attenuat|ile db")) return null
+        val (name, perMetre) = CABLES.firstOrNull { has(q, it.first) }?.second ?: return null
+        val length = metres(q).firstOrNull() ?: return null
+        val loss = length * perMetre
+        val half = if (loss >= 3.0) t.s(" To już ponad połowa mocy.", " That is already more than half the power.") else ""
+        return t.s(
+            "Kabel $name: ok. ${t.n(perMetre, 2)} dB na metr, więc ${t.n(length)} m to około ${t.n(loss)} dB straty (moc spada do ${t.n(100 * 10.0.pow(-loss / 10.0), 0)} %).$half Wartość z tabel producentów przy 1000 MHz; dla naszych 868 MHz strata jest trochę mniejsza.",
+            "Cable $name: about ${t.n(perMetre, 2)} dB per metre, so ${t.n(length)} m loses about ${t.n(loss)} dB (power drops to ${t.n(100 * 10.0.pow(-loss / 10.0), 0)} %).$half The value is from manufacturers' tables at 1000 MHz; at our 868 MHz the loss is a little lower.",
         )
     }
 

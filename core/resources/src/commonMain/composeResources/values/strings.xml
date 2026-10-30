@@ -3223,7 +3223,7 @@
     <string name="ai_model_hearing">Understands speech</string>
     <string name="ai_models_empty">There are no models for this function on this device.</string>
     <string name="ai_models_advice_assistant">For the assistant we recommend the Gemma 4 family (E2B, E4B and larger): it answers most accurately and understands Polish best. Models from other families (Qwen, Bielik) stay as an option for weaker phones.</string>
-    <string name="ai_models_advice_assistant_warning">Note: we cannot guarantee 100% that this model\'s answers are right. We advise checking them elsewhere. This model does not use the internet.</string>
+    <string name="ai_models_advice_assistant_warning">Note: we cannot guarantee 100% that this model\'s answers are right. We advise checking them elsewhere. With the internet switched on, this model only quotes the search results, in no words of its own.</string>
     <string name="ai_models_advice_dictation">For dictation we recommend the Whisper models: they are accurate, fast and light.</string>
     <string name="ai_models_hint">Nothing is downloaded by itself. Each model is a separate download; the first one also installs a small engine program. Deleting a model does not remove the others.</string>
     <string name="ai_unload_title">Free AI memory</string>

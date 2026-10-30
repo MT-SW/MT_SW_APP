@@ -555,6 +555,17 @@ class LlamaAssistantService(
                 else "I do not know or store any passwords, Wi-Fi ones included. Your Wi-Fi password is on your router or in your phone settings."
                 ).also(onPiece)
         }
+        // "What is the ROUTER_LATE role": described by the app from the documentation, word for word, whichever model is chosen.
+        if (ROLE_DEF.containsMatchIn(lower) && !CHANGE_ASK.containsMatchIn(lower) && !data.mentionsNode(lower) &&
+            intent.intent !in setOf("open_screen", "show_setting", "draft_message")
+        ) {
+            val name = ROLE_DEF_NAME.find(question)?.value?.uppercase()
+            val info = name?.let { (if (polish) ROLE_INFO_PL else ROLE_INFO_EN)[it] }
+            if (info != null) {
+                lastRoute = "role description"
+                return "$name: $info\n\n" .plus(if (polish) "Źródło: Baza wiedzy: Role urządzenia i retransmisja" else "Source: Knowledge base: device roles and rebroadcast").also(onPiece)
+            }
+        }
         // "Why does a message say undelivered": a question for the knowledge base, not the app's status page.
         if (intent.intent == "app_status" && WHY_ASK.containsMatchIn(lower)) {
             return fromBase(modelId, history, question, intent.text, polish, answerLang, onPiece, roomFor(modelId))
@@ -566,7 +577,9 @@ class LlamaAssistantService(
         }
         // "Which region should I set" or "how do I change the region": described, and fitted to the user's place (the radio's
         // position first, else the phone's), worked out in code; a button leads to the setting.
-        if (REGION_WORD.containsMatchIn(lower) && REGION_ASK.containsMatchIn(lower) && !GENERAL_QUESTION.containsMatchIn(lower)) {
+        if (REGION_WORD.containsMatchIn(lower) && REGION_ASK.containsMatchIn(lower) && !GENERAL_QUESTION.containsMatchIn(lower) &&
+            !OWN_CONFIG_ASK.containsMatchIn(lower) && !SET_COMMAND.containsMatchIn(lower)
+        ) {
             guideTools.show_setting("region")
             return data.regionAdvice().also(onPiece)
         }
@@ -593,7 +606,7 @@ class LlamaAssistantService(
             return data.nodesByRole(role).also(onPiece)
         }
         // RSSI or SNR of a named node comes from the app's own numbers, never from the model.
-        if (nodeNum != null && SIGNAL_NODE_ASK.containsMatchIn(lower) && data.mentionsNode(lower) && intent.intent in DATA_INTENTS + "chat") {
+        if (nodeNum != null && SIGNAL_NODE_ASK.containsMatchIn(lower) && data.mentionsNode(lower) && intent.intent in DATA_ASK_INTENTS && !DEFINE_ASK.containsMatchIn(lower)) {
             return data.nodeSignal(nodeNum).also(onPiece)
         }
         // The time and the date are read from the phone's clock by the app, never guessed by the model.
@@ -659,8 +672,24 @@ class LlamaAssistantService(
             if (ONLINE_ASK.containsMatchIn(lower) && intent.intent !in setOf("open_screen", "show_setting")) data.nodeFacts(nodeNum)?.let { return it.also(onPiece) }
         }
         // "Open the node list": a command whichever intent the small model chose (it described steps it made up).
-        if (OPEN_ONLY.containsMatchIn(lower) && intent.intent in setOf("web_question", "chat") && !data.mentionsNode(lower)) {
+        if (OPEN_ONLY.containsMatchIn(lower) && intent.intent in setOf("web_question", "chat", "messages_to_me") && !data.mentionsNode(lower)) {
             return exact(goToPlace("", question, settingFirst = false))!!
+        }
+        // "Who wrote to me": the private messages to the user, not a search of every message.
+        if (TO_ME_ASK.containsMatchIn(lower) && intent.intent in DATA_ASK_INTENTS + MESSAGE_ASK_INTENTS + "search_messages" && !ABOUT_TOPIC.containsMatchIn(lower)) {
+            return data.recentToMe(LIST_SHOWN).also(onPiece)
+        }
+        // "How many messages did X write": counted from that sender.
+        if (nodeNum != null && MSG_FROM_NODE.containsMatchIn(lower) && data.mentionsNode(lower)) {
+            return data.toolMessages(data.nodeNameFor(nodeNum), SEARCH_SHOWN, "", senderNum = nodeNum).also(onPiece)
+        }
+        // "Go to node X": the node opens on the map, whichever intent the model chose.
+        if (nodeNum != null && OPEN_NODE.containsMatchIn(lower) && data.mentionsNode(lower) && !Regex("plan|łącz|lacz|link").containsMatchIn(lower)) {
+            return exact(goToNode(nodeNum, intent.node, planner = false))!!
+        }
+        // "A short report on the network": the app's own overview, not a story by the model.
+        if (NETWORK_REPORT.containsMatchIn(lower) && !data.mentionsNode(lower) && intent.intent in DATA_ASK_INTENTS - "nearest_node" && !HOW_TO.containsMatchIn(lower)) {
+            return data.networkOverview().also(onPiece)
         }
         // Nearest or farthest nodes, nodes heard in a period, packet statistics, the uptime of the user's own radio and the
         // favourites are read from the app's data, whichever intent a small model chose (it answered with the user's own
@@ -676,6 +705,19 @@ class LlamaAssistantService(
                 if (DIRECT_WORDS.containsMatchIn(lower)) return data.networkCount().also(onPiece)
                 val window = if (TODAY_WORDS.containsMatchIn(lower)) "today" to 0 else explicitPeriod(lower)
                 if (window != null) return data.findNodesFor(window.first, window.second, false, false).also(onPiece)
+            }
+            if (OWN_AIR.containsMatchIn(lower) && !WHICH_WORDS.containsMatchIn(lower) && intent.intent in DATA_ASK_INTENTS) return data.radioStats().also(onPiece)
+            if (HOW_MANY.containsMatchIn(lower) && ROLE_WORDS.containsMatchIn(lower) && !NEAR_FAR.containsMatchIn(lower) && intent.intent in DATA_ASK_INTENTS &&
+                !asksHow(lower) && !Regex("kosztuj|cena|price|cost").containsMatchIn(lower)
+            ) {
+                val roleKey =
+                    when {
+                        Regex("router|ruter").containsMatchIn(lower) -> "router"
+                        Regex("repeater|przeka").containsMatchIn(lower) -> "repeater"
+                        Regex("czujnik|sensor").containsMatchIn(lower) -> "sensor"
+                        else -> "tracker"
+                    }
+                return data.nodesByRole(roleKey).also(onPiece)
             }
             if (INACTIVE_ASK.containsMatchIn(lower) && intent.intent in DATA_ASK_INTENTS && !HOW_TO.containsMatchIn(lower)) return data.silentNodes().also(onPiece)
             if (PACKET_STATS_ASK.containsMatchIn(lower) && intent.intent in DATA_ASK_INTENTS) return data.radioStats().also(onPiece)
@@ -711,7 +753,7 @@ class LlamaAssistantService(
                         else -> "days" to 1
                     }
                 val text =
-                    if (MOST_WRITTEN.containsMatchIn(lower)) data.countMessagesFor("", period, amount)
+                    if (MOST_WRITTEN.containsMatchIn(lower)) data.countMessagesFor(intent.channel.ifBlank { CHANNEL_NAMED.find(question)?.groupValues?.get(1).orEmpty() }, period, amount)
                     else data.toolMessages("", SEARCH_SHOWN, "")
                 return text.also(onPiece)
             }
@@ -776,11 +818,22 @@ class LlamaAssistantService(
             when (intent.intent) {
                 "show_node_on_map" -> exact(goToNode(nodeNum, intent.node, planner = false))
                 "open_link_planner" ->
-                    exact(goToNode(if (intent.node.isBlank() || !data.mentionsNode(lower)) data.resolveNodeNum("me", "") else nodeNum, "", planner = true))
+                    exact(goToNode(if (!data.mentionsNode(lower)) data.resolveNodeNum("me", "") else (data.resolveNodeNum("", question) ?: nodeNum), "", planner = true))
                 "nearest_node" -> exact(goToNearest(role, intent.metric == "farthest"))
                 "open_screen" -> exact(goToPlace(intent.text, question, settingFirst = false))
                 "show_setting" -> exact(goToPlace(intent.text, question, settingFirst = true))
-                "draft_message" -> exact(draft(intent.channel.ifBlank { intent.node }, intent.text))
+                "draft_message" -> {
+                    // The words the user wrote are the message; a small model made up its own text (or changed a word).
+                    val own = draftText(question)
+                    if (own == null && smallModel(modelId)) {
+                        exact(
+                            if (polish) "Podaj treść wiadomości, np. „Napisz na kanale MT_SW, że jestem na miejscu”. Nie wymyślam treści za Ciebie."
+                            else "Give me the text of the message, for example \"Write on channel MT_SW that I am on site\". I do not make up the text for you.",
+                        )
+                    } else {
+                        exact(draft(intent.channel.ifBlank { intent.node }, own ?: intent.text))
+                    }
+                }
                 "count_messages" ->
                     exact(
                         if (intent.metric == "per_channel") data.channelReport()
@@ -1007,6 +1060,31 @@ class LlamaAssistantService(
         val query = listOf(question, topic).joinToString(" ").trim()
         val facts =
             (if (baseOnly) knowledge?.lookupBaseOnly(query, BASE_CHARS * room, language) else knowledge?.lookupBase(query, BASE_CHARS * room, language)).orEmpty()
+        // A small model (or any model outside the Gemma family) never retells web results in its own words: the app quotes them.
+        val small = smallModel(modelId)
+        if (!baseOnly && !webModel(modelId) && (small || facts.isBlank())) {
+            if (small && facts.isNotBlank()) {
+                quotedEntry(question, facts, polish)?.let {
+                    lastRoute = "quoted knowledge-base entry"
+                    return it.also(onPiece)
+                }
+            }
+            if (CREATIVE_ASK.containsMatchIn(question.lowercase()) && facts.isBlank()) {
+                lastRoute = "refused: too small for this"
+                return smallRefusal(polish).also(onPiece)
+            }
+            if (uiPrefs.assistantInternetEnabled.value && webWanted(question, "")) {
+                val found = webTools.web_search(question.take(WEB_QUERY_CHARS))
+                if (found.isNotBlank()) {
+                    lastRoute = "quoted web results"
+                    return quoteWeb(found, question, polish).also(onPiece)
+                }
+            }
+            if (small) {
+                lastRoute = "not in the knowledge base"
+                return notInBase(polish, uiPrefs.assistantInternetEnabled.value).also(onPiece)
+            }
+        }
         if (facts.isBlank()) return null
         val web = if (uiPrefs.assistantInternetEnabled.value && webModel(modelId) && webWanted(question, facts)) webTools.web_search(question.take(WEB_QUERY_CHARS)) else ""
         Logger.i(tag = TAG) { "Knowledge base: ${facts.length} chars, web ${web.length} chars" }
@@ -1082,9 +1160,21 @@ class LlamaAssistantService(
     /** The smallest models (below the quote limit) invent steps and facts when the base has nothing: they are not left to improvise. */
     private fun smallModel(modelId: String) = (AiModels.byId(modelId)?.ramMb ?: Int.MAX_VALUE) < QUOTE_BELOW_RAM_MB
 
-    private fun notInBase(polish: Boolean) =
-        if (polish) "Nie mam na to pytanie wpisu w bazie wiedzy ani w instrukcji, więc nie będę zgadywać. Spróbuj zapytać krótko i konkretnie (np. „jak dodać kanał”) albo poszukaj tego w wyszukiwarce ustawień."
-        else "I have no entry on this in the knowledge base or the manual, so I will not guess. Try a short, specific question (e.g. \"how do I add a channel\") or look it up in the settings search."
+    private fun notInBase(polish: Boolean, internetOn: Boolean = false) =
+        if (polish) {
+            "Nie mam na to pytanie wpisu w bazie wiedzy ani w instrukcji, więc nie będę zgadywać. " +
+                (if (internetOn) "W internecie też nie znalazłem jasnej odpowiedzi. " else "Możesz włączyć internet w ustawieniach asystenta, wtedy poszukam tam. ") +
+                "Spróbuj zapytać krótko i konkretnie (np. „jak dodać kanał”) albo poszukaj tego w wyszukiwarce ustawień."
+        } else {
+            "I have no entry on this in the knowledge base or the manual, so I will not guess. " +
+                (if (internetOn) "I found no clear answer on the internet either. " else "You can switch the internet on in the assistant settings and I will look there. ") +
+                "Try a short, specific question (e.g. \"how do I add a channel\") or look it up in the settings search."
+        }
+
+    /** A task a very small model does badly (jokes, poems, code, stories): said plainly instead of a made-up answer. */
+    private fun smallRefusal(polish: Boolean) =
+        if (polish) "Ten model jest za mały, żeby zrobić to dobrze (dowcipy, wiersze, kod, opowiadania). Zapytaj o sieć mesh, radio lub aplikację albo wybierz większy model, np. Gemma, w ustawieniach asystenta."
+        else "This model is too small to do that well (jokes, poems, code, stories). Ask about the mesh network, the radio or the app, or pick a larger model such as Gemma in the assistant settings."
 
     /** The internet is a fallback only for the stronger models (the Gemma family); the weaker ones are not given web results. */
     private fun webModel(modelId: String): Boolean = AiModels.byId(modelId)?.name?.startsWith("Gemma 4") == true
@@ -1128,6 +1218,16 @@ class LlamaAssistantService(
         return handle(AssistantIntent(kind, topic = "other"), modelId, history, question, polish, onPiece)
     }
 
+    /** The message text the user wrote: in quotes, or after "że" / "wiadomość:"; null when the question gives none. */
+    private fun draftText(question: String): String? {
+        QUOTED_TEXT.find(question)?.groupValues?.get(1)?.trim()?.takeIf { it.isNotEmpty() }?.let { return it }
+        val m = DRAFT_THAT.find(question) ?: return null
+        val raw = m.groupValues[1].ifBlank { m.groupValues[2] }
+        val cleaned = raw.replace(Regex("(?iu)\\s*\\((nie wysyłaj|nie wysylaj|don.t send|do not send)[^)]*\\)\\s*"), " ").trim().trimEnd('.', '!', '?', ' ')
+        if (cleaned.isEmpty()) return null
+        return cleaned.replaceFirstChar { it.uppercase() } + "."
+    }
+
     private suspend fun goToNode(num: Int?, asked: String, planner: Boolean): String {
         if (num == null) return data.unknownNode(asked.ifBlank { "?" })
         val name = data.nodeNameFor(num).ifBlank { asked }
@@ -1162,13 +1262,15 @@ class LlamaAssistantService(
                 listOf<(String) -> Unit>({ guideTools.open_screen(it) }, { guideTools.show_setting(it) })
             }
         val before = collector.size()
-        loop@ for (words in listOf(what, question).filter { it.isNotBlank() }) {
+        // "Open the display settings": the generic word "settings" must not win over the word that names the place.
+        val bare = question.replace(Regex("(?iu)(?<![\\p{L}])(ustawieni\\p{L}*|settings?)(?![\\p{L}])"), " ").replace(Regex("\\s+"), " ").trim()
+        loop@ for (words in listOf(what, bare, question).filter { it.isNotBlank() }.distinct()) {
             for (attempt in attempts) {
                 attempt(words)
                 if (collector.size() > before) {
                     // The router's words of a small model are often wrong: the found place must share a word with the question.
                     val label = collector.last()?.label.orEmpty()
-                    val fits = words == question || (stems(label) - STOP_STEMS).any { it in stems(question) } || stems(label).isEmpty()
+                    val fits = words == question || words == bare || (stems(label) - STOP_STEMS).any { it in stems(question) } || stems(label).isEmpty()
                     if (fits) break@loop
                     collector.drain()
                 }
@@ -1599,12 +1701,54 @@ class LlamaAssistantService(
         val ADVICE_INTENTS = setOf("app_help", "chat", "network_question", "signal_list", "web_question")
         /** The question is about the user's own radio ("ktoś mnie słabo słyszy", "mam słaby zasięg"), not a general one. */
         val OWN_RANGE = Regex("(?iu)\\b(mam|mój|moj\\p{L}*|mnie|mi|u mnie|moim|my|me|i have)\\b|jak (poprawić|zwiększyć|poprawic|zwiekszyc)|how (can|do) i (improve|increase)")
-        val INACTIVE_ASK = Regex("(?iu)nieaktywn|milcz|nie odzywa|nie odezwa|dawno nie|inactive|silent|not heard|haven.t been heard")
+        val CREATIVE_ASK = Regex("(?iu)dowcip|żart|zart|wiersz|opowiadani|piosenk|kod w |napisz (mi )?(kod|program|skrypt)|joke|poem|story|python|opowiedz (mi )?(coś|cos|bajk)|nudzę|nudze|poleć mi|polec mi")
+        val TO_ME_ASK = Regex("(?iu)(kto|czy ktoś|czy ktos).*(pisał|pisal|napisał|napisal|odezwał|odezwal).*(do mnie|mi)(?![\\p{L}])|wiadomo\\p{L}* do mnie|who wrote to me|messages (sent )?to me")
+        val MSG_FROM_NODE = Regex("(?iu)(ile|how many).*(wiadomo|message).*(napisał|napisal|wysłał|wysyłał|wyslal|pisał|pisal|sent|wrote)")
+        val CHANNEL_NAMED = Regex("(?iu)(?:na kanale|w kanale|kanał|kanale|channel)\\s+[„\"]?([\\p{L}\\p{N}_-]+)")
+        val OPEN_NODE = Regex("(?iu)^\\s*(otwórz|otworz|przejdź|przejdz|pokaż|pokaz|open|go to|show)\\s.*(węzeł|wezel|węzła|wezla|węzła|node)")
+        val NETWORK_REPORT = Regex("(?iu)(raport|stan|stanie|status|podsumuj|podsumowanie).*(sieci|siec\\b|network)|network (status|report)|jak wygląda (moja |nasza )?sie")
+        val OWN_AIR = Regex("(?iu)(airtime|zajętość kanału|zajetosc kanalu|obciążenie kanału|channel utili[sz]ation).*(mój|moj|mojego|moim|mam|my\\b)|(mój|moj|moim|my)\\s+(airtime|zajętość|obciążenie|channel)|(?<![\\p{L}])mój airtime|my airtime")
+        val DEFINE_ASK = Regex("(?iu)^\\s*(co to|czym (jest|są|sa)|co znaczy|what (is|does|are)|what's|wyjaśnij|wyjasnij|explain)")
+        val DRAFT_THAT = Regex("(?iu)(?:,\\s*|\\s)(?:że|ze|aby|żeby)\\s+(.+?)\\s*$|(?:wiadomość|wiadomosc|treść|tresc|message|text)\\s*[:\\-]\\s*(.+?)\\s*$")
+        val QUOTED_TEXT = Regex("[„\"«](.+?)[”\"»]")
+        val ROLE_DEF = Regex("(?iu)(co to|czym (jest|są|sa)|kiedy używać|kiedy uzywac|do czego (służy|sluzy)|what is|when (to|should i) use).*(?<![\\p{L}_])(client_mute|client_hidden|client_base|router_late|repeater|tak_tracker|lost_and_found|tracker|sensor|router|client|tak)(?![\\p{L}_])")
+        val ROLE_DEF_NAME = Regex("(?iu)(?<![\\p{L}_])(client_mute|client_hidden|client_base|router_late|repeater|tak_tracker|lost_and_found|tracker|sensor|router|client|tak)(?![\\p{L}_])")
+        val ROLE_INFO_PL =
+            mapOf(
+                "CLIENT" to "urządzenie z aplikacją lub samodzielne; retransmituje pakiet, gdy nikt inny tego nie zrobił. To rola domyślna i najlepsza dla większości użytkowników.",
+                "CLIENT_MUTE" to "nie przekazuje cudzych pakietów dalej. Dla miejsc z wieloma węzłami albo dla węzła, który ma tylko wysyłać i odbierać własne wiadomości.",
+                "CLIENT_HIDDEN" to "nadaje tylko w razie potrzeby (dyskrecja lub oszczędzanie energii).",
+                "CLIENT_BASE" to "osobista stacja bazowa: zawsze retransmituje pakiety od swoich ulubionych węzłów i do nich, poza tym działa jak CLIENT.",
+                "ROUTER" to "węzeł infrastruktury do zwiększania zasięgu sieci; zawsze retransmituje pakiet raz i jest widoczny na liście węzłów. Stawia się go w dobrym, wysokim miejscu.",
+                "ROUTER_LATE" to "węzeł infrastruktury, który retransmituje pakiet raz dopiero po wszystkich innych, dzięki czemu pokrywa lokalne skupisko; widoczny na liście węzłów.",
+                "REPEATER" to "jak ROUTER, z minimalnym narzutem, ale niewidoczny na liście węzłów; rola oznaczona jako przestarzała od firmware 2.7.11.",
+                "TRACKER" to "ma priorytet w wysyłaniu pozycji GPS; dla urządzeń noszonych albo montowanych w pojazdach.",
+                "SENSOR" to "ma priorytet w wysyłaniu telemetrii, czyli danych z czujników.",
+                "TAK" to "rola do współpracy z ATAK (aplikacją TAK).",
+                "TAK_TRACKER" to "wysyła PLI (informację o pozycji) niezależnie od ATAK; dla urządzeń z GPS.",
+                "LOST_AND_FOUND" to "rozgłasza pozycję urządzenia, żeby łatwiej było je odnaleźć, gdy się zgubi.",
+            )
+        val ROLE_INFO_EN =
+            mapOf(
+                "CLIENT" to "a device with the app or standalone; it rebroadcasts a packet when nobody else did. The default role and the best one for most users.",
+                "CLIENT_MUTE" to "does not pass on other people's packets. For places with many nodes, or a node that only sends and receives its own messages.",
+                "CLIENT_HIDDEN" to "transmits only when needed (discretion or saving power).",
+                "CLIENT_BASE" to "a personal base station: always rebroadcasts packets from and to its favourite nodes, otherwise works like CLIENT.",
+                "ROUTER" to "an infrastructure node that extends the network's range; it always rebroadcasts a packet once and is visible in the node list. It belongs in a good, high place.",
+                "ROUTER_LATE" to "an infrastructure node that rebroadcasts a packet once, only after all the others, so it covers a local cluster; visible in the node list.",
+                "REPEATER" to "like ROUTER with minimal overhead, but not visible in the node list; the role has been deprecated since firmware 2.7.11.",
+                "TRACKER" to "has priority in sending the GPS position; for worn or vehicle-mounted devices.",
+                "SENSOR" to "has priority in sending telemetry, that is sensor data.",
+                "TAK" to "a role for working with ATAK (the TAK app).",
+                "TAK_TRACKER" to "sends PLI (position information) independently of ATAK; for devices with GPS.",
+                "LOST_AND_FOUND" to "broadcasts the device's position so a lost device is easier to find.",
+            )
+        val INACTIVE_ASK = Regex("(?iu)nieaktywn|milcz|nie odzywa|nie odezwa|dawno nie|zniknęł|zniknel|inactive|silent|not heard|haven.t been heard|disappeared")
         val FORECAST_ASK = Regex("(?iu)prognoz|jutro|pojutrze|forecast|tomorrow|będzie (padać|padal|lać|zimno|ciepło)")
-        val SEND_ASK = Regex("(?iu)(czy|can).*(możesz|mozesz|potrafisz|you).*(wysł|wysl|send).*(wiadomo|message)|can you send")
+        val SEND_ASK = Regex("(?iu)(czy|can).*(możesz|mozesz|potrafisz|you|asystent (może|moze)).*(wysł|wysl|send).*(wiadomo|message)|can you send|czy asystent (może|moze) wysł")
         val LANG_ASK = Regex("(?iu)(umiesz|potrafisz|możesz|mozesz|can you|do you).*(po angielsku|po polsku|speak english|speak polish|angielsk)")
-        val OWN_CONFIG_ASK = Regex("(?iu)(jaki|jaką|jaka|jakie|ile|który|który jest|what|which|how many).*(mam|mój|moj\\p{L}*|my|have).*(preset|rol[ęea]|region|kanał|kanal|kanały|kanalow|channel)|ile (mam|jest) kanał")
-        val SET_COMMAND = Regex("(?iu)^\\s*(ustaw|zmień|zmien|set|change)\\s.*(moc|moc\\p{L}*|preset|region|rol[ęea]|power|role)")
+        val OWN_CONFIG_ASK = Regex("(?iu)(jaki|jaką|jaka|jakie|ile|który|który jest|what|which|how many).*(mam|mój|moj\\p{L}*|my|have).*(preset|rol[ęea]|region|kanał|kanal|kanały|kanalow|channel|limit\\s+(skok|przeskok)\\p{L}*|hop limit)|ile (mam|jest) kanał")
+        val SET_COMMAND = Regex("(?iu)^\\s*(ustaw|zmień|zmien|zapisz|set|change)\\s.*((?<![\\p{L}])moc\\p{L}*|preset|region|(?<![\\p{L}])rol\\p{L}*|power|role|limit)")
         val OWN_WORDS_RANGE = Regex("(?iu)(?<![\\p{L}])(my|mój|moj\\p{L}*|mnie|mam|i)(?![\\p{L}])")
         val BATTERY_TYPE_ASK = Regex("(?iu)(jaka|jaki|jakie|which|what) (bateri|akumulator|ogniw|battery|cell)")
         val NOT_OVERVIEW = Regex("(?iu)(what|co to jest|czym jest|wyjaśnij|explain|summary of what).*(meshtastic|lora|mesh)(?! network)")
@@ -1754,7 +1898,7 @@ class LlamaAssistantService(
         val HOW_MANY = Regex("(?iu)(?<![\\p{L}])(ile|ilu|how many)(?![\\p{L}])")
         val NODE_COUNT_ASK = Regex("(?iu)liczb\\p{L}* (znanych |wszystkich )?węzł|ile (jest |mam )?(teraz |obecnie )?(znanych |wszystkich )?węzł|how many (known )?nodes")
         val ROLE_LIST_ASK = Regex("(?iu)pokaż|pokaz|wszystkie|które|ktore|lista|wymień|wymien|show|list|which")
-        val NODE_FACTS_ASK = Regex("(?iu)jaki sprzęt|jakie urządzenie|jaką rolę|jaka rola|what role|co to za (sprzęt|urządzenie|węzeł)|jaką wersję firmware|jaki firmware|wersj\\p{L}* (firmware|oprogramowania)|kiedy (ostatnio )?(go )?słysz|ostatnio słysz|w jakiej odległości|jak daleko jest|ile skoków|what hardware|which device|firmware version|when .*last heard|how far is")
+        val NODE_FACTS_ASK = Regex("(?iu)z ilu skok\\p{L}*|ilu skok\\p{L}*|how many hops|jaki sprzęt|jakie urządzenie|jaką rolę|jaka rola|what role|co to za (sprzęt|urządzenie|węzeł)|jaką wersję firmware|jaki firmware|wersj\\p{L}* (firmware|oprogramowania)|kiedy (ostatnio )?(go )?słysz|ostatnio słysz|w jakiej odległości|jak daleko jest|ile skoków|what hardware|which device|firmware version|when .*last heard|how far is")
         val TIME_ASK =
             Regex(
                 "(?iu)(która|ktora|jaka)\\s+(jest\\s+)?(teraz\\s+)?godzin\\p{L}*|(jaki|jaka)\\s+(jest\\s+)?(dzi\\p{L}*|dzisiaj)\\s+(dzień|dzien|data)|jaka\\s+(jest\\s+)?(dzi\\p{L}*\\s+)?data|" +

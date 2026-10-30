@@ -61,8 +61,33 @@ class GemmaTranslator(private val engine: AiTextEngine) {
             val again = ask("$prompt\n\nTranslate the whole text, every word of it, not only the names.")
             if (again.length > reply.length) reply = again
         }
+        // Names, numbers with units and links must come out as they went in; when one was changed or lost, the model gets one more try.
+        val lost = lostTokens(text, reply)
+        if (lost.isNotEmpty()) {
+            val again = ask("$prompt\n\nImportant: keep exactly as written, do not change or translate: ${lost.joinToString(", ")}.")
+            if (again.isNotBlank() && lostTokens(text, again).size < lost.size) reply = again
+        }
         return reply.ifBlank { text }
     }
+
+    /** Words of the source that must stay as they are: names with digits or underscores, capitals, links, numbers (with their units). */
+    private fun mustKeep(text: String): List<String> {
+        val out = LinkedHashSet<String>()
+        Regex("\\d+(?:[.,]\\d+)?\\s?(?:dBi|dBm|dB|MHz|kHz|GHz|km|mW|%)").findAll(text).forEach { out += it.value }
+        Regex("\\d{2,}(?:[.,]\\d+)?").findAll(text).forEach { out += it.value }
+        for (w in text.split(Regex("\\s+"))) {
+            val x = w.trim(',', '.', ';', ':', '!', '?', '(', ')', '„', '”', '"')
+            val code = x.length >= 3 && x.all { it.isUpperCase() || it.isDigit() || it == '_' } && x.any { it.isLetter() }
+            if (x.length >= 3 && (x.startsWith("http") || x.contains('_') || (x.any { it.isDigit() } && x.any { it.isLetter() }) || code)) out += x
+        }
+        return out.toList()
+    }
+
+    private fun lostTokens(source: String, reply: String): List<String> =
+        mustKeep(source).filter { k ->
+            !reply.contains(k, ignoreCase = true) &&
+                !(k.any { it.isDigit() } && (reply.contains(k.replace(',', '.')) || reply.contains(k.replace('.', ','))))
+        }
 
     /** The translation without the frame small models add: code fences, a JSON wrapper, quotes, a "Translation:" label. */
     private fun clean(raw: String): String {
