@@ -1,0 +1,12 @@
+<!-- Baza wiedzy MT_SW: dostępność (availability) urządzeń MQTT w Home Assistant, czyli temat online i offline. Tylko informacyjnie. -->
+# Home Assistant: dostępność urządzeń MQTT
+
+### Jak Home Assistant pokazuje, że urządzenie MQTT jest online albo offline?
+Dostępność (availability) urządzenia MQTT określa temat availability_topic, który Home Assistant subskrybuje. Domyślna wartość gotowości to online, a niedostępności to offline. Jeśli wpiszesz własne wartości, zmieniają się one przez payload_available i payload_not_available. Opcja availability_mode działa tylko przy liście availability i ma domyślnie wartość latest, czyli liczy się ostatnia wiadomość z dowolnego tematu. Tryb all wymaga gotowości na każdym temacie, a any wystarczy jednego. Dostępność to czy urządzenie odpowiada, a stan to wartość z tematu stanu, np. ON, OFF albo odczyt czujnika. Gdy urządzenie jest niedostępne, jego stan nie nadaje się do odczytu. Wniosek, że lista tematów pomaga przy wielu źródłach, to z ogólnej wiedzy.
+Słowa: home assistant availability, dostępność mqtt, online, offline, availability_topic, payload_available, payload_not_available, availability_mode, latest, all, any, niedostępny, czujnik niedostępny, stan vs dostępność
+Źródło: https://www.home-assistant.io/integrations/mqtt/ (sprawdzono 2026-10; oficjalna dokumentacja Home Assistant; wniosek o wielu tematach z ogólnej wiedzy)
+
+### Jak Mosquitto i Last Will wpływają na status offline w Home Assistant?
+Last Will to wiadomość, którą broker MQTT wysyła w imieniu klienta, gdy ten nagle się rozłączy. Dostępność w Home Assistant może opierać się na takiej wiadomości, żeby urządzenie pokazało offline bez ręcznego działania. Dokumentacja Home Assistant opisuje, że wiadomość z flagą retain zostaje u brokera i po restarcie Home Assistant od razu dostaje aktualny stan dostępności. Bez flagi retain po restarcie urządzenie pokaże się jako niedostępne, dopóki nie przyjdzie nowa wiadomość. Brak tematu dostępności oznacza, że Home Assistant uważa urządzenie za dostępne. Mechanizm Last Will na poziomie brokera jest z ogólnej wiedzy, a nie z tego źródła.
+Słowa: last will, testament, will_set, retain, wiadomość retained, status offline, po restarcie, broker, odłączenie klienta, nagłe rozłączenie, mqtt status, brak availability, domyślnie dostępne
+Źródło: https://www.home-assistant.io/integrations/binary_sensor.mqtt/ (sprawdzono 2026-10; oficjalna dokumentacja Home Assistant; mechanizm Last Will na poziomie brokera z ogólnej wiedzy)
