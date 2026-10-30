@@ -233,6 +233,7 @@ Natywny **Mesh Link Planer** (symulacja zasięgu radiowego, dostępny na Android
 - Brak oficjalnych release'ów/tagów — zmiany trzymane na bieżąco na gałęzi `main`.
 - Pełna lista zmian forka: [CHANGELOG.md](CHANGELOG.md) (sekcja „MT_SW — zmiany forka”).
 - Fork korzysta z tej samej licencji GPL-3.0 co projekt macierzysty.
+- Nazwa MT_SW, logo i nasze teksty: zasady opisuje [NAZWA-I-PRAWA.md](NAZWA-I-PRAWA.md). Licencja GPL daje prawo do kodu, a nie do nazwy.
 
 ---
 *Bazuje na [meshtastic/Meshtastic-Android](https://github.com/meshtastic/Meshtastic-Android). Nieoficjalny, niezwiązany z Meshtastic LLC.*
@@ -477,6 +478,7 @@ The native **Mesh Link Planner** (radio coverage simulation, available on Androi
 - No official releases/tags — changes are kept up to date directly on the `main` branch.
 - Full list of fork changes: [CHANGELOG.md](CHANGELOG.md) (section “MT_SW — fork changes”).
 - The fork uses the same GPL-3.0 license as the upstream project.
+- The MT_SW name, logos and our texts: see [NAZWA-I-PRAWA.md](NAZWA-I-PRAWA.md). The GPL grants rights to the code, not to the name.
 
 ---
 *Based on [meshtastic/Meshtastic-Android](https://github.com/meshtastic/Meshtastic-Android). Unofficial, not affiliated with Meshtastic LLC.*
