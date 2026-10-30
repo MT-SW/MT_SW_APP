@@ -153,6 +153,9 @@ object AiModels {
     const val WHISPER_SMALL = "whisper-small-q5"
     const val WHISPER_MEDIUM = "whisper-medium-q5"
     const val WHISPER_TURBO = "whisper-large-v3-turbo-q5"
+    const val WHISPER_SMALL_Q8 = "whisper-small-q8"
+    const val WHISPER_MEDIUM_Q8 = "whisper-medium-q8"
+    const val WHISPER_TURBO_Q8 = "whisper-large-v3-turbo-q8"
 
     /** True when the assistant screen exists. */
     const val ASSISTANT_SCREEN_READY = true
@@ -559,6 +562,27 @@ object AiModels {
             "The most accurate dictation model in this list, and still fairly fast.",
         )
 
+    // The same models in the Q8_0 format: the Hexagon NPU of Snapdragon phones does the matrix work only for Q4_0, Q8_0
+    // and FP16 (not for Q5), so these are the ones that can run on the NPU. Bigger files, a little slower on the processor.
+    val WhisperSmallQ8 =
+        whisper(
+            WHISPER_SMALL_Q8, "Whisper small (Q8)", "ggml-small-q8_0.bin", 264, 1000,
+            "Mały model do dyktowania w formacie Q8: może działać na NPU telefonu ze Snapdragonem, na procesorze jest nieco większy niż zwykły.",
+            "A small dictation model in the Q8 format: it can run on the NPU of a Snapdragon phone, on the processor it is a little bigger than the normal one.",
+        )
+    val WhisperMediumQ8 =
+        whisper(
+            WHISPER_MEDIUM_Q8, "Whisper medium (Q8)", "ggml-medium-q8_0.bin", 823, 2200,
+            "Dokładny model do dyktowania, także dla polskiego, w formacie Q8: może działać na NPU telefonu ze Snapdragonem.",
+            "An accurate dictation model, also for Polish, in the Q8 format: it can run on the NPU of a Snapdragon phone.",
+        )
+    val WhisperTurboQ8 =
+        whisper(
+            WHISPER_TURBO_Q8, "Whisper large v3 turbo (Q8)", "ggml-large-v3-turbo-q8_0.bin", 874, 2500,
+            "Najdokładniejszy model do dyktowania w formacie Q8: może działać na NPU telefonu ze Snapdragonem.",
+            "The most accurate dictation model in the Q8 format: it can run on the NPU of a Snapdragon phone.",
+        )
+
     /** Every model the app knows, for every platform. */
     val all: List<AiModelInfo> =
         listOf(
@@ -568,6 +592,7 @@ object AiModels {
             Bielik15b, Bielik45b, Bielik7b, Bielik11b, Pllum12b,
             TranslateGemma4b, TranslateGemma12b,
             WhisperBase, WhisperSmall, WhisperMedium, WhisperTurbo,
+            WhisperSmallQ8, WhisperMediumQ8, WhisperTurboQ8,
         )
 
     /** The models that exist on the platform the app runs on. */

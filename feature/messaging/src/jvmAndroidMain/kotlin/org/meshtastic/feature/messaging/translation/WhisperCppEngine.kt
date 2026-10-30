@@ -35,6 +35,8 @@ import org.meshtastic.core.common.util.nowMillis
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.util.UUID
 
 /**
@@ -102,30 +104,106 @@ class WhisperCppEngine(
         }
     }
 
+    /** One way to start the speech program: [chip] ones (NPU, graphics card) count only when they really work. */
+    private class Attempt(
+        val name: String,
+        val asset: ModelServerInstaller.Asset,
+        val chip: Boolean = false,
+        val dsp: Boolean = false,
+        val extra: List<String> = emptyList(),
+        val env: Map<String, String> = emptyMap(),
+    )
+
+    /** Which way the speech program runs now (for the log and the hardware report). */
+    @Volatile var backend: String = ""
+        private set
+
+    private val chipLines = StringBuilder()
+
     private suspend fun ensureLoaded(modelId: String): ModelServerProcess {
         server?.let { if (it.isAlive && loadedId == modelId) return it }
         unload()
         val model = store.fileOf(modelId) ?: error("Model $modelId is not downloaded")
-        val asset = installer.whisperAsset() ?: error("No speech program exists for this system")
-        val program = installer.install(asset)
-        val port = ModelServerProcess.freePort()
-        val threads = (Runtime.getRuntime().availableProcessors() / 2).coerceIn(2, MAX_THREADS)
-        val command =
-            installer.launchPrefix(program) +
-                listOf("-m", model.absolutePath, "--host", "127.0.0.1", "--port", port.toString(), "-l", "auto", "-t", threads.toString(), "-nt")
-        Logger.i(tag = TAG) { "Starting the speech program for $modelId" }
-        val started = ModelServerProcess.start(command, program.parentFile, port, File(logDir, "whisper-server.log"), File(logDir, PID_FILE)) {}
-        try {
-            started.awaitReady("/", LOAD_TIMEOUT_MS, anyAnswer = true)
-        } catch (e: Throwable) {
-            Logger.w(tag = TAG, throwable = e) { "The speech program did not start: ${e.message}\n${started.logTail().takeLast(MAX_TAIL)}" }
-            started.stop()
-            throw e
+        val cpu = installer.whisperAsset() ?: error("No speech program exists for this system")
+        // A phone first tries its NPU (Hexagon) and graphics card, then the processor. A chip that does not start, does
+        // not take part or fails a test run is skipped for some days for this model.
+        val attempts = buildList {
+            for (asset in installer.whisperChipAssets()) {
+                if (installer.isBroken(asset, modelId)) continue
+                val kind = asset.folder.substringAfterLast('-')
+                if (kind == "snapdragon") {
+                    add(Attempt("NPU (Hexagon)", asset, chip = true, dsp = true, extra = listOf("-fa"), env = mapOf("GGML_HEXAGON_DEVICES" to "1")))
+                } else {
+                    add(Attempt("graphics card ($kind)", asset, chip = true))
+                }
+            }
+            add(Attempt("processor", cpu))
         }
-        server = started
-        loadedId = modelId
-        store.reportLoaded(TAG, modelId)
-        return started
+        val threads = (Runtime.getRuntime().availableProcessors() / 2).coerceIn(2, MAX_THREADS)
+        var failure: Throwable? = null
+        for (attempt in attempts) {
+            val program =
+                if (attempt.chip) installer.installGpu(attempt.asset) else installer.install(attempt.asset)
+            if (program == null) {
+                Logger.w(tag = TAG) { "${attempt.name}: the program could not be downloaded (${installer.lastInstallError})" }
+                continue
+            }
+            val port = ModelServerProcess.freePort()
+            val command =
+                installer.launchPrefix(program) +
+                    listOf("-m", model.absolutePath, "--host", "127.0.0.1", "--port", port.toString(), "-l", "auto", "-t", threads.toString(), "-nt") +
+                    attempt.extra
+            val libDirs = buildList {
+                File(program.parentFile.parentFile, "lib").takeIf { it.isDirectory }?.let { add(it.absolutePath) }
+                if (attempt.chip) addAll(VENDOR_LIB_DIRS.filter { File(it).isDirectory })
+            }
+            val env = buildMap<String, String> {
+                putAll(attempt.env)
+                if (attempt.dsp) put("ADSP_LIBRARY_PATH", (listOf(program.parentFile.absolutePath) + DSP_DIRS).joinToString(";"))
+            }
+            Logger.i(tag = TAG) { "Starting the speech program for $modelId: ${attempt.name}" }
+            synchronized(chipLines) { chipLines.clear() }
+            val started =
+                ModelServerProcess.start(command, program.parentFile, port, File(logDir, "whisper-server.log"), File(logDir, PID_FILE), env, libDirs) { line ->
+                    if (CHIP_LINE.containsMatchIn(line)) synchronized(chipLines) { if (chipLines.length < MAX_TAIL) chipLines.appendLine(line.trim()) }
+                }
+            try {
+                started.awaitReady("/", LOAD_TIMEOUT_MS, anyAnswer = true)
+                if (attempt.chip) {
+                    val seen = synchronized(chipLines) { chipLines.toString() }
+                    check(CHIP_USED.containsMatchIn(seen)) { "the chip took no part: ${seen.takeLast(300)}" }
+                    // A chip can load the model and still fail or write nonsense: one second of silence must go through.
+                    withContext(Dispatchers.IO) { send(started, silence()) }
+                }
+            } catch (e: Throwable) {
+                if (e is CancellationException) {
+                    started.stop()
+                    throw e
+                }
+                Logger.w(tag = TAG, throwable = e) { "${attempt.name} did not work: ${e.message}\n${started.logTail().takeLast(MAX_TAIL)}" }
+                started.stop()
+                if (attempt.chip) installer.markBroken(attempt.asset, modelId)
+                failure = e
+                continue
+            }
+            server = started
+            loadedId = modelId
+            backend = attempt.name
+            Logger.i(tag = TAG) { "Speech program runs on: ${attempt.name}" }
+            store.reportLoaded(TAG, modelId)
+            return started
+        }
+        throw failure ?: IllegalStateException("The speech program could not be started")
+    }
+
+    /** One second of silence as a WAV file (16 kHz, mono, 16 bit): a test run for a chip. */
+    private fun silence(): ByteArray {
+        val data = BYTES_PER_SECOND.toInt()
+        val header = ByteBuffer.allocate(WAV_HEADER_BYTES).order(ByteOrder.LITTLE_ENDIAN)
+        header.put("RIFF".toByteArray()).putInt(36 + data).put("WAVE".toByteArray()).put("fmt ".toByteArray())
+        header.putInt(16).putShort(1).putShort(1).putInt(16_000).putInt(32_000).putShort(2).putShort(16)
+        header.put("data".toByteArray()).putInt(data)
+        return header.array() + ByteArray(data)
     }
 
     private fun send(running: ModelServerProcess, wav: ByteArray): String {
@@ -182,6 +260,10 @@ class WhisperCppEngine(
         const val PID_FILE = "whisper-server.pid"
         const val MAX_THREADS = 8
         const val WAV_HEADER_BYTES = 44
+        val VENDOR_LIB_DIRS = listOf("/vendor/lib64", "/system/vendor/lib64", "/odm/lib64")
+        val DSP_DIRS = listOf("/vendor/dsp/cdsp", "/vendor/lib/rfsa/adsp", "/vendor/dsp", "/system/lib/rfsa/adsp", "/dsp")
+        val CHIP_LINE = Regex("backend|HTP\\d|Hexagon|OpenCL|Vulkan|Adreno|device", RegexOption.IGNORE_CASE)
+        val CHIP_USED = Regex("using (HTP|Hexagon|OpenCL|Vulkan|GPU)|HTP\\d|ggml_opencl|ggml_vulkan|ggml-hex|Adreno|Found \\d+ Vulkan", RegexOption.IGNORE_CASE)
         const val BYTES_PER_SECOND = 32_000L
         const val MS_PER_SECOND = 1_000L
         const val LOAD_TIMEOUT_MS = 120_000L

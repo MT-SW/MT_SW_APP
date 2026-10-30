@@ -281,6 +281,28 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
         )
     }
 
+    /**
+     * The whisper.cpp builds that use the phone's chips, best first: the Hexagon NPU (Snapdragon only), then the
+     * graphics card (OpenCL on a Snapdragon, Vulkan on any phone). Our own builds (workflow "Build llama.cpp and
+     * whisper.cpp for Android"); the processor build is [whisperAsset]. Empty where there is no such build.
+     */
+    fun whisperChipAssets(): List<Asset> {
+        if (!android || !llamaSupported) return emptyList()
+        return buildList {
+            if (qualcomm) add(whisperChip("snapdragon", WHISPER_SNAPDRAGON_MB))
+            if (qualcomm) add(whisperChip("opencl", WHISPER_GPU_MB))
+            add(whisperChip("vulkan", WHISPER_GPU_MB))
+        }
+    }
+
+    private fun whisperChip(kind: String, sizeMb: Int) =
+        Asset(
+            url = "https://github.com/MT-SW/MT_SW_APP/releases/download/engines-$LLAMA_TAG/whisper-$WHISPER_REF-android-arm64-$kind.tar.gz",
+            folder = "whisper-$WHISPER_REF-android-arm64-$kind",
+            exeName = "whisper-server",
+            sizeMb = sizeMb,
+        )
+
     private fun llama(suffix: String, sizeMb: Int) =
         Asset(
             url = "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMA_TAG/llama-$LLAMA_TAG-bin-$suffix",
@@ -345,7 +367,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
 
     /** The Android archive carries many tools the app does not use (benchmarks, quantizers, ...); they only take space. */
     private fun prune(dir: File) {
-        val keep = Regex("whisper-server|llama-server|libllama-server-impl\\.so|libllama\\.so|libllama-common\\.so|libggml.*\\.so|libmtmd\\.so|LICENSE")
+        val keep = Regex("whisper-server|llama-server|libllama-server-impl\\.so|libllama\\.so|libllama-common\\.so|libwhisper.*\\.so|libggml.*\\.so|libmtmd\\.so|LICENSE")
         dir.walkTopDown().filter { it.isFile && !keep.matches(it.name) }.forEach { it.delete() }
         // The remote-procedure backend is not used.
         File(dir, "libggml-rpc.so").delete()
@@ -446,6 +468,8 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
         private const val LLAMA_CPU_MB = 24
         private const val WHISPER_MB = 10
         private const val WHISPER_ANDROID_MB = 3
+        private const val WHISPER_SNAPDRAGON_MB = 30
+        private const val WHISPER_GPU_MB = 6
         private const val READY_MARK = ".installed"
         private const val ARCHIVE_PART = ".archive.part"
         private const val DOWNLOAD_SHARE = 0.9f

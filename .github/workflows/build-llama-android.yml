@@ -115,6 +115,10 @@ jobs:
   whisper:
     needs: release
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        kind: [cpu, opencl, vulkan]
     steps:
       - name: Get whisper.cpp
         run: git clone --depth 1 --branch "${{ inputs.whisper_ref || 'v1.9.5' }}" https://github.com/ggml-org/whisper.cpp whisper.cpp
@@ -123,29 +127,109 @@ jobs:
         run: |
           NDK="${ANDROID_NDK_LATEST_HOME:-$ANDROID_NDK_HOME}"
           echo "NDK=$NDK" >> "$GITHUB_ENV"
+          echo "SYSROOT=$NDK/toolchains/llvm/prebuilt/linux-x86_64/sysroot" >> "$GITHUB_ENV"
           sudo apt-get update
-          sudo apt-get install -y ninja-build
+          sudo apt-get install -y ninja-build glslc glslang-tools libvulkan-dev
 
-      - name: Build whisper-server (processor only)
+      - name: OpenCL headers and loader (only to link)
+        if: matrix.kind == 'opencl'
         run: |
+          git clone --depth 1 https://github.com/KhronosGroup/OpenCL-Headers
+          cp -r OpenCL-Headers/CL "$SYSROOT/usr/include"
+          git clone --depth 1 https://github.com/KhronosGroup/OpenCL-ICD-Loader
+          cmake -S OpenCL-ICD-Loader -B icd-build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE="$NDK/build/cmake/android.toolchain.cmake" \
+            -DOPENCL_ICD_LOADER_HEADERS_DIR="$SYSROOT/usr/include" \
+            -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=24 -DANDROID_STL=c++_shared
+          cmake --build icd-build
+          cp icd-build/libOpenCL.so "$SYSROOT/usr/lib/aarch64-linux-android"
+
+      - name: Vulkan and SPIR-V headers (the Android kit has no vulkan.hpp)
+        if: matrix.kind == 'vulkan'
+        run: |
+          git clone --depth 1 https://github.com/KhronosGroup/Vulkan-Headers
+          echo "VULKAN_HEADERS=$PWD/Vulkan-Headers/include" >> "$GITHUB_ENV"
+          git clone --depth 1 https://github.com/KhronosGroup/SPIRV-Headers
+          cmake -S SPIRV-Headers -B spirv-build -G Ninja -DCMAKE_INSTALL_PREFIX="$PWD/spirv-install"
+          cmake --install spirv-build
+          echo "SPIRV_PREFIX=$PWD/spirv-install" >> "$GITHUB_ENV"
+          cp -r "$PWD/spirv-install/include/spirv" "$PWD/Vulkan-Headers/include/"
+
+      - name: Build whisper-server
+        run: |
+          EXTRA_CXX=""
+          BACKEND=""
+          if [ "${{ matrix.kind }}" = "opencl" ]; then
+            BACKEND="-DGGML_OPENCL=ON -DGGML_OPENCL_USE_ADRENO_KERNELS=ON"
+          elif [ "${{ matrix.kind }}" = "vulkan" ]; then
+            EXTRA_CXX="-isystem $SPIRV_PREFIX/include"
+            BACKEND="-DGGML_VULKAN=ON -DVulkan_GLSLC_EXECUTABLE=$(which glslc) -DVulkan_INCLUDE_DIR=$VULKAN_HEADERS -DVulkan_LIBRARY=$SYSROOT/usr/lib/aarch64-linux-android/28/libvulkan.so -DCMAKE_FIND_ROOT_PATH=$SPIRV_PREFIX -DCMAKE_PREFIX_PATH=$SPIRV_PREFIX -DSPIRV-Headers_DIR=$SPIRV_PREFIX/share/cmake/SPIRV-Headers"
+          fi
           cmake -S whisper.cpp -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_TOOLCHAIN_FILE="$NDK/build/cmake/android.toolchain.cmake" \
             -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-28 -DANDROID_STL=c++_static \
-            -DBUILD_SHARED_LIBS=OFF -DGGML_NATIVE=OFF -DGGML_OPENMP=OFF \
-            -DCMAKE_C_FLAGS="-march=armv8.2-a+dotprod" -DCMAKE_CXX_FLAGS="-march=armv8.2-a+dotprod" \
+            -DBUILD_SHARED_LIBS=OFF $BACKEND -DGGML_NATIVE=OFF -DGGML_OPENMP=OFF \
+            -DCMAKE_C_FLAGS="-march=armv8.2-a+dotprod" -DCMAKE_CXX_FLAGS="-march=armv8.2-a+dotprod $EXTRA_CXX" \
             -DWHISPER_BUILD_TESTS=OFF -DWHISPER_SDL2=OFF -DWHISPER_BUILD_EXAMPLES=ON
           cmake --build build --target whisper-server
 
       - name: Pack
         run: |
+          BIN="$(find build -name whisper-server -type f | head -n 1)"
+          # A chip build must really contain its backend; otherwise it would be a processor build under a false name.
+          if [ "${{ matrix.kind }}" = "opencl" ]; then strings "$BIN" | grep -qi "ggml_opencl" ; fi
+          if [ "${{ matrix.kind }}" = "vulkan" ]; then strings "$BIN" | grep -qi "ggml_vulkan" ; fi
           mkdir pack
-          cp "$(find build -name whisper-server -type f | head -n 1)" pack/
+          cp "$BIN" pack/
           cp whisper.cpp/LICENSE pack/
-          tar -czf "whisper-${{ inputs.whisper_ref || 'v1.9.5' }}-android-arm64.tar.gz" -C pack .
+          NAME="whisper-${{ inputs.whisper_ref || 'v1.9.5' }}-android-arm64"
+          if [ "${{ matrix.kind }}" != "cpu" ]; then NAME="$NAME-${{ matrix.kind }}"; fi
+          tar -czf "$NAME.tar.gz" -C pack .
           ls -l *.tar.gz
 
       - name: Publish on the release page
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release upload "engines-${{ inputs.llama_tag || 'b11960' }}" --repo "$GITHUB_REPOSITORY" --clobber whisper-*-android-arm64.tar.gz
+          gh release upload "engines-${{ inputs.llama_tag || 'b11960' }}" --repo "$GITHUB_REPOSITORY" --clobber whisper-*-android-arm64*.tar.gz
+
+  # The Hexagon NPU of Snapdragon phones. Built in Qualcomm's own toolchain image (it holds the Hexagon SDK), with
+  # shared libraries: the NPU programs (libggml-htp-v73/v75/v79/v81.so) are loaded by the NPU backend at run time.
+  whisper-npu:
+    needs: release
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Get whisper.cpp
+        run: git clone --depth 1 --branch "${{ inputs.whisper_ref || 'v1.9.5' }}" https://github.com/ggml-org/whisper.cpp whisper.cpp
+
+      - name: Build whisper-server with the Hexagon backend
+        run: |
+          docker run --rm --platform linux/amd64 -v "$PWD":/workspace -w /workspace ghcr.io/snapdragon-toolchain/arm64-android:v0.7 bash -lc '
+            set -e
+            cmake -S whisper.cpp -B build-npu -G Ninja -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_TOOLCHAIN_FILE=/opt/android-ndk-r28b/build/cmake/android.toolchain.cmake \
+              -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-31 \
+              -DGGML_HEXAGON=ON -DHEXAGON_SDK_ROOT=/opt/hexagon/6.6.0.0 \
+              -DGGML_OPENMP=OFF -DGGML_NATIVE=OFF \
+              -DCMAKE_C_FLAGS="-march=armv8.7a" -DCMAKE_CXX_FLAGS="-march=armv8.7a" \
+              -DWHISPER_BUILD_TESTS=OFF -DWHISPER_SDL2=OFF -DWHISPER_BUILD_EXAMPLES=ON
+            cmake --build build-npu --target whisper-server
+          '
+
+      - name: Pack
+        run: |
+          mkdir -p pack/bin pack/lib
+          cp "$(find build-npu -name whisper-server -type f | head -n 1)" pack/bin/
+          find build-npu -name '*.so' -type f -exec cp {} pack/lib/ \;
+          ls pack/lib
+          ls pack/lib | grep -q "libggml-hexagon.so"
+          ls pack/lib | grep -q "libggml-htp-v"
+          cp whisper.cpp/LICENSE pack/
+          tar -czf "whisper-${{ inputs.whisper_ref || 'v1.9.5' }}-android-arm64-snapdragon.tar.gz" -C pack .
+          ls -l *.tar.gz
+
+      - name: Publish on the release page
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "engines-${{ inputs.llama_tag || 'b11960' }}" --repo "$GITHUB_REPOSITORY" --clobber whisper-*-android-arm64-snapdragon.tar.gz
