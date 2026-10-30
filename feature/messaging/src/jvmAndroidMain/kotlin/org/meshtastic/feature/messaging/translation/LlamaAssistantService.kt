@@ -992,6 +992,15 @@ class LlamaAssistantService(
                     }.trim()
                     if (text.isNotBlank()) return text.also(onPiece)
                 }
+                // A small model gets the manual's own lines about the found setting before anything else is tried.
+                if (smallModel(modelId) && fits && button != null) {
+                    val lines = bestLines(manual, button.label, "${intent.text} ${button.label}", question, polish, oneSetting = false)
+                    if (lines.isNotBlank()) {
+                        val path = guideTools.pathOf(button)
+                        val where = if (path.isNotBlank() && !path.equals(button.label, ignoreCase = true)) aiString(Res.string.ai_help_where, button.label, path) + "\n\n" else ""
+                        return (where + aiString(Res.string.ai_help_from_manual) + "\n" + lines).also(onPiece)
+                    }
+                }
                 if (!fits) collector.drain()
                 fromBase(modelId, history, question, intent.text, polish, answerLang, onPiece, room)?.let { return it }
                 val shown = button.takeIf { fits }
@@ -1091,12 +1100,6 @@ class LlamaAssistantService(
                     }
                 }
             }
-            if (small && facts.isNotBlank()) {
-                quotedEntry(question, facts, polish, loose = true)?.let {
-                    lastRoute = "closest knowledge-base entry"
-                    return it.also(onPiece)
-                }
-            }
             if (small) {
                 lastRoute = "not in the knowledge base"
                 return notInBase(polish, uiPrefs.assistantInternetEnabled.value).also(onPiece)
@@ -1125,7 +1128,8 @@ class LlamaAssistantService(
      */
     private fun quotedEntry(question: String, facts: String, polish: Boolean = true, loose: Boolean = false): String? {
         val asked = stems(question) - STOP_STEMS
-        if (asked.isEmpty()) return null
+        // One word is enough only for a short technical term (SNR, LNA, SAW): any other lone word fits too many entries.
+        if (asked.isEmpty() || (asked.size == 1 && asked.first() !in SHORT_TERMS && !loose)) return null
         // The best entry is chosen by how much of the question its title and heading cover; entries of the related and
         // off-topic tiers never are quoted, and a table or a half-fitting entry is better left to the model's own words.
         var best: Pair<String, String>? = null
@@ -1135,7 +1139,7 @@ class LlamaAssistantService(
             if (head.startsWith("Baza wiedzy (")) continue
             val covered = asked.count { it in stems(head) }
             val score = covered.toDouble() / asked.size
-            if (covered >= (if (loose) 1 else minOf(QUOTE_MIN_WORDS, asked.size)) && score > bestScore) {
+            if (covered >= (if (loose) 1 else QUOTE_MIN_WORDS) && score > bestScore) {
                 best = block to head
                 bestScore = score
             }

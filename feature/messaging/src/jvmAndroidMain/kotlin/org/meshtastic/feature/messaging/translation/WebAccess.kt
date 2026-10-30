@@ -35,9 +35,11 @@ internal object WebAccess {
     private const val CONNECT_MS = 8_000
     private const val READ_MS = 12_000
     private const val USER_AGENT = "MT_SW_APP assistant (offline-first; text only)"
+    private val QUESTION_WORDS = setOf("jaka", "jaki", "jakie", "jest", "co", "to", "kto", "czy", "jak", "ile", "dlaczego", "gdzie", "kiedy", "what", "is", "the", "who", "how", "are", "do", "does", "of", "a", "an", "why", "where", "when", "powiedz", "opowiedz", "wyjaśnij", "podaj")
+    private const val BROWSER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
 
     /** Downloads [url] as text. Throws when the address is not allowed or the server does not answer properly. */
-    fun fetch(url: String, accept: String = "text/html,application/json,text/plain"): String {
+    fun fetch(url: String, accept: String = "text/html,application/json,text/plain", agent: String = USER_AGENT): String {
         var current = url
         repeat(MAX_REDIRECTS + 1) {
             checkAllowed(current)
@@ -46,7 +48,7 @@ internal object WebAccess {
                 connection.instanceFollowRedirects = false
                 connection.connectTimeout = CONNECT_MS
                 connection.readTimeout = READ_MS
-                connection.setRequestProperty("User-Agent", USER_AGENT)
+                connection.setRequestProperty("User-Agent", agent)
                 connection.setRequestProperty("Accept", accept)
                 val code = connection.responseCode
                 if (code in 300..399) {
@@ -137,7 +139,55 @@ internal object WebAccess {
 
     /** Search results of DuckDuckGo's plain HTML page as `title - address` and a short snippet. */
     fun search(query: String, limit: Int): List<String> {
-        val page = fetch("https://html.duckduckgo.com/html/?q=" + URLEncoder.encode(query, Charsets.UTF_8.name()))
+        val fromWeb = runCatching { searchDuckDuckGo(query, limit) }.getOrDefault(emptyList())
+        if (fromWeb.isNotEmpty()) return fromWeb
+        // DuckDuckGo often answers programs with a "are you a robot" page: then Wikipedia (an open interface) is asked.
+        val words = query.split(Regex("[^\\p{L}\\p{N}]+")).filter { it.isNotEmpty() && it.lowercase() !in QUESTION_WORDS }.joinToString(" ").ifBlank { query }
+        for (language in listOf("pl", "en")) {
+            val found = runCatching { searchWikipedia(words, limit, language) }.getOrDefault(emptyList())
+            if (found.isNotEmpty()) return found
+        }
+        return emptyList()
+    }
+
+    private fun searchWikipedia(query: String, limit: Int, language: String): List<String> {
+        val address =
+            "https://$language.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=" +
+                URLEncoder.encode(query, Charsets.UTF_8.name()) +
+                "&gsrlimit=$limit&prop=extracts&exintro=1&explaintext=1&exsentences=4&redirects=1&format=json"
+        val json = fetch(address, "application/json")
+        val title = Regex(""""title":"((?:[^"\\]|\\.)*)"""")
+        val extract = Regex(""""extract":"((?:[^"\\]|\\.)*)"""")
+        // The pages come in one object each: title and extract are read in the order they are written.
+        val pages = Regex("""\{"pageid":.*?"extract":"(?:[^"\\]|\\.)*"\}""", RegexOption.DOT_MATCHES_ALL).findAll(json).map { it.value }.toList()
+        return pages.mapNotNull { page ->
+            val name = title.find(page)?.groupValues?.get(1)?.let { unescapeJson(it) } ?: return@mapNotNull null
+            val text = extract.find(page)?.groupValues?.get(1)?.let { unescapeJson(it) }.orEmpty().replace('\n', ' ').trim()
+            if (text.length < 40) null else "$name - https://$language.wikipedia.org/wiki/" + URLEncoder.encode(name.replace(' ', '_'), Charsets.UTF_8.name()) + "\n" + text
+        }.take(limit)
+    }
+
+    private fun unescapeJson(text: String): String {
+        val out = StringBuilder()
+        var i = 0
+        while (i < text.length) {
+            val c = text[i]
+            if (c == '\\' && i + 1 < text.length) {
+                when (val n = text[i + 1]) {
+                    'n', 't', 'r' -> { out.append(' '); i += 2 }
+                    'u' -> if (i + 5 < text.length) { out.append(text.substring(i + 2, i + 6).toInt(16).toChar()); i += 6 } else { i += 2 }
+                    else -> { out.append(n); i += 2 }
+                }
+            } else {
+                out.append(c)
+                i++
+            }
+        }
+        return out.toString()
+    }
+
+    private fun searchDuckDuckGo(query: String, limit: Int): List<String> {
+        val page = fetch("https://html.duckduckgo.com/html/?kl=pl-pl&q=" + URLEncoder.encode(query, Charsets.UTF_8.name()), agent = BROWSER_AGENT)
         val links = Regex("""<a[^>]*class="result__a"[^>]*href="([^"]+)"[^>]*>(.*?)</a>""", RegexOption.DOT_MATCHES_ALL).findAll(page).toList()
         val snippets = Regex("""<a[^>]*class="result__snippet"[^>]*>(.*?)</a>""", RegexOption.DOT_MATCHES_ALL).findAll(page).toList()
         return links.take(limit).mapIndexed { index, match ->
