@@ -218,9 +218,10 @@ jobs:
             cmake -S whisper.cpp -B build-npu $GEN -DCMAKE_BUILD_TYPE=Release \
               -DCMAKE_TOOLCHAIN_FILE="$NDK/build/cmake/android.toolchain.cmake" \
               -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-31 \
-              -DGGML_HEXAGON=ON -DHEXAGON_SDK_ROOT="$HEX" \
+              -DGGML_HEXAGON=ON -DHEXAGON_SDK_ROOT="$HEX" -DHEXAGON_TOOLS_ROOT="${HEXAGON_TOOLS_ROOT:-}" \
+              -DPREBUILT_LIB_DIR=android_aarch64 \
               -DGGML_OPENMP=OFF -DGGML_NATIVE=OFF \
-              -DCMAKE_C_FLAGS="-march=armv8.7a" -DCMAKE_CXX_FLAGS="-march=armv8.7a" \
+              -DCMAKE_C_FLAGS="-march=armv8.7a+fp16+dotprod+i8mm -D_GNU_SOURCE" -DCMAKE_CXX_FLAGS="-march=armv8.7a+fp16+dotprod+i8mm -D_GNU_SOURCE" \
               -DWHISPER_BUILD_TESTS=OFF -DWHISPER_SDL2=OFF -DWHISPER_BUILD_EXAMPLES=ON
             cmake --build build-npu --target whisper-server -j
           '
