@@ -1137,15 +1137,19 @@ class LlamaAssistantService(
         for (block in facts.split(Regex("\\n\\n(?=\\[)"))) {
             val head = BASE_HEAD.find(block)?.groupValues?.get(1)?.trim() ?: continue
             if (head.startsWith("Baza wiedzy (")) continue
-            val covered = asked.count { it in stems(head) }
-            val score = covered.toDouble() / asked.size
-            if (covered >= (if (loose) 1 else QUOTE_MIN_WORDS) && score > bestScore) {
+            // The title must share a word with the question; the text of the entry may share the rest ("what limit of hops
+            // is recommended" finds "How many hops to set?" through the words of its text).
+            val headStems = stems(head)
+            val bodyStems = stems(block.substringAfter('\n', ""))
+            val inHead = asked.count { it in headStems }
+            val covered = asked.count { it in headStems || it in bodyStems }
+            val score = (covered + inHead).toDouble() / (2 * asked.size)
+            if (inHead >= 1 && covered >= (if (loose) 1 else QUOTE_MIN_WORDS) && covered.toDouble() / asked.size >= (if (loose) QUOTE_LOOSE_SHARE else QUOTE_MIN_SHARE) && score > bestScore) {
                 best = block to head
                 bestScore = score
             }
         }
         val (block, head) = best ?: return null
-        if (bestScore < (if (loose) QUOTE_LOOSE_SHARE else QUOTE_MIN_SHARE)) return null
         val body =
             block.substringAfter('\n', "").lines()
                 .filterNot { it.trimStart().startsWith("Źródło:") || it.trimStart().startsWith("Source:") || it.trimStart().startsWith("|") }
