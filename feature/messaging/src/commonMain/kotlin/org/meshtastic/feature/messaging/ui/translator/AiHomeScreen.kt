@@ -20,6 +20,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Icon
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.IconButton
@@ -44,6 +50,8 @@ import org.meshtastic.core.resources.ai_tab_ai
 import org.meshtastic.core.resources.ai_tab_assistant
 import org.meshtastic.core.resources.ai_tab_translator
 import org.meshtastic.core.resources.assistant_history
+import org.meshtastic.core.resources.assistant_autoscroll
+import org.meshtastic.core.resources.assistant_autoscroll_hint
 import org.meshtastic.core.resources.assistant_info_body
 import org.meshtastic.core.resources.assistant_info_title
 import org.meshtastic.core.resources.translator_open
@@ -78,7 +86,23 @@ fun AiHomeScreen(
         AlertDialog(
             onDismissRequest = { showInfo = false },
             title = { Text(stringResource(Res.string.assistant_info_title)) },
-            text = { Text(stringResource(Res.string.assistant_info_body)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(stringResource(Res.string.assistant_info_body))
+                    val autoScroll by uiPrefs.assistantAutoScroll.collectAsStateWithLifecycle()
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(stringResource(Res.string.assistant_autoscroll), style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                stringResource(Res.string.assistant_autoscroll_hint),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Switch(checked = autoScroll, onCheckedChange = { uiPrefs.setAssistantAutoScroll(it) })
+                    }
+                }
+            },
             confirmButton = { TextButton(onClick = { showInfo = false }) { Text("OK") } },
         )
     }

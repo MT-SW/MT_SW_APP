@@ -109,3 +109,23 @@ Słowa: sieć mesh, sieć kratowa, mesh, przeskoki, hop limit, przekazywanie pak
 LoRa to technika radiowa dalekiego zasięgu i bardzo małego poboru prądu: sygnał jest rozpraszany w widmie, dzięki czemu odbiornik słyszy go nawet wtedy, gdy jest słabszy od szumu. Kosztem jest mała prędkość (od setek bitów do kilku kilobitów na sekundę), więc nadaje się do krótkich wiadomości i danych z czujników, a nie do zdjęć czy rozmów. Meshtastic używa LoRa w paśmie 868 MHz w Europie.
 Słowa: LoRa, co to jest LoRa, spreading factor, zasięg, małe prędkości, pasmo 868, modulacja LoRa
 Źródło: Baza wiedzy: parametry LoRa (opracowanie własne, 2026-10)
+
+### Jakie komendy obsługuje bot scyzoryk?
+Bot scyzoryk to bot działający w naszej sieci na kanale MT_SW (widać go jako węzeł bot_scyzoryk, który m.in. wysyła komunikaty z pogodą). Odpowiada na wiadomości zaczynające się od słowa „scyzoryk”. Komendy, które aplikacja ma w Szybkim Czacie (przyciski S_P, S_T, S_R, S_W, S_I, S_A), to: scyzoryk pomoc, scyzoryk test, scyzoryk range, scyzoryk pogoda, scyzoryk info i scyzoryk aktualnosci. Co dokładnie zwraca każda z nich, opisuje sam bot: wyślij „scyzoryk pomoc”. To nie są komendy /ping, /test i /hello: te należą do wbudowanego ReplyBota w MT_SW_FIRMWARE, czyli do firmware radia, a nie do bota scyzoryk.
+Słowa: bot scyzoryk, scyzoryk, komendy bota, scyzoryk pomoc, scyzoryk test, scyzoryk range, scyzoryk pogoda, scyzoryk info, scyzoryk aktualnosci, bot_scyzoryk, Szybki Czat, Quick Chat
+Źródło: Aplikacja: domyślne szablony Szybkiego Czatu (sprawdzono 2026-10)
+
+### Jakie komendy czatu obsługuje firmware MT_SW_FIRMWARE (ReplyBot)?
+W MT_SW_FIRMWARE jest włączony ReplyBot, który odpowiada na trzy komendy wysłane do węzła: /ping (odpowiedź „pong!” z liczbą skoków, RSSI i SNR), /test (odpowiedź po polsku z odnośnikiem do komendy „scyzoryk pomoc”, bez diagnostyki sygnału) i /hello (powitanie po polsku z linkiem do mt-sw.pl). Dodatkowo węzeł odpowiada na wiadomość !!Test!! informacją o liczbie przeskoków albo o RSSI i SNR. To odpowiedzi samego radia, a nie bot scyzoryk.
+Słowa: ReplyBot, /ping, /test, /hello, !!Test!!, komendy czatu, odpowiedzi automatyczne, MT_SW_FIRMWARE, pong
+Źródło: MT_SW firmware: Komendy czatu i odpowiedzi automatyczne (sprawdzono 2026-10)
+
+### Jak wyłączyć automatyczne przewijanie rozmowy z asystentem?
+W asystencie dotknij ikony „i” w górnym pasku: w oknie informacji jest przełącznik „Przewijaj samo do nowych wiadomości”. Po jego wyłączeniu nowe wiadomości pojawiają się niżej, a rozmowa zostaje tam, gdzie czytasz; przewija się tylko po wysłaniu Twojej własnej wiadomości.
+Słowa: przewijanie, autoprzewijanie, przewijać samo, rozmowa skacze, nowe wiadomości, asystent, ikona i, okno informacji
+Źródło: Dokumentacja aplikacji: Funkcje MT_SW, asystent (sprawdzono 2026-10)
+
+### Jak zrobić zewnętrzny węzeł na maszcie?
+Węzeł na maszcie składa się z kilku części. Radio w szczelnej obudowie (najlepiej IP65 lub lepszej) z dławikami kablowymi na każdym przejściu kabla. Antena na samym szczycie, jak najwyżej i z dala od metalowych elementów, połączona możliwie krótkim kablem dobrej jakości, bo kabel tłumi sygnał (cienki RG-58 znacznie więcej niż LMR-400). Ochrona odgromowa i uziemienie masztu oraz przepięciówka na kablu antenowym. Zasilanie z panelu słonecznego z akumulatorem i regulatorem ładowania albo kablem. Przy montażu pamiętaj o zasadach pracy na wysokości: asekuracja, dobra pogoda i nigdy podczas burzy.
+Słowa: maszt, węzeł na maszcie, węzeł zewnętrzny, montaż na dachu, obudowa IP65, antena na maszcie, ochrona odgromowa, praca na wysokości
+Źródło: Baza wiedzy: montaż, ochrona odgromowa, zasilanie solarne i praca na wysokości (opracowanie własne z wpisów bazy, 2026-10)

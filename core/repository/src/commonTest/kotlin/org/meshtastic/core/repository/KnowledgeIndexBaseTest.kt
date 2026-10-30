@@ -57,7 +57,8 @@ class KnowledgeIndexBaseTest {
     fun hiddenKeywordsFindEntryButAreNotShown() {
         val found = index.lookup("spalenie wzmacniacz", 2000, includeBase = true)
         assertTrue(found.contains("bez anteny"))
-        assertTrue(!found.contains("Słowa"))
+        // The keywords come only as a last line after the entry (the quoting reads them, the answer never shows them).
+        assertTrue(!found.substringBefore("\nSłowa:").contains("wzmacniacz"))
     }
 
     @Test

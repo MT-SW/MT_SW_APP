@@ -515,6 +515,8 @@ archived_channel_read_only
 are_you_sure
 are_you_sure_change_default
 ### ASSISTANT ###
+assistant_autoscroll
+assistant_autoscroll_hint
 assistant_close
 assistant_copy_all
 assistant_copy_assistant

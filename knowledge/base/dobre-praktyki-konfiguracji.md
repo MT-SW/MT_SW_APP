@@ -12,7 +12,7 @@ Słowa: router, repeater, nie używać routera, kolizje, zasięg, hop, społeczn
 
 ### Ile ustawić hop limit?
 Od wersji 2.8.x zalecamy w MT_SW ustawić 7. Firmware 2.8 ma automatyczny, zmienny hop limit: ważne pakiety, jak wiadomości, dostają pełny limit, a mniej ważne (np. telemetria) mają go niższy, zależnie od ruchu w całej sieci. Dlatego 7 nie zalewa już sieci tak jak dawniej. Oficjalna dokumentacja nadal podaje 3 jako domyślne i wystarczające dla większości sieci; na starszym firmware (przed 2.8) zostaw 3 i podnoś tylko na węzłach brzegowych.
-Słowa: hop limit, max hops, liczba przeskoków, 7, 3, zwiększyć zasięg, węzły brzegowe, automatyczny hop limit, 2.8
+Słowa: hop limit, limit skoków, ile skoków, max hops, liczba przeskoków, 7, 3, zwiększyć zasięg, węzły brzegowe, automatyczny hop limit, 2.8
 Źródło: https://github.com/meshtastic/firmware/releases/tag/v2.8.0.7239fe8 (automatyczny, zmienny hop limit) oraz https://meshtastic.org/docs/configuration/radio/lora/ (sprawdzono 2026-10)
 
 ### Ile jest kanałów i jak działa udostępnianie pozycji (2.7.1+)?

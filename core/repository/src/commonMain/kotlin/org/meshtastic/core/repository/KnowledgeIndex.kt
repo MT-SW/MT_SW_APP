@@ -33,7 +33,7 @@ class KnowledgeIndex(documents: List<Document>) {
      */
     class Document(val title: String, val markdown: String, val news: Boolean = false, val base: Boolean = false)
 
-    private class Chunk(val title: String, val text: String, val stems: Set<String>, val news: Boolean, val base: Boolean)
+    private class Chunk(val title: String, val text: String, val stems: Set<String>, val news: Boolean, val base: Boolean, val keywords: String = "")
 
     private val chunks: List<Chunk> = documents.flatMap { split(it.title, it.markdown, it.news, it.base) }
 
@@ -58,14 +58,18 @@ class KnowledgeIndex(documents: List<Document>) {
                         if (term in chunk.stems) score += ln(1.0 + total / (1 + (frequency[term] ?: 0)))
                     }
                     val titleStems = stems(chunk.title)
-                    score += terms.count { it in titleStems } * TITLE_BONUS
+                    val inTitle = terms.count { it in titleStems }
+                    score += inTitle * TITLE_BONUS
+                    // A title that holds every word of the question fits even when the word is in every page ("What is Meshtastic?").
+                    if (inTitle == terms.size) score = maxOf(score, MIN_SCORE)
                     chunk to score
                 }
                 .filter { it.second >= MIN_SCORE }
                 .sortedByDescending { it.second }
         val out = StringBuilder()
         for ((chunk, _) in ranked) {
-            val block = "[${chunk.title}]\n${chunk.text}"
+            // The keywords of an entry of the base are given with it (the quoting counts them as part of the title).
+            val block = "[${chunk.title}]\n${chunk.text}" + if (chunk.base && chunk.keywords.isNotBlank()) "\nSłowa: ${chunk.keywords}" else ""
             if (out.length + block.length + 2 > maxChars) {
                 if (out.isEmpty()) out.append(block.take(maxChars))
                 break
@@ -111,7 +115,7 @@ class KnowledgeIndex(documents: List<Document>) {
                 val piece = rest.substring(0, cut).trim()
                 if (piece.isNotEmpty()) {
                     val title = if (heading == pageTitle) pageTitle else "$pageTitle: $heading"
-                    result += Chunk(title, piece, stems("$heading $piece $extra"), news, base)
+                    result += Chunk(title, piece, stems("$heading $piece $extra"), news, base, extra.trim())
                 }
                 rest = rest.substring(cut).trim()
             }
@@ -151,6 +155,9 @@ class KnowledgeIndex(documents: List<Document>) {
     private fun stems(text: String): Set<String> =
         text
             .lowercase()
+            .replace("wi-fi", "wifi")
+            .replace('ą', 'a').replace('ć', 'c').replace('ę', 'e').replace('ł', 'l').replace('ń', 'n')
+            .replace('ó', 'o').replace('ś', 's').replace('ź', 'z').replace('ż', 'z')
             .split(SPLIT)
             .filter { it.length >= MIN_WORD && it !in STOP_WORDS }
             .map { if (it.length > STEM_LENGTH) it.take(STEM_LENGTH) else it }

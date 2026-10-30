@@ -715,7 +715,10 @@ class LlamaAssistantService(
             return exact(goToNode(nodeNum, intent.node, planner = false))!!
         }
         // "A short report on the network": the app's own overview, not a story by the model.
-        if (NETWORK_REPORT.containsMatchIn(lower) && !data.mentionsNode(lower) && intent.intent in DATA_ASK_INTENTS - "nearest_node" && !HOW_TO.containsMatchIn(lower)) {
+        if (NETWORK_REPORT.containsMatchIn(lower) && !data.mentionsNode(lower) &&
+            (intent.intent in DATA_ASK_INTENTS - "nearest_node" || (LOOKS_LIKE.containsMatchIn(lower) && intent.intent in setOf("app_help", "chat", "web_question"))) &&
+            (!HOW_TO.containsMatchIn(lower) || LOOKS_LIKE.containsMatchIn(lower))
+        ) {
             return data.networkOverview().also(onPiece)
         }
         // Nearest or farthest nodes, nodes heard in a period, packet statistics, the uptime of the user's own radio and the
@@ -812,7 +815,7 @@ class LlamaAssistantService(
             return data.txPowerText().also(onPiece)
         }
         // Calculations (antennas, power, range, airtime, Fresnel zone, horizon, sums) are done by the app, never guessed.
-        if (intent.intent != "draft_message" && !(DEFINITION_ASK.containsMatchIn(question) && question.none { it.isDigit() })) {
+        if (intent.intent != "draft_message" && !(DEFINITION_ASK.containsMatchIn(question) && question.none { it.isDigit() } && !PRESET_NAME.containsMatchIn(question))) {
             val defaults = data.calcDefaults()
             AssistantCalculators.answer(question, polish, defaults)?.let { text ->
                 // An antenna answer gets a button to the antenna calculator, opened on the same antenna and frequency.
@@ -1098,17 +1101,19 @@ class LlamaAssistantService(
             (if (baseOnly) knowledge?.lookupBaseOnly(query, BASE_CHARS * room, language) else knowledge?.lookupBase(query, BASE_CHARS * room, language)).orEmpty()
         // A small model (or any model outside the Gemma family) never retells web results in its own words: the app quotes them.
         val small = smallModel(modelId)
+        // Quoting chooses from many more entries than a small model could be given to read.
+        val pool = if (small) knowledge?.lookupBase(query, QUOTE_FACTS_CHARS, language).orEmpty().ifBlank { facts } else facts
         // A small model does not retell the entries even when only the base is asked: the entry is quoted, or the next step answers.
         if (baseOnly && small) {
             if (facts.isBlank()) return null
-            return quotedEntry(question, facts, polish)?.also {
+            return quotedEntry(question, pool, polish)?.also {
                 lastRoute = "quoted knowledge-base entry"
                 onPiece(it)
             }
         }
         if (!baseOnly && !webModel(modelId) && (small || facts.isBlank())) {
             if (small && facts.isNotBlank()) {
-                quotedEntry(question, facts, polish)?.takeIf { polish || !looksPolish(it) }?.let {
+                quotedEntry(question, pool, polish)?.takeIf { polish || !looksPolish(it) }?.let {
                     lastRoute = "quoted knowledge-base entry"
                     return it.also(onPiece)
                 }
@@ -1128,7 +1133,7 @@ class LlamaAssistantService(
             if (small && !(facts.isNotBlank() && !polish)) {
                 // The closest entry of the base is still better than nothing; it says it may not fit exactly.
                 if (facts.isNotBlank()) {
-                    quotedEntry(question, facts, polish, loose = true)?.takeIf { polish || !looksPolish(it) }?.let {
+                    quotedEntry(question, pool, polish, loose = true)?.takeIf { polish || !looksPolish(it) }?.let {
                         lastRoute = "quoted knowledge-base entry (closest)"
                         return it.also(onPiece)
                     }
@@ -1149,7 +1154,7 @@ class LlamaAssistantService(
         Logger.i(tag = TAG) { "Knowledge base: ${facts.length} chars, web ${web.length} chars" }
         // The smallest models retold the entries wrongly (invented steps, swapped numbers): they quote the best entry as it is written.
         if (web.isBlank() && polish && (AiModels.byId(modelId)?.ramMb ?: Int.MAX_VALUE) < QUOTE_BELOW_RAM_MB) {
-            quotedEntry(question, facts, polish)?.let {
+            quotedEntry(question, pool, polish)?.let {
                 lastRoute = "quoted knowledge-base entry"
                 return it.also(onPiece)
             }
@@ -1166,20 +1171,27 @@ class LlamaAssistantService(
      * words of the question in it). Null otherwise: then the model answers as usual.
      */
     private fun quotedEntry(question: String, facts: String, polish: Boolean = true, loose: Boolean = false): String? {
-        val asked = stems(question) - STOP_STEMS
+        val asked = quoteStems(question) - STOP_STEMS
         if (asked.isEmpty()) return null
         val definition = DEFINITION_ASK.containsMatchIn(question)
-        fun weight(stem: String) = if (stem in GENERIC_STEMS) GENERIC_WEIGHT else 1.0
+        // Only common words ("What is Meshtastic?"): they count in full, but then only an entry that defines the thing fits.
+        val onlyCommon = asked.all { it in GENERIC_STEMS }
+        fun weight(stem: String) = if (stem in GENERIC_STEMS && !onlyCommon) GENERIC_WEIGHT else 1.0
         val total = asked.sumOf { weight(it) }
-        // The best entry is chosen by how much of the question its title and text cover, counting topic words fully and
-        // common words a quarter; entries of the related and off-topic tiers never are quoted.
+        val firstWord = foldPl(question.lowercase()).trim().split(Regex("[^a-z0-9]+")).firstOrNull().orEmpty()
+        val lastWord = foldPl(question.lowercase()).split(Regex("[^a-z0-9]+")).lastOrNull { it.length >= MIN_STEM && it.take(STEM_LENGTH) !in STOP_STEMS }.orEmpty()
         var best: Pair<String, String>? = null
         var bestScore = 0.0
         for (block in facts.split(Regex("\\n\\n(?=\\[)"))) {
             val head = BASE_HEAD.find(block)?.groupValues?.get(1)?.trim() ?: continue
             if (head.startsWith("Baza wiedzy (")) continue
-            val headStems = stems(head)
-            val bodyStems = stems(block.substringAfter('\n', ""))
+            val body = block.substringAfter('\n', "")
+            val heading = head.substringAfterLast(": ")
+            if (onlyCommon && !DEFINITION_ASK.containsMatchIn(heading)) continue
+            // The keywords of the entry count as its title: they hold the other names of the thing.
+            val keywords = body.lines().filter { it.startsWith("Słowa:") }.joinToString(" ")
+            val headStems = quoteStems(head) + quoteStems(keywords)
+            val bodyStems = quoteStems(body)
             val inHead = asked.filter { it in headStems }.sumOf { weight(it) }
             val inAll = asked.filter { it in headStems || it in bodyStems }.sumOf { weight(it) }
             if (inAll < QUOTE_MIN_WEIGHT) continue
@@ -1192,8 +1204,12 @@ class LlamaAssistantService(
                     (headShare >= QUOTE_MIN_SHARE && allShare >= QUOTE_ALL_SHARE) || (inHead >= QUOTE_MIN_WEIGHT && allShare >= QUOTE_BODY_SHARE)
                 }
             if (!enough) continue
-            // "What is X?" prefers the entry that defines X over one that merely mentions it; then the shorter title wins.
-            val score = headShare * 2 + allShare + (if (definition && DEFINITION_ASK.containsMatchIn(head)) DEFINITION_BONUS else 0.0) - head.length / 10000.0
+            // "What is X?" prefers the entry that defines X; the same opening word ("how", "what") and the exact word of
+            // the question in the title also count; then the shorter title wins.
+            val headFolded = foldPl(heading.lowercase())
+            val sameOpening = if (firstWord in OPENING_WORDS && headFolded.trim().startsWith(firstWord)) OPENING_BONUS else 0.0
+            val exactWord = if (lastWord.isNotEmpty() && Regex("\\b${Regex.escape(lastWord)}\\b").containsMatchIn(headFolded)) EXACT_BONUS else 0.0
+            val score = headShare * 2 + allShare + (if (definition && DEFINITION_ASK.containsMatchIn(heading)) DEFINITION_BONUS else 0.0) + sameOpening + exactWord - heading.length / 10000.0
             if (score > bestScore) {
                 best = block to head
                 bestScore = score
@@ -1202,7 +1218,7 @@ class LlamaAssistantService(
         val (block, head) = best ?: return null
         val body =
             block.substringAfter('\n', "").lines()
-                .filterNot { it.trimStart().startsWith("Źródło:") || it.trimStart().startsWith("Source:") || it.trimStart().startsWith("|") }
+                .filterNot { it.trimStart().startsWith("Źródło:") || it.trimStart().startsWith("Source:") || it.trimStart().startsWith("Słowa:") || it.trimStart().startsWith("Keywords:") || it.trimStart().startsWith("|") }
                 .joinToString("\n").trim()
         if (body.length < QUOTE_MIN_CHARS) return null
         val cut = if (body.length > QUOTE_MAX_CHARS) body.substring(0, QUOTE_MAX_CHARS).substringBeforeLast(". ", body.substring(0, QUOTE_MAX_CHARS)).trimEnd() + "." else body
@@ -1605,7 +1621,7 @@ class LlamaAssistantService(
                 .flatMap { it.split(Regex("(?<=[.!?])\\s+")) }
                 .map { it.trim() }.filter { it.length in MIN_QUOTE..MAX_QUOTE && !it.endsWith("?") && it.count { c -> c == ' ' } >= QUOTE_WORDS }.distinct()
         val best = sentences.map { it to stems(it).count { s -> s in want } }.filter { it.second >= maxOf(2, (want.size + 1) / 2) }.sortedByDescending { it.second }.take(2).map { it.first }
-        val chosen = best.ifEmpty { sentences.take(2) }
+        val chosen = best
         return if (chosen.isEmpty()) {
             null
         } else {
@@ -1634,8 +1650,11 @@ class LlamaAssistantService(
         return (if (kept.size > 1 && kept.last().trim().lastOrNull()?.let { it in ".!?)" } != true) kept.dropLast(1) else kept).joinToString("\n")
     }
 
+    /** Like [stems], but "MT_SW" counts as one word (for choosing an entry of the base). */
+    private fun quoteStems(text: String): Set<String> = stems(text.lowercase().replace("mt_sw", "mtsw"))
+
     private fun stems(text: String): Set<String> =
-        foldPl(text.lowercase().replace("wi-fi", "wifi").replace("mt_sw", "mtsw")).split(Regex("[^\\p{L}\\p{N}]+"))
+        foldPl(text.lowercase().replace("wi-fi", "wifi")).split(Regex("[^\\p{L}\\p{N}]+"))
             .filter { it.length >= MIN_STEM || it in SHORT_TERMS }.map { canonicalStem(it.take(STEM_LENGTH)) }.toSet()
 
     /** Plain text for the chat bubble: no markdown stars or backticks the small model likes to add. */
@@ -1795,6 +1814,8 @@ class LlamaAssistantService(
         val MSG_FROM_NODE = Regex("(?iu)(ile|how many).*(wiadomo|message).*(napisał|napisal|wysłał|wysyłał|wyslal|pisał|pisal|sent|wrote)")
         val CHANNEL_NAMED = Regex("(?iu)(?:na kanale|w kanale|kanał|kanale|channel)\\s+[„\"]?([\\p{L}\\p{N}_-]+)")
         val OPEN_NODE = Regex("(?iu)^\\s*(otwórz|otworz|przejdź|przejdz|pokaż|pokaz|open|go to|show)\\s.*(węzeł|wezel|węzła|wezla|węzła|node)")
+        val PRESET_NAME = Regex("(?iu)(short|long|medium|lite|narrow|tiny)\\s?(fast|slow|turbo|moderate)?|turbo")
+        val LOOKS_LIKE = Regex("(?iu)jak wygląd|jak wygląda|how (is|does).{0,20}(network|mesh)")
         val NETWORK_REPORT = Regex("(?iu)(raport|stan|stanie|status|podsumuj|podsumowanie).*(sieci|siec\\b|network)|network (status|report)|jak wygląda (moja |nasza )?sie")
         val OWN_AIR = Regex("(?iu)(airtime|zajętość kanału|zajetosc kanalu|obciążenie kanału|channel utili[sz]ation).*(mój|moj|mojego|moim|mam|my\\b)|(mój|moj|moim|my)\\s+(airtime|zajętość|obciążenie|channel)|(?<![\\p{L}])mój airtime|my airtime")
         val DEFINE_ASK = Regex("(?iu)^\\s*(co to|czym (jest|są|sa)|co znaczy|what (is|does|are)|what's|wyjaśnij|wyjasnij|explain)")
@@ -1934,11 +1955,15 @@ class LlamaAssistantService(
             }
 
         /** Words so common in questions that they say little about the topic: they count a quarter as much. */
-        val GENERIC_STEMS = foldedSet("zmien", "aplik", "ustaw", "wlacz", "wylac", "siec", "funkc", "urzad", "mesht", "podla", "polac", "mtsw", "dzial", "pokaz", "node", "nodes", "radio")
+        val GENERIC_STEMS = foldedSet("zmien", "aplik", "ustaw", "wlacz", "wylac", "siec", "funkc", "urzad", "mesht", "podla", "polac", "mtsw", "dzial", "pokaz", "node", "nodes", "radio", "stani")
         const val GENERIC_WEIGHT = 0.25
         const val QUOTE_ALL_SHARE = 0.6
-        const val QUOTE_BODY_SHARE = 0.9
+        const val QUOTE_BODY_SHARE = 0.6
         const val QUOTE_MIN_WEIGHT = 1.0
+        const val OPENING_BONUS = 0.3
+        const val EXACT_BONUS = 0.3
+        const val QUOTE_FACTS_CHARS = 14000
+        val OPENING_WORDS = setOf("jak", "co", "czy", "dlaczego", "ile", "czym", "kiedy")
         val SHORT_TERMS = setOf("snr", "gps", "usb", "lna", "saw", "ble", "swr", "dbi", "dbm", "sf", "cr", "ota", "pin")
         const val STEM_LENGTH = 5
         const val MIN_WEB_WORDS = 3

@@ -154,8 +154,11 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
         val internetOn by koinInject<UiPrefs>().assistantInternetEnabled.collectAsStateWithLifecycle()
         val lastLength = state.lines.lastOrNull()?.text?.length ?: 0
         // Follows the end of the answer while it is written (a long answer is taller than the screen).
-        LaunchedEffect(state.lines.size, lastLength) {
-            if (state.lines.isNotEmpty()) listState.scrollToItem(state.lines.lastIndex, FOLLOW_END_OFFSET)
+        // With the switch in the info window off, only the user's own message scrolls the chat (so it stays in sight);
+        // the answer comes in below and the user keeps reading where they are.
+        val autoScroll by koinInject<UiPrefs>().assistantAutoScroll.collectAsStateWithLifecycle()
+        LaunchedEffect(state.lines.size, lastLength, autoScroll) {
+            if (state.lines.isNotEmpty() && (autoScroll || state.lines.last().fromUser)) listState.scrollToItem(state.lines.lastIndex, FOLLOW_END_OFFSET)
         }
 
         Text(

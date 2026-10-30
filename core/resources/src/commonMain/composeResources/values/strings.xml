@@ -536,6 +536,8 @@
     <string name="are_you_sure">Are you sure?</string>
     <string name="are_you_sure_change_default">Are you sure you want to change to the default channel?</string>
     <!-- ASSISTANT -->
+    <string name="assistant_autoscroll">Scroll to new messages by itself</string>
+    <string name="assistant_autoscroll_hint">Off: new messages appear lower down and the chat stays where you are reading.</string>
     <string name="assistant_close">Close</string>
     <string name="assistant_copy_all">Copy whole conversation</string>
     <string name="assistant_copy_assistant">Assistant</string>

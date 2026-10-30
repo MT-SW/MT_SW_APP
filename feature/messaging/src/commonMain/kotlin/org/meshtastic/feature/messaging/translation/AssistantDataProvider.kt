@@ -1411,6 +1411,13 @@ class AssistantDataProvider(
         val wanted = name.anyToEmpty()
         val own = nodeRepository.ourNodeInfo.value
         if (wanted in SELF_WORDS) return own?.num
+        // A node whose name is in the question is the one asked about, even when the router wrote another name.
+        val q = question.lowercase()
+        mentionedNodes(q).filter { it.num != own?.num }.maxByOrNull { n ->
+            val long = n.user.long_name.lowercase()
+            val short = n.user.short_name.lowercase()
+            if (long.length >= MIN_NAME && q.contains(long)) long.length else short.length
+        }?.let { return it.num }
         if (wanted.length >= MIN_NAME - 1) {
             findNode(wanted)?.let { return it.num }
             mentionedNodes(" $wanted ").firstOrNull()?.let { return it.num }

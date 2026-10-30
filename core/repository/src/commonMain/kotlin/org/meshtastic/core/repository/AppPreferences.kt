@@ -197,6 +197,12 @@ interface UiPrefs {
 
     fun setAssistantMemoryEnabled(value: Boolean)
 
+    /** Whether the assistant's chat scrolls by itself to new messages (on by default); off lets the user keep reading where they are. */
+    val assistantAutoScroll: StateFlow<Boolean>
+        get() = kotlinx.coroutines.flow.MutableStateFlow(true)
+
+    fun setAssistantAutoScroll(value: Boolean) {}
+
     /** The saved antennas of the antenna calculator as JSON (see AntennaSetups); empty when none. */
     val antennaSetups: StateFlow<String>
         get() = kotlinx.coroutines.flow.MutableStateFlow("")
