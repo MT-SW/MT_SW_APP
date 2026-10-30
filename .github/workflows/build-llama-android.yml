@@ -115,7 +115,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        kind: [cpu, opencl, vulkan]
+        # i8mm: the processor build for newer phones (faster with Q8 models); cpu: the plain build for every phone.
+        kind: [cpu, i8mm, opencl, vulkan]
     steps:
       - name: Get whisper.cpp
         run: git clone --depth 1 --branch "${{ inputs.whisper_ref || 'v1.9.5' }}" https://github.com/ggml-org/whisper.cpp whisper.cpp
@@ -162,11 +163,13 @@ jobs:
             EXTRA_CXX="-isystem $SPIRV_PREFIX/include"
             BACKEND="-DGGML_VULKAN=ON -DVulkan_GLSLC_EXECUTABLE=$(which glslc) -DVulkan_INCLUDE_DIR=$VULKAN_HEADERS -DVulkan_LIBRARY=$SYSROOT/usr/lib/aarch64-linux-android/28/libvulkan.so -DCMAKE_FIND_ROOT_PATH=$SPIRV_PREFIX -DCMAKE_PREFIX_PATH=$SPIRV_PREFIX -DSPIRV-Headers_DIR=$SPIRV_PREFIX/share/cmake/SPIRV-Headers"
           fi
+          ARCH="armv8.2-a+dotprod"
+          if [ "${{ matrix.kind }}" = "i8mm" ]; then ARCH="armv8.6-a+fp16+dotprod+i8mm"; fi
           cmake -S whisper.cpp -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_TOOLCHAIN_FILE="$NDK/build/cmake/android.toolchain.cmake" \
             -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-28 -DANDROID_STL=c++_static \
             -DBUILD_SHARED_LIBS=OFF $BACKEND -DGGML_NATIVE=OFF -DGGML_OPENMP=OFF \
-            -DCMAKE_C_FLAGS="-march=armv8.2-a+dotprod" -DCMAKE_CXX_FLAGS="-march=armv8.2-a+dotprod $EXTRA_CXX" \
+            -DCMAKE_C_FLAGS="-march=$ARCH" -DCMAKE_CXX_FLAGS="-march=$ARCH $EXTRA_CXX" \
             -DWHISPER_BUILD_TESTS=OFF -DWHISPER_SDL2=OFF -DWHISPER_BUILD_EXAMPLES=ON
           cmake --build build --target whisper-server
 
@@ -198,6 +201,14 @@ jobs:
     steps:
       - name: Get whisper.cpp
         run: git clone --depth 1 --branch "${{ inputs.whisper_ref || 'v1.9.5' }}" https://github.com/ggml-org/whisper.cpp whisper.cpp
+
+      - name: Keep the model caches on the processor (the NPU cannot copy into its own memory)
+        run: |
+          # whisper.cpp puts the attention caches in the memory of the first (graphics/NPU) backend; the Hexagon backend
+          # cannot run the copy operation there and the program aborts. The last backend is the processor.
+          sed -i -E 's/(whisper_kv_cache_init\(state->kv_[a-z_]+, )state->backends\[0\]/\1state->backends.back()/' whisper.cpp/src/whisper.cpp
+          test "$(grep -c 'whisper_kv_cache_init(state->kv_[a-z_]*, state->backends.back()' whisper.cpp/src/whisper.cpp)" -ge 3
+          grep -n 'whisper_kv_cache_init(' whisper.cpp/src/whisper.cpp
 
       - name: Build whisper-server with the Hexagon backend
         run: |
