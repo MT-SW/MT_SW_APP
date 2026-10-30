@@ -102,6 +102,7 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Tune
 import org.meshtastic.feature.settings.SettingsViewModel
 import org.meshtastic.feature.settings.component.AiSettings
+import org.meshtastic.feature.settings.component.AiStorageRow
 import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.AppLogSettings
@@ -178,6 +179,8 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     retentionDays = retentionDays,
                     onSelected = { settingsViewModel.setMeshLogRetentionDays(it) },
                 )
+                // Where the app keeps all its data (not only the AI files): one folder on a computer.
+                AiStorageRow()
             }
 
             ExpressiveSection(title = stringResource(Res.string.smart_features_title)) {

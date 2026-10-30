@@ -254,8 +254,6 @@ internal fun AiSettings() {
         )
     }
 
-    AiStorageRow()
-
     if (hiddenOn) {
         SwitchPreference(
             title = stringResource(Res.string.ai_skip_npu_title),
