@@ -221,13 +221,16 @@ jobs:
               -DCMAKE_C_FLAGS="-march=armv8.7a+fp16+dotprod+i8mm -D_GNU_SOURCE" -DCMAKE_CXX_FLAGS="-march=armv8.7a+fp16+dotprod+i8mm -D_GNU_SOURCE" \
               -DWHISPER_BUILD_TESTS=OFF -DWHISPER_SDL2=OFF -DWHISPER_BUILD_EXAMPLES=ON
             cmake --build build-npu --target whisper-server -j
+            # The NPU programs (libggml-htp-v*.so) are put in place by the install step.
+            cmake --install build-npu --prefix /workspace/install-npu
           '
 
       - name: Pack
         run: |
           mkdir -p pack/bin pack/lib
           cp "$(find build-npu -name whisper-server -type f | head -n 1)" pack/bin/
-          find build-npu -name '*.so' -type f -exec cp {} pack/lib/ \;
+          find build-npu install-npu -name '*.so' -type f -exec cp {} pack/lib/ \;
+          find build-npu install-npu -name 'libggml-htp*' | head
           ls pack/lib
           ls pack/lib | grep -q "libggml-hexagon.so"
           ls pack/lib | grep -q "libggml-htp-v"
