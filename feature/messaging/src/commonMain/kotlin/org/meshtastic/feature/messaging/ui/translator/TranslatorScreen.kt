@@ -57,7 +57,9 @@ import org.meshtastic.core.resources.translator_loading_hint
 import org.meshtastic.core.resources.translator_long_warning
 import org.meshtastic.core.resources.translator_model_missing
 import org.meshtastic.core.resources.translator_off
+import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.translator_result
+import org.meshtastic.core.resources.translator_test_title
 import org.meshtastic.core.resources.translator_swap
 import org.meshtastic.core.resources.translator_to
 import org.meshtastic.core.ui.component.CopyIconButton
@@ -168,6 +170,45 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium,
             )
+        }
+
+        if (state.testLines.isNotEmpty() || state.testing) {
+            // The translation test (the /tłumacz command): every sentence with its translation, check and time.
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(Res.string.translator_test_title) + " (${state.testLines.size})",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (state.testing) {
+                                TextButton(onClick = viewModel::cancelTest) { Text(stringResource(Res.string.cancel)) }
+                            }
+                            CopyIconButton(
+                                valueToCopy =
+                                state.testLines.joinToString("\n\n") { "${it.source}\n${it.result}\n(${it.tookMs / 1000.0} s)" },
+                            )
+                        }
+                    }
+                    state.testLines.forEach { line ->
+                        Column {
+                            Text(text = line.source, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(text = line.result, style = MaterialTheme.typography.bodyMedium)
+                            Text(
+                                text = "${line.tookMs / 100 / 10.0} s",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
+            }
         }
 
         if (state.output.isNotBlank()) {

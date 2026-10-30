@@ -19,6 +19,8 @@ package org.meshtastic.feature.messaging.translation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,7 +41,13 @@ data class TranslatorUiState(
     val output: String = "",
     val busy: Boolean = false,
     val error: TranslatorError? = null,
+    /** Results of the translation test (the /tłumacz command), one line per sentence; empty when no test was run. */
+    val testLines: List<TranslatorTestLine> = emptyList(),
+    val testing: Boolean = false,
 )
+
+/** One sentence of the translation test: what was translated, the result with the check, and how long it took. */
+data class TranslatorTestLine(val source: String, val result: String, val tookMs: Long)
 
 enum class TranslatorError {
     /** Could not tell the language of the text; the user should choose it. */
@@ -59,8 +67,11 @@ enum class TranslatorError {
 class TranslatorViewModel(
     private val service: MessageTranslationService,
     private val modelManager: TranslatorModelManager,
+    private val assistant: AssistantService,
     uiPrefs: UiPrefs,
 ) : ViewModel() {
+
+    private var testJob: Job? = null
 
     val enabled: StateFlow<Boolean> = uiPrefs.translatorEnabled
     val modelState: StateFlow<TranslatorModelState> = modelManager.state
@@ -85,6 +96,11 @@ class TranslatorViewModel(
     fun translate() {
         val current = _state.value
         if (current.input.isBlank() || current.busy) return
+        // The same command as in the assistant: "/tłumacz" (also without Polish letters) runs the translation test.
+        if (isTestCommand(current.input)) {
+            runTest()
+            return
+        }
         viewModelScope.launch {
             _state.update { it.copy(busy = true, error = null, output = "") }
             val started = nowMillis
@@ -111,10 +127,48 @@ class TranslatorViewModel(
         }
     }
 
+    private fun isTestCommand(text: String): Boolean =
+        text.trim().lowercase().map { POLISH_TO_PLAIN[it] ?: it }.joinToString("") == TEST_COMMAND
+
+    /**
+     * The translation test of the assistant (the same sentences for every model, so results can be compared): each
+     * sentence appears here with its translation, a check that names, numbers and links stayed as they are, and its time.
+     */
+    private fun runTest() {
+        _state.update { it.copy(busy = true, testing = true, testLines = emptyList(), input = "", output = "", error = null) }
+        testJob =
+            viewModelScope.launch {
+                var mark = nowMillis
+                try {
+                    assistant.selfTest(TEST_COMMAND) { source, result ->
+                        val now = nowMillis
+                        val took = (now - mark).coerceAtLeast(1L)
+                        mark = now
+                        _state.update { it.copy(testLines = it.testLines + TranslatorTestLine(source, result, took)) }
+                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Logger.w(tag = "TranslatorViewModel", throwable = e) { "Translation test failed: ${e.message}" }
+                    _state.update { it.copy(error = TranslatorError.Failed) }
+                } finally {
+                    _state.update { it.copy(busy = false, testing = false) }
+                }
+            }
+    }
+
+    /** Stops a running translation test. */
+    fun cancelTest() {
+        testJob?.cancel()
+    }
+
     /** Warn when a translation will not fit in one radio packet (about 200 characters). */
     fun isTooLongForOnePacket(text: String): Boolean = text.length > ONE_PACKET_CHARS
 
     companion object {
         const val ONE_PACKET_CHARS = 200
+        private const val TEST_COMMAND = "/tlumacz"
+        private val POLISH_TO_PLAIN =
+            mapOf('ą' to 'a', 'ć' to 'c', 'ę' to 'e', 'ł' to 'l', 'ń' to 'n', 'ó' to 'o', 'ś' to 's', 'ź' to 'z', 'ż' to 'z')
     }
 }

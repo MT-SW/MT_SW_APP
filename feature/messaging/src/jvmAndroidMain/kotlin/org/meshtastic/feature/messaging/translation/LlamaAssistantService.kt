@@ -162,6 +162,9 @@ class LlamaAssistantService(
             val resultName =
                 if (command.equals(AssistantSelfTest.COMMAND, ignoreCase = true)) {
                     AssistantSelfTest.RESULT_FILE
+                } else if (command.equals(AssistantSelfTest.TRANSLATE, ignoreCase = true)) {
+                    // One file per translator model, so the results of different models do not overwrite each other.
+                    "translation-test-${translatorTestModel(modelId)}-results.md"
                 } else {
                     "assistant-test-${command.trim('/')}-results.md"
                 }
