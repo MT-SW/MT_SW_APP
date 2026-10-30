@@ -577,7 +577,7 @@ class LlamaAssistantService(
             data.nodeFacts(nodeNum)?.let { return it.also(onPiece) }
         }
         // "Who wrote to me / the most", "did anyone write about X": the messages are read and counted by the app, whichever intent the model chose.
-        if (intent.intent in MESSAGE_INTENTS) {
+        if (intent.intent in MESSAGE_ASK_INTENTS) {
             ABOUT_TOPIC.find(lower)?.groupValues?.get(1)?.trim()?.takeIf { it.length >= 3 }?.let { topic ->
                 return data.toolMessages(topic, SEARCH_SHOWN, "").also(onPiece)
             }
@@ -596,7 +596,7 @@ class LlamaAssistantService(
             }
         }
         // "How many nodes are known" and "show all routers": counted from the node list, whichever intent the model chose.
-        if (intent.intent in MESSAGE_INTENTS && !data.mentionsNode(lower)) {
+        if (intent.intent in MESSAGE_ASK_INTENTS && !data.mentionsNode(lower)) {
             if (NODE_COUNT_ASK.containsMatchIn(lower) && !ROLE_WORDS.containsMatchIn(lower)) return data.networkCount().also(onPiece)
             if (ROLE_LIST_ASK.containsMatchIn(lower) && ROLE_WORDS.containsMatchIn(lower) && !NEAR_FAR.containsMatchIn(lower)) {
                 val roleKey =
@@ -1580,7 +1580,7 @@ class LlamaAssistantService(
         val MODEL_SOURCE_TAIL = Regex("(?iu)[\\s(]*(?<!\\p{L})(źródło|źródła|source|sources)\\s*:[^\\n]*$")
         val NOT_KNOWN = Regex("nie mam informacji|nie wiem|brak informacji|nie znalazłem|nie znalazlem|i do not know|i don't know|no information")
         val NEW_NODES_ASK = Regex("now(?:ych|e|y|ego) (?:węzł|wezl)|new nodes?")
-        val MESSAGE_INTENTS = setOf("chat", "web_question", "app_help", "network_question", "count_messages", "search_messages")
+        val MESSAGE_ASK_INTENTS = setOf("chat", "web_question", "app_help", "network_question", "count_messages", "search_messages")
         val WHO_WROTE = Regex("(?iu)\\bkto (pisał|pisal|napisał|napisal|pisze|wysyłał|wysylal)\\p{L}*|who (wrote|sent|messaged)")
         val MOST_WRITTEN = Regex("(?iu)najwięcej|najwiecej|najczęściej|najczesciej|most")
         val ABOUT_TOPIC = Regex("(?iu)czy (?:ktoś|ktos|ktokolwiek) (?:pisał|pisal|wspominał|wspominal|mówił|mowil)\\p{L}* (?:o|na temat|o tym)\\s+(.+?)\\s*[?.!]*$")
