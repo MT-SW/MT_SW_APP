@@ -84,14 +84,14 @@ onnxruntime = "1.22.0"
 camerax = "1.7.0-rc01"
 
 # Networking
-ktor = "3.6.0"
+ktor = "3.6.1"
 
 # Other
 aboutlibraries = "15.3.0"
 jserialcomm = "2.11.4"
 coil = "3.6.3"
-datadog-gradle = "1.31.0"
-dd-sdk-android = "3.15.0"
+datadog-gradle = "1.32.0"
+dd-sdk-android = "3.16.0"
 detekt = "2.0.0-alpha.6"
 dokka = "2.3.0-Beta"
 devtools-ksp = "2.3.12"
@@ -103,7 +103,7 @@ okio = "3.18.2"
 bouncycastle = "1.86"
 uri-kmp = "0.0.21"
 spotless = "8.10.4"
-sceneview = "4.62.0"
+sceneview = "4.63.0"
 vico = "3.4.0-next.1"
 # Pinned below 0.45.0 (which bumps the vendored Rust btleplug to 0.13.0): that version unconditionally enables
 # SetAllowExtendedAdvertisements(true) on its Windows/WinRT scan backend, which makes some peripherals (Realtek
@@ -116,8 +116,8 @@ jmdns = "3.6.4"
 dbus-java = "5.2.2"
 qrcode-kotlin = "4.5.0"
 takpacket-sdk = "0.9.3"
-meshtastic-protobufs = "2.8.1.29-gffd5ad4-SNAPSHOT"
 wire = "6.4.7"
+meshtastic-protobufs = "2.8.2"
 
 # Gradle Plugins
 ccud = "2.8.0"
@@ -280,10 +280,10 @@ ktor-network = { module = "io.ktor:ktor-network", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
 # Testing
-androidx-test-core = { module = "androidx.test:core", version = "1.8.0-alpha01" }
-androidx-test-ext-junit = { module = "androidx.test.ext:junit", version = "1.4.0-alpha01" }
-androidx-test-runner = { module = "androidx.test:runner", version = "1.8.0-alpha01" }
-androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version = "3.8.0-alpha01" }
+androidx-test-core = { module = "androidx.test:core", version = "1.8.0-alpha03" }
+androidx-test-ext-junit = { module = "androidx.test.ext:junit", version = "1.4.0-alpha03" }
+androidx-test-runner = { module = "androidx.test:runner", version = "1.8.0-alpha03" }
+androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version = "3.8.0-alpha03" }
 junit = { module = "junit:junit", version = "4.13.2" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
 junit-vintage-engine = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "junit5" }

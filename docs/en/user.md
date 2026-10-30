@@ -19,6 +19,8 @@ Keep the last 5–8 entries and archive older ones by removing them.
 
 **October 2026** — [MT_SW features](user/mt-sw-features) — A new page describes what MT_SW_APP adds to the original app, such as Network health, links on the map, the Mesh Link Planner, diagnostics, the Sniffer and app scale, and where to find each one.
 
+**October 2026** — [Firmware Updates](user/firmware) — What the Meshtastic nRF52 Bootloader does while the update drive is up, and where a node waits after a dropped Bluetooth update.
+
 **October 2026** — [Settings — Radio & User](user/settings-radio-user) — Each configuration screen has its own section, settings use the app's exact labels, and every table lists the default value.
 
 **October 2026** — [Firmware Updates](user/firmware) — A node on firmware from 2.3.15 up to 2.5.14 stays connected behind a required-update screen, and the Connect tab flags a newer stable release.
@@ -32,8 +34,6 @@ Keep the last 5–8 entries and archive older ones by removing them.
 **September 2026** — [Notifications](user/notifications) — A page that lists every notification category, what each opens when tapped, when a message stays quiet, and what a message notification lets you do from the shade or a watch.
 
 **September 2026** — [Nodes](user/nodes) — On firmware 2.8.1 or newer, nodes your node has not heard since its LoRa settings changed carry an orange marker, a **Hide unheard nodes** filter, and a banner whose **Remove** action deletes them after you confirm.
-
-**September 2026** — [Local Mesh Discovery](user/discovery) — Signal colors are relative to the preset's demodulation floor rather than fixed thresholds, and a beacon's broadcast targets always hold at least one row.
 
 <!-- WHATS_NEW_END -->
 

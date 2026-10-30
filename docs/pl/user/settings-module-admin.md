@@ -264,7 +264,7 @@ Zdalne zarządzanie zmienia ustawienia innego węzła przez sieć mesh. Węzeł 
 |---|---|
 | Ustaw czas | Wysyła zegar Twojego telefonu do węzła |
 | Restart | Uruchamia węzeł ponownie |
-| Restart w trybie DFU | Uruchamia węzeł nRF52 ponownie w bootloaderze, gdzie pozostaje poza siecią mesh, dopóki nie zostanie wgrane nowe oprogramowanie lub nie zostanie zresetowany. Widoczne tylko dla węzłów nRF52 |
+| Restart w trybie DFU | Uruchamia węzeł nRF52 ponownie w bootloaderze, gdzie pozostaje poza siecią mesh, dopóki nie zostanie wgrane nowe oprogramowanie lub nie zostanie zresetowany. W bootloaderze 2.6.0 i nowszym po 6 minutach bez aktywności aktualizacji uruchamia zainstalowane firmware. Widoczne tylko dla węzłów nRF52 |
 | Wyłącz | Wyłącza zasilanie węzła |
 | Ustawienia fabryczne | Przywraca wszystkim ustawieniom wartości fabryczne |
 | Zresetuj NodeDB | Czyści bazę węzłów. To okno dialogowe zawiera przełącznik **Zachować ulubione?** (Preserve Favorites?) |

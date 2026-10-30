@@ -2,7 +2,7 @@
 title: Aktualizacje firmware
 parent: Przewodnik użytkownika
 nav_order: 13
-last_updated: 2026-10-21
+last_updated: 2026-10-30
 description: Aktualizuj firmware radia przez Bluetooth, Wi-Fi lub USB — proces OTA, kanały wersji, kontrole przed aktualizacją i odzyskiwanie.
 aliases:
   - firmware
@@ -94,7 +94,24 @@ Bootloader nRF od producenta dostarczany jako `.zip` (np. RAK WisBlock RAK4631) 
 
 ### Kasowanie fabryczne i aktualizacja bootloadera
 
-Przy połączeniu **USB/szeregowym** urządzenia nRF52 i RP2040 można wykasować w ramach aktualizacji — to zgoda **Wykasuj urządzenie podczas aktualizacji** opisana wcześniej na tej stronie. Urządzenia nRF52 dodatkowo oferują **Zaktualizuj bootloader**, gdy dla danej płyty opublikowano zaktualizowany bootloader; urządzenia RP2040 nie mają bootloadera Adafruit, więc nigdy go nie widzą.
+Przy połączeniu **USB/szeregowym** urządzenia nRF52 i RP2040 można wykasować w ramach aktualizacji — to zgoda **Wykasuj urządzenie podczas aktualizacji** opisana wcześniej na tej stronie. Urządzenia nRF52 dodatkowo oferują **Zaktualizuj bootloader**, gdy dla danej płyty opublikowano zaktualizowany bootloader; urządzenia RP2040 nie mają bootloadera Adafruit, więc nigdy go nie widzą. Aktualizacja instaluje wydanie [Meshtastic nRF52 Bootloader](https://github.com/meshtastic/nRF52_Bootloader) wskazane na karcie.
+
+### Co robi bootloader nRF52
+
+Wersja 2.6.0 i nowsze Meshtastic nRF52 Bootloader robi poniższe, gdy dysk aktualizacji jest widoczny.
+
+- **Kopia zapasowa.** `CURRENT.UF2` na dysku to kopia zainstalowanego firmware. Skopiuj go, aby zrobić kopię zapasową, albo skopiuj z powrotem na dysk, aby zainstalować ponownie.
+- **Ekran.** W węźle z ekranem tytuł brzmi BOOTLOADER, ERASE, WRONG FILE lub NO FIRMWARE, a pasek postępu pokazuje kopiowanie.
+- **Zły plik.** Plik firmware, którego płyta nie przyjmie, jest odrzucany jako WRONG FILE.
+- **Przerwane kopiowanie.** Jeśli kabel zostanie wyciągnięty w trakcie kopiowania, węzeł nie ma firmware. Podłącz go ponownie i skopiuj firmware jeszcze raz.
+- **Bezczynność.** Po 6 minutach bez aktywności aktualizacji węzeł z firmware uruchamia je. Węzeł bez firmware dalej czeka.
+- **Płyty z jednym przyciskiem.** T1000-E i MeshTracker X1 nie mają przycisku reset. Przytrzymaj przycisk przez około 3 sekundy podczas włączania węzła, aby wejść w tryb aktualizacji. Wysuń dysk z komputera, aby wyjść bez kopiowania pliku. Aktualizacja USB w aplikacji nie wymaga przycisku.
+
+W Meshtastic nRF52 Bootloader 2.6.0 i nowszym przerwana aktualizacja przez Bluetooth może zacząć się od nowa, a miejsce, w którym węzeł czeka, zależy od zasilania:
+
+- Na baterii czeka na aktualizację przez Bluetooth, więc **Wznów aktualizację firmware** może go osiągnąć.
+- Podłączony do komputera pokazuje NO FIRMWARE i pojawia się jako dysk aktualizacji, a nie przez Bluetooth. Skopiuj na dysk plik `.uf2` firmware swojej płyty albo użyj [Web Flashera](https://flasher.meshtastic.org). Odłącz go, aby wznowić przez Bluetooth. Aktualizacja USB w aplikacji nie może tu wystartować.
+
 
 Obie funkcje są tylko dla Androida. Zależą od kontroli dysku aktualizacji w Androidzie, więc aplikacja desktopowa ich nie pokazuje — tam użyj [Web Flashera](https://flasher.meshtastic.org).
 
