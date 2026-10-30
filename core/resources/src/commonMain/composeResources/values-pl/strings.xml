@@ -3237,6 +3237,8 @@
     <string name="ai_radio_none">Brak jeszcze statystyk z Twojego radia.</string>
     <string name="ai_dm_title">Ostatnie wiadomości prywatne do Ciebie (najnowsze na górze):</string>
     <string name="ai_dm_none">Nikt jeszcze nie napisał do Ciebie prywatnie.</string>
+    <string name="ai_dm_channels">Nikt nie napisał do Ciebie prywatnie. Ostatnie wiadomości innych osób na kanałach (najnowsze na górze):</string>
+    <string name="ai_neigh_most_title">Węzły z największą liczbą sąsiadów (z ostatniej listy sąsiadów każdego węzła):</string>
     <string name="assistant_web_used">Odpowiedź z pomocą internetu</string>
     <string name="assistant_web_searched">wyszukano: %1$s</string>
     <string name="assistant_web_sources">źródła: %1$s</string>

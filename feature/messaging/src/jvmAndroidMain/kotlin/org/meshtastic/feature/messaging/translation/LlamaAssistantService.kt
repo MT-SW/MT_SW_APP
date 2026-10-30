@@ -568,6 +568,18 @@ class LlamaAssistantService(
                 return "$name: $info\n\n" .plus(if (polish) "Źródło: Baza wiedzy: Role urządzenia i retransmisja" else "Source: Knowledge base: device roles and rebroadcast").also(onPiece)
             }
         }
+        // "Which nodes are nearest to me" / "the 5 nearest": a list with distances, not only the first node and the map.
+        if (intent.intent == "nearest_node" && NEAR_LIST.containsMatchIn(lower) && !data.mentionsNode(lower)) {
+            data.directAnswer(question)?.let {
+                lastRoute = "nearest nodes list"
+                return it.also(onPiece)
+            }
+        }
+        // "Which node has the most neighbours": a ranking from the nodes' neighbour lists, not the help for the neighbour icon.
+        if (NEIGHBOUR_RANK.containsMatchIn(lower) && !data.mentionsNode(lower) && !CHANGE_ASK.containsMatchIn(lower) && !ICON_OFF.containsMatchIn(lower)) {
+            lastRoute = "neighbour ranking"
+            return data.toolNeighbors("", LIST_SHOWN, rankByCount = true).also(onPiece)
+        }
         // "Why does a message say undelivered": a question for the knowledge base, not the app's status page.
         if (intent.intent == "app_status" && WHY_ASK.containsMatchIn(lower)) {
             return fromBase(modelId, history, question, intent.text, polish, answerLang, onPiece, roomFor(modelId))
@@ -1841,6 +1853,9 @@ class LlamaAssistantService(
             )
         val DEFINITION_ASK = Regex("(?iu)^\\s*(co to (jest|są|sa)|czym (jest|są|sa)|what (is|are))\\s")
         val DEFINITION_FOLLOW = Regex("(?iu)^(jak|jakie|jaki|jaka|co|czy|how|what|which)(?![\\p{L}])")
+        val NEAR_LIST = Regex("(?iu)węzły|wezly|nodes|najbliższe|najblizsze|najbliższych|najblizszych|\\b\\d+\\s+(najbliż|najbliz|nearest|closest)")
+        val NEIGHBOUR_RANK = Regex("(?iu)(najwięcej|najwiecej|najwięcej|most|największą liczb|najwieksza liczb).{0,40}(sąsiad|sasiad|neighbo)|(sąsiad|sasiad|neighbo).{0,40}(najwięcej|najwiecej|most)")
+        val ICON_OFF = Regex("(?iu)ikon|icon|wyłącz|wylacz|ukryj|hide|turn off")
         val JOINER = Regex("^[\\s,.;?]*(?:i|a|oraz|and)?\\s*", RegexOption.IGNORE_CASE)
         val SECOND_QUESTION =
             Regex(

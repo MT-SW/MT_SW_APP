@@ -33,6 +33,7 @@ import org.meshtastic.core.resources.ai_near_one
 import org.meshtastic.core.resources.ai_dist_next
 import org.meshtastic.core.resources.ai_nodes_recent
 import org.meshtastic.core.resources.ai_dm_title
+import org.meshtastic.core.resources.ai_dm_channels
 import org.meshtastic.core.resources.ai_dm_none
 import org.meshtastic.core.resources.ai_radio_title
 import org.meshtastic.core.resources.ai_radio_uptime
@@ -92,6 +93,7 @@ import org.meshtastic.core.resources.ai_msg_error
 import org.meshtastic.core.resources.ai_msg_other
 import org.meshtastic.core.resources.ai_msg_queued
 import org.meshtastic.core.resources.ai_neigh_hears
+import org.meshtastic.core.resources.ai_neigh_most_title
 import org.meshtastic.core.resources.ai_neigh_nobody
 import org.meshtastic.core.resources.ai_neigh_none
 import org.meshtastic.core.resources.ai_neigh_none_node
@@ -1293,7 +1295,7 @@ class AssistantDataProvider(
     }
 
     /** Who each node reported hearing directly (neighbour info), newest report per node; one [node] or all. */
-    suspend fun toolNeighbors(node: String, limit: Int): String {
+    suspend fun toolNeighbors(node: String, limit: Int, rankByCount: Boolean = false): String {
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
         val wanted = node.anyToEmpty()
         val num = if (wanted.isEmpty()) null else (findNode(node)?.num ?: return unknownNode(node))
@@ -1309,10 +1311,11 @@ class AssistantDataProvider(
         }
         if (newest.isEmpty()) return aiString(if (num != null) Res.string.ai_neigh_none_node else Res.string.ai_neigh_none)
         val nobody = aiString(Res.string.ai_neigh_nobody)
-        return aiString(Res.string.ai_neigh_title) + "\n" +
-            newest.entries.sortedByDescending { it.value.first }.take(top).map { (owner, v) ->
+        val ordered = if (rankByCount) newest.entries.sortedByDescending { it.value.second.neighbors.size } else newest.entries.sortedByDescending { it.value.first }
+        return aiString(if (rankByCount) Res.string.ai_neigh_most_title else Res.string.ai_neigh_title) + "\n" +
+            ordered.take(top).map { (owner, v) ->
                 val whenText = ago(((now - v.first) / MILLIS_PER_MINUTE).coerceAtLeast(0))
-                "• ${aiString(Res.string.ai_neigh_hears, nameOf(owner), whenText)} " +
+                "• ${aiString(Res.string.ai_neigh_hears, nameOf(owner), whenText)} " + (if (rankByCount) "[${v.second.neighbors.size}] " else "") +
                     v.second.neighbors.joinToString { "${nameOf(it.node_id)} (${fmt(it.snr)} dB)" }.ifBlank { nobody }
             }.joinToString("\n")
     }
@@ -1666,14 +1669,37 @@ class AssistantDataProvider(
 
     /** Who wrote to the user privately lately: the newest message from each person, newest first, in code. */
     suspend fun recentToMe(limit: Int): String {
-        val keys = packetRepository.getContacts().first().keys.filter { !it.endsWith("^all") }
-        val found = ArrayList<Triple<Long, String, String>>()
-        for (key in keys) {
-            val list = packetRepository.getMessagesFrom(key, RECENT_PER_CHAT) { id -> nodeRepository.getNode(id.orEmpty()) }.first()
-            val newest = list.filter { !it.fromLocal }.maxByOrNull { it.receivedTime } ?: continue
-            val who = newest.node.user.long_name.ifBlank { newest.node.user.short_name }
-            found += Triple(newest.receivedTime, who, newest.text.take(MESSAGE_CHARS))
+        val contacts = packetRepository.getContacts().first().keys
+        suspend fun newestFrom(keys: List<String>): List<Triple<Long, String, String>> {
+            val found = ArrayList<Triple<Long, String, String>>()
+            for (key in keys) {
+                val list = packetRepository.getMessagesFrom(key, RECENT_PER_CHAT) { id -> nodeRepository.getNode(id.orEmpty()) }.first()
+                // On a channel every sender counts, so the newest message of each person is taken, not of the whole chat.
+                val mine = list.filter { !it.fromLocal }
+                val senders = if (key.endsWith("^all")) mine.groupBy { it.node.num }.values.map { group -> group.maxByOrNull { it.receivedTime }!! } else listOfNotNull(mine.maxByOrNull { it.receivedTime })
+                for (newest in senders) {
+                    val who = newest.node.user.long_name.ifBlank { newest.node.user.short_name }
+                    found += Triple(newest.receivedTime, who, newest.text.take(MESSAGE_CHARS))
+                }
+            }
+            return found
         }
+        var found = newestFrom(contacts.filter { !it.endsWith("^all") })
+        var title = Res.string.ai_dm_title
+        // Nobody wrote privately: the people who wrote on the channels lately are the better answer than "nobody".
+        if (found.isEmpty()) {
+            found = newestFrom(contacts.filter { it.endsWith("^all") })
+            title = Res.string.ai_dm_channels
+        }
+        if (found.isEmpty()) return aiString(Res.string.ai_dm_none)
+        val now = nowMillis
+        val sb = StringBuilder(aiString(title))
+        val seen = HashSet<String>()
+        for ((time, who, text) in found.sortedByDescending { it.first }.filter { seen.add(it.second) }.take(limit)) {
+            sb.append("\n• ").append(who).append(", ").append(ago(((now - time) / MILLIS_PER_MINUTE).coerceAtLeast(0))).append(": ").append(text)
+        }
+        return sb.toString()
+    }
         if (found.isEmpty()) return aiString(Res.string.ai_dm_none)
         val now = nowMillis
         val sb = StringBuilder(aiString(Res.string.ai_dm_title))

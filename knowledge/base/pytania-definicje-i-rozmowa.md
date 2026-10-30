@@ -39,3 +39,13 @@ Słowa: nie łączy się, połączenie z telefonem, Bluetooth, parowanie, PIN, z
 Lekkie ciepło podczas ładowania akumulatora jest normalne. Jeśli obudowa robi się gorąca, że nie da się jej trzymać, akumulator puchnie albo czuć zapach, od razu odłącz ładowanie i nie używaj tego akumulatora. Ładuj w miejscu, w którym nic się nie zapali, i nie zostawiaj ładującego się węzła bez nadzoru na całą noc.
 Słowa: grzeje się, gorący, ładowanie, akumulator, Li-ion, puchnięcie, nagrzewanie, bezpieczeństwo baterii
 Źródło: Baza wiedzy: akumulatory Li-ion (wiedza ogólna, opracowanie własne, 2026-10)
+
+### Jak powiększyć interfejs aplikacji?
+Rozmiar tekstu i elementów zmieniasz w ustawieniach aplikacji przez skalowanie aplikacji: od 50% do 200%, niezależnie od ustawień telefonu. Domyślnie jest „Zgodnie z systemem”. Skrót do skalowania jest też w Ustawienia → Funkcje MT_SW. Działa także w wersji na komputer.
+Słowa: powiększyć interfejs, skalowanie aplikacji, rozmiar tekstu, większa czcionka, zoom, mniejszy interfejs, skala
+Źródło: Dokumentacja aplikacji: skalowanie aplikacji (sprawdzono 2026-10)
+
+### Jak wyłączyć (lub włączyć) automatyczne ładowanie obrazków w czacie?
+Podgląd obrazków z linków w czacie jest domyślnie wyłączony. Włączasz go i wyłączasz przełącznikiem w Ustawienia → Prywatność, a ten sam przełącznik jest też w Ustawienia → Funkcje MT_SW. Aplikacja nie wysyła zdjęć przez LoRa, tylko link: odbiorca widzi podgląd, jeśli ma tę funkcję włączoną. Przed wysłaniem zdjęcia jest ostrzeżenie, że serwer ze zdjęciem jest publiczny.
+Słowa: obrazki w czacie, podgląd obrazków, automatyczne ładowanie obrazków, zdjęcia przez link, prywatność, wyłączyć podgląd
+Źródło: Dokumentacja aplikacji: zdjęcia przez link, prywatność (sprawdzono 2026-10)
