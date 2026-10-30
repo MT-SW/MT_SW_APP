@@ -17,7 +17,7 @@ Słowa: przeziębienie, odpoczynek, płyny, płukanie, cytryna, miód, para, zat
 Źródło: https://www.nhs.uk/conditions/common-cold/ (sprawdzono 2026-10, źródło brytyjskie)
 
 ### Jakie leki przeciwprzeziębieniowe radzi farmaceuta według NHS?
-Farmaceuta może polecić paracetamol lub ibuprofen na bóle i gorączkę oraz leki udrażniające nos, których nie podaje się dzieciom poniżej 6 lat. Maść do wcierania pomaga przy kaszlu z flegmą u niemowląt i małych dzieci. Spraye do nosa nie powinny być używane dłużej niż tydzień. Trzeba sprawdzić, czy leki przeziębieniowe nie dublują paracetamolu lub ibuprofenu. Strona zaznacza, że mało dowodów na działanie witaminy C, jeżeżówki i czosnku.
+Farmaceuta może polecić paracetamol lub ibuprofen na bóle i gorączkę oraz leki udrażniające nos, których nie podaje się dzieciom poniżej 6 lat. Maść do wcierania pomaga przy kaszlu z flegmą u niemowląt i małych dzieci. Spraye do nosa nie powinny być używane dłużej niż tydzień. Trzeba sprawdzić, czy leki przeziębieniowe nie dublują paracetamolu lub ibuprofenu. Strona zaznacza, że mało dowodów na działanie witaminy C, jeżówki i czosnku.
 
 Słowa: przeziębienie, farmaceuta, paracetamol, ibuprofen, dekongestant, maść, spray do nosa, witamina C, czosnek
 Źródło: https://www.nhs.uk/conditions/common-cold/ (sprawdzono 2026-10, źródło brytyjskie)
