@@ -137,10 +137,12 @@ object AiModels {
     const val G4_E4B = "g4-e4b-q4"
     const val G4_12B = "g4-12b-q4"
     const val G4_26B = "g4-26b-a4b-q4"
+    const val QWEN_08B = "qwen35-0_8b-q4"
     const val QWEN_2B = "qwen35-2b-q4"
     const val QWEN_4B = "qwen35-4b-q4"
     const val QWEN_9B = "qwen35-9b-q4"
     const val QWEN_35B = "qwen35-35b-a3b-q4"
+    const val BIELIK_15B = "bielik-1_5b-q8"
     const val BIELIK_45B = "bielik-4_5b-q8"
     const val BIELIK_7B = "bielik-minitron-7b-q4"
     const val BIELIK_11B = "bielik-11b-v3-q4"
@@ -278,6 +280,26 @@ object AiModels {
             pageUrl = "${HF}google/gemma-4-26B-A4B-it-qat-q4_0-gguf",
         )
 
+    val Qwen08b =
+        AiModelInfo(
+            id = QWEN_08B,
+            intelNpu = false,
+            quietThinking = false,
+            name = "Qwen 3.5 0.8B",
+            family = "Qwen 3.5",
+            engine = AiEngine.LLAMA_CPP,
+            roles = TEXT,
+            sizeMb = 507,
+            ramMb = 1200,
+            minDeviceRamGb = 3,
+            license = AiLicense.APACHE_2_0,
+            files = listOf(hf("unsloth/Qwen3.5-0.8B-GGUF", "Qwen3.5-0.8B-Q4_0.gguf", 507)),
+            platforms = BOTH,
+            descriptionPl = "Najmniejszy i najszybszy model: do bardzo prostych pytań i najsłabszych telefonów. Odpowiada krótko, polski prosty.",
+            descriptionEn = "The smallest and fastest model: for very simple questions and the weakest phones. Answers briefly, simple Polish.",
+            pageUrl = "${HF}unsloth/Qwen3.5-0.8B-GGUF",
+        )
+
     val Qwen2b =
         AiModelInfo(
             id = QWEN_2B,
@@ -356,6 +378,24 @@ object AiModels {
             descriptionPl = "Bardzo duży model, który w trakcie pracy używa tylko części (3 mld parametrów). Tylko dla komputerów z dużą ilością RAM.",
             descriptionEn = "A very large model that uses only part of itself while working (3 billion parameters). Only for computers with a lot of RAM.",
             pageUrl = "${HF}unsloth/Qwen3.5-35B-A3B-GGUF",
+        )
+
+    val Bielik15b =
+        AiModelInfo(
+            id = BIELIK_15B,
+            name = "Bielik 1.5B v3",
+            family = "Bielik",
+            engine = AiEngine.LLAMA_CPP,
+            roles = TEXT,
+            sizeMb = 1700,
+            ramMb = 2600,
+            minDeviceRamGb = 4,
+            license = AiLicense.APACHE_2_0,
+            files = listOf(hf("speakleash/Bielik-1.5B-v3.0-Instruct-GGUF", "Bielik-1.5B-v3.0-Instruct.Q8_0.gguf", 1700)),
+            platforms = BOTH,
+            descriptionPl = "Najmniejszy polski model od SpeakLeash: lekki, dobrze radzi sobie z polskim w prostych rozmowach.",
+            descriptionEn = "The smallest Polish model from SpeakLeash: light, handles Polish well in simple conversations.",
+            pageUrl = "${HF}speakleash/Bielik-1.5B-v3.0-Instruct-GGUF",
         )
 
     val Bielik45b =
@@ -524,8 +564,8 @@ object AiModels {
         listOf(
             Nllb600,
             G4E2b, G4E4b, G4_12b, G4_26b,
-            Qwen2b, Qwen4b, Qwen9b, Qwen35b,
-            Bielik45b, Bielik7b, Bielik11b, Pllum12b,
+            Qwen08b, Qwen2b, Qwen4b, Qwen9b, Qwen35b,
+            Bielik15b, Bielik45b, Bielik7b, Bielik11b, Pllum12b,
             TranslateGemma4b, TranslateGemma12b,
             WhisperBase, WhisperSmall, WhisperMedium, WhisperTurbo,
         )

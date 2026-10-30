@@ -102,7 +102,7 @@ class LlamaCppEngine(
 
     override fun contextTokens(modelId: String): Int =
         when (modelId) {
-            AiModels.G4_E2B, AiModels.QWEN_2B -> CONTEXT_SMALL
+            AiModels.G4_E2B, AiModels.QWEN_2B, AiModels.QWEN_08B, AiModels.BIELIK_15B -> CONTEXT_SMALL
             else -> CONTEXT_LARGE
         }
 
