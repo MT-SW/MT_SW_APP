@@ -1,0 +1,150 @@
+# Builds the whisper.cpp speech server (dictation) for computers with graphics-card support and puts it on this
+# project's release page, where the app fetches it: Metal on an Apple Silicon Mac, Vulkan on Windows and Linux.
+# If the graphics card does not work on a computer, the app falls back to the processor by itself.
+# Run by hand: Actions -> Run workflow.
+name: Build whisper.cpp for computers
+
+on:
+  # Runs by itself when this file is pushed to GitHub (so nothing has to be clicked), and by hand when needed.
+  push:
+    paths:
+      - ".github/workflows/build-whisper-desktop.yml"
+  workflow_dispatch:
+    inputs:
+      llama_tag:
+        description: "Release tag suffix (must match LLAMA_TAG in ModelServerInstaller)"
+        default: "b11960"
+        required: true
+      whisper_ref:
+        description: "whisper.cpp version (must match WHISPER_REF in ModelServerInstaller)"
+        default: "v1.9.5"
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  REF: ${{ inputs.whisper_ref || 'v1.9.5' }}
+  RELEASE: engines-${{ inputs.llama_tag || 'b11960' }}
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Make sure the release exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$RELEASE" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+            gh release create "$RELEASE" --repo "$GITHUB_REPOSITORY" --title "AI engines ${RELEASE#engines-}" \
+              --notes "Programs the app downloads for its AI models. Do not delete." --prerelease
+
+  mac:
+    needs: release
+    runs-on: macos-14
+    steps:
+      - name: Get whisper.cpp
+        run: git clone --depth 1 --branch "$REF" https://github.com/ggml-org/whisper.cpp whisper.cpp
+
+      - name: Build whisper-server (Metal, one file)
+        run: |
+          cmake -S whisper.cpp -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=13.0 -DBUILD_SHARED_LIBS=OFF -DGGML_METAL=ON -DGGML_METAL_EMBED_LIBRARY=ON \
+            -DGGML_NATIVE=OFF -DWHISPER_BUILD_TESTS=OFF -DWHISPER_SDL2=OFF -DWHISPER_BUILD_EXAMPLES=ON
+          cmake --build build --config Release --target whisper-server -j
+
+      - name: Pack
+        run: |
+          BIN="$(find build -name whisper-server -type f | head -n 1)"
+          strings "$BIN" | grep -qi "ggml_metal"
+          mkdir pack
+          cp "$BIN" pack/
+          cp whisper.cpp/LICENSE pack/
+          tar -czf "whisper-$REF-macos-arm64-metal.tar.gz" -C pack .
+
+      - name: Publish on the release page
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$RELEASE" --repo "$GITHUB_REPOSITORY" --clobber whisper-*-macos-arm64-metal.tar.gz
+
+  linux:
+    needs: release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            arch: x64
+          - runner: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Get whisper.cpp
+        run: git clone --depth 1 --branch "$REF" https://github.com/ggml-org/whisper.cpp whisper.cpp
+
+      - name: Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build glslc glslang-tools libvulkan-dev spirv-headers
+
+      - name: Build whisper-server (Vulkan)
+        run: |
+          cmake -S whisper.cpp -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF \
+            -DGGML_VULKAN=ON -DGGML_NATIVE=OFF -DGGML_OPENMP=OFF \
+            -DCMAKE_EXE_LINKER_FLAGS="-static-libstdc++ -static-libgcc" \
+            -DWHISPER_BUILD_TESTS=OFF -DWHISPER_SDL2=OFF -DWHISPER_BUILD_EXAMPLES=ON
+          cmake --build build --target whisper-server
+
+      - name: Pack
+        run: |
+          BIN="$(find build -name whisper-server -type f | head -n 1)"
+          strings "$BIN" | grep -qi "ggml_vulkan"
+          mkdir pack
+          cp "$BIN" pack/
+          cp whisper.cpp/LICENSE pack/
+          tar -czf "whisper-$REF-linux-${{ matrix.arch }}-vulkan.tar.gz" -C pack .
+
+      - name: Publish on the release page
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$RELEASE" --repo "$GITHUB_REPOSITORY" --clobber whisper-*-linux-*-vulkan.tar.gz
+
+  windows:
+    needs: release
+    runs-on: windows-2022
+    steps:
+      - name: Get whisper.cpp
+        shell: bash
+        run: git clone --depth 1 --branch "$REF" https://github.com/ggml-org/whisper.cpp whisper.cpp
+
+      - name: Vulkan SDK
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://sdk.lunarg.com/sdk/download/1.4.309.0/windows/VulkanSDK-1.4.309.0-Installer.exe" -OutFile vulkan.exe
+          Start-Process -FilePath .\vulkan.exe -ArgumentList "--accept-licenses --default-answer --confirm-command install" -Wait
+          "VULKAN_SDK=C:\VulkanSDK\1.4.309.0" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "C:\VulkanSDK\1.4.309.0\Bin" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+
+      - name: Build whisper-server (Vulkan, runtime built in)
+        shell: bash
+        run: |
+          cmake -S whisper.cpp -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DGGML_VULKAN=ON \
+            -DGGML_NATIVE=OFF -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded \
+            -DWHISPER_BUILD_TESTS=OFF -DWHISPER_SDL2=OFF -DWHISPER_BUILD_EXAMPLES=ON
+          cmake --build build --config Release --target whisper-server -j
+
+      - name: Pack
+        shell: bash
+        run: |
+          BIN="$(find build -name whisper-server.exe -type f | head -n 1)"
+          strings "$BIN" 2>/dev/null | grep -qi "ggml_vulkan" || grep -qa "ggml_vulkan" "$BIN"
+          mkdir pack
+          cp "$BIN" pack/
+          cp whisper.cpp/LICENSE pack/
+          7z a "whisper-$REF-win-x64-vulkan.zip" ./pack/*
+
+      - name: Publish on the release page
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$RELEASE" --repo "$GITHUB_REPOSITORY" --clobber whisper-*-win-x64-vulkan.zip

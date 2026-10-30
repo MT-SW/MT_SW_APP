@@ -255,7 +255,10 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
         return llama(suffix, LLAMA_CPU_MB)
     }
 
-    /** The whisper.cpp program (processor only); null where the project publishes none (a Mac). */
+    /**
+     * The whisper.cpp program that always works (processor). On a Mac it is our own Metal build, run without the
+     * graphics card; null for an Intel Mac, where there is no program.
+     */
     fun whisperAsset(): Asset? {
         if (android) {
             // The whisper.cpp project publishes no Android program: our own build (workflow "Build whisper.cpp for Android").
@@ -269,7 +272,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
         }
         val file =
             when {
-                mac -> return null
+                mac -> return whisperDesktopChip()
                 windows -> if (arm) "whisper-bin-win-cpu-arm64.zip" else "whisper-bin-x64.zip"
                 else -> if (arm) "whisper-bin-ubuntu-arm64.tar.gz" else "whisper-bin-ubuntu-x64.tar.gz"
             }
@@ -287,12 +290,32 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
      * whisper.cpp for Android"); the processor build is [whisperAsset]. Empty where there is no such build.
      */
     fun whisperChipAssets(): List<Asset> {
-        if (!android || !llamaSupported) return emptyList()
+        if (!android) return listOfNotNull(whisperDesktopChip())
+        if (!llamaSupported) return emptyList()
         return buildList {
             if (qualcomm) add(whisperChip("snapdragon", WHISPER_SNAPDRAGON_MB))
             if (qualcomm) add(whisperChip("opencl", WHISPER_GPU_MB))
             add(whisperChip("vulkan", WHISPER_GPU_MB))
         }
+    }
+
+    /**
+     * The computer builds of whisper.cpp that use the graphics card: Metal on an Apple Silicon Mac, Vulkan on Windows
+     * (64-bit Intel/AMD) and Linux. Our own builds (workflow "Build whisper.cpp for computers"); null elsewhere.
+     */
+    private fun whisperDesktopChip(): Asset? {
+        val name =
+            when {
+                mac -> if (arm) "macos-arm64-metal.tar.gz" else return null
+                windows -> if (arm) return null else "win-x64-vulkan.zip"
+                else -> if (arm) "linux-arm64-vulkan.tar.gz" else "linux-x64-vulkan.tar.gz"
+            }
+        return Asset(
+            url = "https://github.com/MT-SW/MT_SW_APP/releases/download/engines-$LLAMA_TAG/whisper-$WHISPER_REF-$name",
+            folder = "whisper-$WHISPER_REF-" + name.substringBefore('.'),
+            exeName = "whisper-server$exe",
+            sizeMb = WHISPER_GPU_MB,
+        )
     }
 
     private fun whisperChip(kind: String, sizeMb: Int) =

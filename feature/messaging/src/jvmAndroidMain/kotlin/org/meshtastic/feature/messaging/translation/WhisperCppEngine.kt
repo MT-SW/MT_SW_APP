@@ -131,13 +131,16 @@ class WhisperCppEngine(
             for (asset in installer.whisperChipAssets()) {
                 if (installer.isBroken(asset, modelId)) continue
                 val kind = asset.folder.substringAfterLast('-')
-                if (kind == "snapdragon") {
+                if (!installer.android) {
+                    add(Attempt("graphics card ($kind)", asset, chip = true))
+                } else if (kind == "snapdragon") {
                     add(Attempt("NPU (Hexagon)", asset, chip = true, dsp = true, extra = listOf("-fa"), env = mapOf("GGML_HEXAGON_DEVICES" to "1")))
                 } else {
                     add(Attempt("graphics card ($kind)", asset, chip = true))
                 }
             }
-            add(Attempt("processor", cpu))
+            // The Mac program is the Metal build: without the graphics card it is the processor build.
+            add(Attempt("processor", cpu, extra = if (installer.mac) listOf("-ng") else emptyList()))
         }
         val threads = (Runtime.getRuntime().availableProcessors() / 2).coerceIn(2, MAX_THREADS)
         var failure: Throwable? = null
@@ -172,6 +175,8 @@ class WhisperCppEngine(
                 if (attempt.chip) {
                     val seen = synchronized(chipLines) { chipLines.toString() }
                     check(CHIP_USED.containsMatchIn(seen)) { "the chip took no part: ${seen.takeLast(300)}" }
+                    // A software "graphics card" (llvmpipe) is slower than the processor build.
+                    check(!seen.contains("llvmpipe", ignoreCase = true)) { "only a software graphics card was found" }
                     // A chip can load the model and still fail or write nonsense: one second of silence must go through.
                     withContext(Dispatchers.IO) { send(started, silence()) }
                 }
@@ -262,8 +267,8 @@ class WhisperCppEngine(
         const val WAV_HEADER_BYTES = 44
         val VENDOR_LIB_DIRS = listOf("/vendor/lib64", "/system/vendor/lib64", "/odm/lib64")
         val DSP_DIRS = listOf("/vendor/dsp/cdsp", "/vendor/lib/rfsa/adsp", "/vendor/dsp", "/system/lib/rfsa/adsp", "/dsp")
-        val CHIP_LINE = Regex("backend|HTP\\d|Hexagon|OpenCL|Vulkan|Adreno|device", RegexOption.IGNORE_CASE)
-        val CHIP_USED = Regex("using (HTP|Hexagon|OpenCL|Vulkan|GPU)|HTP\\d|ggml_opencl|ggml_vulkan|ggml-hex|Adreno|Found \\d+ Vulkan", RegexOption.IGNORE_CASE)
+        val CHIP_LINE = Regex("backend|HTP\\d|Hexagon|OpenCL|Vulkan|Metal|Adreno|device", RegexOption.IGNORE_CASE)
+        val CHIP_USED = Regex("using (HTP|Hexagon|OpenCL|Vulkan|GPU)|HTP\\d|ggml_opencl|ggml_vulkan|ggml_metal_init|using Metal|ggml-hex|Adreno|Found \\d+ Vulkan", RegexOption.IGNORE_CASE)
         const val BYTES_PER_SECOND = 32_000L
         const val MS_PER_SECOND = 1_000L
         const val LOAD_TIMEOUT_MS = 120_000L
