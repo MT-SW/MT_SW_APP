@@ -841,11 +841,34 @@ class LlamaAssistantService(
         if (facts.isBlank()) return null
         val web = if (uiPrefs.assistantInternetEnabled.value && webWanted(question, facts)) webTools.web_search(question.take(WEB_QUERY_CHARS)) else ""
         Logger.i(tag = TAG) { "Knowledge base: ${facts.length} chars, web ${web.length} chars" }
+        // The smallest models retold the entries wrongly (invented steps, swapped numbers): they quote the best entry as it is written.
+        if (polish && web.isBlank() && (AiModels.byId(modelId)?.ramMb ?: Int.MAX_VALUE) < QUOTE_BELOW_RAM_MB) {
+            quotedEntry(question, facts)?.let {
+                lastRoute = "quoted knowledge-base entry"
+                return it.also(onPiece)
+            }
+        }
         val extra = buildString {
             append(rule(polish, BASE_PL, BASE_EN)).append('\n').append(facts)
             if (web.isNotBlank()) append("\n\n").append(rule(polish, BASE_WEB_PL, BASE_WEB_EN)).append('\n').append(web)
         }
         return withBaseSource(speak(modelId, history, polish, onPiece, room, extra = extra, temperature = FACT_TEMPERATURE), facts, polish)
+    }
+
+    /**
+     * The best entry of the knowledge base word for word, with its source, when it clearly fits the question (at least two
+     * words of the question in it). Null otherwise: then the model answers as usual.
+     */
+    private fun quotedEntry(question: String, facts: String): String? {
+        val block = facts.split(Regex("\\n\\n(?=\\[)")).firstOrNull() ?: return null
+        val head = BASE_HEAD.find(block)?.groupValues?.get(1)?.trim() ?: return null
+        val body = block.substringAfter('\n', "").lines().filterNot { it.trimStart().startsWith("Źródło:") || it.trimStart().startsWith("Source:") }.joinToString("\n").trim()
+        if (body.length < QUOTE_MIN_CHARS) return null
+        val asked = stems(question)
+        val overlap = asked.count { it in stems("$head $body") }
+        if (overlap < 2 && !(asked.size <= 2 && overlap >= 1)) return null
+        val cut = if (body.length > QUOTE_MAX_CHARS) body.substring(0, QUOTE_MAX_CHARS).substringBeforeLast(". ", body.substring(0, QUOTE_MAX_CHARS)).trimEnd() + "." else body
+        return cut + "\n\nŹródło: " + head
     }
 
     /**
@@ -1442,6 +1465,9 @@ class LlamaAssistantService(
         val PERIOD_NUMBER = Regex("(\\d+)\\s*(min\\p{L}*|godz\\p{L}*|h(?![\\p{L}])|hours?|dni|dzie\\p{L}*|dob\\p{L}*|days?|tydz\\p{L}*|tygod\\p{L}*|weeks?|miesi\\p{L}*|months?|lat(?![\\p{L}])|rok\\p{L}*|years?)")
         val PERIOD_BARE = Regex("ostatni\\p{L}*\\s+(godzin\\p{L}*|dob\\p{L}*|dzie\\p{L}*|tydz\\p{L}*|tygod\\p{L}*|miesi\\p{L}*)|last (hour|day|week|month)")
         val WHO_ARE_YOU = Regex("kim jesteś|kim jestes|kto ty|kim ty jesteś|who are you|what are you")
+        const val QUOTE_BELOW_RAM_MB = 3000
+        const val QUOTE_MIN_CHARS = 60
+        const val QUOTE_MAX_CHARS = 1100
         const val CAPABILITIES_WORDS = 10
         val CAPABILITIES_ASK = Regex("jakie masz możliwości|jakie masz mozliwosci|co potrafisz|co umiesz|co możesz|co mozesz|w czym (możesz|mozesz) (mi )?pomóc|w czym (możesz|mozesz) pomoc|do czego służysz|do czego sluzysz|what can you do|what are you able|how can you help|what do you do")
         const val CAPABILITIES_PL =
