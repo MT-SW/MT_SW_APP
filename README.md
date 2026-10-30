@@ -227,13 +227,23 @@ Natywny **Mesh Link Planer** (symulacja zasięgu radiowego, dostępny na Android
 
 - Za korektę tłumaczeń oraz część pomysłów na nowe funkcje odpowiada [cheaterenator](https://github.com/cheaterenator).
 
+## Licencja, nazwa i cudze treści
+
+Kod jest otwarty, na licencji GNU GPL v3 — możesz go używać, zmieniać i udostępniać dalej na jej zasadach. Prosimy o dobre praktyki:
+
+- zmienioną lub cudzą wersję programu nazwij inaczej i zaznacz, że nie pochodzi od nas;
+- nie przedstawiaj swojego produktu, strony ani grupy jako oficjalnego projektu MT_SW, jeśli nim nie jest;
+- nasze teksty, zrzuty ekranu i dokumentację możesz cytować z podaniem autora i źródła;
+- jeśli chcesz napisać o projekcie lub sieci, odezwij się do nas wcześniej — pomożemy sprawdzić fakty; prosimy nie publikować prywatnych danych osób tworzących projekt.
+
+Nie odpowiadamy za informacje, artykuły, filmy, strony ani wypowiedzi osób i podmiotów trzecich, w tym za błędne, nieaktualne lub niezwiązane z nami fakty. Odcinamy się od stron, struktur, grup i osób, które piszą lub mówią o nas bez kontaktu z nami i bez udziału w naszej społeczności i sieci. Rzetelne informacje o projekcie są w naszych własnych kanałach i repozytoriach (GitHub MT-SW, mt-sw.pl). Pytania i zgłaszanie błędów: przez nasze kanały (lokalne grupy, Discord/WhatsApp/Signal, sieć mesh).
+
 ## Status i zastrzeżenia
 
 - To osobisty, roboczy fork — część zmian jest zweryfikowana buildem i przetestowana na urządzeniu, część czeka na potwierdzenie w terenie.
 - Brak oficjalnych release'ów/tagów — zmiany trzymane na bieżąco na gałęzi `main`.
 - Pełna lista zmian forka: [CHANGELOG.md](CHANGELOG.md) (sekcja „MT_SW — zmiany forka”).
 - Fork korzysta z tej samej licencji GPL-3.0 co projekt macierzysty.
-- Nazwa MT_SW, logo i nasze teksty: zasady opisuje [NAZWA-I-PRAWA.md](NAZWA-I-PRAWA.md). Licencja GPL daje prawo do kodu, a nie do nazwy.
 
 ---
 *Bazuje na [meshtastic/Meshtastic-Android](https://github.com/meshtastic/Meshtastic-Android). Nieoficjalny, niezwiązany z Meshtastic LLC.*
@@ -472,13 +482,23 @@ The native **Mesh Link Planner** (radio coverage simulation, available on Androi
 
 - Translation corrections and some new feature ideas courtesy of [cheaterenator](https://github.com/cheaterenator).
 
+## Licence, name and third-party content
+
+The code is open, under the GNU GPL v3 — you may use, modify and redistribute it under its terms. We kindly ask for good practice:
+
+- please give a modified or third-party version a different name and state that it does not come from us;
+- please do not present your product, website or group as an official MT_SW project if it is not;
+- you may quote our texts, screenshots and documentation, naming the author and source;
+- if you want to write about the project or the network, please contact us beforehand — we will help check the facts; please do not publish private data of the people behind the project.
+
+We are not responsible for information, articles, videos, websites or statements made by third parties, including incorrect, outdated or unrelated facts about us. We distance ourselves from websites, structures, groups and persons who write or speak about us without any contact with us and without taking part in our community and network. Reliable information about the project is in our own channels and repositories (GitHub MT-SW, mt-sw.pl). Questions and bug reports: through our channels (local groups, Discord/WhatsApp/Signal, the mesh network).
+
 ## Status and caveats
 
 - This is a personal, work-in-progress fork — some changes are build-verified and tested on-device, others are still awaiting confirmation in the field.
 - No official releases/tags — changes are kept up to date directly on the `main` branch.
 - Full list of fork changes: [CHANGELOG.md](CHANGELOG.md) (section “MT_SW — fork changes”).
 - The fork uses the same GPL-3.0 license as the upstream project.
-- The MT_SW name, logos and our texts: see [NAZWA-I-PRAWA.md](NAZWA-I-PRAWA.md). The GPL grants rights to the code, not to the name.
 
 ---
 *Based on [meshtastic/Meshtastic-Android](https://github.com/meshtastic/Meshtastic-Android). Unofficial, not affiliated with Meshtastic LLC.*
