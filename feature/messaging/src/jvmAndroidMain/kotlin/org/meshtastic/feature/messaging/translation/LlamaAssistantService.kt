@@ -1023,6 +1023,8 @@ class LlamaAssistantService(
                     if (text.isNotBlank()) return text.also(onPiece)
                 }
                 // A small model gets the manual's own lines about the found setting before anything else is tried.
+                // An entry of the base that opens like the question ("How do I download…") answers it better than loose manual lines.
+                if (smallModel(modelId)) fromBase(modelId, history, question, intent.text, polish, answerLang, onPiece, room, quoteOnly = true)?.let { return it }
                 if (smallModel(modelId) && fits && button != null) {
                     val lines = bestLines(manual, button.label, "${intent.text} ${button.label}", question, polish, oneSetting = false)
                     if (lines.isNotBlank()) {
@@ -1095,6 +1097,7 @@ class LlamaAssistantService(
         onPiece: (String) -> Unit,
         room: Int,
         baseOnly: Boolean = false,
+        quoteOnly: Boolean = false,
     ): String? {
         val query = listOf(question, topic).joinToString(" ").trim()
         val facts =
@@ -1102,7 +1105,15 @@ class LlamaAssistantService(
         // A small model (or any model outside the Gemma family) never retells web results in its own words: the app quotes them.
         val small = smallModel(modelId)
         // Quoting chooses from many more entries than a small model could be given to read.
-        val pool = if (small) knowledge?.lookupBase(query, QUOTE_FACTS_CHARS, language).orEmpty().ifBlank { facts } else facts
+        val pool =
+            if (small) (if (baseOnly) knowledge?.lookupBaseOnly(query, QUOTE_FACTS_CHARS, language) else knowledge?.lookupBase(query, QUOTE_FACTS_CHARS, language)).orEmpty().ifBlank { facts } else facts
+        if (quoteOnly) {
+            if (!small) return null
+            return quotedEntry(question, pool, polish, sameOpeningOnly = true)?.takeIf { polish || !looksPolish(it) }?.also {
+                lastRoute = "quoted knowledge-base entry"
+                onPiece(it)
+            }
+        }
         // A small model does not retell the entries even when only the base is asked: the entry is quoted, or the next step answers.
         if (baseOnly && small) {
             if (facts.isBlank()) return null
@@ -1132,7 +1143,8 @@ class LlamaAssistantService(
             // An English question about a Polish entry: below the model retells the entry in English instead of quoting Polish.
             if (small && !(facts.isNotBlank() && !polish)) {
                 // The closest entry of the base is still better than nothing; it says it may not fit exactly.
-                if (facts.isNotBlank()) {
+                // Only for a question about the app or the mesh: for any other ("a recipe") a near entry would be a wrong answer.
+                if (facts.isNotBlank() && aboutAppOrMesh(question)) {
                     quotedEntry(question, pool, polish, loose = true)?.takeIf { polish || !looksPolish(it) }?.let {
                         lastRoute = "quoted knowledge-base entry (closest)"
                         return it.also(onPiece)
@@ -1170,7 +1182,7 @@ class LlamaAssistantService(
      * The best entry of the knowledge base word for word, with its source, when it clearly fits the question (at least two
      * words of the question in it). Null otherwise: then the model answers as usual.
      */
-    private fun quotedEntry(question: String, facts: String, polish: Boolean = true, loose: Boolean = false): String? {
+    private fun quotedEntry(question: String, facts: String, polish: Boolean = true, loose: Boolean = false, sameOpeningOnly: Boolean = false): String? {
         val asked = quoteStems(question) - STOP_STEMS
         if (asked.isEmpty()) return null
         val definition = DEFINITION_ASK.containsMatchIn(question)
@@ -1188,6 +1200,7 @@ class LlamaAssistantService(
             val body = block.substringAfter('\n', "")
             val heading = head.substringAfterLast(": ")
             if (onlyCommon && !DEFINITION_ASK.containsMatchIn(heading)) continue
+            if (sameOpeningOnly && !(firstWord in OPENING_WORDS && foldPl(heading.lowercase()).trim().startsWith(firstWord))) continue
             // The keywords of the entry count as its title: they hold the other names of the thing.
             val keywords = body.lines().filter { it.startsWith("Słowa:") }.joinToString(" ")
             val headStems = quoteStems(head) + quoteStems(keywords)
@@ -1201,7 +1214,7 @@ class LlamaAssistantService(
                 if (loose) {
                     inHead >= QUOTE_MIN_WEIGHT && allShare >= QUOTE_LOOSE_SHARE
                 } else {
-                    (headShare >= QUOTE_MIN_SHARE && allShare >= QUOTE_ALL_SHARE) || (inHead >= QUOTE_MIN_WEIGHT && allShare >= QUOTE_BODY_SHARE)
+                    (headShare >= QUOTE_MIN_SHARE && allShare >= QUOTE_ALL_SHARE) || (inHead >= QUOTE_MIN_WEIGHT && allShare >= QUOTE_BODY_SHARE && total < QUOTE_SHORT_TOTAL)
                 }
             if (!enough) continue
             // "What is X?" prefers the entry that defines X; the same opening word ("how", "what") and the exact word of
@@ -1806,7 +1819,7 @@ class LlamaAssistantService(
         val STEP = Regex("^\\d+[.)]\\s")
         val VERB_PREFIXES = listOf("prze", "po", "wy", "za", "z", "s", "u", "na", "od", "do")
         // Common words that say nothing about which part of the manual a question is about.
-        val STOP_STEMS = foldedSet("przez", "jest", "gdzie", "jaki", "jakie", "jaka", "można", "mozna", "zrobi", "mojeg", "moje", "swoje", "swoim", "czym", "tego", "jako", "oraz", "albo", "który", "która", "które", "with", "what", "from", "have", "about", "does", "where", "which")
+        val STOP_STEMS = foldedSet("przed", "dlaczego", "kiedy", "tylko", "napisz", "opowiedz", "podaj", "wyjaśnij", "powiedz", "ciekawego", "przez", "jest", "gdzie", "jaki", "jakie", "jaka", "można", "mozna", "zrobi", "mojeg", "moje", "swoje", "swoim", "czym", "tego", "jako", "oraz", "albo", "który", "która", "które", "with", "what", "from", "have", "about", "does", "where", "which")
         val ADVICE_INTENTS = setOf("app_help", "chat", "network_question", "signal_list", "web_question")
         /** The question is about the user's own radio ("ktoś mnie słabo słyszy", "mam słaby zasięg"), not a general one. */
         val OWN_RANGE = Regex("(?iu)\\b(mam|mój|moj\\p{L}*|mnie|mi|u mnie|moim|my|me|i have)\\b|jak (poprawić|zwiększyć|poprawic|zwiekszyc)|how (can|do) i (improve|increase)")
@@ -1960,6 +1973,7 @@ class LlamaAssistantService(
         const val QUOTE_ALL_SHARE = 0.6
         const val QUOTE_BODY_SHARE = 0.6
         const val QUOTE_MIN_WEIGHT = 1.0
+        const val QUOTE_SHORT_TOTAL = 2.5
         const val OPENING_BONUS = 0.3
         const val EXACT_BONUS = 0.3
         const val QUOTE_FACTS_CHARS = 14000
