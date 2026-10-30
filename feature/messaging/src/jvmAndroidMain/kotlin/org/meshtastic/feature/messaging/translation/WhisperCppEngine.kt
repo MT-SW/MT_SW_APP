@@ -75,15 +75,32 @@ class WhisperCppEngine(
     suspend fun transcribe(modelId: String, wav: ByteArray): String = mutex.withLock {
         run {
             withContext(Dispatchers.IO) {
-                val running = ensureLoaded(modelId)
-                val started = nowMillis
-                val text = send(running, wav)
-                val took = nowMillis - started
                 val audioMs = (wav.size - WAV_HEADER_BYTES).coerceAtLeast(0) * MS_PER_SECOND / BYTES_PER_SECOND
-                Logger.i(tag = TAG) { "Dictation with $modelId: ${text.length} chars from ${audioMs} ms of speech in $took ms (language ${DictationLanguage.hint})" }
-                text
+                var result = ""
+                // A chip that writes nonsense is switched off and the next way (in the end the processor) does the work.
+                repeat(MAX_SWITCHES + 1) {
+                    val running = ensureLoaded(modelId)
+                    val started = nowMillis
+                    val text = send(running, wav)
+                    val took = nowMillis - started
+                    Logger.i(tag = TAG) { "Dictation with $modelId: ${text.length} chars from ${audioMs} ms of speech in $took ms (language ${DictationLanguage.hint})" }
+                    result = text
+                    val chipMark = activeChipMark
+                    if (chipMark == null || !looksLikeNonsense(text, audioMs)) return@withContext text
+                    Logger.w(tag = TAG) { "$backend wrote nonsense (${text.length} chars from ${audioMs} ms): ${text.take(80)} - switching it off" }
+                    installer.markBroken(chipMark.first, modelId + chipMark.second)
+                    unload()
+                }
+                result
             }
         }
+    }
+
+    /** More letters than anyone speaks, or the same few words again and again: the chip counted wrongly. */
+    private fun looksLikeNonsense(text: String, audioMs: Long): Boolean {
+        if (text.length > MIN_NONSENSE_CHARS + audioMs * MAX_CHARS_PER_SECOND / MS_PER_SECOND) return true
+        val words = text.lowercase().split(' ').filter { it.isNotBlank() }
+        return words.size >= MIN_WORDS_FOR_REPEAT_CHECK && words.toSet().size * REPEAT_RATIO < words.size
     }
 
     suspend fun unloadNow() {
@@ -121,6 +138,9 @@ class WhisperCppEngine(
         private set
 
     private val chipLines = StringBuilder()
+
+    /** The program and mark suffix of the chip that runs now (null for the processor): needed to switch a chip off. */
+    @Volatile private var activeChipMark: Pair<ModelServerInstaller.Asset, String>? = null
 
     private suspend fun ensureLoaded(modelId: String): ModelServerProcess {
         server?.let { if (it.isAlive && loadedId == modelId) return it }
@@ -208,8 +228,16 @@ class WhisperCppEngine(
                     check(CHIP_USED.containsMatchIn(seen)) { "the chip took no part: ${seen.takeLast(300)}" }
                     // A software "graphics card" (llvmpipe) is slower than the processor build.
                     check(!seen.contains("llvmpipe", ignoreCase = true)) { "only a software graphics card was found" }
-                    // A chip can load the model and still fail or write nonsense: one second of silence must go through.
-                    withContext(Dispatchers.IO) { send(started, silence()) }
+                    // A chip can load the model and still fail or write nonsense: one second of silence must go through,
+                    // give (almost) no text, and the second run must be faster than the processor (about 2 seconds).
+                    withContext(Dispatchers.IO) {
+                        val first = send(started, silence())
+                        check(first.length <= MAX_SILENCE_CHARS) { "it wrote ${first.length} characters for silence: ${first.take(60)}" }
+                        val t0 = nowMillis
+                        send(started, silence())
+                        val took = nowMillis - t0
+                        check(took <= MAX_SILENCE_MS) { "it is slower than the processor (${took} ms for a test run)" }
+                    }
                 }
             } catch (e: Throwable) {
                 if (e is CancellationException) {
@@ -225,6 +253,7 @@ class WhisperCppEngine(
             server = started
             loadedId = modelId
             backend = attempt.name
+            activeChipMark = if (attempt.chip) attempt.asset to attempt.markSuffix else null
             Logger.i(tag = TAG) { "Speech program runs on: ${attempt.name}" }
             store.reportLoaded(TAG, modelId)
             return started
@@ -288,6 +317,7 @@ class WhisperCppEngine(
         server?.stop()
         server = null
         loadedId = null
+        activeChipMark = null
         store.reportLoaded(TAG, null)
     }
 
@@ -296,6 +326,13 @@ class WhisperCppEngine(
         const val PID_FILE = "whisper-server.pid"
         const val SAFE_SUFFIX = "-safe"
         const val MAX_THREADS = 8
+        const val MAX_SWITCHES = 3
+        const val MIN_NONSENSE_CHARS = 60
+        const val MAX_CHARS_PER_SECOND = 30
+        const val MIN_WORDS_FOR_REPEAT_CHECK = 12
+        const val REPEAT_RATIO = 4
+        const val MAX_SILENCE_CHARS = 30
+        const val MAX_SILENCE_MS = 4_500L
         const val WAV_HEADER_BYTES = 44
         val VENDOR_LIB_DIRS = listOf("/vendor/lib64", "/system/vendor/lib64", "/odm/lib64")
         val DSP_DIRS = listOf("/vendor/dsp/cdsp", "/vendor/lib/rfsa/adsp", "/vendor/dsp", "/system/lib/rfsa/adsp", "/dsp")
