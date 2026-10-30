@@ -37,4 +37,11 @@ object AssistantClock {
 
     /** A duration in seconds with one decimal place ("12.3"). */
     fun seconds(ms: Long): String = (kotlin.math.round(ms / 100.0) / 10).toString()
+
+    /** "12:03:17" for a question, "12:03:17 · 12.3 s" for an answer that took [tookMs]; empty when the time is not known. */
+    fun stamp(at: Long, tookMs: Long = 0L): String {
+        val time = clock(at)
+        if (time.isEmpty()) return ""
+        return if (tookMs > 0L) "$time · ${seconds(tookMs)} s" else time
+    }
 }

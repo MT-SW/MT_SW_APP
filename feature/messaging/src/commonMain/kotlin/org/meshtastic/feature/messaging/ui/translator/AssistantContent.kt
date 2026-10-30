@@ -120,6 +120,7 @@ import org.meshtastic.core.resources.assistant_suggest_4
 import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.assistant.SettingHighlight
 import org.meshtastic.feature.messaging.translation.AssistantActions
+import org.meshtastic.feature.messaging.translation.AssistantClock
 import org.meshtastic.feature.messaging.translation.AssistantViewModel
 
 private val BubbleShape = RoundedCornerShape(20.dp)
@@ -343,6 +344,14 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                                         }
                                     }
                                 }
+                            }
+                            val stamp = AssistantClock.stamp(line.at, if (line.fromUser) 0L else line.tookMs)
+                            if (stamp.isNotBlank()) {
+                                Text(
+                                    text = stamp,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
                             }
                         }
                     }
