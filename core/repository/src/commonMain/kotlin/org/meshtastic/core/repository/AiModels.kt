@@ -235,7 +235,7 @@ object AiModels {
             ),
             platforms = BOTH,
             hearing = true,
-            recommendedFor = setOf(AiRole.ASSISTANT, AiRole.TRANSLATOR, AiRole.DICTATION),
+            recommendedFor = setOf(AiRole.ASSISTANT, AiRole.TRANSLATOR),
             descriptionPl = "Dobry początek: lepsze odpowiedzi niż E2B, rozumie mowę. Na komputery od 8 GB RAM.",
             descriptionEn = "A good start: better answers than E2B, understands speech. For computers from 8 GB of RAM.",
             pageUrl = "${HF}google/gemma-4-E4B-it-qat-q4_0-gguf",
@@ -528,6 +528,7 @@ object AiModels {
             license = AiLicense.MIT,
             files = listOf(hf("ggerganov/whisper.cpp", file, mb)),
             platforms = BOTH,
+            recommendedFor = setOf(AiRole.DICTATION),
             descriptionPl = pl,
             descriptionEn = en,
             pageUrl = "${HF}ggerganov/whisper.cpp",
@@ -569,8 +570,12 @@ object AiModels {
     /** The models that exist on the platform the app runs on. */
     val available: List<AiModelInfo> get() = all.filter { it.engineReady }
 
-    /** The models of the platform that can do [role], in the order of the list. */
-    fun forRole(role: AiRole): List<AiModelInfo> = available.filter { it.canDo(role) }
+    /** The models of the platform that can do [role], in the order of the list (for dictation: the recommended ones first). */
+    fun forRole(role: AiRole): List<AiModelInfo> {
+        val list = available.filter { it.canDo(role) }
+        // Dictation: the models recommended for it (the Whisper family: small, accurate, light on memory) are shown first.
+        return if (role == AiRole.DICTATION) list.sortedBy { if (role in it.recommendedFor) 0 else 1 } else list
+    }
 
     fun byId(id: String?): AiModelInfo? = all.firstOrNull { it.id == id }
 
