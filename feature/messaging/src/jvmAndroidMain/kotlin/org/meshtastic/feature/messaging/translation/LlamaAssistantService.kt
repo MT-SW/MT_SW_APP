@@ -668,7 +668,7 @@ class LlamaAssistantService(
         }
         // "Is X online", "what powers X": read from what the node reported, whichever intent the small model chose.
         if (nodeNum != null && data.mentionsNode(lower) && !WHICH_WORDS.containsMatchIn(lower)) {
-            if (POWERED_ASK.containsMatchIn(lower)) return data.nodeBattery(nodeNum).also(onPiece)
+            if (POWERED_ASK.containsMatchIn(lower) || BATTERY_LEVEL_ASK.containsMatchIn(lower)) return data.nodeBattery(nodeNum).also(onPiece)
             if (ONLINE_ASK.containsMatchIn(lower) && intent.intent !in setOf("open_screen", "show_setting")) data.nodeFacts(nodeNum)?.let { return it.also(onPiece) }
         }
         // "Open the node list": a command whichever intent the small model chose (it described steps it made up).
@@ -1028,7 +1028,7 @@ class LlamaAssistantService(
                 // then the most fitting sentences of the results are quoted instead of the model's words.
                 val core = knowledge?.coreFacts(if (polish) "pl" else "en").orEmpty()
                 if (found.isBlank() || numbersBacked(said, found + "\n" + core + "\n" + question)) said
-                else coreFact(core, question) ?: quoteWeb(found, question, polish)
+                else coreFact(core, question) ?: quoteWeb(found, question, polish) ?: said
             }
             "chat" ->
                 fromBase(modelId, history, question, intent.text, polish, answerLang, onPiece, room)
@@ -1062,6 +1062,14 @@ class LlamaAssistantService(
             (if (baseOnly) knowledge?.lookupBaseOnly(query, BASE_CHARS * room, language) else knowledge?.lookupBase(query, BASE_CHARS * room, language)).orEmpty()
         // A small model (or any model outside the Gemma family) never retells web results in its own words: the app quotes them.
         val small = smallModel(modelId)
+        // A small model does not retell the entries even when only the base is asked: the entry is quoted, or the next step answers.
+        if (baseOnly && small) {
+            if (facts.isBlank()) return null
+            return quotedEntry(question, facts, polish)?.also {
+                lastRoute = "quoted knowledge-base entry"
+                onPiece(it)
+            }
+        }
         if (!baseOnly && !webModel(modelId) && (small || facts.isBlank())) {
             if (small && facts.isNotBlank()) {
                 quotedEntry(question, facts, polish)?.let {
@@ -1075,9 +1083,18 @@ class LlamaAssistantService(
             }
             if (uiPrefs.assistantInternetEnabled.value && webWanted(question, "")) {
                 val found = webTools.web_search(question.take(WEB_QUERY_CHARS))
-                if (found.isNotBlank()) {
-                    lastRoute = "quoted web results"
-                    return quoteWeb(found, question, polish).also(onPiece)
+                // "No results." and connection errors are not findings: they are never quoted.
+                if (found.startsWith("UNTRUSTED")) {
+                    quoteWeb(found, question, polish)?.let {
+                        lastRoute = "quoted web results"
+                        return it.also(onPiece)
+                    }
+                }
+            }
+            if (small && facts.isNotBlank()) {
+                quotedEntry(question, facts, polish, loose = true)?.let {
+                    lastRoute = "closest knowledge-base entry"
+                    return it.also(onPiece)
                 }
             }
             if (small) {
@@ -1106,7 +1123,7 @@ class LlamaAssistantService(
      * The best entry of the knowledge base word for word, with its source, when it clearly fits the question (at least two
      * words of the question in it). Null otherwise: then the model answers as usual.
      */
-    private fun quotedEntry(question: String, facts: String, polish: Boolean = true): String? {
+    private fun quotedEntry(question: String, facts: String, polish: Boolean = true, loose: Boolean = false): String? {
         val asked = stems(question) - STOP_STEMS
         if (asked.isEmpty()) return null
         // The best entry is chosen by how much of the question its title and heading cover; entries of the related and
@@ -1118,20 +1135,21 @@ class LlamaAssistantService(
             if (head.startsWith("Baza wiedzy (")) continue
             val covered = asked.count { it in stems(head) }
             val score = covered.toDouble() / asked.size
-            if (covered >= QUOTE_MIN_WORDS && score > bestScore) {
+            if (covered >= (if (loose) 1 else minOf(QUOTE_MIN_WORDS, asked.size)) && score > bestScore) {
                 best = block to head
                 bestScore = score
             }
         }
         val (block, head) = best ?: return null
-        if (bestScore < QUOTE_MIN_SHARE) return null
+        if (bestScore < (if (loose) QUOTE_LOOSE_SHARE else QUOTE_MIN_SHARE)) return null
         val body =
             block.substringAfter('\n', "").lines()
                 .filterNot { it.trimStart().startsWith("Źródło:") || it.trimStart().startsWith("Source:") || it.trimStart().startsWith("|") }
                 .joinToString("\n").trim()
         if (body.length < QUOTE_MIN_CHARS) return null
         val cut = if (body.length > QUOTE_MAX_CHARS) body.substring(0, QUOTE_MAX_CHARS).substringBeforeLast(". ", body.substring(0, QUOTE_MAX_CHARS)).trimEnd() + "." else body
-        return cut + "\n\n" + (if (polish) "Źródło: " else "Source: ") + head
+        val hedge = if (!loose) "" else if (polish) "Nie mam wpisu dokładnie na to pytanie. Najbliższy wpis w bazie wiedzy (może nie odpowiadać wprost):\n\n" else "I have no entry exactly on this. The closest entry in the knowledge base (it may not answer directly):\n\n"
+        return hedge + cut + "\n\n" + (if (polish) "Źródło: " else "Source: ") + head
     }
 
     /**
@@ -1510,7 +1528,7 @@ class LlamaAssistantService(
     }
 
     /** The two sentences of the web results that share most words with the question, quoted as they are. */
-    private fun quoteWeb(found: String, question: String, polish: Boolean): String {
+    private fun quoteWeb(found: String, question: String, polish: Boolean): String? {
         val want = stems(question)
         val sentences =
             found.lines().filterNot { it.startsWith("UNTRUSTED") || it.startsWith("END OF") }
@@ -1518,7 +1536,7 @@ class LlamaAssistantService(
                 .map { it.trim() }.filter { it.length in MIN_QUOTE..MAX_QUOTE && !it.endsWith("?") && it.count { c -> c == ' ' } >= QUOTE_WORDS }.distinct()
         val best = sentences.map { it to stems(it).count { s -> s in want } }.filter { it.second >= 2 }.sortedByDescending { it.second }.take(2).map { it.first }
         return if (best.isEmpty()) {
-            rule(polish, "W wynikach z internetu nie ma jasnej odpowiedzi na to pytanie.", "The web results do not answer this question clearly.")
+            null
         } else {
             rule(polish, "Z internetu (cytat):", "From the internet (quoted):") + best.joinToString("") { "\n• $it" }
         }
@@ -1546,7 +1564,7 @@ class LlamaAssistantService(
     }
 
     private fun stems(text: String): Set<String> =
-        text.lowercase().split(Regex("[^\\p{L}\\p{N}]+")).filter { it.length >= MIN_STEM }.map { it.take(STEM_LENGTH) }.toSet()
+        text.lowercase().replace("wi-fi", "wifi").split(Regex("[^\\p{L}\\p{N}]+")).filter { it.length >= MIN_STEM || it in SHORT_TERMS }.map { it.take(STEM_LENGTH) }.toSet()
 
     /** Plain text for the chat bubble: no markdown stars or backticks the small model likes to add. */
     /** Without the internet the model cannot know a web address: the links it writes are made up, so they are removed. */
@@ -1803,6 +1821,7 @@ class LlamaAssistantService(
         const val MIN_TELLING_LABEL = 8
         const val HELP_CHARS = 1100
         const val MIN_STEM = 4
+        val SHORT_TERMS = setOf("snr", "gps", "usb", "lna", "saw", "ble", "swr", "dbi", "dbm", "sf", "cr", "ota", "pin")
         const val STEM_LENGTH = 5
         const val MIN_WEB_WORDS = 3
         val POINTER_ONLY = Regex("^(„[^”]+” jest w:|Otwieram stronę z ustawieniem|Otwieram: |To jest na ekranie|Opening the page|Opening: |\"[^\"]+\" is in:)")
@@ -1837,6 +1856,7 @@ class LlamaAssistantService(
         const val SOURCE_MIN_WORDS = 1
         const val SOURCE_MIN_RELATED = 2
         const val QUOTE_MIN_SHARE = 0.5
+        const val QUOTE_LOOSE_SHARE = 0.34
         const val QUOTE_MAX_CHARS = 1100
         const val CAPABILITIES_WORDS = 10
         val CAPABILITIES_ASK = Regex("jakie masz możliwości|jakie masz mozliwosci|co potrafisz|co umiesz|co możesz|co mozesz|w czym (możesz|mozesz) (mi )?pomóc|w czym (możesz|mozesz) pomoc|do czego służysz|do czego sluzysz|what can you do|what are you able|how can you help|what do you do")
@@ -1901,9 +1921,10 @@ class LlamaAssistantService(
         val NODE_FACTS_ASK = Regex("(?iu)z ilu skok\\p{L}*|ilu skok\\p{L}*|how many hops|jaki sprzęt|jakie urządzenie|jaką rolę|jaka rola|what role|co to za (sprzęt|urządzenie|węzeł)|jaką wersję firmware|jaki firmware|wersj\\p{L}* (firmware|oprogramowania)|kiedy (ostatnio )?(go )?słysz|ostatnio słysz|w jakiej odległości|jak daleko jest|ile skoków|what hardware|which device|firmware version|when .*last heard|how far is")
         val TIME_ASK =
             Regex(
-                "(?iu)(która|ktora|jaka)\\s+(jest\\s+)?(teraz\\s+)?godzin\\p{L}*|(jaki|jaka)\\s+(jest\\s+)?(dzi\\p{L}*|dzisiaj)\\s+(dzień|dzien|data)|jaka\\s+(jest\\s+)?(dzi\\p{L}*\\s+)?data|" +
+                "(?iu)(która|ktora|jaka)\\s+(jest\\s+)?(teraz\\s+)?godzin\\p{L}*|(jaki|jaka)\\s+(jest\\s+)?(dzi\\p{L}*|dzisiaj)\\s+(dzień|dzien|data)|jaka\\s+(jest\\s+)?(dzi\\p{L}*\\s+)?data|(jaki|który)\\s+(mamy\\s+)?(dzi\\p{L}*\\s+)?(dzień|dzien)(\\s+tygodnia)?|którego\\s+(dzi\\p{L}*\\s+)?(jest|mamy)|" +
                     "what\\s+time\\s+is\\s+it|what(?:'s| is)\\s+(the\\s+)?(date|time)|what\\s+day\\s+is\\s+(it|today)",
             )
+        val BATTERY_LEVEL_ASK = Regex("(?iu)(ile|jaki|jaka)\\s+(procent\\p{L}*\\s+)?(bateri\\p{L}*|naładowa\\p{L}*)|poziom\\p{L}*\\s+bateri|battery\\s+(level|percent)|how much battery")
         val UPTIME_WORDS = Regex("uptime|czas pracy|czasu pracy|jak długo działa|jak dlugo dziala|how long .* running")
         val NEAR_FAR = Regex("najdal|najbliż|najbliz|nearest|farthest|closest")
         val WHAT_HAPPENS = Regex("^(co się stanie|co sie stanie|co się dzieje|co sie dzieje|what happens|what will happen)")
