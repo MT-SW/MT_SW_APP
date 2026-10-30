@@ -37,7 +37,8 @@ import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.assistant.SettingHighlight
 
 /** One bubble of the conversation. */
-data class AssistantLine(val fromUser: Boolean, val text: String)
+/** [at] is when a question was sent or an answer received (milliseconds, 0 = not known); [tookMs] is how long an answer took. */
+data class AssistantLine(val fromUser: Boolean, val text: String, val at: Long = 0L, val tookMs: Long = 0L)
 
 data class AssistantUiState(
     val lines: List<AssistantLine> = emptyList(),
@@ -98,6 +99,8 @@ class AssistantViewModel(
             )
         }
         pending.value = ""
+        val sentAt = nowMillis
+        _state.update { st -> st.copy(lines = st.lines.dropLast(2) + AssistantLine(true, question, at = sentAt) + st.lines.last()) }
         val pump =
             viewModelScope.launch {
                 while (true) {
@@ -137,6 +140,7 @@ class AssistantViewModel(
                 } finally {
                     pump.cancel()
                     flushPieces()
+                    stampAnswer(sentAt)
                     _state.update { it.copy(busy = false) }
                     withContext(NonCancellable) { persist() }
                 }
@@ -159,7 +163,7 @@ class AssistantViewModel(
             viewModelScope.launch {
                 try {
                     service.selfTest(command) { q, a ->
-                        _state.update { it.copy(lines = it.lines + AssistantLine(true, q) + AssistantLine(false, a)) }
+                        _state.update { it.copy(lines = it.lines + AssistantLine(true, q, at = nowMillis) + AssistantLine(false, a, at = nowMillis)) }
                     }
                 } catch (e: CancellationException) {
                     throw e
@@ -197,7 +201,7 @@ class AssistantViewModel(
     fun open(chat: StoredChat) {
         job?.cancel()
         chatId = chat.id
-        _state.update { AssistantUiState(lines = chat.lines.map { AssistantLine(it.fromUser, it.text) }) }
+        _state.update { AssistantUiState(lines = chat.lines.map { AssistantLine(it.fromUser, it.text, it.at, it.tookMs) }) }
     }
 
     fun deleteSaved(id: String) {
@@ -214,7 +218,7 @@ class AssistantViewModel(
         val id = chatId ?: nowMillis.toString().also { chatId = it }
         val title = lines.first { it.fromUser }.text.lines().first().take(TITLE_LENGTH)
         runCatching {
-            history.save(StoredChat(id, title, nowMillis, lines.map { StoredLine(it.fromUser, it.text) }))
+            history.save(StoredChat(id, title, nowMillis, lines.map { StoredLine(it.fromUser, it.text, it.at, it.tookMs) }))
         }
         refreshSaved()
     }
@@ -230,13 +234,21 @@ class AssistantViewModel(
         if (text.isEmpty()) return
         _state.update { s ->
             if (s.lines.isEmpty() || s.lines.last().fromUser) return@update s
-            s.copy(lines = s.lines.dropLast(1) + AssistantLine(false, s.lines.last().text + text))
+            s.copy(lines = s.lines.dropLast(1) + s.lines.last().copy(text = s.lines.last().text + text))
         }
     }
 
     private fun setAnswer(answer: String) = _state.update { s ->
         if (s.lines.isEmpty() || s.lines.last().fromUser || answer.isBlank()) return@update s
-        s.copy(lines = s.lines.dropLast(1) + AssistantLine(false, answer))
+        s.copy(lines = s.lines.dropLast(1) + s.lines.last().copy(text = answer))
+    }
+
+    /** Notes when the answer arrived and how long it took (also for an answer stopped halfway). */
+    private fun stampAnswer(sentAt: Long) = _state.update { s ->
+        val last = s.lines.lastOrNull() ?: return@update s
+        if (last.fromUser || last.at != 0L || last.text.isBlank()) return@update s
+        val now = nowMillis
+        s.copy(lines = s.lines.dropLast(1) + last.copy(at = now, tookMs = now - sentAt))
     }
 
     private companion object {

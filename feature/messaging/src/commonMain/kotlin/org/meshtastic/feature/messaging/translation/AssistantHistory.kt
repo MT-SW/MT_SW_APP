@@ -19,7 +19,7 @@ package org.meshtastic.feature.messaging.translation
 import kotlinx.serialization.Serializable
 
 /** One saved message of an assistant conversation. */
-@Serializable data class StoredLine(val fromUser: Boolean, val text: String)
+@Serializable data class StoredLine(val fromUser: Boolean, val text: String, val at: Long = 0L, val tookMs: Long = 0L)
 
 /** A saved assistant conversation. It lives only on this device. */
 @Serializable

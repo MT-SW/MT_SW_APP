@@ -21,10 +21,18 @@ import org.meshtastic.core.ui.util.JsonText
 import org.meshtastic.core.ui.util.PdfFile
 import org.meshtastic.core.ui.util.PdfText
 import org.meshtastic.feature.messaging.translation.AssistantActions
+import org.meshtastic.feature.messaging.translation.AssistantClock
 import org.meshtastic.feature.messaging.translation.AssistantLine
 
 /** One bubble of the conversation, prepared for saving. */
-data class ExportEntry(val fromUser: Boolean, val text: String, val note: String?, val buttons: List<String>)
+data class ExportEntry(
+    val fromUser: Boolean,
+    val text: String,
+    val note: String?,
+    val buttons: List<String>,
+    val at: Long = 0L,
+    val tookMs: Long = 0L,
+)
 
 /** The file kinds the conversation can be saved as. */
 enum class ExportFormat(val label: String, val extension: String, val mime: String) {
@@ -45,12 +53,14 @@ object AssistantExport {
             text = shown,
             note = web?.let { it.note.ifBlank { it.queries } }?.takeIf { it.isNotBlank() },
             buttons = actions.map { it.caption.ifBlank { it.label } },
+            at = line.at,
+            tookMs = line.tookMs,
         )
     }
 
     fun text(entries: List<ExportEntry>, you: String, assistant: String): String = entries.joinToString("\n\n") { e ->
         buildString {
-            append(if (e.fromUser) you else assistant).append(": ").append(e.text)
+            append(if (e.fromUser) you else assistant).append(stamp(e)).append(": ").append(e.text)
             e.note?.let { append("\n(").append(it).append(")") }
             e.buttons.forEach { append("\n[").append(it).append("]") }
         }
@@ -67,6 +77,8 @@ object AssistantExport {
             entries.forEachIndexed { i, e ->
                 append(if (i == 0) "\n" else ",\n")
                 append("    {\"n\": ").append(i + 1).append(", \"role\": ").append(q(if (e.fromUser) "user" else "assistant"))
+                if (e.at > 0L) append(", \"").append(if (e.fromUser) "sent" else "received").append("\": ").append(q(AssistantClock.clock(e.at)))
+                if (!e.fromUser && e.tookMs > 0L) append(", \"answer_seconds\": ").append(AssistantClock.seconds(e.tookMs))
                 append(", \"text\": ").append(q(e.text))
                 e.note?.let { append(", \"web\": ").append(q(it)) }
                 if (e.buttons.isNotEmpty()) append(", \"buttons\": [").append(e.buttons.joinToString(", ") { q(it) }).append("]")
@@ -77,11 +89,15 @@ object AssistantExport {
 
     private fun q(s: String): String = JsonText.quote(s)
 
+    /** " (12:03:17)" for a sent question, " (12:03:29, 12.1 s)" for a received answer; empty when the time is not known. */
+    private fun stamp(e: ExportEntry): String =
+        if (e.at <= 0L) "" else " (" + AssistantClock.clock(e.at) + (if (!e.fromUser && e.tookMs > 0L) ", " + AssistantClock.seconds(e.tookMs) + " s" else "") + ")"
+
     fun markdown(entries: List<ExportEntry>, title: String, stamp: String, you: String, assistant: String): String =
         buildString {
             append("# ").append(title).append("\n\n_").append(stamp).append("_\n\n")
             entries.forEach { e ->
-                append("**").append(if (e.fromUser) you else assistant).append(":**\n\n")
+                append("**").append(if (e.fromUser) you else assistant).append(stamp(e)).append(":**\n\n")
                 append(if (e.fromUser) e.text.lines().joinToString("\n") { "> $it" } else e.text).append("\n\n")
                 e.note?.let { append("_").append(it).append("_\n\n") }
                 e.buttons.forEach { append("- [").append(it).append("]\n") }
