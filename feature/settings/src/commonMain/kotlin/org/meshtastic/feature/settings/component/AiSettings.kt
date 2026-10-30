@@ -220,11 +220,11 @@ internal fun AiSettings() {
     // The model leaves the memory after a time without use (any function): the choice is here, 2 minutes by default.
     val idleMinutes by uiPrefs.aiIdleUnloadMinutes.collectAsStateWithLifecycle()
     if (assistantOn || translatorOn || dictationOn) {
-        val minutesLabel: (Int) -> String = { stringResource(Res.string.ai_idle_unload_minutes, it) }
+        val minuteChoices = listOf(1, 2, 5, 10, 30, 60).map { it to stringResource(Res.string.ai_idle_unload_minutes, it) }
         DropDownPreference(
             title = stringResource(Res.string.ai_idle_unload_title),
             enabled = true,
-            items = listOf(0 to stringResource(Res.string.ai_idle_unload_never)) + listOf(1, 2, 5, 10, 30, 60).map { it to minutesLabel(it) },
+            items = listOf(0 to stringResource(Res.string.ai_idle_unload_never)) + minuteChoices,
             selectedItem = idleMinutes,
             onItemSelected = { uiPrefs.setAiIdleUnloadMinutes(it) },
             summary = stringResource(Res.string.ai_idle_unload_summary),
