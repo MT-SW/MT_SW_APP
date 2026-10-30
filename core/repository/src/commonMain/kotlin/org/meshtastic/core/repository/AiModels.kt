@@ -198,6 +198,7 @@ object AiModels {
         AiModelInfo(
             id = G4_E2B,
             name = "Gemma 4 E2B",
+            recommendedFor = setOf(AiRole.ASSISTANT),
             family = "Gemma 4",
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT + AiRole.DICTATION,
@@ -246,6 +247,7 @@ object AiModels {
             id = G4_12B,
             intelNpu = false,
             name = "Gemma 4 12B",
+            recommendedFor = setOf(AiRole.ASSISTANT),
             family = "Gemma 4",
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT,
@@ -265,6 +267,7 @@ object AiModels {
             id = G4_26B,
             intelNpu = false,
             name = "Gemma 4 26B A4B",
+            recommendedFor = setOf(AiRole.ASSISTANT),
             family = "Gemma 4",
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT,

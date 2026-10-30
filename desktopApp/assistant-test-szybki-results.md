@@ -307,3 +307,107 @@ Aby wykonać test zasięgu, musisz włączyć moduł testu zasięgu zarówno na 
 Pamiętaj, że po zakończeniu testu musisz wyłączyć moduł, ponieważ zużywa dużo eteru i zaśmieca kanał. Jeśli używasz ESP32, możesz zapisać dane w pliku CSV, który potem zaimportujesz do programów takich jak Google Earth czy uMap.
 
 Źródło: Baza wiedzy: Moduły: Range Test, Neighbor Info i Detection Sensor (szczegóły): Range Test: jak zmierzyć zasięg i czego uważać?
+
+## 27. Co to jest MT_SW_FIRMWARE?
+Router: AssistantIntent(intent=app_help, node=, channel=, text=MT_SW_FIRMWARE, role=, metric=, topic=, period=, amount=0)
+Sent: 30.10.2026 20:25:14, received: 30.10.2026 20:25:45, answer time: 31.4 s, words: 50
+Internet: no
+Time: 31 s
+Answer:
+MT_SW_FIRMWARE to wersja oprogramowania dla urządzeń radiowych, która została dostosowana do potrzeb regionalnych w województwie świętokrzyskim. Zawiera ona statystyki węzła, takie jak zużycie CPU czy pamięci, które są przesyłane przez sieć mesh.
+
+Źródło: Baza wiedzy: Moduły firmware: ustawienia i ograniczenia: Jak działa Remote Hardware (zdalne GPIO) i czy jest bezpieczny?
+
+## 28. Jak zmniejszyć zużycie baterii?
+Router: AssistantIntent(intent=app_help, node=, channel=, text=zużycie baterii, role=, metric=, topic=, period=, amount=0)
+Sent: 30.10.2026 20:25:45, received: 30.10.2026 20:26:13, answer time: 27.6 s, words: 62
+Internet: no
+Time: 27 s
+Answer:
+Możesz obniżyć zużycie energii, włączając tryb oszczędzania energii (Power Saving), który wyłącza niektóre moduły jak Bluetooth czy Wi-Fi. Ważne jest też ustawienie odpowiedniej roli dla węzła, na przykład CLIENT_MUTE lub CLIENT_HIDDEN, jeśli nie musisz przekazywać cudzych pakietów. Dodatkowo, wydłużanie interwałów wysyłania pozycji i rzadziej używanie GPS znacząco pomaga.
+
+Źródło: Baza wiedzy: Jak zmniejszyć zużycie baterii węzła: Jak zmniejszyć zużycie baterii w węźle?
+
+## 29. Jak chronić węzeł przed wodą?
+Router: AssistantIntent(intent=chat, node=, channel=, text=, role=, metric=, topic=, period=, amount=0)
+Sent: 30.10.2026 20:26:13, received: 30.10.2026 20:26:41, answer time: 27.7 s, words: 69
+Internet: no
+Time: 27 s
+Answer:
+Aby chronić węzeł przed wodą, musisz zadbać o szczelność obudowy zewnętrznej. Użyj dławików kablowych, które uszczelniają przepusty dla kabli i mogą osiągać wysokie klasy ochrony IP66 lub IP68. Pamiętaj też o odpowiednim uszczelnieniu wszystkich szczelin wokół przejść przez ściany oraz o zapewnieniu wentylacji, by uniknąć skraplania pary wodnej wewnątrz obudowy.
+
+Źródło: Baza wiedzy: Teren, obudowy zewnętrzne, powerbanki i łączność awaryjna: Jak chronić instalację zewnętrzną przed wodą: dławiki i szczelność
+
+## 30. Co to jest filtr SAW i po co się go stosuje?
+Router: AssistantIntent(intent=chat, node=, channel=, text=, role=, metric=, topic=, period=, amount=0)
+Sent: 30.10.2026 20:26:41, received: 30.10.2026 20:27:11, answer time: 29.9 s, words: 66
+Internet: no
+Time: 29 s
+Answer:
+Filtr SAW to element, który przepuszcza tylko bardzo wąski zakres częstotliwości, czyli pasmo, którego potrzebujemy, a resztę sygnałów tłumi. Stosuje się go w węzłach radiowych, żeby odciąć silne zakłócenia z innych pasm, na przykład te pochodzące z telefonii komórkowej GSM czy LTE, które mogłyby zagłuszyć czuły odbiornik.
+
+Źródło: Baza wiedzy: Filtr SAW i LNA: skróty: Co to jest filtr SAW i po co się go stosuje?
+
+## 31. Jaki jest rekord zasięgu LoRa?
+Router: AssistantIntent(intent=web_question, node=, channel=, text=rekord zasięg LoRa, role=, metric=, topic=, period=, amount=0)
+Sent: 30.10.2026 20:27:11, received: 30.10.2026 20:27:43, answer time: 32.6 s, words: 67
+Internet: no
+Time: 32 s
+Answer:
+Rekordy zasięgu LoRa osiąga się zazwyczaj wysoko nad ziemią, na balonach stratosferycznych. Znane rekordy to na przykład 702 km, 766 km i 832 km przy bardzo małej mocy. W praktyce w terenie, a zwłaszcza w sieci mesh, pojedyncze łącza mogą osiągać kilkaset kilometrów z górskich szczytów, ale typowe łącze w mieście to kilka do kilkunastu kilometrów.
+
+Źródło: Baza wiedzy: Rekordy zasięgu LoRa: Jaki jest rekord zasięgu LoRa?
+
+## 32. Jak włączyć zapisywanie logów?
+Router: AssistantIntent(intent=app_help, node=, channel=, text=zapisywanie logów, role=, metric=, topic=, period=, amount=0)
+Sent: 30.10.2026 20:27:43, received: 30.10.2026 20:28:11, answer time: 28.2 s, words: 66
+Internet: no
+Time: 28 s
+Answer:
+Zależy to od tego, co dokładnie chcesz zapisać. Jeśli chodzi o samą aplikację, możesz użyć panelu debugowania albo przełączyć zbieranie logów w Ustawienia pod Funkcjami MT_SW. Z urządzenia radiowego dostępny jest tylko panel debugowania, a jeśli chcesz zobaczyć całą sieć mesh, musisz użyć trybu sniffer, który podsłuchuje wszystko, co leci w eterze.
+
+Źródło: Baza wiedzy: Zbieranie logów: gdzie i co: Jak włączyć zapisywanie i zbieranie logów?
+Buttons: Zbieranie logów -> meshtastic://meshtastic/settings/mt-sw-features (blinks: Zbieranie logów)
+
+## 33. Który model AI wybrać na telefon?
+Router: AssistantIntent(intent=chat, node=, channel=, text=, role=, metric=, topic=, period=, amount=0)
+Sent: 30.10.2026 20:28:11, received: 30.10.2026 20:28:40, answer time: 28.8 s, words: 72
+Internet: no
+Time: 28 s
+Answer:
+Wybór modelu AI zależy od tego, do czego chcesz go używać i jak dużo pamięci RAM ma Twój telefon. Jeśli chodzi o asystenta, to dla telefonu z 8 GB RAM lub więcej polecana jest Gemma 4 E4B. Dla mniejszych urządzeń, gdzie masz mniej pamięci, możesz rozważyć Qwen 3.5 0.8B, Qwen 3.5 2B albo Bielik 1.5B.
+
+Źródło: Baza wiedzy: Wybór modelu AI dla asystenta, tłumacza i dyktowania: Który model AI wybrać na telefon?
+
+## 34. Jak wyłączyć ikonę sąsiadów?
+Router: AssistantIntent(intent=app_help, node=, channel=, text=wyłączenie ikony sąsiadów, role=, metric=, topic=, period=, amount=0)
+Sent: 30.10.2026 20:28:40, received: 30.10.2026 20:29:10, answer time: 30.2 s, words: 66
+Internet: no
+Time: 30 s
+Answer:
+Aby wyłączyć małą ikonę z liczbą obok nazwy węzła na liście, musisz wejść w Ustawienia aplikacji MT_SW, a następnie przejść do Funkcji MT_SW i znaleźć Układ węzła. Tam znajdziesz przełącznik "Sąsiedzi przy nazwie węzła (ikona z liczbą)" i go wyłączyć. Pamiętaj, że to tylko wygląd listy, nie moduł informujący o sąsiadach.
+
+Źródło: Baza wiedzy: Ikona sąsiadów na liście węzłów: Jak wyłączyć ikonę sąsiadów przy nazwie węzła?
+
+## 35. Jak podłączyć moduł GPS?
+Router: AssistantIntent(intent=app_help, node=, channel=, text=podłączenie modułu GPS, role=, metric=, topic=, period=, amount=0)
+Sent: 30.10.2026 20:29:10, received: 30.10.2026 20:29:46, answer time: 35.4 s, words: 71
+Internet: no
+Time: 35 s
+Answer:
+Podłączenie modułu GPS zależy od tego, jaki masz węzeł i jakiego modułu używasz. Ogólnie musisz połączyć piny TX i RX między modułem GPS a odpowiednimi pinami na Twoim urządzeniu, pamiętając o napięciu 3,3 V.
+
+Jeśli pracujesz na Linuksie i napotykasz błąd "Permission denied" przy próbie użycia portu szeregowego, musisz dodać swojego użytkownika do grupy dialout i zalogować się ponownie.
+
+Źródło: Baza wiedzy: Moduły Meshtastic: szczegóły ustawień: Moduł szeregowy: podłączenie i ostrzeżenia
+Buttons: Tryb GPS -> meshtastic://meshtastic/settings/position (blinks: Tryb GPS)
+
+## 36. Jak zgłosić błąd w aplikacji?
+Router: AssistantIntent(intent=app_help, node=, channel=, text=zgłosić błąd, role=, metric=, topic=, period=, amount=0)
+Sent: 30.10.2026 20:29:46, received: 30.10.2026 20:30:17, answer time: 30.8 s, words: 61
+Internet: no
+Time: 30 s
+Answer:
+Jeśli problem dotyczy aplikacji MT_SW, najlepiej użyć opcji „Zgłoś błąd lub pomysł” w ustawieniach, co skieruje Cię do naszego Discordora i grup na WhatsAppie czy Signalu. Możesz też napisać do nas przez sieć mesh w województwie świętokrzyskim. Pamiętaj, aby podać szczegóły, wersję aplikacji, model radia i wersję firmware.
+
+Źródło: Baza wiedzy: Zgłaszanie błędów i pomysłów: Gdzie zgłosić błąd oryginalnej aplikacji Meshtastic?

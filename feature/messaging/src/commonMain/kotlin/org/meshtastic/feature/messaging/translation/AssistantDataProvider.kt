@@ -477,7 +477,7 @@ class AssistantDataProvider(
         val now = nowMillis / MILLIS_PER_SECOND
         val heard = if (n.lastHeard == 0) "never" else "${((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)} min ago"
         val head = buildString {
-            appendLine("NODE ${n.user.long_name} (${n.user.short_name}), id ${n.user.id}, hardware ${n.user.hw_model}, role ${n.user.role}")
+            appendLine("NODE ${n.user.long_name} (${n.user.short_name}), id ${n.user.id}, hardware ${n.user.hw_model}, role ${roleLabel(n.user.role.toString())}")
             appendLine("Heard $heard; hops=${n.hopsAway}; SNR=${if (n.snr == Float.MAX_VALUE) "unknown" else fmt(n.snr) + " dB"}; RSSI=${if (n.rssi == Int.MAX_VALUE) "unknown" else n.rssi.toString() + " dBm"}; favourite=${n.isFavorite}; via MQTT=${n.viaMqtt}")
             appendLine("Position: ${n.position}")
             appendLine("Device metrics: ${n.deviceMetrics.toString().pretty()}")
@@ -651,7 +651,7 @@ class AssistantDataProvider(
         fun line(r: Row): String {
             val n = r.n
             val ago = if (n.lastHeard == 0) "never" else "${((now - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)} min ago"
-            return "- ${n.user.short_name} (${n.user.long_name}), role ${n.user.role}: hops=${n.hopsAway}; " +
+            return "- ${n.user.short_name} (${n.user.long_name}), role ${roleLabel(n.user.role.toString())}: hops=${n.hopsAway}; " +
                 "SNR=${if (n.snr == Float.MAX_VALUE) "unknown" else fmt(n.snr) + " dB"}; " +
                 "RSSI=${if (n.rssi == Int.MAX_VALUE) "unknown" else n.rssi.toString() + " dBm"}; " +
                 "distance=${r.meters?.let { m -> fmt(m / METERS_PER_KM) + " km" } ?: "unknown"}; position=${position(n) ?: "unknown"}; heard $ago"
@@ -1229,7 +1229,7 @@ class AssistantDataProvider(
             val bat =
                 n.deviceMetrics.battery_level?.let { if (it > 100) aiString(Res.string.ai_battery_ext) else aiString(Res.string.ai_battery_pct, it) }
                     ?: aiString(Res.string.ai_battery_unknown)
-            sb.append("\n• ${n.user.long_name} (${n.user.short_name}), ${n.user.hw_model}, ${n.user.role}, ${aiString(Res.string.ai_heard, heard)}, $bat")
+            sb.append("\n• ${n.user.long_name} (${n.user.short_name}), ${n.user.hw_model}, ${roleLabel(n.user.role.toString())}, ${aiString(Res.string.ai_heard, heard)}, $bat")
         }
         if (found.size > top) sb.append("\n").append(aiString(Res.string.ai_more, found.size - top))
         return sb.toString()
@@ -1587,7 +1587,7 @@ class AssistantDataProvider(
                 "LOST_AND_FOUND" -> "Zgubiony i znaleziony"
                 else -> return raw
             }
-        return if (name.equals(raw, ignoreCase = true)) raw else "$name ($raw)"
+        return if (name == raw) raw else "$name ($raw)"
     }
 
     /** A distance in metres written in kilometres with one decimal. */
@@ -1759,7 +1759,7 @@ class AssistantDataProvider(
             }
             "role" -> {
                 val role = nodeRepository.ourNodeInfo.value?.user?.role?.toString() ?: return noRadio
-                s("Twoje urządzenie ma ustawioną rolę $role.", "Your device is set to the role $role.")
+                s("Twoje urządzenie ma ustawioną rolę ${roleLabel(role)}.", "Your device is set to the role $role.")
             }
             "channels" -> {
                 val names = radioConfigRepository.channelSetFlow.first().settings
