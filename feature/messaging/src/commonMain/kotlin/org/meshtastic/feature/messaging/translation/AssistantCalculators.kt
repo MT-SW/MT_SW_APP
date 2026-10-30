@@ -50,9 +50,10 @@ object AssistantCalculators {
 
     fun answer(question: String, polish: Boolean, defaults: Defaults = Defaults()): String? {
         lastAntenna = null
+        polishLabels = polish
         val q = question.lowercase().replace(' ', ' ')
         val t = Texts(polish)
-        return arithmetic(q, t) ?: airtime(q, t, defaults) ?: presets(q, t, defaults) ?: range(q, t, defaults) ?: fresnel(q, t) ?: horizon(q, t) ?:
+        return arithmetic(q, t) ?: airtime(q, t, defaults) ?: presetFacts(q, t) ?: presets(q, t, defaults) ?: range(q, t, defaults) ?: fresnel(q, t) ?: horizon(q, t) ?:
             pathLoss(q, t) ?: eirp(q, t) ?: power(q, t) ?: antenna(q, t) ?: wavelength(q, t)
     }
 
@@ -437,7 +438,24 @@ object AssistantCalculators {
         }
     }
 
-    private fun presetName(o: ChannelOption) = o.name.split('_').joinToString(" ") { w -> w.lowercase().replaceFirstChar { it.uppercase() } }
+    /** Whether the answer being built is Polish: then a preset is named the way the app names it, with the English name in brackets. */
+    private var polishLabels = true
+
+    private val POLISH_PRESETS =
+        mapOf(
+            "LITE_FAST" to "Lite - szybki", "LITE_SLOW" to "Lite - wolny", "LONG_FAST" to "Daleki zasięg — Szybko",
+            "LONG_MODERATE" to "Daleki zasięg — Średnio", "LONG_SLOW" to "Daleki zasięg — Wolno", "LONG_TURBO" to "Daleki zasięg — Turbo",
+            "MEDIUM_FAST" to "Średni zasięg — Szybko", "MEDIUM_SLOW" to "Średni zasięg — wolno", "MEDIUM_TURBO" to "Średni zasięg - turbo",
+            "NARROW_FAST" to "Wąski - szybki", "NARROW_SLOW" to "Wąski - wolny", "SHORT_FAST" to "Krótki zasięg — Szybko",
+            "SHORT_SLOW" to "Bliski zasięg — Wolno", "SHORT_TURBO" to "Krótki zasięg — Turbo", "TINY_FAST" to "Mikro - szybki",
+            "TINY_SLOW" to "Mikro - wolny", "VERY_LONG_SLOW" to "Bardzo daleki zasięg — Wolno",
+        )
+
+    private fun presetName(o: ChannelOption): String {
+        val english = o.name.split('_').joinToString(" ") { w -> w.lowercase().replaceFirstChar { it.uppercase() } }
+        val polish = POLISH_PRESETS[o.name]
+        return if (polishLabels && polish != null) "$polish ($english)" else english
+    }
 
     private fun snrLimit(sf: Int) = -7.5 - 2.5 * (sf - 7)
 
@@ -477,14 +495,14 @@ object AssistantCalculators {
                 "• moc ${t.n(p)} dBm$powerNote, anteny ${t.n(gt)} dBi i ${t.n(gr)} dBi\n" +
                 "• czułość odbiornika ok. ${t.n(sens)} dBm (granica SNR ${t.n(snrLimit(o.spreadingFactor))} dB)\n" +
                 "• dopuszczalne tłumienie ok. ${t.n(budget)} dB\n" +
-                "• zasięg teoretyczny w wolnej przestrzeni: ok. ${t.n(dKm, 0)} km\n" + distance +
-                "To górna granica przy pełnej widoczności anten. Na Ziemi zasięg ogranicza horyzont radiowy: ${horizonList(q, t)}. Do tego przeszkody (budynki, las, wzgórza). Konkretne łącze sprawdzisz w planerze łącza.",
+                "• w wolnej przestrzeni, czysta teoria bez Ziemi: ok. ${t.n(dKm, 0)} km (w terenie nierealne)\n" + distance +
+                "W praktyce zasięg ogranicza horyzont radiowy, to realny sufit na płaskim terenie: ${horizonList(q, t)}. Do tego przeszkody (budynki, las, wzgórza). Konkretne łącze sprawdzisz w planerze łącza.",
             "Link budget for the ${presetName(o)} preset$presetNote (SF${o.spreadingFactor}, ${t.n(o.bandwidth * 1000.0, 2)} kHz) at ${t.n(f, 2)} MHz:\n" +
                 "• power ${t.n(p)} dBm$powerNote, antennas ${t.n(gt)} dBi and ${t.n(gr)} dBi\n" +
                 "• receiver sensitivity about ${t.n(sens)} dBm (SNR limit ${t.n(snrLimit(o.spreadingFactor))} dB)\n" +
                 "• allowed path loss about ${t.n(budget)} dB\n" +
-                "• theoretical free-space range: about ${t.n(dKm, 0)} km\n" + distance +
-                "That is the upper limit with the antennas in full view of each other. On Earth the radio horizon limits it: ${horizonList(q, t)}. Obstacles (buildings, forest, hills) come on top. Check a real link in the link planner.",
+                "• in free space, pure theory without the Earth: about ${t.n(dKm, 0)} km (unrealistic on the ground)\n" + distance +
+                "In practice the radio horizon limits the range, the real ceiling over flat ground: ${horizonList(q, t)}. Obstacles (buildings, forest, hills) come on top. Check a real link in the link planner.",
         )
     }
 
@@ -530,6 +548,41 @@ object AssistantCalculators {
      * many nodes fit, worked out from the presets themselves, for the coding rate asked (4/5 ... 4/8) and with a pick for
      * the number of nodes in the question. The model never invents these numbers.
      */
+    private fun namedPresets(q: String): List<ChannelOption> {
+        val flat = q.replace(Regex("[\\s_-]"), "")
+        return ChannelOption.entries.filter { it.removedInFirmware == null }
+            .mapNotNull { o -> flat.indexOf(o.name.replace("_", "").lowercase()).takeIf { it >= 0 }?.let { o to it } }
+            .sortedBy { it.second }.map { it.first }
+    }
+
+    private fun Texts.presetLine(o: ChannelOption): String {
+        val cr = crFor(o, null)
+        val rate = bitRate(o, cr)
+        val speed = if (rate >= 1000) "${n(rate / 1000, 1)} kb/s" else "${n(rate, 0)} b/s"
+        return s(
+            "• ${presetName(o)}: SF${o.spreadingFactor}, ${n(o.bandwidth * 1000.0, 2)} kHz, korekcja 4/$cr, prędkość $speed, czułość ok. ${n(sensitivityDbm(o))} dBm, pakiet 50 B trwa ${n(airtimeMs(o, PRESET_PAYLOAD_BYTES, cr), 0)} ms",
+            "• ${presetName(o)}: SF${o.spreadingFactor}, ${n(o.bandwidth * 1000.0, 2)} kHz, coding rate 4/$cr, speed $speed, sensitivity about ${n(sensitivityDbm(o))} dBm, a 50 B packet takes ${n(airtimeMs(o, PRESET_PAYLOAD_BYTES, cr), 0)} ms",
+        )
+    }
+
+    /** Facts about named presets (sensitivity, speed, difference between two) and "which preset reaches farthest", counted from the preset table. */
+    private fun presetFacts(q: String, t: Texts): String? {
+        if (has(q, "który preset ma (?:największy|najwiekszy|najlepszy) zasięg|który preset (?:sięga|siega) najdalej|which preset has the (?:longest|best) range")) {
+            val best = COMPARED.maxByOrNull { sensitivityDbm(it) * -1.0 } ?: return null
+            return t.s(
+                "Największy zasięg daje najwolniejszy, najczulszy preset: ${presetName(best)} (czułość ok. ${t.n(sensitivityDbm(best))} dBm), kosztem bardzo małej prędkości i długiego zajmowania eteru. Preset musi być taki sam u wszystkich w sieci; w naszej sieci jest to Narrow Fast.\n" + t.presetLine(best),
+                "The longest range comes from the slowest, most sensitive preset: ${presetName(best)} (sensitivity about ${t.n(sensitivityDbm(best))} dBm), at the cost of very low speed and long air time. The preset must be the same for everyone in the network; ours uses Narrow Fast.\n" + t.presetLine(best),
+            )
+        }
+        val named = namedPresets(q).take(2)
+        if (named.isEmpty()) return null
+        if (!has(q, "czułość|czulosc|sensitiv|różni|rozni|różnic|roznic|differ|co to jest|what is|opisz|describe|przepustow|bitrate|prędkość|predkosc|speed|parametr")) return null
+        return named.joinToString("\n") { t.presetLine(it) } + t.s(
+            "\nPreset musi być taki sam u wszystkich w sieci; nasza sieć używa Narrow Fast.",
+            "\nThe preset must be the same for everyone in the network; ours uses Narrow Fast.",
+        )
+    }
+
     private fun presets(q: String, t: Texts, defaults: Defaults): String? {
         if (!has(q, "preset")) return null
         if (!has(q, "zalecan|polec|najlepsz|najlepiej|wybra|dobra[ćc]|dobierz|dobór|tabel|porówn|porown|zestawien|jaki preset|który preset|ktory preset|recommend|best preset|which preset|compare|choose|what preset")) return null

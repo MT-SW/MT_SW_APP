@@ -622,7 +622,7 @@ class AssistantDataProvider(
             val rssi = if (n.rssi == Int.MAX_VALUE) none else n.rssi.toString() + " dBm"
             val dist = r.meters?.let { m -> fmt(m / METERS_PER_KM) + " km" } ?: none
             val where = position(n)?.let { aiString(Res.string.ai_sig_position, it) }.orEmpty()
-            sb.append(aiString(Res.string.ai_sig_line, n.user.short_name, n.user.long_name, n.user.role.toString(), n.hopsAway.toString(), snr, rssi, dist, where, heard)).append('\n')
+            sb.append(aiString(Res.string.ai_sig_line, n.user.short_name, n.user.long_name, roleLabel(n.user.role.toString()), n.hopsAway.toString(), snr, rssi, dist, where, heard)).append('\n')
         }
         return sb.toString().trim()
     }
@@ -803,7 +803,7 @@ class AssistantDataProvider(
         val byHops = nodes.groupingBy { it.hopsAway }.eachCount().toSortedMap().entries.joinToString { "${it.key}:${it.value}" }
         val low = nodes.filter { (it.deviceMetrics.battery_level ?: 100) in 1..LOW_BATTERY }.joinToString { it.user.short_name }
         val hardware = nodes.groupingBy { it.user.hw_model.toString() }.eachCount().entries.sortedByDescending { it.value }.take(HW_LIMIT).joinToString { "${it.key}:${it.value}" }
-        val roles = nodes.groupingBy { it.user.role.toString() }.eachCount().entries.sortedByDescending { it.value }.joinToString { "${it.key}:${it.value}" }
+        val roles = nodes.groupingBy { roleLabel(it.user.role.toString()) }.eachCount().entries.sortedByDescending { it.value }.joinToString { "${it.key}:${it.value}" }
         val favourites = nodes.filter { it.isFavorite }.joinToString { it.user.short_name }
         val mqtt = nodes.count { it.viaMqtt }
         if (polish) {
@@ -817,7 +817,7 @@ class AssistantDataProvider(
                     "$where – ${it.value} węzłów"
                 }
             val hw = nodes.groupingBy { it.user.hw_model.toString() }.eachCount().entries.sortedByDescending { it.value }.take(HW_LIMIT).filter { it.value > 0 }.joinToString("; ") { "${it.key} – ${it.value}" }
-            val rl = nodes.groupingBy { it.user.role.toString() }.eachCount().entries.sortedByDescending { it.value }.joinToString("; ") { "${it.key} – ${it.value}" }
+            val rl = nodes.groupingBy { roleLabel(it.user.role.toString()) }.eachCount().entries.sortedByDescending { it.value }.joinToString("; ") { "${it.key} – ${it.value}" }
             return "PODSUMOWANIE SIECI: znanych węzłów ${nodes.size}, słyszanych w ostatnich 24 h $recent. Węzły według odległości: $hops. " +
                 "Słaba bateria (do $LOW_BATTERY%): ${low.ifBlank { "brak" }}. Sprzęt: $hw. Role: $rl. " +
                 "Ulubione: ${favourites.ifBlank { "brak" }}. Słyszane przez MQTT: $mqtt."
@@ -1547,13 +1547,36 @@ class AssistantDataProvider(
         val nowS = nowMillis / MILLIS_PER_SECOND
         val sb = StringBuilder(s("Węzłów z tą rolą: ${found.size}.", "Nodes with this role: ${found.size}."))
         for (n in found.take(NAMES_SHOWN)) {
-            sb.append("\n• ").append(displayName(n)).append(" (").append(n.user.role.toString()).append(")")
+            sb.append("\n• ").append(displayName(n)).append(" (").append(roleLabel(n.user.role.toString())).append(")")
             if (n.lastHeard != 0) sb.append(", ").append(ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0)))
             if (n.hopsAway > 0) sb.append(s(", skoki ", ", hops ")).append(n.hopsAway)
             me?.let { n.distance(it) }?.let { sb.append(", ").append(kilometres(it)).append(" km") }
         }
         if (found.size > NAMES_SHOWN) sb.append('\n').append(aiString(Res.string.ai_more, found.size - NAMES_SHOWN))
         return sb.toString()
+    }
+
+    /** A role the way the app names it in Polish, with the firmware's English name in brackets ("Router pomocniczy (ROUTER_LATE)"). */
+    private fun roleLabel(raw: String): String {
+        if (!polish) return raw
+        val name =
+            when (raw) {
+                "CLIENT" -> "Klient"
+                "CLIENT_MUTE" -> "Klient pasywny"
+                "CLIENT_HIDDEN" -> "Klient ukryty"
+                "CLIENT_BASE" -> "Klient bazowy"
+                "ROUTER" -> "Router"
+                "ROUTER_LATE" -> "Router pomocniczy"
+                "ROUTER_CLIENT" -> "Router Klienta"
+                "REPEATER" -> "Repeater"
+                "TRACKER" -> "Tracker"
+                "SENSOR" -> "Czujnik"
+                "TAK" -> "TAK"
+                "TAK_TRACKER" -> "TAK Tracker"
+                "LOST_AND_FOUND" -> "Zgubiony i znaleziony"
+                else -> return raw
+            }
+        return if (name.equals(raw, ignoreCase = true)) raw else "$name ($raw)"
     }
 
     /** A distance in metres written in kilometres with one decimal. */
@@ -1745,7 +1768,7 @@ class AssistantDataProvider(
         val hops =
             nodes.filter { it.hopsAway >= 0 }.groupingBy { it.hopsAway }.eachCount().toSortedMap().entries
                 .joinToString(", ") { (h, c) -> "${if (h == 0) direct else h.toString()}: $c" }
-        val roles = nodes.groupingBy { it.user.role.toString() }.eachCount().entries.sortedByDescending { it.value }.joinToString(", ") { "${it.key}: ${it.value}" }
+        val roles = nodes.groupingBy { roleLabel(it.user.role.toString()) }.eachCount().entries.sortedByDescending { it.value }.joinToString(", ") { "${it.key}: ${it.value}" }
         val low = nodes.filter { (it.deviceMetrics.battery_level ?: 100) in 1..LOW_BATTERY }.joinToString(", ") { it.user.long_name.ifBlank { it.user.short_name } }
         if (hops.isNotBlank()) sb.append("\n• ").append(aiString(Res.string.ai_net_hops, hops))
         sb.append("\n• ").append(aiString(Res.string.ai_net_roles, roles))

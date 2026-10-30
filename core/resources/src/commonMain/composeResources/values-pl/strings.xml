@@ -570,7 +570,7 @@
     <string name="debug_store_logs_title">Przechowuj logi sieci</string>
     <string name="debug_info_title">O tym ekranie</string>
     <string name="debug_info_body">Pakiety\nKażdy pakiet, który radio przekazało do aplikacji. Zębatka służy do filtrowania, a kosz do usunięcia listy.\n\nLogi aplikacji\nKomunikaty zapisywane przez samą aplikację. Przydają się, gdy coś w aplikacji nie działa.\n\nLogi urządzenia\nTekst, który radio wypisuje na swoim porcie szeregowym. Najpierw włącz „Debug Logs” w ustawieniach bezpieczeństwa urządzenia. Przez Bluetooth działa to z każdym firmware; przez Wi-Fi i USB tylko z firmware MT_SW.</string>
-    <string name="show_node_links_summary">Rysuje linie między węzłami, które wymieniają pakiety: raporty sąsiadów, traceroute i bezpośrednie odbiory.</string>
+    <string name="show_node_links_summary">Rysuje linie między węzłami, które wymieniają pakiety: raporty sąsiadów, wyznaczanie trasy i bezpośrednie odbiory.</string>
     <string name="debug_tab_app_logs">Dzienniki aplikacji</string>
     <string name="debug_tab_device_logs">Logi urządzenia</string>
     <string name="debug_tab_mirror">Podgląd ekranu</string>
@@ -1725,8 +1725,8 @@
     <string name="port_desc_zps">eksperymentalne pozycjonowanie bez GPS</string>
     <string name="port_name_simulator">Symulator</string>
     <string name="port_desc_simulator">symulator węzła</string>
-    <string name="port_name_traceroute">Śledzenie trasy</string>
-    <string name="port_desc_traceroute">śledzenie trasy pakietu przez sieć</string>
+    <string name="port_name_traceroute">Wyznaczanie trasy</string>
+    <string name="port_desc_traceroute">wyznaczanie trasy pakietu przez sieć</string>
     <string name="port_name_neighborinfo">Info o sąsiadach</string>
     <string name="port_desc_neighborinfo">lista sąsiadów węzła</string>
     <string name="port_name_map_report">Raport dla mapy</string>
@@ -2574,9 +2574,9 @@
     <string name="tls_enabled">Włącz TLS</string>
     <string name="tls_enabled_public_broker_summary">Gdy ta aplikacja przekazuje MQTT, zawsze łączy się z mqtt.meshtastic.org przez TLS. To ustawienie dotyczy sytuacji, gdy radio łączy się z brokerem przez własne Wi-Fi lub Ethernet.</string>
     <string name="toggle_my_position">Pokaż moją pozycję</string>
-    <string name="trace_route">Śledzenie trasy</string>
+    <string name="trace_route">Wyznaczanie trasy</string>
     <!-- TRACEROUTE -->
-    <string name="traceroute">Pokaż trasę</string>
+    <string name="traceroute">Wyznaczanie trasy</string>
     <string name="traceroute_diff">Skoki do: %1$d. Skoki od: %2$d</string>
     <string name="traceroute_direct">Bezpośrednio</string>
     <string name="traceroute_duration">Czas trasy: %1$s s</string>
