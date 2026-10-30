@@ -3016,6 +3016,8 @@
     <string name="translator_result">Translation</string>
     <string name="translator_source_label">Text</string>
     <string name="translator_export_title">MT_SW – translator conversation</string>
+    <string name="translator_info">The translator runs entirely on the device, without the internet. Type or dictate a text, choose the languages (the first can be detected by itself) and tap the translate button. "Swap languages" reverses the direction. "Save translations…" saves all translations of this session as PDF, MD, TXT, HTML or JSON. The /tłumacz command (typed into the text box) runs the translation test: the same sentences for every model, and its results can be saved too.</string>
+    <string name="translator_history_empty">Your translations of this session will appear here. You can save them afterwards.</string>
     <string name="translator_history_title">Translations in this session</string>
     <string name="translator_save">Save translations…</string>
     <string name="translator_history_clear">Clear</string>
@@ -3220,6 +3222,9 @@
     <string name="ai_model_license_line">Licence: %1$s</string>
     <string name="ai_model_hearing">Understands speech</string>
     <string name="ai_models_empty">There are no models for this function on this device.</string>
+    <string name="ai_models_advice_assistant">For the assistant we recommend the Gemma 4 family (E2B, E4B and larger): it answers most accurately and understands Polish best. Models from other families (Qwen, Bielik) stay as an option for weaker phones.</string>
+    <string name="ai_models_advice_assistant_warning">Note: we cannot guarantee 100% that this model\'s answers are right. We advise checking them elsewhere. This model does not use the internet.</string>
+    <string name="ai_models_advice_dictation">For dictation we recommend the Whisper models: they are accurate, fast and light.</string>
     <string name="ai_models_hint">Nothing is downloaded by itself. Each model is a separate download; the first one also installs a small engine program. Deleting a model does not remove the others.</string>
     <string name="ai_unload_title">Free AI memory</string>
     <string name="ai_unload_none">No model is in memory now</string>

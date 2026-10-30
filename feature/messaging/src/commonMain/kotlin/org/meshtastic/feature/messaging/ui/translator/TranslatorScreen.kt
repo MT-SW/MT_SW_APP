@@ -27,6 +27,8 @@ import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.repository.FileService
 import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.core.resources.translator_save
+import org.meshtastic.core.resources.translator_info
+import org.meshtastic.core.resources.translator_history_empty
 import org.meshtastic.core.resources.assistant_save_done
 import org.meshtastic.core.resources.assistant_save_failed
 import org.meshtastic.core.resources.translator_export_title
@@ -115,6 +117,11 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
             return@Column
         }
 
+        Text(
+            text = stringResource(Res.string.translator_info),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
             LanguagePicker(
                 label = stringResource(Res.string.translator_from),
@@ -131,7 +138,10 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
                 modifier = Modifier.weight(1f),
             )
         }
-        TextButton(onClick = viewModel::swapLanguages) { Text(stringResource(Res.string.translator_swap)) }
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+            TextButton(onClick = viewModel::swapLanguages) { Text(stringResource(Res.string.translator_swap)) }
+            TranslatorSaveButton(state.history)
+        }
 
         OutlinedTextField(
             value = state.input,
@@ -264,15 +274,13 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
             }
         }
 
-        if (state.history.isNotEmpty()) {
-            TranslatorHistory(state.history, onClear = viewModel::clearHistory)
-        }
+        TranslatorHistory(state.history, onClear = viewModel::clearHistory)
     }
 }
 
-/** The translations of this session with a button that saves them as a file, like the assistant's conversation. */
+/** The button that saves the translations of this session as a file (grey while there is nothing to save). */
 @Composable
-private fun TranslatorHistory(history: List<TranslatorHistoryEntry>, onClear: () -> Unit) {
+private fun TranslatorSaveButton(history: List<TranslatorHistoryEntry>) {
     val scope = rememberCoroutineScope()
     val fileService = koinInject<FileService>()
     val sourceLabel = stringResource(Res.string.translator_source_label)
@@ -301,6 +309,45 @@ private fun TranslatorHistory(history: List<TranslatorHistoryEntry>, onClear: ()
                 }
             }
         }
+    Box {
+        TextButton(onClick = { saveMenu = true }, enabled = history.isNotEmpty()) { Text(stringResource(Res.string.translator_save)) }
+        DropdownMenu(expanded = saveMenu, onDismissRequest = { saveMenu = false }) {
+            ExportFormat.entries.forEach { format ->
+                DropdownMenuItem(
+                    text = { Text(format.label) },
+                    onClick = {
+                        saveMenu = false
+                        val entries =
+                            history.flatMap {
+                                listOf(
+                                    ExportEntry(fromUser = true, text = it.source, note = null, buttons = emptyList(), at = it.at),
+                                    ExportEntry(fromUser = false, text = it.result, note = null, buttons = emptyList(), at = it.at),
+                                )
+                            }
+                        val stamp = DateFormatter.formatDateTime(nowMillis)
+                        pendingBytes =
+                            when (format) {
+                                ExportFormat.PDF -> AssistantExport.pdf(entries, title, stamp, sourceLabel, resultLabel)
+                                ExportFormat.MARKDOWN ->
+                                    AssistantExport.markdown(entries, title, stamp, sourceLabel, resultLabel).encodeToByteArray()
+                                ExportFormat.TEXT -> AssistantExport.text(entries, sourceLabel, resultLabel).encodeToByteArray()
+                                ExportFormat.HTML ->
+                                    AssistantExport.html(entries, title, stamp, sourceLabel, resultLabel).encodeToByteArray()
+                                ExportFormat.JSON -> AssistantExport.json(entries, title, stamp).encodeToByteArray()
+                            }
+                        saveResult = null
+                        saveLauncher("mt_sw_translator_" + nowMillis / 1000 + format.extension, format.mime)
+                    },
+                )
+            }
+        }
+    }
+    saveResult?.let { Text(text = it, style = MaterialTheme.typography.bodySmall) }
+}
+
+/** The translations of this session, always shown (with a hint while empty), and a button that clears them. */
+@Composable
+private fun TranslatorHistory(history: List<TranslatorHistoryEntry>, onClear: () -> Unit) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
@@ -308,49 +355,20 @@ private fun TranslatorHistory(history: List<TranslatorHistoryEntry>, onClear: ()
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
             )
+            if (history.isEmpty()) {
+                Text(
+                    text = stringResource(Res.string.translator_history_empty),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             history.takeLast(HISTORY_SHOWN).forEach { entry ->
                 Column {
                     Text(text = entry.source, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(text = entry.result, style = MaterialTheme.typography.bodyMedium)
                 }
             }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box {
-                    TextButton(onClick = { saveMenu = true }) { Text(stringResource(Res.string.translator_save)) }
-                    DropdownMenu(expanded = saveMenu, onDismissRequest = { saveMenu = false }) {
-                        ExportFormat.entries.forEach { format ->
-                            DropdownMenuItem(
-                                text = { Text(format.label) },
-                                onClick = {
-                                    saveMenu = false
-                                    val entries =
-                                        history.flatMap {
-                                            listOf(
-                                                ExportEntry(fromUser = true, text = it.source, note = null, buttons = emptyList(), at = it.at),
-                                                ExportEntry(fromUser = false, text = it.result, note = null, buttons = emptyList(), at = it.at),
-                                            )
-                                        }
-                                    val stamp = DateFormatter.formatDateTime(nowMillis)
-                                    pendingBytes =
-                                        when (format) {
-                                            ExportFormat.PDF -> AssistantExport.pdf(entries, title, stamp, sourceLabel, resultLabel)
-                                            ExportFormat.MARKDOWN ->
-                                                AssistantExport.markdown(entries, title, stamp, sourceLabel, resultLabel).encodeToByteArray()
-                                            ExportFormat.TEXT -> AssistantExport.text(entries, sourceLabel, resultLabel).encodeToByteArray()
-                                            ExportFormat.HTML ->
-                                                AssistantExport.html(entries, title, stamp, sourceLabel, resultLabel).encodeToByteArray()
-                                            ExportFormat.JSON -> AssistantExport.json(entries, title, stamp).encodeToByteArray()
-                                        }
-                                    saveResult = null
-                                    saveLauncher("mt_sw_translator_" + nowMillis / 1000 + format.extension, format.mime)
-                                },
-                            )
-                        }
-                    }
-                }
-                TextButton(onClick = onClear) { Text(stringResource(Res.string.translator_history_clear)) }
-            }
-            saveResult?.let { Text(text = it, style = MaterialTheme.typography.bodySmall) }
+            if (history.isNotEmpty()) TextButton(onClick = onClear) { Text(stringResource(Res.string.translator_history_clear)) }
         }
     }
 }

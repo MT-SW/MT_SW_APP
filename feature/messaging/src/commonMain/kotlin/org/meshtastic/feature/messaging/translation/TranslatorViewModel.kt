@@ -154,7 +154,12 @@ class TranslatorViewModel(
                         val now = nowMillis
                         val took = (now - mark).coerceAtLeast(1L)
                         mark = now
-                        _state.update { it.copy(testLines = it.testLines + TranslatorTestLine(source, result, took)) }
+                        _state.update {
+                            it.copy(
+                                testLines = it.testLines + TranslatorTestLine(source, result, took),
+                                history = it.history + TranslatorHistoryEntry(source, result, now),
+                            )
+                        }
                     }
                 } catch (e: CancellationException) {
                     throw e

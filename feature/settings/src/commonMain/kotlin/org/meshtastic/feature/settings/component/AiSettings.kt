@@ -79,6 +79,9 @@ import org.meshtastic.core.resources.ai_model_in_use
 import org.meshtastic.core.resources.ai_model_license_line
 import org.meshtastic.core.resources.ai_model_page
 import org.meshtastic.core.resources.ai_model_recommended
+import org.meshtastic.core.resources.ai_models_advice_assistant
+import org.meshtastic.core.resources.ai_models_advice_assistant_warning
+import org.meshtastic.core.resources.ai_models_advice_dictation
 import org.meshtastic.core.resources.ai_model_soon
 import org.meshtastic.core.resources.ai_model_specs
 import org.meshtastic.core.resources.ai_model_use
@@ -326,6 +329,20 @@ internal fun AiSettings() {
             onCheckedChange = { uiPrefs.setDictationExternalMic(it) },
         )
     }
+    val advice =
+        when (role) {
+            AiRole.ASSISTANT -> Res.string.ai_models_advice_assistant
+            AiRole.DICTATION -> Res.string.ai_models_advice_dictation
+            AiRole.TRANSLATOR -> null
+        }
+    if (advice != null) {
+        Text(
+            text = stringResource(advice),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        )
+    }
     val models = AiModels.forRole(role)
     if (models.isEmpty()) {
         Text(
@@ -346,6 +363,14 @@ internal fun AiSettings() {
                 Tab(selected = shownIndex == index, onClick = { familyIndex = index }, text = { Text(label) })
             }
         }
+    }
+    if (role == AiRole.ASSISTANT && families.getOrNull(shownIndex)?.startsWith("Gemma") == false) {
+        Text(
+            text = stringResource(Res.string.ai_models_advice_assistant_warning),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.error,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+        )
     }
     families.getOrNull(shownIndex)?.let { family ->
         models.filter { it.family == family }.forEach { model ->

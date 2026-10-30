@@ -2846,6 +2846,8 @@
     <string name="translator_result">Tłumaczenie</string>
     <string name="translator_source_label">Tekst</string>
     <string name="translator_export_title">MT_SW – rozmowa w tłumaczu</string>
+    <string name="translator_info">Tłumacz działa w całości na urządzeniu, bez internetu. Wpisz lub podyktuj tekst, wybierz języki (pierwszy może być rozpoznany sam) i dotknij przycisku tłumaczenia. „Zamień języki” odwraca kierunek. „Zapisz tłumaczenia…” zapisuje wszystkie tłumaczenia z tej sesji jako PDF, MD, TXT, HTML lub JSON. Komenda /tłumacz (wpisana w pole tekstu) uruchamia test tłumaczeń: te same zdania dla każdego modelu, a jego wyniki też można zapisać.</string>
+    <string name="translator_history_empty">Tu pojawią się Twoje tłumaczenia z tej sesji. Możesz je potem zapisać.</string>
     <string name="translator_history_title">Tłumaczenia w tej sesji</string>
     <string name="translator_save">Zapisz tłumaczenia…</string>
     <string name="translator_history_clear">Wyczyść</string>
@@ -3434,6 +3436,9 @@
     <string name="ai_model_license_line">Licencja: %1$s</string>
     <string name="ai_model_hearing">Rozumie mowę</string>
     <string name="ai_models_empty">Brak modeli do tej funkcji na tym urządzeniu.</string>
+    <string name="ai_models_advice_assistant">Do asystenta polecamy rodzinę Gemma 4 (E2B, E4B i większe): odpowiada najtrafniej i najlepiej rozumie po polsku. Modele z innych rodzin (Qwen, Bielik) zostają jako dodatek dla słabszych telefonów.</string>
+    <string name="ai_models_advice_assistant_warning">Uwaga: nie możemy dać 100% pewności, że odpowiedzi tego modelu są dobre. Radzimy sprawdzać je w innych miejscach. Ten model nie korzysta z internetu.</string>
+    <string name="ai_models_advice_dictation">Do dyktowania polecamy modele Whisper: są dokładne, szybkie i lekkie.</string>
     <string name="ai_models_hint">Nic nie pobiera się samo. Każdy model to osobne pobranie; pierwszy instaluje też mały program silnika. Usunięcie modelu nie usuwa pozostałych.</string>
     <string name="ai_unload_title">Zwolnij pamięć AI</string>
     <string name="ai_unload_none">Żaden model nie jest teraz w pamięci</string>

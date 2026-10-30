@@ -570,6 +570,10 @@ class LlamaAssistantService(
         if (nodeNum != null && SIGNAL_NODE_ASK.containsMatchIn(lower) && data.mentionsNode(lower) && intent.intent in DATA_INTENTS + "chat") {
             return data.nodeSignal(nodeNum).also(onPiece)
         }
+        // The time and the date are read from the phone's clock by the app, never guessed by the model.
+        if (TIME_ASK.containsMatchIn(lower) && !data.mentionsNode(lower)) {
+            return AssistantClock.nowText(org.meshtastic.core.common.util.nowMillis, polish).also(onPiece)
+        }
         // Hardware, firmware, last heard, hops or distance of one named node: read from the node database, whichever intent the model chose.
         if (nodeNum != null && NODE_FACTS_ASK.containsMatchIn(lower) && data.mentionsNode(lower) && !MANY_WORDS.containsMatchIn(lower) &&
             !NEAR_FAR.containsMatchIn(lower) && !UPTIME_WORDS.containsMatchIn(lower) && !SIGNAL_NODE_ASK.containsMatchIn(lower)
@@ -1587,6 +1591,11 @@ class LlamaAssistantService(
         val NODE_COUNT_ASK = Regex("(?iu)liczb\\p{L}* (znanych |wszystkich )?węzł|ile (jest |mam )?(znanych |wszystkich )?węzł|how many (known )?nodes")
         val ROLE_LIST_ASK = Regex("(?iu)pokaż|pokaz|wszystkie|które|ktore|lista|wymień|wymien|show|list|which")
         val NODE_FACTS_ASK = Regex("(?iu)jaki sprzęt|jakie urządzenie|co to za (sprzęt|urządzenie|węzeł)|jaką wersję firmware|jaki firmware|wersj\\p{L}* (firmware|oprogramowania)|kiedy (ostatnio )?(go )?słysz|ostatnio słysz|w jakiej odległości|jak daleko jest|ile skoków|what hardware|which device|firmware version|when .*last heard|how far is")
+        val TIME_ASK =
+            Regex(
+                "(?iu)(która|ktora|jaka)\\s+(jest\\s+)?(teraz\\s+)?godzin\\p{L}*|(jaki|jaka)\\s+(jest\\s+)?(dzi\\p{L}*|dzisiaj)\\s+(dzień|dzien|data)|jaka\\s+(jest\\s+)?(dzi\\p{L}*\\s+)?data|" +
+                    "what\\s+time\\s+is\\s+it|what(?:'s| is)\\s+(the\\s+)?(date|time)|what\\s+day\\s+is\\s+(it|today)",
+            )
         val UPTIME_WORDS = Regex("uptime|czas pracy|czasu pracy|jak długo działa|jak dlugo dziala|how long .* running")
         val NEAR_FAR = Regex("najdal|najbliż|najbliz|nearest|farthest|closest")
         val WHAT_HAPPENS = Regex("^(co się stanie|co sie stanie|co się dzieje|co sie dzieje|what happens|what will happen)")
