@@ -2086,6 +2086,10 @@ class AssistantDataProvider(
     /** A readable name of node [num]. */
     fun nodeRoleFor(num: Int): String = nodeRepository.nodeDBbyNum.value[num]?.user?.role?.toString().orEmpty()
 
+    /** The label of a button to the link planner: the planner itself, with the node when it is not the user's own. */
+    fun plannerLabel(num: Int): String =
+        if (num == nodeRepository.ourNodeInfo.value?.num) "Mesh Link Planer" else "Mesh Link Planer: ${nodeNameFor(num)}"
+
     fun nodeNameFor(num: Int): String =
         nodeRepository.nodeDBbyNum.value[num]?.let { it.user.long_name.ifBlank { it.user.short_name } }.orEmpty()
 
@@ -2115,7 +2119,7 @@ class AssistantDataProvider(
         val q = name.trim().lowercase()
         if (q.isEmpty()) return null
         val all = nodeRepository.nodeDBbyNum.value.values
-        if (q in OWN_WORDS) return nodeRepository.ourNodeInfo.value
+        if (q in OWN_WORDS || q in SELF_WORDS) return nodeRepository.ourNodeInfo.value
         return all.firstOrNull { it.user.short_name.lowercase() == q }
             ?: all.firstOrNull { it.user.long_name.lowercase() == q }
             ?: all.firstOrNull { it.user.long_name.lowercase().contains(q) }

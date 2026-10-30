@@ -615,7 +615,7 @@ class LlamaAssistantService(
         val role = intent.role.takeUnless { it.isBlank() || it == "any" || !ROLE_WORDS.containsMatchIn(question.lowercase()) } ?: ROLE_WORDS.find(question.lowercase())?.groupValues?.get(1)?.let { ROLE_NAMES[it] }.orEmpty()
         // "Do I have range to X": answered from what the radio heard, with a button to the link planner.
         if (nodeNum != null && REACH_ASK.containsMatchIn(lower) && !OPEN_COMMAND.containsMatchIn(lower) && data.mentionsNode(lower)) {
-            collector.add(AssistantAction(data.nodeNameFor(nodeNum), "$DEEP_LINK_BASE_URI/map/planner/$nodeNum"))
+            collector.add(AssistantAction(data.plannerLabel(nodeNum), "$DEEP_LINK_BASE_URI/map/planner/$nodeNum"))
             return data.reachReport(nodeNum).also(onPiece)
         }
         // "Which node is farthest from X": counted from that node, not from the user's radio.
@@ -1105,8 +1105,13 @@ class LlamaAssistantService(
         // A small model (or any model outside the Gemma family) never retells web results in its own words: the app quotes them.
         val small = smallModel(modelId)
         // Quoting chooses from many more entries than a small model could be given to read.
-        val pool =
-            if (small) (if (baseOnly) knowledge?.lookupBaseOnly(query, QUOTE_FACTS_CHARS, language) else knowledge?.lookupBase(query, QUOTE_FACTS_CHARS, language)).orEmpty().ifBlank { facts } else facts
+        val pool = (if (baseOnly) knowledge?.lookupBaseOnly(query, QUOTE_FACTS_CHARS, language) else knowledge?.lookupBase(query, QUOTE_FACTS_CHARS, language)).orEmpty().ifBlank { facts }
+        if (!small && !baseOnly && !quoteOnly) {
+            quotedEntry(question, pool, polish, exactOnly = true)?.takeIf { polish || !looksPolish(it) }?.let {
+                lastRoute = "quoted knowledge-base entry (exact title)"
+                return it.also(onPiece)
+            }
+        }
         if (quoteOnly) {
             if (!small) return null
             return quotedEntry(question, pool, polish, sameOpeningOnly = true)?.takeIf { polish || !looksPolish(it) }?.also {
@@ -1182,7 +1187,7 @@ class LlamaAssistantService(
      * The best entry of the knowledge base word for word, with its source, when it clearly fits the question (at least two
      * words of the question in it). Null otherwise: then the model answers as usual.
      */
-    private fun quotedEntry(question: String, facts: String, polish: Boolean = true, loose: Boolean = false, sameOpeningOnly: Boolean = false): String? {
+    private fun quotedEntry(question: String, facts: String, polish: Boolean = true, loose: Boolean = false, sameOpeningOnly: Boolean = false, exactOnly: Boolean = false): String? {
         val asked = quoteStems(question) - STOP_STEMS
         if (asked.isEmpty()) return null
         val definition = DEFINITION_ASK.containsMatchIn(question)
@@ -1200,6 +1205,8 @@ class LlamaAssistantService(
             val body = block.substringAfter('\n', "")
             val heading = head.substringAfterLast(": ")
             if (onlyCommon && !DEFINITION_ASK.containsMatchIn(heading)) continue
+            // The title is the question itself (the same words): that entry is the answer, word for word.
+            if (exactOnly && quoteStems(heading) - STOP_STEMS != asked) continue
             if (sameOpeningOnly && !(firstWord in OPENING_WORDS && foldPl(heading.lowercase()).trim().startsWith(firstWord))) continue
             // The keywords of the entry count as its title: they hold the other names of the thing.
             val keywords = body.lines().filter { it.startsWith("Słowa:") }.joinToString(" ")
@@ -1245,11 +1252,15 @@ class LlamaAssistantService(
      */
     private fun withBaseSource(answer: String?, facts: String, polish: Boolean, question: String = ""): String? {
         if (answer.isNullOrBlank()) return answer
+        // A model sometimes goes on after its own source line ("To give you a helpful answer, I need to know..."): that is cut.
+        val ownSource = Regex("(?imu)^\\s*(źródło|źródła|source|sources)\\s*:")
+        val firstSource = ownSource.find(answer)?.range?.first
+        val answer = if (firstSource != null && firstSource > MIN_ANSWER_BEFORE_SOURCE) answer.substring(0, firstSource).trimEnd() else answer
         // The source is the entry whose title covers most of the question; one that hardly fits is not named at all.
-        val asked = stems(question)
+        val asked = quoteStems(question)
         val heads = BASE_HEAD.findAll(facts).map { it.groupValues[1].trim() }.toList()
-        val bestHead = heads.maxByOrNull { h -> asked.count { it in stems(h) } }.orEmpty()
-        val covered = asked.count { it in stems(bestHead) }
+        val bestHead = heads.maxByOrNull { h -> asked.count { it in quoteStems(h) } }.orEmpty()
+        val covered = asked.count { it in quoteStems(bestHead) }
         val related = bestHead.startsWith("Baza wiedzy (")
         val head = if (asked.isEmpty() || covered >= (if (related) SOURCE_MIN_RELATED else SOURCE_MIN_WORDS)) bestHead else ""
         val body = answer.replace(MODEL_SOURCE_LINE, "").replace(MODEL_SOURCE_TAIL, "").trimEnd()
@@ -1348,7 +1359,7 @@ class LlamaAssistantService(
         if (num == null) return data.unknownNode(asked.ifBlank { "?" })
         val name = data.nodeNameFor(num).ifBlank { asked }
         val path = if (planner) "map/planner/$num" else "map/focus/$num"
-        collector.add(AssistantAction(name, "$DEEP_LINK_BASE_URI/$path"))
+        collector.add(AssistantAction(if (planner) data.plannerLabel(num) else name, "$DEEP_LINK_BASE_URI/$path"))
         collector.autoOpenLast()
         return aiString(if (planner) Res.string.ai_go_planner else Res.string.ai_go_map, name)
     }
@@ -1973,6 +1984,7 @@ class LlamaAssistantService(
         const val QUOTE_ALL_SHARE = 0.6
         const val QUOTE_BODY_SHARE = 0.6
         const val QUOTE_MIN_WEIGHT = 1.0
+        const val MIN_ANSWER_BEFORE_SOURCE = 40
         const val QUOTE_SHORT_TOTAL = 2.5
         const val OPENING_BONUS = 0.3
         const val EXACT_BONUS = 0.3

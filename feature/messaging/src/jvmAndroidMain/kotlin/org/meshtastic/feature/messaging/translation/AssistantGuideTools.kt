@@ -192,7 +192,7 @@ class AssistantGuideTools(
     fun open_link_planner(@AiToolParam(name = "node", description = "Node name, or \"me\"") node: String): String = run("open_link_planner") {
         val num = data.nodeNumFor(node) ?: return@run "No node called \"$node\" is known."
         val name = data.nodeNameFor(num).ifBlank { node }
-        collector.add(AssistantAction(name, "$DEEP_LINK_BASE_URI/map/planner/$num"))
+        collector.add(AssistantAction(data.plannerLabel(num), "$DEEP_LINK_BASE_URI/map/planner/$num"))
         "A button that opens the link planner for $name was added. Tell the user to tap it."
     }
 
