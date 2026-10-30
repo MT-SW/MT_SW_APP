@@ -113,6 +113,17 @@ object AssistantCalculators {
     private val PERCENT_OF = Regex("$NUM\\s*(?:%|procent\\p{L}*|percent)\\s*(?:z|od|of)\\s*$NUM")
     private val ROOT = Regex("(?:pierwiastek(?: kwadratowy)?|square root|sqrt)\\s*(?:z|of)?\\s*$NUM")
 
+    /** "2300 podzielić przez 7", "3 do kwadratu plus 4 do kwadratu", "6 times 7" written with symbols: + - * / ^. */
+    private fun spokenOperators(q: String): String =
+        q.lowercase()
+            .replace(Regex("\\s*(?:podzielić|podzielone|podziel|dzielone|dzielić|divided)\\s+(?:przez|by)\\s*"), " / ")
+            .replace(Regex("\\s+(?:razy|pomnożyć przez|pomnożone przez|pomnóż przez|times|multiplied by)\\s+"), " * ")
+            .replace(Regex("\\s+(?:plus|dodać|dodaj|added to)\\s+"), " + ")
+            .replace(Regex("\\s+(?:minus|odjąć|odejmij|minus)\\s+"), " - ")
+            .replace(Regex("\\s*do kwadratu|\\s*squared"), "^2")
+            .replace(Regex("\\s*do sześcianu|\\s*cubed"), "^3")
+            .replace(Regex("\\s+do potęgi\\s+|\\s+to the power of\\s+"), "^")
+
     private fun arithmetic(q: String, t: Texts): String? {
         PERCENT_OF.find(q)?.let { m ->
             val p = num(m.groupValues[1]) ?: return null
@@ -120,7 +131,7 @@ object AssistantCalculators {
             return "${t.n(p, 3)} % ${t.s("z", "of")} ${t.n(v, 3)} = ${t.n(p * v / 100, 4)}"
         }
         ROOT.find(q)?.let { m -> val v = num(m.groupValues[1]) ?: return null; return "√${t.n(v, 3)} = ${t.n(sqrt(v), 4)}" }
-        val expr = q.trim().trimEnd('?', '!', '.', ' ', '=').replace(ASK_WORDS, "").trim()
+        val expr = spokenOperators(q.trim().trimEnd('?', '!', '.', ' ', '=')).replace(ASK_WORDS, "").trim()
         if (!Regex("^[\\d\\s+\\-*/^().,x×:%]+$").matches(expr) || !Regex("\\d").containsMatchIn(expr)) return null
         if (!Regex("\\d\\s*[+\\-*/^x×:]\\s*[\\d(]").containsMatchIn(expr)) return null
         val value = Expr(expr.replace(',', '.').replace('x', '*').replace('×', '*').replace(':', '/')).parse() ?: return null

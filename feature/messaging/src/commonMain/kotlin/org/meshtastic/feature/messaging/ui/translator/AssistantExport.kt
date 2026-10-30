@@ -79,7 +79,7 @@ object AssistantExport {
             entries.forEachIndexed { i, e ->
                 append(if (i == 0) "\n" else ",\n")
                 append("    {\"n\": ").append(i + 1).append(", \"role\": ").append(q(if (e.fromUser) "user" else "assistant"))
-                if (e.at > 0L) append(", \"").append(if (e.fromUser) "sent" else "received").append("\": ").append(q(AssistantClock.clock(e.at)))
+                if (e.at > 0L) append(", \"").append(if (e.fromUser) "sent" else "received").append("\": ").append(q(AssistantClock.full(e.at)))
                 if (!e.fromUser && e.tookMs > 0L) append(", \"answer_seconds\": ").append(AssistantClock.seconds(e.tookMs))
                 if (!e.fromUser) diagnosis(e)
                 append(", \"text\": ").append(q(e.text))
@@ -111,7 +111,7 @@ object AssistantExport {
 
     /** " (12:03:17)" for a sent question, " (12:03:29, 12.1 s)" for a received answer; empty when the time is not known. */
     private fun stamp(e: ExportEntry): String =
-        if (e.at <= 0L) "" else " (" + AssistantClock.clock(e.at) + (if (!e.fromUser && e.tookMs > 0L) ", " + AssistantClock.seconds(e.tookMs) + " s" else "") + ")"
+        if (e.at <= 0L) "" else " (" + AssistantClock.full(e.at) + (if (!e.fromUser && e.tookMs > 0L) ", " + AssistantClock.seconds(e.tookMs) + " s" else "") + ")"
 
     fun markdown(entries: List<ExportEntry>, title: String, stamp: String, you: String, assistant: String): String =
         buildString {

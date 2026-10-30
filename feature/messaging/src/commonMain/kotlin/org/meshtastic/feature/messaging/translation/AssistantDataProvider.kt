@@ -1689,6 +1689,30 @@ class AssistantDataProvider(
         return if (polish) "Czas pracy węzła $name (uptime): ${duration(seconds.toLong())}." else "Uptime of node $name: ${duration(seconds.toLong())}."
     }
 
+    /**
+     * What the app knows about one named node: hardware, firmware, when it was heard, hops and distance. Counted here so
+     * a model never answers "I have no information" about a node that is in the list.
+     */
+    suspend fun nodeFacts(num: Int?): String? {
+        val own = nodeRepository.ourNodeInfo.value
+        val node = num?.let { nodeRepository.nodeDBbyNum.value[it] } ?: return null
+        val name = node.user.long_name.ifBlank { node.user.short_name }
+        val hardware = node.user.hw_model.name.takeIf { it != "UNSET" }?.replace('_', ' ')
+        val firmware = node.metadata?.firmware_version?.takeIf { it.isNotBlank() }
+        val nowS = nowMillis / MILLIS_PER_SECOND
+        val heard = if (node.lastHeard == 0) aiString(Res.string.ai_never) else ago(((nowS - node.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+        val meters = if (own != null && node.num != own.num) node.distance(own) else null
+        val unknown = if (polish) "brak danych (węzeł jeszcze tego nie podał)" else "unknown (the node has not reported it yet)"
+        return buildString {
+            append(if (polish) "Węzeł $name:" else "Node $name:")
+            append(if (polish) "\n• sprzęt: " else "\n• hardware: ").append(hardware ?: unknown)
+            append(if (polish) "\n• firmware: " else "\n• firmware: ").append(firmware ?: unknown)
+            append(if (polish) "\n• ostatnio słyszany: " else "\n• last heard: ").append(heard)
+            if (node.hopsAway >= 0) append(if (polish) "\n• skoki: " else "\n• hops: ").append(node.hopsAway)
+            if (meters != null) append(if (polish) "\n• odległość: " else "\n• distance: ").append(roundTo(meters / 1000.0, 1)).append(" km")
+        }
+    }
+
     /** The battery of one node (the own one when [num] is null), exactly as the node reported it. */
     suspend fun nodeBattery(num: Int?): String {
         val own = nodeRepository.ourNodeInfo.value
