@@ -129,7 +129,10 @@ class WhisperCppEngine(
         // not take part or fails a test run is skipped for some days for this model.
         val attempts = buildList {
             for (asset in installer.whisperChipAssets()) {
-                if (installer.isBroken(asset, modelId)) continue
+                if (installer.isBroken(asset, modelId)) {
+                    Logger.i(tag = TAG) { "Skipping ${asset.folder} for $modelId: it failed here a short time ago" }
+                    continue
+                }
                 val kind = asset.folder.substringAfterLast('-')
                 if (!installer.android) {
                     add(Attempt("graphics card ($kind)", asset, chip = true))
