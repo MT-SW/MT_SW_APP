@@ -138,6 +138,9 @@ class LlamaCppEngine(
         return if (intelNpuTriedFirst(modelId)) minOf(normal, INTEL_NPU_BIG_WINDOW) else normal
     }
 
+    /** Would a plain start (no listening) of [modelId] try the Intel NPU first? */
+    fun npuFirst(modelId: String): Boolean = intelNpuTriedFirst(modelId)
+
     /** True when a start of [modelId] would try the Intel NPU with the bigger window first. */
     private fun intelNpuTriedFirst(modelId: String): Boolean {
         val model = AiModels.byId(modelId) ?: return false
@@ -461,7 +464,7 @@ class LlamaCppEngine(
                 when {
                     skipNpu -> ""
                     !installer.intelNpu -> "- " + note("NPU (Intel): not used, no Intel Core Ultra processor found on this computer", "NPU (Intel): nieużywane, na tym komputerze nie ma procesora Intel Core Ultra") + "\n"
-                    hearing -> "- " + note("NPU (Intel): skipped, not used for listening", "NPU (Intel): pominięte, nie służy do słuchania") + "\n"
+                    hearing -> "- " + note("NPU (Intel): skipped, this model was started with listening (dictation on the same model), and the NPU does not listen. Choose Whisper for dictation to let the assistant use the NPU", "NPU (Intel): pominięte, ten model uruchomiono ze słuchaniem (dyktowanie na tym samym modelu), a NPU nie słucha. Wybierz do dyktowania Whisper, a asystent będzie mógł używać NPU") + "\n"
                     !model.intelNpu -> "- " + note("NPU (Intel): skipped, this model does not run on the Intel NPU", "NPU (Intel): pominięte, ten model nie działa na NPU Intela") + "\n"
                     modelId == assistantModelId -> "- " + note("NPU (Intel): skipped, this model is the assistant and needs a bigger window of text than the NPU allows", "NPU (Intel): pominięte, ten model jest asystentem i potrzebuje większego okna tekstu, niż pozwala NPU") + "\n"
                     installer.intelNpuAsset()?.let { installer.isBroken(it, modelId) } == true -> "- " + note("NPU (Intel): skipped, failed recently for this model", "NPU (Intel): pominięte, niedawno nie zadziałało z tym modelem") + "\n"

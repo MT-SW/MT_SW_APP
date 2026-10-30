@@ -83,7 +83,10 @@ class AiEngineRouter(
                             when {
                                 now.assistantOn && (now.assistant != before.assistant || !before.assistantOn) -> now.assistant to false
                                 now.translatorOn && (now.translator != before.translator || !before.translatorOn) -> now.translator to false
-                                now.dictationOn && now.dictation != before.dictation -> now.dictation to true
+                                // The model of the dictation is also the assistant's or the translator's: it starts without hearing so that the
+                                // Intel NPU can be used (the NPU does not listen); listening restarts it when it is first needed.
+                                now.dictationOn && now.dictation != before.dictation ->
+                                    now.dictation to !(((now.assistantOn && now.assistant == now.dictation) || (now.translatorOn && now.translator == now.dictation)) && llama.npuFirst(now.dictation))
                                 else -> null
                             }
                         load?.let { (id, hearing) -> preload(id, hearing) }
