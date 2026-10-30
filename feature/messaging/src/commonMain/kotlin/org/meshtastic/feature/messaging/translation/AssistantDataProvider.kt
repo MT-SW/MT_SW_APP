@@ -1696,6 +1696,52 @@ class AssistantDataProvider(
         return if (polish) "Moc nadawania w radiu: $dbm dBm (około $mw mW)." else "Transmit power in the radio: $dbm dBm (about $mw mW)."
     }
 
+    /** Nodes not heard for [hours] hours (the user's own radio left out), the longest silent first, counted in code. */
+    suspend fun silentNodes(hours: Int = 24): String {
+        fun s(pl: String, en: String) = if (polish) pl else en
+        val me = nodeRepository.ourNodeInfo.value?.num
+        val nowS = nowMillis / MILLIS_PER_SECOND
+        val all = nodeRepository.nodeDBbyNum.value.values.filter { it.num != me }
+        val silent = all.filter { it.lastHeard == 0 || nowS - it.lastHeard >= hours * SECONDS_PER_HOUR }.sortedBy { it.lastHeard }
+        if (silent.isEmpty()) return s("Wszystkie znane węzły (${all.size}) odezwały się w ciągu ostatnich $hours godz.", "All known nodes (${all.size}) were heard in the last $hours h.")
+        val sb = StringBuilder(s("Węzły, które nie odezwały się od ponad $hours godz.: ${silent.size} z ${all.size} znanych.", "Nodes not heard for more than $hours h: ${silent.size} of ${all.size} known."))
+        for (n in silent.take(NAMES_SHOWN)) {
+            val when_ = if (n.lastHeard == 0) s("nigdy nie słyszany", "never heard") else ago(((nowS - n.lastHeard) / SECONDS_PER_MINUTE).coerceAtLeast(0))
+            sb.append("\n• ").append(n.user.long_name.ifBlank { n.user.short_name }).append(" — ").append(when_)
+        }
+        if (silent.size > NAMES_SHOWN) sb.append('\n').append(aiString(Res.string.ai_more, silent.size - NAMES_SHOWN))
+        return sb.toString()
+    }
+
+    /**
+     * "What preset / role / region do I have set", "how many channels do I have", "which is my main channel": read from the
+     * radio's own settings in code. [kind] is "preset", "role", "region" or "channels"; null when the radio has not sent them.
+     */
+    suspend fun ownConfig(kind: String): String? {
+        fun s(pl: String, en: String) = if (polish) pl else en
+        val noRadio = s("Brak ustawień radia — połącz się z radiem.", "No radio settings — connect to the radio.")
+        return when (kind) {
+            "preset", "region" -> {
+                val lora = radioConfigRepository.localConfigFlow.first().lora ?: return noRadio
+                val option = if (lora.use_preset) ChannelOption.from(lora.modem_preset) else null
+                val presetName = option?.name ?: s("własne ustawienia (bez presetu)", "custom settings (no preset)")
+                s("Twoje radio ma ustawiony preset $presetName w regionie ${lora.region.name}.", "Your radio is set to preset $presetName in region ${lora.region.name}.")
+            }
+            "role" -> {
+                val role = nodeRepository.ourNodeInfo.value?.user?.role?.toString() ?: return noRadio
+                s("Twoje urządzenie ma ustawioną rolę $role.", "Your device is set to the role $role.")
+            }
+            "channels" -> {
+                val names = radioConfigRepository.channelSetFlow.first().settings
+                if (names.isEmpty()) return noRadio
+                val fallback = aiString(Res.string.ai_scope_default)
+                val list = names.mapIndexed { i, c -> "• $i: ${c.name.ifBlank { fallback }}" + if (i == 0) s(" (główny)", " (primary)") else "" }
+                s("Masz ${names.size} kanałów. Kanał główny to ${names.first().name.ifBlank { fallback }}.\n", "You have ${names.size} channels. The primary channel is ${names.first().name.ifBlank { fallback }}.\n") + list.joinToString("\n")
+            }
+            else -> null
+        }
+    }
+
     /**
      * How long one node has been running, from its own device report (the node's uptime), counted by the app so a small
      * model cannot answer "no device sends it". Null when the node did not report it.
@@ -1729,6 +1775,7 @@ class AssistantDataProvider(
         return buildString {
             append(if (polish) "Węzeł $name:" else "Node $name:")
             append(if (polish) "\n• sprzęt: " else "\n• hardware: ").append(hardware ?: unknown)
+            append(if (polish) "\n• rola: " else "\n• role: ").append(roleLabel(node.user.role.toString()))
             append(if (polish) "\n• firmware: " else "\n• firmware: ").append(firmware ?: unknown)
             append(if (polish) "\n• ostatnio słyszany: " else "\n• last heard: ").append(heard)
             if (node.hopsAway >= 0) append(if (polish) "\n• skoki: " else "\n• hops: ").append(node.hopsAway)

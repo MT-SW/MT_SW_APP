@@ -46,14 +46,32 @@ class GemmaTranslator(private val engine: AiTextEngine) {
                     "do not translate proper names. " +
                     "Output only the translation, without quotes, notes or explanations.\n\n$text"
             }
-        val reply =
-            engine.chat(
-                modelId = modelId,
-                messages = listOf("user" to prompt),
-                maxTokens = (text.length / 2 + EXTRA_TOKENS).coerceIn(MIN_TOKENS, MAX_TOKENS),
-                temperature = 0f,
+        suspend fun ask(instruction: String) =
+            clean(
+                engine.chat(
+                    modelId = modelId,
+                    messages = listOf("user" to instruction),
+                    maxTokens = (text.length / 2 + EXTRA_TOKENS).coerceIn(MIN_TOKENS, MAX_TOKENS),
+                    temperature = 0f,
+                ),
             )
+        var reply = ask(prompt)
+        // A small model sometimes answers with one name only: it is asked once more for the whole text.
+        if (text.length >= SHORT_ANSWER_MIN_SOURCE && reply.length < text.length * SHORT_ANSWER_SHARE) {
+            val again = ask("$prompt\n\nTranslate the whole text, every word of it, not only the names.")
+            if (again.length > reply.length) reply = again
+        }
         return reply.ifBlank { text }
+    }
+
+    /** The translation without the frame small models add: code fences, a JSON wrapper, quotes, a "Translation:" label. */
+    private fun clean(raw: String): String {
+        var t = raw.trim()
+        t = t.replace(Regex("(?s)^```[a-zA-Z]*\\s*(.*?)\\s*```$"), "$1").trim()
+        Regex("(?s)^\\{\\s*\"[A-Za-z_]+\"\\s*:\\s*\"(.*)\"\\s*\\}$").find(t)?.let { t = it.groupValues[1].replace("\\\"", "\"").replace("\\n", "\n").trim() }
+        t = t.replace(Regex("(?i)^(translation|translated text|tłumaczenie)\\s*:\\s*"), "").trim()
+        if (t.length >= 2 && t.first() == '"' && t.last() == '"' && t.count { it == '"' } == 2) t = t.substring(1, t.length - 1).trim()
+        return t
     }
 
     private fun englishName(nllb: String): String? {
@@ -65,5 +83,7 @@ class GemmaTranslator(private val engine: AiTextEngine) {
         const val EXTRA_TOKENS = 96
         const val MIN_TOKENS = 96
         const val MAX_TOKENS = 1024
+        const val SHORT_ANSWER_MIN_SOURCE = 25
+        const val SHORT_ANSWER_SHARE = 0.4
     }
 }
