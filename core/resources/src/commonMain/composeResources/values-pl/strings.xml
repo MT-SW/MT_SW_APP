@@ -3486,8 +3486,8 @@
     <string name="ai_legacy_freed">Modele starego silnika zostały usunięte. Zwolniono: %1$d MB.</string>
     <string name="assistant_info_title">O asystencie</string>
     <string name="assistant_info_body">Asystent odpowiada o Twojej sieci, ustawieniach aplikacji i podstawach radia. Działa na Twoim urządzeniu, na zainstalowanym modelu AI (Ustawienia → Funkcje MT_SW → Modele AI). Liczby bierze z narzędzi aplikacji, nie z pamięci modelu. Nigdy sam nie zapisuje ustawień ani nie wysyła wiadomości; najwyżej przygotuje szkic albo otworzy właściwy ekran.\n\nKomendy do wpisania w czacie:\n/test – wszystkie testy naraz, także tłumacza (na komputerze raport zapisuje się do pliku)\n/szybki – krótki test (ok. jedna dziesiąta wszystkiego, kilka minut)\n/narzędzia – jak używa narzędzi aplikacji\n/rozmowa – swobodna rozmowa\n/baza – baza wiedzy i pytania „jak to ustawić”\n/tłumacz – tłumaczenia (nazwy, liczby i linki muszą zostać bez zmian)\n/sprzęt – który model działa, gdzie (karta graficzna czy procesor) i ile zajmuje\n\nKomendy działają z polskimi literami i bez nich (np. /tłumacz i /tlumacz).</string>
-    <string name="assistant_autoscroll">Przewijaj samo do nowych wiadomości</string>
-    <string name="assistant_autoscroll_hint">Wyłączone: nowe wiadomości pojawiają się niżej, a rozmowa zostaje tam, gdzie czytasz.</string>
+    <string name="assistant_autoscroll">Automatyczne przewijanie do najnowszych wiadomości</string>
+    <string name="assistant_autoscroll_hint">Włączone: rozmowa sama przewija się do najnowszych wiadomości. Wyłączone: nowe wiadomości pojawiają się niżej, a rozmowa zostaje tam, gdzie czytasz.</string>
     <string name="ai_idle_unload_title">Zwalniaj model z pamięci po bezczynności</string>
     <string name="ai_idle_unload_summary">Po tym czasie bez używania model AI znika z pamięci (RAM) i wczytuje się ponownie przy następnym pytaniu lub dyktowaniu.</string>
     <string name="ai_idle_unload_never">Nigdy</string>

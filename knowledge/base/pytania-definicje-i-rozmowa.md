@@ -121,7 +121,7 @@ Słowa: ReplyBot, /ping, /test, /hello, !!Test!!, komendy czatu, odpowiedzi auto
 Źródło: MT_SW firmware: Komendy czatu i odpowiedzi automatyczne (sprawdzono 2026-10)
 
 ### Jak wyłączyć automatyczne przewijanie rozmowy z asystentem?
-W asystencie dotknij ikony „i” w górnym pasku: w oknie informacji jest przełącznik „Przewijaj samo do nowych wiadomości”. Po jego wyłączeniu nowe wiadomości pojawiają się niżej, a rozmowa zostaje tam, gdzie czytasz; przewija się tylko po wysłaniu Twojej własnej wiadomości.
+W asystencie dotknij ikony „i” w górnym pasku: w oknie informacji jest przełącznik „Automatyczne przewijanie do najnowszych wiadomości”. Po jego wyłączeniu nowe wiadomości pojawiają się niżej, a rozmowa zostaje tam, gdzie czytasz; przewija się tylko po wysłaniu Twojej własnej wiadomości.
 Słowa: przewijanie, autoprzewijanie, przewijać samo, rozmowa skacze, nowe wiadomości, asystent, ikona i, okno informacji
 Źródło: Dokumentacja aplikacji: Funkcje MT_SW, asystent (sprawdzono 2026-10)
 
