@@ -502,6 +502,12 @@ class LlamaAssistantService(
             guideTools.show_setting("preset")
             return aiString(Res.string.ai_mtsw_setup).also(onPiece)
         }
+        // "Which region should I set" or "how do I change the region": described, and fitted to the user's place (the radio's
+        // position first, else the phone's), worked out in code; a button leads to the setting.
+        if (REGION_WORD.containsMatchIn(lower) && REGION_ASK.containsMatchIn(lower) && !GENERAL_QUESTION.containsMatchIn(lower)) {
+            guideTools.show_setting("region")
+            return data.regionAdvice().also(onPiece)
+        }
         val nodeNum = data.resolveNodeNum(intent.node, question)
         // "the nearest router": the role is taken from the question when the small model left it out.
         val role = intent.role.takeUnless { it.isBlank() || it == "any" } ?: ROLE_WORDS.find(question.lowercase())?.groupValues?.get(1)?.let { ROLE_NAMES[it] }.orEmpty()
@@ -1293,6 +1299,9 @@ class LlamaAssistantService(
         val POINTER_ONLY = Regex("^(„[^”]+” jest w:|Otwieram stronę z ustawieniem|Otwieram: |To jest na ekranie|Opening the page|Opening: |\"[^\"]+\" is in:)")
         val SETTING_ASK = Regex("ustawion|skonfigurowan|moc nadawania|mocy nadawania|tx power|configured|set to")
         const val SMALLTALK_WORDS = 7
+        val REGION_WORD = Regex("region")
+        val REGION_ASK =
+            Regex("jaki|jaką|jaka|jakiego|który|ktory|którego|ustaw|zmie[nń]|wybra|powinien|powinnam|dla mnie|u mnie|w mojej|which|what region|set |change|choose|should|for me")
         val WHO_ARE_YOU = Regex("kim jesteś|kim jestes|kto ty|kim ty jesteś|who are you|what are you")
         const val WHO_PL =
             "Jestem asystentem wbudowanym w aplikację MT_SW. Działam na Twoim urządzeniu, bez internetu. Pomagam w obsłudze " +

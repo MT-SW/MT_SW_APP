@@ -170,7 +170,28 @@ class AssistantDataProvider(
     private val meshLogRepository: MeshLogRepository,
     private val packetRepository: PacketRepository,
     private val connection: org.meshtastic.core.repository.ConnectionStateProvider? = null,
+    /** The phone's location, where the platform has one; used only when the user asks which region fits their place. */
+    private val locationRepository: org.meshtastic.core.repository.LocationRepository? = null,
 ) {
+
+    /** The explanation of the LoRa region and what fits the user's place (radio position first, else the phone's). */
+    suspend fun regionAdvice(): String {
+        val lora = radioConfigRepository.localConfigFlow.first().lora
+        val current = lora?.region?.name.orEmpty().takeUnless { it == "UNSET" }.orEmpty()
+        val me = nodeRepository.ourNodeInfo.value
+        val radio = me?.takeIf { it.validPosition != null }?.let { it.latitude to it.longitude }
+        val (place, source) =
+            if (radio != null) {
+                radio to (if (polish) "pozycji radia" else "the radio's position")
+            } else {
+                val phone =
+                    locationRepository?.let { repo ->
+                        runCatching { kotlinx.coroutines.withTimeoutOrNull(PHONE_FIX_MS) { repo.getLocations().first() } }.getOrNull()
+                    }
+                (phone?.let { it.latitude to it.longitude }) to (if (polish) "lokalizacji telefonu" else "the phone's location")
+            }
+        return AssistantRegion.advice(place?.first, place?.second, source, current, polish)
+    }
 
     /** A text with the data that is useful for answering [question], or an empty text when nothing matches. */
     suspend fun contextFor(question: String, maxChars: Int = MAX_CONTEXT_CHARS): String {
@@ -2062,6 +2083,7 @@ class AssistantDataProvider(
         const val SECONDS_PER_HOUR = 3600
         const val MAX_NODES_DETAIL = 2
         const val ONE_DAY_S = 86_400L
+        const val PHONE_FIX_MS = 4_000L
         const val LOW_BATTERY = 20
         const val HW_LIMIT = 6
         const val INDEX_CHARS = 700
