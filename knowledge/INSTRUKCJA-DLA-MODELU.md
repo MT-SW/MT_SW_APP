@@ -6,7 +6,7 @@ Ten plik jest dla modelu, który ma dalej budować bazę wiedzy. Czytaj go w ca�
 Użytkownik (Cezary) chce, żeby w bazie było **naprawdę dużo informacji i danych**, tak by asystent offline odpowiadał sam i **nie musiał sięgać do internetu bez potrzeby**. Kompletność jest ważniejsza niż lekkość (rozmiar bazy nie jest problemem, nawet do ok. 100 MB tekstu). Pisz dużo, rzetelnie, w prostym polskim.
 
 ## Gdzie co leży (katalog `knowledge/`)
-- `base/` – temat główny: nasza sieć MT_SW, Meshtastic, urządzenia, anteny, LoRa, zasilanie, solary, firmware.
+- `base/` – temat główny: nasza sieć mesh, Meshtastic, urządzenia, anteny, LoRa, zasilanie, solary, firmware.
 - `base/pokrewne/` – tematy bliskie: informatyka, elektronika, Wi-Fi, Bluetooth, krótkofalarstwo, sieć elektryczna, zakupy z zagranicy, alternatywne sieci (MeshCore, Reticulum, APRS, LoRaWAN) – tylko informacyjnie, bez promowania.
 - `base/offtop/` – tematy dalsze: zdrowie, pierwsza pomoc, turystyka, życie codzienne, dom, samochód, druk 3D, praca na wysokości, wiedza ogólna.
 - `README.md` – opis (nie wczytywany). Pliki `firmware.md`, `integration*.md` odświeża skrypt `scripts/update-knowledge.sh` z internetu – **nie edytuj ich ręcznie**.
@@ -43,7 +43,7 @@ Zasady:
 - Alternatywne sieci (MeshCore, Reticulum itd.) – tylko informacja, w `pokrewne/`.
 
 ## Co warto dopisać (pomysły, w kolejności ważności)
-1. Wszystko o sieci MT_SW: konfiguracja, flashowanie dla każdego układu (ESP32, nRF52, RP2040), kompilacja, userPrefs, MQTT, Home Assistant, aplikacja.
+1. Wszystko o sieci mesh: konfiguracja, flashowanie dla każdego układu (ESP32, nRF52, RP2040), kompilacja, userPrefs, MQTT, Home Assistant, aplikacja.
 2. Radio i anteny: dobór, kable, złącza, straty, filtry, LNA, propagacja, przeszkody, budżet łącza, pomiary.
 3. Zasilanie: baterie, ogniwa, solary, MPPT, powerbanki, pobór prądu, zimno/upał.
 4. Sprzęt: porównania urządzeń, obudowy, druk 3D, montaż na maszcie, piorunochrony, praca na wysokości (bezpieczeństwo!).
@@ -67,3 +67,7 @@ Zasady:
 - Pytaj Cezarego tylko wtedy, gdy czegoś nie da się ustalić ze źródeł i od tego zależy poprawność wpisu. Zamiast pytać, oznacz wpis „do przeglądu” i idź dalej.
 - Nie zatrzymuj się po błędzie jednej strony (np. nie da się otworzyć): weź inne źródło albo inny temat.
 - Rób listę zadań (TaskCreate) z całą turą z góry i odhaczaj ją; kończ dopiero, gdy lista jest pusta.
+
+## Nazewnictwo (ważne)
+- MT_SW to nazwa organizacji / grupy użytkowników i aplikacji. Sama sieć radiowa to **„sieć mesh”**. Nigdy nie pisz „sieć MT_SW” ani „do sieci MT_SW”; pisz „sieć mesh” (np. „wiadomość przejdzie przez sieć mesh”).
+- Gdy pytanie jest o czas pracy węzła, w odpowiedziach używaj polskiej nazwy „czas pracy (uptime)”.

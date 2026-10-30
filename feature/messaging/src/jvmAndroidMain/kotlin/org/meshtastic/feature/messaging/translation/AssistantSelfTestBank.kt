@@ -48,7 +48,7 @@ internal object AssistantSelfTestBank {
             Question("Które węzły mają mniej niż 30% baterii?"),
             Question("Który węzeł pracuje najdłużej bez restartu?"),
             Question("Jak długo działa mój węzeł?"),
-            Question("Jaki jest uptime węzła ${node}?"),
+            Question("Jaki jest czas pracy węzła ${node}?"),
             Question("Który węzeł ma największe obciążenie kanału?"),
             Question("Jaka jest zajętość kanału na moim węźle?"),
             Question("Jaki jest mój airtime?"),

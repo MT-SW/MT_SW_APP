@@ -156,6 +156,7 @@ import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.Telemetry
+import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlinx.coroutines.sync.withLock
 
@@ -755,7 +756,7 @@ class AssistantDataProvider(
                 q.hasAny(listOf("heap", "pamię", "pamie", " ram")) -> listOf(Key("used RAM (heap) percent (highest first)", true) { it.heapUsed })
                 q.hasAny(listOf("bateri", "battery")) -> listOf(Key("battery percent (lowest first)", false) { it.battery?.toFloat() })
                 q.hasAny(listOf("zajęt", "zajet", "kanał", "kanal", "channel", "utiliz")) -> listOf(Key("channel utilization percent", true) { it.chUtil })
-                q.hasAny(listOf("uptime", "działa od", "dziala od", "restart")) -> listOf(Key("uptime", true) { it.uptime?.toFloat() })
+                q.hasAny(listOf("uptime", "czas pracy", "czasu pracy", "działa od", "dziala od", "restart")) -> listOf(Key("uptime", true) { it.uptime?.toFloat() })
                 else -> listOf(rxKey)
             }.map { k ->
                 // Battery is listed lowest first by default; everything else highest first.
@@ -1023,9 +1024,10 @@ class AssistantDataProvider(
      * Messages containing [query] (case and Polish accents ignored) in all conversations, or only in [channel] (name or
      * number) or in the direct messages with a node called [channel]; an empty [query] gives the newest ones.
      */
-    suspend fun toolMessages(query: String, limit: Int, channel: String = ""): String {
+    suspend fun toolMessages(query: String, limit: Int, channel: String = "", senderNum: Int? = null): String {
         val top = limit.coerceIn(1, MAX_TOOL_LIST)
-        val needle = query.anyToEmpty().fold()
+        // With a sender (messages FROM a node) the name is not searched in the text: only that node's messages are listed.
+        val needle = if (senderNum != null) "" else query.anyToEmpty().fold()
         val names = radioConfigRepository.channelSetFlow.first().settings.map { it.name }
         val wanted = channel.anyToEmpty()
         var keys = packetRepository.getContacts().first().keys.toList()
@@ -1050,6 +1052,7 @@ class AssistantDataProvider(
                 else aiString(Res.string.ai_private_chat)
             val list = packetRepository.getMessagesFrom(key, SEARCH_PER_CHAT) { id -> nodeRepository.getNode(id.orEmpty()) }.first()
             for (m in list) {
+                if (senderNum != null && (m.fromLocal || m.node.num != senderNum)) continue
                 val who = if (m.fromLocal) "me" else m.node.user.short_name
                 seen += Triple(m.receivedTime, label, "$who: ${m.text.replace(Regex("\\s*\\n\\s*"), " ").take(MESSAGE_CHARS)}") to m.text.lowercase().fold()
             }
@@ -1063,7 +1066,7 @@ class AssistantDataProvider(
             if (found.isNotEmpty()) break
         }
         if (found.isEmpty()) {
-            return if (needle.isNotEmpty()) aiString(Res.string.ai_found_none_for, query.trim()) else aiString(Res.string.ai_found_none)
+            return if (needle.isNotEmpty() || senderNum != null) aiString(Res.string.ai_found_none_for, query.trim()) else aiString(Res.string.ai_found_none)
         }
         val now = nowMillis
         return aiString(Res.string.ai_found_n, found.size) + "\n" +
@@ -1655,6 +1658,35 @@ class AssistantDataProvider(
             sb.append("\n• ").append(who).append(", ").append(ago(((now - time) / MILLIS_PER_MINUTE).coerceAtLeast(0))).append(": ").append(text)
         }
         return sb.toString()
+    }
+
+    /** The transmit power set in the radio, always with its unit (dBm) and the same in mW, so a small model cannot swap them. */
+    suspend fun txPowerText(): String {
+        val lora = radioConfigRepository.localConfigFlow.first().lora
+            ?: return if (polish) "Brak ustawień LoRa — połącz się z radiem." else "No LoRa settings — connect to the radio."
+        val dbm = lora.tx_power
+        if (dbm == 0) {
+            return if (polish) "Moc nadawania jest ustawiona na 0, czyli radio używa największej mocy dozwolonej w Twoim regionie."
+            else "Transmit power is set to 0, which means the radio uses the highest power your region allows."
+        }
+        val mw = 10.0.pow(dbm / 10.0).roundToInt()
+        return if (polish) "Moc nadawania w radiu: $dbm dBm (około $mw mW)." else "Transmit power in the radio: $dbm dBm (about $mw mW)."
+    }
+
+    /**
+     * How long one node has been running, from its own device report (the node's uptime), counted by the app so a small
+     * model cannot answer "no device sends it". Null when the node did not report it.
+     */
+    suspend fun nodeUptime(num: Int?): String? {
+        val own = nodeRepository.ourNodeInfo.value
+        val node = (num?.let { nodeRepository.nodeDBbyNum.value[it] } ?: own) ?: return null
+        val name = node.user.long_name.ifBlank { node.user.short_name }
+        val seconds =
+            (if (own != null && node.num == own.num) nodeRepository.localStats.value.uptime_seconds else null)?.takeIf { it > 0 }
+                ?: node.deviceMetrics.uptime_seconds?.takeIf { it > 0 }
+                ?: return if (polish) "Węzeł $name nie przysłał czasu pracy (uptime) — nie każde urządzenie go wysyła, a ten jeszcze nie podał."
+                else "Node $name has not reported its uptime."
+        return if (polish) "Czas pracy węzła $name (uptime): ${duration(seconds.toLong())}." else "Uptime of node $name: ${duration(seconds.toLong())}."
     }
 
     /** The battery of one node (the own one when [num] is null), exactly as the node reported it. */

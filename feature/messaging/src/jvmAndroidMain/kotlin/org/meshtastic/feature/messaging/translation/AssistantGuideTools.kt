@@ -29,6 +29,7 @@ import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.ai_models_title
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.node_color_pick
+import org.meshtastic.core.resources.node_layout_neighbors
 import org.meshtastic.core.resources.ai_assistant_title
 import org.meshtastic.core.resources.translator_title
 import org.meshtastic.core.resources.ai_unload_title
@@ -366,6 +367,8 @@ class AssistantGuideTools(
                 Target("dictation_switch", "settings/smart-features", Res.string.dictation_enabled_title, listOf("dyktowanie", "dyktuj", "dictation", "dictate", "włącz dyktowanie", "wyłącz dyktowanie", "mikrofon w czacie")),
                 Target("external_mic", "settings/smart-features", Res.string.dictation_external_mic_title, listOf("mikrofon", "słuchawk", "sluchawk", "headset", "microphone", "zestaw głośnomówiący", "bluetooth mikrofon")),
                 Target("node_color", "settings/security", Res.string.node_color_pick, listOf("kolor", "color", "colour", "barw")),
+                // The small icon with a number next to a node's name in the node list (not the neighbor-info module).
+                Target("node_neighbors_icon", "settings/node-list", Res.string.node_layout_neighbors, listOf("ikon", "icon", "sąsiad", "sasiad", "neighbor", "neighbour", "liczb")),
                 Target("ai_model", "settings/smart-features", Res.string.ai_models_title, listOf("model ai", "wybór modelu", "wybor modelu", "model", "gemma", "nllb")),
                 Target("ai_unload", "settings/smart-features", Res.string.ai_unload_title, listOf("zwolnij pamięć", "zwolnij pamiec", "wyłącz model", "wylacz model", "ubij model", "pamięć ai", "pamiec ai", "ram", "free memory", "unload")),
                 Target("translator", "settings/smart-features", Res.string.translator_title, listOf("tłumacz", "tlumacz", "translator", "tłumaczen", "tlumaczen", "translat")),

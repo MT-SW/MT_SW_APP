@@ -170,7 +170,7 @@
     <string name="ai_msg_error">NOT delivered</string>
     <string name="ai_msg_other">no delivery information</string>
     <string name="ai_msg_queued">waiting in the queue</string>
-    <string name="ai_mtsw_setup">The MT_SW network in the Świętokrzyskie region uses the official Narrow Fast preset in the EU_N_868 region, on 869.44165 MHz. MT_SW has no preset of its own and stays compatible with the main network.</string>
+    <string name="ai_mtsw_setup">The mesh network in the Świętokrzyskie region uses the official Narrow Fast preset in the EU_N_868 region, on 869.44165 MHz. MT_SW has no preset of its own and stays compatible with the main network.</string>
     <string name="ai_near_one">The nearest is %1$s (%2$s): %3$s km, heard %4$s.</string>
     <string name="ai_neigh_hears">%1$s (%2$s) hears:</string>
     <string name="ai_neigh_nobody">nobody</string>
@@ -1454,7 +1454,7 @@
     <string name="license_notice">Free software under the GNU General Public License v3, with no warranty. You may redistribute it under the same license.</string>
     <!-- LICENSED -->
     <string name="licensed_amateur_radio">Licensed amateur radio (Ham)</string>
-    <string name="licensed_amateur_radio_text">Enabling this option disables encryption and is not compatible with the default MT_SW network.</string>
+    <string name="licensed_amateur_radio_text">Enabling this option disables encryption and is not compatible with the default mesh network.</string>
     <string name="licensed_mode_enable_confirm">Enable licensed mode</string>
     <string name="licensed_mode_enable_title">Enable licensed (Ham) mode?</string>
     <string name="licensed_mode_enable_warning">Licensed mode removes channel encryption keys and disables the admin channel, so all traffic is sent as plaintext that anyone can read — and this firmware cannot sign it, so other nodes cannot verify it came from you. This is not compatible with the default Meshtastic network, and you remain responsible for meeting your amateur radio license requirements and local regulations.</string>

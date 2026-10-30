@@ -110,7 +110,7 @@ class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : Assis
         for (file in listing) {
             val text = readText("$BASE_PATH/$file")
             if (text.isBlank()) continue
-            val title = text.lineSequence().firstOrNull { it.startsWith("# ") }?.removePrefix("# ")?.trim() ?: file
+            val title = text.lineSequence().firstOrNull { it.startsWith("# ") }?.removePrefix("# ")?.trim() ?: prettyTitle(file)
             val label =
                 when {
                     file.startsWith("offtop/") -> "Baza wiedzy (offtop)"
@@ -151,6 +151,11 @@ class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : Assis
                 "integration-web-client.md" to "MT_SW integration web client",
                 "integration-planner-api.md" to "MT_SW integration planner API",
             )
+        /** A readable title from a file name ("pokrewne/ukryty-wezel-zalewanie.md" -> "Ukryty wezel zalewanie"), for a file without a "# Title" line. */
+        fun prettyTitle(file: String): String =
+            file.substringAfterLast('/').removeSuffix(".md").replace('-', ' ').replace('_', ' ').trim()
+                .let { it.replaceFirstChar { c -> c.uppercase() } }
+
         const val BASE_PATH = "files/knowledge/base"
         const val CHANGELOG_PATH = "files/knowledge/CHANGELOG.md"
         const val POLISH_LETTERS = "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ"

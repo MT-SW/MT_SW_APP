@@ -159,7 +159,7 @@ internal fun NetworkSummaryUiState.toReport(generated: String): NetworkReport {
             topMessageSendersToday.map { ReportBar(it.nodeName, it.count.toFloat(), "${it.count}") },
         )
     }
-    return NetworkReport(title = "Podsumowanie sieci MT_SW", generated = generated, sections = sections)
+    return NetworkReport(title = "Podsumowanie sieci mesh", generated = generated, sections = sections)
 }
 
 private const val SNR_OFFSET = 30f

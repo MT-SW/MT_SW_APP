@@ -493,12 +493,11 @@ object AssistantCalculators {
 
     // ---------------------------------------------------------------- which preset
 
+    /** Every preset firmware still has (Turbo, Lite and Tiny too), fastest first, so a new preset shows up in the table by itself. */
     private val COMPARED =
-        listOf(
-            ChannelOption.SHORT_FAST, ChannelOption.SHORT_SLOW, ChannelOption.MEDIUM_FAST, ChannelOption.MEDIUM_SLOW,
-            ChannelOption.LONG_FAST, ChannelOption.LONG_MODERATE, ChannelOption.LONG_SLOW, ChannelOption.NARROW_FAST,
-            ChannelOption.NARROW_SLOW,
-        )
+        ChannelOption.entries
+            .filter { it.removedInFirmware == null }
+            .sortedByDescending { it.spreadingFactor.let { sf -> sf * (it.bandwidth * 1e6 / 2.0.pow(sf)) * 4.0 / it.codingRate } }
 
     /** Share of the air time a network may use before it clogs (a rule of thumb), and the packets one node sends per 15 minutes. */
     private const val USABLE_AIR_SHARE = 0.25
@@ -562,8 +561,8 @@ object AssistantCalculators {
         }
         sb.append("\n\n").append(
             t.s(
-                "Jak wybierać: mało urządzeń i długie łącza w otwartym terenie — Long Fast lub wolniejszy (większy zasięg, mała przepustowość). Średnia sieć — Medium Fast. Dużo urządzeń, miasto, krótkie łącza — Short Fast lub Short Slow. Las, wzgórza i zabudowa — wolniejszy preset daje zapas, ale zajmuje eter dłużej. Wyższa korekcja błędów (4/6 ... 4/8) ratuje pakiety zakłócone, ale wydłuża pakiet i zmniejsza liczbę urządzeń; zasięgu prawie nie zmienia.",
-                "How to choose: few devices and long links in open country — Long Fast or slower (more range, little capacity). A medium network — Medium Fast. Many devices, a city, short links — Short Fast or Short Slow. Forest, hills and buildings — a slower preset gives margin but uses the air longer. Stronger error correction (4/6 ... 4/8) saves packets that are disturbed, but makes the packet longer and fits fewer devices; it hardly changes the range.",
+                "Jak wybierać: mało urządzeń i długie łącza w otwartym terenie — Long Fast lub wolniejszy (większy zasięg, mała przepustowość). Średnia sieć — Medium Fast. Dużo urządzeń, miasto, krótkie łącza — Short Fast lub Short Slow. Las, wzgórza i zabudowa — wolniejszy preset daje zapas, ale zajmuje eter dłużej. Presety Turbo (500 kHz) są najszybsze, ale potrzebują szerokiego pasma i mają mniejszy zasięg. Lite (125 kHz), Narrow (62,5 kHz) i Tiny (15,6 kHz) są wąskie: mieszczą się w wąskich pasmach, jak nasze 868 MHz, i lepiej radzą sobie z zakłóceniami. Wyższa korekcja błędów (4/6 ... 4/8) ratuje pakiety zakłócone, ale wydłuża pakiet i zmniejsza liczbę urządzeń; zasięgu prawie nie zmienia.",
+                "How to choose: few devices and long links in open country — Long Fast or slower (more range, little capacity). A medium network — Medium Fast. Many devices, a city, short links — Short Fast or Short Slow. Forest, hills and buildings — a slower preset gives margin but uses the air longer. Stronger error correction (4/6 ... 4/8) saves packets that are disturbed, but makes the packet longer and fits fewer devices; it hardly changes the range. The Turbo presets (500 kHz) are the fastest but need a wide band and have less range. Lite (125 kHz), Narrow (62.5 kHz) and Tiny (15.6 kHz) are narrow: they fit narrow bands such as our 868 MHz and cope better with interference.",
             ),
         )
         sb.append("\n").append(
