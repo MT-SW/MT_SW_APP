@@ -576,7 +576,9 @@ class LlamaAssistantService(
             }
         }
         // "My range is weak, what should I check": the user's own radio is checked in code, with a button to the preset.
-        if (intent.intent in ADVICE_INTENTS && RANGE_PROBLEM.containsMatchIn(lower) && RANGE_TOPIC.containsMatchIn(lower)) {
+        if (intent.intent in ADVICE_INTENTS && RANGE_PROBLEM.containsMatchIn(lower) && RANGE_TOPIC.containsMatchIn(lower) &&
+            !ANTENNA_TOPIC.containsMatchIn(lower)
+        ) {
             guideTools.show_setting("preset")
             return data.rangeCheck().also(onPiece)
         }
@@ -823,10 +825,10 @@ class LlamaAssistantService(
         onPiece: (String) -> Unit,
     ): String {
         val flat = question.lowercase()
-        if (asksHow(flat) && !RANGE_PROBLEM.containsMatchIn(flat)) {
+        if (asksHow(flat) && (!RANGE_PROBLEM.containsMatchIn(flat) || ANTENNA_TOPIC.containsMatchIn(flat))) {
             return handle(AssistantIntent("app_help", topic = "other"), modelId, history, question, polish, onPiece)
         }
-        if (RANGE_PROBLEM.containsMatchIn(flat) && RANGE_TOPIC.containsMatchIn(flat)) {
+        if (RANGE_PROBLEM.containsMatchIn(flat) && RANGE_TOPIC.containsMatchIn(flat) && !ANTENNA_TOPIC.containsMatchIn(flat)) {
             return handle(AssistantIntent("app_help", topic = "other"), modelId, history, question, polish, onPiece)
         }
         data.directAnswer(question)?.let { exact ->
@@ -1304,6 +1306,8 @@ class LlamaAssistantService(
         val STOP_STEMS = setOf("przez", "jest", "gdzie", "jaki", "jakie", "jaka", "można", "mozna", "zrobi", "mojeg", "moje", "swoje", "swoim", "czym", "tego", "jako", "oraz", "albo", "który", "która", "które", "with", "what", "from", "have", "about", "does", "where", "which")
         val ADVICE_INTENTS = setOf("app_help", "chat", "network_question", "signal_list", "web_question")
         val RANGE_PROBLEM = Regex("słab|slab|kiepsk|mały zasięg|maly zasieg|krótki zasięg|krotki zasieg|poprawi|zwiększ|zwieksz|lepsz|nie słysz|nie slysz|nie docier|nikogo nie|weak|poor|improve|bad|short range")
+        /** A question about the antenna itself ("how do I improve the range of the antenna"): advice, not a check of the radio. */
+        val ANTENNA_TOPIC = Regex("anten|kabel|przewod|wzmocnieni|dbi|cable|gain")
         val RANGE_TOPIC = Regex("zasięg|zasieg|sygnał|sygnal|odbiór|odbior|słysz|slysz|docier|range|signal|reception|hear")
         val BATTERY_WORDS = Regex("bateri|akumulator|battery")
         val SETUP_WORDS = Regex("preset|region|częstotliw|czestotliw|frequen|slot|jakie ustawienia|jakich ustawień|jakich ustawien")
@@ -1394,7 +1398,7 @@ class LlamaAssistantService(
         val NEAR_FAR = Regex("najdal|najbliż|najbliz|nearest|farthest|closest")
         val WHAT_HAPPENS = Regex("^(co się stanie|co sie stanie|co się dzieje|co sie dzieje|what happens|what will happen)")
         val ADVICE_ASK =
-            Regex("^\\s*(jak|jak można|jak mozna|jak mogę|jak moge|how)\\s+(do |can |to |i )?\\s*(zmniejszyć|zmniejszyc|zwiększyć|zwiekszyc|poprawić|poprawic|oszczędz\\p{L}*|oszczedz\\p{L}*|wydłużyć|wydluzyc|chronić|chronic|podłączyć|podlaczyc|zrobić|zrobic|zbudować|zbudowac|wybrać|wybrac|działa|dziala|reduce|improve|save|protect|connect|make|extend|build|choose)")
+            Regex("^\\s*(jak|jak można|jak mozna|jak mogę|jak moge|how)\\s+(do |can |to |i )?\\s*(zmniejszyć|zmniejszyc|zwiększyć|zwiekszyc|poprawić|poprawic|oszczędz\\p{L}*|oszczedz\\p{L}*|wydłużyć|wydluzyc|chronić|chronic|podłączyć|podlaczyc|zrobić|zrobic|zbudować|zbudowac|wybrać|wybrac|działa|dziala|ustawić|ustawic|zmienić|zmienic|skonfigurować|skonfigurowac|dodać|dodac|włączyć|wlaczyc|wyłączyć|wylaczyc|utworzyć|utworzyc|reduce|improve|save|protect|connect|make|extend|build|choose|set|change|configure|add|enable|disable|create)")
         /** Sentences the small models copy from their own instructions into the answer. */
         val PROMPT_ECHO =
             Regex("(?i)\\s*Odpowiadam po polsku[^.\\n]*\\.?|\\s*[^.\\n]*(zwykłym tekstem|bez markdown|bez gwiazdek|poprawnie pod względem rodzaju)[^.\\n]*\\.?")
