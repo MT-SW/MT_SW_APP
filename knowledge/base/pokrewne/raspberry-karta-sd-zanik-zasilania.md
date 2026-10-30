@@ -1,0 +1,12 @@
+<!-- Baza wiedzy MT_SW: ochrona karty SD w Raspberry Pi przed zanikiem zasilania. Tylko informacyjnie. -->
+# Raspberry Pi: karta SD i nagłe odcięcie zasilania
+
+### Jak uchronić system na karcie SD przed uszkodzeniem przy nagłym odcięciu prądu?
+Raspberry Pi z kartą SD jako dyskiem ryzykuje uszkodzenie systemu plików, gdy prąd zniknie w trakcie zapisu. Oficjalny dokument Raspberry Pi Ltd o odpornym systemie plików zaleca kilka rzeczy. Pierwsza to UPS (zasilacz awaryjny), który pozwala na czyste wyłączenie systemu przy zaniku prądu. Dalej: zostaw journaling ext4 w domyślnym trybie data=ordered i nie wyłączaj barier zapisu (barrier=0). Systemowy root można zamontować tylko do odczytu albo zbudować jako obraz SquashFS lub EROFS i połączyć z nakładką overlayfs, której warstwa zapisu leży w pamięci RAM. Dane, które muszą przetrwać, trzymaj na osobnej małej partycji do zapisu. Pliki tymczasowe i logi przenieś do RAM i unikaj swapu, który może zapisywać dane na flash. Aplikacje powinny zapisywać przez plik tymczasowy, fsync() i rename(). Partycja /boot na FAT nie ma dziennika, więc też warto trzymać ją tylko do odczytu poza aktualizacjami.
+Słowa: raspberry pi, karta sd, zanik zasilania, nagłe wyłączenie, uszkodzenie systemu plików, ups, journaling, ext4, overlayfs, tmpfs, read-only, squashfs, erofs, fsync, rename, logi w ram, swap, boot, fat
+Źródło: https://pip-assets.raspberrypi.com/categories/685-app-notes-guides-whitepapers/documents/RP-003610-WP-3-Making%20a%20more%20resilient%20file%20system.pdf (sprawdzono 2026-10; biały dokument Raspberry Pi Ltd)
+
+### Jaką kartę SD i jak często wymieniać przy Raspberry Pi działającym non-stop?
+Dokument Raspberry Pi zaleca korzystać z renomowanej marki kart i wymieniać je, zanim dojdą do końca żywotności. Ta sama strona ostrzega, że zapis w czasie zaniku prądu jest najbardziej niebezpieczny. Źródło nie podaje konkretnych liczb ani czasu życia kart, więc nie podaję ich tutaj. Ogólne praktyki z forów, np. trzymanie kopii obrazu karty i klonowanie karty, są z ogólnej wiedzy, nie ze źródła. Przy zapisie danych od węzła lub serwera przydatna może być kopia obrazu, zanim pojawią się problemy.
+Słowa: karta sd, wymiana karty, żywotność, marka karty, kopia obrazu, klonowanie karty, zapis, raspberry pi 24/7, bezawaryjna praca, awaria karty
+Źródło: https://pip-assets.raspberrypi.com/categories/685-app-notes-guides-whitepapers/documents/RP-003610-WP-3-Making%20a%20more%20resilient%20file%20system.pdf (sprawdzono 2026-10; biały dokument Raspberry Pi Ltd)
