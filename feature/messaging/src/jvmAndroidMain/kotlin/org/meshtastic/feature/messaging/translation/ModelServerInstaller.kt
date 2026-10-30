@@ -50,6 +50,17 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
                 done.writeText("done")
             }
         }
+        // Our own speech programs keep the same file name when they are rebuilt (a fix in the build), so an installed
+        // copy is never fetched again by itself. Raise WHISPER_REVISION after such a rebuild: once per number, the
+        // installed speech programs are removed and fetched again at the next use.
+        runCatching {
+            val done = File(root, ".whisper-revision-$WHISPER_REVISION")
+            if (!done.exists()) {
+                root.listFiles { f -> f.isDirectory && f.name.startsWith("whisper-") }?.forEach { it.deleteRecursively() }
+                root.mkdirs()
+                done.writeText("done")
+            }
+        }
     }
 
     private val lock = Mutex()
@@ -507,7 +518,10 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
 
         /** The OpenVINO version in the names of the llama.cpp release files (changes together with [LLAMA_TAG]). */
         const val OPENVINO_VERSION = "2026.4.1"
-        private const val BROKEN_RESET = 4
+        private const val BROKEN_RESET = 5
+
+        /** Raise when our speech programs were rebuilt under the same file name (see the init block). */
+        private const val WHISPER_REVISION = 1
         private const val BROKEN_RETRY_MS = 3L * 24L * 60L * 60L * 1000L
         private val QUALCOMM_PLATFORMS = setOf("kalama", "pineapple", "sun", "taro", "lahaina", "kona", "msmnile", "lito", "bengal", "crow", "parrot", "waipio", "cliffs", "canoe")
         private const val LLAMA_MAC_MB = 16
