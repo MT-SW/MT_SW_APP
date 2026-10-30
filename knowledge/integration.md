@@ -110,6 +110,16 @@ Dodane funkcje:
 - Czyszczenie bazy węzłów i wysyłka (2.8.15): nowy rodzaj „Tylko z niezgodnym kluczem” (węzły, których klucz publiczny zmienił się od pierwszego zapamiętanego), ponawianie usuwania węzła, gdy radio (np. przez Bluetooth) chwilowo odrzuci polecenie, informacja o pełnej kolejce radia przy wysyłce wiadomości ostrzeżenie przy potwierdzeniu z błędnym dowodem (możliwa podróbka, firmware 2.8+) oraz podgląd czyszczenia, który podaje, ile pasujących węzłów pominięto jako chronione (ulubione, ignorowane); ręczne czyszczenie usuwa też węzły śledzone w Home Assistant i od razu zdejmuje je ze śledzenia, więc encje znikają bez błędów; protobufy zaktualizowane do wersji 2.8.1
 - Kolory SNR/RSSI (2.8.16): jakość sygnału (kolor SNR) jest liczona względem presetu modemu bramki odczytanego z jej konfiguracji LoRa, tak jak w aplikacji (wcześniej bez wykonania traceroute obowiązywały progi LongFast, przez co np. SNR -7 przy presecie Narrow był złoty); RSSI wlicza się do oceny tylko razem z poziomem szumu, jak w aplikacji
 
+Licencja, nazwa i cudze treści:
+- Kod jest otwarty — możesz go używać, zmieniać i udostępniać dalej na zasadach licencji repozytorium (szczegóły w pliku LICENSE). Prosimy o dobre praktyki:
+  - zmienioną lub cudzą wersję integracji nazwij inaczej i zaznacz, że nie pochodzi od nas;
+  - nie przedstawiaj swojego produktu, strony ani grupy jako oficjalnego projektu MT_SW, jeśli nim nie jest;
+  - nasze teksty, zrzuty ekranu i dokumentację możesz cytować z podaniem autora i źródła;
+  - jeśli chcesz napisać o projekcie lub sieci, odezwij się do nas wcześniej — pomożemy sprawdzić fakty; prosimy nie publikować prywatnych danych osób tworzących projekt
+- Nie odpowiadamy za informacje, artykuły, filmy, strony ani wypowiedzi osób i podmiotów trzecich, w tym za błędne, nieaktualne lub niezwiązane z nami fakty. Odcinamy się od stron, struktur, grup i osób, które piszą lub mówią o nas bez kontaktu z nami i bez udziału w naszej społeczności i sieci. Rzetelne informacje o projekcie są w naszych własnych kanałach i repozytoriach (GitHub MT-SW, mt-sw.pl)
+- Pytania i zgłaszanie błędów: przez nasze kanały (lokalne grupy, Discord/WhatsApp/Signal, sieć mesh)
+- Projekt nie jest afiliowany ani wspierany przez Meshtastic LLC. Meshtastic® jest zarejestrowanym znakiem towarowym Meshtastic LLC. Z integracji korzystasz na własne ryzyko, bez żadnej gwarancji
+
 Podziękowania:
 - Meshtastic i Pascal Brogle (@broglep) za oficjalną integrację, na której oparty jest ten fork
 - Daring-Designs/meshtastic-ui-ha (MIT) — z tego projektu pochodzi zakładka Ustawienia; pozostałe zakładki panelu są własne
@@ -221,6 +231,16 @@ Added features:
 - Planner (2.8.14): large terrain data ranges (above 10 km, including 50 and 100 km) are downloaded in pieces, with heavy pieces split, a progress bar and patient waiting for a busy server; the query memory limit on the Overpass server is restored to 256 MiB (a too low one gave false "out of memory"), a separate message when the server refuses, and a longer timeout in the integration's proxy
 - Node DB cleanup and sending (2.8.15): a new kind "Only mismatched key" (nodes whose public key changed since first seen), retrying node removal when the radio (e.g. over Bluetooth) briefly refuses the command, a clear message when the radio queue is full while sending, a warning for an acknowledgement with an invalid proof (possibly forged, firmware 2.8+) and a cleanup preview that says how many matching nodes were skipped as protected (favorite, ignored); manual cleanup also removes nodes tracked in Home Assistant and immediately stops tracking them, so their entities disappear without errors; protobufs updated to version 2.8.1
 - SNR/RSSI colours (2.8.16): signal quality (SNR colour) is rated against the gateway's modem preset read from its LoRa config, as in the app (before, without a traceroute the LongFast thresholds applied, so e.g. SNR -7 on the Narrow preset showed gold); RSSI joins the rating only together with the noise floor, as in the app
+
+Licence, name and third-party content:
+- The code is open — you may use, modify and redistribute it under the repository's licence (see the LICENSE file). We kindly ask for good practice:
+  - please give a modified or third-party version of the integration a different name and state that it does not come from us;
+  - please do not present your product, website or group as an official MT_SW project if it is not;
+  - you may quote our texts, screenshots and documentation, naming the author and source;
+  - if you want to write about the project or the network, please contact us beforehand — we will help check the facts; please do not publish private data of the people behind the project
+- We are not responsible for information, articles, videos, websites or statements made by third parties, including incorrect, outdated or unrelated facts about us. We distance ourselves from websites, structures, groups and persons who write or speak about us without any contact with us and without taking part in our community and network. Reliable information about the project is in our own channels and repositories (GitHub MT-SW, mt-sw.pl)
+- Questions and bug reports: through our channels (local groups, Discord/WhatsApp/Signal, the mesh network)
+- This project is not affiliated with or endorsed by Meshtastic LLC. Meshtastic® is a registered trademark of Meshtastic LLC. You use the integration at your own risk, with no warranty
 
 Credits:
 - Meshtastic and Pascal Brogle (@broglep) for the official integration this fork is based on

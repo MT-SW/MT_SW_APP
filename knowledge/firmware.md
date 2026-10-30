@@ -94,6 +94,19 @@ pio run -e <nazwa-środowiska>
 ```
 np. `pio run -e rak_killer_v2` albo `pio run -e ikoka_c6`. Pełna lista środowisk w `platformio.ini` oraz w folderach `variants/`.
 
+### Licencja, nazwa i cudze treści
+
+Kod jest otwarty, na licencji GNU GPL v3 — możesz go używać, zmieniać i udostępniać dalej na jej zasadach. Prosimy o dobre praktyki:
+
+- zmienioną lub cudzą wersję programu nazwij inaczej i zaznacz, że nie pochodzi od nas;
+- nie przedstawiaj swojego produktu, strony ani grupy jako oficjalnego projektu MT_SW, jeśli nim nie jest;
+- nasze teksty, zrzuty ekranu i dokumentację możesz cytować z podaniem autora i źródła;
+- jeśli chcesz napisać o projekcie lub sieci, odezwij się do nas wcześniej — pomożemy sprawdzić fakty; prosimy nie publikować prywatnych danych osób tworzących projekt.
+
+Nie odpowiadamy za informacje, artykuły, filmy, strony ani wypowiedzi osób i podmiotów trzecich, w tym za błędne, nieaktualne lub niezwiązane z nami fakty. Odcinamy się od stron, struktur, grup i osób, które piszą lub mówią o nas bez kontaktu z nami i bez udziału w naszej społeczności i sieci. Rzetelne informacje o projekcie są w naszych własnych kanałach i repozytoriach (GitHub MT-SW, mt-sw.pl). Pytania i zgłaszanie błędów: przez nasze kanały (lokalne grupy, Discord/WhatsApp/Signal, sieć mesh).
+
+Projekt nie jest afiliowany ani wspierany przez Meshtastic LLC. Meshtastic® jest zarejestrowanym znakiem towarowym Meshtastic LLC. Z firmware'u korzystasz na własne ryzyko, bez żadnej gwarancji.
+
 ---
 
 ## 🇬🇧 English
@@ -177,3 +190,16 @@ Standard PlatformIO build:
 pio run -e <environment-name>
 ```
 e.g. `pio run -e rak_killer_v2` or `pio run -e ikoka_c6`. Full list of environments in `platformio.ini` and under `variants/`.
+
+### Licence, name and third-party content
+
+The code is open, under the GNU GPL v3 — you may use, modify and redistribute it under its terms. We kindly ask for good practice:
+
+- please give a modified or third-party version a different name and state that it does not come from us;
+- please do not present your product, website or group as an official MT_SW project if it is not;
+- you may quote our texts, screenshots and documentation, naming the author and source;
+- if you want to write about the project or the network, please contact us beforehand — we will help check the facts; please do not publish private data of the people behind the project.
+
+We are not responsible for information, articles, videos, websites or statements made by third parties, including incorrect, outdated or unrelated facts about us. We distance ourselves from websites, structures, groups and persons who write or speak about us without any contact with us and without taking part in our community and network. Reliable information about the project is in our own channels and repositories (GitHub MT-SW, mt-sw.pl). Questions and bug reports: through our channels (local groups, Discord/WhatsApp/Signal, the mesh network).
+
+This project is not affiliated with or endorsed by Meshtastic LLC. Meshtastic® is a registered trademark of Meshtastic LLC. You use the firmware at your own risk, with no warranty.
