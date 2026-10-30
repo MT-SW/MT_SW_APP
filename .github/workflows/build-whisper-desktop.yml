@@ -5,10 +5,7 @@
 name: Build whisper.cpp for computers
 
 on:
-  # Runs by itself when this file is pushed to GitHub (so nothing has to be clicked), and by hand when needed.
-  push:
-    paths:
-      - ".github/workflows/build-whisper-desktop.yml"
+  # Only by hand: Actions -> Run workflow. It never starts by itself.
   workflow_dispatch:
     inputs:
       llama_tag:

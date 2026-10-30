@@ -4,10 +4,7 @@
 name: Build llama.cpp and whisper.cpp for Android
 
 on:
-  # Runs by itself when this file is pushed to GitHub (so nothing has to be clicked), and by hand when needed.
-  push:
-    paths:
-      - ".github/workflows/build-llama-android.yml"
+  # Only by hand: Actions -> Run workflow. It never starts by itself.
   workflow_dispatch:
     inputs:
       llama_tag:
