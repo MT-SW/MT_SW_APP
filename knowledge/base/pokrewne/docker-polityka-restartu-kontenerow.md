@@ -1,0 +1,7 @@
+<!-- Baza wiedzy MT_SW: jak Docker ma restartować kontenery po awarii i po restarcie systemu. Tylko informacyjnie. -->
+# Docker: polityka restartu kontenerów
+
+### Jaką politykę restartu ustawić, żeby kontener wstawał po awarii i po restarcie komputera?
+Docker ma cztery polityki restartu, które ustawia się opcją --restart przy docker run albo w pliku compose. Domyślna no nigdy nie restartuje kontenera. on-failure restartuje tylko wtedy, gdy kontener zakończy się kodem błędu, a opcjonalnie można ograniczyć liczbę prób, np. on-failure:5. always restartuje zawsze, także po restarcie demona Dockera. unless-stopped działa jak always, z jednym wyjątkiem: kontener zatrzymany ręcznie nie wstaje po restarcie demona. Do usług działających non-stop dokumentacja Dockera pasuje najlepiej unless-stopped. Przy ręcznym zatrzymaniu polityka jest ignorowana do restartu demona albo ręcznego uruchomienia kontenera, co zapobiega pętli restartów. Zmiana polityki działającego kontenera jest możliwa poleceniem docker update --restart=unless-stopped nazwa. Wniosek, że bazy danych wolą always, pochodzi z jednego z poradników, a nie z oficjalnej dokumentacji, więc traktuj go jako wskazówkę z ogólnej wiedzy.
+Słowa: docker, restart, --restart, unless-stopped, always, on-failure, no, polityka restartu, kontener po restarcie, docker update, pętla restartów, compose restart, serwer po awarii, docker daemon
+Źródło: https://docs.docker.com/engine/containers/start-containers-automatically/ (sprawdzono 2026-10; oficjalna dokumentacja Docker)
