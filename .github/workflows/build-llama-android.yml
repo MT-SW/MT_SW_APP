@@ -204,16 +204,25 @@ jobs:
 
       - name: Build whisper-server with the Hexagon backend
         run: |
-          docker run --rm --platform linux/amd64 -v "$PWD":/workspace -w /workspace ghcr.io/snapdragon-toolchain/arm64-android:v0.7 bash -lc '
+          docker run --rm --platform linux/amd64 -v "$PWD":/workspace -w /workspace ghcr.io/snapdragon-toolchain/arm64-android:v0.7 bash -c '
             set -e
-            cmake -S whisper.cpp -B build-npu -G Ninja -DCMAKE_BUILD_TYPE=Release \
-              -DCMAKE_TOOLCHAIN_FILE=/opt/android-ndk-r28b/build/cmake/android.toolchain.cmake \
+            # Not a login shell: that would reset the image'"'"'s PATH and environment (Ninja, NDK, Hexagon SDK).
+            env | grep -i -E "ndk|hexagon|android|^PATH" || true
+            NDK="${ANDROID_NDK_ROOT:-${ANDROID_NDK:-$(ls -d /opt/android-ndk* 2>/dev/null | head -n 1)}}"
+            if [ ! -f "$NDK/build/cmake/android.toolchain.cmake" ]; then
+              NDK="$(dirname "$(dirname "$(dirname "$(find / -name android.toolchain.cmake -path "*build/cmake*" 2>/dev/null | head -n 1)")")")"
+            fi
+            HEX="${HEXAGON_SDK_ROOT:-$(ls -d /opt/hexagon/* 2>/dev/null | head -n 1)}"
+            echo "NDK=$NDK HEXAGON=$HEX"
+            GEN="-G Ninja"; command -v ninja >/dev/null 2>&1 || GEN=""
+            cmake -S whisper.cpp -B build-npu $GEN -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_TOOLCHAIN_FILE="$NDK/build/cmake/android.toolchain.cmake" \
               -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-31 \
-              -DGGML_HEXAGON=ON -DHEXAGON_SDK_ROOT=/opt/hexagon/6.6.0.0 \
+              -DGGML_HEXAGON=ON -DHEXAGON_SDK_ROOT="$HEX" \
               -DGGML_OPENMP=OFF -DGGML_NATIVE=OFF \
               -DCMAKE_C_FLAGS="-march=armv8.7a" -DCMAKE_CXX_FLAGS="-march=armv8.7a" \
               -DWHISPER_BUILD_TESTS=OFF -DWHISPER_SDL2=OFF -DWHISPER_BUILD_EXAMPLES=ON
-            cmake --build build-npu --target whisper-server
+            cmake --build build-npu --target whisper-server -j
           '
 
       - name: Pack
