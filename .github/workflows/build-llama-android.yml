@@ -220,7 +220,8 @@ jobs:
               -DGGML_OPENMP=OFF -DGGML_NATIVE=OFF \
               -DCMAKE_C_FLAGS="-march=armv8.7a+fp16+dotprod+i8mm -D_GNU_SOURCE" -DCMAKE_CXX_FLAGS="-march=armv8.7a+fp16+dotprod+i8mm -D_GNU_SOURCE" \
               -DWHISPER_BUILD_TESTS=OFF -DWHISPER_SDL2=OFF -DWHISPER_BUILD_EXAMPLES=ON
-            cmake --build build-npu --target whisper-server -j
+            # Everything is built (not only the server): the install step below needs all of it.
+            cmake --build build-npu -j
             # The NPU programs (libggml-htp-v*.so) are put in place by the install step.
             cmake --install build-npu --prefix /workspace/install-npu
           '
