@@ -71,6 +71,9 @@ class LlamaCppEngine(
     private var server: ModelServerProcess? = null
     private var loadedId: String? = null
     private var loadedHearing = false
+
+    /** The window of text of the program that runs now (smaller than normal on the Intel NPU); 0 = none. */
+    @Volatile private var loadedWindow = 0
     private val report = StringBuilder()
 
     @Volatile
@@ -124,11 +127,24 @@ class LlamaCppEngine(
         ModelServerProcess.stopLeftovers(File(logDir, PID_FILE))
     }
 
-    override fun contextTokens(modelId: String): Int =
-        when (modelId) {
-            AiModels.G4_E2B, AiModels.QWEN_2B, AiModels.QWEN_08B, AiModels.BIELIK_15B -> CONTEXT_SMALL
-            else -> CONTEXT_LARGE
-        }
+    override fun contextTokens(modelId: String): Int {
+        val normal =
+            when (modelId) {
+                AiModels.G4_E2B, AiModels.QWEN_2B, AiModels.QWEN_08B, AiModels.BIELIK_15B -> CONTEXT_SMALL
+                else -> CONTEXT_LARGE
+            }
+        // What runs now keeps its own window; before the start, the Intel NPU (tried first) allows a smaller one.
+        if (loadedId == modelId && loadedWindow > 0) return loadedWindow
+        return if (intelNpuTriedFirst(modelId)) minOf(normal, INTEL_NPU_BIG_WINDOW) else normal
+    }
+
+    /** True when a start of [modelId] would try the Intel NPU with the bigger window first. */
+    private fun intelNpuTriedFirst(modelId: String): Boolean {
+        val model = AiModels.byId(modelId) ?: return false
+        if (installer.android || installer.mac || skipNpu || !installer.intelNpu || !model.intelNpu) return false
+        val asset = installer.intelNpuAsset() ?: return false
+        return !installer.isBroken(asset, modelId + BIG_NPU_SUFFIX)
+    }
 
     override suspend fun chat(
         modelId: String,
@@ -396,12 +412,23 @@ class LlamaCppEngine(
             } else {
                 // A computer with an Intel Core Ultra: its NPU through OpenVINO. Models that the NPU cannot run (Qwen 3.5,
                 // the biggest ones, listening) skip it; the first compilation is kept on disk for the next starts.
+                // The bigger window first (the assistant can use it); the sliding-window layers keep a full-size cache so
+                // that the attention mask fits. A failure has its own mark, so the small window is still tried.
+                installer.intelNpuAsset()?.takeIf { !skipNpu && model.intelNpu && !hearing && !installer.isBroken(it, modelId + BIG_NPU_SUFFIX) }?.let { asset ->
+                    add(
+                        Attempt(
+                            "NPU (Intel), window $INTEL_NPU_BIG_WINDOW, and processor", null, listOf("--swa-full"), asset, requireGpu = true, npu = "Intel",
+                            perModel = true, markSuffix = BIG_NPU_SUFFIX, window = INTEL_NPU_BIG_WINDOW,
+                            env = mapOf("GGML_OPENVINO_DEVICE" to "NPU"),
+                        ),
+                    )
+                }
+                // The small window (512 to 1024 tokens is what the OpenVINO notes advise for the NPU): enough for
+                // translating a message, too little for the assistant, so the assistant's model skips this one.
                 installer.intelNpuAsset()?.takeIf { !skipNpu && model.intelNpu && !hearing && modelId != assistantModelId && !installer.isBroken(it, modelId) }?.let { asset ->
                     add(
                         Attempt(
-                            "NPU (Intel) and processor", null, emptyList(), asset, requireGpu = true, npu = "Intel", perModel = true,
-                            // The OpenVINO notes ask for a small window on the NPU (512 to 1024 tokens) and say that its
-                            // program cache is not supported there.
+                            "NPU (Intel), window $INTEL_NPU_WINDOW, and processor", null, emptyList(), asset, requireGpu = true, npu = "Intel", perModel = true,
                             window = INTEL_NPU_WINDOW,
                             env = mapOf("GGML_OPENVINO_DEVICE" to "NPU"),
                         ),
@@ -497,6 +524,7 @@ class LlamaCppEngine(
             server = started
             loadedId = modelId
             loadedHearing = hearing
+            loadedWindow = attemptWindow
             activeBackend = describeBackend(attempt)
             tried.append("- ${attempt.name}: " + note("works", "działa") + "\n")
             startReport = tried.toString()
@@ -598,6 +626,7 @@ class LlamaCppEngine(
         server = null
         loadedId = null
         loadedHearing = false
+        loadedWindow = 0
         activeBackend = ""
         store.reportLoaded(TAG, null)
     }
@@ -655,6 +684,10 @@ class LlamaCppEngine(
         // A chip (NPU, graphics card) that has not answered in this time is dropped, so a hanging one cannot block the start.
         /** Window of text on the Intel NPU: the notes of the OpenVINO engine say 512 to 1024; it also fits the model's sliding window. */
         const val INTEL_NPU_WINDOW = 1024
+
+        /** The bigger window tried first on the Intel NPU, and the mark that remembers a failure of that try. */
+        const val INTEL_NPU_BIG_WINDOW = 8192
+        const val BIG_NPU_SUFFIX = "-big"
         const val CHIP_LOAD_TIMEOUT_MS = 4 * 60 * 1000L
         const val CONNECT_TIMEOUT_MS = 20_000
         const val READ_TIMEOUT_MS = 10 * 60 * 1000
