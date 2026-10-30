@@ -482,7 +482,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
 
         /** The OpenVINO version in the names of the llama.cpp release files (changes together with [LLAMA_TAG]). */
         const val OPENVINO_VERSION = "2026.4.1"
-        private const val BROKEN_RESET = 3
+        private const val BROKEN_RESET = 4
         private const val BROKEN_RETRY_MS = 3L * 24L * 60L * 60L * 1000L
         private val QUALCOMM_PLATFORMS = setOf("kalama", "pineapple", "sun", "taro", "lahaina", "kona", "msmnile", "lito", "bengal", "crow", "parrot", "waipio", "cliffs", "canoe")
         private const val LLAMA_MAC_MB = 16

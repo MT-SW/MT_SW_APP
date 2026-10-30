@@ -136,7 +136,8 @@ class WhisperCppEngine(
                 } else if (kind == "snapdragon") {
                     add(Attempt("NPU (Hexagon)", asset, chip = true, dsp = true, extra = listOf("-fa"), env = mapOf("GGML_HEXAGON_DEVICES" to "1")))
                 } else {
-                    add(Attempt("graphics card ($kind)", asset, chip = true))
+                    // Flash attention crashed the OpenCL program and failed in the Adreno Vulkan driver (log 2026-10-30).
+                    add(Attempt("graphics card ($kind)", asset, chip = true, extra = listOf("-nfa")))
                 }
             }
             // The Mac program is the Metal build: without the graphics card it is the processor build.
@@ -162,7 +163,11 @@ class WhisperCppEngine(
             }
             val env = buildMap<String, String> {
                 putAll(attempt.env)
-                if (attempt.dsp) put("ADSP_LIBRARY_PATH", (listOf(program.parentFile.absolutePath) + DSP_DIRS).joinToString(";"))
+                if (attempt.dsp) {
+                    // The NPU programs (libggml-htp-v*.so) are in the "lib" folder of the package, next to "bin".
+                    val skeletons = File(program.parentFile.parentFile, "lib").absolutePath
+                    put("ADSP_LIBRARY_PATH", (listOf(skeletons, program.parentFile.absolutePath) + DSP_DIRS).joinToString(";"))
+                }
             }
             Logger.i(tag = TAG) { "Starting the speech program for $modelId: ${attempt.name}" }
             synchronized(chipLines) { chipLines.clear() }
