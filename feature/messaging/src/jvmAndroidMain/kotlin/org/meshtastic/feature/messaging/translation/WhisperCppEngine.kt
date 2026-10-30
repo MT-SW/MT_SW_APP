@@ -81,9 +81,15 @@ class WhisperCppEngine(
                 repeat(MAX_SWITCHES + 1) {
                     val running = ensureLoaded(modelId)
                     val started = nowMillis
-                    val text = send(running, wav)
+                    // Whisper always works on a 30 second window; for a short clip a shorter window is much faster.
+                    val window = audioContextFor(audioMs)
+                    var text = send(running, wav, window)
+                    if (window != 0 && (text.isBlank() || looksLikeNonsense(text, audioMs))) {
+                        Logger.w(tag = TAG) { "The short audio window ($window) gave no usable text, trying the full window" }
+                        text = send(running, wav, 0)
+                    }
                     val took = nowMillis - started
-                    Logger.i(tag = TAG) { "Dictation with $modelId: ${text.length} chars from ${audioMs} ms of speech in $took ms (language ${DictationLanguage.hint})" }
+                    Logger.i(tag = TAG) { "Dictation with $modelId: ${text.length} chars from ${audioMs} ms of speech in $took ms (language ${DictationLanguage.hint}, audio window ${if (window == 0) "full" else window})" }
                     result = text
                     val chipMark = activeChipMark
                     if (chipMark == null || !looksLikeNonsense(text, audioMs)) return@withContext text
@@ -94,6 +100,15 @@ class WhisperCppEngine(
                 result
             }
         }
+    }
+
+    /**
+     * The audio window Whisper needs for a clip of [audioMs] milliseconds: 50 steps per second, with two seconds to
+     * spare and a floor of ten seconds (a very short window hurts accuracy). 0 = the full 30 seconds (long clips).
+     */
+    private fun audioContextFor(audioMs: Long): Int {
+        val steps = ((audioMs + AUDIO_CTX_MARGIN_MS) * AUDIO_STEPS_PER_SECOND / MS_PER_SECOND).toInt()
+        return if (steps >= FULL_AUDIO_CTX - AUDIO_CTX_FULL_BAND) 0 else steps.coerceAtLeast(MIN_AUDIO_CTX)
     }
 
     /** More letters than anyone speaks, or the same few words again and again: the chip counted wrongly. */
@@ -281,7 +296,7 @@ class WhisperCppEngine(
         return header.array() + ByteArray(data)
     }
 
-    private fun send(running: ModelServerProcess, wav: ByteArray): String {
+    private fun send(running: ModelServerProcess, wav: ByteArray, audioCtx: Int = 0): String {
         val boundary = "----mtsw" + UUID.randomUUID().toString().replace("-", "")
         val connection = URL(running.baseUrl + "/inference").openConnection() as HttpURLConnection
         try {
@@ -302,6 +317,7 @@ class WhisperCppEngine(
                 field("temperature_inc", "0.0")
                 field("beam_size", "1")
                 field("best_of", "1")
+                if (audioCtx > 0) field("audio_ctx", audioCtx.toString())
                 field("response_format", "json")
                 field("language", DictationLanguage.hint)
                 out.write("--$boundary--\r\n".toByteArray())
@@ -337,6 +353,11 @@ class WhisperCppEngine(
         const val SAFE_SUFFIX = "-safe"
         const val MAX_THREADS = 8
         const val MAX_SWITCHES = 3
+        const val AUDIO_CTX_MARGIN_MS = 2_000L
+        const val AUDIO_STEPS_PER_SECOND = 50L
+        const val MIN_AUDIO_CTX = 500
+        const val FULL_AUDIO_CTX = 1_500
+        const val AUDIO_CTX_FULL_BAND = 100
         const val CHIP_LOG_WAIT_MS = 3_000
         const val CHIP_LOG_STEP_MS = 100L
         const val MIN_NONSENSE_CHARS = 60
