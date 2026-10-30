@@ -8,3 +8,7 @@ Słowa: który model, model AI, telefon, Gemma, Qwen, Bielik, Whisper, Translate
 ### Którą rodzinę modeli AI polecacie i co z modelami z innych rodzin?
 Polecamy rodzinę Gemma (Gemma 4): odpowiada najlepiej po polsku i najrzadziej się myli. Jeśli telefon jest na nią za słaby, zostają mniejsze modele z innych rodzin (Qwen, Bielik). Powinny odpowiadać poprawnie na większość pytań, ale nie możemy dać stuprocentowej pewności, więc ważne rzeczy sprawdzaj w innych miejscach.
 Słowa: polecany model, gemma, qwen, bielik, słabszy telefon, pewność, sprawdzać odpowiedzi
+
+### Kiedy asystent korzysta z internetu?
+Internet jest tylko awaryjny: asystent najpierw szuka odpowiedzi w naszej bazie wiedzy, a do internetu sięga dopiero wtedy, gdy baza nie ma odpowiedzi (albo pytasz o świeże rzeczy, jak ceny czy wiadomości) i tylko gdy włączysz internet w ustawieniach asystenta. Robią to tylko mocniejsze modele z rodziny Gemma. Słabsze modele (Qwen, Bielik) nie dostają wyników z internetu, bo często je przekręcają. Nie możemy dać 100% pewności, że odpowiedź jest dobra, więc radzimy sprawdzać ważne odpowiedzi w innych miejscach.
+Słowa: internet, awaryjny, baza wiedzy, gemma, qwen, bielik, pewność, sprawdzaj

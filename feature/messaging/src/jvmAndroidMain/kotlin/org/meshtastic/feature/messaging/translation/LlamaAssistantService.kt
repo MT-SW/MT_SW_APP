@@ -842,7 +842,7 @@ class LlamaAssistantService(
                 }
                 fromBase(modelId, history, question, intent.text, polish, answerLang, onPiece, room)?.let { return it }
                 val found =
-                    if (uiPrefs.assistantInternetEnabled.value && webWanted(question, "")) webTools.web_search(intent.text.ifBlank { question }.take(WEB_QUERY_CHARS)) else ""
+                    if (uiPrefs.assistantInternetEnabled.value && webModel(modelId) && webWanted(question, "")) webTools.web_search(intent.text.ifBlank { question }.take(WEB_QUERY_CHARS)) else ""
                 val extra = if (found.isBlank()) "" else rule(polish, WEB_PL, WEB_EN) + "\n" + found
                 val said = speak(modelId, history, polish, onPiece, room, extra = extra, temperature = WEB_TEMPERATURE)
                 // A number the model wrote that is in neither the results nor the facts was garbled or made up:
@@ -878,11 +878,11 @@ class LlamaAssistantService(
         val facts =
             (if (baseOnly) knowledge?.lookupBaseOnly(query, BASE_CHARS * room, language) else knowledge?.lookupBase(query, BASE_CHARS * room, language)).orEmpty()
         if (facts.isBlank()) return null
-        val web = if (uiPrefs.assistantInternetEnabled.value && webWanted(question, facts)) webTools.web_search(question.take(WEB_QUERY_CHARS)) else ""
+        val web = if (uiPrefs.assistantInternetEnabled.value && webModel(modelId) && webWanted(question, facts)) webTools.web_search(question.take(WEB_QUERY_CHARS)) else ""
         Logger.i(tag = TAG) { "Knowledge base: ${facts.length} chars, web ${web.length} chars" }
         // The smallest models retold the entries wrongly (invented steps, swapped numbers): they quote the best entry as it is written.
-        if (polish && web.isBlank() && (AiModels.byId(modelId)?.ramMb ?: Int.MAX_VALUE) < QUOTE_BELOW_RAM_MB) {
-            quotedEntry(question, facts)?.let {
+        if (web.isBlank() && (AiModels.byId(modelId)?.ramMb ?: Int.MAX_VALUE) < QUOTE_BELOW_RAM_MB) {
+            quotedEntry(question, facts, polish)?.let {
                 lastRoute = "quoted knowledge-base entry"
                 return it.also(onPiece)
             }
@@ -898,7 +898,7 @@ class LlamaAssistantService(
      * The best entry of the knowledge base word for word, with its source, when it clearly fits the question (at least two
      * words of the question in it). Null otherwise: then the model answers as usual.
      */
-    private fun quotedEntry(question: String, facts: String): String? {
+    private fun quotedEntry(question: String, facts: String, polish: Boolean = true): String? {
         val asked = stems(question)
         if (asked.isEmpty()) return null
         // The best entry is chosen by how much of the question its title and heading cover; entries of the related and
@@ -923,7 +923,7 @@ class LlamaAssistantService(
                 .joinToString("\n").trim()
         if (body.length < QUOTE_MIN_CHARS) return null
         val cut = if (body.length > QUOTE_MAX_CHARS) body.substring(0, QUOTE_MAX_CHARS).substringBeforeLast(". ", body.substring(0, QUOTE_MAX_CHARS)).trimEnd() + "." else body
-        return cut + "\n\nŹródło: " + head
+        return cut + "\n\n" + (if (polish) "Źródło: " else "Source: ") + head
     }
 
     /**
@@ -939,13 +939,16 @@ class LlamaAssistantService(
         val covered = asked.count { it in stems(bestHead) }
         val related = bestHead.startsWith("Baza wiedzy (")
         val head = if (asked.isEmpty() || covered >= (if (related) SOURCE_MIN_RELATED else SOURCE_MIN_WORDS)) bestHead else ""
-        val body = answer.replace(MODEL_SOURCE_LINE, "").trimEnd()
+        val body = answer.replace(MODEL_SOURCE_LINE, "").replace(MODEL_SOURCE_TAIL, "").trimEnd()
         if (NOT_KNOWN.containsMatchIn(body.lowercase())) {
             return body + "\n\n" + (if (polish) "Zapytaj mnie „co potrafisz”, a powiem, w czym mogę pomóc." else "Ask me “what can you do” and I will tell you how I can help.")
         }
         if (head.isEmpty()) return body
         return body + "\n\n" + (if (polish) "Źródło: " else "Source: ") + head
     }
+
+    /** The internet is a fallback only for the stronger models (the Gemma family); the weaker ones are not given web results. */
+    private fun webModel(modelId: String): Boolean = AiModels.byId(modelId)?.name?.startsWith("Gemma 4") == true
 
     /**
      * The internet is searched only when it can really help: not for greetings and questions about the assistant, not for
@@ -1573,6 +1576,8 @@ class LlamaAssistantService(
         val CALC_WORDS = Regex("policz|oblicz|wylicz|calculate|eirp|erp|zasięg|zasieg|bilans|range|budget|maksymaln|\\bmax|limit|dozwolon|legaln|polsce|przepis|zalecan|polecan|optymaln|powinn|allowed|legal|recommend")
         val BASE_HEAD = Regex("^\\[([^\\]\\n]+)\\]", RegexOption.MULTILINE)
         val MODEL_SOURCE_LINE = Regex("(?imu)^\\s*(źródło|źródła|zrodlo|source|sources)\\s*:.*$\\n?")
+        /** A source the model wrote at the end of a sentence (not on its own line); the app writes the real one. */
+        val MODEL_SOURCE_TAIL = Regex("(?iu)[\\s(]*(?<!\\p{L})(źródło|źródła|source|sources)\\s*:[^\\n]*$")
         val NOT_KNOWN = Regex("nie mam informacji|nie wiem|brak informacji|nie znalazłem|nie znalazlem|i do not know|i don't know|no information")
         val NEW_NODES_ASK = Regex("now(?:ych|e|y|ego) (?:węzł|wezl)|new nodes?")
         val MESSAGE_INTENTS = setOf("chat", "web_question", "app_help", "network_question", "count_messages", "search_messages")

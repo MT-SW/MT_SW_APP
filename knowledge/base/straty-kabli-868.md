@@ -1,0 +1,6 @@
+# Straty w kablu koncentrycznym na 868 MHz (RG-58, LMR-400 i inne)
+
+### Ile dB tracę na kablu koncentrycznym przy 868 MHz: RG-58, LMR-400, RG-213?
+Straty rosną z częstotliwością i długością kabla, a grubszy kabel traci mniej. Wartości z tabel producentów (przy 1000 MHz, czyli trochę więcej niż dla naszych 868 MHz, więc u nas straty będą odrobinę mniejsze): RG-58 ok. 24 dB na 100 stóp (około 0,8 dB na metr), RG-8X ok. 12,9 dB na 100 stóp (około 0,42 dB/m), RG-213 ok. 7,1 dB na 100 stóp (około 0,23 dB/m), LMR-400 ok. 4,1 dB na 100 stóp (około 0,13 dB/m); przy 900 MHz LMR-400 ma ok. 3,9 dB na 100 stóp. Przykład: 5 m cienkiego RG-58 to około 4 dB straty, a to więcej niż daje różnica między wieloma antenami. Te same 5 m kabla LMR-400 to około 0,7 dB. Każde 3 dB to połowa mocy, więc przy wyniesionej antenie bierz gruby kabel o niskich stratach i jak najkrótszy odcinek. Do tego dochodzą straty na każdym złączu i przejściówce.
+Słowa: kabel, koncentryk, straty, tłumienie, rg58, rg-58, lmr400, lmr-400, rg213, dB na metr, 868, pigtail
+Źródło: https://www.raveon.com/data_radio_info/?p=1036 oraz https://data-alliance.net/blog/comparison-of-lmr100-lmr200-and-lmr400-coax-for-antenna-cables (sprawdzono 2026-10)
