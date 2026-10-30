@@ -59,3 +59,11 @@ Zasady:
 - Git w tym katalogu zostawia `index.lock`. Gdy git krzyczy o locku: `mv .git/index.lock .git/index.lock.old` i ponów. Zamiast `git revert` użyj `git diff X^ X | git apply -R`, potem `git add` i `git commit`.
 - Nie rób `git push` – Cezary zbuduje i wypchnie sam.
 - Do Cezarego pisz **po polsku, prostym językiem**, krótko. Na koniec partii podaj: ile wpisów dodano, w których plikach i co proponujesz dalej. Jeśli podajesz mu polecenia, daj je w jednym bloku do skopiowania jednym kliknięciem.
+
+## Nie przerywaj pracy (ważne)
+- Cezary nie chce co chwilę pisać „kontynuuj”. Pracuj **ciągiem, bez pytania o zgodę i bez zatrzymywania się po każdej partii**.
+- Jedna tura = **co najmniej 40 nowych wpisów** (ok. 5–8 plików) albo aż wyczerpiesz tematy z listy wyżej. Dopiero wtedy wolno Ci zakończyć i napisać krótkie podsumowanie.
+- Po każdej partii (commit) **od razu bierz następny temat**. Nie pisz „co dalej?” ani „czy kontynuować?”. Wybierz sam kolejny temat z listy.
+- Pytaj Cezarego tylko wtedy, gdy czegoś nie da się ustalić ze źródeł i od tego zależy poprawność wpisu. Zamiast pytać, oznacz wpis „do przeglądu” i idź dalej.
+- Nie zatrzymuj się po błędzie jednej strony (np. nie da się otworzyć): weź inne źródło albo inny temat.
+- Rób listę zadań (TaskCreate) z całą turą z góry i odhaczaj ją; kończ dopiero, gdy lista jest pusta.
