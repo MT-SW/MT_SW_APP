@@ -104,6 +104,11 @@ class LlamaCppEngine(
     private fun reasonFrom(log: String): String {
         val text = log.takeLast(REPORT_TAIL * 4)
         return when {
+            NPU_UNSUPPORTED.containsMatchIn(text) ->
+                note(
+                    "the Intel NPU driver does not support a setting that this engine needs; update the driver of Intel(R) AI Boost",
+                    "sterownik NPU Intela nie obsługuje ustawienia, którego potrzebuje silnik; zaktualizuj sterownik Intel(R) AI Boost",
+                )
             text.contains("attention_mask", ignoreCase = true) || text.contains("Attention mask", ignoreCase = true) ->
                 note("the chip cannot handle the attention window of this model", "układ nie radzi sobie z oknem uwagi tego modelu")
             Regex("out of memory|failed to allocate|cannot allocate|OOM", RegexOption.IGNORE_CASE).containsMatchIn(text) ->
@@ -125,6 +130,8 @@ class LlamaCppEngine(
         store.unloadAll = { unloadNow() }
         // A program left running by an app that was killed would keep gigabytes of memory.
         ModelServerProcess.stopLeftovers(File(logDir, PID_FILE))
+        // The NPU driver's version is read once in the background (it takes a moment), not while a screen waits for it.
+        if (installer.intelNpu) Thread({ installer.intelNpuDriver }, "intel-npu-driver").apply { isDaemon = true }.start()
     }
 
     override fun contextTokens(modelId: String): Int {
@@ -135,18 +142,25 @@ class LlamaCppEngine(
             }
         // What runs now keeps its own window; before the start, the Intel NPU (tried first) allows a smaller one.
         if (loadedId == modelId && loadedWindow > 0) return loadedWindow
-        return if (intelNpuTriedFirst(modelId)) minOf(normal, INTEL_NPU_BIG_WINDOW) else normal
+        return intelNpuWindow(modelId)?.let { minOf(normal, it) } ?: normal
     }
 
     /** Would a plain start (no listening) of [modelId] try the Intel NPU first? */
     fun npuFirst(modelId: String): Boolean = intelNpuTriedFirst(modelId)
 
-    /** True when a start of [modelId] would try the Intel NPU with the bigger window first. */
-    private fun intelNpuTriedFirst(modelId: String): Boolean {
-        val model = AiModels.byId(modelId) ?: return false
-        if (installer.android || installer.mac || skipNpu || !installer.intelNpu || !model.intelNpu) return false
-        val asset = installer.intelNpuAsset() ?: return false
-        return !installer.isBroken(asset, modelId + BIG_NPU_SUFFIX)
+    /** True when a start of [modelId] would try the Intel NPU with a big window first. */
+    private fun intelNpuTriedFirst(modelId: String): Boolean = intelNpuWindow(modelId) != null
+
+    /** The biggest window of text the Intel NPU is still tried with for [modelId]; null = the NPU is not tried first. */
+    private fun intelNpuWindow(modelId: String): Int? {
+        val model = AiModels.byId(modelId) ?: return null
+        if (installer.android || installer.mac || skipNpu || !installer.intelNpu || !model.intelNpu) return null
+        val asset = installer.intelNpuAsset() ?: return null
+        return when {
+            !installer.isBroken(asset, modelId + BIG_NPU_SUFFIX) -> INTEL_NPU_BIG_WINDOW
+            !installer.isBroken(asset, modelId + MID_NPU_SUFFIX) -> INTEL_NPU_MID_WINDOW
+            else -> null
+        }
     }
 
     override suspend fun chat(
@@ -426,6 +440,16 @@ class LlamaCppEngine(
                         ),
                     )
                 }
+                // The middle window: the assistant's instructions are about 2200 tokens, so 4096 is the smallest that suits it.
+                installer.intelNpuAsset()?.takeIf { !skipNpu && model.intelNpu && !hearing && !installer.isBroken(it, modelId + MID_NPU_SUFFIX) }?.let { asset ->
+                    add(
+                        Attempt(
+                            "NPU (Intel), window $INTEL_NPU_MID_WINDOW, and processor", null, listOf("--swa-full"), asset, requireGpu = true, npu = "Intel",
+                            perModel = true, markSuffix = MID_NPU_SUFFIX, window = INTEL_NPU_MID_WINDOW,
+                            env = mapOf("GGML_OPENVINO_DEVICE" to "NPU"),
+                        ),
+                    )
+                }
                 // The small window (512 to 1024 tokens is what the OpenVINO notes advise for the NPU): enough for
                 // translating a message, too little for the assistant, so the assistant's model skips this one.
                 installer.intelNpuAsset()?.takeIf { !skipNpu && model.intelNpu && !hearing && modelId != assistantModelId && !installer.isBroken(it, modelId) }?.let { asset ->
@@ -466,14 +490,17 @@ class LlamaCppEngine(
                     !installer.intelNpu -> "- " + note("NPU (Intel): not used, no Intel Core Ultra processor found on this computer", "NPU (Intel): nieużywane, na tym komputerze nie ma procesora Intel Core Ultra") + "\n"
                     hearing -> "- " + note("NPU (Intel): skipped, this model was started with listening (dictation on the same model), and the NPU does not listen. Choose Whisper for dictation to let the assistant use the NPU", "NPU (Intel): pominięte, ten model uruchomiono ze słuchaniem (dyktowanie na tym samym modelu), a NPU nie słucha. Wybierz do dyktowania Whisper, a asystent będzie mógł używać NPU") + "\n"
                     !model.intelNpu -> "- " + note("NPU (Intel): skipped, this model does not run on the Intel NPU", "NPU (Intel): pominięte, ten model nie działa na NPU Intela") + "\n"
-                    modelId == assistantModelId -> "- " + note("NPU (Intel): skipped, this model is the assistant and needs a bigger window of text than the NPU allows", "NPU (Intel): pominięte, ten model jest asystentem i potrzebuje większego okna tekstu, niż pozwala NPU") + "\n"
+                    modelId == assistantModelId && installer.intelNpuAsset()?.let { installer.isBroken(it, modelId + BIG_NPU_SUFFIX) && installer.isBroken(it, modelId + MID_NPU_SUFFIX) } == true -> "- " + note("NPU (Intel): skipped, this model is the assistant and needs a bigger window of text than the NPU allows", "NPU (Intel): pominięte, ten model jest asystentem i potrzebuje większego okna tekstu, niż pozwala NPU") + "\n"
                     installer.intelNpuAsset()?.let { installer.isBroken(it, modelId) } == true -> "- " + note("NPU (Intel): skipped, failed recently for this model", "NPU (Intel): pominięte, niedawno nie zadziałało z tym modelem") + "\n"
                     else -> ""
                 },
             )
         }
         startReport = ""
+        // Set when the driver of the Intel NPU said it cannot run this engine's settings: the other NPU windows would fail the same way.
+        var intelNpuRejected = false
         for (attempt in attempts) {
+            if (intelNpuRejected && attempt.npu == "Intel") continue
             // A way that an earlier attempt of this same start already showed cannot work (e.g. the safe Vulkan mode on a phone without Vulkan 1.2).
             if (attempt.requireGpu && attempt.asset?.let { installer.isBroken(it, if (attempt.perModel) modelId + attempt.markSuffix else null) } == true) continue
             val program =
@@ -495,7 +522,20 @@ class LlamaCppEngine(
             try {
                 started.awaitReady(
                     "/health", if (attempt.requireGpu) CHIP_LOAD_TIMEOUT_MS else LOAD_TIMEOUT_MS,
-                    abortIf = if (attempt.requireGpu) ({ if (started.logTail().contains(NO_VULKAN)) NO_VULKAN_MESSAGE else null }) else null,
+                    abortIf =
+                    if (attempt.requireGpu) {
+                        {
+                            val log = started.logTail()
+                            when {
+                                log.contains(NO_VULKAN) -> NO_VULKAN_MESSAGE
+                                // The OpenVINO program prints its error at once; waiting for the load timeout would only lose minutes.
+                                attempt.npu == "Intel" -> NPU_ERROR.find(log)?.value?.trim()?.take(NPU_ERROR_SHOWN)
+                                else -> null
+                            }
+                        }
+                    } else {
+                        null
+                    },
                 )
             } catch (e: Throwable) {
                 if (e is CancellationException) {
@@ -503,7 +543,12 @@ class LlamaCppEngine(
                     throw e
                 }
                 failure = e
-                tried.append("- ${attempt.name}: " + note("failed", "nie uruchomiło się") + ": ${reasonFrom(started.logTail())}\n")
+                val failLog = started.logTail() + " " + e.message.orEmpty()
+                if (attempt.npu == "Intel" && NPU_UNSUPPORTED.containsMatchIn(failLog)) {
+                    intelNpuRejected = true
+                    attempt.asset?.let { asset -> listOf("", BIG_NPU_SUFFIX, MID_NPU_SUFFIX).forEach { installer.markBroken(asset, modelId + it) } }
+                }
+                tried.append("- ${attempt.name}: " + note("failed", "nie uruchomiło się") + ": ${reasonFrom(failLog)}" + (if (attempt.npu == "Intel") " [${e.message.orEmpty().take(NPU_ERROR_SHOWN)}]" else "") + "\n")
                 startReport = tried.toString()
                 Logger.w(tag = TAG, throwable = e) { "${attempt.name} did not start: ${e.message}\n${started.logTail().takeLast(MAX_TAIL)}" }
                 started.stop()
@@ -698,6 +743,17 @@ class LlamaCppEngine(
         /** The bigger window tried first on the Intel NPU, and the mark that remembers a failure of that try. */
         const val INTEL_NPU_BIG_WINDOW = 8192
         const val BIG_NPU_SUFFIX = "-big"
+
+        /** The middle window tried next on the Intel NPU (the assistant's instructions are about 2200 tokens), and the mark of its failure. */
+        const val INTEL_NPU_MID_WINDOW = 4096
+        const val MID_NPU_SUFFIX = "-mid"
+        const val NPU_ERROR_SHOWN = 200
+
+        /** Lines with which the OpenVINO program reports an error that stops the start. */
+        val NPU_ERROR = Regex("^.*(Exception from src|is not supported for current configuration|ZE_RESULT_ERROR|OpenVINO exception|terminate called after).*$", RegexOption.MULTILINE)
+
+        /** The driver of the NPU does not know a setting the engine sets (seen on Meteor Lake). */
+        val NPU_UNSUPPORTED = Regex("NPU_COMPILER_DYNAMIC_QUANTIZATION|is not supported for current configuration", RegexOption.IGNORE_CASE)
         const val CHIP_LOAD_TIMEOUT_MS = 4 * 60 * 1000L
         const val CONNECT_TIMEOUT_MS = 20_000
         const val READ_TIMEOUT_MS = 10 * 60 * 1000

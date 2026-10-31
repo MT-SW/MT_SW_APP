@@ -147,11 +147,20 @@ object AiModels {
     const val BIELIK_7B = "bielik-minitron-7b-q4"
     const val BIELIK_11B = "bielik-11b-v3-q4"
     const val PLLUM_12B = "pllum-12b-q4"
+    const val QWEN_27B = "qwen38-27b-q4"
+    const val GPT_OSS_20B = "gpt-oss-20b-mxfp4"
+    const val GRANITE_8B = "granite42-8b-q4"
     const val TG_4B = "translategemma-4b-q4"
     const val TG_12B = "translategemma-12b-q4"
     const val WHISPER_SMALL_Q8 = "whisper-small-q8"
     const val WHISPER_MEDIUM_Q8 = "whisper-medium-q8"
     const val WHISPER_TURBO_Q8 = "whisper-large-v3-turbo-q8"
+
+    /**
+     * The family of the models that belong to no main family (PLLuM, curiosities for people who want to try them). Not a
+     * name to show: the settings translate it, and put a note about curiosities above the list.
+     */
+    const val OTHER_FAMILY = "Other"
 
     /** True when the assistant screen exists. */
     const val ASSISTANT_SCREEN_READY = true
@@ -199,7 +208,7 @@ object AiModels {
             id = G4_E2B,
             name = "Gemma 4 E2B",
             recommendedFor = setOf(AiRole.ASSISTANT),
-            family = "Gemma 4",
+            family = "Gemma",
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT + AiRole.DICTATION,
             sizeMb = 3350 + 557,
@@ -222,7 +231,7 @@ object AiModels {
         AiModelInfo(
             id = G4_E4B,
             name = "Gemma 4 E4B",
-            family = "Gemma 4",
+            family = "Gemma",
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT + AiRole.DICTATION,
             sizeMb = 5155 + 560,
@@ -248,7 +257,7 @@ object AiModels {
             intelNpu = false,
             name = "Gemma 4 12B",
             recommendedFor = setOf(AiRole.ASSISTANT),
-            family = "Gemma 4",
+            family = "Gemma",
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT,
             sizeMb = 6976,
@@ -268,7 +277,7 @@ object AiModels {
             intelNpu = false,
             name = "Gemma 4 26B A4B",
             recommendedFor = setOf(AiRole.ASSISTANT),
-            family = "Gemma 4",
+            family = "Gemma",
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT,
             sizeMb = 14439,
@@ -288,7 +297,7 @@ object AiModels {
             intelNpu = false,
             quietThinking = false,
             name = "Qwen 3.5 0.8B",
-            family = "Qwen 3.5",
+            family = "Qwen",
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT,
             sizeMb = 507,
@@ -308,7 +317,7 @@ object AiModels {
             intelNpu = false,
             quietThinking = false,
             name = "Qwen 3.5 2B",
-            family = "Qwen 3.5",
+            family = "Qwen",
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT,
             sizeMb = 1215,
@@ -328,7 +337,7 @@ object AiModels {
             intelNpu = false,
             quietThinking = false,
             name = "Qwen 3.5 4B",
-            family = "Qwen 3.5",
+            family = "Qwen",
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT,
             sizeMb = 2464,
@@ -348,7 +357,7 @@ object AiModels {
             intelNpu = false,
             quietThinking = false,
             name = "Qwen 3.5 9B",
-            family = "Qwen 3.5",
+            family = "Qwen",
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT,
             sizeMb = 5130,
@@ -368,7 +377,7 @@ object AiModels {
             intelNpu = false,
             quietThinking = false,
             name = "Qwen 3.5 35B A3B",
-            family = "Qwen 3.5",
+            family = "Qwen",
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT,
             sizeMb = 22016,
@@ -380,6 +389,26 @@ object AiModels {
             descriptionPl = "Bardzo duży model, który w trakcie pracy używa tylko części (3 mld parametrów). Tylko dla komputerów z dużą ilością RAM.",
             descriptionEn = "A very large model that uses only part of itself while working (3 billion parameters). Only for computers with a lot of RAM.",
             pageUrl = "${HF}unsloth/Qwen3.5-35B-A3B-GGUF",
+        )
+
+    val Qwen27b =
+        AiModelInfo(
+            id = QWEN_27B,
+            intelNpu = false,
+            quietThinking = false,
+            name = "Qwen 3.8 27B",
+            family = "Qwen",
+            engine = AiEngine.LLAMA_CPP,
+            roles = TEXT,
+            sizeMb = 16896,
+            ramMb = 20000,
+            minDeviceRamGb = 32,
+            license = AiLicense.APACHE_2_0,
+            files = listOf(hf("unsloth/Qwen3.8-27B-GGUF", "Qwen3.8-27B-UD-Q4_K_M.gguf", 16896)),
+            platforms = DESKTOP,
+            descriptionPl = "Największy i najnowszy Qwen w tej liście. Tylko dla komputerów z dużą ilością RAM lub mocną kartą graficzną.",
+            descriptionEn = "The biggest and newest Qwen in this list. Only for computers with a lot of RAM or a strong graphics card.",
+            pageUrl = "${HF}unsloth/Qwen3.8-27B-GGUF",
         )
 
     val Bielik15b =
@@ -467,7 +496,7 @@ object AiModels {
             id = PLLUM_12B,
             intelNpu = false,
             name = "PLLuM 12B instruct",
-            family = "PLLuM",
+            family = OTHER_FAMILY,
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT,
             sizeMb = 7477,
@@ -479,6 +508,44 @@ object AiModels {
             descriptionPl = "Polski model (polskie ministerstwo cyfryzacji i uczelnie): dobry język urzędowy i ogólny. Plik pochodzi od osoby trzeciej (mradermacher).",
             descriptionEn = "A Polish model (made for the Polish government and universities): good official and general language. The file comes from a third party (mradermacher).",
             pageUrl = "${HF}mradermacher/PLLuM-12B-instruct-2512-GGUF",
+        )
+
+    val GptOss20b =
+        AiModelInfo(
+            id = GPT_OSS_20B,
+            intelNpu = false,
+            name = "gpt-oss 20B",
+            family = OTHER_FAMILY,
+            engine = AiEngine.LLAMA_CPP,
+            roles = TEXT,
+            sizeMb = 12390,
+            ramMb = 14000,
+            minDeviceRamGb = 16,
+            license = AiLicense.APACHE_2_0,
+            files = listOf(hf("ggml-org/gpt-oss-20b-GGUF", "gpt-oss-20b-MXFP4.gguf", 12390)),
+            platforms = DESKTOP,
+            descriptionPl = "Otwarty model od OpenAI. Ciekawostka do własnych testów na komputerze: zajmuje dużo pamięci i długo myśli przed odpowiedzią.",
+            descriptionEn = "An open model from OpenAI. A curiosity for your own tests on a computer: it takes a lot of memory and thinks for a long time before it answers.",
+            pageUrl = "${HF}ggml-org/gpt-oss-20b-GGUF",
+        )
+
+    val Granite8b =
+        AiModelInfo(
+            id = GRANITE_8B,
+            intelNpu = false,
+            name = "Granite 4.2 8B",
+            family = OTHER_FAMILY,
+            engine = AiEngine.LLAMA_CPP,
+            roles = TEXT,
+            sizeMb = 5478,
+            ramMb = 7500,
+            minDeviceRamGb = 12,
+            license = AiLicense.APACHE_2_0,
+            files = listOf(hf("ibm-granite/granite-4.2-8b-GGUF", "granite-4.2-8b-Q4_K_M.gguf", 5478)),
+            platforms = DESKTOP,
+            descriptionPl = "Model od IBM. Ciekawostka do własnych testów na komputerze: słabszy po polsku niż Gemma.",
+            descriptionEn = "A model from IBM. A curiosity for your own tests on a computer: weaker in Polish than Gemma.",
+            pageUrl = "${HF}ibm-granite/granite-4.2-8b-GGUF",
         )
 
     val TranslateGemma4b =
@@ -564,8 +631,9 @@ object AiModels {
         listOf(
             Nllb600,
             G4E2b, G4E4b, G4_12b, G4_26b,
-            Qwen08b, Qwen2b, Qwen4b, Qwen9b, Qwen35b,
-            Bielik15b, Bielik45b, Bielik7b, Bielik11b, Pllum12b,
+            Qwen08b, Qwen2b, Qwen4b, Qwen9b, Qwen35b, Qwen27b,
+            Bielik15b, Bielik45b, Bielik7b, Bielik11b,
+            Pllum12b, GptOss20b, Granite8b,
             TranslateGemma4b, TranslateGemma12b,
             WhisperSmallQ8, WhisperMediumQ8, WhisperTurboQ8,
         )

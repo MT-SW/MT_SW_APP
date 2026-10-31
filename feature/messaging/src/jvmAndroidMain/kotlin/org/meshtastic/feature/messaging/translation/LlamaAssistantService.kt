@@ -1296,7 +1296,7 @@ class LlamaAssistantService(
     }
 
     /** The internet is a fallback only for the stronger models (the Gemma family); the weaker ones are not given web results. */
-    private fun webModel(modelId: String): Boolean = AiModels.byId(modelId)?.name?.startsWith("Gemma 4") == true
+    private fun webModel(modelId: String): Boolean = AiModels.byId(modelId)?.family == "Gemma"
 
     /** Questions about the mesh or the radio are searched with "Meshtastic" in front, so the results are about our subject. */
     private fun webQuery(question: String): String {

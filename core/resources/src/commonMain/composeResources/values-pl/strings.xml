@@ -3438,9 +3438,11 @@
     <string name="ai_model_license_line">Licencja: %1$s</string>
     <string name="ai_model_hearing">Rozumie mowę</string>
     <string name="ai_models_empty">Brak modeli do tej funkcji na tym urządzeniu.</string>
-    <string name="ai_models_advice_assistant">Do asystenta polecamy rodzinę Gemma 4 (E2B, E4B i większe): odpowiada najtrafniej i najlepiej rozumie po polsku. Modele z innych rodzin (Qwen, Bielik) zostają jako dodatek dla słabszych telefonów.</string>
+    <string name="ai_models_advice_assistant">Do asystenta polecamy rodzinę Gemma (E2B, E4B i większe): odpowiada najtrafniej i najlepiej rozumie po polsku. Modele z innych rodzin (Qwen, Bielik) zostają jako dodatek dla słabszych telefonów.</string>
     <string name="ai_models_advice_assistant_warning">Uwaga: nie możemy dać 100% pewności, że odpowiedzi tego modelu są dobre. Radzimy sprawdzać je w innych miejscach. Przy włączonym internecie ten model tylko cytuje wyniki wyszukiwania, bez własnych słów.</string>
     <string name="ai_models_advice_dictation">Do dyktowania polecamy modele Whisper: są dokładne, szybkie i lekkie.</string>
+    <string name="ai_family_other">Pozostałe</string>
+    <string name="ai_models_other_note">Te modele są dodane jako ciekawostki, do własnych testów. Nie polecamy ich do codziennej pracy, a niektóre potrzebują dużo pamięci.</string>
     <string name="ai_models_hint">Nic nie pobiera się samo. Każdy model to osobne pobranie; pierwszy instaluje też mały program silnika. Usunięcie modelu nie usuwa pozostałych.</string>
     <string name="ai_unload_title">Zwolnij pamięć AI</string>
     <string name="ai_unload_none">Żaden model nie jest teraz w pamięci</string>

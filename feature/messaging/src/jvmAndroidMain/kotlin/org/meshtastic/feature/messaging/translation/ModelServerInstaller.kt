@@ -165,11 +165,30 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
                 ?.filter { it.isDigit() }?.toLong()?.div(1024)
         }.getOrNull()
         if (memoryMb != null) appendLine("Memory: $memoryMb MB")
-        append("Snapdragon NPU program: ${if (androidNpuAsset() != null) "available" else "no"}, Intel NPU: ${if (intelNpu) "found" else "no"}")
+        append("Snapdragon NPU program: ${if (androidNpuAsset() != null) "available" else "no"}, Intel NPU: ${if (intelNpu) "found" + intelNpuDriver.takeIf { it.isNotEmpty() }?.let { " (driver $it)" }.orEmpty() else "no"}")
     }
 
-    private fun brokenMark(asset: Asset, key: String?) =
-        File(root, ".broken-" + asset.folder + (key?.let { "-" + it.replace(Regex("[^A-Za-z0-9._-]"), "_") } ?: ""))
+    /**
+     * The version of the Intel NPU driver ("" when not known). A failure of the NPU is remembered together with it, so an
+     * updated driver gets a new try at once instead of waiting for the few days to pass.
+     */
+    val intelNpuDriver: String by lazy {
+        if (!windows) return@lazy ""
+        runCatching {
+            val script = "(Get-PnpDevice -FriendlyName '*AI Boost*' -ErrorAction SilentlyContinue | Select-Object -First 1 | " +
+                "Get-PnpDeviceProperty -KeyName DEVPKEY_Device_DriverVersion -ErrorAction SilentlyContinue).Data"
+            val process = ProcessBuilder("powershell", "-NoProfile", "-NonInteractive", "-Command", script).redirectErrorStream(true).start()
+            val text = process.inputStream.bufferedReader().readText().trim()
+            process.waitFor(DRIVER_QUERY_SECONDS, java.util.concurrent.TimeUnit.SECONDS)
+            text.takeIf { Regex("[0-9]+(\\.[0-9]+)+").matches(it) }.orEmpty()
+        }.getOrDefault("")
+    }
+
+    private fun brokenMark(asset: Asset, key: String?): File {
+        val driver = if (asset.folder.contains("openvino", ignoreCase = true)) intelNpuDriver else ""
+        val tag = (key?.let { "-" + it.replace(Regex("[^A-Za-z0-9._-]"), "_") } ?: "") + (if (driver.isNotEmpty()) "-drv$driver" else "")
+        return File(root, ".broken-" + asset.folder + tag)
+    }
 
     /** True when [asset] (with [key]: only for that model) failed here recently and is skipped for now. */
     fun isBroken(asset: Asset, key: String? = null): Boolean {
@@ -524,6 +543,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
 
         /** Raise when our speech programs were rebuilt under the same file name (see the init block). */
         private const val WHISPER_REVISION = 1
+        private const val DRIVER_QUERY_SECONDS = 10L
         private const val BROKEN_RETRY_MS = 3L * 24L * 60L * 60L * 1000L
         private val QUALCOMM_PLATFORMS = setOf("kalama", "pineapple", "sun", "taro", "lahaina", "kona", "msmnile", "lito", "bengal", "crow", "parrot", "waipio", "cliffs", "canoe")
         private const val LLAMA_MAC_MB = 16

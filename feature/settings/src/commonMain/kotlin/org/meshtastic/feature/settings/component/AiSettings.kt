@@ -60,6 +60,8 @@ import org.meshtastic.core.resources.ai_assistant_summary
 import org.meshtastic.core.resources.ai_assistant_title
 import org.meshtastic.core.resources.ai_assistant_unavailable
 import org.meshtastic.core.resources.ai_dictation_note
+import org.meshtastic.core.resources.ai_family_other
+import org.meshtastic.core.resources.ai_models_other_note
 import org.meshtastic.core.resources.ai_internet_enable
 import org.meshtastic.core.resources.ai_internet_on_indicator
 import org.meshtastic.core.resources.ai_internet_summary
@@ -378,7 +380,8 @@ internal fun AiSettings() {
         SecondaryScrollableTabRow(selectedTabIndex = shownIndex, edgePadding = 0.dp) {
             families.forEachIndexed { index, family ->
                 // A dot marks the family of the model that is in use.
-                val label = if (current?.family == family) "$family •" else family
+                val name = if (family == AiModels.OTHER_FAMILY) stringResource(Res.string.ai_family_other) else family
+                val label = if (current?.family == family) "$name •" else name
                 Tab(selected = shownIndex == index, onClick = { familyIndex = index }, text = { Text(label) })
             }
         }
@@ -388,6 +391,14 @@ internal fun AiSettings() {
             text = stringResource(Res.string.ai_models_advice_assistant_warning),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.error,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+        )
+    }
+    if (families.getOrNull(shownIndex) == AiModels.OTHER_FAMILY) {
+        Text(
+            text = stringResource(Res.string.ai_models_other_note),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
         )
     }

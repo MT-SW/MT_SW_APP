@@ -106,6 +106,7 @@
     <string name="ai_dm_channels">Nobody has written to you privately. The latest messages from others on the channels (newest first):</string>
     <string name="ai_dm_none">Nobody has written to you privately yet.</string>
     <string name="ai_dm_title">Latest private messages to you (newest first):</string>
+    <string name="ai_family_other">Other</string>
     <string name="ai_far_one">The farthest is %1$s (%2$s): %3$s km, heard %4$s.</string>
     <string name="ai_found_n">Found: %1$d (newest first)</string>
     <string name="ai_found_none">No messages found.</string>
@@ -181,11 +182,12 @@
     <string name="ai_model_translate_only_title">Turn off the assistant?</string>
     <string name="ai_model_translator_title">Model used for translation</string>
     <string name="ai_model_use">Use</string>
-    <string name="ai_models_advice_assistant">For the assistant we recommend the Gemma 4 family (E2B, E4B and larger): it answers most accurately and understands Polish best. Models from other families (Qwen, Bielik) stay as an option for weaker phones.</string>
+    <string name="ai_models_advice_assistant">For the assistant we recommend the Gemma family (E2B, E4B and larger): it answers most accurately and understands Polish best. Models from other families (Qwen, Bielik) stay as an option for weaker phones.</string>
     <string name="ai_models_advice_assistant_warning">Note: we cannot guarantee 100% that this model\'s answers are right. We advise checking them elsewhere. With the internet switched on, this model only quotes the search results, in no words of its own.</string>
     <string name="ai_models_advice_dictation">For dictation we recommend the Whisper models: they are accurate, fast and light.</string>
     <string name="ai_models_empty">There are no models for this function on this device.</string>
     <string name="ai_models_hint">Nothing is downloaded by itself. Each model is a separate download; the first one also installs a small engine program. Deleting a model does not remove the others.</string>
+    <string name="ai_models_other_note">These models are added as curiosities, for your own tests. They are not recommended for everyday work, and some need a lot of memory.</string>
     <string name="ai_models_tab_assistant">Assistant</string>
     <string name="ai_models_tab_dictation">Dictation</string>
     <string name="ai_models_tab_translator">Translator</string>
