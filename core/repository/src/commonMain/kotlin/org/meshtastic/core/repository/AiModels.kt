@@ -141,7 +141,7 @@ object AiModels {
     const val QWEN_2B = "qwen35-2b-q4"
     const val QWEN_4B = "qwen35-4b-q4"
     const val QWEN_9B = "qwen35-9b-q4"
-    const val QWEN_35B = "qwen35-35b-a3b-q4"
+    const val QWEN_35B = "qwen36-35b-a3b-q4"
     const val BIELIK_15B = "bielik-1_5b-q8"
     const val BIELIK_45B = "bielik-4_5b-q8"
     const val BIELIK_7B = "bielik-minitron-7b-q4"
@@ -150,6 +150,9 @@ object AiModels {
     const val QWEN_27B = "qwen38-27b-q4"
     const val GPT_OSS_20B = "gpt-oss-20b-mxfp4"
     const val GRANITE_8B = "granite42-8b-q4"
+    const val PHI_MINI = "phi4-mini-q4"
+    const val DEEPSEEK_8B = "deepseek-r1-qwen3-8b-q4"
+    const val MISTRAL_24B = "mistral-small32-24b-q4"
     const val TG_4B = "translategemma-4b-q4"
     const val TG_12B = "translategemma-12b-q4"
     const val WHISPER_SMALL_Q8 = "whisper-small-q8"
@@ -371,24 +374,24 @@ object AiModels {
             pageUrl = "${HF}unsloth/Qwen3.5-9B-GGUF",
         )
 
-    val Qwen35b =
+    val QwenMoe =
         AiModelInfo(
             id = QWEN_35B,
             intelNpu = false,
             quietThinking = false,
-            name = "Qwen 3.5 35B A3B",
+            name = "Qwen 3.6 35B A3B",
             family = "Qwen",
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT,
-            sizeMb = 22016,
+            sizeMb = 22630,
             ramMb = 25000,
             minDeviceRamGb = 32,
             license = AiLicense.APACHE_2_0,
-            files = listOf(hf("unsloth/Qwen3.5-35B-A3B-GGUF", "Qwen3.5-35B-A3B-Q4_K_M.gguf", 22016)),
+            files = listOf(hf("unsloth/Qwen3.6-35B-A3B-GGUF", "Qwen3.6-35B-A3B-UD-Q4_K_M.gguf", 22630)),
             platforms = BOTH,
             descriptionPl = "Bardzo duży model, który w trakcie pracy używa tylko części (3 mld parametrów). Tylko dla komputerów z dużą ilością RAM.",
             descriptionEn = "A very large model that uses only part of itself while working (3 billion parameters). Only for computers with a lot of RAM.",
-            pageUrl = "${HF}unsloth/Qwen3.5-35B-A3B-GGUF",
+            pageUrl = "${HF}unsloth/Qwen3.6-35B-A3B-GGUF",
         )
 
     val Qwen27b =
@@ -548,6 +551,62 @@ object AiModels {
             pageUrl = "${HF}ibm-granite/granite-4.2-8b-GGUF",
         )
 
+    val PhiMini =
+        AiModelInfo(
+            id = PHI_MINI,
+            name = "Phi-4 mini",
+            family = OTHER_FAMILY,
+            engine = AiEngine.LLAMA_CPP,
+            roles = TEXT,
+            sizeMb = 2550,
+            ramMb = 3500,
+            minDeviceRamGb = 6,
+            license = AiLicense.MIT,
+            files = listOf(hf("unsloth/Phi-4-mini-instruct-GGUF", "Phi-4-mini-instruct-Q4_K_M.gguf", 2550)),
+            platforms = DESKTOP,
+            descriptionPl = "Mały model od Microsoftu. Ciekawostka do własnych testów na komputerze: szybki, ale słaby po polsku.",
+            descriptionEn = "A small model from Microsoft. A curiosity for your own tests on a computer: fast, but weak in Polish.",
+            pageUrl = "${HF}unsloth/Phi-4-mini-instruct-GGUF",
+        )
+
+    val DeepSeek8b =
+        AiModelInfo(
+            id = DEEPSEEK_8B,
+            intelNpu = false,
+            name = "DeepSeek R1 Qwen3 8B",
+            family = OTHER_FAMILY,
+            engine = AiEngine.LLAMA_CPP,
+            roles = TEXT,
+            sizeMb = 5150,
+            ramMb = 7000,
+            minDeviceRamGb = 12,
+            license = AiLicense.MIT,
+            files = listOf(hf("unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF", "DeepSeek-R1-0528-Qwen3-8B-Q4_K_M.gguf", 5150)),
+            platforms = DESKTOP,
+            descriptionPl = "Model „myślący” od DeepSeek. Ciekawostka do własnych testów na komputerze: przed odpowiedzią długo myśli.",
+            descriptionEn = "A \"thinking\" model from DeepSeek. A curiosity for your own tests on a computer: it thinks for a long time before it answers.",
+            pageUrl = "${HF}unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF",
+        )
+
+    val Mistral24b =
+        AiModelInfo(
+            id = MISTRAL_24B,
+            intelNpu = false,
+            name = "Mistral Small 3.2 24B",
+            family = OTHER_FAMILY,
+            engine = AiEngine.LLAMA_CPP,
+            roles = TEXT,
+            sizeMb = 14643,
+            ramMb = 17500,
+            minDeviceRamGb = 24,
+            license = AiLicense.APACHE_2_0,
+            files = listOf(hf("unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF", "Mistral-Small-3.2-24B-Instruct-2506-Q4_K_M.gguf", 14643)),
+            platforms = DESKTOP,
+            descriptionPl = "Duży model od Mistral AI. Ciekawostka do własnych testów na mocnym komputerze.",
+            descriptionEn = "A large model from Mistral AI. A curiosity for your own tests on a strong computer.",
+            pageUrl = "${HF}unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF",
+        )
+
     val TranslateGemma4b =
         AiModelInfo(
             id = TG_4B,
@@ -631,9 +690,9 @@ object AiModels {
         listOf(
             Nllb600,
             G4E2b, G4E4b, G4_12b, G4_26b,
-            Qwen08b, Qwen2b, Qwen4b, Qwen9b, Qwen35b, Qwen27b,
+            Qwen08b, Qwen2b, Qwen4b, Qwen9b, QwenMoe, Qwen27b,
             Bielik15b, Bielik45b, Bielik7b, Bielik11b,
-            Pllum12b, GptOss20b, Granite8b,
+            Pllum12b, GptOss20b, Granite8b, PhiMini, DeepSeek8b, Mistral24b,
             TranslateGemma4b, TranslateGemma12b,
             WhisperSmallQ8, WhisperMediumQ8, WhisperTurboQ8,
         )
@@ -651,6 +710,12 @@ object AiModels {
     fun byId(id: String?): AiModelInfo? = all.firstOrNull { it.id == id }
 
     /** Ids of the models of the old engine (Google LiteRT-LM); their files are removed once, when the app first starts with the new engine. */
+    /**
+     * Ids of models that a newer one has replaced (same place in the list). Their files are removed at every start of the
+     * app, so nobody keeps tens of gigabytes of a model the list no longer offers.
+     */
+    val retiredModelIds: List<String> = listOf("qwen35-35b-a3b-q4")
+
     val legacyModelIds: List<String> = listOf("gemma4-e2b", "gemma4-e4b", "gemma4-12b")
 }
 

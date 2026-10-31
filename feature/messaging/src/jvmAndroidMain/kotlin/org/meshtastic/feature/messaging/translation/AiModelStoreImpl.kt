@@ -135,6 +135,7 @@ class AiModelStoreImpl(
     init {
         scope.launch(Dispatchers.IO) {
             cleanLegacyOnce()
+            cleanRetiredModels()
             cleanReplacedFiles()
         }
     }
@@ -168,6 +169,17 @@ class AiModelStoreImpl(
      * engine. Only files the app itself downloaded into its own model folder are touched, and never again afterwards,
      * so a model the user downloads later is never removed by this.
      */
+    /** Removes the files of models that a newer one replaced (see [AiModels.retiredModelIds]); nothing happens when there are none. */
+    private fun cleanRetiredModels() {
+        runCatching {
+            AiModels.retiredModelIds.map { File(ggufDir, it) }.filter { it.exists() }.forEach { dir ->
+                val mb = (dir.walkTopDown().filter { it.isFile }.sumOf { it.length() } / MB).toInt()
+                dir.deleteRecursively()
+                Logger.i(tag = TAG) { "Removed a model that a newer one replaced: ${dir.name} ($mb MB)" }
+            }
+        }.onFailure { Logger.w(tag = TAG, throwable = it) { "Removing replaced models failed: ${it.message}" } }
+    }
+
     private fun cleanLegacyOnce() {
         val marker = File(ggufDir.parentFile ?: return, LEGACY_MARKER)
         if (marker.exists()) return
