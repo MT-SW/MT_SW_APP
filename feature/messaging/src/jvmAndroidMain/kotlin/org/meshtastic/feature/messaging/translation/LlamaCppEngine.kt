@@ -169,9 +169,31 @@ class LlamaCppEngine(
                 note("not enough memory on the chip", "za mało pamięci w układzie")
             text.contains("device lost", ignoreCase = true) || text.contains("VK_ERROR", ignoreCase = true) ->
                 note("the graphics driver reported an error", "sterownik karty graficznej zgłosił błąd")
-            else -> note("the chip did not work with this model", "układ nie zadziałał z tym modelem")
+            exitReason(text) != null -> exitReason(text)!!
+            else -> note("the chip did not work with this model", "układ nie zadziałał z tym modelem") + lastErrorLine(text)?.let { " [$it]" }.orEmpty()
         }
     }
+
+    /** What the exit code of a program that stopped on its own means (on Android a signal shows as 128 plus its number). */
+    private fun exitReason(text: String): String? {
+        val code = EXIT_CODE.find(text)?.groupValues?.get(1)?.toIntOrNull() ?: return null
+        val why =
+            when (code) {
+                126 -> note("the file cannot be run (no permission or wrong kind of file)", "pliku nie można uruchomić (brak uprawnienia lub zły rodzaj pliku)")
+                127 -> note("a file or a library that the program needs was not found", "nie znaleziono pliku lub biblioteki, której program potrzebuje")
+                132 -> note("the processor does not know an instruction the program uses", "procesor nie zna instrukcji, której używa program")
+                134 -> note("the program aborted itself (SIGABRT)", "program sam się przerwał (SIGABRT)")
+                135 -> note("the program read memory wrongly (SIGBUS)", "program błędnie odczytał pamięć (SIGBUS)")
+                139 -> note("the program crashed (SIGSEGV)", "program się wysypał (SIGSEGV)")
+                159 -> note("the system forbade a call the program made (SIGSYS, seccomp)", "system zabronił wywołania, którego użył program (SIGSYS, seccomp)")
+                else -> note("the program stopped with exit code $code", "program zakończył się z kodem $code")
+            }
+        return why + lastErrorLine(text)?.let { " [$it]" }.orEmpty()
+    }
+
+    /** The last line of the program's log that looks like an error, shortened; null when there is none. */
+    private fun lastErrorLine(text: String): String? =
+        text.lineSequence().map { it.trim() }.lastOrNull { ERROR_LINE.containsMatchIn(it) }?.take(ERROR_LINE_SHOWN)
 
     /** Forgets the remembered failed attempts (NPU, graphics card), so the next start tries them again. */
     fun clearFailedAttempts() {
@@ -776,6 +798,9 @@ class LlamaCppEngine(
         const val TAG = "LlamaCppEngine"
         const val PID_FILE = "llama-server.pid"
         const val LAST_START_FILE = "last-start.txt"
+        const val ERROR_LINE_SHOWN = 170
+        val EXIT_CODE = Regex("exit code (-?\\d+)")
+        val ERROR_LINE = Regex("error|fail|cannot|can't|denied|abort|not found|unsupported|signal|dlopen|CANNOT LINK|refused", RegexOption.IGNORE_CASE)
         const val LAST_START_SEPARATOR = "\n=====\n"
         const val USER = "user"
         const val DONE = "[DONE]"
