@@ -278,7 +278,8 @@ internal fun AiSettings() {
         )
     }
 
-    if (hiddenOn) {
+    // Shown when this device has an NPU that our engine can use (or when the hidden settings are unlocked); otherwise hidden.
+    if (store.npuAvailable || hiddenOn) {
         SwitchPreference(
             title = stringResource(Res.string.ai_skip_npu_title),
             summary = stringResource(Res.string.ai_skip_npu_summary),

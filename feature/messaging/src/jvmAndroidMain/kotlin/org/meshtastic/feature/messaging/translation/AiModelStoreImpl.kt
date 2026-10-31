@@ -56,6 +56,9 @@ interface AiEngineInstaller {
     /** True when this installer provides the program for [engine]. */
     fun handles(engine: AiEngine): Boolean
 
+    /** True when this device has an NPU that the engine programs can use. */
+    val npuSupported: Boolean get() = false
+
     /** Size of the download in megabytes while [engine] is not installed yet, 0 when it is ready. */
     fun missingMb(engine: AiEngine): Int
 
@@ -79,6 +82,8 @@ class AiModelStoreImpl(
     private val storageState = MutableStateFlow(storageInfoNow())
     private val storageMoveState = MutableStateFlow<AiStorageMove>(AiStorageMove.Idle)
     private val askFolderState = MutableStateFlow(location?.needsFirstQuestion() == true)
+
+    override val npuAvailable: Boolean get() = installer?.npuSupported == true
 
     override val storage: StateFlow<AiStorageInfo?> = storageState
     override val storageMove: StateFlow<AiStorageMove> = storageMoveState

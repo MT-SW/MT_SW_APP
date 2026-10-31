@@ -222,6 +222,8 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
      */
     val intelNpu: Boolean by lazy { !android && !mac && !arm && isCoreUltra() }
 
+    override val npuSupported: Boolean get() = intelNpu || androidNpuAsset() != null
+
     private fun cpuName(): String = runCatching {
         if (windows) {
             ProcessBuilder("reg", "query", "HKLM\\HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0", "/v", "ProcessorNameString")
