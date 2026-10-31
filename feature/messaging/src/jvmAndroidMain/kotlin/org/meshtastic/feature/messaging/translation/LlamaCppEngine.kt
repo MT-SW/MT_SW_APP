@@ -100,6 +100,13 @@ class LlamaCppEngine(
     /** The notes about the last start are written in Polish on a Polish system, otherwise in English. */
     private fun note(en: String, pl: String): String = if (java.util.Locale.getDefault().language == "pl") pl else en
 
+    /** The name of a way to start the model, in Polish on a Polish system (it is shown in the `/sprzet` report). */
+    private fun nameFor(name: String): String =
+        if (java.util.Locale.getDefault().language != "pl") name
+        else name.replace("processor only", "tylko procesor").replace("processor program", "program na procesor")
+            .replace("graphics card full and processor", "karta graficzna pełna i procesor").replace("(automatic split)", "(automatyczny podział)")
+            .replace(", and processor", " i procesor").replace(" and processor", " i procesor").replace("graphics card", "karta graficzna").replace("window ", "okno ")
+
     /** A short reason taken from the program's log, for the report (the whole log stays in the log file). */
     private fun reasonFrom(log: String): String {
         val text = log.takeLast(REPORT_TAIL * 4)
@@ -507,7 +514,7 @@ class LlamaCppEngine(
                 attempt.program
                     ?: attempt.asset?.let { if (attempt.requireGpu) installer.installGpu(it) else runCatching { installer.install(it) }.getOrNull() }
             if (program == null) {
-                tried.append("- ${attempt.name}: " + note("the program could not be downloaded", "nie udało się pobrać programu") + " (${installer.lastInstallError.take(REPORT_TAIL)})\n")
+                tried.append("- ${nameFor(attempt.name)}: " + note("the program could not be downloaded", "nie udało się pobrać programu") + " (${installer.lastInstallError.take(REPORT_TAIL)})\n")
                 startReport = tried.toString()
                 continue
             }
@@ -548,7 +555,7 @@ class LlamaCppEngine(
                     intelNpuRejected = true
                     attempt.asset?.let { asset -> listOf("", BIG_NPU_SUFFIX, MID_NPU_SUFFIX).forEach { installer.markBroken(asset, modelId + it) } }
                 }
-                tried.append("- ${attempt.name}: " + note("failed", "nie uruchomiło się") + ": ${reasonFrom(failLog)}" + (if (attempt.npu == "Intel") " [${e.message.orEmpty().take(NPU_ERROR_SHOWN)}]" else "") + "\n")
+                tried.append("- ${nameFor(attempt.name)}: " + note("failed", "nie uruchomiło się") + ": ${reasonFrom(failLog)}" + (if (attempt.npu == "Intel") " [${e.message.orEmpty().take(NPU_ERROR_SHOWN)}]" else "") + "\n")
                 startReport = tried.toString()
                 Logger.w(tag = TAG, throwable = e) { "${attempt.name} did not start: ${e.message}\n${started.logTail().takeLast(MAX_TAIL)}" }
                 started.stop()
@@ -559,7 +566,7 @@ class LlamaCppEngine(
             }
             if (attempt.requireGpu && !gpuTookPart()) {
                 // The program started, but the chip did nothing (no driver, no support): not worth keeping here.
-                tried.append("- ${attempt.name}: " + note("started, but the chip was not used", "uruchomiło się, ale układ nie został użyty") + ": ${reasonFrom(started.logTail())}\n")
+                tried.append("- ${nameFor(attempt.name)}: " + note("started, but the chip was not used", "uruchomiło się, ale układ nie został użyty") + ": ${reasonFrom(started.logTail())}\n")
                 startReport = tried.toString()
                 Logger.w(tag = TAG) { "${attempt.name}: the chip was not used\n${started.logTail().takeLast(MAX_TAIL)}" }
                 giveUp()
@@ -569,7 +576,7 @@ class LlamaCppEngine(
             if (attempt.requireGpu && !answersSanely(started, modelId)) {
                 // A chip can load the model and still crash while answering or write nonsense ("##", seen with OpenCL on
                 // an Adreno): this chip is not used for this model.
-                tried.append("- ${attempt.name}: " + note("started, but the test question was not answered properly, so this chip is not used for this model", "uruchomiło się, ale pytanie testowe nie dostało sensownej odpowiedzi, więc ten układ nie jest używany z tym modelem") + "\n")
+                tried.append("- ${nameFor(attempt.name)}: " + note("started, but the test question was not answered properly, so this chip is not used for this model", "uruchomiło się, ale pytanie testowe nie dostało sensownej odpowiedzi, więc ten układ nie jest używany z tym modelem") + "\n")
                 startReport = tried.toString()
                 Logger.w(tag = TAG) { "${attempt.name}: a test question was answered with nonsense" }
                 giveUp()
@@ -581,7 +588,7 @@ class LlamaCppEngine(
             loadedHearing = hearing
             loadedWindow = attemptWindow
             activeBackend = describeBackend(attempt)
-            tried.append("- ${attempt.name}: " + note("works", "działa") + "\n")
+            tried.append("- ${nameFor(attempt.name)}: " + note("works", "działa") + "\n")
             startReport = tried.toString()
             store.reportLoaded(TAG, modelId)
             Logger.i(tag = TAG) { "Model ${model.name} runs: $activeBackend" }

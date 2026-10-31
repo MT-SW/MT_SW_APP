@@ -154,18 +154,26 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
     fun deviceSummary(): String = buildString {
         if (android) {
             val soc = listOf(systemProperty("ro.soc.manufacturer"), systemProperty("ro.soc.model")).filter { it.isNotBlank() }.joinToString(" ")
-            appendLine("Device: ${systemProperty("ro.product.manufacturer")} ${systemProperty("ro.product.model")}, Android ${systemProperty("ro.build.version.release")} (API ${systemProperty("ro.build.version.sdk")})")
-            appendLine("Chip: ${soc.ifBlank { "?" }}, platform ${systemProperty("ro.board.platform").ifBlank { "?" }}, hardware ${systemProperty("ro.hardware").ifBlank { "?" }}")
-            appendLine("Graphics driver: vulkan=${systemProperty("ro.hardware.vulkan").ifBlank { "?" }}, egl=${systemProperty("ro.hardware.egl").ifBlank { "?" }}, Vulkan level ${systemProperty("ro.hardware.vulkan.level").ifBlank { "?" }}")
+            appendLine(tr("Device", "Urządzenie") + ": ${systemProperty("ro.product.manufacturer")} ${systemProperty("ro.product.model")}, Android ${systemProperty("ro.build.version.release")} (API ${systemProperty("ro.build.version.sdk")})")
+            appendLine(tr("Chip", "Układ") + ": ${soc.ifBlank { "?" }}, " + tr("platform", "platforma") + " ${systemProperty("ro.board.platform").ifBlank { "?" }}, " + tr("hardware", "sprzęt") + " ${systemProperty("ro.hardware").ifBlank { "?" }}")
+            appendLine(tr("Graphics driver", "Sterownik grafiki") + ": vulkan=${systemProperty("ro.hardware.vulkan").ifBlank { "?" }}, egl=${systemProperty("ro.hardware.egl").ifBlank { "?" }}, " + tr("Vulkan level", "poziom Vulkan") + " ${systemProperty("ro.hardware.vulkan.level").ifBlank { "?" }}")
         } else {
-            appendLine("Computer: ${System.getProperty("os.name")} $arch, processor: ${cpuName().ifBlank { "?" }}")
+            appendLine(tr("Computer", "Komputer") + ": ${System.getProperty("os.name")} $arch, " + tr("processor", "procesor") + ": ${cpuName().ifBlank { "?" }}")
         }
         val memoryMb = runCatching {
             File("/proc/meminfo").takeIf { it.isFile }?.readLines()?.firstOrNull { it.startsWith("MemTotal") }
                 ?.filter { it.isDigit() }?.toLong()?.div(1024)
         }.getOrNull()
-        if (memoryMb != null) appendLine("Memory: $memoryMb MB")
-        append("Snapdragon NPU program: ${if (androidNpuAsset() != null) "available" else "no"}, Intel NPU: ${if (intelNpu) "found" + intelNpuDriver.takeIf { it.isNotEmpty() }?.let { " (driver $it)" }.orEmpty() else "no"}")
+        if (memoryMb != null) appendLine(tr("Memory", "Pamięć") + ": $memoryMb MB")
+        append(
+            tr("Snapdragon NPU program", "Program NPU Snapdragona") + ": " + (if (androidNpuAsset() != null) tr("available", "jest") else tr("no", "brak")) + ", " +
+                tr("Intel NPU", "NPU Intela") + ": " +
+                if (intelNpu) {
+                    tr("found", "znaleziono") + intelNpuDriver.takeIf { it.isNotEmpty() }?.let { " (" + tr("driver", "sterownik") + " $it)" }.orEmpty()
+                } else {
+                    tr("no", "brak")
+                },
+        )
     }
 
     /**
@@ -183,6 +191,8 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
             text.takeIf { Regex("[0-9]+(\\.[0-9]+)+").matches(it) }.orEmpty()
         }.getOrDefault("")
     }
+
+    private fun tr(en: String, pl: String): String = if (java.util.Locale.getDefault().language == "pl") pl else en
 
     private fun brokenMark(asset: Asset, key: String?): File {
         val driver = if (asset.folder.contains("openvino", ignoreCase = true)) intelNpuDriver else ""
