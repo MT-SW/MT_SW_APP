@@ -179,7 +179,6 @@ object AiModels {
     private const val HF = "https://huggingface.co/"
 
     private val BOTH = setOf(AiPlatform.ANDROID, AiPlatform.DESKTOP)
-    private val DESKTOP = setOf(AiPlatform.DESKTOP)
     private val TEXT = setOf(AiRole.TRANSLATOR, AiRole.ASSISTANT)
 
     private fun hf(repo: String, name: String, mb: Int, kind: AiFileKind = AiFileKind.MODEL) =
@@ -410,9 +409,9 @@ object AiModels {
             minDeviceRamGb = 32,
             license = AiLicense.APACHE_2_0,
             files = listOf(hf("unsloth/Qwen3.8-27B-GGUF", "Qwen3.8-27B-UD-Q4_K_M.gguf", 16896)),
-            platforms = DESKTOP,
-            descriptionPl = "Największy i najnowszy Qwen w tej liście. Tylko dla komputerów z dużą ilością RAM lub mocną kartą graficzną.",
-            descriptionEn = "The biggest and newest Qwen in this list. Only for computers with a lot of RAM or a strong graphics card.",
+            platforms = BOTH,
+            descriptionPl = "Największy i najnowszy Qwen w tej liście. Wymaga dużo pamięci (około 20 GB).",
+            descriptionEn = "The biggest and newest Qwen in this list. Needs a lot of memory (about 20 GB).",
             pageUrl = "${HF}unsloth/Qwen3.8-27B-GGUF",
         )
 
@@ -528,9 +527,9 @@ object AiModels {
             minDeviceRamGb = 16,
             license = AiLicense.APACHE_2_0,
             files = listOf(hf("ggml-org/gpt-oss-20b-GGUF", "gpt-oss-20b-MXFP4.gguf", 12390)),
-            platforms = DESKTOP,
-            descriptionPl = "Otwarty model od OpenAI. Ciekawostka do własnych testów na komputerze: zajmuje dużo pamięci i długo myśli przed odpowiedzią.",
-            descriptionEn = "An open model from OpenAI. A curiosity for your own tests on a computer: it takes a lot of memory and thinks for a long time before it answers.",
+            platforms = BOTH,
+            descriptionPl = "Otwarty model od OpenAI. Ciekawostka do własnych testów: zajmuje dużo pamięci i długo myśli przed odpowiedzią.",
+            descriptionEn = "An open model from OpenAI. A curiosity for your own tests: it takes a lot of memory and thinks for a long time before it answers.",
             pageUrl = "${HF}ggml-org/gpt-oss-20b-GGUF",
         )
 
@@ -603,9 +602,9 @@ object AiModels {
             minDeviceRamGb = 24,
             license = AiLicense.APACHE_2_0,
             files = listOf(hf("unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF", "Mistral-Small-3.2-24B-Instruct-2506-Q4_0.gguf", 13824)),
-            platforms = DESKTOP,
-            descriptionPl = "Duży model od Mistral AI. Ciekawostka do własnych testów na mocnym komputerze.",
-            descriptionEn = "A large model from Mistral AI. A curiosity for your own tests on a strong computer.",
+            platforms = BOTH,
+            descriptionPl = "Duży model od Mistral AI. Ciekawostka do własnych testów: wymaga dużo pamięci.",
+            descriptionEn = "A large model from Mistral AI. A curiosity for your own tests: needs a lot of memory.",
             pageUrl = "${HF}unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF",
         )
 
