@@ -209,6 +209,7 @@ object AiModels {
 
     val G4E2b =
         AiModelInfo(
+            intelNpu = false,
             id = G4_E2B,
             name = "Gemma 4 E2B",
             recommendedFor = setOf(AiRole.ASSISTANT),

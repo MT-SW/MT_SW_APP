@@ -148,14 +148,11 @@ class LlamaCppEngine(
     private fun note(en: String, pl: String): String = if (java.util.Locale.getDefault().language == "pl") pl else en
 
     /**
-     * Settings of the OpenVINO program for the Intel NPU. The compiled model is kept in a folder of its own (per model): the
-     * first compilation of a big model takes minutes, and without a folder it started over at every start and never finished.
+     * Settings of the OpenVINO program for the Intel NPU. No cache folder is given on purpose: with GGML_OPENVINO_CACHE_DIR the
+     * NPU plugin wants a "weights separation" flow that this engine does not provide, and every start failed with
+     * "No WeightlessCacheAttribute has been found" (seen on a Core Ultra, 2026-10-31). So the model is compiled at every start.
      */
-    private fun intelNpuEnv(modelId: String): Map<String, String> =
-        mapOf("GGML_OPENVINO_DEVICE" to "NPU", "GGML_OPENVINO_CACHE_DIR" to installer.cacheDir("openvino-$modelId").absolutePath)
-
-    /** True when the compiled model of [modelId] is not on disk yet, so the NPU has to compile it (slow, once). */
-    private fun intelNpuColdStart(modelId: String): Boolean = installer.cacheDir("openvino-$modelId").listFiles().isNullOrEmpty()
+    private fun intelNpuEnv(): Map<String, String> = mapOf("GGML_OPENVINO_DEVICE" to "NPU")
 
     /** The name of a way to start the model, in Polish on a Polish system (it is shown in the `/sprzet` report). */
     private fun nameFor(name: String): String =
@@ -522,7 +519,7 @@ class LlamaCppEngine(
                         Attempt(
                             "NPU (Intel), window $INTEL_NPU_BIG_WINDOW, and processor", null, listOf("--swa-full"), asset, requireGpu = true, npu = "Intel",
                             perModel = true, markSuffix = BIG_NPU_SUFFIX, window = INTEL_NPU_BIG_WINDOW,
-                            env = intelNpuEnv(modelId),
+                            env = intelNpuEnv(),
                         ),
                     )
                 }
@@ -532,7 +529,7 @@ class LlamaCppEngine(
                         Attempt(
                             "NPU (Intel), window $INTEL_NPU_MID_WINDOW, and processor", null, listOf("--swa-full"), asset, requireGpu = true, npu = "Intel",
                             perModel = true, markSuffix = MID_NPU_SUFFIX, window = INTEL_NPU_MID_WINDOW,
-                            env = intelNpuEnv(modelId),
+                            env = intelNpuEnv(),
                         ),
                     )
                 }
@@ -543,7 +540,7 @@ class LlamaCppEngine(
                         Attempt(
                             "NPU (Intel), window $INTEL_NPU_WINDOW, and processor", null, emptyList(), asset, requireGpu = true, npu = "Intel", perModel = true,
                             window = INTEL_NPU_WINDOW,
-                            env = intelNpuEnv(modelId),
+                            env = intelNpuEnv(),
                         ),
                     )
                 }
@@ -599,9 +596,10 @@ class LlamaCppEngine(
             }
             val attemptWindow = attempt.window ?: window
             Logger.i(tag = TAG) { "Starting ${model.name}: ${attempt.name} (context $attemptWindow tokens, hearing $hearing)" }
-            if (attempt.npu == "Intel" && intelNpuColdStart(modelId)) {
-                Logger.i(tag = TAG) { "The Intel NPU compiles ${model.name} for the first time: this can take up to ${INTEL_NPU_COMPILE_TIMEOUT_MS / 60_000} minutes; the next starts use the saved result" }
+            if (attempt.npu == "Intel") {
+                Logger.i(tag = TAG) { "The Intel NPU compiles ${model.name} at every start: this can take up to ${INTEL_NPU_COMPILE_TIMEOUT_MS / 60_000} minutes" }
             }
+            val startedAt = System.currentTimeMillis()
             val noThinking = if (model.quietThinking) emptyList() else listOf("--reasoning-budget", "0")
             val started = startServer(program, file, hearingFile, attemptWindow, attempt.extra + noThinking, attempt)
             // A chip that fails is not tried again for a while (an NPU only for this model: another may fit).
@@ -612,7 +610,7 @@ class LlamaCppEngine(
                 started.awaitReady(
                     "/health",
                     when {
-                        attempt.npu == "Intel" && intelNpuColdStart(modelId) -> INTEL_NPU_COMPILE_TIMEOUT_MS
+                        attempt.npu == "Intel" -> INTEL_NPU_COMPILE_TIMEOUT_MS
                         attempt.requireGpu -> CHIP_LOAD_TIMEOUT_MS
                         else -> LOAD_TIMEOUT_MS
                     },
@@ -675,7 +673,7 @@ class LlamaCppEngine(
             loadedHearing = hearing
             loadedWindow = attemptWindow
             activeBackend = describeBackend(attempt)
-            tried.append("- ${nameFor(attempt.name)}: " + note("works", "działa") + "\n")
+            tried.append("- ${nameFor(attempt.name)}: " + note("works", "działa") + " (" + note("start took", "start trwał") + " ${(System.currentTimeMillis() - startedAt) / 1000} s)\n")
             startReport = tried.toString()
             store.reportLoaded(TAG, modelId)
             Logger.i(tag = TAG) { "Model ${model.name} runs: $activeBackend" }
@@ -856,7 +854,7 @@ class LlamaCppEngine(
         const val NPU_TAIL_LINES = 4
         const val NPU_TAIL_WIDTH = 140
 
-        /** The first compilation of a big model on the Intel NPU takes minutes (it is then saved on disk), so that wait is much longer. */
+        /** The Intel NPU compiles the model at every start (no usable cache), which takes minutes for a big model, so that wait is much longer. */
         const val INTEL_NPU_COMPILE_TIMEOUT_MS = 20 * 60 * 1000L
 
         /** Lines with which the OpenVINO program reports an error that stops the start. */
