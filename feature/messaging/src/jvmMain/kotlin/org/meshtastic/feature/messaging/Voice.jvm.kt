@@ -138,7 +138,14 @@ private class DesktopMic(private val useHeadset: () -> Boolean) {
                 }
             }
         }
-        return javax.sound.sampled.AudioSystem.getTargetDataLine(format)
+        return try {
+            javax.sound.sampled.AudioSystem.getTargetDataLine(format)
+        } catch (e: IllegalArgumentException) {
+            // For the log: which sound inputs the system offers (none = no microphone connected or all are in use).
+            val names = javax.sound.sampled.AudioSystem.getMixerInfo().joinToString("; ") { it.name }.ifBlank { "none" }
+            Logger.w(tag = "DesktopMic") { "No microphone line for 16 kHz mono. Sound devices seen by Java: $names" }
+            throw e
+        }
     }
 
     private companion object {

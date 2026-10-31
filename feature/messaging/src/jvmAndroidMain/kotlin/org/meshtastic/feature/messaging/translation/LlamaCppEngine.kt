@@ -147,6 +147,16 @@ class LlamaCppEngine(
     /** The notes about the last start are written in Polish on a Polish system, otherwise in English. */
     private fun note(en: String, pl: String): String = if (java.util.Locale.getDefault().language == "pl") pl else en
 
+    /**
+     * Settings of the OpenVINO program for the Intel NPU. The compiled model is kept in a folder of its own (per model): the
+     * first compilation of a big model takes minutes, and without a folder it started over at every start and never finished.
+     */
+    private fun intelNpuEnv(modelId: String): Map<String, String> =
+        mapOf("GGML_OPENVINO_DEVICE" to "NPU", "GGML_OPENVINO_CACHE_DIR" to installer.cacheDir("openvino-$modelId").absolutePath)
+
+    /** True when the compiled model of [modelId] is not on disk yet, so the NPU has to compile it (slow, once). */
+    private fun intelNpuColdStart(modelId: String): Boolean = installer.cacheDir("openvino-$modelId").listFiles().isNullOrEmpty()
+
     /** The name of a way to start the model, in Polish on a Polish system (it is shown in the `/sprzet` report). */
     private fun nameFor(name: String): String =
         if (java.util.Locale.getDefault().language != "pl") name
@@ -512,7 +522,7 @@ class LlamaCppEngine(
                         Attempt(
                             "NPU (Intel), window $INTEL_NPU_BIG_WINDOW, and processor", null, listOf("--swa-full"), asset, requireGpu = true, npu = "Intel",
                             perModel = true, markSuffix = BIG_NPU_SUFFIX, window = INTEL_NPU_BIG_WINDOW,
-                            env = mapOf("GGML_OPENVINO_DEVICE" to "NPU"),
+                            env = intelNpuEnv(modelId),
                         ),
                     )
                 }
@@ -522,7 +532,7 @@ class LlamaCppEngine(
                         Attempt(
                             "NPU (Intel), window $INTEL_NPU_MID_WINDOW, and processor", null, listOf("--swa-full"), asset, requireGpu = true, npu = "Intel",
                             perModel = true, markSuffix = MID_NPU_SUFFIX, window = INTEL_NPU_MID_WINDOW,
-                            env = mapOf("GGML_OPENVINO_DEVICE" to "NPU"),
+                            env = intelNpuEnv(modelId),
                         ),
                     )
                 }
@@ -533,7 +543,7 @@ class LlamaCppEngine(
                         Attempt(
                             "NPU (Intel), window $INTEL_NPU_WINDOW, and processor", null, emptyList(), asset, requireGpu = true, npu = "Intel", perModel = true,
                             window = INTEL_NPU_WINDOW,
-                            env = mapOf("GGML_OPENVINO_DEVICE" to "NPU"),
+                            env = intelNpuEnv(modelId),
                         ),
                     )
                 }
@@ -589,6 +599,9 @@ class LlamaCppEngine(
             }
             val attemptWindow = attempt.window ?: window
             Logger.i(tag = TAG) { "Starting ${model.name}: ${attempt.name} (context $attemptWindow tokens, hearing $hearing)" }
+            if (attempt.npu == "Intel" && intelNpuColdStart(modelId)) {
+                Logger.i(tag = TAG) { "The Intel NPU compiles ${model.name} for the first time: this can take up to ${INTEL_NPU_COMPILE_TIMEOUT_MS / 60_000} minutes; the next starts use the saved result" }
+            }
             val noThinking = if (model.quietThinking) emptyList() else listOf("--reasoning-budget", "0")
             val started = startServer(program, file, hearingFile, attemptWindow, attempt.extra + noThinking, attempt)
             // A chip that fails is not tried again for a while (an NPU only for this model: another may fit).
@@ -597,7 +610,12 @@ class LlamaCppEngine(
             }
             try {
                 started.awaitReady(
-                    "/health", if (attempt.requireGpu) CHIP_LOAD_TIMEOUT_MS else LOAD_TIMEOUT_MS,
+                    "/health",
+                    when {
+                        attempt.npu == "Intel" && intelNpuColdStart(modelId) -> INTEL_NPU_COMPILE_TIMEOUT_MS
+                        attempt.requireGpu -> CHIP_LOAD_TIMEOUT_MS
+                        else -> LOAD_TIMEOUT_MS
+                    },
                     abortIf =
                     if (attempt.requireGpu) {
                         {
@@ -620,11 +638,11 @@ class LlamaCppEngine(
                 }
                 failure = e
                 val failLog = started.logTail() + " " + e.message.orEmpty()
-                if (attempt.npu == "Intel" && NPU_UNSUPPORTED.containsMatchIn(failLog)) {
+                if (attempt.npu == "Intel" && (NPU_UNSUPPORTED.containsMatchIn(failLog) || failLog.contains("did not become ready"))) {
                     intelNpuRejected = true
                     attempt.asset?.let { asset -> listOf("", BIG_NPU_SUFFIX, MID_NPU_SUFFIX).forEach { installer.markBroken(asset, modelId + it) } }
                 }
-                tried.append("- ${nameFor(attempt.name)}: " + note("failed", "nie uruchomiło się") + ": ${reasonFrom(failLog)}" + (if (attempt.npu == "Intel") " [${e.message.orEmpty().take(NPU_ERROR_SHOWN)}]" else "") + "\n")
+                tried.append("- ${nameFor(attempt.name)}: " + note("failed", "nie uruchomiło się") + ": ${reasonFrom(failLog)}" + (if (attempt.npu == "Intel") " [${e.message.orEmpty().take(NPU_ERROR_SHOWN)}] " + note("last lines of the program's log", "ostatnie linie logu programu") + ": " + started.logTail().lines().filter { it.isNotBlank() }.takeLast(NPU_TAIL_LINES).joinToString(" | ") { it.trim().take(NPU_TAIL_WIDTH) } else "") + "\n")
                 startReport = tried.toString()
                 Logger.w(tag = TAG, throwable = e) { "${attempt.name} did not start: ${e.message}\n${started.logTail().takeLast(MAX_TAIL)}" }
                 started.stop()
@@ -719,6 +737,8 @@ class LlamaCppEngine(
             // big enough prompt cache keeps both read, so neither is read again from the start for every question.
             val cacheMb = if (installer.android) CACHE_RAM_PHONE_MB else CACHE_RAM_COMPUTER_MB
             addAll(listOf("-np", "1", "--jinja", "--no-webui", "--cache-ram", cacheMb.toString()))
+            // This engine prints its lines about the chips (devices, memory per chip, layers) only from level 4 up; `/sprzet` reads them.
+            addAll(listOf("-lv", "4"))
             addAll(extra)
         }
         synchronized(report) { report.clear() }
@@ -833,6 +853,11 @@ class LlamaCppEngine(
         const val INTEL_NPU_MID_WINDOW = 4096
         const val MID_NPU_SUFFIX = "-mid"
         const val NPU_ERROR_SHOWN = 200
+        const val NPU_TAIL_LINES = 4
+        const val NPU_TAIL_WIDTH = 140
+
+        /** The first compilation of a big model on the Intel NPU takes minutes (it is then saved on disk), so that wait is much longer. */
+        const val INTEL_NPU_COMPILE_TIMEOUT_MS = 20 * 60 * 1000L
 
         /** Lines with which the OpenVINO program reports an error that stops the start. */
         val NPU_ERROR = Regex("^.*(Exception from src|is not supported for current configuration|ZE_RESULT_ERROR|OpenVINO exception|terminate called after).*$", RegexOption.MULTILINE)
@@ -849,7 +874,7 @@ class LlamaCppEngine(
         /** About 600 tokens of quiet thinking: past that the model is stopped and asked again without thinking. */
         const val MAX_THINKING_CHARS = 2400
         const val MS_PER_SECOND = 1000L
-        val BACKEND_LINE = Regex("offloaded|assigned to device|HTP\\d|ggml_opencl|ggml_vulkan|ggml_metal|ggml_cuda|ggml-hex|openvino|model buffer size|KV buffer size|compute buffer size|using device|Found \\d+ (Vulkan|CUDA|Metal)", RegexOption.IGNORE_CASE)
+        val BACKEND_LINE = Regex("offloaded|assigned to device|HTP\\d|ggml_opencl|ggml_vulkan|ggml_metal|ggml_cuda|ggml-hex|openvino|model buffer size|KV buffer size|compute buffer size|using device|MiB free|device_info|NPUW|NPU_|Found \\d+ (Vulkan|CUDA|Metal)", RegexOption.IGNORE_CASE)
         val MODEL_BUFFER = Regex("(\\S+) model buffer size\\s*=\\s*([0-9.]+) MiB", RegexOption.IGNORE_CASE)
         val KV_BUFFER = Regex("(\\S+) KV buffer size\\s*=\\s*([0-9.]+) MiB", RegexOption.IGNORE_CASE)
         val COMPUTE_BUFFER = Regex("(\\S+) compute buffer size\\s*=\\s*([0-9.]+) MiB", RegexOption.IGNORE_CASE)
