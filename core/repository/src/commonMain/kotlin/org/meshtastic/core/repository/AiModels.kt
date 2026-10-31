@@ -110,8 +110,8 @@ data class AiModelInfo(
      */
     val quietThinking: Boolean = true,
     /**
-     * False for models that the Intel NPU (OpenVINO) cannot run: they skip it and use the graphics card. Taken from the
-     * engine's own list of tested models (Qwen 3.5 and the 12B and bigger models fail there).
+     * False for a model that must never try the Intel NPU (OpenVINO). No model has it now: every model tries the NPU first,
+     * and one that fails there is not tried again for a week (a new NPU driver gives it a new try at once).
      */
     val intelNpu: Boolean = true,
     val recommendedFor: Set<AiRole> = emptySet(),
@@ -258,7 +258,6 @@ object AiModels {
     val G4_12b =
         AiModelInfo(
             id = G4_12B,
-            intelNpu = false,
             name = "Gemma 4 12B",
             recommendedFor = setOf(AiRole.ASSISTANT),
             family = "Gemma",
@@ -278,7 +277,6 @@ object AiModels {
     val G4_26b =
         AiModelInfo(
             id = G4_26B,
-            intelNpu = false,
             name = "Gemma 4 26B A4B",
             recommendedFor = setOf(AiRole.ASSISTANT),
             family = "Gemma",
@@ -298,7 +296,6 @@ object AiModels {
     val Qwen08b =
         AiModelInfo(
             id = QWEN_08B,
-            intelNpu = false,
             quietThinking = false,
             name = "Qwen 3.5 0.8B",
             family = "Qwen",
@@ -318,7 +315,6 @@ object AiModels {
     val Qwen2b =
         AiModelInfo(
             id = QWEN_2B,
-            intelNpu = false,
             quietThinking = false,
             name = "Qwen 3.5 2B",
             family = "Qwen",
@@ -338,7 +334,6 @@ object AiModels {
     val Qwen4b =
         AiModelInfo(
             id = QWEN_4B,
-            intelNpu = false,
             quietThinking = false,
             name = "Qwen 3.5 4B",
             family = "Qwen",
@@ -358,7 +353,6 @@ object AiModels {
     val Qwen9b =
         AiModelInfo(
             id = QWEN_9B,
-            intelNpu = false,
             quietThinking = false,
             name = "Qwen 3.5 9B",
             family = "Qwen",
@@ -378,7 +372,6 @@ object AiModels {
     val QwenMoe =
         AiModelInfo(
             id = QWEN_35B,
-            intelNpu = false,
             quietThinking = false,
             name = "Qwen 3.6 35B A3B",
             family = "Qwen",
@@ -398,7 +391,6 @@ object AiModels {
     val Qwen27b =
         AiModelInfo(
             id = QWEN_27B,
-            intelNpu = false,
             quietThinking = false,
             name = "Qwen 3.8 27B",
             family = "Qwen",
@@ -479,7 +471,6 @@ object AiModels {
     val Bielik11b =
         AiModelInfo(
             id = BIELIK_11B,
-            intelNpu = false,
             name = "Bielik 11B v3",
             family = "Bielik",
             engine = AiEngine.LLAMA_CPP,
@@ -498,7 +489,6 @@ object AiModels {
     val Pllum12b =
         AiModelInfo(
             id = PLLUM_12B,
-            intelNpu = false,
             name = "PLLuM 12B instruct",
             family = OTHER_FAMILY,
             engine = AiEngine.LLAMA_CPP,
@@ -517,7 +507,6 @@ object AiModels {
     val GptOss20b =
         AiModelInfo(
             id = GPT_OSS_20B,
-            intelNpu = false,
             name = "gpt-oss 20B",
             family = OTHER_FAMILY,
             engine = AiEngine.LLAMA_CPP,
@@ -536,7 +525,6 @@ object AiModels {
     val Granite8b =
         AiModelInfo(
             id = GRANITE_8B,
-            intelNpu = false,
             name = "Granite 4.2 8B",
             family = OTHER_FAMILY,
             engine = AiEngine.LLAMA_CPP,
@@ -573,7 +561,6 @@ object AiModels {
     val DeepSeek8b =
         AiModelInfo(
             id = DEEPSEEK_8B,
-            intelNpu = false,
             name = "DeepSeek R1 Qwen3 8B",
             family = OTHER_FAMILY,
             engine = AiEngine.LLAMA_CPP,
@@ -592,7 +579,6 @@ object AiModels {
     val Mistral24b =
         AiModelInfo(
             id = MISTRAL_24B,
-            intelNpu = false,
             name = "Mistral Small 3.2 24B",
             family = OTHER_FAMILY,
             engine = AiEngine.LLAMA_CPP,
@@ -629,7 +615,6 @@ object AiModels {
     val Olmoe7b =
         AiModelInfo(
             id = OLMOE_7B,
-            intelNpu = false,
             name = "OLMoE 1B-7B",
             family = OTHER_FAMILY,
             engine = AiEngine.LLAMA_CPP,
@@ -666,7 +651,6 @@ object AiModels {
     val TranslateGemma12b =
         AiModelInfo(
             id = TG_12B,
-            intelNpu = false,
             name = "TranslateGemma 12B",
             family = "TranslateGemma",
             engine = AiEngine.LLAMA_CPP,

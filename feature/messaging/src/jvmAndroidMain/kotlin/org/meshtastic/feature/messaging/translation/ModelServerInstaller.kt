@@ -170,7 +170,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
 
     /**
      * The version of the Intel NPU driver ("" when not known). A failure of the NPU is remembered together with it, so an
-     * updated driver gets a new try at once instead of waiting for the few days to pass.
+     * updated driver gets a new try at once instead of waiting for the week to pass.
      */
     val intelNpuDriver: String by lazy {
         if (!windows) return@lazy ""
@@ -546,7 +546,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
         /** Raise when our speech programs were rebuilt under the same file name (see the init block). */
         private const val WHISPER_REVISION = 1
         private const val DRIVER_QUERY_SECONDS = 10L
-        private const val BROKEN_RETRY_MS = 3L * 24L * 60L * 60L * 1000L
+        private const val BROKEN_RETRY_MS = 7L * 24L * 60L * 60L * 1000L
         private val QUALCOMM_PLATFORMS = setOf("kalama", "pineapple", "sun", "taro", "lahaina", "kona", "msmnile", "lito", "bengal", "crow", "parrot", "waipio", "cliffs", "canoe")
         private const val LLAMA_MAC_MB = 16
         private const val LLAMA_WIN_MB = 37
