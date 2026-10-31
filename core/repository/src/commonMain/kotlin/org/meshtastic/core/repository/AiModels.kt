@@ -776,7 +776,7 @@ sealed interface AiStorageMove {
 interface AiModelStore {
     val states: StateFlow<Map<String, TranslatorModelState>>
 
-    /** True when this device has an NPU that our engine can use (Intel Core Ultra, Snapdragon); the "Skip NPU" setting is only shown then. */
+    /** True on a computer with an NPU that our engine can use (Intel Core Ultra); the "Skip NPU" setting is shown by default only then (never on phones). */
     val npuAvailable: Boolean get() = false
 
     /** Where the models (and on computers the engine programs) are kept, and what can be chosen; null = not known. */

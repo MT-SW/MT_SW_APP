@@ -222,7 +222,8 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
      */
     val intelNpu: Boolean by lazy { !android && !mac && !arm && isCoreUltra() }
 
-    override val npuSupported: Boolean get() = intelNpu || androidNpuAsset() != null
+    /** Only a computer with an Intel NPU counts: the "Skip NPU" setting is not shown by default on phones. */
+    override val npuSupported: Boolean get() = intelNpu
 
     private fun cpuName(): String = runCatching {
         if (windows) {

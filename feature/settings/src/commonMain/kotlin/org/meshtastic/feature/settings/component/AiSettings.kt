@@ -278,7 +278,7 @@ internal fun AiSettings() {
         )
     }
 
-    // Shown when this device has an NPU that our engine can use (or when the hidden settings are unlocked); otherwise hidden.
+    // Shown by default only on a computer with an NPU that our engine can use (and when the hidden settings are unlocked); hidden on phones.
     if (store.npuAvailable || hiddenOn) {
         SwitchPreference(
             title = stringResource(Res.string.ai_skip_npu_title),
