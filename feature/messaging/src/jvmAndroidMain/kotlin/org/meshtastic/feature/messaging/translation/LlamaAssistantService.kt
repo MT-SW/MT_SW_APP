@@ -161,13 +161,14 @@ class LlamaAssistantService(
                         t("Rozmiar", "Size") + ": ${info?.sizeMb ?: 0} MB, " + t("pamięć podczas pracy", "memory while running") + ": " + t("około", "about") + " ${info?.ramMb ?: 0} MB\n" +
                         t("Gdzie działa", "Where it runs") + ": " + (
                             engine.activeBackend.takeIf { it.isNotBlank() }
-                                ?: engine.lastStart(modelId)?.first?.let { it + " " + t("(ostatnio; model jest teraz zwolniony z pamięci)", "(last time; the model is released from memory now)") }
+                                ?: engine.lastStart(modelId)?.backend?.let { it + " " + t("(ostatnio; model jest teraz zwolniony z pamięci)", "(last time; the model is released from memory now)") }
                                 ?: t("jeszcze nie uruchomiony (zadaj najpierw dowolne pytanie)", "not started yet (ask any question first)")
                             ) + "\n" +
-                        t("Zajęta pamięć teraz", "Memory taken now") + ": " + (engine.memoryUsedMb?.let { "$it MB" } ?: t("0 MB (model nie jest wczytany)", "0 MB (the model is not loaded)")) + "\n" +
+                        t("Zajęta pamięć RAM teraz", "RAM taken now") + ": " + (engine.memoryUsedMb?.let { "$it MB" } ?: t("0 MB (model nie jest wczytany)", "0 MB (the model is not loaded)")) + "\n" +
+                        (engine.activeResources.takeIf { it.isNotBlank() } ?: engine.lastStart(modelId)?.resources?.takeIf { it.isNotBlank() })?.let { it + "\n" }.orEmpty() +
                         t("Okno tekstu", "Context") + ": ${runCatching { engine.contextTokens(modelId) }.getOrDefault(0)} " + t("tokenów", "tokens") +
                         engine.deviceSummary.takeIf { it.isNotBlank() }?.let { "\n$it" }.orEmpty() +
-                        (engine.startReport.takeIf { it.isNotBlank() } ?: engine.lastStart(modelId)?.second?.takeIf { it.isNotBlank() })?.let { "\n" + t("Ostatnie uruchomienie", "Last start") + ":\n$it" }.orEmpty()
+                        (engine.startReport.takeIf { it.isNotBlank() } ?: engine.lastStart(modelId)?.report?.takeIf { it.isNotBlank() })?.let { "\n" + t("Ostatnie uruchomienie", "Last start") + ":\n$it" }.orEmpty()
                 println("===== ASSISTANT HARDWARE =====\n$report")
                 onResult(command, report)
                 return@withContext

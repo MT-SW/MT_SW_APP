@@ -89,10 +89,49 @@ class LlamaCppEngine(
     override val memoryUsedMb: Int? get() = server?.takeIf { it.isAlive }?.memoryMb()
 
     /** The last successful start, kept on disk so `/sprzet` can still tell where the model ran after it was released or the app restarted. */
-    override fun lastStart(modelId: String): Pair<String, String>? = runCatching {
-        val lines = File(logDir, LAST_START_FILE).takeIf { it.isFile }?.readText()?.split("\n", limit = 3) ?: return null
-        if (lines.size < 3 || lines[0] != modelId) null else lines[1] to lines[2].trim()
+    override fun lastStart(modelId: String): LastStart? = runCatching {
+        val text = File(logDir, LAST_START_FILE).takeIf { it.isFile }?.readText() ?: return null
+        val head = text.split("\n", limit = 3)
+        if (head.size < 3 || head[0] != modelId) return null
+        val parts = head[2].split(LAST_START_SEPARATOR, limit = 2)
+        LastStart(head[1], parts[0].trim(), parts.getOrElse(1) { "" }.trim())
     }.getOrNull()
+
+    @Volatile
+    override var activeResources: String = ""
+        private set
+
+    /** What the model that just started takes on each chip, read from the program's own log lines. */
+    private fun resourceSummary(): String {
+        val text = synchronized(report) { report.toString() }
+        fun chip(name: String): String =
+            when {
+                name.startsWith("HTP", ignoreCase = true) -> note("NPU Hexagon", "NPU Hexagon") + " ($name)"
+                name.contains("CPU", ignoreCase = true) -> note("processor (RAM)", "procesor (pamięć RAM)")
+                name.startsWith("Vulkan", ignoreCase = true) -> note("graphics card", "karta graficzna") + " ($name)"
+                name.contains("OpenCL", ignoreCase = true) -> note("graphics card (OpenCL)", "karta graficzna (OpenCL)")
+                name.contains("OpenVINO", ignoreCase = true) || name.startsWith("NPU", ignoreCase = true) -> note("NPU (Intel)", "NPU (Intel)")
+                name.startsWith("CUDA", ignoreCase = true) -> note("graphics card (NVIDIA)", "karta graficzna (NVIDIA)")
+                name.startsWith("Metal", ignoreCase = true) || name.startsWith("MTL", ignoreCase = true) -> note("graphics chip of the Mac", "układ graficzny Maca")
+                else -> name
+            }
+        fun sums(regex: Regex): Map<String, Double> =
+            regex.findAll(text).groupBy({ chip(it.groupValues[1]) }, { it.groupValues[2].toDoubleOrNull() ?: 0.0 }).mapValues { it.value.sum() }
+        fun list(map: Map<String, Double>) = map.entries.joinToString("; ") { "${it.key}: ${it.value.toInt()} MB" }
+        val model = sums(MODEL_BUFFER)
+        val kv = sums(KV_BUFFER)
+        val compute = sums(COMPUTE_BUFFER)
+        val layers = LAYERS.find(text)?.let { "${it.groupValues[1]} " + note("of", "z") + " ${it.groupValues[2]}" }
+        val devices = USING_DEVICE.findAll(text).joinToString("; ") { "${it.groupValues[1]} (${it.groupValues[2].trim()})" }
+        return buildString {
+            if (model.isNotEmpty()) appendLine(note("Model sits in", "Model leży w") + ": " + list(model))
+            if (layers != null) appendLine(note("Layers on the graphics chip or NPU", "Warstwy na karcie graficznej lub NPU") + ": $layers")
+            if (kv.isNotEmpty()) appendLine(note("Chat memory (KV)", "Pamięć rozmowy (KV)") + ": " + list(kv))
+            if (compute.isNotEmpty()) appendLine(note("Work buffers", "Bufory obliczeń") + ": " + list(compute))
+            if (devices.isNotEmpty()) appendLine(note("Chips the engine uses", "Układy użyte przez silnik") + ": $devices")
+            append(note("Processor cores of the device", "Rdzenie procesora urządzenia") + ": ${Runtime.getRuntime().availableProcessors()}")
+        }
+    }
 
     /** Set from a hidden setting: skip every NPU and go straight to the graphics card (to test that path). */
     @Volatile
@@ -600,7 +639,8 @@ class LlamaCppEngine(
             startReport = tried.toString()
             store.reportLoaded(TAG, modelId)
             Logger.i(tag = TAG) { "Model ${model.name} runs: $activeBackend" }
-            runCatching { File(logDir, LAST_START_FILE).writeText("$modelId\n$activeBackend\n${startReport}") }
+            activeResources = resourceSummary()
+            runCatching { File(logDir, LAST_START_FILE).writeText("$modelId\n$activeBackend\n$activeResources\n$LAST_START_SEPARATOR\n$startReport") }
             return started
         }
         throw failure ?: IllegalStateException("The model program could not be started")
@@ -700,6 +740,7 @@ class LlamaCppEngine(
         loadedHearing = false
         loadedWindow = 0
         activeBackend = ""
+        activeResources = ""
         store.reportLoaded(TAG, null)
     }
 
@@ -735,6 +776,7 @@ class LlamaCppEngine(
         const val TAG = "LlamaCppEngine"
         const val PID_FILE = "llama-server.pid"
         const val LAST_START_FILE = "last-start.txt"
+        const val LAST_START_SEPARATOR = "\n=====\n"
         const val USER = "user"
         const val DONE = "[DONE]"
         const val TOP_P = 0.95
@@ -782,7 +824,11 @@ class LlamaCppEngine(
         /** About 600 tokens of quiet thinking: past that the model is stopped and asked again without thinking. */
         const val MAX_THINKING_CHARS = 2400
         const val MS_PER_SECOND = 1000L
-        val BACKEND_LINE = Regex("offloaded|assigned to device|HTP\\d|ggml_opencl|ggml_vulkan|ggml_metal|ggml_cuda|ggml-hex|openvino|model buffer size|using device|Found \\d+ (Vulkan|CUDA|Metal)", RegexOption.IGNORE_CASE)
+        val BACKEND_LINE = Regex("offloaded|assigned to device|HTP\\d|ggml_opencl|ggml_vulkan|ggml_metal|ggml_cuda|ggml-hex|openvino|model buffer size|KV buffer size|compute buffer size|using device|Found \\d+ (Vulkan|CUDA|Metal)", RegexOption.IGNORE_CASE)
+        val MODEL_BUFFER = Regex("(\\S+) model buffer size\\s*=\\s*([0-9.]+) MiB", RegexOption.IGNORE_CASE)
+        val KV_BUFFER = Regex("(\\S+) KV buffer size\\s*=\\s*([0-9.]+) MiB", RegexOption.IGNORE_CASE)
+        val COMPUTE_BUFFER = Regex("(\\S+) compute buffer size\\s*=\\s*([0-9.]+) MiB", RegexOption.IGNORE_CASE)
+        val USING_DEVICE = Regex("using device (\\S+) \\(([^)]*)\\)", RegexOption.IGNORE_CASE)
         val CHIP_LAYER = Regex("assigned to device (GPU|HTP|Vulkan|OpenCL|OpenVINO|CUDA|Metal)", RegexOption.IGNORE_CASE)
         val NPU_DEVICE = Regex("device HTP\\d", RegexOption.IGNORE_CASE)
         val NPU_BUFFER = Regex("(HTP\\d|OPENVINO|OpenVINO)\\S*\\s+model buffer size", RegexOption.IGNORE_CASE)

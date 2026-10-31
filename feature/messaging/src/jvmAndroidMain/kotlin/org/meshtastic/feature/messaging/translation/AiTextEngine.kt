@@ -16,6 +16,9 @@
  */
 package org.meshtastic.feature.messaging.translation
 
+/** The last successful start of a model: [backend] it ran on, [resources] it took on each chip and the [report] of the attempts. */
+data class LastStart(val backend: String, val resources: String, val report: String)
+
 /**
  * What the assistant, the translator and dictation need from the engine that runs the language model. Android and
  * desktop each bring their own engine behind this one door, so the rest of the app never depends on a specific one.
@@ -30,8 +33,14 @@ interface AiTextEngine {
     /** Memory (MB) the model program takes right now; null while nothing is loaded or when it cannot be read. */
     val memoryUsedMb: Int? get() = null
 
-    /** Where the model [modelId] ran at its last start, and that start's report, even after it was released from memory; null = unknown. */
-    fun lastStart(modelId: String): Pair<String, String>? = null
+    /**
+     * What the loaded model takes on each chip: its memory per chip (NPU, graphics card, processor), layers on the chip, the
+     * chat memory and the chips the engine saw; empty while nothing is loaded.
+     */
+    val activeResources: String get() = ""
+
+    /** Where the model [modelId] ran at its last start, even after it was released from memory; null = unknown. */
+    fun lastStart(modelId: String): LastStart? = null
 
     /** Chip, graphics driver and memory of this device, for `/sprzet`; empty when unknown. */
     val deviceSummary: String get() = ""

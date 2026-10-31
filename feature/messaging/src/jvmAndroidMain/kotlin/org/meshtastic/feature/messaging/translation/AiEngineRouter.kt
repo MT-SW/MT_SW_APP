@@ -122,7 +122,9 @@ class AiEngineRouter(
 
     override val memoryUsedMb: Int? get() = llama.memoryUsedMb
 
-    override fun lastStart(modelId: String): Pair<String, String>? = llama.lastStart(modelId)
+    override val activeResources: String get() = llama.activeResources
+
+    override fun lastStart(modelId: String): LastStart? = llama.lastStart(modelId)
 
     override fun contextTokens(modelId: String): Int = llama.contextTokens(modelId)
 

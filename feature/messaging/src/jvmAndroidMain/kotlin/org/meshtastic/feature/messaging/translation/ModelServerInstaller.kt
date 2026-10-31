@@ -164,16 +164,8 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
             File("/proc/meminfo").takeIf { it.isFile }?.readLines()?.firstOrNull { it.startsWith("MemTotal") }
                 ?.filter { it.isDigit() }?.toLong()?.div(1024)
         }.getOrNull()
-        if (memoryMb != null) appendLine(tr("Memory", "Pamięć") + ": $memoryMb MB")
-        append(
-            tr("Snapdragon NPU program", "Program NPU Snapdragona") + ": " + (if (androidNpuAsset() != null) tr("available", "jest") else tr("no", "brak")) + ", " +
-                tr("Intel NPU", "NPU Intela") + ": " +
-                if (intelNpu) {
-                    tr("found", "znaleziono") + intelNpuDriver.takeIf { it.isNotEmpty() }?.let { " (" + tr("driver", "sterownik") + " $it)" }.orEmpty()
-                } else {
-                    tr("no", "brak")
-                },
-        )
+        if (memoryMb != null) appendLine(tr("Device memory (RAM)", "Pamięć urządzenia (RAM)") + ": $memoryMb MB")
+        intelNpuDriver.takeIf { intelNpu && it.isNotEmpty() }?.let { appendLine(tr("Intel NPU driver", "Sterownik NPU Intela") + ": $it") }
     }
 
     /**
