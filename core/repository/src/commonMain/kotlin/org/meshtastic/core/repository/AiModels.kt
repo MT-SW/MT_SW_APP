@@ -153,6 +153,8 @@ object AiModels {
     const val PHI_MINI = "phi4-mini-q4"
     const val DEEPSEEK_8B = "deepseek-r1-qwen3-8b-q4"
     const val MISTRAL_24B = "mistral-small32-24b-q4"
+    const val LLAMA_1B = "llama32-1b-q4"
+    const val OLMOE_7B = "olmoe-1b-7b-q4"
     const val TG_4B = "translategemma-4b-q4"
     const val TG_12B = "translategemma-12b-q4"
     const val WHISPER_SMALL_Q8 = "whisper-small-q8"
@@ -540,14 +542,14 @@ object AiModels {
             family = OTHER_FAMILY,
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT,
-            sizeMb = 5478,
-            ramMb = 7500,
+            sizeMb = 5181,
+            ramMb = 7000,
             minDeviceRamGb = 12,
             license = AiLicense.APACHE_2_0,
-            files = listOf(hf("ibm-granite/granite-4.2-8b-GGUF", "granite-4.2-8b-Q4_K_M.gguf", 5478)),
-            platforms = DESKTOP,
-            descriptionPl = "Model od IBM. Ciekawostka do własnych testów na komputerze: słabszy po polsku niż Gemma.",
-            descriptionEn = "A model from IBM. A curiosity for your own tests on a computer: weaker in Polish than Gemma.",
+            files = listOf(hf("ibm-granite/granite-4.2-8b-GGUF", "granite-4.2-8b-Q4_0.gguf", 5181)),
+            platforms = BOTH,
+            descriptionPl = "Model od IBM. Ciekawostka do własnych testów: słabszy po polsku niż Gemma.",
+            descriptionEn = "A model from IBM. A curiosity for your own tests: weaker in Polish than Gemma.",
             pageUrl = "${HF}ibm-granite/granite-4.2-8b-GGUF",
         )
 
@@ -558,15 +560,15 @@ object AiModels {
             family = OTHER_FAMILY,
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT,
-            sizeMb = 2550,
-            ramMb = 3500,
+            sizeMb = 2386,
+            ramMb = 3300,
             minDeviceRamGb = 6,
             license = AiLicense.MIT,
-            files = listOf(hf("unsloth/Phi-4-mini-instruct-GGUF", "Phi-4-mini-instruct-Q4_K_M.gguf", 2550)),
-            platforms = DESKTOP,
-            descriptionPl = "Mały model od Microsoftu. Ciekawostka do własnych testów na komputerze: szybki, ale słaby po polsku.",
-            descriptionEn = "A small model from Microsoft. A curiosity for your own tests on a computer: fast, but weak in Polish.",
-            pageUrl = "${HF}unsloth/Phi-4-mini-instruct-GGUF",
+            files = listOf(hf("bartowski/microsoft_Phi-4-mini-instruct-GGUF", "microsoft_Phi-4-mini-instruct-Q4_0.gguf", 2386)),
+            platforms = BOTH,
+            descriptionPl = "Mały model od Microsoftu. Ciekawostka do własnych testów: szybki, ale słaby po polsku.",
+            descriptionEn = "A small model from Microsoft. A curiosity for your own tests: fast, but weak in Polish.",
+            pageUrl = "${HF}bartowski/microsoft_Phi-4-mini-instruct-GGUF",
         )
 
     val DeepSeek8b =
@@ -577,14 +579,14 @@ object AiModels {
             family = OTHER_FAMILY,
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT,
-            sizeMb = 5150,
-            ramMb = 7000,
+            sizeMb = 4905,
+            ramMb = 6800,
             minDeviceRamGb = 12,
             license = AiLicense.MIT,
-            files = listOf(hf("unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF", "DeepSeek-R1-0528-Qwen3-8B-Q4_K_M.gguf", 5150)),
-            platforms = DESKTOP,
-            descriptionPl = "Model „myślący” od DeepSeek. Ciekawostka do własnych testów na komputerze: przed odpowiedzią długo myśli.",
-            descriptionEn = "A \"thinking\" model from DeepSeek. A curiosity for your own tests on a computer: it thinks for a long time before it answers.",
+            files = listOf(hf("unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF", "DeepSeek-R1-0528-Qwen3-8B-Q4_0.gguf", 4905)),
+            platforms = BOTH,
+            descriptionPl = "Model „myślący” od DeepSeek. Ciekawostka do własnych testów: przed odpowiedzią długo myśli.",
+            descriptionEn = "A \"thinking\" model from DeepSeek. A curiosity for your own tests: it thinks for a long time before it answers.",
             pageUrl = "${HF}unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF",
         )
 
@@ -596,15 +598,52 @@ object AiModels {
             family = OTHER_FAMILY,
             engine = AiEngine.LLAMA_CPP,
             roles = TEXT,
-            sizeMb = 14643,
-            ramMb = 17500,
+            sizeMb = 13824,
+            ramMb = 16500,
             minDeviceRamGb = 24,
             license = AiLicense.APACHE_2_0,
-            files = listOf(hf("unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF", "Mistral-Small-3.2-24B-Instruct-2506-Q4_K_M.gguf", 14643)),
+            files = listOf(hf("unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF", "Mistral-Small-3.2-24B-Instruct-2506-Q4_0.gguf", 13824)),
             platforms = DESKTOP,
             descriptionPl = "Duży model od Mistral AI. Ciekawostka do własnych testów na mocnym komputerze.",
             descriptionEn = "A large model from Mistral AI. A curiosity for your own tests on a strong computer.",
             pageUrl = "${HF}unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF",
+        )
+
+    val Llama1b =
+        AiModelInfo(
+            id = LLAMA_1B,
+            name = "Llama 3.2 1B",
+            family = OTHER_FAMILY,
+            engine = AiEngine.LLAMA_CPP,
+            roles = TEXT,
+            sizeMb = 773,
+            ramMb = 1400,
+            minDeviceRamGb = 4,
+            license = AiLicense.SEE_MODEL_PAGE,
+            files = listOf(hf("unsloth/Llama-3.2-1B-Instruct-GGUF", "Llama-3.2-1B-Instruct-Q4_0.gguf", 773)),
+            platforms = BOTH,
+            descriptionPl = "Mały model od Mety. Ciekawostka do własnych testów: jeden z modeli sprawdzonych na NPU Snapdragona, ale słaby po polsku.",
+            descriptionEn = "A small model from Meta. A curiosity for your own tests: one of the models checked on the Snapdragon NPU, but weak in Polish.",
+            pageUrl = "${HF}unsloth/Llama-3.2-1B-Instruct-GGUF",
+        )
+
+    val Olmoe7b =
+        AiModelInfo(
+            id = OLMOE_7B,
+            intelNpu = false,
+            name = "OLMoE 1B-7B",
+            family = OTHER_FAMILY,
+            engine = AiEngine.LLAMA_CPP,
+            roles = TEXT,
+            sizeMb = 4024,
+            ramMb = 5500,
+            minDeviceRamGb = 8,
+            license = AiLicense.APACHE_2_0,
+            files = listOf(hf("allenai/OLMoE-1B-7B-0125-Instruct-GGUF", "OLMoE-1B-7B-0125-Instruct-Q4_0.gguf", 4024)),
+            platforms = BOTH,
+            descriptionPl = "Model od Allen AI, który w trakcie pracy używa tylko części siebie (1 mld z 7 mld parametrów). Ciekawostka do własnych testów: sprawdzony na NPU Snapdragona, słaby po polsku.",
+            descriptionEn = "A model from Allen AI that uses only part of itself while working (1 of 7 billion parameters). A curiosity for your own tests: checked on the Snapdragon NPU, weak in Polish.",
+            pageUrl = "${HF}allenai/OLMoE-1B-7B-0125-Instruct-GGUF",
         )
 
     val TranslateGemma4b =
@@ -692,7 +731,7 @@ object AiModels {
             G4E2b, G4E4b, G4_12b, G4_26b,
             Qwen08b, Qwen2b, Qwen4b, Qwen9b, QwenMoe, Qwen27b,
             Bielik15b, Bielik45b, Bielik7b, Bielik11b,
-            Pllum12b, GptOss20b, Granite8b, PhiMini, DeepSeek8b, Mistral24b,
+            Pllum12b, GptOss20b, Granite8b, PhiMini, DeepSeek8b, Mistral24b, Llama1b, Olmoe7b,
             TranslateGemma4b, TranslateGemma12b,
             WhisperSmallQ8, WhisperMediumQ8, WhisperTurboQ8,
         )
