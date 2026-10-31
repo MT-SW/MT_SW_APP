@@ -221,22 +221,23 @@ class WhisperCppEngine(
                 installer.launchPrefix(program) +
                     listOf("-m", model.absolutePath, "--host", "127.0.0.1", "--port", port.toString(), "-l", "auto", "-t", threads.toString(), "-nt") +
                     attempt.extra
+            val programDir = program.absoluteFile.parentFile ?: program
             val libDirs = buildList {
-                File(program.parentFile.parentFile, "lib").takeIf { it.isDirectory }?.let { add(it.absolutePath) }
+                File(programDir.parentFile, "lib").takeIf { it.isDirectory }?.let { add(it.absolutePath) }
                 if (attempt.chip) addAll(VENDOR_LIB_DIRS.filter { File(it).isDirectory })
             }
             val env = buildMap<String, String> {
                 putAll(attempt.env)
                 if (attempt.dsp) {
                     // The NPU programs (libggml-htp-v*.so) are in the "lib" folder of the package, next to "bin".
-                    val skeletons = File(program.parentFile.parentFile, "lib").absolutePath
-                    put("ADSP_LIBRARY_PATH", (listOf(skeletons, program.parentFile.absolutePath) + DSP_DIRS).joinToString(";"))
+                    val skeletons = File(programDir.parentFile, "lib").absolutePath
+                    put("ADSP_LIBRARY_PATH", (listOf(skeletons, programDir.absolutePath) + DSP_DIRS).joinToString(";"))
                 }
             }
             Logger.i(tag = TAG) { "Starting the speech program for $modelId: ${attempt.name}" }
             synchronized(chipLines) { chipLines.clear() }
             val started =
-                ModelServerProcess.start(command, program.parentFile, port, File(logDir, "whisper-server.log"), File(logDir, PID_FILE), env, libDirs) { line ->
+                ModelServerProcess.start(command, programDir, port, File(logDir, "whisper-server.log"), File(logDir, PID_FILE), env, libDirs) { line ->
                     if (CHIP_LINE.containsMatchIn(line)) synchronized(chipLines) { if (chipLines.length < MAX_TAIL) chipLines.appendLine(line.trim()) }
                 }
             try {

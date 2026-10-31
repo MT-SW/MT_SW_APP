@@ -178,7 +178,7 @@ class AiStorageLocation(
                     if (dest.usableSpace < total + total / 20 + 100L * MB) return@runCatching "not enough free space in the new folder"
                     var done = 0L
                     for ((dir, file) in files) {
-                        val relative = file.relativeTo(dir.parentFile)
+                        val relative = file.relativeTo(dir.parentFile ?: dir)
                         val out = File(dest, relative.path)
                         out.parentFile?.mkdirs()
                         val part = File(out.path + ".copy")

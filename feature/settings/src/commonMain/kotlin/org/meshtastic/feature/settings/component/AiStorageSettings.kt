@@ -322,6 +322,5 @@ internal fun rememberDownloadGuard(startDownload: (String) -> Unit): (String) ->
             val computer = current != null && current.choices.isEmpty()
             if (computer && after != null && after < LOW_SPACE_MB) asking = id to after else startDownload(id)
         }
-        Unit
     }
 }

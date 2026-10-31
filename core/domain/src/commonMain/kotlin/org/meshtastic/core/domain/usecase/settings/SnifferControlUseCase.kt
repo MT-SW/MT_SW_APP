@@ -74,7 +74,7 @@ open class SnifferControlUseCase(
         .filter { it.received_date >= sinceMillis }
         .mapNotNull { log ->
             log.fromRadio
-                ?.packet
+                .packet
                 ?.decoded
                 ?.payload
                 ?.let { payload -> runCatching { OnDemand.ADAPTER.decode(payload) }.getOrNull() }
@@ -107,7 +107,7 @@ open class SnifferControlUseCase(
     private fun decodeLatestFwPlusVersion(logs: List<MeshLog>): Int? = logs
         .mapNotNull { log ->
             log.fromRadio
-                ?.packet
+                .packet
                 ?.decoded
                 ?.payload
                 ?.let { payload -> runCatching { OnDemand.ADAPTER.decode(payload) }.getOrNull() }
@@ -146,7 +146,7 @@ open class SnifferControlUseCase(
         .filter { it.received_date >= sinceMillis }
         .mapNotNull { log ->
             log.fromRadio
-                ?.packet
+                .packet
                 ?.decoded
                 ?.payload
                 ?.let { payload -> runCatching { OnDemand.ADAPTER.decode(payload) }.getOrNull() }

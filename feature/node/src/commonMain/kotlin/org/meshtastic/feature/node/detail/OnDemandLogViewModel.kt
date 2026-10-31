@@ -104,7 +104,7 @@ class OnDemandLogViewModel(
         val decoded =
             logs.mapNotNull { log ->
                 log.fromRadio
-                    ?.packet
+                    .packet
                     ?.decoded
                     ?.payload
                     ?.let { payload -> runCatching { OnDemand.ADAPTER.decode(payload) }.getOrNull() }

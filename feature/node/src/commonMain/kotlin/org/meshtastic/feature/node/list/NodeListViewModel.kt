@@ -453,8 +453,8 @@ private fun extraStatsOf(stats: LocalStats?, ext: LocalStatsExtended?): NodeExtr
         if (stats == null) {
             NodeExtraStats()
         } else {
-            val heapTotal = stats.heap_total_bytes ?: 0
-            val heapFree = stats.heap_free_bytes ?: 0
+            val heapTotal = stats.heap_total_bytes
+            val heapFree = stats.heap_free_bytes
             NodeExtraStats(
                 packetsTx = stats.num_packets_tx,
                 packetsRx = stats.num_packets_rx,

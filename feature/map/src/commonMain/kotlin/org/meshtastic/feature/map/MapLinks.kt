@@ -139,7 +139,7 @@ internal fun buildMapLinks(
         val sender = if (log.fromNum == 0 && myNodeNum != null) myNodeNum else log.fromNum
         val payload = log.fromRadio.packet?.decoded?.payload ?: continue
         val info = runCatching { NeighborInfo.ADAPTER.decode(payload) }.getOrNull() ?: continue
-        for (neighbor in info.neighbors) add(sender, neighbor.node_id.toInt(), MapLinkKind.NEIGHBOR, neighbor.snr)
+        for (neighbor in info.neighbors) add(sender, neighbor.node_id, MapLinkKind.NEIGHBOR, neighbor.snr)
     }
     return byPair.values.toList()
 }

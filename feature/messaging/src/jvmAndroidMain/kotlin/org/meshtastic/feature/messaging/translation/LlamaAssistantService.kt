@@ -1025,7 +1025,7 @@ class LlamaAssistantService(
                 // A small model gets the manual's own lines about the found setting before anything else is tried.
                 // An entry of the base that opens like the question ("How do I download…") answers it better than loose manual lines.
                 if (smallModel(modelId)) fromBase(modelId, history, question, intent.text, polish, answerLang, onPiece, room, quoteOnly = true)?.let { return it }
-                if (smallModel(modelId) && fits && button != null) {
+                if (smallModel(modelId) && fits) {
                     val lines = bestLines(manual, button.label, "${intent.text} ${button.label}", question, polish, oneSetting = false)
                     if (lines.isNotBlank()) {
                         val path = guideTools.pathOf(button)

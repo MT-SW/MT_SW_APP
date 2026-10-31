@@ -653,8 +653,9 @@ class LlamaCppEngine(
         synchronized(report) { report.clear() }
         // The engine's libraries lie next to the program or in a "lib" folder beside it; the phone's chip drivers are in
         // its vendor folders (searched last, so they never replace the engine's own files).
+        val programDir = program.absoluteFile.parentFile ?: program
         val libDirs = buildList {
-            File(program.parentFile.parentFile, "lib").takeIf { it.isDirectory }?.let { add(it.absolutePath) }
+            File(programDir.parentFile, "lib").takeIf { it.isDirectory }?.let { add(it.absolutePath) }
             if (attempt.vendorLibs) addAll(VENDOR_LIB_DIRS.filter { File(it).isDirectory })
         }
         val env = buildMap<String, String> {
@@ -662,7 +663,7 @@ class LlamaCppEngine(
             // The NPU loads its own small programs from these folders (the engine's first, then the phone's).
             if (attempt.dspLibs) put("ADSP_LIBRARY_PATH", (libDirs.take(1) + DSP_DIRS).joinToString(";"))
         }
-        return ModelServerProcess.start(command, program.parentFile, port, File(logDir, "llama-server.log"), File(logDir, PID_FILE), env, libDirs) { line ->
+        return ModelServerProcess.start(command, programDir, port, File(logDir, "llama-server.log"), File(logDir, PID_FILE), env, libDirs) { line ->
             // Keep only the lines that say where the model went (card, layers), for the status shown to the user.
             if (BACKEND_LINE.containsMatchIn(line)) synchronized(report) { if (report.length < MAX_REPORT) report.appendLine(line.trim()) }
         }

@@ -429,7 +429,7 @@ private fun showTracerouteDetail(
     val packet = result.fromRadio.packet
     val route = packet?.fullRouteDiscovery
     // The last relay is named from the node database when the firmware left it unknown, as in the live alert.
-    val likely = route?.let { viewModel.likelyLastRelay(it, packet?.relay_node ?: 0) }
+    val likely = route?.let { viewModel.likelyLastRelay(it, packet.relay_node) }
     val usernameWithGuess: (Int) -> String = { num ->
         if (likely?.node?.num == num) probablyPrefix + getUsername(num) else getUsername(num)
     }

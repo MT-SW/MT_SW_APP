@@ -40,6 +40,7 @@ private fun Float?.flipped(): Float? = this?.let { if (it == 0f) it else -it }
  * backwards, so the charge current shows as positive. Display only: voltage, battery level and every other field are
  * left exactly as received, so charging detection is unaffected.
  */
+@Suppress("DEPRECATION")
 internal fun Telemetry.withCurrentSign(invert: Boolean): Telemetry {
     if (!invert) return this
     val env = environment_metrics

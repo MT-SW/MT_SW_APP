@@ -89,8 +89,8 @@ import co.touchlab.kermit.Logger
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
+import kotlin.time.Clock
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.util.DateFormatter

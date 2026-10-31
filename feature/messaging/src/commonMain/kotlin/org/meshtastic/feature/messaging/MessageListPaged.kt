@@ -323,7 +323,7 @@ private fun MessageListPagedContent(
                 }
                 val splitInfo = rawMessage?.let { splitReassembly.groups[it.uuid] }
                 val message =
-                    if (splitInfo != null && rawMessage != null) {
+                    if (splitInfo != null) {
                         rawMessage.copy(
                             text = splitInfo.displayText(),
                             replyId = splitInfo.replyId,

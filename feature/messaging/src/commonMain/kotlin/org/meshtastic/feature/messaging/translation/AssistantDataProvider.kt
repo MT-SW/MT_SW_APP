@@ -706,7 +706,7 @@ class AssistantDataProvider(
                     row.relayed = ls.num_tx_relay
                     row.dropped = ls.num_tx_dropped
                     row.uptime = ls.uptime_seconds
-                    row.heapUsed = if ((ls.heap_total_bytes ?: 0) > 0) ((ls.heap_total_bytes!! - (ls.heap_free_bytes ?: 0)).coerceAtLeast(0)).toFloat() / ls.heap_total_bytes!! * PERCENT else null
+                    row.heapUsed = if (ls.heap_total_bytes > 0) (ls.heap_total_bytes - ls.heap_free_bytes).coerceAtLeast(0).toFloat() / ls.heap_total_bytes * PERCENT else null
                 }
             }
             t.decodeLocalStatsExtended()?.let { ext ->
@@ -1611,7 +1611,7 @@ class AssistantDataProvider(
             safeList {
                 meshLogRepository.getLogsFromNodeSince(num, nowMillis - SIGNAL_WINDOW_MS).first().mapNotNull { log ->
                     val p = log.fromRadio.packet ?: return@mapNotNull null
-                    val snr: Float = p.rx_snr ?: 0f
+                    val snr: Float = p.rx_snr
                     val rssi: Int = p.rx_rssi ?: 0
                     if (p.hop_start == 0 || p.hop_start != p.hop_limit || snr == 0f) null else snr to rssi
                 }
@@ -1647,26 +1647,26 @@ class AssistantDataProvider(
     suspend fun radioStats(): String {
         val ls = nodeRepository.localStats.value
         val ext = nodeRepository.localStatsExtended.value
-        val uptime = (ls.uptime_seconds ?: 0).toLong()
-        val rx = (ls.num_packets_rx ?: 0)
-        val tx = (ls.num_packets_tx ?: 0)
+        val uptime = (ls.uptime_seconds).toLong()
+        val rx = (ls.num_packets_rx)
+        val tx = (ls.num_packets_tx)
         if (uptime == 0L && rx == 0 && tx == 0) return aiString(Res.string.ai_radio_none)
         val me = nodeRepository.ourNodeInfo.value?.user
         val name = me?.let { it.long_name.ifBlank { it.short_name } }.orEmpty()
         val sb = StringBuilder(aiString(Res.string.ai_radio_title, name).trim())
         fun line(text: String) = sb.append("\n• ").append(text)
         line(aiString(Res.string.ai_radio_uptime, duration(uptime)))
-        line(aiString(Res.string.ai_radio_util, fmt(ls.channel_utilization ?: 0f), fmt(ls.air_util_tx ?: 0f)))
-        line(aiString(Res.string.ai_radio_packets, tx.toString(), rx.toString(), (ls.num_packets_rx_bad ?: 0).toString(), (ls.num_rx_dupe ?: 0).toString()))
-        line(aiString(Res.string.ai_radio_relay, (ls.num_tx_relay ?: 0).toString(), (ls.num_tx_relay_canceled ?: 0).toString(), (ls.num_tx_dropped ?: 0).toString()))
-        line(aiString(Res.string.ai_radio_nodes, (ls.num_online_nodes ?: 0).toString(), (ls.num_total_nodes ?: 0).toString()))
-        val heapTotal = ls.heap_total_bytes ?: 0
-        val heapFree = ls.heap_free_bytes ?: 0
+        line(aiString(Res.string.ai_radio_util, fmt(ls.channel_utilization), fmt(ls.air_util_tx)))
+        line(aiString(Res.string.ai_radio_packets, tx.toString(), rx.toString(), (ls.num_packets_rx_bad).toString(), (ls.num_rx_dupe).toString()))
+        line(aiString(Res.string.ai_radio_relay, (ls.num_tx_relay).toString(), (ls.num_tx_relay_canceled).toString(), (ls.num_tx_dropped).toString()))
+        line(aiString(Res.string.ai_radio_nodes, (ls.num_online_nodes).toString(), (ls.num_total_nodes).toString()))
+        val heapTotal = ls.heap_total_bytes
+        val heapFree = ls.heap_free_bytes
         if (heapTotal > 0) {
             val used = (heapTotal - heapFree).coerceAtLeast(0)
             line(aiString(Res.string.ai_radio_heap, fmt(used.toFloat() / heapTotal * PERCENT), (used / BYTES_PER_KB).toString(), (heapTotal / BYTES_PER_KB).toString()))
         }
-        val noise = ls.noise_floor ?: 0
+        val noise = ls.noise_floor
         if (noise != 0) line(aiString(Res.string.ai_radio_noise, noise.toString()))
         if (ext.flashTotalBytes > 0 || ext.cpuUsagePercent > 0) {
             val flash = if (ext.flashTotalBytes > 0) fmt(ext.flashUsedBytes.toFloat() / ext.flashTotalBytes * PERCENT) else aiString(Res.string.ai_none_value)
@@ -1914,11 +1914,11 @@ class AssistantDataProvider(
                     line(s("najlepszy sygnał: $name, SNR ${fmt(best.second)} dB", "best signal: $name, SNR ${fmt(best.second)} dB") + extra)
                 }
             }
-            val noise = ls.noise_floor ?: 0
+            val noise = ls.noise_floor
             if (noise != 0) {
                 line(s("szum: $noise dBm", "noise: $noise dBm") + if (noise > -100) s(" — wysoki, coś w pobliżu zakłóca (zasilacz, komputer, inne radio)", " — high, something nearby interferes (power supply, computer, another radio)") else s(" — w normie", " — normal"))
             }
-            val util = ls.channel_utilization ?: 0f
+            val util = ls.channel_utilization
             if (util > 0f) line(s("zajętość kanału: ${fmt(util)} %", "channel use: ${fmt(util)} %") + if (util > 25f) s(" — kanał jest zatłoczony", " — the channel is crowded") else "")
         }
         sb.append("\n\n").append(

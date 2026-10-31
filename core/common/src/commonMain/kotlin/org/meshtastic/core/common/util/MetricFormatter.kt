@@ -55,7 +55,7 @@ object MetricFormatter {
 
     /** How much of [total] is taken by [used], as a whole percent ("45%"); empty when [total] is not positive. */
     fun usedPercent(used: Long, total: Long): String =
-        if (total > 0) percent((used.coerceIn(0L, total) * PERCENT_SCALE / total).toFloat(), 0) else ""
+        if (total > 0) percent(used.coerceIn(0L, total) * PERCENT_SCALE / total, 0) else ""
 
     fun humidity(value: Float): String = percent(value, 0)
 

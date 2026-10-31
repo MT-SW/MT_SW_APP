@@ -32,8 +32,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -199,7 +199,7 @@ fun NetworkHealthScreen(
                 )
             }
 
-            ScrollableTabRow(selectedTabIndex = uiState.activeMetric.ordinal) {
+            PrimaryScrollableTabRow(selectedTabIndex = uiState.activeMetric.ordinal) {
                 NetworkHealthMetric.entries.forEach { metric ->
                     Tab(
                         selected = uiState.activeMetric == metric,
