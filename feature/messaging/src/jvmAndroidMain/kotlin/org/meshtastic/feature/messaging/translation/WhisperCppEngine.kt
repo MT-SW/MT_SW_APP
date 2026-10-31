@@ -368,7 +368,9 @@ class WhisperCppEngine(
         const val MAX_SILENCE_CHARS = 30
         const val MAX_SILENCE_MS = 4_500L
         const val WAV_HEADER_BYTES = 44
-        val VENDOR_LIB_DIRS = listOf("/vendor/lib64", "/system/vendor/lib64", "/odm/lib64")
+        // The system's own libraries come first: Android 17's liblog needs a symbol (std::__1::__hash_memory) that only the system's
+        // libc++ has, and an older libc++ in a vendor folder (seen on Samsung) found first made the program fail to start.
+        val VENDOR_LIB_DIRS = listOf("/system/lib64", "/vendor/lib64", "/system/vendor/lib64", "/odm/lib64")
         val DSP_DIRS = listOf("/vendor/dsp/cdsp", "/vendor/lib/rfsa/adsp", "/vendor/dsp", "/system/lib/rfsa/adsp", "/dsp")
         val CHIP_LINE = Regex("backend|HTP\\d|Hexagon|OpenCL|Vulkan|Metal|Adreno|device", RegexOption.IGNORE_CASE)
         val CHIP_USED = Regex("using (HTP|Hexagon|OpenCL|Vulkan|GPU)|HTP\\d|ggml_opencl|ggml_vulkan|ggml_metal|using Metal|using MTL\\d|MTL\\d|ggml-hex|Adreno|Found \\d+ Vulkan", RegexOption.IGNORE_CASE)

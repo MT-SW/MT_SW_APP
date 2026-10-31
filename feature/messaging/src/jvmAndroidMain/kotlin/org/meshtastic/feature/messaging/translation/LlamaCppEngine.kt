@@ -858,7 +858,9 @@ class LlamaCppEngine(
         val NPU_DEVICE = Regex("device HTP\\d", RegexOption.IGNORE_CASE)
         val NPU_BUFFER = Regex("(HTP\\d|OPENVINO|OpenVINO)\\S*\\s+model buffer size", RegexOption.IGNORE_CASE)
         /** The phone's own driver folders (OpenCL, Vulkan and the NPU's connection library live there). */
-        val VENDOR_LIB_DIRS = listOf("/vendor/lib64", "/system/vendor/lib64", "/odm/lib64")
+        // The system's own libraries come first: Android 17's liblog needs a symbol (std::__1::__hash_memory) that only the system's
+        // libc++ has, and an older libc++ in a vendor folder (seen on Samsung) found first made the program fail to start.
+        val VENDOR_LIB_DIRS = listOf("/system/lib64", "/vendor/lib64", "/system/vendor/lib64", "/odm/lib64")
         /** Where the phone keeps the NPU's own programs. */
         val DSP_DIRS = listOf("/vendor/dsp/cdsp", "/vendor/lib/rfsa/adsp", "/vendor/dsp", "/system/lib/rfsa/adsp", "/dsp")
         /** The NPU of a Snapdragon gives each session about 2 GB. */
