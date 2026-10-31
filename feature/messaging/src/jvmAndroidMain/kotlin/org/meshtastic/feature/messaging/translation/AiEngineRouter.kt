@@ -120,6 +120,10 @@ class AiEngineRouter(
 
     override val deviceSummary: String get() = llama.deviceSummary
 
+    override val memoryUsedMb: Int? get() = llama.memoryUsedMb
+
+    override fun lastStart(modelId: String): Pair<String, String>? = llama.lastStart(modelId)
+
     override fun contextTokens(modelId: String): Int = llama.contextTokens(modelId)
 
     override suspend fun chat(

@@ -27,6 +27,12 @@ interface AiTextEngine {
     /** What happened at the last start of the model, attempt by attempt (empty before the first start); for `/sprzet`. */
     val startReport: String get() = ""
 
+    /** Memory (MB) the model program takes right now; null while nothing is loaded or when it cannot be read. */
+    val memoryUsedMb: Int? get() = null
+
+    /** Where the model [modelId] ran at its last start, and that start's report, even after it was released from memory; null = unknown. */
+    fun lastStart(modelId: String): Pair<String, String>? = null
+
     /** Chip, graphics driver and memory of this device, for `/sprzet`; empty when unknown. */
     val deviceSummary: String get() = ""
 

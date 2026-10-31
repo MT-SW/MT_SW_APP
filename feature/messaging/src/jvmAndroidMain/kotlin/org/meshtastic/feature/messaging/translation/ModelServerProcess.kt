@@ -39,6 +39,23 @@ internal class ModelServerProcess private constructor(
 ) {
     val isAlive: Boolean get() = process.isAlive
 
+    /** Memory (MB) this program takes in the main memory right now; null when the system does not tell. */
+    fun memoryMb(): Int? = runCatching {
+        val pid = process.pid()
+        val status = File("/proc/$pid/status")
+        val kb =
+            if (status.isFile) {
+                status.readLines().firstOrNull { it.startsWith("VmRSS:") }?.filter { it.isDigit() }?.toLongOrNull()
+            } else if (System.getProperty("os.name").orEmpty().lowercase().contains("windows")) {
+                val out = ProcessBuilder("powershell", "-NoProfile", "-NonInteractive", "-Command", "(Get-Process -Id $pid).WorkingSet64 / 1024").redirectErrorStream(true).start()
+                    .inputStream.bufferedReader().readText().trim()
+                out.substringBefore('.').substringBefore(',').toLongOrNull()
+            } else {
+                ProcessBuilder("ps", "-o", "rss=", "-p", pid.toString()).redirectErrorStream(true).start().inputStream.bufferedReader().readText().trim().toLongOrNull()
+            }
+        kb?.div(1024)?.toInt()
+    }.getOrNull()
+
     val baseUrl: String get() = "http://127.0.0.1:$port"
 
     /** The last lines the program wrote (for the log when it fails). */

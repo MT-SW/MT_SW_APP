@@ -86,6 +86,14 @@ class LlamaCppEngine(
 
     override val deviceSummary: String get() = runCatching { installer.deviceSummary() }.getOrDefault("")
 
+    override val memoryUsedMb: Int? get() = server?.takeIf { it.isAlive }?.memoryMb()
+
+    /** The last successful start, kept on disk so `/sprzet` can still tell where the model ran after it was released or the app restarted. */
+    override fun lastStart(modelId: String): Pair<String, String>? = runCatching {
+        val lines = File(logDir, LAST_START_FILE).takeIf { it.isFile }?.readText()?.split("\n", limit = 3) ?: return null
+        if (lines.size < 3 || lines[0] != modelId) null else lines[1] to lines[2].trim()
+    }.getOrNull()
+
     /** Set from a hidden setting: skip every NPU and go straight to the graphics card (to test that path). */
     @Volatile
     var skipNpu: Boolean = false
@@ -592,6 +600,7 @@ class LlamaCppEngine(
             startReport = tried.toString()
             store.reportLoaded(TAG, modelId)
             Logger.i(tag = TAG) { "Model ${model.name} runs: $activeBackend" }
+            runCatching { File(logDir, LAST_START_FILE).writeText("$modelId\n$activeBackend\n${startReport}") }
             return started
         }
         throw failure ?: IllegalStateException("The model program could not be started")
@@ -725,6 +734,7 @@ class LlamaCppEngine(
     private companion object {
         const val TAG = "LlamaCppEngine"
         const val PID_FILE = "llama-server.pid"
+        const val LAST_START_FILE = "last-start.txt"
         const val USER = "user"
         const val DONE = "[DONE]"
         const val TOP_P = 0.95
