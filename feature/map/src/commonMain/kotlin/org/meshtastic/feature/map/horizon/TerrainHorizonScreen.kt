@@ -136,6 +136,7 @@ import org.meshtastic.core.resources.terrain_horizon_observer_title
 import org.meshtastic.core.resources.terrain_horizon_only_visible
 import org.meshtastic.core.resources.terrain_horizon_options
 import org.meshtastic.core.resources.terrain_horizon_node_range
+import org.meshtastic.core.resources.terrain_horizon_favorites
 import org.meshtastic.core.resources.terrain_horizon_precision
 import org.meshtastic.core.resources.terrain_horizon_range
 import org.meshtastic.core.resources.terrain_horizon_refraction
@@ -297,6 +298,7 @@ fun TerrainHorizonScreen(
             }
             OfflineTerrain(state = state, onRadius = viewModel::setSaveRadius, onSave = viewModel::saveTerrain, onClear = viewModel::clearSavedTerrain)
             ChipRow(stringResource(Res.string.terrain_horizon_only_visible)) { Switch(checked = onlyVisible, onCheckedChange = { onlyVisible = it }) }
+            ChipRow(stringResource(Res.string.terrain_horizon_favorites)) { Switch(checked = state.onlyFavorites, onCheckedChange = viewModel::setOnlyFavorites) }
             ChipRow(stringResource(Res.string.terrain_horizon_precision)) { Switch(checked = state.precisionCircles, onCheckedChange = viewModel::setPrecisionCircles) }
             ChipRow(stringResource(Res.string.terrain_horizon_labels)) { Switch(checked = names, onCheckedChange = { names = it }) }
         }
@@ -634,8 +636,8 @@ private fun MoveMap(state: TerrainHorizonState, onMoved: (Double, Double) -> Uni
     if (pickMap != null) {
         // The same map as the main one, with the nodes drawn as there; a cross in the middle marks the place.
         val mapNodes =
-            remember(state.nodeChoices, state.precisionCircles) {
-                state.nodeChoices.map { HorizonMapNode(it.lat, it.lon, it.shortName, it.color, it.textColor, it.precisionM.takeIf { _ -> state.precisionCircles }) }
+            remember(state.nodeChoices, state.precisionCircles, state.onlyFavorites) {
+                state.nodeChoices.filter { c -> !state.onlyFavorites || c.favorite }.map { HorizonMapNode(it.lat, it.lon, it.shortName, it.color, it.textColor, it.precisionM.takeIf { _ -> state.precisionCircles }) }
             }
         Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {

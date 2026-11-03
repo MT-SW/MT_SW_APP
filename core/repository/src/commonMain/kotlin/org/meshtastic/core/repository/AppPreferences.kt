@@ -648,6 +648,7 @@ data class HorizonPrefs(
     val radiusKm: Int = 15,
     val nodeRangeKm: Int = 100,
     val precisionCircles: Boolean = true,
+    val onlyFavorites: Boolean = false,
     val antennaAuto: Boolean = true,
     val antennaM: Int = 2,
     val targetAntennaM: Int = 2,

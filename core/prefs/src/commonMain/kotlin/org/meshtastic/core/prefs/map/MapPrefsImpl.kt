@@ -179,6 +179,7 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
                 it[KEY_HORIZON_RADIUS_KM] = next.radiusKm
                 it[KEY_HORIZON_NODE_RANGE_KM] = next.nodeRangeKm
                 it[KEY_HORIZON_PRECISION_CIRCLES] = next.precisionCircles
+                it[KEY_HORIZON_ONLY_FAVORITES] = next.onlyFavorites
                 it[KEY_HORIZON_ANTENNA_AUTO] = next.antennaAuto
                 it[KEY_HORIZON_ANTENNA_M] = next.antennaM
                 it[KEY_HORIZON_TARGET_ANTENNA_M] = next.targetAntennaM
@@ -193,6 +194,7 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
             radiusKm = this[KEY_HORIZON_RADIUS_KM] ?: defaults.radiusKm,
             nodeRangeKm = this[KEY_HORIZON_NODE_RANGE_KM] ?: defaults.nodeRangeKm,
             precisionCircles = this[KEY_HORIZON_PRECISION_CIRCLES] ?: defaults.precisionCircles,
+            onlyFavorites = this[KEY_HORIZON_ONLY_FAVORITES] ?: defaults.onlyFavorites,
             antennaAuto = this[KEY_HORIZON_ANTENNA_AUTO] ?: defaults.antennaAuto,
             antennaM = this[KEY_HORIZON_ANTENNA_M] ?: defaults.antennaM,
             targetAntennaM = this[KEY_HORIZON_TARGET_ANTENNA_M] ?: defaults.targetAntennaM,
@@ -222,6 +224,7 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         val KEY_EXCLUDED_ROLES_PREF = stringSetPreferencesKey("map_excluded_roles")
         val KEY_HORIZON_RADIUS_KM = intPreferencesKey("horizon_radius_km")
         val KEY_HORIZON_NODE_RANGE_KM = intPreferencesKey("horizon_node_range_km")
+        val KEY_HORIZON_ONLY_FAVORITES = booleanPreferencesKey("horizon_only_favorites")
         val KEY_HORIZON_PRECISION_CIRCLES = booleanPreferencesKey("horizon_precision_circles")
         val KEY_HORIZON_ANTENNA_AUTO = booleanPreferencesKey("horizon_antenna_auto")
         val KEY_HORIZON_ANTENNA_M = intPreferencesKey("horizon_antenna_m")

@@ -3529,6 +3529,7 @@
     <string name="terrain_horizon_no_position">Brak pozycji telefonu i Twojego węzła, więc nie mogę narysować widoku.</string>
     <string name="terrain_horizon_network">Nie udało się wczytać terenu. Sprawdź połączenie z internetem.</string>
     <string name="terrain_horizon_camera">Aparat</string>
+    <string name="terrain_horizon_favorites">Tylko ulubione</string>
     <string name="terrain_horizon_precision">Okręgi dokładności</string>
     <string name="terrain_horizon_range">Zasięg</string>
     <string name="terrain_horizon_node_range">Węzły do</string>

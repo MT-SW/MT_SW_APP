@@ -71,7 +71,7 @@ sealed interface HorizonObserver {
     data class Point(val lat: Double, val lon: Double) : HorizonObserver
 }
 
-data class HorizonNodeChoice(val num: Int, val name: String, val shortName: String = "", val lat: Double = 0.0, val lon: Double = 0.0, val color: Int = 0, val textColor: Int = 0, val precisionM: Double? = null)
+data class HorizonNodeChoice(val num: Int, val name: String, val shortName: String = "", val lat: Double = 0.0, val lon: Double = 0.0, val color: Int = 0, val textColor: Int = 0, val precisionM: Double? = null, val favorite: Boolean = false)
 
 data class TerrainHorizonState(
     val loading: Boolean = true,
@@ -83,6 +83,8 @@ data class TerrainHorizonState(
     val nodeRangeKm: Int = DEFAULT_NODE_RANGE_KM,
     /** True: a node that hides its exact position gets a circle of the size of the doubt. */
     val precisionCircles: Boolean = true,
+    /** True: only the nodes marked as favourites are drawn (the one the view was opened for always is). */
+    val onlyFavorites: Boolean = false,
     val observer: HorizonObserver = HorizonObserver.MyNode,
     /** The name of the node (or "") the view is looked from, for the label. */
     val observerName: String = "",
@@ -172,6 +174,7 @@ class TerrainHorizonViewModel(
                     radiusKm = saved.radiusKm,
                     nodeRangeKm = saved.nodeRangeKm,
                     precisionCircles = saved.precisionCircles,
+                    onlyFavorites = saved.onlyFavorites,
                     antennaAuto = saved.antennaAuto,
                     antennaM = saved.antennaM,
                     targetAntennaM = saved.targetAntennaM,
@@ -185,6 +188,8 @@ class TerrainHorizonViewModel(
     fun setRadius(km: Int) = change { it.copy(radiusKm = km) }
 
     fun setNodeRange(km: Int) = change { it.copy(nodeRangeKm = km) }
+
+    fun setOnlyFavorites(on: Boolean) = change { it.copy(onlyFavorites = on) }
 
     /** Switches the accuracy circles; nothing is loaded again, they are only drawn or not. */
     fun setPrecisionCircles(on: Boolean) {
@@ -265,6 +270,7 @@ class TerrainHorizonViewModel(
                 radiusKm = after.radiusKm,
                 nodeRangeKm = after.nodeRangeKm,
                 precisionCircles = after.precisionCircles,
+                onlyFavorites = after.onlyFavorites,
                 antennaAuto = after.antennaAuto,
                 antennaM = after.antennaM,
                 targetAntennaM = after.targetAntennaM,
@@ -286,7 +292,7 @@ class TerrainHorizonViewModel(
                     _state.update { it.copy(loading = false, failure = TerrainHorizonFailure.NO_POSITION, profile = null, targets = emptyList(), observerName = "") }
                     return@launch
                 }
-                val nodes = nodes(settings.focusNodeNum, spot.nodeNum)
+                val nodes = nodes(settings.focusNodeNum, spot.nodeNum, settings.onlyFavorites)
                 var radiusKm = settings.radiusKm
                 // A node asked for that lies beyond the range gets the smallest range that reaches it.
                 if (settings.focusNodeNum != null) {
@@ -350,12 +356,12 @@ class TerrainHorizonViewModel(
     private fun nodeChoices(): List<HorizonNodeChoice> =
         nodeRepository.nodeDBbyNum.value.values
             .filter { it.validPosition != null }
-            .map { HorizonNodeChoice(it.num, it.user.long_name.ifBlank { it.user.short_name }, it.user.short_name, it.latitude, it.longitude, it.colors.second, it.colors.first, precisionRadiusMetersOrNull(it.position.precision_bits)) }
+            .map { HorizonNodeChoice(it.num, it.user.long_name.ifBlank { it.user.short_name }, it.user.short_name, it.latitude, it.longitude, it.colors.second, it.colors.first, precisionRadiusMetersOrNull(it.position.precision_bits), it.isFavorite) }
             .sortedBy { it.name.lowercase() }
 
-    private fun nodes(focus: Int?, lookingFrom: Int?): List<Triple<Int, String, GeoPoint>> {
+    private fun nodes(focus: Int?, lookingFrom: Int?, onlyFavorites: Boolean): List<Triple<Int, String, GeoPoint>> {
         return nodeRepository.nodeDBbyNum.value.values
-            .filter { it.num != lookingFrom && it.validPosition != null && (focus == null || it.num == focus) }
+            .filter { it.num != lookingFrom && it.validPosition != null && (focus == null || it.num == focus) && (!onlyFavorites || focus != null || it.isFavorite) }
             .map { node -> Triple(node.num, node.user.short_name.ifBlank { node.user.long_name }, GeoPoint(node.latitude, node.longitude)) }
     }
 }

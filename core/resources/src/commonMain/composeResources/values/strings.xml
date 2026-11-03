@@ -3071,6 +3071,7 @@
     <string name="terrain_horizon_apply">Show</string>
     <string name="terrain_horizon_camera">Camera</string>
     <string name="terrain_horizon_compass">Compass</string>
+    <string name="terrain_horizon_favorites">Only favourites</string>
     <string name="terrain_horizon_fov">Field of view</string>
     <string name="terrain_horizon_from">From</string>
     <string name="terrain_horizon_hint">Drag to turn the view. Green outline: the node stands above the ridge in front of it. Red outline: a ridge hides it. Geometry only: a node in sight can still be out of range. Terrain: Mapterhorn. Method: MeshRF (GPL-3.0).</string>
