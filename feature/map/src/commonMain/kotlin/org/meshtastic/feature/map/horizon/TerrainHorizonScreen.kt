@@ -135,6 +135,7 @@ import org.meshtastic.core.resources.terrain_horizon_title
 import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PhotoCamera
+import org.meshtastic.core.ui.icon.Settings
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -195,6 +196,13 @@ fun TerrainHorizonScreen(
                 Icon(MeshtasticIcons.ArrowBack, stringResource(Res.string.navigate_back), tint = MaterialTheme.colorScheme.onBackground)
             }
             Text(stringResource(Res.string.terrain_horizon_title), color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.weight(1f))
+            IconButton(onClick = { moreOptions = !moreOptions }) {
+                Icon(
+                    MeshtasticIcons.Settings,
+                    stringResource(Res.string.terrain_horizon_options),
+                    tint = if (moreOptions) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
+                )
+            }
             IconButton(onClick = onOpenCamera) {
                 Icon(MeshtasticIcons.PhotoCamera, stringResource(Res.string.terrain_horizon_camera), tint = MaterialTheme.colorScheme.onBackground)
             }
@@ -212,7 +220,6 @@ fun TerrainHorizonScreen(
             )
             BrandChip(selected = compass, onClick = { compass = !compass }, label = { Text(stringResource(Res.string.terrain_horizon_compass)) })
             BrandChip(selected = moving, onClick = { moving = !moving }, label = { Text(stringResource(Res.string.terrain_horizon_move)) })
-            TextButton(onClick = { moreOptions = !moreOptions }) { Text(stringResource(Res.string.terrain_horizon_options)) }
         }
         ChipRow(stringResource(Res.string.terrain_horizon_range)) {
             HORIZON_RADII_KM.forEach { km ->
