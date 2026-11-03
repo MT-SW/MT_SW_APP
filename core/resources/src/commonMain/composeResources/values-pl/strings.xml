@@ -3523,4 +3523,14 @@
     <string name="compat_step_dictation">Sprawdzam dyktowanie…</string>
     <string name="compat_report_note">Test asystenta: wynik w załączonej paczce.</string>
     <string name="compat_run_again">Uruchom test zgodności</string>
+    <string name="terrain_horizon_title">Panorama terenu</string>
+    <string name="terrain_horizon_loading">Wczytuję teren…</string>
+    <string name="terrain_horizon_no_position">Brak pozycji telefonu i Twojego węzła, więc nie mogę narysować widoku.</string>
+    <string name="terrain_horizon_network">Nie udało się wczytać terenu. Sprawdź połączenie z internetem.</string>
+    <string name="terrain_horizon_camera">Aparat</string>
+    <string name="terrain_horizon_range">Zasięg</string>
+    <string name="terrain_horizon_antenna">Moja antena</string>
+    <string name="terrain_horizon_in_sight">Węzły w zasięgu wzroku: %1$d z %2$d</string>
+    <string name="terrain_horizon_hint">Przesuń palcem, żeby obrócić widok. Zielony: węzeł stoi nad grzbietem przed nim. Czerwony: grzbiet go zasłania. Tylko geometria: widoczny węzeł może mimo to być poza zasięgiem radia. Teren: Mapterhorn. Metoda: MeshRF (GPL-3.0).</string>
+    <string name="terrain_horizon_none">Brak węzła z pozycją w tym zasięgu.</string>
 </resources>

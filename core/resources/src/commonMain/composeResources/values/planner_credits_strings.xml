@@ -26,4 +26,5 @@
     <string name="planner_credits_line_openmeteo">Weather data (optional): Open-Meteo.com; CC BY 4.0 licence</string>
     <string name="planner_credits_line_osm">Map data and obstacles (buildings, forests; optional, via the Overpass API): © OpenStreetMap contributors; ODbL licence (openstreetmap.org/copyright)</string>
     <string name="planner_credits_line_cables">Cable and connector data: manufacturers' data sheets (Times Microwave, Belden, Huber+Suhner, SSB-Electronic, CommScope/Andrew, Fairview Microwave and others); approximate values are marked in the planner</string>
+    <string name="planner_credits_line_meshrf">Terrain panorama: method of the Horizon view of MeshRF by Ixitxachitl (github.com/Ixitxachitl/MeshRF), GPL-3.0-or-later.</string>
 </resources>

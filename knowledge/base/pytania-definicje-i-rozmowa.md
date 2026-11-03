@@ -144,3 +144,8 @@ Słowa: zgłoś błąd, zgłoszenie, logi 24 godziny, paczka, test zgodności, t
 Ostrzeżenie i przyciski „Kopiuj całą rozmowę" i „Zapisz rozmowę" nad rozmową zwijają się, gdy przewijasz rozmowę palcem w górę, i wracają po przesunięciu w dół. Dzięki temu przy mocno powiększonym ekranie rozmowa ma miejsce. Zwijanie wyłączysz przełącznikiem w oknie informacji (ikona „i" w asystencie). Tam jest też przełącznik automatycznego przewijania rozmowy.
 Słowa: nagłówek asystenta, zwijanie nagłówka, zwijany nagłówek, ikona i, przewijanie rozmowy, duży ekran, kopiuj rozmowę, zapisz rozmowę
 Źródło: Dokumentacja aplikacji: Funkcje MT_SW, asystent (sprawdzono 2026-11)
+
+### Co to jest panorama terenu w widoku sieci?
+Widok sieci otwiera się najpierw jako panorama terenu: sylwetka terenu dookoła, widziana z miejsca, w którym stoisz, z naniesionymi węzłami. Węzeł zielony stoi nad grzbietem przed nim, czerwony jest przez grzbiet zasłonięty. Przesuwasz palcem, żeby obracać widok, wybierasz zasięg (2, 5, 15 lub 40 km) i wysokość swojej anteny; dotknięcie węzła otwiera jego szczegóły. To tylko geometria, więc węzeł w zasięgu wzroku może być poza zasięgiem radia; sprawdź to w planerze łącza. Przycisk widoku sieci jest wśród przycisków mapy, obok planera, a ikona aparatu na górze przełącza na widok z aparatem. Teren pobierany jest z internetu.
+Słowa: panorama terenu, widok sieci, horyzont, linia horyzontu, teren, węzły w zasięgu wzroku, zasłonięty węzeł, aparat, AR, Mesh HUD, widoczność węzła
+Źródło: Dokumentacja aplikacji: Mapa i punkty trasy, widok sieci (sprawdzono 2026-11)

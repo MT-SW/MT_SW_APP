@@ -18,20 +18,17 @@ package org.meshtastic.feature.map
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.map
-import org.meshtastic.core.resources.mesh_hud_open
 import org.meshtastic.core.ui.component.MainAppBar
-import org.meshtastic.core.ui.icon.CenterFocusStrong
-import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.feature.map.component.LocalOpenMeshHud
 import org.meshtastic.core.ui.util.LocalMapViewProvider
 
 @Composable
@@ -59,26 +56,18 @@ fun MapScreen(
                 showNodeChip = ourNodeInfo != null && isConnected,
                 canNavigateUp = false,
                 onNavigateUp = {},
-                actions = {
-                    onOpenMeshHud?.let { onClick ->
-                        IconButton(onClick = onClick) {
-                            Icon(
-                                MeshtasticIcons.CenterFocusStrong,
-                                contentDescription = stringResource(Res.string.mesh_hud_open),
-                            )
-                        }
-                    }
-                },
                 onClickChip = { onClickNodeChip(it.num) },
             )
         },
     ) { paddingValues ->
-        LocalMapViewProvider.current?.MapView(
-            modifier = Modifier.fillMaxSize().padding(paddingValues),
-            navigateToNodeDetails = navigateToNodeDetails,
-            waypointId = waypointId,
-            plannerNodeNum = plannerNodeNum,
-            focusNodeNum = focusNodeNum,
-        )
+        CompositionLocalProvider(LocalOpenMeshHud provides onOpenMeshHud) {
+            LocalMapViewProvider.current?.MapView(
+                modifier = Modifier.fillMaxSize().padding(paddingValues),
+                navigateToNodeDetails = navigateToNodeDetails,
+                waypointId = waypointId,
+                plannerNodeNum = plannerNodeNum,
+                focusNodeNum = focusNodeNum,
+            )
+        }
     }
 }

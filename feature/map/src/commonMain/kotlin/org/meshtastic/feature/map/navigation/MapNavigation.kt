@@ -16,12 +16,17 @@
  */
 package org.meshtastic.feature.map.navigation
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import org.meshtastic.core.navigation.MapRoute
 import org.meshtastic.core.navigation.NodesRoute
+import org.meshtastic.feature.map.horizon.TerrainHorizonScreen
 import org.meshtastic.feature.map.hud.MeshHudScreen
 
 fun EntryProviderScope<NavKey>.mapGraph(backStack: NavBackStack<NavKey>) {
@@ -37,11 +42,23 @@ fun EntryProviderScope<NavKey>.mapGraph(backStack: NavBackStack<NavKey>) {
         )
     }
 
-    // No pane metadata: the camera view takes the whole window.
+    // No pane metadata: the view takes the whole window. The terrain panorama opens first and the camera is one tap
+    // away; a traceroute or a track is drawn in the air, so those open straight in the camera.
     entry<MapRoute.MeshHud> { args ->
+        val needsCamera = args.tracerouteDestNum != null || args.trackNodeNum != null
+        var camera by rememberSaveable { mutableStateOf(needsCamera) }
+        if (!camera) {
+            TerrainHorizonScreen(
+                focusNodeNum = args.focusNodeNum,
+                onNavigateUp = dropUnlessResumed { backStack.removeLastOrNull() },
+                onOpenCamera = { camera = true },
+                onOpenNode = { num -> backStack.add(NodesRoute.NodeDetail(num)) },
+            )
+            return@entry
+        }
         MeshHudScreen(
             focusNodeNum = args.focusNodeNum,
-            onNavigateUp = dropUnlessResumed { backStack.removeLastOrNull() },
+            onNavigateUp = dropUnlessResumed { if (needsCamera) backStack.removeLastOrNull() else camera = false },
             onOpenNode = { num -> backStack.add(NodesRoute.NodeDetail(num)) },
             tracerouteDestNum = args.tracerouteDestNum,
             tracerouteRequestId = args.tracerouteRequestId,

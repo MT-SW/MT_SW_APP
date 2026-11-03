@@ -44,6 +44,7 @@ import org.meshtastic.core.resources.planner_credits_line_meshmap
 import org.meshtastic.core.resources.planner_credits_line_siteplanner_original
 import org.meshtastic.core.resources.planner_credits_line_splat
 import org.meshtastic.core.resources.planner_credits_line_itm
+import org.meshtastic.core.resources.planner_credits_line_meshrf
 import org.meshtastic.core.resources.planner_credits_line_mapterhorn
 import org.meshtastic.core.resources.planner_credits_line_openmeteo
 import org.meshtastic.core.resources.planner_credits_line_osm
@@ -154,6 +155,12 @@ private fun AcknowledgementsHeader() {
         )
         Text(
             text = stringResource(Res.string.planner_credits_line_itm),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        Text(
+            text = stringResource(Res.string.planner_credits_line_meshrf),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 4.dp),

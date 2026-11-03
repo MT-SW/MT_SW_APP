@@ -3035,6 +3035,17 @@
     <string name="temperature">Temp</string>
     <string name="terminate_app">Force stop the app</string>
     <string name="terminate_app_message">The app will disconnect from the device, stop its background service and end the whole process, like "Force stop" in the system settings. Start it again to resume.</string>
+    <!-- TERRAIN -->
+    <string name="terrain_horizon_antenna">My antenna</string>
+    <string name="terrain_horizon_camera">Camera</string>
+    <string name="terrain_horizon_hint">Drag to turn the view. Green: the node stands above the ridge in front of it. Red: a ridge hides it. Geometry only: a node in sight can still be out of range. Terrain: Mapterhorn. Method: MeshRF (GPL-3.0).</string>
+    <string name="terrain_horizon_in_sight">Nodes in sight: %1$d of %2$d</string>
+    <string name="terrain_horizon_loading">Reading terrain…</string>
+    <string name="terrain_horizon_network">The terrain data could not be loaded. Check the internet connection.</string>
+    <string name="terrain_horizon_no_position">No position of this phone or of your node yet, so the view cannot be drawn.</string>
+    <string name="terrain_horizon_none">No node with a position within this range.</string>
+    <string name="terrain_horizon_range">Range</string>
+    <string name="terrain_horizon_title">Terrain panorama</string>
     <!-- THEME -->
     <string name="theme">Theme</string>
     <string name="theme_dark">Dark</string>

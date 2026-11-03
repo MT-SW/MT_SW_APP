@@ -26,6 +26,7 @@ import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
@@ -36,7 +37,9 @@ import org.meshtastic.core.resources.orient_north
 import org.meshtastic.core.resources.planner_title
 import org.meshtastic.core.resources.refresh
 import org.meshtastic.core.resources.toggle_my_position
+import org.meshtastic.core.resources.mesh_hud_open
 import org.meshtastic.core.ui.icon.CellTower
+import org.meshtastic.core.ui.icon.CenterFocusStrong
 import org.meshtastic.core.ui.icon.LocationDisabled
 import org.meshtastic.core.ui.icon.MapCompass
 import org.meshtastic.core.ui.icon.MeshtasticIcons
@@ -68,6 +71,12 @@ import org.meshtastic.core.ui.theme.StatusColors.StatusRed
  * @param onRefresh Callback when the refresh button is clicked.
  */
 @Suppress("LongParameterList")
+/**
+ * Opens the mesh view (terrain panorama first, camera second); null hides its button. The map screen provides it, so
+ * the button sits in the map's own controls next to the planner whichever map engine draws them.
+ */
+val LocalOpenMeshHud = compositionLocalOf<(() -> Unit)?> { null }
+
 @Composable
 fun MapControlsOverlay(
     modifier: Modifier = Modifier,
@@ -124,6 +133,15 @@ fun MapControlsOverlay(
             MapButton(
                 icon = MeshtasticIcons.CellTower,
                 contentDescription = stringResource(Res.string.planner_title),
+                onClick = onClick,
+            )
+        }
+
+        // The mesh view (terrain panorama first, camera second), next to the planner (optional)
+        LocalOpenMeshHud.current?.let { onClick ->
+            MapButton(
+                icon = MeshtasticIcons.CenterFocusStrong,
+                contentDescription = stringResource(Res.string.mesh_hud_open),
                 onClick = onClick,
             )
         }

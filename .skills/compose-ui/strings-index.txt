@@ -2966,6 +2966,17 @@ telemetry_config
 temperature
 terminate_app
 terminate_app_message
+### TERRAIN ###
+terrain_horizon_antenna
+terrain_horizon_camera
+terrain_horizon_hint
+terrain_horizon_in_sight
+terrain_horizon_loading
+terrain_horizon_network
+terrain_horizon_no_position
+terrain_horizon_none
+terrain_horizon_range
+terrain_horizon_title
 ### THEME ###
 theme
 theme_dark
