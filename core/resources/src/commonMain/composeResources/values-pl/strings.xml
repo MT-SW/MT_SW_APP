@@ -1636,7 +1636,7 @@
     <string name="navigate_into_label">Wejdź do środka</string>
     <string name="nearby_devices_permission">Uprawnienie do pobliskich urządzeń</string>
     <string name="need_hardware">Potrzebujesz sprzętu?</string>
-    <string name="need_hardware_description">MT_SW wymaga kompatybilnego urządzenia. Nasi wspierający i partnerzy oferują gotowy do użycia sprzęt. Oto niektóre z najpopularniejszych opcji.</string>
+    <string name="need_hardware_description">MT_SW działa z radiami LoRa, które mają firmware mesh (oryginalny albo MT_SW_FIRMWARE). Jak wybrać sprzęt i go ustawić, opisuje dokumentacja i strona projektu.</string>
     <string name="neighbor_info">Informacje o sąsiadach</string>
     <string name="neighbor_info_config">Konfiguracja Info o sąsiadach</string>
     <string name="neighbor_info_enabled">Włącz informacje o sąsiadach</string>
@@ -2726,7 +2726,7 @@
     <string name="website">Strona internetowa</string>
     <string name="weight">Waga</string>
     <string name="what_is_meshtastic">Czym jest MT_SW?</string>
-    <string name="what_is_meshtastic_description">Otwarta, zdecentralizowana sieć mesh działająca bez infrastruktury, na niedrogich radiach o niskim poborze mocy.</string>
+    <string name="what_is_meshtastic_description">MT_SW to aplikacja i społeczność wokół otwartej sieci mesh LoRa, która działa bez internetu i bez stacji bazowych: radia przekazują sobie wiadomości z węzła do węzła. Aplikacja rozbudowuje oryginał o m.in. planer łączy, panoramę terenu, asystenta AI i tłumacza działających offline, dodatkowe statystyki, bogatszą listę węzłów i wiele ustawień. Tworzymy ją razem z lokalną społecznością z Świętokrzyskiego, a dołączyć może każdy.</string>
     <!-- WIFI -->
     <string name="widget_node_tracker_choose">Wybierz węzeł do śledzenia</string>
     <string name="widget_node_tracker_not_found">Nie znaleziono węzła. Dotknij, aby wybrać węzeł.</string>

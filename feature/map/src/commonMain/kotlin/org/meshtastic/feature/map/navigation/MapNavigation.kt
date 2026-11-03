@@ -41,7 +41,17 @@ fun EntryProviderScope<NavKey>.mapGraph(backStack: NavBackStack<NavKey>) {
             { backStack.add(MapRoute.MeshHud()) }, // onOpenMeshHud
         )
     }
+    meshHudEntry(backStack)
+}
 
+/**
+ * The mesh view (terrain panorama and camera). Shared by the phone's and the desktop's navigation graph, since a deep
+ * link can open it on either; [onOpenNode] says where a tapped node's details open.
+ */
+fun EntryProviderScope<NavKey>.meshHudEntry(
+    backStack: NavBackStack<NavKey>,
+    onOpenNode: (Int) -> Unit = { num -> backStack.add(NodesRoute.NodeDetail(num)) },
+) {
     // No pane metadata: the view takes the whole window. The terrain panorama opens first and the camera is one tap
     // away; a traceroute or a track is drawn in the air, so those open straight in the camera.
     entry<MapRoute.MeshHud> { args ->
@@ -52,14 +62,14 @@ fun EntryProviderScope<NavKey>.mapGraph(backStack: NavBackStack<NavKey>) {
                 focusNodeNum = args.focusNodeNum,
                 onNavigateUp = dropUnlessResumed { backStack.removeLastOrNull() },
                 onOpenCamera = { camera = true },
-                onOpenNode = { num -> backStack.add(NodesRoute.NodeDetail(num)) },
+                onOpenNode = onOpenNode,
             )
             return@entry
         }
         MeshHudScreen(
             focusNodeNum = args.focusNodeNum,
             onNavigateUp = dropUnlessResumed { if (needsCamera) backStack.removeLastOrNull() else camera = false },
-            onOpenNode = { num -> backStack.add(NodesRoute.NodeDetail(num)) },
+            onOpenNode = onOpenNode,
             tracerouteDestNum = args.tracerouteDestNum,
             tracerouteRequestId = args.tracerouteRequestId,
             tracerouteLogUuid = args.tracerouteLogUuid,

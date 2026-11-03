@@ -32,6 +32,7 @@ import org.meshtastic.feature.discovery.navigation.discoveryGraph
 import org.meshtastic.feature.docs.navigation.docsEntries
 import org.meshtastic.feature.firmware.navigation.firmwareGraph
 import org.meshtastic.feature.messaging.navigation.contactsGraph
+import org.meshtastic.feature.map.navigation.meshHudEntry
 import org.meshtastic.feature.node.navigation.networkHealthGraph
 import org.meshtastic.feature.node.navigation.nodesGraph
 import org.meshtastic.feature.settings.navigation.settingsGraph
@@ -73,8 +74,13 @@ fun EntryProviderScope<NavKey>.desktopNavGraph(
             multiBackstack.backStacks[TopLevelDestination.Nodes.route]?.add(NodesRoute.NodeDetail(id))
         }
         mapScreen(openNodeInNodesTab, openNodeInNodesTab, args.waypointId, args.plannerNodeNum, args.focusNodeNum) {
-            // Widok AR sieci istnieje tylko na telefonach z Androidem — na komputerze nic nie robi.
+            backStack.add(MapRoute.MeshHud())
         }
+    }
+    // The mesh view (terrain panorama first): a node tapped in it opens in the Nodes tab, as from the map.
+    meshHudEntry(backStack) { id ->
+        multiBackstack.navigateTopLevel(TopLevelDestination.Nodes.route)
+        multiBackstack.backStacks[TopLevelDestination.Nodes.route]?.add(NodesRoute.NodeDetail(id))
     }
     firmwareGraph(backStack)
     settingsGraph(backStack, settingsRadioConfigViewModel)
