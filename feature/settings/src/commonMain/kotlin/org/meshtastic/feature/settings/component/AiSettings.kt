@@ -57,6 +57,9 @@ import org.meshtastic.core.repository.TranslatorModelState
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ai_assistant_summary
+import org.meshtastic.core.resources.ai_experimental_body
+import org.meshtastic.core.resources.ai_experimental_report
+import org.meshtastic.core.resources.ai_experimental_title
 import org.meshtastic.core.resources.ai_assistant_title
 import org.meshtastic.core.resources.ai_assistant_unavailable
 import org.meshtastic.core.resources.ai_dictation_note
@@ -116,6 +119,7 @@ import org.meshtastic.core.resources.translator_ready
 import org.meshtastic.core.resources.translator_summary
 import org.meshtastic.core.resources.translator_title
 import org.meshtastic.core.ui.component.DropDownPreference
+import org.meshtastic.core.ui.component.ReportIssuesDialog
 import org.meshtastic.core.ui.component.SwitchPreference
 
 /**
@@ -171,6 +175,23 @@ internal fun AiSettings() {
             text = { Text(stringResource(Res.string.ai_legacy_freed, freedMb)) },
             confirmButton = { TextButton(onClick = { freedNoticeShown = false }) { Text("OK") } },
         )
+    }
+
+    // Everything here is still being developed: people are asked to try the models and tell us how each one works.
+    var reportOpen by remember { mutableStateOf(false) }
+    if (reportOpen) ReportIssuesDialog(onDismiss = { reportOpen = false })
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Text(
+            text = stringResource(Res.string.ai_experimental_title),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Text(
+            text = stringResource(Res.string.ai_experimental_body),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        TextButton(onClick = { reportOpen = true }) { Text(stringResource(Res.string.ai_experimental_report)) }
     }
 
     SwitchPreference(

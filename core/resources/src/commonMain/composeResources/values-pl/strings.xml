@@ -3550,4 +3550,21 @@
     <string name="mt_sw_map_title">Mapa i planer</string>
     <string name="mt_sw_planner_open_summary">Symuluje łącze radiowe między dwoma punktami, z terenem i bilansem łącza. Jest też wśród przycisków mapy i na stronie węzła</string>
     <string name="mt_sw_terrain_open_summary">Sylwetka terenu dookoła z węzłami: zielone w zasięgu wzroku, czerwone zasłonięte; widok z aparatem jest dodatkiem. Jest też pod przyciskiem widoku sieci obok planera na mapie</string>
+    <string name="intro_mtsw_ai_title">Asystent AI i tłumacz</string>
+    <string name="intro_mtsw_ai_subtitle">Działają w całości na urządzeniu, bez internetu: asystent odpowiada o sieci i aplikacji, tłumacz i dyktowanie pomagają przy wiadomościach. Funkcja eksperymentalna, chętnie przyjmiemy Twoje uwagi o modelach.</string>
+    <string name="intro_mtsw_terrain_title">Panorama terenu</string>
+    <string name="intro_mtsw_terrain_subtitle">Widok sieci pokazuje sylwetkę terenu dookoła z węzłami: zielone są w zasięgu wzroku, czerwone zasłonięte. Aparat jest dodatkiem.</string>
+    <string name="intro_mtsw_kb_title">Baza wiedzy offline</string>
+    <string name="intro_mtsw_kb_subtitle">Przeglądaj całą bazę wiedzy o LoRa, antenach i sieci mesh bez internetu.</string>
+    <string name="intro_mtsw_report_title">Zgłoszenia i logi</string>
+    <string name="intro_mtsw_report_subtitle">Aplikacja sama trzyma logi z ostatnich 24 godzin, a jednym przyciskiem wyślesz zgłoszenie z logami na Discord, WhatsApp lub Signal.</string>
+    <string name="intro_mtsw_notifications_title">Powiadomienia adaptacyjne</string>
+    <string name="intro_mtsw_notifications_subtitle">Na Androidzie 16 i nowszym wybrana przez Ciebie rzecz, np. stan sieci, w pasku stanu i w powiadomieniu usługi.</string>
+    <string name="intro_mtsw_layout_title">Lista węzłów po Twojemu</string>
+    <string name="intro_mtsw_layout_subtitle">Dodatkowe dane pod każdym węzłem i własny układ karty: wybierasz, co widzisz.</string>
+    <string name="intro_mtsw_update_title">Aktualizacje aplikacji</string>
+    <string name="intro_mtsw_update_subtitle">Powiadomienie o nowym wydaniu MT_SW_APP z GitHuba, z wyborem kanału testowego lub stabilnego.</string>
+    <string name="ai_experimental_title">Funkcja eksperymentalna</string>
+    <string name="ai_experimental_body">Asystent, tłumacz i dyktowanie działają w całości na Twoim urządzeniu i wciąż są rozwijane. Będziemy bardzo wdzięczni, jeśli wypróbujesz różne modele i zgłosisz każdy problem oraz spostrzeżenie: który model u Ciebie działa najlepiej, jak szybko odpowiada, na czym pracuje (NPU, karta graficzna, procesor), czy się nie zawiesza i jakie błędy popełnia. Test zgodności i komenda /sprzęt w asystencie zbiorą potrzebne dane.</string>
+    <string name="ai_experimental_report">Zgłoś uwagi o modelach</string>
 </resources>
