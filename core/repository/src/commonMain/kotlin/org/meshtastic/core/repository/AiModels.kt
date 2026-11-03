@@ -600,8 +600,8 @@ object AiModels {
         deepSeek(
             DEEPSEEK_15B, "DeepSeek R1 Distill Qwen 1.5B", "bartowski/DeepSeek-R1-Distill-Qwen-1.5B-GGUF",
             "DeepSeek-R1-Distill-Qwen-1.5B-Q4_0.gguf", 1019, 2000, 4, AiLicense.MIT,
-            "Najmniejszy model „myślący” DeepSeek: działa nawet na słabym telefonie, ale rozumuje płytko i po polsku jest słaby. Do prostych zadań i prób.",
-            "The smallest \"thinking\" DeepSeek model: runs even on a weak phone, but its reasoning is shallow and its Polish is poor. For simple tasks and trying things out.",
+            "Najmniejszy model „myślący” DeepSeek: działa nawet na słabym telefonie, ale rozumuje płytko i po polsku jest słaby. Na Snapdragonie w naszych testach NPU i karta graficzna dawały z nim bełkot, więc działa na procesorze. Do prostych zadań i prób.",
+            "The smallest \"thinking\" DeepSeek model: runs even on a weak phone, but its reasoning is shallow and its Polish is poor. On a Snapdragon, the NPU and graphics card gave nonsense with it in our tests, so it runs on the processor. For simple tasks and trying things out.",
         )
 
     val DeepSeek7b =
