@@ -1239,6 +1239,11 @@ class LlamaAssistantService(
                     lastRoute = "not in the knowledge base"
                     return notInBase(polish, uiPrefs.assistantInternetEnabled.value).also(onPiece)
                 }
+                // A very small model writes nonsense about anything it was not given facts for: it says so instead.
+                if ((AiModels.byId(modelId)?.ramMb ?: Int.MAX_VALUE) < TINY_RAM_MB) {
+                    lastRoute = "too small for general questions"
+                    return rule(polish, TINY_PL, TINY_EN).also(onPiece)
+                }
                 lastRoute = "model's own words (nothing in the base)"
                 // A general question: the model gets no MT_SW facts, so it does not answer a recipe with the mesh network.
                 return speak(modelId, history, polish, onPiece, room, extra = "", lean = true)
@@ -1911,6 +1916,10 @@ class LlamaAssistantService(
         const val SLOW_CHARS_PER_SECOND = 22.0
         const val SLOW_ANSWER_TOKENS = 380
         const val SLOW_BASE_CHARS = 2200
+        /** Models that need less memory than this are too small to chat about general things reliably. */
+        const val TINY_RAM_MB = 1500
+        const val TINY_PL = "Ten mały model nie odpowiada rzetelnie na pytania ogólne i rozmowy. Zapytaj mnie o dane z sieci, o ustawienia aplikacji albo o wiedzę o LoRa i mesh, albo wybierz większy model asystenta (np. Gemma 4 E2B)."
+        const val TINY_EN = "This small model does not answer general questions and chat reliably. Ask me about the network data, the app settings or LoRa and mesh knowledge, or choose a bigger assistant model (e.g. Gemma 4 E2B)."
         const val MIN_CHARS_FOR_SPEED = 120
         const val SPEED_KEEP = 0.6
         const val BRIEF_PL = "Odpowiadaj krótko: najwyżej cztery zdania."
@@ -2202,7 +2211,7 @@ class LlamaAssistantService(
         // Device names: a small model made up their features ("Heltec V3 has a better antenna"), so these are never guessed.
         val HARDWARE_TOPIC = Regex("(?iu)heltec|t-beam|tbeam|t-echo|techo|rak\\s?\\d|lilygo|t1000|xiao|station g|esp32|nrf52|sx12\\d\\d|wio|seeed|elecrow|m5stack")
         val MESH_DEVICE_TOPIC = Regex("(?iu)urządzen|radio|antena|anten|pozycj|bateri|moduł|modul|wyświetlacz|oled|gps|bluetooth|usb|kod qr|klucz|logi|model ai|mqtt|wi-?fi|snr|rssi|\\blna\\b|\\bsaw\\b|lora|kopi[ęea] zapas|konfigurac|firmware|węzł|wezl|kanał|kanal|sygnał|sygnal|zasięg|zasieg|maszt|solar|akumulator|channel|node|signal|battery")
-        val MESH_TOPIC = Regex("(?iu)węz|węzł|mesh|kanał|kanal|firmware|lora|preset|meshtastic|nodeinfo|traceroute|hop|skok")
+        val MESH_TOPIC = Regex("(?iu)węz|węzł|mesh|kanał|kanal|firmware|lora|preset|meshtastic|nodeinfo|traceroute|hop|skok|mhz|\\b868\\b|\\b433\\b|dbm|nadawa|licencj|pasm|duplikat|zduplikowan")
         val BATTERY_LEVEL_ASK = Regex("(?iu)(ile|jaki|jaka)\\s+(procent\\p{L}*\\s+)?(bateri\\p{L}*|naładowa\\p{L}*)|poziom\\p{L}*\\s+bateri|battery\\s+(level|percent)|how much battery")
         val UPTIME_WORDS = Regex("uptime|czas pracy|czasu pracy|jak długo działa|jak dlugo dziala|how long .* running")
         val NEAR_FAR = Regex("najdal|najbliż|najbliz|nearest|farthest|closest")

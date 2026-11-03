@@ -59,6 +59,17 @@ internal class AssistantRouter(private val engine: AiTextEngine) {
         notes: String = "",
         lastNode: String = "",
     ): AssistantIntent? {
+        // A model that has not once written a usable answer in a row of questions (small ones often do not) is not asked again
+        // every time: the word rules decide at once, and it is tried once more after a while.
+        if (brokenModel == modelId && failures >= MAX_FAILURES && skipped < RETRY_AFTER) {
+            skipped++
+            return null
+        }
+        if (brokenModel != modelId) {
+            brokenModel = modelId
+            failures = 0
+        }
+        skipped = 0
         val ask =
             buildString {
                 if (notes.isNotBlank()) append("Notes about the user: ").append(notes.take(NOTES_CHARS).replace('\n', ' ')).append('\n')
@@ -81,12 +92,18 @@ internal class AssistantRouter(private val engine: AiTextEngine) {
                 throw e
             } catch (e: Exception) {
                 Logger.w(tag = TAG, throwable = e) { "Router failed: ${e.message}" }
+                failures++
                 return null
             }
         val intent = parse(raw)
+        if (intent == null) failures++ else failures = 0
         Logger.i(tag = TAG) { "Router: \"${question.take(LOG_CHARS)}\" -> ${raw.take(LOG_CHARS).replace("\n", " ")}" }
         return intent
     }
+
+    @Volatile private var brokenModel = ""
+    @Volatile private var failures = 0
+    @Volatile private var skipped = 0
 
     private fun parse(raw: String): AssistantIntent? {
         val start = raw.indexOf('{')
@@ -118,6 +135,8 @@ internal class AssistantRouter(private val engine: AiTextEngine) {
     companion object {
         private const val TAG = "AssistantRouter"
         private const val MAX_TOKENS = 70
+        private const val MAX_FAILURES = 3
+        private const val RETRY_AFTER = 25
         private const val TEMPERATURE = 0.05f
         private const val NOTES_CHARS = 500
         private const val CONVERSATION_CHARS = 3500

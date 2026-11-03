@@ -61,6 +61,11 @@ class GemmaTranslator(private val engine: AiTextEngine) {
             val again = ask("$prompt\n\nTranslate the whole text, every word of it, not only the names.")
             if (again.length > reply.length) reply = again
         }
+        // A small model sometimes gives the text back as it was (or only the links and names): it is told once that it is not translated.
+        if (isUnchanged(text, reply)) {
+            val again = ask("$prompt\n\nThe text above is still written in the original language. Write the whole text in $into.")
+            if (again.isNotBlank() && !isUnchanged(text, again)) reply = again
+        }
         // Names, numbers with units and links must come out as they went in; when one was changed or lost, the model gets one more try.
         val lost = lostTokens(text, reply)
         if (lost.isNotEmpty()) {
@@ -68,6 +73,13 @@ class GemmaTranslator(private val engine: AiTextEngine) {
             if (again.isNotBlank() && lostTokens(text, again).size < lost.size) reply = again
         }
         return reply.ifBlank { text }
+    }
+
+    /** True when [reply] is the source again (same letters and digits, ignoring case, spaces and marks) and the source has words to translate. */
+    private fun isUnchanged(source: String, reply: String): Boolean {
+        fun letters(t: String) = t.filter { it.isLetterOrDigit() }.lowercase()
+        val words = source.split(Regex("\\s+")).count { w -> w.count { it.isLetter() } >= UNCHANGED_MIN_LETTERS && w !in mustKeep(source) }
+        return words >= 2 && letters(source) == letters(reply)
     }
 
     /** Words of the source that must stay as they are: names with digits or underscores, capitals, links, numbers (with their units). */
@@ -96,6 +108,10 @@ class GemmaTranslator(private val engine: AiTextEngine) {
         Regex("(?s)^\\{\\s*\"[A-Za-z_]+\"\\s*:\\s*\"(.*)\"\\s*\\}$").find(t)?.let { t = it.groupValues[1].replace("\\\"", "\"").replace("\\n", "\n").trim() }
         t = t.replace(Regex("(?i)^(translation|translated text|tłumaczenie)\\s*:\\s*"), "").trim()
         if (t.length >= 2 && t.first() == '"' && t.last() == '"' && t.count { it == '"' } == 2) t = t.substring(1, t.length - 1).trim()
+        // Bold or italic marks round the whole answer ("**text**") are not part of a translation.
+        Regex("(?s)^(\\*{1,3}|_{1,2})(.+?)\\1$").find(t)?.let { t = it.groupValues[2].trim() }
+        // An introduction line before the translation ("Here is the translation:").
+        t = t.replace(Regex("(?i)^(here is|here's|oto)[^\\n:]{0,40}(translation|tłumaczenie)[^\\n:]{0,20}:\\s*\\n?"), "").trim()
         return t
     }
 
@@ -110,5 +126,6 @@ class GemmaTranslator(private val engine: AiTextEngine) {
         const val MAX_TOKENS = 1024
         const val SHORT_ANSWER_MIN_SOURCE = 25
         const val SHORT_ANSWER_SHARE = 0.4
+        const val UNCHANGED_MIN_LETTERS = 3
     }
 }
