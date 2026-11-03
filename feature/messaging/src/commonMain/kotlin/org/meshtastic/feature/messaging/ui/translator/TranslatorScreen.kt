@@ -69,6 +69,7 @@ import org.meshtastic.core.resources.translator_busy
 import org.meshtastic.core.resources.translator_error_failed
 import org.meshtastic.core.resources.translator_error_same
 import org.meshtastic.core.resources.translator_error_unknown
+import org.meshtastic.core.resources.translator_hardware_title
 import org.meshtastic.core.resources.translator_from
 import org.meshtastic.core.resources.translator_input_hint
 import org.meshtastic.core.resources.translator_loading_hint
@@ -209,7 +210,12 @@ fun TranslatorContent(viewModel: TranslatorViewModel, modifier: Modifier = Modif
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = stringResource(Res.string.translator_test_title) + " (${state.testLines.size})",
+                            text =
+                            if (state.hardwareReport) {
+                                stringResource(Res.string.translator_hardware_title)
+                            } else {
+                                stringResource(Res.string.translator_test_title) + " (${state.testLines.size})"
+                            },
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.primary,
                         )

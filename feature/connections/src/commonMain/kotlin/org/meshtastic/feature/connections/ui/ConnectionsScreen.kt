@@ -66,6 +66,7 @@ import org.meshtastic.core.model.FirmwareUpdateDestination
 import org.meshtastic.core.model.FirmwareUpdateNotice
 import org.meshtastic.core.model.InterfaceId
 import org.meshtastic.core.model.schemaLabelRes
+import org.meshtastic.core.model.shortFirmwareVersion
 import org.meshtastic.core.model.service.LockdownState
 import org.meshtastic.core.navigation.FirmwareRoute
 import org.meshtastic.core.navigation.Route
@@ -422,7 +423,7 @@ fun ConnectionsScreen(
     val rawFirmwareVersion = ourNode?.metadata?.firmware_version?.takeIf { it.isNotBlank() }
     val firmwareVersion by
         produceState<String?>(null, rawFirmwareVersion, resourceEnvironment) {
-            value = rawFirmwareVersion?.let { getString(resourceEnvironment, Res.string.firmware_version, it) }
+            value = rawFirmwareVersion?.let { getString(resourceEnvironment, Res.string.firmware_version, it.shortFirmwareVersion()) }
         }
     val lora = localConfig.lora
     val loraSummaryText by

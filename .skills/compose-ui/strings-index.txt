@@ -3021,10 +3021,13 @@ translator_error_unknown
 translator_export_title
 translator_failed
 translator_from
+translator_hardware_title
 translator_history_clear
 translator_history_empty
 translator_history_title
 translator_info
+translator_info_body
+translator_info_title
 translator_input_hint
 translator_loading_hint
 translator_long_warning
@@ -3039,6 +3042,9 @@ translator_outgoing_title
 translator_ready
 translator_result
 translator_save
+translator_sessions_empty
+translator_sessions_new
+translator_sessions_title
 translator_source_label
 translator_summary
 translator_swap

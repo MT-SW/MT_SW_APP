@@ -54,6 +54,11 @@ import org.meshtastic.core.resources.assistant_autoscroll
 import org.meshtastic.core.resources.assistant_autoscroll_hint
 import org.meshtastic.core.resources.assistant_info_body
 import org.meshtastic.core.resources.assistant_info_title
+import org.meshtastic.core.resources.translator_sessions_empty
+import org.meshtastic.core.resources.translator_sessions_new
+import org.meshtastic.core.resources.translator_sessions_title
+import org.meshtastic.core.resources.translator_info_body
+import org.meshtastic.core.resources.translator_info_title
 import org.meshtastic.core.resources.translator_open
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.icon.History
@@ -85,21 +90,23 @@ fun AiHomeScreen(
     if (showInfo) {
         AlertDialog(
             onDismissRequest = { showInfo = false },
-            title = { Text(stringResource(Res.string.assistant_info_title)) },
+            title = { Text(stringResource(if (showAssistant) Res.string.assistant_info_title else Res.string.translator_info_title)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(stringResource(Res.string.assistant_info_body))
+                    Text(stringResource(if (showAssistant) Res.string.assistant_info_body else Res.string.translator_info_body))
                     val autoScroll by uiPrefs.assistantAutoScroll.collectAsStateWithLifecycle()
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(stringResource(Res.string.assistant_autoscroll), style = MaterialTheme.typography.bodyLarge)
-                            Text(
-                                stringResource(Res.string.assistant_autoscroll_hint),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
+                    if (showAssistant) {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(stringResource(Res.string.assistant_autoscroll), style = MaterialTheme.typography.bodyLarge)
+                                Text(
+                                    stringResource(Res.string.assistant_autoscroll_hint),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            Switch(checked = autoScroll, onCheckedChange = { uiPrefs.setAssistantAutoScroll(it) })
                         }
-                        Switch(checked = autoScroll, onCheckedChange = { uiPrefs.setAssistantAutoScroll(it) })
                     }
                 }
             },
@@ -107,7 +114,8 @@ fun AiHomeScreen(
         )
     }
     val savedChats by assistantViewModel.saved.collectAsStateWithLifecycle()
-    if (showHistory) {
+    val savedSessions by translatorViewModel.saved.collectAsStateWithLifecycle()
+    if (showHistory && showAssistant) {
         AssistantHistoryDialog(
             chats = savedChats,
             onOpen = {
@@ -121,6 +129,25 @@ fun AiHomeScreen(
                 showHistory = false
             },
             onDismiss = { showHistory = false },
+        )
+    } else if (showHistory) {
+        // The translator's own history: saved sessions with their translations and the results of its commands.
+        AssistantHistoryDialog(
+            chats = savedSessions,
+            onOpen = {
+                translatorViewModel.open(it)
+                selected = 0
+                showHistory = false
+            },
+            onDelete = { translatorViewModel.deleteSaved(it.id) },
+            onNew = {
+                translatorViewModel.startNew()
+                showHistory = false
+            },
+            onDismiss = { showHistory = false },
+            title = Res.string.translator_sessions_title,
+            empty = Res.string.translator_sessions_empty,
+            newLabel = Res.string.translator_sessions_new,
         )
     }
 
@@ -140,7 +167,7 @@ fun AiHomeScreen(
                 ourNode = null,
                 showNodeChip = false,
                 actions = {
-                    if (showAssistant && assistantOn) {
+                    if ((showAssistant && assistantOn) || (!showAssistant && translatorOn)) {
                         IconButton(onClick = { showInfo = true }) {
                             Icon(
                                 MeshtasticIcons.Info,
@@ -149,7 +176,7 @@ fun AiHomeScreen(
                         }
                         IconButton(
                             onClick = {
-                                assistantViewModel.refreshSaved()
+                                if (showAssistant) assistantViewModel.refreshSaved() else translatorViewModel.refreshSaved()
                                 showHistory = true
                             },
                         ) {

@@ -162,8 +162,9 @@ class GoogleAiModule {
         packetRepository: PacketRepository,
         connection: org.meshtastic.core.repository.ConnectionStateProvider,
         locationRepository: org.meshtastic.core.repository.LocationRepository,
+        uiPrefs: UiPrefs,
     ): AssistantDataProvider =
-        AssistantDataProvider(nodeRepository, radioConfigRepository, meshLogRepository, packetRepository, connection, locationRepository)
+        AssistantDataProvider(nodeRepository, radioConfigRepository, meshLogRepository, packetRepository, connection, locationRepository) { uiPrefs.currentInverted.value }
 
     @Single
     fun assistantMemory(context: Context): AssistantMemory = FileAssistantMemory(File(context.filesDir, "assistant-memory"))

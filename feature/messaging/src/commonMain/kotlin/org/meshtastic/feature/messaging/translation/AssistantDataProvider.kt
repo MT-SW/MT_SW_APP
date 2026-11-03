@@ -175,6 +175,8 @@ class AssistantDataProvider(
     private val connection: org.meshtastic.core.repository.ConnectionStateProvider? = null,
     /** The phone's location, where the platform has one; used only when the user asks which region fits their place. */
     private val locationRepository: org.meshtastic.core.repository.LocationRepository? = null,
+    /** Nodes whose displayed current has its sign switched (sensor wired backwards); the assistant tells the same sign as the screens. */
+    private val invertedCurrent: () -> Set<Int> = { emptySet() },
 ) {
 
     /** The explanation of the LoRa region and what fits the user's place (radio position first, else the phone's). */
@@ -536,7 +538,8 @@ class AssistantDataProvider(
                         val key = m.groupValues[1]
                         val d = m.groupValues[2].toDoubleOrNull() ?: return@forEach
                         val range = PLAUSIBLE[key]
-                        if (range == null || d in range) values[key] = d
+                        // A current with the sign switch of its node is told with the sign the screens show.
+                        if (range == null || d in range) values[key] = if (key == "current" && d != 0.0 && num in invertedCurrent()) -d else d
                     }
                 }
                 values.keys.retainAll(REPORT_KEYS.keys)

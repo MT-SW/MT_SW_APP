@@ -73,7 +73,7 @@ class AssistantViewModel(
     }
 
     fun refreshSaved() {
-        viewModelScope.launch { _saved.value = runCatching { history.list() }.getOrDefault(emptyList()) }
+        viewModelScope.launch { _saved.value = runCatching { history.list() }.getOrDefault(emptyList()).filterNot { it.id.startsWith("tr-") } }
     }
 
     fun setInput(value: String) = _state.update { it.copy(input = value) }

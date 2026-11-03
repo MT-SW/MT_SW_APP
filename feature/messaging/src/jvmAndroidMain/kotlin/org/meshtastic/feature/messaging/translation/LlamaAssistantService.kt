@@ -150,12 +150,23 @@ class LlamaAssistantService(
 
     private suspend fun selfTestRun(command: String, onResult: (question: String, answer: String) -> Unit) {
         withContext(Dispatchers.IO) {
-            val modelId = activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
-            if (command.equals(AssistantSelfTest.HARDWARE, ignoreCase = true)) {
+            val translatorHardware = command == TRANSLATOR_HARDWARE_COMMAND
+            val modelId =
+                if (translatorHardware) translatorReportModel() else activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
+            if (translatorHardware || command.equals(AssistantSelfTest.HARDWARE, ignoreCase = true)) {
                 // No questions: only says which model runs where (graphics card or processor) and how big it is.
                 val info = AiModels.byId(modelId)
                 val pl = data.polish
                 fun t(polish: String, english: String) = if (pl) polish else english
+                if (info?.engine == org.meshtastic.core.repository.AiEngine.NLLB_ONNX) {
+                    // The small translator is not a language model: it has no chips to report, it runs on the processor.
+                    val short =
+                        t("Model", "Model") + ": ${info.name}\n" + t("Rozmiar", "Size") + ": ${info.sizeMb} MB, " + t("pamięć podczas pracy", "memory while running") + ": " +
+                            t("około", "about") + " ${info.ramMb} MB\n" + t("Gdzie działa", "Where it runs") + ": " + t("procesor (ONNX Runtime)", "CPU (ONNX Runtime)") +
+                            engine.deviceSummary.takeIf { it.isNotBlank() }?.let { "\n$it" }.orEmpty()
+                    onResult(command, short)
+                    return@withContext
+                }
                 val report =
                     t("Model", "Model") + ": ${info?.name ?: modelId} (${info?.family.orEmpty()})\n" +
                         t("Rozmiar", "Size") + ": ${info?.sizeMb ?: 0} MB, " + t("pamięć podczas pracy", "memory while running") + ": " + t("około", "about") + " ${info?.ramMb ?: 0} MB\n" +
@@ -289,6 +300,15 @@ class LlamaAssistantService(
             val average = if (questions.isEmpty()) "0" else (kotlin.math.round(totalSeconds * 10.0 / questions.size) / 10).toString()
             onResult(command, aiString(Res.string.ai_test_done, questions.size, modelId, average) + "\n\n" + report.toString())
         }
+    }
+
+    /** The model the translator's hardware report is about: the chosen translator model when it is on the device, else any that is, else NLLB. */
+    private fun translatorReportModel(): String {
+        val states = store.states.value
+        val chosen = AiModels.byId(uiPrefs.translatorModelId.value)?.takeIf { it.canDo(AiRole.TRANSLATOR) && states[it.id] == TranslatorModelState.Ready }
+        return chosen?.id
+            ?: AiModels.all.firstOrNull { it.canDo(AiRole.TRANSLATOR) && it.engineReady && states[it.id] == TranslatorModelState.Ready }?.id
+            ?: AiModels.NLLB_600M_ID
     }
 
     /** The model the translator test uses: the chosen translator model when it is a language model, else the assistant's. */

@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.assistant_close
@@ -54,13 +55,16 @@ fun AssistantHistoryDialog(
     onDelete: (StoredChat) -> Unit,
     onNew: () -> Unit,
     onDismiss: () -> Unit,
+    title: StringResource = Res.string.assistant_history,
+    empty: StringResource = Res.string.assistant_history_empty,
+    newLabel: StringResource = Res.string.assistant_new,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(Res.string.assistant_history)) },
+        title = { Text(stringResource(title)) },
         text = {
             if (chats.isEmpty()) {
-                Text(stringResource(Res.string.assistant_history_empty), style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(empty), style = MaterialTheme.typography.bodyMedium)
             } else {
                 LazyColumn(modifier = Modifier.heightIn(max = 360.dp)) {
                     items(chats, key = { it.id }) { chat ->
@@ -84,7 +88,7 @@ fun AssistantHistoryDialog(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onNew) { Text(stringResource(Res.string.assistant_new)) } },
+        confirmButton = { TextButton(onClick = onNew) { Text(stringResource(newLabel)) } },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.assistant_close)) } },
     )
 }

@@ -67,6 +67,7 @@ import org.meshtastic.core.ui.icon.Temperature
 import org.meshtastic.core.ui.icon.Voltage
 import org.meshtastic.core.ui.icon.Weight
 import org.meshtastic.core.ui.icon.WindDirection
+import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.feature.node.model.DrawableMetricInfo
 import org.meshtastic.feature.node.model.VectorMetricInfo
 
@@ -80,6 +81,8 @@ import org.meshtastic.feature.node.model.VectorMetricInfo
 @Suppress("CyclomaticComplexMethod", "LongMethod")
 @Composable
 internal fun EnvironmentMetrics(node: Node, displayUnits: MeasurementSystem, isFahrenheit: Boolean = false) {
+    // The current is shown with the sign switch of its node (sensor wired backwards).
+    val lna = LocalLnaCorrection.current
     val groups: List<MetricGroup> = buildList {
         with(node.environmentMetrics) {
             val temperatureCard =
@@ -148,7 +151,7 @@ internal fun EnvironmentMetrics(node: Node, displayUnits: MeasurementSystem, isF
                     current?.let {
                         VectorMetricInfo(
                             label = Res.string.current,
-                            value = "${NumberFormatter.format(it, 1)}mA",
+                            value = "${NumberFormatter.format(lna.current(node.num, it), 1)}mA",
                             icon = MeshtasticIcons.PowerSupply,
                         )
                     },

@@ -48,6 +48,7 @@ import org.meshtastic.core.model.SessionStatus
 import org.meshtastic.core.model.asDeviceVersion
 import org.meshtastic.core.navigation.NodeDetailRoute
 import org.meshtastic.core.model.effectiveLongName
+import org.meshtastic.core.model.shortFirmwareVersion
 import org.meshtastic.core.repository.EventFirmwareRepository
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.administration
@@ -358,7 +359,7 @@ private fun FirmwareVersionItems(
     ListItem(
         text = stringResource(Res.string.installed_firmware_version),
         leadingIcon = MeshtasticIcons.Memory,
-        supportingText = version,
+        supportingText = version.shortFirmwareVersion(),
         copyable = true,
         leadingIconTint = statusColor,
         trailingIcon = null,
@@ -369,7 +370,7 @@ private fun FirmwareVersionItems(
     ListItem(
         text = stringResource(Res.string.latest_stable_firmware),
         leadingIcon = MeshtasticIcons.Memory,
-        supportingText = latestStable.id.removePrefix("v"),
+        supportingText = latestStable.id.removePrefix("v").shortFirmwareVersion(),
         copyable = true,
         leadingIconTint = MaterialTheme.colorScheme.StatusGreen,
         trailingIcon = null,
@@ -381,7 +382,7 @@ private fun FirmwareVersionItems(
     ListItem(
         text = stringResource(Res.string.latest_alpha_firmware),
         leadingIcon = MeshtasticIcons.Memory,
-        supportingText = latestAlpha.id.removePrefix("v"),
+        supportingText = latestAlpha.id.removePrefix("v").shortFirmwareVersion(),
         copyable = true,
         leadingIconTint = MaterialTheme.colorScheme.StatusYellow,
         trailingIcon = null,

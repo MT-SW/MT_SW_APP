@@ -26,6 +26,7 @@ import org.meshtastic.core.resources.channel_3
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PowerSupply
 import org.meshtastic.core.ui.icon.Voltage
+import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.feature.node.model.VectorMetricInfo
 
 /**
@@ -35,6 +36,8 @@ import org.meshtastic.feature.node.model.VectorMetricInfo
  */
 @Composable
 internal fun PowerMetrics(node: Node) {
+    // The current of a channel is shown with the sign switch of its node (sensor wired backwards).
+    val lna = LocalLnaCorrection.current
     val channels =
         with(node.powerMetrics) {
             listOf(
@@ -52,7 +55,7 @@ internal fun PowerMetrics(node: Node) {
                         current?.let { milliAmps ->
                             VectorMetricInfo(
                                 label,
-                                "${NumberFormatter.format(milliAmps, 1)}mA",
+                                "${NumberFormatter.format(lna.current(node.num, milliAmps), 1)}mA",
                                 MeshtasticIcons.PowerSupply,
                             )
                         },

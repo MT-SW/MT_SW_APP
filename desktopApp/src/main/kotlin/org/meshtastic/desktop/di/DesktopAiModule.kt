@@ -158,8 +158,9 @@ class DesktopAiModule {
         meshLogRepository: MeshLogRepository,
         packetRepository: PacketRepository,
         connection: org.meshtastic.core.repository.ConnectionStateProvider,
+        uiPrefs: UiPrefs,
     ): AssistantDataProvider =
-        AssistantDataProvider(nodeRepository, radioConfigRepository, meshLogRepository, packetRepository, connection)
+        AssistantDataProvider(nodeRepository, radioConfigRepository, meshLogRepository, packetRepository, connection, null) { uiPrefs.currentInverted.value }
 
     @Single
     fun assistantMemory(): AssistantMemory = FileAssistantMemory(File(AppDataRoot.dir, "assistant-memory"))

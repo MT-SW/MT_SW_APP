@@ -80,6 +80,7 @@ import org.meshtastic.core.ui.icon.Temperature
 import org.meshtastic.core.ui.icon.Tsunami
 import org.meshtastic.core.ui.icon.Voltage
 import org.meshtastic.core.ui.icon.Wifi
+import org.meshtastic.core.ui.util.LnaCorrection
 import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.icon.Weight
 import org.meshtastic.core.ui.icon.WindDirection
@@ -214,7 +215,7 @@ private fun weatherChips(node: Node, tempF: Boolean, imperial: Boolean): List<Ex
 
 // The card already shows battery / "powered", its voltage, uptime and (for our own node) channel and air
 // utilization, so none of those are repeated here.
-private fun powerChips(node: Node): List<ExtraChip> = buildList {
+private fun powerChips(node: Node, lna: LnaCorrection): List<ExtraChip> = buildList {
     val env = node.environmentMetrics
     val power = node.powerMetrics
     // Only the voltage of an external sensor (environment or power telemetry) is shown here. The basic device
@@ -222,7 +223,8 @@ private fun powerChips(node: Node): List<ExtraChip> = buildList {
     env.voltage.ok()?.takeIf { it != 0f }?.let {
         add(ExtraChip({ MeshtasticIcons.Voltage }, "Nap.", MetricFormatter.voltage(it)))
     }
-    env.current.ok()?.let { add(ExtraChip({ MeshtasticIcons.ElectricPower }, "Prąd", MetricFormatter.current(it))) }
+    // The current is shown with the sign switch of its node (sensor wired backwards), like everywhere else in the app.
+    env.current.ok()?.let { add(ExtraChip({ MeshtasticIcons.ElectricPower }, "Prąd", MetricFormatter.current(lna.current(node.num, it)))) }
     listOf(
         Triple(1, power.ch1_voltage.ok(), power.ch1_current.ok()),
         Triple(2, power.ch2_voltage.ok(), power.ch2_current.ok()),
@@ -231,7 +233,7 @@ private fun powerChips(node: Node): List<ExtraChip> = buildList {
         .forEach { (ch, v, c) ->
             if (v != null || c != null) {
                 val text =
-                    listOfNotNull(v?.let { MetricFormatter.voltage(it) }, c?.let { MetricFormatter.current(it) })
+                    listOfNotNull(v?.let { MetricFormatter.voltage(it) }, c?.let { MetricFormatter.current(lna.current(node.num, it)) })
                         .joinToString(" ")
                 add(ExtraChip({ MeshtasticIcons.ElectricPower }, "Kan. $ch", text))
             }
@@ -288,8 +290,9 @@ private fun buildGroups(
     tempF: Boolean,
     imperial: Boolean,
     isThisNode: Boolean,
+    lna: LnaCorrection,
 ): List<ExtraGroup> = buildList {
-    if (showEnvironment) add(ExtraGroup(powerChips(node) + weatherChips(node, tempF, imperial), rightAligned = false))
+    if (showEnvironment) add(ExtraGroup(powerChips(node, lna) + weatherChips(node, tempF, imperial), rightAligned = false))
     if (config.packets) add(ExtraGroup(trafficChips(stats), rightAligned = true))
     if (config.hardware) add(ExtraGroup(resourceChips(stats), rightAligned = true))
 }
@@ -314,9 +317,10 @@ fun NodeExtraLine(
     val config = LocalNodeExtraConfig.current
     val stats = LocalNodeExtraStats.current[node.num]
     val imperial = distanceUnits != MeasurementSystem.METRIC
+    val lna = LocalLnaCorrection.current
     val groups =
-        remember(node, stats, config, showEnvironment, tempInFahrenheit, imperial, isThisNode) {
-            buildGroups(node, stats, config, showEnvironment, tempInFahrenheit, imperial, isThisNode)
+        remember(node, stats, config, showEnvironment, tempInFahrenheit, imperial, isThisNode, lna) {
+            buildGroups(node, stats, config, showEnvironment, tempInFahrenheit, imperial, isThisNode, lna)
         }
     if (groups.isEmpty()) return
 
