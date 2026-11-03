@@ -607,9 +607,9 @@ object AiModels {
     val DeepSeek15b =
         deepSeek(
             DEEPSEEK_15B, "DeepSeek R1 Distill Qwen 1.5B", "bartowski/DeepSeek-R1-Distill-Qwen-1.5B-GGUF",
-            "DeepSeek-R1-Distill-Qwen-1.5B-Q8_0.gguf", 1807, 2900, 4, AiLicense.MIT,
-            "Najmniejszy model „myślący” DeepSeek: działa nawet na słabym telefonie, ale rozumuje płytko i po polsku jest słaby. Do prostych zadań i prób.",
-            "The smallest \"thinking\" DeepSeek model: runs even on a weak phone, but its reasoning is shallow and its Polish is poor. For simple tasks and trying things out.",
+            "DeepSeek-R1-Distill-Qwen-1.5B-Q8_0.gguf", 1807, 2900, 6, AiLicense.MIT,
+            "Najmniejszy model „myślący” DeepSeek: zalecane minimum to 6 GB RAM, ale rozumuje płytko i po polsku jest słaby. Do prostych zadań i prób.",
+            "The smallest \"thinking\" DeepSeek model: recommended minimum is 6 GB of RAM, but its reasoning is shallow and its Polish is poor. For simple tasks and trying things out.",
             phoneSafeCache = true,
         )
 
