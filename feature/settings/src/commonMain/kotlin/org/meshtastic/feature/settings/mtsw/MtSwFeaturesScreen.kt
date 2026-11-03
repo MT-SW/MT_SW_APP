@@ -36,6 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.navigation.ContactsRoute
+import org.meshtastic.core.navigation.MapRoute
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.resources.Res
@@ -61,6 +62,10 @@ import org.meshtastic.core.resources.mt_sw_features_links_hint
 import org.meshtastic.core.resources.mt_sw_features_lora_summary
 import org.meshtastic.core.resources.mt_sw_features_switches
 import org.meshtastic.core.resources.mt_sw_features_title
+import org.meshtastic.core.resources.mt_sw_map_title
+import org.meshtastic.core.resources.mt_sw_planner_open_summary
+import org.meshtastic.core.resources.mt_sw_terrain_open_summary
+import org.meshtastic.core.resources.terrain_horizon_title
 import org.meshtastic.core.resources.mt_sw_other_calls_body
 import org.meshtastic.core.resources.mt_sw_other_calls_title
 import org.meshtastic.core.resources.mt_sw_other_full_doc
@@ -79,6 +84,7 @@ import org.meshtastic.core.resources.mt_sw_other_summary
 import org.meshtastic.core.resources.mt_sw_other_title
 import org.meshtastic.core.resources.node_layout_section_title
 import org.meshtastic.core.resources.debug_panel
+import org.meshtastic.core.resources.intro_mtsw_planner_title
 import org.meshtastic.core.resources.kb_summary
 import org.meshtastic.core.resources.kb_title
 import org.meshtastic.core.resources.sniffer_settings_title
@@ -92,6 +98,8 @@ import org.meshtastic.core.ui.component.SwitchListItem
 import org.meshtastic.core.ui.icon.Add
 import org.meshtastic.core.ui.icon.Antenna
 import org.meshtastic.core.ui.icon.BugReport
+import org.meshtastic.core.ui.icon.CellTower
+import org.meshtastic.core.ui.icon.CenterFocusStrong
 import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.HelpOutline
 import org.meshtastic.core.ui.icon.Info
@@ -191,6 +199,24 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     leadingIcon = MeshtasticIcons.Language,
                 ) {
                     onNavigate(SettingsRoute.SmartFeatures)
+                }
+            }
+
+            // The map's own additions: the planner (opens for the connected radio) and the terrain panorama.
+            ExpressiveSection(title = stringResource(Res.string.mt_sw_map_title)) {
+                ListItem(
+                    text = stringResource(Res.string.intro_mtsw_planner_title),
+                    supportingText = stringResource(Res.string.mt_sw_planner_open_summary),
+                    leadingIcon = MeshtasticIcons.CellTower,
+                ) {
+                    onNavigate(MapRoute.Map(plannerNodeNum = settingsViewModel.myNodeNum))
+                }
+                ListItem(
+                    text = stringResource(Res.string.terrain_horizon_title),
+                    supportingText = stringResource(Res.string.mt_sw_terrain_open_summary),
+                    leadingIcon = MeshtasticIcons.CenterFocusStrong,
+                ) {
+                    onNavigate(MapRoute.MeshHud())
                 }
             }
 

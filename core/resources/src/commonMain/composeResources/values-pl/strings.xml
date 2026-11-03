@@ -3547,4 +3547,7 @@
     <string name="terrain_horizon_refraction">Horyzont radiowy (współczynnik ziemi)</string>
     <string name="terrain_horizon_only_visible">Tylko widoczne węzły</string>
     <string name="terrain_horizon_labels">Nazwy</string>
+    <string name="mt_sw_map_title">Mapa i planer</string>
+    <string name="mt_sw_planner_open_summary">Symuluje łącze radiowe między dwoma punktami, z terenem i bilansem łącza. Jest też wśród przycisków mapy i na stronie węzła</string>
+    <string name="mt_sw_terrain_open_summary">Sylwetka terenu dookoła z węzłami: zielone w zasięgu wzroku, czerwone zasłonięte; widok z aparatem jest dodatkiem. Jest też pod przyciskiem widoku sieci obok planera na mapie</string>
 </resources>
