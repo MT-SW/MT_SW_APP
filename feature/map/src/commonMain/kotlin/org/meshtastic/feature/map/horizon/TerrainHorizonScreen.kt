@@ -568,7 +568,7 @@ private fun MoveMap(state: TerrainHorizonState, onMoved: (Double, Double) -> Uni
     var dy by remember(lat0, lon0) { mutableFloatStateOf(0f) }
     val measurer = rememberTextMeasurer()
     val accent = MaterialTheme.colorScheme.primary
-    val halfSpanM = state.radiusKm * METRES_PER_KM
+    val halfSpanM = state.radiusKm * MAP_METRES_PER_KM
     Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(Res.string.terrain_horizon_move_hint), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp, modifier = Modifier.weight(1f))
@@ -681,3 +681,4 @@ private const val MARKER_PAD_Y = 4f
 private const val MARKER_CORNER = 8f
 private const val MARKER_STROKE = 2.5f
 private const val MARKER_FOCUS_STROKE = 4.5f
+private const val MAP_METRES_PER_KM = 1_000.0
