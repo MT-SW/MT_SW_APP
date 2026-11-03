@@ -244,6 +244,8 @@ private fun ProjectInformationSection(
     }
 }
 
+// Whenever the fork starts using another project's code, method or data, add it to feature_credits_description
+// (values and values-pl) in the same change, and to Acknowledgements when it has a licence to show.
 // GPL section 5(d): this screen shows the copyright notice, the no-warranty statement and where the
 // license is, so a modified version has to keep showing them too. Keep all three together here.
 @Composable

@@ -17,6 +17,7 @@ Ten plik opisuje wyłącznie zmiany wprowadzone w aplikacji MT_SW_APP **względe
 Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od początku (27 lipca 2026) do dziś, w kolejności chronologicznej. Opis funkcji: [README.md](README.md).
 
 ### Listopad 2026
+* Strona „O aplikacji”, „Źródła funkcji”: lista uzupełniona o wszystkie projekty, z których korzystają funkcje forka (Sniffer, tłumacz, asystent i dyktowanie, Mesh Link Planer, panorama terenu).
 * Panorama terenu: w „Opcjach” przełącznik „Tylko ulubione” pokazuje w panoramie i na mapie przesuwania tylko ulubione węzły (zapamiętywany).
 * Panorama terenu: okręgi dokładności węzłów, które nie podają dokładnej pozycji. Na małej mapie przesuwania są okręgami na ziemi, jak na głównej mapie, a w samej panoramie owalem o rozmiarze niepewności widzianej z miejsca obserwacji. Wyłączasz je w „Opcjach” (przełącznik „Okręgi dokładności”, zapamiętywany).
 * Panorama terenu: zasięg, wysokości anten i współczynnik horyzontu są zapamiętywane (już nie wraca do 15 km). Nowa opcja „Węzły do” (25–1000 km, domyślnie 100 km) działa osobno od zasięgu terenu: węzły dalsze niż załadowany teren też są rysowane.
@@ -527,6 +528,7 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### November 2026
+* About screen, "Feature credits": the list now names all the projects the fork's features use (Sniffer, translator, assistant and dictation, Mesh Link Planner, terrain panorama).
 * Terrain panorama: an "Only favourites" switch in "Options" shows only favourite nodes in the panorama and on the move map (remembered).
 * Terrain panorama: accuracy circles for nodes that do not report an exact position. On the small move map they are ground circles as on the main map, and in the panorama itself an oval the size of the doubt as seen from the viewpoint. Switch them off in "Options" ("Accuracy circles" switch, remembered).
 * Terrain panorama: the range, antenna heights and radio-horizon factor are remembered (it no longer returns to 15 km). A new "Nodes up to" option (25–1000 km, 100 km by default) works separately from the terrain range: nodes farther than the loaded terrain are drawn too.
