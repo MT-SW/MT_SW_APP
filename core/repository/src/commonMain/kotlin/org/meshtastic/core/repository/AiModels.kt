@@ -115,10 +115,11 @@ data class AiModelInfo(
      */
     val intelNpu: Boolean = true,
     /**
-     * True for a model that gives nonsense on the NPU and the graphics card of a phone (tested: DeepSeek R1 Distill Qwen
-     * 1.5B on a Snapdragon): on a phone it goes straight to the processor, without failing tests first.
+     * True for a model that gave nonsense on the NPU and the graphics card of a phone with the normal settings (seen:
+     * DeepSeek R1 Distill Qwen 1.5B on a Snapdragon). On a phone the NPU and the graphics card are then tried with
+     * full-precision attention and cache (no flash attention, 32-bit cache) first; if that fails too, the processor runs it.
      */
-    val phoneCpuOnly: Boolean = false,
+    val phoneSafeCache: Boolean = false,
     val recommendedFor: Set<AiRole> = emptySet(),
     val descriptionPl: String = "",
     val descriptionEn: String = "",
@@ -584,10 +585,10 @@ object AiModels {
         license: AiLicense,
         pl: String,
         en: String,
-        phoneCpuOnly: Boolean = false,
+        phoneSafeCache: Boolean = false,
     ) = AiModelInfo(
         id = id,
-        phoneCpuOnly = phoneCpuOnly,
+        phoneSafeCache = phoneSafeCache,
         name = name,
         family = DEEPSEEK_FAMILY,
         engine = AiEngine.LLAMA_CPP,
@@ -607,9 +608,9 @@ object AiModels {
         deepSeek(
             DEEPSEEK_15B, "DeepSeek R1 Distill Qwen 1.5B", "bartowski/DeepSeek-R1-Distill-Qwen-1.5B-GGUF",
             "DeepSeek-R1-Distill-Qwen-1.5B-Q4_0.gguf", 1019, 2000, 4, AiLicense.MIT,
-            "Najmniejszy model „myślący” DeepSeek: działa nawet na słabym telefonie, ale rozumuje płytko i po polsku jest słaby. Na Snapdragonie w naszych testach NPU i karta graficzna dawały z nim bełkot, więc działa na procesorze. Do prostych zadań i prób.",
-            "The smallest \"thinking\" DeepSeek model: runs even on a weak phone, but its reasoning is shallow and its Polish is poor. On a Snapdragon, the NPU and graphics card gave nonsense with it in our tests, so it runs on the processor. For simple tasks and trying things out.",
-            phoneCpuOnly = true,
+            "Najmniejszy model „myślący” DeepSeek: działa nawet na słabym telefonie, ale rozumuje płytko i po polsku jest słaby. Do prostych zadań i prób.",
+            "The smallest \"thinking\" DeepSeek model: runs even on a weak phone, but its reasoning is shallow and its Polish is poor. For simple tasks and trying things out.",
+            phoneSafeCache = true,
         )
 
     val DeepSeek7b =
