@@ -18,7 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 * Panorama terenu, Teren offline: przycisk w Opcjach zapisuje na urządzeniu teren wokół miejsca obserwacji dla wszystkich zasięgów do 100 km (zasięg 100 km dodany); zapisany teren działa bez internetu w panoramie i w planerze łączy, jest pokazany jego rozmiar i można go usunąć.
-* Komputer: widok sieci (panorama terenu) otwierany z odnośnika nie zamyka już aplikacji, a przycisk widoku sieci na mapie działa; dotknięty węzeł otwiera się w zakładce Węzły.
+* Komputer: widok sieci (panorama terenu) otwierany z odnośnika nie zamyka już aplikacji, a przycisk widoku sieci obok planera na mapie jest też na komputerze i działa; dotknięty węzeł otwiera się w zakładce Węzły.
 * O aplikacji: nowy opis „Czym jest MT_SW?” (aplikacja i społeczność) oraz opis sprzętu bez odniesień do partnerów oryginału.
 * Panorama terenu: obraca się razem z telefonem (przycisk Kompas; dotknięcie widoku wyłącza kompas), przycisk Przesuń pokazuje mapę z góry, którą przeciągasz, żeby patrzeć z dowolnego miejsca; kolory z motywu aplikacji, wybierane przyciski z żółtą obwódką, węzły jako kolorowe plakietki z krótką nazwą jak na mapie (zielona/czerwona obwódka = widoczny/zasłonięty).
 * Lista węzłów, okienko sąsiadów: ten sam wygląd co „Informacje o sąsiadach” w dzienniku (nazwa, skrót, kolorowy SNR, przyciski Anuluj/OK).
@@ -516,7 +516,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 * Terrain panorama, Offline terrain: a button in Options saves on the device the terrain around the place looked from for every range up to 100 km (a 100 km range was added); the saved terrain works without the internet in the panorama and in the link planner, its size is shown and it can be deleted.
-* Desktop: the mesh view (terrain panorama) opened from a link no longer closes the app, and the mesh view button on the map works; a tapped node opens in the Nodes tab.
+* Desktop: the mesh view (terrain panorama) opened from a link no longer closes the app, and the mesh view button next to the planner on the map is on the desktop too and works; a tapped node opens in the Nodes tab.
 * About: a new "What is MT_SW?" text (app and community) and a hardware text without references to the original's partners.
 * Terrain panorama: it turns with the phone (Compass button; touching the view switches the compass off), the Move button shows a map from above that you drag to look from any place; colours from the app theme, chosen buttons with a yellow outline, nodes as coloured badges with the short name as on the map (green/red outline = in sight/hidden).
 * Node list, neighbours window: the same look as "Neighbor info" in the log (name, short name, coloured SNR, Cancel/OK buttons).
