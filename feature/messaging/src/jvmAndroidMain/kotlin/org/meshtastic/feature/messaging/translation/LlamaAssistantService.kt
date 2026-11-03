@@ -463,6 +463,17 @@ class LlamaAssistantService(
                 }
             return reply.also(onPiece)
         }
+        // A question that is word for word the title of an entry of the knowledge base is answered with that entry at once, in
+        // every model the same way: no sorting run of the model is needed (on a big model that run alone took seconds).
+        if (!data.mentionsNode(flat)) {
+            knowledge?.lookupBase(question, QUOTE_FACTS_CHARS, answerLang)?.takeIf { it.isNotBlank() }
+                ?.let { quotedEntry(question, it, polish, exactOnly = true) }
+                ?.takeIf { polish || !looksPolish(it) }
+                ?.let {
+                    lastRoute = "quoted knowledge-base entry (exact title)"
+                    return it.also(onPiece)
+                }
+        }
         val notes = if (uiPrefs.assistantMemoryEnabled.value) memoryStore?.promptText(ROUTER_NOTES_CHARS).orEmpty() else ""
         val routed =
             router.understand(modelId, question, conversationDigest(history.dropLast(1), previous), notes, lastNode)
@@ -1166,8 +1177,9 @@ class LlamaAssistantService(
         quoteOnly: Boolean = false,
     ): String? {
         val query = listOf(question, topic).joinToString(" ").trim()
+        val baseChars = if (slow) SLOW_BASE_CHARS else BASE_CHARS * room
         val facts =
-            (if (baseOnly) knowledge?.lookupBaseOnly(query, BASE_CHARS * room, language) else knowledge?.lookupBase(query, BASE_CHARS * room, language)).orEmpty()
+            (if (baseOnly) knowledge?.lookupBaseOnly(query, baseChars, language) else knowledge?.lookupBase(query, baseChars, language)).orEmpty()
         // A small model (or any model outside the Gemma family) never retells web results in its own words: the app quotes them.
         val small = smallModel(modelId)
         // Quoting chooses from many more entries than a small model could be given to read.
@@ -1323,7 +1335,7 @@ class LlamaAssistantService(
         val firstSource = ownSource.find(answer)?.range?.first
         val answer = if (firstSource != null && firstSource > MIN_ANSWER_BEFORE_SOURCE) answer.substring(0, firstSource).trimEnd() else answer
         // The source is the entry whose title covers most of the question; one that hardly fits is not named at all.
-        val asked = quoteStems(question)
+        val asked = quoteStems(question) - STOP_STEMS
         val heads = BASE_HEAD.findAll(facts).map { it.groupValues[1].trim() }.toList()
         val bestHead = heads.maxByOrNull { h -> asked.count { it in quoteStems(h) } }.orEmpty()
         val covered = asked.count { it in quoteStems(bestHead) }
@@ -1337,7 +1349,7 @@ class LlamaAssistantService(
         return body + "\n\n" + (if (polish) "Źródło: " else "Source: ") + head
     }
 
-    private fun roomFor(modelId: String) = (engine.contextTokens(modelId) / BASE_TOKENS).coerceIn(1, MAX_ROOM)
+    private fun roomFor(modelId: String) = if (slow) 1 else (engine.contextTokens(modelId) / BASE_TOKENS).coerceIn(1, MAX_ROOM)
 
     /** The smallest models (below the quote limit) invent steps and facts when the base has nothing: they are not left to improvise. */
     private fun smallModel(modelId: String) = (AiModels.byId(modelId)?.ramMb ?: Int.MAX_VALUE) < QUOTE_BELOW_RAM_MB
@@ -1512,15 +1524,19 @@ class LlamaAssistantService(
         val question = history.lastOrNull { it.fromUser }?.text.orEmpty()
         val system = buildString {
             append(if (polish) SYSTEM_PL else SYSTEM_EN)
-            append(' ').append(AssistantClock.nowText(org.meshtastic.core.common.util.nowMillis, polish))
             // The core facts about MT_SW are always given, so the model never answers against them.
             if (core.isNotBlank() && !lean) append("\n\n").append(rule(polish, CORE_PL, CORE_EN)).append('\n').append(core)
             if (uiPrefs.assistantMemoryEnabled.value && !lean) {
-                val notes = memoryStore?.promptText(MEMORY_CHARS * room).orEmpty()
+                val notes = if (slow) "" else memoryStore?.promptText(MEMORY_CHARS * room).orEmpty()
                 if (notes.isNotBlank()) append("\n\n").append(rule(polish, MEMORY_PL, MEMORY_EN)).append('\n').append(notes)
             }
             if (memory.isNotBlank()) append("\n\n").append(rule(polish, EARLIER_PL, EARLIER_EN)).append(' ').append(memory)
             if (extra.isNotBlank()) append("\n\n").append(extra)
+            // The clock changes every second, so it comes last: everything before it stays the same between questions and
+            // the model program does not read it again.
+            append("\n\n").append(AssistantClock.nowText(org.meshtastic.core.common.util.nowMillis, polish))
+            // A slow model (few words a second) answers briefly: the wait is mostly the length of the answer.
+            if (slow) append(' ').append(rule(polish, BRIEF_PL, BRIEF_EN))
         }
         Logger.i(tag = TAG) { "Prompt: system ${system.length} chars, turns ${recent.size}, temperature $temperature" }
         val messages = buildList {
@@ -1529,9 +1545,11 @@ class LlamaAssistantService(
         }
         // Models that think far too long (Qwen 3.5) answer straight away; the others think quietly first.
         val think = THINKING && thinkingWorks && AiModels.byId(modelId)?.quietThinking != false
+        val startedAt = org.meshtastic.core.common.util.nowMillis
+        val maxTokens = if (slow) SLOW_ANSWER_TOKENS else MAX_ANSWER_TOKENS
         val text =
             try {
-                engine.chat(modelId, messages, MAX_ANSWER_TOKENS, temperature, onPiece, thinking = think)
+                engine.chat(modelId, messages, maxTokens, temperature, onPiece, thinking = think)
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -1539,7 +1557,7 @@ class LlamaAssistantService(
                 when {
                     // The window is full: once more with only the question.
                     msg.contains("too long", ignoreCase = true) ->
-                        engine.chat(modelId, listOf("system" to system.take(SHORT_SYSTEM_CHARS), messages.last()), MAX_ANSWER_TOKENS, temperature, onPiece)
+                        engine.chat(modelId, listOf("system" to system.take(SHORT_SYSTEM_CHARS), messages.last()), maxTokens, temperature, onPiece)
                     // Thought for too long without answering: once more, straight to the answer.
                     think && e is ThinkingTooLongException -> {
                         Logger.w(tag = TAG) { "Thinking went on too long, answering without it" }
@@ -1554,7 +1572,20 @@ class LlamaAssistantService(
                     else -> throw e
                 }
             }
+        noteSpeed(text.length, org.meshtastic.core.common.util.nowMillis - startedAt)
         return cleanUp(text)
+    }
+
+    /** Characters a second of the last answers (about 7 characters are a word); 0 = not measured yet. */
+    @Volatile private var charsPerSecond = 0.0
+
+    /** True when the model on this device writes slowly: then the prompt is smaller and the answer shorter. */
+    private val slow: Boolean get() = charsPerSecond in 0.1..SLOW_CHARS_PER_SECOND
+
+    private fun noteSpeed(chars: Int, millis: Long) {
+        if (chars < MIN_CHARS_FOR_SPEED || millis <= 0) return
+        val now = chars * 1000.0 / millis
+        charsPerSecond = if (charsPerSecond == 0.0) now else charsPerSecond * SPEED_KEEP + now * (1 - SPEED_KEEP)
     }
 
     /**
@@ -1876,6 +1907,14 @@ class LlamaAssistantService(
         const val TAG = "AssistantPrompt"
         const val MILLIS_PER_SECOND = 1000L
         const val POLISH_LETTERS = "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ"
+        /** Below this many characters a second (about 3 words) the model is slow: smaller prompt, shorter answers. */
+        const val SLOW_CHARS_PER_SECOND = 22.0
+        const val SLOW_ANSWER_TOKENS = 380
+        const val SLOW_BASE_CHARS = 2200
+        const val MIN_CHARS_FOR_SPEED = 120
+        const val SPEED_KEEP = 0.6
+        const val BRIEF_PL = "Odpowiadaj krótko: najwyżej cztery zdania."
+        const val BRIEF_EN = "Answer briefly: four sentences at most."
         const val MAX_ANSWER_TOKENS = 700 // a long answer is not wanted: it only makes the user wait
         const val TEMPERATURE = 0.5f
 
@@ -2088,7 +2127,7 @@ class LlamaAssistantService(
         const val QUOTE_BELOW_RAM_MB = 3000
         const val QUOTE_MIN_CHARS = 60
         const val SOURCE_MIN_WORDS = 1
-        const val SOURCE_MIN_RELATED = 2
+        const val SOURCE_MIN_RELATED = 3
         const val QUOTE_MIN_SHARE = 0.5
         const val DEFINITION_BONUS = 0.5
         const val QUOTE_LOOSE_SHARE = 0.34
