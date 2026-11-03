@@ -51,6 +51,7 @@ import androidx.navigation3.scene.Scene
 import androidx.navigation3.ui.NavDisplay
 import co.touchlab.kermit.Logger
 import org.meshtastic.core.navigation.MultiBackstack
+import org.meshtastic.core.navigation.replaceAll
 import org.meshtastic.core.navigation.rumViewName
 import org.meshtastic.core.repository.PlatformAnalytics
 
@@ -80,7 +81,16 @@ fun MeshtasticNavDisplay(
         val entriesByTab =
             multiBackstack.backStacks.mapValues { (tab, stack) ->
                 key(tab) {
-                    val keys = stack.toList()
+                    // A saved back stack from an earlier (crashed) session can hold the same key twice, which the
+                    // entry decorators reject. Show each key once and drop the repeats from the stack itself.
+                    val keys = stack.toList().distinct()
+                    if (keys.size != stack.size) {
+                        LaunchedEffect(stack.size) {
+                            val seen = mutableSetOf<NavKey>()
+                            val unique = stack.filter { seen.add(it) }
+                            if (unique.size != stack.size) stack.replaceAll(unique)
+                        }
+                    }
                     val isActive = tab == activeTab
                     // Host providers close over the active stack, so a tab's entries are rebuilt when it activates.
                     val entries = remember(keys, isActive) { keys.map(entryProvider) }
