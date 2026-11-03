@@ -32,6 +32,7 @@ import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.model.util.precisionRadiusMetersOrNull
 import org.meshtastic.core.repository.HorizonPrefs
 import org.meshtastic.core.repository.MapPrefs
 import org.meshtastic.core.repository.MagneticFieldProvider
@@ -70,7 +71,7 @@ sealed interface HorizonObserver {
     data class Point(val lat: Double, val lon: Double) : HorizonObserver
 }
 
-data class HorizonNodeChoice(val num: Int, val name: String, val shortName: String = "", val lat: Double = 0.0, val lon: Double = 0.0, val color: Int = 0, val textColor: Int = 0)
+data class HorizonNodeChoice(val num: Int, val name: String, val shortName: String = "", val lat: Double = 0.0, val lon: Double = 0.0, val color: Int = 0, val textColor: Int = 0, val precisionM: Double? = null)
 
 data class TerrainHorizonState(
     val loading: Boolean = true,
@@ -80,6 +81,8 @@ data class TerrainHorizonState(
     val radiusKm: Int = DEFAULT_RADIUS_KM,
     /** How far the nodes are drawn (km), independent of how far the terrain is loaded. */
     val nodeRangeKm: Int = DEFAULT_NODE_RANGE_KM,
+    /** True: a node that hides its exact position gets a circle of the size of the doubt. */
+    val precisionCircles: Boolean = true,
     val observer: HorizonObserver = HorizonObserver.MyNode,
     /** The name of the node (or "") the view is looked from, for the label. */
     val observerName: String = "",
@@ -168,6 +171,7 @@ class TerrainHorizonViewModel(
                 it.copy(
                     radiusKm = saved.radiusKm,
                     nodeRangeKm = saved.nodeRangeKm,
+                    precisionCircles = saved.precisionCircles,
                     antennaAuto = saved.antennaAuto,
                     antennaM = saved.antennaM,
                     targetAntennaM = saved.targetAntennaM,
@@ -181,6 +185,12 @@ class TerrainHorizonViewModel(
     fun setRadius(km: Int) = change { it.copy(radiusKm = km) }
 
     fun setNodeRange(km: Int) = change { it.copy(nodeRangeKm = km) }
+
+    /** Switches the accuracy circles; nothing is loaded again, they are only drawn or not. */
+    fun setPrecisionCircles(on: Boolean) {
+        _state.update { it.copy(precisionCircles = on) }
+        mapPrefs.updateHorizonPrefs { it.copy(precisionCircles = on) }
+    }
 
     fun setObserver(observer: HorizonObserver) = change { it.copy(observer = observer) }
 
@@ -254,6 +264,7 @@ class TerrainHorizonViewModel(
             HorizonPrefs(
                 radiusKm = after.radiusKm,
                 nodeRangeKm = after.nodeRangeKm,
+                precisionCircles = after.precisionCircles,
                 antennaAuto = after.antennaAuto,
                 antennaM = after.antennaM,
                 targetAntennaM = after.targetAntennaM,
@@ -339,7 +350,7 @@ class TerrainHorizonViewModel(
     private fun nodeChoices(): List<HorizonNodeChoice> =
         nodeRepository.nodeDBbyNum.value.values
             .filter { it.validPosition != null }
-            .map { HorizonNodeChoice(it.num, it.user.long_name.ifBlank { it.user.short_name }, it.user.short_name, it.latitude, it.longitude, it.colors.second, it.colors.first) }
+            .map { HorizonNodeChoice(it.num, it.user.long_name.ifBlank { it.user.short_name }, it.user.short_name, it.latitude, it.longitude, it.colors.second, it.colors.first, precisionRadiusMetersOrNull(it.position.precision_bits)) }
             .sortedBy { it.name.lowercase() }
 
     private fun nodes(focus: Int?, lookingFrom: Int?): List<Triple<Int, String, GeoPoint>> {

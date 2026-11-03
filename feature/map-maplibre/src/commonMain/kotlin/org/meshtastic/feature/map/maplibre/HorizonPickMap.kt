@@ -43,14 +43,17 @@ import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.expressions.dsl.convertToColor
 import org.maplibre.compose.expressions.dsl.feature
 import org.maplibre.compose.layers.CircleLayer
+import org.maplibre.compose.layers.FillLayer
 import org.maplibre.spatialk.geojson.Feature
 import org.maplibre.spatialk.geojson.FeatureCollection
 import org.maplibre.spatialk.geojson.Point
+import org.maplibre.spatialk.geojson.Polygon
 import org.meshtastic.core.ui.util.HorizonMapNode
 import org.meshtastic.feature.map.maplibre.component.customRasterBasemaps
 import org.meshtastic.feature.map.maplibre.component.rememberBasemapSelection
 import org.meshtastic.feature.map.maplibre.geojson.MapChipKey
 import org.meshtastic.feature.map.maplibre.geojson.NodeFeatureKeys
+import org.meshtastic.feature.map.maplibre.geojson.circlePolygon
 import org.meshtastic.feature.map.maplibre.geojson.featureValue
 import org.meshtastic.feature.map.maplibre.geojson.rememberFeatureSource
 import org.meshtastic.feature.map.maplibre.geojson.toCssHex
@@ -103,6 +106,26 @@ fun MapLibreHorizonPickMap(
                         },
                     )
                 }
+            // As on the main map: the ground circle of a node that hides its exact position, under everything else.
+            val circles = located.filter { it.precisionM != null }
+            val circleSource =
+                rememberFeatureSource(circles) {
+                    FeatureCollection(
+                        circles.map { node ->
+                            Feature<Polygon, JsonObject?>(
+                                geometry = circlePolygon(node.latitude, node.longitude, node.precisionM ?: 0.0),
+                                properties = buildJsonObject { put(NodeFeatureKeys.BACKGROUND, node.background.toCssHex()) },
+                            )
+                        },
+                    )
+                }
+            FillLayer(
+                id = "horizon-node-precision",
+                source = circleSource,
+                color = feature[NodeFeatureKeys.BACKGROUND].convertToColor(const(Color.Gray)),
+                opacity = const(PRECISION_OPACITY),
+                outlineColor = feature[NodeFeatureKeys.BACKGROUND].convertToColor(const(Color.Gray)),
+            )
             // As on the main map: the node's own dot under its chip.
             CircleLayer(
                 id = "horizon-node-dot",
@@ -172,3 +195,5 @@ private const val TILE_PIXELS = 256.0
 private const val MIN_ZOOM = 4.0
 private const val MAX_ZOOM = 14.0
 private const val SAME_SPOT_DEG = 1e-6
+
+private const val PRECISION_OPACITY = 0.15f

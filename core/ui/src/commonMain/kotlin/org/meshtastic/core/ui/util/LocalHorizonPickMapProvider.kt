@@ -27,6 +27,8 @@ data class HorizonMapNode(
     val shortName: String,
     val background: Int,
     val foreground: Int,
+    /** Radius (m) of the doubt about its position, or null: no circle is drawn. */
+    val precisionM: Double? = null,
 )
 
 /**

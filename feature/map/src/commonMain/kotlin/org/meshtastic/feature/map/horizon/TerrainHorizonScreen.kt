@@ -136,6 +136,7 @@ import org.meshtastic.core.resources.terrain_horizon_observer_title
 import org.meshtastic.core.resources.terrain_horizon_only_visible
 import org.meshtastic.core.resources.terrain_horizon_options
 import org.meshtastic.core.resources.terrain_horizon_node_range
+import org.meshtastic.core.resources.terrain_horizon_precision
 import org.meshtastic.core.resources.terrain_horizon_range
 import org.meshtastic.core.resources.terrain_horizon_refraction
 import org.meshtastic.core.resources.terrain_horizon_target_antenna
@@ -144,6 +145,7 @@ import org.meshtastic.core.ui.icon.ArrowBack
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PhotoCamera
 import org.meshtastic.core.ui.icon.Settings
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -295,6 +297,7 @@ fun TerrainHorizonScreen(
             }
             OfflineTerrain(state = state, onRadius = viewModel::setSaveRadius, onSave = viewModel::saveTerrain, onClear = viewModel::clearSavedTerrain)
             ChipRow(stringResource(Res.string.terrain_horizon_only_visible)) { Switch(checked = onlyVisible, onCheckedChange = { onlyVisible = it }) }
+            ChipRow(stringResource(Res.string.terrain_horizon_precision)) { Switch(checked = state.precisionCircles, onCheckedChange = viewModel::setPrecisionCircles) }
             ChipRow(stringResource(Res.string.terrain_horizon_labels)) { Switch(checked = names, onCheckedChange = { names = it }) }
         }
         Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
@@ -327,6 +330,7 @@ fun TerrainHorizonScreen(
                         fieldOfView = fieldOfView.toFloat(),
                         names = names,
                         markers = state.nodeChoices.associate { it.num to (Color(it.color) to Color(it.textColor)) },
+                        precisions = if (state.precisionCircles) state.nodeChoices.mapNotNull { c -> c.precisionM?.let { c.num to it } }.toMap() else emptyMap(),
                         compass = compass,
                         heading = heading,
                         onManualTurn = { compass = false },
@@ -451,6 +455,7 @@ private fun Panorama(
     fieldOfView: Float,
     names: Boolean,
     markers: Map<Int, Pair<Color, Color>>,
+    precisions: Map<Int, Double>,
     compass: Boolean,
     heading: Float?,
     onManualTurn: () -> Unit,
@@ -502,7 +507,7 @@ private fun Panorama(
         val perDeg = size.width / fieldOfView
         drawBands(profile, bands, centre, perDeg, range)
         drawGuides(measurer, centre, perDeg, fieldOfView, range, cardinals)
-        drawTargets(measurer, targets, markers, centre, perDeg, range, focusNodeNum, names)
+        drawTargets(measurer, targets, markers, precisions, centre, perDeg, range, focusNodeNum, names)
     }
 }
 
@@ -580,6 +585,7 @@ private fun DrawScope.drawTargets(
     measurer: TextMeasurer,
     targets: List<HorizonTarget>,
     markers: Map<Int, Pair<Color, Color>>,
+    precisions: Map<Int, Double>,
     centre: Float,
     perDeg: Float,
     range: ClosedFloatingPointRange<Double>,
@@ -596,6 +602,18 @@ private fun DrawScope.drawTargets(
         val focus = target.nodeNum == focusNodeNum
         val (background, text) = markers[target.nodeNum] ?: (Color.DarkGray to Color.White)
         val ring = if (target.visible) Visible else Hidden
+        // The doubt about where the node stands, as the angle its radius subtends from here, across and up.
+        precisions[target.nodeNum]?.let { r ->
+            val half = kotlin.math.atan(r / target.distanceM) * 180.0 / kotlin.math.PI
+            val rx = (half * perDeg).toFloat()
+            val ry = abs(yOf(target.angleDeg + half, range, size.height) - y)
+            if (rx >= PRECISION_MIN_PX) {
+                val topLeft = Offset(x - rx, y - ry)
+                val oval = androidx.compose.ui.geometry.Size(2 * rx, 2 * ry)
+                drawOval(background.copy(alpha = PRECISION_FILL_ALPHA), topLeft, oval)
+                drawOval(background.copy(alpha = PRECISION_LINE_ALPHA), topLeft, oval, style = Stroke(1.5f))
+            }
+        }
         drawNodeMarker(measurer, if (names && (target in labelled || focus)) target.name else null, Offset(x, y), background, text, ring, focus)
     }
 }
@@ -616,8 +634,8 @@ private fun MoveMap(state: TerrainHorizonState, onMoved: (Double, Double) -> Uni
     if (pickMap != null) {
         // The same map as the main one, with the nodes drawn as there; a cross in the middle marks the place.
         val mapNodes =
-            remember(state.nodeChoices) {
-                state.nodeChoices.map { HorizonMapNode(it.lat, it.lon, it.shortName, it.color, it.textColor) }
+            remember(state.nodeChoices, state.precisionCircles) {
+                state.nodeChoices.map { HorizonMapNode(it.lat, it.lon, it.shortName, it.color, it.textColor, it.precisionM.takeIf { _ -> state.precisionCircles }) }
             }
         Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
@@ -764,6 +782,9 @@ private const val CHIP_TAIL_WIDTH_DP = 8
 private const val CHIP_GAP_DP = 8
 private const val CHIP_TAIL_ROUND_DP = 2
 private const val CHIP_RING_DP = 1.5f
+private const val PRECISION_MIN_PX = 3f
+private const val PRECISION_FILL_ALPHA = 0.18f
+private const val PRECISION_LINE_ALPHA = 0.7f
 private const val CHIP_FOCUS_RING_DP = 3f
 private const val MAP_METRES_PER_KM = 1_000.0
 
