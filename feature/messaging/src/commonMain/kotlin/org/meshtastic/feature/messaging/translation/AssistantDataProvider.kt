@@ -1421,12 +1421,42 @@ class AssistantDataProvider(
             val short = n.user.short_name.lowercase()
             if (long.length >= MIN_NAME && q.contains(long)) long.length else short.length
         }?.let { return it.num }
+        // A name that is exactly a node's name wins; otherwise the words of the question that together name a node ("unr base" is SP7UNR_base).
+        val allNodes = nodeRepository.nodeDBbyNum.value.values
+        if (wanted.isNotEmpty()) allNodes.firstOrNull { it.user.short_name.lowercase() == wanted || it.user.long_name.lowercase() == wanted }?.let { return it.num }
+        phraseNode(question)?.let { return it.num }
         if (wanted.length >= MIN_NAME - 1) {
             findNode(wanted)?.let { return it.num }
             mentionedNodes(" $wanted ").firstOrNull()?.let { return it.num }
         }
         val inQuestion = mentionedNodes(question.lowercase())
         return (inQuestion.firstOrNull { it.num != own?.num } ?: inQuestion.firstOrNull())?.num
+    }
+
+    /**
+     * Two or three words in a row of the question that all lie in one node's name (spoken "unr base" for SP7UNR_base); the
+     * node with the most matching letters, or null when nothing fits clearly.
+     */
+    private fun phraseNode(question: String): org.meshtastic.core.model.Node? {
+        val words = question.fold().split(Regex("[^a-z0-9]+")).filter { it.length >= PHRASE_MIN_WORD }
+        if (words.size < 2) return null
+        val own = nodeRepository.ourNodeInfo.value?.num
+        val nodes = nodeRepository.nodeDBbyNum.value.values.filter { it.num != own }.map { it to (it.user.long_name + " " + it.user.short_name).fold() }
+        var best: org.meshtastic.core.model.Node? = null
+        var bestScore = 0
+        for (size in PHRASE_MAX_WORDS downTo 2) {
+            for (start in 0..words.size - size) {
+                val window = words.subList(start, start + size)
+                val score = window.sumOf { it.length }
+                for ((node, name) in nodes) {
+                    if (score > bestScore && window.all { name.contains(it) }) {
+                        best = node
+                        bestScore = score
+                    }
+                }
+            }
+        }
+        return best.takeIf { bestScore >= PHRASE_MIN_LETTERS }
     }
 
     /** The nearest (or farthest) node with a known position, of one [role] or any, with its distance in metres. */
@@ -2298,6 +2328,9 @@ class AssistantDataProvider(
         const val SUMMARY_MESSAGES = 20
         const val OVERVIEW_SHORT = 380
         const val MIN_NAME = 3
+        const val PHRASE_MIN_WORD = 3
+        const val PHRASE_MAX_WORDS = 3
+        const val PHRASE_MIN_LETTERS = 6
         const val RANK_WINDOW_MS = 3 * 24 * 60 * 60 * 1000L
         const val RANK_TOP = 8
         const val SIGNAL_TOP = 8

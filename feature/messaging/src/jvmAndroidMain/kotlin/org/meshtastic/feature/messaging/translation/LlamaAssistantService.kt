@@ -171,8 +171,8 @@ class LlamaAssistantService(
                     t("Model", "Model") + ": ${info?.name ?: modelId} (${info?.family.orEmpty()})\n" +
                         t("Rozmiar", "Size") + ": ${info?.sizeMb ?: 0} MB, " + t("pamięć podczas pracy", "memory while running") + ": " + t("około", "about") + " ${info?.ramMb ?: 0} MB\n" +
                         t("Gdzie działa", "Where it runs") + ": " + (
-                            engine.activeBackend.takeIf { it.isNotBlank() }
-                                ?: engine.lastStart(modelId)?.backend?.let { it + " " + t("(ostatnio; model jest teraz zwolniony z pamięci)", "(last time; the model is released from memory now)") }
+                            engine.activeBackend.takeIf { it.isNotBlank() }?.let { localBackend(it, pl) }
+                                ?: engine.lastStart(modelId)?.backend?.let { localBackend(it, pl) + " " + t("(ostatnio; model jest teraz zwolniony z pamięci)", "(last time; the model is released from memory now)") }
                                 ?: t("jeszcze nie uruchomiony (zadaj najpierw dowolne pytanie)", "not started yet (ask any question first)")
                             ) + "\n" +
                         t("Zajęta pamięć RAM teraz", "RAM taken now") + ": " + (engine.memoryUsedMb?.let { "$it MB" } ?: t("0 MB (model nie jest wczytany)", "0 MB (the model is not loaded)")) + "\n" +
@@ -343,6 +343,12 @@ class LlamaAssistantService(
     }
 
     /** The model the translator's hardware report is about: the chosen translator model when it is on the device, else any that is, else NLLB. */
+    /** The chip line is stored in English; in Polish its layer count is written in Polish ("36 z 36 warstw na NPU"). */
+    private fun localBackend(text: String, polish: Boolean): String =
+        if (!polish) text else text.replace(Regex("(\\d+) of (\\d+) layers on the (graphics card|NPU)")) { m ->
+            "${m.groupValues[1]} z ${m.groupValues[2]} warstw na " + if (m.groupValues[3] == "NPU") "NPU" else "karcie graficznej"
+        }
+
     private fun translatorReportModel(): String {
         val states = store.states.value
         val chosen = AiModels.byId(uiPrefs.translatorModelId.value)?.takeIf { it.canDo(AiRole.TRANSLATOR) && states[it.id] == TranslatorModelState.Ready }
@@ -1997,7 +2003,7 @@ class LlamaAssistantService(
         val SEND_ASK = Regex("(?iu)(czy|can).*(możesz|mozesz|potrafisz|you|asystent (może|moze)).*(wysł|wysl|send).*(wiadomo|message)|can you send|czy asystent (może|moze) wysł")
         val LANG_ASK = Regex("(?iu)(umiesz|potrafisz|możesz|mozesz|can you|do you).*(po angielsku|po polsku|speak english|speak polish|angielsk)")
         val OWN_CONFIG_ASK = Regex("(?iu)(jaki|jaką|jaka|jakie|ile|który|który jest|what|which|how many).*(mam|mój|moj\\p{L}*|my|have).*(preset|rol[ęea]|region|kanał|kanal|kanały|kanalow|channel|limit\\s+(skok|przeskok)\\p{L}*|hop limit)|ile (mam|jest) kanał")
-        val SET_COMMAND = Regex("(?iu)^\\s*(ustaw|zmień|zmien|zapisz|set|change)\\s.*((?<![\\p{L}])moc\\p{L}*|preset|region|(?<![\\p{L}])rol\\p{L}*|power|role|limit)")
+        val SET_COMMAND = Regex("(?iu)^\\s*(?:(?:czy\\s+)?(?:możesz|mozesz|mógłbyś|moglbys|proszę|prosze|can you|could you|please)\\s+)?(?:dla mnie\\s+)?(ustaw\\p{L}*|zmień|zmien\\p{L}*|zapisz|set|change)\\s.*((?<![\\p{L}])moc\\p{L}*|preset|region|(?<![\\p{L}])rol\\p{L}*|power|role|limit|interwał|interwal|częstotliw\\p{L}*|czestotliw\\p{L}*|telemetri\\p{L}*|frequency|interval|telemetry)")
         val OWN_WORDS_RANGE = Regex("(?iu)(?<![\\p{L}])(my|mój|moj\\p{L}*|mnie|mam|i)(?![\\p{L}])")
         val BATTERY_TYPE_ASK = Regex("(?iu)(jaka|jaki|jakie|which|what) (bateri|akumulator|ogniw|battery|cell)")
         val NOT_OVERVIEW = Regex("(?iu)(what|co to jest|czym jest|wyjaśnij|explain|summary of what).*(meshtastic|lora|mesh)(?! network)")
