@@ -195,6 +195,8 @@ fun NodeListScreen(
     val deviceImageUrls by viewModel.deviceImageUrls.collectAsStateWithLifecycle()
     val neighborReports by viewModel.neighborReports.collectAsStateWithLifecycle()
     var neighborsOpenFor by remember { mutableStateOf<Int?>(null) }
+    // One lambda for the whole list: a new one on every recomposition made every card redraw each time.
+    val onNeighborsClick = remember<(Int) -> Unit> { { num -> neighborsOpenFor = num } }
     neighborsOpenFor?.let { num ->
         NeighborReportDialog(
             report = neighborReports[num],
@@ -434,7 +436,7 @@ fun NodeListScreen(
                                 }
                             }
 
-                        CompositionLocalProvider(LocalNeighborsClick provides { num -> neighborsOpenFor = num }) {
+                        CompositionLocalProvider(LocalNeighborsClick provides onNeighborsClick) {
                         when (density) {
                             NodeListDensity.COMPLETE ->
                                 NodeItem(
