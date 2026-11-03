@@ -478,7 +478,7 @@ class LlamaCppEngine(
             // bigger model gets more sessions (layers spread over them).
             // Older Snapdragons (Hexagon before v75, e.g. the 8 Gen 2) give only ONE session: a bigger model's request for
             // more fails at once ("invalid device: HTP1"), so the same NPU is then tried with a single session (own mark).
-            installer.androidNpuAsset()?.takeIf { !skipNpu }?.let { asset ->
+            installer.androidNpuAsset()?.takeIf { !skipNpu && !model.phoneCpuOnly }?.let { asset ->
                 val wanted = ((model.sizeMb + NPU_SESSION_MB - 1) / NPU_SESSION_MB).coerceIn(1, MAX_NPU_SESSIONS)
                 for (sessions in listOf(wanted, 1).distinct()) {
                     val suffix = if (sessions == wanted) "" else SINGLE_SESSION_SUFFIX
@@ -495,7 +495,7 @@ class LlamaCppEngine(
             }
             // A phone: our graphics card builds (OpenCL on a Snapdragon, then Vulkan), each only counts when the log
             // shows that the card really took part of the model.
-            for (asset in installer.androidGpuAssetsAll()) {
+            for (asset in if (model.phoneCpuOnly) emptyList() else installer.androidGpuAssetsAll()) {
                 val kind = asset.folder.substringAfterLast('-')
                 if (!installer.isBroken(asset, modelId)) add(Attempt("graphics card ($kind) and processor", null, emptyList(), asset, requireGpu = true, perModel = true, vendorLibs = true))
                 // Vulkan drivers of some phones (Adreno) fail to build the fast shaders: the same card once more with the
@@ -569,9 +569,10 @@ class LlamaCppEngine(
         if (skipNpu) tried.append("- " + note("NPU: skipped on request, the graphics card is tried first", "NPU: pominięte na prośbę, najpierw karta graficzna") + "\n")
         if (installer.android) {
             if (installer.qualcomm) tried.append("- " + note("Snapdragon phone detected", "wykryto telefon ze Snapdragonem") + "\n") else tried.append("- " + note("not a Snapdragon phone: no NPU program", "to nie Snapdragon: brak programu na NPU") + "\n")
-            installer.androidNpuAsset()?.takeIf { !skipNpu && installer.isBroken(it, modelId) }
+            if (model.phoneCpuOnly) tried.append("- " + note("NPU and graphics card: skipped, this model gives nonsense on them (tested), it runs on the processor", "NPU i karta graficzna: pominięte, ten model daje na nich bełkot (sprawdzone), działa na procesorze") + "\n")
+            installer.androidNpuAsset()?.takeIf { !skipNpu && !model.phoneCpuOnly && installer.isBroken(it, modelId) }
                 ?.let { tried.append("- " + note("NPU (Hexagon): skipped, failed recently for this model", "NPU (Hexagon): pominięte, niedawno nie zadziałało z tym modelem") + "\n") }
-            if (installer.androidGpuAssets(modelId).isEmpty()) tried.append("- " + note("graphics card programs: skipped, failed recently", "programy na kartę graficzną: pominięte, niedawno nie zadziałały") + "\n")
+            if (!model.phoneCpuOnly && installer.androidGpuAssets(modelId).isEmpty()) tried.append("- " + note("graphics card programs: skipped, failed recently", "programy na kartę graficzną: pominięte, niedawno nie zadziałały") + "\n")
         } else if (!installer.mac) {
             tried.append(
                 when {

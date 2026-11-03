@@ -114,6 +114,11 @@ data class AiModelInfo(
      * and one that fails there is not tried again for a week (a new NPU driver gives it a new try at once).
      */
     val intelNpu: Boolean = true,
+    /**
+     * True for a model that gives nonsense on the NPU and the graphics card of a phone (tested: DeepSeek R1 Distill Qwen
+     * 1.5B on a Snapdragon): on a phone it goes straight to the processor, without failing tests first.
+     */
+    val phoneCpuOnly: Boolean = false,
     val recommendedFor: Set<AiRole> = emptySet(),
     val descriptionPl: String = "",
     val descriptionEn: String = "",
@@ -579,8 +584,10 @@ object AiModels {
         license: AiLicense,
         pl: String,
         en: String,
+        phoneCpuOnly: Boolean = false,
     ) = AiModelInfo(
         id = id,
+        phoneCpuOnly = phoneCpuOnly,
         name = name,
         family = DEEPSEEK_FAMILY,
         engine = AiEngine.LLAMA_CPP,
@@ -602,6 +609,7 @@ object AiModels {
             "DeepSeek-R1-Distill-Qwen-1.5B-Q4_0.gguf", 1019, 2000, 4, AiLicense.MIT,
             "Najmniejszy model „myślący” DeepSeek: działa nawet na słabym telefonie, ale rozumuje płytko i po polsku jest słaby. Na Snapdragonie w naszych testach NPU i karta graficzna dawały z nim bełkot, więc działa na procesorze. Do prostych zadań i prób.",
             "The smallest \"thinking\" DeepSeek model: runs even on a weak phone, but its reasoning is shallow and its Polish is poor. On a Snapdragon, the NPU and graphics card gave nonsense with it in our tests, so it runs on the processor. For simple tasks and trying things out.",
+            phoneCpuOnly = true,
         )
 
     val DeepSeek7b =
