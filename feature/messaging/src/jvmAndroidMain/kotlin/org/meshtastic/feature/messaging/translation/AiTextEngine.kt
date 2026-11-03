@@ -30,6 +30,9 @@ interface AiTextEngine {
     /** What happened at the last start of the model, attempt by attempt (empty before the first start); for `/sprzet`. */
     val startReport: String get() = ""
 
+    /** Where the speech (dictation) program ran last, for the compatibility test; empty where not known. */
+    val speechBackend: String get() = ""
+
     /** Memory (MB) the model program takes right now; null while nothing is loaded or when it cannot be read. */
     val memoryUsedMb: Int? get() = null
 

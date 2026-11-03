@@ -489,6 +489,8 @@ app_log_folder
 app_log_level
 app_log_open_failed
 app_log_open_folder
+app_log_recent
+app_log_recent_summary
 app_log_summary
 app_log_title
 app_notifications
@@ -730,6 +732,17 @@ compass_north_top
 compass_title
 compass_uncertainty
 compass_uncertainty_unknown
+### COMPAT ###
+compat_offer_body
+compat_offer_no
+compat_offer_title
+compat_offer_yes
+compat_report_note
+compat_run_again
+compat_running_title
+compat_step_dictation
+compat_step_hardware
+compat_step_question
 compromised_keys
 ### CONFIG ###
 config_device_ledHeartbeatEnabled_summary
@@ -2591,6 +2604,9 @@ reply
 replying_to
 ### REPORT ###
 report
+report_done_computer
+report_done_phone
+report_failed
 report_issues_discord_summary
 report_issues_find_us
 report_issues_headline
@@ -2600,6 +2616,12 @@ report_issues_signal_summary
 report_issues_tips
 report_issues_title
 report_issues_whatsapp_summary
+report_note_hint
+report_send
+report_send_to
+report_sending
+report_with_logs
+report_with_logs_hint
 ### REQUEST ###
 request
 request_air_quality_metrics

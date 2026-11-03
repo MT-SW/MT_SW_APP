@@ -24,6 +24,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.delay
@@ -47,11 +48,25 @@ data class AssistantUiState(
     val failed: Boolean = false,
 )
 
+/** The steps of the compatibility test of the assistant, in order. */
+enum class CompatStep { QUESTION, HARDWARE, DICTATION }
+
+/** The compatibility test window: [Idle] nothing, [Asking] the offer, [Running] the test, [Done] the finished package. */
+sealed interface CompatUi {
+    data object Idle : CompatUi
+
+    data object Asking : CompatUi
+
+    data class Running(val step: CompatStep, val detail: String = "") : CompatUi
+
+    data class Done(val files: List<Pair<String, ByteArray>>) : CompatUi
+}
+
 @KoinViewModel
 class AssistantViewModel(
     private val service: AssistantService,
     private val history: AssistantHistoryStore,
-    uiPrefs: UiPrefs,
+    private val uiPrefs: UiPrefs,
 ) : ViewModel() {
 
     val enabled: StateFlow<Boolean> = uiPrefs.assistantEnabled
@@ -67,6 +82,59 @@ class AssistantViewModel(
 
     private var job: Job? = null
     private var chatId: String? = null
+
+    private val _compat = MutableStateFlow<CompatUi>(CompatUi.Idle)
+    val compat: StateFlow<CompatUi> = _compat.asStateFlow()
+
+    /** Offers the compatibility test once, when the first model is ready and nobody answered before. */
+    fun offerCompat() {
+        if (_compat.value == CompatUi.Idle && !uiPrefs.aiCompatAsked.value) _compat.value = CompatUi.Asking
+    }
+
+    /** "No": the offer is not shown again (the test stays available from the assistant's info window). */
+    fun declineCompat() {
+        uiPrefs.setAiCompatAsked(true)
+        _compat.value = CompatUi.Idle
+    }
+
+    fun closeCompat() {
+        _compat.value = CompatUi.Idle
+    }
+
+    /**
+     * The test: a very short question, then the hardware report, then the dictation check. The conversation is saved like
+     * any other and all the results are collected into files for the report window.
+     */
+    fun startCompat() {
+        if (_state.value.busy || _compat.value is CompatUi.Running) return
+        uiPrefs.setAiCompatAsked(true)
+        startNew()
+        _compat.value = CompatUi.Running(CompatStep.QUESTION)
+        viewModelScope.launch {
+            val files = mutableListOf<Pair<String, ByteArray>>()
+            try {
+                setInput(service.compatQuestion)
+                send()
+                _state.first { !it.busy }
+                _compat.value = CompatUi.Running(CompatStep.HARDWARE)
+                setInput("/sprzet")
+                send()
+                _state.first { !it.busy }
+                val chat =
+                    _state.value.lines.joinToString("\n\n") { (if (it.fromUser) "> " else "") + it.text + (if (!it.fromUser && it.info.isNotBlank()) "\n[${it.info}]" else "") }
+                files += "asystent-rozmowa.txt" to chat.encodeToByteArray()
+                _compat.value = CompatUi.Running(CompatStep.DICTATION)
+                val speech = service.dictationCheck { step -> _compat.value = CompatUi.Running(CompatStep.DICTATION, step) }
+                files += "dyktowanie.txt" to speech.encodeToByteArray()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Throwable) {
+                Logger.w(tag = "AssistantViewModel", throwable = e) { "Compatibility test failed: ${e.message}" }
+                files += "blad-testu.txt" to (e.message ?: e.toString()).encodeToByteArray()
+            }
+            _compat.value = CompatUi.Done(files)
+        }
+    }
 
     init {
         refreshSaved()

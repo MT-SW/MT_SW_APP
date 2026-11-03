@@ -92,7 +92,6 @@ import org.meshtastic.core.ui.util.rememberSaveFileLauncher
 import org.meshtastic.feature.settings.component.AppVersionRows
 import org.meshtastic.feature.settings.component.CacheLimitPreference
 import org.meshtastic.feature.settings.component.ExpressiveSection
-import org.meshtastic.feature.settings.component.ReportIssuesSection
 import org.meshtastic.feature.settings.component.FullMessageTimestampsSetting
 import org.meshtastic.feature.settings.component.HomoglyphSetting
 import org.meshtastic.feature.settings.component.NotificationSection
@@ -395,8 +394,6 @@ fun DesktopSettingsScreen(
                             onNavigate(SettingsRoute.HelpDocs)
                         }
                     }
-
-                    ReportIssuesSection()
 
                     DesktopAppInfoSection(
                         appVersionName = settingsViewModel.appVersionName,

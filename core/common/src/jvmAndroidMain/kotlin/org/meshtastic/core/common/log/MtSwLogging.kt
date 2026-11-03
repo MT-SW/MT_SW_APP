@@ -52,11 +52,28 @@ object MtSwLogging {
     private const val CRASH_DIR = "crash"
     private const val FLUSH_EVERY_MS = 1000L
     private const val SAMPLE_EVERY_MS = 30_000L
+
+    /** The automatic log of the last day (on by default): how far back it reaches, how big it may grow, how often it is trimmed. */
+    const val RECENT_WINDOW_MS: Long = 24L * 60 * 60 * 1000
+    private const val RECENT_MAX_BYTES: Long = 40L * 1024 * 1024
+    private const val PRUNE_EVERY_MS = 5L * 60 * 1000
     private const val PART_NUMBER_WIDTH = 3
     private const val BYTES_IN_MB = 1024 * 1024
 
     private val levelFlow = MutableStateFlow(AppLogLevel.OFF)
     val level: StateFlow<AppLogLevel> get() = levelFlow
+
+    /**
+     * The automatic log of the last 24 hours (on by default). While the switch for full logging is off, the app still keeps
+     * the basic log of the last day, so a person who meets a problem can send it at once. It stays on the device.
+     */
+    private val recentFlow = MutableStateFlow(true)
+    val recent: StateFlow<Boolean> get() = recentFlow
+
+    /** What is really written: the chosen level, or the basic level while only the automatic log of the last day is on. */
+    private fun effectiveLevel(): AppLogLevel = levelFlow.value.let { if (it == AppLogLevel.OFF && recentFlow.value) AppLogLevel.BASIC else it }
+
+    @Volatile private var currentName: String? = null
 
     @Volatile private var dir: File? = null
 
@@ -81,7 +98,7 @@ object MtSwLogging {
     val writer: LogWriter =
         object : LogWriter() {
             override fun isLoggable(tag: String, severity: Severity): Boolean {
-                val min = levelFlow.value.severity ?: return false
+                val min = effectiveLevel().severity ?: return false
                 return severity >= min
             }
 
@@ -101,11 +118,14 @@ object MtSwLogging {
         extraSample = sample
         onLevelChanged = onChange
         runCatching { logDir.mkdirs() }
-        levelFlow.value = AppLogLevel.fromKey(runCatching { File(logDir, CONF_NAME).readText() }.getOrNull())
+        val conf = runCatching { File(logDir, CONF_NAME).readLines() }.getOrDefault(emptyList())
+        levelFlow.value = AppLogLevel.fromKey(conf.firstOrNull())
+        recentFlow.value = conf.getOrNull(1)?.trim() != RECENT_OFF
         installCrashRecorder()
         startBackgroundThread()
         installShutdownHook()
-        onLevelChanged(levelFlow.value)
+        runCatching { pruneRecent() }
+        onLevelChanged(effectiveLevel())
     }
 
     /** Kermit's global minimum severity: the lower of [base] (what the build normally keeps) and the chosen level. */
@@ -115,13 +135,27 @@ object MtSwLogging {
     }
 
     fun setLevel(level: AppLogLevel) {
-        val folder = dir ?: return
-        runCatching { File(folder, CONF_NAME).writeText(level.key) }
         val before = levelFlow.value
         levelFlow.value = level
-        if (level == AppLogLevel.OFF) synchronized(lock) { closeCurrent() }
-        onLevelChanged(level)
+        saveConf()
+        if (effectiveLevel() == AppLogLevel.OFF) synchronized(lock) { closeCurrent() }
+        onLevelChanged(effectiveLevel())
         if (before != level) Logger.i(tag = TAG) { "Log level: ${before.key} -> ${level.key}" }
+    }
+
+    /** Switches the automatic log of the last 24 hours on or off (the full logging switch is separate). */
+    fun setRecent(on: Boolean) {
+        if (recentFlow.value == on) return
+        recentFlow.value = on
+        saveConf()
+        if (effectiveLevel() == AppLogLevel.OFF) synchronized(lock) { closeCurrent() }
+        onLevelChanged(effectiveLevel())
+        Logger.i(tag = TAG) { "Automatic log of the last day: ${if (on) "on" else "off"}" }
+    }
+
+    private fun saveConf() {
+        val folder = dir ?: return
+        runCatching { File(folder, CONF_NAME).writeText(levelFlow.value.key + "\n" + (if (recentFlow.value) "recent=on" else RECENT_OFF)) }
     }
 
     /** All log parts, oldest first. */
@@ -135,11 +169,26 @@ object MtSwLogging {
         dir?.let { File(it, CRASH_DIR) }?.listFiles { f -> f.isFile }?.sortedBy { it.name }.orEmpty()
 
     /** Writes a zip with every part, the crash records and a table of contents, and flushes the open part first. */
-    fun writeZip(target: OutputStream) {
+    fun writeZip(target: OutputStream) = writeReportZip(target, 0L)
+
+    /**
+     * Like [writeZip], but only with the parts written since [sinceMillis] (the last 24 hours for a report), plus [extras] (name to
+     * text, put at the top of the zip: the user's note, the hardware report...) and [extraFiles] (name in the zip to file: the
+     * engine's own logs).
+     */
+    fun writeReportZip(
+        target: OutputStream,
+        sinceMillis: Long,
+        extras: List<Pair<String, ByteArray>> = emptyList(),
+        extraFiles: List<Pair<String, File>> = emptyList(),
+    ) {
         flush()
         ZipOutputStream(target).use { zip ->
             val toc = StringBuilder("MT_SW log package, made ${stamp()}\n").append(header()).append('\n')
-            val files = parts() + crashFiles()
+            if (sinceMillis > 0L) toc.append("Only what was written since ${Date(sinceMillis)}\n")
+            val files = (parts() + crashFiles()).filter { it.lastModified() >= sinceMillis }
+            for ((name, bytes) in extras) toc.append("$name: ${bytes.size / 1024} KB\n")
+            for ((name, file) in extraFiles) if (file.isFile) toc.append("$name: ${file.length() / 1024} KB\n")
             for (f in files) {
                 val stats = scan(f)
                 toc.append("${f.name}: ${f.length() / 1024} KB, ${stats.first} errors, ${stats.second} warnings\n")
@@ -147,6 +196,17 @@ object MtSwLogging {
             zip.putNextEntry(ZipEntry("spis_tresci.txt"))
             zip.write(toc.toString().toByteArray())
             zip.closeEntry()
+            for ((name, bytes) in extras) {
+                zip.putNextEntry(ZipEntry(name))
+                zip.write(bytes)
+                zip.closeEntry()
+            }
+            for ((name, file) in extraFiles) {
+                if (!file.isFile) continue
+                zip.putNextEntry(ZipEntry(name))
+                runCatching { file.inputStream().use { it.copyTo(zip) } }
+                zip.closeEntry()
+            }
             for (f in files) {
                 zip.putNextEntry(ZipEntry((if (f.parentFile?.name == CRASH_DIR) "crash/" else "") + f.name))
                 f.inputStream().use { it.copyTo(zip) }
@@ -213,6 +273,7 @@ object MtSwLogging {
         val writer = BufferedWriter(OutputStreamWriter(stream, Charsets.UTF_8), 64 * 1024)
         counter = stream
         out = writer
+        currentName = name
         writer.write("=== MT_SW log, part $part, session $session, opened ${stamp()} ===\n")
         writer.write(header())
         writer.write("\n=== line: MM-dd HH:mm:ss.SSS L/tag [thread] message ===\n")
@@ -225,6 +286,24 @@ object MtSwLogging {
         runCatching { out?.close() }
         out = null
         counter = null
+    }
+
+    /**
+     * While only the automatic log of the last day runs, the parts older than a day go, and the parts together stay under a
+     * size limit. Parts of a log the person switched on by hand are never trimmed by age.
+     */
+    private fun pruneRecent() {
+        if (levelFlow.value != AppLogLevel.OFF) return
+        val cutoff = System.currentTimeMillis() - RECENT_WINDOW_MS
+        val all = parts()
+        var total = all.sumOf { it.length() }
+        for (f in all) {
+            if (f.name == currentName) continue
+            if (f.lastModified() < cutoff || total > RECENT_MAX_BYTES) {
+                total -= f.length()
+                runCatching { f.delete() }
+            }
+        }
     }
 
     private fun pruneOld(folder: File) {
@@ -288,9 +367,15 @@ object MtSwLogging {
         Thread(
             {
                 var sinceSample = 0L
+                var sincePrune = 0L
                 while (true) {
                     runCatching { Thread.sleep(FLUSH_EVERY_MS) }
-                    if (levelFlow.value == AppLogLevel.OFF) continue
+                    if (effectiveLevel() == AppLogLevel.OFF) continue
+                    sincePrune += FLUSH_EVERY_MS
+                    if (sincePrune >= PRUNE_EVERY_MS) {
+                        sincePrune = 0L
+                        runCatching { pruneRecent() }
+                    }
                     flush()
                     sinceSample += FLUSH_EVERY_MS
                     if (sinceSample >= SAMPLE_EVERY_MS) {
@@ -341,6 +426,7 @@ object MtSwLogging {
     @Volatile private var shutdownHookInstalled = false
 
     private const val TAG = "MtSwLog"
+    private const val RECENT_OFF = "recent=off"
 
     /** Column of the level letter in a line: `MM-dd HH:mm:ss.SSS ` is 19 characters long. */
     private const val LEVEL_COLUMN = 19

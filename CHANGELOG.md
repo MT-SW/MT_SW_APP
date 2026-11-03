@@ -17,6 +17,8 @@ Ten plik opisuje wyłącznie zmiany wprowadzone w aplikacji MT_SW_APP **względe
 Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od początku (27 lipca 2026) do dziś, w kolejności chronologicznej. Opis funkcji: [README.md](README.md).
 
 ### Listopad 2026
+* Zgłaszanie błędów i pomysłów: przeniesione do funkcji MT_SW. Aplikacja sama trzyma logi z ostatnich 24 godzin; okno zgłoszenia pozwala wybrać Discord, WhatsApp albo Signal i „Wyślij” składa paczkę z logami (telefon: udostępnienie wybranej aplikacji z plikiem i linkiem do grupy; komputer: zapis zip, otwarcie folderu i grupy).
+* Asystent: po pierwszym pobraniu modelu pyta o zgodę na test zgodności (krótkie pytanie, raport `/sprzęt`, sprawdzenie dyktowania z najmniejszym modelem); wynik trafia do jednej paczki w oknie zgłoszenia, nic nie jest wysyłane samo. Test można powtórzyć z okna „i”.
 * Asystent: nagłówek rozmowy (ostrzeżenie i przyciski kopiowania/zapisu) zwija się przy przewijaniu rozmowy palcem i wraca po przesunięciu w dół, więc przy mocno powiększonym ekranie nie zasłania rozmowy; przełącznik jest w oknie informacji.
 * Tłumacz: ma te same komendy co asystent (`/tłumacz` i `/sprzęt`, z polskimi literami lub bez), ikonę „i” z opisem komend oraz historię sesji pod ikoną zegara. Każda sesja (tłumaczenia razem z wynikami komend) zapisuje się na urządzeniu, można ją otworzyć, usunąć albo zacząć nową.
 * Prąd z czujnika odwrócony przełącznikiem polaryzacji jest teraz pokazywany z właściwym znakiem także na liście węzłów (linia dodatkowa), w szczegółach węzła (czujniki środowiska i kanały zasilania) i w odpowiedziach asystenta. Po migracji pokazywał się tam znak z czujnika.
@@ -497,6 +499,8 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### November 2026
+* Reporting bugs and ideas: moved to the MT_SW features. The app keeps the logs of the last 24 hours by itself; the report window lets you pick Discord, WhatsApp or Signal and "Send" builds a package with the logs (phone: share to the chosen app with the file and the group link; computer: save the zip, open its folder and the group).
+* Assistant: after the first model download it asks for consent to a compatibility test (a short question, the `/sprzęt` report, a dictation check with the smallest model); the result goes into one package in the report window, nothing is sent by itself. The test can be repeated from the "i" window.
 * Assistant: the header of the chat (the notice and the copy/save buttons) folds away when the chat is scrolled with a finger and comes back on a swipe down, so it does not cover the chat on a strongly enlarged screen; the switch is in the info window.
 * Translator: it has the same commands as the assistant (`/tłumacz` and `/sprzęt`, with or without Polish letters), an "i" icon with the description of the commands and a session history under the clock icon. Every session (translations together with the results of the commands) is saved on the device and can be opened, deleted or started anew.
 * A current inverted with the polarity switch is now shown with the right sign also on the node list (the extra line), in the node details (environment sensors and power channels) and in the assistant's answers. After the migration they showed the sensor's own sign.

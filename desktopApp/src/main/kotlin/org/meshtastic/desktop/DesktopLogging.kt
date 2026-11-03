@@ -19,7 +19,9 @@ package org.meshtastic.desktop
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
 import co.touchlab.kermit.platformLogWriter
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.withContext
 import org.meshtastic.core.common.AppDataRoot
 import org.meshtastic.core.common.log.AppLogControl
 import org.meshtastic.core.common.log.AppLogControls
@@ -27,6 +29,8 @@ import org.meshtastic.core.common.log.AppLogLevel
 import org.meshtastic.core.common.log.InMemoryLogBuffer
 import org.meshtastic.core.common.log.MinSeverityLogWriter
 import org.meshtastic.core.common.log.MtSwLogging
+import org.meshtastic.core.common.log.ReportFile
+import org.meshtastic.core.common.log.ReportTarget
 import org.meshtastic.feature.map.maplibre.installMapLibreLogging
 import java.io.File
 
@@ -74,6 +78,41 @@ private class DesktopLogControl(private val dir: File) : AppLogControl {
     override val folderHint: String get() = dir.absolutePath
 
     override val canOpenFolder: Boolean = true
+
+    override val recent: StateFlow<Boolean> get() = MtSwLogging.recent
+
+    override fun setRecent(on: Boolean) = MtSwLogging.setRecent(on)
+
+    override val canMakeReport: Boolean = true
+
+    override suspend fun buildReport(note: String, withLogs: Boolean, extras: List<Pair<String, ByteArray>>): ReportFile? =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val now = System.currentTimeMillis()
+                val folder = File(dir.parentFile, "reports").also { it.mkdirs() }
+                val name = "mt_sw_zgloszenie_" + java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US).format(java.util.Date(now)) + ".zip"
+                val file = File(folder, name)
+                val since = if (withLogs) now - MtSwLogging.RECENT_WINDOW_MS else Long.MAX_VALUE
+                val engineLogs = File(dir.parentFile, "engine-logs").listFiles { f -> f.isFile && (f.extension == "log" || f.extension == "txt") }.orEmpty()
+                file.outputStream().use { out ->
+                    MtSwLogging.writeReportZip(
+                        out,
+                        since,
+                        extras = listOf("opis_zgloszenia.txt" to note.toByteArray()) + extras,
+                        extraFiles = if (withLogs) engineLogs.map { "silnik/${it.name}" to it } else emptyList(),
+                    )
+                }
+                ReportFile(file.absolutePath, file.absolutePath, file.length() / 1024)
+            }
+                .onFailure { Logger.w(it) { "Report could not be built" } }
+                .getOrNull()
+        }
+
+    /** On a computer the folder with the file opens, so the person can attach it in the group that opens next. */
+    override fun shareReport(report: ReportFile, target: ReportTarget, text: String): Boolean = runCatching {
+        java.awt.Desktop.getDesktop().open(File(report.path).parentFile)
+        true
+    }.getOrDefault(false)
 
     override fun openFolder(): Boolean = runCatching {
         dir.mkdirs()

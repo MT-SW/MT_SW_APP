@@ -17,6 +17,7 @@
 package org.meshtastic.core.common.log
 
 import co.touchlab.kermit.Severity
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -52,6 +53,39 @@ interface AppLogControl {
 
     /** Opens the folder holding the logs, on platforms that can; false when this is not possible. */
     fun openFolder(): Boolean
+
+    /**
+     * The automatic log of the last 24 hours, on by default: even with the full logging switch off the app keeps the basic
+     * log of the last day on the device, so a problem can be reported with its log at once.
+     */
+    val recent: StateFlow<Boolean> get() = MutableStateFlow(false)
+
+    fun setRecent(on: Boolean) {}
+
+    /** True where a report package can be made ([buildReport]). */
+    val canMakeReport: Boolean get() = false
+
+    /** True where [shareReport] hands the file itself to the chosen app (a phone); on a computer the person attaches it. */
+    val sharesFileToApp: Boolean get() = false
+
+    /**
+     * Builds a report zip: the logs of the last 24 hours when [withLogs], the engine's own logs, the person's [note] and the
+     * [extras] (name to content, for example a hardware report). Returns where the file is, or null when it failed.
+     */
+    suspend fun buildReport(note: String, withLogs: Boolean, extras: List<Pair<String, ByteArray>> = emptyList()): ReportFile? = null
+
+    /** Hands [report] and [text] to the app of [target]; false when this platform cannot. */
+    fun shareReport(report: ReportFile, target: ReportTarget, text: String): Boolean = false
+}
+
+/** A finished report package: its [path] on the device, the place to show to the person, and its size. */
+data class ReportFile(val path: String, val shownPath: String, val sizeKb: Long)
+
+/** The three places where reports are taken; [packageName] is the phone app that receives the file. */
+enum class ReportTarget(val packageName: String) {
+    DISCORD("com.discord"),
+    WHATSAPP("com.whatsapp"),
+    SIGNAL("org.thoughtcrime.securesms"),
 }
 
 /** Holder of the platform's [AppLogControl]; null until the platform code installs it. */

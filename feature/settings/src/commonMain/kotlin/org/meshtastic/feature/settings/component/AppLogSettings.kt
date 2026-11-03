@@ -35,6 +35,8 @@ import org.meshtastic.core.resources.app_log_folder
 import org.meshtastic.core.resources.app_log_level
 import org.meshtastic.core.resources.app_log_open_failed
 import org.meshtastic.core.resources.app_log_open_folder
+import org.meshtastic.core.resources.app_log_recent
+import org.meshtastic.core.resources.app_log_recent_summary
 import org.meshtastic.core.resources.app_log_summary
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.SwitchPreference
@@ -50,7 +52,19 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 fun AppLogSettings() {
     val control = AppLogControls.current ?: return
     val level by control.level.collectAsStateWithLifecycle()
+    val recent by control.recent.collectAsStateWithLifecycle()
     var failed by remember { mutableStateOf(false) }
+
+    // The basic log of the last 24 hours, kept by the app on its own (on by default), so a problem can be reported with it.
+    if (control.canMakeReport) {
+        SwitchPreference(
+            title = stringResource(Res.string.app_log_recent),
+            summary = stringResource(Res.string.app_log_recent_summary),
+            checked = recent,
+            enabled = true,
+            onCheckedChange = { control.setRecent(it) },
+        )
+    }
 
     SwitchPreference(
         title = stringResource(Res.string.app_log_level),

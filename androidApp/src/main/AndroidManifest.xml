@@ -147,6 +147,10 @@
         <intent>
             <action android:name="android.speech.action.RECOGNIZE_SPEECH" />
         </intent>
+        <!-- The apps of the groups where reports are taken: the report zip is handed to the chosen one. -->
+        <package android:name="com.discord" />
+        <package android:name="com.whatsapp" />
+        <package android:name="org.thoughtcrime.securesms" />
     </queries>
 
     <application
@@ -481,6 +485,17 @@
                 <action android:name="com.atakmap.app.component" />
             </intent-filter>
         </activity>
+
+        <!-- Hands the report zip (made in the cache folder) to the app the person chose, for one reading only. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.reportshare"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/report_paths" />
+        </provider>
 
         <provider
             android:name="androidx.startup.InitializationProvider"

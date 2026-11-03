@@ -248,7 +248,8 @@ Na słabszych urządzeniach duże modele mogą spowalniać aplikację albo ją z
 - **Wgrywanie firmware** — własny plik można wgrać także na urządzenie spoza listy, z ostrzeżeniami o ryzyku; odzyskiwanie urządzenia w trybie DFU działa też po własnym pliku.
 - **Bluetooth** — poprawione ponowne łączenie z już sparowanym urządzeniem, wykrywanie węzła na Windowsie, a lista ostatnich urządzeń sieciowych pamięta 20 wpisów.
 - **Powiadomienia o nowych wersjach** — aplikacja sprawdza na GitHubie, czy wyszło nowsze wydanie, i pokazuje powiadomienie z linkiem.
-- **Zgłaszanie błędów i pomysłów** — pozycja „Zgłoś błąd lub pomysł” w ustawieniach prowadzi do naszego Discorda i grup.
+- **Zgłaszanie błędów i pomysłów** — jest wśród funkcji MT_SW. Aplikacja sama trzyma logi z ostatnich 24 godzin. W oknie zgłoszenia wybierasz Discord, WhatsApp albo Signal, możesz dopisać opis i zostawić włączone dołączanie logów; „Wyślij” składa paczkę (zip) z logami i na telefonie otwiera wybraną aplikację z plikiem i linkiem do grupy, a na komputerze zapisuje zip, otwiera jego folder i grupę. Plik trzeba w grupie wysłać samemu, bo aplikacje nie pozwalają wstawić go automatycznie.
+- **Test zgodności asystenta** — po pierwszym pobraniu modelu asystent pyta o zgodę na krótki test: jedno pytanie („Co to jest zasięg LoRa?”), raport `/sprzęt` i sprawdzenie dyktowania (pobiera najmniejszy model do dyktowania). Rozmowa, raport i wynik dyktowania trafiają do jednej paczki w oknie zgłoszenia; nic nie jest wysyłane samo. Test można powtórzyć z okna „i” asystenta.
 - **Wygląd i marka** — własna nazwa, ikona i kolory (złoto i granat), kolorowa ikona stanu połączenia, instalacja obok oryginalnej aplikacji Meshtastic. Na Windowsie nową wersję instaluje się na starą bez odinstalowywania.
 - **Komputer** — przeciągany pasek przewijania z widocznym torem na długich listach, trzecia kolumna podąża za wybranym węzłem, pozycja „Wprowadzenie” w ustawieniach.
 

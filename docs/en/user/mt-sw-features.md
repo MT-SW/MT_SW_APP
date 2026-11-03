@@ -248,7 +248,8 @@ On weaker devices big models can slow the app down or get it closed, so every mo
 - **Firmware update** — a custom file can be flashed to a device not on the list too, with risk warnings; recovery of a device in DFU mode also works after a custom file.
 - **Bluetooth** — improved reconnecting to an already paired device, node detection on Windows, and the recent network devices list remembers 20 entries.
 - **New version notifications** — the app checks GitHub for a newer release and shows a notification with a link.
-- **Reporting bugs and ideas** — the "Report a bug or idea" item in settings leads to our Discord and groups.
+- **Reporting bugs and ideas** — it is among the MT_SW features. The app keeps the logs of the last 24 hours by itself. In the report window you pick Discord, WhatsApp or Signal, may add a note and keep the logs switch on; "Send" builds a zip package with the logs and, on a phone, opens the chosen app with the file and the group link, while on a computer it saves the zip and opens its folder and the group. The file has to be sent in the group by hand, because the apps do not allow inserting it automatically.
+- **Assistant compatibility test** — after the first model download the assistant asks for consent to a short test: one question ("What is LoRa range?"), the `/sprzęt` report and a dictation check (the smallest dictation model is downloaded). The conversation, the report and the dictation result go into one package in the report window; nothing is sent by itself. The test can be repeated from the assistant's "i" window.
 - **Look and brand** — own name, icon and colours (gold and navy), a coloured connection status icon, installation next to the original Meshtastic app. On Windows a new version installs over the old one without uninstalling.
 - **Desktop** — a draggable scroll bar with a visible track on long lists, the third column follows the selected node, and an "Introduction" item in settings.
 

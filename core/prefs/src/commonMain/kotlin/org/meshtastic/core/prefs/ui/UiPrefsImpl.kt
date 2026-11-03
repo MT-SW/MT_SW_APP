@@ -190,6 +190,13 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_ASSISTANT_HEADER_COLLAPSE] = value } }
     }
 
+    override val aiCompatAsked: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_AI_COMPAT_ASKED] ?: false }.stateIn(scope, SharingStarted.Lazily, true)
+
+    override fun setAiCompatAsked(value: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_AI_COMPAT_ASKED] = value } }
+    }
+
     override val aiIdleUnloadMinutes: StateFlow<Int> =
         dataStore.data.map { it[KEY_AI_IDLE_UNLOAD_MINUTES] ?: 2 }.stateIn(scope, SharingStarted.Lazily, 2)
 
@@ -781,6 +788,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_ASSISTANT_MEMORY_ENABLED = booleanPreferencesKey("assistant-memory-enabled")
         val KEY_ASSISTANT_AUTOSCROLL = booleanPreferencesKey("assistant-autoscroll")
         val KEY_ASSISTANT_HEADER_COLLAPSE = booleanPreferencesKey("assistant-header-collapse")
+        val KEY_AI_COMPAT_ASKED = booleanPreferencesKey("ai-compat-asked")
         val KEY_AI_IDLE_UNLOAD_MINUTES = intPreferencesKey("ai-idle-unload-minutes")
         val KEY_ANTENNA_SETUPS = stringPreferencesKey("antenna-setups")
         val KEY_DICTATION_EXTERNAL_MIC = booleanPreferencesKey("dictation-external-mic")

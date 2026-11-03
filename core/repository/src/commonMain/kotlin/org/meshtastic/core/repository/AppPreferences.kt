@@ -212,6 +212,12 @@ interface UiPrefs {
 
     fun setAssistantHeaderCollapse(value: Boolean) {}
 
+    /** True once the person has answered the offer of the configuration test of the assistant (shown once, then only on request). */
+    val aiCompatAsked: StateFlow<Boolean>
+        get() = kotlinx.coroutines.flow.MutableStateFlow(true)
+
+    fun setAiCompatAsked(value: Boolean) {}
+
     /** After how many minutes without use a language or speech model is freed from memory; 0 = never (default 2). */
     val aiIdleUnloadMinutes: StateFlow<Int>
         get() = kotlinx.coroutines.flow.MutableStateFlow(2)

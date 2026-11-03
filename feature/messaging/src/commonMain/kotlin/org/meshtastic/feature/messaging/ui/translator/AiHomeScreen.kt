@@ -56,6 +56,7 @@ import org.meshtastic.core.resources.assistant_header_collapse
 import org.meshtastic.core.resources.assistant_header_collapse_hint
 import org.meshtastic.core.resources.assistant_info_body
 import org.meshtastic.core.resources.assistant_info_title
+import org.meshtastic.core.resources.compat_run_again
 import org.meshtastic.core.resources.translator_sessions_empty
 import org.meshtastic.core.resources.translator_sessions_new
 import org.meshtastic.core.resources.translator_sessions_title
@@ -89,6 +90,12 @@ fun AiHomeScreen(
 
     var showHistory by remember { mutableStateOf(false) }
     var showInfo by remember { mutableStateOf(false) }
+    val modelReady by assistantViewModel.modelReady.collectAsStateWithLifecycle()
+    val compat by assistantViewModel.compat.collectAsStateWithLifecycle()
+    androidx.compose.runtime.LaunchedEffect(modelReady, showAssistant) {
+        if (modelReady && showAssistant) assistantViewModel.offerCompat()
+    }
+    CompatTestDialogs(compat = compat, viewModel = assistantViewModel)
     if (showInfo) {
         AlertDialog(
             onDismissRequest = { showInfo = false },
@@ -120,6 +127,11 @@ fun AiHomeScreen(
                                 )
                             }
                             Switch(checked = headerCollapse, onCheckedChange = { uiPrefs.setAssistantHeaderCollapse(it) })
+                        }
+                        if (modelReady) {
+                            TextButton(onClick = { showInfo = false; assistantViewModel.startCompat() }) {
+                                Text(stringResource(Res.string.compat_run_again))
+                            }
                         }
                     }
                 }

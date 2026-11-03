@@ -3412,6 +3412,17 @@
     <string name="set_display_name">Ustaw nazwę własną</string>
     <string name="display_name_hint">Widoczna tylko na tym urządzeniu. Udostępnianie i eksport używają prawdziwej nazwy węzła.</string>
     <string name="display_name">Nazwa własna</string>
+    <string name="app_log_recent">Logi z ostatnich 24 godzin</string>
+    <string name="app_log_recent_summary">Domyślnie włączone. Aplikacja sama trzyma na tym urządzeniu podstawowy log z ostatniej doby, żeby w razie błędu można go było od razu dołączyć do zgłoszenia („Zgłoś błąd lub pomysł”). Logi nigdzie same się nie wysyłają; wysyłasz je tylko Ty. Starsze niż doba są usuwane.</string>
+    <string name="report_send_to">Dokąd wysłać zgłoszenie?</string>
+    <string name="report_note_hint">Co się stało? (opcjonalnie)</string>
+    <string name="report_with_logs">Dołącz logi z ostatnich 24 godzin</string>
+    <string name="report_with_logs_hint">Logi zostają na Twoim urządzeniu i trafiają tam, gdzie je wyślesz dotknięciem „Wyślij”. Są potrzebne, żebyśmy mogli sprawdzić, co poszło nie tak.</string>
+    <string name="report_send">Wyślij</string>
+    <string name="report_sending">Przygotowuję paczkę ze zgłoszeniem…</string>
+    <string name="report_done_phone">Paczka (%1$s KB) jest gotowa i otwarta w wybranej aplikacji: wybierz tam czat grupy i wyślij plik. Kopia leży w: %2$s.</string>
+    <string name="report_done_computer">Paczka (%1$s KB) zapisana w: %2$s. Otworzył się jej folder i grupa: dołącz tam ten plik.</string>
+    <string name="report_failed">Nie udało się przygotować paczki z logami. Grupa otwiera się, opisz tam problem słowami.</string>
     <string name="app_log_title">Logi</string>
     <string name="app_log_level">Zbieranie logów</string>
     <string name="app_log_summary">Domyślnie wyłączone. Po włączeniu aplikacja sama, na bieżąco zapisuje do plików wszystko, co robi (od startu do zamknięcia), w częściach po ok. 400 KB, żeby łatwiej znajdować problemy. Wybór zostaje po ponownym uruchomieniu. Treść wiadomości, klucze i pozycje nie są zapisywane.</string>
@@ -3502,4 +3513,14 @@
     <string name="ai_idle_unload_summary">Po tym czasie bez używania model AI znika z pamięci (RAM) i wczytuje się ponownie przy następnym pytaniu lub dyktowaniu.</string>
     <string name="ai_idle_unload_never">Nigdy</string>
     <string name="ai_idle_unload_minutes">%1$d min</string>
+    <string name="compat_offer_title">Test asystenta</string>
+    <string name="compat_offer_body">Czy zgadzasz się na przetestowanie konfiguracji i pomoc w udoskonaleniu kompatybilności? Asystent zada sobie jedno krótkie pytanie, sprawdzi sprzęt i dyktowanie (pobierze najmniejszy model do dyktowania). Wynik nigdzie nie jest wysyłany sam: na końcu zobaczysz gotową paczkę i sam zdecydujesz, czy ją wysłać.</string>
+    <string name="compat_offer_yes">Zgadzam się</string>
+    <string name="compat_offer_no">Nie</string>
+    <string name="compat_running_title">Trwa test…</string>
+    <string name="compat_step_question">Krótkie pytanie do asystenta…</string>
+    <string name="compat_step_hardware">Sprawdzam sprzęt…</string>
+    <string name="compat_step_dictation">Sprawdzam dyktowanie…</string>
+    <string name="compat_report_note">Test asystenta: wynik w załączonej paczce.</string>
+    <string name="compat_run_again">Uruchom test zgodności</string>
 </resources>

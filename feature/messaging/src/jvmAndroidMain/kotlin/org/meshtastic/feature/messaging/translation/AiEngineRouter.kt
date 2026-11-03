@@ -122,6 +122,8 @@ class AiEngineRouter(
 
     override val memoryUsedMb: Int? get() = llama.memoryUsedMb
 
+    override val speechBackend: String get() = whisper?.backend.orEmpty()
+
     override val activeResources: String get() = llama.activeResources
 
     override fun lastStart(modelId: String): LastStart? = llama.lastStart(modelId)

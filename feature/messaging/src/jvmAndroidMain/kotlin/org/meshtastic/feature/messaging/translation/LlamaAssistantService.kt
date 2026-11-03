@@ -302,6 +302,46 @@ class LlamaAssistantService(
         }
     }
 
+    override val compatQuestion: String get() = if (data.polish) "Co to jest zasięg LoRa?" else "What is LoRa range?"
+
+    override suspend fun dictationCheck(onStep: (String) -> Unit): String =
+        withContext(Dispatchers.IO) {
+            val pl = data.polish
+            fun t(polish: String, english: String) = if (pl) polish else english
+            val candidates = AiModels.forRole(AiRole.DICTATION)
+            val model = candidates.firstOrNull { store.states.value[it.id] == TranslatorModelState.Ready } ?: candidates.minByOrNull { it.sizeMb }
+                ?: return@withContext t("Na tym systemie nie ma dyktowania.", "There is no dictation on this system.")
+            try {
+                if (store.states.value[model.id] != TranslatorModelState.Ready) {
+                    onStep(t("Pobieram najmniejszy model do dyktowania: ${model.name} (${model.sizeMb} MB)…", "Downloading the smallest dictation model: ${model.name} (${model.sizeMb} MB)…"))
+                    store.download(model.id)
+                }
+                onStep(t("Sprawdzam dyktowanie…", "Checking dictation…"))
+                val started = System.currentTimeMillis()
+                val text = engine.transcribe(model.id, silentWav())
+                val took = System.currentTimeMillis() - started
+                t("Dyktowanie", "Dictation") + ": " + t("działa", "works") + "\n" + t("Model", "Model") + ": ${model.name} (${model.sizeMb} MB)\n" +
+                    t("Gdzie działa", "Where it runs") + ": ${engine.speechBackend.ifBlank { "?" }}\n" + t("Czas pierwszego uruchomienia", "Time of the first run") + ": $took ms\n" +
+                    t("Odpowiedź na ciszę", "Answer to silence") + ": \"${text.trim().take(80)}\""
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+                t("Dyktowanie", "Dictation") + ": " + t("nie zadziałało", "failed") + "\n" + t("Model", "Model") + ": ${model.name}\n" + t("Powód", "Reason") + ": ${e.message.orEmpty().take(300)}"
+            }
+        }
+
+    /** One second of silence as a WAV file (16 kHz, mono, 16 bit): enough to start the dictation program and see that it answers. */
+    private fun silentWav(): ByteArray {
+        val data = 32_000
+        val out = java.io.ByteArrayOutputStream()
+        fun i32(v: Int) { out.write(v and 0xFF); out.write((v shr 8) and 0xFF); out.write((v shr 16) and 0xFF); out.write((v shr 24) and 0xFF) }
+        fun i16(v: Int) { out.write(v and 0xFF); out.write((v shr 8) and 0xFF) }
+        out.write("RIFF".toByteArray()); i32(36 + data); out.write("WAVE".toByteArray()); out.write("fmt ".toByteArray())
+        i32(16); i16(1); i16(1); i32(16_000); i32(32_000); i16(2); i16(16)
+        out.write("data".toByteArray()); i32(data); out.write(ByteArray(data))
+        return out.toByteArray()
+    }
+
     /** The model the translator's hardware report is about: the chosen translator model when it is on the device, else any that is, else NLLB. */
     private fun translatorReportModel(): String {
         val states = store.states.value

@@ -19,7 +19,9 @@ package org.meshtastic.app
 import android.app.Activity
 import android.app.ActivityManager
 import android.app.Application
+import android.content.ClipData
 import android.content.ComponentCallbacks2
+import android.content.Intent
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
@@ -29,6 +31,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import androidx.core.content.FileProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -46,6 +49,8 @@ import org.meshtastic.core.common.log.AppLogControls
 import org.meshtastic.core.common.log.AppLogLevel
 import org.meshtastic.core.common.log.MinSeverityLogWriter
 import org.meshtastic.core.common.log.MtSwLogging
+import org.meshtastic.core.common.log.ReportFile
+import org.meshtastic.core.common.log.ReportTarget
 import java.io.File
 import java.util.Date
 
@@ -181,6 +186,74 @@ internal object AndroidLogging {
         override val folderHint: String get() = "Pobrane/$FOLDER"
 
         override fun openFolder(): Boolean = false
+
+        override val recent: StateFlow<Boolean> get() = MtSwLogging.recent
+
+        override fun setRecent(on: Boolean) = MtSwLogging.setRecent(on)
+
+        override val canMakeReport: Boolean = true
+
+        override val sharesFileToApp: Boolean = true
+
+        override suspend fun buildReport(note: String, withLogs: Boolean, extras: List<Pair<String, ByteArray>>): ReportFile? =
+            withContext(Dispatchers.IO) {
+                runCatching {
+                    val now = System.currentTimeMillis()
+                    val folder = File(app.cacheDir, "reports").also { it.mkdirs() }
+                    folder.listFiles()?.filter { it.lastModified() < now - MtSwLogging.RECENT_WINDOW_MS }?.forEach { runCatching { it.delete() } }
+                    val name = "mt_sw_zgloszenie_" + java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US).format(Date(now)) + ".zip"
+                    val file = File(folder, name)
+                    val since = if (withLogs) now - MtSwLogging.RECENT_WINDOW_MS else Long.MAX_VALUE
+                    val engineLogs = File(app.filesDir, "engine-logs").listFiles { f -> f.isFile && (f.extension == "log" || f.extension == "txt") }.orEmpty()
+                    file.outputStream().use { out ->
+                        MtSwLogging.writeReportZip(
+                            out,
+                            since,
+                            extras = listOf("opis_zgloszenia.txt" to note.toByteArray()) + extras,
+                            extraFiles = if (withLogs) engineLogs.map { "silnik/${it.name}" to it } else emptyList(),
+                        )
+                    }
+                    // A copy in Downloads too, so the file can also be attached by hand from there.
+                    val shown = copyToDownloads(file, name) ?: file.absolutePath
+                    ReportFile(file.absolutePath, shown, file.length() / 1024)
+                }
+                    .onFailure { Logger.w(it, tag = TAG) { "Report could not be built" } }
+                    .getOrNull()
+            }
+
+        override fun shareReport(report: ReportFile, target: ReportTarget, text: String): Boolean {
+            val uri = runCatching { FileProvider.getUriForFile(app, app.packageName + ".reportshare", File(report.path)) }.getOrNull() ?: return false
+            fun send(pkg: String?) =
+                Intent(Intent.ACTION_SEND).apply {
+                    type = "application/zip"
+                    putExtra(Intent.EXTRA_STREAM, uri)
+                    putExtra(Intent.EXTRA_TEXT, text)
+                    clipData = ClipData.newRawUri(null, uri)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+                    pkg?.let { setPackage(it) }
+                }
+            // The chosen app first; when it is not installed, the system's own list of apps.
+            return runCatching { app.startActivity(send(target.packageName)); true }
+                .recoverCatching { app.startActivity(Intent.createChooser(send(null), text).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); true }
+                .getOrDefault(false)
+        }
+
+        private fun copyToDownloads(file: File, name: String): String? =
+            runCatching {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return@runCatching null
+                val resolver = app.contentResolver
+                val uri =
+                    resolver.insert(
+                        MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                        ContentValues().apply {
+                            put(MediaStore.Downloads.DISPLAY_NAME, name)
+                            put(MediaStore.Downloads.MIME_TYPE, "application/zip")
+                            put(MediaStore.Downloads.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}/$FOLDER/")
+                        },
+                    ) ?: return@runCatching null
+                resolver.openOutputStream(uri, "wt")?.use { out -> file.inputStream().use { it.copyTo(out) } } ?: return@runCatching null
+                "Pobrane/$FOLDER/$name"
+            }.getOrNull()
 
         /** Refreshes the zip in Downloads when there is something new to put in it. */
         suspend fun autoExport() {

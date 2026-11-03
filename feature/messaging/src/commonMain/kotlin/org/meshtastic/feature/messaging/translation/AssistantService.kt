@@ -38,6 +38,16 @@ interface AssistantService {
      */
     suspend fun reply(history: List<AssistantTurn>, onPiece: (String) -> Unit): String
 
+    /**
+     * The dictation part of the compatibility test: makes sure the smallest dictation model is on the device (it is
+     * downloaded when there is none), runs it once and describes how it went. [onStep] gets a short note for each step.
+     * Empty where the platform has no dictation.
+     */
+    suspend fun dictationCheck(onStep: (String) -> Unit): String = ""
+
+    /** The short question the compatibility test asks (in the language of the app). */
+    val compatQuestion: String get() = "Co to jest zasięg LoRa?"
+
     /** What the last answer was made with, "model|route", saved with the answer for diagnosis. Empty where not known. */
     val lastInfo: String get() = ""
 
