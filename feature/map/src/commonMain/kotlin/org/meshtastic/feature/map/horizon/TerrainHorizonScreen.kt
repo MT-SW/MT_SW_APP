@@ -82,6 +82,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.terrain_horizon_saved
+import org.meshtastic.core.resources.terrain_horizon_save_failed
+import org.meshtastic.core.resources.terrain_horizon_saving
+import org.meshtastic.core.resources.terrain_horizon_save_clear
+import org.meshtastic.core.resources.terrain_horizon_save
+import org.meshtastic.core.resources.terrain_horizon_offline_hint
+import org.meshtastic.core.resources.terrain_horizon_offline
 import org.meshtastic.core.resources.terrain_horizon_move_back
 import org.meshtastic.core.resources.terrain_horizon_move_hint
 import org.meshtastic.core.resources.terrain_horizon_move
@@ -245,6 +252,7 @@ fun TerrainHorizonScreen(
                     BrandChip(selected = fieldOfView == deg, onClick = { fieldOfView = deg }, label = { Text("$deg°") })
                 }
             }
+            OfflineTerrain(state = state, onSave = viewModel::saveTerrain, onClear = viewModel::clearSavedTerrain)
             ChipRow(stringResource(Res.string.terrain_horizon_only_visible)) { Switch(checked = onlyVisible, onCheckedChange = { onlyVisible = it }) }
             ChipRow(stringResource(Res.string.terrain_horizon_labels)) { Switch(checked = names, onCheckedChange = { names = it }) }
         }
@@ -682,3 +690,33 @@ private const val MARKER_CORNER = 8f
 private const val MARKER_STROKE = 2.5f
 private const val MARKER_FOCUS_STROKE = 4.5f
 private const val MAP_METRES_PER_KM = 1_000.0
+
+/** Saving the terrain on the device, so the planner and the panorama work there without the internet. */
+@Composable
+private fun OfflineTerrain(state: TerrainHorizonState, onSave: () -> Unit, onClear: () -> Unit) {
+    Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)) {
+        Text(stringResource(Res.string.terrain_horizon_offline), color = MaterialTheme.colorScheme.onBackground, fontSize = 13.sp)
+        Text(stringResource(Res.string.terrain_horizon_offline_hint), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Button(onClick = onSave, enabled = !state.saving && state.observerLat != null) {
+                Text(stringResource(Res.string.terrain_horizon_save, SAVE_MAX_RADIUS_KM))
+            }
+            if (state.savedBytes > 0L && !state.saving) {
+                TextButton(onClick = onClear) { Text(stringResource(Res.string.terrain_horizon_save_clear)) }
+            }
+        }
+        when {
+            state.saving -> Text(stringResource(Res.string.terrain_horizon_saving, state.saveDone, state.saveTotal), color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
+            state.saveOk == false -> Text(stringResource(Res.string.terrain_horizon_save_failed), color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
+            state.savedBytes > 0L -> Text(stringResource(Res.string.terrain_horizon_saved, megabytes(state.savedBytes)), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+        }
+    }
+}
+
+private const val BYTES_PER_MB = 1_000_000L
+private const val TENTHS = 10L
+
+private fun megabytes(bytes: Long): String {
+    val tenths = bytes * TENTHS / BYTES_PER_MB
+    return "${tenths / TENTHS}.${tenths % TENTHS}"
+}

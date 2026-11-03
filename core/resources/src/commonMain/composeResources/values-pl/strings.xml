@@ -3545,6 +3545,13 @@
     <string name="terrain_horizon_move">Przesuń</string>
     <string name="terrain_horizon_move_hint">Przesuń mapę palcem, żeby patrzeć z innego miejsca. Po puszczeniu panorama rysuje się od nowa.</string>
     <string name="terrain_horizon_move_back">Wróć do mojego węzła</string>
+    <string name="terrain_horizon_offline">Teren offline</string>
+    <string name="terrain_horizon_offline_hint">Zapisuje na urządzeniu teren wokół miejsca, z którego patrzysz, dla wszystkich zasięgów do 100 km. Planer łączy i panorama korzystają z niego bez internetu.</string>
+    <string name="terrain_horizon_save">Zapisz teren (do %1$d km)</string>
+    <string name="terrain_horizon_save_clear">Usuń zapisany teren</string>
+    <string name="terrain_horizon_saving">Zapisywanie… %1$d z %2$d</string>
+    <string name="terrain_horizon_save_failed">Nie udało się zapisać terenu (brak internetu albo miejsca na dysku).</string>
+    <string name="terrain_horizon_saved">Zapisano na urządzeniu: %1$s MB</string>
     <string name="terrain_horizon_options">Opcje</string>
     <string name="terrain_horizon_fov">Pole widzenia</string>
     <string name="terrain_horizon_refraction">Horyzont radiowy (współczynnik ziemi)</string>

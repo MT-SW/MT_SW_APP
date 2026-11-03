@@ -68,6 +68,13 @@ interface PlannerElevationSource {
 
     /** Terrain height at one point, or null when there is no data tile for it. */
     suspend fun altitudeAt(lat: Double, lon: Double): Double?
+
+    /**
+     * Saves on the device the terrain around [center] for every range up to [maxRadiusKm], so it is not fetched from
+     * the internet again. [onProgress] gets tiles done and tiles in all. Returns false when it could not be saved.
+     */
+    suspend fun saveArea(center: GeoPoint, maxRadiusKm: Double, onProgress: (done: Int, total: Int) -> Unit = { _, _ -> }): Boolean =
+        false
 }
 
 /**
@@ -88,6 +95,7 @@ class PlannerElevation(
     private val tileDecoder: (ByteArray) -> ElevationTile = { bytes -> decodeTerrariumTile(bytes) },
     private val ioContext: CoroutineDispatcher = ioDispatcher,
     private val cacheCapacity: Int = DEFAULT_CACHE_TILES,
+    private val store: TerrainStore? = null,
 ) : PlannerElevationSource, AutoCloseable {
 
     private val lock = Mutex()
@@ -110,11 +118,39 @@ class PlannerElevation(
         return PathProfile.fromSampler(a, b) { lat, lon -> sampleBilinear(zoom, lat, lon, tiles) }
     }
 
-    override suspend fun prepareArea(center: GeoPoint, radiusKm: Double): (Double, Double) -> Double {
-        val bounds = areaBounds(center, radiusKm)
+    /** The zoom a range of [radiusKm] is drawn at: lowered until the area fits a modest number of tiles. */
+    private fun areaZoom(bounds: GeoBounds): Int {
         // Coverage steps are >= 100 m, so the zoom is lowered until the area fits a modest number of tiles.
         var zoom = MapterhornEndpoints.GLOBAL_MAX_ZOOM
         while (zoom > MIN_AREA_ZOOM && TerrainTileMath.tileCountAt(zoom, bounds) > MAX_AREA_TILES) zoom--
+        return zoom
+    }
+
+    override suspend fun saveArea(center: GeoPoint, maxRadiusKm: Double, onProgress: (done: Int, total: Int) -> Unit): Boolean {
+        val disk = store ?: return false
+        // Every range the views offer, up to the one asked for, each at the zoom it is drawn at.
+        val groups =
+            SAVE_RADII_KM.filter { it <= maxRadiusKm }.ifEmpty { listOf(maxRadiusKm) }.map { r ->
+                val bounds = areaBounds(center, r)
+                val zoom = areaZoom(bounds)
+                Triple(bounds, zoom, LinkedHashSet<TileIndex>(TerrainTileMath.tilesAt(zoom, bounds)))
+            }
+        val total = groups.sumOf { it.third.size }
+        var done = 0
+        onProgress(0, total)
+        for ((bounds, zoom, tiles) in groups) {
+            for (chunk in tiles.chunked(SAVE_CHUNK)) {
+                loadTiles(chunk.toSet(), bounds, zoom, persist = true)
+                done += chunk.size
+                onProgress(done, total)
+            }
+        }
+        return groups.all { (_, _, tiles) -> tiles.all { disk.has(it) } }
+    }
+
+    override suspend fun prepareArea(center: GeoPoint, radiusKm: Double): (Double, Double) -> Double {
+        val bounds = areaBounds(center, radiusKm)
+        val zoom = areaZoom(bounds)
         val needed = LinkedHashSet<TileIndex>(TerrainTileMath.tilesAt(zoom, bounds))
         val tiles = loadTiles(needed, bounds, zoom)
         val z = zoom
@@ -154,18 +190,55 @@ class PlannerElevation(
         needed: Set<TileIndex>,
         bounds: GeoBounds,
         zoom: Int,
+        persist: Boolean = false,
     ): Map<TileIndex, ElevationTile?> {
         val result = HashMap<TileIndex, ElevationTile?>()
         val missing = ArrayList<TileIndex>()
         lock.withLock {
             for (t in needed) {
-                if (cache.containsKey(t)) {
+                // Saving needs the tile on the disk too, so one only in memory still counts as missing.
+                if (cache.containsKey(t) && !(persist && store?.has(t) == false)) {
                     val v = cache.remove(t)
                     cache[t] = v
                     result[t] = v
                 } else {
                     missing.add(t)
                 }
+            }
+        }
+        // Terrain saved on the device first: no internet needed for what is there.
+        val fromDisk = store
+        if (fromDisk != null && missing.isNotEmpty()) {
+            val saved =
+                withContext(ioContext) {
+                    val out = ArrayList<Pair<TileIndex, ElevationTile?>>()
+                    for (t in missing) {
+                        val bytes = fromDisk.read(t) ?: continue
+                        val tile =
+                            if (bytes.isEmpty()) {
+                                null
+                            } else {
+                                try {
+                                    tileDecoder(bytes)
+                                } catch (e: CancellationException) {
+                                    throw e
+                                } catch (_: Exception) {
+                                    continue // a damaged file: fetched again below
+                                }
+                            }
+                        out.add(t to tile)
+                    }
+                    out
+                }
+            if (saved.isNotEmpty()) {
+                lock.withLock {
+                    for ((t, tile) in saved) {
+                        cache.remove(t)
+                        cache[t] = tile
+                        result[t] = tile
+                    }
+                }
+                missing.removeAll { it in result }
             }
         }
         if (missing.isEmpty()) return result
@@ -187,6 +260,7 @@ class PlannerElevation(
                         dropFetcher(url)
                         throw PlannerElevationException(PlannerElevationFailure.NETWORK, e)
                     }
+                    if (persist) store?.write(t, bytes)
                     val tile = if (bytes == null) {
                         null
                     } else {
@@ -247,6 +321,8 @@ class PlannerElevation(
         const val MAX_TILES_HIGH_ZOOM = 40
         private const val MAX_AREA_TILES = 36L
         private const val MIN_AREA_ZOOM = 7
+        private val SAVE_RADII_KM = listOf(2.0, 5.0, 15.0, 25.0, 40.0, 80.0, 100.0)
+        private const val SAVE_CHUNK = 8
         private const val SEA_THRESHOLD_M = -50.0
 
         internal fun boundsOf(points: List<GeoPoint>, padDeg: Double): GeoBounds {

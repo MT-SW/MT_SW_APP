@@ -43,6 +43,7 @@ import org.meshtastic.feature.map.planner.GeoPoint
 import org.meshtastic.feature.map.planner.Geodesy
 import org.meshtastic.feature.map.planner.data.PlannerElevationException
 import org.meshtastic.feature.map.planner.data.PlannerElevationSource
+import org.meshtastic.feature.map.planner.data.TerrainStore
 
 enum class TerrainHorizonFailure {
     /** The place to look from has no position (no phone fix, a node that never reported one). */
@@ -97,11 +98,22 @@ data class TerrainHorizonState(
     val focusNodeNum: Int? = null,
     /** Nodes with a position, to pick another place to look from. */
     val nodeChoices: List<HorizonNodeChoice> = emptyList(),
+    /** The space the terrain saved on the device takes, in bytes. */
+    val savedBytes: Long = 0L,
+    /** Saving the terrain for offline use is running: tiles done of tiles in all. */
+    val saving: Boolean = false,
+    val saveDone: Int = 0,
+    val saveTotal: Int = 0,
+    /** How the last save ended: true saved, false failed (no internet, disk), null none yet. */
+    val saveOk: Boolean? = null,
 )
 
 const val DEFAULT_RADIUS_KM = 15
 const val DEFAULT_ANTENNA_M = 2
-val HORIZON_RADII_KM = listOf(2, 5, 15, 25, 40, 80)
+val HORIZON_RADII_KM = listOf(2, 5, 15, 25, 40, 80, 100)
+
+/** The farthest range the terrain can be saved for. */
+const val SAVE_MAX_RADIUS_KM = 100
 val HORIZON_ANTENNAS_M = listOf(2, 5, 10, 20, 30)
 val HORIZON_REFRACTIONS = listOf(HorizonPanorama.DEFAULT_K, 1.0)
 
@@ -123,6 +135,7 @@ class TerrainHorizonViewModel(
     private val elevation: PlannerElevationSource,
     private val nodeRepository: NodeRepository,
     private val phoneLocationProvider: PhoneLocationProvider,
+    private val terrainStore: TerrainStore,
     private val poseProvider: CameraPoseProvider,
     private val magneticFieldProvider: MagneticFieldProvider,
     private val dispatchers: CoroutineDispatchers,
@@ -138,6 +151,7 @@ class TerrainHorizonViewModel(
         if (opened && _state.value.focusNodeNum == focusNodeNum) return
         opened = true
         _state.update { it.copy(focusNodeNum = focusNodeNum) }
+        viewModelScope.launch { _state.update { it.copy(savedBytes = withContext(dispatchers.io) { terrainStore.sizeBytes() }) } }
         reload()
     }
 
@@ -155,6 +169,37 @@ class TerrainHorizonViewModel(
     fun setRefraction(k: Double) = change { it.copy(refraction = k) }
 
     fun retry() = reload()
+
+    /** Saves the terrain around the place looked from, up to [SAVE_MAX_RADIUS_KM], for use without the internet. */
+    fun saveTerrain() {
+        val here = _state.value
+        val lat = here.observerLat ?: return
+        val lon = here.observerLon ?: return
+        if (here.saving) return
+        viewModelScope.launch {
+            _state.update { it.copy(saving = true, saveDone = 0, saveTotal = 0, saveOk = null) }
+            val ok =
+                try {
+                    elevation.saveArea(GeoPoint(lat, lon), SAVE_MAX_RADIUS_KM.toDouble()) { done, total ->
+                        _state.update { it.copy(saveDone = done, saveTotal = total) }
+                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (_: PlannerElevationException) {
+                    false
+                }
+            val bytes = withContext(dispatchers.io) { terrainStore.sizeBytes() }
+            _state.update { it.copy(saving = false, saveOk = ok, savedBytes = bytes) }
+        }
+    }
+
+    /** Deletes the terrain saved on the device. */
+    fun clearSavedTerrain() {
+        viewModelScope.launch {
+            withContext(dispatchers.io) { terrainStore.clear() }
+            _state.update { it.copy(savedBytes = 0L, saveOk = null) }
+        }
+    }
 
     /**
      * The direction (true north, degrees) the phone faces, following its turning; nothing while it has no sensor. The

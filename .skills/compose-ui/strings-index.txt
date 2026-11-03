@@ -3019,10 +3019,17 @@ terrain_horizon_observer_node
 terrain_horizon_observer_phone
 terrain_horizon_observer_point
 terrain_horizon_observer_title
+terrain_horizon_offline
+terrain_horizon_offline_hint
 terrain_horizon_only_visible
 terrain_horizon_options
 terrain_horizon_range
 terrain_horizon_refraction
+terrain_horizon_save
+terrain_horizon_save_clear
+terrain_horizon_save_failed
+terrain_horizon_saved
+terrain_horizon_saving
 terrain_horizon_target_antenna
 terrain_horizon_title
 ### THEME ###
