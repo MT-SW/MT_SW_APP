@@ -598,16 +598,16 @@ object AiModels {
 
     val DeepSeek15b =
         deepSeek(
-            DEEPSEEK_15B, "DeepSeek R1 Distill Qwen 1.5B", "unsloth/DeepSeek-R1-Distill-Qwen-1.5B-GGUF",
-            "DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf", 1066, 2000, 4, AiLicense.MIT,
+            DEEPSEEK_15B, "DeepSeek R1 Distill Qwen 1.5B", "bartowski/DeepSeek-R1-Distill-Qwen-1.5B-GGUF",
+            "DeepSeek-R1-Distill-Qwen-1.5B-Q4_0.gguf", 1019, 2000, 4, AiLicense.MIT,
             "Najmniejszy model „myślący” DeepSeek: działa nawet na słabym telefonie, ale rozumuje płytko i po polsku jest słaby. Do prostych zadań i prób.",
             "The smallest \"thinking\" DeepSeek model: runs even on a weak phone, but its reasoning is shallow and its Polish is poor. For simple tasks and trying things out.",
         )
 
     val DeepSeek7b =
         deepSeek(
-            DEEPSEEK_7B, "DeepSeek R1 Distill Qwen 7B", "unsloth/DeepSeek-R1-Distill-Qwen-7B-GGUF",
-            "DeepSeek-R1-Distill-Qwen-7B-Q4_K_M.gguf", 4466, 6600, 12, AiLicense.MIT,
+            DEEPSEEK_7B, "DeepSeek R1 Distill Qwen 7B", "bartowski/DeepSeek-R1-Distill-Qwen-7B-GGUF",
+            "DeepSeek-R1-Distill-Qwen-7B-Q4_0.gguf", 4238, 6600, 12, AiLicense.MIT,
             "Średni model „myślący” DeepSeek: dobry w rachunkach i logice, przed odpowiedzią długo rozumuje. Po polsku słabszy niż Gemma i Bielik.",
             "A mid-size \"thinking\" DeepSeek model: good at arithmetic and logic, and it reasons for a long time before it answers. Its Polish is weaker than Gemma and Bielik.",
         )
@@ -615,7 +615,7 @@ object AiModels {
     val DeepSeekLlama8b =
         deepSeek(
             DEEPSEEK_LLAMA_8B, "DeepSeek R1 Distill Llama 8B", "unsloth/DeepSeek-R1-Distill-Llama-8B-GGUF",
-            "DeepSeek-R1-Distill-Llama-8B-Q4_K_M.gguf", 4693, 6800, 12, AiLicense.SEE_MODEL_PAGE,
+            "DeepSeek-R1-Distill-Llama-8B-Q4_0.gguf", 4459, 6800, 12, AiLicense.SEE_MODEL_PAGE,
             "Model „myślący” DeepSeek zbudowany na Llamie (Meta), więc z licencją Llamy. Rozumuje długo, po polsku jest słaby.",
             "A \"thinking\" DeepSeek model built on Llama (Meta), so under the Llama licence. It reasons for a long time; its Polish is poor.",
         )
@@ -630,8 +630,8 @@ object AiModels {
 
     val DeepSeek14b =
         deepSeek(
-            DEEPSEEK_14B, "DeepSeek R1 Distill Qwen 14B", "unsloth/DeepSeek-R1-Distill-Qwen-14B-GGUF",
-            "DeepSeek-R1-Distill-Qwen-14B-Q4_K_M.gguf", 8572, 11500, 16, AiLicense.MIT,
+            DEEPSEEK_14B, "DeepSeek R1 Distill Qwen 14B", "bartowski/DeepSeek-R1-Distill-Qwen-14B-GGUF",
+            "DeepSeek-R1-Distill-Qwen-14B-Q4_0.gguf", 8149, 11500, 16, AiLicense.MIT,
             "Większy model „myślący” DeepSeek: wyraźnie lepszy w rozumowaniu, rachunkach i kodzie. Na mocniejszy telefon albo komputer; po polsku nadal słabszy niż Gemma.",
             "A larger \"thinking\" DeepSeek model: clearly better at reasoning, arithmetic and code. For a stronger phone or a computer; its Polish is still weaker than Gemma.",
         )
