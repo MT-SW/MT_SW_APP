@@ -190,6 +190,7 @@ private fun MeshtasticNavDisplayHost(
     }
 
     val entries = decorateEntries()
+    val movableEntries = rememberMovableEntries(entries)
 
     // In the desktop app the list and the detail start at half of the width each (the divider can still be dragged);
     // other devices keep the original proportions.
@@ -217,7 +218,9 @@ private fun MeshtasticNavDisplayHost(
             else -> ColumnMode.OFF
         }
     val threeColumnSceneStrategy =
-        remember(threeColumnWidths, columnMode) { DesktopThreeColumnSceneStrategy(threeColumnWidths, columnMode) }
+        remember(threeColumnWidths, columnMode, movableEntries) {
+            DesktopThreeColumnSceneStrategy(threeColumnWidths, columnMode, movableEntries)
+        }
 
     // Fades are alpha, not movement, so they follow the theme's effects spec rather than a spatial one.
     val fadeSpec = MaterialTheme.motionScheme.defaultEffectsSpec<Float>()
