@@ -81,6 +81,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import org.meshtastic.core.ui.util.LocalHorizonPickMapProvider
+import org.meshtastic.core.ui.util.HorizonMapNode
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.terrain_horizon_save_range
 import org.meshtastic.core.resources.terrain_horizon_saved
@@ -572,6 +574,22 @@ private const val NODE_DOT_PX = 5f
 private fun MoveMap(state: TerrainHorizonState, onMoved: (Double, Double) -> Unit, onReset: () -> Unit) {
     val lat0 = state.observerLat ?: return
     val lon0 = state.observerLon ?: return
+    val pickMap = LocalHorizonPickMapProvider.current
+    if (pickMap != null) {
+        // The same map as the main one, with the nodes drawn as there; a cross in the middle marks the place.
+        val mapNodes =
+            remember(state.nodeChoices) {
+                state.nodeChoices.map { HorizonMapNode(it.lat, it.lon, it.shortName, it.color, it.textColor) }
+            }
+        Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(Res.string.terrain_horizon_move_hint), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp, modifier = Modifier.weight(1f))
+                TextButton(onClick = onReset) { Text(stringResource(Res.string.terrain_horizon_move_back)) }
+            }
+            pickMap(lat0, lon0, state.radiusKm, mapNodes, onMoved, Modifier.fillMaxWidth().height(PICK_MAP_HEIGHT_DP.dp))
+        }
+        return
+    }
     val cosLat = kotlin.math.cos(lat0 * kotlin.math.PI / HALF_TURN_DEG).coerceAtLeast(MIN_COS_LAT)
     var dx by remember(lat0, lon0) { mutableFloatStateOf(0f) }
     var dy by remember(lat0, lon0) { mutableFloatStateOf(0f) }
@@ -628,6 +646,7 @@ private fun MoveMap(state: TerrainHorizonState, onMoved: (Double, Double) -> Uni
     }
 }
 
+private const val PICK_MAP_HEIGHT_DP = 340
 private const val HALF_TURN_DEG = 180.0
 private const val MIN_COS_LAT = 0.01
 private const val MAX_LAT = 89.9

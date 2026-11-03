@@ -55,6 +55,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.meshtastic.app.intro.AnalyticsIntro
+import org.meshtastic.app.map.getHorizonPickMap
 import org.meshtastic.app.map.getMapViewProvider
 import org.meshtastic.app.node.component.InlineMap
 import org.meshtastic.app.node.deviceModelArViewer
@@ -96,6 +97,7 @@ import org.meshtastic.core.ui.util.LocalBarcodeScannerSupported
 import org.meshtastic.core.ui.util.LocalDeviceModelArViewer
 import org.meshtastic.core.ui.util.LocalDiscoveryMapProvider
 import org.meshtastic.core.ui.util.LocalEventBranding
+import org.meshtastic.core.ui.util.LocalHorizonPickMapProvider
 import org.meshtastic.core.ui.util.LocalInlineMapProvider
 import org.meshtastic.core.ui.util.LocalMapMainScreenProvider
 import org.meshtastic.core.ui.util.LocalMapViewProvider
@@ -298,6 +300,7 @@ class MainActivity : AppCompatActivity() {
                 packageManager.hasSystemFeature(PackageManager.FEATURE_NFC_HOST_CARD_EMULATION),
             LocalAnalyticsIntroProvider provides { AnalyticsIntro() },
             LocalMapViewProvider provides getMapViewProvider(),
+            LocalHorizonPickMapProvider provides getHorizonPickMap(),
             LocalPlannerAvailable provides true,
             LocalDeviceModelArViewer provides deviceModelArViewer,
             LocalInlineMapProvider provides { node, modifier -> InlineMap(node, modifier) },

@@ -17,6 +17,7 @@ Ten plik opisuje wyłącznie zmiany wprowadzone w aplikacji MT_SW_APP **względe
 Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od początku (27 lipca 2026) do dziś, w kolejności chronologicznej. Opis funkcji: [README.md](README.md).
 
 ### Listopad 2026
+* Panorama terenu, Przesuń: pokazuje prawdziwą mapę taką jak główna (podkład, przesuwanie, przybliżanie, węzły jako takie same plakietki z kropką) z krzyżykiem pośrodku; po puszczeniu panorama rysuje się od punktu pod krzyżykiem (w wersji bez mapy MapLibre zostaje prosta mapa).
 * Komputer: szczegóły węzła (z mapą) nie budują się od nowa przy zmianie liczby kolumn, więc otwarcie dodatkowego ekranu nie powoduje chwili zawahania; lista i szczegóły na komputerze mają teraz własny układ z suwakiem.
 * Komputer: ten sam ekran przez chwilę pokazany dwa razy (przy otwarciu dodatkowego ekranu, np. sąsiadów) nie wywala już aplikacji — druga kopia dostaje własny klucz zapisu stanu.
 * Komputer: w węższym oknie (od 600 dp), gdy na szczegółach węzła otwarty jest dodatkowy ekran (np. sąsiedzi), lista węzłów chowa się, a szczegóły i dodatkowy ekran dzielą okno (dwie kolumny z suwakiem); trzy kolumny dopiero od 1400 dp szerokości (np. pełny ekran). Lista sąsiadów nie liczy zaślepki o numerze 0.
@@ -520,6 +521,7 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### November 2026
+* Terrain panorama, Move: shows a real map like the main one (basemap, panning, zoom, nodes as the same badges with a dot) with a cross in the middle; on letting go the panorama is redrawn from the point under the cross (without the MapLibre map the simple map stays).
 * Desktop: a node's details (with the map) are no longer rebuilt when the number of columns changes, so opening an extra screen no longer hesitates; the list and details on desktop now use our own layout with a slider.
 * Desktop: the same screen shown twice for a moment (when an extra screen such as neighbours opens) no longer crashes the app; the second copy gets its own saved-state key.
 * Desktop: in a narrower window (600 dp and up), when an extra screen (e.g. neighbours) is open over a node's details, the node list slides away and the details and the extra screen share the window (two columns with a slider); three columns only from 1400 dp width (e.g. full screen). The neighbour list no longer counts the placeholder with number 0.

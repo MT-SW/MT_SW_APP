@@ -16,6 +16,13 @@
  */
 package org.meshtastic.app.map
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import org.meshtastic.core.ui.util.HorizonMapNode
 import org.meshtastic.core.ui.util.MapViewProvider
 
 fun getMapViewProvider(): MapViewProvider = GoogleMapViewProvider()
+
+/** No MapLibre map in this flavour: the terrain panorama draws its own simple map for the "move" mode. */
+fun getHorizonPickMap():
+    (@Composable (Double, Double, Int, List<HorizonMapNode>, (Double, Double) -> Unit, Modifier) -> Unit)? = null

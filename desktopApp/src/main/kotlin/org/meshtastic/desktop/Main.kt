@@ -106,6 +106,7 @@ import org.meshtastic.core.ui.theme.isMonochromeMode
 import org.meshtastic.core.ui.theme.rememberScaledDensity
 import org.meshtastic.core.ui.util.LocalDiscoveryMapProvider
 import org.meshtastic.core.ui.util.LocalEventBranding
+import org.meshtastic.core.ui.util.LocalHorizonPickMapProvider
 import org.meshtastic.core.ui.util.LocalInlineMapProvider
 import org.meshtastic.core.ui.util.LocalMapMainScreenProvider
 import org.meshtastic.core.ui.util.LocalMapViewProvider
@@ -134,6 +135,7 @@ import org.meshtastic.feature.intro.DesktopWelcomeScreen
 import org.meshtastic.feature.map.MapScreen
 import org.meshtastic.feature.map.SharedMapViewModel
 import org.meshtastic.feature.map.maplibre.MapLibreDiscoveryMap
+import org.meshtastic.feature.map.maplibre.MapLibreHorizonPickMap
 import org.meshtastic.feature.map.maplibre.MapLibreInlineMap
 import org.meshtastic.feature.map.maplibre.MapLibreNodeTrackMap
 import java.awt.Desktop
@@ -532,6 +534,10 @@ private fun ApplicationScope.MeshtasticWindow(
                             onPositionSelect = onPositionSelect,
                             showAttribution = showAttribution,
                         )
+                    },
+                LocalHorizonPickMapProvider provides
+                    { lat, lon, radiusKm, nodes, onCenterChanged, modifier ->
+                        MapLibreHorizonPickMap(lat, lon, radiusKm, nodes, onCenterChanged, modifier)
                     },
                 LocalDiscoveryMapProvider provides
                     { userLatitude, userLongitude, nodes, modifier ->

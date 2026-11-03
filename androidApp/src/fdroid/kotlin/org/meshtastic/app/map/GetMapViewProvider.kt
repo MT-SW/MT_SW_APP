@@ -16,11 +16,15 @@
  */
 package org.meshtastic.app.map
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.koinInject
+import org.meshtastic.core.ui.util.HorizonMapNode
 import org.meshtastic.core.ui.util.MapViewProvider
 import org.meshtastic.feature.map.layers.MapLayersManager
+import org.meshtastic.feature.map.maplibre.MapLibreHorizonPickMap
 import org.meshtastic.feature.map.maplibre.MapLibreMapViewProvider
 import org.meshtastic.feature.map.maplibre.component.CustomTileSourcesMenuItem
 import org.meshtastic.feature.map.maplibre.component.ImportedLayersSlot
@@ -42,3 +46,10 @@ fun getMapViewProvider(): MapViewProvider = MapLibreMapViewProvider(
     // The same imported-layer manager the Google flavour opens from its layers button.
     layersSheetExtra = { ImportedLayersSlot() },
 )
+
+/** The map the terrain panorama's "move" mode is picked on: the same MapLibre map as the main one. */
+fun getHorizonPickMap():
+    (@Composable (Double, Double, Int, List<HorizonMapNode>, (Double, Double) -> Unit, Modifier) -> Unit)? =
+    { lat, lon, radiusKm, nodes, onCenterChanged, modifier ->
+        MapLibreHorizonPickMap(lat, lon, radiusKm, nodes, onCenterChanged, modifier)
+    }
