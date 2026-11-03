@@ -588,7 +588,9 @@ class LlamaCppEngine(
         startReport = ""
         settleLoadingMarker()
         val killed = killedWays()
-        val freeMb = if (installer.android) freeMemoryMb() else null
+        var freeMb: Int? = null
+        // True once a program was started in this run: the memory of one that failed is given back only a moment later.
+        var startedBefore = false
         val needMb = model.ramMb + if (hearing) HEARING_EXTRA_MB else 0
         // Set when the driver of the Intel NPU said it cannot run this engine's settings: the other NPU windows would fail the same way.
         var intelNpuRejected = false
@@ -596,6 +598,10 @@ class LlamaCppEngine(
             if (intelNpuRejected && attempt.npu == "Intel") continue
             // A way that an earlier attempt of this same start already showed cannot work (e.g. the safe Vulkan mode on a phone without Vulkan 1.2).
             if (attempt.requireGpu && attempt.asset?.let { installer.isBroken(it, if (attempt.perModel) modelId + attempt.markSuffix else null) } == true) continue
+            if (installer.android) {
+                if (startedBefore) MemoryProbe.settle()
+                freeMb = MemoryProbe.availableMb()
+            }
             // The phone's memory: a chip copies the whole model into memory that cannot be given back, so with too little
             // free memory the system ends the whole app. Such ways are skipped (and a way that already got the app ended
             // is skipped for a week); the processor reads the file in pieces the system can take back, so it still works.
@@ -635,6 +641,7 @@ class LlamaCppEngine(
                 Logger.i(tag = TAG) { "The Intel NPU compiles ${model.name} at every start: this can take up to ${INTEL_NPU_COMPILE_TIMEOUT_MS / 60_000} minutes" }
             }
             val startedAt = System.currentTimeMillis()
+            startedBefore = true
             // If the system ends the app while the model loads, this note is found at the next start.
             runCatching { File(logDir, LOADING_FILE).writeText("$modelId|${attempt.name}|${freeMb ?: -1}|$needMb") }
             val noThinking = if (model.quietThinking) emptyList() else listOf("--reasoning-budget", "0")
@@ -758,12 +765,11 @@ class LlamaCppEngine(
         runCatching { File(logDir, LOADING_FILE).delete() }
     }
 
-    /** Free memory the system can give (MB), or null where it cannot be read. */
-    private fun freeMemoryMb(): Int? =
-        runCatching {
-            File("/proc/meminfo").readLines().firstOrNull { it.startsWith("MemAvailable:") }
-                ?.split(Regex("\\s+"))?.getOrNull(1)?.toLongOrNull()?.let { (it / 1024).toInt() }
-        }.getOrNull()
+    /** True when a program of [modelId] runs now. */
+    fun isLoaded(modelId: String): Boolean = server?.isAlive == true && loadedId == modelId
+
+    /** True when any program of this engine runs now. */
+    val hasLoaded: Boolean get() = server?.isAlive == true
 
     /**
      * A note left by a start that never ended means the system ended the app while the model loaded. When the memory was

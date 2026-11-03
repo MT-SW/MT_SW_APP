@@ -141,6 +141,7 @@ class AiEngineRouter(
     ): String {
         busy.incrementAndGet()
         try {
+            makeRoomFor(modelId)
             return llama.chat(modelId, messages, maxTokens, temperature, onPiece, jsonSchema, thinking)
         } finally {
             lastUsed = nowMillis
@@ -151,6 +152,7 @@ class AiEngineRouter(
     override suspend fun transcribe(modelId: String, wav: ByteArray): String {
         busy.incrementAndGet()
         try {
+            makeRoomFor(modelId)
             return if (AiModels.byId(modelId)?.engine == AiEngine.WHISPER_CPP) {
                 checkNotNull(whisper) { "Speech models are not available on this system" }.transcribe(modelId, wav)
             } else {
@@ -170,10 +172,33 @@ class AiEngineRouter(
     /** Loads the model just chosen for a function; models of other engines (the NLLB translator) load on first use. */
     private suspend fun preload(modelId: String, hearing: Boolean) {
         lastUsed = nowMillis
+        makeRoomFor(modelId)
         when (AiModels.byId(modelId)?.engine) {
             AiEngine.LLAMA_CPP -> llama.preload(modelId, hearing = hearing && AiModels.byId(modelId)?.hearing == true)
             AiEngine.WHISPER_CPP -> whisper?.preload(modelId)
             else -> Unit
+        }
+    }
+
+    /**
+     * The language model and the speech model are two programs that can be in memory together. When the one about to
+     * load does not fit next to the other, the other is stopped first (it loads again when it is next needed); loading
+     * both on a phone with little free memory got the whole app ended by the system.
+     */
+    private suspend fun makeRoomFor(modelId: String) {
+        val model = AiModels.byId(modelId) ?: return
+        val free = MemoryProbe.availableMb() ?: return
+        val needed = model.ramMb + ROOM_MARGIN_MB
+        if (free >= needed) return
+        val freed =
+            when (model.engine) {
+                AiEngine.LLAMA_CPP -> if (whisper != null && whisper.hasLoaded && !llama.isLoaded(modelId)) whisper.also { it.unloadNow() } else null
+                AiEngine.WHISPER_CPP -> if (whisper?.isLoaded(modelId) != true && llama.hasLoaded) llama.also { it.unloadNow() } else null
+                else -> null
+            }
+        if (freed != null) {
+            Logger.i(tag = TAG) { "Only $free MB free for ${model.name} (about ${model.ramMb} MB): the other model was freed first" }
+            MemoryProbe.settle()
         }
     }
 
@@ -190,6 +215,7 @@ class AiEngineRouter(
     private companion object {
         const val TAG = "AiEngineRouter"
         const val IDLE_CHECK_MS = 15_000L
+        const val ROOM_MARGIN_MB = 300
         const val MILLIS_PER_MINUTE = 60_000L
     }
 }

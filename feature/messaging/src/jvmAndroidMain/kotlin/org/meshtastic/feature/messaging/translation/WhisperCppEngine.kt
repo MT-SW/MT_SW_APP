@@ -118,6 +118,12 @@ class WhisperCppEngine(
         return words.size >= MIN_WORDS_FOR_REPEAT_CHECK && words.toSet().size * REPEAT_RATIO < words.size
     }
 
+    /** True when the speech program of [modelId] runs now. */
+    fun isLoaded(modelId: String): Boolean = server?.isAlive == true && loadedId == modelId
+
+    /** True when any speech program runs now. */
+    val hasLoaded: Boolean get() = server?.isAlive == true
+
     suspend fun unloadNow() {
         mutex.withLock { unload() }
     }
