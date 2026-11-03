@@ -431,7 +431,6 @@ antenna_shortening
 antenna_spacing_mm
 antenna_substrate
 antenna_swr
-antenna_tools_section
 antenna_turns
 antenna_tx_ours
 antenna_tx_power

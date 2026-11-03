@@ -88,7 +88,7 @@ Planer otwiera przycisk **Planer** w szczegółach węzła, obok kompasu.
 
 ## Kalkulator anten
 
-**Ustawienia → Zaawansowane → Funkcje MT_SW → Narzędzia → Kalkulator anten.** Liczy wymiary anteny dla dowolnej częstotliwości i od razu pokazuje jej rysunek z odcinkami A, B, C… i ich wartościami.
+**Ustawienia → Zaawansowane → Funkcje MT_SW → Planowanie sieci → Kalkulator anten** (obok planera łączy i panoramy terenu). Liczy wymiary anteny dla dowolnej częstotliwości i od razu pokazuje jej rysunek z odcinkami A, B, C… i ich wartościami.
 
 - **Typy anten:** ćwierćfalowa ground plane, dipol półfalowy, dipol pętlowy (z balunem λ/2 z kabla), pionowa 5/8 fali, J-pole, Slim Jim, kolinearna z kabla (COCO), Yagi-Uda (3–20 elementów, z poprawką na metalowy nośnik), Moxon, Biquad, helisa osiowa, antena płaska (patch na płytce) i odcinki kabla λ/4 i λ/2.
 - **Materiał:** średnica drutu lub rurki i izolacja zmieniają długość elementów; przy antenach z kabla liczy się współczynnik skrócenia wybranego kabla, przy patchu przenikalność i grubość płytki.

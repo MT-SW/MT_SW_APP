@@ -51,7 +51,6 @@ import org.meshtastic.core.resources.smart_features_title
 import org.meshtastic.core.resources.antenna_calc_summary
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.app_log_title
-import org.meshtastic.core.resources.antenna_tools_section
 import org.meshtastic.core.resources.auto_load_chat_images
 import org.meshtastic.core.resources.import_menu_in_top_bar
 import org.meshtastic.core.resources.clean_node_database_title
@@ -202,7 +201,7 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 }
             }
 
-            // The map's own additions: the planner (opens for the connected radio) and the terrain panorama.
+            // Planning the network in one place: the link planner (opens for the connected radio), the terrain panorama and the antenna calculator.
             ExpressiveSection(title = stringResource(Res.string.mt_sw_map_title)) {
                 ListItem(
                     text = stringResource(Res.string.intro_mtsw_planner_title),
@@ -218,14 +217,6 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 ) {
                     onNavigate(MapRoute.MeshHud())
                 }
-            }
-
-            ExpressiveSection(title = stringResource(Res.string.app_log_title)) { AppLogSettings() }
-
-            // Reports of errors and ideas are ours (our groups), so they sit here and not in the original settings.
-            ReportIssuesSection()
-
-            ExpressiveSection(title = stringResource(Res.string.antenna_tools_section)) {
                 ListItem(
                     text = stringResource(Res.string.antenna_calc_title),
                     supportingText = stringResource(Res.string.antenna_calc_summary),
@@ -234,6 +225,11 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     onNavigate(SettingsRoute.AntennaCalculator)
                 }
             }
+
+            ExpressiveSection(title = stringResource(Res.string.app_log_title)) { AppLogSettings() }
+
+            // Reports of errors and ideas are ours (our groups), so they sit here and not in the original settings.
+            ReportIssuesSection()
 
             ExpressiveSection(title = stringResource(Res.string.mt_sw_features_links)) {
                 Text(

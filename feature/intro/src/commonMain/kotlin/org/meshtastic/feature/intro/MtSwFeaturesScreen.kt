@@ -120,6 +120,11 @@ internal fun MtSwFeaturesScreen(onContinue: () -> Unit, maxContentWidth: Dp = Dp
                 subtitleRes = Res.string.intro_mtsw_planner_subtitle,
             ),
             FeatureUIData(
+                icon = MeshtasticIcons.CenterFocusStrong,
+                titleRes = Res.string.intro_mtsw_terrain_title,
+                subtitleRes = Res.string.intro_mtsw_terrain_subtitle,
+            ),
+            FeatureUIData(
                 icon = MeshtasticIcons.BugReport,
                 titleRes = Res.string.intro_mtsw_diag_title,
                 subtitleRes = Res.string.intro_mtsw_diag_subtitle,
@@ -138,11 +143,6 @@ internal fun MtSwFeaturesScreen(onContinue: () -> Unit, maxContentWidth: Dp = Dp
                 icon = MeshtasticIcons.Language,
                 titleRes = Res.string.intro_mtsw_ai_title,
                 subtitleRes = Res.string.intro_mtsw_ai_subtitle,
-            ),
-            FeatureUIData(
-                icon = MeshtasticIcons.CenterFocusStrong,
-                titleRes = Res.string.intro_mtsw_terrain_title,
-                subtitleRes = Res.string.intro_mtsw_terrain_subtitle,
             ),
             FeatureUIData(
                 icon = MeshtasticIcons.HelpOutline,

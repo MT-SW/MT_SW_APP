@@ -88,7 +88,7 @@ The planner is opened with the **Planner** button in the node details, next to t
 
 ## Antenna calculator
 
-**Settings → Advanced → MT_SW features → Tools → Antenna calculator.** It works out antenna sizes for any frequency and draws the antenna with its parts A, B, C… and their values.
+**Settings → Advanced → MT_SW features → Network planning → Antenna calculator** (next to the link planner and the terrain panorama). It works out antenna sizes for any frequency and draws the antenna with its parts A, B, C… and their values.
 
 - **Antenna types:** quarter-wave ground plane, half-wave dipole, folded dipole (with a λ/2 coax balun), 5/8-wave vertical, J-pole, Slim Jim, coaxial collinear (COCO), Yagi-Uda (3–20 elements, corrected for a metal boom), Moxon, Biquad, axial-mode helix, patch on a PCB and coax sections λ/4 and λ/2.
 - **Material:** the wire or tube diameter and insulation change the element lengths; antennas made of coax use the chosen cable's velocity factor, the patch the board's permittivity and thickness.

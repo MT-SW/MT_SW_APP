@@ -3279,7 +3279,6 @@
     <string name="antenna_calc_title">Kalkulator anten</string>
     <string name="antenna_calc_summary">Wymiary wielu typów anten dla dowolnej częstotliwości, z rysunkiem, oraz straty kabla i złączy</string>
     <string name="antenna_calc_open">Otwórz kalkulator anten</string>
-    <string name="antenna_tools_section">Narzędzia</string>
     <string name="antenna_frequency">Częstotliwość (MHz)</string>
     <string name="antenna_freq_ours">Nasza sieć</string>
     <string name="antenna_type">Typ anteny</string>
@@ -3551,7 +3550,7 @@
     <string name="terrain_horizon_refraction">Horyzont radiowy (współczynnik ziemi)</string>
     <string name="terrain_horizon_only_visible">Tylko widoczne węzły</string>
     <string name="terrain_horizon_labels">Nazwy</string>
-    <string name="mt_sw_map_title">Mapa i planer</string>
+    <string name="mt_sw_map_title">Planowanie sieci</string>
     <string name="mt_sw_planner_open_summary">Symuluje łącze radiowe między dwoma punktami, z terenem i bilansem łącza. Jest też wśród przycisków mapy i na stronie węzła</string>
     <string name="mt_sw_terrain_open_summary">Sylwetka terenu dookoła z węzłami: zielone w zasięgu wzroku, czerwone zasłonięte; widok z aparatem jest dodatkiem. Jest też pod przyciskiem widoku sieci obok planera na mapie</string>
     <string name="intro_mtsw_ai_title">Asystent AI i tłumacz</string>
