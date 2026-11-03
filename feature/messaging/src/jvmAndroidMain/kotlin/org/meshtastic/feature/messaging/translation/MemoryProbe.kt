@@ -24,6 +24,8 @@ internal object MemoryProbe {
     private const val SAMPLE_MS = 300L
     private const val SETTLED_MB = 30
     private const val MAX_WAIT_MS = 4_000L
+    private const val BACK_WAIT_MS = 20_000L
+    private const val BACK_TOLERANCE_MB = 150
     private const val BYTES_PER_KB_TO_MB = 1024
 
     /** Memory the system can give right now (MB), or null where it cannot be read. */
@@ -37,7 +39,18 @@ internal object MemoryProbe {
      * Right after a program ends (or fails to start) the system still takes back its memory, so the number is too small
      * for a moment; this waits until two readings in a row are about the same (at most a few seconds).
      */
-    suspend fun settle() {
+    suspend fun settle(before: Int? = null) {
+        if (before != null) {
+            // The earlier try took memory: wait (longer) until it is back, so the next way starts from a clear place.
+            var waited = 0L
+            while (waited < BACK_WAIT_MS) {
+                val now = availableMb() ?: return
+                if (now >= before - BACK_TOLERANCE_MB) return
+                delay(SAMPLE_MS)
+                waited += SAMPLE_MS
+            }
+            return
+        }
         var last = availableMb() ?: return
         var waited = 0L
         while (waited < MAX_WAIT_MS) {

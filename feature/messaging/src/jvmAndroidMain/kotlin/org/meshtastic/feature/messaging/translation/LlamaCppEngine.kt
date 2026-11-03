@@ -591,6 +591,8 @@ class LlamaCppEngine(
         var freeMb: Int? = null
         // True once a program was started in this run: the memory of one that failed is given back only a moment later.
         var startedBefore = false
+        // The free memory just before the last program started: after it is stopped, the next way waits until this much is back.
+        var freeBeforeStart: Int? = null
         val needMb = model.ramMb + if (hearing) HEARING_EXTRA_MB else 0
         // Set when the driver of the Intel NPU said it cannot run this engine's settings: the other NPU windows would fail the same way.
         var intelNpuRejected = false
@@ -599,7 +601,7 @@ class LlamaCppEngine(
             // A way that an earlier attempt of this same start already showed cannot work (e.g. the safe Vulkan mode on a phone without Vulkan 1.2).
             if (attempt.requireGpu && attempt.asset?.let { installer.isBroken(it, if (attempt.perModel) modelId + attempt.markSuffix else null) } == true) continue
             if (installer.android) {
-                if (startedBefore) MemoryProbe.settle()
+                if (startedBefore) MemoryProbe.settle(freeBeforeStart)
                 freeMb = MemoryProbe.availableMb()
             }
             // The phone's memory: a chip copies the whole model into memory that cannot be given back, so with too little
@@ -642,6 +644,7 @@ class LlamaCppEngine(
             }
             val startedAt = System.currentTimeMillis()
             startedBefore = true
+            freeBeforeStart = freeMb
             // If the system ends the app while the model loads, this note is found at the next start.
             runCatching { File(logDir, LOADING_FILE).writeText("$modelId|${attempt.name}|${freeMb ?: -1}|$needMb") }
             val noThinking = if (model.quietThinking) emptyList() else listOf("--reasoning-budget", "0")
