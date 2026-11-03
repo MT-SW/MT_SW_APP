@@ -18,8 +18,6 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 * Zgłaszanie błędów na komputerze: paczka jest zapisywana od razu w Pobranych (a nie głęboko w folderach aplikacji), a po wysłaniu otwiera się folder z już zaznaczonym plikiem i grupa w przeglądarce, więc plik wystarczy przeciągnąć lub dołączyć.
-* Poprawka: okno zgłaszania błędów i kilka innych okien wywalało aplikację po dodaniu przewijania okien (przewijanie zagnieżdżone w przewijaniu); okna z własnym przewijaniem nie dostają już drugiego.
-* Okna dialogowe: wszystkie okna z dłuższą zawartością (informacje, ustawienia, ostrzeżenia, wybór sieci Wi-Fi i inne) można teraz przewijać, więc na małym ekranie lub przy dużej czcionce nic nie jest ucięte.
 * Asystent: okno „i” przewija się, więc przycisk „Uruchom test zgodności” na jego dole jest zawsze dostępny; opis testu dodany do tekstu okna.
 * Strona „O aplikacji”, „Źródła funkcji”: lista uzupełniona o wszystkie projekty, z których korzystają funkcje forka (Sniffer, tłumacz, asystent i dyktowanie, Mesh Link Planer, panorama terenu).
 * Panorama terenu: w „Opcjach” przełącznik „Tylko ulubione” pokazuje w panoramie i na mapie przesuwania tylko ulubione węzły (zapamiętywany).
@@ -533,8 +531,6 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 * Reporting problems on a computer: the package is saved straight into Downloads (not deep inside the app folders), and after sending, the folder opens with the file already selected, together with the group in the browser, so the file only has to be dragged or attached.
-* Fix: the problem report window and a few other windows crashed the app after window scrolling was added (scrolling nested in scrolling); windows with their own scrolling no longer get a second one.
-* Dialogs: all windows with longer content (information, settings, warnings, Wi-Fi network picker and others) can now be scrolled, so nothing is cut off on a small screen or with a large font.
 * Assistant: the "i" window now scrolls, so the "Run the compatibility test" button at its bottom is always reachable; the test is described in the window text.
 * About screen, "Feature credits": the list now names all the projects the fork's features use (Sniffer, translator, assistant and dictation, Mesh Link Planner, terrain panorama).
 * Terrain panorama: an "Only favourites" switch in "Options" shows only favourite nodes in the panorama and on the move map (remembered).

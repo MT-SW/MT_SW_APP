@@ -601,7 +601,6 @@ internal fun NetworkHealthInfoDialog(
     onDismiss: () -> Unit,
 ) {
     MeshtasticDialog(
-        scrollable = false,
         title = stringResource(Res.string.network_health_info_title),
         text = {
             Column(

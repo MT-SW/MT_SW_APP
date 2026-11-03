@@ -417,14 +417,12 @@ private fun SecurityHelpDialog(securityState: SecurityState, onDismiss: () -> Un
             )
         },
         text = {
- Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             if (showAll) {
                 AllSecurityStates()
             } else {
                 ContextualSecurityState(securityState)
             }
-        }
-},
+        },
         confirmButton = {
             Row(
                 modifier = Modifier.fillMaxWidth(),

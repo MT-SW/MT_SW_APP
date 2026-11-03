@@ -56,7 +56,6 @@ fun RemoteAdminRegionDialog(onClose: () -> Unit) {
     val isEnglish = Locale.current.language == "en"
 
     MeshtasticDialog(
-        scrollable = false,
         title =
         if (isEnglish) {
             "You are changing settings in the Świętokrzyskie region"

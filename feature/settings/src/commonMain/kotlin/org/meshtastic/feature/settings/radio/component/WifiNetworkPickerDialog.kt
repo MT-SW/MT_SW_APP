@@ -212,7 +212,6 @@ fun WifiPasswordDialog(ssid: String, onConnect: (String) -> Unit, onDismiss: () 
         onDismissRequest = onDismiss,
         title = { Text(ssid, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         text = {
- Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = password,
@@ -237,8 +236,7 @@ fun WifiPasswordDialog(ssid: String, onConnect: (String) -> Unit, onDismiss: () 
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-        }
-},
+        },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Anuluj") } },
         confirmButton = {
             TextButton(onClick = { onConnect(password) }, enabled = password.length >= MIN_PASSWORD_LENGTH) {

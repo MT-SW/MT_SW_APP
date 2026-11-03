@@ -16,8 +16,6 @@
  */
 package org.meshtastic.feature.settings.sniffer
 
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -399,13 +397,11 @@ private fun RadioSnifferWarningDialog(onConfirm: () -> Unit, onDismiss: () -> Un
         onDismissRequest = onDismiss,
         title = { Text(stringResource(Res.string.sniffer_warning_title)) },
         text = {
- Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(stringResource(Res.string.sniffer_warning_message))
                 Text(text = stringResource(Res.string.sniffer_warning_compatibility), fontWeight = FontWeight.Bold)
             }
-        }
-},
+        },
         confirmButton = { TextButton(onClick = onConfirm) { Text(stringResource(Res.string.sniffer_warning_accept)) } },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.sniffer_warning_cancel)) } },
     )
@@ -416,9 +412,7 @@ private fun MqttSnifferWarningDialog(onConfirm: () -> Unit, onDismiss: () -> Uni
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(Res.string.mqtt_sniffer_warning_title)) },
-        text = {
- Column(modifier = Modifier.verticalScroll(rememberScrollState())) { Text(stringResource(Res.string.mqtt_sniffer_warning_message)) }
-},
+        text = { Text(stringResource(Res.string.mqtt_sniffer_warning_message)) },
         confirmButton = { TextButton(onClick = onConfirm) { Text(stringResource(Res.string.sniffer_warning_accept)) } },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.sniffer_warning_cancel)) } },
     )

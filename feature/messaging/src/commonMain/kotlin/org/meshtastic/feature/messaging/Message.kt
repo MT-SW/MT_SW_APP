@@ -18,8 +18,6 @@
 
 package org.meshtastic.feature.messaging
 
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -1010,12 +1008,10 @@ internal fun MessageInput(
             onDismissRequest = { pendingImageBytes = null },
             title = { Text("Wysłać zdjęcie?") },
             text = {
- Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 Text(
                     "Zdjęcie zostanie wysłane na publiczny serwer catbox.moe i będzie dostępne dla każdego, kto zna link. Upewnij się, że nie zawiera niczego prywatnego.",
                 )
-            }
-},
+            },
             confirmButton = {
                 TextButton(
                     onClick = {

@@ -16,8 +16,6 @@
  */
 package org.meshtastic.feature.settings.radio.component
 
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -399,7 +397,6 @@ fun RouterRoleConfirmationDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
     AlertDialog(
         title = { Text(text = dialogTitle) },
         text = {
- Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Column {
                 Text(text = annotatedDialogText)
                 Row(
@@ -410,8 +407,7 @@ fun RouterRoleConfirmationDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
                     Text(stringResource(Res.string.i_know_what_i_m_doing))
                 }
             }
-        }
-},
+        },
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = onConfirm, enabled = confirmed) { Text(stringResource(Res.string.accept)) }

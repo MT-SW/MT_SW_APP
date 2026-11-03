@@ -57,7 +57,6 @@ fun NarrowBandWarningDialog(onClose: () -> Unit) {
     val isEnglish = Locale.current.language == "en"
 
     MeshtasticDialog(
-        scrollable = false,
         title =
         if (isEnglish) {
             "Narrow channel: what it is and what it gives you"

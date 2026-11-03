@@ -16,8 +16,6 @@
  */
 package org.meshtastic.feature.map.component
 
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -79,7 +77,6 @@ fun WaypointInfoDialog(
         onDismissRequest = onDismissRequest,
         title = { Text(text = "$emoji  $title", fontWeight = FontWeight.Bold) },
         text = {
- Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 if (waypoint.description.isNotBlank()) {
                     Text(waypoint.description, style = MaterialTheme.typography.bodyMedium)
@@ -107,8 +104,7 @@ fun WaypointInfoDialog(
                     onClick = { onToggleAlerts(!alertsEnabled) },
                 )
             }
-        }
-},
+        },
         confirmButton = { TextButton(onClick = onDismissRequest) { Text(stringResource(Res.string.close)) } },
         // Unlocked foreign geofences stay editable; the edit button is absent for locked ones. The local delete sits
         // alongside it because it is always available.

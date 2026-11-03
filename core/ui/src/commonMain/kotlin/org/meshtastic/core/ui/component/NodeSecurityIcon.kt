@@ -270,7 +270,6 @@ fun NodeSecurityDialog(indicator: NodeSecurityIndicator, key: ByteString?, onDis
         onDismissRequest = onDismiss,
         title = { Text(stringResource(if (showAll) Res.string.security else indicator.title)) },
         text = {
- Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             if (showAll) {
                 SecurityLegend()
             } else {
@@ -280,8 +279,7 @@ fun NodeSecurityDialog(indicator: NodeSecurityIndicator, key: ByteString?, onDis
                     PublicKeyBlock(indicator, key)
                 }
             }
-        }
-},
+        },
         confirmButton = {
             Row(
                 modifier = Modifier.fillMaxWidth(),

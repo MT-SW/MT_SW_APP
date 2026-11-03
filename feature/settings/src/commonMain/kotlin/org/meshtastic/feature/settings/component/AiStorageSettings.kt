@@ -16,8 +16,6 @@
  */
 package org.meshtastic.feature.settings.component
 
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -189,7 +187,6 @@ internal fun AiStorageRow() {
             onDismissRequest = { chooser = false },
             title = { Text(stringResource(Res.string.ai_storage_choose_title)) },
             text = {
- Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 Column {
                     if (i.choices.size < 2) {
                         Text(
@@ -215,8 +212,7 @@ internal fun AiStorageRow() {
                         }
                     }
                 }
-            }
-},
+            },
             confirmButton = {},
             dismissButton = { TextButton(onClick = { chooser = false }) { Text(stringResource(Res.string.translator_cancel)) } },
         )
@@ -239,9 +235,7 @@ fun StorageFolderFirstRunDialog() {
         AlertDialog(
             onDismissRequest = {},
             title = { Text(stringResource(Res.string.ai_storage_first_title)) },
-            text = {
- Column(modifier = Modifier.verticalScroll(rememberScrollState())) { Text(stringResource(Res.string.ai_storage_first_body, i.folder, formatMb(i.freeMb))) }
-},
+            text = { Text(stringResource(Res.string.ai_storage_first_body, i.folder, formatMb(i.freeMb))) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -264,9 +258,7 @@ fun StorageFolderFirstRunDialog() {
     scheduledTo?.let { target ->
         AlertDialog(
             onDismissRequest = { scheduledTo = null },
-            text = {
- Column(modifier = Modifier.verticalScroll(rememberScrollState())) { Text(stringResource(Res.string.app_data_scheduled, target)) }
-},
+            text = { Text(stringResource(Res.string.app_data_scheduled, target)) },
             confirmButton = { TextButton(onClick = { scheduledTo = null }) { Text("OK") } },
         )
     }
@@ -291,18 +283,14 @@ internal fun rememberDownloadGuard(startDownload: (String) -> Unit): (String) ->
             AlertDialog(
                 onDismissRequest = { asking = null },
                 title = { Text(stringResource(Res.string.ai_storage_low_title)) },
-                text = {
- Column(modifier = Modifier.verticalScroll(rememberScrollState())) { Text(stringResource(Res.string.ai_storage_none_body, formatMb(need), formatMb(free))) }
-},
+                text = { Text(stringResource(Res.string.ai_storage_none_body, formatMb(need), formatMb(free))) },
                 confirmButton = { TextButton(onClick = { asking = null }) { Text("OK") } },
             )
         } else {
             AlertDialog(
                 onDismissRequest = { asking = null },
                 title = { Text(stringResource(Res.string.ai_storage_low_title)) },
-                text = {
- Column(modifier = Modifier.verticalScroll(rememberScrollState())) { Text(stringResource(Res.string.ai_storage_low_body, formatMb(after), formatMb(need))) }
-},
+                text = { Text(stringResource(Res.string.ai_storage_low_body, formatMb(after), formatMb(need))) },
                 confirmButton = {
                     TextButton(
                         onClick = {
@@ -320,9 +308,7 @@ internal fun rememberDownloadGuard(startDownload: (String) -> Unit): (String) ->
     if (restartFirst) {
         AlertDialog(
             onDismissRequest = { restartFirst = false },
-            text = {
- Column(modifier = Modifier.verticalScroll(rememberScrollState())) { Text(stringResource(Res.string.ai_storage_restart_first)) }
-},
+            text = { Text(stringResource(Res.string.ai_storage_restart_first)) },
             confirmButton = { TextButton(onClick = { restartFirst = false }) { Text("OK") } },
         )
     }

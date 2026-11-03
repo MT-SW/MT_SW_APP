@@ -99,8 +99,6 @@ fun MeshtasticDialog(
     onDismiss: (() -> Unit)? = null,
     choices: Map<String, () -> Unit> = emptyMap(),
     dismissable: Boolean = true,
-    /** False only when [text] holds a lazy list, which cannot sit inside a scrolling column. */
-    scrollable: Boolean = true,
 ) {
     val titleText = title ?: titleRes?.let { stringResource(it) } ?: ""
     val messageText = message ?: messageRes?.let { stringResource(it) }
@@ -127,7 +125,7 @@ fun MeshtasticDialog(
     // ignore the in-app scale setting. The density is captured here and provided again inside the dialog.
     val appDensity = LocalDensity.current
     val scrollState = rememberScrollState()
-    val bodyScroll = if (choices.isNotEmpty() || scrollable) Modifier.verticalScroll(scrollState) else Modifier
+    val bodyScroll = if (choices.isNotEmpty()) Modifier.verticalScroll(scrollState) else Modifier
 
     BasicAlertDialog(onDismissRequest = { if (dismissable) onDismiss?.invoke() }, modifier = modifier) {
         CompositionLocalProvider(LocalDensity provides appDensity) {

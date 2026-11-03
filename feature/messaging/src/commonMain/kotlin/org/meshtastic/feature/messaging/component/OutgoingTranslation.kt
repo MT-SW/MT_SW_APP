@@ -16,8 +16,6 @@
  */
 package org.meshtastic.feature.messaging.component
 
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -144,7 +142,6 @@ internal fun OutgoingTranslateAction(
             onDismissRequest = { open = false },
             title = { Text(stringResource(Res.string.translator_outgoing_title)) },
             text = {
- Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(stringResource(Res.string.translator_to), style = MaterialTheme.typography.labelMedium)
@@ -204,8 +201,7 @@ internal fun OutgoingTranslateAction(
                             )
                     }
                 }
-            }
-},
+            },
             confirmButton = {
                 Row {
                     TextButton(

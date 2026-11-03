@@ -377,7 +377,6 @@ fun SettingsScreen(
 @Composable
 private fun LanguagePickerDialog(onDismiss: () -> Unit, onSelect: (String) -> Unit) {
     MeshtasticDialog(
-        scrollable = false,
         title = stringResource(Res.string.preferences_language),
         onDismiss = onDismiss,
         text = {

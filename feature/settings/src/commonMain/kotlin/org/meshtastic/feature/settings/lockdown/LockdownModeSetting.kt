@@ -16,8 +16,6 @@
  */
 package org.meshtastic.feature.settings.lockdown
 
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -170,7 +168,6 @@ private fun EnableLockdownDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(Res.string.lockdown_set_passphrase)) },
         text = {
- Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Column {
                 Text(
                     text = stringResource(Res.string.lockdown_enable_warning),
@@ -205,8 +202,7 @@ private fun EnableLockdownDialog(
                     Text(stringResource(Res.string.lockdown_enable_ack))
                 }
             }
-        }
-},
+        },
         confirmButton = {
             TextButton(onClick = { onConfirm(passphrase, boots, hours, sessionMinutes) }, enabled = isValid) {
                 Text(stringResource(Res.string.lockdown_enable))
@@ -226,7 +222,6 @@ private fun DisableLockdownDialog(onConfirm: (passphrase: String) -> Unit, onDis
         onDismissRequest = onDismiss,
         title = { Text(stringResource(Res.string.lockdown_disable)) },
         text = {
- Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Column {
                 Text(stringResource(Res.string.lockdown_disable_message))
                 Spacer(modifier = Modifier.height(SPACING_DP.dp))
@@ -238,8 +233,7 @@ private fun DisableLockdownDialog(onConfirm: (passphrase: String) -> Unit, onDis
                     onToggleVisibility = { passwordVisible = !passwordVisible },
                 )
             }
-        }
-},
+        },
         confirmButton = {
             TextButton(onClick = { onConfirm(passphrase) }, enabled = isValid) {
                 Text(stringResource(Res.string.lockdown_disable))

@@ -187,7 +187,6 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
 
     if (status is VanityGrindStatus.FirmwareTooOld) {
         MeshtasticDialog(
-            scrollable = false,
             title = "Wymagana aktualizacja",
             message = "Aby użyć tej funkcji, zaktualizuj oprogramowanie urządzenia do wersji 2.8.0 lub wyższej.",
             dismissText = "Zamknij",
@@ -197,7 +196,6 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
     }
 
     MeshtasticDialog(
-        scrollable = false,
         title = "Wybierz kolor",
         dismissText = "Anuluj",
         dismissable = status !is VanityGrindStatus.Grinding,
