@@ -38,6 +38,7 @@ import androidx.compose.runtime.LaunchedEffect
 import org.meshtastic.core.ui.util.isDesktopPlatform
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -48,7 +49,6 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberDecoratedNavEntries
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.Scene
 import androidx.navigation3.ui.NavDisplay
 import co.touchlab.kermit.Logger
@@ -134,9 +134,36 @@ fun MeshtasticNavDisplay(
     }
 }
 
+/**
+ * Same job as the library's saveable-state decorator, but it survives the same screen being composed twice for a moment
+ * (a screen moving between the library's layout and ours when an extra pane opens): the second copy gets its own key
+ * instead of failing with "Key ... was used multiple times", and gives it back when it leaves.
+ */
+@Composable
+private fun rememberTolerantSaveableStateDecorator(): NavEntryDecorator<NavKey> {
+    val holder = rememberSaveableStateHolder()
+    return remember(holder) {
+        val claimed = HashSet<Any>()
+        NavEntryDecorator<NavKey>(
+            onPop = { contentKey -> holder.removeState(contentKey) },
+            decorate = { entry ->
+                val slotKey =
+                    remember {
+                        var candidate: Any = entry.contentKey
+                        var n = 1
+                        while (!claimed.add(candidate)) candidate = "${entry.contentKey}#${n++}"
+                        candidate
+                    }
+                DisposableEffect(slotKey) { onDispose { claimed.remove(slotKey) } }
+                holder.SaveableStateProvider(slotKey) { entry.Content() }
+            },
+        )
+    }
+}
+
 @Composable
 private fun rememberMeshtasticEntryDecorators(): List<NavEntryDecorator<NavKey>> {
-    val saveableDecorator = rememberSaveableStateHolderNavEntryDecorator<NavKey>()
+    val saveableDecorator = rememberTolerantSaveableStateDecorator()
     val vmStoreDecorator = rememberViewModelStoreNavEntryDecorator<NavKey>()
     return remember(saveableDecorator, vmStoreDecorator) { listOf(saveableDecorator, vmStoreDecorator) }
 }
