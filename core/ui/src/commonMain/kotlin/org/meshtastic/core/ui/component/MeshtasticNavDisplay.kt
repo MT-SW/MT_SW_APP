@@ -39,6 +39,8 @@ import org.meshtastic.core.ui.util.isDesktopPlatform
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
@@ -183,8 +185,13 @@ private fun MeshtasticNavDisplayHost(
     // The library draws the width slider only between two columns. On a wide desktop window (three columns) our own
     // layout takes over, with a slider at both dividers; everything else stays with the library's layout.
     val threeColumnWidths = remember { ThreeColumnWidths() }
+    // A window of 900 dp or more also gets our three columns: the library's two-column layout showed the node's
+    // details twice when an extra screen (e.g. neighbours) was opened on top of them ("Key ... used multiple times").
+    val windowWidthDp = LocalWindowInfo.current.containerSize.width / LocalDensity.current.density
     val threeColumnsFit =
-        isDesktopPlatform && calculatePaneScaffoldDirective(currentWindowAdaptiveInfoSafe()).maxHorizontalPartitions >= 3
+        isDesktopPlatform &&
+            (calculatePaneScaffoldDirective(currentWindowAdaptiveInfoSafe()).maxHorizontalPartitions >= 3 ||
+                windowWidthDp >= THREE_COLUMNS_MIN_WIDTH_DP)
     val threeColumnSceneStrategy =
         remember(threeColumnWidths, threeColumnsFit) { DesktopThreeColumnSceneStrategy(threeColumnWidths, threeColumnsFit) }
 
@@ -209,6 +216,8 @@ private fun MeshtasticNavDisplayHost(
 }
 
 private const val INITIAL_LIST_PANE_PROPORTION = 0.5f
+
+private const val THREE_COLUMNS_MIN_WIDTH_DP = 900f
 
 /** Drag handle for the list-detail scene strategy, with a 48.dp touch-target floor. */
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)

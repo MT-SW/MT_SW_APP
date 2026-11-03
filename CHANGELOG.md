@@ -17,6 +17,7 @@ Ten plik opisuje wyłącznie zmiany wprowadzone w aplikacji MT_SW_APP **względe
 Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od początku (27 lipca 2026) do dziś, w kolejności chronologicznej. Opis funkcji: [README.md](README.md).
 
 ### Listopad 2026
+* Komputer: okno szerokości od 900 dp pokazuje trzy kolumny także przy otwarciu ekranu na szczegółach węzła (np. sąsiedzi), co usuwa awarię „klucz użyty wiele razy”; lista sąsiadów nie liczy zaślepki o numerze 0.
 * Komputer: zapisany z poprzedniej sesji stos nawigacji z powtórzonymi ekranami (ten sam węzeł dwa razy) nie wywala już aplikacji przy starcie; powtórzenia są usuwane.
 * Komputer: węzeł otwarty z mapy lub z widoku sieci nie zostawia już w zakładce Węzły podwójnych szczegółów tego samego węzła (po ponownym dotknięciu i wejściu w listę informacji o sąsiadach aplikacja zgłaszała błąd klucza użytego wiele razy).
 * Panorama terenu, Teren offline: przycisk w Opcjach zapisuje na urządzeniu teren wokół miejsca obserwacji; wybierasz ile zapisać (2, 5, 15, 25, 40, 80 lub 100 km, domyślnie 100; zasięg 100 km dodany); zapisany teren działa bez internetu w panoramie i w planerze łączy, jest pokazany jego rozmiar i można go usunąć.
@@ -517,6 +518,7 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### November 2026
+* Desktop: a window 900 dp or wider shows three columns also when a screen (e.g. neighbours) is opened over a node's details, fixing the "key used multiple times" crash; the neighbour list no longer counts the placeholder with number 0.
 * Desktop: a navigation stack saved from an earlier session with repeated screens (the same node twice) no longer crashes the app at startup; the repeats are removed.
 * Desktop: a node opened from the map or the mesh view no longer leaves the same node's details twice in the Nodes tab (after a second tap and opening the neighbour info list the app reported a key used several times).
 * Terrain panorama, Offline terrain: a button in Options saves on the device the terrain around the place looked from; you pick how much to save (2, 5, 15, 25, 40, 80 or 100 km, 100 by default; a 100 km range was added); the saved terrain works without the internet in the panorama and in the link planner, its size is shown and it can be deleted.
