@@ -476,16 +476,22 @@ class LlamaCppEngine(
             // A phone with a Snapdragon: the NPU (Hexagon) first. "-ngl 99" is required: without it the NPU reports no
             // memory to the automatic split and the whole model stays on the processor. Its memory is split into sessions of about 2 GB, so a
             // bigger model gets more sessions (layers spread over them).
-            installer.androidNpuAsset()?.takeIf { !skipNpu && !installer.isBroken(it, modelId) }?.let { asset ->
-                val sessions = ((model.sizeMb + NPU_SESSION_MB - 1) / NPU_SESSION_MB).coerceIn(1, MAX_NPU_SESSIONS)
-                val devices = (0 until sessions).joinToString(",") { "HTP$it" }
-                add(
-                    Attempt(
-                        "NPU (Hexagon, $sessions × 2 GB) and processor", null, listOf("--device", devices, "-ngl", "99"), asset,
-                        requireGpu = true, npu = "Hexagon", perModel = true, vendorLibs = true,
-                        env = mapOf("GGML_HEXAGON_DEVICES" to sessions.toString()), dspLibs = true,
-                    ),
-                )
+            // Older Snapdragons (Hexagon before v75, e.g. the 8 Gen 2) give only ONE session: a bigger model's request for
+            // more fails at once ("invalid device: HTP1"), so the same NPU is then tried with a single session (own mark).
+            installer.androidNpuAsset()?.takeIf { !skipNpu }?.let { asset ->
+                val wanted = ((model.sizeMb + NPU_SESSION_MB - 1) / NPU_SESSION_MB).coerceIn(1, MAX_NPU_SESSIONS)
+                for (sessions in listOf(wanted, 1).distinct()) {
+                    val suffix = if (sessions == wanted) "" else SINGLE_SESSION_SUFFIX
+                    if (installer.isBroken(asset, modelId + suffix)) continue
+                    val devices = (0 until sessions).joinToString(",") { "HTP$it" }
+                    add(
+                        Attempt(
+                            "NPU (Hexagon, $sessions × 2 GB) and processor", null, listOf("--device", devices, "-ngl", "99"), asset,
+                            requireGpu = true, npu = "Hexagon", perModel = true, vendorLibs = true,
+                            env = mapOf("GGML_HEXAGON_DEVICES" to sessions.toString()), dspLibs = true, markSuffix = suffix,
+                        ),
+                    )
+                }
             }
             // A phone: our graphics card builds (OpenCL on a Snapdragon, then Vulkan), each only counts when the log
             // shows that the card really took part of the model.
@@ -580,12 +586,40 @@ class LlamaCppEngine(
             )
         }
         startReport = ""
+        settleLoadingMarker()
+        val killed = killedWays()
+        val freeMb = if (installer.android) freeMemoryMb() else null
+        val needMb = model.ramMb + if (hearing) HEARING_EXTRA_MB else 0
         // Set when the driver of the Intel NPU said it cannot run this engine's settings: the other NPU windows would fail the same way.
         var intelNpuRejected = false
         for (attempt in attempts) {
             if (intelNpuRejected && attempt.npu == "Intel") continue
             // A way that an earlier attempt of this same start already showed cannot work (e.g. the safe Vulkan mode on a phone without Vulkan 1.2).
             if (attempt.requireGpu && attempt.asset?.let { installer.isBroken(it, if (attempt.perModel) modelId + attempt.markSuffix else null) } == true) continue
+            // The phone's memory: a chip copies the whole model into memory that cannot be given back, so with too little
+            // free memory the system ends the whole app. Such ways are skipped (and a way that already got the app ended
+            // is skipped for a week); the processor reads the file in pieces the system can take back, so it still works.
+            if (killed.contains("$modelId|${attempt.name}")) {
+                tried.append("- ${nameFor(attempt.name)}: " + note("skipped, it recently got the app ended by the system (too little memory)", "pominięte, niedawno system zakończył przez to aplikację (za mało pamięci)") + "\n")
+                startReport = tried.toString()
+                continue
+            }
+            if (freeMb != null && attempt.requireGpu && freeMb < needMb + MEMORY_MARGIN_MB) {
+                tried.append("- ${nameFor(attempt.name)}: " + note("skipped, too little free memory ($freeMb MB free, about $needMb MB needed)", "pominięte, za mało wolnej pamięci (wolne $freeMb MB, potrzeba około $needMb MB)") + "\n")
+                startReport = tried.toString()
+                continue
+            }
+            if (freeMb != null && !attempt.requireGpu && freeMb < MIN_FREE_MB) {
+                tried.append("- ${nameFor(attempt.name)}: " + note("not started, only $freeMb MB of memory is free", "nie uruchomiono, wolne jest tylko $freeMb MB pamięci") + "\n")
+                startReport = tried.toString()
+                failure = IllegalStateException(
+                    note(
+                        "Not enough free memory to start ${model.name} ($freeMb MB free). Close other apps or choose a smaller model.",
+                        "Za mało wolnej pamięci, żeby uruchomić ${model.name} (wolne $freeMb MB). Zamknij inne aplikacje albo wybierz mniejszy model.",
+                    ),
+                )
+                continue
+            }
             val program =
                 attempt.program
                     ?: attempt.asset?.let { if (attempt.requireGpu) installer.installGpu(it) else runCatching { installer.install(it) }.getOrNull() }
@@ -594,16 +628,20 @@ class LlamaCppEngine(
                 startReport = tried.toString()
                 continue
             }
-            val attemptWindow = attempt.window ?: window
+            val lowMemory = freeMb != null && freeMb < needMb
+            val attemptWindow = (attempt.window ?: window).let { if (lowMemory) minOf(it, LOW_MEMORY_WINDOW) else it }
             Logger.i(tag = TAG) { "Starting ${model.name}: ${attempt.name} (context $attemptWindow tokens, hearing $hearing)" }
             if (attempt.npu == "Intel") {
                 Logger.i(tag = TAG) { "The Intel NPU compiles ${model.name} at every start: this can take up to ${INTEL_NPU_COMPILE_TIMEOUT_MS / 60_000} minutes" }
             }
             val startedAt = System.currentTimeMillis()
+            // If the system ends the app while the model loads, this note is found at the next start.
+            runCatching { File(logDir, LOADING_FILE).writeText("$modelId|${attempt.name}|${freeMb ?: -1}|$needMb") }
             val noThinking = if (model.quietThinking) emptyList() else listOf("--reasoning-budget", "0")
             val started = startServer(program, file, hearingFile, attemptWindow, attempt.extra + noThinking, attempt)
             // A chip that fails is not tried again for a while (an NPU only for this model: another may fit).
             fun giveUp() {
+                clearLoadingMarker()
                 if (attempt.requireGpu) attempt.asset?.let { installer.markBroken(it, if (attempt.perModel) modelId + attempt.markSuffix else null) }
             }
             try {
@@ -668,6 +706,7 @@ class LlamaCppEngine(
                 started.stop()
                 continue
             }
+            clearLoadingMarker()
             server = started
             loadedId = modelId
             loadedHearing = hearing
@@ -712,6 +751,51 @@ class LlamaCppEngine(
         Logger.i(tag = TAG) { "Test question on the chip: \"${text.take(60)}\"" }
         return text.contains("4") || text.contains("four") || text.contains("cztery")
     }
+
+    @Volatile private var markerSettled = false
+
+    private fun clearLoadingMarker() {
+        runCatching { File(logDir, LOADING_FILE).delete() }
+    }
+
+    /** Free memory the system can give (MB), or null where it cannot be read. */
+    private fun freeMemoryMb(): Int? =
+        runCatching {
+            File("/proc/meminfo").readLines().firstOrNull { it.startsWith("MemAvailable:") }
+                ?.split(Regex("\\s+"))?.getOrNull(1)?.toLongOrNull()?.let { (it / 1024).toInt() }
+        }.getOrNull()
+
+    /**
+     * A note left by a start that never ended means the system ended the app while the model loaded. When the memory was
+     * short then, that way (model + chip) is remembered for a week and not tried again.
+     */
+    private fun settleLoadingMarker() {
+        if (markerSettled) return
+        markerSettled = true
+        runCatching {
+            val note = File(logDir, LOADING_FILE)
+            if (!note.isFile) return
+            val parts = note.readText().trim().split('|')
+            note.delete()
+            val free = parts.getOrNull(2)?.toIntOrNull() ?: -1
+            val need = parts.getOrNull(3)?.toIntOrNull() ?: 0
+            if (parts.size >= 2 && free in 0 until need + MEMORY_MARGIN_MB) {
+                File(logDir, KILLED_FILE).appendText("${parts[0]}|${parts[1]}|${System.currentTimeMillis()}\n")
+                Logger.w(tag = TAG) { "The app was ended while loading ${parts[0]} (${parts[1]}) with $free MB free: this way is skipped for a week" }
+            }
+        }
+    }
+
+    /** Ways ("model|way") that got the app ended in the last week; older notes are dropped. */
+    private fun killedWays(): Set<String> =
+        runCatching {
+            val file = File(logDir, KILLED_FILE)
+            if (!file.isFile) return emptySet()
+            val now = System.currentTimeMillis()
+            val fresh = file.readLines().filter { (it.substringAfterLast('|').toLongOrNull() ?: 0L) > now - KILLED_KEEP_MS }
+            file.writeText(fresh.joinToString("\n") + if (fresh.isEmpty()) "" else "\n")
+            fresh.map { it.substringBeforeLast('|') }.toSet()
+        }.getOrDefault(emptySet())
 
     /** True when the log of the program that just started says that layers of the model went to the graphics card. */
     private fun gpuTookPart(): Boolean {
@@ -896,6 +980,14 @@ class LlamaCppEngine(
         const val MAX_NPU_SESSIONS = 4
         /** Memory left free on a computer's graphics card when it is filled with the model (the engine's own default is 1024). */
         const val TIGHT_GPU_MARGIN_MB = 256
+        const val SINGLE_SESSION_SUFFIX = ":hex1"
+        const val LOADING_FILE = "loading.txt"
+        const val KILLED_FILE = "killed-loading.txt"
+        const val KILLED_KEEP_MS = 7L * 24 * 60 * 60 * 1000
+        const val MEMORY_MARGIN_MB = 300
+        const val MIN_FREE_MB = 400
+        const val LOW_MEMORY_WINDOW = 4096
+        const val HEARING_EXTRA_MB = 600
         val LAYERS = Regex("offloaded (\\d+)/(\\d+) layers to GPU", RegexOption.IGNORE_CASE)
         val DEVICE = Regex("(?:ggml_vulkan: \\d+ = |using device |Device \\d+: |ggml_opencl: device: \'?)([^\\n(]+)", RegexOption.IGNORE_CASE)
         const val TRANSCRIBE_RULE =
