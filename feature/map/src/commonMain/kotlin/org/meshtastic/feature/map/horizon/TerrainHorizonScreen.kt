@@ -82,6 +82,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.terrain_horizon_save_range
 import org.meshtastic.core.resources.terrain_horizon_saved
 import org.meshtastic.core.resources.terrain_horizon_save_failed
 import org.meshtastic.core.resources.terrain_horizon_saving
@@ -252,7 +253,7 @@ fun TerrainHorizonScreen(
                     BrandChip(selected = fieldOfView == deg, onClick = { fieldOfView = deg }, label = { Text("$deg°") })
                 }
             }
-            OfflineTerrain(state = state, onSave = viewModel::saveTerrain, onClear = viewModel::clearSavedTerrain)
+            OfflineTerrain(state = state, onRadius = viewModel::setSaveRadius, onSave = viewModel::saveTerrain, onClear = viewModel::clearSavedTerrain)
             ChipRow(stringResource(Res.string.terrain_horizon_only_visible)) { Switch(checked = onlyVisible, onCheckedChange = { onlyVisible = it }) }
             ChipRow(stringResource(Res.string.terrain_horizon_labels)) { Switch(checked = names, onCheckedChange = { names = it }) }
         }
@@ -693,13 +694,18 @@ private const val MAP_METRES_PER_KM = 1_000.0
 
 /** Saving the terrain on the device, so the planner and the panorama work there without the internet. */
 @Composable
-private fun OfflineTerrain(state: TerrainHorizonState, onSave: () -> Unit, onClear: () -> Unit) {
+private fun OfflineTerrain(state: TerrainHorizonState, onRadius: (Int) -> Unit, onSave: () -> Unit, onClear: () -> Unit) {
     Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)) {
         Text(stringResource(Res.string.terrain_horizon_offline), color = MaterialTheme.colorScheme.onBackground, fontSize = 13.sp)
         Text(stringResource(Res.string.terrain_horizon_offline_hint), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
+        ChipRow(stringResource(Res.string.terrain_horizon_save_range)) {
+            HORIZON_RADII_KM.forEach { km ->
+                BrandChip(selected = state.saveRadiusKm == km, onClick = { onRadius(km) }, label = { Text("$km km") })
+            }
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Button(onClick = onSave, enabled = !state.saving && state.observerLat != null) {
-                Text(stringResource(Res.string.terrain_horizon_save, SAVE_MAX_RADIUS_KM))
+                Text(stringResource(Res.string.terrain_horizon_save, state.saveRadiusKm))
             }
             if (state.savedBytes > 0L && !state.saving) {
                 TextButton(onClick = onClear) { Text(stringResource(Res.string.terrain_horizon_save_clear)) }

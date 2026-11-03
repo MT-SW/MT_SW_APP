@@ -3089,7 +3089,7 @@
     <string name="terrain_horizon_observer_point">Own position…</string>
     <string name="terrain_horizon_observer_title">View from</string>
     <string name="terrain_horizon_offline">Offline terrain</string>
-    <string name="terrain_horizon_offline_hint">Saves on the device the terrain around the place you look from, for every range up to 100 km. The link planner and the panorama use it without the internet.</string>
+    <string name="terrain_horizon_offline_hint">Saves on the device the terrain around the place you look from, for every range up to the one you pick (the largest is 100 km). The link planner and the panorama use it without the internet.</string>
     <string name="terrain_horizon_only_visible">Only nodes in sight</string>
     <string name="terrain_horizon_options">Options</string>
     <string name="terrain_horizon_range">Range</string>
@@ -3097,6 +3097,7 @@
     <string name="terrain_horizon_save">Save terrain (up to %1$d km)</string>
     <string name="terrain_horizon_save_clear">Delete saved terrain</string>
     <string name="terrain_horizon_save_failed">Could not save the terrain (no internet or disk space).</string>
+    <string name="terrain_horizon_save_range">How much terrain to save</string>
     <string name="terrain_horizon_saved">Saved on the device: %1$s MB</string>
     <string name="terrain_horizon_saving">Saving… %1$d of %2$d</string>
     <string name="terrain_horizon_target_antenna">Node antennas</string>

@@ -3028,6 +3028,7 @@ terrain_horizon_refraction
 terrain_horizon_save
 terrain_horizon_save_clear
 terrain_horizon_save_failed
+terrain_horizon_save_range
 terrain_horizon_saved
 terrain_horizon_saving
 terrain_horizon_target_antenna

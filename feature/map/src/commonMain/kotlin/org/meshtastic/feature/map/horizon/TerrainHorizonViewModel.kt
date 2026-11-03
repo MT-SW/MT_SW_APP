@@ -101,6 +101,8 @@ data class TerrainHorizonState(
     /** The space the terrain saved on the device takes, in bytes. */
     val savedBytes: Long = 0L,
     /** Saving the terrain for offline use is running: tiles done of tiles in all. */
+    /** How far the terrain is saved (km): the last of the ranges, 100, unless picked otherwise. */
+    val saveRadiusKm: Int = SAVE_MAX_RADIUS_KM,
     val saving: Boolean = false,
     val saveDone: Int = 0,
     val saveTotal: Int = 0,
@@ -170,7 +172,9 @@ class TerrainHorizonViewModel(
 
     fun retry() = reload()
 
-    /** Saves the terrain around the place looked from, up to [SAVE_MAX_RADIUS_KM], for use without the internet. */
+    fun setSaveRadius(km: Int) = _state.update { it.copy(saveRadiusKm = km, saveOk = null) }
+
+    /** Saves the terrain around the place looked from, up to the chosen range (100 km at most), for use without the internet. */
     fun saveTerrain() {
         val here = _state.value
         val lat = here.observerLat ?: return
@@ -180,7 +184,7 @@ class TerrainHorizonViewModel(
             _state.update { it.copy(saving = true, saveDone = 0, saveTotal = 0, saveOk = null) }
             val ok =
                 try {
-                    elevation.saveArea(GeoPoint(lat, lon), SAVE_MAX_RADIUS_KM.toDouble()) { done, total ->
+                    elevation.saveArea(GeoPoint(lat, lon), here.saveRadiusKm.toDouble()) { done, total ->
                         _state.update { it.copy(saveDone = done, saveTotal = total) }
                     }
                 } catch (e: CancellationException) {
