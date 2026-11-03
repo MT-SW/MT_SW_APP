@@ -69,19 +69,13 @@ fun EntryProviderScope<NavKey>.desktopNavGraph(
     // behavior of pushing NodeDetail directly onto the Map tab's own backstack.
     entry<MapRoute.Map> { args ->
         val mapScreen = LocalMapMainScreenProvider.current
-        val openNodeInNodesTab: (Int) -> Unit = { id ->
-            multiBackstack.navigateTopLevel(TopLevelDestination.Nodes.route)
-            multiBackstack.backStacks[TopLevelDestination.Nodes.route]?.add(NodesRoute.NodeDetail(id))
-        }
+        val openNodeInNodesTab: (Int) -> Unit = { id -> openNodeDetailInNodesTab(multiBackstack, id) }
         mapScreen(openNodeInNodesTab, openNodeInNodesTab, args.waypointId, args.plannerNodeNum, args.focusNodeNum) {
             backStack.add(MapRoute.MeshHud())
         }
     }
     // The mesh view (terrain panorama first): a node tapped in it opens in the Nodes tab, as from the map.
-    meshHudEntry(backStack) { id ->
-        multiBackstack.navigateTopLevel(TopLevelDestination.Nodes.route)
-        multiBackstack.backStacks[TopLevelDestination.Nodes.route]?.add(NodesRoute.NodeDetail(id))
-    }
+    meshHudEntry(backStack) { id -> openNodeDetailInNodesTab(multiBackstack, id) }
     firmwareGraph(backStack)
     settingsGraph(backStack, settingsRadioConfigViewModel)
     docsEntries(backStack)
@@ -89,4 +83,16 @@ fun EntryProviderScope<NavKey>.desktopNavGraph(
     connectionsGraph(backStack)
     discoveryGraph(backStack)
     wifiProvisionGraph(backStack)
+}
+
+/**
+ * Opens a node's details in the Nodes tab, from the map or the mesh view. What was open there before is cleared down
+ * to the node list first, the way a tap on the list does it: pushing on top of it instead left the same node's details
+ * in the stack twice after a second tap, and the screen then failed ("key used multiple times").
+ */
+private fun openNodeDetailInNodesTab(multiBackstack: MultiBackstack, id: Int) {
+    multiBackstack.navigateTopLevel(TopLevelDestination.Nodes.route)
+    val stack = multiBackstack.backStacks[TopLevelDestination.Nodes.route] ?: return
+    while (stack.lastOrNull() != NodesRoute.Nodes && stack.size > 1) stack.removeLastOrNull()
+    stack.add(NodesRoute.NodeDetail(id))
 }
