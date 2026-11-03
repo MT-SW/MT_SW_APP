@@ -283,7 +283,7 @@ class NodeListViewModel(
     private fun MeshLog.toNeighborReport(): NeighborReport? {
         val payload = fromRadio.packet?.decoded?.payload ?: return null
         val info = runCatching { NeighborInfo.ADAPTER.decode(payload) }.getOrNull() ?: return null
-        return NeighborReport(received_date, info.neighbors.map { NeighborEntry(it.node_id, it.snr) })
+        return NeighborReport(received_date, info.neighbors.map { NeighborEntry(it.node_id, it.snr) }, fromRadio.packet)
     }
 
     /** The last NeighborInfo list of our own node, read the way its details page reads it (our node's logs are kept under a local number). */
@@ -512,4 +512,8 @@ private fun NodeExtraStats.withHardware(ext: LocalStatsExtended?): NodeExtraStat
 data class NeighborEntry(val nodeNum: Int, val snr: Float)
 
 /** A node's last NeighborInfo list (at most ten neighbours, as the packet holds) and when it was received. */
-data class NeighborReport(val receivedMillis: Long, val neighbors: List<NeighborEntry>)
+data class NeighborReport(
+    val receivedMillis: Long,
+    val neighbors: List<NeighborEntry>,
+    val packet: org.meshtastic.proto.MeshPacket? = null,
+)

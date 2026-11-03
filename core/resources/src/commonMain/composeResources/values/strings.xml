@@ -2163,8 +2163,6 @@
     <string name="neighbor_info">Neighbor Info</string>
     <string name="neighbor_info_config">Neighbor Info Config</string>
     <string name="neighbors_dialog_empty">No neighbour list saved from this node.</string>
-    <string name="neighbors_dialog_packet">Last neighbour packet: %1$s</string>
-    <string name="neighbors_dialog_title">Neighbours: %1$s</string>
     <!-- NETWORK -->
     <string name="network">Network</string>
     <string name="network_health">Network Health</string>
@@ -3073,12 +3071,16 @@
     <string name="terrain_horizon_antenna_auto">From node</string>
     <string name="terrain_horizon_apply">Show</string>
     <string name="terrain_horizon_camera">Camera</string>
+    <string name="terrain_horizon_compass">Compass</string>
     <string name="terrain_horizon_fov">Field of view</string>
     <string name="terrain_horizon_from">From</string>
-    <string name="terrain_horizon_hint">Drag to turn the view. Green: the node stands above the ridge in front of it. Red: a ridge hides it. Geometry only: a node in sight can still be out of range. Terrain: Mapterhorn. Method: MeshRF (GPL-3.0).</string>
+    <string name="terrain_horizon_hint">Drag to turn the view. Green outline: the node stands above the ridge in front of it. Red outline: a ridge hides it. Geometry only: a node in sight can still be out of range. Terrain: Mapterhorn. Method: MeshRF (GPL-3.0).</string>
     <string name="terrain_horizon_in_sight">Nodes in sight: %1$d of %2$d</string>
     <string name="terrain_horizon_labels">Names</string>
     <string name="terrain_horizon_loading">Reading terrain…</string>
+    <string name="terrain_horizon_move">Move</string>
+    <string name="terrain_horizon_move_back">Back to my node</string>
+    <string name="terrain_horizon_move_hint">Drag the map to look from another place. Letting go redraws the panorama.</string>
     <string name="terrain_horizon_network">The terrain data could not be loaded. Check the internet connection.</string>
     <string name="terrain_horizon_no_position">No position of this phone or of your node yet, so the view cannot be drawn.</string>
     <string name="terrain_horizon_none">No node with a position within this range.</string>

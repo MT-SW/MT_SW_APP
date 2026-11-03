@@ -2118,8 +2118,6 @@ need_hardware_description
 neighbor_info
 neighbor_info_config
 neighbors_dialog_empty
-neighbors_dialog_packet
-neighbors_dialog_title
 ### NETWORK ###
 network
 network_health
@@ -3004,12 +3002,16 @@ terrain_horizon_antenna
 terrain_horizon_antenna_auto
 terrain_horizon_apply
 terrain_horizon_camera
+terrain_horizon_compass
 terrain_horizon_fov
 terrain_horizon_from
 terrain_horizon_hint
 terrain_horizon_in_sight
 terrain_horizon_labels
 terrain_horizon_loading
+terrain_horizon_move
+terrain_horizon_move_back
+terrain_horizon_move_hint
 terrain_horizon_network
 terrain_horizon_no_position
 terrain_horizon_none

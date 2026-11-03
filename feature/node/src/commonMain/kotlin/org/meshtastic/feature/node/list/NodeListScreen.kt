@@ -71,10 +71,21 @@ import org.meshtastic.core.model.NodeExtraMode
 import org.meshtastic.core.model.NodeListDensity
 import org.meshtastic.core.model.excludes
 import org.meshtastic.core.resources.Res
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
+import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
+import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
+import org.meshtastic.core.ui.component.Quality
+import org.meshtastic.core.ui.util.LocalModemPreset
+import org.meshtastic.core.ui.util.annotateNeighborInfo
+import org.meshtastic.core.model.getNeighborInfoResponse
+import org.meshtastic.core.resources.neighbor_info
+import org.meshtastic.core.resources.okay
+import org.meshtastic.core.resources.cancel
 import org.meshtastic.core.resources.close
-import org.meshtastic.core.resources.neighbors_dialog_packet
 import org.meshtastic.core.resources.neighbors_dialog_empty
-import org.meshtastic.core.resources.neighbors_dialog_title
 import org.meshtastic.core.ui.component.LocalNeighborsClick
 import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.resources.channel_invalid
@@ -187,9 +198,8 @@ fun NodeListScreen(
     neighborsOpenFor?.let { num ->
         NeighborReportDialog(
             report = neighborReports[num],
-            title = unfilteredNodes.firstOrNull { it.num == num }?.user?.long_name.orEmpty(),
             nameOf = { nodeNum ->
-                unfilteredNodes.firstOrNull { it.num == nodeNum }?.let { it.user.long_name.ifBlank { it.user.short_name } }
+                unfilteredNodes.firstOrNull { it.num == nodeNum }?.let { "${it.user.long_name} (${it.user.short_name})" }
                     ?: "!" + nodeNum.toUInt().toString(HEX_RADIX)
             },
             onDismiss = { neighborsOpenFor = null },
@@ -632,30 +642,40 @@ private const val HEX_RADIX = 16
 @Composable
 private fun NeighborReportDialog(
     report: NeighborReport?,
-    title: String,
     nameOf: (Int) -> String,
     onDismiss: () -> Unit,
 ) {
+    val header = stringResource(Res.string.neighbor_info)
+    val statusGreen = MaterialTheme.colorScheme.StatusOnline
+    val statusYellow = MaterialTheme.colorScheme.StatusDisconnected
+    val statusOrange = MaterialTheme.colorScheme.StatusPurple
+    val statusRed = Quality.NONE.color.invoke()
+    val modemPreset = LocalModemPreset.current
+    val message = report?.packet?.getNeighborInfoResponse(nameOf, header = header)
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(Res.string.neighbors_dialog_title, title)) },
+        title = { Text(header) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                if (report == null || report.neighbors.isEmpty()) {
-                    Text(stringResource(Res.string.neighbors_dialog_empty))
-                } else {
-                    Text(
-                        text = stringResource(Res.string.neighbors_dialog_packet, DateFormatter.formatDateTime(report.receivedMillis)),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    report.neighbors.forEach { neighbor ->
-                        val snr = neighbor.snr.takeIf { it != Float.MAX_VALUE && !it.isNaN() }
-                        Text(nameOf(neighbor.nodeNum) + (snr?.let { " · SNR " + (kotlin.math.round(it * 10f) / 10f) + " dB" }.orEmpty()))
+            if (message == null) {
+                Text(stringResource(Res.string.neighbors_dialog_empty))
+            } else {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    SelectionContainer {
+                        Text(
+                            annotateNeighborInfo(
+                                message,
+                                statusGreen = statusGreen,
+                                statusYellow = statusYellow,
+                                statusOrange = statusOrange,
+                                statusRed = statusRed,
+                                modemPreset = modemPreset,
+                            ),
+                        )
                     }
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.close)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.cancel)) } },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.okay)) } },
     )
 }

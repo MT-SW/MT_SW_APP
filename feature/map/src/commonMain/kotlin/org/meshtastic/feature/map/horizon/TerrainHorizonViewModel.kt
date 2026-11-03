@@ -30,7 +30,13 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.di.CoroutineDispatchers
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.repository.MagneticFieldProvider
+import org.meshtastic.feature.map.hud.CameraPoseProvider
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.map
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.PhoneLocationProvider
 import org.meshtastic.feature.map.planner.GeoPoint
@@ -61,7 +67,7 @@ sealed interface HorizonObserver {
     data class Point(val lat: Double, val lon: Double) : HorizonObserver
 }
 
-data class HorizonNodeChoice(val num: Int, val name: String)
+data class HorizonNodeChoice(val num: Int, val name: String, val shortName: String = "", val lat: Double = 0.0, val lon: Double = 0.0, val color: Int = 0, val textColor: Int = 0)
 
 data class TerrainHorizonState(
     val loading: Boolean = true,
@@ -72,6 +78,9 @@ data class TerrainHorizonState(
     val observer: HorizonObserver = HorizonObserver.MyNode,
     /** The name of the node (or "") the view is looked from, for the label. */
     val observerName: String = "",
+    /** The position the view is looked from, for the move map; null until it is known. */
+    val observerLat: Double? = null,
+    val observerLon: Double? = null,
     /** True: the antenna height is worked out from the node's reported altitude when it has one. */
     val antennaAuto: Boolean = true,
     /** The antenna height typed or picked (m above the ground), used when the automatic one is off or unknown. */
@@ -96,6 +105,7 @@ val HORIZON_RADII_KM = listOf(2, 5, 15, 25, 40, 80)
 val HORIZON_ANTENNAS_M = listOf(2, 5, 10, 20, 30)
 val HORIZON_REFRACTIONS = listOf(HorizonPanorama.DEFAULT_K, 1.0)
 
+private const val FULL_TURN_DEG = 360.0
 private const val LOCATION_WAIT_MS = 1_500L
 private const val METRES_PER_KM = 1_000.0
 private const val MIN_AUTO_HEIGHT_M = 0.5
@@ -113,6 +123,8 @@ class TerrainHorizonViewModel(
     private val elevation: PlannerElevationSource,
     private val nodeRepository: NodeRepository,
     private val phoneLocationProvider: PhoneLocationProvider,
+    private val poseProvider: CameraPoseProvider,
+    private val magneticFieldProvider: MagneticFieldProvider,
     private val dispatchers: CoroutineDispatchers,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TerrainHorizonState())
@@ -143,6 +155,23 @@ class TerrainHorizonViewModel(
     fun setRefraction(k: Double) = change { it.copy(refraction = k) }
 
     fun retry() = reload()
+
+    /**
+     * The direction (true north, degrees) the phone faces, following its turning; nothing while it has no sensor. The
+     * sensor runs only while this is collected.
+     */
+    val heading: Flow<Float?> =
+        poseProvider.poseUpdates().conflate().map { reading ->
+            val azimuth = reading.pose?.azimuthDeg ?: return@map null
+            val here = _state.value
+            val declination =
+                if (reading.trueNorth || here.observerLat == null || here.observerLon == null) {
+                    0.0
+                } else {
+                    magneticFieldProvider.getDeclination(here.observerLat, here.observerLon, 0.0, nowMillis).toDouble()
+                }
+            (((azimuth + declination) % FULL_TURN_DEG + FULL_TURN_DEG) % FULL_TURN_DEG).toFloat()
+        }
 
     private fun change(transform: (TerrainHorizonState) -> TerrainHorizonState) {
         val before = _state.value
@@ -189,6 +218,8 @@ class TerrainHorizonViewModel(
                             targets = targets,
                             radiusKm = radiusKm,
                             observerName = spot.name,
+                            observerLat = spot.at.lat,
+                            observerLon = spot.at.lon,
                             autoAntennaM = auto?.let { a -> kotlin.math.round(a).toInt() },
                             usedAntennaM = kotlin.math.round(height).toInt(),
                         )
@@ -226,7 +257,7 @@ class TerrainHorizonViewModel(
     private fun nodeChoices(): List<HorizonNodeChoice> =
         nodeRepository.nodeDBbyNum.value.values
             .filter { it.validPosition != null }
-            .map { HorizonNodeChoice(it.num, it.user.long_name.ifBlank { it.user.short_name }) }
+            .map { HorizonNodeChoice(it.num, it.user.long_name.ifBlank { it.user.short_name }, it.user.short_name, it.latitude, it.longitude, it.colors.second, it.colors.first) }
             .sortedBy { it.name.lowercase() }
 
     private fun nodes(focus: Int?, lookingFrom: Int?): List<Triple<Int, String, GeoPoint>> {
