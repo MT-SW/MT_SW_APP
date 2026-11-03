@@ -19,6 +19,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 ### Listopad 2026
 * Modele AI: najmniejszy model tłumacza (NLLB) jest w zakładce „Pozostałe”, a „Pozostałe” są zawsze ostatnie, za wszystkimi rodzinami. Na początku jest Gemma (a zaraz za nią TranslateGemma).
 * Modele DeepSeek (1.5B, 7B, Llama 8B, 14B) używają teraz plików Q4_0 jak reszta modeli, bo pliki Q4_K_M dawały bełkot na NPU i karcie graficznej telefonów Snapdragon (model uruchamiał się, ale test nie dawał sensownej odpowiedzi). Kto pobrał stary plik, powinien go usunąć i pobrać model jeszcze raz.
+* DeepSeek R1 Distill Qwen 1.5B używa dokładniejszego pliku Q8_0 (około 1,8 GB), bo najmniejszy model źle znosi mocne ściskanie. Kto pobrał stary plik, powinien go usunąć i pobrać model jeszcze raz.
 * DeepSeek R1 Distill Qwen 1.5B na telefonie: NPU i karta graficzna są próbowane najpierw z uwagą i pamięcią podręczną w pełnej precyzji (wcześniej dawały bełkot); jeśli i tak nie zadziała, model działa na procesorze.
 * Zgłaszanie błędów na telefonie: do wiadomości wysyłanej do grupy trafia teraz opis, który wpisałeś, a nie nazwa i link grupy.
 * Modele AI: cała rodzina DeepSeek (R1 Distill 1.5B, 7B, Llama 8B, R1 0528 Qwen3 8B, 14B, 32B i Llama 70B) ma własną zakładkę zamiast jednego modelu w „Pozostałych”; wszystkie modele są dostępne na obu platformach, z opisem i wymaganiami pamięci.
@@ -537,6 +538,7 @@ The entries below describe only what this fork adds on top of the original, from
 ### November 2026
 * AI models: the smallest translator model (NLLB) is in the "Other" tab, and "Other" is always last, after all the families. Gemma comes first (with TranslateGemma right after it).
 * The DeepSeek models (1.5B, 7B, Llama 8B, 14B) now use Q4_0 files like the other models, because the Q4_K_M files gave nonsense on the NPU and graphics card of Snapdragon phones (the model started but the test got no sensible answer). Whoever downloaded the old file should delete it and download the model again.
+* DeepSeek R1 Distill Qwen 1.5B uses the more exact Q8_0 file (about 1.8 GB), because the smallest model copes badly with heavy compression. Whoever downloaded the old file should delete it and download the model again.
 * DeepSeek R1 Distill Qwen 1.5B on a phone: the NPU and graphics card are tried first with full-precision attention and cache (they gave nonsense before); if that still fails, the model runs on the processor.
 * Reporting problems on a phone: the message sent to the group now carries the description you wrote, not the group's name and link.
 * AI models: the whole DeepSeek family (R1 Distill 1.5B, 7B, Llama 8B, R1 0528 Qwen3 8B, 14B, 32B and Llama 70B) has its own tab instead of one model under "Other"; all models are available on both platforms, with a description and memory needs.
