@@ -227,14 +227,14 @@ internal object AndroidLogging {
                 Intent(Intent.ACTION_SEND).apply {
                     type = "application/zip"
                     putExtra(Intent.EXTRA_STREAM, uri)
-                    putExtra(Intent.EXTRA_TEXT, text)
+                    if (text.isNotBlank()) putExtra(Intent.EXTRA_TEXT, text)
                     clipData = ClipData.newRawUri(null, uri)
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
                     pkg?.let { setPackage(it) }
                 }
             // The chosen app first; when it is not installed, the system's own list of apps.
             return runCatching { app.startActivity(send(target.packageName)); true }
-                .recoverCatching { app.startActivity(Intent.createChooser(send(null), text).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); true }
+                .recoverCatching { app.startActivity(Intent.createChooser(send(null), text.ifBlank { null }).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); true }
                 .getOrDefault(false)
         }
 

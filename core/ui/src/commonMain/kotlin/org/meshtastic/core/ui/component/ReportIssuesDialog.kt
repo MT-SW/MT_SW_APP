@@ -128,7 +128,8 @@ fun ReportIssuesDialog(
                         // Without a package the group still opens, so the report can be written there by hand.
                         openUrl(target.url())
                     } else {
-                        val text = target.label() + ": " + target.url()
+                        // What goes into the message is what the person wrote, not the group's name and link.
+                        val text = note.trim()
                         val handed = control.shareReport(report, target, text)
                         if (!control.sharesFileToApp || !handed) openUrl(target.url())
                         result =
