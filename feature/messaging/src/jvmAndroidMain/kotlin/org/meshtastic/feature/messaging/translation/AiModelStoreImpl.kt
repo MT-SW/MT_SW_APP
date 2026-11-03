@@ -354,7 +354,7 @@ class AiModelStoreImpl(
         while (true) {
             currentCoroutineContext().ensureActive()
             val have = if (part.isFile) part.length() else 0L
-            val connection = URL(url).openConnection() as HttpURLConnection
+            @Suppress("DEPRECATION") val connection = URL(url).openConnection() as HttpURLConnection
             try {
                 connection.connectTimeout = CONNECT_TIMEOUT_MS
                 connection.readTimeout = READ_TIMEOUT_MS

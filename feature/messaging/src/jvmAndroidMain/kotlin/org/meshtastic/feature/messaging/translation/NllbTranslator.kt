@@ -182,7 +182,7 @@ class NllbTranslator(private val modelDir: File, private val uiPrefs: UiPrefs) :
         while (true) {
             currentCoroutineContext().ensureActive()
             val have = if (part.isFile) part.length() else 0L
-            val connection = (URL(BASE_URL + f.remotePath).openConnection() as HttpURLConnection)
+            @Suppress("DEPRECATION") val connection = (URL(BASE_URL + f.remotePath).openConnection() as HttpURLConnection)
             try {
                 connection.connectTimeout = CONNECT_TIMEOUT_MS
                 connection.readTimeout = READ_TIMEOUT_MS

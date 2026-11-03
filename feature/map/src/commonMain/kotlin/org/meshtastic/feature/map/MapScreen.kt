@@ -56,6 +56,7 @@ fun MapScreen(
                 showNodeChip = ourNodeInfo != null && isConnected,
                 canNavigateUp = false,
                 onNavigateUp = {},
+                actions = {},
                 onClickChip = { onClickNodeChip(it.num) },
             )
         },

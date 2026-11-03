@@ -305,7 +305,7 @@ class WhisperCppEngine(
 
     private fun send(running: ModelServerProcess, wav: ByteArray, audioCtx: Int = 0): String {
         val boundary = "----mtsw" + UUID.randomUUID().toString().replace("-", "")
-        val connection = URL(running.baseUrl + "/inference").openConnection() as HttpURLConnection
+        @Suppress("DEPRECATION") val connection = URL(running.baseUrl + "/inference").openConnection() as HttpURLConnection
         try {
             connection.requestMethod = "POST"
             connection.doOutput = true

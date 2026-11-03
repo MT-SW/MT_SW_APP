@@ -43,7 +43,7 @@ internal object WebAccess {
         var current = url
         repeat(MAX_REDIRECTS + 1) {
             checkAllowed(current)
-            val connection = URL(current).openConnection() as HttpURLConnection
+            @Suppress("DEPRECATION") val connection = URL(current).openConnection() as HttpURLConnection
             try {
                 connection.instanceFollowRedirects = false
                 connection.connectTimeout = CONNECT_MS
@@ -77,7 +77,7 @@ internal object WebAccess {
     /** Raw bytes of [url] for checks that need the exact content (same rules as [fetch]). */
     fun fetchBytes(url: String): ByteArray {
         checkAllowed(url)
-        val connection = URL(url).openConnection() as HttpURLConnection
+        @Suppress("DEPRECATION") val connection = URL(url).openConnection() as HttpURLConnection
         try {
             connection.instanceFollowRedirects = false
             connection.connectTimeout = CONNECT_MS

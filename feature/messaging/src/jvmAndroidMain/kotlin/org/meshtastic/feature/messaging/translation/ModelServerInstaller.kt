@@ -460,7 +460,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
 
     private suspend fun download(url: String, target: File, onProgress: (Float) -> Unit) {
         target.parentFile?.mkdirs()
-        val connection = URL(url).openConnection() as HttpURLConnection
+        @Suppress("DEPRECATION") val connection = URL(url).openConnection() as HttpURLConnection
         try {
             connection.connectTimeout = CONNECT_TIMEOUT_MS
             connection.readTimeout = READ_TIMEOUT_MS

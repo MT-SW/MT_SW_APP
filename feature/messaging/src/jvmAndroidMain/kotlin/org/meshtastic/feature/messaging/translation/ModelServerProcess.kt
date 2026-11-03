@@ -79,7 +79,7 @@ internal class ModelServerProcess private constructor(
     }
 
     private fun ping(path: String, anyAnswer: Boolean): Boolean = try {
-        val connection = URL(baseUrl + path).openConnection() as HttpURLConnection
+        @Suppress("DEPRECATION") val connection = URL(baseUrl + path).openConnection() as HttpURLConnection
         try {
             connection.connectTimeout = PING_TIMEOUT_MS
             connection.readTimeout = PING_TIMEOUT_MS

@@ -123,7 +123,7 @@ fun ReportIssuesDialog(
                 result = null
                 scope.launch {
                     val report = control?.takeIf { it.canMakeReport }?.buildReport(note, withLogs, extras)
-                    if (report == null || control == null) {
+                    if (control == null || report == null) {
                         failed = true
                         // Without a package the group still opens, so the report can be written there by hand.
                         openUrl(target.url())

@@ -371,7 +371,7 @@ class LlamaCppEngine(
         // True when the answer stopped for length (or in a loop), not because the model finished.
         var cutShort = false
         val limit = if (maxTokens > 0) maxTokens * CHARS_PER_TOKEN else Int.MAX_VALUE
-        val connection = URL(running.baseUrl + "/v1/chat/completions").openConnection() as HttpURLConnection
+        @Suppress("DEPRECATION") val connection = URL(running.baseUrl + "/v1/chat/completions").openConnection() as HttpURLConnection
         try {
             connection.requestMethod = "POST"
             connection.doOutput = true
