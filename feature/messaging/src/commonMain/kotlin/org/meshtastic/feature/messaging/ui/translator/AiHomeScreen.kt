@@ -52,6 +52,8 @@ import org.meshtastic.core.resources.ai_tab_translator
 import org.meshtastic.core.resources.assistant_history
 import org.meshtastic.core.resources.assistant_autoscroll
 import org.meshtastic.core.resources.assistant_autoscroll_hint
+import org.meshtastic.core.resources.assistant_header_collapse
+import org.meshtastic.core.resources.assistant_header_collapse_hint
 import org.meshtastic.core.resources.assistant_info_body
 import org.meshtastic.core.resources.assistant_info_title
 import org.meshtastic.core.resources.translator_sessions_empty
@@ -106,6 +108,18 @@ fun AiHomeScreen(
                                 )
                             }
                             Switch(checked = autoScroll, onCheckedChange = { uiPrefs.setAssistantAutoScroll(it) })
+                        }
+                        val headerCollapse by uiPrefs.assistantHeaderCollapse.collectAsStateWithLifecycle()
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(stringResource(Res.string.assistant_header_collapse), style = MaterialTheme.typography.bodyLarge)
+                                Text(
+                                    stringResource(Res.string.assistant_header_collapse_hint),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            Switch(checked = headerCollapse, onCheckedChange = { uiPrefs.setAssistantHeaderCollapse(it) })
                         }
                     }
                 }

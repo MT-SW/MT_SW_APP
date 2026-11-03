@@ -183,6 +183,13 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         scope.launch { dataStore.edit { it[KEY_ASSISTANT_AUTOSCROLL] = value } }
     }
 
+    override val assistantHeaderCollapse: StateFlow<Boolean> =
+        dataStore.data.map { it[KEY_ASSISTANT_HEADER_COLLAPSE] ?: true }.stateIn(scope, SharingStarted.Lazily, true)
+
+    override fun setAssistantHeaderCollapse(value: Boolean) {
+        scope.launch { dataStore.edit { it[KEY_ASSISTANT_HEADER_COLLAPSE] = value } }
+    }
+
     override val aiIdleUnloadMinutes: StateFlow<Int> =
         dataStore.data.map { it[KEY_AI_IDLE_UNLOAD_MINUTES] ?: 2 }.stateIn(scope, SharingStarted.Lazily, 2)
 
@@ -773,6 +780,7 @@ class UiPrefsImpl(private val dataStore: UiDataStore, dispatchers: CoroutineDisp
         val KEY_ASSISTANT_INTERNET_ENABLED = booleanPreferencesKey("assistant-internet-enabled")
         val KEY_ASSISTANT_MEMORY_ENABLED = booleanPreferencesKey("assistant-memory-enabled")
         val KEY_ASSISTANT_AUTOSCROLL = booleanPreferencesKey("assistant-autoscroll")
+        val KEY_ASSISTANT_HEADER_COLLAPSE = booleanPreferencesKey("assistant-header-collapse")
         val KEY_AI_IDLE_UNLOAD_MINUTES = intPreferencesKey("ai-idle-unload-minutes")
         val KEY_ANTENNA_SETUPS = stringPreferencesKey("antenna-setups")
         val KEY_DICTATION_EXTERNAL_MIC = booleanPreferencesKey("dictation-external-mic")

@@ -538,6 +538,8 @@ assistant_error
 assistant_export_title
 assistant_go_to
 assistant_greeting
+assistant_header_collapse
+assistant_header_collapse_hint
 assistant_history
 assistant_history_empty
 assistant_info_body

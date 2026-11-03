@@ -41,7 +41,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -123,6 +130,9 @@ import org.meshtastic.feature.messaging.translation.AssistantActions
 import org.meshtastic.feature.messaging.translation.AssistantClock
 import org.meshtastic.feature.messaging.translation.AssistantViewModel
 
+/** How far a finger has to move in one step before the header folds or unfolds (a small shake does not count). */
+private const val HEADER_SWIPE_PX = 6f
+
 private val BubbleShape = RoundedCornerShape(20.dp)
 private val UserBubbleShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomStart = 20.dp, bottomEnd = 4.dp)
 private val AssistantBubbleShape =
@@ -161,28 +171,51 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
             if (state.lines.isNotEmpty() && (autoScroll || state.lines.last().fromUser)) listState.scrollToItem(state.lines.lastIndex, FOLLOW_END_OFFSET)
         }
 
-        Text(
-            text =
-                stringResource(
-                    if (internetOn) Res.string.assistant_disclaimer_web else Res.string.assistant_disclaimer,
-                ),
-            style = MaterialTheme.typography.bodySmall,
-            // With the internet switched on the line warns about it, so it is red like a warning.
-            color = if (internetOn) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 8.dp),
-        )
+        // The header (the notice and the copy/save buttons) folds away when the chat is scrolled with a finger and comes back
+        // on the opposite swipe, so that on a strongly enlarged screen it does not take the whole chat. The switch is in the
+        // info window; only a swipe of the user counts, not the chat following a new answer by itself.
+        val collapsible by koinInject<UiPrefs>().assistantHeaderCollapse.collectAsStateWithLifecycle()
+        var headerFolded by rememberSaveable { mutableStateOf(false) }
+        val collapsibleNow by rememberUpdatedState(collapsible)
+        val headerShown = !(collapsible && headerFolded)
+        val swipeToFold =
+            remember {
+                object : NestedScrollConnection {
+                    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                        if (collapsibleNow && source == NestedScrollSource.UserInput) {
+                            if (available.y < -HEADER_SWIPE_PX) headerFolded = true else if (available.y > HEADER_SWIPE_PX) headerFolded = false
+                        }
+                        return Offset.Zero
+                    }
+                }
+            }
 
-        val memoryOn by koinInject<UiPrefs>().assistantMemoryEnabled.collectAsStateWithLifecycle()
-        if (memoryOn) {
-            Text(
-                text = stringResource(Res.string.assistant_memory_notice),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
-            )
+        AnimatedVisibility(visible = headerShown) {
+            Column {
+                Text(
+                    text =
+                        stringResource(
+                            if (internetOn) Res.string.assistant_disclaimer_web else Res.string.assistant_disclaimer,
+                        ),
+                    style = MaterialTheme.typography.bodySmall,
+                    // With the internet switched on the line warns about it, so it is red like a warning.
+                    color = if (internetOn) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+                val memoryOn by koinInject<UiPrefs>().assistantMemoryEnabled.collectAsStateWithLifecycle()
+                if (memoryOn) {
+                    Text(
+                        text = stringResource(Res.string.assistant_memory_notice),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
+                    )
+                }
+            }
         }
 
-        if (state.lines.isNotEmpty()) {
+        AnimatedVisibility(visible = headerShown && state.lines.isNotEmpty()) {
+          Column {
             val clipboard = LocalClipboard.current
             val exportScope = rememberCoroutineScope()
             val fileService = koinInject<FileService>()
@@ -253,11 +286,12 @@ fun AssistantContent(viewModel: AssistantViewModel, modifier: Modifier = Modifie
                 }
             }
             saveResult?.let { Text(text = it, style = MaterialTheme.typography.bodySmall) }
+          }
         }
 
         LazyColumn(
             state = listState,
-            modifier = Modifier.weight(1f).fillMaxWidth(),
+            modifier = Modifier.nestedScroll(swipeToFold).weight(1f).fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             if (state.lines.isEmpty()) {

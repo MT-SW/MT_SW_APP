@@ -203,6 +203,15 @@ interface UiPrefs {
 
     fun setAssistantAutoScroll(value: Boolean) {}
 
+    /**
+     * Whether the header of the assistant's chat (the notice and the copy/save buttons) folds away when the chat is
+     * scrolled with a finger and comes back on the opposite swipe (on by default); useful on a strongly enlarged screen.
+     */
+    val assistantHeaderCollapse: StateFlow<Boolean>
+        get() = kotlinx.coroutines.flow.MutableStateFlow(true)
+
+    fun setAssistantHeaderCollapse(value: Boolean) {}
+
     /** After how many minutes without use a language or speech model is freed from memory; 0 = never (default 2). */
     val aiIdleUnloadMinutes: StateFlow<Int>
         get() = kotlinx.coroutines.flow.MutableStateFlow(2)
