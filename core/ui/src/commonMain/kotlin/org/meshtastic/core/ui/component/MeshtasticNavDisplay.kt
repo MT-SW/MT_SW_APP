@@ -72,6 +72,11 @@ fun MeshtasticNavDisplay(
     analytics: PlatformAnalytics? = null,
 ) {
     val activeTab = multiBackstack.currentTabRoute
+    // Tymczasowa diagnostyka awarii „klucz użyty wiele razy": zapis stosów wszystkich zakładek przy każdej zmianie.
+    val snapshot = multiBackstack.backStacks.entries.joinToString(" | ") { (tab, stack) ->
+        "${tab::class.simpleName}${if (tab == activeTab) "*" else ""}=" + stack.joinToString(" > ")
+    }
+    LaunchedEffect(snapshot) { Logger.e { "NavStacks: $snapshot" } }
     MeshtasticNavDisplayHost(
         backStack = multiBackstack.activeBackStack,
         onBack = { multiBackstack.goBack() },
