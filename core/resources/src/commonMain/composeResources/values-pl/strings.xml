@@ -3583,5 +3583,4 @@
     <string name="neighbors_dialog_title">Sąsiedzi: %1$s</string>
     <string name="neighbors_dialog_empty">Brak zapisanego pakietu sąsiadów od tego węzła.</string>
     <string name="neighbors_dialog_packet">Ostatni pakiet sąsiadów: %1$s</string>
-    <string name="neighbors_dialog_direct">Węzły słyszane bezpośrednio (najwyżej 10, tak jak mieści pakiet sąsiadów)</string>
 </resources>

@@ -45,6 +45,7 @@ import org.meshtastic.proto.NeighborInfo
 import org.meshtastic.proto.PortNum
 import org.meshtastic.proto.Telemetry
 import org.meshtastic.core.model.DeviceType
+import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.NodeExtraMode
@@ -279,25 +280,39 @@ class NodeListViewModel(
             }
             .stateInWhileSubscribed(initialValue = emptyMap())
 
-    /** Each node's last NeighborInfo list saved (absent when none was saved): what the neighbours icon opens. */
-    val neighborReports: StateFlow<Map<Int, NeighborReport>> =
-        meshLogRepository
-            .getLatestLogsByPortNumPerSender(PortNum.NEIGHBORINFO_APP.value)
-            .map { logs ->
-                logs
-                    .distinctBy { it.fromNum }
-                    .mapNotNull { log ->
-                        val payload = log.fromRadio.packet?.decoded?.payload ?: return@mapNotNull null
-                        val info =
-                            runCatching { NeighborInfo.ADAPTER.decode(payload) }.getOrNull() ?: return@mapNotNull null
-                        log.fromNum to
-                            NeighborReport(
-                                receivedMillis = log.received_date,
-                                neighbors = info.neighbors.map { NeighborEntry(it.node_id, it.snr) },
-                            )
-                    }
-                    .toMap()
+    private fun MeshLog.toNeighborReport(): NeighborReport? {
+        val payload = fromRadio.packet?.decoded?.payload ?: return null
+        val info = runCatching { NeighborInfo.ADAPTER.decode(payload) }.getOrNull() ?: return null
+        return NeighborReport(received_date, info.neighbors.map { NeighborEntry(it.node_id, it.snr) })
+    }
+
+    /** The last NeighborInfo list of our own node, read the way its details page reads it (our node's logs are kept under a local number). */
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    private val ownNeighborReport: Flow<NeighborReport?> =
+        nodeRepository.ourNodeInfo.flatMapLatest { ours ->
+            if (ours == null) {
+                flowOf(null)
+            } else {
+                meshLogRepository
+                    .getLogsFromLimited(ours.num, PortNum.NEIGHBORINFO_APP.value, 1)
+                    .map { logs -> logs.firstNotNullOfOrNull { it.toNeighborReport() } }
             }
+        }
+
+    /**
+     * Each node's last NeighborInfo list saved (absent when none was saved): what the neighbours icon counts and opens.
+     * The count is the number of neighbours in that packet and nothing else.
+     */
+    val neighborReports: StateFlow<Map<Int, NeighborReport>> =
+        combine(
+            meshLogRepository.getLatestLogsByPortNumPerSender(PortNum.NEIGHBORINFO_APP.value),
+            ownNeighborReport,
+            nodeRepository.ourNodeInfo,
+        ) { logs, own, ours ->
+            val received =
+                logs.distinctBy { it.fromNum }.mapNotNull { log -> log.toNeighborReport()?.let { log.fromNum to it } }.toMap()
+            if (own != null && ours != null) received + (ours.num to own) else received
+        }
             .flowOn(Dispatchers.Default)
             .stateInWhileSubscribed(initialValue = emptyMap())
 

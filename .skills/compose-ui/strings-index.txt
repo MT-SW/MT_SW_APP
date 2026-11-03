@@ -1423,7 +1423,6 @@ image_preview_loading
 image_upload_cancel
 image_upload_close
 image_upload_failed
-image_upload_preparing
 image_upload_retry
 image_upload_sending
 ### IMPORT ###
@@ -2118,7 +2117,6 @@ need_hardware
 need_hardware_description
 neighbor_info
 neighbor_info_config
-neighbors_dialog_direct
 neighbors_dialog_empty
 neighbors_dialog_packet
 neighbors_dialog_title

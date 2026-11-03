@@ -2162,7 +2162,6 @@
     <string name="need_hardware_description">MT_SW requires a compatible device. Our backers and partners offer ready-to-use hardware. Here are some of the most popular options.</string>
     <string name="neighbor_info">Neighbor Info</string>
     <string name="neighbor_info_config">Neighbor Info Config</string>
-    <string name="neighbors_dialog_direct">Nodes heard directly (at most 10, as a neighbour packet holds)</string>
     <string name="neighbors_dialog_empty">No neighbour list saved from this node.</string>
     <string name="neighbors_dialog_packet">Last neighbour packet: %1$s</string>
     <string name="neighbors_dialog_title">Neighbours: %1$s</string>

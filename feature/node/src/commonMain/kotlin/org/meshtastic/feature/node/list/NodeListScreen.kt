@@ -72,7 +72,6 @@ import org.meshtastic.core.model.NodeListDensity
 import org.meshtastic.core.model.excludes
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.close
-import org.meshtastic.core.resources.neighbors_dialog_direct
 import org.meshtastic.core.resources.neighbors_dialog_packet
 import org.meshtastic.core.resources.neighbors_dialog_empty
 import org.meshtastic.core.resources.neighbors_dialog_title
@@ -184,25 +183,10 @@ fun NodeListScreen(
     val unheardNodes by viewModel.unheardBannerNodes.collectAsStateWithLifecycle()
     val deviceImageUrls by viewModel.deviceImageUrls.collectAsStateWithLifecycle()
     val neighborReports by viewModel.neighborReports.collectAsStateWithLifecycle()
-    // Our own node sends no saved neighbour list to the phone, so what it would hold is worked out from the nodes heard
-    // directly (no relay, not through the internet): the most recent ones, and never more than a neighbour list can
-    // carry (ten), as the count would otherwise be higher than any packet ever shows.
-    val ownDirectReport =
-        remember(allNodes, ourNode) {
-            ourNode?.num?.let { ours ->
-                val direct =
-                    allNodes
-                        .filter { n -> n.num != ours && n.hopsAway == 0 && !n.viaMqtt && n.isOnline }
-                        .sortedByDescending { it.lastHeard }
-                        .take(MAX_NEIGHBORS_IN_PACKET)
-                NeighborReport(receivedMillis = 0L, neighbors = direct.map { NeighborEntry(it.num, it.snr) })
-            }
-        }
     var neighborsOpenFor by remember { mutableStateOf<Int?>(null) }
     neighborsOpenFor?.let { num ->
         NeighborReportDialog(
-            report = neighborReports[num] ?: ownDirectReport.takeIf { num == ourNode?.num },
-            fromPacket = neighborReports[num] != null,
+            report = neighborReports[num],
             title = unfilteredNodes.firstOrNull { it.num == num }?.user?.long_name.orEmpty(),
             nameOf = { nodeNum ->
                 unfilteredNodes.firstOrNull { it.num == nodeNum }?.let { it.user.long_name.ifBlank { it.user.short_name } }
@@ -457,7 +441,7 @@ fun NodeListScreen(
                                     showTelemetry = showTelemetry,
                                     deviceImageUrl = deviceImageUrls[node.user.hw_model.value],
                                     relayNodeName = relayNodeName,
-                                    neighborCount = (neighborReports[node.num] ?: ownDirectReport.takeIf { node.num == ourNode?.num })?.neighbors?.size,
+                                    neighborCount = neighborReports[node.num]?.neighbors?.size,
                                 )
 
                             NodeListDensity.COMPACT ->
@@ -481,7 +465,7 @@ fun NodeListScreen(
                                     tempInFahrenheit = state.tempInFahrenheit,
                                     deviceImageUrl = deviceImageUrls[node.user.hw_model.value],
                                     relayNodeName = relayNodeName,
-                                    neighborCount = (neighborReports[node.num] ?: ownDirectReport.takeIf { node.num == ourNode?.num })?.neighbors?.size,
+                                    neighborCount = neighborReports[node.num]?.neighbors?.size,
                                 )
                         }
                         }
@@ -639,17 +623,15 @@ private fun UnheardNodesBanner(
     }
 }
 
-private const val MAX_NEIGHBORS_IN_PACKET = 10
 private const val HEX_RADIX = 16
 
 /**
- * The window the neighbours icon opens on the node list: the last neighbour list received from the node (or, for our
- * own node, the nodes it hears directly, as its list would hold them), with the SNR of each. It never leaves the list.
+ * The window the neighbours icon opens on the node list: the last neighbour list received from the node, with the SNR
+ * of each. It never leaves the list.
  */
 @Composable
 private fun NeighborReportDialog(
     report: NeighborReport?,
-    fromPacket: Boolean,
     title: String,
     nameOf: (Int) -> String,
     onDismiss: () -> Unit,
@@ -663,12 +645,7 @@ private fun NeighborReportDialog(
                     Text(stringResource(Res.string.neighbors_dialog_empty))
                 } else {
                     Text(
-                        text =
-                        if (fromPacket) {
-                            stringResource(Res.string.neighbors_dialog_packet, DateFormatter.formatDateTime(report.receivedMillis))
-                        } else {
-                            stringResource(Res.string.neighbors_dialog_direct)
-                        },
+                        text = stringResource(Res.string.neighbors_dialog_packet, DateFormatter.formatDateTime(report.receivedMillis)),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

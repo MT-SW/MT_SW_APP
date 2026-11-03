@@ -1,6 +1,6 @@
 # Ikona sąsiadów na liście węzłów
 
 ### Jak wyłączyć ikonę sąsiadów przy nazwie węzła?
-Mała ikona z liczbą przy nazwie węzła na liście (po dotknięciu pokazuje okienko z ostatnim pakietem sąsiadów tego węzła, nie przenosi do szczegółów; przy naszym węźle liczy węzły słyszane bezpośrednio, najwyżej 10) to osobne ustawienie wyglądu listy, nie moduł Informacje o sąsiadach. Wyłączysz ją w Ustawienia → Funkcje MT_SW → Układ węzła, przełącznikiem „Sąsiedzi przy nazwie węzła (ikona z liczbą)”. Moduł Informacje o sąsiadach (Ustawienia → Moduły) to co innego: on decyduje, czy radio wysyła dane o sąsiadach przez sieć mesh, i jego wyłączenie nie usuwa ikony z listy.
+Mała ikona z liczbą przy nazwie węzła na liście (po dotknięciu pokazuje okienko z ostatnim pakietem sąsiadów tego węzła, nie przenosi do szczegółów; liczba to sąsiedzi z tego pakietu, najwyżej 10; przy naszym węźle też z jego pakietu) to osobne ustawienie wyglądu listy, nie moduł Informacje o sąsiadach. Wyłączysz ją w Ustawienia → Funkcje MT_SW → Układ węzła, przełącznikiem „Sąsiedzi przy nazwie węzła (ikona z liczbą)”. Moduł Informacje o sąsiadach (Ustawienia → Moduły) to co innego: on decyduje, czy radio wysyła dane o sąsiadach przez sieć mesh, i jego wyłączenie nie usuwa ikony z listy.
 Słowa: ikona sąsiadów, sąsiedzi, ikona z liczbą, lista węzłów, układ węzła, wyłączyć ikonę, neighbor info, informacje o sąsiadach
 Źródło: aplikacja MT_SW_APP, ekran Układ węzła (sprawdzono 2026-10)
