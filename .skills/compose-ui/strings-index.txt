@@ -2118,6 +2118,10 @@ need_hardware
 need_hardware_description
 neighbor_info
 neighbor_info_config
+neighbors_dialog_direct
+neighbors_dialog_empty
+neighbors_dialog_packet
+neighbors_dialog_title
 ### NETWORK ###
 network
 network_health

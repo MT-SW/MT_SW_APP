@@ -41,6 +41,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.animateFloatingActionButton
 import androidx.compose.runtime.Composable
@@ -70,6 +71,13 @@ import org.meshtastic.core.model.NodeExtraMode
 import org.meshtastic.core.model.NodeListDensity
 import org.meshtastic.core.model.excludes
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.close
+import org.meshtastic.core.resources.neighbors_dialog_direct
+import org.meshtastic.core.resources.neighbors_dialog_packet
+import org.meshtastic.core.resources.neighbors_dialog_empty
+import org.meshtastic.core.resources.neighbors_dialog_title
+import org.meshtastic.core.ui.component.LocalNeighborsClick
+import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.resources.channel_invalid
 import org.meshtastic.core.resources.hop_histogram_title
 import org.meshtastic.core.resources.node_list_help_title
@@ -175,14 +183,34 @@ fun NodeListScreen(
     val unfilteredNodes by viewModel.unfilteredNodeList.collectAsStateWithLifecycle()
     val unheardNodes by viewModel.unheardBannerNodes.collectAsStateWithLifecycle()
     val deviceImageUrls by viewModel.deviceImageUrls.collectAsStateWithLifecycle()
-    val neighborCounts by viewModel.neighborCounts.collectAsStateWithLifecycle()
-    // Our own node sends no saved neighbour list to the phone, so its count is the nodes heard directly (no relay, not
-    // through the internet), which is what a neighbour list of our node would hold.
-    val ownDirectNeighbors =
+    val neighborReports by viewModel.neighborReports.collectAsStateWithLifecycle()
+    // Our own node sends no saved neighbour list to the phone, so what it would hold is worked out from the nodes heard
+    // directly (no relay, not through the internet): the most recent ones, and never more than a neighbour list can
+    // carry (ten), as the count would otherwise be higher than any packet ever shows.
+    val ownDirectReport =
         remember(allNodes, ourNode) {
-            val ours = ourNode?.num
-            ours?.let { allNodes.count { n -> n.num != it && n.hopsAway == 0 && !n.viaMqtt && n.isOnline } }
+            ourNode?.num?.let { ours ->
+                val direct =
+                    allNodes
+                        .filter { n -> n.num != ours && n.hopsAway == 0 && !n.viaMqtt && n.isOnline }
+                        .sortedByDescending { it.lastHeard }
+                        .take(MAX_NEIGHBORS_IN_PACKET)
+                NeighborReport(receivedMillis = 0L, neighbors = direct.map { NeighborEntry(it.num, it.snr) })
+            }
         }
+    var neighborsOpenFor by remember { mutableStateOf<Int?>(null) }
+    neighborsOpenFor?.let { num ->
+        NeighborReportDialog(
+            report = neighborReports[num] ?: ownDirectReport.takeIf { num == ourNode?.num },
+            fromPacket = neighborReports[num] != null,
+            title = unfilteredNodes.firstOrNull { it.num == num }?.user?.long_name.orEmpty(),
+            nameOf = { nodeNum ->
+                unfilteredNodes.firstOrNull { it.num == nodeNum }?.let { it.user.long_name.ifBlank { it.user.short_name } }
+                    ?: "!" + nodeNum.toUInt().toString(HEX_RADIX)
+            },
+            onDismiss = { neighborsOpenFor = null },
+        )
+    }
     val relayNodeIds by viewModel.relayNodeIds.collectAsStateWithLifecycle()
     val ignoredNodeCount = unfilteredNodes.count { it.isIgnored }
 
@@ -412,6 +440,7 @@ fun NodeListScreen(
                                 }
                             }
 
+                        CompositionLocalProvider(LocalNeighborsClick provides { num -> neighborsOpenFor = num }) {
                         when (density) {
                             NodeListDensity.COMPLETE ->
                                 NodeItem(
@@ -428,7 +457,7 @@ fun NodeListScreen(
                                     showTelemetry = showTelemetry,
                                     deviceImageUrl = deviceImageUrls[node.user.hw_model.value],
                                     relayNodeName = relayNodeName,
-                                    neighborCount = neighborCounts[node.num] ?: ownDirectNeighbors.takeIf { node.num == ourNode?.num },
+                                    neighborCount = (neighborReports[node.num] ?: ownDirectReport.takeIf { node.num == ourNode?.num })?.neighbors?.size,
                                 )
 
                             NodeListDensity.COMPACT ->
@@ -452,8 +481,9 @@ fun NodeListScreen(
                                     tempInFahrenheit = state.tempInFahrenheit,
                                     deviceImageUrl = deviceImageUrls[node.user.hw_model.value],
                                     relayNodeName = relayNodeName,
-                                    neighborCount = neighborCounts[node.num] ?: ownDirectNeighbors.takeIf { node.num == ourNode?.num },
+                                    neighborCount = (neighborReports[node.num] ?: ownDirectReport.takeIf { node.num == ourNode?.num })?.neighbors?.size,
                                 )
+                        }
                         }
                         if (canEditStatus) {
                             LocalNodeContextMenu(
@@ -607,4 +637,48 @@ private fun UnheardNodesBanner(
             }
         }
     }
+}
+
+private const val MAX_NEIGHBORS_IN_PACKET = 10
+private const val HEX_RADIX = 16
+
+/**
+ * The window the neighbours icon opens on the node list: the last neighbour list received from the node (or, for our
+ * own node, the nodes it hears directly, as its list would hold them), with the SNR of each. It never leaves the list.
+ */
+@Composable
+private fun NeighborReportDialog(
+    report: NeighborReport?,
+    fromPacket: Boolean,
+    title: String,
+    nameOf: (Int) -> String,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(Res.string.neighbors_dialog_title, title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                if (report == null || report.neighbors.isEmpty()) {
+                    Text(stringResource(Res.string.neighbors_dialog_empty))
+                } else {
+                    Text(
+                        text =
+                        if (fromPacket) {
+                            stringResource(Res.string.neighbors_dialog_packet, DateFormatter.formatDateTime(report.receivedMillis))
+                        } else {
+                            stringResource(Res.string.neighbors_dialog_direct)
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    report.neighbors.forEach { neighbor ->
+                        val snr = neighbor.snr.takeIf { it != Float.MAX_VALUE && !it.isNaN() }
+                        Text(nameOf(neighbor.nodeNum) + (snr?.let { " · SNR " + (kotlin.math.round(it * 10f) / 10f) + " dB" }.orEmpty()))
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.close)) } },
+    )
 }

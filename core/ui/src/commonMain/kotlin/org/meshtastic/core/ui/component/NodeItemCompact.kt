@@ -224,6 +224,7 @@ fun NodeItemCompact(
                     isFavorite = isFavorite,
                     unmessageable = unmessageable,
                     neighborCount = neighborCount,
+                    nodeNum = thatNode.num,
                 )
 
                 // Row 2: Glanceable health — online + last heard + distance + signal
@@ -275,6 +276,7 @@ private fun CompactNameRow(
     isFavorite: Boolean,
     unmessageable: Boolean,
     neighborCount: Int?,
+    nodeNum: Int,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -295,7 +297,14 @@ private fun CompactNameRow(
             },
             badge =
                 if (neighborCount != null && LocalNodeExtraConfig.current.neighbors) {
-                    { NeighborCountBadge(count = neighborCount, iconSize = 18.dp) }
+                    {
+                        val onNeighborsClick = LocalNeighborsClick.current
+                        NeighborCountBadge(
+                            count = neighborCount,
+                            iconSize = 18.dp,
+                            onClick = onNeighborsClick?.let { click -> { click(nodeNum) } },
+                        )
+                    }
                 } else {
                     null
                 },

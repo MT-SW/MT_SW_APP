@@ -78,6 +78,3 @@ private const val CONNECT_TIMEOUT_MS = 20_000L
 private const val SOCKET_TIMEOUT_MS = 90_000L
 private const val REQUEST_TIMEOUT_MS = 300_000L
 private const val MAX_ERROR_CHARS = 80
-
-// A computer sends the picture as it is: the desktop image classes do not apply the camera's rotation.
-actual fun prepareImageForUpload(bytes: ByteArray, mimeType: String): Pair<ByteArray, String> = bytes to mimeType

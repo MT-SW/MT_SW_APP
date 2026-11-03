@@ -232,6 +232,7 @@ fun NodeItem(
                 deviceType = deviceType,
                 contentColor = contentColor,
                 neighborCount = neighborCount,
+                nodeNum = thatNode.num,
             )
 
             thatNode.nodeStatus?.let { status ->
@@ -625,6 +626,7 @@ private fun NodeItemHeader(
     deviceType: DeviceType?,
     contentColor: Color,
     neighborCount: Int?,
+    nodeNum: Int,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -684,7 +686,12 @@ private fun NodeItemHeader(
                 // The neighbour badge sits in the middle of the free space between the time and the status icons.
                 if (neighborCount != null && LocalNodeExtraConfig.current.neighbors) {
                     Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                        NeighborCountBadge(count = neighborCount, iconSize = 22.dp)
+                        val onNeighborsClick = LocalNeighborsClick.current
+                        NeighborCountBadge(
+                            count = neighborCount,
+                            iconSize = 22.dp,
+                            onClick = onNeighborsClick?.let { click -> { click(nodeNum) } },
+                        )
                     }
                 }
             }

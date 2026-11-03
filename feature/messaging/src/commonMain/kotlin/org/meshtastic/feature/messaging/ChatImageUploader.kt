@@ -33,9 +33,6 @@ import kotlinx.coroutines.withContext
 sealed interface ImageUploadState {
     data object Idle : ImageUploadState
 
-    /** The picture is being made smaller. */
-    data object Preparing : ImageUploadState
-
     /** [percent] of the picture is sent; [attempt] counts from 1 (it is tried again after a failure). */
     data class Uploading(val percent: Int, val attempt: Int) : ImageUploadState
 
@@ -92,9 +89,7 @@ object ChatImageUploader {
         job =
             scope.launch {
                 try {
-                    _state.value = ImageUploadState.Preparing
-                    val (bytes, mime) = prepareImageForUpload(pending.bytes, pending.mimeType)
-                    val url = uploadWithRetries(bytes, mime)
+                    val url = uploadWithRetries(pending.bytes, pending.mimeType)
                     _state.value = ImageUploadState.Idle
                     last = null
                     withContext(Dispatchers.Main) { pending.onUploaded(url) }

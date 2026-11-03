@@ -26,11 +26,3 @@ expect suspend fun uploadToCatbox(
     fileName: String = "image.jpg",
     onProgress: (Float) -> Unit = {},
 ): String
-
-/**
- * Makes a big photo smaller before it is uploaded (a phone photo is several MB, which on a mobile connection is slow and
- * often timed out): the long side is brought to 2048 px and the picture is stored again, with the camera's rotation
- * applied. Small pictures, animated GIFs and anything that cannot be decoded are returned as they are, and so is the
- * original when the new one would not be smaller. Returns the bytes and their MIME type.
- */
-expect fun prepareImageForUpload(bytes: ByteArray, mimeType: String): Pair<ByteArray, String>

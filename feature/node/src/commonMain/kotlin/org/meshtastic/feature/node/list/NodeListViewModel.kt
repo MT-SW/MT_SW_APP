@@ -279,8 +279,8 @@ class NodeListViewModel(
             }
             .stateInWhileSubscribed(initialValue = emptyMap())
 
-    /** Each node's number of direct neighbours, from the last NeighborInfo list saved for it (absent when none was saved). */
-    val neighborCounts: StateFlow<Map<Int, Int>> =
+    /** Each node's last NeighborInfo list saved (absent when none was saved): what the neighbours icon opens. */
+    val neighborReports: StateFlow<Map<Int, NeighborReport>> =
         meshLogRepository
             .getLatestLogsByPortNumPerSender(PortNum.NEIGHBORINFO_APP.value)
             .map { logs ->
@@ -290,11 +290,20 @@ class NodeListViewModel(
                         val payload = log.fromRadio.packet?.decoded?.payload ?: return@mapNotNull null
                         val info =
                             runCatching { NeighborInfo.ADAPTER.decode(payload) }.getOrNull() ?: return@mapNotNull null
-                        log.fromNum to info.neighbors.size
+                        log.fromNum to
+                            NeighborReport(
+                                receivedMillis = log.received_date,
+                                neighbors = info.neighbors.map { NeighborEntry(it.node_id, it.snr) },
+                            )
                     }
                     .toMap()
             }
             .flowOn(Dispatchers.Default)
+            .stateInWhileSubscribed(initialValue = emptyMap())
+
+    /** Each node's number of direct neighbours, from the last NeighborInfo list saved for it (absent when none was saved). */
+    val neighborCounts: StateFlow<Map<Int, Int>> =
+        neighborReports.map { reports -> reports.mapValues { (_, report) -> report.neighbors.size } }
             .stateInWhileSubscribed(initialValue = emptyMap())
 
     /** The nodes the unheard banner offers for removal: see [selectRemovableUnheardNodes], less the ones kept. */
@@ -483,3 +492,9 @@ private fun NodeExtraStats.withHardware(ext: LocalStatsExtended?): NodeExtraStat
         wifiRssi = ext.wifiRssi.takeIf { it != 0 } ?: wifiRssi,
     )
 }
+
+/** One neighbour of a NeighborInfo list: the node and the SNR it was heard with. */
+data class NeighborEntry(val nodeNum: Int, val snr: Float)
+
+/** A node's last NeighborInfo list (at most ten neighbours, as the packet holds) and when it was received. */
+data class NeighborReport(val receivedMillis: Long, val neighbors: List<NeighborEntry>)

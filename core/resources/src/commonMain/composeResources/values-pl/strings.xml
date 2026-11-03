@@ -3573,7 +3573,6 @@
     <string name="widget_relays_canceled">Przekazane / anulowane</string>
     <string name="widget_traffic">TX / RX</string>
     <string name="deep_link_connect_with_pin_message">Link prosi tę aplikację o sparowanie z urządzeniem pod adresem %1$s przy użyciu PIN-u %2$s, a następnie o połączenie z nim. PIN jest skopiowany, więc możesz go wkleić, jeśli aplikacja o niego poprosi. Kontynuuj tylko jeśli ufasz źródłu tego linku.</string>
-    <string name="image_upload_preparing">Przygotowuję zdjęcie…</string>
     <string name="image_upload_sending">Wysyłanie zdjęcia…</string>
     <string name="image_upload_failed">Nie udało się wysłać zdjęcia: %1$s</string>
     <string name="image_upload_retry">Spróbuj ponownie</string>
@@ -3581,4 +3580,8 @@
     <string name="image_upload_close">Zamknij</string>
     <string name="image_preview_loading">Wczytuję zdjęcie…</string>
     <string name="image_preview_failed">Nie udało się wczytać zdjęcia. Dotknij, aby spróbować ponownie.</string>
+    <string name="neighbors_dialog_title">Sąsiedzi: %1$s</string>
+    <string name="neighbors_dialog_empty">Brak zapisanego pakietu sąsiadów od tego węzła.</string>
+    <string name="neighbors_dialog_packet">Ostatni pakiet sąsiadów: %1$s</string>
+    <string name="neighbors_dialog_direct">Węzły słyszane bezpośrednio (najwyżej 10, tak jak mieści pakiet sąsiadów)</string>
 </resources>

@@ -16,6 +16,7 @@
  */
 package org.meshtastic.core.ui.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -24,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Constraints
 import kotlin.math.max
@@ -38,13 +40,13 @@ import org.meshtastic.core.ui.icon.Group
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 
 /**
- * Grey "neighbours" icon (people) with the count from the node's last saved neighbour list. It only informs, like the
- * other status icons next to it: it is not a button.
+ * Grey "neighbours" icon (people) with the count from the node's last saved neighbour list. With [onClick] it is a
+ * button (the node list opens a window with that last list); without it it only informs.
  */
 @Composable
-fun NeighborCountBadge(count: Int, modifier: Modifier = Modifier, iconSize: Dp = 24.dp) {
+fun NeighborCountBadge(count: Int, modifier: Modifier = Modifier, iconSize: Dp = 24.dp, onClick: (() -> Unit)? = null) {
     Row(
-        modifier = modifier,
+        modifier = if (onClick != null) modifier.clickable(onClick = onClick) else modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(2.dp),
     ) {
@@ -61,6 +63,9 @@ fun NeighborCountBadge(count: Int, modifier: Modifier = Modifier, iconSize: Dp =
         )
     }
 }
+
+/** Opens the window with a node's last neighbour list when its icon is tapped; null (the default) makes the icon inert. */
+val LocalNeighborsClick = compositionLocalOf<((nodeNum: Int) -> Unit)?> { null }
 
 /**
  * Puts [badge] in the same column on every card: a fixed distance from the right edge of the header line, left of the

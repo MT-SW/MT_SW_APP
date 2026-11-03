@@ -122,7 +122,6 @@ import org.meshtastic.core.repository.SenderMutePrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.image_upload_sending
 import org.meshtastic.core.resources.image_upload_retry
-import org.meshtastic.core.resources.image_upload_preparing
 import org.meshtastic.core.resources.image_upload_failed
 import org.meshtastic.core.resources.image_upload_close
 import org.meshtastic.core.resources.image_upload_cancel
@@ -1296,16 +1295,6 @@ fun MessageInputPreview() {
 private fun ImageUploadBar(state: ImageUploadState) {
     when (state) {
         ImageUploadState.Idle -> Unit
-        ImageUploadState.Preparing ->
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
-                Text(stringResource(Res.string.image_upload_preparing), modifier = Modifier.weight(1f))
-                TextButton(onClick = ChatImageUploader::cancel) { Text(stringResource(Res.string.image_upload_cancel)) }
-            }
         is ImageUploadState.Uploading ->
             Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
