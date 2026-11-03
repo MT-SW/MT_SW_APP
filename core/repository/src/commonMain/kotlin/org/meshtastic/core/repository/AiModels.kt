@@ -152,6 +152,12 @@ object AiModels {
     const val GRANITE_8B = "granite42-8b-q4"
     const val PHI_MINI = "phi4-mini-q4"
     const val DEEPSEEK_8B = "deepseek-r1-qwen3-8b-q4"
+    const val DEEPSEEK_15B = "deepseek-r1-qwen-1p5b-q4"
+    const val DEEPSEEK_7B = "deepseek-r1-qwen-7b-q4"
+    const val DEEPSEEK_LLAMA_8B = "deepseek-r1-llama-8b-q4"
+    const val DEEPSEEK_14B = "deepseek-r1-qwen-14b-q4"
+    const val DEEPSEEK_32B = "deepseek-r1-qwen-32b-q4"
+    const val DEEPSEEK_LLAMA_70B = "deepseek-r1-llama-70b-q4"
     const val MISTRAL_24B = "mistral-small32-24b-q4"
     const val LLAMA_1B = "llama32-1b-q4"
     const val OLMOE_7B = "olmoe-1b-7b-q4"
@@ -166,6 +172,9 @@ object AiModels {
      * name to show: the settings translate it, and put a note about curiosities above the list.
      */
     const val OTHER_FAMILY = "Other"
+
+    /** The family of the DeepSeek R1 "thinking" models, from the smallest to the largest that runs at home. */
+    const val DEEPSEEK_FAMILY = "DeepSeek"
 
     /** True when the assistant screen exists. */
     const val ASSISTANT_SCREEN_READY = true
@@ -558,22 +567,89 @@ object AiModels {
             pageUrl = "${HF}bartowski/microsoft_Phi-4-mini-instruct-GGUF",
         )
 
+    /** One of the "thinking" DeepSeek R1 models (the whole family is offered on every platform; the list shows what each needs). */
+    private fun deepSeek(
+        id: String,
+        name: String,
+        repo: String,
+        file: String,
+        mb: Int,
+        ramMb: Int,
+        minGb: Int,
+        license: AiLicense,
+        pl: String,
+        en: String,
+    ) = AiModelInfo(
+        id = id,
+        name = name,
+        family = DEEPSEEK_FAMILY,
+        engine = AiEngine.LLAMA_CPP,
+        roles = TEXT,
+        sizeMb = mb,
+        ramMb = ramMb,
+        minDeviceRamGb = minGb,
+        license = license,
+        files = listOf(hf(repo, file, mb)),
+        platforms = BOTH,
+        descriptionPl = pl,
+        descriptionEn = en,
+        pageUrl = "$HF$repo",
+    )
+
+    val DeepSeek15b =
+        deepSeek(
+            DEEPSEEK_15B, "DeepSeek R1 Distill Qwen 1.5B", "unsloth/DeepSeek-R1-Distill-Qwen-1.5B-GGUF",
+            "DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf", 1066, 2000, 4, AiLicense.MIT,
+            "Najmniejszy model „myślący” DeepSeek: działa nawet na słabym telefonie, ale rozumuje płytko i po polsku jest słaby. Do prostych zadań i prób.",
+            "The smallest \"thinking\" DeepSeek model: runs even on a weak phone, but its reasoning is shallow and its Polish is poor. For simple tasks and trying things out.",
+        )
+
+    val DeepSeek7b =
+        deepSeek(
+            DEEPSEEK_7B, "DeepSeek R1 Distill Qwen 7B", "unsloth/DeepSeek-R1-Distill-Qwen-7B-GGUF",
+            "DeepSeek-R1-Distill-Qwen-7B-Q4_K_M.gguf", 4466, 6600, 12, AiLicense.MIT,
+            "Średni model „myślący” DeepSeek: dobry w rachunkach i logice, przed odpowiedzią długo rozumuje. Po polsku słabszy niż Gemma i Bielik.",
+            "A mid-size \"thinking\" DeepSeek model: good at arithmetic and logic, and it reasons for a long time before it answers. Its Polish is weaker than Gemma and Bielik.",
+        )
+
+    val DeepSeekLlama8b =
+        deepSeek(
+            DEEPSEEK_LLAMA_8B, "DeepSeek R1 Distill Llama 8B", "unsloth/DeepSeek-R1-Distill-Llama-8B-GGUF",
+            "DeepSeek-R1-Distill-Llama-8B-Q4_K_M.gguf", 4693, 6800, 12, AiLicense.SEE_MODEL_PAGE,
+            "Model „myślący” DeepSeek zbudowany na Llamie (Meta), więc z licencją Llamy. Rozumuje długo, po polsku jest słaby.",
+            "A \"thinking\" DeepSeek model built on Llama (Meta), so under the Llama licence. It reasons for a long time; its Polish is poor.",
+        )
+
     val DeepSeek8b =
-        AiModelInfo(
-            id = DEEPSEEK_8B,
-            name = "DeepSeek R1 Qwen3 8B",
-            family = OTHER_FAMILY,
-            engine = AiEngine.LLAMA_CPP,
-            roles = TEXT,
-            sizeMb = 4905,
-            ramMb = 6800,
-            minDeviceRamGb = 12,
-            license = AiLicense.MIT,
-            files = listOf(hf("unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF", "DeepSeek-R1-0528-Qwen3-8B-Q4_0.gguf", 4905)),
-            platforms = BOTH,
-            descriptionPl = "Model „myślący” od DeepSeek. Ciekawostka do własnych testów: przed odpowiedzią długo myśli.",
-            descriptionEn = "A \"thinking\" model from DeepSeek. A curiosity for your own tests: it thinks for a long time before it answers.",
-            pageUrl = "${HF}unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF",
+        deepSeek(
+            DEEPSEEK_8B, "DeepSeek R1 0528 Qwen3 8B", "unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF",
+            "DeepSeek-R1-0528-Qwen3-8B-Q4_0.gguf", 4905, 6800, 12, AiLicense.MIT,
+            "Najnowszy z małych modeli „myślących” DeepSeek (na bazie Qwen3): najlepiej rozumuje spośród modeli do 8B. Przed odpowiedzią długo myśli, po polsku słabszy niż Gemma.",
+            "The newest of the small \"thinking\" DeepSeek models (built on Qwen3): the best reasoner among the models up to 8B. It thinks for a long time before it answers; its Polish is weaker than Gemma.",
+        )
+
+    val DeepSeek14b =
+        deepSeek(
+            DEEPSEEK_14B, "DeepSeek R1 Distill Qwen 14B", "unsloth/DeepSeek-R1-Distill-Qwen-14B-GGUF",
+            "DeepSeek-R1-Distill-Qwen-14B-Q4_K_M.gguf", 8572, 11500, 16, AiLicense.MIT,
+            "Większy model „myślący” DeepSeek: wyraźnie lepszy w rozumowaniu, rachunkach i kodzie. Na mocniejszy telefon albo komputer; po polsku nadal słabszy niż Gemma.",
+            "A larger \"thinking\" DeepSeek model: clearly better at reasoning, arithmetic and code. For a stronger phone or a computer; its Polish is still weaker than Gemma.",
+        )
+
+    val DeepSeek32b =
+        deepSeek(
+            DEEPSEEK_32B, "DeepSeek R1 Distill Qwen 32B", "unsloth/DeepSeek-R1-Distill-Qwen-32B-GGUF",
+            "DeepSeek-R1-Distill-Qwen-32B-Q4_K_M.gguf", 18932, 23000, 32, AiLicense.MIT,
+            "Duży model „myślący” DeepSeek: najlepszy z rodziny, który da się uruchomić w domu. Na komputer z dużą pamięcią; odpowiada wolno.",
+            "A large \"thinking\" DeepSeek model: the best of the family that can be run at home. For a computer with a lot of memory; it answers slowly.",
+        )
+
+    val DeepSeekLlama70b =
+        deepSeek(
+            DEEPSEEK_LLAMA_70B, "DeepSeek R1 Distill Llama 70B", "unsloth/DeepSeek-R1-Distill-Llama-70B-GGUF",
+            "DeepSeek-R1-Distill-Llama-70B-Q4_K_M.gguf", 40548, 47000, 64, AiLicense.SEE_MODEL_PAGE,
+            "Największy model DeepSeek, jaki da się uruchomić lokalnie (na Llamie, z licencją Llamy). Tylko na komputer z bardzo dużą pamięcią (od około 64 GB); odpowiada bardzo wolno.",
+            "The largest DeepSeek model that can be run locally (built on Llama, under the Llama licence). Only for a computer with a lot of memory (about 64 GB or more); it answers very slowly.",
         )
 
     val Mistral24b =
@@ -714,7 +790,8 @@ object AiModels {
             G4E2b, G4E4b, G4_12b, G4_26b,
             Qwen08b, Qwen2b, Qwen4b, Qwen9b, QwenMoe, Qwen27b,
             Bielik15b, Bielik45b, Bielik7b, Bielik11b,
-            Pllum12b, GptOss20b, Granite8b, PhiMini, DeepSeek8b, Mistral24b, Llama1b, Olmoe7b,
+            DeepSeek15b, DeepSeek7b, DeepSeekLlama8b, DeepSeek8b, DeepSeek14b, DeepSeek32b, DeepSeekLlama70b,
+            Pllum12b, GptOss20b, Granite8b, PhiMini, Mistral24b, Llama1b, Olmoe7b,
             TranslateGemma4b, TranslateGemma12b,
             WhisperSmallQ8, WhisperMediumQ8, WhisperTurboQ8,
         )

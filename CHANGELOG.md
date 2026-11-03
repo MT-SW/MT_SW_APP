@@ -17,6 +17,7 @@ Ten plik opisuje wyłącznie zmiany wprowadzone w aplikacji MT_SW_APP **względe
 Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od początku (27 lipca 2026) do dziś, w kolejności chronologicznej. Opis funkcji: [README.md](README.md).
 
 ### Listopad 2026
+* Modele AI: cała rodzina DeepSeek (R1 Distill 1.5B, 7B, Llama 8B, R1 0528 Qwen3 8B, 14B, 32B i Llama 70B) ma własną zakładkę zamiast jednego modelu w „Pozostałych”; wszystkie modele są dostępne na obu platformach, z opisem i wymaganiami pamięci.
 * Zgłaszanie błędów na komputerze: paczka jest zapisywana od razu w Pobranych (a nie głęboko w folderach aplikacji), a po wysłaniu otwiera się folder z już zaznaczonym plikiem i grupa w przeglądarce, więc plik wystarczy przeciągnąć lub dołączyć.
 * Asystent: okno „i” przewija się, więc przycisk „Uruchom test zgodności” na jego dole jest zawsze dostępny; opis testu dodany do tekstu okna.
 * Strona „O aplikacji”, „Źródła funkcji”: lista uzupełniona o wszystkie projekty, z których korzystają funkcje forka (Sniffer, tłumacz, asystent i dyktowanie, Mesh Link Planer, panorama terenu).
@@ -530,6 +531,7 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### November 2026
+* AI models: the whole DeepSeek family (R1 Distill 1.5B, 7B, Llama 8B, R1 0528 Qwen3 8B, 14B, 32B and Llama 70B) has its own tab instead of one model under "Other"; all models are available on both platforms, with a description and memory needs.
 * Reporting problems on a computer: the package is saved straight into Downloads (not deep inside the app folders), and after sending, the folder opens with the file already selected, together with the group in the browser, so the file only has to be dragged or attached.
 * Assistant: the "i" window now scrolls, so the "Run the compatibility test" button at its bottom is always reachable; the test is described in the window text.
 * About screen, "Feature credits": the list now names all the projects the fork's features use (Sniffer, translator, assistant and dictation, Mesh Link Planner, terrain panorama).
