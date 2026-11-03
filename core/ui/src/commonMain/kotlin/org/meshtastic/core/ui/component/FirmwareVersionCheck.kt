@@ -16,6 +16,10 @@
  */
 package org.meshtastic.core.ui.component
 
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -133,6 +137,7 @@ private fun FirmwareUpdateGate(
         properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
         title = { Text(stringResource(Res.string.firmware_gate_title)) },
         text = {
+ Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Text(
                 stringResource(
                     Res.string.firmware_gate_message,
@@ -141,7 +146,8 @@ private fun FirmwareUpdateGate(
                     latestStable,
                 ),
             )
-        },
+        }
+},
         confirmButton = {
             TextButton(onClick = onUpdateFirmware) { Text(stringResource(Res.string.firmware_gate_update)) }
         },

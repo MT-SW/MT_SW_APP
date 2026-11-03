@@ -16,6 +16,8 @@
  */
 package org.meshtastic.feature.discovery.ui
 
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -217,7 +219,9 @@ private fun DeleteConfirmationDialog(onConfirm: () -> Unit, onDismiss: () -> Uni
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(Res.string.discovery_delete_session)) },
-        text = { Text(stringResource(Res.string.discovery_delete_session_confirm)) },
+        text = {
+ Column(modifier = Modifier.verticalScroll(rememberScrollState())) { Text(stringResource(Res.string.discovery_delete_session_confirm)) }
+},
         confirmButton = {
             TextButton(onClick = onConfirm) {
                 Text(stringResource(Res.string.delete), color = MaterialTheme.colorScheme.error)

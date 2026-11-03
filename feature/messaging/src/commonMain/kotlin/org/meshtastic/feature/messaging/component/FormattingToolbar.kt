@@ -16,6 +16,9 @@
  */
 package org.meshtastic.feature.messaging.component
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.input.TextFieldState
@@ -133,6 +136,7 @@ private fun LinkDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
         onDismissRequest = onDismiss,
         title = { Text(stringResource(Res.string.insert_link_title)) },
         text = {
+ Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             OutlinedTextField(
                 value = url,
                 onValueChange = { url = it },
@@ -140,7 +144,8 @@ private fun LinkDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
                 label = { Text(stringResource(Res.string.insert_link_message)) },
                 placeholder = { Text(stringResource(Res.string.insert_link_url_hint)) },
             )
-        },
+        }
+},
         confirmButton = {
             TextButton(onClick = { onConfirm(url) }, enabled = url.isNotBlank()) {
                 Text(stringResource(Res.string.insert))

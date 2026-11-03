@@ -16,6 +16,10 @@
  */
 package org.meshtastic.feature.node.component
 
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
@@ -50,6 +54,7 @@ fun DisplayNameDialog(node: Node, onSave: (Int, String) -> Unit, onDismiss: () -
         onDismissRequest = onDismiss,
         title = { Text(stringResource(Res.string.set_display_name)) },
         text = {
+ Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it.trimStart().limitToBytes(MAX_DISPLAY_NAME_BYTES) },
@@ -59,7 +64,8 @@ fun DisplayNameDialog(node: Node, onSave: (Int, String) -> Unit, onDismiss: () -
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { save() }),
             )
-        },
+        }
+},
         confirmButton = { TextButton(onClick = { save() }) { Text(stringResource(Res.string.save)) } },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.cancel)) } },
     )

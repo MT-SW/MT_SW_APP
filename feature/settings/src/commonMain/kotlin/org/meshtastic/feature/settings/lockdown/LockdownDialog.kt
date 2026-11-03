@@ -16,6 +16,8 @@
  */
 package org.meshtastic.feature.settings.lockdown
 
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -88,6 +90,7 @@ fun LockdownDialog(
         onDismissRequest = {}, // Non-dismissable
         title = { Text(text = title) },
         text = {
+ Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Column {
                 when (lockdownState) {
                     is LockdownState.UnlockFailed -> {
@@ -142,7 +145,8 @@ fun LockdownDialog(
                     onSessionMinutesChange = { sessionMinutes = it },
                 )
             }
-        },
+        }
+},
         confirmButton = {
             TextButton(onClick = { onSubmit(passphrase, boots, hours, sessionMinutes) }, enabled = isValid) {
                 Text(stringResource(Res.string.lockdown_submit))

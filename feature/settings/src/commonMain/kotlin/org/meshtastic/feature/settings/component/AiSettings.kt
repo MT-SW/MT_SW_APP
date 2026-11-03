@@ -16,6 +16,8 @@
  */
 package org.meshtastic.feature.settings.component
 
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -172,7 +174,9 @@ internal fun AiSettings() {
     if (freedMb > 0 && freedNoticeShown) {
         AlertDialog(
             onDismissRequest = { freedNoticeShown = false },
-            text = { Text(stringResource(Res.string.ai_legacy_freed, freedMb)) },
+            text = {
+ Column(modifier = Modifier.verticalScroll(rememberScrollState())) { Text(stringResource(Res.string.ai_legacy_freed, freedMb)) }
+},
             confirmButton = { TextButton(onClick = { freedNoticeShown = false }) { Text("OK") } },
         )
     }
@@ -258,7 +262,9 @@ internal fun AiSettings() {
         AlertDialog(
             onDismissRequest = { askInternet = false },
             title = { Text(stringResource(Res.string.ai_internet_warning_title)) },
-            text = { Text(stringResource(Res.string.ai_internet_warning_body)) },
+            text = {
+ Column(modifier = Modifier.verticalScroll(rememberScrollState())) { Text(stringResource(Res.string.ai_internet_warning_body)) }
+},
             confirmButton = {
                 TextButton(
                     onClick = {

@@ -474,6 +474,7 @@ private fun LanguagePickerDialog(onSelectLanguage: (String) -> Unit, onDismiss: 
     MeshtasticDialog(
         title = stringResource(Res.string.preferences_language),
         onDismiss = onDismiss,
+        scrollable = false,
         text = {
             val options = languageOptions()
             LazyColumn {
