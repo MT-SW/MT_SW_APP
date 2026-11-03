@@ -102,7 +102,14 @@ private class DesktopLogControl(private val dir: File) : AppLogControl {
                         extraFiles = if (withLogs) engineLogs.map { "silnik/${it.name}" to it } else emptyList(),
                     )
                 }
-                ReportFile(file.absolutePath, file.absolutePath, file.length() / 1024)
+                // A copy where the person looks first (Downloads, else Desktop, else the home folder), not six folders deep.
+                val home = File(System.getProperty("user.home").orEmpty())
+                val shown =
+                    listOf(File(home, "Downloads"), File(home, "Pobrane"), File(home, "Desktop"), File(home, "Pulpit"), home)
+                        .firstOrNull { it.isDirectory && it.canWrite() }
+                        ?.let { runCatching { file.copyTo(File(it, name), overwrite = true) }.getOrNull() }
+                        ?: file
+                ReportFile(shown.absolutePath, shown.absolutePath, shown.length() / 1024)
             }
                 .onFailure { Logger.w(it) { "Report could not be built" } }
                 .getOrNull()
@@ -110,7 +117,18 @@ private class DesktopLogControl(private val dir: File) : AppLogControl {
 
     /** On a computer the folder with the file opens, so the person can attach it in the group that opens next. */
     override fun shareReport(report: ReportFile, target: ReportTarget, text: String): Boolean = runCatching {
-        java.awt.Desktop.getDesktop().open(File(report.path).parentFile)
+        val file = File(report.path)
+        val os = System.getProperty("os.name").orEmpty().lowercase()
+        // The file manager opens with the file already selected, so it can be dragged into the group that opens next.
+        val selected =
+            runCatching {
+                when {
+                    "mac" in os -> ProcessBuilder("open", "-R", file.absolutePath).start()
+                    "win" in os -> ProcessBuilder("explorer.exe", "/select,", file.absolutePath).start()
+                    else -> null
+                }
+            }.getOrNull()
+        if (selected == null) java.awt.Desktop.getDesktop().open(file.parentFile)
         true
     }.getOrDefault(false)
 

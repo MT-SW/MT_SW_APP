@@ -110,6 +110,7 @@ fun ReportIssuesDialog(
     var result by rememberSaveable { mutableStateOf<String?>(null) }
     var failed by rememberSaveable { mutableStateOf(false) }
     MeshtasticDialog(
+        scrollable = false,
         title = stringResource(Res.string.report_issues_headline),
         icon = MeshtasticIcons.BugReport,
         confirmText = stringResource(Res.string.report_send),

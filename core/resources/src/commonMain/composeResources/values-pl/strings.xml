@@ -3420,7 +3420,7 @@
     <string name="report_send">Wyślij</string>
     <string name="report_sending">Przygotowuję paczkę ze zgłoszeniem…</string>
     <string name="report_done_phone">Paczka (%1$s KB) jest gotowa i otwarta w wybranej aplikacji: wybierz tam czat grupy i wyślij plik. Kopia leży w: %2$s.</string>
-    <string name="report_done_computer">Paczka (%1$s KB) zapisana w: %2$s. Otworzył się jej folder i grupa: dołącz tam ten plik.</string>
+    <string name="report_done_computer">Paczka (%1$s KB) jest zapisana w: %2$s (zwykle w Pobranych). Otworzył się folder z zaznaczonym plikiem oraz grupa: przeciągnij tam ten plik albo dołącz go sam.</string>
     <string name="report_failed">Nie udało się przygotować paczki z logami. Grupa otwiera się, opisz tam problem słowami.</string>
     <string name="app_log_title">Logi</string>
     <string name="app_log_level">Zbieranie logów</string>

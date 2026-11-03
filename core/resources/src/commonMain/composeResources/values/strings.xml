@@ -2700,7 +2700,7 @@
     <string name="replying_to">Replying to %1$s</string>
     <!-- REPORT -->
     <string name="report">Report</string>
-    <string name="report_done_computer">The package (%1$s KB) is saved in: %2$s. Its folder and the group have opened: attach the file there.</string>
+    <string name="report_done_computer">The package (%1$s KB) is saved in: %2$s (usually in Downloads). The folder with the file selected and the group have opened: drag the file there or attach it yourself.</string>
     <string name="report_done_phone">The package (%1$s KB) is ready and open in the chosen app: pick the group chat there and send the file. A copy is in: %2$s.</string>
     <string name="report_failed">The log package could not be prepared. The group is opening, describe the problem there in words.</string>
     <string name="report_issues_discord_summary">Our server: bugs, ideas and chat</string>

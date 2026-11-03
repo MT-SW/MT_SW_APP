@@ -108,6 +108,7 @@ internal enum class ChannelIcons(
 @Composable
 internal fun ChannelLegendDialog(capabilities: Capabilities, onDismiss: () -> Unit) {
     MeshtasticDialog(
+        scrollable = false,
         onDismiss = onDismiss,
         title = stringResource(Res.string.channel_features),
         dismissText = stringResource(Res.string.security_icon_help_dismiss),
