@@ -139,7 +139,7 @@ The debug panel (Settings → Advanced → Debug Panel) has an extra tab in this
 
 ## Messaging
 
-- **Photos via link** — the app does not send a photo over LoRa; it sends a link, and the recipient sees a preview. Before sending there is a warning that the server is public. Previews of images from links are off by default and are enabled in Settings → Privacy. A photo opened full screen can be saved to the device.
+- **Photos via link** — the app does not send a photo over LoRa; it sends a link, and the recipient sees a preview. Before sending there is a warning that the server is public. Previews of images from links are off by default and are enabled in Settings → Privacy. A photo opened full screen can be saved to the device. A progress bar with percentages (and a "Cancel" button) is shown above the message field; the sending goes on after the conversation is left, a failed try is repeated twice, and if it still fails the reason and a "Try again" button are shown. Big photos from a phone (Android 9 and newer) are made smaller before sending (the long side to 2048 px), so that sending on a weak connection is not cut off. The preview of a picture from our server shows "Loading the picture…", and when it does not load, a tap tries again.
 - **Long messages** — text that does not fit in one packet is split into parts with a marker such as `[k9 2/4]` and assembled on the other side.
 - **Quick chat** — comes with a ready set of templates on first launch.
 - **Status colours** — delivered to the network and receipt confirmation are gold, just "delivered to the network" on a direct message is red, and a send error is purple.

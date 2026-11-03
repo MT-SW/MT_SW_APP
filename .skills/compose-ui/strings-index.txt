@@ -1417,6 +1417,15 @@ ignore
 ignore_add
 ignore_incoming
 ignore_remove
+### IMAGE ###
+image_preview_failed
+image_preview_loading
+image_upload_cancel
+image_upload_close
+image_upload_failed
+image_upload_preparing
+image_upload_retry
+image_upload_sending
 ### IMPORT ###
 import_configuration
 import_export_label

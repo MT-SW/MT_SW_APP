@@ -104,6 +104,8 @@ import org.meshtastic.core.model.isAckProofForged
 import org.meshtastic.core.repository.MuteDurations
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.image_preview_loading
+import org.meshtastic.core.resources.image_preview_failed
 import org.meshtastic.core.resources.a11y_message_from
 import org.meshtastic.core.resources.action_show_message_status
 import org.meshtastic.core.resources.filter_message_label
@@ -597,17 +599,56 @@ fun MessageItem(
                     val linkUrl = remember(message.text) { firstUrl(message.text) }
                     val autoLoadChatImages by koinInject<UiPrefs>().autoLoadChatImages.collectAsStateWithLifecycle()
                     var linkImageFailed by remember(linkUrl) { mutableStateOf(false) }
-                    if (linkUrl != null && autoLoadChatImages && !linkImageFailed) {
-                        AsyncImage(
-                            model = ImageRequest.Builder(LocalPlatformContext.current).data(linkUrl).build(),
-                            contentDescription = null,
-                            contentScale = ContentScale.Fit,
-                            onError = { linkImageFailed = true },
-                            modifier =
-                            Modifier.padding(top = 8.dp).fillMaxWidth().heightIn(max = 240.dp).clickable {
-                                fullScreenImageUrl = linkUrl
-                            },
-                        )
+                    var linkImageLoading by remember(linkUrl) { mutableStateOf(true) }
+                    var linkImageAttempt by remember(linkUrl) { mutableStateOf(0) }
+                    // A picture of our own image host that does not load is shown as a failure that can be tried again;
+                    // any other link is a guess at an image and is quietly hidden when it is none.
+                    val ownHost = linkUrl?.contains("catbox.moe", ignoreCase = true) == true
+                    if (linkUrl != null && autoLoadChatImages && (!linkImageFailed || ownHost)) {
+                        if (linkImageFailed) {
+                            Text(
+                                text = stringResource(Res.string.image_preview_failed),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error,
+                                modifier =
+                                Modifier.padding(top = 8.dp).clickable {
+                                    linkImageFailed = false
+                                    linkImageLoading = true
+                                    linkImageAttempt++
+                                },
+                            )
+                        } else {
+                            androidx.compose.runtime.key(linkImageAttempt) {
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalPlatformContext.current).data(linkUrl).build(),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Fit,
+                                    onLoading = { linkImageLoading = true },
+                                    onSuccess = { linkImageLoading = false },
+                                    onError = {
+                                        linkImageLoading = false
+                                        linkImageFailed = true
+                                    },
+                                    modifier =
+                                    Modifier.padding(top = 8.dp).fillMaxWidth().heightIn(max = 240.dp).clickable {
+                                        fullScreenImageUrl = linkUrl
+                                    },
+                                )
+                            }
+                            if (linkImageLoading && ownHost) {
+                                Row(
+                                    modifier = Modifier.padding(top = 4.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                ) {
+                                    CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp)
+                                    Text(
+                                        text = stringResource(Res.string.image_preview_loading),
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                                }
+                            }
+                        }
                     }
 
                     Row(

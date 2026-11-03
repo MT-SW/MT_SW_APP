@@ -16,4 +16,21 @@
  */
 package org.meshtastic.feature.messaging
 
-expect suspend fun uploadToCatbox(bytes: ByteArray, mimeType: String, fileName: String = "image.jpg"): String
+/**
+ * Uploads [bytes] to catbox.moe and returns the link. [onProgress] gets the share sent so far (0..1). Throws when the
+ * server cannot be reached, is too slow, or does not answer with a link (its error text is never returned as a link).
+ */
+expect suspend fun uploadToCatbox(
+    bytes: ByteArray,
+    mimeType: String,
+    fileName: String = "image.jpg",
+    onProgress: (Float) -> Unit = {},
+): String
+
+/**
+ * Makes a big photo smaller before it is uploaded (a phone photo is several MB, which on a mobile connection is slow and
+ * often timed out): the long side is brought to 2048 px and the picture is stored again, with the camera's rotation
+ * applied. Small pictures, animated GIFs and anything that cannot be decoded are returned as they are, and so is the
+ * original when the new one would not be smaller. Returns the bytes and their MIME type.
+ */
+expect fun prepareImageForUpload(bytes: ByteArray, mimeType: String): Pair<ByteArray, String>

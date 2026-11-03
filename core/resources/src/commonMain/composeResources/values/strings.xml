@@ -1453,6 +1453,15 @@
     <string name="ignore_add">Add '%1$s' to ignore list?</string>
     <string name="ignore_incoming">Ignore incoming</string>
     <string name="ignore_remove">Remove '%1$s' from ignore list?</string>
+    <!-- IMAGE -->
+    <string name="image_preview_failed">The picture could not be loaded. Tap to try again.</string>
+    <string name="image_preview_loading">Loading the picture…</string>
+    <string name="image_upload_cancel">Cancel</string>
+    <string name="image_upload_close">Close</string>
+    <string name="image_upload_failed">The picture could not be sent: %1$s</string>
+    <string name="image_upload_preparing">Preparing the picture…</string>
+    <string name="image_upload_retry">Try again</string>
+    <string name="image_upload_sending">Sending the picture…</string>
     <!-- IMPORT -->
     <string name="import_configuration">Import configuration</string>
     <string name="import_export_label">Import/Export</string>

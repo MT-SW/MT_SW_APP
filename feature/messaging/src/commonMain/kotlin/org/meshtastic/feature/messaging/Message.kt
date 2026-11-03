@@ -27,6 +27,7 @@ import org.meshtastic.core.resources.assistant_dictate
 import org.meshtastic.core.ui.icon.Mic
 import androidx.compose.ui.draw.clip
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
@@ -119,6 +120,12 @@ import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.model.util.getChannel
 import org.meshtastic.core.repository.SenderMutePrefs
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.image_upload_sending
+import org.meshtastic.core.resources.image_upload_retry
+import org.meshtastic.core.resources.image_upload_preparing
+import org.meshtastic.core.resources.image_upload_failed
+import org.meshtastic.core.resources.image_upload_close
+import org.meshtastic.core.resources.image_upload_cancel
 import org.meshtastic.core.resources.archived_channel_read_only
 import org.meshtastic.core.resources.message_split_pending
 import org.meshtastic.core.resources.send
@@ -990,7 +997,6 @@ internal fun MessageInput(
 
     var isFocused by remember { mutableStateOf(false) }
     val addIcon = rememberAddIcon()
-    val uploadScope = rememberCoroutineScope()
     var pendingImageBytes by remember { mutableStateOf<ByteArray?>(null) }
     var pendingImageMimeType by remember { mutableStateOf("image/jpeg") }
     val launchImagePicker = rememberImagePickerLauncher { bytes, mimeType ->
@@ -1012,14 +1018,11 @@ internal fun MessageInput(
                     onClick = {
                         pendingImageBytes = null
                         val mime = pendingImageMimeType
-                        uploadScope.launch {
-                            try {
-                                val url = uploadToCatbox(bytesToSend, mime)
-                                textFieldState.setTextAndPlaceCursorAtEnd(url)
-                                onSendMessage()
-                            } catch (e: Exception) {
-                                Logger.e { "ImagePicker: catbox upload failed: ${e.message}" }
-                            }
+                        // The sending lives apart from this screen (it goes on when the conversation is left) and shows
+                        // its progress in the bar above the field.
+                        ChatImageUploader.start(bytesToSend, mime) { url ->
+                            textFieldState.setTextAndPlaceCursorAtEnd(url)
+                            onSendMessage()
                         }
                     },
                 ) {
@@ -1031,6 +1034,8 @@ internal fun MessageInput(
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
+        val imageUpload by ChatImageUploader.state.collectAsStateWithLifecycle()
+        ImageUploadBar(imageUpload)
         if (mentionActive) {
             MentionSuggestions(suggestions = suggestions, onPick = ::insertMention)
         }
@@ -1283,5 +1288,50 @@ fun MessageInputPreview() {
                 )
             }
         }
+    }
+}
+
+/** The bar above the message field while a picture is made smaller, sent, or failed to send. */
+@Composable
+private fun ImageUploadBar(state: ImageUploadState) {
+    when (state) {
+        ImageUploadState.Idle -> Unit
+        ImageUploadState.Preparing ->
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                Text(stringResource(Res.string.image_upload_preparing), modifier = Modifier.weight(1f))
+                TextButton(onClick = ChatImageUploader::cancel) { Text(stringResource(Res.string.image_upload_cancel)) }
+            }
+        is ImageUploadState.Uploading ->
+            Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        stringResource(Res.string.image_upload_sending) +
+                            " ${state.percent}%" +
+                            if (state.attempt > 1) " (${state.attempt}/3)" else "",
+                        modifier = Modifier.weight(1f),
+                    )
+                    TextButton(onClick = ChatImageUploader::cancel) { Text(stringResource(Res.string.image_upload_cancel)) }
+                }
+                LinearProgressIndicator(progress = { state.percent / 100f }, modifier = Modifier.fillMaxWidth())
+            }
+        is ImageUploadState.Failed ->
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    stringResource(Res.string.image_upload_failed, state.reason),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.weight(1f),
+                )
+                TextButton(onClick = ChatImageUploader::retry) { Text(stringResource(Res.string.image_upload_retry)) }
+                TextButton(onClick = ChatImageUploader::dismiss) { Text(stringResource(Res.string.image_upload_close)) }
+            }
     }
 }
