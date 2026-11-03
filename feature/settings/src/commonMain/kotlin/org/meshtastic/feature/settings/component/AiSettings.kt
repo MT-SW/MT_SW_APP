@@ -395,7 +395,15 @@ internal fun AiSettings() {
         )
     }
     // A second, smaller row of tabs: one per model family (Gemma, Qwen, Bielik, ...), so only one family is on screen.
-    val families = models.map { it.family }.distinct()
+    // Gemma (and TranslateGemma) first, the other families in the order of the list, "Other" always last.
+    val families =
+        models.map { it.family }.distinct().sortedBy {
+            when {
+                it.contains("Gemma") -> 0
+                it == AiModels.OTHER_FAMILY -> 2
+                else -> 1
+            }
+        }
     var familyIndex by rememberSaveable(role) { mutableIntStateOf(0) }
     val shownIndex = familyIndex.coerceIn(0, (families.size - 1).coerceAtLeast(0))
     if (families.size > 1) {

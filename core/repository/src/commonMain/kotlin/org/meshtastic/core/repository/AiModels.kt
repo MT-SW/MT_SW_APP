@@ -198,7 +198,7 @@ object AiModels {
         AiModelInfo(
             id = NLLB_600M_ID,
             name = "NLLB-200 600M",
-            family = "NLLB",
+            family = OTHER_FAMILY,
             engine = AiEngine.NLLB_ONNX,
             roles = setOf(AiRole.TRANSLATOR),
             sizeMb = 870,
