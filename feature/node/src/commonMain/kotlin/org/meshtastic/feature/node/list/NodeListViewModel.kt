@@ -283,7 +283,12 @@ class NodeListViewModel(
     private fun MeshLog.toNeighborReport(): NeighborReport? {
         val payload = fromRadio.packet?.decoded?.payload ?: return null
         val info = runCatching { NeighborInfo.ADAPTER.decode(payload) }.getOrNull() ?: return null
-        return NeighborReport(received_date, info.neighbors.map { NeighborEntry(it.node_id, it.snr) }, fromRadio.packet)
+        return NeighborReport(
+            received_date,
+            // Zaślepka, którą aplikacja zapisuje dla własnego węzła bez zapisanej listy (numer 0), to nie sąsiad.
+            info.neighbors.filter { it.node_id != 0 }.map { NeighborEntry(it.node_id, it.snr) },
+            fromRadio.packet,
+        )
     }
 
     /** The last NeighborInfo list of our own node, read the way its details page reads it (our node's logs are kept under a local number). */
