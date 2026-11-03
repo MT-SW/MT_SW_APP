@@ -67,6 +67,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -679,8 +681,9 @@ private const val SELECTED_FILL = 0.18f
 private const val SELECTED_BORDER_DP = 2
 
 /**
- * A node as the map draws it: its own coloured chip with its short name (a plain coloured disc when [label] is null),
- * ringed in [ring] and standing on its point.
+ * A node exactly as the main map draws it: its dot (the node's colour, white ring) on the node's point, and above it,
+ * after a small gap, the node-coloured chip with the short name and a little tail pointing down (a plain dot when
+ * [label] is null). The chip carries a thin [ring] border, which the panorama uses to tell what stands above the ridge.
  */
 private fun DrawScope.drawNodeMarker(
     measurer: TextMeasurer,
@@ -691,31 +694,48 @@ private fun DrawScope.drawNodeMarker(
     ring: Color,
     focus: Boolean,
 ) {
-    val stroke = if (focus) MARKER_FOCUS_STROKE else MARKER_STROKE
-    if (label == null) {
-        drawCircle(background, radius = MARKER_DISC, center = at)
-        drawCircle(ring, radius = MARKER_DISC, center = at, style = Stroke(stroke))
-        return
-    }
-    val layout = measurer.measure(label, TextStyle(color = text, fontSize = 11.sp, fontWeight = FontWeight.Bold))
-    val boxW = layout.size.width + 2 * MARKER_PAD_X
-    val boxH = layout.size.height + 2 * MARKER_PAD_Y
-    val top = Offset(at.x - boxW / 2f, max(0f, at.y - MARKER_STEM - boxH))
-    drawLine(ring, Offset(at.x, top.y + boxH), at, strokeWidth = stroke)
-    drawRoundRect(background, top, Size(boxW, boxH), CornerRadius(MARKER_CORNER))
-    drawRoundRect(ring, top, Size(boxW, boxH), CornerRadius(MARKER_CORNER), style = Stroke(stroke))
-    drawText(layout, topLeft = Offset(top.x + MARKER_PAD_X, top.y + MARKER_PAD_Y))
-    drawCircle(ring, radius = MARKER_ANCHOR, center = at)
+    val dot = CHIP_DOT_DP.dp.toPx()
+    drawCircle(background, radius = dot, center = at)
+    // A dot alone (no name shown) takes the ring colour, so what stands above the ridge can still be told.
+    drawCircle(if (label == null) ring else Color.White, radius = dot, center = at, style = Stroke(CHIP_DOT_RING_DP.dp.toPx()))
+    if (label == null) return
+    val layout = measurer.measure(label, TextStyle(color = text, fontSize = 11.sp))
+    val width = max(CHIP_MIN_WIDTH_DP.dp.toPx(), layout.size.width + 2 * CHIP_PAD_DP.dp.toPx())
+    val bodyH = CHIP_HEIGHT_DP.dp.toPx()
+    val tailH = CHIP_TAIL_HEIGHT_DP.dp.toPx()
+    val tailHalf = CHIP_TAIL_WIDTH_DP.dp.toPx() / 2f
+    val bodyBottom = at.y - CHIP_GAP_DP.dp.toPx() - tailH
+    val top = Offset(at.x - width / 2f, max(0f, bodyBottom - bodyH))
+    val corner = CornerRadius(CHIP_CORNER_DP.dp.toPx())
+    drawRoundRect(background, top, Size(width, bodyH), corner)
+    val border = (if (focus) CHIP_FOCUS_RING_DP else CHIP_RING_DP).dp.toPx()
+    drawRoundRect(ring, Offset(top.x + border / 2f, top.y + border / 2f), Size(width - border, bodyH - border), corner, style = Stroke(border))
+    val tail =
+        Path().apply {
+            moveTo(at.x - tailHalf, top.y + bodyH)
+            lineTo(at.x + tailHalf, top.y + bodyH)
+            lineTo(at.x, top.y + bodyH + tailH)
+            close()
+        }
+    drawPath(tail, background)
+    drawPath(tail, background, style = Stroke(CHIP_TAIL_ROUND_DP.dp.toPx() * 2f, cap = StrokeCap.Round, join = StrokeJoin.Round))
+    drawText(layout, topLeft = Offset(top.x + (width - layout.size.width) / 2f, top.y + (bodyH - layout.size.height) / 2f))
 }
 
-private const val MARKER_DISC = 8f
-private const val MARKER_ANCHOR = 4f
-private const val MARKER_STEM = 10f
-private const val MARKER_PAD_X = 9f
-private const val MARKER_PAD_Y = 4f
-private const val MARKER_CORNER = 8f
-private const val MARKER_STROKE = 2.5f
-private const val MARKER_FOCUS_STROKE = 4.5f
+// The main map's chip, in dp: Material's small corner, a body 20 tall and at least 44 wide, a 6 x 8 tail, 8 of gap and a
+// dot of 4 with a 2 ring.
+private const val CHIP_DOT_DP = 4
+private const val CHIP_DOT_RING_DP = 2
+private const val CHIP_MIN_WIDTH_DP = 44
+private const val CHIP_PAD_DP = 6
+private const val CHIP_HEIGHT_DP = 20
+private const val CHIP_CORNER_DP = 6
+private const val CHIP_TAIL_HEIGHT_DP = 6
+private const val CHIP_TAIL_WIDTH_DP = 8
+private const val CHIP_GAP_DP = 8
+private const val CHIP_TAIL_ROUND_DP = 2
+private const val CHIP_RING_DP = 1.5f
+private const val CHIP_FOCUS_RING_DP = 3f
 private const val MAP_METRES_PER_KM = 1_000.0
 
 /** Saving the terrain on the device, so the planner and the panorama work there without the internet. */
