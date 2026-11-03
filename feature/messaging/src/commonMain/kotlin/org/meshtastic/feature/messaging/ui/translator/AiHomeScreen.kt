@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.MaterialTheme
@@ -101,7 +103,7 @@ fun AiHomeScreen(
             onDismissRequest = { showInfo = false },
             title = { Text(stringResource(if (showAssistant) Res.string.assistant_info_title else Res.string.translator_info_title)) },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(stringResource(if (showAssistant) Res.string.assistant_info_body else Res.string.translator_info_body))
                     val autoScroll by uiPrefs.assistantAutoScroll.collectAsStateWithLifecycle()
                     if (showAssistant) {
