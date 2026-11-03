@@ -29,7 +29,6 @@ import androidx.compose.material3.VerticalDragHandle
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.PaneExpansionState
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldScope
-import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.layout.rememberPaneExpansionState
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
@@ -213,8 +212,7 @@ private fun MeshtasticNavDisplayHost(
     val columnMode =
         when {
             !isDesktopPlatform -> ColumnMode.OFF
-            calculatePaneScaffoldDirective(currentWindowAdaptiveInfoSafe()).maxHorizontalPartitions >= 3 ->
-                ColumnMode.THREE
+            windowWidthDp >= THREE_COLUMNS_MIN_WIDTH_DP -> ColumnMode.THREE
             windowWidthDp >= TWO_COLUMNS_MIN_WIDTH_DP -> ColumnMode.TWO
             else -> ColumnMode.OFF
         }
@@ -244,6 +242,9 @@ private fun MeshtasticNavDisplayHost(
 private const val INITIAL_LIST_PANE_PROPORTION = 0.5f
 
 private const val TWO_COLUMNS_MIN_WIDTH_DP = 600f
+
+/** About the width of a laptop screen in full-screen mode; a window opened at its usual size stays below it. */
+private const val THREE_COLUMNS_MIN_WIDTH_DP = 1400f
 
 /** Drag handle for the list-detail scene strategy, with a 48.dp touch-target floor. */
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
