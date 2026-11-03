@@ -18,7 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 * Komputer: ten sam ekran przez chwilę pokazany dwa razy (przy otwarciu dodatkowego ekranu, np. sąsiadów) nie wywala już aplikacji — druga kopia dostaje własny klucz zapisu stanu.
-* Komputer: okno szerokości od 900 dp pokazuje trzy kolumny także przy otwarciu ekranu na szczegółach węzła (np. sąsiedzi), co usuwa awarię „klucz użyty wiele razy”; lista sąsiadów nie liczy zaślepki o numerze 0.
+* Komputer: w węższym oknie (od 600 dp), gdy na szczegółach węzła otwarty jest dodatkowy ekran (np. sąsiedzi), lista węzłów chowa się, a szczegóły i dodatkowy ekran dzielą okno (dwie kolumny z suwakiem); trzy kolumny tylko w szerokim oknie. Lista sąsiadów nie liczy zaślepki o numerze 0.
 * Komputer: zapisany z poprzedniej sesji stos nawigacji z powtórzonymi ekranami (ten sam węzeł dwa razy) nie wywala już aplikacji przy starcie; powtórzenia są usuwane.
 * Komputer: węzeł otwarty z mapy lub z widoku sieci nie zostawia już w zakładce Węzły podwójnych szczegółów tego samego węzła (po ponownym dotknięciu i wejściu w listę informacji o sąsiadach aplikacja zgłaszała błąd klucza użytego wiele razy).
 * Panorama terenu, Teren offline: przycisk w Opcjach zapisuje na urządzeniu teren wokół miejsca obserwacji; wybierasz ile zapisać (2, 5, 15, 25, 40, 80 lub 100 km, domyślnie 100; zasięg 100 km dodany); zapisany teren działa bez internetu w panoramie i w planerze łączy, jest pokazany jego rozmiar i można go usunąć.
@@ -520,7 +520,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 * Desktop: the same screen shown twice for a moment (when an extra screen such as neighbours opens) no longer crashes the app; the second copy gets its own saved-state key.
-* Desktop: a window 900 dp or wider shows three columns also when a screen (e.g. neighbours) is opened over a node's details, fixing the "key used multiple times" crash; the neighbour list no longer counts the placeholder with number 0.
+* Desktop: in a narrower window (600 dp and up), when an extra screen (e.g. neighbours) is open over a node's details, the node list slides away and the details and the extra screen share the window (two columns with a slider); three columns only in a wide window. The neighbour list no longer counts the placeholder with number 0.
 * Desktop: a navigation stack saved from an earlier session with repeated screens (the same node twice) no longer crashes the app at startup; the repeats are removed.
 * Desktop: a node opened from the map or the mesh view no longer leaves the same node's details twice in the Nodes tab (after a second tap and opening the neighbour info list the app reported a key used several times).
 * Terrain panorama, Offline terrain: a button in Options saves on the device the terrain around the place looked from; you pick how much to save (2, 5, 15, 25, 40, 80 or 100 km, 100 by default; a 100 km range was added); the saved terrain works without the internet in the panorama and in the link planner, its size is shown and it can be deleted.

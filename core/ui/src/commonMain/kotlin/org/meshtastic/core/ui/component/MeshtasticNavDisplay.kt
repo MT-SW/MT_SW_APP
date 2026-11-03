@@ -207,15 +207,19 @@ private fun MeshtasticNavDisplayHost(
     // The library draws the width slider only between two columns. On a wide desktop window (three columns) our own
     // layout takes over, with a slider at both dividers; everything else stays with the library's layout.
     val threeColumnWidths = remember { ThreeColumnWidths() }
-    // A window of 900 dp or more also gets our three columns: the library's two-column layout showed the node's
-    // details twice when an extra screen (e.g. neighbours) was opened on top of them ("Key ... used multiple times").
+    // Wide window: list, detail and extra screen. Narrower (but not phone-sized): the list slides away and the detail
+    // and the extra screen share the window.
     val windowWidthDp = LocalWindowInfo.current.containerSize.width / LocalDensity.current.density
-    val threeColumnsFit =
-        isDesktopPlatform &&
-            (calculatePaneScaffoldDirective(currentWindowAdaptiveInfoSafe()).maxHorizontalPartitions >= 3 ||
-                windowWidthDp >= THREE_COLUMNS_MIN_WIDTH_DP)
+    val columnMode =
+        when {
+            !isDesktopPlatform -> ColumnMode.OFF
+            calculatePaneScaffoldDirective(currentWindowAdaptiveInfoSafe()).maxHorizontalPartitions >= 3 ->
+                ColumnMode.THREE
+            windowWidthDp >= TWO_COLUMNS_MIN_WIDTH_DP -> ColumnMode.TWO
+            else -> ColumnMode.OFF
+        }
     val threeColumnSceneStrategy =
-        remember(threeColumnWidths, threeColumnsFit) { DesktopThreeColumnSceneStrategy(threeColumnWidths, threeColumnsFit) }
+        remember(threeColumnWidths, columnMode) { DesktopThreeColumnSceneStrategy(threeColumnWidths, columnMode) }
 
     // Fades are alpha, not movement, so they follow the theme's effects spec rather than a spatial one.
     val fadeSpec = MaterialTheme.motionScheme.defaultEffectsSpec<Float>()
@@ -239,7 +243,7 @@ private fun MeshtasticNavDisplayHost(
 
 private const val INITIAL_LIST_PANE_PROPORTION = 0.5f
 
-private const val THREE_COLUMNS_MIN_WIDTH_DP = 900f
+private const val TWO_COLUMNS_MIN_WIDTH_DP = 600f
 
 /** Drag handle for the list-detail scene strategy, with a 48.dp touch-target floor. */
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)

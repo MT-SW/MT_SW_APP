@@ -110,21 +110,34 @@ internal class ThreeColumnWidths {
  */
 internal class DesktopThreeColumnSceneStrategy(
     private val widths: ThreeColumnWidths,
-    private val allowed: Boolean,
+    private val mode: ColumnMode,
 ) : SceneStrategy<NavKey> {
 
     override fun SceneStrategyScope<NavKey>.calculateScene(entries: List<NavEntry<NavKey>>): Scene<NavKey>? {
-        if (!allowed) return null
+        if (mode == ColumnMode.OFF) return null
         val extra = entries.lastOrNull()?.takeIf { MeshtasticPanes.isExtra(it) } ?: return null
         val detail = entries.dropLast(1).lastOrNull { MeshtasticPanes.isDetail(it) } ?: return null
         val detailIndex = entries.indexOf(detail)
         val list = entries.take(detailIndex).lastOrNull { MeshtasticPanes.isList(it) } ?: return null
-        return ThreeColumnScene(list, detail, extra, entries.dropLast(1), widths)
+        // In a narrower window the list column slides away and the detail and the extra screen share the window.
+        return ThreeColumnScene(list.takeIf { mode == ColumnMode.THREE }, detail, extra, entries.dropLast(1), widths)
     }
 }
 
+/** How many columns the desktop layout draws when a screen is open over the node's details. */
+internal enum class ColumnMode {
+    /** The library's own layout. */
+    OFF,
+
+    /** Detail and extra screen only; the list is out of view. */
+    TWO,
+
+    /** List, detail and extra screen. */
+    THREE,
+}
+
 private class ThreeColumnScene(
-    private val list: NavEntry<NavKey>,
+    private val list: NavEntry<NavKey>?,
     private val detail: NavEntry<NavKey>,
     private val extra: NavEntry<NavKey>,
     override val previousEntries: List<NavEntry<NavKey>>,
@@ -134,7 +147,7 @@ private class ThreeColumnScene(
     // and three columns the navigation host then swaps the content in place. A different key would show both scenes
     // for a moment, and the same screen cannot be shown twice ("Key ... was used multiple times").
     override val key: Any = Unit
-    override val entries: List<NavEntry<NavKey>> = listOf(list, detail, extra)
+    override val entries: List<NavEntry<NavKey>> = listOfNotNull(list, detail, extra)
     override val content: @Composable () -> Unit = { ThreeColumns(list, detail, extra, widths) }
 
     override fun equals(other: Any?): Boolean =
@@ -145,7 +158,7 @@ private class ThreeColumnScene(
 
 @Composable
 private fun ThreeColumns(
-    list: NavEntry<NavKey>,
+    list: NavEntry<NavKey>?,
     detail: NavEntry<NavKey>,
     extra: NavEntry<NavKey>,
     widths: ThreeColumnWidths,
@@ -159,6 +172,41 @@ private fun ThreeColumns(
     // A plain Layout, not BoxWithConstraints: that one composes its content late (during layout), and while the window
     // switches between two and three columns the same screen would then briefly exist in both layouts at once
     // ("Key ... was used multiple times"). A plain Layout composes with the rest of the screen, as the library's does.
+    if (list == null) {
+        // Two columns: the detail and the extra screen, with one divider between them.
+        var extraShare by remember { mutableFloatStateOf(TWO_COLUMN_EXTRA_SHARE) }
+        val usableTwoDp = ((totalPx - dividerPx).coerceAtLeast(0)) / density.density
+        Layout(
+            modifier = Modifier.fillMaxSize().onSizeChanged { totalPx = it.width },
+            content = {
+                Box(Modifier.fillMaxHeight()) { detail.Content() }
+                ColumnDivider { deltaPx ->
+                    if (usableTwoDp > 0f) {
+                        val minShare = ThreeColumnWidths.MIN_PANE_DP / usableTwoDp
+                        extraShare = (extraShare - deltaPx / density.density / usableTwoDp).coerceIn(minShare, 1f - minShare)
+                    }
+                }
+                Box(Modifier.fillMaxHeight()) { extra.Content() }
+            },
+        ) { measurables, constraints ->
+            val width = constraints.maxWidth
+            val height = constraints.maxHeight
+            val usable = (width - dividerPx).coerceAtLeast(0)
+            val extraW = (usable * extraShare).toInt().coerceIn(0, usable)
+            val detailW = usable - extraW
+            fun measure(index: Int, w: Int) =
+                measurables[index].measure(Constraints(minWidth = w, maxWidth = w, minHeight = height, maxHeight = height))
+            val placeables = listOf(measure(0, detailW), measure(1, dividerPx), measure(2, extraW))
+            layout(width, height) {
+                var x = 0
+                placeables.forEach {
+                    it.placeRelative(x, 0)
+                    x += it.width
+                }
+            }
+        }
+        return
+    }
     Layout(
         modifier = Modifier.fillMaxSize().onSizeChanged { totalPx = it.width },
         content = {
@@ -194,6 +242,8 @@ private fun ThreeColumns(
         }
     }
 }
+
+private const val TWO_COLUMN_EXTRA_SHARE = 0.5f
 
 private val DIVIDER_WIDTH: Dp = 24.dp
 
