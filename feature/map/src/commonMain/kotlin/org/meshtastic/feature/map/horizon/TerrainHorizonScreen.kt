@@ -85,6 +85,11 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.meshtastic.core.ui.util.LocalHorizonPickMapProvider
 import org.meshtastic.core.ui.util.HorizonMapNode
+import org.meshtastic.core.ui.icon.Info
+import androidx.compose.foundation.verticalScroll
+import org.meshtastic.core.resources.close
+import org.meshtastic.core.resources.terrain_horizon_info_body
+import org.meshtastic.core.resources.terrain_horizon_info_title
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.terrain_horizon_save_range
 import org.meshtastic.core.resources.terrain_horizon_saved
@@ -178,6 +183,7 @@ fun TerrainHorizonScreen(
     var onlyVisible by rememberSaveable { mutableStateOf(false) }
     var names by rememberSaveable { mutableStateOf(true) }
     var moreOptions by rememberSaveable { mutableStateOf(false) }
+    var showInfo by rememberSaveable { mutableStateOf(false) }
     var picking by rememberSaveable { mutableStateOf(false) }
     var compass by rememberSaveable { mutableStateOf(true) }
     var moving by rememberSaveable { mutableStateOf(false) }
@@ -192,12 +198,29 @@ fun TerrainHorizonScreen(
             onDismiss = { picking = false },
         )
     }
+    if (showInfo) {
+        AlertDialog(
+            onDismissRequest = { showInfo = false },
+            title = { Text(stringResource(Res.string.terrain_horizon_info_title)) },
+            text = {
+                Text(
+                    stringResource(Res.string.terrain_horizon_info_body),
+                    fontSize = 13.sp,
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                )
+            },
+            confirmButton = { TextButton(onClick = { showInfo = false }) { Text(stringResource(Res.string.close)) } },
+        )
+    }
     Column(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).statusBarsPadding()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onNavigateUp) {
                 Icon(MeshtasticIcons.ArrowBack, stringResource(Res.string.navigate_back), tint = MaterialTheme.colorScheme.onBackground)
             }
             Text(stringResource(Res.string.terrain_horizon_title), color = MaterialTheme.colorScheme.onBackground, modifier = Modifier.weight(1f))
+            IconButton(onClick = { showInfo = true }) {
+                Icon(MeshtasticIcons.Info, stringResource(Res.string.terrain_horizon_info_title), tint = MaterialTheme.colorScheme.onBackground)
+            }
             IconButton(onClick = { moreOptions = !moreOptions }) {
                 Icon(
                     MeshtasticIcons.Settings,

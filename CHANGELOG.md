@@ -17,6 +17,7 @@ Ten plik opisuje wyłącznie zmiany wprowadzone w aplikacji MT_SW_APP **względe
 Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od początku (27 lipca 2026) do dziś, w kolejności chronologicznej. Opis funkcji: [README.md](README.md).
 
 ### Listopad 2026
+* Panorama terenu: ikona informacji na górnej belce (obok koła zębatego) otwiera dokładny opis widoku, jego przycisków i opcji.
 * Panorama terenu: węzły w samej panoramie są rysowane dokładnie jak na głównej mapie (kropka w kolorze węzła z białą obwódką, nad nią plakietka z krótką nazwą i ogonkiem, te same wymiary); zielona i czerwona obwódka zostaje cienką ramką plakietki.
 * Panorama terenu: „Opcje” przeniesione na górną belkę jako ikona koła zębatego (obok aparatu), dzięki czemu rząd przycisków pod belką się nie zawija.
 * Panorama terenu, Przesuń: pokazuje prawdziwą mapę taką jak główna (podkład, przesuwanie, przybliżanie, węzły jako takie same plakietki z kropką) z krzyżykiem pośrodku; po puszczeniu panorama rysuje się od punktu pod krzyżykiem (w wersji bez mapy MapLibre zostaje prosta mapa).
@@ -523,6 +524,7 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### November 2026
+* Terrain panorama: an info icon in the top bar (next to the gear) opens a detailed description of the view, its buttons and options.
 * Terrain panorama: nodes in the panorama itself are drawn exactly as on the main map (a dot in the node's colour with a white ring, above it the badge with the short name and a tail, same sizes); the green and red outline stays as a thin frame on the badge.
 * Terrain panorama: "Options" moved to the top bar as a gear icon (next to the camera), so the row of buttons below it no longer wraps.
 * Terrain panorama, Move: shows a real map like the main one (basemap, panning, zoom, nodes as the same badges with a dot) with a cross in the middle; on letting go the panorama is redrawn from the point under the cross (without the MapLibre map the simple map stays).

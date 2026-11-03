@@ -3006,6 +3006,8 @@ terrain_horizon_fov
 terrain_horizon_from
 terrain_horizon_hint
 terrain_horizon_in_sight
+terrain_horizon_info_body
+terrain_horizon_info_title
 terrain_horizon_labels
 terrain_horizon_loading
 terrain_horizon_move
