@@ -139,3 +139,8 @@ Słowa: tłumacz, komendy tłumacza, /tłumacz, /tlumacz, /sprzęt, /sprzet, his
 Zgłoszenie błędu lub pomysłu jest wśród funkcji MT_SW. Aplikacja sama trzyma logi z ostatnich 24 godzin. W oknie zgłoszenia wybierasz Discord, WhatsApp albo Signal i klikasz „Wyślij”: aplikacja składa paczkę z logami i na telefonie otwiera wybraną aplikację z plikiem i linkiem do grupy, a na komputerze zapisuje zip, otwiera folder i grupę. Plik wysyłasz w grupie sam. Po pierwszym pobraniu modelu asystent pyta o zgodę na test zgodności: jedno krótkie pytanie, raport /sprzęt i sprawdzenie dyktowania. Wynik trafia do jednej paczki w oknie zgłoszenia, nic nie jest wysyłane samo; test można powtórzyć z ikony „i” asystenta.
 Słowa: zgłoś błąd, zgłoszenie, logi 24 godziny, paczka, test zgodności, test asystenta, dyktowanie, Discord, WhatsApp, Signal
 Źródło: Dokumentacja aplikacji: Funkcje MT_SW (sprawdzono 2026-11)
+
+### Jak wyłączyć zwijanie nagłówka w asystencie?
+Ostrzeżenie i przyciski „Kopiuj całą rozmowę" i „Zapisz rozmowę" nad rozmową zwijają się, gdy przewijasz rozmowę palcem w górę, i wracają po przesunięciu w dół. Dzięki temu przy mocno powiększonym ekranie rozmowa ma miejsce. Zwijanie wyłączysz przełącznikiem w oknie informacji (ikona „i" w asystencie). Tam jest też przełącznik automatycznego przewijania rozmowy.
+Słowa: nagłówek asystenta, zwijanie nagłówka, zwijany nagłówek, ikona i, przewijanie rozmowy, duży ekran, kopiuj rozmowę, zapisz rozmowę
+Źródło: Dokumentacja aplikacji: Funkcje MT_SW, asystent (sprawdzono 2026-11)
