@@ -95,7 +95,7 @@ internal object AndroidLogging {
     }
 
     fun header(): String =
-        "MT_SW ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}), Android ${Build.VERSION.RELEASE} " +
+        "MT_SW ${org.meshtastic.core.model.MtswRelease.displayName(BuildConfig.VERSION_NAME)} (${BuildConfig.VERSION_NAME}, ${BuildConfig.VERSION_CODE}), Android ${Build.VERSION.RELEASE} " +
             "(API ${Build.VERSION.SDK_INT}), ${Build.MANUFACTURER} ${Build.MODEL}, ABI ${Build.SUPPORTED_ABIS.firstOrNull()}"
 
     private fun sampleExtras(app: Application): String {

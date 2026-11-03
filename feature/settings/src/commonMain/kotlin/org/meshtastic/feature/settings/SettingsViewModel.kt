@@ -107,8 +107,9 @@ class SettingsViewModel(
     // Process-scoped shared state so other features (e.g. the nightly firmware channel) see the same unlock.
     val hiddenFeaturesUnlocked: StateFlow<Boolean> = hiddenFeaturesUnlock.unlocked
 
+    /** The release as named on GitHub (`v4(2.8.4).test.1`), from the numbers kept in MtswRelease. */
     val appVersionName
-        get() = buildConfigProvider.versionName
+        get() = org.meshtastic.core.model.MtswRelease.displayName(buildConfigProvider.versionName)
 
     val isOtaCapable: StateFlow<Boolean> = isOtaCapableUseCase().stateInWhileSubscribed(initialValue = false)
 

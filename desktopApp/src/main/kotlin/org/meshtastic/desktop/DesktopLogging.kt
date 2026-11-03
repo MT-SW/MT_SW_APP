@@ -64,7 +64,7 @@ private fun desktopHeader(): String {
     val rt = Runtime.getRuntime()
     return "Java ${System.getProperty("java.version")} (${System.getProperty("java.vendor")}), " +
         "${System.getProperty("os.name")} ${System.getProperty("os.version")} ${System.getProperty("os.arch")}, " +
-        "${rt.availableProcessors()} CPUs, heap max ${rt.maxMemory() / MB} MB, version ${DesktopBuildConfig.VERSION_NAME}"
+        "${rt.availableProcessors()} CPUs, heap max ${rt.maxMemory() / MB} MB, version ${org.meshtastic.core.model.MtswRelease.displayName(DesktopBuildConfig.VERSION_NAME)} (${DesktopBuildConfig.VERSION_NAME})"
 }
 
 private const val MB = 1024 * 1024

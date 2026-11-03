@@ -28,4 +28,16 @@ package org.meshtastic.core.model
 object MtswRelease {
     const val RELEASE = 4
     const val TEST = 1
+
+    private val BASE_NUMBER = Regex("^\\d+\\.\\d+\\.\\d+")
+
+    /**
+     * The release as it is named on GitHub, built from the two numbers above and the three-part version of the build:
+     * `v4(2.8.4).test.1` for a test release, `v4(2.8.4)` for a stable one. A [buildVersionName] without a three-part
+     * number at its start is returned as it is.
+     */
+    fun displayName(buildVersionName: String): String {
+        val base = BASE_NUMBER.find(buildVersionName.trim())?.value ?: return buildVersionName
+        return "v$RELEASE($base)" + if (TEST > 0) ".test.$TEST" else ""
+    }
 }
