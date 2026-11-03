@@ -135,6 +135,7 @@ import org.meshtastic.core.resources.terrain_horizon_observer_point
 import org.meshtastic.core.resources.terrain_horizon_observer_title
 import org.meshtastic.core.resources.terrain_horizon_only_visible
 import org.meshtastic.core.resources.terrain_horizon_options
+import org.meshtastic.core.resources.terrain_horizon_node_range
 import org.meshtastic.core.resources.terrain_horizon_range
 import org.meshtastic.core.resources.terrain_horizon_refraction
 import org.meshtastic.core.resources.terrain_horizon_target_antenna
@@ -249,6 +250,11 @@ fun TerrainHorizonScreen(
         ChipRow(stringResource(Res.string.terrain_horizon_range)) {
             HORIZON_RADII_KM.forEach { km ->
                 BrandChip(selected = state.radiusKm == km, onClick = { viewModel.setRadius(km) }, label = { Text("$km km") })
+            }
+        }
+        ChipRow(stringResource(Res.string.terrain_horizon_node_range)) {
+            HORIZON_NODE_RANGES_KM.forEach { km ->
+                BrandChip(selected = state.nodeRangeKm == km, onClick = { viewModel.setNodeRange(km) }, label = { Text("$km km") })
             }
         }
         ChipRow(stringResource(Res.string.terrain_horizon_antenna)) {

@@ -635,7 +635,23 @@ interface MapPrefs {
     val meshHudCoachSeen: StateFlow<Boolean>
 
     fun setMeshHudCoachSeen(seen: Boolean)
+
+    /** The terrain panorama's saved settings, loaded once when the panorama opens. */
+    suspend fun awaitHorizonPrefs(): HorizonPrefs
+
+    /** Applies [transform] to the terrain panorama's saved settings. */
+    fun updateHorizonPrefs(transform: (HorizonPrefs) -> HorizonPrefs)
 }
+
+/** What the terrain panorama remembers between visits: the range, the antenna heights and the radio-horizon factor. */
+data class HorizonPrefs(
+    val radiusKm: Int = 15,
+    val nodeRangeKm: Int = 100,
+    val antennaAuto: Boolean = true,
+    val antennaM: Int = 2,
+    val targetAntennaM: Int = 2,
+    val refraction: Double = 4.0 / 3.0,
+)
 
 data class MapCameraPosition(val latitude: Double, val longitude: Double, val zoom: Double)
 

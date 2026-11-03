@@ -3530,6 +3530,7 @@
     <string name="terrain_horizon_network">Nie udało się wczytać terenu. Sprawdź połączenie z internetem.</string>
     <string name="terrain_horizon_camera">Aparat</string>
     <string name="terrain_horizon_range">Zasięg</string>
+    <string name="terrain_horizon_node_range">Węzły do</string>
     <string name="terrain_horizon_antenna">Moja antena</string>
     <string name="terrain_horizon_in_sight">Węzły w zasięgu wzroku: %1$d z %2$d</string>
     <string name="terrain_horizon_hint">Przesuń palcem, żeby obrócić widok. Zielona obwódka: węzeł stoi nad grzbietem przed nim. Czerwona obwódka: grzbiet go zasłania. Tylko geometria: widoczny węzeł może mimo to być poza zasięgiem radia. Teren: Mapterhorn. Metoda: MeshRF (GPL-3.0).</string>

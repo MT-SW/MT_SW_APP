@@ -29,6 +29,7 @@ import org.meshtastic.core.repository.AutoCleanNodesPolicy
 import org.meshtastic.core.repository.CustomEmojiPrefs
 import org.meshtastic.core.repository.FilterPrefs
 import org.meshtastic.core.repository.HomoglyphPrefs
+import org.meshtastic.core.repository.HorizonPrefs
 import org.meshtastic.core.repository.MapCameraPosition
 import org.meshtastic.core.repository.MapConsentPrefs
 import org.meshtastic.core.repository.MapFilterPrefs
@@ -522,6 +523,14 @@ class FakeMapPrefs : MapPrefs {
 
     override fun setMeshHudCoachSeen(seen: Boolean) {
         meshHudCoachSeen.value = seen
+    }
+
+    private var horizonPrefs = HorizonPrefs()
+
+    override suspend fun awaitHorizonPrefs(): HorizonPrefs = horizonPrefs
+
+    override fun updateHorizonPrefs(transform: (HorizonPrefs) -> HorizonPrefs) {
+        horizonPrefs = transform(horizonPrefs)
     }
 }
 

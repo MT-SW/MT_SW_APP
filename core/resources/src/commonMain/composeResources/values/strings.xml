@@ -3084,6 +3084,7 @@
     <string name="terrain_horizon_move_hint">Drag the map to look from another place. Letting go redraws the panorama.</string>
     <string name="terrain_horizon_network">The terrain data could not be loaded. Check the internet connection.</string>
     <string name="terrain_horizon_no_position">No position of this phone or of your node yet, so the view cannot be drawn.</string>
+    <string name="terrain_horizon_node_range">Nodes up to</string>
     <string name="terrain_horizon_none">No node with a position within this range.</string>
     <string name="terrain_horizon_observer_my_node">My node</string>
     <string name="terrain_horizon_observer_node">Another node…</string>

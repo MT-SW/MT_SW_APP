@@ -35,6 +35,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.annotation.Single
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.prefs.di.MapDataStore
+import org.meshtastic.core.repository.HorizonPrefs
 import org.meshtastic.core.repository.MapCameraPosition
 import org.meshtastic.core.repository.MapFilterPrefs
 import org.meshtastic.core.repository.MapPrefs
@@ -169,6 +170,34 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         scope.launch { dataStore.edit { it[KEY_MESH_HUD_COACH_SEEN_PREF] = seen } }
     }
 
+    override suspend fun awaitHorizonPrefs(): HorizonPrefs = dataStore.data.map { it.toHorizonPrefs() }.first()
+
+    override fun updateHorizonPrefs(transform: (HorizonPrefs) -> HorizonPrefs) {
+        scope.launch {
+            dataStore.edit {
+                val next = transform(it.toHorizonPrefs())
+                it[KEY_HORIZON_RADIUS_KM] = next.radiusKm
+                it[KEY_HORIZON_NODE_RANGE_KM] = next.nodeRangeKm
+                it[KEY_HORIZON_ANTENNA_AUTO] = next.antennaAuto
+                it[KEY_HORIZON_ANTENNA_M] = next.antennaM
+                it[KEY_HORIZON_TARGET_ANTENNA_M] = next.targetAntennaM
+                it[KEY_HORIZON_REFRACTION] = next.refraction
+            }
+        }
+    }
+
+    private fun Preferences.toHorizonPrefs(): HorizonPrefs {
+        val defaults = HorizonPrefs()
+        return HorizonPrefs(
+            radiusKm = this[KEY_HORIZON_RADIUS_KM] ?: defaults.radiusKm,
+            nodeRangeKm = this[KEY_HORIZON_NODE_RANGE_KM] ?: defaults.nodeRangeKm,
+            antennaAuto = this[KEY_HORIZON_ANTENNA_AUTO] ?: defaults.antennaAuto,
+            antennaM = this[KEY_HORIZON_ANTENNA_M] ?: defaults.antennaM,
+            targetAntennaM = this[KEY_HORIZON_TARGET_ANTENNA_M] ?: defaults.targetAntennaM,
+            refraction = this[KEY_HORIZON_REFRACTION] ?: defaults.refraction,
+        )
+    }
+
     companion object {
         val KEY_MESH_HUD_COACH_SEEN_PREF = booleanPreferencesKey("mesh_hud_coach_seen")
         val KEY_MAP_STYLE_PREF = intPreferencesKey("map_style_id")
@@ -189,6 +218,12 @@ class MapPrefsImpl(private val dataStore: MapDataStore, dispatchers: CoroutineDi
         val KEY_SHOW_IGNORED_PREF = booleanPreferencesKey("map_show_ignored")
         val KEY_INCLUDE_UNKNOWN_PREF = booleanPreferencesKey("map_include_unknown")
         val KEY_EXCLUDED_ROLES_PREF = stringSetPreferencesKey("map_excluded_roles")
+        val KEY_HORIZON_RADIUS_KM = intPreferencesKey("horizon_radius_km")
+        val KEY_HORIZON_NODE_RANGE_KM = intPreferencesKey("horizon_node_range_km")
+        val KEY_HORIZON_ANTENNA_AUTO = booleanPreferencesKey("horizon_antenna_auto")
+        val KEY_HORIZON_ANTENNA_M = intPreferencesKey("horizon_antenna_m")
+        val KEY_HORIZON_TARGET_ANTENNA_M = intPreferencesKey("horizon_target_antenna_m")
+        val KEY_HORIZON_REFRACTION = doublePreferencesKey("horizon_refraction")
         val KEY_CAMERA_LATITUDE = doublePreferencesKey("camera_latitude")
         val KEY_CAMERA_LONGITUDE = doublePreferencesKey("camera_longitude")
         val KEY_CAMERA_ZOOM = doublePreferencesKey("camera_zoom")

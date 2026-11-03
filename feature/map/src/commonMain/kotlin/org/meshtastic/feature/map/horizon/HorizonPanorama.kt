@@ -134,7 +134,8 @@ object HorizonPanorama {
 
     /**
      * Places [nodes] (number, name, position) against [profile]; [targetAntennaM] is the height of their antennas above
-     * the ground. Nodes at the station itself or beyond the radius are left out.
+     * the ground. Nodes at the station itself or beyond [maxDistanceM] are left out; the terrain hiding a node is taken only
+     * from inside the profile radius.
      */
     fun place(
         profile: HorizonProfile,
@@ -142,16 +143,19 @@ object HorizonPanorama {
         nodes: List<Triple<Int, String, GeoPoint>>,
         targetAntennaM: Double,
         k: Double = DEFAULT_K,
+        maxDistanceM: Double = profile.radiusM,
     ): List<HorizonTarget> {
         val effectiveRadius = Geodesy.EARTH_RADIUS_M * k
         return nodes.mapNotNull { (num, name, at) ->
             val distance = Geodesy.distanceM(profile.centre, at)
-            if (distance <= 0 || distance > profile.radiusM) return@mapNotNull null
+            if (distance <= 0 || distance > maxDistanceM) return@mapNotNull null
             val bearing = Geodesy.bearingDeg(profile.centre, at)
             val angle = angleDeg(profile.observerM, ground(at.lat, at.lon) + targetAntennaM, distance, effectiveRadius)
             var highest = Double.NEGATIVE_INFINITY
             var d = profile.stepM
-            while (d < distance) {
+            // Terrain is known only as far as the profile reaches; farther nodes are hidden only by what lies inside it.
+            val known = minOf(distance, profile.radiusM)
+            while (d < known) {
                 val p = Geodesy.destination(profile.centre, bearing, d)
                 val a = angleDeg(profile.observerM, ground(p.lat, p.lon), d, effectiveRadius)
                 if (a > highest) highest = a

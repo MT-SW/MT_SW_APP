@@ -3015,6 +3015,7 @@ terrain_horizon_move_back
 terrain_horizon_move_hint
 terrain_horizon_network
 terrain_horizon_no_position
+terrain_horizon_node_range
 terrain_horizon_none
 terrain_horizon_observer_my_node
 terrain_horizon_observer_node

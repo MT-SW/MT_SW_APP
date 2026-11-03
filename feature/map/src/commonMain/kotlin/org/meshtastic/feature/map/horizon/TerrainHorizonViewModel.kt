@@ -32,6 +32,8 @@ import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.Node
+import org.meshtastic.core.repository.HorizonPrefs
+import org.meshtastic.core.repository.MapPrefs
 import org.meshtastic.core.repository.MagneticFieldProvider
 import org.meshtastic.feature.map.hud.CameraPoseProvider
 import kotlinx.coroutines.flow.Flow
@@ -76,6 +78,8 @@ data class TerrainHorizonState(
     val profile: HorizonProfile? = null,
     val targets: List<HorizonTarget> = emptyList(),
     val radiusKm: Int = DEFAULT_RADIUS_KM,
+    /** How far the nodes are drawn (km), independent of how far the terrain is loaded. */
+    val nodeRangeKm: Int = DEFAULT_NODE_RANGE_KM,
     val observer: HorizonObserver = HorizonObserver.MyNode,
     /** The name of the node (or "") the view is looked from, for the label. */
     val observerName: String = "",
@@ -111,6 +115,8 @@ data class TerrainHorizonState(
 )
 
 const val DEFAULT_RADIUS_KM = 15
+const val DEFAULT_NODE_RANGE_KM = 100
+val HORIZON_NODE_RANGES_KM = listOf(25, 50, 100, 200, 500, 1000)
 const val DEFAULT_ANTENNA_M = 2
 val HORIZON_RADII_KM = listOf(2, 5, 15, 25, 40, 80, 100)
 
@@ -140,6 +146,7 @@ class TerrainHorizonViewModel(
     private val terrainStore: TerrainStore,
     private val poseProvider: CameraPoseProvider,
     private val magneticFieldProvider: MagneticFieldProvider,
+    private val mapPrefs: MapPrefs,
     private val dispatchers: CoroutineDispatchers,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TerrainHorizonState())
@@ -154,10 +161,26 @@ class TerrainHorizonViewModel(
         opened = true
         _state.update { it.copy(focusNodeNum = focusNodeNum) }
         viewModelScope.launch { _state.update { it.copy(savedBytes = withContext(dispatchers.io) { terrainStore.sizeBytes() }) } }
-        reload()
+        // The range, antenna heights and radio-horizon factor picked last time come back before the first drawing.
+        viewModelScope.launch {
+            val saved = mapPrefs.awaitHorizonPrefs()
+            _state.update {
+                it.copy(
+                    radiusKm = saved.radiusKm,
+                    nodeRangeKm = saved.nodeRangeKm,
+                    antennaAuto = saved.antennaAuto,
+                    antennaM = saved.antennaM,
+                    targetAntennaM = saved.targetAntennaM,
+                    refraction = saved.refraction,
+                )
+            }
+            reload()
+        }
     }
 
     fun setRadius(km: Int) = change { it.copy(radiusKm = km) }
+
+    fun setNodeRange(km: Int) = change { it.copy(nodeRangeKm = km) }
 
     fun setObserver(observer: HorizonObserver) = change { it.copy(observer = observer) }
 
@@ -227,6 +250,16 @@ class TerrainHorizonViewModel(
         val after = transform(before)
         if (after == before) return
         _state.value = after
+        mapPrefs.updateHorizonPrefs {
+            HorizonPrefs(
+                radiusKm = after.radiusKm,
+                nodeRangeKm = after.nodeRangeKm,
+                antennaAuto = after.antennaAuto,
+                antennaM = after.antennaM,
+                targetAntennaM = after.targetAntennaM,
+                refraction = after.refraction,
+            )
+        }
         reload()
     }
 
@@ -258,7 +291,7 @@ class TerrainHorizonViewModel(
                     val (profile, targets) =
                         withContext(dispatchers.default) {
                             val built = HorizonPanorama.build(ground, spot.at, height, radiusKm * METRES_PER_KM, k = settings.refraction)
-                            built to HorizonPanorama.place(built, ground, nodes, settings.targetAntennaM.toDouble(), settings.refraction)
+                            built to HorizonPanorama.place(built, ground, nodes, settings.targetAntennaM.toDouble(), settings.refraction, maxOf(settings.nodeRangeKm, radiusKm) * METRES_PER_KM)
                         }
                     _state.update {
                         it.copy(
