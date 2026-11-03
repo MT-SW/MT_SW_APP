@@ -3037,14 +3037,28 @@
     <string name="terminate_app_message">The app will disconnect from the device, stop its background service and end the whole process, like "Force stop" in the system settings. Start it again to resume.</string>
     <!-- TERRAIN -->
     <string name="terrain_horizon_antenna">My antenna</string>
+    <string name="terrain_horizon_antenna_auto">From node</string>
+    <string name="terrain_horizon_apply">Show</string>
     <string name="terrain_horizon_camera">Camera</string>
+    <string name="terrain_horizon_fov">Field of view</string>
+    <string name="terrain_horizon_from">From</string>
     <string name="terrain_horizon_hint">Drag to turn the view. Green: the node stands above the ridge in front of it. Red: a ridge hides it. Geometry only: a node in sight can still be out of range. Terrain: Mapterhorn. Method: MeshRF (GPL-3.0).</string>
     <string name="terrain_horizon_in_sight">Nodes in sight: %1$d of %2$d</string>
+    <string name="terrain_horizon_labels">Names</string>
     <string name="terrain_horizon_loading">Reading terrain…</string>
     <string name="terrain_horizon_network">The terrain data could not be loaded. Check the internet connection.</string>
     <string name="terrain_horizon_no_position">No position of this phone or of your node yet, so the view cannot be drawn.</string>
     <string name="terrain_horizon_none">No node with a position within this range.</string>
+    <string name="terrain_horizon_observer_my_node">My node</string>
+    <string name="terrain_horizon_observer_node">Another node…</string>
+    <string name="terrain_horizon_observer_phone">This phone</string>
+    <string name="terrain_horizon_observer_point">Own position…</string>
+    <string name="terrain_horizon_observer_title">View from</string>
+    <string name="terrain_horizon_only_visible">Only nodes in sight</string>
+    <string name="terrain_horizon_options">Options</string>
     <string name="terrain_horizon_range">Range</string>
+    <string name="terrain_horizon_refraction">Radio horizon (earth factor)</string>
+    <string name="terrain_horizon_target_antenna">Node antennas</string>
     <string name="terrain_horizon_title">Terrain panorama</string>
     <!-- THEME -->
     <string name="theme">Theme</string>
