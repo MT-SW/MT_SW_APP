@@ -49,6 +49,7 @@
     <string name="connected_sleeping">Connectat a ràdio, però està hivernant</string>
     <!-- DEBUG -->
     <string name="debug_panel">Panell de depuració</string>
+    <!-- DEEP -->
     <!-- DELETE -->
     <string name="delete">Esborrar</string>
     <string name="delete_for_everyone">Esborrar per a tothom</string>
@@ -255,6 +256,7 @@
     <string name="waypoint_edit">Editar punt de pas</string>
     <string name="waypoint_new">Nou punt de pas</string>
     <string name="waypoint_received">Punt de pas rebut: %1$s</string>
+    <!-- WIDGET -->
     <!-- WIFI -->
     <string name="wifi_provision_success_ip_address">Adreça IP</string>
     <!-- WIND -->

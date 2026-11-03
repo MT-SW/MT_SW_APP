@@ -171,6 +171,7 @@
     <string name="debug_search_clear">Limpar busca</string>
     <string name="debug_search_next">Próxima correspondência</string>
     <string name="debug_search_prev">Correspondência anterior</string>
+    <!-- DEEP -->
     <string name="default_">Padrão</string>
     <!-- DELETE -->
     <string name="delete">Excluir</string>
@@ -664,6 +665,7 @@
     <string name="waypoint_new">Novo ponto de referência</string>
     <string name="waypoint_received">Ponto de referência recebido: %1$s</string>
     <string name="weight">Peso</string>
+    <!-- WIDGET -->
     <!-- WIFI -->
     <string name="wifi_provision_success_done">Concluído</string>
     <string name="wifi_provision_success_ip_address">Endereço IP</string>

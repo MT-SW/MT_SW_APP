@@ -248,6 +248,7 @@
     <string name="debug_search_prev">上一個符合的</string>
     <string name="debug_store_logs_summary">停用後將不會把網狀網路日誌寫入磁碟</string>
     <string name="debug_store_logs_title">儲存網狀網路日誌</string>
+    <!-- DEEP -->
     <string name="default_">默認</string>
     <!-- DELETE -->
     <string name="delete">刪除</string>
@@ -1268,6 +1269,8 @@ You can find detailed instructions and documentation on the official Meshtastic 
     <string name="waypoint_new">新建航點</string>
     <string name="waypoint_received">收到編輯航點：%1$s</string>
     <string name="weight">重量</string>
+    <!-- WIDGET -->
+    <string name="widget_pair_value">%1$d / %2$d</string>
     <!-- WIFI -->
     <string name="wifi_devices">mPWRD-OS 的 Wi-Fi 設定</string>
     <string name="wifi_provision_available_networks">可用的網路</string>

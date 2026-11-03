@@ -157,8 +157,9 @@ import org.meshtastic.core.database.entity.TracerouteNodePositionEntity
         // 63 -> 64 is the manual MIGRATION_63_64 (log index added in place), applied via configureCommon().
         AutoMigration(from = 64, to = 65),
         AutoMigration(from = 65, to = 66),
+        // 66 -> 67 and 67 -> 68 are the manual MIGRATION_66_67 and MIGRATION_67_68 (the fork's own, guarded), applied via configureCommon().
     ],
-    version = 67,
+    version = 68,
     exportSchema = true,
 )
 @androidx.room3.ConstructedBy(MeshtasticDatabaseConstructor::class)
@@ -305,6 +306,40 @@ abstract class MeshtasticDatabase : RoomDatabase() {
             }
 
         /**
+         * Brings every database to version 68: the two columns the original added to `reactions` for the MQTT origin of
+         * a reaction (`via_mqtt`, `transport_mechanism`), and, for a database that came from the original's own version
+         * 67, the fork's three log indices. Everything is guarded, so it is safe whichever way the database got here.
+         */
+        internal val MIGRATION_67_68: Migration =
+            object : Migration(67, 68) {
+                override suspend fun migrate(connection: SQLiteConnection) {
+                    val columns = buildList {
+                        connection.prepare("PRAGMA table_info(`reactions`)").use { info ->
+                            while (info.step()) add(info.getText(1))
+                        }
+                    }
+                    if ("via_mqtt" !in columns) {
+                        connection.execSQL("ALTER TABLE `reactions` ADD COLUMN `via_mqtt` INTEGER NOT NULL DEFAULT 0")
+                    }
+                    if ("transport_mechanism" !in columns) {
+                        connection.execSQL("ALTER TABLE `reactions` ADD COLUMN `transport_mechanism` INTEGER")
+                    }
+                    connection.execSQL(
+                        "CREATE INDEX IF NOT EXISTS `index_log_port_num_received_date` " +
+                            "ON `log` (`port_num`, `received_date`)",
+                    )
+                    connection.execSQL(
+                        "CREATE INDEX IF NOT EXISTS `index_log_from_num_received_date` " +
+                            "ON `log` (`from_num`, `received_date`)",
+                    )
+                    connection.execSQL(
+                        "CREATE INDEX IF NOT EXISTS `index_log_port_num_from_num_received_date` " +
+                            "ON `log` (`port_num`, `from_num`, `received_date`)",
+                    )
+                }
+            }
+
+        /**
          * Configures a [RoomDatabase.Builder] with standard settings for this project.
          *
          * All platforms force [setSingleConnectionPool]. Without it, Room defaults to a 4-reader pool for named
@@ -321,7 +356,7 @@ abstract class MeshtasticDatabase : RoomDatabase() {
         @OptIn(ExperimentalCoroutinesApi::class)
         fun <T : RoomDatabase> RoomDatabase.Builder<T>.configureCommon(): RoomDatabase.Builder<T> =
             this.fallbackToDestructiveMigration(dropAllTables = false)
-                .addMigrations(MIGRATION_52_53, MIGRATION_63_64, MIGRATION_66_67)
+                .addMigrations(MIGRATION_52_53, MIGRATION_63_64, MIGRATION_66_67, MIGRATION_67_68)
                 .setSingleConnectionPool()
                 .setConnectionPoolTimeout(ROOM_POOL_ACQUIRE_TIMEOUT)
                 .setQueryCoroutineContext(

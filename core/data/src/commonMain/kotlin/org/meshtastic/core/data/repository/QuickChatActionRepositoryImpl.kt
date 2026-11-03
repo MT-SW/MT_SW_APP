@@ -41,7 +41,7 @@ class QuickChatActionRepositoryImpl(
     private val seedMutex = Mutex()
 
     override fun getAllActions(): Flow<List<QuickChatAction>> = dbManager
-        .observeCurrentDb { it.quickChatActionDao().getAll() }
+        .observeCurrentDb("QuickChatActionRepository.getAllActions") { it.quickChatActionDao().getAll() }
         .map { actions -> actions.map { it.asExternalModel() } }
         .onStart { seedDefaultsIfNeeded() }
         .flowOn(dispatchers.io)

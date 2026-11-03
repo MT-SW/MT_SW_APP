@@ -3567,4 +3567,10 @@
     <string name="ai_experimental_title">Funkcja eksperymentalna</string>
     <string name="ai_experimental_body">Asystent, tłumacz i dyktowanie działają w całości na Twoim urządzeniu i wciąż są rozwijane. Będziemy bardzo wdzięczni, jeśli wypróbujesz różne modele i zgłosisz każdy problem oraz spostrzeżenie: który model u Ciebie działa najlepiej, jak szybko odpowiada, na czym pracuje (NPU, karta graficzna, procesor), czy się nie zawiesza i jakie błędy popełnia. Test zgodności i komenda /sprzęt w asystencie zbiorą potrzebne dane.</string>
     <string name="ai_experimental_report">Zgłoś uwagi o modelach</string>
+    <string name="widget_bad_dropped">Błędne / odrzucone</string>
+    <string name="widget_node_tracker_title">Śledzenie węzła</string>
+    <string name="widget_pair_value">%1$d / %2$d</string>
+    <string name="widget_relays_canceled">Przekazane / anulowane</string>
+    <string name="widget_traffic">TX / RX</string>
+    <string name="deep_link_connect_with_pin_message">Link prosi tę aplikację o sparowanie z urządzeniem pod adresem %1$s przy użyciu PIN-u %2$s, a następnie o połączenie z nim. PIN jest skopiowany, więc możesz go wkleić, jeśli aplikacja o niego poprosi. Kontynuuj tylko jeśli ufasz źródłu tego linku.</string>
 </resources>

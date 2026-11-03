@@ -106,6 +106,7 @@
     <string name="debug_filters">필터</string>
     <string name="debug_logs_export">로그 내보내기</string>
     <string name="debug_panel">디버그 패널</string>
+    <!-- DEEP -->
     <string name="default_">기본값</string>
     <!-- DELETE -->
     <string name="delete">삭제</string>
@@ -505,6 +506,7 @@
     <string name="waypoint_new">새 웨이포인트</string>
     <string name="waypoint_received">웨이포인트 수신: %1$s</string>
     <string name="weight">무게</string>
+    <!-- WIDGET -->
     <!-- WIFI -->
     <string name="wifi_provision_success_ip_address">IP 주소</string>
     <string name="wifi_provision_success_username">사용자명</string>

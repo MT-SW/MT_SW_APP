@@ -271,7 +271,7 @@ class RadioConfigViewModelTest {
                 it.args.onRequestIdArg()(43)
                 43
             }
-        every { processRadioResponseUseCase(any(), 456, any()) } calls
+        every { processRadioResponseUseCase(any(), 456, any(), any(), any()) } calls
             {
                 val requestId = (it.args[0] as MeshPacket).decoded?.request_id
 
@@ -363,7 +363,7 @@ class RadioConfigViewModelTest {
                     wb.broadcast_message = "hi"
                 }
                 .build()
-        every { processRadioResponseUseCase(any(), 123, any()) } returns
+        every { processRadioResponseUseCase(any(), 123, any(), any(), any()) } returns
             RadioResponseResult.ModuleConfigResponse(
                 ModuleConfig.Builder().also { wb -> wb.mesh_beacon = beacon }.build(),
             )
@@ -371,7 +371,7 @@ class RadioConfigViewModelTest {
         // Pins the mesh_beacon merge line: without it the reply is dropped and the editor renders defaults.
         assertEquals(beacon, viewModel.radioConfigState.value.moduleConfig.mesh_beacon)
 
-        every { processRadioResponseUseCase(any(), 123, any()) } returns
+        every { processRadioResponseUseCase(any(), 123, any(), any(), any()) } returns
             RadioResponseResult.ModuleConfigResponse(
                 ModuleConfig.Builder()
                     .also { wb ->
@@ -682,7 +682,8 @@ class RadioConfigViewModelTest {
         val packetFlow = MutableSharedFlow<MeshPacket>()
 
         every { serviceRepository.meshPacketFlow } returns packetFlow
-        every { processRadioResponseUseCase(any(), 123, any()) } returns RadioResponseResult.Metadata(metadata)
+        every { processRadioResponseUseCase(any(), 123, any(), any(), any()) } returns
+            RadioResponseResult.Metadata(metadata)
 
         viewModel = createViewModel()
 
@@ -864,7 +865,7 @@ class RadioConfigViewModelTest {
         val node = Node(num = 123, user = User.Builder().also { wb -> wb.id = "!123" }.build())
         val packetFlow = MutableSharedFlow<MeshPacket>()
         every { serviceRepository.meshPacketFlow } returns packetFlow
-        every { processRadioResponseUseCase(any(), 123, any()) } returns RadioResponseResult.Success
+        every { processRadioResponseUseCase(any(), 123, any(), any(), any()) } returns RadioResponseResult.Success
         nodeRepository.setNodes(listOf(node))
         viewModel = createViewModel()
 
@@ -924,7 +925,7 @@ class RadioConfigViewModelTest {
         val writtenIndexes = mutableListOf<Int>()
 
         every { serviceRepository.meshPacketFlow } returns packetFlow
-        every { processRadioResponseUseCase(any(), 123, any()) } returns
+        every { processRadioResponseUseCase(any(), 123, any(), any(), any()) } returns
             RadioResponseResult.Error(org.meshtastic.core.resources.UiText.DynamicString("Max Retransmission Reached"))
         nodeRepository.setNodes(listOf(node))
         viewModel = createViewModel()
@@ -969,7 +970,7 @@ class RadioConfigViewModelTest {
         val writtenIndexes = mutableListOf<Int>()
 
         every { serviceRepository.meshPacketFlow } returns packetFlow
-        every { processRadioResponseUseCase(any(), 123, any()) } returns
+        every { processRadioResponseUseCase(any(), 123, any(), any(), any()) } returns
             RadioResponseResult.Error(org.meshtastic.core.resources.UiText.DynamicString("Max Retransmission Reached"))
         nodeRepository.setNodes(listOf(node))
         viewModel = createViewModel()
@@ -1136,7 +1137,7 @@ class RadioConfigViewModelTest {
                 it.args.onRequestIdArg()(100)
                 100
             }
-        every { processRadioResponseUseCase(any(), 123, any()) } calls
+        every { processRadioResponseUseCase(any(), 123, any(), any(), any()) } calls
             {
                 val pendingRequestIds = it.arg<Set<Int>>(2)
                 if (42 in pendingRequestIds) RadioResponseResult.Owner(owner) else null
@@ -1313,7 +1314,7 @@ class RadioConfigViewModelTest {
         every { serviceRepository.meshPacketFlow } returns packetFlow
         // AdminRoute first sends a session key config request; the admin action fires
         // only after the actual ConfigResponse (not a routing ACK / Success).
-        every { processRadioResponseUseCase(any(), any(), any()) } returns
+        every { processRadioResponseUseCase(any(), any(), any(), any(), any()) } returns
             RadioResponseResult.ConfigResponse(Config.Builder().build())
 
         viewModel = createViewModel()
@@ -1335,7 +1336,7 @@ class RadioConfigViewModelTest {
 
         val packetFlow = MutableSharedFlow<MeshPacket>()
         every { serviceRepository.meshPacketFlow } returns packetFlow
-        every { processRadioResponseUseCase(any(), any(), any()) } returns
+        every { processRadioResponseUseCase(any(), any(), any(), any(), any()) } returns
             RadioResponseResult.ConfigResponse(Config.Builder().build())
 
         viewModel = createViewModel()
@@ -1355,7 +1356,7 @@ class RadioConfigViewModelTest {
 
         val packetFlow = MutableSharedFlow<MeshPacket>()
         every { serviceRepository.meshPacketFlow } returns packetFlow
-        every { processRadioResponseUseCase(any(), any(), any()) } returns
+        every { processRadioResponseUseCase(any(), any(), any(), any(), any()) } returns
             RadioResponseResult.ConfigResponse(Config.Builder().build())
 
         viewModel = createViewModel()
@@ -1416,7 +1417,7 @@ class RadioConfigViewModelTest {
         every { serviceRepository.meshPacketFlow } returns packetFlow
         // AdminRoute first sends a session key config request; the admin action fires
         // only after the actual ConfigResponse (not a routing ACK / Success).
-        every { processRadioResponseUseCase(any(), any(), any()) } returns
+        every { processRadioResponseUseCase(any(), any(), any(), any(), any()) } returns
             RadioResponseResult.ConfigResponse(Config.Builder().build())
 
         viewModel = createViewModel()
@@ -1441,7 +1442,7 @@ class RadioConfigViewModelTest {
 
         val packetFlow = MutableSharedFlow<MeshPacket>()
         every { serviceRepository.meshPacketFlow } returns packetFlow
-        every { processRadioResponseUseCase(any(), any(), any()) } returns
+        every { processRadioResponseUseCase(any(), any(), any(), any(), any()) } returns
             RadioResponseResult.ConfigResponse(Config.Builder().build())
 
         viewModel = createViewModel()
@@ -1887,7 +1888,7 @@ class RadioConfigViewModelTest {
             Config.Builder()
                 .also { wb -> wb.lora = Config.LoRaConfig.Builder().also { wb -> wb.hop_limit = 5 }.build() }
                 .build()
-        every { processRadioResponseUseCase(any(), 123, any()) } returns
+        every { processRadioResponseUseCase(any(), 123, any(), any(), any()) } returns
             RadioResponseResult.ConfigResponse(configResponse)
         packetFlow.emit(MeshPacket.Builder().build())
         assertEquals(5, viewModel.radioConfigState.value.radioConfig.lora?.hop_limit)
@@ -1902,24 +1903,25 @@ class RadioConfigViewModelTest {
                             .build()
                 }
                 .build()
-        every { processRadioResponseUseCase(any(), 123, any()) } returns
+        every { processRadioResponseUseCase(any(), 123, any(), any(), any()) } returns
             RadioResponseResult.ModuleConfigResponse(moduleResponse)
         packetFlow.emit(MeshPacket.Builder().build())
         assertEquals(300, viewModel.radioConfigState.value.moduleConfig.telemetry?.device_update_interval)
 
         // Owner
         val user = User.Builder().also { wb -> wb.long_name = "New Name" }.build()
-        every { processRadioResponseUseCase(any(), 123, any()) } returns RadioResponseResult.Owner(user)
+        every { processRadioResponseUseCase(any(), 123, any(), any(), any()) } returns RadioResponseResult.Owner(user)
         packetFlow.emit(MeshPacket.Builder().build())
         assertEquals("New Name", viewModel.radioConfigState.value.userConfig.long_name)
 
         // Ringtone
-        every { processRadioResponseUseCase(any(), 123, any()) } returns RadioResponseResult.Ringtone("bell.mp3")
+        every { processRadioResponseUseCase(any(), 123, any(), any(), any()) } returns
+            RadioResponseResult.Ringtone("bell.mp3")
         packetFlow.emit(MeshPacket.Builder().build())
         assertEquals("bell.mp3", viewModel.radioConfigState.value.ringtone)
 
         // Error
-        every { processRadioResponseUseCase(any(), 123, any()) } returns
+        every { processRadioResponseUseCase(any(), 123, any(), any(), any()) } returns
             RadioResponseResult.Error(org.meshtastic.core.resources.UiText.DynamicString("Fail"))
         packetFlow.emit(MeshPacket.Builder().build())
         assertTrue(viewModel.radioConfigState.value.responseState is ResponseState.Error)
@@ -1943,7 +1945,8 @@ class RadioConfigViewModelTest {
         verifySuspend { radioConfigUseCase.getOwner(123, any()) }
 
         val failure = org.meshtastic.core.resources.UiText.DynamicString("Max Retransmission Reached")
-        every { processRadioResponseUseCase(any(), 123, any()) } returns RadioResponseResult.Error(failure)
+        every { processRadioResponseUseCase(any(), 123, any(), any(), any()) } returns
+            RadioResponseResult.Error(failure)
         packetFlow.emit(MeshPacket.Builder().build())
         runCurrent()
 
@@ -1975,7 +1978,7 @@ class RadioConfigViewModelTest {
                 it.args.onRequestIdArg()(42)
                 42
             }
-        every { processRadioResponseUseCase(any(), 456, any()) } calls { response }
+        every { processRadioResponseUseCase(any(), 456, any(), any(), any()) } calls { response }
         nodeRepository.setNodes(listOf(localNode, remoteNode))
         nodeRepository.setMyNodeInfo(myNodeInfo(myNodeNum = 100))
         viewModel = createViewModel(destNum = 456)
@@ -2028,7 +2031,7 @@ class RadioConfigViewModelTest {
                 }
                 .build()
         var response: RadioResponseResult = RadioResponseResult.Error(maxRetransmit, Routing.Error.MAX_RETRANSMIT)
-        every { processRadioResponseUseCase(any(), 456, any()) } calls
+        every { processRadioResponseUseCase(any(), 456, any(), any(), any()) } calls
             {
                 val pendingRequestIds = it.arg<Set<Int>>(2)
                 if (42 in pendingRequestIds) response else null
@@ -2105,7 +2108,7 @@ class RadioConfigViewModelTest {
                 it.args.onRequestIdArg()(42)
                 42
             }
-        every { processRadioResponseUseCase(any(), 456, any()) } calls
+        every { processRadioResponseUseCase(any(), 456, any(), any(), any()) } calls
             {
                 @Suppress("UNCHECKED_CAST")
                 val pendingRequestIds = it.args[2] as Set<Int>
@@ -2165,7 +2168,7 @@ class RadioConfigViewModelTest {
                 it.args.onRequestIdArg()(42)
                 42
             }
-        every { processRadioResponseUseCase(any(), 456, any()) } calls
+        every { processRadioResponseUseCase(any(), 456, any(), any(), any()) } calls
             {
                 @Suppress("UNCHECKED_CAST")
                 val pendingRequestIds = it.args[2] as Set<Int>
@@ -2224,7 +2227,7 @@ class RadioConfigViewModelTest {
                 it.args.onRequestIdArg()(43)
                 43
             }
-        every { processRadioResponseUseCase(any(), 456, any()) } calls
+        every { processRadioResponseUseCase(any(), 456, any(), any(), any()) } calls
             {
                 val requestId = (it.args[0] as MeshPacket).decoded?.request_id
 
@@ -2298,7 +2301,7 @@ class RadioConfigViewModelTest {
                 it.args.onRequestIdArg()(44)
                 44
             }
-        every { processRadioResponseUseCase(any(), 456, any()) } calls
+        every { processRadioResponseUseCase(any(), 456, any(), any(), any()) } calls
             {
                 val packet = it.args[0] as MeshPacket
 
@@ -2371,7 +2374,7 @@ class RadioConfigViewModelTest {
                 it.args.onRequestIdArg()(42)
                 42
             }
-        every { processRadioResponseUseCase(any(), 456, any()) } returns
+        every { processRadioResponseUseCase(any(), 456, any(), any(), any()) } returns
             RadioResponseResult.Error(maxRetransmit, Routing.Error.MAX_RETRANSMIT)
         nodeRepository.setNodes(listOf(localNode, remoteNode))
         nodeRepository.setMyNodeInfo(myNodeInfo(myNodeNum = 100))
@@ -2405,14 +2408,14 @@ class RadioConfigViewModelTest {
         // SHUTDOWN
         everySuspend { adminActionsUseCase.shutdown(any(), any()) } returns 42
         // Set metadata to allow shutdown
-        every { processRadioResponseUseCase(any(), 123, any()) } returns
+        every { processRadioResponseUseCase(any(), 123, any(), any(), any()) } returns
             RadioResponseResult.Metadata(DeviceMetadata.Builder().also { wb -> wb.canShutdown = true }.build())
         packetFlow.emit(MeshPacket.Builder().build())
 
         viewModel.setResponseStateLoading(AdminRoute.SHUTDOWN)
         // AdminRoute fires sendAdminRequest after receiving ConfigResponse (session key),
         // not after a routing ACK (Success).
-        every { processRadioResponseUseCase(any(), 123, any()) } returns
+        every { processRadioResponseUseCase(any(), 123, any(), any(), any()) } returns
             RadioResponseResult.ConfigResponse(Config.Builder().build())
         packetFlow.emit(MeshPacket.Builder().build())
         verifySuspend { adminActionsUseCase.shutdown(123, any()) }
@@ -2420,7 +2423,7 @@ class RadioConfigViewModelTest {
         // NODEDB_RESET
         everySuspend { adminActionsUseCase.nodedbReset(any(), any(), any(), any()) } returns 42
         viewModel.setResponseStateLoading(AdminRoute.NODEDB_RESET)
-        every { processRadioResponseUseCase(any(), 123, any()) } returns
+        every { processRadioResponseUseCase(any(), 123, any(), any(), any()) } returns
             RadioResponseResult.ConfigResponse(Config.Builder().build())
         packetFlow.emit(MeshPacket.Builder().build())
         verifySuspend { adminActionsUseCase.nodedbReset(123, any(), any(), any()) }
@@ -2725,7 +2728,7 @@ class RadioConfigViewModelTest {
         // The optimistic state still reflects the device's value, not the requested region.
         assertEquals(Config.LoRaConfig.RegionCode.EU_868, viewModel.radioConfigState.value.radioConfig.lora?.region)
 
-        every { processRadioResponseUseCase(any(), 123, any()) } returns RadioResponseResult.Success
+        every { processRadioResponseUseCase(any(), 123, any(), any(), any()) } returns RadioResponseResult.Success
         packetFlow.emit(
             MeshPacket.Builder()
                 .also { wb -> wb.decoded = Data.Builder().also { wb -> wb.request_id = 42 }.build() }

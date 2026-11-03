@@ -67,6 +67,7 @@
     <string name="copy">Αντιγραφή</string>
     <!-- DEBUG -->
     <string name="debug_panel">Πίνακας αποσφαλμάτωσης</string>
+    <!-- DEEP -->
     <!-- DELETE -->
     <string name="delete">Διαγραφή</string>
     <string name="delete_for_everyone">Διαγραφή για όλους</string>
@@ -282,6 +283,7 @@
     <string name="waypoint_edit">Επεξεργασία σημείου διαδρομής</string>
     <string name="waypoint_new">Νέο σημείο πορείας</string>
     <string name="weight">Βάρος</string>
+    <!-- WIDGET -->
     <!-- WIFI -->
     <string name="wifi_provision_success_ip_address">IP διεύθυνση</string>
     <string name="wifi_provision_success_username">Όνομα χρήστη</string>

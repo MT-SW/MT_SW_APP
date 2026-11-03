@@ -58,11 +58,12 @@ import org.meshtastic.core.repository.PacketRepository as SharedPacketRepository
 class PacketRepositoryImpl(private val dbManager: DatabaseProvider, private val dispatchers: CoroutineDispatchers) :
     SharedPacketRepository {
 
-    override fun getWaypoints(): Flow<List<DataPacket>> =
-        dbManager.observeCurrentDb { db -> db.packetDao().getAllWaypointsFlow() }.map { list -> list.map { it.data } }
+    override fun getWaypoints(): Flow<List<DataPacket>> = dbManager
+        .observeCurrentDb("PacketRepository.getWaypoints") { db -> db.packetDao().getAllWaypointsFlow() }
+        .map { list -> list.map { it.data } }
 
     override fun getContacts(): Flow<Map<String, DataPacket>> = dbManager
-        .observeCurrentDb { db -> db.packetDao().getContactKeys() }
+        .observeCurrentDb("PacketRepository.getContacts") { db -> db.packetDao().getContactKeys() }
         .map { map -> map.mapValues { it.value.data } }
 
     override fun getContactsPaged(): Flow<PagingData<Pair<String, DataPacket>>> = Pager(
@@ -91,21 +92,25 @@ class PacketRepositoryImpl(private val dbManager: DatabaseProvider, private val 
     override suspend fun getUnreadCounts(): Map<String, Int> =
         dbManager.withReadDb { it.packetDao().getUnreadCounts() }
 
-    override fun getUnreadCountFlow(contact: String): Flow<Int> = dbManager.observeCurrentDb { db ->
-        db.packetDao().getUnreadCountFlow(contact)
-    }
+    override fun getUnreadCountFlow(contact: String): Flow<Int> =
+        dbManager.observeCurrentDb("PacketRepository.getUnreadCountFlow") { db ->
+            db.packetDao().getUnreadCountFlow(contact)
+        }
 
-    override fun getFirstUnreadMessageUuid(contact: String): Flow<Long?> = dbManager.observeCurrentDb { db ->
-        db.packetDao().getFirstUnreadMessageUuid(contact)
-    }
+    override fun getFirstUnreadMessageUuid(contact: String): Flow<Long?> =
+        dbManager.observeCurrentDb("PacketRepository.getFirstUnreadMessageUuid") { db ->
+            db.packetDao().getFirstUnreadMessageUuid(contact)
+        }
 
-    override fun hasUnreadMessages(contact: String): Flow<Boolean> = dbManager.observeCurrentDb { db ->
-        db.packetDao().hasUnreadMessages(contact)
-    }
+    override fun hasUnreadMessages(contact: String): Flow<Boolean> =
+        dbManager.observeCurrentDb("PacketRepository.hasUnreadMessages") { db ->
+            db.packetDao().hasUnreadMessages(contact)
+        }
 
-    override fun getUnreadCountTotal(): Flow<Int> = dbManager.observeCurrentDb { db ->
-        db.packetDao().getUnreadCountTotal()
-    }
+    override fun getUnreadCountTotal(): Flow<Int> =
+        dbManager.observeCurrentDb("PacketRepository.getUnreadCountTotal") { db ->
+            db.packetDao().getUnreadCountTotal()
+        }
 
     // One-shot writes go through withDb so they register with the cross-transport merge drain barrier. The callback
     // is never replayed after it starts; callers needing retries must make that policy explicit where idempotency is
@@ -209,7 +214,7 @@ class PacketRepositoryImpl(private val dbManager: DatabaseProvider, private val 
         includeFiltered: Boolean,
         getNode: suspend (String?) -> Node,
     ): Flow<List<Message>> = dbManager
-        .observeCurrentDb { db ->
+        .observeCurrentDb("PacketRepository.getMessagesFrom") { db ->
             val dao = db.packetDao()
             val packetsFlow =
                 when {
@@ -484,7 +489,7 @@ class PacketRepositoryImpl(private val dbManager: DatabaseProvider, private val 
     }
 
     override fun getContactSettings(): Flow<Map<String, ContactSettings>> = dbManager
-        .observeCurrentDb { db -> db.packetDao().getContactSettings() }
+        .observeCurrentDb("PacketRepository.getContactSettings") { db -> db.packetDao().getContactSettings() }
         .map { map -> map.mapValues { it.value.toShared() } }
 
     override suspend fun getContactSettings(contact: String): ContactSettings =
@@ -502,9 +507,10 @@ class PacketRepositoryImpl(private val dbManager: DatabaseProvider, private val 
         withContext(dispatchers.io) { dbManager.withDb { it.packetDao().update(reaction) } }
     }
 
-    override fun getFilteredCountFlow(contactKey: String): Flow<Int> = dbManager.observeCurrentDb { db ->
-        db.packetDao().getFilteredCountFlow(contactKey)
-    }
+    override fun getFilteredCountFlow(contactKey: String): Flow<Int> =
+        dbManager.observeCurrentDb("PacketRepository.getFilteredCountFlow") { db ->
+            db.packetDao().getFilteredCountFlow(contactKey)
+        }
 
     override suspend fun getFilteredCount(contactKey: String): Int = dbManager.withReadDb {
         it.packetDao().getFilteredCount(contactKey)
@@ -573,12 +579,14 @@ class PacketRepositoryImpl(private val dbManager: DatabaseProvider, private val 
         sfpp_hash = sfppHash,
         xeddsaSigned = xeddsaSigned,
         ackProofStatus = ackProofStatus,
+        viaMqtt = viaMqtt,
+        transportMechanism = transportMechanism,
     )
 
     override fun searchMessages(query: String, contactKey: String?, getNode: (String?) -> Node): Flow<List<Message>> {
         val sanitized = sanitizeFtsQuery(query)
         if (sanitized.isBlank()) return flowOf(emptyList())
-        return dbManager.observeCurrentDb { db ->
+        return dbManager.observeCurrentDb("PacketRepository.searchMessages") { db ->
             kotlinx.coroutines.flow.flow {
                 val dao = db.packetDao()
                 val packets =

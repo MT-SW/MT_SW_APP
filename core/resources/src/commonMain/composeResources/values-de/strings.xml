@@ -292,6 +292,7 @@
     <string name="debug_store_logs_summary">Deaktivieren, um das Schreiben von Netzprotokollen auf die Festplatte zu überspringen</string>
     <string name="debug_store_logs_title">Netzprotokolle speichern</string>
     <string name="debug_tab_packets">Pakete</string>
+    <!-- DEEP -->
     <string name="deep_link_connect_title">Mit diesem Gerät verbinden?</string>
     <string name="deep_link_disconnect_title">Von deinem Gerät trennen?</string>
     <string name="default_">Standard</string>
@@ -1455,6 +1456,8 @@
     <string name="weight">Gewicht</string>
     <string name="what_is_meshtastic">Was ist Meshtastic?</string>
     <string name="what_is_meshtastic_description">Ein quelloffenes, netzunabhängiges, dezentrales Mesh-Netzwerk, das auf kostengünstigen, stromsparenden Funkgeräten läuft.</string>
+    <!-- WIDGET -->
+    <string name="widget_pair_value">%1$d / %2$d</string>
     <!-- WIFI -->
     <string name="wifi_devices">WLAN Unterstützung für mPWRD-OS</string>
     <string name="wifi_provision_available_networks">Verfügbare Netzwerke</string>

@@ -75,6 +75,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -293,6 +294,23 @@ private fun CameraPositionState.frameInsideChrome(
     move(CameraUpdateFactory.scrollBy((right - left) / 2f, (bottom - top) / 2f))
 }
 
+/**
+ * Animates to the update [build] returns and reports whether it landed. `CameraUpdateFactory` throws
+ * NullPointerException when the Maps SDK never initialized, and `animate` throws IllegalStateException when a gesture
+ * interrupts it; neither should take the app down.
+ */
+private suspend fun CameraPositionState.animateOrLog(what: String, build: () -> CameraUpdate): Boolean = try {
+    animate(build())
+    true
+} catch (e: IllegalStateException) {
+    if (e is CancellationException) currentCoroutineContext().ensureActive()
+    Logger.d { "Error $what: ${e.message}" }
+    false
+} catch (@Suppress("TooGenericExceptionCaught") e: NullPointerException) {
+    Logger.e(e) { "Error $what: the Maps SDK is not initialized" }
+    false
+}
+
 // Shared geofence overlay styling (orange, matching the fdroid flavor).
 private val GEOFENCE_OVERLAY_COLOR = Color(0xFFFF9800)
 private const val GEOFENCE_FILL_ALPHA = 0.12f
@@ -412,30 +430,25 @@ fun MapView(
                 if (isLocationTrackingEnabled) {
                     locationResult.lastLocation?.let { location ->
                         val latLng = LatLng(location.latitude, location.longitude)
-                        val cameraUpdate =
-                            if (followPhoneBearing) {
-                                val bearing =
-                                    if (location.hasBearing()) {
-                                        location.bearing
-                                    } else {
-                                        cameraPositionState.position.bearing
-                                    }
-                                CameraUpdateFactory.newCameraPosition(
-                                    CameraPosition.Builder()
-                                        .target(latLng)
-                                        .zoom(cameraPositionState.position.zoom)
-                                        .bearing(bearing)
-                                        .build(),
-                                )
-                            } else {
-                                CameraUpdateFactory.newLatLngZoom(latLng, cameraPositionState.position.zoom)
-                            }
                         coroutineScope.launch {
-                            try {
-                                cameraPositionState.animate(cameraUpdate)
-                            } catch (e: IllegalStateException) {
-                                if (e is CancellationException) currentCoroutineContext().ensureActive()
-                                Logger.d { "Error animating camera to location: ${e.message}" }
+                            cameraPositionState.animateOrLog("animating camera to location") {
+                                if (followPhoneBearing) {
+                                    val bearing =
+                                        if (location.hasBearing()) {
+                                            location.bearing
+                                        } else {
+                                            cameraPositionState.position.bearing
+                                        }
+                                    CameraUpdateFactory.newCameraPosition(
+                                        CameraPosition.Builder()
+                                            .target(latLng)
+                                            .zoom(cameraPositionState.position.zoom)
+                                            .bearing(bearing)
+                                            .build(),
+                                    )
+                                } else {
+                                    CameraUpdateFactory.newLatLngZoom(latLng, cameraPositionState.position.zoom)
+                                }
                             }
                         }
                     }
@@ -624,33 +637,25 @@ fun MapView(
         LaunchedEffect(sortedTrackPositions, hasCentered) {
             if (hasCentered || sortedTrackPositions.isEmpty()) return@LaunchedEffect
             val points = sortedTrackPositions.map { it.toLatLng() }
-            val cameraUpdate =
-                if (points.size == 1) {
-                    CameraUpdateFactory.newLatLngZoom(points.first(), max(cameraPositionState.position.zoom, 12f))
-                } else {
-                    val bounds = LatLngBounds.builder()
-                    points.forEach { bounds.include(it) }
-                    CameraUpdateFactory.newLatLngBounds(bounds.build(), 80)
+            // False for a user gesture interrupting animate() too: that cancels the animation, not this effect.
+            hasCentered =
+                cameraPositionState.animateOrLog("centering track map") {
+                    if (points.size == 1) {
+                        CameraUpdateFactory.newLatLngZoom(points.first(), max(cameraPositionState.position.zoom, 12f))
+                    } else {
+                        val bounds = LatLngBounds.builder()
+                        points.forEach { bounds.include(it) }
+                        CameraUpdateFactory.newLatLngBounds(bounds.build(), 80)
+                    }
                 }
-            try {
-                cameraPositionState.animate(cameraUpdate)
-                hasCentered = true
-            } catch (e: IllegalStateException) {
-                if (e is CancellationException) currentCoroutineContext().ensureActive()
-                // Reached for a user gesture interrupting animate() too: that cancels the animation, not this effect.
-                Logger.d { "Error centering track map: ${e.message}" }
-            }
         }
 
         // Animate to selected position marker when card is tapped in the list
         LaunchedEffect(mode.selectedPositionTime) {
             val selectedTime = mode.selectedPositionTime ?: return@LaunchedEffect
             val selectedPos = sortedTrackPositions.find { it.time == selectedTime } ?: return@LaunchedEffect
-            try {
-                cameraPositionState.animate(CameraUpdateFactory.newLatLng(selectedPos.toLatLng()))
-            } catch (e: IllegalStateException) {
-                if (e is CancellationException) currentCoroutineContext().ensureActive()
-                Logger.d { "Error animating to selected position: ${e.message}" }
+            cameraPositionState.animateOrLog("animating to selected position") {
+                CameraUpdateFactory.newLatLng(selectedPos.toLatLng())
             }
         }
     }
@@ -660,24 +665,19 @@ fun MapView(
             if (mode.overlay == null || hasCentered) return@LaunchedEffect
             val allPoints = (tracerouteForwardPoints + tracerouteReturnPoints).distinct()
             if (allPoints.isNotEmpty()) {
-                val cameraUpdate =
-                    if (allPoints.size == 1) {
-                        CameraUpdateFactory.newLatLngZoom(
-                            allPoints.first(),
-                            max(cameraPositionState.position.zoom, 12f),
-                        )
-                    } else {
-                        val bounds = LatLngBounds.builder()
-                        allPoints.forEach { bounds.include(it) }
-                        CameraUpdateFactory.newLatLngBounds(bounds.build(), TRACEROUTE_BOUNDS_PADDING_PX)
+                hasCentered =
+                    cameraPositionState.animateOrLog("centering traceroute overlay") {
+                        if (allPoints.size == 1) {
+                            CameraUpdateFactory.newLatLngZoom(
+                                allPoints.first(),
+                                max(cameraPositionState.position.zoom, 12f),
+                            )
+                        } else {
+                            val bounds = LatLngBounds.builder()
+                            allPoints.forEach { bounds.include(it) }
+                            CameraUpdateFactory.newLatLngBounds(bounds.build(), TRACEROUTE_BOUNDS_PADDING_PX)
+                        }
                     }
-                try {
-                    cameraPositionState.animate(cameraUpdate)
-                    hasCentered = true
-                } catch (e: IllegalStateException) {
-                    if (e is CancellationException) currentCoroutineContext().ensureActive()
-                    Logger.d { "Error centering traceroute overlay: ${e.message}" }
-                }
             }
         }
     }
@@ -1172,14 +1172,10 @@ fun MapView(
                     followPhoneBearing = !followPhoneBearing
                 } else {
                     coroutineScope.launch {
-                        try {
-                            val currentPosition = cameraPositionState.position
-                            val newCameraPosition = CameraPosition.Builder(currentPosition).bearing(0f).build()
-                            cameraPositionState.animate(CameraUpdateFactory.newCameraPosition(newCameraPosition))
-                            Logger.d { "Oriented map to north" }
-                        } catch (e: IllegalStateException) {
-                            if (e is CancellationException) currentCoroutineContext().ensureActive()
-                            Logger.d { "Error orienting map to north: ${e.message}" }
+                        cameraPositionState.animateOrLog("orienting map to north") {
+                            val newCameraPosition =
+                                CameraPosition.Builder(cameraPositionState.position).bearing(0f).build()
+                            CameraUpdateFactory.newCameraPosition(newCameraPosition)
                         }
                     }
                 }
@@ -1259,7 +1255,9 @@ fun MapView(
             plannerNodeNum = node.num
             plannerOpen = true
             if (node.validPosition != null) {
-                cameraPositionState.animate(CameraUpdateFactory.newLatLng(LatLng(node.latitude, node.longitude)))
+                cameraPositionState.animateOrLog("centering on site planner node") {
+                    CameraUpdateFactory.newLatLng(LatLng(node.latitude, node.longitude))
+                }
             }
             mapViewModel.consumeSitePlannerRequest(node.num)
         }
@@ -1723,9 +1721,9 @@ private fun MapLayerOverlay(layerItem: MapLayerItem, opacity: Float, mapViewMode
     MapEffect(layerItem.id, layerItem.refreshToken, opacity) { map ->
         currentLayer?.safeHide()
         currentLayer = null
-        val bytes = mapViewModel.readLayerBytes(layerItem) ?: return@MapEffect
         val layer =
             try {
+                val bytes = mapViewModel.readLayerBytes(layerItem) ?: return@MapEffect
                 val dataLayer =
                     withContext(ioDispatcher) {
                         // Buffered because the KMZ sniff marks and resets the stream before the parser reads it.
@@ -1746,6 +1744,10 @@ private fun MapLayerOverlay(layerItem: MapLayerItem, opacity: Float, mapViewMode
                 throw e
             } catch (e: Exception) {
                 Logger.withTag("MapView").e(e) { "Error loading map layer: ${layerItem.name}" }
+                null
+            } catch (e: OutOfMemoryError) {
+                // The parser builds the whole JSON tree beside the raw bytes; a layer too big for the heap fails alone.
+                Logger.withTag("MapView").e(e) { "Map layer too large to load: ${layerItem.name}" }
                 null
             }
         layer?.let {
@@ -1868,6 +1870,10 @@ private fun RenderedMapLayer.safeShow() {
         show()
     } catch (e: Exception) {
         Logger.withTag("MapView").e(e) { "Error adding map layer" }
+    } catch (e: OutOfMemoryError) {
+        // A layer that parsed can still exhaust the heap drawing; drop what it added rather than the app.
+        Logger.withTag("MapView").e(e) { "Map layer too large to draw" }
+        safeHide()
     }
 }
 

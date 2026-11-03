@@ -58,6 +58,7 @@
     <string name="connected_sleeping">Konekte ak radyo, men li ap dòmi</string>
     <!-- DEBUG -->
     <string name="debug_panel">Panno Debug</string>
+    <!-- DEEP -->
     <!-- DELETE -->
     <string name="delete">Efase</string>
     <string name="delete_for_everyone">Efase pou tout moun</string>
@@ -276,6 +277,7 @@
     <string name="waypoint_edit">Modifye pwen</string>
     <string name="waypoint_new">Nouvo pwen</string>
     <string name="waypoint_received">Pwen resevwa: %1$s</string>
+    <!-- WIDGET -->
     <!-- WIFI -->
     <string name="wifi_provision_success_ip_address">Adrès IP</string>
     <!-- WIND -->

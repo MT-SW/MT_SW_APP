@@ -51,6 +51,7 @@
     <string name="connected_sleeping">מחובר למכשיר, אך הוא במצב שינה</string>
     <!-- DEBUG -->
     <string name="debug_panel">פאנל דיבאג</string>
+    <!-- DEEP -->
     <!-- DELETE -->
     <string name="delete">מחק</string>
     <string name="delete_for_everyone">מחק לכולם</string>
@@ -230,6 +231,7 @@
     <string name="waypoint_edit">ערוך נקודת ציון</string>
     <string name="waypoint_new">נקודת ציון חדשה</string>
     <string name="waypoint_received">התקבל נקודת ציון: %1$s</string>
+    <!-- WIDGET -->
     <!-- WIFI -->
     <!-- WIND -->
     <!-- WRITE -->

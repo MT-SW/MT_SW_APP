@@ -332,6 +332,7 @@
     <string name="debug_store_logs_title">Tallenna mesh-verkon lokitiedot</string>
     <string name="debug_tab_app_logs">Sovelluslokitiedot</string>
     <string name="debug_tab_packets">Paketit</string>
+    <!-- DEEP -->
     <string name="deep_link_connect_message">Linkki osoitteessa %1$s pyytää tätä sovellusta muodostamaan yhteyden laitteeseen. Jatka vain, jos luotat linkin lähteeseen.</string>
     <string name="deep_link_connect_title">Muodostetaanko yhteys tähän laitteeseen?</string>
     <string name="deep_link_disconnect_message">Linkki pyytää tätä sovellusta katkaisemaan yhteyden laitteeseesi. Jatka vain, jos luotat linkin lähteeseen.</string>
@@ -1787,6 +1788,8 @@
     <string name="weight">Paino</string>
     <string name="what_is_meshtastic">Mikä on Meshtastic?</string>
     <string name="what_is_meshtastic_description">Avoimen lähdekoodin, internetistä riippumaton ja hajautettu mesh-verkko, joka toimii edullisilla ja vähän virtaa kuluttavilla radioilla.</string>
+    <!-- WIDGET -->
+    <string name="widget_pair_value">%1$d / %2$d</string>
     <!-- WIFI -->
     <string name="wifi_config">WiFi-asetukset</string>
     <string name="wifi_devices">WiFi-määritys mPWRD-OS:lle</string>

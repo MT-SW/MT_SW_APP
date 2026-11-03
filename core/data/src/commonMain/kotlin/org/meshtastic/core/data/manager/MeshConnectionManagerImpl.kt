@@ -42,6 +42,7 @@ import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.InterfaceId
 import org.meshtastic.core.model.TelemetryType
 import org.meshtastic.core.model.util.decodeLocalStatsExtended
+import org.meshtastic.core.repository.AdminRequestRegistry
 import org.meshtastic.core.repository.AppWidgetUpdater
 import org.meshtastic.core.repository.CommandSender
 import org.meshtastic.core.repository.DataPair
@@ -94,6 +95,7 @@ class MeshConnectionManagerImpl(
     private val radioConfigRepository: RadioConfigRepository,
     private val commandSender: CommandSender,
     private val sessionManager: SessionManager,
+    private val adminRequestRegistry: AdminRequestRegistry,
     private val nodeManager: NodeManager,
     private val analytics: PlatformAnalytics,
     private val packetRepository: PacketRepository,
@@ -511,6 +513,7 @@ class MeshConnectionManagerImpl(
         postHandshakeRequestsJob = null
         packetHandler.stopPacketQueue()
         sessionManager.clearAll() // Prevent stale per-node passkeys on reconnect.
+        adminRequestRegistry.clearAll()
         locationManager.stop()
         mqttManager.stop()
     }

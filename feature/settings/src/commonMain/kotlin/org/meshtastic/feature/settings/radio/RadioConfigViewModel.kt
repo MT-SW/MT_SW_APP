@@ -30,6 +30,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,6 +42,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -360,6 +362,13 @@ open class RadioConfigViewModel(
         get() = _destNode
 
     private val requestIds = MutableStateFlow(hashSetOf<Int>())
+
+    /** Index of the legacy `admin` channel, which carries remote admin to nodes without a PKI key. */
+    private val adminChannelIndex: StateFlow<Int?> =
+        radioConfigRepository.channelSetFlow
+            .map { cs -> cs.settings.indexOfFirst { it.name.equals(ADMIN_CHANNEL_NAME, ignoreCase = true) } }
+            .map { it.takeIf { index -> index >= 0 } }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     // USER reads one config on firmware without the status message module and two with it, so whether a
     // load fanned out is a property of that load, not of the route. Null falls back to the route's flag.
@@ -1503,7 +1512,9 @@ open class RadioConfigViewModel(
         val requestId = packet.decoded?.request_id
         val lateRemoteReadRoute = requestId?.let { lateRemoteReads[it]?.route }
         val pendingRequestIds = requestIds.value + lateRemoteReads.keys
-        val result = processRadioResponseUseCase(packet, destNum, pendingRequestIds) ?: return
+        val result =
+            processRadioResponseUseCase(packet, destNum, pendingRequestIds, myNodeNum, adminChannelIndex.value)
+                ?: return
         val route = radioConfigState.value.route
         val isLateRemoteRead = requestId != null && lateRemoteReadRoute != null
 
@@ -1821,3 +1832,5 @@ internal fun Config.saveRebootBehavior(): RebootBehavior = when {
  */
 internal fun ModuleConfig.saveRebootBehavior(): RebootBehavior =
     if (statusmessage != null || mesh_beacon != null) RebootBehavior.NEVER else RebootBehavior.ALWAYS
+
+private const val ADMIN_CHANNEL_NAME = "admin"

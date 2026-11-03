@@ -102,20 +102,20 @@ markdownRenderer = "0.46.0"
 okio = "3.18.2"
 bouncycastle = "1.86"
 uri-kmp = "0.0.21"
-spotless = "8.10.4"
-sceneview = "4.63.0"
+spotless = "8.11.0"
+sceneview = "4.65.0"
 vico = "3.4.0-next.1"
 # Pinned below 0.45.0 (which bumps the vendored Rust btleplug to 0.13.0): that version unconditionally enables
 # SetAllowExtendedAdvertisements(true) on its Windows/WinRT scan backend, which makes some peripherals (Realtek
 # adapters confirmed) invisible to BLE scanning entirely -- see github.com/deviceplug/btleplug issue #472. This broke
 # Meshtastic device discovery on Windows desktop. Un-pin once Kable ships a fix or exposes a way to disable it.
 kable = "0.44.3"
-mqttastic = "0.9.0"
+mqttastic = "0.9.1"
 jmdns = "3.6.5"
 # Desktop-only: speaks StatusNotifierItem over D-Bus so the Linux tray icon is clickable (MIT).
 dbus-java = "5.2.2"
 qrcode-kotlin = "4.5.0"
-takpacket-sdk = "0.9.3"
+takpacket-sdk = "0.10.0"
 wire = "6.4.7"
 meshtastic-protobufs = "2.8.2"
 

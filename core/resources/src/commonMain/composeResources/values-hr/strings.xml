@@ -52,6 +52,7 @@
     <string name="connected_sleeping">Povezan na radio, ali je u stanju mirovanja</string>
     <!-- DEBUG -->
     <string name="debug_panel">Otklanjanje pogrešaka</string>
+    <!-- DEEP -->
     <string name="default_">Zadano</string>
     <!-- DELETE -->
     <string name="delete">Obriši</string>
@@ -250,6 +251,7 @@
     <string name="waypoint_edit">Uredi putnu točku</string>
     <string name="waypoint_new">Nova putna točka</string>
     <string name="waypoint_received">Primljena putna točka: %1$s</string>
+    <!-- WIDGET -->
     <!-- WIFI -->
     <string name="wifi_provision_success_ip_address">IP Adresa</string>
     <!-- WIND -->

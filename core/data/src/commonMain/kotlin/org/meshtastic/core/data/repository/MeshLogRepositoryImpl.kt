@@ -69,7 +69,7 @@ open class MeshLogRepositoryImpl(
 
     /** Retrieves all [MeshLog]s in the database, up to [maxItem]. */
     override fun getAllLogs(maxItem: Int): Flow<List<MeshLog>> = dbManager
-        .observeCurrentDb { it.meshLogDao().getAllLogs(maxItem) }
+        .observeCurrentDb("MeshLogRepository.getAllLogs") { it.meshLogDao().getAllLogs(maxItem) }
         .map { list -> list.map { it.asExternalModel() } }
         .flowOn(dispatchers.io)
 
@@ -151,7 +151,7 @@ open class MeshLogRepositoryImpl(
     override fun getLogsFromLimited(nodeNum: Int, portNum: Int, maxItem: Int): Flow<List<MeshLog>> =
         effectiveLogId(nodeNum)
             .flatMapLatest { logId ->
-                dbManager.observeCurrentDb {
+                dbManager.observeCurrentDb("MeshLogRepository.getLogsFromLimited") {
                     // A specific port has its own query so the database can seek instead of walking all of the rows.
                     if (portNum == -1) {
                         it.meshLogDao().getLogsFrom(logId, portNum, maxItem)
@@ -166,7 +166,7 @@ open class MeshLogRepositoryImpl(
 
     /** The single most recent [MeshLog] per distinct sender, across every port. */
     override fun getLatestLogPerNode(): Flow<List<MeshLog>> = dbManager
-        .observeCurrentDb { it.meshLogDao().getLatestLogPerNode() }
+        .observeCurrentDb("MeshLogRepository.getLatestLogPerNode") { it.meshLogDao().getLatestLogPerNode() }
         .map { list -> list.map { it.asExternalModel() } }
         .flowOn(dispatchers.io)
 
@@ -186,7 +186,7 @@ open class MeshLogRepositoryImpl(
     override fun getTelemetryFromLimited(nodeNum: Int, maxItem: Int): Flow<List<Telemetry>> = effectiveLogId(nodeNum)
         .flatMapLatest { logId ->
             dbManager
-                .observeCurrentDb {
+                .observeCurrentDb("MeshLogRepository.getTelemetryFrom") {
                     it.meshLogDao().getLogsFromPort(logId, PortNum.TELEMETRY_APP.value, maxItem)
                 }
                 .distinctUntilChanged()
@@ -207,7 +207,9 @@ open class MeshLogRepositoryImpl(
         portNum: PortNum,
         maxItem: Int,
     ): Flow<List<MeshLog>> = dbManager
-        .observeCurrentDb { it.meshLogDao().getLogsFromPort(MeshLog.NODE_NUM_LOCAL, portNum.value, maxItem) }
+        .observeCurrentDb("MeshLogRepository.getRequestLogsLimited") {
+            it.meshLogDao().getLogsFromPort(MeshLog.NODE_NUM_LOCAL, portNum.value, maxItem)
+        }
         .map { list ->
             list
                 .map { it.asExternalModel() }
@@ -225,7 +227,9 @@ open class MeshLogRepositoryImpl(
         .conflate()
 
     override fun getInboundRequestLogs(portNum: PortNum): Flow<List<MeshLog>> = dbManager
-        .observeCurrentDb { it.meshLogDao().getLogsOnPort(portNum.value, MeshLog.NODE_NUM_LOCAL, DEFAULT_MAX_LOGS) }
+        .observeCurrentDb("MeshLogRepository.getInboundRequestLogs") {
+            it.meshLogDao().getLogsOnPort(portNum.value, MeshLog.NODE_NUM_LOCAL, DEFAULT_MAX_LOGS)
+        }
         .map { list ->
             list.map { it.asExternalModel() }.filter { it.fromRadio.packet?.decoded?.want_response == true }
         }
@@ -256,7 +260,9 @@ open class MeshLogRepositoryImpl(
 
     /** Returns the cached [MyNodeInfo] from the system logs. */
     override fun getMyNodeInfo(): Flow<MyNodeInfo?> = dbManager
-        .observeCurrentDb { db -> db.meshLogDao().getLogsFromPort(MeshLog.NODE_NUM_LOCAL, 0, DEFAULT_MAX_LOGS) }
+        .observeCurrentDb("MeshLogRepository.getMyNodeInfo") { db ->
+            db.meshLogDao().getLogsFromPort(MeshLog.NODE_NUM_LOCAL, 0, DEFAULT_MAX_LOGS)
+        }
         // Newest first, and decoding stops at the first hit instead of reading every one of up to thousands of rows.
         .mapLatest { list ->
             list.asSequence().map { it.asExternalModel() }.firstOrNull { it.myNodeInfo != null }?.myNodeInfo

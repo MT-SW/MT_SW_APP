@@ -841,8 +841,10 @@ debug_tab_app_logs
 debug_tab_device_logs
 debug_tab_mirror
 debug_tab_packets
+### DEEP ###
 deep_link_connect_message
 deep_link_connect_title
+deep_link_connect_with_pin_message
 deep_link_disconnect_message
 deep_link_disconnect_title
 default_
@@ -3212,8 +3214,14 @@ website
 weight
 what_is_meshtastic
 what_is_meshtastic_description
+### WIDGET ###
+widget_bad_dropped
 widget_node_tracker_choose
 widget_node_tracker_not_found
+widget_node_tracker_title
+widget_pair_value
+widget_relays_canceled
+widget_traffic
 ### WIFI ###
 wifi_config
 wifi_devices

@@ -61,6 +61,7 @@
     <string name="copy">Kopiraj</string>
     <!-- DEBUG -->
     <string name="debug_panel">Plošča za odpravljanje napak</string>
+    <!-- DEEP -->
     <!-- DELETE -->
     <string name="delete">Izbriši</string>
     <string name="delete_for_everyone">Izbriši za vse</string>
@@ -299,6 +300,7 @@
     <string name="waypoint_edit">Uredi točko poti</string>
     <string name="waypoint_new">Nova točka poti</string>
     <string name="waypoint_received">Prejeta točka poti: %1$s</string>
+    <!-- WIDGET -->
     <!-- WIFI -->
     <string name="wifi_provision_success_ip_address">IP naslov</string>
     <!-- WIND -->

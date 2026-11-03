@@ -90,6 +90,7 @@
     <!-- DEBUG -->
     <string name="debug">Debug</string>
     <string name="debug_panel">Debug-paneel</string>
+    <!-- DEEP -->
     <string name="default_">Standaard</string>
     <!-- DELETE -->
     <string name="delete">Verwijder</string>
@@ -426,6 +427,7 @@
     <string name="waypoint_new">Nieuw waypoint</string>
     <string name="waypoint_received">Ontvangen waypoint: %1$s</string>
     <string name="weight">Gewicht</string>
+    <!-- WIDGET -->
     <!-- WIFI -->
     <string name="wifi_provision_success_ip_address">IP-adres</string>
     <string name="wifi_provision_success_username">Gebruikersnaam</string>
