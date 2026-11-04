@@ -232,6 +232,8 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
             // Reports of errors and ideas are ours (our groups), so they sit here and not in the original settings.
             ReportIssuesSection()
 
+            SupportProjectSection()
+
             ExpressiveSection(title = stringResource(Res.string.mt_sw_features_links)) {
                 Text(
                     text = stringResource(Res.string.mt_sw_features_links_hint),
@@ -298,8 +300,6 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                     onNavigate(SettingsRoute.MtSwOtherFeatures)
                 }
             }
-
-            SupportProjectSection()
         }
     }
 }

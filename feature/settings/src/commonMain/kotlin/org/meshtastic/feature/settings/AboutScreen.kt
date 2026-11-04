@@ -161,8 +161,8 @@ fun AboutScreen(
                     onOpenDocs = { uriHandler.openUri(DOCS_URL) },
                     onOpenLicense = { uriHandler.openUri(LICENSE_URL) },
                 )
-                FeatureCreditsSection()
                 SupportProjectSection()
+                FeatureCreditsSection()
                 CopyrightFooter()
             }
             FastScrollSidebar(
