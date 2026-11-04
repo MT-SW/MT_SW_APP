@@ -19,7 +19,7 @@ package org.meshtastic.feature.messaging.translation
 import co.touchlab.kermit.Logger
 import cnames.structs.mtmd_bitmap
 import cnames.structs.mtmd_context
-import cnames.structs.llama_sampler
+import llama.llama_sampler
 import cnames.structs.llama_vocab
 import kotlinx.cinterop.CPointerVar
 import kotlinx.cinterop.addressOf
