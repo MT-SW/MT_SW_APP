@@ -42,6 +42,7 @@ import org.meshtastic.feature.settings.navigation.rememberSettingsRadioConfigVie
 
 private val TOP_TRIM = 20.dp
 private val BAR_HEIGHT = 60.dp
+private val BAR_BOTTOM_GAP = 10.dp
 
 /**
  * iPhone main screen — assembles the shared [MeshtasticAppShell], [MeshtasticNavigationSuite], and
@@ -74,6 +75,7 @@ fun IosMainScreen(uiViewModel: UIViewModel, multiBackstack: MultiBackstack, modi
                 // The bar does not add space for the home indicator, so it sits at the bottom of the screen.
                 modifier = Modifier.fillMaxSize().consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
                 barHeight = BAR_HEIGHT,
+                barBottomGap = BAR_BOTTOM_GAP,
             ) {
                 val provider =
                     entryProvider<NavKey> {

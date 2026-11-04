@@ -42,6 +42,11 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScope
 import androidx.compose.material3.Surface
 import androidx.compose.foundation.layout.height
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.background
 import org.meshtastic.core.ui.theme.monochromeLayer
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
@@ -90,6 +95,8 @@ fun MeshtasticNavigationSuite(
     modifier: Modifier = Modifier,
     /** When set, the bottom bar has this height instead of the standard one (used on iPhone, where it is too tall). */
     barHeight: Dp? = null,
+    /** Empty space under the bar (only with [barHeight]); it lifts the icons away from the rounded screen corners. */
+    barBottomGap: Dp = 0.dp,
     content: @Composable () -> Unit,
 ) {
     val connectionState by uiViewModel.connectionState.collectAsStateWithLifecycle()
@@ -161,7 +168,10 @@ fun MeshtasticNavigationSuite(
         ) {
             NavigationSuiteScaffoldLayout(
                 navigationSuite = {
-                    NavigationSuite(modifier = Modifier.height(barHeight), layoutType = layoutType, content = items)
+                    Column(Modifier.background(NavigationBarDefaults.containerColor)) {
+                        NavigationSuite(modifier = Modifier.height(barHeight), layoutType = layoutType, content = items)
+                        Spacer(Modifier.height(barBottomGap))
+                    }
                 },
                 layoutType = layoutType,
             ) {
