@@ -34,7 +34,7 @@ class CssInliningDecoderFactory(private val delegate: Decoder.Factory) : Decoder
     override fun create(result: SourceFetchResult, options: Options, imageLoader: ImageLoader): Decoder? {
         val looksLikeSvg =
             result.mimeType?.contains("svg", ignoreCase = true) == true ||
-                (result.mimeType == null && result.source.source().peek().readUtf8(SNIFF_BYTES).contains("<svg"))
+                (result.mimeType == null && sniffSvg(result))
         if (!looksLikeSvg) return delegate.create(result, options, imageLoader)
         val bytes = result.source.source().readByteArray()
         val fixed = inlineSvgCss(bytes.decodeToString()).encodeToByteArray()
@@ -96,3 +96,12 @@ internal fun inlineSvgCss(svg: String): String {
         }
     }
 }
+
+/** For a picture that came with no type: is the start of the file an SVG tag? Short files are fine, they just fail to read. */
+private fun sniffSvg(result: SourceFetchResult): Boolean =
+    runCatching {
+        val head = result.source.source().peek()
+        head.request(SNIFF_BYTES)
+        head.buffer.snapshot().utf8().contains("<svg")
+    }
+        .getOrDefault(false)
