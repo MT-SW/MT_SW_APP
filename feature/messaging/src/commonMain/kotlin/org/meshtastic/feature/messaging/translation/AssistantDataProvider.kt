@@ -17,6 +17,7 @@
 package org.meshtastic.feature.messaging.translation
 
 import co.touchlab.kermit.Logger
+import kotlin.concurrent.Volatile
 import org.jetbrains.compose.resources.StringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.getStringSuspend
@@ -805,7 +806,7 @@ class AssistantDataProvider(
         if (nodes.isEmpty()) return ""
         val now = nowMillis / MILLIS_PER_SECOND
         val recent = nodes.count { it.lastHeard != 0 && now - it.lastHeard < ONE_DAY_S }
-        val byHops = nodes.groupingBy { it.hopsAway }.eachCount().toSortedMap().entries.joinToString { "${it.key}:${it.value}" }
+        val byHops = nodes.groupingBy { it.hopsAway }.eachCount().entries.sortedBy { it.key }.joinToString { "${it.key}:${it.value}" }
         val low = nodes.filter { (it.deviceMetrics.battery_level ?: 100) in 1..LOW_BATTERY }.joinToString { it.user.short_name }
         val hardware = nodes.groupingBy { it.user.hw_model.toString() }.eachCount().entries.sortedByDescending { it.value }.take(HW_LIMIT).joinToString { "${it.key}:${it.value}" }
         val roles = nodes.groupingBy { roleLabel(it.user.role.toString()) }.eachCount().entries.sortedByDescending { it.value }.joinToString { "${it.key}:${it.value}" }
@@ -813,7 +814,7 @@ class AssistantDataProvider(
         val mqtt = nodes.count { it.viaMqtt }
         if (polish) {
             val hops =
-                nodes.groupingBy { it.hopsAway }.eachCount().toSortedMap().entries.joinToString("; ") {
+                nodes.groupingBy { it.hopsAway }.eachCount().entries.sortedBy { it.key }.joinToString("; ") {
                     val where = when (it.key) {
                         -1 -> "odległość nieznana"
                         0 -> "bezpośrednio"
@@ -1193,7 +1194,7 @@ class AssistantDataProvider(
                 total++
                 val who = if (m.fromLocal) ownName.ifBlank { "me" } else m.node.user.long_name.ifBlank { m.node.user.short_name }
                 if (m.fromLocal) mine++
-                perSender.merge(who, 1, Int::plus)
+                perSender[who] = (perSender[who] ?: 0) + 1
             }
         }
         val scope =
@@ -1878,7 +1879,7 @@ class AssistantDataProvider(
         if (nodes.isEmpty()) return sb.toString()
         val direct = aiString(Res.string.ai_hops_direct)
         val hops =
-            nodes.filter { it.hopsAway >= 0 }.groupingBy { it.hopsAway }.eachCount().toSortedMap().entries
+            nodes.filter { it.hopsAway >= 0 }.groupingBy { it.hopsAway }.eachCount().entries.sortedBy { it.key }
                 .joinToString(", ") { (h, c) -> "${if (h == 0) direct else h.toString()}: $c" }
         val roles = nodes.groupingBy { roleLabel(it.user.role.toString()) }.eachCount().entries.sortedByDescending { it.value }.joinToString(", ") { "${it.key}: ${it.value}" }
         val low = nodes.filter { (it.deviceMetrics.battery_level ?: 100) in 1..LOW_BATTERY }.joinToString(", ") { it.user.long_name.ifBlank { it.user.short_name } }

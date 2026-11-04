@@ -16,6 +16,7 @@
  */
 package org.meshtastic.feature.messaging.translation
 
+import kotlin.concurrent.Volatile
 import org.jetbrains.compose.resources.StringResource
 import org.meshtastic.core.resources.getStringSuspend
 
