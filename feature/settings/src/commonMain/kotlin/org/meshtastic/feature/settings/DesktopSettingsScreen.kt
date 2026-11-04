@@ -61,6 +61,8 @@ import org.meshtastic.core.resources.import_configuration
 import org.meshtastic.core.resources.info
 import org.meshtastic.core.resources.intro_show
 import org.meshtastic.core.resources.preferences_language
+import org.meshtastic.core.resources.quit_app_summary
+import org.meshtastic.core.resources.quit_app_title
 import org.meshtastic.core.resources.preferences_system_default
 import org.meshtastic.core.resources.pt_BR
 import org.meshtastic.core.resources.supportedLocaleTags
@@ -81,6 +83,7 @@ import org.meshtastic.core.ui.icon.HelpOutline
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.MeshtasticIcons
+import org.meshtastic.core.ui.icon.PowerSettingsNew
 import org.meshtastic.core.ui.icon.PermScanWifi
 import org.meshtastic.core.ui.icon.WavingHand
 import org.meshtastic.core.ui.icon.Wifi
@@ -378,6 +381,19 @@ fun DesktopSettingsScreen(
                             leadingIcon = MeshtasticIcons.HelpOutline,
                         ) {
                             onNavigate(SettingsRoute.HelpDocs)
+                        }
+                    }
+
+                    rememberQuitApp()?.let { quit ->
+                        ExpressiveSection(title = stringResource(Res.string.quit_app_title)) {
+                            ListItem(
+                                text = stringResource(Res.string.quit_app_title),
+                                supportingText = stringResource(Res.string.quit_app_summary),
+                                leadingIcon = MeshtasticIcons.PowerSettingsNew,
+                                trailingIcon = null,
+                            ) {
+                                quit()
+                            }
                         }
                     }
 

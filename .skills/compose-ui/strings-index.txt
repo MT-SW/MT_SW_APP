@@ -2543,6 +2543,8 @@ quick_cmd_test_desc
 quick_commands_hint
 quick_commands_need_keys
 quick_commands_title
+quit_app_summary
+quit_app_title
 radiation
 radio_configuration
 rainfall_1h

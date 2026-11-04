@@ -2603,6 +2603,8 @@
     <string name="quick_commands_hint">Short test messages sent privately to this node, even when its role hides manual messages. Handy for checking the link and new firmware builds. Works only with firmware 2.8.0 or newer.</string>
     <string name="quick_commands_need_keys">Needs an exchange of keys with this node (encrypted private message).</string>
     <string name="quick_commands_title">Quick commands</string>
+    <string name="quit_app_summary">Closes the app completely and ends the radio connection</string>
+    <string name="quit_app_title">Quit the app</string>
     <string name="radiation">Radiation</string>
     <string name="radio_configuration">Radio configuration</string>
     <string name="rainfall_1h">Rain (1h)</string>
