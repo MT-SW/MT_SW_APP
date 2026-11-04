@@ -603,7 +603,7 @@ fun MessageItem(
                     var linkImageAttempt by remember(linkUrl) { mutableStateOf(0) }
                     // A picture of our own image host that does not load is shown as a failure that can be tried again;
                     // any other link is a guess at an image and is quietly hidden when it is none.
-                    val ownHost = linkUrl?.contains("catbox.moe", ignoreCase = true) == true
+                    val ownHost = linkUrl?.let(::isOwnImageHost) == true
                     if (linkUrl != null && autoLoadChatImages && (!linkImageFailed || ownHost)) {
                         if (linkImageFailed) {
                             Text(

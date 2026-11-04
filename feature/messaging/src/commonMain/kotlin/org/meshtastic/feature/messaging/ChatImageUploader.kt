@@ -41,14 +41,14 @@ sealed interface ImageUploadState {
 
 /**
  * Sends a chat picture to the image host and then the link as a message. It lives apart from the screen: a screen that
- * is left (another conversation, a turned phone) used to cancel the sending halfway. A failure is tried again twice
- * before it is shown, and the progress is a flow the message field reads.
+ * is left (another conversation, a turned phone) used to cancel the sending halfway. A failure is tried again on the next
+ * image host (catbox.moe, then litterbox.catbox.moe, then uguu.se) before it is shown, and the progress is a flow the message field reads.
  */
 object ChatImageUploader {
-    private const val ATTEMPTS = 3
     private const val RETRY_DELAY_MS = 2_000L
     private const val PERCENT = 100
 
+    private val hosts = ImageHost.entries
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val _state = MutableStateFlow<ImageUploadState>(ImageUploadState.Idle)
     val state: StateFlow<ImageUploadState> = _state.asStateFlow()
@@ -104,18 +104,18 @@ object ChatImageUploader {
 
     private suspend fun uploadWithRetries(bytes: ByteArray, mime: String): String {
         var failure: Exception? = null
-        for (attempt in 1..ATTEMPTS) {
+        for (attempt in 1..hosts.size) {
             _state.value = ImageUploadState.Uploading(0, attempt)
             try {
-                return uploadToCatbox(bytes, mime) { share ->
+                return uploadToCatbox(bytes, mime, host = hosts[attempt - 1]) { share ->
                     _state.value = ImageUploadState.Uploading((share * PERCENT).toInt().coerceIn(0, PERCENT), attempt)
                 }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 failure = e
-                Logger.w(throwable = e) { "Image upload attempt $attempt of $ATTEMPTS failed: ${e.message}" }
-                if (attempt < ATTEMPTS) delay(RETRY_DELAY_MS * attempt)
+                Logger.w(throwable = e) { "Image upload attempt $attempt of ${hosts.size} failed: ${e.message}" }
+                if (attempt < hosts.size) delay(RETRY_DELAY_MS * attempt)
             }
         }
         throw failure ?: IllegalStateException("Upload failed")

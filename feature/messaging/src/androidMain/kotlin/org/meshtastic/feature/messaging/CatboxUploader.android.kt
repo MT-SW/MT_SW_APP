@@ -22,6 +22,7 @@ import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.onUpload
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
+import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
@@ -29,7 +30,7 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.isSuccess
 
-actual suspend fun uploadToCatbox(bytes: ByteArray, mimeType: String, fileName: String, onProgress: (Float) -> Unit): String {
+actual suspend fun uploadToCatbox(bytes: ByteArray, mimeType: String, fileName: String, host: ImageHost, onProgress: (Float) -> Unit): String {
     // Without limits of its own a slow connection hit the engine's short defaults and the picture stopped part way.
     val client =
         HttpClient(OkHttp) {
@@ -41,13 +42,14 @@ actual suspend fun uploadToCatbox(bytes: ByteArray, mimeType: String, fileName: 
         }
     try {
         val response =
-            client.post("https://catbox.moe/user/api.php") {
+            client.post(host.url) {
+                header(HttpHeaders.UserAgent, "MT_SW_APP")
                 setBody(
                     MultiPartFormDataContent(
                         formData {
-                            append("reqtype", "fileupload")
+                            host.extraFields.forEach { (key, value) -> append(key, value) }
                             append(
-                                "fileToUpload",
+                                host.fileField,
                                 bytes,
                                 Headers.build {
                                     append(HttpHeaders.ContentType, mimeType)
@@ -65,7 +67,7 @@ actual suspend fun uploadToCatbox(bytes: ByteArray, mimeType: String, fileName: 
         val answer = response.bodyAsText().trim()
         // The host answers an error with a text, which must never be sent on as if it were a link.
         check(response.status.isSuccess() && answer.startsWith("https://")) {
-            "Serwer zdjęć odpowiedział: ${response.status.value} ${answer.take(MAX_ERROR_CHARS)}"
+            "Serwer zdjęć (${host.label}) odpowiedział: ${response.status.value} ${answer.take(MAX_ERROR_CHARS)}"
         }
         onProgress(1f)
         return answer

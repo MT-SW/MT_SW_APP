@@ -1009,7 +1009,7 @@ internal fun MessageInput(
             title = { Text("Wysłać zdjęcie?") },
             text = {
                 Text(
-                    "Zdjęcie zostanie wysłane na publiczny serwer catbox.moe i będzie dostępne dla każdego, kto zna link. Upewnij się, że nie zawiera niczego prywatnego.",
+                    "Zdjęcie zostanie wysłane na publiczny serwer zdjęć (catbox.moe, a gdy jest niedostępny: litterbox.catbox.moe lub uguu.se) i będzie dostępne dla każdego, kto zna link. Upewnij się, że nie zawiera niczego prywatnego.",
                 )
             },
             confirmButton = {
