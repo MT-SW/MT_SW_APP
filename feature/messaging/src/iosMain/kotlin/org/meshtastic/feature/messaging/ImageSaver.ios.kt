@@ -17,6 +17,7 @@
 package org.meshtastic.feature.messaging
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.darwin.Darwin
@@ -24,6 +25,9 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsBytes
 import io.ktor.http.contentType
+import platform.Foundation.NSTemporaryDirectory
+import platform.Foundation.NSURL
+import platform.UIKit.UIActivityViewController
 
 actual suspend fun downloadImageBytes(url: String): DownloadedImage? {
     val client = HttpClient(Darwin)
@@ -38,5 +42,13 @@ actual suspend fun downloadImageBytes(url: String): DownloadedImage? {
     }
 }
 
-/** iOS: saving a picture needs the system share/save sheet, which is not wired yet, so for now nothing happens. */
-@Composable actual fun rememberImageSaver(): ImageSaverLauncher = ImageSaverLauncher { _, _, _ -> }
+/** iOS: shows the system share sheet, which also offers saving the picture to Photos or Files. */
+@Composable
+actual fun rememberImageSaver(): ImageSaverLauncher = remember {
+    ImageSaverLauncher { bytes, fileName, _ ->
+        val path = NSTemporaryDirectory() + fileName
+        bytes.toNSData().writeToFile(path, atomically = true)
+        val sheet = UIActivityViewController(listOf(NSURL.fileURLWithPath(path)), null)
+        topViewController()?.presentViewController(sheet, animated = true, completion = null)
+    }
+}

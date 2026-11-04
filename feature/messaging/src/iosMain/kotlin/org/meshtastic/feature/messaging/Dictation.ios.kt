@@ -18,8 +18,83 @@ package org.meshtastic.feature.messaging
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+import kotlinx.cinterop.ExperimentalForeignApi
+import platform.AVFAudio.AVAudioRecorder
+import platform.AVFAudio.AVAudioSession
+import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
+import platform.AVFAudio.AVEncoderAudioQualityKey
+import platform.AVFAudio.AVFormatIDKey
+import platform.AVFAudio.AVLinearPCMBitDepthKey
+import platform.AVFAudio.AVLinearPCMIsBigEndianKey
+import platform.AVFAudio.AVLinearPCMIsFloatKey
+import platform.AVFAudio.AVNumberOfChannelsKey
+import platform.AVFAudio.AVSampleRateKey
+import platform.AVFAudio.setActive
+import platform.CoreAudioTypes.kAudioFormatLinearPCM
+import platform.Foundation.NSData
+import platform.Foundation.NSFileManager
+import platform.Foundation.NSTemporaryDirectory
+import platform.Foundation.NSURL
+import platform.Foundation.dataWithContentsOfFile
 
-/** iOS: the microphone is not wired yet, so permission is reported as refused and nothing is recorded. */
+/** Takes the raw samples out of a WAV file (looks for the "data" block). */
+private fun wavSamples(wav: ByteArray): ByteArray {
+    var pos = 12
+    while (pos + 8 <= wav.size) {
+        val id = String(CharArray(4) { (wav[pos + it].toInt() and 0xFF).toChar() })
+        var size = 0
+        for (i in 3 downTo 0) size = (size shl 8) or (wav[pos + 4 + i].toInt() and 0xFF)
+        if (id == "data") {
+            val end = if (size <= 0 || pos + 8 + size > wav.size) wav.size else pos + 8 + size
+            return wav.copyOfRange(pos + 8, end)
+        }
+        pos += 8 + size + (size and 1)
+    }
+    return ByteArray(0)
+}
+
+@OptIn(ExperimentalForeignApi::class)
+private class IosMic {
+    private var recorder: AVAudioRecorder? = null
+    private val path = NSTemporaryDirectory() + "mt_sw_dictation.wav"
+
+    suspend fun permission(): Boolean = suspendCoroutine { cont ->
+        AVAudioSession.sharedInstance().requestRecordPermission { granted -> cont.resume(granted) }
+    }
+
+    fun start() {
+        val session = AVAudioSession.sharedInstance()
+        session.setCategory(AVAudioSessionCategoryPlayAndRecord, error = null)
+        session.setActive(true, error = null)
+        val settings: Map<Any?, Any?> = mapOf(
+            AVFormatIDKey to kAudioFormatLinearPCM.toInt(),
+            AVSampleRateKey to 16000.0,
+            AVNumberOfChannelsKey to 1,
+            AVLinearPCMBitDepthKey to 16,
+            AVLinearPCMIsFloatKey to false,
+            AVLinearPCMIsBigEndianKey to false,
+        )
+        val rec = AVAudioRecorder(uRL = NSURL.fileURLWithPath(path), settings = settings, error = null)
+        rec.record()
+        recorder = rec
+    }
+
+    fun stop(): ByteArray {
+        val rec = recorder ?: return ByteArray(0)
+        rec.stop()
+        recorder = null
+        AVAudioSession.sharedInstance().setActive(false, error = null)
+        val data: NSData? = NSData.dataWithContentsOfFile(path)
+        NSFileManager.defaultManager.removeItemAtPath(path, error = null)
+        return if (data == null) ByteArray(0) else wavSamples(data.toByteArray())
+    }
+}
+
+/** iOS: records from the microphone (PCM 16 bit, 16 kHz, mono) after the user allows it. */
 @Composable
-actual fun rememberMicRecorder(): MicRecorder =
-    remember { MicRecorder(permission = { false }, start = {}, stop = { ByteArray(0) }) }
+actual fun rememberMicRecorder(): MicRecorder = remember {
+    val mic = IosMic()
+    MicRecorder(permission = { mic.permission() }, start = { mic.start() }, stop = { mic.stop() })
+}

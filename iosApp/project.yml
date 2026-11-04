@@ -22,6 +22,7 @@ targets:
         UIBackgroundModes:
           - bluetooth-central
         NSBluetoothAlwaysUsageDescription: "MT_SW łączy się przez Bluetooth z radiem LoRa (mesh)."
+        NSMicrophoneUsageDescription: "MT_SW używa mikrofonu do dyktowania wiadomości."
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft

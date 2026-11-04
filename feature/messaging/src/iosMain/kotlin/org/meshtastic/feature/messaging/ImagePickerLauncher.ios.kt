@@ -17,7 +17,41 @@
 package org.meshtastic.feature.messaging
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import platform.Foundation.NSData
+import platform.Foundation.NSError
+import platform.PhotosUI.PHPickerViewController
+import platform.PhotosUI.PHPickerConfiguration
+import platform.PhotosUI.PHPickerFilter
+import platform.PhotosUI.PHPickerResult
+import platform.PhotosUI.PHPickerViewControllerDelegateProtocol
+import platform.darwin.NSObject
 
-/** iOS: the system photo picker is not wired yet, so for now nothing happens. */
+private class PickerDelegate(var onPicked: (ByteArray, String) -> Unit) :
+    NSObject(), PHPickerViewControllerDelegateProtocol {
+    override fun picker(picker: PHPickerViewController, didFinishPicking: List<*>) {
+        picker.dismissViewControllerAnimated(true, completion = null)
+        val result = didFinishPicking.firstOrNull() as? PHPickerResult ?: return
+        result.itemProvider.loadDataRepresentationForTypeIdentifier("public.image") { data: NSData?, _: NSError? ->
+            if (data != null) onPicked(data.toByteArray(), "image/jpeg")
+        }
+    }
+}
+
+/** iOS: opens the system photo picker and returns the chosen picture. */
 @Composable
-actual fun rememberImagePickerLauncher(onImagePicked: (bytes: ByteArray, mimeType: String) -> Unit): () -> Unit = {}
+actual fun rememberImagePickerLauncher(onImagePicked: (bytes: ByteArray, mimeType: String) -> Unit): () -> Unit {
+    val current = rememberUpdatedState(onImagePicked)
+    val delegate = remember { PickerDelegate { b, m -> current.value(b, m) } }
+    return remember {
+        {
+            val config = PHPickerConfiguration()
+            config.selectionLimit = 1
+            config.filter = PHPickerFilter.imagesFilter
+            val picker = PHPickerViewController(configuration = config)
+            picker.delegate = delegate
+            topViewController()?.presentViewController(picker, animated = true, completion = null)
+        }
+    }
+}
