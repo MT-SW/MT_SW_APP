@@ -1,0 +1,68 @@
+/*
+ * Copyright (c) 2026 Meshtastic LLC
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package org.meshtastic.core.service
+
+import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.withContext
+import okio.BufferedSink
+import okio.BufferedSource
+import okio.FileSystem
+import okio.Path.Companion.toPath
+import okio.buffer
+import org.koin.core.annotation.Single
+import org.meshtastic.core.common.util.CommonUri
+import org.meshtastic.core.di.CoroutineDispatchers
+import org.meshtastic.core.repository.FileService
+import platform.Foundation.NSURL
+
+/** Reads and writes the files the iPhone pickers hand back (`file:` addresses) or plain paths. */
+@Single
+class IosFileService(private val dispatchers: CoroutineDispatchers) : FileService {
+    override suspend fun write(uri: CommonUri, block: suspend (BufferedSink) -> Unit): Boolean =
+        withContext(dispatchers.io) {
+            try {
+                val path = uri.toFilePath().toPath()
+                path.parent?.let { FileSystem.SYSTEM.createDirectories(it) }
+                FileSystem.SYSTEM.sink(path).buffer().use { sink -> block(sink) }
+                true
+            } catch (e: CancellationException) {
+                throw e
+            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+                Logger.e(e) { "Failed to write to URI: $uri" }
+                false
+            }
+        }
+
+    override suspend fun read(uri: CommonUri, block: suspend (BufferedSource) -> Unit): Boolean =
+        withContext(dispatchers.io) {
+            try {
+                FileSystem.SYSTEM.source(uri.toFilePath().toPath()).buffer().use { source -> block(source) }
+                true
+            } catch (e: CancellationException) {
+                throw e
+            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+                Logger.e(e) { "Failed to read from URI: $uri" }
+                false
+            }
+        }
+
+    private fun CommonUri.toFilePath(): String {
+        val text = toString()
+        return if (text.startsWith("file:")) NSURL.URLWithString(text)?.path ?: text.removePrefix("file://") else text
+    }
+}

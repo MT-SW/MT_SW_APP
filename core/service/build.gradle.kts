@@ -44,6 +44,8 @@ kotlin {
             implementation(libs.kermit)
         }
 
+        getByName("iosMain") { dependencies { implementation(libs.okio) } }
+
         androidMain.dependencies {
             implementation(libs.androidx.core.ktx)
             implementation(libs.androidx.work.runtime.ktx)
