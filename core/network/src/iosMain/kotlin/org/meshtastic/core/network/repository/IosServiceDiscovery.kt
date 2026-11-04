@@ -37,13 +37,14 @@ private const val SERVICE_TYPE = "_meshtastic._tcp."
 private const val RESOLVE_TIMEOUT_SECONDS = 10.0
 
 @OptIn(ExperimentalForeignApi::class)
-private fun NSData.bytes(): ByteArray {
+private fun NSData.toBytes(): ByteArray {
     val out = ByteArray(length.toInt())
     if (out.isNotEmpty()) out.usePinned { memcpy(it.addressOf(0), bytes, length) }
     return out
 }
 
 /** iPhone: finds radios on the Wi-Fi (Bonjour / mDNS). */
+@OptIn(ExperimentalForeignApi::class)
 @Single(binds = [ServiceDiscovery::class])
 class IosServiceDiscovery : ServiceDiscovery {
     override val resolvedServices: Flow<List<DiscoveredService>> = callbackFlow {
@@ -59,10 +60,10 @@ class IosServiceDiscovery : ServiceDiscovery {
                 override fun netServiceDidResolveAddress(sender: NSNetService) {
                     val host = sender.hostName?.trimEnd('.') ?: return
                     val txt =
-                        sender.TXTRecordData?.let { data ->
+                        sender.TXTRecordData()?.let { data ->
                             NSNetService.dictionaryFromTXTRecordData(data)
                                 .entries
-                                .mapNotNull { (k, v) -> (k as? String)?.let { key -> (v as? NSData)?.let { key to it.bytes() } } }
+                                .mapNotNull { (k, v) -> (k as? String)?.let { key -> (v as? NSData)?.let { key to it.toBytes() } } }
                                 .toMap()
                         } ?: emptyMap()
                     resolved[sender.name] = DiscoveredService(sender.name, host, sender.port.toInt(), txt)
