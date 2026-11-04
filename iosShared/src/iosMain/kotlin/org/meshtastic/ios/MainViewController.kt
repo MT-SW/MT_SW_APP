@@ -48,7 +48,10 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 /** Starts the dependency graph once for the whole life of the app process. */
-private val koin: Koin by lazy { startKoin<IosKoinApp> {}.koin }
+private val koin: Koin by lazy {
+    IosFileLog.install()
+    startKoin<IosKoinApp> {}.koin
+}
 
 /** The single entry the iOS app (iosApp) calls: the whole screen is drawn by Compose Multiplatform. */
 fun MainViewController() = ComposeUIViewController {
