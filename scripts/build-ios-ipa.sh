@@ -10,7 +10,7 @@ xcodegen
 # IPA_CONFIG: Release (default, fast app, the iOS compiler needs a lot of memory) or Debug (little memory, e.g. on GitHub).
 # IPA_NATIVE_HEAP: memory for the iOS compiler in Release.
 CONFIG="${IPA_CONFIG:-Release}"
-# Kompilator iOS (Kotlin/Native) działa w samym Gradle, więc to on dostaje dużo pamięci (Release). Przy braku pamięci skrypt sam przechodzi na Debug.
+# Kompilator iOS (Kotlin/Native) działa w samym Gradle, więc to on dostaje dużo pamięci (Release).
 build() {
   CONFIG="$1"
   if [ "$CONFIG" = "Release" ]; then
@@ -23,15 +23,7 @@ build() {
     -derivedDataPath "$ROOT/build/xcode-device" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
 }
 CONFIG="${IPA_CONFIG:-Release}"
-if ! build "$CONFIG"; then
-  if [ "$CONFIG" = "Release" ]; then
-    echo "Release się nie udał (pewnie brak pamięci) - buduję wersję Debug."
-    CONFIG="Debug"
-    build "$CONFIG"
-  else
-    exit 1
-  fi
-fi
+build "$CONFIG"
 APP="$ROOT/build/xcode-device/Build/Products/${CONFIG}-iphoneos/MTSWApp.app"
 rm -rf "$ROOT/build/ipa" && mkdir -p "$ROOT/build/ipa/Payload"
 cp -R "$APP" "$ROOT/build/ipa/Payload/"
