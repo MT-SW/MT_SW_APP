@@ -171,12 +171,14 @@ compose.desktop {
         // under the Gradle JVM, and every Build Desktop leg goes red with the jmods-less signature.
         // MT_SW: when JBR 25 is not installed (e.g. a fresh Mac), fall back to the JVM running
         // Gradle so project sync still works; packaging then needs JBR 25 to be installed.
-        javaHome =
+        // MT_SW: a JDK is only usable for packaging when it has `jpackage`. Android Studio's own JBR is found as a JBR 25
+        // toolchain on a Mac but has no jpackage, so then a Temurin 25 toolchain is used (Gradle downloads it by itself).
+        fun toolchainHome(vendor: JvmVendorSpec): String? =
             try {
                 javaToolchains
                     .launcherFor {
                         languageVersion.set(JavaLanguageVersion.of(25))
-                        vendor.set(JvmVendorSpec.JETBRAINS)
+                        this.vendor.set(vendor)
                     }
                     .get()
                     .metadata
@@ -184,9 +186,14 @@ compose.desktop {
                     .asFile
                     .absolutePath
             } catch (e: Exception) {
-                logger.warn("JetBrains Runtime 25 not found, using the Gradle JVM instead: ${e.message}")
-                System.getProperty("java.home")
+                logger.warn("JDK 25 ($vendor) not found: ${e.message}")
+                null
             }
+        fun hasJpackage(home: String?): Boolean = home != null && File(home, "bin/jpackage").exists()
+        javaHome =
+            toolchainHome(JvmVendorSpec.JETBRAINS).takeIf { hasJpackage(it) }
+                ?: toolchainHome(JvmVendorSpec.ADOPTIUM).takeIf { hasJpackage(it) }
+                ?: System.getProperty("java.home")
 
         val desktopJvmArgs = buildList {
             // No fixed memory limit: the JVM may use up to 90% of the computer's memory (the assistant's model and the maps
