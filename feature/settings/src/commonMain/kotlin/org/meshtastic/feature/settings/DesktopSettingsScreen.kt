@@ -60,8 +60,6 @@ import org.meshtastic.core.resources.help_and_documentation
 import org.meshtastic.core.resources.import_configuration
 import org.meshtastic.core.resources.info
 import org.meshtastic.core.resources.intro_show
-import org.meshtastic.core.resources.mt_sw_features_summary
-import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.preferences_language
 import org.meshtastic.core.resources.preferences_system_default
 import org.meshtastic.core.resources.pt_BR
@@ -84,7 +82,6 @@ import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Language
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.PermScanWifi
-import org.meshtastic.core.ui.icon.Tune
 import org.meshtastic.core.ui.icon.WavingHand
 import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.core.ui.util.rememberOpenFileLauncher
@@ -339,16 +336,6 @@ fun DesktopSettingsScreen(
                             onSetRetentionDays = { settingsViewModel.setMeshLogRetentionDays(it) },
                         )
 
-                    }
-
-                    ExpressiveSection(title = stringResource(Res.string.mt_sw_features_title)) {
-                        ListItem(
-                            text = stringResource(Res.string.mt_sw_features_title),
-                            supportingText = stringResource(Res.string.mt_sw_features_summary),
-                            leadingIcon = MeshtasticIcons.Tune,
-                        ) {
-                            onNavigate(SettingsRoute.MtSwFeatures)
-                        }
                     }
 
                     ExpressiveSection(title = stringResource(Res.string.discovery_local_mesh)) {
