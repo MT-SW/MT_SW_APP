@@ -78,8 +78,12 @@ class LogSearchManager {
     val searchState = _searchState.asStateFlow()
 
     fun setSearchText(text: String) {
+        // An unchanged query never re-emits through the StateFlow, so clearing here would hide its matches for good.
+        if (text == _searchText.value) return
         _searchText.value = text
         _currentMatchIndex.value = -1
+        // The field reads its text from here; matches follow once the off-main search finishes.
+        _searchState.value = SearchState(searchText = text)
     }
 
     fun goToNextMatch() {
@@ -104,8 +108,8 @@ class LogSearchManager {
         setSearchText("")
     }
 
-    fun updateMatches(searchText: String, filteredLogs: List<DebugViewModel.UiMeshLog>) {
-        val matches = findSearchMatches(searchText, filteredLogs)
+    fun applyMatches(searchText: String, matches: List<SearchMatch>) {
+        if (searchText != _searchText.value) return
         val hasMatches = matches.isNotEmpty()
         _searchState.value =
             _searchState.value.copy(
@@ -255,7 +259,6 @@ class DebugViewModel(
 
     fun updateFilteredLogs(logs: List<UiMeshLog>) {
         filterManager.updateFilteredLogs(logs)
-        searchManager.updateMatches(searchManager.searchText.value, logs)
     }
 
     fun setRetentionDays(days: Int) {
@@ -277,12 +280,12 @@ class DebugViewModel(
     init {
         Logger.d { "DebugViewModel created" }
         safeLaunch(tag = "searchMatchUpdater") {
-            combine(searchManager.searchText, filterManager.filteredLogs) { searchText, logs ->
-                searchManager.findSearchMatches(searchText, logs)
-            }
-                .collect {
-                    searchManager.updateMatches(searchManager.searchText.value, filterManager.filteredLogs.value)
+            // Regex over up to DEFAULT_MAX_LOGS rows per keystroke; on main it ANRs.
+            combine(searchManager.searchText, filterManager.filteredLogs, ::Pair)
+                .mapLatest { (searchText, logs) ->
+                    searchText to withContext(dispatchers.default) { searchManager.findSearchMatches(searchText, logs) }
                 }
+                .collect { (searchText, matches) -> searchManager.applyMatches(searchText, matches) }
         }
     }
 

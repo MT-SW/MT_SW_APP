@@ -49,6 +49,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
@@ -117,7 +124,18 @@ fun <T : Message<T, *>> RadioConfigScreenList(
         ) { innerPadding ->
             val showFooterButtons = configState.isDirty || additionalDirtyCheck()
 
-            Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+            // Tab walks the fields on a hardware keyboard; a text field would otherwise insert it as a character.
+            Box(
+                modifier =
+                Modifier.padding(innerPadding).fillMaxSize().onPreviewKeyEvent { event ->
+                    if (event.type != KeyEventType.KeyDown || event.key != Key.Tab) {
+                        return@onPreviewKeyEvent false
+                    }
+                    val direction = if (event.isShiftPressed) FocusDirection.Previous else FocusDirection.Next
+                    focusManager.moveFocus(direction)
+                    true
+                },
+            ) {
                 val fieldFocus = LocalSettingsFieldFocus.current
                 val requestedField = fieldFocus?.pending?.collectAsState()?.value
                 val keyIndex = remember { FieldKeyIndex() }

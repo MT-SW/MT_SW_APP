@@ -43,7 +43,7 @@ private const val VIEW_BASED_ALGORITHM_NODE_THRESHOLD = 1000
  * Renders node markers with clustering via the library's [Clustering] composable.
  *
  * Each unclustered node is composed as a [PulsingNodeChip] (`clusterItemContent`), with its z-index forwarded through
- * [ClusteringMarkerProperties]; cluster bubbles keep the library's default rendering. Native info windows
+ * [ClusteringMarkerProperties]; cluster bubbles keep the library's default rendering, labeled with their exact count. Native info windows
  * (title/snippet from [NodeClusterItem]) and click interactions are handled by the library renderer, and precision
  * circles are drawn for the currently-unclustered items via `clusterItemDecoration`.
  *
@@ -92,10 +92,14 @@ fun NodeClusterMarkers(
             }
         },
         onClusterManager = { clusterManager ->
-            // The library renderer extends DefaultClusterRenderer; raise its clustering threshold once.
+            // The library renderer extends DefaultClusterRenderer; configure it once.
             val renderer = clusterManager.renderer as? DefaultClusterRenderer<*>
-            if (renderer != null && renderer.minClusterSize != MIN_CLUSTER_SIZE) {
+            if (renderer != null && (renderer.minClusterSize != MIN_CLUSTER_SIZE || !renderer.showExactCount)) {
                 renderer.minClusterSize = MIN_CLUSTER_SIZE
+                // Exact counts, "1.2k" past a thousand: what the MapLibre map's point_count_abbreviated label and the
+                // Apple map's cluster badge show, where the library's default buckets read "10+", "20+", "50+".
+                renderer.showExactCount = true
+                renderer.useCompactNumberFormatting = true
                 clusterManager.cluster()
             }
             // Only swap on a threshold crossing; otherwise just resize in place - replacing re-migrates every item.
