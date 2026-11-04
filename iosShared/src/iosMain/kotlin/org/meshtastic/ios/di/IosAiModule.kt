@@ -66,8 +66,8 @@ class IosAiModule {
     @Single
     fun iosAiModelStore(): IosAiModelStore {
         AiModels.platform = AiPlatform.IOS
-        // The speech engine and the ONNX translator are not on the iPhone; the language models run in llama.cpp.
-        AiModels.unavailableEngines = setOf(AiEngine.NLLB_ONNX, AiEngine.WHISPER_CPP)
+        // The ONNX translator is not on the iPhone; language models run in llama.cpp and speech models in whisper.cpp.
+        AiModels.unavailableEngines = setOf(AiEngine.NLLB_ONNX)
         return IosAiModelStore(iosDataDir())
     }
 

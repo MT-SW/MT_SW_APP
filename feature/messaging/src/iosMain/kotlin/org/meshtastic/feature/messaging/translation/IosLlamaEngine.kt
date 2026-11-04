@@ -87,7 +87,23 @@ import llama.llama_sampler_sample
 import llama.llama_token_to_piece
 import llama.llama_tokenize
 import llama.llama_vocab_is_eog
+import org.meshtastic.core.repository.AiEngine
+import org.meshtastic.core.repository.AiModels
 import platform.Foundation.NSProcessInfo
+import llama.WHISPER_SAMPLING_GREEDY
+import llama.whisper_context_default_params
+import llama.whisper_free
+import llama.whisper_full
+import llama.whisper_full_default_params
+import llama.whisper_full_get_segment_text
+import llama.whisper_full_n_segments
+import llama.whisper_init_from_file_with_params
+import cnames.structs.whisper_context
+
+/** The language of the dictation: an ISO code (for example "pl") or "auto". Set by the dictation service. */
+object IosDictationLanguage {
+    var hint: String = "auto"
+}
 
 private const val CONTEXT_TOKENS = 4096
 private const val BATCH_TOKENS = 512
@@ -106,6 +122,8 @@ class IosLlamaEngine(
     private val hearingPath: (String) -> String? = { null },
 ) : AiTextEngine {
     private var mtmdContext: CPointer<mtmd_context>? = null
+    private var whisperContext: CPointer<whisper_context>? = null
+    private var whisperFor: String? = null
     private var mtmdFor: String? = null
     private val lock = Mutex()
     private var loadedId: String? = null
@@ -119,7 +137,14 @@ class IosLlamaEngine(
 
     private fun isSimulator() = NSProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] != null
 
+    private fun releaseWhisper() {
+        whisperContext?.let { whisper_free(it) }
+        whisperContext = null
+        whisperFor = null
+    }
+
     private fun release() {
+        releaseWhisper()
         mtmdContext?.let { mtmd_free(it) }
         mtmdContext = null
         mtmdFor = null
@@ -272,8 +297,46 @@ class IosLlamaEngine(
         }
     }
 
+    /** Dictation with a Whisper model (whisper.cpp, in the same framework as llama.cpp). */
+    private fun transcribeWithWhisper(modelId: String, wav: ByteArray): String {
+        val pcm = wavSamples(wav)
+        val samples = FloatArray(pcm.size / 2) { i ->
+            ((pcm[2 * i].toInt() and 0xFF) or (pcm[2 * i + 1].toInt() shl 8)).toShort() / 32768f
+        }
+        if (samples.isEmpty()) return ""
+        if (whisperFor != modelId) {
+            releaseWhisper()
+            val path = modelPath(modelId) ?: error("Model $modelId is not downloaded")
+            val params = whisper_context_default_params().copy { use_gpu = !isSimulator() }
+            whisperContext = whisper_init_from_file_with_params(path, params) ?: error("Could not load the speech model")
+            whisperFor = modelId
+        }
+        val w = whisperContext!!
+        return memScoped {
+            val language = IosDictationLanguage.hint
+            val languageCode = language.cstr.ptr
+            val params = whisper_full_default_params(WHISPER_SAMPLING_GREEDY).copy {
+                n_threads = 4
+                translate = false
+                no_context = true
+                print_special = false
+                print_progress = false
+                print_realtime = false
+                print_timestamps = false
+                this.language = languageCode
+                detect_language = language == "auto"
+            }
+            val result = samples.usePinned { whisper_full(w, params, it.addressOf(0), samples.size) }
+            if (result != 0) error("The speech model failed")
+            buildString {
+                for (i in 0 until whisper_full_n_segments(w)) append(whisper_full_get_segment_text(w, i)?.toKString().orEmpty())
+            }.trim()
+        }
+    }
+
     override suspend fun transcribe(modelId: String, wav: ByteArray): String = lock.withLock {
         withContext(Dispatchers.Default) {
+            if (AiModels.byId(modelId)?.engine == AiEngine.WHISPER_CPP) return@withContext transcribeWithWhisper(modelId, wav)
             ensureLoaded(modelId)
             val m = model!!
             val c = ctx!!
