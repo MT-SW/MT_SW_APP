@@ -155,6 +155,7 @@ private fun showToastNow(text: String) {
 @Composable
 actual fun rememberShowToastResource(): suspend (StringResource) -> Unit = { res -> showToastNow(getString(res)) }
 
+@OptIn(ExperimentalForeignApi::class)
 @Composable
 actual fun rememberSaveFileLauncher(
     onUriReceived: (CommonUri) -> Unit,
