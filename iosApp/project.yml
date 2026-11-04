@@ -18,6 +18,9 @@ targets:
         CFBundleDisplayName: MT_SW
         UILaunchScreen: {}
         CADisableMinimumFrameDurationOnPhone: true
+        NSLocalNetworkUsageDescription: "MT_SW łączy się z radiem LoRa (mesh) przez Wi-Fi w sieci lokalnej."
+        UIBackgroundModes:
+          - bluetooth-central
         NSBluetoothAlwaysUsageDescription: "MT_SW łączy się przez Bluetooth z radiem LoRa (mesh)."
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
