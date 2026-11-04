@@ -56,6 +56,9 @@ kotlin {
             implementation(libs.usb.serial.android)
         }
 
+        // iPhone: files are handled with okio (including reading the zip with the firmware).
+        matching { it.name == "iosMain" }.configureEach { dependencies { implementation(libs.okio) } }
+
         // performUsbUpdate resolves compose-resources strings, whose desktop implementation needs
         // the skiko-awt runtime to read the system theme.
         jvmTest.dependencies {
