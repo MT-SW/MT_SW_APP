@@ -12,13 +12,10 @@ targets:
     platform: iOS
     sources:
       - path: MTSWApp
-    settings:
-      base:
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     info:
       path: MTSWApp/Info.plist
       properties:
-        CFBundleDisplayName: MT_SW
+        CFBundleDisplayName: MT_SW_APP
         UILaunchScreen: {}
         CADisableMinimumFrameDurationOnPhone: true
         NSLocalNetworkUsageDescription: "MT_SW łączy się z radiem LoRa (mesh) przez Wi-Fi w sieci lokalnej."
@@ -44,6 +41,7 @@ targets:
         codeSign: true
     settings:
       base:
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         PRODUCT_BUNDLE_IDENTIFIER: pl.mtsw.mtswapp
         MARKETING_VERSION: "0.1.0"
         CURRENT_PROJECT_VERSION: "1"
