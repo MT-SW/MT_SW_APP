@@ -68,6 +68,15 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
         }
 
+        // iOS: the HTTP engine for the picture upload/download. Lazy, so hosts without iOS targets are not affected.
+        matching { it.name == "iosMain" }
+            .configureEach {
+                dependencies {
+                    implementation(libs.ktor.client.core)
+                    implementation(libs.ktor.client.darwin)
+                }
+            }
+
         commonTest.dependencies { implementation(libs.compose.multiplatform.ui.test) }
 
         jvmTest.dependencies { implementation(compose.desktop.currentOs) }
