@@ -16,6 +16,7 @@
  */
 package org.meshtastic.ios.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,7 +51,9 @@ fun IosMainScreen(uiViewModel: UIViewModel, multiBackstack: MultiBackstack, modi
     val backStack = multiBackstack.activeBackStack
     val settingsRadioConfigViewModelProvider = rememberSettingsRadioConfigViewModelProvider(backStack)
 
-    Surface(modifier = modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))) {
+    // The background is painted over the whole screen, including the notch area; only the content stays inside it.
+    Surface(modifier = modifier.fillMaxSize()) {
+      Box(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))) {
         MeshtasticAppShell(
             multiBackstack = multiBackstack,
             uiViewModel = uiViewModel,
@@ -78,5 +81,6 @@ fun IosMainScreen(uiViewModel: UIViewModel, multiBackstack: MultiBackstack, modi
                 )
             }
         }
+      }
     }
 }
