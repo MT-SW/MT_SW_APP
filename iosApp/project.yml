@@ -12,6 +12,9 @@ targets:
     platform: iOS
     sources:
       - path: MTSWApp
+    settings:
+      base:
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     info:
       path: MTSWApp/Info.plist
       properties:
