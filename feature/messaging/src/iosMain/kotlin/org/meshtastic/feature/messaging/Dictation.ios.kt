@@ -43,7 +43,7 @@ import platform.Foundation.dataWithContentsOfFile
 private fun wavSamples(wav: ByteArray): ByteArray {
     var pos = 12
     while (pos + 8 <= wav.size) {
-        val id = String(CharArray(4) { (wav[pos + it].toInt() and 0xFF).toChar() })
+        val id = CharArray(4) { (wav[pos + it].toInt() and 0xFF).toChar() }.concatToString()
         var size = 0
         for (i in 3 downTo 0) size = (size shl 8) or (wav[pos + 4 + i].toInt() and 0xFF)
         if (id == "data") {

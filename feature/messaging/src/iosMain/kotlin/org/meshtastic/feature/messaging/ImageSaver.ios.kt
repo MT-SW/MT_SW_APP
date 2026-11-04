@@ -27,6 +27,7 @@ import io.ktor.client.statement.bodyAsBytes
 import io.ktor.http.contentType
 import platform.Foundation.NSTemporaryDirectory
 import platform.Foundation.NSURL
+import platform.Foundation.writeToFile
 import platform.UIKit.UIActivityViewController
 
 actual suspend fun downloadImageBytes(url: String): DownloadedImage? {
