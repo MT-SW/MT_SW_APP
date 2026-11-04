@@ -2940,6 +2940,7 @@ store_forward
 store_forward_config
 success
 super_deep_sleep_duration_seconds
+support_project_description
 support_project_summary
 support_project_title
 supported

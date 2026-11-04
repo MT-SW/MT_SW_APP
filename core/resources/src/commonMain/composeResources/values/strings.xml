@@ -3006,6 +3006,7 @@
     <string name="store_forward_config">Store &amp; Forward Config</string>
     <string name="success">Success</string>
     <string name="super_deep_sleep_duration_seconds">Super deep sleep duration</string>
+    <string name="support_project_description">MT_SW is free and is made by a community, in spare time. If you want to help, you can voluntarily support the maintenance and development of the app, MT_SW_FIRMWARE and the Home Assistant integration. Donations go to the account of the app developer (spontanicznemajsterkowanie), who shares them among the needs of the whole team: cheaterenator (MT_SW_FIRMWARE) and kamkom21 (local bot). The app always stays free.</string>
     <string name="support_project_summary">Voluntary donation to the developer for maintaining and developing the app</string>
     <string name="support_project_title">Support the project</string>
     <string name="supported">Supported</string>

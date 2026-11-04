@@ -16,10 +16,17 @@
  */
 package org.meshtastic.feature.settings.component
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.support_project_description
 import org.meshtastic.core.resources.support_project_summary
 import org.meshtastic.core.resources.support_project_title
 import org.meshtastic.core.ui.component.ListItem
@@ -36,6 +43,12 @@ private const val SUPPORT_PROJECT_URL = "https://ko-fi.com/spontanicznemajsterko
 fun SupportProjectSection() {
     val uriHandler = LocalUriHandler.current
     ExpressiveSection(title = stringResource(Res.string.support_project_title)) {
+        Text(
+            text = stringResource(Res.string.support_project_description),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        )
         ListItem(
             text = stringResource(Res.string.support_project_title),
             supportingText = stringResource(Res.string.support_project_summary),
