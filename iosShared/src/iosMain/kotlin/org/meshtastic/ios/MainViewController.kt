@@ -28,7 +28,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
-import org.koin.compose.koinInject
 import org.koin.core.Koin
 import org.koin.plugin.module.dsl.startKoin
 import org.meshtastic.core.model.DeviceAddress
@@ -53,7 +52,7 @@ private val koin: Koin by lazy { startKoin<IosKoinApp> {}.koin }
 
 /** The single entry the iOS app (iosApp) calls: the whole screen is drawn by Compose Multiplatform. */
 fun MainViewController() = ComposeUIViewController {
-    val uiViewModel = remember { koin.get<UIViewModel>() }
+    val uiViewModel = remember { koin.get(UIViewModel::class) }
     org.koin.compose.KoinContext(koin) {
         MeshServiceLifecycle()
         BackgroundCleanup()
@@ -64,7 +63,7 @@ fun MainViewController() = ComposeUIViewController {
 /** Starts the radio service with the screen and stops it with it. */
 @Composable
 private fun MeshServiceLifecycle() {
-    val orchestrator = koinInject<MeshServiceOrchestrator>()
+    val orchestrator = remember { koin.get(MeshServiceOrchestrator::class) }
     DisposableEffect(Unit) {
         orchestrator.start()
         onDispose { orchestrator.stop() }
@@ -77,8 +76,8 @@ private val NODE_CLEANUP_START_DELAY = 1.minutes
 /** Hourly clean-up of old logs and (when enabled) inactive nodes, while the app is open. */
 @Composable
 private fun BackgroundCleanup() {
-    val scheduler = koinInject<IosNodeCleanupScheduler>()
-    val logCleanup = koinInject<MeshLogCleanup>()
+    val scheduler = remember { koin.get(IosNodeCleanupScheduler::class) }
+    val logCleanup = remember { koin.get(MeshLogCleanup::class) }
     LaunchedEffect(Unit) { withContext(Dispatchers.Default) { logCleanup.runHourly() } }
     LaunchedEffect(Unit) {
         delay(NODE_CLEANUP_START_DELAY)
@@ -93,7 +92,7 @@ private fun BackgroundCleanup() {
 @Suppress("ViewModelForwarding")
 @Composable
 private fun ThemedApp(uiViewModel: UIViewModel) {
-    val uiPrefs = koinInject<UiPrefs>()
+    val uiPrefs = remember { koin.get(UiPrefs::class) }
     val themePref by uiPrefs.theme.collectAsState(initial = -1)
     val isDarkTheme =
         when (themePref) {
