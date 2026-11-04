@@ -75,6 +75,9 @@ dependencies {
     // KSP resolves this via a detached configuration at task execution time,
     // so we declare it explicitly to ensure offline/Flatpak builds can resolve it.
     "kspJvm"(libs.ksp.symbol.processing.aa.embeddable)
+    // iPhone: Room generates the database constructor (MeshtasticDatabaseConstructor) here too.
+    "kspIosArm64"(libs.androidx.room.compiler)
+    "kspIosSimulatorArm64"(libs.androidx.room.compiler)
     "kspAndroidHostTest"(libs.androidx.room.compiler)
     "kspAndroidDeviceTest"(libs.androidx.room.compiler)
 }
