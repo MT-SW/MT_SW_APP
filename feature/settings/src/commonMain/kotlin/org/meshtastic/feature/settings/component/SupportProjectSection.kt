@@ -41,6 +41,7 @@ private const val SUPPORT_PROJECT_URL = "https://ko-fi.com/spontanicznemajsterko
  */
 @Composable
 fun SupportProjectSection() {
+    if (!isSupportLinkAllowed()) return
     val uriHandler = LocalUriHandler.current
     ExpressiveSection(title = stringResource(Res.string.support_project_title)) {
         Text(

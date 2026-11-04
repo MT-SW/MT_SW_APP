@@ -57,6 +57,7 @@ import org.meshtastic.core.resources.import_menu_in_top_bar
 import org.meshtastic.core.resources.app_update_check_title
 import org.meshtastic.core.resources.app_update_tests_title
 import org.meshtastic.core.resources.wifi_devices
+import org.meshtastic.feature.settings.component.isSupportLinkAllowed
 import org.meshtastic.feature.settings.navigation.ConfigRoute
 import org.meshtastic.feature.settings.navigation.ModuleRoute
 
@@ -191,7 +192,6 @@ object SettingsSearchCatalog {
             Res.string.app_log_level to SettingsRoute.MtSwFeatures,
             Res.string.app_log_recent to SettingsRoute.MtSwFeatures,
             Res.string.report_issues_title to SettingsRoute.MtSwFeatures,
-            Res.string.support_project_title to SettingsRoute.MtSwFeatures,
             Res.string.intro_mtsw_planner_title to SettingsRoute.MtSwFeatures,
             Res.string.terrain_horizon_title to SettingsRoute.MtSwFeatures,
             Res.string.node_color_title to SettingsRoute.Security,
@@ -206,7 +206,13 @@ object SettingsSearchCatalog {
             Res.string.local_stats_title to SettingsRoute.Telemetry,
             Res.string.about to SettingsRoute.About,
             Res.string.acknowledgements to SettingsRoute.Acknowledgements,
-        )
+        ) +
+            // The donation link is not offered in the App Store build of the iPhone/iPad app.
+            if (isSupportLinkAllowed()) {
+                listOf(Res.string.support_project_title to SettingsRoute.MtSwFeatures)
+            } else {
+                emptyList()
+            }
 
     private fun appEntries(): List<SettingsSearchEntry> = appSettings.map { (title, route) ->
         SettingsSearchEntry(

@@ -20,7 +20,7 @@ build() {
   fi
   (cd "$ROOT" && ./gradlew --stop) || true
   xcodebuild -project MTSWApp.xcodeproj -scheme MTSWApp -sdk iphoneos -configuration "$CONFIG" \
-    -derivedDataPath "$ROOT/build/xcode-device" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
+    -derivedDataPath "$ROOT/build/xcode-device" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" MTSW_APP_STORE_BUILD="${IPA_APP_STORE:-NO}" build
 }
 CONFIG="${IPA_CONFIG:-Release}"
 build "$CONFIG"

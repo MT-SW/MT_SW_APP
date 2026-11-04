@@ -18,6 +18,7 @@ targets:
         CFBundleDisplayName: MT_SW_APP
         UILaunchScreen: {}
         CADisableMinimumFrameDurationOnPhone: true
+        MTSWAppStoreBuild: $(MTSW_APP_STORE_BUILD)
         NSLocalNetworkUsageDescription: "MT_SW łączy się z radiem LoRa (mesh) przez Wi-Fi w sieci lokalnej."
         NSBonjourServices:
           - _meshtastic._tcp
@@ -55,6 +56,7 @@ targets:
         FRAMEWORK_SEARCH_PATHS: "$(SRCROOT)/../iosShared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)"
         OTHER_LDFLAGS: "$(inherited) -lsqlite3"
         CODE_SIGN_STYLE: Automatic
+        MTSW_APP_STORE_BUILD: NO
         "ARCHS[sdk=iphonesimulator*]": arm64
     preBuildScripts:
       - name: Kotlin framework (Gradle)
