@@ -16,10 +16,13 @@
  */
 package org.meshtastic.core.service
 
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.annotation.Single
 import org.meshtastic.core.repository.GeocodedPlace
 import org.meshtastic.core.repository.Location
 import org.meshtastic.core.repository.LocationService
+import org.meshtastic.core.repository.PhoneLocationProvider
 import org.meshtastic.core.repository.ReverseGeocoder
 
 /** iPhone: the system asks about the local network by itself, so the app treats it as allowed. */
@@ -39,8 +42,24 @@ class IosReverseGeocoder : ReverseGeocoder {
     override suspend fun place(latitude: Double, longitude: Double): GeocodedPlace? = null
 }
 
-/** The phone's own location is not used on iPhone yet. */
+/** The phone's own location, taken from the system's first fix (waits a few seconds at most). */
 @Single
-class IosLocationService : LocationService {
-    override suspend fun getCurrentLocation(): Location? = null
+class IosLocationService(private val provider: PhoneLocationProvider) : LocationService {
+    override suspend fun getCurrentLocation(): Location? =
+        withTimeoutOrNull(FIX_TIMEOUT_MS) { provider.locationUpdates().first { it.location != null }.location }
+            ?.let {
+                Location(
+                    latitude = it.latitude,
+                    longitude = it.longitude,
+                    altitudeMeters = it.altitude,
+                    mslAltitudeMeters = it.mslAltitude,
+                    accuracyMeters = it.accuracyM,
+                    speedMetersPerSecond = it.speedMps,
+                    timeMillis = it.timeMillis,
+                )
+            }
+
+    private companion object {
+        const val FIX_TIMEOUT_MS = 10_000L
+    }
 }
