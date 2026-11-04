@@ -347,11 +347,11 @@ jobs:
 
       # The AI engines (assistant, translator, dictation) are linked into the iOS app, so they are built here too.
       - name: Build the AI engines for iOS
-        run: ./scripts/build-llama-ios.sh
+        run: bash ./scripts/build-llama-ios.sh
 
       # One unsigned file for iPhone and iPad; AltStore or Sideloadly signs it with the installer's own Apple ID.
       - name: Build the unsigned .ipa
-        run: ./scripts/build-ios-ipa.sh
+        run: bash ./scripts/build-ios-ipa.sh
 
       - uses: actions/upload-artifact@v4
         with:
