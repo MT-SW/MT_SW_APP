@@ -44,7 +44,7 @@ kotlin {
             implementation(libs.kermit)
         }
 
-        getByName("iosMain") { dependencies { implementation(libs.okio) } }
+        matching { it.name == "iosMain" }.configureEach { dependencies { implementation(libs.okio) } }
 
         androidMain.dependencies {
             implementation(libs.androidx.core.ktx)
