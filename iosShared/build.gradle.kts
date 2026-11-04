@@ -58,6 +58,7 @@ kotlin {
             implementation(projects.feature.wifiProvision)
             implementation(projects.feature.intro)
             implementation(projects.feature.mapMaplibre)
+            implementation(libs.maplibre.compose)
 
             implementation(libs.koin.core)
             implementation(libs.koin.compose.viewmodel)

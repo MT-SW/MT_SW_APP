@@ -42,6 +42,7 @@ import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
 import org.meshtastic.core.ui.theme.isMonochromeMode
 import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.ios.di.IosKoinApp
+import org.meshtastic.ios.map.ProvideIosMaps
 import org.meshtastic.ios.ui.IosMainScreen
 import org.meshtastic.ios.worker.IosNodeCleanupScheduler
 import kotlin.time.Duration.Companion.hours
@@ -113,6 +114,6 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
             },
         )
     AppTheme(darkTheme = isDarkTheme, monochrome = isMonochromeMode(themePref)) {
-        IosMainScreen(uiViewModel, multiBackstack)
+        ProvideIosMaps { IosMainScreen(uiViewModel, multiBackstack) }
     }
 }

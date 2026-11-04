@@ -1,0 +1,39 @@
+/*
+ * Copyright (c) 2026 Meshtastic LLC
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package org.meshtastic.ios.map
+
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.koin.compose.koinInject
+import org.meshtastic.feature.map.layers.MapLayersManager
+import org.meshtastic.feature.map.maplibre.MapLibreMapViewProvider
+import org.meshtastic.feature.map.maplibre.component.ImportedLayersSlot
+import org.meshtastic.feature.map.maplibre.layers.rememberRenderableLayers
+
+/**
+ * The iPhone map provider: the shared MapLibre surfaces (which include the native MT_SW Planner) and — through the
+ * same imported-layer manager the Android flavours mount — the layers sheet that lets any KML/KMZ/GeoJSON be imported
+ * on iPhone too.
+ */
+internal fun iosMapViewProvider(): MapLibreMapViewProvider = MapLibreMapViewProvider(
+    customLayers = {
+        val layersManager: MapLayersManager = koinInject()
+        val importedLayers by layersManager.mapLayers.collectAsStateWithLifecycle()
+        rememberRenderableLayers(layersManager, importedLayers.filter { it.isVisible })
+    },
+    layersSheetExtra = { ImportedLayersSlot() },
+)
