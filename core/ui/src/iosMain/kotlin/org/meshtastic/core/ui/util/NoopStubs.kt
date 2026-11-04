@@ -33,15 +33,6 @@ actual fun annotatedStringFromHtml(html: String, linkStyles: TextLinkStyles?): A
 
 @Composable actual fun rememberOpenNfcSettings(): () -> Unit = {}
 
-@Composable actual fun rememberShowToast(): suspend (String) -> Unit = { _ -> }
-
-@Composable actual fun rememberShowToastResource(): suspend (StringResource) -> Unit = { _ -> }
-
-@Composable
-actual fun rememberSaveFileLauncher(
-    onUriReceived: (CommonUri) -> Unit,
-): (defaultFilename: String, mimeType: String) -> Unit = { _, _ -> }
-
 @Composable actual fun rememberOpenDocumentTreeLauncher(onTreeUriSelect: (CommonUri?) -> Unit): () -> Unit = {}
 
 actual val isDesktopPlatform: Boolean = false

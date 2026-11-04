@@ -18,7 +18,24 @@ package org.meshtastic.core.ui.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.useContents
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.getString
 import org.meshtastic.core.common.util.CommonUri
+import platform.CoreGraphics.CGRectMake
+import platform.CoreGraphics.CGSizeMake
+import platform.Foundation.NSTemporaryDirectory
+import platform.Foundation.NSString
+import platform.Foundation.NSURL.Companion.fileURLWithPath
+import platform.Foundation.create
+import platform.Foundation.writeToFile
+import platform.Foundation.NSUTF8StringEncoding
+import platform.UIKit.NSTextAlignmentCenter
+import platform.UIKit.UIColor
+import platform.UIKit.UIFont
+import platform.UIKit.UILabel
+import platform.UIKit.UIView
 import platform.Foundation.NSURL
 import platform.UIKit.UIActivityViewController
 import platform.UIKit.UIApplication
@@ -97,6 +114,60 @@ actual fun rememberOpenFileLauncher(onUriReceived: (CommonUri?) -> Unit): (mimeT
     return { _ ->
         // The chosen file is copied into the app's own folder, so it can be read without extra permission.
         val picker = UIDocumentPickerViewController(forOpeningContentTypes = listOf(UTTypeItem), asCopy = true)
+        picker.delegate = delegate
+        topViewController()?.presentViewController(picker, animated = true, completion = null)
+    }
+}
+
+@OptIn(ExperimentalForeignApi::class)
+private fun showToastNow(text: String) {
+    val scene = UIApplication.sharedApplication.connectedScenes.firstOrNull { it is UIWindowScene } as? UIWindowScene
+    val window = (scene?.windows?.firstOrNull { (it as? UIWindow)?.isKeyWindow() == true } ?: scene?.windows?.firstOrNull()) as? UIWindow
+        ?: return
+    val (width, height) = window.bounds.useContents { size.width to size.height }
+    val label = UILabel()
+    label.text = text
+    label.textColor = UIColor.whiteColor
+    label.backgroundColor = UIColor.blackColor.colorWithAlphaComponent(0.85)
+    label.textAlignment = NSTextAlignmentCenter
+    label.numberOfLines = 0L
+    label.font = UIFont.systemFontOfSize(14.0)
+    label.layer.cornerRadius = 14.0
+    label.clipsToBounds = true
+    val (tw, th) = label.sizeThatFits(CGSizeMake(width - 80.0, 400.0)).useContents { this.width to this.height }
+    val w = tw + 32.0
+    val h = th + 20.0
+    label.setFrame(CGRectMake((width - w) / 2.0, height - h - 110.0, w, h))
+    label.alpha = 0.0
+    window.addSubview(label)
+    UIView.animateWithDuration(0.25) { label.alpha = 1.0 }
+    UIView.animateWithDuration(
+        duration = 0.4,
+        delay = 2.5,
+        options = 0uL,
+        animations = { label.alpha = 0.0 },
+        completion = { _ -> label.removeFromSuperview() },
+    )
+}
+
+@Composable actual fun rememberShowToast(): suspend (String) -> Unit = { text -> showToastNow(text) }
+
+@Composable
+actual fun rememberShowToastResource(): suspend (StringResource) -> Unit = { res -> showToastNow(getString(res)) }
+
+@Composable
+actual fun rememberSaveFileLauncher(
+    onUriReceived: (CommonUri) -> Unit,
+): (defaultFilename: String, mimeType: String) -> Unit {
+    val delegate = remember { PickerDelegate { uri -> uri?.let(onUriReceived) } }
+    delegate.onUri = { uri -> uri?.let(onUriReceived) }
+    return { filename, _ ->
+        // The system asks where to keep a file, so an empty file with the wanted name is offered first; the caller
+        // then writes into the place that was chosen.
+        val safeName = filename.replace('/', '_').ifEmpty { "file" }
+        val path = NSTemporaryDirectory().trimEnd('/') + "/" + safeName
+        NSString.create(string = "").writeToFile(path, atomically = true, encoding = NSUTF8StringEncoding, error = null)
+        val picker = UIDocumentPickerViewController(forExportingURLs = listOf(fileURLWithPath(path)), asCopy = true)
         picker.delegate = delegate
         topViewController()?.presentViewController(picker, animated = true, completion = null)
     }
