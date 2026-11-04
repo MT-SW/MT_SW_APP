@@ -342,6 +342,20 @@ jobs:
           jdk21="${{ steps.jdk21.outputs.path }}"
           echo "org.gradle.java.installations.paths=$jdk21" >> ~/.gradle/gradle.properties
 
+      # The GitHub Mac has only about 7 GB of memory. The normal CI settings (8 GB Gradle + 5 GB Kotlin/Native) ran it out
+      # of memory at the last step, so the iOS build uses smaller heaps and builds one thing at a time. Later lines win.
+      - name: Smaller memory settings for the Mac
+        run: |
+          {
+            echo "org.gradle.jvmargs=-Xmx2g -XX:+UseG1GC -Dfile.encoding=UTF-8"
+            echo "kotlin.daemon.jvmargs=-Xmx2g"
+            echo "kotlin.native.jvmArgs=-Xmx4g -XX:+UseG1GC --enable-native-access=ALL-UNNAMED"
+            echo "org.gradle.parallel=false"
+            echo "org.gradle.workers.max=1"
+            echo "org.gradle.caching=false"
+          } >> ~/.gradle/gradle.properties
+          echo "Memory on this machine:"; sysctl -n hw.memsize
+
       - name: Tools
         run: brew install xcodegen cmake
 
