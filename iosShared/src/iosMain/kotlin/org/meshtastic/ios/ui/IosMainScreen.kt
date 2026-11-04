@@ -17,7 +17,8 @@
 package org.meshtastic.ios.ui
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.WindowInsets
@@ -39,7 +40,7 @@ import org.meshtastic.core.ui.viewmodel.UIViewModel
 import org.meshtastic.ios.navigation.iosNavGraph
 import org.meshtastic.feature.settings.navigation.rememberSettingsRadioConfigViewModelProvider
 
-private val BAR_LOWER_BY = 20.dp
+private val TOP_TRIM = 14.dp
 
 /**
  * iPhone main screen — assembles the shared [MeshtasticAppShell], [MeshtasticNavigationSuite], and
@@ -53,7 +54,14 @@ fun IosMainScreen(uiViewModel: UIViewModel, multiBackstack: MultiBackstack, modi
 
     // The background is painted over the whole screen, including the notch area; only the content stays inside it.
     Surface(modifier = modifier.fillMaxSize()) {
-      Box(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))) {
+      // The top gap is a bit smaller than the system's safe area (the content still stays clear of the notch).
+      val topGap = (WindowInsets.safeDrawing.asPaddingValues().calculateTopPadding() - TOP_TRIM).coerceAtLeast(0.dp)
+      Box(
+          Modifier.fillMaxSize()
+              .padding(top = topGap)
+              .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
+              .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
+      ) {
         MeshtasticAppShell(
             multiBackstack = multiBackstack,
             uiViewModel = uiViewModel,
@@ -62,8 +70,8 @@ fun IosMainScreen(uiViewModel: UIViewModel, multiBackstack: MultiBackstack, modi
             MeshtasticNavigationSuite(
                 multiBackstack = multiBackstack,
                 uiViewModel = uiViewModel,
-                // The bar keeps only part of the space reserved for the home indicator, so it sits lower on the screen.
-                modifier = Modifier.fillMaxSize().consumeWindowInsets(PaddingValues(bottom = BAR_LOWER_BY)),
+                // The bar does not add space for the home indicator, so it sits at the bottom of the screen.
+                modifier = Modifier.fillMaxSize().consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
             ) {
                 val provider =
                     entryProvider<NavKey> {
