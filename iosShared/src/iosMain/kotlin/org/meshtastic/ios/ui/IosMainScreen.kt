@@ -33,6 +33,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.composed
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import org.meshtastic.core.navigation.MultiBackstack
@@ -72,7 +81,8 @@ fun IosMainScreen(uiViewModel: UIViewModel, multiBackstack: MultiBackstack, modi
               .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
               .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
               // The whole screen lifts above the keyboard, so the message field and the top bar stay in sight.
-              .imePadding(),
+              .imePadding()
+              .hideKeyboardOnTapOrScroll(),
       ) {
         MeshtasticAppShell(
             multiBackstack = multiBackstack,
@@ -105,4 +115,40 @@ fun IosMainScreen(uiViewModel: UIViewModel, multiBackstack: MultiBackstack, modi
         }
       }
     }
+}
+
+/**
+ * Hides the keyboard when the finger drags across the screen (scrolling a chat or a list) or taps an empty place.
+ * Taps on fields and buttons are not touched, because they consume the touch themselves. Nothing is consumed here.
+ */
+private fun Modifier.hideKeyboardOnTapOrScroll(): Modifier = composed {
+  val focusManager = LocalFocusManager.current
+  val keyboard = LocalSoftwareKeyboardController.current
+  pointerInput(Unit) {
+    awaitEachGesture {
+      val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+      val slop = viewConfiguration.touchSlop
+      var moved = false
+      var total = Offset.Zero
+      var consumedByChild = false
+      while (true) {
+        val event = awaitPointerEvent(PointerEventPass.Final)
+        val change = event.changes.firstOrNull { it.id == down.id } ?: break
+        total += change.positionChange()
+        if (!moved && total.getDistance() > slop) {
+          moved = true
+          focusManager.clearFocus()
+          keyboard?.hide()
+        }
+        if (change.isConsumed && !moved) consumedByChild = true
+        if (!change.pressed) {
+          if (!moved && !consumedByChild) {
+            focusManager.clearFocus()
+            keyboard?.hide()
+          }
+          break
+        }
+      }
+    }
+  }
 }
