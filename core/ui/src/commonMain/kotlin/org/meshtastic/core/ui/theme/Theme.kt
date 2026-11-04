@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import co.touchlab.kermit.Logger
+import kotlin.concurrent.Volatile
 import kotlinx.coroutines.CancellationException
 
 private val lightScheme =
