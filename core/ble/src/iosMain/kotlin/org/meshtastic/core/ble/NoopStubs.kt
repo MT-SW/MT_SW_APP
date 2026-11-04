@@ -19,6 +19,7 @@ package org.meshtastic.core.ble
 import com.juul.kable.Peripheral
 import com.juul.kable.PeripheralBuilder
 import com.juul.kable.ScannerBuilder
+import com.juul.kable.toIdentifier
 
 // Kable's `Filter.Address` throws UnsupportedOperationException on Apple.
 internal actual val supportsNativeAddressScanFilter: Boolean = false
@@ -36,7 +37,7 @@ internal actual fun PeripheralBuilder.platformConfig(device: BleDevice, autoConn
 }
 
 internal actual fun createPeripheral(address: String, builderAction: PeripheralBuilder.() -> Unit): Peripheral =
-    throw UnsupportedOperationException("iOS Peripheral not yet implemented")
+    com.juul.kable.Peripheral(address.toIdentifier(), builderAction)
 
 internal actual fun Peripheral.negotiatedMaxWriteLength(): Int? = null
 
