@@ -1,6 +1,6 @@
 # MT_SW na iPhone'a (iosApp)
 
-Skorupa aplikacji iOS. Cały ekran rysuje wspólny kod Kotlin (moduł `iosShared`, Compose Multiplatform), a Swift tylko go osadza. Gałąź robocza: `develop`.
+Skorupa aplikacji iOS. Cały ekran rysuje wspólny kod Kotlin (moduł `iosShared`, Compose Multiplatform), a Swift tylko go osadza.
 
 ## Uruchomienie (Mac z Xcode)
 0. Raz (silnik AI, potrzebny `cmake`): `./scripts/build-llama-ios.sh`. Powstaje `native/ios/llama.xcframework` (nie trafia do repozytorium).
@@ -10,14 +10,14 @@ Skorupa aplikacji iOS. Cały ekran rysuje wspólny kod Kotlin (moduł `iosShared
 
 Na darmowym Apple ID aplikacja działa 7 dni, potem trzeba ją wgrać ponownie. Bluetooth nie działa w symulatorze, do niego potrzebny jest prawdziwy iPhone.
 
-## Stan (gałąź `develop`)
-Działa: start aplikacji, ekran powitalny, zakładki (węzły, wiadomości, mapa, połączenia, ustawienia), zapis ustawień i bazy, połączenie z radiem przez Bluetooth i Wi-Fi (z wyszukiwaniem w sieci), powiadomienia, GPS, kompas, barometr, linki `meshtastic://`, wybór i zapis zdjęć, mikrofon, asystent, tłumacz i dyktowanie AI na urządzeniu (modele pobierane w aplikacji). Jeszcze nie ma: aktualizacji firmware radia z iPhone'a oraz przechowywania haseł w Keychain (na razie prywatny folder aplikacji).
+## Stan
+Działa: start aplikacji, ekran powitalny, zakładki (węzły, wiadomości, mapa, połączenia, ustawienia), zapis ustawień i bazy, połączenie z radiem przez Bluetooth i Wi-Fi (z wyszukiwaniem w sieci), powiadomienia, GPS, kompas, barometr, linki `meshtastic://`, wybór i zapis zdjęć, mikrofon, asystent, tłumacz i dyktowanie AI na urządzeniu (modele pobierane w aplikacji). Działa też aktualizacja firmware radia z iPhone'a, widok 3D urządzeń, panorama terenu i przycisk „Wymuś zatrzymanie aplikacji”. Jeszcze nie ma: przechowywania haseł w Keychain (na razie prywatny folder aplikacji) i widoku AR z aparatem. Plik `.ipa` bez podpisu (AltStore / Sideloadly): `./scripts/build-ios-ipa.sh`.
 
 ---
 
 # MT_SW on iPhone (iosApp)
 
-The iOS app shell. The whole screen is drawn by shared Kotlin code (module `iosShared`, Compose Multiplatform); Swift only hosts it. Working branch: `develop`.
+The iOS app shell. The whole screen is drawn by shared Kotlin code (module `iosShared`, Compose Multiplatform); Swift only hosts it.
 
 ## Running (Mac with Xcode)
 0. Once (AI engine, needs `cmake`): `./scripts/build-llama-ios.sh`. It creates `native/ios/llama.xcframework` (not stored in the repository).
@@ -27,5 +27,5 @@ The iOS app shell. The whole screen is drawn by shared Kotlin code (module `iosS
 
 With a free Apple ID the app works for 7 days and must then be installed again. Bluetooth does not work in the simulator; a real iPhone is needed for it.
 
-## Status (branch `develop`)
-Working: app start, welcome screen, tabs (nodes, messages, map, connections, settings), saved settings and database, radio link over Bluetooth and Wi-Fi (with network search), notifications, GPS, compass, barometer, `meshtastic://` links, picking and saving pictures, microphone, on-device AI assistant, translator and dictation (models are downloaded in the app). Not yet: radio firmware update from the iPhone and Keychain storage of secrets (for now the app's private folder).
+## Status
+Working: app start, welcome screen, tabs (nodes, messages, map, connections, settings), saved settings and database, radio link over Bluetooth and Wi-Fi (with network search), notifications, GPS, compass, barometer, `meshtastic://` links, picking and saving pictures, microphone, on-device AI assistant, translator and dictation (models are downloaded in the app). Radio firmware update from the iPhone, the 3D device view, the terrain panorama and the "Force stop app" button work too. Not yet: Keychain storage of secrets (for now the app's private folder) and the AR camera view. Unsigned `.ipa` (AltStore / Sideloadly): `./scripts/build-ios-ipa.sh`.

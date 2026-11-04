@@ -4,6 +4,17 @@ Fork oficjalnej aplikacji [Meshtastic-Android](https://github.com/meshtastic/Mes
 
 Stan roboczy — repo służy głównie do własnego użytku i testów z niewielką grupą osób, niekoniecznie buduje się na bieżąco.
 
+## iPhone i iPad
+
+Oryginalna aplikacja Meshtastic-Android nie ma wersji na iOS. Ten fork ma własną aplikację na **iPhone'a i iPada**, zbudowaną w tym samym repozytorium z tego samego kodu co wersja na Androida i na komputer (Kotlin + Compose Multiplatform). Dzięki temu wygląd i działanie są takie same na każdym urządzeniu, a nowa funkcja dodana raz pojawia się wszędzie. Projekt Xcode jest w folderze `iosApp`, a wspólna część w module `iosShared`.
+
+- **Co działa:** ekran powitalny, zakładki (węzły, wiadomości, mapa, połączenia, ustawienia), zapis ustawień i bazy, połączenie z radiem przez Bluetooth i Wi-Fi (z automatycznym wyszukiwaniem w sieci), powiadomienia, GPS, kompas, barometr, linki `meshtastic://` (kanały, kontakty), otwieranie linków i map oraz udostępnianie tekstu, wybór i zapis zdjęć i plików, mikrofon, skala interfejsu, ikona i nazwa aplikacji MT_SW_APP.
+- **Nasze funkcje na iOS:** Funkcje MT_SW w ustawieniach, „Zdrowie sieci”, Sniffer i diagnostyka na żądanie, Mesh Link Planer, widok panoramy terenu, widok 3D urządzeń, ikony urządzeń z poprawnymi kolorami, asystent AI, tłumacz wiadomości i dyktowanie działające na urządzeniu (modele pobierane w aplikacji), aktualizacja firmware radia z iPhone'a (pobranie, rozpakowanie, wgranie) oraz przycisk „Wymuś zatrzymanie aplikacji” taki sam jak na Androidzie i komputerze.
+- **iPad:** ten sam plik aplikacji działa na iPhonie i iPadzie, w pionie i w poziomie. Ekrany z wykresami mają wykres u góry, a listę pod spodem, także na dużych ekranach.
+- **Czego nie ma:** funkcji tylko dla Androida (widżet, kafelek szybkich ustawień), widoku AR z aparatem oraz przechowywania haseł w Keychain (na razie prywatny folder aplikacji). Bluetooth nie działa w symulatorze, do niego potrzebny jest prawdziwy iPhone lub iPad.
+- **Budowanie (Mac z Xcode):** `./gradlew :iosShared:linkDebugFrameworkIosSimulatorArm64`, potem `xcodegen` w folderze `iosApp` i otwarcie `MTSWApp.xcodeproj`. Szczegóły w [iosApp/README.md](iosApp/README.md).
+- **Instalacja bez płatnego konta Apple:** `./scripts/build-ios-ipa.sh` tworzy plik `.ipa` bez podpisu (`build/MT_SW_APP-iOS.ipa`), który podpisuje własnym Apple ID program AltStore lub Sideloadly. Na darmowym Apple ID aplikacja działa 7 dni, potem trzeba ją wgrać ponownie. Mac nie jest potrzebny do samej instalacji.
+
 ## Zarządzanie węzłami i siecią mesh
 
 - **Info o sąsiadach — interwał z listy godzin** — w ustawieniach modułu „Info o sąsiadach” interwał aktualizacji wybiera się z listy (6, 8, 10, 12, 18 i 24 godziny) zamiast wpisywać sekundy.
@@ -259,6 +270,17 @@ ________________________________________________________________________________
 A fork of the official [Meshtastic-Android](https://github.com/meshtastic/Meshtastic-Android) app, developed for the **Świętokrzyskie** mesh radio network (mt-sw.pl). Builds on the upstream KMP/Compose Multiplatform architecture (`fdroid`/`google` flavors, desktop module) and adds a set of local features, fixes, and customizations not found in the upstream version.
 
 Work in progress — this repo is mainly for personal use and testing with a small group of people; it doesn't necessarily build cleanly at all times.
+
+## iPhone and iPad
+
+The original Meshtastic-Android app has no iOS version. This fork has its own app for **iPhone and iPad**, built in the same repository from the same code as the Android and desktop versions (Kotlin + Compose Multiplatform). That keeps the look and behaviour identical on every device, and a feature added once appears everywhere. The Xcode project is in the `iosApp` folder and the shared part is in the `iosShared` module.
+
+- **What works:** the welcome screen, tabs (nodes, messages, map, connections, settings), saved settings and database, the radio link over Bluetooth and Wi-Fi (with automatic network search), notifications, GPS, compass, barometer, `meshtastic://` links (channels, contacts), opening links and maps and sharing text, picking and saving pictures and files, the microphone, interface scale, the MT_SW_APP icon and name.
+- **Our features on iOS:** MT_SW features in settings, Network Health, Sniffer and on-demand diagnostics, Mesh Link Planner, the terrain panorama view, the 3D device view, device icons with correct colours, the AI assistant, message translator and dictation running on the device (models are downloaded in the app), radio firmware update from the iPhone (download, unpack, flash) and the same "Force stop app" button as on Android and desktop.
+- **iPad:** the same app file runs on iPhone and iPad, in portrait and landscape. Screens with charts put the chart on top and the list below, also on large screens.
+- **What is missing:** Android-only features (the widget, the quick settings tile), the AR camera view and Keychain storage of secrets (for now the app's private folder). Bluetooth does not work in the simulator; a real iPhone or iPad is needed for it.
+- **Building (Mac with Xcode):** `./gradlew :iosShared:linkDebugFrameworkIosSimulatorArm64`, then `xcodegen` in the `iosApp` folder and open `MTSWApp.xcodeproj`. Details in [iosApp/README.md](iosApp/README.md).
+- **Installing without a paid Apple account:** `./scripts/build-ios-ipa.sh` creates an unsigned `.ipa` (`build/MT_SW_APP-iOS.ipa`) that AltStore or Sideloadly signs with the installer's own Apple ID. With a free Apple ID the app works for 7 days and must then be installed again. A Mac is not needed for the installation itself.
 
 ## Node and mesh network management
 
