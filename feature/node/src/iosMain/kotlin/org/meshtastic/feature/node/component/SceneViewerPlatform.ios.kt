@@ -45,7 +45,7 @@ private class ViewerPage(val dir: String, val html: String)
  * Writes the page for the 3D view into a temporary folder: the bundled `model-viewer` library (Google, Apache-2.0) and
  * the model, which the page reads from its own text so no network and no file access from the page is needed.
  */
-@OptIn(ExperimentalEncodingApi::class)
+@OptIn(ExperimentalEncodingApi::class, ExperimentalForeignApi::class)
 private fun prepareViewerPage(glb: ByteArray): ViewerPage? {
     val library = NSBundle.mainBundle.pathForResource("model-viewer.min", ofType = "js") ?: return null
     val fm = NSFileManager.defaultManager

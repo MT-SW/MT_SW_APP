@@ -32,6 +32,7 @@ import platform.Foundation.NSLock
 import platform.Foundation.NSMutableURLRequest
 import platform.Foundation.NSURL
 import platform.Foundation.NSURLSession
+import platform.Foundation.dataTaskWithRequest
 import platform.Foundation.setValue
 import platform.darwin.DISPATCH_TIME_NOW
 import platform.darwin.NSEC_PER_SEC
