@@ -1,10 +1,13 @@
 # Builds the llama.cpp server for Android phones in two variants and puts them on this project's release page, where
 # the app fetches them: "opencl" (Snapdragon / Adreno graphics) and "vulkan" (any phone with a Vulkan driver).
-# The app tries them in that order and falls back to the processor build. Run by hand: Actions -> Run workflow.
+# The app tries them in that order and falls back to the processor build. Runs by itself when this file changes; also by hand: Actions -> Run workflow.
 name: Build llama.cpp and whisper.cpp for Android
 
 on:
-  # Only by hand: Actions -> Run workflow. It never starts by itself.
+  # Runs by itself when this file is pushed to GitHub (so nothing has to be clicked), and by hand when needed.
+  push:
+    paths:
+      - ".github/workflows/build-llama-android.yml"
   workflow_dispatch:
     inputs:
       llama_tag:

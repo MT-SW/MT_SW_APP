@@ -13,7 +13,7 @@ Oryginalna aplikacja Meshtastic-Android nie ma wersji na iOS. Ten fork ma własn
 - **iPad:** ten sam plik aplikacji działa na iPhonie i iPadzie, w pionie i w poziomie. Ekrany z wykresami mają wykres u góry, a listę pod spodem, także na dużych ekranach.
 - **Czego nie ma:** funkcji tylko dla Androida (widżet, kafelek szybkich ustawień), widoku AR z aparatem oraz przechowywania haseł w Keychain (na razie prywatny folder aplikacji). Bluetooth nie działa w symulatorze, do niego potrzebny jest prawdziwy iPhone lub iPad.
 - **Budowanie (Mac z Xcode):** `./gradlew :iosShared:linkDebugFrameworkIosSimulatorArm64`, potem `xcodegen` w folderze `iosApp` i otwarcie `MTSWApp.xcodeproj`. Szczegóły w [iosApp/README.md](iosApp/README.md).
-- **Instalacja bez płatnego konta Apple:** `./scripts/build-ios-ipa.sh` tworzy plik `.ipa` bez podpisu (`build/MT_SW_APP-iOS.ipa`), który podpisuje własnym Apple ID program AltStore lub Sideloadly. Na darmowym Apple ID aplikacja działa 7 dni, potem trzeba ją wgrać ponownie. Mac nie jest potrzebny do samej instalacji.
+- **Instalacja bez płatnego konta Apple:** `./scripts/build-ios-ipa.sh` tworzy jeden plik `.ipa` bez podpisu na iPhone'a i iPada (`build/MT_SW_APP-iOS.ipa`; można go też zbudować na GitHubie w „Build Binaries (Manual)”), który podpisuje własnym Apple ID program AltStore lub Sideloadly. Na darmowym Apple ID aplikacja działa 7 dni, potem trzeba ją wgrać ponownie. Mac nie jest potrzebny do samej instalacji.
 
 ## Zarządzanie węzłami i siecią mesh
 
@@ -280,7 +280,7 @@ The original Meshtastic-Android app has no iOS version. This fork has its own ap
 - **iPad:** the same app file runs on iPhone and iPad, in portrait and landscape. Screens with charts put the chart on top and the list below, also on large screens.
 - **What is missing:** Android-only features (the widget, the quick settings tile), the AR camera view and Keychain storage of secrets (for now the app's private folder). Bluetooth does not work in the simulator; a real iPhone or iPad is needed for it.
 - **Building (Mac with Xcode):** `./gradlew :iosShared:linkDebugFrameworkIosSimulatorArm64`, then `xcodegen` in the `iosApp` folder and open `MTSWApp.xcodeproj`. Details in [iosApp/README.md](iosApp/README.md).
-- **Installing without a paid Apple account:** `./scripts/build-ios-ipa.sh` creates an unsigned `.ipa` (`build/MT_SW_APP-iOS.ipa`) that AltStore or Sideloadly signs with the installer's own Apple ID. With a free Apple ID the app works for 7 days and must then be installed again. A Mac is not needed for the installation itself.
+- **Installing without a paid Apple account:** `./scripts/build-ios-ipa.sh` creates one unsigned `.ipa` for iPhone and iPad (`build/MT_SW_APP-iOS.ipa`; it can also be built on GitHub in "Build Binaries (Manual)") that AltStore or Sideloadly signs with the installer's own Apple ID. With a free Apple ID the app works for 7 days and must then be installed again. A Mac is not needed for the installation itself.
 
 ## Node and mesh network management
 

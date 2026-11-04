@@ -1,11 +1,14 @@
 # Builds the whisper.cpp speech server (dictation) for computers with graphics-card support and puts it on this
 # project's release page, where the app fetches it: Metal on an Apple Silicon Mac, Vulkan on Windows and Linux.
 # If the graphics card does not work on a computer, the app falls back to the processor by itself.
-# Run by hand: Actions -> Run workflow.
+# Runs by itself when this file changes; also by hand: Actions -> Run workflow.
 name: Build whisper.cpp for computers
 
 on:
-  # Only by hand: Actions -> Run workflow. It never starts by itself.
+  # Runs by itself when this file is pushed to GitHub (so nothing has to be clicked), and by hand when needed.
+  push:
+    paths:
+      - ".github/workflows/build-whisper-desktop.yml"
   workflow_dispatch:
     inputs:
       llama_tag:
