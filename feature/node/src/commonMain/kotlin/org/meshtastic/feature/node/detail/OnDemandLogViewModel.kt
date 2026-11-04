@@ -17,6 +17,8 @@
 package org.meshtastic.feature.node.detail
 
 import androidx.lifecycle.ViewModel
+import kotlin.concurrent.Volatile
+import kotlin.time.Clock
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.InjectedParam
@@ -221,12 +223,12 @@ class OnDemandLogViewModel(
     fun requestNodeStats() = requestOnDemand(OnDemandType.REQUEST_NODE_STATS)
 
     fun requestPing() {
-        pingSentAtMillis = System.currentTimeMillis()
+        pingSentAtMillis = Clock.System.now().toEpochMilliseconds()
         requestOnDemand(OnDemandType.REQUEST_PING)
     }
 
     fun requestPingAck() {
-        pingAckSentAtMillis = System.currentTimeMillis()
+        pingAckSentAtMillis = Clock.System.now().toEpochMilliseconds()
         requestOnDemand(OnDemandType.REQUEST_PING_ACK)
     }
 
