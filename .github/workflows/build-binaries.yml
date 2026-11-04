@@ -343,6 +343,13 @@ jobs:
           echo "org.gradle.java.installations.paths=$jdk21" >> ~/.gradle/gradle.properties
           echo "Memory on this machine:"; sysctl -n hw.memsize
 
+      # Apple accepts uploads only from Xcode 26 or newer (iOS 26 SDK), so the newest installed Xcode is chosen.
+      - name: Newest Xcode
+        run: |
+          x="$(ls -d /Applications/Xcode_2[6-9]*.app 2>/dev/null | sort -V | tail -1)"
+          if [ -n "$x" ]; then sudo xcode-select -s "$x"; fi
+          xcodebuild -version
+
       - name: Tools
         run: brew install xcodegen cmake
 
