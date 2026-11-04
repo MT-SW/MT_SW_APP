@@ -37,19 +37,10 @@ actual fun annotatedStringFromHtml(html: String, linkStyles: TextLinkStyles?): A
 
 @Composable actual fun rememberShowToastResource(): suspend (StringResource) -> Unit = { _ -> }
 
-@Composable actual fun rememberOpenMap(): (latitude: Double, longitude: Double, label: String) -> Unit = { _, _, _ -> }
-
-@Composable actual fun rememberOpenUrl(): (url: String) -> Unit = { _ -> }
-
-@Composable actual fun rememberShareText(): (text: String, subject: String) -> Unit = { _, _ -> }
-
 @Composable
 actual fun rememberSaveFileLauncher(
     onUriReceived: (CommonUri) -> Unit,
 ): (defaultFilename: String, mimeType: String) -> Unit = { _, _ -> }
-
-@Composable
-actual fun rememberOpenFileLauncher(onUriReceived: (CommonUri?) -> Unit): (mimeType: String) -> Unit = { _ -> }
 
 @Composable actual fun rememberOpenDocumentTreeLauncher(onTreeUriSelect: (CommonUri?) -> Unit): () -> Unit = {}
 
@@ -60,11 +51,6 @@ actual fun KeepScreenOn(enabled: Boolean) {
     // No-op iOS stub.
 }
 
-@Composable actual fun rememberOpenLocationSettings(): () -> Unit = {}
-
-@Composable actual fun rememberOpenBluetoothSettings(): () -> Unit = {}
-
-@Composable actual fun rememberOpenWifiSettings(): () -> Unit = {}
 
 actual val bleScanRequiresLocationServices: Boolean = false
 
