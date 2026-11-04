@@ -16,6 +16,7 @@
  */
 package org.meshtastic.core.repository
 
+import kotlin.concurrent.Volatile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
