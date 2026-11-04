@@ -17,7 +17,6 @@
 package org.meshtastic.feature.messaging.translation
 
 import org.meshtastic.core.repository.AiModels
-import java.util.Locale
 
 /**
  * Translates with a language model: a plain instruction for the general models, the model's own prompt for
@@ -117,10 +116,19 @@ class GemmaTranslator(private val engine: AiTextEngine) {
 
     private fun englishName(nllb: String): String? {
         val iso = TranslatorLanguages.fromNllb(nllb)?.iso ?: return null
-        return Locale.forLanguageTag(iso).getDisplayLanguage(Locale.ENGLISH).takeIf { it.isNotBlank() }
+        return ENGLISH_NAMES[iso]
     }
 
     private companion object {
+        val ENGLISH_NAMES = mapOf(
+            "pl" to "Polish", "en" to "English", "de" to "German", "cs" to "Czech", "sk" to "Slovak",
+            "uk" to "Ukrainian", "ru" to "Russian", "be" to "Belarusian", "fr" to "French", "es" to "Spanish",
+            "it" to "Italian", "pt" to "Portuguese", "nl" to "Dutch", "sv" to "Swedish", "da" to "Danish",
+            "nb" to "Norwegian", "fi" to "Finnish", "hu" to "Hungarian", "ro" to "Romanian", "bg" to "Bulgarian",
+            "hr" to "Croatian", "sl" to "Slovenian", "sr" to "Serbian", "lt" to "Lithuanian", "lv" to "Latvian",
+            "et" to "Estonian", "el" to "Greek", "tr" to "Turkish", "ar" to "Arabic", "he" to "Hebrew",
+            "zh" to "Chinese", "ja" to "Japanese", "ko" to "Korean",
+        )
         const val EXTRA_TOKENS = 96
         const val MIN_TOKENS = 96
         const val MAX_TOKENS = 1024

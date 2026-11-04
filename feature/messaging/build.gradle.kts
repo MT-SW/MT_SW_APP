@@ -15,6 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.konan.target.Family
+
 plugins {
     alias(libs.plugins.meshtastic.kmp.feature)
     alias(libs.plugins.meshtastic.kotlinx.serialization)
@@ -74,6 +77,7 @@ kotlin {
                 dependencies {
                     implementation(libs.ktor.client.core)
                     implementation(libs.ktor.client.darwin)
+                    implementation(libs.okio)
                 }
             }
 
@@ -84,3 +88,20 @@ kotlin {
 }
 
 // Gradle's KMP variant resolution follows `available-at` redirects in module
+
+// iPhone: the AI engine (llama.cpp) is linked in the app itself. It is built once by `scripts/build-llama-ios.sh`
+// into native/ios/llama.xcframework; without it the iPhone app still builds, only the on-device AI stays off.
+val llamaXcframework = rootProject.layout.projectDirectory.dir("native/ios/llama.xcframework").asFile
+if (llamaXcframework.isDirectory) {
+    kotlin.targets.withType<KotlinNativeTarget>().configureEach {
+        if (konanTarget.family == Family.IOS) {
+            val slice =
+                if (konanTarget.name == "ios_arm64") "ios-arm64" else "ios-arm64_x86_64-simulator"
+            val frameworkDir = File(llamaXcframework, "$slice")
+            compilations.getByName("main").cinterops.create("llama") {
+                defFile(project.file("src/nativeInterop/cinterop/llama.def"))
+                compilerOpts("-I${frameworkDir}/llama.framework/Headers")
+            }
+        }
+    }
+}

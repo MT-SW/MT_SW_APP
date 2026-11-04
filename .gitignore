@@ -119,3 +119,4 @@ assistant-test-results.md
 iosApp/MTSWApp.xcodeproj/
 iosApp/MTSWApp/Info.plist
 xcuserdata/
+native/ios/

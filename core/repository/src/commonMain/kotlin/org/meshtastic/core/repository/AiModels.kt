@@ -131,7 +131,7 @@ data class AiModelInfo(
     val engineReady: Boolean get() = AiModels.platform in platforms && engine !in AiModels.unavailableEngines
 
     /** The files this system downloads and uses: the phone's own list on a phone when there is one. */
-    val activeFiles: List<AiModelFile> get() = if (AiModels.platform == AiPlatform.ANDROID) phoneFiles ?: files else files
+    val activeFiles: List<AiModelFile> get() = if (AiModels.platform != AiPlatform.DESKTOP) phoneFiles ?: files else files
 
     fun canDo(role: AiRole): Boolean = role in roles
 }
@@ -195,7 +195,7 @@ object AiModels {
 
     private const val HF = "https://huggingface.co/"
 
-    private val BOTH = setOf(AiPlatform.ANDROID, AiPlatform.DESKTOP)
+    private val BOTH = setOf(AiPlatform.ANDROID, AiPlatform.DESKTOP, AiPlatform.IOS)
     private val TEXT = setOf(AiRole.TRANSLATOR, AiRole.ASSISTANT)
 
     private fun hf(repo: String, name: String, mb: Int, kind: AiFileKind = AiFileKind.MODEL) =
