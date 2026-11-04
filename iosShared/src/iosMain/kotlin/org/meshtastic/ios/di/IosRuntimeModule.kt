@@ -42,6 +42,7 @@ import org.meshtastic.core.repository.MeshNotificationManager
 import org.meshtastic.core.repository.MessageQueue
 import org.meshtastic.core.repository.NeighborInfoResponseProvider
 import org.meshtastic.core.repository.NotificationManager
+import org.meshtastic.core.repository.NotificationPrefs
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.RadioController
 import org.meshtastic.core.repository.RadioTransportFactory
@@ -82,9 +83,11 @@ class IosRuntimeModule {
         connectionFactory = connectionFactory,
     )
 
-    @Single fun notificationManager(): NotificationManager = IosNotificationManager()
+    @Single fun notificationManager(prefs: NotificationPrefs): NotificationManager = IosNotificationManager(prefs)
 
-    @Single fun meshNotificationManager(): MeshNotificationManager = IosMeshNotificationManager()
+    @Single
+    fun meshNotificationManager(notificationManager: NotificationManager): MeshNotificationManager =
+        IosMeshNotificationManager(notificationManager)
 
     @Single
     fun messageQueue(
