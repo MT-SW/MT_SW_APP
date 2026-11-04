@@ -35,7 +35,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuite
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldLayout
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScope
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.unit.Dp
 import org.meshtastic.core.ui.theme.monochromeLayer
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
@@ -82,6 +88,8 @@ fun MeshtasticNavigationSuite(
     multiBackstack: MultiBackstack,
     uiViewModel: UIViewModel,
     modifier: Modifier = Modifier,
+    /** When set, the bottom bar has this height instead of the standard one (used on iPhone, where it is too tall). */
+    barHeight: Dp? = null,
     content: @Composable () -> Unit,
 ) {
     val connectionState by uiViewModel.connectionState.collectAsStateWithLifecycle()
@@ -103,10 +111,7 @@ fun MeshtasticNavigationSuite(
     val layoutType = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo).coerceNavigationType()
     val showLabels = layoutType == NavigationSuiteType.NavigationRail
 
-    NavigationSuiteScaffold(
-        modifier = modifier,
-        layoutType = layoutType,
-        navigationSuiteItems = {
+    val items: NavigationSuiteScope.() -> Unit = {
             visibleDestinations.forEach { destination ->
                 val isSelected = destination == topLevelDestination
                 item(
@@ -146,9 +151,31 @@ fun MeshtasticNavigationSuite(
                     },
                 )
             }
-        },
-    ) {
-        Row { content() }
+    }
+
+    if (barHeight != null && layoutType == NavigationSuiteType.NavigationBar) {
+        Surface(
+            modifier = modifier,
+            color = NavigationSuiteScaffoldDefaults.containerColor,
+            contentColor = NavigationSuiteScaffoldDefaults.contentColor,
+        ) {
+            NavigationSuiteScaffoldLayout(
+                navigationSuite = {
+                    NavigationSuite(modifier = Modifier.height(barHeight), layoutType = layoutType, content = items)
+                },
+                layoutType = layoutType,
+            ) {
+                Row { content() }
+            }
+        }
+    } else {
+        NavigationSuiteScaffold(
+            modifier = modifier,
+            layoutType = layoutType,
+            navigationSuiteItems = items,
+        ) {
+            Row { content() }
+        }
     }
 }
 
