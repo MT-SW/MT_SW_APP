@@ -26,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.uikit.OnFocusBehavior
 import androidx.compose.ui.window.ComposeUIViewController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -71,7 +72,12 @@ fun handleIosDeepLink(url: String) {
 }
 
 /** The single entry the iOS app (iosApp) calls: the whole screen is drawn by Compose Multiplatform. */
-fun MainViewController() = ComposeUIViewController {
+fun MainViewController() =
+    ComposeUIViewController(
+        // The system must not shift the whole screen up when a text field is focused (that pushed the top bar out of
+        // sight and left the field under the keyboard); the screen lifts itself above the keyboard instead.
+        configure = { onFocusBehavior = OnFocusBehavior.DoNothing },
+    ) {
     val uiViewModel = sharedUiViewModel
     org.koin.compose.KoinContext(koin) {
         MeshServiceLifecycle()
