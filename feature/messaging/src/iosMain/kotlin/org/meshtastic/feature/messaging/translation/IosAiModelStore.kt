@@ -20,6 +20,7 @@ import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.darwin.Darwin
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.HttpTimeoutConfig
 import io.ktor.client.request.prepareGet
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.contentLength
@@ -34,6 +35,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import okio.FileSystem
 import okio.Path
+import okio.buffer
 import okio.Path.Companion.toPath
 import org.meshtastic.core.repository.AiFileKind
 import org.meshtastic.core.repository.AiModelStore
@@ -85,8 +87,8 @@ class IosAiModelStore(baseDir: String) : AiModelStore {
         setState(id, TranslatorModelState.Downloading(0f))
         val client = HttpClient(Darwin) {
             install(HttpTimeout) {
-                requestTimeoutMillis = HttpTimeout.INFINITE_TIMEOUT_MS
-                socketTimeoutMillis = HttpTimeout.INFINITE_TIMEOUT_MS
+                requestTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
+                socketTimeoutMillis = HttpTimeoutConfig.INFINITE_TIMEOUT_MS
             }
         }
         try {
@@ -105,7 +107,7 @@ class IosAiModelStore(baseDir: String) : AiModelStore {
                         val channel = response.bodyAsChannel()
                         val buffer = ByteArray(CHUNK_BYTES)
                         var written = 0L
-                        val sink = fs.sink(part).let { okio.buffer(it) }
+                        val sink = fs.sink(part).buffer()
                         try {
                             while (true) {
                                 currentCoroutineContext()[Job]?.let { if (!it.isActive) throw CancellationException() }
