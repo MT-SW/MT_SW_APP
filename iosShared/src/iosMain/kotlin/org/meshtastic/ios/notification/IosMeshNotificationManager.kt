@@ -150,7 +150,8 @@ class IosMeshNotificationManager(private val notificationManager: NotificationMa
     // reading shows.
     override suspend fun notifyLowBattery(node: Node, isRemote: Boolean) {
         val episode = Any()
-        if (lowBatteryEpisodes.putIfAbsent(node.num, episode) != null) return
+        if (lowBatteryEpisodes.containsKey(node.num)) return
+        lowBatteryEpisodes[node.num] = episode
         var shown = false
         try {
             val notification =
@@ -170,7 +171,7 @@ class IosMeshNotificationManager(private val notificationManager: NotificationMa
             shown = notificationManager.dispatch(notification)
         } finally {
             // A warning that never showed ends its own episode, so the next low reading tries again.
-            if (!shown) lowBatteryEpisodes.remove(node.num, episode)
+            if (!shown && lowBatteryEpisodes[node.num] === episode) lowBatteryEpisodes.remove(node.num)
         }
     }
 
