@@ -19,12 +19,13 @@ package org.meshtastic.core.ui.util
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.platform.ClipEntry
-import androidx.compose.ui.platform.withPlainText
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLinkStyles
 import org.jetbrains.compose.resources.StringResource
 import org.meshtastic.core.common.util.CommonUri
 
+@OptIn(ExperimentalComposeUiApi::class)
 actual fun createClipEntry(text: String, label: String, sensitive: Boolean): ClipEntry = ClipEntry.withPlainText(text)
 
 actual fun ClipEntry.plainText(): String? = null
