@@ -315,7 +315,7 @@ jobs:
 
   ios:
     if: ${{ inputs.ios_ipa }}
-    runs-on: macos-latest
+    runs-on: macos-15-intel
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
@@ -341,19 +341,6 @@ jobs:
         run: |
           jdk21="${{ steps.jdk21.outputs.path }}"
           echo "org.gradle.java.installations.paths=$jdk21" >> ~/.gradle/gradle.properties
-
-      # The GitHub Mac has only about 7 GB of memory. The normal CI settings (8 GB Gradle + 5 GB Kotlin/Native) ran it out
-      # of memory at the last step, so the iOS build uses smaller heaps and builds one thing at a time. Later lines win.
-      - name: Smaller memory settings for the Mac
-        run: |
-          {
-            echo "org.gradle.jvmargs=-Xmx2g -XX:+UseG1GC -Dfile.encoding=UTF-8"
-            echo "kotlin.daemon.jvmargs=-Xmx2g"
-            echo "kotlin.native.jvmArgs=-Xmx4g -XX:+UseG1GC --enable-native-access=ALL-UNNAMED"
-            echo "org.gradle.parallel=false"
-            echo "org.gradle.workers.max=1"
-            echo "org.gradle.caching=false"
-          } >> ~/.gradle/gradle.properties
           echo "Memory on this machine:"; sysctl -n hw.memsize
 
       - name: Tools
@@ -365,9 +352,10 @@ jobs:
 
       # One unsigned file for iPhone and iPad; AltStore or Sideloadly signs it with the installer's own Apple ID.
       - name: Build the unsigned .ipa
-        # Debug: the Release compiler step needs far more memory than this machine has.
+        # Release needs a lot of memory; the Intel Mac has about 14 GB (the Apple-silicon one only 7 GB).
         env:
-          IPA_CONFIG: Debug
+          IPA_CONFIG: Release
+          IPA_NATIVE_HEAP: 10g
         run: bash ./scripts/build-ios-ipa.sh
 
       - uses: actions/upload-artifact@v4
