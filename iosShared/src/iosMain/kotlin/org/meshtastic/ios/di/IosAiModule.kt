@@ -16,9 +16,7 @@
  */
 package org.meshtastic.ios.di
 
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 import org.meshtastic.core.database.iosDataDir
@@ -36,7 +34,6 @@ import org.meshtastic.feature.messaging.translation.IosTranslationRouter
 import org.meshtastic.core.repository.AiModels
 import org.meshtastic.core.repository.AiPlatform
 import org.meshtastic.core.repository.AssistantMemory
-import org.meshtastic.core.repository.MemoryNote
 import org.meshtastic.core.repository.TranslatorModelManager
 import org.meshtastic.feature.discovery.ai.AlgorithmicSummaryProvider
 import org.meshtastic.feature.discovery.ai.DiscoverySummaryAiProvider
@@ -45,11 +42,12 @@ import org.meshtastic.feature.docs.ai.KeywordFallbackAssistant
 import org.meshtastic.feature.docs.translation.DocTranslationService
 import org.meshtastic.feature.docs.translation.NoOpDocTranslator
 import org.meshtastic.feature.messaging.translation.AssistantHistoryStore
+import org.meshtastic.feature.messaging.translation.IosAssistantHistoryStore
+import org.meshtastic.feature.messaging.translation.IosAssistantMemory
 import org.meshtastic.feature.messaging.translation.AssistantService
 import org.meshtastic.feature.messaging.translation.AssistantTurn
 import org.meshtastic.feature.messaging.translation.DictationService
 import org.meshtastic.feature.messaging.translation.MessageTranslationService
-import org.meshtastic.feature.messaging.translation.StoredChat
 
 /**
  * AI on iPhone: the assistant and the translator run on-device in llama.cpp; dictation (speech recognition) is not
@@ -95,35 +93,7 @@ class IosAiModule {
     fun dictationService(engine: AiTextEngine, store: IosAiModelStore, uiPrefs: UiPrefs): DictationService =
         IosDictationService(engine, store, uiPrefs)
 
-    @Single fun assistantHistoryStore(): AssistantHistoryStore = IosAssistantHistoryStore()
+    @Single fun assistantHistoryStore(): AssistantHistoryStore = IosAssistantHistoryStore(iosDataDir())
 
-    @Single fun assistantMemory(): AssistantMemory = IosAssistantMemory()
-}
-
-private class IosAssistantHistoryStore : AssistantHistoryStore {
-    private val chats = MutableStateFlow<List<StoredChat>>(emptyList())
-
-    override suspend fun list(): List<StoredChat> = chats.value.sortedByDescending { it.updatedAt }
-
-    override suspend fun save(chat: StoredChat) = chats.update { old -> old.filterNot { it.id == chat.id } + chat }
-
-    override suspend fun delete(id: String) = chats.update { old -> old.filterNot { it.id == id } }
-}
-
-private class IosAssistantMemory : AssistantMemory {
-    override val notes = MutableStateFlow<List<MemoryNote>>(emptyList())
-
-    override fun save(name: String, text: String) {
-        notes.update { old -> old.filterNot { it.name == name } + MemoryNote(name, text, byUser = true) }
-    }
-
-    override fun delete(name: String) {
-        notes.update { old -> old.filterNot { it.name == name } }
-    }
-
-    override fun clearLearned() {
-        notes.update { old -> old.filter { it.byUser } }
-    }
-
-    override fun promptText(maxChars: Int): String = ""
+    @Single fun assistantMemory(): AssistantMemory = IosAssistantMemory(iosDataDir())
 }
