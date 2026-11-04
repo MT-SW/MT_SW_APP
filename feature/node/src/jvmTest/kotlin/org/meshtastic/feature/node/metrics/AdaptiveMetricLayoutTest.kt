@@ -52,7 +52,7 @@ import kotlin.test.assertTrue
 class AdaptiveMetricLayoutTest {
 
     @Test
-    fun `panes fit available width and retain selection and scroll across resizing and expansion`() = runComposeUiTest {
+    fun `panes are stacked, fit available width and retain selection and scroll across resizing and expansion`() = runComposeUiTest {
         val width = mutableStateOf(360)
         val expanded = mutableStateOf(false)
         val selected = mutableStateOf(-1)
@@ -98,15 +98,10 @@ class AdaptiveMetricLayoutTest {
                 assertTrue(pane.left >= parent.left && pane.right <= parent.right)
                 assertTrue(pane.top >= parent.top && pane.bottom <= parent.bottom)
             }
-            if (size < 840) {
-                assertEquals(chart.left, list.left)
-                assertEquals(chart.bottom, list.top)
-                assertEquals(parent.width, list.width)
-            } else {
-                assertEquals(chart.right, list.left)
-                assertEquals(parent.width / 2, chart.width)
-                assertEquals(parent.width / 2, list.width)
-            }
+            // The chart is always on top and the list below it, at every width.
+            assertEquals(chart.left, list.left)
+            assertEquals(chart.bottom, list.top)
+            assertEquals(parent.width, list.width)
             runOnIdle {
                 if (selected.value == 39) assertTrue(listState.firstVisibleItemIndex > 0)
             }
@@ -120,15 +115,6 @@ class AdaptiveMetricLayoutTest {
             onNodeWithText("Metric 39 selected true").assertIsDisplayed()
             runOnIdle { assertEquals(firstVisible, listState.firstVisibleItemIndex) }
         }
-
-        // An expanded window splits even when the composable itself is still below 840dp.
-        runOnIdle { windowInfo.resize(IntSize(600, 400)) }
-        val parent = onNodeWithTag("parent").fetchSemanticsNode().boundsInRoot
-        val chart = onNodeWithTag("chart").fetchSemanticsNode().boundsInRoot
-        val list = onNodeWithTag("list").fetchSemanticsNode().boundsInRoot
-        assertEquals(chart.right, list.left)
-        assertEquals(parent.width / 2, chart.width)
-        assertEquals(parent.width / 2, list.width)
     }
 }
 
