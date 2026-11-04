@@ -116,7 +116,7 @@ private fun spreadPosition(baseLat: Double, baseLon: Double, index: Int, count: 
 
     val angle = 2 * PI * index / count
     val metersPerDegreeLongitude =
-        (METERS_PER_DEGREE_LATITUDE * cos(Math.toRadians(baseLat))).coerceAtLeast(MIN_METERS_PER_DEGREE_LONGITUDE)
+        (METERS_PER_DEGREE_LATITUDE * cos((baseLat * PI / 180.0))).coerceAtLeast(MIN_METERS_PER_DEGREE_LONGITUDE)
     val deltaLat = (SPREAD_RADIUS_METERS * cos(angle)) / METERS_PER_DEGREE_LATITUDE
     val deltaLon = (SPREAD_RADIUS_METERS * sin(angle)) / metersPerDegreeLongitude
     return Position(longitude = baseLon + deltaLon, latitude = baseLat + deltaLat)
