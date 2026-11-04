@@ -46,6 +46,7 @@ import org.meshtastic.core.resources.app_data_title
 import org.meshtastic.core.resources.app_log_level
 import org.meshtastic.core.resources.app_log_recent
 import org.meshtastic.core.resources.report_issues_title
+import org.meshtastic.core.resources.support_project_title
 import org.meshtastic.core.resources.log_retention_days
 import org.meshtastic.core.resources.intro_mtsw_planner_title
 import org.meshtastic.core.resources.mt_sw_features_title
@@ -190,6 +191,7 @@ object SettingsSearchCatalog {
             Res.string.app_log_level to SettingsRoute.MtSwFeatures,
             Res.string.app_log_recent to SettingsRoute.MtSwFeatures,
             Res.string.report_issues_title to SettingsRoute.MtSwFeatures,
+            Res.string.support_project_title to SettingsRoute.MtSwFeatures,
             Res.string.intro_mtsw_planner_title to SettingsRoute.MtSwFeatures,
             Res.string.terrain_horizon_title to SettingsRoute.MtSwFeatures,
             Res.string.node_color_title to SettingsRoute.Security,

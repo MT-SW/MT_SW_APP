@@ -2867,6 +2867,8 @@
     <string name="translator_outgoing_insert">Wstaw do pola</string>
     <string name="translator_outgoing_send">Wyślij tłumaczenie</string>
     <string name="report_issues_title">Zgłoś błąd lub pomysł</string>
+    <string name="support_project_summary">Dobrowolna wpłata dla dewelopera na utrzymanie i rozwój aplikacji</string>
+    <string name="support_project_title">Wesprzyj projekt</string>
     <string name="report_issues_headline">Masz pomysł albo znalazłeś błąd?</string>
     <string name="report_issues_intro">Poinformuj nas o tym! Możesz zgłaszać błędy aplikacji i propozycje nowych funkcji — każde zgłoszenie pomaga nam ulepszać aplikację.</string>
     <string name="report_issues_find_us">Znajdziesz nas tutaj:</string>

@@ -85,6 +85,7 @@ import org.meshtastic.core.ui.icon.Notes
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.feature.settings.component.AppVersionButton
 import org.meshtastic.feature.settings.component.ExpressiveSection
+import org.meshtastic.feature.settings.component.SupportProjectSection
 
 private const val CAROUSEL_INTERVAL_MS = 3000L
 private const val CROSSFADE_DURATION_MS = 500
@@ -160,6 +161,7 @@ fun AboutScreen(
                     onOpenDocs = { uriHandler.openUri(DOCS_URL) },
                     onOpenLicense = { uriHandler.openUri(LICENSE_URL) },
                 )
+                SupportProjectSection()
                 FeatureCreditsSection()
                 CopyrightFooter()
             }

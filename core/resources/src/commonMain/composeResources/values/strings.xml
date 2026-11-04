@@ -3006,6 +3006,8 @@
     <string name="store_forward_config">Store &amp; Forward Config</string>
     <string name="success">Success</string>
     <string name="super_deep_sleep_duration_seconds">Super deep sleep duration</string>
+    <string name="support_project_summary">Voluntary donation to the developer for maintaining and developing the app</string>
+    <string name="support_project_title">Support the project</string>
     <string name="supported">Supported</string>
     <string name="supported_by_community">Supported by Meshtastic Community</string>
     <string name="supported_by_maker">Independent maker hardware</string>

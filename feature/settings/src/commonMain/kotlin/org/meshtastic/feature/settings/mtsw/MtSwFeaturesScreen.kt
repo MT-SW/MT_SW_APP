@@ -114,6 +114,7 @@ import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.AppLogSettings
 import org.meshtastic.feature.settings.component.ReportIssuesSection
+import org.meshtastic.feature.settings.component.SupportProjectSection
 import org.meshtastic.feature.settings.component.LogRetentionPreference
 import org.meshtastic.feature.settings.component.ThemePickerDialog
 import org.meshtastic.feature.settings.component.UiScalePickerDialog
@@ -230,6 +231,8 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
 
             // Reports of errors and ideas are ours (our groups), so they sit here and not in the original settings.
             ReportIssuesSection()
+
+            SupportProjectSection()
 
             ExpressiveSection(title = stringResource(Res.string.mt_sw_features_links)) {
                 Text(
