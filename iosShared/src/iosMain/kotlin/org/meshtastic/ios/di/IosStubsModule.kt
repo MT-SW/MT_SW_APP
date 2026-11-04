@@ -32,13 +32,10 @@ import org.meshtastic.feature.map.hud.PhonePressureProvider
 import org.meshtastic.feature.node.compass.CompassHeadingProvider
 import org.meshtastic.ios.stub.NoopAppWidgetUpdater
 import org.meshtastic.ios.stub.NoopCameraPoseProvider
-import org.meshtastic.ios.stub.NoopCompassHeadingProvider
 import org.meshtastic.ios.stub.NoopLocationRepository
 import org.meshtastic.ios.stub.NoopMagneticFieldProvider
 import org.meshtastic.ios.stub.NoopMeshLocationManager
 import org.meshtastic.ios.stub.NoopMeshWorkerManager
-import org.meshtastic.ios.stub.NoopPhoneLocationProvider
-import org.meshtastic.ios.stub.NoopPhonePressureProvider
 import org.meshtastic.ios.stub.NoopPlatformAnalytics
 import org.meshtastic.ios.worker.IosNodeCleanupScheduler
 
@@ -59,13 +56,13 @@ class IosStubsModule {
 
     @Single fun locationRepository(): LocationRepository = NoopLocationRepository()
 
-    @Single fun compassHeadingProvider(): CompassHeadingProvider = NoopCompassHeadingProvider()
+    @Single fun compassHeadingProvider(): CompassHeadingProvider = org.meshtastic.ios.sensor.IosCompassHeadingProvider()
 
-    @Single fun phoneLocationProvider(): PhoneLocationProvider = NoopPhoneLocationProvider()
+    @Single fun phoneLocationProvider(): PhoneLocationProvider = org.meshtastic.ios.sensor.IosPhoneLocationProvider()
 
     @Single fun magneticFieldProvider(): MagneticFieldProvider = NoopMagneticFieldProvider()
 
     @Single fun cameraPoseProvider(): CameraPoseProvider = NoopCameraPoseProvider()
 
-    @Single fun phonePressureProvider(): PhonePressureProvider = NoopPhonePressureProvider()
+    @Single fun phonePressureProvider(): PhonePressureProvider = org.meshtastic.ios.sensor.IosPhonePressureProvider()
 }

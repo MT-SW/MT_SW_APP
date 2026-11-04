@@ -23,6 +23,8 @@ targets:
           - bluetooth-central
         NSBluetoothAlwaysUsageDescription: "MT_SW łączy się przez Bluetooth z radiem LoRa (mesh)."
         NSMicrophoneUsageDescription: "MT_SW używa mikrofonu do dyktowania wiadomości."
+        NSLocationWhenInUseUsageDescription: "MT_SW pokazuje Twoją pozycję na mapie, w kompasie i może ją wysłać do sieci mesh."
+        NSMotionUsageDescription: "MT_SW odczytuje ciśnienie powietrza (barometr) telefonu."
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft
