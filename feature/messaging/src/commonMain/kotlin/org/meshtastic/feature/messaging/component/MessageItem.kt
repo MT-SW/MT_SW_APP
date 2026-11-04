@@ -147,6 +147,7 @@ import org.meshtastic.core.ui.theme.MessageItemColors
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.util.LocalLnaCorrection
 import org.meshtastic.core.ui.util.createClipEntry
+import org.meshtastic.feature.messaging.isOwnImageHost
 import org.meshtastic.feature.messaging.downloadImageBytes
 import org.meshtastic.feature.messaging.rememberImageSaver
 import org.meshtastic.feature.messaging.rememberSpeaker
