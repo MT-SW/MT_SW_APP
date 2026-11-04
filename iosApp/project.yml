@@ -17,6 +17,7 @@ targets:
       properties:
         CFBundleDisplayName: MT_SW
         UILaunchScreen: {}
+        CADisableMinimumFrameDurationOnPhone: true
         NSBluetoothAlwaysUsageDescription: "MT_SW łączy się przez Bluetooth z radiem LoRa (mesh)."
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
