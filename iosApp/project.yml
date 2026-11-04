@@ -63,4 +63,5 @@ targets:
           cd "$SRCROOT/.."
           # Symulator Apple Silicon ma tylko arm64 (bez Intela).
           case "$SDK_NAME" in iphonesimulator*) export ARCHS=arm64 ;; esac
-          ./gradlew :iosShared:embedAndSignAppleFrameworkForXcode
+          # MTSW_GRADLE_ARGS: dodatkowe ustawienia (np. więcej pamięci dla kompilatora) przekazywane przez scripts/build-ios-ipa.sh
+          ./gradlew :iosShared:embedAndSignAppleFrameworkForXcode $MTSW_GRADLE_ARGS

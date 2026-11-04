@@ -120,3 +120,4 @@ iosApp/MTSWApp.xcodeproj/
 iosApp/MTSWApp/Info.plist
 xcuserdata/
 native/ios/
+*.hprof

@@ -365,6 +365,9 @@ jobs:
 
       # One unsigned file for iPhone and iPad; AltStore or Sideloadly signs it with the installer's own Apple ID.
       - name: Build the unsigned .ipa
+        # Debug: the Release compiler step needs far more memory than this machine has.
+        env:
+          IPA_CONFIG: Debug
         run: bash ./scripts/build-ios-ipa.sh
 
       - uses: actions/upload-artifact@v4
