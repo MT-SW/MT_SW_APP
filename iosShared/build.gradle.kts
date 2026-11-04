@@ -89,7 +89,7 @@ kotlin {
             baseName = "MTSWShared"
             isStatic = true
             // The AI engine (see scripts/build-llama-ios.sh) is a separate framework that Xcode embeds in the app.
-            val llama = rootProject.layout.projectDirectory.dir("native/ios/llama.xcframework").asFile
+            val llama = rootDir.resolve("native/ios/llama.xcframework")
             if (llama.isDirectory) {
                 val slice = if (konanTarget.name == "ios_arm64") "ios-arm64" else "ios-arm64_x86_64-simulator"
                 linkerOpts("-F${File(llama, slice)}", "-framework", "llama")

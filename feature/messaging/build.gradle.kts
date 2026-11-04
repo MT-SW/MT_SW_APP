@@ -91,7 +91,7 @@ kotlin {
 
 // iPhone: the AI engine (llama.cpp) is linked in the app itself. It is built once by `scripts/build-llama-ios.sh`
 // into native/ios/llama.xcframework; without it the iPhone app still builds, only the on-device AI stays off.
-val llamaXcframework = rootProject.layout.projectDirectory.dir("native/ios/llama.xcframework").asFile
+val llamaXcframework = rootDir.resolve("native/ios/llama.xcframework")
 if (llamaXcframework.isDirectory) {
     kotlin.targets.withType<KotlinNativeTarget>().configureEach {
         if (konanTarget.family == Family.IOS) {
