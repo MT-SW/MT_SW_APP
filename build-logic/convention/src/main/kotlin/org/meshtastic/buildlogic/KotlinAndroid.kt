@@ -189,6 +189,18 @@ internal fun Project.configureKotlinMultiplatform() {
         }
     }
 
+    // xmlutil 1.0.2.1 (pinned for jvm/android) was published without its Apple-native variants in the root module
+    // (only js/jvm/linuxX64/wasm/metadata), so resolving it for an iOS target fails with "No matching variant".
+    // The preceding 1.0.2 still lists every iOS variant. Force 1.0.2 for iOS configurations only; jvm and Android
+    // keep 1.0.2.1 untouched. takpacket-sdk only declares a minimum ("requires"), so forcing a lower patch is safe.
+    configurations.configureEach {
+        if (name.contains("ios", ignoreCase = true)) {
+            resolutionStrategy.eachDependency {
+                if (requested.group == "io.github.pdvrieze.xmlutil") useVersion("1.0.2")
+            }
+        }
+    }
+
     configureMokkery()
     configureKotlin<KotlinMultiplatformExtension>()
 }
