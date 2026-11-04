@@ -9,6 +9,9 @@ Skorupa aplikacji iOS. Cały ekran rysuje wspólny kod Kotlin (moduł `iosShared
 
 Na darmowym Apple ID aplikacja działa 7 dni, potem trzeba ją wgrać ponownie. Bluetooth nie działa w symulatorze, do niego potrzebny jest prawdziwy iPhone.
 
+## Stan (gałąź `develop`)
+Działa: start aplikacji, zakładki (węzły, wiadomości, połączenia, ustawienia), zapis ustawień i bazy, połączenie z radiem przez Bluetooth i Wi-Fi (TCP). Jeszcze nie działa: mapa (pusty ekran), powiadomienia poza aplikacją, asystent/tłumacz/dyktowanie AI, wybór zdjęć, zapis obrazów, mikrofon.
+
 ---
 
 # MT_SW on iPhone (iosApp)
@@ -21,3 +24,6 @@ The iOS app shell. The whole screen is drawn by shared Kotlin code (module `iosS
 3. Open `MTSWApp.xcodeproj`, pick a simulator or an iPhone, choose your Apple ID (Team) under Signing & Capabilities and run.
 
 With a free Apple ID the app works for 7 days and must then be installed again. Bluetooth does not work in the simulator; a real iPhone is needed for it.
+
+## Status (branch `develop`)
+Working: app start, tabs (nodes, messages, connections, settings), saved settings and database, radio link over Bluetooth and Wi-Fi (TCP). Not yet: map (empty screen), notifications outside the app, AI assistant/translator/dictation, image picker, image saving, microphone.
