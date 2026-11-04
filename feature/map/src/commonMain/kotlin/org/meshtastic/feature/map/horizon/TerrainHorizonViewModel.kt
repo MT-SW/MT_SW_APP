@@ -327,6 +327,9 @@ class TerrainHorizonViewModel(
                     throw e
                 } catch (e: PlannerElevationException) {
                     _state.update { it.copy(loading = false, failure = TerrainHorizonFailure.NETWORK, profile = null, targets = emptyList()) }
+                } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+                    // Any other failure (a tile that cannot be read, say) must end the loading, never leave it spinning.
+                    _state.update { it.copy(loading = false, failure = TerrainHorizonFailure.NETWORK, profile = null, targets = emptyList()) }
                 }
             }
     }

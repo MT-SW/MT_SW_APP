@@ -16,14 +16,40 @@
  */
 package org.meshtastic.feature.map.terrain
 
-/**
- * Placeholder Kotlin/Native implementation of Terrarium WebP decoding.
- *
- * This module explicitly states "No iOS target" (see build.gradle.kts comment), but the KMP library convention plugin
- * adds iOS targets automatically to all KMP modules. Until those targets are explicitly excluded from the convention
- * plugin or this module restructured, iOS must be able to compile. This stub throws NotImplementedError if called.
- */
-actual fun decodeTerrariumTile(webpBytes: ByteArray): ElevationTile = throw NotImplementedError(
-    "Terrarium elevation decoding is not implemented for Kotlin/Native (iOS). " +
-        "This module has no iOS surface; use the Android or JVM implementations instead.",
-)
+import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.ColorAlphaType
+import org.jetbrains.skia.ColorType
+import org.jetbrains.skia.Image
+import org.jetbrains.skia.ImageInfo
+
+/** iPhone/iPad: the same Skia WebP decode as on desktop, with straight (not premultiplied) alpha. */
+actual fun decodeTerrariumTile(webpBytes: ByteArray): ElevationTile {
+    val image = Image.makeFromEncoded(webpBytes)
+    val width = image.width
+    val height = image.height
+    val bitmap = Bitmap()
+    try {
+        check(bitmap.allocPixels(ImageInfo(width, height, ColorType.N32, ColorAlphaType.UNPREMUL))) {
+            "Could not allocate a $width×$height bitmap for a decoded Terrarium tile"
+        }
+        check(image.readPixels(bitmap)) { "Could not read pixels from a decoded Terrarium tile" }
+        val elevations = FloatArray(width * height)
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                val color = bitmap.getColor(x, y)
+                val red = (color ushr RED_SHIFT) and COLOR_MASK
+                val green = (color ushr GREEN_SHIFT) and COLOR_MASK
+                val blue = color and COLOR_MASK
+                elevations[y * width + x] = terrariumElevationMeters(red, green, blue)
+            }
+        }
+        return ElevationTile(width, height, elevations)
+    } finally {
+        bitmap.close()
+        image.close()
+    }
+}
+
+private const val RED_SHIFT = 16
+private const val GREEN_SHIFT = 8
+private const val COLOR_MASK = 0xFF
