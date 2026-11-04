@@ -1,4 +1,5 @@
 import SwiftUI
+import MTSWShared
 
 @main
 struct MTSWApp: App {
@@ -6,6 +7,9 @@ struct MTSWApp: App {
         WindowGroup {
             ContentView()
                 .ignoresSafeArea(.keyboard)
+                .onOpenURL { url in
+                    MainViewControllerKt.handleIosDeepLink(url: url.absoluteString)
+                }
         }
     }
 }

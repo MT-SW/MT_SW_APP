@@ -25,6 +25,10 @@ targets:
         NSMicrophoneUsageDescription: "MT_SW używa mikrofonu do dyktowania wiadomości."
         NSLocationWhenInUseUsageDescription: "MT_SW pokazuje Twoją pozycję na mapie, w kompasie i może ją wysłać do sieci mesh."
         NSMotionUsageDescription: "MT_SW odczytuje ciśnienie powietrza (barometr) telefonu."
+        CFBundleURLTypes:
+          - CFBundleURLName: "MT_SW link"
+            CFBundleURLSchemes:
+              - meshtastic
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft

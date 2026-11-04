@@ -28,8 +28,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
+import co.touchlab.kermit.Logger
 import org.koin.core.Koin
 import org.koin.plugin.module.dsl.startKoin
+import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.model.DeviceAddress
 import org.meshtastic.core.navigation.TopLevelDestination
 import org.meshtastic.core.navigation.rememberMultiBackstack
@@ -55,9 +57,17 @@ private val koin: Koin by lazy {
     startKoin<IosKoinApp> {}.koin
 }
 
+/** One shared screen model for the whole app, also used by links opened from outside. */
+private val sharedUiViewModel: UIViewModel by lazy { koin.get<UIViewModel>(UIViewModel::class) }
+
+/** Called from the iPhone app when a link (e.g. a shared channel or contact) is opened. */
+fun handleIosDeepLink(url: String) {
+    sharedUiViewModel.handleDeepLink(CommonUri.parse(url)) { Logger.e { "Invalid link from iOS: $url" } }
+}
+
 /** The single entry the iOS app (iosApp) calls: the whole screen is drawn by Compose Multiplatform. */
 fun MainViewController() = ComposeUIViewController {
-    val uiViewModel = remember { koin.get<UIViewModel>(UIViewModel::class) }
+    val uiViewModel = sharedUiViewModel
     org.koin.compose.KoinContext(koin) {
         MeshServiceLifecycle()
         BackgroundCleanup()
