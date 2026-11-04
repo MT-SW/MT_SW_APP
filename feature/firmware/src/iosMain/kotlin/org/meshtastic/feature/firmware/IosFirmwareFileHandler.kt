@@ -239,7 +239,12 @@ class IosFirmwareFileHandler(private val client: HttpClient) : FirmwareFileHandl
             ensureTempDir()
             // Only the last path segment is kept, so an entry name cannot write outside the temp folder.
             val out = tempDir / chosen.name.lowercase()
-            zipFs.source(chosen).buffer().use { source -> fs.write(out) { writeAll(source) } }
+            val source = zipFs.source(chosen).buffer()
+            try {
+                fs.write(out) { writeAll(source) }
+            } finally {
+                source.close()
+            }
             artifactFor(out)
         } catch (e: CancellationException) {
             throw e
