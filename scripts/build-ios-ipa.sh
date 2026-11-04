@@ -10,7 +10,9 @@ xcodegen
 # IPA_CONFIG: Release (default, fast app, the iOS compiler needs a lot of memory) or Debug (little memory, e.g. on GitHub).
 # IPA_NATIVE_HEAP: memory for the iOS compiler in Release.
 CONFIG="${IPA_CONFIG:-Release}"
-export MTSW_GRADLE_ARGS="-Pkotlin.native.jvmArgs=-Xmx${IPA_NATIVE_HEAP:-10g}"
+# Kompilator iOS (Kotlin/Native) działa w demonie Kotlina, więc pamięć ustawiamy tam; Gradle dostaje mniej, żeby zmieściło się w RAM
+export MTSW_GRADLE_ARGS="-Pkotlin.daemon.jvmargs=-Xmx${IPA_NATIVE_HEAP:-10g} -Pkotlin.native.jvmArgs=-Xmx${IPA_NATIVE_HEAP:-10g} -Dorg.gradle.jvmargs=-Xmx3g"
+./gradlew --stop || true
 xcodebuild -project MTSWApp.xcodeproj -scheme MTSWApp -sdk iphoneos -configuration "$CONFIG" \
   -derivedDataPath "$ROOT/build/xcode-device" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
 APP="$ROOT/build/xcode-device/Build/Products/${CONFIG}-iphoneos/MTSWApp.app"
