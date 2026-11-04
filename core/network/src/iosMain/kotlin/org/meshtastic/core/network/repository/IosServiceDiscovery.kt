@@ -17,6 +17,7 @@
 package org.meshtastic.core.network.repository
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlin.native.ObjCSignatureOverride
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.Dispatchers
@@ -77,6 +78,7 @@ class IosServiceDiscovery : ServiceDiscovery {
 
         val browserDelegate =
             object : NSObject(), NSNetServiceBrowserDelegateProtocol {
+                @ObjCSignatureOverride
                 override fun netServiceBrowser(
                     browser: NSNetServiceBrowser,
                     didFindService: NSNetService,
@@ -87,6 +89,7 @@ class IosServiceDiscovery : ServiceDiscovery {
                     didFindService.resolveWithTimeout(RESOLVE_TIMEOUT_SECONDS)
                 }
 
+                @ObjCSignatureOverride
                 override fun netServiceBrowser(
                     browser: NSNetServiceBrowser,
                     didRemoveService: NSNetService,
