@@ -22,7 +22,6 @@ import org.meshtastic.core.domain.usecase.settings.CleanNodeDatabaseUseCase
 import org.meshtastic.core.repository.AppWidgetUpdater
 import org.meshtastic.core.repository.LocationRepository
 import org.meshtastic.core.repository.MagneticFieldProvider
-import org.meshtastic.core.repository.MeshLocationManager
 import org.meshtastic.core.repository.MeshWorkerManager
 import org.meshtastic.core.repository.PhoneLocationProvider
 import org.meshtastic.core.repository.PlatformAnalytics
@@ -34,7 +33,6 @@ import org.meshtastic.ios.stub.NoopAppWidgetUpdater
 import org.meshtastic.ios.stub.NoopCameraPoseProvider
 import org.meshtastic.ios.stub.NoopLocationRepository
 import org.meshtastic.ios.stub.NoopMagneticFieldProvider
-import org.meshtastic.ios.stub.NoopMeshLocationManager
 import org.meshtastic.ios.stub.NoopMeshWorkerManager
 import org.meshtastic.ios.stub.NoopPlatformAnalytics
 import org.meshtastic.ios.worker.IosNodeCleanupScheduler
@@ -51,8 +49,6 @@ class IosStubsModule {
     @Single
     fun nodeCleanupScheduler(uiPrefs: UiPrefs, cleanNodeDatabaseUseCase: CleanNodeDatabaseUseCase): IosNodeCleanupScheduler =
         IosNodeCleanupScheduler(uiPrefs = uiPrefs, cleanNodeDatabaseUseCase = cleanNodeDatabaseUseCase)
-
-    @Single fun meshLocationManager(): MeshLocationManager = NoopMeshLocationManager()
 
     @Single fun locationRepository(): LocationRepository = NoopLocationRepository()
 
