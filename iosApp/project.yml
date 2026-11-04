@@ -19,6 +19,8 @@ targets:
         UILaunchScreen: {}
         CADisableMinimumFrameDurationOnPhone: true
         NSLocalNetworkUsageDescription: "MT_SW łączy się z radiem LoRa (mesh) przez Wi-Fi w sieci lokalnej."
+        NSBonjourServices:
+          - _meshtastic._tcp
         UIBackgroundModes:
           - bluetooth-central
         NSBluetoothAlwaysUsageDescription: "MT_SW łączy się przez Bluetooth z radiem LoRa (mesh)."
