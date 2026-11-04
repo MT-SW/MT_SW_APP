@@ -141,6 +141,7 @@ private val ALL_MODULES_FULL =
         ":feature:wifi-provision",
         ":feature:widget",
         ":desktopApp",
+        ":iosShared",
     )
 
 /** Android-only modules that don't apply the KMP plugin. */

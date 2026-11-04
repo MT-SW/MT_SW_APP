@@ -1,0 +1,40 @@
+# Plik dla XcodeGen: z niego powstaje projekt Xcode (MTSWApp.xcodeproj). Sam projekt nie jest w repo.
+# XcodeGen input: generates the Xcode project (MTSWApp.xcodeproj). The generated project is not kept in the repo.
+name: MTSWApp
+options:
+  bundleIdPrefix: pl.mtsw
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+targets:
+  MTSWApp:
+    type: application
+    platform: iOS
+    sources:
+      - path: MTSWApp
+    info:
+      path: MTSWApp/Info.plist
+      properties:
+        CFBundleDisplayName: MT_SW
+        UILaunchScreen: {}
+        NSBluetoothAlwaysUsageDescription: "MT_SW łączy się przez Bluetooth z radiem LoRa (mesh)."
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: pl.mtsw.mtswapp
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.0"
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+        FRAMEWORK_SEARCH_PATHS: "$(SRCROOT)/../iosShared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)"
+        OTHER_LDFLAGS: "$(inherited) -lsqlite3"
+        CODE_SIGN_STYLE: Automatic
+    preBuildScripts:
+      - name: Kotlin framework (Gradle)
+        basedOnDependencyAnalysis: false
+        script: |
+          cd "$SRCROOT/.."
+          ./gradlew :iosShared:embedAndSignAppleFrameworkForXcode

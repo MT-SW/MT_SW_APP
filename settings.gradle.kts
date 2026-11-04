@@ -121,6 +121,7 @@ include(
     ":feature:firmware",
     ":feature:wifi-provision",
     ":desktopApp",
+    ":iosShared",
     ":androidApp",
     ":core:barcode",
     ":feature:widget",
