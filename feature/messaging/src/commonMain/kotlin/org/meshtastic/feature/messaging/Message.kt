@@ -538,7 +538,11 @@ fun MessageScreen(
                     title = title,
                     channelIndex = channelIndex,
                     mismatchKey = isMismatchKey,
-                    onNavigateBack = { onEvent(MessageScreenEvent.NavigateBack) },
+                    onNavigateBack = {
+                        // The back arrow also hides the keyboard, so the way out is one tap.
+                        focusManager.clearFocus()
+                        onEvent(MessageScreenEvent.NavigateBack)
+                    },
                     channels = channels,
                     channelIndexParam = channelIndex,
                     showQuickChat = showQuickChat,

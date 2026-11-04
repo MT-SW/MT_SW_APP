@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -69,7 +70,9 @@ fun IosMainScreen(uiViewModel: UIViewModel, multiBackstack: MultiBackstack, modi
           Modifier.fillMaxSize()
               .padding(top = topGap)
               .consumeWindowInsets(WindowInsets.safeDrawing.only(WindowInsetsSides.Top))
-              .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
+              .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
+              // The whole screen lifts above the keyboard, so the message field and the top bar stay in sight.
+              .imePadding(),
       ) {
         MeshtasticAppShell(
             multiBackstack = multiBackstack,

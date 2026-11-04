@@ -22,6 +22,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.ime
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Badge
@@ -175,9 +178,17 @@ fun MeshtasticNavigationSuite(
         ) {
             NavigationSuiteScaffoldLayout(
                 navigationSuite = {
-                    Column(Modifier.background(NavigationBarDefaults.containerColor)) {
-                        NavigationSuite(modifier = Modifier.height(barHeight), layoutType = layoutType, content = items)
-                        Spacer(Modifier.height(barBottomGap))
+                    // While the keyboard is up the bar gives way to it, so the message field is not squeezed.
+                    val keyboardUp = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+                    if (!keyboardUp) {
+                        Column(Modifier.background(NavigationBarDefaults.containerColor)) {
+                            NavigationSuite(
+                                modifier = Modifier.height(barHeight),
+                                layoutType = layoutType,
+                                content = items,
+                            )
+                            Spacer(Modifier.height(barBottomGap))
+                        }
                     }
                 },
                 layoutType = layoutType,
