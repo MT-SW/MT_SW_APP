@@ -53,6 +53,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.background
 import org.meshtastic.core.ui.theme.monochromeLayer
+import org.meshtastic.core.ui.util.hideKeyboardOnTapOrScroll
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.rememberTooltipState
@@ -172,7 +173,7 @@ fun MeshtasticNavigationSuite(
 
     if (barHeight != null && layoutType == NavigationSuiteType.NavigationBar) {
         Surface(
-            modifier = modifier,
+            modifier = modifier.hideKeyboardOnTapOrScroll(),
             color = NavigationSuiteScaffoldDefaults.containerColor,
             contentColor = NavigationSuiteScaffoldDefaults.contentColor,
         ) {
@@ -200,7 +201,7 @@ fun MeshtasticNavigationSuite(
         // Tablet and desktop: the side bar keeps its buttons at the bottom of the screen, and a new function is added
         // above the others, so the buttons stay within the reach of the hand.
         Surface(
-            modifier = modifier,
+            modifier = modifier.hideKeyboardOnTapOrScroll(),
             color = NavigationSuiteScaffoldDefaults.containerColor,
             contentColor = NavigationSuiteScaffoldDefaults.contentColor,
         ) {
@@ -226,7 +227,7 @@ fun MeshtasticNavigationSuite(
         }
     } else {
         NavigationSuiteScaffold(
-            modifier = modifier,
+            modifier = modifier.hideKeyboardOnTapOrScroll(),
             layoutType = layoutType,
             navigationSuiteItems = items,
         ) {
