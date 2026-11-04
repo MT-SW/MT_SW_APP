@@ -22,6 +22,7 @@ import coil3.compose.setSingletonImageLoaderFactory
 import coil3.disk.DiskCache
 import coil3.memory.MemoryCache
 import coil3.network.ktor3.KtorNetworkFetcherFactory
+import coil3.request.crossfade
 import coil3.svg.SvgDecoder
 import io.ktor.client.HttpClient
 import okio.Path.Companion.toPath
