@@ -3597,6 +3597,4 @@
     <string name="image_preview_loading">Wczytuję zdjęcie…</string>
     <string name="image_preview_failed">Nie udało się wczytać zdjęcia. Dotknij, aby spróbować ponownie.</string>
     <string name="neighbors_dialog_empty">Brak zapisanego pakietu sąsiadów od tego węzła.</string>
-    <string name="quit_app_title">Zamknij aplikację</string>
-    <string name="quit_app_summary">Zamyka aplikację całkowicie i kończy połączenie z radiem</string>
 </resources>

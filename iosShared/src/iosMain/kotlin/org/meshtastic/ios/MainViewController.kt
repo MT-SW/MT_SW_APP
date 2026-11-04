@@ -42,6 +42,8 @@ import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
 import org.meshtastic.core.ui.theme.AppTheme
+import org.meshtastic.core.ui.util.LocalTerminateApplication
+import platform.posix.exit
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
 import org.meshtastic.core.ui.theme.isMonochromeMode
@@ -128,7 +130,15 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
             },
         )
     val uiScale by uiViewModel.uiScale.collectAsState()
-    CompositionLocalProvider(LocalDensity provides rememberScaledDensity(percent = uiScale)) {
+    // "Force stop" like on Android/desktop: disconnect the radio and stop the service, then end the process.
+    val terminate: () -> Unit = {
+        runCatching { koin.get<MeshServiceOrchestrator>(MeshServiceOrchestrator::class).stop() }
+        exit(0)
+    }
+    CompositionLocalProvider(
+        LocalDensity provides rememberScaledDensity(percent = uiScale),
+        LocalTerminateApplication provides terminate,
+    ) {
     AppTheme(darkTheme = isDarkTheme, monochrome = isMonochromeMode(themePref)) {
         IosCoilSetup()
         val introCompleted by uiViewModel.appIntroCompleted.collectAsState()
