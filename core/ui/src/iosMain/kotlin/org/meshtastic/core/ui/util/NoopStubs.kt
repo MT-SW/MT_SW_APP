@@ -55,8 +55,6 @@ actual fun rememberOpenFileLauncher(onUriReceived: (CommonUri?) -> Unit): (mimeT
 
 actual val isDesktopPlatform: Boolean = false
 
-@Composable actual fun rememberReadTextFromUri(): suspend (uri: CommonUri, maxChars: Int) -> String? = { _, _ -> null }
-
 @Composable
 actual fun KeepScreenOn(enabled: Boolean) {
     // No-op iOS stub.
