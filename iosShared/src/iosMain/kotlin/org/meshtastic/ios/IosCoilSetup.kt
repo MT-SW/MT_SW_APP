@@ -28,6 +28,7 @@ import io.ktor.client.HttpClient
 import okio.Path.Companion.toPath
 import org.koin.compose.koinInject
 import org.meshtastic.core.database.iosDataDir
+import org.meshtastic.core.ui.image.CssInliningDecoderFactory
 
 private const val MEMORY_CACHE_MAX_BYTES = 64L * 1024L * 1024L
 private const val DISK_CACHE_MAX_BYTES = 32L * 1024L * 1024L
@@ -40,12 +41,12 @@ fun IosCoilSetup() {
         ImageLoader.Builder(context)
             .components {
                 add(KtorNetworkFetcherFactory(httpClient = httpClient))
-                add(SvgDecoder.Factory(renderToBitmap = true))
+                add(CssInliningDecoderFactory(SvgDecoder.Factory(renderToBitmap = true)))
             }
             .memoryCache { MemoryCache.Builder().maxSizeBytes(MEMORY_CACHE_MAX_BYTES).build() }
             .diskCache {
                 DiskCache.Builder()
-                    .directory((iosDataDir() + "/image_cache_v3").toPath())
+                    .directory((iosDataDir() + "/image_cache_v4").toPath())
                     .maxSizeBytes(DISK_CACHE_MAX_BYTES)
                     .build()
             }

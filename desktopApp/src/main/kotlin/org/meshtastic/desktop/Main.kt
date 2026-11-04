@@ -64,6 +64,7 @@ import coil3.network.ktor3.KtorNetworkFetcherFactory
 import coil3.request.crossfade
 import coil3.svg.SvgDecoder
 import coil3.util.DebugLogger
+import org.meshtastic.core.ui.image.CssInliningDecoderFactory
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -589,7 +590,7 @@ private fun CoilImageLoaderSetup() {
                 )
                 // Render SVGs to a bitmap on Desktop to avoid Skiko vector rendering artifacts
                 // that show up as solid/black hardware images.
-                add(SvgDecoder.Factory(renderToBitmap = true))
+                add(CssInliningDecoderFactory(SvgDecoder.Factory(renderToBitmap = true)))
             }
             .memoryCache { MemoryCache.Builder().maxSizeBytes(MEMORY_CACHE_MAX_BYTES).build() }
             .diskCache { DiskCache.Builder().directory(cacheDir.toPath()).maxSizeBytes(DISK_CACHE_MAX_BYTES).build() }
