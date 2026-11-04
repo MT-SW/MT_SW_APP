@@ -59,7 +59,9 @@ class IosLockdownPassphraseStore : LockdownPassphraseStore {
         boots: Int,
         hours: Int,
         maxSessionSeconds: Int,
-    ) = writeText(file(deviceAddress), "$boots\n$hours\n$maxSessionSeconds\n$passphrase")
+    ) {
+        writeText(file(deviceAddress), "$boots\n$hours\n$maxSessionSeconds\n$passphrase")
+    }
 
     override fun clearPassphrase(deviceAddress: String) {
         FileSystem.SYSTEM.delete(file(deviceAddress), mustExist = false)
@@ -88,8 +90,9 @@ class IosSecurityKeyBackupStore : SecurityKeyBackupStore {
             num to keys
         }.toMap()
 
-    override fun save(nodeNum: Int, publicKeyBase64: String, privateKeyBase64: String, timestamp: Long, longName: String?) =
+    override fun save(nodeNum: Int, publicKeyBase64: String, privateKeyBase64: String, timestamp: Long, longName: String?) {
         writeText(file(nodeNum), "$publicKeyBase64\n$privateKeyBase64\n$timestamp\n${longName?.replace("\n", " ").orEmpty()}")
+    }
 
     override fun delete(nodeNum: Int) {
         FileSystem.SYSTEM.delete(file(nodeNum), mustExist = false)

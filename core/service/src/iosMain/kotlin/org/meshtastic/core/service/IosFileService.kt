@@ -38,7 +38,12 @@ class IosFileService(private val dispatchers: CoroutineDispatchers) : FileServic
             try {
                 val path = uri.toFilePath().toPath()
                 path.parent?.let { FileSystem.SYSTEM.createDirectories(it) }
-                FileSystem.SYSTEM.sink(path).buffer().use { sink -> block(sink) }
+                val sink = FileSystem.SYSTEM.sink(path).buffer()
+                try {
+                    block(sink)
+                } finally {
+                    sink.close()
+                }
                 true
             } catch (e: CancellationException) {
                 throw e
@@ -51,7 +56,12 @@ class IosFileService(private val dispatchers: CoroutineDispatchers) : FileServic
     override suspend fun read(uri: CommonUri, block: suspend (BufferedSource) -> Unit): Boolean =
         withContext(dispatchers.io) {
             try {
-                FileSystem.SYSTEM.source(uri.toFilePath().toPath()).buffer().use { source -> block(source) }
+                val source = FileSystem.SYSTEM.source(uri.toFilePath().toPath()).buffer()
+                try {
+                    block(source)
+                } finally {
+                    source.close()
+                }
                 true
             } catch (e: CancellationException) {
                 throw e
