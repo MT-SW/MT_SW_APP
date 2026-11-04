@@ -43,6 +43,7 @@ enum class AiRole {
 enum class AiPlatform {
     ANDROID,
     DESKTOP,
+    IOS,
 }
 
 /** The licence a model is distributed under; the model list shows its name and a link to the model's page. */
