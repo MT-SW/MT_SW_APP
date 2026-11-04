@@ -16,7 +16,13 @@
  */
 package org.meshtastic.core.service
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.suspendCancellableCoroutine
+import platform.CoreLocation.CLGeocoder
+import platform.CoreLocation.CLLocation
+import platform.CoreLocation.CLPlacemark
+import kotlin.coroutines.resume
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.annotation.Single
 import org.meshtastic.core.repository.GeocodedPlace
@@ -36,10 +42,25 @@ class IosDeviceAddressChangeHook : DeviceAddressChangeHook {
     override fun onDeviceAddressChanged() = Unit
 }
 
-/** Place names for coordinates are not available on iPhone yet. */
+/** Place names for coordinates, from the system geocoder. */
+@OptIn(ExperimentalForeignApi::class)
 @Single
 class IosReverseGeocoder : ReverseGeocoder {
-    override suspend fun place(latitude: Double, longitude: Double): GeocodedPlace? = null
+    override suspend fun place(latitude: Double, longitude: Double): GeocodedPlace? =
+        withTimeoutOrNull(GEOCODE_TIMEOUT_MS) {
+            suspendCancellableCoroutine { cont ->
+                CLGeocoder().reverseGeocodeLocation(CLLocation(latitude = latitude, longitude = longitude)) { marks, _ ->
+                    val mark = marks?.firstOrNull() as? CLPlacemark
+                    cont.resume(
+                        mark?.let { GeocodedPlace(it.ISOcountryCode, it.administrativeArea, it.locality) },
+                    )
+                }
+            }
+        }
+
+    private companion object {
+        const val GEOCODE_TIMEOUT_MS = 10_000L
+    }
 }
 
 /** The phone's own location, taken from the system's first fix (waits a few seconds at most). */
