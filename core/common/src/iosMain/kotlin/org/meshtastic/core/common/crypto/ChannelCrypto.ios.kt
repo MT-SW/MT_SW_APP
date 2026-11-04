@@ -16,6 +16,64 @@
  */
 package org.meshtastic.core.common.crypto
 
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.alloc
+import kotlinx.cinterop.convert
+import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.ptr
+import kotlinx.cinterop.usePinned
+import kotlinx.cinterop.value
+import kotlinx.cinterop.CPointerVar
+import kotlinx.cinterop.COpaquePointer
+import kotlinx.cinterop.ULongVar
+import platform.CoreCrypto.CCCryptorCreateWithMode
+import platform.CoreCrypto.CCCryptorRef
+import platform.CoreCrypto.CCCryptorRelease
+import platform.CoreCrypto.CCCryptorRefVar
+import platform.CoreCrypto.CCCryptorUpdate
+import platform.CoreCrypto.kCCAlgorithmAES
+import platform.CoreCrypto.kCCEncrypt
+import platform.CoreCrypto.kCCModeCTR
+import platform.CoreCrypto.kCCModeOptionCTR_BE
+import platform.CoreCrypto.ccNoPadding
+
+/** AES in counter mode with the system crypto library (the same operation both encrypts and decrypts). */
+@OptIn(ExperimentalForeignApi::class)
 actual fun aesCtrTransform(key: ByteArray, counterBlock: ByteArray, data: ByteArray): ByteArray {
-    error("AES-CTR channel decryption is not yet implemented on iOS")
+    if (data.isEmpty()) return ByteArray(0)
+    val out = ByteArray(data.size)
+    memScoped {
+        val cryptor = alloc<CCCryptorRefVar>()
+        val created =
+            key.usePinned { k ->
+                counterBlock.usePinned { iv ->
+                    CCCryptorCreateWithMode(
+                        kCCEncrypt,
+                        kCCModeCTR,
+                        kCCAlgorithmAES,
+                        ccNoPadding,
+                        iv.addressOf(0),
+                        k.addressOf(0),
+                        key.size.convert(),
+                        null,
+                        0u,
+                        0,
+                        kCCModeOptionCTR_BE,
+                        cryptor.ptr,
+                    )
+                }
+            }
+        check(created == 0) { "AES-CTR could not start: $created" }
+        val moved = alloc<ULongVar>()
+        val status =
+            data.usePinned { input ->
+                out.usePinned { output ->
+                    CCCryptorUpdate(cryptor.value, input.addressOf(0), data.size.convert(), output.addressOf(0), out.size.convert(), moved.ptr)
+                }
+            }
+        CCCryptorRelease(cryptor.value)
+        check(status == 0) { "AES-CTR failed: $status" }
+    }
+    return out
 }

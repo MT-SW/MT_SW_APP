@@ -48,10 +48,42 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.schemaLabelRes
 import org.meshtastic.core.ui.assistant.assistantHighlight
 import org.meshtastic.core.ui.theme.AppTheme
+import kotlin.enums.enumEntries
 import kotlin.jvm.JvmName
 
+/** A list of all values of an enum. The values are read where the enum type is known, so this works on every platform. */
 @Composable
-fun <T : Enum<T>> DropDownPreference(
+inline fun <reified T : Enum<T>> DropDownPreference(
+    title: String,
+    enabled: Boolean,
+    selectedItem: T,
+    noinline onItemSelected: (T) -> Unit,
+    modifier: Modifier = Modifier,
+    summary: String? = null,
+    noinline itemIcon: @Composable ((T) -> ImageVector)? = null,
+    noinline itemColor: @Composable ((T) -> Color)? = null,
+    noinline itemLabel: @Composable ((T) -> String)? = null,
+    excludedItems: Set<T> = emptySet(),
+) {
+    EnumDropDownPreference(
+        allEntries = enumEntries<T>(),
+        title = title,
+        enabled = enabled,
+        selectedItem = selectedItem,
+        onItemSelected = onItemSelected,
+        modifier = modifier,
+        summary = summary,
+        itemIcon = itemIcon,
+        itemColor = itemColor,
+        itemLabel = itemLabel,
+        excludedItems = excludedItems,
+    )
+}
+
+@PublishedApi
+@Composable
+internal fun <T : Enum<T>> EnumDropDownPreference(
+    allEntries: List<T>,
     title: String,
     enabled: Boolean,
     selectedItem: T,
@@ -66,8 +98,8 @@ fun <T : Enum<T>> DropDownPreference(
     // A deprecated value the radio currently holds stays on the list: dropping it leaves the field showing nothing and
     // writes a different value on the next save.
     val enumConstants =
-        remember(selectedItem, excludedItems) {
-            enumEntriesOf(selectedItem).filter {
+        remember(allEntries, selectedItem, excludedItems) {
+            allEntries.filter {
                 it.name != "UNRECOGNIZED" &&
                     (it == selectedItem || (!it.isDeprecatedEnumEntry() && it !in excludedItems))
             }
@@ -223,8 +255,6 @@ fun <T> DropDownPreference(
         }
     }
 }
-
-internal expect fun <T : Enum<T>> enumEntriesOf(selectedItem: T): List<T>
 
 internal expect fun Enum<*>.isDeprecatedEnumEntry(): Boolean
 

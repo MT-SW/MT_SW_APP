@@ -93,6 +93,8 @@ actual fun rememberOpenMap(): (latitude: Double, longitude: Double, label: Strin
 
 @Composable actual fun rememberOpenBluetoothSettings(): () -> Unit = { openAppSettings() }
 
+@Composable actual fun rememberOpenAppSettings(): () -> Unit = { openAppSettings() }
+
 @Composable actual fun rememberOpenWifiSettings(): () -> Unit = { openAppSettings() }
 
 private class PickerDelegate(var onUri: (CommonUri?) -> Unit) : NSObject(), UIDocumentPickerDelegateProtocol {
