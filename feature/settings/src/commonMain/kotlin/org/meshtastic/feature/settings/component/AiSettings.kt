@@ -395,13 +395,15 @@ internal fun AiSettings() {
         )
     }
     // A second, smaller row of tabs: one per model family (Gemma, Qwen, Bielik, ...), so only one family is on screen.
-    // Gemma (and TranslateGemma) first, the other families in the order of the list, "Other" always last.
+    // The family of the recommended model first (Whisper for dictation), then Gemma (and TranslateGemma), the other
+    // families in the order of the list, "Other" always last.
     val families =
-        models.map { it.family }.distinct().sortedBy {
+        models.map { it.family }.distinct().sortedBy { family ->
             when {
-                it.contains("Gemma") -> 0
-                it == AiModels.OTHER_FAMILY -> 2
-                else -> 1
+                models.any { it.family == family && role in it.recommendedFor } -> 0
+                family.contains("Gemma") -> 1
+                family == AiModels.OTHER_FAMILY -> 3
+                else -> 2
             }
         }
     var familyIndex by rememberSaveable(role) { mutableIntStateOf(0) }
@@ -433,7 +435,8 @@ internal fun AiSettings() {
         )
     }
     families.getOrNull(shownIndex)?.let { family ->
-        models.filter { it.family == family }.forEach { model ->
+        // The recommended model of the family is always the first one.
+        models.filter { it.family == family }.sortedBy { if (role in it.recommendedFor) 0 else 1 }.forEach { model ->
             ModelRow(
                 model = model,
                 role = role,
