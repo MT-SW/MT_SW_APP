@@ -17,17 +17,14 @@
 package org.meshtastic.core.database
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.core.DataStoreFactory
-import androidx.datastore.core.okio.OkioSerializer
-import androidx.datastore.core.okio.OkioStorage
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.room3.Room
 import androidx.room3.RoomDatabase
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import kotlinx.cinterop.ExperimentalForeignApi
-import okio.BufferedSink
-import okio.BufferedSource
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
@@ -72,32 +69,14 @@ actual fun deleteDatabase(dbName: String) {
 /** Returns the system FileSystem for iOS. */
 actual fun getFileSystem(): FileSystem = FileSystem.SYSTEM
 
-private object PreferencesSerializer : OkioSerializer<Preferences> {
-    override val defaultValue: Preferences
-        get() = emptyPreferences()
-
-    override suspend fun readFrom(source: BufferedSource): Preferences {
-        // iOS stub: return an empty Preferences instance instead of crashing.
-        return emptyPreferences()
-    }
-
-    override suspend fun writeTo(t: Preferences, sink: BufferedSink) {
-        // iOS stub: no-op to avoid crashing on write.
-    }
-}
-
 /** Creates an iOS DataStore for database preferences. */
 @OptIn(ExperimentalForeignApi::class)
 actual fun createDatabaseDataStore(name: String): DataStore<Preferences> {
     val dir = documentDirectory() + "/datastore"
     NSFileManager.defaultManager.createDirectoryAtPath(dir, true, null, null)
-    return DataStoreFactory.create(
-        storage =
-        OkioStorage(
-            fileSystem = FileSystem.SYSTEM,
-            serializer = PreferencesSerializer,
-            producePath = { (dir + "/$name.preferences_pb").toPath() },
-        ),
+    return PreferenceDataStoreFactory.createWithPath(
+        corruptionHandler = ReplaceFileCorruptionHandler(produceNewData = { emptyPreferences() }),
+        produceFile = { (dir + "/$name.preferences_pb").toPath() },
     )
 }
 
@@ -113,3 +92,6 @@ private fun documentDirectory(): String {
         )
     return requireNotNull(documentDirectory?.path)
 }
+
+/** The folder of the app's data on iOS (the counterpart of `desktopDataDir()`). */
+fun iosDataDir(): String = documentDirectory()
