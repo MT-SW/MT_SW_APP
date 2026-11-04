@@ -17,7 +17,7 @@
 package org.meshtastic.core.network.repository
 
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlin.native.ObjCSignatureOverride
+import kotlinx.cinterop.ObjCSignatureOverride
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.Dispatchers
