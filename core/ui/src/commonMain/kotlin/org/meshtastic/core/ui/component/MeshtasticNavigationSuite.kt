@@ -39,6 +39,8 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuite
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldLayout
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScope
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Surface
 import androidx.compose.foundation.layout.height
 import androidx.compose.ui.unit.Dp
@@ -118,10 +120,10 @@ fun MeshtasticNavigationSuite(
     val layoutType = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo).coerceNavigationType()
     val showLabels = layoutType == NavigationSuiteType.NavigationRail
 
-    val items: NavigationSuiteScope.() -> Unit = {
-            visibleDestinations.forEach { destination ->
+    val entries =
+            visibleDestinations.map { destination ->
                 val isSelected = destination == topLevelDestination
-                item(
+                NavEntry(
                     selected = isSelected,
                     onClick = { handleNavigation(destination, topLevelDestination, multiBackstack, uiViewModel) },
                     icon = {
@@ -158,6 +160,11 @@ fun MeshtasticNavigationSuite(
                     },
                 )
             }
+
+    val items: NavigationSuiteScope.() -> Unit = {
+        entries.forEach { entry ->
+            item(selected = entry.selected, onClick = entry.onClick, icon = entry.icon, label = entry.label)
+        }
     }
 
     if (barHeight != null && layoutType == NavigationSuiteType.NavigationBar) {
@@ -178,6 +185,34 @@ fun MeshtasticNavigationSuite(
                 Row { content() }
             }
         }
+    } else if (layoutType == NavigationSuiteType.NavigationRail) {
+        // Tablet and desktop: the side bar keeps its buttons at the bottom of the screen, and a new function is added
+        // above the others, so the buttons stay within the reach of the hand.
+        Surface(
+            modifier = modifier,
+            color = NavigationSuiteScaffoldDefaults.containerColor,
+            contentColor = NavigationSuiteScaffoldDefaults.contentColor,
+        ) {
+            NavigationSuiteScaffoldLayout(
+                navigationSuite = {
+                    NavigationRail {
+                        Spacer(Modifier.weight(1f))
+                        entries.forEach { entry ->
+                            NavigationRailItem(
+                                selected = entry.selected,
+                                onClick = entry.onClick,
+                                icon = entry.icon,
+                                label = entry.label,
+                                alwaysShowLabel = true,
+                            )
+                        }
+                    }
+                },
+                layoutType = layoutType,
+            ) {
+                Row { content() }
+            }
+        }
     } else {
         NavigationSuiteScaffold(
             modifier = modifier,
@@ -188,6 +223,14 @@ fun MeshtasticNavigationSuite(
         }
     }
 }
+
+/** One button of the navigation bar (the same data feeds the bottom bar and the side bar). */
+private class NavEntry(
+    val selected: Boolean,
+    val onClick: () -> Unit,
+    val icon: @Composable () -> Unit,
+    val label: (@Composable () -> Unit)?,
+)
 
 /**
  * Caps [NavigationSuiteType] so that expanded/extra-large widths still use a NavigationRail instead of promoting to a

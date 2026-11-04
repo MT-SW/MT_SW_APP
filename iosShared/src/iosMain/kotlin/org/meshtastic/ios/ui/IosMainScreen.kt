@@ -25,6 +25,8 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -41,6 +43,7 @@ import org.meshtastic.ios.navigation.iosNavGraph
 import org.meshtastic.feature.settings.navigation.rememberSettingsRadioConfigViewModelProvider
 
 private val TOP_TRIM = 20.dp
+private val TABLET_WIDTH = 600.dp
 private val BAR_HEIGHT = 60.dp
 private val BAR_BOTTOM_GAP = 10.dp
 
@@ -57,7 +60,11 @@ fun IosMainScreen(uiViewModel: UIViewModel, multiBackstack: MultiBackstack, modi
     // The background is painted over the whole screen, including the notch area; only the content stays inside it.
     Surface(modifier = modifier.fillMaxSize()) {
       // The top gap is a bit smaller than the system's safe area (the content still stays clear of the notch).
-      val topGap = (WindowInsets.safeDrawing.asPaddingValues().calculateTopPadding() - TOP_TRIM).coerceAtLeast(0.dp)
+      // The trim is only for the iPhone; on a tablet (side bar) the whole safe area stays, so the bar clears the clock.
+      val wide = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.width.toDp() } >= TABLET_WIDTH
+      val topGap =
+          (WindowInsets.safeDrawing.asPaddingValues().calculateTopPadding() - (if (wide) 0.dp else TOP_TRIM))
+              .coerceAtLeast(0.dp)
       Box(
           Modifier.fillMaxSize()
               .padding(top = topGap)
