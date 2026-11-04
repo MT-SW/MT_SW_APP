@@ -72,7 +72,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -617,7 +621,18 @@ fun MessageScreen(
             }
         },
     ) { paddingValues ->
-        Box(Modifier.fillMaxSize().padding(paddingValues).focusable()) {
+        Box(
+            Modifier.fillMaxSize()
+                .padding(paddingValues)
+                // Any touch on the messages (tap, also on a message, or drag) hides the keyboard; nothing is consumed.
+                .pointerInput(Unit) {
+                    awaitEachGesture {
+                        awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+                        focusManager.clearFocus()
+                    }
+                }
+                .focusable(),
+        ) {
             MessageListPaged(
                 modifier = Modifier.fillMaxSize(),
                 listState = listState,
