@@ -90,7 +90,7 @@ import llama.llama_vocab_is_eog
 import org.meshtastic.core.repository.AiEngine
 import org.meshtastic.core.repository.AiModels
 import platform.Foundation.NSProcessInfo
-import llama.WHISPER_SAMPLING_GREEDY
+import llama.whisper_sampling_strategy
 import llama.whisper_context_default_params
 import llama.whisper_free
 import llama.whisper_full
@@ -315,7 +315,7 @@ class IosLlamaEngine(
         return memScoped {
             val language = IosDictationLanguage.hint
             val languageCode = language.cstr.ptr
-            val params = whisper_full_default_params(WHISPER_SAMPLING_GREEDY).copy {
+            val params = whisper_full_default_params(whisper_sampling_strategy.WHISPER_SAMPLING_GREEDY).copy {
                 n_threads = 4
                 translate = false
                 no_context = true
