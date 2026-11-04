@@ -18,6 +18,7 @@ package org.meshtastic.feature.settings.navigation
 
 import androidx.compose.runtime.Composable
 import org.meshtastic.core.navigation.Route
+import org.meshtastic.feature.settings.DesktopSettingsScreen
 import org.meshtastic.feature.settings.SettingsViewModel
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 
@@ -29,5 +30,10 @@ actual fun SettingsMainScreen(
     onNavigate: (Route) -> Unit,
     onBack: (() -> Unit)?,
 ) {
-    // TODO: Implement iOS settings main screen
+    DesktopSettingsScreen(
+        settingsViewModel = settingsViewModel,
+        radioConfigViewModel = radioConfigViewModel,
+        onNavigate = onNavigate,
+        onBack = onBack,
+    )
 }

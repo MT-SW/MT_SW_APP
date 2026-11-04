@@ -111,7 +111,6 @@ import org.meshtastic.feature.settings.search.SettingsSearchBar
 import org.meshtastic.feature.settings.search.SettingsSearchViewModel
 import org.meshtastic.proto.DeviceProfile
 import kotlin.time.Instant.Companion.fromEpochMilliseconds
-import java.util.Locale
 
 /**
  * Desktop-specific top-level settings screen. Replaces the Android `SettingsScreen` which uses Android-specific APIs
@@ -463,11 +462,8 @@ private fun languageOptions(): List<Pair<String, String>> {
     return (listOf("") + supportedLocaleTags).map { tag -> tag to (overrides[tag] ?: nativeLanguageName(tag)) }
 }
 
-internal fun nativeLanguageName(tag: String): String = Locale.forLanguageTag(tag).let { locale ->
-    locale.getDisplayName(locale).replaceFirstChar { char ->
-        if (char.isLowerCase()) char.titlecase(locale) else char.toString()
-    }
-}
+/** The name of a language written in that language itself. */
+internal expect fun nativeLanguageName(tag: String): String
 
 @Composable
 private fun LanguagePickerDialog(onSelectLanguage: (String) -> Unit, onDismiss: () -> Unit) {
