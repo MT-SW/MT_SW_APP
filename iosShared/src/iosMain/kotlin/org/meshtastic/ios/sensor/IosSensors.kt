@@ -41,6 +41,7 @@ import platform.CoreMotion.CMAltimeter
 import platform.CoreMotion.CMAltitudeData
 import platform.Foundation.NSError
 import platform.Foundation.NSOperationQueue
+import platform.Foundation.timeIntervalSince1970
 import platform.darwin.NSObject
 
 private fun CLLocationManager.granted(): Boolean =
