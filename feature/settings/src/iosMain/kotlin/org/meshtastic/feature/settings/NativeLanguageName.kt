@@ -18,7 +18,6 @@ package org.meshtastic.feature.settings
 
 import platform.Foundation.NSLocale
 import platform.Foundation.NSLocaleIdentifier
-import platform.Foundation.displayNameForKey
 
 internal actual fun nativeLanguageName(tag: String): String {
     val locale = NSLocale(localeIdentifier = tag.replace('-', '_'))

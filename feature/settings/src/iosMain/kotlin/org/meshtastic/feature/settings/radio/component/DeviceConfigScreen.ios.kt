@@ -19,6 +19,8 @@ package org.meshtastic.feature.settings.radio.component
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import kotlin.math.abs
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.useContents
 import platform.Foundation.NSCalendar
 import platform.Foundation.NSCalendarUnitDay
 import platform.Foundation.NSCalendarUnitHour
@@ -45,6 +47,7 @@ private fun offsetText(secondsEast: Int): String {
 private fun cleanName(name: String): String = if (name.length >= 3 && name.all { it.isLetter() }) name else "GMT"
 
 /** The phone's time zone as a POSIX string (like "CET-1CEST,M3.5.0,M10.5.0/3"), the form the radio expects. */
+@OptIn(ExperimentalForeignApi::class)
 private fun systemPosixTimeZone(): String {
     val tz = NSTimeZone.systemTimeZone
     val now = NSDate()
@@ -62,7 +65,7 @@ private fun systemPosixTimeZone(): String {
         // The wall clock just before the change is the time the rule names.
         val before = transition.dateByAddingTimeInterval(-1.0)
         val c = calendar.components(units, fromDate = before)
-        val daysInMonth = calendar.rangeOfUnit(NSCalendarUnitDay, inUnit = NSCalendarUnitMonth, forDate = before).length.toInt()
+        val daysInMonth = calendar.rangeOfUnit(NSCalendarUnitDay, inUnit = NSCalendarUnitMonth, forDate = before).useContents { length.toInt() }
         val day = c.day.toInt()
         val week = if (day + 7 > daysInMonth) 5 else (day - 1) / 7 + 1
         val weekday = (c.weekday.toInt() - 1) % 7
