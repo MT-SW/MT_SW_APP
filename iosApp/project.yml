@@ -39,4 +39,6 @@ targets:
         basedOnDependencyAnalysis: false
         script: |
           cd "$SRCROOT/.."
+          # Symulator Apple Silicon ma tylko arm64 (bez Intela).
+          case "$SDK_NAME" in iphonesimulator*) export ARCHS=arm64 ;; esac
           ./gradlew :iosShared:embedAndSignAppleFrameworkForXcode
