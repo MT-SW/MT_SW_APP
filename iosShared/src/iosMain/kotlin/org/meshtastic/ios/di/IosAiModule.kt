@@ -30,6 +30,7 @@ import org.meshtastic.feature.messaging.translation.AiTextEngine
 import org.meshtastic.feature.messaging.translation.GemmaTranslator
 import org.meshtastic.feature.messaging.translation.IosAiModelStore
 import org.meshtastic.feature.messaging.translation.IosAssistantService
+import org.meshtastic.feature.messaging.translation.IosDictationService
 import org.meshtastic.feature.messaging.translation.IosLlamaEngine
 import org.meshtastic.feature.messaging.translation.IosTranslationRouter
 import org.meshtastic.core.repository.AiModels
@@ -72,7 +73,7 @@ class IosAiModule {
 
     @Single fun aiModelStore(impl: IosAiModelStore): AiModelStore = impl
 
-    @Single fun aiTextEngine(store: IosAiModelStore): AiTextEngine = IosLlamaEngine { store.modelPath(it) }
+    @Single fun aiTextEngine(store: IosAiModelStore): AiTextEngine = IosLlamaEngine({ store.modelPath(it) }, { store.hearingPath(it) })
 
     @Single
     fun iosTranslationRouter(engine: AiTextEngine, store: IosAiModelStore, uiPrefs: UiPrefs): IosTranslationRouter =
@@ -90,18 +91,13 @@ class IosAiModule {
         knowledge: AssistantKnowledge,
     ): AssistantService = IosAssistantService(engine, store, uiPrefs, knowledge)
 
-    @Single fun dictationService(): DictationService = IosDictationService()
+    @Single
+    fun dictationService(engine: AiTextEngine, store: IosAiModelStore, uiPrefs: UiPrefs): DictationService =
+        IosDictationService(engine, store, uiPrefs)
 
     @Single fun assistantHistoryStore(): AssistantHistoryStore = IosAssistantHistoryStore()
 
     @Single fun assistantMemory(): AssistantMemory = IosAssistantMemory()
-}
-
-private class IosDictationService : DictationService {
-    override val available: StateFlow<Boolean> = MutableStateFlow(false)
-    override val translatorAvailable: StateFlow<Boolean> = MutableStateFlow(false)
-
-    override suspend fun transcribe(wav: ByteArray, translator: Boolean): String = ""
 }
 
 private class IosAssistantHistoryStore : AssistantHistoryStore {

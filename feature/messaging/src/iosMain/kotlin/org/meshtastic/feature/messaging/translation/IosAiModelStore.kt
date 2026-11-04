@@ -74,6 +74,13 @@ class IosAiModelStore(baseDir: String) : AiModelStore {
         return fileOf(id, main.fileName).toString()
     }
 
+    /** Full path of the hearing (audio) file of a model that can hear; null when it has none. */
+    fun hearingPath(id: String): String? {
+        if (!isComplete(id)) return null
+        val file = filesOf(id).firstOrNull { it.kind == AiFileKind.HEARING } ?: return null
+        return fileOf(id, file.fileName).toString()
+    }
+
     private fun setState(id: String, state: TranslatorModelState) = _states.update { it + (id to state) }
 
     override suspend fun download(id: String) {
