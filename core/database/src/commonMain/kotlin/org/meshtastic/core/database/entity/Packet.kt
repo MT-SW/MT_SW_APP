@@ -202,31 +202,32 @@ data class ReactionEntity(
     /** Rows written before schema 67 read as not via MQTT, with a null transport. */
     @ColumnInfo(name = "via_mqtt", defaultValue = "0") val viaMqtt: Boolean = false,
     @ColumnInfo(name = "transport_mechanism") val transportMechanism: Int? = null,
-)
-
-suspend fun ReactionEntity.toReaction(getNode: suspend (userId: String?) -> Node?): Reaction {
-    val user = getNode(userId)?.user ?: org.meshtastic.proto.User.Builder().also { wb -> wb.id = userId }.build()
-    return Reaction(
-        replyId = replyId,
-        user = user,
-        emoji = emoji,
-        timestamp = timestamp,
-        snr = snr,
-        rssi = rssi,
-        hopsAway = hopsAway,
-        packetId = packetId,
-        status = status,
-        routingError = routingError,
-        relays = relays,
-        relayNode = relayNode,
-        to = to,
-        channel = channel,
-        sfppHash = sfpp_hash,
-        xeddsaSigned = xeddsaSigned,
-        ackProofStatus = ackProofStatus,
-        viaMqtt = viaMqtt,
-        transportMechanism = transportMechanism,
-    )
+) {
+    /** A member (not an extension): Kotlin/Native cannot lower a suspend extension on an entity with nested annotations. */
+    suspend fun toReaction(getNode: suspend (userId: String?) -> Node?): Reaction {
+        val user = getNode(userId)?.user ?: org.meshtastic.proto.User.Builder().also { wb -> wb.id = userId }.build()
+        return Reaction(
+            replyId = replyId,
+            user = user,
+            emoji = emoji,
+            timestamp = timestamp,
+            snr = snr,
+            rssi = rssi,
+            hopsAway = hopsAway,
+            packetId = packetId,
+            status = status,
+            routingError = routingError,
+            relays = relays,
+            relayNode = relayNode,
+            to = to,
+            channel = channel,
+            sfppHash = sfpp_hash,
+            xeddsaSigned = xeddsaSigned,
+            ackProofStatus = ackProofStatus,
+            viaMqtt = viaMqtt,
+            transportMechanism = transportMechanism,
+        )
+    }
 }
 
 suspend fun List<ReactionEntity>.toReaction(getNode: suspend (userId: String?) -> Node?) =
