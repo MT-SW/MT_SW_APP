@@ -16,7 +16,6 @@
  */
 package org.meshtastic.ios.di
 
-import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 import org.meshtastic.core.database.iosDataDir
