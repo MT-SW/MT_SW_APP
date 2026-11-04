@@ -18,6 +18,9 @@ package org.meshtastic.ios
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalDensity
+import org.meshtastic.core.ui.theme.rememberScaledDensity
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -124,6 +127,8 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
                 TopLevelDestination.Nodes.route
             },
         )
+    val uiScale by uiViewModel.uiScale.collectAsState()
+    CompositionLocalProvider(LocalDensity provides rememberScaledDensity(percent = uiScale)) {
     AppTheme(darkTheme = isDarkTheme, monochrome = isMonochromeMode(themePref)) {
         IosCoilSetup()
         val introCompleted by uiViewModel.appIntroCompleted.collectAsState()
@@ -132,5 +137,6 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
         } else {
             IosWelcomeScreen(onDone = { uiViewModel.onAppIntroCompleted() })
         }
+    }
     }
 }
