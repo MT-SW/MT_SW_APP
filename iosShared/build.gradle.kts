@@ -57,6 +57,9 @@ kotlin {
             implementation(projects.feature.firmware)
             implementation(projects.feature.wifiProvision)
             implementation(projects.feature.intro)
+            implementation(libs.coil)
+            implementation(libs.coil.network.ktor3)
+            implementation(libs.coil.svg)
             implementation(projects.feature.mapMaplibre)
             implementation(libs.maplibre.compose)
 

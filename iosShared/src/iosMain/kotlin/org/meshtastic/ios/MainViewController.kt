@@ -41,6 +41,7 @@ import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
 import org.meshtastic.core.ui.theme.isMonochromeMode
 import org.meshtastic.core.ui.viewmodel.UIViewModel
+import org.meshtastic.feature.intro.IosWelcomeScreen
 import org.meshtastic.ios.di.IosKoinApp
 import org.meshtastic.ios.map.ProvideIosMaps
 import org.meshtastic.ios.ui.IosMainScreen
@@ -114,6 +115,12 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
             },
         )
     AppTheme(darkTheme = isDarkTheme, monochrome = isMonochromeMode(themePref)) {
-        ProvideIosMaps { IosMainScreen(uiViewModel, multiBackstack) }
+        IosCoilSetup()
+        val introCompleted by uiViewModel.appIntroCompleted.collectAsState()
+        if (introCompleted) {
+            ProvideIosMaps { IosMainScreen(uiViewModel, multiBackstack) }
+        } else {
+            IosWelcomeScreen(onDone = { uiViewModel.onAppIntroCompleted() })
+        }
     }
 }
