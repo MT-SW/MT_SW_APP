@@ -52,7 +52,7 @@ private val koin: Koin by lazy { startKoin<IosKoinApp> {}.koin }
 
 /** The single entry the iOS app (iosApp) calls: the whole screen is drawn by Compose Multiplatform. */
 fun MainViewController() = ComposeUIViewController {
-    val uiViewModel = remember { koin.get(UIViewModel::class) }
+    val uiViewModel = remember { koin.get<UIViewModel>(UIViewModel::class) }
     org.koin.compose.KoinContext(koin) {
         MeshServiceLifecycle()
         BackgroundCleanup()
@@ -63,7 +63,7 @@ fun MainViewController() = ComposeUIViewController {
 /** Starts the radio service with the screen and stops it with it. */
 @Composable
 private fun MeshServiceLifecycle() {
-    val orchestrator = remember { koin.get(MeshServiceOrchestrator::class) }
+    val orchestrator = remember { koin.get<MeshServiceOrchestrator>(MeshServiceOrchestrator::class) }
     DisposableEffect(Unit) {
         orchestrator.start()
         onDispose { orchestrator.stop() }
@@ -76,8 +76,8 @@ private val NODE_CLEANUP_START_DELAY = 1.minutes
 /** Hourly clean-up of old logs and (when enabled) inactive nodes, while the app is open. */
 @Composable
 private fun BackgroundCleanup() {
-    val scheduler = remember { koin.get(IosNodeCleanupScheduler::class) }
-    val logCleanup = remember { koin.get(MeshLogCleanup::class) }
+    val scheduler = remember { koin.get<IosNodeCleanupScheduler>(IosNodeCleanupScheduler::class) }
+    val logCleanup = remember { koin.get<MeshLogCleanup>(MeshLogCleanup::class) }
     LaunchedEffect(Unit) { withContext(Dispatchers.Default) { logCleanup.runHourly() } }
     LaunchedEffect(Unit) {
         delay(NODE_CLEANUP_START_DELAY)
@@ -92,7 +92,7 @@ private fun BackgroundCleanup() {
 @Suppress("ViewModelForwarding")
 @Composable
 private fun ThemedApp(uiViewModel: UIViewModel) {
-    val uiPrefs = remember { koin.get(UiPrefs::class) }
+    val uiPrefs = remember { koin.get<UiPrefs>(UiPrefs::class) }
     val themePref by uiPrefs.theme.collectAsState(initial = -1)
     val isDarkTheme =
         when (themePref) {
