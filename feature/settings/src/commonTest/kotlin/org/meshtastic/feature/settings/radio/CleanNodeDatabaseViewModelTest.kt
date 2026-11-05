@@ -30,9 +30,9 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.meshtastic.core.domain.usecase.settings.CleanNodeDatabaseUseCase
 import org.meshtastic.core.model.Node
-import org.meshtastic.core.ui.util.AlertManager
 import org.meshtastic.core.repository.MeshWorkerManager
 import org.meshtastic.core.testing.FakeUiPrefs
+import org.meshtastic.core.ui.util.AlertManager
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test

@@ -26,8 +26,8 @@ import kotlinx.coroutines.withTimeoutOrNull
 import org.meshtastic.core.ble.BleDevice
 import org.meshtastic.core.ble.BleScanner
 import org.meshtastic.core.ble.BluetoothRepository
-import org.meshtastic.core.ble.MeshtasticBleDevice
 import org.meshtastic.core.ble.MeshtasticBleConstants.SERVICE_UUID
+import org.meshtastic.core.ble.MeshtasticBleDevice
 import org.meshtastic.core.model.RadioNotConnectedException
 import org.meshtastic.core.model.util.anonymize
 import kotlin.time.Duration

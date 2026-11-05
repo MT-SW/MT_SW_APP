@@ -48,7 +48,6 @@ import org.meshtastic.core.ble.BleConnectionFactory
 import org.meshtastic.core.ble.BleConnectionState
 import org.meshtastic.core.ble.BleDevice
 import org.meshtastic.core.ble.BleScanner
-import org.meshtastic.core.ble.MeshtasticBleDevice
 import org.meshtastic.core.ble.BleWriteType
 import org.meshtastic.core.ble.BluetoothRepository
 import org.meshtastic.core.ble.DisconnectReason
@@ -400,8 +399,7 @@ class BleRadioTransport(
 
         // A pending request (iPhone/iPad, no advertisement seen) may wait long: the system finishes it in the
         // background the moment the radio is in range again.
-        val waitsPending =
-            bluetoothRepository.supportsPendingConnect && (device as? MeshtasticBleDevice)?.advertisement == null
+        val waitsPending = bluetoothRepository.supportsPendingConnect && device.rssi == null
         val state =
             bleConnection.connectAndAwait(device, if (waitsPending) PENDING_CONNECT_TIMEOUT else CONNECTION_TIMEOUT)
 
