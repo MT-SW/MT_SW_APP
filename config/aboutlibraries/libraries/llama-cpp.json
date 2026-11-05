@@ -1,0 +1,18 @@
+{
+  "uniqueId": "ggml-org:llama.cpp",
+  "name": "llama.cpp",
+  "description": "Local language model engine used by the assistant, translator and dictation (not part of the Gradle build).",
+  "website": "https://github.com/ggml-org/llama.cpp",
+  "developers": [
+    {
+      "name": "The ggml authors"
+    }
+  ],
+  "scm": {
+    "url": "https://github.com/ggml-org/llama.cpp"
+  },
+  "licenses": [
+    "MIT"
+  ],
+  "openSource": true
+}

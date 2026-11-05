@@ -1,0 +1,18 @@
+{
+  "uniqueId": "ggml-org:whisper.cpp",
+  "name": "whisper.cpp",
+  "description": "Local speech recognition engine used for dictation (not part of the Gradle build).",
+  "website": "https://github.com/ggml-org/whisper.cpp",
+  "developers": [
+    {
+      "name": "The ggml authors"
+    }
+  ],
+  "scm": {
+    "url": "https://github.com/ggml-org/whisper.cpp"
+  },
+  "licenses": [
+    "MIT"
+  ],
+  "openSource": true
+}

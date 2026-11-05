@@ -1,0 +1,18 @@
+{
+  "uniqueId": "ggml-org:ggml",
+  "name": "ggml",
+  "description": "Tensor library under llama.cpp and whisper.cpp.",
+  "website": "https://github.com/ggml-org/ggml",
+  "developers": [
+    {
+      "name": "The ggml authors"
+    }
+  ],
+  "scm": {
+    "url": "https://github.com/ggml-org/ggml"
+  },
+  "licenses": [
+    "MIT"
+  ],
+  "openSource": true
+}

@@ -1,0 +1,18 @@
+{
+  "uniqueId": "google:model-viewer",
+  "name": "model-viewer",
+  "description": "3D device model viewer used in the iPhone/iPad app (model-viewer.min.js).",
+  "website": "https://github.com/google/model-viewer",
+  "developers": [
+    {
+      "name": "Google LLC"
+    }
+  ],
+  "scm": {
+    "url": "https://github.com/google/model-viewer"
+  },
+  "licenses": [
+    "Apache-2.0"
+  ],
+  "openSource": true
+}
