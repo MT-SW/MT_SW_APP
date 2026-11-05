@@ -665,7 +665,7 @@ class BleRadioTransportTest {
     private fun FakeBleConnection.simulateStaleServiceTable() {
         missingServices.add(SERVICE_UUID)
         onDisconnect = {
-            if (invalidateServiceCacheResult && invalidateServiceCacheCalls > 0) missingServices.remove(SERVICE_UUID)
+            if (invalidateServiceCacheResult && reactiveInvalidateServiceCacheCalls > 0) missingServices.remove(SERVICE_UUID)
         }
     }
 

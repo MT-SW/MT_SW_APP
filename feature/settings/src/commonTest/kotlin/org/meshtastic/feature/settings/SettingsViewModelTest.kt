@@ -142,7 +142,7 @@ class SettingsViewModelTest {
     @Test
     fun testInitialization() {
         assertNotNull(viewModel)
-        assertEquals("3.0.0-test", viewModel.appVersionName)
+        assertEquals(org.meshtastic.core.model.MtswRelease.displayName("3.0.0-test"), viewModel.appVersionName)
     }
 
     @Test

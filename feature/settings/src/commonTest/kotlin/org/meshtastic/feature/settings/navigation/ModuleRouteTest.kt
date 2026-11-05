@@ -67,10 +67,10 @@ class ModuleRouteTest {
     }
 
     @Test
-    fun `the status message and traffic management bits hide no module route`() {
+    fun `the status message bit hides no module route and the traffic management bit hides only its own`() {
         val excluded = ExcludedModules.STATUSMESSAGE_CONFIG.value or ExcludedModules.TRAFFICMANAGEMENT_CONFIG.value
 
-        assertEquals(ModuleRoute.entries.toList(), routes(excluded = excluded))
+        assertEquals(ModuleRoute.entries - ModuleRoute.TRAFFIC_MANAGEMENT, routes(excluded = excluded))
     }
 
     @Test
@@ -84,6 +84,9 @@ class ModuleRouteTest {
     fun `metadata not read yet excludes nothing and leaves only the version gates`() {
         val listed = ModuleRoute.filterExcludedFrom(null, Config.DeviceConfig.Role.TAK)
 
-        assertEquals(ModuleRoute.entries - ModuleRoute.TAK - ModuleRoute.MESH_BEACON, listed)
+        assertEquals(
+            ModuleRoute.entries - ModuleRoute.TAK - ModuleRoute.MESH_BEACON - ModuleRoute.TRAFFIC_MANAGEMENT,
+            listed,
+        )
     }
 }

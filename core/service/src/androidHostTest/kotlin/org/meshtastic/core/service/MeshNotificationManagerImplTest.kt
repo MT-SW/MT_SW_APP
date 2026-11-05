@@ -444,7 +444,7 @@ class MeshNotificationManagerImplTest {
         every { nodeRepository.onlineNodeCount } returns flowOf(online)
         every { nodeRepository.totalNodeCount } returns flowOf(total)
         every { nodeRepository.ourNodeInfo } returns MutableStateFlow<Node?>(null)
-        every { nodeRepository.localStats } returns MutableStateFlow(LocalStats())
+        every { nodeRepository.localStats } returns MutableStateFlow(LocalStats.Builder().build())
         every { nodeRepository.localStatsExtended } returns MutableStateFlow(LocalStatsExtended())
         every { packetRepository.getUnreadCountTotal() } returns flowOf(unread)
     }

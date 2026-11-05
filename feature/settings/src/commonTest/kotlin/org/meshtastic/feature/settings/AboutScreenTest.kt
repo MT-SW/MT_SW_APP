@@ -27,12 +27,29 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.v2.runComposeUiTest
 import org.meshtastic.core.ui.theme.AppTheme
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.dsl.module
+import org.meshtastic.core.ui.util.SnackbarManager
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalTestApi::class)
 class AboutScreenTest {
+
+    @BeforeTest
+    fun startKoinForToasts() {
+        // On desktop the toast helper looks up the snackbar manager from Koin.
+        startKoin { modules(module { single { SnackbarManager() } }) }
+    }
+
+    @AfterTest
+    fun stopKoinForToasts() {
+        stopKoin()
+    }
 
     @Test
     fun `about screen displays all sections and content`() = runComposeUiTest {
