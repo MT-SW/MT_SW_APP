@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.feature.connections.ui.components
 
 import androidx.compose.foundation.layout.Spacer
@@ -39,9 +38,9 @@ import org.meshtastic.core.ui.component.MeshtasticResourceDialog
 import org.meshtastic.core.ui.util.LocalTerminateApplication
 
 /**
- * "Force stop" for the whole app, after a confirmation: disconnects, stops the background service and ends the
- * process. It saves digging through system settings when the app keeps reconnecting to a device that is switched off.
- * Renders nothing on platforms that provide no [LocalTerminateApplication].
+ * "Force stop" for the whole app, after a confirmation: disconnects, stops the background service and ends the process.
+ * It saves digging through system settings when the app keeps reconnecting to a device that is switched off. Renders
+ * nothing on platforms that provide no [LocalTerminateApplication].
  */
 @Composable
 fun TerminateApplicationButton(modifier: Modifier = Modifier) {

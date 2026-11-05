@@ -56,7 +56,8 @@ kotlin {
  */
 val docsComposeResources = layout.buildDirectory.dir("generated/docsComposeResources")
 
-// Refreshes the assistant's knowledge about the firmware, integration and protobufs from GitHub; offline it changes nothing.
+// Refreshes the assistant's knowledge about the firmware, integration and protobufs from GitHub; offline it changes
+// nothing.
 val refreshAssistantKnowledge =
     tasks.register<Exec>("refreshAssistantKnowledge") {
         description = "Downloads the newest README files of the other MT_SW repositories for the assistant."
@@ -88,10 +89,16 @@ val syncDocsToComposeResources =
         // next to the guide, so the offline assistant can answer "what is new" without internet.
         from(isolated.rootProject.projectDirectory.file("CHANGELOG.md")) { into("files/knowledge") }
         // Short copies of the READMEs of the firmware, integration and protobufs: only the assistant reads them.
-        from(isolated.rootProject.projectDirectory.dir("knowledge")) { include("*.md"); into("files/knowledge") }
+        from(isolated.rootProject.projectDirectory.dir("knowledge")) {
+            include("*.md")
+            into("files/knowledge")
+        }
         // The technical knowledge base (knowledge/base/*.md, plain text edited by hand); the build adds base/index.txt
         // with the file names, because the app cannot list a resource folder.
-        from(isolated.rootProject.projectDirectory.dir("knowledge/base")) { include("*.md", "pokrewne/*.md", "offtop/*.md"); into("files/knowledge/base") }
+        from(isolated.rootProject.projectDirectory.dir("knowledge/base")) {
+            include("*.md", "pokrewne/*.md", "offtop/*.md")
+            into("files/knowledge/base")
+        }
         // The assistant's own texts in English and Polish: an answer is written in the language of the question even
         // when the app is set to the other one. Only the lines the assistant uses are kept.
         val resourcesDir = isolated.rootProject.projectDirectory.dir("core/resources/src/commonMain/composeResources")
@@ -102,11 +109,13 @@ val syncDocsToComposeResources =
                 filter { line ->
                     val keep =
                         Regex(
-                            "name=\"(ai_[^\"]*|assistant_[^\"]*|schema_[^\"]*|node_color_[^\"]*|dictation_[^\"]*|bottom_nav_settings|lora|device|display|" +
-                                "bluetooth|network|position|power|mqtt|telemetry|mt_sw_features_title|clean_node_database_title|" +
-                                "filter_settings|debug_panel|about|help_and_documentation|nodes|map|messages|channels|connections|" +
-                                "firmware|discovery_local_mesh|quick_chat|ui_scale|auto_load_chat_images|import_menu_in_top_bar|" +
-                                "theme|preferences_language|log_retention_days|translator_title)\"",
+                            "name=\"(ai_[^\"]*|assistant_[^\"]*|schema_[^\"]*|node_color_[^\"]*|dictation_[^\"]*|" +
+                            "bottom_nav_settings|lora|device|display|bluetooth|network|position|power|mqtt|" +
+                            "telemetry|mt_sw_features_title|clean_node_database_title|filter_settings|debug_panel|" +
+                            "about|help_and_documentation|nodes|map|messages|channels|connections|firmware|" +
+                            "discovery_local_mesh|quick_chat|ui_scale|auto_load_chat_images|" +
+                            "import_menu_in_top_bar|theme|preferences_language|log_retention_days|" +
+                            "translator_title)\""
                         )
                     if (keep.containsMatchIn(line)) line else ""
                 }
@@ -138,10 +147,15 @@ val syncDocsToComposeResources =
         val baseSource = isolated.rootProject.projectDirectory.dir("knowledge/base").asFile
         val baseTarget = docsComposeResources.get().asFile.resolve("files/knowledge/base")
         doLast {
-            // Topics outside the network and radio live in knowledge/base/offtop/ and are listed as "offtop/name.md"; adjacent topics (IT, electronics, Wi-Fi) live in knowledge/base/pokrewne/.
+            // Topics outside the network and radio live in knowledge/base/offtop/ and are listed as "offtop/name.md";
+            // adjacent topics (IT, electronics, Wi-Fi) live in knowledge/base/pokrewne/.
             val names =
-                baseSource.walkTopDown().filter { it.isFile && it.extension == "md" }
-                    .map { it.relativeTo(baseSource).path.replace('\\', '/') }.sorted().toList()
+                baseSource
+                    .walkTopDown()
+                    .filter { it.isFile && it.extension == "md" }
+                    .map { it.relativeTo(baseSource).path.replace('\\', '/') }
+                    .sorted()
+                    .toList()
             baseTarget.mkdirs()
             baseTarget.resolve("index.txt").writeText(names.joinToString("\n"))
         }

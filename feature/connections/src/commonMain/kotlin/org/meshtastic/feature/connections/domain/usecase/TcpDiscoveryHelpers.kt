@@ -136,8 +136,10 @@ internal suspend fun virtualDeviceEntries(showMock: Boolean, showReplay: Boolean
         DeviceListEntry.Mock(safeCatchingAll { getStringSuspend(Res.string.demo_mode) }.getOrDefault("Demo Mode"))
     val replay =
         if (showReplay) {
-            val label =
-                safeCatchingAll { getStringSuspend(Res.string.demo_mode_replay) }.getOrDefault("Demo Mode (Replay)")
+            val label = safeCatchingAll {
+                getStringSuspend(Res.string.demo_mode_replay)
+            }
+                .getOrDefault("Demo Mode (Replay)")
             DeviceListEntry.Replay(label)
         } else {
             null

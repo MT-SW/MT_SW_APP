@@ -19,9 +19,6 @@
 package org.meshtastic.core.network.radio
 
 import co.touchlab.kermit.Logger
-import kotlin.concurrent.Volatile
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
@@ -67,6 +64,9 @@ import org.meshtastic.core.network.transport.HeartbeatSender
 import org.meshtastic.core.repository.RadioInterfaceService
 import org.meshtastic.core.repository.RadioTransport
 import org.meshtastic.core.repository.RadioTransportCallback
+import kotlin.concurrent.Volatile
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 private val CONNECTION_TIMEOUT = 15.seconds
 
@@ -307,7 +307,7 @@ class BleRadioTransport(
                     // stale-cache-refresh threshold.
                     if (
                         outcome is BleReconnectPolicy.Outcome.Disconnected &&
-                            (outcome.wasStable || outcome.wasIntentional)
+                        (outcome.wasStable || outcome.wasIntentional)
                     ) {
                         PersistentReconnectFailures.recordSuccess(address)
                     } else {
@@ -587,7 +587,7 @@ class BleRadioTransport(
         val reconnectState = bleConnection.connectAndAwait(device, CONNECTION_TIMEOUT)
         if (reconnectState !is BleConnectionState.Connected) {
             throw RadioNotConnectedException(
-                "Failed to reconnect after GATT cache refresh ($reason, state=$reconnectState)"
+                "Failed to reconnect after GATT cache refresh ($reason, state=$reconnectState)",
             )
         }
         Logger.i { "[${address.anonymize()}] Reconnected after GATT cache refresh ($reason)" }
@@ -837,11 +837,11 @@ class BleRadioTransport(
                 transportLease.release()
                 if (!writePermit && session != null && sessionLease != null) {
                     sendRejectionLogger(
-                        "[${address.anonymize()}] BLE write backlog is full, cannot admit ${p.size} bytes"
+                        "[${address.anonymize()}] BLE write backlog is full, cannot admit ${p.size} bytes",
                     )
                 } else if (logUnavailable) {
                     sendRejectionLogger(
-                        "[${address.anonymize()}] toRadio characteristic unavailable, cannot send ${p.size} bytes"
+                        "[${address.anonymize()}] toRadio characteristic unavailable, cannot send ${p.size} bytes",
                     )
                 }
                 false
@@ -1044,7 +1044,8 @@ class BleRadioTransport(
                 is RadioNotConnectedException -> this.message ?: "Device not found"
 
                 is NoSuchElementException,
-                is IllegalArgumentException -> "Required characteristic missing"
+                is IllegalArgumentException,
+                -> "Required characteristic missing"
 
                 else -> this.message ?: this::class.simpleName ?: "Unknown"
             }

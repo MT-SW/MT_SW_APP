@@ -28,8 +28,8 @@ import org.meshtastic.feature.docs.data.DefaultDocBundleLoader
 import org.meshtastic.feature.docs.model.DocSection
 
 /**
- * Knowledge base of the offline assistant, built from the user guide and the change list that are packaged into the
- * app at build time (nothing is downloaded). The search itself is [KnowledgeIndex].
+ * Knowledge base of the offline assistant, built from the user guide and the change list that are packaged into the app
+ * at build time (nothing is downloaded). The search itself is [KnowledgeIndex].
  */
 @Single(binds = [AssistantKnowledge::class])
 class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : AssistantKnowledge {
@@ -52,7 +52,8 @@ class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : Assis
 
     override suspend fun lookupBaseOnly(question: String, maxChars: Int, language: String?): String {
         if (question.isBlank()) return ""
-        return indexFor(language ?: languageOf(question)).lookup(question, maxChars, includeBase = true, baseOnly = true)
+        return indexFor(language ?: languageOf(question))
+            .lookup(question, maxChars, includeBase = true, baseOnly = true)
     }
 
     override suspend fun coreFacts(language: String): String =
@@ -110,7 +111,8 @@ class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : Assis
         for (file in listing) {
             val text = readText("$BASE_PATH/$file")
             if (text.isBlank()) continue
-            val title = text.lineSequence().firstOrNull { it.startsWith("# ") }?.removePrefix("# ")?.trim() ?: prettyTitle(file)
+            val title =
+                text.lineSequence().firstOrNull { it.startsWith("# ") }?.removePrefix("# ")?.trim() ?: prettyTitle(file)
             val label =
                 when {
                     file.startsWith("offtop/") -> "Baza wiedzy (offtop)"
@@ -132,12 +134,16 @@ class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : Assis
 
     companion object {
         /** Reads `<string name="key">text</string>` lines of a strings file into a map of plain texts. */
-        fun parseStrings(xml: String): Map<String, String> =
-            STRING_LINE.findAll(xml).associate { m ->
-                m.groupValues[1] to
-                    m.groupValues[2].replace("\\'", "'").replace("\\\"", "\"").replace("&lt;", "<").replace("&gt;", ">")
-                        .replace("&amp;", "&").replace("\\n", "\n")
-            }
+        fun parseStrings(xml: String): Map<String, String> = STRING_LINE.findAll(xml).associate { m ->
+            m.groupValues[1] to
+                m.groupValues[2]
+                    .replace("\\'", "'")
+                    .replace("\\\"", "\"")
+                    .replace("&lt;", "<")
+                    .replace("&gt;", ">")
+                    .replace("&amp;", "&")
+                    .replace("\\n", "\n")
+        }
 
         private val STRING_LINE = Regex("<string name=\"([^\"]+)\">(.*?)</string>")
 
@@ -151,10 +157,15 @@ class DocsAssistantKnowledge(private val loader: DefaultDocBundleLoader) : Assis
                 "integration-web-client.md" to "MT_SW integration web client",
                 "integration-planner-api.md" to "MT_SW integration planner API",
             )
-        /** A readable title from a file name ("pokrewne/ukryty-wezel-zalewanie.md" -> "Ukryty wezel zalewanie"), for a file without a "# Title" line. */
+
+        /**
+         * A readable title from a file name ("pokrewne/ukryty-wezel-zalewanie.md" -> "Ukryty wezel zalewanie"), for a
+         * file without a "# Title" line.
+         */
         fun prettyTitle(file: String): String =
-            file.substringAfterLast('/').removeSuffix(".md").replace('-', ' ').replace('_', ' ').trim()
-                .let { it.replaceFirstChar { c -> c.uppercase() } }
+            file.substringAfterLast('/').removeSuffix(".md").replace('-', ' ').replace('_', ' ').trim().let {
+                it.replaceFirstChar { c -> c.uppercase() }
+            }
 
         const val BASE_PATH = "files/knowledge/base"
         const val CHANGELOG_PATH = "files/knowledge/CHANGELOG.md"

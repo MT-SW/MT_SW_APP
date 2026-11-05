@@ -39,7 +39,9 @@ data class KbEntry(
     val question: String,
     val body: String,
     val source: String,
-    /** Lower-case text without Polish diacritics that the search looks through (question, text, hidden words, topic). */
+    /**
+     * Lower-case text without Polish diacritics that the search looks through (question, text, hidden words, topic).
+     */
     val haystack: String,
     /** The same for the question alone, so that matches in the question rank first. */
     val questionKey: String,
@@ -49,12 +51,11 @@ data class KbEntry(
 object KnowledgeBaseParser {
     private val ENTRY_START = Regex("(?m)^### ")
 
-    fun tierOf(file: String): KbTier =
-        when {
-            file.startsWith("offtop/") -> KbTier.OFFTOP
-            file.startsWith("pokrewne/") -> KbTier.RELATED
-            else -> KbTier.MAIN
-        }
+    fun tierOf(file: String): KbTier = when {
+        file.startsWith("offtop/") -> KbTier.OFFTOP
+        file.startsWith("pokrewne/") -> KbTier.RELATED
+        else -> KbTier.MAIN
+    }
 
     /** Parses one file ("# Title" then "### question" entries). [firstId] numbers the entries. */
     fun parse(file: String, text: String, firstId: Int): List<KbEntry> {
@@ -90,24 +91,33 @@ object KnowledgeBaseParser {
     }
 
     /** Lower case and without Polish diacritics, so that "zmija" finds "żmija". */
-    fun searchKey(text: String): String =
-        buildString(text.length) {
-            for (c in text.lowercase()) {
-                append(
-                    when (c) {
-                        'ą' -> 'a'
-                        'ć' -> 'c'
-                        'ę' -> 'e'
-                        'ł' -> 'l'
-                        'ń' -> 'n'
-                        'ó' -> 'o'
-                        'ś' -> 's'
-                        'ź', 'ż' -> 'z'
-                        else -> c
-                    },
-                )
-            }
+    fun searchKey(text: String): String = buildString(text.length) {
+        for (c in text.lowercase()) {
+            append(
+                when (c) {
+                    'ą' -> 'a'
+
+                    'ć' -> 'c'
+
+                    'ę' -> 'e'
+
+                    'ł' -> 'l'
+
+                    'ń' -> 'n'
+
+                    'ó' -> 'o'
+
+                    'ś' -> 's'
+
+                    'ź',
+                    'ż',
+                    -> 'z'
+
+                    else -> c
+                },
+            )
         }
+    }
 
     /** Entries matching every word of [query] (all of them when it is blank), best matches in the question first. */
     fun filter(entries: List<KbEntry>, query: String, tier: KbTier?): List<KbEntry> {
@@ -120,7 +130,10 @@ object KnowledgeBaseParser {
     }
 }
 
-/** Loads the packaged knowledge base: `files/knowledge/base/index.txt` lists its files (compose resources cannot list a folder). */
+/**
+ * Loads the packaged knowledge base: `files/knowledge/base/index.txt` lists its files (compose resources cannot list a
+ * folder).
+ */
 object KnowledgeBaseLoader {
     private const val BASE_PATH = "files/knowledge/base"
 
@@ -135,12 +148,11 @@ object KnowledgeBaseLoader {
         return all
     }
 
-    private suspend fun readText(path: String): String =
-        try {
-            Res.readBytes(path).decodeToString()
-        } catch (e: CancellationException) {
-            throw e
-        } catch (_: Exception) {
-            ""
-        }
+    private suspend fun readText(path: String): String = try {
+        Res.readBytes(path).decodeToString()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (_: Exception) {
+        ""
+    }
 }
