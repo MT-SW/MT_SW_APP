@@ -25,8 +25,8 @@ import java.util.Locale
 /**
  * A bounded in-memory ring buffer of recent Kermit log lines. Desktop has no system logcat, so install this writer at
  * startup (`Logger.setLogWriters(platformLogWriter(), InMemoryLogBuffer)`) to let the Debug screen view and export the
- * app's own logs. Lines are formatted to loosely match Android's `logcat -v time` shape (`MM-dd HH:mm:ss.SSS L/tag: message`) so the same
- * viewer/filters work on both platforms.
+ * app's own logs. Lines are formatted to loosely match Android's `logcat -v time` shape (`MM-dd HH:mm:ss.SSS L/tag:
+ * message`) so the same viewer/filters work on both platforms.
  */
 object InMemoryLogBuffer : LogWriter() {
     private const val MAX_LINES = 5000

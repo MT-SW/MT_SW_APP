@@ -92,7 +92,8 @@ fun AppLogSettings() {
             control.chooseFolder()
         }
         Text(
-            text = chosen?.let { stringResource(Res.string.app_log_folder, it) }
+            text =
+            chosen?.let { stringResource(Res.string.app_log_folder, it) }
                 ?: stringResource(Res.string.app_log_folder_none),
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),

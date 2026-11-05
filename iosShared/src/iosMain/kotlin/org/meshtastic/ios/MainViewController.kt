@@ -34,10 +34,10 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import org.koin.core.Koin
 import org.koin.plugin.module.dsl.startKoin
+import org.meshtastic.core.common.log.AppLogControls
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.model.DeviceAddress
 import org.meshtastic.core.navigation.TopLevelDestination
-import org.meshtastic.core.common.log.AppLogControls
 import org.meshtastic.core.navigation.rememberMultiBackstack
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.service.MeshLogCleanup

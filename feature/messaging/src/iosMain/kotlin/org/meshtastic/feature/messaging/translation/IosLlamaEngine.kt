@@ -25,6 +25,7 @@ import cnames.structs.mtmd_bitmap
 import cnames.structs.mtmd_context
 import cnames.structs.whisper_context
 import kotlinx.cinterop.ByteVar
+import kotlinx.cinterop.COpaquePointer
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.CPointerVar
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -38,11 +39,10 @@ import kotlinx.cinterop.cstr
 import kotlinx.cinterop.get
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.plus
-import kotlinx.cinterop.staticCFunction
-import kotlinx.cinterop.COpaquePointer
 import kotlinx.cinterop.ptr
 import kotlinx.cinterop.readBytes
 import kotlinx.cinterop.set
+import kotlinx.cinterop.staticCFunction
 import kotlinx.cinterop.toKString
 import kotlinx.cinterop.usePinned
 import kotlinx.cinterop.value
@@ -63,8 +63,6 @@ import llama.llama_free
 import llama.llama_get_memory
 import llama.llama_init_from_model
 import llama.llama_log_set
-import llama.whisper_log_set
-import llama.mtmd_log_set
 import llama.llama_memory_clear
 import llama.llama_model_chat_template
 import llama.llama_model_default_params
@@ -93,6 +91,7 @@ import llama.mtmd_init_from_file
 import llama.mtmd_input_chunks_free
 import llama.mtmd_input_chunks_init
 import llama.mtmd_input_text
+import llama.mtmd_log_set
 import llama.mtmd_support_audio
 import llama.mtmd_tokenize
 import llama.whisper_context_default_params
@@ -102,6 +101,7 @@ import llama.whisper_full_default_params
 import llama.whisper_full_get_segment_text
 import llama.whisper_full_n_segments
 import llama.whisper_init_from_file_with_params
+import llama.whisper_log_set
 import llama.whisper_sampling_strategy
 import org.meshtastic.core.repository.AiEngine
 import org.meshtastic.core.repository.AiModels
@@ -467,6 +467,7 @@ object IosEngineLog {
         whisper_log_set(callback, null)
     }
 
+    @Suppress("ReturnCount")
     internal fun append(level: Int, text: String) {
         val folder = dir ?: return
         if (text.isBlank()) return
@@ -485,6 +486,7 @@ object IosEngineLog {
 }
 
 @OptIn(ExperimentalForeignApi::class)
+@Suppress("UnusedParameter")
 private fun onEngineLog(level: ggml_log_level, text: CPointer<ByteVar>?, userData: COpaquePointer?) {
     IosEngineLog.append(level.toInt(), text?.toKString().orEmpty())
 }

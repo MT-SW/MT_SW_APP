@@ -18,8 +18,8 @@
 
 package org.meshtastic.ios
 
-import kotlinx.cinterop.ExperimentalForeignApi
 import co.touchlab.kermit.Logger
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -46,13 +46,12 @@ import platform.Foundation.NSOperationQueue
 import platform.Foundation.NSProcessInfo
 import platform.Foundation.NSTemporaryDirectory
 import platform.Foundation.NSURL
+import platform.Foundation.dataWithContentsOfFile
 import platform.Foundation.lowPowerModeEnabled
 import platform.Foundation.thermalState
-import platform.Foundation.dataWithContentsOfFile
 import platform.Foundation.writeToFile
 import platform.UIKit.UIActivityViewController
 import platform.UIKit.UIApplication
-import platform.UIKit.popoverPresentationController
 import platform.UIKit.UIApplicationDidBecomeActiveNotification
 import platform.UIKit.UIApplicationDidEnterBackgroundNotification
 import platform.UIKit.UIApplicationDidReceiveMemoryWarningNotification
@@ -66,6 +65,7 @@ import platform.UIKit.UIDocumentPickerViewController
 import platform.UIKit.UIViewController
 import platform.UIKit.UIWindow
 import platform.UIKit.UIWindowScene
+import platform.UIKit.popoverPresentationController
 import platform.UniformTypeIdentifiers.UTTypeFolder
 import platform.darwin.NSObject
 
@@ -75,6 +75,7 @@ import platform.darwin.NSObject
  * written there on its own (at start, every few minutes and when the app goes to the background), like the Downloads
  * folder of Android. The same package can be sent at any time with the report button.
  */
+@Suppress("TooManyFunctions")
 internal object IosLogControl : AppLogControl {
     private const val REPORT_DIR = "reports"
     private const val KB = 1024
@@ -96,8 +97,10 @@ internal object IosLogControl : AppLogControl {
 
     private val bookmarkPath: String
         get() = iosDataDir() + "/logs/" + BOOKMARK_FILE
+
     private val statePath: Path
         get() = (iosDataDir() + "/logs/last_state.txt").toPath()
+
     private val namePath: Path
         get() = (iosDataDir() + "/logs/" + NAME_FILE).toPath()
 
@@ -124,8 +127,7 @@ internal object IosLogControl : AppLogControl {
 
     /** Reads the remembered folder and starts the automatic saving. Called once at start-up. */
     fun start() {
-        folderName.value =
-            runCatching { FileSystem.SYSTEM.read(namePath) { readUtf8() } }.getOrNull()?.ifBlank { null }
+        folderName.value = runCatching { FileSystem.SYSTEM.read(namePath) { readUtf8() } }.getOrNull()?.ifBlank { null }
         scope.launch {
             while (true) {
                 runCatching { IosFileLog.pruneRecent() }
@@ -246,14 +248,16 @@ internal object IosLogControl : AppLogControl {
     }
 
     /** Writes a fresh zip of the logs of the last 24 hours into the chosen folder; does nothing without one. */
+    @Suppress("ReturnCount")
     fun exportNow() {
         runCatching {
             // As on Android: only while the full log is on or a crash was recorded, and only when something is new.
             val wanted = IosFileLog.level.value != AppLogLevel.OFF || IosFileLog.crashFiles().isNotEmpty()
             if (!wanted) return
             val files = IosFileLog.parts() + IosFileLog.crashFiles()
-            val fingerprint = "${files.size}:${files.maxOfOrNull { IosFileLog.modified(it) } ?: 0L}:" +
-                "${files.sumOf { IosFileLog.size(it) }}"
+            val fingerprint =
+                "${files.size}:${files.maxOfOrNull { IosFileLog.modified(it) } ?: 0L}:" +
+                    "${files.sumOf { IosFileLog.size(it) }}"
             val marker = (iosDataDir() + "/logs/last_export.txt").toPath()
             if (runCatching { FileSystem.SYSTEM.read(marker) { readUtf8() } }.getOrNull() == fingerprint) return
             val data = NSData.dataWithContentsOfFile(bookmarkPath) ?: return

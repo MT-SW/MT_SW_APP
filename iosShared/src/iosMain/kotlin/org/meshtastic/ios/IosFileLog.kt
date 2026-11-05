@@ -19,9 +19,9 @@ package org.meshtastic.ios
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
+import co.touchlab.kermit.platformLogWriter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import co.touchlab.kermit.platformLogWriter
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
@@ -44,14 +44,15 @@ import kotlin.native.setUnhandledExceptionHook
 /**
  * The fork's log files on iPhone and iPad, built exactly like [org.meshtastic.core.common.log.AppLogControl]'s other
  * platforms (Android and desktop):
- * - Off by default; the choice and the switch of the automatic log of the last 24 hours are remembered in a small
- *   file (`logging.conf`) next to the logs.
+ * - Off by default; the choice and the switch of the automatic log of the last 24 hours are remembered in a small file
+ *   (`logging.conf`) next to the logs.
  * - A log is a series of parts of about [PART_BYTES] each (`mt_sw_log_<session>_<nnn>.txt`) in the `logs` folder; every
  *   part opens with its own header and every line starts with the date and time to the millisecond.
  * - While only the automatic log of the last day runs (on by default), parts older than a day go and the parts stay
  *   under [RECENT_MAX_BYTES]. The oldest parts always go once all of them pass [MAX_TOTAL_BYTES].
  * - The cause of a crash is written to its own small file in `crash/` always: the stack trace and nothing else.
  */
+@Suppress("TooManyFunctions")
 internal object IosFileLog : LogWriter() {
     const val PART_BYTES = 400L * 1024
     const val RECENT_WINDOW_MS = 24L * 60 * 60 * 1000
@@ -89,13 +90,12 @@ internal object IosFileLog : LogWriter() {
 
     fun nowMillis(): Long = (NSDate().timeIntervalSince1970 * MILLIS).toLong()
 
-    private fun format(pattern: String): String =
-        NSDateFormatter()
-            .apply {
-                locale = NSLocale(localeIdentifier = "en_US_POSIX")
-                dateFormat = pattern
-            }
-            .stringFromDate(NSDate())
+    private fun format(pattern: String): String = NSDateFormatter()
+        .apply {
+            locale = NSLocale(localeIdentifier = "en_US_POSIX")
+            dateFormat = pattern
+        }
+        .stringFromDate(NSDate())
 
     private fun threadName(): String =
         if (NSThread.isMainThread) "main" else NSThread.currentThread.name?.takeIf { it.isNotBlank() } ?: "worker"
@@ -220,19 +220,18 @@ internal object IosFileLog : LogWriter() {
         lock.unlock()
     }
 
-    private fun partName(number: Int) =
-        "mt_sw_log_${session}_${number.toString().padStart(PART_NUMBER_WIDTH, '0')}.txt"
+    private fun partName(number: Int) = "mt_sw_log_${session}_${number.toString().padStart(PART_NUMBER_WIDTH, '0')}.txt"
 
     /** All log parts, oldest first. */
-    fun parts(): List<Path> =
-        runCatching {
-            FileSystem.SYSTEM.list(dir).filter { it.name.startsWith("mt_sw_log_") }.sortedBy { it.name }
-        }
-            .getOrDefault(emptyList())
+    fun parts(): List<Path> = runCatching {
+        FileSystem.SYSTEM.list(dir).filter { it.name.startsWith("mt_sw_log_") }.sortedBy { it.name }
+    }
+        .getOrDefault(emptyList())
 
-    fun crashFiles(): List<Path> =
-        runCatching { FileSystem.SYSTEM.list(crashDir).filter { it.name.startsWith("crash_") }.sortedBy { it.name } }
-            .getOrDefault(emptyList())
+    fun crashFiles(): List<Path> = runCatching {
+        FileSystem.SYSTEM.list(crashDir).filter { it.name.startsWith("crash_") }.sortedBy { it.name }
+    }
+        .getOrDefault(emptyList())
 
     fun size(path: Path): Long = FileSystem.SYSTEM.metadataOrNull(path)?.size ?: 0L
 
@@ -253,6 +252,7 @@ internal object IosFileLog : LogWriter() {
         }
     }
 
+    @Suppress("LoopWithTooManyJumpStatements")
     private fun pruneOld() {
         val all = parts()
         var total = all.sumOf { size(it) }
@@ -269,12 +269,14 @@ internal object IosFileLog : LogWriter() {
         runCatching {
             FileSystem.SYSTEM.createDirectories(crashDir)
             val name = "crash_" + format("yyyyMMdd-HHmmss") + ".txt"
-            FileSystem.SYSTEM.write(crashDir / name) { writeUtf8(
+            FileSystem.SYSTEM.write(crashDir / name) {
+                writeUtf8(
                     "Crash at ${stamp()}, ${(nowMillis() - startedAt) / MILLIS_PER_SECOND} s after start\n" +
                         header() +
                         "\nThread: ${threadName()}\n" +
                         "Memory: device ${NSProcessInfo.processInfo.physicalMemory / BYTES_IN_MB} MB\n\n$trace\n",
-                ) }
+                )
+            }
             crashFiles().dropLast(MAX_CRASH_FILES).forEach { runCatching { FileSystem.SYSTEM.delete(it) } }
         }
     }
