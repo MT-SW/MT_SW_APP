@@ -22,8 +22,10 @@ import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -103,6 +105,8 @@ class BaseMapViewModelTest {
 
     @AfterTest
     fun tearDown() {
+        // Stop the ViewModel's coroutines while the test Main dispatcher is still set, so none of them outlives it.
+        viewModel.viewModelScope.cancel()
         Dispatchers.resetMain()
     }
 
