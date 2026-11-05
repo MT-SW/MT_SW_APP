@@ -40,6 +40,10 @@ class PlannerReportBuilderTest {
                 sectionLink = "Trasa",
                 lblDistance = "Odleglosc",
                 verdictExcellent = "Doskonale",
+                verdictGood = "Doskonale",
+                verdictMarginal = "Doskonale",
+                verdictWeak = "Doskonale",
+                verdictNoLink = "Doskonale",
             )
         val report = PlannerReportBuilder.build(stateWithLink(), s)
         assertEquals("T", report.title)
