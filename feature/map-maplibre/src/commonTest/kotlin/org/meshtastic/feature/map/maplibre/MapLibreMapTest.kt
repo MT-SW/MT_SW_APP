@@ -28,6 +28,7 @@ import org.meshtastic.feature.map.maplibre.layers.heardJustNow
 import org.meshtastic.feature.map.maplibre.style.Basemap
 import org.meshtastic.feature.map.maplibre.style.Basemaps
 import org.meshtastic.feature.map.maplibre.style.toBaseStyle
+import org.meshtastic.feature.map.tiles.MapTileCatalogue
 import org.meshtastic.proto.Position
 import kotlin.math.abs
 import kotlin.test.Test
@@ -71,10 +72,9 @@ class BasemapRegistryTest {
     }
 
     @Test
-    fun `the default basemap is the maintained OpenFreeMap style`() {
-        val default = Basemaps.default
-        assertTrue(default is Basemap.Vector)
-        assertEquals("https://tiles.openfreemap.org/styles/liberty", default.styleUri)
+    fun `the default basemap is OpenStreetMap`() {
+        // The fork starts on the plain OpenStreetMap tiles; the OpenFreeMap vector styles are an option.
+        assertEquals(MapTileCatalogue.OpenStreetMap.id, Basemaps.default.id)
     }
 
     @Test
