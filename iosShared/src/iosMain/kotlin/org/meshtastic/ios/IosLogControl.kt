@@ -89,6 +89,8 @@ internal object IosLogControl : AppLogControl {
 
     private val bookmarkPath: String
         get() = iosDataDir() + "/logs/" + BOOKMARK_FILE
+    private val statePath: Path
+        get() = (iosDataDir() + "/logs/last_state.txt").toPath()
     private val namePath: Path
         get() = (iosDataDir() + "/logs/" + NAME_FILE).toPath()
 
@@ -123,17 +125,24 @@ internal object IosLogControl : AppLogControl {
                 delay(AUTO_EXPORT_EVERY_MS)
             }
         }
+        logPreviousExit()
+        markState("foreground")
         observe(UIApplicationDidEnterBackgroundNotification) {
+            markState("background")
             Logger.i(tag = LIFECYCLE) { "App process: ON_STOP (entered the background)" }
             exportNow()
         }
         observe(UIApplicationWillEnterForegroundNotification) {
+            markState("foreground")
             Logger.i(tag = LIFECYCLE) { "App process: ON_START (back in the foreground)" }
         }
         observe(UIApplicationDidBecomeActiveNotification) { Logger.i(tag = LIFECYCLE) { "App process: ON_RESUME" } }
         observe(UIApplicationWillResignActiveNotification) { Logger.i(tag = LIFECYCLE) { "App process: ON_PAUSE" } }
         observe(UIApplicationDidReceiveMemoryWarningNotification) { Logger.w(tag = LIFECYCLE) { "Memory warning" } }
-        observe(UIApplicationWillTerminateNotification) { Logger.i(tag = LIFECYCLE) { "App will terminate" } }
+        observe(UIApplicationWillTerminateNotification) {
+            markState("terminated")
+            Logger.i(tag = LIFECYCLE) { "App will terminate" }
+        }
         Logger.i(tag = LIFECYCLE) { "App start: ${IosFileLog.header()}; log level ${IosFileLog.level.value.key}" }
         UIDevice.currentDevice.batteryMonitoringEnabled = true
         scope.launch {
@@ -147,6 +156,28 @@ internal object IosLogControl : AppLogControl {
                 }
             }
         }
+    }
+
+    /** Remembers the last known state, so the next start can say how the earlier run ended. */
+    private fun markState(state: String) {
+        runCatching { FileSystem.SYSTEM.write(statePath) { writeUtf8("${IosFileLog.nowMillis()} $state") } }
+    }
+
+    /**
+     * iOS does not tell an app why it was closed, so the last state written by the earlier run is read: a run that
+     * ended in the background was most likely closed by the system, one that ended in the foreground crashed or was
+     * swiped away.
+     */
+    private fun logPreviousExit() {
+        val last = runCatching { FileSystem.SYSTEM.read(statePath) { readUtf8() } }.getOrNull() ?: return
+        val state = last.substringAfter(' ', "?")
+        val meaning =
+            when (state) {
+                "terminated" -> "closed normally"
+                "background" -> "ended in the background (most likely closed by the system, memory or time)"
+                else -> "ended in the foreground (crash or swiped away by the person)"
+            }
+        Logger.i(tag = LIFECYCLE) { "Earlier exit: last state $state at ${last.substringBefore(' ')} ms, $meaning" }
     }
 
     private fun observe(name: String?, block: () -> Unit) {
@@ -235,7 +266,20 @@ internal object IosLogControl : AppLogControl {
             val warnings = lines.count { " W/" in it }
             toc.append("$name: ${bytes.size / KB} KB, $errors errors, $warnings warnings\n")
         }
-        return listOf("spis_tresci.txt" to toc.toString().encodeToByteArray()) + all + logs
+        val engine =
+            if (!withLogs) {
+                emptyList()
+            } else {
+                runCatching {
+                    val dir = (iosDataDir() + "/engine-logs").toPath()
+                    FileSystem.SYSTEM.list(dir)
+                        .filter { it.name.endsWith(".log") }
+                        .map { "silnik/${it.name}" to read(it) }
+                }
+                    .getOrDefault(emptyList())
+            }
+        for ((name, bytes) in engine) toc.append("$name: ${bytes.size / KB} KB\n")
+        return listOf("spis_tresci.txt" to toc.toString().encodeToByteArray()) + all + engine + logs
     }
 
     override suspend fun buildReport(

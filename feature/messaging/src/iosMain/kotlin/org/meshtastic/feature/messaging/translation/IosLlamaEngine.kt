@@ -38,6 +38,8 @@ import kotlinx.cinterop.cstr
 import kotlinx.cinterop.get
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.plus
+import kotlinx.cinterop.staticCFunction
+import kotlinx.cinterop.COpaquePointer
 import kotlinx.cinterop.ptr
 import kotlinx.cinterop.readBytes
 import kotlinx.cinterop.set
@@ -50,6 +52,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import llama.ggml_log_level
 import llama.llama_backend_init
 import llama.llama_batch_get_one
 import llama.llama_chat_apply_template
@@ -59,6 +62,9 @@ import llama.llama_decode
 import llama.llama_free
 import llama.llama_get_memory
 import llama.llama_init_from_model
+import llama.llama_log_set
+import llama.whisper_log_set
+import llama.mtmd_log_set
 import llama.llama_memory_clear
 import llama.llama_model_chat_template
 import llama.llama_model_default_params
@@ -162,6 +168,7 @@ class IosLlamaEngine(
         if (loadedId == modelId && ctx != null) return
         release()
         val path = modelPath(modelId) ?: error("Model $modelId is not downloaded")
+        IosEngineLog.install()
         llama_backend_init()
         val gpu = if (isSimulator()) 0 else GPU_LAYERS
         val loaded =
@@ -434,4 +441,48 @@ class IosLlamaEngine(
     override suspend fun unloadNow() {
         lock.withLock { release() }
     }
+}
+
+/**
+ * The native engine's own messages (llama.cpp, the image part and whisper.cpp) kept in `engine-logs/engine.log` in
+ * [dir], like the engine logs of Android and desktop, so a report package can carry them. The file is trimmed by moving
+ * it to `engine.old.log` once it passes [MAX_BYTES].
+ */
+object IosEngineLog {
+    /** The folder for the engine log; set once at start-up by the app. */
+    var dir: String? = null
+
+    private const val MAX_BYTES = 5L * 1024 * 1024
+    private const val DIR_MODE = 493u
+    private var written = 0L
+    private var installed = false
+
+    fun install() {
+        if (installed || dir == null) return
+        installed = true
+        val callback = staticCFunction(::onEngineLog)
+        llama_log_set(callback, null)
+        mtmd_log_set(callback, null)
+        whisper_log_set(callback, null)
+    }
+
+    internal fun append(level: Int, text: String) {
+        val folder = dir ?: return
+        if (text.isBlank()) return
+        platform.posix.mkdir(folder, DIR_MODE.convert())
+        val path = "$folder/engine.log"
+        if (written > MAX_BYTES) {
+            platform.posix.rename(path, "$folder/engine.old.log")
+            written = 0L
+        }
+        val file = platform.posix.fopen(path, "a") ?: return
+        val line = "L$level $text" + if (text.endsWith("\n")) "" else "\n"
+        platform.posix.fputs(line, file)
+        platform.posix.fclose(file)
+        written += line.length
+    }
+}
+
+private fun onEngineLog(level: ggml_log_level, text: CPointer<ByteVar>?, userData: COpaquePointer?) {
+    IosEngineLog.append(level.toInt(), text?.toKString().orEmpty())
 }

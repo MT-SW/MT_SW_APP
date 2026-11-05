@@ -44,6 +44,7 @@ import org.meshtastic.feature.messaging.translation.IosAssistantHistoryStore
 import org.meshtastic.feature.messaging.translation.IosAssistantMemory
 import org.meshtastic.feature.messaging.translation.IosAssistantService
 import org.meshtastic.feature.messaging.translation.IosDictationService
+import org.meshtastic.feature.messaging.translation.IosEngineLog
 import org.meshtastic.feature.messaging.translation.IosLlamaEngine
 import org.meshtastic.feature.messaging.translation.IosTranslationRouter
 import org.meshtastic.feature.messaging.translation.MessageTranslationService
@@ -69,8 +70,10 @@ class IosAiModule {
     @Single fun aiModelStore(impl: IosAiModelStore): AiModelStore = impl
 
     @Single
-    fun aiTextEngine(store: IosAiModelStore): AiTextEngine =
-        IosLlamaEngine({ store.modelPath(it) }, { store.hearingPath(it) })
+    fun aiTextEngine(store: IosAiModelStore): AiTextEngine {
+        IosEngineLog.dir = iosDataDir() + "/engine-logs"
+        return IosLlamaEngine({ store.modelPath(it) }, { store.hearingPath(it) })
+    }
 
     @Single
     fun iosTranslationRouter(engine: AiTextEngine, store: IosAiModelStore, uiPrefs: UiPrefs): IosTranslationRouter =

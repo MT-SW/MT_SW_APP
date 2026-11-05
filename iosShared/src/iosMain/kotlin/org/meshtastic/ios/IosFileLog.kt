@@ -31,6 +31,7 @@ import platform.Foundation.NSDate
 import platform.Foundation.NSDateFormatter
 import platform.Foundation.NSLocale
 import platform.Foundation.NSLock
+import platform.Foundation.NSThread
 import platform.Foundation.timeIntervalSince1970
 import platform.UIKit.UIDevice
 import kotlin.experimental.ExperimentalNativeApi
@@ -89,6 +90,9 @@ internal object IosFileLog : LogWriter() {
             }
             .stringFromDate(NSDate())
 
+    private fun threadName(): String =
+        if (NSThread.isMainThread) "main" else NSThread.currentThread.name?.takeIf { it.isNotBlank() } ?: "worker"
+
     fun stamp(): String = format("MM-dd HH:mm:ss.SSS")
 
     /** Repeated at the top of every part and of the report. */
@@ -146,7 +150,8 @@ internal object IosFileLog : LogWriter() {
 
     override fun log(severity: Severity, message: String, tag: String, throwable: Throwable?) {
         val line = buildString {
-            append(stamp()).append(' ').append(severity.name.first()).append('/').append(tag).append(' ')
+            append(stamp()).append(' ').append(severity.name.first()).append('/').append(tag)
+            append(" [").append(threadName()).append("] ")
             append(message).append('\n')
             throwable?.let { append(it.stackTraceToString()).append('\n') }
         }
@@ -161,7 +166,7 @@ internal object IosFileLog : LogWriter() {
                         currentName = partName(part)
                         "=== MT_SW log, part $part, session $session, opened ${stamp()} ===\n" +
                             header() +
-                            "\n=== line: MM-dd HH:mm:ss.SSS L/tag message ===\n"
+                            "\n=== line: MM-dd HH:mm:ss.SSS L/tag [thread] message ===\n"
                     } else {
                         ""
                     }
