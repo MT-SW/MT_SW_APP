@@ -56,7 +56,7 @@ enum class AiLicense(val label: String) {
     /** MIT licence (Whisper). */
     MIT("MIT"),
 
-    /** Gemma Terms of Use (TranslateGemma). */
+    /** Gemma Terms of Use (no model with it is offered now). */
     GEMMA_TERMS("Gemma Terms of Use"),
 
     /** Not checked by the app: the licence is on the model's page. */
@@ -604,14 +604,6 @@ object AiModels {
             "A mid-size \"thinking\" DeepSeek model: good at arithmetic and logic, and it reasons for a long time before it answers. Its Polish is weaker than Gemma and Bielik.",
         )
 
-    val DeepSeekLlama8b =
-        deepSeek(
-            DEEPSEEK_LLAMA_8B, "DeepSeek R1 Distill Llama 8B", "unsloth/DeepSeek-R1-Distill-Llama-8B-GGUF",
-            "DeepSeek-R1-Distill-Llama-8B-Q4_0.gguf", 4459, 6800, 12, AiLicense.SEE_MODEL_PAGE,
-            "Model „myślący” DeepSeek zbudowany na Llamie (Meta), więc z licencją Llamy. Rozumuje długo, po polsku jest słaby.",
-            "A \"thinking\" DeepSeek model built on Llama (Meta), so under the Llama licence. It reasons for a long time; its Polish is poor.",
-        )
-
     val DeepSeek8b =
         deepSeek(
             DEEPSEEK_8B, "DeepSeek R1 0528 Qwen3 8B", "unsloth/DeepSeek-R1-0528-Qwen3-8B-GGUF",
@@ -636,14 +628,6 @@ object AiModels {
             "A large \"thinking\" DeepSeek model: the best of the family that can be run at home. For a computer with a lot of memory; it answers slowly.",
         )
 
-    val DeepSeekLlama70b =
-        deepSeek(
-            DEEPSEEK_LLAMA_70B, "DeepSeek R1 Distill Llama 70B", "unsloth/DeepSeek-R1-Distill-Llama-70B-GGUF",
-            "DeepSeek-R1-Distill-Llama-70B-Q4_K_M.gguf", 40548, 47000, 64, AiLicense.SEE_MODEL_PAGE,
-            "Największy model DeepSeek, jaki da się uruchomić lokalnie (na Llamie, z licencją Llamy). Tylko na komputer z bardzo dużą pamięcią (od około 64 GB); odpowiada bardzo wolno.",
-            "The largest DeepSeek model that can be run locally (built on Llama, under the Llama licence). Only for a computer with a lot of memory (about 64 GB or more); it answers very slowly.",
-        )
-
     val Mistral24b =
         AiModelInfo(
             id = MISTRAL_24B,
@@ -662,24 +646,6 @@ object AiModels {
             pageUrl = "${HF}unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF",
         )
 
-    val Llama1b =
-        AiModelInfo(
-            id = LLAMA_1B,
-            name = "Llama 3.2 1B",
-            family = OTHER_FAMILY,
-            engine = AiEngine.LLAMA_CPP,
-            roles = TEXT,
-            sizeMb = 773,
-            ramMb = 1400,
-            minDeviceRamGb = 4,
-            license = AiLicense.SEE_MODEL_PAGE,
-            files = listOf(hf("unsloth/Llama-3.2-1B-Instruct-GGUF", "Llama-3.2-1B-Instruct-Q4_0.gguf", 773)),
-            platforms = BOTH,
-            descriptionPl = "Mały model od Mety. Ciekawostka do własnych testów: jeden z modeli sprawdzonych na NPU Snapdragona, ale słaby po polsku.",
-            descriptionEn = "A small model from Meta. A curiosity for your own tests: one of the models checked on the Snapdragon NPU, but weak in Polish.",
-            pageUrl = "${HF}unsloth/Llama-3.2-1B-Instruct-GGUF",
-        )
-
     val Olmoe7b =
         AiModelInfo(
             id = OLMOE_7B,
@@ -696,42 +662,6 @@ object AiModels {
             descriptionPl = "Model od Allen AI, który w trakcie pracy używa tylko części siebie (1 mld z 7 mld parametrów). Ciekawostka do własnych testów: sprawdzony na NPU Snapdragona, słaby po polsku.",
             descriptionEn = "A model from Allen AI that uses only part of itself while working (1 of 7 billion parameters). A curiosity for your own tests: checked on the Snapdragon NPU, weak in Polish.",
             pageUrl = "${HF}allenai/OLMoE-1B-7B-0125-Instruct-GGUF",
-        )
-
-    val TranslateGemma4b =
-        AiModelInfo(
-            id = TG_4B,
-            name = "TranslateGemma 4B",
-            family = "TranslateGemma",
-            engine = AiEngine.LLAMA_CPP,
-            roles = setOf(AiRole.TRANSLATOR),
-            sizeMb = 2490,
-            ramMb = 3800,
-            minDeviceRamGb = 6,
-            license = AiLicense.GEMMA_TERMS,
-            files = listOf(hf("bullerwins/translategemma-4b-it-GGUF", "translategemma-4b-it-Q4_K_M.gguf", 2490)),
-            platforms = BOTH,
-            descriptionPl = "Model Google stworzony tylko do tłumaczenia (55 języków). Plik pochodzi od osoby trzeciej (bullerwins).",
-            descriptionEn = "A Google model made only for translation (55 languages). The file comes from a third party (bullerwins).",
-            pageUrl = "${HF}bullerwins/translategemma-4b-it-GGUF",
-        )
-
-    val TranslateGemma12b =
-        AiModelInfo(
-            id = TG_12B,
-            name = "TranslateGemma 12B",
-            family = "TranslateGemma",
-            engine = AiEngine.LLAMA_CPP,
-            roles = setOf(AiRole.TRANSLATOR),
-            sizeMb = 7301,
-            ramMb = 9500,
-            minDeviceRamGb = 12,
-            license = AiLicense.GEMMA_TERMS,
-            files = listOf(hf("bullerwins/translategemma-12b-it-GGUF", "translategemma-12b-it-Q4_K_M.gguf", 7301)),
-            platforms = BOTH,
-            descriptionPl = "Większy model do tłumaczenia od Google. Plik pochodzi od osoby trzeciej (bullerwins).",
-            descriptionEn = "A larger translation model from Google. The file comes from a third party (bullerwins).",
-            pageUrl = "${HF}bullerwins/translategemma-12b-it-GGUF",
         )
 
     private fun whisper(id: String, name: String, file: String, mb: Int, ramMb: Int, pl: String, en: String) =
@@ -781,9 +711,8 @@ object AiModels {
             G4E2b, G4E4b, G4_12b, G4_26b,
             Qwen08b, Qwen2b, Qwen4b, Qwen9b, QwenMoe, Qwen27b,
             Bielik15b, Bielik45b, Bielik7b, Bielik11b,
-            DeepSeek15b, DeepSeek7b, DeepSeekLlama8b, DeepSeek8b, DeepSeek14b, DeepSeek32b, DeepSeekLlama70b,
-            Pllum12b, GptOss20b, Granite8b, PhiMini, Mistral24b, Llama1b, Olmoe7b,
-            TranslateGemma4b, TranslateGemma12b,
+            DeepSeek15b, DeepSeek7b, DeepSeek8b, DeepSeek14b, DeepSeek32b,
+            Pllum12b, GptOss20b, Granite8b, PhiMini, Mistral24b, Olmoe7b,
             WhisperSmallQ8, WhisperMediumQ8, WhisperTurboQ8,
         )
 
@@ -804,7 +733,11 @@ object AiModels {
      * Ids of models that a newer one has replaced (same place in the list). Their files are removed at every start of the
      * app, so nobody keeps tens of gigabytes of a model the list no longer offers.
      */
-    val retiredModelIds: List<String> = listOf("qwen35-35b-a3b-q4")
+    val retiredModelIds: List<String> = listOf(
+            "qwen35-35b-a3b-q4",
+            // Removed for licence reasons (Llama and Gemma licences are not GPL-compatible to offer): files are deleted.
+            DEEPSEEK_LLAMA_8B, DEEPSEEK_LLAMA_70B, LLAMA_1B, TG_4B, TG_12B,
+        )
 
     val legacyModelIds: List<String> = listOf("gemma4-e2b", "gemma4-e4b", "gemma4-12b")
 }
