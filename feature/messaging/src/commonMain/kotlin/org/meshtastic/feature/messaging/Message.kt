@@ -124,6 +124,11 @@ import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.model.util.getChannel
 import org.meshtastic.core.repository.SenderMutePrefs
 import org.meshtastic.core.resources.Res
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import org.meshtastic.core.resources.cancel
+import org.meshtastic.core.resources.image_send_message
+import org.meshtastic.core.resources.image_send_title
 import org.meshtastic.core.resources.image_upload_sending
 import org.meshtastic.core.resources.image_upload_retry
 import org.meshtastic.core.resources.image_upload_failed
@@ -1025,10 +1030,12 @@ internal fun MessageInput(
     pendingImageBytes?.let { bytesToSend ->
         AlertDialog(
             onDismissRequest = { pendingImageBytes = null },
-            title = { Text("Wysłać zdjęcie?") },
+            title = { Text(stringResource(Res.string.image_send_title)) },
             text = {
+                // Our own window with a long text: it scrolls, so nothing is cut off on a small screen.
                 Text(
-                    "Zdjęcie zostanie wysłane na publiczny serwer zdjęć (catbox.moe, a gdy jest niedostępny: litterbox.catbox.moe lub uguu.se) i będzie dostępne dla każdego, kto zna link. Upewnij się, że nie zawiera niczego prywatnego.",
+                    stringResource(Res.string.image_send_message),
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
                 )
             },
             confirmButton = {
@@ -1044,10 +1051,12 @@ internal fun MessageInput(
                         }
                     },
                 ) {
-                    Text("Wyślij")
+                    Text(stringResource(Res.string.send))
                 }
             },
-            dismissButton = { TextButton(onClick = { pendingImageBytes = null }) { Text("Anuluj") } },
+            dismissButton = {
+                TextButton(onClick = { pendingImageBytes = null }) { Text(stringResource(Res.string.cancel)) }
+            },
         )
     }
 

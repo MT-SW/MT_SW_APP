@@ -3604,6 +3604,8 @@
     <string name="widget_traffic">TX / RX</string>
     <string name="deep_link_connect_with_pin_message">Link prosi tę aplikację o sparowanie z urządzeniem pod adresem %1$s przy użyciu PIN-u %2$s, a następnie o połączenie z nim. PIN jest skopiowany, więc możesz go wkleić, jeśli aplikacja o niego poprosi. Kontynuuj tylko jeśli ufasz źródłu tego linku.</string>
     <string name="image_upload_sending">Wysyłanie zdjęcia…</string>
+    <string name="image_send_title">Wysłać zdjęcie przez internet?</string>
+    <string name="image_send_message">Zdjęcie nie idzie przez LoRa. Aplikacja wysyła je przez internet na publiczny serwer zdjęć, a przez mesh idzie tylko link.\n\nKomu trafi: usługom osób trzecich, niezwiązanym z MT_SW: catbox.moe (zdjęcie zostaje tam na stałe), a gdy jest niedostępny: litterbox.catbox.moe (72 godziny) lub uguu.se (kilka godzin). Serwer widzi też twój adres IP.\n\nKto je zobaczy: każdy, kto zna link, a link dostają wszyscy, którzy odbiorą wiadomość. Aplikacja nie może go potem usunąć.\n\nUpewnij się, że zdjęcie nie zawiera niczego prywatnego. Wysyłamy je tylko za twoją zgodą.</string>
     <string name="image_upload_failed">Nie udało się wysłać zdjęcia: %1$s</string>
     <string name="image_upload_retry">Spróbuj ponownie</string>
     <string name="image_upload_cancel">Anuluj</string>

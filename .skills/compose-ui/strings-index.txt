@@ -1419,6 +1419,8 @@ ignore_remove
 ### IMAGE ###
 image_preview_failed
 image_preview_loading
+image_send_message
+image_send_title
 image_upload_cancel
 image_upload_close
 image_upload_failed

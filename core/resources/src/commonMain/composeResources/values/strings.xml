@@ -1455,6 +1455,8 @@
     <!-- IMAGE -->
     <string name="image_preview_failed">The picture could not be loaded. Tap to try again.</string>
     <string name="image_preview_loading">Loading the picture…</string>
+    <string name="image_send_message">The picture does not travel over LoRa. The app uploads it over the internet to a public picture host, and only a link goes through the mesh.\n\nWho gets it: third-party services that are not connected to MT_SW: catbox.moe (the picture stays for good), or, when it is unavailable, litterbox.catbox.moe (72 hours) or uguu.se (a few hours). The host also sees your IP address.\n\nWho can see it: anyone who has the link, and everyone who receives the message gets the link. The app cannot delete it later.\n\nMake sure the picture contains nothing private. It is uploaded only with your permission.</string>
+    <string name="image_send_title">Send the picture over the internet?</string>
     <string name="image_upload_cancel">Cancel</string>
     <string name="image_upload_close">Close</string>
     <string name="image_upload_failed">The picture could not be sent: %1$s</string>
