@@ -42,6 +42,7 @@ import org.meshtastic.core.repository.notificationId
 import org.meshtastic.core.testing.FakeLiveUpdatePrefs
 import org.meshtastic.core.testing.FakeLocaleUnitsProvider
 import org.meshtastic.core.testing.FakeMeshPrefs
+import org.meshtastic.core.testing.FakeUiPrefs
 import org.meshtastic.core.testing.runWithRenderScope
 import org.meshtastic.proto.ClientNotification
 import org.meshtastic.proto.DuplicatedPublicKey
@@ -389,6 +390,7 @@ class MeshNotificationManagerImplRoutingTest {
         meshPrefs = FakeMeshPrefs(),
         localeUnitsProvider = FakeLocaleUnitsProvider(),
         scope = scope.asServiceScope(),
+        uiPrefs = lazy { FakeUiPrefs() },
     )
 
     private fun activeByTag(tag: String): List<StatusBarNotification> =

@@ -65,6 +65,7 @@ import org.meshtastic.core.testing.FakeLiveUpdatePrefs
 import org.meshtastic.core.testing.FakeLocaleUnitsProvider
 import org.meshtastic.core.testing.FakeMeshLogRepository
 import org.meshtastic.core.testing.FakeMeshPrefs
+import org.meshtastic.core.testing.FakeUiPrefs
 import org.meshtastic.core.testing.runUntilSettled
 import org.meshtastic.core.testing.runWithRenderScope
 import org.meshtastic.proto.DeviceMetrics
@@ -458,6 +459,7 @@ class MeshNotificationManagerImplTest {
         meshPrefs = FakeMeshPrefs(),
         localeUnitsProvider = FakeLocaleUnitsProvider(),
         scope = scope.asServiceScope(),
+        uiPrefs = lazy { FakeUiPrefs() },
     )
 
     private fun serviceBigText() = serviceExtras()?.getCharSequence(Notification.EXTRA_BIG_TEXT)?.toString()
