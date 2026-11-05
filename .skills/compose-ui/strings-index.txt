@@ -753,6 +753,17 @@ compat_step_dictation
 compat_step_graphics
 compat_step_hardware
 compat_step_question
+compat_tip_1
+compat_tip_10
+compat_tip_2
+compat_tip_3
+compat_tip_4
+compat_tip_5
+compat_tip_6
+compat_tip_7
+compat_tip_8
+compat_tip_9
+compat_tips_title
 compromised_keys
 ### CONFIG ###
 config_device_ledHeartbeatEnabled_summary

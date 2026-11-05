@@ -780,6 +780,17 @@
     <string name="compat_step_graphics">The same question on the graphics card (NPU skipped)…</string>
     <string name="compat_step_hardware">Checking the hardware…</string>
     <string name="compat_step_question">A short question to the assistant…</string>
+    <string name="compat_tip_1">Link planner: check whether two points on the map will hear each other over the terrain.</string>
+    <string name="compat_tip_10">About screen: lists every project our features are based on, with licences.</string>
+    <string name="compat_tip_2">Terrain panorama: see the horizon and obstacles around a chosen point.</string>
+    <string name="compat_tip_3">Antenna calculator: quickly work out lengths and parameters for your antenna.</string>
+    <string name="compat_tip_4">Offline AI assistant: answers questions about LoRa and mesh on your device, with no internet.</string>
+    <string name="compat_tip_5">Message translator: translate chat messages with a model that runs on your device.</string>
+    <string name="compat_tip_6">Built-in dictation: speak a message instead of typing it.</string>
+    <string name="compat_tip_7">Extra local statistics: charts and lists with data from your mesh.</string>
+    <string name="compat_tip_8">Traceroute history: entries are marked as manual or automatic.</string>
+    <string name="compat_tip_9">Resizable columns: on a tablet and on a computer you can drag the pane divider.</string>
+    <string name="compat_tips_title">Did you know…</string>
     <string name="compromised_keys">Compromised keys detected, select OK to regenerate.</string>
     <!-- CONFIG -->
     <string name="config_device_ledHeartbeatEnabled_summary">Controls the blinking LED on the device. For most devices this will control one of the up to 4 LEDs, the charger and GPS LEDs are not controllable.</string>

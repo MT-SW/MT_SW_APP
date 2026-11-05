@@ -3622,4 +3622,15 @@
     <string name="image_preview_loading">Wczytuję zdjęcie…</string>
     <string name="image_preview_failed">Nie udało się wczytać zdjęcia. Dotknij, aby spróbować ponownie.</string>
     <string name="neighbors_dialog_empty">Brak zapisanego pakietu sąsiadów od tego węzła.</string>
+    <string name="compat_tips_title">Czy wiesz, że…</string>
+    <string name="compat_tip_1">Planer łącza: sprawdź, czy dwa punkty na mapie usłyszą się nawzajem nad terenem.</string>
+    <string name="compat_tip_2">Panorama terenu: zobacz horyzont i przeszkody wokół wybranego punktu.</string>
+    <string name="compat_tip_3">Kalkulator anten: szybko policz długości i parametry swojej anteny.</string>
+    <string name="compat_tip_4">Asystent AI offline: odpowiada na pytania o LoRa i mesh na Twoim urządzeniu, bez internetu.</string>
+    <string name="compat_tip_5">Tłumacz wiadomości: tłumacz wiadomości z czatu modelem działającym na Twoim urządzeniu.</string>
+    <string name="compat_tip_6">Dyktowanie: wypowiedz wiadomość zamiast ją pisać.</string>
+    <string name="compat_tip_7">Dodatkowe statystyki lokalne: wykresy i listy z danymi z Twojej sieci mesh.</string>
+    <string name="compat_tip_8">Historia traceroute: wpisy są oznaczone jako ręczne lub automatyczne.</string>
+    <string name="compat_tip_9">Zmienne szerokości kolumn: na tablecie i komputerze możesz przeciągać podział okien.</string>
+    <string name="compat_tip_10">Ekran „O aplikacji”: wymienia wszystkie projekty, na których opieramy funkcje, razem z licencjami.</string>
 </resources>

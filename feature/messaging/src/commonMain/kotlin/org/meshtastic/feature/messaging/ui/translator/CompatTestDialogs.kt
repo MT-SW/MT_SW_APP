@@ -26,6 +26,16 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import org.jetbrains.compose.resources.StringResource
+import kotlinx.coroutines.delay
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.animation.Crossfade
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
@@ -42,6 +52,17 @@ import org.meshtastic.core.resources.compat_offer_title
 import org.meshtastic.core.resources.compat_offer_yes
 import org.meshtastic.core.resources.compat_report_note
 import org.meshtastic.core.resources.compat_running_title
+import org.meshtastic.core.resources.compat_tip_1
+import org.meshtastic.core.resources.compat_tip_2
+import org.meshtastic.core.resources.compat_tip_3
+import org.meshtastic.core.resources.compat_tip_4
+import org.meshtastic.core.resources.compat_tip_5
+import org.meshtastic.core.resources.compat_tip_6
+import org.meshtastic.core.resources.compat_tip_7
+import org.meshtastic.core.resources.compat_tip_8
+import org.meshtastic.core.resources.compat_tip_9
+import org.meshtastic.core.resources.compat_tip_10
+import org.meshtastic.core.resources.compat_tips_title
 import org.meshtastic.core.resources.compat_step_dictation
 import org.meshtastic.core.resources.compat_step_graphics
 import org.meshtastic.core.resources.compat_step_hardware
@@ -129,6 +150,7 @@ fun CompatTestDialogs(compat: CompatUi, viewModel: AssistantViewModel) {
                         )
                         if (compat.detail.isNotBlank()) Text(compat.detail)
                         LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                        CompatTips()
                     }
                 },
                 // The window cannot be closed by accident; the only way out is to stop the test.
@@ -146,5 +168,40 @@ fun CompatTestDialogs(compat: CompatUi, viewModel: AssistantViewModel) {
                 startNote = stringResource(Res.string.compat_report_note),
                 extras = compat.files,
             )
+    }
+}
+
+private val compatTips: List<StringResource> =
+    listOf(
+        Res.string.compat_tip_1,
+        Res.string.compat_tip_2,
+        Res.string.compat_tip_3,
+        Res.string.compat_tip_4,
+        Res.string.compat_tip_5,
+        Res.string.compat_tip_6,
+        Res.string.compat_tip_7,
+        Res.string.compat_tip_8,
+        Res.string.compat_tip_9,
+        Res.string.compat_tip_10,
+    )
+
+private const val TIP_INTERVAL_MS = 6_000L
+private const val TIP_MIN_HEIGHT_DP = 96
+
+/** Rotating short descriptions of app features, shown while the compatibility test runs. */
+@Composable
+private fun CompatTips() {
+    var index by remember { mutableIntStateOf(0) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(TIP_INTERVAL_MS)
+            index = (index + 1) % compatTips.size
+        }
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(stringResource(Res.string.compat_tips_title), style = MaterialTheme.typography.labelLarge)
+        Crossfade(targetState = index, modifier = Modifier.heightIn(min = TIP_MIN_HEIGHT_DP.dp)) { i ->
+            Text(stringResource(compatTips[i]), style = MaterialTheme.typography.bodyMedium)
+        }
     }
 }
