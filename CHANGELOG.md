@@ -18,6 +18,7 @@ Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od poc
 
 ### Listopad 2026
 
+* Logi: każdy wpis ma teraz datę i godzinę co do milisekundy także na iPhonie/iPadzie i w logu Debug na komputerze. Log z iPhone'a/iPada dzieli się na kolejne części (około 400 KB każda, folder `logs`, nazwy `mt_sw_log_<sesja>_<numer>.txt`) tak jak na Androidzie i komputerze; zostają części z ostatniej doby.
 * Test zgodności asystenta: sprawdzanie dyktowania jest w języku aplikacji, ekran nie gaśnie w trakcie testu, a porównanie NPU i karty graficznej odbywa się w jednej rozmowie (jeden plik z całą rozmową). Przepisane ciekawostki.
 * Test zgodności asystenta: opis przed testem wyjaśnia, po co on jest (poprawa działania asystenta na różnych urządzeniach).
 * Test zgodności asystenta: w oknie „Test w toku” zmieniają się krótkie podpowiedzi o funkcjach aplikacji (wspólne dla wszystkich platform).
@@ -557,6 +558,7 @@ The entries below describe only what this fork adds on top of the original, from
 
 ### November 2026
 
+* Logs: every entry now has the date and time to the millisecond, also on iPhone/iPad and in the Debug log on desktop. The iPhone/iPad log is split into consecutive parts (about 400 KB each, `logs` folder, names `mt_sw_log_<session>_<number>.txt`) like on Android and desktop; the parts from the last day are kept.
 * Assistant compatibility test: the dictation check uses the app language, the screen stays on during the test, and the NPU and graphics card runs share one conversation (one file with the whole chat). Tips reworded.
 * Assistant compatibility test: the intro text now explains why the test matters (improving the assistant on many different devices).
 * Assistant compatibility test: the running-test window shows rotating short tips about app features (shared on all platforms).
