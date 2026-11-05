@@ -417,7 +417,7 @@ class BleRadioTransport(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Logger.w(e) { "[$address] Failed to negotiate MTU after $MTU_NEGOTIATION_ATTEMPTS attempts" }
+            Logger.w(e) { "[${address.anonymize()}] Failed to negotiate MTU after $MTU_NEGOTIATION_ATTEMPTS attempts" }
         }
 
         // GATT cache invalidation has three triggers, all repaired the same way — refresh the platform's cached

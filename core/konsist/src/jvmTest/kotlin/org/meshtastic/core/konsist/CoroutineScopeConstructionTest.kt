@@ -32,8 +32,6 @@ class CoroutineScopeConstructionTest {
 
     private val allowed =
         listOf(
-            "androidApp/google/AppFunctionStateSync.kt",
-            "androidApp/google/GoogleMapsPrefs.kt",
             "androidApp/main/MeshUtilApplication.kt",
             "core/data/commonMain/FromRadioPacketHandlerImpl.kt",
             "core/data/commonMain/SingleFlightRefresher.kt",
@@ -60,6 +58,7 @@ class CoroutineScopeConstructionTest {
             "core/prefs/commonMain/MeshPrefsImpl.kt",
             "core/prefs/commonMain/NotificationPrefsImpl.kt",
             "core/prefs/commonMain/RadioPrefsImpl.kt",
+            "core/prefs/commonMain/SenderMutePrefsImpl.kt",
             "core/prefs/commonMain/TakPrefsImpl.kt",
             "core/prefs/commonMain/UiPrefsImpl.kt",
             "core/service/androidMain/BootCompleteReceiver.kt",
@@ -83,9 +82,19 @@ class CoroutineScopeConstructionTest {
             "feature/map/commonMain/CustomTileProviderRepository.kt",
             "feature/map/commonMain/LayerOpacityStore.kt",
             "feature/map/commonMain/MapLayersManager.kt",
+            "feature/messaging/commonMain/ChatImageUploader.kt",
+            "feature/messaging/iosMain/IosAssistantService.kt",
+            "feature/messaging/iosMain/IosDictationService.kt",
+            "feature/messaging/iosMain/IosTranslationRouter.kt",
+            "feature/messaging/jvmAndroidMain/AiEngineRouter.kt",
+            "feature/messaging/jvmAndroidMain/AiModelStoreImpl.kt",
+            "feature/messaging/jvmAndroidMain/AiTranslationRouter.kt",
+            "feature/messaging/jvmAndroidMain/LlamaAssistantService.kt",
+            "feature/messaging/jvmAndroidMain/ModelDictationService.kt",
             "feature/widget/main/AndroidAppWidgetUpdater.kt",
             "feature/widget/main/LocalStatsWidgetState.kt",
             "feature/wifi-provision/commonMain/NymeaWifiService.kt",
+            "iosShared/iosMain/IosMessageQueue.kt",
         )
 
     /** A call to the `CoroutineScope(context)` factory; `rememberCoroutineScope()` has no word break before it. */

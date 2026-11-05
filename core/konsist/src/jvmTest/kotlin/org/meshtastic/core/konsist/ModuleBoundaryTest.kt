@@ -28,11 +28,11 @@ import kotlin.test.assertTrue
 class ModuleBoundaryTest {
 
     /**
-     * The MapLibre renderer draws feature:map's shared map model and map-terrain's elevation tiles. Coverage samples
-     * the same elevation tiles and computes the estimate feature:map's Site Planner form describes.
+     * The MapLibre renderer draws feature:map's shared map model and map-terrain's elevation tiles. The link planner in
+     * feature:map reads the same elevation tiles for its terrain profile.
      */
     private val allowedFeatureImports =
-        mapOf("map-maplibre" to setOf("map", "map-terrain"), "coverage" to setOf("map", "map-terrain"))
+        mapOf("map-maplibre" to setOf("map", "map-terrain"), "map" to setOf("map-terrain"))
 
     private val sourceFiles = Konsist.scopeFromProject().files.filterNot { it.isNestedAgentWorktree() }
 
