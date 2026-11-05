@@ -39,7 +39,10 @@ class MeshLogRetentionTest {
     fun `positive settings resolve to that many days`() {
         assertEquals(1.days, MeshLogRetention.windowOrNull(1))
         assertEquals(7.days, MeshLogRetention.windowOrNull(7))
-        assertEquals(MeshLogPrefs.DEFAULT_RETENTION_DAYS.days, MeshLogRetention.windowOrNull(MeshLogPrefs.DEFAULT_RETENTION_DAYS))
+        assertEquals(
+            MeshLogPrefs.DEFAULT_RETENTION_DAYS.days,
+            MeshLogRetention.windowOrNull(MeshLogPrefs.DEFAULT_RETENTION_DAYS),
+        )
         assertEquals(365.days, MeshLogRetention.windowOrNull(MeshLogPrefs.MAX_RETENTION_DAYS))
     }
 

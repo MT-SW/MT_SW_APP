@@ -82,3 +82,6 @@ kotlin {
         jvmTest.dependencies { implementation(compose.desktop.currentOs) }
     }
 }
+
+// The generated resource package keeps its original name (it used to come from the project name).
+compose.resources { packageOfResClass = "meshtasticandroid.core.ui.generated.resources" }

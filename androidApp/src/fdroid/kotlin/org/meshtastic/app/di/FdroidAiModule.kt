@@ -103,10 +103,7 @@ class FdroidAiModule {
         ModelServerInstaller(File(context.filesDir, "engines"))
 
     @Single
-    fun aiModelStoreImpl(
-        location: AiStorageLocation,
-        installer: ModelServerInstaller,
-    ): AiModelStoreImpl {
+    fun aiModelStoreImpl(location: AiStorageLocation, installer: ModelServerInstaller): AiModelStoreImpl {
         // The language model and speech programs exist only for 64-bit phones.
         AiModels.platform = AiPlatform.ANDROID
         AiModels.unavailableEngines = buildSet {
@@ -134,11 +131,8 @@ class FdroidAiModule {
     }
 
     @Single
-    fun aiTranslationRouter(
-        engine: AiTextEngine,
-        store: AiModelStoreImpl,
-        uiPrefs: UiPrefs,
-    ): AiTranslationRouter = AiTranslationRouter(GemmaTranslator(engine), store, uiPrefs)
+    fun aiTranslationRouter(engine: AiTextEngine, store: AiModelStoreImpl, uiPrefs: UiPrefs): AiTranslationRouter =
+        AiTranslationRouter(GemmaTranslator(engine), store, uiPrefs)
 
     @Single
     fun assistantHistoryStore(context: Context): AssistantHistoryStore =

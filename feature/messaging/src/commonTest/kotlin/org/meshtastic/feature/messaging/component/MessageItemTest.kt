@@ -16,10 +16,6 @@
  */
 package org.meshtastic.feature.messaging.component
 
-import org.meshtastic.feature.messaging.stopMessagingTestKoin
-import org.meshtastic.feature.messaging.startMessagingTestKoin
-import kotlin.test.BeforeTest
-import kotlin.test.AfterTest
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -39,7 +35,11 @@ import org.meshtastic.core.model.Node
 import org.meshtastic.core.ui.component.preview.NodePreviewParameterProvider
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
+import org.meshtastic.feature.messaging.startMessagingTestKoin
+import org.meshtastic.feature.messaging.stopMessagingTestKoin
 import org.meshtastic.proto.Routing
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

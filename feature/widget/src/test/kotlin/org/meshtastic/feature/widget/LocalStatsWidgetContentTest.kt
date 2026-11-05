@@ -251,13 +251,12 @@ class LocalStatsWidgetContentTest {
     }
 
     @Test
-    fun `used memory is shown as used and total bytes`() =
-        render(
-            WidgetSizes.EXTRA_BIG,
-            createMockWidgetState().copy(heapFreeBytes = 130_172, heapTotalBytes = 200_000),
-        ) {
-            onNode(hasText("69828 / 200000", substring = true)).assertExists()
-        }
+    fun `used memory is shown as used and total bytes`() = render(
+        WidgetSizes.EXTRA_BIG,
+        createMockWidgetState().copy(heapFreeBytes = 130_172, heapTotalBytes = 200_000),
+    ) {
+        onNode(hasText("69828 / 200000", substring = true)).assertExists()
+    }
 
     @Test
     fun `a reported noise floor renders in dBm`() =

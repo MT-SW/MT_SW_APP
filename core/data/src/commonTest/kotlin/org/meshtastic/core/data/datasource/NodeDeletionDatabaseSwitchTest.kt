@@ -16,7 +16,6 @@
  */
 package org.meshtastic.core.data.datasource
 
-import org.meshtastic.core.testing.FakeLocalStatsExtendedDataSource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -38,6 +37,7 @@ import org.meshtastic.core.database.entity.NodeEntity
 import org.meshtastic.core.database.getInMemoryDatabaseBuilder
 import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.testing.FakeLocalStatsDataSource
+import org.meshtastic.core.testing.FakeLocalStatsExtendedDataSource
 import org.meshtastic.proto.DeviceMetadata
 import org.meshtastic.proto.User
 import kotlin.test.AfterTest

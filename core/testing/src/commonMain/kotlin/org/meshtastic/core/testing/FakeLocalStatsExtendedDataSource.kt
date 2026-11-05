@@ -25,7 +25,8 @@ import org.meshtastic.core.datastore.LocalStatsExtendedDataSource
 import org.meshtastic.core.datastore.di.asCorePreferencesDataStore
 
 /** A test double for [LocalStatsExtendedDataSource] that keeps the values in memory instead of a file. */
-class FakeLocalStatsExtendedDataSource : LocalStatsExtendedDataSource(InMemoryPreferences().asCorePreferencesDataStore())
+class FakeLocalStatsExtendedDataSource :
+    LocalStatsExtendedDataSource(InMemoryPreferences().asCorePreferencesDataStore())
 
 private class InMemoryPreferences : DataStore<Preferences> {
     private val state = MutableStateFlow(emptyPreferences())

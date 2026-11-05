@@ -16,10 +16,6 @@
  */
 package org.meshtastic.feature.messaging.component
 
-import org.meshtastic.feature.messaging.stopMessagingTestKoin
-import org.meshtastic.feature.messaging.startMessagingTestKoin
-import kotlin.test.BeforeTest
-import kotlin.test.AfterTest
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,6 +45,10 @@ import org.meshtastic.core.model.Message
 import org.meshtastic.core.model.MessageStatus
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.ui.component.preview.NodePreviewParameterProvider
+import org.meshtastic.feature.messaging.startMessagingTestKoin
+import org.meshtastic.feature.messaging.stopMessagingTestKoin
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull

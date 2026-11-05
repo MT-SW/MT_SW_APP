@@ -163,4 +163,8 @@ val syncDocsToComposeResources =
     }
 
 // Mapping the task provider carries the task dependency into every compose-resources task that reads the directory.
-compose.resources { customDirectory("commonMain", syncDocsToComposeResources.map { docsComposeResources.get() }) }
+compose.resources {
+    // The generated resource package keeps its original name (it used to come from the project name).
+    packageOfResClass = "meshtasticandroid.feature.docs.generated.resources"
+    customDirectory("commonMain", syncDocsToComposeResources.map { docsComposeResources.get() })
+}

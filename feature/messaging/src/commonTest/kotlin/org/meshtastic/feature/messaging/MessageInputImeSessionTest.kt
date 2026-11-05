@@ -16,8 +16,6 @@
  */
 package org.meshtastic.feature.messaging
 
-import kotlin.test.BeforeTest
-import kotlin.test.AfterTest
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
@@ -39,6 +37,8 @@ import androidx.compose.ui.test.v2.runComposeUiTest
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.awaitCancellation
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

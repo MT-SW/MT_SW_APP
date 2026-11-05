@@ -16,7 +16,6 @@
  */
 package org.meshtastic.core.takserver
 
-import org.meshtastic.core.model.util.LocalStatsExtended
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,6 +26,7 @@ import org.meshtastic.core.di.CoroutineDispatchers
 import org.meshtastic.core.model.MyNodeInfo
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeSortOption
+import org.meshtastic.core.model.util.LocalStatsExtended
 import org.meshtastic.core.repository.MeshConfigHandler
 import org.meshtastic.core.repository.NodeRepository
 import org.meshtastic.core.repository.RadioSessionContext

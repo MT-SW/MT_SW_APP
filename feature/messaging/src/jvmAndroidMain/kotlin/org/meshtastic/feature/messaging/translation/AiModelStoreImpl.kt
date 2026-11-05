@@ -78,9 +78,8 @@ interface AiEngineInstaller {
 
 /**
  * Keeps the downloaded state of every model in [AiModels.all]. Every model is a set of files downloaded here into one
- * folder per model under [ggufDir]. A model's engine program (if it
- * needs one) comes from [installer]. Several models can be on the device at once and each is downloaded, cancelled and
- * deleted on its own.
+ * folder per model under [ggufDir]. A model's engine program (if it needs one) comes from [installer]. Several models
+ * can be on the device at once and each is downloaded, cancelled and deleted on its own.
  */
 class AiModelStoreImpl(
     val ggufDir: File,
@@ -172,22 +171,21 @@ class AiModelStoreImpl(
     private fun cleanReplacedFiles() {
         runCatching {
             var bytes = 0L
-            AiModels.all
-                .forEach { model ->
-                    val dir = modelDir(model)
-                    if (!dir.isDirectory) return@forEach
-                    val keep = model.activeFiles.map { it.fileName }.toSet()
-                    dir.listFiles()
-                        ?.filter { f ->
-                            f.isFile &&
-                                (f.name.endsWith(".gguf") || f.name.endsWith(".gguf.part")) &&
-                                f.name.removeSuffix(".part") !in keep
-                        }
-                        ?.forEach { f ->
-                            bytes += f.length()
-                            f.delete()
-                        }
-                }
+            AiModels.all.forEach { model ->
+                val dir = modelDir(model)
+                if (!dir.isDirectory) return@forEach
+                val keep = model.activeFiles.map { it.fileName }.toSet()
+                dir.listFiles()
+                    ?.filter { f ->
+                        f.isFile &&
+                            (f.name.endsWith(".gguf") || f.name.endsWith(".gguf.part")) &&
+                            f.name.removeSuffix(".part") !in keep
+                    }
+                    ?.forEach { f ->
+                        bytes += f.length()
+                        f.delete()
+                    }
+            }
             val mb = (bytes / MB).toInt()
             if (mb > 0) Logger.i(tag = TAG) { "Removed replaced model files: $mb MB" }
         }

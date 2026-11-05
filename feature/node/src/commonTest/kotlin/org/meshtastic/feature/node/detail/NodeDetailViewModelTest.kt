@@ -16,7 +16,6 @@
  */
 package org.meshtastic.feature.node.detail
 
-import org.meshtastic.core.testing.FakeRadioController
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import dev.mokkery.answering.returns
@@ -51,6 +50,7 @@ import org.meshtastic.core.repository.PacketQueueRejectedException
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.QueryController
 import org.meshtastic.core.testing.FakeRadioConfigRepository
+import org.meshtastic.core.testing.FakeRadioController
 import org.meshtastic.feature.node.component.NodeMenuAction
 import org.meshtastic.feature.node.domain.usecase.GetNodeDetailsUseCase
 import org.meshtastic.proto.Routing

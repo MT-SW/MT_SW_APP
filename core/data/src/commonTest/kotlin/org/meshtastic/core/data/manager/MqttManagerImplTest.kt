@@ -128,6 +128,7 @@ class MqttManagerImplTest {
     private class FakeMqttRepository : MQTTRepository {
         override val connectionState = MutableStateFlow<ConnectionState>(ConnectionState.Disconnected.Idle)
         override val subscriptionRefusal = MutableStateFlow<MqttException.SubscriptionRefused?>(null)
+
         override fun proxyMessageFlow(subscribeAllChannels: Boolean): Flow<MqttClientProxyMessage> = emptyFlow()
 
         override fun disconnect() {}

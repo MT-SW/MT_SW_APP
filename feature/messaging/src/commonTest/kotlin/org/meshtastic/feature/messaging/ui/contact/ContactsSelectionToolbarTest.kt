@@ -16,8 +16,6 @@
  */
 package org.meshtastic.feature.messaging.ui.contact
 
-import org.meshtastic.feature.messaging.stopMessagingTestKoin
-import org.meshtastic.feature.messaging.startMessagingTestKoin
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -51,6 +49,8 @@ import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.testing.FakeNodeRepository
 import org.meshtastic.core.testing.TestDataFactory
 import org.meshtastic.core.ui.util.SnackbarManager
+import org.meshtastic.feature.messaging.startMessagingTestKoin
+import org.meshtastic.feature.messaging.stopMessagingTestKoin
 import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.ChannelSettings
 import kotlin.test.AfterTest

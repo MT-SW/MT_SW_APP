@@ -16,7 +16,6 @@
  */
 package org.meshtastic.core.data.manager
 
-import org.meshtastic.core.testing.FakeMeshLogRepository
 import dev.mokkery.MockMode
 import dev.mokkery.answering.returns
 import dev.mokkery.every
@@ -50,6 +49,7 @@ import org.meshtastic.core.repository.PacketQueueRejectedException
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.repository.SessionManager
 import org.meshtastic.core.repository.TracerouteHandler
+import org.meshtastic.core.testing.FakeMeshLogRepository
 import org.meshtastic.proto.AdminMessage
 import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.LocalConfig

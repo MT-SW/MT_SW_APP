@@ -107,7 +107,9 @@ class SendMessageUseCaseTest {
         useCase("Hello", "0${NodeAddress.ID_BROADCAST}", null)
 
         // Assert
-        verify { analytics.trackAction("message_send", mapOf("num_bytes" to 5, "is_reply" to false, "split_parts" to 1)) }
+        verify {
+            analytics.trackAction("message_send", mapOf("num_bytes" to 5, "is_reply" to false, "split_parts" to 1))
+        }
     }
 
     @Test

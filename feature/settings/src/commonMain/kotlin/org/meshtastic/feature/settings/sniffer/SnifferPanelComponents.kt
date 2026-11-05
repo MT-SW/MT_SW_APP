@@ -15,7 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 @file:OptIn(ExperimentalMaterial3Api::class)
-
 @file:Suppress("LongParameterList")
 
 package org.meshtastic.feature.settings.sniffer

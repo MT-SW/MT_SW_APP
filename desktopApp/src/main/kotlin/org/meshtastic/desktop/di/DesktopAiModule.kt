@@ -121,10 +121,7 @@ class DesktopAiModule {
         ModelServerInstaller(location.enginesDir)
 
     @Single
-    fun aiModelStoreImpl(
-        location: AiStorageLocation,
-        installer: ModelServerInstaller,
-    ): AiModelStoreImpl {
+    fun aiModelStoreImpl(location: AiStorageLocation, installer: ModelServerInstaller): AiModelStoreImpl {
         AiModels.platform = AiPlatform.DESKTOP
         AiModels.unavailableEngines = buildSet {
             if (!installer.whisperSupported) add(AiEngine.WHISPER_CPP)
@@ -143,11 +140,8 @@ class DesktopAiModule {
     }
 
     @Single
-    fun aiTranslationRouter(
-        engine: AiTextEngine,
-        store: AiModelStoreImpl,
-        uiPrefs: UiPrefs,
-    ): AiTranslationRouter = AiTranslationRouter(GemmaTranslator(engine), store, uiPrefs)
+    fun aiTranslationRouter(engine: AiTextEngine, store: AiModelStoreImpl, uiPrefs: UiPrefs): AiTranslationRouter =
+        AiTranslationRouter(GemmaTranslator(engine), store, uiPrefs)
 
     @Single
     fun assistantHistoryStore(): AssistantHistoryStore = FileAssistantHistoryStore(File(AppDataRoot.dir, "assistant"))

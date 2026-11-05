@@ -16,7 +16,6 @@
  */
 package org.meshtastic.feature.node.list
 
-import org.meshtastic.core.testing.FakeMeshLogRepository
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import dev.mokkery.MockMode
@@ -42,6 +41,7 @@ import org.meshtastic.core.repository.NodeManager
 import org.meshtastic.core.repository.RadioConfigRepository
 import org.meshtastic.core.testing.FakeDeviceHardwareRepository
 import org.meshtastic.core.testing.FakeLocaleUnitsProvider
+import org.meshtastic.core.testing.FakeMeshLogRepository
 import org.meshtastic.core.testing.FakeNodeRepository
 import org.meshtastic.core.testing.FakeRadioController
 import org.meshtastic.core.testing.FakeRadioInterfaceService

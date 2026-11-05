@@ -16,13 +16,13 @@
  */
 package org.meshtastic.feature.map
 
+import androidx.lifecycle.viewModelScope
 import app.cash.turbine.test
 import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.every
 import dev.mokkery.matcher.any
 import dev.mokkery.mock
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel

@@ -1,4 +1,4 @@
-<!--
+﻿<!--
   ~ Copyright (c) 2025 Meshtastic LLC
   ~
   ~ This program is free software: you can redistribute it and/or modify
@@ -438,7 +438,7 @@
     <string name="schema_security_admin_key">Admin Key</string>
     <string name="schema_security_admin_key_description">Public keys (up to three) authorized to send admin messages to this node.</string>
     <string name="schema_security_debug_log_api_enabled">Debug Logs</string>
-    <string name="schema_security_debug_log_api_enabled_description">Output live debug logging over serial, view and export position-redacted device logs over Bluetooth. (Over Wi-Fi and USB this works only with MT_SW firmware.)</string>
+    <string name="schema_security_debug_log_api_enabled_description">Output live debug logging over serial, view and export position-redacted device logs over Bluetooth.</string>
     <string name="schema_security_is_managed">Managed Device</string>
     <string name="schema_security_is_managed_description">Settings are changed by a mesh administrator using an admin key, not from the local app. Needs at least one admin key.</string>
     <string name="schema_security_packetsignaturepolicy_packet_signature_policy_balanced">Balanced - Prefer Authenticated</string>
