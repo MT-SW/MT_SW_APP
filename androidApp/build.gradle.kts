@@ -57,8 +57,8 @@ configure<ApplicationExtension> {
 
     // The store build uses exactly the sources, resources and manifest of fdroid (no Google services in it).
     sourceSets.getByName("google") {
-        java.srcDir("src/fdroid/kotlin")
-        res.srcDir("src/fdroid/res")
+        kotlin.directories.add("src/fdroid/kotlin")
+        res.directories.add("src/fdroid/res")
         manifest.srcFile("src/fdroid/AndroidManifest.xml")
     }
 

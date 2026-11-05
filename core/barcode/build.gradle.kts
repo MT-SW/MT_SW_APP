@@ -25,7 +25,7 @@ plugins {
 configure<LibraryExtension> {
     namespace = "org.meshtastic.core.barcode"
 
-    sourceSets.getByName("google") { java.srcDir("src/fdroid/kotlin") }
+    sourceSets.getByName("google") { kotlin.directories.add("src/fdroid/kotlin") }
 
     testOptions { unitTests { isIncludeAndroidResources = true } }
 }
