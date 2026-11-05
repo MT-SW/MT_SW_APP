@@ -20,7 +20,7 @@ import okio.ByteString
 import okio.ByteString.Companion.toByteString
 import org.meshtastic.proto.Data
 
-/**
+/*
  * Support for Meshtastic's "private app port" convention (see the `PRIVATE_APP = 256` comment in portnums.proto):
  * ports >= 256 are used by mutual agreement between firmware and client without adding a named
  * [org.meshtastic.proto.PortNum] enum entry, specifically so a client doesn't need to fork the official protobufs just

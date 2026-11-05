@@ -692,7 +692,7 @@ class AssistantDataProvider(
         var dropped: Int? = null
     }
 
-    /** The latest telemetry every node reported (last 3 days), ranked by what the question is about. */
+    /*  The latest telemetry every node reported (last 3 days), ranked by what the question is about. */
     /** The latest telemetry values every node reported in the last 3 days. */
     private suspend fun latestNodeRows(): HashMap<Int, NodeRow> {
         val rows = HashMap<Int, NodeRow>()

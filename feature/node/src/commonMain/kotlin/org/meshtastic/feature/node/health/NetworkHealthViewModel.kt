@@ -486,7 +486,7 @@ internal fun org.meshtastic.core.model.MeshLog.toHistoryEntry(): org.meshtastic.
 
 private const val PERCENT_MULTIPLIER = 100f
 
-/** Extracts this metric's value from a raw history entry, for sparkline plotting. */
+/*  Extracts this metric's value from a raw history entry, for sparkline plotting. */
 
 /**
  * Decodes SNR/RSSI directly from a MeshLog's raw packet header (any port — this data lives in every packet, not just

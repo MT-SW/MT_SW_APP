@@ -37,7 +37,7 @@ import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.ui.assistant.AssistantLinks
 import org.meshtastic.core.ui.assistant.SettingHighlight
 
-/** One bubble of the conversation. */
+/*  One bubble of the conversation. */
 /** [at] is when a question was sent or an answer received (milliseconds, 0 = not known); [tookMs] is how long an answer took. */
 data class AssistantLine(val fromUser: Boolean, val text: String, val at: Long = 0L, val tookMs: Long = 0L, val info: String = "")
 

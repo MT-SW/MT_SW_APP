@@ -30,7 +30,7 @@ import org.meshtastic.feature.connections.model.DeviceListEntry
 
 private const val SUFFIX_LENGTH = 4
 
-/**
+/*
  * Shared helpers for TCP device discovery logic used by both [CommonGetDiscoveredDevicesUseCase] and the
  * Android-specific variant.
  */

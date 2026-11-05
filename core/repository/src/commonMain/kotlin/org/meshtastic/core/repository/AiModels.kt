@@ -854,7 +854,7 @@ object AiModels {
 
     fun byId(id: String?): AiModelInfo? = all.firstOrNull { it.id == id }
 
-    /**
+    /*
      * Ids of the models of the old engine (Google LiteRT-LM); their files are removed once, when the app first starts
      * with the new engine.
      */

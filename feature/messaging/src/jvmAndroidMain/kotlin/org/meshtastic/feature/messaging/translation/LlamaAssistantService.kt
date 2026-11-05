@@ -342,7 +342,7 @@ class LlamaAssistantService(
         return out.toByteArray()
     }
 
-    /** The model the translator's hardware report is about: the chosen translator model when it is on the device, else any that is, else NLLB. */
+    /*  The model the translator's hardware report is about: the chosen translator model when it is on the device, else any that is, else NLLB. */
     /** The chip line is stored in English; in Polish its layer count is written in Polish ("36 z 36 warstw na NPU"). */
     private fun localBackend(text: String, polish: Boolean): String =
         if (!polish) text else text.replace(Regex("(\\d+) of (\\d+) layers on the (graphics card|NPU)")) { m ->
@@ -1789,7 +1789,7 @@ class LlamaAssistantService(
         foldPl(text.lowercase().replace("wi-fi", "wifi")).split(Regex("[^\\p{L}\\p{N}]+"))
             .filter { it.length >= MIN_STEM || it in SHORT_TERMS }.map { canonicalStem(it.take(STEM_LENGTH)) }.toSet()
 
-    /** Plain text for the chat bubble: no markdown stars or backticks the small model likes to add. */
+    /*  Plain text for the chat bubble: no markdown stars or backticks the small model likes to add. */
     /** Without the internet the model cannot know a web address: the links it writes are made up, so they are removed. */
     private fun String.withoutMadeUpLinks(): String =
         replace(Regex("(?imu)^\\s*(źródło|źródła|zrodlo|source|sources)\\s*:\\s*\\S*https?://.*$\\n?"), "")

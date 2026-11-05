@@ -171,7 +171,7 @@ class AiModelStoreImpl(
         }.onFailure { Logger.w(tag = TAG, throwable = it) { "Removing replaced model files failed: ${it.message}" } }
     }
 
-    /**
+    /*
      * Removes what the old engine left (its model files and its cache) once, the first time the app starts with the new
      * engine. Only files the app itself downloaded into its own model folder are touched, and never again afterwards,
      * so a model the user downloads later is never removed by this.

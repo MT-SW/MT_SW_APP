@@ -33,7 +33,7 @@ import org.maplibre.spatialk.geojson.Position
 import org.meshtastic.core.repository.MapCameraPosition
 import org.meshtastic.core.repository.MapPrefs
 
-/**
+/*
  * Reads back the camera the user left the map on.
  *
  * The OSMdroid map did this and the Google flavor still does; the MapLibre map lost it in the cutover even though

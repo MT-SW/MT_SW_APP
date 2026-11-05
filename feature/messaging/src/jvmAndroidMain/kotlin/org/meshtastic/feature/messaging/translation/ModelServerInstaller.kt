@@ -298,7 +298,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
         return llama(suffix, LLAMA_CPU_MB)
     }
 
-    /**
+    /*
      * The whisper.cpp program that always works (processor). On a Mac it is our own Metal build, run without the
      * graphics card; null for an Intel Mac, where there is no program.
      */

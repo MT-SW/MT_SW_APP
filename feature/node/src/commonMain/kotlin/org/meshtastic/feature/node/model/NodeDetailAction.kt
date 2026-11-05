@@ -58,7 +58,7 @@ sealed interface NodeDetailAction {
     /** Sets the GPIO pins in [gpioMask] on [destNum] to [gpioValue], via the Remote Hardware module. */
     data class WriteGpio(val destNum: Int, val gpioMask: Long, val gpioValue: Long) : NodeDetailAction
 
-    /** Reads the GPIO pins in [gpioMask] on [destNum], via the Remote Hardware module. */
+    /*  Reads the GPIO pins in [gpioMask] on [destNum], via the Remote Hardware module. */
 
     /** Reads the GPIO pins in [gpioMask] on [destNum], via the Remote Hardware module. */
     data class ReadGpio(val destNum: Int, val gpioMask: Long) : NodeDetailAction

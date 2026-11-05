@@ -109,7 +109,7 @@ data class TerrainHorizonState(
     val nodeChoices: List<HorizonNodeChoice> = emptyList(),
     /** The space the terrain saved on the device takes, in bytes. */
     val savedBytes: Long = 0L,
-    /** Saving the terrain for offline use is running: tiles done of tiles in all. */
+    /*  Saving the terrain for offline use is running: tiles done of tiles in all. */
     /** How far the terrain is saved (km): the last of the ranges, 100, unless picked otherwise. */
     val saveRadiusKm: Int = SAVE_MAX_RADIUS_KM,
     val saving: Boolean = false,
