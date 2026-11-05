@@ -101,6 +101,7 @@ private val HEARTBEAT_DRAIN_DELAY = 200.milliseconds
 private val GATT_CLEANUP_TIMEOUT = 5.seconds
 private val BLE_WRITE_OPERATION_TIMEOUT = 10.seconds
 private const val BLE_MAX_PENDING_WRITES = 4
+private const val RX_SUMMARY_INTERVAL_MS = 60_000L
 private val BLE_OPERATION_DRAIN_TIMEOUT = 45.seconds
 
 // An active profile and one predecessor cleanup can each consume a drain budget before their bounded GATT releases.
@@ -672,7 +673,6 @@ class BleRadioTransport(
 
                 radioService.fromRadio
                     .onEach { packet ->
-                        Logger.v { "[${address.anonymize()}] Received packet fromRadio (${packet.size} bytes)" }
                         dispatchPacket(packet, session)
                     }
                     .catch { e ->
@@ -683,7 +683,6 @@ class BleRadioTransport(
 
                 radioService.logRadio
                     .onEach { packet ->
-                        Logger.v { "[${address.anonymize()}] Received packet logRadio (${packet.size} bytes)" }
                         dispatchPacket(packet, session)
                     }
                     .catch { e ->
@@ -889,12 +888,8 @@ class BleRadioTransport(
             retryBleOperation(tag = address.anonymize(), retryWhile = { activeSession.value === session }) {
                 session.profile.sendToRadio(packet)
             }
-            val sent = packetsSent.incrementAndGet()
-            val txBytes = bytesSent.addAndGet(packet.size.toLong())
-            Logger.v {
-                "[${address.anonymize()}] Wrote packet #$sent to toRadio " +
-                    "(${packet.size} bytes, total TX: $txBytes bytes)"
-            }
+            packetsSent.incrementAndGet()
+            bytesSent.addAndGet(packet.size.toLong())
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -949,16 +944,32 @@ class BleRadioTransport(
         }
     }
 
+    /** One summary line per minute instead of one line per packet, so the log stays small and the real events stay visible. */
+    private fun logRxSummary(received: Int, rxBytes: Long) {
+        val now = nowMillis
+        if (now - lastRxSummaryAt < RX_SUMMARY_INTERVAL_MS) return
+        val packetsDelta = received - lastRxSummaryPackets
+        val bytesDelta = rxBytes - lastRxSummaryBytes
+        lastRxSummaryAt = now
+        lastRxSummaryPackets = received
+        lastRxSummaryBytes = rxBytes
+        Logger.d {
+            "[${address.anonymize()}] BLE RX in the last minute: $packetsDelta packets ($bytesDelta bytes), " +
+                "total $received packets ($rxBytes bytes)"
+        }
+    }
+
+    @Volatile private var lastRxSummaryAt = 0L
+    @Volatile private var lastRxSummaryPackets = 0
+    @Volatile private var lastRxSummaryBytes = 0L
+
     private fun dispatchPacket(packet: ByteArray, expectedSession: BleSession) {
         val dispatched =
             expectedSession.lifecycle.runIfOpen {
                 if (activeSession.value !== expectedSession) return@runIfOpen false
                 val received = packetsReceived.incrementAndGet()
                 val rxBytes = bytesReceived.addAndGet(packet.size.toLong())
-                Logger.v {
-                    "[${address.anonymize()}] Dispatching packet #$received " +
-                        "(${packet.size} bytes, total RX: $rxBytes bytes)"
-                }
+                logRxSummary(received, rxBytes)
                 callback.handleFromRadio(packet)
                 true
             } == true
