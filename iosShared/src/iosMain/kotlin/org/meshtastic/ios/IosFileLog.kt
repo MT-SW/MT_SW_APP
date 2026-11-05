@@ -21,11 +21,13 @@ import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import co.touchlab.kermit.platformLogWriter
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
 import okio.buffer
 import org.meshtastic.core.common.log.AppLogLevel
+import org.meshtastic.core.common.log.MinSeverityLogWriter
 import org.meshtastic.core.database.iosDataDir
 import platform.Foundation.NSDate
 import platform.Foundation.NSDateFormatter
@@ -121,7 +123,8 @@ internal object IosFileLog : LogWriter() {
             pruneRecent()
         }
         applySeverity()
-        Logger.addLogWriter(this)
+        // The console keeps what it always saw, whatever the file log asks for.
+        Logger.setLogWriters(MinSeverityLogWriter(platformLogWriter(), baseSeverity), this)
         @OptIn(ExperimentalNativeApi::class)
         setUnhandledExceptionHook { error ->
             runCatching { Logger.e(error, tag = "Log") { "Uncaught exception in thread ${threadName()}" } }
@@ -152,8 +155,11 @@ internal object IosFileLog : LogWriter() {
      * or lower while the full log is on, so the per-packet messages are not even built when nobody reads them.
      */
     @OptIn(ExperimentalNativeApi::class)
+    private val baseSeverity: Severity
+        get() = if (Platform.isDebugBinary) Severity.Debug else Severity.Info
+
     private fun applySeverity() {
-        val base = if (Platform.isDebugBinary) Severity.Debug else Severity.Info
+        val base = baseSeverity
         val chosen = levelFlow.value.severity
         Logger.setMinSeverity(if (chosen != null && chosen < base) chosen else base)
     }
