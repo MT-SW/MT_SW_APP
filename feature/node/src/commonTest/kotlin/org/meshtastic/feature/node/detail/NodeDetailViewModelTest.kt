@@ -16,8 +16,6 @@
  */
 package org.meshtastic.feature.node.detail
 
-import org.meshtastic.core.testing.FakeRadioConfigRepository
-import org.meshtastic.core.repository.LocationService
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import dev.mokkery.answering.returns
@@ -47,9 +45,11 @@ import org.meshtastic.core.model.RoutingNak
 import org.meshtastic.core.model.SessionStatus
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.repository.LocalNodeUnavailableException
+import org.meshtastic.core.repository.LocationService
 import org.meshtastic.core.repository.PacketQueueRejectedException
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.QueryController
+import org.meshtastic.core.testing.FakeRadioConfigRepository
 import org.meshtastic.feature.node.component.NodeMenuAction
 import org.meshtastic.feature.node.domain.usecase.GetNodeDetailsUseCase
 import org.meshtastic.proto.Routing
@@ -96,7 +96,8 @@ class NodeDetailViewModelTest {
         observeRemoteAdminSessionStatus = observeRemoteAdminSessionStatus,
         snackbarManager = snackbarManager,
         radioConfigRepository = FakeRadioConfigRepository(),
-        locationService = object : LocationService {
+        locationService =
+        object : LocationService {
             override suspend fun getCurrentLocation() = null
         },
         nakWatcher = testNakWatcher(),

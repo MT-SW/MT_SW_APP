@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("UnusedParameter")
+
 package org.meshtastic.feature.node.list
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -33,6 +35,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -41,15 +47,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.animateFloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -70,26 +75,13 @@ import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeExtraMode
 import org.meshtastic.core.model.NodeListDensity
 import org.meshtastic.core.model.excludes
-import org.meshtastic.core.resources.Res
-import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
-import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
-import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
-import org.meshtastic.core.ui.component.Quality
-import org.meshtastic.core.ui.util.LocalModemPreset
-import org.meshtastic.core.ui.util.annotateNeighborInfo
 import org.meshtastic.core.model.getNeighborInfoResponse
-import org.meshtastic.core.resources.neighbor_info
-import org.meshtastic.core.resources.okay
+import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.cancel
-import org.meshtastic.core.resources.close
-import org.meshtastic.core.resources.neighbors_dialog_empty
-import org.meshtastic.core.ui.component.LocalNeighborsClick
-import org.meshtastic.core.common.util.DateFormatter
 import org.meshtastic.core.resources.channel_invalid
 import org.meshtastic.core.resources.hop_histogram_title
+import org.meshtastic.core.resources.neighbor_info
+import org.meshtastic.core.resources.neighbors_dialog_empty
 import org.meshtastic.core.resources.node_list_help_title
 import org.meshtastic.core.resources.nodes
 import org.meshtastic.core.resources.nodes_empty_disconnected_hint
@@ -100,18 +92,21 @@ import org.meshtastic.core.resources.nodes_unheard_banner
 import org.meshtastic.core.resources.nodes_unheard_banner_one
 import org.meshtastic.core.resources.nodes_unheard_keep
 import org.meshtastic.core.resources.nodes_unheard_remove
+import org.meshtastic.core.resources.okay
 import org.meshtastic.core.resources.set_up_connection
 import org.meshtastic.core.ui.component.EmptyState
 import org.meshtastic.core.ui.component.FastScrollSidebar
-import org.meshtastic.core.ui.component.MainAppBar
-import org.meshtastic.core.ui.component.MeshtasticImportFAB
+import org.meshtastic.core.ui.component.LocalNeighborsClick
 import org.meshtastic.core.ui.component.LocalNodeExtraConfig
 import org.meshtastic.core.ui.component.LocalNodeExtraStats
 import org.meshtastic.core.ui.component.LocalNodeExtraTick
+import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.MeshtasticImportFAB
 import org.meshtastic.core.ui.component.NODE_EXTRA_PAGE_MILLIS
 import org.meshtastic.core.ui.component.NodeExtraConfig
 import org.meshtastic.core.ui.component.NodeItem
 import org.meshtastic.core.ui.component.NodeItemCompact
+import org.meshtastic.core.ui.component.Quality
 import org.meshtastic.core.ui.component.ScrollToTopEvent
 import org.meshtastic.core.ui.component.ShareContactDialog
 import org.meshtastic.core.ui.component.smartScrollToTop
@@ -121,7 +116,12 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.NoDevice
 import org.meshtastic.core.ui.icon.Nodes
 import org.meshtastic.core.ui.icon.SignalOff
+import org.meshtastic.core.ui.theme.StatusColors.StatusDisconnected
+import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 import org.meshtastic.core.ui.theme.StatusColors.StatusOrange
+import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
+import org.meshtastic.core.ui.util.LocalModemPreset
+import org.meshtastic.core.ui.util.annotateNeighborInfo
 import org.meshtastic.core.ui.util.isDesktopPlatform
 import org.meshtastic.core.ui.util.parseDeepLinkOrInvalid
 import org.meshtastic.feature.node.component.DisplayNameDialog
@@ -201,7 +201,9 @@ fun NodeListScreen(
         NeighborReportDialog(
             report = neighborReports[num],
             nameOf = { nodeNum ->
-                unfilteredNodes.firstOrNull { it.num == nodeNum }?.let { "${it.user.long_name} (${it.user.short_name})" }
+                unfilteredNodes
+                    .firstOrNull { it.num == nodeNum }
+                    ?.let { "${it.user.long_name} (${it.user.short_name})" }
                     ?: "!" + nodeNum.toUInt().toString(HEX_RADIX)
             },
             onDismiss = { neighborsOpenFor = null },
@@ -274,7 +276,11 @@ fun NodeListScreen(
     }
 
     // MT_SW option: the add / share menu in the top bar instead of the floating button.
-    val importInTopBar by org.koin.compose.koinInject<org.meshtastic.core.repository.UiPrefs>().importMenuInTopBar.collectAsStateWithLifecycle()
+    val importInTopBar by
+        org.koin.compose
+            .koinInject<org.meshtastic.core.repository.UiPrefs>()
+            .importMenuInTopBar
+            .collectAsStateWithLifecycle()
     val importMenu: @Composable (Boolean, Modifier) -> Unit = { inBar, menuModifier ->
         MeshtasticImportFAB(
             modifier = menuModifier,
@@ -292,242 +298,246 @@ fun NodeListScreen(
     }
 
     CompositionLocalProvider(
-        LocalNodeExtraConfig provides NodeExtraConfig(extraMode, extraIconsOnly, extraPackets, extraHardware, extraEther, extraNeighbors),
+        LocalNodeExtraConfig provides
+            NodeExtraConfig(extraMode, extraIconsOnly, extraPackets, extraHardware, extraEther, extraNeighbors),
         LocalNodeExtraStats provides extraStats,
         LocalNodeExtraTick provides extraTick,
     ) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            MainAppBar(
-                title = stringResource(Res.string.nodes),
-                // Node counts deliberately live in the list header (NodeCountSummary), not here: the app bar's
-                // title/subtitle slot competes for width with the node chip + action icons and is clipped to a
-                // single line, which truncated the counts (issue #6268).
-                ourNode = ourNode,
-                showNodeChip = ourNode != null && connectionState is ConnectionState.Connected,
-                canNavigateUp = false,
-                onNavigateUp = {},
-                actions = {
-                    if (importInTopBar && connectionState == ConnectionState.Connected &&
-                        (ourNode?.capabilities?.supportsQrCodeSharing ?: false)
-                    ) {
-                        importMenu(true, Modifier)
-                    }
-                    IconButton(onClick = { showHopHistogram = true }) {
-                        Icon(
-                            imageVector = MeshtasticIcons.BarChart,
-                            contentDescription = stringResource(Res.string.hop_histogram_title),
-                        )
-                    }
-                    IconButton(onClick = { showHelpSheet = true }) {
-                        Icon(
-                            imageVector = MeshtasticIcons.Info,
-                            contentDescription = stringResource(Res.string.node_list_help_title),
-                        )
-                    }
-                },
-                onClickChip = { navigateToNodeDetails(it.num) },
-            )
-        },
-        floatingActionButton = {
-            val shareCapable = ourNode?.capabilities?.supportsQrCodeSharing ?: false
-            if (!importInTopBar) {
-                importMenu(
-                    false,
-                    Modifier.animateFloatingActionButton(
-                        visible = !isScrollInProgress && connectionState == ConnectionState.Connected && shareCapable,
-                        alignment = androidx.compose.ui.Alignment.BottomEnd,
-                    ),
+        Scaffold(
+            modifier = modifier,
+            topBar = {
+                MainAppBar(
+                    title = stringResource(Res.string.nodes),
+                    // Node counts deliberately live in the list header (NodeCountSummary), not here: the app bar's
+                    // title/subtitle slot competes for width with the node chip + action icons and is clipped to a
+                    // single line, which truncated the counts (issue #6268).
+                    ourNode = ourNode,
+                    showNodeChip = ourNode != null && connectionState is ConnectionState.Connected,
+                    canNavigateUp = false,
+                    onNavigateUp = {},
+                    actions = {
+                        if (
+                            importInTopBar &&
+                            connectionState == ConnectionState.Connected &&
+                            (ourNode?.capabilities?.supportsQrCodeSharing ?: false)
+                        ) {
+                            importMenu(true, Modifier)
+                        }
+                        IconButton(onClick = { showHopHistogram = true }) {
+                            Icon(
+                                imageVector = MeshtasticIcons.BarChart,
+                                contentDescription = stringResource(Res.string.hop_histogram_title),
+                            )
+                        }
+                        IconButton(onClick = { showHelpSheet = true }) {
+                            Icon(
+                                imageVector = MeshtasticIcons.Info,
+                                contentDescription = stringResource(Res.string.node_list_help_title),
+                            )
+                        }
+                    },
+                    onClickChip = { navigateToNodeDetails(it.num) },
                 )
-            }
-        },
-    ) { contentPadding ->
-        Box(modifier = Modifier.fillMaxSize().padding(contentPadding).focusable()) {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
-            ) {
-                stickyHeader {
-                    val animatedAlpha by
-                        animateFloatAsState(targetValue = if (!isScrollInProgress) 1.0f else 0f, label = "alpha")
-                    Column(
-                        modifier =
-                        Modifier.fillMaxWidth()
-                            .graphicsLayer(alpha = animatedAlpha)
-                            .background(MaterialTheme.colorScheme.background)
-                            .padding(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                    ) {
-                        NodeCountSummary(
-                            onlineCount = onlineNodeCount,
-                            shownCount = nodes.size,
-                            totalCount = totalNodeCount,
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
-                        )
-                        UnheardNodesBanner(
-                            unheardNodes = unheardNodes,
-                            onKeep = { viewModel.keepUnheardNodes(unheardNodes) },
-                            onRemoveAll = { viewModel.removeNodes(unheardNodes) },
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
-                        )
-                        val filterPrefs = viewModel.nodeFilterPreferences
-                        NodeFilterSearchBar(
-                            filterText = state.filter.filterText,
-                            onTextChange = { viewModel.nodeFilterText = it },
-                            currentSortOption = state.sort,
-                            onSortSelect = viewModel::setSortOption,
-                            modifier = Modifier.fillMaxWidth(),
-                            toggles =
-                            NodeFilterToggles(
-                                includeUnknown = state.filter.includeUnknown,
-                                onToggleIncludeUnknown = filterPrefs::toggleIncludeUnknown,
-                                excludeInfrastructure = state.filter.excludeInfrastructure,
-                                onToggleExcludeInfrastructure = filterPrefs::toggleExcludeInfrastructure,
-                                onlyOnline = state.filter.onlyOnline,
-                                onToggleOnlyOnline = filterPrefs::toggleOnlyOnline,
-                                onlyDirect = state.filter.onlyDirect,
-                                onToggleOnlyDirect = filterPrefs::toggleOnlyDirect,
-                                showIgnored = state.filter.showIgnored,
-                                onToggleShowIgnored = filterPrefs::toggleShowIgnored,
-                                ignoredNodeCount = ignoredNodeCount,
-                                excludeUnheard = state.filter.excludeUnheard,
-                                onToggleExcludeUnheard = filterPrefs::toggleExcludeUnheard,
-                                excludeMqtt = state.filter.excludeMqtt,
-                                onToggleExcludeMqtt = filterPrefs::toggleExcludeMqtt,
-                                onlySigned = state.filter.onlySigned,
-                                onToggleOnlySigned = filterPrefs::toggleOnlySigned,
-                                onlyEncrypted = state.filter.onlyEncrypted,
-                                onToggleOnlyEncrypted = filterPrefs::toggleOnlyEncrypted,
-                            ),
-                        )
-                    }
+            },
+            floatingActionButton = {
+                val shareCapable = ourNode?.capabilities?.supportsQrCodeSharing ?: false
+                if (!importInTopBar) {
+                    importMenu(
+                        false,
+                        Modifier.animateFloatingActionButton(
+                            visible =
+                            !isScrollInProgress && connectionState == ConnectionState.Connected && shareCapable,
+                            alignment = androidx.compose.ui.Alignment.BottomEnd,
+                        ),
+                    )
                 }
-
-                items(nodes, key = { it.num }) { node ->
-                    var expanded by remember { mutableStateOf(false) }
-                    var showDisplayNameDialog by remember { mutableStateOf(false) }
-
-                    if (showDisplayNameDialog) {
-                        DisplayNameDialog(
-                            node = node,
-                            onSave = viewModel::setNodeDisplayName,
-                            onDismiss = { showDisplayNameDialog = false },
-                        )
+            },
+        ) { contentPadding ->
+            Box(modifier = Modifier.fillMaxSize().padding(contentPadding).focusable()) {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.fillMaxSize().padding(end = if (isDesktopPlatform) 20.dp else 0.dp),
+                ) {
+                    stickyHeader {
+                        val animatedAlpha by
+                            animateFloatAsState(targetValue = if (!isScrollInProgress) 1.0f else 0f, label = "alpha")
+                        Column(
+                            modifier =
+                            Modifier.fillMaxWidth()
+                                .graphicsLayer(alpha = animatedAlpha)
+                                .background(MaterialTheme.colorScheme.background)
+                                .padding(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            NodeCountSummary(
+                                onlineCount = onlineNodeCount,
+                                shownCount = nodes.size,
+                                totalCount = totalNodeCount,
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                            )
+                            UnheardNodesBanner(
+                                unheardNodes = unheardNodes,
+                                onKeep = { viewModel.keepUnheardNodes(unheardNodes) },
+                                onRemoveAll = { viewModel.removeNodes(unheardNodes) },
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                            )
+                            val filterPrefs = viewModel.nodeFilterPreferences
+                            NodeFilterSearchBar(
+                                filterText = state.filter.filterText,
+                                onTextChange = { viewModel.nodeFilterText = it },
+                                currentSortOption = state.sort,
+                                onSortSelect = viewModel::setSortOption,
+                                modifier = Modifier.fillMaxWidth(),
+                                toggles =
+                                NodeFilterToggles(
+                                    includeUnknown = state.filter.includeUnknown,
+                                    onToggleIncludeUnknown = filterPrefs::toggleIncludeUnknown,
+                                    excludeInfrastructure = state.filter.excludeInfrastructure,
+                                    onToggleExcludeInfrastructure = filterPrefs::toggleExcludeInfrastructure,
+                                    onlyOnline = state.filter.onlyOnline,
+                                    onToggleOnlyOnline = filterPrefs::toggleOnlyOnline,
+                                    onlyDirect = state.filter.onlyDirect,
+                                    onToggleOnlyDirect = filterPrefs::toggleOnlyDirect,
+                                    showIgnored = state.filter.showIgnored,
+                                    onToggleShowIgnored = filterPrefs::toggleShowIgnored,
+                                    ignoredNodeCount = ignoredNodeCount,
+                                    excludeUnheard = state.filter.excludeUnheard,
+                                    onToggleExcludeUnheard = filterPrefs::toggleExcludeUnheard,
+                                    excludeMqtt = state.filter.excludeMqtt,
+                                    onToggleExcludeMqtt = filterPrefs::toggleExcludeMqtt,
+                                    onlySigned = state.filter.onlySigned,
+                                    onToggleOnlySigned = filterPrefs::toggleOnlySigned,
+                                    onlyEncrypted = state.filter.onlyEncrypted,
+                                    onToggleOnlyEncrypted = filterPrefs::toggleOnlyEncrypted,
+                                ),
+                            )
+                        }
                     }
 
-                    Box(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-                        val isThisNode = node.num == ourNode?.num
-                        val canEditStatus = canEditStatusMessage(node, ourNode, connectionState)
-                        // Our own node only earns a long press while it has something to offer, or it opens an
-                        // empty menu.
-                        val longClick =
-                            if (!isThisNode || canEditStatus) {
-                                { expanded = true }
-                            } else {
-                                null
-                            }
+                    items(nodes, key = { it.num }) { node ->
+                        var expanded by remember { mutableStateOf(false) }
+                        var showDisplayNameDialog by remember { mutableStateOf(false) }
 
-                        val isActive = remember(activeNodeId, node.num) { activeNodeId == node.num }
-                        val relayNodeName =
-                            remember(relayNodeIds[node.num], unfilteredNodes, ourNode) {
-                                relayNodeIds[node.num]?.let { relayId ->
-                                    Node.getRelayNode(relayId, unfilteredNodes, ourNode?.num)?.user?.short_name
+                        if (showDisplayNameDialog) {
+                            DisplayNameDialog(
+                                node = node,
+                                onSave = viewModel::setNodeDisplayName,
+                                onDismiss = { showDisplayNameDialog = false },
+                            )
+                        }
+
+                        Box(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+                            val isThisNode = node.num == ourNode?.num
+                            val canEditStatus = canEditStatusMessage(node, ourNode, connectionState)
+                            // Our own node only earns a long press while it has something to offer, or it opens an
+                            // empty menu.
+                            val longClick =
+                                if (!isThisNode || canEditStatus) {
+                                    { expanded = true }
+                                } else {
+                                    null
+                                }
+
+                            val isActive = remember(activeNodeId, node.num) { activeNodeId == node.num }
+                            val relayNodeName =
+                                remember(relayNodeIds[node.num], unfilteredNodes, ourNode) {
+                                    relayNodeIds[node.num]?.let { relayId ->
+                                        Node.getRelayNode(relayId, unfilteredNodes, ourNode?.num)?.user?.short_name
+                                    }
+                                }
+
+                            CompositionLocalProvider(LocalNeighborsClick provides onNeighborsClick) {
+                                when (density) {
+                                    NodeListDensity.COMPLETE ->
+                                        NodeItem(
+                                            modifier = Modifier.animateItem(),
+                                            thisNode = ourNode,
+                                            thatNode = node,
+                                            distanceUnits = state.distanceUnits,
+                                            tempInFahrenheit = state.tempInFahrenheit,
+                                            onClick = { navigateToNodeDetails(node.num) },
+                                            onLongClick = longClick,
+                                            connectionState = connectionState,
+                                            deviceType = deviceType,
+                                            isActive = isActive,
+                                            showTelemetry = showTelemetry,
+                                            deviceImageUrl = deviceImageUrls[node.user.hw_model.value],
+                                            relayNodeName = relayNodeName,
+                                            neighborCount = neighborReports[node.num]?.neighbors?.size,
+                                        )
+
+                                    NodeListDensity.COMPACT ->
+                                        NodeItemCompact(
+                                            modifier = Modifier.animateItem(),
+                                            thisNode = ourNode,
+                                            thatNode = node,
+                                            distanceUnits = state.distanceUnits,
+                                            onClick = { navigateToNodeDetails(node.num) },
+                                            onLongClick = longClick,
+                                            isActive = isActive,
+                                            showPower = showPower,
+                                            showLastHeard = showLastHeard,
+                                            lastHeardIsRelative = lastHeardIsRelative,
+                                            showLocation = showLocation,
+                                            showHops = showHops,
+                                            showSignal = showSignal,
+                                            showChannel = showChannel,
+                                            showRole = showRole,
+                                            showTelemetry = showTelemetry,
+                                            tempInFahrenheit = state.tempInFahrenheit,
+                                            deviceImageUrl = deviceImageUrls[node.user.hw_model.value],
+                                            relayNodeName = relayNodeName,
+                                            neighborCount = neighborReports[node.num]?.neighbors?.size,
+                                        )
                                 }
                             }
-
-                        CompositionLocalProvider(LocalNeighborsClick provides onNeighborsClick) {
-                        when (density) {
-                            NodeListDensity.COMPLETE ->
-                                NodeItem(
-                                    modifier = Modifier.animateItem(),
-                                    thisNode = ourNode,
-                                    thatNode = node,
-                                    distanceUnits = state.distanceUnits,
-                                    tempInFahrenheit = state.tempInFahrenheit,
-                                    onClick = { navigateToNodeDetails(node.num) },
-                                    onLongClick = longClick,
-                                    connectionState = connectionState,
-                                    deviceType = deviceType,
-                                    isActive = isActive,
-                                    showTelemetry = showTelemetry,
-                                    deviceImageUrl = deviceImageUrls[node.user.hw_model.value],
-                                    relayNodeName = relayNodeName,
-                                    neighborCount = neighborReports[node.num]?.neighbors?.size,
+                            if (canEditStatus) {
+                                LocalNodeContextMenu(
+                                    expanded = expanded,
+                                    onUpdateStatus = onEditStatusMessage,
+                                    onDismiss = { expanded = false },
                                 )
-
-                            NodeListDensity.COMPACT ->
-                                NodeItemCompact(
-                                    modifier = Modifier.animateItem(),
-                                    thisNode = ourNode,
-                                    thatNode = node,
-                                    distanceUnits = state.distanceUnits,
-                                    onClick = { navigateToNodeDetails(node.num) },
-                                    onLongClick = longClick,
-                                    isActive = isActive,
-                                    showPower = showPower,
-                                    showLastHeard = showLastHeard,
-                                    lastHeardIsRelative = lastHeardIsRelative,
-                                    showLocation = showLocation,
-                                    showHops = showHops,
-                                    showSignal = showSignal,
-                                    showChannel = showChannel,
-                                    showRole = showRole,
-                                    showTelemetry = showTelemetry,
-                                    tempInFahrenheit = state.tempInFahrenheit,
-                                    deviceImageUrl = deviceImageUrls[node.user.hw_model.value],
-                                    relayNodeName = relayNodeName,
-                                    neighborCount = neighborReports[node.num]?.neighbors?.size,
+                            } else if (!isThisNode) {
+                                NodeContextMenu(
+                                    expanded = expanded,
+                                    node = node,
+                                    ourNode = ourNode,
+                                    onFavorite = { viewModel.favoriteNode(node) },
+                                    onMute = { viewModel.muteNode(node) },
+                                    onMessage = {
+                                        val route = viewModel.getDirectMessageRoute(node)
+                                        navigateToMessages(route)
+                                    },
+                                    lastTracerouteTime = lastTracerouteTime,
+                                    onTraceRoute = { viewModel.traceRoute(node) },
+                                    onIgnore = { viewModel.ignoreNode(node) },
+                                    onRemove = { viewModel.removeNodes(listOf(node)) },
+                                    onDismiss = { expanded = false },
+                                    onOpenMeshView = { navigateToMeshView(node.num) },
+                                    onOpenCompass = { navigateToCompass(node.num) },
+                                    onSetDisplayName = { showDisplayNameDialog = true },
                                 )
+                            }
                         }
-                        }
-                        if (canEditStatus) {
-                            LocalNodeContextMenu(
-                                expanded = expanded,
-                                onUpdateStatus = onEditStatusMessage,
-                                onDismiss = { expanded = false },
-                            )
-                        } else if (!isThisNode) {
-                            NodeContextMenu(
-                                expanded = expanded,
-                                node = node,
-                                ourNode = ourNode,
-                                onFavorite = { viewModel.favoriteNode(node) },
-                                onMute = { viewModel.muteNode(node) },
-                                onMessage = {
-                                    val route = viewModel.getDirectMessageRoute(node)
-                                    navigateToMessages(route)
-                                },
-                                lastTracerouteTime = lastTracerouteTime,
-                                onTraceRoute = { viewModel.traceRoute(node) },
-                                onIgnore = { viewModel.ignoreNode(node) },
-                                onRemove = { viewModel.removeNodes(listOf(node)) },
-                                onDismiss = { expanded = false },
-                                onOpenMeshView = { navigateToMeshView(node.num) },
-                                onOpenCompass = { navigateToCompass(node.num) },
-                                onSetDisplayName = { showDisplayNameDialog = true },
+                    }
+                    if (nodes.isEmpty() && !state.filter.isActive) {
+                        item {
+                            NodeListEmptyState(
+                                connectionState = connectionState,
+                                onNavigateToConnections = onNavigateToConnections,
+                                modifier = Modifier.fillParentMaxSize(),
                             )
                         }
                     }
+                    item { Spacer(modifier = Modifier.height(88.dp)) }
                 }
-                if (nodes.isEmpty() && !state.filter.isActive) {
-                    item {
-                        NodeListEmptyState(
-                            connectionState = connectionState,
-                            onNavigateToConnections = onNavigateToConnections,
-                            modifier = Modifier.fillParentMaxSize(),
-                        )
-                    }
-                }
-                item { Spacer(modifier = Modifier.height(88.dp)) }
+                FastScrollSidebar(
+                    listState = listState,
+                    itemCount = nodes.size,
+                    modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
+                )
             }
-            FastScrollSidebar(
-                listState = listState,
-                itemCount = nodes.size,
-                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 2.dp),
-            )
         }
-    }
     }
 }
 
@@ -642,11 +652,7 @@ private const val HEX_RADIX = 16
  * of each. It never leaves the list.
  */
 @Composable
-private fun NeighborReportDialog(
-    report: NeighborReport?,
-    nameOf: (Int) -> String,
-    onDismiss: () -> Unit,
-) {
+private fun NeighborReportDialog(report: NeighborReport?, nameOf: (Int) -> String, onDismiss: () -> Unit) {
     val header = stringResource(Res.string.neighbor_info)
     val statusGreen = MaterialTheme.colorScheme.StatusOnline
     val statusYellow = MaterialTheme.colorScheme.StatusDisconnected

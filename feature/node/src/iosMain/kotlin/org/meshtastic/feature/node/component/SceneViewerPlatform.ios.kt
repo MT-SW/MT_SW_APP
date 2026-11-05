@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LambdaParameterInRestartableEffect", "ReturnCount")
+
 package org.meshtastic.feature.node.component
 
 import androidx.compose.runtime.Composable
@@ -21,8 +23,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitView
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import org.meshtastic.core.repository.MirrorFrame
 import org.meshtastic.feature.node.model.GlbBounds
@@ -38,6 +38,8 @@ import platform.Foundation.writeToFile
 import platform.UIKit.UIColor
 import platform.WebKit.WKWebView
 import platform.WebKit.WKWebViewConfiguration
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 private class ViewerPage(val dir: String, val html: String)
 
@@ -70,7 +72,9 @@ private fun prepareViewerPage(glb: ByteArray): ViewerPage? {
         """
             .trimIndent()
     val path = "$dir/index.html"
-    val ok = NSString.create(string = page).writeToFile(path, atomically = true, encoding = NSUTF8StringEncoding, error = null)
+    val ok =
+        NSString.create(string = page)
+            .writeToFile(path, atomically = true, encoding = NSUTF8StringEncoding, error = null)
     return if (ok) ViewerPage(dir, path) else null
 }
 

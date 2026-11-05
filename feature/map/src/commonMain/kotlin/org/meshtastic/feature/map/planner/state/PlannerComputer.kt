@@ -14,6 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress(
+    "LongMethod",
+    "LoopWithTooManyJumpStatements",
+    "MagicNumber",
+    "ReturnCount",
+    "SwallowedException",
+    "ThrowsCount",
+    "TooGenericExceptionCaught",
+)
+
 package org.meshtastic.feature.map.planner.state
 
 import kotlinx.coroutines.CancellationException

@@ -131,5 +131,4 @@ internal fun ColumnScope.PrivacySettingsContent(
     )
 
     HomoglyphSetting(homoglyphEncodingEnabled = homoglyphEnabled, onToggle = onToggleHomoglyph)
-
 }

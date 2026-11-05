@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 MT_SW contributors
+ * Copyright (c) 2025-2026 Meshtastic LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,9 @@ internal fun LogFormatDialog(onText: () -> Unit, onJson: () -> Unit, onDismiss: 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(Res.string.sniffer_export_format_title)) },
-        confirmButton = { TextButton(onClick = onJson) { Text(stringResource(Res.string.sniffer_export_format_json)) } },
+        confirmButton = {
+            TextButton(onClick = onJson) { Text(stringResource(Res.string.sniffer_export_format_json)) }
+        },
         dismissButton = { TextButton(onClick = onText) { Text(stringResource(Res.string.sniffer_export_format_txt)) } },
     )
 }

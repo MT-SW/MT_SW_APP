@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("MagicNumber")
+@file:Suppress("MagicNumber", "LongMethod")
 
 package org.meshtastic.feature.node.metrics
 
@@ -179,7 +179,10 @@ internal fun buildHostMetricsChartData(data: List<Telemetry>): HostMetricsChartD
         val total = telemetry.local_stats?.heap_total_bytes ?: 0
         val free = telemetry.local_stats?.heap_free_bytes ?: 0
         if (total > 0) {
-            HostMetricsChartPoint(time = telemetry.time, value = (total - free).coerceAtLeast(0).toDouble() / total * PERCENT_MULTIPLIER)
+            HostMetricsChartPoint(
+                time = telemetry.time,
+                value = (total - free).coerceAtLeast(0).toDouble() / total * PERCENT_MULTIPLIER,
+            )
         } else {
             null
         }
@@ -203,7 +206,9 @@ internal fun buildHostMetricsChartData(data: List<Telemetry>): HostMetricsChartD
             if (ext.memoryPsramTotal > 0) {
                 HostMetricsChartPoint(
                     time = telemetry.time,
-                    value = (ext.memoryPsramTotal - ext.memoryPsramFree).coerceAtLeast(0).toDouble() / ext.memoryPsramTotal * PERCENT_MULTIPLIER,
+                    value =
+                    (ext.memoryPsramTotal - ext.memoryPsramFree).coerceAtLeast(0).toDouble() /
+                        ext.memoryPsramTotal * PERCENT_MULTIPLIER,
                 )
             } else {
                 null

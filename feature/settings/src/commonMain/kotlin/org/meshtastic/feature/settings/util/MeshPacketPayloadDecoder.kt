@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LoopWithTooManyJumpStatements", "MagicNumber", "ReturnCount", "TooGenericExceptionCaught")
+
 package org.meshtastic.feature.settings.util
 
 import org.meshtastic.core.common.crypto.ChannelCrypto

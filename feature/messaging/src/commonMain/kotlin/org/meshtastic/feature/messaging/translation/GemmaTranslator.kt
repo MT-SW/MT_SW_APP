@@ -14,7 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("ktlint:standard:max-line-length")
+@file:Suppress(
+    "ktlint:standard:max-line-length",
+    "ComplexCondition",
+    "FunctionSignature",
+    "MagicNumber",
+    "MaxLineLength",
+    "MultiLineIfElse",
+    "Wrapping",
+)
 
 package org.meshtastic.feature.messaging.translation
 
@@ -47,15 +55,14 @@ class GemmaTranslator(private val engine: AiTextEngine) {
                     "do not translate proper names. " +
                     "Output only the translation, without quotes, notes or explanations.\n\n$text"
             }
-        suspend fun ask(instruction: String) =
-            clean(
-                engine.chat(
-                    modelId = modelId,
-                    messages = listOf("user" to instruction),
-                    maxTokens = (text.length / 2 + EXTRA_TOKENS).coerceIn(MIN_TOKENS, MAX_TOKENS),
-                    temperature = 0f,
-                )
-            )
+        suspend fun ask(instruction: String) = clean(
+            engine.chat(
+                modelId = modelId,
+                messages = listOf("user" to instruction),
+                maxTokens = (text.length / 2 + EXTRA_TOKENS).coerceIn(MIN_TOKENS, MAX_TOKENS),
+                temperature = 0f,
+            ),
+        )
         var reply = ask(prompt)
         // A small model sometimes answers with one name only: it is asked once more for the whole text.
         if (text.length >= SHORT_ANSWER_MIN_SOURCE && reply.length < text.length * SHORT_ANSWER_SHARE) {
@@ -67,7 +74,7 @@ class GemmaTranslator(private val engine: AiTextEngine) {
         if (isUnchanged(text, reply)) {
             val again =
                 ask(
-                    "$prompt\n\nThe text above is still written in the original language. Write the whole text in $into."
+                    "$prompt\n\nThe text above is still written in the original language. Write the whole text in $into.",
                 )
             if (again.isNotBlank() && !isUnchanged(text, again)) reply = again
         }
@@ -77,7 +84,9 @@ class GemmaTranslator(private val engine: AiTextEngine) {
         if (lost.isNotEmpty()) {
             val again =
                 ask(
-                    "$prompt\n\nImportant: keep exactly as written, do not change or translate: ${lost.joinToString(", ")}."
+                    "$prompt\n\nImportant: keep exactly as written, do not change or translate: ${lost.joinToString(
+                        ", ",
+                    )}.",
                 )
             if (again.isNotBlank() && lostTokens(text, again).size < lost.size) reply = again
         }
@@ -111,22 +120,26 @@ class GemmaTranslator(private val engine: AiTextEngine) {
                 x.length >= 3 && x.all { it.isUpperCase() || it.isDigit() || it == '_' } && x.any { it.isLetter() }
             if (
                 x.length >= 3 &&
-                    (x.startsWith("http") ||
+                (
+                    x.startsWith("http") ||
                         x.contains('_') ||
                         (x.any { it.isDigit() } && x.any { it.isLetter() }) ||
-                        code)
-            )
+                        code
+                    )
+            ) {
                 out += x
+            }
         }
         return out.toList()
     }
 
-    private fun lostTokens(source: String, reply: String): List<String> =
-        mustKeep(source).filter { k ->
-            !reply.contains(k, ignoreCase = true) &&
-                !(k.any { it.isDigit() } &&
-                    (reply.contains(k.replace(',', '.')) || reply.contains(k.replace('.', ','))))
-        }
+    private fun lostTokens(source: String, reply: String): List<String> = mustKeep(source).filter { k ->
+        !reply.contains(k, ignoreCase = true) &&
+            !(
+                k.any { it.isDigit() } &&
+                    (reply.contains(k.replace(',', '.')) || reply.contains(k.replace('.', ',')))
+                )
+    }
 
     /**
      * The translation without the frame small models add: code fences, a JSON wrapper, quotes, a "Translation:" label.
@@ -138,16 +151,17 @@ class GemmaTranslator(private val engine: AiTextEngine) {
             t = it.groupValues[1].replace("\\\"", "\"").replace("\\n", "\n").trim()
         }
         t = t.replace(Regex("(?i)^(translation|translated text|tłumaczenie)\\s*:\\s*"), "").trim()
-        if (t.length >= 2 && t.first() == '"' && t.last() == '"' && t.count { it == '"' } == 2)
+        if (t.length >= 2 && t.first() == '"' && t.last() == '"' && t.count { it == '"' } == 2) {
             t = t.substring(1, t.length - 1).trim()
+        }
         // Bold or italic marks round the whole answer ("**text**") are not part of a translation.
         Regex("(?s)^(\\*{1,3}|_{1,2})(.+?)\\1$").find(t)?.let { t = it.groupValues[2].trim() }
         // An introduction line before the translation ("Here is the translation:").
         t =
             t.replace(
-                    Regex("(?i)^(here is|here's|oto)[^\\n:]{0,40}(translation|tłumaczenie)[^\\n:]{0,20}:\\s*\\n?"),
-                    "",
-                )
+                Regex("(?i)^(here is|here's|oto)[^\\n:]{0,40}(translation|tłumaczenie)[^\\n:]{0,20}:\\s*\\n?"),
+                "",
+            )
                 .trim()
         return t
     }

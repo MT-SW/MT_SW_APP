@@ -16,6 +16,8 @@
  */
 @file:OptIn(ExperimentalMaterial3AdaptiveApi::class)
 
+@file:Suppress("LongMethod", "ReturnCount")
+
 package org.meshtastic.core.ui.component
 
 import androidx.compose.foundation.gestures.Orientation

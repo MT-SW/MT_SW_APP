@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("MagicNumber", "ReturnCount")
+
 package org.meshtastic.feature.settings.radio.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import kotlin.math.abs
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import platform.Foundation.NSCalendar
@@ -31,6 +32,7 @@ import platform.Foundation.NSDate
 import platform.Foundation.NSTimeZone
 import platform.Foundation.dateByAddingTimeInterval
 import platform.Foundation.systemTimeZone
+import kotlin.math.abs
 
 @Composable actual fun rememberSystemTimeZonePosixString(): String = remember { systemPosixTimeZone() }
 
@@ -55,17 +57,22 @@ private fun systemPosixTimeZone(): String {
     val std = tz.secondsFromGMTForDate(now).toInt() - dstShift.toInt()
     val stdName = cleanName(tz.abbreviationForDate(now.dateByAddingTimeInterval(-dstShift)) ?: "GMT")
     val first = tz.nextDaylightSavingTimeTransitionAfterDate(now) ?: return stdName + offsetText(std)
-    val second = tz.nextDaylightSavingTimeTransitionAfterDate(first.dateByAddingTimeInterval(1.0))
-        ?: return stdName + offsetText(std)
+    val second =
+        tz.nextDaylightSavingTimeTransitionAfterDate(first.dateByAddingTimeInterval(1.0))
+            ?: return stdName + offsetText(std)
 
     val calendar = NSCalendar.currentCalendar.also { it.timeZone = tz }
-    val units = NSCalendarUnitMonth or NSCalendarUnitDay or NSCalendarUnitWeekday or NSCalendarUnitHour or NSCalendarUnitMinute
+    val units =
+        NSCalendarUnitMonth or NSCalendarUnitDay or NSCalendarUnitWeekday or NSCalendarUnitHour or NSCalendarUnitMinute
 
     fun rule(transition: NSDate): String {
         // The wall clock just before the change is the time the rule names.
         val before = transition.dateByAddingTimeInterval(-1.0)
         val c = calendar.components(units, fromDate = before)
-        val daysInMonth = calendar.rangeOfUnit(NSCalendarUnitDay, inUnit = NSCalendarUnitMonth, forDate = before).useContents { length.toInt() }
+        val daysInMonth =
+            calendar.rangeOfUnit(NSCalendarUnitDay, inUnit = NSCalendarUnitMonth, forDate = before).useContents {
+                length.toInt()
+            }
         val day = c.day.toInt()
         val week = if (day + 7 > daysInMonth) 5 else (day - 1) / 7 + 1
         val weekday = (c.weekday.toInt() - 1) % 7
@@ -77,8 +84,10 @@ private fun systemPosixTimeZone(): String {
     val firstIsStart = tz.daylightSavingTimeOffsetForDate(first.dateByAddingTimeInterval(1.0)) > 0.0
     val startRule = rule(if (firstIsStart) first else second)
     val endRule = rule(if (firstIsStart) second else first)
-    val dstSeconds = tz.daylightSavingTimeOffsetForDate((if (firstIsStart) first else second).dateByAddingTimeInterval(1.0)).toInt()
-    val dstName = cleanName(tz.abbreviationForDate((if (firstIsStart) first else second).dateByAddingTimeInterval(1.0)) ?: "GMT")
+    val dstSeconds =
+        tz.daylightSavingTimeOffsetForDate((if (firstIsStart) first else second).dateByAddingTimeInterval(1.0)).toInt()
+    val dstName =
+        cleanName(tz.abbreviationForDate((if (firstIsStart) first else second).dateByAddingTimeInterval(1.0)) ?: "GMT")
     val dstOffset = if (dstSeconds == 3600) "" else offsetText(std + dstSeconds)
     return stdName + offsetText(std) + dstName + dstOffset + ",$startRule,$endRule"
 }

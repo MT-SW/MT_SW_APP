@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("MagicNumber", "MultipleEmitters")
 
 package org.meshtastic.feature.node.health
 
@@ -149,10 +150,12 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
                     }
                 },
                 actions = {
-                    IconButton(onClick = {
-                        val report = uiState.toReport(generatedStamp())
-                        share(report.toPlainText(), report.title)
-                    }) {
+                    IconButton(
+                        onClick = {
+                            val report = uiState.toReport(generatedStamp())
+                            share(report.toPlainText(), report.title)
+                        },
+                    ) {
                         Icon(MeshtasticIcons.Share, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     }
                     IconButton(onClick = { menuOpen = true }) {
@@ -417,12 +420,7 @@ fun NetworkSummaryScreen(viewModel: NetworkSummaryViewModel, onNavigateUp: () ->
     }
 }
 
-private fun LazyListScope.rankingItem(
-    title: String,
-    icon: ImageVector,
-    bars: List<ReportBar>,
-    color: Color,
-) {
+private fun LazyListScope.rankingItem(title: String, icon: ImageVector, bars: List<ReportBar>, color: Color) {
     if (bars.isEmpty()) return
     item { SummarySection(title = title, icon = icon, accent = color) { BarList(bars = bars, color = color) } }
 }

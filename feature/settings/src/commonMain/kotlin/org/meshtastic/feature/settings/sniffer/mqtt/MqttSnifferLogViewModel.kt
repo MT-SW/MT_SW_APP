@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("ReturnCount")
+
 package org.meshtastic.feature.settings.sniffer.mqtt
 
 import androidx.lifecycle.ViewModel
@@ -278,13 +280,12 @@ class MqttSnifferManager(
         if (enabled == _active.value) return
         _active.value = enabled
         if (enabled) {
-            collectJob =
-                scope.launch {
-                    mqttRepository
-                        .proxyMessageFlow(subscribeAllChannels = true)
-                        .catch { /* connectionState already reflects the failure; nothing else to surface here */ }
-                        .collect(::onMessage)
-                }
+            collectJob = scope.launch {
+                mqttRepository
+                    .proxyMessageFlow(subscribeAllChannels = true)
+                    .catch { /* connectionState already reflects the failure; nothing else to surface here */ }
+                    .collect(::onMessage)
+            }
         } else {
             collectJob?.cancel()
             collectJob = null

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("MagicNumber")
+@file:Suppress("MagicNumber", "LongMethod")
 
 package org.meshtastic.feature.node.metrics
 
@@ -51,13 +51,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
-import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.DateFormatter
+import org.meshtastic.core.common.util.MetricFormatter
 import org.meshtastic.core.common.util.formatByteSize
 import org.meshtastic.core.common.util.formatString
 import org.meshtastic.core.model.TelemetryType
-import org.meshtastic.core.model.util.LocalStatsExtended
 import org.meshtastic.core.model.effectiveLongName
+import org.meshtastic.core.model.util.LocalStatsExtended
 import org.meshtastic.core.model.util.TimeConstants.MS_PER_SEC
 import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.resources.Res
@@ -223,7 +223,15 @@ internal fun HostMetricsCardContent(
             Spacer(modifier = Modifier.height(4.dp))
             LogLine(
                 label = stringResource(Res.string.local_stats_heap),
-                value = "${formatByteSize((heapTotalBytes - (heapFreeBytes ?: 0)).coerceAtLeast(0).toLong())} / ${formatByteSize(heapTotalBytes.toLong())} (${MetricFormatter.usedPercent((heapTotalBytes - (heapFreeBytes ?: 0)).toLong(), heapTotalBytes.toLong())})",
+                value =
+                "${formatByteSize(
+                    (heapTotalBytes - (heapFreeBytes ?: 0)).coerceAtLeast(0).toLong(),
+                )} / ${formatByteSize(
+                    heapTotalBytes.toLong(),
+                )} (${MetricFormatter.usedPercent(
+                    (heapTotalBytes - (heapFreeBytes ?: 0)).toLong(),
+                    heapTotalBytes.toLong(),
+                )})",
             )
         }
 
@@ -236,14 +244,23 @@ internal fun HostMetricsCardContent(
                     value =
                     "${formatByteSize(
                         ext.flashUsedBytes.toLong(),
-                    )} / ${formatByteSize(ext.flashTotalBytes.toLong())} (${MetricFormatter.usedPercent(ext.flashUsedBytes.toLong(), ext.flashTotalBytes.toLong())})",
+                    )} / ${formatByteSize(
+                        ext.flashTotalBytes.toLong(),
+                    )} (${MetricFormatter.usedPercent(ext.flashUsedBytes.toLong(), ext.flashTotalBytes.toLong())})",
                 )
             }
             if (ext.memoryPsramTotal > 0) {
                 LogLine(
                     label = stringResource(Res.string.local_stats_psram),
                     value =
-                    "${formatByteSize((ext.memoryPsramTotal - ext.memoryPsramFree).coerceAtLeast(0).toLong())} / ${formatByteSize(ext.memoryPsramTotal.toLong())} (${MetricFormatter.usedPercent((ext.memoryPsramTotal - ext.memoryPsramFree).toLong(), ext.memoryPsramTotal.toLong())})",
+                    "${formatByteSize(
+                        (ext.memoryPsramTotal - ext.memoryPsramFree).coerceAtLeast(0).toLong(),
+                    )} / ${formatByteSize(
+                        ext.memoryPsramTotal.toLong(),
+                    )} (${MetricFormatter.usedPercent(
+                        (ext.memoryPsramTotal - ext.memoryPsramFree).toLong(),
+                        ext.memoryPsramTotal.toLong(),
+                    )})",
                 )
             }
         }

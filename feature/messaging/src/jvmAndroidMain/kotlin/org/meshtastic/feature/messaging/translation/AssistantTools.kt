@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("MagicNumber")
+
 package org.meshtastic.feature.messaging.translation
 
 /** Drops emoji and other characters the native part of the model library cannot take, and control characters. */

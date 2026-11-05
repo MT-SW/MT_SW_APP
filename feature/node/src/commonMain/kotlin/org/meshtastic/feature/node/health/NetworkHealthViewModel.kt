@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("CyclomaticComplexMethod", "DestructuringDeclarationWithTooManyEntries", "ReturnCount")
+
 package org.meshtastic.feature.node.health
 
 import androidx.lifecycle.ViewModel
@@ -58,11 +60,18 @@ enum class NetworkHealthSortField {
     LAST_HEARD,
 }
 
-private fun List<org.meshtastic.core.model.NodeMetricsHistoryEntry>.latestSnr(): Float? =
-    filter { it.snr != null }.maxByOrNull { it.timestamp }?.snr
+private fun List<org.meshtastic.core.model.NodeMetricsHistoryEntry>.latestSnr(): Float? = filter {
+    it.snr != null
+}
+    .maxByOrNull { it.timestamp }
+    ?.snr
 
-private fun List<org.meshtastic.core.model.NodeMetricsHistoryEntry>.latestNoiseFloor(): Float? =
-    filter { it.noiseFloor != null }.maxByOrNull { it.timestamp }?.noiseFloor?.toFloat()
+private fun List<org.meshtastic.core.model.NodeMetricsHistoryEntry>.latestNoiseFloor(): Float? = filter {
+    it.noiseFloor != null
+}
+    .maxByOrNull { it.timestamp }
+    ?.noiseFloor
+    ?.toFloat()
 
 private data class HistoryBundle(
     val entries: List<org.meshtastic.core.model.NodeMetricsHistoryEntry>,
@@ -114,7 +123,8 @@ data class NodeHealthInfo(
     fun valueFor(metric: NetworkHealthMetric): Float? = when (metric) {
         NetworkHealthMetric.POWER -> batteryLevel?.toFloat()
 
-        // Signal tab shows the noise floor (latest reading from history); the verdict colour still comes from the SNR.
+        // Signal tab shows the noise floor (latest reading from history); the verdict colour still comes from the
+        // SNR.
         NetworkHealthMetric.SIGNAL -> metricHistory.lastOrNull()
 
         // Ether tab sorts/displays by channel utilization; air util TX is an extra series in the detail chart.
@@ -173,6 +183,7 @@ class NetworkHealthViewModel(
     private val favoritesFirstFlow = MutableStateFlow(true)
     private val hideWithoutDataFlow = MutableStateFlow(false)
     private val problemsOnlyFlow = MutableStateFlow(false)
+
     // Every tab keeps its own verdict filter.
     private val levelFilterFlow = MutableStateFlow<Map<NetworkHealthMetric, HealthLevel>>(emptyMap())
     private val searchTextFlow = MutableStateFlow("")
@@ -205,7 +216,8 @@ class NetworkHealthViewModel(
                         mapped
                             .withCurrentSign(mapped.num in invertedNodes)
                             .withBatterySwap(mapped.num in batteryInvertedNodes)
-                            // The noise floor is judged and shown after the node's LNA gain, like on the signal screen.
+                            // The noise floor is judged and shown after the node's LNA gain, like on the signal
+                            // screen.
                             .let { e ->
                                 val gain = lnaGains[e.num] ?: 0
                                 val noise = e.noiseFloor
@@ -215,8 +227,12 @@ class NetworkHealthViewModel(
                 HistoryBundle(
                     // One broken or foreign packet (e.g. from other firmware) must never take the screen down.
                     entries =
-                    allLogs.mapNotNull { log -> runCatching { log.toSignalHistoryEntry()?.let(remap) }.getOrNull() } +
-                        telemetryLogs.mapNotNull { log -> runCatching { log.toHistoryEntry()?.let(remap) }.getOrNull() },
+                    allLogs.mapNotNull { log ->
+                        runCatching { log.toSignalHistoryEntry()?.let(remap) }.getOrNull()
+                    } +
+                        telemetryLogs.mapNotNull { log ->
+                            runCatching { log.toHistoryEntry()?.let(remap) }.getOrNull()
+                        },
                     myNodeNum = myNodeNum,
                     batteryInverted = batteryInvertedNodes,
                 )
@@ -254,56 +270,54 @@ class NetworkHealthViewModel(
             val levelFilter = filters.levelFilters[metric]
             val historyByNode = history.groupBy { it.num }
 
-            val healthInfos =
-                nodes.map { node ->
-                    val nodeHistory = historyByNode[node.num].orEmpty()
-                    val shownBattery =
-                        node.deviceMetrics.battery_level.let { level ->
-                            if (node.num in historyBundle.batteryInverted) {
-                                swapBatteryPolarity(level, node.deviceMetrics.voltage)
-                            } else {
-                                level
-                            }
+            val healthInfos = nodes.map { node ->
+                val nodeHistory = historyByNode[node.num].orEmpty()
+                val shownBattery =
+                    node.deviceMetrics.battery_level.let { level ->
+                        if (node.num in historyBundle.batteryInverted) {
+                            swapBatteryPolarity(level, node.deviceMetrics.voltage)
+                        } else {
+                            level
                         }
-                    NodeHealthInfo(
-                        num = node.num,
-                        shortName = node.user.short_name,
-                        longName = node.user.long_name,
-                        lastHeard = node.lastHeard,
-                        isOnline = node.isOnline,
-                        isFavorite = node.isFavorite,
-                        batteryLevel = shownBattery,
-                        isPowered =
-                        node.deviceMetrics.voltage != null && (shownBattery ?: 0) > BATTERY_POWERED_THRESHOLD,
-                        // Our own device and nodes heard through a relay have no SNR of their own: use the latest
-                        // direct reading from the last 24 hours instead.
-                        snr = node.snr.takeIf { it != Float.MAX_VALUE } ?: nodeHistory.latestSnr(),
-                        rssi = node.rssi.takeIf { it != Int.MAX_VALUE },
-                        channelUtilization = node.deviceMetrics.channel_utilization,
-                        airUtilTx = node.deviceMetrics.air_util_tx,
-                        temperature = node.environmentMetrics.temperature,
-                        relativeHumidity = node.environmentMetrics.relative_humidity,
-                        barometricPressure = node.environmentMetrics.barometric_pressure,
-                        metricHistory =
-                        nodeHistory.sortedBy { it.timestamp }.mapNotNull { metric.historyValue(it) },
-                        neighborCount = neighborCountByNode[node.num],
-                        noiseFloor = nodeHistory.latestNoiseFloor(),
-                        dataTabs =
-                        buildSet {
-                            val unrated =
-                                listOf(
-                                    NetworkHealthMetric.ENVIRONMENT,
-                                    NetworkHealthMetric.RESOURCES,
-                                    NetworkHealthMetric.TRAFFIC,
-                                )
-                            unrated.forEach { m -> if (nodeHistory.any { m.historyValue(it) != null }) add(m) }
-                            val env = node.environmentMetrics
-                            if (env.temperature != null || env.relative_humidity != null) {
-                                add(NetworkHealthMetric.ENVIRONMENT)
-                            }
-                        },
-                    )
-                }
+                    }
+                NodeHealthInfo(
+                    num = node.num,
+                    shortName = node.user.short_name,
+                    longName = node.user.long_name,
+                    lastHeard = node.lastHeard,
+                    isOnline = node.isOnline,
+                    isFavorite = node.isFavorite,
+                    batteryLevel = shownBattery,
+                    isPowered =
+                    node.deviceMetrics.voltage != null && (shownBattery ?: 0) > BATTERY_POWERED_THRESHOLD,
+                    // Our own device and nodes heard through a relay have no SNR of their own: use the latest
+                    // direct reading from the last 24 hours instead.
+                    snr = node.snr.takeIf { it != Float.MAX_VALUE } ?: nodeHistory.latestSnr(),
+                    rssi = node.rssi.takeIf { it != Int.MAX_VALUE },
+                    channelUtilization = node.deviceMetrics.channel_utilization,
+                    airUtilTx = node.deviceMetrics.air_util_tx,
+                    temperature = node.environmentMetrics.temperature,
+                    relativeHumidity = node.environmentMetrics.relative_humidity,
+                    barometricPressure = node.environmentMetrics.barometric_pressure,
+                    metricHistory = nodeHistory.sortedBy { it.timestamp }.mapNotNull { metric.historyValue(it) },
+                    neighborCount = neighborCountByNode[node.num],
+                    noiseFloor = nodeHistory.latestNoiseFloor(),
+                    dataTabs =
+                    buildSet {
+                        val unrated =
+                            listOf(
+                                NetworkHealthMetric.ENVIRONMENT,
+                                NetworkHealthMetric.RESOURCES,
+                                NetworkHealthMetric.TRAFFIC,
+                            )
+                        unrated.forEach { m -> if (nodeHistory.any { m.historyValue(it) != null }) add(m) }
+                        val env = node.environmentMetrics
+                        if (env.temperature != null || env.relative_humidity != null) {
+                            add(NetworkHealthMetric.ENVIRONMENT)
+                        }
+                    },
+                )
+            }
 
             val levelCounts = healthInfos.groupingBy { metric.levelFor(it) }.eachCount()
             val worstByMetric =
@@ -363,8 +377,7 @@ class NetworkHealthViewModel(
                 levelFilter = levelFilter,
                 onlineCount = healthInfos.count { it.isOnline },
                 totalCount = healthInfos.size,
-                withDataCount =
-                healthInfos.count { it.valueFor(metric) != null || it.metricHistory.isNotEmpty() },
+                withDataCount = healthInfos.count { it.valueFor(metric) != null || it.metricHistory.isNotEmpty() },
                 levelCounts = levelCounts,
                 worstLevelByMetric = worstByMetric,
                 isLoaded = true,
@@ -469,7 +482,12 @@ internal fun org.meshtastic.core.model.MeshLog.toHistoryEntry(): org.meshtastic.
         packetsRxBad = telemetry.local_stats?.num_packets_rx_bad,
         uptimeSeconds = telemetry.local_stats?.uptime_seconds,
         cpuUsagePercent = localStatsExtended?.cpuUsagePercent,
-        heapUsedPercent = if (heapTotal > 0) (heapTotal - heapFree).coerceAtLeast(0).toFloat() / heapTotal * PERCENT_MULTIPLIER else null,
+        heapUsedPercent =
+        if (heapTotal > 0) {
+            (heapTotal - heapFree).coerceAtLeast(0).toFloat() / heapTotal * PERCENT_MULTIPLIER
+        } else {
+            null
+        },
         flashUsedPercent =
         localStatsExtended
             ?.takeIf { it.flashTotalBytes > 0 }
@@ -477,7 +495,10 @@ internal fun org.meshtastic.core.model.MeshLog.toHistoryEntry(): org.meshtastic.
         psramUsedPercent =
         localStatsExtended
             ?.takeIf { it.memoryPsramTotal > 0 }
-            ?.let { (it.memoryPsramTotal - it.memoryPsramFree).coerceAtLeast(0).toFloat() / it.memoryPsramTotal * PERCENT_MULTIPLIER },
+            ?.let {
+                (it.memoryPsramTotal - it.memoryPsramFree).coerceAtLeast(0).toFloat() / it.memoryPsramTotal *
+                    PERCENT_MULTIPLIER
+            },
         // The device's own WiFi link: the strength only while connected, the drop counter whenever WiFi is reported.
         wifiRssi = localStatsExtended?.wifiRssi?.takeIf { it != 0 },
         wifiDrops = localStatsExtended?.takeIf { it.hasWifi }?.wifiDrops,
@@ -549,12 +570,18 @@ internal fun NetworkHealthMetric.seriesLabels(): List<String> = when (this) {
  */
 internal fun NetworkHealthMetric.seriesGroups(): List<List<String>> = when (this) {
     NetworkHealthMetric.POWER -> listOf(listOf("Napięcie", "Prąd"), listOf("Bateria"))
+
     NetworkHealthMetric.SIGNAL ->
         listOf(listOf("SNR"), listOf("RSSI", "Noise Floor"), listOf("WiFi RSSI", "Zerwania WiFi"))
+
     NetworkHealthMetric.ETHER -> listOf(listOf("Ch. Util", "Air Util"))
+
     NetworkHealthMetric.ENVIRONMENT -> listOf(listOf("Temperatura", "Wilgotność"), listOf("Ciśnienie"))
+
     NetworkHealthMetric.TRAFFIC -> listOf(listOf("TX", "RX"), listOf("Duplikaty", "Przekazane", "Uszkodzone"))
+
     NetworkHealthMetric.RESOURCES -> listOf(listOf("CPU", "RAM"), listOf("Flash", "PSRAM"))
+
     else -> listOf(listOf(label))
 }
 

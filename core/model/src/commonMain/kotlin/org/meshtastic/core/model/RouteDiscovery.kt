@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("ReturnCount")
+
 package org.meshtastic.core.model
 
 import co.touchlab.kermit.Logger

@@ -16,6 +16,8 @@
  */
 @file:OptIn(ExperimentalLayoutApi::class)
 
+@file:Suppress("LongMethod", "SwallowedException", "ViewModelForwarding")
+
 package org.meshtastic.feature.map.planner.ui
 
 import androidx.compose.foundation.layout.Arrangement

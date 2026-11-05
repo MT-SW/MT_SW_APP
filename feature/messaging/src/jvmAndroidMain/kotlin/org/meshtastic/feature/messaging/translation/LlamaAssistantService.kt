@@ -14,7 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("ktlint:standard:max-line-length")
+@file:Suppress(
+    "ktlint:standard:max-line-length",
+    "BlankLineBetweenWhenConditions",
+    "ComplexCondition",
+    "CyclomaticComplexMethod",
+    "FunctionLiteral",
+    "FunctionSignature",
+    "LargeClass",
+    "LongMethod",
+    "LoopWithTooManyJumpStatements",
+    "MagicNumber",
+    "MaxLineLength",
+    "MultiLineIfElse",
+    "MultilineLoop",
+    "ReturnCount",
+    "StringTemplate",
+    "SwallowedException",
+    "TooGenericExceptionCaught",
+    "TooManyFunctions",
+    "UnusedParameter",
+    "Wrapping",
+)
 
 package org.meshtastic.feature.messaging.translation
 
@@ -118,22 +139,23 @@ class LlamaAssistantService(
         val now = FOLLOW_PERIOD.find(question)?.groupValues?.get(1) ?: return question
         val prev =
             history.dropLast(1).lastOrNull { it.fromUser && !FOLLOW_PERIOD.matches(it.text) }?.text ?: return question
-        if (!MESSAGE_WORDS.containsMatchIn(prev.lowercase()) && !DATA_CUE.containsMatchIn(prev.lowercase()))
+        if (!MESSAGE_WORDS.containsMatchIn(prev.lowercase()) && !DATA_CUE.containsMatchIn(prev.lowercase())) {
             return question
+        }
         val base = PERIOD_PHRASES.replace(prev.trim().trimEnd('?', '.', '!'), "").replace(Regex("\\s+"), " ").trim()
         return "$base $now?"
     }
 
-    private fun appLanguage(): String =
-        org.meshtastic.core.common.util
-            .currentLocaleTag()
-            .substringBefore('-')
-            .substringBefore('_')
-            .lowercase()
-            .ifEmpty { "en" }
+    private fun appLanguage(): String = org.meshtastic.core.common.util
+        .currentLocaleTag()
+        .substringBefore('-')
+        .substringBefore('_')
+        .lowercase()
+        .ifEmpty { "en" }
 
     // How the router understood the newest question, for the test report.
     @Volatile private var lastRoute = ""
+
     // The whole conversation as the router sees it: older turns are folded into a short summary (a few at a time), the
     // newest ones stay as short lines, so the assistant keeps the thread of a long conversation, not only the last
     // sentences.
@@ -160,8 +182,11 @@ class LlamaAssistantService(
         withContext(Dispatchers.IO) {
             val translatorHardware = command == TRANSLATOR_HARDWARE_COMMAND
             val modelId =
-                if (translatorHardware) translatorReportModel()
-                else activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
+                if (translatorHardware) {
+                    translatorReportModel()
+                } else {
+                    activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
+                }
             if (translatorHardware || command.equals(AssistantSelfTest.HARDWARE, ignoreCase = true)) {
                 // No questions: only says which model runs where (graphics card or processor) and how big it is.
                 val info = AiModels.byId(modelId)
@@ -197,35 +222,43 @@ class LlamaAssistantService(
                         " ${info?.ramMb ?: 0} MB\n" +
                         t("Gdzie działa", "Where it runs") +
                         ": " +
-                        (engine.activeBackend.takeIf { it.isNotBlank() }?.let { localBackend(it, pl) }
-                            ?: engine.lastStart(modelId)?.backend?.let {
-                                localBackend(it, pl) +
-                                    " " +
-                                    t(
-                                        "(ostatnio; model jest teraz zwolniony z pamięci)",
-                                        "(last time; the model is released from memory now)",
-                                    )
-                            }
-                            ?: t(
-                                "jeszcze nie uruchomiony (zadaj najpierw dowolne pytanie)",
-                                "not started yet (ask any question first)",
-                            )) +
+                        (
+                            engine.activeBackend.takeIf { it.isNotBlank() }?.let { localBackend(it, pl) }
+                                ?: engine.lastStart(modelId)?.backend?.let {
+                                    localBackend(it, pl) +
+                                        " " +
+                                        t(
+                                            "(ostatnio; model jest teraz zwolniony z pamięci)",
+                                            "(last time; the model is released from memory now)",
+                                        )
+                                }
+                                ?: t(
+                                    "jeszcze nie uruchomiony (zadaj najpierw dowolne pytanie)",
+                                    "not started yet (ask any question first)",
+                                )
+                            ) +
                         "\n" +
                         t("Zajęta pamięć RAM teraz", "RAM taken now") +
                         ": " +
-                        (engine.memoryUsedMb?.let { "$it MB" }
-                            ?: t("0 MB (model nie jest wczytany)", "0 MB (the model is not loaded)")) +
+                        (
+                            engine.memoryUsedMb?.let { "$it MB" }
+                                ?: t("0 MB (model nie jest wczytany)", "0 MB (the model is not loaded)")
+                            ) +
                         "\n" +
-                        (engine.activeResources.takeIf { it.isNotBlank() }
-                                ?: engine.lastStart(modelId)?.resources?.takeIf { it.isNotBlank() })
+                        (
+                            engine.activeResources.takeIf { it.isNotBlank() }
+                                ?: engine.lastStart(modelId)?.resources?.takeIf { it.isNotBlank() }
+                            )
                             ?.let { it + "\n" }
                             .orEmpty() +
                         t("Okno tekstu", "Context") +
                         ": ${runCatching { engine.contextTokens(modelId) }.getOrDefault(0)} " +
                         t("tokenów", "tokens") +
                         engine.deviceSummary.takeIf { it.isNotBlank() }?.let { "\n$it" }.orEmpty() +
-                        (engine.startReport.takeIf { it.isNotBlank() }
-                                ?: engine.lastStart(modelId)?.report?.takeIf { it.isNotBlank() })
+                        (
+                            engine.startReport.takeIf { it.isNotBlank() }
+                                ?: engine.lastStart(modelId)?.report?.takeIf { it.isNotBlank() }
+                            )
                             ?.let { "\n" + t("Ostatnie uruchomienie", "Last start") + ":\n$it" }
                             .orEmpty()
                 println("===== ASSISTANT HARDWARE =====\n$report")
@@ -271,8 +304,11 @@ class LlamaAssistantService(
                 val (text, actions) = AssistantActions.parse(answer)
                 tookMs += finished - started
                 val wordCount = text.trim().split(Regex("\\s+")).count { it.isNotEmpty() }
-                if (text.isBlank() || text.startsWith("ERROR")) empty++
-                else if (POINTER_ONLY.containsMatchIn(text.trim())) pointers++
+                if (text.isBlank() || text.startsWith("ERROR")) {
+                    empty++
+                } else if (POINTER_ONLY.containsMatchIn(text.trim())) {
+                    pointers++
+                }
                 if (AssistantActions.web(answer) != null) internet++
                 words += wordCount
                 wordMs += finished - started
@@ -296,7 +332,7 @@ class LlamaAssistantService(
                             .append(
                                 actions.joinToString {
                                     "${it.label} -> ${it.uri}${if (it.highlight.isNotBlank()) " (blinks: ${it.highlight})" else ""}${if (it.auto) " [opens by itself]" else ""}"
-                                }
+                                },
                             )
                             .append('\n')
                     }
@@ -310,11 +346,13 @@ class LlamaAssistantService(
             val cases =
                 if (
                     command.equals(AssistantSelfTest.COMMAND, ignoreCase = true) ||
-                        command.equals(AssistantSelfTest.TRANSLATE, ignoreCase = true) ||
-                        command.equals(AssistantSelfTest.QUICK, ignoreCase = true)
-                )
+                    command.equals(AssistantSelfTest.TRANSLATE, ignoreCase = true) ||
+                    command.equals(AssistantSelfTest.QUICK, ignoreCase = true)
+                ) {
                     AssistantSelfTest.translationsFor(command)
-                else emptyList()
+                } else {
+                    emptyList()
+                }
             if (cases.isNotEmpty()) {
                 // The translator part: the same sentences for every model; names, numbers and links must stay as they
                 // are.
@@ -338,8 +376,10 @@ class LlamaAssistantService(
                     val missing =
                         c.keep.filter { k ->
                             !out.contains(k, ignoreCase = true) &&
-                                !(k.any { it.isDigit() } &&
-                                    (out.contains(k.replace(',', '.')) || out.contains(k.replace('.', ','))))
+                                !(
+                                    k.any { it.isDigit() } &&
+                                        (out.contains(k.replace(',', '.')) || out.contains(k.replace('.', ',')))
+                                    )
                         }
                     val verdict = if (missing.isEmpty()) "kept: OK" else "MISSING: ${missing.joinToString()}"
                     val block =
@@ -350,7 +390,7 @@ class LlamaAssistantService(
                     onResult("${c.from} -> ${c.to}: ${c.text}", "$out\n($verdict)")
                 }
             }
-            report.append("\nBackend: ${engine.activeBackend.ifBlank { "?" }}, total ${totalSeconds} s\n")
+            report.append("\nBackend: ${engine.activeBackend.ifBlank { "?" }}, total $totalSeconds s\n")
             if (tookMs.isNotEmpty()) {
                 val sorted = tookMs.sorted()
                 val median = sorted[sorted.size / 2]
@@ -359,11 +399,15 @@ class LlamaAssistantService(
                     "\n# Summary\n\n" +
                         "Model: ${AiModels.byId(modelId)?.name ?: modelId}\n" +
                         "Questions: ${tookMs.size}\n" +
-                        "Answer time: average ${AssistantClock.seconds(tookMs.sum() / tookMs.size)} s, median ${AssistantClock.seconds(median)} s, longest ${AssistantClock.seconds(sorted.last())} s\n" +
+                        "Answer time: average ${AssistantClock.seconds(
+                            tookMs.sum() / tookMs.size,
+                        )} s, median ${AssistantClock.seconds(
+                            median,
+                        )} s, longest ${AssistantClock.seconds(sorted.last())} s\n" +
                         "Empty or failed answers: $empty\n" +
                         "Answers that only point to a setting: $pointers\n" +
                         "Answers with the internet used: $internet\n" +
-                        "Average answer length: ${words / tookMs.size} words, speed: $perSecond words/s\n"
+                        "Average answer length: ${words / tookMs.size} words, speed: $perSecond words/s\n",
                 )
             }
             file?.let { f -> runCatching { f.writeText(report.toString()) } }
@@ -372,8 +416,11 @@ class LlamaAssistantService(
             // The whole report also lands in the chat as the last answer, so it can be copied on any device (a phone
             // has no project folder to save it to).
             val average =
-                if (questions.isEmpty()) "0"
-                else (kotlin.math.round(totalSeconds * 10.0 / questions.size) / 10).toString()
+                if (questions.isEmpty()) {
+                    "0"
+                } else {
+                    (kotlin.math.round(totalSeconds * 10.0 / questions.size) / 10).toString()
+                }
             onResult(
                 command,
                 aiString(Res.string.ai_test_done, questions.size, modelId, average) + "\n\n" + report.toString(),
@@ -384,57 +431,56 @@ class LlamaAssistantService(
     override val compatQuestion: String
         get() = if (data.polish) "Co to jest zasięg LoRa?" else "What is LoRa range?"
 
-    override suspend fun dictationCheck(onStep: (String) -> Unit): String =
-        withContext(Dispatchers.IO) {
-            val pl = data.polish
-            fun t(polish: String, english: String) = if (pl) polish else english
-            val candidates = AiModels.forRole(AiRole.DICTATION)
-            val model =
-                candidates.firstOrNull { store.states.value[it.id] == TranslatorModelState.Ready }
-                    ?: candidates.minByOrNull { it.sizeMb }
-                    ?: return@withContext t(
-                        "Na tym systemie nie ma dyktowania.",
-                        "There is no dictation on this system.",
-                    )
-            try {
-                if (store.states.value[model.id] != TranslatorModelState.Ready) {
-                    onStep(
-                        t(
-                            "Pobieram najmniejszy model do dyktowania: ${model.name} (${model.sizeMb} MB)…",
-                            "Downloading the smallest dictation model: ${model.name} (${model.sizeMb} MB)…",
-                        )
-                    )
-                    store.download(model.id)
-                }
-                onStep(t("Sprawdzam dyktowanie…", "Checking dictation…"))
-                val started = System.currentTimeMillis()
-                val text = engine.transcribe(model.id, silentWav())
-                val took = System.currentTimeMillis() - started
-                t("Dyktowanie", "Dictation") +
-                    ": " +
-                    t("działa", "works") +
-                    "\n" +
-                    t("Model", "Model") +
-                    ": ${model.name} (${model.sizeMb} MB)\n" +
-                    t("Gdzie działa", "Where it runs") +
-                    ": ${engine.speechBackend.ifBlank { "?" }}\n" +
-                    t("Czas pierwszego uruchomienia", "Time of the first run") +
-                    ": $took ms\n" +
-                    t("Odpowiedź na ciszę", "Answer to silence") +
-                    ": \"${text.trim().take(80)}\""
-            } catch (e: kotlinx.coroutines.CancellationException) {
-                throw e
-            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-                t("Dyktowanie", "Dictation") +
-                    ": " +
-                    t("nie zadziałało", "failed") +
-                    "\n" +
-                    t("Model", "Model") +
-                    ": ${model.name}\n" +
-                    t("Powód", "Reason") +
-                    ": ${e.message.orEmpty().take(300)}"
+    override suspend fun dictationCheck(onStep: (String) -> Unit): String = withContext(Dispatchers.IO) {
+        val pl = data.polish
+        fun t(polish: String, english: String) = if (pl) polish else english
+        val candidates = AiModels.forRole(AiRole.DICTATION)
+        val model =
+            candidates.firstOrNull { store.states.value[it.id] == TranslatorModelState.Ready }
+                ?: candidates.minByOrNull { it.sizeMb }
+                ?: return@withContext t(
+                    "Na tym systemie nie ma dyktowania.",
+                    "There is no dictation on this system.",
+                )
+        try {
+            if (store.states.value[model.id] != TranslatorModelState.Ready) {
+                onStep(
+                    t(
+                        "Pobieram najmniejszy model do dyktowania: ${model.name} (${model.sizeMb} MB)…",
+                        "Downloading the smallest dictation model: ${model.name} (${model.sizeMb} MB)…",
+                    ),
+                )
+                store.download(model.id)
             }
+            onStep(t("Sprawdzam dyktowanie…", "Checking dictation…"))
+            val started = System.currentTimeMillis()
+            val text = engine.transcribe(model.id, silentWav())
+            val took = System.currentTimeMillis() - started
+            t("Dyktowanie", "Dictation") +
+                ": " +
+                t("działa", "works") +
+                "\n" +
+                t("Model", "Model") +
+                ": ${model.name} (${model.sizeMb} MB)\n" +
+                t("Gdzie działa", "Where it runs") +
+                ": ${engine.speechBackend.ifBlank { "?" }}\n" +
+                t("Czas pierwszego uruchomienia", "Time of the first run") +
+                ": $took ms\n" +
+                t("Odpowiedź na ciszę", "Answer to silence") +
+                ": \"${text.trim().take(80)}\""
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+            t("Dyktowanie", "Dictation") +
+                ": " +
+                t("nie zadziałało", "failed") +
+                "\n" +
+                t("Model", "Model") +
+                ": ${model.name}\n" +
+                t("Powód", "Reason") +
+                ": ${e.message.orEmpty().take(300)}"
         }
+    }
 
     /**
      * One second of silence as a WAV file (16 kHz, mono, 16 bit): enough to start the dictation program and see that it
@@ -471,14 +517,16 @@ class LlamaAssistantService(
     }
 
     /*  The model the translator's hardware report is about: the chosen translator model when it is on the device, else any that is, else NLLB. */
+
     /** The chip line is stored in English; in Polish its layer count is written in Polish ("36 z 36 warstw na NPU"). */
-    private fun localBackend(text: String, polish: Boolean): String =
-        if (!polish) text
-        else
-            text.replace(Regex("(\\d+) of (\\d+) layers on the (graphics card|NPU)")) { m ->
-                "${m.groupValues[1]} z ${m.groupValues[2]} warstw na " +
-                    if (m.groupValues[3] == "NPU") "NPU" else "karcie graficznej"
-            }
+    private fun localBackend(text: String, polish: Boolean): String = if (!polish) {
+        text
+    } else {
+        text.replace(Regex("(\\d+) of (\\d+) layers on the (graphics card|NPU)")) { m ->
+            "${m.groupValues[1]} z ${m.groupValues[2]} warstw na " +
+                if (m.groupValues[3] == "NPU") "NPU" else "karcie graficznej"
+        }
+    }
 
     private fun translatorReportModel(): String {
         val states = store.states.value
@@ -503,8 +551,8 @@ class LlamaAssistantService(
         val chosen = AiModels.byId(uiPrefs.translatorModelId.value)
         return if (
             chosen != null &&
-                chosen.engine == org.meshtastic.core.repository.AiEngine.LLAMA_CPP &&
-                store.states.value[chosen.id] == TranslatorModelState.Ready
+            chosen.engine == org.meshtastic.core.repository.AiEngine.LLAMA_CPP &&
+            store.states.value[chosen.id] == TranslatorModelState.Ready
         ) {
             chosen.id
         } else {
@@ -585,7 +633,8 @@ class LlamaAssistantService(
         onPiece: (String) -> Unit,
     ): String {
         // "And yesterday?" after a question about a period: the earlier question with the new period.
-        @Suppress("NAME_SHADOWING") val question = expandFollowUp(question, history)
+        @Suppress("NAME_SHADOWING")
+        val question = expandFollowUp(question, history)
         // The conversation as the model sees it ends with this one question.
         val turns = history.dropLast(1) + AssistantTurn(true, question)
         val flat = question.trim().lowercase()
@@ -609,8 +658,8 @@ class LlamaAssistantService(
         // model.
         if (
             SMALLTALK.containsMatchIn(flat) &&
-                flat.split(Regex("\\s+")).size <= SMALLTALK_WORDS &&
-                PURE_SMALLTALK.matches(flat)
+            flat.split(Regex("\\s+")).size <= SMALLTALK_WORDS &&
+            PURE_SMALLTALK.matches(flat)
         ) {
             // Only a greeting, "how are you" or thanks gets a fixed reply: the smallest models repeated the question
             // back.
@@ -654,12 +703,14 @@ class LlamaAssistantService(
         val intent =
             if (
                 routed != null &&
-                    routed.intent in COMMAND_INTENTS &&
-                    WHERE_QUESTION.containsMatchIn(question.trim().lowercase()) &&
-                    !OPEN_COMMAND.containsMatchIn(question.trim().lowercase())
-            )
+                routed.intent in COMMAND_INTENTS &&
+                WHERE_QUESTION.containsMatchIn(question.trim().lowercase()) &&
+                !OPEN_COMMAND.containsMatchIn(question.trim().lowercase())
+            ) {
                 routed.copy(intent = "app_help")
-            else routed
+            } else {
+                routed
+            }
         lastRoute = intent?.toString() ?: "router failed: old word rules used"
         return if (intent != null) {
             handle(intent, modelId, turns, question, polish, onPiece)
@@ -681,7 +732,7 @@ class LlamaAssistantService(
             val text = it.text.replace('\n', ' ').trim()
             lines +=
                 (if (it.fromUser) "User: " else "Assistant: ") +
-                    text.take(if (it.fromUser) DIGEST_USER_CHARS else DIGEST_ANSWER_CHARS)
+                text.take(if (it.fromUser) DIGEST_USER_CHARS else DIGEST_ANSWER_CHARS)
         }
         val lastUser = turns.lastOrNull { it.fromUser }?.text.orEmpty()
         if (extraUser.isNotBlank() && extraUser != lastUser) lines += "User: " + extraUser.take(DIGEST_USER_CHARS)
@@ -729,9 +780,14 @@ class LlamaAssistantService(
         return when {
             ask in COMMAND_INTENTS ->
                 if (asksWhy && !OPEN_COMMAND.containsMatchIn(q)) intent.copy(intent = "app_help") else intent
+
             ask in MESSAGE_INTENTS ->
-                if (MESSAGE_WORDS.containsMatchIn(q) && !asksWhy) intent
-                else intent.copy(intent = if (asksWhy) "app_help" else "web_question")
+                if (MESSAGE_WORDS.containsMatchIn(q) && !asksWhy) {
+                    intent
+                } else {
+                    intent.copy(intent = if (asksWhy) "app_help" else "web_question")
+                }
+
             ask in DATA_INTENTS -> {
                 val role =
                     ROLE_WORDS.containsMatchIn(q) && WHICH_WORDS.containsMatchIn(q) && !NEAR_FAR.containsMatchIn(q)
@@ -742,23 +798,29 @@ class LlamaAssistantService(
                     else -> intent
                 }
             }
+
             else -> intent
         }
     }
 
     /** The period and amount written in the question, in the router's words, or null when it names none. */
     private fun explicitPeriod(q: String): Pair<String, Int>? {
-        fun unit(word: String): String? =
-            when {
-                word.startsWith("min") -> "minutes"
-                word.startsWith("godz") || word.startsWith("hour") || word == "h" -> "hours"
-                word.startsWith("dni") || word.startsWith("dzie") || word.startsWith("dob") || word.startsWith("day") ->
-                    "days"
-                word.startsWith("tydz") || word.startsWith("tygod") || word.startsWith("week") -> "weeks"
-                word.startsWith("miesi") || word.startsWith("month") -> "months"
-                word.startsWith("lat") || word.startsWith("rok") || word.startsWith("year") -> "years"
-                else -> null
-            }
+        fun unit(word: String): String? = when {
+            word.startsWith("min") -> "minutes"
+
+            word.startsWith("godz") || word.startsWith("hour") || word == "h" -> "hours"
+
+            word.startsWith("dni") || word.startsWith("dzie") || word.startsWith("dob") || word.startsWith("day") ->
+                "days"
+
+            word.startsWith("tydz") || word.startsWith("tygod") || word.startsWith("week") -> "weeks"
+
+            word.startsWith("miesi") || word.startsWith("month") -> "months"
+
+            word.startsWith("lat") || word.startsWith("rok") || word.startsWith("year") -> "years"
+
+            else -> null
+        }
         PERIOD_NUMBER.find(q)?.let { m ->
             val amount = m.groupValues[1].toIntOrNull()?.takeIf { it > 0 } ?: return@let
             unit(m.groupValues[2])?.let {
@@ -787,8 +849,11 @@ class LlamaAssistantService(
         if (intent.node.isNotBlank() || lastNode.isBlank()) return intent
         val aboutOneNode =
             intent.intent in NODE_INTENTS || (intent.intent == "network_question" && intent.topic in setOf("node", ""))
-        return if (aboutOneNode && POINTS_AT_NODE.containsMatchIn(question.lowercase())) intent.copy(node = lastNode)
-        else intent
+        return if (aboutOneNode && POINTS_AT_NODE.containsMatchIn(question.lowercase())) {
+            intent.copy(node = lastNode)
+        } else {
+            intent
+        }
     }
 
     /** The two questions of a question like "how many nodes ... and how do I ...", or null for a single question. */
@@ -798,9 +863,11 @@ class LlamaAssistantService(
         val second = question.substring(m.range.first).replaceFirst(JOINER, "").trim()
         // "What is SNR and what values are good?": the second half is about the same thing, so it is one question.
         if (DEFINITION_ASK.containsMatchIn(first) && DEFINITION_FOLLOW.containsMatchIn(second)) return null
-        return if (first.length >= MIN_PART && second.length >= MIN_PART)
+        return if (first.length >= MIN_PART && second.length >= MIN_PART) {
             first to second.replaceFirstChar { it.uppercase() }
-        else null
+        } else {
+            null
+        }
     }
 
     /** Does what [intent] asks: code for exact things and for going somewhere, the model for words. */
@@ -818,23 +885,27 @@ class LlamaAssistantService(
         // preset.
         val lower = question.lowercase()
         // "Translate into German: ...": a plain translation by the model, not a search of the app's data.
-        if (TRANSLATE_ASK.containsMatchIn(lower))
+        if (TRANSLATE_ASK.containsMatchIn(lower)) {
             return speak(modelId, history, polish, onPiece, roomFor(modelId), extra = "")
+        }
         // The assistant knows no passwords.
         if (PASSWORD_ASK.containsMatchIn(lower)) {
-            return (if (polish)
+            return (
+                if (polish) {
                     "Nie znam i nie przechowuję żadnych haseł, także do Wi-Fi. Hasło do swojej sieci Wi-Fi znajdziesz na routerze albo w ustawieniach telefonu."
-                else
-                    "I do not know or store any passwords, Wi-Fi ones included. Your Wi-Fi password is on your router or in your phone settings.")
+                } else {
+                    "I do not know or store any passwords, Wi-Fi ones included. Your Wi-Fi password is on your router or in your phone settings."
+                }
+                )
                 .also(onPiece)
         }
         // "What is the ROUTER_LATE role": described by the app from the documentation, word for word, whichever model
         // is chosen.
         if (
             ROLE_DEF.containsMatchIn(lower) &&
-                !CHANGE_ASK.containsMatchIn(lower) &&
-                (!data.mentionsNode(lower) || ROLE_WORD.containsMatchIn(lower)) &&
-                intent.intent !in setOf("open_screen", "show_setting", "draft_message")
+            !CHANGE_ASK.containsMatchIn(lower) &&
+            (!data.mentionsNode(lower) || ROLE_WORD.containsMatchIn(lower)) &&
+            intent.intent !in setOf("open_screen", "show_setting", "draft_message")
         ) {
             val name = ROLE_DEF_NAME.find(question)?.value?.uppercase()
             val info = name?.let { (if (polish) ROLE_INFO_PL else ROLE_INFO_EN)[it] }
@@ -842,8 +913,11 @@ class LlamaAssistantService(
                 lastRoute = "role description"
                 return "$name: $info\n\n"
                     .plus(
-                        if (polish) "Źródło: Baza wiedzy: Role urządzenia i retransmisja"
-                        else "Source: Knowledge base: device roles and rebroadcast"
+                        if (polish) {
+                            "Źródło: Baza wiedzy: Role urządzenia i retransmisja"
+                        } else {
+                            "Source: Knowledge base: device roles and rebroadcast"
+                        },
                     )
                     .also(onPiece)
             }
@@ -860,8 +934,8 @@ class LlamaAssistantService(
         // explanation from the base.
         if (
             KB_FIRST.containsMatchIn(lower) &&
-                !data.mentionsNode(lower) &&
-                intent.intent in setOf("app_help", "web_question", "chat", "show_setting")
+            !data.mentionsNode(lower) &&
+            intent.intent in setOf("app_help", "web_question", "chat", "show_setting")
         ) {
             fromBase(modelId, history, question, intent.text, polish, answerLang, onPiece, roomFor(modelId))?.let {
                 return it
@@ -876,9 +950,9 @@ class LlamaAssistantService(
         // neighbour icon.
         if (
             NEIGHBOUR_RANK.containsMatchIn(lower) &&
-                !data.mentionsNode(lower) &&
-                !CHANGE_ASK.containsMatchIn(lower) &&
-                !ICON_OFF.containsMatchIn(lower)
+            !data.mentionsNode(lower) &&
+            !CHANGE_ASK.containsMatchIn(lower) &&
+            !ICON_OFF.containsMatchIn(lower)
         ) {
             lastRoute = "neighbour ranking"
             return data.toolNeighbors("", LIST_SHOWN, rankByCount = true).also(onPiece)
@@ -886,8 +960,11 @@ class LlamaAssistantService(
         // "Why does a message say undelivered": a question for the knowledge base, not the app's status page.
         if (intent.intent == "app_status" && WHY_ASK.containsMatchIn(lower)) {
             return fromBase(modelId, history, question, intent.text, polish, answerLang, onPiece, roomFor(modelId))
-                ?: if (smallModel(modelId)) notInBase(polish).also(onPiece)
-                else speak(modelId, history, polish, onPiece, roomFor(modelId), extra = "")
+                ?: if (smallModel(modelId)) {
+                    notInBase(polish).also(onPiece)
+                } else {
+                    speak(modelId, history, polish, onPiece, roomFor(modelId), extra = "")
+                }
         }
         if (SETUP_WORDS.containsMatchIn(lower) && OUR_NETWORK_WORDS.containsMatchIn(lower)) {
             guideTools.show_setting("preset")
@@ -898,15 +975,16 @@ class LlamaAssistantService(
         // position first, else the phone's), worked out in code; a button leads to the setting.
         if (
             REGION_WORD.containsMatchIn(lower) &&
-                REGION_ASK.containsMatchIn(lower) &&
-                !GENERAL_QUESTION.containsMatchIn(lower) &&
-                !OWN_CONFIG_ASK.containsMatchIn(lower) &&
-                !SET_COMMAND.containsMatchIn(lower)
+            REGION_ASK.containsMatchIn(lower) &&
+            !GENERAL_QUESTION.containsMatchIn(lower) &&
+            !OWN_CONFIG_ASK.containsMatchIn(lower) &&
+            !SET_COMMAND.containsMatchIn(lower)
         ) {
             guideTools.show_setting("region")
             return data.regionAdvice().also(onPiece)
         }
         val nodeNum = data.resolveNodeNum(intent.node, question)
+
         // The time the user wrote ("24 godziny") wins over the router's guess: small models mixed up hours and days.
         @Suppress("NAME_SHADOWING")
         val intent =
@@ -922,9 +1000,9 @@ class LlamaAssistantService(
         // "Do I have range to X": answered from what the radio heard, with a button to the link planner.
         if (
             nodeNum != null &&
-                REACH_ASK.containsMatchIn(lower) &&
-                !OPEN_COMMAND.containsMatchIn(lower) &&
-                data.mentionsNode(lower)
+            REACH_ASK.containsMatchIn(lower) &&
+            !OPEN_COMMAND.containsMatchIn(lower) &&
+            data.mentionsNode(lower)
         ) {
             collector.add(AssistantAction(data.plannerLabel(nodeNum), "$DEEP_LINK_BASE_URI/map/planner/$nodeNum"))
             return data.reachReport(nodeNum).also(onPiece)
@@ -932,30 +1010,30 @@ class LlamaAssistantService(
         // "Which node is farthest from X": counted from that node, not from the user's radio.
         if (
             nodeNum != null &&
-                NEAR_FAR.containsMatchIn(lower) &&
-                FROM_NODE.containsMatchIn(lower) &&
-                data.mentionsNode(lower)
+            NEAR_FAR.containsMatchIn(lower) &&
+            FROM_NODE.containsMatchIn(lower) &&
+            data.mentionsNode(lower)
         ) {
             return data.distancesFrom(nodeNum, FARTHEST_WORDS.containsMatchIn(lower), role).also(onPiece)
         }
         // "Which nodes are routers": the nodes with that role, not a ranking by signal.
         if (
             role.isNotBlank() &&
-                ROLE_WORDS.containsMatchIn(lower) &&
-                WHICH_WORDS.containsMatchIn(lower) &&
-                !NEAR_FAR.containsMatchIn(lower) &&
-                intent.intent in ROLE_LIST_INTENTS &&
-                !asksHow(lower)
+            ROLE_WORDS.containsMatchIn(lower) &&
+            WHICH_WORDS.containsMatchIn(lower) &&
+            !NEAR_FAR.containsMatchIn(lower) &&
+            intent.intent in ROLE_LIST_INTENTS &&
+            !asksHow(lower)
         ) {
             return data.nodesByRole(role).also(onPiece)
         }
         // RSSI or SNR of a named node comes from the app's own numbers, never from the model.
         if (
             nodeNum != null &&
-                SIGNAL_NODE_ASK.containsMatchIn(lower) &&
-                data.mentionsNode(lower) &&
-                intent.intent in DATA_ASK_INTENTS &&
-                !DEFINE_ASK.containsMatchIn(lower)
+            SIGNAL_NODE_ASK.containsMatchIn(lower) &&
+            data.mentionsNode(lower) &&
+            intent.intent in DATA_ASK_INTENTS &&
+            !DEFINE_ASK.containsMatchIn(lower)
         ) {
             return data.nodeSignal(nodeNum).also(onPiece)
         }
@@ -966,37 +1044,46 @@ class LlamaAssistantService(
         // The app has no weather forecast: it says so, and offers what the nodes' sensors measure right now.
         if (
             FORECAST_ASK.containsMatchIn(lower) &&
-                intent.intent in setOf("weather", "web_question", "chat", "network_question")
+            intent.intent in setOf("weather", "web_question", "chat", "network_question")
         ) {
             val note =
-                if (polish)
+                if (polish) {
                     "Nie znam prognozy pogody, bo asystent działa bez internetu. Mogę pokazać tylko to, co teraz mierzą czujniki węzłów:"
-                else
+                } else {
                     "I have no weather forecast, because the assistant works offline. I can only show what the nodes' sensors measure now:"
+                }
             return (note + "\n\n" + data.sensorReport()).also(onPiece)
         }
         // "Can you send a message for me": never; the assistant only prepares a draft.
         if (SEND_ASK.containsMatchIn(lower) && !data.mentionsNode(lower)) {
-            return (if (polish)
+            return (
+                if (polish) {
                     "Nie wysyłam wiadomości sam. Mogę przygotować treść w oknie rozmowy, a Ty ją sprawdzasz i wysyłasz."
-                else
-                    "I never send messages myself. I can write the text in the conversation box, and you check it and send it.")
+                } else {
+                    "I never send messages myself. I can write the text in the conversation box, and you check it and send it."
+                }
+                )
                 .also(onPiece)
         }
         // "Can you speak English": yes, in the language the question is written in.
         if (LANG_ASK.containsMatchIn(lower)) {
-            return (if (polish) "Tak. Odpowiadam w języku, w którym piszesz: po polsku albo po angielsku."
-                else "Yes. I answer in the language you write in: Polish or English.")
+            return (
+                if (polish) {
+                    "Tak. Odpowiadam w języku, w którym piszesz: po polsku albo po angielsku."
+                } else {
+                    "Yes. I answer in the language you write in: Polish or English."
+                }
+                )
                 .also(onPiece)
         }
         // "What preset / role do I have set", "how many channels do I have": read from the radio's settings, whichever
         // intent the model chose.
         if (
             OWN_CONFIG_ASK.containsMatchIn(lower) &&
-                !data.mentionsNode(lower) &&
-                !Regex("wiadomo|message|pisa|węz|wezl|node|pakiet").containsMatchIn(lower) &&
-                intent.intent !in
-                    setOf("open_screen", "show_setting", "draft_message", "count_messages", "search_messages")
+            !data.mentionsNode(lower) &&
+            !Regex("wiadomo|message|pisa|węz|wezl|node|pakiet").containsMatchIn(lower) &&
+            intent.intent !in
+            setOf("open_screen", "show_setting", "draft_message", "count_messages", "search_messages")
         ) {
             val kind =
                 when {
@@ -1013,25 +1100,28 @@ class LlamaAssistantService(
         // "Which battery is best": advice for the knowledge base, not a ranking of the nodes' battery levels.
         if (
             BATTERY_TYPE_ASK.containsMatchIn(lower) &&
-                !data.mentionsNode(lower) &&
-                intent.intent in setOf("network_question", "list_nodes", "signal_list", "chat", "web_question")
+            !data.mentionsNode(lower) &&
+            intent.intent in setOf("network_question", "list_nodes", "signal_list", "chat", "web_question")
         ) {
             return fromBase(modelId, history, question, intent.text, polish, answerLang, onPiece, roomFor(modelId))
-                ?: if (smallModel(modelId)) notInBase(polish).also(onPiece)
-                else speak(modelId, history, polish, onPiece, roomFor(modelId), extra = "")
+                ?: if (smallModel(modelId)) {
+                    notInBase(polish).also(onPiece)
+                } else {
+                    speak(modelId, history, polish, onPiece, roomFor(modelId), extra = "")
+                }
         }
         if (
             SHOW_POWER_SETTING.containsMatchIn(lower) &&
-                intent.intent in setOf("show_setting", "app_help", "open_screen") &&
-                !TX_POWER_ASK.containsMatchIn(lower)
+            intent.intent in setOf("show_setting", "app_help", "open_screen") &&
+            !TX_POWER_ASK.containsMatchIn(lower)
         ) {
             return exact(goToPlace(if (polish) "Moc nadawania" else "Transmit power", question, settingFirst = true))!!
         }
         // "Set the power to 20 dBm": the assistant never changes settings; the setting opens and the user changes it.
         if (
             SET_COMMAND.containsMatchIn(lower) &&
-                intent.intent in setOf("app_help", "chat", "web_question") &&
-                !data.mentionsNode(lower)
+            intent.intent in setOf("app_help", "chat", "web_question") &&
+            !data.mentionsNode(lower)
         ) {
             return exact(goToPlace(intent.text, question, settingFirst = true))!!
         }
@@ -1039,12 +1129,12 @@ class LlamaAssistantService(
         // intent the model chose.
         if (
             nodeNum != null &&
-                NODE_FACTS_ASK.containsMatchIn(lower) &&
-                data.mentionsNode(lower) &&
-                !MANY_WORDS.containsMatchIn(lower) &&
-                !NEAR_FAR.containsMatchIn(lower) &&
-                !UPTIME_WORDS.containsMatchIn(lower) &&
-                !SIGNAL_NODE_ASK.containsMatchIn(lower)
+            NODE_FACTS_ASK.containsMatchIn(lower) &&
+            data.mentionsNode(lower) &&
+            !MANY_WORDS.containsMatchIn(lower) &&
+            !NEAR_FAR.containsMatchIn(lower) &&
+            !UPTIME_WORDS.containsMatchIn(lower) &&
+            !SIGNAL_NODE_ASK.containsMatchIn(lower)
         ) {
             data.nodeFacts(nodeNum)?.let {
                 return it.also(onPiece)
@@ -1056,26 +1146,28 @@ class LlamaAssistantService(
         }
         // "Is X online", "what powers X": read from what the node reported, whichever intent the small model chose.
         if (nodeNum != null && data.mentionsNode(lower) && !WHICH_WORDS.containsMatchIn(lower)) {
-            if (POWERED_ASK.containsMatchIn(lower) || BATTERY_LEVEL_ASK.containsMatchIn(lower))
+            if (POWERED_ASK.containsMatchIn(lower) || BATTERY_LEVEL_ASK.containsMatchIn(lower)) {
                 return data.nodeBattery(nodeNum).also(onPiece)
-            if (ONLINE_ASK.containsMatchIn(lower) && intent.intent !in setOf("open_screen", "show_setting"))
+            }
+            if (ONLINE_ASK.containsMatchIn(lower) && intent.intent !in setOf("open_screen", "show_setting")) {
                 data.nodeFacts(nodeNum)?.let {
                     return it.also(onPiece)
                 }
+            }
         }
         // "Open the node list": a command whichever intent the small model chose (it described steps it made up).
         if (
             OPEN_ONLY.containsMatchIn(lower) &&
-                intent.intent in setOf("web_question", "chat", "messages_to_me") &&
-                !data.mentionsNode(lower)
+            intent.intent in setOf("web_question", "chat", "messages_to_me") &&
+            !data.mentionsNode(lower)
         ) {
             return exact(goToPlace("", question, settingFirst = false))!!
         }
         // "Who wrote to me": the private messages to the user, not a search of every message.
         if (
             TO_ME_ASK.containsMatchIn(lower) &&
-                intent.intent in DATA_ASK_INTENTS + MESSAGE_ASK_INTENTS + "search_messages" &&
-                !ABOUT_TOPIC.containsMatchIn(lower)
+            intent.intent in DATA_ASK_INTENTS + MESSAGE_ASK_INTENTS + "search_messages" &&
+            !ABOUT_TOPIC.containsMatchIn(lower)
         ) {
             return data.recentToMe(LIST_SHOWN).also(onPiece)
         }
@@ -1086,20 +1178,24 @@ class LlamaAssistantService(
         // "Go to node X": the node opens on the map, whichever intent the model chose.
         if (
             nodeNum != null &&
-                OPEN_NODE.containsMatchIn(lower) &&
-                data.mentionsNode(lower) &&
-                !Regex("plan|łącz|lacz|link").containsMatchIn(lower)
+            OPEN_NODE.containsMatchIn(lower) &&
+            data.mentionsNode(lower) &&
+            !Regex("plan|łącz|lacz|link").containsMatchIn(lower)
         ) {
             return exact(goToNode(nodeNum, intent.node, planner = false))!!
         }
         // "A short report on the network": the app's own overview, not a story by the model.
         if (
             NETWORK_REPORT.containsMatchIn(lower) &&
-                !data.mentionsNode(lower) &&
-                (intent.intent in DATA_ASK_INTENTS - "nearest_node" ||
-                    (LOOKS_LIKE.containsMatchIn(lower) &&
-                        intent.intent in setOf("app_help", "chat", "web_question"))) &&
-                (!HOW_TO.containsMatchIn(lower) || LOOKS_LIKE.containsMatchIn(lower))
+            !data.mentionsNode(lower) &&
+            (
+                intent.intent in DATA_ASK_INTENTS - "nearest_node" ||
+                    (
+                        LOOKS_LIKE.containsMatchIn(lower) &&
+                            intent.intent in setOf("app_help", "chat", "web_question")
+                        )
+                ) &&
+            (!HOW_TO.containsMatchIn(lower) || LOOKS_LIKE.containsMatchIn(lower))
         ) {
             return data.networkOverview().also(onPiece)
         }
@@ -1111,7 +1207,7 @@ class LlamaAssistantService(
         if (!data.mentionsNode(lower)) {
             if (
                 intent.intent in setOf("show_node_on_map", "open_screen", "show_setting") &&
-                    NEAR_FAR.containsMatchIn(lower)
+                NEAR_FAR.containsMatchIn(lower)
             ) {
                 return exact(goToNearest(role, FARTHEST_WORDS.containsMatchIn(lower)))!!
             }
@@ -1131,18 +1227,19 @@ class LlamaAssistantService(
             }
             if (
                 OWN_AIR.containsMatchIn(lower) &&
-                    !WHICH_WORDS.containsMatchIn(lower) &&
-                    !HOW_TO.containsMatchIn(question) &&
-                    intent.intent in DATA_ASK_INTENTS
-            )
+                !WHICH_WORDS.containsMatchIn(lower) &&
+                !HOW_TO.containsMatchIn(question) &&
+                intent.intent in DATA_ASK_INTENTS
+            ) {
                 return data.radioStats().also(onPiece)
+            }
             if (
                 HOW_MANY.containsMatchIn(lower) &&
-                    ROLE_WORDS.containsMatchIn(lower) &&
-                    !NEAR_FAR.containsMatchIn(lower) &&
-                    intent.intent in DATA_ASK_INTENTS &&
-                    !asksHow(lower) &&
-                    !Regex("kosztuj|cena|price|cost").containsMatchIn(lower)
+                ROLE_WORDS.containsMatchIn(lower) &&
+                !NEAR_FAR.containsMatchIn(lower) &&
+                intent.intent in DATA_ASK_INTENTS &&
+                !asksHow(lower) &&
+                !Regex("kosztuj|cena|price|cost").containsMatchIn(lower)
             ) {
                 val roleKey =
                     when {
@@ -1155,18 +1252,21 @@ class LlamaAssistantService(
             }
             if (
                 INACTIVE_ASK.containsMatchIn(lower) &&
-                    intent.intent in DATA_ASK_INTENTS &&
-                    !HOW_TO.containsMatchIn(lower)
-            )
+                intent.intent in DATA_ASK_INTENTS &&
+                !HOW_TO.containsMatchIn(lower)
+            ) {
                 return data.silentNodes().also(onPiece)
+            }
             if (
                 PACKET_STATS_ASK.containsMatchIn(lower) &&
-                    !HOW_TO.containsMatchIn(question) &&
-                    intent.intent in DATA_ASK_INTENTS
-            )
+                !HOW_TO.containsMatchIn(question) &&
+                intent.intent in DATA_ASK_INTENTS
+            ) {
                 return data.radioStats().also(onPiece)
-            if (POWERED_ASK.containsMatchIn(lower) && intent.intent in DATA_ASK_INTENTS)
+            }
+            if (POWERED_ASK.containsMatchIn(lower) && intent.intent in DATA_ASK_INTENTS) {
                 return data.nodeBattery(null).also(onPiece)
+            }
             BATTERY_LIMIT.find(lower)
                 ?.takeIf {
                     Regex("bateri|battery|naładow|nalado").containsMatchIn(lower) && intent.intent in DATA_ASK_INTENTS
@@ -1176,16 +1276,16 @@ class LlamaAssistantService(
                 }
             if (
                 GPS_ASK.containsMatchIn(lower) &&
-                    WHICH_WORDS.containsMatchIn(lower) &&
-                    intent.intent in DATA_ASK_INTENTS
+                WHICH_WORDS.containsMatchIn(lower) &&
+                intent.intent in DATA_ASK_INTENTS
             ) {
                 return data.toolFindNodes(0, "", 0, 0, 1, SEARCH_SHOWN).also(onPiece)
             }
             if (
                 UPTIME_WORDS.containsMatchIn(lower) &&
-                    OWN_WORDS.containsMatchIn(lower) &&
-                    !WHICH_WORDS.containsMatchIn(lower) &&
-                    intent.intent in DATA_ASK_INTENTS
+                OWN_WORDS.containsMatchIn(lower) &&
+                !WHICH_WORDS.containsMatchIn(lower) &&
+                intent.intent in DATA_ASK_INTENTS
             ) {
                 data.nodeUptime(null)?.let {
                     return it.also(onPiece)
@@ -1193,9 +1293,9 @@ class LlamaAssistantService(
             }
             if (
                 FAVORITES_ASK.containsMatchIn(lower) &&
-                    intent.intent in DATA_ASK_INTENTS &&
-                    !CHANGE_ASK.containsMatchIn(lower) &&
-                    !FAVORITES_EDIT.containsMatchIn(lower)
+                intent.intent in DATA_ASK_INTENTS &&
+                !CHANGE_ASK.containsMatchIn(lower) &&
+                !FAVORITES_EDIT.containsMatchIn(lower)
             ) {
                 return data.findNodesFor("all", 0, false, true).also(onPiece)
             }
@@ -1204,10 +1304,10 @@ class LlamaAssistantService(
         // model chose.
         if (
             !data.mentionsNode(lower) &&
-                !BATTERY_TYPE_ASK.containsMatchIn(lower) &&
-                intent.intent in DATA_ASK_INTENTS - "nearest_node" &&
-                (WHICH_WORDS.containsMatchIn(lower) || MANY_WORDS.containsMatchIn(lower)) &&
-                !asksHow(lower)
+            !BATTERY_TYPE_ASK.containsMatchIn(lower) &&
+            intent.intent in DATA_ASK_INTENTS - "nearest_node" &&
+            (WHICH_WORDS.containsMatchIn(lower) || MANY_WORDS.containsMatchIn(lower)) &&
+            !asksHow(lower)
         ) {
             data.metricAnswer(question)?.let {
                 return it.also(onPiece)
@@ -1233,13 +1333,15 @@ class LlamaAssistantService(
                         else -> "days" to 1
                     }
                 val text =
-                    if (MOST_WRITTEN.containsMatchIn(lower))
+                    if (MOST_WRITTEN.containsMatchIn(lower)) {
                         data.countMessagesFor(
                             intent.channel.ifBlank { CHANNEL_NAMED.find(question)?.groupValues?.get(1).orEmpty() },
                             period,
                             amount,
                         )
-                    else data.toolMessages("", SEARCH_SHOWN, "")
+                    } else {
+                        data.toolMessages("", SEARCH_SHOWN, "")
+                    }
                 return text.also(onPiece)
             }
         }
@@ -1247,14 +1349,15 @@ class LlamaAssistantService(
         // chose.
         if (
             intent.intent in MESSAGE_ASK_INTENTS + setOf("open_screen", "show_setting", "signal_list") &&
-                !data.mentionsNode(lower)
+            !data.mentionsNode(lower)
         ) {
-            if (NODE_COUNT_ASK.containsMatchIn(lower) && !ROLE_WORDS.containsMatchIn(lower))
+            if (NODE_COUNT_ASK.containsMatchIn(lower) && !ROLE_WORDS.containsMatchIn(lower)) {
                 return data.networkCount().also(onPiece)
+            }
             if (
                 (ROLE_LIST_ASK.containsMatchIn(lower) || HOW_MANY.containsMatchIn(lower)) &&
-                    ROLE_WORDS.containsMatchIn(lower) &&
-                    !NEAR_FAR.containsMatchIn(lower)
+                ROLE_WORDS.containsMatchIn(lower) &&
+                !NEAR_FAR.containsMatchIn(lower)
             ) {
                 val roleKey =
                     when {
@@ -1270,11 +1373,11 @@ class LlamaAssistantService(
         // node's report.
         if (
             UPTIME_WORDS.containsMatchIn(lower) &&
-                !MANY_WORDS.containsMatchIn(lower) &&
-                !NEAR_FAR.containsMatchIn(lower) &&
-                !WHICH_WORDS.containsMatchIn(lower) &&
-                nodeNum != null &&
-                data.mentionsNode(lower)
+            !MANY_WORDS.containsMatchIn(lower) &&
+            !NEAR_FAR.containsMatchIn(lower) &&
+            !WHICH_WORDS.containsMatchIn(lower) &&
+            nodeNum != null &&
+            data.mentionsNode(lower)
         ) {
             data.nodeUptime(nodeNum)?.let {
                 return it.also(onPiece)
@@ -1284,9 +1387,9 @@ class LlamaAssistantService(
         // chose.
         if (
             TX_POWER_ASK.containsMatchIn(lower) &&
-                !CALC_WORDS.containsMatchIn(lower) &&
-                !CHANGE_ASK.containsMatchIn(lower) &&
-                !Regex("ustaw (mi |na )|zmień|zmien|set my|change").containsMatchIn(lower)
+            !CALC_WORDS.containsMatchIn(lower) &&
+            !CHANGE_ASK.containsMatchIn(lower) &&
+            !Regex("ustaw (mi |na )|zmień|zmien|set my|change").containsMatchIn(lower)
         ) {
             return data.txPowerText().also(onPiece)
         }
@@ -1294,9 +1397,11 @@ class LlamaAssistantService(
         // guessed.
         if (
             intent.intent != "draft_message" &&
-                !(DEFINITION_ASK.containsMatchIn(question) &&
+            !(
+                DEFINITION_ASK.containsMatchIn(question) &&
                     question.none { it.isDigit() } &&
-                    !PRESET_NAME.containsMatchIn(question))
+                    !PRESET_NAME.containsMatchIn(question)
+                )
         ) {
             val defaults = data.calcDefaults()
             AssistantCalculators.answer(question, polish, defaults)?.let { text ->
@@ -1313,13 +1418,15 @@ class LlamaAssistantService(
         // "My range is weak, what should I check": the user's own radio is checked in code, with a button to Mesh Link
         // Planer.
         if (
-            (intent.intent in ADVICE_INTENTS ||
-                intent.intent in setOf("open_link_planner", "show_setting", "open_screen", "app_help")) &&
-                RANGE_PROBLEM.containsMatchIn(lower) &&
-                RANGE_TOPIC.containsMatchIn(lower) &&
-                !ANTENNA_TOPIC.containsMatchIn(lower) &&
-                OWN_RANGE.containsMatchIn(lower) &&
-                (!GENERAL_WHY.containsMatchIn(lower) || OWN_WORDS_RANGE.containsMatchIn(lower))
+            (
+                intent.intent in ADVICE_INTENTS ||
+                    intent.intent in setOf("open_link_planner", "show_setting", "open_screen", "app_help")
+                ) &&
+            RANGE_PROBLEM.containsMatchIn(lower) &&
+            RANGE_TOPIC.containsMatchIn(lower) &&
+            !ANTENNA_TOPIC.containsMatchIn(lower) &&
+            OWN_RANGE.containsMatchIn(lower) &&
+            (!GENERAL_WHY.containsMatchIn(lower) || OWN_WORDS_RANGE.containsMatchIn(lower))
         ) {
             guideTools.open_link_planner("me")
             return data.rangeCheck().also(onPiece)
@@ -1328,50 +1435,65 @@ class LlamaAssistantService(
         // heard in that time.
         if (
             NEW_NODES_ASK.containsMatchIn(lower) &&
-                intent.intent in setOf("list_nodes", "chat", "network_question", "signal_list")
+            intent.intent in setOf("list_nodes", "chat", "network_question", "signal_list")
         ) {
             val (period, amount) = explicitPeriod(lower) ?: ("days" to 1)
             val note =
-                if (polish)
+                if (polish) {
                     "Aplikacja nie zapisuje, kiedy węzeł pojawił się po raz pierwszy, więc nie odróżnię nowych od starych. Poniżej węzły słyszane w tym czasie."
-                else
+                } else {
                     "The app does not record when a node first appeared, so I cannot tell new nodes from old ones. Below are the nodes heard in that time."
+                }
             return (note + "\n\n" + data.findNodesFor(period, amount, false, false)).also(onPiece)
         }
         val answer: String? =
             when (intent.intent) {
                 "show_node_on_map" -> exact(goToNode(nodeNum, intent.node, planner = false))
+
                 "open_link_planner" ->
                     exact(
                         goToNode(
-                            if (!data.mentionsNode(lower)) data.resolveNodeNum("me", "")
-                            else (data.resolveNodeNum("", question) ?: nodeNum),
+                            if (!data.mentionsNode(lower)) {
+                                data.resolveNodeNum("me", "")
+                            } else {
+                                (data.resolveNodeNum("", question) ?: nodeNum)
+                            },
                             "",
                             planner = true,
-                        )
+                        ),
                     )
+
                 "nearest_node" -> exact(goToNearest(role, intent.metric == "farthest"))
+
                 "open_screen" -> exact(goToPlace(intent.text, question, settingFirst = false))
+
                 "show_setting" -> exact(goToPlace(intent.text, question, settingFirst = true))
+
                 "draft_message" -> {
                     // The words the user wrote are the message; a small model made up its own text (or changed a word).
                     val own = draftText(question)
                     if (own == null && smallModel(modelId)) {
                         exact(
-                            if (polish)
+                            if (polish) {
                                 "Podaj treść wiadomości, np. „Napisz na kanale MT_SW, że jestem na miejscu”. Nie wymyślam treści za Ciebie."
-                            else
+                            } else {
                                 "Give me the text of the message, for example \"Write on channel MT_SW that I am on site\". I do not make up the text for you."
+                            },
                         )
                     } else {
                         exact(draft(intent.channel.ifBlank { intent.node }, own ?: intent.text))
                     }
                 }
+
                 "count_messages" ->
                     exact(
-                        if (intent.metric == "per_channel") data.channelReport()
-                        else data.countMessagesFor(intent.channel, intent.period, intent.amount)
+                        if (intent.metric == "per_channel") {
+                            data.channelReport()
+                        } else {
+                            data.countMessagesFor(intent.channel, intent.period, intent.amount)
+                        },
                     )
+
                 "search_messages" ->
                     // "messages from X": the sender is filtered, the name is not looked for in the texts.
                     if (nodeNum != null && FROM_NODE.containsMatchIn(lower) && data.mentionsNode(lower)) {
@@ -1381,13 +1503,14 @@ class LlamaAssistantService(
                                 SEARCH_SHOWN,
                                 intent.channel,
                                 senderNum = nodeNum,
-                            )
+                            ),
                         )
                     } else {
                         intent.text
                             .takeIf { it.isNotBlank() }
                             ?.let { exact(data.toolMessages(it, SEARCH_SHOWN, intent.channel)) }
                     }
+
                 "list_nodes" ->
                     exact(
                         if (intent.period.isBlank() || intent.period == "none") {
@@ -1405,8 +1528,9 @@ class LlamaAssistantService(
                                 intent.metric == "battery",
                                 intent.metric == "favorites",
                             )
-                        }
+                        },
                     )
+
                 "signal_list" ->
                     // A question about one named node is about that node's signal, not about the whole list.
                     if (nodeNum != null && intent.node.isNotBlank()) {
@@ -1414,26 +1538,36 @@ class LlamaAssistantService(
                     } else {
                         val metric =
                             intent.metric.takeIf { it == "nearest" || it == "farthest" }
-                                ?: if (FARTHEST_WORDS.containsMatchIn(lower)) "farthest"
-                                else if (NEAREST_WORDS.containsMatchIn(lower)) "nearest" else intent.metric
+                                ?: if (FARTHEST_WORDS.containsMatchIn(lower)) {
+                                    "farthest"
+                                } else if (NEAREST_WORDS.containsMatchIn(lower)) {
+                                    "nearest"
+                                } else {
+                                    intent.metric
+                                }
                         if (metric == "nearest" || metric == "farthest") addNearestButton(role, metric == "farthest")
                         exact(data.signalListFor(role, metric))
                     }
+
                 "traceroute" -> exact(routeOrUnknown(intent, nodeNum) { data.toolTraceroutes(it, LIST_SHOWN) })
+
                 "neighbors" ->
                     exact(
                         routeOrUnknown(intent, nodeNum) {
                             data.toolNeighbors(it, LIST_SHOWN, ownOnly = HOW_MANY_NEIGH.containsMatchIn(lower))
-                        }
+                        },
                     )
+
                 "network_question" ->
                     when {
                         // "What power do I have set" asks for a setting, not for the statistics of the radio.
                         intent.topic == "radio" && !SETTING_ASK.containsMatchIn(lower) -> exact(data.radioStats())
+
                         // "What power do I have set": the number and its unit come from the radio's settings, not from
                         // the model.
                         TX_POWER_ASK.containsMatchIn(lower) && !CALC_WORDS.containsMatchIn(lower) ->
                             exact(data.txPowerText())
+
                         // The uptime of one named node (or of the user's own) is read from its report, never retold by
                         // the model.
                         (intent.metric == "uptime" || UPTIME_WORDS.containsMatchIn(lower)) &&
@@ -1441,21 +1575,30 @@ class LlamaAssistantService(
                             (nodeNum != null && (data.mentionsNode(lower) || intent.node.isNotBlank())) &&
                             !NEAR_FAR.containsMatchIn(lower) &&
                             !WHICH_WORDS.containsMatchIn(lower) -> data.nodeUptime(nodeNum)?.let { exact(it) }
+
                         // A summary of the whole network is counted by the app (the model mixed up the numbers).
                         intent.topic == "overview" && !NOT_OVERVIEW.containsMatchIn(lower) ->
                             exact(data.networkOverview())
+
                         // Battery questions are answered from the node's own reading, never retold by the model.
                         (intent.metric == "battery" || BATTERY_WORDS.containsMatchIn(question.lowercase())) &&
                             intent.topic != "ranking" &&
                             !MANY_WORDS.containsMatchIn(question.lowercase()) -> exact(data.nodeBattery(nodeNum))
+
                         // Ranking, extremes, averages and summaries of any node value are counted by the app.
                         intent.topic != "node" -> data.metricAnswer(question)?.let { exact(it) }
+
                         else -> null
                     }
+
                 "messages_to_me" -> exact(data.recentToMe(LIST_SHOWN))
+
                 "app_status" -> exact(data.toolAppStatus())
+
                 "waypoints" -> exact(data.toolWaypoints(LIST_SHOWN))
+
                 "weather" -> exact(data.sensorReport())
+
                 else -> null
             }
         if (answer != null) return answer
@@ -1486,35 +1629,41 @@ class LlamaAssistantService(
                     extra = rule(polish, SUMMARIZE_PL, SUMMARIZE_EN) + "\n" + messages,
                 )
             }
+
             "network_question",
             "count_messages",
             "search_messages",
-            "list_nodes" -> {
+            "list_nodes",
+            -> {
                 if (intent.topic == "node" && intent.node.isNotBlank() && nodeNum == null) {
                     return data.unknownNode(intent.node).also(onPiece)
                 }
                 val text = data.dataFor(intent.topic, nodeNum, intent.metric, question, DATA_CHARS * room)
                 val extra =
-                    if (text.isBlank()) rule(polish, NO_DATA_PL, NO_DATA_EN)
-                    else rule(polish, DATA_PL, DATA_EN) + "\n" + text
+                    if (text.isBlank()) {
+                        rule(polish, NO_DATA_PL, NO_DATA_EN)
+                    } else {
+                        rule(polish, DATA_PL, DATA_EN) + "\n" + text
+                    }
                 speak(modelId, history, polish, onPiece, room, extra = extra, temperature = FACT_TEMPERATURE)
             }
+
             "app_help" -> {
                 // "What is a SAW filter?" is a question for the knowledge base, even when a word of it also names a
                 // setting
                 // ("filter" -> message filters): when the base has entries on it, the answer comes from them.
                 if (GENERAL_QUESTION.containsMatchIn(question.trim().lowercase())) {
                     fromBase(
-                            modelId,
-                            history,
-                            question,
-                            intent.text,
-                            polish,
-                            answerLang,
-                            onPiece,
-                            room,
-                            baseOnly = true,
-                        )
+                        modelId,
+                        history,
+                        question,
+                        intent.text,
+                        polish,
+                        answerLang,
+                        onPiece,
+                        room,
+                        baseOnly = true,
+                    )
                         ?.let {
                             return it
                         }
@@ -1526,8 +1675,10 @@ class LlamaAssistantService(
                 // settings.
                 if (CONNECT_WORDS.containsMatchIn(question.lowercase())) guideTools.open_screen("połączenia")
                 loop@ for (words in listOf(intent.text, question).filter { it.isNotBlank() && collector.size() == 0 }) {
-                    for (find in
-                        listOf<(String) -> Unit>({ guideTools.show_setting(it) }, { guideTools.open_screen(it) })) {
+                    for (
+                    find in
+                    listOf<(String) -> Unit>({ guideTools.show_setting(it) }, { guideTools.open_screen(it) })
+                    ) {
                         find(words)
                         if (collector.size() > 0) break@loop
                     }
@@ -1544,8 +1695,13 @@ class LlamaAssistantService(
                 // "Open the display settings" taken for a help question: it is a command, so the place opens.
                 if (button != null && OPEN_COMMAND.containsMatchIn(question.trim().lowercase())) {
                     collector.autoOpenLast()
-                    return (if (button.highlight.isNotBlank()) aiString(Res.string.ai_go_setting, button.label)
-                        else aiString(Res.string.ai_go_open, button.label))
+                    return (
+                        if (button.highlight.isNotBlank()) {
+                            aiString(Res.string.ai_go_setting, button.label)
+                        } else {
+                            aiString(Res.string.ai_go_open, button.label)
+                        }
+                        )
                         .also(onPiece)
                 }
                 // The answer is the app's own manual, shown as it is written, with where the setting is: the small
@@ -1564,8 +1720,9 @@ class LlamaAssistantService(
                             .orEmpty()
                     }
                 val excerpt =
-                    if (wantsNews) wholeLines(manual)
-                    else
+                    if (wantsNews) {
+                        wholeLines(manual)
+                    } else {
                         bestLines(
                             manual,
                             button?.label.orEmpty(),
@@ -1574,21 +1731,22 @@ class LlamaAssistantService(
                             polish,
                             oneSetting = button?.highlight?.isNotBlank() == true,
                         )
+                    }
                 if ((wantsNews || locationAsk) && (excerpt.isNotBlank() || button != null)) {
                     // The manual has nothing on it: an entry of the knowledge base describes the setting (the button
                     // stays under it).
                     if (!wantsNews && excerpt.isBlank()) {
                         fromBase(
-                                modelId,
-                                history,
-                                question,
-                                intent.text,
-                                polish,
-                                answerLang,
-                                onPiece,
-                                room,
-                                baseOnly = true,
-                            )
+                            modelId,
+                            history,
+                            question,
+                            intent.text,
+                            polish,
+                            answerLang,
+                            onPiece,
+                            room,
+                            baseOnly = true,
+                        )
                             ?.let {
                                 return it
                             }
@@ -1617,21 +1775,22 @@ class LlamaAssistantService(
                 // A small model gets the manual's own lines about the found setting before anything else is tried.
                 // An entry of the base that opens like the question ("How do I download…") answers it better than loose
                 // manual lines.
-                if (smallModel(modelId))
+                if (smallModel(modelId)) {
                     fromBase(
-                            modelId,
-                            history,
-                            question,
-                            intent.text,
-                            polish,
-                            answerLang,
-                            onPiece,
-                            room,
-                            quoteOnly = true,
-                        )
+                        modelId,
+                        history,
+                        question,
+                        intent.text,
+                        polish,
+                        answerLang,
+                        onPiece,
+                        room,
+                        quoteOnly = true,
+                    )
                         ?.let {
                             return it
                         }
+                }
                 if (smallModel(modelId) && fits) {
                     val lines =
                         bestLines(
@@ -1645,9 +1804,11 @@ class LlamaAssistantService(
                     if (lines.isNotBlank()) {
                         val path = guideTools.pathOf(button)
                         val where =
-                            if (path.isNotBlank() && !path.equals(button.label, ignoreCase = true))
+                            if (path.isNotBlank() && !path.equals(button.label, ignoreCase = true)) {
                                 aiString(Res.string.ai_help_where, button.label, path) + "\n\n"
-                            else ""
+                            } else {
+                                ""
+                            }
                         return (where + aiString(Res.string.ai_help_from_manual) + "\n" + lines).also(onPiece)
                     }
                 }
@@ -1676,8 +1837,13 @@ class LlamaAssistantService(
                             polish,
                             oneSetting = false,
                         )
-                    return (if (fromGuide.isNotBlank()) aiString(Res.string.ai_help_from_manual) + "\n" + fromGuide
-                        else notInBase(polish))
+                    return (
+                        if (fromGuide.isNotBlank()) {
+                            aiString(Res.string.ai_help_from_manual) + "\n" + fromGuide
+                        } else {
+                            notInBase(polish)
+                        }
+                        )
                         .also(onPiece)
                 }
                 val extra = buildString {
@@ -1687,13 +1853,14 @@ class LlamaAssistantService(
                             .append(
                                 rule(polish, ANCHOR_PL, ANCHOR_EN)
                                     .replace("%1", shown.label)
-                                    .replace("%2", place.ifBlank { "-" })
+                                    .replace("%2", place.ifBlank { "-" }),
                             )
                     }
                     if (guide.isNotBlank()) append('\n').append(guide)
                 }
                 speak(modelId, history, polish, onPiece, room, extra = extra, temperature = FACT_TEMPERATURE)
             }
+
             "web_question" -> {
                 // A question our own verified facts answer (the 868 MHz rules, our network's settings) gets that fact,
                 // word for word: the small model retold it with wrong numbers.
@@ -1709,28 +1876,35 @@ class LlamaAssistantService(
                     return it
                 }
                 val found =
-                    if (uiPrefs.assistantInternetEnabled.value && webModel(modelId) && webWanted(question, ""))
+                    if (uiPrefs.assistantInternetEnabled.value && webModel(modelId) && webWanted(question, "")) {
                         webTools.web_search(intent.text.ifBlank { question }.take(WEB_QUERY_CHARS))
-                    else ""
+                    } else {
+                        ""
+                    }
                 val extra = if (found.isBlank()) "" else rule(polish, WEB_PL, WEB_EN) + "\n" + found
                 val said = speak(modelId, history, polish, onPiece, room, extra = extra, temperature = WEB_TEMPERATURE)
                 // A number the model wrote that is in neither the results nor the facts was garbled or made up:
                 // then the most fitting sentences of the results are quoted instead of the model's words.
                 val core = knowledge?.coreFacts(if (polish) "pl" else "en").orEmpty()
-                if (found.isBlank() || numbersBacked(said, found + "\n" + core + "\n" + question)) said
-                else coreFact(core, question) ?: quoteWeb(found, question, polish) ?: said
+                if (found.isBlank() || numbersBacked(said, found + "\n" + core + "\n" + question)) {
+                    said
+                } else {
+                    coreFact(core, question) ?: quoteWeb(found, question, polish) ?: said
+                }
             }
+
             "chat" ->
                 fromBase(modelId, history, question, intent.text, polish, answerLang, onPiece, room)
                     ?: if (
                         smallModel(modelId) &&
-                            HOW_TO.containsMatchIn(question) &&
-                            question.trim().split(Regex("\\s+")).size >= 3
+                        HOW_TO.containsMatchIn(question) &&
+                        question.trim().split(Regex("\\s+")).size >= 3
                     ) {
                         notInBase(polish).also(onPiece)
                     } else {
                         speak(modelId, history, polish, onPiece, room, extra = "")
                     }
+
             else -> speak(modelId, history, polish, onPiece, room, extra = "")
         }
     }
@@ -1756,16 +1930,26 @@ class LlamaAssistantService(
         val query = listOf(question, topic).joinToString(" ").trim()
         val baseChars = if (slow) SLOW_BASE_CHARS else BASE_CHARS * room
         val facts =
-            (if (baseOnly) knowledge?.lookupBaseOnly(query, baseChars, language)
-                else knowledge?.lookupBase(query, baseChars, language))
+            (
+                if (baseOnly) {
+                    knowledge?.lookupBaseOnly(query, baseChars, language)
+                } else {
+                    knowledge?.lookupBase(query, baseChars, language)
+                }
+                )
                 .orEmpty()
         // A small model (or any model outside the Gemma family) never retells web results in its own words: the app
         // quotes them.
         val small = smallModel(modelId)
         // Quoting chooses from many more entries than a small model could be given to read.
         val pool =
-            (if (baseOnly) knowledge?.lookupBaseOnly(query, QUOTE_FACTS_CHARS, language)
-                else knowledge?.lookupBase(query, QUOTE_FACTS_CHARS, language))
+            (
+                if (baseOnly) {
+                    knowledge?.lookupBaseOnly(query, QUOTE_FACTS_CHARS, language)
+                } else {
+                    knowledge?.lookupBase(query, QUOTE_FACTS_CHARS, language)
+                }
+                )
                 .orEmpty()
                 .ifBlank { facts }
         if (!small && !baseOnly && !quoteOnly) {
@@ -1852,9 +2036,11 @@ class LlamaAssistantService(
         }
         if (facts.isBlank()) return null
         val web =
-            if (uiPrefs.assistantInternetEnabled.value && webModel(modelId) && webWanted(question, facts))
+            if (uiPrefs.assistantInternetEnabled.value && webModel(modelId) && webWanted(question, facts)) {
                 webTools.web_search(webQuery(question))
-            else ""
+            } else {
+                ""
+            }
         Logger.i(tag = TAG) { "Knowledge base: ${facts.length} chars, web ${web.length} chars" }
         // The smallest models retold the entries wrongly (invented steps, swapped numbers): they quote the best entry
         // as it is written.
@@ -1914,9 +2100,10 @@ class LlamaAssistantService(
             if (exactOnly && quoteStems(heading) - STOP_STEMS != asked) continue
             if (
                 sameOpeningOnly &&
-                    !(firstWord in OPENING_WORDS && foldPl(heading.lowercase()).trim().startsWith(firstWord))
-            )
+                !(firstWord in OPENING_WORDS && foldPl(heading.lowercase()).trim().startsWith(firstWord))
+            ) {
                 continue
+            }
             // The keywords of the entry count as its title: they hold the other names of the thing.
             val keywords = body.lines().filter { it.startsWith("Słowa:") }.joinToString(" ")
             val headStems = quoteStems(head) + quoteStems(keywords)
@@ -1941,9 +2128,11 @@ class LlamaAssistantService(
             val sameOpening =
                 if (firstWord in OPENING_WORDS && headFolded.trim().startsWith(firstWord)) OPENING_BONUS else 0.0
             val exactWord =
-                if (lastWord.isNotEmpty() && Regex("\\b${Regex.escape(lastWord)}\\b").containsMatchIn(headFolded))
+                if (lastWord.isNotEmpty() && Regex("\\b${Regex.escape(lastWord)}\\b").containsMatchIn(headFolded)) {
                     EXACT_BONUS
-                else 0.0
+                } else {
+                    0.0
+                }
             val score =
                 headShare * 2 +
                     allShare +
@@ -1971,18 +2160,22 @@ class LlamaAssistantService(
                 .trim()
         if (body.length < QUOTE_MIN_CHARS) return null
         val cut =
-            if (body.length > QUOTE_MAX_CHARS)
+            if (body.length > QUOTE_MAX_CHARS) {
                 body
                     .substring(0, QUOTE_MAX_CHARS)
                     .substringBeforeLast(". ", body.substring(0, QUOTE_MAX_CHARS))
                     .trimEnd() + "."
-            else body
+            } else {
+                body
+            }
         val hedge =
-            if (!loose) ""
-            else if (polish)
+            if (!loose) {
+                ""
+            } else if (polish) {
                 "Nie mam wpisu dokładnie na to pytanie. Najbliższy wpis w bazie wiedzy (może nie odpowiadać wprost):\n\n"
-            else
+            } else {
                 "I have no entry exactly on this. The closest entry in the knowledge base (it may not answer directly):\n\n"
+            }
         return hedge + cut + "\n\n" + (if (polish) "Źródło: " else "Source: ") + head
     }
 
@@ -1998,9 +2191,11 @@ class LlamaAssistantService(
         val ownSource = Regex("(?imu)^\\s*(źródło|źródła|source|sources)\\s*:")
         val firstSource = ownSource.find(answer)?.range?.first
         val answer =
-            if (firstSource != null && firstSource > MIN_ANSWER_BEFORE_SOURCE)
+            if (firstSource != null && firstSource > MIN_ANSWER_BEFORE_SOURCE) {
                 answer.substring(0, firstSource).trimEnd()
-            else answer
+            } else {
+                answer
+            }
         // The source is the entry whose title covers most of the question; one that hardly fits is not named at all.
         val asked = quoteStems(question) - STOP_STEMS
         val heads = BASE_HEAD.findAll(facts).map { it.groupValues[1].trim() }.toList()
@@ -2013,8 +2208,13 @@ class LlamaAssistantService(
         if (NOT_KNOWN.containsMatchIn(body.lowercase())) {
             return body +
                 "\n\n" +
-                (if (polish) "Zapytaj mnie „co potrafisz”, a powiem, w czym mogę pomóc."
-                else "Ask me “what can you do” and I will tell you how I can help.")
+                (
+                    if (polish) {
+                        "Zapytaj mnie „co potrafisz”, a powiem, w czym mogę pomóc."
+                    } else {
+                        "Ask me “what can you do” and I will tell you how I can help."
+                    }
+                    )
         }
         if (head.isEmpty() || head.startsWith("Baza wiedzy (offtop")) return body
         return body + "\n\n" + (if (polish) "Źródło: " else "Source: ") + head
@@ -2029,18 +2229,27 @@ class LlamaAssistantService(
      */
     private fun smallModel(modelId: String) = (AiModels.byId(modelId)?.ramMb ?: Int.MAX_VALUE) < QUOTE_BELOW_RAM_MB
 
-    private fun notInBase(polish: Boolean, internetOn: Boolean = false) =
-        if (polish) {
-            "Nie mam na to pytanie wpisu w bazie wiedzy ani w instrukcji, więc nie będę zgadywać. " +
-                (if (internetOn) "W internecie też nie znalazłem jasnej odpowiedzi. "
-                else "Możesz włączyć internet w ustawieniach asystenta, wtedy poszukam tam. ") +
-                "Spróbuj zapytać krótko i konkretnie (np. „jak dodać kanał”) albo poszukaj tego w wyszukiwarce ustawień."
-        } else {
-            "I have no entry on this in the knowledge base or the manual, so I will not guess. " +
-                (if (internetOn) "I found no clear answer on the internet either. "
-                else "You can switch the internet on in the assistant settings and I will look there. ") +
-                "Try a short, specific question (e.g. \"how do I add a channel\") or look it up in the settings search."
-        }
+    private fun notInBase(polish: Boolean, internetOn: Boolean = false) = if (polish) {
+        "Nie mam na to pytanie wpisu w bazie wiedzy ani w instrukcji, więc nie będę zgadywać. " +
+            (
+                if (internetOn) {
+                    "W internecie też nie znalazłem jasnej odpowiedzi. "
+                } else {
+                    "Możesz włączyć internet w ustawieniach asystenta, wtedy poszukam tam. "
+                }
+                ) +
+            "Spróbuj zapytać krótko i konkretnie (np. „jak dodać kanał”) albo poszukaj tego w wyszukiwarce ustawień."
+    } else {
+        "I have no entry on this in the knowledge base or the manual, so I will not guess. " +
+            (
+                if (internetOn) {
+                    "I found no clear answer on the internet either. "
+                } else {
+                    "You can switch the internet on in the assistant settings and I will look there. "
+                }
+                ) +
+            "Try a short, specific question (e.g. \"how do I add a channel\") or look it up in the settings search."
+    }
 
     private fun looksPolish(text: String): Boolean =
         text.any { it in "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ" } || text.contains(" jest ") || text.contains(" się ")
@@ -2067,9 +2276,11 @@ class LlamaAssistantService(
      */
     private fun webQuery(question: String): String {
         val q = question.take(WEB_QUERY_CHARS)
-        return if (MESH_TOPIC.containsMatchIn(q.lowercase()) && !q.contains("meshtastic", ignoreCase = true))
+        return if (MESH_TOPIC.containsMatchIn(q.lowercase()) && !q.contains("meshtastic", ignoreCase = true)) {
             "Meshtastic $q"
-        else q
+        } else {
+            q
+        }
     }
 
     /**
@@ -2103,8 +2314,8 @@ class LlamaAssistantService(
         }
         if (
             RANGE_PROBLEM.containsMatchIn(flat) &&
-                RANGE_TOPIC.containsMatchIn(flat) &&
-                !ANTENNA_TOPIC.containsMatchIn(flat)
+            RANGE_TOPIC.containsMatchIn(flat) &&
+            !ANTENNA_TOPIC.containsMatchIn(flat)
         ) {
             return handle(AssistantIntent("app_help", topic = "other"), modelId, history, question, polish, onPiece)
         }
@@ -2207,8 +2418,11 @@ class LlamaAssistantService(
         val action =
             collector.last()?.takeIf { collector.size() > before } ?: return aiString(Res.string.ai_go_unknown_place)
         collector.autoOpenLast()
-        return if (action.highlight.isNotBlank()) aiString(Res.string.ai_go_setting, action.label)
-        else aiString(Res.string.ai_go_open, action.label)
+        return if (action.highlight.isNotBlank()) {
+            aiString(Res.string.ai_go_setting, action.label)
+        } else {
+            aiString(Res.string.ai_go_open, action.label)
+        }
     }
 
     /** Puts a message in the message box of the conversation; the user checks it and sends it himself. */
@@ -2251,15 +2465,18 @@ class LlamaAssistantService(
         val system = buildString {
             append(if (polish) SYSTEM_PL else SYSTEM_EN)
             // The core facts about MT_SW are always given, so the model never answers against them.
-            if (core.isNotBlank() && !lean)
+            if (core.isNotBlank() && !lean) {
                 append("\n\n").append(rule(polish, CORE_PL, CORE_EN)).append('\n').append(core)
+            }
             if (uiPrefs.assistantMemoryEnabled.value && !lean) {
                 val notes = if (slow) "" else memoryStore?.promptText(MEMORY_CHARS * room).orEmpty()
-                if (notes.isNotBlank())
+                if (notes.isNotBlank()) {
                     append("\n\n").append(rule(polish, MEMORY_PL, MEMORY_EN)).append('\n').append(notes)
+                }
             }
-            if (memory.isNotBlank())
+            if (memory.isNotBlank()) {
                 append("\n\n").append(rule(polish, EARLIER_PL, EARLIER_EN)).append(' ').append(memory)
+            }
             if (extra.isNotBlank()) append("\n\n").append(extra)
             // The clock changes every second, so it comes last: everything before it stays the same between questions
             // and
@@ -2294,17 +2511,20 @@ class LlamaAssistantService(
                             temperature,
                             onPiece,
                         )
+
                     // Thought for too long without answering: once more, straight to the answer.
                     think && e is ThinkingTooLongException -> {
                         Logger.w(tag = TAG) { "Thinking went on too long, answering without it" }
                         engine.chat(modelId, messages, MAX_ANSWER_TOKENS, temperature, onPiece)
                     }
+
                     // Once more without quiet thinking; it stays off only when the model file says it cannot think.
                     think -> {
                         Logger.w(tag = TAG, throwable = e) { "Answer with thinking failed, trying without: $msg" }
                         if (msg.contains("think", ignoreCase = true)) thinkingWorks = false
                         engine.chat(modelId, messages, MAX_ANSWER_TOKENS, temperature, onPiece)
                     }
+
                     else -> throw e
                 }
             }
@@ -2354,19 +2574,21 @@ class LlamaAssistantService(
             }
             if (
                 line.length < MIN_HELP_LINE ||
-                    line.startsWith("|") ||
-                    line.startsWith(">") ||
-                    line.startsWith("description:")
-            )
+                line.startsWith("|") ||
+                line.startsWith(">") ||
+                line.startsWith("description:")
+            ) {
                 continue
+            }
             if (title.startsWith("MT_SW ") || title == "CHANGELOG" || (polish && title.startsWith("en-"))) continue
             // The part of the manual about the assistant itself quotes example commands ("show the hop limit"): it is
             // not the answer to a question about that setting.
             if (
                 ABOUT_ASSISTANT.containsMatchIn(title.lowercase()) &&
-                    !ABOUT_ASSISTANT.containsMatchIn(focus(question, strong))
-            )
+                !ABOUT_ASSISTANT.containsMatchIn(focus(question, strong))
+            ) {
                 continue
+            }
             val words = stems(line)
             val strongHits = words.count { it in strongTerms }
             val weakHits = words.count { it in weakTerms }
@@ -2392,7 +2614,7 @@ class LlamaAssistantService(
         // guessed
         // only for a screen or a topic ("what is MT_SW features", "how do I update the firmware").
         if (found.isEmpty() && oneSetting) return ""
-        if (found.isEmpty())
+        if (found.isEmpty()) {
             return sectionStart(
                 fragment,
                 stems(label),
@@ -2401,6 +2623,7 @@ class LlamaAssistantService(
                 strong,
                 polish,
             )
+        }
         // A part of the manual whose heading names the setting is the right place; others only when there is none.
         val titled = found.filter { line -> labelStems.size >= 2 && stems(line.title).containsAll(labelStems) }
         val pool = titled.ifEmpty { found }
@@ -2435,12 +2658,13 @@ class LlamaAssistantService(
             }
             if (
                 line.length < MIN_HELP_LINE ||
-                    line.startsWith("|") ||
-                    line.startsWith(">") ||
-                    line.startsWith("#") ||
-                    line.startsWith("description:")
-            )
+                line.startsWith("|") ||
+                line.startsWith(">") ||
+                line.startsWith("#") ||
+                line.startsWith("description:")
+            ) {
                 continue
+            }
             parts.lastOrNull()?.lines?.add(line)
         }
         val usable = parts.filter { p ->
@@ -2448,8 +2672,10 @@ class LlamaAssistantService(
                 !p.title.startsWith("MT_SW ") &&
                 p.title != "CHANGELOG" &&
                 !(polish && p.title.startsWith("en-")) &&
-                (!ABOUT_ASSISTANT.containsMatchIn(p.title.lowercase()) ||
-                    ABOUT_ASSISTANT.containsMatchIn(focus(question, strong)))
+                (
+                    !ABOUT_ASSISTANT.containsMatchIn(p.title.lowercase()) ||
+                        ABOUT_ASSISTANT.containsMatchIn(focus(question, strong))
+                    )
         }
         // Scoring: the name of the found screen in the title counts most, then the question's words in the title
         // ("Page: heading", so the chapter counts too) and in the text. A "how do I" question prefers a part with
@@ -2498,8 +2724,11 @@ class LlamaAssistantService(
         for (w in text.lowercase().split(Regex("[^\\p{L}\\p{N}]+"))) {
             if (w.length < MIN_STEM) continue
             out += w.take(STEM_LENGTH)
-            for (prefix in VERB_PREFIXES) if (w.startsWith(prefix) && w.length - prefix.length >= STEM_LENGTH)
-                out += w.substring(prefix.length).take(STEM_LENGTH)
+            for (prefix in VERB_PREFIXES) {
+                if (w.startsWith(prefix) && w.length - prefix.length >= STEM_LENGTH) {
+                    out += w.substring(prefix.length).take(STEM_LENGTH)
+                }
+            }
         }
         return out
     }
@@ -2583,22 +2812,27 @@ class LlamaAssistantService(
         }
         // The last entry may be cut where the fragment ended: it is left out rather than shown half.
         val kept = out.toString().trim().lines()
-        return (if (kept.size > 1 && kept.last().trim().lastOrNull()?.let { it in ".!?)" } != true) kept.dropLast(1)
-            else kept)
+        return (
+            if (kept.size > 1 && kept.last().trim().lastOrNull()?.let { it in ".!?)" } != true) {
+                kept.dropLast(1)
+            } else {
+                kept
+            }
+            )
             .joinToString("\n")
     }
 
     /** Like [stems], but "MT_SW" counts as one word (for choosing an entry of the base). */
     private fun quoteStems(text: String): Set<String> = stems(text.lowercase().replace("mt_sw", "mtsw"))
 
-    private fun stems(text: String): Set<String> =
-        foldPl(text.lowercase().replace("wi-fi", "wifi"))
-            .split(Regex("[^\\p{L}\\p{N}]+"))
-            .filter { it.length >= MIN_STEM || it in SHORT_TERMS }
-            .map { canonicalStem(it.take(STEM_LENGTH)) }
-            .toSet()
+    private fun stems(text: String): Set<String> = foldPl(text.lowercase().replace("wi-fi", "wifi"))
+        .split(Regex("[^\\p{L}\\p{N}]+"))
+        .filter { it.length >= MIN_STEM || it in SHORT_TERMS }
+        .map { canonicalStem(it.take(STEM_LENGTH)) }
+        .toSet()
 
     /*  Plain text for the chat bubble: no markdown stars or backticks the small model likes to add. */
+
     /**
      * Without the internet the model cannot know a web address: the links it writes are made up, so they are removed.
      */
@@ -2607,27 +2841,28 @@ class LlamaAssistantService(
             .replace(Regex("\\s*(?:i\\s+|and\\s+)?https?://[^\\s)]+"), "")
             .replace(Regex("(?imu)^\\s*(źródło|źródła|zrodlo|source|sources)\\s*:\\s*$\\n?"), "")
 
-    private fun cleanUp(text: String): String =
-        text
-            .let {
-                if (TOOL_CALL_JSON.containsMatchIn(it))
-                    "Tego nie zrobię w tym oknie. Mogę pomóc w sprawach sieci, aplikacji, radia i w prostych pytaniach ogólnych."
-                else it
+    private fun cleanUp(text: String): String = text
+        .let {
+            if (TOOL_CALL_JSON.containsMatchIn(it)) {
+                "Tego nie zrobię w tym oknie. Mogę pomóc w sprawach sieci, aplikacji, radia i w prostych pytaniach ogólnych."
+            } else {
+                it
             }
-            .replace(
-                Regex(
-                    "(?imu)^\\s*(źródło|źródła|zrodlo|zrodla|source|sources)\\s*:?\\s*(brak|none|n/a|-|—)\\.?\\s*$\\n?"
-                ),
-                "",
-            )
-            .replace(Regex("(?imu)^\\s*(źródło|źródła|source|sources)\\s*:\\s*(brak|none)\\b.*$\\n?"), "")
-            .replace(PROMPT_ECHO, "")
-            .let { if (webTools.usage() == null) it.withoutMadeUpLinks() else it }
-            .replace(Regex("\\*\\*([^*\\n]+)\\*\\*"), "$1")
-            .replace("`", "")
-            .replace(Regex("(?m)^\\s*[*-] "), "• ")
-            .replace(Regex("\\n{3,}"), "\n\n")
-            .trim()
+        }
+        .replace(
+            Regex(
+                "(?imu)^\\s*(źródło|źródła|zrodlo|zrodla|source|sources)\\s*:?\\s*(brak|none|n/a|-|—)\\.?\\s*$\\n?",
+            ),
+            "",
+        )
+        .replace(Regex("(?imu)^\\s*(źródło|źródła|source|sources)\\s*:\\s*(brak|none)\\b.*$\\n?"), "")
+        .replace(PROMPT_ECHO, "")
+        .let { if (webTools.usage() == null) it.withoutMadeUpLinks() else it }
+        .replace(Regex("\\*\\*([^*\\n]+)\\*\\*"), "$1")
+        .replace("`", "")
+        .replace(Regex("(?m)^\\s*[*-] "), "• ")
+        .replace(Regex("\\n{3,}"), "\n\n")
+        .trim()
 
     /**
      * Lets the model update its notes about the user after some answers (every second question, or when the user asks
@@ -2670,7 +2905,9 @@ class LlamaAssistantService(
                 "Write the notes in the language of the user. Output every file that changes as a line '### file-name' " +
                 "followed by its full new text (at most 4 short sentences). Good file names: o-uzytkowniku, " +
                 "siec-i-sprzet, styl-rozmowy, projekty. If nothing is worth saving, output exactly: NOTHING.\n\n" +
-                "Current notes:\n${current.ifBlank { "(none)" }}\n\nNewest message of the user:\n${question.take(NOTE_TURN_CHARS)}"
+                "Current notes:\n${current.ifBlank {
+                    "(none)"
+                }}\n\nNewest message of the user:\n${question.take(NOTE_TURN_CHARS)}"
         val out = engine.chat(modelId, listOf("user" to prompt), NOTE_TOKENS, SUMMARY_TEMPERATURE)
         if (out.contains("NOTHING") && !out.contains("###")) return
         for (block in out.split(Regex("(?m)^###\\s*")).drop(1)) {
@@ -2717,29 +2954,28 @@ class LlamaAssistantService(
         return turns.subList(start, turns.size)
     }
 
-    private suspend fun summarize(modelId: String, previous: String, added: List<AssistantTurn>): String? =
-        try {
-            val text =
-                added
-                    .joinToString("\n") {
-                        (if (it.fromUser) "User: " else "Assistant: ") + it.text.take(SUMMARY_TURN_CHARS)
-                    }
-                    .takeLast(SUMMARY_INPUT_CHARS)
-            val prompt =
-                "Below are the summary of an earlier conversation and new messages. Write one updated summary of the " +
-                    "whole conversation in at most 6 short sentences, in the language of the conversation. Keep names, " +
-                    "numbers, node names and what the user wants. Output only the summary.\n\n" +
-                    "Earlier summary: ${previous.ifBlank { "(none)" }}\n\nNew messages:\n$text"
-            engine
-                .chat(modelId, listOf("user" to prompt), SUMMARY_TOKENS, SUMMARY_TEMPERATURE)
-                .trim()
-                .take(MAX_SUMMARY_CHARS)
-                .takeIf { it.isNotBlank() }
-        } catch (e: kotlinx.coroutines.CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            null
-        }
+    private suspend fun summarize(modelId: String, previous: String, added: List<AssistantTurn>): String? = try {
+        val text =
+            added
+                .joinToString("\n") {
+                    (if (it.fromUser) "User: " else "Assistant: ") + it.text.take(SUMMARY_TURN_CHARS)
+                }
+                .takeLast(SUMMARY_INPUT_CHARS)
+        val prompt =
+            "Below are the summary of an earlier conversation and new messages. Write one updated summary of the " +
+                "whole conversation in at most 6 short sentences, in the language of the conversation. Keep names, " +
+                "numbers, node names and what the user wants. Output only the summary.\n\n" +
+                "Earlier summary: ${previous.ifBlank { "(none)" }}\n\nNew messages:\n$text"
+        engine
+            .chat(modelId, listOf("user" to prompt), SUMMARY_TOKENS, SUMMARY_TEMPERATURE)
+            .trim()
+            .take(MAX_SUMMARY_CHARS)
+            .takeIf { it.isNotBlank() }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        null
+    }
 
     private fun activeId(states: Map<String, TranslatorModelState>, selected: String): String? {
         val chosen = AiModels.byId(selected)?.takeIf { it.canDo(AiRole.ASSISTANT) && it.engineReady }
@@ -2757,10 +2993,12 @@ class LlamaAssistantService(
         const val TAG = "AssistantPrompt"
         const val MILLIS_PER_SECOND = 1000L
         const val POLISH_LETTERS = "ąćęłńóśźżĄĆĘŁŃÓŚŹŻ"
+
         /** Below this many characters a second (about 3 words) the model is slow: smaller prompt, shorter answers. */
         const val SLOW_CHARS_PER_SECOND = 22.0
         const val SLOW_ANSWER_TOKENS = 380
         const val SLOW_BASE_CHARS = 2200
+
         /** Models that need less memory than this are too small to chat about general things reliably. */
         const val TINY_RAM_MB = 1500
         const val TINY_PL =
@@ -2791,6 +3029,7 @@ class LlamaAssistantService(
         val HOW_TO = Regex("(?iu)^\\s*(jak|w jaki sposób|w jaki sposob|how)(?![\\p{L}])")
         val STEP = Regex("^\\d+[.)]\\s")
         val VERB_PREFIXES = listOf("prze", "po", "wy", "za", "z", "s", "u", "na", "od", "do")
+
         // Common words that say nothing about which part of the manual a question is about.
         val STOP_STEMS =
             foldedSet(
@@ -2835,51 +3074,52 @@ class LlamaAssistantService(
                 "which",
             )
         val ADVICE_INTENTS = setOf("app_help", "chat", "network_question", "signal_list", "web_question")
+
         /**
          * The question is about the user's own radio ("ktoś mnie słabo słyszy", "mam słaby zasięg"), not a general one.
          */
         val OWN_RANGE =
             Regex(
-                "(?iu)\\b(mam|mój|moj\\p{L}*|mnie|mi|u mnie|moim|my|me|i have)\\b|jak (poprawić|zwiększyć|poprawic|zwiekszyc)|how (can|do) i (improve|increase)"
+                "(?iu)\\b(mam|mój|moj\\p{L}*|mnie|mi|u mnie|moim|my|me|i have)\\b|jak (poprawić|zwiększyć|poprawic|zwiekszyc)|how (can|do) i (improve|increase)",
             )
         val TO_ME_ASK =
             Regex(
-                "(?iu)(kto|czy ktoś|czy ktos).*(pisał|pisal|napisał|napisal|odezwał|odezwal).*(do mnie|mi)(?![\\p{L}])|wiadomo\\p{L}* do mnie|who wrote to me|messages (sent )?to me"
+                "(?iu)(kto|czy ktoś|czy ktos).*(pisał|pisal|napisał|napisal|odezwał|odezwal).*(do mnie|mi)(?![\\p{L}])|wiadomo\\p{L}* do mnie|who wrote to me|messages (sent )?to me",
             )
         val MSG_FROM_NODE =
             Regex(
-                "(?iu)(ile|how many).*(wiadomo|message).*(napisał|napisal|wysłał|wysyłał|wyslal|pisał|pisal|sent|wrote)"
+                "(?iu)(ile|how many).*(wiadomo|message).*(napisał|napisal|wysłał|wysyłał|wyslal|pisał|pisal|sent|wrote)",
             )
         val CHANNEL_NAMED = Regex("(?iu)(?:na kanale|w kanale|kanał|kanale|channel)\\s+[„\"]?([\\p{L}\\p{N}_-]+)")
         val OPEN_NODE =
             Regex(
-                "(?iu)^\\s*(otwórz|otworz|przejdź|przejdz|pokaż|pokaz|open|go to|show)\\s.*(węzeł|wezel|węzła|wezla|węzła|node)"
+                "(?iu)^\\s*(otwórz|otworz|przejdź|przejdz|pokaż|pokaz|open|go to|show)\\s.*(węzeł|wezel|węzła|wezla|węzła|node)",
             )
         val PRESET_NAME = Regex("(?iu)(short|long|medium|lite|narrow|tiny)\\s?(fast|slow|turbo|moderate)?|turbo")
         val LOOKS_LIKE = Regex("(?iu)jak wygląd|jak wygląda|how (is|does).{0,20}(network|mesh)")
         val NETWORK_REPORT =
             Regex(
-                "(?iu)(raport|stan|stanie|status|podsumuj|podsumowanie).*(sieci|siec\\b|network)|network (status|report)|jak wygląda (moja |nasza )?sie"
+                "(?iu)(raport|stan|stanie|status|podsumuj|podsumowanie).*(sieci|siec\\b|network)|network (status|report)|jak wygląda (moja |nasza )?sie",
             )
         val OWN_AIR =
             Regex(
-                "(?iu)(airtime|zajętość kanału|zajetosc kanalu|obciążenie kanału|channel utili[sz]ation).*(mój|moj|mojego|moim|mam|my\\b)|(mój|moj|moim|my)\\s+(airtime|zajętość|obciążenie|channel)|(?<![\\p{L}])mój airtime|my airtime"
+                "(?iu)(airtime|zajętość kanału|zajetosc kanalu|obciążenie kanału|channel utili[sz]ation).*(mój|moj|mojego|moim|mam|my\\b)|(mój|moj|moim|my)\\s+(airtime|zajętość|obciążenie|channel)|(?<![\\p{L}])mój airtime|my airtime",
             )
         val DEFINE_ASK =
             Regex("(?iu)^\\s*(co to|czym (jest|są|sa)|co znaczy|what (is|does|are)|what's|wyjaśnij|wyjasnij|explain)")
         val DRAFT_THAT =
             Regex(
-                "(?iu)(?:,\\s*|\\s)(?:że|ze|aby|żeby)\\s+(.+?)\\s*$|(?:wiadomość|wiadomosc|treść|tresc|message|text)\\s*[:\\-]\\s*(.+?)\\s*$"
+                "(?iu)(?:,\\s*|\\s)(?:że|ze|aby|żeby)\\s+(.+?)\\s*$|(?:wiadomość|wiadomosc|treść|tresc|message|text)\\s*[:\\-]\\s*(.+?)\\s*$",
             )
         val QUOTED_TEXT = Regex("[„\"«](.+?)[”\"»]")
         val ROLE_DEF =
             Regex(
-                "(?iu)(co to|czym (jest|są|sa)|kiedy używać|kiedy uzywac|do czego (służy|sluzy)|what is|when (to|should i) use).*(?<![\\p{L}_])(client_mute|client_hidden|client_base|router_late|repeater|tak_tracker|lost_and_found|tracker|sensor|router|client|tak)(?![\\p{L}_])"
+                "(?iu)(co to|czym (jest|są|sa)|kiedy używać|kiedy uzywac|do czego (służy|sluzy)|what is|when (to|should i) use).*(?<![\\p{L}_])(client_mute|client_hidden|client_base|router_late|repeater|tak_tracker|lost_and_found|tracker|sensor|router|client|tak)(?![\\p{L}_])",
             )
         val ROLE_WORD = Regex("(?iu)(?<![\\p{L}])(rola|rolę|role|roli|rolą)(?![\\p{L}])")
         val ROLE_DEF_NAME =
             Regex(
-                "(?iu)(?<![\\p{L}_])(client_mute|client_hidden|client_base|router_late|repeater|tak_tracker|lost_and_found|tracker|sensor|router|client|tak)(?![\\p{L}_])"
+                "(?iu)(?<![\\p{L}_])(client_mute|client_hidden|client_base|router_late|repeater|tak_tracker|lost_and_found|tracker|sensor|router|client|tak)(?![\\p{L}_])",
             )
         val ROLE_INFO_PL =
             mapOf(
@@ -2926,36 +3166,37 @@ class LlamaAssistantService(
             )
         val INACTIVE_ASK =
             Regex(
-                "(?iu)nieaktywn|milcz|nie odzywa|nie odezwa|dawno nie|zniknęł|zniknel|inactive|silent|not heard|haven.t been heard|disappeared"
+                "(?iu)nieaktywn|milcz|nie odzywa|nie odezwa|dawno nie|zniknęł|zniknel|inactive|silent|not heard|haven.t been heard|disappeared",
             )
         val FORECAST_ASK = Regex("(?iu)prognoz|jutro|pojutrze|forecast|tomorrow|będzie (padać|padal|lać|zimno|ciepło)")
         val SEND_ASK =
             Regex(
-                "(?iu)(czy|can).*(możesz|mozesz|potrafisz|you|asystent (może|moze)).*(wysł|wysl|send).*(wiadomo|message)|can you send|czy asystent (może|moze) wysł"
+                "(?iu)(czy|can).*(możesz|mozesz|potrafisz|you|asystent (może|moze)).*(wysł|wysl|send).*(wiadomo|message)|can you send|czy asystent (może|moze) wysł",
             )
         val LANG_ASK =
             Regex(
-                "(?iu)(umiesz|potrafisz|możesz|mozesz|can you|do you).*(po angielsku|po polsku|speak english|speak polish|angielsk)"
+                "(?iu)(umiesz|potrafisz|możesz|mozesz|can you|do you).*(po angielsku|po polsku|speak english|speak polish|angielsk)",
             )
         val OWN_CONFIG_ASK =
             Regex(
-                "(?iu)(jaki|jaką|jaka|jakie|ile|który|który jest|what|which|how many).*(mam|mój|moj\\p{L}*|my|have).*(preset|rol[ęea]|region|kanał|kanal|kanały|kanalow|channel|limit\\s+(skok|przeskok)\\p{L}*|hop limit)|ile (mam|jest) kanał"
+                "(?iu)(jaki|jaką|jaka|jakie|ile|który|który jest|what|which|how many).*(mam|mój|moj\\p{L}*|my|have).*(preset|rol[ęea]|region|kanał|kanal|kanały|kanalow|channel|limit\\s+(skok|przeskok)\\p{L}*|hop limit)|ile (mam|jest) kanał",
             )
         val SET_COMMAND =
             Regex(
-                "(?iu)^\\s*(?:(?:czy\\s+)?(?:możesz|mozesz|mógłbyś|moglbys|proszę|prosze|can you|could you|please)\\s+)?(?:dla mnie\\s+)?(ustaw\\p{L}*|zmień|zmien\\p{L}*|zapisz|set|change)\\s.*((?<![\\p{L}])moc\\p{L}*|preset|region|(?<![\\p{L}])rol\\p{L}*|power|role|limit|interwał|interwal|częstotliw\\p{L}*|czestotliw\\p{L}*|telemetri\\p{L}*|frequency|interval|telemetry)"
+                "(?iu)^\\s*(?:(?:czy\\s+)?(?:możesz|mozesz|mógłbyś|moglbys|proszę|prosze|can you|could you|please)\\s+)?(?:dla mnie\\s+)?(ustaw\\p{L}*|zmień|zmien\\p{L}*|zapisz|set|change)\\s.*((?<![\\p{L}])moc\\p{L}*|preset|region|(?<![\\p{L}])rol\\p{L}*|power|role|limit|interwał|interwal|częstotliw\\p{L}*|czestotliw\\p{L}*|telemetri\\p{L}*|frequency|interval|telemetry)",
             )
         val OWN_WORDS_RANGE = Regex("(?iu)(?<![\\p{L}])(my|mój|moj\\p{L}*|mnie|mam|i)(?![\\p{L}])")
         val BATTERY_TYPE_ASK = Regex("(?iu)(jaka|jaki|jakie|which|what) (bateri|akumulator|ogniw|battery|cell)")
         val NOT_OVERVIEW =
             Regex(
-                "(?iu)(what|co to jest|czym jest|wyjaśnij|explain|summary of what).*(meshtastic|lora|mesh)(?! network)"
+                "(?iu)(what|co to jest|czym jest|wyjaśnij|explain|summary of what).*(meshtastic|lora|mesh)(?! network)",
             )
         val GENERAL_WHY = Regex("(?iu)^\\s*(czy|dlaczego|czemu|why|does|do|is)\\b")
         val RANGE_PROBLEM =
             Regex(
-                "słab|slab|kiepsk|mały zasięg|maly zasieg|krótki zasięg|krotki zasieg|poprawi|zwiększ|zwieksz|lepsz|nie słysz|nie slysz|nie docier|nikogo nie|weak|poor|improve|bad|short range"
+                "słab|slab|kiepsk|mały zasięg|maly zasieg|krótki zasięg|krotki zasieg|poprawi|zwiększ|zwieksz|lepsz|nie słysz|nie slysz|nie docier|nikogo nie|weak|poor|improve|bad|short range",
             )
+
         /**
          * A question about the antenna itself ("how do I improve the range of the antenna"): advice, not a check of the
          * radio.
@@ -2985,11 +3226,12 @@ class LlamaAssistantService(
         const val ROUTER_NOTES_CHARS = 500
         val FARTHEST_WORDS = Regex("najdalej|najdalsz|farthest|furthest")
         val NEAREST_WORDS = Regex("najbliż|najbliz|nearest|closest")
+
         // "Where is the hop limit" / "how do I change X" asks where a thing is; it does not ask to open it.
         val WHERE_QUESTION = Regex("^(gdzie|jak|w jaki sposób|w jaki sposob|where|how)(?=\\s)")
         val GENERAL_QUESTION =
             Regex(
-                "^(co to (jest|są|sa)|czym (jest|są|sa)|co oznacza|co znaczy|jak działa|jak dziala|dlaczego|po co|what is|what are|what does|how does|why)(?=\\s|$)"
+                "^(co to (jest|są|sa)|czym (jest|są|sa)|co oznacza|co znaczy|jak działa|jak dziala|dlaczego|po co|what is|what are|what does|how does|why)(?=\\s|$)",
             )
         val OPEN_COMMAND = Regex("^(otwórz|otworz|pokaż|pokaz|przejdź|przejdz|open|show|go to)(?=\\s|$)")
         val ABOUT_ASSISTANT = Regex("asystent|assistant|tłumacz|tlumacz|translator")
@@ -3009,11 +3251,11 @@ class LlamaAssistantService(
         val DEFINITION_FOLLOW = Regex("(?iu)^(jak|jakie|jaki|jaka|co|czy|how|what|which)(?![\\p{L}])")
         val NEAR_LIST =
             Regex(
-                "(?iu)węzły|wezly|nodes|najbliższe|najblizsze|najbliższych|najblizszych|\\b\\d+\\s+(najbliż|najbliz|nearest|closest)"
+                "(?iu)węzły|wezly|nodes|najbliższe|najblizsze|najbliższych|najblizszych|\\b\\d+\\s+(najbliż|najbliz|nearest|closest)",
             )
         val KB_FIRST =
             Regex(
-                "(?iu)^\\s*(co się stanie|co sie stanie|what happens)|region.*(zakres|częstotliw|czestotliw|wybra|polsc|europ)|(zakres|częstotliw|czestotliw).*(region|eu_868|eu_433)|what is the frequency range"
+                "(?iu)^\\s*(co się stanie|co sie stanie|what happens)|region.*(zakres|częstotliw|czestotliw|wybra|polsc|europ)|(zakres|częstotliw|czestotliw).*(region|eu_868|eu_433)|what is the frequency range",
             )
         val JOKE_ASK =
             Regex("(?iu)(opowiedz|powiedz|daj|dasz|znasz|masz|tell me|know).{0,25}(dowcip|żart|zart|kawał|joke)")
@@ -3037,11 +3279,11 @@ class LlamaAssistantService(
         val HOW_MANY_NEIGH = Regex("(?iu)(ilu|ile|how many).{0,20}(sąsiad|sasiad|neighbo)")
         val SHOW_POWER_SETTING =
             Regex(
-                "(?iu)(pokaż|pokaz|otwórz|otworz|gdzie|show|open).{0,30}(moc\\p{L}* nadawani|tx power|transmit power)"
+                "(?iu)(pokaż|pokaz|otwórz|otworz|gdzie|show|open).{0,30}(moc\\p{L}* nadawani|tx power|transmit power)",
             )
         val NEIGHBOUR_RANK =
             Regex(
-                "(?iu)(najwięcej|najwiecej|najwięcej|most|największą liczb|najwieksza liczb).{0,40}(sąsiad|sasiad|neighbo)|(sąsiad|sasiad|neighbo).{0,40}(najwięcej|najwiecej|most)"
+                "(?iu)(najwięcej|najwiecej|najwięcej|most|największą liczb|najwieksza liczb).{0,40}(sąsiad|sasiad|neighbo)|(sąsiad|sasiad|neighbo).{0,40}(najwięcej|najwiecej|most)",
             )
         val ICON_OFF = Regex("(?iu)ikon|icon|wyłącz|wylacz|ukryj|hide|turn off")
         val JOINER = Regex("^[\\s,.;?]*(?:i|a|oraz|and)?\\s*", RegexOption.IGNORE_CASE)
@@ -3059,30 +3301,32 @@ class LlamaAssistantService(
         const val HELP_CHARS = 1100
         const val MIN_STEM = 4
 
-        fun foldPl(text: String): String =
-            text
-                .replace('ą', 'a')
-                .replace('ć', 'c')
-                .replace('ę', 'e')
-                .replace('ł', 'l')
-                .replace('ń', 'n')
-                .replace('ó', 'o')
-                .replace('ś', 's')
-                .replace('ź', 'z')
-                .replace('ż', 'z')
+        fun foldPl(text: String): String = text
+            .replace('ą', 'a')
+            .replace('ć', 'c')
+            .replace('ę', 'e')
+            .replace('ł', 'l')
+            .replace('ń', 'n')
+            .replace('ó', 'o')
+            .replace('ś', 's')
+            .replace('ź', 'z')
+            .replace('ż', 'z')
 
         fun foldedSet(vararg words: String): Set<String> = words.map { foldPl(it) }.toSet()
 
         /** Endings that stay different after cutting to five letters ("sieci" / "sieć", "maszcie" / "maszt"). */
-        fun canonicalStem(stem: String): String =
-            when (stem) {
-                "sieci",
-                "sieca",
-                "sieco" -> "siec"
-                "maszc",
-                "masza" -> "maszt"
-                else -> stem
-            }
+        fun canonicalStem(stem: String): String = when (stem) {
+            "sieci",
+            "sieca",
+            "sieco",
+            -> "siec"
+
+            "maszc",
+            "masza",
+            -> "maszt"
+
+            else -> stem
+        }
 
         /** Words so common in questions that they say little about the topic: they count a quarter as much. */
         val GENERIC_STEMS =
@@ -3121,47 +3365,49 @@ class LlamaAssistantService(
         const val MIN_WEB_WORDS = 3
         val POINTER_ONLY =
             Regex(
-                "^(„[^”]+” jest w:|Otwieram stronę z ustawieniem|Otwieram: |To jest na ekranie|Opening the page|Opening: |\"[^\"]+\" is in:)"
+                "^(„[^”]+” jest w:|Otwieram stronę z ustawieniem|Otwieram: |To jest na ekranie|Opening the page|Opening: |\"[^\"]+\" is in:)",
             )
         val SETTING_ASK = Regex("ustawion|skonfigurowan|moc nadawania|mocy nadawania|tx power|configured|set to")
         const val SMALLTALK_WORDS = 7
         val REGION_WORD = Regex("region")
         val REGION_ASK =
             Regex(
-                "jaki|jaką|jaka|jakiego|który|ktory|którego|ustaw|zmie[nń]|wybra|powinien|powinnam|dla mnie|u mnie|w mojej|which|what region|set |change|choose|should|for me"
+                "jaki|jaką|jaka|jakiego|który|ktory|którego|ustaw|zmie[nń]|wybra|powinien|powinnam|dla mnie|u mnie|w mojej|which|what region|set |change|choose|should|for me",
             )
         val PURE_SMALLTALK =
             Regex(
                 "^((cześć|czesc|hej|hejka|siema|witaj|witam|dzień dobry|dzien dobry|dobry wieczór|dobry wieczor|dobranoc|hello|hi|hey|good (morning|evening))[\\s,.!]*)?" +
-                    "((jak się masz|jak sie masz|co słychać|co slychac|how are you|dzięki|dziękuję|dziekuje|thanks|thank you)( bardzo)?( za (pomoc|odpowiedź|odpowiedz|wszystko|info\\p{L}*)| for (the )?(help|answer))?[\\s,.!?]*)?$"
+                    "((jak się masz|jak sie masz|co słychać|co slychac|how are you|dzięki|dziękuję|dziekuje|thanks|thank you)( bardzo)?( za (pomoc|odpowiedź|odpowiedz|wszystko|info\\p{L}*)| for (the )?(help|answer))?[\\s,.!?]*)?$",
             )
         val THANKS = Regex("^(dzięki|dzieki|dziękuję|dziekuje|thanks|thank you)")
         const val GREETING_PL = "Cześć! Wszystko w porządku. W czym mogę pomóc?"
         const val GREETING_EN = "Hello! I am fine. How can I help?"
         const val THANKS_PL = "Proszę! Pytaj dalej, jeśli będziesz czegoś potrzebować."
         const val THANKS_EN = "You are welcome! Ask on if you need anything else."
+
         // "Do I have range to X", "can I reach X": answered from what the radio heard, not by the model.
         val PERIOD_INTENTS = setOf("list_nodes", "count_messages")
         val ROLE_LIST_INTENTS = setOf("signal_list", "list_nodes", "network_question", "chat")
         val SIGNAL_NODE_ASK =
             Regex(
-                "rssi|snr|siła sygnału|sila sygnalu|signal strength|jako\\p{L}* sygnału|jakosc sygnalu|signal quality"
+                "rssi|snr|siła sygnału|sila sygnalu|signal strength|jako\\p{L}* sygnału|jakosc sygnalu|signal quality",
             )
         val REACH_ASK =
             Regex(
-                "zasięg do |zasięgu do |zasieg do |czy (?:mam|mamy) (?:zasięg|zasieg)|czy (?:słyszę|slysze|słychać|slychac|dosięgn|dosiegn|dotrze|złapię|zlapie)|range to |can i reach|do i have (?:range|signal)"
+                "zasięg do |zasięgu do |zasieg do |czy (?:mam|mamy) (?:zasięg|zasieg)|czy (?:słyszę|slysze|słychać|slychac|dosięgn|dosiegn|dotrze|złapię|zlapie)|range to |can i reach|do i have (?:range|signal)",
             )
         val FROM_NODE = Regex("(?<![\\p{L}])(od|from)\\s+(?!mnie|mojego|mojej|me\\b|my\\b)")
+
         /**
          * "24 godziny", "3 dni", "2 tygodnie": the number and unit the user wrote, which the router sometimes mixed up.
          */
         val PERIOD_NUMBER =
             Regex(
-                "(\\d+)\\s*(min\\p{L}*|godz\\p{L}*|h(?![\\p{L}])|hours?|dni|dzie\\p{L}*|dob\\p{L}*|days?|tydz\\p{L}*|tygod\\p{L}*|weeks?|miesi\\p{L}*|months?|lat(?![\\p{L}])|rok\\p{L}*|years?)"
+                "(\\d+)\\s*(min\\p{L}*|godz\\p{L}*|h(?![\\p{L}])|hours?|dni|dzie\\p{L}*|dob\\p{L}*|days?|tydz\\p{L}*|tygod\\p{L}*|weeks?|miesi\\p{L}*|months?|lat(?![\\p{L}])|rok\\p{L}*|years?)",
             )
         val PERIOD_BARE =
             Regex(
-                "ostatni\\p{L}*\\s+(godzin\\p{L}*|dob\\p{L}*|dzie\\p{L}*|tydz\\p{L}*|tygod\\p{L}*|miesi\\p{L}*)|last (hour|day|week|month)"
+                "ostatni\\p{L}*\\s+(godzin\\p{L}*|dob\\p{L}*|dzie\\p{L}*|tydz\\p{L}*|tygod\\p{L}*|miesi\\p{L}*)|last (hour|day|week|month)",
             )
         val WHO_ARE_YOU = Regex("kim jesteś|kim jestes|kto ty|kim ty jesteś|who are you|what are you")
         const val QUOTE_BELOW_RAM_MB = 3000
@@ -3175,7 +3421,7 @@ class LlamaAssistantService(
         const val CAPABILITIES_WORDS = 10
         val CAPABILITIES_ASK =
             Regex(
-                "^\\s*(pomocy|pomoc|help)[!.?\\s]*$|jakie masz możliwości|jakie masz mozliwosci|co potrafisz|co umiesz|co możesz|co mozesz|w czym (możesz|mozesz) (mi )?pomóc|w czym (możesz|mozesz) pomoc|do czego służysz|do czego sluzysz|what can you do|what are you able|how can you help|what do you do"
+                "^\\s*(pomocy|pomoc|help)[!.?\\s]*$|jakie masz możliwości|jakie masz mozliwosci|co potrafisz|co umiesz|co możesz|co mozesz|w czym (możesz|mozesz) (mi )?pomóc|w czym (możesz|mozesz) pomoc|do czego służysz|do czego sluzysz|what can you do|what are you able|how can you help|what do you do",
             )
         const val CAPABILITIES_PL =
             "Mogę pomagać w kilku rzeczach, całkowicie na Twoim urządzeniu:\n" +
@@ -3205,29 +3451,30 @@ class LlamaAssistantService(
         val DATA_INTENTS = setOf("network_question", "list_nodes", "signal_list", "nearest_node")
         val MESSAGE_WORDS =
             Regex(
-                "wiadomo|message|sms|napisa\\S* (do )?(mnie|mi|nam)|napisał mi|prywatn|czat|chat|rozmow|kanał|kanale|kanal|channel"
+                "wiadomo|message|sms|napisa\\S* (do )?(mnie|mi|nam)|napisał mi|prywatn|czat|chat|rozmow|kanał|kanale|kanal|channel",
             )
         val DATA_CUE =
             Regex(
-                "(?<![\\p{L}])(mój|moj|moje|moja|moim|mam|mnie|mi|teraz|aktualn\\p{L}*|obecn\\p{L}*|dzisiaj|dziś|dzis|ostatni\\p{L}*|ile|ilu|któr\\p{L}*|ktor\\p{L}*|kto|najdal\\p{L}*|najbliż\\p{L}*|najbliz\\p{L}*|najsłab\\p{L}*|najlep\\p{L}*|najwięc\\p{L}*|najmniej|uptime|rssi|snr|statystyk\\p{L}*|stan|poziom|daleko|current|now|which|who|nearest|farthest|most|least|many)(?![\\p{L}])"
+                "(?<![\\p{L}])(mój|moj|moje|moja|moim|mam|mnie|mi|teraz|aktualn\\p{L}*|obecn\\p{L}*|dzisiaj|dziś|dzis|ostatni\\p{L}*|ile|ilu|któr\\p{L}*|ktor\\p{L}*|kto|najdal\\p{L}*|najbliż\\p{L}*|najbliz\\p{L}*|najsłab\\p{L}*|najlep\\p{L}*|najwięc\\p{L}*|najmniej|uptime|rssi|snr|statystyk\\p{L}*|stan|poziom|daleko|current|now|which|who|nearest|farthest|most|least|many)(?![\\p{L}])",
             )
         val WHICH_WORDS =
             Regex("(?<![\\p{L}])(któr\\p{L}*|ktor\\p{L}*|jakie|kto|wymień|wymien|lista|which|list)(?![\\p{L}])")
         val TX_POWER_ASK =
             Regex(
-                "(moc|mocy|moc\\p{L}*) nadawani\\p{L}*.*(ustawion|mam|jaka jest|jaką|jaka)|(ustawion|mam|jaka|jaką).*(moc|mocy) nadawani|(what|which).*(transmit|tx) power.*(set|have)|my (transmit|tx) power"
+                "(moc|mocy|moc\\p{L}*) nadawani\\p{L}*.*(ustawion|mam|jaka jest|jaką|jaka)|(ustawion|mam|jaka|jaką).*(moc|mocy) nadawani|(what|which).*(transmit|tx) power.*(set|have)|my (transmit|tx) power",
             )
         val CALC_WORDS =
             Regex(
-                "policz|oblicz|wylicz|calculate|eirp|erp|zasięg|zasieg|bilans|range|budget|maksymaln|\\bmax|limit|dozwolon|legaln|polsce|przepis|zalecan|polecan|optymaln|powinn|allowed|legal|recommend"
+                "policz|oblicz|wylicz|calculate|eirp|erp|zasięg|zasieg|bilans|range|budget|maksymaln|\\bmax|limit|dozwolon|legaln|polsce|przepis|zalecan|polecan|optymaln|powinn|allowed|legal|recommend",
             )
         val BASE_HEAD = Regex("^\\[([^\\]\\n]+)\\]", RegexOption.MULTILINE)
         val MODEL_SOURCE_LINE = Regex("(?imu)^\\s*(źródło|źródła|zrodlo|source|sources)\\s*:.*$\\n?")
+
         /** A source the model wrote at the end of a sentence (not on its own line); the app writes the real one. */
         val MODEL_SOURCE_TAIL = Regex("(?iu)[\\s(]*(?<!\\p{L})(źródło|źródła|source|sources)\\s*:[^\\n]*$")
         val NOT_KNOWN =
             Regex(
-                "nie mam informacji|nie wiem|brak informacji|nie znalazłem|nie znalazlem|i do not know|i don't know|no information"
+                "nie mam informacji|nie wiem|brak informacji|nie znalazłem|nie znalazlem|i do not know|i don't know|no information",
             )
         val NEW_NODES_ASK =
             Regex("now(?:ych|e|y|ego) (?:węzł|wezl)|new nodes?|pojawi\\p{L}* się|pojawi\\p{L}* sie|appeared")
@@ -3235,14 +3482,14 @@ class LlamaAssistantService(
             setOf("chat", "web_question", "app_help", "network_question", "count_messages", "search_messages")
         val MESSAGE_CONTEXT =
             Regex(
-                "(?iu)do mnie|(?<![\\p{L}])mi(?![\\p{L}])|mnie|ostatnio|dzisiaj|dziś|wczoraj|tydzie|tygod|miesi|najwięcej|najwiecej|w sieci|na kanale|kanał|kanal|wiadomo|me\\b|to me|today|recently|channel|message"
+                "(?iu)do mnie|(?<![\\p{L}])mi(?![\\p{L}])|mnie|ostatnio|dzisiaj|dziś|wczoraj|tydzie|tygod|miesi|najwięcej|najwiecej|w sieci|na kanale|kanał|kanal|wiadomo|me\\b|to me|today|recently|channel|message",
             )
         val WHO_WROTE =
             Regex("(?iu)\\bkto (pisał|pisal|napisał|napisal|pisze|wysyłał|wysylal)\\p{L}*|who (wrote|sent|messaged)")
         val MOST_WRITTEN = Regex("(?iu)najwięcej|najwiecej|najczęściej|najczesciej|most")
         val ABOUT_TOPIC =
             Regex(
-                "(?iu)czy (?:ktoś|ktos|ktokolwiek) (?:pisał|pisal|wspominał|wspominal|mówił|mowil)\\p{L}* (?:o|na temat|o tym)\\s+(.+?)\\s*[?.!]*$"
+                "(?iu)czy (?:ktoś|ktos|ktokolwiek) (?:pisał|pisal|wspominał|wspominal|mówił|mowil)\\p{L}* (?:o|na temat|o tym)\\s+(.+?)\\s*[?.!]*$",
             )
         val DATA_ASK_INTENTS = DATA_INTENTS + setOf("chat", "web_question", "app_help")
         val WHERE_NODE = Regex("(?iu)gdzie (jest|leży|lezy|znajduje się|się znajduje)|where is")
@@ -3251,7 +3498,7 @@ class LlamaAssistantService(
         val TODAY_WORDS = Regex("(?iu)dzisiaj|dziś|dzis|today")
         val PACKET_STATS_ASK =
             Regex(
-                "(?iu)pakiet\\p{L}*[^?]*(odebra|wysła|wysla|nadan|błęd|bled|duplik|przekaz|zgubi)|(odebra|wysła|wysla|błęd|duplik)\\p{L}*[^?]*pakiet|packets?\\s+(received|sent|bad|dupl|relay|lost|dropped)|duplikat\\p{L}*"
+                "(?iu)pakiet\\p{L}*[^?]*(odebra|wysła|wysla|nadan|błęd|bled|duplik|przekaz|zgubi)|(odebra|wysła|wysla|błęd|duplik)\\p{L}*[^?]*pakiet|packets?\\s+(received|sent|bad|dupl|relay|lost|dropped)|duplikat\\p{L}*",
             )
         val OWN_WORDS = Regex("(?iu)(?<![\\p{L}])(mój|moj|moje|moja|mojego|mojej|my|mine)(?![\\p{L}])")
         val FAVORITES_ASK = Regex("(?iu)ulubion\\p{L}*|favou?rite")
@@ -3262,39 +3509,40 @@ class LlamaAssistantService(
         val HOW_MANY = Regex("(?iu)(?<![\\p{L}])(ile|ilu|how many)(?![\\p{L}])")
         val NODE_COUNT_ASK =
             Regex(
-                "(?iu)liczb\\p{L}* (znanych |wszystkich )?węzł|ile (jest |mam )?(teraz |obecnie )?(znanych |wszystkich )?węzł|how many (known )?nodes"
+                "(?iu)liczb\\p{L}* (znanych |wszystkich )?węzł|ile (jest |mam )?(teraz |obecnie )?(znanych |wszystkich )?węzł|how many (known )?nodes",
             )
         val ROLE_LIST_ASK = Regex("(?iu)pokaż|pokaz|wszystkie|które|ktore|lista|wymień|wymien|show|list|which")
         val NODE_FACTS_ASK =
             Regex(
-                "(?iu)z ilu skok\\p{L}*|ilu skok\\p{L}*|how many hops|jaki sprzęt|jakie urządzenie|jaką rolę|jaka rola|what role|co to za (sprzęt|urządzenie|węzeł)|jaką wersję firmware|jaki firmware|wersj\\p{L}* (firmware|oprogramowania)|kiedy (ostatnio )?(go )?słysz|ostatnio słysz|w jakiej odległości|jak daleko jest|ile skoków|what hardware|which device|firmware version|when .*last heard|how far is"
+                "(?iu)z ilu skok\\p{L}*|ilu skok\\p{L}*|how many hops|jaki sprzęt|jakie urządzenie|jaką rolę|jaka rola|what role|co to za (sprzęt|urządzenie|węzeł)|jaką wersję firmware|jaki firmware|wersj\\p{L}* (firmware|oprogramowania)|kiedy (ostatnio )?(go )?słysz|ostatnio słysz|w jakiej odległości|jak daleko jest|ile skoków|what hardware|which device|firmware version|when .*last heard|how far is",
             )
         val TIME_ASK =
             Regex(
                 "(?iu)(która|ktora|jaka)\\s+(jest\\s+)?(teraz\\s+)?godzin\\p{L}*|(jaki|jaka)\\s+(jest\\s+)?(dzi\\p{L}*|dzisiaj)\\s+(dzień|dzien|data)|jaka\\s+(jest\\s+)?(dzi\\p{L}*\\s+)?data|(jaki|który)\\s+(mamy\\s+)?(dzi\\p{L}*\\s+)?(dzień|dzien)(\\s+tygodnia)?|którego\\s+(dzi\\p{L}*\\s+)?(jest|mamy)|" +
-                    "what\\s+time\\s+is\\s+it|what(?:'s| is)\\s+(the\\s+)?(date|time)|what\\s+day\\s+is\\s+(it|today)"
+                    "what\\s+time\\s+is\\s+it|what(?:'s| is)\\s+(the\\s+)?(date|time)|what\\s+day\\s+is\\s+(it|today)",
             )
         val APP_UI_ASK =
             Regex(
-                "(?iu)aplikacj|interfejs|czcionk|motyw|ustawieni|czacie|czat\\b|asystent|mt_sw|app\\b|interface|font size|theme"
+                "(?iu)aplikacj|interfejs|czcionk|motyw|ustawieni|czacie|czat\\b|asystent|mt_sw|app\\b|interface|font size|theme",
             )
+
         // Device names: a small model made up their features ("Heltec V3 has a better antenna"), so these are never
         // guessed.
         val HARDWARE_TOPIC =
             Regex(
-                "(?iu)heltec|t-beam|tbeam|t-echo|techo|rak\\s?\\d|lilygo|t1000|xiao|station g|esp32|nrf52|sx12\\d\\d|wio|seeed|elecrow|m5stack"
+                "(?iu)heltec|t-beam|tbeam|t-echo|techo|rak\\s?\\d|lilygo|t1000|xiao|station g|esp32|nrf52|sx12\\d\\d|wio|seeed|elecrow|m5stack",
             )
         val MESH_DEVICE_TOPIC =
             Regex(
-                "(?iu)urządzen|radio|antena|anten|pozycj|bateri|moduł|modul|wyświetlacz|oled|gps|bluetooth|usb|kod qr|klucz|logi|model ai|mqtt|wi-?fi|snr|rssi|\\blna\\b|\\bsaw\\b|lora|kopi[ęea] zapas|konfigurac|firmware|węzł|wezl|kanał|kanal|sygnał|sygnal|zasięg|zasieg|maszt|solar|akumulator|channel|node|signal|battery"
+                "(?iu)urządzen|radio|antena|anten|pozycj|bateri|moduł|modul|wyświetlacz|oled|gps|bluetooth|usb|kod qr|klucz|logi|model ai|mqtt|wi-?fi|snr|rssi|\\blna\\b|\\bsaw\\b|lora|kopi[ęea] zapas|konfigurac|firmware|węzł|wezl|kanał|kanal|sygnał|sygnal|zasięg|zasieg|maszt|solar|akumulator|channel|node|signal|battery",
             )
         val MESH_TOPIC =
             Regex(
-                "(?iu)węz|węzł|mesh|kanał|kanal|firmware|lora|preset|meshtastic|nodeinfo|traceroute|hop|skok|mhz|\\b868\\b|\\b433\\b|dbm|nadawa|licencj|pasm|duplikat|zduplikowan"
+                "(?iu)węz|węzł|mesh|kanał|kanal|firmware|lora|preset|meshtastic|nodeinfo|traceroute|hop|skok|mhz|\\b868\\b|\\b433\\b|dbm|nadawa|licencj|pasm|duplikat|zduplikowan",
             )
         val BATTERY_LEVEL_ASK =
             Regex(
-                "(?iu)(ile|jaki|jaka)\\s+(procent\\p{L}*\\s+)?(bateri\\p{L}*|naładowa\\p{L}*)|poziom\\p{L}*\\s+bateri|battery\\s+(level|percent)|how much battery"
+                "(?iu)(ile|jaki|jaka)\\s+(procent\\p{L}*\\s+)?(bateri\\p{L}*|naładowa\\p{L}*)|poziom\\p{L}*\\s+bateri|battery\\s+(level|percent)|how much battery",
             )
         val UPTIME_WORDS = Regex("uptime|czas pracy|czasu pracy|jak długo działa|jak dlugo dziala|how long .* running")
         val NEAR_FAR = Regex("najdal|najbliż|najbliz|nearest|farthest|closest")
@@ -3302,26 +3550,27 @@ class LlamaAssistantService(
             Regex("^(co się stanie|co sie stanie|co się dzieje|co sie dzieje|what happens|what will happen)")
         val ADVICE_ASK =
             Regex(
-                "^\\s*(jak|jak można|jak mozna|jak mogę|jak moge|how)\\s+(do |can |to |i )?\\s*(zmniejszyć|zmniejszyc|zwiększyć|zwiekszyc|poprawić|poprawic|oszczędz\\p{L}*|oszczedz\\p{L}*|wydłużyć|wydluzyc|chronić|chronic|podłączyć|podlaczyc|zrobić|zrobic|zbudować|zbudowac|wybrać|wybrac|działa|dziala|ustawić|ustawic|zmienić|zmienic|skonfigurować|skonfigurowac|dodać|dodac|włączyć|wlaczyc|wyłączyć|wylaczyc|utworzyć|utworzyc|reduce|improve|save|protect|connect|make|extend|build|choose|set|change|configure|add|enable|disable|create)"
+                "^\\s*(jak|jak można|jak mozna|jak mogę|jak moge|how)\\s+(do |can |to |i )?\\s*(zmniejszyć|zmniejszyc|zwiększyć|zwiekszyc|poprawić|poprawic|oszczędz\\p{L}*|oszczedz\\p{L}*|wydłużyć|wydluzyc|chronić|chronic|podłączyć|podlaczyc|zrobić|zrobic|zbudować|zbudowac|wybrać|wybrac|działa|dziala|ustawić|ustawic|zmienić|zmienic|skonfigurować|skonfigurowac|dodać|dodac|włączyć|wlaczyc|wyłączyć|wylaczyc|utworzyć|utworzyc|reduce|improve|save|protect|connect|make|extend|build|choose|set|change|configure|add|enable|disable|create)",
             )
+
         /** Sentences the small models copy from their own instructions into the answer. */
         val PROMPT_ECHO =
             Regex(
-                "(?i)\\s*Odpowiadam po polsku[^.\\n]*\\.?|\\s*[^.\\n]*(zwykłym tekstem|bez markdown|bez gwiazdek|poprawnie pod względem rodzaju)[^.\\n]*\\.?"
+                "(?i)\\s*Odpowiadam po polsku[^.\\n]*\\.?|\\s*[^.\\n]*(zwykłym tekstem|bez markdown|bez gwiazdek|poprawnie pod względem rodzaju)[^.\\n]*\\.?",
             )
         val SMALLTALK =
             Regex(
-                "^(cześć|czesc|hej|hejka|siema|witaj|witam|dzień dobry|dzien dobry|dobry wieczór|dobry wieczor|dobranoc|hello|hi|hey|good (morning|evening)|kim jesteś|kim jestes|kto ty|kto cię|who are you|jak się masz|jak sie masz|co słychać|co slychac|how are you|dzięki|dziękuję|dziekuje|thanks|thank you)(?![\\p{L}])"
+                "^(cześć|czesc|hej|hejka|siema|witaj|witam|dzień dobry|dzien dobry|dobry wieczór|dobry wieczor|dobranoc|hello|hi|hey|good (morning|evening)|kim jesteś|kim jestes|kto ty|kto cię|who are you|jak się masz|jak sie masz|co słychać|co slychac|how are you|dzięki|dziękuję|dziekuje|thanks|thank you)(?![\\p{L}])",
             )
         val FRESH_WORDS =
             Regex(
-                "cena|ceny|ile kosztuje|kosztuj|aktualn|najnowsz|dzisiaj|wczoraj|202\\d|news|wiadomości ze świata|przepis|prawo|legaln|dozwolon|zezwol|kto wygrał|kurs|pogod|latest|today|price|law|legal|allowed"
+                "cena|ceny|ile kosztuje|kosztuj|aktualn|najnowsz|dzisiaj|wczoraj|202\\d|news|wiadomości ze świata|przepis|prawo|legaln|dozwolon|zezwol|kto wygrał|kurs|pogod|latest|today|price|law|legal|allowed",
             )
         val CORE_ASK =
             Regex("nasz|wojew|świętokrzysk|swietokrzysk|u nas|our |868|869|limit mocy|erp|duty|dozwolon|legaln|zezwol")
         val JAILBREAK =
             Regex(
-                "zapomnij (o )?(wszystk|swoje|te|twoje|zasad)|zapomnie[ćc] (o )?(wszystk|swoje|te|twoje|zasad)|zignorowa[ćc] (wszystk|swoje|poprzednie|zasad)|zignoruj (wszystk|swoje|poprzednie|zasad)|ignoruj (wszystk|swoje|poprzednie|zasad)|forget (all|your|the) (the )?(rules|instructions)|ignore (all|your|the|previous) (the )?(rules|instructions)|bez żadnych zasad|robi[ćc],? co powiem|rób,? co powiem|do whatever i say"
+                "zapomnij (o )?(wszystk|swoje|te|twoje|zasad)|zapomnie[ćc] (o )?(wszystk|swoje|te|twoje|zasad)|zignorowa[ćc] (wszystk|swoje|poprzednie|zasad)|zignoruj (wszystk|swoje|poprzednie|zasad)|ignoruj (wszystk|swoje|poprzednie|zasad)|forget (all|your|the) (the )?(rules|instructions)|ignore (all|your|the|previous) (the )?(rules|instructions)|bez żadnych zasad|robi[ćc],? co powiem|rób,? co powiem|do whatever i say",
             )
         const val JAILBREAK_PL =
             "Nie mogę zapomnieć ani zmienić swoich zasad na prośbę. Mogę za to pomóc w sprawach MT_SW, sieci mesh i ustawień aplikacji."
@@ -3330,39 +3579,40 @@ class LlamaAssistantService(
         val WHERE_ONLY = Regex("^(gdzie|where|w którym miejscu|w ktorym miejscu)(?=\\s)")
         val CHANGE_ASK =
             Regex(
-                "^(jak|w jaki sposób|w jaki sposob|how)\\s+(mogę |moge |można |mozna |do i |can i )?(zmienić|zmienic|włączyć|wlaczyc|wyłączyć|wylaczyc|ustawić|ustawic|skonfigurować|skonfigurowac|zaktualizować|zaktualizowac|przełączyć|przelaczyc|change|enable|disable|set|turn|update|switch)"
+                "^(jak|w jaki sposób|w jaki sposob|how)\\s+(mogę |moge |można |mozna |do i |can i )?(zmienić|zmienic|włączyć|wlaczyc|wyłączyć|wylaczyc|ustawić|ustawic|skonfigurować|skonfigurowac|zaktualizować|zaktualizowac|przełączyć|przelaczyc|change|enable|disable|set|turn|update|switch)",
             )
         val FOLLOW_PERIOD =
             Regex(
-                "(?iu)^\\s*a\\s+(wczoraj|dzisiaj|dziś|dzis|(?:w\\s+)?(?:zeszłym|zeszlym|ubiegłym|ubieglym)\\s+(?:tygodniu|miesiącu|miesiacu)|tydzień temu|tydzien temu|miesiąc temu|miesiac temu)\\s*\\??\\s*$"
+                "(?iu)^\\s*a\\s+(wczoraj|dzisiaj|dziś|dzis|(?:w\\s+)?(?:zeszłym|zeszlym|ubiegłym|ubieglym)\\s+(?:tygodniu|miesiącu|miesiacu)|tydzień temu|tydzien temu|miesiąc temu|miesiac temu)\\s*\\??\\s*$",
             )
         val PERIOD_PHRASES =
             Regex(
-                "(?iu)(?<![\\p{L}])(dzisiaj|dziś|dzis|wczoraj|w ostatni\\p{L}* \\d* ?\\p{L}+|przez ostatni\\p{L}* \\d* ?\\p{L}+|tydzień temu|tydzien temu|miesiąc temu|miesiac temu)(?![\\p{L}])"
+                "(?iu)(?<![\\p{L}])(dzisiaj|dziś|dzis|wczoraj|w ostatni\\p{L}* \\d* ?\\p{L}+|przez ostatni\\p{L}* \\d* ?\\p{L}+|tydzień temu|tydzien temu|miesiąc temu|miesiac temu)(?![\\p{L}])",
             )
         val TRANSLATE_ASK = Regex("(?iu)^\\s*(przetłumacz|przetlumacz|translate)(?![\\p{L}])")
         val PASSWORD_ASK = Regex("(?iu)(podaj|jakie|jaki|what is|tell me).{0,25}(hasł|hasl|password)")
         val ONLINE_ASK =
             Regex(
-                "(?iu)(?<![\\p{L}])(online|aktywn\\p{L}*|dostępn\\p{L}*|dostepn\\p{L}*|żyje|zyje|działa teraz|dziala teraz)(?![\\p{L}])"
+                "(?iu)(?<![\\p{L}])(online|aktywn\\p{L}*|dostępn\\p{L}*|dostepn\\p{L}*|żyje|zyje|działa teraz|dziala teraz)(?![\\p{L}])",
             )
         val BATTERY_LIMIT =
             Regex("(?iu)(mniej niż|mniej niz|poniżej|ponizej|nie więcej niż|below|under|less than)\\s*(\\d{1,3})\\s*%")
         val GPS_ASK = Regex("(?iu)(mają|maja|z|have|with)\\s+(gps|pozycj\\p{L}*|position)")
         val POWERED_ASK =
             Regex(
-                "(?iu)zasilan\\p{L}*\\s+z zewnątrz|zasilan\\p{L}*\\s+z zewnatrz|zasilanie zewnętrzne|zasilanie zewnetrzne|externally powered|external power|ładuje się|laduje sie"
+                "(?iu)zasilan\\p{L}*\\s+z zewnątrz|zasilan\\p{L}*\\s+z zewnatrz|zasilanie zewnętrzne|zasilanie zewnetrzne|externally powered|external power|ładuje się|laduje sie",
             )
         val TOOL_CALL_JSON = Regex("(?s)^\\s*\\{\\s*\"name\"\\s*:.*\"arguments\"\\s*:.*\\}\\s*$")
         val NEWS_WORDS =
             Regex(
-                "co nowego|nowości|nowosci|nowego w|lista zmian|ostatnie zmiany|ostatniej wersji|nowej wersji|what's new|new in|changelog"
+                "co nowego|nowości|nowosci|nowego w|lista zmian|ostatnie zmiany|ostatniej wersji|nowej wersji|what's new|new in|changelog",
             )
         val APP_WORDS = Regex("mt[_ -]?sw|aplikacj|funkcj|ustawie|tłumacz|tlumacz|asystent|dyktowan|app\\b|setting")
 
         /** Quiet thinking before written answers is off: on a laptop it added tens of seconds to every answer. */
         const val THINKING = false
         const val BASE_TOKENS = 4096
+
         /** The prompt is never more than twice the base size: a long prompt is read again at every answer. */
         const val MAX_ROOM = 2
         const val THIN_BASE_CHARS = 600
@@ -3518,16 +3768,17 @@ class LlamaAssistantService(
         const val CORE_EN = "CORE FACTS ABOUT MT_SW (always true, use them when the question is about them):"
         val POLISH_PLAIN =
             Regex(
-                "\\s(jak|gdzie|czy|ile|kto|jest|mam|moj|moje|wezel|wezly|wezla|siec|sieci|pokaz|otworz|zmienic|ustawienia|prosze|dzieki|czesc|jaki|jaka|jakie)\\s"
+                "\\s(jak|gdzie|czy|ile|kto|jest|mam|moj|moje|wezel|wezly|wezla|siec|sieci|pokaz|otworz|zmienic|ustawienia|prosze|dzieki|czesc|jaki|jaka|jakie)\\s",
             )
+
         // English words that are not also Polish ones ("to", "do", "on", "i", "a" are), for a short question.
         val ENGLISH_ONLY =
             Regex(
-                "\\s(the|how|what|where|which|who|is|are|does|can|my|show|open|change|please|hello|thanks|should|would|could|be|for|with|and|this|that|you|your|much|many|long|length|need|calculate|tell|give|explain|joke|far|reach|capital|why|when|write|find|name|did|will|have|has|about|summary|short|now|today)(?=[\\s?.!,])"
+                "\\s(the|how|what|where|which|who|is|are|does|can|my|show|open|change|please|hello|thanks|should|would|could|be|for|with|and|this|that|you|your|much|many|long|length|need|calculate|tell|give|explain|joke|far|reach|capital|why|when|write|find|name|did|will|have|has|about|summary|short|now|today)(?=[\\s?.!,])",
             )
         val ENGLISH_PLAIN =
             Regex(
-                "\\s(the|how|what|where|which|who|is|are|do|does|can|my|me|to|of|in|on|show|open|change|set|please|hello|hi|thanks|i)(?=[\\s?.!,])"
+                "\\s(the|how|what|where|which|who|is|are|do|does|can|my|me|to|of|in|on|show|open|change|set|please|hello|hi|thanks|i)(?=[\\s?.!,])",
             )
         const val EARLIER_PL = "Streszczenie wcześniejszej części tej rozmowy:"
         const val EARLIER_EN = "Summary of the earlier part of this conversation:"

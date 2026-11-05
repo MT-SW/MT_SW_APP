@@ -39,14 +39,13 @@ import org.meshtastic.core.model.util.TimeConstants
 import org.meshtastic.core.model.util.encodeToString
 import org.meshtastic.core.model.util.platformRandomBytes
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.node_color_pick
-import org.meshtastic.core.ui.assistant.assistantHighlight
 import org.meshtastic.core.resources.admin_keys
 import org.meshtastic.core.resources.administration
 import org.meshtastic.core.resources.config_security_private_key
 import org.meshtastic.core.resources.config_security_private_key_remote
 import org.meshtastic.core.resources.direct_message_key
 import org.meshtastic.core.resources.logs
+import org.meshtastic.core.resources.node_color_pick
 import org.meshtastic.core.resources.redacted
 import org.meshtastic.core.resources.regenerate_keys_confirmation
 import org.meshtastic.core.resources.regenerate_private_key
@@ -62,6 +61,7 @@ import org.meshtastic.core.resources.schema_security_public_key_description
 import org.meshtastic.core.resources.schema_security_serial_enabled
 import org.meshtastic.core.resources.schema_security_serial_enabled_description
 import org.meshtastic.core.resources.security
+import org.meshtastic.core.ui.assistant.assistantHighlight
 import org.meshtastic.core.ui.component.CopyIconButton
 import org.meshtastic.core.ui.component.EditBase64Preference
 import org.meshtastic.core.ui.component.EditListPreference

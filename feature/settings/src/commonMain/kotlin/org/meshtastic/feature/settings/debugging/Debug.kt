@@ -83,8 +83,6 @@ import org.meshtastic.core.resources.debug_tab_mirror
 import org.meshtastic.core.resources.debug_tab_packets
 import org.meshtastic.core.resources.okay
 import org.meshtastic.core.ui.component.CopyIconButton
-import org.meshtastic.core.ui.component.DropDownPreference
-import org.meshtastic.feature.settings.component.LogRetentionPreference
 import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.MeshtasticDialog
@@ -96,6 +94,7 @@ import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Settings
 import org.meshtastic.core.ui.theme.AnnotationColor
 import org.meshtastic.core.ui.util.isDesktopPlatform
+import org.meshtastic.feature.settings.component.LogRetentionPreference
 import org.meshtastic.feature.settings.debugging.DebugViewModel.UiMeshLog
 
 // No end-of-line anchor: Wire's toString is single-line, so annotations land mid-line

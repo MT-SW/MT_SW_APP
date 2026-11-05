@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod")
+
 package org.meshtastic.feature.node.detail
 
 import androidx.compose.runtime.Composable
@@ -51,8 +53,8 @@ private const val WINDOW_STEP_MINUTES = 10
 
 /**
  * Everything the on-demand screen has received so far, as the same plain report the network summary uses, so it can be
- * saved as PDF, HTML, Markdown, text or CSV. Only queries that have an answer get a section; the report is empty
- * until at least one answer arrived. The "generated" stamp is filled in when the file is written.
+ * saved as PDF, HTML, Markdown, text or CSV. Only queries that have an answer get a section; the report is empty until
+ * at least one answer arrived. The "generated" stamp is filled in when the file is written.
  */
 @Composable
 internal fun rememberOnDemandReport(uiState: OnDemandLogUiState): NetworkReport {
@@ -79,9 +81,11 @@ internal fun rememberOnDemandReport(uiState: OnDemandLogUiState): NetworkReport 
             ?.let { stats -> nodeStatsRows(stats).map { ReportLine(stringResource(it.first), it.second) } }
             .orEmpty()
     val ports =
-        uiState.portCounterHistory.sortedByDescending { it.count }.map { entry ->
-            ReportBar("${portInfo(entry.port).label} (${entry.port})", entry.count.toFloat(), "${entry.count}")
-        }
+        uiState.portCounterHistory
+            .sortedByDescending { it.count }
+            .map { entry ->
+                ReportBar("${portInfo(entry.port).label} (${entry.port})", entry.count.toFloat(), "${entry.count}")
+            }
     val exchanges =
         uiState.exchangeLog.map { entry ->
             val from = NodeAddress.numToDefaultId(entry.from_node)
@@ -107,12 +111,16 @@ internal fun rememberOnDemandReport(uiState: OnDemandLogUiState): NetworkReport 
             if (statsLines.isNotEmpty()) {
                 add(ReportSection(statsTitle, lines = stamp(OnDemandType.RESPONSE_NODE_STATS) + statsLines))
             }
-            pingLines(uiState.pingResult, uiState.pingRoundTripMs).takeIf { it.isNotEmpty() }?.let {
-                add(ReportSection(pingTitle, lines = stamp(OnDemandType.RESPONSE_PING) + it))
-            }
-            pingLines(uiState.pingAckResult, uiState.pingAckRoundTripMs).takeIf { it.isNotEmpty() }?.let {
-                add(ReportSection(pingAckTitle, lines = stamp(OnDemandType.RESPONSE_PING_ACK) + it))
-            }
+            pingLines(uiState.pingResult, uiState.pingRoundTripMs)
+                .takeIf { it.isNotEmpty() }
+                ?.let {
+                    add(ReportSection(pingTitle, lines = stamp(OnDemandType.RESPONSE_PING) + it))
+                }
+            pingLines(uiState.pingAckResult, uiState.pingAckRoundTripMs)
+                .takeIf { it.isNotEmpty() }
+                ?.let {
+                    add(ReportSection(pingAckTitle, lines = stamp(OnDemandType.RESPONSE_PING_ACK) + it))
+                }
             if (uiState.nodesOnline.isNotEmpty()) {
                 add(
                     ReportSection(
@@ -137,9 +145,11 @@ internal fun rememberOnDemandReport(uiState: OnDemandLogUiState): NetworkReport 
                         stamp(OnDemandType.RESPONSE_ROUTING_ERRORS) +
                             if (errors.isEmpty()) listOf(ReportLine(noErrors, "0")) else emptyList(),
                         bars =
-                        errors.sortedByDescending { it.counter }.map {
-                            ReportBar("#${it.num}", it.counter.toFloat(), "${it.counter}")
-                        },
+                        errors
+                            .sortedByDescending { it.counter }
+                            .map {
+                                ReportBar("#${it.num}", it.counter.toFloat(), "${it.counter}")
+                            },
                     ),
                 )
             }
@@ -166,12 +176,16 @@ internal fun rememberOnDemandReport(uiState: OnDemandLogUiState): NetworkReport 
                     ),
                 )
             }
-            windowBars(uiState.rxAvgTimeHistory).takeIf { it.isNotEmpty() }?.let {
-                add(ReportSection(avgTitle, lines = stamp(OnDemandType.RESPONSE_RX_AVG_TIME), bars = it))
-            }
-            windowBars(uiState.rxPacketHistory).takeIf { it.isNotEmpty() }?.let {
-                add(ReportSection(historyTitle, lines = stamp(OnDemandType.RESPONSE_PACKET_RX_HISTORY), bars = it))
-            }
+            windowBars(uiState.rxAvgTimeHistory)
+                .takeIf { it.isNotEmpty() }
+                ?.let {
+                    add(ReportSection(avgTitle, lines = stamp(OnDemandType.RESPONSE_RX_AVG_TIME), bars = it))
+                }
+            windowBars(uiState.rxPacketHistory)
+                .takeIf { it.isNotEmpty() }
+                ?.let {
+                    add(ReportSection(historyTitle, lines = stamp(OnDemandType.RESPONSE_PACKET_RX_HISTORY), bars = it))
+                }
             uiState.fwPlusVersion?.let {
                 add(
                     ReportSection(

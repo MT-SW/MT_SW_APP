@@ -102,12 +102,11 @@ constructor(
         if (fullHistory) all.calmed() else newest.calmed().onStart { emit(emptyList()) }
 
     /** The summary only needs to know whether a request exists, so it decodes far fewer entries than the full read. */
-    private fun requestLogs(nodeId: Int, port: PortNum, fullHistory: Boolean): Flow<List<MeshLog>> =
-        if (fullHistory) {
-            meshLogRepository.getRequestLogs(nodeId, port)
-        } else {
-            meshLogRepository.getRequestLogsLimited(nodeId, port, QUICK_REQUEST_ITEMS)
-        }
+    private fun requestLogs(nodeId: Int, port: PortNum, fullHistory: Boolean): Flow<List<MeshLog>> = if (fullHistory) {
+        meshLogRepository.getRequestLogs(nodeId, port)
+    } else {
+        meshLogRepository.getRequestLogsLimited(nodeId, port, QUICK_REQUEST_ITEMS)
+    }
 
     @Suppress("LongMethod", "CyclomaticComplexMethod")
     private fun buildFlow(nodeId: Int, effectiveNodeId: Int, fullHistory: Boolean): Flow<NodeDetailUiState> {
@@ -278,7 +277,9 @@ constructor(
                 logs.packets
                     .firstOrNull()
                     ?.relay_node
-                    ?.let { relayId -> Node.getRelayNode(relayId, nodeDBbyNum.values.toList(), identity.ourNode?.num) }
+                    ?.let { relayId ->
+                        Node.getRelayNode(relayId, nodeDBbyNum.values.toList(), identity.ourNode?.num)
+                    }
                     ?.user
                     ?.short_name
 
@@ -307,7 +308,9 @@ constructor(
                     airQualityMetrics = logs.telemetry.filter { it.air_quality_metrics != null },
                     hostMetrics =
                     logs.telemetry.filter {
-                        it.host_metrics != null || it.local_stats != null || it.decodeLocalStatsExtended() != null
+                        it.host_metrics != null ||
+                            it.local_stats != null ||
+                            it.decodeLocalStatsExtended() != null
                     },
                     signalMetrics = logs.packets.filter { it.isDirectSignal() },
                     positionLogs = logs.posPackets.mapNotNull { it.toPosition() },
@@ -316,7 +319,10 @@ constructor(
                     tracerouteResults = logs.trRes,
                     tracerouteObserved = observedTracerouteResponses(trReqs, logs.trRes),
                     tracerouteTracedBy =
-                    tracedByTracerouteRequests(if (isLocal) logs.trInbound else logs.trRes, identity.ourNode?.num),
+                    tracedByTracerouteRequests(
+                        if (isLocal) logs.trInbound else logs.trRes,
+                        identity.ourNode?.num,
+                    ),
                     neighborInfoRequests = niReqs,
                     neighborInfoResults = logs.niRes,
                     firmwareEdition = metadata.edition,
@@ -325,7 +331,9 @@ constructor(
                 )
 
             val environmentState =
-                EnvironmentMetricsState(environmentMetrics = logs.telemetry.filter { it.hasValidEnvironmentMetrics() })
+                EnvironmentMetricsState(
+                    environmentMetrics = logs.telemetry.filter { it.hasValidEnvironmentMetrics() },
+                )
 
             val availableLogs = buildSet {
                 if (metricsState.hasDeviceMetrics()) add(LogsType.DEVICE)

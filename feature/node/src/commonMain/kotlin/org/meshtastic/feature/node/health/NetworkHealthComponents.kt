@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod", "TooManyFunctions")
+
 package org.meshtastic.feature.node.health
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -252,7 +254,11 @@ internal fun NetworkHealthHero(
                             modifier =
                             Modifier.clip(RoundedCornerShape(LEVEL_CHIP_RADIUS_DP.dp))
                                 .background(
-                                    if (selected) level.color().copy(alpha = ROW_TINT_ALPHA * 2) else Color.Transparent,
+                                    if (selected) {
+                                        level.color().copy(alpha = ROW_TINT_ALPHA * 2)
+                                    } else {
+                                        Color.Transparent
+                                    },
                                 )
                                 .clickable { onLevelClick(level) }
                                 .padding(horizontal = 6.dp, vertical = 4.dp),
@@ -290,11 +296,12 @@ internal fun DonutChart(
     val total = segments.sumOf { it.second }
     var target by remember { mutableFloatStateOf(0f) }
     LaunchedEffect(Unit) { target = 1f }
-    val progress by animateFloatAsState(
-        targetValue = target,
-        animationSpec = tween(RING_ANIMATION_MILLIS),
-        label = "donut",
-    )
+    val progress by
+        animateFloatAsState(
+            targetValue = target,
+            animationSpec = tween(RING_ANIMATION_MILLIS),
+            label = "donut",
+        )
     val track = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
 
     Box(modifier = modifier.size(sizeDp.dp), contentAlignment = Alignment.Center) {
@@ -509,8 +516,7 @@ private const val NAME_BADGE_CHARS = 4
 private fun NameBadge(text: String, color: Color) {
     Box(
         modifier =
-        Modifier
-            .size(44.dp)
+        Modifier.size(44.dp)
             .clip(CircleShape)
             .background(color.copy(alpha = 0.18f))
             .border(2.dp, color, CircleShape),
@@ -530,8 +536,7 @@ private fun NameBadge(text: String, color: Color) {
 private fun LevelBar(fraction: Float, color: Color) {
     Box(
         modifier =
-        Modifier
-            .fillMaxWidth()
+        Modifier.fillMaxWidth()
             .height(4.dp)
             .clip(RoundedCornerShape(2.dp))
             .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.10f)),
@@ -552,8 +557,11 @@ private fun NetworkHealthMetric.barFraction(node: NodeHealthInfo): Float? = when
     // Full bar = quiet band (-130 dBm), empty = very noisy; a node without a noise floor gets no bar.
     NetworkHealthMetric.SIGNAL ->
         node.noiseFloor?.let { ((NOISE_BAR_MAX - it) / (NOISE_BAR_MAX - NOISE_BAR_MIN)).coerceIn(0f, 1f) }
+
     NetworkHealthMetric.ETHER -> node.channelUtilization?.let { it / PERCENT }
+
     NetworkHealthMetric.NEIGHBORS -> node.neighborCount?.let { it / NEIGHBOR_BAR_MAX }
+
     NetworkHealthMetric.ENVIRONMENT,
     NetworkHealthMetric.RESOURCES,
     NetworkHealthMetric.TRAFFIC,
@@ -577,12 +585,13 @@ internal fun MetricSparkline(values: List<Float>, color: Color, modifier: Modifi
             if (index == 0) line.moveTo(x, y) else line.lineTo(x, y)
             lastPoint = Offset(x, y)
         }
-        val fill = Path().apply {
-            addPath(line)
-            lineTo(size.width, size.height)
-            lineTo(0f, size.height)
-            close()
-        }
+        val fill =
+            Path().apply {
+                addPath(line)
+                lineTo(size.width, size.height)
+                lineTo(0f, size.height)
+                close()
+            }
         drawPath(
             path = fill,
             brush = Brush.verticalGradient(listOf(color.copy(alpha = SPARKLINE_FILL_ALPHA), Color.Transparent)),
@@ -621,7 +630,10 @@ internal fun NetworkHealthInfoDialog(
                     }
                 }
                 Text(text = stringResource(metric.infoRes), style = MaterialTheme.typography.bodyMedium)
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
                     Text(
                         text = "Blokuj ukrywanie kondycji sieci przy przesuwaniu listy",
                         style = MaterialTheme.typography.bodyMedium,

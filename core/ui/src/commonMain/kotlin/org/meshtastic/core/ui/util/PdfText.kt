@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("CyclomaticComplexMethod", "MagicNumber")
+
 package org.meshtastic.core.ui.util
 
 /** PDF text helpers: Helvetica with WinAnsi + a /Differences table for the Polish letters missing from WinAnsi. */

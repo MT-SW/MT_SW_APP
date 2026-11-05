@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("TooManyFunctions")
+
 package org.meshtastic.feature.settings.radio
 
 import androidx.lifecycle.ViewModel
@@ -28,8 +30,8 @@ import org.meshtastic.core.repository.MeshWorkerManager
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.are_you_sure
-import org.meshtastic.core.resources.clean_node_database_confirmation
 import org.meshtastic.core.resources.clean_app_node_db_confirmation
+import org.meshtastic.core.resources.clean_node_database_confirmation
 import org.meshtastic.core.resources.clean_now
 import org.meshtastic.core.ui.util.AlertManager
 import org.meshtastic.core.ui.viewmodel.safeLaunch

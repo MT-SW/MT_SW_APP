@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LoopWithTooManyJumpStatements", "ReturnCount")
+
 package org.meshtastic.feature.node.list
 
 import androidx.lifecycle.SavedStateHandle
@@ -26,9 +28,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.koin.core.annotation.KoinViewModel
@@ -36,14 +38,6 @@ import org.meshtastic.core.common.util.LocaleUnitsProvider
 import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.TemperatureUnit
 import org.meshtastic.core.common.util.nowMillis
-import org.meshtastic.core.model.noiseFloorOrNull
-import org.meshtastic.core.model.util.LocalStatsExtended
-import org.meshtastic.core.model.util.decodeLocalStatsExtended
-import org.meshtastic.proto.LocalStats
-import org.meshtastic.feature.node.health.calmed
-import org.meshtastic.proto.NeighborInfo
-import org.meshtastic.proto.PortNum
-import org.meshtastic.proto.Telemetry
 import org.meshtastic.core.model.DeviceType
 import org.meshtastic.core.model.MeshLog
 import org.meshtastic.core.model.Node
@@ -53,6 +47,9 @@ import org.meshtastic.core.model.NodeExtraStats
 import org.meshtastic.core.model.NodeListDensity
 import org.meshtastic.core.model.NodeSortOption
 import org.meshtastic.core.model.effectiveLongName
+import org.meshtastic.core.model.noiseFloorOrNull
+import org.meshtastic.core.model.util.LocalStatsExtended
+import org.meshtastic.core.model.util.decodeLocalStatsExtended
 import org.meshtastic.core.repository.AdminController
 import org.meshtastic.core.repository.ConnectionStateProvider
 import org.meshtastic.core.repository.DeviceHardwareRepository
@@ -67,8 +64,13 @@ import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
 import org.meshtastic.feature.node.detail.NodeManagementActions
 import org.meshtastic.feature.node.detail.NodeRequestActions
 import org.meshtastic.feature.node.domain.usecase.GetFilteredNodesUseCase
+import org.meshtastic.feature.node.health.calmed
 import org.meshtastic.proto.ChannelSet
 import org.meshtastic.proto.Config
+import org.meshtastic.proto.LocalStats
+import org.meshtastic.proto.NeighborInfo
+import org.meshtastic.proto.PortNum
+import org.meshtastic.proto.Telemetry
 
 @Suppress("LongParameterList", "TooManyFunctions")
 @KoinViewModel
@@ -153,7 +155,10 @@ class NodeListViewModel(
                 } else {
                     combine(
                         meshLogRepository
-                            .getLogsByPortNumSinceSlim(PortNum.TELEMETRY_APP.value, nowMillis - EXTRA_STATS_WINDOW_MILLIS)
+                            .getLogsByPortNumSinceSlim(
+                                PortNum.TELEMETRY_APP.value,
+                                nowMillis - EXTRA_STATS_WINDOW_MILLIS,
+                            )
                             .calmed(),
                         nodeRepository.ourNodeInfo,
                         nodeRepository.localStatsExtended,
@@ -164,11 +169,16 @@ class NodeListViewModel(
                         // Newest first: the first reading found for a node is its latest.
                         for (log in logs) {
                             val num = if (log.fromNum == 0 && myNum != null) myNum else log.fromNum
-                            // Stop reading a node once it has everything, or after a generous number of packets: the Wi-Fi signal
+                            // Stop reading a node once it has everything, or after a generous number of packets:
+                            // the Wi-Fi signal
                             // arrives rarely (about every few hours), far apart from the many packets in between.
-                            if ((decoded[num] ?: 0) >= MAX_PACKETS_PER_NODE || result[num]?.isComplete == true) continue
-                            val payload = runCatching { log.fromRadio.packet?.decoded?.payload }.getOrNull() ?: continue
-                            val telemetry = runCatching { Telemetry.ADAPTER.decode(payload) }.getOrNull() ?: continue
+                            if ((decoded[num] ?: 0) >= MAX_PACKETS_PER_NODE || result[num]?.isComplete == true) {
+                                continue
+                            }
+                            val payload =
+                                runCatching { log.fromRadio.packet?.decoded?.payload }.getOrNull() ?: continue
+                            val telemetry =
+                                runCatching { Telemetry.ADAPTER.decode(payload) }.getOrNull() ?: continue
                             // The extended stats (CPU, flash, Wi-Fi) come in a telemetry packet of their own, apart
                             // from the normal local stats, so a packet may carry either one or both.
                             val stats = telemetry.local_stats
@@ -291,16 +301,19 @@ class NodeListViewModel(
         )
     }
 
-    /** The last NeighborInfo list of our own node, read the way its details page reads it (our node's logs are kept under a local number). */
+    /**
+     * The last NeighborInfo list of our own node, read the way its details page reads it (our node's logs are kept
+     * under a local number).
+     */
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
     private val ownNeighborReport: Flow<NeighborReport?> =
         nodeRepository.ourNodeInfo.flatMapLatest { ours ->
             if (ours == null) {
                 flowOf(null)
             } else {
-                meshLogRepository
-                    .getLogsFromLimited(ours.num, PortNum.NEIGHBORINFO_APP.value, 1)
-                    .map { logs -> logs.firstNotNullOfOrNull { it.toNeighborReport() } }
+                meshLogRepository.getLogsFromLimited(ours.num, PortNum.NEIGHBORINFO_APP.value, 1).map { logs ->
+                    logs.firstNotNullOfOrNull { it.toNeighborReport() }
+                }
             }
         }
 
@@ -315,15 +328,22 @@ class NodeListViewModel(
             nodeRepository.ourNodeInfo,
         ) { logs, own, ours ->
             val received =
-                logs.distinctBy { it.fromNum }.mapNotNull { log -> log.toNeighborReport()?.let { log.fromNum to it } }.toMap()
+                logs
+                    .distinctBy { it.fromNum }
+                    .mapNotNull { log -> log.toNeighborReport()?.let { log.fromNum to it } }
+                    .toMap()
             if (own != null && ours != null) received + (ours.num to own) else received
         }
             .flowOn(Dispatchers.Default)
             .stateInWhileSubscribed(initialValue = emptyMap())
 
-    /** Each node's number of direct neighbours, from the last NeighborInfo list saved for it (absent when none was saved). */
+    /**
+     * Each node's number of direct neighbours, from the last NeighborInfo list saved for it (absent when none was
+     * saved).
+     */
     val neighborCounts: StateFlow<Map<Int, Int>> =
-        neighborReports.map { reports -> reports.mapValues { (_, report) -> report.neighbors.size } }
+        neighborReports
+            .map { reports -> reports.mapValues { (_, report) -> report.neighbors.size } }
             .stateInWhileSubscribed(initialValue = emptyMap())
 
     /** The nodes the unheard banner offers for removal: see [selectRemovableUnheardNodes], less the ones kept. */
@@ -490,7 +510,8 @@ private fun extraStatsOf(stats: LocalStats?, ext: LocalStatsExtended?): NodeExtr
                 packetsRxBad = stats.num_packets_rx_bad,
                 rxDupe = stats.num_rx_dupe,
                 txRelay = stats.num_tx_relay,
-                heapUsedPercent = if (heapTotal > 0) (heapTotal - heapFree).coerceAtLeast(0) * PERCENT / heapTotal else null,
+                heapUsedPercent =
+                if (heapTotal > 0) (heapTotal - heapFree).coerceAtLeast(0) * PERCENT / heapTotal else null,
                 noiseFloor = stats.noiseFloorOrNull,
             )
         }
@@ -507,7 +528,8 @@ private fun NodeExtraStats.withHardware(ext: LocalStatsExtended?): NodeExtraStat
         ext.takeIf { it.flashTotalBytes > 0 }?.let { it.flashUsedBytes * PERCENT / it.flashTotalBytes }
             ?: flashUsedPercent,
         psramUsedPercent =
-        ext.takeIf { it.memoryPsramTotal > 0 }?.let { (it.memoryPsramTotal - it.memoryPsramFree).coerceAtLeast(0) * PERCENT / it.memoryPsramTotal }
+        ext.takeIf { it.memoryPsramTotal > 0 }
+            ?.let { (it.memoryPsramTotal - it.memoryPsramFree).coerceAtLeast(0) * PERCENT / it.memoryPsramTotal }
             ?: psramUsedPercent,
         wifiRssi = ext.wifiRssi.takeIf { it != 0 } ?: wifiRssi,
     )

@@ -52,70 +52,74 @@ import kotlin.test.assertTrue
 class AdaptiveMetricLayoutTest {
 
     @Test
-    fun `panes are stacked, fit available width and retain selection and scroll across resizing and expansion`() = runComposeUiTest {
-        val width = mutableStateOf(360)
-        val expanded = mutableStateOf(false)
-        val selected = mutableStateOf(-1)
-        val listState = LazyListState()
-        // Density 0.5 keeps the dp sizes inside the pixel window. The split reads this window, not the parent width.
-        val windowInfo = ResizableWindowInfo(IntSize(180, 400))
-        setContent {
-            CompositionLocalProvider(LocalDensity provides Density(0.5f), LocalWindowInfo provides windowInfo) {
-                MaterialTheme {
-                    AdaptiveMetricLayout(
-                        modifier = Modifier.size(width.value.dp, 800.dp).testTag("parent"),
-                        isChartExpanded = expanded.value,
-                        chartPart = { modifier -> Box(modifier.widthIn(min = 320.dp).testTag("chart")) },
-                        listPart = { modifier ->
-                            LazyColumn(
-                                modifier.widthIn(min = 320.dp).fillMaxSize().testTag("list"),
-                                state = listState,
-                            ) {
-                                items(40) { index ->
-                                    Text(
-                                        text = "Metric $index selected ${selected.value == index}",
-                                        modifier =
-                                        Modifier.fillMaxWidth().height(48.dp).clickable { selected.value = index },
-                                    )
+    fun `panes are stacked, fit available width and retain selection and scroll across resizing and expansion`() =
+        runComposeUiTest {
+            val width = mutableStateOf(360)
+            val expanded = mutableStateOf(false)
+            val selected = mutableStateOf(-1)
+            val listState = LazyListState()
+            // Density 0.5 keeps the dp sizes inside the pixel window. The split reads this window, not the parent
+            // width.
+            val windowInfo = ResizableWindowInfo(IntSize(180, 400))
+            setContent {
+                CompositionLocalProvider(LocalDensity provides Density(0.5f), LocalWindowInfo provides windowInfo) {
+                    MaterialTheme {
+                        AdaptiveMetricLayout(
+                            modifier = Modifier.size(width.value.dp, 800.dp).testTag("parent"),
+                            isChartExpanded = expanded.value,
+                            chartPart = { modifier -> Box(modifier.widthIn(min = 320.dp).testTag("chart")) },
+                            listPart = { modifier ->
+                                LazyColumn(
+                                    modifier.widthIn(min = 320.dp).fillMaxSize().testTag("list"),
+                                    state = listState,
+                                ) {
+                                    items(40) { index ->
+                                        Text(
+                                            text = "Metric $index selected ${selected.value == index}",
+                                            modifier =
+                                            Modifier.fillMaxWidth().height(48.dp).clickable {
+                                                selected.value = index
+                                            },
+                                        )
+                                    }
                                 }
-                            }
-                        },
-                    )
+                            },
+                        )
+                    }
                 }
             }
-        }
 
-        for (size in listOf(600, 360, 720, 800, 840, 1200, 720)) {
-            runOnIdle {
-                width.value = size
-                windowInfo.resize(IntSize(size / 2, 400))
+            for (size in listOf(600, 360, 720, 800, 840, 1200, 720)) {
+                runOnIdle {
+                    width.value = size
+                    windowInfo.resize(IntSize(size / 2, 400))
+                }
+                val parent = onNodeWithTag("parent").fetchSemanticsNode().boundsInRoot
+                val chart = onNodeWithTag("chart").fetchSemanticsNode().boundsInRoot
+                val list = onNodeWithTag("list").fetchSemanticsNode().boundsInRoot
+                for (pane in listOf(chart, list)) {
+                    assertTrue(pane.width > 0 && pane.height > 0)
+                    assertTrue(pane.left >= parent.left && pane.right <= parent.right)
+                    assertTrue(pane.top >= parent.top && pane.bottom <= parent.bottom)
+                }
+                // The chart is always on top and the list below it, at every width.
+                assertEquals(chart.left, list.left)
+                assertEquals(chart.bottom, list.top)
+                assertEquals(parent.width, list.width)
+                runOnIdle {
+                    if (selected.value == 39) assertTrue(listState.firstVisibleItemIndex > 0)
+                }
+                onNodeWithTag("list").performScrollToIndex(39)
+                onNodeWithText("Metric 39 selected ${selected.value == 39}").assertIsDisplayed().performClick()
+                val firstVisible = runOnIdle { listState.firstVisibleItemIndex }
+                runOnIdle { expanded.value = true }
+                onNodeWithTag("list").assertDoesNotExist()
+                assertEquals(parent, onNodeWithTag("chart").fetchSemanticsNode().boundsInRoot)
+                runOnIdle { expanded.value = false }
+                onNodeWithText("Metric 39 selected true").assertIsDisplayed()
+                runOnIdle { assertEquals(firstVisible, listState.firstVisibleItemIndex) }
             }
-            val parent = onNodeWithTag("parent").fetchSemanticsNode().boundsInRoot
-            val chart = onNodeWithTag("chart").fetchSemanticsNode().boundsInRoot
-            val list = onNodeWithTag("list").fetchSemanticsNode().boundsInRoot
-            for (pane in listOf(chart, list)) {
-                assertTrue(pane.width > 0 && pane.height > 0)
-                assertTrue(pane.left >= parent.left && pane.right <= parent.right)
-                assertTrue(pane.top >= parent.top && pane.bottom <= parent.bottom)
-            }
-            // The chart is always on top and the list below it, at every width.
-            assertEquals(chart.left, list.left)
-            assertEquals(chart.bottom, list.top)
-            assertEquals(parent.width, list.width)
-            runOnIdle {
-                if (selected.value == 39) assertTrue(listState.firstVisibleItemIndex > 0)
-            }
-            onNodeWithTag("list").performScrollToIndex(39)
-            onNodeWithText("Metric 39 selected ${selected.value == 39}").assertIsDisplayed().performClick()
-            val firstVisible = runOnIdle { listState.firstVisibleItemIndex }
-            runOnIdle { expanded.value = true }
-            onNodeWithTag("list").assertDoesNotExist()
-            assertEquals(parent, onNodeWithTag("chart").fetchSemanticsNode().boundsInRoot)
-            runOnIdle { expanded.value = false }
-            onNodeWithText("Metric 39 selected true").assertIsDisplayed()
-            runOnIdle { assertEquals(firstVisible, listState.firstVisibleItemIndex) }
         }
-    }
 }
 
 private class ResizableWindowInfo(initial: IntSize) : WindowInfo {

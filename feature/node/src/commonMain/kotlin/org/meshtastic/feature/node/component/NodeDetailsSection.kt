@@ -54,8 +54,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlin.io.encoding.Base64
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.MetricFormatter
@@ -117,6 +115,7 @@ import org.meshtastic.core.ui.util.LocalNoiseFloor
 import org.meshtastic.core.ui.util.createClipEntry
 import org.meshtastic.core.ui.util.formatAgo
 import org.meshtastic.proto.MeshPacket.TransportMechanism
+import kotlin.io.encoding.Base64
 
 @Composable
 fun NodeDetailsSection(

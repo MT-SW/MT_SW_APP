@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.feature.settings.debugging
 
 import androidx.compose.foundation.layout.Arrangement
@@ -96,7 +95,9 @@ fun DeviceLogsContent(logs: List<UiMeshLog>, modifier: Modifier = Modifier) {
     val export =
         rememberLogExporters(
             text = { redactText(deviceLogLines(logs, "").reversed().joinToString("\n")) },
-            json = { linesToJson("device_log", redactText(deviceLogLines(logs, "").reversed().joinToString("\n")).lines()) },
+            json = {
+                linesToJson("device_log", redactText(deviceLogLines(logs, "").reversed().joinToString("\n")).lines())
+            },
         )
     var showExportFormat by rememberSaveable { mutableStateOf(false) }
     var showExportWarning by rememberSaveable { mutableStateOf(false) }

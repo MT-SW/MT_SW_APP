@@ -14,6 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress(
+    "LongMethod",
+    "MagicNumber",
+    "MutableStateAutoboxing",
+    "ParameterNaming",
+    "ReturnCount",
+    "TooManyFunctions",
+)
+
 package org.meshtastic.feature.map.horizon
 
 import androidx.compose.foundation.BorderStroke

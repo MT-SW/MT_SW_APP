@@ -84,7 +84,8 @@ fun NetworkHealthScreen(
     val heroLocked by viewModel.heroLocked.collectAsStateWithLifecycle()
     val heroLockedNow by rememberUpdatedState(heroLocked)
 
-    // One swipe up folds the whole summary card away (search, tabs, sorting and list stay); one swipe down at the top of
+    // One swipe up folds the whole summary card away (search, tabs, sorting and list stay); one swipe down at the top
+    // of
     // the list unfolds it. The card animates fully open or fully closed, it never stops half way.
     var heroHeightPx by remember { mutableFloatStateOf(0f) }
     var heroFoldedPx by remember { mutableFloatStateOf(0f) }
@@ -109,22 +110,21 @@ fun NetworkHealthScreen(
             foldAnim.snapTo(0f)
         }
     }
-    val foldConnection =
-        remember {
-            object : NestedScrollConnection {
-                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                    if (heroLockedNow || available.y >= 0f || heroFoldedPx >= heroHeightPx) return Offset.Zero
-                    foldToNow(true)
-                    return Offset(0f, available.y)
-                }
+    val foldConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (heroLockedNow || available.y >= 0f || heroFoldedPx >= heroHeightPx) return Offset.Zero
+                foldToNow(true)
+                return Offset(0f, available.y)
+            }
 
-                override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
-                    if (heroLockedNow || available.y <= 0f || heroFoldedPx <= 0f) return Offset.Zero
-                    foldToNow(false)
-                    return Offset(0f, available.y)
-                }
+            override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
+                if (heroLockedNow || available.y <= 0f || heroFoldedPx <= 0f) return Offset.Zero
+                foldToNow(false)
+                return Offset(0f, available.y)
             }
         }
+    }
     // Dragging the summary card (or the sorting row) itself folds and unfolds it too, not only dragging the list.
     val foldDrag =
         Modifier.draggable(
@@ -132,7 +132,11 @@ fun NetworkHealthScreen(
             state =
             rememberDraggableState { delta ->
                 if (!heroLockedNow) {
-                    if (delta < -FOLD_DRAG_SLOP_PX) foldToNow(true) else if (delta > FOLD_DRAG_SLOP_PX) foldToNow(false)
+                    if (delta < -FOLD_DRAG_SLOP_PX) {
+                        foldToNow(true)
+                    } else if (delta > FOLD_DRAG_SLOP_PX) {
+                        foldToNow(false)
+                    }
                 }
             },
         )

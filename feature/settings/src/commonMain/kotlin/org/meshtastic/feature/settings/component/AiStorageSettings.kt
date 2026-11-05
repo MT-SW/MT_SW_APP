@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod", "MagicNumber")
+
 package org.meshtastic.feature.settings.component
 
 import androidx.compose.foundation.clickable
@@ -66,8 +68,8 @@ import org.meshtastic.core.resources.ai_storage_none_body
 import org.meshtastic.core.resources.ai_storage_pick
 import org.meshtastic.core.resources.ai_storage_restart_first
 import org.meshtastic.core.resources.ai_storage_summary
-import org.meshtastic.core.resources.app_data_previous_failed
 import org.meshtastic.core.resources.app_data_phone_single
+import org.meshtastic.core.resources.app_data_previous_failed
 import org.meshtastic.core.resources.app_data_scheduled
 import org.meshtastic.core.resources.app_data_summary
 import org.meshtastic.core.resources.app_data_summary_fixed
@@ -81,34 +83,42 @@ private const val LOW_SPACE_MB = 50L * 1024L
 private const val MB_PER_GB = 1024L
 
 /** "812 MB" or "3.4 GB". */
-internal fun formatMb(mb: Long): String =
-    if (mb >= MB_PER_GB) {
-        val tenths = mb * 10 / MB_PER_GB
-        "${tenths / 10}.${tenths % 10} GB"
-    } else {
-        "$mb MB"
-    }
+internal fun formatMb(mb: Long): String = if (mb >= MB_PER_GB) {
+    val tenths = mb * 10 / MB_PER_GB
+    "${tenths / 10}.${tenths % 10} GB"
+} else {
+    "$mb MB"
+}
 
-/** The reasons the storage code reports (English, short) as a Polish/English text; unknown ones are shown as they are. */
+/**
+ * The reasons the storage code reports (English, short) as a Polish/English text; unknown ones are shown as they are.
+ */
 @Composable
-private fun reasonText(reason: String): String =
-    when {
-        reason.startsWith("not enough free space") -> stringResource(Res.string.ai_storage_err_space)
-        reason.startsWith("this folder is already used") -> stringResource(Res.string.ai_storage_err_same)
-        reason.contains("inside the") || reason.contains("inside of") -> stringResource(Res.string.ai_storage_err_inside)
-        reason.startsWith("the folder cannot be created") -> stringResource(Res.string.ai_storage_err_create)
-        reason.startsWith("a file was not copied") -> stringResource(Res.string.ai_storage_err_copy)
-        reason.contains("MESHTASTIC_DATA_DIR") -> stringResource(Res.string.ai_storage_err_env)
-        reason.startsWith("a model is being downloaded") -> stringResource(Res.string.ai_storage_err_busy)
-        else -> stringResource(Res.string.ai_storage_err_other, reason)
-    }
+private fun reasonText(reason: String): String = when {
+    reason.startsWith("not enough free space") -> stringResource(Res.string.ai_storage_err_space)
+
+    reason.startsWith("this folder is already used") -> stringResource(Res.string.ai_storage_err_same)
+
+    reason.contains("inside the") || reason.contains("inside of") ->
+        stringResource(Res.string.ai_storage_err_inside)
+
+    reason.startsWith("the folder cannot be created") -> stringResource(Res.string.ai_storage_err_create)
+
+    reason.startsWith("a file was not copied") -> stringResource(Res.string.ai_storage_err_copy)
+
+    reason.contains("MESHTASTIC_DATA_DIR") -> stringResource(Res.string.ai_storage_err_env)
+
+    reason.startsWith("a model is being downloaded") -> stringResource(Res.string.ai_storage_err_busy)
+
+    else -> stringResource(Res.string.ai_storage_err_other, reason)
+}
 
 /**
  * The row "folder for the app's data" in the MT_SW features. It is shown to everyone, on every system.
  *
  * Computers: everything the app keeps (messages, settings, logs, maps, AI models and programs) moves to the chosen
- * folder at the next start. Phone: the Android system keeps the message database in the app's own memory, so only
- * the AI models can be placed elsewhere (the memory or an SD card).
+ * folder at the next start. Phone: the Android system keeps the message database in the app's own memory, so only the
+ * AI models can be placed elsewhere (the memory or an SD card).
  */
 @Composable
 internal fun AiStorageRow() {
@@ -140,12 +150,24 @@ internal fun AiStorageRow() {
         val summary =
             when {
                 computer && !i.canChange -> stringResource(Res.string.app_data_summary_fixed, i.folder)
+
                 computer && i.movableMb != null ->
-                    stringResource(Res.string.app_data_summary, i.folder, formatMb(i.movableMb ?: 0L), formatMb(i.freeMb))
+                    stringResource(
+                        Res.string.app_data_summary,
+                        i.folder,
+                        formatMb(i.movableMb ?: 0L),
+                        formatMb(i.freeMb),
+                    )
+
                 computer -> stringResource(Res.string.ai_storage_summary, i.folder, formatMb(i.freeMb))
+
                 else -> stringResource(Res.string.app_data_summary_phone, i.folder, formatMb(i.freeMb))
             }
-        Text(text = summary, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            text = summary,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         when (val m = move) {
             is AiStorageMove.Moving -> {
                 Text(stringResource(Res.string.ai_storage_moving), style = MaterialTheme.typography.bodySmall)
@@ -214,7 +236,9 @@ internal fun AiStorageRow() {
                 }
             },
             confirmButton = {},
-            dismissButton = { TextButton(onClick = { chooser = false }) { Text(stringResource(Res.string.translator_cancel)) } },
+            dismissButton = {
+                TextButton(onClick = { chooser = false }) { Text(stringResource(Res.string.translator_cancel)) }
+            },
         )
     }
 }
@@ -252,7 +276,11 @@ fun StorageFolderFirstRunDialog() {
                     Text(stringResource(Res.string.ai_storage_pick))
                 }
             },
-            dismissButton = { TextButton(onClick = { store.storageFolderAsked() }) { Text(stringResource(Res.string.ai_storage_keep)) } },
+            dismissButton = {
+                TextButton(onClick = { store.storageFolderAsked() }) {
+                    Text(stringResource(Res.string.ai_storage_keep))
+                }
+            },
         )
     }
     scheduledTo?.let { target ->
@@ -265,9 +293,9 @@ fun StorageFolderFirstRunDialog() {
 }
 
 /**
- * Wraps a model download: on a computer it asks first when the download would leave less than 50 GB free (and says
- * so plainly when the disk cannot hold the model at all), and it holds the download back while a move of the data
- * folder waits for a restart. Returns the function to call instead of starting the download directly.
+ * Wraps a model download: on a computer it asks first when the download would leave less than 50 GB free (and says so
+ * plainly when the disk cannot hold the model at all), and it holds the download back while a move of the data folder
+ * waits for a restart. Returns the function to call instead of starting the download directly.
  */
 @Composable
 internal fun rememberDownloadGuard(startDownload: (String) -> Unit): (String) -> Unit {
@@ -301,7 +329,9 @@ internal fun rememberDownloadGuard(startDownload: (String) -> Unit): (String) ->
                         Text(stringResource(Res.string.ai_storage_download_anyway))
                     }
                 },
-                dismissButton = { TextButton(onClick = { asking = null }) { Text(stringResource(Res.string.translator_cancel)) } },
+                dismissButton = {
+                    TextButton(onClick = { asking = null }) { Text(stringResource(Res.string.translator_cancel)) }
+                },
             )
         }
     }

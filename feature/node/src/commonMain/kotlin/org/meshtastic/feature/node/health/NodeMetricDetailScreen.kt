@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod", "MagicNumber")
+
 package org.meshtastic.feature.node.health
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -93,7 +95,9 @@ fun NodeMetricDetailScreen(
     val lna = LocalLnaCorrection.current
     val nodeNum = viewModel.nodeNum
     val uiState =
-        remember(rawState, lna, nodeNum) { rawState.copy(series = rawState.series.map { it.withLnaCorrection(lna, nodeNum) }) }
+        remember(rawState, lna, nodeNum) {
+            rawState.copy(series = rawState.series.map { it.withLnaCorrection(lna, nodeNum) })
+        }
 
     Scaffold(
         modifier = modifier,
@@ -332,8 +336,11 @@ private fun MetricSeries.withLnaCorrection(lna: LnaCorrection, nodeNum: Int): Me
 private val RX_SHARE_LABELS = setOf("TX", "Duplikaty", "Przekazane", "Uszkodzone")
 
 /** " (2,5%)" — [value] as a share of the received-packet total, or nothing when that total is unknown/zero. */
-private fun rxSharePart(value: Float, rxTotal: Float?): String =
-    if (rxTotal != null && rxTotal > 0f) " (${MetricFormatter.percent(value * 100f / rxTotal, decimalPlaces = 1)})" else ""
+private fun rxSharePart(value: Float, rxTotal: Float?): String = if (rxTotal != null && rxTotal > 0f) {
+    " (${MetricFormatter.percent(value * 100f / rxTotal, decimalPlaces = 1)})"
+} else {
+    ""
+}
 
 @Composable
 private fun StatLabel(
@@ -350,8 +357,7 @@ private fun StatLabel(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
-            text =
-            value?.let { formatSeriesValue(seriesLabel, it) + rxSharePart(it, rxTotal) } ?: "—",
+            text = value?.let { formatSeriesValue(seriesLabel, it) + rxSharePart(it, rxTotal) } ?: "—",
             style = MaterialTheme.typography.titleMedium,
             color = color,
         )
@@ -425,7 +431,9 @@ private fun headlineLevel(metric: NetworkHealthMetric, value: Float?): HealthLev
             }
 
         NetworkHealthMetric.SIGNAL -> snrLevel(value)
+
         NetworkHealthMetric.ETHER -> etherLevel(value)
+
         else -> HealthLevel.UNKNOWN
     }
 }
@@ -484,8 +492,7 @@ private fun NodeMetricHero(uiState: NodeMetricDetailUiState) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text =
-                    if (headline != null && latest != null) formatSeriesValue(headline.label, latest) else "—",
+                    text = if (headline != null && latest != null) formatSeriesValue(headline.label, latest) else "—",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = accent,
@@ -528,6 +535,7 @@ private fun gaugeFraction(metric: NetworkHealthMetric, value: Float?): Float {
         -> value / PERCENT_MAX
 
         NetworkHealthMetric.SIGNAL -> (value - SNR_GAUGE_MIN) / SNR_GAUGE_RANGE
+
         else -> 1f
     }.coerceIn(0f, 1f)
 }

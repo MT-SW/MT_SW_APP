@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("TooManyFunctions")
+@file:Suppress("TooManyFunctions", "LongMethod")
 
 package org.meshtastic.feature.node.metrics
 
@@ -785,9 +785,12 @@ private fun Telemetry.hasEnvironmentPower(): Boolean {
 /** Anything the environment report carries besides voltage and current. */
 private fun Telemetry.hasEnvironmentWeather(): Boolean {
     val env = environment_metrics ?: return false
-    val withoutPower = env.newBuilder().also { wb ->
-        wb.voltage = null
-        wb.current = null
-    }.build()
+    val withoutPower =
+        env.newBuilder()
+            .also { wb ->
+                wb.voltage = null
+                wb.current = null
+            }
+            .build()
     return withoutPower != org.meshtastic.proto.EnvironmentMetrics.Builder().build()
 }

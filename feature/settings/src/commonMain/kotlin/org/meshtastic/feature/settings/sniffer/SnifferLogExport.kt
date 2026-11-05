@@ -62,8 +62,10 @@ private val SnifferExportJson = Json {
 private fun List<SnifferExportRow>.toJsonBytes(): ByteArray = SnifferExportJson.encodeToString(this).encodeToByteArray()
 
 /** Parses a previously exported JSON log back into rows, or null if [bytes] isn't one this app wrote. */
-fun parseSnifferExportJson(bytes: ByteArray): List<SnifferExportRow>? =
-    runCatching { SnifferExportJson.decodeFromString<List<SnifferExportRow>>(bytes.decodeToString()) }.getOrNull()
+fun parseSnifferExportJson(bytes: ByteArray): List<SnifferExportRow>? = runCatching {
+    SnifferExportJson.decodeFromString<List<SnifferExportRow>>(bytes.decodeToString())
+}
+    .getOrNull()
 
 private val CSV_HEADER =
     listOf(

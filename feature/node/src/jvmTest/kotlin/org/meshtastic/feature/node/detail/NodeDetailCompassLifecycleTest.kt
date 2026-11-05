@@ -16,8 +16,6 @@
  */
 package org.meshtastic.feature.node.detail
 
-import org.meshtastic.core.testing.FakeRadioConfigRepository
-import org.meshtastic.core.repository.LocationService
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.semantics.SemanticsActions
@@ -53,6 +51,7 @@ import org.meshtastic.core.domain.usecase.session.EnsureRemoteAdminSessionUseCas
 import org.meshtastic.core.domain.usecase.session.ObserveRemoteAdminSessionStatusUseCase
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.SessionStatus
+import org.meshtastic.core.repository.LocationService
 import org.meshtastic.core.repository.MagneticFieldProvider
 import org.meshtastic.core.repository.PacketRepository
 import org.meshtastic.core.repository.PhoneLocationProvider
@@ -63,6 +62,7 @@ import org.meshtastic.core.resources.UiText
 import org.meshtastic.core.resources.compass_title
 import org.meshtastic.core.resources.getString
 import org.meshtastic.core.resources.open_compass
+import org.meshtastic.core.testing.FakeRadioConfigRepository
 import org.meshtastic.core.ui.util.SnackbarManager
 import org.meshtastic.feature.node.compass.CompassHeadingProvider
 import org.meshtastic.feature.node.compass.CompassViewModel
@@ -191,7 +191,8 @@ class NodeDetailCompassLifecycleTest {
             observeRemoteAdminSessionStatus = observeSessionStatus,
             snackbarManager = SnackbarManager(),
             radioConfigRepository = FakeRadioConfigRepository(),
-            locationService = object : LocationService {
+            locationService =
+            object : LocationService {
                 override suspend fun getCurrentLocation() = null
             },
             nakWatcher = testNakWatcher(),

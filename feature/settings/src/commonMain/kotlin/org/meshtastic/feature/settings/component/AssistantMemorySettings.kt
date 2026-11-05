@@ -114,7 +114,9 @@ private fun MemoryDialog(memory: AssistantMemory, onClose: () -> Unit) {
                         label = { Text(note.name) },
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    TextButton(onClick = { memory.delete(note.name) }) { Text(stringResource(Res.string.ai_memory_delete)) }
+                    TextButton(onClick = { memory.delete(note.name) }) {
+                        Text(stringResource(Res.string.ai_memory_delete))
+                    }
                 }
                 if (learned.isNotEmpty()) {
                     TextButton(onClick = { memory.clearLearned() }) { Text(stringResource(Res.string.ai_memory_clear)) }

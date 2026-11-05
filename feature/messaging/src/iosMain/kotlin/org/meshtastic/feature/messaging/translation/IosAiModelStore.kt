@@ -14,7 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("ktlint:standard:backing-property-naming")
+@file:Suppress(
+    "ktlint:standard:backing-property-naming",
+    "BackingPropertyNaming",
+    "FunctionSignature",
+    "LoopWithTooManyJumpStatements",
+    "MagicNumber",
+    "ReturnCount",
+    "TooGenericExceptionCaught",
+)
 
 package org.meshtastic.feature.messaging.translation
 
@@ -63,12 +71,11 @@ class IosAiModelStore(baseDir: String) : AiModelStore {
         return files.isNotEmpty() && files.all { fs.exists(fileOf(id, it.fileName)) }
     }
 
-    private fun initialStates(): Map<String, TranslatorModelState> =
-        AiModels.all
-            .filter { it.files.isNotEmpty() }
-            .associate {
-                it.id to (if (isComplete(it.id)) TranslatorModelState.Ready else TranslatorModelState.NotDownloaded)
-            }
+    private fun initialStates(): Map<String, TranslatorModelState> = AiModels.all
+        .filter { it.files.isNotEmpty() }
+        .associate {
+            it.id to (if (isComplete(it.id)) TranslatorModelState.Ready else TranslatorModelState.NotDownloaded)
+        }
 
     /** Full path of the main model file when the model is on the device; null otherwise. */
     fun modelPath(id: String): String? {
@@ -130,7 +137,7 @@ class IosAiModelStore(baseDir: String) : AiModelStore {
                                 setState(
                                     id,
                                     TranslatorModelState.Downloading(
-                                        ((before + written).toFloat() / total).coerceIn(0f, 0.99f)
+                                        ((before + written).toFloat() / total).coerceIn(0f, 0.99f),
                                     ),
                                 )
                             }

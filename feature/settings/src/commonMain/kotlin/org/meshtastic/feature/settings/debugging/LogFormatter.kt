@@ -49,16 +49,15 @@ private val PAYLOAD_HEX_REGEX = Regex("""(payload)\s*([:=])\s*\[(?:size=\d+ )?he
 
 /** Builds a collision-free export file name, e.g. `meshtastic_logcat_20260701_143312.txt`. */
 internal fun timestampedExportName(prefix: String, extension: String = ".txt"): String {
-    val format =
-        LocalDateTime.Format {
-            year()
-            monthNumber()
-            day()
-            char('_')
-            hour()
-            minute()
-            second()
-        }
+    val format = LocalDateTime.Format {
+        year()
+        monthNumber()
+        day()
+        char('_')
+        hour()
+        minute()
+        second()
+    }
     val timestamp = fromEpochMilliseconds(nowMillis).toLocalDateTime(TimeZone.UTC).format(format)
     return "${prefix}_$timestamp$extension"
 }
@@ -136,30 +135,30 @@ private fun suppressPayloadBytes(line: String): String =
     PAYLOAD_HEX_REGEX.replace(line) { "${it.groupValues[1]}${it.groupValues[2]}<suppressed>" }
 
 /**
- * The packet log as JSON (one object per entry: time, type, message, decoded payload), sanitised exactly like the
- * text export, so a file in this form is as safe to attach to a public issue.
+ * The packet log as JSON (one object per entry: time, type, message, decoded payload), sanitised exactly like the text
+ * export, so a file in this form is as safe to attach to a public issue.
  */
-internal fun logsToJson(logs: List<DebugViewModel.UiMeshLog>): String =
-    buildString {
-        append("{\"kind\": \"packet_log\", \"entries\": [")
-        logs.forEachIndexed { i, log ->
-            append(if (i == 0) "\n" else ",\n")
-            append("  {\"time\": ").append(JsonText.quote(log.formattedReceivedDate))
-            append(", \"type\": ").append(JsonText.quote(log.messageType))
-            append(", \"message\": ").append(JsonText.quote(sanitizeForExport(log.logMessage).trim()))
-            val payload = log.decodedPayload
-            if (!payload.isNullOrBlank()) append(", \"payload\": ").append(JsonText.quote(sanitizeForExport(payload).trim()))
-            append("}")
+internal fun logsToJson(logs: List<DebugViewModel.UiMeshLog>): String = buildString {
+    append("{\"kind\": \"packet_log\", \"entries\": [")
+    logs.forEachIndexed { i, log ->
+        append(if (i == 0) "\n" else ",\n")
+        append("  {\"time\": ").append(JsonText.quote(log.formattedReceivedDate))
+        append(", \"type\": ").append(JsonText.quote(log.messageType))
+        append(", \"message\": ").append(JsonText.quote(sanitizeForExport(log.logMessage).trim()))
+        val payload = log.decodedPayload
+        if (!payload.isNullOrBlank()) {
+            append(", \"payload\": ").append(JsonText.quote(sanitizeForExport(payload).trim()))
         }
-        append(if (logs.isEmpty()) "]}\n" else "\n]}\n")
+        append("}")
     }
+    append(if (logs.isEmpty()) "]}\n" else "\n]}\n")
+}
 
 /** Text lines (device log, logcat) as JSON; the lines must already be redacted. */
-internal fun linesToJson(kind: String, lines: List<String>): String =
-    buildString {
-        append("{\"kind\": ").append(JsonText.quote(kind)).append(", \"lines\": [")
-        lines.forEachIndexed { i, line ->
-            append(if (i == 0) "\n" else ",\n").append("  ").append(JsonText.quote(line))
-        }
-        append(if (lines.isEmpty()) "]}\n" else "\n]}\n")
+internal fun linesToJson(kind: String, lines: List<String>): String = buildString {
+    append("{\"kind\": ").append(JsonText.quote(kind)).append(", \"lines\": [")
+    lines.forEachIndexed { i, line ->
+        append(if (i == 0) "\n" else ",\n").append("  ").append(JsonText.quote(line))
     }
+    append(if (lines.isEmpty()) "]}\n" else "\n]}\n")
+}

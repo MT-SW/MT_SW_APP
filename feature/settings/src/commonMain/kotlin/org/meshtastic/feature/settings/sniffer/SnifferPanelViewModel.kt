@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("TooManyFunctions")
+
 package org.meshtastic.feature.settings.sniffer
 
 import androidx.lifecycle.ViewModel
@@ -207,8 +209,7 @@ class SnifferPanelViewModel(
                         // First-ever activation: clearedAt is still at its 0L sentinel because the trash icon has
                         // never been clicked. Anchor it to now instead of leaving the panel (and
                         // SnifferLogViewModel's query) unbounded -- see clearedAtMillis's doc.
-                        clearedAt == 0L ->
-                            viewModelScope.launch { prefs.setClearedAtMillis(nowMillis) }
+                        clearedAt == 0L -> viewModelScope.launch { prefs.setClearedAtMillis(nowMillis) }
                     }
                     lastRealSource = source
                     _displaySource.value = source

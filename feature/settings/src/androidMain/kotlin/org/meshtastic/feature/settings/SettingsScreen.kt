@@ -74,7 +74,6 @@ import org.meshtastic.core.ui.icon.SettingsRemote
 import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.core.ui.util.isBluetoothSupported
 import org.meshtastic.feature.settings.component.AppInfoSection
-import org.meshtastic.feature.settings.liveupdate.LiveUpdateSection
 import org.meshtastic.feature.settings.component.AppearanceSettingsContent
 import org.meshtastic.feature.settings.component.ExpressiveSection
 import org.meshtastic.feature.settings.component.PermissionsSettingsContent
@@ -82,10 +81,11 @@ import org.meshtastic.feature.settings.component.PersistenceSettingsContent
 import org.meshtastic.feature.settings.component.PrivacySettingsContent
 import org.meshtastic.feature.settings.component.RadioAdminAppBar
 import org.meshtastic.feature.settings.component.ThemePickerDialog
-import org.meshtastic.feature.settings.component.UnitsOption
 import org.meshtastic.feature.settings.component.UiScalePickerDialog
+import org.meshtastic.feature.settings.component.UnitsOption
 import org.meshtastic.feature.settings.component.UnitsPickerDialog
 import org.meshtastic.feature.settings.component.uiScaleLabel
+import org.meshtastic.feature.settings.liveupdate.LiveUpdateSection
 import org.meshtastic.feature.settings.navigation.ConfigRoute
 import org.meshtastic.feature.settings.navigation.ModuleRoute
 import org.meshtastic.feature.settings.radio.RadioConfigItemList

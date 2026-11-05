@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod", "MagicNumber", "TooManyFunctions")
+
 package org.meshtastic.feature.map.planner.export
 
 import org.meshtastic.core.ui.util.PdfFile

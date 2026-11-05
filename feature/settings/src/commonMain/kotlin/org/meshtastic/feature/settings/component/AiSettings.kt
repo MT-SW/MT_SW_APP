@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("CyclomaticComplexMethod", "LongMethod", "MagicNumber", "MultipleEmitters")
+
 package org.meshtastic.feature.settings.component
 
 import androidx.compose.foundation.clickable
@@ -57,21 +59,23 @@ import org.meshtastic.core.repository.TranslatorModelState
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.ai_assistant_summary
+import org.meshtastic.core.resources.ai_assistant_title
+import org.meshtastic.core.resources.ai_assistant_unavailable
+import org.meshtastic.core.resources.ai_clear_attempts_done
+import org.meshtastic.core.resources.ai_clear_attempts_summary
+import org.meshtastic.core.resources.ai_clear_attempts_title
+import org.meshtastic.core.resources.ai_dictation_note
 import org.meshtastic.core.resources.ai_experimental_body
 import org.meshtastic.core.resources.ai_experimental_report
 import org.meshtastic.core.resources.ai_experimental_title
-import org.meshtastic.core.resources.ai_assistant_title
-import org.meshtastic.core.resources.ai_assistant_unavailable
-import org.meshtastic.core.resources.ai_dictation_note
 import org.meshtastic.core.resources.ai_family_other
-import org.meshtastic.core.resources.ai_models_other_note
-import org.meshtastic.core.resources.ai_internet_enable
-import org.meshtastic.core.resources.ai_internet_on_indicator
-import org.meshtastic.core.resources.ai_internet_summary
 import org.meshtastic.core.resources.ai_idle_unload_minutes
 import org.meshtastic.core.resources.ai_idle_unload_never
 import org.meshtastic.core.resources.ai_idle_unload_summary
 import org.meshtastic.core.resources.ai_idle_unload_title
+import org.meshtastic.core.resources.ai_internet_enable
+import org.meshtastic.core.resources.ai_internet_on_indicator
+import org.meshtastic.core.resources.ai_internet_summary
 import org.meshtastic.core.resources.ai_internet_title
 import org.meshtastic.core.resources.ai_internet_warning_body
 import org.meshtastic.core.resources.ai_internet_warning_title
@@ -88,29 +92,26 @@ import org.meshtastic.core.resources.ai_model_in_use
 import org.meshtastic.core.resources.ai_model_license_line
 import org.meshtastic.core.resources.ai_model_page
 import org.meshtastic.core.resources.ai_model_recommended
+import org.meshtastic.core.resources.ai_model_soon
+import org.meshtastic.core.resources.ai_model_specs
 import org.meshtastic.core.resources.ai_models_advice_assistant
 import org.meshtastic.core.resources.ai_models_advice_assistant_warning
 import org.meshtastic.core.resources.ai_models_advice_dictation
-import org.meshtastic.core.resources.ai_model_soon
-import org.meshtastic.core.resources.ai_model_specs
-import org.meshtastic.core.resources.ai_model_use
 import org.meshtastic.core.resources.ai_models_empty
 import org.meshtastic.core.resources.ai_models_hint
-import org.meshtastic.core.resources.ai_clear_attempts_done
-import org.meshtastic.core.resources.ai_clear_attempts_summary
-import org.meshtastic.core.resources.ai_clear_attempts_title
-import org.meshtastic.core.resources.ai_skip_npu_summary
-import org.meshtastic.core.resources.ai_skip_npu_title
-import org.meshtastic.core.resources.dictation_enabled_summary
-import org.meshtastic.core.resources.dictation_enabled_title
-import org.meshtastic.core.resources.ai_unload_loaded
-import org.meshtastic.core.resources.ai_unload_none
-import org.meshtastic.core.resources.ai_unload_title
+import org.meshtastic.core.resources.ai_models_other_note
 import org.meshtastic.core.resources.ai_models_tab_assistant
 import org.meshtastic.core.resources.ai_models_tab_dictation
 import org.meshtastic.core.resources.ai_models_tab_translator
 import org.meshtastic.core.resources.ai_models_title
 import org.meshtastic.core.resources.ai_privacy
+import org.meshtastic.core.resources.ai_skip_npu_summary
+import org.meshtastic.core.resources.ai_skip_npu_title
+import org.meshtastic.core.resources.ai_unload_loaded
+import org.meshtastic.core.resources.ai_unload_none
+import org.meshtastic.core.resources.ai_unload_title
+import org.meshtastic.core.resources.dictation_enabled_summary
+import org.meshtastic.core.resources.dictation_enabled_title
 import org.meshtastic.core.resources.dictation_external_mic_summary
 import org.meshtastic.core.resources.dictation_external_mic_title
 import org.meshtastic.core.resources.translator_cancel
@@ -153,8 +154,7 @@ internal fun AiSettings() {
 
     fun readyFor(role: AiRole) = AiModels.forRole(role).filter { isReady(it.id) }
 
-    fun downloadingFor(role: AiRole) =
-        AiModels.forRole(role).any { states[it.id] is TranslatorModelState.Downloading }
+    fun downloadingFor(role: AiRole) = AiModels.forRole(role).any { states[it.id] is TranslatorModelState.Downloading }
 
     val assistantPossible = AiModels.ASSISTANT_SCREEN_READY && AiModels.forRole(AiRole.ASSISTANT).isNotEmpty()
 
@@ -243,7 +243,8 @@ internal fun AiSettings() {
     // The model leaves the memory after a time without use (any function): the choice is here, 2 minutes by default.
     val idleMinutes by uiPrefs.aiIdleUnloadMinutes.collectAsStateWithLifecycle()
     if (assistantOn || translatorOn || dictationOn) {
-        val minuteChoices = listOf(1, 2, 5, 10, 30, 60).map { it to stringResource(Res.string.ai_idle_unload_minutes, it) }
+        val minuteChoices =
+            listOf(1, 2, 5, 10, 30, 60).map { it to stringResource(Res.string.ai_idle_unload_minutes, it) }
         DropDownPreference(
             title = stringResource(Res.string.ai_idle_unload_title),
             enabled = true,
@@ -299,7 +300,8 @@ internal fun AiSettings() {
         )
     }
 
-    // Shown by default only on a computer with an NPU that our engine can use (and when the hidden settings are unlocked); hidden on phones.
+    // Shown by default only on a computer with an NPU that our engine can use (and when the hidden settings are
+    // unlocked); hidden on phones.
     if (store.npuAvailable || hiddenOn) {
         SwitchPreference(
             title = stringResource(Res.string.ai_skip_npu_title),
@@ -398,14 +400,17 @@ internal fun AiSettings() {
     // The family of the recommended model first (Whisper for dictation), then Gemma (and TranslateGemma), the other
     // families in the order of the list, "Other" always last.
     val families =
-        models.map { it.family }.distinct().sortedBy { family ->
-            when {
-                models.any { it.family == family && role in it.recommendedFor } -> 0
-                family.contains("Gemma") -> 1
-                family == AiModels.OTHER_FAMILY -> 3
-                else -> 2
+        models
+            .map { it.family }
+            .distinct()
+            .sortedBy { family ->
+                when {
+                    models.any { it.family == family && role in it.recommendedFor } -> 0
+                    family.contains("Gemma") -> 1
+                    family == AiModels.OTHER_FAMILY -> 3
+                    else -> 2
+                }
             }
-        }
     var familyIndex by rememberSaveable(role) { mutableIntStateOf(0) }
     val shownIndex = familyIndex.coerceIn(0, (families.size - 1).coerceAtLeast(0))
     if (families.size > 1) {
@@ -436,22 +441,25 @@ internal fun AiSettings() {
     }
     families.getOrNull(shownIndex)?.let { family ->
         // The recommended model of the family is always the first one.
-        models.filter { it.family == family }.sortedBy { if (role in it.recommendedFor) 0 else 1 }.forEach { model ->
-            ModelRow(
-                model = model,
-                role = role,
-                state = states[model.id] ?: TranslatorModelState.NotDownloaded,
-                inUse = current?.id == model.id,
-                onUse = { onChoose(model.id) },
-                onDownload = {
-                    // The model a person chooses to download becomes the one in use when none is installed yet.
-                    if (current == null) onChoose(model.id)
-                    startDownload(model.id)
-                },
-                onCancel = { store.cancelDownload(model.id) },
-                onDelete = { appScope.launch { store.delete(model.id) } },
-            )
-        }
+        models
+            .filter { it.family == family }
+            .sortedBy { if (role in it.recommendedFor) 0 else 1 }
+            .forEach { model ->
+                ModelRow(
+                    model = model,
+                    role = role,
+                    state = states[model.id] ?: TranslatorModelState.NotDownloaded,
+                    inUse = current?.id == model.id,
+                    onUse = { onChoose(model.id) },
+                    onDownload = {
+                        // The model a person chooses to download becomes the one in use when none is installed yet.
+                        if (current == null) onChoose(model.id)
+                        startDownload(model.id)
+                    },
+                    onCancel = { store.cancelDownload(model.id) },
+                    onDelete = { appScope.launch { store.delete(model.id) } },
+                )
+            }
     }
     Text(
         text = stringResource(Res.string.ai_models_hint),
@@ -473,9 +481,7 @@ internal fun AiSettings() {
 private fun ChooseModelHint(downloading: Boolean, onClick: () -> Unit) {
     Text(
         text =
-        stringResource(
-            if (downloading) Res.string.ai_model_choose_downloading else Res.string.ai_model_choose_red,
-        ),
+        stringResource(if (downloading) Res.string.ai_model_choose_downloading else Res.string.ai_model_choose_red),
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.error,
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 2.dp),
@@ -506,7 +512,13 @@ private fun ModelRow(
     val uriHandler = LocalUriHandler.current
     val polish = Locale.current.language == "pl"
     val description =
-        (if (polish) model.descriptionPl.ifBlank { model.descriptionEn } else model.descriptionEn.ifBlank { model.descriptionPl })
+        (
+            if (polish) {
+                model.descriptionPl.ifBlank { model.descriptionEn }
+            } else {
+                model.descriptionEn.ifBlank { model.descriptionPl }
+            }
+            )
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             if (state == TranslatorModelState.Ready) RadioButton(selected = inUse, onClick = onUse)
@@ -515,8 +527,17 @@ private fun ModelRow(
                 Text(
                     text =
                     stringResource(
-                        if (role in model.recommendedFor) Res.string.ai_model_recommended else Res.string.ai_model_alternative,
-                    ) + if (model.hearing && role == AiRole.DICTATION) " · " + stringResource(Res.string.ai_model_hearing) else "",
+                        if (role in model.recommendedFor) {
+                            Res.string.ai_model_recommended
+                        } else {
+                            Res.string.ai_model_alternative
+                        },
+                    ) +
+                        if (model.hearing && role == AiRole.DICTATION) {
+                            " · " + stringResource(Res.string.ai_model_hearing)
+                        } else {
+                            ""
+                        },
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -537,7 +558,9 @@ private fun ModelRow(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         if (model.pageUrl.isNotBlank()) {
-            TextButton(onClick = { uriHandler.openUri(model.pageUrl) }) { Text(stringResource(Res.string.ai_model_page)) }
+            TextButton(onClick = { uriHandler.openUri(model.pageUrl) }) {
+                Text(stringResource(Res.string.ai_model_page))
+            }
         }
         when {
             !model.engineReady ->

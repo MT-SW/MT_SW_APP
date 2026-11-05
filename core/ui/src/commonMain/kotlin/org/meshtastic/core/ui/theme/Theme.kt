@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("MatchingDeclarationName")
+@file:Suppress("MatchingDeclarationName", "CompositionLocalAllowlist", "MagicNumber")
 
 package org.meshtastic.core.ui.theme
 

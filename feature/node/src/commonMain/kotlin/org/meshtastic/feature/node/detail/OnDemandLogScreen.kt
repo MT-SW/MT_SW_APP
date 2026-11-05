@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("CyclomaticComplexMethod", "LongMethod", "MagicNumber", "ModifierMissing", "TooManyFunctions")
+
 package org.meshtastic.feature.node.detail
 
 import androidx.compose.foundation.background
@@ -383,9 +385,11 @@ fun OnDemandLogScreen(viewModel: OnDemandLogViewModel, onNavigateUp: () -> Unit)
                         } else {
                             BarList(
                                 bars =
-                                errors.sortedByDescending { it.counter }.map {
-                                    ReportBar("#${it.num}", it.counter.toFloat(), "${it.counter}")
-                                },
+                                errors
+                                    .sortedByDescending { it.counter }
+                                    .map {
+                                        ReportBar("#${it.num}", it.counter.toFloat(), "${it.counter}")
+                                    },
                                 color = purple,
                             )
                         }
@@ -601,8 +605,7 @@ private fun OnDemandHero(answered: Set<OnDemandType>) {
                     val tint = if (isDone) gold else MaterialTheme.colorScheme.onSurfaceVariant
                     Row(
                         modifier =
-                        Modifier
-                            .clip(RoundedCornerShape(50))
+                        Modifier.clip(RoundedCornerShape(50))
                             .background(tint.copy(alpha = TINT_ALPHA))
                             .padding(horizontal = 10.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically,
@@ -692,8 +695,9 @@ private fun AnswerStamp(receivedAtMillis: Long?) {
         )
         Text(
             text =
-            receivedAtMillis?.let { stringResource(Res.string.on_demand_received_at, DateFormatter.formatDateTime(it)) }
-                ?: stringResource(Res.string.on_demand_no_answer),
+            receivedAtMillis?.let {
+                stringResource(Res.string.on_demand_received_at, DateFormatter.formatDateTime(it))
+            } ?: stringResource(Res.string.on_demand_no_answer),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -867,7 +871,12 @@ private fun UsageGauge(label: String, free: Int?, total: Int?) {
     val usedPercent = (total - free).coerceAtLeast(0) * PERCENT / total
     GaugeRow(
         label = label,
-        percentText = "${formatByteSize((total - free).toLong().coerceAtLeast(0))} / ${formatByteSize(total.toLong())} (${MetricFormatter.usedPercent((total - free).toLong(), total.toLong())})",
+        percentText =
+        "${formatByteSize(
+            (total - free).toLong().coerceAtLeast(0),
+        )} / ${formatByteSize(
+            total.toLong(),
+        )} (${MetricFormatter.usedPercent((total - free).toLong(), total.toLong())})",
         fraction = usedPercent / PERCENT,
         color = usageLevelOf(usedPercent).color(),
     )
@@ -1001,8 +1010,7 @@ private fun NodesOnlineVisual(entries: List<org.meshtastic.proto.NodeEntry>) {
             ) {
                 Box(
                     modifier =
-                    Modifier
-                        .size(42.dp)
+                    Modifier.size(42.dp)
                         .clip(CircleShape)
                         .background(tint.copy(alpha = TINT_ALPHA))
                         .border(2.dp, tint, CircleShape),
@@ -1062,8 +1070,7 @@ private fun ageText(seconds: Int): String = when {
 private fun ExchangeRow(from: String, to: String, port: String) {
     Column(
         modifier =
-        Modifier
-            .fillMaxWidth()
+        Modifier.fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surfaceContainerHighest)
             .padding(horizontal = 12.dp, vertical = 8.dp),
@@ -1115,8 +1122,7 @@ private fun AirActivityChart(entries: List<org.meshtastic.proto.AirActivityEntry
                 val total = e.tx_time + e.rx_time + e.rxBad_time
                 Column(
                     modifier =
-                    Modifier
-                        .weight(1f)
+                    Modifier.weight(1f)
                         .fillMaxHeight(total / maxTotal.toFloat())
                         .clip(RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)),
                 ) {
@@ -1250,21 +1256,32 @@ internal fun nodeStatsRows(stats: NodeStats): List<Pair<StringResource, String>>
     stats.num_total_nodes?.let { add(Res.string.on_demand_stat_nodes_total to "$it") }
     stats.reboots?.let { add(Res.string.on_demand_reboots to "$it") }
     stats.memory_free_cheap?.let { free ->
-        stats.memory_total?.let { total -> add(Res.string.on_demand_heap_used to (formatByteSize((total - free).coerceAtLeast(0).toLong()) + " (" + MetricFormatter.usedPercent((total - free).toLong(), total.toLong()) + ")")) }
+        stats.memory_total?.let { total ->
+            add(
+                Res.string.on_demand_heap_used to
+                    (
+                        formatByteSize((total - free).coerceAtLeast(0).toLong()) +
+                            " (" +
+                            MetricFormatter.usedPercent((total - free).toLong(), total.toLong()) +
+                            ")"
+                        ),
+            )
+        }
     }
     stats.memory_total?.let { add(Res.string.on_demand_heap_total to formatByteSize(it.toLong())) }
     stats.cpu_usage_percent?.let { add(Res.string.on_demand_cpu_usage to "$it%") }
     if (stats.flash_used_bytes != null || stats.flash_total_bytes != null) {
         val used = stats.flash_used_bytes?.let { formatByteSize(it.toLong()) } ?: "?"
         val total = stats.flash_total_bytes?.let { formatByteSize(it.toLong()) } ?: "?"
-        val share = MetricFormatter.usedPercent((stats.flash_used_bytes ?: 0).toLong(), (stats.flash_total_bytes ?: 0).toLong())
+        val share =
+            MetricFormatter.usedPercent((stats.flash_used_bytes ?: 0).toLong(), (stats.flash_total_bytes ?: 0).toLong())
         add(Res.string.on_demand_flash to "$used / $total" + if (share.isNotEmpty()) " ($share)" else "")
     }
     if (stats.memory_psram_free != null || stats.memory_psram_total != null) {
         val free =
-            stats.memory_psram_free
-                ?.let { f -> stats.memory_psram_total?.let { t -> formatByteSize((t - f).coerceAtLeast(0).toLong()) } }
-                ?: "?"
+            stats.memory_psram_free?.let { f ->
+                stats.memory_psram_total?.let { t -> formatByteSize((t - f).coerceAtLeast(0).toLong()) }
+            } ?: "?"
         val total = stats.memory_psram_total?.let { formatByteSize(it.toLong()) } ?: "?"
         val psramTotal = (stats.memory_psram_total ?: 0).toLong()
         val share = MetricFormatter.usedPercent(psramTotal - (stats.memory_psram_free ?: 0), psramTotal)

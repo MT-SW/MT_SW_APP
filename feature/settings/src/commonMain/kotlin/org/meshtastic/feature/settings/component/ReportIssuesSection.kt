@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("ModifierMissing")
+
 package org.meshtastic.feature.settings.component
 
 import androidx.compose.runtime.Composable
@@ -30,8 +32,8 @@ import org.meshtastic.core.ui.icon.BugReport
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 
 /**
- * The "report a bug or idea" entry of the MT_SW features: one row that opens the report window (where to send it, a note,
- * the log of the last 24 hours the app keeps by itself).
+ * The "report a bug or idea" entry of the MT_SW features: one row that opens the report window (where to send it, a
+ * note, the log of the last 24 hours the app keeps by itself).
  */
 @Composable
 fun ReportIssuesSection() {

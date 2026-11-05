@@ -46,9 +46,9 @@ import org.meshtastic.core.model.FirmwareRelease
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.SessionStatus
 import org.meshtastic.core.model.asDeviceVersion
-import org.meshtastic.core.navigation.NodeDetailRoute
 import org.meshtastic.core.model.effectiveLongName
 import org.meshtastic.core.model.shortFirmwareVersion
+import org.meshtastic.core.navigation.NodeDetailRoute
 import org.meshtastic.core.repository.EventFirmwareRepository
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.administration

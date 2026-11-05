@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod")
+
 package org.meshtastic.feature.settings.radio.component
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,20 +25,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,23 +43,22 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import org.meshtastic.core.ui.icon.Lock
 import org.meshtastic.core.ui.icon.MeshtasticIcons
-import org.meshtastic.core.ui.icon.Visibility
-import org.meshtastic.core.ui.icon.VisibilityOff
 import org.meshtastic.core.ui.icon.SignalCellular1Bar
 import org.meshtastic.core.ui.icon.SignalCellular2Bar
 import org.meshtastic.core.ui.icon.SignalCellular3Bar
 import org.meshtastic.core.ui.icon.SignalCellular4Bar
+import org.meshtastic.core.ui.icon.Visibility
+import org.meshtastic.core.ui.icon.VisibilityOff
 import org.meshtastic.core.ui.icon.Wifi
 import org.meshtastic.core.ui.util.PhoneWifiNetwork
 import org.meshtastic.core.ui.util.PhoneWifiScanner
@@ -107,14 +104,13 @@ fun WifiNetworkPickerDialog(scanner: PhoneWifiScanner, onPick: (PhoneWifiNetwork
     }
 
     // The network we are on now first, then the rest strongest first.
-    val rows =
-        buildList {
-            current?.let { name ->
-                val seen = networks.firstOrNull { it.ssid == name }
-                add(PhoneWifiNetwork(name, seen?.rssi, null, seen?.secured) to true)
-            }
-            networks.filter { it.ssid != current }.forEach { add(it to false) }
+    val rows = buildList {
+        current?.let { name ->
+            val seen = networks.firstOrNull { it.ssid == name }
+            add(PhoneWifiNetwork(name, seen?.rssi, null, seen?.secured) to true)
         }
+        networks.filter { it.ssid != current }.forEach { add(it to false) }
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -170,7 +166,10 @@ fun WifiNetworkPickerDialog(scanner: PhoneWifiScanner, onPick: (PhoneWifiNetwork
                                         overflow = TextOverflow.Ellipsis,
                                     )
                                     val info =
-                                        listOfNotNull(if (isCurrent) "Obecna sieć" else null, strengthText(network.rssi))
+                                        listOfNotNull(
+                                            if (isCurrent) "Obecna sieć" else null,
+                                            strengthText(network.rssi),
+                                        )
                                     if (info.isNotEmpty()) {
                                         Text(
                                             text = info.joinToString(" • "),
@@ -223,7 +222,8 @@ fun WifiPasswordDialog(ssid: String, onConnect: (String) -> Unit, onDismiss: () 
                     trailingIcon = {
                         IconButton(onClick = { visible = !visible }) {
                             Icon(
-                                imageVector = if (visible) MeshtasticIcons.VisibilityOff else MeshtasticIcons.Visibility,
+                                imageVector =
+                                if (visible) MeshtasticIcons.VisibilityOff else MeshtasticIcons.Visibility,
                                 contentDescription = if (visible) "Ukryj hasło" else "Pokaż hasło",
                             )
                         }

@@ -14,12 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("MagicNumber", "TooManyFunctions", "LongMethod", "CyclomaticComplexMethod")
+@file:Suppress(
+    "MagicNumber",
+    "TooManyFunctions",
+    "LongMethod",
+    "CyclomaticComplexMethod",
+    "LambdaParameterInRestartableEffect",
+    "ModifierMissing",
+    "MultipleEmitters",
+    "MutableStateAutoboxing",
+    "SwallowedException",
+    "UnusedParameter",
+)
 
 package org.meshtastic.feature.settings.antenna
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -31,6 +43,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -38,11 +52,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,30 +75,43 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
+import org.meshtastic.core.common.util.DateFormatter
+import org.meshtastic.core.common.util.nowMillis
 import org.meshtastic.core.model.antenna.AntennaDesign
 import org.meshtastic.core.model.antenna.AntennaInput
 import org.meshtastic.core.model.antenna.AntennaMath
 import org.meshtastic.core.model.antenna.AntennaPrefill
+import org.meshtastic.core.model.antenna.AntennaSetup
+import org.meshtastic.core.model.antenna.AntennaSetups
 import org.meshtastic.core.model.antenna.AntennaType
 import org.meshtastic.core.model.antenna.Cable
+import org.meshtastic.core.model.antenna.CableDb
 import org.meshtastic.core.model.antenna.Dim
 import org.meshtastic.core.model.antenna.DimKind
+import org.meshtastic.core.model.antenna.FeederBuilder
+import org.meshtastic.core.model.antenna.FeederConfig
 import org.meshtastic.core.model.antenna.Insulation
 import org.meshtastic.core.model.antenna.Note
 import org.meshtastic.core.model.antenna.PlannerHandoff
 import org.meshtastic.core.model.antenna.Polarization
-import org.meshtastic.core.resources.antenna_planner_name
-import org.meshtastic.core.resources.antenna_use_in_planner
-import org.meshtastic.core.resources.planner_point_a
-import org.meshtastic.core.resources.planner_point_b
-import org.meshtastic.core.ui.assistant.AssistantLinks
+import org.meshtastic.core.repository.FileService
+import org.meshtastic.core.repository.RadioConfigRepository
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.antenna_accuracy
 import org.meshtastic.core.resources.antenna_boom
 import org.meshtastic.core.resources.antenna_cable_for
 import org.meshtastic.core.resources.antenna_calc_title
+import org.meshtastic.core.resources.antenna_cmp_eirp
+import org.meshtastic.core.resources.antenna_cmp_loss
+import org.meshtastic.core.resources.antenna_cmp_pick
+import org.meshtastic.core.resources.antenna_cmp_range
 import org.meshtastic.core.resources.antenna_decimal
 import org.meshtastic.core.resources.antenna_diameter
 import org.meshtastic.core.resources.antenna_dim_arm
@@ -127,6 +156,8 @@ import org.meshtastic.core.resources.antenna_freq_ours
 import org.meshtastic.core.resources.antenna_frequency
 import org.meshtastic.core.resources.antenna_gain
 import org.meshtastic.core.resources.antenna_gain_override
+import org.meshtastic.core.resources.antenna_hint_cable
+import org.meshtastic.core.resources.antenna_hint_worst
 import org.meshtastic.core.resources.antenna_impedance
 import org.meshtastic.core.resources.antenna_insulation
 import org.meshtastic.core.resources.antenna_insulation_none
@@ -148,22 +179,33 @@ import org.meshtastic.core.resources.antenna_note_radials
 import org.meshtastic.core.resources.antenna_note_tune_swr
 import org.meshtastic.core.resources.antenna_note_yagi_boom
 import org.meshtastic.core.resources.antenna_note_yagi_driven
+import org.meshtastic.core.resources.antenna_planner_name
 import org.meshtastic.core.resources.antenna_pol_circular
 import org.meshtastic.core.resources.antenna_pol_either
 import org.meshtastic.core.resources.antenna_pol_linear
 import org.meshtastic.core.resources.antenna_pol_vertical
 import org.meshtastic.core.resources.antenna_properties
 import org.meshtastic.core.resources.antenna_radial_angle
+import org.meshtastic.core.resources.antenna_report_title
 import org.meshtastic.core.resources.antenna_res_at_antenna
 import org.meshtastic.core.resources.antenna_res_band_none
 import org.meshtastic.core.resources.antenna_res_band_ok
 import org.meshtastic.core.resources.antenna_res_band_over
 import org.meshtastic.core.resources.antenna_res_duty
 import org.meshtastic.core.resources.antenna_res_eirp
+import org.meshtastic.core.resources.antenna_res_feeder
 import org.meshtastic.core.resources.antenna_res_mismatch
 import org.meshtastic.core.resources.antenna_res_range
 import org.meshtastic.core.resources.antenna_res_total
+import org.meshtastic.core.resources.antenna_save
 import org.meshtastic.core.resources.antenna_sections
+import org.meshtastic.core.resources.antenna_setup_delete
+import org.meshtastic.core.resources.antenna_setup_load
+import org.meshtastic.core.resources.antenna_setup_name
+import org.meshtastic.core.resources.antenna_setup_save
+import org.meshtastic.core.resources.antenna_setup_saved
+import org.meshtastic.core.resources.antenna_setups_empty
+import org.meshtastic.core.resources.antenna_setups_title
 import org.meshtastic.core.resources.antenna_shortening
 import org.meshtastic.core.resources.antenna_spacing_mm
 import org.meshtastic.core.resources.antenna_substrate
@@ -173,9 +215,6 @@ import org.meshtastic.core.resources.antenna_tx_ours
 import org.meshtastic.core.resources.antenna_tx_power
 import org.meshtastic.core.resources.antenna_tx_radio
 import org.meshtastic.core.resources.antenna_tx_radio_region
-import org.koin.compose.koinInject
-import org.meshtastic.core.repository.RadioConfigRepository
-import androidx.compose.material3.FilterChip
 import org.meshtastic.core.resources.antenna_type
 import org.meshtastic.core.resources.antenna_type_biquad
 import org.meshtastic.core.resources.antenna_type_coax_stub
@@ -190,77 +229,47 @@ import org.meshtastic.core.resources.antenna_type_moxon
 import org.meshtastic.core.resources.antenna_type_patch
 import org.meshtastic.core.resources.antenna_type_slim_jim
 import org.meshtastic.core.resources.antenna_type_yagi
+import org.meshtastic.core.resources.antenna_use_in_planner
 import org.meshtastic.core.resources.antenna_wavelength
 import org.meshtastic.core.resources.antenna_yagi_row
-import org.meshtastic.core.ui.component.DropDownPreference
-import org.meshtastic.core.ui.component.MainAppBar
-import org.meshtastic.core.ui.component.SwitchPreference
-import org.meshtastic.feature.settings.component.ExpressiveSection
-import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.launch
-import org.meshtastic.core.common.util.DateFormatter
-import org.meshtastic.core.common.util.nowMillis
-import org.meshtastic.core.repository.FileService
-import org.meshtastic.core.ui.util.rememberSaveFileLauncher
-import org.meshtastic.core.resources.antenna_report_title
-import org.meshtastic.core.resources.antenna_save
 import org.meshtastic.core.resources.assistant_save_done
 import org.meshtastic.core.resources.assistant_save_failed
-import org.meshtastic.core.resources.planner_feeder_custom_cable
-import org.meshtastic.core.resources.planner_feeder_no_cable
-import org.meshtastic.core.resources.planner_feeder_preset
-import org.meshtastic.core.resources.planner_feeder_preset_custom
-import org.meshtastic.core.resources.planner_feeder_preset_direct
-import org.meshtastic.core.resources.planner_feeder_preset_adapter_sma_n
-import org.meshtastic.core.resources.planner_feeder_preset_adapter_n_n
-import org.meshtastic.core.resources.planner_feeder_preset_pigtail
-import org.meshtastic.core.resources.planner_feeder_preset_pigtail_cable
-import org.meshtastic.core.resources.planner_feeder_preset_long_lmr400
-import org.meshtastic.core.resources.planner_feeder_preset_ecoflex_roof
-import org.meshtastic.core.resources.planner_feeder_preset_heliax_mast
+import org.meshtastic.core.resources.planner_feeder_approximate
+import org.meshtastic.core.resources.planner_feeder_cable_n
 import org.meshtastic.core.resources.planner_feeder_connector_count
 import org.meshtastic.core.resources.planner_feeder_connector_n
-import org.meshtastic.core.resources.planner_feeder_cable_n
-import org.meshtastic.core.resources.planner_feeder_length
+import org.meshtastic.core.resources.planner_feeder_custom_cable
 import org.meshtastic.core.resources.planner_feeder_custom_loss
-import org.meshtastic.core.resources.planner_feeder_approximate
+import org.meshtastic.core.resources.planner_feeder_length
+import org.meshtastic.core.resources.planner_feeder_no_cable
+import org.meshtastic.core.resources.planner_feeder_preset
+import org.meshtastic.core.resources.planner_feeder_preset_adapter_n_n
+import org.meshtastic.core.resources.planner_feeder_preset_adapter_sma_n
+import org.meshtastic.core.resources.planner_feeder_preset_custom
+import org.meshtastic.core.resources.planner_feeder_preset_direct
+import org.meshtastic.core.resources.planner_feeder_preset_ecoflex_roof
+import org.meshtastic.core.resources.planner_feeder_preset_heliax_mast
+import org.meshtastic.core.resources.planner_feeder_preset_long_lmr400
+import org.meshtastic.core.resources.planner_feeder_preset_pigtail
+import org.meshtastic.core.resources.planner_feeder_preset_pigtail_cable
 import org.meshtastic.core.resources.planner_feeder_title
+import org.meshtastic.core.resources.planner_feeder_warn_custom_loss
+import org.meshtastic.core.resources.planner_feeder_warn_frequency
+import org.meshtastic.core.resources.planner_feeder_warn_length
+import org.meshtastic.core.resources.planner_feeder_warn_other
 import org.meshtastic.core.resources.planner_feeder_warn_sections
 import org.meshtastic.core.resources.planner_feeder_warn_too_many
 import org.meshtastic.core.resources.planner_feeder_warn_unknown
-import org.meshtastic.core.resources.planner_feeder_warn_custom_loss
-import org.meshtastic.core.resources.planner_feeder_warn_length
-import org.meshtastic.core.resources.planner_feeder_warn_frequency
-import org.meshtastic.core.resources.planner_feeder_warn_other
-import org.meshtastic.core.resources.planner_unit_m
+import org.meshtastic.core.resources.planner_point_a
+import org.meshtastic.core.resources.planner_point_b
 import org.meshtastic.core.resources.planner_unit_db_per_m
-import org.meshtastic.core.resources.antenna_res_feeder
-import org.meshtastic.core.model.antenna.CableDb
-import org.meshtastic.core.model.antenna.FeederBuilder
-import org.meshtastic.core.model.antenna.FeederConfig
-import org.meshtastic.core.model.antenna.FeederSection as FeederSectionData
-import org.meshtastic.core.resources.antenna_setups_title
-import org.meshtastic.core.resources.antenna_setups_empty
-import org.meshtastic.core.resources.antenna_setup_load
-import org.meshtastic.core.resources.antenna_setup_delete
-import org.meshtastic.core.resources.antenna_setup_name
-import org.meshtastic.core.resources.antenna_setup_save
-import org.meshtastic.core.resources.antenna_setup_saved
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.meshtastic.core.model.antenna.AntennaSetup
-import org.meshtastic.core.model.antenna.AntennaSetups
-import org.meshtastic.core.repository.UiPrefs
-import androidx.compose.runtime.key
-import org.meshtastic.core.resources.antenna_hint_worst
-import org.meshtastic.core.resources.antenna_hint_cable
-import org.meshtastic.core.resources.antenna_cmp_pick
-import org.meshtastic.core.resources.antenna_cmp_loss
-import org.meshtastic.core.resources.antenna_cmp_eirp
-import org.meshtastic.core.resources.antenna_cmp_range
+import org.meshtastic.core.resources.planner_unit_m
+import org.meshtastic.core.ui.assistant.AssistantLinks
+import org.meshtastic.core.ui.component.DropDownPreference
+import org.meshtastic.core.ui.component.MainAppBar
+import org.meshtastic.core.ui.component.SwitchPreference
+import org.meshtastic.core.ui.util.rememberSaveFileLauncher
+import org.meshtastic.feature.settings.component.ExpressiveSection
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -269,6 +278,7 @@ import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.roundToLong
 import kotlin.math.sin
+import org.meshtastic.core.model.antenna.FeederSection as FeederSectionData
 
 private val FREQ_CHIPS = listOf(AntennaMath.OUR_MHZ, 868.0, 433.0, 915.0, 2440.0)
 
@@ -326,28 +336,35 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
     val propertyLines = propertyLines(type, design, lambda, sep)
     var feedData by remember { mutableStateOf<AntennaFeedData?>(null) }
     val feed = feedData.takeIf { type != AntennaType.COAX_STUB }
-    val inputLines =
-        buildList {
-            add(stringResource(Res.string.antenna_type) + ": " + typeLabel)
-            add(stringResource(Res.string.antenna_frequency) + ": " + fmt(mhz, 5, sep))
-            if (type !in setOf(AntennaType.HELIX, AntennaType.PATCH, AntennaType.COAX_STUB)) {
-                add(stringResource(Res.string.antenna_diameter) + ": " + fmt(input.diameterMm, 2, sep))
-            }
-            when (type) {
-                AntennaType.GROUND_PLANE, AntennaType.FIVE_EIGHTHS -> add(stringResource(Res.string.antenna_radial_angle) + ": " + fmt(input.radialAngleDeg, 0, sep))
-                AntennaType.YAGI -> {
-                    add(stringResource(Res.string.antenna_elements) + ": " + input.elements)
-                    add(stringResource(Res.string.antenna_boom) + ": " + fmt(input.boomMm, 1, sep))
-                }
-                AntennaType.COLLINEAR -> add(stringResource(Res.string.antenna_sections) + ": " + input.sections)
-                AntennaType.HELIX -> add(stringResource(Res.string.antenna_turns) + ": " + input.turns)
-                AntennaType.PATCH -> {
-                    add(stringResource(Res.string.antenna_eps) + ": " + fmt(input.epsR, 2, sep))
-                    add(stringResource(Res.string.antenna_substrate) + ": " + fmt(input.substrateMm, 2, sep))
-                }
-                else -> {}
-            }
+    val inputLines = buildList {
+        add(stringResource(Res.string.antenna_type) + ": " + typeLabel)
+        add(stringResource(Res.string.antenna_frequency) + ": " + fmt(mhz, 5, sep))
+        if (type !in setOf(AntennaType.HELIX, AntennaType.PATCH, AntennaType.COAX_STUB)) {
+            add(stringResource(Res.string.antenna_diameter) + ": " + fmt(input.diameterMm, 2, sep))
         }
+        when (type) {
+            AntennaType.GROUND_PLANE,
+            AntennaType.FIVE_EIGHTHS,
+            ->
+                add(stringResource(Res.string.antenna_radial_angle) + ": " + fmt(input.radialAngleDeg, 0, sep))
+
+            AntennaType.YAGI -> {
+                add(stringResource(Res.string.antenna_elements) + ": " + input.elements)
+                add(stringResource(Res.string.antenna_boom) + ": " + fmt(input.boomMm, 1, sep))
+            }
+
+            AntennaType.COLLINEAR -> add(stringResource(Res.string.antenna_sections) + ": " + input.sections)
+
+            AntennaType.HELIX -> add(stringResource(Res.string.antenna_turns) + ": " + input.turns)
+
+            AntennaType.PATCH -> {
+                add(stringResource(Res.string.antenna_eps) + ": " + fmt(input.epsR, 2, sep))
+                add(stringResource(Res.string.antenna_substrate) + ": " + fmt(input.substrateMm, 2, sep))
+            }
+
+            else -> {}
+        }
+    }
     val reportTitle = stringResource(Res.string.antenna_report_title)
     val reportNote = stringResource(Res.string.antenna_accuracy)
     val headingInput = stringResource(Res.string.antenna_type)
@@ -355,18 +372,20 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
     val headingProps = stringResource(Res.string.antenna_properties)
     val headingFeed = stringResource(Res.string.antenna_feed_title)
     val makeReport: (String) -> AntennaReport = { stamp ->
-        val dimRows = dimLines.map { (d, text) -> AntennaDimRow(d.letter, text.substringAfter("— ").substringBefore(":"), d.meters) }
+        val dimRows = dimLines.map { (d, text) ->
+            AntennaDimRow(d.letter, text.substringAfter("— ").substringBefore(":"), d.meters)
+        }
         AntennaReport(
             title = reportTitle,
             stamp = stamp,
             note = reportNote,
             sections =
-                buildList {
-                    add(headingInput to inputLines)
-                    add(headingDims to dimLines.map { it.second })
-                    add(headingProps to propertyLines)
-                    if (feed != null) add(headingFeed to (feed.inputLines + feed.resultLines))
-                },
+            buildList {
+                add(headingInput to inputLines)
+                add(headingDims to dimLines.map { it.second })
+                add(headingProps to propertyLines)
+                if (feed != null) add(headingFeed to (feed.inputLines + feed.resultLines))
+            },
             dims = dimRows,
             json = AntennaReport.json(reportTitle, stamp, input, design, typeLabel, dimRows, feed),
         )
@@ -428,14 +447,19 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
                 canSave = feed != null,
                 loadedName = loaded?.name.orEmpty(),
                 onSave = { name ->
-                    currentSetup(name)?.let { uiPrefs.setAntennaSetups(AntennaSetups.encode(AntennaSetups.upsert(setups, it))) }
+                    currentSetup(name)?.let {
+                        uiPrefs.setAntennaSetups(AntennaSetups.encode(AntennaSetups.upsert(setups, it)))
+                    }
                 },
                 onLoad = applySetup,
                 onDelete = { uiPrefs.setAntennaSetups(AntennaSetups.encode(AntennaSetups.remove(setups, it.id))) },
             )
 
             ExpressiveSection(title = stringResource(Res.string.antenna_type)) {
-                Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(
+                    Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
                     NumberField(stringResource(Res.string.antenna_frequency), freqText) { freqText = it }
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FREQ_CHIPS.forEach { f ->
@@ -443,7 +467,13 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
                                 selected = abs(mhz - f) < 0.001,
                                 onClick = { freqText = numberText(f) },
                                 label = {
-                                    Text(if (f == AntennaMath.OUR_MHZ) stringResource(Res.string.antenna_freq_ours) else fmt(f, 0, sep) + " MHz")
+                                    Text(
+                                        if (f == AntennaMath.OUR_MHZ) {
+                                            stringResource(Res.string.antenna_freq_ours)
+                                        } else {
+                                            fmt(f, 0, sep) + " MHz"
+                                        },
+                                    )
                                 },
                             )
                         }
@@ -459,23 +489,47 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
             }
 
             ExpressiveSection(title = stringResource(typeName(type))) {
-                Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(
+                    Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
                     val wire = type !in setOf(AntennaType.HELIX, AntennaType.PATCH, AntennaType.COAX_STUB)
-                    if (wire) NumberField(stringResource(Res.string.antenna_diameter), diameterText) { diameterText = it }
+                    if (wire) {
+                        NumberField(stringResource(Res.string.antenna_diameter), diameterText) { diameterText = it }
+                    }
                     when (type) {
-                        AntennaType.GROUND_PLANE, AntennaType.FIVE_EIGHTHS ->
+                        AntennaType.GROUND_PLANE,
+                        AntennaType.FIVE_EIGHTHS,
+                        ->
                             NumberField(stringResource(Res.string.antenna_radial_angle), angleText) { angleText = it }
-                        AntennaType.FOLDED_DIPOLE -> NumberField(stringResource(Res.string.antenna_spacing_mm), foldedText) { foldedText = it }
+
+                        AntennaType.FOLDED_DIPOLE ->
+                            NumberField(stringResource(Res.string.antenna_spacing_mm), foldedText) { foldedText = it }
+
                         AntennaType.YAGI -> {
-                            NumberField(stringResource(Res.string.antenna_elements), elementsText, decimal = false) { elementsText = it }
+                            NumberField(stringResource(Res.string.antenna_elements), elementsText, decimal = false) {
+                                elementsText = it
+                            }
                             NumberField(stringResource(Res.string.antenna_boom), boomText) { boomText = it }
                         }
-                        AntennaType.COLLINEAR -> NumberField(stringResource(Res.string.antenna_sections), sectionsText, decimal = false) { sectionsText = it }
-                        AntennaType.HELIX -> NumberField(stringResource(Res.string.antenna_turns), turnsText, decimal = false) { turnsText = it }
+
+                        AntennaType.COLLINEAR ->
+                            NumberField(stringResource(Res.string.antenna_sections), sectionsText, decimal = false) {
+                                sectionsText = it
+                            }
+
+                        AntennaType.HELIX ->
+                            NumberField(stringResource(Res.string.antenna_turns), turnsText, decimal = false) {
+                                turnsText = it
+                            }
+
                         AntennaType.PATCH -> {
                             NumberField(stringResource(Res.string.antenna_eps), epsText) { epsText = it }
-                            NumberField(stringResource(Res.string.antenna_substrate), substrateText) { substrateText = it }
+                            NumberField(stringResource(Res.string.antenna_substrate), substrateText) {
+                                substrateText = it
+                            }
                         }
+
                         else -> {}
                     }
                 }
@@ -492,11 +546,11 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
                         title = stringResource(Res.string.antenna_insulation),
                         enabled = true,
                         items =
-                            listOf(
-                                Insulation.NONE to stringResource(Res.string.antenna_insulation_none),
-                                Insulation.THIN to stringResource(Res.string.antenna_insulation_thin),
-                                Insulation.THICK to stringResource(Res.string.antenna_insulation_thick),
-                            ),
+                        listOf(
+                            Insulation.NONE to stringResource(Res.string.antenna_insulation_none),
+                            Insulation.THIN to stringResource(Res.string.antenna_insulation_thin),
+                            Insulation.THICK to stringResource(Res.string.antenna_insulation_thick),
+                        ),
                         selectedItem = insulation,
                         onItemSelected = { insulation = it },
                     )
@@ -520,18 +574,26 @@ fun AntennaCalculatorScreen(onBack: () -> Unit) {
             )
 
             ExpressiveSection(title = stringResource(Res.string.antenna_dimensions)) {
-                Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Column(
+                    Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
                     dimLines.forEach { Line(it.second) }
                 }
             }
 
             ExpressiveSection(title = stringResource(Res.string.antenna_properties)) {
-                Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Column(
+                    Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
                     propertyLines.forEach { Line(it) }
                 }
             }
 
-            if (type != AntennaType.COAX_STUB) key(loadCount) { FeedSection(mhz, design, sep, prefill.third, loaded, setups) { feedData = it } }
+            if (type != AntennaType.COAX_STUB) {
+                key(loadCount) { FeedSection(mhz, design, sep, prefill.third, loaded, setups) { feedData = it } }
+            }
 
             Text(
                 text = stringResource(Res.string.antenna_accuracy),
@@ -565,7 +627,10 @@ private fun SetupsSection(
     var name by remember(loadedName) { mutableStateOf(loadedName) }
     var saved by remember { mutableStateOf(false) }
     ExpressiveSection(title = stringResource(Res.string.antenna_setups_title)) {
-        Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(
+            Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             if (setups.isEmpty()) {
                 Text(
                     stringResource(Res.string.antenna_setups_empty),
@@ -578,7 +643,9 @@ private fun SetupsSection(
                     Column(Modifier.weight(1f)) {
                         Text(setup.name, style = MaterialTheme.typography.bodyLarge)
                         Text(
-                            "${numberText(setup.input.mhz)} MHz, ${fmt(setup.gainDbi, 1, ".")} dBi, ${fmt(setup.feederLossDb, 2, ".")} dB",
+                            "${numberText(
+                                setup.input.mhz,
+                            )} MHz, ${fmt(setup.gainDbi, 1, ".")} dBi, ${fmt(setup.feederLossDb, 2, ".")} dB",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -604,8 +671,12 @@ private fun SetupsSection(
                         onSave(name.trim())
                         saved = true
                     },
-                ) { Text(stringResource(Res.string.antenna_setup_save)) }
-                if (saved) Text(stringResource(Res.string.antenna_setup_saved), style = MaterialTheme.typography.bodySmall)
+                ) {
+                    Text(stringResource(Res.string.antenna_setup_save))
+                }
+                if (saved) {
+                    Text(stringResource(Res.string.antenna_setup_saved), style = MaterialTheme.typography.bodySmall)
+                }
             }
         }
     }
@@ -619,7 +690,9 @@ private fun SetupsSection(
 private fun UseInPlannerButton(enabled: Boolean, onUse: (toB: Boolean) -> Unit) {
     var menu by remember { mutableStateOf(false) }
     Box {
-        TextButton(enabled = enabled, onClick = { menu = true }) { Text(stringResource(Res.string.antenna_use_in_planner)) }
+        TextButton(enabled = enabled, onClick = { menu = true }) {
+            Text(stringResource(Res.string.antenna_use_in_planner))
+        }
         DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
             DropdownMenuItem(
                 text = { Text(stringResource(Res.string.planner_point_a)) },
@@ -649,24 +722,23 @@ private fun SaveBar(makeReport: (stamp: String) -> AntennaReport) {
     var menu by remember { mutableStateOf(false) }
     var result by remember { mutableStateOf<String?>(null) }
     var pending by remember { mutableStateOf<ByteArray?>(null) }
-    val launcher =
-        rememberSaveFileLauncher { uri ->
-            val bytes = pending
-            if (bytes != null) {
-                scope.launch {
-                    val ok =
-                        try {
-                            fileService.write(uri) { sink -> sink.write(bytes) }
-                        } catch (e: CancellationException) {
-                            throw e
-                        } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-                            false
-                        }
-                    result = if (ok) savedText else failedText
-                    pending = null
-                }
+    val launcher = rememberSaveFileLauncher { uri ->
+        val bytes = pending
+        if (bytes != null) {
+            scope.launch {
+                val ok =
+                    try {
+                        fileService.write(uri) { sink -> sink.write(bytes) }
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+                        false
+                    }
+                result = if (ok) savedText else failedText
+                pending = null
             }
         }
+    }
     Column {
         Box {
             TextButton(onClick = { menu = true }) { Text(stringResource(Res.string.antenna_save)) }
@@ -698,7 +770,15 @@ private const val MAX_SECTION_M = 1000.0
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: Double?, initial: AntennaSetup?, setups: List<AntennaSetup>, onData: (AntennaFeedData) -> Unit) {
+private fun FeedSection(
+    mhz: Double,
+    design: AntennaDesign,
+    sep: String,
+    txDbm: Double?,
+    initial: AntennaSetup?,
+    setups: List<AntennaSetup>,
+    onData: (AntennaFeedData) -> Unit,
+) {
     val radioConfig: RadioConfigRepository = koinInject()
     val lora = radioConfig.localConfigFlow.collectAsState(null).value?.lora
     // Radio output power; 0 means "the region's maximum", which is known here only for the EU 868 regions.
@@ -716,7 +796,10 @@ private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: 
     }
     // The same feed line as in the link planner: any number of connectors joined by cable sections.
     var feeder by remember {
-        mutableStateOf(initial?.feeder ?: FeederConfig(listOf("sma", "sma"), listOf(FeederSectionData(DEFAULT_CABLE_ID, DEFAULT_SECTION_M))))
+        mutableStateOf(
+            initial?.feeder
+                ?: FeederConfig(listOf("sma", "sma"), listOf(FeederSectionData(DEFAULT_CABLE_ID, DEFAULT_SECTION_M))),
+        )
     }
     var swrText by remember { mutableStateOf(initial?.swr?.let { numberText(it) } ?: "1.5") }
     var gainText by remember { mutableStateOf(initial?.gainOverrideDbi?.let { numberText(it) } ?: "") }
@@ -728,23 +811,27 @@ private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: 
     val res = AntennaMath.feedLoss(mhz, tx, feederResult.totalDb, feederResult.connectorsDb, swr, gain)
     val customLabel = stringResource(Res.string.planner_feeder_custom_cable)
     val partLines = feederResult.lines.map { localizeFeederPart(it.label, customLabel) to it.lossDb }
-    val feederText =
-        buildString {
-            feeder.connectorIds.forEachIndexed { i, id ->
-                if (i > 0) {
-                    val section = feeder.sections.getOrNull(i - 1)
-                    if (section != null && section.cableId != FeederBuilder.NONE_ID) {
-                        append(" — ")
-                        append(
-                            if (section.cableId == FeederBuilder.CUSTOM_ID) customLabel else CableDb.cable(section.cableId)?.name ?: section.cableId,
-                        )
-                        append(" ").append(fmt(section.lengthM, 2, sep)).append(" m")
-                    }
+    val feederText = buildString {
+        feeder.connectorIds.forEachIndexed { i, id ->
+            if (i > 0) {
+                val section = feeder.sections.getOrNull(i - 1)
+                if (section != null && section.cableId != FeederBuilder.NONE_ID) {
                     append(" — ")
+                    append(
+                        if (section.cableId == FeederBuilder.CUSTOM_ID) {
+                            customLabel
+                        } else {
+                            CableDb.cable(section.cableId)?.name ?: section.cableId
+                        },
+                    )
+                    append(" ").append(fmt(section.lengthM, 2, sep)).append(" m")
                 }
-                append(CableDb.connector(id)?.name ?: id)
+                append(" — ")
             }
-        }.ifBlank { stringResource(Res.string.planner_feeder_preset_direct) }
+            append(CableDb.connector(id)?.name ?: id)
+        }
+    }
+        .ifBlank { stringResource(Res.string.planner_feeder_preset_direct) }
 
     // What loses the most, in words, and how the line compares with a saved antenna.
     val mismatchName = stringResource(Res.string.antenna_swr)
@@ -757,49 +844,123 @@ private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: 
             }
         }
     val worstPart = (partLines + (mismatchName to res.mismatchDb)).maxByOrNull { it.second }
-    val hintLines =
-        buildList {
-            if (worstPart != null && worstPart.second >= 0.05 && res.totalDb > 0.0) {
-                add(stringResource(Res.string.antenna_hint_worst, worstPart.first, fmt(worstPart.second, 2, sep), fmt(worstPart.second / res.totalDb * 100, 0, sep)))
-                val i = sectionDb.indices.maxByOrNull { sectionDb[it] }
-                val sct = i?.let { feeder.sections[it] }
-                if (i != null && sct != null && sct.lengthM >= 1.0 && sectionDb[i] >= worstPart.second - 1e-9) {
-                    val perM = sectionDb[i] / sct.lengthM
-                    add(stringResource(Res.string.antenna_hint_cable, fmt(perM, 3, sep), fmt(perM * minOf(5.0, sct.lengthM), 2, sep), fmt(minOf(5.0, sct.lengthM), 0, sep)))
-                }
+    val hintLines = buildList {
+        if (worstPart != null && worstPart.second >= 0.05 && res.totalDb > 0.0) {
+            add(
+                stringResource(
+                    Res.string.antenna_hint_worst,
+                    worstPart.first,
+                    fmt(worstPart.second, 2, sep),
+                    fmt(worstPart.second / res.totalDb * 100, 0, sep),
+                ),
+            )
+            val i = sectionDb.indices.maxByOrNull { sectionDb[it] }
+            val sct = i?.let { feeder.sections[it] }
+            if (i != null && sct != null && sct.lengthM >= 1.0 && sectionDb[i] >= worstPart.second - 1e-9) {
+                val perM = sectionDb[i] / sct.lengthM
+                add(
+                    stringResource(
+                        Res.string.antenna_hint_cable,
+                        fmt(perM, 3, sep),
+                        fmt(perM * minOf(5.0, sct.lengthM), 2, sep),
+                        fmt(minOf(5.0, sct.lengthM), 0, sep),
+                    ),
+                )
             }
         }
+    }
     var compareId by remember { mutableStateOf("") }
     val other = setups.firstOrNull { it.id == compareId }
-    val compareLines =
-        buildList {
-            if (other != null) {
-                val of = FeederBuilder.compute(other.feeder, other.input.mhz)
-                val o = AntennaMath.feedLoss(other.input.mhz, other.txDbm, of.totalDb, of.connectorsDb, other.swr, other.gainDbi)
-                add(stringResource(Res.string.antenna_cmp_loss, fmt(res.totalDb, 2, sep), fmt(o.totalDb, 2, sep), fmt(res.totalDb - o.totalDb, 2, sep)))
-                add(stringResource(Res.string.antenna_cmp_eirp, fmt(res.eirpDbm, 1, sep), fmt(o.eirpDbm, 1, sep), fmt(res.eirpDbm - o.eirpDbm, 1, sep)))
-                add(stringResource(Res.string.antenna_cmp_range, fmt(res.rangeFactor * 100, 0, sep), fmt(o.rangeFactor * 100, 0, sep)))
-            }
+    val compareLines = buildList {
+        if (other != null) {
+            val of = FeederBuilder.compute(other.feeder, other.input.mhz)
+            val o =
+                AntennaMath.feedLoss(
+                    other.input.mhz,
+                    other.txDbm,
+                    of.totalDb,
+                    of.connectorsDb,
+                    other.swr,
+                    other.gainDbi,
+                )
+            add(
+                stringResource(
+                    Res.string.antenna_cmp_loss,
+                    fmt(res.totalDb, 2, sep),
+                    fmt(o.totalDb, 2, sep),
+                    fmt(res.totalDb - o.totalDb, 2, sep),
+                ),
+            )
+            add(
+                stringResource(
+                    Res.string.antenna_cmp_eirp,
+                    fmt(res.eirpDbm, 1, sep),
+                    fmt(o.eirpDbm, 1, sep),
+                    fmt(res.eirpDbm - o.eirpDbm, 1, sep),
+                ),
+            )
+            add(
+                stringResource(
+                    Res.string.antenna_cmp_range,
+                    fmt(res.rangeFactor * 100, 0, sep),
+                    fmt(o.rangeFactor * 100, 0, sep),
+                ),
+            )
         }
+    }
 
-    val resultLines =
-        buildList {
-            partLines.forEach { (part, db) -> add("• $part: ${fmt(db, 2, sep)} dB") }
-            add(stringResource(Res.string.antenna_res_feeder, fmt(feederResult.totalDb, 2, sep), fmt(res.cableDb, 2, sep), fmt(res.connectorsDb, 2, sep)))
-            add(stringResource(Res.string.antenna_res_mismatch, fmt(res.mismatchDb, 2, sep)))
-            add(stringResource(Res.string.antenna_res_total, fmt(res.totalDb, 2, sep), fmt((1 - 10.0.pow(-res.totalDb / 10)) * 100, 0, sep)))
-            add(stringResource(Res.string.antenna_res_at_antenna, fmt(res.atAntennaDbm, 1, sep), milli(res.atAntennaDbm, sep)))
-            add(stringResource(Res.string.antenna_res_eirp, fmt(res.eirpDbm, 1, sep), milli(res.eirpDbm, sep), fmt(res.erpDbm, 1, sep), milli(res.erpDbm, sep)))
-            val band = res.band
-            if (band == null) {
-                add(stringResource(Res.string.antenna_res_band_none))
-            } else {
-                val limit = band.erpDbm?.let { "${fmt(it, 0, sep)} dBm ERP (${milli(it, sep)})" } ?: band.eirpDbm?.let { "${fmt(it, 0, sep)} dBm EIRP (${milli(it, sep)})" }.orEmpty()
-                add(stringResource(if (res.overLimit == true) Res.string.antenna_res_band_over else Res.string.antenna_res_band_ok, band.name, limit))
-                band.dutyPercent?.let { add(stringResource(Res.string.antenna_res_duty, fmt(it, 1, sep))) }
-            }
-            add(stringResource(Res.string.antenna_res_range, fmt(res.rangeFactor * 100, 0, sep)))
+    val resultLines = buildList {
+        partLines.forEach { (part, db) -> add("• $part: ${fmt(db, 2, sep)} dB") }
+        add(
+            stringResource(
+                Res.string.antenna_res_feeder,
+                fmt(feederResult.totalDb, 2, sep),
+                fmt(res.cableDb, 2, sep),
+                fmt(res.connectorsDb, 2, sep),
+            ),
+        )
+        add(stringResource(Res.string.antenna_res_mismatch, fmt(res.mismatchDb, 2, sep)))
+        add(
+            stringResource(
+                Res.string.antenna_res_total,
+                fmt(res.totalDb, 2, sep),
+                fmt((1 - 10.0.pow(-res.totalDb / 10)) * 100, 0, sep),
+            ),
+        )
+        add(
+            stringResource(
+                Res.string.antenna_res_at_antenna,
+                fmt(res.atAntennaDbm, 1, sep),
+                milli(res.atAntennaDbm, sep),
+            ),
+        )
+        add(
+            stringResource(
+                Res.string.antenna_res_eirp,
+                fmt(res.eirpDbm, 1, sep),
+                milli(res.eirpDbm, sep),
+                fmt(res.erpDbm, 1, sep),
+                milli(res.erpDbm, sep),
+            ),
+        )
+        val band = res.band
+        if (band == null) {
+            add(stringResource(Res.string.antenna_res_band_none))
+        } else {
+            val limit =
+                band.erpDbm?.let { "${fmt(it, 0, sep)} dBm ERP (${milli(it, sep)})" }
+                    ?: band.eirpDbm?.let { "${fmt(it, 0, sep)} dBm EIRP (${milli(it, sep)})" }.orEmpty()
+            add(
+                stringResource(
+                    if (res.overLimit == true) Res.string.antenna_res_band_over else Res.string.antenna_res_band_ok,
+                    band.name,
+                    limit,
+                ),
+            )
+            band.dutyPercent?.let { add(stringResource(Res.string.antenna_res_duty, fmt(it, 1, sep))) }
         }
+        add(stringResource(Res.string.antenna_res_range, fmt(res.rangeFactor * 100, 0, sep)))
+    }
     val feedInputLines =
         listOf(
             stringResource(Res.string.antenna_tx_power) + ": " + power(tx, sep),
@@ -823,7 +984,10 @@ private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: 
     LaunchedEffect(feedData) { onData(feedData) }
 
     ExpressiveSection(title = stringResource(Res.string.antenna_feed_title)) {
-        Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(
+            Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             NumberField(stringResource(Res.string.antenna_tx_power), powerText, signed = true) {
                 powerText = it
                 powerTouched = true
@@ -854,10 +1018,17 @@ private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: 
                     label = { Text(stringResource(Res.string.antenna_tx_ours, numberText(27.0))) },
                 )
             }
-            Text(power(tx, sep), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                power(tx, sep),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
         FeederEditor(feeder, mhz, sep) { feeder = it }
-        Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(
+            Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             NumberField(stringResource(Res.string.antenna_swr), swrText) { swrText = it }
             NumberField(stringResource(Res.string.antenna_gain_override), gainText, signed = true) { gainText = it }
             if (feederResult.approximate) {
@@ -868,7 +1039,11 @@ private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: 
                 )
             }
             feederResult.warnings.distinct().forEach { code ->
-                Text(feederWarning(code), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary)
+                Text(
+                    feederWarning(code),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.tertiary,
+                )
             }
             resultLines.forEach { Line(it) }
             hintLines.forEach { Line(it) }
@@ -888,7 +1063,11 @@ private fun FeedSection(mhz: Double, design: AntennaDesign, sep: String, txDbm: 
 
 /** Gives a loss line of the database its display name; only the neutral word "custom" is localized. */
 private fun localizeFeederPart(label: String, customLabel: String): String =
-    if (label.startsWith(FeederBuilder.CUSTOM_ID + " ")) customLabel + label.substring(FeederBuilder.CUSTOM_ID.length) else label
+    if (label.startsWith(FeederBuilder.CUSTOM_ID + " ")) {
+        customLabel + label.substring(FeederBuilder.CUSTOM_ID.length)
+    } else {
+        label
+    }
 
 /** The line from the antenna to the radio: a ready-made set or your own connectors and cable sections. */
 @Composable
@@ -900,16 +1079,27 @@ private fun FeederEditor(cfg: FeederConfig, mhz: Double, sep: String, onChange: 
     DropDownPreference(
         title = stringResource(Res.string.planner_feeder_preset),
         enabled = true,
-        items = FeederBuilder.presets.map { it.id to feederPresetName(it.id) } + listOf("custom" to stringResource(Res.string.planner_feeder_preset_custom)),
+        items =
+        FeederBuilder.presets.map { it.id to feederPresetName(it.id) } +
+            listOf("custom" to stringResource(Res.string.planner_feeder_preset_custom)),
         selectedItem = presetId ?: "custom",
         onItemSelected = { id -> FeederBuilder.presets.firstOrNull { it.id == id }?.let { onChange(it.config) } },
     )
     Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(Res.string.planner_feeder_connector_count), modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+            Text(
+                stringResource(Res.string.planner_feeder_connector_count),
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodyMedium,
+            )
             TextButton(onClick = { onChange(FeederBuilder.resize(cfg, count - 1)) }, enabled = count > 0) { Text("−") }
             Text(count.toString(), style = MaterialTheme.typography.bodyLarge)
-            TextButton(onClick = { onChange(FeederBuilder.resize(cfg, count + 1)) }, enabled = count < FeederBuilder.MAX_CONNECTORS) { Text("+") }
+            TextButton(
+                onClick = { onChange(FeederBuilder.resize(cfg, count + 1)) },
+                enabled = count < FeederBuilder.MAX_CONNECTORS,
+            ) {
+                Text("+")
+            }
         }
     }
     for (i in 0 until count) {
@@ -918,7 +1108,9 @@ private fun FeederEditor(cfg: FeederConfig, mhz: Double, sep: String, onChange: 
             enabled = true,
             items = CableDb.connectors.map { it.id to (if (it.approximate) it.name + APPROX_MARK else it.name) },
             selectedItem = cfg.connectorIds[i],
-            onItemSelected = { id -> onChange(cfg.copy(connectorIds = cfg.connectorIds.toMutableList().also { it[i] = id })) },
+            onItemSelected = { id ->
+                onChange(cfg.copy(connectorIds = cfg.connectorIds.toMutableList().also { it[i] = id }))
+            },
         )
         if (i < count - 1) {
             val section = cfg.sections.getOrNull(i) ?: FeederSectionData(DEFAULT_CABLE_ID, DEFAULT_SECTION_M)
@@ -934,30 +1126,55 @@ private fun FeederEditor(cfg: FeederConfig, mhz: Double, sep: String, onChange: 
                 title = stringResource(Res.string.planner_feeder_cable_n, (i + 1).toString()),
                 enabled = true,
                 items =
-                    listOf(FeederBuilder.NONE_ID to noneLabel) +
-                        CableDb.cables.map { it.id to "${it.name}${if (it.approximate) APPROX_MARK else ""} — ${fmt(it.lossDbPerM(mhz) * 100, 1, sep)} dB/100 m" } +
-                        listOf(FeederBuilder.CUSTOM_ID to customLabel),
+                listOf(FeederBuilder.NONE_ID to noneLabel) +
+                    CableDb.cables.map {
+                        it.id to
+                            "${it.name}${if (it.approximate) APPROX_MARK else ""} — ${fmt(
+                                it.lossDbPerM(mhz) * 100,
+                                1,
+                                sep,
+                            )} dB/100 m"
+                    } +
+                    listOf(FeederBuilder.CUSTOM_ID to customLabel),
                 selectedItem = section.cableId,
                 onItemSelected = { id ->
                     update(
                         section.copy(
                             cableId = id,
-                            customDbPerM = if (id == FeederBuilder.CUSTOM_ID) section.customDbPerM ?: DEFAULT_CUSTOM_DB_PER_M else section.customDbPerM,
+                            customDbPerM =
+                            if (id == FeederBuilder.CUSTOM_ID) {
+                                section.customDbPerM ?: DEFAULT_CUSTOM_DB_PER_M
+                            } else {
+                                section.customDbPerM
+                            },
                         ),
                     )
                 },
             )
             if (!isNone) {
-                Column(Modifier.padding(horizontal = 16.dp, vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(
+                    Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
                     DoubleField(
-                        stringResource(Res.string.planner_feeder_length) + " (" + stringResource(Res.string.planner_unit_m) + ")",
+                        stringResource(Res.string.planner_feeder_length) +
+                            " (" +
+                            stringResource(Res.string.planner_unit_m) +
+                            ")",
                         section.lengthM,
-                    ) { v -> update(section.copy(lengthM = v.coerceIn(0.0, MAX_SECTION_M))) }
+                    ) { v ->
+                        update(section.copy(lengthM = v.coerceIn(0.0, MAX_SECTION_M)))
+                    }
                     if (isCustom) {
                         DoubleField(
-                            stringResource(Res.string.planner_feeder_custom_loss) + " (" + stringResource(Res.string.planner_unit_db_per_m) + ")",
+                            stringResource(Res.string.planner_feeder_custom_loss) +
+                                " (" +
+                                stringResource(Res.string.planner_unit_db_per_m) +
+                                ")",
                             section.customDbPerM ?: DEFAULT_CUSTOM_DB_PER_M,
-                        ) { v -> update(section.copy(customDbPerM = v.coerceIn(0.0, 10.0))) }
+                        ) { v ->
+                            update(section.copy(customDbPerM = v.coerceIn(0.0, 10.0)))
+                        }
                     }
                 }
             }
@@ -965,7 +1182,9 @@ private fun FeederEditor(cfg: FeederConfig, mhz: Double, sep: String, onChange: 
     }
 }
 
-/** A number field for a value kept as a number: what is typed stays as typed until the value is changed from outside. */
+/**
+ * A number field for a value kept as a number: what is typed stays as typed until the value is changed from outside.
+ */
 @Composable
 private fun DoubleField(label: String, value: Double, onValue: (Double) -> Unit) {
     var text by remember { mutableStateOf(numberText(value)) }
@@ -1011,17 +1230,26 @@ private fun feederWarning(code: String): String = stringResource(
 private fun dimensionLines(type: AntennaType, design: AntennaDesign, sep: String): List<Pair<Dim, String>> {
     if (type == AntennaType.YAGI) {
         val positions = design.dims.filter { it.kind == DimKind.POSITION }.associateBy { it.index }
-        return design.dims.filter { it.kind != DimKind.POSITION }.map { d ->
-            val pos =
-                when (d.kind) {
-                    DimKind.REFLECTOR -> 0.0
-                    DimKind.DRIVEN -> positions[1]?.meters
-                    DimKind.DIRECTOR -> positions[d.index + 1]?.meters
-                    else -> null
-                }
-            val what = "${d.letter} — ${dimName(d)}"
-            d to (if (pos != null) stringResource(Res.string.antenna_yagi_row, what, length(d.meters, sep), length(pos, sep)) else "$what: ${length(d.meters, sep)}")
-        }
+        return design.dims
+            .filter { it.kind != DimKind.POSITION }
+            .map { d ->
+                val pos =
+                    when (d.kind) {
+                        DimKind.REFLECTOR -> 0.0
+                        DimKind.DRIVEN -> positions[1]?.meters
+                        DimKind.DIRECTOR -> positions[d.index + 1]?.meters
+                        else -> null
+                    }
+                val what = "${d.letter} — ${dimName(d)}"
+                d to
+                    (
+                        if (pos != null) {
+                            stringResource(Res.string.antenna_yagi_row, what, length(d.meters, sep), length(pos, sep))
+                        } else {
+                            "$what: ${length(d.meters, sep)}"
+                        }
+                        )
+            }
     }
     return design.dims.map { d -> d to "${d.letter} — ${dimName(d)}: ${length(d.meters, sep)}" }
 }
@@ -1125,24 +1353,30 @@ private fun noteText(n: Note): StringResource = when (n) {
 
 // ------------------------------------------------------------------ small parts
 
-@Composable
-private fun Line(text: String) = Text(text, style = MaterialTheme.typography.bodyMedium)
+@Composable private fun Line(text: String) = Text(text, style = MaterialTheme.typography.bodyMedium)
 
 @Composable
-private fun NumberField(label: String, value: String, decimal: Boolean = true, signed: Boolean = false, onChange: (String) -> Unit) {
+private fun NumberField(
+    label: String,
+    value: String,
+    decimal: Boolean = true,
+    signed: Boolean = false,
+    onChange: (String) -> Unit,
+) {
     OutlinedTextField(
         value = value,
         onValueChange = { v -> onChange(v.filter { it.isDigit() || it == '.' || it == ',' || (signed && it == '-') }) },
         label = { Text(label) },
         singleLine = true,
         keyboardOptions =
-            KeyboardOptions(
-                keyboardType = when {
-                    signed -> KeyboardType.Text
-                    decimal -> KeyboardType.Decimal
-                    else -> KeyboardType.Number
-                },
-            ),
+        KeyboardOptions(
+            keyboardType =
+            when {
+                signed -> KeyboardType.Text
+                decimal -> KeyboardType.Decimal
+                else -> KeyboardType.Number
+            },
+        ),
         modifier = Modifier.fillMaxWidth().widthIn(max = 480.dp),
     )
 }
@@ -1188,18 +1422,32 @@ private fun AntennaDrawing(type: AntennaType, design: AntennaDesign, input: Ante
     Canvas(modifier = Modifier.fillMaxWidth().height(300.dp)) {
         val p = Pen(this, measurer, style, ink, dimInk)
         when (type) {
-            AntennaType.GROUND_PLANE -> p.vertical(labels, radiatorShare = 0.45f, angle = input.radialAngleDeg, coil = false)
-            AntennaType.FIVE_EIGHTHS -> p.vertical(labels, radiatorShare = 0.6f, angle = input.radialAngleDeg, coil = true)
+            AntennaType.GROUND_PLANE ->
+                p.vertical(labels, radiatorShare = 0.45f, angle = input.radialAngleDeg, coil = false)
+
+            AntennaType.FIVE_EIGHTHS ->
+                p.vertical(labels, radiatorShare = 0.6f, angle = input.radialAngleDeg, coil = true)
+
             AntennaType.DIPOLE -> p.dipole(labels)
+
             AntennaType.FOLDED_DIPOLE -> p.folded(labels)
+
             AntennaType.J_POLE -> p.jPole(labels, slim = false)
+
             AntennaType.SLIM_JIM -> p.jPole(labels, slim = true)
+
             AntennaType.COLLINEAR -> p.collinear(labels, input.sections.coerceIn(2, 8))
+
             AntennaType.YAGI -> p.yagi(design, directorLabels, labels)
+
             AntennaType.MOXON -> p.moxon(labels)
+
             AntennaType.BIQUAD -> p.biquad(labels)
+
             AntennaType.HELIX -> p.helix(labels, input.turns.coerceIn(3, 12))
+
             AntennaType.PATCH -> p.patch(labels)
+
             AntennaType.COAX_STUB -> p.stub(labels)
         }
     }
@@ -1212,7 +1460,8 @@ private class Pen(val s: DrawScope, val tm: TextMeasurer, val style: TextStyle, 
     val thick = 4f
     val thin = 1.5f
 
-    fun line(a: Offset, b: Offset, color: Color = ink, width: Float = thick) = s.drawLine(color, a, b, strokeWidth = width)
+    fun line(a: Offset, b: Offset, color: Color = ink, width: Float = thick) =
+        s.drawLine(color, a, b, strokeWidth = width)
 
     fun dot(c: Offset) = s.drawCircle(ink, radius = 6f, center = c)
 
@@ -1221,7 +1470,10 @@ private class Pen(val s: DrawScope, val tm: TextMeasurer, val style: TextStyle, 
         val r = tm.measure(t, style)
         val x = if (center) at.x - r.size.width / 2f else at.x
         val y = at.y - r.size.height / 2f
-        s.drawText(r, topLeft = Offset(x.coerceIn(0f, max(0f, w - r.size.width)), y.coerceIn(0f, max(0f, h - r.size.height))))
+        s.drawText(
+            r,
+            topLeft = Offset(x.coerceIn(0f, max(0f, w - r.size.width)), y.coerceIn(0f, max(0f, h - r.size.height))),
+        )
     }
 
     /** A dimension line from [a] to [b], moved sideways by [off] pixels, with end ticks and [label] in the middle. */
@@ -1300,8 +1552,24 @@ private class Pen(val s: DrawScope, val tm: TextMeasurer, val style: TextStyle, 
         line(Offset(left, y), Offset(right, y))
         line(Offset(left, y + sp), Offset(cx - 10f, y + sp))
         line(Offset(cx + 10f, y + sp), Offset(right, y + sp))
-        s.drawArc(ink, 90f, 180f, false, topLeft = Offset(left - sp / 2, y), size = Size(sp, sp), style = Stroke(width = thick))
-        s.drawArc(ink, -90f, 180f, false, topLeft = Offset(right - sp / 2, y), size = Size(sp, sp), style = Stroke(width = thick))
+        s.drawArc(
+            ink,
+            90f,
+            180f,
+            false,
+            topLeft = Offset(left - sp / 2, y),
+            size = Size(sp, sp),
+            style = Stroke(width = thick),
+        )
+        s.drawArc(
+            ink,
+            -90f,
+            180f,
+            false,
+            topLeft = Offset(right - sp / 2, y),
+            size = Size(sp, sp),
+            style = Stroke(width = thick),
+        )
         dot(Offset(cx - 10f, y + sp))
         dot(Offset(cx + 10f, y + sp))
         dim(Offset(left - sp / 2, y), Offset(right + sp / 2, y), l["A"], off = -36f)
@@ -1369,7 +1637,10 @@ private class Pen(val s: DrawScope, val tm: TextMeasurer, val style: TextStyle, 
     }
 
     fun yagi(design: AntennaDesign, directors: List<String>, l: Map<String, String>) {
-        val elements = design.dims.filter { it.kind == DimKind.REFLECTOR || it.kind == DimKind.DRIVEN || it.kind == DimKind.DIRECTOR }
+        val elements =
+            design.dims.filter {
+                it.kind == DimKind.REFLECTOR || it.kind == DimKind.DRIVEN || it.kind == DimKind.DIRECTOR
+            }
         val positions = design.dims.filter { it.kind == DimKind.POSITION }.associate { it.index to it.meters }
         val boomLen = design.dims.firstOrNull { it.kind == DimKind.BOOM }?.meters ?: 1.0
         val maxEl = elements.maxOf { it.meters }
@@ -1379,11 +1650,12 @@ private class Pen(val s: DrawScope, val tm: TextMeasurer, val style: TextStyle, 
         val half = h * 0.32f
         line(Offset(left, cy), Offset(right, cy), dimInk, 6f)
         elements.forEach { e ->
-            val pos = when (e.kind) {
-                DimKind.REFLECTOR -> 0.0
-                DimKind.DRIVEN -> positions[1] ?: 0.0
-                else -> positions[e.index + 1] ?: 0.0
-            }
+            val pos =
+                when (e.kind) {
+                    DimKind.REFLECTOR -> 0.0
+                    DimKind.DRIVEN -> positions[1] ?: 0.0
+                    else -> positions[e.index + 1] ?: 0.0
+                }
             val x = left + ((pos / boomLen) * (right - left)).toFloat()
             val hh = half * (e.meters / maxEl).toFloat()
             line(Offset(x, cy - hh), Offset(x, cy + hh), ink, if (e.kind == DimKind.DRIVEN) 5f else 3f)
@@ -1420,7 +1692,11 @@ private class Pen(val s: DrawScope, val tm: TextMeasurer, val style: TextStyle, 
         val cx = w / 2
         val cy = h * 0.5f
         val plate = min(w * 0.8f, h * 0.9f)
-        s.drawRect(dimInk.copy(alpha = 0.15f), topLeft = Offset(cx - plate / 2, cy - plate / 2), size = Size(plate, plate))
+        s.drawRect(
+            dimInk.copy(alpha = 0.15f),
+            topLeft = Offset(cx - plate / 2, cy - plate / 2),
+            size = Size(plate, plate),
+        )
         val side = plate * 0.3f
         val d = side * 0.7071f
         val leftC = Offset(cx - d, cy)

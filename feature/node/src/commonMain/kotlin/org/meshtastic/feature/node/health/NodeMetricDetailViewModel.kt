@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("MagicNumber")
+
 package org.meshtastic.feature.node.health
 
 import androidx.lifecycle.ViewModel
@@ -130,8 +132,7 @@ class NodeMetricDetailViewModel(
                     val (nodes, invertedNodes, batteryInvertedNodes) = nodesAndInverted
                     val isViewingLocalNode = myNodeInfo?.my_node_num == nodeNum
                     val extraLocalLogs = if (isViewingLocalNode) localNodeLogs else emptyList()
-                    val telemetryLogs =
-                        (nodeLogs + extraLocalLogs).filter { it.portNum == PortNum.TELEMETRY_APP.value }
+                    val telemetryLogs = (nodeLogs + extraLocalLogs).filter { it.portNum == PortNum.TELEMETRY_APP.value }
                     val telemetryHistory =
                         telemetryLogs
                             .filter { it.fromNum == nodeNum || (isViewingLocalNode && it.fromNum == 0) }
@@ -148,13 +149,15 @@ class NodeMetricDetailViewModel(
 
                     val series =
                         metric.seriesLabels().map { seriesLabel ->
-                            val points =
-                                sortedHistory.mapNotNull { entry ->
-                                    // A NaN / infinite reading would poison the chart's min, max and path maths.
-                                    metric.historySeriesValue(seriesLabel, entry)?.takeIf { it.isFinite() }?.let {
+                            val points = sortedHistory.mapNotNull { entry ->
+                                // A NaN / infinite reading would poison the chart's min, max and path maths.
+                                metric
+                                    .historySeriesValue(seriesLabel, entry)
+                                    ?.takeIf { it.isFinite() }
+                                    ?.let {
                                         MetricPoint(entry.timestamp, it)
                                     }
-                                }
+                            }
                             MetricSeries(
                                 label = seriesLabel,
                                 points = points.thinned(),
@@ -168,18 +171,18 @@ class NodeMetricDetailViewModel(
                     // just those two for a hop-count-over-time series. Noise Floor is a self-reported telemetry
                     // stat, not a radio measurement of directness, so it's kept whenever the node reports it,
                     // independent of whether SNR/RSSI have direct data.
-                    val hasDirectSignal =
-                        series.any { (it.label == "SNR" || it.label == "RSSI") && it.points.isNotEmpty() }
+                    val hasDirectSignal = series.any {
+                        (it.label == "SNR" || it.label == "RSSI") && it.points.isNotEmpty()
+                    }
                     val finalSeries =
                         if (metric == NetworkHealthMetric.SIGNAL && !hasDirectSignal) {
-                            val hopPoints =
-                                nodeLogs.mapNotNull { log ->
-                                    val packet = log.meshPacket ?: return@mapNotNull null
-                                    if (packet.hop_start == 0 || packet.hop_limit > packet.hop_start) {
-                                        return@mapNotNull null
-                                    }
-                                    MetricPoint(log.received_date, (packet.hop_start - packet.hop_limit).toFloat())
+                            val hopPoints = nodeLogs.mapNotNull { log ->
+                                val packet = log.meshPacket ?: return@mapNotNull null
+                                if (packet.hop_start == 0 || packet.hop_limit > packet.hop_start) {
+                                    return@mapNotNull null
                                 }
+                                MetricPoint(log.received_date, (packet.hop_start - packet.hop_limit).toFloat())
+                            }
                             val hopsSeries =
                                 MetricSeries(
                                     label = "Przeskoki",
@@ -190,10 +193,9 @@ class NodeMetricDetailViewModel(
                                 )
                             val noiseFloorSeries = series.find { it.label == "Noise Floor" && it.points.isNotEmpty() }
                             // The WiFi series are the device's own report too, so they stay as well.
-                            val wifiSeries =
-                                series.filter {
-                                    (it.label == "WiFi RSSI" || it.label == "Zerwania WiFi") && it.points.isNotEmpty()
-                                }
+                            val wifiSeries = series.filter {
+                                (it.label == "WiFi RSSI" || it.label == "Zerwania WiFi") && it.points.isNotEmpty()
+                            }
                             listOfNotNull(hopsSeries, noiseFloorSeries) + wifiSeries
                         } else {
                             series

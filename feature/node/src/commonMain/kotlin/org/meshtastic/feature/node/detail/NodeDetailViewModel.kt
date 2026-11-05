@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("TooManyFunctions")
+
 package org.meshtastic.feature.node.detail
 
 import androidx.lifecycle.SavedStateHandle
@@ -27,16 +29,16 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.getString
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.domain.usecase.session.EnsureRemoteAdminSessionUseCase
 import org.meshtastic.core.domain.usecase.session.EnsureSessionResult
@@ -46,11 +48,11 @@ import org.meshtastic.core.model.DataPacket
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeAddress
 import org.meshtastic.core.model.RegionInfo
+import org.meshtastic.core.model.RoutingNak
 import org.meshtastic.core.model.SessionStatus
 import org.meshtastic.core.model.effectiveBandwidthKHz
-import org.meshtastic.core.model.geofence.SwietokrzyskieRegion
-import org.meshtastic.core.model.RoutingNak
 import org.meshtastic.core.model.effectiveLongName
+import org.meshtastic.core.model.geofence.SwietokrzyskieRegion
 import org.meshtastic.core.model.getMessageRoutingErrorDetailResFrom
 import org.meshtastic.core.model.getStringResFrom
 import org.meshtastic.core.navigation.NodeDetailRoute

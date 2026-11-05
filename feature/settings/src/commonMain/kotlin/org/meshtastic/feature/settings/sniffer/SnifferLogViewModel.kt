@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("DestructuringDeclarationWithTooManyEntries")
+
 package org.meshtastic.feature.settings.sniffer
 
 import androidx.lifecycle.ViewModel
@@ -208,10 +210,10 @@ class SnifferLogViewModel(
      */
     val sniffedPackets: StateFlow<List<SniffedPacket>> =
         combine(prefs.activeSource, prefs.lastRealSource, prefs.clearedAtMillis) { active, lastReal, clearedAtMillis ->
-                // Switching the sniffer off must not blank the log: while Off, keep reading the last real source's
-                // history (the display layer freezes it at the moment of switching off). Only the trash icon clears it.
-                (if (active == SnifferSource.OFF) lastReal ?: active else active) to clearedAtMillis
-            }
+            // Switching the sniffer off must not blank the log: while Off, keep reading the last real source's
+            // history (the display layer freezes it at the moment of switching off). Only the trash icon clears it.
+            (if (active == SnifferSource.OFF) lastReal ?: active else active) to clearedAtMillis
+        }
             .flatMapLatest { (source, clearedAtMillis) ->
                 // Off truly means off: no query, no decoding, nothing buffered -- not just hidden at the display
                 // layer. A stale RADIO selection left over from before a disconnect/reconnect is what used to make
@@ -239,10 +241,10 @@ class SnifferLogViewModel(
                         }
                         .mapNotNull(::toSniffedPacket)
                         .filterNot { packet ->
-                        // OnDemand (port 354) on the primary channel is the phone app's own diagnostic/control
-                        // chatter with the connected node, not mesh traffic -- see hideOnDemandChannel0's doc.
-                        hideOnDemand && packet.channel == 0 && packet.portNum == ON_DEMAND_PORT_NUM
-                    }
+                            // OnDemand (port 354) on the primary channel is the phone app's own diagnostic/control
+                            // chatter with the connected node, not mesh traffic -- see hideOnDemandChannel0's doc.
+                            hideOnDemand && packet.channel == 0 && packet.portNum == ON_DEMAND_PORT_NUM
+                        }
                 capBuffer(packets, policy)
             }
             .stateInWhileSubscribed(initialValue = emptyList())

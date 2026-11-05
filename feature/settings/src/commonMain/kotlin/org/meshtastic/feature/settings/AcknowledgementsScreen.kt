@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod")
+
 package org.meshtastic.feature.settings
 
 import androidx.compose.foundation.layout.Box
@@ -40,15 +42,15 @@ import org.meshtastic.core.resources.library_count
 import org.meshtastic.core.resources.open_source_description
 import org.meshtastic.core.resources.open_source_libraries
 import org.meshtastic.core.resources.planner_credits_header
-import org.meshtastic.core.resources.planner_credits_line_meshmap
-import org.meshtastic.core.resources.planner_credits_line_siteplanner_original
-import org.meshtastic.core.resources.planner_credits_line_splat
+import org.meshtastic.core.resources.planner_credits_line_cables
 import org.meshtastic.core.resources.planner_credits_line_itm
-import org.meshtastic.core.resources.planner_credits_line_meshrf
 import org.meshtastic.core.resources.planner_credits_line_mapterhorn
+import org.meshtastic.core.resources.planner_credits_line_meshmap
+import org.meshtastic.core.resources.planner_credits_line_meshrf
 import org.meshtastic.core.resources.planner_credits_line_openmeteo
 import org.meshtastic.core.resources.planner_credits_line_osm
-import org.meshtastic.core.resources.planner_credits_line_cables
+import org.meshtastic.core.resources.planner_credits_line_siteplanner_original
+import org.meshtastic.core.resources.planner_credits_line_splat
 import org.meshtastic.core.ui.component.MainAppBar
 
 /**

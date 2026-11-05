@@ -529,7 +529,10 @@ open class RadioConfigViewModel(
             .onEach { enabled ->
                 // An empty answer must not cancel the spinner of a request that is still being asked.
                 _radioConfigState.update {
-                    it.copy(snifferEnabled = enabled, snifferLoading = if (enabled != null) false else it.snifferLoading)
+                    it.copy(
+                        snifferEnabled = enabled,
+                        snifferLoading = if (enabled != null) false else it.snifferLoading,
+                    )
                 }
             }
             .launchIn(viewModelScope)

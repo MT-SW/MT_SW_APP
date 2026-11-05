@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("MagicNumber")
+
 package org.meshtastic.feature.node.health
 
 import androidx.lifecycle.ViewModel
@@ -131,10 +133,9 @@ class NetworkSummaryViewModel(
             fun remapLocal(num: Int): Int = if (myNodeNum != null && num == 0) myNodeNum else num
 
             val nameByNum = nodes.associate { it.num to it.user.long_name.ifBlank { it.user.short_name } }
-            val history =
-                telemetryLogs.mapNotNull {
-                    it.toHistoryEntry()?.let { entry -> entry.copy(num = remapLocal(entry.num)) }
-                }
+            val history = telemetryLogs.mapNotNull {
+                it.toHistoryEntry()?.let { entry -> entry.copy(num = remapLocal(entry.num)) }
+            }
             val historyByNode = history.groupBy { it.num }
             val latestPerNode = historyByNode.mapValues { (_, entries) -> entries.maxByOrNull { it.timestamp } }
 
@@ -159,10 +160,9 @@ class NetworkSummaryViewModel(
             // Noise floors shown with each node's LNA gain correction (display-only). Local logs may carry node 0
             // (see remapLocal).
             val lnaGains = uiPrefs.lnaGains.value
-            val noiseFloors =
-                latestPerNode.mapNotNull { (num, entry) ->
-                    entry?.noiseFloor?.let { it - (lnaGains[remapLocal(num)] ?: 0) }
-                }
+            val noiseFloors = latestPerNode.mapNotNull { (num, entry) ->
+                entry?.noiseFloor?.let { it - (lnaGains[remapLocal(num)] ?: 0) }
+            }
             val channelUtils = latestPerNode.values.mapNotNull { it?.channelUtilization }
             val airUtils = latestPerNode.values.mapNotNull { it?.airUtilTx }
 
@@ -316,7 +316,8 @@ class NetworkSummaryViewModel(
             }
 
             // The fifth number is the nodes with no reading at all, so every bar adds up to all nodes.
-            val batteryRated = bucketize(batteryLevels.map { it.toFloat() }, BATTERY_GOOD, BATTERY_MEDIUM, BATTERY_BAD)
+            val batteryRated =
+                bucketize(batteryLevels.map { it.toFloat() }, BATTERY_GOOD, BATTERY_MEDIUM, BATTERY_BAD)
             val batteryDistribution = batteryRated + (nodes.size - batteryRated.sum()).coerceAtLeast(0)
             val snrRated = bucketize(snrByNode.map { it.snr }, SNR_GOOD, SNR_MEDIUM, SNR_BAD)
             val snrDistribution = snrRated + (nodes.size - snrRated.sum()).coerceAtLeast(0)

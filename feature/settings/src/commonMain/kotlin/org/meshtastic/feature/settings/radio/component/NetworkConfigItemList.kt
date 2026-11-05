@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("MagicNumber")
+
 package org.meshtastic.feature.settings.radio.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,7 +42,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.common.util.extractWifiCredentials
-import org.meshtastic.core.ui.util.rememberPhoneWifiScanner
 import org.meshtastic.core.model.Capabilities
 import org.meshtastic.core.model.util.handleMeshtasticUri
 import org.meshtastic.core.resources.Res
@@ -87,6 +88,7 @@ import org.meshtastic.core.ui.component.TitledCard
 import org.meshtastic.core.ui.util.LocalBarcodeScannerProvider
 import org.meshtastic.core.ui.util.LocalNfcScannerProvider
 import org.meshtastic.core.ui.util.LocalNfcScannerSupported
+import org.meshtastic.core.ui.util.rememberPhoneWifiScanner
 import org.meshtastic.feature.settings.navigation.ConfigRoute
 import org.meshtastic.feature.settings.radio.RadioConfigViewModel
 import org.meshtastic.feature.settings.radio.RebootBehavior
@@ -295,7 +297,11 @@ fun NetworkConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit, onO
                                 scanner = wifiScanner,
                                 onPick = { network ->
                                     showWifiPicker = false
-                                    if (network.secured == false) connectNow(network.ssid, "") else passwordFor = network.ssid
+                                    if (network.secured == false) {
+                                        connectNow(network.ssid, "")
+                                    } else {
+                                        passwordFor = network.ssid
+                                    }
                                 },
                                 onDismiss = { showWifiPicker = false },
                             )

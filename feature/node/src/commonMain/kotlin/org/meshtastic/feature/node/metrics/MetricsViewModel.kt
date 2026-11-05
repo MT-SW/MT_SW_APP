@@ -17,6 +17,8 @@
 package org.meshtastic.feature.node.metrics
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
@@ -24,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Dispatchers
@@ -41,6 +44,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import okio.ByteString.Companion.decodeBase64
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.core.annotation.InjectedParam
 import org.koin.core.annotation.KoinViewModel
 import org.meshtastic.core.common.util.CommonUri
@@ -76,10 +80,6 @@ import org.meshtastic.core.resources.traceroute
 import org.meshtastic.core.resources.view_on_map
 import org.meshtastic.core.ui.util.AlertManager
 import org.meshtastic.core.ui.util.toMessageRes
-import org.jetbrains.compose.resources.stringResource
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.ui.unit.dp
 import org.meshtastic.core.ui.viewmodel.safeLaunch
 import org.meshtastic.core.ui.viewmodel.stateInWhileSubscribed
 import org.meshtastic.feature.node.detail.NodeDetailUiState
@@ -132,8 +132,7 @@ open class MetricsViewModel(
             .stateInWhileSubscribed(initialValue = null)
 
     /** True until the node's history has been read -- the statistics screens show a loading indicator meanwhile. */
-    val isLoading: StateFlow<Boolean> =
-        nodeDetails.map { it == null }.stateInWhileSubscribed(initialValue = true)
+    val isLoading: StateFlow<Boolean> = nodeDetails.map { it == null }.stateInWhileSubscribed(initialValue = true)
 
     val state: StateFlow<MetricsState> =
         nodeDetails

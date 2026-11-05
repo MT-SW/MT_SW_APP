@@ -68,9 +68,9 @@ import org.meshtastic.core.resources.theme
 import org.meshtastic.core.resources.ui_scale
 import org.meshtastic.core.resources.units
 import org.meshtastic.core.resources.wifi_devices
-import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.resources.zh_CN
 import org.meshtastic.core.resources.zh_TW
+import org.meshtastic.core.ui.component.FastScrollSidebar
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MeshtasticDialog
 import org.meshtastic.core.ui.icon.ChevronRight
@@ -94,8 +94,8 @@ import org.meshtastic.feature.settings.component.HomoglyphSetting
 import org.meshtastic.feature.settings.component.NotificationSection
 import org.meshtastic.feature.settings.component.RadioAdminAppBar
 import org.meshtastic.feature.settings.component.ThemePickerDialog
-import org.meshtastic.feature.settings.component.UnitsOption
 import org.meshtastic.feature.settings.component.UiScalePickerDialog
+import org.meshtastic.feature.settings.component.UnitsOption
 import org.meshtastic.feature.settings.component.UnitsPickerDialog
 import org.meshtastic.feature.settings.component.uiScaleLabel
 import org.meshtastic.feature.settings.navigation.ConfigRoute
@@ -335,7 +335,6 @@ fun DesktopSettingsScreen(
                             retentionDays = retentionDays,
                             onSetRetentionDays = { settingsViewModel.setMeshLogRetentionDays(it) },
                         )
-
                     }
 
                     ExpressiveSection(title = stringResource(Res.string.discovery_local_mesh)) {

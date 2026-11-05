@@ -25,10 +25,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.meshtastic.core.common.state.HiddenFeaturesUnlock
 import org.meshtastic.core.domain.usecase.settings.SnifferControlUseCase
-import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.model.Capabilities
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.schema_telemetry_air_quality_enabled
@@ -81,7 +81,8 @@ fun TelemetryConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
     val firmwareVersion = state.metadata?.firmware_version
     val capabilities = remember(firmwareVersion) { Capabilities(firmwareVersion) }
 
-    // Extra telemetry (the node's own statistics) works only from MT_SW_FIRMWARE v3; on older firmware the card is shown
+    // Extra telemetry (the node's own statistics) works only from MT_SW_FIRMWARE v3; on older firmware the card is
+    // shown
     // but does not react. It is not part of the module config, but it is saved with the same save bar.
     val localStatsConfig = state.localStatsConfig
     val localStatsSupported =
@@ -92,7 +93,8 @@ fun TelemetryConfigScreen(viewModel: RadioConfigViewModel, onBack: () -> Unit) {
 
     RadioConfigScreenList(
         // Only the node's own statistics changed: they are applied without a restart.
-        rebootBehavior = if (localStatsDirty && !formState.isDirty) RebootBehavior.MAY_RESTART else RebootBehavior.ALWAYS,
+        rebootBehavior =
+        if (localStatsDirty && !formState.isDirty) RebootBehavior.MAY_RESTART else RebootBehavior.ALWAYS,
         title = stringResource(Res.string.telemetry),
         onBack = onBack,
         configState = formState,

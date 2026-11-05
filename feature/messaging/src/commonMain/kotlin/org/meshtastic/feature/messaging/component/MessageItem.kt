@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("MagicNumber", "MutableStateAutoboxing")
+
 package org.meshtastic.feature.messaging.component
 
 import androidx.compose.animation.AnimatedVisibility

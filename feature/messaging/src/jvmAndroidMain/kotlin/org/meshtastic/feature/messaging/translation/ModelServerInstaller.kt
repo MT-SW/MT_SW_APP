@@ -14,15 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress(
+    "FunctionLiteral",
+    "FunctionSignature",
+    "LoopWithTooManyJumpStatements",
+    "MagicNumber",
+    "MaxLineLength",
+    "MultiLineIfElse",
+    "NestedBlockDepth",
+    "ReturnCount",
+    "TooGenericExceptionCaught",
+    "TooManyFunctions",
+)
+
 package org.meshtastic.feature.messaging.translation
 
 import co.touchlab.kermit.Logger
-import java.io.File
-import java.io.FileOutputStream
-import java.net.HttpURLConnection
-import java.net.URL
-import java.util.concurrent.TimeUnit
-import java.util.zip.ZipInputStream
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
@@ -31,6 +38,12 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.meshtastic.core.repository.AiEngine
+import java.io.File
+import java.io.FileOutputStream
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.concurrent.TimeUnit
+import java.util.zip.ZipInputStream
 
 /**
  * Fetches the model programs (llama.cpp and whisper.cpp servers) the first time a model needs one, from the official
@@ -72,6 +85,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
 
     private val os: String = System.getProperty("os.name").orEmpty().lowercase()
     private val arch: String = System.getProperty("os.arch").orEmpty().lowercase()
+
     /** True inside the Android app (the Java runtime there reports an Android vendor). */
     val android: Boolean =
         System.getProperty("java.vendor").orEmpty().contains("Android") ||
@@ -106,10 +120,10 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
     val i8mm: Boolean by lazy {
         android &&
             runCatching {
-                    File("/proc/cpuinfo").useLines { lines ->
-                        lines.any { it.startsWith("Features") && Regex("\\bi8mm\\b").containsMatchIn(it) }
-                    }
+                File("/proc/cpuinfo").useLines { lines ->
+                    lines.any { it.startsWith("Features") && Regex("\\bi8mm\\b").containsMatchIn(it) }
                 }
+            }
                 .getOrDefault(false)
     }
 
@@ -148,14 +162,13 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
         return all
     }
 
-    private fun gpuAsset(kind: String) =
-        Asset(
-            url =
-                "https://github.com/MT-SW/MT_SW_APP/releases/download/engines-$LLAMA_TAG/llama-$LLAMA_TAG-android-arm64-$kind.tar.gz",
-            folder = "llama-$LLAMA_TAG-android-arm64-$kind",
-            exeName = "llama-server",
-            sizeMb = LLAMA_ANDROID_GPU_MB,
-        )
+    private fun gpuAsset(kind: String) = Asset(
+        url =
+        "https://github.com/MT-SW/MT_SW_APP/releases/download/engines-$LLAMA_TAG/llama-$LLAMA_TAG-android-arm64-$kind.tar.gz",
+        folder = "llama-$LLAMA_TAG-android-arm64-$kind",
+        exeName = "llama-server",
+        sizeMb = LLAMA_ANDROID_GPU_MB,
+    )
 
     /** Forgets every remembered failure (NPU and graphics card programs), so the next start tries them all again. */
     fun clearBrokenMarks() {
@@ -183,7 +196,13 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
                     .joinToString(" ")
             appendLine(
                 tr("Device", "Urządzenie") +
-                    ": ${systemProperty("ro.product.manufacturer")} ${systemProperty("ro.product.model")}, Android ${systemProperty("ro.build.version.release")} (API ${systemProperty("ro.build.version.sdk")})"
+                    ": ${systemProperty(
+                        "ro.product.manufacturer",
+                    )} ${systemProperty(
+                        "ro.product.model",
+                    )}, Android ${systemProperty(
+                        "ro.build.version.release",
+                    )} (API ${systemProperty("ro.build.version.sdk")})",
             )
             appendLine(
                 tr("Chip", "Układ") +
@@ -191,20 +210,22 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
                     tr("platform", "platforma") +
                     " ${systemProperty("ro.board.platform").ifBlank { "?" }}, " +
                     tr("hardware", "sprzęt") +
-                    " ${systemProperty("ro.hardware").ifBlank { "?" }}"
+                    " ${systemProperty("ro.hardware").ifBlank { "?" }}",
             )
             appendLine(
                 tr("Graphics driver", "Sterownik grafiki") +
-                    ": vulkan=${systemProperty("ro.hardware.vulkan").ifBlank { "?" }}, egl=${systemProperty("ro.hardware.egl").ifBlank { "?" }}, " +
+                    ": vulkan=${systemProperty("ro.hardware.vulkan").ifBlank {
+                        "?"
+                    }}, egl=${systemProperty("ro.hardware.egl").ifBlank { "?" }}, " +
                     tr("Vulkan level", "poziom Vulkan") +
-                    " ${systemProperty("ro.hardware.vulkan.level").ifBlank { "?" }}"
+                    " ${systemProperty("ro.hardware.vulkan.level").ifBlank { "?" }}",
             )
         } else {
             appendLine(
                 tr("Computer", "Komputer") +
                     ": ${System.getProperty("os.name")} $arch, " +
                     tr("processor", "procesor") +
-                    ": ${cpuName().ifBlank { "?" }}"
+                    ": ${cpuName().ifBlank { "?" }}",
             )
         }
         val memoryMb = runCatching {
@@ -230,17 +251,17 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
     val intelNpuDriver: String by lazy {
         if (!windows) return@lazy ""
         runCatching {
-                val script =
-                    "(Get-PnpDevice -FriendlyName '*AI Boost*' -ErrorAction SilentlyContinue | Select-Object -First 1 | " +
-                        "Get-PnpDeviceProperty -KeyName DEVPKEY_Device_DriverVersion -ErrorAction SilentlyContinue).Data"
-                val process =
-                    ProcessBuilder("powershell", "-NoProfile", "-NonInteractive", "-Command", script)
-                        .redirectErrorStream(true)
-                        .start()
-                val text = process.inputStream.bufferedReader().readText().trim()
-                process.waitFor(DRIVER_QUERY_SECONDS, java.util.concurrent.TimeUnit.SECONDS)
-                text.takeIf { Regex("[0-9]+(\\.[0-9]+)+").matches(it) }.orEmpty()
-            }
+            val script =
+                "(Get-PnpDevice -FriendlyName '*AI Boost*' -ErrorAction SilentlyContinue | Select-Object -First 1 | " +
+                    "Get-PnpDeviceProperty -KeyName DEVPKEY_Device_DriverVersion -ErrorAction SilentlyContinue).Data"
+            val process =
+                ProcessBuilder("powershell", "-NoProfile", "-NonInteractive", "-Command", script)
+                    .redirectErrorStream(true)
+                    .start()
+            val text = process.inputStream.bufferedReader().readText().trim()
+            process.waitFor(DRIVER_QUERY_SECONDS, java.util.concurrent.TimeUnit.SECONDS)
+            text.takeIf { Regex("[0-9]+(\\.[0-9]+)+").matches(it) }.orEmpty()
+        }
             .getOrDefault("")
     }
 
@@ -293,12 +314,12 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
     private fun cpuName(): String = runCatching {
         if (windows) {
             ProcessBuilder(
-                    "reg",
-                    "query",
-                    "HKLM\\HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
-                    "/v",
-                    "ProcessorNameString",
-                )
+                "reg",
+                "query",
+                "HKLM\\HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
+                "/v",
+                "ProcessorNameString",
+            )
                 .redirectErrorStream(true)
                 .start()
                 .inputStream
@@ -336,8 +357,11 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
     /** The official llama.cpp build with OpenVINO (Intel CPU, graphics and NPU); null where there is no Intel NPU. */
     fun intelNpuAsset(): Asset? {
         if (!intelNpu) return null
-        return if (windows) llama("win-openvino-$OPENVINO_VERSION-x64.zip", LLAMA_OPENVINO_WIN_MB)
-        else llama("ubuntu-openvino-$OPENVINO_VERSION-x64.tar.gz", LLAMA_OPENVINO_LINUX_MB)
+        return if (windows) {
+            llama("win-openvino-$OPENVINO_VERSION-x64.zip", LLAMA_OPENVINO_WIN_MB)
+        } else {
+            llama("ubuntu-openvino-$OPENVINO_VERSION-x64.tar.gz", LLAMA_OPENVINO_LINUX_MB)
+        }
     }
 
     /**
@@ -354,16 +378,15 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
     var lastInstallError: String = ""
         private set
 
-    suspend fun installGpu(asset: Asset): File? =
-        try {
-            install(asset)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Throwable) {
-            Logger.w(tag = TAG, throwable = e) { "${asset.folder} is not available" }
-            lastInstallError = "${asset.folder}: ${e.message}"
-            null
-        }
+    suspend fun installGpu(asset: Asset): File? = try {
+        install(asset)
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Throwable) {
+        Logger.w(tag = TAG, throwable = e) { "${asset.folder} is not available" }
+        lastInstallError = "${asset.folder}: ${e.message}"
+        null
+    }
 
     /** Installs the official llama.cpp program of this system and returns it. */
     suspend fun installLlama(onProgress: (Float) -> Unit = {}): File = install(llamaAsset(), onProgress)
@@ -381,7 +404,15 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
                 else -> if (arm) "ubuntu-vulkan-arm64.tar.gz" else "ubuntu-vulkan-x64.tar.gz"
             }
         val size =
-            if (android) LLAMA_ANDROID_MB else if (mac) LLAMA_MAC_MB else if (windows) LLAMA_WIN_MB else LLAMA_LINUX_MB
+            if (android) {
+                LLAMA_ANDROID_MB
+            } else if (mac) {
+                LLAMA_MAC_MB
+            } else if (windows) {
+                LLAMA_WIN_MB
+            } else {
+                LLAMA_LINUX_MB
+            }
         return llama(suffix, size)
     }
 
@@ -403,6 +434,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
      * The whisper.cpp program that always works (processor). On a Mac it is our own Metal build, run without the
      * graphics card; null for an Intel Mac, where there is no program.
      */
+
     /**
      * The speech programs for the processor, best first: on a phone with i8mm the faster build, then the plain one
      * (used when the faster one cannot be fetched or does not start).
@@ -413,7 +445,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
         val fast =
             Asset(
                 url =
-                    "https://github.com/MT-SW/MT_SW_APP/releases/download/engines-$LLAMA_TAG/whisper-$WHISPER_REF-android-arm64-i8mm.tar.gz",
+                "https://github.com/MT-SW/MT_SW_APP/releases/download/engines-$LLAMA_TAG/whisper-$WHISPER_REF-android-arm64-i8mm.tar.gz",
                 folder = "whisper-$WHISPER_REF-android-arm64-i8mm",
                 exeName = "whisper-server",
                 sizeMb = WHISPER_ANDROID_MB,
@@ -428,7 +460,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
             if (!llamaSupported) return null
             return Asset(
                 url =
-                    "https://github.com/MT-SW/MT_SW_APP/releases/download/engines-$LLAMA_TAG/whisper-$WHISPER_REF-android-arm64.tar.gz",
+                "https://github.com/MT-SW/MT_SW_APP/releases/download/engines-$LLAMA_TAG/whisper-$WHISPER_REF-android-arm64.tar.gz",
                 folder = "whisper-$WHISPER_REF-android-arm64",
                 exeName = "whisper-server",
                 sizeMb = WHISPER_ANDROID_MB,
@@ -485,29 +517,26 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
         )
     }
 
-    private fun whisperChip(kind: String, sizeMb: Int) =
-        Asset(
-            url =
-                "https://github.com/MT-SW/MT_SW_APP/releases/download/engines-$LLAMA_TAG/whisper-$WHISPER_REF-android-arm64-$kind.tar.gz",
-            folder = "whisper-$WHISPER_REF-android-arm64-$kind",
-            exeName = "whisper-server",
-            sizeMb = sizeMb,
-        )
+    private fun whisperChip(kind: String, sizeMb: Int) = Asset(
+        url =
+        "https://github.com/MT-SW/MT_SW_APP/releases/download/engines-$LLAMA_TAG/whisper-$WHISPER_REF-android-arm64-$kind.tar.gz",
+        folder = "whisper-$WHISPER_REF-android-arm64-$kind",
+        exeName = "whisper-server",
+        sizeMb = sizeMb,
+    )
 
-    private fun llama(suffix: String, sizeMb: Int) =
-        Asset(
-            url = "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMA_TAG/llama-$LLAMA_TAG-bin-$suffix",
-            folder = "llama-$LLAMA_TAG-" + suffix.substringBefore('.'),
-            exeName = "llama-server$exe",
-            sizeMb = sizeMb,
-        )
+    private fun llama(suffix: String, sizeMb: Int) = Asset(
+        url = "https://github.com/ggml-org/llama.cpp/releases/download/$LLAMA_TAG/llama-$LLAMA_TAG-bin-$suffix",
+        folder = "llama-$LLAMA_TAG-" + suffix.substringBefore('.'),
+        exeName = "llama-server$exe",
+        sizeMb = sizeMb,
+    )
 
-    private fun assetFor(engine: AiEngine): Asset? =
-        when (engine) {
-            AiEngine.LLAMA_CPP -> llamaAsset()
-            AiEngine.WHISPER_CPP -> whisperAsset()
-            else -> null
-        }
+    private fun assetFor(engine: AiEngine): Asset? = when (engine) {
+        AiEngine.LLAMA_CPP -> llamaAsset()
+        AiEngine.WHISPER_CPP -> whisperAsset()
+        else -> null
+    }
 
     override fun handles(engine: AiEngine): Boolean = assetFor(engine) != null
 
@@ -548,12 +577,13 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
                 dir.walkTopDown()
                     .filter { it.isFile && (it.name.endsWith(".dylib") || it.name.contains(".so")) }
                     .forEach { it.setExecutable(true) }
-                if (mac)
+                if (mac) {
                     runCatching {
                         ProcessBuilder("xattr", "-dr", "com.apple.quarantine", dir.absolutePath)
                             .start()
                             .waitFor(UNPACK_SECONDS, TimeUnit.SECONDS)
                     }
+                }
                 File(dir, READY_MARK).writeText(asset.url)
                 onProgress(1f)
                 Logger.i(tag = TAG) { "Installed ${asset.exeName} from ${asset.url}" }
@@ -573,7 +603,7 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
     private fun prune(dir: File) {
         val keep =
             Regex(
-                "whisper-server|llama-server|libllama-server-impl\\.so|libllama\\.so|libllama-common\\.so|libwhisper.*\\.so|libggml.*\\.so|libmtmd\\.so|LICENSE"
+                "whisper-server|llama-server|libllama-server-impl\\.so|libllama\\.so|libllama-common\\.so|libwhisper.*\\.so|libggml.*\\.so|libmtmd\\.so|LICENSE",
             )
         dir.walkTopDown().filter { it.isFile && !keep.matches(it.name) }.forEach { it.delete() }
         // The remote-procedure backend is not used.
@@ -582,7 +612,8 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
 
     private suspend fun download(url: String, target: File, onProgress: (Float) -> Unit) {
         target.parentFile?.mkdirs()
-        @Suppress("DEPRECATION") val connection = URL(url).openConnection() as HttpURLConnection
+        @Suppress("DEPRECATION")
+        val connection = URL(url).openConnection() as HttpURLConnection
         try {
             connection.connectTimeout = CONNECT_TIMEOUT_MS
             connection.readTimeout = READ_TIMEOUT_MS
@@ -618,8 +649,9 @@ class ModelServerInstaller(private val root: File) : AiEngineInstaller {
                     .redirectErrorStream(true)
                     .start()
             val output = process.inputStream.bufferedReader().readText()
-            if (!process.waitFor(UNPACK_SECONDS, TimeUnit.SECONDS) || process.exitValue() != 0)
+            if (!process.waitFor(UNPACK_SECONDS, TimeUnit.SECONDS) || process.exitValue() != 0) {
                 error("Unpacking failed: ${output.take(MAX_ERROR)}")
+            }
             return
         }
         ZipInputStream(archive.inputStream().buffered()).use { zip ->

@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod", "MagicNumber", "ModifierMissing", "ParameterNaming")
+
 package org.meshtastic.feature.settings.radio.component
 
 import androidx.compose.foundation.background
@@ -36,16 +38,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -56,13 +58,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okio.ByteString
 import org.koin.compose.koinInject
 import org.meshtastic.core.domain.usecase.settings.GenerateVanityKeyUseCase
 import org.meshtastic.core.domain.usecase.settings.VanityKeyResult
 import org.meshtastic.core.ui.component.MeshtasticDialog
-import kotlinx.coroutines.delay
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -234,7 +236,10 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
                 val editable = status !is VanityGrindStatus.Grinding
                 val hsv = rgbToHsv(selectedColor)
                 Text(text = "Dowolny kolor", modifier = Modifier.padding(top = 16.dp))
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
                     Box(
                         modifier =
                         Modifier.size(48.dp)
@@ -329,7 +334,7 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
                         Row(modifier = Modifier.padding(top = 16.dp)) {
                             CircularProgressIndicator(modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = "Szukam klucza... ${seconds} s")
+                            Text(text = "Szukam klucza... $seconds s")
                         }
                         TextButton(
                             onClick = {
@@ -382,24 +387,25 @@ fun VanityColorPickerDialog(supported: Boolean, onKeyFound: (ByteString) -> Unit
                                 return@TextButton
                             }
                             status = VanityGrindStatus.Grinding
-                            grindJob =
-                                scope.launch {
-                                    val result =
-                                        grinder(
-                                            selectedColor,
-                                            if (precise) PRECISE_TOLERANCE else FAST_TOLERANCE,
-                                            if (precise) PRECISE_TIMEOUT_MS else FAST_TIMEOUT_MS,
-                                        )
-                                    status =
-                                        if (result != null) {
-                                            recentColors.remove(selectedColor)
-                                            recentColors.add(0, selectedColor)
-                                            while (recentColors.size > MAX_RECENT) recentColors.removeAt(recentColors.lastIndex)
-                                            VanityGrindStatus.Found(result)
-                                        } else {
-                                            VanityGrindStatus.TimedOut
+                            grindJob = scope.launch {
+                                val result =
+                                    grinder(
+                                        selectedColor,
+                                        if (precise) PRECISE_TOLERANCE else FAST_TOLERANCE,
+                                        if (precise) PRECISE_TIMEOUT_MS else FAST_TIMEOUT_MS,
+                                    )
+                                status =
+                                    if (result != null) {
+                                        recentColors.remove(selectedColor)
+                                        recentColors.add(0, selectedColor)
+                                        while (recentColors.size > MAX_RECENT) {
+                                            recentColors.removeAt(recentColors.lastIndex)
                                         }
-                                }
+                                        VanityGrindStatus.Found(result)
+                                    } else {
+                                        VanityGrindStatus.TimedOut
+                                    }
+                            }
                         },
                         enabled = status !is VanityGrindStatus.Grinding,
                         colors =

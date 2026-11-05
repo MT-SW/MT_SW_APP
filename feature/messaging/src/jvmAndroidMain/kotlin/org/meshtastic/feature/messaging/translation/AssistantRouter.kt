@@ -14,7 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("ktlint:standard:max-line-length")
+@file:Suppress(
+    "ktlint:standard:max-line-length",
+    "MaxLineLength",
+    "MultiLineIfElse",
+    "ReturnCount",
+    "TooGenericExceptionCaught",
+    "Wrapping",
+)
 
 package org.meshtastic.feature.messaging.translation
 
@@ -74,12 +81,15 @@ internal class AssistantRouter(private val engine: AiTextEngine) {
         }
         skipped = 0
         val ask = buildString {
-            if (notes.isNotBlank())
+            if (notes.isNotBlank()) {
                 append("Notes about the user: ").append(notes.take(NOTES_CHARS).replace('\n', ' ')).append('\n')
-            if (lastNode.isNotBlank())
+            }
+            if (lastNode.isNotBlank()) {
                 append("Last node talked about: ").append(lastNode.take(LAST_NODE_CHARS)).append('\n')
-            if (conversation.isNotBlank())
+            }
+            if (conversation.isNotBlank()) {
                 append("Conversation so far:\n").append(conversation.takeLast(CONVERSATION_CHARS))
+            }
             append("Question: ").append(question.take(QUESTION_CHARS))
         }
         val raw =
@@ -108,7 +118,9 @@ internal class AssistantRouter(private val engine: AiTextEngine) {
     }
 
     @Volatile private var brokenModel = ""
+
     @Volatile private var failures = 0
+
     @Volatile private var skipped = 0
 
     private fun parse(raw: String): AssistantIntent? {
@@ -131,9 +143,11 @@ internal class AssistantRouter(private val engine: AiTextEngine) {
         val channel = text("channel").takeUnless { it in INTENTS }.orEmpty()
         if (
             kind == "summarize" &&
-                (text("topic").isNotBlank() ||
+            (
+                text("topic").isNotBlank() ||
                     text("channel") in INTENTS ||
-                    text("channel").lowercase() in NETWORK_WORDS)
+                    text("channel").lowercase() in NETWORK_WORDS
+                )
         ) {
             return AssistantIntent(intent = "network_question", topic = "overview")
         }

@@ -462,16 +462,15 @@ private fun showTracerouteDetail(
                 ?.let { AnnotatedString(it) } ?: return
         }
 
-    val overlay =
-        route?.let {
-            TracerouteOverlay(
-                requestId = point.requestId,
-                forwardRoute = it.route,
-                returnRoute = it.route_back,
-                forwardSnr = it.snr_towards,
-                returnSnr = it.snr_back,
-            )
-        }
+    val overlay = route?.let {
+        TracerouteOverlay(
+            requestId = point.requestId,
+            forwardRoute = it.route,
+            returnRoute = it.route_back,
+            forwardSnr = it.snr_towards,
+            returnSnr = it.snr_back,
+        )
+    }
 
     viewModel.showTracerouteDetail(
         annotatedMessage = annotated,

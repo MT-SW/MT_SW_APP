@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod", "ModifierMissing")
+
 package org.meshtastic.feature.settings.mtsw
 
 import androidx.compose.foundation.layout.Arrangement
@@ -40,20 +42,17 @@ import org.meshtastic.core.navigation.MapRoute
 import org.meshtastic.core.navigation.Route
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.resources.Res
-import org.meshtastic.core.resources.node_color_pick
-import org.meshtastic.core.resources.node_color_summary
-import org.meshtastic.core.resources.node_color_title
-import org.meshtastic.core.ui.assistant.SettingHighlight
 import org.meshtastic.core.resources.ai_section_title
-import org.meshtastic.core.resources.smart_features_description
-import org.meshtastic.core.resources.smart_features_summary
-import org.meshtastic.core.resources.smart_features_title
 import org.meshtastic.core.resources.antenna_calc_summary
 import org.meshtastic.core.resources.antenna_calc_title
 import org.meshtastic.core.resources.app_log_title
 import org.meshtastic.core.resources.auto_load_chat_images
-import org.meshtastic.core.resources.import_menu_in_top_bar
 import org.meshtastic.core.resources.clean_node_database_title
+import org.meshtastic.core.resources.debug_panel
+import org.meshtastic.core.resources.import_menu_in_top_bar
+import org.meshtastic.core.resources.intro_mtsw_planner_title
+import org.meshtastic.core.resources.kb_summary
+import org.meshtastic.core.resources.kb_title
 import org.meshtastic.core.resources.local_stats_title
 import org.meshtastic.core.resources.lora
 import org.meshtastic.core.resources.mt_sw_features_links
@@ -62,11 +61,10 @@ import org.meshtastic.core.resources.mt_sw_features_lora_summary
 import org.meshtastic.core.resources.mt_sw_features_switches
 import org.meshtastic.core.resources.mt_sw_features_title
 import org.meshtastic.core.resources.mt_sw_map_title
-import org.meshtastic.core.resources.mt_sw_planner_open_summary
-import org.meshtastic.core.resources.mt_sw_terrain_open_summary
-import org.meshtastic.core.resources.terrain_horizon_title
 import org.meshtastic.core.resources.mt_sw_other_calls_body
 import org.meshtastic.core.resources.mt_sw_other_calls_title
+import org.meshtastic.core.resources.mt_sw_other_contacts_body
+import org.meshtastic.core.resources.mt_sw_other_contacts_title
 import org.meshtastic.core.resources.mt_sw_other_full_doc
 import org.meshtastic.core.resources.mt_sw_other_gpio_body
 import org.meshtastic.core.resources.mt_sw_other_gpio_title
@@ -75,22 +73,26 @@ import org.meshtastic.core.resources.mt_sw_other_lna_body
 import org.meshtastic.core.resources.mt_sw_other_lna_title
 import org.meshtastic.core.resources.mt_sw_other_polarity_body
 import org.meshtastic.core.resources.mt_sw_other_polarity_title
-import org.meshtastic.core.resources.mt_sw_other_contacts_body
-import org.meshtastic.core.resources.mt_sw_other_contacts_title
 import org.meshtastic.core.resources.mt_sw_other_remote_lists_body
 import org.meshtastic.core.resources.mt_sw_other_remote_lists_title
 import org.meshtastic.core.resources.mt_sw_other_summary
 import org.meshtastic.core.resources.mt_sw_other_title
+import org.meshtastic.core.resources.mt_sw_planner_open_summary
+import org.meshtastic.core.resources.mt_sw_terrain_open_summary
+import org.meshtastic.core.resources.node_color_pick
+import org.meshtastic.core.resources.node_color_summary
+import org.meshtastic.core.resources.node_color_title
 import org.meshtastic.core.resources.node_layout_section_title
-import org.meshtastic.core.resources.debug_panel
-import org.meshtastic.core.resources.intro_mtsw_planner_title
-import org.meshtastic.core.resources.kb_summary
-import org.meshtastic.core.resources.kb_title
+import org.meshtastic.core.resources.smart_features_description
+import org.meshtastic.core.resources.smart_features_summary
+import org.meshtastic.core.resources.smart_features_title
 import org.meshtastic.core.resources.sniffer_settings_title
+import org.meshtastic.core.resources.terrain_horizon_title
 import org.meshtastic.core.resources.theme
 import org.meshtastic.core.resources.translator_open
 import org.meshtastic.core.resources.translator_open_summary
 import org.meshtastic.core.resources.ui_scale
+import org.meshtastic.core.ui.assistant.SettingHighlight
 import org.meshtastic.core.ui.component.ListItem
 import org.meshtastic.core.ui.component.MainAppBar
 import org.meshtastic.core.ui.component.SwitchListItem
@@ -102,28 +104,28 @@ import org.meshtastic.core.ui.icon.CenterFocusStrong
 import org.meshtastic.core.ui.icon.FormatPaint
 import org.meshtastic.core.ui.icon.HelpOutline
 import org.meshtastic.core.ui.icon.Info
-import org.meshtastic.core.ui.icon.LinkIcon
 import org.meshtastic.core.ui.icon.Language
+import org.meshtastic.core.ui.icon.LinkIcon
 import org.meshtastic.core.ui.icon.List
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Tune
 import org.meshtastic.feature.settings.SettingsViewModel
 import org.meshtastic.feature.settings.component.AiSettings
 import org.meshtastic.feature.settings.component.AiStorageRow
+import org.meshtastic.feature.settings.component.AppLogSettings
 import org.meshtastic.feature.settings.component.AppUpdateSettings
 import org.meshtastic.feature.settings.component.ExpressiveSection
-import org.meshtastic.feature.settings.component.AppLogSettings
+import org.meshtastic.feature.settings.component.LogRetentionPreference
 import org.meshtastic.feature.settings.component.ReportIssuesSection
 import org.meshtastic.feature.settings.component.SupportProjectSection
-import org.meshtastic.feature.settings.component.LogRetentionPreference
 import org.meshtastic.feature.settings.component.ThemePickerDialog
 import org.meshtastic.feature.settings.component.UiScalePickerDialog
 import org.meshtastic.feature.settings.component.uiScaleLabel
 
 /**
  * The "MT_SW features" screen: every setting that exists only in MT_SW_APP in one place. The switches that belong to
- * the fork live here; settings that have a natural home elsewhere (scaling, LoRa, Sniffer, node database cleaning)
- * stay there and get a shortcut row.
+ * the fork live here; settings that have a natural home elsewhere (scaling, LoRa, Sniffer, node database cleaning) stay
+ * there and get a shortcut row.
  */
 @Composable
 fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit, onNavigate: (Route) -> Unit) {
@@ -202,7 +204,8 @@ fun MtSwFeaturesScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit,
                 }
             }
 
-            // Planning the network in one place: the link planner (opens for the connected radio), the terrain panorama and the antenna calculator.
+            // Planning the network in one place: the link planner (opens for the connected radio), the terrain panorama
+            // and the antenna calculator.
             ExpressiveSection(title = stringResource(Res.string.mt_sw_map_title)) {
                 ListItem(
                     text = stringResource(Res.string.intro_mtsw_planner_title),

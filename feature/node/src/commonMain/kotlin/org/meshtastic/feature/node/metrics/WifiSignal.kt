@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("MatchingDeclarationName")
+
 package org.meshtastic.feature.node.metrics
 
 import androidx.compose.runtime.Composable
@@ -48,12 +50,17 @@ private const val REASON_HANDSHAKE_FAILED = 204
 @Composable
 internal fun wifiDropReasonText(code: Int): String = when (code) {
     REASON_BEACON_TIMEOUT -> stringResource(Res.string.wifi_reason_signal_lost, code)
+
     REASON_NO_AP_FOUND -> stringResource(Res.string.wifi_reason_no_network, code)
+
     REASON_HANDSHAKE_TIMEOUT,
     REASON_HANDSHAKE_FAILED,
     -> stringResource(Res.string.wifi_reason_handshake, code)
+
     REASON_AUTH_EXPIRE -> stringResource(Res.string.wifi_reason_auth_expired, code)
+
     REASON_DISCONNECTED_BY_DEVICE -> stringResource(Res.string.wifi_reason_self, code)
+
     else -> stringResource(Res.string.wifi_reason_other, code)
 }
 

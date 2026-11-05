@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("MagicNumber")
+
 package org.meshtastic.feature.node.metrics
 
 import androidx.compose.foundation.layout.Arrangement
@@ -260,8 +262,7 @@ fun SignalMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit, m
                 )
             }
         },
-        infoExtraContent =
-        lnaNodeNum?.let { num -> @Composable { LnaGainField(num, isLocalNode) } },
+        infoExtraContent = lnaNodeNum?.let { num -> @Composable { LnaGainField(num, isLocalNode) } },
         controlPart = {
             TimeFrameSelector(
                 selectedTimeFrame = timeFrame,
@@ -476,11 +477,16 @@ private fun SignalMetricsChart(
                     }
                 }
                 if (busyFloorData.isNotEmpty()) {
-                    lineModel { series(x = busyFloorData.map { it.time }, y = busyFloorData.map { BUSY_FLOOR_DBM - noiseGain }) }
+                    lineModel {
+                        series(x = busyFloorData.map { it.time }, y = busyFloorData.map { BUSY_FLOOR_DBM - noiseGain })
+                    }
                 }
                 if (rssiData.isNotEmpty()) {
                     lineModel {
-                        series(x = rssiData.map { it.rxTimeOrNull() ?: 0 }, y = rssiData.mapNotNull { it.rx_rssi?.minus(rssiGain) })
+                        series(
+                            x = rssiData.map { it.rxTimeOrNull() ?: 0 },
+                            y = rssiData.mapNotNull { it.rx_rssi?.minus(rssiGain) },
+                        )
                     }
                 }
                 if (wifiRssiData.isNotEmpty()) {
@@ -512,7 +518,8 @@ private fun SignalMetricsChart(
             )
 
         val axisMin = MIN_DBM_AXIS - maxOf(0, noiseGain, rssiGain)
-        val dbmRangeProvider = remember(axisMin) { CartesianLayerRangeProvider.fixed(minY = axisMin, maxY = MAX_DBM_AXIS) }
+        val dbmRangeProvider =
+            remember(axisMin) { CartesianLayerRangeProvider.fixed(minY = axisMin, maxY = MAX_DBM_AXIS) }
         val noiseFloorLayer =
             rememberConditionalLayer(
                 hasData = noiseFloorData.isNotEmpty(),
@@ -597,11 +604,16 @@ private fun SignalMetricsChart(
 @Composable
 private fun noiseFloorTextColor(value: Int?): Color = when {
     value == null -> MaterialTheme.colorScheme.onSurfaceVariant
-    // Palette matches the signal-quality / connection-status colours: gold = quiet, red = busy, purple = very noisy,
+
+    // Palette matches the signal-quality / connection-status colours: gold = quiet, red = busy, purple = very
+    // noisy,
     // white = worst.
     value < QUIET_NOISE_FLOOR_DBM -> MaterialTheme.colorScheme.StatusOnline
+
     value < BUSY_FLOOR_DBM -> MaterialTheme.colorScheme.StatusDisconnected
+
     value < NOISY_FLOOR_DBM -> MaterialTheme.colorScheme.StatusPurple
+
     else -> MaterialTheme.colorScheme.StatusConnecting
 }
 

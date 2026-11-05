@@ -14,56 +14,53 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod", "MultipleEmitters")
+
 package org.meshtastic.feature.settings.component
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import okio.ByteString.Companion.toByteString
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableIntStateOf
 import kotlinx.coroutines.delay
-import org.meshtastic.core.model.NodeExtraStats
-import org.meshtastic.core.ui.component.LocalNodeExtraConfig
-import org.meshtastic.core.ui.component.LocalNodeExtraStats
-import org.meshtastic.core.ui.component.LocalNodeExtraTick
-import org.meshtastic.core.ui.component.NODE_EXTRA_PAGE_MILLIS
-import org.meshtastic.core.ui.component.NodeExtraConfig
+import okio.ByteString.Companion.toByteString
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.common.util.MeasurementSystem
 import org.meshtastic.core.common.util.nowSeconds
 import org.meshtastic.core.model.ConnectionState
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.model.NodeExtraMode
+import org.meshtastic.core.model.NodeExtraStats
 import org.meshtastic.core.model.NodeListDensity
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.node_layout_channel
@@ -82,12 +79,17 @@ import org.meshtastic.core.resources.node_layout_preview
 import org.meshtastic.core.resources.node_layout_relative_last_heard
 import org.meshtastic.core.resources.node_layout_section_title
 import org.meshtastic.core.resources.node_layout_signal_direct_only
+import org.meshtastic.core.ui.component.LocalNodeExtraConfig
+import org.meshtastic.core.ui.component.LocalNodeExtraStats
+import org.meshtastic.core.ui.component.LocalNodeExtraTick
+import org.meshtastic.core.ui.component.NODE_EXTRA_PAGE_MILLIS
+import org.meshtastic.core.ui.component.NodeExtraConfig
 import org.meshtastic.core.ui.component.NodeItem
-import org.meshtastic.core.ui.icon.Info
-import org.meshtastic.core.ui.icon.MeshtasticIcons
-import org.meshtastic.core.ui.component.nodeExtraLegend
 import org.meshtastic.core.ui.component.NodeItemCompact
 import org.meshtastic.core.ui.component.SwitchPreference
+import org.meshtastic.core.ui.component.nodeExtraLegend
+import org.meshtastic.core.ui.icon.Info
+import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.feature.settings.NodeListSettingsState
 import org.meshtastic.proto.Config
 import org.meshtastic.proto.DeviceMetrics
@@ -162,48 +164,49 @@ fun NodeLayoutSettings(
         }
         val previewStats = remember { mapOf(previewNode.num to previewSampleExtraStats()) }
         CompositionLocalProvider(
-            LocalNodeExtraConfig provides NodeExtraConfig(
-                state.extraMode,
-                state.extraIconsOnly,
-                state.extraPackets,
-                state.extraHardware,
-                state.extraEther,
-                state.extraNeighbors,
-            ),
+            LocalNodeExtraConfig provides
+                NodeExtraConfig(
+                    state.extraMode,
+                    state.extraIconsOnly,
+                    state.extraPackets,
+                    state.extraHardware,
+                    state.extraEther,
+                    state.extraNeighbors,
+                ),
             LocalNodeExtraStats provides previewStats,
             LocalNodeExtraTick provides previewTick,
         ) {
-        Box(modifier = Modifier.animateContentSize().padding(bottom = 8.dp)) {
-            when (state.density) {
-                NodeListDensity.COMPLETE ->
-                    NodeItem(
-                        thisNode = localNode,
-                        thatNode = previewNode,
-                        distanceUnits = MeasurementSystem.METRIC,
-                        tempInFahrenheit = false,
-                        connectionState = ConnectionState.Connected,
-                        showTelemetry = state.showTelemetry,
-                        neighborCount = 4,
-                    )
+            Box(modifier = Modifier.animateContentSize().padding(bottom = 8.dp)) {
+                when (state.density) {
+                    NodeListDensity.COMPLETE ->
+                        NodeItem(
+                            thisNode = localNode,
+                            thatNode = previewNode,
+                            distanceUnits = MeasurementSystem.METRIC,
+                            tempInFahrenheit = false,
+                            connectionState = ConnectionState.Connected,
+                            showTelemetry = state.showTelemetry,
+                            neighborCount = 4,
+                        )
 
-                NodeListDensity.COMPACT ->
-                    NodeItemCompact(
-                        thisNode = localNode,
-                        thatNode = previewNode,
-                        distanceUnits = MeasurementSystem.METRIC,
-                        showPower = state.showPower,
-                        showLastHeard = state.showLastHeard,
-                        lastHeardIsRelative = state.lastHeardIsRelative,
-                        showLocation = state.showLocation,
-                        showHops = state.showHops,
-                        showSignal = state.showSignal,
-                        showChannel = state.showChannel,
-                        showRole = state.showRole,
-                        showTelemetry = state.showTelemetry,
-                        neighborCount = 4,
-                    )
+                    NodeListDensity.COMPACT ->
+                        NodeItemCompact(
+                            thisNode = localNode,
+                            thatNode = previewNode,
+                            distanceUnits = MeasurementSystem.METRIC,
+                            showPower = state.showPower,
+                            showLastHeard = state.showLastHeard,
+                            lastHeardIsRelative = state.lastHeardIsRelative,
+                            showLocation = state.showLocation,
+                            showHops = state.showHops,
+                            showSignal = state.showSignal,
+                            showChannel = state.showChannel,
+                            showRole = state.showRole,
+                            showTelemetry = state.showTelemetry,
+                            neighborCount = 4,
+                        )
+                }
             }
-        }
         }
 
         HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))

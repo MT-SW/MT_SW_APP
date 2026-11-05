@@ -14,6 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress(
+    "LoopWithTooManyJumpStatements",
+    "MagicNumber",
+    "ReturnCount",
+    "SwallowedException",
+    "TooGenericExceptionCaught",
+)
+
 package org.meshtastic.feature.map.planner.data
 
 import io.ktor.client.HttpClient

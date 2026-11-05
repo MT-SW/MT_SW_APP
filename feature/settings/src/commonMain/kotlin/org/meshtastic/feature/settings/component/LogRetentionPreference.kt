@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("ParameterNaming")
+
 package org.meshtastic.feature.settings.component
 
 import androidx.compose.runtime.Composable
@@ -37,17 +39,19 @@ private val RETENTION_DAYS_CHOICES = listOf(1, 2, 3, 7, 14, 30, 60)
  */
 @Composable
 fun LogRetentionPreference(retentionDays: Int, enabled: Boolean = true, onSelected: (Int) -> Unit) {
-    val choices =
-        RETENTION_DAYS_CHOICES.map { days ->
-            days.toLong() to pluralStringResource(Res.plurals.log_retention_days_quantity, days, days)
-        }
+    val choices = RETENTION_DAYS_CHOICES.map { days ->
+        days.toLong() to pluralStringResource(Res.plurals.log_retention_days_quantity, days, days)
+    }
     val extra =
         when {
             retentionDays in RETENTION_DAYS_CHOICES -> emptyList()
+
             retentionDays == MeshLogRetention.ONE_HOUR ->
                 listOf(retentionDays.toLong() to pluralStringResource(Res.plurals.log_retention_hours, 1, 1))
+
             retentionDays == MeshLogRetention.KEEP_FOREVER ->
                 listOf(retentionDays.toLong() to stringResource(Res.string.log_retention_never))
+
             else ->
                 listOf(
                     retentionDays.toLong() to

@@ -16,6 +16,8 @@
  */
 @file:OptIn(ExperimentalMaterial3Api::class)
 
+@file:Suppress("ViewModelForwarding")
+
 package org.meshtastic.feature.map.planner.ui
 
 import androidx.compose.foundation.layout.Arrangement

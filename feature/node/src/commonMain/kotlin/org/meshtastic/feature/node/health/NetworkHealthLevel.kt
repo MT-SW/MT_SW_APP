@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("MagicNumber", "MatchingDeclarationName", "ReturnCount")
+
 package org.meshtastic.feature.node.health
 
 import androidx.compose.material3.MaterialTheme
@@ -80,13 +82,17 @@ private const val NEIGHBORS_MEDIUM = 2
 /** This node's verdict in this metric tab; [HealthLevel.UNKNOWN] for tabs without a good/bad limit. */
 internal fun NetworkHealthMetric.levelFor(node: NodeHealthInfo): HealthLevel = when (this) {
     NetworkHealthMetric.POWER -> powerLevel(node)
+
     // The signal tab shows the noise floor, so the verdict follows that same number; a node that reports none is
     // judged by its SNR instead.
-    NetworkHealthMetric.SIGNAL ->
-        node.noiseFloor?.let(::noiseFloorLevel) ?: HealthLevel.UNKNOWN
+    NetworkHealthMetric.SIGNAL -> node.noiseFloor?.let(::noiseFloorLevel) ?: HealthLevel.UNKNOWN
+
     NetworkHealthMetric.ETHER -> node.channelUtilization?.let(::etherLevel) ?: HealthLevel.UNKNOWN
+
     NetworkHealthMetric.NEIGHBORS -> node.neighborCount?.let(::neighborLevel) ?: HealthLevel.UNKNOWN
-    // These tabs have no good / bad limit: a node that reports anything counts as "has data" (shown as GOOD), one that
+
+    // These tabs have no good / bad limit: a node that reports anything counts as "has data" (shown as GOOD), one
+    // that
     // reports nothing is "no data".
     NetworkHealthMetric.ENVIRONMENT,
     NetworkHealthMetric.RESOURCES,
@@ -173,23 +179,29 @@ private val NO_DATA_BLUE = Color(0xFF4DA3FF)
 
 /** The word shown next to the colour, so colour is never the only signal. */
 internal val HealthLevel.labelRes: StringResource
-    get() = when (this) {
-        HealthLevel.GOOD -> Res.string.network_health_level_good
-        HealthLevel.MEDIUM -> Res.string.network_health_level_medium
-        HealthLevel.BAD -> Res.string.network_health_level_bad
-        HealthLevel.CRITICAL -> Res.string.network_health_level_critical
-        HealthLevel.UNKNOWN -> Res.string.network_health_level_unknown
-    }
+    get() =
+        when (this) {
+            HealthLevel.GOOD -> Res.string.network_health_level_good
+            HealthLevel.MEDIUM -> Res.string.network_health_level_medium
+            HealthLevel.BAD -> Res.string.network_health_level_bad
+            HealthLevel.CRITICAL -> Res.string.network_health_level_critical
+            HealthLevel.UNKNOWN -> Res.string.network_health_level_unknown
+        }
 
 /** The explanation of this tab's colour limits, shown in the info dialog. */
 internal val NetworkHealthMetric.infoRes: StringResource
-    get() = when (this) {
-        NetworkHealthMetric.POWER -> Res.string.network_health_info_power
-        NetworkHealthMetric.SIGNAL -> Res.string.network_health_info_signal
-        NetworkHealthMetric.ETHER -> Res.string.network_health_info_ether
-        NetworkHealthMetric.NEIGHBORS -> Res.string.network_health_info_neighbors
-        NetworkHealthMetric.ENVIRONMENT,
-        NetworkHealthMetric.RESOURCES,
-        NetworkHealthMetric.TRAFFIC,
-        -> Res.string.network_health_info_none
-    }
+    get() =
+        when (this) {
+            NetworkHealthMetric.POWER -> Res.string.network_health_info_power
+
+            NetworkHealthMetric.SIGNAL -> Res.string.network_health_info_signal
+
+            NetworkHealthMetric.ETHER -> Res.string.network_health_info_ether
+
+            NetworkHealthMetric.NEIGHBORS -> Res.string.network_health_info_neighbors
+
+            NetworkHealthMetric.ENVIRONMENT,
+            NetworkHealthMetric.RESOURCES,
+            NetworkHealthMetric.TRAFFIC,
+            -> Res.string.network_health_info_none
+        }

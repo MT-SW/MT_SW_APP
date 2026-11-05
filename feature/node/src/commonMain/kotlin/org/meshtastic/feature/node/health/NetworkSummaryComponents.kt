@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.meshtastic.feature.node.health
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -106,13 +105,7 @@ internal fun SummarySection(
 
 /** A square-ish tile with a big number in the verdict colour. */
 @Composable
-internal fun StatTile(
-    label: String,
-    value: String,
-    icon: ImageVector,
-    color: Color,
-    modifier: Modifier = Modifier,
-) {
+internal fun StatTile(label: String, value: String, icon: ImageVector, color: Color, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
@@ -145,8 +138,7 @@ internal fun DistributionBar(counts: List<Int>, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(
             modifier =
-            Modifier
-                .fillMaxWidth()
+            Modifier.fillMaxWidth()
                 .height(14.dp)
                 .clip(RoundedCornerShape(7.dp))
                 .background(MaterialTheme.colorScheme.onSurface.copy(alpha = TRACK_ALPHA)),
@@ -157,8 +149,7 @@ internal fun DistributionBar(counts: List<Int>, modifier: Modifier = Modifier) {
                     if (count > 0) {
                         Box(
                             modifier =
-                            Modifier
-                                .weight((count.toFloat() * grow).coerceAtLeast(MIN_SEGMENT_WEIGHT))
+                            Modifier.weight((count.toFloat() * grow).coerceAtLeast(MIN_SEGMENT_WEIGHT))
                                 .fillMaxHeight()
                                 .background(level.color()),
                         )
@@ -247,8 +238,7 @@ internal fun ProgressTrack(fraction: Float, color: Color, modifier: Modifier = M
     ) {
         Box(
             modifier =
-            Modifier
-                .fillMaxWidth(fraction.coerceIn(0f, 1f))
+            Modifier.fillMaxWidth(fraction.coerceIn(0f, 1f))
                 .fillMaxHeight()
                 .background(Brush.horizontalGradient(listOf(color.copy(alpha = 0.6f), color))),
         )
@@ -298,8 +288,7 @@ internal fun ColumnChart(values: List<Int>, labels: List<String>, color: Color, 
                 )
                 Box(
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
+                    Modifier.fillMaxWidth()
                         .height((CHART_HEIGHT_DP * value / max * grow).dp.coerceAtLeast(2.dp))
                         .clip(RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp))
                         .background(Brush.verticalGradient(listOf(tint, tint.copy(alpha = 0.5f)))),

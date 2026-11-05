@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("ForEachOnRange", "LambdaParameterInRestartableEffect", "LongMethod", "MagicNumber", "ReturnCount")
 
 package org.meshtastic.feature.node.health
 
@@ -129,9 +130,14 @@ internal data class LevelScale(
 /** Same limits as the rest of the Network Health screens. */
 internal fun scaleFor(metric: NetworkHealthMetric, label: String): LevelScale? = when {
     metric == NetworkHealthMetric.POWER && label == "Bateria" -> LevelScale(50f, 20f, 5f, true, 0f, 100f)
+
     metric == NetworkHealthMetric.SIGNAL && label == "SNR" -> LevelScale(0f, -7.5f, -15f, true, -20f, 10f)
+
     metric == NetworkHealthMetric.ETHER && label == "Ch. Util" -> LevelScale(15f, 25f, 40f, false, 0f, 60f)
-    metric == NetworkHealthMetric.SIGNAL && label == "Noise Floor" -> LevelScale(-100f, -90f, -80f, false, -130f, -60f)
+
+    metric == NetworkHealthMetric.SIGNAL && label == "Noise Floor" ->
+        LevelScale(-100f, -90f, -80f, false, -130f, -60f)
+
     else -> null
 }
 
@@ -178,8 +184,7 @@ internal fun TimeInStateStrip(
                 if (weights[i] > 0f) {
                     Box(
                         modifier =
-                        Modifier
-                            .weight(weights[i].coerceAtLeast(MIN_WEIGHT))
+                        Modifier.weight(weights[i].coerceAtLeast(MIN_WEIGHT))
                             .fillMaxHeight()
                             .background(palette[level] ?: Color.Gray),
                     )
@@ -397,8 +402,7 @@ internal fun BucketBarsView(
         Column(modifier = Modifier.weight(1f)) {
             Canvas(
                 modifier =
-                Modifier
-                    .fillMaxWidth()
+                Modifier.fillMaxWidth()
                     .weight(1f)
                     .onSizeChanged { width = it.width.toFloat() }
                     .pointerInput(Unit) {
@@ -472,8 +476,9 @@ internal fun HeatmapView(
                 acc[1] += 1.0
                 firstTime.getOrPut(key) { p.timestampMillis }
             }
-            val averages =
-                sums.mapValues { (key, acc) -> MetricPoint(firstTime.getValue(key), (acc[0] / acc[1]).toFloat()) }
+            val averages = sums.mapValues { (key, acc) ->
+                MetricPoint(firstTime.getValue(key), (acc[0] / acc[1]).toFloat())
+            }
             averages to averages.keys.map { it.first }.distinct().sorted().takeLast(HEAT_MAX_ROWS)
         }
     val averages = data.first
@@ -508,18 +513,15 @@ internal fun HeatmapView(
             }
             Canvas(
                 modifier =
-                Modifier
-                    .weight(1f)
-                    .height((HEAT_CELL_DP * days.size).dp)
-                    .pointerInput(days, averages) {
-                        detectTapGestures { pos ->
-                            val col = (pos.x / (size.width / HEAT_HOURS.toFloat())).toInt()
-                            val row = (pos.y / (size.height / days.size.toFloat())).toInt()
-                            if (col in 0 until HEAT_HOURS && row in days.indices) {
-                                onSelect(averages[days[row] to col])
-                            }
+                Modifier.weight(1f).height((HEAT_CELL_DP * days.size).dp).pointerInput(days, averages) {
+                    detectTapGestures { pos ->
+                        val col = (pos.x / (size.width / HEAT_HOURS.toFloat())).toInt()
+                        val row = (pos.y / (size.height / days.size.toFloat())).toInt()
+                        if (col in 0 until HEAT_HOURS && row in days.indices) {
+                            onSelect(averages[days[row] to col])
                         }
-                    },
+                    }
+                },
             ) {
                 val cw = size.width / HEAT_HOURS
                 val ch = size.height / days.size

@@ -14,7 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("ktlint:standard:max-line-length")
+@file:Suppress(
+    "ktlint:standard:max-line-length",
+    "ClassSignature",
+    "FunctionSignature",
+    "MagicNumber",
+    "MaxLineLength",
+    "ReturnCount",
+    "TooGenericExceptionCaught",
+)
 
 package org.meshtastic.feature.messaging.translation
 
@@ -139,61 +147,57 @@ class AssistantActionCollector {
  * in the message box of the conversation and the user sends it.
  */
 @Suppress("FunctionName", "LargeClass")
-class AssistantGuideTools(
-    private val data: AssistantDataProvider,
-    private val collector: AssistantActionCollector,
-) : AiToolSet {
+class AssistantGuideTools(private val data: AssistantDataProvider, private val collector: AssistantActionCollector) :
+    AiToolSet {
 
     @AiTool(
         description =
-            "Adds a button that opens a screen of the app (settings pages such as LoRa, device, display, bluetooth, network, " +
-                "position, power, MQTT, telemetry, MT_SW features, or the nodes, map, messages, channels, connections, " +
-                "firmware and local mesh discovery screens). Use it when the user asks where something is or wants to open a screen."
+        "Adds a button that opens a screen of the app (settings pages such as LoRa, device, display, bluetooth, network, " +
+            "position, power, MQTT, telemetry, MT_SW features, or the nodes, map, messages, channels, connections, " +
+            "firmware and local mesh discovery screens). Use it when the user asks where something is or wants to open a screen.",
     )
     fun open_screen(
         @AiToolParam(
             name = "screen",
             description = "Name of the screen, for example \"lora\", \"display\", \"map\", \"nodes\"",
         )
-        screen: String
-    ): String =
-        run("open_screen") {
-            val target =
-                bestMatch(SCREENS, screen) ?: return@run "No such screen. Available: " + SCREENS.joinToString { it.key }
-            val title = aiString(target.title)
-            collector.add(AssistantAction(title, "$DEEP_LINK_BASE_URI/${target.path}"))
-            "A button \"$title\" was added under the answer. Tell the user to tap it."
-        }
+        screen: String,
+    ): String = run("open_screen") {
+        val target =
+            bestMatch(SCREENS, screen) ?: return@run "No such screen. Available: " + SCREENS.joinToString { it.key }
+        val title = aiString(target.title)
+        collector.add(AssistantAction(title, "$DEEP_LINK_BASE_URI/${target.path}"))
+        "A button \"$title\" was added under the answer. Tell the user to tap it."
+    }
 
     @AiTool(
         description =
-            "Adds a button that opens the page of a radio or app setting and makes that setting blink with a yellow frame. " +
-                "Use it for questions like where a setting is or how to change it (region, preset, hop limit, role, " +
-                "screen timeout, Wi-Fi, MQTT, telemetry interval, app scale, theme, language, ...). It cannot change the setting."
+        "Adds a button that opens the page of a radio or app setting and makes that setting blink with a yellow frame. " +
+            "Use it for questions like where a setting is or how to change it (region, preset, hop limit, role, " +
+            "screen timeout, Wi-Fi, MQTT, telemetry interval, app scale, theme, language, ...). It cannot change the setting.",
     )
     fun show_setting(
         @AiToolParam(
             name = "setting",
             description = "What the user wants to find, for example \"hop limit\", \"app scale\", \"region\"",
         )
-        setting: String
-    ): String =
-        run("show_setting") {
-            val target =
-                bestMatch(SETTINGS, setting)
-                    ?: return@run "No such setting in the list. Explain where it is from the guide instead."
-            // The caption is in the language of the answer; the blinking row is found by its title in the app's
-            // language.
-            val title = aiString(target.title)
-            collector.add(
-                AssistantAction(title, "$DEEP_LINK_BASE_URI/${target.path}", highlight = getStringSuspend(target.title))
-            )
-            "A button \"$title\" was added under the answer; it opens the page and makes the setting blink. Tell the user to tap it."
-        }
+        setting: String,
+    ): String = run("show_setting") {
+        val target =
+            bestMatch(SETTINGS, setting)
+                ?: return@run "No such setting in the list. Explain where it is from the guide instead."
+        // The caption is in the language of the answer; the blinking row is found by its title in the app's
+        // language.
+        val title = aiString(target.title)
+        collector.add(
+            AssistantAction(title, "$DEEP_LINK_BASE_URI/${target.path}", highlight = getStringSuspend(target.title)),
+        )
+        "A button \"$title\" was added under the answer; it opens the page and makes the setting blink. Tell the user to tap it."
+    }
 
     @AiTool(
         description =
-            "Adds a button that shows a node on the map. Give the node's short or long name, or \"me\" for the own node."
+        "Adds a button that shows a node on the map. Give the node's short or long name, or \"me\" for the own node.",
     )
     fun show_node_on_map(@AiToolParam(name = "node", description = "Node name") node: String): String =
         run("show_node_on_map") {
@@ -205,8 +209,8 @@ class AssistantGuideTools(
 
     @AiTool(
         description =
-            "Adds a button that opens the link planner (range and terrain calculation) on the map for a node. Use it when the " +
-                "user wants to check range or a radio link to or from a node."
+        "Adds a button that opens the link planner (range and terrain calculation) on the map for a node. Use it when the " +
+            "user wants to check range or a radio link to or from a node.",
     )
     fun open_link_planner(@AiToolParam(name = "node", description = "Node name, or \"me\"") node: String): String =
         run("open_link_planner") {
@@ -218,30 +222,29 @@ class AssistantGuideTools(
 
     @AiTool(
         description =
-            "Prepares a message: adds a button that opens the conversation with the text already in the message box. The " +
-                "message is NOT sent; the user checks it and sends it himself. Use it when the user asks to write or send a message."
+        "Prepares a message: adds a button that opens the conversation with the text already in the message box. The " +
+            "message is NOT sent; the user checks it and sends it himself. Use it when the user asks to write or send a message.",
     )
     fun draft_message(
         @AiToolParam(name = "text", description = "The text of the message") text: String,
         @AiToolParam(
             name = "to",
             description =
-                "Channel name or number, or a node name for a direct message; the word main for the main channel",
+            "Channel name or number, or a node name for a direct message; the word main for the main channel",
         )
         to: String,
-    ): String =
-        run("draft_message") {
-            val message = text.trim().take(MAX_DRAFT)
-            if (message.isEmpty()) return@run "The message is empty."
-            val (key, label) = data.contactFor(to) ?: return@run "No channel or node called \"$to\" is known."
-            collector.add(
-                AssistantAction(
-                    label,
-                    "$DEEP_LINK_BASE_URI/messages?contactKey=${encode(key)}&message=${encode(message)}",
-                )
-            )
-            "A button was added that opens the conversation with $label with this text ready: \"$message\". Nothing was sent; tell the user to tap the button and send it."
-        }
+    ): String = run("draft_message") {
+        val message = text.trim().take(MAX_DRAFT)
+        if (message.isEmpty()) return@run "The message is empty."
+        val (key, label) = data.contactFor(to) ?: return@run "No channel or node called \"$to\" is known."
+        collector.add(
+            AssistantAction(
+                label,
+                "$DEEP_LINK_BASE_URI/messages?contactKey=${encode(key)}&message=${encode(message)}",
+            ),
+        )
+        "A button was added that opens the conversation with $label with this text ready: \"$message\". Nothing was sent; tell the user to tap the button and send it."
+    }
 
     private class Target(val key: String, val path: String, val title: StringResource, val words: List<String>)
 

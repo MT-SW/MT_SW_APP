@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LambdaParameterInRestartableEffect", "LongMethod", "MagicNumber")
 
 package org.meshtastic.feature.node.health
 
@@ -128,8 +129,7 @@ internal fun LineAreaChart(
         Column(modifier = Modifier.weight(1f)) {
             Canvas(
                 modifier =
-                Modifier
-                    .fillMaxWidth()
+                Modifier.fillMaxWidth()
                     .weight(1f)
                     .onSizeChanged { width = it.width.toFloat() }
                     .pointerInput(Unit) {

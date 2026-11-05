@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("TooManyFunctions")
+
 package org.meshtastic.feature.node.detail
 
 import androidx.lifecycle.ViewModel
-import kotlin.concurrent.Volatile
-import kotlin.time.Clock
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import org.koin.core.annotation.InjectedParam
@@ -40,6 +40,8 @@ import org.meshtastic.proto.OnDemandType
 import org.meshtastic.proto.Ping
 import org.meshtastic.proto.PortCounterEntry
 import org.meshtastic.proto.RoutingErrorEntry
+import kotlin.concurrent.Volatile
+import kotlin.time.Clock
 
 /** UI state for the OnDemand diagnostics screen — one field per query type. */
 data class OnDemandLogUiState(
@@ -103,15 +105,13 @@ class OnDemandLogViewModel(
             .stateInWhileSubscribed(initialValue = OnDemandLogUiState())
 
     private fun decodeState(logs: List<MeshLog>): OnDemandLogUiState {
-        val decoded =
-            logs.mapNotNull { log ->
-                log.fromRadio
-                    .packet
-                    ?.decoded
-                    ?.payload
-                    ?.let { payload -> runCatching { OnDemand.ADAPTER.decode(payload) }.getOrNull() }
-                    ?.let { it to log.received_date }
-            }
+        val decoded = logs.mapNotNull { log ->
+            log.fromRadio.packet
+                ?.decoded
+                ?.payload
+                ?.let { payload -> runCatching { OnDemand.ADAPTER.decode(payload) }.getOrNull() }
+                ?.let { it to log.received_date }
+        }
 
         fun <T> latest(vararg types: OnDemandType, extract: (OnDemandResponse) -> T?): T? = decoded
             .filter { (od, _) -> od.response?.response_type in types }
@@ -206,14 +206,13 @@ class OnDemandLogViewModel(
      * concatenates 1..packet_total in order. Best-effort — not yet verified against real multi-segment traffic.
      */
     private fun decodeNodesOnline(decoded: List<Pair<OnDemand, Long>>): List<NodeEntry> {
-        val segments =
-            decoded.mapNotNull { (od, ts) ->
-                val response = od.response?.takeIf { it.response_type == OnDemandType.RESPONSE_NODES_ONLINE }
-                val nodeList = response?.node_list ?: return@mapNotNull null
-                val index = od.packet_index ?: 1
-                val total = od.packet_total ?: 1
-                Triple(index, total, nodeList.node_list) to ts
-            }
+        val segments = decoded.mapNotNull { (od, ts) ->
+            val response = od.response?.takeIf { it.response_type == OnDemandType.RESPONSE_NODES_ONLINE }
+            val nodeList = response?.node_list ?: return@mapNotNull null
+            val index = od.packet_index ?: 1
+            val total = od.packet_total ?: 1
+            Triple(index, total, nodeList.node_list) to ts
+        }
         if (segments.isEmpty()) return emptyList()
         val latestPerIndex = segments.groupBy { it.first.first }.mapValues { (_, v) -> v.maxByOrNull { it.second }!! }
         val total = latestPerIndex.values.maxOf { it.first.second }

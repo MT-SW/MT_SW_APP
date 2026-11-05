@@ -123,8 +123,7 @@ fun DeviceMetricsScreen(viewModel: MetricsViewModel, onNavigateUp: () -> Unit) {
     val timeFrame by viewModel.timeFrame.collectAsStateWithLifecycle()
     val availableTimeFrames by viewModel.availableTimeFrames.collectAsStateWithLifecycle()
     val swapBattery = LocalLnaCorrection.current.invertsBattery(state.node?.num)
-    val data =
-        state.deviceMetrics.filter { it.time.toLong() >= timeFrame.timeThreshold() }.withBatterySwap(swapBattery)
+    val data = state.deviceMetrics.filter { it.time.toLong() >= timeFrame.timeThreshold() }.withBatterySwap(swapBattery)
 
     val exportLauncher = rememberSaveFileLauncher { uri -> viewModel.saveDeviceMetricsCSV(uri, data) }
 

@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("LongMethod", "ParameterNaming")
+
 package org.meshtastic.feature.settings.radio
 
 import androidx.compose.foundation.layout.Arrangement

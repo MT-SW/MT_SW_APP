@@ -29,10 +29,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.koin.compose.koinInject
-import org.meshtastic.core.common.state.HiddenFeaturesUnlock
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
+import org.meshtastic.core.common.state.HiddenFeaturesUnlock
 import org.meshtastic.core.model.Position
 import org.meshtastic.core.model.schemaLabelRes
 import org.meshtastic.core.resources.Res
@@ -75,8 +75,8 @@ import org.meshtastic.feature.settings.search.SettingsSearchCatalog
 import org.meshtastic.feature.settings.util.FixedUpdateIntervals
 import org.meshtastic.feature.settings.util.IntervalConfiguration
 import org.meshtastic.feature.settings.util.MIN_BROADCAST_INTERVAL_SECS
-import org.meshtastic.feature.settings.util.intervals
 import org.meshtastic.feature.settings.util.fieldTitle
+import org.meshtastic.feature.settings.util.intervals
 import org.meshtastic.feature.settings.util.offeredOn
 import org.meshtastic.feature.settings.util.toDisplayString
 import org.meshtastic.proto.Config

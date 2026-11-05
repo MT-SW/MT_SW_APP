@@ -14,10 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("MagicNumber", "TooManyFunctions", "ktlint:standard:max-line-length")
+@file:Suppress(
+    "MagicNumber",
+    "TooManyFunctions",
+    "ktlint:standard:max-line-length",
+    "BinaryExpressionWrapping",
+    "BlankLineBetweenWhenConditions",
+    "FunctionLiteral",
+    "FunctionSignature",
+    "LongMethod",
+    "MaxLineLength",
+    "MultiLineIfElse",
+    "ReturnCount",
+    "Wrapping",
+)
 
 package org.meshtastic.feature.messaging.translation
 
+import org.meshtastic.core.model.ChannelOption
+import org.meshtastic.core.model.antenna.AntennaInput
+import org.meshtastic.core.model.antenna.AntennaMath
+import org.meshtastic.core.model.antenna.AntennaType
+import org.meshtastic.core.model.antenna.Dim
+import org.meshtastic.core.model.antenna.DimKind
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.log10
@@ -25,12 +44,6 @@ import kotlin.math.max
 import kotlin.math.pow
 import kotlin.math.round
 import kotlin.math.sqrt
-import org.meshtastic.core.model.ChannelOption
-import org.meshtastic.core.model.antenna.AntennaInput
-import org.meshtastic.core.model.antenna.AntennaMath
-import org.meshtastic.core.model.antenna.AntennaType
-import org.meshtastic.core.model.antenna.Dim
-import org.meshtastic.core.model.antenna.DimKind
 
 /**
  * Radio calculations done by the app, never by the model (a small model guesses numbers). Each one recognises its
@@ -45,6 +58,7 @@ object AssistantCalculators {
     const val OUR_MHZ = 869.44165
     private const val C = 299_792_458.0
     private const val OUR_ERP_LIMIT_DBM = 27.0
+
     /** A link margin of this many dB over free space usually survives some obstacles and fading. */
     private const val GOOD_MARGIN_DB = 20.0
 
@@ -82,18 +96,19 @@ object AssistantCalculators {
         Regex("$NUM\\s*(?:$unit)(?![\\p{L}])").findAll(q).mapNotNull { num(it.groupValues[1]) }.toList()
 
     /** A frequency in MHz: "868 MHz", "0,868 GHz", "433 mhz"; with [bare] also a lone 3–4 digit number like "868". */
-    private fun mhz(q: String, bare: Boolean = false): Double? =
-        first(q, "mhz")?.takeIf { it > 0 }
-            ?: first(q, "ghz")?.takeIf { it > 0 }?.times(1000)
-            ?: first(q, "khz")?.takeIf { it > 0 }?.div(1000)
-            ?: if (bare)
-                Regex("(?<![\\d.,])(\\d{3,4}(?:[.,]\\d+)?)(?![\\d.,]|\\s*(?:km|m\\b|cm|mm|dbm|mw|w\\b))")
-                    .find(q)
-                    ?.groupValues
-                    ?.get(1)
-                    ?.let(::num)
-                    ?.takeIf { it in 100.0..6000.0 }
-            else null
+    private fun mhz(q: String, bare: Boolean = false): Double? = first(q, "mhz")?.takeIf { it > 0 }
+        ?: first(q, "ghz")?.takeIf { it > 0 }?.times(1000)
+        ?: first(q, "khz")?.takeIf { it > 0 }?.div(1000)
+        ?: if (bare) {
+            Regex("(?<![\\d.,])(\\d{3,4}(?:[.,]\\d+)?)(?![\\d.,]|\\s*(?:km|m\\b|cm|mm|dbm|mw|w\\b))")
+                .find(q)
+                ?.groupValues
+                ?.get(1)
+                ?.let(::num)
+                ?.takeIf { it in 100.0..6000.0 }
+        } else {
+            null
+        }
 
     private fun km(q: String): Double? = first(q, "km|kilometr\\p{L}*")?.takeIf { it > 0 }
 
@@ -101,10 +116,9 @@ object AssistantCalculators {
     private fun metres(q: String): List<Double> = all(q, "m|metr\\p{L}*|meter\\p{L}*|metre\\p{L}*").filter { it > 0 }
 
     /** A power in dBm from "27 dBm", "0,5 W", "100 mW". */
-    private fun dbm(q: String): Double? =
-        first(q, "dbm")
-            ?: first(q, "mw|miliwat\\p{L}*|milliwatt\\p{L}*")?.takeIf { it > 0 }?.let { 10 * log10(it) }
-            ?: first(q, "w|wat\\p{L}*|watt\\p{L}*")?.takeIf { it > 0 }?.let { 10 * log10(it * 1000) }
+    private fun dbm(q: String): Double? = first(q, "dbm")
+        ?: first(q, "mw|miliwat\\p{L}*|milliwatt\\p{L}*")?.takeIf { it > 0 }?.let { 10 * log10(it) }
+        ?: first(q, "w|wat\\p{L}*|watt\\p{L}*")?.takeIf { it > 0 }?.let { 10 * log10(it * 1000) }
 
     private fun has(q: String, words: String) = Regex(words).containsMatchIn(q)
 
@@ -127,29 +141,31 @@ object AssistantCalculators {
 
     private fun Texts.power(dbm: Double): String {
         val m = mw(dbm)
-        return if (m >= 1000) "${n(dbm)} dBm = ${n(m / 1000, 2)} W"
-        else "${n(dbm)} dBm = ${n(m, if (m < 10) 2 else 0)} mW"
+        return if (m >= 1000) {
+            "${n(dbm)} dBm = ${n(m / 1000, 2)} W"
+        } else {
+            "${n(dbm)} dBm = ${n(m, if (m < 10) 2 else 0)} mW"
+        }
     }
 
     // ---------------------------------------------------------------- arithmetic
 
     private val ASK_WORDS =
         Regex(
-            "^(policz|oblicz|wylicz|ile to jest|ile to|ile jest|ile wynosi|ile|calculate|compute|what is|what's|how much is)\\s*:?\\s*"
+            "^(policz|oblicz|wylicz|ile to jest|ile to|ile jest|ile wynosi|ile|calculate|compute|what is|what's|how much is)\\s*:?\\s*",
         )
     private val PERCENT_OF = Regex("$NUM\\s*(?:%|procent\\p{L}*|percent)\\s*(?:z|od|of)\\s*$NUM")
     private val ROOT = Regex("(?:pierwiastek(?: kwadratowy)?|square root|sqrt)\\s*(?:z|of)?\\s*$NUM")
 
     /** "2300 podzielić przez 7", "3 do kwadratu plus 4 do kwadratu", "6 times 7" written with symbols: + - * / ^. */
-    private fun spokenOperators(q: String): String =
-        q.lowercase()
-            .replace(Regex("\\s*(?:podzielić|podzielone|podziel|dzielone|dzielić|divided)\\s+(?:przez|by)\\s*"), " / ")
-            .replace(Regex("\\s+(?:razy|pomnożyć przez|pomnożone przez|pomnóż przez|times|multiplied by)\\s+"), " * ")
-            .replace(Regex("\\s+(?:plus|dodać|dodaj|added to)\\s+"), " + ")
-            .replace(Regex("\\s+(?:minus|odjąć|odejmij|minus)\\s+"), " - ")
-            .replace(Regex("\\s*do kwadratu|\\s*squared"), "^2")
-            .replace(Regex("\\s*do sześcianu|\\s*cubed"), "^3")
-            .replace(Regex("\\s+do potęgi\\s+|\\s+to the power of\\s+"), "^")
+    private fun spokenOperators(q: String): String = q.lowercase()
+        .replace(Regex("\\s*(?:podzielić|podzielone|podziel|dzielone|dzielić|divided)\\s+(?:przez|by)\\s*"), " / ")
+        .replace(Regex("\\s+(?:razy|pomnożyć przez|pomnożone przez|pomnóż przez|times|multiplied by)\\s+"), " * ")
+        .replace(Regex("\\s+(?:plus|dodać|dodaj|added to)\\s+"), " + ")
+        .replace(Regex("\\s+(?:minus|odjąć|odejmij|minus)\\s+"), " - ")
+        .replace(Regex("\\s*do kwadratu|\\s*squared"), "^2")
+        .replace(Regex("\\s*do sześcianu|\\s*cubed"), "^3")
+        .replace(Regex("\\s+do potęgi\\s+|\\s+to the power of\\s+"), "^")
 
     private fun arithmetic(q: String, t: Texts): String? {
         PERCENT_OF.find(q)?.let { m ->
@@ -174,15 +190,14 @@ object AssistantCalculators {
     private class Expr(val s: String) {
         var i = 0
 
-        fun parse(): Double? =
-            try {
-                sum().takeIf {
-                    skip()
-                    i == s.length
-                }
-            } catch (@Suppress("TooGenericExceptionCaught") _: Exception) {
-                null
+        fun parse(): Double? = try {
+            sum().takeIf {
+                skip()
+                i == s.length
             }
+        } catch (@Suppress("TooGenericExceptionCaught") _: Exception) {
+            null
+        }
 
         private fun skip() {
             while (i < s.length && s[i] == ' ') i++
@@ -198,10 +213,12 @@ object AssistantCalculators {
                         i++
                         v += product()
                     }
+
                     '-' -> {
                         i++
                         v -= product()
                     }
+
                     else -> return v
                 }
             }
@@ -217,10 +234,12 @@ object AssistantCalculators {
                         i++
                         v *= powerOf()
                     }
+
                     '/' -> {
                         i++
                         v /= powerOf()
                     }
+
                     else -> return v
                 }
             }
@@ -232,7 +251,9 @@ object AssistantCalculators {
             return if (i < s.length && s[i] == '^') {
                 i++
                 base.pow(powerOf())
-            } else base
+            } else {
+                base
+            }
         }
 
         private fun unary(): Double {
@@ -278,86 +299,94 @@ object AssistantCalculators {
     private const val ADVICE = "najlepsz|polec|kupi|wybra|jaką kupić|best|recommend|buy|which antenna"
 
     /** The antenna the question is about, or null for "any antenna" (then the three simple ones are shown). */
-    private fun antennaType(q: String): AntennaType? =
-        when {
-            has(q, "yagi") -> AntennaType.YAGI
-            has(q, "moxon") -> AntennaType.MOXON
-            has(q, "biquad") -> AntennaType.BIQUAD
-            has(q, "heli[sx]|helic") -> AntennaType.HELIX
-            has(q, "patch|płask|plask|mikropask|microstrip") -> AntennaType.PATCH
-            has(q, "slim ?jim") -> AntennaType.SLIM_JIM
-            has(q, "j-?pole") -> AntennaType.J_POLE
-            has(q, "kolinear|collinear|\\bcoco\\b") -> AntennaType.COLLINEAR
-            has(q, "pętlow|petlow|folded") -> AntennaType.FOLDED_DIPOLE
-            has(q, "5/8|pięć ósmych|piec osmych|five.eighth") -> AntennaType.FIVE_EIGHTHS
-            has(q, "dipol|półfal|polfal|1/2|half") -> AntennaType.DIPOLE
-            has(
-                q,
-                "ćwierćfal|cwiercfal|ground ?plane|groundplane|\\bgp\\b|1/4|quarter|radial|przeciwwag|whip|bat\\b",
-            ) -> AntennaType.GROUND_PLANE
-            else -> null
-        }
+    private fun antennaType(q: String): AntennaType? = when {
+        has(q, "yagi") -> AntennaType.YAGI
 
-    private fun Texts.dimName(d: Dim): String =
-        when (d.kind) {
-            DimKind.TOTAL -> s("długość całkowita", "total length")
-            DimKind.RADIATOR -> s("promiennik", "radiator")
-            DimKind.RADIAL -> s("każda przeciwwaga", "each radial")
-            DimKind.ARM -> s("każde ramię", "each arm")
-            DimKind.GAP -> s("przerwa", "gap")
-            DimKind.SPACING -> s("odstęp", "spacing")
-            DimKind.STUB -> s("odcinek dopasowujący", "matching stub")
-            DimKind.FEED -> s("punkt zasilania od dołu", "feed point from the bottom")
-            DimKind.SECTION -> s("każdy odcinek kabla", "each coax section")
-            DimKind.WHIP -> s("bat na szczycie", "top whip")
-            DimKind.REFLECTOR -> s("reflektor", "reflector")
-            DimKind.DRIVEN -> s("element zasilany", "driven element")
-            DimKind.DIRECTOR -> s("direktor ${d.index}", "director ${d.index}")
-            DimKind.BOOM -> s("długość nośnika", "boom length")
-            DimKind.POSITION -> s("pozycja", "position")
-            DimKind.WIDTH -> s("szerokość", "width")
-            DimKind.DEPTH -> s("głębokość", "depth")
-            DimKind.TAIL_DRIVER -> s("zagięcie elementu zasilanego", "driver tail")
-            DimKind.TAIL_REFLECTOR -> s("zagięcie reflektora", "reflector tail")
-            DimKind.SIDE -> s("bok kwadratu", "side of a square")
-            DimKind.REFLECTOR_PLATE -> s("płyta reflektora", "reflector plate")
-            DimKind.DIAMETER -> s("średnica zwojów", "coil diameter")
-            DimKind.PITCH -> s("skok zwoju", "turn spacing")
-            DimKind.TURN_WIRE -> s("drut na zwój", "wire per turn")
-            DimKind.LENGTH -> s("długość helisy", "helix length")
-            DimKind.GROUND -> s("płaszczyzna masy", "ground plane")
-            DimKind.PATCH_W -> s("szerokość łaty", "patch width")
-            DimKind.PATCH_L -> s("długość łaty", "patch length")
-            DimKind.INSET -> s("wcięcie dla 50 Ω", "inset for 50 Ω")
-            DimKind.FEED_WIDTH -> s("ścieżka 50 Ω", "50 Ω track")
-            DimKind.QUARTER -> s("odcinek λ/4", "λ/4 piece")
-            DimKind.HALF -> s("odcinek λ/2", "λ/2 piece")
-            DimKind.WAVELENGTH -> s("długość fali", "wavelength")
-        }
+        has(q, "moxon") -> AntennaType.MOXON
 
-    private fun Texts.len(m: Double): String =
-        when {
-            m >= 1.0 -> n(m, 3) + " m"
-            m < 0.02 -> n(m * 1000, 1) + " mm"
-            else -> n(m * 100, 1) + " cm"
-        }
+        has(q, "biquad") -> AntennaType.BIQUAD
 
-    private fun Texts.typeName(t: AntennaType): String =
-        when (t) {
-            AntennaType.GROUND_PLANE -> s("Ćwierćfalowa (ground plane)", "Quarter-wave (ground plane)")
-            AntennaType.DIPOLE -> s("Dipol półfalowy", "Half-wave dipole")
-            AntennaType.FOLDED_DIPOLE -> s("Dipol pętlowy", "Folded dipole")
-            AntennaType.FIVE_EIGHTHS -> s("5/8 fali", "5/8 wave")
-            AntennaType.J_POLE -> "J-pole"
-            AntennaType.SLIM_JIM -> "Slim Jim"
-            AntennaType.COLLINEAR -> s("Kolinearna z kabla", "Coaxial collinear")
-            AntennaType.YAGI -> s("Yagi ${YAGI_ELEMENTS}-elementowa", "${YAGI_ELEMENTS}-element Yagi")
-            AntennaType.MOXON -> "Moxon"
-            AntennaType.BIQUAD -> "Biquad"
-            AntennaType.HELIX -> s("Helisa osiowa", "Axial helix")
-            AntennaType.PATCH -> s("Płaska (patch, FR4 1,6 mm)", "Patch (FR4 1.6 mm)")
-            AntennaType.COAX_STUB -> s("Odcinek kabla", "Coax section")
-        }
+        has(q, "heli[sx]|helic") -> AntennaType.HELIX
+
+        has(q, "patch|płask|plask|mikropask|microstrip") -> AntennaType.PATCH
+
+        has(q, "slim ?jim") -> AntennaType.SLIM_JIM
+
+        has(q, "j-?pole") -> AntennaType.J_POLE
+
+        has(q, "kolinear|collinear|\\bcoco\\b") -> AntennaType.COLLINEAR
+
+        has(q, "pętlow|petlow|folded") -> AntennaType.FOLDED_DIPOLE
+
+        has(q, "5/8|pięć ósmych|piec osmych|five.eighth") -> AntennaType.FIVE_EIGHTHS
+
+        has(q, "dipol|półfal|polfal|1/2|half") -> AntennaType.DIPOLE
+
+        has(
+            q,
+            "ćwierćfal|cwiercfal|ground ?plane|groundplane|\\bgp\\b|1/4|quarter|radial|przeciwwag|whip|bat\\b",
+        ) -> AntennaType.GROUND_PLANE
+
+        else -> null
+    }
+
+    private fun Texts.dimName(d: Dim): String = when (d.kind) {
+        DimKind.TOTAL -> s("długość całkowita", "total length")
+        DimKind.RADIATOR -> s("promiennik", "radiator")
+        DimKind.RADIAL -> s("każda przeciwwaga", "each radial")
+        DimKind.ARM -> s("każde ramię", "each arm")
+        DimKind.GAP -> s("przerwa", "gap")
+        DimKind.SPACING -> s("odstęp", "spacing")
+        DimKind.STUB -> s("odcinek dopasowujący", "matching stub")
+        DimKind.FEED -> s("punkt zasilania od dołu", "feed point from the bottom")
+        DimKind.SECTION -> s("każdy odcinek kabla", "each coax section")
+        DimKind.WHIP -> s("bat na szczycie", "top whip")
+        DimKind.REFLECTOR -> s("reflektor", "reflector")
+        DimKind.DRIVEN -> s("element zasilany", "driven element")
+        DimKind.DIRECTOR -> s("direktor ${d.index}", "director ${d.index}")
+        DimKind.BOOM -> s("długość nośnika", "boom length")
+        DimKind.POSITION -> s("pozycja", "position")
+        DimKind.WIDTH -> s("szerokość", "width")
+        DimKind.DEPTH -> s("głębokość", "depth")
+        DimKind.TAIL_DRIVER -> s("zagięcie elementu zasilanego", "driver tail")
+        DimKind.TAIL_REFLECTOR -> s("zagięcie reflektora", "reflector tail")
+        DimKind.SIDE -> s("bok kwadratu", "side of a square")
+        DimKind.REFLECTOR_PLATE -> s("płyta reflektora", "reflector plate")
+        DimKind.DIAMETER -> s("średnica zwojów", "coil diameter")
+        DimKind.PITCH -> s("skok zwoju", "turn spacing")
+        DimKind.TURN_WIRE -> s("drut na zwój", "wire per turn")
+        DimKind.LENGTH -> s("długość helisy", "helix length")
+        DimKind.GROUND -> s("płaszczyzna masy", "ground plane")
+        DimKind.PATCH_W -> s("szerokość łaty", "patch width")
+        DimKind.PATCH_L -> s("długość łaty", "patch length")
+        DimKind.INSET -> s("wcięcie dla 50 Ω", "inset for 50 Ω")
+        DimKind.FEED_WIDTH -> s("ścieżka 50 Ω", "50 Ω track")
+        DimKind.QUARTER -> s("odcinek λ/4", "λ/4 piece")
+        DimKind.HALF -> s("odcinek λ/2", "λ/2 piece")
+        DimKind.WAVELENGTH -> s("długość fali", "wavelength")
+    }
+
+    private fun Texts.len(m: Double): String = when {
+        m >= 1.0 -> n(m, 3) + " m"
+        m < 0.02 -> n(m * 1000, 1) + " mm"
+        else -> n(m * 100, 1) + " cm"
+    }
+
+    private fun Texts.typeName(t: AntennaType): String = when (t) {
+        AntennaType.GROUND_PLANE -> s("Ćwierćfalowa (ground plane)", "Quarter-wave (ground plane)")
+        AntennaType.DIPOLE -> s("Dipol półfalowy", "Half-wave dipole")
+        AntennaType.FOLDED_DIPOLE -> s("Dipol pętlowy", "Folded dipole")
+        AntennaType.FIVE_EIGHTHS -> s("5/8 fali", "5/8 wave")
+        AntennaType.J_POLE -> "J-pole"
+        AntennaType.SLIM_JIM -> "Slim Jim"
+        AntennaType.COLLINEAR -> s("Kolinearna z kabla", "Coaxial collinear")
+        AntennaType.YAGI -> s("Yagi ${YAGI_ELEMENTS}-elementowa", "${YAGI_ELEMENTS}-element Yagi")
+        AntennaType.MOXON -> "Moxon"
+        AntennaType.BIQUAD -> "Biquad"
+        AntennaType.HELIX -> s("Helisa osiowa", "Axial helix")
+        AntennaType.PATCH -> s("Płaska (patch, FR4 1,6 mm)", "Patch (FR4 1.6 mm)")
+        AntennaType.COAX_STUB -> s("Odcinek kabla", "Coax section")
+    }
 
     private const val YAGI_ELEMENTS = 5
 
@@ -374,8 +403,9 @@ object AssistantCalculators {
                     .append(": ")
                     .append(len(dim.meters))
             }
-        if (input.type != AntennaType.COAX_STUB)
+        if (input.type != AntennaType.COAX_STUB) {
             sb.append("\n   ").append(s("zysk ok. ${n(d.gainDbi)} dBi", "gain about ${n(d.gainDbi)} dBi"))
+        }
         d.impedanceOhm?.let { sb.append(s(", impedancja ok. ${n(it, 0)} Ω", ", impedance about ${n(it, 0)} Ω")) }
         return sb.toString()
     }
@@ -400,13 +430,30 @@ object AssistantCalculators {
         val sb = StringBuilder()
         sb.append(
             t.s(
-                "Obliczenia dla ${t.n(f, 2)} MHz${if (freq == null) " (częstotliwość naszej sieci)" else ""}: długość fali λ = c / f = ${t.n(lambda)} cm. Elementy z drutu ${t.n(wire)} mm, współczynnik skrócenia ${t.n(k, 3)} (z grubości przewodu).",
-                "Calculation for ${t.n(f, 2)} MHz${if (freq == null) " (our network's frequency)" else ""}: wavelength λ = c / f = ${t.n(lambda)} cm. Elements of ${t.n(wire)} mm wire, shortening factor ${t.n(k, 3)} (from the conductor thickness).",
-            )
+                "Obliczenia dla ${t.n(
+                    f,
+                    2,
+                )} MHz${if (freq == null) " (częstotliwość naszej sieci)" else ""}: długość fali λ = c / f = ${t.n(
+                    lambda,
+                )} cm. Elementy z drutu ${t.n(
+                    wire,
+                )} mm, współczynnik skrócenia ${t.n(k, 3)} (z grubości przewodu).",
+                "Calculation for ${t.n(
+                    f,
+                    2,
+                )} MHz${if (freq == null) " (our network's frequency)" else ""}: wavelength λ = c / f = ${t.n(
+                    lambda,
+                )} cm. Elements of ${t.n(
+                    wire,
+                )} mm wire, shortening factor ${t.n(k, 3)} (from the conductor thickness).",
+            ),
         )
         val types =
-            if (type != null) listOf(type)
-            else listOf(AntennaType.GROUND_PLANE, AntennaType.DIPOLE, AntennaType.FIVE_EIGHTHS)
+            if (type != null) {
+                listOf(type)
+            } else {
+                listOf(AntennaType.GROUND_PLANE, AntennaType.DIPOLE, AntennaType.FIVE_EIGHTHS)
+            }
         types.forEach { sb.append("\n").append(t.describe(base.copy(type = it))) }
         if (has(q, BUILD)) {
             sb.append("\n\n")
@@ -421,7 +468,7 @@ object AssistantCalculators {
                             "Jak zrobić ground plane: weź gniazdo N lub SMA do montażu na panelu, przylutuj promiennik do środkowego pinu, a 3–4 przeciwwagi do korpusu gniazda i odegnij je w dół o ok. 45°. Antenę montuj pionowo, jak najwyżej i z dala od metalu.",
                             "How to make a ground plane: take a panel-mount N or SMA socket, solder the radiator to the centre pin and 3–4 radials to the socket body, and bend them down by about 45°. Mount it vertically, as high as possible and away from metal.",
                         )
-                    }
+                    },
                 )
         }
         sb.append("\n")
@@ -429,7 +476,7 @@ object AssistantCalculators {
                 t.s(
                     "Na koniec dostrój miernikiem SWR albo NanoVNA: gdy rezonans wypada za nisko, skracaj po 1–2 mm. Inne typy anten, inną grubość przewodu i straty kabla policzysz w kalkulatorze anten.",
                     "Finally tune it with an SWR meter or a NanoVNA: if the resonance is too low, shorten it 1–2 mm at a time. Other antenna types, other wire thickness and cable losses are in the antenna calculator.",
-                )
+                ),
             )
         return sb.toString()
     }
@@ -453,13 +500,16 @@ object AssistantCalculators {
                 "\\bile\\b|przelicz|zamie|konwert|ile to|to ile|w mw|na mw|w dbm|na dbm|w wat|na wat|convert|how much|in mw|in dbm|in watt|to mw|to dbm",
             )
         val dbms = all(q, "dbm")
-        if (dbms.isNotEmpty() && (convert || has(q, "\\bmw\\b|wat|watt")))
+        if (dbms.isNotEmpty() && (convert || has(q, "\\bmw\\b|wat|watt"))) {
             return dbms.joinToString("\n") { t.power(it) }
+        }
         val mws = all(q, "mw|miliwat\\p{L}*|milliwatt\\p{L}*").filter { it > 0 }
         val ws = all(q, "w|wat\\p{L}*|watt\\p{L}*").filter { it > 0 }
         if ((mws.isNotEmpty() || ws.isNotEmpty()) && has(q, "dbm")) {
-            return (mws.map { "${t.n(it, 2)} mW = ${t.n(10 * log10(it))} dBm" } +
-                    ws.map { "${t.n(it, 2)} W = ${t.n(10 * log10(it * 1000))} dBm" })
+            return (
+                mws.map { "${t.n(it, 2)} mW = ${t.n(10 * log10(it))} dBm" } +
+                    ws.map { "${t.n(it, 2)} W = ${t.n(10 * log10(it * 1000))} dBm" }
+                )
                 .joinToString("\n")
         }
         return null
@@ -474,9 +524,17 @@ object AssistantCalculators {
         val erp = e - 2.15
         val ok = erp <= OUR_ERP_LIMIT_DBM + 0.05
         return t.s(
-            "Moc ${t.power(p)}, zysk anteny ${t.n(gain)} dBi, straty ${t.n(loss)} dB:\n• EIRP = ${t.power(e)}\n• ERP = EIRP − 2,15 = ${t.power(erp)}\n" +
+            "Moc ${t.power(
+                p,
+            )}, zysk anteny ${t.n(
+                gain,
+            )} dBi, straty ${t.n(loss)} dB:\n• EIRP = ${t.power(e)}\n• ERP = EIRP − 2,15 = ${t.power(erp)}\n" +
                 "W zakresie naszej sieci (869,4–869,65 MHz) limit to 500 mW ERP (27 dBm): ${if (ok) "mieścisz się." else "to za dużo — zmniejsz moc."}",
-            "Power ${t.power(p)}, antenna gain ${t.n(gain)} dBi, losses ${t.n(loss)} dB:\n• EIRP = ${t.power(e)}\n• ERP = EIRP − 2.15 = ${t.power(erp)}\n" +
+            "Power ${t.power(
+                p,
+            )}, antenna gain ${t.n(
+                gain,
+            )} dBi, losses ${t.n(loss)} dB:\n• EIRP = ${t.power(e)}\n• ERP = EIRP − 2.15 = ${t.power(erp)}\n" +
                 "In our network's band (869.4–869.65 MHz) the limit is 500 mW ERP (27 dBm): ${if (ok) "you are within it." else "that is too much — lower the power."}",
         )
     }
@@ -491,13 +549,28 @@ object AssistantCalculators {
                 q,
                 "tłumien|tlumien|strat\\p{L}* (?:na )?(?:trasie|propagac|w wolnej)|path loss|fspl|free.space|wolnej przestrzeni",
             )
-        )
+        ) {
             return null
+        }
         val d = km(q) ?: return null
         val f = mhz(q) ?: OUR_MHZ
         return t.s(
-            "Tłumienie w wolnej przestrzeni na ${t.n(d, 2)} km przy ${t.n(f, 2)} MHz: FSPL = 20·log(d) + 20·log(f) + 32,44 = ${t.n(fspl(d, f))} dB. W terenie z przeszkodami jest więcej.",
-            "Free-space path loss over ${t.n(d, 2)} km at ${t.n(f, 2)} MHz: FSPL = 20·log(d) + 20·log(f) + 32.44 = ${t.n(fspl(d, f))} dB. With obstacles it is more.",
+            "Tłumienie w wolnej przestrzeni na ${t.n(
+                d,
+                2,
+            )} km przy ${t.n(
+                f,
+                2,
+            )} MHz: FSPL = 20·log(d) + 20·log(f) + 32,44 = ${t.n(
+                fspl(d, f),
+            )} dB. W terenie z przeszkodami jest więcej.",
+            "Free-space path loss over ${t.n(
+                d,
+                2,
+            )} km at ${t.n(
+                f,
+                2,
+            )} MHz: FSPL = 20·log(d) + 20·log(f) + 32.44 = ${t.n(fspl(d, f))} dB. With obstacles it is more.",
         )
     }
 
@@ -507,8 +580,24 @@ object AssistantCalculators {
         val f = mhz(q) ?: OUR_MHZ
         val r = 8.657 * sqrt(d / (f / 1000))
         return t.s(
-            "Strefa Fresnela dla ${t.n(d, 2)} km przy ${t.n(f, 2)} MHz: w połowie trasy ma promień ok. ${t.n(r)} m. Żeby łącze działało dobrze, co najmniej 60 % (ok. ${t.n(r * 0.6)} m) powinno być wolne od przeszkód.",
-            "Fresnel zone for ${t.n(d, 2)} km at ${t.n(f, 2)} MHz: at mid-path its radius is about ${t.n(r)} m. For a good link at least 60 % (about ${t.n(r * 0.6)} m) should be free of obstacles.",
+            "Strefa Fresnela dla ${t.n(
+                d,
+                2,
+            )} km przy ${t.n(
+                f,
+                2,
+            )} MHz: w połowie trasy ma promień ok. ${t.n(
+                r,
+            )} m. Żeby łącze działało dobrze, co najmniej 60 % (ok. ${t.n(r * 0.6)} m) powinno być wolne od przeszkód.",
+            "Fresnel zone for ${t.n(
+                d,
+                2,
+            )} km at ${t.n(
+                f,
+                2,
+            )} MHz: at mid-path its radius is about ${t.n(
+                r,
+            )} m. For a good link at least 60 % (about ${t.n(r * 0.6)} m) should be free of obstacles.",
         )
     }
 
@@ -533,8 +622,28 @@ object AssistantCalculators {
         val half =
             if (loss >= 3.0) t.s(" To już ponad połowa mocy.", " That is already more than half the power.") else ""
         return t.s(
-            "Kabel $name: ok. ${t.n(perMetre, 2)} dB na metr, więc ${t.n(length)} m to około ${t.n(loss)} dB straty (moc spada do ${t.n(100 * 10.0.pow(-loss / 10.0), 0)} %).$half Wartość z tabel producentów przy 1000 MHz; dla naszych 868 MHz strata jest trochę mniejsza.",
-            "Cable $name: about ${t.n(perMetre, 2)} dB per metre, so ${t.n(length)} m loses about ${t.n(loss)} dB (power drops to ${t.n(100 * 10.0.pow(-loss / 10.0), 0)} %).$half The value is from manufacturers' tables at 1000 MHz; at our 868 MHz the loss is a little lower.",
+            "Kabel $name: ok. ${t.n(
+                perMetre,
+                2,
+            )} dB na metr, więc ${t.n(
+                length,
+            )} m to około ${t.n(
+                loss,
+            )} dB straty (moc spada do ${t.n(
+                100 * 10.0.pow(-loss / 10.0),
+                0,
+            )} %).$half Wartość z tabel producentów przy 1000 MHz; dla naszych 868 MHz strata jest trochę mniejsza.",
+            "Cable $name: about ${t.n(
+                perMetre,
+                2,
+            )} dB per metre, so ${t.n(
+                length,
+            )} m loses about ${t.n(
+                loss,
+            )} dB (power drops to ${t.n(
+                100 * 10.0.pow(-loss / 10.0),
+                0,
+            )} %).$half The value is from manufacturers' tables at 1000 MHz; at our 868 MHz the loss is a little lower.",
         )
     }
 
@@ -550,8 +659,20 @@ object AssistantCalculators {
         val h2 = h.getOrNull(1) ?: 2.0
         val d = 4.12 * (sqrt(h1) + sqrt(h2))
         return t.s(
-            "Horyzont radiowy dla anten na ${t.n(h1)} m i ${t.n(h2)} m${if (h.size < 2) " (druga antena w ręku)" else ""}: ok. ${t.n(d)} km (d = 4,12·(√h1 + √h2)). To granica przy płaskim terenie; góry i budynki ją skracają, a łącze na tej odległości potrzebuje jeszcze wolnej strefy Fresnela.",
-            "Radio horizon for antennas at ${t.n(h1)} m and ${t.n(h2)} m${if (h.size < 2) " (the other one hand-held)" else ""}: about ${t.n(d)} km (d = 4.12·(√h1 + √h2)). That is the limit over flat ground; hills and buildings shorten it, and a link at that distance also needs a clear Fresnel zone.",
+            "Horyzont radiowy dla anten na ${t.n(
+                h1,
+            )} m i ${t.n(
+                h2,
+            )} m${if (h.size < 2) " (druga antena w ręku)" else ""}: ok. ${t.n(
+                d,
+            )} km (d = 4,12·(√h1 + √h2)). To granica przy płaskim terenie; góry i budynki ją skracają, a łącze na tej odległości potrzebuje jeszcze wolnej strefy Fresnela.",
+            "Radio horizon for antennas at ${t.n(
+                h1,
+            )} m and ${t.n(
+                h2,
+            )} m${if (h.size < 2) " (the other one hand-held)" else ""}: about ${t.n(
+                d,
+            )} km (d = 4.12·(√h1 + √h2)). That is the limit over flat ground; hills and buildings shorten it, and a link at that distance also needs a clear Fresnel zone.",
         )
     }
 
@@ -608,15 +729,17 @@ object AssistantCalculators {
                 q,
                 "zasięg|zasieg|range|link budget|budżet łącza|budzet lacza|budżet mocy|bilans\\p{L}* łącza|bilans\\p{L}* lacza|bilans\\p{L}* mocy|bilans\\p{L}* radiow",
             )
-        )
+        ) {
             return null
+        }
         if (
             !has(
                 q,
                 "teoretycz|maksymal|\\bmax|oblicz|policz|wylicz|ile km|how far|jaki (?:będzie |bedzie |mam |jest )?zasięg|jaki (?:będzie |bedzie |mam |jest )?zasieg|what range|calculate|budżet|budzet|budget|bilans",
             )
-        )
+        ) {
             return null
+        }
         if (has(q, "słab|slab|kiepsk|poprawi|zwiększ|zwieksz|sprawdz|sprawdź|weak|poor|improve")) return null
         val (o, named) = preset(q, defaults)
         val pGiven = dbm(q)
@@ -637,36 +760,63 @@ object AssistantCalculators {
                     val verdict =
                         when {
                             margin >= GOOD_MARGIN_DB -> t.s("wystarczy z zapasem", "enough, with room to spare")
+
                             margin >= 0 ->
                                 t.s("styk — przy przeszkodach może nie działać", "borderline — obstacles may break it")
+
                             else -> t.s("za mało nawet w wolnej przestrzeni", "not enough even in free space")
                         }
                     t.s(
-                        "• na ${t.n(d, 2)} km: tłumienie w wolnej przestrzeni ${t.n(fspl(d, f))} dB, zapas ${t.n(margin)} dB — $verdict\n",
-                        "• over ${t.n(d, 2)} km: free-space path loss ${t.n(fspl(d, f))} dB, margin ${t.n(margin)} dB — $verdict\n",
+                        "• na ${t.n(
+                            d,
+                            2,
+                        )} km: tłumienie w wolnej przestrzeni ${t.n(
+                            fspl(d, f),
+                        )} dB, zapas ${t.n(margin)} dB — $verdict\n",
+                        "• over ${t.n(
+                            d,
+                            2,
+                        )} km: free-space path loss ${t.n(fspl(d, f))} dB, margin ${t.n(margin)} dB — $verdict\n",
                     )
                 }
                 .orEmpty()
         val presetNote = if (named) "" else t.s(" (ustawiony w radiu)", " (set in the radio)")
         val powerNote =
-            if (pGiven != null) ""
-            else if (defaults.txDbm > 0) t.s(" (z radia)", " (from the radio)")
-            else t.s(" (typowe radio SX1262)", " (a typical SX1262 radio)")
+            if (pGiven != null) {
+                ""
+            } else if (defaults.txDbm > 0) {
+                t.s(" (z radia)", " (from the radio)")
+            } else {
+                t.s(" (typowe radio SX1262)", " (a typical SX1262 radio)")
+            }
         return t.s(
-            "Budżet łącza dla presetu ${presetName(o)}$presetNote (SF${o.spreadingFactor}, ${t.n(o.bandwidth * 1000.0, 2)} kHz) przy ${t.n(f, 2)} MHz:\n" +
+            "Budżet łącza dla presetu ${presetName(
+                o,
+            )}$presetNote (SF${o.spreadingFactor}, ${t.n(o.bandwidth * 1000.0, 2)} kHz) przy ${t.n(f, 2)} MHz:\n" +
                 "• moc ${t.n(p)} dBm$powerNote, anteny ${t.n(gt)} dBi i ${t.n(gr)} dBi\n" +
                 "• czułość odbiornika ok. ${t.n(sens)} dBm (granica SNR ${t.n(snrLimit(o.spreadingFactor))} dB)\n" +
                 "• dopuszczalne tłumienie ok. ${t.n(budget)} dB\n" +
                 "• w wolnej przestrzeni, czysta teoria bez Ziemi: ok. ${t.n(dKm, 0)} km (w terenie nierealne)\n" +
                 distance +
-                "W praktyce zasięg ogranicza horyzont radiowy, to realny sufit na płaskim terenie: ${horizonList(q, t)}. Do tego przeszkody (budynki, las, wzgórza). Konkretne łącze sprawdzisz w planerze łącza.",
-            "Link budget for the ${presetName(o)} preset$presetNote (SF${o.spreadingFactor}, ${t.n(o.bandwidth * 1000.0, 2)} kHz) at ${t.n(f, 2)} MHz:\n" +
+                "W praktyce zasięg ogranicza horyzont radiowy, to realny sufit na płaskim terenie: ${horizonList(
+                    q,
+                    t,
+                )}. Do tego przeszkody (budynki, las, wzgórza). Konkretne łącze sprawdzisz w planerze łącza.",
+            "Link budget for the ${presetName(
+                o,
+            )} preset$presetNote (SF${o.spreadingFactor}, ${t.n(o.bandwidth * 1000.0, 2)} kHz) at ${t.n(f, 2)} MHz:\n" +
                 "• power ${t.n(p)} dBm$powerNote, antennas ${t.n(gt)} dBi and ${t.n(gr)} dBi\n" +
                 "• receiver sensitivity about ${t.n(sens)} dBm (SNR limit ${t.n(snrLimit(o.spreadingFactor))} dB)\n" +
                 "• allowed path loss about ${t.n(budget)} dB\n" +
-                "• in free space, pure theory without the Earth: about ${t.n(dKm, 0)} km (unrealistic on the ground)\n" +
+                "• in free space, pure theory without the Earth: about ${t.n(
+                    dKm,
+                    0,
+                )} km (unrealistic on the ground)\n" +
                 distance +
-                "In practice the radio horizon limits the range, the real ceiling over flat ground: ${horizonList(q, t)}. Obstacles (buildings, forest, hills) come on top. Check a real link in the link planner.",
+                "In practice the radio horizon limits the range, the real ceiling over flat ground: ${horizonList(
+                    q,
+                    t,
+                )}. Obstacles (buildings, forest, hills) come on top. Check a real link in the link planner.",
         )
     }
 
@@ -746,8 +896,22 @@ object AssistantCalculators {
         val rate = bitRate(o, cr)
         val speed = if (rate >= 1000) "${n(rate / 1000, 1)} kb/s" else "${n(rate, 0)} b/s"
         return s(
-            "• ${presetName(o)}: SF${o.spreadingFactor}, ${n(o.bandwidth * 1000.0, 2)} kHz, korekcja 4/$cr, prędkość $speed, czułość ok. ${n(sensitivityDbm(o))} dBm, pakiet 50 B trwa ${n(airtimeMs(o, PRESET_PAYLOAD_BYTES, cr), 0)} ms",
-            "• ${presetName(o)}: SF${o.spreadingFactor}, ${n(o.bandwidth * 1000.0, 2)} kHz, coding rate 4/$cr, speed $speed, sensitivity about ${n(sensitivityDbm(o))} dBm, a 50 B packet takes ${n(airtimeMs(o, PRESET_PAYLOAD_BYTES, cr), 0)} ms",
+            "• ${presetName(
+                o,
+            )}: SF${o.spreadingFactor}, ${n(
+                o.bandwidth * 1000.0,
+                2,
+            )} kHz, korekcja 4/$cr, prędkość $speed, czułość ok. ${n(
+                sensitivityDbm(o),
+            )} dBm, pakiet 50 B trwa ${n(airtimeMs(o, PRESET_PAYLOAD_BYTES, cr), 0)} ms",
+            "• ${presetName(
+                o,
+            )}: SF${o.spreadingFactor}, ${n(
+                o.bandwidth * 1000.0,
+                2,
+            )} kHz, coding rate 4/$cr, speed $speed, sensitivity about ${n(
+                sensitivityDbm(o),
+            )} dBm, a 50 B packet takes ${n(airtimeMs(o, PRESET_PAYLOAD_BYTES, cr), 0)} ms",
         )
     }
 
@@ -764,8 +928,16 @@ object AssistantCalculators {
         ) {
             val fastest = COMPARED.minByOrNull { airtimeMs(it, 50) } ?: return null
             return t.s(
-                "Najszybszy jest preset ${presetName(fastest)}: pakiet 50 B trwa ok. ${t.n(airtimeMs(fastest, 50))} ms, ale kosztem zasięgu i czułości. Preset musi być taki sam u wszystkich w sieci; nasza sieć używa Narrow Fast.",
-                "The fastest is ${presetName(fastest)}: a 50 B packet takes about ${t.n(airtimeMs(fastest, 50))} ms, at the cost of range and sensitivity. The preset must be the same for everyone in the network; ours uses Narrow Fast.",
+                "Najszybszy jest preset ${presetName(
+                    fastest,
+                )}: pakiet 50 B trwa ok. ${t.n(
+                    airtimeMs(fastest, 50),
+                )} ms, ale kosztem zasięgu i czułości. Preset musi być taki sam u wszystkich w sieci; nasza sieć używa Narrow Fast.",
+                "The fastest is ${presetName(
+                    fastest,
+                )}: a 50 B packet takes about ${t.n(
+                    airtimeMs(fastest, 50),
+                )} ms, at the cost of range and sensitivity. The preset must be the same for everyone in the network; ours uses Narrow Fast.",
             )
         }
         if (
@@ -776,9 +948,17 @@ object AssistantCalculators {
         ) {
             val best = COMPARED.maxByOrNull { sensitivityDbm(it) * -1.0 } ?: return null
             return t.s(
-                "Największy zasięg daje najwolniejszy, najczulszy preset: ${presetName(best)} (czułość ok. ${t.n(sensitivityDbm(best))} dBm), kosztem bardzo małej prędkości i długiego zajmowania eteru. Preset musi być taki sam u wszystkich w sieci; w naszej sieci jest to Narrow Fast.\n" +
+                "Największy zasięg daje najwolniejszy, najczulszy preset: ${presetName(
+                    best,
+                )} (czułość ok. ${t.n(
+                    sensitivityDbm(best),
+                )} dBm), kosztem bardzo małej prędkości i długiego zajmowania eteru. Preset musi być taki sam u wszystkich w sieci; w naszej sieci jest to Narrow Fast.\n" +
                     t.presetLine(best),
-                "The longest range comes from the slowest, most sensitive preset: ${presetName(best)} (sensitivity about ${t.n(sensitivityDbm(best))} dBm), at the cost of very low speed and long air time. The preset must be the same for everyone in the network; ours uses Narrow Fast.\n" +
+                "The longest range comes from the slowest, most sensitive preset: ${presetName(
+                    best,
+                )} (sensitivity about ${t.n(
+                    sensitivityDbm(best),
+                )} dBm), at the cost of very low speed and long air time. The preset must be the same for everyone in the network; ours uses Narrow Fast.\n" +
                     t.presetLine(best),
             )
         }
@@ -789,8 +969,9 @@ object AssistantCalculators {
                 q,
                 "czułość|czulosc|sensitiv|różni|rozni|różnic|roznic|differ|co to jest|what is|opisz|describe|przepustow|bitrate|prędkość|predkosc|speed|parametr",
             )
-        )
+        ) {
             return null
+        }
         return named.joinToString("\n") { t.presetLine(it) } +
             t.s(
                 "\nPreset musi być taki sam u wszystkich w sieci; nasza sieć używa Narrow Fast.",
@@ -805,8 +986,9 @@ object AssistantCalculators {
                 q,
                 "zalecan|polec|najlepsz|najlepiej|wybra|dobra[ćc]|dobierz|dobór|tabel|porówn|porown|zestawien|jaki preset|który preset|ktory preset|recommend|best preset|which preset|compare|choose|what preset",
             )
-        )
+        ) {
             return null
+        }
         if (has(q, "zmień|zmien|ustaw |przełącz|przelacz|change|switch|set the")) return null
         val asked = Regex("4\\s*[/:]\\s*([5-8])").find(q)?.groupValues?.get(1)?.toInt()
         val nodes =
@@ -816,7 +998,7 @@ object AssistantCalculators {
             t.s(
                 "Preset musi być taki sam u wszystkich w sieci, bo inaczej radia się nie słyszą. W naszej sieci (region EU_N_868) jest to Narrow Fast i tego nie zmieniaj, o ile nie zakładasz własnej, osobnej sieci. Dla własnej sieci dobór zależy od terenu, liczby urządzeń i tego, co ma przesyłać.",
                 "The preset must be the same for everyone in the network, or the radios do not hear each other. In our network (region EU_N_868) it is Narrow Fast and you should not change it unless you build your own separate network. For your own network the choice depends on the terrain, the number of devices and what it has to carry.",
-            )
+            ),
         )
         defaults.preset?.let {
             sb.append(" ")
@@ -825,9 +1007,13 @@ object AssistantCalculators {
         sb.append("\n\n")
             .append(
                 t.s(
-                    "Porównanie (pakiet ${PRESET_PAYLOAD_BYTES} B, korekcja błędów ${asked?.let { "4/$it" } ?: "własna każdego presetu"}):",
-                    "Comparison (${PRESET_PAYLOAD_BYTES} B packet, error correction ${asked?.let { "4/$it" } ?: "each preset's own"}):",
-                )
+                    "Porównanie (pakiet ${PRESET_PAYLOAD_BYTES} B, korekcja błędów ${asked?.let {
+                        "4/$it"
+                    } ?: "własna każdego presetu"}):",
+                    "Comparison (${PRESET_PAYLOAD_BYTES} B packet, error correction ${asked?.let {
+                        "4/$it"
+                    } ?: "each preset's own"}):",
+                ),
             )
         val rows = COMPARED.map { o -> o to crFor(o, asked) }
         for ((o, cr) in rows) {
@@ -856,15 +1042,19 @@ object AssistantCalculators {
                 .append(
                     if (pick != null) {
                         t.s(
-                            "Dla $nodes urządzeń rozsądny jest ${presetName(pick.first)}: największy zasięg, przy którym ruch jeszcze się mieści z zapasem.",
-                            "For $nodes devices ${presetName(pick.first)} is a sensible pick: the longest range that still leaves room to spare.",
+                            "Dla $nodes urządzeń rozsądny jest ${presetName(
+                                pick.first,
+                            )}: największy zasięg, przy którym ruch jeszcze się mieści z zapasem.",
+                            "For $nodes devices ${presetName(
+                                pick.first,
+                            )} is a sensible pick: the longest range that still leaves room to spare.",
                         )
                     } else {
                         t.s(
                             "Dla $nodes urządzeń w jednej sieci żaden z tych presetów nie ma zapasu: podziel sieć na kanały albo ogranicz ruch (rzadsze pozycje i telemetria).",
                             "For $nodes devices in one network none of these presets has room to spare: split the network into channels or cut the traffic (rarer positions and telemetry).",
                         )
-                    }
+                    },
                 )
         }
         sb.append("\n\n")
@@ -872,14 +1062,14 @@ object AssistantCalculators {
                 t.s(
                     "Jak wybierać: mało urządzeń i długie łącza w otwartym terenie — Long Fast lub wolniejszy (większy zasięg, mała przepustowość). Średnia sieć — Medium Fast. Dużo urządzeń, miasto, krótkie łącza — Short Fast lub Short Slow. Las, wzgórza i zabudowa — wolniejszy preset daje zapas, ale zajmuje eter dłużej. Presety Turbo (500 kHz) są najszybsze, ale potrzebują szerokiego pasma i mają mniejszy zasięg. Lite (125 kHz), Narrow (62,5 kHz) i Tiny (15,6 kHz) są wąskie: mieszczą się w wąskich pasmach, jak nasze 868 MHz, i lepiej radzą sobie z zakłóceniami. Wyższa korekcja błędów (4/6 ... 4/8) ratuje pakiety zakłócone, ale wydłuża pakiet i zmniejsza liczbę urządzeń; zasięgu prawie nie zmienia.",
                     "How to choose: few devices and long links in open country — Long Fast or slower (more range, little capacity). A medium network — Medium Fast. Many devices, a city, short links — Short Fast or Short Slow. Forest, hills and buildings — a slower preset gives margin but uses the air longer. Stronger error correction (4/6 ... 4/8) saves packets that are disturbed, but makes the packet longer and fits fewer devices; it hardly changes the range. The Turbo presets (500 kHz) are the fastest but need a wide band and have less range. Lite (125 kHz), Narrow (62.5 kHz) and Tiny (15.6 kHz) are narrow: they fit narrow bands such as our 868 MHz and cope better with interference.",
-                )
+                ),
             )
         sb.append("\n")
             .append(
                 t.s(
                     "Liczba urządzeń to rząd wielkości (przy ${(USABLE_AIR_SHARE * 100).toInt()} % czasu w eterze i $PACKETS_PER_NODE_15_MIN pakietach na urządzenie co 15 minut, bez przekazywania pakietów dalej; w sieci z przekazywaniem jest mniej).",
                     "The number of devices is an order of magnitude (at ${(USABLE_AIR_SHARE * 100).toInt()} % of the air time and $PACKETS_PER_NODE_15_MIN packets per device every 15 minutes, relaying not counted; a network that relays fits fewer).",
-                )
+                ),
             )
         return sb.toString()
     }
@@ -900,7 +1090,7 @@ object AssistantCalculators {
     /** The coding rate written in a question ("4/6", "CR 6", "coding rate 7", "korekcja 4/8"), or null. */
     private val CR_ASKED =
         Regex(
-            "(?iu)4/([5-8])|(?<![\\p{L}\\d])cr\\s*[:=]?\\s*([5-8])(?!\\d)|coding\\s*rate\\s*[:=]?\\s*(?:4/)?([5-8])|korekcj\\p{L}*(?:\\s+błęd\\p{L}*)?\\s*(?:4/)?([5-8])(?!\\d)"
+            "(?iu)4/([5-8])|(?<![\\p{L}\\d])cr\\s*[:=]?\\s*([5-8])(?!\\d)|coding\\s*rate\\s*[:=]?\\s*(?:4/)?([5-8])|korekcj\\p{L}*(?:\\s+błęd\\p{L}*)?\\s*(?:4/)?([5-8])(?!\\d)",
         )
 
     private fun askedCr(q: String): Int? =
@@ -917,21 +1107,23 @@ object AssistantCalculators {
                 q,
                 "tabel|wszystk\\p{L}* preset|każd\\p{L}* preset|kazd\\p{L}* preset|dla każdego|dla kazdego|all presets|each preset|every preset",
             )
-        )
+        ) {
             return null
+        }
         if (
             !has(
                 q,
                 "czas|airtime|air time|obciążeni|obciazeni|load|nadawani|ile urządzeń|ile urzadzen|korekcj|coding rate|\\bcr\\b",
             )
-        )
+        ) {
             return null
+        }
         val sb =
             StringBuilder(
                 t.s(
                     "Czas nadawania pakietu 50 B i ile urządzeń mieści sieć, dla każdego presetu i korekcji błędów (CR). Pierwsza wartość to ustawienie samego presetu:",
                     "Time on air of a 50 B packet and about how many devices a network fits, for every preset and coding rate (CR). The first value is the preset's own:",
-                )
+                ),
             )
         for (o in COMPARED) {
             sb.append("\n• ").append(presetName(o)).append(": ")
@@ -939,8 +1131,11 @@ object AssistantCalculators {
                 crOptions(o)
                     .sortedBy { if (it == o.codingRate) 0 else it }
                     .joinToString("; ") { c ->
-                        "4/$c ${t.n(airtimeMs(o, PRESET_PAYLOAD_BYTES, c), 0)} ms, ${t.s("ok.", "about")} ${nodesFit(o, c)}"
-                    }
+                        "4/$c ${t.n(
+                            airtimeMs(o, PRESET_PAYLOAD_BYTES, c),
+                            0,
+                        )} ms, ${t.s("ok.", "about")} ${nodesFit(o, c)}"
+                    },
             )
         }
         sb.append("\n")
@@ -948,7 +1143,7 @@ object AssistantCalculators {
                 t.s(
                     "Wyższa korekcja to więcej redundancji: pakiet trwa dłużej, sieć zapełnia się szybciej, ale łącze lepiej znosi zakłócenia. Liczba urządzeń to rząd wielkości (25 % czasu, 4 pakiety na 15 minut na urządzenie, bez przekazywania dalej).",
                     "A higher coding rate means more redundancy: a packet takes longer and the network fills up sooner, but the link copes better with interference. The device count is an order of magnitude (25 % of the air time, 4 packets per 15 minutes per device, relaying not counted).",
-                )
+                ),
             )
         return sb.toString()
     }
@@ -959,8 +1154,9 @@ object AssistantCalculators {
                 q,
                 "czas (?:nadawania|transmisji|w eterze|wysyłania|wysylania)|czasu (?:nadawania|transmisji)|airtime|air time|time on air|w eterze|ile trwa (?:wysłan|wysylan|nadawan|transmisj|pakiet|wiadomo)|jak długo trwa|jak dlugo trwa|duty.?cycle|ile (?:wiadomości|wiadomosci|pakietów|pakietow) (?:mogę|moge|można|mozna|da się|da sie) (?:wysłać|wyslac|nadać|nadac)",
             )
-        )
+        ) {
             return null
+        }
         val (o, named) = preset(q, defaults)
         val askedRate = askedCr(q)
         val cr = crFor(o, askedRate)
@@ -978,7 +1174,7 @@ object AssistantCalculators {
                 t.s(
                     "Czas nadawania dla presetu ${presetName(o)}$presetNote, korekcja 4/$cr:",
                     "Time on air for the ${presetName(o)} preset$presetNote, coding rate 4/$cr:",
-                )
+                ),
             )
         if (askedRate == null && has(q, "obciążeni|obciazeni|load|korekcj|coding rate|\\bcr\\b|zależ|zalez|depend")) {
             sb.setLength(0)
@@ -986,7 +1182,7 @@ object AssistantCalculators {
                 t.s(
                     "Preset ${presetName(o)}$presetNote, pakiet 50 B, w zależności od korekcji błędów (CR):",
                     "Preset ${presetName(o)}$presetNote, a 50 B packet, by coding rate (CR):",
-                )
+                ),
             )
             for (c in crOptions(o)) {
                 sb.append("\n• 4/$c: ")
@@ -1004,15 +1200,18 @@ object AssistantCalculators {
                     t.s(
                         "Wyższa korekcja to więcej redundancji: pakiet trwa dłużej, sieć zapełnia się szybciej, ale łącze lepiej znosi zakłócenia.",
                         "A higher coding rate means more redundancy: a packet takes longer and the network fills up sooner, but the link copes better with interference.",
-                    )
+                    ),
                 )
             return sb.toString()
         }
         for (b in sizes) {
             val ms = airtimeMs(o, b, cr)
             val label =
-                if (bytes != null) t.s("$b B", "$b B")
-                else t.s("wiadomość ${b - OVERHEAD} znaków", "a ${b - OVERHEAD}-character message")
+                if (bytes != null) {
+                    t.s("$b B", "$b B")
+                } else {
+                    t.s("wiadomość ${b - OVERHEAD} znaków", "a ${b - OVERHEAD}-character message")
+                }
             sb.append("\n• ")
                 .append(label)
                 .append(": ")
@@ -1022,7 +1221,7 @@ object AssistantCalculators {
                     t.s(
                         ", przy limicie 10 % czasu ok. ${t.n(360_000 / ms, 0)} takich pakietów na godzinę",
                         ", with the 10 % limit about ${t.n(360_000 / ms, 0)} such packets per hour",
-                    )
+                    ),
                 )
         }
         sb.append("\n")
@@ -1030,7 +1229,7 @@ object AssistantCalculators {
                 t.s(
                     "Każdy węzeł, który przekazuje pakiet dalej, nadaje go jeszcze raz. Do tekstu doliczam ok. $OVERHEAD bajtów nagłówka.",
                     "Every node that relays the packet sends it again. About $OVERHEAD header bytes are added to a text.",
-                )
+                ),
             )
         return sb.toString()
     }

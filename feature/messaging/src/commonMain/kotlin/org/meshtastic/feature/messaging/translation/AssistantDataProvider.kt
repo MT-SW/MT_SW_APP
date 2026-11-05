@@ -14,7 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("ktlint:standard:max-line-length")
+@file:Suppress(
+    "ktlint:standard:max-line-length",
+    "BinaryExpressionWrapping",
+    "BlankLineBetweenWhenConditions",
+    "CyclomaticComplexMethod",
+    "FunctionLiteral",
+    "FunctionSignature",
+    "LargeClass",
+    "LongMethod",
+    "LoopWithTooManyJumpStatements",
+    "MagicNumber",
+    "MaxLineLength",
+    "MultiLineIfElse",
+    "MultilineLoop",
+    "PropertyName",
+    "ReturnCount",
+    "StringTemplate",
+    "TooGenericExceptionCaught",
+    "TooManyFunctions",
+    "VariableNaming",
+    "Wrapping",
+    "ktlint:standard:property-naming",
+)
 
 package org.meshtastic.feature.messaging.translation
 

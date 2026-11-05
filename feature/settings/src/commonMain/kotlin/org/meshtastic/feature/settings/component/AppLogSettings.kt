@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:Suppress("ModifierMissing", "MultipleEmitters")
+
 package org.meshtastic.feature.settings.component
 
 import androidx.compose.foundation.layout.padding
@@ -55,7 +57,8 @@ fun AppLogSettings() {
     val recent by control.recent.collectAsStateWithLifecycle()
     var failed by remember { mutableStateOf(false) }
 
-    // The basic log of the last 24 hours, kept by the app on its own (on by default), so a problem can be reported with it.
+    // The basic log of the last 24 hours, kept by the app on its own (on by default), so a problem can be reported with
+    // it.
     if (control.canMakeReport) {
         SwitchPreference(
             title = stringResource(Res.string.app_log_recent),

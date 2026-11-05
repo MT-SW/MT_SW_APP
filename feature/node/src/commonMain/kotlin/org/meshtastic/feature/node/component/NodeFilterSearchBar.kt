@@ -72,8 +72,8 @@ import org.meshtastic.core.ui.icon.Sort
 import org.meshtastic.core.ui.theme.StatusColors.StatusOnline
 
 /**
- * The node list's search field: an inline [MeshtasticSearchBar] that filters the node list in place, with the sort
- * and filter menu as its trailing action.
+ * The node list's search field: an inline [MeshtasticSearchBar] that filters the node list in place, with the sort and
+ * filter menu as its trailing action.
  *
  * The "showing ignored nodes" banner sits under the collapsed bar rather than inside it: it reports a filter that is
  * already applied to the list below, not a search result.

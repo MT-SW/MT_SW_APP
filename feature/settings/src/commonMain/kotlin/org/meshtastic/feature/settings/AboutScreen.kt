@@ -55,7 +55,6 @@ import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.about
 import org.meshtastic.core.resources.acknowledgements
-import org.meshtastic.core.resources.app_version
 import org.meshtastic.core.resources.apps
 import org.meshtastic.core.resources.copyright_notice
 import org.meshtastic.core.resources.documentation
@@ -79,7 +78,6 @@ import org.meshtastic.core.ui.icon.Code
 import org.meshtastic.core.ui.icon.HelpOutline
 import org.meshtastic.core.ui.icon.Info
 import org.meshtastic.core.ui.icon.Language
-import org.meshtastic.core.ui.icon.Memory
 import org.meshtastic.core.ui.icon.MeshtasticIcons
 import org.meshtastic.core.ui.icon.Notes
 import org.meshtastic.core.ui.theme.AppTheme

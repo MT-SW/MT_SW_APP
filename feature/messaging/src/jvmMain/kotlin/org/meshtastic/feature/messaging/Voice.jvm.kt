@@ -14,7 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:Suppress("ktlint:standard:max-line-length")
+@file:Suppress(
+    "ktlint:standard:max-line-length",
+    "BlankLineBetweenWhenConditions",
+    "MagicNumber",
+    "MaxLineLength",
+    "TooGenericExceptionCaught",
+)
 
 package org.meshtastic.feature.messaging
 
@@ -38,6 +44,7 @@ private class DesktopSpeaker : Speaker {
         val command =
             when {
                 "mac" in os -> listOf("say")
+
                 "win" in os ->
                     listOf(
                         "powershell",
@@ -46,6 +53,7 @@ private class DesktopSpeaker : Speaker {
                         "[Console]::InputEncoding = [System.Text.Encoding]::UTF8; Add-Type -AssemblyName System.Speech; " +
                             "(New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak([Console]::In.ReadToEnd())",
                     )
+
                 else -> listOf("espeak-ng", "--stdin")
             }
         Thread {
