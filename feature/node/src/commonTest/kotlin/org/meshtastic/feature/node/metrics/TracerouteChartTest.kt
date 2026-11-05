@@ -187,9 +187,8 @@ class TracerouteChartTest {
         val point = resolveTraceroutePoints(requests, results).first()
 
         assertEquals(0, point.forwardHops)
-        // route_back with empty intermediateRouteBack: snr_back will be empty,
-        // so fullRouteDiscovery won't wrap it → raw route_back is empty → returnHops = null
-        assertNull(point.returnHops)
+        // The fork wraps both directions with the endpoints, so an empty return route is a direct one: 0 hops.
+        assertEquals(0, point.returnHops)
     }
 
     @Test
@@ -354,9 +353,9 @@ class TracerouteChartTest {
     }
 
     @Test
-    fun emptyRouteBack_yieldsNullReturnHops() {
+    fun emptyRouteBack_yieldsZeroReturnHops() {
         val requests = listOf(makeRequest(id = 1, receivedDateMillis = 1000L * MS_PER_SEC))
-        // 1 intermediate hop forward, but null route_back → no return path data
+        // 1 intermediate hop forward, null route_back → the return path is only the two endpoints
         val results =
             listOf(
                 makeResult(
@@ -370,7 +369,7 @@ class TracerouteChartTest {
         val point = resolveTraceroutePoints(requests, results).first()
 
         assertEquals(1, point.forwardHops)
-        assertNull(point.returnHops)
+        assertEquals(0, point.returnHops)
     }
 
     @Test
