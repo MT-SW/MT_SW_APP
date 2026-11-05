@@ -120,14 +120,13 @@ fun RouteDiscovery.withLikelyLastRelay(relayNode: Int, nodes: Collection<Node>, 
     }
     val node =
         nodes
-            .filter {
+            .singleOrNull {
                 it.num != ourNodeNum &&
                     it.lastHeard != 0 &&
                     (it.num and RELAY_BYTE_MASK) == (relayNode and RELAY_BYTE_MASK) &&
                     it.num !in back &&
                     it.num !in route
-            }
-            .singleOrNull() ?: return LikelyRelay(this, null)
+            } ?: return LikelyRelay(this, null)
     val shown =
         newBuilder()
             .also { wb -> wb.route_back = back.mapIndexed { i, num -> if (i == lastRelayIndex) node.num else num } }
