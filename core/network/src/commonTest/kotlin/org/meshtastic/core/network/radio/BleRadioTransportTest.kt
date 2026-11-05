@@ -76,6 +76,8 @@ class BleRadioTransportTest {
 
     @BeforeTest
     fun setup() {
+        // The failure counts are kept per address for the whole process, so one test would count into the next.
+        runTest { PersistentReconnectFailures.clearAll() }
         bluetoothRepository.setHasPermissions(true)
         bluetoothRepository.setBluetoothEnabled(true)
     }

@@ -68,5 +68,10 @@ internal object PersistentReconnectFailures {
         }
     }
 
+    /** Forgets every recorded streak. Only tests use it: the counts live as long as the process, so they would leak. */
+    suspend fun clearAll() {
+        mutex.withLock { entries.clear() }
+    }
+
     private val STALE_AFTER = 30.minutes
 }
