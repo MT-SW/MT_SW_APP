@@ -27,6 +27,14 @@ interface BluetoothRepository {
     val isSupported: Boolean
         get() = true
 
+    /**
+     * True where the system keeps a connection request to a known device pending without a time limit and finishes it
+     * by itself, also while the app is in the background (iPhone and iPad). The transport then waits on such a request
+     * instead of giving up after a short timeout and scanning again.
+     */
+    val supportsPendingConnect: Boolean
+        get() = false
+
     /** Refreshes the Bluetooth state. */
     fun refreshState()
 

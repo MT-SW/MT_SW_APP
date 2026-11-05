@@ -48,6 +48,7 @@ import org.meshtastic.core.ble.BleConnectionFactory
 import org.meshtastic.core.ble.BleConnectionState
 import org.meshtastic.core.ble.BleDevice
 import org.meshtastic.core.ble.BleScanner
+import org.meshtastic.core.ble.MeshtasticBleDevice
 import org.meshtastic.core.ble.BleWriteType
 import org.meshtastic.core.ble.BluetoothRepository
 import org.meshtastic.core.ble.DisconnectReason
@@ -66,9 +67,13 @@ import org.meshtastic.core.repository.RadioTransport
 import org.meshtastic.core.repository.RadioTransportCallback
 import kotlin.concurrent.Volatile
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 private val CONNECTION_TIMEOUT = 15.seconds
+
+// How long one connection request may stay pending where the system finishes it by itself (iPhone, iPad).
+private val PENDING_CONNECT_TIMEOUT = 30.minutes
 
 /** ATT MTU requested on every connect. Android defaults to 23 bytes; Meshtastic packets can be 512. */
 private const val MTU_SIZE = 512
@@ -393,7 +398,12 @@ class BleRadioTransport(
 
         bondDeviceBeforeConnect(device)
 
-        val state = bleConnection.connectAndAwait(device, CONNECTION_TIMEOUT)
+        // A pending request (iPhone/iPad, no advertisement seen) may wait long: the system finishes it in the
+        // background the moment the radio is in range again.
+        val waitsPending =
+            bluetoothRepository.supportsPendingConnect && (device as? MeshtasticBleDevice)?.advertisement == null
+        val state =
+            bleConnection.connectAndAwait(device, if (waitsPending) PENDING_CONNECT_TIMEOUT else CONNECTION_TIMEOUT)
 
         if (state !is BleConnectionState.Connected) {
             throw RadioNotConnectedException("Failed to connect to device at address ${address.anonymize()}")

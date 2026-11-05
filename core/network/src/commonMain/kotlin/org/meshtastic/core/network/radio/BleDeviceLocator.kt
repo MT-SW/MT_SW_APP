@@ -26,6 +26,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import org.meshtastic.core.ble.BleDevice
 import org.meshtastic.core.ble.BleScanner
 import org.meshtastic.core.ble.BluetoothRepository
+import org.meshtastic.core.ble.MeshtasticBleDevice
 import org.meshtastic.core.ble.MeshtasticBleConstants.SERVICE_UUID
 import org.meshtastic.core.model.RadioNotConnectedException
 import org.meshtastic.core.model.util.anonymize
@@ -85,6 +86,17 @@ internal class BleDeviceLocator(
                     "falling back to bonded handle for bounded autoConnect"
             }
             return bondedDevice
+        }
+
+        // iPhone and iPad: one quick scan while the screen is on, otherwise a connection request to the remembered
+        // device. The system keeps that request pending (also in the background) and finishes it as soon as the radio
+        // is back in range, so the link comes back by itself, e.g. after a night.
+        if (bluetoothRepository.supportsPendingConnect) {
+            scanForFreshDevice(SCAN_TIMEOUT)?.let {
+                return it
+            }
+            Logger.i { "[${address.anonymize()}] No advertisement; waiting on a pending connection request" }
+            return MeshtasticBleDevice(address)
         }
 
         // Non-bonded path: preserve existing retry behavior (SCAN_RETRY_COUNT attempts at SCAN_TIMEOUT).

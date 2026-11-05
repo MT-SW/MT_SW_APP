@@ -75,9 +75,9 @@ import org.meshtastic.core.resources.traceroute_forward_hops
 import org.meshtastic.core.resources.traceroute_hops
 import org.meshtastic.core.resources.traceroute_log
 import org.meshtastic.core.resources.traceroute_no_response
+import org.meshtastic.core.resources.traceroute_probably_hop
 import org.meshtastic.core.resources.traceroute_received_automatically
 import org.meshtastic.core.resources.traceroute_requested_manually
-import org.meshtastic.core.resources.traceroute_probably_hop
 import org.meshtastic.core.resources.traceroute_return_hops
 import org.meshtastic.core.resources.traceroute_round_trip
 import org.meshtastic.core.resources.traceroute_route_back_to_us

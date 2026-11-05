@@ -54,6 +54,7 @@ class TracerouteHandlerImplTest {
     private val serviceRepository = FakeServiceRepository()
     private val meshLogRepository = FakeMeshLogRepository()
     private val snapshotRepository = FakeTracerouteSnapshotRepository()
+
     // Sniffer guard of the fork: only responses addressed to our own node count, so the test node must be known.
     private val nodeRepository =
         FakeNodeRepository().apply { setMyNodeInfo(TestDataFactory.createMyNodeInfo(myNodeNum = LOCAL)) }

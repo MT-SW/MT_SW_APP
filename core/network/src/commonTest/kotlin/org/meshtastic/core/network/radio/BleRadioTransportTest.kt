@@ -778,7 +778,11 @@ class BleRadioTransportTest {
         try {
             // First streak: threshold failures, then the next attempt connects and refreshes the cache at ~t = 216 s.
             advanceTimeBy(240_000)
-            assertEquals(1, connection.reactiveInvalidateServiceCacheCalls, "the first streak must refresh the cache once")
+            assertEquals(
+                1,
+                connection.reactiveInvalidateServiceCacheCalls,
+                "the first streak must refresh the cache once",
+            )
 
             // End the streak with a disconnect the policy treats as non-failing, then arm a second streak behind it.
             connection.failNextN = GattCacheInvalidationGate.DEFAULT_FAILURE_THRESHOLD
@@ -822,7 +826,11 @@ class BleRadioTransportTest {
         bleTransport.start()
         try {
             advanceTimeBy(20_000)
-            assertEquals(1, connection.reactiveInvalidateServiceCacheCalls, "the post-OTA flag must refresh the cache once")
+            assertEquals(
+                1,
+                connection.reactiveInvalidateServiceCacheCalls,
+                "the post-OTA flag must refresh the cache once",
+            )
 
             // An unstable (non-intentional, sub-minStableConnection) disconnect starts a streak, so the gate is never
             // re-armed between the post-OTA refresh and the stale-cache refresh under test.

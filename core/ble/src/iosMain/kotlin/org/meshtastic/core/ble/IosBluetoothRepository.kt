@@ -31,6 +31,9 @@ class IosBluetoothRepository : BluetoothRepository {
     private val _state = MutableStateFlow(BluetoothState(hasPermissions = true, enabled = true))
     override val state: StateFlow<BluetoothState> = _state
 
+    // CoreBluetooth keeps a connection request pending and finishes it in the background (bluetooth-central mode).
+    override val supportsPendingConnect: Boolean = true
+
     override fun refreshState() {}
 
     override fun isValid(bleAddress: String): Boolean = bleAddress.isNotEmpty()
