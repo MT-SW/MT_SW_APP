@@ -143,9 +143,9 @@ class AssistantViewModel(
     }
 
     /**
-     * The test: a longer question, then the hardware report (once more on the graphics card after a clean NPU
-     * run), then the dictation check when it was agreed to. The conversation is saved like any other and all the
-     * results are collected into files for the report window.
+     * The test: a longer question, then the hardware report (once more on the graphics card after a clean NPU run),
+     * then the dictation check when it was agreed to. The conversation is saved like any other and all the results are
+     * collected into files for the report window.
      */
     fun startCompat(withDictation: Boolean) {
         if (_state.value.busy || _compat.value is CompatUi.Running) return

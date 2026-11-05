@@ -132,7 +132,7 @@ fun CompatTestDialogs(compat: CompatUi, viewModel: AssistantViewModel) {
                 },
             )
 
-        is CompatUi.Running -> CompatRunningDialog(compat, viewModel)
+        is CompatUi.Running -> CompatRunningDialog(compat, onCancel = { viewModel.cancelCompat() })
 
         is CompatUi.Done ->
             ReportIssuesDialog(
@@ -179,7 +179,7 @@ private fun CompatTips() {
 }
 
 @Composable
-private fun CompatRunningDialog(compat: CompatUi.Running, viewModel: AssistantViewModel) {
+private fun CompatRunningDialog(compat: CompatUi.Running, onCancel: () -> Unit) {
     AlertDialog(
         onDismissRequest = {},
         title = { Text(stringResource(Res.string.compat_running_title)) },
@@ -203,7 +203,7 @@ private fun CompatRunningDialog(compat: CompatUi.Running, viewModel: AssistantVi
         // The window cannot be closed by accident; the only way out is to stop the test.
         confirmButton = {},
         dismissButton = {
-            TextButton(onClick = { viewModel.cancelCompat() }) {
+            TextButton(onClick = onCancel) {
                 Text(stringResource(Res.string.compat_cancel))
             }
         },
