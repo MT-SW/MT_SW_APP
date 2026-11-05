@@ -1,0 +1,22 @@
+MT_SW_APP — zmodyfikowana wersja aplikacji Meshtastic® / modified version of the Meshtastic® app
+==============================================================================================
+
+PL
+Ten program jest oprogramowaniem wolnym na licencji GNU GPL v3 (plik LICENSE). Jest to zmodyfikowana wersja
+aplikacji Meshtastic (https://github.com/meshtastic/Meshtastic-Android), pierwotnie
+Copyright (c) Meshtastic LLC i współtwórców. Zmiany wprowadzone w tym forku wykonali współtwórcy MT_SW.
+Nagłówki w plikach źródłowych wskazują „Meshtastic LLC” zgodnie z szablonem oryginału; autorstwo zmian
+i nowych plików tego forka jest udokumentowane w historii git i w pliku CHANGELOG.md. Wszystkie zmiany
+i nowe pliki tego forka są udostępnione na tej samej licencji GPL v3 (lub nowszej).
+Meshtastic® jest zastrzeżonym znakiem towarowym Meshtastic LLC. Projekt nie jest związany z Meshtastic LLC.
+Biblioteki i modele zewnętrzne oraz ich licencje: ekran „O aplikacji” → „Źródła funkcji” / „Podziękowania”.
+
+EN
+This program is free software under the GNU GPL v3 (see LICENSE). It is a modified version of the
+Meshtastic app (https://github.com/meshtastic/Meshtastic-Android), originally
+Copyright (c) Meshtastic LLC and contributors. Changes in this fork were made by the MT_SW contributors.
+Source file headers name "Meshtastic LLC" following the upstream template; authorship of this fork's
+changes and new files is recorded in the git history and in CHANGELOG.md. All changes and new files of this
+fork are released under the same GPL v3 (or later).
+Meshtastic® is a registered trademark of Meshtastic LLC. This project is not affiliated with Meshtastic LLC.
+Third-party libraries and models and their licences: "About" screen → "Feature sources" / "Acknowledgements".
