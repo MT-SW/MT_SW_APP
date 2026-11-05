@@ -17,6 +17,7 @@ Ten plik opisuje wyłącznie zmiany wprowadzone w aplikacji MT_SW_APP **względe
 Wpisy niżej opisują wyłącznie to, co ten fork dokłada do oryginału, od początku (27 lipca 2026) do dziś, w kolejności chronologicznej. Opis funkcji: [README.md](README.md).
 
 ### Listopad 2026
+* Historia tras (traceroute): każdy wpis ma opis, czy trasa została zlecona ręcznie, czy odebrana automatycznie. W trybie sniffer odpowiedzi adresowane do innych węzłów też zapisują się jako zaobserwowane (bez alarmu); alarm powstaje tylko dla naszych własnych zleceń.
 * Tablet i komputer: boczny pasek z przyciskami (Wiadomości, Węzły, Ustawienia, Połącz i inne) ma przyciski na dole ekranu, a nowa funkcja dochodzi nad nimi. Na iPadzie pasek nie zachodzi już na zegar i baterię u góry.
 * Wysyłanie zdjęć w czacie: gdy główny serwer (catbox.moe) odmawia przyjęcia plików (błąd „412 uploads paused”), aplikacja sama próbuje zapasowych serwisów (litterbox.catbox.moe, potem uguu.se). Zdjęcia z zapasowych serwisów wiszą krócej (72 godziny lub kilka godzin).
 * Nowa pozycja „Wesprzyj projekt” w „Funkcje MT_SW” i w „O aplikacji”: otwiera w przeglądarce stronę dewelopera (Ko-fi) z dobrowolnym wsparciem utrzymania i rozwoju aplikacji. Jest też w wyszukiwarce ustawień i w wiedzy asystenta.
@@ -547,6 +548,7 @@ This file lists only the changes made in MT_SW_APP **compared to the original ap
 The entries below describe only what this fork adds on top of the original, from the very start (27 July 2026) to today, in chronological order. Feature details: [README.md](README.md).
 
 ### November 2026
+* Traceroute history: every entry says whether the trace was requested manually or received automatically. In sniffer mode, responses addressed to other nodes are also recorded as observed (with no alert); an alert is raised only for our own requests.
 * Tablet and desktop: the side bar with the buttons (Messages, Nodes, Settings, Connect and others) keeps its buttons at the bottom of the screen, and a new function is added above them. On the iPad the bar no longer overlaps the clock and battery at the top.
 * Sending chat pictures: when the main host (catbox.moe) refuses files (the "412 uploads paused" error), the app tries the backup hosts on its own (litterbox.catbox.moe, then uguu.se). Pictures on the backup hosts stay for a shorter time (72 hours or a few hours).
 * New "Support the project" entry in "MT_SW features" and in "About": opens the developer's page (Ko-fi) in the browser for voluntary support of the maintenance and development of the app. It is also in the settings search and in the assistant's knowledge.
