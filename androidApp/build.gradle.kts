@@ -29,9 +29,7 @@ val versionInfo = resolveVersionInfo()
 // The release name the installer shows: the same `v4(2.8.4).test.1` as the About screen and GitHub, built from the two
 // numbers kept in MtswRelease.kt and the three-part version of the build.
 val mtswReleaseFile =
-    layout.projectDirectory.file(
-        "../core/model/src/commonMain/kotlin/org/meshtastic/core/model/MtswRelease.kt",
-    )
+    layout.projectDirectory.file("../core/model/src/commonMain/kotlin/org/meshtastic/core/model/MtswRelease.kt")
 val mtswVersionName: String =
     providers
         .fileContents(mtswReleaseFile)
