@@ -114,7 +114,7 @@ class AiTranslationRouter(
     // endregion
 
     private fun activeModel(): AiModelInfo =
-        AiModels.byId(activeId(store.states.value, uiPrefs.translatorModelId.value)) ?: AiModels.Nllb600
+        AiModels.byId(activeId(store.states.value, uiPrefs.translatorModelId.value)) ?: AiModels.G4E2b
 
     /** The chosen model; if it is not on the device but another translator model is, that one is used instead. */
     private fun activeId(states: Map<String, TranslatorModelState>, selected: String): String {
@@ -124,7 +124,7 @@ class AiTranslationRouter(
             AiModels.all.firstOrNull {
                 it.canDo(AiRole.TRANSLATOR) && it.engineReady && states[it.id] == TranslatorModelState.Ready
             }
-        return (other ?: chosen ?: AiModels.Nllb600).id
+        return (other ?: chosen ?: AiModels.G4E2b).id
     }
 
     private companion object {

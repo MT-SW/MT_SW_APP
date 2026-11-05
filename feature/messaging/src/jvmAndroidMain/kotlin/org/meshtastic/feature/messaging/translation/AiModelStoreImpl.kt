@@ -140,6 +140,8 @@ class AiModelStoreImpl(
     init {
         scope.launch(Dispatchers.IO) {
             cleanLegacyOnce()
+            // The NLLB-200 model (CC BY-NC) was removed from the app: delete what an older version downloaded.
+            runCatching { nllb.deleteModel() }
             cleanRetiredModels()
             cleanReplacedFiles()
         }

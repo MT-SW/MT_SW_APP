@@ -354,7 +354,7 @@ class LlamaAssistantService(
         val chosen = AiModels.byId(uiPrefs.translatorModelId.value)?.takeIf { it.canDo(AiRole.TRANSLATOR) && states[it.id] == TranslatorModelState.Ready }
         return chosen?.id
             ?: AiModels.all.firstOrNull { it.canDo(AiRole.TRANSLATOR) && it.engineReady && states[it.id] == TranslatorModelState.Ready }?.id
-            ?: AiModels.NLLB_600M_ID
+            ?: AiModels.G4_E2B
     }
 
     /** The model the translator test uses: the chosen translator model when it is a language model, else the assistant's. */

@@ -49,7 +49,6 @@ enum class AiPlatform {
 /** The licence a model is distributed under; the model list shows its name and a link to the model's page. */
 enum class AiLicense(val label: String) {
     /** NLLB-200 (Meta): Creative Commons BY-NC 4.0, non-commercial use only. */
-    CC_BY_NC_4_0("CC BY-NC 4.0"),
 
     /** Apache License 2.0 (Gemma 4, Qwen 3.5, Bielik). */
     APACHE_2_0("Apache 2.0"),
@@ -138,6 +137,7 @@ data class AiModelInfo(
 
 /** The list of models offered by the app (light to strong, grouped in families). */
 object AiModels {
+    /** Removed: the model is licensed CC BY-NC (non-commercial), which does not fit a GPL-3.0 project. Kept only to clean up. */
     const val NLLB_600M_ID = "nllb-600m"
 
     // The ids differ from those of the old engine (gemma4-e2b, ...) so old and new can never be mixed up.
@@ -200,25 +200,6 @@ object AiModels {
 
     private fun hf(repo: String, name: String, mb: Int, kind: AiFileKind = AiFileKind.MODEL) =
         AiModelFile("$HF$repo/resolve/main/$name", name, mb, kind)
-
-    /** Light: translation only, runs on phones from 4 GB of RAM. Its files are handled by the NLLB engine itself. */
-    val Nllb600 =
-        AiModelInfo(
-            id = NLLB_600M_ID,
-            name = "NLLB-200 600M",
-            family = OTHER_FAMILY,
-            engine = AiEngine.NLLB_ONNX,
-            roles = setOf(AiRole.TRANSLATOR),
-            sizeMb = 870,
-            ramMb = 2300,
-            minDeviceRamGb = 4,
-            license = AiLicense.CC_BY_NC_4_0,
-            files = emptyList(),
-            platforms = BOTH,
-            descriptionPl = "Lekki tłumacz (200 języków), działa na procesorze, także na starszych telefonach. Tylko tłumaczenie.",
-            descriptionEn = "Light translator (200 languages), runs on the processor, also on older phones. Translation only.",
-            pageUrl = "${HF}facebook/nllb-200-distilled-600M",
-        )
 
     // ---- GGUF models run by llama.cpp (computer and phone) ----
 
@@ -797,7 +778,6 @@ object AiModels {
     /** Every model the app knows, for every platform. */
     val all: List<AiModelInfo> =
         listOf(
-            Nllb600,
             G4E2b, G4E4b, G4_12b, G4_26b,
             Qwen08b, Qwen2b, Qwen4b, Qwen9b, QwenMoe, Qwen27b,
             Bielik15b, Bielik45b, Bielik7b, Bielik11b,
