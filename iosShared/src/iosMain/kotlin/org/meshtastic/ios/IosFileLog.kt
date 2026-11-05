@@ -31,10 +31,12 @@ import platform.Foundation.NSDate
 import platform.Foundation.NSDateFormatter
 import platform.Foundation.NSLocale
 import platform.Foundation.NSLock
+import platform.Foundation.NSProcessInfo
 import platform.Foundation.NSThread
 import platform.Foundation.timeIntervalSince1970
 import platform.UIKit.UIDevice
 import kotlin.experimental.ExperimentalNativeApi
+import kotlin.native.Platform
 import kotlin.native.setUnhandledExceptionHook
 
 /**
@@ -56,6 +58,8 @@ internal object IosFileLog : LogWriter() {
     private const val MAX_CRASH_FILES = 20
     private const val PART_NUMBER_WIDTH = 3
     private const val MILLIS = 1000.0
+    private const val MILLIS_PER_SECOND = 1000L
+    private const val BYTES_IN_MB = 1024UL * 1024UL
     private const val CONF_NAME = "logging.conf"
     private const val RECENT_OFF = "recent=off"
 
@@ -67,6 +71,7 @@ internal object IosFileLog : LogWriter() {
     private var open = false
     private var currentName = ""
     private var session = ""
+    private var startedAt = 0L
 
     private val levelFlow = MutableStateFlow(AppLogLevel.OFF)
     val level: StateFlow<AppLogLevel>
@@ -109,14 +114,19 @@ internal object IosFileLog : LogWriter() {
                 if (FileSystem.SYSTEM.exists(legacy)) FileSystem.SYSTEM.delete(legacy)
             }
             session = format("yyyyMMdd-HHmmss")
+            startedAt = nowMillis()
             val conf = runCatching { FileSystem.SYSTEM.read(dir / CONF_NAME) { readUtf8() }.lines() }.getOrNull()
             levelFlow.value = AppLogLevel.fromKey(conf?.firstOrNull())
             recentFlow.value = conf?.getOrNull(1)?.trim() != RECENT_OFF
             pruneRecent()
         }
+        applySeverity()
         Logger.addLogWriter(this)
         @OptIn(ExperimentalNativeApi::class)
-        setUnhandledExceptionHook { error -> writeCrash(error.stackTraceToString()) }
+        setUnhandledExceptionHook { error ->
+            runCatching { Logger.e(error, tag = "Log") { "Uncaught exception in thread ${threadName()}" } }
+            writeCrash(error.stackTraceToString())
+        }
     }
 
     fun setLevel(level: AppLogLevel) {
@@ -124,6 +134,7 @@ internal object IosFileLog : LogWriter() {
         levelFlow.value = level
         saveConf()
         if (effectiveLevel() == AppLogLevel.OFF) closeCurrent()
+        applySeverity()
         if (before != level) Logger.i(tag = "Log") { "Log level: ${before.key} -> ${level.key}" }
     }
 
@@ -132,7 +143,19 @@ internal object IosFileLog : LogWriter() {
         recentFlow.value = on
         saveConf()
         if (effectiveLevel() == AppLogLevel.OFF) closeCurrent()
+        applySeverity()
         Logger.i(tag = "Log") { "Automatic log of the last day: ${if (on) "on" else "off"}" }
+    }
+
+    /**
+     * Kermit's lowest severity, as on Android: what the build normally keeps (Debug in a debug build, Info otherwise),
+     * or lower while the full log is on, so the per-packet messages are not even built when nobody reads them.
+     */
+    @OptIn(ExperimentalNativeApi::class)
+    private fun applySeverity() {
+        val base = if (Platform.isDebugBinary) Severity.Debug else Severity.Info
+        val chosen = levelFlow.value.severity
+        Logger.setMinSeverity(if (chosen != null && chosen < base) chosen else base)
     }
 
     private fun saveConf() {
@@ -209,7 +232,8 @@ internal object IosFileLog : LogWriter() {
 
     fun modified(path: Path): Long = FileSystem.SYSTEM.metadataOrNull(path)?.lastModifiedAtMillis ?: 0L
 
-    private fun pruneRecent() {
+    /** Drops the parts older than a day while only the automatic log runs; also called every few minutes. */
+    fun pruneRecent() {
         if (levelFlow.value != AppLogLevel.OFF) return
         val cutoff = nowMillis() - RECENT_WINDOW_MS
         val all = parts()
@@ -239,7 +263,12 @@ internal object IosFileLog : LogWriter() {
         runCatching {
             FileSystem.SYSTEM.createDirectories(crashDir)
             val name = "crash_" + format("yyyyMMdd-HHmmss") + ".txt"
-            FileSystem.SYSTEM.write(crashDir / name) { writeUtf8("${stamp()} ${header()}\n$trace\n") }
+            FileSystem.SYSTEM.write(crashDir / name) { writeUtf8(
+                    "Crash at ${stamp()}, ${(nowMillis() - startedAt) / MILLIS_PER_SECOND} s after start\n" +
+                        header() +
+                        "\nThread: ${threadName()}\n" +
+                        "Memory: device ${NSProcessInfo.processInfo.physicalMemory / BYTES_IN_MB} MB\n\n$trace\n",
+                ) }
             crashFiles().dropLast(MAX_CRASH_FILES).forEach { runCatching { FileSystem.SYSTEM.delete(it) } }
         }
     }

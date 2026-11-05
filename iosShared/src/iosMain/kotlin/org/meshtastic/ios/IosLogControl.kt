@@ -55,6 +55,7 @@ import platform.UIKit.UIApplicationWillEnterForegroundNotification
 import platform.UIKit.UIApplicationWillResignActiveNotification
 import platform.UIKit.UIApplicationWillTerminateNotification
 import platform.UIKit.UIDevice
+import platform.UIKit.UIDeviceOrientationDidChangeNotification
 import platform.UIKit.UIDocumentPickerDelegateProtocol
 import platform.UIKit.UIDocumentPickerViewController
 import platform.UIKit.UIViewController
@@ -80,6 +81,7 @@ internal object IosLogControl : AppLogControl {
     private const val LIFECYCLE = "AppLifecycle"
     private const val SAMPLE_EVERY_MS = 30_000L
     private const val PERCENT = 100
+    private const val MILLIS_PER_SECOND = 1000L
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val folderName = MutableStateFlow<String?>(null)
@@ -121,6 +123,7 @@ internal object IosLogControl : AppLogControl {
             runCatching { FileSystem.SYSTEM.read(namePath) { readUtf8() } }.getOrNull()?.ifBlank { null }
         scope.launch {
             while (true) {
+                runCatching { IosFileLog.pruneRecent() }
                 exportNow()
                 delay(AUTO_EXPORT_EVERY_MS)
             }
@@ -145,14 +148,21 @@ internal object IosLogControl : AppLogControl {
         }
         Logger.i(tag = LIFECYCLE) { "App start: ${IosFileLog.header()}; log level ${IosFileLog.level.value.key}" }
         UIDevice.currentDevice.batteryMonitoringEnabled = true
+        UIDevice.currentDevice.beginGeneratingDeviceOrientationNotifications()
+        observe(UIDeviceOrientationDidChangeNotification) {
+            Logger.d(tag = LIFECYCLE) { "Configuration changed: orientation ${UIDevice.currentDevice.orientation}" }
+        }
+        val begin = IosFileLog.nowMillis()
         scope.launch {
             while (true) {
                 delay(SAMPLE_EVERY_MS)
                 val device = UIDevice.currentDevice
                 val info = NSProcessInfo.processInfo
-                Logger.d(tag = LIFECYCLE) {
-                    "Sample: battery ${(device.batteryLevel * PERCENT).toInt()}%, thermal state " +
-                        "${info.thermalState}, low power mode ${info.lowPowerModeEnabled}"
+                Logger.d(tag = "Resources") {
+                    val up = (IosFileLog.nowMillis() - begin) / MILLIS_PER_SECOND
+                    "cpus ${info.activeProcessorCount}, up $up s, " +
+                        "battery ${(device.batteryLevel * PERCENT).toInt()}%, thermal state ${info.thermalState}, " +
+                        "low power mode ${info.lowPowerModeEnabled}"
                 }
             }
         }
@@ -226,12 +236,21 @@ internal object IosLogControl : AppLogControl {
         } finally {
             if (opened) url.stopAccessingSecurityScopedResource()
         }
+        runCatching { FileSystem.SYSTEM.delete((iosDataDir() + "/logs/last_export.txt").toPath()) }
         exportNow()
     }
 
     /** Writes a fresh zip of the logs of the last 24 hours into the chosen folder; does nothing without one. */
     fun exportNow() {
         runCatching {
+            // As on Android: only while the full log is on or a crash was recorded, and only when something is new.
+            val wanted = IosFileLog.level.value != AppLogLevel.OFF || IosFileLog.crashFiles().isNotEmpty()
+            if (!wanted) return
+            val files = IosFileLog.parts() + IosFileLog.crashFiles()
+            val fingerprint = "${files.size}:${files.maxOfOrNull { IosFileLog.modified(it) } ?: 0L}:" +
+                "${files.sumOf { IosFileLog.size(it) }}"
+            val marker = (iosDataDir() + "/logs/last_export.txt").toPath()
+            if (runCatching { FileSystem.SYSTEM.read(marker) { readUtf8() } }.getOrNull() == fingerprint) return
             val data = NSData.dataWithContentsOfFile(bookmarkPath) ?: return
             val url = NSURL.URLByResolvingBookmarkData(data, 0uL, null, null, null) ?: return
             val opened = url.startAccessingSecurityScopedResource()
@@ -240,6 +259,7 @@ internal object IosLogControl : AppLogControl {
                 val target = folder.toPath() / AUTO_NAME
                 val bytes = zip(reportEntries("", true, emptyList()))
                 FileSystem.SYSTEM.write(target) { write(bytes) }
+                FileSystem.SYSTEM.write(marker) { writeUtf8(fingerprint) }
             } finally {
                 if (opened) url.stopAccessingSecurityScopedResource()
             }
