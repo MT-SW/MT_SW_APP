@@ -28,6 +28,7 @@ import dev.mokkery.verify
 import dev.mokkery.verify.VerifyMode.Companion.exactly
 import dev.mokkery.verifySuspend
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -75,6 +76,7 @@ class CommandSenderImplTest {
     private val neighborInfoHandler = mock<NeighborInfoHandler>(MockMode.autofill)
     private val sessionManager = mock<SessionManager>(MockMode.autofill)
     private val adminRequestRegistry = AdminRequestRegistryImpl()
+    private val meshLogRepository = FakeMeshLogRepository()
 
     private lateinit var commandSender: CommandSenderImpl
 
@@ -94,7 +96,7 @@ class CommandSenderImplTest {
                 tracerouteHandler = tracerouteHandler,
                 neighborInfoHandler = neighborInfoHandler,
                 sessionManager = sessionManager,
-                meshLogRepository = FakeMeshLogRepository(),
+                meshLogRepository = meshLogRepository,
                 adminRequestRegistry = adminRequestRegistry,
                 scope = TestScope().asServiceScope(),
             )
@@ -145,7 +147,7 @@ class CommandSenderImplTest {
                 tracerouteHandler = tracerouteHandler,
                 neighborInfoHandler = neighborInfoHandler,
                 sessionManager = sessionManager,
-                meshLogRepository = FakeMeshLogRepository(),
+                meshLogRepository = meshLogRepository,
                 adminRequestRegistry = adminRequestRegistry,
                 scope = TestScope().asServiceScope(),
             )
@@ -452,6 +454,7 @@ class CommandSenderImplTest {
         verify { neighborInfoHandler.recordStartTime(generatedId) }
     }
 
+    // Asking our own node never goes over the air: the request and its answer are written straight to the log.
     @Test
     fun requestNeighborInfo_localNode_usesCachedNeighborInfo() = runTest {
         val cached =
@@ -462,34 +465,40 @@ class CommandSenderImplTest {
                 }
                 .build()
         every { neighborInfoHandler.lastNeighborInfo } returns cached
-        everySuspend { packetHandler.sendToRadio(any<MeshPacket>()) } returns true
+        val handled = mutableListOf<MeshPacket>()
+        every { neighborInfoHandler.handleNeighborInfo(capture(handled)) } returns Unit
 
         commandSender.requestNeighborInfo(requestId = 1, destNum = MY_NODE_NUM)
 
-        verifySuspend { packetHandler.sendToRadio(any<MeshPacket>()) }
-        verify { neighborInfoHandler.recordStartTime(1) }
+        verifySuspend(exactly(0)) { packetHandler.sendToRadio(any<MeshPacket>()) }
+        val sent = NeighborInfo.ADAPTER.decode(requireNotNull(handled.single().decoded).payload)
+        assertEquals(cached, sent)
+        assertEquals(2, meshLogRepository.getAllLogsUnbounded().first().size)
     }
 
     @Test
     fun requestNeighborInfo_localNode_generatesDummyWhenNoCached() = runTest {
         every { neighborInfoHandler.lastNeighborInfo } returns null
-        everySuspend { packetHandler.sendToRadio(any<MeshPacket>()) } returns true
+        val handled = mutableListOf<MeshPacket>()
+        every { neighborInfoHandler.handleNeighborInfo(capture(handled)) } returns Unit
 
         commandSender.requestNeighborInfo(requestId = 1, destNum = MY_NODE_NUM)
 
-        verifySuspend { packetHandler.sendToRadio(any<MeshPacket>()) }
-        verify { neighborInfoHandler.recordStartTime(1) }
+        verifySuspend(exactly(0)) { packetHandler.sendToRadio(any<MeshPacket>()) }
+        val sent = NeighborInfo.ADAPTER.decode(requireNotNull(handled.single().decoded).payload)
+        assertEquals(MY_NODE_NUM, sent.node_id)
+        assertEquals(1, sent.neighbors.size)
     }
 
     @Test
     fun requestNeighborInfo_localNode_dummyReportsAnHourBroadcastIntervalInSeconds() = runTest {
         every { neighborInfoHandler.lastNeighborInfo } returns null
-        val packets = mutableListOf<MeshPacket>()
-        everySuspend { packetHandler.sendToRadio(capture(packets)) } returns true
+        val handled = mutableListOf<MeshPacket>()
+        every { neighborInfoHandler.handleNeighborInfo(capture(handled)) } returns Unit
 
         commandSender.requestNeighborInfo(requestId = 1, destNum = MY_NODE_NUM)
 
-        val sent = NeighborInfo.ADAPTER.decode(requireNotNull(packets.single().decoded).payload)
+        val sent = NeighborInfo.ADAPTER.decode(requireNotNull(handled.single().decoded).payload)
         assertEquals(3600, sent.node_broadcast_interval_secs)
         assertEquals(listOf(3600), sent.neighbors.map { it.node_broadcast_interval_secs })
     }
@@ -505,15 +514,13 @@ class CommandSenderImplTest {
     }
 
     @Test
-    fun requestNeighborInfo_localNode_doesNotStartTimerWhenQueueRejectsPacket() = runTest {
+    fun requestNeighborInfo_localNode_doesNotStartTimerNorUseTheQueue() = runTest {
         every { neighborInfoHandler.lastNeighborInfo } returns null
-        everySuspend { packetHandler.sendToRadio(any<MeshPacket>()) } returns false
 
-        assertFailsWith<PacketQueueRejectedException> {
-            commandSender.requestNeighborInfo(requestId = 1, destNum = MY_NODE_NUM)
-        }
+        commandSender.requestNeighborInfo(requestId = 1, destNum = MY_NODE_NUM)
 
         verify(exactly(0)) { neighborInfoHandler.recordStartTime(any()) }
+        verifySuspend(exactly(0)) { packetHandler.sendToRadio(any<MeshPacket>()) }
     }
 
     @Test
@@ -673,7 +680,7 @@ class CommandSenderImplTest {
                 tracerouteHandler = tracerouteHandler,
                 neighborInfoHandler = neighborInfoHandler,
                 sessionManager = sessionManager,
-                meshLogRepository = FakeMeshLogRepository(),
+                meshLogRepository = meshLogRepository,
                 adminRequestRegistry = adminRequestRegistry,
                 scope = testScope.asServiceScope(),
             )
