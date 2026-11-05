@@ -34,7 +34,7 @@ import org.meshtastic.core.model.MessageStatus
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.ui.component.preview.NodePreviewParameterProvider
 import org.meshtastic.core.ui.theme.AppTheme
-import org.meshtastic.core.ui.theme.StatusColors.StatusYellow
+import org.meshtastic.core.ui.theme.StatusColors.StatusPurple
 import org.meshtastic.feature.messaging.startMessagingTestKoin
 import org.meshtastic.feature.messaging.stopMessagingTestKoin
 import org.meshtastic.proto.Routing
@@ -291,7 +291,7 @@ class MessageItemTest {
     }
 
     @Test
-    fun retryableRoutingError_usesWarningStatusColor() = runComposeUiTest {
+    fun retryableRoutingError_usesErrorStatusColor() = runComposeUiTest {
         val testNode = NodePreviewParameterProvider().mickeyMouse
         val message =
             localMessage(
@@ -299,11 +299,11 @@ class MessageItemTest {
                 status = MessageStatus.ERROR,
                 routingError = Routing.Error.MAX_RETRANSMIT.value,
             )
-        var warningColor = Color.Unspecified
+        var errorColor = Color.Unspecified
 
         setContent {
             AppTheme {
-                warningColor = MaterialTheme.colorScheme.StatusYellow
+                errorColor = MaterialTheme.colorScheme.StatusPurple
                 MessageItem(
                     message = message,
                     node = testNode,
@@ -315,7 +315,7 @@ class MessageItemTest {
         }
 
         onNodeWithTag(MESSAGE_STATUS_LABEL_TEST_TAG, useUnmergedTree = true)
-            .assert(SemanticsMatcher.expectValue(MessageStatusColorKey, warningColor))
+            .assert(SemanticsMatcher.expectValue(MessageStatusColorKey, errorColor))
     }
 
     @Test
