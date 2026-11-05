@@ -69,6 +69,8 @@ class KoinVerificationTest {
                     // AiStorageLocation is built by a factory function with the folders of the AI files; its File
                     // parameters are introspected but never resolved from the graph.
                     java.io.File::class,
+                    Boolean::class,
+                    org.meshtastic.feature.messaging.translation.GemmaTranslator::class,
                     okio.Path::class,
                     okio.FileSystem::class,
                 ),
