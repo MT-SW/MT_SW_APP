@@ -64,7 +64,6 @@ import coil3.network.ktor3.KtorNetworkFetcherFactory
 import coil3.request.crossfade
 import coil3.svg.SvgDecoder
 import coil3.util.DebugLogger
-import org.meshtastic.core.ui.image.CssInliningDecoderFactory
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -88,11 +87,11 @@ import org.meshtastic.core.common.util.CommonUri
 import org.meshtastic.core.common.util.ioDispatcher
 import org.meshtastic.core.database.desktopDataDir
 import org.meshtastic.core.model.DeviceAddress
-import org.meshtastic.core.network.update.AppUpdateService
 import org.meshtastic.core.navigation.MultiBackstack
 import org.meshtastic.core.navigation.SettingsRoute
 import org.meshtastic.core.navigation.TopLevelDestination
 import org.meshtastic.core.navigation.rememberMultiBackstack
+import org.meshtastic.core.network.update.AppUpdateService
 import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.core.resources.Res
 import org.meshtastic.core.resources.desktop_tray_quit
@@ -100,6 +99,7 @@ import org.meshtastic.core.resources.desktop_tray_show
 import org.meshtastic.core.resources.desktop_tray_tooltip
 import org.meshtastic.core.service.MeshLogCleanup
 import org.meshtastic.core.service.MeshServiceOrchestrator
+import org.meshtastic.core.ui.image.CssInliningDecoderFactory
 import org.meshtastic.core.ui.theme.AppTheme
 import org.meshtastic.core.ui.theme.MODE_MONO_DARK
 import org.meshtastic.core.ui.theme.MODE_MONO_LIGHT
@@ -131,7 +131,6 @@ import org.meshtastic.desktop.tray.TrayMenuItem
 import org.meshtastic.desktop.tray.canHideToTray
 import org.meshtastic.desktop.ui.DesktopMainScreen
 import org.meshtastic.desktop.worker.DesktopNodeCleanupScheduler
-import org.meshtastic.feature.settings.component.StorageFolderFirstRunDialog
 import org.meshtastic.feature.intro.DesktopWelcomeScreen
 import org.meshtastic.feature.map.MapScreen
 import org.meshtastic.feature.map.SharedMapViewModel
@@ -139,6 +138,7 @@ import org.meshtastic.feature.map.maplibre.MapLibreDiscoveryMap
 import org.meshtastic.feature.map.maplibre.MapLibreHorizonPickMap
 import org.meshtastic.feature.map.maplibre.MapLibreInlineMap
 import org.meshtastic.feature.map.maplibre.MapLibreNodeTrackMap
+import org.meshtastic.feature.settings.component.StorageFolderFirstRunDialog
 import java.awt.Desktop
 import java.util.Locale
 import kotlin.system.exitProcess
@@ -305,8 +305,14 @@ private fun ApplicationScope.ThemeAndLocaleProvider(uiViewModel: UIViewModel) {
 
     val isDarkTheme =
         when (themePref) {
-            1, MODE_MONO_LIGHT -> false
-            2, MODE_MONO_DARK -> true
+            1,
+            MODE_MONO_LIGHT,
+            -> false
+
+            2,
+            MODE_MONO_DARK,
+            -> true
+
             else -> isSystemInDarkTheme()
         }
 

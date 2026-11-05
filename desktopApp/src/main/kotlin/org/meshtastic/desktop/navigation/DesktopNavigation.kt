@@ -31,8 +31,8 @@ import org.meshtastic.feature.connections.navigation.connectionsGraph
 import org.meshtastic.feature.discovery.navigation.discoveryGraph
 import org.meshtastic.feature.docs.navigation.docsEntries
 import org.meshtastic.feature.firmware.navigation.firmwareGraph
-import org.meshtastic.feature.messaging.navigation.contactsGraph
 import org.meshtastic.feature.map.navigation.meshHudEntry
+import org.meshtastic.feature.messaging.navigation.contactsGraph
 import org.meshtastic.feature.node.navigation.networkHealthGraph
 import org.meshtastic.feature.node.navigation.nodesGraph
 import org.meshtastic.feature.settings.navigation.settingsGraph
@@ -86,9 +86,9 @@ fun EntryProviderScope<NavKey>.desktopNavGraph(
 }
 
 /**
- * Opens a node's details in the Nodes tab, from the map or the mesh view. What was open there before is cleared down
- * to the node list first, the way a tap on the list does it: pushing on top of it instead left the same node's details
- * in the stack twice after a second tap, and the screen then failed ("key used multiple times").
+ * Opens a node's details in the Nodes tab, from the map or the mesh view. What was open there before is cleared down to
+ * the node list first, the way a tap on the list does it: pushing on top of it instead left the same node's details in
+ * the stack twice after a second tap, and the screen then failed ("key used multiple times").
  */
 private fun openNodeDetailInNodesTab(multiBackstack: MultiBackstack, id: Int) {
     multiBackstack.navigateTopLevel(TopLevelDestination.Nodes.route)

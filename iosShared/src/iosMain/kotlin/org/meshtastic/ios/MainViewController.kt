@@ -28,8 +28,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.uikit.OnFocusBehavior
 import androidx.compose.ui.window.ComposeUIViewController
 import co.touchlab.kermit.Logger
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -56,6 +54,8 @@ import org.meshtastic.ios.map.ProvideIosMaps
 import org.meshtastic.ios.ui.IosMainScreen
 import org.meshtastic.ios.worker.IosNodeCleanupScheduler
 import platform.posix.exit
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 /** Starts the dependency graph once for the whole life of the app process. */
 private val koin: Koin by lazy {
@@ -74,19 +74,18 @@ fun handleIosDeepLink(url: String) {
 /** The single entry the iOS app (iosApp) calls: the whole screen is drawn by Compose Multiplatform. */
 // The name is called from Swift (iosApp), so it has to start with a capital letter.
 @Suppress("FunctionName", "ktlint:standard:function-naming")
-fun MainViewController() =
-    ComposeUIViewController(
-        // The system must not shift the whole screen up when a text field is focused (that pushed the top bar out of
-        // sight and left the field under the keyboard); the screen lifts itself above the keyboard instead.
-        configure = { onFocusBehavior = OnFocusBehavior.DoNothing }
-    ) {
-        val uiViewModel = sharedUiViewModel
-        org.koin.compose.KoinContext(koin) {
-            MeshServiceLifecycle()
-            BackgroundCleanup()
-            ThemedApp(uiViewModel)
-        }
+fun MainViewController() = ComposeUIViewController(
+    // The system must not shift the whole screen up when a text field is focused (that pushed the top bar out of
+    // sight and left the field under the keyboard); the screen lifts itself above the keyboard instead.
+    configure = { onFocusBehavior = OnFocusBehavior.DoNothing },
+) {
+    val uiViewModel = sharedUiViewModel
+    org.koin.compose.KoinContext(koin) {
+        MeshServiceLifecycle()
+        BackgroundCleanup()
+        ThemedApp(uiViewModel)
     }
+}
 
 /** Starts the radio service with the screen and stops it with it. */
 @Composable
@@ -125,9 +124,13 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
     val isDarkTheme =
         when (themePref) {
             1,
-            MODE_MONO_LIGHT -> false
+            MODE_MONO_LIGHT,
+            -> false
+
             2,
-            MODE_MONO_DARK -> true
+            MODE_MONO_DARK,
+            -> true
+
             else -> isSystemInDarkTheme()
         }
     val multiBackstack =
@@ -137,7 +140,7 @@ private fun ThemedApp(uiViewModel: UIViewModel) {
                 TopLevelDestination.Connect.route
             } else {
                 TopLevelDestination.Nodes.route
-            }
+            },
         )
     val uiScale by uiViewModel.uiScale.collectAsState()
     // "Force stop" like on Android/desktop: disconnect the radio and stop the service, then end the process.

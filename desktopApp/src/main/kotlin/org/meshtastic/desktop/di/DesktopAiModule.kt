@@ -18,46 +18,46 @@ package org.meshtastic.desktop.di
 
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
+import org.meshtastic.core.common.AppDataRoot
+import org.meshtastic.core.repository.AiEngine
+import org.meshtastic.core.repository.AiModelStore
+import org.meshtastic.core.repository.AiModels
+import org.meshtastic.core.repository.AiPlatform
+import org.meshtastic.core.repository.AssistantKnowledge
+import org.meshtastic.core.repository.AssistantMemory
+import org.meshtastic.core.repository.MeshLogRepository
+import org.meshtastic.core.repository.NodeRepository
+import org.meshtastic.core.repository.PacketRepository
+import org.meshtastic.core.repository.RadioConfigRepository
+import org.meshtastic.core.repository.TranslatorModelManager
+import org.meshtastic.core.repository.UiPrefs
 import org.meshtastic.feature.discovery.ai.AlgorithmicSummaryProvider
 import org.meshtastic.feature.discovery.ai.DiscoverySummaryAiProvider
 import org.meshtastic.feature.docs.ai.AIDocAssistant
 import org.meshtastic.feature.docs.ai.KeywordFallbackAssistant
 import org.meshtastic.feature.docs.translation.DocTranslationService
 import org.meshtastic.feature.docs.translation.NoOpDocTranslator
-import org.meshtastic.feature.messaging.translation.MessageTranslationService
-import org.meshtastic.core.repository.TranslatorModelManager
-import org.meshtastic.core.common.AppDataRoot
+import org.meshtastic.feature.messaging.translation.AiEngineRouter
 import org.meshtastic.feature.messaging.translation.AiModelStoreImpl
-import org.meshtastic.feature.messaging.translation.StorageScheduler
+import org.meshtastic.feature.messaging.translation.AiStorageLocation
+import org.meshtastic.feature.messaging.translation.AiTextEngine
 import org.meshtastic.feature.messaging.translation.AiTranslationRouter
+import org.meshtastic.feature.messaging.translation.AssistantDataProvider
 import org.meshtastic.feature.messaging.translation.AssistantHistoryStore
 import org.meshtastic.feature.messaging.translation.AssistantService
+import org.meshtastic.feature.messaging.translation.DictationService
 import org.meshtastic.feature.messaging.translation.FileAssistantHistoryStore
+import org.meshtastic.feature.messaging.translation.FileAssistantMemory
 import org.meshtastic.feature.messaging.translation.GemmaTranslator
 import org.meshtastic.feature.messaging.translation.LlamaAssistantService
-import org.meshtastic.feature.messaging.translation.AiEngineRouter
-import org.meshtastic.feature.messaging.translation.AiTextEngine
 import org.meshtastic.feature.messaging.translation.LlamaCppEngine
-import org.meshtastic.feature.messaging.translation.ModelServerInstaller
-import org.meshtastic.feature.messaging.translation.WhisperCppEngine
-import org.meshtastic.core.repository.AiEngine
-import org.meshtastic.core.repository.AiModels
-import org.meshtastic.core.repository.AiPlatform
+import org.meshtastic.feature.messaging.translation.MessageTranslationService
 import org.meshtastic.feature.messaging.translation.ModelDictationService
-import org.meshtastic.feature.messaging.translation.DictationService
-import org.meshtastic.feature.messaging.translation.UpdatableKnowledge
-import org.meshtastic.core.repository.AiModelStore
-import org.meshtastic.feature.messaging.translation.AssistantDataProvider
-import org.meshtastic.core.repository.AssistantKnowledge
-import org.meshtastic.core.repository.AssistantMemory
-import org.meshtastic.feature.messaging.translation.FileAssistantMemory
-import org.meshtastic.core.repository.MeshLogRepository
-import org.meshtastic.core.repository.PacketRepository
-import org.meshtastic.core.repository.RadioConfigRepository
-import org.meshtastic.core.repository.NodeRepository
-import org.meshtastic.core.repository.UiPrefs
+import org.meshtastic.feature.messaging.translation.ModelServerInstaller
 import org.meshtastic.feature.messaging.translation.NllbTranslator
-import org.meshtastic.feature.messaging.translation.AiStorageLocation
+import org.meshtastic.feature.messaging.translation.StorageScheduler
+import org.meshtastic.feature.messaging.translation.UpdatableKnowledge
+import org.meshtastic.feature.messaging.translation.WhisperCppEngine
 import java.io.File
 
 /** Keyword-only fallback AI assistant and no-op translators for Desktop (no on-device model). */
@@ -75,41 +75,45 @@ class DesktopAiModule {
      * (default: ~/.meshtastic); a change is made at the next start by [AppDataRoot].
      */
     @Single
-    fun aiStorageLocation(): AiStorageLocation {
-        return AiStorageLocation(
-            settingsDir = AppDataRoot.defaultDir,
-            defaultBase = AppDataRoot.dir,
-            withEngines = true,
-            askOnFirstRun = AppDataRoot.canChange,
-            scheduler =
-            object : StorageScheduler {
-                override val root: File get() = AppDataRoot.dir
+    fun aiStorageLocation(): AiStorageLocation = AiStorageLocation(
+        settingsDir = AppDataRoot.defaultDir,
+        defaultBase = AppDataRoot.dir,
+        withEngines = true,
+        askOnFirstRun = AppDataRoot.canChange,
+        scheduler =
+        object : StorageScheduler {
+            override val root: File
+                get() = AppDataRoot.dir
 
-                override fun schedule(target: File): String? = AppDataRoot.schedule(target)
+            override fun schedule(target: File): String? = AppDataRoot.schedule(target)
 
-                override fun pending(): File? = AppDataRoot.pendingTarget()
+            override fun pending(): File? = AppDataRoot.pendingTarget()
 
-                override fun usedMb(): Long = AppDataRoot.usedMb()
+            override fun usedMb(): Long = AppDataRoot.usedMb()
 
-                override val canChange: Boolean get() = AppDataRoot.canChange
+            override val canChange: Boolean
+                get() = AppDataRoot.canChange
 
-                override fun lastError(): String? = AppDataRoot.lastMoveError()
-            },
-            folderPicker = {
-                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-                    runCatching {
-                            val chooser =
-                                javax.swing.JFileChooser().apply {
-                                    dialogTitle = "MT_SW"
-                                    fileSelectionMode = javax.swing.JFileChooser.DIRECTORIES_ONLY
-                                }
-                            if (chooser.showOpenDialog(null) == javax.swing.JFileChooser.APPROVE_OPTION) chooser.selectedFile.path else null
+            override fun lastError(): String? = AppDataRoot.lastMoveError()
+        },
+        folderPicker = {
+            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                runCatching {
+                    val chooser =
+                        javax.swing.JFileChooser().apply {
+                            dialogTitle = "MT_SW"
+                            fileSelectionMode = javax.swing.JFileChooser.DIRECTORIES_ONLY
                         }
-                        .getOrNull()
+                    if (chooser.showOpenDialog(null) == javax.swing.JFileChooser.APPROVE_OPTION) {
+                        chooser.selectedFile.path
+                    } else {
+                        null
+                    }
                 }
-            },
-        )
-    }
+                    .getOrNull()
+            }
+        },
+    )
 
     @Single
     fun nllbTranslator(location: AiStorageLocation, uiPrefs: UiPrefs): NllbTranslator =
@@ -120,13 +124,16 @@ class DesktopAiModule {
         ModelServerInstaller(location.enginesDir)
 
     @Single
-    fun aiModelStoreImpl(location: AiStorageLocation, translator: NllbTranslator, installer: ModelServerInstaller): AiModelStoreImpl {
+    fun aiModelStoreImpl(
+        location: AiStorageLocation,
+        translator: NllbTranslator,
+        installer: ModelServerInstaller,
+    ): AiModelStoreImpl {
         AiModels.platform = AiPlatform.DESKTOP
-        AiModels.unavailableEngines =
-            buildSet {
-                if (!installer.whisperSupported) add(AiEngine.WHISPER_CPP)
-                if (!installer.llamaSupported) add(AiEngine.LLAMA_CPP)
-            }
+        AiModels.unavailableEngines = buildSet {
+            if (!installer.whisperSupported) add(AiEngine.WHISPER_CPP)
+            if (!installer.llamaSupported) add(AiEngine.LLAMA_CPP)
+        }
         return AiModelStoreImpl(translator, location.modelsDir, installer, location)
     }
 
@@ -148,8 +155,7 @@ class DesktopAiModule {
     ): AiTranslationRouter = AiTranslationRouter(translator, GemmaTranslator(engine), store, uiPrefs)
 
     @Single
-    fun assistantHistoryStore(): AssistantHistoryStore =
-        FileAssistantHistoryStore(File(AppDataRoot.dir, "assistant"))
+    fun assistantHistoryStore(): AssistantHistoryStore = FileAssistantHistoryStore(File(AppDataRoot.dir, "assistant"))
 
     @Single
     fun assistantDataProvider(
@@ -159,11 +165,18 @@ class DesktopAiModule {
         packetRepository: PacketRepository,
         connection: org.meshtastic.core.repository.ConnectionStateProvider,
         uiPrefs: UiPrefs,
-    ): AssistantDataProvider =
-        AssistantDataProvider(nodeRepository, radioConfigRepository, meshLogRepository, packetRepository, connection, null) { uiPrefs.currentInverted.value }
+    ): AssistantDataProvider = AssistantDataProvider(
+        nodeRepository,
+        radioConfigRepository,
+        meshLogRepository,
+        packetRepository,
+        connection,
+        null,
+    ) {
+        uiPrefs.currentInverted.value
+    }
 
-    @Single
-    fun assistantMemory(): AssistantMemory = FileAssistantMemory(File(AppDataRoot.dir, "assistant-memory"))
+    @Single fun assistantMemory(): AssistantMemory = FileAssistantMemory(File(AppDataRoot.dir, "assistant-memory"))
 
     @Single
     fun assistantService(
@@ -174,10 +187,13 @@ class DesktopAiModule {
         knowledge: AssistantKnowledge,
         memory: AssistantMemory,
     ): AssistantService = LlamaAssistantService(
-            engine, store, uiPrefs, data,
-            memoryStore = memory,
-            knowledge = UpdatableKnowledge(knowledge, File(AppDataRoot.dir, "knowledge"), uiPrefs),
-        )
+        engine,
+        store,
+        uiPrefs,
+        data,
+        memoryStore = memory,
+        knowledge = UpdatableKnowledge(knowledge, File(AppDataRoot.dir, "knowledge"), uiPrefs),
+    )
 
     @Single
     fun dictationService(engine: AiTextEngine, store: AiModelStoreImpl, uiPrefs: UiPrefs): DictationService =

@@ -28,8 +28,8 @@ import org.meshtastic.core.ble.BleLogFormat
 import org.meshtastic.core.ble.BleLogLevel
 import org.meshtastic.feature.docs.translation.DocTranslationService
 import org.meshtastic.feature.docs.translation.NoOpDocTranslator
-import org.meshtastic.feature.messaging.translation.MessageTranslationService
 import org.meshtastic.feature.messaging.translation.AiTranslationRouter
+import org.meshtastic.feature.messaging.translation.MessageTranslationService
 import kotlin.test.Test
 import kotlin.test.assertIs
 
