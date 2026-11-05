@@ -55,6 +55,13 @@ val appResourcesDir = isolated.rootProject.projectDirectory.dir("core/resources/
 configure<ApplicationExtension> {
     namespace = "org.meshtastic.app"
 
+    // The store build uses exactly the sources, resources and manifest of fdroid (no Google services in it).
+    sourceSets.getByName("google") {
+        java.srcDir("src/fdroid/kotlin")
+        res.srcDir("src/fdroid/res")
+        manifest.srcFile("src/fdroid/AndroidManifest.xml")
+    }
+
     signingConfigs {
         // Shared debug key (checked in; debug keys are not secret) so local builds and CI snapshots
         // stay update-compatible — AGP's default per-machine key makes every snapshot un-sideloadable.
@@ -128,17 +135,7 @@ configure<ApplicationExtension> {
     productFlavors {
         configureEach {
             versionName = "${defaultConfig.versionName} (${defaultConfig.versionCode}) $name"
-            if (name == "google") {
-                // Only the unit-test manifest merge needs this. The secrets plugin injects
-                // MAPS_API_KEY at *variant* level (from secrets.properties, else
-                // secrets.defaults.properties), which overrides this for the app manifest -- but
-                // variant-level placeholders do not reach the unit-test component, so with no
-                // flavor-level value mergeGoogleDebugUnitTestManifest fails on the unsubstituted
-                // ${MAPS_API_KEY} in src/google/AndroidManifest.xml. This value is never shipped;
-                // what a real build carries comes from the plugin. See #6883.
-                manifestPlaceholders["MAPS_API_KEY"] = "dummy"
-            }
-            if (name == "fdroid") {
+            if (name == "fdroid" || name == "google") {
                 proguardFile("proguard-rules-fdroid.pro")
             }
         }
@@ -268,50 +265,9 @@ dependencies {
     // instead of manually polling `dumpsys meminfo`.
     debugImplementation(libs.leakcanary.android)
 
-    googleImplementation(libs.location.services)
-    googleImplementation(libs.play.services.maps)
-    // ARCore for the device model viewer; proprietary, so google only. Same exclusions as feature/node's sceneview.
-    googleImplementation("io.github.sceneview:arsceneview:${libs.versions.sceneview.get()}") {
-        exclude(group = "org.jetbrains.kotlin", module = "kotlin-android-extensions-runtime")
-    }
-    googleImplementation(libs.maps.compose)
-    googleImplementation(libs.maps.compose.utils)
-    googleImplementation(libs.maps.compose.widgets)
-    // The app draws imported layers through this data layer itself, so it is declared rather than inherited.
-    // The pin is load-bearing: the cluster renderer's exact-count labels need 7.0.0; see gradle/libs.versions.toml.
-    googleImplementation(libs.android.maps.utils)
-    // Offline vector basemap: extracts PMTiles-format tiles into a local MBTiles archive, then decodes their MVT
-    // protobuf geometry to draw as native GoogleMap Polygon/Polyline overlays. See offline/pmtiles/README.md.
-    googleImplementation(libs.pmtiles.reader)
-    googleImplementation(libs.kotlinx.serialization.protobuf)
-    // Offline terrain (hillshade + contours) for a downloaded region: Terrarium decode, hillshade shading and
-    // marching-squares contours are shared math from :feature:map-terrain; see offline/terrain/ for the
-    // Google-flavor-specific rendering built on top of it.
-    googleImplementation(projects.feature.mapTerrain)
-    // TerrainTileStore's file hierarchy is Okio-based (it also backs Desktop's MapLibre terrain rendering), but
-    // okio is only an `implementation` dependency of :feature:map-terrain, not `api` — this flavor needs its own
-    // dependency to construct a TerrainTileStore itself.
-    googleImplementation(libs.okio)
-    // maps-compose-widgets requests androidx.compose.material:material version-less (expects a BOM
-    // we exclude). Name it with a version so the version is published in the app's graph metadata.
-    googleImplementation(libs.androidx.compose.material)
-    // Downloadable Google Fonts for event-firmware branding (Play Services font provider — Google flavor only).
-    googleImplementation(libs.androidx.compose.ui.text.google.fonts)
-    googleImplementation(libs.bundles.dd.sdk.android)
-    googleImplementation(platform(libs.firebase.bom))
-    googleImplementation(libs.firebase.analytics)
-    googleImplementation(libs.firebase.crashlytics)
-    googleImplementation(libs.firebase.ai)
-    googleImplementation(libs.firebase.ai.ondevice)
-    googleImplementation(libs.mlkit.translate)
-    googleImplementation(libs.mlkit.language.id)
-    googleImplementation(libs.mlkit.genai.prompt)
-
-    googleImplementation(libs.androidx.appfunctions)
-    add("kspGoogle", libs.androidx.appfunctions.compiler)
-
-    // MapLibre replaces OSMdroid on this flavor; the module also backs the desktop app, and is
-    // deliberately NOT visible to `google`, which stays on Google Maps.
+    // The store build ("google") has no Google services at all: it uses the same sources and the same MapLibre map as
+    // fdroid (see sourceSets below). No Google Maps, Firebase, Datadog, ML Kit, Gemini Nano or ARCore.
+    googleImplementation(projects.feature.mapMaplibre)
     fdroidImplementation(projects.feature.mapMaplibre)
 
     testImplementation(kotlin("test-junit"))

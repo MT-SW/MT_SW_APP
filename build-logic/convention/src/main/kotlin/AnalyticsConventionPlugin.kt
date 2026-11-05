@@ -14,46 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.datadog.gradle.plugin.DdExtension
 import com.datadog.gradle.plugin.InjectBuildIdToAssetsTask
 import com.datadog.gradle.plugin.SdkCheckLevel
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.withType
-import org.meshtastic.buildlogic.libs
-import org.meshtastic.buildlogic.plugin
 import java.io.File
 
 /**
- * Convention plugin for analytics (Google Services, Crashlytics, Datadog). Segregates these plugins to only affect the
- * "google" flavor and disables their tasks for "fdroid".
+ * Convention plugin for analytics (Google Services, Crashlytics, Datadog). In this fork none of these plugins is applied
+ * in any flavor (the store build has no Google services either), so the code below only switches off their tasks if a
+ * plugin ever gets applied again.
  */
 class AnalyticsConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            applyAnalyticsPlugins()
             disableFdroidAnalyticsTasks()
             configureDatadogVariants()
-        }
-    }
-}
-
-private fun Project.applyAnalyticsPlugins() {
-    extensions.configure<ApplicationExtension> {
-        // Deliberately eager `all {}` (not `configureEach`): this block APPLIES plugins as a side
-        // effect of the google flavor being registered. `configureEach` defers until AGP realizes
-        // the flavor objects, which can be too late for google-services/crashlytics to hook variants.
-        productFlavors.all {
-            if (name == "google") {
-                apply(plugin = libs.plugin("google-services").get().pluginId)
-                apply(plugin = libs.plugin("firebase-crashlytics").get().pluginId)
-                apply(plugin = libs.plugin("datadog").get().pluginId)
-            }
         }
     }
 }

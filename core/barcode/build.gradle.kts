@@ -25,6 +25,8 @@ plugins {
 configure<LibraryExtension> {
     namespace = "org.meshtastic.core.barcode"
 
+    sourceSets.getByName("google") { java.srcDir("src/fdroid/kotlin") }
+
     testOptions { unitTests { isIncludeAndroidResources = true } }
 }
 
@@ -38,8 +40,8 @@ dependencies {
     implementation(libs.compose.multiplatform.ui)
     implementation(libs.kermit)
 
-    // ML Kit is used for the Google flavor, while ZXing is used for F-Droid to avoid GMS dependencies.
-    googleImplementation(libs.mlkit.barcode.scanning)
+    // ZXing in both flavors: the store build has no Google services either.
+    googleImplementation(libs.zxing.core)
     fdroidImplementation(libs.zxing.core)
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)
