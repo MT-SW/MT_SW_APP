@@ -182,7 +182,12 @@ internal object IosLogControl : AppLogControl {
         val opened = url.startAccessingSecurityScopedResource()
         try {
             val data =
-                url.bookmarkDataWithOptions(0uL, includingResourceValuesForKeys = null, relativeToURL = null, error = null)
+                url.bookmarkDataWithOptions(
+                    0uL,
+                    includingResourceValuesForKeys = null,
+                    relativeToURL = null,
+                    error = null,
+                )
             if (data == null || !data.writeToFile(bookmarkPath, atomically = true)) return
             val name = url.lastPathComponent ?: "?"
             FileSystem.SYSTEM.write(namePath) { writeUtf8(name) }
