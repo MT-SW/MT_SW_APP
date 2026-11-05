@@ -175,7 +175,7 @@ class RecentAddressesDataSourceTest {
         val result = dataSource.recentAddresses.first()
         assertEquals(3, result.size)
         assertEquals("3.3.3.3", result[0].address)
-        assertEquals("1.1.1.1", result[0].address)
+        assertEquals("1.1.1.1", result[1].address)
     }
 
     // ---- remove() ----
