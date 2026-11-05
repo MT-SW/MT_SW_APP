@@ -75,8 +75,14 @@ class BubbleActivity : AppCompatActivity() {
             val theme by model.theme.collectAsStateWithLifecycle()
             val dark =
                 when (theme) {
-                    AppCompatDelegate.MODE_NIGHT_YES, MODE_MONO_DARK -> true
-                    AppCompatDelegate.MODE_NIGHT_NO, MODE_MONO_LIGHT -> false
+                    AppCompatDelegate.MODE_NIGHT_YES,
+                    MODE_MONO_DARK,
+                    -> true
+
+                    AppCompatDelegate.MODE_NIGHT_NO,
+                    MODE_MONO_LIGHT,
+                    -> false
+
                     else -> isSystemInDarkTheme()
                 }
             SideEffect {

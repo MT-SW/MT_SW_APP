@@ -18,18 +18,18 @@
 
 package org.meshtastic.core.common.util
 
-import kotlin.math.abs
 import platform.Foundation.NSDate
 import platform.Foundation.NSDateFormatter
 import platform.Foundation.NSDateFormatterMediumStyle
 import platform.Foundation.NSDateFormatterNoStyle
 import platform.Foundation.NSDateFormatterShortStyle
 import platform.Foundation.NSLocale
-import platform.Foundation.currentLocale
 import platform.Foundation.countryCode
+import platform.Foundation.currentLocale
+import platform.Foundation.dateWithTimeIntervalSince1970
 import platform.Foundation.languageCode
 import platform.Foundation.localeIdentifier
-import platform.Foundation.dateWithTimeIntervalSince1970
+import kotlin.math.abs
 
 private const val MINUTE_MILLIS = 60_000L
 private const val HOUR_MILLIS = 3_600_000L
@@ -60,12 +60,11 @@ actual object DateFormatter {
     actual fun formatDateTime(timestampMillis: Long): String =
         format(timestampMillis, NSDateFormatterShortStyle, NSDateFormatterShortStyle)
 
-    actual fun formatShortDate(timestampMillis: Long): String =
-        if (nowMillis - timestampMillis <= DAY_MILLIS) {
-            formatTime(timestampMillis)
-        } else {
-            format(timestampMillis, NSDateFormatterShortStyle, NSDateFormatterNoStyle)
-        }
+    actual fun formatShortDate(timestampMillis: Long): String = if (nowMillis - timestampMillis <= DAY_MILLIS) {
+        formatTime(timestampMillis)
+    } else {
+        format(timestampMillis, NSDateFormatterShortStyle, NSDateFormatterNoStyle)
+    }
 
     actual fun formatTime(timestampMillis: Long): String =
         format(timestampMillis, NSDateFormatterNoStyle, NSDateFormatterShortStyle)
@@ -103,9 +102,13 @@ actual fun String?.isValidAddress(): Boolean {
     val value = this?.trim()
     return when {
         value.isNullOrEmpty() -> false
+
         value == "localhost" -> true
+
         IPV4.matches(value) -> value.split('.').all { it.toIntOrNull() in 0..255 }
+
         value.contains(':') -> IPV6.matches(value) && value.count { it == ':' } >= 2
+
         else -> {
             val labels = value.split('.')
             value.length <= 253 &&

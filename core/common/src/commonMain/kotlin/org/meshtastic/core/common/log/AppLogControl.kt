@@ -46,33 +46,45 @@ interface AppLogControl {
     fun setLevel(level: AppLogLevel)
 
     /** A short, readable place where the logs are kept (a folder path), or null when it is not worth showing. */
-    val folderHint: String? get() = null
+    val folderHint: String?
+        get() = null
 
     /** True where [openFolder] can work (the desktop). */
-    val canOpenFolder: Boolean get() = false
+    val canOpenFolder: Boolean
+        get() = false
 
     /** Opens the folder holding the logs, on platforms that can; false when this is not possible. */
     fun openFolder(): Boolean
 
     /**
-     * The automatic log of the last 24 hours, on by default: even with the full logging switch off the app keeps the basic
-     * log of the last day on the device, so a problem can be reported with its log at once.
+     * The automatic log of the last 24 hours, on by default: even with the full logging switch off the app keeps the
+     * basic log of the last day on the device, so a problem can be reported with its log at once.
      */
-    val recent: StateFlow<Boolean> get() = MutableStateFlow(false)
+    val recent: StateFlow<Boolean>
+        get() = MutableStateFlow(false)
 
     fun setRecent(on: Boolean) {}
 
     /** True where a report package can be made ([buildReport]). */
-    val canMakeReport: Boolean get() = false
-
-    /** True where [shareReport] hands the file itself to the chosen app (a phone); on a computer the person attaches it. */
-    val sharesFileToApp: Boolean get() = false
+    val canMakeReport: Boolean
+        get() = false
 
     /**
-     * Builds a report zip: the logs of the last 24 hours when [withLogs], the engine's own logs, the person's [note] and the
-     * [extras] (name to content, for example a hardware report). Returns where the file is, or null when it failed.
+     * True where [shareReport] hands the file itself to the chosen app (a phone); on a computer the person attaches it.
      */
-    suspend fun buildReport(note: String, withLogs: Boolean, extras: List<Pair<String, ByteArray>> = emptyList()): ReportFile? = null
+    val sharesFileToApp: Boolean
+        get() = false
+
+    /**
+     * Builds a report zip: the logs of the last 24 hours when [withLogs], the engine's own logs, the person's [note]
+     * and the [extras] (name to content, for example a hardware report). Returns where the file is, or null when it
+     * failed.
+     */
+    suspend fun buildReport(
+        note: String,
+        withLogs: Boolean,
+        extras: List<Pair<String, ByteArray>> = emptyList(),
+    ): ReportFile? = null
 
     /** Hands [report] and [text] to the app of [target]; false when this platform cannot. */
     fun shareReport(report: ReportFile, target: ReportTarget, text: String): Boolean = false

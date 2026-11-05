@@ -36,8 +36,8 @@ import java.util.zip.ZipOutputStream
  * The fork's log files, shared by Android and desktop. Off by default; once switched on in the settings the choice is
  * remembered in a small file next to the logs, so it survives restarts and crashes.
  *
- * - Everything the app logs through Kermit goes to the files (as far down as the chosen level), so one level covers
- *   all modules.
+ * - Everything the app logs through Kermit goes to the files (as far down as the chosen level), so one level covers all
+ *   modules.
  * - A log is a series of parts of about [PART_BYTES] each (`mt_sw_log_<session>_<nnn>.txt`). Every part opens with its
  *   own header, so it can be read alone.
  * - The oldest parts are deleted once all of them together pass [MAX_TOTAL_BYTES].
@@ -53,7 +53,10 @@ object MtSwLogging {
     private const val FLUSH_EVERY_MS = 1000L
     private const val SAMPLE_EVERY_MS = 30_000L
 
-    /** The automatic log of the last day (on by default): how far back it reaches, how big it may grow, how often it is trimmed. */
+    /**
+     * The automatic log of the last day (on by default): how far back it reaches, how big it may grow, how often it is
+     * trimmed.
+     */
     const val RECENT_WINDOW_MS: Long = 24L * 60 * 60 * 1000
     private const val RECENT_MAX_BYTES: Long = 40L * 1024 * 1024
     private const val PRUNE_EVERY_MS = 5L * 60 * 1000
@@ -61,17 +64,22 @@ object MtSwLogging {
     private const val BYTES_IN_MB = 1024 * 1024
 
     private val levelFlow = MutableStateFlow(AppLogLevel.OFF)
-    val level: StateFlow<AppLogLevel> get() = levelFlow
+    val level: StateFlow<AppLogLevel>
+        get() = levelFlow
 
     /**
-     * The automatic log of the last 24 hours (on by default). While the switch for full logging is off, the app still keeps
-     * the basic log of the last day, so a person who meets a problem can send it at once. It stays on the device.
+     * The automatic log of the last 24 hours (on by default). While the switch for full logging is off, the app still
+     * keeps the basic log of the last day, so a person who meets a problem can send it at once. It stays on the device.
      */
     private val recentFlow = MutableStateFlow(true)
-    val recent: StateFlow<Boolean> get() = recentFlow
+    val recent: StateFlow<Boolean>
+        get() = recentFlow
 
-    /** What is really written: the chosen level, or the basic level while only the automatic log of the last day is on. */
-    private fun effectiveLevel(): AppLogLevel = levelFlow.value.let { if (it == AppLogLevel.OFF && recentFlow.value) AppLogLevel.BASIC else it }
+    /**
+     * What is really written: the chosen level, or the basic level while only the automatic log of the last day is on.
+     */
+    private fun effectiveLevel(): AppLogLevel =
+        levelFlow.value.let { if (it == AppLogLevel.OFF && recentFlow.value) AppLogLevel.BASIC else it }
 
     @Volatile private var currentName: String? = null
 
@@ -155,7 +163,10 @@ object MtSwLogging {
 
     private fun saveConf() {
         val folder = dir ?: return
-        runCatching { File(folder, CONF_NAME).writeText(levelFlow.value.key + "\n" + (if (recentFlow.value) "recent=on" else RECENT_OFF)) }
+        runCatching {
+            File(folder, CONF_NAME)
+                .writeText(levelFlow.value.key + "\n" + (if (recentFlow.value) "recent=on" else RECENT_OFF))
+        }
     }
 
     /** All log parts, oldest first. */
@@ -172,9 +183,9 @@ object MtSwLogging {
     fun writeZip(target: OutputStream) = writeReportZip(target, 0L)
 
     /**
-     * Like [writeZip], but only with the parts written since [sinceMillis] (the last 24 hours for a report), plus [extras] (name to
-     * text, put at the top of the zip: the user's note, the hardware report...) and [extraFiles] (name in the zip to file: the
-     * engine's own logs).
+     * Like [writeZip], but only with the parts written since [sinceMillis] (the last 24 hours for a report), plus
+     * [extras] (name to text, put at the top of the zip: the user's note, the hardware report...) and [extraFiles]
+     * (name in the zip to file: the engine's own logs).
      */
     fun writeReportZip(
         target: OutputStream,
@@ -233,7 +244,10 @@ object MtSwLogging {
                 for (line in lines) {
                     if (line.length > LEVEL_COLUMN && line[LEVEL_COLUMN - 1] == ' ') {
                         when (line[LEVEL_COLUMN]) {
-                            'E', 'A' -> errors++
+                            'E',
+                            'A',
+                            -> errors++
+
                             'W' -> warnings++
                         }
                     }
@@ -244,14 +258,13 @@ object MtSwLogging {
     }
 
     private fun append(severity: Severity, message: String, tag: String, throwable: Throwable?) {
-        val line =
-            buildString {
-                append(stamp()).append(' ')
-                append(severity.name.first()).append('/').append(tag)
-                append(" [").append(Thread.currentThread().name).append("] ")
-                append(message).append('\n')
-                throwable?.let { append(it.stackTraceToString()).append('\n') }
-            }
+        val line = buildString {
+            append(stamp()).append(' ')
+            append(severity.name.first()).append('/').append(tag)
+            append(" [").append(Thread.currentThread().name).append("] ")
+            append(message).append('\n')
+            throwable?.let { append(it.stackTraceToString()).append('\n') }
+        }
         synchronized(lock) {
             runCatching {
                 val w = out ?: openNext()
@@ -289,8 +302,8 @@ object MtSwLogging {
     }
 
     /**
-     * While only the automatic log of the last day runs, the parts older than a day go, and the parts together stay under a
-     * size limit. Parts of a log the person switched on by hand are never trimmed by age.
+     * While only the automatic log of the last day runs, the parts older than a day go, and the parts together stay
+     * under a size limit. Parts of a log the person switched on by hand are never trimmed by age.
      */
     private fun pruneRecent() {
         if (levelFlow.value != AppLogLevel.OFF) return
@@ -321,15 +334,16 @@ object MtSwLogging {
         if (shutdownHookInstalled) return
         shutdownHookInstalled = true
         runCatching {
-            Runtime.getRuntime().addShutdownHook(
-                Thread(
-                    {
-                        runCatching { Logger.i(tag = TAG) { "Process is shutting down" } }
-                        flush()
-                    },
-                    "mtsw-log-shutdown",
-                ),
-            )
+            Runtime.getRuntime()
+                .addShutdownHook(
+                    Thread(
+                        {
+                            runCatching { Logger.i(tag = TAG) { "Process is shutting down" } }
+                            flush()
+                        },
+                        "mtsw-log-shutdown",
+                    ),
+                )
         }
     }
 
@@ -348,15 +362,16 @@ object MtSwLogging {
     private fun writeCrashRecord(thread: Thread, error: Throwable) {
         val folder = File(dir ?: return, CRASH_DIR).also { it.mkdirs() }
         val rt = Runtime.getRuntime()
-        val text =
-            buildString {
-                append("Crash at ${stamp()}, ${(System.currentTimeMillis() - started) / 1000} s after start\n")
-                append(header()).append('\n')
-                append("Thread: ${thread.name}\n")
-                append("Memory: used ${(rt.totalMemory() - rt.freeMemory()) / BYTES_IN_MB} MB, max ${rt.maxMemory() / BYTES_IN_MB} MB\n")
-                append("Threads: ${Thread.getAllStackTraces().size}\n\n")
-                append(error.stackTraceToString())
-            }
+        val text = buildString {
+            append("Crash at ${stamp()}, ${(System.currentTimeMillis() - started) / 1000} s after start\n")
+            append(header()).append('\n')
+            append("Thread: ${thread.name}\n")
+            append(
+                "Memory: used ${(rt.totalMemory() - rt.freeMemory()) / BYTES_IN_MB} MB, max ${rt.maxMemory() / BYTES_IN_MB} MB\n",
+            )
+            append("Threads: ${Thread.getAllStackTraces().size}\n\n")
+            append(error.stackTraceToString())
+        }
         File(folder, "crash_${SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date())}.txt").writeText(text)
         folder.listFiles()?.sortedBy { it.name }?.dropLast(MAX_CRASH_FILES)?.forEach { runCatching { it.delete() } }
     }
@@ -385,10 +400,11 @@ object MtSwLogging {
                 }
             },
             "mtsw-log-flush",
-        ).apply {
-            isDaemon = true
-            start()
-        }
+        )
+            .apply {
+                isDaemon = true
+                start()
+            }
     }
 
     /** One line of the app's resource state, written every [SAMPLE_EVERY_MS] while logging is on. */
@@ -396,7 +412,7 @@ object MtSwLogging {
         val rt = Runtime.getRuntime()
         val used = (rt.totalMemory() - rt.freeMemory()) / BYTES_IN_MB
         Logger.d(tag = "Resources") {
-            "heap ${used}/${rt.maxMemory() / BYTES_IN_MB} MB, threads ${Thread.getAllStackTraces().size}, " +
+            "heap $used/${rt.maxMemory() / BYTES_IN_MB} MB, threads ${Thread.getAllStackTraces().size}, " +
                 "cpus ${rt.availableProcessors()}, up ${(System.currentTimeMillis() - started) / 1000} s ${extraSample()}"
         }
     }

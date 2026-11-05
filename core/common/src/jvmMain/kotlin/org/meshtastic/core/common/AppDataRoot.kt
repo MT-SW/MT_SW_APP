@@ -39,7 +39,9 @@ object AppDataRoot {
     private const val ERROR = "data-move-error.txt"
     private const val ASKED = "data-folder-asked"
 
-    /** The folder created inside a place a person picks, so that picking a disk or a home folder never scatters files. */
+    /**
+     * The folder created inside a place a person picks, so that picking a disk or a home folder never scatters files.
+     */
     const val SUBFOLDER = "MT_SW"
 
     private const val MB = 1024L * 1024L
@@ -62,7 +64,9 @@ object AppDataRoot {
     /** The folder used in this run. Makes sure a requested move is done first (without a progress window). */
     val dir: File
         get() {
-            current?.let { return it }
+            current?.let {
+                return it
+            }
             prepare()
             return current ?: defaultDir
         }
@@ -74,14 +78,19 @@ object AppDataRoot {
     fun pendingTarget(): File? = readPath(File(defaultDir, PENDING))
 
     /** The reason the last move failed (shown once in the settings); null = none. */
-    fun lastMoveError(): String? = runCatching { File(defaultDir, ERROR).takeIf { it.isFile }?.readText()?.trim() }.getOrNull()?.takeIf { it.isNotEmpty() }
+    fun lastMoveError(): String? = runCatching {
+        File(defaultDir, ERROR).takeIf { it.isFile }?.readText()?.trim()
+    }
+        .getOrNull()
+        ?.takeIf { it.isNotEmpty() }
 
     fun clearMoveError() {
         runCatching { File(defaultDir, ERROR).delete() }
     }
 
     /** True until the first-start question about the folder has been answered. */
-    fun needsFirstQuestion(): Boolean = !overridden && !File(defaultDir, ASKED).exists() && !File(defaultDir, POINTER).exists()
+    fun needsFirstQuestion(): Boolean =
+        !overridden && !File(defaultDir, ASKED).exists() && !File(defaultDir, POINTER).exists()
 
     fun markAsked() {
         runCatching {
@@ -91,7 +100,8 @@ object AppDataRoot {
     }
 
     /** False when the folder comes from `MESHTASTIC_DATA_DIR`: then it cannot be changed in the settings. */
-    val canChange: Boolean get() = !overridden
+    val canChange: Boolean
+        get() = !overridden
 
     /** Megabytes free on the disk that holds [folder] (or the nearest folder above it that exists). */
     fun freeMb(folder: File = dir): Long {
@@ -107,28 +117,37 @@ object AppDataRoot {
      * Requests a move of everything to [chosen] (a subfolder [SUBFOLDER] is made inside it). Returns null when the
      * request was saved, or a short reason when it cannot be done. Nothing is copied yet.
      */
-    fun schedule(chosen: File): String? =
-        runCatching {
-                if (overridden) return@runCatching "the folder is set by MESHTASTIC_DATA_DIR"
-                val picked = chosen.absoluteFile.canonicalFile
-                val target =
-                    if (picked == defaultDir.absoluteFile.canonicalFile || picked.name == SUBFOLDER) picked else File(picked, SUBFOLDER)
-                val from = dir.absoluteFile.canonicalFile
-                if (target == from) return@runCatching "this folder is already used"
-                if (target.path.startsWith(from.path + File.separator)) return@runCatching "the new folder is inside the old one"
-                if (from.path.startsWith(target.path + File.separator)) return@runCatching "the old folder is inside the new one"
-                if (!target.isDirectory && !target.mkdirs()) return@runCatching "the folder cannot be created"
-                val needMb = treeSize(from) / MB * 105 / 100 + SPARE_MB
-                if (freeMb(target) < needMb) return@runCatching "not enough free space in the new folder (needs about $needMb MB)"
-                defaultDir.mkdirs()
-                File(defaultDir, PENDING).writeText(target.path)
-                File(defaultDir, ERROR).delete()
-                null
+    fun schedule(chosen: File): String? = runCatching {
+        if (overridden) return@runCatching "the folder is set by MESHTASTIC_DATA_DIR"
+        val picked = chosen.absoluteFile.canonicalFile
+        val target =
+            if (picked == defaultDir.absoluteFile.canonicalFile || picked.name == SUBFOLDER) {
+                picked
+            } else {
+                File(picked, SUBFOLDER)
             }
-            .getOrElse { e ->
-                Logger.w(tag = TAG, throwable = e) { "Requesting the move failed: ${e.message}" }
-                e.message ?: "unknown error"
-            }
+        val from = dir.absoluteFile.canonicalFile
+        if (target == from) return@runCatching "this folder is already used"
+        if (target.path.startsWith(from.path + File.separator)) {
+            return@runCatching "the new folder is inside the old one"
+        }
+        if (from.path.startsWith(target.path + File.separator)) {
+            return@runCatching "the old folder is inside the new one"
+        }
+        if (!target.isDirectory && !target.mkdirs()) return@runCatching "the folder cannot be created"
+        val needMb = treeSize(from) / MB * 105 / 100 + SPARE_MB
+        if (freeMb(target) < needMb) {
+            return@runCatching "not enough free space in the new folder (needs about $needMb MB)"
+        }
+        defaultDir.mkdirs()
+        File(defaultDir, PENDING).writeText(target.path)
+        File(defaultDir, ERROR).delete()
+        null
+    }
+        .getOrElse { e ->
+            Logger.w(tag = TAG, throwable = e) { "Requesting the move failed: ${e.message}" }
+            e.message ?: "unknown error"
+        }
 
     /** Takes back a requested move that has not been done yet. */
     fun cancelPending() {
@@ -169,62 +188,72 @@ object AppDataRoot {
 
     private fun pendingFile() = File(defaultDir, PENDING)
 
-    private fun readPath(file: File): File? =
-        runCatching { file.takeIf { it.isFile }?.readText()?.trim()?.takeIf { it.isNotEmpty() }?.let(::File) }.getOrNull()
+    private fun readPath(file: File): File? = runCatching {
+        file.takeIf { it.isFile }?.readText()?.trim()?.takeIf { it.isNotEmpty() }?.let(::File)
+    }
+        .getOrNull()
 
-    private fun treeSize(root: File): Long =
-        runCatching {
-                if (!root.isDirectory) return@runCatching 0L
-                root.walkTopDown()
-                    .onEnter { dir -> !(dir.parentFile == root && dir.name in SETTINGS_FILES) }
-                    .filter { it.isFile && !(it.parentFile == root && it.name in SETTINGS_FILES) }
-                    .sumOf { it.length() }
-            }
-            .getOrDefault(0L)
+    private fun treeSize(root: File): Long = runCatching {
+        if (!root.isDirectory) return@runCatching 0L
+        root
+            .walkTopDown()
+            .onEnter { dir -> !(dir.parentFile == root && dir.name in SETTINGS_FILES) }
+            .filter { it.isFile && !(it.parentFile == root && it.name in SETTINGS_FILES) }
+            .sumOf { it.length() }
+    }
+        .getOrDefault(0L)
 
-    /** Copies everything from [from] to [to], checks it, switches the pointer and removes the old files. Null = done. */
-    private fun doMove(from: File, to: File, onProgress: ((Float) -> Unit)?): String? =
-        runCatching {
-                val source = from.absoluteFile.canonicalFile
-                val dest = to.absoluteFile.canonicalFile
-                if (dest == source) return@runCatching null
-                if (dest.path.startsWith(source.path + File.separator) || source.path.startsWith(dest.path + File.separator)) {
-                    return@runCatching "one folder is inside the other"
-                }
-                if (!dest.isDirectory && !dest.mkdirs()) return@runCatching "the folder cannot be created"
-                val files =
-                    source.walkTopDown().filter { it.isFile && !(it.parentFile == source && it.name in SETTINGS_FILES) }.toList()
-                val total = files.sumOf { it.length() }
-                if (freeMb(dest) * MB < total + total / 20 + SPARE_MB * MB) return@runCatching "not enough free space in the new folder"
-                var done = 0L
-                onProgress?.invoke(0f)
-                for (file in files) {
-                    val out = File(dest, file.relativeTo(source).path)
-                    out.parentFile?.mkdirs()
-                    val part = File(out.path + ".copy")
-                    Files.copy(file.toPath(), part.toPath(), StandardCopyOption.REPLACE_EXISTING)
-                    if (part.length() != file.length()) {
-                        part.delete()
-                        return@runCatching "a file was not copied completely: ${file.name}"
-                    }
-                    Files.move(part.toPath(), out.toPath(), StandardCopyOption.REPLACE_EXISTING)
-                    done += file.length()
-                    onProgress?.invoke(if (total > 0) (done.toFloat() / total).coerceIn(0f, 1f) else 1f)
-                }
-                defaultDir.mkdirs()
-                val pointer = File(defaultDir, POINTER)
-                if (dest == defaultDir.absoluteFile.canonicalFile) pointer.delete() else pointer.writeText(dest.path)
-                File(defaultDir, ASKED).writeText("done")
-                File(defaultDir, ERROR).delete()
-                removeOld(source, files)
-                null
+    /**
+     * Copies everything from [from] to [to], checks it, switches the pointer and removes the old files. Null = done.
+     */
+    private fun doMove(from: File, to: File, onProgress: ((Float) -> Unit)?): String? = runCatching {
+        val source = from.absoluteFile.canonicalFile
+        val dest = to.absoluteFile.canonicalFile
+        if (dest == source) return@runCatching null
+        if (dest.path.startsWith(source.path + File.separator) || source.path.startsWith(dest.path + File.separator)) {
+            return@runCatching "one folder is inside the other"
+        }
+        if (!dest.isDirectory && !dest.mkdirs()) return@runCatching "the folder cannot be created"
+        val files =
+            source
+                .walkTopDown()
+                .filter { it.isFile && !(it.parentFile == source && it.name in SETTINGS_FILES) }
+                .toList()
+        val total = files.sumOf { it.length() }
+        if (freeMb(dest) * MB < total + total / 20 + SPARE_MB * MB) {
+            return@runCatching "not enough free space in the new folder"
+        }
+        var done = 0L
+        onProgress?.invoke(0f)
+        for (file in files) {
+            val out = File(dest, file.relativeTo(source).path)
+            out.parentFile?.mkdirs()
+            val part = File(out.path + ".copy")
+            Files.copy(file.toPath(), part.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            if (part.length() != file.length()) {
+                part.delete()
+                return@runCatching "a file was not copied completely: ${file.name}"
             }
-            .getOrElse { e ->
-                Logger.w(tag = TAG, throwable = e) { "Moving the data failed: ${e.message}" }
-                e.message ?: "unknown error"
-            }
+            Files.move(part.toPath(), out.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            done += file.length()
+            onProgress?.invoke(if (total > 0) (done.toFloat() / total).coerceIn(0f, 1f) else 1f)
+        }
+        defaultDir.mkdirs()
+        val pointer = File(defaultDir, POINTER)
+        if (dest == defaultDir.absoluteFile.canonicalFile) pointer.delete() else pointer.writeText(dest.path)
+        File(defaultDir, ASKED).writeText("done")
+        File(defaultDir, ERROR).delete()
+        removeOld(source, files)
+        null
+    }
+        .getOrElse { e ->
+            Logger.w(tag = TAG, throwable = e) { "Moving the data failed: ${e.message}" }
+            e.message ?: "unknown error"
+        }
 
-    /** Removes the files that were copied from the old folder (not the pointer files, and nothing the app did not make). */
+    /**
+     * Removes the files that were copied from the old folder (not the pointer files, and nothing the app did not make).
+     */
     private fun removeOld(source: File, copied: List<File>) {
         runCatching {
             copied.forEach { it.delete() }

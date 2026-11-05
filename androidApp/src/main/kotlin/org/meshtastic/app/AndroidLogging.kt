@@ -21,10 +21,10 @@ import android.app.ActivityManager
 import android.app.Application
 import android.content.ClipData
 import android.content.ComponentCallbacks2
-import android.content.Intent
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.BatteryManager
 import android.os.Build
@@ -57,8 +57,8 @@ import java.util.Date
 /**
  * The phone side of the log switch. Logs live in the app's private folder; because a crashed app cannot be asked for
  * them, a zip of them is also kept in the Downloads folder (`Pobrane/MT_SW_logi`): refreshed on its own when the app
- * starts, every few minutes while it runs, and when it goes to the background while logging is on, and on a start that follows a crash even when logging is off
- * (only the crash record is in it then).
+ * starts, every few minutes while it runs, and when it goes to the background while logging is on, and on a start that
+ * follows a crash even when logging is off (only the crash record is in it then).
  */
 internal object AndroidLogging {
     private const val TAG = "AppLifecycle"
@@ -94,9 +94,10 @@ internal object AndroidLogging {
         }
     }
 
-    fun header(): String =
-        "MT_SW ${org.meshtastic.core.model.MtswRelease.displayName(BuildConfig.VERSION_NAME)} (${BuildConfig.VERSION_NAME}, ${BuildConfig.VERSION_CODE}), Android ${Build.VERSION.RELEASE} " +
-            "(API ${Build.VERSION.SDK_INT}), ${Build.MANUFACTURER} ${Build.MODEL}, ABI ${Build.SUPPORTED_ABIS.firstOrNull()}"
+    fun header(): String = "MT_SW ${org.meshtastic.core.model.MtswRelease.displayName(
+        BuildConfig.VERSION_NAME,
+    )} (${BuildConfig.VERSION_NAME}, ${BuildConfig.VERSION_CODE}), Android ${Build.VERSION.RELEASE} " +
+        "(API ${Build.VERSION.SDK_INT}), ${Build.MANUFACTURER} ${Build.MODEL}, ABI ${Build.SUPPORTED_ABIS.firstOrNull()}"
 
     private fun sampleExtras(app: Application): String {
         val parts = mutableListOf<String>()
@@ -156,12 +157,14 @@ internal object AndroidLogging {
                 }
             },
         )
-        ProcessLifecycleOwner.get().lifecycle.addObserver(
-            LifecycleEventObserver { _, event ->
-                Logger.i(tag = TAG) { "App process: $event" }
-                if (event == Lifecycle.Event.ON_STOP) scope.launch { control.autoExport() }
-            },
-        )
+        ProcessLifecycleOwner.get()
+            .lifecycle
+            .addObserver(
+                LifecycleEventObserver { _, event ->
+                    Logger.i(tag = TAG) { "App process: $event" }
+                    if (event == Lifecycle.Event.ON_STOP) scope.launch { control.autoExport() }
+                },
+            )
     }
 
     /** Why Android ended the previous runs of this app (killed for memory, crash, user swipe...). */
@@ -179,15 +182,18 @@ internal object AndroidLogging {
     }
 
     private class AndroidLogControl(private val app: Application, private val dir: File) : AppLogControl {
-        override val level: StateFlow<AppLogLevel> get() = MtSwLogging.level
+        override val level: StateFlow<AppLogLevel>
+            get() = MtSwLogging.level
 
         override fun setLevel(level: AppLogLevel) = MtSwLogging.setLevel(level)
 
-        override val folderHint: String get() = "Pobrane/$FOLDER"
+        override val folderHint: String
+            get() = "Pobrane/$FOLDER"
 
         override fun openFolder(): Boolean = false
 
-        override val recent: StateFlow<Boolean> get() = MtSwLogging.recent
+        override val recent: StateFlow<Boolean>
+            get() = MtSwLogging.recent
 
         override fun setRecent(on: Boolean) = MtSwLogging.setRecent(on)
 
@@ -195,72 +201,95 @@ internal object AndroidLogging {
 
         override val sharesFileToApp: Boolean = true
 
-        override suspend fun buildReport(note: String, withLogs: Boolean, extras: List<Pair<String, ByteArray>>): ReportFile? =
-            withContext(Dispatchers.IO) {
-                runCatching {
-                    val now = System.currentTimeMillis()
-                    val folder = File(app.cacheDir, "reports").also { it.mkdirs() }
-                    folder.listFiles()?.filter { it.lastModified() < now - MtSwLogging.RECENT_WINDOW_MS }?.forEach { runCatching { it.delete() } }
-                    val name = "mt_sw_zgloszenie_" + java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US).format(Date(now)) + ".zip"
-                    val file = File(folder, name)
-                    val since = if (withLogs) now - MtSwLogging.RECENT_WINDOW_MS else Long.MAX_VALUE
-                    val engineLogs = File(app.filesDir, "engine-logs").listFiles { f -> f.isFile && (f.extension == "log" || f.extension == "txt") }.orEmpty()
-                    file.outputStream().use { out ->
-                        MtSwLogging.writeReportZip(
-                            out,
-                            since,
-                            extras = listOf("opis_zgloszenia.txt" to note.toByteArray()) + extras,
-                            extraFiles = if (withLogs) engineLogs.map { "silnik/${it.name}" to it } else emptyList(),
-                        )
-                    }
-                    // A copy in Downloads too, so the file can also be attached by hand from there.
-                    val shown = copyToDownloads(file, name) ?: file.absolutePath
-                    ReportFile(file.absolutePath, shown, file.length() / 1024)
+        override suspend fun buildReport(
+            note: String,
+            withLogs: Boolean,
+            extras: List<Pair<String, ByteArray>>,
+        ): ReportFile? = withContext(Dispatchers.IO) {
+            runCatching {
+                val now = System.currentTimeMillis()
+                val folder = File(app.cacheDir, "reports").also { it.mkdirs() }
+                folder
+                    .listFiles()
+                    ?.filter { it.lastModified() < now - MtSwLogging.RECENT_WINDOW_MS }
+                    ?.forEach { runCatching { it.delete() } }
+                val name =
+                    "mt_sw_zgloszenie_" +
+                        java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US).format(Date(now)) +
+                        ".zip"
+                val file = File(folder, name)
+                val since = if (withLogs) now - MtSwLogging.RECENT_WINDOW_MS else Long.MAX_VALUE
+                val engineLogs =
+                    File(app.filesDir, "engine-logs")
+                        .listFiles { f -> f.isFile && (f.extension == "log" || f.extension == "txt") }
+                        .orEmpty()
+                file.outputStream().use { out ->
+                    MtSwLogging.writeReportZip(
+                        out,
+                        since,
+                        extras = listOf("opis_zgloszenia.txt" to note.toByteArray()) + extras,
+                        extraFiles = if (withLogs) engineLogs.map { "silnik/${it.name}" to it } else emptyList(),
+                    )
                 }
-                    .onFailure { Logger.w(it, tag = TAG) { "Report could not be built" } }
-                    .getOrNull()
+                // A copy in Downloads too, so the file can also be attached by hand from there.
+                val shown = copyToDownloads(file, name) ?: file.absolutePath
+                ReportFile(file.absolutePath, shown, file.length() / 1024)
             }
+                .onFailure { Logger.w(it, tag = TAG) { "Report could not be built" } }
+                .getOrNull()
+        }
 
         override fun shareReport(report: ReportFile, target: ReportTarget, text: String): Boolean {
-            val uri = runCatching { FileProvider.getUriForFile(app, app.packageName + ".reportshare", File(report.path)) }.getOrNull() ?: return false
-            fun send(pkg: String?) =
-                Intent(Intent.ACTION_SEND).apply {
-                    type = "application/zip"
-                    putExtra(Intent.EXTRA_STREAM, uri)
-                    if (text.isNotBlank()) putExtra(Intent.EXTRA_TEXT, text)
-                    clipData = ClipData.newRawUri(null, uri)
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
-                    pkg?.let { setPackage(it) }
-                }
+            val uri =
+                runCatching { FileProvider.getUriForFile(app, app.packageName + ".reportshare", File(report.path)) }
+                    .getOrNull() ?: return false
+            fun send(pkg: String?) = Intent(Intent.ACTION_SEND).apply {
+                type = "application/zip"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                if (text.isNotBlank()) putExtra(Intent.EXTRA_TEXT, text)
+                clipData = ClipData.newRawUri(null, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+                pkg?.let { setPackage(it) }
+            }
             // The chosen app first; when it is not installed, the system's own list of apps.
-            return runCatching { app.startActivity(send(target.packageName)); true }
-                .recoverCatching { app.startActivity(Intent.createChooser(send(null), text.ifBlank { null }).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); true }
+            return runCatching {
+                app.startActivity(send(target.packageName))
+                true
+            }
+                .recoverCatching {
+                    app.startActivity(
+                        Intent.createChooser(send(null), text.ifBlank { null }).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                    )
+                    true
+                }
                 .getOrDefault(false)
         }
 
-        private fun copyToDownloads(file: File, name: String): String? =
-            runCatching {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return@runCatching null
-                val resolver = app.contentResolver
-                val uri =
-                    resolver.insert(
-                        MediaStore.Downloads.EXTERNAL_CONTENT_URI,
-                        ContentValues().apply {
-                            put(MediaStore.Downloads.DISPLAY_NAME, name)
-                            put(MediaStore.Downloads.MIME_TYPE, "application/zip")
-                            put(MediaStore.Downloads.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}/$FOLDER/")
-                        },
-                    ) ?: return@runCatching null
-                resolver.openOutputStream(uri, "wt")?.use { out -> file.inputStream().use { it.copyTo(out) } } ?: return@runCatching null
-                "Pobrane/$FOLDER/$name"
-            }.getOrNull()
+        private fun copyToDownloads(file: File, name: String): String? = runCatching {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return@runCatching null
+            val resolver = app.contentResolver
+            val uri =
+                resolver.insert(
+                    MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                    ContentValues().apply {
+                        put(MediaStore.Downloads.DISPLAY_NAME, name)
+                        put(MediaStore.Downloads.MIME_TYPE, "application/zip")
+                        put(MediaStore.Downloads.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}/$FOLDER/")
+                    },
+                ) ?: return@runCatching null
+            resolver.openOutputStream(uri, "wt")?.use { out -> file.inputStream().use { it.copyTo(out) } }
+                ?: return@runCatching null
+            "Pobrane/$FOLDER/$name"
+        }
+            .getOrNull()
 
         /** Refreshes the zip in Downloads when there is something new to put in it. */
         suspend fun autoExport() {
             val wanted = MtSwLogging.level.value != AppLogLevel.OFF || MtSwLogging.crashFiles().isNotEmpty()
             if (!wanted) return
             val files = MtSwLogging.parts() + MtSwLogging.crashFiles()
-            val fingerprint = "${files.size}:${files.maxOfOrNull { it.lastModified() } ?: 0L}:${files.sumOf { it.length() }}"
+            val fingerprint =
+                "${files.size}:${files.maxOfOrNull { it.lastModified() } ?: 0L}:${files.sumOf { it.length() }}"
             val marker = File(dir, FINGERPRINT_NAME)
             if (runCatching { marker.readText() }.getOrNull() == fingerprint) return
             if (export(AUTO_NAME, overwrite = true) != null) runCatching { marker.writeText(fingerprint) }
@@ -268,7 +297,11 @@ internal object AndroidLogging {
 
         private suspend fun export(name: String, overwrite: Boolean): String? = withContext(Dispatchers.IO) {
             runCatching {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) exportToDownloads(name, overwrite) else exportLegacy(name)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    exportToDownloads(name, overwrite)
+                } else {
+                    exportLegacy(name)
+                }
             }
                 .onFailure { Logger.w(it, tag = TAG) { "Log export failed" } }
                 .getOrNull()
@@ -288,7 +321,9 @@ internal object AndroidLogging {
                             arrayOf(name, relative),
                             null,
                         )
-                        ?.use { c -> if (c.moveToFirst()) ContentUris.withAppendedId(collection, c.getLong(0)) else null }
+                        ?.use { c ->
+                            if (c.moveToFirst()) ContentUris.withAppendedId(collection, c.getLong(0)) else null
+                        }
                 } else {
                     null
                 }
@@ -307,13 +342,18 @@ internal object AndroidLogging {
             return "Pobrane/$FOLDER/$name"
         }
 
-        /** Before Android 10 the Downloads folder needs a storage permission; without it the zip stays in the app's folder. */
+        /**
+         * Before Android 10 the Downloads folder needs a storage permission; without it the zip stays in the app's
+         * folder.
+         */
         @Suppress("DEPRECATION")
         private fun exportLegacy(name: String): String? {
             val publicDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), FOLDER)
-            val target =
-                runCatching { publicDir.mkdirs(); File(publicDir, name).also { it.outputStream().close() } }
-                    .getOrElse { File(app.getExternalFilesDir(null) ?: dir, name) }
+            val target = runCatching {
+                publicDir.mkdirs()
+                File(publicDir, name).also { it.outputStream().close() }
+            }
+                .getOrElse { File(app.getExternalFilesDir(null) ?: dir, name) }
             target.outputStream().use { MtSwLogging.writeZip(it) }
             return target.absolutePath
         }

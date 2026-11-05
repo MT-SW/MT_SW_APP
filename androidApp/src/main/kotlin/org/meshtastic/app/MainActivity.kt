@@ -108,8 +108,8 @@ import org.meshtastic.core.ui.util.LocalNfcScannerSupported
 import org.meshtastic.core.ui.util.LocalNfcWriterProvider
 import org.meshtastic.core.ui.util.LocalNodeTrackMapProvider
 import org.meshtastic.core.ui.util.LocalPlannerAvailable
-import org.meshtastic.core.ui.util.LocalTracerouteMapOverlayInsetsProvider
 import org.meshtastic.core.ui.util.LocalTerminateApplication
+import org.meshtastic.core.ui.util.LocalTracerouteMapOverlayInsetsProvider
 import org.meshtastic.core.ui.util.LocalTracerouteMapProvider
 import org.meshtastic.core.ui.util.accentColorOrNull
 import org.meshtastic.core.ui.util.brandHighlightOrNull
@@ -164,8 +164,10 @@ class MainActivity : AppCompatActivity() {
             val monochrome = isMonochromeMode(theme)
             val dark =
                 when (theme) {
-                    AppCompatDelegate.MODE_NIGHT_YES, MODE_MONO_DARK -> true
-                    AppCompatDelegate.MODE_NIGHT_NO, MODE_MONO_LIGHT -> false
+                    AppCompatDelegate.MODE_NIGHT_YES,
+                    MODE_MONO_DARK -> true
+                    AppCompatDelegate.MODE_NIGHT_NO,
+                    MODE_MONO_LIGHT -> false
                     else -> isSystemInDarkTheme()
                 }
 
@@ -346,12 +348,12 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    @Suppress("NestedBlockDepth")
     /**
-     * "Force stop" from inside the app: stops the mesh service (which disconnects the radio and drops its
-     * notification) and then kills the whole process, so nothing keeps reconnecting to a device that is switched off.
-     * The kill is posted a moment later to give the service time to be stopped first.
+     * "Force stop" from inside the app: stops the mesh service (which disconnects the radio and drops its notification)
+     * and then kills the whole process, so nothing keeps reconnecting to a device that is switched off. The kill is
+     * posted a moment later to give the service time to be stopped first.
      */
+    @Suppress("NestedBlockDepth")
     private fun terminateApplication() {
         stopService(MeshService.createIntent(this))
         finishAndRemoveTask()
@@ -453,8 +455,7 @@ class MainActivity : AppCompatActivity() {
                             showToast(Res.string.map_layer_too_large, MAX_SHARED_MAP_FILE_MB)
 
                         SharedMapFileRejection.NOT_CONTENT_URI,
-                        SharedMapFileRejection.UNREADABLE,
-                        -> showToast(Res.string.map_layer_open_failed)
+                        SharedMapFileRejection.UNREADABLE -> showToast(Res.string.map_layer_open_failed)
                     }
                 }
 
@@ -464,7 +465,7 @@ class MainActivity : AppCompatActivity() {
                             displayName = load.file.displayName,
                             extensionOrMime = load.file.extensionOrMime,
                             read = { load.bytes },
-                        ),
+                        )
                     )
                     handleMeshtasticUri("$DEEP_LINK_BASE_URI/map".toUri())
                 }
