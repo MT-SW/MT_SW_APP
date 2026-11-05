@@ -38,7 +38,6 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -78,13 +77,12 @@ interface AiEngineInstaller {
 }
 
 /**
- * Keeps the downloaded state of every model in [AiModels.all]. The NLLB model is handled by [NllbTranslator] itself;
- * the other models are files downloaded here into one folder per model under [ggufDir]. A model's engine program (if it
+ * Keeps the downloaded state of every model in [AiModels.all]. Every model is a set of files downloaded here into one
+ * folder per model under [ggufDir]. A model's engine program (if it
  * needs one) comes from [installer]. Several models can be on the device at once and each is downloaded, cancelled and
  * deleted on its own.
  */
 class AiModelStoreImpl(
-    private val nllb: NllbTranslator,
     val ggufDir: File,
     private val installer: AiEngineInstaller? = null,
     private val location: AiStorageLocation? = null,
@@ -123,9 +121,7 @@ class AiModelStoreImpl(
     override suspend fun moveStorage(folder: String) {
         val l = location ?: return
         if (storageMoveState.value is AiStorageMove.Moving) return
-        val busy =
-            gguf.value.values.any { it is TranslatorModelState.Downloading } ||
-                nllb.state.value is TranslatorModelState.Downloading
+        val busy = gguf.value.values.any { it is TranslatorModelState.Downloading }
         if (busy) {
             storageMoveState.value = AiStorageMove.Failed("a model is being downloaded, wait until it finishes")
             return
@@ -162,7 +158,7 @@ class AiModelStoreImpl(
         scope.launch(Dispatchers.IO) {
             cleanLegacyOnce()
             // The NLLB-200 model (CC BY-NC) was removed from the app: delete what an older version downloaded.
-            runCatching { nllb.deleteModel() }
+            runCatching { location?.translatorDir?.deleteRecursively() }
             cleanRetiredModels()
             cleanReplacedFiles()
         }
@@ -177,7 +173,6 @@ class AiModelStoreImpl(
         runCatching {
             var bytes = 0L
             AiModels.all
-                .filter { it.engine != AiEngine.NLLB_ONNX }
                 .forEach { model ->
                     val dir = modelDir(model)
                     if (!dir.isDirectory) return@forEach
@@ -271,19 +266,13 @@ class AiModelStoreImpl(
         clearAttempts?.invoke()
     }
 
-    override val states: StateFlow<Map<String, TranslatorModelState>> =
-        combine(nllb.state, gguf) { n, g -> g + (AiModels.NLLB_600M_ID to n) }
-            .stateIn(scope, SharingStarted.Eagerly, gguf.value + (AiModels.NLLB_600M_ID to nllb.state.value))
+    override val states: StateFlow<Map<String, TranslatorModelState>> = gguf
 
     override suspend fun download(id: String) {
         val model = AiModels.byId(id) ?: return
         // After a move was saved, the files of this run are deleted at the next start: a download now would be lost.
         if (location?.nextBase != null) {
-            if (model.engine != AiEngine.NLLB_ONNX) setGguf(id, TranslatorModelState.Failed("restart the app first"))
-            return
-        }
-        if (model.engine == AiEngine.NLLB_ONNX) {
-            nllb.download()
+            setGguf(id, TranslatorModelState.Failed("restart the app first"))
             return
         }
         if (!model.engineReady) return
@@ -338,19 +327,11 @@ class AiModelStoreImpl(
     }
 
     override fun cancelDownload(id: String) {
-        if (AiModels.byId(id)?.engine == AiEngine.NLLB_ONNX) {
-            nllb.cancelDownload()
-        } else {
-            synchronized(jobs) { jobs[id] }?.cancel()
-        }
+        synchronized(jobs) { jobs[id] }?.cancel()
     }
 
     override suspend fun delete(id: String) {
         val model = AiModels.byId(id) ?: return
-        if (model.engine == AiEngine.NLLB_ONNX) {
-            nllb.deleteModel()
-            return
-        }
         cancelDownload(id)
         beforeModelDelete?.invoke()
         withContext(Dispatchers.IO) { modelDir(model).deleteRecursively() }
@@ -385,7 +366,7 @@ class AiModelStoreImpl(
         }
 
     private fun initialGgufStates(): Map<String, TranslatorModelState> = AiModels.all
-        .filter { it.engine != AiEngine.NLLB_ONNX && it.engineReady }
+        .filter { it.engineReady }
         .associate {
             it.id to (if (isComplete(it)) TranslatorModelState.Ready else TranslatorModelState.NotDownloaded)
         }

@@ -24,9 +24,6 @@ import kotlin.concurrent.Volatile
 
 /** The inference engine a model runs on. */
 enum class AiEngine {
-    /** NLLB-200 through ONNX Runtime (translation only). */
-    NLLB_ONNX,
-
     /**
      * GGUF language models through llama.cpp (a separate program the app starts; graphics card and processor share the
      * work).
@@ -147,12 +144,6 @@ data class AiModelInfo(
 
 /** The list of models offered by the app (light to strong, grouped in families). */
 object AiModels {
-    /**
-     * Removed: the model is licensed CC BY-NC (non-commercial), which does not fit a GPL-3.0 project. Kept only to
-     * clean up.
-     */
-    const val NLLB_600M_ID = "nllb-600m"
-
     // The ids differ from those of the old engine (gemma4-e2b, ...) so old and new can never be mixed up.
     const val G4_E2B = "g4-e2b-q4"
     const val G4_E4B = "g4-e4b-q4"

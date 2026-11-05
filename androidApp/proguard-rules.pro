@@ -104,7 +104,3 @@
 -keep class org.meshtastic.feature.messaging.translation.AssistantTools { *; }
 -keepattributes RuntimeVisibleAnnotations,RuntimeVisibleParameterAnnotations,Signature,*Annotation*
 -keep class kotlin.Metadata { *; }
-
-# ONNX Runtime (tłumacz NLLB): bez tego R8 usuwa klasy używane przez JNI i aplikacja się zamyka
--keep class ai.onnxruntime.** { *; }
--keepclassmembers class ai.onnxruntime.** { *; }

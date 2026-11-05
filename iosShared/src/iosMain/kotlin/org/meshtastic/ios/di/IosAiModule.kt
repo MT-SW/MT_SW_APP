@@ -21,7 +21,6 @@ package org.meshtastic.ios.di
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
 import org.meshtastic.core.database.iosDataDir
-import org.meshtastic.core.repository.AiEngine
 import org.meshtastic.core.repository.AiModelStore
 import org.meshtastic.core.repository.AiModels
 import org.meshtastic.core.repository.AiPlatform
@@ -64,8 +63,6 @@ class IosAiModule {
     @Single
     fun iosAiModelStore(): IosAiModelStore {
         AiModels.platform = AiPlatform.IOS
-        // The ONNX translator is not on the iPhone; language models run in llama.cpp and speech models in whisper.cpp.
-        AiModels.unavailableEngines = setOf(AiEngine.NLLB_ONNX)
         return IosAiModelStore(iosDataDir())
     }
 

@@ -49,25 +49,15 @@ kotlin {
             implementation(libs.jetbrains.compose.material3.adaptive.navigation3)
         }
 
-        // The offline translator runs the same ONNX Runtime API on Android and on desktop; only the native build
-        // differs.
-        // compileOnly here lets the shared code compile; each platform brings its own runtime below.
-        getByName("jvmAndroidMain") {
-            dependencies {
-                implementation(libs.kotlinx.serialization.json)
-                compileOnly(libs.onnxruntime)
-            }
-        }
+        getByName("jvmAndroidMain") { dependencies { implementation(libs.kotlinx.serialization.json) } }
 
         androidMain.dependencies {
-            implementation(libs.onnxruntime.android)
             implementation(libs.androidx.work.runtime.ktx)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.okhttp)
         }
 
         jvmMain.dependencies {
-            implementation(libs.onnxruntime)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.okhttp)
         }

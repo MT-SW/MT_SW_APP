@@ -208,7 +208,7 @@ class AiEngineRouter(
         whisper?.unloadNow()
     }
 
-    /** Loads the model just chosen for a function; models of other engines (the NLLB translator) load on first use. */
+    /** Loads the model just chosen for a function; models of other engines load on first use. */
     private suspend fun preload(modelId: String, hearing: Boolean) {
         lastUsed = nowMillis
         makeRoomFor(modelId)

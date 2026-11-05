@@ -197,25 +197,6 @@ class LlamaAssistantService(
                 val info = AiModels.byId(modelId)
                 val pl = data.polish
                 fun t(polish: String, english: String) = if (pl) polish else english
-                if (info?.engine == org.meshtastic.core.repository.AiEngine.NLLB_ONNX) {
-                    // The small translator is not a language model: it has no chips to report, it runs on the
-                    // processor.
-                    val short =
-                        t("Model", "Model") +
-                            ": ${info.name}\n" +
-                            t("Rozmiar", "Size") +
-                            ": ${info.sizeMb} MB, " +
-                            t("pamięć podczas pracy", "memory while running") +
-                            ": " +
-                            t("około", "about") +
-                            " ${info.ramMb} MB\n" +
-                            t("Gdzie działa", "Where it runs") +
-                            ": " +
-                            t("procesor (ONNX Runtime)", "CPU (ONNX Runtime)") +
-                            engine.deviceSummary.takeIf { it.isNotBlank() }?.let { "\n$it" }.orEmpty()
-                    onResult(command, short)
-                    return@withContext
-                }
                 val report =
                     t("Model", "Model") +
                         ": ${info?.name ?: modelId} (${info?.family.orEmpty()})\n" +
@@ -520,8 +501,6 @@ class LlamaAssistantService(
         out.write(ByteArray(data))
         return out.toByteArray()
     }
-
-    /*  The model the translator's hardware report is about: the chosen translator model when it is on the device, else any that is, else NLLB. */
 
     /** The chip line is stored in English; in Polish its layer count is written in Polish ("36 z 36 warstw na NPU"). */
     private fun localBackend(text: String, polish: Boolean): String = if (!polish) {

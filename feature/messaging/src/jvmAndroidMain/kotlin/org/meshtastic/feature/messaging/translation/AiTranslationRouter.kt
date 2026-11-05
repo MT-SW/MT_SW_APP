@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import org.meshtastic.core.repository.AiEngine
 import org.meshtastic.core.repository.AiModelInfo
 import org.meshtastic.core.repository.AiModels
 import org.meshtastic.core.repository.AiRole
@@ -36,11 +35,10 @@ import org.meshtastic.core.repository.TranslatorModelState
 import org.meshtastic.core.repository.UiPrefs
 
 /**
- * Picks the engine for translation by the model chosen in the settings (NLLB or Gemma) and also answers for that model
+ * Picks the engine for translation by the model chosen in the settings and also answers for that model
  * in the model manager, so the translator screen and message actions follow the choice.
  */
 class AiTranslationRouter(
-    private val nllb: NllbTranslator,
     private val gemma: GemmaTranslator,
     private val store: AiModelStoreImpl,
     private val uiPrefs: UiPrefs,
@@ -82,7 +80,6 @@ class AiTranslationRouter(
         if (store.states.value[model.id] != TranslatorModelState.Ready) {
             return TranslationResult.ModelDownloadRequired(listOf(model.id), model.sizeMb)
         }
-        if (model.engine == AiEngine.NLLB_ONNX) return nllb.translateBetween(text, source, targetNllb)
         return try {
             TranslationResult.Success(gemma.translate(model.id, text, source, targetNllb))
         } catch (e: CancellationException) {

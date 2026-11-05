@@ -57,7 +57,6 @@ import org.meshtastic.feature.messaging.translation.LlamaCppEngine
 import org.meshtastic.feature.messaging.translation.MessageTranslationService
 import org.meshtastic.feature.messaging.translation.ModelDictationService
 import org.meshtastic.feature.messaging.translation.ModelServerInstaller
-import org.meshtastic.feature.messaging.translation.NllbTranslator
 import org.meshtastic.feature.messaging.translation.UpdatableKnowledge
 import org.meshtastic.feature.messaging.translation.WhisperCppEngine
 import java.io.File
@@ -71,10 +70,6 @@ class FdroidAiModule {
     @Single fun discoverySummaryAiProvider(fallback: AlgorithmicSummaryProvider): DiscoverySummaryAiProvider = fallback
 
     @Single fun docTranslationService(): DocTranslationService = NoOpDocTranslator()
-
-    @Single
-    fun nllbTranslator(location: AiStorageLocation, uiPrefs: UiPrefs): NllbTranslator =
-        NllbTranslator(location.translatorDir, uiPrefs)
 
     /**
      * Where the models are kept: the phone's memory, or an SD card when a person chooses it. The engine programs always
@@ -110,7 +105,6 @@ class FdroidAiModule {
     @Single
     fun aiModelStoreImpl(
         location: AiStorageLocation,
-        translator: NllbTranslator,
         installer: ModelServerInstaller,
     ): AiModelStoreImpl {
         // The language model and speech programs exist only for 64-bit phones.
@@ -119,7 +113,7 @@ class FdroidAiModule {
             if (!installer.whisperSupported) add(AiEngine.WHISPER_CPP)
             if (!installer.llamaSupported) add(AiEngine.LLAMA_CPP)
         }
-        return AiModelStoreImpl(translator, location.modelsDir, installer, location)
+        return AiModelStoreImpl(location.modelsDir, installer, location)
     }
 
     @Single fun aiModelStore(impl: AiModelStoreImpl): AiModelStore = impl
@@ -141,11 +135,10 @@ class FdroidAiModule {
 
     @Single
     fun aiTranslationRouter(
-        translator: NllbTranslator,
         engine: AiTextEngine,
         store: AiModelStoreImpl,
         uiPrefs: UiPrefs,
-    ): AiTranslationRouter = AiTranslationRouter(translator, GemmaTranslator(engine), store, uiPrefs)
+    ): AiTranslationRouter = AiTranslationRouter(GemmaTranslator(engine), store, uiPrefs)
 
     @Single
     fun assistantHistoryStore(context: Context): AssistantHistoryStore =
