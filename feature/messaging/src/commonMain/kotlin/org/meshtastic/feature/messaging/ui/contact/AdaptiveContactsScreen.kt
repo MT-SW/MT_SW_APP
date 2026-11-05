@@ -26,6 +26,7 @@ import org.meshtastic.core.navigation.ChannelsRoute
 import org.meshtastic.core.navigation.ContactsRoute
 import org.meshtastic.core.navigation.NodesRoute
 import org.meshtastic.core.navigation.SettingsRoute
+import org.meshtastic.core.navigation.replaceLast
 import org.meshtastic.core.ui.component.ScrollToTopEvent
 
 @Composable
@@ -41,10 +42,18 @@ fun AdaptiveContactsScreen(
         onHandleDeepLink = onHandleDeepLink,
         viewModel = contactsViewModel,
         onClickNodeChip = { backStack.add(NodesRoute.NodeDetail(it)) },
-        onNavigateToMessages = { contactKey -> backStack.add(ContactsRoute.Messages(contactKey)) },
+        // With the list and the messages side by side, the list stays visible while a conversation is open: a new
+        // choice replaces the open conversation instead of stacking on it, and the open one is not added again.
+        onNavigateToMessages = { contactKey ->
+            val open = backStack.lastOrNull() as? ContactsRoute.Messages
+            when {
+                open == null -> backStack.add(ContactsRoute.Messages(contactKey))
+                open.contactKey != contactKey -> backStack.replaceLast(ContactsRoute.Messages(contactKey))
+            }
+        },
         onNavigateToNodeDetails = { backStack.add(NodesRoute.NodeDetail(it)) },
         onNavigateToFilterSettings = { backStack.add(SettingsRoute.FilterSettings) },
         scrollToTopEvents = scrollToTopEvents,
-        activeContactKey = null,
+        activeContactKey = (backStack.lastOrNull() as? ContactsRoute.Messages)?.contactKey,
     )
 }

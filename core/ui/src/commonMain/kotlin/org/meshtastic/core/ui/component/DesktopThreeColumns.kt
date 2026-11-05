@@ -122,7 +122,7 @@ internal class ThreeColumnWidths {
         const val DEFAULT_LIST_DETAIL_SHARE = 0.5f
 
         /** The conversations list is narrow so the messages beside it are wide; also used by the tablet layout. */
-        const val CHAT_LIST_SHARE = 0.32f
+        const val CHAT_LIST_SHARE = 0.36f
         const val DEFAULT_DETAIL_EXTRA_SHARE = 0.5f
         const val MIN_PANE_DP = 220f
         const val MIN_DETAIL_DP = 320f
