@@ -18,12 +18,6 @@ package org.meshtastic.feature.messaging.translation
 
 import kotlinx.coroutines.flow.StateFlow
 
-/**
- * The hardware report asked for from the translator screen (the /sprzęt command there): the same report as /sprzet of
- * the assistant, but for the translator's model. It is not typed by the user.
- */
-const val TRANSLATOR_HARDWARE_COMMAND = "/sprzet-tlumacza"
-
 /** One line of the conversation sent to the assistant. */
 data class AssistantTurn(val fromUser: Boolean, val text: String)
 

@@ -131,8 +131,8 @@ Słowa: maszt, węzeł na maszcie, węzeł zewnętrzny, montaż na dachu, obudow
 Źródło: Baza wiedzy: montaż, ochrona odgromowa, zasilanie solarne i praca na wysokości (opracowanie własne z wpisów bazy, 2026-10)
 
 ### Jakie komendy ma tłumacz i gdzie jest jego historia?
-Tłumacz ma dwie komendy, które wpisuje się w polu tekstu (z polskimi literami lub bez): /tłumacz uruchamia test tłumaczeń (te same zdania dla każdego modelu, nazwy, liczby i linki muszą zostać bez zmian), a /sprzęt pokazuje, który model tłumaczy, na czym pracuje (NPU, karta graficzna lub procesor), ile pamięci zajmuje i gdzie pracował ostatnio. Komendy działają tak samo jak w asystencie, a /test jest tylko w asystencie. W górnym pasku karty Tłumacz jest ikona „i” z opisem tłumacza i komend oraz ikona zegara z historią: każda sesja (tłumaczenia razem z wynikami komend) zapisuje się na urządzeniu i można ją otworzyć, usunąć albo zacząć nową.
-Słowa: tłumacz, komendy tłumacza, /tłumacz, /tlumacz, /sprzęt, /sprzet, historia tłumaczeń, sesja, ikona i, zegar, test tłumaczeń
+Tłumacz ma jedną komendę, którą wpisuje się w polu tekstu (z polskimi literami lub bez): /tłumacz uruchamia test tłumaczeń (te same zdania dla każdego modelu, nazwy, liczby i linki muszą zostać bez zmian). Pozostałe komendy i testy (/test, /sprzęt) są tylko w asystencie. W górnym pasku karty Tłumacz jest ikona „i” z opisem tłumacza i komendy oraz ikona zegara z historią: każda sesja (tłumaczenia razem z wynikami komend) zapisuje się na urządzeniu i można ją otworzyć, usunąć albo zacząć nową.
+Słowa: tłumacz, komendy tłumacza, /tłumacz, /tlumacz, historia tłumaczeń, sesja, ikona i, zegar, test tłumaczeń
 Źródło: Dokumentacja aplikacji: Funkcje MT_SW, tłumacz (sprawdzono 2026-11)
 
 ### Jak zgłosić błąd i co to jest test zgodności asystenta?

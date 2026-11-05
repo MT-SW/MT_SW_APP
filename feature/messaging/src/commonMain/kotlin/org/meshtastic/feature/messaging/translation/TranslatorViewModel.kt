@@ -54,8 +54,6 @@ data class TranslatorUiState(
     /** Results of the translation test (the /tłumacz command), one line per sentence; empty when no test was run. */
     val testLines: List<TranslatorTestLine> = emptyList(),
     val testing: Boolean = false,
-    /** True when the lines above are the hardware report (/sprzęt), not the translation test. */
-    val hardwareReport: Boolean = false,
     /** Translations made on this screen since it was opened (or cleared), oldest first; they can be saved as a file. */
     val history: List<TranslatorHistoryEntry> = emptyList(),
 )
@@ -135,19 +133,11 @@ class TranslatorViewModel(
     fun translate() {
         val current = _state.value
         if (current.input.isBlank() || current.busy) return
-        // The same commands as in the assistant (also without Polish letters): /tłumacz runs the translation test and
-        // /sprzęt
-        // reports where the translator's model runs. /test and the other assistant tests stay in the assistant.
-        when (commandOf(current.input)) {
-            TEST_COMMAND -> {
-                runTest()
-                return
-            }
-
-            HARDWARE_COMMAND -> {
-                runHardware()
-                return
-            }
+        // The only command here is /tłumacz (also without Polish letters): it runs the translation test. Every other
+        // command and test stays in the assistant.
+        if (commandOf(current.input) == TEST_COMMAND) {
+            runTest()
+            return
         }
         viewModelScope.launch {
             _state.update { it.copy(busy = true, error = null, output = "") }
@@ -188,46 +178,10 @@ class TranslatorViewModel(
         }
     }
 
-    /**
-     * The command typed in [text] without Polish letters (/tłumacz = /tlumacz), or null when it is none of the
-     * translator's commands.
-     */
+    /** The command typed in [text] without Polish letters (/tłumacz = /tlumacz), or null when it is not /tłumacz. */
     private fun commandOf(text: String): String? {
         val plain = text.trim().lowercase().map { POLISH_TO_PLAIN[it] ?: it }.joinToString("")
-        return plain.takeIf { it == TEST_COMMAND || it == HARDWARE_COMMAND }
-    }
-
-    /**
-     * /sprzęt: where the translator's model runs and what it takes; the report joins the session like a translation
-     * does.
-     */
-    private fun runHardware() {
-        _state.update {
-            it.copy(busy = true, input = "", output = "", error = null, hardwareReport = true, testLines = emptyList())
-        }
-        testJob = viewModelScope.launch {
-            val started = nowMillis
-            try {
-                assistant.selfTest(TRANSLATOR_HARDWARE_COMMAND) { _, report ->
-                    val now = nowMillis
-                    _state.update {
-                        it.copy(
-                            testLines =
-                            listOf(TranslatorTestLine("/sprzęt", report, (now - started).coerceAtLeast(1L))),
-                            history = it.history + TranslatorHistoryEntry("/sprzęt", report, now),
-                        )
-                    }
-                }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                Logger.w(tag = "TranslatorViewModel", throwable = e) { "Hardware report failed: ${e.message}" }
-                _state.update { it.copy(error = TranslatorError.Failed) }
-            } finally {
-                _state.update { it.copy(busy = false) }
-                withContext(NonCancellable) { persist() }
-            }
-        }
+        return plain.takeIf { it == TEST_COMMAND }
     }
 
     /** Saves the session after a translation (the translation itself must not wait for the disk). */
@@ -313,7 +267,6 @@ class TranslatorViewModel(
             it.copy(
                 busy = true,
                 testing = true,
-                hardwareReport = false,
                 testLines = emptyList(),
                 input = "",
                 output = "",
@@ -360,7 +313,6 @@ class TranslatorViewModel(
     companion object {
         const val ONE_PACKET_CHARS = 200
         private const val TEST_COMMAND = "/tlumacz"
-        private const val HARDWARE_COMMAND = "/sprzet"
         private const val SESSION_PREFIX = "tr-"
         private const val TITLE_LENGTH = 48
         private val POLISH_TO_PLAIN =

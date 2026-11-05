@@ -185,14 +185,8 @@ class LlamaAssistantService(
 
     private suspend fun selfTestRun(command: String, onResult: (question: String, answer: String) -> Unit) {
         withContext(Dispatchers.IO) {
-            val translatorHardware = command == TRANSLATOR_HARDWARE_COMMAND
-            val modelId =
-                if (translatorHardware) {
-                    translatorReportModel()
-                } else {
-                    activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
-                }
-            if (translatorHardware || command.equals(AssistantSelfTest.HARDWARE, ignoreCase = true)) {
+            val modelId = activeId(store.states.value, uiPrefs.assistantModelId.value) ?: error("No assistant model")
+            if (command.equals(AssistantSelfTest.HARDWARE, ignoreCase = true)) {
                 // No questions: only says which model runs where (graphics card or processor) and how big it is.
                 val info = AiModels.byId(modelId)
                 val pl = data.polish
@@ -510,21 +504,6 @@ class LlamaAssistantService(
             "${m.groupValues[1]} z ${m.groupValues[2]} warstw na " +
                 if (m.groupValues[3] == "NPU") "NPU" else "karcie graficznej"
         }
-    }
-
-    private fun translatorReportModel(): String {
-        val states = store.states.value
-        val chosen =
-            AiModels.byId(uiPrefs.translatorModelId.value)?.takeIf {
-                it.canDo(AiRole.TRANSLATOR) && states[it.id] == TranslatorModelState.Ready
-            }
-        return chosen?.id
-            ?: AiModels.all
-                .firstOrNull {
-                    it.canDo(AiRole.TRANSLATOR) && it.engineReady && states[it.id] == TranslatorModelState.Ready
-                }
-                ?.id
-            ?: AiModels.G4_E2B
     }
 
     /**
