@@ -179,7 +179,13 @@ class LlamaAssistantService(
         try {
             // Every test starts clean: remembered failed starts (NPU, graphics card) from earlier runs would otherwise
             // make the model skip them and the result would not show what the device can really do.
-            runCatching { store.clearFailedAttempts() }
+            try {
+                store.clearFailedAttempts()
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                // Clearing is a convenience; the test still runs without it.
+            }
             val first = selfTestRun(command, onResult)
             // When the model ran on the NPU and everything went well, the same test runs once more on the graphics
             // card (NPU skipped), so both are measured; the setting goes back to what it was afterwards. After a
@@ -311,11 +317,17 @@ class LlamaAssistantService(
                     "assistant-test-${command.trim('/')}-results.md"
                 }
             val resultName =
-                if (label.isEmpty()) baseName else baseName.substringBeforeLast('.') + "-$label." + baseName.substringAfterLast('.', "md")
+                if (label.isEmpty()) {
+                    baseName
+                } else {
+                    val extension = baseName.substringAfterLast('.', "md")
+                    baseName.substringBeforeLast('.') + "-$label." + extension
+                }
             val file = runCatching { java.io.File(System.getProperty("user.dir").orEmpty(), resultName) }.getOrNull()
             val report =
                 StringBuilder(
-                    "# Assistant test" + (if (label.isEmpty()) "" else " ($label)") +
+                    "# Assistant test" +
+                        (if (label.isEmpty()) "" else " ($label)") +
                         "\n\nModel: $modelId, questions: ${questions.size}\n",
                 )
             var totalSeconds = 0L
