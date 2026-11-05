@@ -26,6 +26,28 @@ import java.util.Properties
 
 val versionInfo = resolveVersionInfo()
 
+// The release name the installer shows: the same `v4(2.8.4).test.1` as the About screen and GitHub, built from the two
+// numbers kept in MtswRelease.kt and the three-part version of the build.
+val mtswReleaseFile =
+    rootProject.layout.projectDirectory.file(
+        "core/model/src/commonMain/kotlin/org/meshtastic/core/model/MtswRelease.kt",
+    )
+val mtswVersionName: String =
+    providers
+        .fileContents(mtswReleaseFile)
+        .asText
+        .map { source ->
+            val release = Regex("""const val RELEASE = (\d+)""").find(source)?.groupValues?.get(1)
+            val test = Regex("""const val TEST = (\d+)""").find(source)?.groupValues?.get(1)?.toInt() ?: 0
+            val base = Regex("""^\d+\.\d+\.\d+""").find(versionInfo.versionName.trim())?.value
+            if (release == null || base == null) {
+                versionInfo.versionName
+            } else {
+                "v$release($base)" + if (test > 0) ".test.$test" else ""
+            }
+        }
+        .get()
+
 plugins {
     alias(libs.plugins.meshtastic.android.application)
     alias(libs.plugins.meshtastic.android.application.flavors)
@@ -82,7 +104,7 @@ configure<ApplicationExtension> {
         applicationId = configProperties.getProperty("APPLICATION_ID")
 
         versionCode = versionInfo.versionCode
-        versionName = versionInfo.versionName
+        versionName = mtswVersionName
         buildConfigField("String", "MIN_FW_VERSION", "\"${versionInfo.minFwVersion}\"")
         buildConfigField("String", "ABS_MIN_FW_VERSION", "\"${versionInfo.absMinFwVersion}\"")
         // Filter library resources to the translated languages, because some libs ship bogus languages that Google
@@ -134,7 +156,9 @@ configure<ApplicationExtension> {
     // with their dynamic version names.
     productFlavors {
         configureEach {
-            versionName = "${defaultConfig.versionName} (${defaultConfig.versionCode}) $name"
+            // The installer and the system settings show the same name as the About screen, without the build number
+            // and the flavor name.
+            versionName = mtswVersionName
             if (name == "fdroid" || name == "google") {
                 proguardFile("proguard-rules-fdroid.pro")
             }
