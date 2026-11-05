@@ -944,7 +944,10 @@ class BleRadioTransport(
         }
     }
 
-    /** One summary line per minute instead of one line per packet, so the log stays small and the real events stay visible. */
+    /**
+     * One summary line per minute instead of one line per packet, so the log stays small and the real events stay
+     * visible.
+     */
     private fun logRxSummary(received: Int, rxBytes: Long) {
         val now = nowMillis
         if (now - lastRxSummaryAt < RX_SUMMARY_INTERVAL_MS) return
@@ -960,7 +963,9 @@ class BleRadioTransport(
     }
 
     @Volatile private var lastRxSummaryAt = 0L
+
     @Volatile private var lastRxSummaryPackets = 0
+
     @Volatile private var lastRxSummaryBytes = 0L
 
     private fun dispatchPacket(packet: ByteArray, expectedSession: BleSession) {
