@@ -75,6 +75,9 @@ sealed interface CompatUi {
 
     data object Asking : CompatUi
 
+    /** The second question: the dictation model is downloaded (when it is not on the device) and tried. */
+    data class AskingDictation(val offer: DictationOffer) : CompatUi
+
     data class Running(val step: CompatStep, val detail: String = "") : CompatUi
 
     data class Done(val files: List<Pair<String, ByteArray>>) : CompatUi
@@ -99,6 +102,7 @@ class AssistantViewModel(
     val saved: StateFlow<List<StoredChat>> = _saved.asStateFlow()
 
     private var job: Job? = null
+    private var compatJob: Job? = null
     private var chatId: String? = null
 
     private val _compat = MutableStateFlow<CompatUi>(CompatUi.Idle)
@@ -119,16 +123,36 @@ class AssistantViewModel(
         _compat.value = CompatUi.Idle
     }
 
+    /** Opens the first window, which describes everything the test does (also from the assistant's info window). */
+    fun requestCompat() {
+        if (_state.value.busy || _compat.value is CompatUi.Running) return
+        _compat.value = CompatUi.Asking
+    }
+
+    /** The first window was confirmed: where the platform has dictation, the second window asks about it. */
+    fun confirmCompatInfo() {
+        val offer = service.dictationOffer
+        if (offer == null) startCompat(withDictation = false) else _compat.value = CompatUi.AskingDictation(offer)
+    }
+
+    /** Stops the running test; the changed settings go back to what they were. */
+    fun cancelCompat() {
+        compatJob?.cancel()
+        stop()
+        _compat.value = CompatUi.Idle
+    }
+
     /**
-     * The test: a very short question, then the hardware report, then the dictation check. The conversation is saved
+     * The test: a longer question, then the hardware report (once more on the graphics card after a clean NPU run), then
+     * the dictation check when it was agreed to. The conversation is saved
      * like any other and all the results are collected into files for the report window.
      */
-    fun startCompat() {
+    fun startCompat(withDictation: Boolean) {
         if (_state.value.busy || _compat.value is CompatUi.Running) return
         uiPrefs.setAiCompatAsked(true)
         startNew()
         _compat.value = CompatUi.Running(CompatStep.QUESTION)
-        viewModelScope.launch {
+        compatJob = viewModelScope.launch {
             val files = mutableListOf<Pair<String, ByteArray>>()
             val skipNpuBefore = uiPrefs.aiSkipNpu.value
             try {
@@ -155,11 +179,13 @@ class AssistantViewModel(
                     files += "asystent-rozmowa-karta-graficzna.txt" to gpu.chat.encodeToByteArray()
                     files += "porownanie-npu-karta-graficzna.txt" to comparison(npu, gpu).encodeToByteArray()
                 }
-                _compat.value = CompatUi.Running(CompatStep.DICTATION)
-                val speech = service.dictationCheck { step ->
-                    _compat.value = CompatUi.Running(CompatStep.DICTATION, step)
+                if (withDictation) {
+                    _compat.value = CompatUi.Running(CompatStep.DICTATION)
+                    val speech = service.dictationCheck { step ->
+                        _compat.value = CompatUi.Running(CompatStep.DICTATION, step)
+                    }
+                    files += "dyktowanie.txt" to speech.encodeToByteArray()
                 }
-                files += "dyktowanie.txt" to speech.encodeToByteArray()
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Throwable) {

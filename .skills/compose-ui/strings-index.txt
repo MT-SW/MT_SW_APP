@@ -736,6 +736,12 @@ compass_title
 compass_uncertainty
 compass_uncertainty_unknown
 ### COMPAT ###
+compat_cancel
+compat_dictation_body_download
+compat_dictation_body_have
+compat_dictation_no
+compat_dictation_title
+compat_dictation_yes
 compat_offer_body
 compat_offer_no
 compat_offer_title
@@ -744,6 +750,7 @@ compat_report_note
 compat_run_again
 compat_running_title
 compat_step_dictation
+compat_step_graphics
 compat_step_hardware
 compat_step_question
 compromised_keys

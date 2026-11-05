@@ -39,6 +39,13 @@ interface AssistantService {
      */
     suspend fun dictationCheck(onStep: (String) -> Unit): String = ""
 
+    /**
+     * The dictation model the compatibility test would use and whether it is on the device already; null where the
+     * platform has no dictation. The test asks for consent to download and try it before it starts.
+     */
+    val dictationOffer: DictationOffer?
+        get() = null
+
     /** Forgets the remembered failed model starts, so a compatibility test shows what the device really can do. */
     suspend fun clearFailedAttempts() {}
 
@@ -66,3 +73,6 @@ interface AssistantService {
      */
     suspend fun selfTest(command: String, onResult: (question: String, answer: String) -> Unit) {}
 }
+
+/** The dictation model of the compatibility test: its [name], its size in MB and whether it is on the device. */
+data class DictationOffer(val name: String, val sizeMb: Int, val onDevice: Boolean)

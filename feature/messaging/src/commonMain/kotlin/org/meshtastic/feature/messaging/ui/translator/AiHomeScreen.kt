@@ -162,7 +162,7 @@ fun AiHomeScreen(
                             TextButton(
                                 onClick = {
                                     showInfo = false
-                                    assistantViewModel.startCompat()
+                                    assistantViewModel.requestCompat()
                                 },
                             ) {
                                 Text(stringResource(Res.string.compat_run_again))

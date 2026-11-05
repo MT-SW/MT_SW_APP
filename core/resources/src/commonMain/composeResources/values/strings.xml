@@ -763,7 +763,13 @@
     <string name="compass_uncertainty">Estimated area: \u00b1%1$s (\u00b1%2$s)</string>
     <string name="compass_uncertainty_unknown">Estimated area: unknown accuracy</string>
     <!-- COMPAT -->
-    <string name="compat_offer_body">Do you agree to test the configuration and help improve compatibility? The assistant asks itself one short question, checks the hardware and dictation (the smallest dictation model is downloaded). Nothing is sent by itself: at the end you see the finished package and decide whether to send it.</string>
+    <string name="compat_cancel">Stop the test</string>
+    <string name="compat_dictation_body_download">The dictation check needs the smallest dictation model: %1$s (%2$d MB). It is not on this device yet, so it will be downloaded (internet and free space are needed) and then tried once. Do you agree to the download and the dictation test?</string>
+    <string name="compat_dictation_body_have">The dictation check uses the model that is already on this device: %1$s (%2$d MB). It will be tried once. Do you agree to the dictation test?</string>
+    <string name="compat_dictation_no">Test without dictation</string>
+    <string name="compat_dictation_title">Dictation</string>
+    <string name="compat_dictation_yes">I agree</string>
+    <string name="compat_offer_body">This is the compatibility test of the assistant. Please read what will happen before you agree.\n\n1. The app clears the remembered failed model starts, so the test shows what this device really can do.\n2. The assistant gets one longer general question that has no ready-made answer, so the model has to think and compose its own words. This shows how fast it works here.\n3. The app asks for a hardware report: the model, the memory it takes and where it runs (NPU, graphics card or processor).\n4. If the model ran on the NPU without errors, the same question and report are repeated on the graphics card (NPU skipped) and the two results are compared. The NPU setting then goes back to what it was.\n5. Dictation is checked. You will be asked about it on the next screen.\n\nWhile the test runs, a window stays on the screen and the only thing you can do is stop the test. It can take several minutes and loads the device heavily. Nothing is sent by itself: at the end you see a ready package and you decide whether to send it.</string>
     <string name="compat_offer_no">No</string>
     <string name="compat_offer_title">Assistant test</string>
     <string name="compat_offer_yes">I agree</string>

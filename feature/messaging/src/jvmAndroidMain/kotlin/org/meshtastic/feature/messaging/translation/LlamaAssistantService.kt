@@ -408,6 +408,14 @@ class LlamaAssistantService(
         }
     }
 
+    override val dictationOffer: DictationOffer?
+        get() {
+            val candidates = AiModels.forRole(AiRole.DICTATION)
+            val ready = candidates.firstOrNull { store.states.value[it.id] == TranslatorModelState.Ready }
+            val model = ready ?: candidates.minByOrNull { it.sizeMb } ?: return null
+            return DictationOffer(model.name, model.sizeMb, onDevice = ready != null)
+        }
+
     override suspend fun clearFailedAttempts() {
         store.clearFailedAttempts()
     }
@@ -419,8 +427,16 @@ class LlamaAssistantService(
     override val backendNow: String
         get() = engine.activeBackend
 
+    // A longer general question with no ready-made answer in the knowledge base, so the model has to compose its own.
     override val compatQuestion: String
-        get() = if (data.polish) "Co to jest zasięg LoRa?" else "What is LoRa range?"
+        get() =
+            if (data.polish) {
+                "Wyjaśnij prostymi słowami, dlaczego niebo w ciągu dnia jest niebieskie, a podczas zachodu słońca " +
+                    "robi się czerwone i pomarańczowe. Odpowiedz w trzech lub czterech zdaniach."
+            } else {
+                "Explain in simple words why the sky is blue during the day and turns red and orange at sunset. " +
+                    "Answer in three or four sentences."
+            }
 
     override suspend fun dictationCheck(onStep: (String) -> Unit): String = withContext(Dispatchers.IO) {
         val pl = data.polish

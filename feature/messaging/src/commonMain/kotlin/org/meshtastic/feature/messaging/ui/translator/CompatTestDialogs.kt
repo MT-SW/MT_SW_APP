@@ -19,6 +19,8 @@ package org.meshtastic.feature.messaging.ui.translator
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
@@ -28,6 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.meshtastic.core.resources.Res
+import org.meshtastic.core.resources.compat_cancel
+import org.meshtastic.core.resources.compat_dictation_body_download
+import org.meshtastic.core.resources.compat_dictation_body_have
+import org.meshtastic.core.resources.compat_dictation_no
+import org.meshtastic.core.resources.compat_dictation_title
+import org.meshtastic.core.resources.compat_dictation_yes
 import org.meshtastic.core.resources.compat_offer_body
 import org.meshtastic.core.resources.compat_offer_no
 import org.meshtastic.core.resources.compat_offer_title
@@ -53,15 +61,52 @@ fun CompatTestDialogs(compat: CompatUi, viewModel: AssistantViewModel) {
             AlertDialog(
                 onDismissRequest = { viewModel.declineCompat() },
                 title = { Text(stringResource(Res.string.compat_offer_title)) },
-                text = { Text(stringResource(Res.string.compat_offer_body)) },
+                // Long text: scrollable, so nothing is cut off on a small screen.
+                text = {
+                    Text(
+                        text = stringResource(Res.string.compat_offer_body),
+                        modifier = Modifier.verticalScroll(rememberScrollState()),
+                    )
+                },
                 confirmButton = {
-                    TextButton(onClick = { viewModel.startCompat() }) {
+                    TextButton(onClick = { viewModel.confirmCompatInfo() }) {
                         Text(stringResource(Res.string.compat_offer_yes))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { viewModel.declineCompat() }) {
                         Text(stringResource(Res.string.compat_offer_no))
+                    }
+                },
+            )
+
+        is CompatUi.AskingDictation ->
+            AlertDialog(
+                onDismissRequest = { viewModel.closeCompat() },
+                title = { Text(stringResource(Res.string.compat_dictation_title)) },
+                text = {
+                    Text(
+                        text =
+                        stringResource(
+                            if (compat.offer.onDevice) {
+                                Res.string.compat_dictation_body_have
+                            } else {
+                                Res.string.compat_dictation_body_download
+                            },
+                            compat.offer.name,
+                            compat.offer.sizeMb,
+                        ),
+                        modifier = Modifier.verticalScroll(rememberScrollState()),
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = { viewModel.startCompat(withDictation = true) }) {
+                        Text(stringResource(Res.string.compat_dictation_yes))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { viewModel.startCompat(withDictation = false) }) {
+                        Text(stringResource(Res.string.compat_dictation_no))
                     }
                 },
             )
@@ -86,7 +131,13 @@ fun CompatTestDialogs(compat: CompatUi, viewModel: AssistantViewModel) {
                         LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                     }
                 },
+                // The window cannot be closed by accident; the only way out is to stop the test.
                 confirmButton = {},
+                dismissButton = {
+                    TextButton(onClick = { viewModel.cancelCompat() }) {
+                        Text(stringResource(Res.string.compat_cancel))
+                    }
+                },
             )
 
         is CompatUi.Done ->
