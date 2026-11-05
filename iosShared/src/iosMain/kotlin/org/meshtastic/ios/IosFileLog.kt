@@ -61,7 +61,7 @@ internal object IosFileLog : LogWriter() {
     private const val PART_NUMBER_WIDTH = 3
     private const val MILLIS = 1000.0
     private const val MILLIS_PER_SECOND = 1000L
-    private const val BYTES_IN_MB = 1024UL * 1024UL
+    private const val BYTES_IN_MB = 1_048_576UL
     private const val CONF_NAME = "logging.conf"
     private const val RECENT_OFF = "recent=off"
 
