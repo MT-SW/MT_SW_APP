@@ -253,6 +253,8 @@ Nie odpowiadamy za informacje, artykuły, filmy, strony ani wypowiedzi osób i p
 
 Zgodność z GPL v3: pełny tekst licencji jest w pliku [LICENSE](LICENSE), a w aplikacji (ekran „O aplikacji” i „Podziękowania”) są informacje o prawach autorskich, brak gwarancji, odnośnik do licencji, lista cudzych projektów z ich licencjami (także silniki llama.cpp i whisper.cpp, ggml oraz model-viewer) i odnośnik do kodu źródłowego. Kod źródłowy każdej wersji jest w tym repozytorium pod odpowiednim znacznikiem lub commitem. Wpłaty (np. Ko-fi) są całkowicie dobrowolne, niczego w aplikacji nie odblokowują i nie warunkują żadnej funkcji; aplikacja zawsze zostaje darmowa.
 
+**Prywatność:** [PRIVACY.md](PRIVACY.md) (PL i EN) opisuje, jakie dane przetwarza aplikacja; nie zbiera statystyk ani raportów o awariach. Informacja o zmodyfikowanej wersji i autorstwie: [NOTICE](NOTICE).
+
 ## Status i zastrzeżenia
 
 - To osobisty, roboczy fork — część zmian jest zweryfikowana buildem i przetestowana na urządzeniu, część czeka na potwierdzenie w terenie.
@@ -522,6 +524,8 @@ The code is open, under the GNU GPL v3 — you may use, modify and redistribute 
 We are not responsible for information, articles, videos, websites or statements made by third parties, including incorrect, outdated or unrelated facts about us. We distance ourselves from websites, structures, groups and persons who write or speak about us without any contact with us and without taking part in our community and network. Reliable information about the project is in our own channels and repositories (GitHub MT-SW, mt-sw.pl). Questions and bug reports: through our channels (local groups, Discord/WhatsApp/Signal, the mesh network).
 
 GPL v3 compliance: the full license text is in the [LICENSE](LICENSE) file, and the app (the "About" and "Acknowledgements" screens) shows the copyright notice, the no-warranty statement, a link to the license, the list of third-party projects with their licenses (including the llama.cpp, whisper.cpp, ggml and model-viewer components) and a link to the source code. The source of every version is in this repository at the matching tag or commit. Donations (for example Ko-fi) are entirely voluntary, unlock nothing in the app and are not a condition of any feature; the app always stays free.
+
+**Privacy:** [PRIVACY.md](PRIVACY.md) (PL and EN) describes what data the app handles; it collects no analytics or crash reports. Modified-version and authorship notice: [NOTICE](NOTICE).
 
 ## Status and caveats
 
