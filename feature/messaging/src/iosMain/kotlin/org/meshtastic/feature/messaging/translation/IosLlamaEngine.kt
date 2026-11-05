@@ -448,6 +448,7 @@ class IosLlamaEngine(
  * [dir], like the engine logs of Android and desktop, so a report package can carry them. The file is trimmed by moving
  * it to `engine.old.log` once it passes [MAX_BYTES].
  */
+@OptIn(ExperimentalForeignApi::class)
 object IosEngineLog {
     /** The folder for the engine log; set once at start-up by the app. */
     var dir: String? = null
@@ -483,6 +484,7 @@ object IosEngineLog {
     }
 }
 
+@OptIn(ExperimentalForeignApi::class)
 private fun onEngineLog(level: ggml_log_level, text: CPointer<ByteVar>?, userData: COpaquePointer?) {
     IosEngineLog.append(level.toInt(), text?.toKString().orEmpty())
 }
