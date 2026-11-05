@@ -508,7 +508,10 @@
     <string name="app_functions_settings">System AI</string>
     <string name="app_functions_settings_summary">Control which functions are available to AI assistants</string>
     <string name="app_functions_write_section">Write functions</string>
+    <string name="app_log_choose_folder">Choose a log folder</string>
     <string name="app_log_folder">Logs are saved on their own in: %1$s</string>
+    <string name="app_log_folder_clear">Stop saving logs to the folder</string>
+    <string name="app_log_folder_none">No folder chosen. You can send the logs with the report button.</string>
     <string name="app_log_level">Collect logs</string>
     <string name="app_log_open_failed">Could not open the log folder.</string>
     <string name="app_log_open_folder">Open log folder</string>

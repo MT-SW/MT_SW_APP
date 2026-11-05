@@ -3633,4 +3633,7 @@
     <string name="compat_tip_8">Na liście traceroute widać, które sprawdzenia zrobiłeś ręcznie, a które wykonały się same.</string>
     <string name="compat_tip_9">Na tablecie i komputerze możesz przeciągnąć podział między listą rozmów a wiadomościami i ustawić szerokość po swojemu.</string>
     <string name="compat_tip_10">W „O aplikacji” w „Źródłach funkcji” są projekty, na których opieramy nasze funkcje, razem z licencjami.</string>
+    <string name="app_log_choose_folder">Wybierz folder na logi</string>
+    <string name="app_log_folder_none">Nie wybrano folderu. Logi możesz wysłać przyciskiem zgłoszenia.</string>
+    <string name="app_log_folder_clear">Nie zapisuj logów w folderze</string>
 </resources>

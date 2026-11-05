@@ -17,8 +17,13 @@
 package org.meshtastic.ios
 
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okio.Buffer
 import okio.ByteString.Companion.toByteString
@@ -30,20 +35,62 @@ import org.meshtastic.core.common.log.AppLogLevel
 import org.meshtastic.core.common.log.ReportFile
 import org.meshtastic.core.common.log.ReportTarget
 import org.meshtastic.core.common.util.Crc32
+import org.meshtastic.core.database.iosDataDir
 import platform.CoreGraphics.CGRectMake
+import platform.Foundation.NSData
+import platform.Foundation.NSNotificationCenter
+import platform.Foundation.NSOperationQueue
+import platform.Foundation.NSProcessInfo
 import platform.Foundation.NSTemporaryDirectory
 import platform.Foundation.NSURL
+import platform.Foundation.URLByResolvingBookmarkData
+import platform.Foundation.dataWithContentsOfFile
+import platform.Foundation.writeToFile
 import platform.UIKit.UIActivityViewController
 import platform.UIKit.UIApplication
+import platform.UIKit.UIApplicationDidBecomeActiveNotification
+import platform.UIKit.UIApplicationDidEnterBackgroundNotification
+import platform.UIKit.UIApplicationDidReceiveMemoryWarningNotification
+import platform.UIKit.UIApplicationWillEnterForegroundNotification
+import platform.UIKit.UIApplicationWillResignActiveNotification
+import platform.UIKit.UIApplicationWillTerminateNotification
+import platform.UIKit.UIDevice
+import platform.UIKit.UIDocumentPickerDelegateProtocol
+import platform.UIKit.UIDocumentPickerViewController
 import platform.UIKit.UIViewController
 import platform.UIKit.UIWindow
 import platform.UIKit.UIWindowScene
+import platform.UniformTypeIdentifiers.UTTypeFolder
+import platform.darwin.NSObject
 
-/** The settings switches and the report package for the iPhone and iPad log ([IosFileLog]). */
+/**
+ * The settings switches, the folder choice and the report package for the iPhone and iPad log ([IosFileLog]). An iPhone
+ * has no Downloads folder for apps, so the person chooses a folder in the Files app; a fresh zip of the logs is then
+ * written there on its own (at start, every few minutes and when the app goes to the background), like the Downloads
+ * folder of Android. The same package can be sent at any time with the report button.
+ */
 internal object IosLogControl : AppLogControl {
     private const val REPORT_DIR = "reports"
     private const val KB = 1024
     private const val VIEW_SIZE = 1.0
+    private const val AUTO_NAME = "mt_sw_logi_najnowsze.zip"
+    private const val AUTO_EXPORT_EVERY_MS = 3 * 60 * 1000L
+    private const val BOOKMARK_FILE = "folder.bookmark"
+    private const val NAME_FILE = "folder.name"
+    private const val LIFECYCLE = "AppLifecycle"
+    private const val SAMPLE_EVERY_MS = 30_000L
+    private const val PERCENT = 100
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val folderName = MutableStateFlow<String?>(null)
+
+    // The picker only keeps a weak reference to its delegate.
+    private var pickerDelegate: FolderPickerDelegate? = null
+
+    private val bookmarkPath: String
+        get() = iosDataDir() + "/logs/" + BOOKMARK_FILE
+    private val namePath: Path
+        get() = (iosDataDir() + "/logs/" + NAME_FILE).toPath()
 
     override val level: StateFlow<AppLogLevel>
         get() = IosFileLog.level
@@ -57,48 +104,156 @@ internal object IosLogControl : AppLogControl {
 
     override fun setRecent(on: Boolean) = IosFileLog.setRecent(on)
 
+    override val canChooseFolder: Boolean = true
+
+    override val chosenFolderName: StateFlow<String?>
+        get() = folderName
+
     override val canMakeReport: Boolean = true
 
     override val sharesFileToApp: Boolean = true
+
+    /** Reads the remembered folder and starts the automatic saving. Called once at start-up. */
+    fun start() {
+        folderName.value =
+            runCatching { FileSystem.SYSTEM.read(namePath) { readUtf8() } }.getOrNull()?.ifBlank { null }
+        scope.launch {
+            while (true) {
+                exportNow()
+                delay(AUTO_EXPORT_EVERY_MS)
+            }
+        }
+        observe(UIApplicationDidEnterBackgroundNotification) {
+            Logger.i(tag = LIFECYCLE) { "App process: ON_STOP (entered the background)" }
+            exportNow()
+        }
+        observe(UIApplicationWillEnterForegroundNotification) {
+            Logger.i(tag = LIFECYCLE) { "App process: ON_START (back in the foreground)" }
+        }
+        observe(UIApplicationDidBecomeActiveNotification) { Logger.i(tag = LIFECYCLE) { "App process: ON_RESUME" } }
+        observe(UIApplicationWillResignActiveNotification) { Logger.i(tag = LIFECYCLE) { "App process: ON_PAUSE" } }
+        observe(UIApplicationDidReceiveMemoryWarningNotification) { Logger.w(tag = LIFECYCLE) { "Memory warning" } }
+        observe(UIApplicationWillTerminateNotification) { Logger.i(tag = LIFECYCLE) { "App will terminate" } }
+        Logger.i(tag = LIFECYCLE) { "App start: ${IosFileLog.header()}; log level ${IosFileLog.level.value.key}" }
+        UIDevice.currentDevice.batteryMonitoringEnabled = true
+        scope.launch {
+            while (true) {
+                delay(SAMPLE_EVERY_MS)
+                val device = UIDevice.currentDevice
+                val info = NSProcessInfo.processInfo
+                Logger.d(tag = LIFECYCLE) {
+                    "Sample: battery ${(device.batteryLevel * PERCENT).toInt()}%, thermal state " +
+                        "${info.thermalState}, low power mode ${info.lowPowerModeEnabled}"
+                }
+            }
+        }
+    }
+
+    private fun observe(name: String?, block: () -> Unit) {
+        NSNotificationCenter.defaultCenter.addObserverForName(
+            name = name,
+            `object` = null,
+            queue = NSOperationQueue.mainQueue,
+        ) { _ ->
+            block()
+        }
+    }
+
+    override fun chooseFolder() {
+        val top = topViewController() ?: return
+        val delegate = FolderPickerDelegate { url -> remember(url) }
+        pickerDelegate = delegate
+        val picker = UIDocumentPickerViewController(forOpeningContentTypes = listOf(UTTypeFolder))
+        picker.delegate = delegate
+        top.presentViewController(picker, animated = true, completion = null)
+    }
+
+    override fun clearChosenFolder() {
+        runCatching {
+            FileSystem.SYSTEM.delete(bookmarkPath.toPath())
+            FileSystem.SYSTEM.delete(namePath)
+        }
+        folderName.value = null
+    }
+
+    /** Keeps the picked folder for later runs (a bookmark keeps the access) and writes the first zip into it. */
+    private fun remember(url: NSURL?) {
+        if (url == null) return
+        val opened = url.startAccessingSecurityScopedResource()
+        try {
+            val data =
+                url.bookmarkDataWithOptions(0uL, includingResourceValuesForKeys = null, relativeToURL = null, error = null)
+            if (data == null || !data.writeToFile(bookmarkPath, atomically = true)) return
+            val name = url.lastPathComponent ?: "?"
+            FileSystem.SYSTEM.write(namePath) { writeUtf8(name) }
+            folderName.value = name
+        } finally {
+            if (opened) url.stopAccessingSecurityScopedResource()
+        }
+        exportNow()
+    }
+
+    /** Writes a fresh zip of the logs of the last 24 hours into the chosen folder; does nothing without one. */
+    fun exportNow() {
+        runCatching {
+            val data = NSData.dataWithContentsOfFile(bookmarkPath) ?: return
+            val url = NSURL.URLByResolvingBookmarkData(data, 0uL, null, null, null) ?: return
+            val opened = url.startAccessingSecurityScopedResource()
+            try {
+                val folder = url.path ?: return
+                val target = folder.toPath() / AUTO_NAME
+                val bytes = zip(reportEntries("", true, emptyList()))
+                FileSystem.SYSTEM.write(target) { write(bytes) }
+            } finally {
+                if (opened) url.stopAccessingSecurityScopedResource()
+            }
+        }
+            .onFailure { Logger.w(it, tag = "Log") { "Saving the logs to the chosen folder failed" } }
+    }
+
+    private fun reportEntries(
+        note: String,
+        withLogs: Boolean,
+        extras: List<Pair<String, ByteArray>>,
+    ): List<Pair<String, ByteArray>> {
+        val now = IosFileLog.nowMillis()
+        val since = if (withLogs) now - IosFileLog.RECENT_WINDOW_MS else Long.MAX_VALUE
+        val files = (IosFileLog.parts() + IosFileLog.crashFiles()).filter { IosFileLog.modified(it) >= since }
+        val toc = StringBuilder("MT_SW log package, made ${IosFileLog.stamp()}\n${IosFileLog.header()}\n")
+        if (withLogs) toc.append("Only what was written in the last 24 hours\n")
+        val all = listOf("opis_zgloszenia.txt" to note.encodeToByteArray()) + extras
+        for ((name, bytes) in all) toc.append("$name: ${bytes.size / KB} KB\n")
+        val logs = files.map { f -> (if (f.parent?.name == "crash") "crash/" else "") + f.name to read(f) }
+        for ((name, bytes) in logs) {
+            val lines = bytes.decodeToString().lines()
+            val errors = lines.count { " E/" in it }
+            val warnings = lines.count { " W/" in it }
+            toc.append("$name: ${bytes.size / KB} KB, $errors errors, $warnings warnings\n")
+        }
+        return listOf("spis_tresci.txt" to toc.toString().encodeToByteArray()) + all + logs
+    }
 
     override suspend fun buildReport(
         note: String,
         withLogs: Boolean,
         extras: List<Pair<String, ByteArray>>,
-    ): ReportFile? =
-        withContext(Dispatchers.Default) {
-            runCatching {
-                val now = IosFileLog.nowMillis()
-                val folder = (NSTemporaryDirectory().trimEnd('/') + "/" + REPORT_DIR).toPath()
-                FileSystem.SYSTEM.createDirectories(folder)
-                FileSystem.SYSTEM.list(folder)
-                    .filter { IosFileLog.modified(it) < now - IosFileLog.RECENT_WINDOW_MS }
-                    .forEach { runCatching { FileSystem.SYSTEM.delete(it) } }
-                val since = if (withLogs) now - IosFileLog.RECENT_WINDOW_MS else Long.MAX_VALUE
-                val files = (IosFileLog.parts() + IosFileLog.crashFiles()).filter { IosFileLog.modified(it) >= since }
-                val entries = mutableListOf<Pair<String, ByteArray>>()
-                val toc = StringBuilder("MT_SW log package, made ${IosFileLog.stamp()}\n${IosFileLog.header()}\n")
-                if (withLogs) toc.append("Only what was written in the last 24 hours\n")
-                val all = listOf("opis_zgloszenia.txt" to note.encodeToByteArray()) + extras
-                for ((name, bytes) in all) toc.append("$name: ${bytes.size / KB} KB\n")
-                val logs = files.map { f -> (if (f.parent?.name == "crash") "crash/" else "") + f.name to read(f) }
-                for ((name, bytes) in logs) {
-                    val text = bytes.decodeToString()
-                    val errors = text.lines().count { " E/" in it }
-                    val warnings = text.lines().count { " W/" in it }
-                    toc.append("$name: ${bytes.size / KB} KB, $errors errors, $warnings warnings\n")
-                }
-                entries += "spis_tresci.txt" to toc.toString().encodeToByteArray()
-                entries += all
-                entries += logs
-                val name = "mt_sw_zgloszenie_" + IosFileLog.stamp().replace(Regex("[^0-9]"), "") + ".zip"
-                val file = folder / name
-                FileSystem.SYSTEM.write(file) { write(zip(entries)) }
-                ReportFile(file.toString(), name, IosFileLog.size(file) / KB)
-            }
-                .onFailure { Logger.w(it, tag = "Log") { "Report could not be built" } }
-                .getOrNull()
+    ): ReportFile? = withContext(Dispatchers.Default) {
+        runCatching {
+            val now = IosFileLog.nowMillis()
+            val folder = (NSTemporaryDirectory().trimEnd('/') + "/" + REPORT_DIR).toPath()
+            FileSystem.SYSTEM.createDirectories(folder)
+            FileSystem.SYSTEM.list(folder)
+                .filter { IosFileLog.modified(it) < now - IosFileLog.RECENT_WINDOW_MS }
+                .forEach { runCatching { FileSystem.SYSTEM.delete(it) } }
+            val name = "mt_sw_zgloszenie_" + IosFileLog.stamp().replace(Regex("[^0-9]"), "") + ".zip"
+            val file = folder / name
+            val bytes = zip(reportEntries(note, withLogs, extras))
+            FileSystem.SYSTEM.write(file) { write(bytes) }
+            ReportFile(file.toString(), name, IosFileLog.size(file) / KB)
         }
+            .onFailure { Logger.w(it, tag = "Log") { "Report could not be built" } }
+            .getOrNull()
+    }
 
     override fun shareReport(report: ReportFile, target: ReportTarget, text: String): Boolean {
         val top = topViewController() ?: return false
@@ -127,6 +282,18 @@ internal object IosLogControl : AppLogControl {
         var top = window?.rootViewController
         while (top?.presentedViewController != null) top = top.presentedViewController
         return top
+    }
+
+    private class FolderPickerDelegate(private val onPicked: (NSURL?) -> Unit) :
+        NSObject(),
+        UIDocumentPickerDelegateProtocol {
+        override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentsAtURLs: List<*>) {
+            onPicked(didPickDocumentsAtURLs.firstOrNull() as? NSURL)
+        }
+
+        override fun documentPickerWasCancelled(controller: UIDocumentPickerViewController) {
+            onPicked(null)
+        }
     }
 
     /** A zip without compression: enough for text logs, and no library is needed. */

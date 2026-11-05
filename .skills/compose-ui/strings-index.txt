@@ -487,7 +487,10 @@ app_functions_send_message
 app_functions_settings
 app_functions_settings_summary
 app_functions_write_section
+app_log_choose_folder
 app_log_folder
+app_log_folder_clear
+app_log_folder_none
 app_log_level
 app_log_open_failed
 app_log_open_folder

@@ -62,6 +62,7 @@ import kotlin.time.Duration.Companion.minutes
 private val koin: Koin by lazy {
     IosFileLog.install()
     AppLogControls.current = IosLogControl
+    IosLogControl.start()
     startKoin<IosKoinApp> {}.koin
 }
 
