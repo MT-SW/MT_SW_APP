@@ -140,6 +140,7 @@ class ProfileRoundTripTest {
                 installProfileUseCase = installProfileUseCase,
                 radioConfigUseCase = radioConfigUseCase,
                 adminActionsUseCase = adminActionsUseCase,
+                snifferControlUseCase = mock(MockMode.autofill),
                 processRadioResponseUseCase = processRadioResponseUseCase,
                 locationService = locationService,
                 fileService = fileService,

@@ -31,6 +31,8 @@ import kotlinx.coroutines.test.setMain
 import org.meshtastic.core.domain.usecase.settings.CleanNodeDatabaseUseCase
 import org.meshtastic.core.model.Node
 import org.meshtastic.core.ui.util.AlertManager
+import org.meshtastic.core.repository.MeshWorkerManager
+import org.meshtastic.core.testing.FakeUiPrefs
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -41,6 +43,7 @@ class CleanNodeDatabaseViewModelTest {
 
     private val cleanNodeDatabaseUseCase: CleanNodeDatabaseUseCase = mock(MockMode.autofill)
     private val alertManager: AlertManager = mock(MockMode.autofill)
+    private val meshWorkerManager: MeshWorkerManager = mock(MockMode.autofill)
     private val testDispatcher = UnconfinedTestDispatcher()
 
     private lateinit var viewModel: CleanNodeDatabaseViewModel
@@ -48,7 +51,7 @@ class CleanNodeDatabaseViewModelTest {
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = CleanNodeDatabaseViewModel(cleanNodeDatabaseUseCase, alertManager)
+        viewModel = CleanNodeDatabaseViewModel(cleanNodeDatabaseUseCase, alertManager, FakeUiPrefs(), meshWorkerManager)
     }
 
     @AfterTest

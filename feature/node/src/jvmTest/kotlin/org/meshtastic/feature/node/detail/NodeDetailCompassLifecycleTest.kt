@@ -63,6 +63,7 @@ import org.meshtastic.core.resources.compass_title
 import org.meshtastic.core.resources.getString
 import org.meshtastic.core.resources.open_compass
 import org.meshtastic.core.testing.FakeRadioConfigRepository
+import org.meshtastic.core.testing.FakeRadioController
 import org.meshtastic.core.ui.util.SnackbarManager
 import org.meshtastic.feature.node.compass.CompassHeadingProvider
 import org.meshtastic.feature.node.compass.CompassViewModel
@@ -185,6 +186,7 @@ class NodeDetailCompassLifecycleTest {
             nodeManagementActions = mock<NodeManagementActions>(),
             nodeRequestActions = mock<NodeRequestActions>(),
             queryController = mock<QueryController>(),
+            radioController = FakeRadioController(),
             getNodeDetailsUseCase = getNodeDetailsUseCase,
             packetRepository = packetRepository,
             ensureRemoteAdminSession = mock<EnsureRemoteAdminSessionUseCase>(),

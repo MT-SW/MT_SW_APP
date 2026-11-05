@@ -255,7 +255,7 @@ class LocalStatsWidgetContentTest {
         WidgetSizes.EXTRA_BIG,
         createMockWidgetState().copy(heapFreeBytes = 130_172, heapTotalBytes = 200_000),
     ) {
-        onNode(hasText("69828 / 200000", substring = true)).assertExists()
+        onNode(hasText("69828 / 200000")).assertExists()
     }
 
     @Test

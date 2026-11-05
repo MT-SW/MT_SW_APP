@@ -35,7 +35,7 @@ class PngTest {
         var p = 8
         while (p < b.size) {
             val len = u32(b, p)
-            val type = String(CharArray(4) { (b[p + 4 + it].toInt() and 255).toChar() })
+            val type = CharArray(4) { (b[p + 4 + it].toInt() and 255).toChar() }.concatToString()
             assertEquals(PlannerPng.crc32(b, p + 4, 4 + len), u32(b, p + 8 + len), "CRC of $type")
             out.add(Chunk(type, p + 8, len))
             p += 12 + len

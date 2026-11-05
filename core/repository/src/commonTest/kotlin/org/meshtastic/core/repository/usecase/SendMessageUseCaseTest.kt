@@ -229,7 +229,7 @@ class SendMessageUseCaseTest {
     }
 
     @Test
-    fun `invoke with direct message to older firmware does not favorite the node, disabled in the fork`() = runTest {
+    fun `invoke with direct message to older firmware does not favorite the node disabled in the fork`() = runTest {
         // Arrange
         val ourNode =
             Node(
@@ -258,7 +258,7 @@ class SendMessageUseCaseTest {
     }
 
     @Test
-    fun `invoke with direct message to new firmware does not share the contact, disabled in the fork`() = runTest {
+    fun `invoke with direct message to new firmware does not share the contact disabled in the fork`() = runTest {
         // Arrange
         val ourNode =
             Node(
@@ -303,7 +303,7 @@ class SendMessageUseCaseTest {
     }
 
     @Test
-    fun `invoke with PKI DM does not share the contact, disabled in the fork`() = runTest {
+    fun `invoke with PKI DM does not share the contact disabled in the fork`() = runTest {
         // Arrange: PKI DMs use contactKey = "8!nodeHex" (PKC_CHANNEL_INDEX = 8)
         val ourNode =
             Node(
